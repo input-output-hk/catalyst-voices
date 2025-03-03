@@ -40,10 +40,6 @@ const GITHUB_ISSUE_TEMPLATE_DEFAULT: &str = "bug_report.yml";
 /// Default `CLIENT_ID_KEY` used in development.
 const CLIENT_ID_KEY_DEFAULT: &str = "3db5301e-40f2-47ed-ab11-55b37674631a";
 
-/// Default `API_HOST_NAME/S` used in dev. This can be a single hostname, or a
-/// list of them.
-const API_HOST_NAMES_DEFAULT: &str = "https://gateway.dev.projectcatalyst.io";
-
 /// Default `API_URL_PREFIX` used in development.
 const API_URL_PREFIX_DEFAULT: &str = "/api";
 
@@ -117,7 +113,7 @@ struct EnvVars {
     client_id_key: StringEnvVar,
 
     /// A List of servers to provide
-    api_host_names: StringEnvVar,
+    api_host_names: Option<StringEnvVar>,
 
     /// The base path the API is served at.
     api_url_prefix: StringEnvVar,
@@ -197,7 +193,7 @@ static ENV_VARS: LazyLock<EnvVars> = LazyLock::new(|| {
         server_name: StringEnvVar::new_optional("SERVER_NAME", false),
         service_id: StringEnvVar::new("SERVICE_ID", calculate_service_uuid().into()),
         client_id_key: StringEnvVar::new("CLIENT_ID_KEY", CLIENT_ID_KEY_DEFAULT.into()),
-        api_host_names: StringEnvVar::new("API_HOST_NAMES", API_HOST_NAMES_DEFAULT.into()),
+        api_host_names: StringEnvVar::new_optional("API_HOST_NAMES", false),
         api_url_prefix: StringEnvVar::new("API_URL_PREFIX", API_URL_PREFIX_DEFAULT.into()),
         event_db_url: StringEnvVar::new("EVENT_DB_URL", EVENT_DB_URL_DEFAULT.into()),
         event_db_username: StringEnvVar::new_optional("EVENT_DB_USERNAME", false),
@@ -345,9 +341,15 @@ impl Settings {
     /// a lits of strings.
     ///
     /// Host names are taken from the `API_HOST_NAMES` environment variable.
-    /// If that is not set, `addr` is used.
+    /// If that is not set, returns an empty list.
     pub(crate) fn api_host_names() -> Vec<String> {
-        string_to_api_host_names(&ENV_VARS.address, ENV_VARS.api_host_names.as_str())
+        string_to_api_host_names(
+            ENV_VARS
+                .api_host_names
+                .as_ref()
+                .map(StringEnvVar::as_str)
+                .unwrap_or_default(),
+        )
     }
 
     /// The socket address we are bound to.
@@ -424,8 +426,7 @@ impl Settings {
 }
 
 /// Transform a string list of host names into a vec of host names.
-/// Default to the service address if none specified.
-fn string_to_api_host_names(addr: &SocketAddr, hosts: &str) -> Vec<String> {
+fn string_to_api_host_names(hosts: &str) -> Vec<String> {
     /// Log an invalid hostname.
     fn invalid_hostname(hostname: &str) -> String {
         error!("Invalid host name for API: {}", hostname);
@@ -471,21 +472,7 @@ fn string_to_api_host_names(addr: &SocketAddr, hosts: &str) -> Vec<String> {
         .filter(|s| !s.is_empty())
         .collect();
 
-    // If there are no host names, just use the address of the service.
-    if configured_hosts.is_empty() {
-        // If the Socket Address is the "catchall" address, then use localhost.
-        if match addr.ip() {
-            IpAddr::V4(ipv4) => ipv4.is_unspecified(),
-            IpAddr::V6(ipv6) => ipv6.is_unspecified(),
-        } {
-            let port = addr.port();
-            vec![format! {"http://localhost:{port}"}]
-        } else {
-            vec![format! {"http://{addr}"}]
-        }
-    } else {
-        configured_hosts
-    }
+    configured_hosts
 }
 
 #[cfg(test)]
@@ -512,7 +499,6 @@ mod tests {
     #[test]
     fn configured_hosts_set_multiple() {
         let configured_hosts = string_to_api_host_names(
-            &SocketAddr::from(([127, 0, 0, 1], 8080)),
             "http://api.prod.projectcatalyst.io , https://api.dev.projectcatalyst.io:1234",
         );
         assert_eq!(configured_hosts, vec![
@@ -523,10 +509,8 @@ mod tests {
 
     #[test]
     fn configured_hosts_set_multiple_one_invalid() {
-        let configured_hosts = string_to_api_host_names(
-            &SocketAddr::from(([127, 0, 0, 1], 8080)),
-            "not a hostname , https://api.dev.projectcatalyst.io:1234",
-        );
+        let configured_hosts =
+            string_to_api_host_names("not a hostname , https://api.dev.projectcatalyst.io:1234");
         assert_eq!(configured_hosts, vec![
             "https://api.dev.projectcatalyst.io:1234"
         ]);
@@ -534,16 +518,8 @@ mod tests {
 
     #[test]
     fn configured_hosts_set_empty() {
-        let configured_hosts =
-            string_to_api_host_names(&SocketAddr::from(([127, 0, 0, 1], 8080)), "");
-        assert_eq!(configured_hosts, vec!["http://127.0.0.1:8080"]);
-    }
-
-    #[test]
-    fn configured_hosts_set_empty_undefined_address() {
-        let configured_hosts =
-            string_to_api_host_names(&SocketAddr::from(([0, 0, 0, 0], 7654)), "");
-        assert_eq!(configured_hosts, vec!["http://localhost:7654"]);
+        let configured_hosts = string_to_api_host_names("");
+        assert!(configured_hosts.is_empty());
     }
 
     #[test]

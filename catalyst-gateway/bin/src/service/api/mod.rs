@@ -69,15 +69,23 @@ pub(crate) fn mk_api() -> OpenApiService<(HealthApi, CardanoApi, ConfigApi, Docu
 
     let hosts = Settings::api_host_names();
 
-    for host in hosts {
-        service = service.server(ServerObject::new(host).description("Server host location."));
+    if hosts.is_empty() {
+        service = set_localhost_addresses(service);
+    } else {
+        for host in &hosts {
+            service = service.server(ServerObject::new(host).description("Server host location."));
+        }
     }
 
     // Add server name if it is set
     if let Some(name) = Settings::server_name() {
         service = service.server(ServerObject::new(name).description("Server at server name."));
     }
+    service
+}
 
+/// Set the localhost addresses descriptions.
+fn set_localhost_addresses<T>(mut service: OpenApiService<T, ()>) -> OpenApiService<T, ()> {
     let port = Settings::bound_address().port();
 
     // Get localhost name
