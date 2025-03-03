@@ -107,12 +107,6 @@ class _DocumentPropertyValueBuilder extends StatelessWidget {
           title: schema.title,
           value: Text(months != null ? context.l10n.valueMonths(months) : '-'),
         );
-      case DocumentGenericIntegerSchema():
-      case DocumentGenericNumberSchema():
-        return _DocumentPropertyValue(
-          title: '${schema.title}[${schema.runtimeType}]',
-          value: const Text('___________'),
-        );
       case DocumentSingleLineHttpsUrlEntrySchema():
         final link = schema.castValue(value);
 
@@ -137,13 +131,9 @@ class _DocumentPropertyValueBuilder extends StatelessWidget {
           value: MarkdownText(data),
           isMultiline: true,
         );
-      case DocumentDropDownSingleSelectSchema():
       case DocumentTagGroupSchema():
       case DocumentTagSelectionSchema():
-        return _DocumentPropertyValue(
-          title: '${schema.title}[${schema.runtimeType}]',
-          value: const Text('___________'),
-        );
+        return const Text('------- NOT IMPLEMENTED -------');
       case DocumentLanguageCodeSchema():
         final code = schema.castValue(value);
         final localeNames = LocaleNames.of(context);
@@ -153,6 +143,9 @@ class _DocumentPropertyValueBuilder extends StatelessWidget {
           title: schema.title,
           value: Text(name ?? '-'),
         );
+      case DocumentDropDownSingleSelectSchema():
+      case DocumentGenericIntegerSchema():
+      case DocumentGenericNumberSchema():
       case DocumentSingleLineTextEntrySchema():
       case DocumentRadioButtonSelect():
       case DocumentGenericStringSchema():
