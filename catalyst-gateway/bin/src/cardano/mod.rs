@@ -404,6 +404,8 @@ impl SyncTask {
 
         self.start_immutable_followers();
 
+        self.dispatch_event(event::ChainIndexerEvent::SyncStarted);
+
         // Wait Sync tasks to complete.  If they fail and have not completed, reschedule them.
         // If an immutable sync task ends OK, and we still have immutable data to sync then
         // start a new task.
@@ -450,6 +452,13 @@ impl SyncTask {
                                 info!(chain=%self.cfg.chain, report=%finished,
                                     "The Immutable follower completed successfully.");
 
+                                finished.last_indexed_block.as_ref().inspect(|block| {
+                                    self.dispatch_event(
+                                        event::ChainIndexerEvent::IndexedSlotProgressed {
+                                            slot: block.slot_or_default(),
+                                        },
+                                    );
+                                });
                                 self.dispatch_event(event::ChainIndexerEvent::SyncTasksChanged {
                                     current_sync_tasks: self.current_sync_tasks,
                                 });
@@ -485,6 +494,8 @@ impl SyncTask {
             // between the live chain and immutable chain.  This gap should be
             // a parameter.
             if self.sync_tasks.len() == 1 {
+                self.dispatch_event(event::ChainIndexerEvent::SyncCompleted);
+
                 if let Err(error) = roll_forward::purge_live_index(self.immutable_tip_slot).await {
                     error!(chain=%self.cfg.chain, error=%error, "BUG: Purging volatile data task failed.");
                 } else {
@@ -607,27 +618,32 @@ pub(crate) async fn start_followers() -> anyhow::Result<()> {
         let mut sync_task = SyncTask::new(cfg);
 
         sync_task.add_event_listener(|event: &Event| {
+            if let Event::SyncStarted = event {
+                reporter::REACHED_TIP.with_label_values(&[]).set(0);
+            }
+            if let Event::SyncCompleted = event {
+                reporter::REACHED_TIP.with_label_values(&[]).set(1);
+            }
             if let Event::SyncTasksChanged { current_sync_tasks } = event {
                 reporter::RUNNING_INDEXER_TASKS_COUNT
                     .with_label_values(&[])
                     .set(i64::try_from(*current_sync_tasks).unwrap_or(-1));
             }
-        });
-        sync_task.add_event_listener(|event: &Event| {
             if let Event::LiveTipSlotChanged { slot } = event {
                 reporter::CURRENT_LIVE_TIP_SLOT
                     .with_label_values(&[])
                     .set(i64::try_from(u64::from(*slot)).unwrap_or(-1));
             }
-        });
-        sync_task.add_event_listener(|event: &Event| {
             if let Event::ImmutableTipSlotChanged { slot } = event {
                 reporter::CURRENT_IMMUTABLE_TIP_SLOT
                     .with_label_values(&[])
                     .set(i64::try_from(u64::from(*slot)).unwrap_or(-1));
             }
-        });
-        sync_task.add_event_listener(|event: &Event| {
+            if let Event::IndexedSlotProgressed { slot } = event {
+                reporter::RUNNING_INDEXER_TASKS_COUNT
+                    .with_label_values(&[])
+                    .set(i64::try_from(u64::from(*slot)).unwrap_or(-1));
+            }
             if let Event::LiveDataPurged { count } = event {
                 reporter::TRIGGERED_DATA_PURGES_COUNT
                     .with_label_values(&[])

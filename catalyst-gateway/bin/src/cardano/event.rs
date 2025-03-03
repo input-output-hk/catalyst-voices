@@ -2,10 +2,12 @@ use cardano_blockchain_types::Slot;
 
 #[derive(Debug, Clone)]
 pub(crate) enum ChainIndexerEvent {
+    SyncStarted,
+    SyncCompleted,
     SyncTasksChanged { current_sync_tasks: u16 },
     LiveTipSlotChanged { slot: Slot },
     ImmutableTipSlotChanged { slot: Slot },
-    IndexedSlotChanged { slot: Slot },
+    IndexedSlotProgressed { slot: Slot },
     LiveDataPurged { count: u64 },
 }
 
