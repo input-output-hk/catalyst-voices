@@ -13,7 +13,7 @@ use oid_registry::{Oid, OID_SIG_ED25519};
 use poem::{error::ResponseError, http::StatusCode, IntoResponse, Request};
 use poem_openapi::{auth::Bearer, payload::Json, SecurityScheme};
 use rbac_registration::{
-    cardano::cip509::{Cip509, LocalRefInt},
+    cardano::cip509::{Cip509, LocalRefInt, RoleNumber},
     registration::cardano::RegistrationChain,
 };
 use tracing::{error, warn};
@@ -230,11 +230,11 @@ async fn last_signing_key(
         .context("Failed to build registration chain")?;
     let key_ref = chain
         .role_data()
-        .iter()
-        // TODO: FIXME: Use BTreeMap to be able to search from the last role.
-        //.rev()
-        .find_map(|(_, (_, r))| r.signing_key())
-        .context("Unable to find signing key")?;
+        .get(&RoleNumber::ROLE_0)
+        .context("Missing role 0 data")?
+        .1
+        .signing_key()
+        .context("Missing signing key")?;
     let key_offset = usize::try_from(key_ref.key_offset).context("Invalid signing key offset")?;
     match key_ref.local_ref {
         LocalRefInt::X509Certs => {
