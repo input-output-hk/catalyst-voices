@@ -1749,5 +1749,36 @@
   "browseMyProposals": "Browse all my proposals",
   "@browseMyProposals": {
     "description": "Title for tile in workspace space page to go to proposals page"
+  },
+  "notPublishedProposals": "Not published proposals",
+  "@notPublishedProposals": {
+    "description": "Title for section to show not published proposals"
+  },
+  "newIterationTitle": "Iteration {iteration} · Not published - {datetime} - {title}",
+  "@newIterationTitle": {
+    "description": "Title for new iteration card",
+    "placeholders": {
+      "iteration": {
+        "type": "int"
+      },
+      "datetime": {
+        "type": "String"
+      },
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "noPublishedProposalsOnMaxCount": "Published Proposals ({current}/{max})",
+  "@noPublishedProposalsOnMaxCount": {
+    "description": "Title for section to show number of published proposals out of max proposals",
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
   }
 }
