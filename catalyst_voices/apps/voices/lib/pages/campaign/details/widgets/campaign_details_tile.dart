@@ -25,7 +25,10 @@ class CampaignDetailsTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return VoicesExpansionTile(
       initiallyExpanded: true,
-      title: Text(context.l10n.campaignDetails),
+      title: Text(
+        key: const Key('CampaignDetailsTitleLabel'),
+        context.l10n.campaignDetails,
+      ),
       children: [
         _Body(
           description: description,
@@ -60,6 +63,7 @@ class _Body extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Text(
+          key: const Key('DescriptionTileKey'),
           context.l10n.description,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
@@ -70,6 +74,7 @@ class _Body extends StatelessWidget {
         ),
         const SizedBox(height: 14),
         Text(
+          key: const Key('DescriptionTextKey'),
           description,
           style: textTheme.bodyLarge?.copyWith(
             color: colors.textOnPrimaryLevel1,
@@ -167,12 +172,14 @@ class _CampaignDataTile extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Text(
+          key: const Key('Title'),
           title,
           style: textTheme.titleSmall?.copyWith(
             color: colors.textOnPrimaryLevel1,
           ),
         ),
         Text(
+          key: const Key('Subtitle'),
           subtitle,
           style: textTheme.bodySmall?.copyWith(
             // TODO(damian-molinski): This color does not have property.
@@ -188,6 +195,7 @@ class _CampaignDataTile extends StatelessWidget {
               : CrossAxisAlignment.end,
           children: [
             Text(
+              key: const Key('Value'),
               '$value',
               style: textTheme.headlineLarge?.copyWith(
                 color: colors.textOnPrimaryLevel1,
@@ -196,6 +204,7 @@ class _CampaignDataTile extends StatelessWidget {
             if (valueSuffix != null) ...[
               const SizedBox(width: 4),
               Text(
+                key: const Key('Suffix'),
                 valueSuffix!,
                 style: textTheme.titleMedium?.copyWith(
                   color: colors.textOnPrimaryLevel1,
