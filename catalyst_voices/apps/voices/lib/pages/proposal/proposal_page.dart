@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:catalyst_voices/pages/proposal/proposal_back_button.dart';
 import 'package:catalyst_voices/pages/proposal/proposal_content.dart';
+import 'package:catalyst_voices/pages/proposal/proposal_header.dart';
 import 'package:catalyst_voices/pages/proposal/proposal_navigation_panel.dart';
 import 'package:catalyst_voices/routes/routes.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
@@ -42,6 +43,7 @@ class _ProposalPageState extends State<ProposalPage> {
         body: Column(
           children: [
             const ProposalBackButton(),
+            const ProposalHeader(),
             Expanded(
               child: SpaceScaffold(
                 left: const ProposalNavigationPanel(),
