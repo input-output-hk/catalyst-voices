@@ -36,14 +36,19 @@ abstract interface class DocumentRepository {
     SignedDocumentRef? of,
   });
 
-  /// Encodes the [document] to exportable format.
+  /// Deletes a proposal draft from the local storage.
+  Future<void> deleteDocumentDraft({
+    required DraftRef ref,
+  });
+
+  /// Encodes the [content] to exportable format.
   ///
   /// It does not save the document anywhere on the disk,
   /// it only encodes a document as [Uint8List]
   /// so that it can be saved as a file.
   Future<Uint8List> encodeDocumentForExport({
     required DocumentDataMetadata metadata,
-    required Document document,
+    required DocumentDataContent content,
   });
 
   /// Returns matching [ProposalDocument] for matching [ref].
@@ -73,7 +78,7 @@ abstract interface class DocumentRepository {
   ///
   /// If watching same draft with [watchProposalDocument] it will emit
   /// change.
-  Future<void> updateProposalDraftContent({
+  Future<void> updateDocumentDraft({
     required DraftRef ref,
     required DocumentDataContent content,
   });
@@ -127,13 +132,18 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   }
 
   @override
+  Future<void> deleteDocumentDraft({required DraftRef ref}) {
+    return _drafts.delete(ref: ref);
+  }
+
+  @override
   Future<Uint8List> encodeDocumentForExport({
     required DocumentDataMetadata metadata,
-    required Document document,
+    required DocumentDataContent content,
   }) async {
     final documentDataDto = DocumentDataDto(
       metadata: DocumentDataMetadataDto.fromModel(metadata),
-      content: DocumentDto.fromModel(document).toJson(),
+      content: DocumentDataContentDto.fromModel(content),
     );
 
     final jsonData = documentDataDto.toJson();
@@ -200,11 +210,14 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   }
 
   @override
-  Future<void> updateProposalDraftContent({
+  Future<void> updateDocumentDraft({
     required DraftRef ref,
     required DocumentDataContent content,
   }) async {
-    await _drafts.update(ref: ref, content: content);
+    await _drafts.update(
+      ref: ref,
+      content: content,
+    );
   }
 
   @visibleForTesting
@@ -273,8 +286,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     final template = _buildProposalTemplate(documentData: templateData);
 
     final metadata = ProposalMetadata(
-      id: documentData.metadata.id,
-      version: documentData.metadata.version,
+      selfRef: documentData.metadata.selfRef,
     );
 
     final content = DocumentDataContentDto.fromModel(
@@ -298,8 +310,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     );
 
     final metadata = ProposalTemplateMetadata(
-      id: documentData.metadata.id,
-      version: documentData.metadata.version,
+      selfRef: documentData.metadata.selfRef,
     );
 
     final contentData = documentData.content.data;

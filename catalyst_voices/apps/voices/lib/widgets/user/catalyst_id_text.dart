@@ -32,33 +32,6 @@ class _CatalystIdTextState extends State<CatalystIdText> {
   Timer? _highlightCopiedFadeoutTimer;
 
   @override
-  void initState() {
-    super.initState();
-
-    _effectiveData = _buildTextData();
-    _tooltipVisible = _isTooltipVisible();
-  }
-
-  @override
-  void didUpdateWidget(CatalystIdText oldWidget) {
-    super.didUpdateWidget(oldWidget);
-
-    if (widget.data != oldWidget.data ||
-        widget.isCompact != oldWidget.isCompact) {
-      _effectiveData = _buildTextData();
-      _tooltipVisible = _isTooltipVisible();
-    }
-  }
-
-  @override
-  void dispose() {
-    _highlightCopiedFadeoutTimer?.cancel();
-    _highlightCopiedFadeoutTimer = null;
-
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Offstage(
       offstage: _effectiveData.isEmpty,
@@ -93,42 +66,31 @@ class _CatalystIdTextState extends State<CatalystIdText> {
     );
   }
 
-  Future<void> _copyDataToClipboard() async {
-    final data = ClipboardData(text: widget.data);
-    await Clipboard.setData(data);
+  @override
+  void didUpdateWidget(CatalystIdText oldWidget) {
+    super.didUpdateWidget(oldWidget);
 
-    if (mounted) {
-      setState(_doHighlightCopied);
+    if (widget.data != oldWidget.data ||
+        widget.isCompact != oldWidget.isCompact) {
+      _effectiveData = _buildTextData();
+      _tooltipVisible = _isTooltipVisible();
     }
   }
 
-  void _handleHoverExit() {
-    if (_highlightCopied && _highlightCopiedFadeoutTimer == null) {
-      _scheduleRemoveHighlight();
-    }
-  }
-
-  void _doHighlightCopied() {
-    _highlightCopied = true;
-
+  @override
+  void dispose() {
     _highlightCopiedFadeoutTimer?.cancel();
     _highlightCopiedFadeoutTimer = null;
+
+    super.dispose();
   }
 
-  void _scheduleRemoveHighlight() {
-    _highlightCopiedFadeoutTimer = Timer(
-      const Duration(seconds: 1),
-      () => setState(_removeHighlight),
-    );
-  }
+  @override
+  void initState() {
+    super.initState();
 
-  void _removeHighlight() {
-    _highlightCopied = false;
-
-    if (_highlightCopiedFadeoutTimer?.isActive ?? false) {
-      _highlightCopiedFadeoutTimer?.cancel();
-    }
-    _highlightCopiedFadeoutTimer = null;
+    _effectiveData = _buildTextData();
+    _tooltipVisible = _isTooltipVisible();
   }
 
   String _buildTextData() {
@@ -144,33 +106,45 @@ class _CatalystIdTextState extends State<CatalystIdText> {
     return data;
   }
 
+  Future<void> _copyDataToClipboard() async {
+    final data = ClipboardData(text: widget.data);
+    await Clipboard.setData(data);
+
+    if (mounted) {
+      setState(_doHighlightCopied);
+    }
+  }
+
+  void _doHighlightCopied() {
+    _highlightCopied = true;
+
+    _highlightCopiedFadeoutTimer?.cancel();
+    _highlightCopiedFadeoutTimer = null;
+  }
+
+  void _handleHoverExit() {
+    if (_highlightCopied && _highlightCopiedFadeoutTimer == null) {
+      _scheduleRemoveHighlight();
+    }
+  }
+
   bool _isTooltipVisible() {
     return widget.isCompact && _effectiveData.length < widget.data.length;
   }
-}
 
-class _TapDetector extends StatelessWidget {
-  final VoidCallback onTap;
-  final VoidCallback onHoverExit;
-  final Widget child;
+  void _removeHighlight() {
+    _highlightCopied = false;
 
-  const _TapDetector({
-    required this.onTap,
-    required this.onHoverExit,
-    required this.child,
-  });
+    if (_highlightCopiedFadeoutTimer?.isActive ?? false) {
+      _highlightCopiedFadeoutTimer?.cancel();
+    }
+    _highlightCopiedFadeoutTimer = null;
+  }
 
-  @override
-  Widget build(BuildContext context) {
-    return MouseRegion(
-      cursor: SystemMouseCursors.click,
-      onExit: (event) => onHoverExit(),
-      child: GestureDetector(
-        onTap: onTap,
-        // there is a gap between text and copy
-        behavior: HitTestBehavior.translucent,
-        child: child,
-      ),
+  void _scheduleRemoveHighlight() {
+    _highlightCopiedFadeoutTimer = Timer(
+      const Duration(seconds: 1),
+      () => setState(_removeHighlight),
     );
   }
 }
@@ -242,6 +216,32 @@ class _Copy extends StatelessWidget {
     return CatalystSvgIcon.asset(
       asset.path,
       color: color,
+    );
+  }
+}
+
+class _TapDetector extends StatelessWidget {
+  final VoidCallback onTap;
+  final VoidCallback onHoverExit;
+  final Widget child;
+
+  const _TapDetector({
+    required this.onTap,
+    required this.onHoverExit,
+    required this.child,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      onExit: (event) => onHoverExit(),
+      child: GestureDetector(
+        onTap: onTap,
+        // there is a gap between text and copy
+        behavior: HitTestBehavior.translucent,
+        child: child,
+      ),
     );
   }
 }

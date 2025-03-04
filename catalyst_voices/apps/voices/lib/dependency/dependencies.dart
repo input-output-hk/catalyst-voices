@@ -105,6 +105,7 @@ final class Dependencies extends DependencyProvider {
           get<CampaignService>(),
           get<ProposalService>(),
           get<DownloaderService>(),
+          get<DocumentMapper>(),
         );
       })
       ..registerFactory<DiscoveryCubit>(() {
@@ -119,6 +120,9 @@ final class Dependencies extends DependencyProvider {
       })
       ..registerFactory<AccountCubit>(() {
         return AccountCubit(get<UserService>());
+      })
+      ..registerFactory<ProposalBloc>(() {
+        return ProposalBloc(get<ProposalService>());
       });
   }
 
@@ -166,7 +170,8 @@ final class Dependencies extends DependencyProvider {
           get<DocumentDataLocalSource>(),
           get<CatGatewayDocumentDataSource>(),
         );
-      });
+      })
+      ..registerLazySingleton<DocumentMapper>(() => const DocumentMapperImpl());
   }
 
   void _registerServices() {

@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
+import 'package:catalyst_voices/routes/routes.dart';
 import 'package:catalyst_voices/widgets/cards/proposal_card.dart';
 import 'package:catalyst_voices/widgets/empty_state/empty_state.dart';
 import 'package:catalyst_voices/widgets/pagination/builders/paged_wrap_child_builder.dart';
@@ -36,10 +39,31 @@ class ProposalsPagination extends StatefulWidget {
   });
 
   @override
-  State<ProposalsPagination> createState() => ProposalsPaginationState();
+  State<ProposalsPagination> createState() => _ProposalsPaginationState();
 }
 
-class ProposalsPaginationState extends State<ProposalsPagination> {
+class _EmptyProposals extends StatelessWidget {
+  final String? title;
+  final String? description;
+
+  const _EmptyProposals({
+    this.title,
+    this.description,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: EmptyState(
+        key: const Key('EmptyProposals'),
+        title: title,
+        description: description ?? context.l10n.discoverySpaceEmptyProposals,
+      ),
+    );
+  }
+}
+
+class _ProposalsPaginationState extends State<ProposalsPagination> {
   late final ProposalsCubit _proposalBloc;
   late PagingController<ProposalViewModel> _pagingController;
 
@@ -58,6 +82,14 @@ class ProposalsPaginationState extends State<ProposalsPagination> {
               key: ValueKey(item.id),
               proposal: item,
               isFavorite: widget.usersFavorite ? item.isFavorite : state,
+              onTap: () {
+                final route = ProposalRoute(
+                  proposalId: item.id,
+                  local: item.isLocal,
+                );
+
+                unawaited(route.push(context));
+              },
               onFavoriteChanged: (isFavorite) async {
                 await context.read<ProposalsCubit>().onChangeFavoriteProposal(
                       item.id,
@@ -160,25 +192,6 @@ class ProposalsPaginationState extends State<ProposalsPagination> {
     _pagingController.appendPage(
       widget.proposals,
       widget.pageKey,
-    );
-  }
-}
-
-class _EmptyProposals extends StatelessWidget {
-  final String? title;
-  final String? description;
-  const _EmptyProposals({
-    this.title,
-    this.description,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: EmptyState(
-        title: title,
-        description: description ?? context.l10n.discoverySpaceEmptyProposals,
-      ),
     );
   }
 }
