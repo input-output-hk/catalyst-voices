@@ -2,6 +2,7 @@
 
 use poem_openapi::{types::Example, Object};
 
+use super::cip509::Cip509;
 use crate::service::common::types::cardano::catalyst_id::CatalystId;
 
 /// RBAC Registrations, contains a latest valid and invalid registration data.
@@ -36,7 +37,7 @@ pub(crate) struct RbacRegistration {
     chain: serde_json::Value,
     /// All Cip509 registrations which formed a current registration chain
     #[oai(skip_serializing_if_is_empty)]
-    details: Vec<serde_json::Value>,
+    details: Vec<Cip509>,
 }
 
 impl Example for RbacRegistration {

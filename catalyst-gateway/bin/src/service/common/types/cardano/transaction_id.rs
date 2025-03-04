@@ -2,10 +2,11 @@
 
 use std::sync::LazyLock;
 
+use cardano_blockchain_types::TransactionId;
 use catalyst_types::hashes::BLAKE_2B256_SIZE;
 use poem_openapi::{
     registry::{MetaSchema, MetaSchemaRef},
-    types::{ParseError, ParseFromJSON, ParseFromParameter, ParseResult, ToJSON, Type},
+    types::{Example, ParseError, ParseFromJSON, ParseFromParameter, ParseResult, ToJSON, Type},
 };
 use serde_json::Value;
 
@@ -59,6 +60,12 @@ impl_string_types!(
     is_valid
 );
 
+impl Example for TxnId {
+    fn example() -> Self {
+        Self(EXAMPLE.to_string())
+    }
+}
+
 impl TryFrom<Vec<u8>> for TxnId {
     type Error = anyhow::Error;
 
@@ -67,5 +74,11 @@ impl TryFrom<Vec<u8>> for TxnId {
             anyhow::bail!("Hash Length Invalid.")
         }
         Ok(Self(as_hex_string(&value)))
+    }
+}
+
+impl From<TransactionId> for TxnId {
+    fn from(value: TransactionId) -> Self {
+        Self(format!("0x{value}"))
     }
 }
