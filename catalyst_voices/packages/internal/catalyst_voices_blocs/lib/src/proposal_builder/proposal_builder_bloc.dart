@@ -93,7 +93,7 @@ final class ProposalBuilderBloc
     Emitter<ProposalBuilderState> emit,
   ) async {
     try {
-      emit(state.copyWith(isLoading: true));
+      emit(state.copyWith(isChanging: true));
 
       final ref = state.metadata.documentRef! as DraftRef;
 
@@ -106,7 +106,7 @@ final class ProposalBuilderBloc
       _logger.severe('Deleting proposal failed', error, stackTrace);
       emitError(const LocalizedUnknownException());
     } finally {
-      emit(state.copyWith(isLoading: false));
+      emit(state.copyWith(isChanging: false));
     }
   }
 
@@ -252,17 +252,7 @@ final class ProposalBuilderBloc
 
     // then proceed slow async operations
     final ref = state.metadata.documentRef!;
-    final nextRef = await _updateDraftProposal(
-      ref,
-      _documentMapper.toContent(document),
-    );
-
-    if (nextRef != null && ref != nextRef) {
-      final updatedMetadata =
-          state.metadata.copyWith(documentRef: Optional(nextRef));
-      final updatedState = state.copyWith(metadata: updatedMetadata);
-      emit(updatedState);
-    }
+    await _saveDocumentLocally(emit, ref, document);
   }
 
   Future<void> _loadDefaultProposalTemplate(
@@ -343,7 +333,7 @@ final class ProposalBuilderBloc
     Future<ProposalBuilderState> Function() stateBuilder,
   ) async {
     try {
-      emit(const ProposalBuilderState(isLoading: true));
+      emit(const ProposalBuilderState(isChanging: true));
       _documentBuilder = null;
 
       final newState = await stateBuilder();
@@ -354,7 +344,7 @@ final class ProposalBuilderBloc
     } catch (error) {
       emit(const ProposalBuilderState(error: LocalizedUnknownException()));
     } finally {
-      emit(state.copyWith(isLoading: false));
+      emit(state.copyWith(isChanging: false));
     }
   }
 
@@ -398,6 +388,26 @@ final class ProposalBuilderBloc
     } catch (error, stackTrace) {
       _logger.severe('PublishProposal', error, stackTrace);
       emitError(error);
+    }
+  }
+
+  Future<void> _saveDocumentLocally(
+    Emitter<ProposalBuilderState> emit,
+    DocumentRef ref,
+    Document document,
+  ) async {
+    final ref = state.metadata.documentRef!;
+    final nextRef = await _updateDraftProposal(
+      ref,
+      _documentMapper.toContent(document),
+    );
+
+    if (nextRef != null && ref != nextRef) {
+      final updatedMetadata = state.metadata.copyWith(
+        documentRef: Optional(nextRef),
+      );
+      final updatedState = state.copyWith(metadata: updatedMetadata);
+      emit(updatedState);
     }
   }
 
