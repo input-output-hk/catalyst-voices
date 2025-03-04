@@ -22,6 +22,7 @@ class CampaignSectionsListView extends StatelessWidget {
             switch (item) {
               case CampaignDetailsListItem():
                 return CampaignDetailsTile(
+                  key: const Key('CampaignDetailsTile'),
                   description: item.description,
                   startDate: item.startDate,
                   endDate: item.endDate,
@@ -30,6 +31,7 @@ class CampaignSectionsListView extends StatelessWidget {
                 );
               case CampaignCategoriesListItem():
                 return CampaignCategoriesTile(
+                  key: const Key('CampaignCategoriesTile'),
                   sections: item.sections,
                 );
             }
