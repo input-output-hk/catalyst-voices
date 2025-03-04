@@ -176,6 +176,7 @@ class _EmptyProposals extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: EmptyState(
+        key: const Key('EmptyProposals'),
         title: title,
         description: description ?? context.l10n.discoverySpaceEmptyProposals,
       ),
