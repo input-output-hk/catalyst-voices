@@ -54,23 +54,26 @@ class LinkText extends StatelessWidget with LaunchUrlMixin {
       decorationStyle: underline ? TextDecorationStyle.solid : null,
     );
 
-    return MouseRegion(
-      cursor: enabled ? SystemMouseCursors.click : SystemMouseCursors.none,
-      child: GestureDetector(
-        onTap: enabled
-            ? onTap ??
-                () {
-                  final uri = this.uri ?? Uri.tryParse(data);
-                  if (uri != null) {
-                    unawaited(launchUri(uri));
+    return DefaultSelectionStyle(
+      mouseCursor: enabled ? SystemMouseCursors.click : null,
+      child: MouseRegion(
+        cursor: enabled ? SystemMouseCursors.click : SystemMouseCursors.none,
+        child: GestureDetector(
+          onTap: enabled
+              ? onTap ??
+                  () {
+                    final uri = this.uri ?? Uri.tryParse(data);
+                    if (uri != null) {
+                      unawaited(launchUri(uri));
+                    }
                   }
-                }
-            : null,
-        child: DefaultTextStyle.merge(
-          style: style,
-          child: Text(
-            data,
-            style: effectiveStyle,
+              : null,
+          child: DefaultTextStyle.merge(
+            style: style,
+            child: Text(
+              data,
+              style: effectiveStyle,
+            ),
           ),
         ),
       ),

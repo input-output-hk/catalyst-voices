@@ -57,8 +57,10 @@ class _ProposalPageState extends State<ProposalPage> {
             Expanded(
               child: SpaceScaffold(
                 left: const ProposalNavigationPanel(),
-                body: ProposalContent(
-                  scrollController: _segmentsScrollController,
+                body: SelectionArea(
+                  child: ProposalContent(
+                    scrollController: _segmentsScrollController,
+                  ),
                 ),
                 right: const Offstage(),
               ),
