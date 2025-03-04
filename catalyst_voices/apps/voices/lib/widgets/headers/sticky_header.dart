@@ -1,15 +1,40 @@
+import 'package:catalyst_voices/pages/proposal/proposal_content.dart';
 import 'package:flutter/material.dart';
 
-class TestingHeader extends StatefulWidget {
-  const TestingHeader({super.key});
+class StickyHeader extends StatefulWidget {
+  final Widget child;
+
+  const StickyHeader({
+    super.key,
+    required this.child,
+  });
 
   @override
-  State<TestingHeader> createState() => _TestingHeaderState();
+  State<StickyHeader> createState() => _StickyHeaderState();
 }
 
-class _TestingHeaderState extends State<TestingHeader> {
+class _StickyHeaderState extends State<StickyHeader> {
   ScrollNotificationObserverState? _scrollNotificationObserver;
   bool _scrolledUnder = false;
+  bool _settled = true;
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedSlide(
+      offset: _scrolledUnder ? Offset.zero : const Offset(0, -1),
+      duration: const Duration(milliseconds: 200),
+      curve: Curves.easeIn,
+      onEnd: () {
+        setState(() {
+          _settled = true;
+        });
+      },
+      child: Offstage(
+        offstage: _settled && !_scrolledUnder,
+        child: widget.child,
+      ),
+    );
+  }
 
   @override
   void didChangeDependencies() {
@@ -28,24 +53,21 @@ class _TestingHeaderState extends State<TestingHeader> {
     super.dispose();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 48,
-      color: Colors.orange,
-      alignment: Alignment.center,
-      child: Text('ScrolledUnder - $_scrolledUnder'),
-    );
-  }
-
   void _handleScrollNotification(ScrollNotification notification) {
     if (notification is ScrollUpdateNotification) {
-      print(notification);
+      // print(notification);
+      final element = notification.context! as Element;
+
+      final listView = element.findAncestorWidgetOfExactType<ProposalContent>();
+
+      if (listView == null) {
+        return;
+      }
+
       final oldScrolledUnder = _scrolledUnder;
       final metrics = notification.metrics;
       switch (metrics.axisDirection) {
         case AxisDirection.up:
-          // Scroll view is reversed
           _scrolledUnder = metrics.extentAfter > 0;
         case AxisDirection.down:
           _scrolledUnder = metrics.extentBefore > 0;
@@ -59,7 +81,7 @@ class _TestingHeaderState extends State<TestingHeader> {
 
       if (_scrolledUnder != oldScrolledUnder) {
         setState(() {
-          // React to a change in MaterialState.scrolledUnder
+          _settled = false;
         });
       }
     }

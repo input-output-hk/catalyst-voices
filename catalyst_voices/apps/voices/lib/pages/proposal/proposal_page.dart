@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:catalyst_voices/pages/proposal/proposal_back_button.dart';
 import 'package:catalyst_voices/pages/proposal/proposal_content.dart';
+import 'package:catalyst_voices/pages/proposal/proposal_header.dart';
 import 'package:catalyst_voices/pages/proposal/proposal_navigation_panel.dart';
-import 'package:catalyst_voices/pages/proposal/testing_header.dart';
 import 'package:catalyst_voices/routes/routes.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
@@ -40,21 +40,25 @@ class _ProposalPageState extends State<ProposalPage> {
         appBar: const VoicesAppBar(
           automaticallyImplyLeading: false,
         ),
-        body: Column(
+        body: Stack(
           children: [
-            const ProposalBackButton(),
-            const TestingHeader(),
-            Expanded(
-              child: SpaceScaffold(
-                left: const ProposalNavigationPanel(),
-                body: SelectionArea(
-                  child: ProposalContent(
-                    scrollController: _segmentsScrollController,
+            Column(
+              children: [
+                const ProposalBackButton(),
+                Expanded(
+                  child: SpaceScaffold(
+                    left: const ProposalNavigationPanel(),
+                    body: SelectionArea(
+                      child: ProposalContent(
+                        scrollController: _segmentsScrollController,
+                      ),
+                    ),
+                    right: const Offstage(),
                   ),
                 ),
-                right: const Offstage(),
-              ),
+              ],
             ),
+            const ProposalHeader(),
           ],
         ),
       ),

@@ -15,6 +15,34 @@ class ProposalHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return const StickyHeader(
+      child: _ProposalHeader(),
+    );
+  }
+}
+
+class _ProposalControls extends StatelessWidget {
+  const _ProposalControls();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Row(
+      mainAxisSize: MainAxisSize.min,
+      spacing: 8,
+      children: <Widget>[
+        ProposalVersion(),
+        ProposalShareButton(),
+        ProposalFavoriteButton(),
+      ],
+    );
+  }
+}
+
+class _ProposalHeader extends StatelessWidget {
+  const _ProposalHeader();
+
+  @override
+  Widget build(BuildContext context) {
     final colors = context.colors;
 
     return Container(
@@ -34,23 +62,6 @@ class ProposalHeader extends StatelessWidget {
           Spacer(),
         ],
       ),
-    );
-  }
-}
-
-class _ProposalControls extends StatelessWidget {
-  const _ProposalControls();
-
-  @override
-  Widget build(BuildContext context) {
-    return const Row(
-      mainAxisSize: MainAxisSize.min,
-      spacing: 8,
-      children: <Widget>[
-        ProposalVersion(),
-        ProposalShareButton(),
-        ProposalFavoriteButton(),
-      ],
     );
   }
 }
