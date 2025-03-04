@@ -75,6 +75,8 @@ struct SyncParams {
     result: Arc<Option<anyhow::Result<()>>>,
     /// Chain follower roll forward.
     follower_roll_forward: Option<Point>,
+    /// Indicate that this sync subchain process has committed data rolling back.
+    rolled_back: bool,
 }
 
 impl Display for SyncParams {
@@ -150,6 +152,7 @@ impl SyncParams {
             backoff_delay: None,
             result: Arc::new(None),
             follower_roll_forward: None,
+            rolled_back: false,
         }
     }
 
@@ -181,9 +184,10 @@ impl SyncParams {
     }
 
     /// Convert Params into the result of the sync.
+    #[allow(clippy::too_many_arguments)]
     fn done(
         &self, first: Option<Point>, first_immutable: bool, last: Option<Point>,
-        last_immutable: bool, synced: u64, result: anyhow::Result<()>,
+        last_immutable: bool, synced: u64, result: anyhow::Result<()>, rolled_back: bool,
     ) -> Self {
         if result.is_ok() && first_immutable && last_immutable {
             // Update sync status in the Immutable DB.
@@ -199,6 +203,7 @@ impl SyncParams {
         done.last_is_immutable = last_immutable;
         done.total_blocks_synced = done.total_blocks_synced.saturating_add(synced);
         done.last_blocks_synced = synced;
+        done.rolled_back = rolled_back;
 
         done.result = Arc::new(Some(result));
 
@@ -247,6 +252,7 @@ fn sync_subchain(params: SyncParams) -> tokio::task::JoinHandle<SyncParams> {
         let mut last_indexed_block = params.last_indexed_block.clone();
         let mut last_immutable = params.last_is_immutable;
         let mut blocks_synced = 0u64;
+        let mut rolled_back = false;
 
         let mut follower =
             ChainFollower::new(params.chain, params.actual_start(), params.end.clone()).await;
@@ -266,6 +272,7 @@ fn sync_subchain(params: SyncParams) -> tokio::task::JoinHandle<SyncParams> {
                             last_immutable,
                             blocks_synced,
                             Ok(()),
+                            rolled_back,
                         );
                         // Signal the point the immutable chain rolled forward to.
                         result.follower_roll_forward = Some(chain_update.block_data().point());
@@ -285,6 +292,7 @@ fn sync_subchain(params: SyncParams) -> tokio::task::JoinHandle<SyncParams> {
                             last_immutable,
                             blocks_synced,
                             Err(error.context(error_msg)),
+                            rolled_back,
                         );
                     }
 
@@ -302,6 +310,8 @@ fn sync_subchain(params: SyncParams) -> tokio::task::JoinHandle<SyncParams> {
                     // What we need to do here, is purge the live DB of records after the
                     // rollback point.  We need to complete this operation here
                     // before we keep syncing the live chain.
+
+                    rolled_back = true;
                 },
             }
         }
@@ -313,6 +323,7 @@ fn sync_subchain(params: SyncParams) -> tokio::task::JoinHandle<SyncParams> {
             last_immutable,
             blocks_synced,
             Ok(()),
+            rolled_back,
         );
 
         info!(chain = %params.chain, result=%result, "Indexing Blockchain Completed: OK");
@@ -333,8 +344,11 @@ struct SyncTask {
     /// How many immutable chain follower sync tasks we are running.
     current_sync_tasks: u16,
 
-    /// How may data purges were run.
-    data_purge_count: u64,
+    /// How many data backward purges were run.
+    backward_purge_count: u64,
+
+    /// How many data forward purges were run.
+    forward_purge_count: u64,
 
     /// Start for the next block we would sync.
     start_slot: Slot,
@@ -355,12 +369,13 @@ struct SyncTask {
 impl SyncTask {
     /// Create a new `SyncTask`.
     fn new(cfg: chain_follower::EnvVars) -> SyncTask {
-        SyncTask {
+        Self {
             cfg,
             sync_tasks: FuturesUnordered::new(),
             start_slot: 0.into(),
             current_sync_tasks: 0,
-            data_purge_count: 0,
+            backward_purge_count: 0,
+            forward_purge_count: 0,
             immutable_tip_slot: 0.into(),
             live_tip_slot: 0.into(),
             sync_status: Vec::new(),
@@ -414,6 +429,15 @@ impl SyncTask {
         while let Some(completed) = self.sync_tasks.next().await {
             match completed {
                 Ok(finished) => {
+                    if finished.rolled_back {
+                        self.forward_purge_count =
+                            self.forward_purge_count.checked_add(1).unwrap_or_default();
+
+                        self.dispatch_event(event::ChainIndexerEvent::ForwardDataPurged {
+                            count: self.forward_purge_count,
+                        });
+                    }
+
                     // Sync task finished.  Check if it completed OK or had an error.
                     // If it failed, we need to reschedule it.
 
@@ -499,10 +523,11 @@ impl SyncTask {
                 if let Err(error) = roll_forward::purge_live_index(self.immutable_tip_slot).await {
                     error!(chain=%self.cfg.chain, error=%error, "BUG: Purging volatile data task failed.");
                 } else {
-                    self.data_purge_count = self.data_purge_count.checked_add(1).unwrap_or(0);
+                    self.backward_purge_count =
+                        self.backward_purge_count.checked_add(1).unwrap_or_default();
 
                     self.dispatch_event(event::ChainIndexerEvent::BackwardDataPurged {
-                        count: self.data_purge_count,
+                        count: self.backward_purge_count,
                     });
                 }
             }
@@ -656,7 +681,12 @@ pub(crate) async fn start_followers() -> anyhow::Result<()> {
                     .set(i64::try_from(u64::from(*slot)).unwrap_or(-1));
             }
             if let Event::BackwardDataPurged { count } = event {
-                reporter::TRIGGERED_DATA_PURGES_COUNT
+                reporter::TRIGGERED_BACKWARD_PURGES_COUNT
+                    .with_label_values(&[&api_host_names, service_id, &network])
+                    .set(i64::try_from(*count).unwrap_or(-1));
+            }
+            if let Event::ForwardDataPurged { count } = event {
+                reporter::TRIGGERED_FORWARD_PURGES_COUNT
                     .with_label_values(&[&api_host_names, service_id, &network])
                     .set(i64::try_from(*count).unwrap_or(-1));
             }

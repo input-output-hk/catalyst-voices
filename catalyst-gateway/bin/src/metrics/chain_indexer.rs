@@ -50,11 +50,22 @@ pub(crate) mod reporter {
         .unwrap()
     });
 
-    /// Chain Indexer number of times triggering data purge.
-    pub(crate) static TRIGGERED_DATA_PURGES_COUNT: LazyLock<IntGaugeVec> = LazyLock::new(|| {
+    /// Chain Indexer number of times triggering backward data purge.
+    pub(crate) static TRIGGERED_BACKWARD_PURGES_COUNT: LazyLock<IntGaugeVec> =
+        LazyLock::new(|| {
+            register_int_gauge_vec!(
+                "indexer_triggered_backward_purges_count",
+                "Chain Indexer number of times triggering backward data purge",
+                &METRIC_LABELS
+            )
+            .unwrap()
+        });
+
+    /// Chain Indexer number of times triggering forward data purge.
+    pub(crate) static TRIGGERED_FORWARD_PURGES_COUNT: LazyLock<IntGaugeVec> = LazyLock::new(|| {
         register_int_gauge_vec!(
-            "indexer_triggered_data_purges_count",
-            "Chain Indexer number of times triggering data purge",
+            "indexer_triggered_forward_purges_count",
+            "Chain Indexer number of times triggering forward data purge",
             &METRIC_LABELS
         )
         .unwrap()
