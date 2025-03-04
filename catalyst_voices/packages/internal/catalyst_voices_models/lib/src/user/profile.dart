@@ -14,7 +14,7 @@ final class Profile extends Equatable {
   });
 
   // TODO(damian-molinski): Extract from catalystId
-  String? get displayName => null;
+  String? get displayName => 'Dev';
 
   @override
   List<Object?> get props => [
