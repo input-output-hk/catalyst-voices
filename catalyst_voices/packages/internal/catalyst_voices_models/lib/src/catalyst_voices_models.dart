@@ -12,6 +12,7 @@ export 'document/data/document_data_content.dart';
 export 'document/data/document_data_metadata.dart';
 export 'document/data/document_type.dart';
 export 'document/document.dart';
+export 'document/document_mapper.dart';
 export 'document/document_node_id.dart';
 export 'document/document_ref.dart';
 export 'document/enums/document_content_media_type.dart';
