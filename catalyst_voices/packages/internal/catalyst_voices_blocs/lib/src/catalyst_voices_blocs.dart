@@ -9,6 +9,7 @@ export 'common/bloc_error_emitter_mixin.dart';
 export 'common/bloc_event_transformers.dart';
 export 'common/bloc_signal_emitter_mixin.dart';
 export 'discovery/discovery.dart';
+export 'proposal/proposal.dart';
 export 'proposal_builder/proposal_builder.dart';
 export 'proposals/proposals.dart';
 export 'registration/registration.dart';
