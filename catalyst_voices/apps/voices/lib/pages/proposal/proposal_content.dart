@@ -51,6 +51,7 @@ class _SegmentsListView extends StatelessWidget {
     return BasicSegmentsListView(
       key: const ValueKey('ProposalSegmentsListView'),
       items: items,
+      itemScrollController: scrollController,
       padding: const EdgeInsets.only(top: 16, bottom: 64),
       itemBuilder: (context, index) {
         final item = items[index];
@@ -94,7 +95,6 @@ class _SegmentsListView extends StatelessWidget {
 
         return const SizedBox.shrink();
       },
-      itemScrollController: scrollController,
     );
   }
 

@@ -3,6 +3,7 @@ import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localized_locales/flutter_localized_locales.dart';
@@ -67,104 +68,41 @@ class _DocumentPropertyValue extends StatelessWidget {
 }
 
 class _DocumentPropertyValueBuilder extends StatelessWidget {
-  final DocumentValueProperty property;
+  final DocumentPropertyValueListItem<Object> item;
 
   const _DocumentPropertyValueBuilder({
     required super.key,
-    required this.property,
+    required this.item,
   });
 
   @override
   Widget build(BuildContext context) {
-    final schema = property.schema;
-    final value = property.value;
-
-    // TODO(damian-molinski): handle tags
-    // print('${schema.runtimeType} - ${schema.title} - $value');
-    // DocumentTagGroupSchema -  - DeFi
-    // DocumentTagSelectionSchema -  - Staking
-
-    switch (schema) {
-      case DocumentAgreementConfirmationSchema():
-      case DocumentGenericBooleanSchema():
-      case DocumentYesNoChoiceSchema():
-        final answer = value is bool ? value : null;
-        final text = answer != null
-            ? answer
-                ? context.l10n.yes
-                : context.l10n.no
-            : '-';
-
-        return _DocumentPropertyValue(
-          title: schema.title,
-          value: Text(text),
-        );
-      case DocumentTokenValueCardanoAdaSchema():
-        final amount = schema.castValue(value);
-        const currency = Currency.ada();
-        return _DocumentPropertyValue(
-          title: schema.title,
-          value: Text(amount != null ? currency.format(amount) : '-'),
-        );
-      case DocumentDurationInMonthsSchema():
-        final months = schema.castValue(value);
-        return _DocumentPropertyValue(
-          title: schema.title,
-          value: Text(months != null ? context.l10n.valueMonths(months) : '-'),
-        );
-      case DocumentSingleLineHttpsUrlEntrySchema():
-        final link = schema.castValue(value);
-
-        return _DocumentPropertyValue(
-          title: schema.title,
-          value: link != null ? LinkText(link) : const Text('-'),
-        );
-      case DocumentMultiLineTextEntrySchema():
-        final text = schema.castValue(value);
-
-        return _DocumentPropertyValue(
-          title: schema.title,
-          value: Text(text ?? '-'),
+    return switch (item) {
+      DocumentLinkListItem(:final title, :final value) =>
+        _DocumentPropertyValue(
+          title: title,
+          value: value != null ? LinkText(value) : const Text('-'),
           isMultiline: true,
-        );
-      case DocumentMultiLineTextEntryMarkdownSchema():
-        final text = schema.castValue(value);
-        final data = MarkdownData(text ?? '-');
-
-        return _DocumentPropertyValue(
-          title: schema.title,
-          value: MarkdownText(data),
+        ),
+      DocumentMarkdownListItem(:final title, :final value) =>
+        _DocumentPropertyValue(
+          title: title,
+          value: MarkdownText(value ?? const MarkdownData('-')),
           isMultiline: true,
-        );
-      case DocumentTagGroupSchema():
-      case DocumentTagSelectionSchema():
-        return const Text('------- NOT IMPLEMENTED -------');
-      case DocumentLanguageCodeSchema():
-        final code = schema.castValue(value);
-        final localeNames = LocaleNames.of(context);
-        final name = code != null ? localeNames?.nameOf(code) : null;
-
-        return _DocumentPropertyValue(
-          title: schema.title,
-          value: Text(name ?? '-'),
-        );
-      case DocumentDropDownSingleSelectSchema():
-      case DocumentGenericIntegerSchema():
-      case DocumentGenericNumberSchema():
-      case DocumentSingleLineTextEntrySchema():
-      case DocumentRadioButtonSelect():
-      case DocumentGenericStringSchema():
-        return _DocumentPropertyValue(
-          title: schema.title,
-          value: Text(value?.toString() ?? '-'),
-        );
-    }
+        ),
+      DocumentTextListItem(:final title, :final value, :final isMultiline) =>
+        _DocumentPropertyValue(
+          title: title,
+          value: Text(value ?? '-'),
+          isMultiline: isMultiline,
+        ),
+    };
   }
 }
 
 class _ProposalDocumentSectionTileState
     extends State<ProposalDocumentSectionTile> {
-  final List<DocumentValueProperty> _valueProperties = [];
+  final List<DocumentPropertyValueListItem<Object>> _items = [];
 
   @override
   Widget build(BuildContext context) {
@@ -175,19 +113,16 @@ class _ProposalDocumentSectionTileState
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _SectionTitleText(widget.property.schema.title),
-          if (_valueProperties.length > 1) const SizedBox(height: 16),
+          if (_items.length > 1) const SizedBox(height: 16),
           Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: _valueProperties
-                .where((property) {
-                  return property.schema.title.isNotEmpty ||
-                      property.value != null;
-                })
-                .map<Widget>((property) {
+            children: _items
+                .whereNot((item) => item.isEmpty)
+                .map<Widget>((item) {
                   return _DocumentPropertyValueBuilder(
-                    key: ObjectKey(property.nodeId),
-                    property: property,
+                    key: ObjectKey(item.id),
+                    item: item,
                   );
                 })
                 .separatedBy(const SizedBox(height: 16))
@@ -199,35 +134,47 @@ class _ProposalDocumentSectionTileState
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    // rebuild items because some of values depends on l10n which may
+    // have changed.
+    _items
+      ..clear()
+      ..addAll(_calculateItemsFrom(widget.property));
+  }
+
+  @override
   void didUpdateWidget(ProposalDocumentSectionTile oldWidget) {
     super.didUpdateWidget(oldWidget);
 
     if (widget.property != oldWidget.property) {
-      _valueProperties
+      _items
         ..clear()
-        ..addAll(_expandValueProperties(widget.property));
+        ..addAll(_calculateItemsFrom(widget.property));
     }
   }
 
-  @override
-  void initState() {
-    super.initState();
-
-    _valueProperties.addAll(_expandValueProperties(widget.property));
-  }
-
-  Iterable<DocumentValueProperty> _expandValueProperties(
+  Iterable<DocumentPropertyValueListItem<Object>> _calculateItemsFrom(
     DocumentProperty property,
   ) sync* {
     switch (property) {
       case DocumentListProperty():
         for (final property in property.properties
             .whereNot((element) => element.schema.isSectionOrSubsection)) {
-          yield* _expandValueProperties(property);
+          yield* _calculateItemsFrom(property);
         }
       case DocumentObjectProperty():
-        switch (property.schema) {
+        final schema = property.schema;
+        switch (schema) {
           case DocumentSingleGroupedTagSelectorSchema():
+            final value = schema.groupedTagsSelection(property);
+
+            yield DocumentTextListItem(
+              id: property.nodeId,
+              title: '',
+              value: value?.toString(),
+            );
           case DocumentSegmentSchema():
           case DocumentSectionSchema():
           case DocumentNestedQuestionsSchema():
@@ -235,11 +182,104 @@ class _ProposalDocumentSectionTileState
           case DocumentGenericObjectSchema():
             for (final property in property.properties
                 .whereNot((element) => element.schema.isSectionOrSubsection)) {
-              yield* _expandValueProperties(property);
+              yield* _calculateItemsFrom(property);
             }
         }
       case DocumentValueProperty<Object>():
-        yield property;
+        yield _mapDocumentPropertyToListItem(property);
+    }
+  }
+
+  DocumentPropertyValueListItem<Object> _mapDocumentPropertyToListItem(
+    DocumentValueProperty property,
+  ) {
+    final schema = property.schema;
+    final value = property.value;
+
+    switch (schema) {
+      case DocumentAgreementConfirmationSchema():
+      case DocumentGenericBooleanSchema():
+      case DocumentYesNoChoiceSchema():
+        final answer = value is bool ? value : null;
+        final text = answer != null
+            ? answer
+                ? context.l10n.yes
+                : context.l10n.no
+            : null;
+
+        return DocumentTextListItem(
+          id: property.nodeId,
+          title: schema.title,
+          value: text,
+        );
+      case DocumentTokenValueCardanoAdaSchema():
+        final num = schema.castValue(value);
+        final text = num != null ? const Currency.ada().format(num) : null;
+
+        return DocumentTextListItem(
+          id: property.nodeId,
+          title: schema.title,
+          value: text,
+        );
+      case DocumentDurationInMonthsSchema():
+        final months = schema.castValue(value);
+        final text = months != null ? context.l10n.valueMonths(months) : null;
+
+        return DocumentTextListItem(
+          id: property.nodeId,
+          title: schema.title,
+          value: text,
+        );
+      case DocumentSingleLineHttpsUrlEntrySchema():
+        final link = schema.castValue(value);
+
+        return DocumentLinkListItem(
+          id: property.nodeId,
+          title: schema.title,
+          value: link,
+        );
+      case DocumentMultiLineTextEntrySchema():
+        final text = schema.castValue(value);
+
+        return DocumentTextListItem(
+          id: property.nodeId,
+          title: schema.title,
+          value: text,
+          isMultiline: true,
+        );
+      case DocumentMultiLineTextEntryMarkdownSchema():
+        final text = schema.castValue(value);
+        final data = text != null ? MarkdownData(text) : null;
+
+        return DocumentMarkdownListItem(
+          id: property.nodeId,
+          title: schema.title,
+          value: data,
+        );
+      case DocumentTagGroupSchema():
+      case DocumentTagSelectionSchema():
+        throw ArgumentError('$property can not be mapped on its own');
+      case DocumentLanguageCodeSchema():
+        final code = schema.castValue(value);
+        final localeNames = LocaleNames.of(context);
+        final text = code != null ? localeNames?.nameOf(code) : null;
+
+        return DocumentTextListItem(
+          id: property.nodeId,
+          title: schema.title,
+          value: text,
+        );
+      case DocumentDropDownSingleSelectSchema():
+      case DocumentGenericIntegerSchema():
+      case DocumentGenericNumberSchema():
+      case DocumentSingleLineTextEntrySchema():
+      case DocumentRadioButtonSelect():
+      case DocumentGenericStringSchema():
+        return DocumentTextListItem(
+          id: property.nodeId,
+          title: schema.title,
+          value: value?.toString(),
+        );
     }
   }
 }
