@@ -87,6 +87,7 @@ class SimpleTreeViewChildRow extends StatelessWidget {
             textStyle: textStyle,
             child: InkWell(
               onTap: onTap,
+              borderRadius: BorderRadius.circular(8),
               child: Stack(
                 children: [
                   if (hasError && isSelected) const _SelectedErrorIndicator(),
@@ -147,6 +148,7 @@ class SimpleTreeViewRootRow extends StatelessWidget {
             textStyle: textStyle,
             child: InkWell(
               onTap: onTap,
+              borderRadius: BorderRadius.circular(8),
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Row(

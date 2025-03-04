@@ -72,8 +72,7 @@ void main() {
       );
 
       // Then
-      expect(proposalDocument.metadata.id, proposal.metadata.id);
-      expect(proposalDocument.metadata.version, proposal.metadata.version);
+      expect(proposalDocument.metadata.selfRef, proposal.metadata.selfRef);
     });
 
     test('getProposalDocument correctly propagates errors', () async {

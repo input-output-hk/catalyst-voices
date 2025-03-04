@@ -45,7 +45,7 @@ class _ProposalBuilderSegments extends StatelessWidget {
         final items = value.listItems;
         final selectedNodeId = value.activeSectionId;
 
-        return SegmentsListView<ProposalBuilderSegment, ProposalBuilderSection>(
+        return SegmentsListView<DocumentSegment, DocumentSection>(
           itemScrollController: itemScrollController,
           items: items,
           padding: const EdgeInsets.only(top: 16, bottom: 64),

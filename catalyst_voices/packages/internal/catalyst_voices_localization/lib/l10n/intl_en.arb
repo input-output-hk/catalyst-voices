@@ -768,6 +768,10 @@
   "@back": {
     "description": "For example in button that goes to previous stage of registration"
   },
+  "backToList": "Back to list",
+  "@backToList": {
+    "description": "For example in button that goes to previous screen with a list like proposals"
+  },
   "retry": "Retry",
   "@retry": {
     "description": "Retry action when something goes wrong."
@@ -1436,7 +1440,7 @@
   "categoryDetails": "Category Details",
   "fundsAvailable": "Funds Available",
   "duration": "Duration",
-  "valueMonths": "{value} {value, plural, =0{Month} other{Months}}",
+  "valueMonths": "{value} {value, plural, =0{Months} =1{Month} other{Months}}",
   "@valueMonths": {
     "description": "Used in proposal card",
     "placeholders": {
@@ -1733,5 +1737,55 @@
   "proposalImportDialogDescription": "Make sure it's a correct Catalyst proposal file.",
   "@proposalImportDialogDescription": {
     "description": "The description of the dialog to import a proposal."
+  },
+  "nrOfIteration": "Iteration {nr}",
+  "@nrOfIteration": {
+    "description": "In context of which version of document is presented",
+    "placeholders": {
+      "nr": {
+        "type": "int"
+      }
+    }
+  },
+  "proposalViewMetadataOverviewSegment": "Overview",
+  "@proposalViewMetadataOverviewSegment": {
+    "description": "Viewing proposal navigation segment"
+  },
+  "proposalViewMetadataSection": "Metadata",
+  "@proposalViewMetadataSection": {
+    "description": "Viewing proposal navigation section"
+  },
+  "proposalViewCommentsSegment": "Comments",
+  "@proposalViewCommentsSegment": {
+    "description": "Viewing proposal navigation section"
+  },
+  "proposalViewAddCommentSection": "Add comment",
+  "@proposalViewAddCommentSection": {
+    "description": "Viewing proposal navigation section"
+  },
+  "proposalViewViewCommentsSection": "View comments",
+  "@proposalViewViewCommentsSection": {
+    "description": "Viewing proposal navigation section"
+  },
+  "proposalViewFundingRequested": "Funding Requested",
+  "@proposalViewFundingRequested": {
+    "description": "When viewing proposal"
+  },
+  "proposalViewProjectDuration": "Project Duration",
+  "@proposalViewProjectDuration": {
+    "description": "When viewing proposal"
+  },
+  "proposalViewProjectDelivery": "Project Delivery",
+  "@proposalViewProjectDelivery": {
+    "description": "When viewing proposal"
+  },
+  "valueMilestones": "{count} {count, plural, =0{Milestones} =1{Milestone} other{Milestones}}",
+  "@valueMilestones": {
+    "description": "In context of proposal. How many milestones there is",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   }
 }

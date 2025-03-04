@@ -31,7 +31,7 @@ abstract interface class ProposalService {
   Future<List<String>> getFavoritesProposalsIds();
 
   Future<Proposal> getProposal({
-    required String id,
+    required DocumentRef ref,
   });
 
   Future<ProposalPaginationItems<Proposal>> getProposals({
@@ -108,9 +108,9 @@ final class ProposalServiceImpl implements ProposalService {
 
   @override
   Future<Proposal> getProposal({
-    required String id,
+    required DocumentRef ref,
   }) async {
-    final proposalBase = await _proposalRepository.getProposal(id: id);
+    final proposalBase = await _proposalRepository.getProposal(ref: ref);
     final proposal = await _buildProposal(proposalBase);
 
     return proposal;

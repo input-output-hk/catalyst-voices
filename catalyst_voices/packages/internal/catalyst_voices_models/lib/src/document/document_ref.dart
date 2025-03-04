@@ -11,6 +11,16 @@ sealed class DocumentRef extends Equatable {
     this.version,
   });
 
+  factory DocumentRef.build({
+    required String id,
+    String? version,
+    required bool isDraft,
+  }) {
+    return isDraft
+        ? DraftRef(id: id, version: version)
+        : SignedDocumentRef(id: id, version: version);
+  }
+
   bool get isExact => version != null;
 
   @override
