@@ -4,9 +4,12 @@
 
 use poem_openapi::{types::Example, Object};
 
-use crate::service::common::types::{
-    cardano::{slot_tx_idx::SlotTxnIdx, transaction_id::TxnId},
-    generic::uuidv4::UUIDv4,
+use crate::service::common::{
+    objects::generic::json_object::JSONObject,
+    types::{
+        cardano::{slot_tx_idx::SlotTxnIdx, transaction_id::TxnId},
+        generic::uuidv4::UUIDv4,
+    },
 };
 
 /// CIP 509 registration transaction data.
@@ -28,6 +31,10 @@ pub(crate) struct Cip509 {
     /// A point (slot) and a transaction index identifying the block and the transaction
     /// that this `Cip509` was extracted from.
     origin: SlotTxnIdx,
+
+    /// A report potentially containing all the issues occurred during `Cip509` decoding
+    /// and validation.
+    report: JSONObject,
 }
 
 impl Example for Cip509 {
@@ -37,17 +44,22 @@ impl Example for Cip509 {
             prv_tx_id: None,
             txn_hash: TxnId::example(),
             origin: SlotTxnIdx::example(),
+            report: serde_json::json!({}).into(),
         }
     }
 }
 
-impl From<&rbac_registration::cardano::cip509::Cip509> for Cip509 {
-    fn from(value: &rbac_registration::cardano::cip509::Cip509) -> Self {
-        Self {
+impl TryFrom<&rbac_registration::cardano::cip509::Cip509> for Cip509 {
+    type Error = anyhow::Error;
+
+    fn try_from(value: &rbac_registration::cardano::cip509::Cip509) -> Result<Self, Self::Error> {
+        let report = serde_json::to_value(value.report())?;
+        Ok(Self {
             purpose: value.purpose().map(Into::into),
             prv_tx_id: value.previous_transaction().map(Into::into),
             txn_hash: value.txn_hash().into(),
             origin: value.origin().clone().into(),
-        }
+            report: report.into(),
+        })
     }
 }

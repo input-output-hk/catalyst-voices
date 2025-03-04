@@ -50,8 +50,9 @@ impl Example for RbacRegistrations {
 #[derive(Object)]
 #[oai(example = true)]
 struct RbacRegistration {
-    /// Registration chain
-    chain: RegistrationChain,
+    /// Registration chain, contains only valid
+    #[oai(skip_serializing_if_is_none)]
+    chain: Option<RegistrationChain>,
     /// All Cip509 registrations which formed a current registration chain
     #[oai(skip_serializing_if_is_empty)]
     details: Vec<Cip509>,
@@ -63,30 +64,21 @@ impl RbacRegistration {
         regs: Vec<rbac_registration::cardano::cip509::Cip509>, detailed: bool,
     ) -> anyhow::Result<Option<Self>> {
         let details = if detailed {
-            regs.iter().map(Into::into).collect()
+            regs.iter()
+                .map(TryInto::try_into)
+                .collect::<anyhow::Result<Vec<_>>>()?
         } else {
             Vec::new()
         };
-        let mut regs_iter = regs.into_iter();
-        let Some(first) = regs_iter.next() else {
-            return Ok(None);
-        };
-        let mut chain = rbac_registration::registration::cardano::RegistrationChain::new(first)?;
-        for reg in regs_iter {
-            chain = chain.update(reg)?;
-        }
-
-        Ok(Some(Self {
-            chain: chain.into(),
-            details,
-        }))
+        let chain = RegistrationChain::new(regs);
+        Ok(Some(Self { chain, details }))
     }
 }
 
 impl Example for RbacRegistration {
     fn example() -> Self {
         Self {
-            chain: RegistrationChain::example(),
+            chain: Some(RegistrationChain::example()),
             details: vec![Cip509::example()],
         }
     }

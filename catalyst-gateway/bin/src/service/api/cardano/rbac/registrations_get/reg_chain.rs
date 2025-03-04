@@ -15,6 +15,28 @@ pub(crate) struct RegistrationChain {
     purpose: Vec<UUIDv4>,
 }
 
+impl RegistrationChain {
+    /// Try to build a `RegistrationChain` from the provided registration list
+    pub(crate) fn new(regs: Vec<rbac_registration::cardano::cip509::Cip509>) -> Option<Self> {
+        let mut regs_iter = regs.into_iter();
+        while let Some(try_first) = regs_iter.next() {
+            if let Ok(mut chain) =
+                rbac_registration::registration::cardano::RegistrationChain::new(try_first)
+            {
+                for reg in regs_iter {
+                    let Ok(updated_chain) = chain.update(reg) else {
+                        continue;
+                    };
+                    chain = updated_chain;
+                }
+                return Some(chain.into());
+            }
+            continue;
+        }
+        None
+    }
+}
+
 impl Example for RegistrationChain {
     fn example() -> Self {
         Self {
