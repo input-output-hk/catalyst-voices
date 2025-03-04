@@ -303,7 +303,7 @@ void main() {
         template: templateRef,
       );
 
-      await repository.updateProposalDraftContent(
+      await repository.updateDocumentDraft(
         ref: draftRef,
         content: updatedContent,
       );
@@ -341,7 +341,7 @@ void main() {
       await draftsSource.save(data: draftData);
 
       // Then
-      await repository.updateProposalDraftContent(
+      await repository.updateDocumentDraft(
         ref: draftRef,
         content: updatedContent,
       );

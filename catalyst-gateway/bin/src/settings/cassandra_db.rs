@@ -88,7 +88,7 @@ impl EnvVars {
             tls,
             tls_cert: StringEnvVar::new_optional(&format!("CASSANDRA_{name}_TLS_CERT"), false),
             compression,
-            max_batch_size: StringEnvVar::new_as(
+            max_batch_size: StringEnvVar::new_as_int(
                 &format!("CASSANDRA_{name}_BATCH_SIZE"),
                 MAX_BATCH_SIZE_DEFAULT,
                 MIN_BATCH_SIZE,

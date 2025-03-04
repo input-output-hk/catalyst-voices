@@ -1579,13 +1579,17 @@
   "@proposalEditorValidationSnackbar": {
     "description": "Snackbar title shown when user tries to save a proposal with errors."
   },
-  "proposalEditorDeleteDialogTitle": "Delete Proposal",
+  "proposalEditorDeleteDialogTitle": "Delete Proposal?",
   "@proposalEditorDeleteDialogTitle": {
     "description": "A title for the dialog to confirm proposal deletion."
   },
-  "proposalEditorDeleteDialogDescription": "Permanently delete your proposal?",
+  "proposalEditorDeleteDialogDescription": "Are you sure you want to delete this proposal?\nThis action cannot be undone.",
   "@proposalEditorDeleteDialogDescription": {
     "description": "A description for the dialog to confirm proposal deletion."
+  },
+  "proposalEditorDeleteDialogDeleteButton": "Delete Proposal",
+  "@proposalEditorDeleteDialogDeleteButton": {
+    "description": "A button label for the dialog to confirm proposal deletion."
   },
   "showAll": "Show All",
   "@showAll": {
