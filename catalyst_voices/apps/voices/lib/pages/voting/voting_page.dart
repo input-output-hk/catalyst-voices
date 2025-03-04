@@ -9,6 +9,7 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:uuid/uuid.dart';
 
 final _favoriteProposals = ValueNotifier<List<PendingProposal>>([]);
 
@@ -22,7 +23,7 @@ and PRISM, but its potential is only barely exploited.
 
 final _proposals = [
   PendingProposal(
-    id: 'f14/0',
+    id: const Uuid().v7(),
     campaignName: 'F14',
     category: 'Cardano Use Cases / MVP',
     title: 'Proposal Title that rocks the world',
@@ -36,7 +37,7 @@ final _proposals = [
     author: 'Alex Wells',
   ),
   PendingProposal(
-    id: 'f14/1',
+    id: const Uuid().v7(),
     campaignName: 'F14',
     category: 'Cardano Use Cases / MVP',
     title: 'Proposal Title that rocks the world',
@@ -50,7 +51,7 @@ final _proposals = [
     author: 'Alex Wells',
   ),
   PendingProposal(
-    id: 'f14/2',
+    id: const Uuid().v7(),
     campaignName: 'F14',
     category: 'Cardano Use Cases / MVP',
     title: 'Proposal Title that rocks the world',

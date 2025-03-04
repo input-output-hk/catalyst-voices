@@ -8,6 +8,13 @@ import 'package:equatable/equatable.dart';
 final class Account extends Equatable {
   /* cSpell:disable */
 
+  static const dummyKeychainId = 'TestUserKeychainID';
+  static const dummyUnlockFactor = PasswordLockFactor('Test1234');
+  static final dummySeedPhrase = SeedPhrase.fromMnemonic(
+    'few loyal swift champion rug peace dinosaur '
+    'erase bacon tone install universe',
+  );
+
   /// base64 role0 key looks like
   ///
   /// ```md
@@ -25,11 +32,18 @@ final class Account extends Equatable {
   /// testnet.midnight/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE
   /// ```
   /* cSpell:enable */
+  // TODO(damian-molinski): this should be an URI
+  // https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/rbac_id_uri/catalyst-id-uri/
   final String catalystId;
+
+  // TODO(damian-molinski): Extract from catalystId. Make nullable
   final String displayName;
   final String email;
+
   final Keychain keychain;
+
   final Set<AccountRole> roles;
+
   final WalletInfo walletInfo;
 
   /// Whether this account is being used.
@@ -39,21 +53,6 @@ final class Account extends Equatable {
   /// "provisional". This means backend does not yet know about it because
   /// transaction was not yet read.
   final bool isProvisional;
-
-  // TODO(damian-molinski): Not integrated. Backend should return it.
-  String get stakeAddress {
-    /* cSpell:disable */
-    return 'addr1q9gkq75mt2hykrktnsgt2zxrj5h9jnd6gkwr5s4r8v'
-        '5x3dzp8n9h9mns5w7zx95jhtwz46yq4nr7y6hhlwtq75jflsqq9dxry2';
-    /* cSpell:enable */
-  }
-
-  static const dummyKeychainId = 'TestUserKeychainID';
-  static const dummyUnlockFactor = PasswordLockFactor('Test1234');
-  static final dummySeedPhrase = SeedPhrase.fromMnemonic(
-    'few loyal swift champion rug peace dinosaur '
-    'erase bacon tone install universe',
-  );
 
   const Account({
     required this.catalystId,
@@ -98,6 +97,26 @@ final class Account extends Equatable {
 
   bool get isDummy => keychain.id == dummyKeychainId;
 
+  @override
+  List<Object?> get props => [
+        catalystId,
+        displayName,
+        email,
+        keychain.id,
+        roles,
+        walletInfo,
+        isActive,
+        isProvisional,
+      ];
+
+  // TODO(damian-molinski): Not integrated. Backend should return it.
+  String get stakeAddress {
+    /* cSpell:disable */
+    return 'addr1q9gkq75mt2hykrktnsgt2zxrj5h9jnd6gkwr5s4r8v'
+        '5x3dzp8n9h9mns5w7zx95jhtwz46yq4nr7y6hhlwtq75jflsqq9dxry2';
+    /* cSpell:enable */
+  }
+
   Account copyWith({
     String? catalystId,
     String? displayName,
@@ -119,16 +138,4 @@ final class Account extends Equatable {
       isProvisional: isProvisional ?? this.isProvisional,
     );
   }
-
-  @override
-  List<Object?> get props => [
-        catalystId,
-        displayName,
-        email,
-        keychain.id,
-        roles,
-        walletInfo,
-        isActive,
-        isProvisional,
-      ];
 }

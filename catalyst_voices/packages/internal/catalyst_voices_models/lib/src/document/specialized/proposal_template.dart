@@ -19,8 +19,7 @@ final class ProposalTemplate extends Equatable {
 }
 
 final class ProposalTemplateMetadata extends DocumentMetadata {
-  const ProposalTemplateMetadata({
-    required super.id,
-    required super.version,
+  ProposalTemplateMetadata({
+    required super.selfRef,
   });
 }

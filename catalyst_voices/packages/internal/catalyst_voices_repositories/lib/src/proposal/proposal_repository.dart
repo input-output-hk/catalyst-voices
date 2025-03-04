@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:uuid/uuid.dart';
 
 final _proposalDescription = """
 Zanzibar is becoming one of the hotspots for DID's through
@@ -32,7 +33,7 @@ abstract interface class ProposalRepository {
   Future<List<String>> getFavoritesProposalsIds();
 
   Future<ProposalBase> getProposal({
-    required String id,
+    required DocumentRef ref,
   });
 
   /// Fetches all proposals.
@@ -62,10 +63,10 @@ final class ProposalRepositoryImpl implements ProposalRepository {
 
   @override
   Future<ProposalBase> getProposal({
-    required String id,
+    required DocumentRef ref,
   }) async {
     return ProposalBase(
-      id: id,
+      id: ref.id,
       category: 'Cardano Use Cases / MVP',
       title: 'Proposal Title that rocks the world',
       updateDate: DateTime.now().minusDays(2),
@@ -102,7 +103,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
           : ProposalPublish.publishedDraft;
       proposals.add(
         ProposalBase(
-          id: '${Random().nextInt(1000)}/${Random().nextInt(1000)}',
+          id: const Uuid().v7(),
           category: 'Cardano Use Cases / MVP',
           title: 'Proposal Title that rocks the world',
           updateDate: DateTime.now().minusDays(2),
@@ -153,7 +154,8 @@ final class ProposalRepositoryImpl implements ProposalRepository {
       );
     }
     for (var i = range.from; i <= range.to; i++) {
-      final proposal = await getProposal(id: favoritesIds[i]);
+      final ref = SignedDocumentRef(id: favoritesIds[i]);
+      final proposal = await getProposal(ref: ref);
       proposals.add(proposal);
     }
 
@@ -180,7 +182,8 @@ final class ProposalRepositoryImpl implements ProposalRepository {
       );
     }
     for (var i = range.from; i <= range.to; i++) {
-      final proposal = await getProposal(id: userProposalsIds[i]);
+      final ref = SignedDocumentRef(id: userProposalsIds[i]);
+      final proposal = await getProposal(ref: ref);
       proposals.add(proposal);
     }
 

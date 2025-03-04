@@ -18,7 +18,7 @@ class ProposalBuilderDeleteConfirmationDialog extends StatelessWidget {
       subtitle: Text(context.l10n.proposalEditorDeleteDialogDescription),
       actions: [
         VoicesQuestionActionItem.positive(
-          context.l10n.delete,
+          context.l10n.proposalEditorDeleteDialogDeleteButton,
           type: VoicesQuestionActionType.filled,
         ),
         VoicesQuestionActionItem.negative(

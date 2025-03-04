@@ -21,8 +21,10 @@ void main() {
 
     final proposalDocument = ProposalDocument(
       metadata: ProposalMetadata(
-        id: const Uuid().v7(),
-        version: const Uuid().v7(),
+        selfRef: SignedDocumentRef(
+          id: const Uuid().v7(),
+          version: const Uuid().v7(),
+        ),
       ),
       document: const Document(
         schema: proposalTemplate,
@@ -41,7 +43,7 @@ void main() {
     );
 
     final proposal = Proposal(
-      id: '1',
+      id: const Uuid().v7(),
       title: 'Proposal 1',
       description: 'Description 1',
       category: '',
