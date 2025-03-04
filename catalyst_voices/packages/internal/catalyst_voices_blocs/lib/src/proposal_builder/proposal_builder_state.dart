@@ -56,7 +56,6 @@ final class ProposalBuilderState extends Equatable {
   final ProposalGuidance guidance;
   final NodeId? activeNodeId;
   final bool showValidationErrors;
-  final bool isDeleted;
 
   const ProposalBuilderState({
     this.isChanging = false,
@@ -67,7 +66,6 @@ final class ProposalBuilderState extends Equatable {
     this.guidance = const ProposalGuidance(),
     this.activeNodeId,
     this.showValidationErrors = false,
-    this.isDeleted = false,
   });
 
   String? get proposalTitle {
@@ -87,7 +85,6 @@ final class ProposalBuilderState extends Equatable {
         guidance,
         activeNodeId,
         showValidationErrors,
-        isDeleted,
       ];
 
   bool get showError => !isChanging && error != null;
@@ -103,7 +100,6 @@ final class ProposalBuilderState extends Equatable {
     ProposalGuidance? guidance,
     Optional<NodeId>? activeNodeId,
     bool? showValidationErrors,
-    bool? isDeleted,
   }) {
     return ProposalBuilderState(
       isChanging: isChanging ?? this.isChanging,
@@ -114,7 +110,6 @@ final class ProposalBuilderState extends Equatable {
       guidance: guidance ?? this.guidance,
       activeNodeId: activeNodeId.dataOr(this.activeNodeId),
       showValidationErrors: showValidationErrors ?? this.showValidationErrors,
-      isDeleted: isDeleted ?? this.isDeleted,
     );
   }
 }

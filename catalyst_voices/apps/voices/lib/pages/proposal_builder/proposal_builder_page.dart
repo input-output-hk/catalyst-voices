@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:catalyst_voices/common/error_handler.dart';
+import 'package:catalyst_voices/common/signal_handler.dart';
 import 'package:catalyst_voices/pages/proposal_builder/appbar/proposal_builder_back_action.dart';
 import 'package:catalyst_voices/pages/proposal_builder/appbar/proposal_builder_status_action.dart';
 import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_error.dart';
@@ -63,12 +64,14 @@ class _ProposalBuilderContent extends StatelessWidget {
 }
 
 class _ProposalBuilderPageState extends State<ProposalBuilderPage>
-    with ErrorHandlerStateMixin<ProposalBuilderBloc, ProposalBuilderPage> {
+    with
+        ErrorHandlerStateMixin<ProposalBuilderBloc, ProposalBuilderPage>,
+        SignalHandlerStateMixin<ProposalBuilderBloc, ProposalBuilderSignal,
+            ProposalBuilderPage> {
   late final SegmentsController _segmentsController;
   late final ItemScrollController _segmentsScrollController;
 
   StreamSubscription<dynamic>? _segmentsSub;
-  StreamSubscription<dynamic>? _isDeletedSub;
 
   @override
   Widget build(BuildContext context) {
@@ -112,9 +115,6 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
     unawaited(_segmentsSub?.cancel());
     _segmentsSub = null;
 
-    unawaited(_isDeletedSub?.cancel());
-    _isDeletedSub = null;
-
     super.dispose();
   }
 
@@ -124,6 +124,14 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
       _showValidationErrorSnackbar(error);
     } else {
       super.handleError(error);
+    }
+  }
+
+  @override
+  void handleSignal(ProposalBuilderSignal signal) {
+    switch (signal) {
+      case DeletedProposalBuilderSignal():
+        _onProposalDeleted();
     }
   }
 
@@ -146,12 +154,6 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
           (a, b) => listEquals(a.segments, b.segments) && a.nodeId == b.nodeId,
         )
         .listen((record) => _updateSegments(record.segments, record.nodeId));
-
-    _isDeletedSub = bloc.stream
-        .map((e) => e.isDeleted)
-        .distinct()
-        .where((isDeleted) => isDeleted)
-        .listen((_) => _onProposalDeleted());
 
     _updateSource(bloc: bloc);
   }

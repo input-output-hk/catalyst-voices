@@ -2,7 +2,9 @@ import 'dart:async';
 
 import 'package:catalyst_voices_blocs/src/common/bloc_error_emitter_mixin.dart';
 import 'package:catalyst_voices_blocs/src/common/bloc_event_transformers.dart';
+import 'package:catalyst_voices_blocs/src/common/bloc_signal_emitter_mixin.dart';
 import 'package:catalyst_voices_blocs/src/proposal_builder/proposal_builder_event.dart';
+import 'package:catalyst_voices_blocs/src/proposal_builder/proposal_builder_signal.dart';
 import 'package:catalyst_voices_blocs/src/proposal_builder/proposal_builder_state.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
@@ -15,7 +17,9 @@ final _logger = Logger('ProposalBuilderBloc');
 
 final class ProposalBuilderBloc
     extends Bloc<ProposalBuilderEvent, ProposalBuilderState>
-    with BlocErrorEmitterMixin {
+    with
+        BlocErrorEmitterMixin,
+        BlocSignalEmitterMixin<ProposalBuilderSignal, ProposalBuilderState> {
   final CampaignService _campaignService;
   final ProposalService _proposalService;
   final DownloaderService _downloaderService;
@@ -101,7 +105,7 @@ final class ProposalBuilderBloc
       final unversionedRef = ref.copyWith(version: const Optional.empty());
 
       await _proposalService.deleteDraftProposal(unversionedRef);
-      emit(state.copyWith(isDeleted: true));
+      emitSignal(const DeletedProposalBuilderSignal());
     } catch (error, stackTrace) {
       _logger.severe('Deleting proposal failed', error, stackTrace);
       emitError(const LocalizedUnknownException());
