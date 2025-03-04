@@ -20,6 +20,12 @@ sealed class DocumentRef extends Equatable {
     String? id,
     Optional<String>? version,
   });
+
+  /// Generates a draft version of the document reference.
+  ///
+  /// The version can be used as next version for updated document,
+  /// i.e. by proposal builder.
+  DraftRef nextVersion();
 }
 
 final class DraftRef extends DocumentRef {
@@ -46,6 +52,9 @@ final class DraftRef extends DocumentRef {
       version: version.dataOr(this.version),
     );
   }
+
+  @override
+  DraftRef nextVersion() => this;
 
   @override
   String toString() =>
@@ -79,6 +88,14 @@ final class SignedDocumentRef extends DocumentRef {
     return SignedDocumentRef(
       id: id ?? this.id,
       version: version.dataOr(this.version),
+    );
+  }
+
+  @override
+  DraftRef nextVersion() {
+    return DraftRef(
+      id: id,
+      version: const Uuid().v7(),
     );
   }
 
