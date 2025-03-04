@@ -1,6 +1,6 @@
 VERSION 0.8
 
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/rust:v3.2.39 AS rust-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/rust:v3.3.0 AS rust-ci
 IMPORT ../ AS repo-ci
 
 #cspell: words rustfmt toolsets USERARCH stdcfgs
@@ -74,6 +74,7 @@ build:
         --docs="true"
 
     # Generate the OpenAPI doc from the cat-gateway executable itself.
+    ENV API_HOST_NAMES "https://gateway.dev.projectcatalyst.io"
     RUN ./target/release/cat-gateway docs ./target/doc/cat-gateway-api.json
 
     SAVE ARTIFACT target/doc doc

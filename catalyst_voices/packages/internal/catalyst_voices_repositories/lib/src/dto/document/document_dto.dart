@@ -38,6 +38,13 @@ final class DocumentDto {
     );
   }
 
+  DocumentDataContentDto toJson() {
+    return DocumentDataContentDto.fromDocument(
+      schemaUrl: schema.schemaSelfUrl,
+      properties: properties.map((e) => e.toJson()),
+    );
+  }
+
   Document toModel() {
     // building a document via builder to sort properties
     return DocumentBuilder(
@@ -46,13 +53,6 @@ final class DocumentDto {
           .map((e) => DocumentPropertyBuilder.fromProperty(e.toModel()))
           .toList(),
     ).build();
-  }
-
-  DocumentDataContentDto toJson() {
-    return DocumentDataContentDto.fromDocument(
-      schemaUrl: schema.schemaSelfUrl,
-      properties: properties.map((e) => e.toJson()),
-    );
   }
 }
 
@@ -95,9 +95,9 @@ sealed class DocumentPropertyDto {
 
   DocumentPropertySchema get schema;
 
-  DocumentProperty toModel();
-
   Map<String, dynamic> toJson();
+
+  DocumentProperty toModel();
 }
 
 final class DocumentPropertyListDto extends DocumentPropertyDto {
@@ -140,6 +140,13 @@ final class DocumentPropertyListDto extends DocumentPropertyDto {
   }
 
   @override
+  Map<String, dynamic> toJson() => {
+        schema.id: [
+          for (final property in properties) ...property.toJson().values,
+        ],
+      };
+
+  @override
   DocumentListProperty toModel() {
     final mappedProperties = properties.map((e) => e.toModel()).toList();
 
@@ -147,13 +154,6 @@ final class DocumentPropertyListDto extends DocumentPropertyDto {
       properties: List.unmodifiable(mappedProperties),
     );
   }
-
-  @override
-  Map<String, dynamic> toJson() => {
-        schema.id: [
-          for (final property in properties) ...property.toJson().values,
-        ],
-      };
 }
 
 final class DocumentPropertyObjectDto extends DocumentPropertyDto {
@@ -189,6 +189,13 @@ final class DocumentPropertyObjectDto extends DocumentPropertyDto {
   }
 
   @override
+  Map<String, dynamic> toJson() => {
+        schema.id: {
+          for (final property in properties) ...property.toJson(),
+        },
+      };
+
+  @override
   DocumentObjectProperty toModel() {
     final mappedProperties = properties.map((e) => e.toModel()).toList();
 
@@ -196,13 +203,6 @@ final class DocumentPropertyObjectDto extends DocumentPropertyDto {
       properties: List.unmodifiable(mappedProperties),
     );
   }
-
-  @override
-  Map<String, dynamic> toJson() => {
-        schema.id: {
-          for (final property in properties) ...property.toJson(),
-        },
-      };
 }
 
 final class DocumentPropertyValueDto<T extends Object>
@@ -235,11 +235,6 @@ final class DocumentPropertyValueDto<T extends Object>
   }
 
   @override
-  DocumentValueProperty<T> toModel() {
-    return schema.buildProperty(value: value);
-  }
-
-  @override
   Map<String, dynamic> toJson() {
     if (value == null) {
       // Don't output keys for nullable values, json schema distinguishes
@@ -253,5 +248,16 @@ final class DocumentPropertyValueDto<T extends Object>
         schema.id: value,
       };
     }
+  }
+
+  @override
+  DocumentValueProperty<T> toModel() {
+    return schema.buildProperty(value: value);
+  }
+}
+
+extension DocumentExt on Document {
+  DocumentDataContent toContent() {
+    return DocumentDto.fromModel(this).toJson().toModel();
   }
 }
