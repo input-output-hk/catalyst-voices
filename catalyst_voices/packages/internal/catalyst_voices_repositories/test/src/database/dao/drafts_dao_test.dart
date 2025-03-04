@@ -245,5 +245,27 @@ void main() {
         );
       });
     });
+
+    group('delete', () {
+      test('inserting and deleting a draft makes the table empty', () async {
+        // Given
+        final ref = DraftRef.generateFirstRef();
+
+        final draft = DraftFactory.build(
+          metadata: DocumentDataMetadata(
+            type: DocumentType.proposalDocument,
+            selfRef: ref,
+          ),
+        );
+
+        // When
+        await database.draftsDao.save(draft);
+        await database.draftsDao.deleteWhere(ref: ref);
+
+        // Then
+        final entities = await database.draftsDao.queryAll();
+        expect(entities, isEmpty);
+      });
+    });
   });
 }

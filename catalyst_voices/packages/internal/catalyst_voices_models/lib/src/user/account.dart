@@ -32,7 +32,11 @@ final class Account extends Equatable {
   /// testnet.midnight/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE
   /// ```
   /* cSpell:enable */
+  // TODO(damian-molinski): this should be an URI
+  // https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/rbac_id_uri/catalyst-id-uri/
   final String catalystId;
+
+  // TODO(damian-molinski): Extract from catalystId. Make nullable
   final String displayName;
   final String email;
 
@@ -49,6 +53,7 @@ final class Account extends Equatable {
   /// "provisional". This means backend does not yet know about it because
   /// transaction was not yet read.
   final bool isProvisional;
+
   const Account({
     required this.catalystId,
     required this.displayName,

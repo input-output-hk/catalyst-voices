@@ -78,6 +78,7 @@ final class ProposalsRoute extends GoRouteData with FadePageTransitionMixin {
   const ProposalsRoute({
     this.categoryId,
   });
+
   @override
   Widget build(BuildContext context, GoRouterState state) {
     return ProposalsPage(
@@ -94,6 +95,7 @@ final class ProposalsRoute extends GoRouteData with FadePageTransitionMixin {
         TypedGoRoute<ProposalsRoute>(
           path: 'proposals',
         ),
+
         TypedGoRoute<MyProposalsRoute>(
           path: 'my-proposals',
         ),

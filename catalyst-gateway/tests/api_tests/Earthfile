@@ -1,6 +1,7 @@
 VERSION 0.8
 
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/python:v3.2.39 AS python-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/python:v3.3.0 AS python-ci
+IMPORT github.com/input-output-hk/catalyst-libs/rust:r20250227-00 AS cat-libs-rust
 
 builder:
     FROM python-ci+python-base
@@ -9,18 +10,19 @@ builder:
     COPY --dir ./api .
     COPY --dir ./integration .
     COPY --dir ./utils .
+    COPY --dir ./test_data .
+    COPY cat-libs-rust+build/mk_signed_doc .
     COPY ./snapshot_tool-56364174.json .
     DO python-ci+BUILDER
 
 test:
     FROM +builder
-
     COPY ./../+docker-compose/docker-compose.yml .
 
     ENV EVENT_DB_TEST_URL "postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev"
     ENV CAT_GATEWAY_TEST_URL "http://127.0.0.1:3030"
     # cspell: disable-next-line
-    ENV BEARER_TOKEN = "catv1.UJm5ZNT1n7l3_h3c3VXp1R9QAZStRmrxdtYwTrdsxKWIF1hAi3mqbz6dPNiICQCkoXWJs8KCpcaPuE7LE5Iu9su0ZweK_0Qr9KhBNNHrDMCh79-fruK7WyNPYNc6FrjwTPaIAQ"
+    ENV BEARER_TOKEN = "catid.:1740660380@preprod.cardano/ycih6xARcuFGiRrtf1ETLWPvXGd_UBheZ4A5kccWNAU.2CB_ByoGhZ8xBjLveK6jcGbKZ7_5TDjCwbTyNtHWFXnyKuvkTp9zo9tmBOVkPRbHjSwzx85kX3lIoGtKF3_dDQ"
 
     WITH DOCKER \
         --compose docker-compose.yml \
@@ -37,7 +39,6 @@ test:
 
 disabled-nightly-test:
     FROM +builder
-
     COPY ./docker-compose.yml .
 
     WITH DOCKER \
