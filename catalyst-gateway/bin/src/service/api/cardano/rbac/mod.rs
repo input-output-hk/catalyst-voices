@@ -1,10 +1,9 @@
 //! RBAC endpoints.
 
-use poem_openapi::{param::Query, payload::Json, OpenApi};
+use poem_openapi::{param::Query, OpenApi};
 
 use crate::service::common::{
-    auth::{none_or_api_key::NoneOrApiKey, none_or_rbac::NoneOrRBAC},
-    tags::ApiTags,
+    auth::none_or_rbac::NoneOrRBAC, tags::ApiTags,
     types::cardano::query::stake_or_voter::StakeOrVoter,
 };
 
@@ -33,24 +32,10 @@ impl Api {
         /// A flag which enalbes returning all corresponded Cip509 registrations
         Query(detailed): Query<Option<bool>>,
         /// No Authorization required, but Token permitted.
-        _auth: NoneOrRBAC,
-        /// No Authorization required, but Api Key permitted.
-        api_key: NoneOrApiKey,
+        auth: NoneOrRBAC,
     ) -> registrations_get::AllResponses {
-        // Special validation for the `lookup` parameter.
-        // If the parameter is ALL, BUT we do not have a valid API Key, just report the parameter
-        // is invalid.
-        if let Some(lookup) = lookup.clone() {
-            if lookup.is_all() && matches!(api_key, NoneOrApiKey::None(_)) {
-                return registrations_get::Responses::UnprocessableContent(Json(
-                    unprocessable_content::RbacUnprocessableContent::new(
-                        "Invalid Stake Address or Voter key",
-                    ),
-                ))
-                .into();
-            }
-        }
         let detailed = detailed.unwrap_or_default();
-        registrations_get::endpoint(lookup, detailed).await
+        let auth_catalyst_id = auth.into();
+        registrations_get::endpoint(lookup, auth_catalyst_id, detailed).await
     }
 }
