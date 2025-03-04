@@ -2,7 +2,6 @@ import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
@@ -117,16 +116,13 @@ class _ProposalDocumentSectionTileState
           Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: _items
-                .whereNot((item) => item.isEmpty)
-                .map<Widget>((item) {
-                  return _DocumentPropertyValueBuilder(
-                    key: ObjectKey(item.id),
-                    item: item,
-                  );
-                })
-                .separatedBy(const SizedBox(height: 16))
-                .toList(),
+            spacing: 16,
+            children: _items.whereNot((item) => item.isEmpty).map((item) {
+              return _DocumentPropertyValueBuilder(
+                key: ObjectKey(item.id),
+                item: item,
+              );
+            }).toList(),
           ),
         ],
       ),
