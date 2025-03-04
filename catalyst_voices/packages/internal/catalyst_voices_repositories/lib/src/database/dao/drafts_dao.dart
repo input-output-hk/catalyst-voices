@@ -18,7 +18,7 @@ abstract interface class DraftsDao {
   Future<int> countAll();
 
   /// Deletes a document draft with [ref].
-  /// 
+  ///
   /// If [ref] is null then all drafts are deleted.
   Future<void> deleteWhere({DraftRef ref});
 
