@@ -21,7 +21,7 @@ class VoicesChip extends StatelessWidget {
   final BorderRadius borderRadius;
 
   /// The internal padding from the widget borders to the internal content.
-  final EdgeInsets padding;
+  final EdgeInsetsGeometry? padding;
 
   /// The callback called when the widget is tapped.
   final VoidCallback? onTap;
@@ -34,20 +34,9 @@ class VoicesChip extends StatelessWidget {
     this.trailing,
     this.backgroundColor,
     required this.borderRadius,
-    this.padding = const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+    this.padding,
     this.onTap,
   });
-
-  /// A constructor that creates a [VoicesChip] with fully rounded corners.
-  const VoicesChip.round({
-    super.key,
-    required this.content,
-    this.leading,
-    this.trailing,
-    this.backgroundColor,
-    this.padding = const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-    this.onTap,
-  }) : borderRadius = const BorderRadius.all(Radius.circular(32));
 
   /// A constructor that creates a [VoicesChip] with slightly rounded,
   /// rectangular corners.
@@ -57,13 +46,43 @@ class VoicesChip extends StatelessWidget {
     this.leading,
     this.trailing,
     this.backgroundColor,
-    this.padding = const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+    this.padding,
     this.onTap,
   }) : borderRadius = const BorderRadius.all(Radius.circular(8));
+
+  /// A constructor that creates a [VoicesChip] with fully rounded corners.
+  const VoicesChip.round({
+    super.key,
+    required this.content,
+    this.leading,
+    this.trailing,
+    this.backgroundColor,
+    this.padding,
+    this.onTap,
+  }) : borderRadius = const BorderRadius.all(Radius.circular(32));
 
   @override
   Widget build(BuildContext context) {
     final iconTheme = IconTheme.of(context).copyWith(size: 18);
+
+    final padding = this.padding ??
+        () {
+          EdgeInsetsGeometry padding = const EdgeInsets.symmetric(
+            vertical: 8,
+            horizontal: 12,
+          );
+
+          if (leading != null) {
+            padding = padding.subtract(const EdgeInsets.only(left: 6));
+          }
+
+          if (trailing != null) {
+            padding = padding.subtract(const EdgeInsets.only(right: 6));
+          }
+
+          return padding;
+        }();
+
     return DecoratedBox(
       decoration: BoxDecoration(
         color: backgroundColor,

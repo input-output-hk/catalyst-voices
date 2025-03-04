@@ -17,6 +17,11 @@ abstract interface class DraftsDao {
   /// Counts unique drafts. All versions of same document are counted as 1.
   Future<int> countAll();
 
+  /// Deletes a document draft with [ref].
+  ///
+  /// If [ref] is null then all drafts are deleted.
+  Future<void> deleteWhere({DraftRef ref});
+
   /// If version is specified in [ref] returns this version or null.
   /// Returns newest version with matching id or null of none found.
   Future<DocumentDraftEntity?> query({required DocumentRef ref});
@@ -35,7 +40,7 @@ abstract interface class DraftsDao {
   /// Be aware that if version is not specified all version of [ref] id
   /// will be updated.
   Future<void> updateContent({
-    required DocumentRef ref,
+    required DraftRef ref,
     required DocumentDataContent content,
   });
 
@@ -61,6 +66,15 @@ class DriftDraftsDao extends DatabaseAccessor<DriftCatalystDatabase>
   @override
   Future<int> countAll() {
     return drafts.count().getSingle();
+  }
+
+  @override
+  Future<void> deleteWhere({DraftRef? ref}) async {
+    if (ref == null) {
+      await drafts.deleteAll();
+    } else {
+      await drafts.deleteWhere((row) => _filterRef(row, ref));
+    }
   }
 
   @override

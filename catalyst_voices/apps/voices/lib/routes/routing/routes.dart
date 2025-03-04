@@ -5,6 +5,7 @@ import 'package:catalyst_voices/routes/routing/overall_spaces_route.dart'
     as overall_spaces;
 import 'package:catalyst_voices/routes/routing/proposal_builder_route.dart'
     as proposal_builder;
+import 'package:catalyst_voices/routes/routing/proposal_route.dart' as proposal;
 import 'package:catalyst_voices/routes/routing/spaces_route.dart' as spaces;
 import 'package:go_router/go_router.dart';
 
@@ -18,6 +19,7 @@ abstract final class Routes {
     ...coming_soon.$appRoutes,
     ...spaces.$appRoutes,
     ...overall_spaces.$appRoutes,
+    ...proposal.$appRoutes,
     ...proposal_builder.$appRoutes,
   ];
 

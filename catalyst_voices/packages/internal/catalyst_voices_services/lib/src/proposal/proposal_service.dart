@@ -3,7 +3,6 @@ import 'dart:typed_data';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:rxdart/rxdart.dart';
-import 'package:uuid/uuid.dart';
 
 abstract interface class ProposalService {
   const factory ProposalService(
@@ -13,21 +12,26 @@ abstract interface class ProposalService {
 
   Future<List<String>> addFavoriteProposal(String proposalId);
 
-  /// Encodes the [document] to exportable format.
+  /// Delete a draft proposal from local storage.
+  ///
+  /// Published proposals cannot be deleted.
+  Future<void> deleteDraftProposal(DraftRef ref);
+
+  /// Encodes the [content] to exportable format.
   ///
   /// It does not save the document anywhere on the disk,
   /// it only encodes a document as [Uint8List]
   /// so that it can be saved as a file.
   Future<Uint8List> encodeProposalForExport({
     required DocumentDataMetadata metadata,
-    required Document document,
+    required DocumentDataContent content,
   });
 
   /// Fetches favorites proposals ids of the user
   Future<List<String>> getFavoritesProposalsIds();
 
   Future<ProposalData> getProposal({
-    required String id,
+    required DocumentRef ref,
   });
 
   Future<ProposalPaginationItems<Proposal>> getProposals({
@@ -59,6 +63,12 @@ abstract interface class ProposalService {
   /// Submits a proposal draft into review.
   Future<void> submitProposalForReview(Document document);
 
+  /// Saves a new proposal draft in the local storage.
+  Future<void> updateDraftProposal({
+    required DraftRef ref,
+    required DocumentDataContent content,
+  });
+
   Stream<List<Proposal>> watchLatestProposals({int? limit});
 }
 
@@ -77,13 +87,18 @@ final class ProposalServiceImpl implements ProposalService {
   }
 
   @override
+  Future<void> deleteDraftProposal(DraftRef ref) {
+    return _documentRepository.deleteDocumentDraft(ref: ref);
+  }
+
+  @override
   Future<Uint8List> encodeProposalForExport({
     required DocumentDataMetadata metadata,
-    required Document document,
+    required DocumentDataContent content,
   }) {
     return _documentRepository.encodeDocumentForExport(
       metadata: metadata,
-      document: document,
+      content: content,
     );
   }
 
@@ -95,34 +110,12 @@ final class ProposalServiceImpl implements ProposalService {
 
   @override
   Future<ProposalData> getProposal({
-    required String id,
+    required DocumentRef ref,
   }) async {
-    const proposalTemplate = DocumentSchema(
-      parentSchemaUrl: '',
-      schemaSelfUrl: '',
-      title: '',
-      description: MarkdownData.empty,
-      properties: [],
-      order: [],
-    );
-    final version = const Uuid().v7();
-    return ProposalData(
-      document: ProposalDocument(
-        metadata: ProposalMetadata(
-          id: id,
-          version: version,
-        ),
-        document: const Document(
-          schema: proposalTemplate,
-          properties: [],
-        ),
-      ),
-      categoryId: '',
-      ref: SignedDocumentRef(
-        id: id,
-        version: version,
-      ),
-    );
+    final proposalBase = await _proposalRepository.getProposal(ref: ref);
+    final proposal = await _buildProposal(proposalBase);
+
+    return proposal;
   }
 
   @override
@@ -180,6 +173,17 @@ final class ProposalServiceImpl implements ProposalService {
   }
 
   @override
+  Future<void> updateDraftProposal({
+    required DraftRef ref,
+    required DocumentDataContent content,
+  }) {
+    return _documentRepository.updateDocumentDraft(
+      ref: ref,
+      content: content,
+    );
+  }
+
+@override
   Stream<List<Proposal>> watchLatestProposals({int? limit}) {
     return _documentRepository
         .watchProposalsDocuments(limit: limit)

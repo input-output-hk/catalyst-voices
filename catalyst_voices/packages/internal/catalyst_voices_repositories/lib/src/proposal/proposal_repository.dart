@@ -31,7 +31,7 @@ abstract interface class ProposalRepository {
   Future<List<String>> getFavoritesProposalsIds();
 
   Future<Proposal> getProposal({
-    required String id,
+    required DocumentRef ref,
   });
 
   /// Fetches all proposals.
@@ -61,10 +61,10 @@ final class ProposalRepositoryImpl implements ProposalRepository {
 
   @override
   Future<Proposal> getProposal({
-    required String id,
+    required DocumentRef ref,
   }) async {
     return Proposal(
-      selfRef: SignedDocumentRef.generateFirstRef(),
+      selfRef: ref,
       category: 'Cardano Use Cases / MVP',
       title: 'Proposal Title that rocks the world',
       updateDate: DateTime.now().minusDays(2),
@@ -152,7 +152,8 @@ final class ProposalRepositoryImpl implements ProposalRepository {
       );
     }
     for (var i = range.from; i <= range.to; i++) {
-      final proposal = await getProposal(id: favoritesIds[i]);
+      final ref = SignedDocumentRef(id: favoritesIds[i]);
+      final proposal = await getProposal(ref: ref);
       proposals.add(proposal);
     }
 
@@ -179,7 +180,8 @@ final class ProposalRepositoryImpl implements ProposalRepository {
       );
     }
     for (var i = range.from; i <= range.to; i++) {
-      final proposal = await getProposal(id: userProposalsIds[i]);
+      final ref = SignedDocumentRef(id: userProposalsIds[i]);
+      final proposal = await getProposal(ref: ref);
       proposals.add(proposal);
     }
 

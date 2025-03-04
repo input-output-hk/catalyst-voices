@@ -62,7 +62,7 @@ impl FullSignedDoc {
     }
 
     /// Returns the document raw bytes.
-    pub(crate) fn raw(&self) -> &Vec<u8> {
+    pub(crate) fn raw(&self) -> &[u8] {
         &self.raw
     }
 

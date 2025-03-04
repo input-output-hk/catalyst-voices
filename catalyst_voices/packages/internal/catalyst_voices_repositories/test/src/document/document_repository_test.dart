@@ -72,8 +72,7 @@ void main() {
       );
 
       // Then
-      expect(proposalDocument.metadata.id, proposal.metadata.id);
-      expect(proposalDocument.metadata.version, proposal.metadata.version);
+      expect(proposalDocument.metadata.selfRef, proposal.metadata.selfRef);
     });
 
     test('getProposalDocument correctly propagates errors', () async {
@@ -303,7 +302,7 @@ void main() {
         template: templateRef,
       );
 
-      await repository.updateProposalDraftContent(
+      await repository.updateDocumentDraft(
         ref: draftRef,
         content: updatedContent,
       );
@@ -341,7 +340,7 @@ void main() {
       await draftsSource.save(data: draftData);
 
       // Then
-      await repository.updateProposalDraftContent(
+      await repository.updateDocumentDraft(
         ref: draftRef,
         content: updatedContent,
       );
