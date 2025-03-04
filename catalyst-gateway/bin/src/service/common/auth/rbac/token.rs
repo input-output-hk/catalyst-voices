@@ -145,6 +145,7 @@ impl CatalystRBACTokenV1 {
         &self.catalyst_id
     }
 
+    /// Returns a network.
     pub(crate) fn network(&self) -> Network {
         self.network
     }
