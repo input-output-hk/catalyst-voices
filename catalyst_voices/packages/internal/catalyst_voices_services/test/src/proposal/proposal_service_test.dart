@@ -64,7 +64,7 @@ void main() {
 
       // Setup repository responses
       when(
-        () => mockDocumentRepository.watchLatestPublicProposalsDocuments(
+        () => mockDocumentRepository.watchProposalsDocuments(
           limit: null,
         ),
       ).thenAnswer((_) => Stream.value([proposalData1, proposalData2]));
@@ -88,7 +88,7 @@ void main() {
       // Verify
       expect(proposals.length, equals(2));
       verify(
-        () => mockDocumentRepository.watchLatestPublicProposalsDocuments(
+        () => mockDocumentRepository.watchProposalsDocuments(
           limit: null,
         ),
       ).called(1);
@@ -143,7 +143,7 @@ void main() {
             Stream.value([proposalData1, proposalData2]).asBroadcastStream();
 
         when(
-          () => mockDocumentRepository.watchLatestPublicProposalsDocuments(
+          () => mockDocumentRepository.watchProposalsDocuments(
             limit: null,
           ),
         ).thenAnswer((_) => proposalsStream);

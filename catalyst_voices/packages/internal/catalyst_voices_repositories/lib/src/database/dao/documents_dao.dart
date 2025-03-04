@@ -259,11 +259,12 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
     final query = select(documents)
       ..where(
         (row) => Expression.and([
-          // TODO(damian-molinski): JSONB filter
+          // TODO(damian-molinski): JSONB filtering
           row.metadata.equalsValue(
             DocumentDataMetadata(
               type: type,
               ref: ref,
+              selfRef: ref,
             ),
           ),
         ]),

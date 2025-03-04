@@ -182,7 +182,7 @@ final class ProposalServiceImpl implements ProposalService {
   @override
   Stream<List<Proposal>> watchLatestProposals({int? limit}) {
     return _documentRepository
-        .watchLatestPublicProposalsDocuments(limit: limit)
+        .watchProposalsDocuments(limit: limit)
         .switchMap((documents) async* {
       final proposalsStreams = await Future.wait(
         documents.map((doc) async {
