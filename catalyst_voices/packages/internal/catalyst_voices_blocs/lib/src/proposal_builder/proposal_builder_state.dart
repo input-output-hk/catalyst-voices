@@ -40,7 +40,7 @@ final class ProposalBuilderState extends Equatable {
   final LocalizedException? error;
   final Document? document;
   final ProposalBuilderMetadata metadata;
-  final List<ProposalBuilderSegment> segments;
+  final List<DocumentSegment> segments;
   final ProposalGuidance guidance;
   final NodeId? activeNodeId;
   final bool showValidationErrors;
@@ -84,7 +84,7 @@ final class ProposalBuilderState extends Equatable {
     Optional<LocalizedException>? error,
     Optional<Document>? document,
     ProposalBuilderMetadata? metadata,
-    List<ProposalBuilderSegment>? segments,
+    List<DocumentSegment>? segments,
     ProposalGuidance? guidance,
     Optional<NodeId>? activeNodeId,
     bool? showValidationErrors,

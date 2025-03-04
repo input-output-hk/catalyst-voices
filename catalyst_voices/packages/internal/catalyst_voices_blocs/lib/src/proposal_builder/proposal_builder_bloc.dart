@@ -120,8 +120,8 @@ final class ProposalBuilderBloc
   }
 
   Iterable<ProposalGuidanceItem> _findGuidanceItems(
-    ProposalBuilderSegment segment,
-    ProposalBuilderSection section,
+    DocumentSegment segment,
+    DocumentSection section,
     DocumentProperty property,
   ) sync* {
     final guidance = property.schema.guidance;
@@ -160,8 +160,8 @@ final class ProposalBuilderBloc
   }
 
   ProposalGuidance _getGuidanceForSection(
-    ProposalBuilderSegment? segment,
-    ProposalBuilderSection? section,
+    DocumentSegment? segment,
+    DocumentSection? section,
   ) {
     if (segment == null || section == null) {
       return const ProposalGuidance();
@@ -304,7 +304,7 @@ final class ProposalBuilderBloc
     }
   }
 
-  List<ProposalBuilderSegment> _mapDocumentToSegments(
+  List<DocumentSegment> _mapDocumentToSegments(
     Document document, {
     required bool showValidationErrors,
   }) {
@@ -312,7 +312,7 @@ final class ProposalBuilderBloc
       final sections = segment.sections
           .expand(DocumentNodeTraverser.findSectionsAndSubsections)
           .map(
-            (section) => ProposalBuilderSection(
+            (section) => DocumentSection(
               id: section.schema.nodeId,
               property: section,
               schema: section.schema,
@@ -324,7 +324,7 @@ final class ProposalBuilderBloc
           )
           .toList();
 
-      return ProposalBuilderSegment(
+      return DocumentSegment(
         id: segment.schema.nodeId,
         sections: sections,
         property: segment,
