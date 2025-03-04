@@ -640,16 +640,14 @@ pub(crate) async fn start_followers() -> anyhow::Result<()> {
         use self::event::ChainIndexerEvent as Event;
         use crate::metrics::chain_indexer::reporter;
 
+        let api_host_names = Settings::api_host_names().join(",");
+        let service_id = Settings::service_id();
         let network = cfg.chain.to_string();
 
         let mut sync_task = SyncTask::new(cfg);
 
         // add an event listener to watch for certain events to report as metrics
         sync_task.add_event_listener(Box::new(move |event: &Event| {
-            let api_host_names = Settings::api_host_names().join(",");
-            let service_id = Settings::service_id();
-            let network = network.clone();
-
             if let Event::SyncStarted = event {
                 reporter::REACHED_TIP
                     .with_label_values(&[&api_host_names, service_id, &network])
