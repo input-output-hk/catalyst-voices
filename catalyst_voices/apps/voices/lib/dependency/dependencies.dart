@@ -105,6 +105,7 @@ final class Dependencies extends DependencyProvider {
           get<CampaignService>(),
           get<ProposalService>(),
           get<DownloaderService>(),
+          get<DocumentMapper>(),
         );
       })
       ..registerFactory<DiscoveryCubit>(() {
@@ -166,7 +167,8 @@ final class Dependencies extends DependencyProvider {
           get<DocumentDataLocalSource>(),
           get<CatGatewayDocumentDataSource>(),
         );
-      });
+      })
+      ..registerLazySingleton<DocumentMapper>(() => const DocumentMapperImpl());
   }
 
   void _registerServices() {
