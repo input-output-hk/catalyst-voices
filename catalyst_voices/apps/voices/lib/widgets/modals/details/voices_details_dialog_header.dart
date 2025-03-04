@@ -108,6 +108,7 @@ class _TitleLabelText extends StatelessWidget {
     final textTheme = theme.textTheme;
 
     return Text(
+      key: const Key('TitleLabelText'),
       data,
       maxLines: 1,
       overflow: TextOverflow.ellipsis,
@@ -129,6 +130,7 @@ class _TitleText extends StatelessWidget {
     final textTheme = theme.textTheme;
 
     return Text(
+      key: const Key('TitleText'),
       data,
       maxLines: 1,
       overflow: TextOverflow.ellipsis,
@@ -154,6 +156,7 @@ class _CloseButton extends StatelessWidget {
     return IconButtonTheme(
       data: IconButtonThemeData(style: style),
       child: XButton(
+        key: const Key('CloseButton'),
         onTap: () async => Navigator.of(context).maybePop(),
       ),
     );

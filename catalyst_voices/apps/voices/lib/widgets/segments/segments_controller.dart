@@ -178,7 +178,12 @@ final class SegmentsController extends ValueNotifier<SegmentsControllerState> {
   }
 
   Future<void> _scrollToIndex(int index) async {
-    await _itemsScrollController?.scrollTo(
+    final controller = _itemsScrollController;
+    if (controller == null || !controller.isAttached) {
+      return;
+    }
+
+    await controller.scrollTo(
       index: index,
       duration: const Duration(milliseconds: 300),
     );
