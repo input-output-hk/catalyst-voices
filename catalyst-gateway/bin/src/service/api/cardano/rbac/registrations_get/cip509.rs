@@ -4,12 +4,14 @@
 
 use poem_openapi::{types::Example, Object};
 
-use crate::service::common::types::{cardano::transaction_id::TxnId, generic::uuidv4::UUIDv4};
+use crate::service::common::types::{
+    cardano::{slot_tx_idx::SlotTxnIdx, transaction_id::TxnId},
+    generic::uuidv4::UUIDv4,
+};
 
 /// CIP 509 registration transaction data.
 #[derive(Object)]
 #[oai(example = true)]
-#[allow(dead_code)]
 pub(crate) struct Cip509 {
     /// A registration purpose (`UUIDv4`).
     ///
@@ -23,6 +25,9 @@ pub(crate) struct Cip509 {
     prv_tx_id: Option<TxnId>,
     /// A hash of the transaction from which this registration is extracted.
     txn_hash: TxnId,
+    /// A point (slot) and a transaction index identifying the block and the transaction
+    /// that this `Cip509` was extracted from.
+    origin: SlotTxnIdx,
 }
 
 impl Example for Cip509 {
@@ -31,16 +36,18 @@ impl Example for Cip509 {
             purpose: Some(UUIDv4::example()),
             prv_tx_id: None,
             txn_hash: TxnId::example(),
+            origin: SlotTxnIdx::example(),
         }
     }
 }
 
-impl From<rbac_registration::cardano::cip509::Cip509> for Cip509 {
-    fn from(value: rbac_registration::cardano::cip509::Cip509) -> Self {
+impl From<&rbac_registration::cardano::cip509::Cip509> for Cip509 {
+    fn from(value: &rbac_registration::cardano::cip509::Cip509) -> Self {
         Self {
             purpose: value.purpose().map(Into::into),
             prv_tx_id: value.previous_transaction().map(Into::into),
             txn_hash: value.txn_hash().into(),
+            origin: value.origin().clone().into(),
         }
     }
 }
