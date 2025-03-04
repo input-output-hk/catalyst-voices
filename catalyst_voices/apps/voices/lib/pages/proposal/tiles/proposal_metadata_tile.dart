@@ -44,6 +44,7 @@ class ProposalMetadataTile extends StatelessWidget {
         ProfileContainer(profile: author),
         Wrap(
           crossAxisAlignment: WrapCrossAlignment.center,
+          runSpacing: 8,
           children: <Widget>[
             ProposalStatusContainer(type: status),
             const SizedBox(width: 8),
