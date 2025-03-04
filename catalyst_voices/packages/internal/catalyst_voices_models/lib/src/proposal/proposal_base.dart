@@ -99,6 +99,7 @@ enum ProposalPublish {
   submittedProposal;
 
   bool get isDraft => this == publishedDraft;
+  bool get isLocal => this == localDraft;
   bool get isPublished => this == submittedProposal;
 }
 

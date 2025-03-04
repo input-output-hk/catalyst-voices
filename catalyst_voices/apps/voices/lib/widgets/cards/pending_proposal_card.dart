@@ -1,5 +1,4 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
-import 'package:catalyst_voices/common/formatters/date_formatter.dart';
 import 'package:catalyst_voices/routes/routing/proposal_builder_route.dart';
 import 'package:catalyst_voices/widgets/cards/proposal_card_widgets.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/share_proposal_dialog.dart';
@@ -339,31 +338,16 @@ class _ProposalInfo extends StatelessWidget {
         ProposalVersionChip(version: version.toString()),
         if (showLastUpdate) ...[
           const SizedBox(width: 4),
-          VoicesPlainTooltip(
-            message: _tooltipMessage(context),
-            child: DayMonthTimeText(
-              dateTime: lastUpdate,
-            ),
+          DayMonthTimeTextWithTooltip(
+            datetime: lastUpdate,
           ),
         ],
         const Spacer(),
-        VoicesChip.rectangular(
-          backgroundColor: context.colors.elevationsOnSurfaceNeutralLv1Grey,
-          leading: VoicesAssets.icons.chatAlt2.buildIcon(),
-          content: Text(
-            key: const Key('CommentsCount'),
-            version.toString(),
-            style: context.textTheme.labelLarge,
-          ),
+        ProposalCommentsChip(
+          commentsCount: commentsCount,
         ),
       ],
     );
-  }
-
-  String _tooltipMessage(BuildContext context) {
-    final dt = DateFormatter.formatDateTimeParts(lastUpdate, includeYear: true);
-
-    return context.l10n.publishedOn(dt.date, dt.time);
   }
 }
 
