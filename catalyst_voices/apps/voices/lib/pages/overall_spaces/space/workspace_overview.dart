@@ -91,9 +91,9 @@ class _NotPublishedProposals extends StatelessWidget {
       duration: 6,
       author: 'Alex Wells',
       updateDate: DateTime.now(),
-      document: const ProposalDocument(
-        metadata: ProposalMetadata(id: '', version: ''),
-        document: Document(
+      document: ProposalDocument(
+        metadata: ProposalMetadata(selfRef: DraftRef.generateFirstRef()),
+        document: const Document(
           schema: DocumentSchema.optional(),
           properties: [],
         ),

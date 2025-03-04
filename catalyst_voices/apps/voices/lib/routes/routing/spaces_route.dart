@@ -95,7 +95,6 @@ final class ProposalsRoute extends GoRouteData with FadePageTransitionMixin {
         TypedGoRoute<ProposalsRoute>(
           path: 'proposals',
         ),
-
         TypedGoRoute<MyProposalsRoute>(
           path: 'my-proposals',
         ),
