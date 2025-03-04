@@ -22,6 +22,7 @@ class VoicesAlignTitleHeader extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
+            key: const Key('Title'),
             title,
             style: titleStyle ?? Theme.of(context).textTheme.titleMedium,
           ),
@@ -45,6 +46,7 @@ class _CloseButton extends StatelessWidget {
     );
 
     return IconButtonTheme(
+      key: const Key('CloseButton'),
       data: IconButtonThemeData(style: style),
       child: XButton(
         onTap: () async => Navigator.of(context).maybePop(),
