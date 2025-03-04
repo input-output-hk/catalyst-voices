@@ -33,10 +33,22 @@ final class ProposalBuilderMetadata extends Equatable {
         templateRef,
         currentIteration,
       ];
+
+  ProposalBuilderMetadata copyWith({
+    ProposalPublish? publish,
+    Optional<DocumentRef>? documentRef,
+    Optional<DocumentRef>? templateRef,
+  }) {
+    return ProposalBuilderMetadata(
+      publish: publish ?? this.publish,
+      documentRef: documentRef.dataOr(this.documentRef),
+      templateRef: templateRef.dataOr(this.templateRef),
+    );
+  }
 }
 
 final class ProposalBuilderState extends Equatable {
-  final bool isLoading;
+  final bool isChanging;
   final LocalizedException? error;
   final Document? document;
   final ProposalBuilderMetadata metadata;
@@ -46,7 +58,7 @@ final class ProposalBuilderState extends Equatable {
   final bool showValidationErrors;
 
   const ProposalBuilderState({
-    this.isLoading = false,
+    this.isChanging = false,
     this.error,
     this.document,
     this.metadata = const ProposalBuilderMetadata(),
@@ -65,7 +77,7 @@ final class ProposalBuilderState extends Equatable {
 
   @override
   List<Object?> get props => [
-        isLoading,
+        isChanging,
         error,
         document,
         metadata,
@@ -75,12 +87,12 @@ final class ProposalBuilderState extends Equatable {
         showValidationErrors,
       ];
 
-  bool get showError => !isLoading && error != null;
+  bool get showError => !isChanging && error != null;
 
-  bool get showSegments => !isLoading && segments.isNotEmpty && error == null;
+  bool get showSegments => !isChanging && segments.isNotEmpty && error == null;
 
   ProposalBuilderState copyWith({
-    bool? isLoading,
+    bool? isChanging,
     Optional<LocalizedException>? error,
     Optional<Document>? document,
     ProposalBuilderMetadata? metadata,
@@ -90,7 +102,7 @@ final class ProposalBuilderState extends Equatable {
     bool? showValidationErrors,
   }) {
     return ProposalBuilderState(
-      isLoading: isLoading ?? this.isLoading,
+      isChanging: isChanging ?? this.isChanging,
       error: error.dataOr(this.error),
       document: document.dataOr(this.document),
       metadata: metadata ?? this.metadata,

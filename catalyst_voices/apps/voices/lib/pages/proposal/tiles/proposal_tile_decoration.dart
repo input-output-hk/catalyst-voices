@@ -3,6 +3,23 @@ import 'package:flutter/material.dart';
 
 typedef FirstAndLast = ({bool isFirst, bool isLast});
 
+class ProposalSeparatorBox extends StatelessWidget {
+  final double height;
+
+  const ProposalSeparatorBox({
+    super.key,
+    required this.height,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ColoredBox(
+      color: context.colors.elevationsOnSurfaceNeutralLv0,
+      child: SizedBox(height: height),
+    );
+  }
+}
+
 class ProposalTileDecoration extends StatelessWidget {
   final FirstAndLast corners;
   final FirstAndLast verticalPadding;
@@ -38,23 +55,6 @@ class ProposalTileDecoration extends StatelessWidget {
         padding: padding,
         child: child,
       ),
-    );
-  }
-}
-
-class ProposalSeparatorBox extends StatelessWidget {
-  final double height;
-
-  const ProposalSeparatorBox({
-    super.key,
-    required this.height,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return ColoredBox(
-      color: context.colors.elevationsOnSurfaceNeutralLv0,
-      child: SizedBox(height: height),
     );
   }
 }
