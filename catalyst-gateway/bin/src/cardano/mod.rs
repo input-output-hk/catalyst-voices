@@ -11,7 +11,10 @@ use tracing::{debug, error, info, warn};
 
 use crate::{
     db::index::{
-        block::{index_block, roll_forward},
+        block::{
+            index_block,
+            roll_forward::{self, PurgeCondition},
+        },
         queries::sync_status::{
             get::{get_sync_status, SyncStatus},
             update::update_sync_status,
@@ -457,7 +460,12 @@ impl SyncTask {
             // between the live chain and immutable chain.  This gap should be
             // a parameter.
             if self.sync_tasks.len() == 1 {
-                if let Err(error) = roll_forward::purge_live_index(self.immutable_tip_slot).await {
+                // Purge data up to this slot
+                // Slots arithmetic has saturating semantic, so this is ok.
+                #[allow(clippy::arithmetic_side_effects)]
+                let purge_to_slot = self.immutable_tip_slot - Settings::purge_slot_buffer();
+                let purge_condition = PurgeCondition::PurgeBackwards(purge_to_slot);
+                if let Err(error) = roll_forward::purge_live_index(purge_condition).await {
                     error!(chain=%self.cfg.chain, error=%error, "BUG: Purging volatile data task failed.");
                 }
             }
