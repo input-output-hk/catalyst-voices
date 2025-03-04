@@ -19,6 +19,31 @@ pub(crate) struct RbacRegistrations {
     volatile: Option<RbacRegistration>,
 }
 
+impl RbacRegistrations {
+    /// Build a reponse `RbacRegistrations` from the provided CIP 509 registrations lists
+    #[allow(dead_code)]
+    pub(crate) fn new(
+        catalyst_id: CatalystId, finalised_regs: Vec<rbac_registration::cardano::cip509::Cip509>,
+        volatile_regs: Vec<rbac_registration::cardano::cip509::Cip509>, detailed: bool,
+    ) -> anyhow::Result<Self> {
+        let finalised = finalised_regs
+            .is_empty()
+            .then_some(RbacRegistration::new(finalised_regs, detailed))
+            .transpose()?;
+
+        let volatile = volatile_regs
+            .is_empty()
+            .then_some(RbacRegistration::new(volatile_regs, detailed))
+            .transpose()?;
+
+        Ok(Self {
+            catalyst_id,
+            finalised,
+            volatile,
+        })
+    }
+}
+
 impl Example for RbacRegistrations {
     fn example() -> Self {
         Self {
@@ -32,12 +57,31 @@ impl Example for RbacRegistrations {
 /// Single RBAC Registrations.
 #[derive(Object)]
 #[oai(example = true)]
-pub(crate) struct RbacRegistration {
+struct RbacRegistration {
     /// Registration chain
     chain: serde_json::Value,
     /// All Cip509 registrations which formed a current registration chain
     #[oai(skip_serializing_if_is_empty)]
     details: Vec<Cip509>,
+}
+
+impl RbacRegistration {
+    /// Build a reponse `RbacRegistration` from the provided CIP 509 registrations lists
+    pub(crate) fn new(
+        regs: Vec<rbac_registration::cardano::cip509::Cip509>, detailed: bool,
+    ) -> anyhow::Result<Self> {
+        let details = if detailed {
+            regs.iter().map(Into::into).collect()
+        } else {
+            Vec::new()
+        };
+
+        Ok(Self {
+            // TODO fix
+            chain: serde_json::Value::Null,
+            details,
+        })
+    }
 }
 
 impl Example for RbacRegistration {
