@@ -30,8 +30,13 @@ pub(crate) enum ChainIndexerEvent {
         /// The latest indexed slot.
         slot: Slot,
     },
-    /// Event triggered when live data is purged.
-    LiveDataPurged {
+    /// Event triggered when backward data is purged.
+    BackwardDataPurged {
+        /// The number of purged data entries.
+        count: u64,
+    },
+    /// Event triggered when forward data is purged.
+    ForwardDataPurged {
         /// The number of purged data entries.
         count: u64,
     },

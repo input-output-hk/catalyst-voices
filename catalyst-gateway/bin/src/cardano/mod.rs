@@ -501,7 +501,7 @@ impl SyncTask {
                 } else {
                     self.data_purge_count = self.data_purge_count.checked_add(1).unwrap_or(0);
 
-                    self.dispatch_event(event::ChainIndexerEvent::LiveDataPurged {
+                    self.dispatch_event(event::ChainIndexerEvent::BackwardDataPurged {
                         count: self.data_purge_count,
                     });
                 }
@@ -655,7 +655,7 @@ pub(crate) async fn start_followers() -> anyhow::Result<()> {
                     .with_label_values(&[&api_host_names, service_id, &network])
                     .set(i64::try_from(u64::from(*slot)).unwrap_or(-1));
             }
-            if let Event::LiveDataPurged { count } = event {
+            if let Event::BackwardDataPurged { count } = event {
                 reporter::TRIGGERED_DATA_PURGES_COUNT
                     .with_label_values(&[&api_host_names, service_id, &network])
                     .set(i64::try_from(*count).unwrap_or(-1));
