@@ -45,8 +45,9 @@ class ProposalData extends Equatable {
     final property =
         document.document.getProperty(ProposalDocument.requestedFundsNodeId)
             as DocumentValueProperty<int>?;
-    if (property == null || property.value == null) return null;
-    return Coin(property.value!);
+    final value = property?.value;
+    if (value == null) return null;
+    return Coin(value);
   }
 
   String? get proposalTitle {

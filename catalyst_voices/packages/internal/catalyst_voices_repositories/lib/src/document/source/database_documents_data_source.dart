@@ -62,18 +62,22 @@ final class DatabaseDocumentsDataSource implements SignedDocumentDataSource {
   }
 
   @override
+  Stream<List<DocumentData>> watchAll({
+    int? limit,
+    required bool unique,
+    DocumentType? type,
+  }) {
+    return _database.documentsDao
+        .watchAll(limit: limit, unique: unique, type: type)
+        .map((entities) => entities.map((e) => e.toModel()).toList());
+  }
+
+  @override
   Stream<int> watchCount({
     required DocumentRef ref,
     required DocumentType type,
   }) {
     return _database.documentsDao.watchCount(ref: ref, type: type);
-  }
-
-  @override
-  Stream<List<DocumentData>> watchLatestVersions({int? limit}) {
-    return _database.documentsDao
-        .watchAll(limit: limit, unique: true)
-        .map((entities) => entities.map((e) => e.toModel()).toList());
   }
 }
 

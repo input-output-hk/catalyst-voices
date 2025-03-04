@@ -97,6 +97,7 @@ abstract interface class DocumentRepository {
 
   Stream<List<ProposalDocument>> watchProposalsDocuments({
     int? limit,
+    bool unique = false,
   });
 }
 
@@ -226,6 +227,30 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     await _drafts.update(ref: ref, content: content);
   }
 
+  Stream<List<DocumentsDataWithRefData>> watchAllDocuments({
+    int? limit,
+    bool unique = false,
+    DocumentType? type,
+  }) {
+    return _localDocuments
+        .watchAll(limit: limit, unique: unique, type: type)
+        .distinct()
+        .switchMap((documents) async* {
+      final results = await Future.wait(
+        documents
+            .where((doc) => doc.metadata.template != null)
+            .map((documentData) async {
+          final templateRef = documentData.metadata.template!;
+          final templateData = await _documentDataLock.synchronized(
+            () => getDocumentData(ref: templateRef),
+          );
+          return (data: documentData, refData: templateData);
+        }),
+      );
+      yield results;
+    });
+  }
+
   @override
   Stream<int> watchCount({
     required DocumentRef ref,
@@ -268,28 +293,6 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     });
   }
 
-  Stream<List<DocumentsDataWithRefData>> watchLatestDocumentsWithRef({
-    int? limit,
-  }) {
-    return _localDocuments
-        .watchLatestVersions(limit: limit)
-        .distinct()
-        .switchMap((documents) async* {
-      final results = await Future.wait(
-        documents
-            .where((doc) => doc.metadata.template != null)
-            .map((documentData) async {
-          final templateRef = documentData.metadata.template!;
-          final templateData = await _documentDataLock.synchronized(
-            () => getDocumentData(ref: templateRef),
-          );
-          return (data: documentData, refData: templateData);
-        }),
-      );
-      yield results;
-    });
-  }
-
   @override
   Stream<ProposalDocument> watchProposalDocument({
     required DocumentRef ref,
@@ -316,9 +319,11 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   @override
   Stream<List<ProposalDocument>> watchProposalsDocuments({
     int? limit,
+    bool unique = false,
   }) {
-    return watchLatestDocumentsWithRef(
+    return watchAllDocuments(
       limit: limit,
+      type: DocumentType.proposalDocument,
     ).whereNotNull().map(
           (documents) => documents.map(
             (doc) {

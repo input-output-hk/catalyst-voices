@@ -71,7 +71,7 @@ void main() {
 
       when(
         () => mockDocumentRepository.queryVersionIds(
-          id: any(named: 'ref'),
+          id: any(named: 'id'),
         ),
       ).thenAnswer((_) => Future.value([versionId1]));
 
@@ -95,7 +95,7 @@ void main() {
 
       verify(
         () => mockDocumentRepository.queryVersionIds(
-          id: any(named: 'ref'),
+          id: any(named: 'id'),
         ),
       ).called(2);
 
@@ -108,8 +108,9 @@ void main() {
     });
 
     test(
-      'watchLatestProposals reacts to comments count changes',
+      'watchProposalsDocuments reacts to comments count changes',
       () async {
+        // TODO(damian-molinski): JSONB filtering
         const proposalTemplate = DocumentSchema(
           parentSchemaUrl: '',
           schemaSelfUrl: '',
@@ -150,7 +151,7 @@ void main() {
 
         when(
           () => mockDocumentRepository.queryVersionIds(
-            id: any(named: 'ref'),
+            id: any(named: 'id'),
           ),
         ).thenAnswer((_) => Future.value([versionId]));
 

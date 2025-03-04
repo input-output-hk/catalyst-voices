@@ -5,6 +5,7 @@ import 'package:catalyst_voices_repositories/src/database/table/documents.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents.drift.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_metadata.dart';
 import 'package:catalyst_voices_repositories/src/database/typedefs.dart';
+import 'package:collection/collection.dart';
 import 'package:drift/drift.dart';
 import 'package:flutter/foundation.dart';
 
@@ -65,7 +66,11 @@ abstract interface class DocumentsDao {
   /// all will be returned unless [unique] is true.
   /// When [unique] is true, only latest versions of each document are returned.
   /// Optional [limit] parameter limits the number of returned documents.
-  Stream<List<DocumentEntity>> watchAll({bool unique = false, int? limit});
+  Stream<List<DocumentEntity>> watchAll({
+    bool unique = false,
+    int? limit,
+    DocumentType? type,
+  });
 
   /// Watches for new comments that are reference by ref.
   Stream<int> watchCount({
@@ -212,42 +217,49 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
   }
 
   @override
-  Stream<List<DocumentEntity>> watchAll({bool unique = false, int? limit}) {
-    if (!unique) {
-      final query = select(documents);
-      if (limit != null) {
-        query.limit(limit);
+  Stream<List<DocumentEntity>> watchAll({
+    bool unique = false,
+    int? limit,
+    DocumentType? type,
+  }) {
+    final query = select(documents);
+
+    if (type != null) {
+      query.where((doc) => doc.type.equals(type.uuid));
+    }
+
+    return query.watch().map((documents) {
+      if (unique) {
+        // Group by document ID and take latest version
+        final uniqueDocs = documents
+            .groupListsBy((doc) => '${doc.idHi}-${doc.idLo}')
+            .values
+            .map(
+              (versions) => versions.reduce((a, b) {
+                // Compare versions (higher version wins)
+                final compareHi = b.verHi.compareTo(a.verHi);
+                if (compareHi != 0) return compareHi > 0 ? b : a;
+                return b.verLo.compareTo(a.verLo) > 0 ? b : a;
+              }),
+            )
+            .toList()
+          ..sort((a, b) {
+            // Sort by version descending
+            final compareHi = b.verHi.compareTo(a.verHi);
+            if (compareHi != 0) return compareHi;
+            return b.verLo.compareTo(a.verLo);
+          });
+
+        if (limit != null) {
+          return uniqueDocs.take(limit).toList();
+        }
+        return uniqueDocs;
       }
-      return query.watch();
-    }
 
-    final uniqueIds = selectOnly(documents)
-      ..addColumns([documents.idHi, documents.idLo])
-      ..groupBy([documents.idHi, documents.idLo])
-      ..orderBy([
-        OrderingTerm(expression: documents.verHi, mode: OrderingMode.desc),
-        OrderingTerm(expression: documents.idHi),
-      ]);
-
-    if (limit != null) {
-      uniqueIds.limit(limit);
-    }
-
-    return uniqueIds.watch().asyncMap((ids) async {
-      final latestVersions = await Future.wait(
-        ids.map(
-          (row) {
-            final id = UuidHiLo(
-              high: row.read(documents.idHi)!,
-              low: row.read(documents.idLo)!,
-            );
-            final ref = SignedDocumentRef(id: id.uuid);
-            return _selectRef(ref).getSingle();
-          },
-        ),
-      );
-
-      return latestVersions;
+      if (limit != null) {
+        return documents.take(limit).toList();
+      }
+      return documents;
     });
   }
 

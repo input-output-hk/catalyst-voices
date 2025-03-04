@@ -15,6 +15,7 @@ class DiscoveryCubit extends Cubit<DiscoveryState> {
   final CampaignService _campaignService;
   final ProposalService _proposalService;
   late StreamSubscription<List<Proposal>>? _proposalsSubscription;
+
   DiscoveryCubit(
     this._campaignService,
     this._proposalService,

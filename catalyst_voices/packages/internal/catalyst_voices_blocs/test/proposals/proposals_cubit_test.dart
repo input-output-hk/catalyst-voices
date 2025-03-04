@@ -10,27 +10,6 @@ import 'package:uuid/uuid.dart';
 
 void main() {
   group(ProposalsCubit, () {
-    const proposalTemplate = DocumentSchema(
-      parentSchemaUrl: '',
-      schemaSelfUrl: '',
-      title: '',
-      description: MarkdownData.empty,
-      properties: [],
-      order: [],
-    );
-
-    // ignore: unused_local_variable
-    final proposalDocument = ProposalDocument(
-      metadata: ProposalMetadata(
-        id: const Uuid().v7(),
-        version: const Uuid().v7(),
-      ),
-      document: const Document(
-        schema: proposalTemplate,
-        properties: [],
-      ),
-    );
-
     final campaign = Campaign(
       id: 'F14',
       name: 'campaign',

@@ -189,6 +189,37 @@ void main() {
         expect(entity, isNull);
       });
 
+      test('Return latest unique documents', () async {
+        final id = const Uuid().v7();
+        final version = const Uuid().v7();
+        await Future<void>.delayed(const Duration(milliseconds: 1));
+        final version2 = const Uuid().v7();
+        final document = DocumentWithMetadataFactory.build(
+          metadata: DocumentDataMetadata(
+            type: DocumentType.proposalDocument,
+            selfRef: SignedDocumentRef(id: id, version: version),
+          ),
+        );
+        final document2 = DocumentWithMetadataFactory.build(
+          metadata: DocumentDataMetadata(
+            type: DocumentType.proposalDocument,
+            selfRef: SignedDocumentRef(id: id, version: version2),
+          ),
+        );
+        final documentsStream =
+            database.documentsDao.watchAll(unique: true).asBroadcastStream();
+
+        await database.documentsDao.saveAll([document]);
+        final firstEmission = await documentsStream.first;
+        await database.documentsDao.saveAll([document2]);
+        final secondEmission = await documentsStream.first;
+
+        expect(firstEmission, equals([document.document]));
+        expect(secondEmission, equals([document2.document]));
+        expect(secondEmission.length, equals(1));
+        expect(secondEmission.first.metadata.selfRef.version, equals(version2));
+      });
+
       test('Returns latest document limited by quantity if provided', () async {
         // Given
         final documentsWithMetadata = List<DocumentEntityWithMetadata>.generate(
@@ -631,17 +662,20 @@ void main() {
           ),
         );
 
+        await database.documentsDao.saveAll([comments.first, otherComment]);
+
         final documentCount = database.documentsDao
             .watchCount(ref: proposalRef, type: DocumentType.commentTemplate)
             .asBroadcastStream();
 
-        await database.documentsDao.saveAll([comments.first, otherComment]);
         final firstEmission = await documentCount.first;
+        // TODO(damian-molinski): JSONB filtering
+        // After proper filtering this test should pass
+        expect(firstEmission, equals(1));
 
+        // Save second comment and wait for update
         await database.documentsDao.saveAll([comments.last]);
         final secondEmission = await documentCount.first;
-
-        expect(firstEmission, equals(1));
         expect(secondEmission, equals(2));
       });
     });

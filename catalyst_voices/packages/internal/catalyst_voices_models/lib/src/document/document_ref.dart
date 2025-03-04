@@ -71,6 +71,14 @@ final class SignedDocumentRef extends DocumentRef {
     super.version,
   });
 
+  factory SignedDocumentRef.generateFirstRef() {
+    final id = const Uuid().v7();
+    return SignedDocumentRef(
+      id: id,
+      version: id,
+    );
+  }
+
   @override
   SignedDocumentRef copyWith({
     String? id,

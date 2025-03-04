@@ -364,7 +364,7 @@ void main() {
     });
 
     test(
-      'watchLatestPublicProposalsDocuments returns correct model',
+      'watchProposalsDocuments returns correct model',
       () async {
         final templateRef = DocumentRefFactory.buildSigned();
         final templateData = DocumentDataFactory.build(
@@ -382,10 +382,9 @@ void main() {
         );
 
         await localDocuments.save(data: templateData);
-        await Future.delayed(const Duration(seconds: 2), () {});
         await localDocuments.save(data: publicDraftData);
 
-        final latestProposals = repository.watchLatestDocumentsWithRef();
+        final latestProposals = repository.watchAllDocuments();
 
         expect(
           latestProposals,
