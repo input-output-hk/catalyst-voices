@@ -49,8 +49,8 @@ pub(crate) async fn endpoint(
         return AllResponses::service_unavailable(&err, RetryAfterOption::Default);
     };
 
-    if lookup.is_none() && auth_catalyst_id.is_none() {
-        return Responses::NotFound.into();
-    }
+    if let Some(_lookup) = lookup {}
+    if let Some(_auth_catalyst_id) = auth_catalyst_id {}
+
     Responses::NotFound.into()
 }

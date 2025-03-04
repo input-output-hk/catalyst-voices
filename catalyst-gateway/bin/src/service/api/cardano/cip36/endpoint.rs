@@ -2,9 +2,7 @@
 
 use tracing::error;
 
-use self::cardano::query::stake_or_voter::StakeAddressOrPublicKey;
 use super::{
-    cardano::{self},
     filter::{get_registration_given_stake_key_hash, get_registration_given_vote_key, snapshot},
     response, SlotNo,
 };
@@ -12,13 +10,19 @@ use crate::{
     db::index::session::CassandraSession,
     service::{
         api::cardano::cip36::response::AllRegistration,
-        common::{self, types::headers::retry_after::RetryAfterOption},
+        common::{
+            self,
+            types::{
+                cardano::query::stake_or_voter::StakeOrVoter,
+                headers::retry_after::RetryAfterOption,
+            },
+        },
     },
 };
 
 /// Process the endpoint operation
 pub(crate) async fn cip36_registrations(
-    lookup: Option<cardano::query::stake_or_voter::StakeOrVoter>, asat: Option<SlotNo>,
+    lookup: Option<StakeOrVoter>, asat: Option<SlotNo>,
     _page: common::types::generic::query::pagination::Page,
     _limit: common::types::generic::query::pagination::Limit,
 ) -> AllRegistration {
@@ -31,8 +35,8 @@ pub(crate) async fn cip36_registrations(
     };
 
     if let Some(stake_or_voter) = lookup {
-        match StakeAddressOrPublicKey::from(stake_or_voter) {
-            StakeAddressOrPublicKey::Address(cip19_stake_address) => {
+        match stake_or_voter {
+            StakeOrVoter::Address(cip19_stake_address) => {
                 // Typically, a stake address will start with 'stake1',
                 // We need to convert this to a stake hash as per our data model to then find the,
                 // Full Stake Public Key (32 byte Ed25519 Public key, not hashed).
@@ -51,7 +55,7 @@ pub(crate) async fn cip36_registrations(
 
                 return get_registration_given_stake_key_hash(address, session, asat).await;
             },
-            StakeAddressOrPublicKey::PublicKey(ed25519_hex_encoded_public_key) => {
+            StakeOrVoter::PublicKey(ed25519_hex_encoded_public_key) => {
                 // As above...
                 // Except using a voting key.
                 return get_registration_given_vote_key(
@@ -61,7 +65,7 @@ pub(crate) async fn cip36_registrations(
                 )
                 .await;
             },
-            StakeAddressOrPublicKey::All =>
+            StakeOrVoter::All =>
             // As above...
             // Snapshot replacement, returns all registrations or returns a
             // subset of registrations if constrained by a given time.
