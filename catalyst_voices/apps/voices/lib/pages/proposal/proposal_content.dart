@@ -51,6 +51,7 @@ class _SegmentsListView extends StatelessWidget {
     return BasicSegmentsListView(
       key: const ValueKey('ProposalSegmentsListView'),
       items: items,
+      itemScrollController: scrollController,
       padding: const EdgeInsets.only(top: 16, bottom: 64),
       itemBuilder: (context, index) {
         final item = items[index];
@@ -73,7 +74,16 @@ class _SegmentsListView extends StatelessWidget {
         );
       },
       separatorBuilder: (context, index) {
+        final item = items[index];
         final nextItem = items.elementAtOrNull(index + 1);
+
+        if (item is DocumentSegment && nextItem is DocumentSection) {
+          return const ProposalSeparatorBox(height: 24);
+        }
+
+        if (item is DocumentSection && nextItem is DocumentSection) {
+          return const ProposalSeparatorBox(height: 24);
+        }
 
         if (nextItem is ProposalCommentsSegment) {
           return const SizedBox(height: 32);
@@ -85,7 +95,6 @@ class _SegmentsListView extends StatelessWidget {
 
         return const SizedBox.shrink();
       },
-      itemScrollController: scrollController,
     );
   }
 
@@ -112,8 +121,12 @@ class _SegmentsListView extends StatelessWidget {
               milestoneCount: data.milestoneCount,
             ),
         },
-      DocumentSegment() => const ProposalDocumentSegmentTitle(),
-      DocumentSection() => const ProposalDocumentSectionTile(),
+      DocumentSegment() => ProposalDocumentSegmentTitle(
+          title: item.resolveTitle(context),
+        ),
+      DocumentSection(:final property) => ProposalDocumentSectionTile(
+          property: property,
+        ),
       ProposalCommentsSegment() => const ProposalCommentsHeaderTile(),
       ProposalCommentsSection() => switch (item) {
           ViewCommentsSection() => const ProposalCommentsTile(),
