@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:catalyst_voices/pages/proposal/proposal_back.dart';
+import 'package:catalyst_voices/pages/proposal/proposal_back_button.dart';
 import 'package:catalyst_voices/pages/proposal/proposal_content.dart';
 import 'package:catalyst_voices/pages/proposal/proposal_navigation_panel.dart';
 import 'package:catalyst_voices/routes/routes.dart';
@@ -14,24 +14,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 class ProposalPage extends StatefulWidget {
-  final String id;
-  final String? version;
-  final bool isLocal;
+  final DocumentRef ref;
 
   const ProposalPage({
     super.key,
-    required this.id,
-    this.version,
-    required this.isLocal,
+    required this.ref,
   });
-
-  DocumentRef get ref {
-    return DocumentRef.build(
-      id: id,
-      version: version,
-      isDraft: isLocal,
-    );
-  }
 
   @override
   State<ProposalPage> createState() => _ProposalPageState();
@@ -53,7 +41,7 @@ class _ProposalPageState extends State<ProposalPage> {
         ),
         body: Column(
           children: [
-            const ProposalBack(),
+            const ProposalBackButton(),
             Expanded(
               child: SpaceScaffold(
                 left: const ProposalNavigationPanel(),

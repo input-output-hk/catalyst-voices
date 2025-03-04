@@ -44,9 +44,8 @@ class _ProposalNavigationPanel extends StatelessWidget {
         if (index == 0) {
           return const _ControlsTile(key: ValueKey('NavigationControls'));
         }
-        index--;
 
-        final segment = segments[index];
+        final segment = segments[index - 1];
 
         return _SegmentMenuTile(
           key: ValueKey('Segment[$index]NodeMenu'),

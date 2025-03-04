@@ -18,6 +18,7 @@ class ProfileContainer extends StatelessWidget {
 
     return Row(
       mainAxisSize: MainAxisSize.min,
+      spacing: 8,
       children: [
         VoicesAvatar(
           radius: 32 / 2,
@@ -41,7 +42,7 @@ class ProfileContainer extends StatelessWidget {
           profile.catalystId,
           isCompact: true,
         ),
-      ].separatedBy(const SizedBox(width: 8)).toList(),
+      ],
     );
   }
 }
