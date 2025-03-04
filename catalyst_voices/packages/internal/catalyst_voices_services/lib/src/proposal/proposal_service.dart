@@ -86,7 +86,7 @@ final class ProposalServiceImpl implements ProposalService {
 
   @override
   Future<void> deleteDraftProposal(DraftRef ref) {
-    return _documentRepository.deleteDraftProposal(ref: ref);
+    return _documentRepository.deleteDocumentDraft(ref: ref);
   }
 
   @override
