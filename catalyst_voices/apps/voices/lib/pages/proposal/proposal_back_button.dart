@@ -2,8 +2,8 @@ import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
 
-class ProposalBack extends StatelessWidget {
-  const ProposalBack({super.key});
+class ProposalBackButton extends StatelessWidget {
+  const ProposalBackButton({super.key});
 
   @override
   Widget build(BuildContext context) {

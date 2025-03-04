@@ -30,10 +30,12 @@ final class ProposalRoute extends GoRouteData with FadePageTransitionMixin {
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
-    return ProposalPage(
+    final ref = DocumentRef.build(
       id: proposalId,
       version: version,
-      isLocal: local,
+      isDraft: local,
     );
+
+    return ProposalPage(ref: ref);
   }
 }

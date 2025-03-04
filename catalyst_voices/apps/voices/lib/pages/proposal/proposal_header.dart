@@ -43,13 +43,14 @@ class _ProposalControls extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
+    return const Row(
       mainAxisSize: MainAxisSize.min,
+      spacing: 8,
       children: <Widget>[
-        const ProposalVersion(),
-        const ProposalShareButton(),
-        const ProposalFavoriteButton(),
-      ].separatedBy(const SizedBox(width: 8)).toList(),
+        ProposalVersion(),
+        ProposalShareButton(),
+        ProposalFavoriteButton(),
+      ],
     );
   }
 }

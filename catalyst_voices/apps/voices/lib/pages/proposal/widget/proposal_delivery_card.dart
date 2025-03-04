@@ -1,7 +1,6 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 
 class ProposalDeliveryCard extends StatelessWidget {
@@ -25,13 +24,14 @@ class ProposalDeliveryCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
+        spacing: 16,
         children: [
           _ValueCell(
             title: context.l10n.proposalViewFundingRequested,
             value: '',
             valueSuffix: const Currency.ada().format(
               fundsRequested,
-              spacer: ' ',
+              separator: ' ',
             ),
           ),
           _ValueCell(
@@ -50,10 +50,7 @@ class ProposalDeliveryCard extends StatelessWidget {
                 .trim(),
             valueSuffix: '$milestoneCount',
           ),
-        ]
-            .map<Widget>((e) => Expanded(child: e))
-            .separatedBy(const SizedBox(width: 16))
-            .toList(),
+        ].map<Widget>((e) => Expanded(child: e)).toList(),
       ),
     );
   }
@@ -93,6 +90,7 @@ class _ValueCell extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           textBaseline: TextBaseline.alphabetic,
           crossAxisAlignment: CrossAxisAlignment.baseline,
+          spacing: 6,
           children: <Widget>[
             Text(
               valueSuffix,
@@ -106,7 +104,7 @@ class _ValueCell extends StatelessWidget {
               maxLines: 1,
               overflow: TextOverflow.clip,
             ),
-          ].separatedBy(const SizedBox(width: 6)).toList(),
+          ],
         ),
       ],
     );

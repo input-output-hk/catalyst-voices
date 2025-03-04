@@ -57,6 +57,9 @@ final class ProposalOverviewSegment
   SvgGenImage get icon => VoicesAssets.icons.lightningBolt;
 
   @override
+  List<Object?> get props => super.props + [categoryName, proposalTitle];
+
+  @override
   String resolveTitle(BuildContext context) {
     return context.l10n.proposalViewMetadataOverviewSegment;
   }
