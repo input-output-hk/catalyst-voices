@@ -71,7 +71,7 @@ class WriteDownSeedphrasePanel extends OnboardingPageBase {
     expect(infoPartTaskPicture(), findsOneWidget);
     expect($(progressBar), findsOneWidget);
     expect(
-      $(registrationInfoPanel).$(CommonPage.decorData).$(Text).text,
+      infoPartLearnMoreText(),
       T.get('Learn More'),
     );
   }
@@ -80,7 +80,7 @@ class WriteDownSeedphrasePanel extends OnboardingPageBase {
     await writedownSeedPhrasesAreDisplayed();
     expect($(downloadSeedPhraseButton), findsOneWidget);
     expect(
-      $(downloadSeedPhraseButton).$(CommonPage.decorData).$(Text).text,
+      $(downloadSeedPhraseButton).$(CommonPage($).decorData).$(Text).text,
       T.get('Export Security Words'),
     );
     expect($(seedPhraseStoredCheckbox), findsOneWidget);

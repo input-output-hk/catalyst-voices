@@ -3,6 +3,8 @@ import 'package:catalyst_voices_models/src/document/document_metadata.dart';
 import 'package:equatable/equatable.dart';
 
 final class ProposalDocument extends Equatable {
+  static const String exportFileExt = 'json';
+
   final ProposalMetadata metadata;
   final Document document;
 
@@ -19,8 +21,7 @@ final class ProposalDocument extends Equatable {
 }
 
 final class ProposalMetadata extends DocumentMetadata {
-  const ProposalMetadata({
-    required super.id,
-    required super.version,
+  ProposalMetadata({
+    required super.selfRef,
   });
 }
