@@ -38,7 +38,7 @@ static SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| {
 });
 
 /// Transaction Index within a block.
-#[derive(Debug, Eq, PartialEq, Hash, Clone, PartialOrd, Ord)]
+#[derive(Debug, Eq, PartialEq, Hash, Clone, PartialOrd, Ord, Default)]
 pub(crate) struct TxnIndex(u16);
 
 /// Is the Slot Number valid?
@@ -127,11 +127,5 @@ impl From<DbTxnIndex> for TxnIndex {
 impl Example for TxnIndex {
     fn example() -> Self {
         Self(EXAMPLE)
-    }
-}
-
-impl Default for TxnIndex {
-    fn default() -> Self {
-        TxnIndex(0)
     }
 }

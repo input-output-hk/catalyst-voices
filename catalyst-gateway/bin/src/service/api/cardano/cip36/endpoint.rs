@@ -6,7 +6,7 @@ use tracing::error;
 use self::cardano::query::stake_or_voter::StakeAddressOrPublicKey;
 use super::{
     cardano::{self},
-    filter::{get_registration_given_stake_key_hash, get_registration_given_vote_key, snapshot},
+    filter::{get_registration_given_stake_addr, get_registration_given_vote_key, snapshot},
     response, SlotNo,
 };
 use crate::{
@@ -20,8 +20,8 @@ use crate::{
 /// Process the endpoint operation
 pub(crate) async fn cip36_registrations(
     lookup: Option<cardano::query::stake_or_voter::StakeOrVoter>, asat: Option<SlotNo>,
-    _page: common::types::generic::query::pagination::Page,
-    _limit: common::types::generic::query::pagination::Limit, _headers: &HeaderMap,
+    page: common::types::generic::query::pagination::Page,
+    limit: common::types::generic::query::pagination::Limit, _headers: &HeaderMap,
 ) -> AllRegistration {
     let Some(session) = CassandraSession::get(true) else {
         error!("Failed to acquire db session");
@@ -50,7 +50,8 @@ pub(crate) async fn cip36_registrations(
                     },
                 };
 
-                return get_registration_given_stake_key_hash(address, session, asat).await;
+                return get_registration_given_stake_addr(address, session, asat, page, limit)
+                    .await;
             },
             StakeAddressOrPublicKey::PublicKey(ed25519_hex_encoded_public_key) => {
                 // As above...
@@ -59,6 +60,8 @@ pub(crate) async fn cip36_registrations(
                     ed25519_hex_encoded_public_key,
                     session,
                     asat,
+                    page,
+                    limit,
                 )
                 .await;
             },
