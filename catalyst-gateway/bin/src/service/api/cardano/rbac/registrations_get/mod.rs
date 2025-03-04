@@ -1,12 +1,13 @@
 //! Implementation of the GET `/rbac/registrations` endpoint.
 
 mod cip509;
-mod rbac_registration;
+mod rbac_reg;
+mod reg_chain;
 mod unprocessable_content;
 
 use catalyst_types::id_uri::IdUri;
 use poem_openapi::{payload::Json, ApiResponse};
-use rbac_registration::RbacRegistrations;
+use rbac_reg::RbacRegistrations;
 use tracing::error;
 use unprocessable_content::RbacUnprocessableContent;
 

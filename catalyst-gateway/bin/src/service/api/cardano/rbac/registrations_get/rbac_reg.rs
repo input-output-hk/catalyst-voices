@@ -2,7 +2,7 @@
 
 use poem_openapi::{types::Example, Object};
 
-use super::cip509::Cip509;
+use super::{cip509::Cip509, reg_chain::RegistrationChain};
 use crate::service::common::types::cardano::catalyst_id::CatalystId;
 
 /// RBAC Registrations, contains a latest valid and invalid registration data.
@@ -26,16 +26,8 @@ impl RbacRegistrations {
         catalyst_id: CatalystId, finalised_regs: Vec<rbac_registration::cardano::cip509::Cip509>,
         volatile_regs: Vec<rbac_registration::cardano::cip509::Cip509>, detailed: bool,
     ) -> anyhow::Result<Self> {
-        let finalised = finalised_regs
-            .is_empty()
-            .then_some(RbacRegistration::new(finalised_regs, detailed))
-            .transpose()?;
-
-        let volatile = volatile_regs
-            .is_empty()
-            .then_some(RbacRegistration::new(volatile_regs, detailed))
-            .transpose()?;
-
+        let finalised = RbacRegistration::new(finalised_regs, detailed)?;
+        let volatile = RbacRegistration::new(volatile_regs, detailed)?;
         Ok(Self {
             catalyst_id,
             finalised,
@@ -59,7 +51,7 @@ impl Example for RbacRegistrations {
 #[oai(example = true)]
 struct RbacRegistration {
     /// Registration chain
-    chain: serde_json::Value,
+    chain: RegistrationChain,
     /// All Cip509 registrations which formed a current registration chain
     #[oai(skip_serializing_if_is_empty)]
     details: Vec<Cip509>,
@@ -69,26 +61,33 @@ impl RbacRegistration {
     /// Build a reponse `RbacRegistration` from the provided CIP 509 registrations lists
     pub(crate) fn new(
         regs: Vec<rbac_registration::cardano::cip509::Cip509>, detailed: bool,
-    ) -> anyhow::Result<Self> {
+    ) -> anyhow::Result<Option<Self>> {
         let details = if detailed {
             regs.iter().map(Into::into).collect()
         } else {
             Vec::new()
         };
+        let mut regs_iter = regs.into_iter();
+        let Some(first) = regs_iter.next() else {
+            return Ok(None);
+        };
+        let mut chain = rbac_registration::registration::cardano::RegistrationChain::new(first)?;
+        for reg in regs_iter {
+            chain = chain.update(reg)?;
+        }
 
-        Ok(Self {
-            // TODO fix
-            chain: serde_json::Value::Null,
+        Ok(Some(Self {
+            chain: chain.into(),
             details,
-        })
+        }))
     }
 }
 
 impl Example for RbacRegistration {
     fn example() -> Self {
         Self {
-            chain: serde_json::Value::Null,
-            details: vec![],
+            chain: RegistrationChain::example(),
+            details: vec![Cip509::example()],
         }
     }
 }
