@@ -79,6 +79,11 @@ class _DocumentPropertyValueBuilder extends StatelessWidget {
     final schema = property.schema;
     final value = property.value;
 
+    // TODO(damian-molinski): handle tags
+    // print('${schema.runtimeType} - ${schema.title} - $value');
+    // DocumentTagGroupSchema -  - DeFi
+    // DocumentTagSelectionSchema -  - Staking
+
     switch (schema) {
       case DocumentAgreementConfirmationSchema():
       case DocumentGenericBooleanSchema():
