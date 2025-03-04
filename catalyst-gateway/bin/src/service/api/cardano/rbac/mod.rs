@@ -7,9 +7,7 @@ use crate::service::common::{
     types::cardano::query::cat_id_or_stake::CatIdOrStake,
 };
 
-mod rbac_registration;
 mod registrations_get;
-mod unprocessable_content;
 
 /// Cardano RBAC API Endpoints
 pub(crate) struct Api;

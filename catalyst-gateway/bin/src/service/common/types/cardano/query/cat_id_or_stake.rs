@@ -1,3 +1,7 @@
+//! Query Parameter that can take a CIP-19 stake address or a Catalyst Id.
+//!
+//! Allows us to have one parameter that can represent two things, uniformly.
+
 use std::sync::LazyLock;
 
 use const_format::concatcp;
@@ -112,7 +116,6 @@ mod tests {
         )
         .is_ok());
 
-        
         assert!(
             CatIdOrStake::try_from("cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE",).is_ok()
         );

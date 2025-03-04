@@ -1,12 +1,15 @@
 //! Implementation of the GET `/rbac/registrations` endpoint.
 
+mod cip509;
+mod rbac_registration;
+mod unprocessable_content;
+
 use catalyst_types::id_uri::IdUri;
 use poem_openapi::{payload::Json, ApiResponse};
+use rbac_registration::RbacRegistrations;
 use tracing::error;
+use unprocessable_content::RbacUnprocessableContent;
 
-use super::{
-    rbac_registration::RbacRegistrations, unprocessable_content::RbacUnprocessableContent,
-};
 use crate::{
     db::index::session::CassandraSession,
     service::common::{
