@@ -7,7 +7,7 @@ final class Proposal extends Equatable {
   final DocumentRef selfRef;
   final String title;
   final String description;
-  final DateTime updateDate;
+  final DateTime? updateDate;
   final DateTime? fundedDate;
   final Coin fundsRequested;
   final ProposalStatus status;
@@ -50,7 +50,11 @@ final class Proposal extends Equatable {
       );
 
   factory Proposal.fromData(ProposalData data) {
-    final updateDate = UuidUtils.dateTime(data.document.metadata.version);
+    DateTime? updateDate;
+    final version = data.document.metadata.selfRef.version;
+    if (version != null) {
+      updateDate = UuidUtils.dateTime(version);
+    }
     return Proposal(
       selfRef: data.ref,
       title: data.proposalTitle ?? '',

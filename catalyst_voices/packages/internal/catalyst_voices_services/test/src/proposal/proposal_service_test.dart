@@ -48,14 +48,24 @@ void main() {
       final proposalId2 = const Uuid().v7();
 
       final proposalData1 = ProposalDocument(
-        metadata: ProposalMetadata(id: proposalId1, version: versionId1),
+        metadata: ProposalMetadata(
+          selfRef: SignedDocumentRef(
+            id: proposalId1,
+            version: versionId1,
+          ),
+        ),
         document: const Document(
           schema: proposalTemplate,
           properties: [],
         ),
       );
       final proposalData2 = ProposalDocument(
-        metadata: ProposalMetadata(id: proposalId2, version: versionId1),
+        metadata: ProposalMetadata(
+          selfRef: SignedDocumentRef(
+            id: proposalId2,
+            version: versionId1,
+          ),
+        ),
         document: const Document(
           schema: proposalTemplate,
           properties: [],
@@ -125,7 +135,12 @@ void main() {
         final versionId = const Uuid().v7();
 
         final proposalData1 = ProposalDocument(
-          metadata: ProposalMetadata(id: proposalId1, version: versionId),
+          metadata: ProposalMetadata(
+            selfRef: SignedDocumentRef(
+              id: proposalId1,
+              version: versionId,
+            ),
+          ),
           document: const Document(
             schema: proposalTemplate,
             properties: [],
@@ -133,7 +148,12 @@ void main() {
         );
 
         final proposalData2 = ProposalDocument(
-          metadata: ProposalMetadata(id: proposalId2, version: versionId),
+          metadata: ProposalMetadata(
+            selfRef: SignedDocumentRef(
+              id: proposalId1,
+              version: versionId,
+            ),
+          ),
           document: const Document(
             schema: proposalTemplate,
             properties: [],

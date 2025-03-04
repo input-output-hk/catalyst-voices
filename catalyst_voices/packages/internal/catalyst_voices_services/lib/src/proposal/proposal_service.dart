@@ -112,8 +112,7 @@ final class ProposalServiceImpl implements ProposalService {
   Future<ProposalData> getProposal({
     required DocumentRef ref,
   }) async {
-    final proposalBase = await _proposalRepository.getProposal(ref: ref);
-    final proposal = await _buildProposal(proposalBase);
+    final proposal = await _proposalRepository.getProposal(ref: ref);
 
     return proposal;
   }
@@ -183,29 +182,29 @@ final class ProposalServiceImpl implements ProposalService {
     );
   }
 
-@override
+  @override
   Stream<List<Proposal>> watchLatestProposals({int? limit}) {
     return _documentRepository
         .watchProposalsDocuments(limit: limit)
         .switchMap((documents) async* {
       final proposalsStreams = await Future.wait(
         documents.map((doc) async {
-          final ref = SignedDocumentRef(
-            id: doc.metadata.id,
-            version: doc.metadata.version,
+          final versionIds = await _documentRepository.queryVersionIds(
+            id: doc.metadata.selfRef.id,
           );
-          final versionIds =
-              await _documentRepository.queryVersionIds(id: doc.metadata.id);
 
           return _documentRepository
-              .watchCount(ref: ref, type: DocumentType.commentTemplate)
+              .watchCount(
+            ref: doc.metadata.selfRef,
+            type: DocumentType.commentTemplate,
+          )
               .map((commentsCount) {
             final proposalData = ProposalData(
               document: doc,
               categoryId: DocumentType.categoryParametersDocument.uuid,
               versions: versionIds,
               commentsCount: commentsCount,
-              ref: ref,
+              ref: doc.metadata.selfRef,
             );
             return Proposal.fromData(proposalData);
           });

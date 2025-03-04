@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:uuid/uuid.dart';
 
 final _proposalDescription = """
 Zanzibar is becoming one of the hotspots for DID's through
@@ -30,7 +31,7 @@ abstract interface class ProposalRepository {
 
   Future<List<String>> getFavoritesProposalsIds();
 
-  Future<Proposal> getProposal({
+  Future<ProposalData> getProposal({
     required DocumentRef ref,
   });
 
@@ -60,22 +61,19 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   }
 
   @override
-  Future<Proposal> getProposal({
+  Future<ProposalData> getProposal({
     required DocumentRef ref,
   }) async {
-    return Proposal(
-      selfRef: ref,
-      category: 'Cardano Use Cases / MVP',
-      title: 'Proposal Title that rocks the world',
-      updateDate: DateTime.now().minusDays(2),
-      fundsRequested: Coin.fromAda(100000),
-      status: ProposalStatus.draft,
-      publish: ProposalPublish.localDraft,
-      commentsCount: 0,
-      description: _proposalDescription,
-      duration: 6,
-      author: 'Alex Wells',
-      versionCount: 1,
+    return ProposalData(
+      categoryId: const Uuid().v7(),
+      document: ProposalDocument(
+        metadata: ProposalMetadata(selfRef: ref),
+        document: const Document(
+          properties: [],
+          schema: DocumentSchema.optional(),
+        ),
+      ),
+      ref: ref,
     );
   }
 
@@ -153,7 +151,8 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     }
     for (var i = range.from; i <= range.to; i++) {
       final ref = SignedDocumentRef(id: favoritesIds[i]);
-      final proposal = await getProposal(ref: ref);
+      final proposalData = await getProposal(ref: ref);
+      final proposal = Proposal.fromData(proposalData);
       proposals.add(proposal);
     }
 
@@ -181,7 +180,8 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     }
     for (var i = range.from; i <= range.to; i++) {
       final ref = SignedDocumentRef(id: userProposalsIds[i]);
-      final proposal = await getProposal(ref: ref);
+      final proposalData = await getProposal(ref: ref);
+      final proposal = Proposal.fromData(proposalData);
       proposals.add(proposal);
     }
 

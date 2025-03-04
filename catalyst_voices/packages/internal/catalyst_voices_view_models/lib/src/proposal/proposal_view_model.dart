@@ -91,7 +91,7 @@ final class PendingProposal extends ProposalViewModel {
   final String campaignName;
   final String category;
   final String title;
-  final DateTime lastUpdateDate;
+  final DateTime? lastUpdateDate;
   final Coin _fundsRequested;
   final int commentsCount;
   final String description;
