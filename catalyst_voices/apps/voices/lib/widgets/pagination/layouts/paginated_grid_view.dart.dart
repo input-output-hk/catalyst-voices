@@ -54,6 +54,7 @@ class PaginatedGridView<ItemType> extends StatelessWidget {
             child = SizedBox(
               width: double.infinity,
               child: Wrap(
+                key: const Key('PaginatedGridView'),
                 spacing: 16,
                 runSpacing: 16,
                 children: [
@@ -135,13 +136,16 @@ class _Controls extends StatelessWidget {
     return Row(
       children: [
         Text(
+          key: const Key('PaginationText'),
           '$fromNumber-$toNumber of $maxResults proposals',
         ),
         VoicesIconButton(
+          key: const Key('PrevPageBtn'),
           onTap: onPrevPageTap,
           child: VoicesAssets.icons.chevronLeft.buildIcon(),
         ),
         VoicesIconButton(
+          key: const Key('NextPageBtn'),
           onTap: onNextPageTap,
           child: VoicesAssets.icons.chevronRight.buildIcon(),
         ),

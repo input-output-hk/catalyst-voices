@@ -15,6 +15,7 @@ class NavigationBack extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
+      key: const Key('NavigationBackBtn'),
       onTap: () {
         if (Navigator.canPop(context)) {
           Navigator.pop(context);

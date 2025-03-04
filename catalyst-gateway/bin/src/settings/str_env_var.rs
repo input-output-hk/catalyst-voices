@@ -174,8 +174,9 @@ impl StringEnvVar {
     }
 
     /// Convert an Envvar into the required Duration type.
-    pub(crate) fn new_as_duration(var_name: &str, default: &str) -> Duration {
+    pub(crate) fn new_as_duration(var_name: &str, default: Duration) -> Duration {
         let choices = "A value in the format of `[0-9]+(ns|us|ms|[smhdwy])`";
+        let default = DurationString::new(default);
 
         let raw_value = StringEnvVar::new(
             var_name,
@@ -183,31 +184,16 @@ impl StringEnvVar {
         )
         .as_string();
 
-        match DurationString::try_from(raw_value.clone()) {
-            Ok(duration) => duration.into(),
-            Err(error) => {
-                error!(
-                    "Invalid Duration: {} : {}. Defaulting to {}.",
-                    raw_value, error, default
-                );
-
-                match DurationString::try_from(default.to_string()) {
-                    Ok(duration) => duration.into(),
-                    // The error from parsing the default value must not happen
-                    Err(error) => {
-                        error!(
-                            "Invalid Default Duration: {} : {}. Defaulting to 1s.",
-                            default, error
-                        );
-                        Duration::from_secs(1)
-                    },
-                }
-            },
-        }
+        DurationString::try_from(raw_value.clone())
+            .inspect(|err| {
+                error!("Invalid Duration: {raw_value} : {err}. Defaulting to {default}.",);
+            })
+            .unwrap_or(default)
+            .into()
     }
 
     /// Convert an Envvar into an integer in the bounded range.
-    pub(super) fn new_as<T>(var_name: &str, default: T, min: T, max: T) -> T
+    pub(super) fn new_as_int<T>(var_name: &str, default: T, min: T, max: T) -> T
     where
         T: FromStr + Display + PartialOrd + tracing::Value,
         <T as std::str::FromStr>::Err: std::fmt::Display,
