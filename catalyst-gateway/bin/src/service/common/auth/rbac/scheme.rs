@@ -324,7 +324,9 @@ async fn registration(network: Network, slot: Slot, txn_index: TxnIndex) -> anyh
 /// Returns `VerifyingKey` from the given X509 certificate.
 fn x509_key(cert: &Certificate) -> anyhow::Result<VerifyingKey> {
     let oid: Oid = cert
-        .signature_algorithm
+        .tbs_certificate
+        .subject_public_key_info
+        .algorithm
         .oid
         .to_string()
         .parse()
