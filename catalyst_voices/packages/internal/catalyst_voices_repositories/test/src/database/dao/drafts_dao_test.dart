@@ -260,7 +260,7 @@ void main() {
 
         // When
         await database.draftsDao.save(draft);
-        await database.draftsDao.deleteSingle(ref: ref);
+        await database.draftsDao.deleteWhere(ref: ref);
 
         // Then
         final entities = await database.draftsDao.queryAll();
