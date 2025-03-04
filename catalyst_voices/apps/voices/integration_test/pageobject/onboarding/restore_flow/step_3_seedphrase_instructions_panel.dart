@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../../utils/translations_utils.dart';
-import '../../common_page.dart';
 import '../onboarding_base_page.dart';
 import 'step_2_restore_keychain_choice_panel.dart';
 
@@ -31,7 +30,7 @@ class SeedPhraseInstructionsPanel extends OnboardingPageBase {
     );
     expect(infoPartTaskPicture(), findsOneWidget);
     expect(
-      $(registrationInfoPanel).$(CommonPage.decorData).$(Text).text,
+      infoPartLearnMoreText(),
       T.get('Learn More'),
     );
   }

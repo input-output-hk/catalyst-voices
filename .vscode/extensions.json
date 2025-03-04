@@ -22,6 +22,7 @@
         "fill-labs.dependi",
         "lawrencegrant.cql",
         "ldez.ignore-files",
-        "davidlday.languagetool-linter"
+        "davidlday.languagetool-linter",
+        "nefrob.vscode-just-syntax"
     ]
 }

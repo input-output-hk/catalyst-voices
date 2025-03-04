@@ -18,10 +18,13 @@ final class DeleteProposalEvent extends ProposalBuilderEvent {
 }
 
 final class ExportProposalEvent extends ProposalBuilderEvent {
-  const ExportProposalEvent();
+  /// The prefix for the file where the proposal will be exported.
+  final String filePrefix;
+
+  const ExportProposalEvent({required this.filePrefix});
 
   @override
-  List<Object?> get props => [];
+  List<Object?> get props => [filePrefix];
 }
 
 final class LoadDefaultProposalTemplateEvent extends ProposalBuilderEvent {
@@ -32,25 +35,25 @@ final class LoadDefaultProposalTemplateEvent extends ProposalBuilderEvent {
 }
 
 final class LoadProposalEvent extends ProposalBuilderEvent {
-  final String id;
+  final DocumentRef ref;
 
   const LoadProposalEvent({
-    required this.id,
+    required this.ref,
   });
 
   @override
-  List<Object?> get props => [id];
+  List<Object?> get props => [ref];
 }
 
 final class LoadProposalTemplateEvent extends ProposalBuilderEvent {
-  final String id;
+  final DocumentRef ref;
 
   const LoadProposalTemplateEvent({
-    required this.id,
+    required this.ref,
   });
 
   @override
-  List<Object?> get props => [id];
+  List<Object?> get props => [ref];
 }
 
 sealed class ProposalBuilderEvent extends Equatable {

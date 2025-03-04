@@ -1,5 +1,5 @@
 //! CLI interpreter for the service
-use std::{io::Write, time::Duration};
+use std::{io::Write, path::PathBuf, time::Duration};
 
 use clap::Parser;
 use tracing::{error, info};
@@ -13,7 +13,7 @@ use crate::{
             condition_for_started, is_live, live_counter_reset, service_has_started, set_to_started,
         },
     },
-    settings::{DocsSettings, ServiceSettings, Settings},
+    settings::{ServiceSettings, Settings},
 };
 
 #[derive(Parser)]
@@ -23,7 +23,10 @@ pub(crate) enum Cli {
     /// Run the service
     Run(ServiceSettings),
     /// Build API docs of the service in the JSON format
-    Docs(DocsSettings),
+    Docs {
+        /// The output path to the generated docs file, if omitted prints to stdout.
+        output: Option<PathBuf>,
+    },
 }
 
 impl Cli {
@@ -94,9 +97,9 @@ impl Cli {
 
                 info!("Catalyst Gateway - Shut Down");
             },
-            Self::Docs(settings) => {
+            Self::Docs { output } => {
                 let docs = service::get_app_docs();
-                match settings.output {
+                match output {
                     Some(path) => {
                         let mut docs_file = std::fs::File::create(path)?;
                         docs_file.write_all(docs.as_bytes())?;
