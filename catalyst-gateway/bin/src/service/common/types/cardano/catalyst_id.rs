@@ -12,6 +12,12 @@ use poem_openapi::{
 };
 use serde_json::Value;
 
+/// Catalyst Id String Format
+pub(crate) const FORMAT: &str = "catalyst_id";
+
+/// Catalyst Id Pattern
+pub(crate) const PATTERN: &str = r".+\..+\/[A-Za-z0-9_-]{43}";
+
 /// A schema.
 static SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| {
     let example = Some(CatalystId::example().0.to_string().into());
@@ -19,7 +25,7 @@ static SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| {
         title: Some("Catalyst short ID".into()),
         description: Some("Catalyst short identifier in string format"),
         example,
-        pattern: Some(r".+\..+\/[A-Za-z0-9_-]{43}".into()),
+        pattern: Some(PATTERN.into()),
         ..MetaSchema::ANY
     }
 });
@@ -35,15 +41,12 @@ impl Type for CatalystId {
     const IS_REQUIRED: bool = true;
 
     fn name() -> Cow<'static, str> {
-        "string(catalyst_id)".into()
+        format!("string{FORMAT}").into()
     }
 
     fn schema_ref() -> MetaSchemaRef {
-        MetaSchemaRef::Inline(Box::new(MetaSchema::new_with_format(
-            "string",
-            "catalyst_id",
-        )))
-        .merge(SCHEMA.clone())
+        MetaSchemaRef::Inline(Box::new(MetaSchema::new_with_format("string", FORMAT)))
+            .merge(SCHEMA.clone())
     }
 
     fn as_raw_value(&self) -> Option<&Self::RawValueType> {
@@ -69,6 +72,18 @@ impl From<CatalystId> for IdUri {
     }
 }
 
+impl TryFrom<&str> for CatalystId {
+    type Error = anyhow::Error;
+
+    fn try_from(value: &str) -> Result<Self, Self::Error> {
+        let id: IdUri = match value.parse() {
+            Ok(v) => v,
+            Err(e) => anyhow::bail!("Invalid Catalyst ID: {e:?}"),
+        };
+        Ok(Self(id.as_short_id()))
+    }
+}
+
 impl ParseFromJSON for CatalystId {
     fn parse_from_json(value: Option<Value>) -> ParseResult<Self> {
         let value = value.unwrap_or_default();
@@ -82,11 +97,7 @@ impl ParseFromJSON for CatalystId {
 
 impl ParseFromParameter for CatalystId {
     fn parse_from_parameter(value: &str) -> ParseResult<Self> {
-        let id: IdUri = match value.parse() {
-            Ok(v) => v,
-            Err(e) => return Err(format!("Invalid Catalyst ID: {e:?}").into()),
-        };
-        Ok(Self(id.as_short_id()))
+        Ok(value.try_into()?)
     }
 }
 

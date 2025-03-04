@@ -4,7 +4,7 @@ use poem_openapi::{param::Query, OpenApi};
 
 use crate::service::common::{
     auth::none_or_rbac::NoneOrRBAC, tags::ApiTags,
-    types::cardano::query::stake_or_voter::StakeOrVoter,
+    types::cardano::query::cat_id_or_stake::CatIdOrStake,
 };
 
 mod rbac_registration;
@@ -28,7 +28,7 @@ impl Api {
     async fn rbac_registrations_get(
         &self,
         /// Stake address to get the RBACE registration for.
-        Query(lookup): Query<Option<StakeOrVoter>>,
+        Query(lookup): Query<Option<CatIdOrStake>>,
         /// A flag which enalbes returning all corresponded Cip509 registrations
         Query(detailed): Query<Option<bool>>,
         /// No Authorization required, but Token permitted.

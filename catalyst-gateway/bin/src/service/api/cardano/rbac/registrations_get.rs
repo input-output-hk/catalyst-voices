@@ -12,7 +12,7 @@ use crate::{
     service::common::{
         responses::WithErrorResponses,
         types::{
-            cardano::query::stake_or_voter::StakeOrVoter, headers::retry_after::RetryAfterOption,
+            cardano::query::cat_id_or_stake::CatIdOrStake, headers::retry_after::RetryAfterOption,
         },
     },
 };
@@ -41,7 +41,7 @@ pub(crate) type AllResponses = WithErrorResponses<Responses>;
 /// Get RBAC registration endpoint.
 #[allow(clippy::unused_async)]
 pub(crate) async fn endpoint(
-    lookup: Option<StakeOrVoter>, auth_catalyst_id: Option<IdUri>, _detailed: bool,
+    lookup: Option<CatIdOrStake>, auth_catalyst_id: Option<IdUri>, _detailed: bool,
 ) -> AllResponses {
     let Some(_session) = CassandraSession::get(true) else {
         error!("Failed to acquire db session");

@@ -74,12 +74,14 @@ const DESCRIPTION: &str = "Restrict the query to this Stake address, or Voters P
 If neither are defined, the stake address(es) from the auth tokens role0 registration are used.";
 /// Example
 const EXAMPLE: &str = common::types::cardano::cip19_stake_address::EXAMPLE;
-/// Stake Address Pattern
-const STAKE_PATTERN: &str = common::types::cardano::cip19_stake_address::PATTERN;
-/// Voting Key Pattern
-const VOTING_KEY_PATTERN: &str = common::types::generic::ed25519_public_key::PATTERN;
 /// Validation Regex Pattern
-const PATTERN: &str = concatcp!("^(", STAKE_PATTERN, ")|(", VOTING_KEY_PATTERN, ")$");
+const PATTERN: &str = concatcp!(
+    "^(",
+    common::types::cardano::cip19_stake_address::PATTERN,
+    ")|(",
+    common::types::generic::ed25519_public_key::PATTERN,
+    ")$"
+);
 /// Minimum parameter length
 static MIN_LENGTH: LazyLock<usize> = LazyLock::new(|| {
     min(
