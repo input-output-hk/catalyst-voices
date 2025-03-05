@@ -10,8 +10,7 @@ import 'package:flutter/foundation.dart';
 abstract interface class DraftsDao {
   /// Counts drafts matching required [ref] id and optional [ref] ver.
   ///
-  /// If ref is null it will count all drafts. If [unique] is true counts
-  /// all versions of same document as one.
+  /// If ref is null it will count all drafts.
   ///
   /// If [ref] ver is not specified it will return count of all version
   /// matching [ref] id.
