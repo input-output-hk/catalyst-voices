@@ -15,12 +15,17 @@ abstract final class UuidUtils {
     }
 
     // Extract the 48-bit timestamp from the first 6 bytes.
-    var timestampMillis = 0;
+    var timestampMillis = BigInt.from(0);
     for (var i = 0; i < 6; i++) {
-      timestampMillis = (timestampMillis << 8) | bytes[i];
+      // Using BigInt due to how JS binary shift works,
+      // it truncates the number to be uint32 which is not enough in this case.
+      timestampMillis = (timestampMillis << 8) | BigInt.from(bytes[i]);
     }
 
-    return DateTime.fromMillisecondsSinceEpoch(timestampMillis, isUtc: true);
+    return DateTime.fromMillisecondsSinceEpoch(
+      timestampMillis.toInt(),
+      isUtc: true,
+    );
   }
 
   static int version(
