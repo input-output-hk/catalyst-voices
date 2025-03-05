@@ -1,6 +1,8 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart'
     show ApiConfig;
+import 'package:catalyst_voices_repositories/generated/api/cat_gateway.models.swagger.dart';
 import 'package:catalyst_voices_repositories/generated/api/client_index.dart';
+import 'package:catalyst_voices_repositories/generated/api/client_mapping.dart';
 import 'package:catalyst_voices_repositories/src/api/interceptors/rbac_auth_interceptor.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart'
     show UserObserver;
@@ -16,6 +18,8 @@ final class ApiServices {
     required ApiConfig config,
     required UserObserver userObserver,
   }) {
+    _fixModelsMapping();
+
     final cat = CatGateway.create(
       authenticator: null,
       baseUrl: Uri.parse(config.gatewayUrl),
@@ -51,4 +55,13 @@ final class ApiServices {
     required this.vit,
     required this.reviews,
   });
+}
+
+// swagger_dart_code_generator does not add this model to mapping list.
+// TODO(damian-molinski): investigate if this can be removed.
+void _fixModelsMapping() {
+  generatedMapping.putIfAbsent(
+    DocumentIndexList,
+    () => DocumentIndexList.fromJsonFactory,
+  );
 }
