@@ -7,7 +7,8 @@ mod unprocessable_content;
 
 use catalyst_types::id_uri::IdUri;
 use poem_openapi::{payload::Json, ApiResponse};
-use rbac_reg::RbacRegistrations;
+use rbac_reg::{RbacRegistration, RbacRegistrations};
+use reg_chain::RegistrationChain;
 use tracing::error;
 use unprocessable_content::RbacUnprocessableContent;
 
@@ -57,4 +58,45 @@ pub(crate) async fn endpoint(
     if let Some(_auth_catalyst_id) = auth_catalyst_id {}
 
     Responses::NotFound.into()
+}
+
+/// Build a reponse `RbacRegistration` from the provided CIP 509 registrations lists
+#[allow(dead_code)]
+pub(crate) fn build_rbac_reg(
+    regs: Vec<rbac_registration::cardano::cip509::Cip509>, detailed: bool,
+) -> anyhow::Result<Option<RbacRegistration>> {
+    let details = if detailed {
+        regs.iter()
+            .map(TryInto::try_into)
+            .collect::<anyhow::Result<Vec<_>>>()?
+    } else {
+        Vec::new()
+    };
+    let chain = build_chain(regs);
+    if details.is_empty() && chain.is_none() {
+        return Ok(None);
+    }
+    Ok(Some(RbacRegistration { chain, details }))
+}
+
+/// Try to build a `RegistrationChain` from the provided registration list
+pub(crate) fn build_chain(
+    regs: Vec<rbac_registration::cardano::cip509::Cip509>,
+) -> Option<RegistrationChain> {
+    let mut regs_iter = regs.into_iter();
+    while let Some(try_first) = regs_iter.next() {
+        if let Ok(mut chain) =
+            rbac_registration::registration::cardano::RegistrationChain::new(try_first)
+        {
+            for reg in regs_iter {
+                let Ok(updated_chain) = chain.update(reg) else {
+                    continue;
+                };
+                chain = updated_chain;
+            }
+            return Some(chain.into());
+        }
+        continue;
+    }
+    None
 }
