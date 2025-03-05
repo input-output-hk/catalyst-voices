@@ -29,21 +29,28 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
       );
 
       // TODO(damian-molinski): mapping errors if response not successful
+      if (!response.isSuccessful) {
+        // throw exception.
+      }
+
       final bytes = response.bodyBytes;
 
-      final signedDocument =
-          await _signedDocumentManager.parseDocument<SignedDocumentJsonPayload>(
+      final signedDocument = await _signedDocumentManager.parseDocument(
         bytes,
         parser: SignedDocumentJsonPayload.fromBytes,
       );
 
       // TODO(damian-molinski): parsing metadata
       // TODO(damian-molinski): mapping signedDocument to DocumentData.
-      debugPrint('Document');
-      debugPrint(json.encode(signedDocument.payload.data));
+      if (kDebugMode) {
+        debugPrint('Document');
+        debugPrint(json.encode(signedDocument.payload.data));
+      }
     } catch (error, stack) {
-      debugPrint(error.toString());
-      debugPrintStack(stackTrace: stack);
+      if (kDebugMode) {
+        debugPrint(error.toString());
+        debugPrintStack(stackTrace: stack);
+      }
       rethrow;
     }
 
