@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:async/async.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -40,6 +41,21 @@ abstract interface class DocumentRepository {
     SignedDocumentRef? of,
   });
 
+  /// Deletes a proposal draft from the local storage.
+  Future<void> deleteDocumentDraft({
+    required DraftRef ref,
+  });
+
+  /// Encodes the [content] to exportable format.
+  ///
+  /// It does not save the document anywhere on the disk,
+  /// it only encodes a document as [Uint8List]
+  /// so that it can be saved as a file.
+  Future<Uint8List> encodeDocumentForExport({
+    required DocumentDataMetadata metadata,
+    required DocumentDataContent content,
+  });
+
   /// Returns list of refs to all published and any refs it may hold.
   ///
   /// Its using documents index api.
@@ -48,7 +64,7 @@ abstract interface class DocumentRepository {
   /// Returns list of locally saved signed documents refs.
   Future<List<SignedDocumentRef>> getCachedDocumentsRefs();
 
-  /// Returns [ProposalDocument] for matching [ref].
+  /// Returns matching [ProposalDocument] for matching [ref].
   ///
   /// Source of data depends whether [ref] is [SignedDocumentRef] or [DraftRef].
   Future<ProposalDocument> getProposalDocument({
@@ -62,12 +78,23 @@ abstract interface class DocumentRepository {
     required DocumentRef ref,
   });
 
+  /// Imports a document [data] previously encoded by [encodeDocumentForExport].
+  ///
+  /// The document reference will be altered to avoid linking
+  /// the imported document to the old document.
+  ///
+  /// Once imported from the version management point of view this becomes
+  /// a new standalone document not related to the previous one.
+  ///
+  /// Returns the reference to the imported document.
+  Future<DocumentRef> importDocument({required Uint8List data});
+
   /// Updates local draft (or drafts if version is not specified)
   /// matching [ref] with given [content].
   ///
   /// If watching same draft with [watchProposalDocument] it will emit
   /// change.
-  Future<void> updateProposalDraftContent({
+  Future<void> updateDocumentDraft({
     required DraftRef ref,
     required DocumentDataContent content,
   });
@@ -125,6 +152,25 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     await _drafts.save(data: data);
 
     return ref;
+  }
+
+  @override
+  Future<void> deleteDocumentDraft({required DraftRef ref}) {
+    return _drafts.delete(ref: ref);
+  }
+
+  @override
+  Future<Uint8List> encodeDocumentForExport({
+    required DocumentDataMetadata metadata,
+    required DocumentDataContent content,
+  }) async {
+    final documentDataDto = DocumentDataDto(
+      metadata: DocumentDataMetadataDto.fromModel(metadata),
+      content: DocumentDataContentDto.fromModel(content),
+    );
+
+    final jsonData = documentDataDto.toJson();
+    return json.fuse(utf8).encode(jsonData) as Uint8List;
   }
 
   @override
@@ -187,11 +233,32 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   }
 
   @override
-  Future<void> updateProposalDraftContent({
+  Future<DocumentRef> importDocument({required Uint8List data}) async {
+    final jsonData = json.fuse(utf8).decode(data)! as Map<String, dynamic>;
+    final document = DocumentDataDto.fromJson(jsonData).toModel();
+
+    final newMetadata = document.metadata.copyWith(
+      selfRef: DraftRef.generateFirstRef(),
+    );
+
+    final newDocument = DocumentData(
+      metadata: newMetadata,
+      content: document.content,
+    );
+
+    await _drafts.save(data: newDocument);
+    return newDocument.ref;
+  }
+
+  @override
+  Future<void> updateDocumentDraft({
     required DraftRef ref,
     required DocumentDataContent content,
   }) async {
-    await _drafts.update(ref: ref, content: content);
+    await _drafts.update(
+      ref: ref,
+      content: content,
+    );
   }
 
   @visibleForTesting
@@ -260,8 +327,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     final template = _buildProposalTemplate(documentData: templateData);
 
     final metadata = ProposalMetadata(
-      id: documentData.metadata.id,
-      version: documentData.metadata.version,
+      selfRef: documentData.metadata.selfRef,
     );
 
     final content = DocumentDataContentDto.fromModel(
@@ -285,8 +351,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     );
 
     final metadata = ProposalTemplateMetadata(
-      id: documentData.metadata.id,
-      version: documentData.metadata.version,
+      selfRef: documentData.metadata.selfRef,
     );
 
     final contentData = documentData.content.data;

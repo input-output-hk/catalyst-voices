@@ -1,5 +1,5 @@
 //! CLI interpreter for the service
-use std::io::Write;
+use std::{io::Write, path::PathBuf};
 
 use clap::Parser;
 use tracing::{error, info};
@@ -7,8 +7,11 @@ use tracing::{error, info};
 use crate::{
     cardano::start_followers,
     db::{self, index::session::CassandraSession},
-    service::{self, started},
-    settings::{DocsSettings, ServiceSettings, Settings},
+    service::{
+        self, started,
+        utilities::health::{is_live, live_counter_reset},
+    },
+    settings::{ServiceSettings, Settings},
 };
 
 #[derive(Parser)]
@@ -18,7 +21,10 @@ pub(crate) enum Cli {
     /// Run the service
     Run(ServiceSettings),
     /// Build API docs of the service in the JSON format
-    Docs(DocsSettings),
+    Docs {
+        /// The output path to the generated docs file, if omitted prints to stdout.
+        output: Option<PathBuf>,
+    },
 }
 
 impl Cli {
@@ -60,6 +66,14 @@ impl Cli {
                 });
                 tasks.push(handle);
 
+                let handle = tokio::spawn(async move {
+                    while is_live() {
+                        tokio::time::sleep(Settings::service_live_timeout_interval()).await;
+                        live_counter_reset();
+                    }
+                });
+                tasks.push(handle);
+
                 started();
 
                 for task in tasks {
@@ -68,9 +82,9 @@ impl Cli {
 
                 info!("Catalyst Gateway - Shut Down");
             },
-            Self::Docs(settings) => {
+            Self::Docs { output } => {
                 let docs = service::get_app_docs();
-                match settings.output {
+                match output {
                     Some(path) => {
                         let mut docs_file = std::fs::File::create(path)?;
                         docs_file.write_all(docs.as_bytes())?;

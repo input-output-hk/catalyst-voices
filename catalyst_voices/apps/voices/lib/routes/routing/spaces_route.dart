@@ -1,7 +1,6 @@
 import 'package:catalyst_voices/pages/category/category_page.dart';
 import 'package:catalyst_voices/pages/discovery/discovery.dart';
 import 'package:catalyst_voices/pages/funded_projects/funded_projects_page.dart';
-import 'package:catalyst_voices/pages/proposal_builder/proposal_builder.dart';
 import 'package:catalyst_voices/pages/proposals/proposals_page.dart';
 import 'package:catalyst_voices/pages/spaces/spaces.dart';
 import 'package:catalyst_voices/pages/treasury/treasury.dart';
@@ -21,6 +20,58 @@ part 'spaces_route.g.dart';
 
 const _prefix = Routes.currentMilestone;
 
+final class CategoryDetailRoute extends GoRouteData
+    with FadePageTransitionMixin {
+  final String categoryId;
+
+  const CategoryDetailRoute(this.categoryId);
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) {
+    return CategoryPage(categoryId: categoryId);
+  }
+}
+
+final class DiscoveryRoute extends GoRouteData with FadePageTransitionMixin {
+  const DiscoveryRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) {
+    return const DiscoveryPage();
+  }
+}
+
+final class FundedProjectsRoute extends GoRouteData
+    with FadePageTransitionMixin, CompositeRouteGuardMixin {
+  const FundedProjectsRoute();
+
+  @override
+  List<RouteGuard> get routeGuards => const [
+        SessionUnlockedGuard(),
+        UserAccessGuard(),
+      ];
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) {
+    return const FundedProjectsPage();
+  }
+}
+
+final class ProposalsRoute extends GoRouteData with FadePageTransitionMixin {
+  final String? categoryId;
+
+  const ProposalsRoute({
+    this.categoryId,
+  });
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) {
+    return ProposalsPage(
+      categoryId: categoryId,
+    );
+  }
+}
+
 @TypedShellRoute<SpacesShellRouteData>(
   routes: <TypedRoute<RouteData>>[
     TypedGoRoute<DiscoveryRoute>(
@@ -29,22 +80,10 @@ const _prefix = Routes.currentMilestone;
         TypedGoRoute<ProposalsRoute>(
           path: 'proposals',
         ),
-        TypedGoRoute<CategoryDetailRoute>(
-          path: 'category/:categoryId',
-        ),
+        TypedGoRoute<CategoryDetailRoute>(path: 'category/:categoryId'),
       ],
     ),
-    TypedGoRoute<WorkspaceRoute>(
-      path: '/$_prefix/workspace',
-      routes: [
-        TypedGoRoute<ProposalBuilderDraftRoute>(
-          path: 'proposal_builder/draft',
-        ),
-        TypedGoRoute<ProposalBuilderRoute>(
-          path: 'proposal_builder/:proposalId',
-        ),
-      ],
-    ),
+    TypedGoRoute<WorkspaceRoute>(path: '/$_prefix/workspace'),
     TypedGoRoute<VotingRoute>(path: '/$_prefix/voting'),
     TypedGoRoute<FundedProjectsRoute>(path: '/$_prefix/funded_projects'),
     TypedGoRoute<TreasuryRoute>(path: '/$_prefix/treasury'),
@@ -86,82 +125,19 @@ final class SpacesShellRouteData extends ShellRouteData {
   }
 }
 
-final class DiscoveryRoute extends GoRouteData with FadePageTransitionMixin {
-  const DiscoveryRoute();
-
-  @override
-  Widget build(BuildContext context, GoRouterState state) {
-    return const DiscoveryPage();
-  }
-}
-
-final class WorkspaceRoute extends GoRouteData
+final class TreasuryRoute extends GoRouteData
     with FadePageTransitionMixin, CompositeRouteGuardMixin {
-  const WorkspaceRoute();
+  const TreasuryRoute();
 
   @override
   List<RouteGuard> get routeGuards => const [
         SessionUnlockedGuard(),
-        UserAccessGuard(),
+        AdminAccessGuard(),
       ];
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
-    return const WorkspacePage();
-  }
-}
-
-final class ProposalsRoute extends GoRouteData with FadePageTransitionMixin {
-  final String? categoryId;
-
-  const ProposalsRoute({
-    this.categoryId,
-  });
-  @override
-  Widget build(BuildContext context, GoRouterState state) {
-    return ProposalsPage(
-      categoryId: categoryId,
-    );
-  }
-}
-
-final class ProposalBuilderDraftRoute extends GoRouteData
-    with FadePageTransitionMixin, CompositeRouteGuardMixin {
-  final String? templateId;
-
-  const ProposalBuilderDraftRoute({
-    this.templateId,
-  });
-
-  @override
-  List<RouteGuard> get routeGuards => const [
-        SessionUnlockedGuard(),
-        UserAccessGuard(),
-      ];
-
-  @override
-  Widget build(BuildContext context, GoRouterState state) {
-    return ProposalBuilderPage(templateId: templateId);
-  }
-}
-
-final class ProposalBuilderRoute extends GoRouteData
-    with FadePageTransitionMixin, CompositeRouteGuardMixin {
-  final String proposalId;
-
-  const ProposalBuilderRoute({
-    required this.proposalId,
-  });
-
-  @override
-  List<RouteGuard> get routeGuards => const [
-        SessionUnlockedGuard(),
-        UserAccessGuard(),
-      ];
-
-  @override
-  Widget build(BuildContext context, GoRouterState state) {
-    return ProposalBuilderPage(proposalId: proposalId);
+    return const TreasuryPage();
   }
 }
 
@@ -181,9 +157,9 @@ final class VotingRoute extends GoRouteData
   }
 }
 
-final class FundedProjectsRoute extends GoRouteData
+final class WorkspaceRoute extends GoRouteData
     with FadePageTransitionMixin, CompositeRouteGuardMixin {
-  const FundedProjectsRoute();
+  const WorkspaceRoute();
 
   @override
   List<RouteGuard> get routeGuards => const [
@@ -193,34 +169,6 @@ final class FundedProjectsRoute extends GoRouteData
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
-    return const FundedProjectsPage();
-  }
-}
-
-final class TreasuryRoute extends GoRouteData
-    with FadePageTransitionMixin, CompositeRouteGuardMixin {
-  const TreasuryRoute();
-
-  @override
-  List<RouteGuard> get routeGuards => const [
-        SessionUnlockedGuard(),
-        AdminAccessGuard(),
-      ];
-
-  @override
-  Widget build(BuildContext context, GoRouterState state) {
-    return const TreasuryPage();
-  }
-}
-
-final class CategoryDetailRoute extends GoRouteData
-    with FadePageTransitionMixin {
-  final String categoryId;
-
-  const CategoryDetailRoute(this.categoryId);
-
-  @override
-  Widget build(BuildContext context, GoRouterState state) {
-    return CategoryPage(categoryId: categoryId);
+    return const WorkspacePage();
   }
 }

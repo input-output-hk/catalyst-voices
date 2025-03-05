@@ -1,4 +1,4 @@
-import 'package:catalyst_voices/common/ext/ext.dart';
+import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/widgets/modals/details/voices_align_title_header.dart';
 import 'package:catalyst_voices/widgets/snackbar/voices_snackbar.dart';
 import 'package:catalyst_voices/widgets/snackbar/voices_snackbar_type.dart';
@@ -178,9 +178,11 @@ class _ShareItem extends StatelessWidget with LaunchUrlMixin {
           ),
           padding: const EdgeInsets.all(12),
           child: Row(
+            key: const Key('ShareItem'),
             spacing: 16,
             children: [
               VoicesAvatar(
+                key: const Key('ItemIcon'),
                 icon: shareType.icon.buildIcon(),
                 backgroundColor:
                     context.colors.elevationsOnSurfaceNeutralLv1Grey,
@@ -192,9 +194,11 @@ class _ShareItem extends StatelessWidget with LaunchUrlMixin {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
+                      key: const Key('ItemTitle'),
                       shareType.shareMessage(context.l10n),
                     ),
                     Text(
+                      key: const Key('ItemDescription'),
                       shareType.description(context.l10n, itemType),
                     ),
                   ],

@@ -39,61 +39,6 @@ pub(crate) fn generate_uuid_string_from_data(key: &str, data: &[String]) -> Stri
         .to_string()
 }
 
-/// 224 Byte Blake2b Hash
-#[allow(dead_code)]
-pub(crate) type Blake2b224 = [u8; 28];
-
-/// Computes a BLAKE2b-224 hash of the input bytes.
-///
-/// # Arguments
-/// - `input_bytes`: A slice of bytes to be hashed.
-///
-/// # Returns
-/// An array containing the BLAKE2b-224 hash of the input bytes.
-#[allow(dead_code)]
-pub(crate) fn blake2b_224(input_bytes: &[u8]) -> Blake2b224 {
-    // Where we will actually store the bytes we derive the UUID from.
-    let mut bytes: Blake2b224 = Blake2b224::default();
-
-    // Generate a unique hash of the data.
-    let mut hasher = Params::new().hash_length(bytes.len()).to_state();
-
-    hasher.update(input_bytes);
-    let hash = hasher.finalize();
-
-    // Create a new array containing the first 16 elements from the original array
-    bytes.copy_from_slice(hash.as_bytes());
-
-    bytes
-}
-
-/// 256 Byte Blake2b Hash
-pub(crate) type Blake2b256 = [u8; 32];
-
-/// Computes a BLAKE2b-256 hash of the input bytes.
-///
-/// # Arguments
-/// - `input_bytes`: A slice of bytes to be hashed.
-///
-/// # Returns
-/// An array containing the BLAKE2b-256 hash of the input bytes.
-#[allow(dead_code)]
-pub(crate) fn blake2b_256(input_bytes: &[u8]) -> Blake2b256 {
-    // Where we will actually store the bytes we derive the UUID from.
-    let mut bytes: Blake2b256 = Blake2b256::default();
-
-    // Generate a unique hash of the data.
-    let mut hasher = Params::new().hash_length(bytes.len()).to_state();
-
-    hasher.update(input_bytes);
-    let hash = hasher.finalize();
-
-    // Create a new array containing the first 16 elements from the original array
-    bytes.copy_from_slice(hash.as_bytes());
-
-    bytes
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;

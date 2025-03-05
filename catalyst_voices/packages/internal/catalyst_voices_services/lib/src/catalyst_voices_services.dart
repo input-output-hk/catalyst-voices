@@ -1,7 +1,7 @@
 export 'campaign/campaign_service.dart' show CampaignService;
 export 'config/config_service.dart' show ConfigService;
 export 'documents/documents_service.dart' show DocumentsService;
-export 'downloader/downloader.dart';
+export 'downloader/downloader_service.dart' show DownloaderService;
 export 'proposal/proposal_service.dart' show ProposalService;
 export 'registration/registration_progress_notifier.dart';
 export 'registration/registration_service.dart' show RegistrationService;
