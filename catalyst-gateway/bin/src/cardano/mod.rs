@@ -352,7 +352,7 @@ struct SyncTask {
     sync_status: Vec<SyncStatus>,
 
     /// Event sender during the process of sync tasks.
-    event_broadcaster: (
+    event_channel: (
         broadcast::Sender<event::ChainIndexerEvent>,
         broadcast::Receiver<event::ChainIndexerEvent>,
     ),
@@ -369,7 +369,7 @@ impl SyncTask {
             immutable_tip_slot: 0.into(),
             live_tip_slot: 0.into(),
             sync_status: Vec::new(),
-            event_broadcaster: broadcast::channel(10),
+            event_channel: broadcast::channel(10),
         }
     }
 
@@ -407,7 +407,7 @@ impl SyncTask {
                 Point::fuzzy(self.immutable_tip_slot),
                 Point::TIP,
             ),
-            self.event_broadcaster.0.clone(),
+            self.event_channel.0.clone(),
         ));
 
         self.start_immutable_followers();
@@ -450,7 +450,7 @@ impl SyncTask {
                         // Start the Live Chain sync task again from where it left off.
                         self.sync_tasks.push(sync_subchain(
                             finished.retry(),
-                            self.event_broadcaster.0.clone(),
+                            self.event_channel.0.clone(),
                         ));
                     } else if let Some(result) = finished.result.as_ref() {
                         match result {
@@ -485,7 +485,7 @@ impl SyncTask {
                                 // off.
                                 self.sync_tasks.push(sync_subchain(
                                     finished.retry(),
-                                    self.event_broadcaster.0.clone(),
+                                    self.event_channel.0.clone(),
                                 ));
                             },
                         }
@@ -541,7 +541,7 @@ impl SyncTask {
                 {
                     self.sync_tasks.push(sync_subchain(
                         SyncParams::new(self.cfg.chain, first_point, last_point.clone()),
-                        self.event_broadcaster.0.clone(),
+                        self.event_channel.0.clone(),
                     ));
                     self.current_sync_tasks = self.current_sync_tasks.saturating_add(1);
 
@@ -599,7 +599,7 @@ impl SyncTask {
 
 impl event::EventTarget<event::ChainIndexerEvent> for SyncTask {
     fn add_event_listener(&mut self, listener: event::EventListenerFn<event::ChainIndexerEvent>) {
-        let mut rx = self.event_broadcaster.0.subscribe();
+        let mut rx = self.event_channel.0.subscribe();
         tokio::spawn(async move {
             while let Ok(event) = rx.recv().await {
                 (listener)(&event);
@@ -608,7 +608,7 @@ impl event::EventTarget<event::ChainIndexerEvent> for SyncTask {
     }
 
     fn dispatch_event(&self, message: event::ChainIndexerEvent) {
-        let _ = self.event_broadcaster.0.send(message);
+        let _ = self.event_channel.0.send(message);
     }
 }
 
