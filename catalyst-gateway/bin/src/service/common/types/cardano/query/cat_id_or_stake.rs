@@ -2,6 +2,8 @@
 //!
 //! Allows us to have one parameter that can represent two things, uniformly.
 
+// cSpell:ignoreRegExp cardano/Fftx
+
 use std::sync::LazyLock;
 
 use const_format::concatcp;
