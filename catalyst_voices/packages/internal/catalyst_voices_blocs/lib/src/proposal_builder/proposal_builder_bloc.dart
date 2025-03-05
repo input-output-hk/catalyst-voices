@@ -142,8 +142,8 @@ final class ProposalBuilderBloc
   }
 
   Iterable<ProposalGuidanceItem> _findGuidanceItems(
-    ProposalBuilderSegment segment,
-    ProposalBuilderSection section,
+    DocumentSegment segment,
+    DocumentSection section,
     DocumentProperty property,
   ) sync* {
     final guidance = property.schema.guidance;
@@ -169,27 +169,6 @@ final class ProposalBuilderBloc
     }
   }
 
-  Iterable<DocumentProperty> _findSectionsAndSubsections(
-    DocumentProperty property,
-  ) sync* {
-    if (property.schema.isSectionOrSubsection) {
-      yield property;
-    }
-
-    switch (property) {
-      case DocumentListProperty():
-        for (final childProperty in property.properties) {
-          yield* _findSectionsAndSubsections(childProperty);
-        }
-      case DocumentObjectProperty():
-        for (final childProperty in property.properties) {
-          yield* _findSectionsAndSubsections(childProperty);
-        }
-      case DocumentValueProperty():
-      // value property doesn't have children
-    }
-  }
-
   ProposalGuidance _getGuidanceForNodeId(NodeId? nodeId) {
     if (nodeId == null) {
       return const ProposalGuidance(isNoneSelected: true);
@@ -203,8 +182,8 @@ final class ProposalBuilderBloc
   }
 
   ProposalGuidance _getGuidanceForSection(
-    ProposalBuilderSegment? segment,
-    ProposalBuilderSection? section,
+    DocumentSegment? segment,
+    DocumentSection? section,
   ) {
     if (segment == null || section == null) {
       return const ProposalGuidance();
@@ -292,17 +271,18 @@ final class ProposalBuilderBloc
     LoadProposalEvent event,
     Emitter<ProposalBuilderState> emit,
   ) async {
-    _logger.info('Loading proposal[${event.id}]');
+    _logger.info('Loading proposal[${event.ref}]');
 
     await _loadState(emit, () async {
-      final proposal = await _proposalService.getProposal(id: event.id);
+      final proposalData = await _proposalService.getProposal(ref: event.ref);
+      final proposal = Proposal.fromData(proposalData);
 
       return _createState(
-        document: proposal.document.document,
+        document: proposalData.document.document,
         metadata: ProposalBuilderMetadata(
           publish: proposal.publish,
-          documentRef: proposal.ref,
-          currentIteration: proposal.version,
+          documentRef: proposal.selfRef,
+          currentIteration: proposal.versionCount,
         ),
       );
     });
@@ -312,12 +292,13 @@ final class ProposalBuilderBloc
     LoadProposalTemplateEvent event,
     Emitter<ProposalBuilderState> emit,
   ) async {
-    _logger.info('Loading proposal template[${event.id}]');
+    final ref = event.ref;
+
+    _logger.info('Loading proposal template[$ref]');
 
     await _loadState(emit, () async {
-      final proposalTemplateRef = SignedDocumentRef(id: event.id);
       final proposalTemplate = await _proposalService.getProposalTemplate(
-        ref: proposalTemplateRef,
+        ref: ref,
       );
 
       final documentBuilder =
@@ -326,7 +307,7 @@ final class ProposalBuilderBloc
       return _createState(
         document: documentBuilder.build(),
         metadata: ProposalBuilderMetadata.newDraft(
-          templateRef: proposalTemplateRef,
+          templateRef: ref,
         ),
       );
     });
@@ -352,15 +333,15 @@ final class ProposalBuilderBloc
     }
   }
 
-  List<ProposalBuilderSegment> _mapDocumentToSegments(
+  List<DocumentSegment> _mapDocumentToSegments(
     Document document, {
     required bool showValidationErrors,
   }) {
     return document.segments.map((segment) {
       final sections = segment.sections
-          .expand(_findSectionsAndSubsections)
+          .expand(DocumentNodeTraverser.findSectionsAndSubsections)
           .map(
-            (section) => ProposalBuilderSection(
+            (section) => DocumentSection(
               id: section.schema.nodeId,
               property: section,
               schema: section.schema,
@@ -372,7 +353,7 @@ final class ProposalBuilderBloc
           )
           .toList();
 
-      return ProposalBuilderSegment(
+      return DocumentSegment(
         id: segment.schema.nodeId,
         sections: sections,
         property: segment,

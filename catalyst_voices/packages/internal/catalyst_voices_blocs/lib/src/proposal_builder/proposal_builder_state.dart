@@ -52,7 +52,7 @@ final class ProposalBuilderState extends Equatable {
   final LocalizedException? error;
   final Document? document;
   final ProposalBuilderMetadata metadata;
-  final List<ProposalBuilderSegment> segments;
+  final List<DocumentSegment> segments;
   final ProposalGuidance guidance;
   final NodeId? activeNodeId;
   final bool showValidationErrors;
@@ -69,7 +69,7 @@ final class ProposalBuilderState extends Equatable {
   });
 
   String? get proposalTitle {
-    final property = document?.getProperty(Proposal.titleNodeId)
+    final property = document?.getProperty(ProposalDocument.titleNodeId)
         as DocumentValueProperty<String>?;
 
     return property?.value;
@@ -96,7 +96,7 @@ final class ProposalBuilderState extends Equatable {
     Optional<LocalizedException>? error,
     Optional<Document>? document,
     ProposalBuilderMetadata? metadata,
-    List<ProposalBuilderSegment>? segments,
+    List<DocumentSegment>? segments,
     ProposalGuidance? guidance,
     Optional<NodeId>? activeNodeId,
     bool? showValidationErrors,

@@ -3,6 +3,7 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/src/campaign/campaign_stage.dart';
 import 'package:equatable/equatable.dart';
+import 'package:uuid/uuid.dart';
 
 /// Defines the already funded proposal.
 final class FundedProposal extends ProposalViewModel {
@@ -30,7 +31,7 @@ final class FundedProposal extends ProposalViewModel {
     Proposal proposal, {
     required String campaignName,
   }) : this(
-          id: proposal.id,
+          id: proposal.selfRef.id,
           campaignName: campaignName,
           category: proposal.category,
           title: proposal.title,
@@ -43,6 +44,9 @@ final class FundedProposal extends ProposalViewModel {
   String get fundsRequested {
     return CryptocurrencyFormatter.formatAmount(_fundsRequested);
   }
+
+  @override
+  bool get isLocal => false;
 
   @override
   List<Object?> get props => [
@@ -87,7 +91,7 @@ final class PendingProposal extends ProposalViewModel {
   final String campaignName;
   final String category;
   final String title;
-  final DateTime lastUpdateDate;
+  final DateTime? lastUpdateDate;
   final Coin _fundsRequested;
   final int commentsCount;
   final String description;
@@ -114,7 +118,7 @@ final class PendingProposal extends ProposalViewModel {
 
   factory PendingProposal.dummy() {
     return PendingProposal(
-      id: 'f14/2',
+      id: const Uuid().v7(),
       campaignName: 'F14',
       category: 'Cardano Use Cases: Concept',
       title: 'Proposal Title that rocks the world',
@@ -139,7 +143,7 @@ and PRISM, but its potential is only barely exploited.
     Proposal proposal, {
     required String campaignName,
   }) : this(
-          id: proposal.id,
+          id: proposal.selfRef.id,
           campaignName: campaignName,
           category: proposal.category,
           title: proposal.title,
@@ -148,7 +152,7 @@ and PRISM, but its potential is only barely exploited.
           commentsCount: proposal.commentsCount,
           description: proposal.description,
           publishStage: proposal.publish,
-          version: proposal.version,
+          version: proposal.versionCount,
           duration: proposal.duration,
           author: proposal.author,
         );
@@ -156,6 +160,9 @@ and PRISM, but its potential is only barely exploited.
   String get fundsRequested {
     return CryptocurrencyFormatter.decimalFormat(_fundsRequested);
   }
+
+  @override
+  bool get isLocal => publishStage == ProposalPublish.localDraft;
 
   @override
   List<Object?> get props => [
@@ -240,6 +247,8 @@ sealed class ProposalViewModel extends Equatable {
         );
     }
   }
+
+  bool get isLocal;
 
   @override
   List<Object?> get props => [id, isFavorite];

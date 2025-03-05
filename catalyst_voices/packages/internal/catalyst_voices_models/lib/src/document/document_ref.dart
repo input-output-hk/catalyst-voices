@@ -11,6 +11,16 @@ sealed class DocumentRef extends Equatable {
     this.version,
   });
 
+  factory DocumentRef.build({
+    required String id,
+    String? version,
+    required bool isDraft,
+  }) {
+    return isDraft
+        ? DraftRef(id: id, version: version)
+        : SignedDocumentRef(id: id, version: version);
+  }
+
   bool get isExact => version != null;
 
   @override
@@ -79,6 +89,14 @@ final class SignedDocumentRef extends DocumentRef {
     required super.id,
     super.version,
   });
+
+  factory SignedDocumentRef.generateFirstRef() {
+    final id = const Uuid().v7();
+    return SignedDocumentRef(
+      id: id,
+      version: id,
+    );
+  }
 
   @override
   SignedDocumentRef copyWith({
