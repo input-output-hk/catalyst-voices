@@ -16,14 +16,6 @@ final class SessionAccount extends Equatable {
     this.isDrep = false,
   });
 
-  const SessionAccount.mocked()
-      : this(
-          catalystId: 'cardano/uuid',
-          displayName: 'Account Mocked',
-          isAdmin: true,
-          isProposer: true,
-        );
-
   factory SessionAccount.fromAccount(Account account) {
     return SessionAccount(
       catalystId: account.catalystId,
@@ -33,6 +25,14 @@ final class SessionAccount extends Equatable {
       isDrep: account.roles.contains(AccountRole.drep),
     );
   }
+
+  const SessionAccount.mocked()
+      : this(
+          catalystId: 'cardano/uuid',
+          displayName: 'Account Mocked',
+          isAdmin: true,
+          isProposer: true,
+        );
 
   @override
   List<Object?> get props => [

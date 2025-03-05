@@ -3,6 +3,20 @@ import 'package:catalyst_voices_models/src/document/document_metadata.dart';
 import 'package:equatable/equatable.dart';
 
 final class ProposalDocument extends Equatable {
+  /// A hardcoded [NodeId] of the title property.
+  ///
+  /// Since properties are dynamic the application cannot determine
+  /// which property is the title in any other way than
+  /// by hardcoding it's node ID.
+  static final titleNodeId = DocumentNodeId.fromString('setup.title.title');
+  static final descriptionNodeId =
+      DocumentNodeId.fromString('summary.solution.summary');
+  static final requestedFundsNodeId =
+      DocumentNodeId.fromString('summary.budget.requestedFunds');
+  static final durationNodeId =
+      DocumentNodeId.fromString('summary.time.duration');
+  static final authorNameNodeId =
+      DocumentNodeId.fromString('summary.proposer.applicant');
   static const String exportFileExt = 'json';
 
   final ProposalMetadata metadata;
