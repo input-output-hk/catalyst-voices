@@ -196,7 +196,10 @@ final class DocumentRepositoryImpl implements DocumentRepository {
       // Note. categories are mocked on backend so we can't not fetch them.
       ...categoriesTemplatesRefs.expand((e) => [e.proposal, e.comment]),
       ...remoteRefs,
-    }.toList();
+    }
+        .toList()
+        // TODO(damian-molinski): delete it after parsing it ready.
+        .sublist(0, 1);
   }
 
   @override
