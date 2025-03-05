@@ -98,9 +98,13 @@ check-license:
     RUN melos run license-check
 
 # Run unit tests
-test-unit:
+test-unit-native:
     FROM +code-generator
-    DO flutter-ci+UNIT_TESTS
+    DO flutter-ci+UNIT_TESTS --PLATFORM=native --REPORT=true
+
+test-unit-web:
+    FROM +code-generator
+    DO flutter-ci+UNIT_TESTS --PLATFORM=web --REPORT=false
 
 # Runs static analysis on the code.
 build-static-analysis:
