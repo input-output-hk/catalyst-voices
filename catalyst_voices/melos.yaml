@@ -220,12 +220,21 @@ scripts:
       melos exec -c 1 --dir-exists="test" -- flutter test
     description: Run `flutter test` for selected packages.
 
-  test:
+  test-native:
     run: |
       melos run test:select --no-select
     description: Run `flutter test` for all packages.
 
-  test-report:
+  # TODO(kukkok3):
+  # catalyst_voices: enable when ISSUE# is fixed
+  # catalyst_voices_repositories: enable when ISSUE# is fixed
+  # catalyst_voices_assets: enable when ISSUE# is fixed
+  test-web:
+    run: |
+      melos exec -c 1 --dir-exists="test" --ignore="catalyst_voices,catalyst_voices_repositories,catalyst_voices_assets" -- flutter test --platform chrome
+    description: Run `flutter test --platform chrome` for all packages.
+
+  test-report-web:
     run: |
       # cleanup from previous build and create empty folder where test reports will be stored
       rm -fR $MELOS_ROOT_PATH/test_reports
@@ -238,7 +247,54 @@ scripts:
       melos exec -c 1 --dir-exists="test" -- \
       ' TESTS_OUTPUT_FILE="$MELOS_ROOT_PATH/test_reports/$MELOS_PACKAGE_NAME.tests-output.json"
         JUNIT_REPORT_FILE="$MELOS_ROOT_PATH/test_reports/$MELOS_PACKAGE_NAME.junit-report.xml"
-        flutter test --platform=chrome --reporter github --file-reporter=json:$TESTS_OUTPUT_FILE --coverage ; \
+        flutter test --platform chrome --reporter github --file-reporter=json:$TESTS_OUTPUT_FILE --coverage ; \
+        EXIT_CODE=$? ; \
+        cat $TESTS_OUTPUT_FILE | tojunit --output $JUNIT_REPORT_FILE ; \
+        exit $EXIT_CODE'
+
+      # store the exit code after running the tests,
+      # this is the exit code for the whole script
+      EXIT_CODE=$?
+
+      # removes code coverage for generated code
+      find . -name "*.lcov.info" -exec \
+        lcov --remove {} -o {} --ignore-errors unused,unused \
+        '*.g.dart' \
+        '*.freezed.dart' \
+        '*.chopper.dart' \
+        '*.swagger.dart' \
+        '*.openapi.dart' \
+        '*.gen.dart' \
+        '*.swagger.*.dart' \
+        '*.drift.dart' \
+        'lib/generated/**' \;
+
+      # merges all coverage reports into a single one and puts it in /coverage/lcov.info
+      dart pub global run combine_coverage --repo-path=.
+      mv ./coverage/lcov.info ./coverage/lcov.coverage.info
+
+      exit $EXIT_CODE
+
+    description: |
+      Run `flutter test --platform chrome` for all packages and generate junit and coverage reports.
+      The test reports are saved in /test_reports folder.
+      The coverages are saved in coverage/lcov.info file for each tested package.
+      The combined coverage is saved in the /coverage/lcov.coverage.info file.
+
+  test-report-native:
+    run: |
+      # cleanup from previous build and create empty folder where test reports will be stored
+      rm -fR $MELOS_ROOT_PATH/test_reports
+      mkdir $MELOS_ROOT_PATH/test_reports
+
+      # cleanup old coverage files and create empty folder where coverage files will be stored
+      find . -type d -name coverage -prune -exec rm -rf {} \;
+      mkdir $MELOS_ROOT_PATH/coverage
+      # run tests, generate junit reports in /test_reports/ & code coverage report
+      melos exec -c 1 --dir-exists="test" -- \
+      ' TESTS_OUTPUT_FILE="$MELOS_ROOT_PATH/test_reports/$MELOS_PACKAGE_NAME.tests-output.json"
+        JUNIT_REPORT_FILE="$MELOS_ROOT_PATH/test_reports/$MELOS_PACKAGE_NAME.junit-report.xml"
+        flutter test --reporter github --file-reporter=json:$TESTS_OUTPUT_FILE --coverage ; \
         EXIT_CODE=$? ; \
         cat $TESTS_OUTPUT_FILE | tojunit --output $JUNIT_REPORT_FILE ; \
         exit $EXIT_CODE'
