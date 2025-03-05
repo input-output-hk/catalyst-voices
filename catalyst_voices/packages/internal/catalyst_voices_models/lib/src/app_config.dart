@@ -1,5 +1,24 @@
 import 'package:equatable/equatable.dart';
 
+final class ApiConfig extends Equatable {
+  final String gatewayUrl;
+  final String vitUrl;
+  final String reviewsUrl;
+
+  const ApiConfig({
+    this.gatewayUrl = 'https://gateway.dev.projectcatalyst.io/',
+    this.vitUrl = 'https://core.dev.projectcatalyst.io/',
+    this.reviewsUrl = 'https://api.reviews.dev.projectcatalyst.io/',
+  });
+
+  @override
+  List<Object?> get props => [
+        gatewayUrl,
+        vitUrl,
+        reviewsUrl,
+      ];
+}
+
 final class AppConfig extends Equatable {
   final ApiConfig api;
   final CacheConfig cache;
@@ -19,27 +38,6 @@ final class AppConfig extends Equatable {
         cache,
         database,
         sentry,
-      ];
-}
-
-final class ApiConfig extends Equatable {
-  final String catGatewayUrl;
-  final String vitUrl;
-  final String reviewModuleUrl;
-
-  // TODO(damian-molinski): review module url have to be updated
-  // TODO(damian-molinski): vit url is invalid
-  const ApiConfig({
-    this.catGatewayUrl = 'https://gateway.dev.projectcatalyst.io/',
-    this.vitUrl = 'https://core.dev.projectcatalyst.io/',
-    this.reviewModuleUrl = 'https://',
-  });
-
-  @override
-  List<Object?> get props => [
-        catGatewayUrl,
-        vitUrl,
-        reviewModuleUrl,
       ];
 }
 

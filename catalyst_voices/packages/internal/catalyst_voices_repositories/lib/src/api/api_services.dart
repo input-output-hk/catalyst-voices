@@ -1,18 +1,16 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart'
     show ApiConfig;
-import 'package:catalyst_voices_repositories/generated/api/cat_gateway.swagger.dart';
-import 'package:catalyst_voices_repositories/generated/api/vit.swagger.dart';
+import 'package:catalyst_voices_repositories/generated/api/client_index.dart';
 import 'package:catalyst_voices_repositories/src/api/interceptors/rbac_auth_interceptor.dart';
-import 'package:catalyst_voices_repositories/src/api/review_module.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart'
     show UserObserver;
 import 'package:chopper/chopper.dart';
 import 'package:flutter/foundation.dart';
 
 final class ApiServices {
-  final CatGateway cat;
+  final CatGateway gateway;
   final Vit vit;
-  final ReviewModule review;
+  final CatReviews reviews;
 
   factory ApiServices({
     required ApiConfig config,
@@ -20,7 +18,7 @@ final class ApiServices {
   }) {
     final cat = CatGateway.create(
       authenticator: null,
-      baseUrl: Uri.parse(config.catGatewayUrl),
+      baseUrl: Uri.parse(config.gatewayUrl),
       interceptors: [
         RbacAuthInterceptor(userObserver),
         if (kDebugMode) HttpLoggingInterceptor(onlyErrors: true),
@@ -32,9 +30,9 @@ final class ApiServices {
         if (kDebugMode) HttpLoggingInterceptor(onlyErrors: true),
       ],
     );
-    final review = ReviewModule.create(
+    final review = CatReviews.create(
       authenticator: null,
-      baseUrl: Uri.parse(config.reviewModuleUrl),
+      baseUrl: Uri.parse(config.reviewsUrl),
       interceptors: [
         RbacAuthInterceptor(userObserver),
         if (kDebugMode) HttpLoggingInterceptor(onlyErrors: true),
@@ -42,15 +40,15 @@ final class ApiServices {
     );
 
     return ApiServices._(
-      cat: cat,
+      gateway: cat,
       vit: vit,
-      review: review,
+      reviews: review,
     );
   }
 
   const ApiServices._({
-    required this.cat,
+    required this.gateway,
     required this.vit,
-    required this.review,
+    required this.reviews,
   });
 }

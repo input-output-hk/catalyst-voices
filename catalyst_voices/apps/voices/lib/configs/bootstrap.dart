@@ -17,89 +17,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_strategy/url_strategy.dart';
 
-final _loggingService = LoggingService();
-
 final _bootstrapLogger = Logger('Bootstrap');
+
 final _flutterLogger = Logger('Flutter');
+final _loggingService = LoggingService();
 final _platformDispatcherLogger = Logger('PlatformDispatcher');
 final _uncaughtZoneLogger = Logger('UncaughtZone');
-
-typedef BootstrapWidgetBuilder = FutureOr<Widget> Function(BootstrapArgs args);
-
-final class BootstrapArgs {
-  final RouterConfig<Object> routerConfig;
-
-  BootstrapArgs({
-    required this.routerConfig,
-  });
-}
-
-// TODO(damian-molinski): Add Isolate.current.addErrorListener
-//
-/// The entry point for Catalyst Voices,
-/// initializes and runs the application.
-///
-/// Should configure dependency injection, setup logger and do
-/// all the things which are necessary before the actual app is run.
-///
-/// You can customize the default app by providing
-/// your own instance via [builder].
-Future<void> bootstrapAndRun([
-  BootstrapWidgetBuilder builder = _defaultBuilder,
-]) async {
-  await runZonedGuarded(
-    () => _safeBootstrapAndRun(builder),
-    _reportUncaughtZoneError,
-  );
-}
-
-Future<void> _safeBootstrapAndRun(BootstrapWidgetBuilder builder) async {
-  try {
-    await _doBootstrapAndRun(builder);
-  } catch (error, stack) {
-    await _reportBootstrapError(error, stack);
-  }
-}
-
-Future<void> _doBootstrapAndRun(BootstrapWidgetBuilder builder) async {
-  // There's no need to call WidgetsFlutterBinding.ensureInitialized()
-  // since this is already done internally by SentryFlutter.init()
-  // More info here: https://github.com/getsentry/sentry-dart/issues/2063
-  if (!kReleaseMode) {
-    WidgetsFlutterBinding.ensureInitialized();
-  }
-
-  FlutterError.onError = _reportFlutterError;
-  PlatformDispatcher.instance.onError = _reportPlatformDispatcherError;
-
-  final args = await bootstrap();
-  final app = await builder(args);
-  await _runApp(app);
-}
-
-@visibleForTesting
-GoRouter buildAppRouter({
-  String? initialLocation,
-}) {
-  return AppRouter.init(
-    initialLocation: initialLocation,
-    guards: const [
-      MilestoneGuard(),
-    ],
-  );
-}
-
-@visibleForTesting
-Future<void> registerDependencies({required AppConfig config}) async {
-  if (!Dependencies.instance.isInitialized) {
-    await Dependencies.instance.init(config: config);
-  }
-}
-
-@visibleForTesting
-Future<void> restartDependencies() async {
-  await Dependencies.instance.reset;
-}
 
 /// Initializes the application before it can be run. Should setup all
 /// the things which are necessary before the actual app is run,
@@ -139,12 +62,47 @@ Future<BootstrapArgs> bootstrap({
   return BootstrapArgs(routerConfig: router);
 }
 
-Future<void> _runApp(Widget app) async {
-  if (kReleaseMode) {
-    await SentryService.init(app);
-  } else {
-    runApp(app);
+/// The entry point for Catalyst Voices,
+/// initializes and runs the application.
+///
+/// Should configure dependency injection, setup logger and do
+/// all the things which are necessary before the actual app is run.
+///
+/// You can customize the default app by providing
+/// your own instance via [builder].
+Future<void> bootstrapAndRun([
+  BootstrapWidgetBuilder builder = _defaultBuilder,
+]) async {
+  await runZonedGuarded(
+    () => _safeBootstrapAndRun(builder),
+    _reportUncaughtZoneError,
+  );
+}
+
+// TODO(damian-molinski): Add Isolate.current.addErrorListener
+//
+@visibleForTesting
+GoRouter buildAppRouter({
+  String? initialLocation,
+}) {
+  return AppRouter.init(
+    initialLocation: initialLocation,
+    guards: const [
+      MilestoneGuard(),
+    ],
+  );
+}
+
+@visibleForTesting
+Future<void> registerDependencies({required AppConfig config}) async {
+  if (!Dependencies.instance.isInitialized) {
+    await Dependencies.instance.init(config: config);
   }
+}
+
+@visibleForTesting
+Future<void> restartDependencies() async {
+  await Dependencies.instance.reset;
 }
 
 Future<void> _cleanupOldStorages() async {
@@ -155,6 +113,22 @@ Widget _defaultBuilder(BootstrapArgs args) {
   return App(
     routerConfig: args.routerConfig,
   );
+}
+
+Future<void> _doBootstrapAndRun(BootstrapWidgetBuilder builder) async {
+  // There's no need to call WidgetsFlutterBinding.ensureInitialized()
+  // since this is already done internally by SentryFlutter.init()
+  // More info here: https://github.com/getsentry/sentry-dart/issues/2063
+  if (!kReleaseMode) {
+    WidgetsFlutterBinding.ensureInitialized();
+  }
+
+  FlutterError.onError = _reportFlutterError;
+  PlatformDispatcher.instance.onError = _reportPlatformDispatcherError;
+
+  final args = await bootstrap();
+  final app = await builder(args);
+  await _runApp(app);
 }
 
 Future<void> _reportBootstrapError(Object error, StackTrace stack) async {
@@ -181,4 +155,30 @@ bool _reportPlatformDispatcherError(Object error, StackTrace stack) {
 /// Uncaught Errors reporting
 void _reportUncaughtZoneError(Object error, StackTrace stack) {
   _uncaughtZoneLogger.severe('Uncaught Error', error, stack);
+}
+
+Future<void> _runApp(Widget app) async {
+  if (kReleaseMode) {
+    await SentryService.init(app);
+  } else {
+    runApp(app);
+  }
+}
+
+Future<void> _safeBootstrapAndRun(BootstrapWidgetBuilder builder) async {
+  try {
+    await _doBootstrapAndRun(builder);
+  } catch (error, stack) {
+    await _reportBootstrapError(error, stack);
+  }
+}
+
+typedef BootstrapWidgetBuilder = FutureOr<Widget> Function(BootstrapArgs args);
+
+final class BootstrapArgs {
+  final RouterConfig<Object> routerConfig;
+
+  BootstrapArgs({
+    required this.routerConfig,
+  });
 }
