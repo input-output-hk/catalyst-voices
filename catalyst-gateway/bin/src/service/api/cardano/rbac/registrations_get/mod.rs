@@ -64,8 +64,15 @@ pub(crate) async fn endpoint(
 /// Build a response `RbacRegistration` from the provided CIP 509 registrations lists
 #[allow(dead_code)]
 pub(crate) fn build_rbac_reg(
-    regs: Vec<rbac_registration::cardano::cip509::Cip509>, detailed: bool,
+    mut regs: Vec<rbac_registration::cardano::cip509::Cip509>, detailed: bool,
 ) -> anyhow::Result<Option<RbacRegistration>> {
+    // sort registrations in the ascending order from the oldest to the latest
+    regs.sort_by(|a, b| {
+        let a = a.origin().point();
+        let b = b.origin().point();
+        a.cmp(b)
+    });
+
     let details: Cip509List = if detailed {
         regs.iter()
             .map(TryInto::try_into)
