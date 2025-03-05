@@ -156,6 +156,7 @@ final class Dependencies extends DependencyProvider {
       })
       ..registerLazySingleton<CatGatewayDocumentDataSource>(() {
         return CatGatewayDocumentDataSource(
+          get<ApiServices>(),
           get<SignedDocumentManager>(),
         );
       })
@@ -225,6 +226,11 @@ final class Dependencies extends DependencyProvider {
         get<ConfigRepository>(),
       );
     });
+    registerLazySingleton<DocumentsService>(() {
+      return DocumentsService(
+        get<DocumentRepository>(),
+      );
+    });
   }
 
   void _registerStorages() {
@@ -248,6 +254,14 @@ final class Dependencies extends DependencyProvider {
 
   void _registerUtils() {
     registerLazySingleton<SignedDocumentManager>(SignedDocumentManager.new);
+    registerLazySingleton<SyncManager>(
+      () {
+        return SyncManager(
+          get<DocumentsService>(),
+        );
+      },
+      dispose: (manager) async => manager.dispose(),
+    );
     registerLazySingleton<UserObserver>(
       StreamUserObserver.new,
       dispose: (observer) async => observer.dispose(),
