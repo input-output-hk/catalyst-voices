@@ -11,7 +11,10 @@ pub(crate) struct RegistrationChain {
     /// The current transaction ID
     current_tx_id_hash: TxnId,
     /// List of purpose for this registration chain
-    #[oai(skip_serializing_if_is_empty)]
+    #[oai(
+        skip_serializing_if_is_empty,
+        validator(max_items = "1000", min_items = "1")
+    )]
     purpose: Vec<UUIDv4>,
 }
 
