@@ -41,7 +41,7 @@ class _ProposalControls extends StatelessWidget {
     return const Row(
       mainAxisSize: MainAxisSize.min,
       spacing: 8,
-      children: <Widget>[
+      children: [
         ProposalVersion(),
         ProposalShareButton(),
         ProposalFavoriteButton(),
