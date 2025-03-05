@@ -1,6 +1,7 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/database/catalyst_database.dart';
 import 'package:catalyst_voices_repositories/src/database/database.dart';
+import 'package:collection/collection.dart';
 import 'package:drift/drift.dart' show DatabaseConnection;
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -187,6 +188,232 @@ void main() {
 
         expect(entity, isNull);
       });
+
+      test('Return latest unique documents', () async {
+        final id = const Uuid().v7();
+        final version = const Uuid().v7();
+        await Future<void>.delayed(const Duration(milliseconds: 1));
+        final version2 = const Uuid().v7();
+        final document = DocumentWithMetadataFactory.build(
+          metadata: DocumentDataMetadata(
+            type: DocumentType.proposalDocument,
+            selfRef: SignedDocumentRef(id: id, version: version),
+          ),
+        );
+        final document2 = DocumentWithMetadataFactory.build(
+          metadata: DocumentDataMetadata(
+            type: DocumentType.proposalDocument,
+            selfRef: SignedDocumentRef(id: id, version: version2),
+          ),
+        );
+        final documentsStream =
+            database.documentsDao.watchAll(unique: true).asBroadcastStream();
+
+        await database.documentsDao.saveAll([document]);
+        final firstEmission = await documentsStream.first;
+        await database.documentsDao.saveAll([document2]);
+        final secondEmission = await documentsStream.first;
+
+        expect(firstEmission, equals([document.document]));
+        expect(secondEmission, equals([document2.document]));
+        expect(secondEmission.length, equals(1));
+        expect(secondEmission.first.metadata.selfRef.version, equals(version2));
+      });
+
+      test('Returns latest document limited by quantity if provided', () async {
+        // Given
+        final documentsWithMetadata = List<DocumentEntityWithMetadata>.generate(
+          20,
+          (index) => DocumentWithMetadataFactory.build(),
+        );
+
+        final expectedDocuments = documentsWithMetadata
+            .map((e) => e.document)
+            .groupListsBy((doc) => '${doc.idHi}-${doc.idLo}')
+            .values
+            .map(
+              (versions) => versions.reduce((a, b) {
+                // Compare versions (higher version wins)
+                final compareHi = b.verHi.compareTo(a.verHi);
+                if (compareHi != 0) return compareHi > 0 ? b : a;
+                return b.verLo.compareTo(a.verLo) > 0 ? b : a;
+              }),
+            )
+            .toList()
+          ..sort((a, b) {
+            // Sort by version descending
+            final compareHi = b.verHi.compareTo(a.verHi);
+            if (compareHi != 0) return compareHi;
+            return b.verLo.compareTo(a.verLo);
+          });
+
+        final limitedExpectedDocuments = expectedDocuments.take(7).toList();
+
+        // When
+        final documentsStream =
+            database.documentsDao.watchAll(limit: 7, unique: true);
+
+        await database.documentsDao.saveAll(documentsWithMetadata);
+
+        // Then
+        expect(
+          documentsStream,
+          emitsInOrder([
+            equals(limitedExpectedDocuments),
+          ]),
+        );
+
+        expect(
+          limitedExpectedDocuments.length,
+          equals(7),
+          reason: 'should have 7 documents',
+        );
+
+        final uniqueIds =
+            limitedExpectedDocuments.map((d) => '${d.idHi}-${d.idLo}').toSet();
+        expect(
+          uniqueIds.length,
+          equals(limitedExpectedDocuments.length),
+          reason: 'should have unique document IDs',
+        );
+      });
+
+      test('returns latest version when document has more than 1 version',
+          () async {
+        final id = const Uuid().v7();
+        final v1 = const Uuid().v7();
+        await Future<void>.delayed(const Duration(milliseconds: 1));
+        final v2 = const Uuid().v7();
+
+        final documentsWithMetadata = [v1, v2].map((version) {
+          final metadata = DocumentDataMetadata(
+            type: DocumentType.proposalDocument,
+            selfRef: DocumentRefFactory.buildSigned(
+              id: id,
+              version: version,
+            ),
+          );
+          return DocumentWithMetadataFactory.build(metadata: metadata);
+        }).toList();
+
+        // When
+        final documentsStream =
+            database.documentsDao.watchAll(limit: 7, unique: true);
+
+        await database.documentsDao.saveAll(documentsWithMetadata);
+        // Then
+        expect(
+          documentsStream,
+          emitsInOrder([
+            predicate<List<DocumentEntity>>(
+              (documents) {
+                if (documents.length != 1) return false;
+                final doc = documents.first;
+                return doc.metadata.version == v2;
+              },
+              'should return document with version $v2',
+            ),
+          ]),
+        );
+      });
+
+      test('emits new version of recent document', () async {
+        // Generate base ID
+        final id = const Uuid().v7();
+
+        // Create versions with enforced order (v2 is newer than v1)
+        final v1 = const Uuid().v7();
+        // Wait a moment to ensure second UUID is newer
+        await Future<void>.delayed(const Duration(milliseconds: 1));
+        final v2 = const Uuid().v7();
+
+        final documentsWithMetadata = DocumentWithMetadataFactory.build(
+          metadata: DocumentDataMetadata(
+            type: DocumentType.proposalDocument,
+            selfRef: DocumentRefFactory.buildSigned(
+              id: id,
+              version: v1,
+            ),
+          ),
+        );
+
+        final newVersion = DocumentWithMetadataFactory.build(
+          metadata: DocumentDataMetadata(
+            type: DocumentType.proposalDocument,
+            selfRef: DocumentRefFactory.buildSigned(
+              id: id,
+              version: v2,
+            ),
+          ),
+        );
+
+        // When
+        final documentsStream = database.documentsDao
+            .watchAll(limit: 7, unique: true)
+            .asBroadcastStream();
+
+        // Save first version and wait for emission
+        await database.documentsDao.saveAll([documentsWithMetadata]);
+        final firstEmission = await documentsStream.first;
+
+        // Save second version and wait for emission
+        await database.documentsDao.saveAll([newVersion]);
+        final secondEmission = await documentsStream.first;
+
+        // Then verify both emissions
+        expect(firstEmission, equals([documentsWithMetadata.document]));
+        expect(secondEmission, equals([newVersion.document]));
+      });
+
+      test('emits new document when is inserted', () async {
+        // Generate base ID
+        final id1 = const Uuid().v7();
+
+        // Create versions with enforced order (v2 is newer than v1)
+        final v1 = const Uuid().v7();
+        // Wait a moment to ensure second UUID is newer
+        await Future<void>.delayed(const Duration(milliseconds: 1));
+        final id2 = const Uuid().v7();
+        final v2 = const Uuid().v7();
+
+        final document1 = DocumentWithMetadataFactory.build(
+          metadata: DocumentDataMetadata(
+            type: DocumentType.proposalDocument,
+            selfRef: DocumentRefFactory.buildSigned(
+              id: id1,
+              version: v1,
+            ),
+          ),
+        );
+
+        final document2 = DocumentWithMetadataFactory.build(
+          metadata: DocumentDataMetadata(
+            type: DocumentType.proposalDocument,
+            selfRef: DocumentRefFactory.buildSigned(
+              id: id2,
+              version: v2,
+            ),
+          ),
+        );
+
+        // When
+        final documentsStream = database.documentsDao
+            .watchAll(limit: 1, unique: true)
+            .asBroadcastStream();
+
+        await database.documentsDao.saveAll([document1]);
+        final firstEmission = await documentsStream.first;
+
+        await database.documentsDao.saveAll([document2]);
+        final secondEmission = await documentsStream.first;
+
+        // Then verify both emissions
+        expect(firstEmission, equals([document1.document]));
+        expect(
+          secondEmission,
+          equals([document2.document]),
+        );
+      });
     });
 
     group('count', () {
@@ -307,6 +534,154 @@ void main() {
 
         expect(count, 1);
       });
+
+      test('Counts comments for specific proposal document version', () async {
+        final proposalId = const Uuid().v7();
+        final versionId = const Uuid().v7();
+        final proposalRef = DocumentRefFactory.buildSigned(
+          id: proposalId,
+          version: versionId,
+        );
+        final proposal = DocumentWithMetadataFactory.build(
+          metadata: DocumentDataMetadata(
+            type: DocumentType.proposalDocument,
+            selfRef: proposalRef,
+          ),
+        );
+
+        await database.documentsDao.saveAll([proposal]);
+
+        final comments = List.generate(
+          10,
+          (index) => DocumentWithMetadataFactory.build(
+            metadata: DocumentDataMetadata(
+              type: DocumentType.commentTemplate,
+              selfRef: DocumentRefFactory.buildSigned(),
+              ref: proposalRef,
+            ),
+          ),
+        );
+        final otherComments = List.generate(
+          5,
+          (index) => DocumentWithMetadataFactory.build(
+            metadata: DocumentDataMetadata(
+              type: DocumentType.commentTemplate,
+              selfRef: DocumentRefFactory.buildSigned(),
+              ref: DocumentRefFactory.buildSigned(),
+            ),
+          ),
+        );
+        await database.documentsDao.saveAll([...comments, ...otherComments]);
+
+        final count = await database.documentsDao.countRefDocumentByType(
+          ref: proposalRef,
+          type: DocumentType.commentTemplate,
+        );
+
+        expect(count, equals(10));
+      });
+
+      test('Count versions of specific document', () async {
+        final proposalId = const Uuid().v7();
+        final versionId = const Uuid().v7();
+        final proposalRef = DocumentRefFactory.buildSigned(
+          id: proposalId,
+          version: versionId,
+        );
+        final proposal = DocumentWithMetadataFactory.build(
+          metadata: DocumentDataMetadata(
+            type: DocumentType.proposalDocument,
+            selfRef: proposalRef,
+          ),
+        );
+
+        await database.documentsDao.saveAll([proposal]);
+
+        final versions = List.generate(
+          10,
+          (index) {
+            return DocumentWithMetadataFactory.build(
+              metadata: DocumentDataMetadata(
+                type: DocumentType.proposalDocument,
+                selfRef: DocumentRefFactory.buildSigned(
+                  id: proposalId,
+                ),
+                ref: proposalRef,
+              ),
+            );
+          },
+        );
+
+        await database.documentsDao.saveAll(versions);
+
+        final ids = await database.documentsDao.queryVersionIds(
+          id: proposalId,
+        );
+
+        expect(ids.length, equals(11));
+      });
+
+      test(
+        'Watches comments count',
+        () async {
+          final proposalId = const Uuid().v7();
+          await Future<void>.delayed(const Duration(milliseconds: 1));
+          final versionId = const Uuid().v7();
+          final proposalId2 = const Uuid().v7();
+          final proposalRef = DocumentRefFactory.buildSigned(
+            id: proposalId,
+            version: versionId,
+          );
+          final proposal = DocumentWithMetadataFactory.build(
+            metadata: DocumentDataMetadata(
+              type: DocumentType.proposalDocument,
+              selfRef: proposalRef,
+            ),
+          );
+
+          final proposalRef2 = DocumentRefFactory.buildSigned(
+            id: proposalId2,
+            version: versionId,
+          );
+
+          await database.documentsDao.saveAll([proposal]);
+
+          final comments = List.generate(2, (index) {
+            return DocumentWithMetadataFactory.build(
+              metadata: DocumentDataMetadata(
+                type: DocumentType.commentTemplate,
+                selfRef: DocumentRefFactory.buildSigned(),
+                ref: proposalRef,
+              ),
+            );
+          });
+
+          final otherComment = DocumentWithMetadataFactory.build(
+            metadata: DocumentDataMetadata(
+              type: DocumentType.commentTemplate,
+              selfRef: DocumentRefFactory.buildSigned(),
+              ref: proposalRef2,
+            ),
+          );
+
+          await database.documentsDao.saveAll([comments.first, otherComment]);
+
+          final documentCount = database.documentsDao
+              .watchCount(ref: proposalRef, type: DocumentType.commentTemplate)
+              .asBroadcastStream();
+
+          final firstEmission = await documentCount.first;
+          // TODO(damian-molinski): JSONB filtering
+          // After proper filtering this test should pass
+          expect(firstEmission, equals(1));
+
+          // Save second comment and wait for update
+          await database.documentsDao.saveAll([comments.last]);
+          final secondEmission = await documentCount.first;
+          expect(secondEmission, equals(2));
+        },
+        skip: true,
+      );
     });
 
     group('delete all', () {

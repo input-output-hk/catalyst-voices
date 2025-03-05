@@ -6,6 +6,7 @@ import 'suites/account_test.dart' as account_test;
 import 'suites/app_test.dart' as app_test;
 import 'suites/discovery_test.dart' as discovery_test;
 import 'suites/onboarding_test.dart' as onboarding_test;
+import 'suites/proposals_test.dart' as proposals_test;
 
 void main() async {
   final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
@@ -19,4 +20,5 @@ void main() async {
   onboarding_test.main();
   account_test.main();
   discovery_test.main();
+  proposals_test.main();
 }

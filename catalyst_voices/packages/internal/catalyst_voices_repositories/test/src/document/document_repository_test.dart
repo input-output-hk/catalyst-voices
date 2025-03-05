@@ -20,7 +20,7 @@ void main() {
   late DriftCatalystDatabase database;
 
   late DraftDataSource draftsSource;
-  late DocumentDataLocalSource localDocuments;
+  late SignedDocumentDataSource localDocuments;
   late DocumentDataRemoteSource remoteDocuments;
 
   setUp(() {
@@ -72,8 +72,7 @@ void main() {
       );
 
       // Then
-      expect(proposalDocument.metadata.id, proposal.metadata.id);
-      expect(proposalDocument.metadata.version, proposal.metadata.version);
+      expect(proposalDocument.metadata.selfRef, proposal.metadata.selfRef);
     });
 
     test('getProposalDocument correctly propagates errors', () async {
@@ -303,7 +302,7 @@ void main() {
         template: templateRef,
       );
 
-      await repository.updateProposalDraftContent(
+      await repository.updateDocumentDraft(
         ref: draftRef,
         content: updatedContent,
       );
@@ -341,7 +340,7 @@ void main() {
       await draftsSource.save(data: draftData);
 
       // Then
-      await repository.updateProposalDraftContent(
+      await repository.updateDocumentDraft(
         ref: draftRef,
         content: updatedContent,
       );
@@ -362,6 +361,44 @@ void main() {
         ]),
       );
     });
+
+    test(
+      'watchProposalsDocuments returns correct model',
+      () async {
+        final templateRef = DocumentRefFactory.buildSigned();
+        final templateData = DocumentDataFactory.build(
+          selfRef: templateRef,
+          type: DocumentType.proposalTemplate,
+        );
+        const publicDraftContent =
+            DocumentDataContent({'title': 'My proposal'});
+        final publicDraftRef = DocumentRefFactory.buildDraft();
+        final publicDraftData = DocumentDataFactory.build(
+          type: DocumentType.proposalDocument,
+          selfRef: publicDraftRef,
+          template: templateData.ref,
+          content: publicDraftContent,
+        );
+
+        await localDocuments.save(data: templateData);
+        await localDocuments.save(data: publicDraftData);
+
+        final latestProposals = repository.watchAllDocuments();
+
+        expect(
+          latestProposals,
+          emitsInOrder([
+            predicate<List<DocumentsDataWithRefData>>((dataList) {
+              if (dataList.isEmpty) return false;
+              final data = dataList.first;
+              final isRef = data.data.ref == publicDraftRef;
+              final isContent = data.data.content == publicDraftContent;
+              return isRef && isContent;
+            }),
+          ]),
+        );
+      },
+    );
   });
 }
 

@@ -13,10 +13,9 @@ project: {
 			//tag: {}
 			always: {}
 		}
-		environment: "dev"
 		modules: main: {
 			name:    "app"
-			version: "0.3.3"
+			version: "0.4.2"
 			values: {
 				deployment: {
 					containers: gateway: {

@@ -18,6 +18,15 @@ final class Dependencies extends DependencyProvider {
 
   Dependencies._();
 
+  bool get isInitialized => _isInitialized;
+
+  @override
+  Future<void> get reset {
+    return super.reset.whenComplete(() {
+      _isInitialized = false;
+    });
+  }
+
   Future<void> init({
     required AppConfig config,
   }) async {
@@ -33,15 +42,6 @@ final class Dependencies extends DependencyProvider {
     _registerBlocsWithDependencies();
 
     _isInitialized = true;
-  }
-
-  bool get isInitialized => _isInitialized;
-
-  @override
-  Future<void> get reset {
-    return super.reset.whenComplete(() {
-      _isInitialized = false;
-    });
   }
 
   void _registerBlocsWithDependencies() {
@@ -67,7 +67,7 @@ final class Dependencies extends DependencyProvider {
       // Factory will rebuild it each time needed
       ..registerFactory<RegistrationCubit>(() {
         return RegistrationCubit(
-          downloader: get<Downloader>(),
+          downloaderService: get<DownloaderService>(),
           userService: get<UserService>(),
           registrationService: get<RegistrationService>(),
           progressNotifier: get<RegistrationProgressNotifier>(),
@@ -97,17 +97,21 @@ final class Dependencies extends DependencyProvider {
       ..registerFactory<WorkspaceBloc>(() {
         return WorkspaceBloc(
           get<CampaignService>(),
+          get<ProposalService>(),
         );
       })
       ..registerFactory<ProposalBuilderBloc>(() {
         return ProposalBuilderBloc(
           get<CampaignService>(),
           get<ProposalService>(),
+          get<DownloaderService>(),
+          get<DocumentMapper>(),
         );
       })
       ..registerFactory<DiscoveryCubit>(() {
         return DiscoveryCubit(
           get<CampaignService>(),
+          get<ProposalService>(),
         );
       })
       ..registerFactory<CategoryDetailCubit>(() {
@@ -117,6 +121,9 @@ final class Dependencies extends DependencyProvider {
       })
       ..registerFactory<AccountCubit>(() {
         return AccountCubit(get<UserService>());
+      })
+      ..registerFactory<ProposalBloc>(() {
+        return ProposalBloc(get<ProposalService>());
       });
   }
 
@@ -142,7 +149,7 @@ final class Dependencies extends DependencyProvider {
           get<CatalystDatabase>(),
         );
       })
-      ..registerLazySingleton<DocumentDataLocalSource>(() {
+      ..registerLazySingleton<SignedDocumentDataSource>(() {
         return DatabaseDocumentsDataSource(
           get<CatalystDatabase>(),
         );
@@ -161,10 +168,11 @@ final class Dependencies extends DependencyProvider {
       ..registerLazySingleton<DocumentRepository>(() {
         return DocumentRepository(
           get<DatabaseDraftsDataSource>(),
-          get<DocumentDataLocalSource>(),
+          get<SignedDocumentDataSource>(),
           get<CatGatewayDocumentDataSource>(),
         );
-      });
+      })
+      ..registerLazySingleton<DocumentMapper>(() => const DocumentMapperImpl());
   }
 
   void _registerServices() {
@@ -177,7 +185,7 @@ final class Dependencies extends DependencyProvider {
         cacheConfig: get<AppConfig>().cache,
       );
     });
-    registerLazySingleton<Downloader>(Downloader.new);
+    registerLazySingleton<DownloaderService>(DownloaderService.new);
     registerLazySingleton<CatalystCardano>(() => CatalystCardano.instance);
     registerLazySingleton<RegistrationProgressNotifier>(
       RegistrationProgressNotifier.new,

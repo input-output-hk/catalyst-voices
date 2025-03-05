@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:uuid/uuid.dart';
 
 final _proposalDescription = """
 Zanzibar is becoming one of the hotspots for DID's through
@@ -23,7 +24,6 @@ int _maxResults(ProposalPublish? stage) {
   return 32;
 }
 
-// ignore: one_member_abstracts
 abstract interface class ProposalRepository {
   const factory ProposalRepository() = ProposalRepositoryImpl;
 
@@ -31,8 +31,8 @@ abstract interface class ProposalRepository {
 
   Future<List<String>> getFavoritesProposalsIds();
 
-  Future<ProposalBase> getProposal({
-    required String id,
+  Future<ProposalData> getProposal({
+    required DocumentRef ref,
   });
 
   /// Fetches all proposals.
@@ -61,22 +61,19 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   }
 
   @override
-  Future<ProposalBase> getProposal({
-    required String id,
+  Future<ProposalData> getProposal({
+    required DocumentRef ref,
   }) async {
-    return ProposalBase(
-      id: id,
-      category: 'Cardano Use Cases / MVP',
-      title: 'Proposal Title that rocks the world',
-      updateDate: DateTime.now().minusDays(2),
-      fundsRequested: Coin.fromAda(100000),
-      status: ProposalStatus.draft,
-      publish: ProposalPublish.localDraft,
-      commentsCount: 0,
-      description: _proposalDescription,
-      duration: 6,
-      author: 'Alex Wells',
-      version: 1,
+    return ProposalData(
+      categoryId: const Uuid().v7(),
+      document: ProposalDocument(
+        metadata: ProposalMetadata(selfRef: ref),
+        document: const Document(
+          properties: [],
+          schema: DocumentSchema.optional(),
+        ),
+      ),
+      ref: ref,
     );
   }
 
@@ -85,7 +82,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     required ProposalPaginationRequest request,
   }) async {
     // optionally filter by status.
-    final proposals = <ProposalBase>[];
+    final proposals = <Proposal>[];
 
     // Return users proposals match his account id with proposals metadata from
     // author field.
@@ -101,8 +98,8 @@ final class ProposalRepositoryImpl implements ProposalRepository {
           ? ProposalPublish.submittedProposal
           : ProposalPublish.publishedDraft;
       proposals.add(
-        ProposalBase(
-          id: '${Random().nextInt(1000)}/${Random().nextInt(1000)}',
+        Proposal(
+          selfRef: SignedDocumentRef.generateFirstRef(),
           category: 'Cardano Use Cases / MVP',
           title: 'Proposal Title that rocks the world',
           updateDate: DateTime.now().minusDays(2),
@@ -113,7 +110,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
           description: _proposalDescription,
           duration: 6,
           author: 'Alex Wells',
-          version: 1,
+          versionCount: 1,
         ),
       );
     }
@@ -140,7 +137,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     ProposalPaginationRequest request,
   ) async {
     final favoritesIds = await getFavoritesProposalsIds();
-    final proposals = <ProposalBase>[];
+    final proposals = <Proposal>[];
     final range = PagingRange.calculateRange(
       pageKey: request.pageKey,
       itemsPerPage: request.pageSize,
@@ -153,7 +150,9 @@ final class ProposalRepositoryImpl implements ProposalRepository {
       );
     }
     for (var i = range.from; i <= range.to; i++) {
-      final proposal = await getProposal(id: favoritesIds[i]);
+      final ref = SignedDocumentRef(id: favoritesIds[i]);
+      final proposalData = await getProposal(ref: ref);
+      final proposal = Proposal.fromData(proposalData);
       proposals.add(proposal);
     }
 
@@ -167,7 +166,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     ProposalPaginationRequest request,
   ) async {
     final userProposalsIds = await getUserProposalsIds('');
-    final proposals = <ProposalBase>[];
+    final proposals = <Proposal>[];
     final range = PagingRange.calculateRange(
       pageKey: request.pageKey,
       itemsPerPage: request.pageSize,
@@ -180,7 +179,9 @@ final class ProposalRepositoryImpl implements ProposalRepository {
       );
     }
     for (var i = range.from; i <= range.to; i++) {
-      final proposal = await getProposal(id: userProposalsIds[i]);
+      final ref = SignedDocumentRef(id: userProposalsIds[i]);
+      final proposalData = await getProposal(ref: ref);
+      final proposal = Proposal.fromData(proposalData);
       proposals.add(proposal);
     }
 
