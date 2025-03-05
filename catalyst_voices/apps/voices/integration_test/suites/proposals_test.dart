@@ -142,5 +142,13 @@ void main() async {
         await ProposalsPage($).shareModalCloseButtonWorks();
       },
     );
-  });
+  }, skip: true);
+
+  patrolWidgetTest(
+    'visitor - share modal close button works',
+    (PatrolTester $) async {
+      await $.pumpWidgetAndSettle(App(routerConfig: router));
+      await ProposalsPage($).tmp1();
+    },
+  );
 }

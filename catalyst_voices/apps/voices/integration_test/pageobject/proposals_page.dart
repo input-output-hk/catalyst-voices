@@ -1,8 +1,11 @@
 import 'package:catalyst_voices/widgets/search/search_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mockito/mockito.dart';
 import 'package:patrol_finders/patrol_finders.dart';
+import 'package:url_launcher_platform_interface/url_launcher_platform_interface.dart';
 
+import '../utils/mockUrlLauncher.dart';
 import '../utils/translations_utils.dart';
 import 'app_bar_page.dart';
 import 'common_page.dart';
@@ -361,5 +364,45 @@ class ProposalsPage {
     expect($(shareProposalDialog).$(closeButton), findsOneWidget);
     await $(shareProposalDialog).$(closeButton).tap();
     expect($(shareProposalDialog).$(closeButton), findsNothing);
+  }
+
+  Future<void> tmp1() async {
+    final mockUrlLauncher = MockUrlLauncher();
+    UrlLauncherPlatform.instance = mockUrlLauncher;
+
+    await $(proposalsContainer)
+        .$(MostRecentSection($).proposalCard)
+        .at(0)
+        .$(MostRecentSection($).shareButton)
+        .tap();
+    await $(shareProposalDialog).$(shareItem).at(1).tap();
+
+    print('^type: ${mockUrlLauncher.runtimeType}');
+
+    verify(
+      () => mockUrlLauncher.launch(
+        'https://www.example.com',
+        useSafariVC: false,
+        useWebView: false,
+        universalLinksOnly: false,
+        // webViewConfiguration: any(named: 'webViewConfiguration'),
+        enableJavaScript: false,
+        enableDomStorage: false,
+        headers: {},
+      ),
+    ).called(1);
+
+    // expect(
+    //     await mockUrlLauncher.launch(
+    //       'https://www.example.com',
+    //       useSafariVC: false,
+    //       useWebView: false,
+    //       universalLinksOnly: false,
+    //       // webViewConfiguration: any(named: 'webViewConfiguration'),
+    //       enableJavaScript: false,
+    //       enableDomStorage: false,
+    //       headers: {},
+    //     ),
+    //     true);
   }
 }
