@@ -5,6 +5,7 @@ import 'package:catalyst_voices_repositories/src/database/table/documents.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents.drift.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_metadata.dart';
 import 'package:catalyst_voices_repositories/src/database/typedefs.dart';
+import 'package:collection/collection.dart';
 import 'package:drift/drift.dart';
 import 'package:flutter/foundation.dart';
 
@@ -24,6 +25,18 @@ abstract interface class DocumentsDao {
   @visibleForTesting
   Future<int> countDocumentsMetadata();
 
+  /// Counts documents of specified [type]
+  /// that reference a given document [ref].
+  ///
+  /// [ref] is the reference to the parent document being referenced
+  /// [type] is the type of documents to count (e.g., comments, reactions, etc.)
+  ///
+  /// Returns the count of documents matching both the type and reference.
+  Future<int> countRefDocumentByType({
+    required DocumentRef ref,
+    required DocumentType type,
+  });
+
   /// Deletes all documents. Cascades to metadata.
   Future<void> deleteAll();
 
@@ -38,6 +51,10 @@ abstract interface class DocumentsDao {
   /// Returns all known document refs.
   Future<List<SignedDocumentRef>> queryAllRefs();
 
+  /// Returns a list of version of ref object.
+  /// Can be used to get versions count.
+  Future<List<String>> queryVersionIds({required String id});
+
   /// Inserts all documents and metadata. On conflicts ignores duplicates.
   Future<void> saveAll(
     Iterable<DocumentEntityWithMetadata> documentsWithMetadata,
@@ -47,7 +64,21 @@ abstract interface class DocumentsDao {
   Stream<DocumentEntity?> watch({required DocumentRef ref});
 
   /// Similar to [queryAll] but emits when new records are inserted or deleted.
-  Stream<List<DocumentEntity>> watchAll();
+  /// Returns all entities. If same document have different versions
+  /// all will be returned unless [unique] is true.
+  /// When [unique] is true, only latest versions of each document are returned.
+  /// Optional [limit] parameter limits the number of returned documents.
+  Stream<List<DocumentEntity>> watchAll({
+    bool unique = false,
+    int? limit,
+    DocumentType? type,
+  });
+
+  /// Watches for new comments that are reference by ref.
+  Stream<int> watchCount({
+    required DocumentRef ref,
+    required DocumentType type,
+  });
 }
 
 @DriftAccessor(
@@ -105,6 +136,26 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
   }
 
   @override
+  Future<int> countRefDocumentByType({
+    required DocumentRef ref,
+    required DocumentType type,
+  }) {
+    final query = select(documents)
+      ..where(
+        (row) => Expression.and([
+          row.type.equals(type.uuid),
+        ]),
+      );
+
+    return query.get().then(
+          (docs) => docs.where((doc) {
+            // TODO(damian-molinski): JSONB filter
+            return doc.metadata.ref == ref;
+          }).length,
+        );
+  }
+
+  @override
   Future<void> deleteAll() async {
     final deletedRows = await delete(documents).go();
 
@@ -148,6 +199,19 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
   }
 
   @override
+  Future<List<String>> queryVersionIds({required String id}) {
+    final query = select(documents)
+      ..where((tbl) => _filterRef(tbl, SignedDocumentRef(id: id)))
+      ..orderBy([
+        (u) => OrderingTerm.desc(u.verHi),
+      ]);
+
+    return query
+        .map((doc) => UuidHiLo(high: doc.verHi, low: doc.verLo).toString())
+        .get();
+  }
+
+  @override
   Future<void> saveAll(
     Iterable<DocumentEntityWithMetadata> documentsWithMetadata,
   ) async {
@@ -178,8 +242,72 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
   }
 
   @override
-  Stream<List<DocumentEntity>> watchAll() {
-    return select(documents).watch();
+  Stream<List<DocumentEntity>> watchAll({
+    bool unique = false,
+    int? limit,
+    DocumentType? type,
+  }) {
+    final query = select(documents);
+
+    if (type != null) {
+      query.where((doc) => doc.type.equals(type.uuid));
+    }
+
+    return query.watch().map((documents) {
+      if (unique) {
+        // Group by document ID and take latest version
+        final uniqueDocs = documents
+            .groupListsBy((doc) => '${doc.idHi}-${doc.idLo}')
+            .values
+            .map(
+              (versions) => versions.reduce((a, b) {
+                // Compare versions (higher version wins)
+                final compareHi = b.verHi.compareTo(a.verHi);
+                if (compareHi != 0) return compareHi > 0 ? b : a;
+                return b.verLo.compareTo(a.verLo) > 0 ? b : a;
+              }),
+            )
+            .toList()
+          ..sort((a, b) {
+            // Sort by version descending
+            final compareHi = b.verHi.compareTo(a.verHi);
+            if (compareHi != 0) return compareHi;
+            return b.verLo.compareTo(a.verLo);
+          });
+
+        if (limit != null) {
+          return uniqueDocs.take(limit).toList();
+        }
+        return uniqueDocs;
+      }
+
+      if (limit != null) {
+        return documents.take(limit).toList();
+      }
+      return documents;
+    });
+  }
+
+  @override
+  Stream<int> watchCount({
+    required DocumentRef ref,
+    required DocumentType type,
+  }) {
+    final query = select(documents)
+      ..where(
+        (row) => Expression.and([
+          // TODO(damian-molinski): JSONB filtering
+          row.metadata.equalsValue(
+            DocumentDataMetadata(
+              type: type,
+              ref: ref,
+              selfRef: ref,
+            ),
+          ),
+        ]),
+      );
+
+    return query.watch().map((comments) => comments.length).distinct();
   }
 
   bool _entitiesEquals(DocumentEntity? previous, DocumentEntity? next) {

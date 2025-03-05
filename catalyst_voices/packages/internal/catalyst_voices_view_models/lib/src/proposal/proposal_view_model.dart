@@ -31,7 +31,7 @@ final class FundedProposal extends ProposalViewModel {
     Proposal proposal, {
     required String campaignName,
   }) : this(
-          id: proposal.id,
+          id: proposal.selfRef.id,
           campaignName: campaignName,
           category: proposal.category,
           title: proposal.title,
@@ -91,7 +91,7 @@ final class PendingProposal extends ProposalViewModel {
   final String campaignName;
   final String category;
   final String title;
-  final DateTime lastUpdateDate;
+  final DateTime? lastUpdateDate;
   final Coin _fundsRequested;
   final int commentsCount;
   final String description;
@@ -143,7 +143,7 @@ and PRISM, but its potential is only barely exploited.
     Proposal proposal, {
     required String campaignName,
   }) : this(
-          id: proposal.id,
+          id: proposal.selfRef.id,
           campaignName: campaignName,
           category: proposal.category,
           title: proposal.title,
@@ -152,7 +152,7 @@ and PRISM, but its potential is only barely exploited.
           commentsCount: proposal.commentsCount,
           description: proposal.description,
           publishStage: proposal.publish,
-          version: proposal.version,
+          version: proposal.versionCount,
           duration: proposal.duration,
           author: proposal.author,
         );
