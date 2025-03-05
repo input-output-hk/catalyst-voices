@@ -24,7 +24,6 @@ int _maxResults(ProposalPublish? stage) {
   return 32;
 }
 
-// ignore: one_member_abstracts
 abstract interface class ProposalRepository {
   const factory ProposalRepository() = ProposalRepositoryImpl;
 
@@ -32,7 +31,7 @@ abstract interface class ProposalRepository {
 
   Future<List<String>> getFavoritesProposalsIds();
 
-  Future<ProposalBase> getProposal({
+  Future<ProposalData> getProposal({
     required DocumentRef ref,
   });
 
@@ -62,22 +61,19 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   }
 
   @override
-  Future<ProposalBase> getProposal({
+  Future<ProposalData> getProposal({
     required DocumentRef ref,
   }) async {
-    return ProposalBase(
-      id: ref.id,
-      category: 'Cardano Use Cases / MVP',
-      title: 'Proposal Title that rocks the world',
-      updateDate: DateTime.now().minusDays(2),
-      fundsRequested: Coin.fromAda(100000),
-      status: ProposalStatus.draft,
-      publish: ProposalPublish.localDraft,
-      commentsCount: 0,
-      description: _proposalDescription,
-      duration: 6,
-      author: 'Alex Wells',
-      version: 1,
+    return ProposalData(
+      categoryId: const Uuid().v7(),
+      document: ProposalDocument(
+        metadata: ProposalMetadata(selfRef: ref),
+        document: const Document(
+          properties: [],
+          schema: DocumentSchema.optional(),
+        ),
+      ),
+      ref: ref,
     );
   }
 
@@ -86,7 +82,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     required ProposalPaginationRequest request,
   }) async {
     // optionally filter by status.
-    final proposals = <ProposalBase>[];
+    final proposals = <Proposal>[];
 
     // Return users proposals match his account id with proposals metadata from
     // author field.
@@ -102,8 +98,8 @@ final class ProposalRepositoryImpl implements ProposalRepository {
           ? ProposalPublish.submittedProposal
           : ProposalPublish.publishedDraft;
       proposals.add(
-        ProposalBase(
-          id: const Uuid().v7(),
+        Proposal(
+          selfRef: SignedDocumentRef.generateFirstRef(),
           category: 'Cardano Use Cases / MVP',
           title: 'Proposal Title that rocks the world',
           updateDate: DateTime.now().minusDays(2),
@@ -114,7 +110,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
           description: _proposalDescription,
           duration: 6,
           author: 'Alex Wells',
-          version: 1,
+          versionCount: 1,
         ),
       );
     }
@@ -141,7 +137,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     ProposalPaginationRequest request,
   ) async {
     final favoritesIds = await getFavoritesProposalsIds();
-    final proposals = <ProposalBase>[];
+    final proposals = <Proposal>[];
     final range = PagingRange.calculateRange(
       pageKey: request.pageKey,
       itemsPerPage: request.pageSize,
@@ -155,7 +151,8 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     }
     for (var i = range.from; i <= range.to; i++) {
       final ref = SignedDocumentRef(id: favoritesIds[i]);
-      final proposal = await getProposal(ref: ref);
+      final proposalData = await getProposal(ref: ref);
+      final proposal = Proposal.fromData(proposalData);
       proposals.add(proposal);
     }
 
@@ -169,7 +166,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     ProposalPaginationRequest request,
   ) async {
     final userProposalsIds = await getUserProposalsIds('');
-    final proposals = <ProposalBase>[];
+    final proposals = <Proposal>[];
     final range = PagingRange.calculateRange(
       pageKey: request.pageKey,
       itemsPerPage: request.pageSize,
@@ -183,7 +180,8 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     }
     for (var i = range.from; i <= range.to; i++) {
       final ref = SignedDocumentRef(id: userProposalsIds[i]);
-      final proposal = await getProposal(ref: ref);
+      final proposalData = await getProposal(ref: ref);
+      final proposal = Proposal.fromData(proposalData);
       proposals.add(proposal);
     }
 
