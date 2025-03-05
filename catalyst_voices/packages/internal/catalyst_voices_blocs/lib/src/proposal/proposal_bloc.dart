@@ -36,7 +36,9 @@ final class ProposalBloc extends Bloc<ProposalEvent, ProposalState>
       categoryName: 'Cardano Partners: Growth & Acceleration',
       proposalTitle: 'Project Mayhem: Freedom by Chaos',
       data: ProposalViewMetadata(
-        author: const Profile(catalystId: 'id'),
+        author: const Profile(
+          catalystId: 'cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE',
+        ),
         description: 'Project Mayhem is a disruptive initiative to dismantle '
             'societal hierarchies through acts of controlled chaos. '
             'By targeting oppressive systems like credit structures and '
