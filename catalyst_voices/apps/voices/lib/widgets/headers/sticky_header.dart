@@ -1,11 +1,12 @@
-import 'package:catalyst_voices/pages/proposal/proposal_content.dart';
 import 'package:flutter/material.dart';
 
 class StickyHeader extends StatefulWidget {
+  final ScrollNotificationPredicate notificationPredicate;
   final Widget child;
 
   const StickyHeader({
     super.key,
+    this.notificationPredicate = defaultScrollNotificationPredicate,
     required this.child,
   });
 
@@ -54,16 +55,8 @@ class _StickyHeaderState extends State<StickyHeader> {
   }
 
   void _handleScrollNotification(ScrollNotification notification) {
-    if (notification is ScrollUpdateNotification) {
-      // print(notification);
-      final element = notification.context! as Element;
-
-      final listView = element.findAncestorWidgetOfExactType<ProposalContent>();
-
-      if (listView == null) {
-        return;
-      }
-
+    if (notification is ScrollUpdateNotification &&
+        widget.notificationPredicate(notification)) {
       final oldScrolledUnder = _scrolledUnder;
       final metrics = notification.metrics;
       switch (metrics.axisDirection) {

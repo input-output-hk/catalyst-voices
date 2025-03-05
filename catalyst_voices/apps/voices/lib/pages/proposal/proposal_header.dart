@@ -1,4 +1,5 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
+import 'package:catalyst_voices/pages/proposal/proposal_content.dart';
 import 'package:catalyst_voices/pages/proposal/widget/proposal_favorite_button.dart';
 import 'package:catalyst_voices/pages/proposal/widget/proposal_share_button.dart';
 import 'package:catalyst_voices/pages/proposal/widget/proposal_version.dart';
@@ -15,8 +16,19 @@ class ProposalHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const StickyHeader(
-      child: _ProposalHeader(),
+    return StickyHeader(
+      notificationPredicate: (notification) {
+        if (notification.depth != 0) {
+          return false;
+        }
+
+        final element = notification.context as Element?;
+
+        // Only react to content scroll not menu.
+        return element?.findAncestorWidgetOfExactType<ProposalContent>() !=
+            null;
+      },
+      child: const _ProposalHeader(),
     );
   }
 }
