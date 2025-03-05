@@ -12,12 +12,11 @@ import 'package:flutter/foundation.dart';
 abstract interface class DocumentsDao {
   /// Counts documents matching required [ref] id and optional [ref] ver.
   ///
+  /// If [ref] is null counts all documents.
+  ///
   /// If [ref] ver is not specified it will return count of all version
   /// matching [ref] id.
-  Future<int> count({required DocumentRef ref});
-
-  /// Counts all documents.
-  Future<int> countAll();
+  Future<int> count({DocumentRef? ref});
 
   /// Counts unique documents. All versions of same document are counted as 1.
   Future<int> countDocuments();
@@ -63,13 +62,12 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
   DriftDocumentsDao(super.attachedDatabase);
 
   @override
-  Future<int> count({required DocumentRef ref}) {
-    return documents.count(where: (row) => _filterRef(row, ref)).getSingle();
-  }
-
-  @override
-  Future<int> countAll() {
-    return documents.count().getSingle();
+  Future<int> count({DocumentRef? ref}) {
+    if (ref == null) {
+      return documents.count().getSingle();
+    } else {
+      return documents.count(where: (row) => _filterRef(row, ref)).getSingle();
+    }
   }
 
   @override

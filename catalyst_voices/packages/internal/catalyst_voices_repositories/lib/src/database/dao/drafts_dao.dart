@@ -10,12 +10,12 @@ import 'package:flutter/foundation.dart';
 abstract interface class DraftsDao {
   /// Counts drafts matching required [ref] id and optional [ref] ver.
   ///
+  /// If ref is null it will count all drafts. If [unique] is true counts
+  /// all versions of same document as one.
+  ///
   /// If [ref] ver is not specified it will return count of all version
   /// matching [ref] id.
-  Future<int> count({required DocumentRef ref});
-
-  /// Counts unique drafts. All versions of same document are counted as 1.
-  Future<int> countAll();
+  Future<int> count({DocumentRef? ref});
 
   /// Deletes a document draft with [ref].
   ///
@@ -62,13 +62,12 @@ class DriftDraftsDao extends DatabaseAccessor<DriftCatalystDatabase>
   DriftDraftsDao(super.attachedDatabase);
 
   @override
-  Future<int> count({required DocumentRef ref}) {
-    return drafts.count(where: (row) => _filterRef(row, ref)).getSingle();
-  }
-
-  @override
-  Future<int> countAll() {
-    return drafts.count().getSingle();
+  Future<int> count({DocumentRef? ref}) {
+    if (ref == null) {
+      return drafts.count().getSingle();
+    } else {
+      return drafts.count(where: (row) => _filterRef(row, ref)).getSingle();
+    }
   }
 
   @override
