@@ -50,20 +50,30 @@ pub(crate) async fn cip36_registrations(
                     },
                 };
 
-                return get_registration_given_stake_addr(address, session, asat, page, limit)
-                    .await;
+                match get_registration_given_stake_addr(address, session, asat, page, limit).await {
+                    Ok(reg) => AllRegistration::With(reg),
+                    Err(err) => {
+                        return AllRegistration::handle_error(&err);
+                    },
+                }
             },
             StakeAddressOrPublicKey::PublicKey(ed25519_hex_encoded_public_key) => {
                 // As above...
                 // Except using a voting key.
-                return get_registration_given_vote_key(
+                match get_registration_given_vote_key(
                     ed25519_hex_encoded_public_key,
                     session,
                     asat,
                     page,
                     limit,
                 )
-                .await;
+                .await
+                {
+                    Ok(reg) => AllRegistration::With(reg),
+                    Err(err) => {
+                        return AllRegistration::handle_error(&err);
+                    },
+                }
             },
             StakeAddressOrPublicKey::All =>
             // As above...
