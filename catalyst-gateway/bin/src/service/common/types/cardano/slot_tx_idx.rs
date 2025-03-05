@@ -6,7 +6,7 @@ use rbac_registration::cardano::cip509::PointTxnIdx;
 use super::{slot_no::SlotNo, txn_index::TxnIndex};
 
 /// Block's slot number and transaction index.
-#[derive(Object)]
+#[derive(Debug, Clone, Object)]
 #[oai(example = true)]
 pub struct SlotTxnIdx {
     /// Slot number
@@ -28,9 +28,7 @@ impl From<PointTxnIdx> for SlotTxnIdx {
     fn from(value: PointTxnIdx) -> Self {
         Self {
             slot: value.point().slot_or_default().into(),
-            // TODO: fix that after updating `cardano_blockchain_types::TxnIndex`
-            // txn_index: value.txn_index().into(),
-            txn_index: 0.into(),
+            txn_index: value.txn_index().into(),
         }
     }
 }

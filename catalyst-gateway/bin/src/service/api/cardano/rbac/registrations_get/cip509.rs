@@ -2,18 +2,22 @@
 //! Doc Reference: <https://github.com/input-output-hk/catalyst-CIPs/tree/x509-envelope-metadata/CIP-XXXX>
 //! CDDL Reference: <https://github.com/input-output-hk/catalyst-CIPs/blob/x509-envelope-metadata/CIP-XXXX/x509-envelope.cddl>
 
-use poem_openapi::{types::Example, Object};
+use poem_openapi::{
+    types::{Example, ToJSON},
+    Object,
+};
 
 use crate::service::common::{
     objects::generic::json_object::JSONObject,
     types::{
+        array_types::impl_array_types,
         cardano::{slot_tx_idx::SlotTxnIdx, transaction_id::TxnId},
         generic::uuidv4::UUIDv4,
     },
 };
 
 /// CIP 509 registration transaction data.
-#[derive(Object)]
+#[derive(Debug, Clone, Object)]
 #[oai(example = true)]
 pub(crate) struct Cip509 {
     /// A registration purpose (`UUIDv4`).
@@ -37,6 +41,17 @@ pub(crate) struct Cip509 {
     report: JSONObject,
 }
 
+impl_array_types!(
+    Cip509List,
+    Cip509,
+    Some(poem_openapi::registry::MetaSchema {
+        example: Self::example().to_json(),
+        max_items: Some(10000),
+        items: Some(Box::new(Cip509::schema_ref())),
+        ..poem_openapi::registry::MetaSchema::ANY
+    })
+);
+
 impl Example for Cip509 {
     fn example() -> Self {
         Self {
@@ -46,6 +61,12 @@ impl Example for Cip509 {
             origin: SlotTxnIdx::example(),
             report: serde_json::json!({}).into(),
         }
+    }
+}
+
+impl Example for Cip509List {
+    fn example() -> Self {
+        Self(vec![Example::example()])
     }
 }
 

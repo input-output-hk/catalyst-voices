@@ -6,6 +6,7 @@ mod reg_chain;
 mod unprocessable_content;
 
 use catalyst_types::id_uri::IdUri;
+use cip509::Cip509List;
 use poem_openapi::{payload::Json, ApiResponse};
 use rbac_reg::{RbacRegistration, RbacRegistrations};
 use reg_chain::RegistrationChain;
@@ -65,12 +66,13 @@ pub(crate) async fn endpoint(
 pub(crate) fn build_rbac_reg(
     regs: Vec<rbac_registration::cardano::cip509::Cip509>, detailed: bool,
 ) -> anyhow::Result<Option<RbacRegistration>> {
-    let details = if detailed {
+    let details: Cip509List = if detailed {
         regs.iter()
             .map(TryInto::try_into)
             .collect::<anyhow::Result<Vec<_>>>()?
+            .into()
     } else {
-        Vec::new()
+        Vec::new().into()
     };
     let chain = build_chain(regs);
     if details.is_empty() && chain.is_none() {
