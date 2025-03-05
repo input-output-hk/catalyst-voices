@@ -60,7 +60,7 @@ pub(crate) async fn endpoint(
     Responses::NotFound.into()
 }
 
-/// Build a reponse `RbacRegistration` from the provided CIP 509 registrations lists
+/// Build a response `RbacRegistration` from the provided CIP 509 registrations lists
 #[allow(dead_code)]
 pub(crate) fn build_rbac_reg(
     regs: Vec<rbac_registration::cardano::cip509::Cip509>, detailed: bool,

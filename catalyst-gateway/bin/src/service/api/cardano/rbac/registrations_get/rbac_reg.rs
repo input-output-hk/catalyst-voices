@@ -11,10 +11,10 @@ use crate::service::common::types::cardano::catalyst_id::CatalystId;
 pub(crate) struct RbacRegistrations {
     /// User's catalyst id
     pub(crate) catalyst_id: CatalystId,
-    /// Latest valid RBAC registration
+    /// Finalized RBAC registration
     #[oai(skip_serializing_if_is_none)]
-    pub(crate) finalised: Option<RbacRegistration>,
-    /// Latest invalid RBAC registration
+    pub(crate) finalized: Option<RbacRegistration>,
+    /// No-Finalized RBAC registration
     #[oai(skip_serializing_if_is_none)]
     pub(crate) volatile: Option<RbacRegistration>,
 }
@@ -23,7 +23,7 @@ impl Example for RbacRegistrations {
     fn example() -> Self {
         Self {
             catalyst_id: CatalystId::example(),
-            finalised: Some(RbacRegistration::example()),
+            finalized: Some(RbacRegistration::example()),
             volatile: Some(RbacRegistration::example()),
         }
     }
