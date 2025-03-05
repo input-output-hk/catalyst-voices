@@ -1,4 +1,5 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
+import 'package:catalyst_voices/pages/proposal/proposal_content.dart';
 import 'package:catalyst_voices/pages/proposal/widget/proposal_favorite_button.dart';
 import 'package:catalyst_voices/pages/proposal/widget/proposal_share_button.dart';
 import 'package:catalyst_voices/pages/proposal/widget/proposal_version.dart';
@@ -12,6 +13,45 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ProposalHeader extends StatelessWidget {
   const ProposalHeader({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return StickyHeader(
+      notificationPredicate: (notification) {
+        if (notification.depth != 0) {
+          return false;
+        }
+
+        final element = notification.context as Element?;
+
+        // Only react to content scroll not menu.
+        return element?.findAncestorWidgetOfExactType<ProposalContent>() !=
+            null;
+      },
+      child: const _ProposalHeader(),
+    );
+  }
+}
+
+class _ProposalControls extends StatelessWidget {
+  const _ProposalControls();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Row(
+      mainAxisSize: MainAxisSize.min,
+      spacing: 8,
+      children: [
+        ProposalVersion(),
+        ProposalShareButton(),
+        ProposalFavoriteButton(),
+      ],
+    );
+  }
+}
+
+class _ProposalHeader extends StatelessWidget {
+  const _ProposalHeader();
 
   @override
   Widget build(BuildContext context) {
@@ -34,23 +74,6 @@ class ProposalHeader extends StatelessWidget {
           Spacer(),
         ],
       ),
-    );
-  }
-}
-
-class _ProposalControls extends StatelessWidget {
-  const _ProposalControls();
-
-  @override
-  Widget build(BuildContext context) {
-    return const Row(
-      mainAxisSize: MainAxisSize.min,
-      spacing: 8,
-      children: <Widget>[
-        ProposalVersion(),
-        ProposalShareButton(),
-        ProposalFavoriteButton(),
-      ],
     );
   }
 }
