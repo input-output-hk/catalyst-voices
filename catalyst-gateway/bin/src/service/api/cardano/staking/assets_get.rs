@@ -1,6 +1,6 @@
 //! Implementation of the GET `../assets` endpoint
 
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 use cardano_blockchain_types::{Slot, StakeAddress, TransactionId, TxnIndex};
 use futures::StreamExt;
@@ -34,9 +34,6 @@ use crate::{
         },
     },
 };
-
-/// A `TxoInfo` by transaction ID map.
-type TxosByTxn = HashMap<TransactionId, HashMap<i16, TxoInfo>>;
 
 /// Endpoint responses.
 #[derive(ApiResponse)]
@@ -100,8 +97,8 @@ pub(crate) async fn endpoint(
     .into()
 }
 
-/// TXO asset information.
-struct TxoAssetInfo {
+/// TXO Native Token information.
+struct NativeTokens {
     /// Asset hash.
     id: Vec<u8>,
     /// Asset name.
@@ -114,8 +111,6 @@ struct TxoAssetInfo {
 struct TxoInfo {
     /// TXO value.
     value: num_bigint::BigInt,
-    /// TXO transaction hash.
-    txn_hash: TransactionId,
     /// TXO transaction index within the slot.
     txn_index: TxnIndex,
     /// TXO index.
@@ -124,8 +119,6 @@ struct TxoInfo {
     slot_no: Slot,
     /// Whether the TXO was spent.
     spent_slot_no: Option<Slot>,
-    /// TXO assets.
-    assets: HashMap<Vec<u8>, Vec<TxoAssetInfo>>,
 }
 
 /// Calculate the stake info for a given stake address.
@@ -136,104 +129,93 @@ async fn calculate_stake_info(
     session: &CassandraSession, stake_address: Cip19StakeAddress, slot_num: Option<SlotNo>,
 ) -> anyhow::Result<Option<StakeInfo>> {
     let address: StakeAddress = stake_address.try_into()?;
-    let mut txos_by_txn = get_txo_by_txn(session, &address, slot_num).await?;
-    if txos_by_txn.is_empty() {
+    let adjusted_slot_num = slot_num.map_or(Slot::from(u64::MAX), Into::into);
+
+    let (mut txos, native_tokens) = futures::try_join!(
+        get_txo(session, &address, adjusted_slot_num),
+        get_native_tokens(session, &address, adjusted_slot_num)
+    )?;
+    if txos.is_empty() {
         return Ok(None);
     }
 
-    check_and_set_spent(session, &mut txos_by_txn).await?;
-    // TODO: This could be executed in the background, it does not actually matter if it
-    // succeeds. This is just an optimization step to reduce the need to query spent
-    // TXO's.
-    update_spent(session, &address, &txos_by_txn).await?;
+    set_and_update_spent(session, &address, &mut txos).await?;
 
-    let stake_info = build_stake_info(txos_by_txn)?;
+    let stake_info = build_stake_info(txos, native_tokens, adjusted_slot_num)?;
 
     Ok(Some(stake_info))
 }
 
-/// Returns a map of TXO infos by transaction hash for the given stake address.
-async fn get_txo_by_txn(
-    session: &CassandraSession, stake_address: &StakeAddress, slot_num: Option<SlotNo>,
-) -> anyhow::Result<TxosByTxn> {
-    let adjusted_slot_num: u64 = slot_num.map_or(u64::MAX, Into::into);
+/// `TxoInfo` map type alias
+type TxoMap = HashMap<(TransactionId, i16), TxoInfo>;
 
-    let mut txo_map = HashMap::new();
+/// Returns a map of TXO infos for the given stake address.
+async fn get_txo(
+    session: &CassandraSession, stake_address: &StakeAddress, slot_num: Slot,
+) -> anyhow::Result<TxoMap> {
     let mut txos_iter = GetTxoByStakeAddressQuery::execute(
         session,
-        GetTxoByStakeAddressQueryParams::new(stake_address.clone(), adjusted_slot_num.into()),
+        GetTxoByStakeAddressQueryParams::new(stake_address.clone(), slot_num),
     )
     .await?;
 
-    // Aggregate TXO info.
+    let mut txo_map = HashMap::new();
     while let Some(row_res) = txos_iter.next().await {
         let row = row_res?;
 
-        // Filter out already known spent TXOs.
-        if row.spent_slot.is_some() {
-            continue;
-        }
-
-        let key = (row.slot_no, row.txn_index, row.txo);
+        let key = (row.txn_id.into(), row.txo.into());
         txo_map.insert(key, TxoInfo {
             value: row.value,
-            txn_hash: row.txn_id.into(),
             txn_index: row.txn_index.into(),
             txo: row.txo.into(),
             slot_no: row.slot_no.into(),
-            spent_slot_no: None,
-            assets: HashMap::new(),
+            spent_slot_no: row.spent_slot.map(Into::into),
         });
     }
+    Ok(txo_map)
+}
 
-    // Augment TXO info with asset info.
+/// Native Tokes map type alias
+type NativeTokensMap = HashMap<(Slot, TxnIndex, i16), NativeTokens>;
+
+/// Returns a map of native token infos for the given stake address.
+async fn get_native_tokens(
+    session: &CassandraSession, stake_address: &StakeAddress, slot_num: Slot,
+) -> anyhow::Result<NativeTokensMap> {
     let mut assets_txos_iter = GetAssetsByStakeAddressQuery::execute(
         session,
-        GetAssetsByStakeAddressParams::new(stake_address.clone(), adjusted_slot_num.into()),
+        GetAssetsByStakeAddressParams::new(stake_address.clone(), slot_num),
     )
     .await?;
 
+    let mut tokens_map = HashMap::new();
     while let Some(row_res) = assets_txos_iter.next().await {
         let row = row_res?;
 
-        let txo_info_key = (row.slot_no, row.txn_index, row.txo);
-        let Some(txo_info) = txo_map.get_mut(&txo_info_key) else {
-            continue;
-        };
-
-        let entry = txo_info
-            .assets
-            .entry(row.policy_id.clone())
-            .or_insert_with(Vec::new);
-
-        match entry.iter_mut().find(|item| item.id == row.policy_id) {
-            Some(item) => item.amount += row.value,
-            None => {
-                entry.push(TxoAssetInfo {
-                    id: row.policy_id,
-                    name: row.asset_name.into(),
-                    amount: row.value,
-                });
-            },
-        }
+        let key = (row.slot_no.into(), row.txn_index.into(), row.txo.into());
+        tokens_map.insert(key, NativeTokens {
+            id: row.policy_id,
+            name: row.asset_name.into(),
+            amount: row.value,
+        });
     }
-
-    let mut txos_by_txn = HashMap::new();
-    for txo_info in txo_map.into_values() {
-        let txn_map = txos_by_txn
-            .entry(txo_info.txn_hash)
-            .or_insert(HashMap::new());
-        txn_map.insert(txo_info.txo, txo_info);
-    }
-
-    Ok(txos_by_txn)
+    Ok(tokens_map)
 }
 
 /// Checks if the given TXOs were spent and mark then as such.
-async fn check_and_set_spent(
-    session: &CassandraSession, txos_by_txn: &mut TxosByTxn,
+/// Sets TXOs as spent in the database if they are marked as spent in the map.
+async fn set_and_update_spent(
+    session: &CassandraSession, stake_address: &StakeAddress, txos: &mut TxoMap,
 ) -> anyhow::Result<()> {
-    let txn_hashes = txos_by_txn.keys().copied().collect::<Vec<_>>();
+    let txn_hashes = txos
+        .iter()
+        .filter(|(_, txo)| txo.spent_slot_no.is_none())
+        .map(|((tx_id, _), _)| *tx_id)
+        .collect::<HashSet<_>>()
+        .into_iter()
+        .collect::<Vec<_>>();
+
+    let mut params = Vec::new();
 
     for chunk in txn_hashes.chunks(100) {
         let mut txi_iter = GetTxiByTxnHashesQuery::execute(
@@ -245,36 +227,17 @@ async fn check_and_set_spent(
         while let Some(row_res) = txi_iter.next().await {
             let row = row_res?;
 
-            if let Some(txn_map) = txos_by_txn.get_mut(&row.txn_id.into()) {
-                if let Some(txo_info) = txn_map.get_mut(&row.txo.into()) {
-                    txo_info.spent_slot_no = Some(row.slot_no.into());
-                }
-            }
-        }
-    }
-
-    Ok(())
-}
-
-/// Sets TXOs as spent in the database if they are marked as spent in the map.
-async fn update_spent(
-    session: &CassandraSession, stake_address: &StakeAddress, txos_by_txn: &TxosByTxn,
-) -> anyhow::Result<()> {
-    let mut params = Vec::new();
-    for txn_map in txos_by_txn.values() {
-        for txo_info in txn_map.values() {
-            if txo_info.spent_slot_no.is_none() {
-                continue;
-            }
-
-            if let Some(spent_slot) = txo_info.spent_slot_no {
+            let key = (row.txn_id.into(), row.txo.into());
+            if let Some(txo_info) = txos.get_mut(&key) {
                 params.push(UpdateTxoSpentQueryParams {
                     stake_address: stake_address.clone().into(),
                     txn_index: txo_info.txn_index.into(),
                     txo: txo_info.txo.into(),
                     slot_no: txo_info.slot_no.into(),
-                    spent_slot: spent_slot.into(),
+                    spent_slot: row.slot_no,
                 });
+
+                txo_info.spent_slot_no = Some(row.slot_no.into());
             }
         }
     }
@@ -285,36 +248,42 @@ async fn update_spent(
 }
 
 /// Builds an instance of [`StakeInfo`] based on the TXOs given.
-fn build_stake_info(txos_by_txn: TxosByTxn) -> anyhow::Result<StakeInfo> {
+fn build_stake_info(
+    txos: TxoMap, mut tokens: NativeTokensMap, slot_num: Slot,
+) -> anyhow::Result<StakeInfo> {
     let mut stake_info = StakeInfo::default();
-    for txn_map in txos_by_txn.into_values() {
-        for txo_info in txn_map.into_values() {
-            if txo_info.spent_slot_no.is_none() {
-                let value = u64::try_from(txo_info.value)?;
-                stake_info.ada_amount = stake_info
-                    .ada_amount
-                    .checked_add(value)
-                    .ok_or_else(|| {
-                        anyhow::anyhow!(
-                            "Total stake amount overflow: {} + {value}",
-                            stake_info.ada_amount
-                        )
-                    })?
-                    .into();
-
-                for asset in txo_info.assets.into_values().flatten() {
-                    stake_info.native_tokens.push(StakedNativeTokenInfo {
-                        policy_hash: asset.id.try_into()?,
-                        asset_name: asset.name,
-                        amount: asset.amount.try_into()?,
-                    });
-                }
-
-                let slot_no = txo_info.slot_no.into();
-                if stake_info.slot_number < slot_no {
-                    stake_info.slot_number = slot_no;
-                }
+    for txo_info in txos.into_values() {
+        // Filter out spent TXOs.
+        if let Some(spent_slot) = txo_info.spent_slot_no {
+            if spent_slot <= slot_num {
+                continue;
             }
+        }
+
+        let value = u64::try_from(txo_info.value)?;
+        stake_info.ada_amount = stake_info
+            .ada_amount
+            .checked_add(value)
+            .ok_or_else(|| {
+                anyhow::anyhow!(
+                    "Total stake amount overflow: {} + {value}",
+                    stake_info.ada_amount
+                )
+            })?
+            .into();
+
+        let key = (txo_info.slot_no, txo_info.txn_index, txo_info.txo);
+        if let Some(native_token) = tokens.remove(&key) {
+            stake_info.native_tokens.push(StakedNativeTokenInfo {
+                policy_hash: native_token.id.try_into()?,
+                asset_name: native_token.name,
+                amount: native_token.amount.try_into()?,
+            });
+        }
+
+        let slot_no = txo_info.slot_no.into();
+        if stake_info.slot_number < slot_no {
+            stake_info.slot_number = slot_no;
         }
     }
 
