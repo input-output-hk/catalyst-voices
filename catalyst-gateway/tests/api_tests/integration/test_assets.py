@@ -1,40 +1,16 @@
 import pytest
-from loguru import logger
-from typing import Dict, Any, List
-import json
-import glob
-import re
-import os
-from utils import address
+from utils.address import stake_public_key_to_address
+from utils.snapshot import snapshot
 from api.v1 import cardano
 
 
-class Snapshot:
-    def __init__(self, data: List[Dict[str, Any]], slot_no: int, network: str):
-        self.data = data
-        self.slot_no = slot_no
-        self.network = network
-
-
-@pytest.fixture
-def snapshot() -> Snapshot:
-    # snapthot file should follow the following pattern:
-    # snapshot-<slot_no>-<network>.json
-    files = glob.glob("./test_data/snapshot-*.json")
-    with open(files[0]) as snapshot_file:
-        snapshot_data = json.load(snapshot_file)
-        file_name = os.path.basename(snapshot_file.name)
-        res = re.split(r"[-.]+", file_name)
-        return Snapshot(snapshot_data, int(res[1]), res[2])
-
-
-def test_assets_endpoint(snapshot):
+def test_persistent_ada_amount_endpoint(snapshot):
     # health.is_live()
     # health.is_ready()
 
     for entry in snapshot.data:
         expected_amount = entry["voting_power"]
-        stake_address = address.stake_public_key_to_address(
+        stake_address = stake_public_key_to_address(
             key=entry["stake_public_key"][2:],
             is_stake=True,
             network_type=snapshot.network,
