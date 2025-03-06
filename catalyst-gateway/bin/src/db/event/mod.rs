@@ -160,6 +160,11 @@ impl EventDB {
         Ok(())
     }
 
+    /// Checks that connection to `EventDB` is available.
+    pub(crate) fn connection_is_ok() -> bool {
+        EVENT_DB_POOL.get().is_some()
+    }
+
     /// Prepend `EXPLAIN ANALYZE` to the query, and rollback the transaction.
     async fn explain_analyze_rollback(
         stmt: &str, params: &[&(dyn ToSql + Sync)],
