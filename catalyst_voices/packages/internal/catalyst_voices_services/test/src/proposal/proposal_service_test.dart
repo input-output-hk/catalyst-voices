@@ -13,6 +13,7 @@ void main() {
   late MockDocumentRepository mockDocumentRepository;
   late MockProposalRepository mockProposalRepository;
   late MockSignedDocumentManager mockSignedDocumentManager;
+  late MockKeychain mockKeychain;
 
   late ProposalService proposalService;
 
@@ -20,11 +21,13 @@ void main() {
     mockDocumentRepository = MockDocumentRepository();
     mockProposalRepository = MockProposalRepository();
     mockSignedDocumentManager = MockSignedDocumentManager();
+    mockKeychain = MockKeychain();
 
     proposalService = ProposalService(
       mockProposalRepository,
       mockDocumentRepository,
       mockSignedDocumentManager,
+      mockKeychain,
     );
 
     registerFallbackValue(const SignedDocumentRef(id: 'fallback-id'));
@@ -217,6 +220,8 @@ void main() {
 }
 
 class MockDocumentRepository extends Mock implements DocumentRepository {}
+
+class MockKeychain extends Mock implements Keychain {}
 
 class MockProposalRepository extends Mock implements ProposalRepository {}
 

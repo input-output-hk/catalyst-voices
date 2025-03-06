@@ -1,6 +1,6 @@
 import 'dart:convert' show json, utf8;
 
-import 'package:catalyst_voices_shared/src/document/signed_document_manager.dart';
+import 'package:catalyst_voices_models/src/signed_document/signed_document.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 

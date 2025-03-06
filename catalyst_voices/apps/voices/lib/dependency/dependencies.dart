@@ -220,6 +220,7 @@ final class Dependencies extends DependencyProvider {
         get<ProposalRepository>(),
         get<DocumentRepository>(),
         get<SignedDocumentManager>(),
+        get<Keychain>(),
       );
     });
     registerLazySingleton<ConfigService>(() {

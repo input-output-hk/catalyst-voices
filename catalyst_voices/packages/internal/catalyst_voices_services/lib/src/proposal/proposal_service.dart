@@ -5,13 +5,12 @@ import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:rxdart/rxdart.dart';
 
-class Equatable {}
-
 abstract interface class ProposalService {
   const factory ProposalService(
     ProposalRepository proposalRepository,
     DocumentRepository documentRepository,
     SignedDocumentManager signedDocumentManager,
+    Keychain keychain,
   ) = ProposalServiceImpl;
 
   Future<List<String>> addFavoriteProposal(String proposalId);
@@ -86,11 +85,13 @@ final class ProposalServiceImpl implements ProposalService {
   final ProposalRepository _proposalRepository;
   final DocumentRepository _documentRepository;
   final SignedDocumentManager _signedDocumentManager;
+  final Keychain _keychain;
 
   const ProposalServiceImpl(
     this._proposalRepository,
     this._documentRepository,
     this._signedDocumentManager,
+    this._keychain,
   );
 
   @override
@@ -171,15 +172,21 @@ final class ProposalServiceImpl implements ProposalService {
     required DocumentDataMetadata metadata,
     required DocumentDataContent content,
   }) async {
+    final privateKey = await _keychain.getMasterKey();
+    if (privateKey == null) {
+      throw StateError('Cannot publish a proposal, master key missing');
+    }
+    final publicKey = await privateKey.derivePublicKey();
+
     const metadata = SignedDocumentMetadata(
-      contentType: DocumentContentType.json,
+      contentType: SignedDocumentContentType.json,
     );
 
     final signedDocument = await _signedDocumentManager.signDocument(
       SignedDocumentJsonPayload(content.data),
       metadata: metadata,
-      publicKey: Uint8List(0),
-      privateKey: Uint8List(0),
+      publicKey: Uint8List.fromList(publicKey.bytes),
+      privateKey: Uint8List.fromList(privateKey.bytes),
     );
 
     await _documentRepository.uploadDocument(document: signedDocument);

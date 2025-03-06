@@ -2,7 +2,8 @@ import 'dart:convert';
 
 import 'package:catalyst_compression/catalyst_compression.dart';
 import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
-import 'package:catalyst_voices_shared/src/document/signed_document_manager.dart';
+import 'package:catalyst_voices_models/src/signed_document/signed_document.dart';
+import 'package:catalyst_voices_repositories/src/signed_document/signed_document_manager.dart';
 import 'package:convert/convert.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
@@ -53,7 +54,8 @@ void main() {
   });
 }
 
-const _metadata = SignedDocumentMetadata(contentType: DocumentContentType.json);
+const _metadata =
+    SignedDocumentMetadata(contentType: SignedDocumentContentType.json);
 
 final _privateKey = Uint8List.fromList(List.filled(32, 0));
 final _publicKey = Uint8List.fromList(List.filled(32, 1));
