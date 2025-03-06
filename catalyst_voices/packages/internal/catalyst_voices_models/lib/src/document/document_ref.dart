@@ -90,6 +90,9 @@ final class SignedDocumentRef extends DocumentRef {
     super.version,
   });
 
+  /// Creates ref for first version of [id] document.
+  const SignedDocumentRef.first(String id) : this(id: id, version: id);
+
   factory SignedDocumentRef.generateFirstRef() {
     final id = const Uuid().v7();
     return SignedDocumentRef(
