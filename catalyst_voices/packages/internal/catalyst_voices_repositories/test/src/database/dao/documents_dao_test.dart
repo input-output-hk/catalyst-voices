@@ -189,6 +189,30 @@ void main() {
         expect(entity, isNull);
       });
 
+      test('all refs return as expected', () async {
+        // Given
+        final refs = List.generate(10, (_) => DocumentRefFactory.buildSigned());
+        final documentsWithMetadata = refs.map((ref) {
+          return DocumentWithMetadataFactory.build(
+            metadata: DocumentDataMetadata(
+              type: DocumentType.proposalDocument,
+              selfRef: ref,
+            ),
+          );
+        });
+
+        // When
+        await database.documentsDao.saveAll(documentsWithMetadata);
+
+        // Then
+        final allRefs = await database.documentsDao.queryAllRefs();
+
+        expect(
+          allRefs,
+          allOf(hasLength(refs.length), containsAll(refs)),
+        );
+      });
+
       test('Return latest unique documents', () async {
         final id = const Uuid().v7();
         final version = const Uuid().v7();
