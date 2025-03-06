@@ -30,6 +30,11 @@ final class DatabaseDraftsDataSource implements DraftDataSource {
   }
 
   @override
+  Future<List<DraftRef>> index() {
+    return _database.draftsDao.queryAllRefs();
+  }
+
+  @override
   Future<void> save({required DocumentData data}) async {
     final idHiLo = UuidHiLo.from(data.metadata.id);
     final verHiLo = UuidHiLo.from(data.metadata.version);
