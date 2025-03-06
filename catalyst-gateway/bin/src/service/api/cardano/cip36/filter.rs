@@ -1,10 +1,6 @@
 //! Implementation of the GET `/cardano/cip36` endpoint
 
-use std::{
-    cmp::Reverse,
-    collections::{BTreeMap, HashMap},
-    sync::Arc,
-};
+use std::{collections::BTreeMap, sync::Arc};
 
 use cardano_blockchain_types::StakeAddress;
 use dashmap::DashMap;
@@ -16,7 +12,7 @@ use super::{
     cardano::{cip19_shelley_address::Cip19ShelleyAddress, nonce::Nonce},
     common::types::generic::error_msg::ErrorMessage,
     response::{
-        AllRegistration, Cip36Details, Cip36Registration, Cip36RegistrationList,
+        Cip36Details, Cip36Registration, Cip36RegistrationList,
         Cip36RegistrationsForVotingPublicKey,
     },
     Ed25519HexEncodedPublicKey, SlotNo,
@@ -43,9 +39,9 @@ use crate::{
     },
 };
 
-/// Get registration given a stake address, it can be time specific based on asat param,
+/// Get registrations given a stake address, it can be time specific based on asat param,
 /// or the latest registration returned if no asat given.
-pub(crate) async fn get_registration_given_stake_addr(
+pub(crate) async fn get_registrations_given_stake_addr(
     stake_address: StakeAddress, session: Arc<CassandraSession>, asat: Option<SlotNo>,
     page: common::types::generic::query::pagination::Page,
     limit: common::types::generic::query::pagination::Limit,
@@ -61,9 +57,11 @@ pub(crate) async fn get_registration_given_stake_addr(
     })?;
 
     let row_stake_pk = match stake_pk_iter.next().await {
-        Some(result) => result.map_err(|err| {
-            anyhow::anyhow!("Failed to query stake public key from stake address {err:?}")
-        })?,
+        Some(result) => {
+            result.map_err(|err| {
+                anyhow::anyhow!("Failed to query stake public key from stake address {err:?}")
+            })?
+        },
 
         None => return Ok(Cip36Registration::NotFound),
     };
@@ -71,7 +69,7 @@ pub(crate) async fn get_registration_given_stake_addr(
     // Verify that there is 1:1 stake address to stake public key.
     if stake_pk_iter.next().await.is_some() {
         return Err(anyhow::anyhow!(
-            "Multiple stake public keys found for address."
+            "Multiple stake public keys found for stake address."
         ));
     }
 
@@ -89,7 +87,6 @@ pub(crate) async fn get_registration_given_stake_addr(
     // Apply time (asat) filter if specified
     let registrations = if let Some(slot_no) = asat {
         get_registrations_given_slot_no(stake_pk_registrations, &slot_no)
-            .map_err(|err| anyhow::anyhow!("Failed to get registrations given slot no {err:?}"))?
     } else {
         // If no time is specified, return the original registrations
         stake_pk_registrations
@@ -97,7 +94,7 @@ pub(crate) async fn get_registration_given_stake_addr(
 
     // Sort the registrations into valid/invalid registrations, there should be only 1 valid
     // registration which is the latest one.
-    let (valid_reg, mut invalid_regs) = sort_registration(registrations)
+    let (valid_reg, mut invalid_regs) = sort_registrations(registrations)
         .map_err(|err| anyhow::anyhow!("Failed to sort registrations {err:?}"))?;
 
     // This is needed since the registration can be latest (no asat)
@@ -121,20 +118,27 @@ pub(crate) async fn get_registration_given_stake_addr(
             )
         })?;
 
+    // Combine the invalid registrations
     invalid_regs.extend(invalids);
 
     // Paginate results
-    let (valid_regs, invalid_regs, remaining) =
-        paginate_registrations(&[valid_reg], &invalid_regs, page.into(), limit.into());
+    let (valid_regs, invalid_regs, remaining) = paginate_registrations(
+        [Cip36RegistrationsForVotingPublicKey {
+            vote_pub_key,
+            registrations: [valid_reg].to_vec().into(),
+        }]
+        .to_vec(),
+        &invalid_regs,
+        // Only 1 valid registration.
+        1 + invalid_regs.len() as u32,
+        page.into(),
+        limit.into(),
+    );
 
     return Ok(Cip36Registration::Ok(poem_openapi::payload::Json(
         Cip36RegistrationList {
             slot: slot_no,
-            voting_key: vec![Cip36RegistrationsForVotingPublicKey {
-                vote_pub_key,
-                registrations: valid_regs.into(),
-            }]
-            .into(),
+            voting_key: valid_regs.into(),
             invalid: invalid_regs.into(),
             page: Some(
                 CurrentPage {
@@ -173,12 +177,9 @@ fn cross_reference_key(
 async fn get_all_registrations_from_stake_pub_key(
     session: &Arc<CassandraSession>, stake_pub_key: Ed25519HexEncodedPublicKey,
 ) -> Result<Vec<Cip36Details>, anyhow::Error> {
-    let mut registrations_iter = GetRegistrationQuery::execute(
-        session,
-        GetRegistrationParams {
-            stake_public_key: stake_pub_key.clone().try_into()?,
-        },
-    )
+    let mut registrations_iter = GetRegistrationQuery::execute(session, GetRegistrationParams {
+        stake_public_key: stake_pub_key.clone().try_into()?,
+    })
     .await?;
     let mut registrations = Vec::new();
     while let Some(row) = registrations_iter.next().await {
@@ -243,11 +244,11 @@ async fn get_all_registrations_from_stake_pub_key(
     Ok(registrations)
 }
 
-/// Sort registrations for a given stake address by slot number, nonce, and
-/// transaction offset. If `slot_no` is the same, the registration with the highest
-/// `nonce` wins. If `nonce` is the same, the registration with the highest `txn_offset`
-/// wins. Return the valid registration and the rest as invalid.
-fn sort_registration(
+/// Sort registrations by slot number, nonce, and transaction offset.
+/// If `slot_no` is the same, the registration with the highest `nonce` wins.
+/// If `nonce` is the same, the registration with the highest `txn_offset` wins.
+/// The latest one is considered the only valid registration. The rest are invalid.
+fn sort_registrations(
     mut registrations: Vec<Cip36Details>,
 ) -> anyhow::Result<(Cip36Details, Vec<Cip36Details>)> {
     // Sort registrations by slot_no, nonce, and txn_offset in descending order
@@ -272,7 +273,7 @@ fn sort_registration(
 
     let valid_reg = registrations
         .first()
-        .ok_or_else(|| anyhow::anyhow!("Can't sort registrations: no registrations found"))?;
+        .ok_or_else(|| anyhow::anyhow!("No registrations found"))?;
 
     // The rest are invalid registrations
     let invalid_registrations = registrations[1..].to_vec();
@@ -283,18 +284,11 @@ fn sort_registration(
 /// Get registration given slot#
 fn get_registrations_given_slot_no(
     registrations: Vec<Cip36Details>, slot_no: &SlotNo,
-) -> anyhow::Result<Vec<Cip36Details>> {
-    // Possible to have multiple registrations for a given slot#?.
-    let r: Vec<_> = registrations
+) -> Vec<Cip36Details> {
+    registrations
         .into_iter()
         .filter(|registration| registration.slot_no == *slot_no)
-        .collect();
-
-    if r.is_empty() {
-        Err(anyhow::anyhow!("Unable to get registrations given slot no"))
-    } else {
-        Ok(r)
-    }
+        .collect()
 }
 
 /// Get invalid registrations for stake addr after given slot#
@@ -337,9 +331,9 @@ async fn get_invalid_registrations(
     Ok(invalid_registrations)
 }
 
-/// Get registration given a vote key, time specific based on asat param,
+/// Get registrations given a vote key, time specific based on asat param,
 /// or latest registration returned if no asat given.
-pub(crate) async fn get_registration_given_vote_key(
+pub(crate) async fn get_registrations_given_vote_key(
     vote_key: Ed25519HexEncodedPublicKey, session: Arc<CassandraSession>, asat: Option<SlotNo>,
     page: common::types::generic::query::pagination::Page,
     limit: common::types::generic::query::pagination::Limit,
@@ -376,17 +370,16 @@ pub(crate) async fn get_registration_given_vote_key(
         return Ok(Cip36Registration::NotFound);
     }
 
-    // Should return multiple valid registration because voting key can have multiple current
-    // stake address registered
     // Store stake pk as a key and list of registrations as a value
-    let mut stake_pks_with_regs = HashMap::new();
-    // Get all registrations from given stake pub keys.
+    let mut stake_pks_with_regs = BTreeMap::new();
     for stake_pk in stake_pks {
         let mut stake_pk_registrations =
             get_all_registrations_from_stake_pub_key(&session.clone(), stake_pk.clone())
                 .await
                 .map_err(|err| {
-                    anyhow::anyhow!("Failed to query registration from stake public key {err:?}",)
+                    anyhow::anyhow!(
+                        "Failed to query registration from stake public key {stake_pk:?}: {err:?}",
+                    )
                 })?;
 
         stake_pk_registrations =
@@ -394,28 +387,29 @@ pub(crate) async fn get_registration_given_vote_key(
         stake_pks_with_regs.insert(stake_pk, stake_pk_registrations);
     }
 
-    if let Some(slot_no) = asat {
+    let mut slot_no = if let Some(slot_no) = asat {
         for (_, regs) in stake_pks_with_regs.iter_mut() {
-            // Get the registrations associated with the given asat
-            *regs = get_registrations_given_slot_no(regs.clone(), &slot_no).map_err(|err| {
-                anyhow::anyhow!("Failed to get registrations given slot no {err:?}",)
-            })?;
+            *regs = get_registrations_given_slot_no(regs.clone(), &slot_no);
         }
+        Some(slot_no)
+    } else {
+        None
     };
 
-    // This is needed in case where asat is not provided, so we need to look up the reg slot
-    // number
-    let mut slot_no = None;
     let mut valid_regs = Vec::new();
     let mut invalid_regs = Vec::new();
     for (_, regs) in stake_pks_with_regs.iter() {
         // Sort each registration for each stake public key
-        let (valid_reg, invalid_reg) = sort_registration(regs.clone())
+        let (valid_reg, invalid_reg) = sort_registrations(regs.clone())
             .map_err(|err| anyhow::anyhow!("Failed to sort latest registration {err:?}",))?;
+
+        // Update the latest valid slot
+        if valid_reg.slot_no > slot_no.unwrap_or_default() {
+            slot_no = Some(valid_reg.slot_no);
+        }
 
         valid_regs.push(valid_reg.clone());
         invalid_regs.extend(invalid_reg);
-        slot_no = Some(valid_reg.slot_no);
     }
 
     for (stake_pk, _) in stake_pks_with_regs.iter() {
@@ -423,24 +417,29 @@ pub(crate) async fn get_registration_given_vote_key(
             .await
             .map_err(|err| {
                 anyhow::anyhow!(
-                    "Failed to obtain invalid registrations for given stake pub key {err:?}",
+                    "Failed to obtain invalid registrations for given stake pub key {stake_pk:?}: {err:?}",
                 )
             })?;
 
         invalid_regs.extend(invalids);
     }
 
-    let (valid_regs, invalid_regs, remaining) =
-        paginate_registrations(&valid_regs, &invalid_regs, page.into(), limit.into());
+    let (valid_regs, invalid_regs, remaining) = paginate_registrations(
+        [Cip36RegistrationsForVotingPublicKey {
+            vote_pub_key: vote_key,
+            registrations: valid_regs.clone().into(),
+        }]
+        .to_vec(),
+        &invalid_regs,
+        (valid_regs.len() + invalid_regs.len()) as u32,
+        page.into(),
+        limit.into(),
+    );
 
     Ok(Cip36Registration::Ok(poem_openapi::payload::Json(
         Cip36RegistrationList {
             slot: slot_no.unwrap_or_default(),
-            voting_key: vec![Cip36RegistrationsForVotingPublicKey {
-                vote_pub_key: vote_key,
-                registrations: valid_regs.into(),
-            }]
-            .into(),
+            voting_key: valid_regs.into(),
             invalid: invalid_regs.into(),
             page: Some(
                 CurrentPage {
@@ -455,7 +454,11 @@ pub(crate) async fn get_registration_given_vote_key(
 }
 
 /// Get all registrations or constrain if slot# given.
-pub async fn snapshot(session: Arc<CassandraSession>, slot_no: Option<SlotNo>) -> AllRegistration {
+pub async fn snapshot(
+    session: Arc<CassandraSession>, asat: Option<SlotNo>,
+    page: common::types::generic::query::pagination::Page,
+    limit: common::types::generic::query::pagination::Limit,
+) -> anyhow::Result<Cip36Registration> {
     let valid_invalid_queries = future::join(
         get_all_registrations(session.clone()),
         get_all_invalid_registrations(session.clone()),
@@ -467,7 +470,7 @@ pub async fn snapshot(session: Arc<CassandraSession>, slot_no: Option<SlotNo>) -
     let all_registrations = match valid_registrations {
         Ok(all_registrations) => all_registrations,
         Err(err) => {
-            return AllRegistration::handle_error(&anyhow::anyhow!("Failed to query ALL {err:?}",));
+            return Err(anyhow::anyhow!("Failed to query ALL {err:?}"));
         },
     };
 
@@ -475,42 +478,53 @@ pub async fn snapshot(session: Arc<CassandraSession>, slot_no: Option<SlotNo>) -
     let all_invalid_registrations = match invalid_registrations {
         Ok(invalids) => invalids,
         Err(err) => {
-            return AllRegistration::handle_error(&anyhow::anyhow!("Failed to query ALL {err:?}",));
+            return Err(anyhow::anyhow!("Failed to query ALL {err:?}"));
         },
     };
 
     let mut all_registrations_after_filtering = Vec::new();
     let mut all_invalids_after_filtering = Vec::new();
+    let mut total_regs = 0;
 
-    // Map of key vote pub key -> to registrations
-    // Order does matter since we are going to paginate
-    let map = BTreeMap::new();
+    let mut slot_no = asat;
+
+    let mut vote_key_regs_map = BTreeMap::new();
     for (stake_public_key, registrations) in all_registrations {
-        let filtered_registrations = if let Some(slot_no) = slot_no {
-            slot_filter(registrations, slot_no)
+        let filtered_registrations = if let Some(slot_no) = asat {
+            get_registrations_given_slot_no(registrations, &slot_no)
         } else {
             registrations
         };
 
+        // It is okay for the stake pk to not have registrations (eg. no reg at asat)
         if filtered_registrations.is_empty() {
             continue;
         }
 
-        let (valid_reg, mut invalid_regs) = match sort_registration(filtered_registrations.clone())
+        let (valid_reg, mut invalid_regs) = match sort_registrations(filtered_registrations.clone())
         {
             Ok((valid, invalid)) => (valid, invalid),
             Err(err) => {
-                error!("Snapshot: Failed to sort registration{:?}", err);
+                error!(
+                    "Snapshot: Failed to sort registration of {stake_public_key:?}: {:?}",
+                    err
+                );
                 continue;
             },
         };
+
+        // Update the latest valid slot
+        if valid_reg.slot_no > slot_no.unwrap_or_default() {
+            slot_no = Some(valid_reg.slot_no);
+        }
 
         let vote_pub_key = valid_reg
             .clone()
             .vote_pub_key
             .ok_or_else(|| anyhow::anyhow!("Vote key not in registration"))?;
 
-        map.entry(vote_pub_key.clone())
+        vote_key_regs_map
+            .entry(vote_pub_key.clone())
             .or_insert(vec![])
             .push(valid_reg.clone());
 
@@ -520,36 +534,50 @@ pub async fn snapshot(session: Arc<CassandraSession>, slot_no: Option<SlotNo>) -
             None => vec![],
         };
 
-        invalid_registrations.extend(invalid_regs);
+        invalid_regs.extend(invalid_registrations);
 
-        if let Some(ref slot_no) = slot_no {
+        if let Some(ref slot_no) = asat {
             // include any erroneous registrations which occur AFTER the slot# of the last valid
             // registration or return all if NO slot# declared.
             // Any registrations that occurred before this Slot are not included in the list.
-            let invalids_report_after_filtering = invalid_filter(invalid_registrations, *slot_no);
-            all_invalids_after_filtering.push(invalids_report_after_filtering);
+            let invalids_report_after_filtering = invalid_filter(invalid_regs, *slot_no);
+            all_invalids_after_filtering.extend(invalids_report_after_filtering);
         } else {
-            all_invalids_after_filtering.push(invalid_registrations);
+            all_invalids_after_filtering.extend(invalid_regs);
         }
     }
 
-    for (vote_pub_key, registrations) in map {
+    for (vote_pub_key, registrations) in vote_key_regs_map {
         all_registrations_after_filtering.push(Cip36RegistrationsForVotingPublicKey {
             vote_pub_key,
-            registrations,
+            registrations: registrations.clone().into(),
         });
+        total_regs += registrations.len();
     }
 
-    AllRegistration::With(Cip36Registration::Ok(poem_openapi::payload::Json(
+    total_regs += all_invalid_registrations.len();
+
+    let (valid_regs, invalid_regs, remaining) = paginate_registrations(
+        all_registrations_after_filtering,
+        &all_invalids_after_filtering,
+        total_regs as u32,
+        limit.into(),
+        page.into(),
+    );
+
+    Ok(Cip36Registration::Ok(poem_openapi::payload::Json(
         Cip36RegistrationList {
             slot: slot_no.unwrap_or_default(),
-            voting_key: all_registrations_after_filtering.into(),
-            invalid: all_invalids_after_filtering
-                .into_par_iter()
-                .flatten()
-                .collect::<Vec<_>>()
+            voting_key: valid_regs.into(),
+            invalid: invalid_regs.into(),
+            page: Some(
+                CurrentPage {
+                    page,
+                    limit,
+                    remaining,
+                }
                 .into(),
-            page: None,
+            ),
         },
     )))
 }
@@ -704,31 +732,6 @@ async fn get_all_invalid_registrations(
     Ok(invalids_map)
 }
 
-/// Filter out any registrations that occurred after this Slot no
-fn slot_filter(registrations: Vec<Cip36Details>, slot_no: SlotNo) -> Vec<Cip36Details> {
-    registrations
-        .into_par_iter()
-        .filter(|registration| registration.slot_no < slot_no)
-        .collect()
-}
-
-/// Stake addr may have multiple registrations and multiple vote key associations, filter
-/// out latest vote key.
-fn latest_vote_key(
-    mut registrations: Vec<Cip36Details>,
-) -> anyhow::Result<Ed25519HexEncodedPublicKey> {
-    registrations.sort_by_key(|registration| Reverse(registration.slot_no));
-    for registration in registrations {
-        if let Some(vote_key) = registration.vote_pub_key {
-            return Ok(vote_key);
-        }
-    }
-
-    Err(anyhow::anyhow!(
-        "No vote keys associated with any registration"
-    ))
-}
-
 /// Filter out any invalid registrations that occurred before this Slot no
 fn invalid_filter(registrations: Vec<Cip36Details>, slot_no: SlotNo) -> Vec<Cip36Details> {
     registrations
@@ -739,33 +742,60 @@ fn invalid_filter(registrations: Vec<Cip36Details>, slot_no: SlotNo) -> Vec<Cip3
 
 /// Paginate the registrations.
 fn paginate_registrations(
-    valid: &[Cip36Details], invalid: &[Cip36Details], page: u32, limit: u32,
-) -> (Vec<Cip36Details>, Vec<Cip36Details>, Remaining) {
-    let start_index: usize = page.saturating_mul(limit).try_into().unwrap_or_default();
+    valid: Vec<Cip36RegistrationsForVotingPublicKey>, invalid: &[Cip36Details], total_reg: u32,
+    page: u32, limit: u32,
+) -> (
+    Vec<Cip36RegistrationsForVotingPublicKey>,
+    Vec<Cip36Details>,
+    Remaining,
+) {
+    let mut start_index: usize = page.saturating_mul(limit).try_into().unwrap_or_default();
 
     // Paginate the valid list first
-    let valid_to_show = valid
-        .iter()
-        .skip(start_index)
-        .take(limit.try_into().unwrap_or_default())
-        .cloned()
-        .collect::<Vec<_>>();
+    let mut valid_to_show = Vec::new();
+    let mut remaining_limit = limit;
+    let mut total_valid = 0;
+    // Iterate through each vote_key's registrations in valid
+    for cip36_reg in valid.iter() {
+        let registrations = &cip36_reg.registrations;
+        let total_regs = registrations.len();
+
+        // If we haven't reached the start index yet, skip this set
+        if start_index >= total_regs {
+            continue;
+        }
+
+        // Calculate how many registrations we can take from this vote_key
+        let available = total_regs.saturating_sub(start_index);
+        let take_count = std::cmp::min(available, remaining_limit as usize);
+
+        let registrations = registrations[start_index..start_index + take_count].to_vec();
+
+        total_valid += registrations.len();
+
+        // Add the sliced valid registrations to the result
+        valid_to_show.push(Cip36RegistrationsForVotingPublicKey {
+            vote_pub_key: cip36_reg.vote_pub_key.clone(),
+            registrations: registrations.into(),
+        });
+
+        remaining_limit = remaining_limit.saturating_sub(take_count as u32);
+        if remaining_limit == 0 {
+            break; // No space left for more valid registrations
+        }
+
+        // Reset start index after the first set
+        start_index = 0;
+    }
 
     // Calculate how many invalid items to show, if there's space remaining
-    let remaining_space = limit.saturating_sub(valid_to_show.len().try_into().unwrap_or_default());
     let invalid_to_show = invalid
         .iter()
-        .take(remaining_space.try_into().unwrap_or_default())
+        .take(remaining_limit.try_into().unwrap_or_default())
         .cloned()
         .collect::<Vec<_>>();
 
-    let total_reg: u32 = valid
-        .len()
-        .saturating_add(invalid.len())
-        .try_into()
-        .unwrap_or_default();
-    let reg_count: u32 = valid_to_show
-        .len()
+    let reg_count: u32 = total_valid
         .saturating_add(invalid_to_show.len())
         .try_into()
         .unwrap_or_default();

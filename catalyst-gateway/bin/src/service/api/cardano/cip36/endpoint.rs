@@ -6,7 +6,7 @@ use tracing::error;
 use self::cardano::query::stake_or_voter::StakeAddressOrPublicKey;
 use super::{
     cardano::{self},
-    filter::{get_registration_given_stake_addr, get_registration_given_vote_key, snapshot},
+    filter::{get_registrations_given_stake_addr, get_registrations_given_vote_key, snapshot},
     response, SlotNo,
 };
 use crate::{
@@ -50,7 +50,8 @@ pub(crate) async fn cip36_registrations(
                     },
                 };
 
-                match get_registration_given_stake_addr(address, session, asat, page, limit).await {
+                match get_registrations_given_stake_addr(address, session, asat, page, limit).await
+                {
                     Ok(reg) => AllRegistration::With(reg),
                     Err(err) => {
                         return AllRegistration::handle_error(&err);
@@ -60,7 +61,7 @@ pub(crate) async fn cip36_registrations(
             StakeAddressOrPublicKey::PublicKey(ed25519_hex_encoded_public_key) => {
                 // As above...
                 // Except using a voting key.
-                match get_registration_given_vote_key(
+                match get_registrations_given_vote_key(
                     ed25519_hex_encoded_public_key,
                     session,
                     asat,
@@ -80,7 +81,12 @@ pub(crate) async fn cip36_registrations(
             // Snapshot replacement, returns all registrations or returns a
             // subset of registrations if constrained by a given time.
             {
-                return snapshot(session, asat).await
+                match snapshot(session, asat, page, limit).await {
+                    Ok(reg) => AllRegistration::With(reg),
+                    Err(err) => {
+                        return AllRegistration::handle_error(&err);
+                    },
+                }
             },
         };
     };
