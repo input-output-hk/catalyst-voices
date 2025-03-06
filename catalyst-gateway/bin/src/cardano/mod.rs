@@ -182,7 +182,6 @@ impl SyncParams {
     }
 
     /// Convert Params into the result of the sync.
-    #[allow(clippy::too_many_arguments)]
     fn done(
         &self, first: Option<Point>, first_immutable: bool, last: Option<Point>,
         last_immutable: bool, synced: u64, result: anyhow::Result<()>,
