@@ -4,21 +4,30 @@ import 'package:catalyst_voices/routes/routes.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:patrol_finders/patrol_finders.dart';
+import 'package:url_launcher_platform_interface/url_launcher_platform_interface.dart';
 
 import '../pageobject/proposals_page.dart';
+import '../utils/mockUrlLauncher.dart';
 import '../utils/translations_utils.dart';
 
 void main() async {
   late final GoRouter router;
+  late MockUrlLauncher mockUrlLauncher;
 
   setUpAll(() async {
     router = buildAppRouter();
+    registerFallbackValue(
+      FakeLaunchOptions(),
+    ); // Register the fake for LaunchOptions
   });
 
   setUp(() async {
     await registerDependencies(config: const AppConfig());
     router.go(const ProposalsRoute().location);
+    mockUrlLauncher = MockUrlLauncher();
+    UrlLauncherPlatform.instance = mockUrlLauncher;
   });
 
   tearDown(() async {
@@ -148,7 +157,7 @@ void main() async {
     'visitor - share modal close button works',
     (PatrolTester $) async {
       await $.pumpWidgetAndSettle(App(routerConfig: router));
-      await ProposalsPage($).tmp1();
+      await ProposalsPage($).tmp1(mockUrlLauncher);
     },
   );
 }

@@ -366,10 +366,18 @@ class ProposalsPage {
     expect($(shareProposalDialog).$(closeButton), findsNothing);
   }
 
-  Future<void> tmp1() async {
-    final mockUrlLauncher = MockUrlLauncher();
-    UrlLauncherPlatform.instance = mockUrlLauncher;
+  Future<void> tmp1(MockUrlLauncher mockUrlLauncher) async {
+    final testUrl = Uri.parse('https://example.com');
 
+    // Stub method to return true
+    when(
+      () => mockUrlLauncher.launchUrl(
+        '',
+        const LaunchOptions(),
+      ),
+    ).thenAnswer((invocation) => Future.value(true));
+
+    // Call the actual launch function
     await $(proposalsContainer)
         .$(MostRecentSection($).proposalCard)
         .at(0)
@@ -379,18 +387,27 @@ class ProposalsPage {
 
     print('^type: ${mockUrlLauncher.runtimeType}');
 
+    // Validate
+    // expect(result, isTrue);
     verify(
-      () => mockUrlLauncher.launch(
-        'https://www.example.com',
-        useSafariVC: false,
-        useWebView: false,
-        universalLinksOnly: false,
-        // webViewConfiguration: any(named: 'webViewConfiguration'),
-        enableJavaScript: false,
-        enableDomStorage: false,
-        headers: {},
+      () => mockUrlLauncher.launchUrl(
+        testUrl.toString(),
+        any<LaunchOptions>(),
       ),
     ).called(1);
+
+    // verify(
+    //   () => mockUrlLauncher.launch(
+    //     'https://www.example.com',
+    //     useSafariVC: false,
+    //     useWebView: false,
+    //     universalLinksOnly: false,
+    //     // webViewConfiguration: any(named: 'webViewConfiguration'),
+    //     enableJavaScript: false,
+    //     enableDomStorage: false,
+    //     headers: {},
+    //   ),
+    // ).called(1);
 
     // expect(
     //     await mockUrlLauncher.launch(
