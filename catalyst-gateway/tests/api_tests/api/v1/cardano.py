@@ -6,10 +6,9 @@ URL = cat_gateway_endpoint_url("api/v1/cardano")
 
 # Signed document GET
 def assets(stake_address: str, slot_no: int, network: str):
-    document_url = f"{URL}/assets/{stake_address}"
+    document_url = f"{URL}/assets/{stake_address}?asat=SLOT:{slot_no}&network={network}"
     headers = {
         "Authorization": f"Bearer {BEARER_TOKEN}",
         "Content-Type": "application/json",
     }
-    params = {"asat": f"SLOT:{slot_no}", "network": network}
-    return requests.get(document_url, headers=headers, json=params)
+    return requests.get(document_url, headers=headers)
