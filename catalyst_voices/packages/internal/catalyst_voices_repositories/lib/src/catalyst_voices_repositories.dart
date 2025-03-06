@@ -2,6 +2,7 @@ export 'api/api.dart';
 export 'campaign/campaign_repository.dart' show CampaignRepository;
 export 'config/config_repository.dart' show ConfigRepository;
 export 'database/database.dart';
+export 'document/constants.dart';
 export 'document/document_mapper.dart' show DocumentMapperImpl;
 export 'document/document_repository.dart' show DocumentRepository;
 export 'document/exception/document_data_local_source_exception.dart';

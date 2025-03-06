@@ -111,6 +111,7 @@ final class Dependencies extends DependencyProvider {
       ..registerFactory<DiscoveryCubit>(() {
         return DiscoveryCubit(
           get<CampaignService>(),
+          get<ProposalService>(),
         );
       })
       ..registerFactory<CategoryDetailCubit>(() {
@@ -148,13 +149,14 @@ final class Dependencies extends DependencyProvider {
           get<CatalystDatabase>(),
         );
       })
-      ..registerLazySingleton<DocumentDataLocalSource>(() {
+      ..registerLazySingleton<SignedDocumentDataSource>(() {
         return DatabaseDocumentsDataSource(
           get<CatalystDatabase>(),
         );
       })
       ..registerLazySingleton<CatGatewayDocumentDataSource>(() {
         return CatGatewayDocumentDataSource(
+          get<ApiServices>(),
           get<SignedDocumentManager>(),
         );
       })
@@ -167,7 +169,7 @@ final class Dependencies extends DependencyProvider {
       ..registerLazySingleton<DocumentRepository>(() {
         return DocumentRepository(
           get<DatabaseDraftsDataSource>(),
-          get<DocumentDataLocalSource>(),
+          get<SignedDocumentDataSource>(),
           get<CatGatewayDocumentDataSource>(),
         );
       })
@@ -224,6 +226,11 @@ final class Dependencies extends DependencyProvider {
         get<ConfigRepository>(),
       );
     });
+    registerLazySingleton<DocumentsService>(() {
+      return DocumentsService(
+        get<DocumentRepository>(),
+      );
+    });
   }
 
   void _registerStorages() {
@@ -247,6 +254,14 @@ final class Dependencies extends DependencyProvider {
 
   void _registerUtils() {
     registerLazySingleton<SignedDocumentManager>(SignedDocumentManager.new);
+    registerLazySingleton<SyncManager>(
+      () {
+        return SyncManager(
+          get<DocumentsService>(),
+        );
+      },
+      dispose: (manager) async => manager.dispose(),
+    );
     registerLazySingleton<UserObserver>(
       StreamUserObserver.new,
       dispose: (observer) async => observer.dispose(),

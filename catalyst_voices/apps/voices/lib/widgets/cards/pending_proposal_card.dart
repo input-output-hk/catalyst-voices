@@ -1,4 +1,5 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
+import 'package:catalyst_voices/common/formatters/date_formatter.dart';
 import 'package:catalyst_voices/routes/routing/proposal_builder_route.dart';
 import 'package:catalyst_voices/widgets/cards/proposal_card_widgets.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/share_proposal_dialog.dart';
@@ -314,7 +315,7 @@ final class _ProposalBorderColor extends WidgetStateColor {
 class _ProposalInfo extends StatelessWidget {
   final ProposalPublish proposalStage;
   final int version;
-  final DateTime lastUpdate;
+  final DateTime? lastUpdate;
   final int commentsCount;
   final bool showLastUpdate;
 
@@ -337,10 +338,13 @@ class _ProposalInfo extends StatelessWidget {
           const FinalProposalChip(),
         const SizedBox(width: 4),
         ProposalVersionChip(version: version.toString()),
-        if (showLastUpdate) ...[
+        if (showLastUpdate && lastUpdate != null) ...[
           const SizedBox(width: 4),
-          DayMonthTimeTextWithTooltip(
-            datetime: lastUpdate,
+          VoicesPlainTooltip(
+            message: _tooltipMessage(context),
+            child: DayMonthTimeText(
+              dateTime: lastUpdate!,
+            ),
           ),
         ],
         const Spacer(),
@@ -349,6 +353,16 @@ class _ProposalInfo extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  String _tooltipMessage(BuildContext context) {
+    if (lastUpdate == null) {
+      return '';
+    }
+    final dt =
+        DateFormatter.formatDateTimeParts(lastUpdate!, includeYear: true);
+
+    return context.l10n.publishedOn(dt.date, dt.time);
   }
 }
 
@@ -402,6 +416,7 @@ class _Topbar extends StatelessWidget {
           FavoriteButton(
             key: const Key('FavoriteBtn'),
             circle: false,
+            isFavorite: isFavorite,
             onChanged: onFavoriteChanged,
           ),
         ],
