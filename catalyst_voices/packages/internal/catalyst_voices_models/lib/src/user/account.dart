@@ -93,7 +93,7 @@ final class Account extends Equatable {
     );
   }
 
-  bool get isAdmin => true;
+  bool get isAdmin => false;
 
   bool get isDummy => keychain.id == dummyKeychainId;
 
