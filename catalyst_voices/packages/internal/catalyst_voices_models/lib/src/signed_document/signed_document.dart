@@ -82,7 +82,7 @@ final class SignedDocumentMetadata extends Equatable {
   /// A reference to the campaign targeted by the document.
   final SignedDocumentMetadataRef? campaignId;
 
-  /// A reference to the campaign targeted by the document.
+  /// A reference to the election (fund) targeted by the document.
   final String? electionId;
 
   /// A reference to the category targeted by the document.

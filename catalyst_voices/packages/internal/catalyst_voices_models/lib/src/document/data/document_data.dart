@@ -9,7 +9,7 @@ import 'package:equatable/equatable.dart';
 /// For example one [Document] of [DocumentType.proposalDocument] require
 /// document itself and template which is different document.
 ///
-/// [DocumentData] can be created from SignedDocument which comes from
+/// [DocumentData] can be created from [SignedDocument] which comes from
 /// backend or locally as work in progress.
 final class DocumentData extends Equatable {
   final DocumentDataMetadata metadata;
