@@ -4,6 +4,7 @@ import 'dart:async';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:uuid/uuid.dart';
@@ -11,14 +12,20 @@ import 'package:uuid/uuid.dart';
 void main() {
   late MockDocumentRepository mockDocumentRepository;
   late MockProposalRepository mockProposalRepository;
+  late MockSignedDocumentManager mockSignedDocumentManager;
+
   late ProposalService proposalService;
 
   setUp(() {
     mockDocumentRepository = MockDocumentRepository();
     mockProposalRepository = MockProposalRepository();
+    mockSignedDocumentManager = MockSignedDocumentManager();
 
-    proposalService =
-        ProposalService(mockProposalRepository, mockDocumentRepository);
+    proposalService = ProposalService(
+      mockProposalRepository,
+      mockDocumentRepository,
+      mockSignedDocumentManager,
+    );
 
     registerFallbackValue(const SignedDocumentRef(id: 'fallback-id'));
 
@@ -212,3 +219,5 @@ void main() {
 class MockDocumentRepository extends Mock implements DocumentRepository {}
 
 class MockProposalRepository extends Mock implements ProposalRepository {}
+
+class MockSignedDocumentManager extends Mock implements SignedDocumentManager {}

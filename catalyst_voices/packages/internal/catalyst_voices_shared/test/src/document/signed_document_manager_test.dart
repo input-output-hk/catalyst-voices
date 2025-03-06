@@ -32,6 +32,7 @@ void main() {
 
       final signedDocument = await documentManager.signDocument(
         document,
+        metadata: _metadata,
         publicKey: _publicKey,
         privateKey: _privateKey,
       );
@@ -52,9 +53,10 @@ void main() {
   });
 }
 
+const _metadata = SignedDocumentMetadata(contentType: DocumentContentType.json);
+
 final _privateKey = Uint8List.fromList(List.filled(32, 0));
 final _publicKey = Uint8List.fromList(List.filled(32, 1));
-
 final _signature = Uint8List.fromList(List.filled(32, 2));
 
 class _FakeBip32Ed22519XPrivateKey extends Fake
@@ -154,9 +156,6 @@ final class _JsonDocument extends Equatable implements SignedDocumentPayload {
   factory _JsonDocument.fromJson(Map<String, dynamic> map) {
     return _JsonDocument(map['title'] as String);
   }
-
-  @override
-  DocumentContentType get contentType => DocumentContentType.json;
 
   @override
   List<Object?> get props => [title];

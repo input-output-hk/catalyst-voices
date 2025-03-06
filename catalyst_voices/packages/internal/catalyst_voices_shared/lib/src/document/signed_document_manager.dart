@@ -1,3 +1,5 @@
+// ignore_for_file: one_member_abstracts
+
 import 'package:catalyst_compression/catalyst_compression.dart';
 import 'package:catalyst_cose/catalyst_cose.dart';
 import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
@@ -17,6 +19,32 @@ typedef SignedDocumentPayloadParser<T extends SignedDocumentPayload> = T
     Function(
   Uint8List bytes,
 );
+
+/// Defines the content type of the [SignedDocumentPayload].
+enum DocumentContentType {
+  /// The document's content type is JSON.
+  json,
+}
+
+/// Represents an abstract document that is protected
+/// with cryptographic signature.
+///
+/// The [payload] can be UTF-8 encoded bytes, a binary data
+/// or anything else that can be represented in binary format.
+abstract interface class SignedDocument<T extends SignedDocumentPayload> {
+  /// The default constructor for the [SignedDocument].
+  const SignedDocument();
+
+  /// A getter that returns a parsed document payload.
+  T get payload;
+
+  /// Converts the document into binary representation.
+  Uint8List toBytes();
+
+  /// Verifies if the [payload] has been signed by a private key
+  /// that belongs to the given [publicKey].
+  Future<bool> verifySignature(Uint8List publicKey);
+}
 
 /// Manages the [SignedDocument]s.
 abstract interface class SignedDocumentManager {
@@ -42,29 +70,22 @@ abstract interface class SignedDocumentManager {
   /// so that it's easier to identify who signed it.
   Future<SignedDocument<T>> signDocument<T extends SignedDocumentPayload>(
     T document, {
+    required SignedDocumentMetadata metadata,
     required Uint8List publicKey,
     required Uint8List privateKey,
   });
 }
 
-/// Represents an abstract document that is protected
-/// with cryptographic signature.
-///
-/// The [payload] can be UTF-8 encoded bytes, a binary data
-/// or anything else that can be represented in binary format.
-abstract interface class SignedDocument<T extends SignedDocumentPayload> {
-  /// The default constructor for the [SignedDocument].
-  const SignedDocument();
+final class SignedDocumentMetadata extends Equatable {
+  /// Returns the document content type.
+  final DocumentContentType contentType;
 
-  /// A getter that returns a parsed document payload.
-  T get payload;
+  const SignedDocumentMetadata({
+    required this.contentType,
+  });
 
-  /// Verifies if the [payload] has been signed by a private key
-  /// that belongs to the given [publicKey].
-  Future<bool> verifySignature(Uint8List publicKey);
-
-  /// Converts the document into binary representation.
-  Uint8List toBytes();
+  @override
+  List<Object?> get props => [contentType];
 }
 
 /// Represents an abstract document that can be represented in binary format.
@@ -73,13 +94,4 @@ abstract interface class SignedDocumentPayload {
   ///
   /// See [SignedDocumentPayloadParser].
   Uint8List toBytes();
-
-  /// Returns the document content type.
-  DocumentContentType get contentType;
-}
-
-/// Defines the content type of the [SignedDocumentPayload].
-enum DocumentContentType {
-  /// The document's content type is JSON.
-  json,
 }

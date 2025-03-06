@@ -17,10 +17,7 @@ final class SignedDocumentJsonPayload extends Equatable
   }
 
   @override
-  DocumentContentType get contentType => DocumentContentType.json;
-
-  @override
-  List<Object?> get props => [data, contentType];
+  List<Object?> get props => [data];
 
   @override
   Uint8List toBytes() => Uint8List.fromList(json.fuse(utf8).encode(data));

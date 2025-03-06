@@ -90,6 +90,12 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
   Future<List<SignedDocumentRef>> index() async {
     return [];
   }
+
+  @override
+  Future<void> upload(SignedDocument document) async {
+    final bytes = document.toBytes();
+    await _api.gateway.apiV1DocumentPut(body: bytes);
+  }
 }
 
 abstract interface class DocumentDataRemoteSource
@@ -98,4 +104,6 @@ abstract interface class DocumentDataRemoteSource
 
   @override
   Future<List<SignedDocumentRef>> index();
+
+  Future<void> upload(SignedDocument document);
 }

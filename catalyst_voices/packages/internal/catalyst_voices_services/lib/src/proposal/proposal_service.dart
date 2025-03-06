@@ -2,12 +2,16 @@ import 'dart:typed_data';
 
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:rxdart/rxdart.dart';
+
+class Equatable {}
 
 abstract interface class ProposalService {
   const factory ProposalService(
     ProposalRepository proposalRepository,
     DocumentRepository documentRepository,
+    SignedDocumentManager signedDocumentManager,
   ) = ProposalServiceImpl;
 
   Future<List<String>> addFavoriteProposal(String proposalId);
@@ -56,12 +60,18 @@ abstract interface class ProposalService {
   Future<DocumentRef> importProposal(Uint8List data);
 
   /// Publishes a public proposal draft.
-  Future<void> publishProposal(Document document);
+  Future<void> publishProposal({
+    required DocumentDataMetadata metadata,
+    required DocumentDataContent content,
+  });
 
   Future<List<String>> removeFavoriteProposal(String proposalId);
 
   /// Submits a proposal draft into review.
-  Future<void> submitProposalForReview(Document document);
+  Future<void> submitProposalForReview({
+    required DocumentDataMetadata metadata,
+    required DocumentDataContent content,
+  });
 
   /// Saves a new proposal draft in the local storage.
   Future<void> updateDraftProposal({
@@ -75,10 +85,12 @@ abstract interface class ProposalService {
 final class ProposalServiceImpl implements ProposalService {
   final ProposalRepository _proposalRepository;
   final DocumentRepository _documentRepository;
+  final SignedDocumentManager _signedDocumentManager;
 
   const ProposalServiceImpl(
     this._proposalRepository,
     this._documentRepository,
+    this._signedDocumentManager,
   );
 
   @override
@@ -155,9 +167,22 @@ final class ProposalServiceImpl implements ProposalService {
   }
 
   @override
-  Future<void> publishProposal(Document document) {
-    // TODO(dtscalac): implement publishing proposals
-    throw UnimplementedError();
+  Future<void> publishProposal({
+    required DocumentDataMetadata metadata,
+    required DocumentDataContent content,
+  }) async {
+    const metadata = SignedDocumentMetadata(
+      contentType: DocumentContentType.json,
+    );
+
+    final signedDocument = await _signedDocumentManager.signDocument(
+      SignedDocumentJsonPayload(content.data),
+      metadata: metadata,
+      publicKey: Uint8List(0),
+      privateKey: Uint8List(0),
+    );
+
+    await _documentRepository.uploadDocument(document: signedDocument);
   }
 
   @override
@@ -166,9 +191,11 @@ final class ProposalServiceImpl implements ProposalService {
   }
 
   @override
-  Future<void> submitProposalForReview(Document document) {
-    // TODO(dtscalac): implement submitting proposals into review
-    throw UnimplementedError();
+  Future<void> submitProposalForReview({
+    required DocumentDataMetadata metadata,
+    required DocumentDataContent content,
+  }) async {
+    // TODO(dtscalac): implement
   }
 
   @override
