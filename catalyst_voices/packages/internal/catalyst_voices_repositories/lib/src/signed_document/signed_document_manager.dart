@@ -1,4 +1,4 @@
-import 'package:catalyst_voices_models/src/signed_document/signed_document.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/signed_document/signed_document_manager_impl.dart';
 import 'package:flutter/foundation.dart';
 

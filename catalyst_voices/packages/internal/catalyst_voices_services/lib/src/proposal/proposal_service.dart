@@ -176,15 +176,13 @@ final class ProposalServiceImpl implements ProposalService {
     if (privateKey == null) {
       throw StateError('Cannot publish a proposal, master key missing');
     }
-    final publicKey = await privateKey.derivePublicKey();
 
-    const metadata = SignedDocumentMetadata(
-      contentType: SignedDocumentContentType.json,
-    );
+    final publicKey = await privateKey.derivePublicKey();
 
     final signedDocument = await _signedDocumentManager.signDocument(
       SignedDocumentJsonPayload(content.data),
-      metadata: metadata,
+      metadata: _createProposalMetadata(metadata),
+      // TODO(dtscalac): derive correct key
       publicKey: Uint8List.fromList(publicKey.bytes),
       privateKey: Uint8List.fromList(privateKey.bytes),
     );
@@ -252,5 +250,21 @@ final class ProposalServiceImpl implements ProposalService {
         yield commentsUpdates;
       }
     });
+  }
+
+  SignedDocumentMetadata _createProposalMetadata(
+    DocumentDataMetadata metadata,
+  ) {
+    final template = metadata.template;
+
+    return SignedDocumentMetadata(
+      contentType: SignedDocumentContentType.json,
+      documentType: DocumentType.proposalDocument,
+      id: metadata.id,
+      ver: metadata.selfRef.version,
+      template: template == null
+          ? null
+          : SignedDocumentMetadataRef.fromDocumentRef(template),
+    );
   }
 }

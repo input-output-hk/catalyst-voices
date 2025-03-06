@@ -1,5 +1,3 @@
-export 'package:catalyst_cose/catalyst_cose.dart' show ReferenceUuid;
-
 export 'cache/cache.dart';
 export 'cache/local_tll_cache.dart';
 export 'cache/ttl_cache.dart';
