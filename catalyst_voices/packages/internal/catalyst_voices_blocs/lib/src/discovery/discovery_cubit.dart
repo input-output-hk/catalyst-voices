@@ -52,9 +52,10 @@ class DiscoveryCubit extends Cubit<DiscoveryState> {
     final categories = isSuccess
         ? List.generate(
             6,
-            (index) => CampaignCategoryViewModel.dummy(id: index.toString()),
+            (index) =>
+                DetailedCampaignCategoryViewModel.dummy(id: index.toString()),
           )
-        : <CampaignCategoryViewModel>[];
+        : <DetailedCampaignCategoryViewModel>[];
 
     final error = isSuccess ? null : const LocalizedUnknownException();
 
@@ -111,7 +112,7 @@ class DiscoveryCubit extends Cubit<DiscoveryState> {
     _setupProposalsSubscription();
   }
 
-  CampaignCategoryViewModel? localCategory(String id) {
+  DetailedCampaignCategoryViewModel? localCategory(String id) {
     return state.campaignCategories.categories
         .firstWhereOrNull((e) => e.id == id);
   }

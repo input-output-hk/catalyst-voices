@@ -13,6 +13,27 @@ class CategoryDetailCubit extends Cubit<CategoryDetailState> {
     this._campaignService,
   ) : super(const CategoryDetailState(isLoading: true));
 
+  Future<void> getCategories() async {
+    if (!state.isLoading) {
+      emit(state.copyWith(isLoading: true));
+    }
+
+    // TODO(LynxLynxx): get data from campaignService
+
+    final categories = List.generate(
+      6,
+      (index) => DetailedCampaignCategoryViewModel.dummy(id: index.toString()),
+    );
+
+    emit(
+      state.copyWith(
+        isLoading: false,
+        categories: categories,
+        error: const Optional.empty(),
+      ),
+    );
+  }
+
   Future<void> getCategoryDetail(String categoryId) async {
     emit(state.copyWith(isLoading: true));
 
@@ -25,32 +46,11 @@ class CategoryDetailCubit extends Cubit<CategoryDetailState> {
 
     emit(
       state.copyWith(
-        category: CampaignCategoryViewModel.dummy(id: categoryId),
+        category: DetailedCampaignCategoryViewModel.dummy(id: categoryId),
         isLoading: false,
         error: isSuccess
             ? const Optional.empty()
             : const Optional.of(LocalizedUnknownException()),
-      ),
-    );
-  }
-
-  Future<void> getCategories() async {
-    if (!state.isLoading) {
-      emit(state.copyWith(isLoading: true));
-    }
-
-    // TODO(LynxLynxx): get data from campaignService
-
-    final categories = List.generate(
-      6,
-      (index) => CampaignCategoryViewModel.dummy(id: index.toString()),
-    );
-
-    emit(
-      state.copyWith(
-        isLoading: false,
-        categories: categories,
-        error: const Optional.empty(),
       ),
     );
   }

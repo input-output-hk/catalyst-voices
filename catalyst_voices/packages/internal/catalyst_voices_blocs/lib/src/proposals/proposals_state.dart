@@ -11,7 +11,7 @@ class ProposalsState extends Equatable {
   final ProposalPaginationItems<ProposalViewModel> allProposals;
   final List<String> favoritesIds;
   final List<String> myProposalsIds;
-  final List<CampaignCategoryViewModel> categories;
+  final List<DetailedCampaignCategoryViewModel> categories;
   final String? selectedCategoryId;
   final String? searchValue;
 
@@ -50,7 +50,7 @@ class ProposalsState extends Equatable {
     ProposalPaginationItems<ProposalViewModel>? allProposals,
     List<String>? favoritesIds,
     List<String>? myProposalsIds,
-    List<CampaignCategoryViewModel>? categories,
+    List<DetailedCampaignCategoryViewModel>? categories,
     Optional<String>? selectedCategoryId,
     Optional<String>? searchValue,
     bool isLoading = false,
