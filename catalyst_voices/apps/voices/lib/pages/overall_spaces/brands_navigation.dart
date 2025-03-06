@@ -1,4 +1,6 @@
 import 'package:catalyst_voices/common/ext/brand_ext.dart';
+import 'package:catalyst_voices/common/ext/build_context_ext.dart';
+import 'package:catalyst_voices/widgets/common/affix_decorator.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
@@ -20,6 +22,7 @@ class BrandsNavigation extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Column(
         mainAxisSize: MainAxisSize.max,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           ...Brand.values.map(
             (brand) {
@@ -35,59 +38,26 @@ class BrandsNavigation extends StatelessWidget {
             indent: 0,
             endIndent: 0,
           ),
-          const _SearchTile(),
-          const _TasksTile(),
+          const _SpacesTile(),
+          const _OpportunitiesTile(),
         ],
       ),
     );
   }
 }
 
-class _BrandTile extends StatelessWidget {
-  final Brand brand;
-  final VoidCallback? onTap;
+final class _BackgroundColor implements WidgetStateProperty<Color?> {
+  final VoicesColorScheme colors;
 
-  const _BrandTile(
-    this.brand, {
-    super.key,
-    this.onTap,
-  });
+  _BackgroundColor(this.colors);
 
   @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isCurrent = theme.brandAssets.brand == brand;
+  Color? resolve(Set<WidgetState> states) {
+    if (states.contains(WidgetState.selected)) {
+      return colors.onSurfacePrimaryContainer.withValues(alpha: 0.12);
+    }
 
-    return _BrandsNavigationTile(
-      onTap: onTap,
-      isSelected: isCurrent,
-      leading: brand.logoIcon(context).buildIcon(allowColorFilter: false),
-      content: Text(brand.localizedName(context.l10n)),
-    );
-  }
-}
-
-class _SearchTile extends StatelessWidget {
-  const _SearchTile();
-
-  @override
-  Widget build(BuildContext context) {
-    return _BrandsNavigationTile(
-      leading: VoicesAssets.icons.search.buildIcon(),
-      content: Text(context.l10n.overallSpacesSearchBrands),
-    );
-  }
-}
-
-class _TasksTile extends StatelessWidget {
-  const _TasksTile();
-
-  @override
-  Widget build(BuildContext context) {
-    return _BrandsNavigationTile(
-      leading: VoicesAssets.icons.collection.buildIcon(),
-      content: Text(context.l10n.overallSpacesTasks),
-    );
+    return Colors.transparent;
   }
 }
 
@@ -158,18 +128,32 @@ class _BrandsNavigationTile extends StatelessWidget {
   }
 }
 
-final class _BackgroundColor implements WidgetStateProperty<Color?> {
-  final VoicesColorScheme colors;
+class _BrandTile extends StatelessWidget {
+  final Brand brand;
+  final VoidCallback? onTap;
 
-  _BackgroundColor(this.colors);
+  const _BrandTile(
+    this.brand, {
+    super.key,
+    this.onTap,
+  });
 
   @override
-  Color? resolve(Set<WidgetState> states) {
-    if (states.contains(WidgetState.selected)) {
-      return colors.onSurfacePrimaryContainer.withValues(alpha: 0.12);
-    }
-
-    return Colors.transparent;
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: 12,
+        vertical: 8,
+      ),
+      child: AffixDecorator(
+        prefix: brand.logoIcon(context).buildIcon(allowColorFilter: false),
+        child: Text(
+          brand.localizedName(context.l10n),
+          style: context.textTheme.titleMedium
+              ?.copyWith(color: context.colorScheme.primary),
+        ),
+      ),
+    );
   }
 }
 
@@ -185,5 +169,31 @@ final class _ForegroundColor implements WidgetStateProperty<Color?> {
     }
 
     return colors.textOnPrimaryLevel0;
+  }
+}
+
+class _OpportunitiesTile extends StatelessWidget {
+  const _OpportunitiesTile();
+
+  @override
+  Widget build(BuildContext context) {
+    return _BrandsNavigationTile(
+      leading: VoicesAssets.icons.collection.buildIcon(),
+      content: Text(context.l10n.opportunities),
+    );
+  }
+}
+
+class _SpacesTile extends StatelessWidget {
+  const _SpacesTile();
+
+  @override
+  Widget build(BuildContext context) {
+    return _BrandsNavigationTile(
+      isSelected: true,
+      leading: VoicesAssets.icons.viewGrid.buildIcon(),
+      content: Text(context.l10n.spaces),
+      onTap: () {},
+    );
   }
 }
