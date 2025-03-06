@@ -25,6 +25,7 @@ class DraftProposalChip extends StatelessWidget {
 
 class FinalProposalChip extends StatelessWidget {
   final bool onColorBackground;
+
   const FinalProposalChip({super.key, this.onColorBackground = true});
 
   @override
@@ -65,6 +66,7 @@ class PrivateProposalChip extends StatelessWidget {
 class ProposalCommentsChip extends StatelessWidget {
   final int commentsCount;
   final bool useInternalBackground;
+
   const ProposalCommentsChip({
     super.key,
     required this.commentsCount,
@@ -94,8 +96,8 @@ class ProposalCommentsChip extends StatelessWidget {
 }
 
 class ProposalVersionChip extends StatelessWidget {
-  final bool useInternalBackground;
   final String version;
+  final bool useInternalBackground;
 
   const ProposalVersionChip({
     super.key,

@@ -11,6 +11,7 @@ import 'package:flutter/widgets.dart';
 
 class SmallProposalCard extends StatelessWidget {
   final Proposal proposal;
+
   const SmallProposalCard({
     super.key,
     required this.proposal,
@@ -115,6 +116,7 @@ class _NewIterationDetails extends StatelessWidget {
   final int iteration;
   final DateTime? datetime;
   final DocumentRef id;
+
   const _NewIterationDetails({
     required this.title,
     required this.iteration,
