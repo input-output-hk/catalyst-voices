@@ -3,7 +3,7 @@ from utils.address import stake_public_key_to_address
 from utils.snapshot import snapshot
 from api.v1 import cardano
 
-
+# @pytest.mark.skip('To be refactored when the api is ready')
 def test_persistent_ada_amount_endpoint(snapshot):
     # health.is_live()
     # health.is_ready()
