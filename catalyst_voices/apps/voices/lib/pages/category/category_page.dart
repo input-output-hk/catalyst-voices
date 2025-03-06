@@ -119,11 +119,13 @@ class _CategoryDetailErrorSelector extends StatelessWidget {
             child: Center(
               child: VoicesErrorIndicator(
                 message: error.message(context),
-                onRetry: () async {
-                  await context
-                      .read<CategoryDetailCubit>()
-                      .getCategoryDetail(categoryId);
-                },
+                onRetry: error is LocalizedNotFound
+                    ? null
+                    : () async {
+                        context
+                            .read<CategoryDetailCubit>()
+                            .getCategoryDetail(categoryId);
+                      },
               ),
             ),
           ),
@@ -147,7 +149,7 @@ class _CategoryDetailLoadingOrDataSelector extends StatelessWidget {
       },
       builder: (context, state) {
         return _Body(
-          category: DetailedCampaignCategoryViewModel.dummy(),
+          category: state.data,
           isLoading: state.show,
         );
       },
@@ -182,11 +184,7 @@ class _CategoryPageState extends State<CategoryPage> {
     super.didUpdateWidget(oldWidget);
 
     if (widget.categoryId != oldWidget.categoryId) {
-      unawaited(
-        context
-            .read<CategoryDetailCubit>()
-            .getCategoryDetail(widget.categoryId),
-      );
+      context.read<CategoryDetailCubit>().getCategoryDetail(widget.categoryId);
     }
   }
 
@@ -194,8 +192,6 @@ class _CategoryPageState extends State<CategoryPage> {
   void initState() {
     super.initState();
     unawaited(context.read<CategoryDetailCubit>().getCategories());
-    unawaited(
-      context.read<CategoryDetailCubit>().getCategoryDetail(widget.categoryId),
-    );
+    context.read<CategoryDetailCubit>().getCategoryDetail(widget.categoryId);
   }
 }

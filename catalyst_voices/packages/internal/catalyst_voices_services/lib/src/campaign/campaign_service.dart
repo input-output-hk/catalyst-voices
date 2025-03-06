@@ -15,6 +15,8 @@ abstract interface class CampaignService {
 
   // TODO(LynxLynxx): return correct model type
   Future<List<CampaignCategory>> getCampaignCategories();
+
+  CampaignCategory getCategory(String uuid);
 }
 
 final class CampaignServiceImpl implements CampaignService {
@@ -47,5 +49,15 @@ final class CampaignServiceImpl implements CampaignService {
   @override
   Future<List<CampaignCategory>> getCampaignCategories() async {
     return staticCampaignCategories;
+  }
+
+  @override
+  CampaignCategory getCategory(String uuid) {
+    // TODO(LynxLynxx): call backend for current ask amount
+    // and submitted proposal count
+    return staticCampaignCategories.firstWhere(
+      (e) => e.uuid == uuid,
+      orElse: () => throw const NotFoundException(),
+    );
   }
 }
