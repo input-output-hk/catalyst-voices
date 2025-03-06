@@ -7,7 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'package:uuid/uuid.dart';
 
 const mockedDocumentUuid = '0194f567-65f5-7ec6-b4f2-f744c0f74844';
-const mockedTemplateUuid = '0194f567-65f5-7d96-ad12-77762fdef00b';
+const mockedTemplateUuid = '0194d492-1daa-75b5-b4a4-5cf331cd8d1a';
 
 final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
   final ApiServices _api;

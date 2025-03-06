@@ -2,6 +2,7 @@ import 'dart:typed_data';
 
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
+import 'package:catalyst_voices_services/src/user/user_service.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -10,7 +11,8 @@ abstract interface class ProposalService {
     ProposalRepository proposalRepository,
     DocumentRepository documentRepository,
     SignedDocumentManager signedDocumentManager,
-    Keychain keychain,
+    UserService userService,
+    KeyDerivation keyDerivation,
   ) = ProposalServiceImpl;
 
   Future<List<String>> addFavoriteProposal(String proposalId);
@@ -85,13 +87,15 @@ final class ProposalServiceImpl implements ProposalService {
   final ProposalRepository _proposalRepository;
   final DocumentRepository _documentRepository;
   final SignedDocumentManager _signedDocumentManager;
-  final Keychain _keychain;
+  final UserService _userService;
+  final KeyDerivation _keyDerivation;
 
   const ProposalServiceImpl(
     this._proposalRepository,
     this._documentRepository,
     this._signedDocumentManager,
-    this._keychain,
+    this._userService,
+    this._keyDerivation,
   );
 
   @override
@@ -172,19 +176,26 @@ final class ProposalServiceImpl implements ProposalService {
     required DocumentDataMetadata metadata,
     required DocumentDataContent content,
   }) async {
-    final privateKey = await _keychain.getMasterKey();
-    if (privateKey == null) {
+    final account = _userService.user.activeAccount;
+    if (account == null) {
+      throw StateError('Cannot publish a proposal, account missing');
+    }
+
+    final masterKey = await account.keychain.getMasterKey();
+    if (masterKey == null) {
       throw StateError('Cannot publish a proposal, master key missing');
     }
 
-    final publicKey = await privateKey.derivePublicKey();
+    final keyPair = await _keyDerivation.deriveAccountRoleKeyPair(
+      masterKey: masterKey,
+      role: AccountRole.proposer,
+    );
 
     final signedDocument = await _signedDocumentManager.signDocument(
       SignedDocumentJsonPayload(content.data),
       metadata: _createProposalMetadata(metadata),
-      // TODO(dtscalac): derive correct key
-      publicKey: Uint8List.fromList(publicKey.bytes),
-      privateKey: Uint8List.fromList(privateKey.bytes),
+      publicKey: Uint8List.fromList(keyPair.publicKey.bytes),
+      privateKey: Uint8List.fromList(keyPair.privateKey.bytes),
     );
 
     await _documentRepository.uploadDocument(document: signedDocument);
