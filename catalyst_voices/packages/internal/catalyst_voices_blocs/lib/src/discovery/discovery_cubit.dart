@@ -14,7 +14,7 @@ class DiscoveryCubit extends Cubit<DiscoveryState> {
   // ignore: unused_field
   final CampaignService _campaignService;
   final ProposalService _proposalService;
-  late StreamSubscription<List<Proposal>>? _proposalsSubscription;
+  StreamSubscription<List<Proposal>>? _proposalsSubscription;
 
   DiscoveryCubit(
     this._campaignService,
@@ -151,6 +151,12 @@ class DiscoveryCubit extends Cubit<DiscoveryState> {
           ),
         );
       },
+    );
+    emit(
+      state.copyWith(
+        mostRecentProposals:
+            const DiscoveryMostRecentProposalsState(isLoading: false),
+      ),
     );
   }
 }
