@@ -69,7 +69,7 @@ final class ProposalBuilderState extends Equatable {
   });
 
   String? get proposalTitle {
-    final property = document?.getProperty(Proposal.titleNodeId)
+    final property = document?.getProperty(ProposalDocument.titleNodeId)
         as DocumentValueProperty<String>?;
 
     return property?.value;

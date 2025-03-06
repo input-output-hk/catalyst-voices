@@ -316,7 +316,7 @@ final class _ProposalBorderColor extends WidgetStateColor {
 class _ProposalInfo extends StatelessWidget {
   final ProposalPublish proposalStage;
   final int version;
-  final DateTime lastUpdate;
+  final DateTime? lastUpdate;
   final int commentsCount;
   final bool showLastUpdate;
 
@@ -339,12 +339,12 @@ class _ProposalInfo extends StatelessWidget {
           const FinalProposalChip(),
         const SizedBox(width: 4),
         ProposalVersionChip(version: version.toString()),
-        if (showLastUpdate) ...[
+        if (showLastUpdate && lastUpdate != null) ...[
           const SizedBox(width: 4),
           VoicesPlainTooltip(
             message: _tooltipMessage(context),
             child: DayMonthTimeText(
-              dateTime: lastUpdate,
+              dateTime: lastUpdate!,
             ),
           ),
         ],
@@ -363,7 +363,11 @@ class _ProposalInfo extends StatelessWidget {
   }
 
   String _tooltipMessage(BuildContext context) {
-    final dt = DateFormatter.formatDateTimeParts(lastUpdate, includeYear: true);
+    if (lastUpdate == null) {
+      return '';
+    }
+    final dt =
+        DateFormatter.formatDateTimeParts(lastUpdate!, includeYear: true);
 
     return context.l10n.publishedOn(dt.date, dt.time);
   }

@@ -10,12 +10,11 @@ import 'package:flutter/foundation.dart';
 abstract interface class DraftsDao {
   /// Counts drafts matching required [ref] id and optional [ref] ver.
   ///
+  /// If ref is null it will count all drafts.
+  ///
   /// If [ref] ver is not specified it will return count of all version
   /// matching [ref] id.
-  Future<int> count({required DocumentRef ref});
-
-  /// Counts unique drafts. All versions of same document are counted as 1.
-  Future<int> countAll();
+  Future<int> count({DocumentRef? ref});
 
   /// Deletes a document draft with [ref].
   ///
@@ -28,6 +27,9 @@ abstract interface class DraftsDao {
 
   /// Returns all drafts
   Future<List<DocumentDraftEntity>> queryAll();
+
+  /// Returns all known document drafts refs.
+  Future<List<DraftRef>> queryAllRefs();
 
   /// Singular version of [saveAll]. Does not run in transaction.
   Future<void> save(DocumentDraftEntity draft);
@@ -59,13 +61,12 @@ class DriftDraftsDao extends DatabaseAccessor<DriftCatalystDatabase>
   DriftDraftsDao(super.attachedDatabase);
 
   @override
-  Future<int> count({required DocumentRef ref}) {
-    return drafts.count(where: (row) => _filterRef(row, ref)).getSingle();
-  }
-
-  @override
-  Future<int> countAll() {
-    return drafts.count().getSingle();
+  Future<int> count({DocumentRef? ref}) {
+    if (ref == null) {
+      return drafts.count().getSingle();
+    } else {
+      return drafts.count(where: (row) => _filterRef(row, ref)).getSingle();
+    }
   }
 
   @override
@@ -85,6 +86,30 @@ class DriftDraftsDao extends DatabaseAccessor<DriftCatalystDatabase>
   @override
   Future<List<DocumentDraftEntity>> queryAll() {
     return select(drafts).get();
+  }
+
+  @override
+  Future<List<DraftRef>> queryAllRefs() {
+    final select = selectOnly(drafts)
+      ..addColumns([
+        drafts.idHi,
+        drafts.idLo,
+        drafts.verHi,
+        drafts.verLo,
+      ]);
+
+    return select.map((row) {
+      final id = UuidHiLo(
+        high: row.read(drafts.idHi)!,
+        low: row.read(drafts.idLo)!,
+      );
+      final version = UuidHiLo(
+        high: row.read(drafts.verHi)!,
+        low: row.read(drafts.verLo)!,
+      );
+
+      return DraftRef(id: id.uuid, version: version.uuid);
+    }).get();
   }
 
   @override

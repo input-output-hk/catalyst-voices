@@ -13,6 +13,9 @@ final class DocumentDataContent extends Equatable {
   @override
   List<Object?> get props => [data];
 
-  String? get title =>
-      DocumentNodeTraverser.getValue(Proposal.titleNodeId, data) as String?;
+  String? get title {
+    final value =
+        DocumentNodeTraverser.getValue(ProposalDocument.titleNodeId, data);
+    return value as String?;
+  }
 }

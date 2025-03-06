@@ -1,10 +1,9 @@
-import 'dart:typed_data';
-
 import 'package:catalyst_compression/catalyst_compression.dart';
 import 'package:catalyst_cose/catalyst_cose.dart';
 import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
 import 'package:cbor/cbor.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/foundation.dart';
 
 part 'signed_document_manager_impl.dart';
 
@@ -69,7 +68,6 @@ abstract interface class SignedDocument<T extends SignedDocumentPayload> {
 }
 
 /// Represents an abstract document that can be represented in binary format.
-// ignore: one_member_abstracts
 abstract interface class SignedDocumentPayload {
   /// Converts the document into a binary representation.
   ///

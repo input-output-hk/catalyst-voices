@@ -14,8 +14,9 @@ devtools_options.yaml
 **/generated/*
 **/openapi/**
 
-# Un-ignore vit openapi spec as they're not generated
+# Un-ignore vit and cat-reviews openapi spec as they're not generated
 !**/openapi/vit.json
+!**/openapi/cat-reviews.json
 
 # Un-ignore generated files in public packages
 !**/packages/libs/**/*.g.dart

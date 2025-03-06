@@ -1,16 +1,18 @@
-import 'dart:math';
-
 import 'package:catalyst_cardano_serialization/src/types.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:test/test.dart';
+import 'package:uuid/uuid.dart';
 
 void main() {
-  late ProposalBase baseProposal;
+  late Proposal baseProposal;
 
   setUpAll(() {
-    baseProposal = ProposalBase(
-      id: '${Random().nextInt(1000)}/${Random().nextInt(1000)}',
+    baseProposal = Proposal(
+      selfRef: SignedDocumentRef(
+        id: const Uuid().v7(),
+        version: const Uuid().v7(),
+      ),
       category: 'Cardano Use Cases / MVP',
       title: 'Proposal Title that rocks the world',
       updateDate: DateTime.now().minusDays(2),
@@ -21,13 +23,13 @@ void main() {
       description: '',
       duration: 6,
       author: 'Alex Wells',
-      version: 1,
+      versionCount: 1,
     );
   });
 
   group(ProposalPaginationItems, () {
     test('creates instance with default values', () {
-      const pagination = ProposalPaginationItems<ProposalBase>();
+      const pagination = ProposalPaginationItems<Proposal>();
 
       expect(pagination.pageKey, equals(0));
       expect(pagination.maxResults, equals(0));
@@ -36,7 +38,7 @@ void main() {
 
     test('creates instance with custom values', () {
       final items = [baseProposal, baseProposal];
-      final pagination = ProposalPaginationItems<ProposalBase>(
+      final pagination = ProposalPaginationItems<Proposal>(
         pageKey: 1,
         maxResults: 10,
         items: items,
@@ -48,7 +50,7 @@ void main() {
     });
 
     test('copyWith creates new instance with updated values', () {
-      final original = ProposalPaginationItems<ProposalBase>(
+      final original = ProposalPaginationItems<Proposal>(
         pageKey: 1,
         maxResults: 10,
         items: [baseProposal],
@@ -67,13 +69,13 @@ void main() {
     });
 
     test('equals works correctly', () {
-      final pagination1 = ProposalPaginationItems<ProposalBase>(
+      final pagination1 = ProposalPaginationItems<Proposal>(
         pageKey: 1,
         maxResults: 10,
         items: [baseProposal],
       );
 
-      final pagination2 = ProposalPaginationItems<ProposalBase>(
+      final pagination2 = ProposalPaginationItems<Proposal>(
         pageKey: 1,
         maxResults: 10,
         items: [baseProposal],

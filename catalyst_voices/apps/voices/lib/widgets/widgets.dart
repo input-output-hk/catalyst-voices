@@ -36,6 +36,7 @@ export 'footers/standard_links_page_footer.dart';
 export 'headers/brand_header.dart';
 export 'headers/section_header.dart';
 export 'headers/segment_header.dart';
+export 'headers/sticky_header.dart';
 export 'indicators/process_progress_indicator.dart';
 export 'indicators/voices_circular_progress_indicator.dart';
 export 'indicators/voices_error_indicator.dart';

@@ -274,14 +274,15 @@ final class ProposalBuilderBloc
     _logger.info('Loading proposal[${event.ref}]');
 
     await _loadState(emit, () async {
-      final proposal = await _proposalService.getProposal(ref: event.ref);
+      final proposalData = await _proposalService.getProposal(ref: event.ref);
+      final proposal = Proposal.fromData(proposalData);
 
       return _createState(
-        document: proposal.document.document,
+        document: proposalData.document.document,
         metadata: ProposalBuilderMetadata(
           publish: proposal.publish,
-          documentRef: proposal.ref,
-          currentIteration: proposal.version,
+          documentRef: proposal.selfRef,
+          currentIteration: proposal.versionCount,
         ),
       );
     });

@@ -33,16 +33,16 @@ void main() {
         await database.draftsDao.saveAll(drafts);
 
         // Then
-        final draftsCountBefore = await database.draftsDao.countAll();
-        final documentsCountBefore = await database.documentsDao.countAll();
+        final draftsCountBefore = await database.draftsDao.count();
+        final documentsCountBefore = await database.documentsDao.count();
 
         expect(draftsCountBefore, drafts.length);
         expect(documentsCountBefore, documents.length);
 
         await database.clear();
 
-        final draftsCountAfter = await database.draftsDao.countAll();
-        final documentsCountAfter = await database.documentsDao.countAll();
+        final draftsCountAfter = await database.draftsDao.count();
+        final documentsCountAfter = await database.documentsDao.count();
 
         expect(draftsCountAfter, isZero);
         expect(documentsCountAfter, isZero);
