@@ -48,7 +48,6 @@ class RestoreKeychainInputPanel extends OnboardingPageBase {
       $(registrationInfoPanel).$(CommonPage($).decorData).$(Text).text,
       T.get('Learn More'),
     );
-    
   }
 
   Future<void> verifyDetailsPanel() async {}
