@@ -24,6 +24,11 @@ final class DatabaseDocumentsDataSource implements SignedDocumentDataSource {
   }
 
   @override
+  Future<List<DocumentRef>> index() {
+    return _database.documentsDao.queryAllRefs();
+  }
+
+  @override
   Future<List<String>> queryVersionIds({required String id}) {
     return _database.documentsDao.queryVersionIds(id: id);
   }
