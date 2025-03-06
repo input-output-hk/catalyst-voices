@@ -121,7 +121,7 @@ class _PublishedProposals extends StatelessWidget {
   Widget build(BuildContext context) {
     // TODO(LynxLynxx): replace with real data
     final proposal = Proposal(
-      id: '1',
+      selfRef: SignedDocumentRef.generateFirstRef(),
       title: 'Latest proposal that is making its rounds.',
       category: 'F14: Cardano Use Cases: Concept',
       description: 'Lorem ipsum dolor sit ',
@@ -132,14 +132,7 @@ class _PublishedProposals extends StatelessWidget {
       duration: 6,
       author: 'Alex Wells',
       updateDate: DateTime.now(),
-      document: ProposalDocument(
-        metadata: ProposalMetadata(selfRef: DraftRef.generateFirstRef()),
-        document: const Document(
-          schema: DocumentSchema.optional(),
-          properties: [],
-        ),
-      ),
-      version: 1,
+      versionCount: 1,
     );
     return Column(
       mainAxisSize: MainAxisSize.min,

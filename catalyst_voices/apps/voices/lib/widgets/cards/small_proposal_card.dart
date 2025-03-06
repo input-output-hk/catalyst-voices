@@ -53,9 +53,9 @@ class SmallProposalCard extends StatelessWidget {
             offstage: !proposal.publish.isLocal,
             child: _NewIterationDetails(
               title: proposal.title,
-              iteration: proposal.version,
+              iteration: proposal.versionCount,
               datetime: proposal.updateDate,
-              id: proposal.id,
+              id: proposal.selfRef,
             ),
           ),
           const SizedBox(height: 12),
@@ -87,12 +87,15 @@ class _Details extends StatelessWidget {
           ProposalPublish.localDraft => const PrivateProposalChip(),
         },
         ProposalVersionChip(
-          version: proposal.version.toString(),
+          version: proposal.versionCount.toString(),
           useInternalBackground: !isPublished,
         ),
-        DayMonthTimeTextWithTooltip(
-          datetime: proposal.updateDate,
-          color: isPublished ? context.colors.textOnPrimaryWhite : null,
+        Offstage(
+          offstage: proposal.updateDate == null,
+          child: DayMonthTimeTextWithTooltip(
+            datetime: proposal.updateDate!,
+            color: isPublished ? context.colors.textOnPrimaryWhite : null,
+          ),
         ),
         const Spacer(),
         Offstage(
@@ -110,8 +113,8 @@ class _Details extends StatelessWidget {
 class _NewIterationDetails extends StatelessWidget {
   final String title;
   final int iteration;
-  final DateTime datetime;
-  final String id;
+  final DateTime? datetime;
+  final DocumentRef id;
   const _NewIterationDetails({
     required this.title,
     required this.iteration,
@@ -142,7 +145,9 @@ class _NewIterationDetails extends StatelessWidget {
                   child: Text(
                     context.l10n.newIterationTitle(
                       iteration,
-                      DateFormatter.formatDayMonthTime(datetime),
+                      DateFormatter.formatDayMonthTime(
+                        datetime ?? DateTime.now(),
+                      ),
                       title,
                     ),
                     style: context.textTheme.bodySmall?.copyWith(

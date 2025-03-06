@@ -88,7 +88,7 @@ final class Proposal extends Equatable {
       ];
 
   Proposal copyWith({
-    String? id,
+    DocumentRef? selfRef,
     String? title,
     String? description,
     DateTime? updateDate,
@@ -98,11 +98,11 @@ final class Proposal extends Equatable {
     int? commentsCount,
     int? duration,
     String? author,
-    int? version,
+    int? versionCount,
     String? category,
   }) =>
       Proposal(
-        id: id ?? this.id,
+        selfRef: selfRef ?? this.selfRef,
         title: title ?? this.title,
         description: description ?? this.description,
         updateDate: updateDate ?? this.updateDate,
@@ -112,8 +112,7 @@ final class Proposal extends Equatable {
         commentsCount: commentsCount ?? this.commentsCount,
         duration: duration ?? this.duration,
         author: author ?? this.author,
-        version: version ?? this.version,
-        document: document,
+        versionCount: versionCount ?? this.versionCount,
         category: category ?? this.category,
       );
 }
