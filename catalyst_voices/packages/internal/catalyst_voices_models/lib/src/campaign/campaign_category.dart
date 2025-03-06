@@ -3,10 +3,10 @@ import 'package:catalyst_voices_models/src/document/data/static_document_data.da
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:equatable/equatable.dart';
 
-final categories = [
+final staticCampaignCategories = [
   CampaignCategory(
     uuid: StaticProposalTemplateData.documents[0].categoryUuid,
-    proposalTemplateUuid: StaticProposalTemplateData.documents[0].categoryUuid,
+    proposalTemplateUuid: StaticProposalTemplateData.documents[0].uuid,
     categoryName: 'Cardano Open:',
     categorySubname: 'Developers',
     description:
@@ -22,7 +22,7 @@ final categories = [
   ),
   CampaignCategory(
     uuid: StaticProposalTemplateData.documents[1].categoryUuid,
-    proposalTemplateUuid: StaticProposalTemplateData.documents[1].categoryUuid,
+    proposalTemplateUuid: StaticProposalTemplateData.documents[1].uuid,
     categoryName: 'Cardano Open:',
     categorySubname: 'Ecosystem',
     description:
@@ -38,7 +38,7 @@ final categories = [
   ),
   CampaignCategory(
     uuid: StaticProposalTemplateData.documents[2].categoryUuid,
-    proposalTemplateUuid: StaticProposalTemplateData.documents[2].categoryUuid,
+    proposalTemplateUuid: StaticProposalTemplateData.documents[2].uuid,
     categoryName: 'Cardano Use Cases:',
     categorySubname: 'Concept',
     description: '''
@@ -55,7 +55,7 @@ Accepts early stage ideas to deliver proof of concept, design research and basic
   ),
   CampaignCategory(
     uuid: StaticProposalTemplateData.documents[3].categoryUuid,
-    proposalTemplateUuid: StaticProposalTemplateData.documents[3].categoryUuid,
+    proposalTemplateUuid: StaticProposalTemplateData.documents[3].uuid,
     categoryName: 'Cardano Use Cases:',
     categorySubname: 'Product',
     description:
@@ -71,7 +71,7 @@ Accepts early stage ideas to deliver proof of concept, design research and basic
   ),
   CampaignCategory(
     uuid: StaticProposalTemplateData.documents[4].categoryUuid,
-    proposalTemplateUuid: StaticProposalTemplateData.documents[4].categoryUuid,
+    proposalTemplateUuid: StaticProposalTemplateData.documents[4].uuid,
     categoryName: 'Cardano Partners:',
     categorySubname: 'Enterprise R&D',
     description: '''
@@ -88,7 +88,7 @@ Fuels the fly-wheels of innovation to ignite premium R&D projects that benefit C
   ),
   CampaignCategory(
     uuid: StaticProposalTemplateData.documents[5].categoryUuid,
-    proposalTemplateUuid: StaticProposalTemplateData.documents[5].categoryUuid,
+    proposalTemplateUuid: StaticProposalTemplateData.documents[5].uuid,
     categoryName: 'Cardano Partners:',
     categorySubname: 'Growth & Acceleration',
     description: '''
@@ -105,7 +105,7 @@ Fuels adoption by igniting premium advertising or venture building partnerships 
   ),
   CampaignCategory(
     uuid: StaticProposalTemplateData.documents[6].categoryUuid,
-    proposalTemplateUuid: StaticProposalTemplateData.documents[6].categoryUuid,
+    proposalTemplateUuid: StaticProposalTemplateData.documents[6].uuid,
     categoryName: '',
     categorySubname: '',
     description: '',
@@ -120,7 +120,7 @@ Fuels adoption by igniting premium advertising or venture building partnerships 
   ),
   CampaignCategory(
     uuid: StaticProposalTemplateData.documents[7].categoryUuid,
-    proposalTemplateUuid: StaticProposalTemplateData.documents[7].categoryUuid,
+    proposalTemplateUuid: StaticProposalTemplateData.documents[7].uuid,
     categoryName: '',
     categorySubname: '',
     description: '',
@@ -135,7 +135,7 @@ Fuels adoption by igniting premium advertising or venture building partnerships 
   ),
   CampaignCategory(
     uuid: StaticProposalTemplateData.documents[8].categoryUuid,
-    proposalTemplateUuid: StaticProposalTemplateData.documents[8].categoryUuid,
+    proposalTemplateUuid: StaticProposalTemplateData.documents[8].uuid,
     categoryName: '',
     categorySubname: '',
     description: '',
@@ -150,7 +150,7 @@ Fuels adoption by igniting premium advertising or venture building partnerships 
   ),
   CampaignCategory(
     uuid: StaticProposalTemplateData.documents[9].categoryUuid,
-    proposalTemplateUuid: StaticProposalTemplateData.documents[9].categoryUuid,
+    proposalTemplateUuid: StaticProposalTemplateData.documents[9].uuid,
     categoryName: '',
     categorySubname: '',
     description: '',
@@ -165,7 +165,7 @@ Fuels adoption by igniting premium advertising or venture building partnerships 
   ),
   CampaignCategory(
     uuid: StaticProposalTemplateData.documents[10].categoryUuid,
-    proposalTemplateUuid: StaticProposalTemplateData.documents[10].categoryUuid,
+    proposalTemplateUuid: StaticProposalTemplateData.documents[10].uuid,
     categoryName: '',
     categorySubname: '',
     description: '',
@@ -180,7 +180,7 @@ Fuels adoption by igniting premium advertising or venture building partnerships 
   ),
   CampaignCategory(
     uuid: StaticProposalTemplateData.documents[11].categoryUuid,
-    proposalTemplateUuid: StaticProposalTemplateData.documents[11].categoryUuid,
+    proposalTemplateUuid: StaticProposalTemplateData.documents[11].uuid,
     categoryName: '',
     categorySubname: '',
     description: '',

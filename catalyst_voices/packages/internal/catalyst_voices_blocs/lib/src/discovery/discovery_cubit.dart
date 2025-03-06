@@ -43,28 +43,15 @@ class DiscoveryCubit extends Cubit<DiscoveryState> {
       ),
     );
 
-    final isSuccess = await Future.delayed(
-      const Duration(seconds: 1),
-      () => Random().nextBool(),
-    );
-    if (isClosed) return;
-
-    final categories = isSuccess
-        ? List.generate(
-            6,
-            (index) =>
-                DetailedCampaignCategoryViewModel.dummy(id: index.toString()),
-          )
-        : <DetailedCampaignCategoryViewModel>[];
-
-    final error = isSuccess ? null : const LocalizedUnknownException();
+    final categories = await _campaignService.getCampaignCategories();
+    final categoriesModel =
+        categories.map(DetailedCampaignCategoryViewModel.fromModel).toList();
 
     emit(
       state.copyWith(
         campaignCategories: DiscoveryCampaignCategoriesState(
           isLoading: false,
-          error: error,
-          categories: categories,
+          categories: categoriesModel,
         ),
       ),
     );

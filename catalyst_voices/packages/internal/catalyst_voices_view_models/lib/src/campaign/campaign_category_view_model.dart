@@ -105,9 +105,9 @@ extension CategoryImageUrl on StaticCategoryDocumentData {
   static String imageUrl(String uuid) {
     return VoicesAssets.images.category.values
         .firstWhere(
-          (img) => img.keyName.contains(uuid),
+          (img) => img.path.contains(uuid),
           orElse: () => VoicesAssets
-              .images.category.category0194d4921daa75b5B4a45cf331cd8d1a,
+              .images.category.category0194d49030bf70438c5cF0e09f8a6d8c,
         )
         .path;
   }

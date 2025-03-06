@@ -14,7 +14,7 @@ abstract interface class CampaignService {
   });
 
   // TODO(LynxLynxx): return correct model type
-  Future<List<dynamic>> getCampaignCategories();
+  Future<List<CampaignCategory>> getCampaignCategories();
 }
 
 final class CampaignServiceImpl implements CampaignService {
@@ -45,7 +45,7 @@ final class CampaignServiceImpl implements CampaignService {
   }
 
   @override
-  Future<List<dynamic>> getCampaignCategories() async {
-    return <dynamic>[];
+  Future<List<CampaignCategory>> getCampaignCategories() async {
+    return staticCampaignCategories;
   }
 }
