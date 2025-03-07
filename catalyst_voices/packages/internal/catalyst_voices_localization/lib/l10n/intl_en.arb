@@ -1411,7 +1411,7 @@
   "heroSectionTitle": "Create, fund and deliver the future of Cardano.",
   "projectCatalystDescription": "Project Catalyst is an experiment in community innovation, providing a framework to turn ideas into impactful real world projects.\n\nWe're putting the community at the heart of Cardano's future development. Are you ready for the Challenge?",
   "viewCurrentCampaign": "View Current Campaign",
-  "catalystF14": "Catalyst Fund 14",
+  "catalystF14": "Catalyst Fund14",
   "@catalystF14": {
     "description": "Used in discovery page in hero section"
   },
@@ -1737,6 +1737,57 @@
   "proposalImportDialogDescription": "Make sure it's a correct Catalyst proposal file.",
   "@proposalImportDialogDescription": {
     "description": "The description of the dialog to import a proposal."
+  },
+  "spaces": "Spaces",
+  "@spaces": {
+    "description": "The title of the tile that shows the list of spaces."
+  },
+  "opportunities": "Opportunities",
+  "@opportunities": {
+    "description": "The title of the tile that shows the list of opportunities."
+  },
+  "discoveryHomepage": "Discovery Homepage",
+  "@discoveryHomepage": {
+    "description": "Title for tile in overall spaces page to go to discovery page"
+  },
+  "feedbackOnProposals": "Feedback on Proposals",
+  "@feedbackOnProposals": {
+    "description": "Title for tile in overall spaces page to go to proposals list page"
+  },
+  "browseMyProposals": "Browse all my proposals",
+  "@browseMyProposals": {
+    "description": "Title for tile in workspace space page to go to proposals page"
+  },
+  "notPublishedProposals": "Not published proposals",
+  "@notPublishedProposals": {
+    "description": "Title for section to show not published proposals"
+  },
+  "newIterationTitle": "Iteration {iteration} · Not published - {datetime} - {title}",
+  "@newIterationTitle": {
+    "description": "Title for new iteration card",
+    "placeholders": {
+      "iteration": {
+        "type": "int"
+      },
+      "datetime": {
+        "type": "String"
+      },
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "noPublishedProposalsOnMaxCount": "Published Proposals ({current}/{max})",
+  "@noPublishedProposalsOnMaxCount": {
+    "description": "Title for section to show number of published proposals out of max proposals",
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
   },
   "nrOfIteration": "Iteration {nr}",
   "@nrOfIteration": {
