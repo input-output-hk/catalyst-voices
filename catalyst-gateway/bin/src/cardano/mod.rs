@@ -328,7 +328,7 @@ struct SyncTask {
     /// The current running sync tasks.
     sync_tasks: FuturesUnordered<tokio::task::JoinHandle<SyncParams>>,
 
-    /// // How many immutable chain follower sync tasks we are running.
+    /// How many immutable chain follower sync tasks we are running.
     current_sync_tasks: u16,
 
     /// Start for the next block we would sync.
