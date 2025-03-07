@@ -10,6 +10,5 @@ pub(crate) mod cip19_stake_address;
 pub(crate) mod hash28;
 pub(crate) mod nonce;
 pub(crate) mod query;
-pub(crate) mod registration_list;
 pub(crate) mod slot_no;
 pub(crate) mod txn_index;

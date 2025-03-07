@@ -14,10 +14,7 @@ use tracing::error;
 use super::{
     cardano::{cip19_shelley_address::Cip19ShelleyAddress, nonce::Nonce},
     common::types::generic::error_msg::ErrorMessage,
-    response::{
-        Cip36Details, Cip36Registration, Cip36RegistrationList,
-        Cip36RegistrationsForVotingPublicKey,
-    },
+    response::{Cip36Details, Cip36Registration, Cip36RegistrationList},
     Ed25519HexEncodedPublicKey, SlotNo,
 };
 use crate::{
@@ -86,11 +83,6 @@ pub(crate) async fn get_registrations_given_stake_addr(
     // This is needed since the registration can be latest (no asat)
     let slot_no = valid_reg.slot_no;
 
-    let vote_pub_key = valid_reg
-        .clone()
-        .vote_pub_key
-        .ok_or_else(|| anyhow::anyhow!("Vote key not in registration"))?;
-
     // Fetch additional invalid registrations
     let invalids = get_invalid_registrations(stake_public_key, Some(slot_no), session)
         .await
@@ -104,19 +96,12 @@ pub(crate) async fn get_registrations_given_stake_addr(
     invalid_regs.extend(invalids);
 
     // Paginate results
-    let (valid_regs, invalid_regs, remaining) = paginate_registrations(
-        &[Cip36RegistrationsForVotingPublicKey {
-            vote_pub_key,
-            registrations: vec![valid_reg].into(),
-        }],
-        &invalid_regs,
-        page.into(),
-        limit.into(),
-    )?;
+    let (valid_regs, remaining) =
+        paginate_registrations(vec![valid_reg], page.into(), limit.into())?;
 
     let res = Cip36RegistrationList {
         slot: slot_no,
-        voting_key: valid_regs.into(),
+        valid: valid_regs.into(),
         invalid: invalid_regs.into(),
         page: Some(
             CurrentPage {
@@ -267,7 +252,7 @@ fn get_registrations_given_slot_no(
 ) -> Vec<Cip36Details> {
     registrations
         .into_iter()
-        .filter(|registration| registration.slot_no == slot_no)
+        .filter(|registration| registration.slot_no <= slot_no)
         .collect()
 }
 
@@ -381,20 +366,12 @@ pub(crate) async fn get_registrations_given_vote_key(
         invalid_regs.extend(invalids);
     }
 
-    let (valid_regs, invalid_regs, remaining) = paginate_registrations(
-        &[Cip36RegistrationsForVotingPublicKey {
-            vote_pub_key: vote_key,
-            registrations: valid_regs.clone().into(),
-        }],
-        &invalid_regs,
-        page.into(),
-        limit.into(),
-    )?;
+    let (valid_regs, remaining) = paginate_registrations(valid_regs, page.into(), limit.into())?;
 
     Ok(Cip36Registration::Ok(poem_openapi::payload::Json(
         Cip36RegistrationList {
             slot: slot_no.unwrap_or_default(),
-            voting_key: valid_regs.into(),
+            valid: valid_regs.into(),
             invalid: invalid_regs.into(),
             page: Some(
                 CurrentPage {
@@ -501,25 +478,18 @@ pub async fn snapshot(
         }
     }
 
-    for (vote_pub_key, registrations) in vote_key_regs_map {
-        all_registrations_after_filtering.push(Cip36RegistrationsForVotingPublicKey {
-            vote_pub_key,
-            registrations: registrations.clone().into(),
-        });
+    for registrations in vote_key_regs_map.into_values() {
+        all_registrations_after_filtering.extend(registrations);
     }
 
-    let (valid_regs, invalid_regs, remaining) = paginate_registrations(
-        &all_registrations_after_filtering,
-        &all_invalids_after_filtering,
-        limit.into(),
-        page.into(),
-    )?;
+    let (valid_regs, remaining) =
+        paginate_registrations(all_registrations_after_filtering, limit.into(), page.into())?;
 
     Ok(Cip36Registration::Ok(poem_openapi::payload::Json(
         Cip36RegistrationList {
             slot: slot_no.unwrap_or_default(),
-            voting_key: valid_regs.into(),
-            invalid: invalid_regs.into(),
+            valid: valid_regs.into(),
+            invalid: all_invalids_after_filtering.into(),
             page: Some(
                 CurrentPage {
                     page,
@@ -692,69 +662,22 @@ fn invalid_filter(registrations: Vec<Cip36Details>, slot_no: SlotNo) -> Vec<Cip3
 
 /// Paginate the registrations.
 fn paginate_registrations(
-    valid: &[Cip36RegistrationsForVotingPublicKey], invalid: &[Cip36Details], page: u32, limit: u32,
-) -> anyhow::Result<(
-    Vec<Cip36RegistrationsForVotingPublicKey>,
-    Vec<Cip36Details>,
-    Remaining,
-)> {
-    let total_reg: u32 = valid
-        .len()
-        .saturating_add(invalid.len())
-        .try_into()
-        .map_err(|_| anyhow::anyhow!("total_reg overflow"))?;
-    let mut start_index: usize = page.saturating_mul(limit).try_into().unwrap_or_default();
+    regs: Vec<Cip36Details>, page: u32, limit: u32,
+) -> anyhow::Result<(Vec<Cip36Details>, Remaining)> {
+    let total_reg = regs.len();
 
-    // Paginate the valid list first
-    let mut valid_to_show = Vec::new();
-    let mut remaining_limit = limit;
-    let mut total_valid = 0;
-    // Iterate through each vote_key's registrations in valid
-    for cip36_reg in valid {
-        let registrations = &cip36_reg.registrations;
-        let total_regs = registrations.len();
+    let page_usize: usize = page.try_into()?;
+    let limit_usize: usize = limit.try_into()?;
+    let start_index: usize = page_usize.saturating_mul(limit_usize);
+    let paginated_regs: Vec<_> = regs
+        .into_iter()
+        .skip(start_index)
+        .take(limit_usize)
+        .collect();
+    let reg_count = paginated_regs.len();
 
-        // If we haven't reached the start index yet, skip this set
-        if start_index >= total_regs {
-            continue;
-        }
+    let remaining = Remaining::calculate(page, limit, total_reg.try_into()?, reg_count.try_into()?);
 
-        // Calculate how many registrations we can take from this vote_key
-        let available = total_regs.saturating_sub(start_index);
-        let take_count = std::cmp::min(available, remaining_limit as usize);
-
-        let registrations = registrations[start_index..start_index + take_count].to_vec();
-
-        total_valid += registrations.len();
-
-        // Add the sliced valid registrations to the result
-        valid_to_show.push(Cip36RegistrationsForVotingPublicKey {
-            vote_pub_key: cip36_reg.vote_pub_key.clone(),
-            registrations: registrations.into(),
-        });
-
-        remaining_limit = remaining_limit.saturating_sub(take_count as u32);
-        if remaining_limit == 0 {
-            break; // No space left for more valid registrations
-        }
-
-        // Reset start index after the first set
-        start_index = 0;
-    }
-
-    // Calculate how many invalid items to show, if there's space remaining
-    let invalid_to_show = invalid
-        .iter()
-        .take(remaining_limit.try_into().unwrap_or_default())
-        .cloned()
-        .collect::<Vec<_>>();
-
-    let reg_count: u32 = total_valid
-        .saturating_add(invalid_to_show.len())
-        .try_into()
-        .unwrap_or_default();
-    let remaining = Remaining::calculate(page, limit, total_reg, reg_count);
-
-    // Return the paginated valid, invalid lists, and remaining.
-    Ok((valid_to_show, invalid_to_show, remaining))
+    // Return the paginated valid, and remaining.
+    Ok((paginated_regs, remaining))
 }
