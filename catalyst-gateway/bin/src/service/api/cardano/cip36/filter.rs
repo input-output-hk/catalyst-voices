@@ -243,7 +243,6 @@ pub(crate) async fn get_registrations_given_vote_key(
     limit: common::types::generic::query::pagination::Limit,
 ) -> anyhow::Result<Cip36Registration> {
     let voting_key: Vec<u8> = vote_key
-        .clone()
         .try_into()
         .map_err(|err| anyhow::anyhow!("Failed to convert vote key to bytes {err:?}"))?;
 
