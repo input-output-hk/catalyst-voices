@@ -3,9 +3,9 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 
 /// Derives key pairs from a seed phrase.
 
-abstract interface class KeyDerivation {
-  const factory KeyDerivation(CatalystKeyDerivation keyDerivation) =
-      KeyDerivationImpl;
+abstract interface class KeyDerivationService {
+  const factory KeyDerivationService(CatalystKeyDerivation keyDerivation) =
+      KeyDerivationServiceImpl;
 
   /// Derives the [Ed25519KeyPair] for the [role] from a [masterKey].
   Future<Bip32Ed25519XKeyPair> deriveAccountRoleKeyPair({
@@ -26,14 +26,14 @@ abstract interface class KeyDerivation {
   });
 }
 
-final class KeyDerivationImpl implements KeyDerivation {
+final class KeyDerivationServiceImpl implements KeyDerivationService {
   /// See: https://github.com/input-output-hk/catalyst-voices/pull/1300
   static const int _purpose = 508;
   static const int _type = 139;
   static const int _account = 0; // Future Use
   final CatalystKeyDerivation _keyDerivation;
 
-  const KeyDerivationImpl(this._keyDerivation);
+  const KeyDerivationServiceImpl(this._keyDerivation);
 
   @override
   Future<Bip32Ed25519XKeyPair> deriveAccountRoleKeyPair({

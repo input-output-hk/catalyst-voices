@@ -149,7 +149,7 @@ final class RecoverCubit extends Cubit<RecoverStateData>
     final keychain = account.keychain;
     await keychain.setLock(lockFactor);
     await keychain.unlock(lockFactor);
-    await keychain.setMasterKey(masterKey);
+    await keychain.setMasterKey(Uint8List.fromList(masterKey.bytes));
 
     await _userService.useAccount(account);
 

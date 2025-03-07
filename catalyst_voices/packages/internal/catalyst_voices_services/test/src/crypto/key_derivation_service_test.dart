@@ -1,23 +1,23 @@
 import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_shared/src/crypto/key_derivation.dart';
+import 'package:catalyst_voices_services/src/crypto/key_derivation_service.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 
 void main() {
-  group(KeyDerivation, () {
+  group(KeyDerivationService, () {
     final seedPhrase = SeedPhrase.fromMnemonic(
       'few loyal swift champion rug peace dinosaur'
       ' erase bacon tone install universe',
     );
 
     late _FakeCatalystKeyDerivation catalystKeyDerivation;
-    late KeyDerivation keyDerivation;
+    late KeyDerivationService keyDerivation;
     late _FakeBip32Ed22519XPrivateKey masterKey;
 
     setUp(() {
       catalystKeyDerivation = _FakeCatalystKeyDerivation();
-      keyDerivation = KeyDerivation(catalystKeyDerivation);
+      keyDerivation = KeyDerivationService(catalystKeyDerivation);
       masterKey = _FakeBip32Ed22519XPrivateKey(bytes: [1]);
     });
 
@@ -49,15 +49,6 @@ void main() {
   });
 }
 
-class _FakeCatalystKeyDerivation extends Fake implements CatalystKeyDerivation {
-  @override
-  Future<Bip32Ed25519XPrivateKey> deriveMasterKey({
-    required String mnemonic,
-  }) async {
-    return _FakeBip32Ed22519XPrivateKey(bytes: mnemonic.codeUnits);
-  }
-}
-
 class _FakeBip32Ed22519XPrivateKey extends Fake
     implements Bip32Ed25519XPrivateKey {
   @override
@@ -66,15 +57,15 @@ class _FakeBip32Ed22519XPrivateKey extends Fake
   _FakeBip32Ed22519XPrivateKey({required this.bytes});
 
   @override
-  Future<Bip32Ed25519XPublicKey> derivePublicKey() async {
-    return _FakeBip32Ed25519XPublicKey(bytes: bytes);
-  }
-
-  @override
   Future<Bip32Ed25519XPrivateKey> derivePrivateKey({
     required String path,
   }) async {
     return _FakeBip32Ed22519XPrivateKey(bytes: path.codeUnits);
+  }
+
+  @override
+  Future<Bip32Ed25519XPublicKey> derivePublicKey() async {
+    return _FakeBip32Ed25519XPublicKey(bytes: bytes);
   }
 }
 
@@ -84,4 +75,13 @@ class _FakeBip32Ed25519XPublicKey extends Fake
   final List<int> bytes;
 
   _FakeBip32Ed25519XPublicKey({required this.bytes});
+}
+
+class _FakeCatalystKeyDerivation extends Fake implements CatalystKeyDerivation {
+  @override
+  Future<Bip32Ed25519XPrivateKey> deriveMasterKey({
+    required String mnemonic,
+  }) async {
+    return _FakeBip32Ed22519XPrivateKey(bytes: mnemonic.codeUnits);
+  }
 }

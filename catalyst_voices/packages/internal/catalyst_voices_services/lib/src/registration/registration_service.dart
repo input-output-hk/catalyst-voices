@@ -9,26 +9,28 @@ import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:uuid/uuid.dart';
 
+/* cSpell:enable */
+
+final _logger = Logger('RegistrationService');
 // TODO(damian-molinski): remove once recover account is implemented
 /* cSpell:disable */
 final _testNetAddress = ShelleyAddress.fromBech32(
   'addr_test1vzpwq95z3xyum8vqndgdd'
   '9mdnmafh3djcxnc6jemlgdmswcve6tkw',
 );
-/* cSpell:enable */
-
-final _logger = Logger('RegistrationService');
 
 abstract interface class RegistrationService {
   factory RegistrationService(
     TransactionConfigRepository transactionConfigRepository,
     KeychainProvider keychainProvider,
     CatalystCardano cardano,
-    KeyDerivation keyDerivation,
+    KeyDerivationService keyDerivationService,
   ) = RegistrationServiceImpl;
 
-  /// Returns the available cardano wallet extensions.
-  Future<List<CardanoWallet>> getCardanoWallets();
+  /// See [KeyDerivationService.deriveMasterKey].
+  Future<Bip32Ed25519XPrivateKey> deriveMasterKey({
+    required SeedPhrase seedPhrase,
+  });
 
   /// Returns the details of a [wallet].
   ///
@@ -36,15 +38,8 @@ abstract interface class RegistrationService {
   /// Afterwards the user must grant a permission inside the wallet extension.
   Future<WalletInfo> getCardanoWalletInfo(CardanoWallet wallet);
 
-  /// See [KeyDerivation.deriveMasterKey].
-  Future<Bip32Ed25519XPrivateKey> deriveMasterKey({
-    required SeedPhrase seedPhrase,
-  });
-
-  /// Loads account related to this [seedPhrase]. Throws exception if non found.
-  Future<Account> recoverAccount({
-    required SeedPhrase seedPhrase,
-  });
+  /// Returns the available cardano wallet extensions.
+  Future<List<CardanoWallet>> getCardanoWallets();
 
   /// Builds an unsigned registration transaction from given parameters.
   ///
@@ -54,6 +49,11 @@ abstract interface class RegistrationService {
     required NetworkId networkId,
     required Bip32Ed25519XPrivateKey masterKey,
     required Set<AccountRole> roles,
+  });
+
+  /// Loads account related to this [seedPhrase]. Throws exception if non found.
+  Future<Account> recoverAccount({
+    required SeedPhrase seedPhrase,
   });
 
   /// Requests the user to sign the registration transaction
@@ -87,18 +87,20 @@ final class RegistrationServiceImpl implements RegistrationService {
   final TransactionConfigRepository _transactionConfigRepository;
   final KeychainProvider _keychainProvider;
   final CatalystCardano _cardano;
-  final KeyDerivation _keyDerivation;
+  final KeyDerivationService _keyDerivationService;
 
   const RegistrationServiceImpl(
     this._transactionConfigRepository,
     this._keychainProvider,
     this._cardano,
-    this._keyDerivation,
+    this._keyDerivationService,
   );
 
   @override
-  Future<List<CardanoWallet>> getCardanoWallets() {
-    return _cardano.getWallets();
+  Future<Bip32Ed25519XPrivateKey> deriveMasterKey({
+    required SeedPhrase seedPhrase,
+  }) {
+    return _keyDerivationService.deriveMasterKey(seedPhrase: seedPhrase);
   }
 
   @override
@@ -115,10 +117,46 @@ final class RegistrationServiceImpl implements RegistrationService {
   }
 
   @override
-  Future<Bip32Ed25519XPrivateKey> deriveMasterKey({
-    required SeedPhrase seedPhrase,
-  }) {
-    return _keyDerivation.deriveMasterKey(seedPhrase: seedPhrase);
+  Future<List<CardanoWallet>> getCardanoWallets() {
+    return _cardano.getWallets();
+  }
+
+  @override
+  Future<Transaction> prepareRegistration({
+    required CardanoWallet wallet,
+    required NetworkId networkId,
+    required Bip32Ed25519XPrivateKey masterKey,
+    required Set<AccountRole> roles,
+  }) async {
+    try {
+      final config = await _transactionConfigRepository.fetch(networkId);
+
+      final enabledWallet = await wallet.enable();
+      final changeAddress = await enabledWallet.getChangeAddress();
+      final rewardAddresses = await enabledWallet.getRewardAddresses();
+      final utxos = await enabledWallet.getUtxos(
+        amount: Balance(
+          coin: CardanoWalletDetails.minAdaForRegistration,
+        ),
+      );
+
+      final registrationBuilder = RegistrationTransactionBuilder(
+        transactionConfig: config,
+        keyDerivationService: _keyDerivationService,
+        masterKey: masterKey,
+        networkId: networkId,
+        roles: roles,
+        changeAddress: changeAddress,
+        rewardAddresses: rewardAddresses,
+        utxos: utxos,
+      );
+
+      return await registrationBuilder.build();
+    } on RegistrationException {
+      rethrow;
+    } catch (error) {
+      throw const RegistrationUnknownException();
+    }
   }
 
   // TODO(damian-molinski): to be implemented
@@ -164,44 +202,6 @@ final class RegistrationServiceImpl implements RegistrationService {
         address: _testNetAddress,
       ),
     );
-  }
-
-  @override
-  Future<Transaction> prepareRegistration({
-    required CardanoWallet wallet,
-    required NetworkId networkId,
-    required Bip32Ed25519XPrivateKey masterKey,
-    required Set<AccountRole> roles,
-  }) async {
-    try {
-      final config = await _transactionConfigRepository.fetch(networkId);
-
-      final enabledWallet = await wallet.enable();
-      final changeAddress = await enabledWallet.getChangeAddress();
-      final rewardAddresses = await enabledWallet.getRewardAddresses();
-      final utxos = await enabledWallet.getUtxos(
-        amount: Balance(
-          coin: CardanoWalletDetails.minAdaForRegistration,
-        ),
-      );
-
-      final registrationBuilder = RegistrationTransactionBuilder(
-        transactionConfig: config,
-        keyDerivation: _keyDerivation,
-        masterKey: masterKey,
-        networkId: networkId,
-        roles: roles,
-        changeAddress: changeAddress,
-        rewardAddresses: rewardAddresses,
-        utxos: utxos,
-      );
-
-      return await registrationBuilder.build();
-    } on RegistrationException {
-      rethrow;
-    } catch (error) {
-      throw const RegistrationUnknownException();
-    }
   }
 
   @override

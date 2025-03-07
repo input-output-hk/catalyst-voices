@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:catalyst_voices_services/src/crypto/key_derivation_service.dart';
 
 /// The transaction metadata used for registration.
 typedef RegistrationMetadata = X509MetadataEnvelope<RegistrationData>;
@@ -19,7 +19,7 @@ final class RegistrationTransactionBuilder {
   final TransactionBuilderConfig transactionConfig;
 
   /// The algorithm for deriving keys.
-  final KeyDerivation keyDerivation;
+  final KeyDerivationService keyDerivationService;
 
   /// The master key derived from the seed phrase.
   final Bip32Ed25519XPrivateKey masterKey;
@@ -44,7 +44,7 @@ final class RegistrationTransactionBuilder {
 
   const RegistrationTransactionBuilder({
     required this.transactionConfig,
-    required this.keyDerivation,
+    required this.keyDerivationService,
     required this.masterKey,
     required this.networkId,
     required this.roles,
@@ -52,6 +52,8 @@ final class RegistrationTransactionBuilder {
     required this.rewardAddresses,
     required this.utxos,
   });
+
+  ShelleyAddress get _stakeAddress => rewardAddresses.first;
 
   /// Builds the unsigned registration transaction.
   ///
@@ -72,7 +74,7 @@ final class RegistrationTransactionBuilder {
   }
 
   Future<RegistrationMetadata> _buildMetadataEnvelope() async {
-    final rootKeyPair = await keyDerivation.deriveAccountRoleKeyPair(
+    final rootKeyPair = await keyDerivationService.deriveAccountRoleKeyPair(
       masterKey: masterKey,
       role: AccountRole.root,
     );
@@ -152,6 +154,15 @@ final class RegistrationTransactionBuilder {
     );
   }
 
+  Future<Ed25519PublicKey> _deriveProposerPublicKey() async {
+    final keyPair = await keyDerivationService.deriveAccountRoleKeyPair(
+      masterKey: masterKey,
+      role: AccountRole.proposer,
+    );
+
+    return keyPair.publicKey.toPublicKey();
+  }
+
   Future<X509Certificate> _generateX509Certificate({
     required Bip32Ed25519XKeyPair keyPair,
   }) async {
@@ -196,15 +207,4 @@ final class RegistrationTransactionBuilder {
       privateKey: keyPair.privateKey,
     );
   }
-
-  Future<Ed25519PublicKey> _deriveProposerPublicKey() async {
-    final keyPair = await keyDerivation.deriveAccountRoleKeyPair(
-      masterKey: masterKey,
-      role: AccountRole.proposer,
-    );
-
-    return keyPair.publicKey.toPublicKey();
-  }
-
-  ShelleyAddress get _stakeAddress => rewardAddresses.first;
 }

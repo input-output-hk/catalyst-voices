@@ -2,8 +2,8 @@ import 'dart:typed_data';
 
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
+import 'package:catalyst_voices_services/src/crypto/key_derivation_service.dart';
 import 'package:catalyst_voices_services/src/user/user_service.dart';
-import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:rxdart/rxdart.dart';
 
 abstract interface class ProposalService {
@@ -12,7 +12,7 @@ abstract interface class ProposalService {
     DocumentRepository documentRepository,
     SignedDocumentManager signedDocumentManager,
     UserService userService,
-    KeyDerivation keyDerivation,
+    KeyDerivationService keyDerivationService,
   ) = ProposalServiceImpl;
 
   Future<List<String>> addFavoriteProposal(String proposalId);
@@ -88,14 +88,14 @@ final class ProposalServiceImpl implements ProposalService {
   final DocumentRepository _documentRepository;
   final SignedDocumentManager _signedDocumentManager;
   final UserService _userService;
-  final KeyDerivation _keyDerivation;
+  final KeyDerivationService _keyDerivationService;
 
   const ProposalServiceImpl(
     this._proposalRepository,
     this._documentRepository,
     this._signedDocumentManager,
     this._userService,
-    this._keyDerivation,
+    this._keyDerivationService,
   );
 
   @override
@@ -186,7 +186,7 @@ final class ProposalServiceImpl implements ProposalService {
       throw StateError('Cannot publish a proposal, master key missing');
     }
 
-    final keyPair = await _keyDerivation.deriveAccountRoleKeyPair(
+    final keyPair = await _keyDerivationService.deriveAccountRoleKeyPair(
       masterKey: masterKey,
       role: AccountRole.proposer,
     );
