@@ -39,8 +39,8 @@ use crate::{
 /// or the latest registration returned if no asat given.
 pub(crate) async fn get_registrations_given_stake_addr(
     stake_address: StakeAddress, session: Arc<CassandraSession>, asat: Option<SlotNo>,
-    _page: common::types::generic::query::pagination::Page,
-    _limit: common::types::generic::query::pagination::Limit,
+    page: common::types::generic::query::pagination::Page,
+    limit: common::types::generic::query::pagination::Limit,
 ) -> anyhow::Result<Cip36Registration> {
     // Get stake public key associated with given stake address.
     let mut stake_pk_iter = GetStakePublicKeyFromStakeAddrQuery::execute(
@@ -52,40 +52,40 @@ pub(crate) async fn get_registrations_given_stake_addr(
     let Some(row_stake_pk) = stake_pk_iter.next().await else {
         return Ok(Cip36Registration::NotFound);
     };
-    let row_stake_pk = row_stake_pk?;
-    let stake_public_key = row_stake_pk.stake_public_key;
+    let stake_public_key = row_stake_pk?.stake_public_key;
 
-    // Fetch all registrations for this public key
-    let valid_regs = get_all_registrations_from_stake_pub_key(&session, stake_public_key.clone())
-        .await
-        .map_err(|err| {
-            anyhow::anyhow!("Failed to query registrations from stake public key {err}")
-        })?;
+    let (valid_regs, invalid_regs) = futures::try_join!(
+        get_valid_registrations(&session, stake_public_key.clone()),
+        get_invalid_registrations(&session, stake_public_key)
+    )?;
 
     let valid_regs = filter_and_sort_registrations(valid_regs, asat);
-
-    // Fetch additional invalid registrations
-    let invalid_regs = get_invalid_registrations(&session, stake_public_key)
-        .await
-        .map_err(|err| {
-            anyhow::anyhow!("Failed to obtain invalid registrations for given stake pub key {err}")
-        })?;
     let invalid_regs = filter_and_sort_registrations(invalid_regs, asat);
 
+    if valid_regs.is_empty() && invalid_regs.is_empty() {
+        return Ok(Cip36Registration::NotFound);
+    }
+
     // Paginate results
-    // let (valid_regs, remaining) = paginate_registrations(valid_regs, page.into(),
-    // limit.into())?;
+    let (valid_regs, remaining) = paginate_registrations(valid_regs, page.into(), limit.into())?;
 
     let res = Cip36RegistrationList {
         valid: valid_regs.into(),
         invalid: invalid_regs.into(),
-        page: None,
+        page: Some(
+            CurrentPage {
+                page,
+                limit,
+                remaining,
+            }
+            .into(),
+        ),
     };
     Ok(Cip36Registration::Ok(poem_openapi::payload::Json(res)))
 }
 
-/// Get all cip36 registrations for a given stake public key.
-async fn get_all_registrations_from_stake_pub_key(
+/// Get valid cip36 registrations for a given stake public key.
+async fn get_valid_registrations(
     session: &CassandraSession, stake_public_key: Vec<u8>,
 ) -> Result<Vec<Cip36Details>, anyhow::Error> {
     let hex_stake_pk = Ed25519HexEncodedPublicKey::try_from(stake_public_key.as_slice())
@@ -260,13 +260,10 @@ pub(crate) async fn get_registrations_given_vote_key(
     while let Some(row_stake_pk) = stake_pk_iter.next().await {
         let stake_public_key = row_stake_pk?.stake_public_key;
 
-        let valid_regs =
-            get_all_registrations_from_stake_pub_key(&session, stake_public_key.clone())
-                .await
-                .map_err(|err| anyhow::anyhow!("Failed to query registration, {err}",))?;
-        let invalid_regs = get_invalid_registrations(&session, stake_public_key.clone())
-            .await
-            .map_err(|err| anyhow::anyhow!("Failed to obtain invalid registrations, {err}",))?;
+        let (valid_regs, invalid_regs) = futures::try_join!(
+            get_valid_registrations(&session, stake_public_key.clone()),
+            get_invalid_registrations(&session, stake_public_key.clone())
+        )?;
 
         all_valid_regs.extend(valid_regs);
         all_invalid_regs.extend(invalid_regs);
@@ -274,6 +271,10 @@ pub(crate) async fn get_registrations_given_vote_key(
 
     let all_valid_regs = filter_and_sort_registrations(all_valid_regs, asat);
     let all_invalid_regs = filter_and_sort_registrations(all_invalid_regs, asat);
+
+    if all_valid_regs.is_empty() && all_invalid_regs.is_empty() {
+        return Ok(Cip36Registration::NotFound);
+    }
 
     let (all_valid_regs, remaining) =
         paginate_registrations(all_valid_regs, page.into(), limit.into())?;
@@ -299,7 +300,7 @@ pub async fn snapshot(
     session: Arc<CassandraSession>, asat: Option<SlotNo>,
 ) -> anyhow::Result<Cip36Registration> {
     let valid_invalid_queries = future::join(
-        get_all_registrations(session.clone()),
+        get_all_valid_registrations(session.clone()),
         get_all_invalid_registrations(session.clone()),
     );
 
@@ -320,8 +321,8 @@ pub async fn snapshot(
     )))
 }
 
-/// Get all cip36 registrations.
-pub async fn get_all_registrations(
+/// Get all valid cip36 registrations.
+async fn get_all_valid_registrations(
     session: Arc<CassandraSession>,
 ) -> Result<DashMap<Ed25519HexEncodedPublicKey, Vec<Cip36Details>>, anyhow::Error> {
     let mut registrations_iter =
