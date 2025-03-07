@@ -2,10 +2,15 @@
 use poem_openapi::ApiResponse;
 
 use crate::{
-    db::{event::establish_connection, index::session::CassandraSession},
+    db::{
+        event::{establish_connection, EventDB},
+        index::session::CassandraSession,
+    },
     service::{
         common::{responses::WithErrorResponses, types::headers::retry_after::RetryAfterOption},
-        utilities::health::{event_db_is_live, index_db_is_live},
+        utilities::health::{
+            event_db_is_live, index_db_is_live, set_event_db_liveness, set_index_db_liveness,
+        },
     },
 };
 
@@ -41,19 +46,52 @@ pub(crate) type AllResponses = WithErrorResponses<Responses>;
 /// service that are ready.
 #[allow(clippy::unused_async)]
 pub(crate) async fn endpoint() -> AllResponses {
-    let error = AllResponses::service_unavailable(
-        &anyhow::anyhow!("Service is not ready, do not send other requests."),
-        RetryAfterOption::Default,
-    );
-    if !event_db_is_live() {
+    // Check Event DB connection
+    let event_db_live = if event_db_is_live() {
+        true
+    } else {
         // Attempt to reconnect
         establish_connection();
-        return error;
-    }
-    if !index_db_is_live() {
+        // Re-check, if success, enable flag.
+        if EventDB::connection_is_ok() {
+            set_event_db_liveness(true);
+            true
+        } else {
+            false
+        }
+    };
+
+    // Check Event DB connection
+    let index_db_live = index_db_is_live();
+    if !index_db_live {
         // Attempt to reconnect
         CassandraSession::init();
-        return error;
+        // Re-check, if success, enable flag.
+        if CassandraSession::wait_until_ready(core::time::Duration::from_secs(1), false)
+            .await
+            .is_ok()
+        {
+            set_index_db_liveness(true);
+        }
     }
-    Responses::NoContent.into()
+
+    let first_check_passed = index_db_live && event_db_live;
+
+    let success_response = Responses::NoContent.into();
+
+    // Return 204 response if check passed initially.
+    if first_check_passed {
+        return success_response;
+    }
+
+    // Otherwise, re-check, and return 403 response if all is good.
+    if index_db_is_live() && event_db_is_live() {
+        return success_response;
+    }
+
+    // Otherwise, return 503 response.
+    AllResponses::service_unavailable(
+        &anyhow::anyhow!("Service is not ready, do not send other requests."),
+        RetryAfterOption::Default,
+    )
 }
