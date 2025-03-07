@@ -5,6 +5,7 @@ export 'auth/password_strength.dart';
 export 'campaign/campaign.dart';
 export 'campaign/campaign_base.dart';
 export 'campaign/campaign_category.dart';
+export 'campaign/current_campaign.dart';
 export 'crypto/lock_factor.dart';
 export 'document/builder/document_builder.dart';
 export 'document/builder/document_change.dart';

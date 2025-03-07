@@ -13,7 +13,6 @@ abstract interface class CampaignService {
     required String id,
   });
 
-  // TODO(LynxLynxx): return correct model type
   Future<List<CampaignCategory>> getCampaignCategories();
 
   CampaignCategory getCategory(String uuid);
