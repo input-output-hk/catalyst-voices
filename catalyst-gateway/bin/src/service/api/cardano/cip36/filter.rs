@@ -38,7 +38,7 @@ use crate::{
 /// Get registrations given a stake address, it can be time specific based on asat param,
 /// or the latest registration returned if no asat given.
 pub(crate) async fn get_registrations_given_stake_addr(
-    stake_address: StakeAddress, session: Arc<CassandraSession>, _asat: Option<SlotNo>,
+    stake_address: StakeAddress, session: Arc<CassandraSession>, asat: Option<SlotNo>,
     _page: common::types::generic::query::pagination::Page,
     _limit: common::types::generic::query::pagination::Limit,
 ) -> anyhow::Result<Cip36Registration> {
@@ -61,9 +61,8 @@ pub(crate) async fn get_registrations_given_stake_addr(
         .map_err(|err| {
             anyhow::anyhow!("Failed to query registrations from stake public key {err}")
         })?;
-    println!("valid_regs: {valid_regs:?}");
 
-    // let valid_regs = filter_and_sort_registrations(valid_regs, asat);
+    let valid_regs = filter_and_sort_registrations(valid_regs, asat);
 
     // Fetch additional invalid registrations
     let invalid_regs = get_invalid_registrations(&session, stake_public_key)
@@ -71,8 +70,7 @@ pub(crate) async fn get_registrations_given_stake_addr(
         .map_err(|err| {
             anyhow::anyhow!("Failed to obtain invalid registrations for given stake pub key {err}")
         })?;
-    println!("invalid_regs: {invalid_regs:?}");
-    // let invalid_regs = filter_and_sort_registrations(invalid_regs, asat);
+    let invalid_regs = filter_and_sort_registrations(invalid_regs, asat);
 
     // Paginate results
     // let (valid_regs, remaining) = paginate_registrations(valid_regs, page.into(),

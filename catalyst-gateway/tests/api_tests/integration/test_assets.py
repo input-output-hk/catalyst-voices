@@ -22,10 +22,10 @@ def test_persistent_ada_amount_endpoint(snapshot):
             # at this case cat-gateway return 404, that is why we are checking this case additionally
             return
 
-        assets = resp.json()
         assert (
             resp.status_code == 200
         ), f"Cannot find assets for stake_address: {stake_address}"
+        assets = resp.json()
         assert (
             assets["persistent"]["ada_amount"] == expected_amount
         ), f"Not expected ada amount for stake_address: {stake_address}"
