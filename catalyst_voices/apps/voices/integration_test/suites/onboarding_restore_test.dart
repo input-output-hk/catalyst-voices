@@ -1,4 +1,3 @@
-// suites/onboarding_test_restore.dart
 import 'package:catalyst_voices/app/view/app.dart';
 import 'package:catalyst_voices/configs/bootstrap.dart';
 import 'package:catalyst_voices/routes/routes.dart';
@@ -7,6 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:patrol_finders/patrol_finders.dart';
 
+import '../pageobject/app_bar_page.dart';
 import '../pageobject/onboarding/restore_flow/step_2_restore_keychain_choice_panel.dart';
 import '../pageobject/onboarding/restore_flow/step_3_seedphrase_instructions_panel.dart';
 import '../pageobject/onboarding/restore_flow/step_4_restore_keychain_input_panel.dart';
@@ -122,7 +122,7 @@ void main() async {
         await UnlockPasswordSuccessPanel($).goto();
         await UnlockPasswordSuccessPanel($).verifyPageElements();
         await UnlockPasswordSuccessPanel($).clickGoToDashboard();
-        //expect($(Key('DashboardScreen')), findsOneWidget);
+        await AppBarPage($).sessionAccountPopupMenuAvatarIsVisible();
       });
 
       patrolWidgetTest('restore - password mismatch shows error',
