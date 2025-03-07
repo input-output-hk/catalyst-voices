@@ -4,6 +4,7 @@
 
 use std::{
     borrow::Cow,
+    cmp::Ordering,
     ops::{Deref, DerefMut},
     sync::LazyLock,
 };
@@ -139,6 +140,18 @@ impl TryInto<Vec<u8>> for Ed25519HexEncodedPublicKey {
 
     fn try_into(self) -> Result<Vec<u8>, Self::Error> {
         Ok(hex::decode(self.0.trim_start_matches("0x"))?)
+    }
+}
+
+impl PartialOrd for Ed25519HexEncodedPublicKey {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.0.cmp(&other.0))
+    }
+}
+
+impl Ord for Ed25519HexEncodedPublicKey {
+    fn cmp(&self, other: &Self) -> Ordering {
+        self.0.cmp(&other.0)
     }
 }
 
