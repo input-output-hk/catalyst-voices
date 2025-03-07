@@ -1838,5 +1838,9 @@
         "type": "int"
       }
     }
+  },
+  "notFoundError": "The requested data could not be found. Try different search.",
+  "@notFoundError": {
+    "description": "Error message when user tries to access resourse that does not exist."
   }
 }

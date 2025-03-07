@@ -1,8 +1,8 @@
 export 'account/my_account_role_item.dart';
 export 'account/my_account_status_notification.dart';
 export 'authentication/authentication.dart';
-export 'campaign/campaign_category.dart';
 export 'campaign/campaign_category_section.dart';
+export 'campaign/campaign_category_view_model.dart';
 export 'campaign/campaign_info.dart';
 export 'campaign/campaign_list_item.dart';
 export 'campaign/campaign_stage.dart';
@@ -16,6 +16,7 @@ export 'document/document_segment.dart';
 export 'document/document_versions.dart';
 export 'document/validation/localized_document_validation_result.dart';
 export 'exception/localized_exception.dart';
+export 'exception/localized_not_found.dart';
 export 'exception/localized_unknown_exception.dart';
 export 'menu/menu_item.dart';
 export 'menu/popup_menu_item.dart';
