@@ -1,27 +1,27 @@
 import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_services/src/crypto/bip32_ed25519_catalyst_private_key.dart';
 
 /// Derives key pairs from a seed phrase.
-
 abstract interface class KeyDerivationService {
   const factory KeyDerivationService(CatalystKeyDerivation keyDerivation) =
       KeyDerivationServiceImpl;
 
-  /// Derives the [Ed25519KeyPair] for the [role] from a [masterKey].
-  Future<Bip32Ed25519XKeyPair> deriveAccountRoleKeyPair({
-    required Bip32Ed25519XPrivateKey masterKey,
+  /// Derives the [CatalystKeyPair] for the [role] from a [masterKey].
+  Future<CatalystKeyPair> deriveAccountRoleKeyPair({
+    required CatalystPrivateKey masterKey,
     required AccountRole role,
   });
 
-  /// Derives an [Ed25519KeyPair] from a [masterKey] and [path].
+  /// Derives an [CatalystKeyPair] from a [masterKey] and [path].
   ///
   /// Example [path]: m/0'/2147483647'
-  Future<Bip32Ed25519XKeyPair> deriveKeyPair({
-    required Bip32Ed25519XPrivateKey masterKey,
+  Future<CatalystKeyPair> deriveKeyPair({
+    required CatalystPrivateKey masterKey,
     required String path,
   });
 
-  Future<Bip32Ed25519XPrivateKey> deriveMasterKey({
+  Future<CatalystPrivateKey> deriveMasterKey({
     required SeedPhrase seedPhrase,
   });
 }
@@ -36,8 +36,8 @@ final class KeyDerivationServiceImpl implements KeyDerivationService {
   const KeyDerivationServiceImpl(this._keyDerivation);
 
   @override
-  Future<Bip32Ed25519XKeyPair> deriveAccountRoleKeyPair({
-    required Bip32Ed25519XPrivateKey masterKey,
+  Future<CatalystKeyPair> deriveAccountRoleKeyPair({
+    required CatalystPrivateKey masterKey,
     required AccountRole role,
   }) async {
     return deriveKeyPair(
@@ -47,26 +47,28 @@ final class KeyDerivationServiceImpl implements KeyDerivationService {
   }
 
   @override
-  Future<Bip32Ed25519XKeyPair> deriveKeyPair({
-    required Bip32Ed25519XPrivateKey masterKey,
+  Future<CatalystKeyPair> deriveKeyPair({
+    required CatalystPrivateKey masterKey,
     required String path,
   }) async {
     final privateKey = await masterKey.derivePrivateKey(path: path);
     final publicKey = await privateKey.derivePublicKey();
 
-    return Bip32Ed25519XKeyPair(
+    return CatalystKeyPair(
       publicKey: publicKey,
       privateKey: privateKey,
     );
   }
 
   @override
-  Future<Bip32Ed25519XPrivateKey> deriveMasterKey({
+  Future<CatalystPrivateKey> deriveMasterKey({
     required SeedPhrase seedPhrase,
-  }) {
-    return _keyDerivation.deriveMasterKey(
+  }) async {
+    final privateKey = await _keyDerivation.deriveMasterKey(
       mnemonic: seedPhrase.mnemonic,
     );
+
+    return Bip32Ed25519CatalystPrivateKey(privateKey);
   }
 
   /// The path feed into key derivation algorithm

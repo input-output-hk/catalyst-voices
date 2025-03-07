@@ -194,8 +194,8 @@ final class ProposalServiceImpl implements ProposalService {
     final signedDocument = await _signedDocumentManager.signDocument(
       SignedDocumentJsonPayload(content.data),
       metadata: _createProposalMetadata(metadata),
-      publicKey: Uint8List.fromList(keyPair.publicKey.bytes),
-      privateKey: Uint8List.fromList(keyPair.privateKey.bytes),
+      publicKey: keyPair.publicKey,
+      privateKey: keyPair.privateKey,
     );
 
     await _documentRepository.uploadDocument(document: signedDocument);

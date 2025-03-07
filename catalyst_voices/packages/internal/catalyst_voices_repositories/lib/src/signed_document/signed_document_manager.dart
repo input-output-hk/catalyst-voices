@@ -15,7 +15,9 @@ typedef SignedDocumentPayloadParser<T extends SignedDocumentPayload> = T
 abstract interface class SignedDocumentManager {
   /// The default constructor for the [SignedDocumentManager],
   /// provides the default implementation of the interface.
-  const factory SignedDocumentManager() = SignedDocumentManagerImpl;
+  const factory SignedDocumentManager({
+    required CatalystKeyFactory keyFactory,
+  }) = SignedDocumentManagerImpl;
 
   /// Parses the document from the [bytes] representation.
   ///
@@ -36,7 +38,7 @@ abstract interface class SignedDocumentManager {
   Future<SignedDocument<T>> signDocument<T extends SignedDocumentPayload>(
     T document, {
     required SignedDocumentMetadata metadata,
-    required Uint8List publicKey,
-    required Uint8List privateKey,
+    required CatalystPublicKey publicKey,
+    required CatalystPrivateKey privateKey,
   });
 }

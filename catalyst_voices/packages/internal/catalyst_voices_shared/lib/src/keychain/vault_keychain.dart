@@ -1,30 +1,18 @@
 import 'dart:async';
+import 'dart:typed_data';
 
-import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
-
-const _rootKey = 'rootKey';
+import 'package:convert/convert.dart';
 
 const _allKeys = [
   _rootKey,
 ];
 
-final class VaultKeychain extends SecureStorageVault implements Keychain {
-  /// See [SecureStorageVault.isStorageKey].
-  static bool isKeychainKey(
-    String value, {
-    String key = SecureStorageVault.defaultKey,
-  }) {
-    return SecureStorageVault.isStorageKey(value, key: key);
-  }
+const _rootKey = 'rootKey';
 
-  /// See [SecureStorageVault.getStorageId].
-  static String getStorageId(
-    String value, {
-    String key = SecureStorageVault.defaultKey,
-  }) {
-    return SecureStorageVault.getStorageId(value, key: key);
-  }
+final class VaultKeychain extends SecureStorageVault implements Keychain {
+  final CatalystKeyFactory privateKeyFactory;
 
   VaultKeychain({
     required super.id,
@@ -33,6 +21,7 @@ final class VaultKeychain extends SecureStorageVault implements Keychain {
     required super.sharedPreferences,
     super.unlockTtl,
     super.cryptoService,
+    required this.privateKeyFactory,
   });
 
   @override
@@ -47,21 +36,40 @@ final class VaultKeychain extends SecureStorageVault implements Keychain {
   }
 
   @override
-  Future<Bip32Ed25519XPrivateKey?> getMasterKey() async {
-    final encodedMasterKey = await readString(key: _rootKey);
-    return encodedMasterKey != null
-        ? Bip32Ed25519XPrivateKeyFactory.instance.fromHex(encodedMasterKey)
-        : null;
-  }
-
-  @override
-  Future<void> setMasterKey(Bip32Ed25519XPrivateKey data) async {
-    await writeString(data.toHex(), key: _rootKey);
-  }
-
-  @override
   Future<void> erase() => clear();
 
   @override
+  Future<CatalystPrivateKey?> getMasterKey() async {
+    final masterKeyHex = await readString(key: _rootKey);
+    if (masterKeyHex == null) {
+      return null;
+    }
+
+    final masterKeyBytes = Uint8List.fromList(hex.decode(masterKeyHex));
+    return privateKeyFactory.createPrivateKey(masterKeyBytes);
+  }
+
+  @override
+  Future<void> setMasterKey(CatalystPrivateKey data) async {
+    await writeString(hex.encode(data.bytes), key: _rootKey);
+  }
+
+  @override
   String toString() => 'VaultKeychain[$id]';
+
+  /// See [SecureStorageVault.getStorageId].
+  static String getStorageId(
+    String value, {
+    String key = SecureStorageVault.defaultKey,
+  }) {
+    return SecureStorageVault.getStorageId(value, key: key);
+  }
+
+  /// See [SecureStorageVault.isStorageKey].
+  static bool isKeychainKey(
+    String value, {
+    String key = SecureStorageVault.defaultKey,
+  }) {
+    return SecureStorageVault.isStorageKey(value, key: key);
+  }
 }

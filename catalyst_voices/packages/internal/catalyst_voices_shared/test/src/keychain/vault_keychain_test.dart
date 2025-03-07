@@ -1,4 +1,5 @@
-import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
+import 'dart:typed_data';
+
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:convert/convert.dart';
@@ -14,6 +15,7 @@ void main() {
   group(VaultKeychain, () {
     late final FlutterSecureStorage secureStorage;
     late final SharedPreferencesAsync sharedPreferences;
+    late final CatalystKeyFactory privateKeyFactory;
 
     setUpAll(() {
       FlutterSecureStorage.setMockInitialValues({});
@@ -23,9 +25,7 @@ void main() {
 
       secureStorage = const FlutterSecureStorage();
       sharedPreferences = SharedPreferencesAsync();
-
-      Bip32Ed25519XPrivateKeyFactory.instance =
-          _FakeBip32Ed25519XPrivateKeyFactory();
+      privateKeyFactory = _FakeCatalystPrivateKeyFactory();
     });
 
     tearDown(() async {
@@ -38,6 +38,7 @@ void main() {
         id: id,
         secureStorage: secureStorage,
         sharedPreferences: sharedPreferences,
+        privateKeyFactory: privateKeyFactory,
       );
     }
 
@@ -56,8 +57,12 @@ void main() {
       // Given
       final id = const Uuid().v4();
       const lock = PasswordLockFactor('Test1234');
-      final key = Bip32Ed25519XPrivateKeyFactory.instance.fromHex(
-        '8a88e3dd7409f195fd52db2d3cba5d72ca6709bf1d94121bf3748801b40f6f5c',
+      final key = privateKeyFactory.createPrivateKey(
+        Uint8List.fromList(
+          hex.decode(
+            '8a88e3dd7409f195fd52db2d3cba5d72ca6709bf1d94121bf3748801b40f6f5c',
+          ),
+        ),
       );
 
       // When
@@ -84,21 +89,17 @@ void main() {
   });
 }
 
-class _FakeBip32Ed25519XPrivateKeyFactory
-    extends Bip32Ed25519XPrivateKeyFactory {
+class _FakeCatalystPrivateKey extends Fake implements CatalystPrivateKey {
   @override
-  Bip32Ed25519XPrivateKey fromBytes(List<int> bytes) {
-    return _FakeBip32Ed22519XPrivateKey(bytes: bytes);
-  }
+  final Uint8List bytes;
+
+  _FakeCatalystPrivateKey({required this.bytes});
 }
 
-class _FakeBip32Ed22519XPrivateKey extends Fake
-    implements Bip32Ed25519XPrivateKey {
+class _FakeCatalystPrivateKeyFactory extends Fake
+    implements CatalystKeyFactory {
   @override
-  final List<int> bytes;
-
-  _FakeBip32Ed22519XPrivateKey({required this.bytes});
-
-  @override
-  String toHex() => hex.encode(bytes);
+  CatalystPrivateKey createPrivateKey(Uint8List bytes) {
+    return _FakeCatalystPrivateKey(bytes: bytes);
+  }
 }

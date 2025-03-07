@@ -2,7 +2,6 @@ import 'dart:math';
 
 import 'package:catalyst_cardano/catalyst_cardano.dart';
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
-import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
@@ -28,7 +27,7 @@ abstract interface class RegistrationService {
   ) = RegistrationServiceImpl;
 
   /// See [KeyDerivationService.deriveMasterKey].
-  Future<Bip32Ed25519XPrivateKey> deriveMasterKey({
+  Future<CatalystPrivateKey> deriveMasterKey({
     required SeedPhrase seedPhrase,
   });
 
@@ -47,7 +46,7 @@ abstract interface class RegistrationService {
   Future<Transaction> prepareRegistration({
     required CardanoWallet wallet,
     required NetworkId networkId,
-    required Bip32Ed25519XPrivateKey masterKey,
+    required CatalystPrivateKey masterKey,
     required Set<AccountRole> roles,
   });
 
@@ -72,7 +71,7 @@ abstract interface class RegistrationService {
     required Transaction unsignedTx,
     required Set<AccountRole> roles,
     required LockFactor lockFactor,
-    required Bip32Ed25519XPrivateKey masterKey,
+    required CatalystPrivateKey masterKey,
   });
 
   Future<Account> registerTestAccount({
@@ -97,7 +96,7 @@ final class RegistrationServiceImpl implements RegistrationService {
   );
 
   @override
-  Future<Bip32Ed25519XPrivateKey> deriveMasterKey({
+  Future<CatalystPrivateKey> deriveMasterKey({
     required SeedPhrase seedPhrase,
   }) {
     return _keyDerivationService.deriveMasterKey(seedPhrase: seedPhrase);
@@ -125,7 +124,7 @@ final class RegistrationServiceImpl implements RegistrationService {
   Future<Transaction> prepareRegistration({
     required CardanoWallet wallet,
     required NetworkId networkId,
-    required Bip32Ed25519XPrivateKey masterKey,
+    required CatalystPrivateKey masterKey,
     required Set<AccountRole> roles,
   }) async {
     try {
@@ -212,7 +211,7 @@ final class RegistrationServiceImpl implements RegistrationService {
     required Transaction unsignedTx,
     required Set<AccountRole> roles,
     required LockFactor lockFactor,
-    required Bip32Ed25519XPrivateKey masterKey,
+    required CatalystPrivateKey masterKey,
   }) async {
     try {
       final enabledWallet = await wallet.enable();

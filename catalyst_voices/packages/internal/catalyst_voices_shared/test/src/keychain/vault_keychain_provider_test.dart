@@ -1,4 +1,5 @@
-import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
+import 'dart:typed_data';
+
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:convert/convert.dart';
@@ -11,6 +12,7 @@ import 'package:test/test.dart';
 import 'package:uuid/uuid.dart';
 
 void main() {
+  late final CatalystKeyFactory privateKeyFactory;
   late final VaultKeychainProvider provider;
 
   setUpAll(() {
@@ -19,10 +21,13 @@ void main() {
     final store = InMemorySharedPreferencesAsync.empty();
     SharedPreferencesAsyncPlatform.instance = store;
 
+    privateKeyFactory = _FakeCatalystPrivateKeyFactory();
+
     provider = VaultKeychainProvider(
       secureStorage: const FlutterSecureStorage(),
       sharedPreferences: SharedPreferencesAsync(),
       cacheConfig: const CacheConfig(),
+      privateKeyFactory: privateKeyFactory,
     );
   });
 
@@ -51,9 +56,11 @@ void main() {
       // Given
       final id = const Uuid().v4();
       const lockFactor = PasswordLockFactor('Test1234');
-      final key = _FakeBip32Ed22519XPrivateKey(
-        bytes: hex.decode(
-          '8a88e3dd7409f195fd52db2d3cba5d72ca6709bf1d94121bf3748801b40f6f5c',
+      final key = privateKeyFactory.createPrivateKey(
+        Uint8List.fromList(
+          hex.decode(
+            '8a88e3dd7409f195fd52db2d3cba5d72ca6709bf1d94121bf3748801b40f6f5c',
+          ),
         ),
       );
 
@@ -128,13 +135,17 @@ void main() {
   });
 }
 
-class _FakeBip32Ed22519XPrivateKey extends Fake
-    implements Bip32Ed25519XPrivateKey {
+class _FakeCatalystPrivateKey extends Fake implements CatalystPrivateKey {
   @override
-  final List<int> bytes;
+  final Uint8List bytes;
 
-  _FakeBip32Ed22519XPrivateKey({required this.bytes});
+  _FakeCatalystPrivateKey({required this.bytes});
+}
 
+class _FakeCatalystPrivateKeyFactory extends Fake
+    implements CatalystKeyFactory {
   @override
-  String toHex() => hex.encode(bytes);
+  CatalystPrivateKey createPrivateKey(Uint8List bytes) {
+    return _FakeCatalystPrivateKey(bytes: bytes);
+  }
 }
