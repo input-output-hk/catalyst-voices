@@ -70,6 +70,7 @@ class _SessionAccountPopupMenuState extends State<SessionAccountPopupMenu>
       // InkWell which adds unwanted background over color.
       enabled: false,
       child: SessionAccountAvatar(
+        key: const Key('SessionAccountPopupMenuAvatar'),
         onTap: () {
           _popupMenuButtonKey.currentState?.showButtonMenu();
         },

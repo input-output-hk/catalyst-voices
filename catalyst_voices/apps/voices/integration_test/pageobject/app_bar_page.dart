@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:patrol_finders/patrol_finders.dart';
+
 import '../utils/constants.dart';
 
 class AppBarPage {
@@ -12,6 +13,8 @@ class AppBarPage {
   final lockBtn = const Key('LockButton');
   final unlockBtn = const Key('UnlockButton');
   final visitorBtn = const Key('VisitorBtn');
+  final sessionAccountPopupMenuAvatar =
+      const Key('SessionAccountPopupMenuAvatar');
 
   Future<void> spacesDrawerButtonExists({bool? reverse = false}) async {
     expect($(spacesDrawerButton).exists, !reverse!);
@@ -27,6 +30,10 @@ class AppBarPage {
 
   Future<void> getStartedBtnIsVisible() async {
     expect($(getStartedBtn), findsOneWidget);
+  }
+
+  Future<void> sessionAccountPopupMenuAvatarIsVisible() async {
+    expect($(sessionAccountPopupMenuAvatar), findsOneWidget);
   }
 
   Future<void> accountPopupBtnClick() async {

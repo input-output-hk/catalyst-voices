@@ -20,6 +20,7 @@ class RestoredPanel extends StatelessWidget {
       children: [
         const SizedBox(height: 24),
         Text(
+          key: const Key('RecoverySuccessTitle'),
           context.l10n.recoverySuccessTitle,
           style: textTheme.titleLarge?.copyWith(
             color: colors.textOnPrimaryLevel1,
@@ -27,6 +28,7 @@ class RestoredPanel extends StatelessWidget {
         ),
         const SizedBox(height: 24),
         Text(
+          key: const Key('RecoverySuccessSubtitle'),
           context.l10n.recoverySuccessSubtitle,
           style: textTheme.bodyMedium?.copyWith(
             color: colors.textOnPrimaryLevel0,
@@ -35,11 +37,13 @@ class RestoredPanel extends StatelessWidget {
         const Spacer(),
         const SizedBox(height: 10),
         VoicesFilledButton(
+          key: const Key('RecoverySuccessGoToDashboardButton'),
           onTap: () => _redirectToDashboard(context),
           child: Text(context.l10n.recoverySuccessGoToDashboard),
         ),
         const SizedBox(height: 10),
         VoicesTextButton(
+          key: const Key('RecoverySuccessGoAccountButton'),
           onTap: () => _redirectToMyAccount(context),
           child: Text(context.l10n.recoverySuccessGoAccount),
         ),

@@ -36,6 +36,7 @@ class WalletSummary extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
+            key: const Key('WalletDetectionSummary'),
             context.l10n.walletDetectionSummary,
             style: Theme.of(context).textTheme.titleSmall,
           ),
@@ -97,8 +98,12 @@ class _WalletSummaryName extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _WalletSummaryItem(
-      label: Text(context.l10n.nameOfWallet),
-      value: Text(walletName),
+      label:
+          Text(context.l10n.nameOfWallet, key: const Key('NameOfWalletLabel')),
+      value: Text(
+        walletName,
+        key: const Key('NameOfWalletValue'),
+      ),
     );
   }
 }
@@ -115,10 +120,14 @@ class _WalletSummaryBalance extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _WalletSummaryItem(
-      label: Text(context.l10n.walletBalance),
+      label: Text(
+        context.l10n.walletBalance,
+        key: const Key('WalletBalanceLabel'),
+      ),
       value: Row(
         children: [
           Text(
+            key: const Key('WalletBalanceValue'),
             balance,
             style: showLowBalance
                 ? TextStyle(color: Theme.of(context).colors.iconsError)
@@ -152,10 +161,16 @@ class _WalletSummaryAddress extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _WalletSummaryItem(
-      label: Text(context.l10n.walletAddress),
+      label: Text(
+        context.l10n.walletAddress,
+        key: const Key('WalletAddressLabel'),
+      ),
       value: Row(
         children: [
-          Text(address),
+          Text(
+            address,
+            key: const Key('WalletAddressValue'),
+          ),
           const SizedBox(width: 4),
           InkWell(
             onTap: () async {
