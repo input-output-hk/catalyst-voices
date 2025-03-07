@@ -98,10 +98,8 @@ async fn get_valid_registrations(
     while let Some(row) = registrations_iter.next().await {
         let row = row?;
 
-        let nonce = if let Some(nonce) = row.nonce.into_parts().1.to_u64_digits().first() {
-            *nonce
-        } else {
-            continue;
+        let Ok(nonce) = u64::try_from(row.nonce) else {
+            anyhow::bail!("Corrupt valid registration, cannot decode nonce");
         };
 
         let slot_no: u64 = row.slot_no.into();
@@ -109,34 +107,27 @@ async fn get_valid_registrations(
         let slot_no = match SlotNo::try_from(slot_no) {
             Ok(slot_no) => slot_no,
             Err(err) => {
-                error!("Corrupt valid registration {:?}", err);
-                // This should NOT happen, valid registrations should be infallible.
-                // If it happens, there is an indexing issue.
-                continue;
+                anyhow::bail!("Corrupt valid registration, invalid slot_no {err}");
             },
         };
 
         let payment_address = match Cip19ShelleyAddress::try_from(row.payment_address) {
             Ok(payment_addr) => Some(payment_addr),
             Err(err) => {
-                // This should NOT happen, valid registrations should be infallible.
-                // If it happens, there is an indexing issue.
-                error!(
-                    "Corrupt valid registration {err}\n Stake pub key: {}",
+                anyhow::bail!(
+                    "Corrupt valid registration, invalid payment_address {err}\n Stake pub key: {}",
                     *hex_stake_pk
                 );
-                continue;
             },
         };
 
         let vote_pub_key = match Ed25519HexEncodedPublicKey::try_from(row.vote_key) {
             Ok(vote_pub_key) => Some(vote_pub_key),
             Err(err) => {
-                error!(
-                    "Corrupt valid registration {err}\n Stake pub key:{:?}",
+                anyhow::bail!(
+                    "Corrupt valid registration, invalid vote_pub_key {err}\n Stake pub key:{:?}",
                     *hex_stake_pk
                 );
-                continue;
             },
         };
 
