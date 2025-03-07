@@ -39,7 +39,7 @@ void main() {
       secureStorage: const FlutterSecureStorage(),
       sharedPreferences: SharedPreferencesAsync(),
       cacheConfig: const CacheConfig(),
-      privateKeyFactory: _FakeCatalystPrivateKeyFactory(),
+      keyFactory: _FakeCatalystKeyFactory(),
     );
     userRepository = UserRepository(
       SecureUserStorage(),
@@ -305,7 +305,7 @@ class _FakeCatalystPrivateKey extends Fake implements CatalystPrivateKey {
   _FakeCatalystPrivateKey({required this.bytes});
 }
 
-class _FakeCatalystPrivateKeyFactory extends Fake
+class _FakeCatalystKeyFactory extends Fake
     implements CatalystKeyFactory {
   @override
   CatalystPrivateKey createPrivateKey(Uint8List bytes) {

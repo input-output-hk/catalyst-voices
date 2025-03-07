@@ -194,7 +194,7 @@ final class Dependencies extends DependencyProvider {
         secureStorage: get<FlutterSecureStorage>(),
         sharedPreferences: get<SharedPreferencesAsync>(),
         cacheConfig: get<AppConfig>().cache,
-        privateKeyFactory: get<CatalystKeyFactory>(),
+        keyFactory: get<CatalystKeyFactory>(),
       );
     });
     registerLazySingleton<DownloaderService>(DownloaderService.new);

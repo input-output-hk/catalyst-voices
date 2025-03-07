@@ -12,7 +12,7 @@ import 'package:test/test.dart';
 import 'package:uuid/uuid.dart';
 
 void main() {
-  late final CatalystKeyFactory privateKeyFactory;
+  late final CatalystKeyFactory keyFactory;
   late final VaultKeychainProvider provider;
 
   setUpAll(() {
@@ -21,13 +21,13 @@ void main() {
     final store = InMemorySharedPreferencesAsync.empty();
     SharedPreferencesAsyncPlatform.instance = store;
 
-    privateKeyFactory = _FakeCatalystPrivateKeyFactory();
+    keyFactory = _FakeCatalystKeyFactory();
 
     provider = VaultKeychainProvider(
       secureStorage: const FlutterSecureStorage(),
       sharedPreferences: SharedPreferencesAsync(),
       cacheConfig: const CacheConfig(),
-      privateKeyFactory: privateKeyFactory,
+      keyFactory: keyFactory,
     );
   });
 
@@ -56,7 +56,7 @@ void main() {
       // Given
       final id = const Uuid().v4();
       const lockFactor = PasswordLockFactor('Test1234');
-      final key = privateKeyFactory.createPrivateKey(
+      final key = keyFactory.createPrivateKey(
         Uint8List.fromList(
           hex.decode(
             '8a88e3dd7409f195fd52db2d3cba5d72ca6709bf1d94121bf3748801b40f6f5c',
@@ -142,7 +142,7 @@ class _FakeCatalystPrivateKey extends Fake implements CatalystPrivateKey {
   _FakeCatalystPrivateKey({required this.bytes});
 }
 
-class _FakeCatalystPrivateKeyFactory extends Fake
+class _FakeCatalystKeyFactory extends Fake
     implements CatalystKeyFactory {
   @override
   CatalystPrivateKey createPrivateKey(Uint8List bytes) {
