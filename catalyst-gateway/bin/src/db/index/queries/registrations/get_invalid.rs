@@ -8,15 +8,12 @@ use scylla::{
 };
 use tracing::error;
 
-use crate::{
-    db::{
-        index::{
-            queries::{PreparedQueries, PreparedSelectQuery},
-            session::CassandraSession,
-        },
-        types::DbSlot,
+use crate::db::{
+    index::{
+        queries::{PreparedQueries, PreparedSelectQuery},
+        session::CassandraSession,
     },
-    service::common::types::cardano::slot_no::SlotNo,
+    types::DbSlot,
 };
 
 /// Get invalid registrations from stake addr query.
@@ -27,24 +24,14 @@ const GET_INVALID_REGISTRATIONS_FROM_STAKE_ADDR_QUERY: &str =
 #[derive(SerializeRow)]
 pub(crate) struct GetInvalidRegistrationParams {
     /// Stake address.
-    pub stake_public_key: Vec<u8>,
-    /// Block Slot Number when spend occurred.
-    slot_no: DbSlot,
-}
-
-impl GetInvalidRegistrationParams {
-    /// Create a new instance of [`GetInvalidRegistrationParams`]
-    pub(crate) fn new(stake_public_key: Vec<u8>, slot_no: SlotNo) -> GetInvalidRegistrationParams {
-        Self {
-            stake_public_key,
-            slot_no: u64::from(slot_no).into(),
-        }
-    }
+    pub(crate) stake_public_key: Vec<u8>,
 }
 
 /// Get invalid registrations given stake address.
 #[derive(DeserializeRow)]
 pub(crate) struct GetInvalidRegistrationQuery {
+    /// Slot Number the cert is in.
+    pub slot_no: DbSlot,
     /// Error report
     pub problem_report: String,
     /// Full Stake Address (not hashed, 32 byte ED25519 Public key).

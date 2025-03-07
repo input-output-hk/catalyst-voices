@@ -38,9 +38,9 @@ use crate::{
 /// Get registrations given a stake address, it can be time specific based on asat param,
 /// or the latest registration returned if no asat given.
 pub(crate) async fn get_registrations_given_stake_addr(
-    stake_address: StakeAddress, session: Arc<CassandraSession>, asat: Option<SlotNo>,
-    page: common::types::generic::query::pagination::Page,
-    limit: common::types::generic::query::pagination::Limit,
+    stake_address: StakeAddress, session: Arc<CassandraSession>, _asat: Option<SlotNo>,
+    _page: common::types::generic::query::pagination::Page,
+    _limit: common::types::generic::query::pagination::Limit,
 ) -> anyhow::Result<Cip36Registration> {
     // Get stake public key associated with given stake address.
     let mut stake_pk_iter = GetStakePublicKeyFromStakeAddrQuery::execute(
@@ -61,38 +61,34 @@ pub(crate) async fn get_registrations_given_stake_addr(
         .map_err(|err| {
             anyhow::anyhow!("Failed to query registrations from stake public key {err}")
         })?;
+    println!("valid_regs: {valid_regs:?}");
 
-    let valid_regs = filter_and_sort_registrations(valid_regs, asat);
+    // let valid_regs = filter_and_sort_registrations(valid_regs, asat);
 
     // Fetch additional invalid registrations
-    let invalid_regs = get_invalid_registrations(stake_public_key, asat, session)
+    let invalid_regs = get_invalid_registrations(&session, stake_public_key)
         .await
         .map_err(|err| {
             anyhow::anyhow!("Failed to obtain invalid registrations for given stake pub key {err}")
         })?;
-    let invalid_regs = filter_and_sort_registrations(invalid_regs, asat);
+    println!("invalid_regs: {invalid_regs:?}");
+    // let invalid_regs = filter_and_sort_registrations(invalid_regs, asat);
 
     // Paginate results
-    let (valid_regs, remaining) = paginate_registrations(valid_regs, page.into(), limit.into())?;
+    // let (valid_regs, remaining) = paginate_registrations(valid_regs, page.into(),
+    // limit.into())?;
 
     let res = Cip36RegistrationList {
         valid: valid_regs.into(),
         invalid: invalid_regs.into(),
-        page: Some(
-            CurrentPage {
-                page,
-                limit,
-                remaining,
-            }
-            .into(),
-        ),
+        page: None,
     };
     Ok(Cip36Registration::Ok(poem_openapi::payload::Json(res)))
 }
 
 /// Get all cip36 registrations for a given stake public key.
 async fn get_all_registrations_from_stake_pub_key(
-    session: &Arc<CassandraSession>, stake_public_key: Vec<u8>,
+    session: &CassandraSession, stake_public_key: Vec<u8>,
 ) -> Result<Vec<Cip36Details>, anyhow::Error> {
     let hex_stake_pk = Ed25519HexEncodedPublicKey::try_from(stake_public_key.as_slice())
         .map_err(|err| anyhow::anyhow!("Failed to convert to type stake public key {err}"))?;
@@ -199,22 +195,28 @@ fn filter_and_sort_registrations(
     registrations
 }
 
-/// Get invalid registrations for stake addr after given slot#
+/// Get invalid registrations for stake public key
 async fn get_invalid_registrations(
-    stake_pub_key: Vec<u8>, slot_no: Option<SlotNo>, session: Arc<CassandraSession>,
+    session: &CassandraSession, stake_public_key: Vec<u8>,
 ) -> anyhow::Result<Vec<Cip36Details>> {
-    // include any erroneous registrations which occur AFTER the slot# of the last valid
-    // registration or return all invalids if NO slot# declared.
-    let slot_no = slot_no.unwrap_or_default();
-
-    let mut invalid_registrations_iter = GetInvalidRegistrationQuery::execute(
-        &session,
-        GetInvalidRegistrationParams::new(stake_pub_key, slot_no),
-    )
-    .await?;
+    let mut invalid_registrations_iter =
+        GetInvalidRegistrationQuery::execute(session, GetInvalidRegistrationParams {
+            stake_public_key,
+        })
+        .await?;
     let mut invalid_registrations = Vec::new();
     while let Some(row) = invalid_registrations_iter.next().await {
         let row = row?;
+        let slot_no: u64 = row.slot_no.into();
+        let slot_no = match SlotNo::try_from(slot_no) {
+            Ok(slot_no) => slot_no,
+            Err(err) => {
+                error!("Corrupt invalid registration {err}");
+                // This should NOT happen, valid registrations should be infallible.
+                // If it happens, there is an indexing issue.
+                continue;
+            },
+        };
         let payment_address = Cip19ShelleyAddress::try_from(row.payment_address).ok();
         let vote_pub_key = Ed25519HexEncodedPublicKey::try_from(row.vote_key).ok();
         let stake_pub_key = Ed25519HexEncodedPublicKey::try_from(row.stake_public_key.clone()).ok();
@@ -261,13 +263,12 @@ pub(crate) async fn get_registrations_given_vote_key(
         let stake_public_key = row_stake_pk?.stake_public_key;
 
         let valid_regs =
-            get_all_registrations_from_stake_pub_key(&session.clone(), stake_public_key.clone())
+            get_all_registrations_from_stake_pub_key(&session, stake_public_key.clone())
                 .await
                 .map_err(|err| anyhow::anyhow!("Failed to query registration, {err}",))?;
-        let invalid_regs =
-            get_invalid_registrations(stake_public_key.clone(), asat, session.clone())
-                .await
-                .map_err(|err| anyhow::anyhow!("Failed to obtain invalid registrations, {err}",))?;
+        let invalid_regs = get_invalid_registrations(&session, stake_public_key.clone())
+            .await
+            .map_err(|err| anyhow::anyhow!("Failed to obtain invalid registrations, {err}",))?;
 
         all_valid_regs.extend(valid_regs);
         all_invalid_regs.extend(invalid_regs);
@@ -306,16 +307,8 @@ pub async fn snapshot(
 
     let (valid_regs, invalid_regs) = valid_invalid_queries.await;
 
-    let all_valid_regs = valid_regs?
-        .into_iter()
-        .map(|(_, reg)| reg)
-        .flatten()
-        .collect();
-    let all_invalid_regs = invalid_regs?
-        .into_iter()
-        .map(|(_, reg)| reg)
-        .flatten()
-        .collect();
+    let all_valid_regs = valid_regs?.into_iter().flat_map(|(_, reg)| reg).collect();
+    let all_invalid_regs = invalid_regs?.into_iter().flat_map(|(_, reg)| reg).collect();
 
     let all_valid_regs = filter_and_sort_registrations(all_valid_regs, asat);
     let all_invalid_regs = filter_and_sort_registrations(all_invalid_regs, asat);
