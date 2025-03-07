@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math';
 
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
@@ -63,24 +62,14 @@ class DiscoveryCubit extends Cubit<DiscoveryState> {
         currentCampaign: const DiscoveryCurrentCampaignState(),
       ),
     );
-
-    final isSuccess = await Future.delayed(
-      const Duration(seconds: 2),
-      () => Random().nextBool(),
-    );
-    if (isClosed) return;
-
-    final currentCampaign = isSuccess
-        ? CurrentCampaignInfoViewModel.dummy()
-        : const NullCurrentCampaignInfoViewModel();
-
-    final error = isSuccess ? null : const LocalizedUnknownException();
+    final campaign = await _campaignService.getCurrentCampaign();
+    final currentCampaign = CurrentCampaignInfoViewModel.fromModel(campaign);
 
     emit(
       state.copyWith(
         currentCampaign: DiscoveryCurrentCampaignState(
           currentCampaign: currentCampaign,
-          error: error,
+          error: null,
           isLoading: false,
         ),
       ),
