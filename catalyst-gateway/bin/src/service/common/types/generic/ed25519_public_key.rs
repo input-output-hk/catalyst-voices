@@ -113,13 +113,20 @@ impl TryFrom<String> for Ed25519HexEncodedPublicKey {
     }
 }
 
+impl TryFrom<&[u8]> for Ed25519HexEncodedPublicKey {
+    type Error = anyhow::Error;
+
+    fn try_from(value: &[u8]) -> Result<Self, Self::Error> {
+        let key = ed25519::verifying_key_from_vec(value)?;
+        Ok(Self(as_hex_string(key.as_ref())))
+    }
+}
+
 impl TryFrom<Vec<u8>> for Ed25519HexEncodedPublicKey {
     type Error = anyhow::Error;
 
     fn try_from(value: Vec<u8>) -> Result<Self, Self::Error> {
-        let key = ed25519::verifying_key_from_vec(&value)?;
-
-        Ok(Self(as_hex_string(key.as_ref())))
+        value.as_slice().try_into()
     }
 }
 

@@ -44,10 +44,10 @@ impl Api {
         operation_id = "cardanoRegistrationCip36"
     )]
     async fn get_registration(
-        &self, lookup: Query<Option<cardano::query::stake_or_voter::StakeOrVoter>>,
-        asat: Query<Option<cardano::query::AsAt>>,
-        page: Query<Option<common::types::generic::query::pagination::Page>>,
-        limit: Query<Option<common::types::generic::query::pagination::Limit>>,
+        &self, Query(lookup): Query<Option<cardano::query::stake_or_voter::StakeOrVoter>>,
+        Query(asat): Query<Option<cardano::query::AsAt>>,
+        Query(page): Query<Option<common::types::generic::query::pagination::Page>>,
+        Query(limit): Query<Option<common::types::generic::query::pagination::Limit>>,
         /// Headers, used if the query is requesting ALL to determine if the secret API
         /// Key is also defined.
         headers: &HeaderMap,
@@ -56,7 +56,7 @@ impl Api {
         // Special validation for the `lookup` parameter.
         // If the parameter is ALL, BUT we do not have a valid API Key, just report the parameter
         // is invalid.
-        if let Some(lookup) = lookup.0.clone() {
+        if let Some(lookup) = &lookup {
             if lookup.is_all(headers).is_err() {
                 return response::Cip36Registration::UnprocessableContent(Json(
                     Cip36RegistrationUnprocessableContent::new(
@@ -68,10 +68,10 @@ impl Api {
         }
 
         endpoint::cip36_registrations(
-            lookup.0,
-            SlotNo::into_option(asat.0),
-            page.0.unwrap_or_default(),
-            limit.0.unwrap_or_default(),
+            lookup,
+            SlotNo::into_option(asat),
+            page.unwrap_or_default(),
+            limit.unwrap_or_default(),
             headers,
         )
         .await
