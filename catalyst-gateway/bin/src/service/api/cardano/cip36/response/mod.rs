@@ -33,13 +33,13 @@ pub(crate) type AllRegistration = common::responses::WithErrorResponses<Cip36Reg
 #[derive(Object)]
 #[oai(example = true)]
 pub(crate) struct Cip36RegistrationList {
-    /// The Slot the Registrations are valid up until.
-    ///
-    /// Any registrations that occurred after this Slot are not included in the list.
-    /// Errors are reported only if they fall between the last valid registration and this
-    /// slot number.
-    /// Earlier errors are never reported.
-    pub slot: common::types::cardano::slot_no::SlotNo,
+    // /// The Slot the Registrations are valid up until.
+    // ///
+    // /// Any registrations that occurred after this Slot are not included in the list.
+    // /// Errors are reported only if they fall between the last valid registration and this
+    // /// slot number.
+    // /// Earlier errors are never reported.
+    // pub slot: common::types::cardano::slot_no::SlotNo,
     /// List of latest valid registrations that were found, for the requested filter.
     #[oai(skip_serializing_if_is_empty)]
     pub valid: Cip36List,
@@ -54,9 +54,9 @@ pub(crate) struct Cip36RegistrationList {
 impl Example for Cip36RegistrationList {
     fn example() -> Self {
         Self {
-            slot: (common::types::cardano::slot_no::EXAMPLE + 635)
-                .try_into()
-                .unwrap_or_default(),
+            // slot: (common::types::cardano::slot_no::EXAMPLE + 635)
+            //     .try_into()
+            //     .unwrap_or_default(),
             valid: vec![Cip36Details::example()].into(),
             invalid: vec![Cip36Details::invalid_example()].into(),
             page: Some(Example::example()),
