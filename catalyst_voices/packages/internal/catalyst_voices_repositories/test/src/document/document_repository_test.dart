@@ -233,14 +233,15 @@ void main() {
       });
     });
 
-    group('createProposalDraft', () {
+    group('createDocumentDraft', () {
       test('version should equals id', () async {
         // Given
         const content = DocumentDataContent({});
         final templateRef = DocumentRefFactory.buildSigned();
 
         // When
-        final draftRef = await repository.createProposalDraft(
+        final draftRef = await repository.createDocumentDraft(
+          type: DocumentType.proposalDocument,
           content: content,
           template: templateRef,
         );
@@ -258,7 +259,8 @@ void main() {
         final templateRef = DocumentRefFactory.buildSigned();
 
         // When
-        final draftRef = await repository.createProposalDraft(
+        final draftRef = await repository.createDocumentDraft(
+          type: DocumentType.proposalDocument,
           content: content,
           template: templateRef,
           of: docRef,
@@ -275,7 +277,8 @@ void main() {
         final templateRef = DocumentRefFactory.buildSigned();
 
         // When
-        final draftRef = await repository.createProposalDraft(
+        final draftRef = await repository.createDocumentDraft(
+          type: DocumentType.proposalDocument,
           content: content,
           template: templateRef,
         );
@@ -297,7 +300,8 @@ void main() {
       final templateRef = DocumentRefFactory.buildSigned();
 
       // When
-      final draftRef = await repository.createProposalDraft(
+      final draftRef = await repository.createDocumentDraft(
+        type: DocumentType.proposalDocument,
         content: initialContent,
         template: templateRef,
       );
