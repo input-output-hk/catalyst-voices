@@ -8,23 +8,20 @@ use catalyst_types::id_uri::IdUri;
 use futures::StreamExt;
 
 use super::*;
-use crate::{
-    db::index::{
-        queries::{
-            rbac,
-            registrations::{
-                get_from_stake_addr::*, get_invalid::*, get_stake_pk_from_stake_addr::*,
-                get_stake_pk_from_vote_key::*,
-            },
-            staked_ada::{
-                get_assets_by_stake_address::*, get_txi_by_txn_hash::*,
-                get_txo_by_stake_address::*, update_txo_spent::*,
-            },
-            sync_status::update::*,
+use crate::db::index::{
+    queries::{
+        rbac,
+        registrations::{
+            get_from_stake_addr::*, get_invalid::*, get_stake_pk_from_stake_addr::*,
+            get_stake_pk_from_vote_key::*,
         },
-        tests::test_utils::stake_address_1,
+        staked_ada::{
+            get_assets_by_stake_address::*, get_txi_by_txn_hash::*, get_txo_by_stake_address::*,
+            update_txo_spent::*,
+        },
+        sync_status::update::*,
     },
-    service::common::types::cardano::slot_no::SlotNo,
+    tests::test_utils::stake_address_1,
 };
 
 #[ignore = "An integration test which requires a running Scylla node instance, disabled from `testunit` CI run"]
@@ -92,12 +89,12 @@ async fn test_get_invalid_registration_w_stake_addr() {
         panic!("{SESSION_ERR_MSG}");
     };
 
-    let mut row_stream = GetInvalidRegistrationQuery::execute(
-        &session,
-        GetInvalidRegistrationParams::new(vec![], SlotNo::default()),
-    )
-    .await
-    .unwrap();
+    let mut row_stream =
+        GetInvalidRegistrationQuery::execute(&session, GetInvalidRegistrationParams {
+            stake_public_key: vec![],
+        })
+        .await
+        .unwrap();
 
     while let Some(row_res) = row_stream.next().await {
         drop(row_res.unwrap());
