@@ -49,7 +49,7 @@ final class SignedDocumentManagerImpl implements SignedDocumentManager {
       protectedHeaders: metadata.asCoseProtectedHeaders,
       unprotectedHeaders: metadata.asCoseUnprotectedHeaders,
       payload: compressedPayload,
-      signers: [_Bip32Ed25519XSigner(publicKey, privateKey)],
+      signers: [_CatalystSigner(publicKey, privateKey)],
     );
 
     return _CoseSignedDocument(
@@ -77,11 +77,11 @@ final class SignedDocumentManagerImpl implements SignedDocumentManager {
   }
 }
 
-final class _Bip32Ed25519XSigner implements CatalystCoseSigner {
+final class _CatalystSigner implements CatalystCoseSigner {
   final CatalystPublicKey _publicKey;
   final CatalystPrivateKey _privateKey;
 
-  const _Bip32Ed25519XSigner(this._publicKey, this._privateKey);
+  const _CatalystSigner(this._publicKey, this._privateKey);
 
   @override
   StringOrInt? get alg => const IntValue(CoseValues.eddsaAlg);
@@ -98,11 +98,11 @@ final class _Bip32Ed25519XSigner implements CatalystCoseSigner {
   }
 }
 
-final class _Bip32Ed25519XVerifier implements CatalystCoseVerifier {
+final class _CatalystVerifier implements CatalystCoseVerifier {
   final CatalystKeyFactory _keyFactory;
   final CatalystPublicKey _publicKey;
 
-  const _Bip32Ed25519XVerifier(this._keyFactory, this._publicKey);
+  const _CatalystVerifier(this._keyFactory, this._publicKey);
 
   // TODO(dtscalac): provide the kid in catalyst ID format,
   // not just public key bytes
@@ -148,7 +148,7 @@ final class _CoseSignedDocument<T extends SignedDocumentPayload>
   @override
   Future<bool> verifySignature(CatalystPublicKey publicKey) async {
     return _coseSign.verify(
-      verifier: _Bip32Ed25519XVerifier(_keyFactory, publicKey),
+      verifier: _CatalystVerifier(_keyFactory, publicKey),
     );
   }
 }
