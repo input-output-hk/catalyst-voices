@@ -50,7 +50,6 @@ pub(crate) async fn get_registrations_given_stake_addr(
     .await?;
 
     let Some(row_stake_pk) = stake_pk_iter.next().await else {
-        println!("Cannot find stake public key");
         return Ok(Cip36Registration::NotFound);
     };
     let row_stake_pk = row_stake_pk?;

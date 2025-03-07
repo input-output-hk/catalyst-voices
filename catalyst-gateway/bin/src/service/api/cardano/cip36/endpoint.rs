@@ -31,69 +31,58 @@ pub(crate) async fn cip36_registrations(
         );
     };
 
-    if let Some(stake_or_voter) = lookup {
-        match StakeAddressOrPublicKey::from(stake_or_voter) {
-            StakeAddressOrPublicKey::Address(cip19_stake_address) => {
-                // Typically, a stake address will start with 'stake1',
-                // We need to convert this to a stake hash as per our data model to then find the,
-                // Full Stake Public Key (32 byte Ed25519 Public key, not hashed).
-                // We then get the latest registration or from a specific time as optionally
-                // specified in the query parameter. This can be represented as either
-                // the blockchains slot number or a unix timestamp.
-                let address = match cip19_stake_address.try_into() {
-                    Ok(a) => a,
-                    Err(err) => {
-                        return AllRegistration::handle_error(&anyhow::anyhow!(
-                            "Given stake pub key is corrupt {:?}",
-                            err
-                        ));
-                    },
-                };
-
-                match get_registrations_given_stake_addr(address, session, asat, page, limit).await
-                {
-                    Ok(reg) => AllRegistration::With(reg),
-                    Err(err) => {
-                        return AllRegistration::handle_error(&err);
-                    },
-                }
-            },
-            StakeAddressOrPublicKey::PublicKey(ed25519_hex_encoded_public_key) => {
-                // As above...
-                // Except using a voting key.
-                match get_registrations_given_vote_key(
-                    ed25519_hex_encoded_public_key,
-                    session,
-                    asat,
-                    page,
-                    limit,
-                )
-                .await
-                {
-                    Ok(reg) => AllRegistration::With(reg),
-                    Err(err) => {
-                        return AllRegistration::handle_error(&err);
-                    },
-                }
-            },
-            StakeAddressOrPublicKey::All =>
-            // As above...
-            // Snapshot replacement, returns all registrations or returns a
-            // subset of registrations if constrained by a given time.
-            {
-                match snapshot(session, asat).await {
-                    Ok(reg) => AllRegistration::With(reg),
-                    Err(err) => {
-                        return AllRegistration::handle_error(&err);
-                    },
-                }
-            },
-        };
+    let Some(lookup) = lookup else {
+        return response::Cip36Registration::NotFound.into();
     };
 
-    // If _for is not defined, use the stake addresses defined for Role0 in the _auth
-    // parameter. _auth not yet implemented, so put placeholder for that, and return not
-    // found until _auth is implemented.
+    match StakeAddressOrPublicKey::from(lookup) {
+        StakeAddressOrPublicKey::Address(cip19_stake_address) => {
+            // Typically, a stake address will start with 'stake1',
+            // We need to convert this to a stake hash as per our data model to then find the,
+            // Full Stake Public Key (32 byte Ed25519 Public key, not hashed).
+            // We then get the latest registration or from a specific time as optionally
+            // specified in the query parameter. This can be represented as either
+            // the blockchains slot number or a unix timestamp.
+            let address = match cip19_stake_address.try_into() {
+                Ok(a) => a,
+                Err(err) => {
+                    return AllRegistration::handle_error(&anyhow::anyhow!(
+                        "Given stake pub key is corrupt {:?}",
+                        err
+                    ));
+                },
+            };
 
-    response::Cip36Registration::NotFound.into()
+            match get_registrations_given_stake_addr(address, session, asat, page, limit).await {
+                Ok(reg) => reg.into(),
+                Err(err) => AllRegistration::handle_error(&err),
+            }
+        },
+        StakeAddressOrPublicKey::PublicKey(ed25519_hex_encoded_public_key) => {
+            // As above...
+            // Except using a voting key.
+            match get_registrations_given_vote_key(
+                ed25519_hex_encoded_public_key,
+                session,
+                asat,
+                page,
+                limit,
+            )
+            .await
+            {
+                Ok(reg) => reg.into(),
+                Err(err) => AllRegistration::handle_error(&err),
+            }
+        },
+        StakeAddressOrPublicKey::All =>
+        // As above...
+        // Snapshot replacement, returns all registrations or returns a
+        // subset of registrations if constrained by a given time.
+        {
+            match snapshot(session, asat).await {
+                Ok(reg) => reg.into(),
+                Err(err) => AllRegistration::handle_error(&err),
+            }
+        },
+    }
 }
