@@ -42,6 +42,7 @@ export 'proposal/proposal_pagination_items.dart';
 export 'proposal/proposal_pagination_request.dart';
 export 'registration/registration.dart';
 export 'seed_phrase.dart';
+export 'signed_document/signed_document.dart';
 export 'space.dart';
 export 'user/account.dart';
 export 'user/account_role.dart';

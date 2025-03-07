@@ -10,8 +10,6 @@ export 'crypto/local_crypto_service.dart';
 export 'dependency/dependency_provider.dart';
 export 'document/extension/document_list_sort_ext.dart';
 export 'document/extension/document_map_to_list_ext.dart';
-export 'document/signed_document_json_payload.dart';
-export 'document/signed_document_manager.dart';
 export 'document/utils/document_node_traverser.dart';
 export 'formatter/cryptocurrency_formatter.dart';
 export 'formatter/wallet_address_formatter.dart';
