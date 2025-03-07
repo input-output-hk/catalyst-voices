@@ -299,8 +299,8 @@ pub async fn snapshot(
     session: Arc<CassandraSession>, asat: Option<SlotNo>,
 ) -> anyhow::Result<Cip36Registration> {
     let valid_invalid_queries = future::join(
-        get_all_valid_registrations(session.clone()),
-        get_all_invalid_registrations(session.clone()),
+        get_all_valid_registrations(&session),
+        get_all_invalid_registrations(&session),
     );
 
     let (valid_regs, invalid_regs) = valid_invalid_queries.await;
@@ -322,35 +322,28 @@ pub async fn snapshot(
 
 /// Get all valid cip36 registrations.
 async fn get_all_valid_registrations(
-    session: Arc<CassandraSession>,
+    session: &CassandraSession,
 ) -> Result<DashMap<Ed25519HexEncodedPublicKey, Vec<Cip36Details>>, anyhow::Error> {
     let mut registrations_iter =
-        GetAllRegistrationsQuery::execute(&session, GetAllRegistrationsParams {}).await?;
+        GetAllRegistrationsQuery::execute(session, GetAllRegistrationsParams {}).await?;
 
     let registrations_map: DashMap<Ed25519HexEncodedPublicKey, Vec<Cip36Details>> = DashMap::new();
 
     while let Some(row) = registrations_iter.next().await {
         let row = row?;
 
-        let nonce = if let Some(nonce) = row.nonce.into_parts().1.to_u64_digits().first() {
-            *nonce
-        } else {
-            continue;
+        let Ok(nonce) = u64::try_from(row.nonce) else {
+            anyhow::bail!("Corrupt valid registration, cannot decode nonce");
         };
 
-        let slot_no = if let Some(slot_no) = row.slot_no.into_parts().1.to_u64_digits().first() {
-            *slot_no
-        } else {
-            continue;
+        let Ok(slot_no) = u64::try_from(row.slot_no) else {
+            anyhow::bail!("Corrupt valid registration, cannot decode slot_no");
         };
 
         let slot_no = match SlotNo::try_from(slot_no) {
             Ok(slot_no) => slot_no,
             Err(err) => {
-                error!("Corrupt valid registration {:?}", err);
-                // This should NOT happen, valid registrations should be infallible.
-                // If it happens, there is an indexing issue.
-                continue;
+                anyhow::bail!("Corrupt valid registration, invalid slot_no {err}");
             },
         };
 
@@ -358,32 +351,21 @@ async fn get_all_valid_registrations(
         {
             Ok(stake_pub_key) => Some(stake_pub_key),
             Err(err) => {
-                error!("Corrupt valid registration {:?}", err);
-                // This should NOT happen, valid registrations should be infallible.
-                // If it happens, there is an indexing issue.
-                continue;
+                anyhow::bail!("Corrupt valid registration, invalid stake_pub_key {err}");
             },
         };
 
         let payment_address = match Cip19ShelleyAddress::try_from(row.payment_address) {
             Ok(payment_addr) => Some(payment_addr),
             Err(err) => {
-                error!(
-                    "Corrupt valid registration {:?}\n Stake pub key:{:?}",
-                    err, stake_pub_key
-                );
-                continue;
+                anyhow::bail!("Corrupt valid registration, invalid payment_address {err}\n Stake pub key:{stake_pub_key:?}");
             },
         };
 
         let vote_pub_key = match Ed25519HexEncodedPublicKey::try_from(row.vote_key) {
             Ok(vote_pub_key) => Some(vote_pub_key),
             Err(err) => {
-                error!(
-                    "Corrupt valid registration {:?}\n Stake pub key:{:?}",
-                    err, stake_pub_key
-                );
-                continue;
+                anyhow::bail!("Corrupt valid registration, invalid vote_pub_key {err}\n Stake pub key:{stake_pub_key:?}");
             },
         };
 
@@ -417,21 +399,19 @@ async fn get_all_valid_registrations(
 
 /// Get all invalid registrations
 async fn get_all_invalid_registrations(
-    session: Arc<CassandraSession>,
+    session: &CassandraSession,
 ) -> Result<DashMap<Ed25519HexEncodedPublicKey, Vec<Cip36Details>>, anyhow::Error> {
     let invalids_map: DashMap<Ed25519HexEncodedPublicKey, Vec<Cip36Details>> = DashMap::new();
 
     let mut invalid_registrations_iter =
-        GetAllInvalidRegistrationsQuery::execute(&session, GetAllInvalidRegistrationsParams {})
+        GetAllInvalidRegistrationsQuery::execute(session, GetAllInvalidRegistrationsParams {})
             .await?;
 
     while let Some(row) = invalid_registrations_iter.next().await {
         let row = row?;
 
-        let slot_no = if let Some(slot_no) = row.slot_no.into_parts().1.to_u64_digits().first() {
-            *slot_no
-        } else {
-            continue;
+        let Ok(slot_no) = u64::try_from(row.slot_no) else {
+            anyhow::bail!("Corrupt valid registration, cannot decode slot_no");
         };
 
         let slot_no = SlotNo::try_from(slot_no).unwrap_or_default();
