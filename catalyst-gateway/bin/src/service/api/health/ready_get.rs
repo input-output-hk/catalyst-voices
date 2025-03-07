@@ -47,24 +47,22 @@ pub(crate) type AllResponses = WithErrorResponses<Responses>;
 #[allow(clippy::unused_async)]
 pub(crate) async fn endpoint() -> AllResponses {
     // Check Event DB connection
-    let event_db_live = if event_db_is_live() {
-        true
-    } else {
-        // Attempt to reconnect
+    let event_db_live = event_db_is_live();
+
+    // When check fails, attempt to re-connect
+    if !event_db_live {
         establish_connection();
         // Re-check, if success, enable flag.
         if EventDB::connection_is_ok() {
             set_event_db_liveness(true);
-            true
-        } else {
-            false
         }
     };
 
-    // Check Event DB connection
+    // Check Index DB connection
     let index_db_live = index_db_is_live();
+
+    // When check fails, attempt to re-connect
     if !index_db_live {
-        // Attempt to reconnect
         CassandraSession::init();
         // Re-check, if success, enable flag.
         if CassandraSession::wait_until_ready(core::time::Duration::from_secs(1), false)
@@ -75,12 +73,10 @@ pub(crate) async fn endpoint() -> AllResponses {
         }
     }
 
-    let first_check_passed = index_db_live && event_db_live;
-
     let success_response = Responses::NoContent.into();
 
     // Return 204 response if check passed initially.
-    if first_check_passed {
+    if index_db_live && event_db_live {
         return success_response;
     }
 
