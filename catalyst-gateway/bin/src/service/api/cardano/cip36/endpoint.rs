@@ -81,7 +81,7 @@ pub(crate) async fn cip36_registrations(
         // Snapshot replacement, returns all registrations or returns a
         // subset of registrations if constrained by a given time.
         {
-            match snapshot(session, asat, invalid).await {
+            match snapshot(session, asat, page, limit, invalid).await {
                 Ok(reg) => reg.into(),
                 Err(err) => AllRegistration::handle_error(&err),
             }

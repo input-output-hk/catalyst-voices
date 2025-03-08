@@ -147,42 +147,6 @@ async fn get_valid_registrations(
     Ok(registrations)
 }
 
-/// Filter registrations by the provided lost if provided then sort registrations by slot
-/// number, nonce, and transaction offset. If `slot_no` is the same, the registration with
-/// the highest `nonce` wins. If `nonce` is the same, the registration with the highest
-/// `txn_offset` wins. The latest one is considered the only valid registration. The rest
-/// are invalid.
-fn filter_and_sort_registrations(
-    mut registrations: Vec<Cip36Details>, slot_no: Option<SlotNo>,
-) -> Vec<Cip36Details> {
-    // Filter registrations by the provided lost if provided
-    if let Some(slot_no) = slot_no {
-        registrations.retain(|registration| registration.slot_no <= slot_no);
-    }
-
-    // Sort registrations by slot_no, nonce, and txn_offset in descending order
-    registrations.sort_by(|a, b| {
-        // Compare by slot_no (descending)
-        // Safe to use 0 value,  since ordering in descending order
-        b.slot_no
-            .cmp(&a.slot_no)
-            .then_with(|| {
-                b.nonce
-                    .clone()
-                    .unwrap_or_default()
-                    .cmp(&a.nonce.clone().unwrap_or_default())
-            }) // If slot_no is the same, compare by nonce (descending)
-            .then_with(|| {
-                b.txn_index
-                    .clone()
-                    .unwrap_or_default()
-                    .cmp(&a.txn_index.clone().unwrap_or_default())
-            }) // If nonce is also the same, compare by txn_offset (descending)
-    });
-
-    registrations
-}
-
 /// Get invalid registrations for stake public key
 async fn get_invalid_registrations(
     session: &CassandraSession, stake_public_key: Vec<u8>,
@@ -283,7 +247,9 @@ pub(crate) async fn get_registrations_given_vote_key(
 
 /// Get all registrations or constrain if slot# given.
 pub async fn snapshot(
-    session: Arc<CassandraSession>, asat: Option<SlotNo>, invalid: bool,
+    session: Arc<CassandraSession>, asat: Option<SlotNo>,
+    page: common::types::generic::query::pagination::Page,
+    limit: common::types::generic::query::pagination::Limit, invalid: bool,
 ) -> anyhow::Result<Cip36Registration> {
     let all_regs = if invalid {
         get_all_invalid_registrations(&session).await?
@@ -293,12 +259,20 @@ pub async fn snapshot(
 
     let all_regs = all_regs.into_iter().flat_map(|(_, reg)| reg).collect();
     let all_regs = filter_and_sort_registrations(all_regs, asat);
+    let (all_regs, remaining) = paginate_registrations(all_regs, page.into(), limit.into())?;
 
     Ok(Cip36Registration::Ok(poem_openapi::payload::Json(
         Cip36RegistrationList {
             is_valid: !invalid,
             regs: all_regs.into(),
-            page: None,
+            page: Some(
+                CurrentPage {
+                    page,
+                    limit,
+                    remaining,
+                }
+                .into(),
+            ),
         },
     )))
 }
@@ -433,8 +407,43 @@ async fn get_all_invalid_registrations(
     Ok(invalids_map)
 }
 
+/// Filter registrations by the provided slot if provided then sort registrations by slot
+/// number, nonce, and transaction offset. If `slot_no` is the same, the registration with
+/// the highest `nonce` wins. If `nonce` is the same, the registration with the highest
+/// `txn_offset` wins. The latest one is considered the only valid registration. The rest
+/// are invalid.
+fn filter_and_sort_registrations(
+    mut regs: Vec<Cip36Details>, slot_no: Option<SlotNo>,
+) -> Vec<Cip36Details> {
+    // Filter registrations by the provided slot if provided
+    if let Some(slot_no) = slot_no {
+        regs.retain(|registration| registration.slot_no <= slot_no);
+    }
+
+    // Sort registrations by slot_no, nonce, and txn_offset in descending order
+    regs.sort_by(|a, b| {
+        // Compare by slot_no (descending)
+        // Safe to use 0 value,  since ordering in descending order
+        b.slot_no
+            .cmp(&a.slot_no)
+            .then_with(|| {
+                b.nonce
+                    .clone()
+                    .unwrap_or_default()
+                    .cmp(&a.nonce.clone().unwrap_or_default())
+            }) // If slot_no is the same, compare by nonce (descending)
+            .then_with(|| {
+                b.txn_index
+                    .clone()
+                    .unwrap_or_default()
+                    .cmp(&a.txn_index.clone().unwrap_or_default())
+            }) // If nonce is also the same, compare by txn_offset (descending)
+    });
+
+    regs
+}
+
 /// Paginate the registrations.
-#[allow(dead_code)]
 fn paginate_registrations(
     regs: Vec<Cip36Details>, page: u32, limit: u32,
 ) -> anyhow::Result<(Vec<Cip36Details>, Remaining)> {

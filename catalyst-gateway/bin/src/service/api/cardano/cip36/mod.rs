@@ -43,6 +43,7 @@ impl Api {
         method = "get",
         operation_id = "cardanoRegistrationCip36"
     )]
+    #[allow(clippy::too_many_arguments)]
     async fn get_registration(
         &self, Query(lookup): Query<Option<cardano::query::stake_or_voter::StakeOrVoter>>,
         Query(asat): Query<Option<cardano::query::AsAt>>,
