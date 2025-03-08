@@ -48,6 +48,9 @@ impl Api {
         Query(asat): Query<Option<cardano::query::AsAt>>,
         Query(page): Query<Option<common::types::generic::query::pagination::Page>>,
         Query(limit): Query<Option<common::types::generic::query::pagination::Limit>>,
+        /// Flag for returning invalid registrations, if not provided or set to false,
+        /// returns only valid registrations
+        Query(invalid): Query<Option<bool>>,
         /// Headers, used if the query is requesting ALL to determine if the secret API
         /// Key is also defined.
         headers: &HeaderMap,
@@ -72,7 +75,7 @@ impl Api {
             SlotNo::into_option(asat),
             page.unwrap_or_default(),
             limit.unwrap_or_default(),
-            headers,
+            invalid.unwrap_or_default(),
         )
         .await
     }

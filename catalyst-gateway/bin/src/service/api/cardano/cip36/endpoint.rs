@@ -1,6 +1,5 @@
 //! Implementation of the GET `/cardano/cip36` endpoint
 
-use poem::http::HeaderMap;
 use tracing::error;
 
 use self::cardano::query::stake_or_voter::StakeAddressOrPublicKey;
@@ -21,7 +20,7 @@ use crate::{
 pub(crate) async fn cip36_registrations(
     lookup: Option<cardano::query::stake_or_voter::StakeOrVoter>, asat: Option<SlotNo>,
     page: common::types::generic::query::pagination::Page,
-    limit: common::types::generic::query::pagination::Limit, _headers: &HeaderMap,
+    limit: common::types::generic::query::pagination::Limit, invalid: bool,
 ) -> AllRegistration {
     let Some(session) = CassandraSession::get(true) else {
         error!("Failed to acquire db session");
@@ -53,7 +52,9 @@ pub(crate) async fn cip36_registrations(
                 },
             };
 
-            match get_registrations_given_stake_addr(address, session, asat, page, limit).await {
+            match get_registrations_given_stake_addr(address, session, asat, page, limit, invalid)
+                .await
+            {
                 Ok(reg) => reg.into(),
                 Err(err) => AllRegistration::handle_error(&err),
             }
@@ -67,6 +68,7 @@ pub(crate) async fn cip36_registrations(
                 asat,
                 page,
                 limit,
+                invalid,
             )
             .await
             {
@@ -79,7 +81,7 @@ pub(crate) async fn cip36_registrations(
         // Snapshot replacement, returns all registrations or returns a
         // subset of registrations if constrained by a given time.
         {
-            match snapshot(session, asat).await {
+            match snapshot(session, asat, invalid).await {
                 Ok(reg) => reg.into(),
                 Err(err) => AllRegistration::handle_error(&err),
             }

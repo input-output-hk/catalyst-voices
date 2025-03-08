@@ -4,7 +4,7 @@ use std::sync::Arc;
 
 use cardano_blockchain_types::StakeAddress;
 use dashmap::DashMap;
-use futures::{future, StreamExt};
+use futures::StreamExt;
 use tracing::error;
 
 use super::{
@@ -40,7 +40,7 @@ use crate::{
 pub(crate) async fn get_registrations_given_stake_addr(
     stake_address: StakeAddress, session: Arc<CassandraSession>, asat: Option<SlotNo>,
     page: common::types::generic::query::pagination::Page,
-    limit: common::types::generic::query::pagination::Limit,
+    limit: common::types::generic::query::pagination::Limit, invalid: bool,
 ) -> anyhow::Result<Cip36Registration> {
     // Get stake public key associated with given stake address.
     let mut stake_pk_iter = GetStakePublicKeyFromStakeAddrQuery::execute(
@@ -54,24 +54,23 @@ pub(crate) async fn get_registrations_given_stake_addr(
     };
     let stake_public_key = row_stake_pk?.stake_public_key;
 
-    let (valid_regs, invalid_regs) = futures::try_join!(
-        get_valid_registrations(&session, stake_public_key.clone()),
-        get_invalid_registrations(&session, stake_public_key)
-    )?;
+    let all_regs = if invalid {
+        get_invalid_registrations(&session, stake_public_key).await?
+    } else {
+        get_valid_registrations(&session, stake_public_key).await?
+    };
 
-    let valid_regs = filter_and_sort_registrations(valid_regs, asat);
-    let invalid_regs = filter_and_sort_registrations(invalid_regs, asat);
+    let all_regs = filter_and_sort_registrations(all_regs, asat);
 
-    if valid_regs.is_empty() && invalid_regs.is_empty() {
+    if all_regs.is_empty() {
         return Ok(Cip36Registration::NotFound);
     }
 
-    // Paginate results
-    let (valid_regs, remaining) = paginate_registrations(valid_regs, page.into(), limit.into())?;
+    let (all_regs, remaining) = paginate_registrations(all_regs, page.into(), limit.into())?;
 
     let res = Cip36RegistrationList {
-        valid: valid_regs.into(),
-        invalid: invalid_regs.into(),
+        is_valid: !invalid,
+        regs: all_regs.into(),
         page: Some(
             CurrentPage {
                 page,
@@ -231,7 +230,7 @@ async fn get_invalid_registrations(
 pub(crate) async fn get_registrations_given_vote_key(
     vote_key: Ed25519HexEncodedPublicKey, session: Arc<CassandraSession>, asat: Option<SlotNo>,
     page: common::types::generic::query::pagination::Page,
-    limit: common::types::generic::query::pagination::Limit,
+    limit: common::types::generic::query::pagination::Limit, invalid: bool,
 ) -> anyhow::Result<Cip36Registration> {
     let voting_key: Vec<u8> = vote_key
         .try_into()
@@ -245,34 +244,31 @@ pub(crate) async fn get_registrations_given_vote_key(
     .await
     .map_err(|err| anyhow::anyhow!("Failed to query stake public key from vote key {err:?}",))?;
 
-    let mut all_valid_regs = Vec::new();
-    let mut all_invalid_regs = Vec::new();
+    let mut all_regs = Vec::new();
     while let Some(row_stake_pk) = stake_pk_iter.next().await {
         let stake_public_key = row_stake_pk?.stake_public_key;
 
-        let (valid_regs, invalid_regs) = futures::try_join!(
-            get_valid_registrations(&session, stake_public_key.clone()),
-            get_invalid_registrations(&session, stake_public_key.clone())
-        )?;
+        let regs = if invalid {
+            get_invalid_registrations(&session, stake_public_key.clone()).await?
+        } else {
+            get_valid_registrations(&session, stake_public_key.clone()).await?
+        };
 
-        all_valid_regs.extend(valid_regs);
-        all_invalid_regs.extend(invalid_regs);
+        all_regs.extend(regs);
     }
 
-    let all_valid_regs = filter_and_sort_registrations(all_valid_regs, asat);
-    let all_invalid_regs = filter_and_sort_registrations(all_invalid_regs, asat);
+    let all_regs = filter_and_sort_registrations(all_regs, asat);
 
-    if all_valid_regs.is_empty() && all_invalid_regs.is_empty() {
+    if all_regs.is_empty() {
         return Ok(Cip36Registration::NotFound);
     }
 
-    let (all_valid_regs, remaining) =
-        paginate_registrations(all_valid_regs, page.into(), limit.into())?;
+    let (all_regs, remaining) = paginate_registrations(all_regs, page.into(), limit.into())?;
 
     Ok(Cip36Registration::Ok(poem_openapi::payload::Json(
         Cip36RegistrationList {
-            valid: all_valid_regs.into(),
-            invalid: all_invalid_regs.into(),
+            is_valid: !invalid,
+            regs: all_regs.into(),
             page: Some(
                 CurrentPage {
                     page,
@@ -287,25 +283,21 @@ pub(crate) async fn get_registrations_given_vote_key(
 
 /// Get all registrations or constrain if slot# given.
 pub async fn snapshot(
-    session: Arc<CassandraSession>, asat: Option<SlotNo>,
+    session: Arc<CassandraSession>, asat: Option<SlotNo>, invalid: bool,
 ) -> anyhow::Result<Cip36Registration> {
-    let valid_invalid_queries = future::join(
-        get_all_valid_registrations(&session),
-        get_all_invalid_registrations(&session),
-    );
+    let all_regs = if invalid {
+        get_all_invalid_registrations(&session).await?
+    } else {
+        get_all_valid_registrations(&session).await?
+    };
 
-    let (valid_regs, invalid_regs) = valid_invalid_queries.await;
-
-    let all_valid_regs = valid_regs?.into_iter().flat_map(|(_, reg)| reg).collect();
-    let all_invalid_regs = invalid_regs?.into_iter().flat_map(|(_, reg)| reg).collect();
-
-    let all_valid_regs = filter_and_sort_registrations(all_valid_regs, asat);
-    let all_invalid_regs = filter_and_sort_registrations(all_invalid_regs, asat);
+    let all_regs = all_regs.into_iter().flat_map(|(_, reg)| reg).collect();
+    let all_regs = filter_and_sort_registrations(all_regs, asat);
 
     Ok(Cip36Registration::Ok(poem_openapi::payload::Json(
         Cip36RegistrationList {
-            valid: all_valid_regs.into(),
-            invalid: all_invalid_regs.into(),
+            is_valid: !invalid,
+            regs: all_regs.into(),
             page: None,
         },
     )))
@@ -442,6 +434,7 @@ async fn get_all_invalid_registrations(
 }
 
 /// Paginate the registrations.
+#[allow(dead_code)]
 fn paginate_registrations(
     regs: Vec<Cip36Details>, page: u32, limit: u32,
 ) -> anyhow::Result<(Vec<Cip36Details>, Remaining)> {
