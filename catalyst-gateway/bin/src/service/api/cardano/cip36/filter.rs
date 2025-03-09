@@ -4,7 +4,7 @@ use std::sync::Arc;
 
 use cardano_blockchain_types::StakeAddress;
 use dashmap::DashMap;
-use futures::StreamExt;
+use futures::TryStreamExt;
 use tracing::error;
 
 use super::{
@@ -48,10 +48,10 @@ pub(crate) async fn get_registrations_given_stake_addr(
     )
     .await?;
 
-    let Some(row_stake_pk) = stake_pk_iter.next().await else {
+    let Some(row_stake_pk) = stake_pk_iter.try_next().await? else {
         return Ok(Cip36Registration::NotFound);
     };
-    let stake_public_key = row_stake_pk?.stake_public_key;
+    let stake_public_key = row_stake_pk.stake_public_key;
 
     let asat = asat.unwrap_or(SlotNo::MAXIMUM);
     let all_regs = if invalid {
@@ -74,26 +74,30 @@ pub(crate) async fn get_registrations_given_vote_key(
         .map_err(|err| anyhow::anyhow!("Failed to convert vote key to bytes {err:?}"))?;
 
     // Get stake public key associated voting key
-    let mut stake_pk_iter = GetStakePublicKeyFromVoteKeyQuery::execute(
+    let stake_pk_stream = GetStakePublicKeyFromVoteKeyQuery::execute(
         &session,
         GetStakePublicKeyFromVoteKeyParams::new(voting_key),
     )
     .await
     .map_err(|err| anyhow::anyhow!("Failed to query stake public key from vote key {err:?}",))?;
 
-    let mut all_regs = Vec::new();
     let asat = asat.unwrap_or(SlotNo::MAXIMUM);
-    while let Some(row_stake_pk) = stake_pk_iter.next().await {
-        let stake_public_key = row_stake_pk?.stake_public_key;
 
-        let regs = if invalid {
-            get_invalid_registrations(&session, stake_public_key.clone(), asat).await?
-        } else {
-            get_valid_registrations(&session, stake_public_key.clone(), asat).await?
-        };
-
-        all_regs.extend(regs);
-    }
+    let all_regs = stake_pk_stream
+        .map_err(|e| -> anyhow::Error { e.into() })
+        .try_fold(Vec::new(), |mut all_regs, row_stake_pk| {
+            async {
+                let stake_public_key = row_stake_pk.stake_public_key;
+                let regs = if invalid {
+                    get_invalid_registrations(&session, stake_public_key, asat).await?
+                } else {
+                    get_valid_registrations(&session, stake_public_key, asat).await?
+                };
+                all_regs.extend(regs);
+                Ok(all_regs)
+            }
+        })
+        .await?;
 
     build_response(all_regs, page, limit, invalid)
 }
@@ -128,9 +132,7 @@ async fn get_valid_registrations(
     .await?;
 
     let mut registrations = Vec::new();
-    while let Some(row) = registrations_iter.next().await {
-        let row = row?;
-
+    while let Some(row) = registrations_iter.try_next().await? {
         let Ok(nonce) = u64::try_from(row.nonce) else {
             anyhow::bail!("Corrupt valid registration, cannot decode nonce");
         };
@@ -191,8 +193,7 @@ async fn get_invalid_registrations(
     )
     .await?;
     let mut invalid_registrations = Vec::new();
-    while let Some(row) = invalid_registrations_iter.next().await {
-        let row = row?;
+    while let Some(row) = invalid_registrations_iter.try_next().await? {
         let slot_no: u64 = row.slot_no.into();
         let slot_no = match SlotNo::try_from(slot_no) {
             Ok(slot_no) => slot_no,
@@ -232,9 +233,7 @@ async fn get_all_valid_registrations(
 
     let registrations_map: DashMap<Ed25519HexEncodedPublicKey, Vec<Cip36Details>> = DashMap::new();
 
-    while let Some(row) = registrations_iter.next().await {
-        let row = row?;
-
+    while let Some(row) = registrations_iter.try_next().await? {
         let Ok(nonce) = u64::try_from(row.nonce) else {
             anyhow::bail!("Corrupt valid registration, cannot decode nonce");
         };
@@ -312,9 +311,7 @@ async fn get_all_invalid_registrations(
     )
     .await?;
 
-    while let Some(row) = invalid_registrations_iter.next().await {
-        let row = row?;
-
+    while let Some(row) = invalid_registrations_iter.try_next().await? {
         let Ok(slot_no) = u64::try_from(row.slot_no) else {
             anyhow::bail!("Corrupt valid registration, cannot decode slot_no");
         };
