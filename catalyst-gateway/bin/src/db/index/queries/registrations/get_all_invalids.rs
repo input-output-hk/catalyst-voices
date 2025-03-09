@@ -8,9 +8,12 @@ use scylla::{
 };
 use tracing::error;
 
-use crate::db::index::{
-    queries::{PreparedQueries, PreparedSelectQuery},
-    session::CassandraSession,
+use crate::db::{
+    index::{
+        queries::{PreparedQueries, PreparedSelectQuery},
+        session::CassandraSession,
+    },
+    types::DbSlot,
 };
 
 /// Get all invalid registrations
@@ -18,7 +21,19 @@ const GET_ALL_INVALIDS: &str = include_str!("../cql/get_all_invalids.cql");
 
 /// Get all invalid registrations
 #[derive(SerializeRow)]
-pub(crate) struct GetAllInvalidRegistrationsParams {}
+pub(crate) struct GetAllInvalidRegistrationsParams {
+    /// Block Slot Number.
+    slot_no: DbSlot,
+}
+
+impl GetAllInvalidRegistrationsParams {
+    /// Create a new instance of [`GetAllInvalidRegistrationsParams`]
+    pub(crate) fn new<T: Into<DbSlot>>(slot_no: T) -> Self {
+        Self {
+            slot_no: slot_no.into(),
+        }
+    }
+}
 
 /// Get all invalid registrations details for snapshot.
 #[derive(DeserializeRow)]

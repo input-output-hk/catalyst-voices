@@ -60,7 +60,7 @@ impl Cip36InsertQuery {
         match Cip36::new(block, index, true) {
             // Check for CIP-36 validity and should be strict catalyst (only 1 voting key)
             // Note that in `validate_voting_keys` we already checked if the array has only one
-            Ok(Some(cip36)) if cip36.is_valid() && cip36.is_cip36().unwrap_or_default() => {
+            Ok(Some(cip36)) if cip36.is_valid() => {
                 // This should always pass, because we already checked if the array has only one
                 if let Some(voting_key) = cip36.voting_pks().first() {
                     self.registrations.push(insert_cip36::Params::new(
@@ -74,7 +74,7 @@ impl Cip36InsertQuery {
                 }
             },
             // Invalid CIP-36 Registration
-            Ok(Some(cip36)) if cip36.is_cip36().unwrap_or_default() => {
+            Ok(Some(cip36)) => {
                 // Cannot index an invalid CIP36, if there is no stake public key.
                 if cip36.stake_pk().is_some() {
                     if cip36.voting_pks().is_empty() {
