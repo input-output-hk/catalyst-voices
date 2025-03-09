@@ -89,12 +89,12 @@ async fn test_get_invalid_registration_w_stake_addr() {
         panic!("{SESSION_ERR_MSG}");
     };
 
-    let mut row_stream =
-        GetInvalidRegistrationQuery::execute(&session, GetInvalidRegistrationParams {
-            stake_public_key: vec![],
-        })
-        .await
-        .unwrap();
+    let mut row_stream = GetInvalidRegistrationQuery::execute(
+        &session,
+        GetInvalidRegistrationParams::new(vec![], 0),
+    )
+    .await
+    .unwrap();
 
     while let Some(row_res) = row_stream.next().await {
         drop(row_res.unwrap());
@@ -154,11 +154,10 @@ async fn test_get_registrations_w_stake_addr() {
         panic!("{SESSION_ERR_MSG}");
     };
 
-    let mut row_stream = GetRegistrationQuery::execute(&session, GetRegistrationParams {
-        stake_public_key: vec![],
-    })
-    .await
-    .unwrap();
+    let mut row_stream =
+        GetRegistrationQuery::execute(&session, GetRegistrationParams::new(vec![], 0))
+            .await
+            .unwrap();
 
     while let Some(row_res) = row_stream.next().await {
         drop(row_res.unwrap());
