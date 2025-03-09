@@ -30,17 +30,16 @@ use crate::{
         session::CassandraSession,
     },
     service::common::{
-        self, objects::generic::pagination::CurrentPage,
-        types::generic::query::pagination::Remaining,
+        objects::generic::pagination::CurrentPage,
+        types::generic::query::pagination::{Limit, Page, Remaining},
     },
 };
 
 /// Get registrations given a stake address, it can be time specific based on asat param,
 /// or the latest registration returned if no asat given.
 pub(crate) async fn get_registrations_given_stake_addr(
-    stake_address: StakeAddress, session: Arc<CassandraSession>, asat: Option<SlotNo>,
-    page: common::types::generic::query::pagination::Page,
-    limit: common::types::generic::query::pagination::Limit, invalid: bool,
+    stake_address: StakeAddress, session: Arc<CassandraSession>, asat: Option<SlotNo>, page: Page,
+    limit: Limit, invalid: bool,
 ) -> anyhow::Result<Cip36Registration> {
     // Get stake public key associated with given stake address.
     let mut stake_pk_iter = GetStakePublicKeyFromStakeAddrQuery::execute(
@@ -61,35 +60,14 @@ pub(crate) async fn get_registrations_given_stake_addr(
         get_valid_registrations(&session, stake_public_key, asat).await?
     };
 
-    let all_regs = sort_registrations(all_regs);
-
-    if all_regs.is_empty() {
-        return Ok(Cip36Registration::NotFound);
-    }
-
-    let (all_regs, remaining) = paginate_registrations(all_regs, page.into(), limit.into())?;
-
-    let res = Cip36RegistrationList {
-        is_valid: (!invalid).into(),
-        regs: all_regs.into(),
-        page: Some(
-            CurrentPage {
-                page,
-                limit,
-                remaining,
-            }
-            .into(),
-        ),
-    };
-    Ok(Cip36Registration::Ok(poem_openapi::payload::Json(res)))
+    build_response(all_regs, page, limit, invalid)
 }
 
 /// Get registrations given a vote key, time specific based on asat param,
 /// or latest registration returned if no asat given.
 pub(crate) async fn get_registrations_given_vote_key(
     vote_key: Ed25519HexEncodedPublicKey, session: Arc<CassandraSession>, asat: Option<SlotNo>,
-    page: common::types::generic::query::pagination::Page,
-    limit: common::types::generic::query::pagination::Limit, invalid: bool,
+    page: Page, limit: Limit, invalid: bool,
 ) -> anyhow::Result<Cip36Registration> {
     let voting_key: Vec<u8> = vote_key
         .try_into()
@@ -117,60 +95,23 @@ pub(crate) async fn get_registrations_given_vote_key(
         all_regs.extend(regs);
     }
 
-    let all_regs = sort_registrations(all_regs);
-
-    if all_regs.is_empty() {
-        return Ok(Cip36Registration::NotFound);
-    }
-
-    let (all_regs, remaining) = paginate_registrations(all_regs, page.into(), limit.into())?;
-
-    Ok(Cip36Registration::Ok(poem_openapi::payload::Json(
-        Cip36RegistrationList {
-            is_valid: (!invalid).into(),
-            regs: all_regs.into(),
-            page: Some(
-                CurrentPage {
-                    page,
-                    limit,
-                    remaining,
-                }
-                .into(),
-            ),
-        },
-    )))
+    build_response(all_regs, page, limit, invalid)
 }
 
 /// Get all registrations or constrain if slot# given.
 pub(crate) async fn snapshot(
-    session: Arc<CassandraSession>, _asat: Option<SlotNo>,
-    page: common::types::generic::query::pagination::Page,
-    limit: common::types::generic::query::pagination::Limit, invalid: bool,
+    session: Arc<CassandraSession>, asat: Option<SlotNo>, page: Page, limit: Limit, invalid: bool,
 ) -> anyhow::Result<Cip36Registration> {
+    let asat = asat.unwrap_or(SlotNo::MAXIMUM);
     let all_regs = if invalid {
-        get_all_invalid_registrations(&session).await?
+        get_all_invalid_registrations(&session, asat).await?
     } else {
-        get_all_valid_registrations(&session).await?
+        get_all_valid_registrations(&session, asat).await?
     };
 
     let all_regs = all_regs.into_iter().flat_map(|(_, reg)| reg).collect();
-    let all_regs = sort_registrations(all_regs);
-    let (all_regs, remaining) = paginate_registrations(all_regs, page.into(), limit.into())?;
 
-    Ok(Cip36Registration::Ok(poem_openapi::payload::Json(
-        Cip36RegistrationList {
-            is_valid: (!invalid).into(),
-            regs: all_regs.into(),
-            page: Some(
-                CurrentPage {
-                    page,
-                    limit,
-                    remaining,
-                }
-                .into(),
-            ),
-        },
-    )))
+    build_response(all_regs, page, limit, invalid)
 }
 
 /// Get valid cip36 registrations for a given stake public key.
@@ -284,10 +225,10 @@ async fn get_invalid_registrations(
 
 /// Get all valid cip36 registrations.
 async fn get_all_valid_registrations(
-    session: &CassandraSession,
+    session: &CassandraSession, slot_no: SlotNo,
 ) -> Result<DashMap<Ed25519HexEncodedPublicKey, Vec<Cip36Details>>, anyhow::Error> {
     let mut registrations_iter =
-        GetAllRegistrationsQuery::execute(session, GetAllRegistrationsParams {}).await?;
+        GetAllRegistrationsQuery::execute(session, GetAllRegistrationsParams::new(slot_no)).await?;
 
     let registrations_map: DashMap<Ed25519HexEncodedPublicKey, Vec<Cip36Details>> = DashMap::new();
 
@@ -361,13 +302,15 @@ async fn get_all_valid_registrations(
 
 /// Get all invalid registrations
 async fn get_all_invalid_registrations(
-    session: &CassandraSession,
+    session: &CassandraSession, slot_no: SlotNo,
 ) -> Result<DashMap<Ed25519HexEncodedPublicKey, Vec<Cip36Details>>, anyhow::Error> {
     let invalids_map: DashMap<Ed25519HexEncodedPublicKey, Vec<Cip36Details>> = DashMap::new();
 
-    let mut invalid_registrations_iter =
-        GetAllInvalidRegistrationsQuery::execute(session, GetAllInvalidRegistrationsParams {})
-            .await?;
+    let mut invalid_registrations_iter = GetAllInvalidRegistrationsQuery::execute(
+        session,
+        GetAllInvalidRegistrationsParams::new(slot_no),
+    )
+    .await?;
 
     while let Some(row) = invalid_registrations_iter.next().await {
         let row = row?;
@@ -410,6 +353,33 @@ async fn get_all_invalid_registrations(
     }
 
     Ok(invalids_map)
+}
+
+/// Build a final response which will contain all found registrations,
+/// sort them and apply pagination.
+fn build_response(
+    regs: Vec<Cip36Details>, page: Page, limit: Limit, invalid: bool,
+) -> anyhow::Result<Cip36Registration> {
+    if regs.is_empty() {
+        return Ok(Cip36Registration::NotFound);
+    }
+    let regs = sort_registrations(regs);
+    let (regs, remaining) = paginate_registrations(regs, page.into(), limit.into())?;
+
+    Ok(Cip36Registration::Ok(poem_openapi::payload::Json(
+        Cip36RegistrationList {
+            is_valid: (!invalid).into(),
+            regs: regs.into(),
+            page: Some(
+                CurrentPage {
+                    page,
+                    limit,
+                    remaining,
+                }
+                .into(),
+            ),
+        },
+    )))
 }
 
 /// Sort registrations by slot number, nonce, and transaction offset. If `slot_no` is the

@@ -13,7 +13,7 @@ use crate::db::{
         queries::{PreparedQueries, PreparedSelectQuery},
         session::CassandraSession,
     },
-    types::DbTxnIndex,
+    types::{DbSlot, DbTxnIndex},
 };
 
 /// Get all registrations
@@ -21,7 +21,19 @@ const GET_ALL_REGISTRATIONS: &str = include_str!("../cql/get_all_registrations.c
 
 /// Get all registrations
 #[derive(SerializeRow)]
-pub(crate) struct GetAllRegistrationsParams {}
+pub(crate) struct GetAllRegistrationsParams {
+    /// Block Slot Number.
+    slot_no: DbSlot,
+}
+
+impl GetAllRegistrationsParams {
+    /// Create a new instance of [`GetAllRegistrationsParams`]
+    pub(crate) fn new<T: Into<DbSlot>>(slot_no: T) -> Self {
+        Self {
+            slot_no: slot_no.into(),
+        }
+    }
+}
 
 /// Get all registration details for snapshot.
 #[derive(DeserializeRow)]

@@ -6,3 +6,4 @@ SELECT problem_report,
        is_payable,
        cip36
 FROM   cip36_registration_invalid
+WHERE  slot_no <= :slot_no
