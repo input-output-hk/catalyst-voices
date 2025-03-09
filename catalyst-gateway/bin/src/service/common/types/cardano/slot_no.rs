@@ -43,7 +43,7 @@ impl SlotNo {
 
     /// Is the Slot Number valid?
     fn is_valid(value: u64) -> bool {
-        (MINIMUM..=MAXIMUM).contains(&value)
+        (Self::MINIMUM.0..=Self::MAXIMUM.0).contains(&value)
     }
 
     /// Generic conversion of `Option<T>` to `Option<SlotNo>`.

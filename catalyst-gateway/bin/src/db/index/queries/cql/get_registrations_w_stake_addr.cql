@@ -7,3 +7,4 @@ SELECT nonce,
        cip36
 FROM   cip36_registration
 WHERE  stake_public_key = :stake_public_key
+       AND slot_no >= :slot_no

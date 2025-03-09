@@ -25,7 +25,7 @@ const GET_INVALID_REGISTRATIONS_FROM_STAKE_ADDR_QUERY: &str =
 pub(crate) struct GetInvalidRegistrationParams {
     /// Stake address.
     stake_public_key: Vec<u8>,
-    /// Block Slot Number when spend occurred.
+    /// Block Slot Number.
     slot_no: DbSlot,
 }
 
