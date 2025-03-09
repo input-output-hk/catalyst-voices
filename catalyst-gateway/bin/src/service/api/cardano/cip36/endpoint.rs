@@ -34,7 +34,7 @@ pub(crate) async fn cip36_registrations(
         return response::Cip36Registration::NotFound.into();
     };
 
-    match StakeAddressOrPublicKey::from(lookup) {
+    let res = match StakeAddressOrPublicKey::from(lookup) {
         StakeAddressOrPublicKey::Address(cip19_stake_address) => {
             // Typically, a stake address will start with 'stake1',
             // We need to convert this to a stake hash as per our data model to then find the,
@@ -52,17 +52,12 @@ pub(crate) async fn cip36_registrations(
                 },
             };
 
-            match get_registrations_given_stake_addr(address, session, asat, page, limit, invalid)
-                .await
-            {
-                Ok(reg) => reg.into(),
-                Err(err) => AllRegistration::handle_error(&err),
-            }
+            get_registrations_given_stake_addr(address, session, asat, page, limit, invalid).await
         },
         StakeAddressOrPublicKey::PublicKey(ed25519_hex_encoded_public_key) => {
             // As above...
             // Except using a voting key.
-            match get_registrations_given_vote_key(
+            get_registrations_given_vote_key(
                 ed25519_hex_encoded_public_key,
                 session,
                 asat,
@@ -71,20 +66,17 @@ pub(crate) async fn cip36_registrations(
                 invalid,
             )
             .await
-            {
-                Ok(reg) => reg.into(),
-                Err(err) => AllRegistration::handle_error(&err),
-            }
         },
-        StakeAddressOrPublicKey::All =>
-        // As above...
-        // Snapshot replacement, returns all registrations or returns a
-        // subset of registrations if constrained by a given time.
-        {
-            match snapshot(session, asat, page, limit, invalid).await {
-                Ok(reg) => reg.into(),
-                Err(err) => AllRegistration::handle_error(&err),
-            }
+        StakeAddressOrPublicKey::All => {
+            // As above...
+            // Snapshot replacement, returns all registrations or returns a
+            // subset of registrations if constrained by a given time.
+            snapshot(session, asat, page, limit, invalid).await
         },
+    };
+
+    match res {
+        Ok(res) => res.into(),
+        Err(err) => AllRegistration::handle_error(&err),
     }
 }
