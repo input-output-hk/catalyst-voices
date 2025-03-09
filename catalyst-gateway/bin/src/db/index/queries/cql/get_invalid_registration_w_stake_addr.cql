@@ -7,3 +7,4 @@ SELECT slot_no,
        cip36
 FROM   cip36_registration_invalid
 WHERE  stake_public_key = :stake_public_key
+       AND slot_no >= :slot_no

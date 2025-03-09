@@ -17,10 +17,6 @@ const TITLE: &str = "Cardano Blockchain Slot Number";
 const DESCRIPTION: &str = "The Slot Number of a Cardano Block on the chain.";
 /// Example.
 pub(crate) const EXAMPLE: u64 = 1_234_567;
-/// Minimum.
-const MINIMUM: u64 = 0;
-/// Maximum.
-const MAXIMUM: u64 = u64::MAX / 2;
 
 /// Schema.
 #[allow(clippy::cast_precision_loss)]
@@ -29,8 +25,8 @@ static SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| {
         title: Some(TITLE.to_owned()),
         description: Some(DESCRIPTION),
         example: Some(EXAMPLE.into()),
-        maximum: Some(MAXIMUM as f64),
-        minimum: Some(MINIMUM as f64),
+        maximum: Some(SlotNo::MAXIMUM.0 as f64),
+        minimum: Some(SlotNo::MINIMUM.0 as f64),
         ..MetaSchema::ANY
     }
 });
@@ -40,6 +36,11 @@ static SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| {
 pub(crate) struct SlotNo(u64);
 
 impl SlotNo {
+    /// Maximum.
+    pub(crate) const MAXIMUM: SlotNo = SlotNo(u64::MAX / 2);
+    /// Minimum.
+    pub(crate) const MINIMUM: SlotNo = SlotNo(0);
+
     /// Is the Slot Number valid?
     fn is_valid(value: u64) -> bool {
         (MINIMUM..=MAXIMUM).contains(&value)

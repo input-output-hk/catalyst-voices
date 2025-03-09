@@ -54,13 +54,14 @@ pub(crate) async fn get_registrations_given_stake_addr(
     };
     let stake_public_key = row_stake_pk?.stake_public_key;
 
+    let asat = asat.unwrap_or(SlotNo::MAXIMUM);
     let all_regs = if invalid {
-        get_invalid_registrations(&session, stake_public_key).await?
+        get_invalid_registrations(&session, stake_public_key, asat).await?
     } else {
         get_valid_registrations(&session, stake_public_key).await?
     };
 
-    let all_regs = filter_and_sort_registrations(all_regs, asat);
+    let all_regs = sort_registrations(all_regs);
 
     if all_regs.is_empty() {
         return Ok(Cip36Registration::NotFound);
@@ -149,13 +150,13 @@ async fn get_valid_registrations(
 
 /// Get invalid registrations for stake public key
 async fn get_invalid_registrations(
-    session: &CassandraSession, stake_public_key: Vec<u8>,
+    session: &CassandraSession, stake_public_key: Vec<u8>, slot_no: SlotNo,
 ) -> anyhow::Result<Vec<Cip36Details>> {
-    let mut invalid_registrations_iter =
-        GetInvalidRegistrationQuery::execute(session, GetInvalidRegistrationParams {
-            stake_public_key,
-        })
-        .await?;
+    let mut invalid_registrations_iter = GetInvalidRegistrationQuery::execute(
+        session,
+        GetInvalidRegistrationParams::new(stake_public_key, slot_no),
+    )
+    .await?;
     let mut invalid_registrations = Vec::new();
     while let Some(row) = invalid_registrations_iter.next().await {
         let row = row?;
@@ -209,11 +210,12 @@ pub(crate) async fn get_registrations_given_vote_key(
     .map_err(|err| anyhow::anyhow!("Failed to query stake public key from vote key {err:?}",))?;
 
     let mut all_regs = Vec::new();
+    let asat = asat.unwrap_or(SlotNo::MAXIMUM);
     while let Some(row_stake_pk) = stake_pk_iter.next().await {
         let stake_public_key = row_stake_pk?.stake_public_key;
 
         let regs = if invalid {
-            get_invalid_registrations(&session, stake_public_key.clone()).await?
+            get_invalid_registrations(&session, stake_public_key.clone(), asat).await?
         } else {
             get_valid_registrations(&session, stake_public_key.clone()).await?
         };
@@ -221,7 +223,7 @@ pub(crate) async fn get_registrations_given_vote_key(
         all_regs.extend(regs);
     }
 
-    let all_regs = filter_and_sort_registrations(all_regs, asat);
+    let all_regs = sort_registrations(all_regs);
 
     if all_regs.is_empty() {
         return Ok(Cip36Registration::NotFound);
@@ -247,7 +249,7 @@ pub(crate) async fn get_registrations_given_vote_key(
 
 /// Get all registrations or constrain if slot# given.
 pub async fn snapshot(
-    session: Arc<CassandraSession>, asat: Option<SlotNo>,
+    session: Arc<CassandraSession>, _asat: Option<SlotNo>,
     page: common::types::generic::query::pagination::Page,
     limit: common::types::generic::query::pagination::Limit, invalid: bool,
 ) -> anyhow::Result<Cip36Registration> {
@@ -258,7 +260,7 @@ pub async fn snapshot(
     };
 
     let all_regs = all_regs.into_iter().flat_map(|(_, reg)| reg).collect();
-    let all_regs = filter_and_sort_registrations(all_regs, asat);
+    let all_regs = sort_registrations(all_regs);
     let (all_regs, remaining) = paginate_registrations(all_regs, page.into(), limit.into())?;
 
     Ok(Cip36Registration::Ok(poem_openapi::payload::Json(
@@ -407,19 +409,11 @@ async fn get_all_invalid_registrations(
     Ok(invalids_map)
 }
 
-/// Filter registrations by the provided slot if provided then sort registrations by slot
-/// number, nonce, and transaction offset. If `slot_no` is the same, the registration with
-/// the highest `nonce` wins. If `nonce` is the same, the registration with the highest
-/// `txn_offset` wins. The latest one is considered the only valid registration. The rest
-/// are invalid.
-fn filter_and_sort_registrations(
-    mut regs: Vec<Cip36Details>, slot_no: Option<SlotNo>,
-) -> Vec<Cip36Details> {
-    // Filter registrations by the provided slot if provided
-    if let Some(slot_no) = slot_no {
-        regs.retain(|registration| registration.slot_no <= slot_no);
-    }
-
+/// Sort registrations by slot number, nonce, and transaction offset. If `slot_no` is the
+/// same, the registration with the highest `nonce` wins. If `nonce` is the same, the
+/// registration with the highest `txn_offset` wins. The latest one is considered the only
+/// valid registration. The rest are invalid.
+fn sort_registrations(mut regs: Vec<Cip36Details>) -> Vec<Cip36Details> {
     // Sort registrations by slot_no, nonce, and txn_offset in descending order
     regs.sort_by(|a, b| {
         // Compare by slot_no (descending)
