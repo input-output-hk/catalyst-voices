@@ -7,7 +7,7 @@ use cip36_reg::Cip36List;
 use derive_more::{From, Into};
 use poem_openapi::{payload::Json, types::Example, ApiResponse, NewType, Object};
 
-use crate::service::common;
+use crate::service::common::{self, types::generic::boolean::BooleanFlag};
 
 // ToDo: The examples of this response should be taken from representative data from a
 // response generated on pre-prod.
@@ -34,7 +34,7 @@ pub(crate) type AllRegistration = common::responses::WithErrorResponses<Cip36Reg
 #[oai(example = true)]
 pub(crate) struct Cip36RegistrationList {
     /// Flag which identifies that resulted registrations are all valid or not
-    pub is_valid: bool,
+    pub is_valid: BooleanFlag,
     /// List of registrations that were found, for the requested filter.
     #[oai(skip_serializing_if_is_empty)]
     pub regs: Cip36List,
@@ -46,7 +46,7 @@ pub(crate) struct Cip36RegistrationList {
 impl Example for Cip36RegistrationList {
     fn example() -> Self {
         Self {
-            is_valid: true,
+            is_valid: true.into(),
             regs: vec![Cip36Details::example()].into(),
             page: Some(Example::example()),
         }

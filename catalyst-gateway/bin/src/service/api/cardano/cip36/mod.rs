@@ -9,7 +9,16 @@ use super::Ed25519HexEncodedPublicKey;
 use crate::service::common::{
     self,
     tags::ApiTags,
-    types::cardano::{self},
+    types::{
+        cardano::{
+            self,
+            query::{stake_or_voter::StakeOrVoter, AsAt},
+        },
+        generic::{
+            boolean::BooleanFlag,
+            query::pagination::{Limit, Page},
+        },
+    },
 };
 
 pub(crate) mod endpoint;
@@ -45,13 +54,11 @@ impl Api {
     )]
     #[allow(clippy::too_many_arguments)]
     async fn get_registration(
-        &self, Query(lookup): Query<Option<cardano::query::stake_or_voter::StakeOrVoter>>,
-        Query(asat): Query<Option<cardano::query::AsAt>>,
-        Query(page): Query<Option<common::types::generic::query::pagination::Page>>,
-        Query(limit): Query<Option<common::types::generic::query::pagination::Limit>>,
+        &self, Query(lookup): Query<Option<StakeOrVoter>>, Query(asat): Query<Option<AsAt>>,
+        Query(page): Query<Option<Page>>, Query(limit): Query<Option<Limit>>,
         /// Flag for returning invalid registrations, if not provided or set to false,
         /// returns only valid registrations
-        Query(invalid): Query<Option<bool>>,
+        Query(invalid): Query<Option<BooleanFlag>>,
         /// Headers, used if the query is requesting ALL to determine if the secret API
         /// Key is also defined.
         headers: &HeaderMap,
@@ -76,7 +83,7 @@ impl Api {
             SlotNo::into_option(asat),
             page.unwrap_or_default(),
             limit.unwrap_or_default(),
-            invalid.unwrap_or_default(),
+            invalid.map(Into::into).unwrap_or_default(),
         )
         .await
     }

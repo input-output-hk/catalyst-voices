@@ -69,7 +69,7 @@ pub(crate) async fn get_registrations_given_stake_addr(
     let (all_regs, remaining) = paginate_registrations(all_regs, page.into(), limit.into())?;
 
     let res = Cip36RegistrationList {
-        is_valid: !invalid,
+        is_valid: (!invalid).into(),
         regs: all_regs.into(),
         page: Some(
             CurrentPage {
@@ -231,7 +231,7 @@ pub(crate) async fn get_registrations_given_vote_key(
 
     Ok(Cip36Registration::Ok(poem_openapi::payload::Json(
         Cip36RegistrationList {
-            is_valid: !invalid,
+            is_valid: (!invalid).into(),
             regs: all_regs.into(),
             page: Some(
                 CurrentPage {
@@ -263,7 +263,7 @@ pub async fn snapshot(
 
     Ok(Cip36Registration::Ok(poem_openapi::payload::Json(
         Cip36RegistrationList {
-            is_valid: !invalid,
+            is_valid: (!invalid).into(),
             regs: all_regs.into(),
             page: Some(
                 CurrentPage {

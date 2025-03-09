@@ -11,3 +11,4 @@ pub(crate) mod query;
 pub(crate) mod url;
 pub(crate) mod uuidv4;
 pub(crate) mod uuidv7;
+pub(crate) mod boolean;
