@@ -83,7 +83,7 @@ impl Api {
             SlotNo::into_option(asat),
             page.unwrap_or_default(),
             limit.unwrap_or_default(),
-            invalid.map(Into::into).unwrap_or_default(),
+            invalid.is_some_and(Into::into),
         )
         .await
     }
