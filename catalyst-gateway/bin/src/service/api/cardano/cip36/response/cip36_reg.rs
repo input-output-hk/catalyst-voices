@@ -81,6 +81,7 @@ impl Example for Cip36Details {
 
 impl Cip36Details {
     /// Example of an invalid registration
+    #[allow(dead_code)]
     pub(crate) fn invalid_example() -> Self {
         let problem_report = ProblemReport::new("Cip36");
         problem_report.other("Error occurred", "Cip36 decoding error");
