@@ -33,7 +33,7 @@ async fn test_get_assets_by_stake_addr() {
 
     let mut row_stream = GetAssetsByStakeAddressQuery::execute(
         &session,
-        GetAssetsByStakeAddressParams::new(stake_address_1(), u64::MAX.into()),
+        GetAssetsByStakeAddressParams::new(stake_address_1(), u64::MAX),
     )
     .await
     .unwrap();
@@ -240,10 +240,7 @@ async fn test_get_txo_by_stake_address() {
 
     let mut row_stream = GetTxoByStakeAddressQuery::execute(
         &session,
-        GetTxoByStakeAddressQueryParams::new(
-            stake_address_1(),
-            u64::try_from(i64::MAX).unwrap().into(),
-        ),
+        GetTxoByStakeAddressQueryParams::new(stake_address_1(), u64::try_from(i64::MAX).unwrap()),
     )
     .await
     .unwrap();

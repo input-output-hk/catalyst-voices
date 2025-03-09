@@ -129,7 +129,7 @@ async fn calculate_stake_info(
     session: &CassandraSession, stake_address: Cip19StakeAddress, slot_num: Option<SlotNo>,
 ) -> anyhow::Result<Option<StakeInfo>> {
     let address: StakeAddress = stake_address.try_into()?;
-    let adjusted_slot_num = slot_num.map_or(Slot::from(u64::MAX), Into::into);
+    let adjusted_slot_num = slot_num.unwrap_or(SlotNo::MAXIMUM);
 
     let (mut txos, native_tokens) = futures::try_join!(
         get_txo(session, &address, adjusted_slot_num),
@@ -151,7 +151,7 @@ type TxoMap = HashMap<(TransactionId, i16), TxoInfo>;
 
 /// Returns a map of TXO infos for the given stake address.
 async fn get_txo(
-    session: &CassandraSession, stake_address: &StakeAddress, slot_num: Slot,
+    session: &CassandraSession, stake_address: &StakeAddress, slot_num: SlotNo,
 ) -> anyhow::Result<TxoMap> {
     let mut txos_iter = GetTxoByStakeAddressQuery::execute(
         session,
@@ -180,7 +180,7 @@ type NativeTokensMap = HashMap<(Slot, TxnIndex, i16), NativeTokens>;
 
 /// Returns a map of native token infos for the given stake address.
 async fn get_native_tokens(
-    session: &CassandraSession, stake_address: &StakeAddress, slot_num: Slot,
+    session: &CassandraSession, stake_address: &StakeAddress, slot_num: SlotNo,
 ) -> anyhow::Result<NativeTokensMap> {
     let mut assets_txos_iter = GetAssetsByStakeAddressQuery::execute(
         session,
@@ -249,8 +249,9 @@ async fn set_and_update_spent(
 
 /// Builds an instance of [`StakeInfo`] based on the TXOs given.
 fn build_stake_info(
-    txos: TxoMap, mut tokens: NativeTokensMap, slot_num: Slot,
+    txos: TxoMap, mut tokens: NativeTokensMap, slot_num: SlotNo,
 ) -> anyhow::Result<StakeInfo> {
+    let slot_num = slot_num.into();
     let mut stake_info = StakeInfo::default();
     for txo_info in txos.into_values() {
         // Filter out spent TXOs.
