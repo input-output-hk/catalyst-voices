@@ -9,7 +9,7 @@ use poem_openapi::{payload::Json, types::Example, ApiResponse, NewType, Object};
 
 use crate::service::common::{self, types::generic::boolean::BooleanFlag};
 
-// ToDo: The examples of this response should be taken from representative data from a
+// TODO: The examples of this response should be taken from representative data from a
 // response generated on pre-prod.
 
 /// Endpoint responses.
