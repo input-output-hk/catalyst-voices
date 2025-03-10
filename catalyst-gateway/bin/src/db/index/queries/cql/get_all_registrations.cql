@@ -7,3 +7,4 @@ SELECT stake_public_key,
        is_payable,
        cip36
 FROM   cip36_registration
+WHERE  slot_no <= :slot_no
