@@ -135,7 +135,10 @@ void main() {
       expect(uri.host, 'cardano');
       expect(uri.userInfo, 'testuser:12345678');
       expect(uri.fragment, 'encrypt');
-      expect(uri.path, contains('/1/2'));
+      expect(
+        uri.path,
+        equals('/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE=/1/2'),
+      );
     });
   });
 }
