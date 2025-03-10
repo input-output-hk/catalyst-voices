@@ -87,10 +87,24 @@ final class CatalystId extends Equatable {
         encrypt,
       ];
 
+  /// Formats the catalyst ID skipping the scheme and the scheme separator `//`.
+  String formatAsUriWithoutScheme() {
+    final uri = Uri(
+      scheme: null,
+      userInfo: _formatUserInfo(),
+      host: host,
+      path: _formatPath(),
+      fragment: encrypt ? encryptFragment : null,
+    );
+
+    final string = uri.toString();
+    return string.replaceAll('//', '');
+  }
+
   /// Builds the [Uri] from the [CatalystId].
-  Uri toUri({bool includeScheme = true}) {
+  Uri toUri() {
     return Uri(
-      scheme: includeScheme ? scheme : null,
+      scheme: scheme,
       userInfo: _formatUserInfo(),
       host: host,
       path: _formatPath(),

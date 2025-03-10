@@ -141,16 +141,16 @@ void main() {
       );
     });
 
-    test('should convert minimal $CatalystId to Uri correctly', () {
+    test('should format minimal $CatalystId to Uri correctly', () {
       final catalystId = CatalystId(
         host: CatalystIdHost.cardano.host,
         role0Key: role0Key,
         nonce: 123456,
       );
 
-      final uri = catalystId.toUri(includeScheme: false);
+      final formattedId = catalystId.formatAsUriWithoutScheme();
       expect(
-        uri.toString(),
+        formattedId,
         equals(
           ':123456@cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE=',
         ),
