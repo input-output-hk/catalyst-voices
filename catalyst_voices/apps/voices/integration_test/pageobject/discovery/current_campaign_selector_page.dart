@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:patrol_finders/patrol_finders.dart';
 import '../../utils/translations_utils.dart';
+import '../discovery_page.dart';
 
 class CurrentCampaignSection {
   CurrentCampaignSection(this.$);
