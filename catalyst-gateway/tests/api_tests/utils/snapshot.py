@@ -15,7 +15,7 @@ class Snapshot:
 
 @pytest.fixture
 def snapshot() -> Snapshot:
-    # snapthot file should follow the following pattern:
+    # snapshot file should follow the following pattern:
     # snapshot-<slot_no>-<network>.json
     files = glob.glob("./test_data/snapshot-*.json")
     with open(files[0]) as snapshot_file:
