@@ -1,9 +1,11 @@
-part of 'new_proposal_cubit.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
+import 'package:equatable/equatable.dart';
 
 class NewProposalState extends Equatable {
   final String? title;
   final String? categoryId;
-  final List<CampaignCategoryViewModel> categories;
+  final List<CampaignCategoryDetailsViewModel> categories;
 
   const NewProposalState({
     this.title,
@@ -19,7 +21,7 @@ class NewProposalState extends Equatable {
   NewProposalState copyWith({
     Optional<String>? title,
     Optional<String>? categoryId,
-    List<CampaignCategoryViewModel>? categories,
+    List<CampaignCategoryDetailsViewModel>? categories,
   }) {
     return NewProposalState(
       title: title.dataOr(this.title),

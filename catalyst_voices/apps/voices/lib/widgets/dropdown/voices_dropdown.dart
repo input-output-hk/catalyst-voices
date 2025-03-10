@@ -136,7 +136,9 @@ class SingleSelectDropdown<T> extends VoicesFormField<T> {
   FormFieldState<T> createState() => _DropdownFormFieldState<T>();
 
   static OutlineInputBorder _border(
-          BuildContext context, double borderRadius) =>
+    BuildContext context,
+    double borderRadius,
+  ) =>
       OutlineInputBorder(
         borderSide: BorderSide(
           color: Theme.of(context).colors.outlineBorderVariant,
