@@ -33,6 +33,10 @@ use super::types::headers::{
     ratelimit::RateLimitHeader,
     retry_after::{RetryAfterHeader, RetryAfterOption},
 };
+use crate::{
+    db::index::session::CassandraSessionError,
+    service::utilities::health::{set_event_db_liveness, set_index_db_liveness},
+};
 
 /// Default error responses
 #[derive(ApiResponse)]
@@ -146,6 +150,13 @@ impl<T> WithErrorResponses<T> {
     pub(crate) fn handle_error(err: &anyhow::Error) -> Self {
         match err {
             err if err.is::<bb8::RunError<tokio_postgres::Error>>() => {
+                // Event DB failed
+                set_event_db_liveness(false);
+                Self::service_unavailable(err, RetryAfterOption::Default)
+            },
+            err if err.is::<CassandraSessionError>() => {
+                // Index DB failed
+                set_index_db_liveness(false);
                 Self::service_unavailable(err, RetryAfterOption::Default)
             },
             err => Self::internal_error(err),
