@@ -1,6 +1,28 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 
 final class DocumentNodeTraverser {
+  /// Expands nested properties.
+  static Iterable<DocumentProperty> findSectionsAndSubsections(
+    DocumentProperty property,
+  ) sync* {
+    if (property.schema.isSectionOrSubsection) {
+      yield property;
+    }
+
+    switch (property) {
+      case DocumentListProperty():
+        for (final childProperty in property.properties) {
+          yield* findSectionsAndSubsections(childProperty);
+        }
+      case DocumentObjectProperty():
+        for (final childProperty in property.properties) {
+          yield* findSectionsAndSubsections(childProperty);
+        }
+      case DocumentValueProperty():
+      // value property doesn't have children
+    }
+  }
+
   /// Retrieves the value of a property located at the specified [nodeId].
   ///
   /// This method traverses the nested structure of the [data] using

@@ -11,6 +11,16 @@ sealed class DocumentRef extends Equatable {
     this.version,
   });
 
+  factory DocumentRef.build({
+    required String id,
+    String? version,
+    required bool isDraft,
+  }) {
+    return isDraft
+        ? DraftRef(id: id, version: version)
+        : SignedDocumentRef(id: id, version: version);
+  }
+
   bool get isExact => version != null;
 
   @override
@@ -20,6 +30,12 @@ sealed class DocumentRef extends Equatable {
     String? id,
     Optional<String>? version,
   });
+
+  /// Generates a draft version of the document reference.
+  ///
+  /// The version can be used as next version for updated document,
+  /// i.e. by proposal builder.
+  DraftRef nextVersion();
 }
 
 final class DraftRef extends DocumentRef {
@@ -48,6 +64,9 @@ final class DraftRef extends DocumentRef {
   }
 
   @override
+  DraftRef nextVersion() => this;
+
+  @override
   String toString() =>
       isExact ? 'ExactDraftRef($id.v$version)' : 'LooseDraftRef($id)';
 }
@@ -71,6 +90,17 @@ final class SignedDocumentRef extends DocumentRef {
     super.version,
   });
 
+  /// Creates ref for first version of [id] document.
+  const SignedDocumentRef.first(String id) : this(id: id, version: id);
+
+  factory SignedDocumentRef.generateFirstRef() {
+    final id = const Uuid().v7();
+    return SignedDocumentRef(
+      id: id,
+      version: id,
+    );
+  }
+
   @override
   SignedDocumentRef copyWith({
     String? id,
@@ -79,6 +109,14 @@ final class SignedDocumentRef extends DocumentRef {
     return SignedDocumentRef(
       id: id ?? this.id,
       version: version.dataOr(this.version),
+    );
+  }
+
+  @override
+  DraftRef nextVersion() {
+    return DraftRef(
+      id: id,
+      version: const Uuid().v7(),
     );
   }
 

@@ -19,9 +19,14 @@ typedef DocumentsDataWithRefData = ({DocumentData data, DocumentData refData});
 abstract interface class DocumentRepository {
   factory DocumentRepository(
     DraftDataSource drafts,
-    DocumentDataLocalSource localDocuments,
+    SignedDocumentDataSource localDocuments,
     DocumentDataRemoteSource remoteDocuments,
   ) = DocumentRepositoryImpl;
+
+  /// Making sure document from [ref] is available locally.
+  Future<void> cacheDocument({
+    required SignedDocumentRef ref,
+  });
 
   /// Stores new draft locally and returns ref to it.
   ///
@@ -30,21 +35,35 @@ abstract interface class DocumentRepository {
   ///
   /// If [of] is declared it will be used for this draft and new version
   /// assigned. Think of it as editing published document.
-  Future<DraftRef> createProposalDraft({
+  Future<DraftRef> createDocumentDraft({
+    required DocumentType type,
     required DocumentDataContent content,
     required SignedDocumentRef template,
     SignedDocumentRef? of,
   });
 
-  /// Encodes the [document] to exportable format.
+  /// Deletes a document draft from the local storage.
+  Future<void> deleteDocumentDraft({
+    required DraftRef ref,
+  });
+
+  /// Encodes the [content] to exportable format.
   ///
   /// It does not save the document anywhere on the disk,
   /// it only encodes a document as [Uint8List]
   /// so that it can be saved as a file.
   Future<Uint8List> encodeDocumentForExport({
     required DocumentDataMetadata metadata,
-    required Document document,
+    required DocumentDataContent content,
   });
+
+  /// Returns list of refs to all published and any refs it may hold.
+  ///
+  /// Its using documents index api.
+  Future<List<SignedDocumentRef>> getAllDocumentsRefs();
+
+  /// Returns list of locally saved signed documents refs.
+  Future<List<SignedDocumentRef>> getCachedDocumentsRefs();
 
   /// Returns matching [ProposalDocument] for matching [ref].
   ///
@@ -53,6 +72,9 @@ abstract interface class DocumentRepository {
     required DocumentRef ref,
   });
 
+  /// Returns [ProposalTemplate] for matching [ref].
+  ///
+  /// Source of data depends whether [ref] is [SignedDocumentRef] or [DraftRef].
   Future<ProposalTemplate> getProposalTemplate({
     required DocumentRef ref,
   });
@@ -68,14 +90,28 @@ abstract interface class DocumentRepository {
   /// Returns the reference to the imported document.
   Future<DocumentRef> importDocument({required Uint8List data});
 
+  /// Returns a list of version of ref object.
+  ///
+  /// Can be used to get versions count.
+  Future<List<String>> queryVersionIds({required String id});
+
   /// Updates local draft (or drafts if version is not specified)
   /// matching [ref] with given [content].
   ///
   /// If watching same draft with [watchProposalDocument] it will emit
   /// change.
-  Future<void> updateProposalDraftContent({
+  Future<void> updateDocumentDraft({
     required DraftRef ref,
     required DocumentDataContent content,
+  });
+
+  Future<void> uploadDocument({
+    required SignedDocument document,
+  });
+
+  Stream<int> watchCount({
+    required DocumentRef ref,
+    required DocumentType type,
   });
 
   /// Observes matching [ProposalDocument] and emits updates.
@@ -84,12 +120,17 @@ abstract interface class DocumentRepository {
   Stream<ProposalDocument> watchProposalDocument({
     required DocumentRef ref,
   });
+
+  Stream<List<ProposalDocument>> watchProposalsDocuments({
+    int? limit,
+    bool unique = false,
+  });
 }
 
 final class DocumentRepositoryImpl implements DocumentRepository {
   // ignore: unused_field
   final DraftDataSource _drafts;
-  final DocumentDataLocalSource _localDocuments;
+  final SignedDocumentDataSource _localDocuments;
   final DocumentDataRemoteSource _remoteDocuments;
 
   final _documentDataLock = Lock();
@@ -101,7 +142,15 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   );
 
   @override
-  Future<DraftRef> createProposalDraft({
+  Future<void> cacheDocument({required SignedDocumentRef ref}) async {
+    final documentData = await _remoteDocuments.get(ref: ref);
+
+    await _localDocuments.save(data: documentData);
+  }
+
+  @override
+  Future<DraftRef> createDocumentDraft({
+    required DocumentType type,
     required DocumentDataContent content,
     required SignedDocumentRef template,
     SignedDocumentRef? of,
@@ -111,7 +160,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
 
     final ref = DraftRef(id: id, version: version);
     final metadata = DocumentDataMetadata(
-      type: DocumentType.proposalDocument,
+      type: type,
       selfRef: ref,
       template: template,
     );
@@ -127,17 +176,43 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   }
 
   @override
+  Future<void> deleteDocumentDraft({required DraftRef ref}) {
+    return _drafts.delete(ref: ref);
+  }
+
+  @override
   Future<Uint8List> encodeDocumentForExport({
     required DocumentDataMetadata metadata,
-    required Document document,
+    required DocumentDataContent content,
   }) async {
     final documentDataDto = DocumentDataDto(
       metadata: DocumentDataMetadataDto.fromModel(metadata),
-      content: DocumentDto.fromModel(document).toJson(),
+      content: DocumentDataContentDto.fromModel(content),
     );
 
     final jsonData = documentDataDto.toJson();
     return json.fuse(utf8).encode(jsonData) as Uint8List;
+  }
+
+  @override
+  Future<List<SignedDocumentRef>> getAllDocumentsRefs() async {
+    final remoteRefs = await _remoteDocuments.index();
+
+    return {
+      // Note. categories are mocked on backend so we can't not fetch them.
+      ...categoriesTemplatesRefs.expand((e) => [e.proposal, e.comment]),
+      ...remoteRefs,
+    }
+        .toList()
+        // TODO(damian-molinski): delete it after parsing it ready.
+        .sublist(0, 1);
+  }
+
+  @override
+  Future<List<SignedDocumentRef>> getCachedDocumentsRefs() {
+    return _localDocuments
+        .index()
+        .then((refs) => refs.cast<SignedDocumentRef>());
   }
 
   @visibleForTesting
@@ -200,11 +275,59 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   }
 
   @override
-  Future<void> updateProposalDraftContent({
+  Future<List<String>> queryVersionIds({required String id}) {
+    return _localDocuments.queryVersionIds(id: id);
+  }
+
+  @override
+  Future<void> updateDocumentDraft({
     required DraftRef ref,
     required DocumentDataContent content,
   }) async {
-    await _drafts.update(ref: ref, content: content);
+    await _drafts.update(
+      ref: ref,
+      content: content,
+    );
+  }
+
+  @override
+  Future<void> uploadDocument({required SignedDocument document}) async {
+    await _remoteDocuments.upload(document);
+  }
+
+  Stream<List<DocumentsDataWithRefData>> watchAllDocuments({
+    int? limit,
+    bool unique = false,
+    DocumentType? type,
+  }) {
+    return _localDocuments
+        .watchAll(limit: limit, unique: unique, type: type)
+        .distinct()
+        .switchMap((documents) async* {
+      final results = await Future.wait(
+        documents
+            .where((doc) => doc.metadata.template != null)
+            .map((documentData) async {
+          final templateRef = documentData.metadata.template!;
+          final templateData = await _documentDataLock.synchronized(
+            () => getDocumentData(ref: templateRef),
+          );
+          return (data: documentData, refData: templateData);
+        }),
+      );
+      yield results;
+    });
+  }
+
+  @override
+  Stream<int> watchCount({
+    required DocumentRef ref,
+    required DocumentType type,
+  }) {
+    return _localDocuments.watchCount(
+      ref: ref,
+      type: type,
+    );
   }
 
   @visibleForTesting
@@ -261,6 +384,29 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     );
   }
 
+  @override
+  Stream<List<ProposalDocument>> watchProposalsDocuments({
+    int? limit,
+    bool unique = false,
+  }) {
+    return watchAllDocuments(
+      limit: limit,
+      type: DocumentType.proposalDocument,
+    ).whereNotNull().map(
+          (documents) => documents.map(
+            (doc) {
+              final documentData = doc.data;
+              final templateData = doc.refData;
+
+              return _buildProposalDocument(
+                documentData: documentData,
+                templateData: templateData,
+              );
+            },
+          ).toList(),
+        );
+  }
+
   ProposalDocument _buildProposalDocument({
     required DocumentData documentData,
     required DocumentData templateData,
@@ -273,8 +419,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     final template = _buildProposalTemplate(documentData: templateData);
 
     final metadata = ProposalMetadata(
-      id: documentData.metadata.id,
-      version: documentData.metadata.version,
+      selfRef: documentData.metadata.selfRef,
     );
 
     final content = DocumentDataContentDto.fromModel(
@@ -298,8 +443,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     );
 
     final metadata = ProposalTemplateMetadata(
-      id: documentData.metadata.id,
-      version: documentData.metadata.version,
+      selfRef: documentData.metadata.selfRef,
     );
 
     final contentData = documentData.content.data;

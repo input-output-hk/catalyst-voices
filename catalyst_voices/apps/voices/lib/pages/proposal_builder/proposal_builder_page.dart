@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:catalyst_voices/common/error_handler.dart';
+import 'package:catalyst_voices/common/signal_handler.dart';
 import 'package:catalyst_voices/pages/proposal_builder/appbar/proposal_builder_back_action.dart';
 import 'package:catalyst_voices/pages/proposal_builder/appbar/proposal_builder_status_action.dart';
 import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_error.dart';
@@ -9,6 +10,7 @@ import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_navigati
 import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_segments.dart';
 import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_setup_panel.dart';
 import 'package:catalyst_voices/pages/spaces/appbar/session_state_header.dart';
+import 'package:catalyst_voices/routes/routing/spaces_route.dart';
 import 'package:catalyst_voices/widgets/snackbar/voices_snackbar.dart';
 import 'package:catalyst_voices/widgets/snackbar/voices_snackbar_action.dart';
 import 'package:catalyst_voices/widgets/snackbar/voices_snackbar_type.dart';
@@ -62,7 +64,10 @@ class _ProposalBuilderContent extends StatelessWidget {
 }
 
 class _ProposalBuilderPageState extends State<ProposalBuilderPage>
-    with ErrorHandlerStateMixin<ProposalBuilderBloc, ProposalBuilderPage> {
+    with
+        ErrorHandlerStateMixin<ProposalBuilderBloc, ProposalBuilderPage>,
+        SignalHandlerStateMixin<ProposalBuilderBloc, ProposalBuilderSignal,
+            ProposalBuilderPage> {
   late final SegmentsController _segmentsController;
   late final ItemScrollController _segmentsScrollController;
 
@@ -105,10 +110,11 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
 
   @override
   void dispose() {
+    _segmentsController.dispose();
+
     unawaited(_segmentsSub?.cancel());
     _segmentsSub = null;
 
-    _segmentsController.dispose();
     super.dispose();
   }
 
@@ -118,6 +124,14 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
       _showValidationErrorSnackbar(error);
     } else {
       super.handleError(error);
+    }
+  }
+
+  @override
+  void handleSignal(ProposalBuilderSignal signal) {
+    switch (signal) {
+      case DeletedProposalBuilderSignal():
+        _onProposalDeleted();
     }
   }
 
@@ -149,6 +163,12 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
 
     final event = ActiveNodeChangedEvent(activeSectionId);
     context.read<ProposalBuilderBloc>().add(event);
+  }
+
+  void _onProposalDeleted() {
+    Router.neglect(context, () {
+      const WorkspaceRoute().replace(context);
+    });
   }
 
   void _showValidationErrorSnackbar(ProposalBuilderValidationException error) {
@@ -196,9 +216,11 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
     final templateId = widget.templateId;
 
     if (proposalId != null) {
-      bloc.add(LoadProposalEvent(id: proposalId));
+      final ref = SignedDocumentRef(id: proposalId);
+      bloc.add(LoadProposalEvent(ref: ref));
     } else if (templateId != null) {
-      bloc.add(LoadProposalTemplateEvent(id: templateId));
+      final ref = SignedDocumentRef(id: templateId);
+      bloc.add(LoadProposalTemplateEvent(ref: ref));
     } else {
       bloc.add(const LoadDefaultProposalTemplateEvent());
     }
