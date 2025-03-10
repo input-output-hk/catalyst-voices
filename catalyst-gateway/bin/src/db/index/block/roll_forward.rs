@@ -12,7 +12,6 @@ use crate::db::index::{block::CassandraSession, queries::purge};
 pub(crate) enum PurgeCondition {
     /// Purge all data before the provided slot number (including)
     PurgeBackwards(Slot),
-    #[allow(dead_code)]
     /// Purge all data after the provided slot number (including)
     PurgeForwards(Slot),
 }

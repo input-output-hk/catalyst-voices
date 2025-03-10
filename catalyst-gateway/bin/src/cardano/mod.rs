@@ -7,7 +7,7 @@ use cardano_chain_follower::{ChainFollower, ChainSyncConfig};
 use duration_string::DurationString;
 use futures::{stream::FuturesUnordered, StreamExt};
 use rand::{Rng, SeedableRng};
-use tracing::{debug, error, info, warn};
+use tracing::{debug, error, info};
 
 use crate::{
     db::index::{
@@ -299,10 +299,17 @@ fn sync_subchain(params: SyncParams) -> tokio::task::JoinHandle<SyncParams> {
                     blocks_synced = blocks_synced.saturating_add(1);
                 },
                 cardano_chain_follower::Kind::Rollback => {
-                    warn!("TODO: Live Chain rollback");
-                    // What we need to do here, is purge the live DB of records after the
-                    // rollback point.  We need to complete this operation here
-                    // before we keep syncing the live chain.
+                    if let Some(ref purge_point) = params.follower_roll_forward {
+                        let purge_condition =
+                            PurgeCondition::PurgeForwards(purge_point.slot_or_default());
+                        if let Err(error) = roll_forward::purge_live_index(purge_condition).await {
+                            error!(chain=%params.chain, error=%error, "Chain follower
+                    rollback, purging volatile data task failed.");
+                        }
+                    } else {
+                        error!(chain=%params.chain, "Chain follower rollback, rollback
+                    triggered, but no point available.");
+                    }
                 },
             }
         }
