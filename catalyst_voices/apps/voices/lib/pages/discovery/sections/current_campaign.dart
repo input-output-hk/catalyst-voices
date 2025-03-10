@@ -75,7 +75,9 @@ class _SubTitle extends StatelessWidget {
             style: context.textTheme.headlineMedium,
           ),
           const SizedBox(height: 12),
-          MarkdownText(MarkdownData(context.l10n.ideaJourneyDescription)),
+          MarkdownText(
+              key: const Key('IdeaDescription'),
+              MarkdownData(context.l10n.ideaJourneyDescription)),
         ],
       ),
     );
