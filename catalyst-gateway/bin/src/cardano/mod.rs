@@ -9,11 +9,14 @@ use event::EventTarget;
 use futures::{stream::FuturesUnordered, StreamExt};
 use rand::{Rng, SeedableRng};
 use tokio::sync::broadcast;
-use tracing::{debug, error, info, warn};
+use tracing::{debug, error, info};
 
 use crate::{
     db::index::{
-        block::{index_block, roll_forward},
+        block::{
+            index_block,
+            roll_forward::{self, PurgeCondition},
+        },
         queries::sync_status::{
             get::{get_sync_status, SyncStatus},
             update::update_sync_status,
@@ -301,12 +304,18 @@ fn sync_subchain(
                     blocks_synced = blocks_synced.saturating_add(1);
                 },
                 cardano_chain_follower::Kind::Rollback => {
-                    warn!("TODO: Live Chain rollback");
-                    // What we need to do here, is purge the live DB of records after the
-                    // rollback point.  We need to complete this operation here
-                    // before we keep syncing the live chain.
-
                     let _ = event_sender.send(event::ChainIndexerEvent::ForwardDataPurged);
+                    if let Some(ref purge_point) = params.follower_roll_forward {
+                        let purge_condition =
+                            PurgeCondition::PurgeForwards(purge_point.slot_or_default());
+                        if let Err(error) = roll_forward::purge_live_index(purge_condition).await {
+                            error!(chain=%params.chain, error=%error, "Chain follower
+                    rollback, purging volatile data task failed.");
+                        }
+                    } else {
+                        error!(chain=%params.chain, "Chain follower rollback, rollback
+                    triggered, but no point available.");
+                    }
                 },
             }
         }
@@ -509,7 +518,12 @@ impl SyncTask {
             if self.sync_tasks.len() == 1 {
                 self.dispatch_event(event::ChainIndexerEvent::SyncCompleted);
 
-                if let Err(error) = roll_forward::purge_live_index(self.immutable_tip_slot).await {
+                // Purge data up to this slot
+                // Slots arithmetic has saturating semantic, so this is ok.
+                #[allow(clippy::arithmetic_side_effects)]
+                let purge_to_slot = self.immutable_tip_slot - Settings::purge_slot_buffer();
+                let purge_condition = PurgeCondition::PurgeBackwards(purge_to_slot);
+                if let Err(error) = roll_forward::purge_live_index(purge_condition).await {
                     error!(chain=%self.cfg.chain, error=%error, "BUG: Purging volatile data task failed.");
                 } else {
                     self.dispatch_event(event::ChainIndexerEvent::BackwardDataPurged);
