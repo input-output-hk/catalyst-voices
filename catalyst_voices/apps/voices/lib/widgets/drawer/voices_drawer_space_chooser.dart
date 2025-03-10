@@ -8,7 +8,10 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-typedef _AccessSpaces = ({List<Space> canAccessSpaces, List<Space> availableSpaces});
+typedef _AccessSpaces = ({
+  List<Space> canAccessSpaces,
+  List<Space> availableSpaces
+});
 
 class VoicesDrawerSpaceChooser extends StatelessWidget {
   final Space currentSpace;
