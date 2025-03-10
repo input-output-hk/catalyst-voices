@@ -7,7 +7,6 @@ use futures::TryStreamExt;
 
 use super::{
     cardano::{cip19_shelley_address::Cip19ShelleyAddress, nonce::Nonce},
-    common::types::generic::error_msg::ErrorMessage,
     response::{Cip36Details, Cip36Registration, Cip36RegistrationList},
     Ed25519HexEncodedPublicKey, SlotNo,
 };
@@ -175,7 +174,7 @@ async fn get_valid_registrations(
                         payment_address,
                         is_payable: row.is_payable.into(),
                         cip15: (!row.cip36).into(),
-                        errors: None,
+                        report: None,
                     };
 
                     regs.push(cip36);
@@ -211,6 +210,10 @@ async fn get_invalid_registrations(
                 let vote_pub_key = Ed25519HexEncodedPublicKey::try_from(row.vote_key).ok();
                 let stake_pub_key =
                     Ed25519HexEncodedPublicKey::try_from(row.stake_public_key.clone()).ok();
+                let report: serde_json::Value =
+                    serde_json::from_str(&row.problem_report).map_err(|e| {
+                        anyhow::anyhow!("Invalid CIP36 registration problem report should me JSON encodable, err: {e}")
+                    })?;
 
                 regs.push(Cip36Details {
                     slot_no,
@@ -221,7 +224,7 @@ async fn get_invalid_registrations(
                     payment_address,
                     is_payable: row.is_payable.into(),
                     cip15: (!row.cip36).into(),
-                    errors: Some(ErrorMessage::from(row.problem_report)),
+                    report: Some(report.into()),
                 });
                 Ok(regs)
             }
@@ -284,7 +287,7 @@ async fn get_all_valid_registrations(
             payment_address,
             is_payable: row.is_payable.into(),
             cip15: (!row.cip36).into(),
-            errors: None,
+            report: None,
         };
         regs.push(cip36);
         Ok(regs)
@@ -317,6 +320,12 @@ async fn get_all_invalid_registrations(
 
                 let stake_pub_key =
                     Ed25519HexEncodedPublicKey::try_from(row.stake_public_key.clone()).ok();
+                let report: serde_json::Value =
+                    serde_json::from_str(&row.problem_report).map_err(|e| {
+                        anyhow::anyhow!(
+                            "Invalid CIP36 registration problem report should me JSON encodable, err: {e}"
+                        )
+                    })?;
 
                 let invalid = Cip36Details {
                     slot_no,
@@ -327,7 +336,7 @@ async fn get_all_invalid_registrations(
                     payment_address: payment_addr,
                     is_payable: row.is_payable.into(),
                     cip15: (!row.cip36).into(),
-                    errors: Some(ErrorMessage::from(row.problem_report)),
+                    report: Some(report.into()),
                 };
                 regs.push(invalid);
                 Ok(regs)
