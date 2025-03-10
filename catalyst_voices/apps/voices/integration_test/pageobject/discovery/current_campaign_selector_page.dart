@@ -3,8 +3,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:patrol_finders/patrol_finders.dart';
 import '../../utils/translations_utils.dart';
 
-class CurrentCampaignSelector {
-  CurrentCampaignSelector(this.$);
+class CurrentCampaignSection {
+  CurrentCampaignSection(this.$);
 
   late PatrolTester $;
   final currentCampaignRoot = const Key('CurrentCampaignRoot');
