@@ -39,10 +39,12 @@ class _AccountRolesTileState extends State<_AccountRolesTile> {
   Widget build(BuildContext context) {
     return PropertyTile(
       title: context.l10n.myRoles,
+      key: const Key('AddRoleTile'),
       action: _EditButton(
         onTap: widget.state.canAddRole ? _addAccountRole : null,
       ),
       child: _Roles(items: widget.state.items),
+      
     );
   }
 
@@ -68,6 +70,7 @@ class _EditButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return VoicesTextButton(
       onTap: onTap,
+      key: const Key('EditRolesButton'),
       child: Text(
         context.l10n.addRole,
         style: Theme.of(context).textTheme.labelSmall,

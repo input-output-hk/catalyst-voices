@@ -8,7 +8,9 @@ import 'package:patrol_finders/patrol_finders.dart';
 
 import '../pageobject/account_dropdown_page.dart';
 import '../pageobject/app_bar_page.dart';
+import '../pageobject/onboarding/restore_flow/step_8_unlock_password_success_panel.dart';
 import '../pageobject/overall_spaces_page.dart';
+import '../pageobject/profile_page.dart';
 import '../pageobject/unlock_modal_page.dart';
 import '../utils/constants.dart';
 
@@ -69,6 +71,22 @@ void main() async {
         await $(UnlockModalPage.unlockConfirmPasswordButton).tap();
         await AppBarPage($).unlockBtnIsVisible();
       });
+    },
+    skip: true,
+  );
+  patrolWidgetTest(
+    'user - Account dropdown button opens account dropdown',
+    (PatrolTester $) async {
+      await $.pumpWidgetAndSettle(App(routerConfig: router));
+      await UnlockPasswordSuccessPanel($).goto();
+      await UnlockPasswordSuccessPanel($).clickGoToDashboard();
+      await AppBarPage($).accountPopupBtnClick();
+      // await AccountDropdownPage($).clickDarkTheme();
+      await AccountDropdownPage($).clickProfileAndKeychain();
+      await ProfilePage($).clickDisplayNameEdit();
+      await ProfilePage($).clickEmailAdressEdit();
+      // await ProfilePage($).addRoleClick();
+      await ProfilePage($).removeKeychainClick();
     },
   );
 }

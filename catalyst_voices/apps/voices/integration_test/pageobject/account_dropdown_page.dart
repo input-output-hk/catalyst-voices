@@ -5,10 +5,14 @@ import 'package:patrol_finders/patrol_finders.dart';
 import '../utils/translations_utils.dart';
 
 class AccountDropdownPage {
+  PatrolTester $;
+  AccountDropdownPage(this.$);
+  final profileAndKeychainText = const Key('ProfileAndKeychainText');
   static const popUpMenuAccountHeader = Key('PopUpMenuAccountHeader');
   static const popUpMenuMyAccount = Key('PopUpMenuMyAccount');
   static const popUpMenuProfileAndKeychain = Key('PopUpMenuProfileAndKeychain');
   static const popUpMenuLock = Key('PopUpMenuLockAccount');
+  final segmentedButton = const Key('SegmentedButton');
 
   static Future<void> accountDropdownContainsSpecificData(
     PatrolTester $,
@@ -42,4 +46,23 @@ class AccountDropdownPage {
     expect($(popUpMenuProfileAndKeychain), findsOneWidget);
     expect($(popUpMenuLock), findsOneWidget);
   }
+
+  Future<void> clickProfileAndKeychain() async {
+    await $(profileAndKeychainText).tap();
+  }
+
+  Future<void> clickDarkTheme() async {
+    await $(segmentedButton).$('Dark').tap();
+  }
+  Future<void> clickLightTheme() async {
+    await $(segmentedButton).$('Light').tap();
+  }
+
+  Future<void> clickUTC() async {
+    await $(segmentedButton).$('UTC').tap();
+  }
+  Future<void> clickLocal() async {
+    await $(segmentedButton).$('Local').tap();
+  }
+
 }

@@ -177,7 +177,9 @@ class _Account extends StatelessWidget {
       children: [
         MenuItemTile(
           leading: VoicesAssets.icons.userCircle.buildIcon(),
-          title: Text(context.l10n.profileAndKeychain),
+          title: Text(context.l10n.profileAndKeychain, 
+          key: const Key('ProfileAndKeychainText'),
+          ),
           trailing: VoicesAssets.icons.chevronRight.buildIcon(),
           onTap: () => Navigator.pop(context, const _OpenAccountDetails()),
         ),

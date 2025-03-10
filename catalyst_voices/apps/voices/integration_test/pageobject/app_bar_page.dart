@@ -9,12 +9,12 @@ class AppBarPage {
   late PatrolTester $;
   final spacesDrawerButton = const Key('DrawerButton');
   final getStartedBtn = const Key('GetStartedButton');
-  final accountPopupBtn = const Key('AccountPopupButton');
   final lockBtn = const Key('LockButton');
   final unlockBtn = const Key('UnlockButton');
   final visitorBtn = const Key('VisitorBtn');
   final sessionAccountPopupMenuAvatar =
       const Key('SessionAccountPopupMenuAvatar');
+
 
   Future<void> spacesDrawerButtonExists({bool? reverse = false}) async {
     expect($(spacesDrawerButton).exists, !reverse!);
@@ -37,7 +37,7 @@ class AppBarPage {
   }
 
   Future<void> accountPopupBtnClick() async {
-    await $(accountPopupBtn).tap();
+    await $(sessionAccountPopupMenuAvatar).tap();
   }
 
   Future<void> lockBtnClick() async {
