@@ -19,6 +19,7 @@ dependencies:
   catalyst_voices_shared:
     path: ../catalyst_voices_shared
   collection: ^1.19.0
+  equatable: ^2.0.7
   flutter:
     sdk: flutter
   flutter_driver:

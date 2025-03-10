@@ -4,8 +4,10 @@ import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/src/crypto/bip32_ed25519_catalyst_public_key.dart';
 import 'package:catalyst_voices_services/src/crypto/bip32_ed25519_catalyst_signature.dart';
+import 'package:equatable/equatable.dart';
 
-final class Bip32Ed25519CatalystPrivateKey implements CatalystPrivateKey {
+final class Bip32Ed25519CatalystPrivateKey extends Equatable
+    implements CatalystPrivateKey {
   final Bip32Ed25519XPrivateKey _privateKey;
 
   const Bip32Ed25519CatalystPrivateKey(this._privateKey);
@@ -16,6 +18,9 @@ final class Bip32Ed25519CatalystPrivateKey implements CatalystPrivateKey {
 
   @override
   Uint8List get bytes => Uint8List.fromList(_privateKey.bytes);
+
+  @override
+  List<Object?> get props => [_privateKey];
 
   @override
   Future<CatalystPrivateKey> derivePrivateKey({required String path}) async {

@@ -1,10 +1,11 @@
 import 'dart:typed_data';
 
-import 'package:catalyst_voices_models/src/crypto/catalyst_public_key.dart';
-import 'package:catalyst_voices_models/src/crypto/catalyst_signature.dart';
-import 'package:catalyst_voices_models/src/crypto/catalyst_signature_algorithm.dart';
+import 'package:catalyst_voices_models/src/catalyst_voices_models.dart';
 
 abstract interface class CatalystPrivateKey {
+  /// A factory that creates instances of [CatalystPrivateKey].
+  static late CatalystPrivateKeyFactory factory;
+
   /// Returns the signature algorithm used by the private key.
   CatalystSignatureAlgorithm get algorithm;
 

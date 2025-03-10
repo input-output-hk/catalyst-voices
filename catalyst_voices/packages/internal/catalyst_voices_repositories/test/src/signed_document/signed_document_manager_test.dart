@@ -9,11 +9,11 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group(SignedDocumentManager, () {
-    final documentManager = SignedDocumentManager(
-      keyFactory: _FakeCatalystKeyFactory(),
-    );
+    const documentManager = SignedDocumentManager();
 
     setUpAll(() {
+      CatalystPublicKey.factory = _FakeCatalystKeyFactory();
+      CatalystSignature.factory = _FakeCatalystKeyFactory();
       CatalystCompressionPlatform.instance = _FakeCatalystCompressionPlatform();
     });
 
@@ -24,8 +24,8 @@ void main() {
 
       final signedDocument = await documentManager.signDocument(
         document,
+        catalystId: _catalystId,
         metadata: _metadata,
-        publicKey: _publicKey,
         privateKey: _privateKey,
       );
 
@@ -50,6 +50,11 @@ const _metadata = SignedDocumentMetadata(
   documentType: DocumentType.proposalDocument,
 );
 
+final _catalystId = CatalystId(
+  host: CatalystIdHost.cardano.host,
+  role0Key: _publicKey,
+);
+
 final _privateKey = _FakeCatalystPrivateKey(bytes: _privateKeyBytes);
 final _privateKeyBytes = Uint8List.fromList(List.filled(32, 0));
 final _publicKey = _FakeCatalystPublicKey(bytes: _publicKeyBytes);
@@ -62,7 +67,11 @@ class _FakeCatalystCompressionPlatform extends CatalystCompressionPlatform {
   CatalystCompressor get brotli => const _FakeCompressor();
 }
 
-class _FakeCatalystKeyFactory extends Fake implements CatalystKeyFactory {
+class _FakeCatalystKeyFactory extends Fake
+    implements
+        CatalystPrivateKeyFactory,
+        CatalystPublicKeyFactory,
+        CatalystSignatureFactory {
   @override
   CatalystPrivateKey createPrivateKey(Uint8List bytes) {
     return _FakeCatalystPrivateKey(bytes: bytes);
