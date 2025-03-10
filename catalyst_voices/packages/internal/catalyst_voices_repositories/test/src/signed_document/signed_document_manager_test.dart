@@ -23,8 +23,8 @@ void main() {
 
       final signedDocument = await documentManager.signDocument(
         document,
+        catalystId: _catalystId,
         metadata: _metadata,
-        publicKey: _publicKey,
         privateKey: _privateKey,
       );
 
@@ -47,6 +47,11 @@ void main() {
 const _metadata = SignedDocumentMetadata(
   contentType: SignedDocumentContentType.json,
   documentType: DocumentType.proposalDocument,
+);
+
+final _catalystId = CatalystId(
+  host: CatalystIdHost.cardano.host,
+  role0Key: _publicKey,
 );
 
 final _privateKey = _FakeCatalystPrivateKey(bytes: _privateKeyBytes);

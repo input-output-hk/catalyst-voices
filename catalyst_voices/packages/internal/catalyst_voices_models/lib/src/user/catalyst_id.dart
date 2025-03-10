@@ -80,7 +80,7 @@ final class CatalystId extends Equatable {
   List<Object?> get props => [
         host,
         username,
-        scheme,
+        nonce,
         role0Key,
         role,
         rotation,
