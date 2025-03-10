@@ -10,26 +10,6 @@ import 'package:uuid/uuid.dart';
 
 void main() {
   group(ProposalsCubit, () {
-    const proposalTemplate = DocumentSchema(
-      parentSchemaUrl: '',
-      schemaSelfUrl: '',
-      title: '',
-      description: MarkdownData.empty,
-      properties: [],
-      order: [],
-    );
-
-    final proposalDocument = ProposalDocument(
-      metadata: ProposalMetadata(
-        id: const Uuid().v7(),
-        version: const Uuid().v7(),
-      ),
-      document: const Document(
-        schema: proposalTemplate,
-        properties: [],
-      ),
-    );
-
     final campaign = Campaign(
       id: 'F14',
       name: 'campaign',
@@ -41,7 +21,10 @@ void main() {
     );
 
     final proposal = Proposal(
-      id: '1',
+      selfRef: SignedDocumentRef(
+        id: const Uuid().v7(),
+        version: const Uuid().v7(),
+      ),
       title: 'Proposal 1',
       description: 'Description 1',
       category: '',
@@ -50,8 +33,7 @@ void main() {
       status: ProposalStatus.draft,
       publish: ProposalPublish.publishedDraft,
       commentsCount: 0,
-      document: proposalDocument,
-      version: 1,
+      versionCount: 1,
       duration: 6,
       author: 'Alex Wells',
     );

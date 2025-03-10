@@ -105,11 +105,13 @@ final class Dependencies extends DependencyProvider {
           get<CampaignService>(),
           get<ProposalService>(),
           get<DownloaderService>(),
+          get<DocumentMapper>(),
         );
       })
       ..registerFactory<DiscoveryCubit>(() {
         return DiscoveryCubit(
           get<CampaignService>(),
+          get<ProposalService>(),
         );
       })
       ..registerFactory<CategoryDetailCubit>(() {
@@ -119,6 +121,9 @@ final class Dependencies extends DependencyProvider {
       })
       ..registerFactory<AccountCubit>(() {
         return AccountCubit(get<UserService>());
+      })
+      ..registerFactory<ProposalBloc>(() {
+        return ProposalBloc(get<ProposalService>());
       });
   }
 
@@ -139,18 +144,24 @@ final class Dependencies extends DependencyProvider {
           get<KeychainProvider>(),
         );
       })
+      ..registerLazySingleton<SignedDocumentManager>(() {
+        return SignedDocumentManager(
+          keyFactory: get<CatalystKeyFactory>(),
+        );
+      })
       ..registerLazySingleton<DatabaseDraftsDataSource>(() {
         return DatabaseDraftsDataSource(
           get<CatalystDatabase>(),
         );
       })
-      ..registerLazySingleton<DocumentDataLocalSource>(() {
+      ..registerLazySingleton<SignedDocumentDataSource>(() {
         return DatabaseDocumentsDataSource(
           get<CatalystDatabase>(),
         );
       })
       ..registerLazySingleton<CatGatewayDocumentDataSource>(() {
         return CatGatewayDocumentDataSource(
+          get<ApiServices>(),
           get<SignedDocumentManager>(),
         );
       })
@@ -163,20 +174,27 @@ final class Dependencies extends DependencyProvider {
       ..registerLazySingleton<DocumentRepository>(() {
         return DocumentRepository(
           get<DatabaseDraftsDataSource>(),
-          get<DocumentDataLocalSource>(),
+          get<SignedDocumentDataSource>(),
           get<CatGatewayDocumentDataSource>(),
         );
-      });
+      })
+      ..registerLazySingleton<DocumentMapper>(() => const DocumentMapperImpl());
   }
 
   void _registerServices() {
     registerLazySingleton<CatalystKeyDerivation>(CatalystKeyDerivation.new);
-    registerLazySingleton<KeyDerivation>(() => KeyDerivation(get()));
+    registerLazySingleton<KeyDerivationService>(() {
+      return KeyDerivationService(get<CatalystKeyDerivation>());
+    });
+    registerLazySingleton<CatalystKeyFactory>(
+      () => const Bip32Ed25519CatalystKeyFactory(),
+    );
     registerLazySingleton<KeychainProvider>(() {
       return VaultKeychainProvider(
         secureStorage: get<FlutterSecureStorage>(),
         sharedPreferences: get<SharedPreferencesAsync>(),
         cacheConfig: get<AppConfig>().cache,
+        keyFactory: get<CatalystKeyFactory>(),
       );
     });
     registerLazySingleton<DownloaderService>(DownloaderService.new);
@@ -189,7 +207,7 @@ final class Dependencies extends DependencyProvider {
         get<TransactionConfigRepository>(),
         get<KeychainProvider>(),
         get<CatalystCardano>(),
-        get<KeyDerivation>(),
+        get<KeyDerivationService>(),
       );
     });
     registerLazySingleton<UserService>(
@@ -212,11 +230,19 @@ final class Dependencies extends DependencyProvider {
       return ProposalService(
         get<ProposalRepository>(),
         get<DocumentRepository>(),
+        get<SignedDocumentManager>(),
+        get<UserService>(),
+        get<KeyDerivationService>(),
       );
     });
     registerLazySingleton<ConfigService>(() {
       return ConfigService(
         get<ConfigRepository>(),
+      );
+    });
+    registerLazySingleton<DocumentsService>(() {
+      return DocumentsService(
+        get<DocumentRepository>(),
       );
     });
   }
@@ -241,7 +267,14 @@ final class Dependencies extends DependencyProvider {
   }
 
   void _registerUtils() {
-    registerLazySingleton<SignedDocumentManager>(SignedDocumentManager.new);
+    registerLazySingleton<SyncManager>(
+      () {
+        return SyncManager(
+          get<DocumentsService>(),
+        );
+      },
+      dispose: (manager) async => manager.dispose(),
+    );
     registerLazySingleton<UserObserver>(
       StreamUserObserver.new,
       dispose: (observer) async => observer.dispose(),

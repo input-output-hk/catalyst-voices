@@ -5,7 +5,6 @@ import 'package:catalyst_voices/widgets/cards/proposal_card_widgets.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/share_proposal_dialog.dart';
 import 'package:catalyst_voices/widgets/text/day_month_time_text.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
-import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -18,6 +17,7 @@ class PendingProposalCard extends StatefulWidget {
   final bool showStatus;
   final bool showLastUpdate;
   final bool isFavorite;
+  final VoidCallback? onTap;
   final ValueChanged<bool>? onFavoriteChanged;
 
   const PendingProposalCard({
@@ -26,6 +26,7 @@ class PendingProposalCard extends StatefulWidget {
     this.showStatus = true,
     this.showLastUpdate = true,
     this.isFavorite = false,
+    this.onTap,
     this.onFavoriteChanged,
   });
 
@@ -157,7 +158,7 @@ class _PendingProposalCardState extends State<PendingProposalCard> {
       color: Colors.transparent,
       child: InkWell(
         statesController: _statesController,
-        onTap: () {},
+        onTap: widget.onTap,
         child: ValueListenableBuilder(
           valueListenable: _statesController,
           builder: (context, value, child) => Container(
@@ -314,7 +315,7 @@ final class _ProposalBorderColor extends WidgetStateColor {
 class _ProposalInfo extends StatelessWidget {
   final ProposalPublish proposalStage;
   final int version;
-  final DateTime lastUpdate;
+  final DateTime? lastUpdate;
   final int commentsCount;
   final bool showLastUpdate;
 
@@ -337,31 +338,29 @@ class _ProposalInfo extends StatelessWidget {
           const FinalProposalChip(),
         const SizedBox(width: 4),
         ProposalVersionChip(version: version.toString()),
-        if (showLastUpdate) ...[
+        if (showLastUpdate && lastUpdate != null) ...[
           const SizedBox(width: 4),
           VoicesPlainTooltip(
             message: _tooltipMessage(context),
             child: DayMonthTimeText(
-              dateTime: lastUpdate,
+              dateTime: lastUpdate!,
             ),
           ),
         ],
         const Spacer(),
-        VoicesChip.rectangular(
-          backgroundColor: context.colors.elevationsOnSurfaceNeutralLv1Grey,
-          leading: VoicesAssets.icons.chatAlt2.buildIcon(),
-          content: Text(
-            key: const Key('CommentsCount'),
-            version.toString(),
-            style: context.textTheme.labelLarge,
-          ),
+        ProposalCommentsChip(
+          commentsCount: commentsCount,
         ),
       ],
     );
   }
 
   String _tooltipMessage(BuildContext context) {
-    final dt = DateFormatter.formatDateTimeParts(lastUpdate, includeYear: true);
+    if (lastUpdate == null) {
+      return '';
+    }
+    final dt =
+        DateFormatter.formatDateTimeParts(lastUpdate!, includeYear: true);
 
     return context.l10n.publishedOn(dt.date, dt.time);
   }
@@ -403,45 +402,25 @@ class _Topbar extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         const Spacer(),
-        VoicesIconButton.filled(
+        ShareButton(
           key: const Key('ShareBtn'),
+          circle: false,
           onTap: () async {
             // TODO(LynxLynxx): Change to proposal view route when implemented
             final url = ProposalBuilderRoute(proposalId: proposalId).location;
             await ShareProposalDialog.show(context, url);
           },
-          style: _buttonStyle(context),
-          child: VoicesAssets.icons.share.buildIcon(
-            color: context.colorScheme.primary,
-          ),
         ),
         if (onFavoriteChanged != null) ...[
           const SizedBox(width: 4),
-          VoicesIconButton.filled(
+          FavoriteButton(
             key: const Key('FavoriteBtn'),
-            onTap: () => onFavoriteChanged?.call(!isFavorite),
-            style: _buttonStyle(context),
-            child: CatalystSvgIcon.asset(
-              isFavorite
-                  ? VoicesAssets.icons.starFilled.path
-                  : VoicesAssets.icons.starOutlined.path,
-              color: context.colorScheme.primary,
-            ),
+            circle: false,
+            isFavorite: isFavorite,
+            onChanged: onFavoriteChanged,
           ),
         ],
       ],
-    );
-  }
-
-  ButtonStyle _buttonStyle(BuildContext context) {
-    return IconButton.styleFrom(
-      padding: const EdgeInsets.all(10),
-      backgroundColor: context.colors.onSurfacePrimary08,
-      foregroundColor: context.colorScheme.primary,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8),
-      ),
-      iconSize: 18,
     );
   }
 }

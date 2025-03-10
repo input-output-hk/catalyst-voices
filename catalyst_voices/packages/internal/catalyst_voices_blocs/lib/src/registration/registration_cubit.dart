@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
-import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_blocs/src/registration/cubits/base_profile_cubit.dart';
 import 'package:catalyst_voices_blocs/src/registration/cubits/keychain_creation_cubit.dart';
@@ -29,7 +28,7 @@ final class RegistrationCubit extends Cubit<RegistrationState>
   final RegistrationService _registrationService;
   final RegistrationProgressNotifier _progressNotifier;
 
-  Bip32Ed25519XPrivateKey? _masterKey;
+  CatalystPrivateKey? _masterKey;
   Transaction? _transaction;
 
   RegistrationCubit({

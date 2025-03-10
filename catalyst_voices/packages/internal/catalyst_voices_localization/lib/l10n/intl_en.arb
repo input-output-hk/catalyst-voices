@@ -768,6 +768,10 @@
   "@back": {
     "description": "For example in button that goes to previous stage of registration"
   },
+  "backToList": "Back to list",
+  "@backToList": {
+    "description": "For example in button that goes to previous screen with a list like proposals"
+  },
   "retry": "Retry",
   "@retry": {
     "description": "Retry action when something goes wrong."
@@ -1407,7 +1411,7 @@
   "heroSectionTitle": "Create, fund and deliver the future of Cardano.",
   "projectCatalystDescription": "Project Catalyst is an experiment in community innovation, providing a framework to turn ideas into impactful real world projects.\n\nWe're putting the community at the heart of Cardano's future development. Are you ready for the Challenge?",
   "viewCurrentCampaign": "View Current Campaign",
-  "catalystF14": "Catalyst Fund 14",
+  "catalystF14": "Catalyst Fund14",
   "@catalystF14": {
     "description": "Used in discovery page in hero section"
   },
@@ -1436,7 +1440,7 @@
   "categoryDetails": "Category Details",
   "fundsAvailable": "Funds Available",
   "duration": "Duration",
-  "valueMonths": "{value} {value, plural, =0{Month} other{Months}}",
+  "valueMonths": "{value} {value, plural, =0{Months} =1{Month} other{Months}}",
   "@valueMonths": {
     "description": "Used in proposal card",
     "placeholders": {
@@ -1579,13 +1583,17 @@
   "@proposalEditorValidationSnackbar": {
     "description": "Snackbar title shown when user tries to save a proposal with errors."
   },
-  "proposalEditorDeleteDialogTitle": "Delete Proposal",
+  "proposalEditorDeleteDialogTitle": "Delete Proposal?",
   "@proposalEditorDeleteDialogTitle": {
     "description": "A title for the dialog to confirm proposal deletion."
   },
-  "proposalEditorDeleteDialogDescription": "Permanently delete your proposal?",
+  "proposalEditorDeleteDialogDescription": "Are you sure you want to delete this proposal?\nThis action cannot be undone.",
   "@proposalEditorDeleteDialogDescription": {
     "description": "A description for the dialog to confirm proposal deletion."
+  },
+  "proposalEditorDeleteDialogDeleteButton": "Delete Proposal",
+  "@proposalEditorDeleteDialogDeleteButton": {
+    "description": "A button label for the dialog to confirm proposal deletion."
   },
   "showAll": "Show All",
   "@showAll": {
@@ -1729,5 +1737,106 @@
   "proposalImportDialogDescription": "Make sure it's a correct Catalyst proposal file.",
   "@proposalImportDialogDescription": {
     "description": "The description of the dialog to import a proposal."
+  },
+  "spaces": "Spaces",
+  "@spaces": {
+    "description": "The title of the tile that shows the list of spaces."
+  },
+  "opportunities": "Opportunities",
+  "@opportunities": {
+    "description": "The title of the tile that shows the list of opportunities."
+  },
+  "discoveryHomepage": "Discovery Homepage",
+  "@discoveryHomepage": {
+    "description": "Title for tile in overall spaces page to go to discovery page"
+  },
+  "feedbackOnProposals": "Feedback on Proposals",
+  "@feedbackOnProposals": {
+    "description": "Title for tile in overall spaces page to go to proposals list page"
+  },
+  "browseMyProposals": "Browse all my proposals",
+  "@browseMyProposals": {
+    "description": "Title for tile in workspace space page to go to proposals page"
+  },
+  "notPublishedProposals": "Not published proposals",
+  "@notPublishedProposals": {
+    "description": "Title for section to show not published proposals"
+  },
+  "newIterationTitle": "Iteration {iteration} · Not published - {datetime} - {title}",
+  "@newIterationTitle": {
+    "description": "Title for new iteration card",
+    "placeholders": {
+      "iteration": {
+        "type": "int"
+      },
+      "datetime": {
+        "type": "String"
+      },
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "noPublishedProposalsOnMaxCount": "Published Proposals ({current}/{max})",
+  "@noPublishedProposalsOnMaxCount": {
+    "description": "Title for section to show number of published proposals out of max proposals",
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "nrOfIteration": "Iteration {nr}",
+  "@nrOfIteration": {
+    "description": "In context of which version of document is presented",
+    "placeholders": {
+      "nr": {
+        "type": "int"
+      }
+    }
+  },
+  "proposalViewMetadataOverviewSegment": "Overview",
+  "@proposalViewMetadataOverviewSegment": {
+    "description": "Viewing proposal navigation segment"
+  },
+  "proposalViewMetadataSection": "Metadata",
+  "@proposalViewMetadataSection": {
+    "description": "Viewing proposal navigation section"
+  },
+  "proposalViewCommentsSegment": "Comments",
+  "@proposalViewCommentsSegment": {
+    "description": "Viewing proposal navigation section"
+  },
+  "proposalViewAddCommentSection": "Add comment",
+  "@proposalViewAddCommentSection": {
+    "description": "Viewing proposal navigation section"
+  },
+  "proposalViewViewCommentsSection": "View comments",
+  "@proposalViewViewCommentsSection": {
+    "description": "Viewing proposal navigation section"
+  },
+  "proposalViewFundingRequested": "Funding Requested",
+  "@proposalViewFundingRequested": {
+    "description": "When viewing proposal"
+  },
+  "proposalViewProjectDuration": "Project Duration",
+  "@proposalViewProjectDuration": {
+    "description": "When viewing proposal"
+  },
+  "proposalViewProjectDelivery": "Project Delivery",
+  "@proposalViewProjectDelivery": {
+    "description": "When viewing proposal"
+  },
+  "valueMilestones": "{count} {count, plural, =0{Milestones} =1{Milestone} other{Milestones}}",
+  "@valueMilestones": {
+    "description": "In context of proposal. How many milestones there is",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   }
 }
