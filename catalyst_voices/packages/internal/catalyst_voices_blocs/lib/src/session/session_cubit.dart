@@ -73,13 +73,24 @@ final class SessionCubit extends Cubit<SessionState>
     }
   }
 
-  Future<bool> unlock(LockFactor lockFactor) async {
-    final keychain = _userService.user.activeAccount?.keychain;
-    if (keychain == null) {
-      return false;
-    }
+  @override
+  Future<void> close() async {
+    await _userSettingsSub?.cancel();
+    _userSettingsSub = null;
 
-    return keychain.unlock(lockFactor);
+    await _keychainUnlockedSub?.cancel();
+    _keychainUnlockedSub = null;
+
+    _registrationProgressNotifier
+        .removeListener(_onRegistrationProgressChanged);
+
+    await _accountSub?.cancel();
+    _accountSub = null;
+
+    await _adminToolsSub?.cancel();
+    _adminToolsSub = null;
+
+    return super.close();
   }
 
   Future<void> lock() async {
@@ -104,12 +115,13 @@ final class SessionCubit extends Cubit<SessionState>
     await _userService.useAccount(dummyAccount);
   }
 
-  void updateTimezone(TimezonePreferences value) {
-    final settings = _userService.user.settings;
+  Future<bool> unlock(LockFactor lockFactor) async {
+    final keychain = _userService.user.activeAccount?.keychain;
+    if (keychain == null) {
+      return false;
+    }
 
-    final updatedSettings = settings.copyWith(timezone: Optional.of(value));
-
-    unawaited(_userService.updateSettings(updatedSettings));
+    return keychain.unlock(lockFactor);
   }
 
   void updateTheme(ThemePreferences value) {
@@ -120,55 +132,12 @@ final class SessionCubit extends Cubit<SessionState>
     unawaited(_userService.updateSettings(updatedSettings));
   }
 
-  @override
-  Future<void> close() async {
-    await _userSettingsSub?.cancel();
-    _userSettingsSub = null;
+  void updateTimezone(TimezonePreferences value) {
+    final settings = _userService.user.settings;
 
-    await _keychainUnlockedSub?.cancel();
-    _keychainUnlockedSub = null;
+    final updatedSettings = settings.copyWith(timezone: Optional.of(value));
 
-    _registrationProgressNotifier
-        .removeListener(_onRegistrationProgressChanged);
-
-    await _accountSub?.cancel();
-    _accountSub = null;
-
-    await _adminToolsSub?.cancel();
-    _adminToolsSub = null;
-
-    return super.close();
-  }
-
-  void _onActiveAccountChanged(Account? account) {
-    _logger.fine('Active account changed [$account]');
-
-    _account = account;
-
-    _updateState();
-  }
-
-  void _handleUserSettings(UserSettings settings) {
-    _userSettings = settings;
-
-    _updateState();
-  }
-
-  void _onActiveKeychainUnlockChanged(bool isUnlocked) {
-    _logger.fine('Keychain unlock changed [$isUnlocked]');
-
-    _updateState();
-  }
-
-  void _onRegistrationProgressChanged() {
-    _updateState();
-  }
-
-  void _onAdminToolsChanged(AdminToolsState adminTools) {
-    _logger.fine('Admin tools changed: $adminTools');
-
-    _adminToolsState = adminTools;
-    _updateState();
+    unawaited(_userService.updateSettings(updatedSettings));
   }
 
   Future<void> _checkAvailableWallets() async {
@@ -183,11 +152,30 @@ final class SessionCubit extends Cubit<SessionState>
     }
   }
 
-  void _updateState() {
-    if (_adminToolsState.enabled) {
-      emit(_createMockedSessionState());
-    } else {
-      emit(_createSessionState());
+  SessionState _createMockedSessionState() {
+    switch (_adminToolsState.sessionStatus) {
+      case SessionStatus.actor:
+        return SessionState(
+          status: SessionStatus.actor,
+          account: const SessionAccount.mocked(),
+          spaces: Space.values,
+          availableSpaces: Space.values,
+          overallSpaces: Space.values,
+          spacesShortcuts: AccessControl.allSpacesShortcutsActivators,
+          canCreateAccount: true,
+          settings: const SessionSettings.fallback(),
+        );
+      case SessionStatus.guest:
+        return const SessionState.guest(
+          canCreateAccount: true,
+          settings: SessionSettings.fallback(),
+        );
+      case SessionStatus.visitor:
+        return const SessionState.visitor(
+          settings: SessionSettings.fallback(),
+          isRegistrationInProgress: false,
+          canCreateAccount: true,
+        );
     }
   }
 
@@ -219,6 +207,7 @@ final class SessionCubit extends Cubit<SessionState>
 
     final sessionAccount = SessionAccount.fromAccount(account);
     final spaces = _accessControl.spacesAccess(account);
+    final availableSpaces = _accessControl.availableSpaces(account);
     final overallSpaces = _accessControl.overallSpaces(account);
     final spacesShortcuts = _accessControl.spacesShortcutsActivators(account);
 
@@ -226,37 +215,12 @@ final class SessionCubit extends Cubit<SessionState>
       status: SessionStatus.actor,
       account: sessionAccount,
       spaces: spaces,
+      availableSpaces: availableSpaces,
       overallSpaces: overallSpaces,
       spacesShortcuts: spacesShortcuts,
       canCreateAccount: canCreateAccount,
       settings: sessionSettings,
     );
-  }
-
-  SessionState _createMockedSessionState() {
-    switch (_adminToolsState.sessionStatus) {
-      case SessionStatus.actor:
-        return SessionState(
-          status: SessionStatus.actor,
-          account: const SessionAccount.mocked(),
-          spaces: Space.values,
-          overallSpaces: Space.values,
-          spacesShortcuts: AccessControl.allSpacesShortcutsActivators,
-          canCreateAccount: true,
-          settings: const SessionSettings.fallback(),
-        );
-      case SessionStatus.guest:
-        return const SessionState.guest(
-          canCreateAccount: true,
-          settings: SessionSettings.fallback(),
-        );
-      case SessionStatus.visitor:
-        return const SessionState.visitor(
-          settings: SessionSettings.fallback(),
-          isRegistrationInProgress: false,
-          canCreateAccount: true,
-        );
-    }
   }
 
   Future<Account> _getDummyAccount() async {
@@ -269,5 +233,44 @@ final class SessionCubit extends Cubit<SessionState>
           seedPhrase: Account.dummySeedPhrase,
           lockFactor: Account.dummyUnlockFactor,
         );
+  }
+
+  void _handleUserSettings(UserSettings settings) {
+    _userSettings = settings;
+
+    _updateState();
+  }
+
+  void _onActiveAccountChanged(Account? account) {
+    _logger.fine('Active account changed [$account]');
+
+    _account = account;
+
+    _updateState();
+  }
+
+  void _onActiveKeychainUnlockChanged(bool isUnlocked) {
+    _logger.fine('Keychain unlock changed [$isUnlocked]');
+
+    _updateState();
+  }
+
+  void _onAdminToolsChanged(AdminToolsState adminTools) {
+    _logger.fine('Admin tools changed: $adminTools');
+
+    _adminToolsState = adminTools;
+    _updateState();
+  }
+
+  void _onRegistrationProgressChanged() {
+    _updateState();
+  }
+
+  void _updateState() {
+    if (_adminToolsState.enabled) {
+      emit(_createMockedSessionState());
+    } else {
+      emit(_createSessionState());
+    }
   }
 }

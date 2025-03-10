@@ -13,8 +13,11 @@ abstract interface class CampaignService {
     required String id,
   });
 
-  // TODO(LynxLynxx): return correct model type
-  Future<List<dynamic>> getCampaignCategories();
+  Future<List<CampaignCategory>> getCampaignCategories();
+
+  CampaignCategory getCategory(String uuid);
+
+  Future<CurrentCampaign> getCurrentCampaign();
 }
 
 final class CampaignServiceImpl implements CampaignService {
@@ -45,7 +48,23 @@ final class CampaignServiceImpl implements CampaignService {
   }
 
   @override
-  Future<List<dynamic>> getCampaignCategories() async {
-    return <dynamic>[];
+  Future<List<CampaignCategory>> getCampaignCategories() async {
+    return staticCampaignCategories;
+  }
+
+  @override
+  CampaignCategory getCategory(String uuid) {
+    // TODO(LynxLynxx): call backend for current ask amount
+    // and submitted proposal count
+    return staticCampaignCategories.firstWhere(
+      (e) => e.uuid == uuid,
+      orElse: () => throw const NotFoundException(),
+    );
+  }
+
+  @override
+  Future<CurrentCampaign> getCurrentCampaign() async {
+    // TODO(LynxLynxx): call backend for current ask amount
+    return CurrentCampaignX.staticContent;
   }
 }
