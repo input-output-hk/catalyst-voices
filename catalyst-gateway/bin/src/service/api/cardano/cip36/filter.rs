@@ -40,13 +40,13 @@ pub(crate) async fn get_registrations_given_stake_addr(
     limit: Limit, invalid: bool,
 ) -> anyhow::Result<Cip36Registration> {
     // Get stake public key associated with given stake address.
-    let mut stake_pk_iter = GetStakePublicKeyFromStakeAddrQuery::execute(
+    let mut stake_pk_stream = GetStakePublicKeyFromStakeAddrQuery::execute(
         &session,
         GetStakePublicKeyFromStakeAddrParams::new(stake_address),
     )
     .await?;
 
-    let Some(row_stake_pk) = stake_pk_iter.try_next().await? else {
+    let Some(row_stake_pk) = stake_pk_stream.try_next().await? else {
         return Ok(Cip36Registration::NotFound);
     };
     let stake_public_key = row_stake_pk.stake_public_key;

@@ -98,10 +98,10 @@ impl TxoInsertQuery {
 
                         let address = match address.delegation() {
                             pallas::ledger::addresses::ShelleyDelegationPart::Script(hash) => {
-                                Some(StakeAddress::new(network, true, *hash))
+                                Some(StakeAddress::new(network, true, (*hash).into()))
                             },
                             pallas::ledger::addresses::ShelleyDelegationPart::Key(hash) => {
-                                Some(StakeAddress::new(network, false, *hash))
+                                Some(StakeAddress::new(network, false, (*hash).into()))
                             },
                             pallas::ledger::addresses::ShelleyDelegationPart::Pointer(_pointer) => {
                                 // These are not supported from Conway, so we don't support them
