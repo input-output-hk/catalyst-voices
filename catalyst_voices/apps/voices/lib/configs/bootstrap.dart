@@ -47,11 +47,8 @@ Future<BootstrapArgs> bootstrap({
       .onError((error, stackTrace) => const AppConfig());
 
   await _cleanupOldStorages();
-
   await registerDependencies(config: config);
-
-  // Key derivation needs to be initialized before it can be used
-  await CatalystKeyDerivation.init();
+  await _initCryptoUtils();
 
   router ??= buildAppRouter();
 
@@ -133,6 +130,16 @@ Future<void> _doBootstrapAndRun(BootstrapWidgetBuilder builder) async {
   final args = await bootstrap();
   final app = await builder(args);
   await _runApp(app);
+}
+
+Future<void> _initCryptoUtils() async {
+  // Key derivation needs to be initialized before it can be used
+  await CatalystKeyDerivation.init();
+
+  const factory = Bip32Ed25519CatalystKeyFactory();
+  CatalystPrivateKey.factory = factory;
+  CatalystPublicKey.factory = factory;
+  CatalystSignature.factory = factory;
 }
 
 Future<void> _reportBootstrapError(Object error, StackTrace stack) async {

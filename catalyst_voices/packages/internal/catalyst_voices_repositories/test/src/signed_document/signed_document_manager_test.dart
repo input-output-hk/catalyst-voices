@@ -9,11 +9,10 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group(SignedDocumentManager, () {
-    final documentManager = SignedDocumentManager(
-      keyFactory: _FakeCatalystKeyFactory(),
-    );
+    const documentManager = SignedDocumentManager();
 
     setUpAll(() {
+      CatalystPublicKey.factory = _FakeCatalystKeyFactory();
       CatalystCompressionPlatform.instance = _FakeCatalystCompressionPlatform();
     });
 
@@ -62,7 +61,11 @@ class _FakeCatalystCompressionPlatform extends CatalystCompressionPlatform {
   CatalystCompressor get brotli => const _FakeCompressor();
 }
 
-class _FakeCatalystKeyFactory extends Fake implements CatalystKeyFactory {
+class _FakeCatalystKeyFactory extends Fake
+    implements
+        CatalystPrivateKeyFactory,
+        CatalystPublicKeyFactory,
+        CatalystSignatureFactory {
   @override
   CatalystPrivateKey createPrivateKey(Uint8List bytes) {
     return _FakeCatalystPrivateKey(bytes: bytes);

@@ -6,7 +6,11 @@ import 'package:catalyst_voices_services/src/crypto/bip32_ed25519_catalyst_priva
 import 'package:catalyst_voices_services/src/crypto/bip32_ed25519_catalyst_public_key.dart';
 import 'package:catalyst_voices_services/src/crypto/bip32_ed25519_catalyst_signature.dart';
 
-final class Bip32Ed25519CatalystKeyFactory implements CatalystKeyFactory {
+final class Bip32Ed25519CatalystKeyFactory
+    implements
+        CatalystPrivateKeyFactory,
+        CatalystPublicKeyFactory,
+        CatalystSignatureFactory {
   const Bip32Ed25519CatalystKeyFactory();
 
   @override

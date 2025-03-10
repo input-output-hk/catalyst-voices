@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:catalyst_cardano/catalyst_cardano.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -39,7 +37,6 @@ void main() {
       secureStorage: const FlutterSecureStorage(),
       sharedPreferences: SharedPreferencesAsync(),
       cacheConfig: const CacheConfig(),
-      keyFactory: _FakeCatalystKeyFactory(),
     );
     userRepository = UserRepository(
       SecureUserStorage(),
@@ -296,21 +293,6 @@ void main() {
       });
     });
   });
-}
-
-class _FakeCatalystPrivateKey extends Fake implements CatalystPrivateKey {
-  @override
-  final Uint8List bytes;
-
-  _FakeCatalystPrivateKey({required this.bytes});
-}
-
-class _FakeCatalystKeyFactory extends Fake
-    implements CatalystKeyFactory {
-  @override
-  CatalystPrivateKey createPrivateKey(Uint8List bytes) {
-    return _FakeCatalystPrivateKey(bytes: bytes);
-  }
 }
 
 class _MockCardanoWallet extends Mock implements CardanoWallet {

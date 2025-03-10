@@ -12,7 +12,7 @@ import 'package:test/test.dart';
 import 'package:uuid/uuid.dart';
 
 void main() {
-  late final CatalystKeyFactory keyFactory;
+  late final CatalystPrivateKeyFactory keyFactory;
   late final VaultKeychainProvider provider;
 
   setUpAll(() {
@@ -27,7 +27,6 @@ void main() {
       secureStorage: const FlutterSecureStorage(),
       sharedPreferences: SharedPreferencesAsync(),
       cacheConfig: const CacheConfig(),
-      keyFactory: keyFactory,
     );
   });
 
@@ -135,17 +134,17 @@ void main() {
   });
 }
 
+class _FakeCatalystKeyFactory extends Fake
+    implements CatalystPrivateKeyFactory {
+  @override
+  CatalystPrivateKey createPrivateKey(Uint8List bytes) {
+    return _FakeCatalystPrivateKey(bytes: bytes);
+  }
+}
+
 class _FakeCatalystPrivateKey extends Fake implements CatalystPrivateKey {
   @override
   final Uint8List bytes;
 
   _FakeCatalystPrivateKey({required this.bytes});
-}
-
-class _FakeCatalystKeyFactory extends Fake
-    implements CatalystKeyFactory {
-  @override
-  CatalystPrivateKey createPrivateKey(Uint8List bytes) {
-    return _FakeCatalystPrivateKey(bytes: bytes);
-  }
 }
