@@ -139,6 +139,16 @@ abstract class DateFormatter {
     return DateFormat.MMM().format(dateTime);
   }
 
+  /// Formats full date and time with more timestamp like pattern.
+  /// Adapts to device local settings.
+  ///
+  /// Example:
+  /// - 7/10/1996 5:08 PM
+  /// - 7/10/1996 17:08
+  static String formatTimestamp(DateTime dateTime) {
+    return DateFormat.yMd().add_jm().format(dateTime);
+  }
+
   /// Formats the timezone info extracted from the [dateTime].
   ///
   /// Example:
@@ -147,10 +157,6 @@ abstract class DateFormatter {
     final offset = _formatTimezoneOffset(dateTime.timeZoneOffset);
     final timezone = dateTime.timeZoneName;
     return 'GMT$offset $timezone';
-  }
-
-  static String lastEdit(DateTime dateTime) {
-    return '';
   }
 
   static String _formatDurationHHmm(Duration offset) {
