@@ -86,4 +86,33 @@ final class Proposal extends Equatable {
         category,
         commentsCount,
       ];
+
+  Proposal copyWith({
+    DocumentRef? selfRef,
+    String? title,
+    String? description,
+    DateTime? updateDate,
+    Coin? fundsRequested,
+    ProposalStatus? status,
+    ProposalPublish? publish,
+    int? commentsCount,
+    int? duration,
+    String? author,
+    int? versionCount,
+    String? category,
+  }) =>
+      Proposal(
+        selfRef: selfRef ?? this.selfRef,
+        title: title ?? this.title,
+        description: description ?? this.description,
+        updateDate: updateDate ?? this.updateDate,
+        fundsRequested: fundsRequested ?? this.fundsRequested,
+        status: status ?? this.status,
+        publish: publish ?? this.publish,
+        commentsCount: commentsCount ?? this.commentsCount,
+        duration: duration ?? this.duration,
+        author: author ?? this.author,
+        versionCount: versionCount ?? this.versionCount,
+        category: category ?? this.category,
+      );
 }
