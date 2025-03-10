@@ -8,6 +8,8 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+typedef _AccessSpaces = ({List<Space> canAccessSpaces, List<Space> availableSpaces});
+
 class VoicesDrawerSpaceChooser extends StatelessWidget {
   final Space currentSpace;
   final ValueChanged<Space> onChanged;
@@ -24,11 +26,14 @@ class VoicesDrawerSpaceChooser extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<SessionCubit, SessionState, List<Space>>(
-      selector: (state) => state.spaces,
+    return BlocSelector<SessionCubit, SessionState, _AccessSpaces>(
+      selector: (state) => (
+        canAccessSpaces: state.spaces,
+        availableSpaces: state.availableSpaces,
+      ),
       builder: (context, spaces) {
         return VoicesDrawerChooser<Space>(
-          items: Space.spaces(spaces.contains(Space.treasury)),
+          items: spaces.availableSpaces,
           selectedItem: currentSpace,
           onSelected: onChanged,
           itemBuilder: ({
@@ -40,7 +45,7 @@ class VoicesDrawerSpaceChooser extends StatelessWidget {
             context: context,
             item: item,
             isSelected: isSelected,
-            canAccess: spaces.contains(item),
+            canAccess: spaces.canAccessSpaces.contains(item),
           ),
           leading: VoicesIconButton(
             key: const ValueKey('DrawerChooserAllSpacesButton'),
