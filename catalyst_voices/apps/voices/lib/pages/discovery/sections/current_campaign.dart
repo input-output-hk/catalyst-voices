@@ -1,9 +1,10 @@
-import 'package:catalyst_voices/common/ext/ext.dart';
+import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/widgets/campaign_timeline/campaign_timeline_card.dart';
 import 'package:catalyst_voices/widgets/cards/funds_detail_card.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
-import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart'
+    show MarkdownData;
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 import 'package:skeletonizer/skeletonizer.dart';
@@ -32,6 +33,7 @@ class CurrentCampaign extends StatelessWidget {
               Skeletonizer(
                 enabled: isLoading,
                 child: FundsDetailCard(
+                  key: const Key('FundsDetailCard'),
                   allFunds: currentCampaignInfo.allFunds,
                   totalAsk: currentCampaignInfo.totalAsk,
                   askRange: currentCampaignInfo.askRange,
@@ -43,9 +45,9 @@ class CurrentCampaign extends StatelessWidget {
           ),
         ),
         Padding(
-          padding: const EdgeInsets.only(top: 32, bottom: 160),
+          padding: const EdgeInsets.only(top: 32, bottom: 100),
           child: CampaignTimeline(
-            timelineItems: CampaignTimelineViewModelX.mockData,
+            timelineItems: currentCampaignInfo.timeline,
             placement: CampaignTimelinePlacement.discovery,
             horizontalPadding: const SizedBox(width: 120),
           ),
@@ -67,6 +69,7 @@ class _SubTitle extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
+            key: const Key('IdeaSubTitle'),
             context.l10n.ideaJourney,
             style: context.textTheme.headlineMedium,
           ),

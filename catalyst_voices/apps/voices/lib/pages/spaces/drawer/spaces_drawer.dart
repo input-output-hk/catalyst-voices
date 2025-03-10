@@ -1,10 +1,10 @@
 import 'dart:async';
 
-import 'package:catalyst_voices/common/ext/ext.dart';
-import 'package:catalyst_voices/pages/spaces/drawer/discovery_menu.dart';
+import 'package:catalyst_voices/common/ext/space_ext.dart';
+import 'package:catalyst_voices/pages/overall_spaces/space/discovery_overview.dart';
+import 'package:catalyst_voices/pages/overall_spaces/space/workspace_overview.dart';
 import 'package:catalyst_voices/pages/spaces/drawer/guest_menu.dart';
 import 'package:catalyst_voices/pages/spaces/drawer/individual_private_campaigns.dart';
-import 'package:catalyst_voices/pages/spaces/drawer/my_private_proposals.dart';
 import 'package:catalyst_voices/pages/spaces/drawer/voting_rounds.dart';
 import 'package:catalyst_voices/routes/routes.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
@@ -30,36 +30,6 @@ class SpacesDrawer extends StatefulWidget {
 
 class _SpacesDrawerState extends State<SpacesDrawer> {
   late final PageController _pageController;
-
-  @override
-  void initState() {
-    super.initState();
-
-    final initialPage = Space.values.indexOf(widget.space);
-    _pageController = PageController(initialPage: initialPage);
-  }
-
-  @override
-  void didUpdateWidget(SpacesDrawer oldWidget) {
-    super.didUpdateWidget(oldWidget);
-
-    if (widget.space != oldWidget.space) {
-      final page = Space.values.indexOf(widget.space);
-      unawaited(
-        _pageController.animateToPage(
-          page,
-          duration: const Duration(milliseconds: 150),
-          curve: Curves.easeIn,
-        ),
-      );
-    }
-  }
-
-  @override
-  void dispose() {
-    _pageController.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -89,8 +59,6 @@ class _SpacesDrawerState extends State<SpacesDrawer> {
             ),
       child: Column(
         children: [
-          const SizedBox(height: 12),
-          const BrandHeader(),
           Expanded(
             child: PageView.builder(
               physics: const NeverScrollableScrollPhysics(),
@@ -116,6 +84,36 @@ class _SpacesDrawerState extends State<SpacesDrawer> {
     );
   }
 
+  @override
+  void didUpdateWidget(SpacesDrawer oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (widget.space != oldWidget.space) {
+      final page = Space.values.indexOf(widget.space);
+      unawaited(
+        _pageController.animateToPage(
+          page,
+          duration: const Duration(milliseconds: 150),
+          curve: Curves.easeIn,
+        ),
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    final initialPage = Space.values.indexOf(widget.space);
+    _pageController = PageController(initialPage: initialPage);
+  }
+
   Widget _menuBuilder(
     BuildContext context, {
     required Space space,
@@ -123,9 +121,9 @@ class _SpacesDrawerState extends State<SpacesDrawer> {
     return switch (space) {
       _ when !widget.isUnlocked => GuestMenu(space: space),
       Space.treasury => const IndividualPrivateCampaigns(),
-      Space.workspace => const MyPrivateProposals(),
+      Space.workspace => const WorkspaceOverview(),
       Space.voting => const VotingRounds(),
-      Space.discovery => const DiscoveryDrawerMenu(),
+      Space.discovery => const DiscoveryOverview(),
       Space.fundedProjects => const SizedBox.shrink(),
     };
   }

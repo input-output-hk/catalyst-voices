@@ -49,14 +49,15 @@ class _MostRecentProposalsError extends StatelessWidget {
     return BlocSelector<DiscoveryCubit, DiscoveryState, VisibilityState>(
       selector: (state) {
         return (
-          show: state.currentCampaign.showError,
-          error: state.currentCampaign.error,
+          show: state.mostRecentProposals.showError,
+          error: state.mostRecentProposals.error,
         );
       },
       builder: (context, state) {
         final errorMessage = state.error?.message(context);
         return Offstage(
-          offstage: state.show,
+          key: const Key('MostRecentError'),
+          offstage: !state.show,
           child: Padding(
             padding: const EdgeInsets.all(16),
             child: Center(

@@ -2,12 +2,14 @@
 
 use std::sync::LazyLock;
 
-use anyhow::bail;
+use catalyst_types::conversion::from_saturating;
 use poem_openapi::{
     registry::{MetaSchema, MetaSchemaRef},
     types::{Example, ParseError, ParseFromJSON, ParseFromParameter, ParseResult, ToJSON, Type},
 };
 use serde_json::Value;
+
+use crate::db::types::DbTxnIndex;
 
 /// Title.
 const TITLE: &str = "Transaction Index";
@@ -102,33 +104,23 @@ impl ToJSON for TxnIndex {
     }
 }
 
-impl TryFrom<u64> for TxnIndex {
-    type Error = anyhow::Error;
-
-    fn try_from(value: u64) -> Result<Self, Self::Error> {
-        let value: u16 = value.try_into()?;
-        if !is_valid(value) {
-            bail!(INVALID_MSG);
-        }
-        Ok(Self(value))
+impl<
+        T: Copy
+            + TryInto<u16>
+            + std::ops::Sub<Output = T>
+            + PartialOrd<T>
+            + num_traits::identities::Zero,
+    > From<T> for TxnIndex
+{
+    fn from(value: T) -> Self {
+        Self(from_saturating(value))
     }
 }
 
-impl TryFrom<i16> for TxnIndex {
-    type Error = anyhow::Error;
-
-    fn try_from(value: i16) -> Result<Self, Self::Error> {
-        let value: u16 = value.try_into()?;
-        if !is_valid(value) {
-            bail!(INVALID_MSG);
-        }
-        Ok(Self(value))
-    }
-}
-
-impl From<u16> for TxnIndex {
-    fn from(value: u16) -> Self {
-        Self(value)
+impl From<DbTxnIndex> for TxnIndex {
+    fn from(val: DbTxnIndex) -> Self {
+        let txn: i16 = val.into();
+        TxnIndex::from(txn)
     }
 }
 

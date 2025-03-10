@@ -1,5 +1,6 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/document_ref_dto.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'document_data_dto.g.dart';
@@ -9,12 +10,6 @@ part 'document_data_dto.g.dart';
 /// Contains utility structure for traversing a json map using [DocumentNodeId].
 final class DocumentDataContentDto {
   final Map<String, dynamic> data;
-
-  String get schemaUrl => data[r'$schema'] as String;
-
-  const DocumentDataContentDto.fromJson(this.data);
-
-  DocumentDataContentDto.fromModel(DocumentDataContent data) : data = data.data;
 
   factory DocumentDataContentDto.fromDocument({
     required String schemaUrl,
@@ -26,7 +21,11 @@ final class DocumentDataContentDto {
     });
   }
 
-  DocumentDataContent toModel() => DocumentDataContent(data);
+  const DocumentDataContentDto.fromJson(this.data);
+
+  DocumentDataContentDto.fromModel(DocumentDataContent data) : data = data.data;
+
+  String get schemaUrl => data[r'$schema'] as String;
 
   /// Retrieves the value of a property located at the specified [nodeId].
   ///
@@ -35,23 +34,43 @@ final class DocumentDataContentDto {
   /// corresponding property value is returned. If the path is invalid or does
   /// not exist, the method returns `null`.
   Object? getProperty(DocumentNodeId nodeId) {
-    Object? object = data;
-    for (final path in nodeId.paths) {
-      if (object is Map<String, dynamic>) {
-        object = object[path];
-      } else if (object is List) {
-        final index = int.tryParse(path);
-        if (index == null) {
-          // index must be a number
-          return null;
-        }
-        object = object[index];
-      } else {
-        return null;
-      }
-    }
+    return DocumentNodeTraverser.getValue(nodeId, data);
+  }
 
-    return object;
+  Map<String, dynamic> toJson() => data;
+
+  DocumentDataContent toModel() => DocumentDataContent(data);
+}
+
+/// DTO of [DocumentData].
+@JsonSerializable()
+final class DocumentDataDto {
+  final DocumentDataMetadataDto metadata;
+  final DocumentDataContentDto content;
+
+  const DocumentDataDto({
+    required this.metadata,
+    required this.content,
+  });
+
+  factory DocumentDataDto.fromJson(Map<String, dynamic> json) {
+    return _$DocumentDataDtoFromJson(json);
+  }
+
+  factory DocumentDataDto.fromModel(DocumentData document) {
+    return DocumentDataDto(
+      metadata: DocumentDataMetadataDto.fromModel(document.metadata),
+      content: DocumentDataContentDto.fromModel(document.content),
+    );
+  }
+
+  Map<String, dynamic> toJson() => _$DocumentDataDtoToJson(this);
+
+  DocumentData toModel() {
+    return DocumentData(
+      metadata: metadata.toModel(),
+      content: content.toModel(),
+    );
   }
 }
 
@@ -83,6 +102,12 @@ final class DocumentDataMetadataDto {
     this.categoryId,
   });
 
+  factory DocumentDataMetadataDto.fromJson(Map<String, dynamic> json) {
+    final migrated = _migrateJson1(json);
+
+    return _$DocumentDataMetadataDtoFromJson(migrated);
+  }
+
   DocumentDataMetadataDto.fromModel(DocumentDataMetadata data)
       : this(
           type: data.type,
@@ -95,12 +120,6 @@ final class DocumentDataMetadataDto {
           electionId: data.electionId,
           categoryId: data.categoryId,
         );
-
-  factory DocumentDataMetadataDto.fromJson(Map<String, dynamic> json) {
-    final migrated = _migrateJson1(json);
-
-    return _$DocumentDataMetadataDtoFromJson(migrated);
-  }
 
   Map<String, dynamic> toJson() => _$DocumentDataMetadataDtoToJson(this);
 
@@ -117,23 +136,23 @@ final class DocumentDataMetadataDto {
       categoryId: categoryId,
     );
   }
-}
 
-Map<String, dynamic> _migrateJson1(Map<String, dynamic> json) {
-  final modified = Map<String, dynamic>.from(json);
+  static Map<String, dynamic> _migrateJson1(Map<String, dynamic> json) {
+    final modified = Map<String, dynamic>.from(json);
 
-  if (modified.containsKey('id') && modified.containsKey('version')) {
-    final id = modified.remove('id') as String;
-    final version = modified.remove('version') as String;
+    if (modified.containsKey('id') && modified.containsKey('version')) {
+      final id = modified.remove('id') as String;
+      final version = modified.remove('version') as String;
 
-    modified['selfRef'] = {
-      'id': id,
-      'version': version,
-      'type': DocumentRefDtoType.signed.name,
-    };
+      modified['selfRef'] = {
+        'id': id,
+        'version': version,
+        'type': DocumentRefDtoType.signed.name,
+      };
+    }
+
+    return modified;
   }
-
-  return modified;
 }
 
 extension on DocumentRef {

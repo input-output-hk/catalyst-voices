@@ -1,8 +1,10 @@
-import 'package:catalyst_voices/common/ext/ext.dart';
+import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/common/formatters/date_formatter.dart';
+import 'package:catalyst_voices/routes/routing/proposal_builder_route.dart';
+import 'package:catalyst_voices/widgets/cards/proposal_card_widgets.dart';
+import 'package:catalyst_voices/widgets/modals/proposals/share_proposal_dialog.dart';
 import 'package:catalyst_voices/widgets/text/day_month_time_text.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
-import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -15,6 +17,7 @@ class PendingProposalCard extends StatefulWidget {
   final bool showStatus;
   final bool showLastUpdate;
   final bool isFavorite;
+  final VoidCallback? onTap;
   final ValueChanged<bool>? onFavoriteChanged;
 
   const PendingProposalCard({
@@ -23,6 +26,7 @@ class PendingProposalCard extends StatefulWidget {
     this.showStatus = true,
     this.showLastUpdate = true,
     this.isFavorite = false,
+    this.onTap,
     this.onFavoriteChanged,
   });
 
@@ -45,12 +49,14 @@ class _Author extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           VoicesAvatar(
+            key: const Key('AuthorAvatar'),
             icon: Text(author[0]),
             backgroundColor: context.colors.primaryContainer,
             foregroundColor: context.colors.textOnPrimaryWhite,
           ),
           const SizedBox(width: 8),
           Text(
+            key: const Key('Author'),
             author,
             style: context.textTheme.titleSmall?.copyWith(
               color: context.colors.textOnPrimaryLevel1,
@@ -72,6 +78,7 @@ class _Category extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Text(
+      key: const Key('Category'),
       category,
       style: context.textTheme.labelMedium?.copyWith(
         color: context.colors.textDisabled,
@@ -88,6 +95,7 @@ class _Description extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Text(
+      key: const Key('Description'),
       text,
       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
             color: Theme.of(context).colors.textOnPrimaryLevel0,
@@ -121,10 +129,12 @@ class _FundsAndDuration extends StatelessWidget {
           alignment: WrapAlignment.spaceBetween,
           children: [
             _PropertyValue(
+              key: const Key('FundsRequested'),
               title: context.l10n.fundsRequested,
               formattedValue: funds,
             ),
             _PropertyValue(
+              key: const Key('Duration'),
               title: context.l10n.duration,
               formattedValue: context.l10n.valueMonths(duration),
             ),
@@ -144,10 +154,11 @@ class _PendingProposalCardState extends State<PendingProposalCard> {
   @override
   Widget build(BuildContext context) {
     return Material(
+      key: const Key('ProposalCard'),
       color: Colors.transparent,
       child: InkWell(
         statesController: _statesController,
-        onTap: () {},
+        onTap: widget.onTap,
         child: ValueListenableBuilder(
           valueListenable: _statesController,
           builder: (context, value, child) => Container(
@@ -168,6 +179,7 @@ class _PendingProposalCardState extends State<PendingProposalCard> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       _Topbar(
+                        proposalId: widget.proposal.id,
                         showStatus: widget.showStatus,
                         isFavorite: widget.isFavorite,
                         onFavoriteChanged: widget.onFavoriteChanged,
@@ -245,6 +257,7 @@ class _PropertyValue extends StatelessWidget {
   const _PropertyValue({
     required this.title,
     required this.formattedValue,
+    super.key,
   });
 
   @override
@@ -255,12 +268,14 @@ class _PropertyValue extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
         Text(
+          key: const Key('Title'),
           title,
           style: context.textTheme.bodySmall?.copyWith(
             color: context.colors.textOnPrimaryLevel1,
           ),
         ),
         Text(
+          key: const Key('Value'),
           formattedValue,
           style: context.textTheme.titleLarge?.copyWith(
             color: context.colors.textOnPrimaryLevel1,
@@ -286,8 +301,10 @@ final class _ProposalBorderColor extends WidgetStateColor {
   Color resolve(Set<WidgetState> states) {
     if (states.contains(WidgetState.hovered)) {
       return switch (publishStage) {
-        ProposalPublish.draft => colorScheme.secondary,
-        ProposalPublish.published => colorScheme.primary,
+        ProposalPublish.localDraft ||
+        ProposalPublish.publishedDraft =>
+          colorScheme.secondary,
+        ProposalPublish.submittedProposal => colorScheme.primary,
       };
     }
 
@@ -298,7 +315,7 @@ final class _ProposalBorderColor extends WidgetStateColor {
 class _ProposalInfo extends StatelessWidget {
   final ProposalPublish proposalStage;
   final int version;
-  final DateTime lastUpdate;
+  final DateTime? lastUpdate;
   final int commentsCount;
   final bool showLastUpdate;
 
@@ -315,66 +332,35 @@ class _ProposalInfo extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        VoicesChip.rectangular(
-          backgroundColor: proposalStage.isDraft
-              ? context.colorScheme.secondary
-              : context.colorScheme.primary,
-          content: Text(
-            _localizedProposalStage(
-              proposalStage,
-              context.l10n,
-            ),
-            style: context.textTheme.labelLarge?.copyWith(
-              color: context.colors.onWarning,
-            ),
-          ),
-        ),
+        if (proposalStage.isDraft)
+          const DraftProposalChip()
+        else
+          const FinalProposalChip(),
         const SizedBox(width: 4),
-        VoicesChip.rectangular(
-          leading: VoicesAssets.icons.documentText.buildIcon(
-            color: context.colors.textOnPrimaryLevel1,
-          ),
-          content: Text(
-            version.toString(),
-            style: context.textTheme.labelLarge?.copyWith(
-              color: context.colors.textOnPrimaryLevel1,
-            ),
-          ),
-        ),
-        if (showLastUpdate) ...[
+        ProposalVersionChip(version: version.toString()),
+        if (showLastUpdate && lastUpdate != null) ...[
           const SizedBox(width: 4),
           VoicesPlainTooltip(
             message: _tooltipMessage(context),
             child: DayMonthTimeText(
-              dateTime: lastUpdate,
+              dateTime: lastUpdate!,
             ),
           ),
         ],
         const Spacer(),
-        VoicesChip.rectangular(
-          backgroundColor: context.colors.elevationsOnSurfaceNeutralLv1Grey,
-          leading: VoicesAssets.icons.chatAlt2.buildIcon(),
-          content: Text(
-            version.toString(),
-            style: context.textTheme.labelLarge,
-          ),
+        ProposalCommentsChip(
+          commentsCount: commentsCount,
         ),
       ],
     );
   }
 
-  String _localizedProposalStage(
-    ProposalPublish proposalStage,
-    VoicesLocalizations l10n,
-  ) {
-    return switch (proposalStage) {
-      ProposalPublish.draft => l10n.draft,
-      ProposalPublish.published => l10n.finalProposal,
-    };
-  }
-
   String _tooltipMessage(BuildContext context) {
-    final dt = DateFormatter.formatDateTimeParts(lastUpdate, includeYear: true);
+    if (lastUpdate == null) {
+      return '';
+    }
+    final dt =
+        DateFormatter.formatDateTimeParts(lastUpdate!, includeYear: true);
 
     return context.l10n.publishedOn(dt.date, dt.time);
   }
@@ -388,6 +374,7 @@ class _Title extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Text(
+      key: const Key('Title'),
       text,
       style: Theme.of(context).textTheme.titleLarge,
       maxLines: 2,
@@ -397,11 +384,13 @@ class _Title extends StatelessWidget {
 }
 
 class _Topbar extends StatelessWidget {
+  final String proposalId;
   final bool showStatus;
   final bool isFavorite;
   final ValueChanged<bool>? onFavoriteChanged;
 
   const _Topbar({
+    required this.proposalId,
     required this.showStatus,
     required this.isFavorite,
     required this.onFavoriteChanged,
@@ -413,39 +402,25 @@ class _Topbar extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         const Spacer(),
-        VoicesIconButton.filled(
-          onTap: () {},
-          style: _buttonStyle(context),
-          child: VoicesAssets.icons.share.buildIcon(
-            color: context.colorScheme.primary,
-          ),
+        ShareButton(
+          key: const Key('ShareBtn'),
+          circle: false,
+          onTap: () async {
+            // TODO(LynxLynxx): Change to proposal view route when implemented
+            final url = ProposalBuilderRoute(proposalId: proposalId).location;
+            await ShareProposalDialog.show(context, url);
+          },
         ),
         if (onFavoriteChanged != null) ...[
           const SizedBox(width: 4),
-          VoicesIconButton.filled(
-            onTap: () => onFavoriteChanged?.call(!isFavorite),
-            style: _buttonStyle(context),
-            child: CatalystSvgIcon.asset(
-              isFavorite
-                  ? VoicesAssets.icons.starFilled.path
-                  : VoicesAssets.icons.starOutlined.path,
-              color: context.colorScheme.primary,
-            ),
+          FavoriteButton(
+            key: const Key('FavoriteBtn'),
+            circle: false,
+            isFavorite: isFavorite,
+            onChanged: onFavoriteChanged,
           ),
         ],
       ],
-    );
-  }
-
-  ButtonStyle _buttonStyle(BuildContext context) {
-    return IconButton.styleFrom(
-      padding: const EdgeInsets.all(10),
-      backgroundColor: context.colors.onSurfacePrimary08,
-      foregroundColor: context.colorScheme.primary,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8),
-      ),
-      iconSize: 18,
     );
   }
 }

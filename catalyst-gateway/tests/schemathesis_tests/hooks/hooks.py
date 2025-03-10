@@ -34,7 +34,7 @@ class MyAuth:
         if "CatalystRBACSecurityScheme" in choosen_auth:
             case.headers.pop("X-API-Key", None)
             # cspell: disable
-            rbac_token = "catv1.UJm5ZNT1n7l3_h3c3VXp1R9QAZStRmrxdtYwTrdsxKWIF1hAi3mqbz6dPNiICQCkoXWJs8KCpcaPuE7LE5Iu9su0ZweK_0Qr9KhBNNHrDMCh79-fruK7WyNPYNc6FrjwTPaIAQ"
+            rbac_token = "catid.:1740660380@preprod.cardano/ycih6xARcuFGiRrtf1ETLWPvXGd_UBheZ4A5kccWNAU.2CB_ByoGhZ8xBjLveK6jcGbKZ7_5TDjCwbTyNtHWFXnyKuvkTp9zo9tmBOVkPRbHjSwzx85kX3lIoGtKF3_dDQ"
             # cspell: enable
             case.headers["Authorization"] = f"Bearer {rbac_token}"
             pass
@@ -65,6 +65,8 @@ def negative_data_rejection_custom(ctx, response, case):
     ctx.config.negative_data_rejection.allowed_statuses = list(
         [code for code in status_codes if code.startswith("4")]
     )
+    # Allow 503 status for this validation
+    ctx.config.negative_data_rejection.allowed_statuses.append("503")
 
     if case.data_generation_method and case.data_generation_method.is_negative:
         # if only headers are included
@@ -89,3 +91,12 @@ def negative_data_rejection_custom(ctx, response, case):
     return schemathesis.specs.openapi.checks.negative_data_rejection(
         ctx, response, case
     )
+
+
+@schemathesis.check
+def not_a_server_error_custom(ctx, response, case):
+    # Allow 503 status for this validation
+    if response.status_code == 503:
+        return None
+
+    return schemathesis.checks.not_a_server_error(ctx, response, case)

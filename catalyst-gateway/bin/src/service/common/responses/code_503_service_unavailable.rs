@@ -3,6 +3,8 @@
 use poem_openapi::{types::Example, Object};
 use uuid::Uuid;
 
+use crate::service::common;
+
 #[derive(Object)]
 #[oai(example)]
 /// The service is not available, try again later.
@@ -11,11 +13,10 @@ use uuid::Uuid;
 /// or has become unavailable.*
 pub(crate) struct ServiceUnavailable {
     /// Unique ID of this Server Error so that it can be located easily for debugging.
-    id: Uuid,
+    id: common::types::generic::error_uuid::ErrorUuid,
     /// Error message.
     // Will not contain sensitive information, internal details or backtraces.
-    #[oai(validator(max_length = "100", pattern = "^[0-9a-zA-Z].*$"))]
-    msg: String,
+    msg: common::types::generic::error_msg::ErrorMessage,
 }
 
 impl ServiceUnavailable {
@@ -27,12 +28,15 @@ impl ServiceUnavailable {
         );
         let id = Uuid::new_v4();
 
-        Self { id, msg }
+        Self {
+            id: id.into(),
+            msg: msg.into(),
+        }
     }
 
     /// Get the id of this Server Error.
     pub(crate) fn id(&self) -> Uuid {
-        self.id
+        self.id.clone().into()
     }
 }
 

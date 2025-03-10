@@ -1,5 +1,7 @@
+import 'dart:async';
+
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
-import 'package:catalyst_voices/routes/routing/spaces_route.dart';
+import 'package:catalyst_voices/routes/routes.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_filled_button.dart';
 import 'package:catalyst_voices/widgets/cards/pending_proposal_card.dart';
 import 'package:catalyst_voices/widgets/scrollbar/voices_slider.dart';
@@ -45,6 +47,7 @@ class _LatestProposalsState extends State<MostRecentProposals> {
   @override
   Widget build(BuildContext context) {
     return Container(
+      key: const Key('MostRecentProposals'),
       constraints: const BoxConstraints(maxHeight: 900),
       decoration: BoxDecoration(
         image: DecorationImage(
@@ -59,6 +62,7 @@ class _LatestProposalsState extends State<MostRecentProposals> {
         children: [
           const SizedBox(height: 72),
           Text(
+            key: const Key('MostRecentProposalsTitle'),
             context.l10n.mostRecent,
             style: context.textTheme.headlineLarge?.copyWith(
               color: ThemeBuilder.buildTheme().colors.textOnPrimaryWhite,
@@ -79,11 +83,17 @@ class _LatestProposalsState extends State<MostRecentProposals> {
                   itemCount: widget.proposals.length,
                   itemBuilder: (context, index) {
                     final proposal = widget.proposals[index];
+                    final id = proposal.id;
                     return Skeletonizer(
                       enabled: widget.isLoading,
                       child: PendingProposalCard(
-                        key: Key('PendingProposalCard_${proposal.id}'),
+                        key: Key('PendingProposalCard_$id'),
                         proposal: proposal,
+                        onTap: () {
+                          unawaited(
+                            ProposalRoute(proposalId: id).push(context),
+                          );
+                        },
                         onFavoriteChanged: (value) {},
                       ),
                     );
@@ -98,6 +108,7 @@ class _LatestProposalsState extends State<MostRecentProposals> {
           ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 360),
             child: VoicesSlider(
+              key: const Key('MostRecentProposalsSlider'),
               value: _scrollPercentage,
               onChanged: _onSliderChanged,
             ),
@@ -107,6 +118,7 @@ class _LatestProposalsState extends State<MostRecentProposals> {
             backgroundColor: ThemeBuilder.buildTheme().colorScheme.onPrimary,
             foregroundColor: ThemeBuilder.buildTheme().colorScheme.primary,
             child: Text(
+              key: const Key('ViewAllProposalsBtn'),
               context.l10n.viewAllProposals,
             ),
             onTap: () => const ProposalsRoute().go(context),

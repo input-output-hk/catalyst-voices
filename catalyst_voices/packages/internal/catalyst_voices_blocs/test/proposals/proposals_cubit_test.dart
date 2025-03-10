@@ -10,26 +10,6 @@ import 'package:uuid/uuid.dart';
 
 void main() {
   group(ProposalsCubit, () {
-    const proposalTemplate = DocumentSchema(
-      parentSchemaUrl: '',
-      schemaSelfUrl: '',
-      title: '',
-      description: MarkdownData.empty,
-      properties: [],
-      order: [],
-    );
-
-    final proposalDocument = ProposalDocument(
-      metadata: ProposalMetadata(
-        id: const Uuid().v7(),
-        version: const Uuid().v7(),
-      ),
-      document: const Document(
-        schema: proposalTemplate,
-        properties: [],
-      ),
-    );
-
     final campaign = Campaign(
       id: 'F14',
       name: 'campaign',
@@ -41,18 +21,19 @@ void main() {
     );
 
     final proposal = Proposal(
-      id: '1',
+      selfRef: SignedDocumentRef(
+        id: const Uuid().v7(),
+        version: const Uuid().v7(),
+      ),
       title: 'Proposal 1',
       description: 'Description 1',
       category: '',
       updateDate: DateTime.now(),
       fundsRequested: const Coin(100000),
       status: ProposalStatus.draft,
-      publish: ProposalPublish.draft,
-      access: ProposalAccess.private,
+      publish: ProposalPublish.publishedDraft,
       commentsCount: 0,
-      document: proposalDocument,
-      version: 1,
+      versionCount: 1,
       duration: 6,
       author: 'Alex Wells',
     );
@@ -86,12 +67,20 @@ void main() {
         );
       },
       expect: () => [
+        const ProposalsState(
+          userProposals: ProposalPaginationItems(
+            pageKey: 0,
+            maxResults: 0,
+            items: [],
+            isLoading: true,
+          ),
+        ),
         ProposalsState(
           userProposals: ProposalPaginationItems(
             pageKey: 1,
-            maxResults: 10,
+            maxResults: 1,
             items: [proposalViewModel],
-            isEmpty: false,
+            isLoading: false,
           ),
         ),
       ],
@@ -111,12 +100,19 @@ void main() {
         );
       },
       expect: () => [
+        const ProposalsState(
+          favoriteProposals: ProposalPaginationItems(
+            pageKey: 0,
+            maxResults: 0,
+            items: [],
+            isLoading: true,
+          ),
+        ),
         ProposalsState(
           favoriteProposals: ProposalPaginationItems(
             pageKey: 1,
-            maxResults: 10,
+            maxResults: 1,
             items: [proposalViewModel],
-            isEmpty: false,
           ),
         ),
       ],
@@ -142,17 +138,24 @@ void main() {
             pageKey: 1,
             pageSize: 10,
             lastId: null,
-            stage: ProposalPublish.draft,
+            stage: ProposalPublish.publishedDraft,
           ),
         );
       },
       expect: () => [
+        const ProposalsState(
+          draftProposals: ProposalPaginationItems(
+            pageKey: 0,
+            maxResults: 0,
+            items: [],
+            isLoading: true,
+          ),
+        ),
         ProposalsState(
           draftProposals: ProposalPaginationItems(
             pageKey: 1,
             maxResults: 10,
             items: [proposalViewModel],
-            isEmpty: false,
           ),
         ),
       ],
@@ -167,17 +170,24 @@ void main() {
             pageKey: 1,
             pageSize: 10,
             lastId: null,
-            stage: ProposalPublish.published,
+            stage: ProposalPublish.submittedProposal,
           ),
         );
       },
       expect: () => [
+        const ProposalsState(
+          finalProposals: ProposalPaginationItems(
+            pageKey: 0,
+            maxResults: 0,
+            items: [],
+            isLoading: true,
+          ),
+        ),
         ProposalsState(
           finalProposals: ProposalPaginationItems(
             pageKey: 1,
             maxResults: 10,
             items: [proposalViewModel],
-            isEmpty: false,
           ),
         ),
       ],
@@ -190,18 +200,22 @@ void main() {
         await cubit.getProposals(
           const ProposalPaginationRequest(
             pageKey: 1,
-            pageSize: 10,
+            pageSize: 1,
             lastId: null,
           ),
         );
       },
       expect: () => [
+        const ProposalsState(
+          allProposals: ProposalPaginationItems(
+            isLoading: true,
+          ),
+        ),
         ProposalsState(
           allProposals: ProposalPaginationItems(
             pageKey: 1,
             maxResults: 10,
             items: [proposalViewModel],
-            isEmpty: false,
           ),
         ),
       ],
@@ -227,10 +241,14 @@ void main() {
       expect: () => [
         const ProposalsState(
           allProposals: ProposalPaginationItems(
+            isLoading: true,
+          ),
+        ),
+        const ProposalsState(
+          allProposals: ProposalPaginationItems(
             pageKey: 1,
             maxResults: 10,
             items: [],
-            isEmpty: true,
           ),
         ),
       ],
@@ -286,21 +304,19 @@ class _FakeProposalService extends Fake implements ProposalService {
   _FakeProposalService(this._proposals);
 
   @override
+  Future<List<String>> getFavoritesProposalsIds() async {
+    return ['1', '2'];
+  }
+
+  @override
   Future<ProposalPaginationItems<Proposal>> getProposals({
     required ProposalPaginationRequest request,
-    required String campaignId,
   }) async {
     return ProposalPaginationItems(
       pageKey: request.pageKey,
       maxResults: 10,
       items: _proposals,
-      isEmpty: false,
     );
-  }
-
-  @override
-  Future<List<String>> getFavoritesProposalsIds() async {
-    return ['1', '2'];
   }
 
   @override

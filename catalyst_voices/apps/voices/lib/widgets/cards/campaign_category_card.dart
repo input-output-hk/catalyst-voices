@@ -7,7 +7,7 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 class CampaignCategoryCard extends StatelessWidget {
-  final CampaignCategoryViewModel category;
+  final CampaignCategoryDetailsViewModel category;
 
   const CampaignCategoryCard({
     super.key,
@@ -17,6 +17,7 @@ class CampaignCategoryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      key: const Key('CampaignCategories'),
       decoration: BoxDecoration(
         color: context.colors.elevationsOnSurfaceNeutralLv1White,
         borderRadius: BorderRadius.circular(16),
@@ -34,7 +35,8 @@ class CampaignCategoryCard extends StatelessWidget {
         children: [
           // TODO(LynxxLynx): implement image when info from where it comes
           CatalystImage.asset(
-            VoicesAssets.images.campaignCategoryDeveloper.path,
+            key: const Key('CategoryImage'),
+            category.imageUrl,
             fit: BoxFit.fill,
             height: 220,
           ),
@@ -44,15 +46,18 @@ class CampaignCategoryCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                _Title(category.name),
-                _Title(category.subname),
+                _Title(category.name, const Key('CategoryTitle')),
+                _Title(category.subname, const Key('CategorySubname')),
                 const SizedBox(height: 16),
                 _CampaignStats(
                   availableFunds: category.availableFundsText,
                   proposalsCount: category.proposalsCount,
                 ),
                 const SizedBox(height: 16),
-                _Description(category.description),
+                _Description(
+                  category.description,
+                  key: const Key('Description'),
+                ),
                 const SizedBox(height: 32),
                 _Buttons(
                   categoryId: category.id,
@@ -80,6 +85,7 @@ class _Buttons extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         VoicesFilledButton(
+          key: const Key('CategoryDetailsBtn'),
           onTap: () {
             CategoryDetailRoute(categoryId).go(context);
           },
@@ -87,6 +93,7 @@ class _Buttons extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         VoicesFilledButton(
+          key: const Key('ViewProposalsBtn'),
           onTap: () {
             ProposalsRoute(categoryId: categoryId).go(context);
           },
@@ -96,37 +103,6 @@ class _Buttons extends StatelessWidget {
         ),
         const SizedBox(height: 24),
       ],
-    );
-  }
-}
-
-class _Title extends StatelessWidget {
-  final String text;
-
-  const _Title(this.text);
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      text,
-      style: context.textTheme.titleLarge,
-    );
-  }
-}
-
-class _Description extends StatelessWidget {
-  final String description;
-
-  const _Description(this.description);
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      description,
-      style: context.textTheme.bodyMedium?.copyWith(
-        color: context.colors.textOnPrimaryLevel1,
-      ),
-      maxLines: 5,
     );
   }
 }
@@ -155,6 +131,7 @@ class _CampaignStats extends StatelessWidget {
             alignment: WrapAlignment.spaceBetween,
             children: [
               _TextStats(
+                key: const Key('AvailableFunds'),
                 text: context.l10n.fundsAvailable,
                 value: availableFunds,
               ),
@@ -170,6 +147,7 @@ class _CampaignStats extends StatelessWidget {
                   ),
                   const SizedBox(width: 16),
                   _TextStats(
+                    key: const Key('ProposalsCount'),
                     text: context.l10n.proposals,
                     value: proposalsCount.toString(),
                   ),
@@ -183,6 +161,24 @@ class _CampaignStats extends StatelessWidget {
   }
 }
 
+class _Description extends StatelessWidget {
+  final String description;
+
+  const _Description(this.description, {super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      key: super.key,
+      description,
+      style: context.textTheme.bodyMedium?.copyWith(
+        color: context.colors.textOnPrimaryLevel1,
+      ),
+      maxLines: 5,
+    );
+  }
+}
+
 class _TextStats extends StatelessWidget {
   final String text;
   final String value;
@@ -190,6 +186,7 @@ class _TextStats extends StatelessWidget {
   const _TextStats({
     required this.text,
     required this.value,
+    super.key,
   });
 
   @override
@@ -199,6 +196,7 @@ class _TextStats extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
+          key: const Key('DataTitle'),
           text,
           style: context.textTheme.bodySmall?.copyWith(
             color: context.colors.textOnPrimaryLevel1,
@@ -206,12 +204,28 @@ class _TextStats extends StatelessWidget {
         ),
         const SizedBox(height: 4),
         Text(
+          key: const Key('DataValue'),
           value,
           style: context.textTheme.titleLarge?.copyWith(
             color: context.colors.textOnPrimaryLevel1,
           ),
         ),
       ],
+    );
+  }
+}
+
+class _Title extends StatelessWidget {
+  final String text;
+
+  const _Title(this.text, [Key? key]) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      key: super.key,
+      text,
+      style: context.textTheme.titleLarge,
     );
   }
 }

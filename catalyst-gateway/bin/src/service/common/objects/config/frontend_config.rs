@@ -1,44 +1,77 @@
 //! Frontend configuration objects.
 
-use poem_openapi::{types::Example, Object};
+use derive_more::{From, Into};
+use poem_openapi::{types::Example, NewType, Object};
+
+use super::{environment::ConfigEnvironment, version::SemVer};
+use crate::service::common;
 
 /// Frontend JSON schema.
-#[derive(Object, Default, serde::Deserialize)]
+#[derive(Object, Default)]
 #[oai(example = true)]
 pub(crate) struct FrontendConfig {
     /// Sentry properties.
-    sentry: Option<Sentry>,
+    sentry: Option<ConfiguredSentry>,
 }
 
 impl Example for FrontendConfig {
     fn example() -> Self {
-        FrontendConfig {
-            sentry: Some(Sentry::example()),
+        Self {
+            sentry: Some(Example::example()),
         }
     }
 }
 
+/// Configured sentry using in `FrontendConfig`.
+#[derive(NewType, From, Into)]
+#[oai(
+    from_multipart = false,
+    from_parameter = false,
+    to_header = false,
+    example = true
+)]
+pub(crate) struct ConfiguredSentry(Sentry);
+
+impl Example for ConfiguredSentry {
+    fn example() -> Self {
+        Self(Example::example())
+    }
+}
+
 /// Frontend configuration for Sentry.
-#[derive(Object, Default, serde::Deserialize)]
+#[derive(Object)]
 #[oai(example = true)]
 pub(crate) struct Sentry {
     /// The Data Source Name (DSN) for Sentry.
-    #[oai(validator(max_length = "100", pattern = "^https?://"))]
-    dsn: String,
+    dsn: common::types::generic::url::Url,
     /// A version of the code deployed to an environment.
-    #[oai(validator(max_length = "100", pattern = "^[0-9a-zA-Z].*$"))]
-    release: Option<String>,
+    release: Option<SemVer>,
     /// The environment in which the application is running, e.g., 'dev', 'qa'.
-    #[oai(validator(max_length = "100", pattern = "^[0-9a-zA-Z].*$"))]
-    environment: Option<String>,
+    environment: Option<SentryConfiguredProfile>,
 }
 
 impl Example for Sentry {
     fn example() -> Self {
-        Sentry {
-            dsn: "https://example.com".to_string(),
-            release: Some("1.0.0".to_string()),
-            environment: Some("dev".to_string()),
+        Self {
+            dsn: Example::example(),
+            release: Some(Example::example()),
+            environment: Some(Example::example()),
         }
+    }
+}
+
+/// Configured sentry profile.
+#[derive(NewType, From, Into)]
+#[oai(
+    from_multipart = false,
+    from_parameter = false,
+    to_header = false,
+    example = true
+)]
+pub(crate) struct SentryConfiguredProfile(ConfigEnvironment);
+
+impl Example for SentryConfiguredProfile {
+    fn example() -> Self {
+        Self(Example::example())
     }
 }

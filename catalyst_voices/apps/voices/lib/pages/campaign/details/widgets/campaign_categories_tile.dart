@@ -47,12 +47,16 @@ class _CampaignCategoriesTileState extends State<CampaignCategoriesTile> {
 
     return VoicesExpansionTile(
       initiallyExpanded: true,
-      title: Text(context.l10n.campaignCategories),
+      title: Text(
+        key: const Key('CampaignCategoriesTitleLabel'),
+        context.l10n.campaignCategories,
+      ),
       children: [
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _Menu(
+              key: const Key('CampaignCategoriesMenu'),
               selectedId: _selectedSectionId,
               menuItems: widget.sections,
               onTap: _updateSelection,
@@ -85,6 +89,7 @@ class _Menu extends StatelessWidget {
     this.selectedId,
     required this.menuItems,
     required this.onTap,
+    super.key,
   });
 
   @override
@@ -99,6 +104,7 @@ class _Menu extends StatelessWidget {
       children: [
         const SizedBox(height: 16),
         Text(
+          key: const Key('CardanoUseCasesLabel'),
           context.l10n.cardanoUseCases,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
@@ -137,6 +143,7 @@ class _Details extends StatelessWidget {
       children: [
         const SizedBox(height: 48),
         Text(
+          key: const Key('CardanoUseCasesSectionLabel'),
           section.label,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
@@ -146,6 +153,7 @@ class _Details extends StatelessWidget {
         ),
         const SizedBox(height: 24),
         Text(
+          key: const Key('CardanoUseCasesSectionTitle'),
           section.title,
           style: textTheme.titleLarge?.copyWith(
             color: colors.textOnPrimaryLevel0,
@@ -153,6 +161,7 @@ class _Details extends StatelessWidget {
         ),
         const SizedBox(height: 16),
         Text(
+          key: const Key('CardanoUseCasesSectionBody'),
           section.body,
           style: textTheme.bodyLarge?.copyWith(
             color: colors.textOnPrimaryLevel1,

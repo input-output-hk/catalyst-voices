@@ -86,12 +86,13 @@ pub(crate) async fn endpoint(
             let remaining = Remaining::calculate(page.into(), limit.into(), total, doc_count);
 
             Responses::Ok(Json(DocumentIndexListDocumented(DocumentIndexList {
-                docs,
+                docs: docs.into(),
                 page: CurrentPage {
                     page,
                     limit,
                     remaining,
-                },
+                }
+                .into(),
             })))
             .into()
         },
@@ -120,7 +121,8 @@ async fn fetch_docs(
             let ver = docs
                 .into_iter()
                 .map(TryInto::try_into)
-                .collect::<Result<_, _>>()?;
+                .collect::<Result<Vec<_>, _>>()?
+                .into();
 
             Ok(IndexedDocumentDocumented(IndexedDocument {
                 doc_id: DocumentId::new_unchecked(id.to_string()),

@@ -110,6 +110,30 @@ void main() {
 
         expect(entity, isNull);
       });
+
+      test('all refs return as expected', () async {
+        // Given
+        final refs = List.generate(10, (_) => DocumentRefFactory.buildDraft());
+        final drafts = refs.map((ref) {
+          return DraftFactory.build(
+            metadata: DocumentDataMetadata(
+              type: DocumentType.proposalDocument,
+              selfRef: ref,
+            ),
+          );
+        });
+
+        // When
+        await database.draftsDao.saveAll(drafts);
+
+        // Then
+        final allRefs = await database.draftsDao.queryAllRefs();
+
+        expect(
+          allRefs,
+          allOf(hasLength(refs.length), containsAll(refs)),
+        );
+      });
     });
 
     group('count', () {
@@ -243,6 +267,28 @@ void main() {
           entities.every((element) => element.content == updatedContent),
           isTrue,
         );
+      });
+    });
+
+    group('delete', () {
+      test('inserting and deleting a draft makes the table empty', () async {
+        // Given
+        final ref = DraftRef.generateFirstRef();
+
+        final draft = DraftFactory.build(
+          metadata: DocumentDataMetadata(
+            type: DocumentType.proposalDocument,
+            selfRef: ref,
+          ),
+        );
+
+        // When
+        await database.draftsDao.save(draft);
+        await database.draftsDao.deleteWhere(ref: ref);
+
+        // Then
+        final entities = await database.draftsDao.queryAll();
+        expect(entities, isEmpty);
       });
     });
   });

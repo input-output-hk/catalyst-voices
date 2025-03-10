@@ -117,18 +117,19 @@ command:
       flutter_secure_storage: ^9.2.2
       formz: ^0.7.0
       intl: ^0.19.0
-      logging: ^1.2.0
+      logging: ^1.3.0
       markdown: ^7.2.2
       markdown_quill: ^4.2.0
-      meta: ^1.10.0
+      meta: ^1.16.0
       result_type: ^0.2.0
+      rxdart: ^0.27.7
       password_strength: ^0.2.0
       plugin_platform_interface: ^2.1.7
       bech32: ^0.2.2
       bip32_ed25519: ^0.6.0
       cbor: ^6.2.0
       convert: ^3.1.1
-      path: ^1.9.0
+      path: ^1.9.1
       pinenacl: ^0.6.0
       uuid: ^4.5.1
       sentry_flutter: ^8.8.0
@@ -146,7 +147,7 @@ command:
     dev_dependencies:
       test: ^1.24.9
       build_runner: ^2.4.12
-      chopper_generator: ^8.0.3
+      chopper_generator: ^8.0.4
       mocktail: ^1.0.1
 
 scripts:
@@ -169,14 +170,13 @@ scripts:
 
   build_runner_repository:
     run: |
+      melos exec -c 1 --depends-on="build_runner" --scope="catalyst_voices_repositories" -- dart run build_runner clean && \
+      melos exec -c 1 --scope="catalyst_voices_repositories" -- dart run process_openapi.dart && \
       melos exec -c 1 \
       --depends-on="build_runner" \
-      --scope="catalyst_voices_repositories" -- \
-          dart run build_runner build --delete-conflicting-outputs \
-              --build-filter="lib/src/dto/**" \
-              --build-filter="lib/src/database/**"
+      --scope="catalyst_voices_repositories" -- dart run build_runner build --delete-conflicting-outputs
     description: |
-      Run `build_runner` in catalyst_voices_repositories package only in selected folders
+      Run `build_runner` in catalyst_voices_repositories package
 
   db-make-migration:
     run: |
@@ -234,7 +234,6 @@ scripts:
       # cleanup old coverage files and create empty folder where coverage files will be stored
       find . -type d -name coverage -prune -exec rm -rf {} \;
       mkdir $MELOS_ROOT_PATH/coverage
-            
       # run tests, generate junit reports in /test_reports/ & code coverage report
       melos exec -c 1 --dir-exists="test" -- \
       ' TESTS_OUTPUT_FILE="$MELOS_ROOT_PATH/test_reports/$MELOS_PACKAGE_NAME.tests-output.json"
@@ -263,6 +262,7 @@ scripts:
 
       # merges all coverage reports into a single one and puts it in /coverage/lcov.info
       dart pub global run combine_coverage --repo-path=.
+      mv ./coverage/lcov.info ./coverage/lcov.coverage.info
 
       exit $EXIT_CODE
 
@@ -270,4 +270,4 @@ scripts:
       Run `flutter test` for all packages and generate junit and coverage reports.
       The test reports are saved in /test_reports folder.
       The coverages are saved in coverage/lcov.info file for each tested package.
-      The combined coverage is saved in the /coverage/lcov.info file.
+      The combined coverage is saved in the /coverage/lcov.coverage.info file.

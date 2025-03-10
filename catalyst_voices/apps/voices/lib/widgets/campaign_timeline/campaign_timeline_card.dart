@@ -1,4 +1,4 @@
-import 'package:catalyst_voices/common/ext/ext.dart';
+import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/common/formatters/date_formatter.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
@@ -41,6 +41,7 @@ class CampaignTimelineCardState extends State<CampaignTimelineCard> {
         width: 288,
         height: _isExpanded ? 300 : 150,
         child: Card(
+          key: const Key('TimelineCard'),
           color:
               widget.placement.backgroundColor(context, isOngoing: _isOngoing),
           shape: OutlineInputBorder(
@@ -69,6 +70,7 @@ class CampaignTimelineCardState extends State<CampaignTimelineCard> {
                 ),
                 const SizedBox(height: 16),
                 Text(
+                  key: const Key('TimelineCardTitle'),
                   widget.timelineItem.title,
                   style: context.textTheme.titleSmall?.copyWith(
                     color: context.colors.textOnPrimaryLevel1,
@@ -82,6 +84,7 @@ class CampaignTimelineCardState extends State<CampaignTimelineCard> {
                     children: [
                       Expanded(
                         child: Text(
+                          key: const Key('TimelineCardDate'),
                           DateFormatter.formatDateRange(
                             MaterialLocalizations.of(context),
                             context.l10n,

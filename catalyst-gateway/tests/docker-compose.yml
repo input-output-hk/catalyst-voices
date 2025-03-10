@@ -24,6 +24,14 @@ services:
       timeout: 5s
       retries: 10
 
+  scylla-node:
+    image: scylladb/scylla:latest
+    container_name: scylla-node
+    restart: unless-stopped
+    command: --smp 2 --memory 1G --overprovisioned 1 --api-address 0.0.0.0
+    ports:
+      - "9042:9042"
+
   cat-gateway-with-scylla:
     image: cat-gateway-with-scylla:latest
     container_name: cat-gateway-with-scylla
@@ -33,6 +41,7 @@ services:
       - CASSANDRA_VOLATILE_URL=localhost:9042
       - CAT_ADDRESS=0.0.0.0:3030
       - CHAIN_NETWORK="Preprod"
+      - SIGNED_DOC_SK=0x6455585b5dcc565c8975bc136e215d6d4dd96540620f37783c564da3cb3686dd
       - LOG_LEVEL=error
       - RUST_LOG="error,cat_gateway=debug,cardano_chain_follower=debug,mithril-client=debug"
       - DATA_REFRESH_TICK=5
@@ -40,7 +49,6 @@ services:
       - CHAIN_FOLLOWER_SYNC_TASKS="16"
       - MACHINE_ID="UID"
       - RBAC_OFF=true
-    hostname: 127.0.0.1
     ports:
       - 3030:3030
     depends_on:
