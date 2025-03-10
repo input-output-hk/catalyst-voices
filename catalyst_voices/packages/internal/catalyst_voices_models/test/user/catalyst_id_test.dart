@@ -59,12 +59,12 @@ void main() {
     test('should create minimal $CatalystId instance with username correctly',
         () {
       final catalystId = CatalystId(
-        host: CatalystIdHost.cardano.name,
+        host: CatalystIdHost.cardano.host,
         username: 'john',
         role0Key: role0Key,
       );
 
-      expect(catalystId.host, equals(CatalystIdHost.cardano.name));
+      expect(catalystId.host, equals(CatalystIdHost.cardano.host));
       expect(catalystId.username, equals('john'));
       expect(catalystId.nonce, isNull);
       expect(catalystId.role0Key, equals(role0Key));
@@ -79,7 +79,7 @@ void main() {
       );
 
       final catalystId = CatalystId.fromUri(uri);
-      expect(catalystId.host, equals(CatalystIdHost.cardano.name));
+      expect(catalystId.host, equals(CatalystIdHost.cardano.host));
       expect(catalystId.username, isNull);
       expect(catalystId.nonce, isNull);
       expect(catalystId.role0Key, isNotNull);
@@ -95,7 +95,7 @@ void main() {
       );
 
       final catalystId = CatalystId.fromUri(uri);
-      expect(catalystId.host, equals(CatalystIdHost.cardanoPreprod.name));
+      expect(catalystId.host, equals(CatalystIdHost.cardanoPreprod.host));
       expect(catalystId.username, equals('john'));
       expect(catalystId.nonce, isNull);
       expect(catalystId.role0Key, isNotNull);
@@ -110,7 +110,7 @@ void main() {
       );
 
       final catalystId = CatalystId.fromUri(uri);
-      expect(catalystId.host, equals(CatalystIdHost.cardano.name));
+      expect(catalystId.host, equals(CatalystIdHost.cardano.host));
       expect(catalystId.username, equals('testuser'));
       expect(catalystId.nonce, equals(12345678));
       expect(catalystId.role0Key, isNotNull);
@@ -119,9 +119,9 @@ void main() {
       expect(catalystId.encrypt, isTrue);
     });
 
-    test('should convert CatalystId to Uri correctly', () {
+    test('should convert $CatalystId to Uri correctly', () {
       final catalystId = CatalystId(
-        host: CatalystIdHost.cardano.name,
+        host: CatalystIdHost.cardano.host,
         username: 'testuser',
         nonce: 12345678,
         role0Key: role0Key,
@@ -138,6 +138,22 @@ void main() {
       expect(
         uri.path,
         equals('/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE=/1/2'),
+      );
+    });
+
+    test('should convert minimal $CatalystId to Uri correctly', () {
+      final catalystId = CatalystId(
+        host: CatalystIdHost.cardano.host,
+        role0Key: role0Key,
+        nonce: 123456,
+      );
+
+      final uri = catalystId.toUri(includeScheme: false);
+      expect(
+        uri.toString(),
+        equals(
+          ':123456@cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE=',
+        ),
       );
     });
   });

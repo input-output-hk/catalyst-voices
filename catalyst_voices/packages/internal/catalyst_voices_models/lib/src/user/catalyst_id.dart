@@ -88,9 +88,9 @@ final class CatalystId extends Equatable {
       ];
 
   /// Builds the [Uri] from the [CatalystId].
-  Uri toUri() {
+  Uri toUri({bool includeScheme = true}) {
     return Uri(
-      scheme: scheme,
+      scheme: includeScheme ? scheme : null,
       userInfo: _formatUserInfo(),
       host: host,
       path: _formatPath(),
