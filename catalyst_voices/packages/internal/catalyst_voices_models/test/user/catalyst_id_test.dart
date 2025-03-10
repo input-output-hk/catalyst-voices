@@ -9,6 +9,7 @@ import 'package:flutter/foundation.dart';
 import 'package:test/fake.dart';
 import 'package:test/test.dart';
 
+/* cSpell:disable */
 void main() {
   group(CatalystId, () {
     late CatalystPublicKey role0Key;
@@ -183,3 +184,4 @@ class _FakeCatalystPublicKey extends Fake implements CatalystPublicKey {
     return const DeepCollectionEquality().equals(other.bytes, bytes);
   }
 }
+/* cSpell:enable */
