@@ -71,6 +71,10 @@ class ProposalsPage {
     expect($(CommonPage($).navigationBackBtn).$(Text).text, T.get('Back'));
   }
 
+  Future<void> clickBackButton() async {
+    await $(CommonPage($).navigationBackBtn).tap();
+  }
+
   Future<void> currentCampaignDetailsLooksAsExpected() async {
     expect(
       $(currentCampaignTitle).text?.startsWith(T.get('Catalyst Fund ')),

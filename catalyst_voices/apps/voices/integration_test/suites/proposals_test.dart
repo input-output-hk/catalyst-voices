@@ -6,6 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:patrol_finders/patrol_finders.dart';
 
+import '../pageobject/discovery/campaign_hero_section_page.dart';
 import '../pageobject/proposals_page.dart';
 import '../utils/translations_utils.dart';
 
@@ -140,6 +141,15 @@ void main() async {
       (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await ProposalsPage($).shareModalCloseButtonWorks();
+      },
+    );
+
+    patrolWidgetTest(
+      'visitor - back button works',
+      (PatrolTester $) async {
+        await $.pumpWidgetAndSettle(App(routerConfig: router));
+        await ProposalsPage($).clickBackButton();
+        await CampaignHeroSection($).campaignBriefTitleIsRenderedCorrectly();
       },
     );
   });
