@@ -1,3 +1,4 @@
+
 import 'package:catalyst_cardano/catalyst_cardano.dart';
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -166,7 +167,7 @@ final class RegistrationServiceImpl implements RegistrationService {
   }) async {
     await Future<void>.delayed(const Duration(milliseconds: 200));
 
-    // const isSuccess = true;
+    // final isSuccess = Random().nextBool();
     // if (!isSuccess) {
     //   throw const RegistrationUnknownException();
     // }

@@ -36,6 +36,7 @@ class _AccountKeychainTileState extends State<AccountKeychainTile> {
         child: Text(context.l10n.removeKeychain),
       ),
       child: VoicesTextField(
+        key: const Key('AccountKeychainTextField'),
         controller: _controller,
         onFieldSubmitted: null,
         readOnly: true,

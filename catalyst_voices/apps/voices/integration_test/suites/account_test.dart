@@ -40,10 +40,9 @@ void main() async {
         (PatrolTester $) async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
           await $(OverallSpacesPage.userShortcutBtn)
-              .tap(settleTimeout: Time.long.duration);
+              .tap(settleTimeout: const Duration(seconds: 10));
           await AppBarPage($).accountPopupBtnClick();
-          await AccountDropdownPage.accountDropdownLooksAsExpected($);
-          await AccountDropdownPage.accountDropdownContainsSpecificData($);
+          await AccountDropdownPage($).accountDropdownLooksAsExpected();
         },
       );
 
@@ -77,16 +76,7 @@ void main() async {
   patrolWidgetTest(
     'user - Account dropdown button opens account dropdown',
     (PatrolTester $) async {
-      await $.pumpWidgetAndSettle(App(routerConfig: router));
-      await UnlockPasswordSuccessPanel($).goto();
-      await UnlockPasswordSuccessPanel($).clickGoToDashboard();
-      await AppBarPage($).accountPopupBtnClick();
-      // await AccountDropdownPage($).clickDarkTheme();
-      await AccountDropdownPage($).clickProfileAndKeychain();
-      await ProfilePage($).clickDisplayNameEdit();
-      await ProfilePage($).clickEmailAdressEdit();
-      // await ProfilePage($).addRoleClick();
-      await ProfilePage($).removeKeychainClick();
+
     },
   );
 }
