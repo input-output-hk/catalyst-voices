@@ -183,21 +183,21 @@ final class CatalystId extends Equatable {
 }
 
 enum CatalystIdHost {
-  cardano(name: 'cardano'),
-  cardanoPreprod(name: 'preprod.cardano'),
-  cardanoPreview(name: 'preview.cardano'),
-  midnight(name: 'midnight'),
-  ethereum(name: 'ethereum'),
-  cosmos(name: 'cosmos'),
-  undefined(name: 'undefined');
+  cardano(host: 'cardano'),
+  cardanoPreprod(host: 'preprod.cardano'),
+  cardanoPreview(host: 'preview.cardano'),
+  midnight(host: 'midnight'),
+  ethereum(host: 'ethereum'),
+  cosmos(host: 'cosmos'),
+  undefined(host: 'undefined');
 
-  final String name;
+  final String host;
 
-  const CatalystIdHost({required this.name});
+  const CatalystIdHost({required this.host});
 
   factory CatalystIdHost.fromTag(String tag) {
     for (final value in values) {
-      if (value.name.toLowerCase() == tag.toLowerCase()) {
+      if (value.host.toLowerCase() == tag.toLowerCase()) {
         return value;
       }
     }
