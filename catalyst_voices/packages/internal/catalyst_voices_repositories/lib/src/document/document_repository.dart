@@ -35,13 +35,14 @@ abstract interface class DocumentRepository {
   ///
   /// If [of] is declared it will be used for this draft and new version
   /// assigned. Think of it as editing published document.
-  Future<DraftRef> createProposalDraft({
+  Future<DraftRef> createDocumentDraft({
+    required DocumentType type,
     required DocumentDataContent content,
     required SignedDocumentRef template,
     SignedDocumentRef? of,
   });
 
-  /// Deletes a proposal draft from the local storage.
+  /// Deletes a document draft from the local storage.
   Future<void> deleteDocumentDraft({
     required DraftRef ref,
   });
@@ -104,6 +105,10 @@ abstract interface class DocumentRepository {
     required DocumentDataContent content,
   });
 
+  Future<void> uploadDocument({
+    required SignedDocument document,
+  });
+
   Stream<int> watchCount({
     required DocumentRef ref,
     required DocumentType type,
@@ -144,7 +149,8 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   }
 
   @override
-  Future<DraftRef> createProposalDraft({
+  Future<DraftRef> createDocumentDraft({
+    required DocumentType type,
     required DocumentDataContent content,
     required SignedDocumentRef template,
     SignedDocumentRef? of,
@@ -154,7 +160,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
 
     final ref = DraftRef(id: id, version: version);
     final metadata = DocumentDataMetadata(
-      type: DocumentType.proposalDocument,
+      type: type,
       selfRef: ref,
       template: template,
     );
@@ -282,6 +288,11 @@ final class DocumentRepositoryImpl implements DocumentRepository {
       ref: ref,
       content: content,
     );
+  }
+
+  @override
+  Future<void> uploadDocument({required SignedDocument document}) async {
+    await _remoteDocuments.upload(document);
   }
 
   Stream<List<DocumentsDataWithRefData>> watchAllDocuments({

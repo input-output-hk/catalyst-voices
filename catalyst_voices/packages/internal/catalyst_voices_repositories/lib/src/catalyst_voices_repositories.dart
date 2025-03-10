@@ -13,6 +13,11 @@ export 'document/source/document_data_remote_source.dart';
 export 'document/source/document_data_source.dart';
 export 'dto/document/document_dto.dart' show DocumentExt;
 export 'proposal/proposal_repository.dart' show ProposalRepository;
+export 'signed_document/signed_document_json_payload.dart';
+export 'signed_document/signed_document_manager.dart'
+    show SignedDocumentManager;
+export 'signed_document/signed_document_manager_impl.dart'
+    show SignedDocumentManagerImpl;
 export 'transaction/transaction_config_repository.dart';
 export 'user/user_repository.dart' show UserRepository;
 export 'user/user_storage.dart';

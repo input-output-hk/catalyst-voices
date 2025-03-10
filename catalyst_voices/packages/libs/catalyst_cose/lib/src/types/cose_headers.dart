@@ -47,6 +47,9 @@ final class CoseHeaders extends Equatable {
   /// See [CoseHeaderKeys.ref].
   final ReferenceUuid? ref;
 
+  /// See [CoseHeaderKeys.refHash].
+  final ReferenceUuidHash? refHash;
+
   /// See [CoseHeaderKeys.template].
   final ReferenceUuid? template;
 
@@ -58,6 +61,18 @@ final class CoseHeaders extends Equatable {
 
   /// See [CoseHeaderKeys.collabs].
   final List<String>? collabs;
+
+  /// See [CoseHeaderKeys.brandId].
+  final ReferenceUuid? brandId;
+
+  /// See [CoseHeaderKeys.campaignId].
+  final ReferenceUuid? campaignId;
+
+  /// See [CoseHeaderKeys.electionId].
+  final String? electionId;
+
+  /// See [CoseHeaderKeys.categoryId].
+  final ReferenceUuid? categoryId;
 
   /// Whether the type should be wrapped in extra [CborBytes]
   /// or be a plain [CborMap], both formats are supported.
@@ -76,44 +91,17 @@ final class CoseHeaders extends Equatable {
     this.id,
     this.ver,
     this.ref,
+    this.refHash,
     this.template,
     this.reply,
     this.section,
     this.collabs,
+    this.brandId,
+    this.campaignId,
+    this.electionId,
+    this.categoryId,
     required this.encodeAsBytes,
   });
-
-  /// The constructor for the protected [CoseHeaders].
-  const CoseHeaders.protected({
-    this.alg,
-    this.kid,
-    this.contentType,
-    this.contentEncoding,
-    this.type,
-    this.id,
-    this.ver,
-    this.ref,
-    this.template,
-    this.reply,
-    this.section,
-    this.collabs,
-  }) : encodeAsBytes = true;
-
-  /// The constructor for the unprotected [CoseHeaders].
-  const CoseHeaders.unprotected({
-    this.alg,
-    this.kid,
-    this.contentType,
-    this.contentEncoding,
-    this.type,
-    this.id,
-    this.ver,
-    this.ref,
-    this.template,
-    this.reply,
-    this.section,
-    this.collabs,
-  }) : encodeAsBytes = false;
 
   /// Deserializes the type from cbor.
   factory CoseHeaders.fromCbor(CborValue value, {bool encodeAsBytes = true}) {
@@ -140,12 +128,128 @@ final class CoseHeaders extends Equatable {
       id: CborUtils.deserializeUuid(map[CoseHeaderKeys.id]),
       ver: CborUtils.deserializeUuid(map[CoseHeaderKeys.ver]),
       ref: CborUtils.deserializeReferenceUuid(map[CoseHeaderKeys.ref]),
+      refHash:
+          CborUtils.deserializeReferenceUuidHash(map[CoseHeaderKeys.refHash]),
       template:
           CborUtils.deserializeReferenceUuid(map[CoseHeaderKeys.template]),
       reply: CborUtils.deserializeReferenceUuid(map[CoseHeaderKeys.reply]),
       section: CborUtils.deserializeString(map[CoseHeaderKeys.section]),
       collabs: CborUtils.deserializeStringList(map[CoseHeaderKeys.collabs]),
+      brandId: CborUtils.deserializeReferenceUuid(map[CoseHeaderKeys.brandId]),
+      campaignId:
+          CborUtils.deserializeReferenceUuid(map[CoseHeaderKeys.campaignId]),
+      electionId: CborUtils.deserializeString(map[CoseHeaderKeys.electionId]),
+      categoryId:
+          CborUtils.deserializeReferenceUuid(map[CoseHeaderKeys.categoryId]),
       encodeAsBytes: encodeAsBytes,
+    );
+  }
+
+  /// The constructor for the protected [CoseHeaders].
+  const CoseHeaders.protected({
+    this.alg,
+    this.kid,
+    this.contentType,
+    this.contentEncoding,
+    this.type,
+    this.id,
+    this.ver,
+    this.ref,
+    this.refHash,
+    this.template,
+    this.reply,
+    this.section,
+    this.collabs,
+    this.brandId,
+    this.campaignId,
+    this.electionId,
+    this.categoryId,
+  }) : encodeAsBytes = true;
+
+  /// The constructor for the unprotected [CoseHeaders].
+  const CoseHeaders.unprotected({
+    this.alg,
+    this.kid,
+    this.contentType,
+    this.contentEncoding,
+    this.type,
+    this.id,
+    this.ver,
+    this.ref,
+    this.refHash,
+    this.template,
+    this.reply,
+    this.section,
+    this.collabs,
+    this.brandId,
+    this.campaignId,
+    this.electionId,
+    this.categoryId,
+  }) : encodeAsBytes = false;
+
+  @override
+  List<Object?> get props => [
+        alg,
+        kid,
+        contentType,
+        contentEncoding,
+        type,
+        id,
+        ver,
+        ref,
+        refHash,
+        template,
+        reply,
+        section,
+        collabs,
+        brandId,
+        campaignId,
+        electionId,
+        categoryId,
+        encodeAsBytes,
+      ];
+
+  /// Returns a copy of the [CoseHeaders] with overwritten properties.
+  CoseHeaders copyWith({
+    OptionalValueGetter<StringOrInt?>? alg,
+    OptionalValueGetter<Uint8List?>? kid,
+    OptionalValueGetter<StringOrInt?>? contentType,
+    OptionalValueGetter<StringOrInt?>? contentEncoding,
+    OptionalValueGetter<Uuid?>? type,
+    OptionalValueGetter<Uuid?>? id,
+    OptionalValueGetter<Uuid?>? ver,
+    OptionalValueGetter<ReferenceUuid?>? ref,
+    OptionalValueGetter<ReferenceUuidHash?>? refHash,
+    OptionalValueGetter<ReferenceUuid?>? template,
+    OptionalValueGetter<ReferenceUuid?>? reply,
+    OptionalValueGetter<String?>? section,
+    OptionalValueGetter<List<String>?>? collabs,
+    OptionalValueGetter<ReferenceUuid?>? brandId,
+    OptionalValueGetter<ReferenceUuid?>? campaignId,
+    OptionalValueGetter<String?>? electionId,
+    OptionalValueGetter<ReferenceUuid?>? categoryId,
+    bool? encodeAsBytes,
+  }) {
+    return CoseHeaders(
+      alg: alg != null ? alg() : this.alg,
+      kid: kid != null ? kid() : this.kid,
+      contentType: contentType != null ? contentType() : this.contentType,
+      contentEncoding:
+          contentEncoding != null ? contentEncoding() : this.contentEncoding,
+      type: type != null ? type() : this.type,
+      id: id != null ? id() : this.id,
+      ver: ver != null ? ver() : this.ver,
+      ref: ref != null ? ref() : this.ref,
+      refHash: refHash != null ? refHash() : this.refHash,
+      template: template != null ? template() : this.template,
+      reply: reply != null ? reply() : this.reply,
+      section: section != null ? section() : this.section,
+      collabs: collabs != null ? collabs() : this.collabs,
+      brandId: brandId != null ? brandId() : this.brandId,
+      campaignId: campaignId != null ? campaignId() : this.campaignId,
+      electionId: electionId != null ? electionId() : this.electionId,
+      categoryId: categoryId != null ? categoryId() : this.categoryId,
+      encodeAsBytes: encodeAsBytes ?? this.encodeAsBytes,
     );
   }
 
@@ -162,9 +266,15 @@ final class CoseHeaders extends Equatable {
       if (id != null) CoseHeaderKeys.id: id!.toCbor(),
       if (ver != null) CoseHeaderKeys.ver: ver!.toCbor(),
       if (ref != null) CoseHeaderKeys.ref: ref!.toCbor(),
+      if (refHash != null) CoseHeaderKeys.refHash: refHash!.toCbor(),
       if (template != null) CoseHeaderKeys.template: template!.toCbor(),
       if (reply != null) CoseHeaderKeys.reply: reply!.toCbor(),
       if (section != null) CoseHeaderKeys.section: CborString(section!),
+      if (brandId != null) CoseHeaderKeys.brandId: brandId!.toCbor(),
+      if (campaignId != null) CoseHeaderKeys.campaignId: campaignId!.toCbor(),
+      if (electionId != null)
+        CoseHeaderKeys.electionId: CborString(electionId!),
+      if (categoryId != null) CoseHeaderKeys.categoryId: categoryId!.toCbor(),
       if (collabs != null)
         CoseHeaderKeys.collabs: CborUtils.serializeStringList(collabs),
     });
@@ -175,55 +285,4 @@ final class CoseHeaders extends Equatable {
       return map;
     }
   }
-
-  /// Returns a copy of the [CoseHeaders] with overwritten properties.
-  CoseHeaders copyWith({
-    OptionalValueGetter<StringOrInt?>? alg,
-    OptionalValueGetter<Uint8List?>? kid,
-    OptionalValueGetter<StringOrInt?>? contentType,
-    OptionalValueGetter<StringOrInt?>? contentEncoding,
-    OptionalValueGetter<Uuid?>? type,
-    OptionalValueGetter<Uuid?>? id,
-    OptionalValueGetter<Uuid?>? ver,
-    OptionalValueGetter<ReferenceUuid?>? ref,
-    OptionalValueGetter<ReferenceUuid?>? template,
-    OptionalValueGetter<ReferenceUuid?>? reply,
-    OptionalValueGetter<String?>? section,
-    OptionalValueGetter<List<String>?>? collabs,
-    bool? encodeAsBytes,
-  }) {
-    return CoseHeaders(
-      alg: alg != null ? alg() : this.alg,
-      kid: kid != null ? kid() : this.kid,
-      contentType: contentType != null ? contentType() : this.contentType,
-      contentEncoding:
-          contentEncoding != null ? contentEncoding() : this.contentEncoding,
-      type: type != null ? type() : this.type,
-      id: id != null ? id() : this.id,
-      ver: ver != null ? ver() : this.ver,
-      ref: ref != null ? ref() : this.ref,
-      template: template != null ? template() : this.template,
-      reply: reply != null ? reply() : this.reply,
-      section: section != null ? section() : this.section,
-      collabs: collabs != null ? collabs() : this.collabs,
-      encodeAsBytes: encodeAsBytes ?? this.encodeAsBytes,
-    );
-  }
-
-  @override
-  List<Object?> get props => [
-        alg,
-        kid,
-        contentType,
-        contentEncoding,
-        type,
-        id,
-        ver,
-        ref,
-        template,
-        reply,
-        section,
-        collabs,
-        encodeAsBytes,
-      ];
 }
