@@ -3,7 +3,6 @@
 use std::sync::Arc;
 
 use cardano_blockchain_types::StakeAddress;
-use dashmap::DashMap;
 use futures::TryStreamExt;
 
 use super::{
@@ -111,8 +110,6 @@ pub(crate) async fn snapshot(
     } else {
         get_all_valid_registrations(&session, asat).await?
     };
-
-    let all_regs = all_regs.into_iter().flat_map(|(_, reg)| reg).collect();
 
     build_response(all_regs, page, limit, invalid)
 }
@@ -235,13 +232,12 @@ async fn get_invalid_registrations(
 /// Get all valid cip36 registrations.
 async fn get_all_valid_registrations(
     session: &CassandraSession, slot_no: SlotNo,
-) -> Result<DashMap<Ed25519HexEncodedPublicKey, Vec<Cip36Details>>, anyhow::Error> {
-    let mut registrations_iter =
+) -> Result<Vec<Cip36Details>, anyhow::Error> {
+    let regs_stream =
         GetAllRegistrationsQuery::execute(session, GetAllRegistrationsParams::new(slot_no)).await?;
 
-    let registrations_map: DashMap<Ed25519HexEncodedPublicKey, Vec<Cip36Details>> = DashMap::new();
-
-    while let Some(row) = registrations_iter.try_next().await? {
+    regs_stream.map_err(|e| -> anyhow::Error {e.into()}).try_fold(Vec::new(), |mut regs, row|
+    async move {
         let Ok(nonce) = u64::try_from(row.nonce) else {
             anyhow::bail!("Corrupt valid registration, cannot decode nonce");
         };
@@ -290,74 +286,54 @@ async fn get_all_valid_registrations(
             cip15: (!row.cip36).into(),
             errors: None,
         };
-
-        if let Some(mut v) = registrations_map.get_mut(&Ed25519HexEncodedPublicKey::try_from(
-            row.stake_public_key.clone(),
-        )?) {
-            v.push(cip36);
-            continue;
-        };
-
-        registrations_map.insert(
-            Ed25519HexEncodedPublicKey::try_from(row.stake_public_key)?,
-            vec![cip36],
-        );
-    }
-
-    Ok(registrations_map)
+        regs.push(cip36);
+        Ok(regs)
+    }).await
 }
 
 /// Get all invalid registrations
 async fn get_all_invalid_registrations(
     session: &CassandraSession, slot_no: SlotNo,
-) -> Result<DashMap<Ed25519HexEncodedPublicKey, Vec<Cip36Details>>, anyhow::Error> {
-    let invalids_map: DashMap<Ed25519HexEncodedPublicKey, Vec<Cip36Details>> = DashMap::new();
-
-    let mut invalid_regs_stream = GetAllInvalidRegistrationsQuery::execute(
+) -> Result<Vec<Cip36Details>, anyhow::Error> {
+    let invalid_regs_stream = GetAllInvalidRegistrationsQuery::execute(
         session,
         GetAllInvalidRegistrationsParams::new(slot_no),
     )
     .await?;
 
-    while let Some(row) = invalid_regs_stream.try_next().await? {
-        let Ok(slot_no) = u64::try_from(row.slot_no) else {
-            anyhow::bail!("Corrupt valid registration, cannot decode slot_no");
-        };
+    invalid_regs_stream
+        .map_err(|e| -> anyhow::Error { e.into() })
+        .try_fold(Vec::new(), |mut regs, row| {
+            async move {
+                let Ok(slot_no) = u64::try_from(row.slot_no) else {
+                    anyhow::bail!("Corrupt valid registration, cannot decode slot_no");
+                };
 
-        let slot_no = SlotNo::try_from(slot_no).unwrap_or_default();
+                let slot_no = SlotNo::try_from(slot_no).unwrap_or_default();
 
-        let payment_addr = Cip19ShelleyAddress::try_from(row.payment_address).ok();
+                let payment_addr = Cip19ShelleyAddress::try_from(row.payment_address).ok();
 
-        let vote_pub_key = Ed25519HexEncodedPublicKey::try_from(row.vote_key).ok();
+                let vote_pub_key = Ed25519HexEncodedPublicKey::try_from(row.vote_key).ok();
 
-        let stake_pub_key = Ed25519HexEncodedPublicKey::try_from(row.stake_public_key.clone()).ok();
+                let stake_pub_key =
+                    Ed25519HexEncodedPublicKey::try_from(row.stake_public_key.clone()).ok();
 
-        let invalid = Cip36Details {
-            slot_no,
-            stake_pub_key,
-            vote_pub_key,
-            nonce: None,
-            txn_index: None,
-            payment_address: payment_addr,
-            is_payable: row.is_payable.into(),
-            cip15: (!row.cip36).into(),
-            errors: Some(ErrorMessage::from(row.problem_report)),
-        };
-
-        if let Some(mut v) = invalids_map.get_mut(&Ed25519HexEncodedPublicKey::try_from(
-            row.stake_public_key.clone(),
-        )?) {
-            v.push(invalid);
-            continue;
-        };
-
-        invalids_map.insert(
-            Ed25519HexEncodedPublicKey::try_from(row.stake_public_key)?,
-            vec![invalid],
-        );
-    }
-
-    Ok(invalids_map)
+                let invalid = Cip36Details {
+                    slot_no,
+                    stake_pub_key,
+                    vote_pub_key,
+                    nonce: None,
+                    txn_index: None,
+                    payment_address: payment_addr,
+                    is_payable: row.is_payable.into(),
+                    cip15: (!row.cip36).into(),
+                    errors: Some(ErrorMessage::from(row.problem_report)),
+                };
+                regs.push(invalid);
+                Ok(regs)
+            }
+        })
+        .await
 }
 
 /// Build a final response which will contain all found registrations,
