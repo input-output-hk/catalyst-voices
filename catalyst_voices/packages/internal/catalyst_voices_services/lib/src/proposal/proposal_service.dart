@@ -196,6 +196,8 @@ final class ProposalServiceImpl implements ProposalService {
     final catalystId = CatalystId(
       host: CatalystIdHost.cardano.host,
       role0Key: role0KeyPair.publicKey,
+      role: AccountRole.proposer,
+      rotation: 0,
     );
 
     final keyPair = await _keyDerivationService.deriveAccountRoleKeyPair(
