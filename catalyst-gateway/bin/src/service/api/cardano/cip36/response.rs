@@ -8,7 +8,7 @@ use poem_openapi::{
     ApiResponse, NewType, Object,
 };
 
-use crate::service::{common, common::types::array_types::impl_array_types};
+use crate::service::common::{self, types::array_types::impl_array_types};
 
 // ToDo: The examples of this response should be taken from representative data from a
 // response generated on pre-prod.
@@ -142,10 +142,10 @@ pub(crate) struct Cip36Details {
     pub payment_address: Option<common::types::cardano::cip19_shelley_address::Cip19ShelleyAddress>,
     /// If the payment address is a script, then it can not be payed rewards.
     #[oai(default)]
-    pub is_payable: common::types::cardano::boolean::IsPayable,
+    pub is_payable: common::types::generic::boolean::BooleanFlag,
     /// If this field is set, then the registration was in CIP15 format.
     #[oai(default)]
-    pub cip15: common::types::cardano::boolean::IsCip15,
+    pub cip15: common::types::generic::boolean::BooleanFlag,
     /// If there are errors with this registration, they are listed here.
     /// This field is *NEVER* returned for a valid registration.
     #[oai(skip_serializing_if_is_none)]
