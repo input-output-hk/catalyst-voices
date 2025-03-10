@@ -1,29 +1,20 @@
 import 'dart:convert';
 
 import 'package:catalyst_compression/catalyst_compression.dart';
-import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/signed_document/signed_document_manager.dart';
-import 'package:convert/convert.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group(SignedDocumentManager, () {
-    const documentManager = SignedDocumentManager();
+    final documentManager = SignedDocumentManager(
+      keyFactory: _FakeCatalystKeyFactory(),
+    );
 
     setUpAll(() {
       CatalystCompressionPlatform.instance = _FakeCatalystCompressionPlatform();
-
-      Bip32Ed25519XPublicKeyFactory.instance =
-          _FakeBip32Ed25519XPublicKeyFactory();
-
-      Bip32Ed25519XPrivateKeyFactory.instance =
-          _FakeBip32Ed25519XPrivateKeyFactory();
-
-      Bip32Ed25519XSignatureFactory.instance =
-          _FakeBip32Ed25519XSignatureFactory();
     });
 
     test(
@@ -59,81 +50,79 @@ const _metadata = SignedDocumentMetadata(
   documentType: DocumentType.proposalDocument,
 );
 
-final _privateKey = Uint8List.fromList(List.filled(32, 0));
-final _publicKey = Uint8List.fromList(List.filled(32, 1));
-final _signature = Uint8List.fromList(List.filled(32, 2));
-
-class _FakeBip32Ed22519XPrivateKey extends Fake
-    implements Bip32Ed25519XPrivateKey {
-  @override
-  final List<int> bytes;
-
-  _FakeBip32Ed22519XPrivateKey({required this.bytes});
-
-  @override
-  Future<Bip32Ed25519XSignature> sign(List<int> message) async {
-    return _FakeBip32Ed22519XSignature(bytes: _signature);
-  }
-
-  @override
-  String toHex() => hex.encode(bytes);
-}
-
-class _FakeBip32Ed22519XPublicKey extends Fake
-    implements Bip32Ed25519XPublicKey {
-  @override
-  final List<int> bytes;
-
-  _FakeBip32Ed22519XPublicKey({required this.bytes});
-
-  @override
-  String toHex() => hex.encode(bytes);
-
-  @override
-  Future<bool> verify(
-    List<int> message, {
-    required Bip32Ed25519XSignature signature,
-  }) async {
-    return listEquals(signature.bytes, _signature);
-  }
-}
-
-class _FakeBip32Ed22519XSignature extends Fake
-    implements Bip32Ed25519XSignature {
-  @override
-  final List<int> bytes;
-
-  _FakeBip32Ed22519XSignature({required this.bytes});
-
-  @override
-  String toHex() => hex.encode(bytes);
-}
-
-class _FakeBip32Ed25519XPrivateKeyFactory
-    extends Bip32Ed25519XPrivateKeyFactory {
-  @override
-  Bip32Ed25519XPrivateKey fromBytes(List<int> bytes) {
-    return _FakeBip32Ed22519XPrivateKey(bytes: bytes);
-  }
-}
-
-class _FakeBip32Ed25519XPublicKeyFactory extends Bip32Ed25519XPublicKeyFactory {
-  @override
-  Bip32Ed25519XPublicKey fromBytes(List<int> bytes) {
-    return _FakeBip32Ed22519XPublicKey(bytes: bytes);
-  }
-}
-
-class _FakeBip32Ed25519XSignatureFactory extends Bip32Ed25519XSignatureFactory {
-  @override
-  Bip32Ed25519XSignature fromBytes(List<int> bytes) {
-    return _FakeBip32Ed22519XSignature(bytes: bytes);
-  }
-}
+final _privateKey = _FakeCatalystPrivateKey(bytes: _privateKeyBytes);
+final _privateKeyBytes = Uint8List.fromList(List.filled(32, 0));
+final _publicKey = _FakeCatalystPublicKey(bytes: _publicKeyBytes);
+final _publicKeyBytes = Uint8List.fromList(List.filled(32, 1));
+final _signature = _FakeCatalystSignature(bytes: _signatureBytes);
+final _signatureBytes = Uint8List.fromList(List.filled(32, 2));
 
 class _FakeCatalystCompressionPlatform extends CatalystCompressionPlatform {
   @override
   CatalystCompressor get brotli => const _FakeCompressor();
+}
+
+class _FakeCatalystKeyFactory extends Fake implements CatalystKeyFactory {
+  @override
+  CatalystPrivateKey createPrivateKey(Uint8List bytes) {
+    return _FakeCatalystPrivateKey(bytes: bytes);
+  }
+
+  @override
+  CatalystPublicKey createPublicKey(Uint8List bytes) {
+    return _FakeCatalystPublicKey(bytes: bytes);
+  }
+
+  @override
+  CatalystSignature createSignature(Uint8List bytes) {
+    return _FakeCatalystSignature(bytes: bytes);
+  }
+}
+
+class _FakeCatalystPrivateKey extends Fake implements CatalystPrivateKey {
+  @override
+  final Uint8List bytes;
+
+  _FakeCatalystPrivateKey({required this.bytes});
+
+  @override
+  Future<CatalystPrivateKey> derivePrivateKey({
+    required String path,
+  }) async {
+    return _FakeCatalystPrivateKey(bytes: Uint8List.fromList(path.codeUnits));
+  }
+
+  @override
+  Future<CatalystPublicKey> derivePublicKey() async {
+    return _FakeCatalystPublicKey(bytes: bytes);
+  }
+
+  @override
+  Future<CatalystSignature> sign(Uint8List data) async {
+    return _signature;
+  }
+}
+
+class _FakeCatalystPublicKey extends Fake implements CatalystPublicKey {
+  @override
+  final Uint8List bytes;
+
+  _FakeCatalystPublicKey({required this.bytes});
+
+  @override
+  Future<bool> verify(
+    Uint8List data, {
+    required CatalystSignature signature,
+  }) async {
+    return listEquals(signature.bytes, _signatureBytes);
+  }
+}
+
+class _FakeCatalystSignature extends Fake implements CatalystSignature {
+  @override
+  final Uint8List bytes;
+
+  _FakeCatalystSignature({required this.bytes});
 }
 
 final class _FakeCompressor implements CatalystCompressor {

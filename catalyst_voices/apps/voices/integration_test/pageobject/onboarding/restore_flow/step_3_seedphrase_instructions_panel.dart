@@ -12,7 +12,6 @@ class SeedPhraseInstructionsPanel extends OnboardingPageBase {
       const Key('SeedPhraseInstructionsTitle');
   final seedPhraseInstructionsSubtitleKey =
       const Key('SeedPhraseInstructionsSubtitleKey');
-  final keychainNotFoundKey = const Key('KeychainNotFoundMessage');
 
   @override
   Future<void> goto() async {
@@ -20,8 +19,15 @@ class SeedPhraseInstructionsPanel extends OnboardingPageBase {
     await RestoreKeychainChoicePanel($).clickRestoreSeedPhrase();
   }
 
+  Future<void> clickNext() async {
+    await $(nextButton).tap();
+  }
+
   @override
-  Future<void> verifyPageElements() async {}
+  Future<void> verifyPageElements() async {
+    await verifyInfoPanel();
+    await verifyDetailsPanel();
+  }
 
   Future<void> verifyInfoPanel() async {
     expect(
@@ -35,5 +41,18 @@ class SeedPhraseInstructionsPanel extends OnboardingPageBase {
     );
   }
 
-  Future<void> verifyDetailsPanel() async {}
+  Future<void> verifyDetailsPanel() async {
+    expect(
+      $(seedPhraseInstructionsTitleKey).text,
+      T.get('Restore your Catalyst Keychain with \n'
+          'your 12-word Catalyst seed phrase'),
+    );
+    expect(
+      $(seedPhraseInstructionsSubtitleKey).text,
+      T.get('Enter your security words in the correct order,'
+          ' and sign into your Catalyst account on a new device.'),
+    );
+    expect($(backButton), findsOneWidget);
+    expect($(nextButton), findsOneWidget);
+  }
 }

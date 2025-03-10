@@ -2,6 +2,7 @@
 
 import 'dart:typed_data';
 
+import 'package:catalyst_voices_models/src/crypto/catalyst_public_key.dart';
 import 'package:catalyst_voices_models/src/document/data/document_type.dart';
 import 'package:catalyst_voices_models/src/document/document_ref.dart';
 import 'package:equatable/equatable.dart';
@@ -26,7 +27,7 @@ abstract interface class SignedDocument<T extends SignedDocumentPayload> {
 
   /// Verifies if the [payload] has been signed by a private key
   /// that belongs to the given [publicKey].
-  Future<bool> verifySignature(Uint8List publicKey);
+  Future<bool> verifySignature(CatalystPublicKey publicKey);
 }
 
 /// Defines the content type of the [SignedDocumentPayload].

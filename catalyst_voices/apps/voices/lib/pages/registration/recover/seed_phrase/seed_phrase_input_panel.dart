@@ -47,8 +47,14 @@ class _SeedPhraseInputPanelState extends State<SeedPhraseInputPanel> {
       children: [
         const SizedBox(height: 24),
         RegistrationStageMessage(
-          title: Text(context.l10n.recoverySeedPhraseInputTitle),
-          subtitle: Text(context.l10n.recoverySeedPhraseInputSubtitle),
+          title: Text(
+            context.l10n.recoverySeedPhraseInputTitle,
+            key: const Key('RecoverySeedPhraseInputTitle'),
+          ),
+          subtitle: Text(
+            context.l10n.recoverySeedPhraseInputSubtitle,
+            key: const Key('RecoverySeedPhraseInputSubtitle'),
+          ),
           spacing: 12,
         ),
         const SizedBox(height: 12),
