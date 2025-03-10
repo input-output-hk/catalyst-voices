@@ -4,16 +4,12 @@ use std::sync::Arc;
 
 use cardano_blockchain_types::{MultiEraBlock, Slot, StakeAddress, TxnIndex, VKeyHash};
 use pallas::ledger::primitives::{alonzo, conway};
-use scylla::Session;
 use tracing::error;
 
 use super::stake_reg::StakeRegistrationInsertQuery;
-use crate::{
-    db::index::{
-        queries::{FallibleQueryTasks, PreparedQuery, SizedBatch},
-        session::CassandraSession,
-    },
-    settings::cassandra_db,
+use crate::db::index::{
+    queries::{FallibleQueryTasks, PreparedQuery},
+    session::CassandraSession,
 };
 
 /// Insert Cert Queries
@@ -28,15 +24,6 @@ impl CertInsertQuery {
         CertInsertQuery {
             stake_reg_data: Vec::new(),
         }
-    }
-
-    /// Prepare Batch of Insert TXI Index Data Queries
-    pub(crate) async fn prepare_batch(
-        session: &Arc<Session>, cfg: &cassandra_db::EnvVars,
-    ) -> anyhow::Result<SizedBatch> {
-        // Note: for now we have one query, but there are many certs, and later we may have more
-        // to add here.
-        StakeRegistrationInsertQuery::prepare_batch(session, cfg).await
     }
 
     /// Get the stake address for a hash, return an empty address if one can not be found.

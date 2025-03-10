@@ -7,51 +7,34 @@ pub(crate) mod insert_cip36_invalid;
 use std::sync::Arc;
 
 use cardano_blockchain_types::{Cip36, MultiEraBlock, Slot, TxnIndex};
-use scylla::Session;
 
-use crate::{
-    db::index::{
-        queries::{FallibleQueryTasks, PreparedQuery, SizedBatch},
-        session::CassandraSession,
-    },
-    settings::cassandra_db,
+use super::stake_reg;
+use crate::db::index::{
+    queries::{FallibleQueryTasks, PreparedQuery},
+    session::CassandraSession,
 };
 
 /// Insert CIP-36 Registration Queries
 pub(crate) struct Cip36InsertQuery {
     /// Stake Registration Data captured during indexing.
-    registrations: Vec<insert_cip36::Params>,
+    valid_regs: Vec<insert_cip36::Params>,
     /// Stake Registration Data captured during indexing.
-    invalid: Vec<insert_cip36_invalid::Params>,
+    invalid_regs: Vec<insert_cip36_invalid::Params>,
     /// Stake Registration Data captured during indexing.
     for_vote_key: Vec<insert_cip36_for_vote_key::Params>,
+    /// Stake Registration Data captured during indexing.
+    stake_regs: Vec<stake_reg::StakeRegistrationInsertQuery>,
 }
 
 impl Cip36InsertQuery {
     /// Create new data set for CIP-36 Registrations Insert Query Batch.
     pub(crate) fn new() -> Self {
         Cip36InsertQuery {
-            registrations: Vec::new(),
-            invalid: Vec::new(),
+            valid_regs: Vec::new(),
+            invalid_regs: Vec::new(),
             for_vote_key: Vec::new(),
+            stake_regs: Vec::new(),
         }
-    }
-
-    /// Prepare Batch of Insert Cip36 Registration Data Queries
-    pub(crate) async fn prepare_batch(
-        session: &Arc<Session>, cfg: &cassandra_db::EnvVars,
-    ) -> anyhow::Result<(SizedBatch, SizedBatch, SizedBatch)> {
-        let insert_cip36_batch = insert_cip36::Params::prepare_batch(session, cfg).await;
-        let insert_cip36_invalid_batch =
-            insert_cip36_invalid::Params::prepare_batch(session, cfg).await;
-        let insert_cip36_for_vote_key_addr_batch =
-            insert_cip36_for_vote_key::Params::prepare_batch(session, cfg).await;
-
-        Ok((
-            insert_cip36_batch?,
-            insert_cip36_invalid_batch?,
-            insert_cip36_for_vote_key_addr_batch?,
-        ))
     }
 
     /// Index the CIP-36 registrations in a transaction.
@@ -63,7 +46,7 @@ impl Cip36InsertQuery {
             Ok(Some(cip36)) if cip36.is_valid() => {
                 // This should always pass, because we already checked if the array has only one
                 if let Some(voting_key) = cip36.voting_pks().first() {
-                    self.registrations.push(insert_cip36::Params::new(
+                    self.valid_regs.push(insert_cip36::Params::new(
                         voting_key, slot_no, index, &cip36,
                     ));
 
@@ -78,12 +61,12 @@ impl Cip36InsertQuery {
                 // Cannot index an invalid CIP36, if there is no stake public key.
                 if cip36.stake_pk().is_some() {
                     if cip36.voting_pks().is_empty() {
-                        self.invalid.push(insert_cip36_invalid::Params::new(
+                        self.invalid_regs.push(insert_cip36_invalid::Params::new(
                             None, slot_no, index, &cip36,
                         ));
                     } else {
                         for voting_key in cip36.voting_pks() {
-                            self.invalid.push(insert_cip36_invalid::Params::new(
+                            self.invalid_regs.push(insert_cip36_invalid::Params::new(
                                 Some(voting_key),
                                 slot_no,
                                 index,
@@ -107,25 +90,22 @@ impl Cip36InsertQuery {
     pub(crate) fn execute(self, session: &Arc<CassandraSession>) -> FallibleQueryTasks {
         let mut query_handles: FallibleQueryTasks = Vec::new();
 
-        if !self.registrations.is_empty() {
+        if !self.valid_regs.is_empty() {
             let inner_session = session.clone();
             query_handles.push(tokio::spawn(async move {
                 inner_session
-                    .execute_batch(
-                        PreparedQuery::Cip36RegistrationInsertQuery,
-                        self.registrations,
-                    )
+                    .execute_batch(PreparedQuery::Cip36RegistrationInsertQuery, self.valid_regs)
                     .await
             }));
         }
 
-        if !self.invalid.is_empty() {
+        if !self.invalid_regs.is_empty() {
             let inner_session = session.clone();
             query_handles.push(tokio::spawn(async move {
                 inner_session
                     .execute_batch(
                         PreparedQuery::Cip36RegistrationInsertErrorQuery,
-                        self.invalid,
+                        self.invalid_regs,
                     )
                     .await
             }));
@@ -139,6 +119,14 @@ impl Cip36InsertQuery {
                         PreparedQuery::Cip36RegistrationForStakeAddrInsertQuery,
                         self.for_vote_key,
                     )
+                    .await
+            }));
+        }
+        if !self.stake_regs.is_empty() {
+            let inner_session = session.clone();
+            query_handles.push(tokio::spawn(async move {
+                inner_session
+                    .execute_batch(PreparedQuery::StakeRegistrationInsertQuery, self.stake_regs)
                     .await
             }));
         }
@@ -157,8 +145,8 @@ mod tests {
         let block = test_utils::block_2();
         let mut query = Cip36InsertQuery::new();
         query.index(0.into(), 0.into(), &block);
-        assert_eq!(1, query.registrations.len());
-        assert!(query.invalid.is_empty());
+        assert_eq!(1, query.valid_regs.len());
+        assert!(query.invalid_regs.is_empty());
         assert_eq!(1, query.for_vote_key.len());
     }
 }
