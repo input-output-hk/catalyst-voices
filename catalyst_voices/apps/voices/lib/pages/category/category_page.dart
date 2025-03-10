@@ -11,6 +11,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
+typedef _StateData = ({bool show, CampaignCategoryDetailsViewModel data});
+
+typedef _StateError = ({bool show, LocalizedException? error});
+
 class CategoryPage extends StatefulWidget {
   final String categoryId;
 
@@ -20,115 +24,8 @@ class CategoryPage extends StatefulWidget {
   State<CategoryPage> createState() => _CategoryPageState();
 }
 
-class _CategoryPageState extends State<CategoryPage> {
-  @override
-  void initState() {
-    super.initState();
-    unawaited(context.read<CategoryDetailCubit>().getCategories());
-    unawaited(
-      context.read<CategoryDetailCubit>().getCategoryDetail(widget.categoryId),
-    );
-  }
-
-  @override
-  void didUpdateWidget(CategoryPage oldWidget) {
-    super.didUpdateWidget(oldWidget);
-
-    if (widget.categoryId != oldWidget.categoryId) {
-      unawaited(
-        context
-            .read<CategoryDetailCubit>()
-            .getCategoryDetail(widget.categoryId),
-      );
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: ResponsivePadding(
-        xs: const EdgeInsets.symmetric(horizontal: 12),
-        sm: const EdgeInsets.symmetric(horizontal: 20),
-        md: const EdgeInsets.symmetric(horizontal: 120),
-        lg: const EdgeInsets.symmetric(horizontal: 120),
-        other: const EdgeInsets.symmetric(horizontal: 120),
-        child: Stack(
-          children: [
-            const _CategoryDetailLoadingOrDataSelector(),
-            _CategoryDetailErrorSelector(
-              categoryId: widget.categoryId,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-typedef _StateData = ({bool show, CampaignCategoryViewModel data});
-
-class _CategoryDetailLoadingOrDataSelector extends StatelessWidget {
-  const _CategoryDetailLoadingOrDataSelector();
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocSelector<CategoryDetailCubit, CategoryDetailState, _StateData>(
-      selector: (state) {
-        return (
-          show: state.isLoading || state.error != null,
-          data: state.category ?? CampaignCategoryViewModel.dummy()
-        );
-      },
-      builder: (context, state) {
-        return _Body(
-          category: CampaignCategoryViewModel.dummy(),
-          isLoading: state.show,
-        );
-      },
-    );
-  }
-}
-
-typedef _StateError = ({bool show, LocalizedException? error});
-
-class _CategoryDetailErrorSelector extends StatelessWidget {
-  final String categoryId;
-  const _CategoryDetailErrorSelector({required this.categoryId});
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocSelector<CategoryDetailCubit, CategoryDetailState, _StateError>(
-      selector: (state) {
-        return (
-          show: state.isLoading == false && state.error != null,
-          error: state.error,
-        );
-      },
-      builder: (context, state) {
-        final error = state.error ?? const LocalizedUnknownException();
-        return Offstage(
-          offstage: !state.show,
-          child: Padding(
-            padding: const EdgeInsets.only(top: 60),
-            child: Center(
-              child: VoicesErrorIndicator(
-                message: error.message(context),
-                onRetry: () async {
-                  await context
-                      .read<CategoryDetailCubit>()
-                      .getCategoryDetail(categoryId);
-                },
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
-}
-
 class _Body extends StatelessWidget {
-  final CampaignCategoryViewModel category;
+  final CampaignCategoryDetailsViewModel category;
   final bool isLoading;
   const _Body({
     required this.category,
@@ -159,7 +56,7 @@ class _Body extends StatelessWidget {
 }
 
 class _CardInformation extends StatelessWidget {
-  final CampaignCategoryViewModel category;
+  final CampaignCategoryDetailsViewModel category;
   const _CardInformation({
     required this.category,
   });
@@ -197,5 +94,104 @@ class _CardInformation extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+class _CategoryDetailErrorSelector extends StatelessWidget {
+  final String categoryId;
+  const _CategoryDetailErrorSelector({required this.categoryId});
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocSelector<CategoryDetailCubit, CategoryDetailState, _StateError>(
+      selector: (state) {
+        return (
+          show: state.isLoading == false && state.error != null,
+          error: state.error,
+        );
+      },
+      builder: (context, state) {
+        final error = state.error ?? const LocalizedUnknownException();
+        return Offstage(
+          offstage: !state.show,
+          child: Padding(
+            padding: const EdgeInsets.only(top: 60),
+            child: Center(
+              child: VoicesErrorIndicator(
+                message: error.message(context),
+                onRetry: error is LocalizedNotFoundException
+                    ? null
+                    : () async {
+                        context
+                            .read<CategoryDetailCubit>()
+                            .getCategoryDetail(categoryId);
+                      },
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _CategoryDetailLoadingOrDataSelector extends StatelessWidget {
+  const _CategoryDetailLoadingOrDataSelector();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocSelector<CategoryDetailCubit, CategoryDetailState, _StateData>(
+      selector: (state) {
+        return (
+          show: state.isLoading,
+          data: state.category ?? CampaignCategoryDetailsViewModel.dummy()
+        );
+      },
+      builder: (context, state) {
+        return _Body(
+          category: state.data,
+          isLoading: state.show,
+        );
+      },
+    );
+  }
+}
+
+class _CategoryPageState extends State<CategoryPage> {
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      child: ResponsivePadding(
+        xs: const EdgeInsets.symmetric(horizontal: 12),
+        sm: const EdgeInsets.symmetric(horizontal: 20),
+        md: const EdgeInsets.symmetric(horizontal: 120),
+        lg: const EdgeInsets.symmetric(horizontal: 120),
+        other: const EdgeInsets.symmetric(horizontal: 120),
+        child: Stack(
+          children: [
+            const _CategoryDetailLoadingOrDataSelector(),
+            _CategoryDetailErrorSelector(
+              categoryId: widget.categoryId,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  @override
+  void didUpdateWidget(CategoryPage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (widget.categoryId != oldWidget.categoryId) {
+      context.read<CategoryDetailCubit>().getCategoryDetail(widget.categoryId);
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    unawaited(context.read<CategoryDetailCubit>().getCategories());
+    context.read<CategoryDetailCubit>().getCategoryDetail(widget.categoryId);
   }
 }

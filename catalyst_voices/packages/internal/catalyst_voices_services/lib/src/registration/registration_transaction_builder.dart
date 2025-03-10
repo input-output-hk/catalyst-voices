@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:catalyst_voices_services/src/crypto/key_derivation_service.dart';
 
 /// The transaction metadata used for registration.
 typedef RegistrationMetadata = X509MetadataEnvelope<RegistrationData>;
@@ -19,10 +19,10 @@ final class RegistrationTransactionBuilder {
   final TransactionBuilderConfig transactionConfig;
 
   /// The algorithm for deriving keys.
-  final KeyDerivation keyDerivation;
+  final KeyDerivationService keyDerivationService;
 
   /// The master key derived from the seed phrase.
-  final Bip32Ed25519XPrivateKey masterKey;
+  final CatalystPrivateKey masterKey;
 
   /// The network ID where the transaction will be submitted.
   final NetworkId networkId;
@@ -42,16 +42,21 @@ final class RegistrationTransactionBuilder {
   /// The UTXOs that will be used as inputs for the transaction.
   final Set<TransactionUnspentOutput> utxos;
 
-  const RegistrationTransactionBuilder({
+  RegistrationTransactionBuilder({
     required this.transactionConfig,
-    required this.keyDerivation,
+    required this.keyDerivationService,
     required this.masterKey,
     required this.networkId,
     required this.roles,
     required this.changeAddress,
     required this.rewardAddresses,
     required this.utxos,
-  });
+  }) : assert(
+          masterKey.algorithm == CatalystSignatureAlgorithm.ed25519,
+          'RegistrationTransaction requires Ed25519 signatures',
+        );
+
+  ShelleyAddress get _stakeAddress => rewardAddresses.first;
 
   /// Builds the unsigned registration transaction.
   ///
@@ -72,7 +77,7 @@ final class RegistrationTransactionBuilder {
   }
 
   Future<RegistrationMetadata> _buildMetadataEnvelope() async {
-    final rootKeyPair = await keyDerivation.deriveAccountRoleKeyPair(
+    final rootKeyPair = await keyDerivationService.deriveAccountRoleKeyPair(
       masterKey: masterKey,
       role: AccountRole.root,
     );
@@ -83,7 +88,7 @@ final class RegistrationTransactionBuilder {
     };
 
     final publicKeys = {
-      AccountRole.root: rootKeyPair.publicKey.toPublicKey(),
+      AccountRole.root: rootKeyPair.publicKey.toEd25519(),
       if (roles.contains(AccountRole.proposer))
         AccountRole.proposer: await _deriveProposerPublicKey(),
     };
@@ -121,7 +126,9 @@ final class RegistrationTransactionBuilder {
     );
 
     return x509Envelope.sign(
-      privateKey: rootKeyPair.privateKey,
+      privateKey: Bip32Ed25519XPrivateKeyFactory.instance.fromBytes(
+        rootKeyPair.privateKey.bytes,
+      ),
       serializer: (e) => e.toCbor(),
     );
   }
@@ -152,8 +159,17 @@ final class RegistrationTransactionBuilder {
     );
   }
 
+  Future<Ed25519PublicKey> _deriveProposerPublicKey() async {
+    final keyPair = await keyDerivationService.deriveAccountRoleKeyPair(
+      masterKey: masterKey,
+      role: AccountRole.proposer,
+    );
+
+    return keyPair.publicKey.toEd25519();
+  }
+
   Future<X509Certificate> _generateX509Certificate({
-    required Bip32Ed25519XKeyPair keyPair,
+    required CatalystKeyPair keyPair,
   }) async {
     // TODO(dtscalac): once serial number generation is defined come up with
     // a better solution than assigning a random number
@@ -175,7 +191,9 @@ final class RegistrationTransactionBuilder {
 
     final tbs = X509TBSCertificate(
       serialNumber: Random().nextInt(maxInt),
-      subjectPublicKey: keyPair.publicKey,
+      subjectPublicKey: Bip32Ed25519XPublicKeyFactory.instance.fromBytes(
+        keyPair.publicKey.bytes,
+      ),
       issuer: issuer,
       validityNotBefore: DateTime.now().toUtc(),
       validityNotAfter: X509TBSCertificate.foreverValid,
@@ -193,18 +211,17 @@ final class RegistrationTransactionBuilder {
 
     return X509Certificate.generateSelfSigned(
       tbsCertificate: tbs,
-      privateKey: keyPair.privateKey,
+      privateKey: Bip32Ed25519XPrivateKeyFactory.instance.fromBytes(
+        keyPair.privateKey.bytes,
+      ),
     );
   }
+}
 
-  Future<Ed25519PublicKey> _deriveProposerPublicKey() async {
-    final keyPair = await keyDerivation.deriveAccountRoleKeyPair(
-      masterKey: masterKey,
-      role: AccountRole.proposer,
-    );
-
-    return keyPair.publicKey.toPublicKey();
+extension on CatalystPublicKey {
+  Ed25519PublicKey toEd25519() {
+    return Bip32Ed25519XPublicKeyFactory.instance
+        .fromBytes(bytes)
+        .toPublicKey();
   }
-
-  ShelleyAddress get _stakeAddress => rewardAddresses.first;
 }

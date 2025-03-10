@@ -4,7 +4,6 @@ import 'dart:async';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
-import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:uuid/uuid.dart';
@@ -14,7 +13,7 @@ void main() {
   late MockProposalRepository mockProposalRepository;
   late MockSignedDocumentManager mockSignedDocumentManager;
   late MockUserService mockUserService;
-  late MockKeyDerivation mockKeyDerivation;
+  late MockKeyDerivationService mockKeyDerivationService;
 
   late ProposalService proposalService;
 
@@ -22,7 +21,7 @@ void main() {
     mockDocumentRepository = MockDocumentRepository();
     mockProposalRepository = MockProposalRepository();
     mockSignedDocumentManager = MockSignedDocumentManager();
-    mockKeyDerivation = MockKeyDerivation();
+    mockKeyDerivationService = MockKeyDerivationService();
     mockUserService = MockUserService();
 
     proposalService = ProposalService(
@@ -30,7 +29,7 @@ void main() {
       mockDocumentRepository,
       mockSignedDocumentManager,
       mockUserService,
-      mockKeyDerivation,
+      mockKeyDerivationService,
     );
 
     registerFallbackValue(const SignedDocumentRef(id: 'fallback-id'));
@@ -224,7 +223,7 @@ void main() {
 
 class MockDocumentRepository extends Mock implements DocumentRepository {}
 
-class MockKeyDerivation extends Mock implements KeyDerivation {}
+class MockKeyDerivationService extends Mock implements KeyDerivationService {}
 
 class MockProposalRepository extends Mock implements ProposalRepository {}
 

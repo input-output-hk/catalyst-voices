@@ -5,7 +5,6 @@ export 'codecs/codecs.dart';
 export 'common/build_config.dart';
 export 'common/build_environment.dart';
 export 'crypto/crypto_service.dart';
-export 'crypto/key_derivation.dart';
 export 'crypto/local_crypto_service.dart';
 export 'dependency/dependency_provider.dart';
 export 'document/extension/document_list_sort_ext.dart';

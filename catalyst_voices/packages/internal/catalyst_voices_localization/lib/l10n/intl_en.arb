@@ -992,9 +992,9 @@
   "recoverKeychainNonFound": "No Catalyst Keychain found\u2028on this device.",
   "recoverKeychainFound": "Keychain found!  \u2028Please unlock your device.",
   "recoverWithSeedPhrase12Words": "Restore/Upload with 12-word seed phrase",
-  "recoverySeedPhraseInstructionsTitle": "Restore your Catalyst Keychain with \u2028your 12-word Catalyst seed phrase",
+  "recoverySeedPhraseInstructionsTitle": "Restore your Catalyst Keychain with \nyour 12-word Catalyst seed phrase",
   "recoverySeedPhraseInstructionsSubtitle": "Enter your security words in the correct order, and sign into your Catalyst account on a new device.",
-  "recoverySeedPhraseInputTitle": "Restore your Catalyst Keychain with \u2028your 12-word Catalyst seed phrase",
+  "recoverySeedPhraseInputTitle": "Restore your Catalyst Keychain with \nyour 12-word Catalyst seed phrase",
   "recoverySeedPhraseInputSubtitle": "Enter each word of your Catalyst seed phrase in the right order to bring your Catalyst account to this device.",
   "recoveryAccountTitle": "Catalyst account recovery",
   "recoveryAccountSuccessTitle": "Keychain recovered successfully!",
@@ -1042,7 +1042,7 @@
   "@lockSnackbarMessage": {
     "description": "The message shown below the title in confirmation snackbar after locking the keychain."
   },
-  "recoverySuccessTitle": "Congratulations your Catalyst \u2028Keychain is restored!",
+  "recoverySuccessTitle": "Congratulations your Catalyst \nKeychain is restored!",
   "recoverySuccessSubtitle": "You have successfully restored your Catalyst Keychain, and unlocked Catalyst Voices on this device.",
   "recoverySuccessGoToDashboard": "Jump into the Discovery space / Dashboard",
   "recoverySuccessGoAccount": "Check my account",
@@ -1838,6 +1838,10 @@
         "type": "int"
       }
     }
+  },
+  "notFoundError": "The requested data could not be found. Try different search.",
+  "@notFoundError": {
+    "description": "Error message when user tries to access resourse that does not exist."
   },
   "title": "Title",
   "@title": {

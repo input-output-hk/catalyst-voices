@@ -1,3 +1,4 @@
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -15,7 +16,8 @@ class RestoreKeychainChoicePanel extends OnboardingPageBase {
       const Key('RecoverKeychainMethodsSubtitle');
   final recoverKeychainMethodsListTitleKey =
       const Key('RecoverKeychainMethodsListTitle');
-  final registrationTileKey = const Key('RegistrationRecoverMethod.seedPhrase');
+  final registrationTileKey =
+      const ValueKey(RegistrationRecoverMethod.seedPhrase);
 
   @override
   Future<void> goto() async {
@@ -24,7 +26,7 @@ class RestoreKeychainChoicePanel extends OnboardingPageBase {
   }
 
   Future<void> clickRestoreSeedPhrase() async {
-    await $(registrationTileKey).$(registrationTileTitle).tap();
+    await $(registrationTileKey).tap();
   }
 
   @override
