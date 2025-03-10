@@ -16,8 +16,12 @@ class DiscoveryPage {
     await AppBarPage($).looksAsExpectedForVisitor();
     await CampaignHeroSection($).looksAsExpectedForVisitor();
     await HowItWorksSection($).looksAsExpectedForVisitor();
-    await CurrentCampaignSelector($).looksAsExpectedForVisitor();
+    await CurrentCampaignSection($).looksAsExpectedForVisitor();
     await CampaignCategoriesSection($).looksAsExpectedForVisitor();
     await MostRecentSection($).looksAsExpectedForVisitor();
+  }
+
+  Future<void> viewProposalsBtnClick() async {
+    await $(CampaignHeroSection($).viewProposalsButton).tap();
   }
 }
