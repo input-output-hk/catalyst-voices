@@ -47,6 +47,7 @@ class CurrentCampaign extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.only(top: 32, bottom: 100),
           child: CampaignTimeline(
+            key: const Key('CampaignTimeline'),
             timelineItems: currentCampaignInfo.timeline,
             placement: CampaignTimelinePlacement.discovery,
             horizontalPadding: const SizedBox(width: 120),

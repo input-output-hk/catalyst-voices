@@ -120,6 +120,7 @@ class CampaignTimelineCardState extends State<CampaignTimelineCard> {
                   duration: Durations.medium4,
                   child: _isExpanded
                       ? Text(
+                          key: const Key('TimelineCardDescription'),
                           widget.timelineItem.description,
                           style: context.textTheme.bodyMedium?.copyWith(
                             color: context.colors.sysColorsNeutralN60,
