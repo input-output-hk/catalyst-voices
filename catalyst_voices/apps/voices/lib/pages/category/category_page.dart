@@ -11,7 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
-typedef _StateData = ({bool show, DetailedCampaignCategoryViewModel data});
+typedef _StateData = ({bool show, CampaignCategoryDetailsViewModel data});
 
 typedef _StateError = ({bool show, LocalizedException? error});
 
@@ -25,7 +25,7 @@ class CategoryPage extends StatefulWidget {
 }
 
 class _Body extends StatelessWidget {
-  final DetailedCampaignCategoryViewModel category;
+  final CampaignCategoryDetailsViewModel category;
   final bool isLoading;
   const _Body({
     required this.category,
@@ -56,7 +56,7 @@ class _Body extends StatelessWidget {
 }
 
 class _CardInformation extends StatelessWidget {
-  final DetailedCampaignCategoryViewModel category;
+  final CampaignCategoryDetailsViewModel category;
   const _CardInformation({
     required this.category,
   });
@@ -119,7 +119,7 @@ class _CategoryDetailErrorSelector extends StatelessWidget {
             child: Center(
               child: VoicesErrorIndicator(
                 message: error.message(context),
-                onRetry: error is LocalizedNotFound
+                onRetry: error is LocalizedNotFoundException
                     ? null
                     : () async {
                         context
@@ -143,8 +143,8 @@ class _CategoryDetailLoadingOrDataSelector extends StatelessWidget {
     return BlocSelector<CategoryDetailCubit, CategoryDetailState, _StateData>(
       selector: (state) {
         return (
-          show: state.isLoading || state.error != null,
-          data: state.category ?? DetailedCampaignCategoryViewModel.dummy()
+          show: state.isLoading,
+          data: state.category ?? CampaignCategoryDetailsViewModel.dummy()
         );
       },
       builder: (context, state) {

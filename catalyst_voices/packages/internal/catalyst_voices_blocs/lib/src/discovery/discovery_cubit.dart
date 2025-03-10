@@ -44,7 +44,7 @@ class DiscoveryCubit extends Cubit<DiscoveryState> {
 
     final categories = await _campaignService.getCampaignCategories();
     final categoriesModel =
-        categories.map(DetailedCampaignCategoryViewModel.fromModel).toList();
+        categories.map(CampaignCategoryDetailsViewModel.fromModel).toList();
 
     emit(
       state.copyWith(
@@ -88,7 +88,7 @@ class DiscoveryCubit extends Cubit<DiscoveryState> {
     _setupProposalsSubscription();
   }
 
-  DetailedCampaignCategoryViewModel? localCategory(String id) {
+  CampaignCategoryDetailsViewModel? localCategory(String id) {
     return state.campaignCategories.categories
         .firstWhereOrNull((e) => e.id == id);
   }

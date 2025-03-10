@@ -8,7 +8,7 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 class CategoryDetailView extends StatelessWidget {
-  final DetailedCampaignCategoryViewModel category;
+  final CampaignCategoryDetailsViewModel category;
 
   const CategoryDetailView({
     super.key,

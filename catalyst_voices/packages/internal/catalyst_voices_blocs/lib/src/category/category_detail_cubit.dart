@@ -18,7 +18,7 @@ class CategoryDetailCubit extends Cubit<CategoryDetailState> {
     final categories = await _campaignService.getCampaignCategories();
 
     final categoriesModels =
-        categories.map(DetailedCampaignCategoryViewModel.fromModel).toList();
+        categories.map(CampaignCategoryDetailsViewModel.fromModel).toList();
 
     emit(
       state.copyWith(
@@ -37,16 +37,16 @@ class CategoryDetailCubit extends Cubit<CategoryDetailState> {
       emit(
         state.copyWith(
           isLoading: false,
-          category: DetailedCampaignCategoryViewModel.fromModel(category),
+          category: CampaignCategoryDetailsViewModel.fromModel(category),
           error: const Optional.empty(),
         ),
       );
-    } on Exception catch (_) {
+    } on Exception catch (exception) {
       emit(
         state.copyWith(
-          category: DetailedCampaignCategoryViewModel.dummy(),
+          category: CampaignCategoryDetailsViewModel.dummy(),
           isLoading: false,
-          error: const Optional.of(LocalizedNotFound()),
+          error: Optional.of(exception.toLocalizedException()),
         ),
       );
     }

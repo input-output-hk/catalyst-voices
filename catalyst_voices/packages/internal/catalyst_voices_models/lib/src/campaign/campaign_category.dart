@@ -227,7 +227,21 @@ class CampaignCategory extends Equatable {
   });
 
   @override
-  List<Object?> get props => [];
+  List<Object?> get props => [
+        uuid,
+        proposalTemplateUuid,
+        categoryName,
+        categorySubname,
+        description,
+        proposalsCount,
+        availableFunds,
+        imageUrl,
+        totalAsk,
+        range,
+        descriptions,
+        requirements,
+        submissionCloseDate,
+      ];
 
   CampaignCategory copyWith({
     String? uuid,

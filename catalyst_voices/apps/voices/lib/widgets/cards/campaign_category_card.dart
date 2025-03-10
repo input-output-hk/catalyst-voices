@@ -7,7 +7,7 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 class CampaignCategoryCard extends StatelessWidget {
-  final DetailedCampaignCategoryViewModel category;
+  final CampaignCategoryDetailsViewModel category;
 
   const CampaignCategoryCard({
     super.key,
@@ -54,7 +54,10 @@ class CampaignCategoryCard extends StatelessWidget {
                   proposalsCount: category.proposalsCount,
                 ),
                 const SizedBox(height: 16),
-                _Description(category.description, const Key('Description')),
+                _Description(
+                  category.description,
+                  key: const Key('Description'),
+                ),
                 const SizedBox(height: 32),
                 _Buttons(
                   categoryId: category.id,
@@ -161,7 +164,7 @@ class _CampaignStats extends StatelessWidget {
 class _Description extends StatelessWidget {
   final String description;
 
-  const _Description(this.description, [Key? key]) : super(key: key);
+  const _Description(this.description, {super.key});
 
   @override
   Widget build(BuildContext context) {

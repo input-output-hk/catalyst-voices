@@ -3,7 +3,7 @@ part of 'discovery_cubit.dart';
 final class DiscoveryCampaignCategoriesState extends Equatable {
   final bool isLoading;
   final LocalizedException? error;
-  final List<DetailedCampaignCategoryViewModel> categories;
+  final List<CampaignCategoryDetailsViewModel> categories;
 
   const DiscoveryCampaignCategoriesState({
     this.isLoading = true,

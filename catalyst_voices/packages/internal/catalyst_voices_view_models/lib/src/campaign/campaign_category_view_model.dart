@@ -6,21 +6,7 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:equatable/equatable.dart';
 
-final class CampaignCategoryViewModel extends Equatable {
-  final String id;
-  final String name;
-
-  const CampaignCategoryViewModel({
-    required this.id,
-    required this.name,
-  });
-
-  @override
-  List<Object?> get props => [id, name];
-}
-
-final class DetailedCampaignCategoryViewModel
-    extends CampaignCategoryViewModel {
+final class CampaignCategoryDetailsViewModel extends CampaignCategoryViewModel {
   final String subname;
   final String description;
   final int proposalsCount;
@@ -32,7 +18,7 @@ final class DetailedCampaignCategoryViewModel
   final List<String> requirements;
   final DateTime submissionCloseDate;
 
-  const DetailedCampaignCategoryViewModel({
+  const CampaignCategoryDetailsViewModel({
     required this.subname,
     required this.description,
     required this.proposalsCount,
@@ -47,8 +33,8 @@ final class DetailedCampaignCategoryViewModel
     required this.submissionCloseDate,
   });
 
-  factory DetailedCampaignCategoryViewModel.dummy({String? id}) =>
-      DetailedCampaignCategoryViewModel(
+  factory CampaignCategoryDetailsViewModel.dummy({String? id}) =>
+      CampaignCategoryDetailsViewModel(
         id: id ?? '1',
         name: 'Cardano Open:',
         subname: 'Developers',
@@ -63,8 +49,8 @@ final class DetailedCampaignCategoryViewModel
         submissionCloseDate: DateTime.now(),
       );
 
-  factory DetailedCampaignCategoryViewModel.fromModel(CampaignCategory model) {
-    return DetailedCampaignCategoryViewModel(
+  factory CampaignCategoryDetailsViewModel.fromModel(CampaignCategory model) {
+    return CampaignCategoryDetailsViewModel(
       subname: model.categorySubname,
       description: model.description,
       proposalsCount: model.proposalsCount,
@@ -99,6 +85,19 @@ final class DetailedCampaignCategoryViewModel
         availableFunds,
         imageUrl,
       ];
+}
+
+final class CampaignCategoryViewModel extends Equatable {
+  final String id;
+  final String name;
+
+  const CampaignCategoryViewModel({
+    required this.id,
+    required this.name,
+  });
+
+  @override
+  List<Object?> get props => [id, name];
 }
 
 extension CategoryImageUrl on StaticCategoryDocumentData {

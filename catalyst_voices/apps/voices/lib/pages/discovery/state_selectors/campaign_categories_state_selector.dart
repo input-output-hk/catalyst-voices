@@ -8,7 +8,7 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-typedef _ListItems = List<DetailedCampaignCategoryViewModel>;
+typedef _ListItems = List<CampaignCategoryDetailsViewModel>;
 
 class CampaignCategoriesStateSelector extends StatelessWidget {
   const CampaignCategoriesStateSelector({super.key});
@@ -103,14 +103,14 @@ class _CampaignCategoriesLoading extends StatelessWidget {
       selector: (state) {
         return state.campaignCategories.isLoading;
       },
-      builder: (context, state) {
+      builder: (context, isLoading) {
         final dummyCategories = List.filled(
           6,
-          DetailedCampaignCategoryViewModel.dummy(),
+          CampaignCategoryDetailsViewModel.dummy(),
         );
         return Offstage(
-          offstage: !state,
-          child: CampaignCategories(dummyCategories, isLoading: state),
+          offstage: !isLoading,
+          child: CampaignCategories(dummyCategories, isLoading: isLoading),
         );
       },
     );
