@@ -13,6 +13,7 @@ void main() {
 
     setUpAll(() {
       CatalystPublicKey.factory = _FakeCatalystKeyFactory();
+      CatalystSignature.factory = _FakeCatalystKeyFactory();
       CatalystCompressionPlatform.instance = _FakeCatalystCompressionPlatform();
     });
 
