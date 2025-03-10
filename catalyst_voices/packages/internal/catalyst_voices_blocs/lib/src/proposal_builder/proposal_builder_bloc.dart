@@ -369,7 +369,10 @@ final class ProposalBuilderBloc
     try {
       _logger.info('Publishing proposal');
       final document = _buildDocument();
-      await _proposalService.publishProposal(document);
+      await _proposalService.publishProposal(
+        metadata: _buildDocumentMetadata(),
+        content: _documentMapper.toContent(document),
+      );
     } catch (error, stackTrace) {
       _logger.severe('PublishProposal', error, stackTrace);
       emitError(error);
@@ -403,7 +406,10 @@ final class ProposalBuilderBloc
     try {
       _logger.info('Submitting proposal for review');
       final document = _buildDocument();
-      await _proposalService.submitProposalForReview(document);
+      await _proposalService.submitProposalForReview(
+        metadata: _buildDocumentMetadata(),
+        content: _documentMapper.toContent(document),
+      );
     } catch (error, stackTrace) {
       _logger.severe('SubmitProposalForReview', error, stackTrace);
       emitError(error);
