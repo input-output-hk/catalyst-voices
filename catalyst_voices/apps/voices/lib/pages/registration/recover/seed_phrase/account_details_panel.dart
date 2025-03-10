@@ -26,6 +26,7 @@ class AccountDetailsPanel extends StatelessWidget {
       children: [
         const SizedBox(height: 24),
         Text(
+          key: const Key('RecoveryAccountTitle'),
           context.l10n.recoveryAccountTitle,
           style: theme.textTheme.titleMedium?.copyWith(color: textColor),
         ),
@@ -109,6 +110,7 @@ class _RecoverAccountFailure extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return VoicesErrorIndicator(
+      key: const Key('RecoveryAccountError'),
       message: exception.message(context),
       onRetry: () async {
         final recover = RegistrationCubit.of(context).recover;
@@ -127,6 +129,7 @@ class _RecoverStatusText extends StatelessWidget {
     final textColor = theme.colors.textOnPrimaryLevel1;
 
     return Text(
+      key: const Key('RecoveryAccountSuccessTitle'),
       context.l10n.recoveryAccountSuccessTitle,
       style: theme.textTheme.titleMedium?.copyWith(color: textColor),
     );
@@ -163,6 +166,7 @@ class _Navigation extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         VoicesFilledButton(
+          key: const Key('SetUnlockPasswordButton'),
           onTap: isNextEnabled
               ? () => RegistrationCubit.of(context).nextStep()
               : null,
@@ -170,6 +174,7 @@ class _Navigation extends StatelessWidget {
         ),
         const SizedBox(height: 10),
         VoicesTextButton(
+          key: const Key('RecoverDifferentKeychainButton'),
           onTap: () async {
             final cubit = RegistrationCubit.of(context);
             await cubit.recover.reset();

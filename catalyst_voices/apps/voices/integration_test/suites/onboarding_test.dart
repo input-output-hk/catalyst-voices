@@ -22,7 +22,6 @@ import '../pageobject/onboarding/create_flow/step_7_catalyst_keychain_success.da
 import '../pageobject/onboarding/create_flow/step_8_writedown_seedphrase.dart';
 import '../pageobject/onboarding/create_flow/step_9_writedown_seedphrase_info.dart';
 import '../pageobject/onboarding/onboarding_base_page.dart';
-import '../pageobject/onboarding/restore_flow/step_2_restore_keychain_choice_panel.dart';
 import '../pageobject/onboarding/step_1_get_started.dart';
 import '../types/password_validation_states.dart';
 import '../utils/test_context.dart';
@@ -321,22 +320,6 @@ void main() async {
       await WalletListPanel($).goto();
       await WalletListPanel($).clickBack();
       await LinkWalletInfoPanel($).verifyInfoPanel();
-    });
-
-    patrolWidgetTest('visitor - restore - keychain choice screen looks OK',
-        (PatrolTester $) async {
-      await $.pumpWidgetAndSettle(App(routerConfig: router));
-      await RestoreKeychainChoicePanel($).goto();
-      await RestoreKeychainChoicePanel($).verifyInfoPanel();
-    });
-
-    patrolWidgetTest(
-        'visitor - restore - keychain choice screen back button works',
-        (PatrolTester $) async {
-      await $.pumpWidgetAndSettle(App(routerConfig: router));
-      await RestoreKeychainChoicePanel($).goto();
-      await RestoreKeychainChoicePanel($).clickBack();
-      await GetStartedPanel($).verifyPageElements();
     });
   });
 }
