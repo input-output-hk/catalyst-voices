@@ -182,6 +182,7 @@ final class CatalystId extends Equatable {
   }
 }
 
+/// Predefined values for [CatalystId.host].
 enum CatalystIdHost {
   cardano(host: 'cardano'),
   cardanoPreprod(host: 'preprod.cardano'),
