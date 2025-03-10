@@ -7,6 +7,8 @@ import 'package:equatable/equatable.dart';
 
 /// Definition of a URI, which allows for RBAC keys used for different
 /// purposes to be easily and unambiguously identified.
+///
+/// See: https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/rbac_id_uri/catalyst-id-uri/
 final class CatalystId extends Equatable {
   /// The default scheme for the Catalyst ID.
   static const String scheme = 'id.catalyst';
@@ -196,9 +198,9 @@ enum CatalystIdHost {
 
   const CatalystIdHost({required this.host});
 
-  factory CatalystIdHost.fromTag(String tag) {
+  factory CatalystIdHost.fromHost(String host) {
     for (final value in values) {
-      if (value.host.toLowerCase() == tag.toLowerCase()) {
+      if (value.host.toLowerCase() == host.toLowerCase()) {
         return value;
       }
     }
