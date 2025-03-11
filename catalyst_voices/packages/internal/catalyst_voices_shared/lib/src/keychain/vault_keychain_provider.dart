@@ -11,6 +11,11 @@ final class VaultKeychainProvider implements KeychainProvider {
   final CacheConfig _cacheConfig;
   final CatalystKeyFactory _keyFactory;
 
+  // Note. caching keychains because of .isUnlocked is stored as a property
+  // and when updating any other properties of Account we don't want to lose
+  // this information.
+  final _cache = <String, Keychain>{};
+
   VaultKeychainProvider({
     required FlutterSecureStorage secureStorage,
     required SharedPreferencesAsync sharedPreferences,
@@ -83,15 +88,22 @@ final class VaultKeychainProvider implements KeychainProvider {
     for (final key in keys) {
       await _secureStorage.delete(key: key);
     }
+
+    _cache.remove(id);
   }
 
   Keychain _get(String id) {
-    return VaultKeychain(
-      id: id,
-      secureStorage: _secureStorage,
-      sharedPreferences: _sharedPreferences,
-      unlockTtl: _cacheConfig.expiryDuration.keychainUnlock,
-      keyFactory: _keyFactory,
+    return _cache.putIfAbsent(
+      id,
+      () {
+        return VaultKeychain(
+          id: id,
+          secureStorage: _secureStorage,
+          sharedPreferences: _sharedPreferences,
+          unlockTtl: _cacheConfig.expiryDuration.keychainUnlock,
+          keyFactory: _keyFactory,
+        );
+      },
     );
   }
 }
