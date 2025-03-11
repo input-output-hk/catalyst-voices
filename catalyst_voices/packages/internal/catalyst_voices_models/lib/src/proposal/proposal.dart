@@ -54,19 +54,20 @@ final class Proposal extends Equatable {
     final version = data.document.metadata.selfRef.version ??
         data.document.metadata.selfRef.id;
     updateDate = UuidUtils.dateTime(version);
+
     return Proposal(
       selfRef: data.ref,
-      title: data.proposalTitle ?? '',
-      description: data.proposalDescription ?? '',
+      title: data.getProposalTitle() ?? '',
+      description: data.getProposalDescription() ?? '',
       updateDate: updateDate,
-      fundsRequested: data.proposalFundsRequested ?? Coin.fromAda(0),
-      // TODO(LynxLynxx): from here we need to get the real status
+      fundsRequested: data.getProposalFundsRequested() ?? Coin.fromAda(0),
+      // TODO(LynxLynxx): from where we need to get the real status
       status: ProposalStatus.inProgress,
-      // TODO(LynxLynxx): from here we need to get the real publish
+      // TODO(LynxLynxx): from where we need to get the real publish
       publish: ProposalPublish.publishedDraft,
       versionCount: data.versions.length,
-      duration: data.proposalDuration ?? 0,
-      author: data.proposalAuthor ?? '',
+      duration: data.getProposalDuration() ?? 0,
+      author: data.getProposalAuthor() ?? '',
       commentsCount: data.commentsCount,
       category: data.categoryId,
     );
@@ -237,7 +238,7 @@ extension ProposalWithVersionX on ProposalWithVersions {
               version: '019584be-2314-7aaa-8b21-0f902ff817d4',
             ),
             title: 'Title ver 1',
-            updateDate: DateTime.now(),
+            createdAt: DateTime.now(),
           ),
           ProposalVersion(
             publish: ProposalPublish.submittedProposal,
@@ -246,7 +247,7 @@ extension ProposalWithVersionX on ProposalWithVersions {
               version: '019584be-2321-7a1a-9b68-ad33a97a7e84',
             ),
             title: 'Dummy Proposal ver 2',
-            updateDate: DateTime.now(),
+            createdAt: DateTime.now(),
           ),
           ProposalVersion(
             publish: ProposalPublish.publishedDraft,
@@ -255,7 +256,7 @@ extension ProposalWithVersionX on ProposalWithVersions {
               version: '019584be-232d-729b-950d-ce9fb79513ed',
             ),
             title: 'Title ver 3',
-            updateDate: DateTime.now(),
+            createdAt: DateTime.now(),
           ),
         ],
       );

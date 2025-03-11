@@ -39,7 +39,7 @@ void main() {
               version: versionId1,
             ),
             title: 'Title ver 1',
-            updateDate: DateTime.now(),
+            createdAt: DateTime.now(),
           ),
           ProposalVersion(
             publish: ProposalPublish.publishedDraft,
@@ -48,7 +48,7 @@ void main() {
               version: versionId2,
             ),
             title: 'Title ver 2',
-            updateDate: DateTime.now(),
+            createdAt: DateTime.now(),
           ),
           ProposalVersion(
             publish: ProposalPublish.publishedDraft,
@@ -57,7 +57,7 @@ void main() {
               version: versionId3,
             ),
             title: 'Title ver 3',
-            updateDate: DateTime.now(),
+            createdAt: DateTime.now(),
           ),
         ],
       );
@@ -73,6 +73,71 @@ void main() {
       expect(
         proposalWithVersions.versions[0].selfRef.version,
         equals(versionId3),
+      );
+    });
+
+    test('check if proposal without version is the oldest', () async {
+      final proposalId = const Uuid().v7();
+      await Future.delayed(const Duration(milliseconds: 10), () {});
+      final versionId1 = const Uuid().v7();
+      await Future.delayed(const Duration(milliseconds: 10), () {});
+      final versionId2 = const Uuid().v7();
+
+      final proposalWithVersions = ProposalWithVersions(
+        selfRef: DocumentRef.build(
+          id: proposalId,
+          isDraft: true,
+          version: versionId1,
+        ),
+        title: 'Title ver 1',
+        description: 'Description ver 1',
+        updateDate: DateTime.now(),
+        fundsRequested: const Coin(100),
+        status: ProposalStatus.draft,
+        publish: ProposalPublish.localDraft,
+        versionCount: 3,
+        duration: 6,
+        author: 'Alex Wells',
+        commentsCount: 0,
+        category: 'Cardano Use Cases / MVP',
+        versions: [
+          ProposalVersion(
+            publish: ProposalPublish.publishedDraft,
+            selfRef: DraftRef(
+              id: proposalId,
+              version: versionId1,
+            ),
+            title: 'Title ver 1',
+            createdAt: DateTime.now(),
+          ),
+          ProposalVersion(
+            publish: ProposalPublish.publishedDraft,
+            selfRef: DraftRef(
+              id: proposalId,
+              version: versionId2,
+            ),
+            title: 'Title ver 2',
+            createdAt: DateTime.now(),
+          ),
+          ProposalVersion(
+            publish: ProposalPublish.publishedDraft,
+            selfRef: DraftRef(
+              id: proposalId,
+            ),
+            title: 'Title ver 3',
+            createdAt: DateTime.now(),
+          ),
+        ],
+      );
+
+      expect(
+        proposalWithVersions.versions.last.selfRef.version,
+        isNull,
+      );
+
+      expect(
+        proposalWithVersions.versions.first.selfRef.version,
+        equals(versionId2),
       );
     });
   });

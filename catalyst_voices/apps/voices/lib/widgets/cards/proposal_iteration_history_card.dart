@@ -21,6 +21,40 @@ class ProposalIterationHistory extends StatefulWidget {
       _ProposalIterationHistoryState();
 }
 
+class _Actions extends StatelessWidget {
+  final DocumentRef ref;
+
+  const _Actions({
+    required this.ref,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        VoicesTextButton(
+          child: Text(context.l10n.delete),
+          onTap: () {
+            // TODO(dtscalac): call delete method
+          },
+        ),
+        VoicesTextButton(
+          child: Text(context.l10n.exportButtonText),
+          onTap: () {
+            // TODO(dtscalac): call export method
+          },
+        ),
+        VoicesTextButton(
+          child: Text(context.l10n.open),
+          onTap: () {
+            // TODO(dtscalac): call open method
+          },
+        ),
+      ],
+    );
+  }
+}
+
 class _IterationVersion extends StatelessWidget {
   final ProposalVersion version;
   final int iteration;
@@ -44,7 +78,47 @@ class _IterationVersion extends StatelessWidget {
         title: version.title,
         iteration: iteration,
         publish: version.publish,
-        updateDate: version.updateDate,
+        updateDate: version.createdAt,
+      ),
+    );
+  }
+}
+
+class _IterationVersionList extends StatelessWidget {
+  final bool _isExpanded;
+  final List<ProposalVersion> versions;
+
+  const _IterationVersionList({
+    required bool isExpanded,
+    required this.versions,
+  }) : _isExpanded = isExpanded;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: 32,
+      ),
+      child: AnimatedSwitcher(
+        duration: Durations.long4,
+        child: _isExpanded
+            ? Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                spacing: 6,
+                children: versions
+                    .skip(1)
+                    .map(
+                      (e) => _IterationVersion(
+                        version: e,
+                        iteration: versions.versionNumber(
+                          e.selfRef.version ?? '',
+                        ),
+                      ),
+                    )
+                    .toList(),
+              )
+            : const SizedBox.shrink(),
       ),
     );
   }
@@ -52,18 +126,16 @@ class _IterationVersion extends StatelessWidget {
 
 class _ProposalIterationHistoryState extends State<ProposalIterationHistory> {
   bool _isExpanded = false;
+
   bool get _hasNewerLocalIteration =>
       widget.proposal.versions.first.isLatestVersion(
         widget.proposal.selfRef.version ?? '',
       );
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {
-        setState(() {
-          _isExpanded = !_isExpanded;
-        });
-      },
+      onTap: _changeExpanded,
       child: DecoratedBox(
         decoration: BoxDecoration(
           color: context.colors.elevationsOnSurfaceNeutralLv1Grey,
@@ -91,7 +163,7 @@ class _ProposalIterationHistoryState extends State<ProposalIterationHistory> {
                       iteration: widget.proposal.versions.versionNumber(
                         widget.proposal.versions.first.selfRef.version ?? '',
                       ),
-                      updateDate: widget.proposal.versions.first.updateDate,
+                      updateDate: widget.proposal.versions.first.createdAt,
                       boldTitle: true,
                     )
                   else
@@ -104,65 +176,29 @@ class _ProposalIterationHistoryState extends State<ProposalIterationHistory> {
                   const Spacer(),
                   Offstage(
                     offstage: !_hasNewerLocalIteration,
-                    child: Row(
-                      children: [
-                        VoicesTextButton(
-                          child: Text(context.l10n.delete),
-                          onTap: () {
-                            // TODO(dtscalac): call delete method
-                          },
-                        ),
-                        VoicesTextButton(
-                          child: Text(context.l10n.exportButtonText),
-                          onTap: () {
-                            // TODO(dtscalac): call export method
-                          },
-                        ),
-                        VoicesTextButton(
-                          child: Text(context.l10n.open),
-                          onTap: () {
-                            // TODO(dtscalac): call open method
-                          },
-                        ),
-                      ],
+                    child: _Actions(
+                      ref: widget.proposal.selfRef,
                     ),
                   ),
                 ],
               ),
             ),
             if (_isExpanded) const SizedBox(height: 12),
-            Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 32,
-              ),
-              child: AnimatedSwitcher(
-                duration: Durations.long4,
-                child: _isExpanded
-                    ? Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        spacing: 6,
-                        children: widget.proposal.versions
-                            .skip(1)
-                            .map(
-                              (e) => _IterationVersion(
-                                version: e,
-                                iteration:
-                                    widget.proposal.versions.versionNumber(
-                                  e.selfRef.version ?? '',
-                                ),
-                              ),
-                            )
-                            .toList(),
-                      )
-                    : const SizedBox.shrink(),
-              ),
+            _IterationVersionList(
+              isExpanded: _isExpanded,
+              versions: widget.proposal.versions,
             ),
             if (_isExpanded) const SizedBox(height: 16),
           ],
         ),
       ),
     );
+  }
+
+  void _changeExpanded() {
+    setState(() {
+      _isExpanded = !_isExpanded;
+    });
   }
 }
 

@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 
 class WorkspaceProposalCard extends StatelessWidget {
   final ProposalWithVersions proposal;
+
   const WorkspaceProposalCard({
     super.key,
     required this.proposal,
@@ -19,6 +20,7 @@ class WorkspaceProposalCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isSubmitted = proposal.publish.isPublished;
+
     return _ProposalSubmitState(
       isSubmitted: isSubmitted,
       child: Padding(
@@ -53,11 +55,13 @@ class WorkspaceProposalCard extends StatelessWidget {
 
 class _Body extends StatelessWidget {
   final ProposalWithVersions proposal;
+
   const _Body(this.proposal);
 
   @override
   Widget build(BuildContext context) {
     final isSubmitted = _ProposalSubmitState.of(context)?.isSubmitted ?? false;
+    final commentsCount = proposal.commentsCount;
     return Wrap(
       alignment: WrapAlignment.spaceBetween,
       spacing: 10,
@@ -84,11 +88,15 @@ class _Body extends StatelessWidget {
           subValue: context.l10n.proposalViewFundingRequested,
         ),
         _CampaignData(
-          leadValue: proposal.commentsCount.toString(),
+          leadValue: commentsCount == 0
+              ? context.l10n.notAvailableAbbr
+              : commentsCount.toString(),
           subValue: context.l10n.comments,
         ),
         VoicesIconButton(
-          onTap: () {},
+          onTap: () {
+            // TODO(dtscalac): call menu actions
+          },
           style: IconButton.styleFrom(
             foregroundColor:
                 isSubmitted ? context.colors.textOnPrimaryWhite : null,
@@ -103,6 +111,7 @@ class _Body extends StatelessWidget {
 class _BodyHeader extends StatelessWidget {
   final String title;
   final DateTime lastUpdate;
+
   const _BodyHeader({
     required this.title,
     required this.lastUpdate,
@@ -139,6 +148,7 @@ class _BodyHeader extends StatelessWidget {
 class _CampaignData extends StatelessWidget {
   final String leadValue;
   final String subValue;
+
   const _CampaignData({
     required this.leadValue,
     required this.subValue,
@@ -148,6 +158,7 @@ class _CampaignData extends StatelessWidget {
   Widget build(BuildContext context) {
     final labelColor =
         _ProposalSubmitState.of(context)?.dataLabelColor(context);
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,

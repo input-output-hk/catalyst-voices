@@ -1922,5 +1922,9 @@
   "publishingHistory": "Publishing history",
   "@publishingHistory": {
     "description": "To let user know that document have history of published documents"
+  },
+  "notAvailableAbbr": "N/A",
+  "@notAvailableAbbr": {
+    "description": "Abbreviation for not available"
   }
 }

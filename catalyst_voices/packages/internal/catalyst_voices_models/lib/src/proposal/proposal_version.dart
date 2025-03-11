@@ -5,13 +5,13 @@ final class ProposalVersion extends Equatable
     implements Comparable<ProposalVersion> {
   final DocumentRef selfRef;
   final String title;
-  final DateTime updateDate;
+  final DateTime createdAt;
   final ProposalPublish publish;
 
   const ProposalVersion({
     required this.selfRef,
     required this.title,
-    required this.updateDate,
+    required this.createdAt,
     required this.publish,
   });
 
@@ -19,7 +19,7 @@ final class ProposalVersion extends Equatable
   List<Object?> get props => [
         selfRef,
         title,
-        updateDate,
+        createdAt,
         publish,
       ];
 
