@@ -3,7 +3,8 @@ import 'dart:async';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:chopper/chopper.dart';
 
-/// An [Interceptor] which overrides the content-type header for [supportedRequests].
+/// An [Interceptor] which overrides the content-type header
+/// for [supportedRequests].
 ///
 /// The swagger_dart_code_generator package doesn't support
 /// generating requests with application/cbor content-type,
