@@ -1,3 +1,5 @@
+import 'package:catalyst_voices_models/catalyst_voices_models.dart'
+    show CategoryDescription;
 import 'package:equatable/equatable.dart';
 
 class CategoryDescriptionViewModel extends Equatable {
@@ -19,6 +21,13 @@ The Cardano Use Cases: Concept category is aimed towards projects seeking to dev
 
 It will help support proposers, especially new Catalyst entrants, get their idea off the ground and gain experience of working with product design processes. Your project must generate and test new ideas that bring utility to Cardano.''',
       );
+
+  factory CategoryDescriptionViewModel.fromModel(CategoryDescription model) {
+    return CategoryDescriptionViewModel(
+      title: model.title,
+      description: model.description,
+    );
+  }
 
   @override
   List<Object?> get props => [title, description];

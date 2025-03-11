@@ -1,3 +1,4 @@
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:equatable/equatable.dart';
 
@@ -19,6 +20,16 @@ class CampaignTimelineViewModel extends Equatable {
         timeline: DateRange(
           from: DateTime(2024, 9, 26),
           to: DateTime(2024, 10, 10),
+        ),
+      );
+
+  factory CampaignTimelineViewModel.fromModel(CampaignTimeline model) =>
+      CampaignTimelineViewModel(
+        title: model.title,
+        description: model.description,
+        timeline: DateRange(
+          from: model.timeline.from,
+          to: model.timeline.to,
         ),
       );
 
