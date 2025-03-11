@@ -72,7 +72,7 @@ final class CatalystId extends Equatable {
       role0Key: role0Key,
       role: role,
       rotation: rotation,
-      encrypt: uri.fragment.toLowerCase() == encryptFragment.toLowerCase(),
+      encrypt: uri.fragment.equalsIgnoreCase(encryptFragment),
     );
   }
 

@@ -30,8 +30,8 @@ extension StringExt on String {
 
   String withSuffix(String value) => '$this$value';
 
-  bool equalsIgnoreCase(String other) {
-    return toLowerCase() == other.toLowerCase();
+  bool equalsIgnoreCase(String? other) {
+    return toLowerCase() == other?.toLowerCase();
   }
 }
 
