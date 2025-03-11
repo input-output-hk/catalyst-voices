@@ -99,6 +99,9 @@ class _FakeCatalystPublicKey extends Fake implements CatalystPublicKey {
   _FakeCatalystPublicKey({required this.bytes});
 
   @override
+  Uint8List get publicKeyBytes => bytes;
+
+  @override
   Future<bool> verify(
     Uint8List data, {
     required CatalystSignature signature,

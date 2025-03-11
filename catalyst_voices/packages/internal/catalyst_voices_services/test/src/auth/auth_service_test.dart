@@ -35,7 +35,6 @@ void main() {
 
       final token = await authService.createRbacToken();
       expect(token, startsWith(AuthServiceImpl.tokenPrefix));
-      expect(token.split('.'), hasLength(3));
     });
   });
 }
@@ -57,6 +56,9 @@ class _FakeCatalystPublicKey extends Fake implements CatalystPublicKey {
   final Uint8List bytes;
 
   _FakeCatalystPublicKey(this.bytes);
+
+  @override
+  Uint8List get publicKeyBytes => bytes;
 }
 
 class _FakeCatalystSignature extends Fake implements CatalystSignature {

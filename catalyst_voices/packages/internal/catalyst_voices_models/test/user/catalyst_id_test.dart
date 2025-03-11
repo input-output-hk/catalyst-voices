@@ -174,6 +174,9 @@ class _FakeCatalystPublicKey extends Fake implements CatalystPublicKey {
   @override
   final Uint8List bytes;
 
+  @override
+  Uint8List get publicKeyBytes => bytes;
+
   _FakeCatalystPublicKey({required this.bytes});
 
   @override

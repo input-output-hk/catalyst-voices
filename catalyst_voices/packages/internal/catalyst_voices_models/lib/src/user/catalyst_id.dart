@@ -99,7 +99,7 @@ final class CatalystId extends Equatable {
   }
 
   String _formatPath() {
-    final encodedRole0Key = base64Encode(role0Key.bytes);
+    final encodedRole0Key = base64Encode(role0Key.publicKeyBytes);
     final role = this.role?.number.toString();
     final rotation = this.rotation?.toString();
 
