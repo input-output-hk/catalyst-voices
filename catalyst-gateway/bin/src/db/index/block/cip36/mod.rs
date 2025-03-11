@@ -49,11 +49,11 @@ impl Cip36InsertQuery {
             Ok(Some(cip36)) if cip36.is_valid() => {
                 // This should always pass, because we already checked if the array has only one
                 let voting_key = cip36.voting_pks().first().ok_or(anyhow::anyhow!(
-                    "Valid CIP36 registtration must have one voting key"
+                    "Valid CIP36 registration must have one voting key"
                 ))?;
 
                 let stake_pk = cip36.stake_pk().ok_or(anyhow::anyhow!(
-                    "Valid CIP36 registtration must have one stake public key"
+                    "Valid CIP36 registration must have one stake public key"
                 ))?;
                 let stake_pk_hash = Blake2b224Hash::new(&stake_pk.to_bytes());
                 let stake_address = StakeAddress::new(block.network(), false, stake_pk_hash);
