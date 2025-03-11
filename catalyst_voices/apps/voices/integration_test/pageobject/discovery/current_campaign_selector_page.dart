@@ -30,7 +30,7 @@ class CurrentCampaignSection {
   }
 
   Future<void> subtitleIsRenderedCorrectly() async {
-    expect($(subtitle).text, T.get('Catalyst Fund 14'));
+    expect($(subtitle).text, T.get('Catalyst Fund14'));
   }
 
   Future<void> descriptionIsRenderedCorrectly() async {

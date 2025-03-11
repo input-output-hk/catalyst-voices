@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:catalyst_compression/catalyst_compression.dart';
@@ -10,9 +11,7 @@ import 'package:equatable/equatable.dart';
 const _brotliEncoding = StringValue(CoseValues.brotliContentEncoding);
 
 final class SignedDocumentManagerImpl implements SignedDocumentManager {
-  final CatalystKeyFactory keyFactory;
-
-  const SignedDocumentManagerImpl({required this.keyFactory});
+  const SignedDocumentManagerImpl();
 
   @override
   Future<SignedDocument<T>> parseDocument<T extends SignedDocumentPayload>(
@@ -29,7 +28,6 @@ final class SignedDocumentManagerImpl implements SignedDocumentManager {
     );
 
     return _CoseSignedDocument(
-      keyFactory: keyFactory,
       coseSign: coseSign,
       payload: payload,
       metadata: metadata,
@@ -40,7 +38,7 @@ final class SignedDocumentManagerImpl implements SignedDocumentManager {
   Future<SignedDocument<T>> signDocument<T extends SignedDocumentPayload>(
     T document, {
     required SignedDocumentMetadata metadata,
-    required CatalystPublicKey publicKey,
+    required CatalystId catalystId,
     required CatalystPrivateKey privateKey,
   }) async {
     final compressedPayload = await _brotliCompressPayload(document.toBytes());
@@ -49,11 +47,10 @@ final class SignedDocumentManagerImpl implements SignedDocumentManager {
       protectedHeaders: metadata.asCoseProtectedHeaders,
       unprotectedHeaders: metadata.asCoseUnprotectedHeaders,
       payload: compressedPayload,
-      signers: [_CatalystSigner(publicKey, privateKey)],
+      signers: [_CatalystSigner(catalystId, privateKey)],
     );
 
     return _CoseSignedDocument(
-      keyFactory: keyFactory,
       coseSign: coseSign,
       payload: document,
       metadata: metadata,
@@ -78,18 +75,22 @@ final class SignedDocumentManagerImpl implements SignedDocumentManager {
 }
 
 final class _CatalystSigner implements CatalystCoseSigner {
-  final CatalystPublicKey _publicKey;
+  final CatalystId _catalystId;
   final CatalystPrivateKey _privateKey;
 
-  const _CatalystSigner(this._publicKey, this._privateKey);
+  const _CatalystSigner(
+    this._catalystId,
+    this._privateKey,
+  );
 
   @override
   StringOrInt? get alg => const IntValue(CoseValues.eddsaAlg);
 
-  // TODO(dtscalac): provide the kid in catalyst ID format,
-  // not just public key bytes
   @override
-  Future<Uint8List?> get kid async => _publicKey.bytes;
+  Future<Uint8List?> get kid async {
+    final string = _catalystId.toUri().toString();
+    return utf8.encode(string);
+  }
 
   @override
   Future<Uint8List> sign(Uint8List data) async {
@@ -99,19 +100,20 @@ final class _CatalystSigner implements CatalystCoseSigner {
 }
 
 final class _CatalystVerifier implements CatalystCoseVerifier {
-  final CatalystKeyFactory _keyFactory;
+  final CatalystId _catalystId;
   final CatalystPublicKey _publicKey;
 
-  const _CatalystVerifier(this._keyFactory, this._publicKey);
+  const _CatalystVerifier(this._catalystId, this._publicKey);
 
-  // TODO(dtscalac): provide the kid in catalyst ID format,
-  // not just public key bytes
   @override
-  Future<Uint8List?> get kid async => _publicKey.bytes;
+  Future<Uint8List?> get kid async {
+    final string = _catalystId.toUri().toString();
+    return utf8.encode(string);
+  }
 
   @override
   Future<bool> verify(Uint8List data, Uint8List signature) async {
-    final catalystSignature = _keyFactory.createSignature(signature);
+    final catalystSignature = CatalystSignature.factory.create(signature);
     return _publicKey.verify(data, signature: catalystSignature);
   }
 }
@@ -119,7 +121,6 @@ final class _CatalystVerifier implements CatalystCoseVerifier {
 final class _CoseSignedDocument<T extends SignedDocumentPayload>
     with EquatableMixin
     implements SignedDocument<T> {
-  final CatalystKeyFactory _keyFactory;
   final CoseSign _coseSign;
 
   @override
@@ -129,12 +130,10 @@ final class _CoseSignedDocument<T extends SignedDocumentPayload>
   final SignedDocumentMetadata metadata;
 
   const _CoseSignedDocument({
-    required CatalystKeyFactory keyFactory,
     required CoseSign coseSign,
     required this.payload,
     required this.metadata,
-  })  : _keyFactory = keyFactory,
-        _coseSign = coseSign;
+  }) : _coseSign = coseSign;
 
   @override
   List<Object?> get props => [_coseSign, payload, metadata];
@@ -147,8 +146,20 @@ final class _CoseSignedDocument<T extends SignedDocumentPayload>
 
   @override
   Future<bool> verifySignature(CatalystPublicKey publicKey) async {
+    // TODO(dtscalac): obtain from somewhere the catalyst ID
+    // which corresponds to the user who signed the document,
+    // not to the current app user.
+
+    final catalystId = CatalystId(
+      host: CatalystIdHost.cardano.host,
+      role0Key: publicKey,
+    );
+
     return _coseSign.verify(
-      verifier: _CatalystVerifier(_keyFactory, publicKey),
+      verifier: _CatalystVerifier(
+        catalystId,
+        publicKey,
+      ),
     );
   }
 }
