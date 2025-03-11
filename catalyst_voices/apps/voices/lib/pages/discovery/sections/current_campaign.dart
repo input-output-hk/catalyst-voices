@@ -76,8 +76,9 @@ class _SubTitle extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           MarkdownText(
-              key: const Key('IdeaDescription'),
-              MarkdownData(context.l10n.ideaJourneyDescription)),
+            key: const Key('IdeaDescription'),
+            MarkdownData(context.l10n.ideaJourneyDescription),
+          ),
         ],
       ),
     );
