@@ -1,34 +1,27 @@
 part of 'discovery_cubit.dart';
 
-final class DiscoveryState extends Equatable {
-  final DiscoveryCurrentCampaignState currentCampaign;
-  final DiscoveryCampaignCategoriesState campaignCategories;
-  final DiscoveryMostRecentProposalsState mostRecentProposals;
+final class DiscoveryCampaignCategoriesState extends Equatable {
+  final bool isLoading;
+  final LocalizedException? error;
+  final List<CampaignCategoryDetailsViewModel> categories;
 
-  const DiscoveryState({
-    this.currentCampaign = const DiscoveryCurrentCampaignState(),
-    this.campaignCategories = const DiscoveryCampaignCategoriesState(),
-    this.mostRecentProposals = const DiscoveryMostRecentProposalsState(),
+  const DiscoveryCampaignCategoriesState({
+    this.isLoading = true,
+    this.error,
+    this.categories = const [],
   });
-
-  DiscoveryState copyWith({
-    DiscoveryCurrentCampaignState? currentCampaign,
-    DiscoveryCampaignCategoriesState? campaignCategories,
-    DiscoveryMostRecentProposalsState? mostRecentProposals,
-  }) {
-    return DiscoveryState(
-      currentCampaign: currentCampaign ?? this.currentCampaign,
-      campaignCategories: campaignCategories ?? this.campaignCategories,
-      mostRecentProposals: mostRecentProposals ?? this.mostRecentProposals,
-    );
-  }
 
   @override
   List<Object?> get props => [
-        currentCampaign,
-        campaignCategories,
-        mostRecentProposals,
+        isLoading,
+        error,
+        categories,
       ];
+
+  bool get showCategories =>
+      !isLoading && categories.isNotEmpty && error == null;
+
+  bool get showError => !isLoading && error != null;
 }
 
 final class DiscoveryCurrentCampaignState extends Equatable {
@@ -43,41 +36,17 @@ final class DiscoveryCurrentCampaignState extends Equatable {
   }) : currentCampaign =
             currentCampaign ?? const NullCurrentCampaignInfoViewModel();
 
-  bool get showCurrentCampaign =>
-      !isLoading && currentCampaign is! NullCurrentCampaignInfoViewModel;
-
-  bool get showError => !isLoading && error != null;
-
   @override
   List<Object?> get props => [
         isLoading,
         error,
         currentCampaign,
       ];
-}
 
-final class DiscoveryCampaignCategoriesState extends Equatable {
-  final bool isLoading;
-  final LocalizedException? error;
-  final List<CampaignCategoryViewModel> categories;
-
-  const DiscoveryCampaignCategoriesState({
-    this.isLoading = true,
-    this.error,
-    this.categories = const [],
-  });
-
-  bool get showCategories =>
-      !isLoading && categories.isNotEmpty && error == null;
+  bool get showCurrentCampaign =>
+      !isLoading && currentCampaign is! NullCurrentCampaignInfoViewModel;
 
   bool get showError => !isLoading && error != null;
-
-  @override
-  List<Object?> get props => [
-        isLoading,
-        error,
-        categories,
-      ];
 }
 
 final class DiscoveryMostRecentProposalsState extends Equatable {
@@ -91,14 +60,45 @@ final class DiscoveryMostRecentProposalsState extends Equatable {
     this.proposals = const [],
   });
 
-  bool get showProposals => !isLoading && proposals.isNotEmpty && error == null;
-
-  bool get showError => !isLoading && error != null;
-
   @override
   List<Object?> get props => [
         isLoading,
         error,
         proposals,
       ];
+
+  bool get showError => !isLoading && error != null;
+
+  bool get showProposals => !isLoading && proposals.isNotEmpty && error == null;
+}
+
+final class DiscoveryState extends Equatable {
+  final DiscoveryCurrentCampaignState currentCampaign;
+  final DiscoveryCampaignCategoriesState campaignCategories;
+  final DiscoveryMostRecentProposalsState mostRecentProposals;
+
+  const DiscoveryState({
+    this.currentCampaign = const DiscoveryCurrentCampaignState(),
+    this.campaignCategories = const DiscoveryCampaignCategoriesState(),
+    this.mostRecentProposals = const DiscoveryMostRecentProposalsState(),
+  });
+
+  @override
+  List<Object?> get props => [
+        currentCampaign,
+        campaignCategories,
+        mostRecentProposals,
+      ];
+
+  DiscoveryState copyWith({
+    DiscoveryCurrentCampaignState? currentCampaign,
+    DiscoveryCampaignCategoriesState? campaignCategories,
+    DiscoveryMostRecentProposalsState? mostRecentProposals,
+  }) {
+    return DiscoveryState(
+      currentCampaign: currentCampaign ?? this.currentCampaign,
+      campaignCategories: campaignCategories ?? this.campaignCategories,
+      mostRecentProposals: mostRecentProposals ?? this.mostRecentProposals,
+    );
+  }
 }
