@@ -21,7 +21,6 @@ const QUERY: &str = include_str!("../cql/get_rbac_registrations_catalyst_id.cql"
 
 /// Get registrations by Catalyst ID query params.
 #[derive(SerializeRow)]
-#[allow(dead_code)]
 pub(crate) struct QueryParams {
     /// A Catalyst ID.
     pub catalyst_id: DbCatalystId,
@@ -54,7 +53,6 @@ impl Query {
     }
 
     /// Executes a get registrations by Catalyst ID query.
-    #[allow(dead_code)]
     pub(crate) async fn execute(
         session: &CassandraSession, params: QueryParams,
     ) -> anyhow::Result<TypedRowStream<Query>> {

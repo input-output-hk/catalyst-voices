@@ -2,7 +2,6 @@
 
 pub(crate) mod cip36;
 pub(crate) mod rbac;
-// mod registration_get;
 pub(crate) mod staking;
 
 /// All Cardano API Endpoints
