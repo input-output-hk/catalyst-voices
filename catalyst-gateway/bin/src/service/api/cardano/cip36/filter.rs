@@ -6,7 +6,7 @@ use cardano_blockchain_types::StakeAddress;
 use futures::TryStreamExt;
 
 use super::{
-    cardano::cip19_shelley_address::Cip19ShelleyAddress,
+    cardano::cip19_address::Cip19Address,
     response::{Cip36Details, Cip36Registration, Cip36RegistrationList},
     Ed25519HexEncodedPublicKey, SlotNo,
 };
@@ -146,7 +146,7 @@ async fn get_valid_registrations(
                         },
                     };
 
-                    let payment_address = match Cip19ShelleyAddress::try_from(row.payment_address) {
+                    let payment_address = match Cip19Address::try_from(row.payment_address) {
                         Ok(payment_addr) => Some(payment_addr),
                         Err(err) => {
                             anyhow::bail!(
@@ -213,7 +213,7 @@ async fn get_invalid_registrations(
                         anyhow::bail!("Corrupt invalid registration {err}");
                     },
                 };
-                let payment_address = Cip19ShelleyAddress::try_from(row.payment_address).ok();
+                let payment_address = Cip19Address::try_from(row.payment_address).ok();
                 let vote_pub_key = Ed25519HexEncodedPublicKey::try_from(row.vote_key).ok();
                 let stake_pub_key =
                     Ed25519HexEncodedPublicKey::try_from(row.stake_public_key.clone()).ok();
@@ -271,7 +271,7 @@ async fn get_all_valid_registrations(
             },
         };
 
-        let payment_address = match Cip19ShelleyAddress::try_from(row.payment_address) {
+        let payment_address = match Cip19Address::try_from(row.payment_address) {
             Ok(payment_addr) => Some(payment_addr),
             Err(err) => {
                 anyhow::bail!("Corrupt valid registration, invalid payment_address {err}\n Stake pub key:{stake_pub_key:?}");
@@ -329,7 +329,7 @@ async fn get_all_invalid_registrations(
                     },
                 };
 
-                let payment_addr = Cip19ShelleyAddress::try_from(row.payment_address).ok();
+                let payment_addr = Cip19Address::try_from(row.payment_address).ok();
 
                 let vote_pub_key = Ed25519HexEncodedPublicKey::try_from(row.vote_key).ok();
 

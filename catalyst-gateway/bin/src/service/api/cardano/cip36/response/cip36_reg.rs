@@ -13,8 +13,7 @@ use crate::service::common::{
     types::{
         array_types::impl_array_types,
         cardano::{
-            cip19_shelley_address::Cip19ShelleyAddress, nonce::Nonce, slot_no::SlotNo,
-            txn_index::TxnIndex,
+            cip19_address::Cip19Address, nonce::Nonce, slot_no::SlotNo, txn_index::TxnIndex,
         },
         generic::{boolean::BooleanFlag, ed25519_public_key::Ed25519HexEncodedPublicKey},
     },
@@ -44,7 +43,7 @@ pub(crate) struct Cip36Details {
     pub txn_index: Option<TxnIndex>,
     /// Cardano Cip-19 Formatted Shelley Payment Address.
     #[oai(skip_serializing_if_is_none)]
-    pub payment_address: Option<Cip19ShelleyAddress>,
+    pub payment_address: Option<Cip19Address>,
     /// If the payment address is a script, then it can not be payed rewards.
     #[oai(default)]
     pub is_payable: BooleanFlag,
@@ -83,9 +82,7 @@ impl Example for Cip36Details {
             nonce: Some(common::types::cardano::nonce::Nonce::example()),
             raw_nonce: Some(common::types::cardano::nonce::Nonce::example()),
             txn_index: Some(common::types::cardano::txn_index::TxnIndex::example()),
-            payment_address: Some(
-                common::types::cardano::cip19_shelley_address::Cip19ShelleyAddress::example(),
-            ),
+            payment_address: Some(common::types::cardano::cip19_address::Cip19Address::example()),
             is_payable: true.into(),
             cip15: false.into(),
             report: None,

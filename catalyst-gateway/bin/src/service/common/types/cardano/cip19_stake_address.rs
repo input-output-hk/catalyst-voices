@@ -18,7 +18,10 @@ use poem_openapi::{
 };
 use serde_json::Value;
 
-use crate::service::common::types::string_types::impl_string_types;
+use crate::service::common::types::{
+    cardano::cip19_address::{STAKE_PROD, STAKE_TEST},
+    string_types::impl_string_types,
+};
 
 /// Stake address title.
 const TITLE: &str = "Cardano stake address";
@@ -28,16 +31,12 @@ const DESCRIPTION: &str = "Cardano stake address, also known as a reward address
 // cSpell:disable
 pub(crate) const EXAMPLE: &str = "stake_test1uqehkck0lajq8gr28t9uxnuvgcqrc6070x3k9r8048z8y5gssrtvn";
 // cSpell:enable
-/// Production Stake Address Identifier
-const PROD_STAKE: &str = "stake";
-/// Test Stake Address Identifier
-const TEST_STAKE: &str = "stake_test";
 /// Regex Pattern
 pub(crate) const PATTERN: &str = concatcp!(
     "(",
-    PROD_STAKE,
+    STAKE_PROD,
     "|",
-    TEST_STAKE,
+    STAKE_TEST,
     ")1[a,c-h,j-n,p-z,0,2-9]{53}"
 );
 /// Length of the encoded address.
@@ -45,9 +44,9 @@ const ENCODED_ADDR_LEN: usize = 53;
 /// Length of the decoded address.
 const DECODED_ADDR_LEN: usize = 29;
 /// Minimum length
-pub(crate) const MIN_LENGTH: usize = PROD_STAKE.len() + 1 + ENCODED_ADDR_LEN;
+pub(crate) const MIN_LENGTH: usize = STAKE_PROD.len() + 1 + ENCODED_ADDR_LEN;
 /// Minimum length
-pub(crate) const MAX_LENGTH: usize = TEST_STAKE.len() + 1 + ENCODED_ADDR_LEN;
+pub(crate) const MAX_LENGTH: usize = STAKE_TEST.len() + 1 + ENCODED_ADDR_LEN;
 
 /// String Format
 pub(crate) const FORMAT: &str = "cardano:cip19-address";
@@ -81,7 +80,7 @@ fn is_valid(stake_addr: &str) -> bool {
     // Just check the string can be safely converted into the type.
     if let Ok((hrp, addr)) = bech32::decode(stake_addr) {
         let hrp = hrp.as_str();
-        addr.len() == DECODED_ADDR_LEN && (hrp == PROD_STAKE || hrp == TEST_STAKE)
+        addr.len() == DECODED_ADDR_LEN && (hrp == STAKE_PROD || hrp == STAKE_TEST)
     } else {
         false
     }
@@ -110,7 +109,7 @@ impl TryFrom<String> for Cip19StakeAddress {
         match bech32::decode(&value) {
             Ok((hrp, addr)) => {
                 let hrp = hrp.as_str();
-                if addr.len() == DECODED_ADDR_LEN && (hrp == PROD_STAKE || hrp == TEST_STAKE) {
+                if addr.len() == DECODED_ADDR_LEN && (hrp == STAKE_PROD || hrp == STAKE_TEST) {
                     return Ok(Cip19StakeAddress(value));
                 }
                 bail!("Invalid CIP-19 formatted Stake Address")
