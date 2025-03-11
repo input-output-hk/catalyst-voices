@@ -13,7 +13,7 @@ abstract interface class AuthService implements AuthTokenProvider {
 }
 
 final class AuthServiceImpl implements AuthService {
-  static const String tokenPrefix = 'catv1';
+  static const String tokenPrefix = 'catid';
 
   final UserObserver userObserver;
   final KeyDerivationService keyDerivationService;
