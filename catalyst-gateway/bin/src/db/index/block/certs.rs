@@ -58,18 +58,19 @@ impl CertInsertQuery {
             error!("Stake Delegation Certificate {stake_address} is NOT Witnessed.");
         }
 
-        // This may not be witnessed, its normal but disappointing.
-        self.stake_reg_data.push(StakeRegistrationInsertQuery::new(
-            stake_address,
-            slot_no,
-            txn,
-            pubkey,
-            script,
-            register,
-            deregister,
-            cip36,
-            delegation,
-        ));
+        if let Some(pubkey) = pubkey {
+            self.stake_reg_data.push(StakeRegistrationInsertQuery::new(
+                stake_address,
+                slot_no,
+                txn,
+                pubkey,
+                script,
+                register,
+                deregister,
+                cip36,
+                delegation,
+            ));
+        }
     }
 
     /// Index an Alonzo Era certificate into the database.

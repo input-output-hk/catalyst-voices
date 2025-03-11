@@ -24,7 +24,7 @@ pub(crate) struct StakeRegistrationInsertQuery {
     /// Transaction Index.
     txn_index: DbTxnIndex,
     /// Full Stake Public Key (32 byte Ed25519 Public key, not hashed).
-    stake_public_key: MaybeUnset<DbPublicKey>,
+    stake_public_key: DbPublicKey,
     /// Is the stake address a script or not.
     script: bool,
     /// Is the Cardano Certificate Registered
@@ -39,10 +39,7 @@ pub(crate) struct StakeRegistrationInsertQuery {
 
 impl Debug for StakeRegistrationInsertQuery {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        let stake_public_key = match self.stake_public_key {
-            MaybeUnset::Unset => "UNSET",
-            MaybeUnset::Set(ref v) => &hex::encode(v.as_ref()),
-        };
+        let stake_public_key = hex::encode(self.stake_public_key.as_ref());
         let register = match self.register {
             MaybeUnset::Unset => "UNSET",
             MaybeUnset::Set(v) => &format!("{v:?}"),
@@ -86,16 +83,14 @@ impl StakeRegistrationInsertQuery {
         TxIndexT: Into<DbTxnIndex>,
     >(
         stake_address: StakeAddressT, slot_no: SlotT, txn_index: TxIndexT,
-        stake_public_key: Option<VerifyingKey>, script: bool, register: Option<bool>,
+        stake_public_key: VerifyingKey, script: bool, register: Option<bool>,
         deregister: Option<bool>, cip36: Option<bool>, pool_delegation: Option<Vec<u8>>,
     ) -> Self {
-        let stake_public_key =
-            stake_public_key.map_or(MaybeUnset::Unset, |a| MaybeUnset::Set(a.into()));
         StakeRegistrationInsertQuery {
             stake_address: stake_address.into(),
             slot_no: slot_no.into(),
             txn_index: txn_index.into(),
-            stake_public_key,
+            stake_public_key: stake_public_key.into(),
             script,
             register: register.map_or(MaybeUnset::Unset, MaybeUnset::Set),
             deregister: deregister.map_or(MaybeUnset::Unset, MaybeUnset::Set),
