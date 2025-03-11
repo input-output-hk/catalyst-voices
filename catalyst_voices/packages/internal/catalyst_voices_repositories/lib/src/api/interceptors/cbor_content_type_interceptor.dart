@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:chopper/chopper.dart';
 
 /// An [Interceptor] which overrides the content-type header for [supportedRequests].
@@ -23,8 +24,8 @@ final class CborContentTypeInterceptor implements Interceptor {
     var request = chain.request;
 
     for (final cborRequest in supportedRequests) {
-      if (cborRequest.method.toUpperCase() == request.method.toUpperCase() &&
-          cborRequest.path.toUpperCase() == request.uri.path.toUpperCase()) {
+      if (cborRequest.method.equalsIgnoreCase(request.method) &&
+          cborRequest.path.equalsIgnoreCase(request.uri.path)) {
         request = applyHeader(request, headerKey, headerValue);
         break;
       }
