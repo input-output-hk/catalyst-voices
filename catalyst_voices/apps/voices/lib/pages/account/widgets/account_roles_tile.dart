@@ -44,7 +44,6 @@ class _AccountRolesTileState extends State<_AccountRolesTile> {
         onTap: widget.state.canAddRole ? _addAccountRole : null,
       ),
       child: _Roles(items: widget.state.items),
-      
     );
   }
 

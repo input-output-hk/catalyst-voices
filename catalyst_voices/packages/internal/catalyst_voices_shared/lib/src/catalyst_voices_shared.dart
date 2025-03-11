@@ -42,4 +42,5 @@ export 'utils/lockable.dart';
 export 'utils/map_ext.dart';
 export 'utils/string_ext.dart';
 export 'utils/typedefs.dart';
+export 'utils/uri_ext.dart';
 export 'utils/uuid_utils.dart';

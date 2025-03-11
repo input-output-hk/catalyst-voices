@@ -25,7 +25,6 @@ class _AccountKeychainTileState extends State<AccountKeychainTile> {
   @override
   Widget build(BuildContext context) {
     return PropertyTile(
-      
       title: context.l10n.catalystKeychain,
       action: VoicesTextButton.danger(
         key: const Key('RemoveKeychainButton'),

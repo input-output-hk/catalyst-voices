@@ -75,8 +75,6 @@ void main() async {
   );
   patrolWidgetTest(
     'user - Account dropdown button opens account dropdown',
-    (PatrolTester $) async {
-
-    },
+    (PatrolTester $) async {},
   );
 }

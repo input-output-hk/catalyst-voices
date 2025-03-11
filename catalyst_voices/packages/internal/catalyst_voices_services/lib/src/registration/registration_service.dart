@@ -1,4 +1,3 @@
-
 import 'package:catalyst_cardano/catalyst_cardano.dart';
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -166,11 +165,6 @@ final class RegistrationServiceImpl implements RegistrationService {
     required SeedPhrase seedPhrase,
   }) async {
     await Future<void>.delayed(const Duration(milliseconds: 200));
-
-    // final isSuccess = Random().nextBool();
-    // if (!isSuccess) {
-    //   throw const RegistrationUnknownException();
-    // }
 
     // TODO(damian-molinski): should come from backend
     const displayName = 'Recovered';

@@ -20,7 +20,7 @@ class ProfilePage {
     await $(displayNameTile).$(editBtn).tap();
   }
 
-  Future<void> clickEmailAdressEdit() async {
+  Future<void> clickEmailAddressEdit() async {
     await $(accountEmailTile).$(editBtn).tap();
   }
 
@@ -32,24 +32,24 @@ class ProfilePage {
     await $(removeKeychain).tap();
   }
 
-  Future<void> displayNameIsAsExpected(String exepctedDisplayName) async {
+  Future<void> displayNameIsAsExpected(String expectedDisplayName) async {
     final textField = $(accDisplayNameTxtField)
         .$(CommonPage($).voicesTextField)
         .evaluate()
         .first
         .widget as TextField;
 
-    expect(textField.controller!.text, exepctedDisplayName);
+    expect(textField.controller!.text, expectedDisplayName);
   }
 
   Future<void> emailIsAsExpected(String expectedEmail) async {
-  final textField = $(accountEmailTile)
-      .$(CommonPage($).voicesTextField)
-      .evaluate()
-      .first
-      .widget as TextField;
+    final textField = $(accountEmailTile)
+        .$(CommonPage($).voicesTextField)
+        .evaluate()
+        .first
+        .widget as TextField;
 
-  expect(textField.controller!.text, expectedEmail);
+    expect(textField.controller!.text, expectedEmail);
   }
 
   Future<void> keychainIsAsExpected(String expectedKeychain) async {
@@ -61,6 +61,4 @@ class ProfilePage {
 
     expect(textField.controller!.text, expectedKeychain);
   }
-
-
 }

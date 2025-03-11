@@ -5,7 +5,6 @@ import 'package:patrol_finders/patrol_finders.dart';
 import '../utils/translations_utils.dart';
 
 class AccountDropdownPage {
-  
   PatrolTester $;
   AccountDropdownPage(this.$);
 
@@ -21,7 +20,7 @@ class AccountDropdownPage {
   final segmentedButtonContainer = const Key('segmentedButtonContainer');
   final lockAccountButton = const Key('LockAccountButton');
 
-   Future<void> accountDropdownContainsSpecificData() async {
+  Future<void> accountDropdownContainsSpecificData() async {
     expect(
       $(popUpMenuAccountHeader).$(Expanded).$(Text).text?.isNotEmpty,
       true,
@@ -57,6 +56,7 @@ class AccountDropdownPage {
   Future<void> clickDarkTheme() async {
     await $(segmentedButton).$('Dark').tap();
   }
+
   Future<void> clickLightTheme() async {
     await $(segmentedButton).$('Light').tap();
   }
@@ -64,6 +64,7 @@ class AccountDropdownPage {
   Future<void> clickUTC() async {
     await $(segmentedButton).$('UTC').tap();
   }
+
   Future<void> clickLocal() async {
     await $(segmentedButton).$('Local').tap();
   }
@@ -79,5 +80,4 @@ class AccountDropdownPage {
   Future<void> clickRedirectToDocs() async {
     await $(redirectToDocsMenuItem).tap();
   }
-
 }

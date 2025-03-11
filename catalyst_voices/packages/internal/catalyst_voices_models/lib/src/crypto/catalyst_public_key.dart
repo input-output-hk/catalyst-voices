@@ -1,8 +1,11 @@
 import 'dart:typed_data';
 
-import 'package:catalyst_voices_models/src/crypto/catalyst_signature.dart';
+import 'package:catalyst_voices_models/src/catalyst_voices_models.dart';
 
 abstract interface class CatalystPublicKey {
+  /// A factory that creates instances of [CatalystPublicKey].
+  static late CatalystPublicKeyFactory factory;
+
   /// Returns the public key bytes.
   Uint8List get bytes;
 

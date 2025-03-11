@@ -15,7 +15,6 @@ class AppBarPage {
   final sessionAccountPopupMenuAvatar =
       const Key('SessionAccountPopupMenuAvatar');
 
-
   Future<void> spacesDrawerButtonExists({bool? reverse = false}) async {
     expect($(spacesDrawerButton).exists, !reverse!);
   }

@@ -56,7 +56,7 @@ class _AccountEmailTileState extends State<AccountEmailTile> {
   Widget build(BuildContext context) {
     return EditableTile(
       title: context.l10n.emailAddress,
-      key: const Key('AccountEmailTile'), 
+      key: const Key('AccountEmailTile'),
       onChanged: _onEditModeChange,
       isEditMode: _isEditMode,
       isSaveEnabled: _email.isValid,
