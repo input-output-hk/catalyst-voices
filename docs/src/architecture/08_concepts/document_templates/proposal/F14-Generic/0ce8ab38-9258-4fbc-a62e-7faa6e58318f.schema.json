@@ -1195,15 +1195,5 @@
         "milestones",
         "pitch",
         "agreements"
-    ],
-    "required": [
-        "setup",
-        "summary",
-        "campaign_category",
-        "theme",
-        "details",
-        "milestones",
-        "pitch",
-        "agreements"
     ]
 }
