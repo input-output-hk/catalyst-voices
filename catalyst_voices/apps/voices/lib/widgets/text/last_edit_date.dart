@@ -26,7 +26,8 @@ class LastEditDate extends StatelessWidget {
         );
         return context.l10n.lastEditDate(date);
       },
-      style: textStyle ?? context.textTheme.labelMedium?.copyWith(
+      style: textStyle ??
+          context.textTheme.labelMedium?.copyWith(
             color: context.colors.textOnPrimaryLevel1,
           ),
       showTimezone: showTimezone,
