@@ -31,7 +31,7 @@ final class AuthServiceImpl implements AuthService {
     final catalystIdString = catalystId.toUri().toStringWithoutScheme();
     final toBeSigned = utf8.encode('$tokenPrefix.$catalystIdString.');
     final signature = await keyPair.privateKey.sign(toBeSigned);
-    final encodedSignature = base64Encode(signature.bytes);
+    final encodedSignature = base64UrlEncode(signature.bytes);
 
     return '$tokenPrefix.$catalystIdString.$encodedSignature';
   }
