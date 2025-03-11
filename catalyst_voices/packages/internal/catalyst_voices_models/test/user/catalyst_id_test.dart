@@ -4,6 +4,7 @@ import 'package:catalyst_voices_models/src/crypto/catalyst_key_factory.dart';
 import 'package:catalyst_voices_models/src/crypto/catalyst_public_key.dart';
 import 'package:catalyst_voices_models/src/user/account_role.dart';
 import 'package:catalyst_voices_models/src/user/catalyst_id.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:test/fake.dart';
@@ -149,7 +150,7 @@ void main() {
         nonce: 123456,
       );
 
-      final formattedId = catalystId.formatAsUriWithoutScheme();
+      final formattedId = catalystId.toUri().toStringWithoutScheme();
       expect(
         formattedId,
         equals(

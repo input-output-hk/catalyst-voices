@@ -87,20 +87,6 @@ final class CatalystId extends Equatable {
         encrypt,
       ];
 
-  /// Formats the catalyst ID skipping the scheme and the scheme separator `//`.
-  String formatAsUriWithoutScheme() {
-    final uri = Uri(
-      scheme: null,
-      userInfo: _formatUserInfo(),
-      host: host,
-      path: _formatPath(),
-      fragment: encrypt ? encryptFragment : null,
-    );
-
-    final string = uri.toString();
-    return string.replaceAll('//', '');
-  }
-
   /// Builds the [Uri] from the [CatalystId].
   Uri toUri() {
     return Uri(
@@ -113,19 +99,17 @@ final class CatalystId extends Equatable {
   }
 
   String _formatPath() {
-    final buffer = StringBuffer(base64Encode(role0Key.bytes));
+    final encodedRole0Key = base64Encode(role0Key.bytes);
+    final role = this.role?.number.toString();
+    final rotation = this.rotation?.toString();
 
-    final role = this.role?.number;
-    if (role != null) {
-      buffer.write('/$role');
-    }
+    final parts = [
+      encodedRole0Key,
+      if (role != null) role,
+      if (rotation != null) rotation,
+    ];
 
-    final rotation = this.rotation;
-    if (rotation != null) {
-      buffer.write('/$rotation');
-    }
-
-    return buffer.toString();
+    return parts.join('/');
   }
 
   String? _formatUserInfo() {
@@ -158,34 +142,28 @@ final class CatalystId extends Equatable {
     final parts = sanitizedPath.split('/');
 
     final role0Key = parts.elementAt(0);
-    final role = parts.elementAtOrNull(1);
-    final rotation = parts.elementAtOrNull(2);
+    final role = int.tryParse(parts.elementAtOrNull(1) ?? '');
+    final rotation = int.tryParse(parts.elementAtOrNull(2) ?? '');
 
     final decodedRole0Key = base64Decode(role0Key);
-    final catalystRole0Key =
-        CatalystPublicKey.factory.create(decodedRole0Key);
+    final catalystRole0Key = CatalystPublicKey.factory.create(decodedRole0Key);
+    final accountRole = role != null ? AccountRole.fromNumber(role) : null;
 
-    final roleNumber = role != null ? int.tryParse(role) : null;
-    final accountRole =
-        roleNumber != null ? AccountRole.fromNumber(roleNumber) : null;
-
-    final rotationInt = rotation != null ? int.tryParse(rotation) : null;
-
-    return (catalystRole0Key, accountRole, rotationInt);
+    return (catalystRole0Key, accountRole, rotation);
   }
 
   /// Parse [username] and [nonce] from [Uri.userInfo].
   ///
   /// Format: [username][:nonce]
   static (String? username, int? nonce) _parseUserInfo(String userInfo) {
-    if (userInfo.isEmpty) {
-      return (null, null);
-    } else if (!userInfo.contains(':')) {
-      return (userInfo, null);
-    } else {
-      final parts = userInfo.split(':');
-      return (parts[0], int.parse(parts[1]));
-    }
+    final parts = userInfo.split(':');
+    final username = parts.elementAtOrNull(0) ?? '';
+    final nonce = parts.elementAtOrNull(1) ?? '';
+
+    return (
+      username.isNotBlank ? username : null,
+      nonce.isNotBlank ? int.parse(nonce) : null,
+    );
   }
 
   /// Removes the first '/' from the [path].
@@ -213,12 +191,9 @@ enum CatalystIdHost {
   const CatalystIdHost({required this.host});
 
   factory CatalystIdHost.fromHost(String host) {
-    for (final value in values) {
-      if (value.host.toLowerCase() == host.toLowerCase()) {
-        return value;
-      }
-    }
-
-    return undefined;
+    return CatalystIdHost.values.firstWhere(
+      (element) => element.host.equalsIgnoreCase(host),
+      orElse: () => CatalystIdHost.undefined,
+    );
   }
 }
