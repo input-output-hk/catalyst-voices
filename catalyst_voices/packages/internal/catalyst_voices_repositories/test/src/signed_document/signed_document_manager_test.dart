@@ -12,8 +12,8 @@ void main() {
     const documentManager = SignedDocumentManager();
 
     setUpAll(() {
-      CatalystPublicKey.factory = _FakeCatalystKeyFactory();
-      CatalystSignature.factory = _FakeCatalystKeyFactory();
+      CatalystPublicKey.factory = _FakeCatalystPublicKeyFactory();
+      CatalystSignature.factory = _FakeCatalystSignatureFactory();
       CatalystCompressionPlatform.instance = _FakeCatalystCompressionPlatform();
     });
 
@@ -67,27 +67,6 @@ class _FakeCatalystCompressionPlatform extends CatalystCompressionPlatform {
   CatalystCompressor get brotli => const _FakeCompressor();
 }
 
-class _FakeCatalystKeyFactory extends Fake
-    implements
-        CatalystPrivateKeyFactory,
-        CatalystPublicKeyFactory,
-        CatalystSignatureFactory {
-  @override
-  CatalystPrivateKey createPrivateKey(Uint8List bytes) {
-    return _FakeCatalystPrivateKey(bytes: bytes);
-  }
-
-  @override
-  CatalystPublicKey createPublicKey(Uint8List bytes) {
-    return _FakeCatalystPublicKey(bytes: bytes);
-  }
-
-  @override
-  CatalystSignature createSignature(Uint8List bytes) {
-    return _FakeCatalystSignature(bytes: bytes);
-  }
-}
-
 class _FakeCatalystPrivateKey extends Fake implements CatalystPrivateKey {
   @override
   final Uint8List bytes;
@@ -127,11 +106,27 @@ class _FakeCatalystPublicKey extends Fake implements CatalystPublicKey {
   }
 }
 
+class _FakeCatalystPublicKeyFactory extends Fake
+    implements CatalystPublicKeyFactory {
+  @override
+  CatalystPublicKey create(Uint8List bytes) {
+    return _FakeCatalystPublicKey(bytes: bytes);
+  }
+}
+
 class _FakeCatalystSignature extends Fake implements CatalystSignature {
   @override
   final Uint8List bytes;
 
   _FakeCatalystSignature({required this.bytes});
+}
+
+class _FakeCatalystSignatureFactory extends Fake
+    implements CatalystSignatureFactory {
+  @override
+  CatalystSignature create(Uint8List bytes) {
+    return _FakeCatalystSignature(bytes: bytes);
+  }
 }
 
 final class _FakeCompressor implements CatalystCompressor {

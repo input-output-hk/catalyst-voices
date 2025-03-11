@@ -163,7 +163,7 @@ final class CatalystId extends Equatable {
 
     final decodedRole0Key = base64Decode(role0Key);
     final catalystRole0Key =
-        CatalystPublicKey.factory.createPublicKey(decodedRole0Key);
+        CatalystPublicKey.factory.create(decodedRole0Key);
 
     final roleNumber = role != null ? int.tryParse(role) : null;
     final accountRole =

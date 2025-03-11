@@ -6,11 +6,11 @@ import 'package:catalyst_voices_services/src/crypto/bip32_ed25519_catalyst_publi
 import 'package:catalyst_voices_services/src/crypto/bip32_ed25519_catalyst_signature.dart';
 import 'package:equatable/equatable.dart';
 
-final class Bip32Ed25519CatalystPrivateKey extends Equatable
+final class Bip32Ed25519XCatalystPrivateKey extends Equatable
     implements CatalystPrivateKey {
   final Bip32Ed25519XPrivateKey _privateKey;
 
-  const Bip32Ed25519CatalystPrivateKey(this._privateKey);
+  const Bip32Ed25519XCatalystPrivateKey(this._privateKey);
 
   @override
   CatalystSignatureAlgorithm get algorithm =>
@@ -25,7 +25,7 @@ final class Bip32Ed25519CatalystPrivateKey extends Equatable
   @override
   Future<CatalystPrivateKey> derivePrivateKey({required String path}) async {
     final derivedKey = await _privateKey.derivePrivateKey(path: path);
-    return Bip32Ed25519CatalystPrivateKey(derivedKey);
+    return Bip32Ed25519XCatalystPrivateKey(derivedKey);
   }
 
   @override
@@ -43,5 +43,16 @@ final class Bip32Ed25519CatalystPrivateKey extends Equatable
   Future<CatalystSignature> sign(Uint8List data) async {
     final signature = await _privateKey.sign(data);
     return Bip32Ed25519XCatalystSignature(signature);
+  }
+}
+
+final class Bip32Ed25519XCatalystPrivateKeyFactory
+    implements CatalystPrivateKeyFactory {
+  const Bip32Ed25519XCatalystPrivateKeyFactory();
+
+  @override
+  CatalystPrivateKey create(Uint8List bytes) {
+    final privateKey = Bip32Ed25519XPrivateKeyFactory.instance.fromBytes(bytes);
+    return Bip32Ed25519XCatalystPrivateKey(privateKey);
   }
 }

@@ -25,3 +25,14 @@ final class Bip32Ed25519XCatalystPublicKey extends Equatable
     return _publicKey.verify(data, signature: bip32Signature);
   }
 }
+
+final class Bip32Ed25519XCatalystPublicKeyFactory
+    implements CatalystPublicKeyFactory {
+  const Bip32Ed25519XCatalystPublicKeyFactory();
+
+  @override
+  CatalystPublicKey create(Uint8List bytes) {
+    final publicKey = Bip32Ed25519XPublicKeyFactory.instance.fromBytes(bytes);
+    return Bip32Ed25519XCatalystPublicKey(publicKey);
+  }
+}

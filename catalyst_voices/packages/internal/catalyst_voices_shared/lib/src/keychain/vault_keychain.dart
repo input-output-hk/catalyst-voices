@@ -43,7 +43,7 @@ final class VaultKeychain extends SecureStorageVault implements Keychain {
     }
 
     final masterKeyBytes = Uint8List.fromList(hex.decode(masterKeyHex));
-    return CatalystPrivateKey.factory.createPrivateKey(masterKeyBytes);
+    return CatalystPrivateKey.factory.create(masterKeyBytes);
   }
 
   @override
