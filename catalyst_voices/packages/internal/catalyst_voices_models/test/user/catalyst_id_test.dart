@@ -161,7 +161,8 @@ void main() {
   });
 }
 
-class _FakeCatalystPublicKeyFactory extends Fake implements CatalystPublicKeyFactory {
+class _FakeCatalystPublicKeyFactory extends Fake
+    implements CatalystPublicKeyFactory {
   @override
   CatalystPublicKey create(Uint8List bytes) {
     return _FakeCatalystPublicKey(bytes: bytes);
