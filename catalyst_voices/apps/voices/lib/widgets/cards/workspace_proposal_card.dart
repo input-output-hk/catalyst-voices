@@ -1,18 +1,24 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
-import 'package:catalyst_voices/widgets/buttons/voices_icon_button.dart';
+import 'package:catalyst_voices/widgets/cards/proposal_card_widgets.dart';
+import 'package:catalyst_voices/widgets/cards/proposal_iteration_history_card.dart';
 import 'package:catalyst_voices/widgets/text/last_edit_date.dart';
+import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
+import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 
 class WorkspaceProposalCard extends StatelessWidget {
-  final bool isSubmitted;
+  final ProposalWithVersions proposal;
   const WorkspaceProposalCard({
     super.key,
-    required this.isSubmitted,
+    required this.proposal,
   });
 
   @override
   Widget build(BuildContext context) {
+    final isSubmitted = proposal.publish.isPublished;
     return _ProposalSubmitState(
       isSubmitted: isSubmitted,
       child: Padding(
@@ -28,11 +34,14 @@ class WorkspaceProposalCard extends StatelessWidget {
           child: Column(
             spacing: 12,
             mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const _Body(),
+              _Body(proposal),
               Offstage(
                 offstage: isSubmitted,
-                child: const _ProposalIterationHistory(),
+                child: ProposalIterationHistory(
+                  proposal: proposal,
+                ),
               ),
             ],
           ),
@@ -43,29 +52,40 @@ class WorkspaceProposalCard extends StatelessWidget {
 }
 
 class _Body extends StatelessWidget {
-  const _Body();
+  final ProposalWithVersions proposal;
+  const _Body(this.proposal);
 
   @override
   Widget build(BuildContext context) {
     final isSubmitted = _ProposalSubmitState.of(context)?.isSubmitted ?? false;
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return Wrap(
+      alignment: WrapAlignment.spaceBetween,
+      spacing: 10,
+      runSpacing: 10,
       children: [
         _BodyHeader(
-          title: 'Latest proposal that is making its rounds.',
-          lastUpdate: DateTime.now(),
+          title: proposal.title,
+          lastUpdate: proposal.updateDate,
         ),
-        const _CampaignData(
-          leadValue: 'Cardano Use Cases: Concept',
-          subValue: 'Fund 14 Category',
+        ProposalIterationStageChip(
+          status: proposal.publish,
+          versionNumber: proposal.versions.versionNumber(
+            proposal.selfRef.version ?? '',
+          ),
+          useInternalBackground: !isSubmitted,
         ),
-        const _CampaignData(
-          leadValue: '₳50,000',
-          subValue: 'Funding Requested',
+        _CampaignData(
+          leadValue: proposal.category,
+          subValue: context.l10n.fundNoCategory(14),
         ),
-        const _CampaignData(
-          leadValue: '7',
-          subValue: 'Comments',
+        _CampaignData(
+          leadValue:
+              CryptocurrencyFormatter.decimalFormat(proposal.fundsRequested),
+          subValue: context.l10n.proposalViewFundingRequested,
+        ),
+        _CampaignData(
+          leadValue: proposal.commentsCount.toString(),
+          subValue: context.l10n.comments,
         ),
         VoicesIconButton(
           onTap: () {},
@@ -126,9 +146,8 @@ class _CampaignData extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final headerColor = _ProposalSubmitState.of(context)?.headerColor(context);
     final labelColor =
-        _ProposalSubmitState.of(context)?.headerLabelColor(context);
+        _ProposalSubmitState.of(context)?.dataLabelColor(context);
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -137,7 +156,7 @@ class _CampaignData extends StatelessWidget {
         Text(
           leadValue,
           style: context.textTheme.titleSmall?.copyWith(
-            color: headerColor,
+            color: labelColor,
           ),
         ),
         Text(
@@ -147,19 +166,6 @@ class _CampaignData extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-}
-
-class _ProposalIterationHistory extends StatelessWidget {
-  const _ProposalIterationHistory();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      color: context.colors.elevationsOnSurfaceNeutralLv1Grey,
-      width: double.infinity,
-      height: 50,
     );
   }
 }
@@ -175,6 +181,10 @@ class _ProposalSubmitState extends InheritedWidget {
   Color backgroundColor(BuildContext context) => isSubmitted
       ? context.colors.onSurfacePrimary08
       : context.colors.elevationsOnSurfaceNeutralLv1White;
+
+  Color dataLabelColor(BuildContext context) => isSubmitted
+      ? context.colors.primaryContainer
+      : context.colors.textOnPrimaryLevel1;
 
   Color headerColor(BuildContext context) => isSubmitted
       ? context.colors.textOnPrimaryWhite
