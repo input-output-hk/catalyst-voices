@@ -11,6 +11,7 @@ project: {
 			// TODO: re-enable once we can better control number of deployments
 			//merge: {}
 			//tag: {}
+			always: {}
 		}
 		modules: main: {
 			name:    "app"
@@ -26,6 +27,12 @@ project: {
 						env: {
 							"RBAC_OFF": {
 								value: "True"
+							}
+							"SIGNED_DOC_SK": {
+    							secret: {
+        							name: "gateway"
+        							key:  "signed-doc-secret-key"
+    							}
 							}
 							"RUST_LOG": {
 								value: "debug,cat_gateway=debug,cardano_chain_follower=info"
@@ -228,8 +235,9 @@ project: {
 	release: {
 		docker: {
 			on: {
-				merge: {}
-				tag: {}
+				//merge: {}
+				//tag: {}
+				always: {}
 			}
 			config: {
 				tag: _ @forge(name="GIT_COMMIT_HASH")

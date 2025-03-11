@@ -68,7 +68,7 @@ final class KeyDerivationServiceImpl implements KeyDerivationService {
       mnemonic: seedPhrase.mnemonic,
     );
 
-    return Bip32Ed25519CatalystPrivateKey(privateKey);
+    return Bip32Ed25519XCatalystPrivateKey(privateKey);
   }
 
   /// The path feed into key derivation algorithm
