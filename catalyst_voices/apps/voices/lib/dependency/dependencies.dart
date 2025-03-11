@@ -145,9 +145,7 @@ final class Dependencies extends DependencyProvider {
         );
       })
       ..registerLazySingleton<SignedDocumentManager>(() {
-        return SignedDocumentManager(
-          keyFactory: get<CatalystKeyFactory>(),
-        );
+        return const SignedDocumentManager();
       })
       ..registerLazySingleton<DatabaseDraftsDataSource>(() {
         return DatabaseDraftsDataSource(
@@ -186,15 +184,11 @@ final class Dependencies extends DependencyProvider {
     registerLazySingleton<KeyDerivationService>(() {
       return KeyDerivationService(get<CatalystKeyDerivation>());
     });
-    registerLazySingleton<CatalystKeyFactory>(
-      () => const Bip32Ed25519CatalystKeyFactory(),
-    );
     registerLazySingleton<KeychainProvider>(() {
       return VaultKeychainProvider(
         secureStorage: get<FlutterSecureStorage>(),
         sharedPreferences: get<SharedPreferencesAsync>(),
         cacheConfig: get<AppConfig>().cache,
-        keyFactory: get<CatalystKeyFactory>(),
       );
     });
     registerLazySingleton<DownloaderService>(DownloaderService.new);
