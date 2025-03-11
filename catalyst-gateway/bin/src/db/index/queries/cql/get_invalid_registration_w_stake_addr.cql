@@ -1,4 +1,7 @@
-SELECT slot_no,
+SELECT nonce,
+       raw_nonce,
+       slot_no,
+       txn_index,
        problem_report,
        stake_public_key,
        vote_key,

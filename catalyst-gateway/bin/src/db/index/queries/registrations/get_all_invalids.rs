@@ -13,7 +13,7 @@ use crate::db::{
         queries::{PreparedQueries, PreparedSelectQuery},
         session::CassandraSession,
     },
-    types::DbSlot,
+    types::{DbSlot, DbTxnIndex},
 };
 
 /// Get all invalid registrations
@@ -38,12 +38,18 @@ impl GetAllInvalidRegistrationsParams {
 /// Get all invalid registrations details for snapshot.
 #[derive(DeserializeRow)]
 pub(crate) struct GetAllInvalidRegistrationsQuery {
+    /// Nonce value after normalization.
+    pub nonce: num_bigint::BigInt,
+    /// Raw Nonce value.
+    pub raw_nonce: num_bigint::BigInt,
+    /// Slot Number the cert is in.
+    pub slot_no: DbSlot,
+    /// Transaction Index.
+    pub txn_index: DbTxnIndex,
     /// Error report
     pub problem_report: String,
     /// Full Stake Address (not hashed, 32 byte ED25519 Public key).
     pub stake_public_key: Vec<u8>,
-    /// Slot Number
-    pub slot_no: num_bigint::BigInt,
     /// Voting Public Key
     pub vote_key: Vec<u8>,
     /// Full Payment Address (not hashed, 32 byte ED25519 Public key).

@@ -48,6 +48,8 @@ pub(crate) struct GetRegistrationQuery {
     pub slot_no: DbSlot,
     /// Transaction Index.
     pub txn_index: DbTxnIndex,
+    /// Raw Nonce value.
+    pub raw_nonce: num_bigint::BigInt,
     /// Voting Public Key
     pub vote_key: Vec<u8>,
     /// Full Payment Address (not hashed, 32 byte ED25519 Public key).

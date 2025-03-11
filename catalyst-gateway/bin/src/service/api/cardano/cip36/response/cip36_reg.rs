@@ -7,41 +7,54 @@ use poem_openapi::{
     Object,
 };
 
-use crate::service::{common, common::types::array_types::impl_array_types};
+use crate::service::common::{
+    self,
+    objects::generic::json_object::JSONObject,
+    types::{
+        array_types::impl_array_types,
+        cardano::{
+            cip19_shelley_address::Cip19ShelleyAddress, nonce::Nonce, slot_no::SlotNo,
+            txn_index::TxnIndex,
+        },
+        generic::{boolean::BooleanFlag, ed25519_public_key::Ed25519HexEncodedPublicKey},
+    },
+};
 
 /// CIP36 Registration Data as found on-chain.
 #[derive(Object, Debug, Clone)]
 #[oai(example = true)]
 pub(crate) struct Cip36Details {
     /// Blocks Slot Number that the registration certificate is in.
-    pub slot_no: common::types::cardano::slot_no::SlotNo,
+    pub slot_no: SlotNo,
     /// Full Stake Address (not hashed, 32 byte ED25519 Public key).
     #[oai(skip_serializing_if_is_none)]
-    pub stake_pub_key:
-        Option<common::types::generic::ed25519_public_key::Ed25519HexEncodedPublicKey>,
+    pub stake_pub_key: Option<Ed25519HexEncodedPublicKey>,
     /// Voting Public Key (Ed25519 Public key).
     #[oai(skip_serializing_if_is_none)]
-    pub vote_pub_key:
-        Option<common::types::generic::ed25519_public_key::Ed25519HexEncodedPublicKey>,
+    pub vote_pub_key: Option<Ed25519HexEncodedPublicKey>,
+    /// A Catalyst corrected nonce, which is used during sorting of registrations.
+    #[oai(skip_serializing_if_is_none)]
+    pub nonce: Option<Nonce>,
+    /// Raw nonce (nonce that has not had slot correction applied).
+    /// Field 4 in the CIP-36 61284 Spec.
+    #[oai(skip_serializing_if_is_none)]
+    pub raw_nonce: Option<Nonce>,
     #[allow(clippy::missing_docs_in_private_items)] // Type is pre documented.
     #[oai(skip_serializing_if_is_none)]
-    pub nonce: Option<common::types::cardano::nonce::Nonce>,
-    #[allow(clippy::missing_docs_in_private_items)] // Type is pre documented.
-    #[oai(skip_serializing_if_is_none)]
-    pub txn_index: Option<common::types::cardano::txn_index::TxnIndex>,
+    pub txn_index: Option<TxnIndex>,
     /// Cardano Cip-19 Formatted Shelley Payment Address.
     #[oai(skip_serializing_if_is_none)]
-    pub payment_address: Option<common::types::cardano::cip19_shelley_address::Cip19ShelleyAddress>,
+    pub payment_address: Option<Cip19ShelleyAddress>,
     /// If the payment address is a script, then it can not be payed rewards.
     #[oai(default)]
-    pub is_payable: common::types::cardano::boolean::IsPayable,
+    pub is_payable: BooleanFlag,
     /// If this field is set, then the registration was in CIP15 format.
     #[oai(default)]
-    pub cip15: common::types::cardano::boolean::IsCip15,
+    pub cip15: BooleanFlag,
     /// If there are errors with this registration, they are listed here.
     /// This field is *NEVER* returned for a valid registration.
     #[oai(skip_serializing_if_is_none)]
-    pub report: Option<common::objects::generic::json_object::JSONObject>,
+    pub report: Option<JSONObject>,
 }
 
 // List of CIP-36 Registrations
@@ -68,6 +81,7 @@ impl Example for Cip36Details {
                 common::types::generic::ed25519_public_key::Ed25519HexEncodedPublicKey::example(),
             ),
             nonce: Some(common::types::cardano::nonce::Nonce::example()),
+            raw_nonce: Some(common::types::cardano::nonce::Nonce::example()),
             txn_index: Some(common::types::cardano::txn_index::TxnIndex::example()),
             payment_address: Some(
                 common::types::cardano::cip19_shelley_address::Cip19ShelleyAddress::example(),
@@ -96,6 +110,7 @@ impl Cip36Details {
                 common::types::generic::ed25519_public_key::Ed25519HexEncodedPublicKey::example(),
             ),
             nonce: Some((common::types::cardano::nonce::EXAMPLE + 97).into()),
+            raw_nonce: Some((common::types::cardano::nonce::EXAMPLE + 97).into()),
             txn_index: Some(common::types::cardano::txn_index::TxnIndex::example()),
             payment_address: None,
             is_payable: false.into(),

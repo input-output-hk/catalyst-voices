@@ -1,6 +1,7 @@
 SELECT nonce,
        slot_no,
        txn_index,
+       raw_nonce,
        vote_key,
        payment_address,
        is_payable,

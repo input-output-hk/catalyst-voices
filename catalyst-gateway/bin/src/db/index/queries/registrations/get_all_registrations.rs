@@ -43,9 +43,11 @@ pub(crate) struct GetAllRegistrationsQuery {
     /// Nonce value after normalization.
     pub nonce: num_bigint::BigInt,
     /// Slot Number the cert is in.
-    pub slot_no: num_bigint::BigInt,
+    pub slot_no: DbSlot,
     /// Transaction Index.
     pub txn_index: DbTxnIndex,
+    /// Raw Nonce value.
+    pub raw_nonce: num_bigint::BigInt,
     /// Voting Public Key
     pub vote_key: Vec<u8>,
     /// Full Payment Address (not hashed, 32 byte ED25519 Public key).

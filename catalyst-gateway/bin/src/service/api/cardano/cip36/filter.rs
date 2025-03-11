@@ -6,7 +6,7 @@ use cardano_blockchain_types::StakeAddress;
 use futures::TryStreamExt;
 
 use super::{
-    cardano::{cip19_shelley_address::Cip19ShelleyAddress, nonce::Nonce},
+    cardano::cip19_shelley_address::Cip19ShelleyAddress,
     response::{Cip36Details, Cip36Registration, Cip36RegistrationList},
     Ed25519HexEncodedPublicKey, SlotNo,
 };
@@ -135,13 +135,14 @@ async fn get_valid_registrations(
                     let Ok(nonce) = u64::try_from(row.nonce) else {
                         anyhow::bail!("Corrupt valid registration, cannot decode nonce");
                     };
+                    let Ok(raw_nonce) = u64::try_from(row.raw_nonce) else {
+                        anyhow::bail!("Corrupt valid registration, cannot decode raw_nonce");
+                    };
 
-                    let slot_no: u64 = row.slot_no.into();
-
-                    let slot_no = match SlotNo::try_from(slot_no) {
+                    let slot_no = match SlotNo::try_from(u64::from(row.slot_no)) {
                         Ok(slot_no) => slot_no,
                         Err(err) => {
-                            anyhow::bail!("Corrupt valid registration, invalid slot_no {err}");
+                            anyhow::bail!("Corrupt invalid registration {err}");
                         },
                     };
 
@@ -149,9 +150,9 @@ async fn get_valid_registrations(
                         Ok(payment_addr) => Some(payment_addr),
                         Err(err) => {
                             anyhow::bail!(
-                    "Corrupt valid registration, invalid payment_address {err}\n Stake pub key: {}",
-                    *hex_stake_pk
-                );
+                                "Corrupt valid registration, invalid payment_address {err}\n Stake pub key: {}",
+                                *hex_stake_pk
+                            );
                         },
                     };
 
@@ -159,9 +160,9 @@ async fn get_valid_registrations(
                         Ok(vote_pub_key) => Some(vote_pub_key),
                         Err(err) => {
                             anyhow::bail!(
-                    "Corrupt valid registration, invalid vote_pub_key {err}\n Stake pub key:{:?}",
-                    *hex_stake_pk
-                );
+                                "Corrupt valid registration, invalid vote_pub_key {err}\n Stake pub key:{:?}",
+                                *hex_stake_pk
+                            );
                         },
                     };
 
@@ -169,7 +170,8 @@ async fn get_valid_registrations(
                         slot_no,
                         stake_pub_key: Some(hex_stake_pk),
                         vote_pub_key,
-                        nonce: Some(Nonce::from(nonce)),
+                        nonce: Some(nonce.into()),
+                        raw_nonce: Some(raw_nonce.into()),
                         txn_index: Some(row.txn_index.into()),
                         payment_address,
                         is_payable: row.is_payable.into(),
@@ -199,8 +201,13 @@ async fn get_invalid_registrations(
         .map_err(|e| -> anyhow::Error { e.into() })
         .try_fold(Vec::new(), |mut regs, row| {
             async move {
-                let slot_no: u64 = row.slot_no.into();
-                let slot_no = match SlotNo::try_from(slot_no) {
+                let Ok(nonce) = u64::try_from(row.nonce) else {
+                    anyhow::bail!("Corrupt invalid registration, cannot decode nonce");
+                };
+                let Ok(raw_nonce) =u64::try_from(row.raw_nonce) else {
+                    anyhow::bail!("Corrupt invalid registration, cannot decode raw_nonce");
+                };
+                let slot_no = match SlotNo::try_from(u64::from(row.slot_no)) {
                     Ok(slot_no) => slot_no,
                     Err(err) => {
                         anyhow::bail!("Corrupt invalid registration {err}");
@@ -219,8 +226,9 @@ async fn get_invalid_registrations(
                     slot_no,
                     stake_pub_key,
                     vote_pub_key,
-                    nonce: None,
-                    txn_index: None,
+                    nonce: Some(nonce.into()),
+                    raw_nonce: Some(raw_nonce.into()),
+                    txn_index: Some(row.txn_index.into()),
                     payment_address,
                     is_payable: row.is_payable.into(),
                     cip15: (!row.cip36).into(),
@@ -244,15 +252,14 @@ async fn get_all_valid_registrations(
         let Ok(nonce) = u64::try_from(row.nonce) else {
             anyhow::bail!("Corrupt valid registration, cannot decode nonce");
         };
-
-        let Ok(slot_no) = u64::try_from(row.slot_no) else {
-            anyhow::bail!("Corrupt valid registration, cannot decode slot_no");
+        let Ok(raw_nonce) = u64::try_from(row.raw_nonce) else {
+            anyhow::bail!("Corrupt valid registration, cannot decode raw_nonce");
         };
 
-        let slot_no = match SlotNo::try_from(slot_no) {
+        let slot_no = match SlotNo::try_from(u64::from(row.slot_no)) {
             Ok(slot_no) => slot_no,
             Err(err) => {
-                anyhow::bail!("Corrupt valid registration, invalid slot_no {err}");
+                anyhow::bail!("Corrupt invalid registration {err}");
             },
         };
 
@@ -282,7 +289,8 @@ async fn get_all_valid_registrations(
             slot_no,
             stake_pub_key,
             vote_pub_key,
-            nonce: Some(Nonce::from(nonce)),
+            nonce: Some(nonce.into()),
+            raw_nonce: Some(raw_nonce.into()),
             txn_index: Some(row.txn_index.into()),
             payment_address,
             is_payable: row.is_payable.into(),
@@ -308,11 +316,18 @@ async fn get_all_invalid_registrations(
         .map_err(|e| -> anyhow::Error { e.into() })
         .try_fold(Vec::new(), |mut regs, row| {
             async move {
-                let Ok(slot_no) = u64::try_from(row.slot_no) else {
-                    anyhow::bail!("Corrupt valid registration, cannot decode slot_no");
+                let Ok(nonce) = u64::try_from(row.nonce) else {
+                    anyhow::bail!("Corrupt valid registration, cannot decode nonce");
                 };
-
-                let slot_no = SlotNo::try_from(slot_no).unwrap_or_default();
+                let Ok(raw_nonce) = u64::try_from(row.raw_nonce) else {
+                    anyhow::bail!("Corrupt valid registration, cannot decode raw_nonce");
+                };
+                let slot_no = match SlotNo::try_from(u64::from(row.slot_no)) {
+                    Ok(slot_no) => slot_no,
+                    Err(err) => {
+                        anyhow::bail!("Corrupt invalid registration {err}");
+                    },
+                };
 
                 let payment_addr = Cip19ShelleyAddress::try_from(row.payment_address).ok();
 
@@ -331,8 +346,9 @@ async fn get_all_invalid_registrations(
                     slot_no,
                     stake_pub_key,
                     vote_pub_key,
-                    nonce: None,
-                    txn_index: None,
+                    nonce: Some(nonce.into()),
+                    raw_nonce: Some(raw_nonce.into()),
+                    txn_index: Some(row.txn_index.into()),
                     payment_address: payment_addr,
                     is_payable: row.is_payable.into(),
                     cip15: (!row.cip36).into(),
