@@ -33,6 +33,8 @@
                 "supportingLinks": { "type": "object" },
                 "dependencies": { "type": "object" },
                 "open_source": { "type": "object" },
+                "category_details": { "type": "object" },
+                "category_questions": { "type": "object" },
                 "theme": { "type": "object" },
                 "impact": { "type": "object" },
                 "feasibility": { "type": "object" },

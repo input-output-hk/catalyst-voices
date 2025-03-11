@@ -52,6 +52,55 @@
             "licenseInformation": "All source code and documentation will be released under the MIT license."
         }
     },
+    "campaign_category": {
+        "category_details": {
+            "details": {}
+        },
+        "category_questions": {
+            "informational_content": {
+                "answer": false
+            },
+            "foundational_rd": {
+                "answer": false
+            },
+            "financial_products": {
+                "answer": false
+            },
+            "early_stage_product": {
+                "answer": false
+            },
+            "developer_tools": {
+                "answer": false
+            },
+            "enterprise_partnership": {
+                "answer": true,
+                "secondary_question": {
+                    "question": "Example Enterprise with proven track record"
+                }
+            },
+            "working_product": {
+                "answer": true,
+                "secondary_question": {
+                    "question": "Example product with measurable adoption metrics"
+                }
+            },
+            "timeline": {
+                "answer": true
+            },
+            "matching_funds": {
+                "answer": true,
+                "secondary_question": {
+                    "question": "Example matching funds details"
+                }
+            },
+            "adoption_potential": {
+                "answer": true,
+                "secondary_question": {
+                    "question": "Example measurable outcomes and assessment methods"
+                }
+            }
+        }
+    },
     "theme": {
         "theme": {
             "grouped_tag": {
