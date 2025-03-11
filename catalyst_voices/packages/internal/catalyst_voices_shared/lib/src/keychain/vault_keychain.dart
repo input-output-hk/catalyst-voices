@@ -12,8 +12,6 @@ const _allKeys = [
 const _rootKey = 'rootKey';
 
 final class VaultKeychain extends SecureStorageVault implements Keychain {
-  final CatalystKeyFactory keyFactory;
-
   VaultKeychain({
     required super.id,
     super.key,
@@ -21,7 +19,6 @@ final class VaultKeychain extends SecureStorageVault implements Keychain {
     required super.sharedPreferences,
     super.unlockTtl,
     super.cryptoService,
-    required this.keyFactory,
   });
 
   @override
@@ -46,7 +43,7 @@ final class VaultKeychain extends SecureStorageVault implements Keychain {
     }
 
     final masterKeyBytes = Uint8List.fromList(hex.decode(masterKeyHex));
-    return keyFactory.createPrivateKey(masterKeyBytes);
+    return CatalystPrivateKey.factory.create(masterKeyBytes);
   }
 
   @override
