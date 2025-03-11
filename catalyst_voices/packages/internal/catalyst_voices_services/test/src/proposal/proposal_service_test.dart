@@ -92,10 +92,10 @@ void main() {
       ).thenAnswer((_) => Stream.value([proposalData1, proposalData2]));
 
       when(
-        () => mockDocumentRepository.queryVersionIds(
+        () => mockDocumentRepository.queryVersionsOfId(
           id: any(named: 'id'),
         ),
-      ).thenAnswer((_) => Future.value([versionId1]));
+      ).thenAnswer((_) => Future.value([proposalData1]));
 
       when(
         () => mockDocumentRepository.watchCount(
@@ -116,7 +116,7 @@ void main() {
       ).called(1);
 
       verify(
-        () => mockDocumentRepository.queryVersionIds(
+        () => mockDocumentRepository.queryVersionsOfId(
           id: any(named: 'id'),
         ),
       ).called(2);
@@ -182,10 +182,10 @@ void main() {
         ).thenAnswer((_) => proposalsStream);
 
         when(
-          () => mockDocumentRepository.queryVersionIds(
+          () => mockDocumentRepository.queryVersionsOfId(
             id: any(named: 'id'),
           ),
-        ).thenAnswer((_) => Future.value([versionId]));
+        ).thenAnswer((_) => Future.value([proposalData1, proposalData2]));
 
         final commentsStream1 =
             Stream.fromIterable([5, 10]).asBroadcastStream();
