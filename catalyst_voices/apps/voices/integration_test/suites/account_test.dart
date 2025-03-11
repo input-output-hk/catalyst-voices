@@ -8,9 +8,7 @@ import 'package:patrol_finders/patrol_finders.dart';
 
 import '../pageobject/account_dropdown_page.dart';
 import '../pageobject/app_bar_page.dart';
-import '../pageobject/onboarding/restore_flow/step_8_unlock_password_success_panel.dart';
 import '../pageobject/overall_spaces_page.dart';
-import '../pageobject/profile_page.dart';
 import '../pageobject/unlock_modal_page.dart';
 import '../utils/constants.dart';
 
@@ -30,51 +28,41 @@ void main() async {
     await restartDependencies();
   });
 
-  group(
-    'Account dropdown -',
-    () {
-      patrolWidgetTest(
+  group('Account dropdown -', () {
+    patrolWidgetTest(
+      tags: 'issues_1715',
+      skip: true,
+      'user - Account dropdown button opens account dropdown',
+      (PatrolTester $) async {
+        await $.pumpWidgetAndSettle(App(routerConfig: router));
+        await $(OverallSpacesPage.userShortcutBtn)
+            .tap(settleTimeout: const Duration(seconds: 10));
+        await AppBarPage($).accountPopupBtnClick();
+        await AccountDropdownPage($).accountDropdownLooksAsExpected();
+      },
+    );
+
+    patrolWidgetTest(tags: 'issues_1715', skip: true, 'user - locking account',
+        (PatrolTester $) async {
+      await $.pumpWidgetAndSettle(App(routerConfig: router));
+      await $(OverallSpacesPage.userShortcutBtn)
+          .tap(settleTimeout: const Duration(seconds: 10));
+      await AppBarPage($).lockBtnClick();
+      await AppBarPage($).unlockBtnIsVisible();
+    });
+
+    patrolWidgetTest(
         tags: 'issues_1715',
         skip: true,
-        'user - Account dropdown button opens account dropdown',
-        (PatrolTester $) async {
-          await $.pumpWidgetAndSettle(App(routerConfig: router));
-          await $(OverallSpacesPage.userShortcutBtn)
-              .tap(settleTimeout: const Duration(seconds: 10));
-          await AppBarPage($).accountPopupBtnClick();
-          await AccountDropdownPage($).accountDropdownLooksAsExpected();
-        },
-      );
-
-      patrolWidgetTest(
-          tags: 'issues_1715',
-          skip: true,
-          'user - locking account', (PatrolTester $) async {
-        await $.pumpWidgetAndSettle(App(routerConfig: router));
-        await $(OverallSpacesPage.userShortcutBtn)
-            .tap(settleTimeout: const Duration(seconds: 10));
-        await AppBarPage($).lockBtnClick();
-        await AppBarPage($).unlockBtnIsVisible();
-      });
-
-      patrolWidgetTest(
-          tags: 'issues_1715',
-          skip: true,
-          'user - locking and unlocking account', (PatrolTester $) async {
-        await $.pumpWidgetAndSettle(App(routerConfig: router));
-        await $(OverallSpacesPage.userShortcutBtn)
-            .tap(settleTimeout: const Duration(seconds: 10));
-        await AppBarPage($).lockBtnClick();
-        await AppBarPage($).unlockBtnClick();
-        await $(UnlockModalPage.unlockPasswordTextField).enterText('Test1234');
-        await $(UnlockModalPage.unlockConfirmPasswordButton).tap();
-        await AppBarPage($).unlockBtnIsVisible();
-      });
-    },
-    skip: true,
-  );
-  patrolWidgetTest(
-    'user - Account dropdown button opens account dropdown',
-    (PatrolTester $) async {},
-  );
+        'user - locking and unlocking account', (PatrolTester $) async {
+      await $.pumpWidgetAndSettle(App(routerConfig: router));
+      await $(OverallSpacesPage.userShortcutBtn)
+          .tap(settleTimeout: Time.long.duration);
+      await AppBarPage($).lockBtnClick();
+      await AppBarPage($).unlockBtnClick();
+      await $(UnlockModalPage.unlockPasswordTextField).enterText('Test1234');
+      await $(UnlockModalPage.unlockConfirmPasswordButton).tap();
+      await AppBarPage($).unlockBtnIsVisible();
+    });
+  });
 }
