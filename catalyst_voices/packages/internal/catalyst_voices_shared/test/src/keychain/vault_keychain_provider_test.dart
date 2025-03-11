@@ -131,6 +131,19 @@ void main() {
       expect(keychains.length, ids.length);
       expect(keychains.map((e) => e.id), containsAll(ids));
     });
+
+    test('calling get for same keychain returns same instance', () async {
+      // Given
+      final id = const Uuid().v4();
+
+      // When
+      await provider.create(id);
+      final keychainOne = await provider.get(id);
+      final keychainTwo = await provider.get(id);
+
+      // Then
+      expect(keychainOne, same(keychainTwo));
+    });
   });
 }
 
