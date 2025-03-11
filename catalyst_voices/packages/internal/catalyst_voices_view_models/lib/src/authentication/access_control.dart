@@ -3,9 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 final class AccessControl {
-  const AccessControl();
   static const defaultSpacesAccess = [Space.discovery];
-
   static const List<Space> _votingAccess = [
     Space.discovery,
     Space.voting,
@@ -40,6 +38,30 @@ final class AccessControl {
         LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.keyT),
   };
 
+  static const List<Space> defaultAvailableSpaces = [
+    Space.discovery,
+    Space.workspace,
+    Space.voting,
+    Space.fundedProjects,
+  ];
+
+  const AccessControl();
+
+  List<Space> availableSpaces(Account? account) {
+    if (account == null || !account.isAdmin) {
+      return defaultAvailableSpaces;
+    } else {
+      return Space.values;
+    }
+  }
+
+  List<Space> overallSpaces(Account? account) {
+    if (account == null) return _votingAccess;
+    if (account.isAdmin) return _adminAccess;
+    if (_hasProposerOrDrepRole(account)) return _proposalAccess;
+    return _votingAccess;
+  }
+
   List<Space> spacesAccess(Account? account) {
     if (account == null) return defaultSpacesAccess;
     if (account.isAdmin) return Space.values;
@@ -50,13 +72,6 @@ final class AccessControl {
 
     // TODO(LynxLynxx): After F14 use _votingAccess
     return defaultSpacesAccess;
-  }
-
-  List<Space> overallSpaces(Account? account) {
-    if (account == null) return _votingAccess;
-    if (account.isAdmin) return _adminAccess;
-    if (_hasProposerOrDrepRole(account)) return _proposalAccess;
-    return _votingAccess;
   }
 
   Map<Space, ShortcutActivator> spacesShortcutsActivators(
