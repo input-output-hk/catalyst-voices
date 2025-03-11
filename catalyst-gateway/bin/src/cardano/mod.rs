@@ -304,18 +304,14 @@ fn sync_subchain(
                     blocks_synced = blocks_synced.saturating_add(1);
                 },
                 cardano_chain_follower::Kind::Rollback => {
-                    if let Some(ref purge_point) = params.follower_roll_forward {
-                        let purge_condition =
-                            PurgeCondition::PurgeForwards(purge_point.slot_or_default());
-                        if let Err(error) = roll_forward::purge_live_index(purge_condition).await {
-                            error!(chain=%params.chain, error=%error, "Chain follower
+                    // Rollback occurs, need to purge forward
+                    let rollback_point = chain_update.block_data().slot();
+                    let purge_condition = PurgeCondition::PurgeForwards(rollback_point);
+                    if let Err(error) = roll_forward::purge_live_index(purge_condition).await {
+                        error!(chain=%params.chain, error=%error, "Chain follower
                     rollback, purging volatile data task failed.");
-                        } else {
-                            let _ = event_sender.send(event::ChainIndexerEvent::ForwardDataPurged);
-                        }
                     } else {
-                        error!(chain=%params.chain, "Chain follower rollback, rollback
-                    triggered, but no point available.");
+                        let _ = event_sender.send(event::ChainIndexerEvent::ForwardDataPurged);
                     }
                 },
             }
