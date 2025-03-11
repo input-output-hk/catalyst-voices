@@ -9,17 +9,14 @@ final class VaultKeychainProvider implements KeychainProvider {
   final FlutterSecureStorage _secureStorage;
   final SharedPreferencesAsync _sharedPreferences;
   final CacheConfig _cacheConfig;
-  final CatalystKeyFactory _keyFactory;
 
   VaultKeychainProvider({
     required FlutterSecureStorage secureStorage,
     required SharedPreferencesAsync sharedPreferences,
     required CacheConfig cacheConfig,
-    required CatalystKeyFactory keyFactory,
   })  : _secureStorage = secureStorage,
         _sharedPreferences = sharedPreferences,
-        _cacheConfig = cacheConfig,
-        _keyFactory = keyFactory;
+        _cacheConfig = cacheConfig;
 
   @override
   Future<Keychain> create(String id) async {
@@ -91,7 +88,6 @@ final class VaultKeychainProvider implements KeychainProvider {
       secureStorage: _secureStorage,
       sharedPreferences: _sharedPreferences,
       unlockTtl: _cacheConfig.expiryDuration.keychainUnlock,
-      keyFactory: _keyFactory,
     );
   }
 }
