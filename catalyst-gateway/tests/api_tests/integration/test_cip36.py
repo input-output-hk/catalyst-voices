@@ -32,10 +32,16 @@ def test_cip36_registration_endpoint(snapshot):
             is_stake=True,
             network_type=snapshot.network,
         )
-        resp = cardano.cip36_registration(stake_address, snapshot.slot_no)
-        print(stake_address, stake_public_key, resp.status_code)
-        # assert (
-        #     resp.status_code == 200
-        # ), f"Cannot get cip36 registration for stake address {stake_address}, {stake_public_key}"
-        # reg = resp.json()["regs"][0]
-        # print(stake_address, stake_public_key, reg["is_payable"], reg["payment_address"])
+
+        voting_key = (
+            entry["delegations"][0][0]
+            if type(entry["delegations"]) is list
+            else entry["delegations"]
+        )
+        # skipping invalid voting keys which are not 32 bytes long
+        if len(voting_key) != 66:
+            continue
+        resp = cardano.cip36_registration(stake_address, snapshot.slot_no, 1)
+        assert (
+            resp.status_code == 200
+        ), f"Cannot get cip36 registration for stake address {stake_address}"
