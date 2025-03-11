@@ -35,6 +35,15 @@ void main() {
     test('withSuffix adds suffix correctly', () {
       expect('Hello'.withSuffix(' World'), 'Hello World');
     });
+
+    test('equalsIgnoreCase ignores lower or upper case', () {
+      expect('Hello'.equalsIgnoreCase('HELLO'), isTrue);
+      expect('HELLO'.equalsIgnoreCase('Hello'), isTrue);
+      expect('hello'.equalsIgnoreCase('HELLO'), isTrue);
+      expect('123'.equalsIgnoreCase('123'), isTrue);
+      expect('!@#'.equalsIgnoreCase('!@#'), isTrue);
+      expect('Hello1'.equalsIgnoreCase('Hello2'), isFalse);
+    });
   });
 
   group('UrlParser Tests', () {

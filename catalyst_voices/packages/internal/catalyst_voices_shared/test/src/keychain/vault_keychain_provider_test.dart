@@ -12,7 +12,7 @@ import 'package:test/test.dart';
 import 'package:uuid/uuid.dart';
 
 void main() {
-  late final CatalystKeyFactory keyFactory;
+  late final CatalystPrivateKeyFactory keyFactory;
   late final VaultKeychainProvider provider;
 
   setUpAll(() {
@@ -21,13 +21,12 @@ void main() {
     final store = InMemorySharedPreferencesAsync.empty();
     SharedPreferencesAsyncPlatform.instance = store;
 
-    keyFactory = _FakeCatalystKeyFactory();
+    keyFactory = _FakeCatalystPrivateKeyFactory();
 
     provider = VaultKeychainProvider(
       secureStorage: const FlutterSecureStorage(),
       sharedPreferences: SharedPreferencesAsync(),
       cacheConfig: const CacheConfig(),
-      keyFactory: keyFactory,
     );
   });
 
@@ -56,7 +55,7 @@ void main() {
       // Given
       final id = const Uuid().v4();
       const lockFactor = PasswordLockFactor('Test1234');
-      final key = keyFactory.createPrivateKey(
+      final key = keyFactory.create(
         Uint8List.fromList(
           hex.decode(
             '8a88e3dd7409f195fd52db2d3cba5d72ca6709bf1d94121bf3748801b40f6f5c',
@@ -135,16 +134,17 @@ void main() {
   });
 }
 
+class _FakeCatalystPrivateKeyFactory extends Fake
+    implements CatalystPrivateKeyFactory {
+  @override
+  CatalystPrivateKey create(Uint8List bytes) {
+    return _FakeCatalystPrivateKey(bytes: bytes);
+  }
+}
+
 class _FakeCatalystPrivateKey extends Fake implements CatalystPrivateKey {
   @override
   final Uint8List bytes;
 
   _FakeCatalystPrivateKey({required this.bytes});
-}
-
-class _FakeCatalystKeyFactory extends Fake implements CatalystKeyFactory {
-  @override
-  CatalystPrivateKey createPrivateKey(Uint8List bytes) {
-    return _FakeCatalystPrivateKey(bytes: bytes);
-  }
 }
