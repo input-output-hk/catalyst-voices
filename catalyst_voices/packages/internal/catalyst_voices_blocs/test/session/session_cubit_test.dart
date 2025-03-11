@@ -295,6 +295,10 @@ void main() {
   });
 }
 
+class _MockCardanoWallet extends Mock implements CardanoWallet {
+  _MockCardanoWallet();
+}
+
 class _MockRegistrationService extends Mock implements RegistrationService {
   final KeychainProvider keychainProvider;
   List<CardanoWallet> cardanoWallets;
@@ -322,8 +326,4 @@ class _MockRegistrationService extends Mock implements RegistrationService {
 
     return Account.dummy(keychain: keychain);
   }
-}
-
-class _MockCardanoWallet extends Mock implements CardanoWallet {
-  _MockCardanoWallet();
 }

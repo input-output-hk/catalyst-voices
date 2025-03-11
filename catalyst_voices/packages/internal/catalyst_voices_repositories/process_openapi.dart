@@ -46,7 +46,7 @@ void main() {
       continue;
     }
 
-    if (version != _supportedOpenApiVersion) {
+    if (!_supportedOpenApiVersions.contains(version)) {
       print('[$baseName] Unsupported OpenApi version[$version]');
       continue;
     }
@@ -57,7 +57,7 @@ void main() {
     );
     final encodedProcessedJson = jsonEncode(processedJson);
 
-    final fileName = '$baseName.processed.json';
+    final fileName = '$baseName.json';
     final filePath = path.join(processedDir.path, fileName);
 
     File(filePath)
@@ -68,7 +68,7 @@ void main() {
   }
 }
 
-const _supportedOpenApiVersion = '3.0.0';
+const _supportedOpenApiVersions = ['3.0.0', '3.1.0'];
 
 /// Processor for OpenAPI specifications
 class OpenApiProcessor {

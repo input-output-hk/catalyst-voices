@@ -23,6 +23,11 @@ abstract interface class DocumentRepository {
     DocumentDataRemoteSource remoteDocuments,
   ) = DocumentRepositoryImpl;
 
+  /// Making sure document from [ref] is available locally.
+  Future<void> cacheDocument({
+    required SignedDocumentRef ref,
+  });
+
   /// Stores new draft locally and returns ref to it.
   ///
   /// At the moment we do not support drafts of templates that's why
@@ -30,13 +35,14 @@ abstract interface class DocumentRepository {
   ///
   /// If [of] is declared it will be used for this draft and new version
   /// assigned. Think of it as editing published document.
-  Future<DraftRef> createProposalDraft({
+  Future<DraftRef> createDocumentDraft({
+    required DocumentType type,
     required DocumentDataContent content,
     required SignedDocumentRef template,
     SignedDocumentRef? of,
   });
 
-  /// Deletes a proposal draft from the local storage.
+  /// Deletes a document draft from the local storage.
   Future<void> deleteDocumentDraft({
     required DraftRef ref,
   });
@@ -51,6 +57,14 @@ abstract interface class DocumentRepository {
     required DocumentDataContent content,
   });
 
+  /// Returns list of refs to all published and any refs it may hold.
+  ///
+  /// Its using documents index api.
+  Future<List<SignedDocumentRef>> getAllDocumentsRefs();
+
+  /// Returns list of locally saved signed documents refs.
+  Future<List<SignedDocumentRef>> getCachedDocumentsRefs();
+
   /// Returns matching [ProposalDocument] for matching [ref].
   ///
   /// Source of data depends whether [ref] is [SignedDocumentRef] or [DraftRef].
@@ -58,6 +72,9 @@ abstract interface class DocumentRepository {
     required DocumentRef ref,
   });
 
+  /// Returns [ProposalTemplate] for matching [ref].
+  ///
+  /// Source of data depends whether [ref] is [SignedDocumentRef] or [DraftRef].
   Future<ProposalTemplate> getProposalTemplate({
     required DocumentRef ref,
   });
@@ -86,6 +103,10 @@ abstract interface class DocumentRepository {
   Future<void> updateDocumentDraft({
     required DraftRef ref,
     required DocumentDataContent content,
+  });
+
+  Future<void> uploadDocument({
+    required SignedDocument document,
   });
 
   Stream<int> watchCount({
@@ -121,7 +142,15 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   );
 
   @override
-  Future<DraftRef> createProposalDraft({
+  Future<void> cacheDocument({required SignedDocumentRef ref}) async {
+    final documentData = await _remoteDocuments.get(ref: ref);
+
+    await _localDocuments.save(data: documentData);
+  }
+
+  @override
+  Future<DraftRef> createDocumentDraft({
+    required DocumentType type,
     required DocumentDataContent content,
     required SignedDocumentRef template,
     SignedDocumentRef? of,
@@ -131,7 +160,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
 
     final ref = DraftRef(id: id, version: version);
     final metadata = DocumentDataMetadata(
-      type: DocumentType.proposalDocument,
+      type: type,
       selfRef: ref,
       template: template,
     );
@@ -163,6 +192,27 @@ final class DocumentRepositoryImpl implements DocumentRepository {
 
     final jsonData = documentDataDto.toJson();
     return json.fuse(utf8).encode(jsonData) as Uint8List;
+  }
+
+  @override
+  Future<List<SignedDocumentRef>> getAllDocumentsRefs() async {
+    final remoteRefs = await _remoteDocuments.index();
+
+    return {
+      // Note. categories are mocked on backend so we can't not fetch them.
+      ...categoriesTemplatesRefs.expand((e) => [e.proposal, e.comment]),
+      ...remoteRefs,
+    }
+        .toList()
+        // TODO(damian-molinski): delete it after parsing it ready.
+        .sublist(0, 1);
+  }
+
+  @override
+  Future<List<SignedDocumentRef>> getCachedDocumentsRefs() {
+    return _localDocuments
+        .index()
+        .then((refs) => refs.cast<SignedDocumentRef>());
   }
 
   @visibleForTesting
@@ -238,6 +288,11 @@ final class DocumentRepositoryImpl implements DocumentRepository {
       ref: ref,
       content: content,
     );
+  }
+
+  @override
+  Future<void> uploadDocument({required SignedDocument document}) async {
+    await _remoteDocuments.upload(document);
   }
 
   Stream<List<DocumentsDataWithRefData>> watchAllDocuments({

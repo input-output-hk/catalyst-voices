@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math';
 
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
@@ -14,7 +13,7 @@ class DiscoveryCubit extends Cubit<DiscoveryState> {
   // ignore: unused_field
   final CampaignService _campaignService;
   final ProposalService _proposalService;
-  late StreamSubscription<List<Proposal>>? _proposalsSubscription;
+  StreamSubscription<List<Proposal>>? _proposalsSubscription;
 
   DiscoveryCubit(
     this._campaignService,
@@ -43,27 +42,15 @@ class DiscoveryCubit extends Cubit<DiscoveryState> {
       ),
     );
 
-    final isSuccess = await Future.delayed(
-      const Duration(seconds: 1),
-      () => Random().nextBool(),
-    );
-    if (isClosed) return;
-
-    final categories = isSuccess
-        ? List.generate(
-            6,
-            (index) => CampaignCategoryViewModel.dummy(id: index.toString()),
-          )
-        : <CampaignCategoryViewModel>[];
-
-    final error = isSuccess ? null : const LocalizedUnknownException();
+    final categories = await _campaignService.getCampaignCategories();
+    final categoriesModel =
+        categories.map(CampaignCategoryDetailsViewModel.fromModel).toList();
 
     emit(
       state.copyWith(
         campaignCategories: DiscoveryCampaignCategoriesState(
           isLoading: false,
-          error: error,
-          categories: categories,
+          categories: categoriesModel,
         ),
       ),
     );
@@ -75,24 +62,14 @@ class DiscoveryCubit extends Cubit<DiscoveryState> {
         currentCampaign: const DiscoveryCurrentCampaignState(),
       ),
     );
-
-    final isSuccess = await Future.delayed(
-      const Duration(seconds: 2),
-      () => Random().nextBool(),
-    );
-    if (isClosed) return;
-
-    final currentCampaign = isSuccess
-        ? CurrentCampaignInfoViewModel.dummy()
-        : const NullCurrentCampaignInfoViewModel();
-
-    final error = isSuccess ? null : const LocalizedUnknownException();
+    final campaign = await _campaignService.getCurrentCampaign();
+    final currentCampaign = CurrentCampaignInfoViewModel.fromModel(campaign);
 
     emit(
       state.copyWith(
         currentCampaign: DiscoveryCurrentCampaignState(
           currentCampaign: currentCampaign,
-          error: error,
+          error: null,
           isLoading: false,
         ),
       ),
@@ -111,7 +88,7 @@ class DiscoveryCubit extends Cubit<DiscoveryState> {
     _setupProposalsSubscription();
   }
 
-  CampaignCategoryViewModel? localCategory(String id) {
+  CampaignCategoryDetailsViewModel? localCategory(String id) {
     return state.campaignCategories.categories
         .firstWhereOrNull((e) => e.id == id);
   }
@@ -151,6 +128,12 @@ class DiscoveryCubit extends Cubit<DiscoveryState> {
           ),
         );
       },
+    );
+    emit(
+      state.copyWith(
+        mostRecentProposals:
+            const DiscoveryMostRecentProposalsState(isLoading: false),
+      ),
     );
   }
 }
