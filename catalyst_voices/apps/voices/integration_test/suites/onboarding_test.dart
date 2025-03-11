@@ -74,8 +74,6 @@ void main() async {
       expect($(OnboardingPageBase($).registrationDialog), findsNothing);
     });
 
-    // TODO(oldgreg): add Introduction screen tests and base profile screens
-
     patrolWidgetTest('visitor - create - base profile info screen looks OK',
         (PatrolTester $) async {
       await $.pumpWidgetAndSettle(App(routerConfig: router));
@@ -83,11 +81,61 @@ void main() async {
       await BaseProfileInfoPanel($).verifyPageElements();
     });
 
+    patrolWidgetTest(
+        'visitor - create - base profile info screen close button works',
+        (PatrolTester $) async {
+      await $.pumpWidgetAndSettle(App(routerConfig: router));
+      await BaseProfileInfoPanel($).goto();
+      await OnboardingPageBase($).closeButton().tap();
+      expect($(OnboardingPageBase($).registrationDialog), findsNothing);
+    });
+
     patrolWidgetTest('visitor - create - base profile setup screen looks OK',
         (PatrolTester $) async {
       await $.pumpWidgetAndSettle(App(routerConfig: router));
       await SetupBaseProfilePanel($).goto();
       await SetupBaseProfilePanel($).verifyPageElements();
+    });
+
+    patrolWidgetTest(
+        'visitor - create - base profile setup screen close button - '
+        'dialog check', (PatrolTester $) async {
+      await $.pumpWidgetAndSettle(App(routerConfig: router));
+      await SetupBaseProfilePanel($).goto();
+      await OnboardingPageBase($).closeButton().tap();
+      await OnboardingPageBase($).incompleteDialogCheckKeychainPhase();
+    });
+
+    patrolWidgetTest(
+        'visitor - create - base profile setup screen close button - '
+        'dialog continue', (PatrolTester $) async {
+      await $.pumpWidgetAndSettle(App(routerConfig: router));
+      await SetupBaseProfilePanel($).goto();
+      await OnboardingPageBase($).closeButton().tap();
+      await OnboardingPageBase($).incompleteDialogClickContinue();
+      await SetupBaseProfilePanel($).verifyDetailsPanel();
+    });
+
+    patrolWidgetTest(
+        'visitor - create - base profile setup screen close button - '
+        'dialog cancel', (PatrolTester $) async {
+      await $.pumpWidgetAndSettle(App(routerConfig: router));
+      await SetupBaseProfilePanel($).goto();
+      await OnboardingPageBase($).closeButton().tap();
+      await OnboardingPageBase($).incompleteDialogClickCancel();
+      await AppBarPage($).looksAsExpectedForVisitor();
+    });
+
+    patrolWidgetTest(
+        tags: 'issues_1998',
+        skip: true,
+        'visitor - create - base profile setup screen close button - '
+        'dialog close', (PatrolTester $) async {
+      await $.pumpWidgetAndSettle(App(routerConfig: router));
+      await SetupBaseProfilePanel($).goto();
+      await OnboardingPageBase($).closeButton().tap();
+      await OnboardingPageBase($).incompleteDialogClickClose();
+      await SetupBaseProfilePanel($).verifyDetailsPanel();
     });
 
     patrolWidgetTest('visitor - create - keychain info screen looks OK',
@@ -138,6 +186,47 @@ void main() async {
       await WriteDownSeedphrasePanel($).verifyNextButtonIsDisabled();
     });
 
+    patrolWidgetTest(
+        'visitor - create - mnemonic writedown screen close button - '
+        'dialog check', (PatrolTester $) async {
+      await $.pumpWidgetAndSettle(App(routerConfig: router));
+      await WriteDownSeedphrasePanel($).goto();
+      await OnboardingPageBase($).closeButton().tap();
+      await OnboardingPageBase($).incompleteDialogCheckKeychainPhase();
+    });
+
+    patrolWidgetTest(
+        'visitor - create - mnemonic writedown screen close button - '
+        'dialog continue', (PatrolTester $) async {
+      await $.pumpWidgetAndSettle(App(routerConfig: router));
+      await WriteDownSeedphrasePanel($).goto();
+      await OnboardingPageBase($).closeButton().tap();
+      await OnboardingPageBase($).incompleteDialogClickContinue();
+      await WriteDownSeedphrasePanel($).verifyDetailsPanel();
+    });
+
+    patrolWidgetTest(
+        'visitor - create - mnemonic writedown screen close button - '
+        'dialog cancel', (PatrolTester $) async {
+      await $.pumpWidgetAndSettle(App(routerConfig: router));
+      await WriteDownSeedphrasePanel($).goto();
+      await OnboardingPageBase($).closeButton().tap();
+      await OnboardingPageBase($).incompleteDialogClickCancel();
+      await AppBarPage($).looksAsExpectedForVisitorOnboardingInProgress();
+    });
+
+    patrolWidgetTest(
+        tags: 'issues_1998',
+        skip: true,
+        'visitor - create - mnemonic writedown screen close button - '
+        'dialog close', (PatrolTester $) async {
+      await $.pumpWidgetAndSettle(App(routerConfig: router));
+      await WriteDownSeedphrasePanel($).goto();
+      await OnboardingPageBase($).closeButton().tap();
+      await OnboardingPageBase($).incompleteDialogClickClose();
+      await WriteDownSeedphrasePanel($).verifyDetailsPanel();
+    });
+
     patrolWidgetTest('visitor - create - mnemonic input info screen looks OK',
         (PatrolTester $) async {
       await $.pumpWidgetAndSettle(App(routerConfig: router));
@@ -180,6 +269,47 @@ void main() async {
     });
 
     patrolWidgetTest(
+        'visitor - create - mnemonic input screen close button - '
+        'dialog check', (PatrolTester $) async {
+      await $.pumpWidgetAndSettle(App(routerConfig: router));
+      await InputSeedphrasePanel($).goto();
+      await OnboardingPageBase($).closeButton().tap();
+      await OnboardingPageBase($).incompleteDialogCheckKeychainPhase();
+    });
+
+    patrolWidgetTest(
+        'visitor - create - mnemonic input screen close button - '
+        'dialog continue', (PatrolTester $) async {
+      await $.pumpWidgetAndSettle(App(routerConfig: router));
+      await InputSeedphrasePanel($).goto();
+      await OnboardingPageBase($).closeButton().tap();
+      await OnboardingPageBase($).incompleteDialogClickContinue();
+      await InputSeedphrasePanel($).verifyInfoPanel();
+    });
+
+    patrolWidgetTest(
+        'visitor - create - mnemonic input screen close button - '
+        'dialog cancel', (PatrolTester $) async {
+      await $.pumpWidgetAndSettle(App(routerConfig: router));
+      await InputSeedphrasePanel($).goto();
+      await OnboardingPageBase($).closeButton().tap();
+      await OnboardingPageBase($).incompleteDialogClickCancel();
+      await AppBarPage($).looksAsExpectedForVisitorOnboardingInProgress();
+    });
+
+    patrolWidgetTest(
+        tags: 'issues_1998',
+        skip: true,
+        'visitor - create - mnemonic input screen close button - '
+        'dialog close', (PatrolTester $) async {
+      await $.pumpWidgetAndSettle(App(routerConfig: router));
+      await InputSeedphrasePanel($).goto();
+      await OnboardingPageBase($).closeButton().tap();
+      await OnboardingPageBase($).incompleteDialogClickClose();
+      await InputSeedphrasePanel($).verifyInfoPanel();
+    });
+
+    patrolWidgetTest(
         'visitor - create - mnemonic input verified screen looks OK',
         (PatrolTester $) async {
       await $.pumpWidgetAndSettle(App(routerConfig: router));
@@ -210,6 +340,47 @@ void main() async {
       await PasswordInfoPanel($).goto();
       await PasswordInfoPanel($).clickBack();
       await PasswordInfoPanel($).verifyInfoPanel();
+    });
+
+    patrolWidgetTest(
+        'visitor - create - password info screen screen close button - '
+        'dialog check', (PatrolTester $) async {
+      await $.pumpWidgetAndSettle(App(routerConfig: router));
+      await PasswordInfoPanel($).goto();
+      await OnboardingPageBase($).closeButton().tap();
+      await OnboardingPageBase($).incompleteDialogCheckKeychainPhase();
+    });
+
+    patrolWidgetTest(
+        'visitor - create - password info screen close button - '
+        'dialog continue', (PatrolTester $) async {
+      await $.pumpWidgetAndSettle(App(routerConfig: router));
+      await PasswordInfoPanel($).goto();
+      await OnboardingPageBase($).closeButton().tap();
+      await OnboardingPageBase($).incompleteDialogClickContinue();
+      await PasswordInfoPanel($).verifyDetailsPanel();
+    });
+
+    patrolWidgetTest(
+        'visitor - create - password info screen close button - '
+        'dialog cancel', (PatrolTester $) async {
+      await $.pumpWidgetAndSettle(App(routerConfig: router));
+      await PasswordInfoPanel($).goto();
+      await OnboardingPageBase($).closeButton().tap();
+      await OnboardingPageBase($).incompleteDialogClickCancel();
+      await AppBarPage($).looksAsExpectedForVisitorOnboardingInProgress();
+    });
+
+    patrolWidgetTest(
+        tags: 'issues_1998',
+        skip: true,
+        'visitor - create - password info screen close button - '
+        'dialog close', (PatrolTester $) async {
+      await $.pumpWidgetAndSettle(App(routerConfig: router));
+      await PasswordInfoPanel($).goto();
+      await OnboardingPageBase($).closeButton().tap();
+      await OnboardingPageBase($).incompleteDialogClickClose();
+      await PasswordInfoPanel($).verifyDetailsPanel();
     });
 
     patrolWidgetTest('visitor - create - password input screen looks OK',
@@ -299,11 +470,105 @@ void main() async {
       await KeychainFinalPanel($).verifyInfoPanel();
     });
 
+    patrolWidgetTest(
+        tags: 'issues_2004',
+        skip: true,
+        'visitor - create - keychain created success screen close button - '
+        'dialog check', (PatrolTester $) async {
+      await $.pumpWidgetAndSettle(App(routerConfig: router));
+      await KeychainFinalPanel($).goto();
+      await OnboardingPageBase($).closeButton().tap();
+      await OnboardingPageBase($).incompleteDialogCheckWalletLinkPhase();
+    });
+
+    patrolWidgetTest(
+        tags: 'issues_2004',
+        skip: true,
+        'visitor - create - keychain created success screen close button - '
+        'dialog continue', (PatrolTester $) async {
+      await $.pumpWidgetAndSettle(App(routerConfig: router));
+      await KeychainFinalPanel($).goto();
+      await OnboardingPageBase($).closeButton().tap();
+      await OnboardingPageBase($).incompleteDialogClickContinue();
+      await PasswordInfoPanel($).verifyDetailsPanel();
+    });
+
+    patrolWidgetTest(
+        tags: 'issues_2004',
+        skip: true,
+        'visitor - create - keychain created success screen close button - '
+        'dialog cancel', (PatrolTester $) async {
+      await $.pumpWidgetAndSettle(App(routerConfig: router));
+      await KeychainFinalPanel($).goto();
+      await OnboardingPageBase($).closeButton().tap();
+      await OnboardingPageBase($).incompleteDialogClickCancel();
+      await AppBarPage($).looksAsExpectedForVisitorOnboardingInProgress();
+    });
+
+    patrolWidgetTest(
+        tags: 'issues_2004',
+        skip: true,
+        'visitor - create - keychain created success screen close button - '
+        'dialog close', (PatrolTester $) async {
+      await $.pumpWidgetAndSettle(App(routerConfig: router));
+      await KeychainFinalPanel($).goto();
+      await OnboardingPageBase($).closeButton().tap();
+      await OnboardingPageBase($).incompleteDialogClickClose();
+      await PasswordInfoPanel($).verifyDetailsPanel();
+    });
+
     patrolWidgetTest('visitor - create - link wallet info screen looks OK',
         (PatrolTester $) async {
       await $.pumpWidgetAndSettle(App(routerConfig: router));
       await LinkWalletInfoPanel($).goto();
       await LinkWalletInfoPanel($).verifyInfoPanel();
+    });
+
+    patrolWidgetTest(
+        tags: 'issues_2004',
+        skip: true,
+        'visitor - create - link wallet info screen close button - '
+        'dialog check', (PatrolTester $) async {
+      await $.pumpWidgetAndSettle(App(routerConfig: router));
+      await LinkWalletInfoPanel($).goto();
+      await OnboardingPageBase($).closeButton().tap();
+      await OnboardingPageBase($).incompleteDialogCheckWalletLinkPhase();
+    });
+
+    patrolWidgetTest(
+        tags: 'issues_2004',
+        skip: true,
+        'visitor - create - link wallet info screen close button - '
+        'dialog continue', (PatrolTester $) async {
+      await $.pumpWidgetAndSettle(App(routerConfig: router));
+      await LinkWalletInfoPanel($).goto();
+      await OnboardingPageBase($).closeButton().tap();
+      await OnboardingPageBase($).incompleteDialogClickContinue();
+      await LinkWalletInfoPanel($).verifyDetailsPanel();
+    });
+
+    patrolWidgetTest(
+        tags: 'issues_2004',
+        skip: true,
+        'visitor - create - link wallet info screen close button - '
+        'dialog cancel', (PatrolTester $) async {
+      await $.pumpWidgetAndSettle(App(routerConfig: router));
+      await LinkWalletInfoPanel($).goto();
+      await OnboardingPageBase($).closeButton().tap();
+      await OnboardingPageBase($).incompleteDialogClickCancel();
+      await AppBarPage($).looksAsExpectedForVisitorOnboardingInProgress();
+    });
+
+    patrolWidgetTest(
+        tags: 'issues_2004',
+        skip: true,
+        'visitor - create - link wallet info screen close button - '
+        'dialog close', (PatrolTester $) async {
+      await $.pumpWidgetAndSettle(App(routerConfig: router));
+      await LinkWalletInfoPanel($).goto();
+      await OnboardingPageBase($).closeButton().tap();
+      await OnboardingPageBase($).incompleteDialogClickClose();
+      await LinkWalletInfoPanel($).verifyDetailsPanel();
     });
 
     patrolWidgetTest('visitor - create - link wallet select screen looks OK',
@@ -321,5 +586,48 @@ void main() async {
       await WalletListPanel($).clickBack();
       await LinkWalletInfoPanel($).verifyInfoPanel();
     });
-  });
+
+    patrolWidgetTest(
+        tags: 'issues_2004',
+        skip: true,
+        'visitor - create - link wallet select screen close button - '
+        'dialog check', (PatrolTester $) async {
+      await $.pumpWidgetAndSettle(App(routerConfig: router));
+      await WalletListPanel($).goto();
+      await OnboardingPageBase($).closeButton().tap();
+      await OnboardingPageBase($).incompleteDialogCheckWalletLinkPhase();
+    });
+
+    patrolWidgetTest(
+        'visitor - create - link wallet select screen close button - '
+        'dialog continue', (PatrolTester $) async {
+      await $.pumpWidgetAndSettle(App(routerConfig: router));
+      await WalletListPanel($).goto();
+      await OnboardingPageBase($).closeButton().tap();
+      await OnboardingPageBase($).incompleteDialogClickContinue();
+      await WalletListPanel($).verifyDetailsPanel();
+    });
+
+    patrolWidgetTest(
+        'visitor - create - link wallet select screen close button - '
+        'dialog cancel', (PatrolTester $) async {
+      await $.pumpWidgetAndSettle(App(routerConfig: router));
+      await WalletListPanel($).goto();
+      await OnboardingPageBase($).closeButton().tap();
+      await OnboardingPageBase($).incompleteDialogClickCancel();
+      await AppBarPage($).looksAsExpectedForVisitorOnboardingInProgress();
+    });
+
+    patrolWidgetTest(
+        tags: 'issues_2004',
+        skip: true,
+        'visitor - create - link wallet select screen close button - '
+        'dialog close', (PatrolTester $) async {
+      await $.pumpWidgetAndSettle(App(routerConfig: router));
+      await WalletListPanel($).goto();
+      await OnboardingPageBase($).closeButton().tap();
+      await OnboardingPageBase($).incompleteDialogClickClose();
+      await WalletListPanel($).verifyDetailsPanel();
+    });
+  }, skip: true);
 }
