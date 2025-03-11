@@ -3,11 +3,22 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart'
 import 'package:catalyst_voices_repositories/generated/api/cat_gateway.models.swagger.dart';
 import 'package:catalyst_voices_repositories/generated/api/client_index.dart';
 import 'package:catalyst_voices_repositories/generated/api/client_mapping.dart';
+import 'package:catalyst_voices_repositories/src/api/interceptors/cbor_content_type_interceptor.dart';
 import 'package:catalyst_voices_repositories/src/api/interceptors/rbac_auth_interceptor.dart';
+import 'package:catalyst_voices_repositories/src/auth/auth_token_provider.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart'
     show UserObserver;
 import 'package:chopper/chopper.dart';
 import 'package:flutter/foundation.dart';
+
+// swagger_dart_code_generator does not add this model to mapping list.
+// TODO(damian-molinski): investigate if this can be removed.
+void _fixModelsMapping() {
+  generatedMapping.putIfAbsent(
+    DocumentIndexList,
+    () => DocumentIndexList.fromJsonFactory,
+  );
+}
 
 final class ApiServices {
   final CatGateway gateway;
@@ -17,6 +28,7 @@ final class ApiServices {
   factory ApiServices({
     required ApiConfig config,
     required UserObserver userObserver,
+    required AuthTokenProvider authTokenProvider,
   }) {
     _fixModelsMapping();
 
@@ -24,7 +36,8 @@ final class ApiServices {
       authenticator: null,
       baseUrl: Uri.parse(config.gatewayUrl),
       interceptors: [
-        RbacAuthInterceptor(userObserver),
+        RbacAuthInterceptor(userObserver, authTokenProvider),
+        const CborContentTypeInterceptor(),
         if (kDebugMode) HttpLoggingInterceptor(onlyErrors: true),
       ],
     );
@@ -38,7 +51,8 @@ final class ApiServices {
       authenticator: null,
       baseUrl: Uri.parse(config.reviewsUrl),
       interceptors: [
-        RbacAuthInterceptor(userObserver),
+        RbacAuthInterceptor(userObserver, authTokenProvider),
+        const CborContentTypeInterceptor(),
         if (kDebugMode) HttpLoggingInterceptor(onlyErrors: true),
       ],
     );
@@ -55,13 +69,4 @@ final class ApiServices {
     required this.vit,
     required this.reviews,
   });
-}
-
-// swagger_dart_code_generator does not add this model to mapping list.
-// TODO(damian-molinski): investigate if this can be removed.
-void _fixModelsMapping() {
-  generatedMapping.putIfAbsent(
-    DocumentIndexList,
-    () => DocumentIndexList.fromJsonFactory,
-  );
 }
