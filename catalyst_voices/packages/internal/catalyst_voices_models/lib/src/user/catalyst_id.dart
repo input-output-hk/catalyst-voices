@@ -113,21 +113,15 @@ final class CatalystId extends Equatable {
   }
 
   String? _formatUserInfo() {
-    final username = this.username;
+    final username = this.username?.trim() ?? '';
     final nonce = this.nonce;
 
-    final hasUsername = username != null && username.isNotBlank;
-    final hasNonce = nonce != null;
-
-    if (hasUsername && hasNonce) {
-      return '$username:$nonce';
-    } else if (hasUsername) {
-      return username;
-    } else if (hasNonce) {
-      return ':$nonce';
-    } else {
-      return null;
-    }
+    final parts = [
+      username,
+      if (nonce != null) nonce,
+    ];
+    final userInfo = parts.join(':');
+    return userInfo.isNotEmpty ? userInfo : null;
   }
 
   /// Parses the data from [Uri.path].
