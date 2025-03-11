@@ -40,7 +40,8 @@ final class AuthServiceImpl implements AuthService {
     final dateTime = DateTimeExt.now();
 
     return CatalystId(
-      host: CatalystIdHost.cardano.host,
+      // TODO(dtscalac): inject the host from configuration, don't hardcode it
+      host: CatalystIdHost.cardanoPreprod.host,
       role0Key: keyPair.publicKey,
       nonce: dateTime.millisecondsSinceEpoch ~/ Duration.millisecondsPerSecond,
     );

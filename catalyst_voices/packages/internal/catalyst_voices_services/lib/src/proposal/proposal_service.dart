@@ -194,7 +194,7 @@ final class ProposalServiceImpl implements ProposalService {
     // TODO(dtscalac): catalyst id should come from the profile
     // TODO(dtscalac): don't hardcode the host, it should be injected by DI
     final catalystId = CatalystId(
-      host: CatalystIdHost.cardano.host,
+      host: CatalystIdHost.cardanoPreprod.host,
       role0Key: role0KeyPair.publicKey,
       role: AccountRole.proposer,
       rotation: 0,
