@@ -8,15 +8,12 @@ use scylla::{
 };
 use tracing::error;
 
-use crate::{
-    db::{
-        index::{
-            queries::{PreparedQueries, PreparedSelectQuery},
-            session::CassandraSession,
-        },
-        types::DbSlot,
+use crate::db::{
+    index::{
+        queries::{PreparedQueries, PreparedSelectQuery},
+        session::CassandraSession,
     },
-    service::common::types::cardano::slot_no::SlotNo,
+    types::{DbSlot, DbTxnIndex},
 };
 
 /// Get invalid registrations from stake addr query.
@@ -27,17 +24,19 @@ const GET_INVALID_REGISTRATIONS_FROM_STAKE_ADDR_QUERY: &str =
 #[derive(SerializeRow)]
 pub(crate) struct GetInvalidRegistrationParams {
     /// Stake address.
-    pub stake_public_key: Vec<u8>,
-    /// Block Slot Number when spend occurred.
+    stake_public_key: Vec<u8>,
+    /// Block Slot Number.
     slot_no: DbSlot,
 }
 
 impl GetInvalidRegistrationParams {
     /// Create a new instance of [`GetInvalidRegistrationParams`]
-    pub(crate) fn new(stake_public_key: Vec<u8>, slot_no: SlotNo) -> GetInvalidRegistrationParams {
+    pub(crate) fn new<T: Into<DbSlot>>(
+        stake_public_key: Vec<u8>, slot_no: T,
+    ) -> GetInvalidRegistrationParams {
         Self {
             stake_public_key,
-            slot_no: u64::from(slot_no).into(),
+            slot_no: slot_no.into(),
         }
     }
 }
@@ -45,6 +44,14 @@ impl GetInvalidRegistrationParams {
 /// Get invalid registrations given stake address.
 #[derive(DeserializeRow)]
 pub(crate) struct GetInvalidRegistrationQuery {
+    /// Nonce value after normalization.
+    pub nonce: num_bigint::BigInt,
+    /// Raw Nonce value.
+    pub raw_nonce: num_bigint::BigInt,
+    /// Slot Number the cert is in.
+    pub slot_no: DbSlot,
+    /// Transaction Index.
+    pub txn_index: DbTxnIndex,
     /// Error report
     pub problem_report: String,
     /// Full Stake Address (not hashed, 32 byte ED25519 Public key).

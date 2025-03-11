@@ -12,7 +12,6 @@ builder:
     COPY --dir ./utils .
     COPY --dir ./test_data .
     COPY cat-libs-rust+build/mk_signed_doc .
-    COPY ./snapshot_tool-56364174.json .
     DO python-ci+BUILDER
 
 test:

@@ -541,24 +541,26 @@ async fn test_stake_registration() {
     ])
     .unwrap();
     let data = vec![
-        certs::StakeRegistrationInsertQuery::new(
+        stake_reg::StakeRegistrationInsertQuery::new(
             stake_address_1(),
-            0.into(),
-            0.into(),
-            Some(stake_public_key_1),
+            0,
+            0,
+            stake_public_key_1,
             false,
-            false,
-            false,
+            Some(false),
+            Some(false),
+            Some(false),
             None,
         ),
-        certs::StakeRegistrationInsertQuery::new(
+        stake_reg::StakeRegistrationInsertQuery::new(
             stake_address_2(),
-            1.into(),
-            1.into(),
-            Some(stake_public_key_2),
+            1,
+            1,
+            stake_public_key_2,
             true,
-            true,
-            true,
+            Some(true),
+            Some(true),
+            Some(true),
             None,
         ),
     ];

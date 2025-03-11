@@ -8,23 +8,20 @@ use catalyst_types::id_uri::IdUri;
 use futures::StreamExt;
 
 use super::*;
-use crate::{
-    db::index::{
-        queries::{
-            rbac,
-            registrations::{
-                get_from_stake_addr::*, get_from_stake_address::*, get_from_vote_key::*,
-                get_invalid::*,
-            },
-            staked_ada::{
-                get_assets_by_stake_address::*, get_txi_by_txn_hash::*,
-                get_txo_by_stake_address::*, update_txo_spent::*,
-            },
-            sync_status::update::*,
+use crate::db::index::{
+    queries::{
+        rbac,
+        registrations::{
+            get_from_stake_addr::*, get_invalid::*, get_stake_pk_from_stake_addr::*,
+            get_stake_pk_from_vote_key::*,
         },
-        tests::test_utils::stake_address_1,
+        staked_ada::{
+            get_assets_by_stake_address::*, get_txi_by_txn_hash::*, get_txo_by_stake_address::*,
+            update_txo_spent::*,
+        },
+        sync_status::update::*,
     },
-    service::common::types::cardano::slot_no::SlotNo,
+    tests::test_utils::stake_address_1,
 };
 
 #[ignore = "An integration test which requires a running Scylla node instance, disabled from `testunit` CI run"]
@@ -36,7 +33,7 @@ async fn test_get_assets_by_stake_addr() {
 
     let mut row_stream = GetAssetsByStakeAddressQuery::execute(
         &session,
-        GetAssetsByStakeAddressParams::new(stake_address_1(), u64::MAX.into()),
+        GetAssetsByStakeAddressParams::new(stake_address_1(), u64::MAX),
     )
     .await
     .unwrap();
@@ -94,7 +91,7 @@ async fn test_get_invalid_registration_w_stake_addr() {
 
     let mut row_stream = GetInvalidRegistrationQuery::execute(
         &session,
-        GetInvalidRegistrationParams::new(vec![], SlotNo::default()),
+        GetInvalidRegistrationParams::new(vec![], 0),
     )
     .await
     .unwrap();
@@ -157,11 +154,10 @@ async fn test_get_registrations_w_stake_addr() {
         panic!("{SESSION_ERR_MSG}");
     };
 
-    let mut row_stream = GetRegistrationQuery::execute(&session, GetRegistrationParams {
-        stake_public_key: vec![],
-    })
-    .await
-    .unwrap();
+    let mut row_stream =
+        GetRegistrationQuery::execute(&session, GetRegistrationParams::new(vec![], 0))
+            .await
+            .unwrap();
 
     while let Some(row_res) = row_stream.next().await {
         drop(row_res.unwrap());
@@ -175,9 +171,12 @@ async fn test_get_stake_addr_w_stake_key_hash() {
         panic!("{SESSION_ERR_MSG}");
     };
 
-    let mut row_stream = GetStakeAddrQuery::execute(&session, GetStakeAddrParams {
-        stake_address: stake_address_1().into(),
-    })
+    let mut row_stream = GetStakePublicKeyFromStakeAddrQuery::execute(
+        &session,
+        GetStakePublicKeyFromStakeAddrParams {
+            stake_address: stake_address_1().into(),
+        },
+    )
     .await
     .unwrap();
 
@@ -194,7 +193,7 @@ async fn test_get_stake_addr_w_vote_key() {
     };
 
     let mut row_stream =
-        GetStakeAddrFromVoteKeyQuery::execute(&session, GetStakeAddrFromVoteKeyParams {
+        GetStakePublicKeyFromVoteKeyQuery::execute(&session, GetStakePublicKeyFromVoteKeyParams {
             vote_key: vec![],
         })
         .await
@@ -241,10 +240,7 @@ async fn test_get_txo_by_stake_address() {
 
     let mut row_stream = GetTxoByStakeAddressQuery::execute(
         &session,
-        GetTxoByStakeAddressQueryParams::new(
-            stake_address_1(),
-            u64::try_from(i64::MAX).unwrap().into(),
-        ),
+        GetTxoByStakeAddressQueryParams::new(stake_address_1(), u64::try_from(i64::MAX).unwrap()),
     )
     .await
     .unwrap();

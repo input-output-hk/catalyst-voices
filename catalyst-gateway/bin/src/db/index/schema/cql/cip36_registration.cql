@@ -13,6 +13,6 @@ CREATE TABLE IF NOT EXISTS cip36_registration (
     raw_nonce           varint,     -- Nonce that has not been slot corrected.
     cip36               boolean,    -- True if the registration is CIP-36 format, Cip-15=False.
 
-    PRIMARY KEY (stake_public_key, nonce, slot_no, txn_index)
+    PRIMARY KEY (stake_public_key, slot_no, nonce, txn_index)
 )
-WITH CLUSTERING ORDER BY (nonce DESC, slot_no DESC, txn_index DESC);
+WITH CLUSTERING ORDER BY (slot_no DESC, nonce DESC, txn_index DESC);
