@@ -50,14 +50,14 @@ pub(crate) async fn get_registrations_given_stake_addr(
     };
     let stake_public_key = row_stake_pk.stake_public_key;
 
-    let asat = asat.unwrap_or(SlotNo::MAXIMUM);
+    let slot_no = asat.unwrap_or(SlotNo::MAXIMUM);
     let all_regs = if invalid {
-        get_invalid_registrations(&session, stake_public_key, asat).await?
+        get_invalid_registrations(&session, stake_public_key, slot_no).await?
     } else {
-        get_valid_registrations(&session, stake_public_key, asat).await?
+        get_valid_registrations(&session, stake_public_key, slot_no).await?
     };
 
-    build_response(all_regs, page, limit, invalid)
+    build_response(all_regs, page, limit, invalid, asat)
 }
 
 /// Get registrations given a vote key, time specific based on asat param,
@@ -78,7 +78,7 @@ pub(crate) async fn get_registrations_given_vote_key(
     .await
     .map_err(|err| anyhow::anyhow!("Failed to query stake public key from vote key {err:?}",))?;
 
-    let asat = asat.unwrap_or(SlotNo::MAXIMUM);
+    let slot_no = asat.unwrap_or(SlotNo::MAXIMUM);
 
     let all_regs = stake_pk_stream
         .map_err(|e| -> anyhow::Error { e.into() })
@@ -86,9 +86,9 @@ pub(crate) async fn get_registrations_given_vote_key(
             async {
                 let stake_public_key = row_stake_pk.stake_public_key;
                 let regs = if invalid {
-                    get_invalid_registrations(&session, stake_public_key, asat).await?
+                    get_invalid_registrations(&session, stake_public_key, slot_no).await?
                 } else {
-                    get_valid_registrations(&session, stake_public_key, asat).await?
+                    get_valid_registrations(&session, stake_public_key, slot_no).await?
                 };
                 all_regs.extend(regs);
                 Ok(all_regs)
@@ -96,21 +96,21 @@ pub(crate) async fn get_registrations_given_vote_key(
         })
         .await?;
 
-    build_response(all_regs, page, limit, invalid)
+    build_response(all_regs, page, limit, invalid, asat)
 }
 
 /// Get all registrations or constrain if slot# given.
 pub(crate) async fn snapshot(
     session: Arc<CassandraSession>, asat: Option<SlotNo>, page: Page, limit: Limit, invalid: bool,
 ) -> anyhow::Result<Cip36Registration> {
-    let asat = asat.unwrap_or(SlotNo::MAXIMUM);
+    let slot_no = asat.unwrap_or(SlotNo::MAXIMUM);
     let all_regs = if invalid {
-        get_all_invalid_registrations(&session, asat).await?
+        get_all_invalid_registrations(&session, slot_no).await?
     } else {
-        get_all_valid_registrations(&session, asat).await?
+        get_all_valid_registrations(&session, slot_no).await?
     };
 
-    build_response(all_regs, page, limit, invalid)
+    build_response(all_regs, page, limit, invalid, asat)
 }
 
 /// Get valid cip36 registrations for a given stake public key.
@@ -364,7 +364,7 @@ async fn get_all_invalid_registrations(
 /// Build a final response which will contain all found registrations,
 /// sort them and apply pagination.
 fn build_response(
-    regs: Vec<Cip36Details>, page: Page, limit: Limit, invalid: bool,
+    regs: Vec<Cip36Details>, page: Page, limit: Limit, invalid: bool, slot: Option<SlotNo>,
 ) -> anyhow::Result<Cip36Registration> {
     if regs.is_empty() {
         return Ok(Cip36Registration::NotFound);
@@ -374,6 +374,7 @@ fn build_response(
 
     Ok(Cip36Registration::Ok(poem_openapi::payload::Json(
         Cip36RegistrationList {
+            slot,
             is_valid: (!invalid).into(),
             regs: regs.into(),
             page: Some(

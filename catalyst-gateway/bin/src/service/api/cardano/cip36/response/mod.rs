@@ -7,7 +7,10 @@ use cip36_reg::Cip36List;
 use derive_more::{From, Into};
 use poem_openapi::{payload::Json, types::Example, ApiResponse, NewType, Object};
 
-use crate::service::common::{self, types::generic::boolean::BooleanFlag};
+use crate::service::common::{
+    self,
+    types::{cardano::slot_no::SlotNo, generic::boolean::BooleanFlag},
+};
 
 // TODO: The examples of this response should be taken from representative data from a
 // response generated on pre-prod.
@@ -33,9 +36,16 @@ pub(crate) type AllRegistration = common::responses::WithErrorResponses<Cip36Reg
 #[derive(Object)]
 #[oai(example = true)]
 pub(crate) struct Cip36RegistrationList {
+    /// The Slot the Registrations are valid up until.
+    ///
+    /// Any registrations that occurred after this Slot are not included in the list.
+    /// If absent return the most recent registrations.
+    #[oai(skip_serializing_if_is_none)]
+    pub slot: Option<SlotNo>,
     /// Flag which identifies that resulted registrations are all valid or not
     pub is_valid: BooleanFlag,
-    /// List of registrations that were found, for the requested filter.
+    /// List of registrations that were found, for the requested filter from the finalized
+    /// blockchain state.
     #[oai(skip_serializing_if_is_empty)]
     pub regs: Cip36List,
     /// Current Page
@@ -46,6 +56,7 @@ pub(crate) struct Cip36RegistrationList {
 impl Example for Cip36RegistrationList {
     fn example() -> Self {
         Self {
+            slot: Some(SlotNo::example()),
             is_valid: true.into(),
             regs: vec![Cip36Details::example()].into(),
             page: Some(Example::example()),
