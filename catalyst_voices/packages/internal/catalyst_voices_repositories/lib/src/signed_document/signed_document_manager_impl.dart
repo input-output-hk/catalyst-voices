@@ -113,8 +113,7 @@ final class _CatalystVerifier implements CatalystCoseVerifier {
 
   @override
   Future<bool> verify(Uint8List data, Uint8List signature) async {
-    final catalystSignature =
-        CatalystSignature.factory.createSignature(signature);
+    final catalystSignature = CatalystSignature.factory.create(signature);
     return _publicKey.verify(data, signature: catalystSignature);
   }
 }

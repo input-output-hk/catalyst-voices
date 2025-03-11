@@ -21,7 +21,7 @@ void main() {
     final store = InMemorySharedPreferencesAsync.empty();
     SharedPreferencesAsyncPlatform.instance = store;
 
-    keyFactory = _FakeCatalystKeyFactory();
+    keyFactory = _FakeCatalystPrivateKeyFactory();
 
     provider = VaultKeychainProvider(
       secureStorage: const FlutterSecureStorage(),
@@ -55,7 +55,7 @@ void main() {
       // Given
       final id = const Uuid().v4();
       const lockFactor = PasswordLockFactor('Test1234');
-      final key = keyFactory.createPrivateKey(
+      final key = keyFactory.create(
         Uint8List.fromList(
           hex.decode(
             '8a88e3dd7409f195fd52db2d3cba5d72ca6709bf1d94121bf3748801b40f6f5c',
@@ -134,10 +134,10 @@ void main() {
   });
 }
 
-class _FakeCatalystKeyFactory extends Fake
+class _FakeCatalystPrivateKeyFactory extends Fake
     implements CatalystPrivateKeyFactory {
   @override
-  CatalystPrivateKey createPrivateKey(Uint8List bytes) {
+  CatalystPrivateKey create(Uint8List bytes) {
     return _FakeCatalystPrivateKey(bytes: bytes);
   }
 }

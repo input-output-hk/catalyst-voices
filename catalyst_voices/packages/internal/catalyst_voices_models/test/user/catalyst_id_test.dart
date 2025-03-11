@@ -4,6 +4,7 @@ import 'package:catalyst_voices_models/src/crypto/catalyst_key_factory.dart';
 import 'package:catalyst_voices_models/src/crypto/catalyst_public_key.dart';
 import 'package:catalyst_voices_models/src/user/account_role.dart';
 import 'package:catalyst_voices_models/src/user/catalyst_id.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:test/fake.dart';
@@ -15,11 +16,11 @@ void main() {
     late CatalystPublicKey role0Key;
 
     setUpAll(() {
-      CatalystPublicKey.factory = _FakeCatalystKeyFactory();
+      CatalystPublicKey.factory = _FakeCatalystPublicKeyFactory();
 
       final role0KeyBytes =
           base64Decode('FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE=');
-      role0Key = CatalystPublicKey.factory.createPublicKey(role0KeyBytes);
+      role0Key = CatalystPublicKey.factory.create(role0KeyBytes);
     });
 
     test('should create CatalystId instance correctly', () {
@@ -149,7 +150,7 @@ void main() {
         nonce: 123456,
       );
 
-      final formattedId = catalystId.formatAsUriWithoutScheme();
+      final formattedId = catalystId.toUri().toStringWithoutScheme();
       expect(
         formattedId,
         equals(
@@ -160,9 +161,10 @@ void main() {
   });
 }
 
-class _FakeCatalystKeyFactory extends Fake implements CatalystPublicKeyFactory {
+class _FakeCatalystPublicKeyFactory extends Fake
+    implements CatalystPublicKeyFactory {
   @override
-  CatalystPublicKey createPublicKey(Uint8List bytes) {
+  CatalystPublicKey create(Uint8List bytes) {
     return _FakeCatalystPublicKey(bytes: bytes);
   }
 }

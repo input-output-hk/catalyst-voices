@@ -16,3 +16,14 @@ final class Bip32Ed25519XCatalystSignature extends Equatable
   @override
   List<Object?> get props => [_signature];
 }
+
+final class Bip32Ed25519XCatalystSignatureFactory
+    implements CatalystSignatureFactory {
+  const Bip32Ed25519XCatalystSignatureFactory();
+
+  @override
+  CatalystSignature create(Uint8List bytes) {
+    final signature = Bip32Ed25519XSignatureFactory.instance.fromBytes(bytes);
+    return Bip32Ed25519XCatalystSignature(signature);
+  }
+}

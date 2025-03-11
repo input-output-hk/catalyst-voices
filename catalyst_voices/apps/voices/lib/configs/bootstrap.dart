@@ -136,10 +136,9 @@ Future<void> _initCryptoUtils() async {
   // Key derivation needs to be initialized before it can be used
   await CatalystKeyDerivation.init();
 
-  const factory = Bip32Ed25519CatalystKeyFactory();
-  CatalystPrivateKey.factory = factory;
-  CatalystPublicKey.factory = factory;
-  CatalystSignature.factory = factory;
+  CatalystPrivateKey.factory = const Bip32Ed25519XCatalystPrivateKeyFactory();
+  CatalystPublicKey.factory = const Bip32Ed25519XCatalystPublicKeyFactory();
+  CatalystSignature.factory = const Bip32Ed25519XCatalystSignatureFactory();
 }
 
 Future<void> _reportBootstrapError(Object error, StackTrace stack) async {
