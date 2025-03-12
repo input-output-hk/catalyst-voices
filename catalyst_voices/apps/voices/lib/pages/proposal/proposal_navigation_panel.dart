@@ -135,12 +135,11 @@ class _VersionSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<ProposalBloc, ProposalState, DocumentVersions>(
+    return BlocSelector<ProposalBloc, ProposalState, List<DocumentVersion>>(
       selector: (state) => state.data.header.versions,
       builder: (context, state) {
         return DocumentVersionSelector(
-          current: state.current,
-          versions: state.all,
+          versions: state,
           showBorder: false,
         );
       },

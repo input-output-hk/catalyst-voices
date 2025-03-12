@@ -64,6 +64,10 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   Future<ProposalData> getProposal({
     required DocumentRef ref,
   }) async {
+    if (!ref.isExact) {
+      ref = ref.copyWith(version: Optional(ref.id));
+    }
+
     return ProposalData(
       categoryId: const Uuid().v7(),
       document: ProposalDocument(
@@ -73,7 +77,6 @@ final class ProposalRepositoryImpl implements ProposalRepository {
           schema: DocumentSchema.optional(),
         ),
       ),
-      ref: ref,
     );
   }
 

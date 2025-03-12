@@ -8,7 +8,7 @@ final class ProposalViewHeader extends Equatable {
   final String authorDisplayName;
   final DateTime? createdAt;
   final int commentsCount;
-  final DocumentVersions versions;
+  final List<DocumentVersion> versions;
   final bool isFavorite;
 
   const ProposalViewHeader({
@@ -17,7 +17,7 @@ final class ProposalViewHeader extends Equatable {
     this.authorDisplayName = '',
     this.createdAt,
     this.commentsCount = 0,
-    this.versions = const DocumentVersions(),
+    this.versions = const <DocumentVersion>[],
     this.isFavorite = false,
   });
 
@@ -38,7 +38,7 @@ final class ProposalViewHeader extends Equatable {
     String? authorDisplayName,
     Optional<DateTime>? createdAt,
     int? commentsCount,
-    DocumentVersions? versions,
+    List<DocumentVersion>? versions,
     bool? isFavorite,
   }) {
     return ProposalViewHeader(

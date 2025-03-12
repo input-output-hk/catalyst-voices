@@ -3,8 +3,8 @@ import 'package:catalyst_voices_blocs/src/proposal/proposal.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:uuid/uuid.dart';
 
 final class ProposalBloc extends Bloc<ProposalEvent, ProposalState>
     with DocumentToSegmentMixin {
@@ -60,20 +60,23 @@ final class ProposalBloc extends Bloc<ProposalEvent, ProposalState>
       comments: const [],
     );
 
+    final versions = proposal.versions.mapIndexed((index, version) {
+      return DocumentVersion(
+        id: version,
+        nr: index + 1,
+        isCurrent: version == proposalDocumentRef.version,
+        isLatest: index == proposal.versions.length - 1,
+      );
+    }).toList();
+
     final data = ProposalViewData(
       header: ProposalViewHeader(
         id: event.ref.id,
         title: 'Project Mayhem: Freedom by Chaos',
         authorDisplayName: 'Tyler Durden',
         createdAt: DateTime.timestamp(),
-        commentsCount: 6,
-        versions: DocumentVersions(
-          current: proposalDocumentRef.version,
-          all: [
-            proposalDocumentRef.version!,
-            ...List.generate(4, (_) => const Uuid().v7()),
-          ],
-        ),
+        commentsCount: proposal.commentsCount,
+        versions: versions,
         isFavorite: false,
       ),
       segments: [

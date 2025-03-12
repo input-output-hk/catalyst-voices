@@ -16,7 +16,7 @@ class ProposalVersion extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<ProposalBloc, ProposalState, DocumentVersions>(
+    return BlocSelector<ProposalBloc, ProposalState, List<DocumentVersion>>(
       selector: (state) => state.data.header.versions,
       builder: (context, state) {
         return _ProposalVersion(
@@ -32,7 +32,7 @@ class ProposalVersion extends StatelessWidget {
 class _ProposalVersion extends StatelessWidget {
   final bool readOnly;
   final bool showBorder;
-  final DocumentVersions versions;
+  final List<DocumentVersion> versions;
 
   const _ProposalVersion({
     required this.readOnly,
@@ -43,8 +43,7 @@ class _ProposalVersion extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DocumentVersionSelector(
-      current: versions.current,
-      versions: versions.all,
+      versions: versions,
       readOnly: readOnly,
       showBorder: showBorder,
     );
