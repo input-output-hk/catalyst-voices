@@ -112,7 +112,7 @@ final class _CatalystVerifier implements CatalystCoseVerifier {
 
   @override
   Future<bool> verify(Uint8List data, Uint8List signature) async {
-    // TODO(dtscalac): obtain the public key correspoding
+    // TODO(dtscalac): obtain the public key corresponding
     // to the private key which generated the signature and use
     // it for verification, most likely the role0Key is not the correct one.
     final catalystSignature = CatalystSignature.factory.create(signature);
