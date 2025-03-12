@@ -37,7 +37,7 @@ base class CampaignBase extends Equatable {
 
   // TODO(damian-molinski): this should come from api
   DocumentRef get proposalTemplateRef {
-    return const SignedDocumentRef(id: 'schema');
+    return const SignedDocumentRef(id: '0194d492-1daa-75b5-b4a4-5cf331cd8d1a');
   }
 
   Campaign toCampaign() {

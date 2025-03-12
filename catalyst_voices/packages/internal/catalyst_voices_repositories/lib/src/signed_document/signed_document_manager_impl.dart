@@ -148,6 +148,10 @@ final class _CoseSignedDocument<T extends SignedDocumentPayload>
 
   @override
   Future<bool> verifySignature(CatalystId catalystId) async {
+    // TODO(dtscalac): obtain from somewhere the catalyst ID
+    // which corresponds to the user who signed the document,
+    // not to the current app user.
+
     return _coseSign.verify(
       verifier: _CatalystVerifier(catalystId),
     );
