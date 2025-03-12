@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:uuid/data.dart';
 import 'package:uuid/uuid.dart';
 
 // TODO(damian-molinski): Delete it after versions query is ready.
@@ -74,9 +75,20 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     final versions = _docVersionsCache.putIfAbsent(
       ref.id,
       () => [
-        ...List.generate(3, (_) => const Uuid().v7()),
         ref.version!,
-      ],
+        ...List.generate(3, (index) {
+          final now = DateTimeExt.now();
+          final createdAt = now.subtract(
+            Duration(
+              days: index + 1,
+              hours: index + 2,
+            ),
+          );
+
+          final config = V7Options(createdAt.millisecondsSinceEpoch, null);
+          return const Uuid().v7(config: config);
+        }),
+      ].reversed.toList(),
     );
 
     return ProposalData(
