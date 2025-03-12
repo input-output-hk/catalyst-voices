@@ -31,7 +31,7 @@ void main() {
 
       expect(signedDocument.payload, equals(document));
 
-      final isVerified = await signedDocument.verifySignature(_publicKey);
+      final isVerified = await signedDocument.verifySignature(_catalystId);
       expect(isVerified, isTrue);
 
       final signedDocumentBytes = signedDocument.toBytes();

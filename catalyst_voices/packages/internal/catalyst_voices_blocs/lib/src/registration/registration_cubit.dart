@@ -27,6 +27,7 @@ final class RegistrationCubit extends Cubit<RegistrationState>
   final UserService _userService;
   final RegistrationService _registrationService;
   final RegistrationProgressNotifier _progressNotifier;
+  final BlockchainConfig _blockchainConfig;
 
   CatalystPrivateKey? _masterKey;
   Transaction? _transaction;
@@ -36,9 +37,11 @@ final class RegistrationCubit extends Cubit<RegistrationState>
     required UserService userService,
     required RegistrationService registrationService,
     required RegistrationProgressNotifier progressNotifier,
+    required BlockchainConfig blockchainConfig,
   })  : _registrationService = registrationService,
         _userService = userService,
         _progressNotifier = progressNotifier,
+        _blockchainConfig = blockchainConfig,
         _baseProfileCubit = BaseProfileCubit(),
         _keychainCreationCubit = KeychainCreationCubit(
           downloaderService: downloaderService,
@@ -146,8 +149,7 @@ final class RegistrationCubit extends Cubit<RegistrationState>
 
       final transaction = await _registrationService.prepareRegistration(
         wallet: wallet,
-        // TODO(dtscalac): inject the networkId
-        networkId: NetworkId.testnet,
+        networkId: _blockchainConfig.networkId,
         masterKey: masterKey,
         roles: roles,
       );
