@@ -36,7 +36,7 @@ pub(crate) type AllRegistration = common::responses::WithErrorResponses<Cip36Reg
 #[derive(Object)]
 #[oai(example = true)]
 pub(crate) struct Cip36RegistrationList {
-    /// The Slot the Registrations are valid up until.
+    /// The Slot the Registrations are up to this specific slot.
     ///
     /// Any registrations that occurred after this Slot are not included in the list.
     /// If absent return the most recent registrations.
