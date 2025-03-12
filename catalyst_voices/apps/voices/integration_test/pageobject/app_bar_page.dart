@@ -3,12 +3,15 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:patrol_finders/patrol_finders.dart';
 
 import '../utils/constants.dart';
+import '../utils/translations_utils.dart';
 
 class AppBarPage {
   AppBarPage(this.$);
   late PatrolTester $;
   final spacesDrawerButton = const Key('DrawerButton');
   final getStartedBtn = const Key('GetStartedButton');
+  final finishRegistrationBtn = const Key('FinishRegistrationButton');
+  final accountPopupBtn = const Key('AccountPopupButton');
   final lockBtn = const Key('LockButton');
   final unlockBtn = const Key('UnlockButton');
   final visitorBtn = const Key('VisitorBtn');
@@ -29,6 +32,15 @@ class AppBarPage {
 
   Future<void> getStartedBtnIsVisible() async {
     expect($(getStartedBtn), findsOneWidget);
+    expect($(getStartedBtn).$(Text).text, T.get('Get Started'));
+  }
+
+  Future<void> finishAccountCreationBtnIsVisible() async {
+    expect($(finishRegistrationBtn), findsOneWidget);
+    expect(
+      $(finishRegistrationBtn).$(Text).text,
+      T.get('Finish account creation'),
+    );
   }
 
   Future<void> sessionAccountPopupMenuAvatarIsVisible() async {
@@ -57,6 +69,11 @@ class AppBarPage {
 
   Future<void> looksAsExpectedForVisitor() async {
     await getStartedBtnIsVisible();
+    await visitorBtnIsVisible();
+  }
+
+  Future<void> looksAsExpectedForVisitorOnboardingInProgress() async {
+    await finishAccountCreationBtnIsVisible();
     await visitorBtnIsVisible();
   }
 }

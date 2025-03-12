@@ -151,7 +151,8 @@ final class _CoseSignedDocument<T extends SignedDocumentPayload>
     // not to the current app user.
 
     final catalystId = CatalystId(
-      host: CatalystIdHost.cardano.host,
+      // TODO(dtscalac): inject the host from configuration, don't hardcode it
+      host: CatalystIdHost.cardanoPreprod.host,
       role0Key: publicKey,
     );
 

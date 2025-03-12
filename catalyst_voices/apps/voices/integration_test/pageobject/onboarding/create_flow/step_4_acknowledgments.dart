@@ -1,10 +1,14 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+
+import '../../../utils/translations_utils.dart';
 import '../onboarding_base_page.dart';
 import 'step_3_setup_base_profile.dart';
 
 class AcknowledgmentsPanel extends OnboardingPageBase {
   AcknowledgmentsPanel(super.$);
   final acknowledgmentsTile = const Key('AcknowledgementsTitle');
-  final tosCheckox = const Key('TosCheckbox');
+  final tosCheckbox = const Key('TosCheckbox');
   final privacyPolicyCheckbox = const Key('PrivacyPolicyCheckbox');
 
   Future<void> clickNext() async {
@@ -37,10 +41,15 @@ class AcknowledgmentsPanel extends OnboardingPageBase {
 
   Future<void> verifyDetailsPanel() async {
     expect(
-        $(acknowledgmentsTile).text, T.get('Mandatory AcknowledgementsTitle'));
+      $(acknowledgmentsTile).text,
+      T.get('Mandatory AcknowledgementsTitle'),
+    );
     expect(
-        $(tosCheckox).text,
-        T.get(
-            'I confirm that I have read and agree to be bound by Project Catalyst Terms and Conditions'));
+      $(tosCheckbox).text,
+      T.get(
+        'I confirm that I have read and agree to be bound by Project Catalyst '
+        'Terms and Conditions',
+      ),
+    );
   }
 }

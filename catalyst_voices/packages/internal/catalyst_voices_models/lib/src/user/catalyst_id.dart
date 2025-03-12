@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:catalyst_voices_models/src/crypto/catalyst_public_key.dart';
 import 'package:catalyst_voices_models/src/user/account_role.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
@@ -99,7 +97,7 @@ final class CatalystId extends Equatable {
   }
 
   String _formatPath() {
-    final encodedRole0Key = base64Encode(role0Key.bytes);
+    final encodedRole0Key = base64UrlNoPadEncode(role0Key.publicKeyBytes);
     final role = this.role?.number.toString();
     final rotation = this.rotation?.toString();
 
@@ -139,7 +137,7 @@ final class CatalystId extends Equatable {
     final role = int.tryParse(parts.elementAtOrNull(1) ?? '');
     final rotation = int.tryParse(parts.elementAtOrNull(2) ?? '');
 
-    final decodedRole0Key = base64Decode(role0Key);
+    final decodedRole0Key = base64UrlNoPadDecode(role0Key);
     final catalystRole0Key = CatalystPublicKey.factory.create(decodedRole0Key);
     final accountRole = role != null ? AccountRole.fromNumber(role) : null;
 
