@@ -15,7 +15,7 @@ use crate::{
         queries::registrations::{
             get_all_invalids::{GetAllInvalidRegistrationsParams, GetAllInvalidRegistrationsQuery},
             get_all_registrations::{GetAllRegistrationsParams, GetAllRegistrationsQuery},
-            get_from_stake_addr::{GetRegistrationParams, GetRegistrationQuery},
+            get_from_stake_pk::{GetRegistrationParams, GetRegistrationQuery},
             get_invalid::{GetInvalidRegistrationParams, GetInvalidRegistrationQuery},
             get_stake_pk_from_stake_addr::{
                 GetStakePublicKeyFromStakeAddrParams, GetStakePublicKeyFromStakeAddrQuery,
@@ -391,8 +391,7 @@ fn build_response(
 
 /// Sort registrations by slot number, nonce, and transaction offset. If `slot_no` is the
 /// same, the registration with the highest `nonce` wins. If `nonce` is the same, the
-/// registration with the highest `txn_offset` wins. The latest one is considered the only
-/// valid registration. The rest are invalid.
+/// registration with the highest `txn_offset` wins.
 fn sort_registrations(mut regs: Vec<Cip36Details>) -> Vec<Cip36Details> {
     // Sort registrations by slot_no, nonce, and txn_offset in descending order
     regs.sort_by(|a, b| {

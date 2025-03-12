@@ -12,7 +12,7 @@ use crate::db::index::{
     queries::{
         rbac,
         registrations::{
-            get_from_stake_addr::*, get_invalid::*, get_stake_pk_from_stake_addr::*,
+            get_from_stake_pk::*, get_invalid::*, get_stake_pk_from_stake_addr::*,
             get_stake_pk_from_vote_key::*,
         },
         staked_ada::{

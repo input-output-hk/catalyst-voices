@@ -19,9 +19,9 @@ use serde_json::Value;
 use crate::service::common::types::string_types::impl_string_types;
 
 /// Title
-const TITLE: &str = "Cardano Payment Address";
+const TITLE: &str = "Cardano CIP-19 Address";
 /// Description
-const DESCRIPTION: &str = "Cardano Shelley Payment Address (CIP-19 Formatted).";
+const DESCRIPTION: &str = "Cardano CIP-19 Formatted Address.";
 /// Example
 // cSpell:disable
 const EXAMPLE: &str = "addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3n0d3vllmyqwsx5wktcd8cc3sq835lu7drv2xwl2wywfgs68faae";

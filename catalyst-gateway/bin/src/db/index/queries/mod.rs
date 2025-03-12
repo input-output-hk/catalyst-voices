@@ -14,7 +14,7 @@ use anyhow::bail;
 use crossbeam_skiplist::SkipMap;
 use registrations::{
     get_all_invalids::GetAllInvalidRegistrationsQuery,
-    get_all_registrations::GetAllRegistrationsQuery, get_from_stake_addr::GetRegistrationQuery,
+    get_all_registrations::GetAllRegistrationsQuery, get_from_stake_pk::GetRegistrationQuery,
     get_invalid::GetInvalidRegistrationQuery,
     get_stake_pk_from_stake_addr::GetStakePublicKeyFromStakeAddrQuery,
     get_stake_pk_from_vote_key::GetStakePublicKeyFromVoteKeyQuery,

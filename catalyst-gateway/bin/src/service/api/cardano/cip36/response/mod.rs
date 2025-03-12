@@ -18,10 +18,10 @@ use crate::service::common::{
 /// Endpoint responses.
 #[derive(ApiResponse)]
 pub(crate) enum Cip36Registration {
-    /// All CIP36 registrations associated with the same Voting Key.
+    /// All CIP36 registrations according to the request.
     #[oai(status = 200)]
     Ok(Json<Cip36RegistrationList>),
-    /// No valid registration.
+    /// Registrations not found.
     #[oai(status = 404)]
     NotFound,
     /// Response for unprocessable content.
