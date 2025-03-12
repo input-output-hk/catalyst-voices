@@ -397,7 +397,6 @@ final class ProposalBuilderBloc
       ref,
       _documentMapper.toContent(document),
     );
-    print(nextRef);
 
     if (ref != nextRef) {
       final updatedMetadata = state.metadata.copyWith(
