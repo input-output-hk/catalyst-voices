@@ -53,7 +53,7 @@ impl GetStakePublicKeyFromVoteKeyQuery {
         .map_err(|error| anyhow::anyhow!("{error}\n--\n{GET_STAKE_PK_FROM_VOTE_KEY}"))
     }
 
-    /// Executes a get txi by transaction hashes query.
+    /// Executes a get stake public key form vote key.
     pub(crate) async fn execute(
         session: &CassandraSession, params: GetStakePublicKeyFromVoteKeyParams,
     ) -> anyhow::Result<TypedRowStream<GetStakePublicKeyFromVoteKeyQuery>> {
