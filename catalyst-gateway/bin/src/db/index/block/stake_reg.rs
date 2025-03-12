@@ -31,7 +31,7 @@ pub(crate) struct StakeRegistrationInsertQuery {
     register: MaybeUnset<bool>,
     /// Is the Cardano Certificate Deregistered
     deregister: MaybeUnset<bool>,
-    /// Is the Certificate Deregistered?
+    /// Is the stake address contains CIP36 registration?
     cip36: MaybeUnset<bool>,
     /// Pool Delegation Address
     pool_delegation: MaybeUnset<Vec<u8>>,
