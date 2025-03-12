@@ -194,6 +194,7 @@ final class Dependencies extends DependencyProvider {
       return AuthService(
         get<UserObserver>(),
         get<KeyDerivationService>(),
+        get<AppConfig>().blockchain,
       );
     });
     registerLazySingleton<AuthTokenProvider>(() => get<AuthService>());
