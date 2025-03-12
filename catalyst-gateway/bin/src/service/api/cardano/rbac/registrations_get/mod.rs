@@ -5,7 +5,7 @@ mod rbac_reg;
 mod reg_chain;
 mod unprocessable_content;
 
-use anyhow::{anyhow, Context};
+use anyhow::{anyhow, bail, Context};
 use cardano_blockchain_types::{Point, StakeAddress};
 use cardano_chain_follower::ChainFollower;
 use catalyst_types::id_uri::IdUri;
@@ -62,7 +62,7 @@ pub(crate) async fn endpoint(
 ) -> AllResponses {
     let Some(session) = CassandraSession::get(true) else {
         error!("Failed to acquire db session");
-        let err = anyhow::anyhow!("Failed to acquire db session");
+        let err = anyhow!("Failed to acquire db session");
         return AllResponses::service_unavailable(&err, RetryAfterOption::Default);
     };
 
@@ -152,7 +152,7 @@ async fn registrations(
         if block.point().slot_or_default() != reg.slot_no.into() {
             // The `ChainFollower::get_block` function can return the next consecutive block if it
             // cannot find the exact one. This shouldn't happen, but we need to check anyway.
-            anyhow::bail!("Unable to find exact block");
+            bail!("Unable to find exact block");
         }
         let reg =
             rbac_registration::cardano::cip509::Cip509::new(&block, reg.txn_index.into(), &[])
