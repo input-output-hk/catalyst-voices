@@ -5,6 +5,7 @@ import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_services/src/crypto/key_derivation_service.dart';
 import 'package:catalyst_voices_services/src/user/user_service.dart';
 import 'package:rxdart/rxdart.dart';
+import 'package:uuid/uuid.dart';
 
 abstract interface class ProposalService {
   const factory ProposalService(
@@ -150,8 +151,22 @@ final class ProposalServiceImpl implements ProposalService {
     required DocumentRef ref,
   }) async {
     final proposal = await _proposalRepository.getProposal(ref: ref);
+    final document = await _documentRepository.getProposalDocument(
+      ref: ref,
+    );
 
-    return proposal;
+    // TODO(damian-molinski): Delete this after documents sync is ready.
+    final mergedDocument = ProposalDocument(
+      metadata: proposal.document.metadata,
+      document: document.document,
+    );
+
+    return ProposalData(
+      document: mergedDocument,
+      categoryId: const Uuid().v7(),
+      commentsCount: 10,
+      versions: proposal.versions,
+    );
   }
 
   @override
@@ -281,7 +296,6 @@ final class ProposalServiceImpl implements ProposalService {
               categoryId: DocumentType.categoryParametersDocument.uuid,
               versions: versionIds,
               commentsCount: commentsCount,
-              ref: doc.metadata.selfRef,
             );
             return Proposal.fromData(proposalData);
           });
