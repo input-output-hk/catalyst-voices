@@ -32,14 +32,11 @@ abstract interface class DocumentRepository {
   ///
   /// At the moment we do not support drafts of templates that's why
   /// [template] requires [SignedDocumentRef].
-  ///
-  /// If [of] is declared it will be used for this draft and new version
-  /// assigned. Think of it as editing published document.
   Future<DraftRef> createDocumentDraft({
     required DocumentType type,
     required DocumentDataContent content,
-    required SignedDocumentRef template,
-    SignedDocumentRef? of,
+    required DocumentRef template,
+    DraftRef? selfRef,
   });
 
   /// Deletes a document draft from the local storage.
@@ -152,13 +149,14 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   Future<DraftRef> createDocumentDraft({
     required DocumentType type,
     required DocumentDataContent content,
-    required SignedDocumentRef template,
-    SignedDocumentRef? of,
+    required DocumentRef template,
+    DraftRef? selfRef,
   }) async {
-    final id = of?.id ?? const Uuid().v7();
-    final version = of != null ? const Uuid().v7() : id;
-
-    final ref = DraftRef(id: id, version: version);
+    final ref = selfRef ??
+        DraftRef(
+          id: const Uuid().v7(),
+          version: const Uuid().v7(),
+        );
     final metadata = DocumentDataMetadata(
       type: type,
       selfRef: ref,

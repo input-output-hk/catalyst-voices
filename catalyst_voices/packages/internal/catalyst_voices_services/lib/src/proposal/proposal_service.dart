@@ -17,6 +17,12 @@ abstract interface class ProposalService {
 
   Future<List<String>> addFavoriteProposal(String proposalId);
 
+  Future<DraftRef> createDraftProposal({
+    DraftRef? ref,
+    required DocumentDataContent content,
+    required DocumentRef template,
+  });
+
   /// Delete a draft proposal from local storage.
   ///
   /// Published proposals cannot be deleted.
@@ -101,6 +107,20 @@ final class ProposalServiceImpl implements ProposalService {
   @override
   Future<List<String>> addFavoriteProposal(String proposalId) async {
     return _proposalRepository.addFavoriteProposal(proposalId);
+  }
+
+  @override
+  Future<DraftRef> createDraftProposal({
+    DraftRef? ref,
+    required DocumentDataContent content,
+    required DocumentRef template,
+  }) async {
+    return _documentRepository.createDocumentDraft(
+      type: DocumentType.proposalDocument,
+      content: content,
+      template: template,
+      selfRef: ref,
+    );
   }
 
   @override

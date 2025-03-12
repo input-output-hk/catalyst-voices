@@ -244,7 +244,7 @@ final class ProposalBuilderBloc
   ) async {
     _logger.info('Loading default proposal template');
 
-    await _loadState(emit, () async {
+    await _loadState(true, emit, () async {
       final campaign = await _campaignService.getActiveCampaign();
       final proposalTemplateRef = campaign?.proposalTemplateRef;
       if (proposalTemplateRef == null) {
@@ -273,7 +273,7 @@ final class ProposalBuilderBloc
   ) async {
     _logger.info('Loading proposal[${event.ref}]');
 
-    await _loadState(emit, () async {
+    await _loadState(false, emit, () async {
       final proposalData = await _proposalService.getProposal(ref: event.ref);
       final proposal = Proposal.fromData(proposalData);
 
@@ -296,7 +296,7 @@ final class ProposalBuilderBloc
 
     _logger.info('Loading proposal template[$ref]');
 
-    await _loadState(emit, () async {
+    await _loadState(true, emit, () async {
       final proposalTemplate = await _proposalService.getProposalTemplate(
         ref: ref,
       );
@@ -314,12 +314,18 @@ final class ProposalBuilderBloc
   }
 
   Future<void> _loadState(
+    bool isNewDocument,
     Emitter<ProposalBuilderState> emit,
     Future<ProposalBuilderState> Function() stateBuilder,
   ) async {
     try {
       _logger.info('load state');
-      emit(const ProposalBuilderState(isChanging: true));
+      emit(
+        ProposalBuilderState(
+          isChanging: true,
+          isNewDocument: isNewDocument,
+        ),
+      );
       _documentBuilder = null;
 
       final newState = await stateBuilder();
@@ -388,16 +394,23 @@ final class ProposalBuilderBloc
     Document document,
   ) async {
     final ref = state.metadata.documentRef!;
-    final nextRef = await _updateDraftProposal(
+    final isNewDocument = state.isNewDocument;
+
+    final nextRef = await _upsertDraftProposal(
+      isNewDocument,
       ref,
       _documentMapper.toContent(document),
     );
+    emit(state.copyWith(isNewDocument: false));
 
-    if (nextRef != null && ref != nextRef) {
+    if (ref != nextRef) {
       final updatedMetadata = state.metadata.copyWith(
         documentRef: Optional(nextRef),
       );
-      final updatedState = state.copyWith(metadata: updatedMetadata);
+      final updatedState = state.copyWith(
+        metadata: updatedMetadata,
+        isNewDocument: false,
+      );
       emit(updatedState);
     }
   }
@@ -419,15 +432,28 @@ final class ProposalBuilderBloc
     }
   }
 
-  Future<DraftRef?> _updateDraftProposal(
+  Future<DraftRef?> _upsertDraftProposal(
+    bool isNewDocument,
     DocumentRef currentRef,
     DocumentDataContent document,
   ) async {
-    final nextRef = currentRef.nextVersion();
-    await _proposalService.updateDraftProposal(
-      ref: nextRef,
-      content: document,
-    );
+    DraftRef nextRef;
+    if (isNewDocument) {
+      final template = state.metadata.templateRef;
+      if (template == null) {
+        throw const ProposalTemplateNotFoundException();
+      }
+      nextRef = await _proposalService.createDraftProposal(
+        content: document,
+        template: template,
+      );
+    } else {
+      nextRef = currentRef.nextVersion();
+      await _proposalService.updateDraftProposal(
+        ref: nextRef,
+        content: document,
+      );
+    }
 
     return nextRef;
   }
