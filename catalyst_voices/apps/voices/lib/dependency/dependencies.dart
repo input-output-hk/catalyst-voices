@@ -132,6 +132,7 @@ final class Dependencies extends DependencyProvider {
       return ApiServices(
         config: get<AppConfig>().api,
         userObserver: get<UserObserver>(),
+        authTokenProvider: get<AuthTokenProvider>(),
       );
     });
   }
@@ -191,6 +192,13 @@ final class Dependencies extends DependencyProvider {
         cacheConfig: get<AppConfig>().cache,
       );
     });
+    registerLazySingleton<AuthService>(() {
+      return AuthService(
+        get<UserObserver>(),
+        get<KeyDerivationService>(),
+      );
+    });
+    registerLazySingleton<AuthTokenProvider>(() => get<AuthService>());
     registerLazySingleton<DownloaderService>(DownloaderService.new);
     registerLazySingleton<CatalystCardano>(() => CatalystCardano.instance);
     registerLazySingleton<RegistrationProgressNotifier>(

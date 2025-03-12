@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:catalyst_voices_models/src/crypto/catalyst_key_factory.dart';
 import 'package:catalyst_voices_models/src/crypto/catalyst_public_key.dart';
 import 'package:catalyst_voices_models/src/user/account_role.dart';
@@ -19,7 +17,7 @@ void main() {
       CatalystPublicKey.factory = _FakeCatalystPublicKeyFactory();
 
       final role0KeyBytes =
-          base64Decode('FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE=');
+          base64UrlNoPadDecode('FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE');
       role0Key = CatalystPublicKey.factory.create(role0KeyBytes);
     });
 
@@ -139,7 +137,7 @@ void main() {
       expect(uri.fragment, 'encrypt');
       expect(
         uri.path,
-        equals('/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE=/1/2'),
+        equals('/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE/1/2'),
       );
     });
 
@@ -154,19 +152,11 @@ void main() {
       expect(
         formattedId,
         equals(
-          ':123456@cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE=',
+          ':123456@cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE',
         ),
       );
     });
   });
-}
-
-class _FakeCatalystPublicKeyFactory extends Fake
-    implements CatalystPublicKeyFactory {
-  @override
-  CatalystPublicKey create(Uint8List bytes) {
-    return _FakeCatalystPublicKey(bytes: bytes);
-  }
 }
 
 @immutable
@@ -180,10 +170,21 @@ class _FakeCatalystPublicKey extends Fake implements CatalystPublicKey {
   int get hashCode => const DeepCollectionEquality().hash(bytes);
 
   @override
+  Uint8List get publicKeyBytes => bytes;
+
+  @override
   bool operator ==(Object other) {
     if (other is! _FakeCatalystPublicKey) return false;
 
     return const DeepCollectionEquality().equals(other.bytes, bytes);
+  }
+}
+
+class _FakeCatalystPublicKeyFactory extends Fake
+    implements CatalystPublicKeyFactory {
+  @override
+  CatalystPublicKey create(Uint8List bytes) {
+    return _FakeCatalystPublicKey(bytes: bytes);
   }
 }
 /* cSpell:enable */

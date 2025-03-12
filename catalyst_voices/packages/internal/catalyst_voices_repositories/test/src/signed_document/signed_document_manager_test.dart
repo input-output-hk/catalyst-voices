@@ -51,7 +51,8 @@ const _metadata = SignedDocumentMetadata(
 );
 
 final _catalystId = CatalystId(
-  host: CatalystIdHost.cardano.host,
+  // TODO(dtscalac): inject the host from configuration, don't hardcode it
+  host: CatalystIdHost.cardanoPreprod.host,
   role0Key: _publicKey,
 );
 
@@ -96,6 +97,9 @@ class _FakeCatalystPublicKey extends Fake implements CatalystPublicKey {
   final Uint8List bytes;
 
   _FakeCatalystPublicKey({required this.bytes});
+
+  @override
+  Uint8List get publicKeyBytes => bytes;
 
   @override
   Future<bool> verify(
