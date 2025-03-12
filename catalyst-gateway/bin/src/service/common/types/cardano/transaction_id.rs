@@ -13,7 +13,7 @@ use serde_json::Value;
 use crate::service::{common::types::string_types::impl_string_types, utilities::as_hex_string};
 
 /// Title.
-const TITLE: &str = "Transaction Id";
+const TITLE: &str = "Transaction Id or Transaction hash";
 /// Description.
 const DESCRIPTION: &str = "The Blake2b-256 hash of the transaction.";
 /// Example.
