@@ -25,7 +25,6 @@ class CurrentCampaignSection {
   final campaignTimelineComponent = const Key('CampaignTimeline');
   final timelineCardTitle = const Key('TimelineCardTitle');
   final timelineCardDate = const Key('TimelineCardDate');
-  final timelineCardDescription = const Key('TimelineCardDescription');
   final currentCampaignLoadingError = const Key('CurrentCampaignError');
 
   Future<void> titleIsRenderedCorrectly() async {
