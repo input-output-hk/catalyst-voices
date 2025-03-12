@@ -46,7 +46,7 @@ pub(crate) async fn cip36_registrations(
                 Ok(a) => a,
                 Err(err) => {
                     return AllRegistration::handle_error(&anyhow::anyhow!(
-                        "Given stake pub key is corrupt {:?}",
+                        "Given stake address is corrupted {:?}",
                         err
                     ));
                 },
