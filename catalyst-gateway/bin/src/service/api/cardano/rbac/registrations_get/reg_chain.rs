@@ -14,7 +14,7 @@ use crate::service::common::types::{
 #[oai(example = true)]
 pub(crate) struct RegistrationChain {
     /// The current transaction ID
-    current_tx_id_hash: TxnId,
+    current_tx_id: TxnId,
     /// List of purpose for this registration chain
     #[oai(skip_serializing_if_is_empty)]
     purpose: PurposeList,
@@ -47,7 +47,7 @@ impl_array_types!(
 impl Example for RegistrationChain {
     fn example() -> Self {
         Self {
-            current_tx_id_hash: TxnId::example(),
+            current_tx_id: TxnId::example(),
             purpose: PurposeList::example(),
         }
     }
@@ -68,7 +68,7 @@ impl Example for PurposeList {
 impl From<rbac_registration::registration::cardano::RegistrationChain> for RegChain {
     fn from(value: rbac_registration::registration::cardano::RegistrationChain) -> Self {
         Self(RegistrationChain {
-            current_tx_id_hash: value.current_tx_id_hash().into(),
+            current_tx_id: value.current_tx_id_hash().into(),
             purpose: value
                 .purpose()
                 .iter()
