@@ -7,6 +7,7 @@ import 'package:catalyst_voices/pages/proposal/proposal_header.dart';
 import 'package:catalyst_voices/pages/proposal/proposal_navigation_panel.dart';
 import 'package:catalyst_voices/pages/proposal/snack_bar/viewing_older_version_snack_bar.dart';
 import 'package:catalyst_voices/routes/routes.dart';
+import 'package:catalyst_voices/widgets/snackbar/voices_snackbar.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -91,6 +92,7 @@ class _ProposalPageState extends State<ProposalPage>
     switch (signal) {
       case ViewingOlderVersionSignal():
         final latestRef = widget.ref.copyWith(version: const Optional.empty());
+        VoicesSnackBar.hideCurrent(context);
         ViewingOlderVersionSnackBar(context, latestRef: latestRef)
             .show(context);
     }
