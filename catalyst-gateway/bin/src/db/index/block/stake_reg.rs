@@ -99,7 +99,7 @@ impl StakeRegistrationInsertQuery {
         }
     }
 
-    /// Prepare Batch of Insert TXI Index Data Queries
+    /// Prepare Batch of Insert stake registration.
     pub(crate) async fn prepare_batch(
         session: &Arc<Session>, cfg: &cassandra_db::EnvVars,
     ) -> anyhow::Result<SizedBatch> {
