@@ -21,8 +21,6 @@ final class ApiConfig extends Equatable {
       ];
 }
 
-// TODO(dtscalac): NetworkId shouldn't be hardcoded,
-// preferably it should come from some configuration.
 final class AppConfig extends Equatable {
   final ApiConfig api;
   final CacheConfig cache;
