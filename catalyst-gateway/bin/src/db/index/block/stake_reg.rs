@@ -14,7 +14,7 @@ use crate::{
     settings::cassandra_db,
 };
 
-/// Insert TXI Query and Parameters
+/// Insert stake registration query
 #[derive(SerializeRow)]
 pub(crate) struct StakeRegistrationInsertQuery {
     /// Stake address (29 bytes).
