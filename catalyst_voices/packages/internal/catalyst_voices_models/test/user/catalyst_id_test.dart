@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:catalyst_voices_models/src/crypto/catalyst_key_factory.dart';
 import 'package:catalyst_voices_models/src/crypto/catalyst_public_key.dart';
 import 'package:catalyst_voices_models/src/user/account_role.dart';
@@ -19,7 +17,7 @@ void main() {
       CatalystPublicKey.factory = _FakeCatalystPublicKeyFactory();
 
       final role0KeyBytes =
-          base64Decode('FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE=');
+          base64UrlNoPadDecode('FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE');
       role0Key = CatalystPublicKey.factory.create(role0KeyBytes);
     });
 
@@ -161,21 +159,10 @@ void main() {
   });
 }
 
-class _FakeCatalystPublicKeyFactory extends Fake
-    implements CatalystPublicKeyFactory {
-  @override
-  CatalystPublicKey create(Uint8List bytes) {
-    return _FakeCatalystPublicKey(bytes: bytes);
-  }
-}
-
 @immutable
 class _FakeCatalystPublicKey extends Fake implements CatalystPublicKey {
   @override
   final Uint8List bytes;
-
-  @override
-  Uint8List get publicKeyBytes => bytes;
 
   _FakeCatalystPublicKey({required this.bytes});
 
@@ -183,10 +170,21 @@ class _FakeCatalystPublicKey extends Fake implements CatalystPublicKey {
   int get hashCode => const DeepCollectionEquality().hash(bytes);
 
   @override
+  Uint8List get publicKeyBytes => bytes;
+
+  @override
   bool operator ==(Object other) {
     if (other is! _FakeCatalystPublicKey) return false;
 
     return const DeepCollectionEquality().equals(other.bytes, bytes);
+  }
+}
+
+class _FakeCatalystPublicKeyFactory extends Fake
+    implements CatalystPublicKeyFactory {
+  @override
+  CatalystPublicKey create(Uint8List bytes) {
+    return _FakeCatalystPublicKey(bytes: bytes);
   }
 }
 /* cSpell:enable */
