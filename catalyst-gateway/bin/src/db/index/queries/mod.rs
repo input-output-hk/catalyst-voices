@@ -66,8 +66,8 @@ pub(crate) enum PreparedQuery {
     Cip36RegistrationInsertQuery,
     /// CIP 36 Registration Error Insert query.
     Cip36RegistrationInsertErrorQuery,
-    /// CIP 36 Registration for stake address Insert query.
-    Cip36RegistrationForStakeAddrInsertQuery,
+    /// CIP 36 Registration for voting key Insert query.
+    Cip36RegistrationForVoteKeyInsertQuery,
     /// TXO spent Update query.
     TxoSpentUpdateQuery,
     /// RBAC 509 Registration Insert query.
@@ -134,9 +134,9 @@ pub(crate) struct PreparedQueries {
     /// CIP36 Registrations.
     cip36_registration_insert_queries: SizedBatch,
     /// CIP36 Registration errors.
-    cip36_registration_error_insert_queries: SizedBatch,
-    /// CIP36 Registration for Stake Address Insert query.
-    cip36_registration_for_stake_address_insert_queries: SizedBatch,
+    cip36_registration_invalid_insert_queries: SizedBatch,
+    /// CIP36 Registration for Voting Key Insert query.
+    cip36_registration_for_vote_key_insert_queries: SizedBatch,
     /// Update TXO spent query.
     txo_spent_update_queries: SizedBatch,
     /// Get TXO by stake address query.
@@ -196,9 +196,9 @@ impl PreparedQueries {
 
         let cip36_registration_insert_queries =
             cip36::insert_cip36::Params::prepare_batch(&session, cfg).await?;
-        let cip36_registration_error_insert_queries =
+        let cip36_registration_invalid_insert_queries =
             cip36::insert_cip36_invalid::Params::prepare_batch(&session, cfg).await?;
-        let cip36_registration_for_stake_address_insert_queries =
+        let cip36_registration_for_vote_key_insert_queries =
             cip36::insert_cip36_for_vote_key::Params::prepare_batch(&session, cfg).await?;
 
         let txo_spent_update_queries =
@@ -250,8 +250,8 @@ impl PreparedQueries {
             txi_insert_queries,
             stake_registration_insert_queries,
             cip36_registration_insert_queries,
-            cip36_registration_error_insert_queries,
-            cip36_registration_for_stake_address_insert_queries,
+            cip36_registration_invalid_insert_queries,
+            cip36_registration_for_vote_key_insert_queries,
             txo_spent_update_queries,
             txo_by_stake_address_query: txo_by_stake_address_query?,
             txi_by_txn_hash_query: txi_by_txn_hash_query?,
@@ -398,10 +398,10 @@ impl PreparedQueries {
             PreparedQuery::StakeRegistrationInsertQuery => &self.stake_registration_insert_queries,
             PreparedQuery::Cip36RegistrationInsertQuery => &self.cip36_registration_insert_queries,
             PreparedQuery::Cip36RegistrationInsertErrorQuery => {
-                &self.cip36_registration_error_insert_queries
+                &self.cip36_registration_invalid_insert_queries
             },
-            PreparedQuery::Cip36RegistrationForStakeAddrInsertQuery => {
-                &self.cip36_registration_for_stake_address_insert_queries
+            PreparedQuery::Cip36RegistrationForVoteKeyInsertQuery => {
+                &self.cip36_registration_for_vote_key_insert_queries
             },
             PreparedQuery::TxoSpentUpdateQuery => &self.txo_spent_update_queries,
             PreparedQuery::Rbac509InsertQuery => &self.rbac509_registration_insert_queries,

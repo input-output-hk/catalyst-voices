@@ -340,10 +340,7 @@ async fn test_cip36_registration_for_vote_key() {
 
     // insert
     session
-        .execute_batch(
-            PreparedQuery::Cip36RegistrationForStakeAddrInsertQuery,
-            data,
-        )
+        .execute_batch(PreparedQuery::Cip36RegistrationForVoteKeyInsertQuery, data)
         .await
         .unwrap();
 

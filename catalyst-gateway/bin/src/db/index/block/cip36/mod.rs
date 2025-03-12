@@ -153,7 +153,7 @@ impl Cip36InsertQuery {
             query_handles.push(tokio::spawn(async move {
                 inner_session
                     .execute_batch(
-                        PreparedQuery::Cip36RegistrationForStakeAddrInsertQuery,
+                        PreparedQuery::Cip36RegistrationForVoteKeyInsertQuery,
                         self.for_vote_key,
                     )
                     .await
