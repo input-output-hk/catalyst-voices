@@ -152,7 +152,7 @@ async fn registrations(
         if block.point().slot_or_default() != reg.slot_no.into() {
             // The `ChainFollower::get_block` function can return the next consecutive block if it
             // cannot find the exact one. This shouldn't happen, but we need to check anyway.
-            return Err(anyhow!("Unable to find exact block"));
+            anyhow::bail!("Unable to find exact block");
         }
         let reg =
             rbac_registration::cardano::cip509::Cip509::new(&block, reg.txn_index.into(), &[])
