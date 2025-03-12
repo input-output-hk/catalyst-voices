@@ -41,7 +41,7 @@ pub(crate) struct Cip36Details {
     #[allow(clippy::missing_docs_in_private_items)] // Type is pre documented.
     #[oai(skip_serializing_if_is_none)]
     pub txn_index: Option<TxnIndex>,
-    /// Cardano Cip-19 Formatted Shelley Payment Address.
+    /// Cardano Cip-19 Formatted Address.
     #[oai(skip_serializing_if_is_none)]
     pub payment_address: Option<Cip19Address>,
     /// If the payment address is a script, then it can not be payed rewards.
