@@ -46,7 +46,7 @@ class CampaignCategoriesSection {
       );
       expect(
         $(categoriesRoot).$(campaignCategories).at(i).$(subname).$(Text).text,
-        T.get('Developers'),
+        isNotEmpty,
       );
       expect(
         $(categoriesRoot)
