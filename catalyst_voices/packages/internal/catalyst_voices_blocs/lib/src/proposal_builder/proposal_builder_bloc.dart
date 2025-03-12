@@ -318,15 +318,18 @@ final class ProposalBuilderBloc
     Future<ProposalBuilderState> Function() stateBuilder,
   ) async {
     try {
+      _logger.info('load state');
       emit(const ProposalBuilderState(isChanging: true));
       _documentBuilder = null;
 
       final newState = await stateBuilder();
       _documentBuilder = newState.document?.toBuilder();
       emit(newState);
-    } on LocalizedException catch (error) {
+    } on LocalizedException catch (error, stackTrace) {
+      _logger.severe('load state error', error, stackTrace);
       emit(ProposalBuilderState(error: error));
-    } catch (error) {
+    } catch (error, stackTrace) {
+      _logger.severe('load state error', error, stackTrace);
       emit(const ProposalBuilderState(error: LocalizedUnknownException()));
     } finally {
       emit(state.copyWith(isChanging: false));
