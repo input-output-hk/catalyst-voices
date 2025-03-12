@@ -83,11 +83,13 @@ class VoicesQuestionDialog extends StatelessWidget {
     switch (item.type) {
       case VoicesQuestionActionType.filled:
         return VoicesFilledButton(
+          key: const Key('ButtonFilled'),
           onTap: () => Navigator.of(context).pop(item.isPositive),
           child: Text(item.name),
         );
       case VoicesQuestionActionType.text:
         return VoicesTextButton(
+          key: const Key('ButtonText'),
           onTap: () => Navigator.of(context).pop(item.isPositive),
           child: Text(item.name),
         );
