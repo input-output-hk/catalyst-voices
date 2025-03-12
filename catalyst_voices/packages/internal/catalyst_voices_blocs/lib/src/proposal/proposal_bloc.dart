@@ -32,7 +32,7 @@ final class ProposalBloc extends Bloc<ProposalEvent, ProposalState>
     final versions = proposal.versions.mapIndexed((index, version) {
       return DocumentVersion(
         id: version,
-        nr: index + 1,
+        number: index + 1,
         isCurrent: version == proposalDocumentRef.version,
         isLatest: index == proposal.versions.length - 1,
       );

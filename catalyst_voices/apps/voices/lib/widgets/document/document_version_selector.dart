@@ -62,7 +62,7 @@ class DocumentVersionSelector extends StatelessWidget {
                 foregroundColor: context.colors.textOnPrimaryLevel1,
                 iconColor: context.colors.textOnPrimaryLevel1,
               ),
-              child: Text(context.l10n.nrOfIteration(current?.nr ?? 0)),
+              child: Text(context.l10n.nrOfIteration(current?.number ?? 0)),
             ),
           ),
         ),
@@ -86,7 +86,7 @@ class _VersionOverview extends StatelessWidget {
     return Row(
       children: [
         Text(
-          context.l10n.nrOfIteration(data.nr),
+          context.l10n.nrOfIteration(data.number),
           maxLines: 1,
           overflow: TextOverflow.clip,
           style: textTheme.bodyMedium?.copyWith(
