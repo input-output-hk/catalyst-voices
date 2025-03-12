@@ -30,6 +30,17 @@ final class ProposalBloc extends Bloc<ProposalEvent, ProposalState>
     final documentSegments = mapDocumentToSegments(proposalDocument.document);
 
     /* cSpell:disable */
+    final versions = proposal.versions.mapIndexed((index, version) {
+      return DocumentVersion(
+        id: version,
+        nr: index + 1,
+        isCurrent: version == proposalDocumentRef.version,
+        isLatest: index == proposal.versions.length - 1,
+      );
+    }).toList();
+
+    final currentVersion = versions.singleWhereOrNull((e) => e.isCurrent);
+
     final overviewSegment = ProposalOverviewSegment.build(
       categoryName: 'Cardano Partners: Growth & Acceleration',
       proposalTitle: 'Project Mayhem: Freedom by Chaos',
@@ -45,7 +56,8 @@ final class ProposalBloc extends Bloc<ProposalEvent, ProposalState>
             'inspiring global action for liberation and a return to human '
             'authenticity.',
         status: ProposalStatus.draft,
-        createdAt: DateTime.now(),
+        createdAt: currentVersion?.id.tryDateTime ?? DateTime.now(),
+        warningCreatedAt: currentVersion?.isLatest == false,
         tag: 'Community Outreach',
         commentsCount: 6,
         fundsRequested: 200000,
@@ -57,20 +69,6 @@ final class ProposalBloc extends Bloc<ProposalEvent, ProposalState>
     final commentsSegment = ProposalCommentsSegment.build(
       comments: const [],
     );
-
-    final versions = proposal.versions.mapIndexed((index, version) {
-      return DocumentVersion(
-        id: version,
-        nr: index + 1,
-        isCurrent: version == proposalDocumentRef.version,
-        isLatest: index == proposal.versions.length - 1,
-      );
-    }).toList();
-
-    print('proposalDocumentRef: $proposalDocumentRef');
-    print('versions: $versions');
-
-    final currentVersion = versions.singleWhereOrNull((e) => e.isCurrent);
 
     return ProposalViewData(
       currentRef: proposalDocumentRef,
