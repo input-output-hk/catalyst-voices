@@ -4,15 +4,11 @@ import 'package:catalyst_voices/widgets/snackbar/voices_snackbar_type.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
-import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 final class ViewingOlderVersionSnackBar extends VoicesSnackBar {
-  factory ViewingOlderVersionSnackBar(
-    BuildContext context, {
-    required DocumentRef latestRef,
-  }) {
+  factory ViewingOlderVersionSnackBar(BuildContext context) {
     return ViewingOlderVersionSnackBar._(
       message: context.l10n.viewingOlderDocumentVersion,
       action: VoicesSnackBarPrimaryAction(
@@ -21,8 +17,9 @@ final class ViewingOlderVersionSnackBar extends VoicesSnackBar {
           if (context.mounted) {
             VoicesSnackBar.hideCurrent(context);
 
-            final event = ShowProposalEvent(ref: latestRef);
-            context.read<ProposalBloc>().add(event);
+            context
+                .read<ProposalBloc>()
+                .emitSignal(const ChangeVersionSignal());
           }
         },
         child: Text(context.l10n.viewLatestDocumentVersion),

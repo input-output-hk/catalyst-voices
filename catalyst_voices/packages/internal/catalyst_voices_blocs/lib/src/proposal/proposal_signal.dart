@@ -1,8 +1,8 @@
 final class ChangeVersionSignal implements ProposalSignal {
-  final String to;
+  final String? to;
 
-  ChangeVersionSignal({
-    required this.to,
+  const ChangeVersionSignal({
+    this.to,
   });
 }
 
