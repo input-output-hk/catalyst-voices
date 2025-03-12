@@ -1,9 +1,11 @@
 import 'dart:async';
 
+import 'package:catalyst_voices/common/signal_handler.dart';
 import 'package:catalyst_voices/pages/proposal/proposal_back_button.dart';
 import 'package:catalyst_voices/pages/proposal/proposal_content.dart';
 import 'package:catalyst_voices/pages/proposal/proposal_header.dart';
 import 'package:catalyst_voices/pages/proposal/proposal_navigation_panel.dart';
+import 'package:catalyst_voices/pages/proposal/snack_bar/viewing_older_version_snack_bar.dart';
 import 'package:catalyst_voices/routes/routes.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
@@ -26,7 +28,8 @@ class ProposalPage extends StatefulWidget {
   State<ProposalPage> createState() => _ProposalPageState();
 }
 
-class _ProposalPageState extends State<ProposalPage> {
+class _ProposalPageState extends State<ProposalPage>
+    with SignalHandlerStateMixin<ProposalBloc, ProposalSignal, ProposalPage> {
   late final SegmentsController _segmentsController;
   late final ItemScrollController _segmentsScrollController;
 
@@ -84,6 +87,16 @@ class _ProposalPageState extends State<ProposalPage> {
   }
 
   @override
+  void handleSignal(ProposalSignal signal) {
+    switch (signal) {
+      case ViewingOlderVersionSignal():
+        final latestRef = widget.ref.copyWith(version: const Optional.empty());
+        ViewingOlderVersionSnackBar(context, latestRef: latestRef)
+            .show(context);
+    }
+  }
+
+  @override
   void initState() {
     super.initState();
 
@@ -97,16 +110,9 @@ class _ProposalPageState extends State<ProposalPage> {
       ..attachItemsScrollController(_segmentsScrollController);
 
     _segmentsSub = bloc.stream
-        .map((event) {
-          return (
-            segments: event.data.segments,
-            nodeId: event.data.activeNodeId,
-          );
-        })
-        .distinct(
-          (a, b) => listEquals(a.segments, b.segments) && a.nodeId == b.nodeId,
-        )
-        .listen((record) => _updateSegments(record.segments, record.nodeId));
+        .map((event) => event.data.segments)
+        .distinct(listEquals)
+        .listen(_updateSegments);
 
     bloc.add(ShowProposalEvent(ref: widget.ref));
   }
@@ -121,18 +127,12 @@ class _ProposalPageState extends State<ProposalPage> {
 
   void _handleSegmentsControllerChange() {}
 
-  void _updateSegments(List<Segment> data, NodeId? activeSectionId) {
+  void _updateSegments(List<Segment> data) {
     final state = _segmentsController.value;
 
     final newState = state.segments.isEmpty
-        ? SegmentsControllerState.initial(
-            segments: data,
-            activeSectionId: activeSectionId,
-          )
-        : state.copyWith(
-            segments: data,
-            activeSectionId: Optional(activeSectionId),
-          );
+        ? SegmentsControllerState.initial(segments: data)
+        : state.copyWith(segments: data);
 
     _segmentsController.value = newState;
   }

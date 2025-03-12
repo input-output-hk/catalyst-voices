@@ -44,6 +44,12 @@ class _ProposalVersion extends StatelessWidget {
   Widget build(BuildContext context) {
     return DocumentVersionSelector(
       versions: versions,
+      onSelected: readOnly
+          ? null
+          : (value) {
+              final event = ChangeVersionEvent(version: value);
+              context.read<ProposalBloc>().add(event);
+            },
       readOnly: readOnly,
       showBorder: showBorder,
     );

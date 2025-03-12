@@ -130,18 +130,22 @@ final class ProposalServiceImpl implements ProposalService {
   Future<ProposalData> getProposal({
     required DocumentRef ref,
   }) async {
+    final proposal = await _proposalRepository.getProposal(ref: ref);
     final document = await _documentRepository.getProposalDocument(
       ref: ref,
     );
 
+    // TODO(damian-molinski): Delete this after documents sync is ready.
+    final mergedDocument = ProposalDocument(
+      metadata: proposal.document.metadata,
+      document: document.document,
+    );
+
     return ProposalData(
-      document: document,
+      document: mergedDocument,
       categoryId: const Uuid().v7(),
       commentsCount: 10,
-      versions: [
-        ...List.generate(3, (_) => const Uuid().v7()),
-        document.metadata.selfRef.version!,
-      ],
+      versions: proposal.versions,
     );
   }
 

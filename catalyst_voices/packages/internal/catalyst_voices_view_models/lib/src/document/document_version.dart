@@ -21,4 +21,18 @@ final class DocumentVersion extends Equatable {
         isCurrent,
         isLatest,
       ];
+
+  DocumentVersion copyWith({
+    String? id,
+    int? nr,
+    bool? isCurrent,
+    bool? isLatest,
+  }) {
+    return DocumentVersion(
+      id: id ?? this.id,
+      nr: nr ?? this.nr,
+      isCurrent: isCurrent ?? this.isCurrent,
+      isLatest: isLatest ?? this.isLatest,
+    );
+  }
 }

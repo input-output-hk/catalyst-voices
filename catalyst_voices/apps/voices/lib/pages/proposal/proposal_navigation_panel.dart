@@ -1,11 +1,10 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
+import 'package:catalyst_voices/pages/proposal/widget/proposal_version.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
-import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ProposalNavigationPanel extends StatelessWidget {
   const ProposalNavigationPanel({super.key});
@@ -21,6 +20,36 @@ class ProposalNavigationPanel extends StatelessWidget {
           selectedSectionId: value.activeSectionId,
         );
       },
+    );
+  }
+}
+
+class _ControlsTile extends StatelessWidget {
+  const _ControlsTile({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final bottomBorder = BorderSide(
+      color: context.colors.outlineBorderVariant,
+    );
+
+    return Container(
+      decoration: BoxDecoration(border: Border(bottom: bottomBorder)),
+      padding: const EdgeInsets.symmetric(vertical: 12),
+      child: Row(
+        children: [
+          VoicesIconButton(
+            onTap: () {
+              // TODO(damian-molinski): Implement toggling panel
+            },
+            child: VoicesAssets.icons.leftRailToggle.buildIcon(),
+          ),
+          const Spacer(),
+          const ProposalVersion(showBorder: false),
+        ],
+      ),
     );
   }
 }
@@ -55,36 +84,6 @@ class _ProposalNavigationPanel extends StatelessWidget {
       },
       separatorBuilder: (_, __) => const SizedBox(height: 12),
       itemCount: segments.length + 1,
-    );
-  }
-}
-
-class _ControlsTile extends StatelessWidget {
-  const _ControlsTile({
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final bottomBorder = BorderSide(
-      color: context.colors.outlineBorderVariant,
-    );
-
-    return Container(
-      decoration: BoxDecoration(border: Border(bottom: bottomBorder)),
-      padding: const EdgeInsets.symmetric(vertical: 12),
-      child: Row(
-        children: [
-          VoicesIconButton(
-            onTap: () {
-              // TODO(damian-molinski): Implement toggling panel
-            },
-            child: VoicesAssets.icons.leftRailToggle.buildIcon(),
-          ),
-          const Spacer(),
-          const _VersionSelector(),
-        ],
-      ),
     );
   }
 }
@@ -126,23 +125,6 @@ class _SegmentMenuTile extends StatelessWidget {
           );
         },
       ).toList(),
-    );
-  }
-}
-
-class _VersionSelector extends StatelessWidget {
-  const _VersionSelector();
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocSelector<ProposalBloc, ProposalState, List<DocumentVersion>>(
-      selector: (state) => state.data.header.versions,
-      builder: (context, state) {
-        return DocumentVersionSelector(
-          versions: state,
-          showBorder: false,
-        );
-      },
     );
   }
 }

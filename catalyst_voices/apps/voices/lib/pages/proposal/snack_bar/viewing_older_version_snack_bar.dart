@@ -1,0 +1,41 @@
+import 'package:catalyst_voices/widgets/snackbar/voices_snackbar.dart';
+import 'package:catalyst_voices/widgets/snackbar/voices_snackbar_action.dart';
+import 'package:catalyst_voices/widgets/snackbar/voices_snackbar_type.dart';
+import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
+import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
+import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+final class ViewingOlderVersionSnackBar extends VoicesSnackBar {
+  factory ViewingOlderVersionSnackBar(
+    BuildContext context, {
+    required DocumentRef latestRef,
+  }) {
+    return ViewingOlderVersionSnackBar._(
+      message: context.l10n.viewingOlderDocumentVersion,
+      action: VoicesSnackBarPrimaryAction(
+        type: VoicesSnackBarType.warning,
+        onPressed: () {
+          if (context.mounted) {
+            VoicesSnackBar.hideCurrent(context);
+
+            final event = ShowProposalEvent(ref: latestRef);
+            context.read<ProposalBloc>().add(event);
+          }
+        },
+        child: Text(context.l10n.viewLatestDocumentVersion),
+      ),
+    );
+  }
+
+  ViewingOlderVersionSnackBar._({
+    required super.message,
+    required Widget action,
+  }) : super(
+          type: VoicesSnackBarType.warning,
+          icon: VoicesAssets.icons.reply.buildIcon(),
+          actions: [action],
+        );
+}

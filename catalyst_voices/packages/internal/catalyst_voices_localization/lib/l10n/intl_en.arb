@@ -1846,5 +1846,13 @@
   "latestDocumentVersion": "Latest",
   "@latestDocumentVersion": {
     "description": "When showing different version of proposal we may add suffix indicating this is latest version"
+  },
+  "viewingOlderDocumentVersion": "You are viewing an older iteration of this proposal",
+  "@viewingOlderDocumentVersion": {
+    "description": "After changing document version warning"
+  },
+  "viewLatestDocumentVersion": "View Latest",
+  "@viewLatestDocumentVersion": {
+    "description": "Action to change back to latest version"
   }
 }

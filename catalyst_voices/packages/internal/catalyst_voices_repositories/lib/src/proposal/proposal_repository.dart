@@ -5,6 +5,9 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:uuid/uuid.dart';
 
+// TODO(damian-molinski): Delete it after versions query is ready.
+final _docVersionsCache = <String, List<String>>{};
+
 final _proposalDescription = """
 Zanzibar is becoming one of the hotspots for DID's through
 World Mobile and PRISM, but its potential is only barely exploited.
@@ -68,6 +71,14 @@ final class ProposalRepositoryImpl implements ProposalRepository {
       ref = ref.copyWith(version: Optional(ref.id));
     }
 
+    final versions = _docVersionsCache.putIfAbsent(
+      ref.id,
+      () => [
+        ...List.generate(3, (_) => const Uuid().v7()),
+        ref.version!,
+      ],
+    );
+
     return ProposalData(
       categoryId: const Uuid().v7(),
       document: ProposalDocument(
@@ -77,6 +88,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
           schema: DocumentSchema.optional(),
         ),
       ),
+      versions: versions,
     );
   }
 

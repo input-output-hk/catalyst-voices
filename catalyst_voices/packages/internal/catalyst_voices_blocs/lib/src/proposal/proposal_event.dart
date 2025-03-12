@@ -1,6 +1,17 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:equatable/equatable.dart';
 
+final class ChangeVersionEvent extends ProposalEvent {
+  final String version;
+
+  const ChangeVersionEvent({
+    required this.version,
+  });
+
+  @override
+  List<Object?> get props => [version];
+}
+
 sealed class ProposalEvent extends Equatable {
   const ProposalEvent();
 }
