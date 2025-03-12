@@ -47,6 +47,16 @@ enum AccountRole {
     this.isHidden = false,
   });
 
+  factory AccountRole.fromNumber(int number) {
+    for (final value in values) {
+      if (value.number == number) {
+        return value;
+      }
+    }
+
+    throw ArgumentError('Unsupported role with number: $number');
+  }
+
   /// Returns the role which is assigned to every user.
   static AccountRole get root => voter;
 }

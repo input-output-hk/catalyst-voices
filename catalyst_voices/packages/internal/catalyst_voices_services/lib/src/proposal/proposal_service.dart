@@ -197,6 +197,20 @@ final class ProposalServiceImpl implements ProposalService {
       throw StateError('Cannot publish a proposal, master key missing');
     }
 
+    final role0KeyPair = await _keyDerivationService.deriveAccountRoleKeyPair(
+      masterKey: masterKey,
+      role: AccountRole.root,
+    );
+
+    // TODO(dtscalac): catalyst id should come from the profile
+    // TODO(dtscalac): don't hardcode the host, it should be injected by DI
+    final catalystId = CatalystId(
+      host: CatalystIdHost.cardano.host,
+      role0Key: role0KeyPair.publicKey,
+      role: AccountRole.proposer,
+      rotation: 0,
+    );
+
     final keyPair = await _keyDerivationService.deriveAccountRoleKeyPair(
       masterKey: masterKey,
       role: AccountRole.proposer,
@@ -205,7 +219,7 @@ final class ProposalServiceImpl implements ProposalService {
     final signedDocument = await _signedDocumentManager.signDocument(
       SignedDocumentJsonPayload(content.data),
       metadata: _createProposalMetadata(metadata),
-      publicKey: keyPair.publicKey,
+      catalystId: catalystId,
       privateKey: keyPair.privateKey,
     );
 

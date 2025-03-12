@@ -8,6 +8,8 @@ const mockedTemplateUuid = '0194d492-1daa-75b5-b4a4-5cf331cd8d1a';
 
 final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
   final ApiServices _api;
+
+  // ignore: unused_field
   final SignedDocumentManager _signedDocumentManager;
 
   CatGatewayDocumentDataSource(
@@ -18,6 +20,7 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
   // TODO(damian-molinski): make API call and use _signedDocumentManager.
   @override
   Future<DocumentData> get({required DocumentRef ref}) async {
+    // TODO(damian-molinski): uncomment when documents sync is ready.
     /*try {
       final response = await _api.gateway.apiV1DocumentDocumentIdGet(
         documentId: ref.id,
