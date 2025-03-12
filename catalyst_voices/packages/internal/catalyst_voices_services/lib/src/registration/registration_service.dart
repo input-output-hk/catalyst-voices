@@ -174,8 +174,11 @@ final class RegistrationServiceImpl implements RegistrationService {
     }
 
     // TODO(damian-molinski): should come from backend
-    const displayName = 'Recovered';
     const email = 'recovered@iohk.com';
+    final catalystIdUri = Uri.parse(
+      'id.catalyst://recovered@preprod.cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE=',
+    );
+    final catalystId = CatalystId.fromUri(catalystIdUri);
 
     // TODO(dtscalac): derive a key from the seed phrase and fetch
     // from the backend info about the registration (roles, wallet, etc).
@@ -184,14 +187,9 @@ final class RegistrationServiceImpl implements RegistrationService {
     final keychainId = const Uuid().v4();
     final keychain = await _keychainProvider.create(keychainId);
 
-    // TODO(damian-molinski): should extracted from role0.
-    //  See [Account.catalystId]
-    final catalystId = 'cardano/$keychainId';
-
     // Note. with rootKey query backend for account details.
     return Account(
       catalystId: catalystId,
-      displayName: displayName,
       email: email,
       keychain: keychain,
       roles: roles,
@@ -237,13 +235,17 @@ final class RegistrationServiceImpl implements RegistrationService {
       final balance = await enabledWallet.getBalance();
       final address = await enabledWallet.getChangeAddress();
 
-      // TODO(damian-molinski): should extracted from role0.
-      //  See [Account.catalystId]
-      final catalystId = 'cardano/$keychainId';
+      final role0key = await masterKey.derivePublicKey();
+
+      final catalystId = CatalystId(
+        // TODO(damian): inject
+        host: CatalystIdHost.cardanoPreprod.host,
+        username: displayName,
+        role0Key: role0key,
+      );
 
       return Account(
         catalystId: catalystId,
-        displayName: displayName,
         email: email,
         keychain: keychain,
         roles: roles,
@@ -274,11 +276,17 @@ final class RegistrationServiceImpl implements RegistrationService {
     await keychain.unlock(lockFactor);
     await keychain.setMasterKey(masterKey);
 
-    final catalystId = 'cardano/$keychain';
+    final role0key = await masterKey.derivePublicKey();
+
+    final catalystId = CatalystId(
+      // TODO(damian): inject
+      host: CatalystIdHost.cardanoPreprod.host,
+      username: 'Dummy',
+      role0Key: role0key,
+    );
 
     return Account(
       catalystId: catalystId,
-      displayName: 'Dummy',
       email: 'dummy@iohk.com',
       keychain: keychain,
       roles: roles,

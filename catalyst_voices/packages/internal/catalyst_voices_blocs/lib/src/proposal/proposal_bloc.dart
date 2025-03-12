@@ -2,6 +2,7 @@ import 'package:catalyst_voices_blocs/src/document/document_to_segment_mixin.dar
 import 'package:catalyst_voices_blocs/src/proposal/proposal.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:uuid/uuid.dart';
@@ -36,9 +37,7 @@ final class ProposalBloc extends Bloc<ProposalEvent, ProposalState>
       categoryName: 'Cardano Partners: Growth & Acceleration',
       proposalTitle: 'Project Mayhem: Freedom by Chaos',
       data: ProposalViewMetadata(
-        author: const Profile(
-          catalystId: 'cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE',
-        ),
+        author: Profile(catalystId: DummyCatalystIdFactory.create()),
         description: 'Project Mayhem is a disruptive initiative to dismantle '
             'societal hierarchies through acts of controlled chaos. '
             'By targeting oppressive systems like credit structures and '

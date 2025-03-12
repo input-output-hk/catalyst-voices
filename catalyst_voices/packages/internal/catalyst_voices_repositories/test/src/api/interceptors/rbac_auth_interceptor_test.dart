@@ -60,7 +60,11 @@ void main() {
 
       final user = User(
         accounts: [
-          Account.dummy(keychain: keychain, isActive: true),
+          Account.dummy(
+            catalystId: DummyCatalystIdFactory.create(),
+            keychain: keychain,
+            isActive: true,
+          ),
         ],
         settings: const UserSettings(),
       );
@@ -90,7 +94,11 @@ void main() {
 
       final user = User(
         accounts: [
-          Account.dummy(keychain: keychain, isActive: true),
+          Account.dummy(
+            catalystId: DummyCatalystIdFactory.create(),
+            keychain: keychain,
+            isActive: true,
+          ),
         ],
         settings: const UserSettings(),
       );
@@ -122,7 +130,11 @@ void main() {
 
       final user = User(
         accounts: [
-          Account.dummy(keychain: keychain, isActive: true),
+          Account.dummy(
+            catalystId: DummyCatalystIdFactory.create(),
+            keychain: keychain,
+            isActive: true,
+          ),
         ],
         settings: const UserSettings(),
       );
@@ -151,7 +163,11 @@ void main() {
 
       final user = User(
         accounts: [
-          Account.dummy(keychain: keychain, isActive: false),
+          Account.dummy(
+            catalystId: DummyCatalystIdFactory.create(),
+            keychain: keychain,
+            isActive: false,
+          ),
         ],
         settings: const UserSettings(),
       );
