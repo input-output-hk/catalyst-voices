@@ -1,6 +1,7 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/schema/document_definitions_dto.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/schema/document_property_schema_dto.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 
 enum _DocumentObjectDefinition {
   segment('segment'),
@@ -16,7 +17,7 @@ enum _DocumentObjectDefinition {
 
   factory _DocumentObjectDefinition.fromDef(String? def) {
     for (final value in values) {
-      if (value.def.toLowerCase() == def?.toLowerCase()) {
+      if (value.def.equalsIgnoreCase(def)) {
         return value;
       }
     }

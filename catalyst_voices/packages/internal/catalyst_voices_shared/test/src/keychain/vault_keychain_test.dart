@@ -15,17 +15,16 @@ void main() {
   group(VaultKeychain, () {
     late final FlutterSecureStorage secureStorage;
     late final SharedPreferencesAsync sharedPreferences;
-    late final CatalystKeyFactory keyFactory;
 
     setUpAll(() {
       FlutterSecureStorage.setMockInitialValues({});
 
       final store = InMemorySharedPreferencesAsync.empty();
       SharedPreferencesAsyncPlatform.instance = store;
+      CatalystPrivateKey.factory = _FakeCatalystPrivateKeyFactory();
 
       secureStorage = const FlutterSecureStorage();
       sharedPreferences = SharedPreferencesAsync();
-      keyFactory = _FakeCatalystKeyFactory();
     });
 
     tearDown(() async {
@@ -38,7 +37,6 @@ void main() {
         id: id,
         secureStorage: secureStorage,
         sharedPreferences: sharedPreferences,
-        keyFactory: keyFactory,
       );
     }
 
@@ -57,7 +55,7 @@ void main() {
       // Given
       final id = const Uuid().v4();
       const lock = PasswordLockFactor('Test1234');
-      final key = keyFactory.createPrivateKey(
+      final key = CatalystPrivateKey.factory.create(
         Uint8List.fromList(
           hex.decode(
             '8a88e3dd7409f195fd52db2d3cba5d72ca6709bf1d94121bf3748801b40f6f5c',
@@ -96,9 +94,10 @@ class _FakeCatalystPrivateKey extends Fake implements CatalystPrivateKey {
   _FakeCatalystPrivateKey({required this.bytes});
 }
 
-class _FakeCatalystKeyFactory extends Fake implements CatalystKeyFactory {
+class _FakeCatalystPrivateKeyFactory extends Fake
+    implements CatalystPrivateKeyFactory {
   @override
-  CatalystPrivateKey createPrivateKey(Uint8List bytes) {
+  CatalystPrivateKey create(Uint8List bytes) {
     return _FakeCatalystPrivateKey(bytes: bytes);
   }
 }
