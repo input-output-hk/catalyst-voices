@@ -42,7 +42,7 @@ pub(crate) struct GetAllInvalidRegistrationsQuery {
     pub nonce: num_bigint::BigInt,
     /// Raw Nonce value.
     pub raw_nonce: num_bigint::BigInt,
-    /// Slot Number the cert is in.
+    /// Slot Number the invalid CIP36 registration is in.
     pub slot_no: DbSlot,
     /// Transaction Index.
     pub txn_index: DbTxnIndex,
