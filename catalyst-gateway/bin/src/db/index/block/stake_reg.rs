@@ -71,7 +71,7 @@ impl Debug for StakeRegistrationInsertQuery {
     }
 }
 
-/// TXI by Txn hash Index
+/// Insert stake registration
 const INSERT_STAKE_REGISTRATION_QUERY: &str = include_str!("./cql/insert_stake_registration.cql");
 
 impl StakeRegistrationInsertQuery {
