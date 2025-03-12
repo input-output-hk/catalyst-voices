@@ -137,7 +137,7 @@ void main() {
       expect(uri.fragment, 'encrypt');
       expect(
         uri.path,
-        equals('/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE=/1/2'),
+        equals('/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE/1/2'),
       );
     });
 
@@ -152,7 +152,7 @@ void main() {
       expect(
         formattedId,
         equals(
-          ':123456@cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE=',
+          ':123456@cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE',
         ),
       );
     });
