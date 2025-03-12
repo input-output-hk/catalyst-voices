@@ -42,7 +42,7 @@ pub(crate) struct GetAllRegistrationsQuery {
     pub stake_public_key: Vec<u8>,
     /// Nonce value after normalization.
     pub nonce: num_bigint::BigInt,
-    /// Slot Number the cert is in.
+    /// Slot Number the CIP36 registration is in.
     pub slot_no: DbSlot,
     /// Transaction Index.
     pub txn_index: DbTxnIndex,
