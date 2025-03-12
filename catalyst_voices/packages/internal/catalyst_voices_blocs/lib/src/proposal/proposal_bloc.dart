@@ -20,7 +20,6 @@ final class ProposalBloc extends Bloc<ProposalEvent, ProposalState>
   ) : super(const ProposalState()) {
     on<ShowProposalEvent>(_handleShowProposalEvent);
     on<UpdateProposalFavoriteEvent>(_handleUpdateProposalFavoriteEvent);
-    on<ChangeVersionEvent>(_handleVersionChangeEvent);
   }
 
   ProposalViewData _buildProposalViewData(ProposalData proposal) {
@@ -142,18 +141,5 @@ final class ProposalBloc extends Bloc<ProposalEvent, ProposalState>
     final proposalId = state.data.currentRef?.id;
 
     emit(state.copyWithFavorite(isFavorite: event.isFavorite));
-  }
-
-  Future<void> _handleVersionChangeEvent(
-    ChangeVersionEvent event,
-    Emitter<ProposalState> emit,
-  ) {
-    final version = event.version;
-    final ref = state.data.currentRef?.copyWith(version: Optional(version));
-    if (ref == null) {
-      throw StateError('Did not found proposal to change version for');
-    }
-
-    return _changeDocumentTo(ref: ref, emit: emit);
   }
 }

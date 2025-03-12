@@ -47,8 +47,8 @@ class _ProposalVersion extends StatelessWidget {
       onSelected: readOnly
           ? null
           : (value) {
-              final event = ChangeVersionEvent(version: value);
-              context.read<ProposalBloc>().add(event);
+              final signal = ChangeVersionSignal(to: value);
+              context.read<ProposalBloc>().emitSignal(signal);
             },
       readOnly: readOnly,
       showBorder: showBorder,

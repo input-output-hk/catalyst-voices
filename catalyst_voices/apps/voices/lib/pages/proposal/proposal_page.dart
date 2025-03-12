@@ -95,6 +95,8 @@ class _ProposalPageState extends State<ProposalPage>
         VoicesSnackBar.hideCurrent(context);
         ViewingOlderVersionSnackBar(context, latestRef: latestRef)
             .show(context);
+      case ChangeVersionSignal():
+        _changeVersion(signal.to);
     }
   }
 
@@ -119,7 +121,6 @@ class _ProposalPageState extends State<ProposalPage>
     bloc.add(ShowProposalEvent(ref: widget.ref));
   }
 
-  // ignore: unused_element
   void _changeVersion(String version) {
     Router.neglect(context, () {
       final ref = widget.ref.copyWith(version: Optional.of(version));
