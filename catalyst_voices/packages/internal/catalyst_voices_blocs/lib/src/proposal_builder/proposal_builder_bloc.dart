@@ -393,11 +393,11 @@ final class ProposalBuilderBloc
     Document document,
   ) async {
     final ref = state.metadata.documentRef!;
-    print(ref.id);
     final nextRef = await _upsertDraftProposal(
       ref,
       _documentMapper.toContent(document),
     );
+    print(nextRef);
 
     if (ref != nextRef) {
       final updatedMetadata = state.metadata.copyWith(
