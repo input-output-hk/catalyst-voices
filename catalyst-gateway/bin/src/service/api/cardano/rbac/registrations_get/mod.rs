@@ -71,39 +71,20 @@ pub(crate) async fn endpoint(
     let catalyst_id = match lookup {
         Some(CatIdOrStake::CatId(v)) => v.into(),
         Some(CatIdOrStake::Address(address)) => {
-            let address: StakeAddress = match address.try_into() {
+            let address = match address.try_into() {
                 Ok(a) => a,
                 Err(e) => return AllResponses::handle_error(&e),
             };
-            let mut iter = match CatalystIdQuery::execute(&session, CatalystIdQueryParams {
-                stake_address: address.into(),
-            })
-            .await
-            {
-                Ok(v) => v,
-                Err(e) => {
-                    return AllResponses::handle_error(&anyhow!(
-                        "Failed to query Catalyst ID from stake address {e:?}",
-                    ));
-                },
-            };
-            match iter.next().await {
-                Some(Ok(v)) => v.catalyst_id.into(),
-                Some(Err(e)) => {
-                    return AllResponses::handle_error(&anyhow!(
-                        "Failed to query Catalyst ID from stake address {e:?}",
-                    ));
-                },
-                None => {
-                    return Responses::NotFound.into();
-                },
+            match catalyst_id_from_stake(&session, address).await {
+                Ok(Some(v)) => v,
+                Ok(None) => return Responses::NotFound.into(),
+                Err(e) => return AllResponses::handle_error(&e),
             }
         },
         None => {
             match auth_catalyst_id {
                 Some(id) => id,
                 None => {
-                    //  TODO: FIXME: Return 500?
                     return AllResponses::handle_error(&anyhow!(
                         "Either lookup parameter or token must be provided"
                     ));
@@ -127,6 +108,27 @@ pub(crate) async fn endpoint(
         },
         Ok(None) => Responses::NotFound.into(),
         Err(e) => AllResponses::handle_error(&e),
+    }
+}
+
+/// Returns a Catalyst ID for the given stake address.
+async fn catalyst_id_from_stake(
+    session: &CassandraSession, address: StakeAddress,
+) -> anyhow::Result<Option<IdUri>> {
+    let mut iter = CatalystIdQuery::execute(session, CatalystIdQueryParams {
+        stake_address: address.into(),
+    })
+    .await
+    .context("Failed to query Catalyst ID from stake address {e:?}")?;
+
+    match iter.next().await {
+        Some(Ok(v)) => Ok(Some(v.catalyst_id.into())),
+        Some(Err(e)) => {
+            Err(anyhow!(
+                "Failed to query Catalyst ID from stake address {e:?}"
+            ))
+        },
+        None => Ok(None),
     }
 }
 
