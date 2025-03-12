@@ -41,7 +41,7 @@ impl Type for CatalystId {
     const IS_REQUIRED: bool = true;
 
     fn name() -> Cow<'static, str> {
-        format!("string{FORMAT}").into()
+        format!("string({FORMAT})").into()
     }
 
     fn schema_ref() -> MetaSchemaRef {

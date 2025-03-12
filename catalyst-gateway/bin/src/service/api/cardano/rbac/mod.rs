@@ -26,7 +26,7 @@ impl Api {
     /// or by the `lookup` argument if provided.
     async fn rbac_registrations_get(
         &self,
-        /// Stake address to get the RBAC registration for.
+        /// Stake address or Catalyst ID to get the RBAC registration for.
         Query(lookup): Query<Option<CatIdOrStake>>,
         /// A flag which enables returning all corresponded Cip509 registrations
         Query(detailed): Query<Option<BooleanFlag>>,

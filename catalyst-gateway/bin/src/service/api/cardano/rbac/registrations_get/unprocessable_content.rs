@@ -23,6 +23,6 @@ impl RbacUnprocessableContent {
 
 impl Example for RbacUnprocessableContent {
     fn example() -> Self {
-        Self::new("Missing Document in request body")
+        Self::new("Invalid request query parameters")
     }
 }
