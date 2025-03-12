@@ -263,7 +263,6 @@ void main() {
           type: DocumentType.proposalDocument,
           content: content,
           template: templateRef,
-          of: docRef,
         );
 
         // Then

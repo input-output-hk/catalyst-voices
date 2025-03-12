@@ -11,7 +11,6 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/foundation.dart';
 import 'package:rxdart/transformers.dart';
 import 'package:synchronized/synchronized.dart';
-import 'package:uuid/uuid.dart';
 
 @visibleForTesting
 typedef DocumentsDataWithRefData = ({DocumentData data, DocumentData refData});
@@ -35,7 +34,7 @@ abstract interface class DocumentRepository {
   Future<DraftRef> createDocumentDraft({
     required DocumentType type,
     required DocumentDataContent content,
-    required DocumentRef template,
+    required SignedDocumentRef template,
     DraftRef? selfRef,
   });
 
@@ -149,14 +148,10 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   Future<DraftRef> createDocumentDraft({
     required DocumentType type,
     required DocumentDataContent content,
-    required DocumentRef template,
+    required SignedDocumentRef template,
     DraftRef? selfRef,
   }) async {
-    final ref = selfRef ??
-        DraftRef(
-          id: const Uuid().v7(),
-          version: const Uuid().v7(),
-        );
+    final ref = selfRef ?? DraftRef.generateFirstRef();
     final metadata = DocumentDataMetadata(
       type: type,
       selfRef: ref,
