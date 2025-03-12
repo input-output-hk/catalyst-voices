@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import 'package:patrol_finders/patrol_finders.dart';
 
 import '../pageobject/app_bar_page.dart';
+import '../pageobject/onboarding/onboarding_base_page.dart';
 import '../pageobject/onboarding/restore_flow/step_2_restore_keychain_choice_panel.dart';
 import '../pageobject/onboarding/restore_flow/step_3_seedphrase_instructions_panel.dart';
 import '../pageobject/onboarding/restore_flow/step_4_restore_keychain_input_panel.dart';
@@ -77,11 +78,93 @@ void main() async {
         await SeedPhraseInstructionsPanel($).verifyPageElements();
       });
 
+      patrolWidgetTest(
+          'restore - seed phrase instructions screen close button - '
+          'dialog check', (PatrolTester $) async {
+        await $.pumpWidgetAndSettle(App(routerConfig: router));
+        await SeedPhraseInstructionsPanel($).goto();
+        await OnboardingPageBase($).closeButton().tap();
+        await OnboardingPageBase($).incompleteDialogCheckRestorationPhase();
+      });
+
+      patrolWidgetTest(
+          'restore - seed phrase instructions screen close button - '
+          'dialog continue', (PatrolTester $) async {
+        await $.pumpWidgetAndSettle(App(routerConfig: router));
+        await SeedPhraseInstructionsPanel($).goto();
+        await OnboardingPageBase($).closeButton().tap();
+        await OnboardingPageBase($).incompleteDialogClickContinue();
+        await SeedPhraseInstructionsPanel($).verifyDetailsPanel();
+      });
+
+      patrolWidgetTest(
+          'restore - seed phrase instructions screen close button - '
+          'dialog cancel', (PatrolTester $) async {
+        await $.pumpWidgetAndSettle(App(routerConfig: router));
+        await SeedPhraseInstructionsPanel($).goto();
+        await OnboardingPageBase($).closeButton().tap();
+        await OnboardingPageBase($).incompleteDialogClickCancel();
+        await AppBarPage($).looksAsExpectedForVisitor();
+      });
+
+      patrolWidgetTest(
+          tags: 'issues_2004',
+          skip: true,
+          'restore - seed phrase instructions screen close button - '
+          'dialog close', (PatrolTester $) async {
+        await $.pumpWidgetAndSettle(App(routerConfig: router));
+        await SeedPhraseInstructionsPanel($).goto();
+        await OnboardingPageBase($).closeButton().tap();
+        await OnboardingPageBase($).incompleteDialogClickClose();
+        await SeedPhraseInstructionsPanel($).verifyDetailsPanel();
+      });
+
       patrolWidgetTest('restore - seed phrase input screen looks OK',
           (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await RestoreKeychainInputPanel($).goto();
         await RestoreKeychainInputPanel($).verifyPageElements();
+      });
+
+      patrolWidgetTest(
+          'restore - seed phrase input screen close button - '
+          'dialog check', (PatrolTester $) async {
+        await $.pumpWidgetAndSettle(App(routerConfig: router));
+        await RestoreKeychainInputPanel($).goto();
+        await OnboardingPageBase($).closeButton().tap();
+        await OnboardingPageBase($).incompleteDialogCheckRestorationPhase();
+      });
+
+      patrolWidgetTest(
+          'restore - seed phrase input screen close button - '
+          'dialog continue', (PatrolTester $) async {
+        await $.pumpWidgetAndSettle(App(routerConfig: router));
+        await RestoreKeychainInputPanel($).goto();
+        await OnboardingPageBase($).closeButton().tap();
+        await OnboardingPageBase($).incompleteDialogClickContinue();
+        await RestoreKeychainInputPanel($).verifyDetailsPanel();
+      });
+
+      patrolWidgetTest(
+          'restore - seed phrase input screen close button - '
+          'dialog cancel', (PatrolTester $) async {
+        await $.pumpWidgetAndSettle(App(routerConfig: router));
+        await RestoreKeychainInputPanel($).goto();
+        await OnboardingPageBase($).closeButton().tap();
+        await OnboardingPageBase($).incompleteDialogClickCancel();
+        await AppBarPage($).looksAsExpectedForVisitor();
+      });
+
+      patrolWidgetTest(
+          tags: 'issues_2004',
+          skip: true,
+          'restore - seed phrase input screen close button - '
+          'dialog close', (PatrolTester $) async {
+        await $.pumpWidgetAndSettle(App(routerConfig: router));
+        await RestoreKeychainInputPanel($).goto();
+        await OnboardingPageBase($).closeButton().tap();
+        await OnboardingPageBase($).incompleteDialogClickClose();
+        await RestoreKeychainInputPanel($).verifyDetailsPanel();
       });
 
       patrolWidgetTest('restore - valid seed phrase input works',
@@ -96,6 +179,47 @@ void main() async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await UnlockPasswordInfoPanel($).goto();
         await UnlockPasswordInfoPanel($).verifyPageElements();
+      });
+
+      patrolWidgetTest(
+          'restore - unlock password info screen close button - '
+          'dialog check', (PatrolTester $) async {
+        await $.pumpWidgetAndSettle(App(routerConfig: router));
+        await UnlockPasswordInfoPanel($).goto();
+        await OnboardingPageBase($).closeButton().tap();
+        await OnboardingPageBase($).incompleteDialogCheckRestorationPhase();
+      });
+
+      patrolWidgetTest(
+          'restore - unlock password info screen close button - '
+          'dialog continue', (PatrolTester $) async {
+        await $.pumpWidgetAndSettle(App(routerConfig: router));
+        await UnlockPasswordInfoPanel($).goto();
+        await OnboardingPageBase($).closeButton().tap();
+        await OnboardingPageBase($).incompleteDialogClickContinue();
+        await UnlockPasswordInfoPanel($).verifyDetailsPanel();
+      });
+
+      patrolWidgetTest(
+          'restore - unlock password info screen close button - '
+          'dialog cancel', (PatrolTester $) async {
+        await $.pumpWidgetAndSettle(App(routerConfig: router));
+        await UnlockPasswordInfoPanel($).goto();
+        await OnboardingPageBase($).closeButton().tap();
+        await OnboardingPageBase($).incompleteDialogClickCancel();
+        await AppBarPage($).looksAsExpectedForVisitor();
+      });
+
+      patrolWidgetTest(
+          tags: 'issues_2004',
+          skip: true,
+          'restore - unlock password info screen close button - '
+          'dialog close', (PatrolTester $) async {
+        await $.pumpWidgetAndSettle(App(routerConfig: router));
+        await UnlockPasswordInfoPanel($).goto();
+        await OnboardingPageBase($).closeButton().tap();
+        await OnboardingPageBase($).incompleteDialogClickClose();
+        await UnlockPasswordInfoPanel($).verifyDetailsPanel();
       });
 
       patrolWidgetTest('restore - password input validation works',
