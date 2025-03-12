@@ -57,7 +57,6 @@ pub(crate) enum Responses {
 pub(crate) type AllResponses = WithErrorResponses<Responses>;
 
 /// Get RBAC registration endpoint.
-#[allow(clippy::unused_async)]
 pub(crate) async fn endpoint(
     lookup: Option<CatIdOrStake>, auth_catalyst_id: Option<IdUri>, detailed: bool,
 ) -> AllResponses {
