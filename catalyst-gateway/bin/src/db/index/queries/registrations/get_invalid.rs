@@ -16,9 +16,9 @@ use crate::db::{
     types::{DbSlot, DbTxnIndex},
 };
 
-/// Get invalid registrations from stake addr query.
-const GET_INVALID_REGISTRATIONS_FROM_STAKE_ADDR_QUERY: &str =
-    include_str!("../cql/get_invalid_registration_w_stake_addr.cql");
+/// Get invalid registrations from stake public key query.
+const GET_INVALID_REGISTRATIONS_FROM_STAKE_PK_QUERY: &str =
+    include_str!("../cql/get_invalid_registration_w_stake_pk.cql");
 
 /// Get registration
 #[derive(SerializeRow)]
@@ -71,14 +71,14 @@ impl GetInvalidRegistrationQuery {
     pub(crate) async fn prepare(session: Arc<Session>) -> anyhow::Result<PreparedStatement> {
         PreparedQueries::prepare(
             session,
-            GET_INVALID_REGISTRATIONS_FROM_STAKE_ADDR_QUERY,
+            GET_INVALID_REGISTRATIONS_FROM_STAKE_PK_QUERY,
             scylla::statement::Consistency::All,
             true,
         )
         .await
         .inspect_err(|error| error!(error=%error, "Failed to prepare get invalid registration from stake address query."))
         .map_err(|error| {
-            anyhow::anyhow!("{error}\n--\n{GET_INVALID_REGISTRATIONS_FROM_STAKE_ADDR_QUERY}")
+            anyhow::anyhow!("{error}\n--\n{GET_INVALID_REGISTRATIONS_FROM_STAKE_PK_QUERY}")
         })
     }
 

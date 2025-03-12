@@ -16,9 +16,9 @@ use crate::db::{
     types::{DbSlot, DbTxnIndex},
 };
 
-/// Get registrations from stake addr query.
-const GET_REGISTRATIONS_FROM_STAKE_ADDR_QUERY: &str =
-    include_str!("../cql/get_registrations_w_stake_addr.cql");
+/// Get registrations from stake public key query.
+const GET_REGISTRATIONS_FROM_STAKE_PK_QUERY: &str =
+    include_str!("../cql/get_registrations_w_stake_pk.cql");
 
 /// Get registration
 #[derive(SerializeRow)]
@@ -65,13 +65,13 @@ impl GetRegistrationQuery {
     pub(crate) async fn prepare(session: Arc<Session>) -> anyhow::Result<PreparedStatement> {
         PreparedQueries::prepare(
             session,
-            GET_REGISTRATIONS_FROM_STAKE_ADDR_QUERY,
+            GET_REGISTRATIONS_FROM_STAKE_PK_QUERY,
             scylla::statement::Consistency::All,
             true,
         )
         .await
         .inspect_err(|error| error!(error=%error, "Failed to prepare get registration from stake address query."))
-        .map_err(|error| anyhow::anyhow!("{error}\n--\n{GET_REGISTRATIONS_FROM_STAKE_ADDR_QUERY}"))
+        .map_err(|error| anyhow::anyhow!("{error}\n--\n{GET_REGISTRATIONS_FROM_STAKE_PK_QUERY}"))
     }
 
     /// Executes get registration info for given stake addr query.
