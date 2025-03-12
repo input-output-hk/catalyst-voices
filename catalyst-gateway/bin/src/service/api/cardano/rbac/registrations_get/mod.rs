@@ -38,7 +38,6 @@ use crate::{
 
 /// Endpoint responses.
 #[derive(ApiResponse)]
-#[allow(dead_code)]
 pub(crate) enum Responses {
     /// ## Ok
     ///
@@ -85,9 +84,10 @@ pub(crate) async fn endpoint(
             match auth_catalyst_id {
                 Some(id) => id,
                 None => {
-                    return AllResponses::handle_error(&anyhow!(
-                        "Either lookup parameter or token must be provided"
-                    ));
+                    return Responses::UnprocessableContent(Json(RbacUnprocessableContent::new(
+                        "Either lookup parameter or token must be provided",
+                    )))
+                    .into()
                 },
             }
         },
