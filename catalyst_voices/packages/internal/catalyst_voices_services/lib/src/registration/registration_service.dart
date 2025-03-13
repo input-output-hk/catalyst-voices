@@ -174,7 +174,7 @@ final class RegistrationServiceImpl implements RegistrationService {
     // TODO(damian-molinski): should come from backend
     const email = 'recovered@iohk.com';
     final catalystIdUri = Uri.parse(
-      'id.catalyst://recovered@preprod.cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE=',
+      'id.catalyst://recovered@preprod.cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE',
     );
     final catalystId = CatalystId.fromUri(catalystIdUri);
 
@@ -233,7 +233,12 @@ final class RegistrationServiceImpl implements RegistrationService {
       final balance = await enabledWallet.getBalance();
       final address = await enabledWallet.getChangeAddress();
 
-      final role0key = await masterKey.derivePublicKey();
+      final keyPair = await _keyDerivationService.deriveAccountRoleKeyPair(
+        masterKey: masterKey,
+        role: AccountRole.root,
+      );
+
+      final role0key = keyPair.publicKey;
 
       final catalystId = CatalystId(
         host: _blockchainConfig.host.host,
@@ -273,7 +278,12 @@ final class RegistrationServiceImpl implements RegistrationService {
     await keychain.unlock(lockFactor);
     await keychain.setMasterKey(masterKey);
 
-    final role0key = await masterKey.derivePublicKey();
+    final keyPair = await _keyDerivationService.deriveAccountRoleKeyPair(
+      masterKey: masterKey,
+      role: AccountRole.root,
+    );
+
+    final role0key = keyPair.publicKey;
 
     final catalystId = CatalystId(
       host: _blockchainConfig.host.host,
