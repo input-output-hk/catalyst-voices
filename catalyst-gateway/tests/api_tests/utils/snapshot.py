@@ -18,7 +18,8 @@ def snapshot() -> Snapshot:
     # snapshot file should follow the following pattern:
     # snapshot-<slot_no>-<network>.json
     files = glob.glob("./test_data/snapshot-*.json")
-    with open(files[0]) as snapshot_file:
+    print(files)
+    with open(files[3]) as snapshot_file:
         snapshot_data = json.load(snapshot_file)
         file_name = os.path.basename(snapshot_file.name)
         res = re.split(r"[-.]+", file_name)

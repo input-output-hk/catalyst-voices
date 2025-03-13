@@ -4,19 +4,22 @@ from utils.snapshot import snapshot
 from api.v1 import cardano
 
 
-@pytest.mark.skip("To be refactored when the api is ready")
+# @pytest.mark.skip("To be refactored when the api is ready")
 def test_persistent_ada_amount_endpoint(snapshot):
     # health.is_live()
     # health.is_ready()
+    print(f"{snapshot.network}, {snapshot.slot_no}")
 
-    for entry in snapshot.data:
+    total_len = len(snapshot.data)
+    for i, entry in enumerate(snapshot.data):
+        print(f"Loading .... {i/total_len * 100}%", end="\r")
         expected_amount = entry["voting_power"]
         stake_address = stake_public_key_to_address(
             key=entry["stake_public_key"][2:],
             is_stake=True,
             network_type=snapshot.network,
         )
-        resp = cardano.assets(stake_address, snapshot.slot_no, snapshot.network)
+        resp = cardano.assets(stake_address, snapshot.slot_no)
         if expected_amount == 0 and resp.status_code == 404:
             # it is possible that snapshot tool collected data for the stake key which does not have any unspent utxo
             # at this case cat-gateway return 404, that is why we are checking this case additionally
@@ -28,4 +31,4 @@ def test_persistent_ada_amount_endpoint(snapshot):
         assets = resp.json()
         assert (
             assets["persistent"]["ada_amount"] == expected_amount
-        ), f"Not expected ada amount for stake_address: {stake_address}"
+        ), f"Not expected ada amount for stake_address: {stake_address}, {entry["stake_public_key"]}"
