@@ -4,15 +4,13 @@ import 'package:equatable/equatable.dart';
 
 class ProposalData extends Equatable {
   final ProposalDocument document;
-  final DocumentRef ref;
   final String categoryId;
   final int commentsCount;
   final List<String> versions;
 
   const ProposalData({
-    required this.document,
-    required this.ref,
     required this.categoryId,
+    required this.document,
     this.commentsCount = 0,
     this.versions = const [],
   });
@@ -60,7 +58,6 @@ class ProposalData extends Equatable {
   @override
   List<Object?> get props => [
         document,
-        ref,
         categoryId,
         commentsCount,
         versions,

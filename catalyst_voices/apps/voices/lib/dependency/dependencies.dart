@@ -71,6 +71,7 @@ final class Dependencies extends DependencyProvider {
           userService: get<UserService>(),
           registrationService: get<RegistrationService>(),
           progressNotifier: get<RegistrationProgressNotifier>(),
+          blockchainConfig: get<AppConfig>().blockchain,
         );
       })
       ..registerLazySingleton<ProposalsCubit>(
@@ -164,9 +165,6 @@ final class Dependencies extends DependencyProvider {
           get<SignedDocumentManager>(),
         );
       })
-      ..registerLazySingleton<TransactionConfigRepository>(
-        TransactionConfigRepository.new,
-      )
       ..registerLazySingleton<ProposalRepository>(ProposalRepository.new)
       ..registerLazySingleton<CampaignRepository>(CampaignRepository.new)
       ..registerLazySingleton<ConfigRepository>(ConfigRepository.new)
@@ -196,6 +194,7 @@ final class Dependencies extends DependencyProvider {
       return AuthService(
         get<UserObserver>(),
         get<KeyDerivationService>(),
+        get<AppConfig>().blockchain,
       );
     });
     registerLazySingleton<AuthTokenProvider>(() => get<AuthService>());
@@ -206,10 +205,10 @@ final class Dependencies extends DependencyProvider {
     );
     registerLazySingleton<RegistrationService>(() {
       return RegistrationService(
-        get<TransactionConfigRepository>(),
         get<KeychainProvider>(),
         get<CatalystCardano>(),
         get<KeyDerivationService>(),
+        get<AppConfig>().blockchain,
       );
     });
     registerLazySingleton<UserService>(
@@ -235,6 +234,7 @@ final class Dependencies extends DependencyProvider {
         get<SignedDocumentManager>(),
         get<UserService>(),
         get<KeyDerivationService>(),
+        get<AppConfig>().blockchain,
       );
     });
     registerLazySingleton<ConfigService>(() {
