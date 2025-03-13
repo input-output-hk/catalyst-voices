@@ -1,5 +1,4 @@
-import 'package:catalyst_voices_models/src/crypto/catalyst_public_key.dart';
-import 'package:catalyst_voices_models/src/user/account_role.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:equatable/equatable.dart';
 
@@ -84,6 +83,29 @@ final class CatalystId extends Equatable {
         rotation,
         encrypt,
       ];
+
+  CatalystId copyWith({
+    String? host,
+    Optional<String>? username,
+    Optional<int>? nonce,
+    CatalystPublicKey? role0Key,
+    Optional<AccountRole>? role,
+    Optional<int>? rotation,
+    bool? encrypt,
+  }) {
+    return CatalystId(
+      host: host ?? this.host,
+      username: username.dataOr(this.username),
+      nonce: nonce.dataOr(this.nonce),
+      role0Key: role0Key ?? this.role0Key,
+      role: role.dataOr(this.role),
+      rotation: rotation.dataOr(this.rotation),
+      encrypt: encrypt ?? this.encrypt,
+    );
+  }
+
+  @override
+  String toString() => toUri().toString();
 
   /// Builds the [Uri] from the [CatalystId].
   Uri toUri() {

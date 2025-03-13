@@ -26,6 +26,40 @@ class _AccountDisplayNameTileState extends State<AccountDisplayNameTile> {
   StreamSubscription<DisplayName>? _sub;
 
   @override
+  Widget build(BuildContext context) {
+    return EditableTile(
+      key: const Key('AccountDisplayNameTile'),
+      title: context.l10n.displayName,
+      onChanged: _onEditModeChange,
+      isEditMode: _isEditMode,
+      isSaveEnabled: _displayName.isValid,
+      isEditEnabled: false,
+      child: VoicesDisplayNameTextField(
+        key: const Key('AccountDisplayNameTextField'),
+        controller: _controller,
+        focusNode: _focusNode,
+        decoration: VoicesTextFieldDecoration(
+          hintText: context.l10n.displayName,
+          errorText: _displayName.displayError?.message(context),
+        ),
+        onFieldSubmitted: null,
+        readOnly: !_isEditMode,
+        maxLength: _isEditMode ? DisplayName.lengthRange.max : null,
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    unawaited(_sub?.cancel());
+    _sub = null;
+
+    _controller.dispose();
+    _focusNode.dispose();
+    super.dispose();
+  }
+
+  @override
   void initState() {
     super.initState();
 
@@ -44,37 +78,23 @@ class _AccountDisplayNameTileState extends State<AccountDisplayNameTile> {
         .listen(_handleDisplayNameChange);
   }
 
-  @override
-  void dispose() {
-    unawaited(_sub?.cancel());
-    _sub = null;
-
-    _controller.dispose();
-    _focusNode.dispose();
-    super.dispose();
+  void _handleControllerChange() {
+    setState(() {
+      _displayName = DisplayName.dirty(_controller.text);
+    });
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return EditableTile(
-      key: const Key('AccountDisplayNameTile'),
-      title: context.l10n.displayName,
-      onChanged: _onEditModeChange,
-      isEditMode: _isEditMode,
-      isSaveEnabled: _displayName.isValid,
-      child: VoicesDisplayNameTextField(
-        key: const Key('AccountDisplayNameTextField'),
-        controller: _controller,
-        focusNode: _focusNode,
-        decoration: VoicesTextFieldDecoration(
-          hintText: context.l10n.displayName,
-          errorText: _displayName.displayError?.message(context),
-        ),
-        onFieldSubmitted: null,
-        readOnly: !_isEditMode,
-        maxLength: _isEditMode ? DisplayName.lengthRange.max : null,
-      ),
-    );
+  void _handleDisplayNameChange(DisplayName displayName) {
+    if (_isEditMode) {
+      return;
+    }
+
+    _controller.textWithSelection = displayName.value;
+  }
+
+  void _onCancel() {
+    final displayName = context.read<AccountCubit>().state.displayName;
+    _controller.textWithSelection = displayName.value;
   }
 
   void _onEditModeChange(EditableTileChange value) {
@@ -97,26 +117,8 @@ class _AccountDisplayNameTileState extends State<AccountDisplayNameTile> {
     });
   }
 
-  void _onCancel() {
-    final displayName = context.read<AccountCubit>().state.displayName;
-    _controller.textWithSelection = displayName.value;
-  }
-
   void _onSave() {
-    unawaited(context.read<AccountCubit>().updateDisplayName(_displayName));
-  }
-
-  void _handleControllerChange() {
-    setState(() {
-      _displayName = DisplayName.dirty(_controller.text);
-    });
-  }
-
-  void _handleDisplayNameChange(DisplayName displayName) {
-    if (_isEditMode) {
-      return;
-    }
-
-    _controller.textWithSelection = displayName.value;
+    // Note. not supported atm.
+    // unawaited(context.read<AccountCubit>().updateDisplayName(_displayName));
   }
 }
