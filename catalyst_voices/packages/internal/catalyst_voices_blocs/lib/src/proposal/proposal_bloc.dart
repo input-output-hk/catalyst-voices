@@ -56,7 +56,10 @@ final class ProposalBloc extends Bloc<ProposalEvent, ProposalState>
     );
 
     final commentsSegment = ProposalCommentsSegment.build(
-      comments: const [],
+      comments: const [
+        'The first rule about fight club is...',
+        'This proposal embodies a bold and disruptive vision that aligns with the decentralised ethos of the Cardano ecosystem. The focus on empowering individuals through grassroots action and the inclusion of open-source methodologies makes it a transformative initiative. The clear milestones and emphasis on secure, replicable strategies inspire confidence in the project’s feasibility and scalability. I look forward to seeing its impact.',
+      ],
     );
 
     final data = ProposalViewData(

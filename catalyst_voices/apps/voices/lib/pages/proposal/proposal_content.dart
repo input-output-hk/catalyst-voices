@@ -1,8 +1,8 @@
 import 'dart:math';
 
 import 'package:catalyst_voices/pages/proposal/tiles/proposal_add_comment_tile.dart';
+import 'package:catalyst_voices/pages/proposal/tiles/proposal_comment_tile.dart';
 import 'package:catalyst_voices/pages/proposal/tiles/proposal_comments_header_tile.dart';
-import 'package:catalyst_voices/pages/proposal/tiles/proposal_comments_tile.dart';
 import 'package:catalyst_voices/pages/proposal/tiles/proposal_document_section_tile.dart';
 import 'package:catalyst_voices/pages/proposal/tiles/proposal_document_segment_title.dart';
 import 'package:catalyst_voices/pages/proposal/tiles/proposal_metadata_tile.dart';
@@ -129,9 +129,12 @@ class _SegmentsListView extends StatelessWidget {
         ),
       ProposalCommentsSegment() => const ProposalCommentsHeaderTile(),
       ProposalCommentsSection() => switch (item) {
-          ViewCommentsSection() => const ProposalCommentsTile(),
+          ViewCommentsSection() => throw ArgumentError(
+              'View comments not supported',
+            ),
           AddCommentSection() => const ProposalAddCommentTile(),
         },
+      CommentListItem(:final message) => ProposalCommentTile(message: message),
       _ => throw ArgumentError('Not supported type ${item.runtimeType}'),
     };
   }
