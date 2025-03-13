@@ -44,7 +44,7 @@ final class AuthServiceImpl implements AuthService {
 
     return CatalystId(
       host: _blockchainConfig.host.host,
-      role0Key: keyPair.publicKey,
+      role0Key: keyPair.publicKey.publicKeyBytes,
       nonce: dateTime.millisecondsSinceEpoch ~/ Duration.millisecondsPerSecond,
     );
   }
