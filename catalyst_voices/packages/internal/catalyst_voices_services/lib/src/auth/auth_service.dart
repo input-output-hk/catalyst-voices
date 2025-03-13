@@ -9,18 +9,21 @@ abstract interface class AuthService implements AuthTokenProvider {
   const factory AuthService(
     UserObserver userObserver,
     KeyDerivationService keyDerivationService,
+    BlockchainConfig blockchainConfig,
   ) = AuthServiceImpl;
 }
 
 final class AuthServiceImpl implements AuthService {
   static const String tokenPrefix = 'catid';
 
-  final UserObserver userObserver;
-  final KeyDerivationService keyDerivationService;
+  final UserObserver _userObserver;
+  final KeyDerivationService _keyDerivationService;
+  final BlockchainConfig _blockchainConfig;
 
   const AuthServiceImpl(
-    this.userObserver,
-    this.keyDerivationService,
+    this._userObserver,
+    this._keyDerivationService,
+    this._blockchainConfig,
   );
 
   @override
@@ -40,15 +43,14 @@ final class AuthServiceImpl implements AuthService {
     final dateTime = DateTimeExt.now();
 
     return CatalystId(
-      // TODO(dtscalac): inject the host from configuration, don't hardcode it
-      host: CatalystIdHost.cardanoPreprod.host,
-      role0Key: keyPair.publicKey,
+      host: _blockchainConfig.host.host,
+      role0Key: keyPair.publicKey.publicKeyBytes,
       nonce: dateTime.millisecondsSinceEpoch ~/ Duration.millisecondsPerSecond,
     );
   }
 
   Future<CatalystKeyPair> _getRole0KeyPair() async {
-    final account = userObserver.user.activeAccount;
+    final account = _userObserver.user.activeAccount;
     if (account == null) {
       throw StateError('Cannot create rbac token, account missing');
     }
@@ -58,7 +60,7 @@ final class AuthServiceImpl implements AuthService {
       throw StateError('Cannot publish a proposal, master key missing');
     }
 
-    return keyDerivationService.deriveAccountRoleKeyPair(
+    return _keyDerivationService.deriveAccountRoleKeyPair(
       masterKey: masterKey,
       role: AccountRole.root,
     );

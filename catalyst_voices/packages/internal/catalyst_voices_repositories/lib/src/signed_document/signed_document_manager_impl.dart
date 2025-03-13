@@ -101,9 +101,8 @@ final class _CatalystSigner implements CatalystCoseSigner {
 
 final class _CatalystVerifier implements CatalystCoseVerifier {
   final CatalystId _catalystId;
-  final CatalystPublicKey _publicKey;
 
-  const _CatalystVerifier(this._catalystId, this._publicKey);
+  const _CatalystVerifier(this._catalystId);
 
   @override
   Future<Uint8List?> get kid async {
@@ -113,8 +112,13 @@ final class _CatalystVerifier implements CatalystCoseVerifier {
 
   @override
   Future<bool> verify(Uint8List data, Uint8List signature) async {
+    // TODO(dtscalac): obtain the public key corresponding
+    // to the private key which generated the signature and use
+    // it for verification, most likely the role0Key is not the correct one.
     final catalystSignature = CatalystSignature.factory.create(signature);
-    return _publicKey.verify(data, signature: catalystSignature);
+    return CatalystPublicKey.factory
+        .create(_catalystId.role0Key)
+        .verify(data, signature: catalystSignature);
   }
 }
 
@@ -145,23 +149,8 @@ final class _CoseSignedDocument<T extends SignedDocumentPayload>
   }
 
   @override
-  Future<bool> verifySignature(CatalystPublicKey publicKey) async {
-    // TODO(dtscalac): obtain from somewhere the catalyst ID
-    // which corresponds to the user who signed the document,
-    // not to the current app user.
-
-    final catalystId = CatalystId(
-      // TODO(dtscalac): inject the host from configuration, don't hardcode it
-      host: CatalystIdHost.cardanoPreprod.host,
-      role0Key: publicKey,
-    );
-
-    return _coseSign.verify(
-      verifier: _CatalystVerifier(
-        catalystId,
-        publicKey,
-      ),
-    );
+  Future<bool> verifySignature(CatalystId catalystId) async {
+    return _coseSign.verify(verifier: _CatalystVerifier(catalystId));
   }
 }
 

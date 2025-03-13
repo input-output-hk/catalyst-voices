@@ -14,6 +14,7 @@ class EditableTile extends StatelessWidget {
   final bool isSelected;
   final bool isEditMode;
   final bool isSaveEnabled;
+  final bool isEditEnabled;
   final String? errorText;
   final ValueChanged<EditableTileChange>? onChanged;
   final Widget child;
@@ -24,6 +25,7 @@ class EditableTile extends StatelessWidget {
     this.isSelected = false,
     this.isEditMode = false,
     this.isSaveEnabled = false,
+    this.isEditEnabled = true,
     this.errorText,
     this.onChanged,
     required this.child,
@@ -37,10 +39,14 @@ class EditableTile extends StatelessWidget {
     return PropertyTile(
       title: title,
       isSelected: isSelected,
-      action: VoicesEditSaveButton(
-        onTap: _toggleEditMode,
-        isEditing: isEditMode,
-        hasError: errorText != null,
+      action: Offstage(
+        offstage: !isEditEnabled,
+        child: VoicesEditSaveButton(
+          key: const Key('EditableTileEditSaveButton'),
+          onTap: _toggleEditMode,
+          isEditing: isEditMode,
+          hasError: errorText != null,
+        ),
       ),
       footer: showFooter
           ? _Footer(

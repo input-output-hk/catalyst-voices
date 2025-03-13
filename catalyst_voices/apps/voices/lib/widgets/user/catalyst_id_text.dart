@@ -3,13 +3,15 @@ import 'dart:async';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 const _compactMaxLength = 6;
 
 class CatalystIdText extends StatefulWidget {
-  final String data;
+  final CatalystId data;
   final bool isCompact;
   final Color? backgroundColor;
 
@@ -25,6 +27,7 @@ class CatalystIdText extends StatefulWidget {
 }
 
 class _CatalystIdTextState extends State<CatalystIdText> {
+  String _fullDataAsString = '';
   String _effectiveData = '';
   bool _tooltipVisible = false;
   bool _highlightCopied = false;
@@ -45,7 +48,7 @@ class _CatalystIdTextState extends State<CatalystIdText> {
             children: [
               Flexible(
                 child: VoicesPlainTooltip(
-                  message: widget.data,
+                  message: _fullDataAsString,
                   // Do not constraint width.
                   constraints: const BoxConstraints(),
                   child: _Chip(
@@ -72,6 +75,7 @@ class _CatalystIdTextState extends State<CatalystIdText> {
 
     if (widget.data != oldWidget.data ||
         widget.isCompact != oldWidget.isCompact) {
+      _fullDataAsString = widget.data.toUri().toStringWithoutScheme();
       _effectiveData = _buildTextData();
       _tooltipVisible = _isTooltipVisible();
     }
@@ -89,12 +93,13 @@ class _CatalystIdTextState extends State<CatalystIdText> {
   void initState() {
     super.initState();
 
+    _fullDataAsString = widget.data.toUri().toStringWithoutScheme();
     _effectiveData = _buildTextData();
     _tooltipVisible = _isTooltipVisible();
   }
 
   String _buildTextData() {
-    final data = widget.data;
+    final data = _fullDataAsString;
     final isCompact = widget.isCompact;
 
     // If isCompact use last _compactMaxLength characters.
@@ -107,7 +112,7 @@ class _CatalystIdTextState extends State<CatalystIdText> {
   }
 
   Future<void> _copyDataToClipboard() async {
-    final data = ClipboardData(text: widget.data);
+    final data = ClipboardData(text: _fullDataAsString);
     await Clipboard.setData(data);
 
     if (mounted) {
@@ -129,7 +134,7 @@ class _CatalystIdTextState extends State<CatalystIdText> {
   }
 
   bool _isTooltipVisible() {
-    return widget.isCompact && _effectiveData.length < widget.data.length;
+    return widget.isCompact && _effectiveData.length < _fullDataAsString.length;
   }
 
   void _removeHighlight() {
