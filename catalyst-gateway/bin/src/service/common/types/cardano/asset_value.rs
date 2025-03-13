@@ -100,7 +100,7 @@ impl TryFrom<num_bigint::BigInt> for AssetValue {
     fn try_from(value: num_bigint::BigInt) -> Result<Self, Self::Error> {
         let value: i128 = value.try_into()?;
         if !is_valid(value) {
-            bail!("Invalid Asset Value");
+            bail!("Invalid Asset Value: {value}");
         }
         Ok(Self(value))
     }

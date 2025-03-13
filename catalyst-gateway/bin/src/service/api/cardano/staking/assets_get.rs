@@ -4,7 +4,7 @@ use std::collections::{HashMap, HashSet};
 
 use cardano_blockchain_types::{Slot, StakeAddress, TransactionId, TxnIndex};
 use futures::StreamExt;
-use poem_openapi::{payload::Json, ApiResponse};
+use poem_openapi::{payload::Json, types::Example, ApiResponse};
 
 use crate::{
     db::index::{
@@ -28,7 +28,8 @@ use crate::{
         responses::WithErrorResponses,
         types::{
             cardano::{
-                asset_name::AssetName, cip19_stake_address::Cip19StakeAddress, slot_no::SlotNo,
+                asset_name::AssetName, asset_value::AssetValue,
+                cip19_stake_address::Cip19StakeAddress, slot_no::SlotNo,
             },
             headers::retry_after::RetryAfterOption,
         },
@@ -104,6 +105,7 @@ struct NativeTokens {
     /// Asset name.
     name: AssetName,
     /// Asset amount.
+    #[allow(dead_code)]
     amount: num_bigint::BigInt,
 }
 
@@ -278,7 +280,8 @@ fn build_stake_info(
             stake_info.native_tokens.push(StakedNativeTokenInfo {
                 policy_hash: native_token.id.try_into()?,
                 asset_name: native_token.name,
-                amount: native_token.amount.try_into()?,
+                // amount: native_token.amount.try_into().context("Invalid token amount")?,
+                amount: AssetValue::example(),
             });
         }
 
