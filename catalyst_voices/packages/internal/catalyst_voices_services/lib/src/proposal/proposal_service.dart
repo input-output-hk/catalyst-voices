@@ -290,7 +290,6 @@ final class ProposalServiceImpl implements ProposalService {
               .map(
                 (e) => BaseProposalData(
                   document: e,
-                  ref: e.metadata.selfRef,
                 ),
               )
               .toList();

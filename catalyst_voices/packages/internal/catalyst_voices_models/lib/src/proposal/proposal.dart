@@ -57,8 +57,8 @@ final class Proposal extends Equatable {
 
     return Proposal(
       selfRef: data.document.metadata.selfRef,
-      title: data.proposalTitle ?? '',
-      description: data.proposalDescription ?? '',
+      title: data.getProposalTitle() ?? '',
+      description: data.getProposalDescription() ?? '',
       updateDate: updateDate,
       fundsRequested: data.getProposalFundsRequested() ?? Coin.fromAda(0),
       // TODO(LynxLynxx): from where we need to get the real status

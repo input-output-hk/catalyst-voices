@@ -26,22 +26,20 @@ class _WorkspacePageState extends State<WorkspacePage>
   @override
   Widget build(BuildContext context) {
     return const Scaffold(
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            WorkspaceHeader(),
-            Expanded(
-              child: Stack(
-                children: [
-                  WorkspaceMyProposalsSelector(),
-                  WorkspaceLoadingSelector(),
-                  WorkspaceEmptyStateSelector(),
-                  WorkspaceErrorSelector(),
-                ],
-              ),
+      body: Column(
+        children: [
+          WorkspaceHeader(),
+          Expanded(
+            child: Stack(
+              children: [
+                WorkspaceMyProposalsSelector(),
+                WorkspaceLoadingSelector(),
+                WorkspaceEmptyStateSelector(),
+                WorkspaceErrorSelector(),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

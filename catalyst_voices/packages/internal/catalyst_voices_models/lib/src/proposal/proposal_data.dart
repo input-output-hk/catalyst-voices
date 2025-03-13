@@ -66,7 +66,9 @@ class BaseProposalData extends Equatable {
     return ProposalVersion(
       selfRef: document.metadata.selfRef,
       title: getProposalTitle() ?? '',
-      createdAt: UuidUtils.dateTime(document.metadata.selfRef.version ?? document.metadata.selfRef.id),
+      createdAt: UuidUtils.dateTime(
+        document.metadata.selfRef.version ?? document.metadata.selfRef.id,
+      ),
       // TODO(LynxLynxx): from where we need to get the real status
       publish: ProposalPublish.publishedDraft,
     );
@@ -79,7 +81,6 @@ class ProposalData extends BaseProposalData {
 
   const ProposalData({
     required super.document,
-    required super.ref,
     required this.categoryId,
     super.commentsCount = 0,
     this.versions = const [],
