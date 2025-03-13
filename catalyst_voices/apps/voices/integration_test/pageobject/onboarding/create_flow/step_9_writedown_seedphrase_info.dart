@@ -35,5 +35,10 @@ class WritedownSeedphraseInfoPanel extends OnboardingPageBase {
     expect(await closeButton(), findsOneWidget);
   }
 
-  Future<void> verifyDetailsPanel() async {}
+  Future<void> verifyDetailsPanel() async {
+    
+
+
+
+  }
 }
