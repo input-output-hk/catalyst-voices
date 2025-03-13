@@ -1,0 +1,161 @@
+import 'package:catalyst_voices/widgets/document_builder/value/document_builder_value_widget.dart';
+import 'package:catalyst_voices/widgets/widgets.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart'
+    hide DocumentPropertyBuilder;
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
+import 'package:collection/collection.dart';
+import 'package:flutter/material.dart';
+
+class DocumentObjectPropertyBuilder extends StatelessWidget {
+  final DocumentObjectProperty property;
+  final bool isEditMode;
+  final ValueChanged<List<DocumentChange>> onChanged;
+
+  const DocumentObjectPropertyBuilder({
+    super.key,
+    required this.property,
+    required this.isEditMode,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final schema = property.schema;
+
+    switch (schema) {
+      case DocumentSingleGroupedTagSelectorSchema():
+        return SingleGroupedTagSelectorWidget(
+          schema: schema,
+          property: property,
+          isEditMode: isEditMode,
+          onChanged: onChanged,
+        );
+
+      case DocumentSegmentSchema():
+      case DocumentSectionSchema():
+      case DocumentNestedQuestionsSchema():
+      case DocumentGenericObjectSchema():
+      case DocumentBorderGroupSchema():
+        return _GenericDocumentObjectPropertyBuilder(
+          schema: schema,
+          property: property,
+          isEditMode: isEditMode,
+          onChanged: onChanged,
+        );
+    }
+  }
+}
+
+class _GenericDocumentObjectPropertyBuilder extends StatefulWidget {
+  final DocumentObjectSchema schema;
+  final DocumentObjectProperty property;
+  final bool isEditMode;
+  final ValueChanged<List<DocumentChange>> onChanged;
+
+  const _GenericDocumentObjectPropertyBuilder({
+    required this.schema,
+    required this.property,
+    required this.isEditMode,
+    required this.onChanged,
+  });
+
+  @override
+  State<_GenericDocumentObjectPropertyBuilder> createState() =>
+      _GenericDocumentObjectPropertyBuilderState();
+}
+
+class _GenericDocumentObjectPropertyBuilderState
+    extends State<_GenericDocumentObjectPropertyBuilder> {
+  AutovalidateMode _autovalidateMode = AutovalidateMode.onUserInteraction;
+
+  @override
+  Widget build(BuildContext context) {
+    return _GenericObjectPropertyFormField(
+      value: widget.property,
+      validator: (property) => _validator(context, property),
+      autovalidateMode: _autovalidateMode,
+      isEditMode: widget.isEditMode,
+      onDocumentChanged: _onDocumentChanged,
+    );
+  }
+
+  void _onDocumentChanged(List<DocumentChange> changes) {
+    setState(() {
+      _autovalidateMode = AutovalidateMode.always;
+    });
+    widget.onChanged(changes);
+  }
+
+  String? _validator(BuildContext context, DocumentObjectProperty? property) {
+    if (property == null) {
+      return null;
+    }
+
+    return LocalizedDocumentValidationResult.from(property.validationResult)
+        .message(context);
+  }
+}
+
+class _GenericObjectPropertyFormField
+    extends VoicesFormField<DocumentObjectProperty> {
+  _GenericObjectPropertyFormField({
+    required super.value,
+    super.validator,
+    super.autovalidateMode,
+    required bool isEditMode,
+    required ValueChanged<List<DocumentChange>> onDocumentChanged,
+  }) : super(
+          enabled: isEditMode,
+          builder: (field) {
+            final context = field.context;
+            final property = field.value!;
+            final schema = property.schema;
+            final title = schema.title;
+            final properties = property.properties
+                .whereNot((child) => child.schema.isSectionOrSubsection);
+
+            final showBorder = schema is DocumentBorderGroupSchema;
+            final error = field.errorText;
+
+            return Container(
+              width: double.infinity,
+              padding: showBorder ? const EdgeInsets.all(16) : null,
+              decoration: showBorder
+                  ? BoxDecoration(
+                      border: Border.all(color: Theme.of(context).dividerColor),
+                      borderRadius: BorderRadius.circular(8),
+                    )
+                  : null,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (title.isNotEmpty && !schema.isSectionOrSubsection) ...[
+                    Text(
+                      title,
+                      style: Theme.of(context).textTheme.titleSmall,
+                    ),
+                    const SizedBox(height: 8),
+                  ],
+                  ...properties.map<Widget>((child) {
+                    return DocumentPropertyBuilder(
+                      key: ValueKey(child.nodeId),
+                      property: child,
+                      isEditMode: isEditMode,
+                      onChanged: onDocumentChanged,
+                    );
+                  }).separatedBy(const SizedBox(height: 24)),
+                  if (error != null) ...[
+                    if (properties.isNotEmpty) const SizedBox(height: 4),
+                    DocumentErrorText(
+                      text: error,
+                      enabled: isEditMode,
+                    ),
+                  ],
+                ],
+              ),
+            );
+          },
+        );
+}
