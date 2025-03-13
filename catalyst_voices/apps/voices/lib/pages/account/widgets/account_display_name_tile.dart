@@ -57,11 +57,13 @@ class _AccountDisplayNameTileState extends State<AccountDisplayNameTile> {
   @override
   Widget build(BuildContext context) {
     return EditableTile(
+      key: const Key('AccountDisplayNameTile'),
       title: context.l10n.displayName,
       onChanged: _onEditModeChange,
       isEditMode: _isEditMode,
       isSaveEnabled: _displayName.isValid,
       child: VoicesDisplayNameTextField(
+        key: const Key('AccountDisplayNameTextField'),
         controller: _controller,
         focusNode: _focusNode,
         decoration: VoicesTextFieldDecoration(

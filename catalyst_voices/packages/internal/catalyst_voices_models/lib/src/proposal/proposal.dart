@@ -56,9 +56,9 @@ final class Proposal extends Equatable {
     updateDate = UuidUtils.dateTime(version);
 
     return Proposal(
-      selfRef: data.ref,
-      title: data.getProposalTitle() ?? '',
-      description: data.getProposalDescription() ?? '',
+      selfRef: data.document.metadata.selfRef,
+      title: data.proposalTitle ?? '',
+      description: data.proposalDescription ?? '',
       updateDate: updateDate,
       fundsRequested: data.getProposalFundsRequested() ?? Coin.fromAda(0),
       // TODO(LynxLynxx): from where we need to get the real status

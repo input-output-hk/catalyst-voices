@@ -2,16 +2,6 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 
-/// Enum representing the state of a campaign.
-/// Draft: campaign is not published yet.
-/// Published: campaign is published and can be seen by users.
-enum CampaignPublish {
-  draft,
-  published;
-
-  bool get isDraft => this == draft;
-}
-
 // Note. Most, if not all, fields will be removed from here because they come
 // from document.
 base class CampaignBase extends Equatable {
@@ -36,21 +26,21 @@ base class CampaignBase extends Equatable {
   int get categoriesCount => 0;
 
   // TODO(damian-molinski): this should come from api
-  DocumentRef get proposalTemplateRef {
-    return const SignedDocumentRef(id: 'schema');
+  SignedDocumentRef get proposalTemplateRef {
+    return const SignedDocumentRef(id: '0194d492-1daa-75b5-b4a4-5cf331cd8d1a');
   }
 
-  Campaign toCampaign() {
-    return Campaign(
-      id: id,
-      name: name,
-      description: description,
-      startDate: startDate,
-      endDate: endDate,
-      proposalsCount: proposalsCount,
-      publish: publish,
-    );
-  }
+  @override
+  @mustCallSuper
+  List<Object?> get props => [
+        id,
+        name,
+        description,
+        startDate,
+        endDate,
+        proposalsCount,
+        publish,
+      ];
 
   CampaignBase copyWith({
     String? id,
@@ -72,15 +62,25 @@ base class CampaignBase extends Equatable {
     );
   }
 
-  @override
-  @mustCallSuper
-  List<Object?> get props => [
-        id,
-        name,
-        description,
-        startDate,
-        endDate,
-        proposalsCount,
-        publish,
-      ];
+  Campaign toCampaign() {
+    return Campaign(
+      id: id,
+      name: name,
+      description: description,
+      startDate: startDate,
+      endDate: endDate,
+      proposalsCount: proposalsCount,
+      publish: publish,
+    );
+  }
+}
+
+/// Enum representing the state of a campaign.
+/// Draft: campaign is not published yet.
+/// Published: campaign is published and can be seen by users.
+enum CampaignPublish {
+  draft,
+  published;
+
+  bool get isDraft => this == draft;
 }

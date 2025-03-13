@@ -1,9 +1,6 @@
-import 'dart:math';
-
 import 'package:catalyst_cardano/catalyst_cardano.dart';
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:uuid/uuid.dart';
@@ -20,10 +17,10 @@ final _testNetAddress = ShelleyAddress.fromBech32(
 
 abstract interface class RegistrationService {
   factory RegistrationService(
-    TransactionConfigRepository transactionConfigRepository,
     KeychainProvider keychainProvider,
     CatalystCardano cardano,
     KeyDerivationService keyDerivationService,
+    BlockchainConfig blockchainConfig,
   ) = RegistrationServiceImpl;
 
   /// See [KeyDerivationService.deriveMasterKey].
@@ -83,16 +80,16 @@ abstract interface class RegistrationService {
 
 /// Manages the user registration.
 final class RegistrationServiceImpl implements RegistrationService {
-  final TransactionConfigRepository _transactionConfigRepository;
   final KeychainProvider _keychainProvider;
   final CatalystCardano _cardano;
   final KeyDerivationService _keyDerivationService;
+  final BlockchainConfig _blockchainConfig;
 
   const RegistrationServiceImpl(
-    this._transactionConfigRepository,
     this._keychainProvider,
     this._cardano,
     this._keyDerivationService,
+    this._blockchainConfig,
   );
 
   @override
@@ -128,8 +125,7 @@ final class RegistrationServiceImpl implements RegistrationService {
     required Set<AccountRole> roles,
   }) async {
     try {
-      final config = await _transactionConfigRepository.fetch(networkId);
-
+      final config = _blockchainConfig.transactionBuilderConfig;
       final enabledWallet = await wallet.enable();
       final changeAddress = await enabledWallet.getChangeAddress();
       final rewardAddresses = await enabledWallet.getRewardAddresses();
@@ -167,11 +163,6 @@ final class RegistrationServiceImpl implements RegistrationService {
     required SeedPhrase seedPhrase,
   }) async {
     await Future<void>.delayed(const Duration(milliseconds: 200));
-
-    final isSuccess = Random().nextBool();
-    if (!isSuccess) {
-      throw const RegistrationUnknownException();
-    }
 
     // TODO(damian-molinski): should come from backend
     const displayName = 'Recovered';

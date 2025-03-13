@@ -1411,7 +1411,7 @@
   "heroSectionTitle": "Create, fund and deliver the future of Cardano.",
   "projectCatalystDescription": "Project Catalyst is an experiment in community innovation, providing a framework to turn ideas into impactful real world projects.\n\nWe're putting the community at the heart of Cardano's future development. Are you ready for the Challenge?",
   "viewCurrentCampaign": "View Current Campaign",
-  "catalystF14": "Catalyst Fund14",
+  "catalystF14": "Catalyst Fund 14",
   "@catalystF14": {
     "description": "Used in discovery page in hero section"
   },
@@ -1926,5 +1926,17 @@
   "notAvailableAbbr": "N/A",
   "@notAvailableAbbr": {
     "description": "Abbreviation for not available"
+  },
+  "latestDocumentVersion": "Latest",
+  "@latestDocumentVersion": {
+    "description": "When showing different version of proposal we may add suffix indicating this is latest version"
+  },
+  "viewingOlderDocumentVersion": "You are viewing an older iteration of this proposal",
+  "@viewingOlderDocumentVersion": {
+    "description": "After changing document version warning"
+  },
+  "viewLatestDocumentVersion": "View Latest",
+  "@viewLatestDocumentVersion": {
+    "description": "Action to change back to latest version"
   }
 }

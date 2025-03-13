@@ -5,19 +5,16 @@ import 'package:equatable/equatable.dart';
 
 class BaseProposalData extends Equatable {
   final ProposalDocument document;
-  final DocumentRef ref;
   final int commentsCount;
 
   const BaseProposalData({
     required this.document,
-    required this.ref,
     this.commentsCount = 0,
   });
 
   @override
   List<Object?> get props => [
         document,
-        ref,
         commentsCount,
       ];
 
@@ -67,9 +64,9 @@ class BaseProposalData extends Equatable {
 
   ProposalVersion toProposalVersion() {
     return ProposalVersion(
-      selfRef: ref,
+      selfRef: document.metadata.selfRef,
       title: getProposalTitle() ?? '',
-      createdAt: UuidUtils.dateTime(ref.version ?? ref.id),
+      createdAt: UuidUtils.dateTime(document.metadata.selfRef.version ?? document.metadata.selfRef.id),
       // TODO(LynxLynxx): from where we need to get the real status
       publish: ProposalPublish.publishedDraft,
     );

@@ -30,6 +30,7 @@ void main() {
       mockSignedDocumentManager,
       mockUserService,
       mockKeyDerivationService,
+      const BlockchainConfig(),
     );
 
     registerFallbackValue(const SignedDocumentRef(id: 'fallback-id'));
