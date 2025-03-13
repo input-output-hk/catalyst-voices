@@ -183,6 +183,7 @@ class _StepNameTextContainer extends StatelessWidget {
               ? Alignment.bottomCenter
               : Alignment.center,
       child: Text(
+        
         data,
         style: switch (status) {
           _StepIndicatorStatus.current =>
