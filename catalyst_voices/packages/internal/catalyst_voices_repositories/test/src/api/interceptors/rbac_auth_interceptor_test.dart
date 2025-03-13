@@ -1,5 +1,6 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/api/interceptors/rbac_auth_interceptor.dart';
+import 'package:catalyst_voices_repositories/src/auth/auth_token_provider.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:chopper/chopper.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -10,40 +11,41 @@ import 'mock_chain.dart';
 import 'mock_keychain.dart';
 import 'mock_response.dart';
 
-const _authHeaderName = 'Authorization';
-
 void main() {
-  late final UserObserver userObserver;
-  late final RbacAuthInterceptor interceptor;
-  late final Chain<String> chain;
-
-  final Keychain keychain = MockKeychain();
-
-  setUpAll(() {
-    userObserver = StreamUserObserver();
-    interceptor = RbacAuthInterceptor(userObserver);
-
-    chain = MockChain<String>();
-
-    registerFallbackValue(Request('X', Uri(), Uri()));
-  });
-
-  tearDownAll(() async {
-    await userObserver.dispose();
-  });
-
-  setUp(() {
-    when(() => keychain.id).thenAnswer((_) => const Uuid().v4());
-
-    userObserver.user = const User.empty();
-  });
-
-  tearDown(() {
-    reset(chain);
-    reset(keychain);
-  });
-
   group(RbacAuthInterceptor, () {
+    late final UserObserver userObserver;
+    late final RbacAuthInterceptor interceptor;
+    late final Chain<String> chain;
+
+    final Keychain keychain = MockKeychain();
+
+    setUpAll(() {
+      userObserver = StreamUserObserver();
+      interceptor = RbacAuthInterceptor(
+        userObserver,
+        _FakeAuthTokenProvider(),
+      );
+
+      chain = MockChain<String>();
+
+      registerFallbackValue(Request('X', Uri(), Uri()));
+    });
+
+    tearDownAll(() async {
+      await userObserver.dispose();
+    });
+
+    setUp(() {
+      when(() => keychain.id).thenAnswer((_) => const Uuid().v4());
+
+      userObserver.user = const User.empty();
+    });
+
+    tearDown(() {
+      reset(chain);
+      reset(keychain);
+    });
+
     test(
         'when active account keychain is '
         'unlocked auth header is added', () async {
@@ -167,4 +169,11 @@ void main() {
       );
     });
   });
+}
+
+const _authHeaderName = 'Authorization';
+
+class _FakeAuthTokenProvider extends Fake implements AuthTokenProvider {
+  @override
+  Future<String> createRbacToken() async => 'auth_token';
 }

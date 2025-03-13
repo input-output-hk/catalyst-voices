@@ -252,9 +252,9 @@ void main() {
 
       test(
           'of document should use same '
-          'id but assign new version', () async {
+          'id and same version', () async {
         // Given
-        final docRef = DocumentRefFactory.buildSigned();
+        final docRef = DocumentRefFactory.buildDraft();
         const content = DocumentDataContent({});
         final templateRef = DocumentRefFactory.buildSigned();
 
@@ -263,12 +263,12 @@ void main() {
           type: DocumentType.proposalDocument,
           content: content,
           template: templateRef,
-          of: docRef,
+          selfRef: docRef,
         );
 
         // Then
         expect(draftRef.id, docRef.id);
-        expect(draftRef.version, isNot(docRef.version));
+        expect(draftRef.version, docRef.version);
       });
 
       test('document data type should be proposal document', () async {

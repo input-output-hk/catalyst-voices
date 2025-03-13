@@ -1,3 +1,4 @@
+export 'auth/auth_service.dart' show AuthService;
 export 'campaign/campaign_service.dart' show CampaignService;
 export 'config/config_service.dart' show ConfigService;
 export 'crypto/bip32_ed25519_catalyst_private_key.dart'

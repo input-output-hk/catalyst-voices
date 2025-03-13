@@ -177,7 +177,10 @@ class _Account extends StatelessWidget {
       children: [
         MenuItemTile(
           leading: VoicesAssets.icons.userCircle.buildIcon(),
-          title: Text(context.l10n.profileAndKeychain),
+          key: const Key('ProfileAndKeychain'),
+          title: Text(
+            context.l10n.profileAndKeychain,
+          ),
           trailing: VoicesAssets.icons.chevronRight.buildIcon(),
           onTap: () => Navigator.pop(context, const _OpenAccountDetails()),
         ),
@@ -210,16 +213,19 @@ class _Links extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         MenuItemTile(
+          key: const Key('SetupRolesMenuItem'),
           leading: VoicesAssets.icons.userGroup.buildIcon(),
           title: Text(context.l10n.setupCatalystRoles),
           onTap: () => Navigator.pop(context, const _SetupRoles()),
         ),
         MenuItemTile(
+          key: const Key('SubmitSupportRequest'),
           leading: VoicesAssets.icons.support.buildIcon(),
           title: Text(context.l10n.submitSupportRequest),
           onTap: () => Navigator.pop(context, const _RedirectToSupport()),
         ),
         MenuItemTile(
+          key: const Key('CatalystKnowledgeBase'),
           leading: VoicesAssets.icons.academicCap.buildIcon(),
           title: Text(context.l10n.catalystKnowledgeBase),
           onTap: () => Navigator.pop(context, const _RedirectToDocs()),
@@ -237,6 +243,7 @@ class _Session extends StatelessWidget {
     return Column(
       children: [
         MenuItemTile(
+          key: const Key('LockAccountButton'),
           leading: VoicesAssets.icons.lockClosed.buildIcon(),
           title: Text(context.l10n.lockAccount),
           onTap: () => Navigator.pop(context, const _Lock()),
