@@ -112,7 +112,7 @@ class ProposalIterationStageChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return VoicesChip.rectangular(
-      leading: status.workspaceIcons.buildIcon(
+      leading: status.workspaceIcon.buildIcon(
         color: useInternalBackground ? null : context.colors.iconsBackground,
       ),
       content: Text(

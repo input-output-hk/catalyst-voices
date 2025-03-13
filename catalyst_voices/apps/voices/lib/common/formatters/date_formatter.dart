@@ -76,10 +76,7 @@ abstract class DateFormatter {
   /// - Abbreviated month name (e.g., Jan, Feb, Mar)
   /// - 24-hour time format with hours and minutes (e.g., 14:30)
   static String formatDayMonthTime(DateTime dateTime, {bool dayFirst = true}) {
-    if (dayFirst) {
-      return DateFormat('d MMM HH:mm').format(dateTime);
-    }
-    return DateFormat('MMM d, HH:mm').format(dateTime);
+    return DateFormat('d MMM HH:mm').format(dateTime);
   }
 
   /// Formats full date and time.

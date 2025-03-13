@@ -7,18 +7,17 @@ void main() {
   group(ProposalWithVersions, () {
     test('check if versions are sorted from latest to oldest', () async {
       final proposalId = const Uuid().v7();
-      await Future.delayed(const Duration(milliseconds: 10), () {});
       final versionId1 = const Uuid().v7();
-      await Future.delayed(const Duration(milliseconds: 10), () {});
+      await Future.delayed(const Duration(milliseconds: 1), () {});
       final versionId2 = const Uuid().v7();
-      await Future.delayed(const Duration(milliseconds: 10), () {});
+      await Future.delayed(const Duration(milliseconds: 1), () {});
       final versionId3 = const Uuid().v7();
 
       final proposalWithVersions = ProposalWithVersions(
         selfRef: DocumentRef.build(
           id: proposalId,
           isDraft: true,
-          version: versionId1,
+          version: versionId2,
         ),
         title: 'Title ver 1',
         description: 'Description ver 1',
@@ -69,18 +68,19 @@ void main() {
       expect(
         proposalWithVersions.versions[1].selfRef.version,
         equals(versionId2),
+        reason: 'Should be the second latest version',
       );
       expect(
         proposalWithVersions.versions[0].selfRef.version,
         equals(versionId3),
+        reason: 'Should be the latest version',
       );
     });
 
     test('check if proposal without version is the oldest', () async {
       final proposalId = const Uuid().v7();
-      await Future.delayed(const Duration(milliseconds: 10), () {});
       final versionId1 = const Uuid().v7();
-      await Future.delayed(const Duration(milliseconds: 10), () {});
+      await Future.delayed(const Duration(milliseconds: 1), () {});
       final versionId2 = const Uuid().v7();
 
       final proposalWithVersions = ProposalWithVersions(

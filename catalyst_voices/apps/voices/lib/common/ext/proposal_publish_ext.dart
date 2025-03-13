@@ -3,7 +3,7 @@ import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 
 extension ProposalPublishExt on ProposalPublish {
-  SvgGenImage get workspaceIcons => switch (this) {
+  SvgGenImage get workspaceIcon => switch (this) {
         ProposalPublish.submittedProposal => VoicesAssets.icons.lockClosed,
         _ => VoicesAssets.icons.documentText,
       };
