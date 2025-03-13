@@ -5,7 +5,8 @@ final class ProposalViewMetadata extends Equatable {
   final Profile author;
   final String? description;
   final ProposalStatus status;
-  final DateTime createdAt;
+  final DateTime? createdAt;
+  final bool warningCreatedAt;
   final String? tag;
   final int commentsCount;
   final int fundsRequested;
@@ -17,6 +18,7 @@ final class ProposalViewMetadata extends Equatable {
     this.description,
     required this.status,
     required this.createdAt,
+    required this.warningCreatedAt,
     this.tag,
     required this.commentsCount,
     required this.fundsRequested,
@@ -30,6 +32,7 @@ final class ProposalViewMetadata extends Equatable {
         description,
         status,
         createdAt,
+        warningCreatedAt,
         tag,
         commentsCount,
         fundsRequested,

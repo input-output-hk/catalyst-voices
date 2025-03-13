@@ -56,7 +56,7 @@ final class Proposal extends Equatable {
       updateDate = UuidUtils.dateTime(version);
     }
     return Proposal(
-      selfRef: data.ref,
+      selfRef: data.document.metadata.selfRef,
       title: data.proposalTitle ?? '',
       description: data.proposalDescription ?? '',
       updateDate: updateDate,

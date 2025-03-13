@@ -31,7 +31,7 @@ void main() {
 
       expect(signedDocument.payload, equals(document));
 
-      final isVerified = await signedDocument.verifySignature(_publicKey);
+      final isVerified = await signedDocument.verifySignature(_catalystId);
       expect(isVerified, isTrue);
 
       final signedDocumentBytes = signedDocument.toBytes();
@@ -51,7 +51,6 @@ const _metadata = SignedDocumentMetadata(
 );
 
 final _catalystId = CatalystId(
-  // TODO(dtscalac): inject the host from configuration, don't hardcode it
   host: CatalystIdHost.cardanoPreprod.host,
   role0Key: _publicKey,
 );

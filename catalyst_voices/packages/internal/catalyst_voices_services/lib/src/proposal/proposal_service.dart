@@ -5,6 +5,7 @@ import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_services/src/crypto/key_derivation_service.dart';
 import 'package:catalyst_voices_services/src/user/user_service.dart';
 import 'package:rxdart/rxdart.dart';
+import 'package:uuid/uuid.dart';
 
 abstract interface class ProposalService {
   const factory ProposalService(
@@ -13,9 +14,16 @@ abstract interface class ProposalService {
     SignedDocumentManager signedDocumentManager,
     UserService userService,
     KeyDerivationService keyDerivationService,
+    BlockchainConfig blockchainConfig,
   ) = ProposalServiceImpl;
 
   Future<List<String>> addFavoriteProposal(String proposalId);
+
+  Future<DraftRef> createDraftProposal({
+    required DocumentDataContent content,
+    required SignedDocumentRef template,
+    DraftRef? ref,
+  });
 
   /// Delete a draft proposal from local storage.
   ///
@@ -89,6 +97,7 @@ final class ProposalServiceImpl implements ProposalService {
   final SignedDocumentManager _signedDocumentManager;
   final UserService _userService;
   final KeyDerivationService _keyDerivationService;
+  final BlockchainConfig _blockchainConfig;
 
   const ProposalServiceImpl(
     this._proposalRepository,
@@ -96,11 +105,26 @@ final class ProposalServiceImpl implements ProposalService {
     this._signedDocumentManager,
     this._userService,
     this._keyDerivationService,
+    this._blockchainConfig,
   );
 
   @override
   Future<List<String>> addFavoriteProposal(String proposalId) async {
     return _proposalRepository.addFavoriteProposal(proposalId);
+  }
+
+  @override
+  Future<DraftRef> createDraftProposal({
+    required DocumentDataContent content,
+    required SignedDocumentRef template,
+    DraftRef? ref,
+  }) async {
+    return _documentRepository.createDocumentDraft(
+      type: DocumentType.proposalDocument,
+      content: content,
+      template: template,
+      selfRef: ref,
+    );
   }
 
   @override
@@ -130,8 +154,22 @@ final class ProposalServiceImpl implements ProposalService {
     required DocumentRef ref,
   }) async {
     final proposal = await _proposalRepository.getProposal(ref: ref);
+    final document = await _documentRepository.getProposalDocument(
+      ref: ref,
+    );
 
-    return proposal;
+    // TODO(damian-molinski): Delete this after documents sync is ready.
+    final mergedDocument = ProposalDocument(
+      metadata: proposal.document.metadata,
+      document: document.document,
+    );
+
+    return ProposalData(
+      document: mergedDocument,
+      categoryId: const Uuid().v7(),
+      commentsCount: 10,
+      versions: proposal.versions,
+    );
   }
 
   @override
@@ -192,9 +230,8 @@ final class ProposalServiceImpl implements ProposalService {
     );
 
     // TODO(dtscalac): catalyst id should come from the profile
-    // TODO(dtscalac): don't hardcode the host, it should be injected by DI
     final catalystId = CatalystId(
-      host: CatalystIdHost.cardanoPreprod.host,
+      host: _blockchainConfig.host.host,
       role0Key: role0KeyPair.publicKey,
       role: AccountRole.proposer,
       rotation: 0,
@@ -261,7 +298,6 @@ final class ProposalServiceImpl implements ProposalService {
               categoryId: DocumentType.categoryParametersDocument.uuid,
               versions: versionIds,
               commentsCount: commentsCount,
-              ref: doc.metadata.selfRef,
             );
             return Proposal.fromData(proposalData);
           });

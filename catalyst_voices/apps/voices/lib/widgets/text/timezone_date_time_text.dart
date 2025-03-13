@@ -59,14 +59,12 @@ typedef TimezoneDateTimeTextFormatter = String Function(
 class TimezoneDateTimeText extends StatelessWidget {
   final DateTime data;
   final TimezoneDateTimeTextFormatter formatter;
-  final TextStyle? style;
   final bool showTimezone;
 
   const TimezoneDateTimeText(
     this.data, {
     super.key,
     required this.formatter,
-    this.style,
     this.showTimezone = true,
   });
 
@@ -77,6 +75,9 @@ class TimezoneDateTimeText extends StatelessWidget {
     final timezone = context.select<SessionCubit?, TimezonePreferences>(
       (value) => value?.state.settings.timezone ?? TimezonePreferences.local,
     );
+    final timezoneTheme = TimezoneDateTimeTextTheme.maybeOf(context);
+
+    const states = <WidgetState>{};
 
     final effectiveData = switch (timezone) {
       TimezonePreferences.utc => data.toUtc(),
@@ -84,20 +85,40 @@ class TimezoneDateTimeText extends StatelessWidget {
     };
     final string = formatter(context, effectiveData);
 
-    final baseStyle = (textTheme.bodyMedium ?? const TextStyle()).copyWith(
-      color: theme.colors.textOnPrimaryLevel1,
-    );
+    final timestampTextStyle = timezoneTheme?.timestampTextStyle ??
+        WidgetStatePropertyAll(textTheme.bodyMedium);
+    final timezoneTextStyle = timezoneTheme?.timezoneTextStyle ??
+        WidgetStatePropertyAll(textTheme.labelSmall);
 
-    final style = this.style ?? const TextStyle();
-    final effectiveStyle = baseStyle.merge(style);
+    // TODO(damian-molinski): update this color from schema.
+    final backgroundColor = timezoneTheme?.backgroundColor ??
+        const WidgetStatePropertyAll(Color(0xFFE8ECFD));
+    final foregroundColor = timezoneTheme?.foregroundColor ??
+        WidgetStatePropertyAll(theme.colors.textOnPrimaryLevel1);
+
+    final effectiveBackgroundColor = backgroundColor.resolve(states);
+    final effectiveForegroundColor = foregroundColor.resolve(states);
+
+    final timestampStyle =
+        (timestampTextStyle.resolve(states) ?? const TextStyle())
+            .copyWith(color: effectiveForegroundColor);
+    final timezoneStyle =
+        (timezoneTextStyle.resolve(states) ?? const TextStyle())
+            .copyWith(color: effectiveForegroundColor);
 
     return AffixDecorator(
       gap: showTimezone ? 6 : 0,
-      suffix: showTimezone ? _TimezoneCard(timezone) : null,
+      suffix: showTimezone
+          ? _TimezoneCard(
+              timezone,
+              style: timezoneStyle,
+              backgroundColor: effectiveBackgroundColor,
+            )
+          : null,
       child: Text(
         key: const Key('TimezoneDateTimeText'),
         string,
-        style: effectiveStyle,
+        style: timestampStyle,
       ),
     );
   }
@@ -105,22 +126,17 @@ class TimezoneDateTimeText extends StatelessWidget {
 
 class _TimezoneCard extends StatelessWidget {
   final TimezonePreferences data;
+  final TextStyle style;
+  final Color backgroundColor;
 
-  const _TimezoneCard(this.data);
+  const _TimezoneCard(
+    this.data, {
+    required this.style,
+    required this.backgroundColor,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final textTheme = theme.textTheme;
-
-    // TODO(damian-molinski): update this color from schema.
-    const backgroundColor = Color(0xFFE8ECFD);
-    final foregroundColor = theme.colors.textOnPrimaryLevel1;
-
-    final style = (textTheme.labelSmall ?? const TextStyle()).copyWith(
-      color: foregroundColor,
-    );
-
     return Material(
       color: backgroundColor,
       borderRadius: BorderRadius.circular(4),

@@ -16,7 +16,11 @@ void main() {
     setUp(() {
       userObserver = StreamUserObserver();
       keyDerivationService = _FakeKeyDerivationService();
-      authService = AuthService(userObserver, keyDerivationService);
+      authService = AuthService(
+        userObserver,
+        keyDerivationService,
+        const BlockchainConfig(),
+      );
     });
 
     tearDownAll(() async {
