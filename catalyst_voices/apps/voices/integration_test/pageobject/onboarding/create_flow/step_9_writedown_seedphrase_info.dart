@@ -50,7 +50,7 @@ class WritedownSeedphraseInfoPanel extends OnboardingPageBase {
     //         " don't trust, we verify before continuing.   \u2028\u2028It's also good"
     //         " practice to get familiar with using a \nseed phrase if you're new "
     //         "to crypto."));
-    // expect($(nextButton), findsOneWidget);
+    expect($(nextButton), findsOneWidget);
     // expect($(backButton), findsOneWidget);
   }
 }
