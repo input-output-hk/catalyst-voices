@@ -13,7 +13,8 @@ class PasswordInputPanel extends OnboardingPageBase {
   final passwordInputField = const Key('PasswordInputField');
   final passwordConfirmInputField = const Key('PasswordConfirmInputField');
   final passwordStrengthLabel = const Key('PasswordStrengthLabel');
-
+  final enterPasswordText = const Key('EnterPasswordText');
+  final voicesTextField = const Key('VoicesTextField');
   Future<void> clickNext() async {
     await $(nextButton).tap();
   }
@@ -81,7 +82,12 @@ class PasswordInputPanel extends OnboardingPageBase {
     }
   }
 
-  Future<void> verifyDetailsPanel() async {}
+  Future<void> verifyDetailsPanel() async {
+    expect($(enterPasswordText), T.get('Enter password'));
+    expect($(passwordInputField), findsOneWidget);
+    expect($(passwordConfirmInputField), findsOneWidget);
+    expect($(passwordConfirmInputField).$(voicesTextField), findsOneWidget);
+  }
 
   Future<void> verifyInfoPanel() async {
     expect(await infoPartHeaderTitleText(), T.get('Catalyst Keychain'));

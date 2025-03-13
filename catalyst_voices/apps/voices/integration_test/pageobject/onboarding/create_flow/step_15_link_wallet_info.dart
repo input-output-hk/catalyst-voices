@@ -1,3 +1,4 @@
+import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -26,7 +27,22 @@ class LinkWalletInfoPanel extends OnboardingPageBase {
     await verifyDetailsPanel();
   }
 
-  Future<void> verifyDetailsPanel() async {}
+  Future<void> verifyDetailsPanel() async {
+    expect(
+        $(registrationDetailsTitle).$(Text).text,
+        T.get('Link Cardano Wallet & Catalyst Roles '
+            '\u2028to you Catalyst Keychain.'));
+
+    expect($(registrationDetailsBody).$(Text).text, 
+    T.get("You're almost there! This "
+    'is the final and most important step in your account '
+    "setup. \u2028\u2028We're going to link a Cardano Wallet to your "
+    'Catalyst Keychain, so you can start collecting Role Keys.  '
+    "\u2028\u2028We'll start with your Voter/Commenter Key by default. "
+    'You can decide to add a Proposer Key if you want.'));
+
+    expect($(chooseCardanoWalletButton),findsOneWidget);
+  }
 
   Future<void> verifyInfoPanel() async {
     expect(
@@ -38,10 +54,19 @@ class LinkWalletInfoPanel extends OnboardingPageBase {
       T.get('Link your Cardano wallet'),
     );
     //temporary: check for specific picture (blue key icon)
+    expect(
+      find.byWidgetPredicate(
+        (widget) =>
+            widget is CatalystSvgPicture &&
+            (widget.bytesLoader as dynamic).assetName ==
+                'assets/images/keychain.svg',
+      ),
+      findsOneWidget,
+    );
     expect(infoPartTaskPicture(), findsOneWidget);
     expect($(progressBar), findsOneWidget);
     expect(
-      infoPartLearnMoreText(),
+      $(learnMoreButton).$(Text).text,
       T.get('Learn More'),
     );
   }

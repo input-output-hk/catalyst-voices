@@ -36,7 +36,7 @@ class SeedPhraseInstructionsPanel extends OnboardingPageBase {
     );
     expect(infoPartTaskPicture(), findsOneWidget);
     expect(
-      infoPartLearnMoreText(),
+      $(learnMoreButton).$(Text).text,
       T.get('Learn More'),
     );
   }
