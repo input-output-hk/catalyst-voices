@@ -99,7 +99,13 @@ final class SegmentsController extends ValueNotifier<SegmentsControllerState> {
   }
 
   Future<void> _scrollTo(NodeId id) async {
-    final index = value.listItems.indexWhere((e) => e.id == id);
+    final listItems = value.listItems;
+    var index = listItems.indexWhere((e) => e.id == id);
+
+    if (index == -1) {
+      index = listItems.indexWhere((e) => e.id.isChildOf(id));
+    }
+
     if (index == -1) {
       return;
     }
