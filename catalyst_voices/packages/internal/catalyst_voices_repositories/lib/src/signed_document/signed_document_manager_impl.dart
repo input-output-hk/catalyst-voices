@@ -116,7 +116,9 @@ final class _CatalystVerifier implements CatalystCoseVerifier {
     // to the private key which generated the signature and use
     // it for verification, most likely the role0Key is not the correct one.
     final catalystSignature = CatalystSignature.factory.create(signature);
-    return _catalystId.role0Key.verify(data, signature: catalystSignature);
+    return CatalystPublicKey.factory
+        .create(_catalystId.role0Key)
+        .verify(data, signature: catalystSignature);
   }
 }
 

@@ -236,7 +236,7 @@ final class RegistrationServiceImpl implements RegistrationService {
       final catalystId = CatalystId(
         host: _blockchainConfig.host.host,
         username: displayName,
-        role0Key: role0key,
+        role0Key: role0key.publicKeyBytes,
       );
 
       return Account(
@@ -281,7 +281,7 @@ final class RegistrationServiceImpl implements RegistrationService {
     final catalystId = CatalystId(
       host: _blockchainConfig.host.host,
       username: 'Dummy',
-      role0Key: role0key,
+      role0Key: role0key.publicKeyBytes,
     );
 
     return Account(
