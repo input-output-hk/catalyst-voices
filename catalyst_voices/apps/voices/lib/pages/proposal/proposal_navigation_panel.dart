@@ -111,7 +111,16 @@ class _SegmentMenuTile extends StatelessWidget {
         final sections = segment.sections;
         final section = sections.firstWhere((e) => e.id.value == id);
 
-        SegmentsControllerScope.of(context).selectSectionStep(section.id);
+        final NodeId nodeId;
+
+        if (section is SegmentGroupedListViewItems) {
+          final children = (section as SegmentGroupedListViewItems).children;
+          nodeId = children.isNotEmpty ? children.first.id : section.id;
+        } else {
+          nodeId = section.id;
+        }
+
+        SegmentsControllerScope.of(context).selectSectionStep(nodeId);
       },
       selectedItemId: null,
       isExpanded: isExpanded,

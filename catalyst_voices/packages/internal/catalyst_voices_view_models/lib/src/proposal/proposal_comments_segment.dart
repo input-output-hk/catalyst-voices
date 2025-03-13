@@ -2,6 +2,7 @@ import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
+import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 
@@ -75,12 +76,14 @@ final class ViewCommentsSection extends ProposalCommentsSection
   });
 
   @override
-  Iterable<SegmentsListViewItem> get children => comments.map((e) {
-        return CommentListItem(
-          id: NodeId('${id.value}.$e'),
-          message: e,
-        );
-      });
+  Iterable<SegmentsListViewItem> get children {
+    return comments.mapIndexed((index, e) {
+      return CommentListItem(
+        id: id.child('$index'),
+        message: e,
+      );
+    });
+  }
 
   @override
   List<Object?> get props => super.props + [comments];
