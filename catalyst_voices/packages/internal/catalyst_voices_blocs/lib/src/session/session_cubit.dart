@@ -157,7 +157,7 @@ final class SessionCubit extends Cubit<SessionState>
       case SessionStatus.actor:
         return SessionState(
           status: SessionStatus.actor,
-          account: const SessionAccount.mocked(),
+          account: SessionAccount.mocked(),
           spaces: Space.values,
           availableSpaces: Space.values,
           overallSpaces: Space.values,

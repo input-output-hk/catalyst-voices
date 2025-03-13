@@ -33,7 +33,11 @@ void main() {
       when(keychain.getMasterKey)
           .thenAnswer((_) async => _FakeCatalystPrivateKey(Uint8List(32)));
 
-      final account = Account.dummy(keychain: keychain, isActive: true);
+      final account = Account.dummy(
+        catalystId: DummyCatalystIdFactory.create(),
+        keychain: keychain,
+        isActive: true,
+      );
       final user = User.optional(accounts: [account]);
       userObserver.user = user;
 
