@@ -232,7 +232,7 @@ final class ProposalServiceImpl implements ProposalService {
     // TODO(dtscalac): catalyst id should come from the profile
     final catalystId = CatalystId(
       host: _blockchainConfig.host.host,
-      role0Key: role0KeyPair.publicKey,
+      role0Key: role0KeyPair.publicKey.publicKeyBytes,
       role: AccountRole.proposer,
       rotation: 0,
     );
