@@ -16,7 +16,7 @@ def assets(stake_address: str, slot_no: int, network: str):
 
 # cardano cip36 registrations GET
 def cip36_registration(lookup: str, slot_no: int, limit: int, valid: bool):
-    url = f"{URL}/registration/cip36?asat=SLOT:{slot_no}&lookup={lookup}&limit={limit}&invalid={not valid}"
+    url = f"{URL}/registration/cip36?asat=SLOT:{slot_no}&lookup={lookup}&limit={limit}&invalid={str(not valid).lower()}"
     headers = {
         "Authorization": f"Bearer {BEARER_TOKEN}",
         "Content-Type": "application/json",
