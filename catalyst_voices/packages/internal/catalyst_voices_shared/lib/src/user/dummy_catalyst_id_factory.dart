@@ -24,7 +24,7 @@ final class DummyCatalystIdFactory {
     return CatalystId(
       host: host.host,
       username: username,
-      role0Key: role0Key,
+      role0Key: role0Key.publicKeyBytes,
       role: role,
       nonce: nonce ?? Random().nextInt(50000),
     );
