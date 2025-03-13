@@ -19,7 +19,6 @@ void main() {
       authService = AuthService(
         userObserver,
         keyDerivationService,
-        const BlockchainConfig(),
       );
     });
 

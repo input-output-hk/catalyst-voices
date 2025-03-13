@@ -7,6 +7,7 @@ final class ProposalBuilderMetadata extends Equatable {
   final DocumentRef? documentRef;
   final DocumentRef? originalDocumentRef;
   final SignedDocumentRef? templateRef;
+  final String? categoryId;
 
   /// The current iteration version, 0 if not published.
   final int currentIteration;
@@ -16,17 +17,20 @@ final class ProposalBuilderMetadata extends Equatable {
     this.documentRef,
     this.originalDocumentRef,
     this.templateRef,
+    this.categoryId,
     this.currentIteration = 0,
   });
 
   factory ProposalBuilderMetadata.newDraft({
     required SignedDocumentRef templateRef,
+    required String categoryId,
   }) {
     final firstRef = DraftRef.generateFirstRef();
     return ProposalBuilderMetadata(
       publish: ProposalPublish.localDraft,
       documentRef: firstRef,
       templateRef: templateRef,
+      categoryId: categoryId,
       currentIteration: 0,
     );
   }
@@ -37,6 +41,7 @@ final class ProposalBuilderMetadata extends Equatable {
         documentRef,
         originalDocumentRef,
         templateRef,
+        categoryId,
         currentIteration,
       ];
 
@@ -45,12 +50,16 @@ final class ProposalBuilderMetadata extends Equatable {
     Optional<DocumentRef>? documentRef,
     Optional<DocumentRef>? originalDocumentRef,
     Optional<SignedDocumentRef>? templateRef,
+    Optional<String>? categoryId,
+    int? currentIteration,
   }) {
     return ProposalBuilderMetadata(
       publish: publish ?? this.publish,
       documentRef: documentRef.dataOr(this.documentRef),
       originalDocumentRef: originalDocumentRef.dataOr(this.originalDocumentRef),
       templateRef: templateRef.dataOr(this.templateRef),
+      categoryId: categoryId.dataOr(this.categoryId),
+      currentIteration: currentIteration ?? this.currentIteration,
     );
   }
 }

@@ -62,11 +62,19 @@ final class ProposalBuilderBloc
     return documentBuilder!.build();
   }
 
+  DocumentData _buildDocumentData() {
+    return DocumentData(
+      metadata: _buildDocumentMetadata(),
+      content: _documentMapper.toContent(_buildDocument()),
+    );
+  }
+
   DocumentDataMetadata _buildDocumentMetadata() {
     return DocumentDataMetadata(
       type: DocumentType.proposalDocument,
       selfRef: state.metadata.documentRef!,
       template: state.metadata.templateRef,
+      categoryId: state.metadata.categoryId,
     );
   }
 
@@ -121,11 +129,8 @@ final class ProposalBuilderBloc
     try {
       final documentRef = state.metadata.documentRef!;
       final proposalId = documentRef.id;
-      final document = _buildDocument();
-
       final encodedProposal = await _proposalService.encodeProposalForExport(
-        metadata: _buildDocumentMetadata(),
-        content: _documentMapper.toContent(document),
+        document: _buildDocumentData(),
       );
 
       final filename = '${event.filePrefix}_$proposalId';
@@ -262,6 +267,9 @@ final class ProposalBuilderBloc
         document: documentBuilder.build(),
         metadata: ProposalBuilderMetadata.newDraft(
           templateRef: proposalTemplateRef,
+          // TODO(dtscalac): refactor proposal builder to require category ID
+          // as input when creating a new proposal
+          categoryId: 'category_id',
         ),
       );
     });
@@ -284,6 +292,7 @@ final class ProposalBuilderBloc
           documentRef: proposal.selfRef,
           originalDocumentRef: proposal.selfRef,
           currentIteration: proposal.versionCount,
+          categoryId: proposal.categoryId,
         ),
       );
     });
@@ -309,6 +318,9 @@ final class ProposalBuilderBloc
         document: documentBuilder.build(),
         metadata: ProposalBuilderMetadata.newDraft(
           templateRef: ref,
+          // TODO(dtscalac): refactor proposal builder to require category ID
+          // as input when creating a new proposal
+          categoryId: 'category_id',
         ),
       );
     });
@@ -376,10 +388,9 @@ final class ProposalBuilderBloc
   ) async {
     try {
       _logger.info('Publishing proposal');
-      final document = _buildDocument();
+
       await _proposalService.publishProposal(
-        metadata: _buildDocumentMetadata(),
-        content: _documentMapper.toContent(document),
+        document: _buildDocumentData(),
       );
     } catch (error, stackTrace) {
       _logger.severe('PublishProposal', error, stackTrace);
@@ -416,10 +427,10 @@ final class ProposalBuilderBloc
   ) async {
     try {
       _logger.info('Submitting proposal for review');
-      final document = _buildDocument();
+
       await _proposalService.submitProposalForReview(
-        metadata: _buildDocumentMetadata(),
-        content: _documentMapper.toContent(document),
+        ref: state.metadata.documentRef! as SignedDocumentRef,
+        categoryId: state.metadata.categoryId!,
       );
     } catch (error, stackTrace) {
       _logger.severe('SubmitProposalForReview', error, stackTrace);

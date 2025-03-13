@@ -9,7 +9,6 @@ abstract interface class AuthService implements AuthTokenProvider {
   const factory AuthService(
     UserObserver userObserver,
     KeyDerivationService keyDerivationService,
-    BlockchainConfig blockchainConfig,
   ) = AuthServiceImpl;
 }
 
@@ -18,19 +17,18 @@ final class AuthServiceImpl implements AuthService {
 
   final UserObserver _userObserver;
   final KeyDerivationService _keyDerivationService;
-  final BlockchainConfig _blockchainConfig;
 
   const AuthServiceImpl(
     this._userObserver,
     this._keyDerivationService,
-    this._blockchainConfig,
   );
 
   @override
   Future<String> createRbacToken() async {
-    final keyPair = await _getRole0KeyPair();
+    final account = await _getAccount();
+    final keyPair = await _getRole0KeyPair(account);
 
-    final catalystId = await _createCatalystId(keyPair);
+    final catalystId = _createCatalystId(account);
     final catalystIdString = catalystId.toUri().toStringWithoutScheme();
     final toBeSigned = utf8.encode('$tokenPrefix.$catalystIdString.');
     final signature = await keyPair.privateKey.sign(toBeSigned);
@@ -39,22 +37,25 @@ final class AuthServiceImpl implements AuthService {
     return '$tokenPrefix.$catalystIdString.$encodedSignature';
   }
 
-  Future<CatalystId> _createCatalystId(CatalystKeyPair keyPair) async {
+  CatalystId _createCatalystId(Account account) {
     final dateTime = DateTimeExt.now();
+    final secondsSinceEpoch =
+        dateTime.millisecondsSinceEpoch ~/ Duration.millisecondsPerSecond;
 
-    return CatalystId(
-      host: _blockchainConfig.host.host,
-      role0Key: keyPair.publicKey,
-      nonce: dateTime.millisecondsSinceEpoch ~/ Duration.millisecondsPerSecond,
+    return account.catalystId.copyWith(
+      nonce: Optional(secondsSinceEpoch),
     );
   }
 
-  Future<CatalystKeyPair> _getRole0KeyPair() async {
+  Future<Account> _getAccount() async {
     final account = _userObserver.user.activeAccount;
     if (account == null) {
       throw StateError('Cannot create rbac token, account missing');
     }
+    return account;
+  }
 
+  Future<CatalystKeyPair> _getRole0KeyPair(Account account) async {
     final masterKey = await account.keychain.getMasterKey();
     if (masterKey == null) {
       throw StateError('Cannot publish a proposal, master key missing');

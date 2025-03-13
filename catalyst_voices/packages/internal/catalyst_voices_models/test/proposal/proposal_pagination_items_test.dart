@@ -14,6 +14,7 @@ void main() {
         version: const Uuid().v7(),
       ),
       category: 'Cardano Use Cases / MVP',
+      categoryId: 'dummy_category_id',
       title: 'Proposal Title that rocks the world',
       updateDate: DateTime.now().minusDays(2),
       fundsRequested: Coin.fromAda(100000),

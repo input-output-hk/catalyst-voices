@@ -28,6 +28,7 @@ void main() {
       title: 'Proposal 1',
       description: 'Description 1',
       category: '',
+      categoryId: 'dummy_category_id',
       updateDate: DateTime.now(),
       fundsRequested: const Coin(100000),
       status: ProposalStatus.draft,
