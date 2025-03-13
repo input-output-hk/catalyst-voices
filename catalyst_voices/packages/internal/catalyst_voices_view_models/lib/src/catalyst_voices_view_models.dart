@@ -21,7 +21,6 @@ export 'exception/localized_not_found_exception.dart';
 export 'exception/localized_unknown_exception.dart';
 export 'menu/menu_item.dart';
 export 'menu/popup_menu_item.dart';
-export 'proposal/comment.dart';
 export 'proposal/proposal_comments_segment.dart';
 export 'proposal/proposal_overview_segment.dart';
 export 'proposal/proposal_pagination_view_model.dart';
