@@ -236,8 +236,7 @@ final class RegistrationServiceImpl implements RegistrationService {
       final role0key = await masterKey.derivePublicKey();
 
       final catalystId = CatalystId(
-        // TODO(damian): inject
-        host: CatalystIdHost.cardanoPreprod.host,
+        host: _blockchainConfig.host.host,
         username: displayName,
         role0Key: role0key,
       );
@@ -277,8 +276,7 @@ final class RegistrationServiceImpl implements RegistrationService {
     final role0key = await masterKey.derivePublicKey();
 
     final catalystId = CatalystId(
-      // TODO(damian): inject
-      host: CatalystIdHost.cardanoPreprod.host,
+      host: _blockchainConfig.host.host,
       username: 'Dummy',
       role0Key: role0key,
     );
