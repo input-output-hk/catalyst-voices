@@ -28,6 +28,7 @@ class _AccountDisplayNameTileState extends State<AccountDisplayNameTile> {
   @override
   Widget build(BuildContext context) {
     return EditableTile(
+      key: const Key('AccountDisplayNameTextField'),
       title: context.l10n.displayName,
       onChanged: _onEditModeChange,
       isEditMode: _isEditMode,

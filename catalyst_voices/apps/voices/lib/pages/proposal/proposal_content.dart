@@ -114,6 +114,7 @@ class _SegmentsListView extends StatelessWidget {
               description: data.description,
               status: data.status,
               createdAt: data.createdAt,
+              warningCreatedAt: data.warningCreatedAt,
               tag: data.tag,
               commentsCount: data.commentsCount,
               fundsRequested: data.fundsRequested,

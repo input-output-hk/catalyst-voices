@@ -48,7 +48,7 @@ class AppBarPage {
   }
 
   Future<void> accountPopupBtnClick() async {
-    await $(accountPopupBtn).tap();
+    await $(sessionAccountPopupMenuAvatar).tap();
   }
 
   Future<void> lockBtnClick() async {

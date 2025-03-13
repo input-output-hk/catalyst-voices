@@ -282,6 +282,7 @@ final class ProposalBuilderBloc
         metadata: ProposalBuilderMetadata(
           publish: proposal.publish,
           documentRef: proposal.selfRef,
+          originalDocumentRef: proposal.selfRef,
           currentIteration: proposal.versionCount,
         ),
       );
@@ -319,7 +320,11 @@ final class ProposalBuilderBloc
   ) async {
     try {
       _logger.info('load state');
-      emit(const ProposalBuilderState(isChanging: true));
+      emit(
+        const ProposalBuilderState(
+          isChanging: true,
+        ),
+      );
       _documentBuilder = null;
 
       final newState = await stateBuilder();
@@ -388,16 +393,19 @@ final class ProposalBuilderBloc
     Document document,
   ) async {
     final ref = state.metadata.documentRef!;
-    final nextRef = await _updateDraftProposal(
+    final nextRef = await _upsertDraftProposal(
       ref,
       _documentMapper.toContent(document),
     );
 
-    if (nextRef != null && ref != nextRef) {
+    if (ref != nextRef) {
       final updatedMetadata = state.metadata.copyWith(
         documentRef: Optional(nextRef),
+        originalDocumentRef: Optional(nextRef),
       );
-      final updatedState = state.copyWith(metadata: updatedMetadata);
+      final updatedState = state.copyWith(
+        metadata: updatedMetadata,
+      );
       emit(updatedState);
     }
   }
@@ -419,15 +427,26 @@ final class ProposalBuilderBloc
     }
   }
 
-  Future<DraftRef?> _updateDraftProposal(
+  Future<DraftRef?> _upsertDraftProposal(
     DocumentRef currentRef,
     DocumentDataContent document,
   ) async {
-    final nextRef = currentRef.nextVersion();
-    await _proposalService.updateDraftProposal(
-      ref: nextRef,
-      content: document,
-    );
+    final originalRef = state.metadata.originalDocumentRef;
+    DraftRef nextRef;
+    if (originalRef == null) {
+      final template = state.metadata.templateRef;
+
+      nextRef = await _proposalService.createDraftProposal(
+        content: document,
+        template: template!,
+      );
+    } else {
+      nextRef = currentRef.nextVersion();
+      await _proposalService.updateDraftProposal(
+        ref: nextRef,
+        content: document,
+      );
+    }
 
     return nextRef;
   }

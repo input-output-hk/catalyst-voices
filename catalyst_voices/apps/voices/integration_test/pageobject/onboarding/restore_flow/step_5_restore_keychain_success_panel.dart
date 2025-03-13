@@ -43,16 +43,7 @@ class RestoreKeychainSuccessPanel extends OnboardingPageBase {
     await RestoreKeychainInputPanel($).goto();
     await RestoreKeychainInputPanel($).enterSeedPhrase(seedPhrase);
     await RestoreKeychainInputPanel($).clickNext();
-    // TODO(emiride): remove this when backend is connected
-    while (true) {
-      try {
-        await $(recoveryAccountSuccessTitle)
-            .waitUntilVisible(timeout: const Duration(seconds: 5));
-        break;
-      } catch (e) {
-        await $(recoveryAccountError).$(CommonPage($).errorRetryBtn).tap();
-      }
-    }
+    await _ensureWalletIsRecovered();
   }
 
   Future<void> clickSetUnlockPassword() async {
@@ -98,5 +89,16 @@ class RestoreKeychainSuccessPanel extends OnboardingPageBase {
       $(registrationInfoPanel).$(CommonPage($).decorData).$(Text).text,
       'Learn More',
     );
+  }
+
+  Future<void> _ensureWalletIsRecovered() async {
+    try {
+      await $(recoveryAccountSuccessTitle)
+          .waitUntilVisible(timeout: const Duration(seconds: 5));
+    } catch (e) {
+      await $(recoveryAccountError).$(CommonPage($).errorRetryBtn).tap();
+    }
+    await $(recoveryAccountSuccessTitle)
+        .waitUntilVisible(timeout: const Duration(seconds: 5));
   }
 }

@@ -14,8 +14,10 @@ final class DummyCatalystIdFactory {
     AccountRole? role,
     int? nonce,
   }) {
+    /* cSpell:disable */
     final role0KeyBytes =
         base64UrlNoPadDecode('FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE');
+    /* cSpell:enable */
 
     final role0Key = _DummyCatalystPublicKeyFactory().create(role0KeyBytes);
 
