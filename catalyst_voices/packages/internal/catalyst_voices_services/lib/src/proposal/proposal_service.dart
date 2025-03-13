@@ -14,6 +14,7 @@ abstract interface class ProposalService {
     SignedDocumentManager signedDocumentManager,
     UserService userService,
     KeyDerivationService keyDerivationService,
+    BlockchainConfig blockchainConfig,
   ) = ProposalServiceImpl;
 
   Future<List<String>> addFavoriteProposal(String proposalId);
@@ -96,6 +97,7 @@ final class ProposalServiceImpl implements ProposalService {
   final SignedDocumentManager _signedDocumentManager;
   final UserService _userService;
   final KeyDerivationService _keyDerivationService;
+  final BlockchainConfig _blockchainConfig;
 
   const ProposalServiceImpl(
     this._proposalRepository,
@@ -103,6 +105,7 @@ final class ProposalServiceImpl implements ProposalService {
     this._signedDocumentManager,
     this._userService,
     this._keyDerivationService,
+    this._blockchainConfig,
   );
 
   @override
@@ -227,9 +230,8 @@ final class ProposalServiceImpl implements ProposalService {
     );
 
     // TODO(dtscalac): catalyst id should come from the profile
-    // TODO(dtscalac): don't hardcode the host, it should be injected by DI
     final catalystId = CatalystId(
-      host: CatalystIdHost.cardanoPreprod.host,
+      host: _blockchainConfig.host.host,
       role0Key: role0KeyPair.publicKey,
       role: AccountRole.proposer,
       rotation: 0,
