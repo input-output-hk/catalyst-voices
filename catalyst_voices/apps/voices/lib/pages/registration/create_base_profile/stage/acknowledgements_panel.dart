@@ -49,6 +49,7 @@ class _Title extends StatelessWidget {
     );
 
     return Text(
+      key: const ValueKey('AcknowledgementsTitle'),
       context.l10n.createBaseProfileAcknowledgementsTitle,
       style: textStyle,
     );
@@ -77,6 +78,7 @@ class _TosCheckbox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return VoicesCheckbox(
+      key: const ValueKey('TosCheckbox'),
       value: isChecked,
       label: const TosRichText(),
       onChanged: (value) {
