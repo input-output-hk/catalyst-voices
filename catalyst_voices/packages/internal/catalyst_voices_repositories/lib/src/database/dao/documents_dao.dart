@@ -53,7 +53,7 @@ abstract interface class DocumentsDao {
 
   /// Returns a list of version of ref object.
   /// Can be used to get versions count.
-  Future<List<String>> queryVersionIds({required String id});
+  Future<List<DocumentEntity>> queryVersionsOfId({required String id});
 
   /// Inserts all documents and metadata. On conflicts ignores duplicates.
   Future<void> saveAll(
@@ -199,16 +199,14 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
   }
 
   @override
-  Future<List<String>> queryVersionIds({required String id}) {
+  Future<List<DocumentEntity>> queryVersionsOfId({required String id}) {
     final query = select(documents)
       ..where((tbl) => _filterRef(tbl, SignedDocumentRef(id: id)))
       ..orderBy([
         (u) => OrderingTerm.desc(u.verHi),
       ]);
 
-    return query
-        .map((doc) => UuidHiLo(high: doc.verHi, low: doc.verLo).toString())
-        .get();
+    return query.get();
   }
 
   @override

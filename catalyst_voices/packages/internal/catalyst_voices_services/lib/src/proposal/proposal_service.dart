@@ -283,9 +283,16 @@ final class ProposalServiceImpl implements ProposalService {
         .switchMap((documents) async* {
       final proposalsStreams = await Future.wait(
         documents.map((doc) async {
-          final versionIds = await _documentRepository.queryVersionIds(
+          final versionIds = await _documentRepository.queryVersionsOfId(
             id: doc.metadata.selfRef.id,
           );
+          final versionsData = versionIds
+              .map(
+                (e) => BaseProposalData(
+                  document: e,
+                ),
+              )
+              .toList();
 
           return _documentRepository
               .watchCount(
@@ -296,7 +303,7 @@ final class ProposalServiceImpl implements ProposalService {
             final proposalData = ProposalData(
               document: doc,
               categoryId: DocumentType.categoryParametersDocument.uuid,
-              versions: versionIds,
+              versions: versionsData,
               commentsCount: commentsCount,
             );
             return Proposal.fromData(proposalData);

@@ -5,7 +5,8 @@ import 'package:catalyst_voices/widgets/common/proposal_status_container.dart';
 import 'package:catalyst_voices/widgets/document/document_comments_chip.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
-import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart'
+    hide ProposalVersion;
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 

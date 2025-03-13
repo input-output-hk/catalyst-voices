@@ -91,12 +91,9 @@ class _Details extends StatelessWidget {
           version: proposal.versionCount.toString(),
           useInternalBackground: !isPublished,
         ),
-        Offstage(
-          offstage: proposal.updateDate == null,
-          child: DayMonthTimeTextWithTooltip(
-            datetime: proposal.updateDate!,
-            color: isPublished ? context.colors.textOnPrimaryWhite : null,
-          ),
+        DayMonthTimeTextWithTooltip(
+          datetime: proposal.updateDate,
+          color: isPublished ? context.colors.textOnPrimaryWhite : null,
         ),
         const Spacer(),
         Offstage(
