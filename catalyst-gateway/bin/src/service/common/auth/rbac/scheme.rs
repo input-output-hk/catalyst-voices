@@ -192,13 +192,15 @@ async fn checker_api_catalyst_auth(
     Ok(token)
 }
 
-/// Returns a list of all registrations for the given Catalyst ID from the database.
+/// Returns a sorted list of all registrations for the given Catalyst ID from the
+/// database.
 async fn indexed_registrations(catalyst_id: &IdUri) -> poem::Result<Vec<Query>> {
     let session = CassandraSession::get(true).ok_or_else(|| {
         error!("Failed to acquire db session");
         service_unavailable()
     })?;
-    Query::execute(&session, QueryParams {
+
+    let mut result: Vec<_> = Query::execute(&session, QueryParams {
         catalyst_id: catalyst_id.clone().into(),
     })
     .and_then(|r| r.try_collect().map_err(Into::into))
@@ -212,7 +214,10 @@ async fn indexed_registrations(catalyst_id: &IdUri) -> poem::Result<Vec<Query>> 
             error!(id=%error.id(), error=?e);
             ErrorResponses::ServerError(Json(error)).into()
         }
-    })
+    })?;
+
+    result.sort_by_key(|r| r.slot_no);
+    Ok(result)
 }
 
 /// Returns a 503 error instance.
