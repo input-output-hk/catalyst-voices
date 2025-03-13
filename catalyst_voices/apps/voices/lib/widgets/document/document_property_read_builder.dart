@@ -140,7 +140,7 @@ class _DocumentPropertyReadBuilderState
       case DocumentSingleLineHttpsUrlEntrySchema():
         final link = schema.castValue(value);
 
-        return DocumentLinkListItem(
+        return DocumentLinkReadItem(
           id: property.nodeId,
           title: schema.title,
           value: link,
@@ -254,7 +254,7 @@ class _ListItemBuilder extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return switch (item) {
-      DocumentLinkListItem(:final title, :final value) => _ListItem(
+      DocumentLinkReadItem(:final title, :final value) => _ListItem(
           title: title,
           value: value != null ? LinkText(value) : const Text('-'),
           isMultiline: true,
