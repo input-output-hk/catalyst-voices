@@ -27,6 +27,7 @@ export 'containers/sidebar_scaffold.dart';
 export 'containers/space_scaffold.dart';
 export 'containers/space_side_panel.dart';
 export 'containers/workspace_text_tile_container.dart';
+export 'document/document_property_read_builder.dart';
 export 'document/document_tag_chip.dart';
 export 'document/document_version_selector.dart';
 export 'document_builder/document_property_builder.dart';
