@@ -42,6 +42,7 @@ class EditableTile extends StatelessWidget {
       action: Offstage(
         offstage: !isEditEnabled,
         child: VoicesEditSaveButton(
+          key: const Key('EditableTileEditSaveButton'),
           onTap: _toggleEditMode,
           isEditing: isEditMode,
           hasError: errorText != null,

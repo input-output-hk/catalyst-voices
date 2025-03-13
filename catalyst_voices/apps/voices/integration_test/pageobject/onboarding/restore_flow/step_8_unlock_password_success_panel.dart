@@ -26,6 +26,10 @@ class UnlockPasswordSuccessPanel extends OnboardingPageBase {
     await $(recoverySuccessGoToDashboardButton).tap();
   }
 
+  Future<void> clickGoToAccount() async {
+    await $(recoverySuccessGoAccountButton).tap();
+  }
+
   @override
   Future<void> verifyPageElements() async {
     await verifyInfoPanel();
