@@ -98,7 +98,7 @@ abstract interface class DocumentRepository {
   /// Returns the reference to the imported document.
   Future<DocumentRef> importDocument({required Uint8List data});
 
-  /// Returns a list of version of ref object.
+  /// Returns a list of version for given [id].
   ///
   /// Can be used to get versions count.
   Future<List<ProposalDocument>> queryVersionsOfId({required String id});
@@ -300,6 +300,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     await _remoteDocuments.upload(document);
   }
 
+  @visibleForTesting
   Stream<List<DocumentsDataWithRefData>> watchAllDocuments({
     int? limit,
     bool unique = false,

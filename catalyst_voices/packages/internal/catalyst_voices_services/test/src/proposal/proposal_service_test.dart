@@ -1,4 +1,3 @@
-// Create mocks
 import 'dart:async';
 
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -131,7 +130,6 @@ void main() {
     test(
       'watchProposalsDocuments reacts to comments count changes',
       () async {
-        // TODO(damian-molinski): JSONB filtering
         const proposalTemplate = DocumentSchema(
           parentSchemaUrl: '',
           schemaSelfUrl: '',
@@ -145,12 +143,19 @@ void main() {
         final proposalId2 = const Uuid().v7();
         final versionId = const Uuid().v7();
 
+        final proposalRef1 = SignedDocumentRef(
+          id: proposalId1,
+          version: versionId,
+        );
+
+        final proposalRef2 = SignedDocumentRef(
+          id: proposalId2,
+          version: versionId,
+        );
+
         final proposalData1 = ProposalDocument(
           metadata: ProposalMetadata(
-            selfRef: SignedDocumentRef(
-              id: proposalId1,
-              version: versionId,
-            ),
+            selfRef: proposalRef1,
           ),
           document: const Document(
             schema: proposalTemplate,
@@ -160,10 +165,7 @@ void main() {
 
         final proposalData2 = ProposalDocument(
           metadata: ProposalMetadata(
-            selfRef: SignedDocumentRef(
-              id: proposalId1,
-              version: versionId,
-            ),
+            selfRef: proposalRef2,
           ),
           document: const Document(
             schema: proposalTemplate,
@@ -181,25 +183,31 @@ void main() {
         ).thenAnswer((_) => proposalsStream);
 
         when(
-          () => mockDocumentRepository.queryVersionsOfId(
-            id: any(named: 'id'),
+          () => mockProposalRepository.queryVersionsOfId(
+            id: proposalRef1.id,
           ),
-        ).thenAnswer((_) => Future.value([proposalData1, proposalData2]));
+        ).thenAnswer((_) => Future.value([proposalData1]));
+
+        when(
+          () => mockProposalRepository.queryVersionsOfId(
+            id: proposalRef2.id,
+          ),
+        ).thenAnswer((_) => Future.value([proposalData2]));
 
         final commentsStream1 =
             Stream.fromIterable([5, 10]).asBroadcastStream();
         final commentsStream2 = Stream.fromIterable([3, 7]).asBroadcastStream();
 
         when(
-          () => mockDocumentRepository.watchCount(
-            ref: SignedDocumentRef(id: proposalId1),
+          () => mockProposalRepository.watchCount(
+            ref: proposalRef1,
             type: DocumentType.commentTemplate,
           ),
         ).thenAnswer((_) => commentsStream1);
 
         when(
-          () => mockDocumentRepository.watchCount(
-            ref: SignedDocumentRef(id: proposalId2),
+          () => mockProposalRepository.watchCount(
+            ref: proposalRef2,
             type: DocumentType.commentTemplate,
           ),
         ).thenAnswer((_) => commentsStream2);
@@ -215,7 +223,6 @@ void main() {
           ]),
         );
       },
-      // skip: true,
     );
   });
 }
