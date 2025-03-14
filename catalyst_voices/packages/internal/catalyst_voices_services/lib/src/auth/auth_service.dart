@@ -9,7 +9,6 @@ abstract interface class AuthService implements AuthTokenProvider {
   const factory AuthService(
     UserObserver userObserver,
     KeyDerivationService keyDerivationService,
-    BlockchainConfig blockchainConfig,
   ) = AuthServiceImpl;
 }
 
@@ -18,51 +17,49 @@ final class AuthServiceImpl implements AuthService {
 
   final UserObserver _userObserver;
   final KeyDerivationService _keyDerivationService;
-  final BlockchainConfig _blockchainConfig;
 
   const AuthServiceImpl(
     this._userObserver,
     this._keyDerivationService,
-    this._blockchainConfig,
   );
 
   @override
   Future<String> createRbacToken() async {
-    final keyPair = await _getRole0KeyPair();
+    final account = await _getAccount();
 
-    final catalystId = await _createCatalystId(keyPair);
-    final catalystIdString = catalystId.toUri().toStringWithoutScheme();
-    final toBeSigned = utf8.encode('$tokenPrefix.$catalystIdString.');
-    final signature = await keyPair.privateKey.sign(toBeSigned);
-    final encodedSignature = base64UrlNoPadEncode(signature.bytes);
+    return account.keychain.getMasterKey().use((masterKey) {
+      final keyPair = _keyDerivationService.deriveAccountRoleKeyPair(
+        masterKey: masterKey,
+        role: AccountRole.root,
+      );
 
-    return '$tokenPrefix.$catalystIdString.$encodedSignature';
+      return keyPair.use((keyPair) async {
+        final catalystId = _createCatalystId(account);
+        final catalystIdString = catalystId.toUri().toStringWithoutScheme();
+        final toBeSigned = utf8.encode('$tokenPrefix.$catalystIdString.');
+        final signature = await keyPair.privateKey.sign(toBeSigned);
+        final encodedSignature = base64UrlNoPadEncode(signature.bytes);
+
+        return '$tokenPrefix.$catalystIdString.$encodedSignature';
+      });
+    });
   }
 
-  Future<CatalystId> _createCatalystId(CatalystKeyPair keyPair) async {
+  CatalystId _createCatalystId(Account account) {
     final dateTime = DateTimeExt.now();
+    final secondsSinceEpoch =
+        dateTime.millisecondsSinceEpoch ~/ Duration.millisecondsPerSecond;
 
-    return CatalystId(
-      host: _blockchainConfig.host.host,
-      role0Key: keyPair.publicKey.publicKeyBytes,
-      nonce: dateTime.millisecondsSinceEpoch ~/ Duration.millisecondsPerSecond,
+    return account.catalystId.copyWith(
+      nonce: Optional(secondsSinceEpoch),
     );
   }
 
-  Future<CatalystKeyPair> _getRole0KeyPair() async {
+  Future<Account> _getAccount() async {
     final account = _userObserver.user.activeAccount;
     if (account == null) {
       throw StateError('Cannot create rbac token, account missing');
     }
-
-    final masterKey = await account.keychain.getMasterKey();
-    if (masterKey == null) {
-      throw StateError('Cannot publish a proposal, master key missing');
-    }
-
-    return _keyDerivationService.deriveAccountRoleKeyPair(
-      masterKey: masterKey,
-      role: AccountRole.root,
-    );
+    return account;
   }
 }

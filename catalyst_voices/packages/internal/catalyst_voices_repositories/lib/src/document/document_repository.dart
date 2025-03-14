@@ -43,14 +43,13 @@ abstract interface class DocumentRepository {
     required DraftRef ref,
   });
 
-  /// Encodes the [content] to exportable format.
+  /// Encodes the [document] to exportable format.
   ///
   /// It does not save the document anywhere on the disk,
   /// it only encodes a document as [Uint8List]
   /// so that it can be saved as a file.
   Future<Uint8List> encodeDocumentForExport({
-    required DocumentDataMetadata metadata,
-    required DocumentDataContent content,
+    required DocumentData document,
   });
 
   /// Returns list of refs to all published and any refs it may hold.
@@ -86,6 +85,10 @@ abstract interface class DocumentRepository {
   /// Returns the reference to the imported document.
   Future<DocumentRef> importDocument({required Uint8List data});
 
+  Future<void> publishDocument({
+    required SignedDocument document,
+  });
+
   /// Returns a list of version of ref object.
   ///
   /// Can be used to get versions count.
@@ -99,10 +102,6 @@ abstract interface class DocumentRepository {
   Future<void> updateDocumentDraft({
     required DraftRef ref,
     required DocumentDataContent content,
-  });
-
-  Future<void> uploadDocument({
-    required SignedDocument document,
   });
 
   Stream<int> watchCount({
@@ -175,14 +174,9 @@ final class DocumentRepositoryImpl implements DocumentRepository {
 
   @override
   Future<Uint8List> encodeDocumentForExport({
-    required DocumentDataMetadata metadata,
-    required DocumentDataContent content,
+    required DocumentData document,
   }) async {
-    final documentDataDto = DocumentDataDto(
-      metadata: DocumentDataMetadataDto.fromModel(metadata),
-      content: DocumentDataContentDto.fromModel(content),
-    );
-
+    final documentDataDto = DocumentDataDto.fromModel(document);
     final jsonData = documentDataDto.toJson();
     return json.fuse(utf8).encode(jsonData) as Uint8List;
   }
@@ -268,6 +262,11 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   }
 
   @override
+  Future<void> publishDocument({required SignedDocument document}) async {
+    await _remoteDocuments.publish(document);
+  }
+
+  @override
   Future<List<String>> queryVersionIds({required String id}) {
     return _localDocuments.queryVersionIds(id: id);
   }
@@ -281,11 +280,6 @@ final class DocumentRepositoryImpl implements DocumentRepository {
       ref: ref,
       content: content,
     );
-  }
-
-  @override
-  Future<void> uploadDocument({required SignedDocument document}) async {
-    await _remoteDocuments.upload(document);
   }
 
   Stream<List<DocumentsDataWithRefData>> watchAllDocuments({
