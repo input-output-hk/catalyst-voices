@@ -52,7 +52,7 @@ const _metadata = SignedDocumentMetadata(
 
 final _catalystId = CatalystId(
   host: CatalystIdHost.cardanoPreprod.host,
-  role0Key: _publicKey,
+  role0Key: _publicKey.publicKeyBytes,
 );
 
 final _privateKey = _FakeCatalystPrivateKey(bytes: _privateKeyBytes);
