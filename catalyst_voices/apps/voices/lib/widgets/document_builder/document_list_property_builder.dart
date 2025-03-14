@@ -30,7 +30,7 @@ class _DocumentListPropertyBuilderState
 
   @override
   Widget build(BuildContext context) {
-    return _FromField(
+    return _FormField(
       value: widget.property,
       validator: (property) => _validator(context, property),
       autovalidateMode: _autovalidateMode,
@@ -56,8 +56,8 @@ class _DocumentListPropertyBuilderState
   }
 }
 
-class _FromField extends VoicesFormField<DocumentListProperty> {
-  _FromField({
+class _FormField extends VoicesFormField<DocumentListProperty> {
+  _FormField({
     required super.value,
     super.validator,
     super.autovalidateMode,
