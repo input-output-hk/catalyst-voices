@@ -43,39 +43,46 @@ void main() {
   });
 
   group(DocumentRepository, () {
-    test('getProposalDocument returns correct model', () async {
-      // Given
-      final templateData = await VoicesDocumentsTemplates.proposalF14Schema;
-      final proposalData = await VoicesDocumentsTemplates.proposalF14Document;
+    // TODO(LynxLynxx): change test to new implementation
+    test(
+      'getDocument returns correct model',
+      () async {
+        // Given
+        final templateData = await VoicesDocumentsTemplates.proposalF14Schema;
+        final proposalData = await VoicesDocumentsTemplates.proposalF14Document;
 
-      final template = DocumentDataFactory.build(
-        selfRef: DocumentRefFactory.buildSigned(id: mockedTemplateUuid),
-        type: DocumentType.proposalTemplate,
-        content: DocumentDataContent(templateData),
-      );
-      final proposal = DocumentDataFactory.build(
-        selfRef: DocumentRefFactory.buildSigned(id: mockedDocumentUuid),
-        type: DocumentType.proposalDocument,
-        template: template.ref,
-        content: DocumentDataContent(proposalData),
-      );
+        final template = DocumentDataFactory.build(
+          selfRef: DocumentRefFactory.buildSigned(id: mockedTemplateUuid),
+          type: DocumentType.proposalTemplate,
+          content: DocumentDataContent(templateData),
+        );
+        final proposal = DocumentDataFactory.build(
+          selfRef: DocumentRefFactory.buildSigned(id: mockedDocumentUuid),
+          type: DocumentType.proposalDocument,
+          template: template.ref,
+          content: DocumentDataContent(proposalData),
+        );
 
-      when(() => remoteDocuments.get(ref: template.ref))
-          .thenAnswer((_) => Future.value(template));
-      when(() => remoteDocuments.get(ref: proposal.ref))
-          .thenAnswer((_) => Future.value(proposal));
+        when(() => remoteDocuments.get(ref: template.ref))
+            .thenAnswer((_) => Future.value(template));
+        when(() => remoteDocuments.get(ref: proposal.ref))
+            .thenAnswer((_) => Future.value(proposal));
 
-      // When
-      final ref = proposal.ref;
-      final proposalDocument = await repository.getProposalDocument(
-        ref: ref,
-      );
+        // When
+        final ref = proposal.ref;
+        final proposalDocument = await repository.getDocumentData(
+          ref: ref,
+        );
 
-      // Then
-      expect(proposalDocument.metadata.selfRef, proposal.metadata.selfRef);
-    });
+        // Then
+        expect(
+          proposalDocument.metadata.selfRef,
+          proposal.metadata.selfRef,
+        );
+      },
+    );
 
-    test('getProposalDocument correctly propagates errors', () async {
+    test('getDocument correctly propagates errors', () async {
       // Given
       final templateRef = SignedDocumentRef(
         id: mockedTemplateUuid,
@@ -91,11 +98,11 @@ void main() {
       when(() => remoteDocuments.get(ref: templateRef))
           .thenAnswer((_) => Future.error(DocumentNotFound(ref: templateRef)));
       when(() => remoteDocuments.get(ref: proposal.ref))
-          .thenAnswer((_) => Future.value(proposal));
+          .thenAnswer((_) => Future.error(DocumentNotFound(ref: templateRef)));
 
       // When
       final ref = proposal.ref;
-      final proposalDocumentFuture = repository.getProposalDocument(
+      final proposalDocumentFuture = repository.getDocumentData(
         ref: ref,
       );
 

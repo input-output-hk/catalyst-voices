@@ -31,7 +31,6 @@ class _WorkspacePageState extends State<WorkspacePage>
           WorkspaceHeader(),
           Expanded(
             child: Stack(
-              fit: StackFit.expand,
               children: [
                 WorkspaceMyProposalsSelector(),
                 WorkspaceLoadingSelector(),

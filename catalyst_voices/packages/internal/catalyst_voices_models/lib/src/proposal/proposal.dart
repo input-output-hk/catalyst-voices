@@ -7,19 +7,83 @@ final class Proposal extends Equatable {
   final DocumentRef selfRef;
   final String title;
   final String description;
-  final DateTime? updateDate;
+  final DateTime updateDate;
   final DateTime? fundedDate;
   final Coin fundsRequested;
   final ProposalStatus status;
   final ProposalPublish publish;
-  final int versionCount;
+  final List<ProposalVersion> versions;
   final int duration;
   final String author;
   final int commentsCount;
   final String category;
   final SignedDocumentRef categoryId;
 
-  const Proposal({
+  factory Proposal({
+    required DocumentRef selfRef,
+    required String title,
+    required String description,
+    required DateTime updateDate,
+    DateTime? fundedDate,
+    required Coin fundsRequested,
+    required ProposalStatus status,
+    required ProposalPublish publish,
+    List<ProposalVersion> versions = const [],
+    required int duration,
+    required String author,
+    required int commentsCount,
+    required String category,
+    required SignedDocumentRef categoryId,
+  }) {
+    final sortedVersions = List<ProposalVersion>.from(versions)..sort();
+
+    return Proposal._(
+      selfRef: selfRef,
+      category: category,
+      title: title,
+      updateDate: updateDate,
+      fundedDate: fundedDate,
+      fundsRequested: fundsRequested,
+      status: status,
+      publish: publish,
+      commentsCount: commentsCount,
+      description: description,
+      duration: duration,
+      author: author,
+      versions: sortedVersions,
+      categoryId: categoryId,
+    );
+  }
+
+  factory Proposal.fromData(ProposalData data) {
+    DateTime updateDate;
+    final version = data.document.metadata.selfRef.version ??
+        data.document.metadata.selfRef.id;
+    updateDate = UuidUtils.dateTime(version);
+
+    final versions = data.versions.map(ProposalVersion.fromData).toList()
+      ..sort();
+
+    return Proposal._(
+      selfRef: data.document.metadata.selfRef,
+      title: data.getProposalTitle() ?? '',
+      description: data.getProposalDescription() ?? '',
+      updateDate: updateDate,
+      fundsRequested: data.getProposalFundsRequested() ?? Coin.fromAda(0),
+      // TODO(LynxLynxx): from where we need to get the real status
+      status: ProposalStatus.inProgress,
+      // TODO(LynxLynxx): from where we need to get the real publish
+      publish: ProposalPublish.publishedDraft,
+      versions: versions,
+      duration: data.getProposalDuration() ?? 0,
+      author: data.getProposalAuthor() ?? '',
+      commentsCount: data.commentsCount,
+      categoryId: data.categoryId,
+      category: '',
+    );
+  }
+
+  const Proposal._({
     required this.selfRef,
     required this.title,
     required this.description,
@@ -28,54 +92,13 @@ final class Proposal extends Equatable {
     required this.fundsRequested,
     required this.status,
     required this.publish,
-    required this.versionCount,
+    this.versions = const [],
     required this.duration,
     required this.author,
     required this.commentsCount,
     required this.category,
     required this.categoryId,
   });
-
-  factory Proposal.dummy(DocumentRef ref) => Proposal(
-        selfRef: ref,
-        category: 'Cardano Use Cases / MVP',
-        categoryId: const SignedDocumentRef(id: 'dummy_category_id'),
-        title: 'Dummy Proposal',
-        updateDate: DateTime.now(),
-        fundsRequested: Coin.fromAda(100000),
-        status: ProposalStatus.draft,
-        publish: ProposalPublish.localDraft,
-        commentsCount: 0,
-        description: 'Dummy description',
-        duration: 6,
-        author: 'Alex Wells',
-        versionCount: 1,
-      );
-
-  factory Proposal.fromData(ProposalData data) {
-    DateTime? updateDate;
-    final version = data.document.metadata.selfRef.version;
-    if (version != null) {
-      updateDate = UuidUtils.dateTime(version);
-    }
-    return Proposal(
-      selfRef: data.document.metadata.selfRef,
-      title: data.proposalTitle ?? '',
-      description: data.proposalDescription ?? '',
-      updateDate: updateDate,
-      fundsRequested: data.proposalFundsRequested ?? Coin.fromAda(0),
-      // TODO(LynxLynxx): from here we need to get the real status
-      status: ProposalStatus.inProgress,
-      // TODO(LynxLynxx): from here we need to get the real publish
-      publish: ProposalPublish.publishedDraft,
-      versionCount: data.versions.length,
-      duration: data.proposalDuration ?? 0,
-      author: data.proposalAuthor ?? '',
-      commentsCount: data.commentsCount,
-      category: data.categoryId.id,
-      categoryId: data.categoryId,
-    );
-  }
 
   @override
   List<Object?> get props => [
@@ -92,6 +115,8 @@ final class Proposal extends Equatable {
         commentsCount,
       ];
 
+  int get versionCount => versions.length;
+
   Proposal copyWith({
     DocumentRef? selfRef,
     String? title,
@@ -103,11 +128,11 @@ final class Proposal extends Equatable {
     int? commentsCount,
     int? duration,
     String? author,
-    int? versionCount,
+    List<ProposalVersion>? versions,
     String? category,
     SignedDocumentRef? categoryId,
   }) =>
-      Proposal(
+      Proposal._(
         selfRef: selfRef ?? this.selfRef,
         title: title ?? this.title,
         description: description ?? this.description,
@@ -118,8 +143,57 @@ final class Proposal extends Equatable {
         commentsCount: commentsCount ?? this.commentsCount,
         duration: duration ?? this.duration,
         author: author ?? this.author,
-        versionCount: versionCount ?? this.versionCount,
+        versions: versions ?? this.versions,
         category: category ?? this.category,
         categoryId: categoryId ?? this.categoryId,
+      );
+}
+
+extension ProposalWithVersionX on Proposal {
+  static Proposal dummy(ProposalPublish publish) => Proposal._(
+        selfRef: const SignedDocumentRef(
+          id: '019584be-f0ef-7b01-8d36-422a3d6a0533',
+          version: '019584be-2321-7a1a-9b68-ad33a97a7e84',
+        ),
+        title: 'Dummy Proposal ver 2',
+        description: 'Dummy description',
+        updateDate: DateTime.now(),
+        fundsRequested: const Coin(100),
+        status: ProposalStatus.draft,
+        publish: publish,
+        duration: 6,
+        author: 'Alex Wells',
+        commentsCount: 0,
+        category: 'Cardano Use Cases / MVP',
+        categoryId: const SignedDocumentRef(id: 'dummy_category_id'),
+        versions: [
+          ProposalVersion(
+            publish: ProposalPublish.publishedDraft,
+            selfRef: const SignedDocumentRef(
+              id: '019584be-f0ef-7b01-8d36-422a3d6a0533',
+              version: '019584be-2314-7aaa-8b21-0f902ff817d4',
+            ),
+            title: 'Title ver 1',
+            createdAt: DateTime.now(),
+          ),
+          ProposalVersion(
+            publish: ProposalPublish.submittedProposal,
+            selfRef: const SignedDocumentRef(
+              id: '019584be-f0ef-7b01-8d36-422a3d6a0533',
+              version: '019584be-2321-7a1a-9b68-ad33a97a7e84',
+            ),
+            title: 'Dummy Proposal ver 2',
+            createdAt: DateTime.now(),
+          ),
+          ProposalVersion(
+            publish: ProposalPublish.publishedDraft,
+            selfRef: const SignedDocumentRef(
+              id: '019584be-f0ef-7b01-8d36-422a3d6a0533',
+              version: '019584be-232d-729b-950d-ce9fb79513ed',
+            ),
+            title: 'Title ver 3',
+            createdAt: DateTime.now(),
+          ),
+        ],
       );
 }

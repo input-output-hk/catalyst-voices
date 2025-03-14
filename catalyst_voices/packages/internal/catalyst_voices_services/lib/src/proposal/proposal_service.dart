@@ -9,7 +9,6 @@ import 'package:rxdart/rxdart.dart';
 abstract interface class ProposalService {
   const factory ProposalService(
     ProposalRepository proposalRepository,
-    DocumentRepository documentRepository,
     UserService userService,
     KeyDerivationService keyDerivationService,
   ) = ProposalServiceImpl;
@@ -88,13 +87,11 @@ abstract interface class ProposalService {
 
 final class ProposalServiceImpl implements ProposalService {
   final ProposalRepository _proposalRepository;
-  final DocumentRepository _documentRepository;
   final UserService _userService;
   final KeyDerivationService _keyDerivationService;
 
   const ProposalServiceImpl(
     this._proposalRepository,
-    this._documentRepository,
     this._userService,
     this._keyDerivationService,
   );
@@ -110,8 +107,7 @@ final class ProposalServiceImpl implements ProposalService {
     required SignedDocumentRef template,
     DraftRef? ref,
   }) async {
-    return _documentRepository.createDocumentDraft(
-      type: DocumentType.proposalDocument,
+    return _proposalRepository.createDraftProposal(
       content: content,
       template: template,
       selfRef: ref,
@@ -120,14 +116,14 @@ final class ProposalServiceImpl implements ProposalService {
 
   @override
   Future<void> deleteDraftProposal(DraftRef ref) {
-    return _documentRepository.deleteDocumentDraft(ref: ref);
+    return _proposalRepository.deleteDraftProposal(ref);
   }
 
   @override
   Future<Uint8List> encodeProposalForExport({
     required DocumentData document,
   }) {
-    return _documentRepository.encodeDocumentForExport(
+    return _proposalRepository.encodeProposalForExport(
       document: document,
     );
   }
@@ -142,24 +138,7 @@ final class ProposalServiceImpl implements ProposalService {
   Future<ProposalData> getProposal({
     required DocumentRef ref,
   }) async {
-    final proposal = await _proposalRepository.getProposal(ref: ref);
-    final document = await _documentRepository.getProposalDocument(
-      ref: ref,
-    );
-
-    // TODO(damian-molinski): Delete this after documents sync is ready.
-    final mergedDocument = ProposalDocument(
-      metadata: proposal.document.metadata,
-      document: document.document,
-    );
-
-    return ProposalData(
-      document: mergedDocument,
-      // TODO(dtscalac): replace by actual category ID
-      categoryId: SignedDocumentRef.generateFirstRef(),
-      commentsCount: 10,
-      versions: proposal.versions,
-    );
+    return _proposalRepository.getProposal(ref: ref);
   }
 
   @override
@@ -181,7 +160,7 @@ final class ProposalServiceImpl implements ProposalService {
   Future<ProposalTemplate> getProposalTemplate({
     required DocumentRef ref,
   }) async {
-    final proposalTemplate = await _documentRepository.getProposalTemplate(
+    final proposalTemplate = await _proposalRepository.getProposalTemplate(
       ref: ref,
     );
 
@@ -196,7 +175,7 @@ final class ProposalServiceImpl implements ProposalService {
 
   @override
   Future<DocumentRef> importProposal(Uint8List data) {
-    return _documentRepository.importDocument(data: data);
+    return _proposalRepository.importProposal(data);
   }
 
   @override
@@ -242,7 +221,7 @@ final class ProposalServiceImpl implements ProposalService {
     required DraftRef ref,
     required DocumentDataContent content,
   }) {
-    return _documentRepository.updateDocumentDraft(
+    return _proposalRepository.updateDraftProposal(
       ref: ref,
       content: content,
     );
@@ -250,16 +229,23 @@ final class ProposalServiceImpl implements ProposalService {
 
   @override
   Stream<List<Proposal>> watchLatestProposals({int? limit}) {
-    return _documentRepository
-        .watchProposalsDocuments(limit: limit)
+    return _proposalRepository
+        .watchLatestProposals(limit: limit)
         .switchMap((documents) async* {
       final proposalsStreams = await Future.wait(
         documents.map((doc) async {
-          final versionIds = await _documentRepository.queryVersionIds(
+          final versionIds = await _proposalRepository.queryVersionsOfId(
             id: doc.metadata.selfRef.id,
           );
+          final versionsData = versionIds
+              .map(
+                (e) => BaseProposalData(
+                  document: e,
+                ),
+              )
+              .toList();
 
-          return _documentRepository
+          return _proposalRepository
               .watchCount(
             ref: doc.metadata.selfRef,
             type: DocumentType.commentTemplate,
@@ -267,10 +253,8 @@ final class ProposalServiceImpl implements ProposalService {
               .map((commentsCount) {
             final proposalData = ProposalData(
               document: doc,
-              categoryId: SignedDocumentRef(
-                id: DocumentType.categoryParametersDocument.uuid,
-              ),
-              versions: versionIds,
+              categoryId: SignedDocumentRef.generateFirstRef(),
+              versions: versionsData,
               commentsCount: commentsCount,
             );
             return Proposal.fromData(proposalData);

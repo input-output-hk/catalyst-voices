@@ -35,6 +35,13 @@ final class DatabaseDraftsDataSource implements DraftDataSource {
   }
 
   @override
+  Future<List<DocumentData>> queryVersionsOfId({required String id}) async {
+    final documentEntities =
+        await _database.draftsDao.queryVersionsOfId(id: id);
+    return documentEntities.map((e) => e.toModel()).toList();
+  }
+
+  @override
   Future<void> save({required DocumentData data}) async {
     final idHiLo = UuidHiLo.from(data.metadata.id);
     final verHiLo = UuidHiLo.from(data.metadata.version);

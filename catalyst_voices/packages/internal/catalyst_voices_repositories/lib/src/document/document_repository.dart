@@ -57,21 +57,33 @@ abstract interface class DocumentRepository {
   /// Its using documents index api.
   Future<List<SignedDocumentRef>> getAllDocumentsRefs();
 
+  /// Return list of all cached documents id for given [id].
+  /// It looks for documents in the local storage and draft storage.
+  Future<List<DocumentData>> getAllVersionsOfId({
+    required String id,
+  });
+
   /// Returns list of locally saved signed documents refs.
   Future<List<SignedDocumentRef>> getCachedDocumentsRefs();
 
-  /// Returns matching [ProposalDocument] for matching [ref].
+  /// If version is not specified in [ref] method will try to return latest
+  /// version of document matching [ref].
   ///
-  /// Source of data depends whether [ref] is [SignedDocumentRef] or [DraftRef].
-  Future<ProposalDocument> getProposalDocument({
+  /// If document does not exist it will throw [DocumentNotFound].
+  ///
+  /// If [DocumentRef] is [SignedDocumentRef] it will look for this document in
+  /// local storage.
+  ///
+  /// If [DocumentRef] is [DraftRef] it will look for this document in local
+  /// storage.
+  Future<DocumentData> getDocumentData({
     required DocumentRef ref,
   });
 
-  /// Returns [ProposalTemplate] for matching [ref].
-  ///
-  /// Source of data depends whether [ref] is [SignedDocumentRef] or [DraftRef].
-  Future<ProposalTemplate> getProposalTemplate({
+  /// Returns count of documents matching [ref] id and [type].
+  Future<int> getRefCount({
     required DocumentRef ref,
+    required DocumentType type,
   });
 
   /// Imports a document [data] previously encoded by [encodeDocumentForExport].
@@ -89,15 +101,15 @@ abstract interface class DocumentRepository {
     required SignedDocument document,
   });
 
-  /// Returns a list of version of ref object.
+  /// Returns a list of version for given [id].
   ///
   /// Can be used to get versions count.
-  Future<List<String>> queryVersionIds({required String id});
+  Future<List<ProposalDocument>> queryVersionsOfId({required String id});
 
   /// Updates local draft (or drafts if version is not specified)
   /// matching [ref] with given [content].
   ///
-  /// If watching same draft with [watchProposalDocument] it will emit
+  /// If watching same draft with [watchDocument] it will emit
   /// change.
   Future<void> updateDocumentDraft({
     required DraftRef ref,
@@ -112,11 +124,12 @@ abstract interface class DocumentRepository {
   /// Observes matching [ProposalDocument] and emits updates.
   ///
   /// Source of data depends whether [ref] is [SignedDocumentRef] or [DraftRef].
-  Stream<ProposalDocument> watchProposalDocument({
+  Stream<ProposalDocument> watchDocument({
     required DocumentRef ref,
   });
 
-  Stream<List<ProposalDocument>> watchProposalsDocuments({
+  Stream<List<({DocumentData data, DocumentData refData})>> watchDocuments({
+    required DocumentType type,
     int? limit,
     bool unique = false,
   });
@@ -196,13 +209,23 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   }
 
   @override
+  Future<List<DocumentData>> getAllVersionsOfId({
+    required String id,
+  }) async {
+    final localRefs = await _localDocuments.queryVersionsOfId(id: id);
+    final drafts = await _drafts.queryVersionsOfId(id: id);
+
+    return [...drafts, ...localRefs];
+  }
+
+  @override
   Future<List<SignedDocumentRef>> getCachedDocumentsRefs() {
     return _localDocuments
         .index()
         .then((refs) => refs.cast<SignedDocumentRef>());
   }
 
-  @visibleForTesting
+  @override
   Future<DocumentData> getDocumentData({
     required DocumentRef ref,
   }) {
@@ -213,34 +236,11 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   }
 
   @override
-  Future<ProposalDocument> getProposalDocument({
+  Future<int> getRefCount({
     required DocumentRef ref,
-  }) async {
-    // TODO(damian-molinski): remove this override once we have API
-    ref = ref.copyWith(id: mockedDocumentUuid);
-
-    final documentData = await getDocumentData(ref: ref);
-    final templateRef = documentData.metadata.template!;
-    final templateData = await getDocumentData(ref: templateRef);
-
-    return _buildProposalDocument(
-      documentData: documentData,
-      templateData: templateData,
-    );
-  }
-
-  @override
-  Future<ProposalTemplate> getProposalTemplate({
-    required DocumentRef ref,
-  }) async {
-    // TODO(damian-molinski): remove this override once we have API
-    ref = ref.copyWith(id: mockedTemplateUuid);
-
-    final documentData = await _documentDataLock.synchronized(
-      () => getDocumentData(ref: ref),
-    );
-
-    return _buildProposalTemplate(documentData: documentData);
+    required DocumentType type,
+  }) {
+    return _localDocuments.getRefCount(ref: ref, type: type);
   }
 
   @override
@@ -267,8 +267,20 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   }
 
   @override
-  Future<List<String>> queryVersionIds({required String id}) {
-    return _localDocuments.queryVersionIds(id: id);
+  Future<List<ProposalDocument>> queryVersionsOfId({required String id}) async {
+    final documents = await _localDocuments.queryVersionsOfId(id: id);
+    if (documents.isEmpty) return [];
+    final templateRef = documents.first.metadata.template!;
+    final templateData = await getDocumentData(ref: templateRef);
+
+    return documents
+        .map(
+          (e) => _buildProposalDocument(
+            documentData: e,
+            templateData: templateData,
+          ),
+        )
+        .toList();
   }
 
   @override
@@ -282,6 +294,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     );
   }
 
+  @visibleForTesting
   Stream<List<DocumentsDataWithRefData>> watchAllDocuments({
     int? limit,
     bool unique = false,
@@ -317,6 +330,41 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     );
   }
 
+  @override
+  Stream<ProposalDocument> watchDocument({
+    required DocumentRef ref,
+  }) {
+    // TODO(damian-molinski): remove this override once we have API
+    ref = ref.copyWith(id: mockedDocumentUuid);
+
+    return watchDocumentWithRef(
+      ref: ref,
+      refGetter: (data) => data.metadata.template!,
+    ).whereNotNull().map(
+      (event) {
+        final documentData = event.data;
+        final templateData = event.refData;
+
+        return _buildProposalDocument(
+          documentData: documentData,
+          templateData: templateData,
+        );
+      },
+    );
+  }
+
+  @override
+  Stream<List<({DocumentData data, DocumentData refData})>> watchDocuments({
+    required DocumentType type,
+    int? limit,
+    bool unique = false,
+  }) {
+    return watchAllDocuments(
+      limit: limit,
+      type: type,
+    );
+  }
+
   @visibleForTesting
   Stream<DocumentsDataWithRefData?> watchDocumentWithRef({
     required DocumentRef ref,
@@ -346,52 +394,6 @@ final class DocumentRepositoryImpl implements DocumentRepository {
         },
       );
     });
-  }
-
-  @override
-  Stream<ProposalDocument> watchProposalDocument({
-    required DocumentRef ref,
-  }) {
-    // TODO(damian-molinski): remove this override once we have API
-    ref = ref.copyWith(id: mockedDocumentUuid);
-
-    return watchDocumentWithRef(
-      ref: ref,
-      refGetter: (data) => data.metadata.template!,
-    ).whereNotNull().map(
-      (event) {
-        final documentData = event.data;
-        final templateData = event.refData;
-
-        return _buildProposalDocument(
-          documentData: documentData,
-          templateData: templateData,
-        );
-      },
-    );
-  }
-
-  @override
-  Stream<List<ProposalDocument>> watchProposalsDocuments({
-    int? limit,
-    bool unique = false,
-  }) {
-    return watchAllDocuments(
-      limit: limit,
-      type: DocumentType.proposalDocument,
-    ).whereNotNull().map(
-          (documents) => documents.map(
-            (doc) {
-              final documentData = doc.data;
-              final templateData = doc.refData;
-
-              return _buildProposalDocument(
-                documentData: documentData,
-                templateData: templateData,
-              );
-            },
-          ).toList(),
-        );
   }
 
   ProposalDocument _buildProposalDocument({

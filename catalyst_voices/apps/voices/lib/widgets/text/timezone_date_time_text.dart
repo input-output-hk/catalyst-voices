@@ -60,12 +60,14 @@ class TimezoneDateTimeText extends StatelessWidget {
   final DateTime data;
   final TimezoneDateTimeTextFormatter formatter;
   final bool showTimezone;
+  final TextStyle? style;
 
   const TimezoneDateTimeText(
     this.data, {
     super.key,
     required this.formatter,
     this.showTimezone = true,
+    this.style,
   });
 
   @override
@@ -118,7 +120,7 @@ class TimezoneDateTimeText extends StatelessWidget {
       child: Text(
         key: const Key('TimezoneDateTimeText'),
         string,
-        style: timestampStyle,
+        style: style != null ? timestampStyle.merge(style) : timestampStyle,
       ),
     );
   }

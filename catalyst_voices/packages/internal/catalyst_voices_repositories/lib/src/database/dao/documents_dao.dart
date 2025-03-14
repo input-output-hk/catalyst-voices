@@ -7,6 +7,7 @@ import 'package:catalyst_voices_repositories/src/database/table/documents_metada
 import 'package:catalyst_voices_repositories/src/database/typedefs.dart';
 import 'package:collection/collection.dart';
 import 'package:drift/drift.dart';
+import 'package:drift/extensions/json1.dart';
 import 'package:flutter/foundation.dart';
 
 /// Exposes only public operation on documents, and related, tables.
@@ -53,7 +54,7 @@ abstract interface class DocumentsDao {
 
   /// Returns a list of version of ref object.
   /// Can be used to get versions count.
-  Future<List<String>> queryVersionIds({required String id});
+  Future<List<DocumentEntity>> queryVersionsOfId({required String id});
 
   /// Inserts all documents and metadata. On conflicts ignores duplicates.
   Future<void> saveAll(
@@ -199,16 +200,14 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
   }
 
   @override
-  Future<List<String>> queryVersionIds({required String id}) {
+  Future<List<DocumentEntity>> queryVersionsOfId({required String id}) {
     final query = select(documents)
       ..where((tbl) => _filterRef(tbl, SignedDocumentRef(id: id)))
       ..orderBy([
         (u) => OrderingTerm.desc(u.verHi),
       ]);
 
-    return query
-        .map((doc) => UuidHiLo(high: doc.verHi, low: doc.verLo).toString())
-        .get();
+    return query.get();
   }
 
   @override
@@ -295,16 +294,16 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
   }) {
     final query = select(documents)
       ..where(
-        (row) => Expression.and([
-          // TODO(damian-molinski): JSONB filtering
-          row.metadata.equalsValue(
-            DocumentDataMetadata(
-              type: type,
-              ref: ref,
-              selfRef: ref,
-            ),
-          ),
-        ]),
+        (row) {
+          return Expression.and([
+            row.metadata.jsonExtract<String>(r'$.type').equals(type.uuid),
+            row.metadata.jsonExtract<String>(r'$.ref.id').equals(ref.id),
+            if (ref.version != null)
+              row.metadata
+                  .jsonExtract<String>(r'$.ref.version')
+                  .equals(ref.version!),
+          ]);
+        },
       );
 
     return query.watch().map((comments) => comments.length).distinct();
