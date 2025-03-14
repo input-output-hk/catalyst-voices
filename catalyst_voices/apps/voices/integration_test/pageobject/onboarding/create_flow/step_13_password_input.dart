@@ -37,9 +37,9 @@ class PasswordInputPanel extends OnboardingPageBase {
     await verifyDetailsPanel();
   }
 
-  void verifyPasswordConfirmErrorIcon({
+  Future<void> verifyPasswordConfirmErrorIcon({
     bool isShown = true,
-  }) {
+  }) async {
     final passwordConfirmField = $(passwordConfirmInputField);
     final widget =
         $.tester.widget<VoicesPasswordTextField>(passwordConfirmField);
@@ -47,36 +47,27 @@ class PasswordInputPanel extends OnboardingPageBase {
     if (!isShown) {
       expect(decoration.errorText, null);
     } else {
-      expect(
-        decoration.errorText,
-        T.get('Passwords do not match, please correct'),
-      );
+      expect(decoration.errorText, (await t()).passwordDoNotMatch);
     }
   }
 
-  void verifyValidationIndicator(
+  Future<void> verifyValidationIndicator(
     PasswordValidationStatus validationStatus,
-  ) {
+  ) async {
     expect($(passwordStrengthLabel), findsOneWidget);
 
     switch (validationStatus) {
       case PasswordValidationStatus.weak:
-        expect(
-          $(passwordStrengthLabel).text,
-          T.get('Weak password strength'),
-        );
+        expect($(passwordStrengthLabel).text, (await t()).weakPasswordStrength);
         break;
       case PasswordValidationStatus.normal:
         expect(
           $(passwordStrengthLabel).text,
-          T.get('Normal password strength'),
+          (await t()).normalPasswordStrength,
         );
         break;
       case PasswordValidationStatus.good:
-        expect(
-          $(passwordStrengthLabel).text,
-          T.get('Good password strength'),
-        );
+        expect($(passwordStrengthLabel).text, (await t()).goodPasswordStrength);
         break;
     }
   }
@@ -84,16 +75,14 @@ class PasswordInputPanel extends OnboardingPageBase {
   Future<void> verifyDetailsPanel() async {}
 
   Future<void> verifyInfoPanel() async {
-    expect(await infoPartHeaderTitleText(), T.get('Catalyst Keychain'));
+    expect(await infoPartHeaderTitleText(), (await t()).catalystKeychain);
     expect(
       await infoPartHeaderSubtitleText(),
-      T.get('Catalyst unlock password'),
+      (await t()).createKeychainUnlockPasswordIntoSubtitle,
     );
     expect(
       await infoPartHeaderBodyText(),
-      T.get(
-        'Please provide a password for your Catalyst Keychain.',
-      ),
+      (await t()).createKeychainUnlockPasswordIntoBody,
     );
     expect(await closeButton(), findsOneWidget);
   }

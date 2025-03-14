@@ -7,9 +7,3 @@ Future<VoicesLocalizations> t() async {
   const locale = 'en';
   return VoicesLocalizations.delegate.load(const Locale(locale));
 }
-
-class T {
-  static String get(String key, {String? locale}) {
-    return key;
-  }
-}

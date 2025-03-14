@@ -23,11 +23,12 @@ class UnlockPasswordInputPanel extends PasswordInputPanel {
 
   @override
   Future<void> verifyInfoPanel() async {
-    expect(await infoPartHeaderTitleText(), T.get('Restore Catalyst keychain'));
+    expect(
+        await infoPartHeaderTitleText(), (await t()).recoverCatalystKeychain);
     expect(infoPartTaskPicture(), findsOneWidget);
     expect(
       $(registrationInfoPanel).$(CommonPage($).decorData).$(Text).text,
-      T.get('Learn More'),
+      (await t()).learnMore,
     );
     expect(await closeButton(), findsOneWidget);
   }
