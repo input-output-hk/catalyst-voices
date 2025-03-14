@@ -4,7 +4,7 @@ import 'package:equatable/equatable.dart';
 
 class ProposalData extends Equatable {
   final ProposalDocument document;
-  final String categoryId;
+  final SignedDocumentRef categoryId;
   final int commentsCount;
   final List<String> versions;
 
