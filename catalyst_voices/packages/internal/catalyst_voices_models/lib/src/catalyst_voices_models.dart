@@ -37,6 +37,7 @@ export 'document/schema/document_schema.dart';
 export 'document/schema/property/document_property_schema.dart';
 export 'document/specialized/comment_document.dart';
 export 'document/specialized/comment_template.dart';
+export 'document/specialized/comment_with_replies.dart';
 export 'document/specialized/proposal_document.dart';
 export 'document/specialized/proposal_template.dart';
 export 'document/validation/document_validation_result.dart';

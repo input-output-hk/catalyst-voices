@@ -1,15 +1,16 @@
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 
 class ProposalCommentTile extends StatelessWidget {
-  final String message;
+  final CommentWithReplies comment;
 
   const ProposalCommentTile({
     super.key,
-    required this.message,
+    required this.comment,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Placeholder(child: Text(message));
+    return Placeholder(child: Text('TODO'));
   }
 }

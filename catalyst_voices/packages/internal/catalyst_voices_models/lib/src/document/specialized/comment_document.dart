@@ -21,10 +21,14 @@ final class CommentMetadata extends DocumentMetadata {
   final SignedDocumentRef? parent;
 
   CommentMetadata({
+    // Note. no drafts for comments
     required SignedDocumentRef super.selfRef,
     this.parent,
   });
 
   @override
   List<Object?> get props => super.props + [parent];
+
+  @override
+  SignedDocumentRef get selfRef => super.selfRef as SignedDocumentRef;
 }

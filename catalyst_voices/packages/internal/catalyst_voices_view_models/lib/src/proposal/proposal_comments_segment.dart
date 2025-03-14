@@ -20,15 +20,15 @@ final class AddCommentSection extends ProposalCommentsSection {
 final class CommentListItem extends Equatable implements SegmentsListViewItem {
   @override
   final NodeId id;
-  final String message;
+  final CommentWithReplies comment;
 
   const CommentListItem({
     required this.id,
-    required this.message,
+    required this.comment,
   });
 
   @override
-  List<Object?> get props => [id, message];
+  List<Object?> get props => [id, comment];
 }
 
 sealed class ProposalCommentsSection extends BaseSection {
@@ -45,7 +45,7 @@ final class ProposalCommentsSegment
   });
 
   ProposalCommentsSegment.build({
-    required List<String> comments,
+    required List<CommentWithReplies> comments,
   }) : this(
           id: const NodeId('comments'),
           sections: [
@@ -68,7 +68,7 @@ final class ProposalCommentsSegment
 
 final class ViewCommentsSection extends ProposalCommentsSection
     implements SegmentGroupedListViewItems {
-  final List<String> comments;
+  final List<CommentWithReplies> comments;
 
   const ViewCommentsSection({
     required super.id,
@@ -77,10 +77,10 @@ final class ViewCommentsSection extends ProposalCommentsSection
 
   @override
   Iterable<SegmentsListViewItem> get children {
-    return comments.mapIndexed((index, e) {
+    return comments.mapIndexed((index, comment) {
       return CommentListItem(
-        id: id.child('$index'),
-        message: e,
+        id: id.child(comment.comment.metadata.selfRef.id),
+        comment: comment,
       );
     });
   }

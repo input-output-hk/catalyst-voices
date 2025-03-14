@@ -135,7 +135,7 @@ class _SegmentsListView extends StatelessWidget {
             ),
           AddCommentSection() => const ProposalAddCommentTile(),
         },
-      CommentListItem(:final message) => ProposalCommentTile(message: message),
+      CommentListItem(:final comment) => ProposalCommentTile(comment: comment),
       _ => throw ArgumentError('Not supported type ${item.runtimeType}'),
     };
   }
