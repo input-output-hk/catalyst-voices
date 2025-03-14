@@ -239,7 +239,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
       contentType: SignedDocumentContentType.json,
       documentType: DocumentType.proposalDocument,
       id: metadata.id,
-      ver: metadata.selfRef.version,
+      ver: metadata.version,
       template: template == null
           ? null
           : SignedDocumentMetadataRef.fromDocumentRef(template),
