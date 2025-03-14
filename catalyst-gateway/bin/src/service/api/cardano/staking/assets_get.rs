@@ -3,7 +3,7 @@
 use std::collections::{HashMap, HashSet};
 
 use cardano_blockchain_types::{Slot, StakeAddress, TransactionId, TxnIndex};
-use futures::StreamExt;
+use futures::TryStreamExt;
 use poem_openapi::{payload::Json, types::Example, ApiResponse};
 
 use crate::{
@@ -155,25 +155,28 @@ type TxoMap = HashMap<(TransactionId, i16), TxoInfo>;
 async fn get_txo(
     session: &CassandraSession, stake_address: &StakeAddress, slot_num: SlotNo,
 ) -> anyhow::Result<TxoMap> {
-    let mut txos_iter = GetTxoByStakeAddressQuery::execute(
+    let txos_stream = GetTxoByStakeAddressQuery::execute(
         session,
         GetTxoByStakeAddressQueryParams::new(stake_address.clone(), slot_num),
     )
     .await?;
 
-    let mut txo_map = HashMap::new();
-    while let Some(row_res) = txos_iter.next().await {
-        let row = row_res?;
-
-        let key = (row.txn_id.into(), row.txo.into());
-        txo_map.insert(key, TxoInfo {
-            value: row.value,
-            txn_index: row.txn_index.into(),
-            txo: row.txo.into(),
-            slot_no: row.slot_no.into(),
-            spent_slot_no: row.spent_slot.map(Into::into),
-        });
-    }
+    let txo_map = txos_stream
+        .map_err(Into::<anyhow::Error>::into)
+        .try_fold(HashMap::new(), |mut txo_map, row| {
+            async move {
+                let key = (row.txn_id.into(), row.txo.into());
+                txo_map.insert(key, TxoInfo {
+                    value: row.value,
+                    txn_index: row.txn_index.into(),
+                    txo: row.txo.into(),
+                    slot_no: row.slot_no.into(),
+                    spent_slot_no: row.spent_slot.map(Into::into),
+                });
+                Ok(txo_map)
+            }
+        })
+        .await?;
     Ok(txo_map)
 }
 
@@ -184,23 +187,26 @@ type NativeTokensMap = HashMap<(Slot, TxnIndex, i16), NativeTokens>;
 async fn get_native_tokens(
     session: &CassandraSession, stake_address: &StakeAddress, slot_num: SlotNo,
 ) -> anyhow::Result<NativeTokensMap> {
-    let mut assets_txos_iter = GetAssetsByStakeAddressQuery::execute(
+    let assets_txos_stream = GetAssetsByStakeAddressQuery::execute(
         session,
         GetAssetsByStakeAddressParams::new(stake_address.clone(), slot_num),
     )
     .await?;
 
-    let mut tokens_map = HashMap::new();
-    while let Some(row_res) = assets_txos_iter.next().await {
-        let row = row_res?;
-
-        let key = (row.slot_no.into(), row.txn_index.into(), row.txo.into());
-        tokens_map.insert(key, NativeTokens {
-            id: row.policy_id,
-            name: row.asset_name.into(),
-            amount: row.value,
-        });
-    }
+    let tokens_map = assets_txos_stream
+        .map_err(Into::<anyhow::Error>::into)
+        .try_fold(HashMap::new(), |mut tokens_map, row| {
+            async move {
+                let key = (row.slot_no.into(), row.txn_index.into(), row.txo.into());
+                tokens_map.insert(key, NativeTokens {
+                    id: row.policy_id,
+                    name: row.asset_name.into(),
+                    amount: row.value,
+                });
+                Ok(tokens_map)
+            }
+        })
+        .await?;
     Ok(tokens_map)
 }
 
@@ -220,15 +226,13 @@ async fn set_and_update_spent(
     let mut params = Vec::new();
 
     for chunk in txn_hashes.chunks(100) {
-        let mut txi_iter = GetTxiByTxnHashesQuery::execute(
+        let mut txi_stream = GetTxiByTxnHashesQuery::execute(
             session,
             GetTxiByTxnHashesQueryParams::new(chunk.to_vec()),
         )
         .await?;
 
-        while let Some(row_res) = txi_iter.next().await {
-            let row = row_res?;
-
+        while let Some(row) = txi_stream.try_next().await? {
             let key = (row.txn_id.into(), row.txo.into());
             if let Some(txo_info) = txos.get_mut(&key) {
                 params.push(UpdateTxoSpentQueryParams {

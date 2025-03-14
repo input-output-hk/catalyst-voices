@@ -81,7 +81,7 @@ pub(crate) async fn get_registrations_given_vote_key(
     let slot_no = asat.unwrap_or(SlotNo::MAXIMUM);
 
     let all_regs = stake_pk_stream
-        .map_err(|e| -> anyhow::Error { e.into() })
+        .map_err(Into::<anyhow::Error>::into)
         .try_fold(Vec::new(), |mut all_regs, row_stake_pk| {
             async {
                 let stake_public_key = row_stake_pk.stake_public_key;
@@ -127,7 +127,7 @@ async fn get_valid_registrations(
     .await?;
 
     regs_stream
-        .map_err(|e| -> anyhow::Error { e.into() })
+        .map_err(Into::<anyhow::Error>::into)
         .try_fold(Vec::new(), |mut regs, row| {
             {
                 let hex_stake_pk = hex_stake_pk.clone();
@@ -198,7 +198,7 @@ async fn get_invalid_registrations(
     .await?;
 
     invalid_regs_stream
-        .map_err(|e| -> anyhow::Error { e.into() })
+        .map_err(Into::<anyhow::Error>::into)
         .try_fold(Vec::new(), |mut regs, row| {
             async move {
                 let Ok(nonce) = u64::try_from(row.nonce) else {
@@ -247,7 +247,7 @@ async fn get_all_valid_registrations(
     let regs_stream =
         GetAllRegistrationsQuery::execute(session, GetAllRegistrationsParams::new(slot_no)).await?;
 
-    regs_stream.map_err(|e| -> anyhow::Error {e.into()}).try_fold(Vec::new(), |mut regs, row|
+    regs_stream.map_err(Into::<anyhow::Error>::into).try_fold(Vec::new(), |mut regs, row|
     async move {
         let Ok(nonce) = u64::try_from(row.nonce) else {
             anyhow::bail!("Corrupt valid registration, cannot decode nonce");
@@ -313,7 +313,7 @@ async fn get_all_invalid_registrations(
     .await?;
 
     invalid_regs_stream
-        .map_err(|e| -> anyhow::Error { e.into() })
+        .map_err(Into::<anyhow::Error>::into)
         .try_fold(Vec::new(), |mut regs, row| {
             async move {
                 let Ok(nonce) = u64::try_from(row.nonce) else {
