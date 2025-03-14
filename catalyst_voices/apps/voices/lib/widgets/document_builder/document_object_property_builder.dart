@@ -47,59 +47,8 @@ class DocumentObjectPropertyBuilder extends StatelessWidget {
   }
 }
 
-class _GenericDocumentObjectPropertyBuilder extends StatefulWidget {
-  final DocumentObjectSchema schema;
-  final DocumentObjectProperty property;
-  final bool isEditMode;
-  final ValueChanged<List<DocumentChange>> onChanged;
-
-  const _GenericDocumentObjectPropertyBuilder({
-    required this.schema,
-    required this.property,
-    required this.isEditMode,
-    required this.onChanged,
-  });
-
-  @override
-  State<_GenericDocumentObjectPropertyBuilder> createState() =>
-      _GenericDocumentObjectPropertyBuilderState();
-}
-
-class _GenericDocumentObjectPropertyBuilderState
-    extends State<_GenericDocumentObjectPropertyBuilder> {
-  AutovalidateMode _autovalidateMode = AutovalidateMode.onUserInteraction;
-
-  @override
-  Widget build(BuildContext context) {
-    return _GenericObjectPropertyFormField(
-      value: widget.property,
-      validator: (property) => _validator(context, property),
-      autovalidateMode: _autovalidateMode,
-      isEditMode: widget.isEditMode,
-      onDocumentChanged: _onDocumentChanged,
-    );
-  }
-
-  void _onDocumentChanged(List<DocumentChange> changes) {
-    setState(() {
-      _autovalidateMode = AutovalidateMode.always;
-    });
-    widget.onChanged(changes);
-  }
-
-  String? _validator(BuildContext context, DocumentObjectProperty? property) {
-    if (property == null) {
-      return null;
-    }
-
-    return LocalizedDocumentValidationResult.from(property.validationResult)
-        .message(context);
-  }
-}
-
-class _GenericObjectPropertyFormField
-    extends VoicesFormField<DocumentObjectProperty> {
-  _GenericObjectPropertyFormField({
+class _FormField extends VoicesFormField<DocumentObjectProperty> {
+  _FormField({
     required super.value,
     super.validator,
     super.autovalidateMode,
@@ -158,4 +107,54 @@ class _GenericObjectPropertyFormField
             );
           },
         );
+}
+
+class _GenericDocumentObjectPropertyBuilder extends StatefulWidget {
+  final DocumentObjectSchema schema;
+  final DocumentObjectProperty property;
+  final bool isEditMode;
+  final ValueChanged<List<DocumentChange>> onChanged;
+
+  const _GenericDocumentObjectPropertyBuilder({
+    required this.schema,
+    required this.property,
+    required this.isEditMode,
+    required this.onChanged,
+  });
+
+  @override
+  State<_GenericDocumentObjectPropertyBuilder> createState() =>
+      _GenericDocumentObjectPropertyBuilderState();
+}
+
+class _GenericDocumentObjectPropertyBuilderState
+    extends State<_GenericDocumentObjectPropertyBuilder> {
+  AutovalidateMode _autovalidateMode = AutovalidateMode.onUserInteraction;
+
+  @override
+  Widget build(BuildContext context) {
+    return _FormField(
+      value: widget.property,
+      validator: (property) => _validator(context, property),
+      autovalidateMode: _autovalidateMode,
+      isEditMode: widget.isEditMode,
+      onDocumentChanged: _onDocumentChanged,
+    );
+  }
+
+  void _onDocumentChanged(List<DocumentChange> changes) {
+    setState(() {
+      _autovalidateMode = AutovalidateMode.always;
+    });
+    widget.onChanged(changes);
+  }
+
+  String? _validator(BuildContext context, DocumentObjectProperty? property) {
+    if (property == null) {
+      return null;
+    }
+
+    return LocalizedDocumentValidationResult.from(property.validationResult)
+        .message(context);
+  }
 }

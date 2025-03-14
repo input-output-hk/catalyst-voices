@@ -17,6 +17,8 @@ class ProposalBuilderSetupPanel extends StatelessWidget {
           name: context.l10n.guidance,
           body: const ProposalBuilderGuidanceSelector(),
         ),
+        // TODO(damian-molinski): uncomment and implement when builder
+        // collaboration is ready.
         /*SpaceSidePanelTab(
           name: 'Comments',
           body: CommentCard(
