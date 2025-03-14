@@ -35,7 +35,7 @@ class _ProposalCommentWithRepliesCardState
       children: [
         ProposalCommentCard(
           document: widget.comment.comment,
-          canReply: widget.comment.depth == 0,
+          canReply: widget.comment.depth == 1,
           onReplyTap: _onReplyTap,
           footer: Offstage(
             offstage: widget.comment.replies.isEmpty,
