@@ -31,7 +31,7 @@ void main() {
 
       expect(signedDocument.payload, equals(document));
 
-      final isVerified = await signedDocument.verifySignature(_publicKey);
+      final isVerified = await signedDocument.verifySignature(_catalystId);
       expect(isVerified, isTrue);
 
       final signedDocumentBytes = signedDocument.toBytes();
@@ -51,8 +51,8 @@ const _metadata = SignedDocumentMetadata(
 );
 
 final _catalystId = CatalystId(
-  host: CatalystIdHost.cardano.host,
-  role0Key: _publicKey,
+  host: CatalystIdHost.cardanoPreprod.host,
+  role0Key: _publicKey.publicKeyBytes,
 );
 
 final _privateKey = _FakeCatalystPrivateKey(bytes: _privateKeyBytes);
@@ -96,6 +96,9 @@ class _FakeCatalystPublicKey extends Fake implements CatalystPublicKey {
   final Uint8List bytes;
 
   _FakeCatalystPublicKey({required this.bytes});
+
+  @override
+  Uint8List get publicKeyBytes => bytes;
 
   @override
   Future<bool> verify(

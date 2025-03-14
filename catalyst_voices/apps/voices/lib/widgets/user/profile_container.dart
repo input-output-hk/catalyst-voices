@@ -14,7 +14,7 @@ class ProfileContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final displayName = profile.displayName;
+    final displayName = profile.username;
 
     return Row(
       mainAxisSize: MainAxisSize.min,

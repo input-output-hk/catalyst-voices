@@ -1,26 +1,17 @@
-import 'dart:convert';
-
-import 'package:catalyst_voices_models/src/crypto/catalyst_key_factory.dart';
-import 'package:catalyst_voices_models/src/crypto/catalyst_public_key.dart';
 import 'package:catalyst_voices_models/src/user/account_role.dart';
 import 'package:catalyst_voices_models/src/user/catalyst_id.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
-import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
-import 'package:test/fake.dart';
 import 'package:test/test.dart';
 
 /* cSpell:disable */
 void main() {
   group(CatalystId, () {
-    late CatalystPublicKey role0Key;
+    late Uint8List role0Key;
 
     setUpAll(() {
-      CatalystPublicKey.factory = _FakeCatalystPublicKeyFactory();
-
-      final role0KeyBytes =
-          base64Decode('FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE=');
-      role0Key = CatalystPublicKey.factory.create(role0KeyBytes);
+      role0Key =
+          base64UrlNoPadDecode('FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE');
     });
 
     test('should create CatalystId instance correctly', () {
@@ -139,7 +130,7 @@ void main() {
       expect(uri.fragment, 'encrypt');
       expect(
         uri.path,
-        equals('/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE=/1/2'),
+        equals('/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE/1/2'),
       );
     });
 
@@ -154,36 +145,11 @@ void main() {
       expect(
         formattedId,
         equals(
-          ':123456@cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE=',
+          ':123456@cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE',
         ),
       );
     });
   });
 }
 
-class _FakeCatalystPublicKeyFactory extends Fake
-    implements CatalystPublicKeyFactory {
-  @override
-  CatalystPublicKey create(Uint8List bytes) {
-    return _FakeCatalystPublicKey(bytes: bytes);
-  }
-}
-
-@immutable
-class _FakeCatalystPublicKey extends Fake implements CatalystPublicKey {
-  @override
-  final Uint8List bytes;
-
-  _FakeCatalystPublicKey({required this.bytes});
-
-  @override
-  int get hashCode => const DeepCollectionEquality().hash(bytes);
-
-  @override
-  bool operator ==(Object other) {
-    if (other is! _FakeCatalystPublicKey) return false;
-
-    return const DeepCollectionEquality().equals(other.bytes, bytes);
-  }
-}
 /* cSpell:enable */
