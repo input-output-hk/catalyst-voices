@@ -77,60 +77,67 @@ final class RegistrationTransactionBuilder {
   }
 
   Future<RegistrationMetadata> _buildMetadataEnvelope() async {
-    final rootKeyPair = await keyDerivationService.deriveAccountRoleKeyPair(
+    final rootKeyPair = keyDerivationService.deriveAccountRoleKeyPair(
       masterKey: masterKey,
       role: AccountRole.root,
     );
 
-    final cert = await _generateX509Certificate(keyPair: rootKeyPair);
-    final derCerts = {
-      AccountRole.root: cert.toDer(),
-    };
+    return rootKeyPair.use((rootKeyPair) async {
+      final cert = await _generateX509Certificate(keyPair: rootKeyPair);
+      final derCerts = {
+        AccountRole.root: cert.toDer(),
+      };
 
-    final publicKeys = {
-      AccountRole.root: rootKeyPair.publicKey.toEd25519(),
-      if (roles.contains(AccountRole.proposer))
-        AccountRole.proposer: await _deriveProposerPublicKey(),
-    };
+      final publicKeys = {
+        AccountRole.root: rootKeyPair.publicKey.toEd25519(),
+        if (roles.contains(AccountRole.proposer))
+          AccountRole.proposer: await _deriveProposerPublicKey(),
+      };
 
-    final x509Envelope = X509MetadataEnvelope.unsigned(
-      purpose: UuidV4.fromString(_catalystUserRoleRegistrationPurpose),
-      txInputsHash: TransactionInputsHash.fromTransactionInputs(utxos),
-      chunkedData: RegistrationData(
-        derCerts: derCerts.values.toList(),
-        publicKeys: publicKeys.values.toList(),
-        roleDataSet: {
-          RoleData(
-            roleNumber: AccountRole.root.number,
-            roleSigningKey: LocalKeyReference(
-              keyType: LocalKeyReferenceType.x509Certs,
-              offset: derCerts.keys.toList().indexOf(AccountRole.root),
-            ),
-            // Refer to first key in transaction outputs,
-            // in our case it's the change address (which the user controls).
-            paymentKey: -1,
-          ),
-          if (roles.contains(AccountRole.proposer))
+      final x509Envelope = X509MetadataEnvelope.unsigned(
+        purpose: UuidV4.fromString(_catalystUserRoleRegistrationPurpose),
+        txInputsHash: TransactionInputsHash.fromTransactionInputs(utxos),
+        chunkedData: RegistrationData(
+          derCerts: derCerts.values.toList(),
+          publicKeys: publicKeys.values.toList(),
+          roleDataSet: {
             RoleData(
-              roleNumber: AccountRole.proposer.number,
+              roleNumber: AccountRole.root.number,
               roleSigningKey: LocalKeyReference(
-                keyType: LocalKeyReferenceType.pubKeys,
-                offset: publicKeys.keys.toList().indexOf(AccountRole.proposer),
+                keyType: LocalKeyReferenceType.x509Certs,
+                offset: derCerts.keys.toList().indexOf(AccountRole.root),
               ),
               // Refer to first key in transaction outputs,
               // in our case it's the change address (which the user controls).
               paymentKey: -1,
             ),
-        },
-      ),
-    );
+            if (roles.contains(AccountRole.proposer))
+              RoleData(
+                roleNumber: AccountRole.proposer.number,
+                roleSigningKey: LocalKeyReference(
+                  keyType: LocalKeyReferenceType.pubKeys,
+                  offset:
+                      publicKeys.keys.toList().indexOf(AccountRole.proposer),
+                ),
+                // Refer to first key in transaction outputs, in our case
+                // it's the change address (which the user controls).
+                paymentKey: -1,
+              ),
+          },
+        ),
+      );
 
-    return x509Envelope.sign(
-      privateKey: Bip32Ed25519XPrivateKeyFactory.instance.fromBytes(
+      final privateKey = Bip32Ed25519XPrivateKeyFactory.instance.fromBytes(
         rootKeyPair.privateKey.bytes,
-      ),
-      serializer: (e) => e.toCbor(),
-    );
+      );
+
+      return privateKey.use((privateKey) {
+        return x509Envelope.sign(
+          privateKey: privateKey,
+          serializer: (e) => e.toCbor(),
+        );
+      });
+    });
   }
 
   Transaction _buildUnsignedRbacTx({required AuxiliaryData auxiliaryData}) {
@@ -159,13 +166,13 @@ final class RegistrationTransactionBuilder {
     );
   }
 
-  Future<Ed25519PublicKey> _deriveProposerPublicKey() async {
-    final keyPair = await keyDerivationService.deriveAccountRoleKeyPair(
+  Future<Ed25519PublicKey> _deriveProposerPublicKey() {
+    final keyPair = keyDerivationService.deriveAccountRoleKeyPair(
       masterKey: masterKey,
       role: AccountRole.proposer,
     );
 
-    return keyPair.publicKey.toEd25519();
+    return keyPair.use((keyPair) => keyPair.publicKey.toEd25519());
   }
 
   Future<X509Certificate> _generateX509Certificate({
@@ -209,12 +216,16 @@ final class RegistrationTransactionBuilder {
     );
     /* cSpell:enable */
 
-    return X509Certificate.generateSelfSigned(
-      tbsCertificate: tbs,
-      privateKey: Bip32Ed25519XPrivateKeyFactory.instance.fromBytes(
-        keyPair.privateKey.bytes,
-      ),
+    final privateKey = Bip32Ed25519XPrivateKeyFactory.instance.fromBytes(
+      keyPair.privateKey.bytes,
     );
+
+    return privateKey.use((privateKey) {
+      return X509Certificate.generateSelfSigned(
+        tbsCertificate: tbs,
+        privateKey: privateKey,
+      );
+    });
   }
 }
 

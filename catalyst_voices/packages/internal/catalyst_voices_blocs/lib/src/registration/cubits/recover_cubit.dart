@@ -10,19 +10,22 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:result_type/result_type.dart';
 
+const _testWords = [
+  SeedPhraseWord('broken', nr: 1),
+  SeedPhraseWord('member', nr: 2),
+  SeedPhraseWord('repeat', nr: 3),
+  SeedPhraseWord('liquid', nr: 4),
+  SeedPhraseWord('barely', nr: 5),
+  SeedPhraseWord('electric', nr: 6),
+  SeedPhraseWord('theory', nr: 7),
+  SeedPhraseWord('paddle', nr: 8),
+  SeedPhraseWord('coyote', nr: 9),
+  SeedPhraseWord('behind', nr: 10),
+  SeedPhraseWord('unique', nr: 11),
+  SeedPhraseWord('member', nr: 12),
+];
+
 final _logger = Logger('RecoverCubit');
-
-abstract interface class RecoverManager implements UnlockPasswordManager {
-  Future<void> checkLocalKeychains();
-
-  void setSeedPhraseWords(List<SeedPhraseWord> words);
-
-  Future<bool> recoverAccount();
-
-  Future<bool> createKeychain();
-
-  Future<void> reset();
-}
 
 final class RecoverCubit extends Cubit<RecoverStateData>
     with BlocErrorEmitterMixin, UnlockPasswordMixin
@@ -56,18 +59,36 @@ final class RecoverCubit extends Cubit<RecoverStateData>
   }
 
   @override
-  void setSeedPhraseWords(List<SeedPhraseWord> words) {
-    final isValid = SeedPhrase.isValid(words: words);
-    if (isValid) {
-      _seedPhrase = SeedPhrase.fromWords(words);
+  Future<bool> createKeychain() async {
+    final account = _recoveredAccount;
+    final seedPhrase = _seedPhrase;
+    final password = this.password;
+
+    if (account == null || seedPhrase == null || password.isNotValid) {
+      emitError(const LocalizedRegistrationUnknownException());
+      return false;
     }
 
-    emit(
-      state.copyWith(
-        userSeedPhraseWords: words,
-        isSeedPhraseValid: isValid,
-      ),
+    final lockFactor = PasswordLockFactor(password.value);
+    final masterKey = _registrationService.deriveMasterKey(
+      seedPhrase: seedPhrase,
     );
+
+    return masterKey.use((masterKey) async {
+      final keychain = account.keychain;
+      await keychain.setLock(lockFactor);
+      await keychain.unlock(lockFactor);
+      await keychain.setMasterKey(masterKey);
+
+      await _userService.useAccount(account);
+
+      return true;
+    });
+  }
+
+  @override
+  void onUnlockPasswordStateChanged(UnlockPasswordState data) {
+    emit(state.copyWith(unlockPasswordState: data));
   }
 
   @override
@@ -131,37 +152,6 @@ final class RecoverCubit extends Cubit<RecoverStateData>
   }
 
   @override
-  Future<bool> createKeychain() async {
-    final account = _recoveredAccount;
-    final seedPhrase = _seedPhrase;
-    final password = this.password;
-
-    if (account == null || seedPhrase == null || password.isNotValid) {
-      emitError(const LocalizedRegistrationUnknownException());
-      return false;
-    }
-
-    final lockFactor = PasswordLockFactor(password.value);
-    final masterKey = await _registrationService.deriveMasterKey(
-      seedPhrase: seedPhrase,
-    );
-
-    final keychain = account.keychain;
-    await keychain.setLock(lockFactor);
-    await keychain.unlock(lockFactor);
-    await keychain.setMasterKey(masterKey);
-
-    await _userService.useAccount(account);
-
-    return true;
-  }
-
-  @override
-  void onUnlockPasswordStateChanged(UnlockPasswordState data) {
-    emit(state.copyWith(unlockPasswordState: data));
-  }
-
-  @override
   Future<void> reset() async {
     final recoveredAccount = _recoveredAccount;
     if (recoveredAccount != null) {
@@ -172,19 +162,31 @@ final class RecoverCubit extends Cubit<RecoverStateData>
 
     setSeedPhraseWords([]);
   }
+
+  @override
+  void setSeedPhraseWords(List<SeedPhraseWord> words) {
+    final isValid = SeedPhrase.isValid(words: words);
+    if (isValid) {
+      _seedPhrase = SeedPhrase.fromWords(words);
+    }
+
+    emit(
+      state.copyWith(
+        userSeedPhraseWords: words,
+        isSeedPhraseValid: isValid,
+      ),
+    );
+  }
 }
 
-const _testWords = [
-  SeedPhraseWord('broken', nr: 1),
-  SeedPhraseWord('member', nr: 2),
-  SeedPhraseWord('repeat', nr: 3),
-  SeedPhraseWord('liquid', nr: 4),
-  SeedPhraseWord('barely', nr: 5),
-  SeedPhraseWord('electric', nr: 6),
-  SeedPhraseWord('theory', nr: 7),
-  SeedPhraseWord('paddle', nr: 8),
-  SeedPhraseWord('coyote', nr: 9),
-  SeedPhraseWord('behind', nr: 10),
-  SeedPhraseWord('unique', nr: 11),
-  SeedPhraseWord('member', nr: 12),
-];
+abstract interface class RecoverManager implements UnlockPasswordManager {
+  Future<void> checkLocalKeychains();
+
+  Future<bool> createKeychain();
+
+  Future<bool> recoverAccount();
+
+  Future<void> reset();
+
+  void setSeedPhraseWords(List<SeedPhraseWord> words);
+}
