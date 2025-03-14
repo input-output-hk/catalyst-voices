@@ -18,36 +18,39 @@ final class Proposal extends Equatable {
   final int commentsCount;
   final String category;
 
-  const Proposal({
-    required this.selfRef,
-    required this.title,
-    required this.description,
-    required this.updateDate,
-    this.fundedDate,
-    required this.fundsRequested,
-    required this.status,
-    required this.publish,
-    this.versions = const [],
-    required this.duration,
-    required this.author,
-    required this.commentsCount,
-    required this.category,
-  });
+  factory Proposal({
+    required DocumentRef selfRef,
+    required String title,
+    required String description,
+    required DateTime updateDate,
+    DateTime? fundedDate,
+    required Coin fundsRequested,
+    required ProposalStatus status,
+    required ProposalPublish publish,
+    List<ProposalVersion> versions = const [],
+    required int duration,
+    required String author,
+    required int commentsCount,
+    required String category,
+  }) {
+    versions.sort();
 
-  factory Proposal.dummy(DocumentRef ref) => Proposal(
-        selfRef: ref,
-        category: 'Cardano Use Cases / MVP',
-        title: 'Dummy Proposal',
-        updateDate: DateTime.now(),
-        fundsRequested: Coin.fromAda(100000),
-        status: ProposalStatus.draft,
-        publish: ProposalPublish.localDraft,
-        commentsCount: 0,
-        description: 'Dummy description',
-        duration: 6,
-        author: 'Alex Wells',
-        versions: const [],
-      );
+    return Proposal._(
+      selfRef: selfRef,
+      category: category,
+      title: title,
+      updateDate: updateDate,
+      fundedDate: fundedDate,
+      fundsRequested: fundsRequested,
+      status: status,
+      publish: publish,
+      commentsCount: commentsCount,
+      description: description,
+      duration: duration,
+      author: author,
+      versions: versions,
+    );
+  }
 
   factory Proposal.fromData(ProposalData data) {
     DateTime updateDate;
@@ -55,9 +58,10 @@ final class Proposal extends Equatable {
         data.document.metadata.selfRef.id;
     updateDate = UuidUtils.dateTime(version);
 
-    final versions = data.versions.map(ProposalVersion.fromData).toList();
+    final versions = data.versions.map(ProposalVersion.fromData).toList()
+      ..sort();
 
-    return Proposal(
+    return Proposal._(
       selfRef: data.document.metadata.selfRef,
       title: data.getProposalTitle() ?? '',
       description: data.getProposalDescription() ?? '',
@@ -74,6 +78,22 @@ final class Proposal extends Equatable {
       category: data.categoryId,
     );
   }
+
+  const Proposal._({
+    required this.selfRef,
+    required this.title,
+    required this.description,
+    required this.updateDate,
+    this.fundedDate,
+    required this.fundsRequested,
+    required this.status,
+    required this.publish,
+    this.versions = const [],
+    required this.duration,
+    required this.author,
+    required this.commentsCount,
+    required this.category,
+  });
 
   @override
   List<Object?> get props => [
@@ -105,7 +125,7 @@ final class Proposal extends Equatable {
     List<ProposalVersion>? versions,
     String? category,
   }) =>
-      Proposal(
+      Proposal._(
         selfRef: selfRef ?? this.selfRef,
         title: title ?? this.title,
         description: description ?? this.description,
@@ -122,7 +142,7 @@ final class Proposal extends Equatable {
 }
 
 extension ProposalWithVersionX on Proposal {
-  static Proposal dummy(ProposalPublish publish) => Proposal(
+  static Proposal dummy(ProposalPublish publish) => Proposal._(
         selfRef: const SignedDocumentRef(
           id: '019584be-f0ef-7b01-8d36-422a3d6a0533',
           version: '019584be-2321-7a1a-9b68-ad33a97a7e84',

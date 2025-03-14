@@ -34,7 +34,6 @@ void main() {
 
     registerFallbackValue(const SignedDocumentRef(id: 'fallback-id'));
 
-    // Add a default response for any watchProposalCommentsCount call
     when(
       () => mockDocumentRepository.watchCount(
         ref: any(named: 'ref'),
@@ -92,13 +91,13 @@ void main() {
       ).thenAnswer((_) => Stream.value([proposalData1, proposalData2]));
 
       when(
-        () => mockDocumentRepository.queryVersionsOfId(
+        () => mockProposalRepository.queryVersionsOfId(
           id: any(named: 'id'),
         ),
       ).thenAnswer((_) => Future.value([proposalData1]));
 
       when(
-        () => mockDocumentRepository.watchCount(
+        () => mockProposalRepository.watchCount(
           ref: any(named: 'ref'),
           type: DocumentType.commentTemplate,
         ),
@@ -116,13 +115,13 @@ void main() {
       ).called(1);
 
       verify(
-        () => mockDocumentRepository.queryVersionsOfId(
+        () => mockProposalRepository.queryVersionsOfId(
           id: any(named: 'id'),
         ),
       ).called(2);
 
       verify(
-        () => mockDocumentRepository.watchCount(
+        () => mockProposalRepository.watchCount(
           ref: any(named: 'ref'),
           type: DocumentType.commentTemplate,
         ),
@@ -216,7 +215,7 @@ void main() {
           ]),
         );
       },
-      skip: true,
+      // skip: true,
     );
   });
 }
