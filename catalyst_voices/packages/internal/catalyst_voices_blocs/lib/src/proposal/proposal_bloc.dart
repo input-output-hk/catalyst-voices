@@ -13,9 +13,11 @@ final class ProposalBloc extends Bloc<ProposalEvent, ProposalState>
     with
         DocumentToSegmentMixin,
         BlocSignalEmitterMixin<ProposalSignal, ProposalState> {
+  final UserService _userService;
   final ProposalService _proposalService;
 
   ProposalBloc(
+    this._userService,
     this._proposalService,
   ) : super(const ProposalState()) {
     on<ShowProposalEvent>(_handleShowProposalEvent);
@@ -27,21 +29,7 @@ final class ProposalBloc extends Bloc<ProposalEvent, ProposalState>
     SignedDocumentRef? parent,
     String? message,
   }) {
-    final commentTemplate = DocumentSchema.optional(
-      properties: [
-        DocumentGenericObjectSchema.optional(
-          nodeId: DocumentNodeId.fromString('comment'),
-          description: const MarkdownData('The comments on the proposal'),
-          properties: [
-            DocumentMultiLineTextEntrySchema.optional(
-              nodeId: DocumentNodeId.fromString('comment.content'),
-              description: const MarkdownData('The comment text content'),
-              strLengthRange: const Range(min: 1, max: 5000),
-            ),
-          ],
-        ),
-      ],
-    );
+    final commentTemplate = _buildSchema();
 
     final builder = DocumentBuilder.fromSchema(schema: commentTemplate);
 
@@ -64,7 +52,22 @@ final class ProposalBloc extends Bloc<ProposalEvent, ProposalState>
     );
   }
 
+  CommentTemplate _buildCommentTemplate() {
+    final schema = _buildSchema();
+
+    final document = DocumentBuilder.fromSchema(schema: schema).build();
+
+    return CommentTemplate(
+      metadata: CommentTemplateMetadata(
+        selfRef: SignedDocumentRef.generateFirstRef(),
+      ),
+      document: document,
+    );
+  }
+
   ProposalViewData _buildProposalViewData(ProposalData proposal) {
+    final activeAccountId = _userService.user.activeAccount?.catalystId;
+
     final proposalDocument = proposal.document;
     final proposalDocumentRef = proposalDocument.metadata.selfRef;
 
@@ -82,6 +85,37 @@ final class ProposalBloc extends Bloc<ProposalEvent, ProposalState>
 
     final currentVersion = versions.singleWhereOrNull((e) => e.isCurrent);
 
+    final firstComment = _buildComment(
+      message: 'The first rule about fight club is...',
+    );
+    final comments = [
+      CommentWithReplies(
+        comment: firstComment,
+        replies: [
+          CommentWithReplies(
+            comment: _buildComment(
+              parent: firstComment.metadata.selfRef,
+              message: 'Don’t talk about fight club',
+            ),
+            replies: const [],
+          ),
+        ],
+      ),
+      CommentWithReplies(
+        comment: _buildComment(
+          message: '''
+            This proposal embodies a bold and disruptive vision 
+            that aligns with the decentralised ethos of the Cardano ecosystem. 
+            The focus on empowering individuals through grassroots action and 
+            the inclusion of open-source methodologies makes it a transformative
+             initiative. The clear milestones and emphasis on secure, replicable
+              strategies inspire confidence in the project’s feasibility and 
+              scalability. I look forward to seeing its impact.''',
+        ),
+        replies: const [],
+      ),
+    ];
+
     final overviewSegment = ProposalOverviewSegment.build(
       categoryName: 'Cardano Partners: Growth & Acceleration',
       proposalTitle: 'Project Mayhem: Freedom by Chaos',
@@ -98,44 +132,22 @@ final class ProposalBloc extends Bloc<ProposalEvent, ProposalState>
         createdAt: currentVersion?.id.tryDateTime ?? DateTime.now(),
         warningCreatedAt: currentVersion?.isLatest == false,
         tag: 'Community Outreach',
-        commentsCount: 6,
+        commentsCount: comments.length,
         fundsRequested: 200000,
         projectDuration: 12,
         milestoneCount: 3,
       ),
     );
 
-    final firstComment = _buildComment(
-      message: 'The first rule about fight club is...',
-    );
     final commentsSegment = ProposalCommentsSegment.build(
-      comments: [
-        CommentWithReplies(
-          comment: firstComment,
-          replies: [
-            CommentWithReplies(
-              comment: _buildComment(
-                parent: firstComment.metadata.selfRef,
-                message: 'Don’t talk about fight club',
-              ),
-              replies: const [],
+      authorId: activeAccountId ??
+          CatalystId.fromUri(
+            Uri.parse(
+              'id.catalyst://cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE',
             ),
-          ],
-        ),
-        CommentWithReplies(
-          comment: _buildComment(
-            message: '''
-            This proposal embodies a bold and disruptive vision 
-            that aligns with the decentralised ethos of the Cardano ecosystem. 
-            The focus on empowering individuals through grassroots action and 
-            the inclusion of open-source methodologies makes it a transformative
-             initiative. The clear milestones and emphasis on secure, replicable
-              strategies inspire confidence in the project’s feasibility and 
-              scalability. I look forward to seeing its impact.''',
           ),
-          replies: const [],
-        ),
-      ],
+      template: _buildCommentTemplate(),
+      comments: comments,
     );
 
     return ProposalViewData(
@@ -156,6 +168,25 @@ final class ProposalBloc extends Bloc<ProposalEvent, ProposalState>
       ],
     );
     /* cSpell:enable */
+  }
+
+  DocumentSchema _buildSchema() {
+    return DocumentSchema.optional(
+      properties: [
+        DocumentGenericObjectSchema.optional(
+          nodeId: DocumentNodeId.fromString('comment'),
+          description: const MarkdownData('The comments on the proposal'),
+          properties: [
+            DocumentMultiLineTextEntrySchema.optional(
+              nodeId: DocumentNodeId.fromString('comment.content'),
+              description: const MarkdownData('The comment text content'),
+              strLengthRange: const Range(min: 1, max: 5000),
+              isRequired: true,
+            ),
+          ],
+        ),
+      ],
+    );
   }
 
   Future<void> _changeDocumentTo({
