@@ -33,8 +33,9 @@ final class Proposal extends Equatable {
     required String author,
     required int commentsCount,
     required String category,
+    required SignedDocumentRef categoryId,
   }) {
-    versions.sort();
+    final sortedVersions = List<ProposalVersion>.from(versions)..sort();
 
     return Proposal._(
       selfRef: selfRef,
@@ -49,7 +50,8 @@ final class Proposal extends Equatable {
       description: description,
       duration: duration,
       author: author,
-      versions: versions,
+      versions: sortedVersions,
+      categoryId: categoryId,
     );
   }
 
@@ -76,7 +78,8 @@ final class Proposal extends Equatable {
       duration: data.getProposalDuration() ?? 0,
       author: data.getProposalAuthor() ?? '',
       commentsCount: data.commentsCount,
-      category: data.categoryId,
+      categoryId: data.categoryId,
+      category: '',
     );
   }
 
@@ -162,6 +165,7 @@ extension ProposalWithVersionX on Proposal {
         author: 'Alex Wells',
         commentsCount: 0,
         category: 'Cardano Use Cases / MVP',
+        categoryId: const SignedDocumentRef(id: 'dummy_category_id'),
         versions: [
           ProposalVersion(
             publish: ProposalPublish.publishedDraft,

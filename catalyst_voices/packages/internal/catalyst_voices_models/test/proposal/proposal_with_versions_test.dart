@@ -29,6 +29,7 @@ void main() {
         author: 'Alex Wells',
         commentsCount: 0,
         category: 'Cardano Use Cases / MVP',
+        categoryId: SignedDocumentRef.generateFirstRef(),
         versions: [
           ProposalVersion(
             publish: ProposalPublish.publishedDraft,
@@ -98,6 +99,7 @@ void main() {
         author: 'Alex Wells',
         commentsCount: 0,
         category: 'Cardano Use Cases / MVP',
+        categoryId: SignedDocumentRef.generateFirstRef(),
         versions: [
           ProposalVersion(
             publish: ProposalPublish.publishedDraft,

@@ -109,7 +109,7 @@ abstract interface class DocumentRepository {
   /// Updates local draft (or drafts if version is not specified)
   /// matching [ref] with given [content].
   ///
-  /// If watching same draft with [watchProposalDocument] it will emit
+  /// If watching same draft with [watchDocument] it will emit
   /// change.
   Future<void> updateDocumentDraft({
     required DraftRef ref,
@@ -121,17 +121,17 @@ abstract interface class DocumentRepository {
     required DocumentType type,
   });
 
+  /// Observes matching [ProposalDocument] and emits updates.
+  ///
+  /// Source of data depends whether [ref] is [SignedDocumentRef] or [DraftRef].
+  Stream<ProposalDocument> watchDocument({
+    required DocumentRef ref,
+  });
+
   Stream<List<({DocumentData data, DocumentData refData})>> watchDocuments({
     required DocumentType type,
     int? limit,
     bool unique = false,
-  });
-
-  /// Observes matching [ProposalDocument] and emits updates.
-  ///
-  /// Source of data depends whether [ref] is [SignedDocumentRef] or [DraftRef].
-  Stream<ProposalDocument> watchProposalDocument({
-    required DocumentRef ref,
   });
 }
 
@@ -262,6 +262,11 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   }
 
   @override
+  Future<void> publishDocument({required SignedDocument document}) async {
+    await _remoteDocuments.publish(document);
+  }
+
+  @override
   Future<List<ProposalDocument>> queryVersionsOfId({required String id}) async {
     final documents = await _localDocuments.queryVersionsOfId(id: id);
     if (documents.isEmpty) return [];
@@ -277,11 +282,6 @@ final class DocumentRepositoryImpl implements DocumentRepository {
         )
         .toList();
   }
-  Future<void> publishDocument({required SignedDocument document}) async {
-    await _remoteDocuments.publish(document);
-  }
-
-  
 
   @override
   Future<void> updateDocumentDraft({
@@ -292,11 +292,6 @@ final class DocumentRepositoryImpl implements DocumentRepository {
       ref: ref,
       content: content,
     );
-  }
-
-  @override
-  Future<void> uploadDocument({required SignedDocument document}) async {
-    await _remoteDocuments.upload(document);
   }
 
   @visibleForTesting
@@ -332,6 +327,29 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     return _localDocuments.watchCount(
       ref: ref,
       type: type,
+    );
+  }
+
+  @override
+  Stream<ProposalDocument> watchDocument({
+    required DocumentRef ref,
+  }) {
+    // TODO(damian-molinski): remove this override once we have API
+    ref = ref.copyWith(id: mockedDocumentUuid);
+
+    return watchDocumentWithRef(
+      ref: ref,
+      refGetter: (data) => data.metadata.template!,
+    ).whereNotNull().map(
+      (event) {
+        final documentData = event.data;
+        final templateData = event.refData;
+
+        return _buildProposalDocument(
+          documentData: documentData,
+          templateData: templateData,
+        );
+      },
     );
   }
 
@@ -376,29 +394,6 @@ final class DocumentRepositoryImpl implements DocumentRepository {
         },
       );
     });
-  }
-
-  @override
-  Stream<ProposalDocument> watchProposalDocument({
-    required DocumentRef ref,
-  }) {
-    // TODO(damian-molinski): remove this override once we have API
-    ref = ref.copyWith(id: mockedDocumentUuid);
-
-    return watchDocumentWithRef(
-      ref: ref,
-      refGetter: (data) => data.metadata.template!,
-    ).whereNotNull().map(
-      (event) {
-        final documentData = event.data;
-        final templateData = event.refData;
-
-        return _buildProposalDocument(
-          documentData: documentData,
-          templateData: templateData,
-        );
-      },
-    );
   }
 
   ProposalDocument _buildProposalDocument({

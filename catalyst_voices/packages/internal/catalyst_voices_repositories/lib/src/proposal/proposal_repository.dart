@@ -49,8 +49,7 @@ abstract interface class ProposalRepository {
   Future<void> deleteDraftProposal(DraftRef ref);
 
   Future<Uint8List> encodeProposalForExport({
-    required DocumentDataMetadata metadata,
-    required DocumentDataContent content,
+    required DocumentData document,
   });
 
   Future<List<String>> getFavoritesProposalsIds();
@@ -73,10 +72,7 @@ abstract interface class ProposalRepository {
 
   Future<List<String>> getUserProposalsIds(String userId);
 
-
   Future<DocumentRef> importProposal(Uint8List data);
-
-  Future<List<ProposalDocument>> queryVersionsOfId({required String id});
 
   Future<void> publishProposal({
     required DocumentData document,
@@ -92,15 +88,13 @@ abstract interface class ProposalRepository {
     required CatalystPrivateKey privateKey,
   });
 
+  Future<List<ProposalDocument>> queryVersionsOfId({required String id});
 
   Future<List<String>> removeFavoriteProposal(String proposalId);
 
   Future<void> updateDraftProposal({
     required DraftRef ref,
     required DocumentDataContent content,
-  });
-  Future<void> uploadDocument({
-    required SignedDocument document,
   });
 
   Stream<int> watchCount({
@@ -147,12 +141,10 @@ final class ProposalRepositoryImpl implements ProposalRepository {
 
   @override
   Future<Uint8List> encodeProposalForExport({
-    required DocumentDataMetadata metadata,
-    required DocumentDataContent content,
+    required DocumentData document,
   }) {
     return _documentRepository.encodeDocumentForExport(
-      metadata: metadata,
-      content: content,
+      document: document,
     );
   }
 
@@ -192,7 +184,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
 
     return ProposalData(
       document: proposalDocument,
-      categoryId: documentData.metadata.categoryId ?? '',
+      categoryId: SignedDocumentRef.generateFirstRef(),
       commentsCount: commentsCount,
       versions: proposalVersions,
     );
@@ -265,9 +257,6 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   }
 
   @override
-  Future<List<ProposalDocument>> queryVersionsOfId({required String id}) {
-    return _documentRepository.queryVersionsOfId(id: id);
-
   Future<void> publishProposal({
     required DocumentData document,
     required CatalystId catalystId,
@@ -306,7 +295,11 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     );
 
     await _documentRepository.publishDocument(document: signedDocument);
+  }
 
+  @override
+  Future<List<ProposalDocument>> queryVersionsOfId({required String id}) {
+    return _documentRepository.queryVersionsOfId(id: id);
   }
 
   @override
@@ -324,13 +317,6 @@ final class ProposalRepositoryImpl implements ProposalRepository {
       ref: ref,
       content: content,
     );
-  }
-
-  @override
-  Future<void> uploadDocument({
-    required SignedDocument<SignedDocumentPayload> document,
-  }) {
-    return _documentRepository.uploadDocument(document: document);
   }
 
   @override
@@ -428,6 +414,8 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     return ProposalTemplate(
       metadata: metadata,
       schema: schema,
+    );
+  }
 
   SignedDocumentMetadata _createProposalMetadata(
     DocumentDataMetadata metadata,
@@ -446,7 +434,6 @@ final class ProposalRepositoryImpl implements ProposalRepository {
       categoryId: categoryId == null
           ? null
           : SignedDocumentMetadataRef.fromDocumentRef(categoryId),
-
     );
   }
 

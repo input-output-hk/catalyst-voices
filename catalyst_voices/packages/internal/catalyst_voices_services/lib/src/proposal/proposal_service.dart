@@ -124,8 +124,7 @@ final class ProposalServiceImpl implements ProposalService {
     required DocumentData document,
   }) {
     return _proposalRepository.encodeProposalForExport(
-      metadata: metadata,
-      content: content,
+      document: document,
     );
   }
 
@@ -140,7 +139,6 @@ final class ProposalServiceImpl implements ProposalService {
     required DocumentRef ref,
   }) async {
     return _proposalRepository.getProposal(ref: ref);
-
   }
 
   @override
@@ -255,7 +253,7 @@ final class ProposalServiceImpl implements ProposalService {
               .map((commentsCount) {
             final proposalData = ProposalData(
               document: doc,
-              categoryId: DocumentType.categoryParametersDocument.uuid,
+              categoryId: SignedDocumentRef.generateFirstRef(),
               versions: versionsData,
               commentsCount: commentsCount,
             );
