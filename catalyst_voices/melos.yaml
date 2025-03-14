@@ -226,7 +226,7 @@ scripts:
     description: Run `flutter test` for all packages.
 
   # TODO(kukkok3):
-  # catalyst_voices: enable when widget tests are fixed
+  # catalyst_voices: this package should contain only widget tests
   # catalyst_voices_repositories: enable when https://github.com/input-output-hk/catalyst-voices/issues/1980 is fixed
   # catalyst_voices_assets: enable when https://github.com/input-output-hk/catalyst-voices/issues/1979 is fixed
   test-web:
@@ -244,7 +244,7 @@ scripts:
       find . -type d -name coverage -prune -exec rm -rf {} \;
       mkdir $MELOS_ROOT_PATH/coverage
       # run tests, generate junit reports in /test_reports/ & code coverage report
-      melos exec -c 1 --dir-exists="test" -- \
+      melos exec -c 1 --dir-exists="test" --ignore="catalyst_voices" -- \
       ' TESTS_OUTPUT_FILE="$MELOS_ROOT_PATH/test_reports/$MELOS_PACKAGE_NAME.tests-output.json"
         JUNIT_REPORT_FILE="$MELOS_ROOT_PATH/test_reports/$MELOS_PACKAGE_NAME.junit-report.xml"
         flutter test --platform chrome --reporter github --file-reporter=json:$TESTS_OUTPUT_FILE --coverage ; \
