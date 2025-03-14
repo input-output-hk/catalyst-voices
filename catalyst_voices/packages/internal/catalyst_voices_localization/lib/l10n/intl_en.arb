@@ -1843,6 +1843,31 @@
   "@notFoundError": {
     "description": "Error message when user tries to access resourse that does not exist."
   },
+<<<<<<< HEAD
+  "title": "Title",
+  "@title": {
+    "description": "description of the title field"
+  },
+  "required": "Required",
+  "@required": {
+    "description": "description of the required field"
+  },
+  "selectedCategory": "Selected category",
+  "@selectedCategory": {
+    "description": "description of the selected category field"
+  },
+  "jumpToCampaignCategory": "Jump to campaign category",
+  "@jumpToCampaignCategory": {
+    "description": "description of the button that takes to campaign category page"
+  },
+  "saveDraft": "Save draft",
+  "@saveDraft": {
+    "description": "description of the button that saves the draft"
+  },
+  "openInEditor": "Open in editor",
+  "@openInEditor": {
+    "description": "description of the button that opens the proposal in editor"
+  },
   "latestDocumentVersion": "Latest",
   "@latestDocumentVersion": {
     "description": "When showing different version of proposal we may add suffix indicating this is latest version"
