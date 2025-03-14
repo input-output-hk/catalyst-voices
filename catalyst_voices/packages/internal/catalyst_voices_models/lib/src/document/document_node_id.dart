@@ -1,4 +1,4 @@
-import 'package:catalyst_voices_models/src/node_id.dart';
+import 'package:catalyst_voices_models/src/common/node_id.dart';
 
 /// The interface that every object in a document should implement,
 /// helps to navigate to a certain segment/section/property of the document.
@@ -49,6 +49,7 @@ final class DocumentNodeId extends NodeId {
   /// Returns a child node at given [path].
   ///
   /// The [path] is appended to the parent's [path].
+  @override
   DocumentNodeId child(String path) {
     return DocumentNodeId._fromPaths([
       ...paths,

@@ -29,6 +29,10 @@ extension StringExt on String {
   String withPrefix(String value) => '$value$this';
 
   String withSuffix(String value) => '$this$value';
+
+  bool equalsIgnoreCase(String? other) {
+    return toLowerCase() == other?.toLowerCase();
+  }
 }
 
 extension UrlParser on String {
@@ -39,6 +43,14 @@ extension UrlParser on String {
 
 extension UuidStringUtils on String {
   DateTime get dateTime => UuidUtils.dateTime(this);
+
+  DateTime? get tryDateTime {
+    try {
+      return dateTime;
+    } catch (_) {
+      return null;
+    }
+  }
 
   int get version => UuidUtils.version(this);
 }

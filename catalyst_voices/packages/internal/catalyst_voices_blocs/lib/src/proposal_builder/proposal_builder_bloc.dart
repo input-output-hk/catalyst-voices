@@ -62,11 +62,19 @@ final class ProposalBuilderBloc
     return documentBuilder!.build();
   }
 
+  DocumentData _buildDocumentData() {
+    return DocumentData(
+      metadata: _buildDocumentMetadata(),
+      content: _documentMapper.toContent(_buildDocument()),
+    );
+  }
+
   DocumentDataMetadata _buildDocumentMetadata() {
     return DocumentDataMetadata(
       type: DocumentType.proposalDocument,
       selfRef: state.metadata.documentRef!,
       template: state.metadata.templateRef,
+      categoryId: state.metadata.categoryId,
     );
   }
 
@@ -121,11 +129,8 @@ final class ProposalBuilderBloc
     try {
       final documentRef = state.metadata.documentRef!;
       final proposalId = documentRef.id;
-      final document = _buildDocument();
-
       final encodedProposal = await _proposalService.encodeProposalForExport(
-        metadata: _buildDocumentMetadata(),
-        content: _documentMapper.toContent(document),
+        document: _buildDocumentData(),
       );
 
       final filename = '${event.filePrefix}_$proposalId';
@@ -262,6 +267,9 @@ final class ProposalBuilderBloc
         document: documentBuilder.build(),
         metadata: ProposalBuilderMetadata.newDraft(
           templateRef: proposalTemplateRef,
+          // TODO(dtscalac): refactor proposal builder to require category ID
+          // as input when creating a new proposal
+          categoryId: const SignedDocumentRef(id: 'category_id'),
         ),
       );
     });
@@ -282,7 +290,9 @@ final class ProposalBuilderBloc
         metadata: ProposalBuilderMetadata(
           publish: proposal.publish,
           documentRef: proposal.selfRef,
+          originalDocumentRef: proposal.selfRef,
           currentIteration: proposal.versionCount,
+          categoryId: proposal.categoryId,
         ),
       );
     });
@@ -308,6 +318,9 @@ final class ProposalBuilderBloc
         document: documentBuilder.build(),
         metadata: ProposalBuilderMetadata.newDraft(
           templateRef: ref,
+          // TODO(dtscalac): refactor proposal builder to require category ID
+          // as input when creating a new proposal
+          categoryId: const SignedDocumentRef(id: 'category_id'),
         ),
       );
     });
@@ -318,15 +331,22 @@ final class ProposalBuilderBloc
     Future<ProposalBuilderState> Function() stateBuilder,
   ) async {
     try {
-      emit(const ProposalBuilderState(isChanging: true));
+      _logger.info('load state');
+      emit(
+        const ProposalBuilderState(
+          isChanging: true,
+        ),
+      );
       _documentBuilder = null;
 
       final newState = await stateBuilder();
       _documentBuilder = newState.document?.toBuilder();
       emit(newState);
-    } on LocalizedException catch (error) {
+    } on LocalizedException catch (error, stackTrace) {
+      _logger.severe('load state error', error, stackTrace);
       emit(ProposalBuilderState(error: error));
-    } catch (error) {
+    } catch (error, stackTrace) {
+      _logger.severe('load state error', error, stackTrace);
       emit(const ProposalBuilderState(error: LocalizedUnknownException()));
     } finally {
       emit(state.copyWith(isChanging: false));
@@ -368,8 +388,10 @@ final class ProposalBuilderBloc
   ) async {
     try {
       _logger.info('Publishing proposal');
-      final document = _buildDocument();
-      await _proposalService.publishProposal(document);
+
+      await _proposalService.publishProposal(
+        document: _buildDocumentData(),
+      );
     } catch (error, stackTrace) {
       _logger.severe('PublishProposal', error, stackTrace);
       emitError(error);
@@ -382,16 +404,19 @@ final class ProposalBuilderBloc
     Document document,
   ) async {
     final ref = state.metadata.documentRef!;
-    final nextRef = await _updateDraftProposal(
+    final nextRef = await _upsertDraftProposal(
       ref,
       _documentMapper.toContent(document),
     );
 
-    if (nextRef != null && ref != nextRef) {
+    if (ref != nextRef) {
       final updatedMetadata = state.metadata.copyWith(
         documentRef: Optional(nextRef),
+        originalDocumentRef: Optional(nextRef),
       );
-      final updatedState = state.copyWith(metadata: updatedMetadata);
+      final updatedState = state.copyWith(
+        metadata: updatedMetadata,
+      );
       emit(updatedState);
     }
   }
@@ -402,23 +427,37 @@ final class ProposalBuilderBloc
   ) async {
     try {
       _logger.info('Submitting proposal for review');
-      final document = _buildDocument();
-      await _proposalService.submitProposalForReview(document);
+
+      await _proposalService.submitProposalForReview(
+        ref: state.metadata.documentRef! as SignedDocumentRef,
+        categoryId: state.metadata.categoryId!,
+      );
     } catch (error, stackTrace) {
       _logger.severe('SubmitProposalForReview', error, stackTrace);
       emitError(error);
     }
   }
 
-  Future<DraftRef?> _updateDraftProposal(
+  Future<DraftRef?> _upsertDraftProposal(
     DocumentRef currentRef,
     DocumentDataContent document,
   ) async {
-    final nextRef = currentRef.nextVersion();
-    await _proposalService.updateDraftProposal(
-      ref: nextRef,
-      content: document,
-    );
+    final originalRef = state.metadata.originalDocumentRef;
+    DraftRef nextRef;
+    if (originalRef == null) {
+      final template = state.metadata.templateRef;
+
+      nextRef = await _proposalService.createDraftProposal(
+        content: document,
+        template: template!,
+      );
+    } else {
+      nextRef = currentRef.nextVersion();
+      await _proposalService.updateDraftProposal(
+        ref: nextRef,
+        content: document,
+      );
+    }
 
     return nextRef;
   }

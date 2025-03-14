@@ -36,7 +36,7 @@ final class ProposalsCubit extends Cubit<ProposalsState> {
     await _campaignService.getCampaignCategories();
     final categories = List.generate(
       6,
-      (index) => CampaignCategoryViewModel.dummy(id: '$index'),
+      (index) => CampaignCategoryDetailsViewModel.dummy(id: '$index'),
     );
 
     emit(state.copyWith(categories: categories));

@@ -16,7 +16,7 @@ class SessionAccountAvatar extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocSelector<SessionCubit, SessionState, String>(
       selector: (state) {
-        return state.account?.displayName.firstLetter?.capitalize() ?? '';
+        return state.account?.username?.firstLetter?.capitalize() ?? '';
       },
       builder: (context, state) {
         return _Avatar(

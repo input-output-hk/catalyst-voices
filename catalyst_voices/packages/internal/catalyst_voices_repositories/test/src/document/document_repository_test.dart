@@ -233,14 +233,15 @@ void main() {
       });
     });
 
-    group('createProposalDraft', () {
+    group('createDocumentDraft', () {
       test('version should equals id', () async {
         // Given
         const content = DocumentDataContent({});
         final templateRef = DocumentRefFactory.buildSigned();
 
         // When
-        final draftRef = await repository.createProposalDraft(
+        final draftRef = await repository.createDocumentDraft(
+          type: DocumentType.proposalDocument,
           content: content,
           template: templateRef,
         );
@@ -251,22 +252,23 @@ void main() {
 
       test(
           'of document should use same '
-          'id but assign new version', () async {
+          'id and same version', () async {
         // Given
-        final docRef = DocumentRefFactory.buildSigned();
+        final docRef = DocumentRefFactory.buildDraft();
         const content = DocumentDataContent({});
         final templateRef = DocumentRefFactory.buildSigned();
 
         // When
-        final draftRef = await repository.createProposalDraft(
+        final draftRef = await repository.createDocumentDraft(
+          type: DocumentType.proposalDocument,
           content: content,
           template: templateRef,
-          of: docRef,
+          selfRef: docRef,
         );
 
         // Then
         expect(draftRef.id, docRef.id);
-        expect(draftRef.version, isNot(docRef.version));
+        expect(draftRef.version, docRef.version);
       });
 
       test('document data type should be proposal document', () async {
@@ -275,7 +277,8 @@ void main() {
         final templateRef = DocumentRefFactory.buildSigned();
 
         // When
-        final draftRef = await repository.createProposalDraft(
+        final draftRef = await repository.createDocumentDraft(
+          type: DocumentType.proposalDocument,
           content: content,
           template: templateRef,
         );
@@ -297,7 +300,8 @@ void main() {
       final templateRef = DocumentRefFactory.buildSigned();
 
       // When
-      final draftRef = await repository.createProposalDraft(
+      final draftRef = await repository.createDocumentDraft(
+        type: DocumentType.proposalDocument,
         content: initialContent,
         template: templateRef,
       );

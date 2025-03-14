@@ -46,7 +46,7 @@ class InputSeedphrasePanel extends OnboardingPageBase {
     expect(infoPartTaskPicture(), findsOneWidget);
     expect($(progressBar), findsOneWidget);
     expect(
-      infoPartLearnMoreText(),
+      await infoPartLearnMoreText(),
       T.get('Learn More'),
     );
     expect(await closeButton(), findsOneWidget);

@@ -14,4 +14,7 @@ class CommonPage {
   final paginationText = const Key('PaginationText');
   final prevPageBtn = const Key('PrevPageBtn');
   final nextPageBtn = const Key('NextPageBtn');
+  final errorRetryBtn = const Key('ErrorRetryBtn');
+  final buttonFilledType = const Key('ButtonFilled');
+  final buttonTextType = const Key('ButtonText');
 }
