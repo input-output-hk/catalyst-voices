@@ -10,7 +10,7 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 
 class WorkspaceProposalCard extends StatelessWidget {
-  final ProposalWithVersions proposal;
+  final Proposal proposal;
 
   const WorkspaceProposalCard({
     super.key,
@@ -54,7 +54,7 @@ class WorkspaceProposalCard extends StatelessWidget {
 }
 
 class _Body extends StatelessWidget {
-  final ProposalWithVersions proposal;
+  final Proposal proposal;
 
   const _Body(this.proposal);
 

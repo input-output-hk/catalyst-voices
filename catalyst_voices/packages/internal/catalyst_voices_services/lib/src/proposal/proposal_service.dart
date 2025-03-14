@@ -5,7 +5,6 @@ import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_services/src/crypto/key_derivation_service.dart';
 import 'package:catalyst_voices_services/src/user/user_service.dart';
 import 'package:rxdart/rxdart.dart';
-import 'package:uuid/uuid.dart';
 
 abstract interface class ProposalService {
   const factory ProposalService(
@@ -119,8 +118,7 @@ final class ProposalServiceImpl implements ProposalService {
     required SignedDocumentRef template,
     DraftRef? ref,
   }) async {
-    return _documentRepository.createDocumentDraft(
-      type: DocumentType.proposalDocument,
+    return _proposalRepository.createDraftProposal(
       content: content,
       template: template,
       selfRef: ref,
@@ -129,7 +127,7 @@ final class ProposalServiceImpl implements ProposalService {
 
   @override
   Future<void> deleteDraftProposal(DraftRef ref) {
-    return _documentRepository.deleteDocumentDraft(ref: ref);
+    return _proposalRepository.deleteDraftProposal(ref);
   }
 
   @override
@@ -137,7 +135,7 @@ final class ProposalServiceImpl implements ProposalService {
     required DocumentDataMetadata metadata,
     required DocumentDataContent content,
   }) {
-    return _documentRepository.encodeDocumentForExport(
+    return _proposalRepository.encodeProposalForExport(
       metadata: metadata,
       content: content,
     );
@@ -153,23 +151,7 @@ final class ProposalServiceImpl implements ProposalService {
   Future<ProposalData> getProposal({
     required DocumentRef ref,
   }) async {
-    final proposal = await _proposalRepository.getProposal(ref: ref);
-    final document = await _documentRepository.getProposalDocument(
-      ref: ref,
-    );
-
-    // TODO(damian-molinski): Delete this after documents sync is ready.
-    final mergedDocument = ProposalDocument(
-      metadata: proposal.document.metadata,
-      document: document.document,
-    );
-
-    return ProposalData(
-      document: mergedDocument,
-      categoryId: const Uuid().v7(),
-      commentsCount: 10,
-      versions: proposal.versions,
-    );
+    return _proposalRepository.getProposal(ref: ref);
   }
 
   @override
@@ -191,7 +173,7 @@ final class ProposalServiceImpl implements ProposalService {
   Future<ProposalTemplate> getProposalTemplate({
     required DocumentRef ref,
   }) async {
-    final proposalTemplate = await _documentRepository.getProposalTemplate(
+    final proposalTemplate = await _proposalRepository.getProposalTemplate(
       ref: ref,
     );
 

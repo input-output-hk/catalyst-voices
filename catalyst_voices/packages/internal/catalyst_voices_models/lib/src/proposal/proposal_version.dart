@@ -1,4 +1,5 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:equatable/equatable.dart';
 
 final class ProposalVersion extends Equatable
@@ -14,6 +15,19 @@ final class ProposalVersion extends Equatable
     required this.createdAt,
     required this.publish,
   });
+
+  factory ProposalVersion.fromData(BaseProposalData data) {
+    final version = data.document.metadata.selfRef.version ??
+        data.document.metadata.selfRef.id;
+    final createAt = UuidUtils.dateTime(version);
+    return ProposalVersion(
+      selfRef: data.document.metadata.selfRef,
+      title: data.getProposalTitle() ?? '',
+      createdAt: createAt,
+      // TODO(LynxLynxx): change when we get this from doc actions
+      publish: ProposalPublish.publishedDraft,
+    );
+  }
 
   @override
   List<Object?> get props => [

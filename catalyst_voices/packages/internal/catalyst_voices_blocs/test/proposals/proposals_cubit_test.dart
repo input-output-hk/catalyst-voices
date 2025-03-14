@@ -33,7 +33,7 @@ void main() {
       status: ProposalStatus.draft,
       publish: ProposalPublish.publishedDraft,
       commentsCount: 0,
-      versionCount: 1,
+      versions: const [],
       duration: 6,
       author: 'Alex Wells',
     );

@@ -31,6 +31,8 @@ abstract interface class DraftsDao {
   /// Returns all known document drafts refs.
   Future<List<DraftRef>> queryAllRefs();
 
+  Future<List<DocumentDraftEntity>> queryVersionsOfId({required String id});
+
   /// Singular version of [saveAll]. Does not run in transaction.
   Future<void> save(DocumentDraftEntity draft);
 
@@ -110,6 +112,17 @@ class DriftDraftsDao extends DatabaseAccessor<DriftCatalystDatabase>
 
       return DraftRef(id: id.uuid, version: version.uuid);
     }).get();
+  }
+
+  @override
+  Future<List<DocumentDraftEntity>> queryVersionsOfId({required String id}) {
+    final query = select(drafts)
+      ..where((tbl) => _filterRef(tbl, SignedDocumentRef(id: id)))
+      ..orderBy([
+        (u) => OrderingTerm.desc(u.verHi),
+      ]);
+
+    return query.get();
   }
 
   @override
