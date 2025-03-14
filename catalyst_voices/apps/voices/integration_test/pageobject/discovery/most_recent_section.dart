@@ -33,7 +33,7 @@ class MostRecentSection {
 
   Future<void> titleIsRenderedCorrectly() async {
     await $(mostRecentProposalsTitle).scrollTo();
-    expect($(mostRecentProposalsTitle).text, T.get('Most Recent'));
+    expect($(mostRecentProposalsTitle).text, (await t()).mostRecent);
   }
 
   Future<void> recentProposalsAreRenderedCorrectly() async {
@@ -59,7 +59,7 @@ class MostRecentSection {
     );
     expect(
       $(mostRecentProposals).$(viewAllProposalsButton).text,
-      T.get('View All Proposals'),
+      (await t()).viewAllProposals,
     );
   }
 
@@ -103,7 +103,7 @@ class MostRecentSection {
           .$(fundsRequested)
           .$(title)
           .text,
-      T.get('Funds requested'),
+      (await t()).fundsRequested,
     );
     expect(
       $(parentContainer)
@@ -121,7 +121,7 @@ class MostRecentSection {
           .$(duration)
           .$(title)
           .text,
-      T.get('Duration'),
+      (await t()).duration,
     );
     expect(
       $(parentContainer)

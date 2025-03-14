@@ -32,25 +32,20 @@ class SeedPhraseInstructionsPanel extends OnboardingPageBase {
   Future<void> verifyInfoPanel() async {
     expect(
       await infoPartHeaderTitleText(),
-      T.get('Restore Catalyst keychain'),
+      (await t()).recoverCatalystKeychain,
     );
     expect(infoPartTaskPicture(), findsOneWidget);
-    expect(
-      infoPartLearnMoreText(),
-      T.get('Learn More'),
-    );
+    expect(infoPartLearnMoreText(), (await t()).learnMore);
   }
 
   Future<void> verifyDetailsPanel() async {
     expect(
       $(seedPhraseInstructionsTitleKey).text,
-      T.get('Restore your Catalyst Keychain with \n'
-          'your 12-word Catalyst seed phrase'),
+      (await t()).recoverySeedPhraseInstructionsTitle,
     );
     expect(
       $(seedPhraseInstructionsSubtitleKey).text,
-      T.get('Enter your security words in the correct order,'
-          ' and sign into your Catalyst account on a new device.'),
+      (await t()).recoverySeedPhraseInstructionsSubtitle,
     );
     expect($(backButton), findsOneWidget);
     expect($(nextButton), findsOneWidget);

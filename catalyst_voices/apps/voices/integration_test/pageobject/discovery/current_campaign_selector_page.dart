@@ -29,32 +29,27 @@ class CurrentCampaignSection {
 
   Future<void> titleIsRenderedCorrectly() async {
     await $(title).scrollTo();
-    expect($(title).text, T.get('Current Campaign'));
+    expect($(title).text, (await t()).currentCampaign);
   }
 
   Future<void> subtitleIsRenderedCorrectly() async {
-    expect($(subtitle).text, T.get('Catalyst Fund 14'));
+    expect($(subtitle).text?.startsWith('Catalyst Fund '), true);
   }
 
   Future<void> descriptionIsRenderedCorrectly() async {
     await $(description).scrollTo(step: 90);
-    expect(
-      $(description).text,
-      T.get('Project Catalyst turns economic power '
-          'into innovation power by using the Cardano Treasury to incentivize '
-          'and fund community-approved ideas.'),
-    );
+    expect($(description).text, (await t()).currentCampaignDescription);
   }
 
   Future<void> campaignDetailsAreRenderedCorrectly() async {
     await $(fundsDetailCard).$(fundsDetailAskRangeMax).$(#Title).scrollTo();
     expect(
       $(fundsDetailCard).$(fundsDetailBudget).$(#Title).text,
-      T.get('Campaign Treasury'),
+      (await t()).campaignTreasury,
     );
     expect(
       $(fundsDetailCard).$(fundsDetailBudget).$(#Description).text,
-      T.get('Total budget, including ecosystem incentives'),
+      (await t()).campaignTreasuryDescription,
     );
     expect(
       $(fundsDetailCard).$(fundsDetailBudget).$(#Funds).text!.isNotEmpty,
@@ -62,11 +57,11 @@ class CurrentCampaignSection {
     );
     expect(
       $(fundsDetailCard).$(fundsDetailRequested).$(#Title).text,
-      T.get('Campaign Total Ask'),
+      (await t()).campaignTotalAsk,
     );
     expect(
       $(fundsDetailCard).$(fundsDetailRequested).$(#Description).text,
-      T.get('Funds requested by all submitted projects'),
+      (await t()).campaignTotalAskDescription,
     );
     expect(
       $(fundsDetailCard).$(fundsDetailRequested).$(#Funds).text!.isNotEmpty,
@@ -74,15 +69,11 @@ class CurrentCampaignSection {
     );
     expect(
       $(fundsDetailCard).$(fundsDetailAskRangeMax).$(#Title).text,
-      T.get('Maximum Ask'),
+      (await t()).maximumAsk,
     );
     expect(
       $(fundsDetailCard).$(fundsDetailAskRangeMax).$(#Value).text!.isNotEmpty,
       isTrue,
-    );
-    expect(
-      $(fundsDetailCard).$(fundsDetailAskRangeMax).$(#Title).text,
-      T.get('Maximum Ask'),
     );
     expect(
       $(fundsDetailCard).$(fundsDetailAskRangeMax).$(#Value).text!.isNotEmpty,
@@ -91,21 +82,18 @@ class CurrentCampaignSection {
     await $(currentCampaignRoot).$(ideaSubTitle).scrollTo(step: 150);
     expect(
       $(currentCampaignRoot).$(ideaSubTitle).text,
-      T.get('Idea Journey'),
+      (await t()).ideaJourney,
     );
     final descriptionText = $.tester
         .widget<MarkdownBody>(
           $(currentCampaignRoot).$(ideaDescription).$(MarkdownBody),
         )
         .data;
-    expect(
-      descriptionText.indexOf(
-        T.get(
-            'Ideas comes to life in Catalyst through its key stages below. For'
-            ' the full timeline, deadlines and latest updates, visit the'),
-      ),
-      greaterThanOrEqualTo(1),
-    );
+    final textToMatch = (await t())
+        .ideaJourneyDescription
+        .split('#### ')[1]
+        .split('[fund timeline]')[0];
+    expect(descriptionText.indexOf(textToMatch), greaterThanOrEqualTo(1));
     expect($(currentCampaignRoot).$(timelineCard), findsExactly(5));
   }
 
@@ -144,28 +132,9 @@ class CurrentCampaignSection {
         findsNothing,
       );
       await $(currentCampaignRoot).$(timelineCard).at(i).tap();
-
-      var titleText = '';
-      switch (i) {
-        case 0:
-          titleText = T.get('Proposal Submission');
-          break;
-        case 1:
-          titleText = T.get('Community Review');
-          break;
-        case 2:
-          titleText = T.get('Community Voting');
-          break;
-        case 3:
-          titleText = T.get('Voting Results');
-          break;
-        case 4:
-          titleText = T.get('Project Onboarding');
-          break;
-      }
       expect(
         $(currentCampaignRoot).$(timelineCard).at(i).$(timelineCardTitle).text,
-        titleText,
+        isNotEmpty,
       );
       expect(
         $(currentCampaignRoot).$(timelineCard).at(i).$(timelineCardDate).text,

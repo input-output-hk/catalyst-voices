@@ -41,14 +41,11 @@ class InputSeedphrasePanel extends OnboardingPageBase {
   Future<void> verifyInfoPanel() async {
     expect(
       $(registrationInfoPanel).$(headerTitle).text,
-      T.get('Catalyst Keychain'),
+      (await t()).catalystKeychain,
     );
     expect(infoPartTaskPicture(), findsOneWidget);
     expect($(progressBar), findsOneWidget);
-    expect(
-      await infoPartLearnMoreText(),
-      T.get('Learn More'),
-    );
+    expect(await infoPartLearnMoreText(), (await t()).learnMore);
     expect(await closeButton(), findsOneWidget);
   }
 }

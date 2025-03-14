@@ -33,13 +33,13 @@ class AccountDropdownPage {
     );
     expect(
       $(popUpMenuMyAccount).$(Text).text,
-      T.get('My account'),
+      (await t()).myAccount,
     );
     expect(
       $(popUpMenuProfileAndKeychain).$(Text).text,
-      T.get('Profile & Keychain'),
+      (await t()).profileAndKeychain,
     );
-    expect($(popUpMenuLock).$(Text).text, T.get('Lock account'));
+    expect($(popUpMenuLock).$(Text).text, (await t()).lockAccount);
   }
 
   Future<void> accountDropdownLooksAsExpected() async {

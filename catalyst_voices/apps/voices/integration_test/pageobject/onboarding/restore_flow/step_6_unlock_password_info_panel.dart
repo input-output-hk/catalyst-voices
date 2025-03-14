@@ -30,7 +30,7 @@ class UnlockPasswordInfoPanel extends OnboardingPageBase {
   Future<void> verifyDetailsPanel() async {
     expect(
       $(unlockPasswordInfoTitle).text,
-      T.get('Set your Catalyst unlock password for this device'),
+      (await t()).recoveryUnlockPasswordInstructionsTitle,
     );
     expect(
       $(unlockPasswordInfoSubtitle),
@@ -41,12 +41,9 @@ class UnlockPasswordInfoPanel extends OnboardingPageBase {
   Future<void> verifyInfoPanel() async {
     expect(
       $(registrationInfoPanel).$(headerTitle).text,
-      T.get('Restore Catalyst keychain'),
+      (await t()).recoverCatalystKeychain,
     );
     expect($(pictureContainer).$(IconTheme), findsOneWidget);
-    expect(
-      $(learnMoreButton).$(Text).text,
-      T.get('Learn More'),
-    );
+    expect($(learnMoreButton).$(Text).text, (await t()).learnMore);
   }
 }

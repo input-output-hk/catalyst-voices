@@ -415,8 +415,9 @@ void main() async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await PasswordInputPanel($).goto();
         await PasswordInputPanel($).enterPassword('Test1234', 'Test1234');
-        PasswordInputPanel($).verifyPasswordConfirmErrorIcon(isShown: false);
-        PasswordInputPanel($).verifyValidationIndicator(
+        await PasswordInputPanel($)
+            .verifyPasswordConfirmErrorIcon(isShown: false);
+        await PasswordInputPanel($).verifyValidationIndicator(
           PasswordValidationStatus.normal,
         );
         await PasswordInputPanel($).verifyNextButtonIsEnabled();
@@ -431,8 +432,9 @@ void main() async {
           'Test1234Test1234',
           'Test1234Test1234',
         );
-        PasswordInputPanel($).verifyPasswordConfirmErrorIcon(isShown: false);
-        PasswordInputPanel($).verifyValidationIndicator(
+        await PasswordInputPanel($)
+            .verifyPasswordConfirmErrorIcon(isShown: false);
+        await PasswordInputPanel($).verifyValidationIndicator(
           PasswordValidationStatus.good,
         );
         await PasswordInputPanel($).verifyNextButtonIsEnabled();
@@ -443,9 +445,10 @@ void main() async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await PasswordInputPanel($).goto();
         await PasswordInputPanel($).enterPassword('Test123', '');
-        PasswordInputPanel($)
+        await PasswordInputPanel($)
             .verifyValidationIndicator(PasswordValidationStatus.weak);
-        PasswordInputPanel($).verifyPasswordConfirmErrorIcon(isShown: false);
+        await PasswordInputPanel($)
+            .verifyPasswordConfirmErrorIcon(isShown: false);
         await PasswordInputPanel($).verifyNextButtonIsDisabled();
       });
 
@@ -455,9 +458,10 @@ void main() async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await PasswordInputPanel($).goto();
         await PasswordInputPanel($).enterPassword('Test1234', '');
-        PasswordInputPanel($)
+        await PasswordInputPanel($)
             .verifyValidationIndicator(PasswordValidationStatus.normal);
-        PasswordInputPanel($).verifyPasswordConfirmErrorIcon(isShown: false);
+        await PasswordInputPanel($)
+            .verifyPasswordConfirmErrorIcon(isShown: false);
         await PasswordInputPanel($).verifyNextButtonIsDisabled();
       });
 
@@ -467,9 +471,10 @@ void main() async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await PasswordInputPanel($).goto();
         await PasswordInputPanel($).enterPassword('Test1234', 'Test123');
-        PasswordInputPanel($)
+        await PasswordInputPanel($)
             .verifyValidationIndicator(PasswordValidationStatus.normal);
-        PasswordInputPanel($).verifyPasswordConfirmErrorIcon(isShown: true);
+        await PasswordInputPanel($)
+            .verifyPasswordConfirmErrorIcon(isShown: true);
         await PasswordInputPanel($).verifyNextButtonIsDisabled();
       });
 

@@ -90,19 +90,17 @@ class OnboardingPageBase {
   Future<void> incompleteDialogCheckKeychainPhase() async {
     expect(
       $(voicesAlertDialogTitleRow).$(registrationDialogTitle).text,
-      T.get('WARNING'),
+      (await t()).warning,
     );
     expect($(voicesAlertDialogTitleRow).$(VoicesIconButton), findsExactly(2));
     expect($(voicesAlertDialog).$(warningIcon), findsOneWidget);
     expect(
       $(voicesAlertDialog).$(voicesAlertDialogSubtitle).$(Text).text,
-      T.get('ACCOUNT CREATION INCOMPLETE!'),
+      (await t()).registrationExitConfirmDialogSubtitle,
     );
     expect(
       $(voicesAlertDialog).$(registrationExitDialogContent).text,
-      T.get('Leaving before creating your keychain means account creation is'
-          ' incomplete.   You cannot login without  completing your'
-          ' key chain.'),
+      (await t()).registrationExitConfirmDialogContent,
     );
     expect(
       $(voicesAlertDialog).$(CommonPage($).buttonFilledType),
@@ -110,7 +108,7 @@ class OnboardingPageBase {
     );
     expect(
       $(voicesAlertDialog).$(CommonPage($).buttonFilledType).$(Text).text,
-      T.get('Continue keychain creation'),
+      (await t()).registrationExitConfirmDialogContinue,
     );
     expect(
       $(voicesAlertDialog).$(CommonPage($).buttonTextType),
@@ -118,25 +116,24 @@ class OnboardingPageBase {
     );
     expect(
       $(voicesAlertDialog).$(CommonPage($).buttonTextType).$(Text).text,
-      T.get('Cancel anyway'),
+      (await t()).cancelAnyways,
     );
   }
 
   Future<void> incompleteDialogCheckRestorationPhase() async {
     expect(
       $(voicesAlertDialogTitleRow).$(registrationDialogTitle).text,
-      T.get('WARNING'),
+      (await t()).warning,
     );
     expect($(voicesAlertDialogTitleRow).$(VoicesIconButton), findsExactly(2));
     expect($(voicesAlertDialog).$(warningIcon), findsOneWidget);
     expect(
       $(voicesAlertDialog).$(voicesAlertDialogSubtitle).$(Text).text,
-      T.get('12 WORD KEYCHAIN RESTORATION INCOMPLETE'),
+      (await t()).recoveryExitConfirmDialogSubtitle,
     );
     expect(
       $(voicesAlertDialog).$(recoveryExitDialogContent).text,
-      T.get('Please continue your Catalyst Keychain restoration, if you cancel'
-          ' all input will be lost.'),
+      (await t()).recoveryExitConfirmDialogContent,
     );
     expect(
       $(voicesAlertDialog).$(CommonPage($).buttonFilledType),
@@ -144,7 +141,7 @@ class OnboardingPageBase {
     );
     expect(
       $(voicesAlertDialog).$(CommonPage($).buttonFilledType).$(Text).text,
-      T.get('Continue recovery process'),
+      (await t()).recoveryExitConfirmDialogContinue,
     );
     expect(
       $(voicesAlertDialog).$(CommonPage($).buttonTextType),
@@ -152,7 +149,7 @@ class OnboardingPageBase {
     );
     expect(
       $(voicesAlertDialog).$(CommonPage($).buttonTextType).$(Text).text,
-      T.get('Cancel anyway'),
+      (await t()).cancelAnyways,
     );
   }
 

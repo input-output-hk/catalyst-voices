@@ -20,21 +20,15 @@ class WalletListPanel extends OnboardingPageBase {
   }
 
   Future<void> verifyInfoPanel() async {
-    expect(
-      await infoPartHeaderTitleText(),
-      T.get('Link keys to your Catalyst Keychain'),
-    );
+    expect(await infoPartHeaderTitleText(), (await t()).walletLinkHeader);
     expect(
       await infoPartHeaderSubtitleText(),
-      T.get('Link your Cardano wallet'),
+      (await t()).walletLinkWalletSubheader,
     );
     //temporary: check for specific picture (blue key icon)
     expect(infoPartTaskPicture(), findsOneWidget);
     expect($(progressBar), findsOneWidget);
-    expect(
-      infoPartLearnMoreText(),
-      T.get('Learn More'),
-    );
+    expect(infoPartLearnMoreText(), (await t()).learnMore);
   }
 
   Future<void> verifyDetailsPanel() async {}
