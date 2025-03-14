@@ -9,7 +9,6 @@ import 'package:rxdart/rxdart.dart';
 abstract interface class ProposalService {
   const factory ProposalService(
     ProposalRepository proposalRepository,
-    DocumentRepository documentRepository,
     SignedDocumentManager signedDocumentManager,
     UserService userService,
     KeyDerivationService keyDerivationService,
@@ -92,7 +91,6 @@ abstract interface class ProposalService {
 
 final class ProposalServiceImpl implements ProposalService {
   final ProposalRepository _proposalRepository;
-  // final DocumentRepository _documentRepository;
   final SignedDocumentManager _signedDocumentManager;
   final UserService _userService;
   final KeyDerivationService _keyDerivationService;
@@ -100,7 +98,6 @@ final class ProposalServiceImpl implements ProposalService {
 
   const ProposalServiceImpl(
     this._proposalRepository,
-    this._documentRepository,
     this._signedDocumentManager,
     this._userService,
     this._keyDerivationService,
@@ -231,7 +228,7 @@ final class ProposalServiceImpl implements ProposalService {
       privateKey: keyPair.privateKey,
     );
 
-    await _documentRepository.uploadDocument(document: signedDocument);
+    await _proposalRepository.uploadDocument(document: signedDocument);
   }
 
   @override
@@ -252,7 +249,7 @@ final class ProposalServiceImpl implements ProposalService {
     required DraftRef ref,
     required DocumentDataContent content,
   }) {
-    return _documentRepository.updateDocumentDraft(
+    return _proposalRepository.updateDraftProposal(
       ref: ref,
       content: content,
     );
@@ -260,12 +257,12 @@ final class ProposalServiceImpl implements ProposalService {
 
   @override
   Stream<List<Proposal>> watchLatestProposals({int? limit}) {
-    return _documentRepository
-        .watchProposalsDocuments(limit: limit)
+    return _proposalRepository
+        .watchLatestProposals(limit: limit)
         .switchMap((documents) async* {
       final proposalsStreams = await Future.wait(
         documents.map((doc) async {
-          final versionIds = await _documentRepository.queryVersionsOfId(
+          final versionIds = await _proposalRepository.queryVersionsOfId(
             id: doc.metadata.selfRef.id,
           );
           final versionsData = versionIds
@@ -276,7 +273,7 @@ final class ProposalServiceImpl implements ProposalService {
               )
               .toList();
 
-          return _documentRepository
+          return _proposalRepository
               .watchCount(
             ref: doc.metadata.selfRef,
             type: DocumentType.commentTemplate,

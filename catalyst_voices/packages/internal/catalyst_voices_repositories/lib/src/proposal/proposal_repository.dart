@@ -8,6 +8,7 @@ import 'package:catalyst_voices_repositories/src/dto/document/document_data_dto.
 import 'package:catalyst_voices_repositories/src/dto/document/document_dto.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/schema/document_schema_dto.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:rxdart/rxdart.dart';
 
 final _proposalDescription = """
 Zanzibar is becoming one of the hotspots for DID's through
@@ -69,7 +70,24 @@ abstract interface class ProposalRepository {
 
   Future<DocumentRef> importProposal(Uint8List data);
 
+  Future<List<ProposalDocument>> queryVersionsOfId({required String id});
+
   Future<List<String>> removeFavoriteProposal(String proposalId);
+
+  Future<void> updateDraftProposal({
+    required DraftRef ref,
+    required DocumentDataContent content,
+  });
+  Future<void> uploadDocument({
+    required SignedDocument document,
+  });
+
+  Stream<int> watchCount({
+    required DocumentRef ref,
+    required DocumentType type,
+  });
+
+  Stream<List<ProposalDocument>> watchLatestProposals({int? limit});
 }
 
 final class ProposalRepositoryImpl implements ProposalRepository {
@@ -220,9 +238,63 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   }
 
   @override
+  Future<List<ProposalDocument>> queryVersionsOfId({required String id}) {
+    return _documentRepository.queryVersionsOfId(id: id);
+  }
+
+  @override
   Future<List<String>> removeFavoriteProposal(String proposalId) async {
     // TODO(LynxLynxx): remove proposal from favorites
     return getFavoritesProposalsIds();
+  }
+
+  @override
+  Future<void> updateDraftProposal({
+    required DraftRef ref,
+    required DocumentDataContent content,
+  }) {
+    return _documentRepository.updateDocumentDraft(
+      ref: ref,
+      content: content,
+    );
+  }
+
+  @override
+  Future<void> uploadDocument({
+    required SignedDocument<SignedDocumentPayload> document,
+  }) {
+    return _documentRepository.uploadDocument(document: document);
+  }
+
+  @override
+  Stream<int> watchCount({
+    required DocumentRef ref,
+    required DocumentType type,
+  }) {
+    return _documentRepository.watchCount(ref: ref, type: type);
+  }
+
+  @override
+  Stream<List<ProposalDocument>> watchLatestProposals({int? limit}) {
+    return _documentRepository
+        .watchDocuments(
+          limit: limit,
+          type: DocumentType.proposalDocument,
+        )
+        .whereNotNull()
+        .map(
+          (documents) => documents.map(
+            (doc) {
+              final documentData = doc.data;
+              final templateData = doc.refData;
+
+              return _buildProposalDocument(
+                documentData: documentData,
+                templateData: templateData,
+              );
+            },
+          ).toList(),
+        );
   }
 
   BaseProposalData _buildProposalData({

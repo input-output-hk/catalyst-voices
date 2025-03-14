@@ -58,7 +58,7 @@ abstract interface class DocumentRepository {
   /// Its using documents index api.
   Future<List<SignedDocumentRef>> getAllDocumentsRefs();
 
-  /// Return list of all cached documents id for given [id] and [type].
+  /// Return list of all cached documents id for given [id].
   /// It looks for documents in the local storage and draft storage.
   Future<List<DocumentData>> getAllVersionsOfId({
     required String id,
@@ -122,16 +122,17 @@ abstract interface class DocumentRepository {
     required DocumentType type,
   });
 
+  Stream<List<({DocumentData data, DocumentData refData})>> watchDocuments({
+    required DocumentType type,
+    int? limit,
+    bool unique = false,
+  });
+
   /// Observes matching [ProposalDocument] and emits updates.
   ///
   /// Source of data depends whether [ref] is [SignedDocumentRef] or [DraftRef].
   Stream<ProposalDocument> watchProposalDocument({
     required DocumentRef ref,
-  });
-
-  Stream<List<ProposalDocument>> watchProposalsDocuments({
-    int? limit,
-    bool unique = false,
   });
 }
 
@@ -334,6 +335,18 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     );
   }
 
+  @override
+  Stream<List<({DocumentData data, DocumentData refData})>> watchDocuments({
+    required DocumentType type,
+    int? limit,
+    bool unique = false,
+  }) {
+    return watchAllDocuments(
+      limit: limit,
+      type: type,
+    );
+  }
+
   @visibleForTesting
   Stream<DocumentsDataWithRefData?> watchDocumentWithRef({
     required DocumentRef ref,
@@ -386,29 +399,6 @@ final class DocumentRepositoryImpl implements DocumentRepository {
         );
       },
     );
-  }
-
-  @override
-  Stream<List<ProposalDocument>> watchProposalsDocuments({
-    int? limit,
-    bool unique = false,
-  }) {
-    return watchAllDocuments(
-      limit: limit,
-      type: DocumentType.proposalDocument,
-    ).whereNotNull().map(
-          (documents) => documents.map(
-            (doc) {
-              final documentData = doc.data;
-              final templateData = doc.refData;
-
-              return _buildProposalDocument(
-                documentData: documentData,
-                templateData: templateData,
-              );
-            },
-          ).toList(),
-        );
   }
 
   ProposalDocument _buildProposalDocument({

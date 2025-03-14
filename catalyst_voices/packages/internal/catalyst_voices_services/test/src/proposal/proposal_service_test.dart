@@ -26,7 +26,6 @@ void main() {
 
     proposalService = ProposalService(
       mockProposalRepository,
-      mockDocumentRepository,
       mockSignedDocumentManager,
       mockUserService,
       mockKeyDerivationService,
@@ -87,7 +86,7 @@ void main() {
 
       // Setup repository responses
       when(
-        () => mockDocumentRepository.watchProposalsDocuments(
+        () => mockProposalRepository.watchLatestProposals(
           limit: null,
         ),
       ).thenAnswer((_) => Stream.value([proposalData1, proposalData2]));
@@ -111,7 +110,7 @@ void main() {
       // Verify
       expect(proposals.length, equals(2));
       verify(
-        () => mockDocumentRepository.watchProposalsDocuments(
+        () => mockProposalRepository.watchLatestProposals(
           limit: null,
         ),
       ).called(1);
@@ -177,7 +176,7 @@ void main() {
             Stream.value([proposalData1, proposalData2]).asBroadcastStream();
 
         when(
-          () => mockDocumentRepository.watchProposalsDocuments(
+          () => mockProposalRepository.watchLatestProposals(
             limit: null,
           ),
         ).thenAnswer((_) => proposalsStream);
