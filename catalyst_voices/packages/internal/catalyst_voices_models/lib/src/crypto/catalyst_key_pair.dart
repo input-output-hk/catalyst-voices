@@ -38,7 +38,7 @@ extension FutureCatalystKeyPairExt on Future<CatalystKeyPair?> {
 
     try {
       final result = await callback(keyPair);
-      
+
       assert(
         result is! CatalystKeyPair,
         'After the callback is called the key pair will '
