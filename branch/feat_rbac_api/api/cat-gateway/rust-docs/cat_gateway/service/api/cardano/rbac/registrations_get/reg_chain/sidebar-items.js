@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":["PurposeList","RegChain","RegistrationChain"]};
