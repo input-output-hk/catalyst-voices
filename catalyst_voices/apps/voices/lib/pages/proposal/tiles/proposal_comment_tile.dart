@@ -11,6 +11,6 @@ class ProposalCommentTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Placeholder(child: Text('TODO'));
+    return const Placeholder(child: Text('TODO'));
   }
 }
