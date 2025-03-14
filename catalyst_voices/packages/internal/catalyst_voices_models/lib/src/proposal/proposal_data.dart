@@ -5,7 +5,6 @@ import 'package:equatable/equatable.dart';
 
 class BaseProposalData extends Equatable {
   final ProposalDocument document;
-  
 
   const BaseProposalData({
     required this.document,
