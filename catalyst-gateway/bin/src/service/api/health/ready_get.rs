@@ -1,7 +1,18 @@
 //! Implementation of the GET /health/ready endpoint
 use poem_openapi::ApiResponse;
 
-use crate::service::common::responses::WithErrorResponses;
+use crate::{
+    db::{
+        event::{establish_connection, EventDB},
+        index::session::CassandraSession,
+    },
+    service::{
+        common::{responses::WithErrorResponses, types::headers::retry_after::RetryAfterOption},
+        utilities::health::{
+            event_db_is_live, index_db_is_live, set_event_db_liveness, set_index_db_liveness,
+        },
+    },
+};
 
 /// Endpoint responses.
 #[derive(ApiResponse)]
@@ -35,5 +46,48 @@ pub(crate) type AllResponses = WithErrorResponses<Responses>;
 /// service that are ready.
 #[allow(clippy::unused_async)]
 pub(crate) async fn endpoint() -> AllResponses {
-    Responses::NoContent.into()
+    // Check Event DB connection
+    let event_db_live = event_db_is_live();
+
+    // When check fails, attempt to re-connect
+    if !event_db_live {
+        establish_connection();
+        // Re-check, if success, enable flag.
+        if EventDB::connection_is_ok() {
+            set_event_db_liveness(true);
+        }
+    };
+
+    // Check Index DB connection
+    let index_db_live = index_db_is_live();
+
+    // When check fails, attempt to re-connect
+    if !index_db_live {
+        CassandraSession::init();
+        // Re-check, if success, enable flag.
+        if CassandraSession::wait_until_ready(core::time::Duration::from_secs(1), false)
+            .await
+            .is_ok()
+        {
+            set_index_db_liveness(true);
+        }
+    }
+
+    let success_response = Responses::NoContent.into();
+
+    // Return 204 response if check passed initially.
+    if index_db_live && event_db_live {
+        return success_response;
+    }
+
+    // Otherwise, re-check, and return 403 response if all is good.
+    if index_db_is_live() && event_db_is_live() {
+        return success_response;
+    }
+
+    // Otherwise, return 503 response.
+    AllResponses::service_unavailable(
+        &anyhow::anyhow!("Service is not ready, do not send other requests."),
+        RetryAfterOption::Default,
+    )
 }
