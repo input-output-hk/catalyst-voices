@@ -1843,7 +1843,6 @@
   "@notFoundError": {
     "description": "Error message when user tries to access resourse that does not exist."
   },
-<<<<<<< HEAD
   "title": "Title",
   "@title": {
     "description": "description of the title field"
