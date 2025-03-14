@@ -365,6 +365,30 @@ final class ProposalBuilderBloc
     }).toList();
   }
 
+  Future<void> _publishAndSubmitProposalForReview(
+    Emitter<ProposalBuilderState> emit,
+  ) async {
+    final updatedRef = await _proposalService.publishProposal(
+      document: _buildDocumentData(),
+    );
+
+    _updateMetadata(
+      emit,
+      documentRef: updatedRef,
+      publish: ProposalPublish.localDraft,
+    );
+
+    await _proposalService.submitProposalForReview(
+      ref: updatedRef,
+      categoryId: state.metadata.categoryId!,
+    );
+
+    _updateMetadata(
+      emit,
+      publish: ProposalPublish.submittedProposal,
+    );
+  }
+
   Future<void> _publishProposal(
     PublishProposalEvent event,
     Emitter<ProposalBuilderState> emit,
@@ -372,13 +396,13 @@ final class ProposalBuilderBloc
     try {
       _logger.info('Publishing proposal');
 
-      final newRef = await _proposalService.publishProposal(
+      final updatedRef = await _proposalService.publishProposal(
         document: _buildDocumentData(),
       );
 
       _updateMetadata(
         emit,
-        documentRef: newRef,
+        documentRef: updatedRef,
         publish: ProposalPublish.publishedDraft,
       );
     } catch (error, stackTrace) {
@@ -393,12 +417,12 @@ final class ProposalBuilderBloc
   ) async {
     // TODO(dtscalac): if a new version has been created
     // update the version in the metadata
-    final nextRef = await _upsertDraftProposal(
+    final updatedRef = await _upsertDraftProposal(
       state.metadata.documentRef!,
       _documentMapper.toContent(document),
     );
 
-    _updateMetadata(emit, documentRef: nextRef);
+    _updateMetadata(emit, documentRef: updatedRef);
   }
 
   Future<void> _submitProposal(
@@ -408,16 +432,33 @@ final class ProposalBuilderBloc
     try {
       _logger.info('Submitting proposal for review');
 
-      await _proposalService.submitProposalForReview(
-        ref: state.metadata.documentRef! as SignedDocumentRef,
-        categoryId: state.metadata.categoryId!,
-      );
+      switch (state.metadata.publish) {
+        case ProposalPublish.localDraft:
+          await _publishAndSubmitProposalForReview(emit);
+        case ProposalPublish.publishedDraft:
+          await _submitProposalForReview(emit);
+        case ProposalPublish.submittedProposal:
+          // already submitted, do nothing
+          break;
+      }
     } catch (error, stackTrace) {
       _logger.severe('SubmitProposalForReview', error, stackTrace);
       emitError(error);
     }
   }
 
+  Future<void> _submitProposalForReview(
+    Emitter<ProposalBuilderState> emit,
+  ) async {
+    await _proposalService.submitProposalForReview(
+      ref: state.metadata.documentRef! as SignedDocumentRef,
+      categoryId: state.metadata.categoryId!,
+    );
+
+    _updateMetadata(emit, publish: ProposalPublish.submittedProposal);
+  }
+
+  // TODO(dtscalac): update versions accordingly
   void _updateMetadata(
     Emitter<ProposalBuilderState> emit, {
     DocumentRef? documentRef,
@@ -428,9 +469,11 @@ final class ProposalBuilderBloc
       originalDocumentRef: documentRef != null ? Optional(documentRef) : null,
       publish: publish,
     );
+
     final updatedState = state.copyWith(
       metadata: updatedMetadata,
     );
+    
     emit(updatedState);
   }
 

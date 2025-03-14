@@ -171,13 +171,12 @@ enum _MenuItemEnum {
   static List<_MenuItemEnum> availableOptions(ProposalPublish proposalPublish) {
     switch (proposalPublish) {
       case ProposalPublish.localDraft:
-        // TODO(dtscalac): submit -> publish & submit in one action
-        return [view, publish, export, delete];
+        return _MenuItemEnum.values;
       case ProposalPublish.publishedDraft:
-        // TODO(dtscalac): delete -> revert
+        // TODO(dtscalac): delete? revert?
         return [view, submit, export];
       case ProposalPublish.submittedProposal:
-        // TODO(dtscalac): delete -> revert
+        // TODO(dtscalac): delete? revert?
         return [view, export];
     }
   }
