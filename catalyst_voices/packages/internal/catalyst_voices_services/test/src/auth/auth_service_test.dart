@@ -53,6 +53,11 @@ class _FakeCatalystPrivateKey extends Fake implements CatalystPrivateKey {
   _FakeCatalystPrivateKey(this.bytes);
 
   @override
+  void drop() {
+    // do nothing
+  }
+
+  @override
   Future<CatalystSignature> sign(Uint8List data) async {
     return _FakeCatalystSignature(data);
   }
