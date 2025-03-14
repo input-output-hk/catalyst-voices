@@ -9,12 +9,10 @@ import 'package:flutter_localized_locales/flutter_localized_locales.dart';
 
 class DocumentPropertyReadBuilder extends StatefulWidget {
   final DocumentProperty property;
-  final double leadingSpacing;
 
   const DocumentPropertyReadBuilder({
     super.key,
     required this.property,
-    this.leadingSpacing = 0,
   });
 
   @override
@@ -34,7 +32,6 @@ class _DocumentPropertyReadBuilderState
       crossAxisAlignment: CrossAxisAlignment.start,
       spacing: 16,
       children: [
-        if (_items.isNotEmpty) SizedBox(height: widget.leadingSpacing),
         for (final item in _items)
           _ListItemBuilder(
             key: ObjectKey(item.id),

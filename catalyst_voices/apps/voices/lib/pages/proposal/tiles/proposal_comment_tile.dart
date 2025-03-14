@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/pages/proposal/widget/proposal_comment_with_replies_card.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 
@@ -11,6 +12,6 @@ class ProposalCommentTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Placeholder(child: Text('TODO'));
+    return ProposalCommentWithRepliesCard(comment: comment);
   }
 }

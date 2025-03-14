@@ -13,12 +13,16 @@ const _compactMaxLength = 6;
 class CatalystIdText extends StatefulWidget {
   final CatalystId data;
   final bool isCompact;
+  final bool showCopy;
+  final TextStyle? style;
   final Color? backgroundColor;
 
   const CatalystIdText(
     this.data, {
     super.key,
     required this.isCompact,
+    this.showCopy = true,
+    this.style,
     this.backgroundColor,
   });
 
@@ -54,14 +58,17 @@ class _CatalystIdTextState extends State<CatalystIdText> {
                   child: _Chip(
                     _effectiveData,
                     onTap: _copyDataToClipboard,
+                    style: widget.style,
                     backgroundColor: widget.backgroundColor,
                   ),
                 ),
               ),
-              const SizedBox(width: 6),
-              _Copy(
-                showCheck: _highlightCopied,
-              ),
+              if (widget.showCopy) ...[
+                const SizedBox(width: 6),
+                _Copy(
+                  showCheck: _highlightCopied,
+                ),
+              ],
             ],
           ),
         ),
@@ -158,10 +165,12 @@ class _Chip extends StatelessWidget {
   final String data;
   final VoidCallback onTap;
   final Color? backgroundColor;
+  final TextStyle? style;
 
   const _Chip(
     this.data, {
     required this.onTap,
+    this.style,
     this.backgroundColor,
   });
 
@@ -176,9 +185,9 @@ class _Chip extends StatelessWidget {
     final foregroundColor = colors.textOnPrimaryLevel1;
     final overlayColor = colors.onSurfaceNeutralOpaqueLv2;
 
-    final textStyle = (textTheme.bodyMedium ?? const TextStyle()).copyWith(
-      color: foregroundColor,
-    );
+    final textStyle = (textTheme.bodyMedium ?? const TextStyle())
+        .merge(style)
+        .copyWith(color: foregroundColor);
 
     return Material(
       color: backgroundColor,
