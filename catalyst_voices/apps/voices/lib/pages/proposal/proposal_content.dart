@@ -133,7 +133,11 @@ class _SegmentsListView extends StatelessWidget {
           ViewCommentsSection() => throw ArgumentError(
               'View comments not supported',
             ),
-          AddCommentSection() => const ProposalAddCommentTile(),
+          AddCommentSection(:final template, :final authorId) =>
+            ProposalAddCommentTile(
+              template: template,
+              authorId: authorId,
+            ),
         },
       CommentListItem(:final comment) => ProposalCommentTile(comment: comment),
       _ => throw ArgumentError('Not supported type ${item.runtimeType}'),

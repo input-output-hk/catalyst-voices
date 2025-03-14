@@ -1854,5 +1854,13 @@
   "viewLatestDocumentVersion": "View Latest",
   "@viewLatestDocumentVersion": {
     "description": "Action to change back to latest version"
+  },
+  "cancelCommit": "Cancel",
+  "@cancelCommit": {
+    "description": "Cancel comment submission"
+  },
+  "submitCommit": "Submit",
+  "@submitCommit": {
+    "description": "Send comment"
   }
 }
