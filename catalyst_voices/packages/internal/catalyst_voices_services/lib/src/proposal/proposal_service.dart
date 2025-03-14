@@ -65,7 +65,11 @@ abstract interface class ProposalService {
   Future<DocumentRef> importProposal(Uint8List data);
 
   /// Publishes a public proposal draft.
-  Future<void> publishProposal({
+  /// The local draft referenced by the [document] is removed.
+  ///
+  /// The [DocumentRef] is retained but it's promoted from [DraftRef]
+  /// instance to [SignedDocumentRef] instance.
+  Future<SignedDocumentRef> publishProposal({
     required DocumentData document,
   });
 
@@ -200,10 +204,10 @@ final class ProposalServiceImpl implements ProposalService {
   }
 
   @override
-  Future<void> publishProposal({
+  Future<SignedDocumentRef> publishProposal({
     required DocumentData document,
-  }) {
-    return _useProposerRoleCredentials(
+  }) async {
+    await _useProposerRoleCredentials(
       (catalystId, privateKey) {
         return _proposalRepository.publishProposal(
           document: document,
@@ -212,6 +216,13 @@ final class ProposalServiceImpl implements ProposalService {
         );
       },
     );
+
+    final ref = document.ref;
+    if (ref is DraftRef) {
+      await _documentRepository.deleteDocumentDraft(ref: ref);
+    }
+
+    return ref.asSignedDocumentRef;
   }
 
   @override

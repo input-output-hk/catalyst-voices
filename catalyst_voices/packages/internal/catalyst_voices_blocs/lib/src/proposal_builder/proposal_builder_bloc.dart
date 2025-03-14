@@ -20,7 +20,6 @@ final class ProposalBuilderBloc
     with
         BlocErrorEmitterMixin,
         BlocSignalEmitterMixin<ProposalBuilderSignal, ProposalBuilderState> {
-  final CampaignService _campaignService;
   final ProposalService _proposalService;
   final DownloaderService _downloaderService;
   final DocumentMapper _documentMapper;
@@ -28,7 +27,6 @@ final class ProposalBuilderBloc
   DocumentBuilder? _documentBuilder;
 
   ProposalBuilderBloc(
-    this._campaignService,
     this._proposalService,
     this._downloaderService,
     this._documentMapper,
@@ -239,8 +237,7 @@ final class ProposalBuilderBloc
     emit(newState);
 
     // then proceed slow async operations
-    final ref = state.metadata.documentRef!;
-    await _saveDocumentLocally(emit, ref, document);
+    await _saveDocumentLocally(emit, document);
   }
 
   Future<void> _loadDefaultProposalTemplate(
@@ -249,30 +246,9 @@ final class ProposalBuilderBloc
   ) async {
     _logger.info('Loading default proposal template');
 
-    await _loadState(emit, () async {
-      final campaign = await _campaignService.getActiveCampaign();
-      final proposalTemplateRef = campaign?.proposalTemplateRef;
-      if (proposalTemplateRef == null) {
-        throw const ActiveCampaignNotFoundException();
-      }
-
-      final proposalTemplate = await _proposalService.getProposalTemplate(
-        ref: proposalTemplateRef,
-      );
-
-      final documentBuilder =
-          DocumentBuilder.fromSchema(schema: proposalTemplate.schema);
-
-      return _createState(
-        document: documentBuilder.build(),
-        metadata: ProposalBuilderMetadata.newDraft(
-          templateRef: proposalTemplateRef,
-          // TODO(dtscalac): refactor proposal builder to require category ID
-          // as input when creating a new proposal
-          categoryId: const SignedDocumentRef(id: 'category_id'),
-        ),
-      );
-    });
+    // TODO(dtscalac): proposal builder cannot work without templateId or proposalId.
+    // A proposal must be assigned to a category. Show an error if neither is specified.
+    emit(const ProposalBuilderState(error: LocalizedUnknownException()));
   }
 
   Future<void> _loadProposal(
@@ -285,13 +261,22 @@ final class ProposalBuilderBloc
       final proposalData = await _proposalService.getProposal(ref: event.ref);
       final proposal = Proposal.fromData(proposalData);
 
+      final versions = proposalData.versions.mapIndexed((index, version) {
+        return DocumentVersion(
+          id: version,
+          number: index + 1,
+          isCurrent: version == event.ref.version,
+          isLatest: index == proposalData.versions.length - 1,
+        );
+      }).toList();
+
       return _createState(
         document: proposalData.document.document,
         metadata: ProposalBuilderMetadata(
           publish: proposal.publish,
           documentRef: proposal.selfRef,
           originalDocumentRef: proposal.selfRef,
-          currentIteration: proposal.versionCount,
+          versions: versions,
           categoryId: proposal.categoryId,
         ),
       );
@@ -318,9 +303,7 @@ final class ProposalBuilderBloc
         document: documentBuilder.build(),
         metadata: ProposalBuilderMetadata.newDraft(
           templateRef: ref,
-          // TODO(dtscalac): refactor proposal builder to require category ID
-          // as input when creating a new proposal
-          categoryId: const SignedDocumentRef(id: 'category_id'),
+          categoryId: proposalTemplate.metadata.categoryId,
         ),
       );
     });
@@ -389,8 +372,14 @@ final class ProposalBuilderBloc
     try {
       _logger.info('Publishing proposal');
 
-      await _proposalService.publishProposal(
+      final newRef = await _proposalService.publishProposal(
         document: _buildDocumentData(),
+      );
+
+      _updateMetadata(
+        emit,
+        documentRef: newRef,
+        publish: ProposalPublish.publishedDraft,
       );
     } catch (error, stackTrace) {
       _logger.severe('PublishProposal', error, stackTrace);
@@ -400,25 +389,16 @@ final class ProposalBuilderBloc
 
   Future<void> _saveDocumentLocally(
     Emitter<ProposalBuilderState> emit,
-    DocumentRef ref,
     Document document,
   ) async {
-    final ref = state.metadata.documentRef!;
+    // TODO(dtscalac): if a new version has been created
+    // update the version in the metadata
     final nextRef = await _upsertDraftProposal(
-      ref,
+      state.metadata.documentRef!,
       _documentMapper.toContent(document),
     );
 
-    if (ref != nextRef) {
-      final updatedMetadata = state.metadata.copyWith(
-        documentRef: Optional(nextRef),
-        originalDocumentRef: Optional(nextRef),
-      );
-      final updatedState = state.copyWith(
-        metadata: updatedMetadata,
-      );
-      emit(updatedState);
-    }
+    _updateMetadata(emit, documentRef: nextRef);
   }
 
   Future<void> _submitProposal(
@@ -438,7 +418,23 @@ final class ProposalBuilderBloc
     }
   }
 
-  Future<DraftRef?> _upsertDraftProposal(
+  void _updateMetadata(
+    Emitter<ProposalBuilderState> emit, {
+    DocumentRef? documentRef,
+    ProposalPublish? publish,
+  }) {
+    final updatedMetadata = state.metadata.copyWith(
+      documentRef: documentRef != null ? Optional(documentRef) : null,
+      originalDocumentRef: documentRef != null ? Optional(documentRef) : null,
+      publish: publish,
+    );
+    final updatedState = state.copyWith(
+      metadata: updatedMetadata,
+    );
+    emit(updatedState);
+  }
+
+  Future<DraftRef> _upsertDraftProposal(
     DocumentRef currentRef,
     DocumentDataContent document,
   ) async {

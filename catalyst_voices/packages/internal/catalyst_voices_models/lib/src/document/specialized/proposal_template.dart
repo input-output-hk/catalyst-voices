@@ -21,5 +21,6 @@ final class ProposalTemplate extends Equatable {
 final class ProposalTemplateMetadata extends DocumentMetadata {
   ProposalTemplateMetadata({
     required super.selfRef,
+    super.categoryId,
   });
 }

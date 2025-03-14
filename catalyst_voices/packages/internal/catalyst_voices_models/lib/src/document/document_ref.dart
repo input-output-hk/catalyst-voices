@@ -21,6 +21,12 @@ sealed class DocumentRef extends Equatable {
         : SignedDocumentRef(id: id, version: version);
   }
 
+  /// Converts the [DocumentRef] to [SignedDocumentRef].
+  ///
+  /// Useful if a draft has been published and we need to update it's ref.
+  SignedDocumentRef get asSignedDocumentRef;
+
+  /// Whether the ref specifies the document [version].
   bool get isExact => version != null;
 
   @override
@@ -51,6 +57,12 @@ final class DraftRef extends DocumentRef {
       version: id,
     );
   }
+
+  @override
+  SignedDocumentRef get asSignedDocumentRef => SignedDocumentRef(
+        id: id,
+        version: version,
+      );
 
   @override
   DraftRef copyWith({
@@ -100,6 +112,9 @@ final class SignedDocumentRef extends DocumentRef {
       version: id,
     );
   }
+
+  @override
+  SignedDocumentRef get asSignedDocumentRef => this;
 
   @override
   SignedDocumentRef copyWith({

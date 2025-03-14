@@ -407,6 +407,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
 
     final metadata = ProposalMetadata(
       selfRef: documentData.metadata.selfRef,
+      categoryId: documentData.metadata.categoryId,
     );
 
     final content = DocumentDataContentDto.fromModel(
@@ -431,6 +432,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
 
     final metadata = ProposalTemplateMetadata(
       selfRef: documentData.metadata.selfRef,
+      categoryId: documentData.metadata.categoryId,
     );
 
     final contentData = documentData.content.data;

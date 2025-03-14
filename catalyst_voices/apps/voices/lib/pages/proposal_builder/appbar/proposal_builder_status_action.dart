@@ -75,7 +75,7 @@ class _MenuItem extends StatelessWidget {
     final title = item.title(
       context,
       proposalTitle,
-      metadata.currentIteration,
+      metadata.latestVersion?.number ?? 0,
     );
 
     final description = item.description(context, metadata);
@@ -161,7 +161,8 @@ enum _MenuItemEnum {
     BuildContext context,
     ProposalBuilderMetadata metadata,
   ) {
-    final nextIteration = metadata.currentIteration + 1;
+    final currentIteration = metadata.latestVersion?.number ?? 0;
+    final nextIteration = currentIteration + 1;
     return context.l10n.proposalEditorStatusDropdownViewDescription(
       nextIteration,
     );
@@ -293,13 +294,13 @@ class _PopupMenuButtonState extends State<_PopupMenuButton> {
     final state = bloc.state;
     final proposalTitle = state.proposalTitle ??
         context.l10n.proposalEditorStatusDropdownViewTitle;
-    final iteration = state.metadata.currentIteration;
+    final iteration = state.metadata.latestVersion?.number;
 
     final shouldPublish = await PublishProposalIterationDialog.show(
           context: context,
           proposalTitle: proposalTitle,
-          currentIteration: iteration == 0 ? null : iteration,
-          nextIteration: iteration + 1,
+          currentIteration: iteration,
+          nextIteration: (iteration ?? 0) + 1,
         ) ??
         false;
 
@@ -321,7 +322,7 @@ class _PopupMenuButtonState extends State<_PopupMenuButton> {
     final state = bloc.state;
     final proposalTitle = state.proposalTitle ??
         context.l10n.proposalEditorStatusDropdownViewTitle;
-    final iteration = state.metadata.currentIteration;
+    final iteration = state.metadata.latestVersion!.number;
 
     final shouldSubmit = await SubmitProposalForReviewDialog.show(
           context: context,

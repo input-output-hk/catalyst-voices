@@ -37,5 +37,6 @@ final class ProposalDocument extends Equatable {
 final class ProposalMetadata extends DocumentMetadata {
   ProposalMetadata({
     required super.selfRef,
+    super.categoryId,
   });
 }
