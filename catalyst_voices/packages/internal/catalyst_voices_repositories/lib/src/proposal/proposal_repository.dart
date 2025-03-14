@@ -67,6 +67,8 @@ abstract interface class ProposalRepository {
 
   Future<List<String>> getUserProposalsIds(String userId);
 
+  Future<DocumentRef> importProposal(Uint8List data);
+
   Future<List<String>> removeFavoriteProposal(String proposalId);
 }
 
@@ -210,6 +212,11 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   Future<List<String>> getUserProposalsIds(String userId) async {
     // TODO(LynxLynxx): read db to get user's proposals
     return <String>[];
+  }
+
+  @override
+  Future<DocumentRef> importProposal(Uint8List data) {
+    return _documentRepository.importDocument(data: data);
   }
 
   @override

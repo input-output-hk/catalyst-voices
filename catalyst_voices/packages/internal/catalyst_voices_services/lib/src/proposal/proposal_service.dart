@@ -92,7 +92,7 @@ abstract interface class ProposalService {
 
 final class ProposalServiceImpl implements ProposalService {
   final ProposalRepository _proposalRepository;
-  final DocumentRepository _documentRepository;
+  // final DocumentRepository _documentRepository;
   final SignedDocumentManager _signedDocumentManager;
   final UserService _userService;
   final KeyDerivationService _keyDerivationService;
@@ -188,7 +188,7 @@ final class ProposalServiceImpl implements ProposalService {
 
   @override
   Future<DocumentRef> importProposal(Uint8List data) {
-    return _documentRepository.importDocument(data: data);
+    return _proposalRepository.importProposal(data);
   }
 
   @override
