@@ -226,30 +226,32 @@ final class RegistrationServiceImpl implements RegistrationService {
       final balance = await enabledWallet.getBalance();
       final address = await enabledWallet.getChangeAddress();
 
-      final keyPair = await _keyDerivationService.deriveAccountRoleKeyPair(
+      final keyPair = _keyDerivationService.deriveAccountRoleKeyPair(
         masterKey: masterKey,
         role: AccountRole.root,
       );
 
-      final role0key = keyPair.publicKey;
+      return keyPair.use((keyPair) {
+        final role0key = keyPair.publicKey;
 
-      final catalystId = CatalystId(
-        host: _blockchainConfig.host.host,
-        username: displayName,
-        role0Key: role0key.publicKeyBytes,
-      );
+        final catalystId = CatalystId(
+          host: _blockchainConfig.host.host,
+          username: displayName,
+          role0Key: role0key.publicKeyBytes,
+        );
 
-      return Account(
-        catalystId: catalystId,
-        email: email,
-        keychain: keychain,
-        roles: roles,
-        walletInfo: WalletInfo(
-          metadata: WalletMetadata.fromCardanoWallet(wallet),
-          balance: balance.coin,
-          address: address,
-        ),
-      );
+        return Account(
+          catalystId: catalystId,
+          email: email,
+          keychain: keychain,
+          roles: roles,
+          walletInfo: WalletInfo(
+            metadata: WalletMetadata.fromCardanoWallet(wallet),
+            balance: balance.coin,
+            address: address,
+          ),
+        );
+      });
     } on RegistrationException {
       rethrow;
     } catch (error) {
@@ -271,29 +273,31 @@ final class RegistrationServiceImpl implements RegistrationService {
     await keychain.unlock(lockFactor);
     await keychain.setMasterKey(masterKey);
 
-    final keyPair = await _keyDerivationService.deriveAccountRoleKeyPair(
+    final keyPair = _keyDerivationService.deriveAccountRoleKeyPair(
       masterKey: masterKey,
       role: AccountRole.root,
     );
 
-    final role0key = keyPair.publicKey;
+    return keyPair.use((keyPair) {
+      final role0key = keyPair.publicKey;
 
-    final catalystId = CatalystId(
-      host: _blockchainConfig.host.host,
-      username: 'Dummy',
-      role0Key: role0key.publicKeyBytes,
-    );
+      final catalystId = CatalystId(
+        host: _blockchainConfig.host.host,
+        username: 'Dummy',
+        role0Key: role0key.publicKeyBytes,
+      );
 
-    return Account(
-      catalystId: catalystId,
-      email: 'dummy@iohk.com',
-      keychain: keychain,
-      roles: roles,
-      walletInfo: WalletInfo(
-        metadata: const WalletMetadata(name: 'Dummy Wallet'),
-        balance: Coin.fromAda(10),
-        address: _testNetAddress,
-      ),
-    );
+      return Account(
+        catalystId: catalystId,
+        email: 'dummy@iohk.com',
+        keychain: keychain,
+        roles: roles,
+        walletInfo: WalletInfo(
+          metadata: const WalletMetadata(name: 'Dummy Wallet'),
+          balance: Coin.fromAda(10),
+          address: _testNetAddress,
+        ),
+      );
+    });
   }
 }

@@ -26,15 +26,23 @@ final class AuthServiceImpl implements AuthService {
   @override
   Future<String> createRbacToken() async {
     final account = await _getAccount();
-    final keyPair = await _getRole0KeyPair(account);
 
-    final catalystId = _createCatalystId(account);
-    final catalystIdString = catalystId.toUri().toStringWithoutScheme();
-    final toBeSigned = utf8.encode('$tokenPrefix.$catalystIdString.');
-    final signature = await keyPair.privateKey.sign(toBeSigned);
-    final encodedSignature = base64UrlNoPadEncode(signature.bytes);
+    return account.keychain.getMasterKey().use((masterKey) {
+      final keyPair = _keyDerivationService.deriveAccountRoleKeyPair(
+        masterKey: masterKey,
+        role: AccountRole.root,
+      );
 
-    return '$tokenPrefix.$catalystIdString.$encodedSignature';
+      return keyPair.use((keyPair) async {
+        final catalystId = _createCatalystId(account);
+        final catalystIdString = catalystId.toUri().toStringWithoutScheme();
+        final toBeSigned = utf8.encode('$tokenPrefix.$catalystIdString.');
+        final signature = await keyPair.privateKey.sign(toBeSigned);
+        final encodedSignature = base64UrlNoPadEncode(signature.bytes);
+
+        return '$tokenPrefix.$catalystIdString.$encodedSignature';
+      });
+    });
   }
 
   CatalystId _createCatalystId(Account account) {
@@ -53,17 +61,5 @@ final class AuthServiceImpl implements AuthService {
       throw StateError('Cannot create rbac token, account missing');
     }
     return account;
-  }
-
-  Future<CatalystKeyPair> _getRole0KeyPair(Account account) async {
-    final masterKey = await account.keychain.getMasterKey();
-    if (masterKey == null) {
-      throw StateError('Cannot publish a proposal, master key missing');
-    }
-
-    return _keyDerivationService.deriveAccountRoleKeyPair(
-      masterKey: masterKey,
-      role: AccountRole.root,
-    );
   }
 }

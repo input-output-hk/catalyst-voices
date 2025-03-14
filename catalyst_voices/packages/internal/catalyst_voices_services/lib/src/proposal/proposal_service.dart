@@ -203,7 +203,7 @@ final class ProposalServiceImpl implements ProposalService {
   Future<void> publishProposal({
     required DocumentData document,
   }) {
-    return _withProposerRoleCredentials(
+    return _useProposerRoleCredentials(
       (catalystId, privateKey) {
         return _proposalRepository.publishProposal(
           document: document,
@@ -224,7 +224,7 @@ final class ProposalServiceImpl implements ProposalService {
     required SignedDocumentRef ref,
     required String categoryId,
   }) {
-    return _withProposerRoleCredentials(
+    return _useProposerRoleCredentials(
       (catalystId, privateKey) {
         return _proposalRepository.publishProposalAction(
           ref: ref,
@@ -285,7 +285,7 @@ final class ProposalServiceImpl implements ProposalService {
     });
   }
 
-  Future<void> _withProposerRoleCredentials(
+  Future<void> _useProposerRoleCredentials(
     Future<void> Function(
       CatalystId catalystId,
       CatalystPrivateKey privateKey,
@@ -298,23 +298,20 @@ final class ProposalServiceImpl implements ProposalService {
       );
     }
 
-    final masterKey = await account.keychain.getMasterKey();
-    if (masterKey == null) {
-      throw StateError(
-        'Cannot obtain proposer credentials, master key missing',
-      );
-    }
-
     final catalystId = account.catalystId.copyWith(
       role: const Optional(AccountRole.proposer),
       rotation: const Optional(0),
     );
 
-    final keyPair = await _keyDerivationService.deriveAccountRoleKeyPair(
-      masterKey: masterKey,
-      role: AccountRole.proposer,
-    );
+    await account.keychain.getMasterKey().use((masterKey) async {
+      final keyPair = _keyDerivationService.deriveAccountRoleKeyPair(
+        masterKey: masterKey,
+        role: AccountRole.proposer,
+      );
 
-    await callback(catalystId, keyPair.privateKey);
+      await keyPair.use(
+        (keyPair) => callback(catalystId, keyPair.privateKey),
+      );
+    });
   }
 }
