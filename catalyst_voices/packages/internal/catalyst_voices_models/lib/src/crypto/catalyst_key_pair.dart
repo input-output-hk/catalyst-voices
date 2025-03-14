@@ -27,7 +27,7 @@ final class CatalystKeyPair extends Equatable {
   }
 }
 
-extension FutureCatalystKeyPair on Future<CatalystKeyPair?> {
+extension FutureCatalystKeyPairExt on Future<CatalystKeyPair?> {
   /// Calls the [callback] on the key pair
   /// and then drops the private key bytes.
   Future<R> use<R>(FutureOr<R> Function(CatalystKeyPair) callback) async {

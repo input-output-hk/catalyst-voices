@@ -26,7 +26,7 @@ abstract interface class CatalystPrivateKey {
   Future<CatalystSignature> sign(Uint8List data);
 }
 
-extension FutureCatalystPrivateKey on Future<CatalystPrivateKey?> {
+extension FutureCatalystPrivateKeyExt on Future<CatalystPrivateKey?> {
   /// Calls the [callback] on the private key
   /// and then drops the private key bytes.
   Future<R> use<R>(FutureOr<R> Function(CatalystPrivateKey) callback) async {
