@@ -23,6 +23,8 @@ class ProposalCommentWithRepliesCard extends StatefulWidget {
 class _ProposalCommentWithRepliesCardState
     extends State<ProposalCommentWithRepliesCard> {
   bool _showReplies = true;
+
+  // ignore: unused_field
   bool _showReplyInput = false;
 
   @override
@@ -62,6 +64,7 @@ class _ProposalCommentWithRepliesCardState
     );
   }
 
+  // ignore: unused_element
   void _hideReplyInput() {
     setState(() {
       _showReplyInput = false;
