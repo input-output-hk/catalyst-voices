@@ -124,6 +124,7 @@ class _PublishedProposals extends StatelessWidget {
       selfRef: SignedDocumentRef.generateFirstRef(),
       title: 'Latest proposal that is making its rounds.',
       category: 'F14: Cardano Use Cases: Concept',
+      categoryId: const SignedDocumentRef(id: 'dummy_category_id'),
       description: 'Lorem ipsum dolor sit ',
       fundsRequested: const Coin(100000),
       status: ProposalStatus.draft,

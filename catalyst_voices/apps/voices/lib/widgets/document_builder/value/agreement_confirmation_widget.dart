@@ -1,5 +1,4 @@
-import 'package:catalyst_voices/widgets/document_builder/document_error_text.dart';
-import 'package:catalyst_voices/widgets/form/voices_form_field.dart';
+import 'package:catalyst_voices/widgets/document_builder/value/document_error_text.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';

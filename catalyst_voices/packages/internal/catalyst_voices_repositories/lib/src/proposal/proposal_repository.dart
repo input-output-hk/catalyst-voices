@@ -7,6 +7,9 @@ import 'package:catalyst_voices_repositories/src/document/document_repository.da
 import 'package:catalyst_voices_repositories/src/dto/document/document_data_dto.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/document_dto.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/schema/document_schema_dto.dart';
+import 'package:catalyst_voices_repositories/src/dto/proposal/proposal_submission_action_dto.dart';
+import 'package:catalyst_voices_repositories/src/signed_document/signed_document_json_payload.dart';
+import 'package:catalyst_voices_repositories/src/signed_document/signed_document_manager.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -30,8 +33,10 @@ int _maxResults(ProposalPublish? stage) {
 }
 
 abstract interface class ProposalRepository {
-  const factory ProposalRepository(DocumentRepository documentRepository) =
-      ProposalRepositoryImpl;
+  const factory ProposalRepository(
+    SignedDocumentManager signedDocumentManager,
+    DocumentRepository documentRepository,
+  ) = ProposalRepositoryImpl;
 
   Future<List<String>> addFavoriteProposal(String proposalId);
 
@@ -68,9 +73,25 @@ abstract interface class ProposalRepository {
 
   Future<List<String>> getUserProposalsIds(String userId);
 
+
   Future<DocumentRef> importProposal(Uint8List data);
 
   Future<List<ProposalDocument>> queryVersionsOfId({required String id});
+
+  Future<void> publishProposal({
+    required DocumentData document,
+    required CatalystId catalystId,
+    required CatalystPrivateKey privateKey,
+  });
+
+  Future<void> publishProposalAction({
+    required SignedDocumentRef ref,
+    required SignedDocumentRef categoryId,
+    required ProposalSubmissionAction action,
+    required CatalystId catalystId,
+    required CatalystPrivateKey privateKey,
+  });
+
 
   Future<List<String>> removeFavoriteProposal(String proposalId);
 
@@ -91,8 +112,13 @@ abstract interface class ProposalRepository {
 }
 
 final class ProposalRepositoryImpl implements ProposalRepository {
+  final SignedDocumentManager _signedDocumentManager;
   final DocumentRepository _documentRepository;
-  const ProposalRepositoryImpl(this._documentRepository);
+
+  const ProposalRepositoryImpl(
+    this._signedDocumentManager,
+    this._documentRepository,
+  );
 
   @override
   Future<List<String>> addFavoriteProposal(String proposalId) async {
@@ -196,6 +222,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
         Proposal(
           selfRef: SignedDocumentRef.generateFirstRef(),
           category: 'Cardano Use Cases / MVP',
+          categoryId: const SignedDocumentRef(id: 'dummy_category_id'),
           title: 'Proposal Title that rocks the world',
           updateDate: DateTime.now().minusDays(2),
           fundsRequested: Coin.fromAda(100000),
@@ -240,6 +267,46 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   @override
   Future<List<ProposalDocument>> queryVersionsOfId({required String id}) {
     return _documentRepository.queryVersionsOfId(id: id);
+
+  Future<void> publishProposal({
+    required DocumentData document,
+    required CatalystId catalystId,
+    required CatalystPrivateKey privateKey,
+  }) async {
+    final signedDocument = await _signedDocumentManager.signDocument(
+      SignedDocumentJsonPayload(document.content.data),
+      metadata: _createProposalMetadata(document.metadata),
+      catalystId: catalystId,
+      privateKey: privateKey,
+    );
+
+    await _documentRepository.publishDocument(document: signedDocument);
+  }
+
+  @override
+  Future<void> publishProposalAction({
+    required SignedDocumentRef ref,
+    required SignedDocumentRef categoryId,
+    required ProposalSubmissionAction action,
+    required CatalystId catalystId,
+    required CatalystPrivateKey privateKey,
+  }) async {
+    final signedDocument = await _signedDocumentManager.signDocument(
+      ProposalSubmissionActionDocumentDto(
+        action: ProposalSubmissionActionDto.fromModel(action),
+      ),
+      metadata: SignedDocumentMetadata(
+        contentType: SignedDocumentContentType.json,
+        documentType: DocumentType.proposalActionDocument,
+        ref: SignedDocumentMetadataRef.fromDocumentRef(ref),
+        categoryId: SignedDocumentMetadataRef.fromDocumentRef(ref),
+      ),
+      catalystId: catalystId,
+      privateKey: privateKey,
+    );
+
+    await _documentRepository.publishDocument(document: signedDocument);
+
   }
 
   @override
@@ -361,6 +428,25 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     return ProposalTemplate(
       metadata: metadata,
       schema: schema,
+
+  SignedDocumentMetadata _createProposalMetadata(
+    DocumentDataMetadata metadata,
+  ) {
+    final template = metadata.template;
+    final categoryId = metadata.categoryId;
+
+    return SignedDocumentMetadata(
+      contentType: SignedDocumentContentType.json,
+      documentType: DocumentType.proposalDocument,
+      id: metadata.id,
+      ver: metadata.version,
+      template: template == null
+          ? null
+          : SignedDocumentMetadataRef.fromDocumentRef(template),
+      categoryId: categoryId == null
+          ? null
+          : SignedDocumentMetadataRef.fromDocumentRef(categoryId),
+
     );
   }
 

@@ -73,7 +73,7 @@ class BaseProposalData extends Equatable {
 }
 
 class ProposalData extends BaseProposalData {
-  final String categoryId;
+  final SignedDocumentRef categoryId;
   final List<BaseProposalData> versions;
   final int commentsCount;
 

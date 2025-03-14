@@ -17,6 +17,7 @@ final class Proposal extends Equatable {
   final String author;
   final int commentsCount;
   final String category;
+  final SignedDocumentRef categoryId;
 
   factory Proposal({
     required DocumentRef selfRef,
@@ -93,6 +94,7 @@ final class Proposal extends Equatable {
     required this.author,
     required this.commentsCount,
     required this.category,
+    required this.categoryId,
   });
 
   @override
@@ -106,6 +108,7 @@ final class Proposal extends Equatable {
         status,
         publish,
         category,
+        categoryId,
         commentsCount,
       ];
 
@@ -124,6 +127,7 @@ final class Proposal extends Equatable {
     String? author,
     List<ProposalVersion>? versions,
     String? category,
+    SignedDocumentRef? categoryId,
   }) =>
       Proposal._(
         selfRef: selfRef ?? this.selfRef,
@@ -138,6 +142,7 @@ final class Proposal extends Equatable {
         author: author ?? this.author,
         versions: versions ?? this.versions,
         category: category ?? this.category,
+        categoryId: categoryId ?? this.categoryId,
       );
 }
 

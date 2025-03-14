@@ -1,8 +1,8 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:equatable/equatable.dart';
 
-final class DocumentLinkListItem extends DocumentPropertyValueListItem<String> {
-  const DocumentLinkListItem({
+final class DocumentLinkReadItem extends DocumentPropertyValueListItem<String> {
+  const DocumentLinkReadItem({
     required super.id,
     required super.title,
     required super.value,

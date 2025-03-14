@@ -165,11 +165,6 @@ final class Dependencies extends DependencyProvider {
           get<SignedDocumentManager>(),
         );
       })
-      ..registerLazySingleton<ProposalRepository>(() {
-        return ProposalRepository(
-          get<DocumentRepository>(),
-        );
-      })
       ..registerLazySingleton<CampaignRepository>(CampaignRepository.new)
       ..registerLazySingleton<ConfigRepository>(ConfigRepository.new)
       ..registerLazySingleton<DocumentRepository>(() {
@@ -179,7 +174,13 @@ final class Dependencies extends DependencyProvider {
           get<CatGatewayDocumentDataSource>(),
         );
       })
-      ..registerLazySingleton<DocumentMapper>(() => const DocumentMapperImpl());
+      ..registerLazySingleton<DocumentMapper>(() => const DocumentMapperImpl())
+      ..registerLazySingleton<ProposalRepository>(
+        () => ProposalRepository(
+          get<SignedDocumentManager>(),
+          get<DocumentRepository>(),
+        ),
+      );
   }
 
   void _registerServices() {
@@ -198,7 +199,6 @@ final class Dependencies extends DependencyProvider {
       return AuthService(
         get<UserObserver>(),
         get<KeyDerivationService>(),
-        get<AppConfig>().blockchain,
       );
     });
     registerLazySingleton<AuthTokenProvider>(() => get<AuthService>());
@@ -237,7 +237,6 @@ final class Dependencies extends DependencyProvider {
         get<SignedDocumentManager>(),
         get<UserService>(),
         get<KeyDerivationService>(),
-        get<AppConfig>().blockchain,
       );
     });
     registerLazySingleton<ConfigService>(() {
