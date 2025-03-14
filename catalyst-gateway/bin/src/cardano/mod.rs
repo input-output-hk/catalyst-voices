@@ -505,8 +505,9 @@ impl SyncTask {
             // Note: to prevent a data race when multiple nodes are syncing, we probably
             // want to put a gap in this, so that there are X slots of overlap
             // between the live chain and immutable chain.  This gap should be
-            // a parameter.
+            // a parameter.sss
             if self.sync_tasks.len() == 1 {
+                info!(chain=%self.cfg.chain, immutable_tip=u64::from(self.immutable_tip_slot), "Immutable State Indexing Finished");
                 self.dispatch_event(event::ChainIndexerEvent::SyncCompleted);
 
                 if let Err(error) = roll_forward::purge_live_index(self.immutable_tip_slot).await {

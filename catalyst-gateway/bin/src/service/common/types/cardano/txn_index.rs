@@ -38,7 +38,7 @@ static SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| {
 });
 
 /// Transaction Index within a block.
-#[derive(Debug, Eq, PartialEq, Hash, Clone)]
+#[derive(Debug, Eq, PartialEq, Hash, Clone, PartialOrd, Ord, Default)]
 pub(crate) struct TxnIndex(u16);
 
 /// Is the Slot Number valid?
