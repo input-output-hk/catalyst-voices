@@ -24,13 +24,17 @@ const GET_REGISTRATIONS_FROM_STAKE_ADDR_QUERY: &str =
 #[derive(SerializeRow)]
 pub(crate) struct GetRegistrationParams {
     /// Stake address.
-    pub stake_public_key: Vec<u8>,
+    stake_public_key: Vec<u8>,
+    /// Block Slot Number.
+    slot_no: DbSlot,
 }
 
-impl From<Vec<u8>> for GetRegistrationParams {
-    fn from(value: Vec<u8>) -> Self {
-        GetRegistrationParams {
-            stake_public_key: value,
+impl GetRegistrationParams {
+    /// Create a new instance of [`GetRegistrationParams`]
+    pub(crate) fn new<T: Into<DbSlot>>(stake_public_key: Vec<u8>, slot_no: T) -> Self {
+        Self {
+            stake_public_key,
+            slot_no: slot_no.into(),
         }
     }
 }
@@ -44,6 +48,8 @@ pub(crate) struct GetRegistrationQuery {
     pub slot_no: DbSlot,
     /// Transaction Index.
     pub txn_index: DbTxnIndex,
+    /// Raw Nonce value.
+    pub raw_nonce: num_bigint::BigInt,
     /// Voting Public Key
     pub vote_key: Vec<u8>,
     /// Full Payment Address (not hashed, 32 byte ED25519 Public key).

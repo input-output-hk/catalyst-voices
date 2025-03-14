@@ -9,7 +9,7 @@ use std::{
 };
 
 use const_format::concatcp;
-use pallas::ledger::addresses::{Address, ShelleyAddress};
+use pallas::ledger::addresses::Address;
 use poem_openapi::{
     registry::{MetaExternalDocument, MetaSchema, MetaSchemaRef},
     types::{Example, ParseError, ParseFromJSON, ParseFromParameter, ParseResult, ToJSON, Type},
@@ -30,6 +30,10 @@ const EXAMPLE: &str = "addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3
 const PROD: &str = "addr";
 /// Test Address Identifier
 const TEST: &str = "addr_test";
+/// Production Stake Address Identifier
+pub(crate) const STAKE_PROD: &str = "stake";
+/// Test Stake Address Identifier
+pub(crate) const STAKE_TEST: &str = "stake_test";
 /// Bech32 Match Pattern
 const BECH32: &str = "[a,c-h,j-n,p-z,0,2-9]";
 /// Length of the encoded address (for type 0 - 3).
@@ -42,6 +46,10 @@ const PATTERN: &str = concatcp!(
     PROD,
     "|",
     TEST,
+    "|",
+    STAKE_PROD,
+    "|",
+    STAKE_TEST,
     ")1(",
     BECH32,
     "{",
@@ -98,29 +106,26 @@ fn is_valid(addr: &str) -> bool {
 }
 
 impl_string_types!(
-    Cip19ShelleyAddress,
+    Cip19Address,
     "string",
     "cardano:cip19-address",
     Some(SCHEMA.clone()),
     is_valid
 );
 
-impl TryFrom<Vec<u8>> for Cip19ShelleyAddress {
+impl TryFrom<Vec<u8>> for Cip19Address {
     type Error = anyhow::Error;
 
     fn try_from(bytes: Vec<u8>) -> Result<Self, Self::Error> {
         let addr = Address::from_bytes(&bytes)?;
-        let Address::Shelley(addr) = addr else {
-            return Err(anyhow::anyhow!("Not a Shelley address: {addr}"));
-        };
         addr.try_into()
     }
 }
 
-impl TryFrom<ShelleyAddress> for Cip19ShelleyAddress {
+impl TryFrom<Address> for Cip19Address {
     type Error = anyhow::Error;
 
-    fn try_from(addr: ShelleyAddress) -> Result<Self, Self::Error> {
+    fn try_from(addr: Address) -> Result<Self, Self::Error> {
         let addr_str = addr
             .to_bech32()
             .map_err(|e| anyhow::anyhow!(format!("Invalid payment address {e}")))?;
@@ -128,20 +133,17 @@ impl TryFrom<ShelleyAddress> for Cip19ShelleyAddress {
     }
 }
 
-impl TryInto<ShelleyAddress> for Cip19ShelleyAddress {
+impl TryInto<Address> for Cip19Address {
     type Error = anyhow::Error;
 
-    fn try_into(self) -> Result<ShelleyAddress, Self::Error> {
+    fn try_into(self) -> Result<Address, Self::Error> {
         let address_str = &self.0;
         let address = Address::from_bech32(address_str)?;
-        match address {
-            Address::Shelley(address) => Ok(address),
-            _ => Err(anyhow::anyhow!("Invalid payment address")),
-        }
+        Ok(address)
     }
 }
 
-impl Example for Cip19ShelleyAddress {
+impl Example for Cip19Address {
     fn example() -> Self {
         Self(EXAMPLE.to_owned())
     }

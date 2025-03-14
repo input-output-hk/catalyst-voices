@@ -5,6 +5,7 @@ pub(crate) mod certs;
 pub(crate) mod cip36;
 pub(crate) mod rbac509;
 pub(crate) mod roll_forward;
+pub(crate) mod stake_reg;
 pub(crate) mod txi;
 pub(crate) mod txo;
 
@@ -46,7 +47,7 @@ pub(crate) async fn index_block(block: &MultiEraBlock) -> anyhow::Result<()> {
         // let mint = txs.mints().iter() {};
 
         // TODO: Index Metadata.
-        cip36_index.index(index, slot_no, block);
+        cip36_index.index(index, slot_no, block)?;
 
         // Index Certificates inside the transaction.
         cert_index.index(&txn, slot_no, index, block);

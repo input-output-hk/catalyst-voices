@@ -3,7 +3,7 @@
 use std::{fmt::Debug, sync::Arc};
 
 use cardano_blockchain_types::{Cip36, Slot, TxnIndex, VotingPubKey};
-use pallas::ledger::addresses::ShelleyAddress;
+use pallas::ledger::addresses::Address;
 use scylla::{frame::value::MaybeUnset, SerializeRow, Session};
 use tracing::error;
 
@@ -80,9 +80,7 @@ impl Params {
             .and_then(|k| k.voting_pk().map(|k| k.as_bytes().to_vec()))
             .unwrap_or_default();
         let is_cip36 = cip36.is_cip36().map_or(MaybeUnset::Unset, MaybeUnset::Set);
-        let payment_address = cip36
-            .payment_address()
-            .map_or(Vec::new(), ShelleyAddress::to_vec);
+        let payment_address = cip36.payment_address().map_or(Vec::new(), Address::to_vec);
         let problem_report = serde_json::to_string(cip36.err_report()).unwrap_or_else(|e| {
             error!(
                 "Failed to serialize problem report: {e:?}. Report = {:?}",
