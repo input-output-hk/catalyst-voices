@@ -269,7 +269,7 @@ final class ProposalBuilderBloc
           templateRef: proposalTemplateRef,
           // TODO(dtscalac): refactor proposal builder to require category ID
           // as input when creating a new proposal
-          categoryId: 'category_id',
+          categoryId: const SignedDocumentRef(id: 'category_id'),
         ),
       );
     });
@@ -320,7 +320,7 @@ final class ProposalBuilderBloc
           templateRef: ref,
           // TODO(dtscalac): refactor proposal builder to require category ID
           // as input when creating a new proposal
-          categoryId: 'category_id',
+          categoryId: const SignedDocumentRef(id: 'category_id'),
         ),
       );
     });

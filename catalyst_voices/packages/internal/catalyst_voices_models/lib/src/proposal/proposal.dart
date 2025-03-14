@@ -17,7 +17,7 @@ final class Proposal extends Equatable {
   final String author;
   final int commentsCount;
   final String category;
-  final String categoryId;
+  final SignedDocumentRef categoryId;
 
   const Proposal({
     required this.selfRef,
@@ -39,7 +39,7 @@ final class Proposal extends Equatable {
   factory Proposal.dummy(DocumentRef ref) => Proposal(
         selfRef: ref,
         category: 'Cardano Use Cases / MVP',
-        categoryId: 'dummy_category_id',
+        categoryId: const SignedDocumentRef(id: 'dummy_category_id'),
         title: 'Dummy Proposal',
         updateDate: DateTime.now(),
         fundsRequested: Coin.fromAda(100000),
@@ -72,7 +72,7 @@ final class Proposal extends Equatable {
       duration: data.proposalDuration ?? 0,
       author: data.proposalAuthor ?? '',
       commentsCount: data.commentsCount,
-      category: data.categoryId,
+      category: data.categoryId.id,
       categoryId: data.categoryId,
     );
   }
@@ -105,7 +105,7 @@ final class Proposal extends Equatable {
     String? author,
     int? versionCount,
     String? category,
-    String? categoryId,
+    SignedDocumentRef? categoryId,
   }) =>
       Proposal(
         selfRef: selfRef ?? this.selfRef,

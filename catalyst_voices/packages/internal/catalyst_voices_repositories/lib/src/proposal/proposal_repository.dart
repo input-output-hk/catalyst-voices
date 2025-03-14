@@ -61,7 +61,7 @@ abstract interface class ProposalRepository {
 
   Future<void> publishProposalAction({
     required SignedDocumentRef ref,
-    required String categoryId,
+    required SignedDocumentRef categoryId,
     required ProposalSubmissionAction action,
     required CatalystId catalystId,
     required CatalystPrivateKey privateKey,
@@ -119,7 +119,8 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     );
 
     return ProposalData(
-      categoryId: const Uuid().v7(),
+      // TODO(dtscalac): replace by actual category ID
+      categoryId: SignedDocumentRef.generateFirstRef(),
       document: ProposalDocument(
         metadata: ProposalMetadata(selfRef: ref),
         document: const Document(
@@ -155,7 +156,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
         Proposal(
           selfRef: SignedDocumentRef.generateFirstRef(),
           category: 'Cardano Use Cases / MVP',
-          categoryId: 'dummy_category_id',
+          categoryId: const SignedDocumentRef(id: 'dummy_category_id'),
           title: 'Proposal Title that rocks the world',
           updateDate: DateTime.now().minusDays(2),
           fundsRequested: Coin.fromAda(100000),
@@ -201,7 +202,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   @override
   Future<void> publishProposalAction({
     required SignedDocumentRef ref,
-    required String categoryId,
+    required SignedDocumentRef categoryId,
     required ProposalSubmissionAction action,
     required CatalystId catalystId,
     required CatalystPrivateKey privateKey,
@@ -214,7 +215,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
         contentType: SignedDocumentContentType.json,
         documentType: DocumentType.proposalActionDocument,
         ref: SignedDocumentMetadataRef.fromDocumentRef(ref),
-        categoryId: SignedDocumentMetadataRef(id: categoryId),
+        categoryId: SignedDocumentMetadataRef.fromDocumentRef(ref),
       ),
       catalystId: catalystId,
       privateKey: privateKey,
@@ -243,8 +244,9 @@ final class ProposalRepositoryImpl implements ProposalRepository {
       template: template == null
           ? null
           : SignedDocumentMetadataRef.fromDocumentRef(template),
-      categoryId:
-          categoryId == null ? null : SignedDocumentMetadataRef(id: categoryId),
+      categoryId: categoryId == null
+          ? null
+          : SignedDocumentMetadataRef.fromDocumentRef(categoryId),
     );
   }
 

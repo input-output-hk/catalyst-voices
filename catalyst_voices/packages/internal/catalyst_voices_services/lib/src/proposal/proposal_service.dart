@@ -5,7 +5,6 @@ import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_services/src/crypto/key_derivation_service.dart';
 import 'package:catalyst_voices_services/src/user/user_service.dart';
 import 'package:rxdart/rxdart.dart';
-import 'package:uuid/uuid.dart';
 
 abstract interface class ProposalService {
   const factory ProposalService(
@@ -75,7 +74,7 @@ abstract interface class ProposalService {
   /// Submits a proposal draft into review.
   Future<void> submitProposalForReview({
     required SignedDocumentRef ref,
-    required String categoryId,
+    required SignedDocumentRef categoryId,
   });
 
   /// Saves a new proposal draft in the local storage.
@@ -156,7 +155,8 @@ final class ProposalServiceImpl implements ProposalService {
 
     return ProposalData(
       document: mergedDocument,
-      categoryId: const Uuid().v7(),
+      // TODO(dtscalac): replace by actual category ID
+      categoryId: SignedDocumentRef.generateFirstRef(),
       commentsCount: 10,
       versions: proposal.versions,
     );
@@ -222,7 +222,7 @@ final class ProposalServiceImpl implements ProposalService {
   @override
   Future<void> submitProposalForReview({
     required SignedDocumentRef ref,
-    required String categoryId,
+    required SignedDocumentRef categoryId,
   }) {
     return _useProposerRoleCredentials(
       (catalystId, privateKey) {
@@ -267,7 +267,9 @@ final class ProposalServiceImpl implements ProposalService {
               .map((commentsCount) {
             final proposalData = ProposalData(
               document: doc,
-              categoryId: DocumentType.categoryParametersDocument.uuid,
+              categoryId: SignedDocumentRef(
+                id: DocumentType.categoryParametersDocument.uuid,
+              ),
               versions: versionIds,
               commentsCount: commentsCount,
             );
