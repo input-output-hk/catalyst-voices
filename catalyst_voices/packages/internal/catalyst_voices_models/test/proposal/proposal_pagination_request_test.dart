@@ -8,7 +8,7 @@ void main() {
         pageKey: 1,
         pageSize: 10,
         lastId: 'lastId123',
-        categoryId: 'category1',
+        categoryId: SignedDocumentRef(id: 'category1'),
         searchValue: 'search',
         stage: ProposalPublish.publishedDraft,
         usersProposals: true,
@@ -44,12 +44,12 @@ void main() {
         pageKey: 1,
         pageSize: 10,
         lastId: 'lastId123',
-        categoryId: 'category1',
+        categoryId: SignedDocumentRef(id: 'category1'),
       );
 
       final copied = original.copyWith(
         pageKey: 2,
-        categoryId: 'category2',
+        categoryId: const SignedDocumentRef(id: 'category2'),
         searchValue: 'newSearch',
         stage: ProposalPublish.submittedProposal,
         usersProposals: true,
@@ -71,7 +71,7 @@ void main() {
         pageKey: 1,
         pageSize: 10,
         lastId: 'lastId123',
-        categoryId: 'category1',
+        categoryId: SignedDocumentRef(id: 'category1'),
         searchValue: 'search',
         stage: ProposalPublish.publishedDraft,
         usersProposals: true,
@@ -93,14 +93,14 @@ void main() {
         pageKey: 1,
         pageSize: 10,
         lastId: 'lastId123',
-        categoryId: 'category1',
+        categoryId: SignedDocumentRef(id: 'category1'),
       );
 
       const request2 = ProposalPaginationRequest(
         pageKey: 1,
         pageSize: 10,
         lastId: 'lastId123',
-        categoryId: 'category1',
+        categoryId: SignedDocumentRef(id: 'category1'),
       );
 
       expect(request1, equals(request2));

@@ -4,10 +4,11 @@ import 'package:catalyst_voices/widgets/cards/voices_leading_icon_card.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 
 class CategoryProposalsDetailsCard extends StatelessWidget {
-  final String categoryId;
+  final SignedDocumentRef categoryId;
   final String categoryName;
   final int categoryProposalsCount;
 

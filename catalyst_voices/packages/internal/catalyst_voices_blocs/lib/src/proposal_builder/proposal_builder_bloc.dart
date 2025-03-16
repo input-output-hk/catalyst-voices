@@ -473,7 +473,7 @@ final class ProposalBuilderBloc
     final updatedState = state.copyWith(
       metadata: updatedMetadata,
     );
-    
+
     emit(updatedState);
   }
 

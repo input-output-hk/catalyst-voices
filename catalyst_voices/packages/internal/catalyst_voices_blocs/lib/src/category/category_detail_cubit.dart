@@ -29,7 +29,7 @@ class CategoryDetailCubit extends Cubit<CategoryDetailState> {
     );
   }
 
-  void getCategoryDetail(String categoryId) {
+  void getCategoryDetail(SignedDocumentRef categoryId) {
     emit(state.copyWith(isLoading: true));
 
     try {

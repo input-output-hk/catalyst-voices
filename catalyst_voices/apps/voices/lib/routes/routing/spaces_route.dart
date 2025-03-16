@@ -28,7 +28,7 @@ final class CategoryDetailRoute extends GoRouteData
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
-    return CategoryPage(categoryId: categoryId);
+    return CategoryPage(categoryId: SignedDocumentRef(id: categoryId));
   }
 }
 
@@ -58,7 +58,8 @@ final class FundedProjectsRoute extends GoRouteData
 }
 
 final class MyProposalsRoute extends GoRouteData with FadePageTransitionMixin {
-  final String? categoryId;
+  final SignedDocumentRef? categoryId;
+
   const MyProposalsRoute({
     this.categoryId,
   });
@@ -73,7 +74,7 @@ final class MyProposalsRoute extends GoRouteData with FadePageTransitionMixin {
 }
 
 final class ProposalsRoute extends GoRouteData with FadePageTransitionMixin {
-  final String? categoryId;
+  final SignedDocumentRef? categoryId;
 
   const ProposalsRoute({
     this.categoryId,

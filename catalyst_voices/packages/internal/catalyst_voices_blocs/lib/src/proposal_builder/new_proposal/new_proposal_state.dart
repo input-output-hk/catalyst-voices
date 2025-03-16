@@ -4,7 +4,7 @@ import 'package:equatable/equatable.dart';
 
 class NewProposalState extends Equatable {
   final String? title;
-  final String? categoryId;
+  final SignedDocumentRef? categoryId;
   final List<CampaignCategoryDetailsViewModel> categories;
 
   const NewProposalState({
@@ -20,7 +20,7 @@ class NewProposalState extends Equatable {
 
   NewProposalState copyWith({
     Optional<String>? title,
-    Optional<String>? categoryId,
+    Optional<SignedDocumentRef>? categoryId,
     List<CampaignCategoryDetailsViewModel>? categories,
   }) {
     return NewProposalState(
