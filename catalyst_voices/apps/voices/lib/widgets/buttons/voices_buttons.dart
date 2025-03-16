@@ -1,12 +1,12 @@
 import 'dart:async';
 
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
-import 'package:catalyst_voices/routes/routing/proposal_builder_route.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_filled_button.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_icon_button.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_outlined_button.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_text_button.dart';
 import 'package:catalyst_voices/widgets/common/animated_expand_chevron.dart';
+import 'package:catalyst_voices/widgets/modals/proposals/create_new_proposal_dialog.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
@@ -234,8 +234,7 @@ class VoicesStartProposalButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return VoicesOutlinedButton(
-      // TODO(dtscalac): should ask for the category
-      onTap: () => unawaited(const ProposalBuilderDraftRoute().push(context)),
+      onTap: () => unawaited(CreateNewProposalDialog.show(context)),
       child: Text(context.l10n.startProposal),
     );
   }

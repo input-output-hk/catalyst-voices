@@ -84,7 +84,10 @@ abstract interface class ProposalService {
 
   /// Upserts a proposal draft in the local storage.
   Future<void> upsertDraftProposal({
-    required DocumentData document,
+    required DraftRef selfRef,
+    required DocumentDataContent content,
+    required SignedDocumentRef template,
+    required SignedDocumentRef categoryId,
   });
 
   Stream<List<Proposal>> watchLatestProposals({int? limit});
@@ -229,7 +232,7 @@ final class ProposalServiceImpl implements ProposalService {
       await _documentRepository.deleteDocumentDraft(ref: ref);
     }
 
-    return ref.asSignedDocumentRef;
+    return ref.toSignedDocumentRef();
   }
 
   @override
@@ -257,10 +260,21 @@ final class ProposalServiceImpl implements ProposalService {
 
   @override
   Future<void> upsertDraftProposal({
-    required DocumentData document,
-  }) {
-    return _documentRepository.upsertDocumentDraft(
-      document: document,
+    required DraftRef selfRef,
+    required DocumentDataContent content,
+    required SignedDocumentRef template,
+    required SignedDocumentRef categoryId,
+  }) async {
+    await _documentRepository.upsertDocumentDraft(
+      document: DocumentData(
+        metadata: DocumentDataMetadata(
+          type: DocumentType.proposalDocument,
+          selfRef: selfRef,
+          template: template,
+          categoryId: categoryId,
+        ),
+        content: content,
+      ),
     );
   }
 

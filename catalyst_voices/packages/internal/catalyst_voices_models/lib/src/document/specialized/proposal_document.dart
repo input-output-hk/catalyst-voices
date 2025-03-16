@@ -35,8 +35,13 @@ final class ProposalDocument extends Equatable {
 }
 
 final class ProposalMetadata extends DocumentMetadata {
+  final SignedDocumentRef? categoryId;
+
   ProposalMetadata({
     required super.selfRef,
-    super.categoryId,
+    this.categoryId,
   });
+
+  @override
+  List<Object?> get props => super.props + [categoryId];
 }

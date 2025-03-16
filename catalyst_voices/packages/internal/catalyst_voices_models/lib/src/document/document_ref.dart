@@ -21,11 +21,6 @@ sealed class DocumentRef extends Equatable {
         : SignedDocumentRef(id: id, version: version);
   }
 
-  /// Converts the [DocumentRef] to [SignedDocumentRef].
-  ///
-  /// Useful if a draft has been published and we need to update it's ref.
-  SignedDocumentRef get asSignedDocumentRef;
-
   /// Whether the ref specifies the document [version].
   bool get isExact => version != null;
 
@@ -42,6 +37,11 @@ sealed class DocumentRef extends Equatable {
   /// The version can be used as next version for updated document,
   /// i.e. by proposal builder.
   DraftRef nextVersion();
+
+  /// Converts the [DocumentRef] to [SignedDocumentRef].
+  ///
+  /// Useful when a draft becomes a signed document after publishing.
+  SignedDocumentRef toSignedDocumentRef();
 }
 
 final class DraftRef extends DocumentRef {
@@ -59,12 +59,6 @@ final class DraftRef extends DocumentRef {
   }
 
   @override
-  SignedDocumentRef get asSignedDocumentRef => SignedDocumentRef(
-        id: id,
-        version: version,
-      );
-
-  @override
   DraftRef copyWith({
     String? id,
     Optional<String>? version,
@@ -77,6 +71,12 @@ final class DraftRef extends DocumentRef {
 
   @override
   DraftRef nextVersion() => this;
+
+  @override
+  SignedDocumentRef toSignedDocumentRef() => SignedDocumentRef(
+        id: id,
+        version: version,
+      );
 
   @override
   String toString() =>
@@ -114,9 +114,6 @@ final class SignedDocumentRef extends DocumentRef {
   }
 
   @override
-  SignedDocumentRef get asSignedDocumentRef => this;
-
-  @override
   SignedDocumentRef copyWith({
     String? id,
     Optional<String>? version,
@@ -134,6 +131,9 @@ final class SignedDocumentRef extends DocumentRef {
       version: const Uuid().v7(),
     );
   }
+
+  @override
+  SignedDocumentRef toSignedDocumentRef() => this;
 
   @override
   String toString() => isExact

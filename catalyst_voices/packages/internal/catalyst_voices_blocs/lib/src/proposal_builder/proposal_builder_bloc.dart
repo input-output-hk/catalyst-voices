@@ -504,11 +504,11 @@ final class ProposalBuilderBloc
     DocumentDataContent document,
   ) async {
     final originalRef = state.metadata.originalDocumentRef;
+    final template = state.metadata.templateRef!;
+    final categoryId = state.metadata.categoryId!;
+
     DraftRef nextRef;
     if (originalRef == null) {
-      final template = state.metadata.templateRef!;
-      final categoryId = state.metadata.categoryId!;
-
       nextRef = await _proposalService.createDraftProposal(
         content: document,
         template: template,
@@ -517,10 +517,10 @@ final class ProposalBuilderBloc
     } else {
       nextRef = currentRef.nextVersion();
       await _proposalService.upsertDraftProposal(
-        document: DocumentData(
-          metadata: _buildDocumentMetadata(nextRef),
-          content: document,
-        ),
+        selfRef: nextRef,
+        content: document,
+        template: template,
+        categoryId: categoryId,
       );
     }
 
