@@ -88,8 +88,8 @@ void main() {
         content: const DocumentDataContent({}),
       );
 
-      when(() => remoteDocuments.get(ref: templateRef))
-          .thenAnswer((_) => Future.error(DocumentNotFound(ref: templateRef)));
+      when(() => remoteDocuments.get(ref: templateRef)).thenAnswer(
+          (_) => Future.error(DocumentNotFoundException(ref: templateRef)));
       when(() => remoteDocuments.get(ref: proposal.ref))
           .thenAnswer((_) => Future.value(proposal));
 
@@ -102,7 +102,7 @@ void main() {
       // Then
       expect(
         () async => proposalDocumentFuture,
-        throwsA(isA<DocumentNotFound>()),
+        throwsA(isA<DocumentNotFoundException>()),
       );
     });
 

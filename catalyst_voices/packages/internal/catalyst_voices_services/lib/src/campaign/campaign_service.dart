@@ -57,7 +57,7 @@ final class CampaignServiceImpl implements CampaignService {
     // TODO(LynxLynxx): call backend for current ask amount
     // and submitted proposal count
     return staticCampaignCategories.firstWhere(
-      (e) => e.selfRef == ref.id,
+      (e) => e.selfRef == ref,
       orElse: () => throw const NotFoundException(),
     );
   }
