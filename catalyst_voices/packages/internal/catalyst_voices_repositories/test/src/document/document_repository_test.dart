@@ -89,7 +89,8 @@ void main() {
       );
 
       when(() => remoteDocuments.get(ref: templateRef)).thenAnswer(
-          (_) => Future.error(DocumentNotFoundException(ref: templateRef)));
+        (_) => Future.error(DocumentNotFoundException(ref: templateRef)),
+      );
       when(() => remoteDocuments.get(ref: proposal.ref))
           .thenAnswer((_) => Future.value(proposal));
 

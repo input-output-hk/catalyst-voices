@@ -161,7 +161,8 @@ class _CreateNewProposalDialogState extends State<CreateNewProposalDialog> {
   }
 
   Future<void> _onOpenInEditor() async {
-    // TODO(dtscalac): create a draft but dont store locally, open proposal builder with it
+    // TODO(dtscalac): create a draft but dont store locally,
+    // open proposal builder with it
   }
 
   Future<void> _onSave() async {
