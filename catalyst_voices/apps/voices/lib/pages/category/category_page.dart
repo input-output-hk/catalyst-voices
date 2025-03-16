@@ -124,10 +124,12 @@ class _CategoryDetailErrorSelector extends StatelessWidget {
                 message: error.message(context),
                 onRetry: error is LocalizedNotFoundException
                     ? null
-                    : () async {
-                        context
-                            .read<CategoryDetailCubit>()
-                            .getCategoryDetail(categoryId);
+                    : () {
+                        unawaited(
+                          context
+                              .read<CategoryDetailCubit>()
+                              .getCategoryDetail(categoryId),
+                        );
                       },
               ),
             ),
@@ -187,7 +189,11 @@ class _CategoryPageState extends State<CategoryPage> {
     super.didUpdateWidget(oldWidget);
 
     if (widget.categoryId != oldWidget.categoryId) {
-      context.read<CategoryDetailCubit>().getCategoryDetail(widget.categoryId);
+      unawaited(
+        context
+            .read<CategoryDetailCubit>()
+            .getCategoryDetail(widget.categoryId),
+      );
     }
   }
 
@@ -195,6 +201,8 @@ class _CategoryPageState extends State<CategoryPage> {
   void initState() {
     super.initState();
     unawaited(context.read<CategoryDetailCubit>().getCategories());
-    context.read<CategoryDetailCubit>().getCategoryDetail(widget.categoryId);
+    unawaited(
+      context.read<CategoryDetailCubit>().getCategoryDetail(widget.categoryId),
+    );
   }
 }

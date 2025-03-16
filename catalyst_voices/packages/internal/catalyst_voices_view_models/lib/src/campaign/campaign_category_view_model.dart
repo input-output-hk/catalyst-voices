@@ -51,12 +51,12 @@ final class CampaignCategoryDetailsViewModel extends CampaignCategoryViewModel {
 
   factory CampaignCategoryDetailsViewModel.fromModel(CampaignCategory model) {
     return CampaignCategoryDetailsViewModel(
-      id: SignedDocumentRef(id: model.uuid),
+      id: model.selfRef,
       subname: model.categorySubname,
       description: model.description,
       proposalsCount: model.proposalsCount,
       availableFunds: model.availableFunds,
-      imageUrl: CategoryImageUrl.imageUrl(model.uuid),
+      imageUrl: CategoryImageUrl.imageUrl(model.selfRef.id),
       totalAsk: model.totalAsk,
       range: model.range,
       descriptions: model.descriptions

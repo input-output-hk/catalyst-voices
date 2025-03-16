@@ -8,9 +8,47 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 class NewProposalCubit extends Cubit<NewProposalState> {
   final CampaignService _campaignService;
+  final ProposalService _proposalService;
+  final DocumentMapper _documentMapper;
 
-  NewProposalCubit(this._campaignService) : super(const NewProposalState()) {
+  NewProposalCubit(
+    this._campaignService,
+    this._proposalService,
+    this._documentMapper,
+  ) : super(const NewProposalState()) {
     unawaited(getCampaignCategories());
+  }
+
+  Future<DraftRef> createDraft() async {
+    final title = state.title;
+    final categoryId = state.categoryId;
+
+    if (title == null || categoryId == null) {
+      throw StateError('Cannot create draft, title or category not selected');
+    }
+
+    final category = await _campaignService.getCategory(categoryId);
+    final templateRef = category.proposalTemplateRef;
+    final template = await _proposalService.getProposalTemplate(
+      ref: templateRef,
+    );
+
+    final documentBuilder = DocumentBuilder.fromSchema(schema: template.schema)
+      ..addChange(
+        DocumentValueChange(
+          nodeId: ProposalDocument.titleNodeId,
+          value: title,
+        ),
+      );
+
+    final document = documentBuilder.build();
+    final documentContent = _documentMapper.toContent(document);
+
+    return _proposalService.createDraftProposal(
+      content: documentContent,
+      template: templateRef,
+      categoryId: categoryId,
+    );
   }
 
   Future<void> getCampaignCategories() async {

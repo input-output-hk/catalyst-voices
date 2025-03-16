@@ -1,12 +1,13 @@
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_models/src/document/data/static_document_data.dart';
+import 'package:catalyst_voices_models/src/document/document_ref.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:equatable/equatable.dart';
 
 final staticCampaignCategories = [
   CampaignCategory(
-    uuid: StaticProposalTemplateData.documents[0].categoryUuid,
-    proposalTemplateUuid: StaticProposalTemplateData.documents[0].uuid,
+    selfRef: StaticProposalTemplateData.documents[0].categoryId,
+    proposalTemplateRef: StaticProposalTemplateData.documents[0].ref,
     categoryName: 'Cardano Open:',
     categorySubname: 'Developers',
     description:
@@ -21,8 +22,8 @@ final staticCampaignCategories = [
     submissionCloseDate: DateTime.now(),
   ),
   CampaignCategory(
-    uuid: StaticProposalTemplateData.documents[1].categoryUuid,
-    proposalTemplateUuid: StaticProposalTemplateData.documents[1].uuid,
+    selfRef: StaticProposalTemplateData.documents[1].categoryId,
+    proposalTemplateRef: StaticProposalTemplateData.documents[1].ref,
     categoryName: 'Cardano Open:',
     categorySubname: 'Ecosystem',
     description:
@@ -37,8 +38,8 @@ final staticCampaignCategories = [
     submissionCloseDate: DateTime.now(),
   ),
   CampaignCategory(
-    uuid: StaticProposalTemplateData.documents[2].categoryUuid,
-    proposalTemplateUuid: StaticProposalTemplateData.documents[2].uuid,
+    selfRef: StaticProposalTemplateData.documents[2].categoryId,
+    proposalTemplateRef: StaticProposalTemplateData.documents[2].ref,
     categoryName: 'Cardano Use Cases:',
     categorySubname: 'Concept',
     description: '''
@@ -54,8 +55,8 @@ Accepts early stage ideas to deliver proof of concept, design research and basic
     submissionCloseDate: DateTime.now(),
   ),
   CampaignCategory(
-    uuid: StaticProposalTemplateData.documents[3].categoryUuid,
-    proposalTemplateUuid: StaticProposalTemplateData.documents[3].uuid,
+    selfRef: StaticProposalTemplateData.documents[3].categoryId,
+    proposalTemplateRef: StaticProposalTemplateData.documents[3].ref,
     categoryName: 'Cardano Use Cases:',
     categorySubname: 'Product',
     description:
@@ -70,8 +71,8 @@ Accepts early stage ideas to deliver proof of concept, design research and basic
     submissionCloseDate: DateTime.now(),
   ),
   CampaignCategory(
-    uuid: StaticProposalTemplateData.documents[4].categoryUuid,
-    proposalTemplateUuid: StaticProposalTemplateData.documents[4].uuid,
+    selfRef: StaticProposalTemplateData.documents[4].categoryId,
+    proposalTemplateRef: StaticProposalTemplateData.documents[4].ref,
     categoryName: 'Cardano Partners:',
     categorySubname: 'Enterprise R&D',
     description: '''
@@ -87,8 +88,8 @@ Fuels the fly-wheels of innovation to ignite premium R&D projects that benefit C
     submissionCloseDate: DateTime.now(),
   ),
   CampaignCategory(
-    uuid: StaticProposalTemplateData.documents[5].categoryUuid,
-    proposalTemplateUuid: StaticProposalTemplateData.documents[5].uuid,
+    selfRef: StaticProposalTemplateData.documents[5].categoryId,
+    proposalTemplateRef: StaticProposalTemplateData.documents[5].ref,
     categoryName: 'Cardano Partners:',
     categorySubname: 'Growth & Acceleration',
     description: '''
@@ -104,8 +105,8 @@ Fuels adoption by igniting premium advertising or venture building partnerships 
     submissionCloseDate: DateTime.now(),
   ),
   CampaignCategory(
-    uuid: StaticProposalTemplateData.documents[6].categoryUuid,
-    proposalTemplateUuid: StaticProposalTemplateData.documents[6].uuid,
+    selfRef: StaticProposalTemplateData.documents[6].categoryId,
+    proposalTemplateRef: StaticProposalTemplateData.documents[6].ref,
     categoryName: '',
     categorySubname: '',
     description: '',
@@ -119,8 +120,8 @@ Fuels adoption by igniting premium advertising or venture building partnerships 
     submissionCloseDate: DateTime.now(),
   ),
   CampaignCategory(
-    uuid: StaticProposalTemplateData.documents[7].categoryUuid,
-    proposalTemplateUuid: StaticProposalTemplateData.documents[7].uuid,
+    selfRef: StaticProposalTemplateData.documents[7].categoryId,
+    proposalTemplateRef: StaticProposalTemplateData.documents[7].ref,
     categoryName: '',
     categorySubname: '',
     description: '',
@@ -134,8 +135,8 @@ Fuels adoption by igniting premium advertising or venture building partnerships 
     submissionCloseDate: DateTime.now(),
   ),
   CampaignCategory(
-    uuid: StaticProposalTemplateData.documents[8].categoryUuid,
-    proposalTemplateUuid: StaticProposalTemplateData.documents[8].uuid,
+    selfRef: StaticProposalTemplateData.documents[8].categoryId,
+    proposalTemplateRef: StaticProposalTemplateData.documents[8].ref,
     categoryName: '',
     categorySubname: '',
     description: '',
@@ -149,8 +150,8 @@ Fuels adoption by igniting premium advertising or venture building partnerships 
     submissionCloseDate: DateTime.now(),
   ),
   CampaignCategory(
-    uuid: StaticProposalTemplateData.documents[9].categoryUuid,
-    proposalTemplateUuid: StaticProposalTemplateData.documents[9].uuid,
+    selfRef: StaticProposalTemplateData.documents[9].categoryId,
+    proposalTemplateRef: StaticProposalTemplateData.documents[9].ref,
     categoryName: '',
     categorySubname: '',
     description: '',
@@ -164,8 +165,8 @@ Fuels adoption by igniting premium advertising or venture building partnerships 
     submissionCloseDate: DateTime.now(),
   ),
   CampaignCategory(
-    uuid: StaticProposalTemplateData.documents[10].categoryUuid,
-    proposalTemplateUuid: StaticProposalTemplateData.documents[10].uuid,
+    selfRef: StaticProposalTemplateData.documents[10].categoryId,
+    proposalTemplateRef: StaticProposalTemplateData.documents[10].ref,
     categoryName: '',
     categorySubname: '',
     description: '',
@@ -179,8 +180,8 @@ Fuels adoption by igniting premium advertising or venture building partnerships 
     submissionCloseDate: DateTime.now(),
   ),
   CampaignCategory(
-    uuid: StaticProposalTemplateData.documents[11].categoryUuid,
-    proposalTemplateUuid: StaticProposalTemplateData.documents[11].uuid,
+    selfRef: StaticProposalTemplateData.documents[11].categoryId,
+    proposalTemplateRef: StaticProposalTemplateData.documents[11].ref,
     categoryName: '',
     categorySubname: '',
     description: '',
@@ -196,8 +197,8 @@ Fuels adoption by igniting premium advertising or venture building partnerships 
 ];
 
 class CampaignCategory extends Equatable {
-  final String uuid;
-  final String proposalTemplateUuid;
+  final SignedDocumentRef selfRef;
+  final SignedDocumentRef proposalTemplateRef;
   final String categoryName;
   final String categorySubname;
   final String description;
@@ -211,8 +212,8 @@ class CampaignCategory extends Equatable {
   final DateTime submissionCloseDate;
 
   const CampaignCategory({
-    required this.uuid,
-    required this.proposalTemplateUuid,
+    required this.selfRef,
+    required this.proposalTemplateRef,
     required this.categoryName,
     required this.categorySubname,
     required this.description,
@@ -228,8 +229,8 @@ class CampaignCategory extends Equatable {
 
   @override
   List<Object?> get props => [
-        uuid,
-        proposalTemplateUuid,
+        selfRef,
+        proposalTemplateRef,
         categoryName,
         categorySubname,
         description,
@@ -244,8 +245,8 @@ class CampaignCategory extends Equatable {
       ];
 
   CampaignCategory copyWith({
-    String? uuid,
-    String? proposalTemplateUuid,
+    SignedDocumentRef? selfRef,
+    SignedDocumentRef? proposalTemplateRef,
     String? categoryName,
     String? categorySubname,
     String? description,
@@ -259,8 +260,8 @@ class CampaignCategory extends Equatable {
     DateTime? submissionCloseDate,
   }) {
     return CampaignCategory(
-      uuid: uuid ?? this.uuid,
-      proposalTemplateUuid: proposalTemplateUuid ?? this.proposalTemplateUuid,
+      selfRef: selfRef ?? this.selfRef,
+      proposalTemplateRef: proposalTemplateRef ?? this.proposalTemplateRef,
       categoryName: categoryName ?? this.categoryName,
       categorySubname: categorySubname ?? this.categorySubname,
       description: description ?? this.description,

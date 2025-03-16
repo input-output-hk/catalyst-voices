@@ -60,17 +60,17 @@ final class ProposalBuilderBloc
     return documentBuilder!.build();
   }
 
-  DocumentData _buildDocumentData() {
+  DocumentData _buildDocumentData([DocumentRef? selfRef]) {
     return DocumentData(
-      metadata: _buildDocumentMetadata(),
+      metadata: _buildDocumentMetadata(selfRef),
       content: _documentMapper.toContent(_buildDocument()),
     );
   }
 
-  DocumentDataMetadata _buildDocumentMetadata() {
+  DocumentDataMetadata _buildDocumentMetadata([DocumentRef? selfRef]) {
     return DocumentDataMetadata(
       type: DocumentType.proposalDocument,
-      selfRef: state.metadata.documentRef!,
+      selfRef: selfRef ?? state.metadata.documentRef!,
       template: state.metadata.templateRef,
       categoryId: state.metadata.categoryId,
     );
@@ -486,17 +486,21 @@ final class ProposalBuilderBloc
     final originalRef = state.metadata.originalDocumentRef;
     DraftRef nextRef;
     if (originalRef == null) {
-      final template = state.metadata.templateRef;
+      final template = state.metadata.templateRef!;
+      final categoryId = state.metadata.categoryId!;
 
       nextRef = await _proposalService.createDraftProposal(
         content: document,
-        template: template!,
+        template: template,
+        categoryId: categoryId,
       );
     } else {
       nextRef = currentRef.nextVersion();
-      await _proposalService.updateDraftProposal(
-        ref: nextRef,
-        content: document,
+      await _proposalService.upsertDraftProposal(
+        document: DocumentData(
+          metadata: _buildDocumentMetadata(nextRef),
+          content: document,
+        ),
       );
     }
 

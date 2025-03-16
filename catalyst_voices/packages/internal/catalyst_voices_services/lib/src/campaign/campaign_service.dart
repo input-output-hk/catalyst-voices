@@ -15,7 +15,7 @@ abstract interface class CampaignService {
 
   Future<List<CampaignCategory>> getCampaignCategories();
 
-  CampaignCategory getCategory(SignedDocumentRef ref);
+  Future<CampaignCategory> getCategory(SignedDocumentRef ref);
 
   Future<CurrentCampaign> getCurrentCampaign();
 }
@@ -53,11 +53,11 @@ final class CampaignServiceImpl implements CampaignService {
   }
 
   @override
-  CampaignCategory getCategory(SignedDocumentRef ref) {
+  Future<CampaignCategory> getCategory(SignedDocumentRef ref) async {
     // TODO(LynxLynxx): call backend for current ask amount
     // and submitted proposal count
     return staticCampaignCategories.firstWhere(
-      (e) => e.uuid == ref.id,
+      (e) => e.selfRef == ref.id,
       orElse: () => throw const NotFoundException(),
     );
   }

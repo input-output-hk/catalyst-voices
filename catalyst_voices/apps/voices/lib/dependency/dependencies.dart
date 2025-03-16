@@ -126,7 +126,11 @@ final class Dependencies extends DependencyProvider {
         return ProposalBloc(get<ProposalService>());
       })
       ..registerFactory<NewProposalCubit>(() {
-        return NewProposalCubit(get<CampaignService>());
+        return NewProposalCubit(
+          get<CampaignService>(),
+          get<ProposalService>(),
+          get<DocumentMapper>(),
+        );
       });
   }
 
