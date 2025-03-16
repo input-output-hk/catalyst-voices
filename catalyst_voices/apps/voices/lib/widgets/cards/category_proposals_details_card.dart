@@ -43,7 +43,7 @@ class CategoryProposalsDetailsCard extends StatelessWidget {
           VoicesOutlinedButton(
             child: Text(context.l10n.viewProposals),
             onTap: () {
-              ProposalsRoute.fromRef(ref: categoryId).go(context);
+              ProposalsRoute.fromRef(categoryId: categoryId).go(context);
             },
           ),
         ],

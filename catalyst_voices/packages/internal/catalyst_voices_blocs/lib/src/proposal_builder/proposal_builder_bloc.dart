@@ -21,6 +21,7 @@ final class ProposalBuilderBloc
         BlocErrorEmitterMixin,
         BlocSignalEmitterMixin<ProposalBuilderSignal, ProposalBuilderState> {
   final ProposalService _proposalService;
+  final CampaignService _campaignService;
   final DownloaderService _downloaderService;
   final DocumentMapper _documentMapper;
 
@@ -28,11 +29,12 @@ final class ProposalBuilderBloc
 
   ProposalBuilderBloc(
     this._proposalService,
+    this._campaignService,
     this._downloaderService,
     this._documentMapper,
   ) : super(const ProposalBuilderState()) {
-    on<LoadDefaultProposalTemplateEvent>(_loadDefaultProposalTemplate);
-    on<LoadProposalTemplateEvent>(_loadProposalTemplate);
+    on<LoadDefaultProposalCategoryEvent>(_loadDefaultProposalCategory);
+    on<LoadProposalCategoryEvent>(_loadProposalCategory);
     on<LoadProposalEvent>(_loadProposal);
     on<ActiveNodeChangedEvent>(
       _handleActiveNodeChangedEvent,
@@ -240,34 +242,51 @@ final class ProposalBuilderBloc
     await _saveDocumentLocally(emit, document);
   }
 
-  Future<void> _loadDefaultProposalTemplate(
-    LoadDefaultProposalTemplateEvent event,
+  Future<void> _loadDefaultProposalCategory(
+    LoadDefaultProposalCategoryEvent event,
     Emitter<ProposalBuilderState> emit,
   ) async {
-    _logger.info('Loading default proposal template');
+    _logger.info('Loading default proposal category');
 
-    // TODO(dtscalac): proposal builder cannot work
-    //without templateId or proposalId.
-    // A proposal must be assigned to a category.
-    // Show an error if neither is specified.
-    emit(const ProposalBuilderState(error: LocalizedUnknownException()));
+    await _loadState(emit, () async {
+      final categories = await _campaignService.getCampaignCategories();
+      final category = categories.first;
+      final templateRef = category.proposalTemplateRef;
+
+      final proposalTemplate = await _proposalService.getProposalTemplate(
+        ref: templateRef,
+      );
+
+      final documentBuilder =
+          DocumentBuilder.fromSchema(schema: proposalTemplate.schema);
+
+      return _createState(
+        document: documentBuilder.build(),
+        metadata: ProposalBuilderMetadata.newDraft(
+          templateRef: templateRef,
+          categoryId: category.selfRef,
+        ),
+      );
+    });
   }
 
   Future<void> _loadProposal(
     LoadProposalEvent event,
     Emitter<ProposalBuilderState> emit,
   ) async {
-    _logger.info('Loading proposal[${event.ref}]');
+    _logger.info('Loading proposal: ${event.proposalId}');
 
     await _loadState(emit, () async {
-      final proposalData = await _proposalService.getProposal(ref: event.ref);
+      final proposalData = await _proposalService.getProposal(
+        ref: event.proposalId,
+      );
       final proposal = Proposal.fromData(proposalData);
 
       final versions = proposalData.versions.mapIndexed((index, version) {
         return DocumentVersion(
           id: version,
           number: index + 1,
-          isCurrent: version == event.ref.version,
+          isCurrent: version == event.proposalId.version,
           isLatest: index == proposalData.versions.length - 1,
         );
       }).toList();
@@ -285,17 +304,18 @@ final class ProposalBuilderBloc
     });
   }
 
-  Future<void> _loadProposalTemplate(
-    LoadProposalTemplateEvent event,
+  Future<void> _loadProposalCategory(
+    LoadProposalCategoryEvent event,
     Emitter<ProposalBuilderState> emit,
   ) async {
-    final ref = event.ref;
-
-    _logger.info('Loading proposal template[$ref]');
+    final categoryId = event.categoryId;
+    _logger.info('Loading proposal category: $categoryId');
 
     await _loadState(emit, () async {
+      final category = await _campaignService.getCategory(categoryId);
+      final templateRef = category.proposalTemplateRef;
       final proposalTemplate = await _proposalService.getProposalTemplate(
-        ref: ref,
+        ref: templateRef,
       );
 
       final documentBuilder =
@@ -304,8 +324,8 @@ final class ProposalBuilderBloc
       return _createState(
         document: documentBuilder.build(),
         metadata: ProposalBuilderMetadata.newDraft(
-          templateRef: ref,
-          categoryId: proposalTemplate.metadata.categoryId,
+          templateRef: templateRef,
+          categoryId: categoryId,
         ),
       );
     });

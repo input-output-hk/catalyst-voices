@@ -5,6 +5,7 @@ import 'package:catalyst_voices/routes/guards/session_unlocked_guard.dart';
 import 'package:catalyst_voices/routes/guards/user_access_guard.dart';
 import 'package:catalyst_voices/routes/routing/routes.dart';
 import 'package:catalyst_voices/routes/routing/transitions/fade_page_transition_mixin.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 
@@ -15,11 +16,17 @@ part 'proposal_builder_route.g.dart';
 )
 final class ProposalBuilderDraftRoute extends GoRouteData
     with FadePageTransitionMixin, CompositeRouteGuardMixin {
-  final String? templateId;
+  final String? categoryId;
 
   const ProposalBuilderDraftRoute({
-    this.templateId,
+    this.categoryId,
   });
+
+  factory ProposalBuilderDraftRoute.fromRef({
+    required SignedDocumentRef categoryId,
+  }) {
+    return ProposalBuilderDraftRoute(categoryId: categoryId.id);
+  }
 
   @override
   List<RouteGuard> get routeGuards => const [
@@ -29,7 +36,10 @@ final class ProposalBuilderDraftRoute extends GoRouteData
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
-    return ProposalBuilderPage(templateId: templateId);
+    final categoryId = this.categoryId;
+    final categoryRef =
+        categoryId != null ? SignedDocumentRef(id: categoryId) : null;
+    return ProposalBuilderPage(categoryId: categoryRef);
   }
 }
 
@@ -39,10 +49,21 @@ final class ProposalBuilderDraftRoute extends GoRouteData
 final class ProposalBuilderRoute extends GoRouteData
     with FadePageTransitionMixin, CompositeRouteGuardMixin {
   final String proposalId;
+  final bool local;
 
   const ProposalBuilderRoute({
     required this.proposalId,
+    this.local = false,
   });
+
+  factory ProposalBuilderRoute.fromRef({
+    required DocumentRef ref,
+  }) {
+    return ProposalBuilderRoute(
+      proposalId: ref.id,
+      local: ref is DraftRef,
+    );
+  }
 
   @override
   List<RouteGuard> get routeGuards => const [
@@ -52,6 +73,11 @@ final class ProposalBuilderRoute extends GoRouteData
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
-    return ProposalBuilderPage(proposalId: proposalId);
+    final ref = DocumentRef.build(
+      id: proposalId,
+      isDraft: local,
+    );
+
+    return ProposalBuilderPage(proposalId: ref);
   }
 }

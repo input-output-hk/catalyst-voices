@@ -1,5 +1,6 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/routes/routes.dart';
+import 'package:catalyst_voices/routes/routing/proposal_builder_route.dart';
 import 'package:catalyst_voices/widgets/dropdown/voices_dropdown.dart';
 import 'package:catalyst_voices/widgets/modals/details/voices_align_title_header.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
@@ -17,44 +18,12 @@ typedef _SelectedCategoryData = ({
   SignedDocumentRef? value,
 });
 
-class CreateNewProposalDialog extends StatelessWidget {
+class CreateNewProposalDialog extends StatefulWidget {
   const CreateNewProposalDialog({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return VoicesDetailsDialog(
-      constraints: const BoxConstraints(maxHeight: 390, maxWidth: 750),
-      header: VoicesAlignTitleHeader(
-        title: context.l10n.createProposal,
-        padding: const EdgeInsets.all(24),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.fromLTRB(
-          24,
-          16,
-          24,
-          24,
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            _SectionTitle(
-              text: context.l10n.title.starred(),
-            ),
-            const _TitleTextField(),
-            const SizedBox(height: 16),
-            _SectionTitle(
-              text: context.l10n.selectedCategory.starred(),
-            ),
-            const _CategorySelection(),
-            const SizedBox(height: 40),
-            const _ActionButtons(),
-          ],
-        ),
-      ),
-    );
-  }
+  State<CreateNewProposalDialog> createState() =>
+      _CreateNewProposalDialogState();
 
   static Future<void> show(BuildContext context) async {
     final result = showDialog<void>(
@@ -68,7 +37,13 @@ class CreateNewProposalDialog extends StatelessWidget {
 }
 
 class _ActionButtons extends StatelessWidget {
-  const _ActionButtons();
+  final VoidCallback onSave;
+  final VoidCallback onOpenInEditor;
+
+  const _ActionButtons({
+    required this.onSave,
+    required this.onOpenInEditor,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -88,11 +63,7 @@ class _ActionButtons extends StatelessWidget {
           },
           builder: (context, isValid) {
             return VoicesTextButton(
-              onTap: isValid
-                  ? () {
-                      // TODO(dtscalac): save new draft
-                    }
-                  : null,
+              onTap: isValid ? onSave : null,
               child: Text(context.l10n.saveDraft),
             );
           },
@@ -104,17 +75,7 @@ class _ActionButtons extends StatelessWidget {
           },
           builder: (context, isValid) {
             return VoicesFilledButton(
-              onTap: isValid
-                  ? () {
-                      // ignore: unused_local_variable
-                      final title =
-                          context.read<NewProposalCubit>().state.title;
-                      // ignore: unused_local_variable
-                      final categoryId =
-                          context.read<NewProposalCubit>().state.categoryId;
-                      // TODO(dtscalac): create new proposal and open in editor
-                    }
-                  : null,
+              onTap: isValid ? onOpenInEditor : null,
               child: Text(context.l10n.openInEditor),
             );
           },
@@ -156,6 +117,59 @@ class _CategorySelection extends StatelessWidget {
         );
       },
     );
+  }
+}
+
+class _CreateNewProposalDialogState extends State<CreateNewProposalDialog> {
+  @override
+  Widget build(BuildContext context) {
+    return VoicesDetailsDialog(
+      constraints: const BoxConstraints(maxHeight: 390, maxWidth: 750),
+      header: VoicesAlignTitleHeader(
+        title: context.l10n.createProposal,
+        padding: const EdgeInsets.all(24),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.fromLTRB(
+          24,
+          16,
+          24,
+          24,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _SectionTitle(
+              text: context.l10n.title.starred(),
+            ),
+            const _TitleTextField(),
+            const SizedBox(height: 16),
+            _SectionTitle(
+              text: context.l10n.selectedCategory.starred(),
+            ),
+            const _CategorySelection(),
+            const SizedBox(height: 40),
+            _ActionButtons(
+              onSave: _onSave,
+              onOpenInEditor: _onOpenInEditor,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _onOpenInEditor() async {
+    // TODO(dtscalac): create a draft but dont store locally, open proposal builder with it
+  }
+
+  Future<void> _onSave() async {
+    final cubit = context.read<NewProposalCubit>();
+    final draftRef = await cubit.createDraft();
+    if (mounted) {
+      ProposalBuilderRoute.fromRef(ref: draftRef).go(context);
+    }
   }
 }
 

@@ -26,8 +26,10 @@ final class CategoryDetailRoute extends GoRouteData
 
   const CategoryDetailRoute({required this.categoryId});
 
-  factory CategoryDetailRoute.fromRef({required SignedDocumentRef ref}) {
-    return CategoryDetailRoute(categoryId: ref.id);
+  factory CategoryDetailRoute.fromRef({
+    required SignedDocumentRef categoryId,
+  }) {
+    return CategoryDetailRoute(categoryId: categoryId.id);
   }
 
   @override
@@ -88,8 +90,8 @@ final class ProposalsRoute extends GoRouteData with FadePageTransitionMixin {
 
   const ProposalsRoute({this.categoryId});
 
-  factory ProposalsRoute.fromRef({SignedDocumentRef? ref}) {
-    return ProposalsRoute(categoryId: ref?.id);
+  factory ProposalsRoute.fromRef({SignedDocumentRef? categoryId}) {
+    return ProposalsRoute(categoryId: categoryId?.id);
   }
 
   @override
