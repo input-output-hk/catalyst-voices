@@ -62,7 +62,10 @@ void main() {
       expect(copied.pageKey, equals(2));
       expect(copied.pageSize, equals(10)); // Unchanged
       expect(copied.lastId, equals('lastId123')); // Unchanged
-      expect(copied.categoryId, equals('category2'));
+      expect(
+        copied.categoryId,
+        equals(const SignedDocumentRef(id: 'category2')),
+      );
       expect(copied.searchValue, equals('newSearch'));
       expect(copied.stage, equals(ProposalPublish.submittedProposal));
       expect(copied.usersProposals, isTrue);
