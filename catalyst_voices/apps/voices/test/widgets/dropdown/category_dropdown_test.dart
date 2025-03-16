@@ -54,7 +54,7 @@ void main() {
 
       await tester.tap(find.text('Item 1'));
       await tester.pumpAndSettle();
-      expect(selectedValue, equals('value1'));
+      expect(selectedValue, equals(const SignedDocumentRef(id: 'value1')));
     });
 
     testWidgets('$CategoryDropdown handles callbacks',

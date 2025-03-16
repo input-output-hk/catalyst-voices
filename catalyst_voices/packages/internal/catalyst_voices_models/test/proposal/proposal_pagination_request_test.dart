@@ -18,7 +18,10 @@ void main() {
       expect(request.pageKey, equals(1));
       expect(request.pageSize, equals(10));
       expect(request.lastId, equals('lastId123'));
-      expect(request.categoryId, equals('category1'));
+      expect(
+        request.categoryId,
+        equals(const SignedDocumentRef(id: 'category1')),
+      );
       expect(request.searchValue, equals('search'));
       expect(request.stage, equals(ProposalPublish.publishedDraft));
       expect(request.usersProposals, isTrue);
