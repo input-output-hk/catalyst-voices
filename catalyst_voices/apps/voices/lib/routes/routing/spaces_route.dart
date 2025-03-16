@@ -24,11 +24,17 @@ final class CategoryDetailRoute extends GoRouteData
     with FadePageTransitionMixin {
   final String categoryId;
 
-  const CategoryDetailRoute(this.categoryId);
+  const CategoryDetailRoute({required this.categoryId});
+
+  factory CategoryDetailRoute.fromRef({required SignedDocumentRef ref}) {
+    return CategoryDetailRoute(categoryId: ref.id);
+  }
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
-    return CategoryPage(categoryId: SignedDocumentRef(id: categoryId));
+    return CategoryPage(
+      categoryId: SignedDocumentRef(id: categoryId),
+    );
   }
 }
 
@@ -58,7 +64,7 @@ final class FundedProjectsRoute extends GoRouteData
 }
 
 final class MyProposalsRoute extends GoRouteData with FadePageTransitionMixin {
-  final SignedDocumentRef? categoryId;
+  final String? categoryId;
 
   const MyProposalsRoute({
     this.categoryId,
@@ -66,25 +72,33 @@ final class MyProposalsRoute extends GoRouteData with FadePageTransitionMixin {
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
+    final categoryId = this.categoryId;
+    final categoryRef =
+        categoryId != null ? SignedDocumentRef(id: categoryId) : null;
+
     return ProposalsPage(
       selectMyProposalsView: true,
-      categoryId: categoryId,
+      categoryId: categoryRef,
     );
   }
 }
 
 final class ProposalsRoute extends GoRouteData with FadePageTransitionMixin {
-  final SignedDocumentRef? categoryId;
+  final String? categoryId;
 
-  const ProposalsRoute({
-    this.categoryId,
-  });
+  const ProposalsRoute({this.categoryId});
+
+  factory ProposalsRoute.fromRef({SignedDocumentRef? ref}) {
+    return ProposalsRoute(categoryId: ref?.id);
+  }
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
-    return ProposalsPage(
-      categoryId: categoryId,
-    );
+    final categoryId = this.categoryId;
+    final categoryRef =
+        categoryId != null ? SignedDocumentRef(id: categoryId) : null;
+
+    return ProposalsPage(categoryId: categoryRef);
   }
 }
 

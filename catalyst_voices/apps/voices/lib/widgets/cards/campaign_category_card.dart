@@ -88,7 +88,7 @@ class _Buttons extends StatelessWidget {
         VoicesFilledButton(
           key: const Key('CategoryDetailsBtn'),
           onTap: () {
-            CategoryDetailRoute(categoryId).go(context);
+            CategoryDetailRoute.fromRef(ref: categoryId).go(context);
           },
           child: Text(context.l10n.categoryDetails),
         ),
@@ -96,7 +96,7 @@ class _Buttons extends StatelessWidget {
         VoicesFilledButton(
           key: const Key('ViewProposalsBtn'),
           onTap: () {
-            ProposalsRoute(categoryId: categoryId).go(context);
+            ProposalsRoute.fromRef(ref: categoryId).go(context);
           },
           backgroundColor: context.colors.elevationsOnSurfaceNeutralLv2,
           foregroundColor: context.colorScheme.primary,

@@ -246,8 +246,10 @@ final class ProposalBuilderBloc
   ) async {
     _logger.info('Loading default proposal template');
 
-    // TODO(dtscalac): proposal builder cannot work without templateId or proposalId.
-    // A proposal must be assigned to a category. Show an error if neither is specified.
+    // TODO(dtscalac): proposal builder cannot work
+    //without templateId or proposalId.
+    // A proposal must be assigned to a category.
+    // Show an error if neither is specified.
     emit(const ProposalBuilderState(error: LocalizedUnknownException()));
   }
 

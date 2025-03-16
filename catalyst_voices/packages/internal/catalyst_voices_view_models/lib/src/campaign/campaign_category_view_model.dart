@@ -35,7 +35,7 @@ final class CampaignCategoryDetailsViewModel extends CampaignCategoryViewModel {
 
   factory CampaignCategoryDetailsViewModel.dummy({String? id}) =>
       CampaignCategoryDetailsViewModel(
-        ref: SignedDocumentRef(id: id ?? '1)'),
+        id: SignedDocumentRef(id: id ?? '1)'),
         name: 'Cardano Open:',
         subname: 'Developers',
         description:
@@ -51,6 +51,7 @@ final class CampaignCategoryDetailsViewModel extends CampaignCategoryViewModel {
 
   factory CampaignCategoryDetailsViewModel.fromModel(CampaignCategory model) {
     return CampaignCategoryDetailsViewModel(
+      id: SignedDocumentRef(id: model.uuid),
       subname: model.categorySubname,
       description: model.description,
       proposalsCount: model.proposalsCount,
@@ -63,7 +64,6 @@ final class CampaignCategoryDetailsViewModel extends CampaignCategoryViewModel {
           .toList(),
       requirements: model.requirements,
       submissionCloseDate: model.submissionCloseDate,
-      ref: SignedDocumentRef(id: model.uuid),
       name: model.categoryName,
     );
   }
