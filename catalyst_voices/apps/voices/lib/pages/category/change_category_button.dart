@@ -69,11 +69,11 @@ class _ChangeCategoryButtonState extends State<ChangeCategoryButton> {
     );
   }
 
-  Future<void> _changeCategory(SignedDocumentRef? ref) async {
-    if (ref == null) {
+  Future<void> _changeCategory(SignedDocumentRef? categoryId) async {
+    if (categoryId == null) {
       return;
     }
-    context.read<CategoryDetailCubit>().getCategoryDetail(ref);
+    await context.read<CategoryDetailCubit>().getCategoryDetail(categoryId);
   }
 
   void _handleClose() {

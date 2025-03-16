@@ -20,12 +20,18 @@ class ProposalBuilderStatusAction extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocSelector<ProposalBuilderBloc, ProposalBuilderState,
-        List<_MenuItemEnum>>(
+        ({bool offstage, List<_MenuItemEnum> items})>(
       selector: (state) {
-        return _MenuItemEnum.availableOptions(state.metadata.publish);
+        return (
+          offstage: state.isChanging || state.error != null,
+          items: _MenuItemEnum.availableOptions(state.metadata.publish)
+        );
       },
-      builder: (context, items) {
-        return _PopupMenuButton(items: items);
+      builder: (context, state) {
+        return Offstage(
+          offstage: state.offstage,
+          child: _PopupMenuButton(items: state.items),
+        );
       },
     );
   }
