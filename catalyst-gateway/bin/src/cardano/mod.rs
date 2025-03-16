@@ -1,30 +1,26 @@
 //! Logic for orchestrating followers
 
-use std::{fmt::Display, sync::Arc, time::Duration};
+use std::time::Duration;
 
-use cardano_blockchain_types::{Network, Point, Slot};
+use cardano_blockchain_types::{Point, Slot};
 use cardano_chain_follower::{ChainFollower, ChainSyncConfig};
-use duration_string::DurationString;
 use event::EventTarget;
 use futures::{stream::FuturesUnordered, StreamExt};
-use rand::{Rng, SeedableRng};
+use sync_params::SyncParams;
 use tokio::sync::broadcast;
 use tracing::{debug, error, info, warn};
 
 use crate::{
     db::index::{
         block::{index_block, roll_forward},
-        queries::sync_status::{
-            get::{get_sync_status, SyncStatus},
-            update::update_sync_status,
-        },
+        queries::sync_status::get::{get_sync_status, SyncStatus},
         session::CassandraSession,
     },
     settings::{chain_follower, Settings},
 };
 
-// pub(crate) mod cip36_registration_obsolete;
 pub(crate) mod event;
+mod sync_params;
 pub(crate) mod util;
 
 /// How long we wait between checks for connection to the indexing DB to be ready.
@@ -47,221 +43,38 @@ async fn start_sync_for(cfg: &chain_follower::EnvVars) -> anyhow::Result<()> {
     Ok(())
 }
 
-/// Data we return from a sync task.
-#[derive(Clone)]
-struct SyncParams {
-    /// What blockchain are we syncing.
-    chain: Network,
-    /// The starting point of this sync.
-    start: Point,
-    /// The ending point of this sync.
-    end: Point,
-    /// The first block we successfully synced.
-    first_indexed_block: Option<Point>,
-    /// Is the starting point immutable? (True = immutable, false = don't know.)
-    first_is_immutable: bool,
-    /// The last block we successfully synced.
-    last_indexed_block: Option<Point>,
-    /// Is the ending point immutable? (True = immutable, false = don't know.)
-    last_is_immutable: bool,
-    /// The number of blocks we successfully synced overall.
-    total_blocks_synced: u64,
-    /// The number of blocks we successfully synced, in the last attempt.
-    last_blocks_synced: u64,
-    /// The number of retries so far on this sync task.
-    retries: u64,
-    /// The number of retries so far on this sync task.
-    backoff_delay: Option<Duration>,
-    /// If the sync completed without error or not.
-    result: Arc<Option<anyhow::Result<()>>>,
-    /// Chain follower roll forward.
-    follower_roll_forward: Option<Point>,
-}
-
-impl Display for SyncParams {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        if self.result.is_none() {
-            write!(f, "Sync_Params {{ ")?;
-        } else {
-            write!(f, "Sync_Result {{ ")?;
-        }
-
-        write!(f, "start: {}, end: {}", self.start, self.end)?;
-
-        if let Some(first) = self.first_indexed_block.as_ref() {
-            write!(
-                f,
-                ", first_indexed_block: {first}{}",
-                if self.first_is_immutable { ":I" } else { "" }
-            )?;
-        }
-
-        if let Some(last) = self.last_indexed_block.as_ref() {
-            write!(
-                f,
-                ", last_indexed_block: {last}{}",
-                if self.last_is_immutable { ":I" } else { "" }
-            )?;
-        }
-
-        if self.retries > 0 {
-            write!(f, ", retries: {}", self.retries)?;
-        }
-
-        if self.retries > 0 || self.result.is_some() {
-            write!(f, ", synced_blocks: {}", self.total_blocks_synced)?;
-        }
-
-        if self.result.is_some() {
-            write!(f, ", last_sync: {}", self.last_blocks_synced)?;
-        }
-
-        if let Some(backoff) = self.backoff_delay.as_ref() {
-            write!(f, ", backoff: {}", DurationString::from(*backoff))?;
-        }
-
-        if let Some(result) = self.result.as_ref() {
-            match result {
-                Ok(()) => write!(f, ", Success")?,
-                Err(error) => write!(f, ", {error}")?,
-            };
-        }
-
-        f.write_str(" }")
-    }
-}
-
-/// The range we generate random backoffs within given a base backoff value.
-const BACKOFF_RANGE_MULTIPLIER: u32 = 3;
-
-impl SyncParams {
-    /// Create a new `SyncParams`.
-    fn new(chain: Network, start: Point, end: Point) -> Self {
-        Self {
-            chain,
-            start,
-            end,
-            first_indexed_block: None,
-            first_is_immutable: false,
-            last_indexed_block: None,
-            last_is_immutable: false,
-            total_blocks_synced: 0,
-            last_blocks_synced: 0,
-            retries: 0,
-            backoff_delay: None,
-            result: Arc::new(None),
-            follower_roll_forward: None,
-        }
-    }
-
-    /// Convert a result back into parameters for a retry.
-    fn retry(&self) -> Self {
-        let retry_count = self.retries.saturating_add(1);
-
-        let mut backoff = None;
-
-        // If we did sync any blocks last time, first retry is immediate.
-        // Otherwise we backoff progressively more as we do more retries.
-        if self.last_blocks_synced == 0 {
-            // Calculate backoff based on number of retries so far.
-            backoff = match retry_count {
-                1 => Some(Duration::from_secs(1)),     // 1-3 seconds
-                2..5 => Some(Duration::from_secs(10)), // 10-30 seconds
-                _ => Some(Duration::from_secs(30)),    // 30-90 seconds.
-            };
-        }
-
-        let mut retry = self.clone();
-        retry.last_blocks_synced = 0;
-        retry.retries = retry_count;
-        retry.backoff_delay = backoff;
-        retry.result = Arc::new(None);
-        retry.follower_roll_forward = None;
-
-        retry
-    }
-
-    /// Convert Params into the result of the sync.
-    fn done(
-        &self, first: Option<Point>, first_immutable: bool, last: Option<Point>,
-        last_immutable: bool, synced: u64, result: anyhow::Result<()>,
-    ) -> Self {
-        if result.is_ok() && first_immutable && last_immutable {
-            // Update sync status in the Immutable DB.
-            // Can fire and forget, because failure to update DB will simply cause the chunk to be
-            // re-indexed, on recovery.
-            update_sync_status(self.end.slot_or_default(), self.start.slot_or_default());
-        }
-
-        let mut done = self.clone();
-        done.first_indexed_block = first;
-        done.first_is_immutable = first_immutable;
-        done.last_indexed_block = last;
-        done.last_is_immutable = last_immutable;
-        done.total_blocks_synced = done.total_blocks_synced.saturating_add(synced);
-        done.last_blocks_synced = synced;
-
-        done.result = Arc::new(Some(result));
-
-        done
-    }
-
-    /// Get where this sync run actually needs to start from.
-    fn actual_start(&self) -> Point {
-        self.last_indexed_block
-            .as_ref()
-            .unwrap_or(&self.start)
-            .clone()
-    }
-
-    /// Do the backoff delay processing.
-    ///
-    /// The actual delay is a random time from the Delay itself to
-    /// `BACKOFF_RANGE_MULTIPLIER` times the delay. This is to prevent hammering the
-    /// service at regular intervals.
-    async fn backoff(&self) {
-        if let Some(backoff) = self.backoff_delay {
-            let mut rng = rand::rngs::StdRng::from_entropy();
-            let actual_backoff =
-                rng.gen_range(backoff..backoff.saturating_mul(BACKOFF_RANGE_MULTIPLIER));
-
-            tokio::time::sleep(actual_backoff).await;
-        }
-    }
-}
-
 /// Sync a portion of the blockchain.
 /// Set end to `Point::TIP` to sync the tip continuously.
 fn sync_subchain(
     params: SyncParams, event_sender: broadcast::Sender<event::ChainIndexerEvent>,
 ) -> tokio::task::JoinHandle<SyncParams> {
     tokio::spawn(async move {
-        info!(chain = %params.chain, params=%params, "Indexing Blockchain");
+        info!(chain = %params.chain(), params=%params, "Indexing Blockchain");
 
         // Backoff hitting the database if we need to.
         params.backoff().await;
 
         // Wait for indexing DB to be ready before continuing.
         drop(CassandraSession::wait_until_ready(INDEXING_DB_READY_WAIT_INTERVAL, true).await);
-        info!(chain=%params.chain, params=%params,"Indexing DB is ready");
+        info!(chain=%params.chain(), params=%params,"Indexing DB is ready");
 
-        let mut first_indexed_block = params.first_indexed_block.clone();
-        let mut first_immutable = params.first_is_immutable;
-        let mut last_indexed_block = params.last_indexed_block.clone();
-        let mut last_immutable = params.last_is_immutable;
+        let mut first_indexed_block = params.first_indexed_block().cloned();
+        let mut first_immutable = params.first_is_immutable();
+        let mut last_indexed_block = params.last_indexed_block().cloned();
+        let mut last_immutable = params.last_is_immutable();
         let mut blocks_synced = 0u64;
 
         let mut follower =
-            ChainFollower::new(params.chain, params.actual_start(), params.end.clone()).await;
+            ChainFollower::new(*params.chain(), params.actual_start(), params.end().clone()).await;
         while let Some(chain_update) = follower.next().await {
             match chain_update.kind {
                 cardano_chain_follower::Kind::ImmutableBlockRollForward => {
                     // We only process these on the follower tracking the TIP.
-                    if params.end == Point::TIP {
+                    if params.end() == &Point::TIP {
                         // What we need to do here is tell the primary follower to start a new sync
                         // for the new immutable data, and then purge the volatile database of the
                         // old data (after the immutable data has synced).
-                        info!(chain=%params.chain, "Immutable chain rolled forward.");
+                        info!(chain=%params.chain(), "Immutable chain rolled forward.");
                         let mut result = params.done(
                             first_indexed_block,
                             first_immutable,
@@ -271,7 +84,7 @@ fn sync_subchain(
                             Ok(()),
                         );
                         // Signal the point the immutable chain rolled forward to.
-                        result.follower_roll_forward = Some(chain_update.block_data().point());
+                        result.set_follower_roll_forward(chain_update.block_data().point());
                         return result;
                     };
                 },
@@ -280,7 +93,7 @@ fn sync_subchain(
 
                     if let Err(error) = index_block(block).await {
                         let error_msg = format!("Failed to index block {}", block.point());
-                        error!(chain=%params.chain, error=%error, params=%params, error_msg);
+                        error!(chain=%params.chain(), error=%error, params=%params, error_msg);
                         return params.done(
                             first_indexed_block,
                             first_immutable,
@@ -320,7 +133,7 @@ fn sync_subchain(
             Ok(()),
         );
 
-        info!(chain = %params.chain, result=%result, "Indexing Blockchain Completed: OK");
+        info!(chain = %params.chain(), result=%result, "Indexing Blockchain Completed: OK");
 
         result
     })
@@ -428,8 +241,8 @@ impl SyncTask {
                     // or there is an error.  If this is not a roll forward, log an error.
                     // It can fail if the index DB goes down in some way.
                     // Restart it always.
-                    if finished.end == Point::TIP {
-                        if let Some(ref roll_forward_point) = finished.follower_roll_forward {
+                    if finished.end() == &Point::TIP {
+                        if let Some(roll_forward_point) = finished.follower_roll_forward() {
                             // Advance the known immutable tip, and try and start followers to reach
                             // it.
                             self.immutable_tip_slot = roll_forward_point.slot_or_default();
@@ -451,7 +264,7 @@ impl SyncTask {
                             finished.retry(),
                             self.event_channel.0.clone(),
                         ));
-                    } else if let Some(result) = finished.result.as_ref() {
+                    } else if let Some(result) = finished.result() {
                         match result {
                             Ok(()) => {
                                 self.current_sync_tasks =
@@ -462,7 +275,7 @@ impl SyncTask {
                                 info!(chain=%self.cfg.chain, report=%finished,
                                     "The Immutable follower completed successfully.");
 
-                                finished.last_indexed_block.as_ref().inspect(|block| {
+                                finished.last_indexed_block().inspect(|block| {
                                     self.dispatch_event(
                                         event::ChainIndexerEvent::IndexedSlotProgressed {
                                             slot: block.slot_or_default(),
