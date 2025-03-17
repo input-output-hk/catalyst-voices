@@ -31,8 +31,8 @@ class WorkspaceProposalCard extends StatelessWidget {
         unawaited(
           ProposalBuilderRoute(
             proposalId: proposal.selfRef.id,
-            version: proposal.selfRef.id,
-            isPrivate: isLocalDraft,
+            proposalVersion: proposal.selfRef.id,
+            local: isLocalDraft,
           ).push(context),
         );
       },

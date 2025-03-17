@@ -284,9 +284,10 @@ final class ProposalBuilderBloc
 
       final versions = proposalData.versions.mapIndexed((index, version) {
         return DocumentVersion(
-          id: version,
+          id: version.document.metadata.selfRef.version ?? '',
           number: index + 1,
-          isCurrent: version == event.proposalId.version,
+          isCurrent: version.document.metadata.selfRef.version ==
+              event.proposalId.version,
           isLatest: index == proposalData.versions.length - 1,
         );
       }).toList();

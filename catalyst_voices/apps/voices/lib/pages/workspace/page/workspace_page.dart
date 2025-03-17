@@ -57,8 +57,8 @@ class _WorkspacePageState extends State<WorkspacePage>
       unawaited(
         ProposalBuilderRoute(
           proposalId: ref.id,
-          version: ref.version,
-          isPrivate: DocumentRef is DraftRef,
+          proposalVersion: ref.version,
+          local: DocumentRef is DraftRef,
         ).push(context),
       );
     }
