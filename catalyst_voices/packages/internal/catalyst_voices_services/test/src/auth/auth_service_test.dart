@@ -19,7 +19,6 @@ void main() {
       authService = AuthService(
         userObserver,
         keyDerivationService,
-        const BlockchainConfig(),
       );
     });
 
@@ -52,6 +51,11 @@ class _FakeCatalystPrivateKey extends Fake implements CatalystPrivateKey {
   final Uint8List bytes;
 
   _FakeCatalystPrivateKey(this.bytes);
+
+  @override
+  void drop() {
+    // do nothing
+  }
 
   @override
   Future<CatalystSignature> sign(Uint8List data) async {

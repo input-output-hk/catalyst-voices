@@ -101,6 +101,7 @@ final class RegistrationCubit extends Cubit<RegistrationState>
     _keychainCreationCubit.close();
     _walletLinkCubit.close();
     _recoverCubit.close();
+    _masterKey?.drop();
     return super.close();
   }
 
@@ -144,8 +145,9 @@ final class RegistrationCubit extends Cubit<RegistrationState>
       final wallet = _walletLinkCubit.selectedWallet!;
       final roles = _walletLinkCubit.roles;
 
-      final masterKey =
-          await _registrationService.deriveMasterKey(seedPhrase: seedPhrase);
+      final masterKey = await _registrationService.deriveMasterKey(
+        seedPhrase: seedPhrase,
+      );
 
       final transaction = await _registrationService.prepareRegistration(
         wallet: wallet,
@@ -154,6 +156,7 @@ final class RegistrationCubit extends Cubit<RegistrationState>
         roles: roles,
       );
 
+      _masterKey?.drop();
       _masterKey = masterKey;
       _transaction = transaction;
 

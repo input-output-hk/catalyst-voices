@@ -5,10 +5,12 @@ import 'package:equatable/equatable.dart';
 
 class BaseProposalData extends Equatable {
   final ProposalDocument document;
+  final SignedDocumentRef categoryId;
   final int commentsCount;
 
   const BaseProposalData({
     required this.document,
+    required thos.categpryId
     this.commentsCount = 0,
   });
 
@@ -76,12 +78,11 @@ class BaseProposalData extends Equatable {
 }
 
 class ProposalData extends BaseProposalData {
-  final String categoryId;
   final List<BaseProposalData> versions;
 
   const ProposalData({
     required super.document,
-    required this.categoryId,
+    required super.categoryId,
     super.commentsCount = 0,
     this.versions = const [],
   });
