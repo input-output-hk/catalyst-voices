@@ -79,7 +79,9 @@ impl ResponseError for AuthTokenError {
 
     /// Convert this error to a HTTP response.
     fn as_response(&self) -> poem::Response
-    where Self: Error + Send + Sync + 'static {
+    where
+        Self: Error + Send + Sync + 'static,
+    {
         ErrorResponses::unauthorized().into_response()
     }
 }
@@ -98,7 +100,9 @@ impl ResponseError for AuthTokenAccessViolation {
 
     /// Convert this error to a HTTP response.
     fn as_response(&self) -> poem::Response
-    where Self: Error + Send + Sync + 'static {
+    where
+        Self: Error + Send + Sync + 'static,
+    {
         // TODO: Actually check permissions needed for an endpoint.
         ErrorResponses::forbidden(Some(self.0.clone())).into_response()
     }
@@ -200,9 +204,12 @@ async fn indexed_registrations(catalyst_id: &IdUri) -> poem::Result<Vec<Query>> 
         service_unavailable()
     })?;
 
-    let mut result: Vec<_> = Query::execute(&session, QueryParams {
-        catalyst_id: catalyst_id.clone().into(),
-    })
+    let mut result: Vec<_> = Query::execute(
+        &session,
+        QueryParams {
+            catalyst_id: catalyst_id.clone().into(),
+        },
+    )
     .and_then(|r| r.try_collect().map_err(Into::into))
     .await
     .map_err(|e| {
@@ -237,7 +244,7 @@ async fn last_signing_key(
         .role_data()
         .get(&RoleNumber::ROLE_0)
         .context("Missing role 0 data")?
-        .1
+        .data()
         .signing_key()
         .context("Missing signing key")?;
     let key_offset = usize::try_from(key_ref.key_offset).context("Invalid signing key offset")?;
@@ -247,7 +254,9 @@ async fn last_signing_key(
                 .x509_certs()
                 .get(&key_offset)
                 .context("Missing X509 role 0 certificate")?
-                .1;
+                .last()
+                .and_then(|p| p.data().as_ref())
+                .context("Unable to get last X509 role 0 certificate")?;
             x509_key(cert)
         },
         LocalRefInt::C509Certs => {
@@ -255,7 +264,9 @@ async fn last_signing_key(
                 .c509_certs()
                 .get(&key_offset)
                 .context("Missing C509 role 0 certificate")?
-                .1;
+                .last()
+                .and_then(|p| p.data().as_ref())
+                .context("Unable to get last C509 role 0 certificate")?;
             c509_key(cert)
         },
         LocalRefInt::PubKeys => {
