@@ -112,7 +112,6 @@ class SingleSelectDropdown<T> extends VoicesFormField<T> {
                   ),
                   focusColor: Colors.tealAccent,
                 ),
-
                 errorText: field.errorText,
                 // using visibility so that the widget reserves
                 // the space for the icon, otherwise when widget changes
