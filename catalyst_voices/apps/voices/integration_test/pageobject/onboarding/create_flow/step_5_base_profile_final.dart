@@ -11,7 +11,6 @@ class BaseProfileFinalPanel extends OnboardingPageBase {
   static const createKeychainButton = Key('CreateKeychainButton');
   final nextStepBody = const Key('NextStepBody');
   final nextStepTitle = const Key('NextStepText');
-  final progressBar = const Key('ProgressBar');
   Future<void> clickCreateKeychain() async {
     await $(createKeychainButton).tap();
   }
@@ -32,7 +31,7 @@ class BaseProfileFinalPanel extends OnboardingPageBase {
     expect(await infoPartHeaderTitleText(), T.get('Catalyst Keychain'));
     expect(infoPartTaskPicture(), findsOneWidget);
     expect($(progressBar), findsOneWidget);
-        expect(
+    expect(
       $(learnMoreButton).$(Text).text,
       T.get('Learn More'),
     );
@@ -42,6 +41,5 @@ class BaseProfileFinalPanel extends OnboardingPageBase {
     expect($(createKeychainButton), findsOneWidget);
     expect($(nextStepBody), findsOneWidget);
     expect($(nextStepTitle), findsOneWidget);
-    
   }
 }

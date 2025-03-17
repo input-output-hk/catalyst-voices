@@ -165,8 +165,11 @@ final class RegistrationServiceImpl implements RegistrationService {
     await Future<void>.delayed(const Duration(milliseconds: 200));
 
     // TODO(damian-molinski): should come from backend
-    const displayName = 'Recovered';
     const email = 'recovered@iohk.com';
+    final catalystIdUri = Uri.parse(
+      'id.catalyst://recovered@preprod.cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE',
+    );
+    final catalystId = CatalystId.fromUri(catalystIdUri);
 
     // TODO(dtscalac): derive a key from the seed phrase and fetch
     // from the backend info about the registration (roles, wallet, etc).
@@ -175,14 +178,9 @@ final class RegistrationServiceImpl implements RegistrationService {
     final keychainId = const Uuid().v4();
     final keychain = await _keychainProvider.create(keychainId);
 
-    // TODO(damian-molinski): should extracted from role0.
-    //  See [Account.catalystId]
-    final catalystId = 'cardano/$keychainId';
-
     // Note. with rootKey query backend for account details.
     return Account(
       catalystId: catalystId,
-      displayName: displayName,
       email: email,
       keychain: keychain,
       roles: roles,
@@ -228,22 +226,32 @@ final class RegistrationServiceImpl implements RegistrationService {
       final balance = await enabledWallet.getBalance();
       final address = await enabledWallet.getChangeAddress();
 
-      // TODO(damian-molinski): should extracted from role0.
-      //  See [Account.catalystId]
-      final catalystId = 'cardano/$keychainId';
-
-      return Account(
-        catalystId: catalystId,
-        displayName: displayName,
-        email: email,
-        keychain: keychain,
-        roles: roles,
-        walletInfo: WalletInfo(
-          metadata: WalletMetadata.fromCardanoWallet(wallet),
-          balance: balance.coin,
-          address: address,
-        ),
+      final keyPair = _keyDerivationService.deriveAccountRoleKeyPair(
+        masterKey: masterKey,
+        role: AccountRole.root,
       );
+
+      return keyPair.use((keyPair) {
+        final role0key = keyPair.publicKey;
+
+        final catalystId = CatalystId(
+          host: _blockchainConfig.host.host,
+          username: displayName,
+          role0Key: role0key.publicKeyBytes,
+        );
+
+        return Account(
+          catalystId: catalystId,
+          email: email,
+          keychain: keychain,
+          roles: roles,
+          walletInfo: WalletInfo(
+            metadata: WalletMetadata.fromCardanoWallet(wallet),
+            balance: balance.coin,
+            address: address,
+          ),
+        );
+      });
     } on RegistrationException {
       rethrow;
     } catch (error) {
@@ -265,19 +273,31 @@ final class RegistrationServiceImpl implements RegistrationService {
     await keychain.unlock(lockFactor);
     await keychain.setMasterKey(masterKey);
 
-    final catalystId = 'cardano/$keychain';
-
-    return Account(
-      catalystId: catalystId,
-      displayName: 'Dummy',
-      email: 'dummy@iohk.com',
-      keychain: keychain,
-      roles: roles,
-      walletInfo: WalletInfo(
-        metadata: const WalletMetadata(name: 'Dummy Wallet'),
-        balance: Coin.fromAda(10),
-        address: _testNetAddress,
-      ),
+    final keyPair = _keyDerivationService.deriveAccountRoleKeyPair(
+      masterKey: masterKey,
+      role: AccountRole.root,
     );
+
+    return keyPair.use((keyPair) {
+      final role0key = keyPair.publicKey;
+
+      final catalystId = CatalystId(
+        host: _blockchainConfig.host.host,
+        username: 'Dummy',
+        role0Key: role0key.publicKeyBytes,
+      );
+
+      return Account(
+        catalystId: catalystId,
+        email: 'dummy@iohk.com',
+        keychain: keychain,
+        roles: roles,
+        walletInfo: WalletInfo(
+          metadata: const WalletMetadata(name: 'Dummy Wallet'),
+          balance: Coin.fromAda(10),
+          address: _testNetAddress,
+        ),
+      );
+    });
   }
 }

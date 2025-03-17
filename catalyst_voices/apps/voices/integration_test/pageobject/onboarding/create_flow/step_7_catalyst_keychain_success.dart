@@ -44,8 +44,8 @@ class CatalystKeychainSuccessPanel extends OnboardingPageBase {
       $(registrationDetailsBody).$(Text).text,
       T.get("On the next screen, you're going to see 12 words. \u2028This is "
           "called your \"Catalyst seed phrase\".   \u2028\u2028It's "
-          'like a supersecure password that only you know, \u2028that '
-          'allows you to proveownership of your keychain.  \u2028\u2028Use '
+          'like a super secure password that only you know, \u2028that '
+          'allows you to prove ownership of your keychain.  \u2028\u2028Use '
           'your Catalyst seed phrase to login and recover your account on '
           'different devices, so be sure to put it somewhere safe!\n\nIt '
           'is a super secure password that only you '

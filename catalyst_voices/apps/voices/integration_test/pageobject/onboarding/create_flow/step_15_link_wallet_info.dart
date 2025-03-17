@@ -31,17 +31,18 @@ class LinkWalletInfoPanel extends OnboardingPageBase {
     expect(
         $(registrationDetailsTitle).$(Text).text,
         T.get('Link Cardano Wallet & Catalyst Roles '
-            '\u2028to you Catalyst Keychain.'));
+            '\u2028to you Catalyst Keychain.'),);
 
-    expect($(registrationDetailsBody).$(Text).text, 
-    T.get("You're almost there! This "
-    'is the final and most important step in your account '
-    "setup. \u2028\u2028We're going to link a Cardano Wallet to your "
-    'Catalyst Keychain, so you can start collecting Role Keys.  '
-    "\u2028\u2028We'll start with your Voter/Commenter Key by default. "
-    'You can decide to add a Proposer Key if you want.'));
+    expect(
+        $(registrationDetailsBody).$(Text).text,
+        T.get("You're almost there! This "
+            'is the final and most important step in your account '
+            "setup. \u2028\u2028We're going to link a Cardano Wallet to your "
+            'Catalyst Keychain, so you can start collecting Role Keys.  '
+            "\u2028\u2028We'll start with your Voter/Commenter Key by default. "
+            'You can decide to add a Proposer Key if you want.'),);
 
-    expect($(chooseCardanoWalletButton),findsOneWidget);
+    expect($(chooseCardanoWalletButton), findsOneWidget);
   }
 
   Future<void> verifyInfoPanel() async {

@@ -56,20 +56,20 @@ class RestoreKeychainInputPanel extends OnboardingPageBase {
     expect(
         $(recoverySeedPhraseInputTitle).text,
         T.get('Restore your '
-            'Catalyst Keychain with \nyour 12-word Catalyst seed phrase'));
+            'Catalyst Keychain with \nyour 12-word Catalyst seed phrase'),);
 
     expect(
         $(recoverySeedPhraseInputSubtitle).text,
         T.get('Enter each word of your Catalyst seed phrase in the right order '
-            'to bring your Catalyst account to this device.'));
+            'to bring your Catalyst account to this device.'),);
 
     for (var i = 1; i < 13; i++) {
       expect(find.byKey(Key('Word${i}CellKey')), findsOneWidget);
 
       expect($(uploadKeyButton), findsOneWidget);
-      expect($(resetButton), findsOneWidget); 
-      expect($(backButton), findsOneWidget);  
-      expect($(nextButton), findsOneWidget);  
+      expect($(resetButton), findsOneWidget);
+      expect($(backButton), findsOneWidget);
+      expect($(nextButton), findsOneWidget);
     }
   }
 }

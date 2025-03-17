@@ -47,20 +47,33 @@ class AcknowledgmentsPanel extends OnboardingPageBase {
       findsOneWidget,
     );
     expect(
-     find.byWidgetPredicate(
-      (widget)=> widget is PlaceholderRichText && widget.text == 'I confirm '
-      'that I have read and agree to be bound by {tos}.',),
+      find.byWidgetPredicate(
+        (widget) =>
+            widget is PlaceholderRichText &&
+            widget.text ==
+                'I confirm '
+                    'that I have read and agree to be bound by {tos}.',
+      ),
       findsOneWidget,
     );
     expect(
-    find.byWidgetPredicate((widget)=> widget is PlaceholderRichText 
-    && widget.text == 'I acknowledge and agree that any data I share in '
-    'connection with my participation in Project Catalyst Funds will be '
-    'collected, stored, used and processed in accordance '
-    'with the {privacy_policy}.',), findsOneWidget,
+      find.byWidgetPredicate(
+        (widget) =>
+            widget is PlaceholderRichText &&
+            widget.text ==
+                'I acknowledge and agree that any data I share in '
+                'connection with my participation in '
+                'Project Catalyst Funds will be '
+                'collected, stored, used and processed in accordance '
+                'with the {privacy_policy}.',
+      ),
+      findsOneWidget,
     );
 
-    expect(find.text('I acknowledge that the Catalyst Ops team may use my '
-    'email only for Catalyst communication.'),findsOneWidget,);
+    expect(
+      find.text('I acknowledge that the Catalyst Ops team may use my '
+          'email only for Catalyst communication.'),
+      findsOneWidget,
+    );
   }
 }

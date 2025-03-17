@@ -42,7 +42,8 @@ class SeedphraseSuccessPanel extends OnboardingPageBase {
     expect(
       $(registrationDetailsBody).text,
       T.get('Enter your seed phrase to recover your Catalyst Keychain on '
-          "any device.   \u2028\u2028It's kinda like your email and password all"
+          "any device.   \u2028\u2028It's kinda "
+          'like your email and password all'
           ' rolled into one, so keep it somewhere safe!\u2028\u2028In the next '
           'step we’ll add a password to your Catalyst Keychain, so you can'
           ' lock/unlock access to Voices.'),

@@ -15,6 +15,7 @@ class InputSeedphrasePanel extends OnboardingPageBase {
   Future<void> clickNext() async {
     await $(nextButton).tap();
   }
+
   @override
   Future<void> goto() async {
     await WritedownSeedphraseInfoPanel($).goto();

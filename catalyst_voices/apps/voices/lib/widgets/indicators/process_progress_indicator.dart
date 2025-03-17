@@ -183,7 +183,6 @@ class _StepNameTextContainer extends StatelessWidget {
               ? Alignment.bottomCenter
               : Alignment.center,
       child: Text(
-        
         data,
         style: switch (status) {
           _StepIndicatorStatus.current =>
@@ -221,6 +220,7 @@ class _StepStatusIndicatorContainer extends StatelessWidget {
     }
 
     return Container(
+      key: const ValueKey('IconContainer'),
       constraints: const BoxConstraints.tightFor(width: 56),
       padding: padding,
       alignment: Alignment.center,
@@ -333,8 +333,11 @@ class _StepIcon extends StatelessWidget {
             ? Theme.of(context).colors.iconsSuccess
             : Theme.of(context).colors.iconsForeground,
       ),
-      child:
-          showFlag ? const Icon(Icons.flag_outlined) : const Icon(Icons.check),
+      child: showFlag
+          ? const Icon(
+              Icons.flag_outlined,
+            )
+          : const Icon(Icons.check),
     );
   }
 }

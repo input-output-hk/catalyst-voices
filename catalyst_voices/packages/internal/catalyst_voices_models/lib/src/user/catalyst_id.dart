@@ -1,5 +1,6 @@
-import 'package:catalyst_voices_models/src/crypto/catalyst_public_key.dart';
-import 'package:catalyst_voices_models/src/user/account_role.dart';
+import 'dart:typed_data';
+
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:equatable/equatable.dart';
 
@@ -34,7 +35,7 @@ final class CatalystId extends Equatable {
 
   /// This is the very first role 0 key used to post
   /// the registration to the network.
-  final CatalystPublicKey role0Key;
+  final Uint8List role0Key;
 
   //// Optional - This is the Role number being used.
   final AccountRole? role;
@@ -56,7 +57,12 @@ final class CatalystId extends Equatable {
     this.role,
     this.rotation,
     this.encrypt = false,
-  });
+  }) : assert(
+          role0Key.length == 32,
+          'Role0Key must be 32 bytes long. '
+          'Make sure to use plain public key, '
+          'not the extended public key.',
+        );
 
   /// Parses the [CatalystId] from [Uri].
   factory CatalystId.fromUri(Uri uri) {
@@ -85,6 +91,29 @@ final class CatalystId extends Equatable {
         encrypt,
       ];
 
+  CatalystId copyWith({
+    String? host,
+    Optional<String>? username,
+    Optional<int>? nonce,
+    Uint8List? role0Key,
+    Optional<AccountRole>? role,
+    Optional<int>? rotation,
+    bool? encrypt,
+  }) {
+    return CatalystId(
+      host: host ?? this.host,
+      username: username.dataOr(this.username),
+      nonce: nonce.dataOr(this.nonce),
+      role0Key: role0Key ?? this.role0Key,
+      role: role.dataOr(this.role),
+      rotation: rotation.dataOr(this.rotation),
+      encrypt: encrypt ?? this.encrypt,
+    );
+  }
+
+  @override
+  String toString() => toUri().toString();
+
   /// Builds the [Uri] from the [CatalystId].
   Uri toUri() {
     return Uri(
@@ -97,7 +126,7 @@ final class CatalystId extends Equatable {
   }
 
   String _formatPath() {
-    final encodedRole0Key = base64UrlNoPadEncode(role0Key.publicKeyBytes);
+    final encodedRole0Key = base64UrlNoPadEncode(role0Key);
     final role = this.role?.number.toString();
     final rotation = this.rotation?.toString();
 
@@ -126,7 +155,7 @@ final class CatalystId extends Equatable {
   ///
   /// Format: role0Key[/roleNumber][/rotation]
   static (
-    CatalystPublicKey role0Key,
+    Uint8List role0Key,
     AccountRole? role,
     int? rotation,
   ) _parsePath(String path) {
@@ -138,7 +167,7 @@ final class CatalystId extends Equatable {
     final rotation = int.tryParse(parts.elementAtOrNull(2) ?? '');
 
     final decodedRole0Key = base64UrlNoPadDecode(role0Key);
-    final catalystRole0Key = CatalystPublicKey.factory.create(decodedRole0Key);
+    final catalystRole0Key = decodedRole0Key;
     final accountRole = role != null ? AccountRole.fromNumber(role) : null;
 
     return (catalystRole0Key, accountRole, rotation);

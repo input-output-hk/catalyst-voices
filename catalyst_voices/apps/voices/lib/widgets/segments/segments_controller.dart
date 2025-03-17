@@ -7,76 +7,6 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
-final class SegmentsControllerState extends Equatable {
-  final List<Segment> segments;
-  final Set<NodeId> openedSegments;
-  final NodeId? activeSectionId;
-  final Set<NodeId> editSectionId;
-
-  const SegmentsControllerState({
-    this.segments = const [],
-    this.openedSegments = const {},
-    this.activeSectionId,
-    this.editSectionId = const {},
-  });
-
-  bool get allSegmentsClosed => openedSegments.isEmpty;
-
-  bool isEditing(NodeId stepId) {
-    return editSectionId.contains(stepId);
-  }
-
-  List<SegmentsListViewItem> get listItems {
-    final openedSegments = {...this.openedSegments};
-
-    return segments
-        .expand<SegmentsListViewItem>(
-          (element) => [
-            element,
-            if (openedSegments.contains(element.id)) ...element.sections,
-          ],
-        )
-        .toList();
-  }
-
-  /// All [segments] are opened and first section is selected.
-  factory SegmentsControllerState.initial({
-    required List<Segment> segments,
-    NodeId? activeSectionId,
-  }) {
-    final allSegmentsIds = segments.map((e) => e.id).toSet();
-    final segment = segments.firstWhereOrNull((e) => e.sections.isNotEmpty);
-
-    return SegmentsControllerState(
-      segments: segments,
-      openedSegments: allSegmentsIds,
-      activeSectionId: activeSectionId ?? segment?.sections.first.id,
-    );
-  }
-
-  SegmentsControllerState copyWith({
-    List<Segment>? segments,
-    Set<NodeId>? openedSegments,
-    Optional<NodeId>? activeSectionId,
-    Set<NodeId>? editSectionId,
-  }) {
-    return SegmentsControllerState(
-      segments: segments ?? this.segments,
-      openedSegments: openedSegments ?? this.openedSegments,
-      activeSectionId: activeSectionId.dataOr(this.activeSectionId),
-      editSectionId: editSectionId ?? this.editSectionId,
-    );
-  }
-
-  @override
-  List<Object?> get props => [
-        segments,
-        openedSegments,
-        activeSectionId,
-        editSectionId,
-      ];
-}
-
 final class SegmentsController extends ValueNotifier<SegmentsControllerState> {
   ItemScrollController? _itemsScrollController;
 
@@ -91,6 +21,42 @@ final class SegmentsController extends ValueNotifier<SegmentsControllerState> {
 
   void detachItemsScrollController() {
     _itemsScrollController = null;
+  }
+
+  @override
+  void dispose() {
+    detachItemsScrollController();
+    super.dispose();
+  }
+
+  void editSection(
+    NodeId id, {
+    required bool enabled,
+  }) {
+    final editSectionId = <NodeId>{...value.editSectionId};
+    Optional<NodeId>? activeSectionId;
+
+    if (enabled) {
+      editSectionId.add(id);
+      activeSectionId = Optional.of(id);
+    } else {
+      editSectionId.remove(id);
+    }
+
+    value = value.copyWith(
+      editSectionId: editSectionId,
+      activeSectionId: activeSectionId,
+    );
+  }
+
+  void focusSection(NodeId id) {
+    unawaited(_scrollTo(id));
+  }
+
+  void selectSectionStep(NodeId id) {
+    value = value.copyWith(activeSectionId: Optional(id));
+
+    unawaited(_scrollTo(id));
   }
 
   void toggleSegment(NodeId id) {
@@ -132,44 +98,14 @@ final class SegmentsController extends ValueNotifier<SegmentsControllerState> {
     );
   }
 
-  void selectSectionStep(NodeId id) {
-    value = value.copyWith(activeSectionId: Optional(id));
+  Future<void> _scrollTo(NodeId id) async {
+    final listItems = value.listItems;
+    var index = listItems.indexWhere((e) => e.id == id);
 
-    unawaited(_scrollTo(id));
-  }
-
-  void focusSection(NodeId id) {
-    unawaited(_scrollTo(id));
-  }
-
-  void editSection(
-    NodeId id, {
-    required bool enabled,
-  }) {
-    final editSectionId = <NodeId>{...value.editSectionId};
-    Optional<NodeId>? activeSectionId;
-
-    if (enabled) {
-      editSectionId.add(id);
-      activeSectionId = Optional.of(id);
-    } else {
-      editSectionId.remove(id);
+    if (index == -1) {
+      index = listItems.indexWhere((e) => e.id.isChildOf(id));
     }
 
-    value = value.copyWith(
-      editSectionId: editSectionId,
-      activeSectionId: activeSectionId,
-    );
-  }
-
-  @override
-  void dispose() {
-    detachItemsScrollController();
-    super.dispose();
-  }
-
-  Future<void> _scrollTo(NodeId id) async {
-    final index = value.listItems.indexWhere((e) => e.id == id);
     if (index == -1) {
       return;
     }
@@ -199,6 +135,11 @@ final class SegmentsControllerScope extends InheritedWidget {
     required super.child,
   });
 
+  @override
+  bool updateShouldNotify(covariant SegmentsControllerScope oldWidget) {
+    return controller != oldWidget.controller;
+  }
+
   static SegmentsController of(BuildContext context) {
     final controller = context
         .dependOnInheritedWidgetOfExactType<SegmentsControllerScope>()
@@ -211,9 +152,82 @@ final class SegmentsControllerScope extends InheritedWidget {
 
     return controller!;
   }
+}
+
+final class SegmentsControllerState extends Equatable {
+  final List<Segment> segments;
+  final Set<NodeId> openedSegments;
+  final NodeId? activeSectionId;
+  final Set<NodeId> editSectionId;
+
+  const SegmentsControllerState({
+    this.segments = const [],
+    this.openedSegments = const {},
+    this.activeSectionId,
+    this.editSectionId = const {},
+  });
+
+  /// All [segments] are opened and first section is selected.
+  factory SegmentsControllerState.initial({
+    required List<Segment> segments,
+    NodeId? activeSectionId,
+  }) {
+    final allSegmentsIds = segments.map((e) => e.id).toSet();
+    final segment = segments.firstWhereOrNull((e) => e.sections.isNotEmpty);
+
+    return SegmentsControllerState(
+      segments: segments,
+      openedSegments: allSegmentsIds,
+      activeSectionId: activeSectionId ?? segment?.sections.first.id,
+    );
+  }
+
+  bool get allSegmentsClosed => openedSegments.isEmpty;
+
+  List<SegmentsListViewItem> get listItems {
+    final openedSegments = {...this.openedSegments};
+
+    return segments
+        .expand<SegmentsListViewItem>(
+          (element) => [
+            element,
+            if (openedSegments.contains(element.id)) ...element.sections,
+          ],
+        )
+        .expand(
+          (element) => [
+            if (element is SegmentGroupedListViewItems)
+              ...(element as SegmentGroupedListViewItems).children
+            else
+              element,
+          ],
+        )
+        .toList();
+  }
 
   @override
-  bool updateShouldNotify(covariant SegmentsControllerScope oldWidget) {
-    return controller != oldWidget.controller;
+  List<Object?> get props => [
+        segments,
+        openedSegments,
+        activeSectionId,
+        editSectionId,
+      ];
+
+  SegmentsControllerState copyWith({
+    List<Segment>? segments,
+    Set<NodeId>? openedSegments,
+    Optional<NodeId>? activeSectionId,
+    Set<NodeId>? editSectionId,
+  }) {
+    return SegmentsControllerState(
+      segments: segments ?? this.segments,
+      openedSegments: openedSegments ?? this.openedSegments,
+      activeSectionId: activeSectionId.dataOr(this.activeSectionId),
+      editSectionId: editSectionId ?? this.editSectionId,
+    );
+  }
+
+  bool isEditing(NodeId stepId) {
+    return editSectionId.contains(stepId);
   }
 }

@@ -1,14 +1,17 @@
 import 'package:catalyst_voices/widgets/avatars/voices_avatar.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
-import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 class CommentCard extends StatelessWidget {
-  final Comment comment;
+  final String text;
+  final String username;
+  final DateTime date;
 
   const CommentCard({
     super.key,
-    required this.comment,
+    required this.text,
+    required this.username,
+    required this.date,
   });
 
   @override
@@ -28,7 +31,7 @@ class CommentCard extends StatelessWidget {
           children: [
             VoicesAssets.icons.chatAlt.buildIcon(),
             const SizedBox(height: 10),
-            Text(comment.text),
+            Text(text),
             const SizedBox(height: 10),
             Row(
               children: [
@@ -37,8 +40,8 @@ class CommentCard extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(comment.userName),
-                    Text(comment.date.toString()),
+                    Text(username),
+                    Text(date.toString()),
                   ],
                 ),
               ],

@@ -19,7 +19,6 @@ void main() {
       authService = AuthService(
         userObserver,
         keyDerivationService,
-        const BlockchainConfig(),
       );
     });
 
@@ -33,7 +32,11 @@ void main() {
       when(keychain.getMasterKey)
           .thenAnswer((_) async => _FakeCatalystPrivateKey(Uint8List(32)));
 
-      final account = Account.dummy(keychain: keychain, isActive: true);
+      final account = Account.dummy(
+        catalystId: DummyCatalystIdFactory.create(),
+        keychain: keychain,
+        isActive: true,
+      );
       final user = User.optional(accounts: [account]);
       userObserver.user = user;
 
@@ -48,6 +51,11 @@ class _FakeCatalystPrivateKey extends Fake implements CatalystPrivateKey {
   final Uint8List bytes;
 
   _FakeCatalystPrivateKey(this.bytes);
+
+  @override
+  void drop() {
+    // do nothing
+  }
 
   @override
   Future<CatalystSignature> sign(Uint8List data) async {

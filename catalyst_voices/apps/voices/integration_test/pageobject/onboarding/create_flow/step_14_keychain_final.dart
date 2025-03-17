@@ -34,20 +34,29 @@ class KeychainFinalPanel extends OnboardingPageBase {
 
   Future<void> verifyDetailsPanel() async {
     expect(
-        find.text('Base profile created', findRichText: true), findsOneWidget);
-    expect(find.text('Catalyst Keychain created', findRichText: true),
-        findsOneWidget);
-    expect(find.text('Link Cardano Wallet & Roles', findRichText: true),
-        findsOneWidget);
+      find.text('Base profile created', findRichText: true),
+      findsOneWidget,
+    );
     expect(
-        find.text('Catalyst account creation completed!', findRichText: true),
-        findsOneWidget);
+      find.text('Catalyst Keychain created', findRichText: true),
+      findsOneWidget,
+    );
     expect(
-        find.text(
-            'In the next step you write your Catalyst roles '
-            'and \u2028account to the Cardano Mainnet.',
-            findRichText: true),
-        findsOneWidget);
+      find.text('Link Cardano Wallet & Roles', findRichText: true),
+      findsOneWidget,
+    );
+    expect(
+      find.text('Catalyst account creation completed!', findRichText: true),
+      findsOneWidget,
+    );
+    expect(
+      find.text(
+        'In the next step you write your Catalyst roles '
+        'and \u2028account to the Cardano Mainnet.',
+        findRichText: true,
+      ),
+      findsOneWidget,
+    );
     expect($(iconContainer), findsExactly(4));
   }
 
