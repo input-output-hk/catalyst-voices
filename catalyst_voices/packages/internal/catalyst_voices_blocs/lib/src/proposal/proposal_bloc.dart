@@ -7,6 +7,8 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+part 'proposal_bloc_mock_data.dart';
+
 final _logger = Logger('ProposalBloc');
 
 final class ProposalBloc extends Bloc<ProposalEvent, ProposalState>
@@ -16,53 +18,16 @@ final class ProposalBloc extends Bloc<ProposalEvent, ProposalState>
   final UserService _userService;
   final ProposalService _proposalService;
 
+  // 1. Fetch proposal document
+  // 2. Observe document comments
+  // 3. Observe active account
+  // 4. Sort comments.
   ProposalBloc(
     this._userService,
     this._proposalService,
   ) : super(const ProposalState()) {
     on<ShowProposalEvent>(_handleShowProposalEvent);
     on<UpdateProposalFavoriteEvent>(_handleUpdateProposalFavoriteEvent);
-  }
-
-  CommentDocument _buildComment({
-    SignedDocumentRef? selfRef,
-    SignedDocumentRef? parent,
-    String? message,
-  }) {
-    final commentTemplate = _buildSchema();
-
-    final builder = DocumentBuilder.fromSchema(schema: commentTemplate);
-
-    if (message != null) {
-      final change = DocumentValueChange(
-        nodeId: DocumentNodeId.fromString('comment.content'),
-        value: message,
-      );
-      builder.addChange(change);
-    }
-
-    final document = builder.build();
-
-    return CommentDocument(
-      metadata: CommentMetadata(
-        selfRef: selfRef ?? SignedDocumentRef.generateFirstRef(),
-        parent: parent,
-      ),
-      document: document,
-    );
-  }
-
-  CommentTemplate _buildCommentTemplate() {
-    final schema = _buildSchema();
-
-    final document = DocumentBuilder.fromSchema(schema: schema).build();
-
-    return CommentTemplate(
-      metadata: CommentTemplateMetadata(
-        selfRef: SignedDocumentRef.generateFirstRef(),
-      ),
-      document: document,
-    );
   }
 
   ProposalViewData _buildProposalViewData(ProposalData proposal) {
@@ -155,7 +120,6 @@ final class ProposalBloc extends Bloc<ProposalEvent, ProposalState>
     );
 
     return ProposalViewData(
-      currentRef: proposalDocumentRef,
       isCurrentVersionLatest: currentVersion?.isLatest,
       header: ProposalViewHeader(
         title: 'Project Mayhem: Freedom by Chaos',
@@ -172,25 +136,6 @@ final class ProposalBloc extends Bloc<ProposalEvent, ProposalState>
       ],
     );
     /* cSpell:enable */
-  }
-
-  DocumentSchema _buildSchema() {
-    return DocumentSchema.optional(
-      properties: [
-        DocumentGenericObjectSchema.optional(
-          nodeId: DocumentNodeId.fromString('comment'),
-          description: const MarkdownData('The comments on the proposal'),
-          properties: [
-            DocumentMultiLineTextEntrySchema.optional(
-              nodeId: DocumentNodeId.fromString('comment.content'),
-              description: const MarkdownData('The comment text content'),
-              strLengthRange: const Range(min: 1, max: 5000),
-              isRequired: true,
-            ),
-          ],
-        ),
-      ],
-    );
   }
 
   Future<void> _changeDocumentTo({
