@@ -11,7 +11,6 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/foundation.dart';
 import 'package:rxdart/transformers.dart';
 import 'package:synchronized/synchronized.dart';
-import 'package:uuid/uuid.dart';
 
 @visibleForTesting
 typedef DocumentsDataWithRefData = ({DocumentData data, DocumentData refData});
@@ -32,28 +31,25 @@ abstract interface class DocumentRepository {
   ///
   /// At the moment we do not support drafts of templates that's why
   /// [template] requires [SignedDocumentRef].
-  ///
-  /// If [of] is declared it will be used for this draft and new version
-  /// assigned. Think of it as editing published document.
-  Future<DraftRef> createProposalDraft({
+  Future<DraftRef> createDocumentDraft({
+    required DocumentType type,
     required DocumentDataContent content,
     required SignedDocumentRef template,
-    SignedDocumentRef? of,
+    DraftRef? selfRef,
   });
 
-  /// Deletes a proposal draft from the local storage.
+  /// Deletes a document draft from the local storage.
   Future<void> deleteDocumentDraft({
     required DraftRef ref,
   });
 
-  /// Encodes the [content] to exportable format.
+  /// Encodes the [document] to exportable format.
   ///
   /// It does not save the document anywhere on the disk,
   /// it only encodes a document as [Uint8List]
   /// so that it can be saved as a file.
   Future<Uint8List> encodeDocumentForExport({
-    required DocumentDataMetadata metadata,
-    required DocumentDataContent content,
+    required DocumentData document,
   });
 
   /// Returns list of refs to all published and any refs it may hold.
@@ -88,6 +84,10 @@ abstract interface class DocumentRepository {
   ///
   /// Returns the reference to the imported document.
   Future<DocumentRef> importDocument({required Uint8List data});
+
+  Future<void> publishDocument({
+    required SignedDocument document,
+  });
 
   /// Returns a list of version of ref object.
   ///
@@ -144,17 +144,15 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   }
 
   @override
-  Future<DraftRef> createProposalDraft({
+  Future<DraftRef> createDocumentDraft({
+    required DocumentType type,
     required DocumentDataContent content,
     required SignedDocumentRef template,
-    SignedDocumentRef? of,
+    DraftRef? selfRef,
   }) async {
-    final id = of?.id ?? const Uuid().v7();
-    final version = of != null ? const Uuid().v7() : id;
-
-    final ref = DraftRef(id: id, version: version);
+    final ref = selfRef ?? DraftRef.generateFirstRef();
     final metadata = DocumentDataMetadata(
-      type: DocumentType.proposalDocument,
+      type: type,
       selfRef: ref,
       template: template,
     );
@@ -176,14 +174,9 @@ final class DocumentRepositoryImpl implements DocumentRepository {
 
   @override
   Future<Uint8List> encodeDocumentForExport({
-    required DocumentDataMetadata metadata,
-    required DocumentDataContent content,
+    required DocumentData document,
   }) async {
-    final documentDataDto = DocumentDataDto(
-      metadata: DocumentDataMetadataDto.fromModel(metadata),
-      content: DocumentDataContentDto.fromModel(content),
-    );
-
+    final documentDataDto = DocumentDataDto.fromModel(document);
     final jsonData = documentDataDto.toJson();
     return json.fuse(utf8).encode(jsonData) as Uint8List;
   }
@@ -266,6 +259,11 @@ final class DocumentRepositoryImpl implements DocumentRepository {
 
     await _drafts.save(data: newDocument);
     return newDocument.ref;
+  }
+
+  @override
+  Future<void> publishDocument({required SignedDocument document}) async {
+    await _remoteDocuments.publish(document);
   }
 
   @override

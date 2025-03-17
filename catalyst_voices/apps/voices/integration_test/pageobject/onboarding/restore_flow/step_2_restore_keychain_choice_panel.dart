@@ -1,3 +1,4 @@
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -15,7 +16,8 @@ class RestoreKeychainChoicePanel extends OnboardingPageBase {
       const Key('RecoverKeychainMethodsSubtitle');
   final recoverKeychainMethodsListTitleKey =
       const Key('RecoverKeychainMethodsListTitle');
-  final registrationTileKey = const Key('RegistrationRecoverMethod.seedPhrase');
+  final registrationTileKey =
+      const ValueKey(RegistrationRecoverMethod.seedPhrase);
 
   @override
   Future<void> goto() async {
@@ -24,7 +26,7 @@ class RestoreKeychainChoicePanel extends OnboardingPageBase {
   }
 
   Future<void> clickRestoreSeedPhrase() async {
-    await $(registrationTileKey).$(registrationTileTitle).tap();
+    await $(registrationTileKey).tap();
   }
 
   @override
@@ -36,36 +38,32 @@ class RestoreKeychainChoicePanel extends OnboardingPageBase {
   Future<void> verifyDetailsPanel() async {
     expect(
       $(recoverKeychainMethodsTitle).text,
-      T.get('Restore your Catalyst Keychain'),
+      (await t()).recoverKeychainMethodsTitle,
     );
     expect(
       $(onDeviceKeychainsWidget).$(keychainNotFoundIndicator).$(Text).text,
-      T.get('No Catalyst Keychain found on this device.'),
+      (await t()).recoverKeychainMethodsNoKeychainFound,
     );
     expect(
       $(recoverKeychainMethodsSubtitleKey).text,
-      T.get('Not to worry, in the next step you can choose the recovery '
-          'option that applies to you for this device!'),
+      (await t()).recoverKeychainMethodsSubtitle,
     );
     expect(
       $(recoverKeychainMethodsListTitleKey).text,
-      T.get('How do you want Restore your Catalyst Keychain?'),
+      (await t()).recoverKeychainMethodsListTitle,
     );
     expect(
       $(registrationTileTitle).text,
-      T.get('Restore/Upload with 12-word seed phrase'),
+      (await t()).recoverWithSeedPhrase12Words,
     );
   }
 
   Future<void> verifyInfoPanel() async {
     expect(
       await infoPartHeaderTitleText(),
-      T.get('Restore Catalyst keychain'),
+      (await t()).recoverCatalystKeychain,
     );
     expect(infoPartTaskPicture(), findsOneWidget);
-    expect(
-      infoPartLearnMoreText(),
-      T.get('Learn More'),
-    );
+    expect(infoPartLearnMoreText(), (await t()).learnMore);
   }
 }

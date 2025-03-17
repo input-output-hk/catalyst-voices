@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
-import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_blocs/src/registration/cubits/base_profile_cubit.dart';
 import 'package:catalyst_voices_blocs/src/registration/cubits/keychain_creation_cubit.dart';
@@ -28,8 +27,9 @@ final class RegistrationCubit extends Cubit<RegistrationState>
   final UserService _userService;
   final RegistrationService _registrationService;
   final RegistrationProgressNotifier _progressNotifier;
+  final BlockchainConfig _blockchainConfig;
 
-  Bip32Ed25519XPrivateKey? _masterKey;
+  CatalystPrivateKey? _masterKey;
   Transaction? _transaction;
 
   RegistrationCubit({
@@ -37,9 +37,11 @@ final class RegistrationCubit extends Cubit<RegistrationState>
     required UserService userService,
     required RegistrationService registrationService,
     required RegistrationProgressNotifier progressNotifier,
+    required BlockchainConfig blockchainConfig,
   })  : _registrationService = registrationService,
         _userService = userService,
         _progressNotifier = progressNotifier,
+        _blockchainConfig = blockchainConfig,
         _baseProfileCubit = BaseProfileCubit(),
         _keychainCreationCubit = KeychainCreationCubit(
           downloaderService: downloaderService,
@@ -99,6 +101,7 @@ final class RegistrationCubit extends Cubit<RegistrationState>
     _keychainCreationCubit.close();
     _walletLinkCubit.close();
     _recoverCubit.close();
+    _masterKey?.drop();
     return super.close();
   }
 
@@ -142,17 +145,18 @@ final class RegistrationCubit extends Cubit<RegistrationState>
       final wallet = _walletLinkCubit.selectedWallet!;
       final roles = _walletLinkCubit.roles;
 
-      final masterKey =
-          await _registrationService.deriveMasterKey(seedPhrase: seedPhrase);
+      final masterKey = await _registrationService.deriveMasterKey(
+        seedPhrase: seedPhrase,
+      );
 
       final transaction = await _registrationService.prepareRegistration(
         wallet: wallet,
-        // TODO(dtscalac): inject the networkId
-        networkId: NetworkId.testnet,
+        networkId: _blockchainConfig.networkId,
         masterKey: masterKey,
         roles: roles,
       );
 
+      _masterKey?.drop();
       _masterKey = masterKey;
       _transaction = transaction;
 

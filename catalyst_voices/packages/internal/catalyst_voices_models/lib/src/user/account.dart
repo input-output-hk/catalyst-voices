@@ -15,35 +15,12 @@ final class Account extends Equatable {
     'erase bacon tone install universe',
   );
 
-  /// base64 role0 key looks like
-  ///
-  /// ```md
-  /// kid.catalyst-rbac://cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE/0/0
-  /// ```
-  ///
-  /// 'kid.catalyst-rbac://' part is common so it can be skipped while building
-  /// catalystId.
-  ///
-  /// Examples:
-  /// ```md
-  /// username@cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE
-  /// cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE
-  /// preprod.cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE
-  /// testnet.midnight/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE
-  /// ```
   /* cSpell:enable */
-  // TODO(damian-molinski): this should be an URI
-  // https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/rbac_id_uri/catalyst-id-uri/
-  final String catalystId;
 
-  // TODO(damian-molinski): Extract from catalystId. Make nullable
-  final String displayName;
+  final CatalystId catalystId;
   final String email;
-
   final Keychain keychain;
-
   final Set<AccountRole> roles;
-
   final WalletInfo walletInfo;
 
   /// Whether this account is being used.
@@ -56,7 +33,6 @@ final class Account extends Equatable {
 
   const Account({
     required this.catalystId,
-    required this.displayName,
     required this.email,
     required this.keychain,
     required this.roles,
@@ -66,12 +42,12 @@ final class Account extends Equatable {
   });
 
   factory Account.dummy({
+    required CatalystId catalystId,
     required Keychain keychain,
     bool isActive = false,
   }) {
     return Account(
-      catalystId: 'cardano/${keychain.id}',
-      displayName: 'Dummy',
+      catalystId: catalystId,
       email: 'dummy@iohk.com',
       keychain: keychain,
       roles: const {
@@ -93,14 +69,13 @@ final class Account extends Equatable {
     );
   }
 
-  bool get isAdmin => true;
+  bool get isAdmin => false;
 
   bool get isDummy => keychain.id == dummyKeychainId;
 
   @override
   List<Object?> get props => [
         catalystId,
-        displayName,
         email,
         keychain.id,
         roles,
@@ -117,9 +92,10 @@ final class Account extends Equatable {
     /* cSpell:enable */
   }
 
+  String? get username => catalystId.username;
+
   Account copyWith({
-    String? catalystId,
-    String? displayName,
+    CatalystId? catalystId,
     String? email,
     Keychain? keychain,
     Set<AccountRole>? roles,
@@ -129,7 +105,6 @@ final class Account extends Equatable {
   }) {
     return Account(
       catalystId: catalystId ?? this.catalystId,
-      displayName: displayName ?? this.displayName,
       email: email ?? this.email,
       keychain: keychain ?? this.keychain,
       roles: roles ?? this.roles,

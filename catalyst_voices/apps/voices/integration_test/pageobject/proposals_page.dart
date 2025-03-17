@@ -68,50 +68,69 @@ class ProposalsPage {
   }
 
   Future<void> navigationBackButtonIsVisible() async {
-    expect($(CommonPage($).navigationBackBtn).$(Text).text, T.get('Back'));
+    expect($(CommonPage($).navigationBackBtn).$(Text).text, (await t()).back);
+  }
+
+  Future<void> clickBackButton() async {
+    await $(CommonPage($).navigationBackBtn).tap();
   }
 
   Future<void> currentCampaignDetailsLooksAsExpected() async {
     expect(
-      $(currentCampaignTitle).text?.startsWith(T.get('Catalyst Fund ')),
+      $(currentCampaignTitle).text?.startsWith('Catalyst Fund '),
       true,
     );
     expect($(currentCampaignDescription).text, isNotEmpty);
-    expect($(campaignDetailsButton).$(Text).text, T.get('Campaign Details'));
+    expect($(campaignDetailsButton).$(Text).text, (await t()).campaignDetails);
   }
 
   Future<void> proposalsTabsLookAsExpected() async {
     expect(
-      $(allProposalsTab).$(Text).text?.startsWith(T.get('All (')),
+      $(allProposalsTab)
+          .$(Text)
+          .text
+          ?.startsWith((await t()).noOfAll(0).split('(')[0]),
       true,
     );
     expect(
-      $(draftProposalsTab).$(Text).text?.startsWith(T.get('Draft proposals (')),
+      $(draftProposalsTab)
+          .$(Text)
+          .text
+          ?.startsWith((await t()).noOfDraft(0).split('(')[0]),
       true,
     );
     expect(
-      $(finalProposalsTab).$(Text).text?.startsWith(T.get('Final proposals (')),
+      $(finalProposalsTab)
+          .$(Text)
+          .text
+          ?.startsWith((await t()).noOfFinal(0).split('(')[0]),
       true,
     );
     expect(
-      $(favoriteProposalsTab).$(Text).text?.startsWith(T.get('Favorites (')),
+      $(favoriteProposalsTab)
+          .$(Text)
+          .text
+          ?.startsWith((await t()).noOfFavorites(0).split('(')[0]),
       true,
     );
     expect(
-      $(myProposalsTab).$(Text).text?.startsWith(T.get('My proposals (')),
+      $(myProposalsTab)
+          .$(Text)
+          .text
+          ?.startsWith((await t()).noOfMyProposals(0).split('(')[0]),
       true,
     );
   }
 
   Future<void> changeCategoriesBtnLooksAsExpected() async {
-    expect($(categorySelectorLabel).text, T.get('Category'));
-    expect($(categorySelectorValue).text, T.get('Show All'));
+    expect($(categorySelectorLabel).text, (await t()).category);
+    expect($(categorySelectorValue).text, (await t()).showAll);
   }
 
   Future<void> searchFieldLooksAsExpected() async {
     final searchHintText =
         $.tester.widget<SearchTextField>($(searchProposalsField)).hintText;
-    expect(searchHintText, T.get('Search Proposals'));
+    expect(searchHintText, (await t()).searchProposals);
   }
 
   Future<void> proposalCardsLookAsExpected() async {
@@ -141,7 +160,8 @@ class ProposalsPage {
         .length;
     expect(proposalsCount, int.parse(proposalsDisplayedCount!));
     expect(
-      paginationText?.indexOf(T.get('proposals')),
+      // TODO(oldgreg): Fix this with translations after #2027 is done
+      paginationText?.indexOf('proposals'),
       greaterThanOrEqualTo(1),
     );
     expect(proposalsDisplayedCount, proposalsCount.toString());
@@ -157,33 +177,33 @@ class ProposalsPage {
 
   Future<void> campaignDetailsScreenLooksAsExpected() async {
     await $(campaignDetailsButton).tap();
-    expect($(titleLabelText).text, T.get('Campaign'));
+    expect($(titleLabelText).text, (await t()).campaign);
     expect($(titleText).text, isNotEmpty);
-    expect($(campaignDetailsTitleLabel).text, T.get('Campaign Details'));
+    expect($(campaignDetailsTitleLabel).text, (await t()).campaignDetails);
     expect($(campaignDetailsTile).$(animatedExpandChevron), findsOneWidget);
-    expect($(descriptionTileKey).text, T.get('Description'));
+    expect($(descriptionTileKey).text, (await t()).description);
     expect($(descriptionTextKey).text, isNotEmpty);
-    expect($(startDateTileKey).$(title).text, T.get('Start Date'));
+    expect($(startDateTileKey).$(title).text, (await t()).startDate);
     expect($(startDateTileKey).$(subtitle).text, isNotEmpty);
     expect(
       int.parse($(startDateTileKey).$(value).text!),
       inInclusiveRange(0, 31),
     );
     expect($(startDateTileKey).$(suffix).text, isNotEmpty);
-    expect($(endDateTileKey).$(title).text, T.get('End Date'));
+    expect($(endDateTileKey).$(title).text, (await t()).endDate);
     expect($(endDateTileKey).$(subtitle).text, isNotEmpty);
     expect(
       int.parse($(endDateTileKey).$(value).text!),
       inInclusiveRange(0, 31),
     );
     expect($(endDateTileKey).$(suffix).text, isNotEmpty);
-    expect($(categoriesTileKey).$(title).text, T.get('Categories'));
+    expect($(categoriesTileKey).$(title).text, (await t()).categories);
     expect($(categoriesTileKey).$(subtitle).text, isNotEmpty);
     expect(
       int.parse($(categoriesTileKey).$(value).text!),
       inInclusiveRange(0, 31),
     );
-    expect($(proposalsTileKey).$(title).text, T.get('Proposals'));
+    expect($(proposalsTileKey).$(title).text, (await t()).proposals);
     expect($(proposalsTileKey).$(subtitle).text, isNotEmpty);
     expect(
       int.parse($(proposalsTileKey).$(value).text!),
@@ -191,10 +211,9 @@ class ProposalsPage {
     );
     expect(
       $(campaignCategoriesTitleLabel).text,
-      T.get('Campaign'
-          ' Categories'),
+      (await t()).campaignCategories,
     );
-    expect($(cardanoUseCasesLabel).text, T.get('Cardano Use Cases'));
+    expect($(cardanoUseCasesLabel).text, (await t()).cardanoUseCases);
     final useCasesItemsCount = $.tester
         .widgetList<InkWell>(
           $(campaignCategoriesMenu).$(InkWell),
@@ -202,6 +221,7 @@ class ProposalsPage {
         .length;
     for (var i = 1; i <= useCasesItemsCount; i++) {
       final item = $(Key('VoicesModalMenu[$i]Key')).$(Text);
+      await item.scrollTo();
       await $(item).tap();
       expect(
         item.text,
@@ -238,7 +258,7 @@ class ProposalsPage {
       await $(#ProposalStage).at(cardIndex).scrollTo();
       expect(
         $(#ProposalStage).at(cardIndex).text,
-        T.get(expectedStage),
+        expectedStage,
       );
     }
   }
@@ -332,10 +352,8 @@ class ProposalsPage {
         .at(proposalNumber)
         .$(MostRecentSection($).shareButton)
         .tap();
-    expect(
-      $(shareProposalDialog).$(title).text,
-      T.get('Share Proposal'),
-    );
+    final textToMatch = (await t()).shareType((await t()).proposal);
+    expect($(shareProposalDialog).$(title).text, textToMatch);
     for (var i = 0; i < 5; i++) {
       expect(
         $(shareProposalDialog).$(shareItem).at(i).$(itemIcon),

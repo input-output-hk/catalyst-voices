@@ -67,11 +67,13 @@ class VoicesAlertDialog extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.only(top: 10, bottom: 16),
               child: Column(
+                key: const Key('VoicesAlertDialog'),
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   if (title != null || isDismissible)
                     Row(
+                      key: const Key('VoicesAlertDialogTitleRow'),
                       children: [
                         // if widget is dismissible then show an invisible
                         // close button to reserve space on this side of the
@@ -111,6 +113,7 @@ class VoicesAlertDialog extends StatelessWidget {
                         right: 20,
                       ),
                       child: DefaultTextStyle(
+                        key: const Key('VoicesAlertDialogSubtitle'),
                         style: Theme.of(context).textTheme.titleSmall!,
                         textAlign: TextAlign.center,
                         child: subtitle,
@@ -157,6 +160,7 @@ class _CloseButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return XButton(
+      key: const Key('VoicesAlertDialogCloseButton'),
       onTap: () => Navigator.of(context).pop(),
     );
   }

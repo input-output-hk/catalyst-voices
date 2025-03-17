@@ -26,6 +26,7 @@ class MenuSegmentsItemTile<T extends Object> extends StatelessWidget {
     final onChanged = this.onChanged;
 
     return Container(
+      key: const Key('segmentedButtonContainer'),
       constraints: const BoxConstraints.tightFor(height: 48),
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Row(

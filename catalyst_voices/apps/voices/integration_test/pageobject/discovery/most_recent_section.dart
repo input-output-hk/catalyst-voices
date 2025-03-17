@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:patrol_finders/patrol_finders.dart';
 
 import '../../utils/translations_utils.dart';
+import '../discovery_page.dart';
 
 class MostRecentSection {
   MostRecentSection(this.$);
@@ -32,7 +33,7 @@ class MostRecentSection {
 
   Future<void> titleIsRenderedCorrectly() async {
     await $(mostRecentProposalsTitle).scrollTo();
-    expect($(mostRecentProposalsTitle).text, T.get('Most Recent'));
+    expect($(mostRecentProposalsTitle).text, (await t()).mostRecent);
   }
 
   Future<void> recentProposalsAreRenderedCorrectly() async {
@@ -58,7 +59,7 @@ class MostRecentSection {
     );
     expect(
       $(mostRecentProposals).$(viewAllProposalsButton).text,
-      T.get('View All Proposals'),
+      (await t()).viewAllProposals,
     );
   }
 
@@ -102,7 +103,7 @@ class MostRecentSection {
           .$(fundsRequested)
           .$(title)
           .text,
-      T.get('Funds requested'),
+      (await t()).fundsRequested,
     );
     expect(
       $(parentContainer)
@@ -120,7 +121,7 @@ class MostRecentSection {
           .$(duration)
           .$(title)
           .text,
-      T.get('Duration'),
+      (await t()).duration,
     );
     expect(
       $(parentContainer)
@@ -157,18 +158,6 @@ class MostRecentSection {
     );
   }
 
-  Future<bool> loadingErrorIsVisible() async {
-    try {
-      return $(mostRecentLoadingError).$(#ErrorRetryBtn).visible;
-    } catch (e) {
-      return false;
-    }
-  }
-
-  Future<void> loadingErrorClick() async {
-    await $(mostRecentLoadingError).$(#ErrorRetryBtn).tap();
-  }
-
   Future<void> tryToScrollToRetryError() async {
     try {
       await $(mostRecentLoadingError)
@@ -179,27 +168,9 @@ class MostRecentSection {
     }
   }
 
-  Future<void> loadRetryOnError() async {
-    await tryToScrollToRetryError();
-    if (await loadingErrorIsVisible()) {
-      var i = 0;
-      for (i = 0; i < 9; i++) {
-        await loadingErrorClick();
-        await Future<void>.delayed(const Duration(seconds: 5));
-        if (!(await loadingErrorIsVisible())) {
-          break;
-        }
-      }
-      expect(
-        await loadingErrorIsVisible(),
-        false,
-        reason: 'Max ${i - 1} retries exceeded',
-      );
-    }
-  }
-
   Future<void> looksAsExpectedForVisitor() async {
-    await loadRetryOnError();
+    await tryToScrollToRetryError();
+    await DiscoveryPage($).loadRetryOnError(mostRecentLoadingError);
     await titleIsRenderedCorrectly();
     await recentProposalsAreRenderedCorrectly();
   }

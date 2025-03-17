@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 
 class GreyOutContainer extends StatelessWidget {
   final bool greyOut;
+  final double greyOutOpacity;
   final Widget child;
 
   const GreyOutContainer({
     super.key,
     this.greyOut = true,
+    this.greyOutOpacity = 0.5,
     required this.child,
   });
 
@@ -15,7 +17,7 @@ class GreyOutContainer extends StatelessWidget {
     return IgnorePointer(
       ignoring: greyOut,
       child: Opacity(
-        opacity: greyOut ? 0.5 : 1,
+        opacity: greyOut ? greyOutOpacity : 1,
         child: child,
       ),
     );

@@ -9,6 +9,7 @@ use std::{
 
 use anyhow::{anyhow, Context, Result};
 use base64::{prelude::BASE64_URL_SAFE_NO_PAD, Engine};
+use cardano_blockchain_types::Network;
 use catalyst_types::id_uri::IdUri;
 use chrono::{TimeDelta, Utc};
 use ed25519_dalek::{ed25519::signature::Signer, Signature, SigningKey, VerifyingKey};
@@ -22,6 +23,11 @@ use ed25519_dalek::{ed25519::signature::Signer, Signature, SigningKey, Verifying
 pub(crate) struct CatalystRBACTokenV1 {
     /// A Catalyst identifier.
     catalyst_id: IdUri,
+    /// A network value.
+    ///
+    /// The network value is contained in the Catalyst ID and can be accessed from it, but
+    /// it is a string, so we convert it to this enum during the validation.
+    network: Network,
     /// Ed25519 Signature of the Token
     signature: Signature,
     /// Raw bytes of the token without the signature.
@@ -37,16 +43,18 @@ impl CatalystRBACTokenV1 {
     #[allow(dead_code)]
     pub(crate) fn new(
         network: &str, subnet: Option<&str>, role0_pk: VerifyingKey, sk: &SigningKey,
-    ) -> Self {
+    ) -> Result<Self> {
         let catalyst_id = IdUri::new(network, subnet, role0_pk).with_nonce().as_id();
+        let network = convert_network(&catalyst_id.network())?;
         let raw = as_raw_bytes(&catalyst_id.to_string());
         let signature = sk.sign(&raw);
 
-        Self {
+        Ok(Self {
             catalyst_id,
+            network,
             signature,
             raw,
-        }
+        })
     }
 
     /// Parses a token from the given string.
@@ -87,10 +95,11 @@ impl CatalystRBACTokenV1 {
         if catalyst_id.nonce().is_none() {
             return Err(anyhow!("Catalyst ID must have nonce"));
         }
-        is_network_supported(&catalyst_id.network())?;
+        let network = convert_network(&catalyst_id.network())?;
 
         Ok(Self {
             catalyst_id,
+            network,
             signature,
             raw,
         })
@@ -135,6 +144,11 @@ impl CatalystRBACTokenV1 {
     pub(crate) fn catalyst_id(&self) -> &IdUri {
         &self.catalyst_id
     }
+
+    /// Returns a network.
+    pub(crate) fn network(&self) -> Network {
+        self.network
+    }
 }
 
 impl From<CatalystRBACTokenV1> for IdUri {
@@ -166,17 +180,17 @@ fn as_raw_bytes(token: &str) -> Vec<u8> {
 }
 
 /// Checks if the given network is supported.
-fn is_network_supported((network, subnet): &(String, Option<String>)) -> Result<()> {
+fn convert_network((network, subnet): &(String, Option<String>)) -> Result<Network> {
     if network != "cardano" {
         return Err(anyhow!("Unsupported network: {network}"));
     }
 
-    let subnet = subnet.as_deref();
-    if subnet != Some("mainnet") && subnet != Some("preprod") {
-        return Err(anyhow!("Unsupported subnet: {subnet:?}"));
+    match subnet.as_deref() {
+        Some("mainnet") => Ok(Network::Mainnet),
+        Some("preprod") => Ok(Network::Preprod),
+        Some("preview") => Ok(Network::Preview),
+        _ => Err(anyhow!("Unsupported network: {network}")),
     }
-
-    Ok(())
 }
 
 #[cfg(test)]
@@ -193,7 +207,8 @@ mod tests {
         let signing_key: SigningKey = SigningKey::generate(&mut seed);
         let verifying_key = signing_key.verifying_key();
         let token =
-            CatalystRBACTokenV1::new("cardano", Some("preprod"), verifying_key, &signing_key);
+            CatalystRBACTokenV1::new("cardano", Some("preprod"), verifying_key, &signing_key)
+                .unwrap();
         assert_eq!(token.catalyst_id().username(), None);
         assert!(token.catalyst_id().nonce().is_some());
         assert_eq!(
@@ -226,7 +241,8 @@ mod tests {
         let signing_key: SigningKey = SigningKey::generate(&mut seed);
         let verifying_key = signing_key.verifying_key();
         let mut token =
-            CatalystRBACTokenV1::new("cardano", Some("preprod"), verifying_key, &signing_key);
+            CatalystRBACTokenV1::new("cardano", Some("preprod"), verifying_key, &signing_key)
+                .unwrap();
 
         // Update the token timestamp to be two seconds in the past.
         let now = Utc::now();
@@ -263,7 +279,8 @@ mod tests {
         let signing_key: SigningKey = SigningKey::generate(&mut seed);
         let verifying_key = signing_key.verifying_key();
         let token =
-            CatalystRBACTokenV1::new("cardano", Some("preprod"), verifying_key, &signing_key);
+            CatalystRBACTokenV1::new("cardano", Some("preprod"), verifying_key, &signing_key)
+                .unwrap();
         token.verify(&verifying_key).unwrap();
     }
 }

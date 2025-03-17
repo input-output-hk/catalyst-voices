@@ -5,7 +5,6 @@ import 'package:catalyst_voices/widgets/cards/proposal_card_widgets.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/share_proposal_dialog.dart';
 import 'package:catalyst_voices/widgets/text/day_month_time_text.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
-import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -49,9 +48,9 @@ class _Author extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          VoicesAvatar(
+          ProfileAvatar(
             key: const Key('AuthorAvatar'),
-            icon: Text(author[0]),
+            username: author,
             backgroundColor: context.colors.primaryContainer,
             foregroundColor: context.colors.textOnPrimaryWhite,
           ),
@@ -349,14 +348,8 @@ class _ProposalInfo extends StatelessWidget {
           ),
         ],
         const Spacer(),
-        VoicesChip.rectangular(
-          backgroundColor: context.colors.elevationsOnSurfaceNeutralLv1Grey,
-          leading: VoicesAssets.icons.chatAlt2.buildIcon(),
-          content: Text(
-            key: const Key('CommentsCount'),
-            version.toString(),
-            style: context.textTheme.labelLarge,
-          ),
+        ProposalCommentsChip(
+          commentsCount: commentsCount,
         ),
       ],
     );
@@ -423,6 +416,7 @@ class _Topbar extends StatelessWidget {
           FavoriteButton(
             key: const Key('FavoriteBtn'),
             circle: false,
+            isFavorite: isFavorite,
             onChanged: onFavoriteChanged,
           ),
         ],

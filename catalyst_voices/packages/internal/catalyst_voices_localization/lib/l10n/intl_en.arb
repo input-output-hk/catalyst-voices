@@ -992,9 +992,9 @@
   "recoverKeychainNonFound": "No Catalyst Keychain found\u2028on this device.",
   "recoverKeychainFound": "Keychain found!  \u2028Please unlock your device.",
   "recoverWithSeedPhrase12Words": "Restore/Upload with 12-word seed phrase",
-  "recoverySeedPhraseInstructionsTitle": "Restore your Catalyst Keychain with \u2028your 12-word Catalyst seed phrase",
+  "recoverySeedPhraseInstructionsTitle": "Restore your Catalyst Keychain with \nyour 12-word Catalyst seed phrase",
   "recoverySeedPhraseInstructionsSubtitle": "Enter your security words in the correct order, and sign into your Catalyst account on a new device.",
-  "recoverySeedPhraseInputTitle": "Restore your Catalyst Keychain with \u2028your 12-word Catalyst seed phrase",
+  "recoverySeedPhraseInputTitle": "Restore your Catalyst Keychain with \nyour 12-word Catalyst seed phrase",
   "recoverySeedPhraseInputSubtitle": "Enter each word of your Catalyst seed phrase in the right order to bring your Catalyst account to this device.",
   "recoveryAccountTitle": "Catalyst account recovery",
   "recoveryAccountSuccessTitle": "Keychain recovered successfully!",
@@ -1042,7 +1042,7 @@
   "@lockSnackbarMessage": {
     "description": "The message shown below the title in confirmation snackbar after locking the keychain."
   },
-  "recoverySuccessTitle": "Congratulations your Catalyst \u2028Keychain is restored!",
+  "recoverySuccessTitle": "Congratulations your Catalyst \nKeychain is restored!",
   "recoverySuccessSubtitle": "You have successfully restored your Catalyst Keychain, and unlocked Catalyst Voices on this device.",
   "recoverySuccessGoToDashboard": "Jump into the Discovery space / Dashboard",
   "recoverySuccessGoAccount": "Check my account",
@@ -1360,10 +1360,6 @@
   "@errorValidationListItemsNotUnique": {
     "description": "The list items must be unique."
   },
-  "noTagSelected": "No Tag Selected",
-  "@noTagSelected": {
-    "description": "For example in context of document builder"
-  },
   "errorValidationConstValueMismatch": "The value must be \"{constValue}\".",
   "@errorValidationConstValueMismatch": {
     "description": "Validation error when the user entered value does not match the const value",
@@ -1385,6 +1381,14 @@
   "errorValidationPatternMismatch": "The value does not match the valid pattern.",
   "@errorValidationPatternMismatch": {
     "description": "Validation error when the user entered value does not match the pattern"
+  },
+  "errorValidationStringEmpty": "The text cannot be empty.",
+  "@errorValidationStringEmpty": {
+    "description": "Validation error when the user entered text is empty"
+  },
+  "noTagSelected": "No Tag Selected",
+  "@noTagSelected": {
+    "description": "For example in context of document builder"
   },
   "singleGroupedTagSelectorTitle": "Please choose the most relevant category group and tag related to the outcomes of your proposal",
   "singleGroupedTagSelectorRelevantTag": "Select the most relevant tag",
@@ -1738,6 +1742,57 @@
   "@proposalImportDialogDescription": {
     "description": "The description of the dialog to import a proposal."
   },
+  "spaces": "Spaces",
+  "@spaces": {
+    "description": "The title of the tile that shows the list of spaces."
+  },
+  "opportunities": "Opportunities",
+  "@opportunities": {
+    "description": "The title of the tile that shows the list of opportunities."
+  },
+  "discoveryHomepage": "Discovery Homepage",
+  "@discoveryHomepage": {
+    "description": "Title for tile in overall spaces page to go to discovery page"
+  },
+  "feedbackOnProposals": "Feedback on Proposals",
+  "@feedbackOnProposals": {
+    "description": "Title for tile in overall spaces page to go to proposals list page"
+  },
+  "browseMyProposals": "Browse all my proposals",
+  "@browseMyProposals": {
+    "description": "Title for tile in workspace space page to go to proposals page"
+  },
+  "notPublishedProposals": "Not published proposals",
+  "@notPublishedProposals": {
+    "description": "Title for section to show not published proposals"
+  },
+  "newIterationTitle": "Iteration {iteration} · Not published - {datetime} - {title}",
+  "@newIterationTitle": {
+    "description": "Title for new iteration card",
+    "placeholders": {
+      "iteration": {
+        "type": "int"
+      },
+      "datetime": {
+        "type": "String"
+      },
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "noPublishedProposalsOnMaxCount": "Published Proposals ({current}/{max})",
+  "@noPublishedProposalsOnMaxCount": {
+    "description": "Title for section to show number of published proposals out of max proposals",
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
   "nrOfIteration": "Iteration {nr}",
   "@nrOfIteration": {
     "description": "In context of which version of document is presented",
@@ -1782,6 +1837,59 @@
   "valueMilestones": "{count} {count, plural, =0{Milestones} =1{Milestone} other{Milestones}}",
   "@valueMilestones": {
     "description": "In context of proposal. How many milestones there is",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "notFoundError": "The requested data could not be found. Try different search.",
+  "@notFoundError": {
+    "description": "Error message when user tries to access resourse that does not exist."
+  },
+  "title": "Title",
+  "@title": {
+    "description": "description of the title field"
+  },
+  "required": "Required",
+  "@required": {
+    "description": "description of the required field"
+  },
+  "selectedCategory": "Selected category",
+  "@selectedCategory": {
+    "description": "description of the selected category field"
+  },
+  "jumpToCampaignCategory": "Jump to campaign category",
+  "@jumpToCampaignCategory": {
+    "description": "description of the button that takes to campaign category page"
+  },
+  "saveDraft": "Save draft",
+  "@saveDraft": {
+    "description": "description of the button that saves the draft"
+  },
+  "openInEditor": "Open in editor",
+  "@openInEditor": {
+    "description": "description of the button that opens the proposal in editor"
+  },
+  "latestDocumentVersion": "Latest",
+  "@latestDocumentVersion": {
+    "description": "When showing different version of proposal we may add suffix indicating this is latest version"
+  },
+  "viewingOlderDocumentVersion": "You are viewing an older iteration of this proposal",
+  "@viewingOlderDocumentVersion": {
+    "description": "After changing document version warning"
+  },
+  "viewLatestDocumentVersion": "View Latest",
+  "@viewLatestDocumentVersion": {
+    "description": "Action to change back to latest version"
+  },
+  "commentHideReplies": "Hide replies",
+  "@commentHideReplies": {
+    "description": "Hide comment replies"
+  },
+  "commentXReplies": "{count} {count, plural, =0{replies} =1{reply} other{replies}}",
+  "@commentXReplies": {
+    "description": "Show comment replies",
     "placeholders": {
       "count": {
         "type": "int"

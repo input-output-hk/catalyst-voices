@@ -17,6 +17,7 @@ final class Proposal extends Equatable {
   final String author;
   final int commentsCount;
   final String category;
+  final SignedDocumentRef categoryId;
 
   const Proposal({
     required this.selfRef,
@@ -32,11 +33,13 @@ final class Proposal extends Equatable {
     required this.author,
     required this.commentsCount,
     required this.category,
+    required this.categoryId,
   });
 
   factory Proposal.dummy(DocumentRef ref) => Proposal(
         selfRef: ref,
         category: 'Cardano Use Cases / MVP',
+        categoryId: const SignedDocumentRef(id: 'dummy_category_id'),
         title: 'Dummy Proposal',
         updateDate: DateTime.now(),
         fundsRequested: Coin.fromAda(100000),
@@ -56,7 +59,7 @@ final class Proposal extends Equatable {
       updateDate = UuidUtils.dateTime(version);
     }
     return Proposal(
-      selfRef: data.ref,
+      selfRef: data.document.metadata.selfRef,
       title: data.proposalTitle ?? '',
       description: data.proposalDescription ?? '',
       updateDate: updateDate,
@@ -69,7 +72,8 @@ final class Proposal extends Equatable {
       duration: data.proposalDuration ?? 0,
       author: data.proposalAuthor ?? '',
       commentsCount: data.commentsCount,
-      category: data.categoryId,
+      category: data.categoryId.id,
+      categoryId: data.categoryId,
     );
   }
 
@@ -84,6 +88,38 @@ final class Proposal extends Equatable {
         status,
         publish,
         category,
+        categoryId,
         commentsCount,
       ];
+
+  Proposal copyWith({
+    DocumentRef? selfRef,
+    String? title,
+    String? description,
+    DateTime? updateDate,
+    Coin? fundsRequested,
+    ProposalStatus? status,
+    ProposalPublish? publish,
+    int? commentsCount,
+    int? duration,
+    String? author,
+    int? versionCount,
+    String? category,
+    SignedDocumentRef? categoryId,
+  }) =>
+      Proposal(
+        selfRef: selfRef ?? this.selfRef,
+        title: title ?? this.title,
+        description: description ?? this.description,
+        updateDate: updateDate ?? this.updateDate,
+        fundsRequested: fundsRequested ?? this.fundsRequested,
+        status: status ?? this.status,
+        publish: publish ?? this.publish,
+        commentsCount: commentsCount ?? this.commentsCount,
+        duration: duration ?? this.duration,
+        author: author ?? this.author,
+        versionCount: versionCount ?? this.versionCount,
+        category: category ?? this.category,
+        categoryId: categoryId ?? this.categoryId,
+      );
 }
