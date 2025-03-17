@@ -11,14 +11,23 @@ import 'package:uuid/uuid.dart';
 void main() {
   late MockDocumentRepository mockDocumentRepository;
   late MockProposalRepository mockProposalRepository;
+  late MockUserService mockUserService;
+  late MockKeyDerivationService mockKeyDerivationService;
+
   late ProposalService proposalService;
 
   setUp(() {
     mockDocumentRepository = MockDocumentRepository();
     mockProposalRepository = MockProposalRepository();
+    mockKeyDerivationService = MockKeyDerivationService();
+    mockUserService = MockUserService();
 
-    proposalService =
-        ProposalService(mockProposalRepository, mockDocumentRepository);
+    proposalService = ProposalService(
+      mockProposalRepository,
+      mockDocumentRepository,
+      mockUserService,
+      mockKeyDerivationService,
+    );
 
     registerFallbackValue(const SignedDocumentRef(id: 'fallback-id'));
 
@@ -211,4 +220,8 @@ void main() {
 
 class MockDocumentRepository extends Mock implements DocumentRepository {}
 
+class MockKeyDerivationService extends Mock implements KeyDerivationService {}
+
 class MockProposalRepository extends Mock implements ProposalRepository {}
+
+class MockUserService extends Mock implements UserService {}

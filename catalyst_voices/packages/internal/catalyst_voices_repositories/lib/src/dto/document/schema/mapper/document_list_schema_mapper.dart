@@ -17,7 +17,7 @@ enum _DocumentArrayDefinition {
 
   factory _DocumentArrayDefinition.fromDef(String? def) {
     for (final value in values) {
-      if (value.def.toLowerCase() == def?.toLowerCase()) {
+      if (value.def.equalsIgnoreCase(def)) {
         return value;
       }
     }

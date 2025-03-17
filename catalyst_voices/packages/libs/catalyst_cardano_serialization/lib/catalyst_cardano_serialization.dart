@@ -7,7 +7,6 @@ export 'src/datum.dart';
 export 'src/exceptions.dart';
 export 'src/fees.dart';
 export 'src/hashes.dart';
-export 'src/rbac/auth_token.dart';
 export 'src/rbac/registration_data.dart';
 export 'src/rbac/x509_certificate.dart';
 export 'src/rbac/x509_metadata_envelope.dart';

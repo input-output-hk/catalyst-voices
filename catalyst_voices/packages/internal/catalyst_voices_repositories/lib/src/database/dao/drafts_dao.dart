@@ -133,7 +133,11 @@ class DriftDraftsDao extends DatabaseAccessor<DriftCatalystDatabase>
     required DocumentRef ref,
     required DocumentDataContent content,
   }) async {
-    final insertable = DraftsCompanion(content: Value(content));
+    final insertable = DraftsCompanion(
+      content: Value(content),
+      title:
+          content.title != null ? Value(content.title!) : const Value.absent(),
+    );
     final query = update(drafts)..where((tbl) => _filterRef(tbl, ref));
 
     final updatedRows = await query.write(insertable);

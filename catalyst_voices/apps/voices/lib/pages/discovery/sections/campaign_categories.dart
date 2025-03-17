@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 class CampaignCategories extends StatelessWidget {
-  final List<CampaignCategoryViewModel> categories;
+  final List<CampaignCategoryDetailsViewModel> categories;
   final bool isLoading;
 
   const CampaignCategories(

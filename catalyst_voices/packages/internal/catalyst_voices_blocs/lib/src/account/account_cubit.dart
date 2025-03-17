@@ -21,18 +21,6 @@ final class AccountCubit extends Cubit<AccountState> {
     return super.close();
   }
 
-  Future<void> loadAccountDetails() async {
-    // TODO(damian-molinski): Integration
-  }
-
-  Future<void> updateDisplayName(DisplayName value) async {
-    // TODO(damian-molinski): Integration
-  }
-
-  Future<void> updateEmail(Email value) async {
-    // TODO(damian-molinski): Integration
-  }
-
   Future<void> deleteActiveKeychain() async {
     final account = _userService.user.activeAccount;
     if (account != null) {
@@ -40,8 +28,17 @@ final class AccountCubit extends Cubit<AccountState> {
     }
   }
 
+  Future<void> loadAccountDetails() async {
+    // TODO(damian-molinski): Integration
+  }
+
+  Future<void> updateEmail(Email value) async {
+    // TODO(damian-molinski): Integration
+  }
+
   static AccountState _buildState({Account? from}) {
     final roles = from?.roles ?? const {};
+    final catalystId = from?.catalystId;
 
     final accountRolesItems = AccountRole.values
         .where((role) => !role.isHidden)
@@ -55,8 +52,8 @@ final class AccountCubit extends Cubit<AccountState> {
 
     return AccountState(
       status: const AccountFinalized(),
-      catalystId: from?.catalystId ?? '',
-      displayName: DisplayName.pure(from?.displayName ?? ''),
+      catalystId: catalystId,
+      displayName: DisplayName.pure(catalystId?.username ?? ''),
       email: Email.pure(from?.email ?? ''),
       roles: AccountRolesState(
         items: accountRolesItems,

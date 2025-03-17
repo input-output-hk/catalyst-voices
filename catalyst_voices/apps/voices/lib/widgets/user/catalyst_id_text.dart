@@ -3,20 +3,26 @@ import 'dart:async';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 const _compactMaxLength = 6;
 
 class CatalystIdText extends StatefulWidget {
-  final String data;
+  final CatalystId data;
   final bool isCompact;
+  final bool showCopy;
+  final TextStyle? style;
   final Color? backgroundColor;
 
   const CatalystIdText(
     this.data, {
     super.key,
     required this.isCompact,
+    this.showCopy = true,
+    this.style,
     this.backgroundColor,
   });
 
@@ -25,6 +31,7 @@ class CatalystIdText extends StatefulWidget {
 }
 
 class _CatalystIdTextState extends State<CatalystIdText> {
+  String _fullDataAsString = '';
   String _effectiveData = '';
   bool _tooltipVisible = false;
   bool _highlightCopied = false;
@@ -45,20 +52,23 @@ class _CatalystIdTextState extends State<CatalystIdText> {
             children: [
               Flexible(
                 child: VoicesPlainTooltip(
-                  message: widget.data,
+                  message: _fullDataAsString,
                   // Do not constraint width.
                   constraints: const BoxConstraints(),
                   child: _Chip(
                     _effectiveData,
                     onTap: _copyDataToClipboard,
+                    style: widget.style,
                     backgroundColor: widget.backgroundColor,
                   ),
                 ),
               ),
-              const SizedBox(width: 6),
-              _Copy(
-                showCheck: _highlightCopied,
-              ),
+              if (widget.showCopy) ...[
+                const SizedBox(width: 6),
+                _Copy(
+                  showCheck: _highlightCopied,
+                ),
+              ],
             ],
           ),
         ),
@@ -72,6 +82,7 @@ class _CatalystIdTextState extends State<CatalystIdText> {
 
     if (widget.data != oldWidget.data ||
         widget.isCompact != oldWidget.isCompact) {
+      _fullDataAsString = widget.data.toUri().toStringWithoutScheme();
       _effectiveData = _buildTextData();
       _tooltipVisible = _isTooltipVisible();
     }
@@ -89,12 +100,13 @@ class _CatalystIdTextState extends State<CatalystIdText> {
   void initState() {
     super.initState();
 
+    _fullDataAsString = widget.data.toUri().toStringWithoutScheme();
     _effectiveData = _buildTextData();
     _tooltipVisible = _isTooltipVisible();
   }
 
   String _buildTextData() {
-    final data = widget.data;
+    final data = _fullDataAsString;
     final isCompact = widget.isCompact;
 
     // If isCompact use last _compactMaxLength characters.
@@ -107,7 +119,7 @@ class _CatalystIdTextState extends State<CatalystIdText> {
   }
 
   Future<void> _copyDataToClipboard() async {
-    final data = ClipboardData(text: widget.data);
+    final data = ClipboardData(text: _fullDataAsString);
     await Clipboard.setData(data);
 
     if (mounted) {
@@ -129,7 +141,7 @@ class _CatalystIdTextState extends State<CatalystIdText> {
   }
 
   bool _isTooltipVisible() {
-    return widget.isCompact && _effectiveData.length < widget.data.length;
+    return widget.isCompact && _effectiveData.length < _fullDataAsString.length;
   }
 
   void _removeHighlight() {
@@ -153,10 +165,12 @@ class _Chip extends StatelessWidget {
   final String data;
   final VoidCallback onTap;
   final Color? backgroundColor;
+  final TextStyle? style;
 
   const _Chip(
     this.data, {
     required this.onTap,
+    this.style,
     this.backgroundColor,
   });
 
@@ -171,9 +185,9 @@ class _Chip extends StatelessWidget {
     final foregroundColor = colors.textOnPrimaryLevel1;
     final overlayColor = colors.onSurfaceNeutralOpaqueLv2;
 
-    final textStyle = (textTheme.bodyMedium ?? const TextStyle()).copyWith(
-      color: foregroundColor,
-    );
+    final textStyle = (textTheme.bodyMedium ?? const TextStyle())
+        .merge(style)
+        .copyWith(color: foregroundColor);
 
     return Material(
       color: backgroundColor,

@@ -3,32 +3,39 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:equatable/equatable.dart';
 
 final class ProposalViewData extends Equatable {
+  final DocumentRef? currentRef;
+  final bool? isCurrentVersionLatest;
   final ProposalViewHeader header;
   final List<Segment> segments;
-  final NodeId? activeNodeId;
 
   const ProposalViewData({
+    this.currentRef,
+    this.isCurrentVersionLatest,
     this.header = const ProposalViewHeader(),
     this.segments = const [],
-    this.activeNodeId,
   });
 
   @override
   List<Object?> get props => [
+        currentRef,
+        isCurrentVersionLatest,
         header,
         segments,
-        activeNodeId,
       ];
 
   ProposalViewData copyWith({
+    Optional<DocumentRef>? currentRef,
+    Optional<bool>? isCurrentVersionLatest,
     ProposalViewHeader? header,
     List<Segment>? segments,
-    Optional<NodeId>? activeNodeId,
   }) {
     return ProposalViewData(
+      currentRef: currentRef.dataOr(this.currentRef),
+      isCurrentVersionLatest: isCurrentVersionLatest.dataOr(
+        this.isCurrentVersionLatest,
+      ),
       header: header ?? this.header,
       segments: segments ?? this.segments,
-      activeNodeId: activeNodeId.dataOr(this.activeNodeId),
     );
   }
 }

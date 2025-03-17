@@ -1,7 +1,7 @@
 import 'package:catalyst_voices_shared/src/utils/uuid_utils.dart';
 
 extension StringExt on String {
-  String? get firstLetter => isEmpty ? null : substring(0, 1);
+  String? get first => isEmpty ? null : substring(0, 1);
 
   bool get isBlank => trim().isEmpty;
 
@@ -13,6 +13,10 @@ extension StringExt on String {
     } else {
       return '';
     }
+  }
+
+  bool equalsIgnoreCase(String? other) {
+    return toLowerCase() == other?.toLowerCase();
   }
 
   String starred({
@@ -39,6 +43,14 @@ extension UrlParser on String {
 
 extension UuidStringUtils on String {
   DateTime get dateTime => UuidUtils.dateTime(this);
+
+  DateTime? get tryDateTime {
+    try {
+      return dateTime;
+    } catch (_) {
+      return null;
+    }
+  }
 
   int get version => UuidUtils.version(this);
 }

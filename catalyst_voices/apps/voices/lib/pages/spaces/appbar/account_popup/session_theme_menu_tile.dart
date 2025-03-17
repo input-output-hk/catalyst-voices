@@ -29,6 +29,7 @@ class _SegmentsTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MenuSegmentsItemTile<ThemePreferences>(
+      key: const Key('SessionThemeMenuTile'),
       title: Text(context.l10n.theme),
       segments: (
         first: ThemePreferences.dark.asSegmentButton(context),

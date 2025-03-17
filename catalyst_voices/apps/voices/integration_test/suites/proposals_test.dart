@@ -72,7 +72,7 @@ void main() async {
       (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await ProposalsPage($).clickDraftTab();
-        await ProposalsPage($).checkProposalsStageMatch(T.get('Draft'));
+        await ProposalsPage($).checkProposalsStageMatch('Draft');
       },
     );
 
@@ -81,7 +81,7 @@ void main() async {
       (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await ProposalsPage($).clickFinalTab();
-        await ProposalsPage($).checkProposalsStageMatch(T.get('Final'));
+        await ProposalsPage($).checkProposalsStageMatch('Final');
       },
     );
 

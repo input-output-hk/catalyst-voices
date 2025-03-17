@@ -3,6 +3,17 @@ import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:flutter/material.dart';
 
+/// A builder that builds menu items for the [VoicesDrawerChooser].
+///
+/// The builder might provide a completely different widget
+/// based on [isSelected] field, which will be true if the [item]
+/// is currently selected in the [VoicesDrawerChooser].
+typedef VoicesDrawerChooserBuilder<T> = Widget Function({
+  required BuildContext context,
+  required T item,
+  required bool isSelected,
+});
+
 /// A custom [Drawer] component that implements the Voices style
 /// navigation drawer.
 ///
@@ -39,7 +50,7 @@ class VoicesDrawer extends StatelessWidget {
         ),
       ),
       child: Drawer(
-        width: 350,
+        width: 360,
         shape: const RoundedRectangleBorder(),
         child: Column(
           children: [
@@ -60,17 +71,6 @@ class VoicesDrawer extends StatelessWidget {
     );
   }
 }
-
-/// A builder that builds menu items for the [VoicesDrawerChooser].
-///
-/// The builder might provide a completely different widget
-/// based on [isSelected] field, which will be true if the [item]
-/// is currently selected in the [VoicesDrawerChooser].
-typedef VoicesDrawerChooserBuilder<T> = Widget Function({
-  required BuildContext context,
-  required T item,
-  required bool isSelected,
-});
 
 /// Displays a horizontal list of [items] built by [itemBuilder]
 /// with left and right chevrons that select previous/next items.
@@ -106,6 +106,8 @@ class VoicesDrawerChooser<T> extends StatelessWidget {
     required this.itemBuilder,
     this.leading,
   });
+
+  int get _selectedIndex => items.indexOf(selectedItem);
 
   @override
   Widget build(BuildContext context) {
@@ -146,16 +148,14 @@ class VoicesDrawerChooser<T> extends StatelessWidget {
     );
   }
 
-  int get _selectedIndex => items.indexOf(selectedItem);
+  void _onSelectNext() {
+    final next = _selectedIndex + 1;
+    onSelected(items[next]);
+  }
 
   void _onSelectPrevious() {
     final previous = _selectedIndex - 1;
     onSelected(items[previous]);
-  }
-
-  void _onSelectNext() {
-    final next = _selectedIndex + 1;
-    onSelected(items[next]);
   }
 }
 

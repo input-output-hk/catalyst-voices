@@ -8,7 +8,7 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 class CategoryDetailView extends StatelessWidget {
-  final CampaignCategoryViewModel category;
+  final CampaignCategoryDetailsViewModel category;
 
   const CategoryDetailView({
     super.key,
@@ -44,6 +44,20 @@ class CategoryDetailView extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _BodyText extends StatelessWidget {
+  final String value;
+
+  const _BodyText(this.value);
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      value,
+      style: context.textTheme.bodyMedium,
     );
   }
 }
@@ -128,20 +142,6 @@ class _Header extends StatelessWidget {
       value,
       style: context.textTheme.titleLarge
           ?.copyWith(color: context.colors.textOnPrimaryLevel1),
-    );
-  }
-}
-
-class _BodyText extends StatelessWidget {
-  final String value;
-
-  const _BodyText(this.value);
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      value,
-      style: context.textTheme.bodyMedium,
     );
   }
 }

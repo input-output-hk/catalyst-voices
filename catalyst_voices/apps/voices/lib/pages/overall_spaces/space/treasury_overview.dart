@@ -39,14 +39,14 @@ class TreasuryOverview extends StatelessWidget {
           VoicesDivider(indent: 0, endIndent: 0, height: 16),
           SectionHeader(title: Text('Public campaigns')),
           VoicesNavTile(
-            name: 'Fund 14',
+            name: 'Fund14',
             status: ProposalStatus.live,
             trailing: MoreOptionsButton(),
           ),
           VoicesDivider(indent: 0, endIndent: 0, height: 16),
           SectionHeader(title: Text('Completed campaigns')),
           VoicesNavTile(
-            name: 'Fund 15',
+            name: 'Fund15',
             status: ProposalStatus.completed,
             trailing: MoreOptionsButton(),
           ),

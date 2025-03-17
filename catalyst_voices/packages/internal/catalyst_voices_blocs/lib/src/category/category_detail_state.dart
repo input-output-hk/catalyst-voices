@@ -3,8 +3,8 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:equatable/equatable.dart';
 
 class CategoryDetailState extends Equatable {
-  final CampaignCategoryViewModel? category;
-  final List<CampaignCategoryViewModel> categories;
+  final CampaignCategoryDetailsViewModel? category;
+  final List<CampaignCategoryDetailsViewModel> categories;
   final bool isLoading;
   final LocalizedException? error;
 
@@ -15,9 +15,17 @@ class CategoryDetailState extends Equatable {
     this.error,
   });
 
+  @override
+  List<Object?> get props => [
+        category,
+        categories,
+        isLoading,
+        error,
+      ];
+
   CategoryDetailState copyWith({
-    CampaignCategoryViewModel? category,
-    List<CampaignCategoryViewModel>? categories,
+    CampaignCategoryDetailsViewModel? category,
+    List<CampaignCategoryDetailsViewModel>? categories,
     bool? isLoading,
     Optional<LocalizedException>? error,
   }) {
@@ -28,12 +36,4 @@ class CategoryDetailState extends Equatable {
       error: error.dataOr(this.error),
     );
   }
-
-  @override
-  List<Object?> get props => [
-        category,
-        categories,
-        isLoading,
-        error,
-      ];
 }

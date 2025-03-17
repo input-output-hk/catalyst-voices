@@ -32,46 +32,43 @@ class BaseProfileInfoPanel extends OnboardingPageBase {
   Future<void> verifyInfoPanel() async {
     expect(
       $(registrationInfoPanel).$(headerTitle).text,
-      T.get('Welcome to Catalyst'),
+      (await t()).accountCreationGetStartedTitle,
     );
     expect($(pictureContainer).$(IconTheme), findsOneWidget);
     expect(
       $(learnMoreButton).$(Text).text,
-      T.get('Learn More'),
+      (await t()).learnMore,
     );
   }
 
   Future<void> verifyDetailsPanel() async {
     expect(
       $(registrationDetailsTitle).$(Text).text,
-      T.get('Introduction'),
+      (await t()).createBaseProfileInstructionsTitle,
     );
     expect(
       $(registrationDetailsBody).$(Text).text,
-      T.get(
-        'In the following account creation steps we will:\n\n1. Setup your base'
-        ' profile\n2. Create your Catalyst Keychain\n3. Link Cardano wallet &'
-        ' roles\n\nTo ensure a smooth experience, completing your account setup'
-        ' in one session is essential—stay focused and avoid interruptions to'
-        ' finalize everything efficiently.',
-      ),
+      (await t()).createBaseProfileInstructionsMessage,
     );
     expect(
       $(baseProfileExplanationText).$(Text).text,
-      T.get('Heads up'),
+      (await t()).headsUp,
     );
-    expect($(emailRequestTitle).text, T.get('Email request'));
+    expect(
+      $(emailRequestTitle).text,
+      (await t()).createBaseProfileInstructionsEmailRequest,
+    );
     expect(
       $(emailRequestList).$(Flexible).at(0).$(Text).text,
-      T.get('We store email in a mutable database.'),
+      (await t()).createBaseProfileInstructionsEmailReason1,
     );
     expect(
       $(emailRequestList).$(Flexible).at(1).$(Text).text,
-      T.get('We do not store your email on-chain ever.'),
+      (await t()).createBaseProfileInstructionsEmailReason2,
     );
     expect(
       $(emailRequestList).$(Flexible).at(2).$(Text).text,
-      T.get('We only use email for communication about Catalyst.'),
+      (await t()).createBaseProfileInstructionsEmailReason3,
     );
     expect($(createBaseProfileButton).visible, true);
     expect(await closeButton(), findsOneWidget);

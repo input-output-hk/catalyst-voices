@@ -55,6 +55,7 @@ class _FinishRegistrationButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return VoicesFilledButton(
+      key: const Key('FinishRegistrationButton'),
       onTap: () => unawaited(RegistrationDialog.show(context)),
       child: Text(context.l10n.finishAccountCreation),
     );

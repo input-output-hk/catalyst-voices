@@ -2,29 +2,38 @@ import 'dart:typed_data';
 
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
+import 'package:catalyst_voices_services/src/crypto/key_derivation_service.dart';
+import 'package:catalyst_voices_services/src/user/user_service.dart';
 import 'package:rxdart/rxdart.dart';
 
 abstract interface class ProposalService {
   const factory ProposalService(
     ProposalRepository proposalRepository,
     DocumentRepository documentRepository,
+    UserService userService,
+    KeyDerivationService keyDerivationService,
   ) = ProposalServiceImpl;
 
   Future<List<String>> addFavoriteProposal(String proposalId);
+
+  Future<DraftRef> createDraftProposal({
+    required DocumentDataContent content,
+    required SignedDocumentRef template,
+    DraftRef? ref,
+  });
 
   /// Delete a draft proposal from local storage.
   ///
   /// Published proposals cannot be deleted.
   Future<void> deleteDraftProposal(DraftRef ref);
 
-  /// Encodes the [content] to exportable format.
+  /// Encodes the [document] to exportable format.
   ///
   /// It does not save the document anywhere on the disk,
   /// it only encodes a document as [Uint8List]
   /// so that it can be saved as a file.
   Future<Uint8List> encodeProposalForExport({
-    required DocumentDataMetadata metadata,
-    required DocumentDataContent content,
+    required DocumentData document,
   });
 
   /// Fetches favorites proposals ids of the user
@@ -56,12 +65,17 @@ abstract interface class ProposalService {
   Future<DocumentRef> importProposal(Uint8List data);
 
   /// Publishes a public proposal draft.
-  Future<void> publishProposal(Document document);
+  Future<void> publishProposal({
+    required DocumentData document,
+  });
 
   Future<List<String>> removeFavoriteProposal(String proposalId);
 
   /// Submits a proposal draft into review.
-  Future<void> submitProposalForReview(Document document);
+  Future<void> submitProposalForReview({
+    required SignedDocumentRef ref,
+    required SignedDocumentRef categoryId,
+  });
 
   /// Saves a new proposal draft in the local storage.
   Future<void> updateDraftProposal({
@@ -75,15 +89,33 @@ abstract interface class ProposalService {
 final class ProposalServiceImpl implements ProposalService {
   final ProposalRepository _proposalRepository;
   final DocumentRepository _documentRepository;
+  final UserService _userService;
+  final KeyDerivationService _keyDerivationService;
 
   const ProposalServiceImpl(
     this._proposalRepository,
     this._documentRepository,
+    this._userService,
+    this._keyDerivationService,
   );
 
   @override
   Future<List<String>> addFavoriteProposal(String proposalId) async {
     return _proposalRepository.addFavoriteProposal(proposalId);
+  }
+
+  @override
+  Future<DraftRef> createDraftProposal({
+    required DocumentDataContent content,
+    required SignedDocumentRef template,
+    DraftRef? ref,
+  }) async {
+    return _documentRepository.createDocumentDraft(
+      type: DocumentType.proposalDocument,
+      content: content,
+      template: template,
+      selfRef: ref,
+    );
   }
 
   @override
@@ -93,12 +125,10 @@ final class ProposalServiceImpl implements ProposalService {
 
   @override
   Future<Uint8List> encodeProposalForExport({
-    required DocumentDataMetadata metadata,
-    required DocumentDataContent content,
+    required DocumentData document,
   }) {
     return _documentRepository.encodeDocumentForExport(
-      metadata: metadata,
-      content: content,
+      document: document,
     );
   }
 
@@ -113,8 +143,23 @@ final class ProposalServiceImpl implements ProposalService {
     required DocumentRef ref,
   }) async {
     final proposal = await _proposalRepository.getProposal(ref: ref);
+    final document = await _documentRepository.getProposalDocument(
+      ref: ref,
+    );
 
-    return proposal;
+    // TODO(damian-molinski): Delete this after documents sync is ready.
+    final mergedDocument = ProposalDocument(
+      metadata: proposal.document.metadata,
+      document: document.document,
+    );
+
+    return ProposalData(
+      document: mergedDocument,
+      // TODO(dtscalac): replace by actual category ID
+      categoryId: SignedDocumentRef.generateFirstRef(),
+      commentsCount: 10,
+      versions: proposal.versions,
+    );
   }
 
   @override
@@ -155,9 +200,18 @@ final class ProposalServiceImpl implements ProposalService {
   }
 
   @override
-  Future<void> publishProposal(Document document) {
-    // TODO(dtscalac): implement publishing proposals
-    throw UnimplementedError();
+  Future<void> publishProposal({
+    required DocumentData document,
+  }) {
+    return _useProposerRoleCredentials(
+      (catalystId, privateKey) {
+        return _proposalRepository.publishProposal(
+          document: document,
+          catalystId: catalystId,
+          privateKey: privateKey,
+        );
+      },
+    );
   }
 
   @override
@@ -166,9 +220,21 @@ final class ProposalServiceImpl implements ProposalService {
   }
 
   @override
-  Future<void> submitProposalForReview(Document document) {
-    // TODO(dtscalac): implement submitting proposals into review
-    throw UnimplementedError();
+  Future<void> submitProposalForReview({
+    required SignedDocumentRef ref,
+    required SignedDocumentRef categoryId,
+  }) {
+    return _useProposerRoleCredentials(
+      (catalystId, privateKey) {
+        return _proposalRepository.publishProposalAction(
+          ref: ref,
+          categoryId: categoryId,
+          action: ProposalSubmissionAction.aFinal,
+          catalystId: catalystId,
+          privateKey: privateKey,
+        );
+      },
+    );
   }
 
   @override
@@ -201,10 +267,11 @@ final class ProposalServiceImpl implements ProposalService {
               .map((commentsCount) {
             final proposalData = ProposalData(
               document: doc,
-              categoryId: DocumentType.categoryParametersDocument.uuid,
+              categoryId: SignedDocumentRef(
+                id: DocumentType.categoryParametersDocument.uuid,
+              ),
               versions: versionIds,
               commentsCount: commentsCount,
-              ref: doc.metadata.selfRef,
             );
             return Proposal.fromData(proposalData);
           });
@@ -217,6 +284,36 @@ final class ProposalServiceImpl implements ProposalService {
       )) {
         yield commentsUpdates;
       }
+    });
+  }
+
+  Future<void> _useProposerRoleCredentials(
+    Future<void> Function(
+      CatalystId catalystId,
+      CatalystPrivateKey privateKey,
+    ) callback,
+  ) async {
+    final account = _userService.user.activeAccount;
+    if (account == null) {
+      throw StateError(
+        'Cannot obtain proposer credentials, account missing',
+      );
+    }
+
+    final catalystId = account.catalystId.copyWith(
+      role: const Optional(AccountRole.proposer),
+      rotation: const Optional(0),
+    );
+
+    await account.keychain.getMasterKey().use((masterKey) async {
+      final keyPair = _keyDerivationService.deriveAccountRoleKeyPair(
+        masterKey: masterKey,
+        role: AccountRole.proposer,
+      );
+
+      await keyPair.use(
+        (keyPair) => callback(catalystId, keyPair.privateKey),
+      );
     });
   }
 }

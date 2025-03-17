@@ -1,4 +1,4 @@
-import 'package:catalyst_voices_models/src/optional.dart';
+import 'package:catalyst_voices_models/src/common/optional.dart';
 import 'package:test/test.dart';
 
 void main() {

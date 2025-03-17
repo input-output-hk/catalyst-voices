@@ -5,7 +5,9 @@ import 'package:equatable/equatable.dart';
 final class ProposalBuilderMetadata extends Equatable {
   final ProposalPublish publish;
   final DocumentRef? documentRef;
-  final DocumentRef? templateRef;
+  final DocumentRef? originalDocumentRef;
+  final SignedDocumentRef? templateRef;
+  final SignedDocumentRef? categoryId;
 
   /// The current iteration version, 0 if not published.
   final int currentIteration;
@@ -13,15 +15,22 @@ final class ProposalBuilderMetadata extends Equatable {
   const ProposalBuilderMetadata({
     this.publish = ProposalPublish.localDraft,
     this.documentRef,
+    this.originalDocumentRef,
     this.templateRef,
+    this.categoryId,
     this.currentIteration = 0,
   });
 
-  factory ProposalBuilderMetadata.newDraft({required DocumentRef templateRef}) {
+  factory ProposalBuilderMetadata.newDraft({
+    required SignedDocumentRef templateRef,
+    required SignedDocumentRef categoryId,
+  }) {
+    final firstRef = DraftRef.generateFirstRef();
     return ProposalBuilderMetadata(
       publish: ProposalPublish.localDraft,
-      documentRef: DraftRef.generateFirstRef(),
+      documentRef: firstRef,
       templateRef: templateRef,
+      categoryId: categoryId,
       currentIteration: 0,
     );
   }
@@ -30,19 +39,27 @@ final class ProposalBuilderMetadata extends Equatable {
   List<Object?> get props => [
         publish,
         documentRef,
+        originalDocumentRef,
         templateRef,
+        categoryId,
         currentIteration,
       ];
 
   ProposalBuilderMetadata copyWith({
     ProposalPublish? publish,
     Optional<DocumentRef>? documentRef,
-    Optional<DocumentRef>? templateRef,
+    Optional<DocumentRef>? originalDocumentRef,
+    Optional<SignedDocumentRef>? templateRef,
+    Optional<SignedDocumentRef>? categoryId,
+    int? currentIteration,
   }) {
     return ProposalBuilderMetadata(
       publish: publish ?? this.publish,
       documentRef: documentRef.dataOr(this.documentRef),
+      originalDocumentRef: originalDocumentRef.dataOr(this.originalDocumentRef),
       templateRef: templateRef.dataOr(this.templateRef),
+      categoryId: categoryId.dataOr(this.categoryId),
+      currentIteration: currentIteration ?? this.currentIteration,
     );
   }
 }

@@ -1,7 +1,6 @@
 import 'package:catalyst_voices/pages/overall_spaces/back_fab.dart';
 import 'package:catalyst_voices/pages/overall_spaces/brands_navigation.dart';
 import 'package:catalyst_voices/pages/overall_spaces/spaces_overview_list_view.dart';
-import 'package:catalyst_voices/pages/overall_spaces/update_ready.dart';
 import 'package:flutter/material.dart';
 
 class OverallSpacesPage extends StatelessWidget {
@@ -38,8 +37,6 @@ class _Navigation extends StatelessWidget {
         children: [
           BrandsNavigation(),
           Spacer(),
-          UpdateReady(),
-          SizedBox(height: 20),
           Align(
             alignment: Alignment.centerLeft,
             child: BackFab(),

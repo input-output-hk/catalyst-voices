@@ -97,6 +97,7 @@ class _RegistrationDialogState extends State<RegistrationDialog>
         context,
         routeSettings: const RouteSettings(name: '/registration-confirm-exit'),
         builder: (_) => const RegistrationExitConfirmDialog(),
+        fallback: true,
       );
 
       return !stayInTheFlow;
@@ -107,6 +108,7 @@ class _RegistrationDialogState extends State<RegistrationDialog>
         context,
         routeSettings: const RouteSettings(name: '/recovery-confirm-exit'),
         builder: (_) => const RecoveryExitConfirmDialog(),
+        fallback: true,
       );
 
       return !stayInTheFlow;

@@ -32,11 +32,14 @@ class GetStartedPanel extends OnboardingPageBase {
   }
 
   Future<void> verifyInfoPanel() async {
-    expect($(registrationInfoPanel).$(headerTitle).text, T.get('Get Started'));
+    expect(
+      $(registrationInfoPanel).$(headerTitle).text,
+      (await t()).getStarted,
+    );
     expect($(pictureContainer).$(IconTheme), findsOneWidget);
     expect(
       $(learnMoreButton).$(Text).text,
-      T.get('Learn More'),
+      (await t()).learnMore,
     );
     expect(await closeButton(), findsOneWidget);
   }
@@ -44,31 +47,31 @@ class GetStartedPanel extends OnboardingPageBase {
   Future<void> verifyDetailsPanel() async {
     expect(
       $(registrationDetailsTitle).$(Text).text,
-      T.get('Welcome to Catalyst'),
+      (await t()).accountCreationGetStartedTitle,
     );
     expect(
       $(registrationDetailsBody).$(Text).text,
-      T.get(
-        'If you already have a Catalyst keychain you can restore it '
-        'on this device, or you can create a new Catalyst Keychain.',
-      ),
+      (await t()).accountCreationGetStatedDesc,
     );
-    expect($(getStartedQuestion).text, T.get('What do you want to do?'));
+    expect(
+      $(getStartedQuestion).text,
+      (await t()).accountCreationGetStatedWhatNext,
+    );
     expect(
       $(createNewKeychain).$(registrationTileTitle).text,
-      T.get('Create a new \nCatalyst Keychain'),
+      (await t()).accountCreationCreate,
     );
     expect(
       $(createNewKeychain).$(registrationTileSubtitle).text,
-      T.get('On this device'),
+      (await t()).accountCreationOnThisDevice,
     );
     expect(
       $(recoverKeychain).$(registrationTileTitle).text,
-      T.get('Recover your\nCatalyst Keychain'),
+      (await t()).accountCreationRecover,
     );
     expect(
       $(recoverKeychain).$(registrationTileSubtitle).text,
-      T.get('On this device'),
+      (await t()).accountCreationOnThisDevice,
     );
   }
 }

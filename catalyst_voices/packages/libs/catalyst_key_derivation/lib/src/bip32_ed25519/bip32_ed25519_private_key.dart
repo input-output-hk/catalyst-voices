@@ -89,6 +89,18 @@ class Bip32Ed25519XPrivateKey extends Equatable {
     _bytes.drop();
   }
 
+  /// Runs the [callback] with this private key and then calls [drop].
+  Future<R> use<R>(
+    Future<R> Function(Bip32Ed25519XPrivateKey privateKey) callback,
+  ) async {
+    final privateKey = this;
+    try {
+      return await callback(privateKey);
+    } finally {
+      privateKey.drop();
+    }
+  }
+
   @override
   List<Object?> get props => [_bytes];
 }

@@ -46,7 +46,7 @@ final class LoadProposalEvent extends ProposalBuilderEvent {
 }
 
 final class LoadProposalTemplateEvent extends ProposalBuilderEvent {
-  final DocumentRef ref;
+  final SignedDocumentRef ref;
 
   const LoadProposalTemplateEvent({
     required this.ref,

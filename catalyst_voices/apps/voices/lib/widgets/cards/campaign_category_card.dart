@@ -7,7 +7,7 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 class CampaignCategoryCard extends StatelessWidget {
-  final CampaignCategoryViewModel category;
+  final CampaignCategoryDetailsViewModel category;
 
   const CampaignCategoryCard({
     super.key,
@@ -36,7 +36,7 @@ class CampaignCategoryCard extends StatelessWidget {
           // TODO(LynxxLynx): implement image when info from where it comes
           CatalystImage.asset(
             key: const Key('CategoryImage'),
-            VoicesAssets.images.campaignCategoryDeveloper.path,
+            category.imageUrl,
             fit: BoxFit.fill,
             height: 220,
           ),
@@ -54,7 +54,10 @@ class CampaignCategoryCard extends StatelessWidget {
                   proposalsCount: category.proposalsCount,
                 ),
                 const SizedBox(height: 16),
-                _Description(category.description, const Key('Description')),
+                _Description(
+                  category.description,
+                  key: const Key('Description'),
+                ),
                 const SizedBox(height: 32),
                 _Buttons(
                   categoryId: category.id,
@@ -100,39 +103,6 @@ class _Buttons extends StatelessWidget {
         ),
         const SizedBox(height: 24),
       ],
-    );
-  }
-}
-
-class _Title extends StatelessWidget {
-  final String text;
-
-  const _Title(this.text, [Key? key]) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      key: super.key,
-      text,
-      style: context.textTheme.titleLarge,
-    );
-  }
-}
-
-class _Description extends StatelessWidget {
-  final String description;
-
-  const _Description(this.description, [Key? key]) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      key: super.key,
-      description,
-      style: context.textTheme.bodyMedium?.copyWith(
-        color: context.colors.textOnPrimaryLevel1,
-      ),
-      maxLines: 5,
     );
   }
 }
@@ -191,6 +161,24 @@ class _CampaignStats extends StatelessWidget {
   }
 }
 
+class _Description extends StatelessWidget {
+  final String description;
+
+  const _Description(this.description, {super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      key: super.key,
+      description,
+      style: context.textTheme.bodyMedium?.copyWith(
+        color: context.colors.textOnPrimaryLevel1,
+      ),
+      maxLines: 5,
+    );
+  }
+}
+
 class _TextStats extends StatelessWidget {
   final String text;
   final String value;
@@ -223,6 +211,21 @@ class _TextStats extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _Title extends StatelessWidget {
+  final String text;
+
+  const _Title(this.text, [Key? key]) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      key: super.key,
+      text,
+      style: context.textTheme.titleLarge,
     );
   }
 }

@@ -4,18 +4,8 @@ import 'package:catalyst_voices_repositories/src/dto/user_dto.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 
 const _key = 'UserStorage';
-const _version = 2;
 const _userKey = 'User';
-
-abstract interface class UserStorage {
-  Future<UserDto?> readUser();
-
-  Future<void> writeUser(UserDto user);
-
-  Future<void> deleteUser();
-
-  Future<void> clear();
-}
+const _version = 3;
 
 final class SecureUserStorage extends SecureStorage implements UserStorage {
   SecureUserStorage({
@@ -29,12 +19,14 @@ final class SecureUserStorage extends SecureStorage implements UserStorage {
     super.version,
   }) : super(key: _key);
 
-  static Future<void> clearPreviousVersions() async {
-    for (var i = 0; i < _version; i++) {
-      final versionedStorage = SecureUserStorage._versioned(version: i);
+  @override
+  Future<void> clear() async {
+    await deleteUser();
+  }
 
-      await versionedStorage.clear();
-    }
+  @override
+  Future<void> deleteUser() async {
+    await delete(key: _userKey);
   }
 
   @override
@@ -55,13 +47,21 @@ final class SecureUserStorage extends SecureStorage implements UserStorage {
     await writeString(encoded, key: _userKey);
   }
 
-  @override
-  Future<void> deleteUser() async {
-    await delete(key: _userKey);
-  }
+  static Future<void> clearPreviousVersions() async {
+    for (var i = 0; i < _version; i++) {
+      final versionedStorage = SecureUserStorage._versioned(version: i);
 
-  @override
-  Future<void> clear() async {
-    await deleteUser();
+      await versionedStorage.clear();
+    }
   }
+}
+
+abstract interface class UserStorage {
+  Future<void> clear();
+
+  Future<void> deleteUser();
+
+  Future<UserDto?> readUser();
+
+  Future<void> writeUser(UserDto user);
 }

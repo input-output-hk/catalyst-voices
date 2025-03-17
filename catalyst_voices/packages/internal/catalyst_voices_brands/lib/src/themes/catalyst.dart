@@ -12,6 +12,10 @@ import 'package:catalyst_voices_brands/src/themes/widgets/voices_segmented_butto
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+const BrandAssets darkBrandAssets = BrandAssets(
+  brand: Brand.catalyst,
+);
+
 const ColorScheme darkColorScheme = ColorScheme.dark(
   primary: VoicesColors.darkPrimary,
   onPrimary: VoicesColors.darkOnPrimary,
@@ -92,6 +96,10 @@ const VoicesColorScheme darkVoicesColorScheme = VoicesColorScheme(
   overlay: Color(0xA610141C),
   dropShadow: Color(0xA610141C),
   sysColorsNeutralN60: Color(0xFF7F90B3),
+);
+
+const BrandAssets lightBrandAssets = BrandAssets(
+  brand: Brand.catalyst,
 );
 
 const ColorScheme lightColorScheme = ColorScheme.light(
@@ -186,19 +194,11 @@ final ThemeData catalyst = _buildThemeData(
   lightBrandAssets,
 );
 
-const BrandAssets darkBrandAssets = BrandAssets(
-  brand: Brand.catalyst,
-);
-
 /// Dark [ThemeData] for the `catalyst` brand.
 final ThemeData darkCatalyst = _buildThemeData(
   darkColorScheme,
   darkVoicesColorScheme,
   darkBrandAssets,
-);
-
-const BrandAssets lightBrandAssets = BrandAssets(
-  brand: Brand.catalyst,
 );
 
 TextTheme _buildTextTheme(VoicesColorScheme voicesColorScheme) {
@@ -323,7 +323,7 @@ ThemeData _buildThemeData(
       scrolledUnderElevation: 0,
     ),
     drawerTheme: DrawerThemeData(
-      backgroundColor: voicesColorScheme.onSurfaceNeutralOpaqueLv0,
+      backgroundColor: voicesColorScheme.elevationsOnSurfaceNeutralLv1White,
     ),
     popupMenuTheme: VoicesPopupMenuThemeData(colors: voicesColorScheme),
     dialogTheme: VoicesDialogTheme(colors: voicesColorScheme),

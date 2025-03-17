@@ -22,7 +22,11 @@ class WalletConnectionStatus extends StatelessWidget {
         const SizedBox(width: 8),
         VoicesWalletTileIcon(iconSrc: icon),
         const SizedBox(width: 12),
-        Text(name, style: Theme.of(context).textTheme.bodyLarge),
+        Text(
+          name,
+          style: Theme.of(context).textTheme.bodyLarge,
+          key: const Key('WalletNameText'),
+        ),
         if (isConnected) ...[
           const SizedBox(width: 8),
           VoicesAvatar(

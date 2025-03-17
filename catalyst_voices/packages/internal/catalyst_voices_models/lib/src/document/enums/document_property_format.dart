@@ -1,3 +1,5 @@
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+
 /// The format expected by the property value.
 enum DocumentPropertyFormat {
   path('path'),
@@ -25,7 +27,7 @@ enum DocumentPropertyFormat {
 
   factory DocumentPropertyFormat.fromString(String string) {
     for (final format in values) {
-      if (format.value.toLowerCase() == string.toLowerCase()) {
+      if (format.value.equalsIgnoreCase(string)) {
         return format;
       }
     }

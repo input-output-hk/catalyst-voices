@@ -12,7 +12,6 @@ class SeedPhraseInstructionsPanel extends OnboardingPageBase {
       const Key('SeedPhraseInstructionsTitle');
   final seedPhraseInstructionsSubtitleKey =
       const Key('SeedPhraseInstructionsSubtitleKey');
-  final keychainNotFoundKey = const Key('KeychainNotFoundMessage');
 
   @override
   Future<void> goto() async {
@@ -20,20 +19,35 @@ class SeedPhraseInstructionsPanel extends OnboardingPageBase {
     await RestoreKeychainChoicePanel($).clickRestoreSeedPhrase();
   }
 
+  Future<void> clickNext() async {
+    await $(nextButton).tap();
+  }
+
   @override
-  Future<void> verifyPageElements() async {}
+  Future<void> verifyPageElements() async {
+    await verifyInfoPanel();
+    await verifyDetailsPanel();
+  }
 
   Future<void> verifyInfoPanel() async {
     expect(
       await infoPartHeaderTitleText(),
-      T.get('Restore Catalyst keychain'),
+      (await t()).recoverCatalystKeychain,
     );
     expect(infoPartTaskPicture(), findsOneWidget);
-    expect(
-      infoPartLearnMoreText(),
-      T.get('Learn More'),
-    );
+    expect(infoPartLearnMoreText(), (await t()).learnMore);
   }
 
-  Future<void> verifyDetailsPanel() async {}
+  Future<void> verifyDetailsPanel() async {
+    expect(
+      $(seedPhraseInstructionsTitleKey).text,
+      (await t()).recoverySeedPhraseInstructionsTitle,
+    );
+    expect(
+      $(seedPhraseInstructionsSubtitleKey).text,
+      (await t()).recoverySeedPhraseInstructionsSubtitle,
+    );
+    expect($(backButton), findsOneWidget);
+    expect($(nextButton), findsOneWidget);
+  }
 }

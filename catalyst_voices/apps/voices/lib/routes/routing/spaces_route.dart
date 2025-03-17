@@ -57,6 +57,21 @@ final class FundedProjectsRoute extends GoRouteData
   }
 }
 
+final class MyProposalsRoute extends GoRouteData with FadePageTransitionMixin {
+  final String? categoryId;
+  const MyProposalsRoute({
+    this.categoryId,
+  });
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) {
+    return ProposalsPage(
+      selectMyProposalsView: true,
+      categoryId: categoryId,
+    );
+  }
+}
+
 final class ProposalsRoute extends GoRouteData with FadePageTransitionMixin {
   final String? categoryId;
 
@@ -80,7 +95,12 @@ final class ProposalsRoute extends GoRouteData with FadePageTransitionMixin {
         TypedGoRoute<ProposalsRoute>(
           path: 'proposals',
         ),
-        TypedGoRoute<CategoryDetailRoute>(path: 'category/:categoryId'),
+        TypedGoRoute<MyProposalsRoute>(
+          path: 'my-proposals',
+        ),
+        TypedGoRoute<CategoryDetailRoute>(
+          path: 'category/:categoryId',
+        ),
       ],
     ),
     TypedGoRoute<WorkspaceRoute>(path: '/$_prefix/workspace'),

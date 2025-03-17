@@ -33,6 +33,8 @@
                 "supportingLinks": { "type": "object" },
                 "dependencies": { "type": "object" },
                 "open_source": { "type": "object" },
+                "category_details": { "type": "object" },
+                "category_questions": { "type": "object" },
                 "theme": { "type": "object" },
                 "impact": { "type": "object" },
                 "feasibility": { "type": "object" },
@@ -520,6 +522,16 @@
             "description": "Determine the eligibility of the proposal for this category",
 
             "properties": {
+                "category_details": {
+                    "$ref": "#/definitions/section",
+                    "title": "Selected Category",
+                    "properties": {
+                        "details": {
+                            "type": "object",
+                            "title": "Selected Category"
+                        }
+                    }
+                },
                 "category_questions": {
                     "$ref": "#/definitions/section",
                     "title": "Category Questions",
@@ -679,7 +691,7 @@
                     "x-order": ["informational_content", "foundational_rd", "financial_products", "early_stage_product", "developer_tools", "enterprise_partnership", "working_product", "timeline", "matching_funds", "adoption_potential"]
                 }
             },
-            "x-order": ["category_questions"]
+            "x-order": ["category_details", "category_questions"]
         },
         "theme": {
             "$ref": "#/definitions/segment",

@@ -11,6 +11,9 @@ dependencies:
   async: ^2.11.0
   build: ^2.4.1
   catalyst_cardano_serialization: ^1.0.0
+  catalyst_compression: ^1.0.0
+  catalyst_cose: ^1.0.0
+  catalyst_key_derivation: ^1.0.0
   # using for document json assets
   catalyst_voices_assets:
     path: ../catalyst_voices_assets
@@ -18,8 +21,10 @@ dependencies:
     path: ../catalyst_voices_models
   catalyst_voices_shared:
     path: ../catalyst_voices_shared
+  cbor: ^6.2.0
   chopper: ^8.0.3
   collection: ^1.19.0
+  convert: ^3.1.1
   drift: ^2.24.0
   drift_flutter: ^0.2.4
   equatable: ^2.0.7
