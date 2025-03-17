@@ -448,6 +448,11 @@ void main() {
           (index) => DocumentWithMetadataFactory.build(),
         );
 
+        // ignore: avoid_print
+        print(
+          documentsWithMetadata.map((e) => e.document.metadata.ref).join('\n'),
+        );
+
         // When
         await database.documentsDao.saveAll(documentsWithMetadata);
 
