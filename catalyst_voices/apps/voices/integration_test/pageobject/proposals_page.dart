@@ -89,35 +89,35 @@ class ProposalsPage {
       $(allProposalsTab)
           .$(Text)
           .text
-          ?.startsWith((await t()).noOfAll(0).split('{count})')[0]),
+          ?.startsWith((await t()).noOfAll(0).split('(')[0]),
       true,
     );
     expect(
       $(draftProposalsTab)
           .$(Text)
           .text
-          ?.startsWith((await t()).noOfDraft(0).split('{count})')[0]),
+          ?.startsWith((await t()).noOfDraft(0).split('(')[0]),
       true,
     );
     expect(
       $(finalProposalsTab)
           .$(Text)
           .text
-          ?.startsWith((await t()).noOfFinal(0).split('{count})')[0]),
+          ?.startsWith((await t()).noOfFinal(0).split('(')[0]),
       true,
     );
     expect(
       $(favoriteProposalsTab)
           .$(Text)
           .text
-          ?.startsWith((await t()).noOfFavorites(0).split('{count})')[0]),
+          ?.startsWith((await t()).noOfFavorites(0).split('(')[0]),
       true,
     );
     expect(
       $(myProposalsTab)
           .$(Text)
           .text
-          ?.startsWith((await t()).noOfMyProposals(0).split('{count})')[0]),
+          ?.startsWith((await t()).noOfMyProposals(0).split('(')[0]),
       true,
     );
   }
@@ -221,6 +221,7 @@ class ProposalsPage {
         .length;
     for (var i = 1; i <= useCasesItemsCount; i++) {
       final item = $(Key('VoicesModalMenu[$i]Key')).$(Text);
+      await item.scrollTo();
       await $(item).tap();
       expect(
         item.text,
