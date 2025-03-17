@@ -1,4 +1,5 @@
 import 'package:catalyst_voices/widgets/widgets.dart';
+import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart'
     hide DocumentPropertyBuilder;
@@ -76,35 +77,40 @@ class _ProposalCommentBuilderState extends State<ProposalCommentBuilder> {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _Avatar(letter: widget.authorId.username?.firstLetter),
-        const SizedBox(width: 16),
-        Expanded(
-          child: Form(
-            autovalidateMode: AutovalidateMode.onUserInteraction,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                for (final property in widget.template.document.properties)
-                  DocumentPropertyBuilder(
-                    key: ValueKey(property.nodeId),
-                    property: property,
-                    isEditMode: true,
-                    onChanged: _handlePropertyChanges,
+    return DocumentBuilderTheme(
+      data: const DocumentBuilderThemeData(
+        shouldDebounceChange: false,
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _Avatar(letter: widget.authorId.username?.firstLetter),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Form(
+              autovalidateMode: AutovalidateMode.onUserInteraction,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  for (final property in widget.template.document.properties)
+                    DocumentPropertyBuilder(
+                      key: ValueKey(property.nodeId),
+                      property: property,
+                      isEditMode: true,
+                      onChanged: _handlePropertyChanges,
+                    ),
+                  const SizedBox(height: 4),
+                  _Actions(
+                    onSubmitTap: _submit,
+                    onCancelTap: widget.onCancelTap,
+                    showCancel: widget.showCancel,
                   ),
-                const SizedBox(height: 4),
-                _Actions(
-                  onSubmitTap: _submit,
-                  onCancelTap: widget.onCancelTap,
-                  showCancel: widget.showCancel,
-                ),
-              ],
+                ],
+              ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
