@@ -103,8 +103,8 @@ final class Dependencies extends DependencyProvider {
       })
       ..registerFactory<ProposalBuilderBloc>(() {
         return ProposalBuilderBloc(
-          get<CampaignService>(),
           get<ProposalService>(),
+          get<CampaignService>(),
           get<DownloaderService>(),
           get<DocumentMapper>(),
         );
@@ -127,7 +127,11 @@ final class Dependencies extends DependencyProvider {
         return ProposalBloc(get<ProposalService>());
       })
       ..registerFactory<NewProposalCubit>(() {
-        return NewProposalCubit(get<CampaignService>());
+        return NewProposalCubit(
+          get<CampaignService>(),
+          get<ProposalService>(),
+          get<DocumentMapper>(),
+        );
       });
   }
 

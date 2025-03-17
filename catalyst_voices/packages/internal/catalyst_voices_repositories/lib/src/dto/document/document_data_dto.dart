@@ -133,7 +133,7 @@ final class DocumentDataMetadataDto {
       brandId: brandId,
       campaignId: campaignId,
       electionId: electionId,
-      categoryId: categoryId?.toModel(),
+      categoryId: categoryId?.toSignedModel(),
     );
   }
 

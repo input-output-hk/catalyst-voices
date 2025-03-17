@@ -16,7 +16,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 typedef _CategoryButtonSelector = ({
-  List<DropdownMenuViewModel> categories,
+  List<DropdownMenuViewModel<SignedDocumentRef>> categories,
   String selectedName,
 });
 
@@ -29,7 +29,7 @@ typedef _ProposalsCount = ({
 });
 
 class ProposalsPage extends StatefulWidget {
-  final String? categoryId;
+  final SignedDocumentRef? categoryId;
   final bool selectMyProposalsView;
 
   const ProposalsPage({
@@ -97,9 +97,9 @@ class _CampaignDetailsButton extends StatelessWidget {
 }
 
 class _ChangeCategoryButton extends StatefulWidget {
-  final List<DropdownMenuViewModel> items;
+  final List<DropdownMenuViewModel<SignedDocumentRef>> items;
   final String selectedName;
-  final ValueChanged<String?>? onChanged;
+  final ValueChanged<SignedDocumentRef?>? onChanged;
 
   const _ChangeCategoryButton({
     required this.items,
@@ -132,7 +132,7 @@ class _ChangeCategoryButtonSelector extends StatelessWidget {
         final dropdownCategories = [
           DropdownMenuViewModel(
             name: context.l10n.showAll,
-            value: '-1',
+            value: const SignedDocumentRef(id: '-1'),
             isSelected: state.selectedCategoryId == null,
           ),
           ...dropdownItems,
@@ -151,7 +151,7 @@ class _ChangeCategoryButtonSelector extends StatelessWidget {
           items: state.categories,
           selectedName: state.selectedName,
           onChanged: (value) {
-            final categoryId = value == '-1' ? null : value;
+            final categoryId = value?.id == '-1' ? null : value;
             context.read<ProposalsCubit>().changeSelectedCategory(categoryId);
           },
         );
