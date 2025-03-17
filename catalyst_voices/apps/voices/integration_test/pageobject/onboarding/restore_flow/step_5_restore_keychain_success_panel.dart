@@ -61,33 +61,33 @@ class RestoreKeychainSuccessPanel extends OnboardingPageBase {
   }
 
   Future<void> verifyDetailsPanel() async {
-    expect($(recoveryAccountTitle).text, T.get('Catalyst account recovery'));
+    expect($(recoveryAccountTitle).text, (await t()).recoveryAccountTitle);
     expect($(walletNameText), findsOneWidget);
     expect(
       $(recoveryAccountSuccessTitle).text,
-      T.get('Keychain recovered successfully!'),
+      (await t()).recoveryAccountSuccessTitle,
     );
     expect(
       $(walletDetectionSummaryText).text,
-      T.get('Wallet detection summary'),
+      (await t()).walletDetectionSummary,
     );
-    expect($(nameOfWalletLabel).text, T.get('Name of the wallet'));
+    expect($(nameOfWalletLabel).text, (await t()).nameOfWallet);
     expect($(nameOfWalletValue), findsOneWidget);
-    expect($(walletBalanceLabel).text, T.get('Wallet balance'));
+    expect($(walletBalanceLabel).text, (await t()).walletBalance);
     expect($(walletBalanceValue), findsOneWidget);
-    expect($(walletAddressLabel).text, T.get('Wallet address'));
+    expect($(walletAddressLabel).text, (await t()).walletAddress);
     expect($(walletAddressValue), findsOneWidget);
     expect($(setUnlockPasswordButton), findsOneWidget);
     expect($(recoverDifferentKeychainButton), findsOneWidget);
   }
 
   Future<void> verifyInfoPanel() async {
-    expect(await infoPartHeaderTitleText(), 'Catalyst Keychain');
+    expect(await infoPartHeaderTitleText(), (await t()).catalystKeychain);
     expect(infoPartTaskPicture(), findsOneWidget);
     expect($(progressBar), findsOneWidget);
     expect(
       $(registrationInfoPanel).$(CommonPage($).decorData).$(Text).text,
-      'Learn More',
+      (await t()).learnMore,
     );
   }
 
