@@ -103,6 +103,10 @@ abstract interface class ProposalRepository {
   });
 
   Stream<List<ProposalDocument>> watchLatestProposals({int? limit});
+
+  Stream<List<ProposalDocument>> watchUserProposals({
+    required CatalystId userCatalystId,
+  });
 }
 
 final class ProposalRepositoryImpl implements ProposalRepository {
@@ -298,8 +302,17 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   }
 
   @override
-  Future<List<ProposalDocument>> queryVersionsOfId({required String id}) {
-    return _documentRepository.queryVersionsOfId(id: id);
+  Future<List<ProposalDocument>> queryVersionsOfId({required String id}) async {
+    final documents = await _documentRepository.queryVersionsOfId(id: id);
+
+    return documents
+        .map(
+          (e) => _buildProposalDocument(
+            documentData: e.data,
+            templateData: e.refData,
+          ),
+        )
+        .toList();
   }
 
   @override
@@ -333,6 +346,32 @@ final class ProposalRepositoryImpl implements ProposalRepository {
         .watchDocuments(
           limit: limit,
           type: DocumentType.proposalDocument,
+        )
+        .whereNotNull()
+        .map(
+          (documents) => documents.map(
+            (doc) {
+              final documentData = doc.data;
+              final templateData = doc.refData;
+
+              return _buildProposalDocument(
+                documentData: documentData,
+                templateData: templateData,
+              );
+            },
+          ).toList(),
+        );
+  }
+
+  @override
+  Stream<List<ProposalDocument>> watchUserProposals({
+    required CatalystId userCatalystId,
+  }) {
+    return _documentRepository
+        .watchDocuments(
+          type: DocumentType.proposalDocument,
+          getlocalDrafts: true,
+          catalystId: userCatalystId,
         )
         .whereNotNull()
         .map(

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:catalyst_voices_blocs/src/common/bloc_error_emitter_mixin.dart';
@@ -16,6 +17,7 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
   // ignore: unused_field
   final CampaignService _campaignService;
   final ProposalService _proposalService;
+  StreamSubscription<List<Proposal>>? _proposalsSubscription;
 
   // ignore: unused_field
   final List<Proposal> _proposals = [];
@@ -27,11 +29,25 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     on<LoadProposalsEvent>(_loadProposals);
     on<TabChangedEvent>(_handleTabChange);
     on<ImportProposalEvent>(_importProposal);
+    on<WatchUserProposalsEvent>(
+      _watchUserProposals,
+    );
     on<SearchQueryChangedEvent>(
       _handleQueryChange,
       // TODO(damian-molinski): implement debounce
       transformer: null,
     );
+  }
+
+  @override
+  Future<void> close() {
+    _proposalsSubscription?.cancel();
+    _proposalsSubscription = null;
+    return super.close();
+  }
+
+  void _emitProposals(List<Proposal> proposals) {
+    emit(state.copyWith(userProposals: proposals));
   }
 
   Future<void> _handleQueryChange(
@@ -112,5 +128,28 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     );
 
     emit(newState);
+  }
+
+  void _setupProposalsSubscription() {
+    _proposalsSubscription = _proposalService.watchUserProposals().listen(
+      (proposals) {
+        if (isClosed) return;
+        _logger.info('Stream received ${proposals.length} proposals');
+        _emitProposals(proposals);
+      },
+      onError: (error) {
+        if (isClosed) return;
+      },
+    );
+  }
+
+  Future<void> _watchUserProposals(
+    WatchUserProposalsEvent event,
+    Emitter<WorkspaceState> emit,
+  ) async {
+    _logger.info('Setup user proposals subscription');
+    await _proposalsSubscription?.cancel();
+    _proposalsSubscription = null;
+    _setupProposalsSubscription();
   }
 }

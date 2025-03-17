@@ -73,7 +73,7 @@ final class Proposal extends Equatable {
       // TODO(LynxLynxx): from where we need to get the real status
       status: ProposalStatus.inProgress,
       // TODO(LynxLynxx): from where we need to get the real publish
-      publish: ProposalPublish.publishedDraft,
+      publish: ProposalPublish.localDraft,
       versions: versions,
       duration: data.getProposalDuration() ?? 0,
       author: data.getProposalAuthor() ?? '',

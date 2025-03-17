@@ -3,6 +3,7 @@ import 'package:catalyst_voices_repositories/src/database/catalyst_database.dart
 import 'package:catalyst_voices_repositories/src/database/dao/drafts_dao.drift.dart';
 import 'package:catalyst_voices_repositories/src/database/table/drafts.dart';
 import 'package:catalyst_voices_repositories/src/database/table/drafts.drift.dart';
+import 'package:collection/collection.dart';
 import 'package:drift/drift.dart';
 import 'package:flutter/foundation.dart';
 
@@ -50,6 +51,13 @@ abstract interface class DraftsDao {
 
   /// Same as [query] but emits updates.
   Stream<DocumentDraftEntity?> watch({required DocumentRef ref});
+
+  Stream<List<DocumentDraftEntity>> watchAll({
+    bool unique = false,
+    int? limit,
+    DocumentType? type,
+    CatalystId? catalystId,
+  });
 }
 
 @DriftAccessor(
@@ -163,6 +171,58 @@ class DriftDraftsDao extends DatabaseAccessor<DriftCatalystDatabase>
   @override
   Stream<DocumentDraftEntity?> watch({required DocumentRef ref}) {
     return _selectRef(ref).watch().map((event) => event.firstOrNull);
+  }
+
+  @override
+  Stream<List<DocumentDraftEntity>> watchAll({
+    bool unique = false,
+    int? limit,
+    DocumentType? type,
+    CatalystId? catalystId,
+  }) {
+    final query = select(drafts);
+
+    if (type != null) {
+      query.where((doc) => doc.type.equals(type.uuid));
+    }
+    if (catalystId != null) {
+      // TODO(LynxLynxx): filter when catalystId is implemented as metadata
+      // query.where((doc) => doc.metadata.catalystId.equals(catalystId.uuid));
+    }
+
+    return query.watch().map((documents) {
+      if (unique) {
+        // Group by document ID and take latest version
+        final uniqueDocs = documents
+            .groupListsBy((doc) => '${doc.idHi}-${doc.idLo}')
+            .values
+            .map(
+              (versions) => versions.reduce((a, b) {
+                // Compare versions (higher version wins)
+                final compareHi = b.verHi.compareTo(a.verHi);
+                if (compareHi != 0) return compareHi > 0 ? b : a;
+                return b.verLo.compareTo(a.verLo) > 0 ? b : a;
+              }),
+            )
+            .toList()
+          ..sort((a, b) {
+            // Sort by version descending
+            final compareHi = b.verHi.compareTo(a.verHi);
+            if (compareHi != 0) return compareHi;
+            return b.verLo.compareTo(a.verLo);
+          });
+
+        if (limit != null) {
+          return uniqueDocs.take(limit).toList();
+        }
+        return uniqueDocs;
+      }
+
+      if (limit != null) {
+        return documents.take(limit).toList();
+      }
+      return documents;
+    });
   }
 
   Expression<bool> _filterRef($DraftsTable row, DocumentRef ref) {

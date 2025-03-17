@@ -44,6 +44,13 @@ final class TabChangedEvent extends WorkspaceEvent {
   List<Object?> get props => [tab];
 }
 
+final class WatchUserProposalsEvent extends WorkspaceEvent {
+  const WatchUserProposalsEvent();
+
+  @override
+  List<Object?> get props => [];
+}
+
 sealed class WorkspaceEvent extends Equatable {
   const WorkspaceEvent();
 }

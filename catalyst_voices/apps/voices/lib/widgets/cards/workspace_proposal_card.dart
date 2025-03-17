@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
+import 'package:catalyst_voices/routes/routing/proposal_builder_route.dart';
 import 'package:catalyst_voices/widgets/cards/proposal_card_widgets.dart';
 import 'package:catalyst_voices/widgets/cards/proposal_iteration_history_card.dart';
 import 'package:catalyst_voices/widgets/text/last_edit_date.dart';
@@ -20,32 +23,45 @@ class WorkspaceProposalCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isSubmitted = proposal.publish.isPublished;
+    final isLocalDraft = proposal.publish.isLocal;
 
-    return _ProposalSubmitState(
-      isSubmitted: isSubmitted,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 6),
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: isSubmitted
-                ? context.colors.iconsPrimary
-                : context.colors.elevationsOnSurfaceNeutralLv1White,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Column(
-            spacing: 12,
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              _Body(proposal),
-              Offstage(
-                offstage: isSubmitted,
-                child: ProposalIterationHistory(
-                  proposal: proposal,
+    return GestureDetector(
+      // TODO(LynxLynxx): When menu is implemented, remove this widget
+      onTap: () {
+        unawaited(
+          ProposalBuilderRoute(
+            proposalId: proposal.selfRef.id,
+            version: proposal.selfRef.id,
+            isPrivate: isLocalDraft,
+          ).push(context),
+        );
+      },
+      child: _ProposalSubmitState(
+        isSubmitted: isSubmitted,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 6),
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: isSubmitted
+                  ? context.colors.iconsPrimary
+                  : context.colors.elevationsOnSurfaceNeutralLv1White,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Column(
+              spacing: 12,
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _Body(proposal),
+                Offstage(
+                  offstage: isSubmitted || isLocalDraft,
+                  child: ProposalIterationHistory(
+                    proposal: proposal,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

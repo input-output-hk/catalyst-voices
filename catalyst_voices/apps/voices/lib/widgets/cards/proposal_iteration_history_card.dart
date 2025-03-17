@@ -127,10 +127,12 @@ class _IterationVersionList extends StatelessWidget {
 class _ProposalIterationHistoryState extends State<ProposalIterationHistory> {
   bool _isExpanded = false;
 
-  bool get _hasNewerLocalIteration =>
-      widget.proposal.versions.first.isLatestVersion(
-        widget.proposal.selfRef.version ?? '',
-      );
+  bool get _hasNewerLocalIteration {
+    if (widget.proposal.versions.isEmpty) return false;
+    return widget.proposal.versions.first.isLatestVersion(
+      widget.proposal.selfRef.version ?? '',
+    );
+  }
 
   @override
   Widget build(BuildContext context) {

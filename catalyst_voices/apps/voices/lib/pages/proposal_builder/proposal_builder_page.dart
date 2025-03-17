@@ -26,12 +26,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 class ProposalBuilderPage extends StatefulWidget {
-  final String? proposalId;
+  final DocumentRef? proposalRef;
   final String? templateId;
 
   const ProposalBuilderPage({
     super.key,
-    this.proposalId,
+    this.proposalRef,
     this.templateId,
   });
 
@@ -102,7 +102,7 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
   void didUpdateWidget(ProposalBuilderPage oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    if (widget.proposalId != oldWidget.proposalId ||
+    if (widget.proposalRef != oldWidget.proposalRef ||
         widget.templateId != oldWidget.templateId) {
       _updateSource();
     }
@@ -212,12 +212,11 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
   void _updateSource({ProposalBuilderBloc? bloc}) {
     bloc ??= context.read<ProposalBuilderBloc>();
 
-    final proposalId = widget.proposalId;
+    final proposalRef = widget.proposalRef;
     final templateId = widget.templateId;
 
-    if (proposalId != null) {
-      final ref = SignedDocumentRef(id: proposalId);
-      bloc.add(LoadProposalEvent(ref: ref));
+    if (proposalRef != null) {
+      bloc.add(LoadProposalEvent(ref: proposalRef));
     } else if (templateId != null) {
       final ref = SignedDocumentRef(id: templateId);
       bloc.add(LoadProposalTemplateEvent(ref: ref));

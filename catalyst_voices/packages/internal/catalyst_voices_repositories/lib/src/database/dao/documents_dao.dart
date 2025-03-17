@@ -73,6 +73,7 @@ abstract interface class DocumentsDao {
     bool unique = false,
     int? limit,
     DocumentType? type,
+    CatalystId? catalystId,
   });
 
   /// Watches for new comments that are reference by ref.
@@ -245,11 +246,16 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
     bool unique = false,
     int? limit,
     DocumentType? type,
+    CatalystId? catalystId,
   }) {
     final query = select(documents);
 
     if (type != null) {
       query.where((doc) => doc.type.equals(type.uuid));
+    }
+    if (catalystId != null) {
+      // TODO(LynxLynxx): filter when catalystId is implemented as metadata
+      // query.where((doc) => doc.metadata.catalystId.equals(catalystId.uuid));
     }
 
     return query.watch().map((documents) {

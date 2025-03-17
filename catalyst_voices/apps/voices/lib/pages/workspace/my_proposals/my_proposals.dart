@@ -1,9 +1,11 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/widgets/cards/workspace_proposal_card.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
+import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class MyProposals extends StatelessWidget {
   const MyProposals({super.key});
@@ -27,15 +29,21 @@ class MyProposals extends StatelessWidget {
             maxCount: 5,
             submittedCount: 2,
           ),
-          WorkspaceProposalCard(
-            proposal: ProposalWithVersionX.dummy(
-              ProposalPublish.submittedProposal,
-            ),
-          ),
-          WorkspaceProposalCard(
-            proposal: ProposalWithVersionX.dummy(
-              ProposalPublish.publishedDraft,
-            ),
+          BlocSelector<WorkspaceBloc, WorkspaceState, List<Proposal>>(
+            selector: (state) {
+              return state.userProposals;
+            },
+            builder: (context, state) {
+              return Column(
+                children: state
+                    .map(
+                      (e) => WorkspaceProposalCard(
+                        proposal: e,
+                      ),
+                    )
+                    .toList(),
+              );
+            },
           ),
           const _SharedForPublicHeader(),
           const _NotPublishedHeader(),

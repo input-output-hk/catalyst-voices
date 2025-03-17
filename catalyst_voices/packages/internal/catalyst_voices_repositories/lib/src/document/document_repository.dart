@@ -5,15 +5,11 @@ import 'package:async/async.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/document_data_dto.dart';
-import 'package:catalyst_voices_repositories/src/dto/document/document_dto.dart';
-import 'package:catalyst_voices_repositories/src/dto/document/schema/document_schema_dto.dart';
+import 'package:catalyst_voices_repositories/src/dto/document_data_with_ref_dat.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/foundation.dart';
 import 'package:rxdart/transformers.dart';
 import 'package:synchronized/synchronized.dart';
-
-@visibleForTesting
-typedef DocumentsDataWithRefData = ({DocumentData data, DocumentData refData});
 
 abstract interface class DocumentRepository {
   factory DocumentRepository(
@@ -104,7 +100,9 @@ abstract interface class DocumentRepository {
   /// Returns a list of version for given [id].
   ///
   /// Can be used to get versions count.
-  Future<List<ProposalDocument>> queryVersionsOfId({required String id});
+  Future<List<DocumentsDataWithRefData>> queryVersionsOfId({
+    required String id,
+  });
 
   /// Updates local draft (or drafts if version is not specified)
   /// matching [ref] with given [content].
@@ -124,14 +122,16 @@ abstract interface class DocumentRepository {
   /// Observes matching [ProposalDocument] and emits updates.
   ///
   /// Source of data depends whether [ref] is [SignedDocumentRef] or [DraftRef].
-  Stream<ProposalDocument> watchDocument({
+  Stream<DocumentsDataWithRefData> watchDocument({
     required DocumentRef ref,
   });
 
-  Stream<List<({DocumentData data, DocumentData refData})>> watchDocuments({
+  Stream<List<DocumentsDataWithRefData>> watchDocuments({
     required DocumentType type,
     int? limit,
     bool unique = false,
+    bool getlocalDrafts = false,
+    CatalystId? catalystId,
   });
 }
 
@@ -228,7 +228,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   @override
   Future<DocumentData> getDocumentData({
     required DocumentRef ref,
-  }) {
+  }) async {
     return switch (ref) {
       SignedDocumentRef() => _getSignedDocumentData(ref: ref),
       DraftRef() => _getDraftDocumentData(ref: ref),
@@ -267,7 +267,9 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   }
 
   @override
-  Future<List<ProposalDocument>> queryVersionsOfId({required String id}) async {
+  Future<List<DocumentsDataWithRefData>> queryVersionsOfId({
+    required String id,
+  }) async {
     final documents = await _localDocuments.queryVersionsOfId(id: id);
     if (documents.isEmpty) return [];
     final templateRef = documents.first.metadata.template!;
@@ -275,9 +277,9 @@ final class DocumentRepositoryImpl implements DocumentRepository {
 
     return documents
         .map(
-          (e) => _buildProposalDocument(
-            documentData: e,
-            templateData: templateData,
+          (e) => DocumentsDataWithRefData(
+            data: e,
+            refData: templateData,
           ),
         )
         .toList();
@@ -298,10 +300,17 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   Stream<List<DocumentsDataWithRefData>> watchAllDocuments({
     int? limit,
     bool unique = false,
+    bool getlocalDrafts = false,
     DocumentType? type,
+    CatalystId? catalystId,
   }) {
-    return _localDocuments
-        .watchAll(limit: limit, unique: unique, type: type)
+    final localDocs = _localDocuments
+        .watchAll(
+          limit: limit,
+          unique: unique,
+          type: type,
+          catalystId: catalystId,
+        )
         .distinct()
         .switchMap((documents) async* {
       final results = await Future.wait(
@@ -312,11 +321,47 @@ final class DocumentRepositoryImpl implements DocumentRepository {
           final templateData = await _documentDataLock.synchronized(
             () => getDocumentData(ref: templateRef),
           );
-          return (data: documentData, refData: templateData);
+          return DocumentsDataWithRefData(
+            data: documentData,
+            refData: templateData,
+          );
         }),
       );
       yield results;
     });
+    if (getlocalDrafts) {
+      final localDrafts = _drafts
+          .watchAll(
+            limit: limit,
+            unique: unique,
+            type: type,
+            catalystId: catalystId,
+          )
+          .distinct()
+          .switchMap((documents) async* {
+        final results = await Future.wait(
+          documents
+              .where((doc) => doc.metadata.template != null)
+              .map((documentData) async {
+            final templateRef = documentData.metadata.template!;
+            final templateData = await _documentDataLock.synchronized(
+              () => getDocumentData(ref: templateRef),
+            );
+            return DocumentsDataWithRefData(
+              data: documentData,
+              refData: templateData,
+            );
+          }),
+        );
+        yield results;
+      });
+      return StreamGroup.merge([
+        localDocs,
+        localDrafts,
+      ]);
+    }
+
+    return localDocs;
   }
 
   @override
@@ -331,7 +376,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   }
 
   @override
-  Stream<ProposalDocument> watchDocument({
+  Stream<DocumentsDataWithRefData> watchDocument({
     required DocumentRef ref,
   }) {
     // TODO(damian-molinski): remove this override once we have API
@@ -345,23 +390,27 @@ final class DocumentRepositoryImpl implements DocumentRepository {
         final documentData = event.data;
         final templateData = event.refData;
 
-        return _buildProposalDocument(
-          documentData: documentData,
-          templateData: templateData,
+        return DocumentsDataWithRefData(
+          data: documentData,
+          refData: templateData,
         );
       },
     );
   }
 
   @override
-  Stream<List<({DocumentData data, DocumentData refData})>> watchDocuments({
+  Stream<List<DocumentsDataWithRefData>> watchDocuments({
     required DocumentType type,
     int? limit,
     bool unique = false,
+    bool getlocalDrafts = false,
+    CatalystId? catalystId,
   }) {
     return watchAllDocuments(
       limit: limit,
       type: type,
+      getlocalDrafts: getlocalDrafts,
+      catalystId: catalystId,
     );
   }
 
@@ -389,59 +438,14 @@ final class DocumentRepositoryImpl implements DocumentRepository {
       return refDocumentStream.map<DocumentsDataWithRefData?>(
         (refDocumentData) {
           return refDocumentData != null
-              ? (data: document, refData: refDocumentData)
+              ? DocumentsDataWithRefData(
+                  data: document,
+                  refData: refDocumentData,
+                )
               : null;
         },
       );
     });
-  }
-
-  ProposalDocument _buildProposalDocument({
-    required DocumentData documentData,
-    required DocumentData templateData,
-  }) {
-    assert(
-      documentData.metadata.type == DocumentType.proposalDocument,
-      'Not a proposalDocument document data type',
-    );
-
-    final template = _buildProposalTemplate(documentData: templateData);
-
-    final metadata = ProposalMetadata(
-      selfRef: documentData.metadata.selfRef,
-    );
-
-    final content = DocumentDataContentDto.fromModel(
-      documentData.content,
-    );
-    final schema = template.schema;
-    final document = DocumentDto.fromJsonSchema(content, schema).toModel();
-
-    return ProposalDocument(
-      metadata: metadata,
-      document: document,
-    );
-  }
-
-  ProposalTemplate _buildProposalTemplate({
-    required DocumentData documentData,
-  }) {
-    assert(
-      documentData.metadata.type == DocumentType.proposalTemplate,
-      'Not a proposalTemplate document data type',
-    );
-
-    final metadata = ProposalTemplateMetadata(
-      selfRef: documentData.metadata.selfRef,
-    );
-
-    final contentData = documentData.content.data;
-    final schema = DocumentSchemaDto.fromJson(contentData).toModel();
-
-    return ProposalTemplate(
-      metadata: metadata,
-      schema: schema,
-    );
   }
 
   Future<DocumentData> _getDraftDocumentData({

@@ -74,6 +74,24 @@ final class DatabaseDraftsDataSource implements DraftDataSource {
         .watch(ref: ref)
         .map((entity) => entity?.toModel());
   }
+
+  @override
+  Stream<List<DocumentData>> watchAll({
+    int? limit,
+    required bool unique,
+    DocumentType? type,
+    CatalystId? catalystId,
+  }) {
+    return _database.draftsDao
+        .watchAll(
+      limit: limit,
+      unique: unique,
+      type: type,
+    )
+        .map((event) {
+      return List<DocumentData>.from(event.map((e) => e.toModel()));
+    });
+  }
 }
 
 extension on DocumentDraftEntity {

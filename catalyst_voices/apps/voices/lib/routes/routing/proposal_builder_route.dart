@@ -5,6 +5,7 @@ import 'package:catalyst_voices/routes/guards/session_unlocked_guard.dart';
 import 'package:catalyst_voices/routes/guards/user_access_guard.dart';
 import 'package:catalyst_voices/routes/routing/routes.dart';
 import 'package:catalyst_voices/routes/routing/transitions/fade_page_transition_mixin.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 
@@ -39,9 +40,13 @@ final class ProposalBuilderDraftRoute extends GoRouteData
 final class ProposalBuilderRoute extends GoRouteData
     with FadePageTransitionMixin, CompositeRouteGuardMixin {
   final String proposalId;
+  final String? version;
+  final bool isPrivate;
 
   const ProposalBuilderRoute({
     required this.proposalId,
+    this.version,
+    required this.isPrivate,
   });
 
   @override
@@ -52,6 +57,12 @@ final class ProposalBuilderRoute extends GoRouteData
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
-    return ProposalBuilderPage(proposalId: proposalId);
+    DocumentRef proposalRef;
+    if (isPrivate) {
+      proposalRef = DraftRef(id: proposalId, version: version);
+    } else {
+      proposalRef = SignedDocumentRef(id: proposalId, version: version);
+    }
+    return ProposalBuilderPage(proposalRef: proposalRef);
   }
 }

@@ -20,7 +20,11 @@ class _MyProposalsList extends StatelessWidget {
           item: item,
           onTap: () {
             unawaited(
-              ProposalBuilderRoute(proposalId: item.id).push(context),
+              ProposalBuilderRoute(
+                proposalId: item.id,
+                version: '',
+                isPrivate: false,
+              ).push(context),
             );
           },
         );

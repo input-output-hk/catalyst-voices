@@ -83,6 +83,8 @@ abstract interface class ProposalService {
   });
 
   Stream<List<Proposal>> watchLatestProposals({int? limit});
+
+  Stream<List<Proposal>> watchUserProposals();
 }
 
 final class ProposalServiceImpl implements ProposalService {
@@ -268,6 +270,27 @@ final class ProposalServiceImpl implements ProposalService {
       )) {
         yield commentsUpdates;
       }
+    });
+  }
+
+  @override
+  Stream<List<Proposal>> watchUserProposals() {
+    return _proposalRepository
+        .watchUserProposals(
+      userCatalystId: CatalystId(
+        host: '',
+        role0Key: Uint8List.fromList(List.filled(32, 0)),
+      ),
+    )
+        .switchMap((documents) async* {
+      final proposals = documents.map((e) {
+        final proposalData = ProposalData(
+          document: e,
+          categoryId: SignedDocumentRef.generateFirstRef(),
+        );
+        return Proposal.fromData(proposalData);
+      }).toList();
+      yield proposals;
     });
   }
 

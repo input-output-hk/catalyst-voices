@@ -1,14 +1,10 @@
-import 'dart:ffi';
-
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/database/catalyst_database.dart';
 import 'package:catalyst_voices_repositories/src/database/database.dart';
 import 'package:collection/collection.dart';
 import 'package:drift/drift.dart' show DatabaseConnection;
 import 'package:drift/native.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sqlite3/open.dart';
 import 'package:uuid/data.dart';
 import 'package:uuid/uuid.dart';
 
@@ -18,14 +14,6 @@ void main() {
   late DriftCatalystDatabase database;
 
   setUp(() {
-    if (!kIsWeb) {
-      open.overrideFor(
-        OperatingSystem.macOS,
-        () => DynamicLibrary.open(
-            '/opt/homebrew/Cellar/sqlite/3.49.1/lib/libsqlite3.3.49.1.dylib'),
-      );
-    }
-
     final inMemory = DatabaseConnection(NativeDatabase.memory());
     database = DriftCatalystDatabase(inMemory);
   });
