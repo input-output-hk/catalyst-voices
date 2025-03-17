@@ -20,10 +20,8 @@ class ProposalDocumentSectionTile extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _SectionTitleText(property.schema.title),
-          DocumentPropertyReadBuilder(
-            property: property,
-            leadingSpacing: 16,
-          ),
+          const SizedBox(height: 16),
+          DocumentPropertyReadBuilder(property: property),
         ],
       ),
     );

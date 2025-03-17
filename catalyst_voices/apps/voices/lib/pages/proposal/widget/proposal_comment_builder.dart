@@ -3,7 +3,6 @@ import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart'
     hide DocumentPropertyBuilder;
-import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 
 class ProposalCommentBuilder extends StatefulWidget {
@@ -55,22 +54,6 @@ class _Actions extends StatelessWidget {
   }
 }
 
-class _Avatar extends StatelessWidget {
-  final String? letter;
-
-  const _Avatar({
-    this.letter,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return VoicesAvatar(
-      radius: 40 / 2,
-      icon: Text(letter?.toUpperCase() ?? ''),
-    );
-  }
-}
-
 class _ProposalCommentBuilderState extends State<ProposalCommentBuilder> {
   late DocumentBuilder _builder;
   late Document _comment;
@@ -84,7 +67,10 @@ class _ProposalCommentBuilderState extends State<ProposalCommentBuilder> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _Avatar(letter: widget.authorId.username?.firstLetter),
+          ProfileAvatar(
+            username: widget.authorId.username,
+            size: 40,
+          ),
           const SizedBox(width: 16),
           Expanded(
             child: Form(
