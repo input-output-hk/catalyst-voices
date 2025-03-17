@@ -152,7 +152,7 @@ impl SyncTask {
                     self.get_syncable_range(self.start_slot, end_slot)
                 {
                     self.sync_tasks.push(sync_subchain(
-                        SyncParams::new(self.cfg.chain, first_point, last_point.clone()),
+                        SyncParams::new_immutable(self.cfg.chain, first_point, last_point.clone()),
                         self.event_channel.0.clone(),
                     ));
 
@@ -179,11 +179,7 @@ impl SyncTask {
     fn start_live_chain_follower(&mut self) {
         if self.sync_tasks.len() < self.cfg.sync_tasks {
             self.sync_tasks.push(sync_subchain(
-                SyncParams::new(
-                    self.cfg.chain,
-                    Point::fuzzy(self.immutable_tip_slot),
-                    Point::TIP,
-                ),
+                SyncParams::new_live(self.cfg.chain, Point::fuzzy(self.immutable_tip_slot)),
                 self.event_channel.0.clone(),
             ));
         }
@@ -325,7 +321,10 @@ fn sync_subchain(
                     info!(chain=%params.chain(), "Immutable chain rolled forward.");
                     // Signal the point the immutable chain rolled forward to.
                     params.set_follower_roll_forward(chain_update.block_data().point());
-                    return params.done(None);
+                    // If this task is imm
+                    if !params.is_immutable() {
+                        return params.done(None);
+                    }
                 },
                 cardano_chain_follower::Kind::Block => {
                     let block = chain_update.block_data();

@@ -22,12 +22,8 @@ pub(crate) struct SyncParams {
     end: Point,
     /// The first block we successfully synced.
     first_indexed_block: Option<Point>,
-    /// Is the starting point immutable? (True = immutable, false = don't know.)
-    first_is_immutable: bool,
     /// The last block we successfully synced.
     last_indexed_block: Option<Point>,
-    /// Is the ending point immutable? (True = immutable, false = don't know.)
-    last_is_immutable: bool,
     /// The number of blocks we successfully synced overall.
     total_blocks_synced: u64,
     /// The number of blocks we successfully synced, in the last attempt.
@@ -53,19 +49,11 @@ impl Display for SyncParams {
         write!(f, "start: {}, end: {}", self.start, self.end)?;
 
         if let Some(first) = self.first_indexed_block.as_ref() {
-            write!(
-                f,
-                ", first_indexed_block: {first}{}",
-                if self.first_is_immutable { ":I" } else { "" }
-            )?;
+            write!(f, ", first_indexed_block: {first}",)?;
         }
 
         if let Some(last) = self.last_indexed_block.as_ref() {
-            write!(
-                f,
-                ", last_indexed_block: {last}{}",
-                if self.last_is_immutable { ":I" } else { "" }
-            )?;
+            write!(f, ", last_indexed_block: {last}",)?;
         }
 
         if self.retries > 0 {
@@ -94,16 +82,31 @@ impl Display for SyncParams {
 }
 
 impl SyncParams {
-    /// Create a new `SyncParams`.
-    pub(crate) fn new(chain: Network, start: Point, end: Point) -> Self {
+    /// Create a new `SyncParams` for the immutable chain sync task.
+    pub(crate) fn new_immutable(chain: Network, start: Point, end: Point) -> Self {
         Self {
             chain,
             start,
             end,
             first_indexed_block: None,
-            first_is_immutable: false,
             last_indexed_block: None,
-            last_is_immutable: false,
+            total_blocks_synced: 0,
+            last_blocks_synced: 0,
+            retries: 0,
+            backoff_delay: None,
+            error: Arc::new(None),
+            follower_roll_forward: None,
+        }
+    }
+
+    /// Create a new `SyncParams` for the live chain sync task.
+    pub(crate) fn new_live(chain: Network, start: Point) -> Self {
+        Self {
+            chain,
+            start,
+            end: Point::TIP,
+            first_indexed_block: None,
+            last_indexed_block: None,
             total_blocks_synced: 0,
             last_blocks_synced: 0,
             retries: 0,
@@ -142,7 +145,7 @@ impl SyncParams {
 
     /// Convert Params into the result of the sync.
     pub(crate) fn done(mut self, error: Option<anyhow::Error>) -> Self {
-        if error.is_none() && self.first_is_immutable && self.last_is_immutable {
+        if error.is_none() && self.is_immutable() {
             // Update sync status in the Immutable DB.
             // Can fire and forget, because failure to update DB will simply cause the chunk to be
             // re-indexed, on recovery.
@@ -160,10 +163,8 @@ impl SyncParams {
 
     /// During indexing block updating corresponding sync parameters
     pub(crate) fn update_block_state(&mut self, block: &MultiEraBlock) {
-        self.last_is_immutable = block.is_immutable();
         self.last_indexed_block = Some(block.point());
         if self.first_indexed_block.is_none() {
-            self.first_is_immutable = block.is_immutable();
             self.first_indexed_block = Some(block.point());
         }
         self.last_blocks_synced = self.last_blocks_synced.saturating_add(1);
@@ -172,6 +173,12 @@ impl SyncParams {
     /// Returns a chain's network type
     pub(crate) fn chain(&self) -> &Network {
         &self.chain
+    }
+
+    /// Returns if the running sync task was defined as immutable
+    /// Only live chain sync task
+    pub(crate) fn is_immutable(&self) -> bool {
+        self.end == Point::TIP
     }
 
     /// Returns the last block we successfully synced.
