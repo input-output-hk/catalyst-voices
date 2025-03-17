@@ -89,7 +89,8 @@ final class DatabaseDraftsDataSource implements DraftDataSource {
       type: type,
     )
         .map((event) {
-      return List<DocumentData>.from(event.map((e) => e.toModel()));
+      final list = List<DocumentData>.from(event.map((e) => e.toModel()));
+      return list;
     });
   }
 }

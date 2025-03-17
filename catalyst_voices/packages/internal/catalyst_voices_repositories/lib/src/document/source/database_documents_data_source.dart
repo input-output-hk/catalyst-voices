@@ -85,12 +85,14 @@ final class DatabaseDocumentsDataSource implements SignedDocumentDataSource {
   }) {
     return _database.documentsDao
         .watchAll(
-          limit: limit,
-          unique: unique,
-          type: type,
-          catalystId: catalystId,
-        )
-        .map((entities) => entities.map((e) => e.toModel()).toList());
+      limit: limit,
+      unique: unique,
+      type: type,
+      catalystId: catalystId,
+    )
+        .map((entities) {
+      return List<DocumentData>.from(entities.map((e) => e.toModel()));
+    });
   }
 
   @override

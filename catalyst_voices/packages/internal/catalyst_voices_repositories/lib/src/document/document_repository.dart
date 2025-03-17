@@ -8,7 +8,7 @@ import 'package:catalyst_voices_repositories/src/dto/document/document_data_dto.
 import 'package:catalyst_voices_repositories/src/dto/document_data_with_ref_dat.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/foundation.dart';
-import 'package:rxdart/transformers.dart';
+import 'package:rxdart/rxdart.dart';
 import 'package:synchronized/synchronized.dart';
 
 abstract interface class DocumentRepository {
@@ -306,15 +306,15 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   }) {
     final localDocs = _localDocuments
         .watchAll(
-          limit: limit,
-          unique: unique,
-          type: type,
-          catalystId: catalystId,
-        )
-        .distinct()
-        .switchMap((documents) async* {
+      limit: limit,
+      unique: unique,
+      type: type,
+      catalystId: catalystId,
+    )
+        .asyncMap((documents) async {
+      final typedDocuments = documents.cast<DocumentData>();
       final results = await Future.wait(
-        documents
+        typedDocuments
             .where((doc) => doc.metadata.template != null)
             .map((documentData) async {
           final templateRef = documentData.metadata.template!;
@@ -327,41 +327,52 @@ final class DocumentRepositoryImpl implements DocumentRepository {
           );
         }),
       );
-      yield results;
+      return results;
     });
-    if (getlocalDrafts) {
-      final localDrafts = _drafts
-          .watchAll(
-            limit: limit,
-            unique: unique,
-            type: type,
-            catalystId: catalystId,
-          )
-          .distinct()
-          .switchMap((documents) async* {
-        final results = await Future.wait(
-          documents
-              .where((doc) => doc.metadata.template != null)
-              .map((documentData) async {
-            final templateRef = documentData.metadata.template!;
-            final templateData = await _documentDataLock.synchronized(
-              () => getDocumentData(ref: templateRef),
-            );
-            return DocumentsDataWithRefData(
-              data: documentData,
-              refData: templateData,
-            );
-          }),
-        );
-        yield results;
-      });
-      return StreamGroup.merge([
-        localDocs,
-        localDrafts,
-      ]);
+
+    if (!getlocalDrafts) {
+      return localDocs;
     }
 
-    return localDocs;
+    final localDrafts = _drafts
+        .watchAll(
+      limit: limit,
+      unique: unique,
+      type: type,
+      catalystId: catalystId,
+    )
+        .asyncMap((documents) async {
+      final typedDocuments = documents.cast<DocumentData>();
+      final results = await Future.wait(
+        typedDocuments
+            .where((doc) => doc.metadata.template != null)
+            .map((documentData) async {
+          final templateRef = documentData.metadata.template!;
+          final templateData = await _documentDataLock.synchronized(
+            () => getDocumentData(ref: templateRef),
+          );
+          return DocumentsDataWithRefData(
+            data: documentData,
+            refData: templateData,
+          );
+        }),
+      );
+      return results;
+    });
+
+    return Rx.combineLatest2(
+      localDocs,
+      localDrafts,
+      (
+        List<DocumentsDataWithRefData> docs,
+        List<DocumentsDataWithRefData> drafts,
+      ) {
+        final combined = [...docs, ...drafts];
+        return combined.toSet().toList();
+      },
+    ).distinct(
+      listEquals,
+    );
   }
 
   @override
