@@ -79,9 +79,7 @@ impl ResponseError for AuthTokenError {
 
     /// Convert this error to a HTTP response.
     fn as_response(&self) -> poem::Response
-    where
-        Self: Error + Send + Sync + 'static,
-    {
+    where Self: Error + Send + Sync + 'static {
         ErrorResponses::unauthorized().into_response()
     }
 }
@@ -100,9 +98,7 @@ impl ResponseError for AuthTokenAccessViolation {
 
     /// Convert this error to a HTTP response.
     fn as_response(&self) -> poem::Response
-    where
-        Self: Error + Send + Sync + 'static,
-    {
+    where Self: Error + Send + Sync + 'static {
         // TODO: Actually check permissions needed for an endpoint.
         ErrorResponses::forbidden(Some(self.0.clone())).into_response()
     }
@@ -204,12 +200,9 @@ async fn indexed_registrations(catalyst_id: &IdUri) -> poem::Result<Vec<Query>> 
         service_unavailable()
     })?;
 
-    let mut result: Vec<_> = Query::execute(
-        &session,
-        QueryParams {
-            catalyst_id: catalyst_id.clone().into(),
-        },
-    )
+    let mut result: Vec<_> = Query::execute(&session, QueryParams {
+        catalyst_id: catalyst_id.clone().into(),
+    })
     .and_then(|r| r.try_collect().map_err(Into::into))
     .await
     .map_err(|e| {
