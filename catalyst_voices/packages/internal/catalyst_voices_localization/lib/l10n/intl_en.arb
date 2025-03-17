@@ -1878,5 +1878,18 @@
   "viewLatestDocumentVersion": "View Latest",
   "@viewLatestDocumentVersion": {
     "description": "Action to change back to latest version"
+  },
+  "commentHideReplies": "Hide replies",
+  "@commentHideReplies": {
+    "description": "Hide comment replies"
+  },
+  "commentXReplies": "{count} {count, plural, =0{replies} =1{reply} other{replies}}",
+  "@commentXReplies": {
+    "description": "Show comment replies",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   }
 }
