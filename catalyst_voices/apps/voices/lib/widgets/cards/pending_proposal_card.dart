@@ -48,9 +48,9 @@ class _Author extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          VoicesAvatar(
+          ProfileAvatar(
             key: const Key('AuthorAvatar'),
-            icon: Text(author[0]),
+            username: author,
             backgroundColor: context.colors.primaryContainer,
             foregroundColor: context.colors.textOnPrimaryWhite,
           ),
