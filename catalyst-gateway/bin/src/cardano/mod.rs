@@ -65,7 +65,7 @@ pub(crate) async fn start_followers() -> anyhow::Result<()> {
             if let Event::SyncTasksChanged { current_sync_tasks } = event {
                 reporter::RUNNING_INDEXER_TASKS_COUNT
                     .with_label_values(&[&api_host_names, service_id, &network])
-                    .set(From::from(*current_sync_tasks));
+                    .set(i64::try_from(*current_sync_tasks).unwrap_or(-1));
             }
             if let Event::LiveTipSlotChanged { slot } = event {
                 reporter::CURRENT_LIVE_TIP_SLOT

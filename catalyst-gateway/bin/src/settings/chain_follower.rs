@@ -12,10 +12,10 @@ use super::str_env_var::StringEnvVar;
 const DEFAULT_NETWORK: Network = Network::Mainnet;
 
 /// Default number of sync tasks (must be in the range 1 to 256 inclusive.)
-const DEFAULT_SYNC_TASKS: u16 = 16;
+const DEFAULT_SYNC_TASKS: usize = 16;
 
 /// Maximum number of sync tasks (must be in the range 1 to 256 inclusive.)
-const MAX_SYNC_TASKS: u16 = 256;
+const MAX_SYNC_TASKS: usize = 256;
 
 /// Default number of slots each sync task will process at one time.
 /// This default is just over one week worth of data where 1 slot == 1 second.
@@ -48,7 +48,7 @@ pub(crate) struct EnvVars {
     pub(crate) chain: Network,
 
     /// The maximum number of sync tasks.
-    pub(crate) sync_tasks: u16,
+    pub(crate) sync_tasks: usize,
 
     /// The maximum number of slots a sync task will process at once.
     pub(crate) sync_chunk_max_slots: u64,
@@ -61,7 +61,7 @@ impl EnvVars {
     /// Create a config for a cassandra cluster, identified by a default namespace.
     pub(super) fn new() -> Self {
         let chain = StringEnvVar::new_as_enum("CHAIN_NETWORK", DEFAULT_NETWORK, false);
-        let sync_tasks: u16 = StringEnvVar::new_as_int(
+        let sync_tasks: usize = StringEnvVar::new_as_int(
             "CHAIN_FOLLOWER_SYNC_TASKS",
             DEFAULT_SYNC_TASKS,
             1,
