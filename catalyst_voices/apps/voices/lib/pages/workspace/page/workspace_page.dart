@@ -28,16 +28,6 @@ class _WorkspacePageState extends State<WorkspacePage>
           children: [
             WorkspaceHeader(),
             MyProposals(),
-            // Expanded(
-            //   child: Stack(
-            //     children: [
-            //       WorkspaceMyProposalsSelector(),
-            //       WorkspaceLoadingSelector(),
-            //       WorkspaceEmptyStateSelector(),
-            //       WorkspaceErrorSelector(),
-            //     ],
-            //   ),
-            // ),
           ],
         ),
       ),
