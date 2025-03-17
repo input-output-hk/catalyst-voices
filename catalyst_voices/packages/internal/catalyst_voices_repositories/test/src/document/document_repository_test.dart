@@ -8,7 +8,7 @@ import 'package:drift/drift.dart' show DatabaseConnection;
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:uuid/uuid.dart';
+import 'package:uuid_plus/uuid_plus.dart';
 
 import '../utils/test_factories.dart';
 
@@ -99,8 +99,9 @@ void main() {
       when(() => remoteDocuments.get(ref: templateRef)).thenAnswer(
         (_) => Future.error(DocumentNotFoundException(ref: templateRef)),
       );
-      when(() => remoteDocuments.get(ref: proposal.ref))
-          .thenAnswer((_) => Future.error(DocumentNotFound(ref: templateRef)));
+      when(() => remoteDocuments.get(ref: proposal.ref)).thenAnswer(
+        (_) => Future.error(DocumentNotFoundException(ref: templateRef)),
+      );
 
       // When
       final ref = proposal.ref;

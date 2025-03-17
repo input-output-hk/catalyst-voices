@@ -1,7 +1,7 @@
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:equatable/equatable.dart';
+import 'package:uuid_plus/uuid_plus.dart';
 
 class BaseProposalData extends Equatable {
   final ProposalDocument document;
@@ -65,6 +65,18 @@ class BaseProposalData extends Equatable {
         as DocumentValueProperty<String>?;
 
     return property?.value;
+  }
+
+  ProposalVersion toProposalVersion() {
+    return ProposalVersion(
+      selfRef: document.metadata.selfRef,
+      title: getProposalTitle() ?? '',
+      createdAt: UuidV7.parseDateTime(
+        document.metadata.selfRef.version ?? document.metadata.selfRef.id,
+      ),
+      // TODO(LynxLynxx): from where we need to get the real status
+      publish: ProposalPublish.publishedDraft,
+    );
   }
 }
 

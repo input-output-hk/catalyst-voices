@@ -407,10 +407,8 @@ class _Topbar extends StatelessWidget {
           circle: false,
           onTap: () async {
             // TODO(LynxLynxx): Change to proposal view route when implemented
-            final url = ProposalBuilderRoute(
-              proposalId: proposalId,
-              local: false,
-            ).location;
+            // TODO(LynxLynxx): change proposalId to use DocumentRef
+            final url = ProposalBuilderRoute(proposalId: proposalId).location;
             await ShareProposalDialog.show(context, url);
           },
         ),

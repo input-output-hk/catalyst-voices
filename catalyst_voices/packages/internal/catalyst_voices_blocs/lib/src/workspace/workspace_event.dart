@@ -15,6 +15,7 @@ final class ImportProposalEvent extends WorkspaceEvent {
 
 final class LoadProposalsEvent extends WorkspaceEvent {
   final List<Proposal> proposals;
+  
   const LoadProposalsEvent(this.proposals);
 
   @override

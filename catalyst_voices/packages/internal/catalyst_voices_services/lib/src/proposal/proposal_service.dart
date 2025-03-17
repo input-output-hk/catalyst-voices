@@ -116,10 +116,17 @@ final class ProposalServiceImpl implements ProposalService {
     required SignedDocumentRef template,
     required SignedDocumentRef categoryId,
   }) async {
-    return _proposalRepository.createDraftProposal(
-      content: content,
-      template: template,
-      selfRef: ref,
+    final draftRef = DraftRef.generateFirstRef();
+    await _proposalRepository.upsertDraftProposal(
+      document: DocumentData(
+        metadata: DocumentDataMetadata(
+          type: DocumentType.proposalDocument,
+          selfRef: draftRef,
+          template: template,
+          categoryId: categoryId,
+        ),
+        content: content,
+      ),
     );
 
     return draftRef;
@@ -205,7 +212,7 @@ final class ProposalServiceImpl implements ProposalService {
 
     final ref = document.ref;
     if (ref is DraftRef) {
-      await _documentRepository.deleteDocumentDraft(ref: ref);
+      await _proposalRepository.deleteDraftProposal(ref);
     }
 
     return ref.toSignedDocumentRef();
@@ -238,10 +245,19 @@ final class ProposalServiceImpl implements ProposalService {
   Future<void> upsertDraftProposal({
     required DraftRef selfRef,
     required DocumentDataContent content,
-  }) {
-    return _proposalRepository.updateDraftProposal(
-      ref: ref,
-      content: content,
+    required SignedDocumentRef template,
+    required SignedDocumentRef categoryId,
+  }) async {
+    await _proposalRepository.upsertDraftProposal(
+      document: DocumentData(
+        metadata: DocumentDataMetadata(
+          type: DocumentType.proposalDocument,
+          selfRef: selfRef,
+          template: template,
+          categoryId: categoryId,
+        ),
+        content: content,
+      ),
     );
   }
 

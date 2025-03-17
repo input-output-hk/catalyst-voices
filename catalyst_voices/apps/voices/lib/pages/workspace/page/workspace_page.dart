@@ -55,11 +55,7 @@ class _WorkspacePageState extends State<WorkspacePage>
   void _onImportProposal(DocumentRef? ref) {
     if (ref != null) {
       unawaited(
-        ProposalBuilderRoute(
-          proposalId: ref.id,
-          proposalVersion: ref.version,
-          local: DocumentRef is DraftRef,
-        ).push(context),
+        ProposalBuilderRoute.fromRef(ref: ref).push(context),
       );
     }
   }

@@ -54,7 +54,7 @@ abstract interface class DocumentRepository {
   /// If version is not specified in [ref] method will try to return latest
   /// version of document matching [ref].
   ///
-  /// If document does not exist it will throw [DocumentNotFound].
+  /// If document does not exist it will throw [DocumentNotFoundException].
   ///
   /// If [DocumentRef] is [SignedDocumentRef] it will look for this document in
   /// local storage.
