@@ -138,7 +138,7 @@ final class CoseSign extends Equatable {
   }
 
   /// Serializes the type as cbor.
-  CborValue toCbor() {
+  CborValue toCbor({bool tagged = true}) {
     return CborList(
       [
         protectedHeaders.toCbor(),
@@ -148,7 +148,9 @@ final class CoseSign extends Equatable {
           for (final signature in signatures) signature.toCbor(),
         ]),
       ],
-      tags: [CoseTags.coseSign],
+      tags: [
+        if (tagged) CoseTags.coseSign,
+      ],
     );
   }
 
