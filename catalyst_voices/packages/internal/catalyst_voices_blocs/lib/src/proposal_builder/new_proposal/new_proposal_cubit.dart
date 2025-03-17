@@ -9,7 +9,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 class NewProposalCubit extends Cubit<NewProposalState> {
   final CampaignService _campaignService;
 
-  NewProposalCubit(this._campaignService) : super(const NewProposalState()) {
+  NewProposalCubit(this._campaignService)
+      : super(
+          const NewProposalState(
+            title: ProposalTitle.pure(),
+          ),
+        ) {
     unawaited(getCampaignCategories());
   }
 
@@ -29,11 +34,7 @@ class NewProposalCubit extends Cubit<NewProposalState> {
     emit(state.copyWith(categoryId: Optional(categoryId)));
   }
 
-  void updateTitle(String? title) {
-    emit(
-      state.copyWith(
-        title: Optional(title),
-      ),
-    );
+  void updateTitle(ProposalTitle title) {
+    emit(state.copyWith(title: title));
   }
 }

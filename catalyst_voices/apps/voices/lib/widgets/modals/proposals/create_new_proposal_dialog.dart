@@ -16,44 +16,12 @@ typedef _SelectedCategoryData = ({
   String? value,
 });
 
-class CreateNewProposalDialog extends StatelessWidget {
+class CreateNewProposalDialog extends StatefulWidget {
   const CreateNewProposalDialog({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return VoicesDetailsDialog(
-      constraints: const BoxConstraints(maxHeight: 390, maxWidth: 750),
-      header: VoicesAlignTitleHeader(
-        title: context.l10n.createProposal,
-        padding: const EdgeInsets.all(24),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.fromLTRB(
-          24,
-          16,
-          24,
-          24,
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            _SectionTitle(
-              text: context.l10n.title.starred(),
-            ),
-            const _TitleTextField(),
-            const SizedBox(height: 16),
-            _SectionTitle(
-              text: context.l10n.selectedCategory.starred(),
-            ),
-            const _CategorySelection(),
-            const SizedBox(height: 40),
-            const _ActionButtons(),
-          ],
-        ),
-      ),
-    );
-  }
+  State<CreateNewProposalDialog> createState() =>
+      _CreateNewProposalDialogState();
 
   static Future<void> show(BuildContext context) async {
     final result = showDialog<void>(
@@ -82,9 +50,7 @@ class _ActionButtons extends StatelessWidget {
         ),
         const Spacer(),
         BlocSelector<NewProposalCubit, NewProposalState, bool>(
-          selector: (state) {
-            return state.isValid;
-          },
+          selector: (state) => state.isValid,
           builder: (context, isValid) {
             return VoicesTextButton(
               onTap: isValid
@@ -98,9 +64,7 @@ class _ActionButtons extends StatelessWidget {
         ),
         const SizedBox(width: 8),
         BlocSelector<NewProposalCubit, NewProposalState, bool>(
-          selector: (state) {
-            return state.isValid;
-          },
+          selector: (state) => state.isValid,
           builder: (context, isValid) {
             return VoicesFilledButton(
               onTap: isValid
@@ -124,7 +88,9 @@ class _ActionButtons extends StatelessWidget {
 }
 
 class _CategorySelection extends StatelessWidget {
-  const _CategorySelection();
+  final FocusNode focusNode;
+
+  const _CategorySelection({required this.focusNode});
 
   @override
   Widget build(BuildContext context) {
@@ -138,6 +104,7 @@ class _CategorySelection extends StatelessWidget {
       },
       builder: (context, state) {
         return SingleSelectDropdown<String>(
+          focusNode: focusNode,
           filled: false,
           borderRadius: 8,
           items: state.categories
@@ -158,8 +125,61 @@ class _CategorySelection extends StatelessWidget {
   }
 }
 
+class _CreateNewProposalDialogState extends State<CreateNewProposalDialog> {
+  final FocusNode _categoryFocusNode = FocusNode();
+
+  @override
+  Widget build(BuildContext context) {
+    return VoicesDetailsDialog(
+      constraints: const BoxConstraints(maxHeight: 390, maxWidth: 750),
+      header: VoicesAlignTitleHeader(
+        title: context.l10n.createProposal,
+        padding: const EdgeInsets.all(24),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.fromLTRB(
+          24,
+          16,
+          24,
+          24,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _SectionTitle(
+              text: context.l10n.title.starred(),
+            ),
+            _TitleTextField(
+              onFieldSubmitted: _onTitleSubmitted,
+            ),
+            const SizedBox(height: 16),
+            _SectionTitle(
+              text: context.l10n.selectedCategory.starred(),
+            ),
+            _CategorySelection(focusNode: _categoryFocusNode),
+            const SizedBox(height: 40),
+            const _ActionButtons(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _categoryFocusNode.dispose();
+    super.dispose();
+  }
+
+  void _onTitleSubmitted(String title) {
+    _categoryFocusNode.requestFocus();
+  }
+}
+
 class _SectionTitle extends StatelessWidget {
   final String text;
+
   const _SectionTitle({
     required this.text,
   });
@@ -174,22 +194,33 @@ class _SectionTitle extends StatelessWidget {
 }
 
 class _TitleTextField extends StatelessWidget {
-  const _TitleTextField();
+  final ValueChanged<String> onFieldSubmitted;
+
+  const _TitleTextField({required this.onFieldSubmitted});
 
   @override
   Widget build(BuildContext context) {
-    return VoicesTextField(
-      onFieldSubmitted: (_) {},
-      onChanged: (value) => context.read<NewProposalCubit>().updateTitle(value),
-      decoration: VoicesTextFieldDecoration(
-        borderRadius: BorderRadius.circular(8),
-        filled: false,
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: context.colors.outlineBorder),
-        ),
-        helperText: context.l10n.required.starred().toLowerCase(),
-      ),
+    return BlocSelector<NewProposalCubit, NewProposalState, ProposalTitle>(
+      selector: (state) => state.title,
+      builder: (context, title) {
+        return VoicesTextField(
+          initialText: title.value,
+          onFieldSubmitted: onFieldSubmitted,
+          onChanged: (value) => context
+              .read<NewProposalCubit>()
+              .updateTitle(const ProposalTitle.dirty('')),
+          decoration: VoicesTextFieldDecoration(
+            borderRadius: BorderRadius.circular(8),
+            filled: false,
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: BorderSide(color: context.colors.outlineBorder),
+            ),
+            errorText: title.displayError?.message(context),
+            helperText: context.l10n.required.starred().toLowerCase(),
+          ),
+        );
+      },
     );
   }
 }
