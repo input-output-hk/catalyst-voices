@@ -15,7 +15,11 @@ class NewProposalCubit extends Cubit<NewProposalState> {
     this._campaignService,
     this._proposalService,
     this._documentMapper,
-  ) : super(const NewProposalState()) {
+  ) : super(
+          const NewProposalState(
+            title: ProposalTitle.pure(),
+          ),
+        ) {
     unawaited(getCampaignCategories());
   }
 
@@ -23,7 +27,7 @@ class NewProposalCubit extends Cubit<NewProposalState> {
     final title = state.title;
     final categoryId = state.categoryId;
 
-    if (title == null || categoryId == null) {
+    if (categoryId == null) {
       throw StateError('Cannot create draft, title or category not selected');
     }
 
@@ -67,11 +71,7 @@ class NewProposalCubit extends Cubit<NewProposalState> {
     emit(state.copyWith(categoryId: Optional(categoryId)));
   }
 
-  void updateTitle(String? title) {
-    emit(
-      state.copyWith(
-        title: Optional(title),
-      ),
-    );
+  void updateTitle(ProposalTitle title) {
+    emit(state.copyWith(title: title));
   }
 }

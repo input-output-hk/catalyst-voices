@@ -1,6 +1,5 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/routes/routes.dart';
-import 'package:catalyst_voices/routes/routing/proposal_builder_route.dart';
 import 'package:catalyst_voices/widgets/dropdown/voices_dropdown.dart';
 import 'package:catalyst_voices/widgets/modals/details/voices_align_title_header.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
@@ -8,7 +7,6 @@ import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -37,13 +35,7 @@ class CreateNewProposalDialog extends StatefulWidget {
 }
 
 class _ActionButtons extends StatelessWidget {
-  final VoidCallback onSave;
-  final VoidCallback onOpenInEditor;
-
-  const _ActionButtons({
-    required this.onSave,
-    required this.onOpenInEditor,
-  });
+  const _ActionButtons();
 
   @override
   Widget build(BuildContext context) {
@@ -58,24 +50,34 @@ class _ActionButtons extends StatelessWidget {
         ),
         const Spacer(),
         BlocSelector<NewProposalCubit, NewProposalState, bool>(
-          selector: (state) {
-            return state.isValid;
-          },
+          selector: (state) => state.isValid,
           builder: (context, isValid) {
             return VoicesTextButton(
-              onTap: isValid ? onSave : null,
+              onTap: isValid
+                  ? () {
+                      // TODO(dtscalac): save new draft
+                    }
+                  : null,
               child: Text(context.l10n.saveDraft),
             );
           },
         ),
         const SizedBox(width: 8),
         BlocSelector<NewProposalCubit, NewProposalState, bool>(
-          selector: (state) {
-            return state.isValid;
-          },
+          selector: (state) => state.isValid,
           builder: (context, isValid) {
             return VoicesFilledButton(
-              onTap: isValid ? onOpenInEditor : null,
+              onTap: isValid
+                  ? () {
+                      // ignore: unused_local_variable
+                      final title =
+                          context.read<NewProposalCubit>().state.title;
+                      // ignore: unused_local_variable
+                      final categoryId =
+                          context.read<NewProposalCubit>().state.categoryId;
+                      // TODO(dtscalac): create new proposal and open in editor
+                    }
+                  : null,
               child: Text(context.l10n.openInEditor),
             );
           },
@@ -86,7 +88,9 @@ class _ActionButtons extends StatelessWidget {
 }
 
 class _CategorySelection extends StatelessWidget {
-  const _CategorySelection();
+  final FocusNode focusNode;
+
+  const _CategorySelection({required this.focusNode});
 
   @override
   Widget build(BuildContext context) {
@@ -100,6 +104,7 @@ class _CategorySelection extends StatelessWidget {
       },
       builder: (context, state) {
         return SingleSelectDropdown<SignedDocumentRef>(
+          focusNode: focusNode,
           filled: false,
           borderRadius: 8,
           items: state.categories
@@ -121,6 +126,8 @@ class _CategorySelection extends StatelessWidget {
 }
 
 class _CreateNewProposalDialogState extends State<CreateNewProposalDialog> {
+  final FocusNode _categoryFocusNode = FocusNode();
+
   @override
   Widget build(BuildContext context) {
     return VoicesDetailsDialog(
@@ -143,39 +150,36 @@ class _CreateNewProposalDialogState extends State<CreateNewProposalDialog> {
             _SectionTitle(
               text: context.l10n.title.starred(),
             ),
-            const _TitleTextField(),
+            _TitleTextField(
+              onFieldSubmitted: _onTitleSubmitted,
+            ),
             const SizedBox(height: 16),
             _SectionTitle(
               text: context.l10n.selectedCategory.starred(),
             ),
-            const _CategorySelection(),
+            _CategorySelection(focusNode: _categoryFocusNode),
             const SizedBox(height: 40),
-            _ActionButtons(
-              onSave: _onSave,
-              onOpenInEditor: _onOpenInEditor,
-            ),
+            const _ActionButtons(),
           ],
         ),
       ),
     );
   }
 
-  Future<void> _onOpenInEditor() async {
-    // TODO(dtscalac): create a draft but dont store locally,
-    // open proposal builder with it
+  @override
+  void dispose() {
+    _categoryFocusNode.dispose();
+    super.dispose();
   }
 
-  Future<void> _onSave() async {
-    final cubit = context.read<NewProposalCubit>();
-    final draftRef = await cubit.createDraft();
-    if (mounted) {
-      ProposalBuilderRoute.fromRef(ref: draftRef).go(context);
-    }
+  void _onTitleSubmitted(String title) {
+    _categoryFocusNode.requestFocus();
   }
 }
 
 class _SectionTitle extends StatelessWidget {
   final String text;
+
   const _SectionTitle({
     required this.text,
   });
@@ -190,22 +194,33 @@ class _SectionTitle extends StatelessWidget {
 }
 
 class _TitleTextField extends StatelessWidget {
-  const _TitleTextField();
+  final ValueChanged<String> onFieldSubmitted;
+
+  const _TitleTextField({required this.onFieldSubmitted});
 
   @override
   Widget build(BuildContext context) {
-    return VoicesTextField(
-      onFieldSubmitted: (_) {},
-      onChanged: (value) => context.read<NewProposalCubit>().updateTitle(value),
-      decoration: VoicesTextFieldDecoration(
-        borderRadius: BorderRadius.circular(8),
-        filled: false,
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: context.colors.outlineBorder),
-        ),
-        helperText: context.l10n.required.starred().toLowerCase(),
-      ),
+    return BlocSelector<NewProposalCubit, NewProposalState, ProposalTitle>(
+      selector: (state) => state.title,
+      builder: (context, title) {
+        return VoicesTextField(
+          initialText: title.value,
+          onFieldSubmitted: onFieldSubmitted,
+          onChanged: (value) => context
+              .read<NewProposalCubit>()
+              .updateTitle(ProposalTitle.dirty(value ?? '')),
+          decoration: VoicesTextFieldDecoration(
+            borderRadius: BorderRadius.circular(8),
+            filled: false,
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: BorderSide(color: context.colors.outlineBorder),
+            ),
+            errorText: title.displayError?.message(context),
+            helperText: context.l10n.required.starred().toLowerCase(),
+          ),
+        );
+      },
     );
   }
 }

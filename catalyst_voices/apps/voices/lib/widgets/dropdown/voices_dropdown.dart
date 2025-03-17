@@ -74,6 +74,7 @@ class SingleSelectDropdown<T> extends VoicesFormField<T> {
     this.filled = true,
     this.borderRadius = 4,
     super.autovalidateMode = AutovalidateMode.onUserInteraction,
+    FocusNode? focusNode,
   }) : super(
           builder: (field) {
             final state = field as _DropdownFormFieldState<T>;
@@ -88,6 +89,7 @@ class SingleSelectDropdown<T> extends VoicesFormField<T> {
               constraints: const BoxConstraints(),
               child: DropdownMenu(
                 controller: state._controller,
+                focusNode: focusNode,
                 expandedInsets: EdgeInsets.zero,
                 initialSelection: state.value,
                 enabled: enabled,
