@@ -1,9 +1,7 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
-import 'package:catalyst_voices/widgets/avatars/voices_avatar.dart';
-import 'package:catalyst_voices/widgets/user/catalyst_id_text.dart';
+import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -32,16 +30,9 @@ class _AccountHeaderTile extends StatelessWidget {
 
     return Row(
       children: [
-        VoicesAvatar(
-          radius: 155 / 2,
-          icon: Text(
-            data?.username?.firstLetter?.capitalize() ?? '',
-            style: const TextStyle(
-              fontSize: 92,
-              fontWeight: FontWeight.w600,
-              height: 1,
-            ),
-          ),
+        ProfileAvatar(
+          size: 155,
+          username: data?.username,
         ),
         const SizedBox(width: 24),
         Expanded(
