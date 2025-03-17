@@ -145,5 +145,7 @@ class _ProposalCommentBuilderState extends State<ProposalCommentBuilder> {
     if (!_comment.isValid) {
       return;
     }
+
+    // TODO(damian-molinski): bloc submit comment
   }
 }
