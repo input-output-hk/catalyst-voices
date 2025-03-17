@@ -24,11 +24,19 @@ final class CategoryDetailRoute extends GoRouteData
     with FadePageTransitionMixin {
   final String categoryId;
 
-  const CategoryDetailRoute(this.categoryId);
+  const CategoryDetailRoute({required this.categoryId});
+
+  factory CategoryDetailRoute.fromRef({
+    required SignedDocumentRef categoryId,
+  }) {
+    return CategoryDetailRoute(categoryId: categoryId.id);
+  }
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
-    return CategoryPage(categoryId: categoryId);
+    return CategoryPage(
+      categoryId: SignedDocumentRef(id: categoryId),
+    );
   }
 }
 
@@ -59,15 +67,20 @@ final class FundedProjectsRoute extends GoRouteData
 
 final class MyProposalsRoute extends GoRouteData with FadePageTransitionMixin {
   final String? categoryId;
+
   const MyProposalsRoute({
     this.categoryId,
   });
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
+    final categoryId = this.categoryId;
+    final categoryRef =
+        categoryId != null ? SignedDocumentRef(id: categoryId) : null;
+
     return ProposalsPage(
       selectMyProposalsView: true,
-      categoryId: categoryId,
+      categoryId: categoryRef,
     );
   }
 }
@@ -75,15 +88,19 @@ final class MyProposalsRoute extends GoRouteData with FadePageTransitionMixin {
 final class ProposalsRoute extends GoRouteData with FadePageTransitionMixin {
   final String? categoryId;
 
-  const ProposalsRoute({
-    this.categoryId,
-  });
+  const ProposalsRoute({this.categoryId});
+
+  factory ProposalsRoute.fromRef({SignedDocumentRef? categoryId}) {
+    return ProposalsRoute(categoryId: categoryId?.id);
+  }
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
-    return ProposalsPage(
-      categoryId: categoryId,
-    );
+    final categoryId = this.categoryId;
+    final categoryRef =
+        categoryId != null ? SignedDocumentRef(id: categoryId) : null;
+
+    return ProposalsPage(categoryId: categoryRef);
   }
 }
 

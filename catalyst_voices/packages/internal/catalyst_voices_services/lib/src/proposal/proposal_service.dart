@@ -16,10 +16,11 @@ abstract interface class ProposalService {
 
   Future<List<String>> addFavoriteProposal(String proposalId);
 
+  /// Creates a new proposal draft locally.
   Future<DraftRef> createDraftProposal({
     required DocumentDataContent content,
     required SignedDocumentRef template,
-    DraftRef? ref,
+    required SignedDocumentRef categoryId,
   });
 
   /// Delete a draft proposal from local storage.
@@ -65,7 +66,11 @@ abstract interface class ProposalService {
   Future<DocumentRef> importProposal(Uint8List data);
 
   /// Publishes a public proposal draft.
-  Future<void> publishProposal({
+  /// The local draft referenced by the [document] is removed.
+  ///
+  /// The [DocumentRef] is retained but it's promoted from [DraftRef]
+  /// instance to [SignedDocumentRef] instance.
+  Future<SignedDocumentRef> publishProposal({
     required DocumentData document,
   });
 
@@ -77,10 +82,12 @@ abstract interface class ProposalService {
     required SignedDocumentRef categoryId,
   });
 
-  /// Saves a new proposal draft in the local storage.
-  Future<void> updateDraftProposal({
-    required DraftRef ref,
+  /// Upserts a proposal draft in the local storage.
+  Future<void> upsertDraftProposal({
+    required DraftRef selfRef,
     required DocumentDataContent content,
+    required SignedDocumentRef template,
+    required SignedDocumentRef categoryId,
   });
 
   Stream<List<Proposal>> watchLatestProposals({int? limit});
@@ -108,14 +115,22 @@ final class ProposalServiceImpl implements ProposalService {
   Future<DraftRef> createDraftProposal({
     required DocumentDataContent content,
     required SignedDocumentRef template,
-    DraftRef? ref,
+    required SignedDocumentRef categoryId,
   }) async {
-    return _documentRepository.createDocumentDraft(
-      type: DocumentType.proposalDocument,
-      content: content,
-      template: template,
-      selfRef: ref,
+    final draftRef = DraftRef.generateFirstRef();
+    await _documentRepository.upsertDocumentDraft(
+      document: DocumentData(
+        metadata: DocumentDataMetadata(
+          type: DocumentType.proposalDocument,
+          selfRef: draftRef,
+          template: template,
+          categoryId: categoryId,
+        ),
+        content: content,
+      ),
     );
+
+    return draftRef;
   }
 
   @override
@@ -155,8 +170,7 @@ final class ProposalServiceImpl implements ProposalService {
 
     return ProposalData(
       document: mergedDocument,
-      // TODO(dtscalac): replace by actual category ID
-      categoryId: SignedDocumentRef.generateFirstRef(),
+      categoryId: proposal.categoryId,
       commentsCount: 10,
       versions: proposal.versions,
     );
@@ -200,10 +214,10 @@ final class ProposalServiceImpl implements ProposalService {
   }
 
   @override
-  Future<void> publishProposal({
+  Future<SignedDocumentRef> publishProposal({
     required DocumentData document,
-  }) {
-    return _useProposerRoleCredentials(
+  }) async {
+    await _useProposerRoleCredentials(
       (catalystId, privateKey) {
         return _proposalRepository.publishProposal(
           document: document,
@@ -212,6 +226,13 @@ final class ProposalServiceImpl implements ProposalService {
         );
       },
     );
+
+    final ref = document.ref;
+    if (ref is DraftRef) {
+      await _documentRepository.deleteDocumentDraft(ref: ref);
+    }
+
+    return ref.toSignedDocumentRef();
   }
 
   @override
@@ -238,13 +259,22 @@ final class ProposalServiceImpl implements ProposalService {
   }
 
   @override
-  Future<void> updateDraftProposal({
-    required DraftRef ref,
+  Future<void> upsertDraftProposal({
+    required DraftRef selfRef,
     required DocumentDataContent content,
-  }) {
-    return _documentRepository.updateDocumentDraft(
-      ref: ref,
-      content: content,
+    required SignedDocumentRef template,
+    required SignedDocumentRef categoryId,
+  }) async {
+    await _documentRepository.upsertDocumentDraft(
+      document: DocumentData(
+        metadata: DocumentDataMetadata(
+          type: DocumentType.proposalDocument,
+          selfRef: selfRef,
+          template: template,
+          categoryId: categoryId,
+        ),
+        content: content,
+      ),
     );
   }
 

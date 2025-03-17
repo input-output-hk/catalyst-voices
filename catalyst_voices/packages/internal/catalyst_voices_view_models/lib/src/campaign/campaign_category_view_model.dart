@@ -1,7 +1,7 @@
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_assets/generated/assets.gen.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart'
-    show CampaignCategory, StaticCategoryDocumentData;
+    show CampaignCategory, SignedDocumentRef, StaticCategoryDocumentData;
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:equatable/equatable.dart';
@@ -35,7 +35,7 @@ final class CampaignCategoryDetailsViewModel extends CampaignCategoryViewModel {
 
   factory CampaignCategoryDetailsViewModel.dummy({String? id}) =>
       CampaignCategoryDetailsViewModel(
-        id: id ?? '1',
+        id: SignedDocumentRef(id: id ?? '1)'),
         name: 'Cardano Open:',
         subname: 'Developers',
         description:
@@ -51,11 +51,12 @@ final class CampaignCategoryDetailsViewModel extends CampaignCategoryViewModel {
 
   factory CampaignCategoryDetailsViewModel.fromModel(CampaignCategory model) {
     return CampaignCategoryDetailsViewModel(
+      id: model.selfRef,
       subname: model.categorySubname,
       description: model.description,
       proposalsCount: model.proposalsCount,
       availableFunds: model.availableFunds,
-      imageUrl: CategoryImageUrl.imageUrl(model.uuid),
+      imageUrl: CategoryImageUrl.imageUrl(model.selfRef.id),
       totalAsk: model.totalAsk,
       range: model.range,
       descriptions: model.descriptions
@@ -63,7 +64,6 @@ final class CampaignCategoryDetailsViewModel extends CampaignCategoryViewModel {
           .toList(),
       requirements: model.requirements,
       submissionCloseDate: model.submissionCloseDate,
-      id: model.uuid,
       name: model.categoryName,
     );
   }
@@ -88,7 +88,7 @@ final class CampaignCategoryDetailsViewModel extends CampaignCategoryViewModel {
 }
 
 final class CampaignCategoryViewModel extends Equatable {
-  final String id;
+  final SignedDocumentRef id;
   final String name;
 
   const CampaignCategoryViewModel({

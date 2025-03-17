@@ -84,7 +84,7 @@ final class _CatalystSigner implements CatalystCoseSigner {
   );
 
   @override
-  StringOrInt? get alg => const IntValue(CoseValues.eddsaAlg);
+  StringOrInt? get alg => null;
 
   @override
   Future<Uint8List?> get kid async {
@@ -144,7 +144,7 @@ final class _CoseSignedDocument<T extends SignedDocumentPayload>
 
   @override
   Uint8List toBytes() {
-    final bytes = cbor.encode(_coseSign.toCbor());
+    final bytes = cbor.encode(_coseSign.toCbor(tagged: false));
     return Uint8List.fromList(bytes);
   }
 
