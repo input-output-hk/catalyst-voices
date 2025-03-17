@@ -3,9 +3,8 @@
 use poem_openapi::{param::Query, OpenApi};
 
 use crate::service::common::{
-    auth::none_or_rbac::NoneOrRBAC,
-    tags::ApiTags,
-    types::{cardano::query::cat_id_or_stake::CatIdOrStake, generic::boolean::BooleanFlag},
+    auth::none_or_rbac::NoneOrRBAC, tags::ApiTags,
+    types::cardano::query::cat_id_or_stake::CatIdOrStake,
 };
 
 mod registrations_get;
@@ -28,13 +27,10 @@ impl Api {
         &self,
         /// Stake address or Catalyst ID to get the RBAC registration for.
         Query(lookup): Query<Option<CatIdOrStake>>,
-        /// A flag which enables returning all corresponded Cip509 registrations
-        Query(detailed): Query<Option<BooleanFlag>>,
         /// No Authorization required, but Token permitted.
         auth: NoneOrRBAC,
     ) -> registrations_get::AllResponses {
-        let detailed = detailed.unwrap_or_default();
         let auth_catalyst_id = auth.into();
-        registrations_get::endpoint(lookup, auth_catalyst_id, detailed.into()).await
+        registrations_get::endpoint(lookup, auth_catalyst_id).await
     }
 }

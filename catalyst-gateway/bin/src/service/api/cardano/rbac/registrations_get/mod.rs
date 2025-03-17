@@ -1,21 +1,25 @@
 //! Implementation of the GET `/rbac/registrations` endpoint.
 
-mod cip509;
-mod rbac_reg;
-mod reg_chain;
+pub(crate) use response::AllResponses;
+
+mod purpose_list;
+mod registration_chain;
+mod response;
 mod unprocessable_content;
 
+// TODO: FIXME: Remove.
+// mod cip509;
+// mod rbac_reg;
+// mod reg_chain;
+
 use anyhow::{anyhow, bail, Context};
-use cardano_blockchain_types::{Point, StakeAddress};
+use cardano_blockchain_types::{Network, Point, Slot, StakeAddress, TxnIndex};
 use cardano_chain_follower::ChainFollower;
 use catalyst_types::id_uri::IdUri;
-use cip509::Cip509List;
-use futures::StreamExt;
-use poem_openapi::{payload::Json, ApiResponse};
-use rbac_reg::{RbacReg, RbacRegistration, RbacRegistrations};
-use reg_chain::RegChain;
+use futures::{StreamExt, TryFutureExt, TryStreamExt};
+use poem_openapi::payload::Json;
+use rbac_registration::{cardano::cip509::Cip509, registration::cardano::RegistrationChain};
 use tracing::error;
-use unprocessable_content::RbacUnprocessableContent;
 
 use crate::{
     db::index::{
@@ -27,38 +31,20 @@ use crate::{
         },
         session::CassandraSession,
     },
-    service::common::{
-        responses::WithErrorResponses,
-        types::{
+    service::{
+        api::cardano::rbac::registrations_get::{
+            response::Responses, unprocessable_content::RbacUnprocessableContent,
+        },
+        common::types::{
             cardano::query::cat_id_or_stake::CatIdOrStake, headers::retry_after::RetryAfterOption,
         },
     },
     settings::Settings,
 };
 
-/// Endpoint responses.
-#[derive(ApiResponse)]
-pub(crate) enum Responses {
-    /// ## Ok
-    ///
-    /// Success returns a list of registration transaction ids.
-    #[oai(status = 200)]
-    Ok(Json<Box<RbacRegistrations>>),
-
-    /// No valid registration.
-    #[oai(status = 404)]
-    NotFound,
-
-    /// Response for unprocessable content.
-    #[oai(status = 422)]
-    UnprocessableContent(Json<RbacUnprocessableContent>),
-}
-
-pub(crate) type AllResponses = WithErrorResponses<Responses>;
-
 /// Get RBAC registration endpoint.
 pub(crate) async fn endpoint(
-    lookup: Option<CatIdOrStake>, auth_catalyst_id: Option<IdUri>, detailed: bool,
+    lookup: Option<CatIdOrStake>, auth_catalyst_id: Option<IdUri>,
 ) -> AllResponses {
     let Some(session) = CassandraSession::get(true) else {
         error!("Failed to acquire db session");
@@ -92,19 +78,8 @@ pub(crate) async fn endpoint(
         },
     };
 
-    let registrations = match registrations(&session, &catalyst_id).await {
-        Ok(v) => v,
-        Err(e) => return AllResponses::handle_error(&e),
-    };
-    match build_rbac_reg(registrations, detailed) {
-        Ok(Some(reg)) => {
-            Responses::Ok(Json(Box::new(RbacRegistrations {
-                catalyst_id: catalyst_id.into(),
-                finalized: Some(reg),
-                volatile: None,
-            })))
-            .into()
-        },
+    match registration_chain(&session, &catalyst_id).await {
+        Ok(Some(c)) => Responses::Ok(Json(Box::new(c.into()))).into(),
         Ok(None) => Responses::NotFound.into(),
         Err(e) => AllResponses::handle_error(&e),
     }
@@ -131,80 +106,74 @@ async fn catalyst_id_from_stake(
     }
 }
 
-/// Returns a list of `Cip509` for the given Catalyst ID.
-async fn registrations(
+/// Returns a registration chain for the given Catalyst ID.
+async fn registration_chain(
     session: &CassandraSession, catalyst_id: &IdUri,
-) -> anyhow::Result<Vec<rbac_registration::cardano::cip509::Cip509>> {
-    let network = Settings::cardano_network();
+) -> anyhow::Result<Option<RegistrationChain>> {
+    let indexed_registrations = indexed_registrations(session, catalyst_id).await?;
+    let mut indexed_registrations = indexed_registrations.iter();
+    let Some(root) = indexed_registrations.next() else {
+        return Ok(None);
+    };
 
-    let mut iter = RbacQuery::execute(session, RbacQueryParams {
+    let network = Settings::cardano_network();
+    let root = registration(network, root.slot_no.into(), root.txn_index.into())
+        .await
+        .context("Failed to get root registration")?;
+    let mut chain = RegistrationChain::new(root).context("Invalid root registration")?;
+
+    for reg in indexed_registrations {
+        // We only store valid registrations in this table, so an error here indicates a bug in
+        // our indexing logic.
+        let cip509 = registration(network, reg.slot_no.into(), reg.txn_index.into())
+            .await
+            .with_context(|| {
+                format!(
+                    "Invalid or missing registration at {:?} block {:?} transaction",
+                    reg.slot_no, reg.txn_index,
+                )
+            })?;
+        match chain.update(cip509) {
+            Ok(c) => chain = c,
+            Err(_) => {
+                // This isn't a hard error because while the individual registration can
+                // be valid it can be invalid in the context of the whole registration
+                // chain.
+            },
+        }
+    }
+
+    Ok(Some(chain))
+}
+
+/// Returns a sorted list of all registrations for the given Catalyst ID from the
+/// database.
+async fn indexed_registrations(
+    session: &CassandraSession, catalyst_id: &IdUri,
+) -> anyhow::Result<Vec<RbacQuery>> {
+    let mut result: Vec<_> = RbacQuery::execute(&session, RbacQueryParams {
         catalyst_id: catalyst_id.clone().into(),
     })
+    .and_then(|r| r.try_collect().map_err(Into::into))
     .await?;
 
-    let mut result = Vec::new();
-    while let Some(reg) = iter.next().await.transpose()? {
-        let point = Point::fuzzy(reg.slot_no.into());
-        let block = ChainFollower::get_block(network, point)
-            .await
-            .context("Unable to get block")?
-            .data;
-        if block.point().slot_or_default() != reg.slot_no.into() {
-            // The `ChainFollower::get_block` function can return the next consecutive block if it
-            // cannot find the exact one. This shouldn't happen, but we need to check anyway.
-            bail!("Unable to find exact block");
-        }
-        let reg =
-            rbac_registration::cardano::cip509::Cip509::new(&block, reg.txn_index.into(), &[])
-                .context("Invalid RBAC registration")?
-                .context("No RBAC registration at this block and txn index")?;
-        result.push(reg);
-    }
+    result.sort_by_key(|r| r.slot_no);
     Ok(result)
 }
 
-/// Build a response `RbacRegistration` from the provided CIP 509 registrations lists
-fn build_rbac_reg(
-    mut regs: Vec<rbac_registration::cardano::cip509::Cip509>, detailed: bool,
-) -> anyhow::Result<Option<RbacReg>> {
-    // sort registrations in the ascending order from the oldest to the latest
-    regs.sort_by(|a, b| {
-        let a = a.origin().point();
-        let b = b.origin().point();
-        a.cmp(b)
-    });
-
-    let details: Cip509List = if detailed {
-        regs.iter()
-            .map(TryInto::try_into)
-            .collect::<anyhow::Result<Vec<_>>>()?
-            .into()
-    } else {
-        Vec::new().into()
-    };
-    let chain = build_chain(regs);
-    if details.is_empty() && chain.is_none() {
-        return Ok(None);
+/// Returns a RBAC registration from the given block and slot.
+async fn registration(network: Network, slot: Slot, txn_index: TxnIndex) -> anyhow::Result<Cip509> {
+    let point = Point::fuzzy(slot);
+    let block = ChainFollower::get_block(network, point)
+        .await
+        .context("Unable to get block")?
+        .data;
+    if block.point().slot_or_default() != slot {
+        // The `ChainFollower::get_block` function can return the next consecutive block if it
+        // cannot find the exact one. This shouldn't happen, but we need to check anyway.
+        bail!("Unable to find exact block");
     }
-    Ok(Some(RbacRegistration { chain, details }.into()))
-}
-
-/// Try to build a `RegistrationChain` from the provided registration list
-fn build_chain(regs: Vec<rbac_registration::cardano::cip509::Cip509>) -> Option<RegChain> {
-    let mut regs_iter = regs.into_iter();
-    while let Some(try_first) = regs_iter.next() {
-        if let Ok(mut chain) =
-            rbac_registration::registration::cardano::RegistrationChain::new(try_first)
-        {
-            for reg in regs_iter {
-                let Ok(updated_chain) = chain.update(reg) else {
-                    continue;
-                };
-                chain = updated_chain;
-            }
-            return Some(chain.into());
-        }
-        continue;
-    }
-    None
+    Cip509::new(&block, txn_index, &[])
+        .context("Invalid RBAC registration")?
+        .context("No RBAC registration at this block and txn index")
 }

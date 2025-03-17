@@ -32,18 +32,6 @@ pub(crate) struct RegistrationChain {
 /// RBAC registrations chain.
 pub(crate) struct RegChain(pub(crate) RegistrationChain);
 
-impl_array_types!(
-    PurposeList,
-    UUIDv4,
-    Some(poem_openapi::registry::MetaSchema {
-        example: Self::example().to_json(),
-        min_items: Some(1),
-        max_items: Some(10000),
-        items: Some(Box::new(UUIDv4::schema_ref())),
-        ..poem_openapi::registry::MetaSchema::ANY
-    })
-);
-
 impl Example for RegistrationChain {
     fn example() -> Self {
         Self {
@@ -56,12 +44,6 @@ impl Example for RegistrationChain {
 impl Example for RegChain {
     fn example() -> Self {
         Self(RegistrationChain::example())
-    }
-}
-
-impl Example for PurposeList {
-    fn example() -> Self {
-        Self(vec![UUIDv4::example()])
     }
 }
 
