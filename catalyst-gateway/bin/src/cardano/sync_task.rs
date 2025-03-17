@@ -321,7 +321,7 @@ fn sync_subchain(
                     info!(chain=%params.chain(), "Immutable chain rolled forward.");
                     // Signal the point the immutable chain rolled forward to.
                     params.set_follower_roll_forward(chain_update.block_data().point());
-                    // If this task is imm
+                    // If this is live chain immediately stops to later run immutable sync tasks
                     if !params.is_immutable() {
                         return params.done(None);
                     }
@@ -343,33 +343,33 @@ fn sync_subchain(
 
                     let purge_condition = PurgeCondition::PurgeForwards(rollback_slot);
                     if let Err(error) = roll_forward::purge_live_index(purge_condition).await {
-                        error!(chain=%params.chain(), error=%error,
-                            "Chain follower rollback, purging volatile data task failed."
-                        );
-                    } else {
-                        // How many slots are purged
-                        #[allow(clippy::arithmetic_side_effects)]
-                        let purge_slots = params
-                            .last_indexed_block()
-                            // Slots arithmetic has saturating semantic, so this is ok
-                            .map_or(0.into(), |l| l.slot_or_default() - rollback_slot);
-
-                        let _ = event_sender.send(ChainIndexerEvent::ForwardDataPurged {
-                            purge_slots: purge_slots.into(),
-                        });
-
-                        // Purge success, now index the current block
-                        let block = chain_update.block_data();
-                        if let Err(error) = index_block(block).await {
-                            let error = error.context(format!(
-                                "Failed to index block after rollback {}",
-                                block.point()
-                            ));
-                            return params.done(Some(error));
-                        }
-
-                        params.update_block_state(block);
+                        let error = error
+                            .context("Chain follower rollback, purging volatile data task failed.");
+                        error!(chain=%params.chain(), error=%error);
+                        return params.done(Some(error));
                     }
+                    // How many slots are purged
+                    #[allow(clippy::arithmetic_side_effects)]
+                    let purge_slots = params
+                        .last_indexed_block()
+                        // Slots arithmetic has saturating semantic, so this is ok
+                        .map_or(0.into(), |l| l.slot_or_default() - rollback_slot);
+
+                    let _ = event_sender.send(ChainIndexerEvent::ForwardDataPurged {
+                        purge_slots: purge_slots.into(),
+                    });
+
+                    // Purge success, now index the current block
+                    let block = chain_update.block_data();
+                    if let Err(error) = index_block(block).await {
+                        let error = error.context(format!(
+                            "Failed to index block after rollback {}",
+                            block.point()
+                        ));
+                        return params.done(Some(error));
+                    }
+
+                    params.update_block_state(block);
                 },
             }
         }
