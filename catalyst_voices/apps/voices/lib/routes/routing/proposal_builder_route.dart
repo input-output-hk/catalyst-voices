@@ -49,10 +49,12 @@ final class ProposalBuilderDraftRoute extends GoRouteData
 final class ProposalBuilderRoute extends GoRouteData
     with FadePageTransitionMixin, CompositeRouteGuardMixin {
   final String proposalId;
+  final String? proposalVersion;
   final bool local;
 
   const ProposalBuilderRoute({
     required this.proposalId,
+    this.proposalVersion,
     this.local = false,
   });
 
@@ -61,6 +63,7 @@ final class ProposalBuilderRoute extends GoRouteData
   }) {
     return ProposalBuilderRoute(
       proposalId: ref.id,
+      proposalVersion: ref.version,
       local: ref is DraftRef,
     );
   }
@@ -75,6 +78,7 @@ final class ProposalBuilderRoute extends GoRouteData
   Widget build(BuildContext context, GoRouterState state) {
     final ref = DocumentRef.build(
       id: proposalId,
+      version: proposalVersion,
       isDraft: local,
     );
 
