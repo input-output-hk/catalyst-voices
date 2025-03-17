@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math';
 
 import 'package:catalyst_voices_blocs/src/common/bloc_error_emitter_mixin.dart';
 import 'package:catalyst_voices_blocs/src/workspace/workspace_event.dart';
@@ -46,10 +45,6 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     return super.close();
   }
 
-  void _emitProposals(List<Proposal> proposals) {
-    emit(state.copyWith(userProposals: proposals));
-  }
-
   Future<void> _handleQueryChange(
     SearchQueryChangedEvent event,
     Emitter<WorkspaceState> emit,
@@ -94,40 +89,9 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
         finalProposalCount: 0,
         proposals: const [],
         error: const Optional.empty(),
+        userProposals: event.proposals,
       ),
     );
-
-    // TODO(damian-molinski): implement fetching proposals
-    // TODO(damian-molinski): implement filtering of _proposals
-
-    final isSuccess = await Future.delayed(
-      const Duration(milliseconds: 300),
-      () => Random().nextBool(),
-    );
-    if (isClosed) return;
-
-    final proposals = isSuccess
-        ? List<WorkspaceProposalListItem>.generate(
-            20,
-            (index) => WorkspaceProposalListItem(
-              id: '$index',
-              name: 'Proposal [${index + 1}]',
-            ),
-          )
-        : const <WorkspaceProposalListItem>[];
-
-    final LocalizedException? error =
-        isSuccess ? null : const LocalizedUnknownException();
-
-    final newState = state.copyWith(
-      isLoading: false,
-      draftProposalCount: isSuccess ? 2 : 0,
-      finalProposalCount: isSuccess ? 1 : 0,
-      proposals: proposals,
-      error: Optional(error),
-    );
-
-    emit(newState);
   }
 
   void _setupProposalsSubscription() {
@@ -135,7 +99,7 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
       (proposals) {
         if (isClosed) return;
         _logger.info('Stream received ${proposals.length} proposals');
-        _emitProposals(proposals);
+        add(LoadProposalsEvent(proposals));
       },
       onError: (error) {
         if (isClosed) return;

@@ -138,25 +138,28 @@ class _BodyHeader extends StatelessWidget {
     final headerColor = _ProposalSubmitState.of(context)?.headerColor(context);
     final labelColor =
         _ProposalSubmitState.of(context)?.headerLabelColor(context);
-    return Column(
-      spacing: 2,
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          title,
-          style: context.textTheme.titleSmall?.copyWith(
-            color: headerColor,
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: 439),
+      child: Column(
+        spacing: 2,
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(
+            title,
+            style: context.textTheme.titleSmall?.copyWith(
+              color: headerColor,
+            ),
           ),
-        ),
-        LastEditDate(
-          dateTime: lastUpdate,
-          showTimezone: false,
-          textStyle: context.textTheme.labelMedium?.copyWith(
-            color: labelColor,
+          LastEditDate(
+            dateTime: lastUpdate,
+            showTimezone: false,
+            textStyle: context.textTheme.labelMedium?.copyWith(
+              color: labelColor,
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

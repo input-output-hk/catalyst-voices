@@ -45,9 +45,6 @@ class _WorkspacePageState extends State<WorkspacePage>
   void initState() {
     super.initState();
     final bloc = context.read<WorkspaceBloc>();
-
-    // ignore: cascade_invocations
-    bloc.add(const LoadProposalsEvent());
     // ignore: cascade_invocations
     bloc.add(const WatchUserProposalsEvent());
 

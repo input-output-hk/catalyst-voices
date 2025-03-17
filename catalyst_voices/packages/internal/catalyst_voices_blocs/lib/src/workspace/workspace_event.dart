@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:equatable/equatable.dart';
 
@@ -13,10 +14,11 @@ final class ImportProposalEvent extends WorkspaceEvent {
 }
 
 final class LoadProposalsEvent extends WorkspaceEvent {
-  const LoadProposalsEvent();
+  final List<Proposal> proposals;
+  const LoadProposalsEvent(this.proposals);
 
   @override
-  List<Object?> get props => [];
+  List<Object?> get props => [proposals];
 }
 
 final class SearchQueryChangedEvent extends WorkspaceEvent {
