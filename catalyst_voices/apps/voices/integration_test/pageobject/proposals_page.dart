@@ -1,9 +1,7 @@
 import 'package:catalyst_voices/widgets/search/search_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mockito/mockito.dart';
 import 'package:patrol_finders/patrol_finders.dart';
-import 'package:url_launcher_platform_interface/url_launcher_platform_interface.dart';
 
 import '../utils/mockUrlLauncher.dart';
 import '../utils/translations_utils.dart';
@@ -384,16 +382,25 @@ class ProposalsPage {
     expect($(shareProposalDialog).$(closeButton), findsNothing);
   }
 
+  Future<void> clickOnShare1() async {
+    await $(proposalsContainer)
+        .$(MostRecentSection($).proposalCard)
+        .at(0)
+        .$(MostRecentSection($).shareButton)
+        .tap();
+    await $(shareProposalDialog).$(shareItem).at(1).tap();
+  }
+
   Future<void> tmp1(MockUrlLauncher mockUrlLauncher) async {
     final testUrl = Uri.parse('https://example.com');
 
     // Stub method to return true
-    when(
-      () => mockUrlLauncher.launchUrl(
-        '',
-        const LaunchOptions(),
-      ),
-    ).thenAnswer((invocation) => Future.value(true));
+    // when(
+    //   () => mockUrlLauncher.launchUrl(
+    //     '',
+    //     const LaunchOptions(),
+    //   ),
+    // ).thenAnswer((invocation) => Future.value(true));
 
     // Call the actual launch function
     await $(proposalsContainer)
@@ -407,12 +414,12 @@ class ProposalsPage {
 
     // Validate
     // expect(result, isTrue);
-    verify(
-      () => mockUrlLauncher.launchUrl(
-        testUrl.toString(),
-        any<LaunchOptions>(),
-      ),
-    ).called(1);
+    // verify(
+    //   () => mockUrlLauncher.launchUrl(
+    //     testUrl.toString(),
+    //     any<LaunchOptions>(),
+    //   ),
+    // ).called(1);
 
     // verify(
     //   () => mockUrlLauncher.launch(

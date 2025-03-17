@@ -10,11 +10,10 @@ import 'package:url_launcher_platform_interface/url_launcher_platform_interface.
 
 import '../pageobject/proposals_page.dart';
 import '../utils/mockUrlLauncher.dart';
-import '../utils/translations_utils.dart';
 
 void main() async {
   late final GoRouter router;
-  late MockUrlLauncher mockUrlLauncher;
+  late MockUrlLauncher mockUrlLauncherPlatform;
 
   setUpAll(() async {
     router = buildAppRouter();
@@ -26,13 +25,41 @@ void main() async {
   setUp(() async {
     await registerDependencies(config: const AppConfig());
     router.go(const ProposalsRoute().location);
-    mockUrlLauncher = MockUrlLauncher();
-    UrlLauncherPlatform.instance = mockUrlLauncher;
+    mockUrlLauncherPlatform = MockUrlLauncher();
+    UrlLauncherPlatform.instance = mockUrlLauncherPlatform;
   });
 
   tearDown(() async {
     await restartDependencies();
   });
+
+  patrolWidgetTest(
+    'visitor - share modal close button works',
+    (PatrolTester $) async {
+      final testUrl = Uri.parse('https://example.com');
+      await $.pumpWidgetAndSettle(App(routerConfig: router));
+
+      // Stub method to return true
+      when(
+        () => mockUrlLauncherPlatform.launchUrl(
+          testUrl.toString(),
+          any<LaunchOptions>(),
+        ),
+      ).thenAnswer((_) async => true);
+
+      // Call the actual launch function
+      await ProposalsPage($).clickOnShare1();
+
+      // Validate
+      // expect(result, isTrue);
+      verify(
+        () => mockUrlLauncherPlatform.launchUrl(
+          testUrl.toString(),
+          any<LaunchOptions>(),
+        ),
+      ).called(1);
+    },
+  );
 
   group('Proposals space -', () {
     patrolWidgetTest(
@@ -152,12 +179,4 @@ void main() async {
       },
     );
   }, skip: true);
-
-  patrolWidgetTest(
-    'visitor - share modal close button works',
-    (PatrolTester $) async {
-      await $.pumpWidgetAndSettle(App(routerConfig: router));
-      await ProposalsPage($).tmp1(mockUrlLauncher);
-    },
-  );
 }
