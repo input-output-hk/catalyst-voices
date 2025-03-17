@@ -637,7 +637,7 @@ void main() {
 
         await database.documentsDao.saveAll(versions);
 
-        final ids = await database.documentsDao.queryVersionIds(
+        final ids = await database.documentsDao.queryVersionsOfId(
           id: proposalId,
         );
 

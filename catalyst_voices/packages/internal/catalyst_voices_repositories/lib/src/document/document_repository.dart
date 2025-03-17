@@ -81,7 +81,7 @@ abstract interface class DocumentRepository {
   /// Returns a list of version of ref object.
   ///
   /// Can be used to get versions count.
-  Future<List<String>> queryVersionIds({required String id});
+  Future<List<ProposalDocument>> queryVersionsOfId({required String id});
 
   /// Creates/updates a local document draft.
   ///
@@ -230,8 +230,20 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   }
 
   @override
-  Future<List<String>> queryVersionIds({required String id}) {
-    return _localDocuments.queryVersionIds(id: id);
+  Future<List<ProposalDocument>> queryVersionsOfId({required String id}) async {
+    final documents = await _localDocuments.queryVersionsOfId(id: id);
+    if (documents.isEmpty) return [];
+    final templateRef = documents.first.metadata.template!;
+    final templateData = await getDocumentData(ref: templateRef);
+
+    return documents
+        .map(
+          (e) => _buildProposalDocument(
+            documentData: e,
+            templateData: templateData,
+          ),
+        )
+        .toList();
   }
 
   @override

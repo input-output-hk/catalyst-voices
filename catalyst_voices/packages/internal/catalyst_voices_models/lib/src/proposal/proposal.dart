@@ -7,7 +7,7 @@ final class Proposal extends Equatable {
   final DocumentRef selfRef;
   final String title;
   final String description;
-  final DateTime? updateDate;
+  final DateTime updateDate;
   final DateTime? fundedDate;
   final Coin fundsRequested;
   final ProposalStatus status;
@@ -54,23 +54,25 @@ final class Proposal extends Equatable {
 
   factory Proposal.fromData(ProposalData data) {
     DateTime? updateDate;
-    final version = data.document.metadata.selfRef.version;
-    if (version != null) {
-      updateDate = UuidV7.parseDateTime(version, utc: true);
-    }
+    final version = data.document.metadata.selfRef.version ??
+        data.document.metadata.selfRef.id;
+    updateDate = UuidV7.parseDateTime(version, utc: true);
+
     return Proposal(
       selfRef: data.document.metadata.selfRef,
-      title: data.proposalTitle ?? '',
-      description: data.proposalDescription ?? '',
+      title: BaseProposalData.getProposalTitle(data.document) ?? '',
+      description: BaseProposalData.getProposalDescription(data.document) ?? '',
       updateDate: updateDate,
-      fundsRequested: data.proposalFundsRequested ?? Coin.fromAda(0),
-      // TODO(LynxLynxx): from here we need to get the real status
+      fundsRequested:
+          BaseProposalData.getProposalFundsRequested(data.document) ??
+              Coin.fromAda(0),
+      // TODO(LynxLynxx): from where we need to get the real status
       status: ProposalStatus.inProgress,
-      // TODO(LynxLynxx): from here we need to get the real publish
+      // TODO(LynxLynxx): from where we need to get the real publish
       publish: ProposalPublish.publishedDraft,
       versionCount: data.versions.length,
-      duration: data.proposalDuration ?? 0,
-      author: data.proposalAuthor ?? '',
+      duration: BaseProposalData.getProposalDuration(data.document) ?? 0,
+      author: BaseProposalData.getProposalAuthor(data.document) ?? '',
       commentsCount: data.commentsCount,
       category: data.categoryId.id,
       categoryId: data.categoryId,
@@ -121,5 +123,158 @@ final class Proposal extends Equatable {
         versionCount: versionCount ?? this.versionCount,
         category: category ?? this.category,
         categoryId: categoryId ?? this.categoryId,
+      );
+}
+
+final class ProposalWithVersions extends Proposal {
+  final List<ProposalVersion> versions;
+
+  factory ProposalWithVersions({
+    required DocumentRef selfRef,
+    required String title,
+    required String description,
+    required DateTime updateDate,
+    DateTime? fundedDate,
+    required Coin fundsRequested,
+    required ProposalStatus status,
+    required ProposalPublish publish,
+    required int versionCount,
+    required int duration,
+    required String author,
+    required int commentsCount,
+    required String category,
+    required List<ProposalVersion> versions,
+    required SignedDocumentRef categoryId,
+  }) {
+    final sortedVersions = List<ProposalVersion>.of(versions)..sort();
+
+    return ProposalWithVersions._(
+      selfRef: selfRef,
+      title: title,
+      categoryId: categoryId,
+      description: description,
+      updateDate: updateDate,
+      fundedDate: fundedDate,
+      fundsRequested: fundsRequested,
+      status: status,
+      publish: publish,
+      versionCount: versionCount,
+      duration: duration,
+      author: author,
+      commentsCount: commentsCount,
+      category: category,
+      versions: sortedVersions,
+    );
+  }
+
+  const ProposalWithVersions._({
+    required super.selfRef,
+    required super.title,
+    required super.description,
+    required super.updateDate,
+    super.fundedDate,
+    required super.fundsRequested,
+    required super.status,
+    required super.publish,
+    required super.versionCount,
+    required super.duration,
+    required super.author,
+    required super.commentsCount,
+    required super.category,
+    required this.versions,
+    required super.categoryId,
+  });
+
+  @override
+  List<Object?> get props => [
+        ...super.props,
+        versions,
+      ];
+
+  @override
+  ProposalWithVersions copyWith({
+    DocumentRef? selfRef,
+    SignedDocumentRef? categoryId,
+    String? title,
+    String? description,
+    DateTime? updateDate,
+    DateTime? fundedDate,
+    Coin? fundsRequested,
+    ProposalStatus? status,
+    ProposalPublish? publish,
+    int? commentsCount,
+    int? duration,
+    String? author,
+    int? versionCount,
+    String? category,
+    List<ProposalVersion>? versions,
+  }) =>
+      ProposalWithVersions(
+        selfRef: selfRef ?? this.selfRef,
+        categoryId: categoryId ?? this.categoryId,
+        title: title ?? this.title,
+        description: description ?? this.description,
+        updateDate: updateDate ?? this.updateDate,
+        fundedDate: fundedDate ?? this.fundedDate,
+        fundsRequested: fundsRequested ?? this.fundsRequested,
+        status: status ?? this.status,
+        publish: publish ?? this.publish,
+        commentsCount: commentsCount ?? this.commentsCount,
+        duration: duration ?? this.duration,
+        author: author ?? this.author,
+        versionCount: versionCount ?? this.versionCount,
+        category: category ?? this.category,
+        versions: versions ?? this.versions,
+      );
+}
+
+extension ProposalWithVersionX on ProposalWithVersions {
+  static ProposalWithVersions dummy(ProposalPublish publish) =>
+      ProposalWithVersions(
+        selfRef: const SignedDocumentRef(
+          id: '019584be-f0ef-7b01-8d36-422a3d6a0533',
+          version: '019584be-2321-7a1a-9b68-ad33a97a7e84',
+        ),
+        categoryId: SignedDocumentRef.generateFirstRef(),
+        title: 'Dummy Proposal ver 2',
+        description: 'Dummy description',
+        updateDate: DateTime.now(),
+        fundsRequested: const Coin(100),
+        status: ProposalStatus.draft,
+        publish: publish,
+        versionCount: 3,
+        duration: 6,
+        author: 'Alex Wells',
+        commentsCount: 0,
+        category: 'Cardano Use Cases / MVP',
+        versions: [
+          ProposalVersion(
+            publish: ProposalPublish.publishedDraft,
+            selfRef: const SignedDocumentRef(
+              id: '019584be-f0ef-7b01-8d36-422a3d6a0533',
+              version: '019584be-2314-7aaa-8b21-0f902ff817d4',
+            ),
+            title: 'Title ver 1',
+            createdAt: DateTime.now(),
+          ),
+          ProposalVersion(
+            publish: ProposalPublish.submittedProposal,
+            selfRef: const SignedDocumentRef(
+              id: '019584be-f0ef-7b01-8d36-422a3d6a0533',
+              version: '019584be-2321-7a1a-9b68-ad33a97a7e84',
+            ),
+            title: 'Dummy Proposal ver 2',
+            createdAt: DateTime.now(),
+          ),
+          ProposalVersion(
+            publish: ProposalPublish.publishedDraft,
+            selfRef: const SignedDocumentRef(
+              id: '019584be-f0ef-7b01-8d36-422a3d6a0533',
+              version: '019584be-232d-729b-950d-ce9fb79513ed',
+            ),
+            title: 'Title ver 3',
+            createdAt: DateTime.now(),
+          ),
+        ],
       );
 }
