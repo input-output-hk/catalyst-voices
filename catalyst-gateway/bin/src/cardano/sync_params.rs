@@ -2,7 +2,7 @@
 
 use std::{fmt::Display, sync::Arc, time::Duration};
 
-use cardano_blockchain_types::{Network, Point};
+use cardano_blockchain_types::{MultiEraBlock, Network, Point};
 use duration_string::DurationString;
 use rand::{Rng, SeedableRng};
 
@@ -37,14 +37,14 @@ pub(crate) struct SyncParams {
     /// The number of retries so far on this sync task.
     backoff_delay: Option<Duration>,
     /// If the sync completed without error or not.
-    result: Arc<Option<anyhow::Result<()>>>,
+    error: Arc<Option<anyhow::Error>>,
     /// Chain follower roll forward.
     follower_roll_forward: Option<Point>,
 }
 
 impl Display for SyncParams {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        if self.result.is_none() {
+        if self.error.is_none() {
             write!(f, "Sync_Params {{ ")?;
         } else {
             write!(f, "Sync_Result {{ ")?;
@@ -72,11 +72,11 @@ impl Display for SyncParams {
             write!(f, ", retries: {}", self.retries)?;
         }
 
-        if self.retries > 0 || self.result.is_some() {
+        if self.retries > 0 || self.error.is_some() {
             write!(f, ", synced_blocks: {}", self.total_blocks_synced)?;
         }
 
-        if self.result.is_some() {
+        if self.error.is_some() {
             write!(f, ", last_sync: {}", self.last_blocks_synced)?;
         }
 
@@ -84,11 +84,9 @@ impl Display for SyncParams {
             write!(f, ", backoff: {}", DurationString::from(*backoff))?;
         }
 
-        if let Some(result) = self.result.as_ref() {
-            match result {
-                Ok(()) => write!(f, ", Success")?,
-                Err(error) => write!(f, ", {error}")?,
-            };
+        match self.error.as_ref() {
+            None => write!(f, ", Success")?,
+            Some(error) => write!(f, ", {error}")?,
         }
 
         f.write_str(" }")
@@ -110,7 +108,7 @@ impl SyncParams {
             last_blocks_synced: 0,
             retries: 0,
             backoff_delay: None,
-            result: Arc::new(None),
+            error: Arc::new(None),
             follower_roll_forward: None,
         }
     }
@@ -136,35 +134,39 @@ impl SyncParams {
         retry.last_blocks_synced = 0;
         retry.retries = retry_count;
         retry.backoff_delay = backoff;
-        retry.result = Arc::new(None);
+        retry.error = Arc::new(None);
         retry.follower_roll_forward = None;
 
         retry
     }
 
     /// Convert Params into the result of the sync.
-    pub(crate) fn done(
-        &self, first: Option<Point>, first_immutable: bool, last: Option<Point>,
-        last_immutable: bool, synced: u64, result: anyhow::Result<()>,
-    ) -> Self {
-        if result.is_ok() && first_immutable && last_immutable {
+    pub(crate) fn done(mut self, error: Option<anyhow::Error>) -> Self {
+        if error.is_none() && self.first_is_immutable && self.last_is_immutable {
             // Update sync status in the Immutable DB.
             // Can fire and forget, because failure to update DB will simply cause the chunk to be
             // re-indexed, on recovery.
             update_sync_status(self.end.slot_or_default(), self.start.slot_or_default());
         }
+        self.total_blocks_synced = self
+            .total_blocks_synced
+            .saturating_add(self.last_blocks_synced);
+        self.last_blocks_synced = 0;
 
-        let mut done = self.clone();
-        done.first_indexed_block = first;
-        done.first_is_immutable = first_immutable;
-        done.last_indexed_block = last;
-        done.last_is_immutable = last_immutable;
-        done.total_blocks_synced = done.total_blocks_synced.saturating_add(synced);
-        done.last_blocks_synced = synced;
+        self.error = Arc::new(error);
 
-        done.result = Arc::new(Some(result));
+        self
+    }
 
-        done
+    /// During indexing block updating corresponding sync parameters
+    pub(crate) fn update_block_state(&mut self, block: &MultiEraBlock) {
+        self.last_is_immutable = block.is_immutable();
+        self.last_indexed_block = Some(block.point());
+        if self.first_indexed_block.is_none() {
+            self.first_is_immutable = block.is_immutable();
+            self.first_indexed_block = Some(block.point());
+        }
+        self.last_blocks_synced = self.last_blocks_synced.saturating_add(1);
     }
 
     /// Returns a chain's network type
@@ -172,29 +174,14 @@ impl SyncParams {
         &self.chain
     }
 
-    /// Returns the first block we successfully synced.
-    pub(crate) fn first_indexed_block(&self) -> Option<&Point> {
-        self.first_indexed_block.as_ref()
-    }
-
     /// Returns the last block we successfully synced.
     pub(crate) fn last_indexed_block(&self) -> Option<&Point> {
         self.last_indexed_block.as_ref()
     }
 
-    /// Returns is the starting point immutable? (True = immutable, false = don't know.)
-    pub(crate) fn first_is_immutable(&self) -> bool {
-        self.first_is_immutable
-    }
-
-    /// Returns Is the ending point immutable? (True = immutable, false = don't know.)
-    pub(crate) fn last_is_immutable(&self) -> bool {
-        self.last_is_immutable
-    }
-
     /// Returns if the sync completed without error or not.
-    pub(crate) fn result(&self) -> Option<&anyhow::Result<()>> {
-        self.result.as_ref().as_ref()
+    pub(crate) fn error(&self) -> Option<&anyhow::Error> {
+        self.error.as_ref().as_ref()
     }
 
     /// Returns Chain follower roll forward point.
