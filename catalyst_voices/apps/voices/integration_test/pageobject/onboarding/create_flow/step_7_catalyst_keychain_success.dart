@@ -24,12 +24,12 @@ class CatalystKeychainSuccessPanel extends OnboardingPageBase {
   }
 
   Future<void> verifyInfoPanel() async {
-    expect(await infoPartHeaderTitleText(), T.get('Catalyst Keychain'));
+    expect(await infoPartHeaderTitleText(), (await t()).catalystKeychain);
     expect(infoPartTaskPicture(), findsOneWidget);
     expect($(progressBar), findsOneWidget);
     expect(
       infoPartLearnMoreText(),
-      T.get('Learn More'),
+      (await t()).learnMore,
     );
   }
 }

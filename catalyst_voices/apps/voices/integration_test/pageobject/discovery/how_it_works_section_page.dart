@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:patrol_finders/patrol_finders.dart';
+
 import '../../utils/translations_utils.dart';
 
 class HowItWorksSection {
@@ -21,7 +22,7 @@ class HowItWorksSection {
   final howItWorksRoot = const Key('HowItWorks');
 
   Future<void> titleIsRenderedCorrectly() async {
-    expect($(title).text, T.get('Here’s how it works'));
+    expect($(title).text, (await t()).howItWorks);
   }
 
   Future<void> collaborateAvatarIsRenderedCorrectly() async {
@@ -29,15 +30,13 @@ class HowItWorksSection {
   }
 
   Future<void> collaborateTitleIsRenderedCorrectly() async {
-    expect($(collaborateTitle).text, T.get('Innovate together'));
+    expect($(collaborateTitle).text, (await t()).howItWorksCollaborate);
   }
 
   Future<void> collaborateDescriptionIsRenderedCorrectly() async {
     expect(
       $(collaborateDescription).text,
-      T.get('Got an Idea? Create an impactful '
-          'proposal and collaborate with the community to develop and refine '
-          'it.'),
+      (await t()).howItWorksCollaborateDescription,
     );
   }
 
@@ -46,15 +45,11 @@ class HowItWorksSection {
   }
 
   Future<void> voteTitleIsRenderedCorrectly() async {
-    expect($(voteTitle).text, T.get('Vote for your favorite ideas'));
+    expect($(voteTitle).text, (await t()).howItWorksVote);
   }
 
   Future<void> voteDescriptionIsRenderedCorrectly() async {
-    expect(
-      $(voteDescription).text,
-      T.get('Use a voting app to choose ideas with impact worth funding. Get '
-          'rewarded in ada for taking part.'),
-    );
+    expect($(voteDescription).text, (await t()).howItWorksVoteDescription);
   }
 
   Future<void> followAvatarIsRenderedCorrectly() async {
@@ -62,15 +57,11 @@ class HowItWorksSection {
   }
 
   Future<void> followTitleIsRenderedCorrectly() async {
-    expect($(followTitle).text, T.get('Stay up to date'));
+    expect($(followTitle).text, (await t()).howItWorksFollow);
   }
 
   Future<void> followDescriptionIsRenderedCorrectly() async {
-    expect(
-      $(followDescription).text,
-      T.get('Receive regular updates on all the funded ideas, so you can '
-          'follow along and see how things are progressing.'),
-    );
+    expect($(followDescription).text, (await t()).howItWorksFollowDescription);
   }
 
   Future<void> loadingErrorIsVisible() async {
