@@ -4,10 +4,10 @@ use anyhow::anyhow;
 use poem_openapi::{payload::Json, ApiResponse};
 use unprocessable_content_request::PutDocumentUnprocessableContent;
 
-use super::get_document::DocProvider;
+use super::common::{DocProvider, VerifyingKeyProvider};
 use crate::{
     db::event::signed_docs::{FullSignedDoc, SignedDocBody, StoreError},
-    service::common::responses::WithErrorResponses,
+    service::common::{auth::rbac::token::CatalystRBACTokenV1, responses::WithErrorResponses},
 };
 
 pub(crate) mod unprocessable_content_request;
@@ -45,11 +45,20 @@ pub(crate) enum Responses {
 pub(crate) type AllResponses = WithErrorResponses<Responses>;
 
 /// # PUT `/document`
-pub(crate) async fn endpoint(doc_bytes: Vec<u8>) -> AllResponses {
+pub(crate) async fn endpoint(doc_bytes: Vec<u8>, token: CatalystRBACTokenV1) -> AllResponses {
     match doc_bytes.as_slice().try_into() {
         Ok(doc) => {
             if let Err(e) = catalyst_signed_doc::validator::validate(&doc, &DocProvider).await {
                 // means that something happened inside the `DocProvider`, some db error.
+                return AllResponses::handle_error(&e);
+            }
+            if let Err(e) = catalyst_signed_doc::validator::validate_signatures(
+                &doc,
+                &VerifyingKeyProvider::from(token),
+            )
+            .await
+            {
+                // means that something happened inside the `VerifyingKeyProvider`, some db error.
                 return AllResponses::handle_error(&e);
             }
 
