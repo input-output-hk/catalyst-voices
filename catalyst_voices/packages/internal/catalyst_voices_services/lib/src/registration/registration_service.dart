@@ -3,7 +3,7 @@ import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.da
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
-import 'package:uuid/uuid.dart';
+import 'package:uuid_plus/uuid_plus.dart';
 
 /* cSpell:enable */
 

@@ -7,7 +7,7 @@ import 'package:drift/drift.dart' show DatabaseConnection;
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:uuid/uuid.dart';
+import 'package:uuid_plus/uuid_plus.dart';
 
 import '../utils/test_factories.dart';
 

@@ -1,5 +1,4 @@
-import 'package:uuid/parsing.dart';
-import 'package:uuid/uuid.dart';
+import 'package:uuid_plus/uuid_plus.dart';
 
 abstract final class UuidUtils {
   UuidUtils._();

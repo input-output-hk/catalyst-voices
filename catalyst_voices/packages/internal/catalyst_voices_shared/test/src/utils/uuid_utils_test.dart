@@ -1,7 +1,6 @@
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:test/test.dart';
-import 'package:uuid/data.dart';
-import 'package:uuid/uuid.dart';
+import 'package:uuid_plus/uuid_plus.dart';
 
 void main() {
   group(UuidUtils, () {

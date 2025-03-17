@@ -38,7 +38,10 @@ dependencies:
   result_type: ^0.2.0
   rxdart: ^0.27.7
   synchronized: ^3.3.0+3
-  uuid: ^4.5.1
+  uuid_plus:
+    git:
+      url: https://github.com/input-output-hk/uuid_plus.git
+      ref: main
 
 dev_dependencies:
   build_runner: ^2.4.12
