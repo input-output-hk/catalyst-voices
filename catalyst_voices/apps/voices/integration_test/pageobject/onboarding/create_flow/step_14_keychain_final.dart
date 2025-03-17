@@ -61,7 +61,7 @@ class KeychainFinalPanel extends OnboardingPageBase {
   }
 
   Future<void> verifyInfoPanel() async {
-    expect(await infoPartHeaderTitleText(), T.get('Catalyst Keychain'));
+    expect(await infoPartHeaderTitleText(), (await t()).catalystKeychain);
     // temporary: check for specific picture (green key locked icon)
     expect(
       find.byWidgetPredicate(
@@ -83,9 +83,6 @@ class KeychainFinalPanel extends OnboardingPageBase {
     );
     expect(infoPartTaskPicture(), findsOneWidget);
     expect($(progressBar), findsOneWidget);
-    expect(
-      $(learnMoreButton).$(Text).text,
-      T.get('Learn More'),
-    );
+    expect($(learnMoreButton).$(Text).text, (await t()).learnMore);
   }
 }

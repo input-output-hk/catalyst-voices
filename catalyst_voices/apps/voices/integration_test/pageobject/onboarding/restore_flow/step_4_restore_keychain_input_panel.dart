@@ -43,25 +43,25 @@ class RestoreKeychainInputPanel extends OnboardingPageBase {
   }
 
   Future<void> verifyInfoPanel() async {
-    expect(await infoPartHeaderTitleText(), T.get('Restore Catalyst keychain'));
+    expect(await infoPartHeaderTitleText(), (await t()).catalystKeychain);
     expect(infoPartTaskPicture(), findsOneWidget);
     expect($(progressBar), findsOneWidget);
     expect(
       $(learnMoreButton).$(Text).text,
-      T.get('Learn More'),
+      (await t()).learnMore,
     );
   }
 
   Future<void> verifyDetailsPanel() async {
     expect(
-        $(recoverySeedPhraseInputTitle).text,
-        T.get('Restore your '
-            'Catalyst Keychain with \nyour 12-word Catalyst seed phrase'),);
+      $(recoverySeedPhraseInputTitle).text,
+      (await t()).recoverySeedPhraseInstructionsTitle,
+    );
 
     expect(
-        $(recoverySeedPhraseInputSubtitle).text,
-        T.get('Enter each word of your Catalyst seed phrase in the right order '
-            'to bring your Catalyst account to this device.'),);
+      $(recoverySeedPhraseInputSubtitle).text,
+      (await t()).recoverySeedPhraseInstructionsSubtitle,
+    );
 
     for (var i = 1; i < 13; i++) {
       expect(find.byKey(Key('Word${i}CellKey')), findsOneWidget);

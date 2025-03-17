@@ -26,31 +26,23 @@ class CatalystKeychainSuccessPanel extends OnboardingPageBase {
   }
 
   Future<void> verifyInfoPanel() async {
-    expect(await infoPartHeaderTitleText(), T.get('Catalyst Keychain'));
+    expect(await infoPartHeaderTitleText(), (await t()).catalystKeychain);
     expect(infoPartTaskPicture(), findsOneWidget);
     expect($(progressBar), findsOneWidget);
     expect(
       $(learnMoreButton).$(Text).text,
-      T.get('Learn More'),
+      (await t()).learnMore,
     );
   }
 
   Future<void> verifyDetailsPanel() async {
     expect(
       $(registrationDetailsTitle).$(Text).text,
-      T.get('Great! Your Catalyst Keychain \u2028has been created.'),
+      (await t()).accountInstructionsTitle,
     );
     expect(
       $(registrationDetailsBody).$(Text).text,
-      T.get("On the next screen, you're going to see 12 words. \u2028This is "
-          "called your \"Catalyst seed phrase\".   \u2028\u2028It's "
-          'like a super secure password that only you know, \u2028that '
-          'allows you to prove ownership of your keychain.  \u2028\u2028Use '
-          'your Catalyst seed phrase to login and recover your account on '
-          'different devices, so be sure to put it somewhere safe!\n\nIt '
-          'is a super secure password that only you '
-          'know, so best is to write it down with pen and paper, '
-          'so get this ready. '),
+      (await t()).accountInstructionsMessage,
     );
     expect($(backButton), findsOneWidget);
     expect($(nextButton), findsOneWidget);

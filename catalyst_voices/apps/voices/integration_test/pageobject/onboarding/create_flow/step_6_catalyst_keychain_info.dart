@@ -26,28 +26,23 @@ class CatalystKeychainInfoPanel extends OnboardingPageBase {
   }
 
   Future<void> verifyInfoPanel() async {
-    expect(await infoPartHeaderTitleText(), T.get('Catalyst Keychain'));
+    expect(await infoPartHeaderTitleText(), (await t()).catalystKeychain);
     expect(infoPartTaskPicture(), findsOneWidget);
     expect($(progressBar), findsOneWidget);
     expect(
       $(learnMoreButton).$(Text).text,
-      T.get('Learn More'),
+      (await t()).learnMore,
     );
   }
 
   Future<void> verifyDetailsPanel() async {
     expect(
       $(registrationDetailsTitle).$(Text).text,
-      T.get('Create your '
-          'Catalyst Keychain'),
+      (await t()).accountCreationSplashTitle,
     );
     expect(
       $(registrationDetailsBody).$(Text).text,
-      T.get('Catalyst Keychain is your ticket to participate in innovation on '
-          'the global stage.  \u2028\u2028These next steps will create your '
-          'Catalyst keychain so you can enter new spaces, '
-          'discover awesome ideas, '
-          'and share your feedback to help improve ideas.'),
+      (await t()).accountCreationSplashMessage,
     );
     expect($(createKeychainButton), findsOneWidget);
   }

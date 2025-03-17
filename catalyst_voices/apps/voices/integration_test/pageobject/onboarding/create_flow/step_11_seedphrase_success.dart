@@ -32,26 +32,20 @@ class SeedphraseSuccessPanel extends OnboardingPageBase {
   Future<void> verifyDetailsPanel() async {
     expect(
       $(nextStepBody).text,
-      T.get('Now let’s set your Unlock password for this device!'),
+      (await t()).createKeychainSeedPhraseCheckSuccessNextStep,
     );
     expect(
       $(registrationDetailsTitle).text,
-      T.get("Nice job! You've"
-          ' successfully verified your Catalyst seed phase'),
+      (await t()).createKeychainSeedPhraseCheckSuccessTitle,
     );
     expect(
       $(registrationDetailsBody).text,
-      T.get('Enter your seed phrase to recover your Catalyst Keychain on '
-          "any device.   \u2028\u2028It's kinda "
-          'like your email and password all'
-          ' rolled into one, so keep it somewhere safe!\u2028\u2028In the next '
-          'step we’ll add a password to your Catalyst Keychain, so you can'
-          ' lock/unlock access to Voices.'),
+      (await t()).createKeychainSeedPhraseCheckSuccessSubtitle,
     );
   }
 
   Future<void> verifyInfoPanel() async {
-    expect(await infoPartHeaderTitleText(), T.get('Catalyst Keychain'));
+    expect(await infoPartHeaderTitleText(), (await t()).catalystKeychain);
     //temporary: check for specific picture (green checked icon)
     expect(
       find.byWidgetPredicate(
@@ -64,9 +58,10 @@ class SeedphraseSuccessPanel extends OnboardingPageBase {
     );
     expect(infoPartTaskPicture(), findsOneWidget);
     expect($(progressBar), findsOneWidget);
+    expect($(learnMoreButton).$(Text).text, (await t()).learnMore);
     expect(
-      $(learnMoreButton).$(Text).text,
-      T.get('Learn More'),
+      $(nextStepBody).text,
+      (await t()).createKeychainSeedPhraseCheckSuccessNextStep,
     );
     expect(await closeButton(), findsOneWidget);
   }

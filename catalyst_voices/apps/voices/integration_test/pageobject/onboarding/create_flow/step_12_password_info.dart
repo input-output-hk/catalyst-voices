@@ -28,7 +28,7 @@ class PasswordInfoPanel extends OnboardingPageBase {
   Future<void> verifyDetailsPanel() async {
     expect(
       $(registrationDetailsPanel).$(registrationDetailsTitle).$(Text).text,
-      T.get('Set your Catalyst unlock password for this device'),
+      (await t()).createKeychainUnlockPasswordInstructionsTitle,
     );
     expect(
       $(registrationDetailsPanel).$(registrationDetailsBody).$(Text).text,
@@ -39,7 +39,7 @@ class PasswordInfoPanel extends OnboardingPageBase {
   }
 
   Future<void> verifyInfoPanel() async {
-    expect(await infoPartHeaderTitleText(), T.get('Catalyst Keychain'));
+    expect($(headerTitle).text, (await t()).catalystKeychain);
     //temporary: check for specific picture (locked icon)
     expect(
       find.byWidgetPredicate(
@@ -53,10 +53,7 @@ class PasswordInfoPanel extends OnboardingPageBase {
     expect($(lockedPictureConstrainedBox), findsOneWidget);
     expect(infoPartTaskPicture(), findsOneWidget);
     expect($(progressBar), findsOneWidget);
-    expect(
-      $(learnMoreButton).$(Text).text,
-      T.get('Learn More'),
-    );
+    expect($(learnMoreButton).$(Text).text, (await t()).learnMore);
     expect(await closeButton(), findsOneWidget);
   }
 }

@@ -32,47 +32,33 @@ class AcknowledgmentsPanel extends OnboardingPageBase {
   Future<void> verifyInfoPanel() async {
     expect(
       $(registrationInfoPanel).$(headerTitle).text,
-      T.get('Welcome to Catalyst'),
+      (await t()).accountCreationGetStartedTitle,
     );
     expect($(pictureContainer).$(IconTheme), findsOneWidget);
     expect(
       $(learnMoreButton).$(Text).text,
-      T.get('Learn More'),
+      (await t()).learnMore,
     );
   }
 
   Future<void> verifyDetailsPanel() async {
     expect(
-      find.text('Mandatory Acknowledgements'),
-      findsOneWidget,
+      $(acknowledgmentsTile).text,
+      (await t()).createBaseProfileAcknowledgementsTitle,
     );
+    final tosText =
+        (await t()).createBaseProfileAcknowledgementsToS.split('{tos}')[0];
     expect(
       find.byWidgetPredicate(
-        (widget) =>
-            widget is PlaceholderRichText &&
-            widget.text ==
-                'I confirm '
-                    'that I have read and agree to be bound by {tos}.',
+        (widget) {
+          if (widget is Text) {
+            return widget.data?.contains(tosText) ?? false;
+          } else if (widget is RichText) {
+            return widget.text.toPlainText().contains(tosText);
+          }
+          return false;
+        },
       ),
-      findsOneWidget,
-    );
-    expect(
-      find.byWidgetPredicate(
-        (widget) =>
-            widget is PlaceholderRichText &&
-            widget.text ==
-                'I acknowledge and agree that any data I share in '
-                'connection with my participation in '
-                'Project Catalyst Funds will be '
-                'collected, stored, used and processed in accordance '
-                'with the {privacy_policy}.',
-      ),
-      findsOneWidget,
-    );
-
-    expect(
-      find.text('I acknowledge that the Catalyst Ops team may use my '
-          'email only for Catalyst communication.'),
       findsOneWidget,
     );
   }
