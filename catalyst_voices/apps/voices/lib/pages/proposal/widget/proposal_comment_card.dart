@@ -26,7 +26,10 @@ class ProposalCommentCard extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _Avatar(letter: author?.catalystId.username?.firstLetter),
+        ProfileAvatar(
+          size: 40,
+          username: author?.catalystId.username,
+        ),
         const SizedBox(width: 16),
         Expanded(
           child: Column(
@@ -52,22 +55,6 @@ class ProposalCommentCard extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-}
-
-class _Avatar extends StatelessWidget {
-  final String? letter;
-
-  const _Avatar({
-    this.letter,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return VoicesAvatar(
-      radius: 40 / 2,
-      icon: Text(letter?.toUpperCase() ?? ''),
     );
   }
 }
