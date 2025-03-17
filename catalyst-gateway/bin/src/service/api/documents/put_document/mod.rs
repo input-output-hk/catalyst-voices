@@ -53,8 +53,8 @@ pub(crate) async fn endpoint(doc_bytes: Vec<u8>, token: CatalystRBACTokenV1) -> 
                     if !result {
                         return Responses::UnprocessableContent(Json(
                             PutDocumentUnprocessableContent::new(
-                                "Failed validating document signatures",
-                                None,
+                                "Failed validating document integrity",
+                                serde_json::to_value(doc.problem_report()).ok(),
                             ),
                         ))
                         .into();
@@ -76,7 +76,7 @@ pub(crate) async fn endpoint(doc_bytes: Vec<u8>, token: CatalystRBACTokenV1) -> 
                         return Responses::UnprocessableContent(Json(
                             PutDocumentUnprocessableContent::new(
                                 "Failed validating document signatures",
-                                None,
+                                serde_json::to_value(doc.problem_report()).ok(),
                             ),
                         ))
                         .into();
@@ -98,7 +98,7 @@ pub(crate) async fn endpoint(doc_bytes: Vec<u8>, token: CatalystRBACTokenV1) -> 
                 Err(err) if err.is::<StoreError>() => {
                     Responses::UnprocessableContent(Json(PutDocumentUnprocessableContent::new(
                         "Document with the same `id` and `ver` already exists",
-                        None,
+                        serde_json::to_value(doc.problem_report()).ok(),
                     )))
                     .into()
                 },
