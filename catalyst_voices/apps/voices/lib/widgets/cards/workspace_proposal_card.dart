@@ -29,11 +29,7 @@ class WorkspaceProposalCard extends StatelessWidget {
       // TODO(LynxLynxx): When menu is implemented, remove this widget
       onTap: () {
         unawaited(
-          ProposalBuilderRoute(
-            proposalId: proposal.selfRef.id,
-            version: proposal.selfRef.id,
-            isPrivate: isLocalDraft,
-          ).push(context),
+          ProposalBuilderRoute.fromRef(ref: proposal.selfRef).push(context),
         );
       },
       child: _ProposalSubmitState(

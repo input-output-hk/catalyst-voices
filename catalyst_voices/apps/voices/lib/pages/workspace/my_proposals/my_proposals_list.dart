@@ -19,12 +19,9 @@ class _MyProposalsList extends StatelessWidget {
           key: ValueKey('WorkspaceProposal${item.id}ListTileKey'),
           item: item,
           onTap: () {
+            // TODO(LynxLynxx): the id should be DocumentRef
             unawaited(
-              ProposalBuilderRoute(
-                proposalId: item.id,
-                version: '',
-                isPrivate: false,
-              ).push(context),
+              ProposalBuilderRoute(proposalId: item.id).push(context),
             );
           },
         );

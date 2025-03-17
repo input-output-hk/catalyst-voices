@@ -1,6 +1,6 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:equatable/equatable.dart';
+import 'package:uuid_plus/uuid_plus.dart';
 
 final class ProposalVersion extends Equatable
     implements Comparable<ProposalVersion> {
@@ -19,7 +19,7 @@ final class ProposalVersion extends Equatable
   factory ProposalVersion.fromData(BaseProposalData data) {
     final version = data.document.metadata.selfRef.version ??
         data.document.metadata.selfRef.id;
-    final createAt = UuidUtils.dateTime(version);
+    final createAt = UuidV7.parseDateTime(version);
     return ProposalVersion(
       selfRef: data.document.metadata.selfRef,
       title: data.getProposalTitle() ?? '',

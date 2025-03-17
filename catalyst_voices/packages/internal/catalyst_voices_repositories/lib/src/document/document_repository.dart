@@ -23,17 +23,6 @@ abstract interface class DocumentRepository {
     required SignedDocumentRef ref,
   });
 
-  /// Stores new draft locally and returns ref to it.
-  ///
-  /// At the moment we do not support drafts of templates that's why
-  /// [template] requires [SignedDocumentRef].
-  Future<DraftRef> createDocumentDraft({
-    required DocumentType type,
-    required DocumentDataContent content,
-    required SignedDocumentRef template,
-    DraftRef? selfRef,
-  });
-
   /// Deletes a document draft from the local storage.
   Future<void> deleteDocumentDraft({
     required DraftRef ref,
@@ -65,7 +54,7 @@ abstract interface class DocumentRepository {
   /// If version is not specified in [ref] method will try to return latest
   /// version of document matching [ref].
   ///
-  /// If document does not exist it will throw [DocumentNotFound].
+  /// If document does not exist it will throw [DocumentNotFoundException].
   ///
   /// If [DocumentRef] is [SignedDocumentRef] it will look for this document in
   /// local storage.
@@ -104,14 +93,12 @@ abstract interface class DocumentRepository {
     required String id,
   });
 
-  /// Updates local draft (or drafts if version is not specified)
-  /// matching [ref] with given [content].
+  /// Creates/updates a local document draft.
   ///
   /// If watching same draft with [watchDocument] it will emit
   /// change.
-  Future<void> updateDocumentDraft({
-    required DraftRef ref,
-    required DocumentDataContent content,
+  Future<void> upsertDocumentDraft({
+    required DocumentData document,
   });
 
   Stream<int> watchCount({
@@ -154,30 +141,6 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     final documentData = await _remoteDocuments.get(ref: ref);
 
     await _localDocuments.save(data: documentData);
-  }
-
-  @override
-  Future<DraftRef> createDocumentDraft({
-    required DocumentType type,
-    required DocumentDataContent content,
-    required SignedDocumentRef template,
-    DraftRef? selfRef,
-  }) async {
-    final ref = selfRef ?? DraftRef.generateFirstRef();
-    final metadata = DocumentDataMetadata(
-      type: type,
-      selfRef: ref,
-      template: template,
-    );
-
-    final data = DocumentData(
-      metadata: metadata,
-      content: content,
-    );
-
-    await _drafts.save(data: data);
-
-    return ref;
   }
 
   @override
@@ -286,14 +249,10 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   }
 
   @override
-  Future<void> updateDocumentDraft({
-    required DraftRef ref,
-    required DocumentDataContent content,
+  Future<void> upsertDocumentDraft({
+    required DocumentData document,
   }) async {
-    await _drafts.update(
-      ref: ref,
-      content: content,
-    );
+    await _drafts.save(data: document);
   }
 
   @visibleForTesting

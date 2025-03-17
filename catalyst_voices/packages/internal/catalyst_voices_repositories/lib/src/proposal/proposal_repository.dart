@@ -40,12 +40,6 @@ abstract interface class ProposalRepository {
 
   Future<List<String>> addFavoriteProposal(String proposalId);
 
-  Future<DraftRef> createDraftProposal({
-    required DocumentDataContent content,
-    required SignedDocumentRef template,
-    DraftRef? selfRef,
-  });
-
   Future<void> deleteDraftProposal(DraftRef ref);
 
   Future<Uint8List> encodeProposalForExport({
@@ -92,10 +86,7 @@ abstract interface class ProposalRepository {
 
   Future<List<String>> removeFavoriteProposal(String proposalId);
 
-  Future<void> updateDraftProposal({
-    required DraftRef ref,
-    required DocumentDataContent content,
-  });
+  Future<void> upsertDraftProposal({required DocumentData document});
 
   Stream<int> watchCount({
     required DocumentRef ref,
@@ -122,20 +113,6 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   Future<List<String>> addFavoriteProposal(String proposalId) async {
     // TODO(LynxLynxx): add proposal to favorites
     return getFavoritesProposalsIds();
-  }
-
-  @override
-  Future<DraftRef> createDraftProposal({
-    required DocumentDataContent content,
-    required SignedDocumentRef template,
-    DraftRef? selfRef,
-  }) {
-    return _documentRepository.createDocumentDraft(
-      type: DocumentType.proposalDocument,
-      content: content,
-      template: template,
-      selfRef: selfRef,
-    );
   }
 
   @override
@@ -322,14 +299,8 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   }
 
   @override
-  Future<void> updateDraftProposal({
-    required DraftRef ref,
-    required DocumentDataContent content,
-  }) {
-    return _documentRepository.updateDocumentDraft(
-      ref: ref,
-      content: content,
-    );
+  Future<void> upsertDraftProposal({required DocumentData document}) {
+    return _documentRepository.upsertDocumentDraft(document: document);
   }
 
   @override

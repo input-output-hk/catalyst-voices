@@ -23,7 +23,7 @@ final class DatabaseDraftsDataSource implements DraftDataSource {
   Future<DocumentData> get({required DocumentRef ref}) async {
     final entity = await _database.draftsDao.query(ref: ref);
     if (entity == null) {
-      throw DraftNotFound(ref: ref);
+      throw DraftNotFoundException(ref: ref);
     }
 
     return entity.toModel();

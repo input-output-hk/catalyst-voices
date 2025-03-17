@@ -21,7 +21,7 @@ class ProposalsPagination extends StatefulWidget {
   final ProposalPublish? stage;
   final bool userProposals;
   final bool usersFavorite;
-  final String? categoryId;
+  final SignedDocumentRef? categoryId;
   final String? searchValue;
   final bool isLoading;
 

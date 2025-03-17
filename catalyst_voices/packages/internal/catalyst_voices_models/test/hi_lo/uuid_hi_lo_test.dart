@@ -1,7 +1,6 @@
 import 'package:catalyst_voices_models/src/hi_lo/uuid_hi_lo.dart';
 import 'package:test/test.dart';
-import 'package:uuid/data.dart';
-import 'package:uuid/uuid.dart';
+import 'package:uuid_plus/uuid_plus.dart';
 
 void main() {
   group(UuidHiLo, () {

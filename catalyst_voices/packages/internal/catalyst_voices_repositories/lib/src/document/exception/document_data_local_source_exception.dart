@@ -4,19 +4,19 @@ sealed class DocumentDataLocalSourceException implements Exception {
   const DocumentDataLocalSourceException();
 }
 
-final class DocumentNotFound extends DocumentDataLocalSourceException {
+final class DocumentNotFoundException extends DocumentDataLocalSourceException {
   final DocumentRef ref;
 
-  DocumentNotFound({required this.ref});
+  const DocumentNotFoundException({required this.ref});
 
   @override
   String toString() => 'Document matching $ref not found';
 }
 
-final class DraftNotFound extends DocumentDataLocalSourceException {
+final class DraftNotFoundException extends DocumentDataLocalSourceException {
   final DocumentRef ref;
 
-  DraftNotFound({required this.ref});
+  const DraftNotFoundException({required this.ref});
 
   @override
   String toString() => 'Draft matching $ref not found';

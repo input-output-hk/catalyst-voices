@@ -17,7 +17,7 @@ final class DatabaseDocumentsDataSource implements SignedDocumentDataSource {
   Future<DocumentData> get({required DocumentRef ref}) async {
     final entity = await _database.documentsDao.query(ref: ref);
     if (entity == null) {
-      throw DocumentNotFound(ref: ref);
+      throw DocumentNotFoundException(ref: ref);
     }
 
     return entity.toModel();

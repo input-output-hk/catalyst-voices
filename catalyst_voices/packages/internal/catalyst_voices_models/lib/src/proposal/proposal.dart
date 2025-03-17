@@ -1,7 +1,7 @@
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:equatable/equatable.dart';
+import 'package:uuid_plus/uuid_plus.dart';
 
 final class Proposal extends Equatable {
   final DocumentRef selfRef;
@@ -59,7 +59,7 @@ final class Proposal extends Equatable {
     DateTime updateDate;
     final version = data.document.metadata.selfRef.version ??
         data.document.metadata.selfRef.id;
-    updateDate = UuidUtils.dateTime(version);
+    updateDate = UuidV7.parseDateTime(version, utc: true);
 
     final versions = data.versions.map(ProposalVersion.fromData).toList()
       ..sort();
