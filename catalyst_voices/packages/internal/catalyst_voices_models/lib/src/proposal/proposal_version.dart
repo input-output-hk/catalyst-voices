@@ -22,7 +22,7 @@ final class ProposalVersion extends Equatable
     final createAt = UuidUtils.dateTime(version);
     return ProposalVersion(
       selfRef: data.document.metadata.selfRef,
-      title: data.getProposalTitle() ?? '',
+      title: BaseProposalData.getProposalTitle(data.document) ?? '',
       createdAt: createAt,
       // TODO(LynxLynxx): change when we get this from doc actions
       publish: ProposalPublish.publishedDraft,

@@ -19,6 +19,7 @@ void main() {
           isDraft: true,
           version: versionId2,
         ),
+        categoryId: SignedDocumentRef.generateFirstRef(),
         title: 'Title ver 1',
         description: 'Description ver 1',
         updateDate: DateTime.now(),
@@ -29,7 +30,6 @@ void main() {
         author: 'Alex Wells',
         commentsCount: 0,
         category: 'Cardano Use Cases / MVP',
-        categoryId: SignedDocumentRef.generateFirstRef(),
         versions: [
           ProposalVersion(
             publish: ProposalPublish.publishedDraft,
@@ -89,6 +89,7 @@ void main() {
           isDraft: true,
           version: versionId1,
         ),
+        categoryId: SignedDocumentRef.generateFirstRef(),
         title: 'Title ver 1',
         description: 'Description ver 1',
         updateDate: DateTime.now(),
@@ -99,7 +100,6 @@ void main() {
         author: 'Alex Wells',
         commentsCount: 0,
         category: 'Cardano Use Cases / MVP',
-        categoryId: SignedDocumentRef.generateFirstRef(),
         versions: [
           ProposalVersion(
             publish: ProposalPublish.publishedDraft,

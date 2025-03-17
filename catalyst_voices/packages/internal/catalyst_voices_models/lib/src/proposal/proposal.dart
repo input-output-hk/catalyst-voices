@@ -66,20 +66,22 @@ final class Proposal extends Equatable {
 
     return Proposal._(
       selfRef: data.document.metadata.selfRef,
-      title: data.getProposalTitle() ?? '',
-      description: data.getProposalDescription() ?? '',
+      title: BaseProposalData.getProposalTitle(data.document) ?? '',
+      description: BaseProposalData.getProposalDescription(data.document) ?? '',
       updateDate: updateDate,
-      fundsRequested: data.getProposalFundsRequested() ?? Coin.fromAda(0),
+      fundsRequested:
+          BaseProposalData.getProposalFundsRequested(data.document) ??
+              Coin.fromAda(0),
       // TODO(LynxLynxx): from where we need to get the real status
       status: ProposalStatus.inProgress,
       // TODO(LynxLynxx): from where we need to get the real publish
-      publish: ProposalPublish.localDraft,
-      versions: versions,
-      duration: data.getProposalDuration() ?? 0,
-      author: data.getProposalAuthor() ?? '',
+      publish: ProposalPublish.publishedDraft,
+      duration: BaseProposalData.getProposalDuration(data.document) ?? 0,
+      author: BaseProposalData.getProposalAuthor(data.document) ?? '',
       commentsCount: data.commentsCount,
       categoryId: data.categoryId,
       category: '',
+      versions: versions,
     );
   }
 
@@ -155,6 +157,7 @@ extension ProposalWithVersionX on Proposal {
           id: '019584be-f0ef-7b01-8d36-422a3d6a0533',
           version: '019584be-2321-7a1a-9b68-ad33a97a7e84',
         ),
+        categoryId: SignedDocumentRef.generateFirstRef(),
         title: 'Dummy Proposal ver 2',
         description: 'Dummy description',
         updateDate: DateTime.now(),
@@ -165,7 +168,6 @@ extension ProposalWithVersionX on Proposal {
         author: 'Alex Wells',
         commentsCount: 0,
         category: 'Cardano Use Cases / MVP',
-        categoryId: const SignedDocumentRef(id: 'dummy_category_id'),
         versions: [
           ProposalVersion(
             publish: ProposalPublish.publishedDraft,

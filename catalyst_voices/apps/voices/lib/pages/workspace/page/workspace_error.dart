@@ -39,7 +39,7 @@ class _WorkspaceError extends StatelessWidget {
       child: VoicesErrorIndicator(
         message: message,
         onRetry: () {
-          const event = LoadProposalsEvent();
+          const event = LoadProposalsEvent([]);
           context.read<WorkspaceBloc>().add(event);
         },
       ),

@@ -22,7 +22,6 @@ class LastEditDate extends StatelessWidget {
       formatter: (context, dateTime) {
         final date = DateFormatter.formatDayMonthTime(
           dateTime,
-          dayFirst: false,
         );
         return context.l10n.lastEditDate(date);
       },
