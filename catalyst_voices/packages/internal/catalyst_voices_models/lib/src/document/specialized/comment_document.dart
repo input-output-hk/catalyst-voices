@@ -13,6 +13,17 @@ final class CommentDocument extends Equatable {
     required this.document,
   });
 
+  Profile? get author {
+    /* cSpell:disable */
+    final uri = Uri.parse(
+      'id.catalyst://cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE',
+    );
+    var catId = CatalystId.fromUri(uri);
+    catId = catId.copyWith(username: const Optional('Daniel Ribar'));
+    return Profile(catalystId: catId);
+    /* cSpell:enable */
+  }
+
   @override
   List<Object?> get props => [metadata, document];
 }
