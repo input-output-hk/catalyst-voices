@@ -128,7 +128,9 @@ class _SegmentsListView extends StatelessWidget {
       DocumentSection(:final property) => ProposalDocumentSectionTile(
           property: property,
         ),
-      ProposalCommentsSegment() => const ProposalCommentsHeaderTile(),
+      ProposalCommentsSegment(:final sort) => ProposalCommentsHeaderTile(
+          sort: sort,
+        ),
       ProposalCommentsSection() => switch (item) {
           ViewCommentsSection() => throw ArgumentError(
               'View comments not supported',

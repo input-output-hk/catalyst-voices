@@ -140,6 +140,7 @@ final class ProposalBloc extends Bloc<ProposalEvent, ProposalState>
     );
 
     final commentsSegment = ProposalCommentsSegment.build(
+      sort: ProposalCommentsSort.newest,
       authorId: activeAccountId ??
           CatalystId.fromUri(
             Uri.parse(

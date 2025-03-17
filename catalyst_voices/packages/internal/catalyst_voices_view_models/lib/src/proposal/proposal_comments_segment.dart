@@ -47,17 +47,22 @@ sealed class ProposalCommentsSection extends BaseSection {
 
 final class ProposalCommentsSegment
     extends BaseSegment<ProposalCommentsSection> {
+  final ProposalCommentsSort sort;
+
   const ProposalCommentsSegment({
     required super.id,
+    required this.sort,
     required super.sections,
   });
 
   ProposalCommentsSegment.build({
+    required ProposalCommentsSort sort,
     required CatalystId authorId,
     required CommentTemplate template,
     required List<CommentWithReplies> comments,
   }) : this(
           id: const NodeId('comments'),
+          sort: sort,
           sections: [
             ViewCommentsSection(
               id: const NodeId('comments.view'),
@@ -73,6 +78,9 @@ final class ProposalCommentsSegment
 
   @override
   SvgGenImage get icon => VoicesAssets.icons.chatAlt2;
+
+  @override
+  List<Object?> get props => super.props + [sort];
 
   @override
   String resolveTitle(BuildContext context) {

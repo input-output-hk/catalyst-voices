@@ -1862,5 +1862,13 @@
   "submitCommit": "Submit",
   "@submitCommit": {
     "description": "Send comment"
+  },
+  "proposalCommentsSortNewest": "Newest First",
+  "@proposalCommentsSortNewest": {
+    "description": "One of options for sorting comments under proposal"
+  },
+  "proposalCommentsSortOldest": "Newest Oldest",
+  "@proposalCommentsSortOldest": {
+    "description": "One of options for sorting comments under proposal"
   }
 }
