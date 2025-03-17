@@ -20,12 +20,18 @@ class ProposalBuilderStatusAction extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocSelector<ProposalBuilderBloc, ProposalBuilderState,
-        List<_MenuItemEnum>>(
+        ({bool offstage, List<_MenuItemEnum> items})>(
       selector: (state) {
-        return _MenuItemEnum.availableOptions(state.metadata.publish);
+        return (
+          offstage: state.isChanging || state.error != null,
+          items: _MenuItemEnum.availableOptions(state.metadata.publish)
+        );
       },
-      builder: (context, items) {
-        return _PopupMenuButton(items: items);
+      builder: (context, state) {
+        return Offstage(
+          offstage: state.offstage,
+          child: _PopupMenuButton(items: state.items),
+        );
       },
     );
   }
@@ -75,7 +81,7 @@ class _MenuItem extends StatelessWidget {
     final title = item.title(
       context,
       proposalTitle,
-      metadata.currentIteration,
+      metadata.latestVersion?.number ?? 0,
     );
 
     final description = item.description(context, metadata);
@@ -161,7 +167,8 @@ enum _MenuItemEnum {
     BuildContext context,
     ProposalBuilderMetadata metadata,
   ) {
-    final nextIteration = metadata.currentIteration + 1;
+    final currentIteration = metadata.latestVersion?.number ?? 0;
+    final nextIteration = currentIteration + 1;
     return context.l10n.proposalEditorStatusDropdownViewDescription(
       nextIteration,
     );
@@ -172,8 +179,11 @@ enum _MenuItemEnum {
       case ProposalPublish.localDraft:
         return _MenuItemEnum.values;
       case ProposalPublish.publishedDraft:
+        // TODO(dtscalac): delete? revert?
+        return [view, submit, export];
       case ProposalPublish.submittedProposal:
-        return [view, publish, submit, export];
+        // TODO(dtscalac): delete? revert?
+        return [view, export];
     }
   }
 }
@@ -293,13 +303,13 @@ class _PopupMenuButtonState extends State<_PopupMenuButton> {
     final state = bloc.state;
     final proposalTitle = state.proposalTitle ??
         context.l10n.proposalEditorStatusDropdownViewTitle;
-    final iteration = state.metadata.currentIteration;
+    final iteration = state.metadata.latestVersion?.number;
 
     final shouldPublish = await PublishProposalIterationDialog.show(
           context: context,
           proposalTitle: proposalTitle,
-          currentIteration: iteration == 0 ? null : iteration,
-          nextIteration: iteration + 1,
+          currentIteration: iteration,
+          nextIteration: (iteration ?? 0) + 1,
         ) ??
         false;
 
@@ -321,7 +331,7 @@ class _PopupMenuButtonState extends State<_PopupMenuButton> {
     final state = bloc.state;
     final proposalTitle = state.proposalTitle ??
         context.l10n.proposalEditorStatusDropdownViewTitle;
-    final iteration = state.metadata.currentIteration;
+    final iteration = state.metadata.latestVersion!.number;
 
     final shouldSubmit = await SubmitProposalForReviewDialog.show(
           context: context,

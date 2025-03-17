@@ -1,11 +1,13 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/routes/routes.dart';
+import 'package:catalyst_voices/routes/routing/proposal_builder_route.dart';
 import 'package:catalyst_voices/widgets/dropdown/voices_dropdown.dart';
 import 'package:catalyst_voices/widgets/modals/details/voices_align_title_header.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
@@ -13,7 +15,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 typedef _SelectedCategoryData = ({
   List<CampaignCategoryDetailsViewModel> categories,
-  String? value,
+  SignedDocumentRef? value,
 });
 
 class CreateNewProposalDialog extends StatefulWidget {
@@ -35,7 +37,13 @@ class CreateNewProposalDialog extends StatefulWidget {
 }
 
 class _ActionButtons extends StatelessWidget {
-  const _ActionButtons();
+  final VoidCallback onSave;
+  final VoidCallback onOpenInEditor;
+
+  const _ActionButtons({
+    required this.onSave,
+    required this.onOpenInEditor,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -53,11 +61,7 @@ class _ActionButtons extends StatelessWidget {
           selector: (state) => state.isValid,
           builder: (context, isValid) {
             return VoicesTextButton(
-              onTap: isValid
-                  ? () {
-                      // TODO(dtscalac): save new draft
-                    }
-                  : null,
+              onTap: isValid ? onSave : null,
               child: Text(context.l10n.saveDraft),
             );
           },
@@ -67,17 +71,7 @@ class _ActionButtons extends StatelessWidget {
           selector: (state) => state.isValid,
           builder: (context, isValid) {
             return VoicesFilledButton(
-              onTap: isValid
-                  ? () {
-                      // ignore: unused_local_variable
-                      final title =
-                          context.read<NewProposalCubit>().state.title;
-                      // ignore: unused_local_variable
-                      final categoryId =
-                          context.read<NewProposalCubit>().state.categoryId;
-                      // TODO(dtscalac): create new proposal and open in editor
-                    }
-                  : null,
+              onTap: isValid ? onOpenInEditor : null,
               child: Text(context.l10n.openInEditor),
             );
           },
@@ -103,7 +97,7 @@ class _CategorySelection extends StatelessWidget {
         );
       },
       builder: (context, state) {
-        return SingleSelectDropdown<String>(
+        return SingleSelectDropdown<SignedDocumentRef>(
           focusNode: focusNode,
           filled: false,
           borderRadius: 8,
@@ -159,7 +153,10 @@ class _CreateNewProposalDialogState extends State<CreateNewProposalDialog> {
             ),
             _CategorySelection(focusNode: _categoryFocusNode),
             const SizedBox(height: 40),
-            const _ActionButtons(),
+            _ActionButtons(
+              onSave: _onSave,
+              onOpenInEditor: _onOpenInEditor,
+            ),
           ],
         ),
       ),
@@ -170,6 +167,23 @@ class _CreateNewProposalDialogState extends State<CreateNewProposalDialog> {
   void dispose() {
     _categoryFocusNode.dispose();
     super.dispose();
+  }
+
+  void onTitleSubmitted(String title) {
+    _categoryFocusNode.requestFocus();
+  }
+
+  Future<void> _onOpenInEditor() async {
+    // TODO(dtscalac): create a draft but dont store locally,
+    // open proposal builder with it
+  }
+
+  Future<void> _onSave() async {
+    final cubit = context.read<NewProposalCubit>();
+    final draftRef = await cubit.createDraft();
+    if (mounted) {
+      ProposalBuilderRoute.fromRef(ref: draftRef).go(context);
+    }
   }
 
   void _onTitleSubmitted(String title) {
