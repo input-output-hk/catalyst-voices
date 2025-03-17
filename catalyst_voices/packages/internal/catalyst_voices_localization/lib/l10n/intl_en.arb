@@ -1730,6 +1730,35 @@
   "@change": {
     "description": "An action to change/modify something."
   },
+  "submittedForReview": "Submitted for Review ({submittedCount}/{maxCount})",
+  "@submittedForReview": {
+    "description": "Label for the submitted for review section",
+    "placeholders": {
+      "submittedCount": {
+        "type": "int"
+      },
+      "maxCount": {
+        "type": "int"
+      }
+    }
+  },
+  "sharedForPublicInProgress": "Shared for public feedback / In progress",
+  "@sharedForPublicInProgress": {
+    "description": "Label for shared for public feedback or in progress proposals in workspace"
+  },
+  "notPublished": "Not published",
+  "@notPublished": {
+    "description": "Label for not published proposals in workspace"
+  },
+  "lastEditDate": "Last edit {date}",
+  "@lastEditDate": {
+    "description": "Indicated when item was last updated",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
   "enterPhrase": "Enter phrase",
   "@enterPhrase": {
     "description": "Action to enter the seed phrase"
@@ -1846,6 +1875,61 @@
   "notFoundError": "The requested data could not be found. Try different search.",
   "@notFoundError": {
     "description": "Error message when user tries to access resourse that does not exist."
+  },
+  "proposalStageAndIteration": "{stage} - Iteration {iteration}",
+  "@proposalStageAndIteration": {
+    "description": "In context of proposal. Shows the stage and iteration of the proposal",
+    "placeholders": {
+      "stage": {
+        "type": "String"
+      },
+      "iteration": {
+        "type": "int"
+      }
+    }
+  },
+  "fundNoCategory": "Fund{number} Category",
+  "@fundNoCategory": {
+    "description": "Describes that category comes from fund number",
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "comments": "Comments",
+  "@comments": {
+    "description": "Describes comments"
+  },
+  "proposalIterationPublishUpdateAndTitle": "Iteration {iteration} - {publish} - {datetime} - {title}",
+  "@proposalIterationPublishUpdateAndTitle": {
+    "description": "Title for the proposal iteration card",
+    "placeholders": {
+      "iteration": {
+        "type": "int"
+      },
+      "publish": {
+        "type": "String"
+      },
+      "datetime": {
+        "type": "String"
+      },
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "exportButtonText": "Export",
+  "@exportButtonText": {
+    "description": "Text shown in export button"
+  },
+  "publishingHistory": "Publishing history",
+  "@publishingHistory": {
+    "description": "To let user know that document have history of published documents"
+  },
+  "notAvailableAbbr": "N/A",
+  "@notAvailableAbbr": {
+    "description": "Abbreviation for not available"
   },
   "title": "Title",
   "@title": {

@@ -3,7 +3,7 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/src/campaign/campaign_stage.dart';
 import 'package:equatable/equatable.dart';
-import 'package:uuid/uuid.dart';
+import 'package:uuid_plus/uuid_plus.dart';
 
 /// Defines the already funded proposal.
 final class FundedProposal extends ProposalViewModel {
