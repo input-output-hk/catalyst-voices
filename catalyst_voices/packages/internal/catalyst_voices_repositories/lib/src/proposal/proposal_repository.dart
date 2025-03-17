@@ -370,7 +370,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     return _documentRepository
         .watchDocuments(
           type: DocumentType.proposalDocument,
-          getlocalDrafts: true,
+          getLocalDrafts: true,
           catalystId: userCatalystId,
         )
         .whereNotNull()

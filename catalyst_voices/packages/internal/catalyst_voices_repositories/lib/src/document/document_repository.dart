@@ -130,7 +130,7 @@ abstract interface class DocumentRepository {
     required DocumentType type,
     int? limit,
     bool unique = false,
-    bool getlocalDrafts = false,
+    bool getLocalDrafts = false,
     CatalystId? catalystId,
   });
 }
@@ -300,7 +300,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   Stream<List<DocumentsDataWithRefData>> watchAllDocuments({
     int? limit,
     bool unique = false,
-    bool getlocalDrafts = false,
+    bool getLocalDrafts = false,
     DocumentType? type,
     CatalystId? catalystId,
   }) {
@@ -330,7 +330,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
       return results;
     });
 
-    if (!getlocalDrafts) {
+    if (!getLocalDrafts) {
       return localDocs;
     }
 
@@ -414,13 +414,13 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     required DocumentType type,
     int? limit,
     bool unique = false,
-    bool getlocalDrafts = false,
+    bool getLocalDrafts = false,
     CatalystId? catalystId,
   }) {
     return watchAllDocuments(
       limit: limit,
       type: type,
-      getlocalDrafts: getlocalDrafts,
+      getLocalDrafts: getLocalDrafts,
       catalystId: catalystId,
     );
   }
