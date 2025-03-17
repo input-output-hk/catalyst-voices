@@ -319,16 +319,13 @@ fn sync_subchain(
         while let Some(chain_update) = follower.next().await {
             match chain_update.kind {
                 cardano_chain_follower::Kind::ImmutableBlockRollForward => {
-                    // We only process these on the follower tracking the TIP.
-                    if params.end() == &Point::TIP {
-                        // What we need to do here is tell the primary follower to start a new sync
-                        // for the new immutable data, and then purge the volatile database of the
-                        // old data (after the immutable data has synced).
-                        info!(chain=%params.chain(), "Immutable chain rolled forward.");
-                        // Signal the point the immutable chain rolled forward to.
-                        params.set_follower_roll_forward(chain_update.block_data().point());
-                        return params.done(None);
-                    };
+                    // What we need to do here is tell the primary follower to start a new sync
+                    // for the new immutable data, and then purge the volatile database of the
+                    // old data (after the immutable data has synced).
+                    info!(chain=%params.chain(), "Immutable chain rolled forward.");
+                    // Signal the point the immutable chain rolled forward to.
+                    params.set_follower_roll_forward(chain_update.block_data().point());
+                    return params.done(None);
                 },
                 cardano_chain_follower::Kind::Block => {
                     let block = chain_update.block_data();
