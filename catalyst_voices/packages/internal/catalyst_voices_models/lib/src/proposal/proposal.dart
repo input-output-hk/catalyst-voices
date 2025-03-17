@@ -60,17 +60,19 @@ final class Proposal extends Equatable {
 
     return Proposal(
       selfRef: data.document.metadata.selfRef,
-      title: data.getProposalTitle() ?? '',
-      description: data.getProposalDescription() ?? '',
+      title: BaseProposalData.getProposalTitle(data.document) ?? '',
+      description: BaseProposalData.getProposalDescription(data.document) ?? '',
       updateDate: updateDate,
-      fundsRequested: data.getProposalFundsRequested() ?? Coin.fromAda(0),
+      fundsRequested:
+          BaseProposalData.getProposalFundsRequested(data.document) ??
+              Coin.fromAda(0),
       // TODO(LynxLynxx): from where we need to get the real status
       status: ProposalStatus.inProgress,
       // TODO(LynxLynxx): from where we need to get the real publish
       publish: ProposalPublish.publishedDraft,
       versionCount: data.versions.length,
-      duration: data.getProposalDuration() ?? 0,
-      author: data.getProposalAuthor() ?? '',
+      duration: BaseProposalData.getProposalDuration(data.document) ?? 0,
+      author: BaseProposalData.getProposalAuthor(data.document) ?? '',
       commentsCount: data.commentsCount,
       category: data.categoryId.id,
       categoryId: data.categoryId,
@@ -142,12 +144,14 @@ final class ProposalWithVersions extends Proposal {
     required int commentsCount,
     required String category,
     required List<ProposalVersion> versions,
+    required SignedDocumentRef categoryId,
   }) {
     final sortedVersions = List<ProposalVersion>.from(versions)..sort();
 
     return ProposalWithVersions._(
       selfRef: selfRef,
       title: title,
+      categoryId: categoryId,
       description: description,
       updateDate: updateDate,
       fundedDate: fundedDate,
@@ -178,6 +182,7 @@ final class ProposalWithVersions extends Proposal {
     required super.commentsCount,
     required super.category,
     required this.versions,
+    required super.categoryId,
   });
 
   @override
@@ -189,6 +194,7 @@ final class ProposalWithVersions extends Proposal {
   @override
   ProposalWithVersions copyWith({
     DocumentRef? selfRef,
+    SignedDocumentRef? categoryId,
     String? title,
     String? description,
     DateTime? updateDate,
@@ -204,6 +210,7 @@ final class ProposalWithVersions extends Proposal {
   }) =>
       ProposalWithVersions(
         selfRef: selfRef ?? this.selfRef,
+        categoryId: categoryId ?? this.categoryId,
         title: title ?? this.title,
         description: description ?? this.description,
         updateDate: updateDate ?? this.updateDate,
@@ -226,6 +233,7 @@ extension ProposalWithVersionX on ProposalWithVersions {
           id: '019584be-f0ef-7b01-8d36-422a3d6a0533',
           version: '019584be-2321-7a1a-9b68-ad33a97a7e84',
         ),
+        categoryId: SignedDocumentRef.generateFirstRef(),
         title: 'Dummy Proposal ver 2',
         description: 'Dummy description',
         updateDate: DateTime.now(),

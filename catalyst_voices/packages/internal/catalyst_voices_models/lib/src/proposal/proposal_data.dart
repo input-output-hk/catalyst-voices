@@ -10,7 +10,7 @@ class BaseProposalData extends Equatable {
 
   const BaseProposalData({
     required this.document,
-    required thos.categpryId
+    required this.categoryId,
     this.commentsCount = 0,
   });
 
@@ -20,60 +20,56 @@ class BaseProposalData extends Equatable {
         commentsCount,
       ];
 
-  String? getProposalAuthor([ProposalDocument? doc]) {
-    final property = (doc ?? document)
-            .document
-            .getProperty(ProposalDocument.authorNameNodeId)
-        as DocumentValueProperty<String>?;
-
-    return property?.value;
-  }
-
-  String? getProposalDescription([ProposalDocument? doc]) {
-    final property = (doc ?? document)
-            .document
-            .getProperty(ProposalDocument.descriptionNodeId)
-        as DocumentValueProperty<String>?;
-
-    return property?.value;
-  }
-
-  int? getProposalDuration([ProposalDocument? doc]) {
-    final property =
-        (doc ?? document).document.getProperty(ProposalDocument.durationNodeId)
-            as DocumentValueProperty<int>?;
-
-    return property?.value;
-  }
-
-  Coin? getProposalFundsRequested([ProposalDocument? doc]) {
-    final property = (doc ?? document)
-            .document
-            .getProperty(ProposalDocument.requestedFundsNodeId)
-        as DocumentValueProperty<int>?;
-    final value = property?.value;
-    if (value == null) return null;
-    return Coin(value);
-  }
-
-  String? getProposalTitle([ProposalDocument? doc]) {
-    final property =
-        (doc ?? document).document.getProperty(ProposalDocument.titleNodeId)
-            as DocumentValueProperty<String>?;
-
-    return property?.value;
-  }
-
   ProposalVersion toProposalVersion() {
     return ProposalVersion(
       selfRef: document.metadata.selfRef,
-      title: getProposalTitle() ?? '',
+      title: getProposalTitle(document) ?? '',
       createdAt: UuidUtils.dateTime(
         document.metadata.selfRef.version ?? document.metadata.selfRef.id,
       ),
       // TODO(LynxLynxx): from where we need to get the real status
       publish: ProposalPublish.publishedDraft,
     );
+  }
+
+  static String? getProposalAuthor(ProposalDocument document) {
+    final property = document.document.getProperty(
+      ProposalDocument.authorNameNodeId,
+    ) as DocumentValueProperty<String>?;
+
+    return property?.value;
+  }
+
+  static String? getProposalDescription(ProposalDocument document) {
+    final property =
+        document.document.getProperty(ProposalDocument.descriptionNodeId)
+            as DocumentValueProperty<String>?;
+
+    return property?.value;
+  }
+
+  static int? getProposalDuration(ProposalDocument document) {
+    final property =
+        document.document.getProperty(ProposalDocument.durationNodeId)
+            as DocumentValueProperty<int>?;
+
+    return property?.value;
+  }
+
+  static Coin? getProposalFundsRequested(ProposalDocument document) {
+    final property =
+        document.document.getProperty(ProposalDocument.requestedFundsNodeId)
+            as DocumentValueProperty<int>?;
+    final value = property?.value;
+    if (value == null) return null;
+    return Coin(value);
+  }
+
+  static String? getProposalTitle(ProposalDocument document) {
+    final property = document.document.getProperty(ProposalDocument.titleNodeId)
+        as DocumentValueProperty<String>?;
+
+    return property?.value;
   }
 }
 

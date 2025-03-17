@@ -261,7 +261,12 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     return newDocument.ref;
   }
 
+  @override
+  Future<void> publishDocument({required SignedDocument document}) async {
+    await _remoteDocuments.publish(document);
+  }
 
+  @override
   Future<List<ProposalDocument>> queryVersionsOfId({required String id}) async {
     final documents = await _localDocuments.queryVersionsOfId(id: id);
     if (documents.isEmpty) return [];
@@ -276,10 +281,6 @@ final class DocumentRepositoryImpl implements DocumentRepository {
           ),
         )
         .toList();
-  }
-
-  Future<void> publishDocument({required SignedDocument document}) async {
-    await _remoteDocuments.publish(document);
   }
 
   @override

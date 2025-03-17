@@ -262,6 +262,7 @@ final class ProposalServiceImpl implements ProposalService {
               .map(
                 (e) => BaseProposalData(
                   document: e,
+                  categoryId: SignedDocumentRef.generateFirstRef(),
                 ),
               )
               .toList();
@@ -277,7 +278,7 @@ final class ProposalServiceImpl implements ProposalService {
               categoryId: SignedDocumentRef(
                 id: DocumentType.categoryParametersDocument.uuid,
               ),
-              versions: versionIds,
+              versions: versionsData,
               commentsCount: commentsCount,
             );
             return Proposal.fromData(proposalData);

@@ -119,7 +119,10 @@ final class ProposalRepositoryImpl implements ProposalRepository {
         ),
       );
 
-      return BaseProposalData(document: document);
+      return BaseProposalData(
+        document: document,
+        categoryId: SignedDocumentRef.generateFirstRef(),
+      );
     }).reversed.toList();
 
     return ProposalData(
