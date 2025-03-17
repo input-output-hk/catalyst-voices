@@ -146,7 +146,7 @@ final class ProposalWithVersions extends Proposal {
     required List<ProposalVersion> versions,
     required SignedDocumentRef categoryId,
   }) {
-    final sortedVersions = List<ProposalVersion>.from(versions)..sort();
+    final sortedVersions = List<ProposalVersion>.of(versions)..sort();
 
     return ProposalWithVersions._(
       selfRef: selfRef,
@@ -198,6 +198,7 @@ final class ProposalWithVersions extends Proposal {
     String? title,
     String? description,
     DateTime? updateDate,
+    DateTime? fundedDate,
     Coin? fundsRequested,
     ProposalStatus? status,
     ProposalPublish? publish,
@@ -214,6 +215,7 @@ final class ProposalWithVersions extends Proposal {
         title: title ?? this.title,
         description: description ?? this.description,
         updateDate: updateDate ?? this.updateDate,
+        fundedDate: fundedDate ?? this.fundedDate,
         fundsRequested: fundsRequested ?? this.fundsRequested,
         status: status ?? this.status,
         publish: publish ?? this.publish,
