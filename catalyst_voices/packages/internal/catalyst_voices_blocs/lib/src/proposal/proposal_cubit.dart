@@ -45,7 +45,7 @@ final class ProposalCubit extends Cubit<ProposalState>
       final catalystId = _userService.user.activeAccount?.catalystId ??
           CatalystId.fromUri(
             Uri.parse(
-              'id.catalyst://cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE',
+              'id.catalyst://dev@cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE',
             ),
           );
 
