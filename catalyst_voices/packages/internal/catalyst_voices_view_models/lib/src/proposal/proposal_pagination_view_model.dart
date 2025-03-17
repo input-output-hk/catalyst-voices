@@ -6,7 +6,7 @@ class ProposalPaginationViewModel extends Equatable {
   final int pageKey;
   final int maxResults;
   final List<ProposalViewModel> items;
-  final String? categoryId;
+  final SignedDocumentRef? categoryId;
   final String? searchValue;
   final bool isLoading;
 
@@ -21,7 +21,7 @@ class ProposalPaginationViewModel extends Equatable {
 
   factory ProposalPaginationViewModel.fromPaginationItems({
     required ProposalPaginationItems<ProposalViewModel> paginItems,
-    String? categoryId,
+    SignedDocumentRef? categoryId,
     String? searchValue,
     required bool isLoading,
   }) {
@@ -49,7 +49,7 @@ class ProposalPaginationViewModel extends Equatable {
     int? pageKey,
     int? maxResults,
     List<ProposalViewModel>? items,
-    String? categoryId,
+    SignedDocumentRef? categoryId,
     String? searchValue,
     bool? canReload,
     bool? isLoading,

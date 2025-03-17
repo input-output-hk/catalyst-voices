@@ -8,14 +8,51 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 class NewProposalCubit extends Cubit<NewProposalState> {
   final CampaignService _campaignService;
+  final ProposalService _proposalService;
+  final DocumentMapper _documentMapper;
 
-  NewProposalCubit(this._campaignService)
-      : super(
+  NewProposalCubit(
+    this._campaignService,
+    this._proposalService,
+    this._documentMapper,
+  ) : super(
           const NewProposalState(
             title: ProposalTitle.pure(),
           ),
         ) {
     unawaited(getCampaignCategories());
+  }
+
+  Future<DraftRef> createDraft() async {
+    final title = state.title.value;
+    final categoryId = state.categoryId;
+
+    if (categoryId == null) {
+      throw StateError('Cannot create draft, category not selected');
+    }
+
+    final category = await _campaignService.getCategory(categoryId);
+    final templateRef = category.proposalTemplateRef;
+    final template = await _proposalService.getProposalTemplate(
+      ref: templateRef,
+    );
+
+    final documentBuilder = DocumentBuilder.fromSchema(schema: template.schema)
+      ..addChange(
+        DocumentValueChange(
+          nodeId: ProposalDocument.titleNodeId,
+          value: title,
+        ),
+      );
+
+    final document = documentBuilder.build();
+    final documentContent = _documentMapper.toContent(document);
+
+    return _proposalService.createDraftProposal(
+      content: documentContent,
+      template: templateRef,
+      categoryId: categoryId,
+    );
   }
 
   Future<void> getCampaignCategories() async {
@@ -30,7 +67,7 @@ class NewProposalCubit extends Cubit<NewProposalState> {
     );
   }
 
-  void updateSelectedCategory(String? categoryId) {
+  void updateSelectedCategory(SignedDocumentRef? categoryId) {
     emit(state.copyWith(categoryId: Optional(categoryId)));
   }
 
