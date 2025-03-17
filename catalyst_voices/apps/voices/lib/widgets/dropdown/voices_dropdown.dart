@@ -57,32 +57,11 @@ class FilterByDropdown<T> extends StatelessWidget {
   }
 }
 
-class VoicesDropdownMenuEntry<T> extends DropdownMenuEntry<T> {
-  final BuildContext context;
-
-  VoicesDropdownMenuEntry({
-    required super.value,
-    required super.label,
-    required this.context,
-    ButtonStyle? style,
-  }) : super(
-          style: style ?? _createButtonStyle(context),
-        );
-
-  static ButtonStyle _createButtonStyle(BuildContext context) => ButtonStyle(
-        textStyle: WidgetStateProperty.all(
-          Theme.of(context).textTheme.labelLarge,
-        ),
-        foregroundColor: WidgetStateProperty.all(
-          Theme.of(context).colorScheme.primary,
-        ),
-        visualDensity: VisualDensity.compact,
-      );
-}
-
 class SingleSelectDropdown<T> extends VoicesFormField<T> {
   final List<DropdownMenuEntry<T>> items;
   final String? hintText;
+  final bool filled;
+  final double borderRadius;
 
   SingleSelectDropdown({
     super.key,
@@ -92,7 +71,10 @@ class SingleSelectDropdown<T> extends VoicesFormField<T> {
     super.enabled,
     super.validator,
     this.hintText,
+    this.filled = true,
+    this.borderRadius = 4,
     super.autovalidateMode = AutovalidateMode.onUserInteraction,
+    FocusNode? focusNode,
   }) : super(
           builder: (field) {
             final state = field as _DropdownFormFieldState<T>;
@@ -107,6 +89,7 @@ class SingleSelectDropdown<T> extends VoicesFormField<T> {
               constraints: const BoxConstraints(),
               child: DropdownMenu(
                 controller: state._controller,
+                focusNode: focusNode,
                 expandedInsets: EdgeInsets.zero,
                 initialSelection: state.value,
                 enabled: enabled,
@@ -118,15 +101,16 @@ class SingleSelectDropdown<T> extends VoicesFormField<T> {
                     color: theme.colors.textDisabled,
                   ),
                   fillColor: theme.colors.elevationsOnSurfaceNeutralLv1Grey,
-                  filled: true,
-                  enabledBorder: _border(field.context),
-                  disabledBorder: _border(field.context),
-                  focusedBorder: _border(field.context),
+                  filled: filled,
+                  enabledBorder: _border(field.context, borderRadius),
+                  disabledBorder: _border(field.context, borderRadius),
+                  focusedBorder: _border(field.context, borderRadius),
                   errorStyle: theme.textTheme.bodySmall?.copyWith(
                     color: enabled
                         ? theme.colorScheme.error
                         : theme.colors.textDisabled,
                   ),
+                  focusColor: Colors.tealAccent,
                 ),
                 errorText: field.errorText,
                 // using visibility so that the widget reserves
@@ -149,14 +133,42 @@ class SingleSelectDropdown<T> extends VoicesFormField<T> {
           },
         );
 
-  static OutlineInputBorder _border(BuildContext context) => OutlineInputBorder(
+  @override
+  FormFieldState<T> createState() => _DropdownFormFieldState<T>();
+
+  static OutlineInputBorder _border(
+    BuildContext context,
+    double borderRadius,
+  ) =>
+      OutlineInputBorder(
         borderSide: BorderSide(
           color: Theme.of(context).colors.outlineBorderVariant,
         ),
+        borderRadius: BorderRadius.circular(borderRadius),
       );
+}
 
-  @override
-  FormFieldState<T> createState() => _DropdownFormFieldState<T>();
+class VoicesDropdownMenuEntry<T> extends DropdownMenuEntry<T> {
+  final BuildContext context;
+
+  VoicesDropdownMenuEntry({
+    required super.value,
+    required super.label,
+    required this.context,
+    ButtonStyle? style,
+  }) : super(
+          style: style ?? _createButtonStyle(context),
+        );
+
+  static ButtonStyle _createButtonStyle(BuildContext context) => ButtonStyle(
+        textStyle: WidgetStateProperty.all(
+          Theme.of(context).textTheme.labelLarge,
+        ),
+        foregroundColor: WidgetStateProperty.all(
+          Theme.of(context).colorScheme.primary,
+        ),
+        visualDensity: VisualDensity.compact,
+      );
 }
 
 class _DropdownFormFieldState<T> extends VoicesFormFieldState<T> {

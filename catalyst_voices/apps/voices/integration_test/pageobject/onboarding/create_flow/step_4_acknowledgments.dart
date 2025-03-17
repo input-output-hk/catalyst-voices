@@ -30,26 +30,25 @@ class AcknowledgmentsPanel extends OnboardingPageBase {
   Future<void> verifyInfoPanel() async {
     expect(
       $(registrationInfoPanel).$(headerTitle).text,
-      T.get('Welcome to Catalyst'),
+      (await t()).accountCreationGetStartedTitle,
     );
     expect($(pictureContainer).$(IconTheme), findsOneWidget);
     expect(
       $(learnMoreButton).$(Text).text,
-      T.get('Learn More'),
+      (await t()).learnMore,
     );
   }
 
   Future<void> verifyDetailsPanel() async {
     expect(
       $(acknowledgmentsTile).text,
-      T.get('Mandatory AcknowledgementsTitle'),
+      (await t()).createBaseProfileAcknowledgementsTitle,
     );
     expect(
-      $(tosCheckbox).text,
-      T.get(
-        'I confirm that I have read and agree to be bound by Project Catalyst '
-        'Terms and Conditions',
-      ),
+      $(tosCheckbox).text?.indexOf(
+            (await t()).createBaseProfileAcknowledgementsToS.split('{tos}')[0],
+          ),
+      true,
     );
   }
 }

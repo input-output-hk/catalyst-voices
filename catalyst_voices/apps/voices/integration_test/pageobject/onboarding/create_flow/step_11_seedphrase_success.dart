@@ -30,17 +30,14 @@ class SeedphraseSuccessPanel extends OnboardingPageBase {
   Future<void> verifyDetailsPanel() async {}
 
   Future<void> verifyInfoPanel() async {
-    expect(await infoPartHeaderTitleText(), T.get('Catalyst Keychain'));
+    expect(await infoPartHeaderTitleText(), (await t()).catalystKeychain);
     //temporary: check for specific picture (green checked icon)
     expect(infoPartTaskPicture(), findsOneWidget);
     expect($(progressBar), findsOneWidget);
-    expect(
-      infoPartLearnMoreText(),
-      T.get('Learn More'),
-    );
+    expect(infoPartLearnMoreText(), (await t()).learnMore);
     expect(
       $(nextStepBody).text,
-      T.get('Now let’s set your Unlock password for this device!'),
+      (await t()).createKeychainSeedPhraseCheckSuccessNextStep,
     );
     expect(await closeButton(), findsOneWidget);
   }
