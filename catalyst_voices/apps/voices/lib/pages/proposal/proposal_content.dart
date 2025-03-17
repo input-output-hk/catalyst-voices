@@ -67,9 +67,7 @@ class _SegmentsListView extends StatelessWidget {
             isLast: isLast || nextItem is ProposalCommentsSegment,
           ),
           verticalPadding: (
-            isFirst: item is Segment ||
-                item is CommentListItem ||
-                item is AddCommentSection,
+            isFirst: item is Segment || item is CommentListItem,
             isLast: nextItem is! Section && nextItem is! CommentListItem,
           ),
           child: _buildItem(context, item),
@@ -88,7 +86,7 @@ class _SegmentsListView extends StatelessWidget {
         }
 
         if (nextItem is AddCommentSection) {
-          return const VoicesDivider.expanded(height: 1);
+          return const ProposalDivider(height: 48);
         }
 
         if (nextItem is ProposalCommentsSegment) {
