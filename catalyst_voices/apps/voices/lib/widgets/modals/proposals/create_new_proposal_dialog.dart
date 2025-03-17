@@ -208,7 +208,7 @@ class _TitleTextField extends StatelessWidget {
           onFieldSubmitted: onFieldSubmitted,
           onChanged: (value) => context
               .read<NewProposalCubit>()
-              .updateTitle(const ProposalTitle.dirty('')),
+              .updateTitle(ProposalTitle.dirty(value ?? '')),
           decoration: VoicesTextFieldDecoration(
             borderRadius: BorderRadius.circular(8),
             filled: false,

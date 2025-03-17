@@ -25,7 +25,7 @@ final class ProposalTitleEmptyValidationException
 
   @override
   String message(BuildContext context) {
-    return context.l10n.errorDisplayNameValidationEmpty;
+    return context.l10n.errorValidationStringEmpty;
   }
 }
 
