@@ -16,11 +16,17 @@ part 'proposal_builder_route.g.dart';
 )
 final class ProposalBuilderDraftRoute extends GoRouteData
     with FadePageTransitionMixin, CompositeRouteGuardMixin {
-  final String? templateId;
+  final String? categoryId;
 
   const ProposalBuilderDraftRoute({
-    this.templateId,
+    this.categoryId,
   });
+
+  factory ProposalBuilderDraftRoute.fromRef({
+    required SignedDocumentRef categoryId,
+  }) {
+    return ProposalBuilderDraftRoute(categoryId: categoryId.id);
+  }
 
   @override
   List<RouteGuard> get routeGuards => const [
@@ -30,7 +36,10 @@ final class ProposalBuilderDraftRoute extends GoRouteData
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
-    return ProposalBuilderPage(templateId: templateId);
+    final categoryId = this.categoryId;
+    final categoryRef =
+        categoryId != null ? SignedDocumentRef(id: categoryId) : null;
+    return ProposalBuilderPage(categoryId: categoryRef);
   }
 }
 
@@ -40,14 +49,24 @@ final class ProposalBuilderDraftRoute extends GoRouteData
 final class ProposalBuilderRoute extends GoRouteData
     with FadePageTransitionMixin, CompositeRouteGuardMixin {
   final String proposalId;
-  final String? version;
-  final bool isPrivate;
+  final String? proposalVersion;
+  final bool local;
 
   const ProposalBuilderRoute({
     required this.proposalId,
-    this.version,
-    required this.isPrivate,
+    this.proposalVersion,
+    this.local = false,
   });
+
+  factory ProposalBuilderRoute.fromRef({
+    required DocumentRef ref,
+  }) {
+    return ProposalBuilderRoute(
+      proposalId: ref.id,
+      proposalVersion: ref.version,
+      local: ref is DraftRef,
+    );
+  }
 
   @override
   List<RouteGuard> get routeGuards => const [
@@ -57,12 +76,12 @@ final class ProposalBuilderRoute extends GoRouteData
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
-    DocumentRef proposalRef;
-    if (isPrivate) {
-      proposalRef = DraftRef(id: proposalId, version: version);
-    } else {
-      proposalRef = SignedDocumentRef(id: proposalId, version: version);
-    }
-    return ProposalBuilderPage(proposalRef: proposalRef);
+    final ref = DocumentRef.build(
+      id: proposalId,
+      version: proposalVersion,
+      isDraft: local,
+    );
+
+    return ProposalBuilderPage(proposalId: ref);
   }
 }
