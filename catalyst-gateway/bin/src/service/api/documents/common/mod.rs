@@ -57,9 +57,8 @@ impl catalyst_signed_doc::providers::VerifyingKeyProvider for VerifyingKeyProvid
 
 impl From<CatalystRBACTokenV1> for VerifyingKeyProvider {
     fn from(value: CatalystRBACTokenV1) -> Self {
-        Self(Vec::from([(
-            value.catalyst_id().clone().as_uri(),
-            value.catalyst_id().role0_pk(),
-        )]))
+        let cat_id = value.catalyst_id();
+
+        Self(Vec::from([(cat_id.clone().as_uri(), cat_id.role0_pk())]))
     }
 }

@@ -48,19 +48,44 @@ pub(crate) type AllResponses = WithErrorResponses<Responses>;
 pub(crate) async fn endpoint(doc_bytes: Vec<u8>, token: CatalystRBACTokenV1) -> AllResponses {
     match doc_bytes.as_slice().try_into() {
         Ok(doc) => {
-            if let Err(e) = catalyst_signed_doc::validator::validate(&doc, &DocProvider).await {
-                // means that something happened inside the `DocProvider`, some db error.
-                return AllResponses::handle_error(&e);
+            match catalyst_signed_doc::validator::validate(&doc, &DocProvider).await {
+                Ok(result) => {
+                    if !result {
+                        return Responses::UnprocessableContent(Json(
+                            PutDocumentUnprocessableContent::new(
+                                "Failed validating document signatures",
+                                None,
+                            ),
+                        ))
+                        .into();
+                    }
+                },
+                Err(e) => {
+                    // means that something happened inside the `DocProvider`, some db error.
+                    return AllResponses::handle_error(&e);
+                },
             }
-            if let Err(e) = catalyst_signed_doc::validator::validate_signatures(
+            match catalyst_signed_doc::validator::validate_signatures(
                 &doc,
                 &VerifyingKeyProvider::from(token),
             )
             .await
             {
-                // means that something happened inside the `VerifyingKeyProvider`, some db error.
-                return AllResponses::handle_error(&e);
-            }
+                Ok(result) => {
+                    if !result {
+                        return Responses::UnprocessableContent(Json(
+                            PutDocumentUnprocessableContent::new(
+                                "Failed validating document signatures",
+                                None,
+                            ),
+                        ))
+                        .into();
+                    }
+                },
+                Err(e) => {
+                    return AllResponses::handle_error(&e);
+                },
+            };
 
             let report = doc.problem_report();
             if report.is_problematic() {
