@@ -7,8 +7,7 @@ import 'package:catalyst_voices_repositories/src/dto/proposal/proposal_submissio
 import 'package:catalyst_voices_repositories/src/signed_document/signed_document_json_payload.dart';
 import 'package:catalyst_voices_repositories/src/signed_document/signed_document_manager.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
-import 'package:uuid/data.dart';
-import 'package:uuid/uuid.dart';
+import 'package:uuid_plus/uuid_plus.dart';
 
 // TODO(damian-molinski): Delete it after versions query is ready.
 final _docVersionsCache = <String, List<String>>{};
