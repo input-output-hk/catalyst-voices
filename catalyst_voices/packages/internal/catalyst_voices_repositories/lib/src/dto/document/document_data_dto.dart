@@ -88,7 +88,7 @@ final class DocumentDataMetadataDto {
   final String? brandId;
   final String? campaignId;
   final String? electionId;
-  final String? categoryId;
+  final DocumentRefDto? categoryId;
 
   DocumentDataMetadataDto({
     required this.type,
@@ -118,7 +118,7 @@ final class DocumentDataMetadataDto {
           brandId: data.brandId,
           campaignId: data.campaignId,
           electionId: data.electionId,
-          categoryId: data.categoryId,
+          categoryId: data.categoryId?.toDto(),
         );
 
   Map<String, dynamic> toJson() => _$DocumentDataMetadataDtoToJson(this);
@@ -133,7 +133,7 @@ final class DocumentDataMetadataDto {
       brandId: brandId,
       campaignId: campaignId,
       electionId: electionId,
-      categoryId: categoryId,
+      categoryId: categoryId?.toModel(),
     );
   }
 
