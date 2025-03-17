@@ -9,11 +9,11 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group(SignedDocumentManager, () {
-    final documentManager = SignedDocumentManager(
-      keyFactory: _FakeCatalystKeyFactory(),
-    );
+    const documentManager = SignedDocumentManager();
 
     setUpAll(() {
+      CatalystPublicKey.factory = _FakeCatalystPublicKeyFactory();
+      CatalystSignature.factory = _FakeCatalystSignatureFactory();
       CatalystCompressionPlatform.instance = _FakeCatalystCompressionPlatform();
     });
 
@@ -24,14 +24,14 @@ void main() {
 
       final signedDocument = await documentManager.signDocument(
         document,
+        catalystId: _catalystId,
         metadata: _metadata,
-        publicKey: _publicKey,
         privateKey: _privateKey,
       );
 
       expect(signedDocument.payload, equals(document));
 
-      final isVerified = await signedDocument.verifySignature(_publicKey);
+      final isVerified = await signedDocument.verifySignature(_catalystId);
       expect(isVerified, isTrue);
 
       final signedDocumentBytes = signedDocument.toBytes();
@@ -50,6 +50,11 @@ const _metadata = SignedDocumentMetadata(
   documentType: DocumentType.proposalDocument,
 );
 
+final _catalystId = CatalystId(
+  host: CatalystIdHost.cardanoPreprod.host,
+  role0Key: _publicKey.publicKeyBytes,
+);
+
 final _privateKey = _FakeCatalystPrivateKey(bytes: _privateKeyBytes);
 final _privateKeyBytes = Uint8List.fromList(List.filled(32, 0));
 final _publicKey = _FakeCatalystPublicKey(bytes: _publicKeyBytes);
@@ -60,23 +65,6 @@ final _signatureBytes = Uint8List.fromList(List.filled(32, 2));
 class _FakeCatalystCompressionPlatform extends CatalystCompressionPlatform {
   @override
   CatalystCompressor get brotli => const _FakeCompressor();
-}
-
-class _FakeCatalystKeyFactory extends Fake implements CatalystKeyFactory {
-  @override
-  CatalystPrivateKey createPrivateKey(Uint8List bytes) {
-    return _FakeCatalystPrivateKey(bytes: bytes);
-  }
-
-  @override
-  CatalystPublicKey createPublicKey(Uint8List bytes) {
-    return _FakeCatalystPublicKey(bytes: bytes);
-  }
-
-  @override
-  CatalystSignature createSignature(Uint8List bytes) {
-    return _FakeCatalystSignature(bytes: bytes);
-  }
 }
 
 class _FakeCatalystPrivateKey extends Fake implements CatalystPrivateKey {
@@ -110,6 +98,9 @@ class _FakeCatalystPublicKey extends Fake implements CatalystPublicKey {
   _FakeCatalystPublicKey({required this.bytes});
 
   @override
+  Uint8List get publicKeyBytes => bytes;
+
+  @override
   Future<bool> verify(
     Uint8List data, {
     required CatalystSignature signature,
@@ -118,11 +109,27 @@ class _FakeCatalystPublicKey extends Fake implements CatalystPublicKey {
   }
 }
 
+class _FakeCatalystPublicKeyFactory extends Fake
+    implements CatalystPublicKeyFactory {
+  @override
+  CatalystPublicKey create(Uint8List bytes) {
+    return _FakeCatalystPublicKey(bytes: bytes);
+  }
+}
+
 class _FakeCatalystSignature extends Fake implements CatalystSignature {
   @override
   final Uint8List bytes;
 
   _FakeCatalystSignature({required this.bytes});
+}
+
+class _FakeCatalystSignatureFactory extends Fake
+    implements CatalystSignatureFactory {
+  @override
+  CatalystSignature create(Uint8List bytes) {
+    return _FakeCatalystSignature(bytes: bytes);
+  }
 }
 
 final class _FakeCompressor implements CatalystCompressor {

@@ -30,7 +30,7 @@ final class User extends Equatable {
   }
 
   User useAccount({
-    required String catalystId,
+    required CatalystId catalystId,
   }) {
     if (this.accounts.none((e) => e.catalystId == catalystId)) {
       throw ArgumentError('Account[$catalystId] is not on the list');
@@ -44,7 +44,7 @@ final class User extends Equatable {
   }
 
   bool hasAccount({
-    required String catalystId,
+    required CatalystId catalystId,
   }) {
     return accounts.any((element) => element.catalystId == catalystId);
   }
@@ -56,7 +56,7 @@ final class User extends Equatable {
   }
 
   User removeAccount({
-    required String catalystId,
+    required CatalystId catalystId,
   }) {
     final accounts = [...this.accounts]
         .where((element) => element.catalystId != catalystId)

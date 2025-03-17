@@ -1,3 +1,4 @@
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 enum DocumentPropertyTypeDto {
@@ -15,7 +16,7 @@ enum DocumentPropertyTypeDto {
 
   factory DocumentPropertyTypeDto.fromString(String string) {
     for (final type in values) {
-      if (type.value.toLowerCase() == string.toLowerCase()) {
+      if (type.value.equalsIgnoreCase(string)) {
         return type;
       }
     }

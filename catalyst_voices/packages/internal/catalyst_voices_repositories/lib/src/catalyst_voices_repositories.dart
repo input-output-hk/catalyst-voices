@@ -1,4 +1,5 @@
 export 'api/api.dart';
+export 'auth/auth_token_provider.dart' show AuthTokenProvider;
 export 'campaign/campaign_repository.dart' show CampaignRepository;
 export 'config/config_repository.dart' show ConfigRepository;
 export 'database/database.dart';
@@ -18,6 +19,5 @@ export 'signed_document/signed_document_manager.dart'
     show SignedDocumentManager;
 export 'signed_document/signed_document_manager_impl.dart'
     show SignedDocumentManagerImpl;
-export 'transaction/transaction_config_repository.dart';
 export 'user/user_repository.dart' show UserRepository;
 export 'user/user_storage.dart';

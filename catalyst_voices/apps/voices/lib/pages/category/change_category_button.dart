@@ -72,7 +72,7 @@ class _ChangeCategoryButtonState extends State<ChangeCategoryButton> {
     if (categoryId == null) {
       return;
     }
-    await context.read<CategoryDetailCubit>().getCategoryDetail(categoryId);
+    context.read<CategoryDetailCubit>().getCategoryDetail(categoryId);
   }
 
   void _handleClose() {

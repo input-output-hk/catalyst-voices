@@ -10,26 +10,30 @@ abstract interface class ProposalService {
   const factory ProposalService(
     ProposalRepository proposalRepository,
     DocumentRepository documentRepository,
-    SignedDocumentManager signedDocumentManager,
     UserService userService,
     KeyDerivationService keyDerivationService,
   ) = ProposalServiceImpl;
 
   Future<List<String>> addFavoriteProposal(String proposalId);
 
+  Future<DraftRef> createDraftProposal({
+    required DocumentDataContent content,
+    required SignedDocumentRef template,
+    DraftRef? ref,
+  });
+
   /// Delete a draft proposal from local storage.
   ///
   /// Published proposals cannot be deleted.
   Future<void> deleteDraftProposal(DraftRef ref);
 
-  /// Encodes the [content] to exportable format.
+  /// Encodes the [document] to exportable format.
   ///
   /// It does not save the document anywhere on the disk,
   /// it only encodes a document as [Uint8List]
   /// so that it can be saved as a file.
   Future<Uint8List> encodeProposalForExport({
-    required DocumentDataMetadata metadata,
-    required DocumentDataContent content,
+    required DocumentData document,
   });
 
   /// Fetches favorites proposals ids of the user
@@ -62,16 +66,15 @@ abstract interface class ProposalService {
 
   /// Publishes a public proposal draft.
   Future<void> publishProposal({
-    required DocumentDataMetadata metadata,
-    required DocumentDataContent content,
+    required DocumentData document,
   });
 
   Future<List<String>> removeFavoriteProposal(String proposalId);
 
   /// Submits a proposal draft into review.
   Future<void> submitProposalForReview({
-    required DocumentDataMetadata metadata,
-    required DocumentDataContent content,
+    required SignedDocumentRef ref,
+    required SignedDocumentRef categoryId,
   });
 
   /// Saves a new proposal draft in the local storage.
@@ -86,14 +89,12 @@ abstract interface class ProposalService {
 final class ProposalServiceImpl implements ProposalService {
   final ProposalRepository _proposalRepository;
   final DocumentRepository _documentRepository;
-  final SignedDocumentManager _signedDocumentManager;
   final UserService _userService;
   final KeyDerivationService _keyDerivationService;
 
   const ProposalServiceImpl(
     this._proposalRepository,
     this._documentRepository,
-    this._signedDocumentManager,
     this._userService,
     this._keyDerivationService,
   );
@@ -104,18 +105,30 @@ final class ProposalServiceImpl implements ProposalService {
   }
 
   @override
+  Future<DraftRef> createDraftProposal({
+    required DocumentDataContent content,
+    required SignedDocumentRef template,
+    DraftRef? ref,
+  }) async {
+    return _documentRepository.createDocumentDraft(
+      type: DocumentType.proposalDocument,
+      content: content,
+      template: template,
+      selfRef: ref,
+    );
+  }
+
+  @override
   Future<void> deleteDraftProposal(DraftRef ref) {
     return _documentRepository.deleteDocumentDraft(ref: ref);
   }
 
   @override
   Future<Uint8List> encodeProposalForExport({
-    required DocumentDataMetadata metadata,
-    required DocumentDataContent content,
+    required DocumentData document,
   }) {
     return _documentRepository.encodeDocumentForExport(
-      metadata: metadata,
-      content: content,
+      document: document,
     );
   }
 
@@ -130,8 +143,23 @@ final class ProposalServiceImpl implements ProposalService {
     required DocumentRef ref,
   }) async {
     final proposal = await _proposalRepository.getProposal(ref: ref);
+    final document = await _documentRepository.getProposalDocument(
+      ref: ref,
+    );
 
-    return proposal;
+    // TODO(damian-molinski): Delete this after documents sync is ready.
+    final mergedDocument = ProposalDocument(
+      metadata: proposal.document.metadata,
+      document: document.document,
+    );
+
+    return ProposalData(
+      document: mergedDocument,
+      // TODO(dtscalac): replace by actual category ID
+      categoryId: SignedDocumentRef.generateFirstRef(),
+      commentsCount: 10,
+      versions: proposal.versions,
+    );
   }
 
   @override
@@ -173,32 +201,17 @@ final class ProposalServiceImpl implements ProposalService {
 
   @override
   Future<void> publishProposal({
-    required DocumentDataMetadata metadata,
-    required DocumentDataContent content,
-  }) async {
-    final account = _userService.user.activeAccount;
-    if (account == null) {
-      throw StateError('Cannot publish a proposal, account missing');
-    }
-
-    final masterKey = await account.keychain.getMasterKey();
-    if (masterKey == null) {
-      throw StateError('Cannot publish a proposal, master key missing');
-    }
-
-    final keyPair = await _keyDerivationService.deriveAccountRoleKeyPair(
-      masterKey: masterKey,
-      role: AccountRole.proposer,
+    required DocumentData document,
+  }) {
+    return _useProposerRoleCredentials(
+      (catalystId, privateKey) {
+        return _proposalRepository.publishProposal(
+          document: document,
+          catalystId: catalystId,
+          privateKey: privateKey,
+        );
+      },
     );
-
-    final signedDocument = await _signedDocumentManager.signDocument(
-      SignedDocumentJsonPayload(content.data),
-      metadata: _createProposalMetadata(metadata),
-      publicKey: keyPair.publicKey,
-      privateKey: keyPair.privateKey,
-    );
-
-    await _documentRepository.uploadDocument(document: signedDocument);
   }
 
   @override
@@ -208,10 +221,20 @@ final class ProposalServiceImpl implements ProposalService {
 
   @override
   Future<void> submitProposalForReview({
-    required DocumentDataMetadata metadata,
-    required DocumentDataContent content,
-  }) async {
-    // TODO(dtscalac): implement
+    required SignedDocumentRef ref,
+    required SignedDocumentRef categoryId,
+  }) {
+    return _useProposerRoleCredentials(
+      (catalystId, privateKey) {
+        return _proposalRepository.publishProposalAction(
+          ref: ref,
+          categoryId: categoryId,
+          action: ProposalSubmissionAction.aFinal,
+          catalystId: catalystId,
+          privateKey: privateKey,
+        );
+      },
+    );
   }
 
   @override
@@ -244,10 +267,11 @@ final class ProposalServiceImpl implements ProposalService {
               .map((commentsCount) {
             final proposalData = ProposalData(
               document: doc,
-              categoryId: DocumentType.categoryParametersDocument.uuid,
+              categoryId: SignedDocumentRef(
+                id: DocumentType.categoryParametersDocument.uuid,
+              ),
               versions: versionIds,
               commentsCount: commentsCount,
-              ref: doc.metadata.selfRef,
             );
             return Proposal.fromData(proposalData);
           });
@@ -263,19 +287,33 @@ final class ProposalServiceImpl implements ProposalService {
     });
   }
 
-  SignedDocumentMetadata _createProposalMetadata(
-    DocumentDataMetadata metadata,
-  ) {
-    final template = metadata.template;
+  Future<void> _useProposerRoleCredentials(
+    Future<void> Function(
+      CatalystId catalystId,
+      CatalystPrivateKey privateKey,
+    ) callback,
+  ) async {
+    final account = _userService.user.activeAccount;
+    if (account == null) {
+      throw StateError(
+        'Cannot obtain proposer credentials, account missing',
+      );
+    }
 
-    return SignedDocumentMetadata(
-      contentType: SignedDocumentContentType.json,
-      documentType: DocumentType.proposalDocument,
-      id: metadata.id,
-      ver: metadata.selfRef.version,
-      template: template == null
-          ? null
-          : SignedDocumentMetadataRef.fromDocumentRef(template),
+    final catalystId = account.catalystId.copyWith(
+      role: const Optional(AccountRole.proposer),
+      rotation: const Optional(0),
     );
+
+    await account.keychain.getMasterKey().use((masterKey) async {
+      final keyPair = _keyDerivationService.deriveAccountRoleKeyPair(
+        masterKey: masterKey,
+        role: AccountRole.proposer,
+      );
+
+      await keyPair.use(
+        (keyPair) => callback(catalystId, keyPair.privateKey),
+      );
+    });
   }
 }

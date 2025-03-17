@@ -71,6 +71,7 @@ final class Dependencies extends DependencyProvider {
           userService: get<UserService>(),
           registrationService: get<RegistrationService>(),
           progressNotifier: get<RegistrationProgressNotifier>(),
+          blockchainConfig: get<AppConfig>().blockchain,
         );
       })
       ..registerLazySingleton<ProposalsCubit>(
@@ -124,6 +125,9 @@ final class Dependencies extends DependencyProvider {
       })
       ..registerFactory<ProposalBloc>(() {
         return ProposalBloc(get<ProposalService>());
+      })
+      ..registerFactory<NewProposalCubit>(() {
+        return NewProposalCubit(get<CampaignService>());
       });
   }
 
@@ -132,6 +136,7 @@ final class Dependencies extends DependencyProvider {
       return ApiServices(
         config: get<AppConfig>().api,
         userObserver: get<UserObserver>(),
+        authTokenProvider: get<AuthTokenProvider>(),
       );
     });
   }
@@ -145,9 +150,7 @@ final class Dependencies extends DependencyProvider {
         );
       })
       ..registerLazySingleton<SignedDocumentManager>(() {
-        return SignedDocumentManager(
-          keyFactory: get<CatalystKeyFactory>(),
-        );
+        return const SignedDocumentManager();
       })
       ..registerLazySingleton<DatabaseDraftsDataSource>(() {
         return DatabaseDraftsDataSource(
@@ -165,10 +168,6 @@ final class Dependencies extends DependencyProvider {
           get<SignedDocumentManager>(),
         );
       })
-      ..registerLazySingleton<TransactionConfigRepository>(
-        TransactionConfigRepository.new,
-      )
-      ..registerLazySingleton<ProposalRepository>(ProposalRepository.new)
       ..registerLazySingleton<CampaignRepository>(CampaignRepository.new)
       ..registerLazySingleton<ConfigRepository>(ConfigRepository.new)
       ..registerLazySingleton<DocumentRepository>(() {
@@ -178,7 +177,13 @@ final class Dependencies extends DependencyProvider {
           get<CatGatewayDocumentDataSource>(),
         );
       })
-      ..registerLazySingleton<DocumentMapper>(() => const DocumentMapperImpl());
+      ..registerLazySingleton<DocumentMapper>(() => const DocumentMapperImpl())
+      ..registerLazySingleton<ProposalRepository>(
+        () => ProposalRepository(
+          get<SignedDocumentManager>(),
+          get<DocumentRepository>(),
+        ),
+      );
   }
 
   void _registerServices() {
@@ -186,17 +191,20 @@ final class Dependencies extends DependencyProvider {
     registerLazySingleton<KeyDerivationService>(() {
       return KeyDerivationService(get<CatalystKeyDerivation>());
     });
-    registerLazySingleton<CatalystKeyFactory>(
-      () => const Bip32Ed25519CatalystKeyFactory(),
-    );
     registerLazySingleton<KeychainProvider>(() {
       return VaultKeychainProvider(
         secureStorage: get<FlutterSecureStorage>(),
         sharedPreferences: get<SharedPreferencesAsync>(),
         cacheConfig: get<AppConfig>().cache,
-        keyFactory: get<CatalystKeyFactory>(),
       );
     });
+    registerLazySingleton<AuthService>(() {
+      return AuthService(
+        get<UserObserver>(),
+        get<KeyDerivationService>(),
+      );
+    });
+    registerLazySingleton<AuthTokenProvider>(() => get<AuthService>());
     registerLazySingleton<DownloaderService>(DownloaderService.new);
     registerLazySingleton<CatalystCardano>(() => CatalystCardano.instance);
     registerLazySingleton<RegistrationProgressNotifier>(
@@ -204,10 +212,10 @@ final class Dependencies extends DependencyProvider {
     );
     registerLazySingleton<RegistrationService>(() {
       return RegistrationService(
-        get<TransactionConfigRepository>(),
         get<KeychainProvider>(),
         get<CatalystCardano>(),
         get<KeyDerivationService>(),
+        get<AppConfig>().blockchain,
       );
     });
     registerLazySingleton<UserService>(
@@ -230,7 +238,6 @@ final class Dependencies extends DependencyProvider {
       return ProposalService(
         get<ProposalRepository>(),
         get<DocumentRepository>(),
-        get<SignedDocumentManager>(),
         get<UserService>(),
         get<KeyDerivationService>(),
       );

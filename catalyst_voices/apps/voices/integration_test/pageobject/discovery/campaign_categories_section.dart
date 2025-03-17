@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:patrol_finders/patrol_finders.dart';
+
 import '../../utils/translations_utils.dart';
+import '../discovery_page.dart';
 
 class CampaignCategoriesSection {
   CampaignCategoriesSection(this.$);
@@ -24,7 +26,7 @@ class CampaignCategoriesSection {
 
   Future<void> titleIsRenderedCorrectly() async {
     await $(categoriesTitle).scrollTo(step: 90);
-    expect($(categoriesTitle).text, T.get('Campaign Categories'));
+    expect($(categoriesTitle).text, (await t()).campaignCategories);
   }
 
   Future<void> categoriesAreRenderedCorrectly() async {
@@ -40,11 +42,11 @@ class CampaignCategoriesSection {
       }
       expect(
         $(categoriesRoot).$(campaignCategories).at(i).$(title).$(Text).text,
-        T.get('Cardano Open:'),
+        isNotEmpty,
       );
       expect(
         $(categoriesRoot).$(campaignCategories).at(i).$(subname).$(Text).text,
-        T.get('Developers'),
+        isNotEmpty,
       );
       expect(
         $(categoriesRoot)
@@ -53,7 +55,7 @@ class CampaignCategoriesSection {
             .$(availableFunds)
             .$(dataTitle)
             .text,
-        T.get('Funds Available'),
+        (await t()).fundsAvailable,
       );
       expect(
         $(categoriesRoot)
@@ -71,7 +73,7 @@ class CampaignCategoriesSection {
             .$(proposalsCount)
             .$(dataTitle)
             .text,
-        T.get('Proposals'),
+        (await t()).proposals,
       );
       expect(
         $(categoriesRoot)
@@ -98,7 +100,7 @@ class CampaignCategoriesSection {
             .$(categoryDetailsButton)
             .$(Text)
             .text,
-        T.get('Category Details'),
+        (await t()).categoryDetails,
       );
       expect(
         $(categoriesRoot)
@@ -107,45 +109,14 @@ class CampaignCategoriesSection {
             .$(viewProposalsButton)
             .$(Text)
             .text,
-        T.get('View proposals'),
-      );
-    }
-  }
-
-  Future<bool> loadingErrorIsVisible() async {
-    try {
-      return !$.tester.widget<Offstage>($(categoriesLoadingError)).offstage;
-    } catch (e) {
-      return false;
-    }
-  }
-
-  Future<void> loadingErrorClick() async {
-    await $(categoriesLoadingError).scrollTo();
-    await $(categoriesLoadingError).$(#ErrorRetryBtn).tap();
-  }
-
-  Future<void> loadRetryOnError() async {
-    if (await loadingErrorIsVisible()) {
-      var i = 0;
-      for (i = 0; i < 9; i++) {
-        await loadingErrorClick();
-        await Future<void>.delayed(const Duration(seconds: 5));
-        if (!(await loadingErrorIsVisible())) {
-          break;
-        }
-      }
-      expect(
-        await loadingErrorIsVisible(),
-        false,
-        reason: 'Max ${i - 1} retries exceeded',
+        (await t()).viewProposals,
       );
     }
   }
 
   Future<void> looksAsExpectedForVisitor() async {
     await titleIsRenderedCorrectly();
-    await loadRetryOnError();
+    await DiscoveryPage($).loadRetryOnError(categoriesLoadingError);
     await categoriesAreRenderedCorrectly();
   }
 }

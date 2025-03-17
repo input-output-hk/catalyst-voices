@@ -2,18 +2,21 @@
 
 use std::{fmt::Display, sync::Arc, time::Duration};
 
-use cardano_blockchain_types::{Network, Point, Slot};
+use cardano_blockchain_types::{MultiEraBlock, Network, Point, Slot};
 use cardano_chain_follower::{ChainFollower, ChainSyncConfig};
 use duration_string::DurationString;
 use event::EventTarget;
 use futures::{stream::FuturesUnordered, StreamExt};
 use rand::{Rng, SeedableRng};
 use tokio::sync::broadcast;
-use tracing::{debug, error, info, warn};
+use tracing::{debug, error, info};
 
 use crate::{
     db::index::{
-        block::{index_block, roll_forward},
+        block::{
+            index_block,
+            roll_forward::{self, PurgeCondition},
+        },
         queries::sync_status::{
             get::{get_sync_status, SyncStatus},
             update::update_sync_status,
@@ -236,6 +239,7 @@ impl SyncParams {
 
 /// Sync a portion of the blockchain.
 /// Set end to `Point::TIP` to sync the tip continuously.
+#[allow(clippy::too_many_lines)]
 fn sync_subchain(
     params: SyncParams, event_sender: broadcast::Sender<event::ChainIndexerEvent>,
 ) -> tokio::task::JoinHandle<SyncParams> {
@@ -295,22 +299,62 @@ fn sync_subchain(
                         );
                     }
 
-                    last_immutable = block.is_immutable();
-                    last_indexed_block = Some(block.point());
-
-                    if first_indexed_block.is_none() {
-                        first_immutable = last_immutable;
-                        first_indexed_block = Some(block.point());
-                    }
-                    blocks_synced = blocks_synced.saturating_add(1);
+                    update_block_state(
+                        block,
+                        &mut first_indexed_block,
+                        &mut first_immutable,
+                        &mut last_indexed_block,
+                        &mut last_immutable,
+                        &mut blocks_synced,
+                    );
                 },
-                cardano_chain_follower::Kind::Rollback => {
-                    warn!("TODO: Live Chain rollback");
-                    // What we need to do here, is purge the live DB of records after the
-                    // rollback point.  We need to complete this operation here
-                    // before we keep syncing the live chain.
 
-                    let _ = event_sender.send(event::ChainIndexerEvent::ForwardDataPurged);
+                cardano_chain_follower::Kind::Rollback => {
+                    // Rollback occurs, need to purge forward
+                    let rollback_slot = chain_update.block_data().slot();
+
+                    let purge_condition = PurgeCondition::PurgeForwards(rollback_slot);
+                    if let Err(error) = roll_forward::purge_live_index(purge_condition).await {
+                        error!(chain=%params.chain, error=%error, "Chain follower
+                    rollback, purging volatile data task failed.");
+                    } else {
+                        // How many slots are purged
+                        #[allow(clippy::arithmetic_side_effects)]
+                        let purge_slots = params
+                            .last_indexed_block
+                            .as_ref()
+                            // Slots arithmetic has saturating semantic, so this is ok
+                            .map_or(0.into(), |l| l.slot_or_default() - rollback_slot);
+
+                        let _ = event_sender.send(event::ChainIndexerEvent::ForwardDataPurged {
+                            purge_slots: purge_slots.into(),
+                        });
+
+                        // Purge success, now index the current block
+                        let block = chain_update.block_data();
+                        if let Err(error) = index_block(block).await {
+                            let error_msg =
+                                format!("Failed to index block after rollback {}", block.point());
+                            error!(chain=%params.chain, error=%error, params=%params, error_msg);
+                            return params.done(
+                                first_indexed_block,
+                                first_immutable,
+                                last_indexed_block,
+                                last_immutable,
+                                blocks_synced,
+                                Err(error.context(error_msg)),
+                            );
+                        }
+
+                        update_block_state(
+                            block,
+                            &mut first_indexed_block,
+                            &mut first_immutable,
+                            &mut last_indexed_block,
+                            &mut last_immutable,
+                            &mut blocks_synced,
+                        );
+                    }
                 },
             }
         }
@@ -328,6 +372,22 @@ fn sync_subchain(
 
         result
     })
+}
+
+/// Update block related state.
+fn update_block_state(
+    block: &MultiEraBlock, first_indexed_block: &mut Option<Point>, first_immutable: &mut bool,
+    last_indexed_block: &mut Option<Point>, last_immutable: &mut bool, blocks_synced: &mut u64,
+) {
+    *last_immutable = block.is_immutable();
+    *last_indexed_block = Some(block.point());
+
+    if first_indexed_block.is_none() {
+        *first_immutable = *last_immutable;
+        *first_indexed_block = Some(block.point());
+    }
+
+    *blocks_synced = blocks_synced.saturating_add(1);
 }
 
 /// The synchronisation task, and its state.
@@ -532,7 +592,13 @@ impl SyncTask {
             if self.sync_tasks.len() == 1 {
                 self.dispatch_event(event::ChainIndexerEvent::SyncCompleted);
 
-                if let Err(error) = roll_forward::purge_live_index(self.immutable_tip_slot).await {
+                // Purge data up to this slot
+                // Slots arithmetic has saturating semantic, so this is ok.
+                #[allow(clippy::arithmetic_side_effects)]
+                let purge_to_slot =
+                    self.immutable_tip_slot - Settings::purge_backward_slot_buffer();
+                let purge_condition = PurgeCondition::PurgeBackwards(purge_to_slot);
+                if let Err(error) = roll_forward::purge_live_index(purge_condition).await {
                     error!(chain=%self.cfg.chain, error=%error, "BUG: Purging volatile data task failed.");
                 } else {
                     self.dispatch_event(event::ChainIndexerEvent::BackwardDataPurged);
@@ -692,10 +758,13 @@ pub(crate) async fn start_followers() -> anyhow::Result<()> {
                     .with_label_values(&[&api_host_names, service_id, &network])
                     .inc();
             }
-            if let Event::ForwardDataPurged = event {
+            if let Event::ForwardDataPurged { purge_slots } = event {
                 reporter::TRIGGERED_FORWARD_PURGES_COUNT
                     .with_label_values(&[&api_host_names, service_id, &network])
                     .inc();
+                reporter::PURGED_SLOTS
+                    .with_label_values(&[&api_host_names, service_id, &network])
+                    .set(i64::try_from(*purge_slots).unwrap_or(-1));
             }
         }));
 

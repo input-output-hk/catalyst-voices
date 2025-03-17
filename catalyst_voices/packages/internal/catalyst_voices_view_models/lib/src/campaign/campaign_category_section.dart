@@ -1,11 +1,11 @@
-import 'package:catalyst_voices_view_models/src/campaign/campaign_category.dart';
+import 'package:catalyst_voices_view_models/src/campaign/campaign_category_view_model.dart';
 import 'package:catalyst_voices_view_models/src/menu/menu_item.dart';
 import 'package:equatable/equatable.dart';
 
 final class CampaignCategorySection extends Equatable implements MenuItem {
   @override
   final String id;
-  final CampaignCategory category;
+  final CampaignCategoryViewModel category;
   final String title;
   final String body;
   @override
