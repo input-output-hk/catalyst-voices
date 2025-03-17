@@ -145,7 +145,7 @@ impl SyncParams {
 
     /// Convert Params into the result of the sync.
     pub(crate) fn done(mut self, error: Option<anyhow::Error>) -> Self {
-        if error.is_none() && self.is_immutable() {
+        if error.is_none() && !self.is_live() {
             // Update sync status in the Immutable DB.
             // Can fire and forget, because failure to update DB will simply cause the chunk to be
             // re-indexed, on recovery.
@@ -175,9 +175,8 @@ impl SyncParams {
         &self.chain
     }
 
-    /// Returns if the running sync task was defined as immutable
-    /// Only live chain sync task
-    pub(crate) fn is_immutable(&self) -> bool {
+    /// Returns if the running sync task was defined as live chain sync task
+    pub(crate) fn is_live(&self) -> bool {
         self.end == Point::TIP
     }
 

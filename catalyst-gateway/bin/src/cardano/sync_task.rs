@@ -322,7 +322,7 @@ fn sync_subchain(
                     // Signal the point the immutable chain rolled forward to.
                     params.set_follower_roll_forward(chain_update.block_data().point());
                     // If this is live chain immediately stops to later run immutable sync tasks
-                    if !params.is_immutable() {
+                    if params.is_live() {
                         return params.done(None);
                     }
                 },
