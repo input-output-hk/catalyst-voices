@@ -24,11 +24,11 @@ class NewProposalCubit extends Cubit<NewProposalState> {
   }
 
   Future<DraftRef> createDraft() async {
-    final title = state.title;
+    final title = state.title.value;
     final categoryId = state.categoryId;
 
     if (categoryId == null) {
-      throw StateError('Cannot create draft, title or category not selected');
+      throw StateError('Cannot create draft, category not selected');
     }
 
     final category = await _campaignService.getCategory(categoryId);
