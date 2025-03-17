@@ -123,8 +123,8 @@ final class Dependencies extends DependencyProvider {
       ..registerFactory<AccountCubit>(() {
         return AccountCubit(get<UserService>());
       })
-      ..registerFactory<ProposalBloc>(() {
-        return ProposalBloc(
+      ..registerFactory<ProposalCubit>(() {
+        return ProposalCubit(
           get<UserService>(),
           get<ProposalService>(),
         );

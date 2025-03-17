@@ -1,4 +1,4 @@
-part of 'proposal_bloc.dart';
+part of 'proposal_cubit.dart';
 
 // TODO(damian-molinski): delete this after integration.
 CommentDocument _buildComment({

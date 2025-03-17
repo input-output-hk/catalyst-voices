@@ -7,11 +7,11 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-part 'proposal_bloc_mock_data.dart';
+part 'proposal_cubit_mock_data.dart';
 
 final _logger = Logger('ProposalBloc');
 
-final class ProposalBloc extends Bloc<ProposalEvent, ProposalState>
+final class ProposalCubit extends Cubit<ProposalState>
     with
         DocumentToSegmentMixin,
         BlocSignalEmitterMixin<ProposalSignal, ProposalState> {
@@ -22,12 +22,50 @@ final class ProposalBloc extends Bloc<ProposalEvent, ProposalState>
   // 2. Observe document comments
   // 3. Observe active account
   // 4. Sort comments.
-  ProposalBloc(
+  ProposalCubit(
     this._userService,
     this._proposalService,
-  ) : super(const ProposalState()) {
-    on<ShowProposalEvent>(_handleShowProposalEvent);
-    on<UpdateProposalFavoriteEvent>(_handleUpdateProposalFavoriteEvent);
+  ) : super(const ProposalState());
+
+  Future<void> load({required DocumentRef ref}) async {
+    try {
+      _logger.info('Loading $ref');
+
+      emit(state.copyWith(isLoading: true));
+
+      final proposal = await _proposalService.getProposal(ref: ref);
+
+      if (isClosed) {
+        return;
+      }
+
+      final proposalViewData = _buildProposalViewData(proposal);
+
+      emit(ProposalState(data: proposalViewData));
+
+      if (proposalViewData.isCurrentVersionLatest == false) {
+        emitSignal(const ViewingOlderVersionSignal());
+      }
+    } on LocalizedException catch (error, stack) {
+      _logger.severe('Change document to $ref failed', error, stack);
+
+      emit(ProposalState(error: error));
+    } catch (error, stack) {
+      _logger.severe('Change document to $ref failed', error, stack);
+
+      emit(const ProposalState(error: LocalizedUnknownException()));
+    } finally {
+      emit(state.copyWith(isLoading: false));
+    }
+  }
+
+  Future<void> updateIsFavorite({required bool value}) async {
+    // TODO(damian-molinski): not implemented
+
+    // ignore: unused_local_variable
+    final proposalId = state.data.currentRef?.id;
+
+    emit(state.copyWithFavorite(isFavorite: value));
   }
 
   ProposalViewData _buildProposalViewData(ProposalData proposal) {
@@ -136,59 +174,5 @@ final class ProposalBloc extends Bloc<ProposalEvent, ProposalState>
       ],
     );
     /* cSpell:enable */
-  }
-
-  Future<void> _changeDocumentTo({
-    required DocumentRef ref,
-    required Emitter<ProposalState> emit,
-  }) async {
-    try {
-      _logger.info('Changing document to $ref');
-
-      emit(state.copyWith(isLoading: true));
-
-      final proposal = await _proposalService.getProposal(ref: ref);
-
-      if (isClosed) {
-        return;
-      }
-
-      final proposalViewData = _buildProposalViewData(proposal);
-
-      emit(ProposalState(data: proposalViewData));
-
-      if (proposalViewData.isCurrentVersionLatest == false) {
-        emitSignal(const ViewingOlderVersionSignal());
-      }
-    } on LocalizedException catch (error, stack) {
-      _logger.severe('Change document to $ref failed', error, stack);
-
-      emit(ProposalState(error: error));
-    } catch (error, stack) {
-      _logger.severe('Change document to $ref failed', error, stack);
-
-      emit(const ProposalState(error: LocalizedUnknownException()));
-    } finally {
-      emit(state.copyWith(isLoading: false));
-    }
-  }
-
-  Future<void> _handleShowProposalEvent(
-    ShowProposalEvent event,
-    Emitter<ProposalState> emit,
-  ) {
-    return _changeDocumentTo(ref: event.ref, emit: emit);
-  }
-
-  Future<void> _handleUpdateProposalFavoriteEvent(
-    UpdateProposalFavoriteEvent event,
-    Emitter<ProposalState> emit,
-  ) async {
-    // TODO(damian-molinski): not implemented
-
-    // ignore: unused_local_variable
-    final proposalId = state.data.currentRef?.id;
-
-    emit(state.copyWithFavorite(isFavorite: event.isFavorite));
   }
 }
