@@ -33,7 +33,10 @@ pub(crate) enum ChainIndexerEvent {
     /// Event triggered when backward data is purged.
     BackwardDataPurged,
     /// Event triggered when forward data is purged.
-    ForwardDataPurged,
+    ForwardDataPurged {
+        /// Number of purged slots.
+        purge_slots: u64,
+    },
 }
 
 pub(crate) type EventListenerFn<T> = Box<dyn Fn(&T) + Send + Sync + 'static>;

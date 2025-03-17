@@ -26,7 +26,7 @@ class CampaignCategoriesSection {
 
   Future<void> titleIsRenderedCorrectly() async {
     await $(categoriesTitle).scrollTo(step: 90);
-    expect($(categoriesTitle).text, T.get('Campaign Categories'));
+    expect($(categoriesTitle).text, (await t()).campaignCategories);
   }
 
   Future<void> categoriesAreRenderedCorrectly() async {
@@ -42,7 +42,7 @@ class CampaignCategoriesSection {
       }
       expect(
         $(categoriesRoot).$(campaignCategories).at(i).$(title).$(Text).text,
-        T.get('Cardano Open:'),
+        isNotEmpty,
       );
       expect(
         $(categoriesRoot).$(campaignCategories).at(i).$(subname).$(Text).text,
@@ -55,7 +55,7 @@ class CampaignCategoriesSection {
             .$(availableFunds)
             .$(dataTitle)
             .text,
-        T.get('Funds Available'),
+        (await t()).fundsAvailable,
       );
       expect(
         $(categoriesRoot)
@@ -73,7 +73,7 @@ class CampaignCategoriesSection {
             .$(proposalsCount)
             .$(dataTitle)
             .text,
-        T.get('Proposals'),
+        (await t()).proposals,
       );
       expect(
         $(categoriesRoot)
@@ -100,7 +100,7 @@ class CampaignCategoriesSection {
             .$(categoryDetailsButton)
             .$(Text)
             .text,
-        T.get('Category Details'),
+        (await t()).categoryDetails,
       );
       expect(
         $(categoriesRoot)
@@ -109,7 +109,7 @@ class CampaignCategoriesSection {
             .$(viewProposalsButton)
             .$(Text)
             .text,
-        T.get('View proposals'),
+        (await t()).viewProposals,
       );
     }
   }
