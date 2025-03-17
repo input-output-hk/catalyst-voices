@@ -18,4 +18,16 @@ final class CommentWithReplies extends Equatable {
         replies,
         depth,
       ];
+
+  CommentWithReplies copyWith({
+    CommentDocument? comment,
+    List<CommentWithReplies>? replies,
+    int? depth,
+  }) {
+    return CommentWithReplies(
+      comment: comment ?? this.comment,
+      replies: replies ?? this.replies,
+      depth: depth ?? this.depth,
+    );
+  }
 }

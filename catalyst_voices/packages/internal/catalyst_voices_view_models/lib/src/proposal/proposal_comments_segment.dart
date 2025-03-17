@@ -82,6 +82,36 @@ final class ProposalCommentsSegment
   @override
   List<Object?> get props => super.props + [sort];
 
+  ProposalCommentsSegment copySorted({
+    required ProposalCommentsSort sort,
+  }) {
+    final sortedSection = sections.map((section) {
+      return switch (section) {
+        AddCommentSection() => section,
+        ViewCommentsSection() => section.copyWith(
+            comments: sort.applyTo(section.comments),
+          ),
+      };
+    }).toList();
+
+    return copyWith(
+      sort: sort,
+      sections: sortedSection,
+    );
+  }
+
+  ProposalCommentsSegment copyWith({
+    NodeId? id,
+    ProposalCommentsSort? sort,
+    List<ProposalCommentsSection>? sections,
+  }) {
+    return ProposalCommentsSegment(
+      id: id ?? this.id,
+      sort: sort ?? this.sort,
+      sections: sections ?? this.sections,
+    );
+  }
+
   @override
   String resolveTitle(BuildContext context) {
     return context.l10n.proposalViewCommentsSegment;
@@ -109,6 +139,16 @@ final class ViewCommentsSection extends ProposalCommentsSection
 
   @override
   List<Object?> get props => super.props + [comments];
+
+  ViewCommentsSection copyWith({
+    NodeId? id,
+    List<CommentWithReplies>? comments,
+  }) {
+    return ViewCommentsSection(
+      id: id ?? this.id,
+      comments: comments ?? this.comments,
+    );
+  }
 
   @override
   String resolveTitle(BuildContext context) {

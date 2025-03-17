@@ -6,6 +6,8 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:uuid/data.dart';
+import 'package:uuid/uuid.dart';
 
 part 'proposal_cubit_mock_data.dart';
 
@@ -17,6 +19,11 @@ final class ProposalCubit extends Cubit<ProposalState>
         BlocSignalEmitterMixin<ProposalSignal, ProposalState> {
   final UserService _userService;
   final ProposalService _proposalService;
+
+  // Cache
+  DocumentRef? _ref;
+  ProposalData? _proposal;
+  List<CommentWithReplies>? _comments;
 
   // 1. Fetch proposal document
   // 2. Observe document comments
@@ -34,12 +41,31 @@ final class ProposalCubit extends Cubit<ProposalState>
       emit(state.copyWith(isLoading: true));
 
       final proposal = await _proposalService.getProposal(ref: ref);
+      final comments = _buildComments();
+      final catalystId = _userService.user.activeAccount?.catalystId ??
+          CatalystId.fromUri(
+            Uri.parse(
+              'id.catalyst://cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE',
+            ),
+          );
 
       if (isClosed) {
         return;
       }
 
-      final proposalViewData = _buildProposalViewData(proposal);
+      final commentsSort = state.data.commentsSort;
+
+      final proposalViewData = _buildProposalViewData(
+        activeAccountId: catalystId,
+        proposal: proposal,
+        comments: comments,
+        commentsSort: commentsSort,
+        isFavorite: false,
+      );
+
+      _ref = ref;
+      _proposal = proposal;
+      _comments = comments;
 
       emit(ProposalState(data: proposalViewData));
 
@@ -47,11 +73,19 @@ final class ProposalCubit extends Cubit<ProposalState>
         emitSignal(const ViewingOlderVersionSignal());
       }
     } on LocalizedException catch (error, stack) {
-      _logger.severe('Change document to $ref failed', error, stack);
+      _logger.severe('Loading $ref failed', error, stack);
+
+      _ref = null;
+      _proposal = null;
+      _comments = null;
 
       emit(ProposalState(error: error));
     } catch (error, stack) {
-      _logger.severe('Change document to $ref failed', error, stack);
+      _logger.severe('Loading $ref failed', error, stack);
+
+      _ref = null;
+      _proposal = null;
+      _comments = null;
 
       emit(const ProposalState(error: LocalizedUnknownException()));
     } finally {
@@ -59,21 +93,35 @@ final class ProposalCubit extends Cubit<ProposalState>
     }
   }
 
-  Future<void> updateIsFavorite({required bool value}) async {
-    // TODO(damian-molinski): not implemented
+  void updateCommentsSort({required ProposalCommentsSort sort}) {
+    final data = state.data;
+    final segments = data.segments.sortWith(sort: sort).toList();
 
-    // ignore: unused_local_variable
-    final proposalId = state.data.currentRef?.id;
+    final updatedData = data.copyWith(
+      segments: segments,
+      commentsSort: sort,
+    );
+
+    emit(state.copyWith(data: updatedData));
+  }
+
+  // TODO(damian-molinski): not implemented
+  Future<void> updateIsFavorite({required bool value}) async {
+    final proposalId = _ref?.id;
+    assert(proposalId != null, 'Proposal ref not found. Load doc first');
 
     emit(state.copyWithFavorite(isFavorite: value));
   }
 
-  ProposalViewData _buildProposalViewData(ProposalData proposal) {
-    final activeAccountId = _userService.user.activeAccount?.catalystId;
-
+  ProposalViewData _buildProposalViewData({
+    required CatalystId activeAccountId,
+    required ProposalData proposal,
+    required List<CommentWithReplies> comments,
+    required ProposalCommentsSort commentsSort,
+    required bool isFavorite,
+  }) {
     final proposalDocument = proposal.document;
     final proposalDocumentRef = proposalDocument.metadata.selfRef;
-
     final documentSegments = mapDocumentToSegments(proposalDocument.document);
 
     /* cSpell:disable */
@@ -87,40 +135,6 @@ final class ProposalCubit extends Cubit<ProposalState>
     }).toList();
 
     final currentVersion = versions.singleWhereOrNull((e) => e.isCurrent);
-
-    final firstComment = _buildComment(
-      message: 'The first rule about fight club is...',
-    );
-    final comments = [
-      CommentWithReplies(
-        comment: firstComment,
-        replies: [
-          CommentWithReplies(
-            comment: _buildComment(
-              parent: firstComment.metadata.selfRef,
-              message: 'Don’t talk about fight club',
-            ),
-            replies: const [],
-            depth: 2,
-          ),
-        ],
-        depth: 1,
-      ),
-      CommentWithReplies(
-        comment: _buildComment(
-          message: 'This proposal embodies a bold and disruptive vision that '
-              'aligns with the decentralised ethos of the Cardano ecosystem. '
-              'The focus on empowering individuals through grassroots action '
-              'and the inclusion of open-source methodologies makes it a '
-              'transformative initiative. The clear milestones and emphasis '
-              'on secure, replicable strategies inspire confidence in the '
-              'project’s feasibility and scalability. I look forward to '
-              'seeing its impact.',
-        ),
-        replies: const [],
-        depth: 1,
-      ),
-    ];
 
     final overviewSegment = ProposalOverviewSegment.build(
       categoryName: 'Cardano Partners: Growth & Acceleration',
@@ -145,16 +159,12 @@ final class ProposalCubit extends Cubit<ProposalState>
       ),
     );
 
+    final sortedComments = commentsSort.applyTo(comments);
     final commentsSegment = ProposalCommentsSegment.build(
       sort: ProposalCommentsSort.newest,
-      authorId: activeAccountId ??
-          CatalystId.fromUri(
-            Uri.parse(
-              'id.catalyst://cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE',
-            ),
-          ),
+      authorId: activeAccountId,
       template: _buildCommentTemplate(),
-      comments: comments,
+      comments: sortedComments,
     );
 
     return ProposalViewData(
@@ -163,15 +173,16 @@ final class ProposalCubit extends Cubit<ProposalState>
         title: 'Project Mayhem: Freedom by Chaos',
         authorDisplayName: 'Tyler Durden',
         createdAt: DateTime.timestamp(),
-        commentsCount: proposal.commentsCount,
+        commentsCount: comments.length,
         versions: versions,
-        isFavorite: false,
+        isFavorite: isFavorite,
       ),
       segments: [
         overviewSegment,
         ...documentSegments,
         commentsSegment,
       ],
+      commentsSort: commentsSort,
     );
     /* cSpell:enable */
   }

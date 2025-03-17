@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 
 class VoicesOutlinedPopupMeuButton<T> extends StatelessWidget {
   final List<T> items;
+  final T? initialValue;
   final IndexedWidgetBuilder builder;
   final ValueChanged<T>? onSelected;
   final bool showBorder;
@@ -15,6 +16,7 @@ class VoicesOutlinedPopupMeuButton<T> extends StatelessWidget {
   const VoicesOutlinedPopupMeuButton({
     super.key,
     required this.items,
+    this.initialValue,
     required this.builder,
     this.onSelected,
     this.showBorder = true,
@@ -33,6 +35,7 @@ class VoicesOutlinedPopupMeuButton<T> extends StatelessWidget {
           );
         }).toList();
       },
+      initialValue: initialValue,
       clipBehavior: Clip.antiAlias,
       onSelected: onSelected,
       constraints: const BoxConstraints(minWidth: 212),

@@ -29,6 +29,63 @@ CommentDocument _buildComment({
   );
 }
 
+List<CommentWithReplies> _buildComments() {
+  const uuid = Uuid();
+  final now = DateTimeExt.now();
+
+  SignedDocumentRef buildRefAt(DateTime dateTime) {
+    final config = V7Options(dateTime.millisecondsSinceEpoch, null);
+    final val = uuid.v7(config: config);
+    return SignedDocumentRef.first(val);
+  }
+
+  final firstComment = _buildComment(
+    message: 'The first rule about fight club is...',
+    selfRef: buildRefAt(now),
+  );
+  return [
+    CommentWithReplies(
+      comment: firstComment,
+      replies: [
+        CommentWithReplies(
+          comment: _buildComment(
+            parent: firstComment.metadata.selfRef,
+            message: 'Don’t talk about fight club',
+            selfRef: buildRefAt(now.subtract(const Duration(hours: 2))),
+          ),
+          replies: const [],
+          depth: 2,
+        ),
+        CommentWithReplies(
+          comment: _buildComment(
+            parent: firstComment.metadata.selfRef,
+            message: 'Quiet!',
+            selfRef: buildRefAt(now.subtract(const Duration(hours: 1))),
+          ),
+          replies: const [],
+          depth: 2,
+        ),
+      ],
+      depth: 1,
+    ),
+    CommentWithReplies(
+      comment: _buildComment(
+        message: 'This proposal embodies a bold and disruptive vision that '
+            'aligns with the decentralised ethos of the Cardano ecosystem. '
+            'The focus on empowering individuals through grassroots action '
+            'and the inclusion of open-source methodologies makes it a '
+            'transformative initiative. The clear milestones and emphasis '
+            'on secure, replicable strategies inspire confidence in the '
+            'project’s feasibility and scalability. I look forward to '
+            'seeing its impact.',
+        selfRef: buildRefAt(now.subtract(const Duration(hours: 5))),
+      ),
+      replies: const [],
+      depth: 1,
+    ),
+  ];
+}
+
 CommentTemplate _buildCommentTemplate() {
   final schema = _buildSchema();
 
