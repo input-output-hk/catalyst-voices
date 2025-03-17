@@ -1,5 +1,6 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
+import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
 
 final class ProposalBuilderMetadata extends Equatable {
@@ -8,9 +9,7 @@ final class ProposalBuilderMetadata extends Equatable {
   final DocumentRef? originalDocumentRef;
   final SignedDocumentRef? templateRef;
   final SignedDocumentRef? categoryId;
-
-  /// The current iteration version, 0 if not published.
-  final int currentIteration;
+  final List<DocumentVersion> versions;
 
   const ProposalBuilderMetadata({
     this.publish = ProposalPublish.localDraft,
@@ -18,12 +17,12 @@ final class ProposalBuilderMetadata extends Equatable {
     this.originalDocumentRef,
     this.templateRef,
     this.categoryId,
-    this.currentIteration = 0,
+    this.versions = const [],
   });
 
   factory ProposalBuilderMetadata.newDraft({
     required SignedDocumentRef templateRef,
-    required SignedDocumentRef categoryId,
+    required SignedDocumentRef? categoryId,
   }) {
     final firstRef = DraftRef.generateFirstRef();
     return ProposalBuilderMetadata(
@@ -31,9 +30,12 @@ final class ProposalBuilderMetadata extends Equatable {
       documentRef: firstRef,
       templateRef: templateRef,
       categoryId: categoryId,
-      currentIteration: 0,
+      versions: const [],
     );
   }
+
+  DocumentVersion? get latestVersion =>
+      versions.firstWhereOrNull((e) => e.isLatest);
 
   @override
   List<Object?> get props => [
@@ -42,7 +44,7 @@ final class ProposalBuilderMetadata extends Equatable {
         originalDocumentRef,
         templateRef,
         categoryId,
-        currentIteration,
+        versions,
       ];
 
   ProposalBuilderMetadata copyWith({
@@ -51,7 +53,7 @@ final class ProposalBuilderMetadata extends Equatable {
     Optional<DocumentRef>? originalDocumentRef,
     Optional<SignedDocumentRef>? templateRef,
     Optional<SignedDocumentRef>? categoryId,
-    int? currentIteration,
+    List<DocumentVersion>? versions,
   }) {
     return ProposalBuilderMetadata(
       publish: publish ?? this.publish,
@@ -59,7 +61,7 @@ final class ProposalBuilderMetadata extends Equatable {
       originalDocumentRef: originalDocumentRef.dataOr(this.originalDocumentRef),
       templateRef: templateRef.dataOr(this.templateRef),
       categoryId: categoryId.dataOr(this.categoryId),
-      currentIteration: currentIteration ?? this.currentIteration,
+      versions: versions ?? this.versions,
     );
   }
 }

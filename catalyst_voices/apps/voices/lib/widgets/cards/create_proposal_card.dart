@@ -8,10 +8,11 @@ import 'package:catalyst_voices/widgets/text/day_at_time_text.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 
 class CreateProposalCard extends StatelessWidget {
-  final String categoryId;
+  final SignedDocumentRef categoryId;
   final String categoryName;
   final List<String> categoryRequirements;
   final DateTime submissionCloseDate;

@@ -121,7 +121,11 @@ final class ProposalRepositoryImpl implements ProposalRepository {
       // TODO(dtscalac): replace by actual category ID
       categoryId: SignedDocumentRef.generateFirstRef(),
       document: ProposalDocument(
-        metadata: ProposalMetadata(selfRef: ref),
+        metadata: ProposalMetadata(
+          selfRef: ref,
+          // TODO(dtscalac): get category id
+          categoryId: const SignedDocumentRef(id: 'mocked_category_id'),
+        ),
         document: const Document(
           properties: [],
           schema: DocumentSchema.optional(),

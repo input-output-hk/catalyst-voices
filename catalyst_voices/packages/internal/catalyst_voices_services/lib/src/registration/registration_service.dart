@@ -173,7 +173,7 @@ final class RegistrationServiceImpl implements RegistrationService {
 
     // TODO(dtscalac): derive a key from the seed phrase and fetch
     // from the backend info about the registration (roles, wallet, etc).
-    final roles = {AccountRole.root};
+    final roles = {AccountRole.root, AccountRole.proposer};
 
     final keychainId = const Uuid().v4();
     final keychain = await _keychainProvider.create(keychainId);

@@ -5,6 +5,7 @@ import 'package:catalyst_voices/widgets/cards/category_proposals_details_card.da
 import 'package:catalyst_voices/widgets/cards/create_proposal_card.dart';
 import 'package:catalyst_voices/widgets/indicators/voices_error_indicator.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
@@ -16,7 +17,7 @@ typedef _StateData = ({bool show, CampaignCategoryDetailsViewModel data});
 typedef _StateError = ({bool show, LocalizedException? error});
 
 class CategoryPage extends StatefulWidget {
-  final String categoryId;
+  final SignedDocumentRef categoryId;
 
   const CategoryPage({super.key, required this.categoryId});
 
@@ -57,6 +58,7 @@ class _Body extends StatelessWidget {
 
 class _CardInformation extends StatelessWidget {
   final CampaignCategoryDetailsViewModel category;
+
   const _CardInformation({
     required this.category,
   });
@@ -98,7 +100,8 @@ class _CardInformation extends StatelessWidget {
 }
 
 class _CategoryDetailErrorSelector extends StatelessWidget {
-  final String categoryId;
+  final SignedDocumentRef categoryId;
+
   const _CategoryDetailErrorSelector({required this.categoryId});
 
   @override
@@ -121,10 +124,12 @@ class _CategoryDetailErrorSelector extends StatelessWidget {
                 message: error.message(context),
                 onRetry: error is LocalizedNotFoundException
                     ? null
-                    : () async {
-                        context
-                            .read<CategoryDetailCubit>()
-                            .getCategoryDetail(categoryId);
+                    : () {
+                        unawaited(
+                          context
+                              .read<CategoryDetailCubit>()
+                              .getCategoryDetail(categoryId),
+                        );
                       },
               ),
             ),
@@ -184,7 +189,11 @@ class _CategoryPageState extends State<CategoryPage> {
     super.didUpdateWidget(oldWidget);
 
     if (widget.categoryId != oldWidget.categoryId) {
-      context.read<CategoryDetailCubit>().getCategoryDetail(widget.categoryId);
+      unawaited(
+        context
+            .read<CategoryDetailCubit>()
+            .getCategoryDetail(widget.categoryId),
+      );
     }
   }
 
@@ -192,6 +201,8 @@ class _CategoryPageState extends State<CategoryPage> {
   void initState() {
     super.initState();
     unawaited(context.read<CategoryDetailCubit>().getCategories());
-    context.read<CategoryDetailCubit>().getCategoryDetail(widget.categoryId);
+    unawaited(
+      context.read<CategoryDetailCubit>().getCategoryDetail(widget.categoryId),
+    );
   }
 }
