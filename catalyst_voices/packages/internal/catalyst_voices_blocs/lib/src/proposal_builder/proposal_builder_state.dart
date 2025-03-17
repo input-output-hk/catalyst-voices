@@ -1,48 +1,67 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
+import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
 
 final class ProposalBuilderMetadata extends Equatable {
   final ProposalPublish publish;
   final DocumentRef? documentRef;
-  final DocumentRef? templateRef;
-
-  /// The current iteration version, 0 if not published.
-  final int currentIteration;
+  final DocumentRef? originalDocumentRef;
+  final SignedDocumentRef? templateRef;
+  final SignedDocumentRef? categoryId;
+  final List<DocumentVersion> versions;
 
   const ProposalBuilderMetadata({
     this.publish = ProposalPublish.localDraft,
     this.documentRef,
+    this.originalDocumentRef,
     this.templateRef,
-    this.currentIteration = 0,
+    this.categoryId,
+    this.versions = const [],
   });
 
-  factory ProposalBuilderMetadata.newDraft({required DocumentRef templateRef}) {
+  factory ProposalBuilderMetadata.newDraft({
+    required SignedDocumentRef templateRef,
+    required SignedDocumentRef? categoryId,
+  }) {
+    final firstRef = DraftRef.generateFirstRef();
     return ProposalBuilderMetadata(
       publish: ProposalPublish.localDraft,
-      documentRef: DraftRef.generateFirstRef(),
+      documentRef: firstRef,
       templateRef: templateRef,
-      currentIteration: 0,
+      categoryId: categoryId,
+      versions: const [],
     );
   }
+
+  DocumentVersion? get latestVersion =>
+      versions.firstWhereOrNull((e) => e.isLatest);
 
   @override
   List<Object?> get props => [
         publish,
         documentRef,
+        originalDocumentRef,
         templateRef,
-        currentIteration,
+        categoryId,
+        versions,
       ];
 
   ProposalBuilderMetadata copyWith({
     ProposalPublish? publish,
     Optional<DocumentRef>? documentRef,
-    Optional<DocumentRef>? templateRef,
+    Optional<DocumentRef>? originalDocumentRef,
+    Optional<SignedDocumentRef>? templateRef,
+    Optional<SignedDocumentRef>? categoryId,
+    List<DocumentVersion>? versions,
   }) {
     return ProposalBuilderMetadata(
       publish: publish ?? this.publish,
       documentRef: documentRef.dataOr(this.documentRef),
+      originalDocumentRef: originalDocumentRef.dataOr(this.originalDocumentRef),
       templateRef: templateRef.dataOr(this.templateRef),
+      categoryId: categoryId.dataOr(this.categoryId),
+      versions: versions ?? this.versions,
     );
   }
 }

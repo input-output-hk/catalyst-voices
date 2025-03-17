@@ -3,7 +3,7 @@ import 'dart:typed_data';
 import 'package:catalyst_cose/src/utils/cbor_utils.dart';
 import 'package:cbor/cbor.dart';
 import 'package:equatable/equatable.dart';
-import 'package:uuid/uuid.dart' as uuid;
+import 'package:uuid_plus/uuid_plus.dart' as uuid;
 
 /// A reference to an entity represented by the [id].
 /// Optionally the version of the entity may be specified by the [ver].

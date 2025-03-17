@@ -47,6 +47,7 @@ class CurrentCampaign extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.only(top: 32, bottom: 100),
           child: CampaignTimeline(
+            key: const Key('CampaignTimeline'),
             timelineItems: currentCampaignInfo.timeline,
             placement: CampaignTimelinePlacement.discovery,
             horizontalPadding: const SizedBox(width: 120),
@@ -74,7 +75,10 @@ class _SubTitle extends StatelessWidget {
             style: context.textTheme.headlineMedium,
           ),
           const SizedBox(height: 12),
-          MarkdownText(MarkdownData(context.l10n.ideaJourneyDescription)),
+          MarkdownText(
+            key: const Key('IdeaDescription'),
+            MarkdownData(context.l10n.ideaJourneyDescription),
+          ),
         ],
       ),
     );

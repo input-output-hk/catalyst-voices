@@ -1,17 +1,14 @@
-import 'dart:typed_data';
-
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_services/src/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:mocktail/mocktail.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shared_preferences_platform_interface/in_memory_shared_preferences_async.dart';
 import 'package:shared_preferences_platform_interface/shared_preferences_async_platform_interface.dart';
 import 'package:test/expect.dart';
 import 'package:test/scaffolding.dart';
-import 'package:uuid/uuid.dart';
+import 'package:uuid_plus/uuid_plus.dart';
 
 void main() {
   late final KeychainProvider keychainProvider;
@@ -24,12 +21,12 @@ void main() {
     final store = InMemorySharedPreferencesAsync.empty();
     SharedPreferencesAsyncPlatform.instance = store;
     FlutterSecureStorage.setMockInitialValues({});
+    DummyCatalystIdFactory.registerDummyKeyFactory();
 
     keychainProvider = VaultKeychainProvider(
       secureStorage: const FlutterSecureStorage(),
       sharedPreferences: SharedPreferencesAsync(),
       cacheConfig: const CacheConfig(),
-      keyFactory: _FakeCatalystKeyFactory(),
     );
     userRepository = UserRepository(SecureUserStorage(), keychainProvider);
     userObserver = StreamUserObserver();
@@ -57,7 +54,10 @@ void main() {
 
       // When
       final keychain = await keychainProvider.create(keychainId);
-      final account = Account.dummy(keychain: keychain);
+      final account = Account.dummy(
+        catalystId: DummyCatalystIdFactory.create(),
+        keychain: keychain,
+      );
 
       await service.useAccount(account);
 
@@ -76,8 +76,17 @@ void main() {
       // When
       final keychainOne = await keychainProvider.create(keychainIdOne);
       final keychainTwo = await keychainProvider.create(keychainIdTwo);
-      final accountOne = Account.dummy(keychain: keychainOne);
-      final accountTwo = Account.dummy(keychain: keychainTwo);
+      final catalystIdOne = DummyCatalystIdFactory.create();
+      final catalystIdTwo = DummyCatalystIdFactory.create();
+
+      final accountOne = Account.dummy(
+        catalystId: catalystIdOne,
+        keychain: keychainOne,
+      );
+      final accountTwo = Account.dummy(
+        catalystId: catalystIdTwo,
+        keychain: keychainTwo,
+      );
 
       final accountStream = service.watchUser.map((user) => user.activeAccount);
 
@@ -111,7 +120,10 @@ void main() {
       final accounts = <Account>[];
       for (final id in ids) {
         final keychain = await keychainProvider.create(id);
-        final account = Account.dummy(keychain: keychain);
+        final account = Account.dummy(
+          catalystId: DummyCatalystIdFactory.create(),
+          keychain: keychain,
+        );
 
         accounts.add(account);
       }
@@ -134,6 +146,7 @@ void main() {
       // When
       final keychain = await keychainProvider.create(keychainId);
       final lastAccount = Account.dummy(
+        catalystId: DummyCatalystIdFactory.create(),
         keychain: keychain,
         isActive: true,
       );
@@ -164,6 +177,7 @@ void main() {
       // When
       final keychain = await keychainProvider.create(keychainId);
       final account = Account.dummy(
+        catalystId: DummyCatalystIdFactory.create(),
         keychain: keychain,
         isActive: true,
       );
@@ -239,18 +253,4 @@ void main() {
       });
     });
   });
-}
-
-class _FakeCatalystPrivateKey extends Fake implements CatalystPrivateKey {
-  @override
-  final Uint8List bytes;
-
-  _FakeCatalystPrivateKey({required this.bytes});
-}
-
-class _FakeCatalystKeyFactory extends Fake implements CatalystKeyFactory {
-  @override
-  CatalystPrivateKey createPrivateKey(Uint8List bytes) {
-    return _FakeCatalystPrivateKey(bytes: bytes);
-  }
 }

@@ -8,6 +8,14 @@ abstract class CryptocurrencyFormatter {
   static const _million = 1000000;
   static const _thousand = 1000;
 
+  static String decimalFormat(Coin amount) {
+    if (amount.value == 0) {
+      return '${const Currency.ada().symbol} -';
+    }
+    final value = NumberFormat.decimalPattern().format(amount.value);
+    return '${const Currency.ada().symbol} $value';
+  }
+
   /// Formats the [amount] of ADA cryptocurrency.
   ///
   /// Uses K (thousands) or M (millions) multipliers.
@@ -41,10 +49,5 @@ abstract class CryptocurrencyFormatter {
     final numberFormat = NumberFormat('#.######');
     final symbol = const Currency.ada().symbol;
     return numberFormat.format(amount.ada) + symbol;
-  }
-
-  static String decimalFormat(Coin amount) {
-    final value = NumberFormat.decimalPattern().format(amount.value);
-    return '${const Currency.ada().symbol} $value';
   }
 }

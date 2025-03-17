@@ -2,8 +2,12 @@ import 'dart:math';
 
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_repositories/src/document/document_repository.dart';
+import 'package:catalyst_voices_repositories/src/dto/proposal/proposal_submission_action_dto.dart';
+import 'package:catalyst_voices_repositories/src/signed_document/signed_document_json_payload.dart';
+import 'package:catalyst_voices_repositories/src/signed_document/signed_document_manager.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
-import 'package:uuid/uuid.dart';
+import 'package:uuid_plus/uuid_plus.dart';
 
 final _proposalDescription = """
 Zanzibar is becoming one of the hotspots for DID's through
@@ -25,7 +29,10 @@ int _maxResults(ProposalPublish? stage) {
 }
 
 abstract interface class ProposalRepository {
-  const factory ProposalRepository() = ProposalRepositoryImpl;
+  const factory ProposalRepository(
+    SignedDocumentManager signedDocumentManager,
+    DocumentRepository documentRepository,
+  ) = ProposalRepositoryImpl;
 
   Future<List<String>> addFavoriteProposal(String proposalId);
 
@@ -42,11 +49,31 @@ abstract interface class ProposalRepository {
 
   Future<List<String>> getUserProposalsIds(String userId);
 
+  Future<void> publishProposal({
+    required DocumentData document,
+    required CatalystId catalystId,
+    required CatalystPrivateKey privateKey,
+  });
+
+  Future<void> publishProposalAction({
+    required SignedDocumentRef ref,
+    required SignedDocumentRef categoryId,
+    required ProposalSubmissionAction action,
+    required CatalystId catalystId,
+    required CatalystPrivateKey privateKey,
+  });
+
   Future<List<String>> removeFavoriteProposal(String proposalId);
 }
 
 final class ProposalRepositoryImpl implements ProposalRepository {
-  const ProposalRepositoryImpl();
+  final SignedDocumentManager _signedDocumentManager;
+  final DocumentRepository _documentRepository;
+
+  const ProposalRepositoryImpl(
+    this._signedDocumentManager,
+    this._documentRepository,
+  );
 
   @override
   Future<List<String>> addFavoriteProposal(String proposalId) async {
@@ -64,16 +91,54 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   Future<ProposalData> getProposal({
     required DocumentRef ref,
   }) async {
+    if (!ref.isExact) {
+      ref = ref.copyWith(version: Optional(ref.id));
+    }
+
+    final ver = List.generate(3, (index) {
+      final now = DateTimeExt.now();
+      final createdAt = now.subtract(
+        Duration(
+          days: index + 1,
+          hours: index + 2,
+        ),
+      );
+
+      final config = V7Options(createdAt.millisecondsSinceEpoch, null);
+      final versionId = const Uuid().v7(config: config);
+      final document = ProposalDocument(
+        metadata: ProposalMetadata(
+          selfRef: ref.copyWith(
+            version: Optional(versionId),
+          ),
+        ),
+        document: const Document(
+          properties: [],
+          schema: DocumentSchema.optional(),
+        ),
+      );
+
+      return BaseProposalData(
+        document: document,
+        categoryId: SignedDocumentRef.generateFirstRef(),
+      );
+    }).reversed.toList();
+
     return ProposalData(
-      categoryId: const Uuid().v7(),
+      // TODO(dtscalac): replace by actual category ID
+      categoryId: SignedDocumentRef.generateFirstRef(),
       document: ProposalDocument(
-        metadata: ProposalMetadata(selfRef: ref),
+        metadata: ProposalMetadata(
+          selfRef: ref,
+          // TODO(dtscalac): get category id
+          categoryId: const SignedDocumentRef(id: 'mocked_category_id'),
+        ),
         document: const Document(
           properties: [],
           schema: DocumentSchema.optional(),
         ),
       ),
-      ref: ref,
+      versions: ver,
     );
   }
 
@@ -101,6 +166,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
         Proposal(
           selfRef: SignedDocumentRef.generateFirstRef(),
           category: 'Cardano Use Cases / MVP',
+          categoryId: const SignedDocumentRef(id: 'dummy_category_id'),
           title: 'Proposal Title that rocks the world',
           updateDate: DateTime.now().minusDays(2),
           fundsRequested: Coin.fromAda(100000),
@@ -128,9 +194,70 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   }
 
   @override
+  Future<void> publishProposal({
+    required DocumentData document,
+    required CatalystId catalystId,
+    required CatalystPrivateKey privateKey,
+  }) async {
+    final signedDocument = await _signedDocumentManager.signDocument(
+      SignedDocumentJsonPayload(document.content.data),
+      metadata: _createProposalMetadata(document.metadata),
+      catalystId: catalystId,
+      privateKey: privateKey,
+    );
+
+    await _documentRepository.publishDocument(document: signedDocument);
+  }
+
+  @override
+  Future<void> publishProposalAction({
+    required SignedDocumentRef ref,
+    required SignedDocumentRef categoryId,
+    required ProposalSubmissionAction action,
+    required CatalystId catalystId,
+    required CatalystPrivateKey privateKey,
+  }) async {
+    final signedDocument = await _signedDocumentManager.signDocument(
+      ProposalSubmissionActionDocumentDto(
+        action: ProposalSubmissionActionDto.fromModel(action),
+      ),
+      metadata: SignedDocumentMetadata(
+        contentType: SignedDocumentContentType.json,
+        documentType: DocumentType.proposalActionDocument,
+        ref: SignedDocumentMetadataRef.fromDocumentRef(ref),
+        categoryId: SignedDocumentMetadataRef.fromDocumentRef(ref),
+      ),
+      catalystId: catalystId,
+      privateKey: privateKey,
+    );
+
+    await _documentRepository.publishDocument(document: signedDocument);
+  }
+
+  @override
   Future<List<String>> removeFavoriteProposal(String proposalId) async {
     // TODO(LynxLynxx): remove proposal from favorites
     return getFavoritesProposalsIds();
+  }
+
+  SignedDocumentMetadata _createProposalMetadata(
+    DocumentDataMetadata metadata,
+  ) {
+    final template = metadata.template;
+    final categoryId = metadata.categoryId;
+
+    return SignedDocumentMetadata(
+      contentType: SignedDocumentContentType.json,
+      documentType: DocumentType.proposalDocument,
+      id: metadata.id,
+      ver: metadata.version,
+      template: template == null
+          ? null
+          : SignedDocumentMetadataRef.fromDocumentRef(template),
+      categoryId: categoryId == null
+          ? null
+          : SignedDocumentMetadataRef.fromDocumentRef(categoryId),
+    );
   }
 
   Future<ProposalsSearchResult> _getFavoritesProposalsSearchResult(

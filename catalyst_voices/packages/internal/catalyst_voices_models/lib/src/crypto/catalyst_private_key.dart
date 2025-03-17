@@ -1,10 +1,12 @@
+import 'dart:async';
 import 'dart:typed_data';
 
-import 'package:catalyst_voices_models/src/crypto/catalyst_public_key.dart';
-import 'package:catalyst_voices_models/src/crypto/catalyst_signature.dart';
-import 'package:catalyst_voices_models/src/crypto/catalyst_signature_algorithm.dart';
+import 'package:catalyst_voices_models/src/catalyst_voices_models.dart';
 
 abstract interface class CatalystPrivateKey {
+  /// A factory that creates instances of [CatalystPrivateKey].
+  static late CatalystPrivateKeyFactory factory;
+
   /// Returns the signature algorithm used by the private key.
   CatalystSignatureAlgorithm get algorithm;
 
@@ -22,4 +24,35 @@ abstract interface class CatalystPrivateKey {
 
   /// Signs a [data] message and returns the signature.
   Future<CatalystSignature> sign(Uint8List data);
+}
+
+extension FutureCatalystPrivateKeyExt on Future<CatalystPrivateKey?> {
+  /// Calls the [callback] on the private key
+  /// and then drops the private key bytes.
+  Future<R> use<R>(FutureOr<R> Function(CatalystPrivateKey) callback) async {
+    final privateKey = await this;
+    if (privateKey == null) {
+      throw StateError("Cannot use private key, it's not provided.");
+    }
+
+    try {
+      final result = await callback(privateKey);
+
+      assert(
+        result is! CatalystKeyPair,
+        'After the callback is called the key pair will '
+        'be destroyed therefore it is not safe to return it',
+      );
+
+      assert(
+        result is! CatalystPrivateKey,
+        'After the callback is called the private key will '
+        'be destroyed therefore it is not safe to return it',
+      );
+
+      return result;
+    } finally {
+      privateKey.drop();
+    }
+  }
 }

@@ -27,33 +27,33 @@ final class ExportProposalEvent extends ProposalBuilderEvent {
   List<Object?> get props => [filePrefix];
 }
 
-final class LoadDefaultProposalTemplateEvent extends ProposalBuilderEvent {
-  const LoadDefaultProposalTemplateEvent();
+final class LoadDefaultProposalCategoryEvent extends ProposalBuilderEvent {
+  const LoadDefaultProposalCategoryEvent();
 
   @override
   List<Object?> get props => [];
 }
 
-final class LoadProposalEvent extends ProposalBuilderEvent {
-  final DocumentRef ref;
+final class LoadProposalCategoryEvent extends ProposalBuilderEvent {
+  final SignedDocumentRef categoryId;
 
-  const LoadProposalEvent({
-    required this.ref,
+  const LoadProposalCategoryEvent({
+    required this.categoryId,
   });
 
   @override
-  List<Object?> get props => [ref];
+  List<Object?> get props => [categoryId];
 }
 
-final class LoadProposalTemplateEvent extends ProposalBuilderEvent {
-  final DocumentRef ref;
+final class LoadProposalEvent extends ProposalBuilderEvent {
+  final DocumentRef proposalId;
 
-  const LoadProposalTemplateEvent({
-    required this.ref,
+  const LoadProposalEvent({
+    required this.proposalId,
   });
 
   @override
-  List<Object?> get props => [ref];
+  List<Object?> get props => [proposalId];
 }
 
 sealed class ProposalBuilderEvent extends Equatable {

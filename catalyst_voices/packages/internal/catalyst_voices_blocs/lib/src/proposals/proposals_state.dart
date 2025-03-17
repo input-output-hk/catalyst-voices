@@ -12,7 +12,7 @@ class ProposalsState extends Equatable {
   final List<String> favoritesIds;
   final List<String> myProposalsIds;
   final List<CampaignCategoryDetailsViewModel> categories;
-  final String? selectedCategoryId;
+  final SignedDocumentRef? selectedCategoryId;
   final String? searchValue;
 
   const ProposalsState({
@@ -51,7 +51,7 @@ class ProposalsState extends Equatable {
     List<String>? favoritesIds,
     List<String>? myProposalsIds,
     List<CampaignCategoryDetailsViewModel>? categories,
-    Optional<String>? selectedCategoryId,
+    Optional<SignedDocumentRef>? selectedCategoryId,
     Optional<String>? searchValue,
     bool isLoading = false,
   }) {

@@ -87,10 +87,13 @@ pub(crate) async fn start_followers() -> anyhow::Result<()> {
                     .with_label_values(&[&api_host_names, service_id, &network])
                     .inc();
             }
-            if let Event::ForwardDataPurged = event {
+            if let Event::ForwardDataPurged { purge_slots } = event {
                 reporter::TRIGGERED_FORWARD_PURGES_COUNT
                     .with_label_values(&[&api_host_names, service_id, &network])
                     .inc();
+                reporter::PURGED_SLOTS
+                    .with_label_values(&[&api_host_names, service_id, &network])
+                    .set(i64::try_from(*purge_slots).unwrap_or(-1));
             }
         }));
 

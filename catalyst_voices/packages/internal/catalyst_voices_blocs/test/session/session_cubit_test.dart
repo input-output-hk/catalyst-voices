@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:catalyst_cardano/catalyst_cardano.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -35,11 +33,12 @@ void main() {
     final store = InMemorySharedPreferencesAsync.empty();
     SharedPreferencesAsyncPlatform.instance = store;
 
+    DummyCatalystIdFactory.registerDummyKeyFactory();
+
     keychainProvider = VaultKeychainProvider(
       secureStorage: const FlutterSecureStorage(),
       sharedPreferences: SharedPreferencesAsync(),
       cacheConfig: const CacheConfig(),
-      keyFactory: _FakeCatalystKeyFactory(),
     );
     userRepository = UserRepository(
       SecureUserStorage(),
@@ -183,7 +182,10 @@ void main() {
       await keychain.setLock(lockFactor);
       await keychain.lock();
 
-      final account = Account.dummy(keychain: keychain);
+      final account = Account.dummy(
+        catalystId: DummyCatalystIdFactory.create(),
+        keychain: keychain,
+      );
 
       await userService.useAccount(account);
 
@@ -206,7 +208,10 @@ void main() {
       final keychain = await keychainProvider.create(keychainId);
       await keychain.setLock(lockFactor);
 
-      final account = Account.dummy(keychain: keychain);
+      final account = Account.dummy(
+        catalystId: DummyCatalystIdFactory.create(),
+        keychain: keychain,
+      );
 
       await userService.useAccount(account);
       await account.keychain.unlock(lockFactor);
@@ -298,20 +303,6 @@ void main() {
   });
 }
 
-class _FakeCatalystPrivateKey extends Fake implements CatalystPrivateKey {
-  @override
-  final Uint8List bytes;
-
-  _FakeCatalystPrivateKey({required this.bytes});
-}
-
-class _FakeCatalystKeyFactory extends Fake implements CatalystKeyFactory {
-  @override
-  CatalystPrivateKey createPrivateKey(Uint8List bytes) {
-    return _FakeCatalystPrivateKey(bytes: bytes);
-  }
-}
-
 class _MockCardanoWallet extends Mock implements CardanoWallet {
   _MockCardanoWallet();
 }
@@ -341,6 +332,9 @@ class _MockRegistrationService extends Mock implements RegistrationService {
     await keychain.setLock(lockFactor);
     await keychain.unlock(lockFactor);
 
-    return Account.dummy(keychain: keychain);
+    return Account.dummy(
+      catalystId: DummyCatalystIdFactory.create(),
+      keychain: keychain,
+    );
   }
 }

@@ -26,13 +26,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 class ProposalBuilderPage extends StatefulWidget {
-  final String? proposalId;
-  final String? templateId;
+  final DocumentRef? proposalId;
+  final SignedDocumentRef? categoryId;
 
   const ProposalBuilderPage({
     super.key,
     this.proposalId,
-    this.templateId,
+    this.categoryId,
   });
 
   @override
@@ -103,7 +103,7 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
     super.didUpdateWidget(oldWidget);
 
     if (widget.proposalId != oldWidget.proposalId ||
-        widget.templateId != oldWidget.templateId) {
+        widget.categoryId != oldWidget.categoryId) {
       _updateSource();
     }
   }
@@ -213,16 +213,14 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
     bloc ??= context.read<ProposalBuilderBloc>();
 
     final proposalId = widget.proposalId;
-    final templateId = widget.templateId;
+    final categoryId = widget.categoryId;
 
     if (proposalId != null) {
-      final ref = SignedDocumentRef(id: proposalId);
-      bloc.add(LoadProposalEvent(ref: ref));
-    } else if (templateId != null) {
-      final ref = SignedDocumentRef(id: templateId);
-      bloc.add(LoadProposalTemplateEvent(ref: ref));
+      bloc.add(LoadProposalEvent(proposalId: proposalId));
+    } else if (categoryId != null) {
+      bloc.add(LoadProposalCategoryEvent(categoryId: categoryId));
     } else {
-      bloc.add(const LoadDefaultProposalTemplateEvent());
+      bloc.add(const LoadDefaultProposalCategoryEvent());
     }
   }
 }
