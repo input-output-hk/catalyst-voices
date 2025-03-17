@@ -17,12 +17,17 @@ final class ProposalCubit extends Cubit<ProposalState>
     with
         DocumentToSegmentMixin,
         BlocSignalEmitterMixin<ProposalSignal, ProposalState> {
+  // ignore: unused_field
   final UserService _userService;
   final ProposalService _proposalService;
 
   // Cache
   DocumentRef? _ref;
+
+  // ignore: unused_field
   ProposalData? _proposal;
+
+  // ignore: unused_field
   List<CommentWithReplies>? _comments;
 
   // 1. Fetch proposal document
@@ -42,12 +47,6 @@ final class ProposalCubit extends Cubit<ProposalState>
 
       final proposal = await _proposalService.getProposal(ref: ref);
       final comments = _buildComments();
-      final catalystId = _userService.user.activeAccount?.catalystId ??
-          CatalystId.fromUri(
-            Uri.parse(
-              'id.catalyst://dev@cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE',
-            ),
-          );
 
       if (isClosed) {
         return;
@@ -56,7 +55,6 @@ final class ProposalCubit extends Cubit<ProposalState>
       final commentsSort = state.data.commentsSort;
 
       final proposalViewData = _buildProposalViewData(
-        activeAccountId: catalystId,
         proposal: proposal,
         comments: comments,
         commentsSort: commentsSort,
@@ -93,6 +91,27 @@ final class ProposalCubit extends Cubit<ProposalState>
     }
   }
 
+  Future<void> submitComment({
+    required Document document,
+    SignedDocumentRef? parent,
+  }) async {
+    final comment = CommentDocument(
+      metadata: CommentMetadata(
+        selfRef: SignedDocumentRef.generateFirstRef(),
+        parent: parent,
+      ),
+      document: document,
+    );
+
+    final data = state.data;
+
+    final updatedData = data.copyWith();
+
+    emit(state.copyWith(data: updatedData));
+
+    // TODO(damian-molinski): integrate
+  }
+
   void updateCommentsSort({required ProposalCommentsSort sort}) {
     final data = state.data;
     final segments = data.segments.sortWith(sort: sort).toList();
@@ -114,7 +133,6 @@ final class ProposalCubit extends Cubit<ProposalState>
   }
 
   ProposalViewData _buildProposalViewData({
-    required CatalystId activeAccountId,
     required ProposalData proposal,
     required List<CommentWithReplies> comments,
     required ProposalCommentsSort commentsSort,
@@ -162,8 +180,7 @@ final class ProposalCubit extends Cubit<ProposalState>
     final sortedComments = commentsSort.applyTo(comments);
     final commentsSegment = ProposalCommentsSegment.build(
       sort: ProposalCommentsSort.newest,
-      authorId: activeAccountId,
-      template: _buildCommentTemplate(),
+      commentSchema: _buildCommentTemplate().document.schema,
       comments: sortedComments,
     );
 

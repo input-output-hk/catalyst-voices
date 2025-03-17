@@ -1,4 +1,5 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
+import 'package:catalyst_voices/pages/proposal/widget/proposal_comment_builder.dart';
 import 'package:catalyst_voices/pages/proposal/widget/proposal_comment_card.dart';
 import 'package:catalyst_voices/widgets/common/affix_decorator.dart';
 import 'package:catalyst_voices/widgets/common/animated_expand_chevron.dart';
@@ -23,14 +24,11 @@ class ProposalCommentWithRepliesCard extends StatefulWidget {
 class _ProposalCommentWithRepliesCardState
     extends State<ProposalCommentWithRepliesCard> {
   bool _showReplies = true;
-
-  // ignore: unused_field
   bool _showReplyInput = false;
 
   @override
   Widget build(BuildContext context) {
     final repliesIndent = 56 * widget.comment.depth;
-
     return Column(
       mainAxisSize: MainAxisSize.min,
       spacing: 8,
@@ -60,11 +58,20 @@ class _ProposalCommentWithRepliesCardState
               ],
             ),
           ),
+        if (_showReplyInput)
+          Padding(
+            padding: EdgeInsets.only(left: repliesIndent.toDouble()),
+            child: ProposalCommentBuilder(
+              schema: widget.comment.comment.document.schema,
+              parent: widget.comment.comment.metadata.selfRef,
+              showCancel: true,
+              onCancelTap: _hideReplyInput,
+            ),
+          ),
       ],
     );
   }
 
-  // ignore: unused_element
   void _hideReplyInput() {
     setState(() {
       _showReplyInput = false;

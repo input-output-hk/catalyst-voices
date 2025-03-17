@@ -7,17 +7,15 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 
 final class AddCommentSection extends ProposalCommentsSection {
-  final CommentTemplate template;
-  final CatalystId authorId;
+  final DocumentSchema schema;
 
   const AddCommentSection({
     required super.id,
-    required this.template,
-    required this.authorId,
+    required this.schema,
   });
 
   @override
-  List<Object?> get props => super.props + [template, authorId];
+  List<Object?> get props => super.props + [schema];
 
   @override
   String resolveTitle(BuildContext context) {
@@ -57,8 +55,7 @@ final class ProposalCommentsSegment
 
   ProposalCommentsSegment.build({
     required ProposalCommentsSort sort,
-    required CatalystId authorId,
-    required CommentTemplate template,
+    required DocumentSchema commentSchema,
     required List<CommentWithReplies> comments,
   }) : this(
           id: const NodeId('comments'),
@@ -70,8 +67,7 @@ final class ProposalCommentsSegment
             ),
             AddCommentSection(
               id: const NodeId('comments.add'),
-              authorId: authorId,
-              template: template,
+              schema: commentSchema,
             ),
           ],
         );

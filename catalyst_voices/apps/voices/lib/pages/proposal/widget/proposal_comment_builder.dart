@@ -1,20 +1,24 @@
+import 'dart:async';
+
 import 'package:catalyst_voices/widgets/widgets.dart';
+import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart'
     hide DocumentPropertyBuilder;
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ProposalCommentBuilder extends StatefulWidget {
-  final CommentTemplate template;
-  final CatalystId authorId;
+  final DocumentSchema schema;
+  final SignedDocumentRef? parent;
   final bool showCancel;
   final VoidCallback? onCancelTap;
 
   const ProposalCommentBuilder({
     super.key,
-    required this.template,
-    required this.authorId,
+    required this.schema,
+    this.parent,
     this.showCancel = false,
     this.onCancelTap,
   });
@@ -67,10 +71,7 @@ class _ProposalCommentBuilderState extends State<ProposalCommentBuilder> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          ProfileAvatar(
-            username: widget.authorId.username,
-            size: 40,
-          ),
+          const _SessionAccountAvatar(),
           const SizedBox(width: 16),
           Expanded(
             child: Form(
@@ -78,7 +79,7 @@ class _ProposalCommentBuilderState extends State<ProposalCommentBuilder> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  for (final property in widget.template.document.properties)
+                  for (final property in _comment.properties)
                     DocumentPropertyBuilder(
                       key: ValueKey(property.nodeId),
                       property: property,
@@ -104,8 +105,8 @@ class _ProposalCommentBuilderState extends State<ProposalCommentBuilder> {
   void didUpdateWidget(covariant ProposalCommentBuilder oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    if (widget.template != oldWidget.template) {
-      _builder = widget.template.document.toBuilder();
+    if (widget.schema != oldWidget.schema) {
+      _builder = DocumentBuilder.fromSchema(schema: widget.schema);
       _comment = _builder.build();
     }
   }
@@ -114,7 +115,7 @@ class _ProposalCommentBuilderState extends State<ProposalCommentBuilder> {
   void initState() {
     super.initState();
 
-    _builder = widget.template.document.toBuilder();
+    _builder = DocumentBuilder.fromSchema(schema: widget.schema);
     _comment = _builder.build();
   }
 
@@ -132,6 +133,31 @@ class _ProposalCommentBuilderState extends State<ProposalCommentBuilder> {
       return;
     }
 
-    // TODO(damian-molinski): bloc submit comment
+    final catalystId = context.read<SessionCubit>().state.account?.catalystId;
+    assert(catalystId != null, 'No active account found!');
+
+    final cubit = context.read<ProposalCubit>();
+
+    unawaited(cubit.submitComment(document: _comment, parent: widget.parent));
+
+    setState(() {
+      _builder = DocumentBuilder.fromSchema(schema: widget.schema);
+      _comment = _builder.build();
+    });
+  }
+}
+
+class _SessionAccountAvatar extends StatelessWidget {
+  const _SessionAccountAvatar();
+
+  @override
+  Widget build(BuildContext context) {
+    final username = context.select<SessionCubit, String?>(
+      (value) => value.state.account?.username,
+    );
+    return ProfileAvatar(
+      username: username,
+      size: 40,
+    );
   }
 }

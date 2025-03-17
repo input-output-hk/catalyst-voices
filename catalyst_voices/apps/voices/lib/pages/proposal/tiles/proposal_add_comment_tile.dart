@@ -3,20 +3,17 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 
 class ProposalAddCommentTile extends StatelessWidget {
-  final CommentTemplate template;
-  final CatalystId authorId;
+  final DocumentSchema schema;
 
   const ProposalAddCommentTile({
     super.key,
-    required this.template,
-    required this.authorId,
+    required this.schema,
   });
 
   @override
   Widget build(BuildContext context) {
     return ProposalCommentBuilder(
-      template: template,
-      authorId: authorId,
+      schema: schema,
     );
   }
 }
