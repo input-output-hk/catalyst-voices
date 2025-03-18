@@ -39,6 +39,7 @@ export 'footers/standard_links_page_footer.dart';
 export 'form/voices_form_field.dart';
 export 'headers/brand_header.dart';
 export 'headers/section_header.dart';
+export 'headers/section_learn_more_header.dart';
 export 'headers/segment_header.dart';
 export 'headers/sticky_header.dart';
 export 'indicators/process_progress_indicator.dart';

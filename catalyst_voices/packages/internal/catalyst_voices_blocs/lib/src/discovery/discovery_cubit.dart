@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
-import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -86,11 +85,6 @@ class DiscoveryCubit extends Cubit<DiscoveryState> {
     await _proposalsSubscription?.cancel();
     _proposalsSubscription = null;
     _setupProposalsSubscription();
-  }
-
-  CampaignCategoryDetailsViewModel? localCategory(String id) {
-    return state.campaignCategories.categories
-        .firstWhereOrNull((e) => e.id == id);
   }
 
   void _setupProposalsSubscription() {

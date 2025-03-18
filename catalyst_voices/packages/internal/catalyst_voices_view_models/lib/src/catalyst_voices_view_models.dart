@@ -25,6 +25,7 @@ export 'proposal/proposal_comments_segment.dart';
 export 'proposal/proposal_comments_sort.dart';
 export 'proposal/proposal_overview_segment.dart';
 export 'proposal/proposal_pagination_view_model.dart';
+export 'proposal/proposal_title.dart';
 export 'proposal/proposal_view_data.dart';
 export 'proposal/proposal_view_header.dart';
 export 'proposal/proposal_view_metadata.dart';

@@ -71,6 +71,9 @@ class _AppState extends State<App> {
       BlocProvider<ProposalCubit>(
         create: (_) => Dependencies.instance.get<ProposalCubit>(),
       ),
+      BlocProvider<NewProposalCubit>(
+        create: (_) => Dependencies.instance.get<NewProposalCubit>(),
+      ),
     ];
   }
 }
