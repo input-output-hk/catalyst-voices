@@ -1,5 +1,6 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/widgets/cards/workspace_proposal_card.dart';
+import 'package:catalyst_voices/widgets/empty_state/empty_state.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -39,20 +40,17 @@ class UserProposals extends StatelessWidget {
           ),
           _ListOfProposals(
             items: submitted,
-            // TODO(LynxLynxx): add empty text message when design is ready
-            emptyTextMessage: 'No submitted proposals',
+            emptyTextMessage: context.l10n.noFinalUserProposals,
           ),
           const _SharedForPublicHeader(),
           _ListOfProposals(
             items: publicDraft,
-            // TODO(LynxLynxx): add empty text message when design is ready
-            emptyTextMessage: 'No public drafts',
+            emptyTextMessage: context.l10n.noDraftUserProposals,
           ),
           const _NotPublishedHeader(),
           _ListOfProposals(
             items: localDraft,
-            // TODO(LynxLynxx): add empty text message when design is ready
-            emptyTextMessage: 'No local drafts',
+            emptyTextMessage: context.l10n.noLocalUserProposals,
           ),
         ],
       ),
@@ -84,8 +82,9 @@ class _ListOfProposals extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (items.isEmpty) {
-      return Text(
-        emptyTextMessage,
+      return EmptyState(
+        title: emptyTextMessage,
+        description: context.l10n.emptyUserProposalDescriptionHelp,
       );
     } else {
       return Column(
