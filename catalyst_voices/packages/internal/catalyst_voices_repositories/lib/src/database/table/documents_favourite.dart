@@ -4,9 +4,9 @@ import 'package:drift/drift.dart';
 
 @TableIndex(name: 'idx_fav_type', columns: {#type})
 @TableIndex(name: 'idx_fav_unique_id', columns: {#idHi, #idLo}, unique: true)
-@DataClassName('DocumentFavouriteEntity')
-class DocumentsFavourite extends Table with IdHiLoTableMixin {
-  BoolColumn get isFavourite => boolean()();
+@DataClassName('DocumentFavoriteEntity')
+class DocumentsFavorites extends Table with IdHiLoTableMixin {
+  BoolColumn get isFavorite => boolean()();
 
   @override
   Set<Column> get primaryKey => {

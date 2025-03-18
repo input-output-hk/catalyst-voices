@@ -2,7 +2,7 @@ import 'package:catalyst_voices_repositories/src/database/catalyst_database.drif
 import 'package:catalyst_voices_repositories/src/database/catalyst_database_config.dart';
 import 'package:catalyst_voices_repositories/src/database/dao/documents_dao.dart';
 import 'package:catalyst_voices_repositories/src/database/dao/drafts_dao.dart';
-import 'package:catalyst_voices_repositories/src/database/dao/favourites_dao.dart';
+import 'package:catalyst_voices_repositories/src/database/dao/favorites_dao.dart';
 import 'package:catalyst_voices_repositories/src/database/migration/drift_migration_strategy.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents.drift.dart';
@@ -35,7 +35,7 @@ abstract interface class CatalystDatabase {
   DraftsDao get draftsDao;
 
   /// Contains all operations related to fav status of documents.
-  FavouritesDao get favouritesDao;
+  FavoritesDao get favoritesDao;
 
   /// Removes all data from this db.
   Future<void> clear();
@@ -45,12 +45,12 @@ abstract interface class CatalystDatabase {
   tables: [
     Documents,
     DocumentsMetadata,
-    DocumentsFavourite,
+    DocumentsFavorites,
     Drafts,
   ],
   daos: [
     DriftDocumentsDao,
-    DriftFavouritesDao,
+    DriftFavoritesDao,
     DriftDraftsDao,
   ],
   queries: {},
@@ -86,7 +86,7 @@ class DriftCatalystDatabase extends $DriftCatalystDatabase
   DraftsDao get draftsDao => driftDraftsDao;
 
   @override
-  FavouritesDao get favouritesDao => driftFavouritesDao;
+  FavoritesDao get favoritesDao => driftFavoritesDao;
 
   @override
   MigrationStrategy get migration {

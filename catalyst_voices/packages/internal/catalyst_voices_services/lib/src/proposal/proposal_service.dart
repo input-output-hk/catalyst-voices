@@ -120,10 +120,10 @@ final class ProposalServiceImpl implements ProposalService {
 
   @override
   Future<void> addFavoriteProposal({required DocumentRef ref}) {
-    return _documentRepository.updateDocumentFavourite(
+    return _documentRepository.updateDocumentFavorite(
       ref: ref,
       type: DocumentType.proposalDocument,
-      isFavourite: true,
+      isFavorite: true,
     );
   }
 
@@ -166,7 +166,7 @@ final class ProposalServiceImpl implements ProposalService {
   @override
   Future<List<String>> getFavoritesProposalsIds() {
     return _documentRepository
-        .watchAllDocumentsFavouriteIds(type: DocumentType.proposalDocument)
+        .watchAllDocumentsFavoriteIds(type: DocumentType.proposalDocument)
         .first;
   }
 
@@ -254,10 +254,10 @@ final class ProposalServiceImpl implements ProposalService {
 
   @override
   Future<void> removeFavoriteProposal({required DocumentRef ref}) {
-    return _documentRepository.updateDocumentFavourite(
+    return _documentRepository.updateDocumentFavorite(
       ref: ref,
       type: DocumentType.proposalDocument,
-      isFavourite: false,
+      isFavorite: false,
     );
   }
 
@@ -301,12 +301,12 @@ final class ProposalServiceImpl implements ProposalService {
 
   @override
   Stream<bool> watchIsFavoritesProposal({required DocumentRef ref}) {
-    return _documentRepository.watchDocumentsFavourite(ref: ref);
+    return _documentRepository.watchDocumentsFavorite(ref: ref);
   }
 
   @override
   Stream<List<String>> watchFavoritesProposalsIds() {
-    return _documentRepository.watchAllDocumentsFavouriteIds(
+    return _documentRepository.watchAllDocumentsFavoriteIds(
       type: DocumentType.proposalDocument,
     );
   }

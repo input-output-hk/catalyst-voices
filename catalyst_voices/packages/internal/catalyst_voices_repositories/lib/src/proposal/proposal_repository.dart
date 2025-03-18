@@ -240,7 +240,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     ProposalPaginationRequest request,
   ) async {
     final favoritesRefs = await _documentRepository
-        .watchAllDocumentsFavouriteIds(type: DocumentType.proposalDocument)
+        .watchAllDocumentsFavoriteIds(type: DocumentType.proposalDocument)
         .map((event) => event.map((e) => SignedDocumentRef(id: e)).toList())
         .first;
     final proposals = <Proposal>[];

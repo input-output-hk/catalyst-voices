@@ -2,7 +2,7 @@ export 'catalyst_database.dart' show CatalystDatabase;
 export 'catalyst_database_config.dart';
 export 'dao/documents_dao.dart' show DocumentsDao;
 export 'dao/drafts_dao.dart' show DraftsDao;
-export 'dao/favourites_dao.dart' show FavouritesDao;
+export 'dao/favorites_dao.dart' show FavoritesDao;
 export 'table/documents.drift.dart' show DocumentEntity;
 export 'table/documents_favourite.drift.dart' show DocumentFavouriteEntity;
 export 'table/documents_metadata.drift.dart' show DocumentMetadataEntity;

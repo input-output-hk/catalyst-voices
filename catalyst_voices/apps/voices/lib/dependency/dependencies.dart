@@ -166,8 +166,8 @@ final class Dependencies extends DependencyProvider {
           get<CatalystDatabase>(),
         );
       })
-      ..registerLazySingleton<DocumentFavouriteSource>(() {
-        return DatabaseDocumentFavouriteSource(
+      ..registerLazySingleton<DocumentFavoriteSource>(() {
+        return DatabaseDocumentFavoriteSource(
           get<CatalystDatabase>(),
         );
       })
@@ -184,7 +184,7 @@ final class Dependencies extends DependencyProvider {
           get<DatabaseDraftsDataSource>(),
           get<SignedDocumentDataSource>(),
           get<CatGatewayDocumentDataSource>(),
-          get<DocumentFavouriteSource>(),
+          get<DocumentFavoriteSource>(),
         );
       })
       ..registerLazySingleton<DocumentMapper>(() => const DocumentMapperImpl())

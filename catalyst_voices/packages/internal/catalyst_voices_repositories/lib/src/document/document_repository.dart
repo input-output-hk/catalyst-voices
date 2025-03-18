@@ -20,7 +20,7 @@ abstract interface class DocumentRepository {
     DraftDataSource drafts,
     SignedDocumentDataSource localDocuments,
     DocumentDataRemoteSource remoteDocuments,
-    DocumentFavouriteSource favourite,
+    DocumentFavoriteSource favorite,
   ) = DocumentRepositoryImpl;
 
   /// Making sure document from [ref] is available locally.
@@ -75,8 +75,8 @@ abstract interface class DocumentRepository {
   /// Returns the reference to the imported document.
   Future<DocumentRef> importDocument({required Uint8List data});
 
-  /// Similar to [watchDocumentsFavourite] but stops after first emit.
-  Future<bool> isDocumentsFavourite({
+  /// Similar to [watchDocumentsFavorite] but stops after first emit.
+  Future<bool> isDocumentsFavorite({
     required DocumentRef ref,
   });
 
@@ -90,10 +90,10 @@ abstract interface class DocumentRepository {
   Future<List<ProposalDocument>> queryVersionsOfId({required String id});
 
   /// Updates fav status matching [ref].
-  Future<void> updateDocumentFavourite({
+  Future<void> updateDocumentFavorite({
     required DocumentRef ref,
     required DocumentType type,
-    required bool isFavourite,
+    required bool isFavorite,
   });
 
   /// Creates/updates a local document draft.
@@ -104,10 +104,10 @@ abstract interface class DocumentRepository {
     required DocumentData document,
   });
 
-  /// Emits list of all favourite ids.
+  /// Emits list of all favorite ids.
   ///
   /// All returned ids are loose and won't specify version.
-  Stream<List<String>> watchAllDocumentsFavouriteIds({
+  Stream<List<String>> watchAllDocumentsFavoriteIds({
     DocumentType? type,
   });
 
@@ -117,7 +117,7 @@ abstract interface class DocumentRepository {
   });
 
   /// Emits changes to fav status of [ref].
-  Stream<bool> watchDocumentsFavourite({
+  Stream<bool> watchDocumentsFavorite({
     required DocumentRef ref,
   });
 
@@ -138,7 +138,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   final DraftDataSource _drafts;
   final SignedDocumentDataSource _localDocuments;
   final DocumentDataRemoteSource _remoteDocuments;
-  final DocumentFavouriteSource _favourite;
+  final DocumentFavoriteSource _favorite;
 
   final _documentDataLock = Lock();
 
@@ -146,7 +146,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     this._drafts,
     this._localDocuments,
     this._remoteDocuments,
-    this._favourite,
+    this._favorite,
   );
 
   @override
@@ -251,10 +251,10 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   }
 
   @override
-  Future<bool> isDocumentsFavourite({required DocumentRef ref}) {
-    assert(!ref.isExact, 'Favourite ref have to be lose!');
+  Future<bool> isDocumentsFavorite({required DocumentRef ref}) {
+    assert(!ref.isExact, 'Favorite ref have to be lose!');
 
-    return _favourite.watchIsDocumentFavourite(ref.id).first;
+    return _favorite.watchIsDocumentFavorite(ref.id).first;
   }
 
   @override
@@ -280,17 +280,17 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   }
 
   @override
-  Future<void> updateDocumentFavourite({
+  Future<void> updateDocumentFavorite({
     required DocumentRef ref,
     required DocumentType type,
-    required bool isFavourite,
+    required bool isFavorite,
   }) {
-    assert(!ref.isExact, 'Favourite ref have to be lose!');
+    assert(!ref.isExact, 'Favorite ref have to be lose!');
 
-    return _favourite.updateDocumentFavourite(
+    return _favorite.updateDocumentFavorite(
       ref.id,
       type: type,
-      isFavourite: isFavourite,
+      isFavorite: isFavorite,
     );
   }
 
@@ -326,10 +326,10 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   }
 
   @override
-  Stream<List<String>> watchAllDocumentsFavouriteIds({
+  Stream<List<String>> watchAllDocumentsFavoriteIds({
     DocumentType? type,
   }) {
-    return _favourite.watchAllFavouriteIds(type: type);
+    return _favorite.watchAllFavoriteIds(type: type);
   }
 
   @override
@@ -344,10 +344,10 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   }
 
   @override
-  Stream<bool> watchDocumentsFavourite({required DocumentRef ref}) {
-    assert(!ref.isExact, 'Favourite ref have to be lose!');
+  Stream<bool> watchDocumentsFavorite({required DocumentRef ref}) {
+    assert(!ref.isExact, 'Favorite ref have to be lose!');
 
-    return _favourite.watchIsDocumentFavourite(ref.id);
+    return _favorite.watchIsDocumentFavorite(ref.id);
   }
 
   @visibleForTesting
