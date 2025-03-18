@@ -25,7 +25,6 @@ final class SignedDocumentManagerImpl implements SignedDocumentManager {
     final metadata = _SignedDocumentMetadataExt.fromCose(
       protectedHeaders: coseSign.protectedHeaders,
       unprotectedHeaders: coseSign.unprotectedHeaders,
-      signatures: coseSign.signatures,
     );
 
     return _CoseSignedDocument(
@@ -230,7 +229,6 @@ extension _SignedDocumentMetadataExt on SignedDocumentMetadata {
   static SignedDocumentMetadata fromCose({
     required CoseHeaders protectedHeaders,
     required CoseHeaders unprotectedHeaders,
-    required List<CoseSignature> signatures,
   }) {
     final type = protectedHeaders.type?.value;
     final ref = protectedHeaders.ref;
