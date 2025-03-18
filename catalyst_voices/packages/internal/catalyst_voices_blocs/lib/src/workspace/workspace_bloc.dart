@@ -45,7 +45,12 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     Emitter<WorkspaceState> emit,
   ) async {
     _logger.info('Error loading proposals');
-    emit(state.copyWith(error: Optional(event.error)));
+    emit(
+      state.copyWith(
+        error: Optional(event.error),
+        isLoading: false,
+      ),
+    );
   }
 
   Future<void> _importProposal(
@@ -93,6 +98,12 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     Emitter<WorkspaceState> emit,
   ) async {
     _logger.info('Setup user proposals subscription');
+    emit(
+      state.copyWith(
+        isLoading: true,
+        error: const Optional.empty(),
+      ),
+    );
     await _proposalsSubscription?.cancel();
     _proposalsSubscription = null;
     _setupProposalsSubscription();

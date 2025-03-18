@@ -23,12 +23,9 @@ final class WorkspaceState extends Equatable {
         userProposals,
       ];
 
-  bool get showEmptyState =>
-      userProposals.isEmpty && error == null && !isLoading;
   bool get showError => error != null && !isLoading;
   bool get showLoading => isLoading;
-  bool get showProposals =>
-      userProposals.isNotEmpty && error == null && !isLoading;
+  bool get showProposals => error == null && !isLoading;
 
   WorkspaceState copyWith({
     WorkspaceTabType? tab,
