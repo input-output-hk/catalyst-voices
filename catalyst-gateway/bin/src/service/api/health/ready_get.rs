@@ -62,7 +62,7 @@ pub(crate) async fn endpoint() -> AllResponses {
     // When check fails, attempt to re-connect
     if !index_db_live {
         CassandraSession::init();
-        // Re-check, if success, enable flag.
+        // Re-check connection to Indexing DB (internally updates the liveness flag)
         if !index_db_is_ready().await {
             error!("Index DB re-connection failed readiness check");
         }
