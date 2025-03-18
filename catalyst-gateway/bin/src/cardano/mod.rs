@@ -24,8 +24,7 @@ use crate::{
         session::CassandraSession,
     },
     service::utilities::health::{
-        follower_has_first_reached_tip, index_db_is_live, set_follower_first_reached_tip,
-        set_index_db_liveness,
+        follower_has_first_reached_tip, set_follower_first_reached_tip, set_index_db_liveness,
     },
     settings::{chain_follower, Settings},
 };
@@ -36,6 +35,23 @@ pub(crate) mod util;
 
 /// How long we wait between checks for connection to the indexing DB to be ready.
 const INDEXING_DB_READY_WAIT_INTERVAL: Duration = Duration::from_secs(1);
+
+/// Wait for the Cassandra Indexing DB to be ready before continuing.
+///
+/// Returns boolean that is `true` if connection to the Indexing DB is `OK`.
+///
+/// NOTE: This function updates the Indexing DB liveness variables.
+pub async fn index_db_is_ready() -> bool {
+    let is_ready = CassandraSession::wait_until_ready(INDEXING_DB_READY_WAIT_INTERVAL, true)
+        .await
+        .is_ok();
+    if is_ready {
+        set_index_db_liveness(true);
+    } else {
+        set_index_db_liveness(false);
+    }
+    is_ready
+}
 
 /// Start syncing a particular network
 async fn start_sync_for(cfg: &chain_follower::EnvVars) -> anyhow::Result<()> {
@@ -250,7 +266,9 @@ fn sync_subchain(
         params.backoff().await;
 
         // Wait for indexing DB to be ready before continuing.
-        drop(CassandraSession::wait_until_ready(INDEXING_DB_READY_WAIT_INTERVAL, true).await);
+        if !index_db_is_ready().await {
+            error!(chain=%params.chain, params=%params,"Indexing DB connection failed");
+        }
         info!(chain=%params.chain, params=%params,"Indexing DB is ready");
 
         let mut first_indexed_block = params.first_indexed_block.clone();
@@ -444,6 +462,7 @@ impl SyncTask {
     ///
     /// Sets the Chain Follower Has First Reached Tip flag to true if it is not already
     /// set.
+    #[allow(clippy::too_many_lines)]
     async fn run(&mut self) {
         // We can't sync until the local chain data is synced.
         // This call will wait until we sync.
@@ -464,12 +483,8 @@ impl SyncTask {
         // want to wait do any work they already completed while we were fetching the blockchain.
         //
         // After waiting, we set the liveness flag to true if it is not already set.
-        if CassandraSession::wait_until_ready(INDEXING_DB_READY_WAIT_INTERVAL, true)
-            .await
-            .is_ok()
-            && !index_db_is_live()
-        {
-            set_index_db_liveness(true);
+        if !index_db_is_ready().await {
+            error!(chain=%self.cfg.chain, "Indexing DB connection failed");
         }
 
         info!(chain=%self.cfg.chain, "Indexing DB is ready - Getting recovery state");

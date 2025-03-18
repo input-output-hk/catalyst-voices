@@ -5,7 +5,7 @@ use tracing::error;
 
 use crate::{
     db::{event::EventDB, index::session::CassandraSession},
-    service::utilities::health::set_index_db_liveness,
+    service::utilities::health::{set_event_db_liveness, set_index_db_liveness},
 };
 
 /// Middleware type that returns a response with 503 status code
@@ -33,7 +33,7 @@ impl<E: Endpoint> Endpoint for DatabaseConnectionImpl<E> {
         // TODO: find a better way to filter URI paths
         if !req.uri().path().starts_with("/health") {
             if !EventDB::connection_is_ok() {
-                set_index_db_liveness(false);
+                set_event_db_liveness(false);
                 error!("EventDB connection failed");
                 return Err(StatusCode::SERVICE_UNAVAILABLE.into());
             }

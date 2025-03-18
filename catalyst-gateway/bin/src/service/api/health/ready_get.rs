@@ -1,16 +1,16 @@
 //! Implementation of the GET /health/ready endpoint
 use poem_openapi::ApiResponse;
+use tracing::error;
 
 use crate::{
+    cardano::index_db_is_ready,
     db::{
         event::{establish_connection, EventDB},
         index::session::CassandraSession,
     },
     service::{
         common::{responses::WithErrorResponses, types::headers::retry_after::RetryAfterOption},
-        utilities::health::{
-            event_db_is_live, index_db_is_live, set_event_db_liveness, set_index_db_liveness,
-        },
+        utilities::health::{event_db_is_live, index_db_is_live, set_event_db_liveness},
     },
 };
 
@@ -55,6 +55,8 @@ pub(crate) async fn endpoint() -> AllResponses {
         // Re-check, if success, enable flag.
         if EventDB::connection_is_ok() {
             set_event_db_liveness(true);
+        } else {
+            set_event_db_liveness(false);
         }
     };
 
@@ -65,11 +67,8 @@ pub(crate) async fn endpoint() -> AllResponses {
     if !index_db_live {
         CassandraSession::init();
         // Re-check, if success, enable flag.
-        if CassandraSession::wait_until_ready(core::time::Duration::from_secs(1), false)
-            .await
-            .is_ok()
-        {
-            set_index_db_liveness(true);
+        if !index_db_is_ready().await {
+            error!("Index DB re-connection failed readiness check");
         }
     }
 
