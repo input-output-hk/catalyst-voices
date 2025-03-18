@@ -97,6 +97,8 @@ impl SyncTask {
 
         self.start_immutable_followers();
 
+        self.start_live_chain_follower();
+
         self.dispatch_event(ChainIndexerEvent::SyncStarted);
 
         while let Some(completed) = self.sync_tasks.next().await {
@@ -318,7 +320,7 @@ fn sync_subchain(
                     // What we need to do here is tell the primary follower to start a new sync
                     // for the new immutable data, and then purge the volatile database of the
                     // old data (after the immutable data has synced).
-                    info!(chain=%params.chain(), "Immutable chain rolled forward.");
+                    info!(chain=%params.chain(), "Immutable chain rolled forward, point {}.", chain_update.block_data().point());
                     // Signal the point the immutable chain rolled forward to.
                     params.set_follower_roll_forward(chain_update.block_data().point());
                     // If this is live chain immediately stops to later run immutable sync tasks
