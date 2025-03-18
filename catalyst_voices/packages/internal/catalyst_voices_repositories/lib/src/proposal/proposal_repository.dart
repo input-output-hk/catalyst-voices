@@ -34,7 +34,6 @@ abstract interface class ProposalRepository {
   const factory ProposalRepository(
     SignedDocumentManager signedDocumentManager,
     DocumentRepository documentRepository,
-    CampaignRepository campaignRepository,
   ) = ProposalRepositoryImpl;
 
   Future<List<String>> addFavoriteProposal(String proposalId);
@@ -102,12 +101,10 @@ abstract interface class ProposalRepository {
 final class ProposalRepositoryImpl implements ProposalRepository {
   final SignedDocumentManager _signedDocumentManager;
   final DocumentRepository _documentRepository;
-  final CampaignRepository _campaignRepository;
 
   const ProposalRepositoryImpl(
     this._signedDocumentManager,
     this._documentRepository,
-    this._campaignRepository,
   );
 
   @override
@@ -166,7 +163,6 @@ final class ProposalRepositoryImpl implements ProposalRepository {
 
     return ProposalData(
       document: proposalDocument,
-      categoryId: SignedDocumentRef.generateFirstRef(),
       commentsCount: commentsCount,
       versions: proposalVersions,
     );
@@ -374,13 +370,8 @@ final class ProposalRepositoryImpl implements ProposalRepository {
       documentData: documentData,
       templateData: documentTemplate,
     );
-    final categoryId =
-        _campaignRepository.getCategory(document.metadata.categoryId!);
 
-    return BaseProposalData(
-      document: document,
-      categoryId: categoryId.selfRef,
-    );
+    return BaseProposalData(document: document);
   }
 
   ProposalDocument _buildProposalDocument({
@@ -396,6 +387,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
 
     final metadata = ProposalMetadata(
       selfRef: documentData.metadata.selfRef,
+      categoryId: documentData.metadata.categoryId!,
     );
 
     final content = DocumentDataContentDto.fromModel(

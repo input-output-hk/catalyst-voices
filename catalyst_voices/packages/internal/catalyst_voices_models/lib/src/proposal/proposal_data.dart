@@ -5,11 +5,9 @@ import 'package:uuid_plus/uuid_plus.dart';
 
 class BaseProposalData extends Equatable {
   final ProposalDocument document;
-  final SignedDocumentRef categoryId;
 
   const BaseProposalData({
     required this.document,
-    required this.categoryId,
   });
 
   @override
@@ -77,11 +75,12 @@ class ProposalData extends BaseProposalData {
 
   const ProposalData({
     required super.document,
-    required super.categoryId,
     this.commentsCount = 0,
     this.categoryName = '',
     this.versions = const [],
   });
+
+  SignedDocumentRef get categoryId => document.metadata.categoryId;
 
   List<ProposalVersion> get proposalVersions =>
       versions.map((v) => v.toProposalVersion()).toList();

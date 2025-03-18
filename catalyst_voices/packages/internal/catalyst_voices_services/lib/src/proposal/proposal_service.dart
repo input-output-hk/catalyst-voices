@@ -274,13 +274,10 @@ final class ProposalServiceImpl implements ProposalService {
             id: doc.metadata.selfRef.id,
           );
           final category =
-              _campaignRepository.getCategory(doc.metadata.categoryId!);
+              _campaignRepository.getCategory(doc.metadata.categoryId);
           final versionsData = versionIds
               .map(
-                (e) => BaseProposalData(
-                  document: e,
-                  categoryId: category.selfRef,
-                ),
+                (e) => BaseProposalData(document: e),
               )
               .toList();
 
@@ -292,7 +289,6 @@ final class ProposalServiceImpl implements ProposalService {
               .map((commentsCount) {
             final proposalData = ProposalData(
               document: doc,
-              categoryId: category.selfRef,
               categoryName: category.categoryText,
               versions: versionsData,
               commentsCount: commentsCount,
@@ -322,12 +318,7 @@ final class ProposalServiceImpl implements ProposalService {
     )
         .switchMap((documents) async* {
       final proposals = documents.map((e) {
-        final categoryId =
-            _campaignRepository.getCategory(e.metadata.categoryId!);
-        final proposalData = ProposalData(
-          document: e,
-          categoryId: categoryId.selfRef,
-        );
+        final proposalData = ProposalData(document: e);
         return Proposal.fromData(proposalData);
       }).toList();
       yield proposals;

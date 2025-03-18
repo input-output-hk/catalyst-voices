@@ -186,7 +186,6 @@ final class Dependencies extends DependencyProvider {
         () => ProposalRepository(
           get<SignedDocumentManager>(),
           get<DocumentRepository>(),
-          get<CampaignRepository>(),
         ),
       );
   }
