@@ -52,12 +52,8 @@ pub(crate) async fn endpoint() -> AllResponses {
     // When check fails, attempt to re-connect
     if !event_db_live {
         establish_connection();
-        // Re-check, if success, enable flag.
-        if EventDB::connection_is_ok() {
-            set_event_db_liveness(true);
-        } else {
-            set_event_db_liveness(false);
-        }
+        // Re-check, and update Event DB service liveness flag
+        set_event_db_liveness(EventDB::connection_is_ok());
     };
 
     // Check Index DB connection
