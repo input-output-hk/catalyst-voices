@@ -189,11 +189,24 @@ final class DocumentPropertyObjectDto extends DocumentPropertyDto {
   }
 
   @override
-  Map<String, dynamic> toJson() => {
-        schema.id: {
-          for (final property in properties) ...property.toJson(),
-        },
+  Map<String, dynamic> toJson() {
+    final propertiesMap = {
+      for (final property in properties) ...property.toJson(),
+    };
+
+    if (propertiesMap.isEmpty && !schema.isRequired) {
+      // If properties are empty and the schema is not required
+      // then return empty map to skip this object from the resulting json.
+      //
+      // Empty non-required object unnecessarily
+      // consume storage and data transfer.
+      return {};
+    } else {
+      return {
+        schema.id: propertiesMap,
       };
+    }
+  }
 
   @override
   DocumentObjectProperty toModel() {
