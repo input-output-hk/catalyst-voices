@@ -12,6 +12,10 @@ class ProposalCommentTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ProposalCommentWithRepliesCard(comment: comment);
+    final id = comment.comment.metadata.selfRef.id;
+    return ProposalCommentWithRepliesCard(
+      key: ValueKey('ProposalComment.$id.WithReplies'),
+      comment: comment,
+    );
   }
 }

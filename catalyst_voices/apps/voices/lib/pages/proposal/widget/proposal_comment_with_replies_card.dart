@@ -33,6 +33,7 @@ class _ProposalCommentWithRepliesCardState
     final hasActiveAccount = context
         .select<SessionCubit, bool>((value) => value.state.account != null);
     final repliesIndent = 56 * widget.comment.depth;
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       spacing: 8,

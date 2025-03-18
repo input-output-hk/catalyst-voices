@@ -61,7 +61,7 @@ class _SegmentsListView extends StatelessWidget {
         final isLast = index == max(items.length - 1, 0);
 
         return ProposalTileDecoration(
-          key: ValueKey('Proposal[${item.id.value}]Tile'),
+          key: ValueKey('Proposal.${item.id.value}.Tile'),
           corners: (
             isFirst: isFirst || item is ProposalCommentsSegment,
             isLast: isLast || nextItem is ProposalCommentsSegment,
@@ -144,7 +144,10 @@ class _SegmentsListView extends StatelessWidget {
               schema: schema,
             ),
         },
-      CommentListItem(:final comment) => ProposalCommentTile(comment: comment),
+      CommentListItem(:final comment) => ProposalCommentTile(
+          key: ValueKey(comment.comment.metadata.selfRef),
+          comment: comment,
+        ),
       _ => throw ArgumentError('Not supported type ${item.runtimeType}'),
     };
   }
