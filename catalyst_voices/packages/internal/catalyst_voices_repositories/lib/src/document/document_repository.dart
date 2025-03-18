@@ -326,8 +326,8 @@ final class DocumentRepositoryImpl implements DocumentRepository {
         List<DocumentsDataWithRefData> docs,
         List<DocumentsDataWithRefData> drafts,
       ) {
-        final combined = [...docs, ...drafts];
-        return combined.toSet().toList();
+        final combined = {...docs, ...drafts};
+        return combined.toList();
       },
     ).distinct(
       listEquals,

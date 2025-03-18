@@ -75,7 +75,7 @@ class _ProposalsPaginationState extends State<ProposalsPagination> {
         builder: (context, item) =>
             BlocSelector<ProposalsCubit, ProposalsState, bool>(
           selector: (state) {
-            return state.isFavorite(item.id);
+            return state.isFavorite(item.id.id);
           },
           builder: (context, state) {
             return ProposalCard(
@@ -84,7 +84,7 @@ class _ProposalsPaginationState extends State<ProposalsPagination> {
               isFavorite: widget.usersFavorite ? item.isFavorite : state,
               onTap: () {
                 final route = ProposalRoute(
-                  proposalId: item.id,
+                  proposalId: item.id.id,
                   local: item.isLocal,
                 );
 
@@ -92,7 +92,7 @@ class _ProposalsPaginationState extends State<ProposalsPagination> {
               },
               onFavoriteChanged: (isFavorite) async {
                 await context.read<ProposalsCubit>().onChangeFavoriteProposal(
-                      item.id,
+                      item.id.id,
                       isFavorite: isFavorite,
                     );
               },
@@ -177,7 +177,7 @@ class _ProposalsPaginationState extends State<ProposalsPagination> {
         final request = ProposalPaginationRequest(
           pageKey: newPageKey,
           pageSize: pageSize,
-          lastId: lastItem?.id,
+          lastId: lastItem?.id.id,
           stage: widget.stage,
           categoryId: widget.categoryId,
           usersProposals: widget.userProposals,

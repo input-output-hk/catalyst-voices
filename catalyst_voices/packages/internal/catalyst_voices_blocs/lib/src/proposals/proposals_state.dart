@@ -70,7 +70,7 @@ class ProposalsState extends Equatable {
   }
 
   bool isFavorite(String proposalId) {
-    return favoriteProposals.items.any((e) => e.id == proposalId);
+    return favoriteProposals.items.any((e) => e.id.id == proposalId);
   }
 }
 

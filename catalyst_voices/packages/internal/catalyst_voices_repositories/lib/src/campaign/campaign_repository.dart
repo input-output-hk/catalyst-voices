@@ -46,7 +46,9 @@ final class CampaignRepositoryImpl implements CampaignRepository {
   Future<CampaignCategory> getCategory(SignedDocumentRef ref) async {
     return staticCampaignCategories.firstWhere(
       (e) => e.selfRef == ref,
-      orElse: () => throw const NotFoundException(),
+      orElse: () => throw NotFoundException(
+        message: 'Did not find category with ref $ref',
+      ),
     );
   }
 

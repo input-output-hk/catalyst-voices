@@ -8,6 +8,7 @@ import 'package:flutter/widgets.dart';
 
 class UserProposals extends StatelessWidget {
   final List<Proposal> items;
+
   const UserProposals({super.key, required this.items});
 
   @override

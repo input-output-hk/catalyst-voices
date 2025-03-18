@@ -31,20 +31,6 @@ class _LatestProposalsState extends State<MostRecentProposals> {
   late double _scrollPercentage;
 
   @override
-  void initState() {
-    super.initState();
-    _scrollController = ScrollController();
-    _scrollController.addListener(_onScroll);
-    _scrollPercentage = 0.0;
-  }
-
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Container(
       key: const Key('MostRecentProposals'),
@@ -91,7 +77,7 @@ class _LatestProposalsState extends State<MostRecentProposals> {
                         proposal: proposal,
                         onTap: () {
                           unawaited(
-                            ProposalRoute(proposalId: id).push(context),
+                            ProposalRoute(proposalId: id.id).push(context),
                           );
                         },
                         onFavoriteChanged: (value) {},
@@ -127,6 +113,20 @@ class _LatestProposalsState extends State<MostRecentProposals> {
         ],
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController = ScrollController();
+    _scrollController.addListener(_onScroll);
+    _scrollPercentage = 0.0;
   }
 
   void _onHorizontalDrag(DragUpdateDetails details) {

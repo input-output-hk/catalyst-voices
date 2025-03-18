@@ -19,11 +19,11 @@ final class ProposalVersion extends Equatable
   factory ProposalVersion.fromData(BaseProposalData data) {
     final version = data.document.metadata.selfRef.version ??
         data.document.metadata.selfRef.id;
-    final createAt = UuidV7.parseDateTime(version);
+    final createdAt = UuidV7.parseDateTime(version);
     return ProposalVersion(
       selfRef: data.document.metadata.selfRef,
       title: BaseProposalData.getProposalTitle(data.document) ?? '',
-      createdAt: createAt,
+      createdAt: createdAt,
       // TODO(LynxLynxx): change when we get this from doc actions
       publish: ProposalPublish.publishedDraft,
     );

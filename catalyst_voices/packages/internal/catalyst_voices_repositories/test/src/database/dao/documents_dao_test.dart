@@ -694,16 +694,13 @@ void main() {
               .asBroadcastStream();
 
           final firstEmission = await documentCount.first;
-          // TODO(damian-molinski): JSONB filtering
-          // After proper filtering this test should pass
+
           expect(firstEmission, equals(1));
 
-          // Save second comment and wait for update
           await database.documentsDao.saveAll([comments.last]);
           final secondEmission = await documentCount.first;
           expect(secondEmission, equals(2));
         },
-        // skip: true,
       );
     });
 
