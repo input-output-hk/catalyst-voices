@@ -10,7 +10,7 @@ use std::{
 use anyhow::{anyhow, Context, Result};
 use base64::{prelude::BASE64_URL_SAFE_NO_PAD, Engine};
 use cardano_blockchain_types::Network;
-use catalyst_types::id_uri::IdUri;
+use catalyst_types::id_uri::{key_rotation::KeyRotation, role_index::RoleIndex, IdUri};
 use chrono::{TimeDelta, Utc};
 use ed25519_dalek::{ed25519::signature::Signer, Signature, SigningKey, VerifyingKey};
 
@@ -94,6 +94,13 @@ impl CatalystRBACTokenV1 {
         }
         if catalyst_id.nonce().is_none() {
             return Err(anyhow!("Catalyst ID must have nonce"));
+        }
+        let (role, rotation) = catalyst_id.role_and_rotation();
+        if role != RoleIndex::DEFAULT {
+            return Err(anyhow!("Catalyst ID mustn't have role specified"));
+        }
+        if rotation != KeyRotation::DEFAULT {
+            return Err(anyhow!("Catalyst ID mustn't have rotation specified"));
         }
         let network = convert_network(&catalyst_id.network())?;
 
