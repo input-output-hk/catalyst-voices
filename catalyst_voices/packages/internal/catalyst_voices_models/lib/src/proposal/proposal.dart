@@ -72,15 +72,14 @@ final class Proposal extends Equatable {
       fundsRequested:
           BaseProposalData.getProposalFundsRequested(data.document) ??
               Coin.fromAda(0),
-      // TODO(LynxLynxx): from where we need to get the real status
       status: ProposalStatus.inProgress,
       // TODO(LynxLynxx): from where we need to get the real publish
-      publish: ProposalPublish.publishedDraft,
+      publish: ProposalPublish.localDraft,
       duration: BaseProposalData.getProposalDuration(data.document) ?? 0,
       author: BaseProposalData.getProposalAuthor(data.document) ?? '',
       commentsCount: data.commentsCount,
       categoryId: data.categoryId,
-      category: '',
+      category: data.categoryName,
       versions: versions,
     );
   }

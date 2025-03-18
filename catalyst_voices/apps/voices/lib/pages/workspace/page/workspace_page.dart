@@ -2,7 +2,9 @@ import 'dart:async';
 
 import 'package:catalyst_voices/common/error_handler.dart';
 import 'package:catalyst_voices/pages/workspace/header/workspace_header.dart';
-import 'package:catalyst_voices/pages/workspace/my_proposals/my_proposals.dart';
+import 'package:catalyst_voices/pages/workspace/page/workspace_error.dart';
+import 'package:catalyst_voices/pages/workspace/page/workspace_loading.dart';
+import 'package:catalyst_voices/pages/workspace/page/workspace_user_proposals.dart';
 import 'package:catalyst_voices/routes/routing/proposal_builder_route.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -27,7 +29,13 @@ class _WorkspacePageState extends State<WorkspacePage>
         child: Column(
           children: [
             WorkspaceHeader(),
-            MyProposals(),
+            Stack(
+              children: [
+                WorkspaceErrorSelector(),
+                WorkspaceLoadingSelector(),
+                WorkspaceUserProposalsSelector(),
+              ],
+            ),
           ],
         ),
       ),

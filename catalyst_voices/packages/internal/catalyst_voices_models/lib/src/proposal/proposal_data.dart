@@ -5,9 +5,11 @@ import 'package:uuid_plus/uuid_plus.dart';
 
 class BaseProposalData extends Equatable {
   final ProposalDocument document;
+  final SignedDocumentRef categoryId;
 
   const BaseProposalData({
     required this.document,
+    required this.categoryId,
   });
 
   @override
@@ -66,29 +68,18 @@ class BaseProposalData extends Equatable {
 
     return property?.value;
   }
-
-  ProposalVersion toProposalVersion() {
-    return ProposalVersion(
-      selfRef: document.metadata.selfRef,
-      title: getProposalTitle() ?? '',
-      createdAt: UuidV7.parseDateTime(
-        document.metadata.selfRef.version ?? document.metadata.selfRef.id,
-      ),
-      // TODO(LynxLynxx): from where we need to get the real status
-      publish: ProposalPublish.publishedDraft,
-    );
-  }
 }
 
 class ProposalData extends BaseProposalData {
-  final SignedDocumentRef categoryId;
   final List<BaseProposalData> versions;
   final int commentsCount;
+  final String categoryName;
 
   const ProposalData({
     required super.document,
-    required this.categoryId,
+    required super.categoryId,
     this.commentsCount = 0,
+    this.categoryName = '',
     this.versions = const [],
   });
 
@@ -98,7 +89,8 @@ class ProposalData extends BaseProposalData {
   @override
   List<Object?> get props => [
         ...super.props,
-        categoryId,
+        commentsCount,
+        categoryName,
         versions,
       ];
 }

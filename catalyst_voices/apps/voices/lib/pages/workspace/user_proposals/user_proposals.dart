@@ -1,17 +1,25 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/widgets/cards/workspace_proposal_card.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
-import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
-class MyProposals extends StatelessWidget {
-  const MyProposals({super.key});
+class UserProposals extends StatelessWidget {
+  final List<Proposal> items;
+  const UserProposals({super.key, required this.items});
 
   @override
   Widget build(BuildContext context) {
+    final submitted = items
+        .where((item) => item.publish == ProposalPublish.submittedProposal)
+        .toList();
+    final publicDraft = items
+        .where((item) => item.publish == ProposalPublish.publishedDraft)
+        .toList();
+    final localDraft = items
+        .where((item) => item.publish == ProposalPublish.localDraft)
+        .toList();
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 32),
       child: Column(
@@ -25,28 +33,24 @@ class MyProposals extends StatelessWidget {
             height: 56,
             color: context.colors.primaryContainer,
           ),
-          const _SubmittedForReviewHeader(
+          _SubmittedForReviewHeader(
             maxCount: 5,
-            submittedCount: 2,
+            submittedCount: submitted.length,
           ),
-          BlocSelector<WorkspaceBloc, WorkspaceState, List<Proposal>>(
-            selector: (state) {
-              return state.userProposals;
-            },
-            builder: (context, state) {
-              return Column(
-                children: state
-                    .map(
-                      (e) => WorkspaceProposalCard(
-                        proposal: e,
-                      ),
-                    )
-                    .toList(),
-              );
-            },
+          _ListOfProposals(
+            items: submitted,
+            emptyTextMessage: 'No submitted proposals',
           ),
           const _SharedForPublicHeader(),
+          _ListOfProposals(
+            items: publicDraft,
+            emptyTextMessage: 'No public drafts',
+          ),
           const _NotPublishedHeader(),
+          _ListOfProposals(
+            items: localDraft,
+            emptyTextMessage: 'No local drafts',
+          ),
         ],
       ),
     );
@@ -62,6 +66,36 @@ class _Header extends StatelessWidget {
       context.l10n.myProposals,
       style: context.textTheme.headlineSmall,
     );
+  }
+}
+
+class _ListOfProposals extends StatelessWidget {
+  final List<Proposal> items;
+  final String emptyTextMessage;
+
+  const _ListOfProposals({
+    required this.items,
+    required this.emptyTextMessage,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    if (items.isEmpty) {
+      return Text(
+        emptyTextMessage,
+      );
+    } else {
+      return Column(
+        children: items
+            .map(
+              (e) => WorkspaceProposalCard(
+                key: Key(e.selfRef.id),
+                proposal: e,
+              ),
+            )
+            .toList(),
+      );
+    }
   }
 }
 

@@ -3,13 +3,11 @@ import 'dart:typed_data';
 
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_repositories/src/document/document_repository.dart';
+import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/document_data_dto.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/document_dto.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/schema/document_schema_dto.dart';
 import 'package:catalyst_voices_repositories/src/dto/proposal/proposal_submission_action_dto.dart';
-import 'package:catalyst_voices_repositories/src/signed_document/signed_document_json_payload.dart';
-import 'package:catalyst_voices_repositories/src/signed_document/signed_document_manager.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -36,6 +34,7 @@ abstract interface class ProposalRepository {
   const factory ProposalRepository(
     SignedDocumentManager signedDocumentManager,
     DocumentRepository documentRepository,
+    CampaignRepository campaignRepository,
   ) = ProposalRepositoryImpl;
 
   Future<List<String>> addFavoriteProposal(String proposalId);
@@ -103,10 +102,12 @@ abstract interface class ProposalRepository {
 final class ProposalRepositoryImpl implements ProposalRepository {
   final SignedDocumentManager _signedDocumentManager;
   final DocumentRepository _documentRepository;
+  final CampaignRepository _campaignRepository;
 
   const ProposalRepositoryImpl(
     this._signedDocumentManager,
     this._documentRepository,
+    this._campaignRepository,
   );
 
   @override
@@ -373,9 +374,12 @@ final class ProposalRepositoryImpl implements ProposalRepository {
       documentData: documentData,
       templateData: documentTemplate,
     );
+    final categoryId =
+        _campaignRepository.getCategory(document.metadata.categoryId!);
 
     return BaseProposalData(
       document: document,
+      categoryId: categoryId.selfRef,
     );
   }
 

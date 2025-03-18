@@ -2,8 +2,7 @@ import 'dart:typed_data';
 
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
-import 'package:catalyst_voices_services/src/crypto/key_derivation_service.dart';
-import 'package:catalyst_voices_services/src/user/user_service.dart';
+import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:rxdart/rxdart.dart';
 
 abstract interface class ProposalService {
@@ -11,6 +10,7 @@ abstract interface class ProposalService {
     ProposalRepository proposalRepository,
     UserService userService,
     KeyDerivationService keyDerivationService,
+    CampaignRepository campaignRepository,
   ) = ProposalServiceImpl;
 
   Future<List<String>> addFavoriteProposal(String proposalId);
@@ -98,11 +98,13 @@ final class ProposalServiceImpl implements ProposalService {
   final ProposalRepository _proposalRepository;
   final UserService _userService;
   final KeyDerivationService _keyDerivationService;
+  final CampaignRepository _campaignRepository;
 
   const ProposalServiceImpl(
     this._proposalRepository,
     this._userService,
     this._keyDerivationService,
+    this._campaignRepository,
   );
 
   @override
@@ -271,10 +273,13 @@ final class ProposalServiceImpl implements ProposalService {
           final versionIds = await _proposalRepository.queryVersionsOfId(
             id: doc.metadata.selfRef.id,
           );
+          final category =
+              _campaignRepository.getCategory(doc.metadata.categoryId!);
           final versionsData = versionIds
               .map(
                 (e) => BaseProposalData(
                   document: e,
+                  categoryId: category.selfRef,
                 ),
               )
               .toList();
@@ -287,7 +292,8 @@ final class ProposalServiceImpl implements ProposalService {
               .map((commentsCount) {
             final proposalData = ProposalData(
               document: doc,
-              categoryId: SignedDocumentRef.generateFirstRef(),
+              categoryId: category.selfRef,
+              categoryName: category.categoryText,
               versions: versionsData,
               commentsCount: commentsCount,
             );
@@ -316,9 +322,11 @@ final class ProposalServiceImpl implements ProposalService {
     )
         .switchMap((documents) async* {
       final proposals = documents.map((e) {
+        final categoryId =
+            _campaignRepository.getCategory(e.metadata.categoryId!);
         final proposalData = ProposalData(
           document: e,
-          categoryId: SignedDocumentRef.generateFirstRef(),
+          categoryId: categoryId.selfRef,
         );
         return Proposal.fromData(proposalData);
       }).toList();

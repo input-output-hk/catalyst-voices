@@ -26,15 +26,10 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     this._proposalService,
   ) : super(const WorkspaceState()) {
     on<LoadProposalsEvent>(_loadProposals);
-    on<TabChangedEvent>(_handleTabChange);
     on<ImportProposalEvent>(_importProposal);
+    on<ErrorLoadProposalsEvent>(_errorLoadProposals);
     on<WatchUserProposalsEvent>(
       _watchUserProposals,
-    );
-    on<SearchQueryChangedEvent>(
-      _handleQueryChange,
-      // TODO(damian-molinski): implement debounce
-      transformer: null,
     );
   }
 
@@ -45,24 +40,12 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     return super.close();
   }
 
-  Future<void> _handleQueryChange(
-    SearchQueryChangedEvent event,
+  Future<void> _errorLoadProposals(
+    ErrorLoadProposalsEvent event,
     Emitter<WorkspaceState> emit,
   ) async {
-    // TODO(damian-molinski): implement filtering of _proposals
-
-    final query = event.query;
-
-    emit(state.copyWith(searchQuery: query));
-  }
-
-  Future<void> _handleTabChange(
-    TabChangedEvent event,
-    Emitter<WorkspaceState> emit,
-  ) async {
-    // TODO(damian-molinski): implement filtering of _proposals
-
-    emit(state.copyWith(tab: event.tab));
+    _logger.info('Error loading proposals');
+    emit(state.copyWith(error: Optional(event.error)));
   }
 
   Future<void> _importProposal(
@@ -84,10 +67,7 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
   ) async {
     emit(
       state.copyWith(
-        isLoading: true,
-        draftProposalCount: 0,
-        finalProposalCount: 0,
-        proposals: const [],
+        isLoading: false,
         error: const Optional.empty(),
         userProposals: event.proposals,
       ),
@@ -101,8 +81,9 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
         _logger.info('Stream received ${proposals.length} proposals');
         add(LoadProposalsEvent(proposals));
       },
-      onError: (error) {
+      onError: (_) {
         if (isClosed) return;
+        add(const ErrorLoadProposalsEvent(LocalizedUnknownException()));
       },
     );
   }

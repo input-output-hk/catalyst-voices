@@ -11,6 +11,7 @@ void main() {
   late MockDocumentRepository mockDocumentRepository;
   late MockProposalRepository mockProposalRepository;
   late MockUserService mockUserService;
+  late MockCampaignRepository mockCampaignRepository;
   late MockKeyDerivationService mockKeyDerivationService;
 
   late ProposalService proposalService;
@@ -19,12 +20,14 @@ void main() {
     mockDocumentRepository = MockDocumentRepository();
     mockProposalRepository = MockProposalRepository();
     mockKeyDerivationService = MockKeyDerivationService();
+    mockCampaignRepository = MockCampaignRepository();
     mockUserService = MockUserService();
 
     proposalService = ProposalService(
       mockProposalRepository,
       mockUserService,
       mockKeyDerivationService,
+      mockCampaignRepository,
     );
 
     registerFallbackValue(const SignedDocumentRef(id: 'fallback-id'));
@@ -222,6 +225,8 @@ void main() {
     );
   });
 }
+
+class MockCampaignRepository extends Mock implements CampaignRepository {}
 
 class MockDocumentRepository extends Mock implements DocumentRepository {}
 
