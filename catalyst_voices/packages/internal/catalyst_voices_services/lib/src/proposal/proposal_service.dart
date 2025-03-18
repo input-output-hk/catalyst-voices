@@ -308,13 +308,11 @@ final class ProposalServiceImpl implements ProposalService {
   }
 
   @override
-  Stream<List<Proposal>> watchUserProposals() {
-    return _proposalRepository
+  Stream<List<Proposal>> watchUserProposals() async* {
+    final userCatalystId = await _getUserCatalystId();
+    yield* _proposalRepository
         .watchUserProposals(
-      userCatalystId: CatalystId(
-        host: '',
-        role0Key: Uint8List.fromList(List.filled(32, 0)),
-      ),
+      userCatalystId: userCatalystId,
     )
         .switchMap((documents) async* {
       final proposals = documents.map((e) async {
@@ -328,6 +326,20 @@ final class ProposalServiceImpl implements ProposalService {
       }).toList();
       yield await Future.wait(proposals);
     });
+  }
+
+  Future<CatalystId> _getUserCatalystId() async {
+    final account = _userService.user.activeAccount;
+    if (account == null) {
+      throw StateError(
+        'Cannot obtain proposer credentials, account missing',
+      );
+    }
+
+    return account.catalystId.copyWith(
+      role: const Optional(AccountRole.proposer),
+      rotation: const Optional(0),
+    );
   }
 
   Future<void> _useProposerRoleCredentials(
