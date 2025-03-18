@@ -59,6 +59,9 @@ class _Actions extends StatelessWidget {
 }
 
 class _ProposalCommentBuilderState extends State<ProposalCommentBuilder> {
+  final _formKey = GlobalKey<FormState>();
+  final _focusNode = FocusScopeNode();
+
   late DocumentBuilder _builder;
   late Document _comment;
 
@@ -75,24 +78,28 @@ class _ProposalCommentBuilderState extends State<ProposalCommentBuilder> {
           const SizedBox(width: 16),
           Expanded(
             child: Form(
+              key: _formKey,
               autovalidateMode: AutovalidateMode.onUserInteraction,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  for (final property in _comment.properties)
-                    DocumentPropertyBuilder(
-                      key: ValueKey(property.nodeId),
-                      property: property,
-                      isEditMode: true,
-                      onChanged: _handlePropertyChanges,
+              child: FocusScope(
+                node: _focusNode,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    for (final property in _comment.properties)
+                      DocumentPropertyBuilder(
+                        key: ValueKey(property.nodeId),
+                        property: property,
+                        isEditMode: true,
+                        onChanged: _handlePropertyChanges,
+                      ),
+                    const SizedBox(height: 4),
+                    _Actions(
+                      onSubmitTap: _submit,
+                      onCancelTap: widget.onCancelTap,
+                      showCancel: widget.showCancel,
                     ),
-                  const SizedBox(height: 4),
-                  _Actions(
-                    onSubmitTap: _submit,
-                    onCancelTap: widget.onCancelTap,
-                    showCancel: widget.showCancel,
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
@@ -109,6 +116,12 @@ class _ProposalCommentBuilderState extends State<ProposalCommentBuilder> {
       _builder = DocumentBuilder.fromSchema(schema: widget.schema);
       _comment = _builder.build();
     }
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _focusNode.dispose();
   }
 
   @override
@@ -133,14 +146,17 @@ class _ProposalCommentBuilderState extends State<ProposalCommentBuilder> {
       return;
     }
 
-    final catalystId = context.read<SessionCubit>().state.account?.catalystId;
-    assert(catalystId != null, 'No active account found!');
+    // TODO(damian-molinski): uncomment
+    // final catalystId = context.read<SessionCubit>().state.account?.catalystId;
+    // assert(catalystId != null, 'No active account found!');
 
     final cubit = context.read<ProposalCubit>();
 
     unawaited(cubit.submitComment(document: _comment, parent: widget.parent));
 
     setState(() {
+      _formKey.currentState?.reset();
+      _focusNode.unfocus();
       _builder = DocumentBuilder.fromSchema(schema: widget.schema);
       _comment = _builder.build();
     });
