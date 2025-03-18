@@ -36,6 +36,7 @@ class _WorkspacePageState extends State<WorkspacePage>
                 WorkspaceUserProposalsSelector(),
               ],
             ),
+            SizedBox(height: 50),
           ],
         ),
       ),

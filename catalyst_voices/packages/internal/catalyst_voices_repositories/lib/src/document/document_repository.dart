@@ -284,7 +284,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
             data: documentData,
             refData: templateData,
           );
-        }),
+        }).toList(),
       );
       return results;
     });
@@ -314,7 +314,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
             data: documentData,
             refData: templateData,
           );
-        }),
+        }).toList(),
       );
       return results;
     });

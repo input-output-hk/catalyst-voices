@@ -104,7 +104,7 @@ void main() {
       ).thenAnswer((_) => Stream.fromIterable([5]));
 
       when(() => mockCampaignRepository.getCategory(any())).thenReturn(
-        staticCampaignCategories.first,
+        Future.value(staticCampaignCategories.first),
       );
 
       // Execute
@@ -202,7 +202,7 @@ void main() {
         ).thenAnswer((_) => Future.value([proposalData2]));
 
         when(() => mockCampaignRepository.getCategory(any())).thenReturn(
-          staticCampaignCategories.first,
+          Future.value(staticCampaignCategories.first),
         );
 
         final commentsStream1 =
