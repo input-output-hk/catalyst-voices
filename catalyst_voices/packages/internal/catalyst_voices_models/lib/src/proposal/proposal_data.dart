@@ -19,7 +19,7 @@ class BaseProposalData extends Equatable {
     return ProposalVersion(
       selfRef: document.metadata.selfRef,
       title: getProposalTitle(document) ?? '',
-      createdAt: UuidUtils.dateTime(
+      createdAt: UuidV7.parseDateTime(
         document.metadata.selfRef.version ?? document.metadata.selfRef.id,
       ),
       // TODO(LynxLynxx): from where we need to get the real status
