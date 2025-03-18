@@ -336,10 +336,7 @@ final class ProposalServiceImpl implements ProposalService {
       );
     }
 
-    return account.catalystId.copyWith(
-      role: const Optional(AccountRole.proposer),
-      rotation: const Optional(0),
-    );
+    return account.catalystId;
   }
 
   Future<void> _useProposerRoleCredentials(

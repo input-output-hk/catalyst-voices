@@ -127,15 +127,17 @@ final class ProposalsCubit extends Cubit<ProposalsState> {
       // await _proposalService.getProposal(id: proposalId);
 
       // TODO(LynxLynxx): to mock data. remove after implementing db
+      final id = SignedDocumentRef(id: proposalId);
       final proposal = state.allProposals.items.first.copyWith(
-        id: proposalId,
+        id: id,
         isFavorite: isFavorite,
       );
       await _favorite(isFavorite, proposal);
     } else {
       // TODO(LynxLynxx): to mock data. remove after implementing db
+      final id = SignedDocumentRef(id: proposalId);
       final proposal = state.allProposals.items.first.copyWith(
-        id: proposalId,
+        id: id,
         isFavorite: isFavorite,
       );
       await _favorite(isFavorite, proposal);

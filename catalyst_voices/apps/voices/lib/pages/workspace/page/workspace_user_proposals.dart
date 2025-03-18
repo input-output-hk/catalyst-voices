@@ -4,7 +4,7 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-typedef UserProposalsSelectorBuilder = ({bool show, List<Proposal> proposals});
+typedef UserProposalsSelectorState = ({bool show, List<Proposal> proposals});
 
 class WorkspaceUserProposalsSelector extends StatelessWidget {
   const WorkspaceUserProposalsSelector({super.key});
@@ -12,7 +12,7 @@ class WorkspaceUserProposalsSelector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocSelector<WorkspaceBloc, WorkspaceState,
-        UserProposalsSelectorBuilder>(
+        UserProposalsSelectorState>(
       selector: (state) => (
         proposals: state.userProposals,
         show: state.showProposals,
