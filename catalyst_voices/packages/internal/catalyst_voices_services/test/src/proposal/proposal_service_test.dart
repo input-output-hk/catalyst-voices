@@ -62,6 +62,7 @@ void main() {
             id: proposalId1,
             version: versionId1,
           ),
+          categoryId: SignedDocumentRef.generateFirstRef(),
         ),
         document: const Document(
           schema: proposalTemplate,
@@ -74,6 +75,7 @@ void main() {
             id: proposalId2,
             version: versionId1,
           ),
+          categoryId: SignedDocumentRef.generateFirstRef(),
         ),
         document: const Document(
           schema: proposalTemplate,
@@ -100,6 +102,10 @@ void main() {
           type: DocumentType.commentTemplate,
         ),
       ).thenAnswer((_) => Stream.fromIterable([5]));
+
+      when(() => mockCampaignRepository.getCategory(any())).thenReturn(
+        staticCampaignCategories.first,
+      );
 
       // Execute
       final proposals = await proposalService.watchLatestProposals().first;
@@ -155,6 +161,7 @@ void main() {
         final proposalData1 = ProposalDocument(
           metadata: ProposalMetadata(
             selfRef: proposalRef1,
+            categoryId: SignedDocumentRef.generateFirstRef(),
           ),
           document: const Document(
             schema: proposalTemplate,
@@ -165,6 +172,7 @@ void main() {
         final proposalData2 = ProposalDocument(
           metadata: ProposalMetadata(
             selfRef: proposalRef2,
+            categoryId: SignedDocumentRef.generateFirstRef(),
           ),
           document: const Document(
             schema: proposalTemplate,
@@ -192,6 +200,10 @@ void main() {
             id: proposalRef2.id,
           ),
         ).thenAnswer((_) => Future.value([proposalData2]));
+
+        when(() => mockCampaignRepository.getCategory(any())).thenReturn(
+          staticCampaignCategories.first,
+        );
 
         final commentsStream1 =
             Stream.fromIterable([5, 10]).asBroadcastStream();
