@@ -116,9 +116,10 @@ final class ProposalsCubit extends Cubit<ProposalsState> {
     String proposalId, {
     required bool isFavorite,
   }) async {
+    final ref = SignedDocumentRef(id: proposalId);
     if (isFavorite) {
       // ignore: unused_local_variable
-      final favIds = await _proposalService.addFavoriteProposal(proposalId);
+      final favIds = await _proposalService.addFavoriteProposal(ref: ref);
       // TODO(LynxLynxx): to mock data. remove after implementing db
       final favoritesIds = [...state.favoritesIds, proposalId];
       emit(state.copyWith(favoritesIds: favoritesIds));
@@ -139,7 +140,7 @@ final class ProposalsCubit extends Cubit<ProposalsState> {
         isFavorite: isFavorite,
       );
       await _favorite(isFavorite, proposal);
-      await _proposalService.removeFavoriteProposal(proposalId);
+      await _proposalService.removeFavoriteProposal(ref: ref);
       // TODO(LynxLynxx): to mock data. remove after implementing db
       final favoritesIds = [...state.favoritesIds]..remove(proposalId);
 

@@ -14,7 +14,9 @@ abstract interface class ProposalService {
     KeyDerivationService keyDerivationService,
   ) = ProposalServiceImpl;
 
-  Future<List<String>> addFavoriteProposal(String proposalId);
+  Future<void> addFavoriteProposal({
+    required DocumentRef ref,
+  });
 
   /// Creates a new proposal draft locally.
   Future<DraftRef> createDraftProposal({
@@ -37,7 +39,7 @@ abstract interface class ProposalService {
     required DocumentData document,
   });
 
-  /// Fetches favorites proposals ids of the user
+  /// Similar to [watchFavoritesProposalsIds] stops after first emit.
   Future<List<String>> getFavoritesProposalsIds();
 
   Future<ProposalData> getProposal({
@@ -74,7 +76,9 @@ abstract interface class ProposalService {
     required DocumentData document,
   });
 
-  Future<List<String>> removeFavoriteProposal(String proposalId);
+  Future<void> removeFavoriteProposal({
+    required DocumentRef ref,
+  });
 
   /// Submits a proposal draft into review.
   Future<void> submitProposalForReview({
@@ -89,6 +93,14 @@ abstract interface class ProposalService {
     required SignedDocumentRef template,
     required SignedDocumentRef categoryId,
   });
+
+  /// Emits when proposal fav status changes.
+  Stream<bool> watchFavoritesProposal({
+    required DocumentRef ref,
+  });
+
+  /// Fetches favorites proposals ids of the user
+  Stream<List<String>> watchFavoritesProposalsIds();
 
   Stream<List<Proposal>> watchLatestProposals({int? limit});
 }
@@ -107,8 +119,11 @@ final class ProposalServiceImpl implements ProposalService {
   );
 
   @override
-  Future<List<String>> addFavoriteProposal(String proposalId) async {
-    return _proposalRepository.addFavoriteProposal(proposalId);
+  Future<void> addFavoriteProposal({required DocumentRef ref}) {
+    return _documentRepository.updateDocumentFavourite(
+      ref: ref,
+      isFavourite: true,
+    );
   }
 
   @override
@@ -148,9 +163,11 @@ final class ProposalServiceImpl implements ProposalService {
   }
 
   @override
-  Future<List<String>> getFavoritesProposalsIds() async {
-    final proposalsIds = await _proposalRepository.getFavoritesProposalsIds();
-    return proposalsIds;
+  Future<List<String>> getFavoritesProposalsIds() {
+    return _documentRepository
+        .watchAllDocumentsFavouriteRefs(type: DocumentType.proposalDocument)
+        .map((event) => event.map((e) => e.id).toList())
+        .first;
   }
 
   @override
@@ -236,8 +253,11 @@ final class ProposalServiceImpl implements ProposalService {
   }
 
   @override
-  Future<List<String>> removeFavoriteProposal(String proposalId) async {
-    return _proposalRepository.removeFavoriteProposal(proposalId);
+  Future<void> removeFavoriteProposal({required DocumentRef ref}) {
+    return _documentRepository.updateDocumentFavourite(
+      ref: ref,
+      isFavourite: false,
+    );
   }
 
   @override
@@ -276,6 +296,18 @@ final class ProposalServiceImpl implements ProposalService {
         content: content,
       ),
     );
+  }
+
+  @override
+  Stream<bool> watchFavoritesProposal({required DocumentRef ref}) {
+    return _documentRepository.watchDocumentsFavourite(ref: ref);
+  }
+
+  @override
+  Stream<List<String>> watchFavoritesProposalsIds() {
+    return _documentRepository
+        .watchAllDocumentsFavouriteRefs()
+        .map((event) => event.map((e) => e.id).toList());
   }
 
   @override

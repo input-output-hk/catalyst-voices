@@ -34,10 +34,6 @@ abstract interface class ProposalRepository {
     DocumentRepository documentRepository,
   ) = ProposalRepositoryImpl;
 
-  Future<List<String>> addFavoriteProposal(String proposalId);
-
-  Future<List<String>> getFavoritesProposalsIds();
-
   Future<ProposalData> getProposal({
     required DocumentRef ref,
   });
@@ -62,8 +58,6 @@ abstract interface class ProposalRepository {
     required CatalystId catalystId,
     required CatalystPrivateKey privateKey,
   });
-
-  Future<List<String>> removeFavoriteProposal(String proposalId);
 }
 
 final class ProposalRepositoryImpl implements ProposalRepository {
@@ -74,18 +68,6 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     this._signedDocumentManager,
     this._documentRepository,
   );
-
-  @override
-  Future<List<String>> addFavoriteProposal(String proposalId) async {
-    // TODO(LynxLynxx): add proposal to favorites
-    return getFavoritesProposalsIds();
-  }
-
-  @override
-  Future<List<String>> getFavoritesProposalsIds() async {
-    // TODO(LynxLynxx): read db to get favorites proposals ids
-    return <String>[];
-  }
 
   @override
   Future<ProposalData> getProposal({
@@ -234,12 +216,6 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     await _documentRepository.publishDocument(document: signedDocument);
   }
 
-  @override
-  Future<List<String>> removeFavoriteProposal(String proposalId) async {
-    // TODO(LynxLynxx): remove proposal from favorites
-    return getFavoritesProposalsIds();
-  }
-
   SignedDocumentMetadata _createProposalMetadata(
     DocumentDataMetadata metadata,
   ) {
@@ -263,28 +239,29 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   Future<ProposalsSearchResult> _getFavoritesProposalsSearchResult(
     ProposalPaginationRequest request,
   ) async {
-    final favoritesIds = await getFavoritesProposalsIds();
+    final favoritesRefs = await _documentRepository
+        .watchAllDocumentsFavouriteRefs(type: DocumentType.proposalDocument)
+        .first;
     final proposals = <Proposal>[];
     final range = PagingRange.calculateRange(
       pageKey: request.pageKey,
       itemsPerPage: request.pageSize,
-      maxResults: favoritesIds.length,
+      maxResults: favoritesRefs.length,
     );
-    if (favoritesIds.isEmpty) {
+    if (favoritesRefs.isEmpty) {
       return const ProposalsSearchResult(
         maxResults: 0,
         proposals: [],
       );
     }
     for (var i = range.from; i <= range.to; i++) {
-      final ref = SignedDocumentRef(id: favoritesIds[i]);
-      final proposalData = await getProposal(ref: ref);
+      final proposalData = await getProposal(ref: favoritesRefs[i]);
       final proposal = Proposal.fromData(proposalData);
       proposals.add(proposal);
     }
 
     return ProposalsSearchResult(
-      maxResults: favoritesIds.length,
+      maxResults: favoritesRefs.length,
       proposals: proposals,
     );
   }
