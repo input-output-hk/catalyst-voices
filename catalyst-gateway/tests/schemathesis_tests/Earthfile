@@ -40,43 +40,7 @@ package-schemathesis:
 
     SAVE IMAGE schemathesis:$tag
 
-# schemathesis image that targets all the endpoints in the schema
-nightly-package-draft-schemathesis:
-    FROM python:3.12-alpine3.20
-    ARG api_spec
-    ARG wait_for_schema
-    ARG max_response_time
-    ARG hypothesis_max_examples
-    ARG seed # optional argument that can be used to pass a --hypothesis-seed to replicate specific test failures
-    ARG version=3.39.8
-    ARG tag="draft-latest"
-
-    RUN apk add --no-cache gcc musl-dev
-    RUN python -m pip install schemathesis==$version
-    RUN mkdir /results
-    COPY ./hooks/hooks.py .
-    VOLUME /results
-
-    ENTRYPOINT export SCHEMATHESIS_HOOKS=hooks \
-                && st run --checks=all $api_spec \
-                    --exclude-checks=ignored_auth \ # overridden check with ignored_auth_custom
-                    --exclude-checks=negative_data_rejection \ # overridden check with negative_data_rejection_custom
-                    --workers=2 \
-                    --wait-for-schema=$wait_for_schema \
-                    --max-response-time=$max_response_time \
-                    --hypothesis-max-examples=$hypothesis_max_examples \
-                    --data-generation-method=all \
-                    --exclude-deprecated \
-                    --force-schema-version=30 \
-                    --show-trace \
-                    --force-color  \
-                    --junit-xml=/results/junit-report.xml \
-                    --cassette-path=/results/cassette.yaml \
-                    $seed
-
-    SAVE IMAGE schemathesis:$tag
-
-# test-ci-schemathesis - Runs schemathesis in CI only on versioned endpoints
+# test-ci-schemathesis - Runs schemathesis in CI
 test-ci-schemathesis:
     FROM earthly/dind:alpine-3.19-docker-25.0.5-r0
     LET api_spec="http://0.0.0.0:3030/docs/cat-gateway.json"
@@ -109,46 +73,7 @@ test-ci-schemathesis:
             exit 1
     END
 
-
-# nightly-test-draft-schemathesis - Runs schemathesis on nightly testing all the endpoints in the api doc
-nightly-test-draft-schemathesis:
-    FROM earthly/dind:alpine-3.19-docker-25.0.5-r0
-    RUN apk update && apk add iptables-legacy # workaround for https://github.com/earthly/earthly/issues/3784
-    LET api_spec="http://0.0.0.0:3030/docs/cat-gateway.json"
-    ARG wait_for_schema=120
-    ARG max_response_time=300
-    ARG hypothesis_max_examples=1000
-    ARG seed
-
-    COPY ./../+docker-compose/docker-compose.yml .
-
-    WITH DOCKER \
-        --compose docker-compose.yml \
-        --load schemathesis:latest=(+nightly-package-draft-schemathesis --api_spec=$api_spec --seed=$seed \
-                                    --wait_for_schema=$wait_for_schema --max_response_time=$max_response_time \
-                                    --hypothesis_max_examples=$hypothesis_max_examples) \
-        --load event-db:latest=(../../event-db+build) \
-        --load cat-gateway-with-scylla:latest=(./../+package-cat-gateway-with-scylla) \
-        --service cat-gateway-with-scylla \
-        --allow-privileged
-        # --no-cache is only for running in nightly - DO NOT use this in CI
-        RUN --no-cache sleep 130; docker run --net=host --name=st schemathesis:latest || echo fail > fail; \
-            docker cp st:/results/junit-report.xml junit-report.xml && \
-            docker cp st:/results/cassette.yaml cassette.yaml && \
-            docker-compose logs cat-gateway > ./cat-gateway.log && zstd -9 cat-gateway.log; \
-            docker container logs -n all scylla-node
-    END
-    WAIT
-        SAVE ARTIFACT junit-report.xml AS LOCAL schemathesis-nightly.junit-report.xml
-        SAVE ARTIFACT cassette.yaml AS LOCAL cassette.yaml
-        SAVE ARTIFACT cat-gateway.log.zst AS LOCAL cat-gateway.log.zst
-    END
-    IF [ -f fail ]
-        RUN --no-cache echo "Nightly schemathesis test failed. Check the logs for more details" && \
-            exit 1
-    END
-
-# nightly-test-dev-schemathesis - Runs schemathesis on nightly testing the versioned endpoints on dev envrionment
+# nightly-test-dev-schemathesis - Runs schemathesis on nightly dev envrionment
 nightly-test-dev-schemathesis:
     FROM earthly/dind:alpine-3.19-docker-25.0.5-r0
     RUN apk update && apk add iptables-legacy curl zstd # workaround for https://github.com/earthly/earthly/issues/3784
