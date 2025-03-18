@@ -16,6 +16,8 @@ final class CommentWithReplies extends Equatable {
       : replies = const [],
         depth = 1;
 
+  SignedDocumentRef get ref => comment.metadata.selfRef;
+
   @override
   List<Object?> get props => [
         comment,

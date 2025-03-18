@@ -7,12 +7,16 @@ final class ProposalViewData extends Equatable {
   final ProposalViewHeader header;
   final List<Segment> segments;
   final ProposalCommentsSort commentsSort;
+  final Map<DocumentRef, bool> showReplies;
+  final Map<DocumentRef, bool> showReplyBuilder;
 
   const ProposalViewData({
     this.isCurrentVersionLatest,
     this.header = const ProposalViewHeader(),
     this.segments = const [],
     this.commentsSort = ProposalCommentsSort.newest,
+    this.showReplies = const {},
+    this.showReplyBuilder = const {},
   });
 
   @override
@@ -21,6 +25,8 @@ final class ProposalViewData extends Equatable {
         header,
         segments,
         commentsSort,
+        showReplies,
+        showReplyBuilder,
       ];
 
   ProposalViewData addComment(CommentDocument comment) {
@@ -41,6 +47,8 @@ final class ProposalViewData extends Equatable {
     ProposalViewHeader? header,
     List<Segment>? segments,
     ProposalCommentsSort? commentsSort,
+    Map<DocumentRef, bool>? showReplies,
+    Map<DocumentRef, bool>? showReplyBuilder,
   }) {
     return ProposalViewData(
       isCurrentVersionLatest: isCurrentVersionLatest.dataOr(
@@ -49,6 +57,8 @@ final class ProposalViewData extends Equatable {
       header: header ?? this.header,
       segments: segments ?? this.segments,
       commentsSort: commentsSort ?? this.commentsSort,
+      showReplies: showReplies ?? this.showReplies,
+      showReplyBuilder: showReplyBuilder ?? this.showReplyBuilder,
     );
   }
 }

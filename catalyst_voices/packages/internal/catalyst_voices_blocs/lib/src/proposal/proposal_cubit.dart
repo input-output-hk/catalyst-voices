@@ -114,6 +114,32 @@ final class ProposalCubit extends Cubit<ProposalState>
     // TODO(damian-molinski): send document
   }
 
+  void updateCommentBuilder({
+    required SignedDocumentRef ref,
+    required bool show,
+  }) {
+    final showReplyBuilder = Map.of(state.data.showReplyBuilder);
+
+    showReplyBuilder[ref] = show;
+
+    final updatedData = state.data.copyWith(showReplyBuilder: showReplyBuilder);
+
+    emit(state.copyWith(data: updatedData));
+  }
+
+  void updateCommentReplies({
+    required SignedDocumentRef ref,
+    required bool show,
+  }) {
+    final showReplies = Map.of(state.data.showReplies);
+
+    showReplies[ref] = show;
+
+    final updatedData = state.data.copyWith(showReplies: showReplies);
+
+    emit(state.copyWith(data: updatedData));
+  }
+
   void updateCommentsSort({required ProposalCommentsSort sort}) {
     final data = state.data;
     final segments = data.segments.sortWith(sort: sort).toList();
