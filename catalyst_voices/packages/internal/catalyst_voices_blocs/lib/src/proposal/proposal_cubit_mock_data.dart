@@ -53,7 +53,6 @@ List<CommentWithReplies> _buildComments() {
             message: 'Don’t talk about fight club',
             selfRef: buildRefAt(now.subtract(const Duration(hours: 2))),
           ),
-          replies: const [],
           depth: 2,
         ),
         CommentWithReplies(
@@ -62,14 +61,13 @@ List<CommentWithReplies> _buildComments() {
             message: 'Quiet!',
             selfRef: buildRefAt(now.subtract(const Duration(hours: 1))),
           ),
-          replies: const [],
           depth: 2,
         ),
       ],
       depth: 1,
     ),
-    CommentWithReplies(
-      comment: _buildComment(
+    CommentWithReplies.direct(
+      _buildComment(
         message: 'This proposal embodies a bold and disruptive vision that '
             'aligns with the decentralised ethos of the Cardano ecosystem. '
             'The focus on empowering individuals through grassroots action '
@@ -80,8 +78,6 @@ List<CommentWithReplies> _buildComments() {
             'seeing its impact.',
         selfRef: buildRefAt(now.subtract(const Duration(hours: 5))),
       ),
-      replies: const [],
-      depth: 1,
     ),
   ];
 }

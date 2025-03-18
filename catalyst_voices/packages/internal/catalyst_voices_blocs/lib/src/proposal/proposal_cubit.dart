@@ -105,7 +105,7 @@ final class ProposalCubit extends Cubit<ProposalState>
 
     final data = state.data;
 
-    final updatedData = data.copyWith();
+    final updatedData = data.addComment(comment);
 
     emit(state.copyWith(data: updatedData));
 
