@@ -25,7 +25,7 @@ class NextStep extends StatelessWidget {
             child: Text(
           context.l10n.yourNextStep,
           key: const Key('NextStepText'),
-        )),
+        ),),
         const SizedBox(height: 12),
         if (data != null) ...[
           Text(

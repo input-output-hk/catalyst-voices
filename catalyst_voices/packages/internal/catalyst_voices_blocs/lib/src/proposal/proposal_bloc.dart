@@ -73,9 +73,10 @@ final class ProposalBloc extends Bloc<ProposalEvent, ProposalState>
     /* cSpell:disable */
     final versions = proposal.versions.mapIndexed((index, version) {
       return DocumentVersion(
-        id: version,
+        id: version.document.metadata.selfRef.version ?? '',
         number: index + 1,
-        isCurrent: version == proposalDocumentRef.version,
+        isCurrent: version.document.metadata.selfRef.version ==
+            proposalDocumentRef.version,
         isLatest: index == proposal.versions.length - 1,
       );
     }).toList();

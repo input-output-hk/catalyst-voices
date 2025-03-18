@@ -312,7 +312,7 @@ void main() async {
       await WalletListPanel($).clickBack();
       await LinkWalletInfoPanel($).verifyInfoPanel();
     });
-  }, skip: true);
+  }, skip: true,);
 
   group(
     'Onboarding -',

@@ -1,7 +1,5 @@
-import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
 import '../../../utils/translations_utils.dart';
 import '../onboarding_base_page.dart';
 import 'step_3_setup_base_profile.dart';

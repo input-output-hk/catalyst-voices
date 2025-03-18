@@ -40,7 +40,6 @@ class InputSeedphrasePanel extends OnboardingPageBase {
 
   Future<void> clickResetButton() async {
     await $(resetButton).tap();
-    await Future.delayed(const Duration(seconds: 3));
   }
 
   Future<void> verifyInfoPanel() async {
