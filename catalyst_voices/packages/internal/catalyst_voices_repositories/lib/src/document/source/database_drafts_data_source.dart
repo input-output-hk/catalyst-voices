@@ -87,6 +87,7 @@ final class DatabaseDraftsDataSource implements DraftDataSource {
       limit: limit,
       unique: unique,
       type: type,
+      catalystId: catalystId,
     )
         .map((event) {
       final list = List<DocumentData>.from(event.map((e) => e.toModel()));

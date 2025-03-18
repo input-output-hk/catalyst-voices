@@ -39,6 +39,10 @@ final class DocumentDataMetadata extends Equatable {
   /// "Products & Integrations".
   final SignedDocumentRef? categoryId;
 
+  /// List of String representation of CatalystId of users
+  /// who are authors of this document
+  final List<String> signers;
+
   DocumentDataMetadata({
     required this.type,
     required this.selfRef,
@@ -49,6 +53,7 @@ final class DocumentDataMetadata extends Equatable {
     this.campaignId,
     this.electionId,
     this.categoryId,
+    this.signers = const [],
   }) : assert(
           selfRef.isExact,
           'selfRef have to be exact. Make sure version is not null',
@@ -67,6 +72,7 @@ final class DocumentDataMetadata extends Equatable {
         campaignId,
         electionId,
         categoryId,
+        signers,
       ];
 
   String get version => selfRef.version!;
@@ -81,6 +87,7 @@ final class DocumentDataMetadata extends Equatable {
     Optional<String>? campaignId,
     Optional<String>? electionId,
     Optional<SignedDocumentRef>? categoryId,
+    List<String>? signers,
   }) {
     return DocumentDataMetadata(
       type: type ?? this.type,
@@ -92,6 +99,7 @@ final class DocumentDataMetadata extends Equatable {
       campaignId: campaignId.dataOr(this.campaignId),
       electionId: electionId.dataOr(this.electionId),
       categoryId: categoryId.dataOr(this.categoryId),
+      signers: signers ?? this.signers,
     );
   }
 }

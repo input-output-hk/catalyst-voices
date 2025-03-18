@@ -62,6 +62,7 @@ void main() {
             id: proposalId1,
             version: versionId1,
           ),
+          signers: const [],
           templateRef: SignedDocumentRef.generateFirstRef(),
           categoryId: SignedDocumentRef.generateFirstRef(),
         ),
@@ -76,6 +77,7 @@ void main() {
             id: proposalId2,
             version: versionId1,
           ),
+          signers: const [],
           templateRef: SignedDocumentRef.generateFirstRef(),
           categoryId: SignedDocumentRef.generateFirstRef(),
         ),
@@ -165,6 +167,7 @@ void main() {
             selfRef: proposalRef1,
             templateRef: SignedDocumentRef.generateFirstRef(),
             categoryId: SignedDocumentRef.generateFirstRef(),
+            signers: const [],
           ),
           document: const Document(
             schema: proposalTemplate,
@@ -177,6 +180,7 @@ void main() {
             selfRef: proposalRef2,
             templateRef: SignedDocumentRef.generateFirstRef(),
             categoryId: SignedDocumentRef.generateFirstRef(),
+            signers: const [],
           ),
           document: const Document(
             schema: proposalTemplate,
