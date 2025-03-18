@@ -1,6 +1,6 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
-    "$id": "https://cardano.org/schemas/catalyst/f14/proposal",
+    "$id": "https://raw.githubusercontent.com/input-output-hk/catalyst-voices/refs/heads/main/docs/src/architecture/08_concepts/document_templates/proposal/F14-Generic/0ce8ab38-9258-4fbc-a62e-7faa6e58318f.schema.json",
     "title": "F14 Submission Form",
     "description": "Schema for the F14 Catalyst Proposal Submission Form",
     "maintainers": [
@@ -27,6 +27,65 @@
             "$comment": "UI - Logical Document Section Break.",
             "type": "object",
             "additionalProperties": false,
+            "properties": {
+                "title": {
+                    "type": "object"
+                },
+                "proposer": {
+                    "type": "object"
+                },
+                "budget": {
+                    "type": "object"
+                },
+                "time": {
+                    "type": "object"
+                },
+                "translation": {
+                    "type": "object"
+                },
+                "problem": {
+                    "type": "object"
+                },
+                "solution": {
+                    "type": "object"
+                },
+                "supportingLinks": {
+                    "type": "object"
+                },
+                "dependencies": {
+                    "type": "object"
+                },
+                "open_source": {
+                    "type": "object"
+                },
+                "category_details": {
+                    "type": "object"
+                },
+                "category_questions": {
+                    "type": "object"
+                },
+                "theme": {
+                    "type": "object"
+                },
+                "impact": {
+                    "type": "object"
+                },
+                "feasibility": {
+                    "type": "object"
+                },
+                "milestones": {
+                    "type": "object"
+                },
+                "team": {
+                    "type": "object"
+                },
+                "value": {
+                    "type": "object"
+                },
+                "mandatory": {
+                    "type": "object"
+                }
+            },
             "x-note": "Major sections of the proposal. Each segment contains sections of information grouped together."
         },
         "section": {
@@ -515,6 +574,16 @@
             "$ref": "#/definitions/segment",
             "description": "Determine the eligibility of the proposal for this category",
             "properties": {
+                "category_details": {
+                    "$ref": "#/definitions/section",
+                    "title": "Selected Category",
+                    "properties": {
+                        "details": {
+                            "type": "object",
+                            "title": "Selected Category"
+                        }
+                    }
+                },
                 "category_questions": {
                     "$ref": "#/definitions/section",
                     "title": "Category Questions",
@@ -686,6 +755,7 @@
                 }
             },
             "x-order": [
+                "category_details",
                 "category_questions"
             ]
         },
@@ -1207,6 +1277,15 @@
             ]
         }
     },
+    "required": [
+        "setup",
+        "summary",
+        "theme",
+        "details",
+        "milestones",
+        "pitch",
+        "agreements"
+    ],
     "x-order": [
         "setup",
         "summary",

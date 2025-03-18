@@ -53,40 +53,51 @@
         }
     },
     "campaign_category": {
+        "category_details": {
+            "details": {}
+        },
         "category_questions": {
             "informational_content": {
-                "answer": true
+                "answer": false
             },
             "foundational_rd": {
-                "answer": true
+                "answer": false
             },
             "financial_products": {
-                "answer": true
+                "answer": false
             },
             "early_stage_product": {
-                "answer": true
+                "answer": false
             },
             "developer_tools": {
-                "answer": true
+                "answer": false
             },
             "enterprise_partnership": {
                 "answer": true,
-                "secondary_question": {}
+                "secondary_question": {
+                    "question": "Example Enterprise with proven track record"
+                }
             },
             "working_product": {
                 "answer": true,
-                "secondary_question": {}
+                "secondary_question": {
+                    "question": "Example product with measurable adoption metrics"
+                }
             },
             "timeline": {
                 "answer": true
             },
             "matching_funds": {
                 "answer": true,
-                "secondary_question": {}
+                "secondary_question": {
+                    "question": "Example matching funds details"
+                }
             },
             "adoption_potential": {
                 "answer": true,
-                "secondary_question": {}
+                "secondary_question": {
+                    "question": "Example measurable outcomes and assessment methods"
+                }
             }
         }
     },
