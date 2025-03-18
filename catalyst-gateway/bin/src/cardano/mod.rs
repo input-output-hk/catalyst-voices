@@ -45,11 +45,8 @@ pub async fn index_db_is_ready() -> bool {
     let is_ready = CassandraSession::wait_until_ready(INDEXING_DB_READY_WAIT_INTERVAL, true)
         .await
         .is_ok();
-    if is_ready {
-        set_index_db_liveness(true);
-    } else {
-        set_index_db_liveness(false);
-    }
+    // Set the Indexing DB service liveness flag
+    set_index_db_liveness(is_ready);
     is_ready
 }
 
@@ -536,7 +533,7 @@ impl SyncTask {
                             self.start_immutable_followers();
 
                             // Update flag if this is the first time reaching TIP.
-                            if follower_has_first_reached_tip() {
+                            if !follower_has_first_reached_tip() {
                                 set_follower_first_reached_tip();
                             }
                         } else {
