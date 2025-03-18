@@ -95,7 +95,7 @@ abstract interface class ProposalService {
   });
 
   /// Emits when proposal fav status changes.
-  Stream<bool> watchFavoritesProposal({
+  Stream<bool> watchIsFavoritesProposal({
     required DocumentRef ref,
   });
 
@@ -300,7 +300,7 @@ final class ProposalServiceImpl implements ProposalService {
   }
 
   @override
-  Stream<bool> watchFavoritesProposal({required DocumentRef ref}) {
+  Stream<bool> watchIsFavoritesProposal({required DocumentRef ref}) {
     return _documentRepository.watchDocumentsFavourite(ref: ref);
   }
 

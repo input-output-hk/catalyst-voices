@@ -157,7 +157,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   }
 
   @override
-  Future<void> deleteDocumentDraft({required DraftRef ref}) async {
+  Future<void> deleteDocumentDraft({required DraftRef ref}) {
     return _drafts.delete(ref: ref);
   }
 
