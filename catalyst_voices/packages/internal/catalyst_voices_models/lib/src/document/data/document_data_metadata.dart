@@ -37,7 +37,7 @@ final class DocumentDataMetadata extends Equatable {
   /// Defines a voting category as a collection of proposals, e.g.
   /// "Development & Infrastructure",
   /// "Products & Integrations".
-  final DocumentRef? categoryId;
+  final SignedDocumentRef? categoryId;
 
   DocumentDataMetadata({
     required this.type,
@@ -80,7 +80,7 @@ final class DocumentDataMetadata extends Equatable {
     Optional<String>? brandId,
     Optional<String>? campaignId,
     Optional<String>? electionId,
-    Optional<DocumentRef>? categoryId,
+    Optional<SignedDocumentRef>? categoryId,
   }) {
     return DocumentDataMetadata(
       type: type ?? this.type,
