@@ -4,6 +4,7 @@ import 'package:catalyst_voices_repositories/src/database/catalyst_database.dart
 import 'package:catalyst_voices_repositories/src/database/dao/drafts_dao.dart';
 import 'package:drift/drift.dart' show DatabaseConnection;
 import 'package:drift/native.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:uuid_plus/uuid_plus.dart';
 
@@ -131,6 +132,46 @@ void main() {
         expect(
           allRefs,
           allOf(hasLength(refs.length), containsAll(refs)),
+        );
+      });
+
+      test('stream emits data that contains correct catalystId', () async {
+        final catalystId1 = CatalystId(host: 'test', role0Key: Uint8List(32));
+        final catalystId2 = CatalystId(host: 'test1', role0Key: Uint8List(32));
+        final catalystId3 = CatalystId(host: 'test3', role0Key: Uint8List(32));
+        // Given
+        final draft = DraftFactory.build(
+          metadata: DocumentDataMetadata(
+            type: DocumentType.proposalDocument,
+            selfRef: DraftRef.generateFirstRef(),
+            signers: [
+              catalystId1.toString(),
+              catalystId2.toString(),
+            ],
+          ),
+        );
+
+        // When
+        final documentsStream =
+            database.draftsDao.watchAll(catalystId: catalystId2);
+        final invalidCatalystIdStream =
+            database.draftsDao.watchAll(catalystId: catalystId3);
+
+        await database.draftsDao.save(draft);
+
+        // Then
+        expect(
+          documentsStream,
+          emitsInOrder([
+            equals([draft]),
+          ]),
+        );
+
+        expect(
+          invalidCatalystIdStream,
+          emitsInOrder([
+            equals([]),
+          ]),
         );
       });
     });

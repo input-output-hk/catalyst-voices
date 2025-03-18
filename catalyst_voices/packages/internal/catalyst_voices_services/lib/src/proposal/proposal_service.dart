@@ -253,6 +253,7 @@ final class ProposalServiceImpl implements ProposalService {
     required SignedDocumentRef categoryId,
   }) async {
     final catalystId = await _getUserCatalystId();
+
     await _proposalRepository.upsertDraftProposal(
       document: DocumentData(
         metadata: DocumentDataMetadata(
@@ -320,7 +321,6 @@ final class ProposalServiceImpl implements ProposalService {
     )
         .switchMap((documents) async* {
       final proposals = documents.map((e) async {
-        print(e.metadata.categoryId);
         final campaign =
             await _campaignRepository.getCategory(e.metadata.categoryId);
         final proposalData = ProposalData(

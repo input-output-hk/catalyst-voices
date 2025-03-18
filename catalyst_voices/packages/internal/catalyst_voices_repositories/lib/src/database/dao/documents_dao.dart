@@ -141,20 +141,21 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
   Future<int> countRefDocumentByType({
     required DocumentRef ref,
     required DocumentType type,
-  }) {
+  }) async {
     final query = select(documents)
       ..where(
         (row) => Expression.and([
-          row.type.equals(type.uuid),
+          row.metadata.jsonExtract<String>(r'$.type').equals(type.uuid),
+          row.metadata.jsonExtract<String>(r'$.ref.id').equals(ref.id),
+          if (ref.version != null)
+            row.metadata
+                .jsonExtract<String>(r'$.ref.version')
+                .equals(ref.version!),
         ]),
       );
 
-    return query.get().then(
-          (docs) => docs.where((doc) {
-            // TODO(damian-molinski): JSONB filter
-            return doc.metadata.ref == ref;
-          }).length,
-        );
+    final docs = await query.get();
+    return docs.length;
   }
 
   @override
@@ -254,8 +255,11 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
       query.where((doc) => doc.type.equals(type.uuid));
     }
     if (catalystId != null) {
-      // TODO(LynxLynxx): filter when catalystId is implemented as metadata
-      // query.where((doc) => doc.metadata.catalystId.equals(catalystId.uuid));
+      query.where(
+        (doc) => CustomExpression<bool>(
+          "json_extract(metadata, '\$.signers') LIKE '%$catalystId%'",
+        ),
+      );
     }
 
     return query.watch().map((documents) {
