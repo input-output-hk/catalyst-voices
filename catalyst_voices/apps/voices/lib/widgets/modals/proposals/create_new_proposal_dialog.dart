@@ -172,9 +172,7 @@ class _CreateNewProposalDialogState extends State<CreateNewProposalDialog> {
   @override
   void initState() {
     super.initState();
-     context
-            .read<NewProposalCubit>()
-            .updateTitle(const ProposalTitle.pure());
+    context.read<NewProposalCubit>().updateTitle(const ProposalTitle.pure());
   }
 
   void onTitleSubmitted(String title) {
