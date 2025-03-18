@@ -39,16 +39,19 @@ class UserProposals extends StatelessWidget {
           ),
           _ListOfProposals(
             items: submitted,
+            // TODO(LynxLynxx): add empty text message when design is ready
             emptyTextMessage: 'No submitted proposals',
           ),
           const _SharedForPublicHeader(),
           _ListOfProposals(
             items: publicDraft,
+            // TODO(LynxLynxx): add empty text message when design is ready
             emptyTextMessage: 'No public drafts',
           ),
           const _NotPublishedHeader(),
           _ListOfProposals(
             items: localDraft,
+            // TODO(LynxLynxx): add empty text message when design is ready
             emptyTextMessage: 'No local drafts',
           ),
         ],

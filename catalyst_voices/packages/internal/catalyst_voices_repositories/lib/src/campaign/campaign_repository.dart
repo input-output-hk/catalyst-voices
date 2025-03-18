@@ -8,11 +8,11 @@ abstract interface class CampaignRepository {
     required String id,
   });
 
-  List<CampaignCategory> getCampaignCategories();
+  Future<List<CampaignCategory>> getCampaignCategories();
 
-  CampaignCategory getCategory(SignedDocumentRef ref);
+  Future<CampaignCategory> getCategory(SignedDocumentRef ref);
 
-  CurrentCampaign getCurrentCampaign();
+  Future<CurrentCampaign> getCurrentCampaign();
 }
 
 final class CampaignRepositoryImpl implements CampaignRepository {
@@ -38,12 +38,12 @@ final class CampaignRepositoryImpl implements CampaignRepository {
   }
 
   @override
-  List<CampaignCategory> getCampaignCategories() {
+  Future<List<CampaignCategory>> getCampaignCategories() async {
     return staticCampaignCategories;
   }
 
   @override
-  CampaignCategory getCategory(SignedDocumentRef ref) {
+  Future<CampaignCategory> getCategory(SignedDocumentRef ref) async {
     return staticCampaignCategories.firstWhere(
       (e) => e.selfRef == ref,
       orElse: () => throw const NotFoundException(),
@@ -51,7 +51,7 @@ final class CampaignRepositoryImpl implements CampaignRepository {
   }
 
   @override
-  CurrentCampaign getCurrentCampaign() {
+  Future<CurrentCampaign> getCurrentCampaign() async {
     return CurrentCampaignX.staticContent;
   }
 }
