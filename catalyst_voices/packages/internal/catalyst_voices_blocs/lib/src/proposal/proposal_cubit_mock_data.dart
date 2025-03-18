@@ -1,5 +1,7 @@
 part of 'proposal_cubit.dart';
 
+/* cSpell:disable */
+
 // TODO(damian-molinski): delete this after integration.
 CommentDocument _buildComment({
   SignedDocumentRef? selfRef,
@@ -113,3 +115,5 @@ DocumentSchema _buildSchema() {
     ],
   );
 }
+
+/* cSpell:enable */
