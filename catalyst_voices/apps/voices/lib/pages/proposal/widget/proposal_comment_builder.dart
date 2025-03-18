@@ -109,7 +109,7 @@ class _ProposalCommentBuilderState extends State<ProposalCommentBuilder> {
   }
 
   @override
-  void didUpdateWidget(covariant ProposalCommentBuilder oldWidget) {
+  void didUpdateWidget(ProposalCommentBuilder oldWidget) {
     super.didUpdateWidget(oldWidget);
 
     if (widget.schema != oldWidget.schema) {
@@ -120,8 +120,8 @@ class _ProposalCommentBuilderState extends State<ProposalCommentBuilder> {
 
   @override
   void dispose() {
-    super.dispose();
     _focusNode.dispose();
+    super.dispose();
   }
 
   @override
@@ -134,9 +134,7 @@ class _ProposalCommentBuilderState extends State<ProposalCommentBuilder> {
 
   void _handlePropertyChanges(List<DocumentChange> changes) {
     setState(() {
-      for (final change in changes) {
-        _builder.addChange(change);
-      }
+      _builder.addChanges(changes);
       _comment = _builder.build();
     });
   }
