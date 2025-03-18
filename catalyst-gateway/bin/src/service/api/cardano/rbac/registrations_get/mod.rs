@@ -2,6 +2,7 @@
 
 pub(crate) use response::AllResponses;
 
+mod certificate_map;
 mod purpose_list;
 mod registration_chain;
 mod response;
