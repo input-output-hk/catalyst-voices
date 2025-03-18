@@ -67,8 +67,9 @@ class _SegmentsListView extends StatelessWidget {
             isLast: isLast || nextItem is ProposalCommentsSegment,
           ),
           verticalPadding: (
-            isFirst: item is Segment || item is CommentListItem,
-            isLast: nextItem is! Section && nextItem is! CommentListItem,
+            isFirst: item is Segment,
+            isLast: (nextItem is! Section && nextItem is! CommentListItem) ||
+                (item is ProposalCommentsSegment),
           ),
           child: _buildItem(context, item),
         );
