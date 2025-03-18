@@ -387,6 +387,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
 
     final metadata = ProposalMetadata(
       selfRef: documentData.metadata.selfRef,
+      templateRef: documentData.metadata.template!,
       categoryId: documentData.metadata.categoryId!,
     );
 

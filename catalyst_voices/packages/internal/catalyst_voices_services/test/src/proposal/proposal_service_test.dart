@@ -62,6 +62,7 @@ void main() {
             id: proposalId1,
             version: versionId1,
           ),
+          templateRef: SignedDocumentRef.generateFirstRef(),
           categoryId: SignedDocumentRef.generateFirstRef(),
         ),
         document: const Document(
@@ -75,6 +76,7 @@ void main() {
             id: proposalId2,
             version: versionId1,
           ),
+          templateRef: SignedDocumentRef.generateFirstRef(),
           categoryId: SignedDocumentRef.generateFirstRef(),
         ),
         document: const Document(
@@ -161,6 +163,7 @@ void main() {
         final proposalData1 = ProposalDocument(
           metadata: ProposalMetadata(
             selfRef: proposalRef1,
+            templateRef: SignedDocumentRef.generateFirstRef(),
             categoryId: SignedDocumentRef.generateFirstRef(),
           ),
           document: const Document(
@@ -172,6 +175,7 @@ void main() {
         final proposalData2 = ProposalDocument(
           metadata: ProposalMetadata(
             selfRef: proposalRef2,
+            templateRef: SignedDocumentRef.generateFirstRef(),
             categoryId: SignedDocumentRef.generateFirstRef(),
           ),
           document: const Document(
