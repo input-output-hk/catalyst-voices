@@ -1,6 +1,5 @@
 //! Implementation of the PUT `/document` endpoint
 
-use anyhow::anyhow;
 use poem_openapi::{payload::Json, ApiResponse};
 use unprocessable_content_request::PutDocumentUnprocessableContent;
 
@@ -46,72 +45,72 @@ pub(crate) type AllResponses = WithErrorResponses<Responses>;
 
 /// # PUT `/document`
 pub(crate) async fn endpoint(doc_bytes: Vec<u8>, token: CatalystRBACTokenV1) -> AllResponses {
-    match doc_bytes.as_slice().try_into() {
-        Ok(doc) => {
-            match catalyst_signed_doc::validator::validate(&doc, &DocProvider).await {
-                Ok(result) => {
-                    if !result {
-                        return Responses::UnprocessableContent(Json(
-                            PutDocumentUnprocessableContent::new(
-                                "Failed validating document integrity",
-                                serde_json::to_value(doc.problem_report()).ok(),
-                            ),
-                        ))
-                        .into();
-                    }
-                },
-                Err(e) => {
-                    // means that something happened inside the `DocProvider`, some db error.
-                    return AllResponses::handle_error(&e);
-                },
-            }
-            match catalyst_signed_doc::validator::validate_signatures(
-                &doc,
-                &VerifyingKeyProvider::from(token),
-            )
-            .await
-            {
-                Ok(result) => {
-                    if !result {
-                        return Responses::UnprocessableContent(Json(
-                            PutDocumentUnprocessableContent::new(
-                                "Failed validating document signatures",
-                                serde_json::to_value(doc.problem_report()).ok(),
-                            ),
-                        ))
-                        .into();
-                    }
-                },
-                Err(e) => {
-                    return AllResponses::handle_error(&e);
-                },
-            };
+    let Ok(doc) = doc_bytes.as_slice().try_into() else {
+        return Responses::UnprocessableContent(Json(PutDocumentUnprocessableContent::new(
+            "Invalid CBOR bytes, cannot decode Catalyst Signed Document.",
+            None,
+        )))
+        .into();
+    };
 
-            let report = doc.problem_report();
-            if report.is_problematic() {
-                return return_error_report(&report);
-            }
-
-            match store_document_in_db(&doc, doc_bytes).await {
-                Ok(true) => Responses::Created.into(),
-                Ok(false) => Responses::NoContent.into(),
-                Err(err) if err.is::<StoreError>() => {
-                    Responses::UnprocessableContent(Json(PutDocumentUnprocessableContent::new(
-                        "Document with the same `id` and `ver` already exists",
+    match catalyst_signed_doc::validator::validate(&doc, &DocProvider).await {
+        Ok(result) => {
+            if !result {
+                return Responses::UnprocessableContent(Json(
+                    PutDocumentUnprocessableContent::new(
+                        "Failed validating document integrity",
                         serde_json::to_value(doc.problem_report()).ok(),
-                    )))
-                    .into()
-                },
-                Err(err) => AllResponses::handle_error(&err),
+                    ),
+                ))
+                .into();
             }
         },
-        Err(_) => {
+        Err(e) => {
+            // means that something happened inside the `DocProvider`, some db error.
+            return AllResponses::handle_error(&e);
+        },
+    }
+    match catalyst_signed_doc::validator::validate_signatures(
+        &doc,
+        &VerifyingKeyProvider::from(token),
+    )
+    .await
+    {
+        Ok(result) => {
+            if !result {
+                return Responses::UnprocessableContent(Json(
+                    PutDocumentUnprocessableContent::new(
+                        "Failed validating document signatures",
+                        serde_json::to_value(doc.problem_report()).ok(),
+                    ),
+                ))
+                .into();
+            }
+        },
+        Err(e) => {
+            return AllResponses::handle_error(&e);
+        },
+    };
+
+    if doc.problem_report().is_problematic() {
+        return Responses::UnprocessableContent(Json(PutDocumentUnprocessableContent::new(
+            "Invalid Catalyst Signed Document",
+            serde_json::to_value(doc.problem_report()).ok(),
+        )))
+        .into();
+    }
+
+    match store_document_in_db(&doc, doc_bytes).await {
+        Ok(true) => Responses::Created.into(),
+        Ok(false) => Responses::NoContent.into(),
+        Err(err) if err.is::<StoreError>() => {
             Responses::UnprocessableContent(Json(PutDocumentUnprocessableContent::new(
-                "Invalid CBOR bytes, cannot decode Catalyst Signed Document.",
-                None,
+                "Document with the same `id` and `ver` already exists",
+                serde_json::to_value(doc.problem_report()).ok(),
             )))
             .into()
         },
+        Err(err) => AllResponses::handle_error(&err),
     }
 }
 
@@ -159,21 +158,4 @@ async fn store_document_in_db(
     FullSignedDoc::new(doc_body, payload, doc_bytes)
         .store()
         .await
-}
-
-/// Return a response with the full error report from `CatalystSignedDocError`
-fn return_error_report(report: &catalyst_signed_doc::ProblemReport) -> AllResponses {
-    let json_report = match serde_json::to_value(report) {
-        Ok(json_report) => json_report,
-        Err(e) => {
-            return AllResponses::internal_error(&anyhow!(
-                "Invalid Signed Document Problem Report, not Json encoded: {e}"
-            ))
-        },
-    };
-    Responses::UnprocessableContent(Json(PutDocumentUnprocessableContent::new(
-        "Invalid Catalyst Signed Document",
-        Some(json_report),
-    )))
-    .into()
 }
