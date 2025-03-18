@@ -92,4 +92,6 @@ class ProposalData extends BaseProposalData {
         categoryName,
         versions,
       ];
+
+  DocumentRef get templateRef => document.metadata.templateRef;
 }

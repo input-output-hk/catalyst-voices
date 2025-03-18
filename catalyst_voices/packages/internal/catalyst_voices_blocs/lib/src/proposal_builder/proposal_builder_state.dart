@@ -7,7 +7,7 @@ final class ProposalBuilderMetadata extends Equatable {
   final ProposalPublish publish;
   final DocumentRef? documentRef;
   final DocumentRef? originalDocumentRef;
-  final SignedDocumentRef? templateRef;
+  final DocumentRef? templateRef;
   final SignedDocumentRef? categoryId;
   final List<DocumentVersion> versions;
 
@@ -22,7 +22,7 @@ final class ProposalBuilderMetadata extends Equatable {
 
   factory ProposalBuilderMetadata.newDraft({
     required SignedDocumentRef templateRef,
-    required SignedDocumentRef? categoryId,
+    required SignedDocumentRef categoryId,
   }) {
     final firstRef = DraftRef.generateFirstRef();
     return ProposalBuilderMetadata(
@@ -51,7 +51,7 @@ final class ProposalBuilderMetadata extends Equatable {
     ProposalPublish? publish,
     Optional<DocumentRef>? documentRef,
     Optional<DocumentRef>? originalDocumentRef,
-    Optional<SignedDocumentRef>? templateRef,
+    Optional<DocumentRef>? templateRef,
     Optional<SignedDocumentRef>? categoryId,
     List<DocumentVersion>? versions,
   }) {

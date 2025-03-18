@@ -299,8 +299,9 @@ final class ProposalBuilderBloc
           publish: proposal.publish,
           documentRef: proposal.selfRef,
           originalDocumentRef: proposal.selfRef,
+          templateRef: proposalData.templateRef,
+          categoryId: proposalData.categoryId,
           versions: versions,
-          categoryId: proposal.categoryId,
         ),
       );
     });
