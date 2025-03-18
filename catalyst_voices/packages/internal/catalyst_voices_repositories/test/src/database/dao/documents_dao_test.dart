@@ -5,8 +5,7 @@ import 'package:collection/collection.dart';
 import 'package:drift/drift.dart' show DatabaseConnection;
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:uuid/data.dart';
-import 'package:uuid/uuid.dart';
+import 'package:uuid_plus/uuid_plus.dart';
 
 import '../../utils/test_factories.dart';
 
@@ -638,7 +637,7 @@ void main() {
 
         await database.documentsDao.saveAll(versions);
 
-        final ids = await database.documentsDao.queryVersionIds(
+        final ids = await database.documentsDao.queryVersionsOfId(
           id: proposalId,
         );
 

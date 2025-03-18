@@ -7,11 +7,7 @@ import 'package:catalyst_voices_repositories/src/dto/proposal/proposal_submissio
 import 'package:catalyst_voices_repositories/src/signed_document/signed_document_json_payload.dart';
 import 'package:catalyst_voices_repositories/src/signed_document/signed_document_manager.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
-import 'package:uuid/data.dart';
-import 'package:uuid/uuid.dart';
-
-// TODO(damian-molinski): Delete it after versions query is ready.
-final _docVersionsCache = <String, List<String>>{};
+import 'package:uuid_plus/uuid_plus.dart';
 
 final _proposalDescription = """
 Zanzibar is becoming one of the hotspots for DID's through
@@ -99,24 +95,34 @@ final class ProposalRepositoryImpl implements ProposalRepository {
       ref = ref.copyWith(version: Optional(ref.id));
     }
 
-    final versions = _docVersionsCache.putIfAbsent(
-      ref.id,
-      () => [
-        ref.version!,
-        ...List.generate(3, (index) {
-          final now = DateTimeExt.now();
-          final createdAt = now.subtract(
-            Duration(
-              days: index + 1,
-              hours: index + 2,
-            ),
-          );
+    final ver = List.generate(3, (index) {
+      final now = DateTimeExt.now();
+      final createdAt = now.subtract(
+        Duration(
+          days: index + 1,
+          hours: index + 2,
+        ),
+      );
 
-          final config = V7Options(createdAt.millisecondsSinceEpoch, null);
-          return const Uuid().v7(config: config);
-        }),
-      ].reversed.toList(),
-    );
+      final config = V7Options(createdAt.millisecondsSinceEpoch, null);
+      final versionId = const Uuid().v7(config: config);
+      final document = ProposalDocument(
+        metadata: ProposalMetadata(
+          selfRef: ref.copyWith(
+            version: Optional(versionId),
+          ),
+        ),
+        document: const Document(
+          properties: [],
+          schema: DocumentSchema.optional(),
+        ),
+      );
+
+      return BaseProposalData(
+        document: document,
+        categoryId: SignedDocumentRef.generateFirstRef(),
+      );
+    }).reversed.toList();
 
     return ProposalData(
       // TODO(dtscalac): replace by actual category ID
@@ -132,7 +138,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
           schema: DocumentSchema.optional(),
         ),
       ),
-      versions: versions,
+      versions: ver,
     );
   }
 
