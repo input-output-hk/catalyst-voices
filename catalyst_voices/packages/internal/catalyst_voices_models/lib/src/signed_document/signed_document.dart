@@ -22,6 +22,9 @@ abstract interface class SignedDocument<T extends SignedDocumentPayload> {
   /// A getter that returns a parsed document payload.
   T get payload;
 
+  /// Returns a list of [CatalystId] that signed the document.
+  List<CatalystId> get signers;
+
   /// Converts the document into binary representation.
   Uint8List toBytes();
 
