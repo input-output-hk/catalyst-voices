@@ -6,8 +6,7 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:uuid/data.dart';
-import 'package:uuid/uuid.dart';
+import 'package:uuid_plus/uuid_plus.dart';
 
 part 'proposal_cubit_mock_data.dart';
 
@@ -17,7 +16,6 @@ final class ProposalCubit extends Cubit<ProposalState>
     with
         DocumentToSegmentMixin,
         BlocSignalEmitterMixin<ProposalSignal, ProposalState> {
-  // ignore: unused_field
   final UserService _userService;
   final ProposalService _proposalService;
 
@@ -30,6 +28,7 @@ final class ProposalCubit extends Cubit<ProposalState>
   // ignore: unused_field
   List<CommentWithReplies>? _comments;
 
+  // Note for integration.
   // 1. Fetch proposal document
   // 2. Observe document comments
   // 3. Observe active account
@@ -55,7 +54,7 @@ final class ProposalCubit extends Cubit<ProposalState>
       final commentsSort = state.data.commentsSort;
 
       final proposalViewData = _buildProposalViewData(
-        hasActiveAccount: false,
+        hasActiveAccount: _userService.user.activeAccount != null,
         proposal: proposal,
         comments: comments,
         commentSchema: _buildCommentTemplate().document.schema,

@@ -146,9 +146,8 @@ class _ProposalCommentBuilderState extends State<ProposalCommentBuilder> {
       return;
     }
 
-    // TODO(damian-molinski): uncomment
-    // final catalystId = context.read<SessionCubit>().state.account?.catalystId;
-    // assert(catalystId != null, 'No active account found!');
+    final catalystId = context.read<SessionCubit>().state.account?.catalystId;
+    assert(catalystId != null, 'No active account found!');
 
     final cubit = context.read<ProposalCubit>();
 
