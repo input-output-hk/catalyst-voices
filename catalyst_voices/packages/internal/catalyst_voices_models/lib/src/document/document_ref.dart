@@ -102,6 +102,11 @@ final class SignedDocumentRef extends DocumentRef {
     super.version,
   });
 
+  const SignedDocumentRef.exact({
+    required super.id,
+    required String super.version,
+  });
+
   /// Creates ref for first version of [id] document.
   const SignedDocumentRef.first(String id) : this(id: id, version: id);
 
@@ -112,6 +117,8 @@ final class SignedDocumentRef extends DocumentRef {
       version: id,
     );
   }
+
+  const SignedDocumentRef.loose({required super.id});
 
   @override
   SignedDocumentRef copyWith({
@@ -131,6 +138,8 @@ final class SignedDocumentRef extends DocumentRef {
       version: const Uuid().v7(),
     );
   }
+
+  SignedDocumentRef toLose() => copyWith(version: const Optional.empty());
 
   @override
   SignedDocumentRef toSignedDocumentRef() => this;

@@ -116,7 +116,7 @@ final class ProposalsCubit extends Cubit<ProposalsState> {
     String proposalId, {
     required bool isFavorite,
   }) async {
-    final ref = SignedDocumentRef(id: proposalId);
+    final ref = SignedDocumentRef.loose(id: proposalId);
     if (isFavorite) {
       // ignore: unused_local_variable
       final favIds = await _proposalService.addFavoriteProposal(ref: ref);

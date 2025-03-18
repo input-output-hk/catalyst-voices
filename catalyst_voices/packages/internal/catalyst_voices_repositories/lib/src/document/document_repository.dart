@@ -92,6 +92,7 @@ abstract interface class DocumentRepository {
   /// Updates fav status matching [ref].
   Future<void> updateDocumentFavourite({
     required DocumentRef ref,
+    required DocumentType type,
     required bool isFavourite,
   });
 
@@ -103,10 +104,10 @@ abstract interface class DocumentRepository {
     required DocumentData document,
   });
 
-  /// Emits list of all favourite refs.
+  /// Emits list of all favourite ids.
   ///
-  /// All returned refs are loose and won't specify version.
-  Stream<List<DocumentRef>> watchAllDocumentsFavouriteRefs({
+  /// All returned ids are loose and won't specify version.
+  Stream<List<String>> watchAllDocumentsFavouriteIds({
     DocumentType? type,
   });
 
@@ -134,7 +135,6 @@ abstract interface class DocumentRepository {
 }
 
 final class DocumentRepositoryImpl implements DocumentRepository {
-  // ignore: unused_field
   final DraftDataSource _drafts;
   final SignedDocumentDataSource _localDocuments;
   final DocumentDataRemoteSource _remoteDocuments;
@@ -282,12 +282,14 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   @override
   Future<void> updateDocumentFavourite({
     required DocumentRef ref,
+    required DocumentType type,
     required bool isFavourite,
   }) {
     assert(!ref.isExact, 'Favourite ref have to be lose!');
 
     return _favourite.updateDocumentFavourite(
       ref.id,
+      type: type,
       isFavourite: isFavourite,
     );
   }
@@ -324,10 +326,10 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   }
 
   @override
-  Stream<List<DocumentRef>> watchAllDocumentsFavouriteRefs({
+  Stream<List<String>> watchAllDocumentsFavouriteIds({
     DocumentType? type,
   }) {
-    return _favourite.watchAllFavouriteRefs(type: type);
+    return _favourite.watchAllFavouriteIds(type: type);
   }
 
   @override

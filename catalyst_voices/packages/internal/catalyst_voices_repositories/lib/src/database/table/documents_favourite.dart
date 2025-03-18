@@ -2,13 +2,11 @@ import 'package:catalyst_voices_repositories/src/database/table/converter/docume
 import 'package:catalyst_voices_repositories/src/database/table/mixin/id_table_mixin.dart';
 import 'package:drift/drift.dart';
 
-@TableIndex(name: 'idx_doc_favourite_type', columns: {#type})
-@TableIndex(name: 'idx_doc_unique_ver', columns: {#verHi, #verLo}, unique: true)
+@TableIndex(name: 'idx_fav_type', columns: {#type})
+@TableIndex(name: 'idx_fav_unique_id', columns: {#idHi, #idLo}, unique: true)
 @DataClassName('DocumentFavouriteEntity')
 class DocumentsFavourite extends Table with IdHiLoTableMixin {
   BoolColumn get isFavourite => boolean()();
-
-  BoolColumn get isLocalDraft => boolean()();
 
   @override
   Set<Column> get primaryKey => {
