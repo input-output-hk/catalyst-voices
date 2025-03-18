@@ -31,6 +31,10 @@ final class SignedDocumentManagerImpl implements SignedDocumentManager {
       coseSign: coseSign,
       payload: payload,
       metadata: metadata,
+      signers: coseSign.signatures
+          .map((e) => e.decodeCatalystId())
+          .nonNulls
+          .toList(),
     );
   }
 
@@ -54,6 +58,7 @@ final class SignedDocumentManagerImpl implements SignedDocumentManager {
       coseSign: coseSign,
       payload: document,
       metadata: metadata,
+      signers: [catalystId],
     );
   }
 
@@ -84,7 +89,7 @@ final class _CatalystSigner implements CatalystCoseSigner {
   );
 
   @override
-  StringOrInt? get alg => const IntValue(CoseValues.eddsaAlg);
+  StringOrInt? get alg => null;
 
   @override
   Future<Uint8List?> get kid async {
@@ -133,24 +138,41 @@ final class _CoseSignedDocument<T extends SignedDocumentPayload>
   @override
   final SignedDocumentMetadata metadata;
 
+  @override
+  final List<CatalystId> signers;
+
   const _CoseSignedDocument({
     required CoseSign coseSign,
     required this.payload,
     required this.metadata,
+    required this.signers,
   }) : _coseSign = coseSign;
 
   @override
-  List<Object?> get props => [_coseSign, payload, metadata];
+  List<Object?> get props => [_coseSign, payload, metadata, signers];
 
   @override
   Uint8List toBytes() {
-    final bytes = cbor.encode(_coseSign.toCbor());
+    final bytes = cbor.encode(_coseSign.toCbor(tagged: false));
     return Uint8List.fromList(bytes);
   }
 
   @override
   Future<bool> verifySignature(CatalystId catalystId) async {
     return _coseSign.verify(verifier: _CatalystVerifier(catalystId));
+  }
+}
+
+extension _CoseSignatureExt on CoseSignature {
+  CatalystId? decodeCatalystId() {
+    final kid = protectedHeaders.kid;
+    if (kid == null) return null;
+
+    final string = utf8.decode(kid);
+    final uri = Uri.tryParse(string);
+    if (uri == null) return null;
+
+    return CatalystId.fromUri(uri);
   }
 }
 

@@ -27,17 +27,6 @@ abstract interface class DocumentRepository {
     required SignedDocumentRef ref,
   });
 
-  /// Stores new draft locally and returns ref to it.
-  ///
-  /// At the moment we do not support drafts of templates that's why
-  /// [template] requires [SignedDocumentRef].
-  Future<DraftRef> createDocumentDraft({
-    required DocumentType type,
-    required DocumentDataContent content,
-    required SignedDocumentRef template,
-    DraftRef? selfRef,
-  });
-
   /// Deletes a document draft from the local storage.
   Future<void> deleteDocumentDraft({
     required DraftRef ref,
@@ -92,16 +81,14 @@ abstract interface class DocumentRepository {
   /// Returns a list of version of ref object.
   ///
   /// Can be used to get versions count.
-  Future<List<String>> queryVersionIds({required String id});
+  Future<List<ProposalDocument>> queryVersionsOfId({required String id});
 
-  /// Updates local draft (or drafts if version is not specified)
-  /// matching [ref] with given [content].
+  /// Creates/updates a local document draft.
   ///
   /// If watching same draft with [watchProposalDocument] it will emit
   /// change.
-  Future<void> updateDocumentDraft({
-    required DraftRef ref,
-    required DocumentDataContent content,
+  Future<void> upsertDocumentDraft({
+    required DocumentData document,
   });
 
   Stream<int> watchCount({
@@ -141,30 +128,6 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     final documentData = await _remoteDocuments.get(ref: ref);
 
     await _localDocuments.save(data: documentData);
-  }
-
-  @override
-  Future<DraftRef> createDocumentDraft({
-    required DocumentType type,
-    required DocumentDataContent content,
-    required SignedDocumentRef template,
-    DraftRef? selfRef,
-  }) async {
-    final ref = selfRef ?? DraftRef.generateFirstRef();
-    final metadata = DocumentDataMetadata(
-      type: type,
-      selfRef: ref,
-      template: template,
-    );
-
-    final data = DocumentData(
-      metadata: metadata,
-      content: content,
-    );
-
-    await _drafts.save(data: data);
-
-    return ref;
   }
 
   @override
@@ -267,19 +230,27 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   }
 
   @override
-  Future<List<String>> queryVersionIds({required String id}) {
-    return _localDocuments.queryVersionIds(id: id);
+  Future<List<ProposalDocument>> queryVersionsOfId({required String id}) async {
+    final documents = await _localDocuments.queryVersionsOfId(id: id);
+    if (documents.isEmpty) return [];
+    final templateRef = documents.first.metadata.template!;
+    final templateData = await getDocumentData(ref: templateRef);
+
+    return documents
+        .map(
+          (e) => _buildProposalDocument(
+            documentData: e,
+            templateData: templateData,
+          ),
+        )
+        .toList();
   }
 
   @override
-  Future<void> updateDocumentDraft({
-    required DraftRef ref,
-    required DocumentDataContent content,
+  Future<void> upsertDocumentDraft({
+    required DocumentData document,
   }) async {
-    await _drafts.update(
-      ref: ref,
-      content: content,
-    );
+    await _drafts.save(data: document);
   }
 
   Stream<List<DocumentsDataWithRefData>> watchAllDocuments({
@@ -407,6 +378,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
 
     final metadata = ProposalMetadata(
       selfRef: documentData.metadata.selfRef,
+      categoryId: documentData.metadata.categoryId,
     );
 
     final content = DocumentDataContentDto.fromModel(
@@ -431,6 +403,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
 
     final metadata = ProposalTemplateMetadata(
       selfRef: documentData.metadata.selfRef,
+      categoryId: documentData.metadata.categoryId,
     );
 
     final contentData = documentData.content.data;

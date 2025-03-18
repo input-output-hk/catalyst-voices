@@ -73,9 +73,10 @@ final class ProposalBloc extends Bloc<ProposalEvent, ProposalState>
     /* cSpell:disable */
     final versions = proposal.versions.mapIndexed((index, version) {
       return DocumentVersion(
-        id: version,
+        id: version.document.metadata.selfRef.version ?? '',
         number: index + 1,
-        isCurrent: version == proposalDocumentRef.version,
+        isCurrent: version.document.metadata.selfRef.version ==
+            proposalDocumentRef.version,
         isLatest: index == proposal.versions.length - 1,
       );
     }).toList();
@@ -119,21 +120,24 @@ final class ProposalBloc extends Bloc<ProposalEvent, ProposalState>
                 message: 'Don’t talk about fight club',
               ),
               replies: const [],
+              depth: 2,
             ),
           ],
+          depth: 1,
         ),
         CommentWithReplies(
           comment: _buildComment(
-            message: '''
-            This proposal embodies a bold and disruptive vision 
-            that aligns with the decentralised ethos of the Cardano ecosystem. 
-            The focus on empowering individuals through grassroots action and 
-            the inclusion of open-source methodologies makes it a transformative
-             initiative. The clear milestones and emphasis on secure, replicable
-              strategies inspire confidence in the project’s feasibility and 
-              scalability. I look forward to seeing its impact.''',
+            message: 'This proposal embodies a bold and disruptive vision that '
+                'aligns with the decentralised ethos of the Cardano ecosystem. '
+                'The focus on empowering individuals through grassroots action '
+                'and the inclusion of open-source methodologies makes it a '
+                'transformative initiative. The clear milestones and emphasis '
+                'on secure, replicable strategies inspire confidence in the '
+                'project’s feasibility and scalability. I look forward to '
+                'seeing its impact.',
           ),
           replies: const [],
+          depth: 1,
         ),
       ],
     );

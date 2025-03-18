@@ -1360,10 +1360,6 @@
   "@errorValidationListItemsNotUnique": {
     "description": "The list items must be unique."
   },
-  "noTagSelected": "No Tag Selected",
-  "@noTagSelected": {
-    "description": "For example in context of document builder"
-  },
   "errorValidationConstValueMismatch": "The value must be \"{constValue}\".",
   "@errorValidationConstValueMismatch": {
     "description": "Validation error when the user entered value does not match the const value",
@@ -1385,6 +1381,14 @@
   "errorValidationPatternMismatch": "The value does not match the valid pattern.",
   "@errorValidationPatternMismatch": {
     "description": "Validation error when the user entered value does not match the pattern"
+  },
+  "errorValidationStringEmpty": "The text cannot be empty.",
+  "@errorValidationStringEmpty": {
+    "description": "Validation error when the user entered text is empty"
+  },
+  "noTagSelected": "No Tag Selected",
+  "@noTagSelected": {
+    "description": "For example in context of document builder"
   },
   "singleGroupedTagSelectorTitle": "Please choose the most relevant category group and tag related to the outcomes of your proposal",
   "singleGroupedTagSelectorRelevantTag": "Select the most relevant tag",
@@ -1726,6 +1730,35 @@
   "@change": {
     "description": "An action to change/modify something."
   },
+  "submittedForReview": "Submitted for Review ({submittedCount}/{maxCount})",
+  "@submittedForReview": {
+    "description": "Label for the submitted for review section",
+    "placeholders": {
+      "submittedCount": {
+        "type": "int"
+      },
+      "maxCount": {
+        "type": "int"
+      }
+    }
+  },
+  "sharedForPublicInProgress": "Shared for public feedback / In progress",
+  "@sharedForPublicInProgress": {
+    "description": "Label for shared for public feedback or in progress proposals in workspace"
+  },
+  "notPublished": "Not published",
+  "@notPublished": {
+    "description": "Label for not published proposals in workspace"
+  },
+  "lastEditDate": "Last edit {date}",
+  "@lastEditDate": {
+    "description": "Indicated when item was last updated",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
   "enterPhrase": "Enter phrase",
   "@enterPhrase": {
     "description": "Action to enter the seed phrase"
@@ -1843,6 +1876,85 @@
   "@notFoundError": {
     "description": "Error message when user tries to access resourse that does not exist."
   },
+  "proposalStageAndIteration": "{stage} - Iteration {iteration}",
+  "@proposalStageAndIteration": {
+    "description": "In context of proposal. Shows the stage and iteration of the proposal",
+    "placeholders": {
+      "stage": {
+        "type": "String"
+      },
+      "iteration": {
+        "type": "int"
+      }
+    }
+  },
+  "fundNoCategory": "Fund{number} Category",
+  "@fundNoCategory": {
+    "description": "Describes that category comes from fund number",
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "comments": "Comments",
+  "@comments": {
+    "description": "Describes comments"
+  },
+  "proposalIterationPublishUpdateAndTitle": "Iteration {iteration} - {publish} - {datetime} - {title}",
+  "@proposalIterationPublishUpdateAndTitle": {
+    "description": "Title for the proposal iteration card",
+    "placeholders": {
+      "iteration": {
+        "type": "int"
+      },
+      "publish": {
+        "type": "String"
+      },
+      "datetime": {
+        "type": "String"
+      },
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "exportButtonText": "Export",
+  "@exportButtonText": {
+    "description": "Text shown in export button"
+  },
+  "publishingHistory": "Publishing history",
+  "@publishingHistory": {
+    "description": "To let user know that document have history of published documents"
+  },
+  "notAvailableAbbr": "N/A",
+  "@notAvailableAbbr": {
+    "description": "Abbreviation for not available"
+  },
+  "title": "Title",
+  "@title": {
+    "description": "description of the title field"
+  },
+  "required": "Required",
+  "@required": {
+    "description": "description of the required field"
+  },
+  "selectedCategory": "Selected category",
+  "@selectedCategory": {
+    "description": "description of the selected category field"
+  },
+  "jumpToCampaignCategory": "Jump to campaign category",
+  "@jumpToCampaignCategory": {
+    "description": "description of the button that takes to campaign category page"
+  },
+  "saveDraft": "Save draft",
+  "@saveDraft": {
+    "description": "description of the button that saves the draft"
+  },
+  "openInEditor": "Open in editor",
+  "@openInEditor": {
+    "description": "description of the button that opens the proposal in editor"
+  },
   "latestDocumentVersion": "Latest",
   "@latestDocumentVersion": {
     "description": "When showing different version of proposal we may add suffix indicating this is latest version"
@@ -1854,5 +1966,18 @@
   "viewLatestDocumentVersion": "View Latest",
   "@viewLatestDocumentVersion": {
     "description": "Action to change back to latest version"
+  },
+  "commentHideReplies": "Hide replies",
+  "@commentHideReplies": {
+    "description": "Hide comment replies"
+  },
+  "commentXReplies": "{count} {count, plural, =0{replies} =1{reply} other{replies}}",
+  "@commentXReplies": {
+    "description": "Show comment replies",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   }
 }
