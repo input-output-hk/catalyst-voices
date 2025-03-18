@@ -17,7 +17,7 @@ final class DatabaseDocumentsDataSource implements SignedDocumentDataSource {
   Future<DocumentData> get({required DocumentRef ref}) async {
     final entity = await _database.documentsDao.query(ref: ref);
     if (entity == null) {
-      throw DocumentNotFound(ref: ref);
+      throw DocumentNotFoundException(ref: ref);
     }
 
     return entity.toModel();
@@ -29,8 +29,10 @@ final class DatabaseDocumentsDataSource implements SignedDocumentDataSource {
   }
 
   @override
-  Future<List<String>> queryVersionIds({required String id}) {
-    return _database.documentsDao.queryVersionIds(id: id);
+  Future<List<DocumentData>> queryVersionsOfId({required String id}) async {
+    final documentEntities =
+        await _database.documentsDao.queryVersionsOfId(id: id);
+    return documentEntities.map((e) => e.toModel()).toList();
   }
 
   @override

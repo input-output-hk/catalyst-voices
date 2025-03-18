@@ -21,7 +21,7 @@ final class ProposalRoute extends GoRouteData with FadePageTransitionMixin {
     this.local = false,
   });
 
-  ProposalRoute.from({required DocumentRef ref})
+  ProposalRoute.fromRef({required DocumentRef ref})
       : this(
           proposalId: ref.id,
           version: ref.version,

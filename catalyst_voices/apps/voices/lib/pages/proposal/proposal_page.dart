@@ -122,7 +122,7 @@ class _ProposalPageState extends State<ProposalPage>
   void _changeVersion(String? version) {
     Router.neglect(context, () {
       final ref = widget.ref.copyWith(version: Optional(version));
-      ProposalRoute.from(ref: ref).replace(context);
+      ProposalRoute.fromRef(ref: ref).replace(context);
     });
   }
 
