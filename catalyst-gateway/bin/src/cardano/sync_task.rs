@@ -95,9 +95,12 @@ impl SyncTask {
         self.sync_status = get_sync_status().await;
         debug!(chain=%self.cfg.chain, "Sync Status: {:?}", self.sync_status);
 
-        self.start_immutable_followers();
-
-        self.start_live_chain_follower();
+        if !self.try_start_immutable_followers() {
+            // immutable chain already synced, start live chain
+            if !self.try_start_live_chain_follower() {
+                error!(chain=%self.cfg.chain, "BUG: Cannot start any follower task");
+            }
+        }
 
         self.dispatch_event(ChainIndexerEvent::SyncStarted);
 
@@ -128,22 +131,24 @@ impl SyncTask {
                     self.dispatch_event(ChainIndexerEvent::BackwardDataPurged);
                 }
 
-                self.start_live_chain_follower();
+                if !self.try_start_live_chain_follower() {
+                    error!(chain=%self.cfg.chain,
+                        "BUG: Cannot start live chain follower task, after completed immutable sync."
+                    );
+                }
             }
         }
 
         error!(chain=%self.cfg.chain,"BUG: Sync tasks have all stopped.  This is an unexpected error!");
     }
 
-    /// Start immutable followers
-    fn start_immutable_followers(&mut self) {
-        // Start the Immutable Chain sync tasks, as required.
-        // We will start at most the number of configured sync tasks.
-        // The live chain sync task is not counted as a sync task for this config value.
-
+    /// Try to start immutable followers.
+    /// Returns `true` if at least one task was started, `false` otherwise.
+    fn try_start_immutable_followers(&mut self) -> bool {
+        let mut started = false;
         // Nothing to do if the start_slot is not less than the end of the immutable chain.
         if self.start_slot < self.immutable_tip_slot {
-            // Will also break if there are no more slots left to sync.
+            // We will start at most the number of configured sync tasks.
             while self.sync_tasks.len() < self.cfg.sync_tasks {
                 let end_slot = self.immutable_tip_slot.min(
                     (u64::from(self.start_slot).saturating_add(self.cfg.sync_chunk_max_slots))
@@ -157,7 +162,7 @@ impl SyncTask {
                         SyncParams::new_immutable(self.cfg.chain, first_point, last_point.clone()),
                         self.event_channel.0.clone(),
                     ));
-
+                    started = true;
                     self.dispatch_event(ChainIndexerEvent::SyncTasksChanged {
                         current_sync_tasks: self.sync_tasks.len(),
                     });
@@ -171,20 +176,21 @@ impl SyncTask {
                     break;
                 }
             }
-            // `start_slot` is still used, because it is used to keep syncing chunks as required
-            // while each immutable sync task finishes.
-            info!(chain=%self.cfg.chain, tasks=self.sync_tasks.len(), until=?self.start_slot, "Immutable follower syncing tasks started.");
         }
+        started
     }
 
-    /// Start only one live chain follower
-    fn start_live_chain_follower(&mut self) {
+    /// Try to start only one live chain follower.
+    /// Returns `true` if task was started, `false` otherwise.
+    fn try_start_live_chain_follower(&mut self) -> bool {
         if self.sync_tasks.len() < self.cfg.sync_tasks {
             self.sync_tasks.push(sync_subchain(
                 SyncParams::new_live(self.cfg.chain, Point::fuzzy(self.immutable_tip_slot)),
                 self.event_channel.0.clone(),
             ));
+            return true;
         }
+        false
     }
 
     /// Process completed sync tasks
@@ -214,7 +220,7 @@ impl SyncTask {
                 slot: self.immutable_tip_slot,
             });
 
-            self.start_immutable_followers();
+            self.try_start_immutable_followers();
         }
 
         // Sync task finished.  Check if it completed OK or had an error.
@@ -245,7 +251,7 @@ impl SyncTask {
 
             // If we need more immutable chain followers to sync the block
             // chain, we can now start them.
-            self.start_immutable_followers();
+            self.try_start_immutable_followers();
         }
     }
 
