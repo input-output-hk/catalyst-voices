@@ -28,7 +28,7 @@ final class ProposalsCubit extends Cubit<ProposalsState> {
     );
   }
 
-  void changeSelectedCategory(String? categoryId) {
+  void changeSelectedCategory(SignedDocumentRef? categoryId) {
     emit(state.copyWith(selectedCategoryId: Optional(categoryId)));
   }
 

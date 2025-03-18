@@ -41,6 +41,7 @@ void main() {
       );
 
       expect(parsedDocument, equals(signedDocument));
+      expect(parsedDocument.signers, [_catalystId]);
     });
   });
 }

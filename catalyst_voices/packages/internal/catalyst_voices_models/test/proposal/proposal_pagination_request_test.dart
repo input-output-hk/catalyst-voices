@@ -8,7 +8,7 @@ void main() {
         pageKey: 1,
         pageSize: 10,
         lastId: 'lastId123',
-        categoryId: 'category1',
+        categoryId: SignedDocumentRef(id: 'category1'),
         searchValue: 'search',
         stage: ProposalPublish.publishedDraft,
         usersProposals: true,
@@ -18,7 +18,10 @@ void main() {
       expect(request.pageKey, equals(1));
       expect(request.pageSize, equals(10));
       expect(request.lastId, equals('lastId123'));
-      expect(request.categoryId, equals('category1'));
+      expect(
+        request.categoryId,
+        equals(const SignedDocumentRef(id: 'category1')),
+      );
       expect(request.searchValue, equals('search'));
       expect(request.stage, equals(ProposalPublish.publishedDraft));
       expect(request.usersProposals, isTrue);
@@ -44,12 +47,12 @@ void main() {
         pageKey: 1,
         pageSize: 10,
         lastId: 'lastId123',
-        categoryId: 'category1',
+        categoryId: SignedDocumentRef(id: 'category1'),
       );
 
       final copied = original.copyWith(
         pageKey: 2,
-        categoryId: 'category2',
+        categoryId: const SignedDocumentRef(id: 'category2'),
         searchValue: 'newSearch',
         stage: ProposalPublish.submittedProposal,
         usersProposals: true,
@@ -59,7 +62,10 @@ void main() {
       expect(copied.pageKey, equals(2));
       expect(copied.pageSize, equals(10)); // Unchanged
       expect(copied.lastId, equals('lastId123')); // Unchanged
-      expect(copied.categoryId, equals('category2'));
+      expect(
+        copied.categoryId,
+        equals(const SignedDocumentRef(id: 'category2')),
+      );
       expect(copied.searchValue, equals('newSearch'));
       expect(copied.stage, equals(ProposalPublish.submittedProposal));
       expect(copied.usersProposals, isTrue);
@@ -71,7 +77,7 @@ void main() {
         pageKey: 1,
         pageSize: 10,
         lastId: 'lastId123',
-        categoryId: 'category1',
+        categoryId: SignedDocumentRef(id: 'category1'),
         searchValue: 'search',
         stage: ProposalPublish.publishedDraft,
         usersProposals: true,
@@ -93,14 +99,14 @@ void main() {
         pageKey: 1,
         pageSize: 10,
         lastId: 'lastId123',
-        categoryId: 'category1',
+        categoryId: SignedDocumentRef(id: 'category1'),
       );
 
       const request2 = ProposalPaginationRequest(
         pageKey: 1,
         pageSize: 10,
         lastId: 'lastId123',
-        categoryId: 'category1',
+        categoryId: SignedDocumentRef(id: 'category1'),
       );
 
       expect(request1, equals(request2));
