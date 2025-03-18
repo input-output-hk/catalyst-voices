@@ -245,7 +245,7 @@ impl EventDB {
 /// The env var "`DATABASE_URL`" can be set directly as an anv var, or in a
 /// `.env` file.
 ///
-/// If connection to the poll is `OK`, the `LIVE_EVENT_DB` atomic flag is set to `true`.
+/// If connection to the pool is `OK`, the `LIVE_EVENT_DB` atomic flag is set to `true`.
 pub fn establish_connection() {
     let (url, user, pass) = Settings::event_db_settings();
 

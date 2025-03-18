@@ -80,7 +80,7 @@ pub(crate) async fn endpoint() -> AllResponses {
         return success_response;
     }
 
-    // Otherwise, re-check, and return 403 response if all is good.
+    // Otherwise, re-check, and return 204 response if all is good.
     if index_db_is_live() && event_db_is_live() {
         return success_response;
     }
