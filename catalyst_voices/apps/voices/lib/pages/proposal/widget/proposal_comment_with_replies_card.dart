@@ -3,9 +3,11 @@ import 'package:catalyst_voices/pages/proposal/widget/proposal_comment_builder.d
 import 'package:catalyst_voices/pages/proposal/widget/proposal_comment_card.dart';
 import 'package:catalyst_voices/widgets/common/affix_decorator.dart';
 import 'package:catalyst_voices/widgets/common/animated_expand_chevron.dart';
+import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ProposalCommentWithRepliesCard extends StatefulWidget {
   final CommentWithReplies comment;
@@ -28,6 +30,8 @@ class _ProposalCommentWithRepliesCardState
 
   @override
   Widget build(BuildContext context) {
+    final hasActiveAccount = context
+        .select<SessionCubit, bool>((value) => value.state.account != null);
     final repliesIndent = 56 * widget.comment.depth;
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -35,7 +39,7 @@ class _ProposalCommentWithRepliesCardState
       children: [
         ProposalCommentCard(
           document: widget.comment.comment,
-          canReply: widget.comment.depth == 1,
+          canReply: hasActiveAccount && widget.comment.depth == 1,
           onReplyTap: _onReplyTap,
           footer: Offstage(
             offstage: widget.comment.replies.isEmpty,

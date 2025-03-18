@@ -53,25 +53,6 @@ final class ProposalCommentsSegment
     required super.sections,
   });
 
-  ProposalCommentsSegment.build({
-    required ProposalCommentsSort sort,
-    required DocumentSchema commentSchema,
-    required List<CommentWithReplies> comments,
-  }) : this(
-          id: const NodeId('comments'),
-          sort: sort,
-          sections: [
-            ViewCommentsSection(
-              id: const NodeId('comments.view'),
-              comments: comments,
-            ),
-            AddCommentSection(
-              id: const NodeId('comments.add'),
-              schema: commentSchema,
-            ),
-          ],
-        );
-
   @override
   SvgGenImage get icon => VoicesAssets.icons.chatAlt2;
 

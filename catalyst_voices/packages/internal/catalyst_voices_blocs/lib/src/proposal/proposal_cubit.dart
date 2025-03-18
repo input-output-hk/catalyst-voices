@@ -55,8 +55,10 @@ final class ProposalCubit extends Cubit<ProposalState>
       final commentsSort = state.data.commentsSort;
 
       final proposalViewData = _buildProposalViewData(
+        hasActiveAccount: false,
         proposal: proposal,
         comments: comments,
+        commentSchema: _buildCommentTemplate().document.schema,
         commentsSort: commentsSort,
         isFavorite: false,
       );
@@ -109,7 +111,7 @@ final class ProposalCubit extends Cubit<ProposalState>
 
     emit(state.copyWith(data: updatedData));
 
-    // TODO(damian-molinski): integrate
+    // TODO(damian-molinski): send document
   }
 
   void updateCommentsSort({required ProposalCommentsSort sort}) {
@@ -133,8 +135,10 @@ final class ProposalCubit extends Cubit<ProposalState>
   }
 
   ProposalViewData _buildProposalViewData({
+    required bool hasActiveAccount,
     required ProposalData proposal,
     required List<CommentWithReplies> comments,
+    required DocumentSchema commentSchema,
     required ProposalCommentsSort commentsSort,
     required bool isFavorite,
   }) {
@@ -177,11 +181,20 @@ final class ProposalCubit extends Cubit<ProposalState>
       ),
     );
 
-    final sortedComments = commentsSort.applyTo(comments);
-    final commentsSegment = ProposalCommentsSegment.build(
-      sort: ProposalCommentsSort.newest,
-      commentSchema: _buildCommentTemplate().document.schema,
-      comments: sortedComments,
+    final commentsSegment = ProposalCommentsSegment(
+      id: const NodeId('comments'),
+      sort: commentsSort,
+      sections: [
+        ViewCommentsSection(
+          id: const NodeId('comments.view'),
+          comments: commentsSort.applyTo(comments),
+        ),
+        if (hasActiveAccount)
+          AddCommentSection(
+            id: const NodeId('comments.add'),
+            schema: commentSchema,
+          ),
+      ],
     );
 
     return ProposalViewData(
