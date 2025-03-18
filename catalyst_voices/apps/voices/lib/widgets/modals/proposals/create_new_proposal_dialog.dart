@@ -169,6 +169,14 @@ class _CreateNewProposalDialogState extends State<CreateNewProposalDialog> {
     super.dispose();
   }
 
+  @override
+  void initState() {
+    super.initState();
+     context
+            .read<NewProposalCubit>()
+            .updateTitle(const ProposalTitle.pure());
+  }
+
   void onTitleSubmitted(String title) {
     _categoryFocusNode.requestFocus();
   }

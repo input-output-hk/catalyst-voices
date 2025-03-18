@@ -51,6 +51,8 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
         isLoading: false,
       ),
     );
+    await _proposalsSubscription?.cancel();
+    _proposalsSubscription = null;
   }
 
   Future<void> _importProposal(
@@ -86,8 +88,9 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
         _logger.info('Stream received ${proposals.length} proposals');
         add(LoadProposalsEvent(proposals));
       },
-      onError: (_) {
+      onError: (Object error) {
         if (isClosed) return;
+        _logger.info(error.toString());
         add(const ErrorLoadProposalsEvent(LocalizedUnknownException()));
       },
     );
