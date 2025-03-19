@@ -39,14 +39,23 @@ enum NetworkId {
 }
 
 /// Specifies an amount of ADA in terms of lovelace.
-extension type const Coin(int value) {
+final class Coin implements Comparable<Coin> {
   /// The amount of lovelaces in one ADA.
   static const int adaInLovelaces = 1000000;
+
+  /// The amount of lovelaces.
+  final int value;
+
+  /// The default constructor for the [Coin].
+  const Coin(this.value);
 
   /// Creates a [Coin] from [amount] specified in ADAs.
   factory Coin.fromAda(double amount) {
     return Coin((amount * adaInLovelaces).toInt());
   }
+
+  /// Creates a [Coin] from [amount] specified in ADAs (without lovelaces).
+  const Coin.fromWholeAda(int amount) : this(amount * adaInLovelaces);
 
   /// Deserializes the type from cbor.
   factory Coin.fromCbor(CborValue value) {
@@ -83,6 +92,9 @@ extension type const Coin(int value) {
 
   /// Returns true if [value] is smaller than or equal [other] value.
   bool operator <=(Coin other) => value < other.value || value == other.value;
+
+  @override
+  int compareTo(Coin other) => value.compareTo(other.value);
 }
 
 /// A blockchain slot number.

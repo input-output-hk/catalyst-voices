@@ -12,7 +12,7 @@ final class CampaignCategoryDetailsViewModel extends CampaignCategoryViewModel {
   final int proposalsCount;
   final Coin availableFunds;
   final Coin totalAsk;
-  final Range<int> range;
+  final ComparableRange<Coin> range;
   final List<CategoryDescriptionViewModel> descriptions;
   final String imageUrl;
   final List<String> requirements;
@@ -43,7 +43,10 @@ final class CampaignCategoryDetailsViewModel extends CampaignCategoryViewModel {
         proposalsCount: 263,
         availableFunds: const Coin(8000000),
         totalAsk: const Coin(400000),
-        range: const Range(min: 15000, max: 100000),
+        range: const ComparableRange(
+          min: Coin.fromWholeAda(15000),
+          max: Coin.fromWholeAda(100000),
+        ),
         descriptions: List.filled(3, CategoryDescriptionViewModel.dummy()),
         imageUrl: CategoryImageUrl.imageUrl('1'),
         submissionCloseDate: DateTime.now(),
