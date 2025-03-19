@@ -172,14 +172,6 @@ void main() {
           expect(entity.metadata.version, secondVersionId);
           expect(entity.content, secondContent);
         },
-        onPlatform: {
-          'linux': [
-            const Skip(
-              'On CI uses build in version which is lower then '
-              '3.45 (required for jsonb)',
-            ),
-          ],
-        },
       );
 
       test('returns null when id does not match any id', () async {
