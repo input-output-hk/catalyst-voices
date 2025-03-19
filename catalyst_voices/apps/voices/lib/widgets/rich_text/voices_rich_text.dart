@@ -410,7 +410,8 @@ class _ToolbarAttributeIconButton extends StatelessWidget {
       attribute: attribute,
       options: quill.QuillToolbarToggleStyleButtonOptions(
         // TODO(minikin): We need to use dynamic here because
-        // of some issue with the type inference of the quill package.
+        // of the bug in the quill package.
+        // https://github.com/singerdmx/flutter-quill/issues/2511
         childBuilder: (dynamic options, dynamic extraOptions) {
           return _ToolbarIconButton(
             icon: icon,
@@ -459,7 +460,8 @@ class _ToolbarImageOptionButton extends StatelessWidget {
       controller: controller,
       options: quill_ext.QuillToolbarImageButtonOptions(
         // TODO(minikin): We need to use dynamic here because
-        // of some issue with the type inference of the quill package.
+        // of the bug in the quill package.
+        // https://github.com/singerdmx/flutter-quill/issues/2511
         childBuilder: (dynamic options, dynamic extraOptions) {
           return _ToolbarIconButton(
             icon: VoicesAssets.icons.photograph,
