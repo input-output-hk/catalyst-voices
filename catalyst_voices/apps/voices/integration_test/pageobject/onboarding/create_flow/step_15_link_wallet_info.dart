@@ -1,3 +1,4 @@
+import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -26,14 +27,40 @@ class LinkWalletInfoPanel extends OnboardingPageBase {
     await verifyDetailsPanel();
   }
 
-  Future<void> verifyDetailsPanel() async {}
+  Future<void> verifyDetailsPanel() async {
+    expect(
+      $(registrationDetailsTitle).$(Text).text,
+      (await t()).walletLinkIntroTitle,
+    );
+
+    expect(
+      $(registrationDetailsBody).$(Text).text,
+      (await t()).walletLinkIntroContent,
+    );
+
+    expect($(chooseCardanoWalletButton), findsOneWidget);
+  }
 
   Future<void> verifyInfoPanel() async {
-    expect(await infoPartHeaderTitleText(), (await t()).walletLinkHeader);
-    expect(await infoPartHeaderSubtitleText(), (await t()).walletLinkHeader);
-    //temporary: check for specific picture (blue key icon)
+    expect(
+      await infoPartHeaderTitleText(),
+      (await t()).walletLinkHeader,
+    );
+    expect(
+      await infoPartHeaderSubtitleText(),
+      (await t()).walletLinkWalletSubheader,
+    );
+    expect(
+      find.byWidgetPredicate(
+        (widget) =>
+            widget is CatalystSvgPicture &&
+            (widget.bytesLoader as dynamic).assetName ==
+                'assets/images/keychain.svg',
+      ),
+      findsOneWidget,
+    );
     expect(infoPartTaskPicture(), findsOneWidget);
     expect($(progressBar), findsOneWidget);
-    expect(infoPartLearnMoreText(), (await t()).learnMore);
+    expect($(learnMoreButton).$(Text).text, (await t()).learnMore);
   }
 }

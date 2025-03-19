@@ -37,6 +37,7 @@ class _TosRichTextState extends State<TosRichText> with LaunchUrlMixin {
   @override
   Widget build(BuildContext context) {
     return PlaceholderRichText(
+      key: const Key('TosRichText'),
       context.l10n.createBaseProfileAcknowledgementsToS,
       placeholderSpanBuilder: (context, placeholder) {
         return switch (placeholder) {
