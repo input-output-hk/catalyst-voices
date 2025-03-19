@@ -24,6 +24,14 @@ final class DatabaseDocumentsDataSource implements SignedDocumentDataSource {
   }
 
   @override
+  Future<int> getRefCount({
+    required DocumentRef ref,
+    required DocumentType type,
+  }) {
+    return _database.documentsDao.countRefDocumentByType(ref: ref, type: type);
+  }
+
+  @override
   Future<List<DocumentRef>> index() {
     return _database.documentsDao.queryAllRefs();
   }
@@ -73,10 +81,18 @@ final class DatabaseDocumentsDataSource implements SignedDocumentDataSource {
     int? limit,
     required bool unique,
     DocumentType? type,
+    CatalystId? authorId,
   }) {
     return _database.documentsDao
-        .watchAll(limit: limit, unique: unique, type: type)
-        .map((entities) => entities.map((e) => e.toModel()).toList());
+        .watchAll(
+      limit: limit,
+      unique: unique,
+      type: type,
+      authorId: authorId,
+    )
+        .map((entities) {
+      return List<DocumentData>.from(entities.map((e) => e.toModel()));
+    });
   }
 
   @override
@@ -84,7 +100,10 @@ final class DatabaseDocumentsDataSource implements SignedDocumentDataSource {
     required DocumentRef ref,
     required DocumentType type,
   }) {
-    return _database.documentsDao.watchCount(ref: ref, type: type);
+    return _database.documentsDao.watchCount(
+      ref: ref,
+      type: type,
+    );
   }
 }
 

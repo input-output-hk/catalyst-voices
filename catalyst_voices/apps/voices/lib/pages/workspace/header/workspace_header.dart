@@ -68,7 +68,7 @@ class _WorkspaceHeaderState extends State<WorkspaceHeader> {
             ],
           ),
           const SizedBox(height: 24),
-          if (_isTimelineVisible)
+          if (_isTimelineVisible) ...[
             Row(
               children: [
                 Expanded(
@@ -95,7 +95,8 @@ class _WorkspaceHeaderState extends State<WorkspaceHeader> {
                 ),
               ],
             ),
-          const SizedBox(height: 48),
+            const SizedBox(height: 48),
+          ],
         ],
       ),
     );

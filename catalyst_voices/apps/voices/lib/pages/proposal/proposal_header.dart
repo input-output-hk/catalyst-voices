@@ -131,7 +131,7 @@ class _ProposalMetadataSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<ProposalBloc, ProposalState, ProposalViewHeader>(
+    return BlocSelector<ProposalCubit, ProposalState, ProposalViewHeader>(
       selector: (state) => state.data.header,
       builder: (context, state) {
         return _ProposalMetadata(
