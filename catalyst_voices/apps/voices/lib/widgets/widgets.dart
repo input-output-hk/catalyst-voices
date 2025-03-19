@@ -7,6 +7,7 @@ export 'buttons/voices_icon_button.dart';
 export 'buttons/voices_keyboard_key_button.dart';
 export 'buttons/voices_logical_keyboard_key_button.dart';
 export 'buttons/voices_outlined_button.dart';
+export 'buttons/voices_outlined_popup_meu_button.dart';
 export 'buttons/voices_segmented_button.dart';
 export 'buttons/voices_text_button.dart';
 export 'campaign_timeline/campaign_timeline.dart';

@@ -1,3 +1,4 @@
+import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -28,6 +29,15 @@ class CatalystKeychainSuccessPanel extends OnboardingPageBase {
   Future<void> verifyInfoPanel() async {
     expect(await infoPartHeaderTitleText(), (await t()).catalystKeychain);
     expect(infoPartTaskPicture(), findsOneWidget);
+    expect(
+      find.byWidgetPredicate(
+        (widget) =>
+            widget is CatalystSvgPicture &&
+            (widget.bytesLoader as dynamic).assetName ==
+                'assets/images/keychain.svg',
+      ),
+      findsOneWidget,
+    );
     expect($(progressBar), findsOneWidget);
     expect(
       $(learnMoreButton).$(Text).text,

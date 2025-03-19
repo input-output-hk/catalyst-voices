@@ -1,3 +1,4 @@
+import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -26,7 +27,15 @@ class WalletListPanel extends OnboardingPageBase {
       await infoPartHeaderSubtitleText(),
       (await t()).walletLinkWalletSubheader,
     );
-    //temporary: check for specific picture (blue key icon)
+    expect(
+      find.byWidgetPredicate(
+        (widget) =>
+            widget is CatalystSvgPicture &&
+            (widget.bytesLoader as dynamic).assetName ==
+                'assets/icons/check.svg',
+      ),
+      findsOneWidget,
+    );
     expect(infoPartTaskPicture(), findsOneWidget);
     expect($(progressBar), findsOneWidget);
     expect($(learnMoreButton).$(Text).text, (await t()).learnMore);

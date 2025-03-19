@@ -50,7 +50,6 @@ class LinkWalletInfoPanel extends OnboardingPageBase {
       await infoPartHeaderSubtitleText(),
       (await t()).walletLinkWalletSubheader,
     );
-    //temporary: check for specific picture (blue key icon)
     expect(
       find.byWidgetPredicate(
         (widget) =>

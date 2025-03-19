@@ -1,5 +1,5 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
-import 'package:catalyst_voices/widgets/buttons/voices_outlined_button.dart';
+import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart'
@@ -29,42 +29,13 @@ class DocumentVersionSelector extends StatelessWidget {
       offstage: current == null,
       child: AbsorbPointer(
         absorbing: readOnly,
-        child: PopupMenuButton<String>(
-          initialValue: current?.id,
-          itemBuilder: (context) {
-            return [
-              for (final version in versions)
-                PopupMenuItem(
-                  value: version.id,
-                  child: _VersionOverview(data: version),
-                ),
-            ];
-          },
-          clipBehavior: Clip.antiAlias,
+        child: VoicesOutlinedPopupMeuButton<String>(
+          items: versions.map((e) => e.id).toList(),
+          builder: (context, index) => _VersionOverview(data: versions[index]),
           onSelected: readOnly ? null : onSelected,
-          constraints: const BoxConstraints(minWidth: 212),
-          borderRadius: BorderRadius.circular(8),
-          splashRadius: 8,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-          child: AbsorbPointer(
-            child: VoicesOutlinedButton(
-              leading: VoicesAssets.icons.documentText.buildIcon(),
-              trailing:
-                  readOnly ? null : VoicesAssets.icons.chevronDown.buildIcon(),
-              onTap: () {},
-              style: OutlinedButton.styleFrom(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                side: showBorder
-                    ? BorderSide(color: context.colors.outlineBorderVariant)
-                    : BorderSide.none,
-                foregroundColor: context.colors.textOnPrimaryLevel1,
-                iconColor: context.colors.textOnPrimaryLevel1,
-              ),
-              child: Text(context.l10n.nrOfIteration(current?.number ?? 0)),
-            ),
-          ),
+          showBorder: showBorder,
+          leading: VoicesAssets.icons.documentText.buildIcon(),
+          child: Text(context.l10n.nrOfIteration(current?.number ?? 0)),
         ),
       ),
     );

@@ -40,7 +40,6 @@ class PasswordInfoPanel extends OnboardingPageBase {
 
   Future<void> verifyInfoPanel() async {
     expect($(headerTitle).text, (await t()).catalystKeychain);
-    //temporary: check for specific picture (locked icon)
     expect(
       find.byWidgetPredicate(
         (widget) =>

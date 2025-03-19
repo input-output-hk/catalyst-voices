@@ -18,7 +18,7 @@ final class ViewingOlderVersionSnackBar extends VoicesSnackBar {
             VoicesSnackBar.hideCurrent(context);
 
             context
-                .read<ProposalBloc>()
+                .read<ProposalCubit>()
                 .emitSignal(const ChangeVersionSignal());
           }
         },

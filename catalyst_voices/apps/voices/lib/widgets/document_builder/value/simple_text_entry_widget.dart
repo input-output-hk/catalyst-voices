@@ -1,5 +1,6 @@
 import 'package:catalyst_voices/common/ext/text_editing_controller_ext.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
+import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
@@ -28,47 +29,15 @@ class _SimpleTextEntryWidgetState extends State<SimpleTextEntryWidget> {
   late final TextEditingController _controller;
   late final FocusNode _focusNode;
   late final Debouncer _onChangedDebouncer;
+  bool _shouldDebounceChange = true;
 
-  String get _title => widget.schema.title;
   bool get _isRequired => widget.schema.isRequired;
+
   int? get _maxLength => widget.schema.strLengthRange?.max;
+
   bool get _resizable => widget.schema is DocumentMultiLineTextEntrySchema;
 
-  @override
-  void initState() {
-    super.initState();
-
-    final textValue =
-        TextEditingValueExt.collapsedAtEndOf(widget.property.value ?? '');
-
-    _controller = TextEditingController.fromValue(textValue);
-    _focusNode = FocusNode(canRequestFocus: widget.isEditMode);
-    _onChangedDebouncer = Debouncer();
-  }
-
-  @override
-  void didUpdateWidget(SimpleTextEntryWidget oldWidget) {
-    super.didUpdateWidget(oldWidget);
-
-    if (oldWidget.isEditMode != widget.isEditMode) {
-      _onEditModeChanged();
-      if (!widget.isEditMode) {
-        _controller.textWithSelection = widget.property.value ?? '';
-      }
-    }
-
-    if (widget.property.value != oldWidget.property.value) {
-      _controller.textWithSelection = widget.property.value ?? '';
-    }
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    _focusNode.dispose();
-    _onChangedDebouncer.dispose();
-    super.dispose();
-  }
+  String get _title => widget.schema.title;
 
   @override
   Widget build(BuildContext context) {
@@ -103,18 +72,49 @@ class _SimpleTextEntryWidgetState extends State<SimpleTextEntryWidget> {
     );
   }
 
-  void _onEditModeChanged() {
-    _focusNode.canRequestFocus = widget.isEditMode;
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
 
-    if (widget.isEditMode) {
-      _focusNode.requestFocus();
-    } else {
-      _focusNode.unfocus();
+    final theme = DocumentBuilderTheme.maybeOf(context);
+
+    _shouldDebounceChange = theme?.shouldDebounceChange ?? true;
+  }
+
+  @override
+  void didUpdateWidget(SimpleTextEntryWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (oldWidget.isEditMode != widget.isEditMode) {
+      _onEditModeChanged();
+      if (!widget.isEditMode) {
+        _controller.textWithSelection = widget.property.value ?? '';
+      }
+    }
+
+    if (widget.property.value != oldWidget.property.value) {
+      _controller.textWithSelection = widget.property.value ?? '';
     }
   }
 
-  void _onChanged(String? value) {
-    _onChangedDebouncer.run(() => _dispatchChange(value));
+  @override
+  void dispose() {
+    _controller.dispose();
+    _focusNode.dispose();
+    _onChangedDebouncer.dispose();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    final textValue =
+        TextEditingValueExt.collapsedAtEndOf(widget.property.value ?? '');
+
+    _controller = TextEditingController.fromValue(textValue);
+    _focusNode = FocusNode(canRequestFocus: widget.isEditMode);
+    _onChangedDebouncer = Debouncer();
   }
 
   void _dispatchChange(String? value) {
@@ -124,6 +124,24 @@ class _SimpleTextEntryWidgetState extends State<SimpleTextEntryWidget> {
       value: normalizedValue,
     );
     widget.onChanged([change]);
+  }
+
+  void _onChanged(String? value) {
+    if (_shouldDebounceChange) {
+      _onChangedDebouncer.run(() => _dispatchChange(value));
+    } else {
+      _dispatchChange(value);
+    }
+  }
+
+  void _onEditModeChanged() {
+    _focusNode.canRequestFocus = widget.isEditMode;
+
+    if (widget.isEditMode) {
+      _focusNode.requestFocus();
+    } else {
+      _focusNode.unfocus();
+    }
   }
 
   VoicesTextFieldValidationResult _validator(String? value) {

@@ -1,4 +1,5 @@
 import 'package:catalyst_voices/widgets/text_field/voices_password_text_field.dart';
+import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -85,6 +86,15 @@ class PasswordInputPanel extends OnboardingPageBase {
     expect(
       await infoPartHeaderSubtitleText(),
       (await t()).createKeychainUnlockPasswordIntoSubtitle,
+    );
+    expect(
+      find.byWidgetPredicate(
+        (widget) =>
+            widget is CatalystSvgPicture &&
+            (widget.bytesLoader as dynamic).assetName ==
+                'assets/icons/lock-closed.svg',
+      ),
+      findsOneWidget,
     );
     expect(
       await infoPartHeaderBodyText(),

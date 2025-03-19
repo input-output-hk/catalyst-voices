@@ -62,7 +62,6 @@ class KeychainFinalPanel extends OnboardingPageBase {
 
   Future<void> verifyInfoPanel() async {
     expect(await infoPartHeaderTitleText(), (await t()).catalystKeychain);
-    // temporary: check for specific picture (green key locked icon)
     expect(
       find.byWidgetPredicate(
         (widget) =>

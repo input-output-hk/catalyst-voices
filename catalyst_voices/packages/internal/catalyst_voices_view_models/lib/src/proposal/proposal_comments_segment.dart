@@ -7,9 +7,15 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 
 final class AddCommentSection extends ProposalCommentsSection {
+  final DocumentSchema schema;
+
   const AddCommentSection({
     required super.id,
+    required this.schema,
   });
+
+  @override
+  List<Object?> get props => super.props + [schema];
 
   @override
   String resolveTitle(BuildContext context) {
@@ -39,26 +45,63 @@ sealed class ProposalCommentsSection extends BaseSection {
 
 final class ProposalCommentsSegment
     extends BaseSegment<ProposalCommentsSection> {
+  final ProposalCommentsSort sort;
+
   const ProposalCommentsSegment({
     required super.id,
+    required this.sort,
     required super.sections,
   });
 
-  ProposalCommentsSegment.build({
-    required List<CommentWithReplies> comments,
-  }) : this(
-          id: const NodeId('comments'),
-          sections: [
-            ViewCommentsSection(
-              id: const NodeId('comments.view'),
-              comments: comments,
-            ),
-            const AddCommentSection(id: NodeId('comments.add')),
-          ],
-        );
-
   @override
   SvgGenImage get icon => VoicesAssets.icons.chatAlt2;
+
+  @override
+  List<Object?> get props => super.props + [sort];
+
+  ProposalCommentsSegment addComment(CommentDocument comment) {
+    final sections = this
+        .sections
+        .map(
+          (section) => switch (section) {
+            AddCommentSection() => section,
+            ViewCommentsSection() => section.addComment(comment),
+          },
+        )
+        .toList();
+
+    return copyWith(sections: sections);
+  }
+
+  ProposalCommentsSegment copySorted({
+    required ProposalCommentsSort sort,
+  }) {
+    final sortedSection = sections.map((section) {
+      return switch (section) {
+        AddCommentSection() => section,
+        ViewCommentsSection() => section.copyWith(
+            comments: sort.applyTo(section.comments),
+          ),
+      };
+    }).toList();
+
+    return copyWith(
+      sort: sort,
+      sections: sortedSection,
+    );
+  }
+
+  ProposalCommentsSegment copyWith({
+    NodeId? id,
+    ProposalCommentsSort? sort,
+    List<ProposalCommentsSection>? sections,
+  }) {
+    return ProposalCommentsSegment(
+      id: id ?? this.id,
+      sort: sort ?? this.sort,
+      sections: sections ?? this.sections,
+    );
+  }
 
   @override
   String resolveTitle(BuildContext context) {
@@ -87,6 +130,33 @@ final class ViewCommentsSection extends ProposalCommentsSection
 
   @override
   List<Object?> get props => super.props + [comments];
+
+  ViewCommentsSection addComment(CommentDocument comment) {
+    final comments = List.of(this.comments);
+    final parent = comment.metadata.parent;
+
+    if (parent != null) {
+      final index = comments.indexWhere((comment) => comment.contains(parent));
+      if (index != -1) {
+        final updated = comments.removeAt(index).addReply(comment);
+        comments.insert(index, updated);
+      }
+    } else {
+      comments.add(CommentWithReplies.direct(comment));
+    }
+
+    return copyWith(comments: comments);
+  }
+
+  ViewCommentsSection copyWith({
+    NodeId? id,
+    List<CommentWithReplies>? comments,
+  }) {
+    return ViewCommentsSection(
+      id: id ?? this.id,
+      comments: comments ?? this.comments,
+    );
+  }
 
   @override
   String resolveTitle(BuildContext context) {
