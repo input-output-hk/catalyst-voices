@@ -10,7 +10,6 @@ class SeedphraseSuccessPanel extends OnboardingPageBase {
   SeedphraseSuccessPanel(super.$);
 
   final nextStepBody = const Key('NextStepBody');
-  final greenImageLayoutBuilder = const Key('GreenImageLayoutBuilder');
 
   Future<void> clickNext() async {
     await $(nextButton).tap();
@@ -46,7 +45,6 @@ class SeedphraseSuccessPanel extends OnboardingPageBase {
 
   Future<void> verifyInfoPanel() async {
     expect(await infoPartHeaderTitleText(), (await t()).catalystKeychain);
-    //temporary: check for specific picture (green checked icon)
     expect(
       find.byWidgetPredicate(
         (widget) =>
