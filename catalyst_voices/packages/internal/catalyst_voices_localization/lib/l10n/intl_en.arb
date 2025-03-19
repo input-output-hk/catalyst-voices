@@ -1980,6 +1980,22 @@
       }
     }
   },
+  "emptyUserProposalDescriptionHelp": "Use Create Proposal in the top menu to get started.",
+  "@emptyUserProposalDescriptionHelp": {
+    "description": "Description shown when user has no proposals in workspace"
+  },
+  "noFinalUserProposals": "No Final proposals found",
+  "@noFinalUserProposals": {
+    "description": "Title shown when user has no final proposals in workspace"
+  },
+  "noDraftUserProposals": "No Draft proposals found",
+  "@noDraftUserProposals": {
+    "description": "Title shown when user has no draft proposals in workspace"
+  },
+  "noLocalUserProposals": "No Local proposals found",
+  "@noLocalUserProposals": {
+    "description": "Title shown when user has no local proposals in workspace"
+  },
   "cancelCommit": "Cancel",
   "@cancelCommit": {
     "description": "Cancel comment submission"

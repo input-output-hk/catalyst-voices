@@ -179,7 +179,7 @@ class _PendingProposalCardState extends State<PendingProposalCard> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       _Topbar(
-                        proposalId: widget.proposal.id,
+                        proposalRef: widget.proposal.ref,
                         showStatus: widget.showStatus,
                         isFavorite: widget.isFavorite,
                         onFavoriteChanged: widget.onFavoriteChanged,
@@ -384,13 +384,13 @@ class _Title extends StatelessWidget {
 }
 
 class _Topbar extends StatelessWidget {
-  final String proposalId;
+  final DocumentRef proposalRef;
   final bool showStatus;
   final bool isFavorite;
   final ValueChanged<bool>? onFavoriteChanged;
 
   const _Topbar({
-    required this.proposalId,
+    required this.proposalRef,
     required this.showStatus,
     required this.isFavorite,
     required this.onFavoriteChanged,
@@ -407,7 +407,10 @@ class _Topbar extends StatelessWidget {
           circle: false,
           onTap: () async {
             // TODO(LynxLynxx): Change to proposal view route when implemented
-            final url = ProposalBuilderRoute(proposalId: proposalId).location;
+            final url = ProposalBuilderRoute(
+              proposalId: proposalRef.id,
+              proposalVersion: proposalRef.version,
+            ).location;
             await ShareProposalDialog.show(context, url);
           },
         ),

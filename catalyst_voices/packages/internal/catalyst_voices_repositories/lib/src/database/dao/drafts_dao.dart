@@ -3,6 +3,7 @@ import 'package:catalyst_voices_repositories/src/database/catalyst_database.dart
 import 'package:catalyst_voices_repositories/src/database/dao/drafts_dao.drift.dart';
 import 'package:catalyst_voices_repositories/src/database/table/drafts.dart';
 import 'package:catalyst_voices_repositories/src/database/table/drafts.drift.dart';
+import 'package:collection/collection.dart';
 import 'package:drift/drift.dart';
 import 'package:flutter/foundation.dart';
 
@@ -31,6 +32,8 @@ abstract interface class DraftsDao {
   /// Returns all known document drafts refs.
   Future<List<DraftRef>> queryAllRefs();
 
+  Future<List<DocumentDraftEntity>> queryVersionsOfId({required String id});
+
   /// Singular version of [saveAll]. Does not run in transaction.
   Future<void> save(DocumentDraftEntity draft);
 
@@ -48,6 +51,12 @@ abstract interface class DraftsDao {
 
   /// Same as [query] but emits updates.
   Stream<DocumentDraftEntity?> watch({required DocumentRef ref});
+
+  Stream<List<DocumentDraftEntity>> watchAll({
+    int? limit,
+    DocumentType? type,
+    CatalystId? authorId,
+  });
 }
 
 @DriftAccessor(
@@ -113,6 +122,17 @@ class DriftDraftsDao extends DatabaseAccessor<DriftCatalystDatabase>
   }
 
   @override
+  Future<List<DocumentDraftEntity>> queryVersionsOfId({required String id}) {
+    final query = select(drafts)
+      ..where((tbl) => _filterRef(tbl, SignedDocumentRef(id: id)))
+      ..orderBy([
+        (u) => OrderingTerm.desc(u.verHi),
+      ]);
+
+    return query.get();
+  }
+
+  @override
   Future<void> save(DocumentDraftEntity draft) async {
     await into(drafts).insert(draft, mode: InsertMode.insertOrReplace);
   }
@@ -150,6 +170,36 @@ class DriftDraftsDao extends DatabaseAccessor<DriftCatalystDatabase>
   @override
   Stream<DocumentDraftEntity?> watch({required DocumentRef ref}) {
     return _selectRef(ref).watch().map((event) => event.firstOrNull);
+  }
+
+  @override
+  Stream<List<DocumentDraftEntity>> watchAll({
+    int? limit,
+    DocumentType? type,
+    CatalystId? authorId,
+  }) {
+    final query = select(drafts);
+
+    if (type != null) {
+      query.where((doc) => doc.type.equals(type.uuid));
+    }
+    if (authorId != null) {
+      // TODO(LynxLynxx): filter when catalystId is implemented as metadata
+      // query.where((doc) => doc.metadata.catalystId.equals(catalystId.uuid));
+    }
+
+    query.orderBy([
+      (t) => OrderingTerm(
+            expression: t.verHi,
+            mode: OrderingMode.desc,
+          ),
+    ]);
+
+    if (limit != null) {
+      query.limit(limit);
+    }
+
+    return query.watch();
   }
 
   Expression<bool> _filterRef($DraftsTable row, DocumentRef ref) {
