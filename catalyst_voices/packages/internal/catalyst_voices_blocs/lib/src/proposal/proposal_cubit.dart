@@ -21,12 +21,10 @@ final class ProposalCubit extends Cubit<ProposalState>
 
   // Cache
   DocumentRef? _ref;
-
-  // ignore: unused_field
   ProposalData? _proposal;
-
-  // ignore: unused_field
+  CommentTemplate? _commentTemplate;
   List<CommentWithReplies>? _comments;
+  bool? _isFavorite;
 
   // Note for integration.
   // 1. Fetch proposal document
@@ -46,30 +44,25 @@ final class ProposalCubit extends Cubit<ProposalState>
 
       final proposal = await _proposalService.getProposal(ref: ref);
       final comments = _buildComments();
-
-      if (isClosed) {
-        return;
-      }
-
-      final commentsSort = state.data.commentsSort;
-
-      final proposalViewData = _buildProposalViewData(
-        hasActiveAccount: _userService.user.activeAccount != null,
-        proposal: proposal,
-        comments: comments,
-        commentSchema: _buildCommentTemplate().document.schema,
-        commentsSort: commentsSort,
-        isFavorite: false,
-      );
+      final isFavorite = await _proposalService
+          .watchIsFavoritesProposal(
+            ref: ref,
+          )
+          .first;
 
       _ref = ref;
       _proposal = proposal;
       _comments = comments;
+      _isFavorite = isFavorite;
 
-      emit(ProposalState(data: proposalViewData));
+      if (!isClosed) {
+        final proposalState = _rebuildProposalState();
 
-      if (proposalViewData.isCurrentVersionLatest == false) {
-        emitSignal(const ViewingOlderVersionSignal());
+        emit(ProposalState(data: proposalState));
+
+        if (proposalState.isCurrentVersionLatest == false) {
+          emitSignal(const ViewingOlderVersionSignal());
+        }
       }
     } on LocalizedException catch (error, stack) {
       _logger.severe('Loading $ref failed', error, stack);
@@ -77,6 +70,7 @@ final class ProposalCubit extends Cubit<ProposalState>
       _ref = null;
       _proposal = null;
       _comments = null;
+      _isFavorite = null;
 
       emit(ProposalState(error: error));
     } catch (error, stack) {
@@ -85,6 +79,7 @@ final class ProposalCubit extends Cubit<ProposalState>
       _ref = null;
       _proposal = null;
       _comments = null;
+      _isFavorite = null;
 
       emit(const ProposalState(error: LocalizedUnknownException()));
     } finally {
@@ -149,39 +144,80 @@ final class ProposalCubit extends Cubit<ProposalState>
     emit(state.copyWith(data: updatedData));
   }
 
-  // TODO(damian-molinski): not implemented
   Future<void> updateIsFavorite({required bool value}) async {
-    final proposalId = _ref?.id;
-    assert(proposalId != null, 'Proposal ref not found. Load doc first');
+    final ref = _ref?.toLose();
+    assert(ref != null, 'Proposal ref not found. Load doc first');
 
     emit(state.copyWithFavorite(isFavorite: value));
+
+    if (value) {
+      await _proposalService.addFavoriteProposal(ref: ref!);
+    } else {
+      await _proposalService.removeFavoriteProposal(ref: ref!);
+    }
   }
 
   ProposalViewData _buildProposalViewData({
     required bool hasActiveAccount,
-    required ProposalData proposal,
+    required ProposalData? proposal,
     required List<CommentWithReplies> comments,
-    required DocumentSchema commentSchema,
+    required DocumentSchema? commentSchema,
     required ProposalCommentsSort commentsSort,
     required bool isFavorite,
   }) {
-    final proposalDocument = proposal.document;
-    final proposalDocumentRef = proposalDocument.metadata.selfRef;
-    final documentSegments = mapDocumentToSegments(proposalDocument.document);
+    final proposalDocument = proposal?.document;
+    final proposalDocumentRef = proposalDocument?.metadata.selfRef;
 
     /* cSpell:disable */
-    final versions = proposal.versions.mapIndexed((index, version) {
+    final proposalVersions = proposal?.versions ?? const [];
+    final versions = proposalVersions.mapIndexed((index, version) {
+      final ver = version.document.metadata.selfRef.version;
+
       return DocumentVersion(
-        id: version.document.metadata.selfRef.version ?? '',
+        id: ver ?? '',
         number: index + 1,
-        isCurrent: version.document.metadata.selfRef.version ==
-            proposalDocumentRef.version,
-        isLatest: index == proposal.versions.length - 1,
+        isCurrent: ver == proposalDocumentRef?.version,
+        isLatest: index == proposalVersions.length - 1,
       );
     }).toList();
-
     final currentVersion = versions.singleWhereOrNull((e) => e.isCurrent);
 
+    final segments = proposal != null
+        ? _buildSegments(
+            proposal: proposal,
+            version: currentVersion,
+            comments: comments,
+            commentSchema: commentSchema,
+            commentsSort: commentsSort,
+            hasActiveAccount: hasActiveAccount,
+          )
+        : const <Segment>[];
+
+    return ProposalViewData(
+      isCurrentVersionLatest: currentVersion?.isLatest,
+      header: ProposalViewHeader(
+        title: 'Project Mayhem: Freedom by Chaos',
+        authorDisplayName: 'Tyler Durden',
+        createdAt: DateTime.timestamp(),
+        commentsCount: comments.length,
+        versions: versions,
+        isFavorite: isFavorite,
+      ),
+      segments: segments,
+      commentsSort: commentsSort,
+    );
+    /* cSpell:enable */
+  }
+
+  /* cSpell:disable */
+  List<Segment> _buildSegments({
+    required ProposalData proposal,
+    required DocumentVersion? version,
+    required List<CommentWithReplies> comments,
+    required DocumentSchema? commentSchema,
+    required ProposalCommentsSort commentsSort,
+    required bool hasActiveAccount,
+  }) {
     final overviewSegment = ProposalOverviewSegment.build(
       categoryName: 'Cardano Partners: Growth & Acceleration',
       proposalTitle: 'Project Mayhem: Freedom by Chaos',
@@ -195,8 +231,8 @@ final class ProposalCubit extends Cubit<ProposalState>
             'inspiring global action for liberation and a return to human '
             'authenticity.',
         status: ProposalStatus.draft,
-        createdAt: currentVersion?.id.tryDateTime ?? DateTime.now(),
-        warningCreatedAt: currentVersion?.isLatest == false,
+        createdAt: version?.id.tryDateTime ?? DateTime.now(),
+        warningCreatedAt: version?.isLatest == false,
         tag: 'Community Outreach',
         commentsCount: comments.length,
         fundsRequested: 200000,
@@ -204,6 +240,8 @@ final class ProposalCubit extends Cubit<ProposalState>
         milestoneCount: 3,
       ),
     );
+
+    final proposalSegments = mapDocumentToSegments(proposal.document.document);
 
     final commentsSegment = ProposalCommentsSegment(
       id: const NodeId('comments'),
@@ -213,7 +251,7 @@ final class ProposalCubit extends Cubit<ProposalState>
           id: const NodeId('comments.view'),
           comments: commentsSort.applyTo(comments),
         ),
-        if (hasActiveAccount)
+        if (hasActiveAccount && commentSchema != null)
           AddCommentSection(
             id: const NodeId('comments.add'),
             schema: commentSchema,
@@ -221,23 +259,30 @@ final class ProposalCubit extends Cubit<ProposalState>
       ],
     );
 
-    return ProposalViewData(
-      isCurrentVersionLatest: currentVersion?.isLatest,
-      header: ProposalViewHeader(
-        title: 'Project Mayhem: Freedom by Chaos',
-        authorDisplayName: 'Tyler Durden',
-        createdAt: DateTime.timestamp(),
-        commentsCount: comments.length,
-        versions: versions,
-        isFavorite: isFavorite,
-      ),
-      segments: [
-        overviewSegment,
-        ...documentSegments,
-        commentsSegment,
-      ],
+    return [
+      overviewSegment,
+      ...proposalSegments,
+      commentsSegment,
+    ];
+  }
+
+  /* cSpell:enable */
+
+  ProposalViewData _rebuildProposalState() {
+    final proposal = _proposal;
+    final commentTemplate = _commentTemplate;
+    final comments = _comments ?? const [];
+    final commentsSort = state.data.commentsSort;
+    final isFavorite = _isFavorite ?? false;
+    final activeAccount = _userService.user.activeAccount;
+
+    return _buildProposalViewData(
+      hasActiveAccount: activeAccount != null,
+      proposal: proposal,
+      comments: comments,
+      commentSchema: commentTemplate?.document.schema,
       commentsSort: commentsSort,
+      isFavorite: isFavorite,
     );
-    /* cSpell:enable */
   }
 }

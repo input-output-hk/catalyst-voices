@@ -59,6 +59,9 @@ sealed class DocumentRef extends Equatable implements Comparable<DocumentRef> {
   /// i.e. by proposal builder.
   DraftRef nextVersion();
 
+  /// Creates ref without version.
+  DocumentRef toLose();
+
   /// Converts the [DocumentRef] to [SignedDocumentRef].
   ///
   /// Useful when a draft becomes a signed document after publishing.
@@ -92,6 +95,9 @@ final class DraftRef extends DocumentRef {
 
   @override
   DraftRef nextVersion() => this;
+
+  @override
+  DraftRef toLose() => copyWith(version: const Optional.empty());
 
   @override
   SignedDocumentRef toSignedDocumentRef() => SignedDocumentRef(
@@ -160,6 +166,7 @@ final class SignedDocumentRef extends DocumentRef {
     );
   }
 
+  @override
   SignedDocumentRef toLose() => copyWith(version: const Optional.empty());
 
   @override

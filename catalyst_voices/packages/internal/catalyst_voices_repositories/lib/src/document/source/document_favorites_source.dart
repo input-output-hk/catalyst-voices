@@ -15,6 +15,10 @@ final class DatabaseDocumentFavoriteSource implements DocumentFavoriteSource {
     required DocumentType type,
     required bool isFavorite,
   }) {
+    if (!isFavorite) {
+      return _database.favoritesDao.deleteWhere(id: id);
+    }
+
     final idHiLo = UuidHiLo.from(id);
     final entity = DocumentFavoriteEntity(
       idHi: idHiLo.high,
@@ -23,7 +27,7 @@ final class DatabaseDocumentFavoriteSource implements DocumentFavoriteSource {
       type: type,
     );
 
-    return _database.favoritesDao.upsert(entity);
+    return _database.favoritesDao.save(entity);
   }
 
   @override

@@ -16,10 +16,22 @@ class DriftFavoritesDao extends DatabaseAccessor<DriftCatalystDatabase>
   DriftFavoritesDao(super.attachedDatabase);
 
   @override
-  Future<void> upsert(DocumentFavoriteEntity entity) async {
+  Future<void> deleteWhere({required String id}) async {
+    final idHiLo = UuidHiLo.from(id);
+
+    final query = delete(documentsFavorites)
+      ..where((tbl) {
+        return tbl.idHi.equals(idHiLo.high) & tbl.idLo.equals(idHiLo.low);
+      });
+
+    await query.go();
+  }
+
+  @override
+  Future<void> save(DocumentFavoriteEntity entity) async {
     await into(documentsFavorites).insert(
       entity,
-      mode: InsertMode.insertOrReplace,
+      mode: InsertMode.insertOrIgnore,
     );
   }
 
@@ -66,7 +78,9 @@ class DriftFavoritesDao extends DatabaseAccessor<DriftCatalystDatabase>
 }
 
 abstract interface class FavoritesDao {
-  Future<void> upsert(DocumentFavoriteEntity entity);
+  Future<void> deleteWhere({required String id});
+
+  Future<void> save(DocumentFavoriteEntity entity);
 
   Stream<bool> watch({required String id});
 
