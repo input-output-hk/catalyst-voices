@@ -23,12 +23,16 @@ class DocumentBuilderSectionTile extends StatefulWidget {
   /// (Usually single property)
   final ValueChanged<List<model.DocumentChange>> onChanged;
 
+  /// See [DocumentPropertyBuilderOverrides].
+  final DocumentPropertyBuilderOverrides? overrides;
+
   const DocumentBuilderSectionTile({
     required super.key,
     required this.section,
     this.isSelected = false,
     this.autovalidateMode = AutovalidateMode.disabled,
     required this.onChanged,
+    this.overrides,
   });
 
   @override
@@ -76,6 +80,7 @@ class _DocumentBuilderSectionTileState
           property: _editedSection,
           isEditMode: _isEditMode,
           onChanged: _handlePropertyChanges,
+          overrides: widget.overrides,
         ),
       ),
     );

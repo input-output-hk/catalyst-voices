@@ -73,7 +73,7 @@ final class ProposalBuilderState extends Equatable {
   final ProposalBuilderMetadata metadata;
   final List<DocumentSegment> segments;
   final ProposalGuidance guidance;
-  final CampaignCategory? category;
+  final CampaignCategoryDetailsViewModel? category;
   final NodeId? activeNodeId;
   final bool showValidationErrors;
 
@@ -120,7 +120,7 @@ final class ProposalBuilderState extends Equatable {
     ProposalBuilderMetadata? metadata,
     List<DocumentSegment>? segments,
     ProposalGuidance? guidance,
-    Optional<CampaignCategory>? category,
+    Optional<CampaignCategoryDetailsViewModel>? category,
     Optional<NodeId>? activeNodeId,
     bool? showValidationErrors,
   }) {

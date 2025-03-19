@@ -91,13 +91,14 @@ final class ProposalBuilderBloc
     final firstSegment = segments.firstOrNull;
     final firstSection = firstSegment?.sections.firstOrNull;
     final guidance = _getGuidanceForSection(firstSegment, firstSection);
+    final categoryVM = CampaignCategoryDetailsViewModel.fromModel(category);
 
     return ProposalBuilderState(
       segments: segments,
       guidance: guidance,
       document: document,
       metadata: metadata,
-      category: category,
+      category: categoryVM,
       activeNodeId: firstSection?.id,
     );
   }

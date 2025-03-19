@@ -1,10 +1,20 @@
+import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
+import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
+
+part 'proposal_builder_document_widgets.dart';
+
+final DocumentPropertyBuilderOverrides _widgetOverrides = {
+  ProposalDocument.categoryDetailsNodeId: (context, property) =>
+      _CategoryDetails(property: property),
+};
 
 class ProposalBuilderSegmentsSelector extends StatelessWidget {
   final ItemScrollController itemScrollController;
@@ -86,6 +96,7 @@ class _Section extends StatelessWidget {
             final event = SectionChangedEvent(changes: value);
             context.read<ProposalBuilderBloc>().add(event);
           },
+          overrides: _widgetOverrides,
         );
       },
     );
