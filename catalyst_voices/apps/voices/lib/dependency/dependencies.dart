@@ -253,6 +253,7 @@ final class Dependencies extends DependencyProvider {
         get<DocumentRepository>(),
         get<UserService>(),
         get<KeyDerivationService>(),
+        get<CampaignRepository>(),
       );
     });
     registerLazySingleton<ConfigService>(() {

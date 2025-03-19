@@ -56,6 +56,7 @@ class VoicesCheckbox extends StatelessWidget {
             note: note,
             spacings: const [12, 8],
             child: Checkbox(
+              key: const Key('Checkbox'),
               value: value,
               // forcing null unwrapping because we're not allowing null value
               onChanged:
