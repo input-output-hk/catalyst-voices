@@ -237,7 +237,7 @@ async fn last_signing_key(
         .role_data()
         .get(&RoleNumber::ROLE_0)
         .context("Missing role 0 data")?
-        .1
+        .data()
         .signing_key()
         .context("Missing signing key")?;
     let key_offset = usize::try_from(key_ref.key_offset).context("Invalid signing key offset")?;
@@ -247,7 +247,9 @@ async fn last_signing_key(
                 .x509_certs()
                 .get(&key_offset)
                 .context("Missing X509 role 0 certificate")?
-                .1;
+                .last()
+                .and_then(|p| p.data().as_ref())
+                .context("Unable to get last X509 role 0 certificate")?;
             x509_key(cert)
         },
         LocalRefInt::C509Certs => {
@@ -255,7 +257,9 @@ async fn last_signing_key(
                 .c509_certs()
                 .get(&key_offset)
                 .context("Missing C509 role 0 certificate")?
-                .1;
+                .last()
+                .and_then(|p| p.data().as_ref())
+                .context("Unable to get last C509 role 0 certificate")?;
             c509_key(cert)
         },
         LocalRefInt::PubKeys => {
