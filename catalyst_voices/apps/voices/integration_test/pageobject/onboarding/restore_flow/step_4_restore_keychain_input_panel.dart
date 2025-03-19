@@ -15,6 +15,7 @@ class RestoreKeychainInputPanel extends OnboardingPageBase {
       const Key('RecoverySeedPhraseInputSubtitle');
   final resetButton = const Key('ResetButton');
   final importCatalystKey = const Key('UploadKeyButton');
+  final uploadKeyButton = const Key('UploadKeyButton');
 
   @override
   Future<void> goto() async {
@@ -38,6 +39,7 @@ class RestoreKeychainInputPanel extends OnboardingPageBase {
   @override
   Future<void> verifyPageElements() async {
     await verifyInfoPanel();
+    await verifyDetailsPanel();
   }
 
   Future<void> verifyInfoPanel() async {
@@ -45,10 +47,29 @@ class RestoreKeychainInputPanel extends OnboardingPageBase {
     expect(infoPartTaskPicture(), findsOneWidget);
     expect($(progressBar), findsOneWidget);
     expect(
-      $(registrationInfoPanel).$(CommonPage($).decorData).$(Text).text,
+      $(learnMoreButton).$(Text).text,
       (await t()).learnMore,
     );
   }
 
-  Future<void> verifyDetailsPanel() async {}
+  Future<void> verifyDetailsPanel() async {
+    expect(
+      $(recoverySeedPhraseInputTitle).text,
+      (await t()).recoverySeedPhraseInstructionsTitle,
+    );
+
+    expect(
+      $(recoverySeedPhraseInputSubtitle).text,
+      (await t()).recoverySeedPhraseInstructionsSubtitle,
+    );
+
+    for (var i = 1; i < 13; i++) {
+      expect(find.byKey(Key('Word${i}CellKey')), findsOneWidget);
+
+      expect($(uploadKeyButton), findsOneWidget);
+      expect($(resetButton), findsOneWidget);
+      expect($(backButton), findsOneWidget);
+      expect($(nextButton), findsOneWidget);
+    }
+  }
 }
