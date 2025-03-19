@@ -6,7 +6,7 @@ import 'package:catalyst_voices_repositories/src/database/dao/favorites_dao.dart
 import 'package:catalyst_voices_repositories/src/database/migration/drift_migration_strategy.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents.drift.dart';
-import 'package:catalyst_voices_repositories/src/database/table/documents_favourite.dart';
+import 'package:catalyst_voices_repositories/src/database/table/documents_favorite.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_metadata.dart';
 import 'package:catalyst_voices_repositories/src/database/table/drafts.dart';
 import 'package:catalyst_voices_repositories/src/database/table/drafts.drift.dart';

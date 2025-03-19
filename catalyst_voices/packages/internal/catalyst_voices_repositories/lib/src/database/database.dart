@@ -4,7 +4,7 @@ export 'dao/documents_dao.dart' show DocumentsDao;
 export 'dao/drafts_dao.dart' show DraftsDao;
 export 'dao/favorites_dao.dart' show FavoritesDao;
 export 'table/documents.drift.dart' show DocumentEntity;
-export 'table/documents_favourite.drift.dart' show DocumentFavouriteEntity;
+export 'table/documents_favorite.drift.dart' show DocumentFavoriteEntity;
 export 'table/documents_metadata.drift.dart' show DocumentMetadataEntity;
 export 'table/drafts.drift.dart' show DocumentDraftEntity;
 export 'typedefs.dart';

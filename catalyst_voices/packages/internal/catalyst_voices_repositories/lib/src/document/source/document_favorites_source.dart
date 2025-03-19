@@ -1,6 +1,6 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
-import 'package:catalyst_voices_repositories/src/database/table/documents_favourite.drift.dart';
+import 'package:catalyst_voices_repositories/src/database/table/documents_favorite.drift.dart';
 
 final class DatabaseDocumentFavoriteSource implements DocumentFavoriteSource {
   final CatalystDatabase _database;

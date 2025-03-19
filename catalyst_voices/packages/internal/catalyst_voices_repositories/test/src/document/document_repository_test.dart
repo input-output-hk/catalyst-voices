@@ -22,7 +22,7 @@ void main() {
   late DraftDataSource draftsSource;
   late SignedDocumentDataSource localDocuments;
   late DocumentDataRemoteSource remoteDocuments;
-  late DocumentFavoriteSource favourite;
+  late DocumentFavoriteSource favorite;
 
   setUp(() {
     final inMemory = DatabaseConnection(NativeDatabase.memory());
@@ -31,13 +31,13 @@ void main() {
     draftsSource = DatabaseDraftsDataSource(database);
     localDocuments = DatabaseDocumentsDataSource(database);
     remoteDocuments = _MockDocumentDataRemoteSource();
-    favourite = DatabaseDocumentFavoriteSource(database);
+    favorite = DatabaseDocumentFavoriteSource(database);
 
     repository = DocumentRepositoryImpl(
       draftsSource,
       localDocuments,
       remoteDocuments,
-      favourite,
+      favorite,
     );
   });
 

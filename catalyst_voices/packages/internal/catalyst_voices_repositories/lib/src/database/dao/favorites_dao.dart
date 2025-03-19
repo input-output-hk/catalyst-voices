@@ -1,8 +1,8 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/database/catalyst_database.dart';
 import 'package:catalyst_voices_repositories/src/database/dao/favorites_dao.drift.dart';
-import 'package:catalyst_voices_repositories/src/database/table/documents_favourite.dart';
-import 'package:catalyst_voices_repositories/src/database/table/documents_favourite.drift.dart';
+import 'package:catalyst_voices_repositories/src/database/table/documents_favorite.dart';
+import 'package:catalyst_voices_repositories/src/database/table/documents_favorite.drift.dart';
 import 'package:drift/drift.dart';
 
 @DriftAccessor(
