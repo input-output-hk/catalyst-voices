@@ -80,6 +80,18 @@ class _Section extends StatelessWidget {
     required this.isSelected,
   });
 
+  bool get _isEditable {
+    for (final overriddenNodeId in _widgetOverrides.keys) {
+      final sectionHasOverrides = overriddenNodeId.isChildOf(property.nodeId);
+      if (sectionHasOverrides) {
+        // disable editing for overridden widgets
+        return false;
+      }
+    }
+
+    return true;
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocSelector<ProposalBuilderBloc, ProposalBuilderState, bool>(
@@ -89,6 +101,7 @@ class _Section extends StatelessWidget {
           key: key,
           section: property,
           isSelected: isSelected,
+          isEditable: _isEditable,
           autovalidateMode: showValidationErrors
               ? AutovalidateMode.always
               : AutovalidateMode.disabled,
