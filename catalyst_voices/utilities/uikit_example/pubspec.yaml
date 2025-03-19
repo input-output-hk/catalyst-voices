@@ -33,7 +33,7 @@ dependencies:
   flutter_quill:
     git:
       url: https://github.com/input-output-hk/flutter-quill
-      ref: 6caa9297da64e6582739280329ae43a0a58ce217
+      ref: 41f37dcf56b97b1bffe10f012dc667795a30e74e
 
 dev_dependencies:
   build_runner: ^2.4.12
