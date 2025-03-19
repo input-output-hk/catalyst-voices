@@ -136,26 +136,26 @@ void main() {
       });
 
       test('stream emits data that contains correct catalystId', () async {
-        final catalystId1 = CatalystId(host: 'test', role0Key: Uint8List(32));
-        final catalystId2 = CatalystId(host: 'test1', role0Key: Uint8List(32));
-        final catalystId3 = CatalystId(host: 'test3', role0Key: Uint8List(32));
+        final authorId1 = CatalystId(host: 'test', role0Key: Uint8List(32));
+        final authorId2 = CatalystId(host: 'test1', role0Key: Uint8List(32));
+        final authorId3 = CatalystId(host: 'test3', role0Key: Uint8List(32));
         // Given
         final draft = DraftFactory.build(
           metadata: DocumentDataMetadata(
             type: DocumentType.proposalDocument,
             selfRef: DraftRef.generateFirstRef(),
             signers: [
-              catalystId1.toString(),
-              catalystId2.toString(),
+              authorId1.toString(),
+              authorId2.toString(),
             ],
           ),
         );
 
         // When
         final documentsStream =
-            database.draftsDao.watchAll(catalystId: catalystId2);
+            database.draftsDao.watchAll(authorId: authorId2);
         final invalidCatalystIdStream =
-            database.draftsDao.watchAll(catalystId: catalystId3);
+            database.draftsDao.watchAll(authorId: authorId3);
 
         await database.draftsDao.save(draft);
 
