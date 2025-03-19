@@ -1995,5 +1995,21 @@
   "noLocalUserProposals": "No Local proposals found",
   "@noLocalUserProposals": {
     "description": "Title shown when user has no local proposals in workspace"
+  },
+  "cancelCommit": "Cancel",
+  "@cancelCommit": {
+    "description": "Cancel comment submission"
+  },
+  "submitCommit": "Submit",
+  "@submitCommit": {
+    "description": "Send comment"
+  },
+  "proposalCommentsSortNewest": "Newest First",
+  "@proposalCommentsSortNewest": {
+    "description": "One of options for sorting comments under proposal"
+  },
+  "proposalCommentsSortOldest": "Newest Oldest",
+  "@proposalCommentsSortOldest": {
+    "description": "One of options for sorting comments under proposal"
   }
 }
