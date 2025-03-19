@@ -81,6 +81,7 @@ final class ProposalBuilderBloc
   ProposalBuilderState _createState({
     required Document document,
     required ProposalBuilderMetadata metadata,
+    required CampaignCategory category,
   }) {
     final segments = _mapDocumentToSegments(
       document,
@@ -96,6 +97,7 @@ final class ProposalBuilderBloc
       guidance: guidance,
       document: document,
       metadata: metadata,
+      category: category,
       activeNodeId: firstSection?.id,
     );
   }
@@ -266,6 +268,7 @@ final class ProposalBuilderBloc
           templateRef: templateRef,
           categoryId: category.selfRef,
         ),
+        category: category,
       );
     });
   }
@@ -293,6 +296,9 @@ final class ProposalBuilderBloc
         );
       }).toList();
 
+      final categoryId = proposalData.categoryId;
+      final category = await _campaignService.getCategory(categoryId);
+
       return _createState(
         document: proposalData.document.document,
         metadata: ProposalBuilderMetadata(
@@ -303,6 +309,7 @@ final class ProposalBuilderBloc
           categoryId: proposalData.categoryId,
           versions: versions,
         ),
+        category: category,
       );
     });
   }
@@ -330,6 +337,7 @@ final class ProposalBuilderBloc
           templateRef: templateRef,
           categoryId: categoryId,
         ),
+        category: category,
       );
     });
   }

@@ -73,6 +73,7 @@ final class ProposalBuilderState extends Equatable {
   final ProposalBuilderMetadata metadata;
   final List<DocumentSegment> segments;
   final ProposalGuidance guidance;
+  final CampaignCategory? category;
   final NodeId? activeNodeId;
   final bool showValidationErrors;
 
@@ -83,6 +84,7 @@ final class ProposalBuilderState extends Equatable {
     this.metadata = const ProposalBuilderMetadata(),
     this.segments = const [],
     this.guidance = const ProposalGuidance(),
+    this.category,
     this.activeNodeId,
     this.showValidationErrors = false,
   });
@@ -102,6 +104,7 @@ final class ProposalBuilderState extends Equatable {
         metadata,
         segments,
         guidance,
+        category,
         activeNodeId,
         showValidationErrors,
       ];
@@ -117,6 +120,7 @@ final class ProposalBuilderState extends Equatable {
     ProposalBuilderMetadata? metadata,
     List<DocumentSegment>? segments,
     ProposalGuidance? guidance,
+    Optional<CampaignCategory>? category,
     Optional<NodeId>? activeNodeId,
     bool? showValidationErrors,
   }) {
@@ -127,6 +131,7 @@ final class ProposalBuilderState extends Equatable {
       metadata: metadata ?? this.metadata,
       segments: segments ?? this.segments,
       guidance: guidance ?? this.guidance,
+      category: category.dataOr(this.category),
       activeNodeId: activeNodeId.dataOr(this.activeNodeId),
       showValidationErrors: showValidationErrors ?? this.showValidationErrors,
     );
