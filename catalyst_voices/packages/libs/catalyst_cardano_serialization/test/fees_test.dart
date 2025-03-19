@@ -158,7 +158,7 @@ void main() {
       final expectedFee = Coin(linearFee + scriptFee);
       final actualFee = tieredFee.tieredFee(txBytes, refScriptsBytes);
 
-      expect(actualFee, equals(expectedFee));
+      expect(Coin(actualFee), equals(expectedFee));
     });
   });
 
