@@ -64,6 +64,6 @@ class RestoreKeychainChoicePanel extends OnboardingPageBase {
       (await t()).recoverCatalystKeychain,
     );
     expect(infoPartTaskPicture(), findsOneWidget);
-    expect($(learnMoreButton).$(Text).text, (await t()).learnMore);
+    expect(infoPartLearnMoreText(), (await t()).learnMore);
   }
 }

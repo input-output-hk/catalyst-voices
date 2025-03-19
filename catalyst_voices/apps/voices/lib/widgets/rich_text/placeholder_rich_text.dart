@@ -48,7 +48,6 @@ class _PlaceholderRichTextState extends State<PlaceholderRichText> {
   @override
   Widget build(BuildContext context) {
     return Text.rich(
-      key: const Key('PlaceholderRichText'),
       TextSpan(children: _spans),
       textAlign: widget.textAlign,
       style: widget.style,

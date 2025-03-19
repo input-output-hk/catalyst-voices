@@ -49,5 +49,4 @@ dev_dependencies:
     sdk: flutter
   json_serializable: ^6.7.1
   mocktail: ^1.0.1
-  sqlite3: ^2.7.5
   swagger_dart_code_generator: ^3.0.1

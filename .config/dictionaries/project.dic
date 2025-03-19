@@ -179,7 +179,6 @@ libatspi
 libavcodec
 libcatalyst
 libdrm
-libsqlite3
 libflutter
 libgbm
 libnss

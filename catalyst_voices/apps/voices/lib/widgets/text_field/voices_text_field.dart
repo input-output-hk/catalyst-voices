@@ -163,7 +163,6 @@ class VoicesTextField extends VoicesFormField<String> {
               children: [
                 if (labelText.isNotEmpty) ...[
                   Text(
-                    key: const Key('EnterPasswordText'),
                     labelText,
                     style: enabled
                         ? textTheme.titleSmall

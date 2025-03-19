@@ -242,7 +242,6 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
         .distinct(_entitiesEquals);
   }
 
-  /// When [unique] is true, only latest versions of each document are returned.
   @override
   Stream<List<DocumentEntity>> watchAll({
     bool unique = false,

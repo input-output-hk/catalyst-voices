@@ -68,7 +68,7 @@ class WriteDownSeedphrasePanel extends OnboardingPageBase {
     );
     expect(infoPartTaskPicture(), findsOneWidget);
     expect($(progressBar), findsOneWidget);
-    expect($(learnMoreButton).$(Text).text, (await t()).learnMore);
+    expect(infoPartLearnMoreText(), (await t()).learnMore);
   }
 
   Future<void> verifyDetailsPanel() async {

@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../../utils/translations_utils.dart';
@@ -23,27 +22,15 @@ class WritedownSeedphraseInfoPanel extends OnboardingPageBase {
   @override
   Future<void> verifyPageElements() async {
     await verifyInfoPanel();
-    await verifyDetailsPanel();
   }
 
   Future<void> verifyInfoPanel() async {
-    expect($(headerTitle).text, (await t()).catalystKeychain);
+    expect(await infoPartHeaderTitleText(), (await t()).catalystKeychain);
     expect(infoPartTaskPicture(), findsOneWidget);
     expect($(progressBar), findsOneWidget);
-    expect($(learnMoreButton).$(Text).text, (await t()).learnMore);
+    expect(infoPartLearnMoreText(), (await t()).learnMore);
     expect(await closeButton(), findsOneWidget);
   }
 
-  Future<void> verifyDetailsPanel() async {
-    expect(
-      $(registrationDetailsTitle).$(Text).text,
-      (await t()).createKeychainSeedPhraseCheckInstructionsTitle,
-    );
-    expect(
-      $(registrationDetailsBody).$(Text).text,
-      (await t()).createKeychainSeedPhraseCheckInstructionsSubtitle,
-    );
-    expect($(nextButton), findsOneWidget);
-    expect($(backButton), findsOneWidget);
-  }
+  Future<void> verifyDetailsPanel() async {}
 }

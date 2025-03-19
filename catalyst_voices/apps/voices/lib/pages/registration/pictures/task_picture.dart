@@ -64,7 +64,6 @@ class TaskPicture extends StatelessWidget {
                 height: size.height,
               ),
               ConstrainedBox(
-                key: const ValueKey('LockedPictureConstrainedBox'),
                 constraints: BoxConstraints.tight(childSize),
                 child: child,
               ),

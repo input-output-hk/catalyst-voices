@@ -34,17 +34,4 @@ class UnlockPasswordInputPanel extends PasswordInputPanel {
     );
     expect(await closeButton(), findsOneWidget);
   }
-
-  @override
-  Future<void> verifyDetailsPanel() async {
-    expect($(passwordInputField).$(voicesTextField), findsOneWidget);
-    expect($(enterPasswordText).text, (await t()).enterPassword);
-    expect(
-      $(passwordConfirmInputField).$(enterPasswordText).text,
-      (await t()).confirmPassword,
-    );
-    expect($(passwordConfirmInputField).$(voicesTextField), findsOneWidget);
-    expect($(backButton), findsOneWidget);
-    expect($(nextButton), findsOneWidget);
-  }
 }

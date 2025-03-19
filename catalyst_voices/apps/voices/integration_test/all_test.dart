@@ -16,6 +16,7 @@ void main() async {
   setUpAll(() async {
     await bootstrap(router: buildAppRouter());
   });
+
   app_test.main();
   onboarding_restore_test.main();
   onboarding_test.main();

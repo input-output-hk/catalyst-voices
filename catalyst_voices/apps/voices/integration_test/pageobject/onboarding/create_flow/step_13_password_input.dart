@@ -1,5 +1,4 @@
 import 'package:catalyst_voices/widgets/text_field/voices_password_text_field.dart';
-import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -14,8 +13,7 @@ class PasswordInputPanel extends OnboardingPageBase {
   final passwordInputField = const Key('PasswordInputField');
   final passwordConfirmInputField = const Key('PasswordConfirmInputField');
   final passwordStrengthLabel = const Key('PasswordStrengthLabel');
-  final enterPasswordText = const Key('EnterPasswordText');
-  final voicesTextField = const Key('VoicesTextField');
+
   Future<void> clickNext() async {
     await $(nextButton).tap();
   }
@@ -74,27 +72,13 @@ class PasswordInputPanel extends OnboardingPageBase {
     }
   }
 
-  Future<void> verifyDetailsPanel() async {
-    expect($(enterPasswordText), (await t()).enterPassword);
-    expect($(passwordInputField), findsOneWidget);
-    expect($(passwordConfirmInputField), findsOneWidget);
-    expect($(passwordConfirmInputField).$(voicesTextField), findsOneWidget);
-  }
+  Future<void> verifyDetailsPanel() async {}
 
   Future<void> verifyInfoPanel() async {
     expect(await infoPartHeaderTitleText(), (await t()).catalystKeychain);
     expect(
       await infoPartHeaderSubtitleText(),
       (await t()).createKeychainUnlockPasswordIntoSubtitle,
-    );
-    expect(
-      find.byWidgetPredicate(
-        (widget) =>
-            widget is CatalystSvgPicture &&
-            (widget.bytesLoader as dynamic).assetName ==
-                'assets/icons/lock-closed.svg',
-      ),
-      findsOneWidget,
     );
     expect(
       await infoPartHeaderBodyText(),

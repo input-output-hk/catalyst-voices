@@ -22,7 +22,6 @@ class SeedPhrasePicture extends StatelessWidget {
       child: TaskPictureIconBox(
         type: type,
         child: LayoutBuilder(
-          key: const Key('GreenImageLayoutBuilder'),
           builder: (context, constraints) {
             return Padding(
               padding: EdgeInsets.all(constraints.maxWidth * 0.176),

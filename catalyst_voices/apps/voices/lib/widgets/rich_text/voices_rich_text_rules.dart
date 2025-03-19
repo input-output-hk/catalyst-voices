@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart' as quill;
-import 'package:flutter_quill/internal.dart' as quill_int;
+import 'package:flutter_quill/flutter_quill_internal.dart' as quill_int;
 import 'package:flutter_quill/quill_delta.dart';
 
 /// Heuristic rule to exit current block when user inserts two consecutive

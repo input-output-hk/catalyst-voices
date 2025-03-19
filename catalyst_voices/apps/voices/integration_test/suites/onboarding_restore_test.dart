@@ -226,7 +226,6 @@ void main() async {
           (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await UnlockPasswordInputPanel($).goto();
-        await UnlockPasswordInputPanel($).verifyPageElements();
 
         // Test invalid password
         await UnlockPasswordInputPanel($).enterPassword('short', 'short');

@@ -21,12 +21,7 @@ class NextStep extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         const SizedBox(height: 8),
-        VoicesTextDivider(
-          child: Text(
-            context.l10n.yourNextStep,
-            key: const Key('NextStepText'),
-          ),
-        ),
+        VoicesTextDivider(child: Text(context.l10n.yourNextStep)),
         const SizedBox(height: 12),
         if (data != null) ...[
           Text(

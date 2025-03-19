@@ -53,7 +53,7 @@ class AccountCreateProgressPanel extends StatelessWidget {
         ),
         if (nextStepText != null) ...[
           const SizedBox(height: 10),
-          NextStep(nextStepText, key: const Key('NextStep')),
+          NextStep(nextStepText),
         ],
         if (nextStep == AccountCreateStepType.keychain) ...[
           const SizedBox(height: 10),
