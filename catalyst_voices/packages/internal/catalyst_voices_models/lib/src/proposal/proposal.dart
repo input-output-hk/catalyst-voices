@@ -55,7 +55,7 @@ final class Proposal extends Equatable {
     );
   }
 
-factory Proposal.fromData(ProposalData data) {
+  factory Proposal.fromData(ProposalData data) {
     final updateDate = data.document.metadata.selfRef.version!.dateTime;
 
     final versions = data.versions.map(ProposalVersion.fromData).toList()
