@@ -2,7 +2,7 @@ import 'package:catalyst_voices_shared/src/range/range.dart';
 import 'package:test/test.dart';
 
 void main() {
-  group('ComparableRange', () {
+  group(ComparableRange, () {
     test('contains() returns true for values within range', () {
       const range = ComparableRange<num>(min: 10, max: 20);
       expect(range.contains(15), isTrue);
@@ -26,7 +26,7 @@ void main() {
     });
   });
 
-  group('NumRange', () {
+  group(NumRange, () {
     test('contains() returns true for constrained range', () {
       const range = NumRange(min: 10, max: 20);
       expect(range.contains(15), isTrue);

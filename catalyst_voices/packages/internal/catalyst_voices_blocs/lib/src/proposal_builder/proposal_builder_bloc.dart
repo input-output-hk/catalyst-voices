@@ -307,7 +307,7 @@ final class ProposalBuilderBloc
           documentRef: proposal.selfRef,
           originalDocumentRef: proposal.selfRef,
           templateRef: proposalData.templateRef,
-          categoryId: proposalData.categoryId,
+          categoryId: categoryId,
           versions: versions,
         ),
         category: category,
