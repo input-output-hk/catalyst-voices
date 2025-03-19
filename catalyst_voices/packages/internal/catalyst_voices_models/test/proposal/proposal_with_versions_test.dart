@@ -4,7 +4,7 @@ import 'package:test/test.dart';
 import 'package:uuid_plus/uuid_plus.dart';
 
 void main() {
-  group(ProposalWithVersions, () {
+  group(Proposal, () {
     test('check if versions are sorted from latest to oldest', () async {
       final proposalId = const Uuid().v7();
       final versionId1 = const Uuid().v7();
@@ -13,7 +13,7 @@ void main() {
       await Future.delayed(const Duration(milliseconds: 1), () {});
       final versionId3 = const Uuid().v7();
 
-      final proposalWithVersions = ProposalWithVersions(
+      final proposalWithVersions = Proposal(
         selfRef: DocumentRef.build(
           id: proposalId,
           isDraft: true,
@@ -26,7 +26,6 @@ void main() {
         fundsRequested: const Coin(100),
         status: ProposalStatus.draft,
         publish: ProposalPublish.localDraft,
-        versionCount: 3,
         duration: 6,
         author: 'Alex Wells',
         commentsCount: 0,
@@ -84,7 +83,7 @@ void main() {
       await Future.delayed(const Duration(milliseconds: 1), () {});
       final versionId2 = const Uuid().v7();
 
-      final proposalWithVersions = ProposalWithVersions(
+      final proposalWithVersions = Proposal(
         selfRef: DocumentRef.build(
           id: proposalId,
           isDraft: true,
@@ -97,7 +96,6 @@ void main() {
         fundsRequested: const Coin(100),
         status: ProposalStatus.draft,
         publish: ProposalPublish.localDraft,
-        versionCount: 3,
         duration: 6,
         author: 'Alex Wells',
         commentsCount: 0,

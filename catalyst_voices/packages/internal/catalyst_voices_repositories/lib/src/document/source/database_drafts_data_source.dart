@@ -35,6 +35,13 @@ final class DatabaseDraftsDataSource implements DraftDataSource {
   }
 
   @override
+  Future<List<DocumentData>> queryVersionsOfId({required String id}) async {
+    final documentEntities =
+        await _database.draftsDao.queryVersionsOfId(id: id);
+    return documentEntities.map((e) => e.toModel()).toList();
+  }
+
+  @override
   Future<void> save({required DocumentData data}) async {
     final idHiLo = UuidHiLo.from(data.metadata.id);
     final verHiLo = UuidHiLo.from(data.metadata.version);
@@ -66,6 +73,24 @@ final class DatabaseDraftsDataSource implements DraftDataSource {
     return _database.draftsDao
         .watch(ref: ref)
         .map((entity) => entity?.toModel());
+  }
+
+  @override
+  Stream<List<DocumentData>> watchAll({
+    int? limit,
+    DocumentType? type,
+    CatalystId? authorId,
+  }) {
+    return _database.draftsDao
+        .watchAll(
+      limit: limit,
+      type: type,
+      authorId: authorId,
+    )
+        .map((event) {
+      final list = List<DocumentData>.from(event.map((e) => e.toModel()));
+      return list;
+    });
   }
 }
 
