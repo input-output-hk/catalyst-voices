@@ -1,13 +1,15 @@
 import 'dart:math';
+import 'dart:typed_data';
 
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_repositories/src/document/document_repository.dart';
+import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
+import 'package:catalyst_voices_repositories/src/dto/document/document_data_dto.dart';
+import 'package:catalyst_voices_repositories/src/dto/document/document_dto.dart';
+import 'package:catalyst_voices_repositories/src/dto/document/schema/document_schema_dto.dart';
 import 'package:catalyst_voices_repositories/src/dto/proposal/proposal_submission_action_dto.dart';
-import 'package:catalyst_voices_repositories/src/signed_document/signed_document_json_payload.dart';
-import 'package:catalyst_voices_repositories/src/signed_document/signed_document_manager.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
-import 'package:uuid_plus/uuid_plus.dart';
+import 'package:rxdart/rxdart.dart';
 
 final _proposalDescription = """
 Zanzibar is becoming one of the hotspots for DID's through
@@ -36,6 +38,12 @@ abstract interface class ProposalRepository {
 
   Future<List<String>> addFavoriteProposal(String proposalId);
 
+  Future<void> deleteDraftProposal(DraftRef ref);
+
+  Future<Uint8List> encodeProposalForExport({
+    required DocumentData document,
+  });
+
   Future<List<String>> getFavoritesProposalsIds();
 
   Future<ProposalData> getProposal({
@@ -47,7 +55,16 @@ abstract interface class ProposalRepository {
     required ProposalPaginationRequest request,
   });
 
+  /// Returns [ProposalTemplate] for matching [ref].
+  ///
+  /// Source of data depends whether [ref] is [SignedDocumentRef] or [DraftRef].
+  Future<ProposalTemplate> getProposalTemplate({
+    required DocumentRef ref,
+  });
+
   Future<List<String>> getUserProposalsIds(String userId);
+
+  Future<DocumentRef> importProposal(Uint8List data);
 
   Future<void> publishProposal({
     required DocumentData document,
@@ -63,7 +80,22 @@ abstract interface class ProposalRepository {
     required CatalystPrivateKey privateKey,
   });
 
+  Future<List<ProposalDocument>> queryVersionsOfId({required String id});
+
   Future<List<String>> removeFavoriteProposal(String proposalId);
+
+  Future<void> upsertDraftProposal({required DocumentData document});
+
+  Stream<int> watchCount({
+    required DocumentRef ref,
+    required DocumentType type,
+  });
+
+  Stream<List<ProposalDocument>> watchLatestProposals({int? limit});
+
+  Stream<List<ProposalDocument>> watchUserProposals({
+    required CatalystId authorId,
+  });
 }
 
 final class ProposalRepositoryImpl implements ProposalRepository {
@@ -82,6 +114,20 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   }
 
   @override
+  Future<void> deleteDraftProposal(DraftRef ref) {
+    return _documentRepository.deleteDocumentDraft(ref: ref);
+  }
+
+  @override
+  Future<Uint8List> encodeProposalForExport({
+    required DocumentData document,
+  }) {
+    return _documentRepository.encodeDocumentForExport(
+      document: document,
+    );
+  }
+
+  @override
   Future<List<String>> getFavoritesProposalsIds() async {
     // TODO(LynxLynxx): read db to get favorites proposals ids
     return <String>[];
@@ -91,54 +137,34 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   Future<ProposalData> getProposal({
     required DocumentRef ref,
   }) async {
-    if (!ref.isExact) {
-      ref = ref.copyWith(version: Optional(ref.id));
-    }
-
-    final ver = List.generate(3, (index) {
-      final now = DateTimeExt.now();
-      final createdAt = now.subtract(
-        Duration(
-          days: index + 1,
-          hours: index + 2,
-        ),
-      );
-
-      final config = V7Options(createdAt.millisecondsSinceEpoch, null);
-      final versionId = const Uuid().v7(config: config);
-      final document = ProposalDocument(
-        metadata: ProposalMetadata(
-          selfRef: ref.copyWith(
-            version: Optional(versionId),
+    final documentData = await _documentRepository.getDocumentData(ref: ref);
+    final commentsCount = await _documentRepository.getRefCount(
+      ref: ref,
+      type: DocumentType.commentDocument,
+    );
+    final templateRef = documentData.metadata.template!;
+    final documentTemplate =
+        await _documentRepository.getDocumentData(ref: templateRef);
+    final proposalDocument = _buildProposalDocument(
+      documentData: documentData,
+      templateData: documentTemplate,
+    );
+    final documentVersions = await _documentRepository.getAllVersionsOfId(
+      id: ref.id,
+    );
+    final proposalVersions = documentVersions
+        .map(
+          (e) => _buildProposalData(
+            documentData: e,
+            documentTemplate: documentTemplate,
           ),
-        ),
-        document: const Document(
-          properties: [],
-          schema: DocumentSchema.optional(),
-        ),
-      );
-
-      return BaseProposalData(
-        document: document,
-        categoryId: SignedDocumentRef.generateFirstRef(),
-      );
-    }).reversed.toList();
+        )
+        .toList();
 
     return ProposalData(
-      // TODO(dtscalac): replace by actual category ID
-      categoryId: SignedDocumentRef.generateFirstRef(),
-      document: ProposalDocument(
-        metadata: ProposalMetadata(
-          selfRef: ref,
-          // TODO(dtscalac): get category id
-          categoryId: const SignedDocumentRef(id: 'mocked_category_id'),
-        ),
-        document: const Document(
-          properties: [],
-          schema: DocumentSchema.optional(),
-        ),
-      ),
-      versions: ver,
+      document: proposalDocument,
+      commentsCount: commentsCount,
+      versions: proposalVersions,
     );
   }
 
@@ -176,7 +202,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
           description: _proposalDescription,
           duration: 6,
           author: 'Alex Wells',
-          versionCount: 1,
+          versions: const [],
         ),
       );
     }
@@ -188,9 +214,24 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   }
 
   @override
+  Future<ProposalTemplate> getProposalTemplate({
+    required DocumentRef ref,
+  }) async {
+    final proposalDocument =
+        await _documentRepository.getDocumentData(ref: ref);
+
+    return _buildProposalTemplate(documentData: proposalDocument);
+  }
+
+  @override
   Future<List<String>> getUserProposalsIds(String userId) async {
     // TODO(LynxLynxx): read db to get user's proposals
     return <String>[];
+  }
+
+  @override
+  Future<DocumentRef> importProposal(Uint8List data) {
+    return _documentRepository.importDocument(data: data);
   }
 
   @override
@@ -235,9 +276,152 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   }
 
   @override
+  Future<List<ProposalDocument>> queryVersionsOfId({required String id}) async {
+    final documents = await _documentRepository.queryVersionsOfId(id: id);
+
+    return documents
+        .map(
+          (e) => _buildProposalDocument(
+            documentData: e.data,
+            templateData: e.refData,
+          ),
+        )
+        .toList();
+  }
+
+  @override
   Future<List<String>> removeFavoriteProposal(String proposalId) async {
     // TODO(LynxLynxx): remove proposal from favorites
     return getFavoritesProposalsIds();
+  }
+
+  @override
+  Future<void> upsertDraftProposal({required DocumentData document}) {
+    return _documentRepository.upsertDocumentDraft(document: document);
+  }
+
+  @override
+  Stream<int> watchCount({
+    required DocumentRef ref,
+    required DocumentType type,
+  }) {
+    return _documentRepository.watchCount(ref: ref, type: type);
+  }
+
+  @override
+  Stream<List<ProposalDocument>> watchLatestProposals({int? limit}) {
+    return _documentRepository
+        .watchDocuments(
+          limit: limit,
+          type: DocumentType.proposalDocument,
+        )
+        .whereNotNull()
+        .map(
+          (documents) => documents.map(
+            (doc) {
+              final documentData = doc.data;
+              final templateData = doc.refData;
+
+              return _buildProposalDocument(
+                documentData: documentData,
+                templateData: templateData,
+              );
+            },
+          ).toList(),
+        );
+  }
+
+  @override
+  Stream<List<ProposalDocument>> watchUserProposals({
+    required CatalystId authorId,
+  }) {
+    return _documentRepository
+        .watchDocuments(
+          type: DocumentType.proposalDocument,
+          getLocalDrafts: true,
+          authorId: authorId,
+        )
+        .whereNotNull()
+        .map(
+          (documents) => documents.map(
+            (doc) {
+              final documentData = doc.data;
+              final templateData = doc.refData;
+
+              return _buildProposalDocument(
+                documentData: documentData,
+                templateData: templateData,
+              );
+            },
+          ).toList(),
+        );
+  }
+
+  BaseProposalData _buildProposalData({
+    required DocumentData documentData,
+    required DocumentData documentTemplate,
+  }) {
+    assert(
+      documentData.metadata.type == DocumentType.proposalDocument,
+      'Not a proposalDocument document data type',
+    );
+
+    final document = _buildProposalDocument(
+      documentData: documentData,
+      templateData: documentTemplate,
+    );
+
+    return BaseProposalData(document: document);
+  }
+
+  ProposalDocument _buildProposalDocument({
+    required DocumentData documentData,
+    required DocumentData templateData,
+  }) {
+    assert(
+      documentData.metadata.type == DocumentType.proposalDocument,
+      'Not a proposalDocument document data type',
+    );
+
+    final template = _buildProposalTemplate(documentData: templateData);
+
+    final metadata = ProposalMetadata(
+      selfRef: documentData.metadata.selfRef,
+      templateRef: documentData.metadata.template!,
+      categoryId: documentData.metadata.categoryId!,
+    );
+
+    final content = DocumentDataContentDto.fromModel(
+      documentData.content,
+    );
+    final schema = template.schema;
+    final document = DocumentDto.fromJsonSchema(content, schema).toModel();
+
+    return ProposalDocument(
+      metadata: metadata,
+      document: document,
+    );
+  }
+
+  ProposalTemplate _buildProposalTemplate({
+    required DocumentData documentData,
+  }) {
+    assert(
+      documentData.metadata.type == DocumentType.proposalTemplate,
+      'Not a proposalTemplate document data type',
+    );
+
+    final metadata = ProposalTemplateMetadata(
+      selfRef: documentData.metadata.selfRef,
+    );
+
+    final contentData = documentData.content.data;
+    final schema = DocumentSchemaDto.fromJson(contentData).toModel();
+
+    return ProposalTemplate(
+      metadata: metadata,
+      schema: schema,
+    );
   }
 
   SignedDocumentMetadata _createProposalMetadata(

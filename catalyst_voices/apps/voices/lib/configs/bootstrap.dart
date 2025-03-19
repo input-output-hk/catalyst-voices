@@ -58,7 +58,7 @@ Future<BootstrapArgs> bootstrap({
   // TODO(damian-molinski): enable it after after docs sync is ready.
   /*await Dependencies.instance.get<CatalystDatabase>().clear();
 
-  Dependencies.instance.get<SyncManager>().start().ignore();*/
+  Dependencies.instance.get<SyncManager>().start().ignore(); */
 
   return BootstrapArgs(routerConfig: router);
 }
