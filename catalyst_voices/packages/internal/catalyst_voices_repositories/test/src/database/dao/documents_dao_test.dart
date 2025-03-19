@@ -178,7 +178,7 @@ void main() {
               'On CI uses build in version which is lower then '
               '3.45 (required for jsonb)',
             ),
-          ]
+          ],
         },
       );
 

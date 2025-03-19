@@ -7,7 +7,8 @@ import 'package:sqlite3/open.dart';
 Future<void> testExecutable(FutureOr<void> Function() testMain) async {
   // ignore: avoid_single_cascade_in_expression_statements
   open
-    // TODO(damian-molinski): uncomment linux when we'll have working compilation
+    // TODO(damian-molinski): uncomment linux when we'll have working
+    //  compilation
     // ..overrideFor(OperatingSystem.linux, _openOnLinux)
     ..overrideFor(OperatingSystem.macOS, _openOnMacOS);
 
