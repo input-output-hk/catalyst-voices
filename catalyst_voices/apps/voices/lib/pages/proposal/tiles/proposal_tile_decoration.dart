@@ -1,7 +1,25 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
+import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 
 typedef FirstAndLast = ({bool isFirst, bool isLast});
+
+class ProposalDivider extends StatelessWidget {
+  final double height;
+
+  const ProposalDivider({
+    super.key,
+    required this.height,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ColoredBox(
+      color: context.colors.elevationsOnSurfaceNeutralLv0,
+      child: VoicesDivider.expanded(height: height),
+    );
+  }
+}
 
 class ProposalSeparatorBox extends StatelessWidget {
   final double height;
