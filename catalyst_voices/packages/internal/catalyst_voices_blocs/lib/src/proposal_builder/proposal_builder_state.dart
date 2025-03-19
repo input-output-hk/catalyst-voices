@@ -7,7 +7,7 @@ final class ProposalBuilderMetadata extends Equatable {
   final ProposalPublish publish;
   final DocumentRef? documentRef;
   final DocumentRef? originalDocumentRef;
-  final DocumentRef? templateRef;
+  final SignedDocumentRef? templateRef;
   final SignedDocumentRef? categoryId;
   final List<DocumentVersion> versions;
 
@@ -51,7 +51,7 @@ final class ProposalBuilderMetadata extends Equatable {
     ProposalPublish? publish,
     Optional<DocumentRef>? documentRef,
     Optional<DocumentRef>? originalDocumentRef,
-    Optional<DocumentRef>? templateRef,
+    Optional<SignedDocumentRef>? templateRef,
     Optional<SignedDocumentRef>? categoryId,
     List<DocumentVersion>? versions,
   }) {

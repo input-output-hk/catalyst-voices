@@ -52,15 +52,17 @@ void main() {
         final templateData = await VoicesDocumentsTemplates.proposalF14Schema;
         final proposalData = await VoicesDocumentsTemplates.proposalF14Document;
 
+        final templateRef =
+            DocumentRefFactory.buildSigned(id: mockedTemplateUuid);
         final template = DocumentDataFactory.build(
-          selfRef: DocumentRefFactory.buildSigned(id: mockedTemplateUuid),
+          selfRef: templateRef,
           type: DocumentType.proposalTemplate,
           content: DocumentDataContent(templateData),
         );
         final proposal = DocumentDataFactory.build(
           selfRef: DocumentRefFactory.buildSigned(id: mockedDocumentUuid),
           type: DocumentType.proposalDocument,
-          template: template.ref,
+          template: templateRef,
           content: DocumentDataContent(proposalData),
         );
 
@@ -169,10 +171,12 @@ void main() {
     group('watchDocumentWithRef', () {
       test('template reference is watched and combined correctly', () async {
         // Given
+        final templateRef = DocumentRefFactory.buildSigned();
         final template = DocumentDataFactory.build(
           type: DocumentType.proposalTemplate,
+          selfRef: templateRef,
         );
-        final proposal = DocumentDataFactory.build(template: template.ref);
+        final proposal = DocumentDataFactory.build(template: templateRef);
 
         when(() => remoteDocuments.get(ref: template.ref))
             .thenAnswer((_) => Future.value(template));
@@ -206,11 +210,13 @@ void main() {
 
       test('loads template once when two documents refers to it', () async {
         // Given
+        final templateRef = DocumentRefFactory.buildSigned();
         final template = DocumentDataFactory.build(
           type: DocumentType.proposalTemplate,
+          selfRef: templateRef,
         );
-        final proposal1 = DocumentDataFactory.build(template: template.ref);
-        final proposal2 = DocumentDataFactory.build(template: template.ref);
+        final proposal1 = DocumentDataFactory.build(template: templateRef);
+        final proposal2 = DocumentDataFactory.build(template: templateRef);
 
         when(() => remoteDocuments.get(ref: template.ref))
             .thenAnswer((_) => Future.value(template));
@@ -331,7 +337,7 @@ void main() {
         final publicDraftData = DocumentDataFactory.build(
           type: DocumentType.proposalDocument,
           selfRef: publicDraftRef,
-          template: templateData.ref,
+          template: templateRef,
           content: publicDraftContent,
         );
 
