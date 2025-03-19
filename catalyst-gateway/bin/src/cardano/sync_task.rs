@@ -346,38 +346,41 @@ fn sync_subchain(
                     params.update_block_state(block);
                 },
                 cardano_chain_follower::Kind::Rollback => {
-                    // Rollback occurs, need to purge forward
-                    let rollback_slot = chain_update.block_data().slot();
+                    if params.is_live() {
+                        // Rollback occurs, need to purge forward
+                        let rollback_slot = chain_update.block_data().slot();
 
-                    let purge_condition = PurgeCondition::PurgeForwards(rollback_slot);
-                    if let Err(error) = roll_forward::purge_live_index(purge_condition).await {
-                        let error = error
-                            .context("Chain follower rollback, purging volatile data task failed.");
-                        error!(chain=%params.chain(), error=%error);
-                        return params.done(Some(error));
+                        let purge_condition = PurgeCondition::PurgeForwards(rollback_slot);
+                        if let Err(error) = roll_forward::purge_live_index(purge_condition).await {
+                            let error = error.context(
+                                "Chain follower rollback, purging volatile data task failed.",
+                            );
+                            error!(chain=%params.chain(), error=%error);
+                            return params.done(Some(error));
+                        }
+                        // How many slots are purged
+                        #[allow(clippy::arithmetic_side_effects)]
+                        let purge_slots = params
+                            .last_indexed_block()
+                            // Slots arithmetic has saturating semantic, so this is ok
+                            .map_or(0.into(), |l| l.slot_or_default() - rollback_slot);
+
+                        let _ = event_sender.send(ChainIndexerEvent::ForwardDataPurged {
+                            purge_slots: purge_slots.into(),
+                        });
+
+                        // Purge success, now index the current block
+                        let block = chain_update.block_data();
+                        if let Err(error) = index_block(block).await {
+                            let error = error.context(format!(
+                                "Failed to index block after rollback {}",
+                                block.point()
+                            ));
+                            return params.done(Some(error));
+                        }
+
+                        params.update_block_state(block);
                     }
-                    // How many slots are purged
-                    #[allow(clippy::arithmetic_side_effects)]
-                    let purge_slots = params
-                        .last_indexed_block()
-                        // Slots arithmetic has saturating semantic, so this is ok
-                        .map_or(0.into(), |l| l.slot_or_default() - rollback_slot);
-
-                    let _ = event_sender.send(ChainIndexerEvent::ForwardDataPurged {
-                        purge_slots: purge_slots.into(),
-                    });
-
-                    // Purge success, now index the current block
-                    let block = chain_update.block_data();
-                    if let Err(error) = index_block(block).await {
-                        let error = error.context(format!(
-                            "Failed to index block after rollback {}",
-                            block.point()
-                        ));
-                        return params.done(Some(error));
-                    }
-
-                    params.update_block_state(block);
                 },
             }
         }

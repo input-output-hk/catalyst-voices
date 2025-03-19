@@ -76,6 +76,11 @@ impl TxiInsertQuery {
 
     /// Index the transaction Inputs.
     pub(crate) fn index(&mut self, txs: &pallas_traverse::MultiEraTx<'_>, slot_no: Slot) {
+        tracing::info!(
+            txn_id=txs.hash().to_string(),
+            slot_no=?slot_no,
+            "Index transaction inputs"
+        );
         // Index the TXI's.
         for txi in txs.inputs() {
             let txn_id = Blake2b256Hash::from(*txi.hash()).into();
