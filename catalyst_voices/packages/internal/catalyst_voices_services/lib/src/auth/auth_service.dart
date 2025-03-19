@@ -51,7 +51,11 @@ final class AuthServiceImpl implements AuthService {
         dateTime.millisecondsSinceEpoch ~/ Duration.millisecondsPerSecond;
 
     return account.catalystId.copyWith(
+      username: const Optional.empty(),
       nonce: Optional(secondsSinceEpoch),
+      role: const Optional.empty(),
+      rotation: const Optional.empty(),
+      encrypt: false,
     );
   }
 

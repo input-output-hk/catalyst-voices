@@ -18,7 +18,7 @@ abstract interface class ProposalService {
   /// Creates a new proposal draft locally.
   Future<DraftRef> createDraftProposal({
     required DocumentDataContent content,
-    required DocumentRef template,
+    required SignedDocumentRef template,
     required SignedDocumentRef categoryId,
   });
 
@@ -85,7 +85,7 @@ abstract interface class ProposalService {
   Future<void> upsertDraftProposal({
     required DraftRef selfRef,
     required DocumentDataContent content,
-    required DocumentRef template,
+    required SignedDocumentRef template,
     required SignedDocumentRef categoryId,
   });
 
@@ -115,7 +115,7 @@ final class ProposalServiceImpl implements ProposalService {
   @override
   Future<DraftRef> createDraftProposal({
     required DocumentDataContent content,
-    required DocumentRef template,
+    required SignedDocumentRef template,
     required SignedDocumentRef categoryId,
   }) async {
     final draftRef = DraftRef.generateFirstRef();
@@ -247,7 +247,7 @@ final class ProposalServiceImpl implements ProposalService {
   Future<void> upsertDraftProposal({
     required DraftRef selfRef,
     required DocumentDataContent content,
-    required DocumentRef template,
+    required SignedDocumentRef template,
     required SignedDocumentRef categoryId,
   }) async {
     await _proposalRepository.upsertDraftProposal(
@@ -353,6 +353,7 @@ final class ProposalServiceImpl implements ProposalService {
     }
 
     final catalystId = account.catalystId.copyWith(
+      username: const Optional.empty(),
       role: const Optional(AccountRole.proposer),
       rotation: const Optional(0),
     );

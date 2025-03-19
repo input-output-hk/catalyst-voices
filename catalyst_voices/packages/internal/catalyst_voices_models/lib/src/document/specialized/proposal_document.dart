@@ -35,7 +35,7 @@ final class ProposalDocument extends Equatable {
 }
 
 final class ProposalMetadata extends DocumentMetadata {
-  final DocumentRef templateRef;
+  final SignedDocumentRef templateRef;
   final SignedDocumentRef categoryId;
 
   ProposalMetadata({

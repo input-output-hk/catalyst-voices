@@ -93,5 +93,5 @@ class ProposalData extends BaseProposalData {
         versions,
       ];
 
-  DocumentRef get templateRef => document.metadata.templateRef;
+  SignedDocumentRef get templateRef => document.metadata.templateRef;
 }
