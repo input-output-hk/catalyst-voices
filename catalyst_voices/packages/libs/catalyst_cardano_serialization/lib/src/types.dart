@@ -39,7 +39,7 @@ enum NetworkId {
 }
 
 /// Specifies an amount of ADA in terms of lovelace.
-final class Coin implements Comparable<Coin> {
+final class Coin extends Equatable implements Comparable<Coin> {
   /// The amount of lovelaces in one ADA.
   static const int adaInLovelaces = 1000000;
 
@@ -95,6 +95,9 @@ final class Coin implements Comparable<Coin> {
 
   @override
   int compareTo(Coin other) => value.compareTo(other.value);
+
+  @override
+  List<Object?> get props => [value];
 }
 
 /// A blockchain slot number.
