@@ -46,7 +46,6 @@ class SeedphraseSuccessPanel extends OnboardingPageBase {
 
   Future<void> verifyInfoPanel() async {
     expect(await infoPartHeaderTitleText(), (await t()).catalystKeychain);
-    //temporary: check for specific picture (green checked icon)
     expect(
       find.byWidgetPredicate(
         (widget) =>
