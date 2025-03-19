@@ -174,6 +174,34 @@ void main() {
           ]),
         );
       });
+
+      test('signers are correctly extracted', () async {
+        final authorId1 = CatalystId(host: 'test', role0Key: Uint8List(32));
+        final authorId2 = CatalystId(host: 'test1', role0Key: Uint8List(32));
+
+        final ref = DraftRef.generateFirstRef();
+        // Given
+        final draft = DraftFactory.build(
+          metadata: DocumentDataMetadata(
+            type: DocumentType.proposalDocument,
+            selfRef: ref,
+            signers: [
+              authorId1.toString(),
+              authorId2.toString(),
+            ],
+          ),
+        );
+
+        await database.draftsDao.save(draft);
+        final doc = await database.draftsDao.query(ref: ref);
+        expect(
+          doc?.metadata.signers,
+          [
+            authorId1.toString(),
+            authorId2.toString(),
+          ],
+        );
+      });
     });
 
     group('count', () {
