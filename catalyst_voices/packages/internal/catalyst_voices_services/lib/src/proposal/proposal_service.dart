@@ -18,7 +18,7 @@ abstract interface class ProposalService {
   /// Creates a new proposal draft locally.
   Future<DraftRef> createDraftProposal({
     required DocumentDataContent content,
-    required DocumentRef template,
+    required SignedDocumentRef template,
     required SignedDocumentRef categoryId,
   });
 
@@ -85,7 +85,7 @@ abstract interface class ProposalService {
   Future<void> upsertDraftProposal({
     required DraftRef selfRef,
     required DocumentDataContent content,
-    required DocumentRef template,
+    required SignedDocumentRef template,
     required SignedDocumentRef categoryId,
   });
 
@@ -115,7 +115,7 @@ final class ProposalServiceImpl implements ProposalService {
   @override
   Future<DraftRef> createDraftProposal({
     required DocumentDataContent content,
-    required DocumentRef template,
+    required SignedDocumentRef template,
     required SignedDocumentRef categoryId,
   }) async {
     final draftRef = DraftRef.generateFirstRef();
@@ -249,7 +249,7 @@ final class ProposalServiceImpl implements ProposalService {
   Future<void> upsertDraftProposal({
     required DraftRef selfRef,
     required DocumentDataContent content,
-    required DocumentRef template,
+    required SignedDocumentRef template,
     required SignedDocumentRef categoryId,
   }) async {
     final catalystId = await _getUserCatalystId();
@@ -314,10 +314,10 @@ final class ProposalServiceImpl implements ProposalService {
 
   @override
   Stream<List<Proposal>> watchUserProposals() async* {
-    final userCatalystId = await _getUserCatalystId();
+    final authorId = await _getUserCatalystId();
     yield* _proposalRepository
         .watchUserProposals(
-      userCatalystId: userCatalystId,
+      authorId: authorId,
     )
         .switchMap((documents) async* {
       final proposals = documents.map((e) async {
@@ -358,6 +358,7 @@ final class ProposalServiceImpl implements ProposalService {
     }
 
     final catalystId = account.catalystId.copyWith(
+      username: const Optional.empty(),
       role: const Optional(AccountRole.proposer),
       rotation: const Optional(0),
     );

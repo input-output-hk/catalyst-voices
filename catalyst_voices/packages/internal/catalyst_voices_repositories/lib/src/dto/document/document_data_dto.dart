@@ -132,7 +132,7 @@ final class DocumentDataMetadataDto {
       selfRef: selfRef.toModel(),
       ref: ref?.toModel(),
       refHash: refHash?.toModel(),
-      template: template?.toModel(),
+      template: template?.toSignedModel(),
       brandId: brandId,
       campaignId: campaignId,
       electionId: electionId,

@@ -22,7 +22,7 @@ and PRISM, but its potential is only barely exploited.
 
 final _proposals = [
   PendingProposal(
-    id: SignedDocumentRef.generateFirstRef(),
+    ref: SignedDocumentRef.generateFirstRef(),
     campaignName: 'F14',
     category: 'Cardano Use Cases / MVP',
     title: 'Proposal Title that rocks the world',
@@ -36,7 +36,7 @@ final _proposals = [
     author: 'Alex Wells',
   ),
   PendingProposal(
-    id: SignedDocumentRef.generateFirstRef(),
+    ref: SignedDocumentRef.generateFirstRef(),
     campaignName: 'F14',
     category: 'Cardano Use Cases / MVP',
     title: 'Proposal Title that rocks the world',
@@ -50,7 +50,7 @@ final _proposals = [
     author: 'Alex Wells',
   ),
   PendingProposal(
-    id: SignedDocumentRef.generateFirstRef(),
+    ref: SignedDocumentRef.generateFirstRef(),
     campaignName: 'F14',
     category: 'Cardano Use Cases / MVP',
     title: 'Proposal Title that rocks the world',

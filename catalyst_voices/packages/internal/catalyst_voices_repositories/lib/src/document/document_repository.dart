@@ -118,7 +118,7 @@ abstract interface class DocumentRepository {
     int? limit,
     bool unique = false,
     bool getLocalDrafts = false,
-    CatalystId? catalystId,
+    CatalystId? authorId,
   });
 }
 
@@ -261,14 +261,14 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     bool unique = false,
     bool getLocalDrafts = false,
     DocumentType? type,
-    CatalystId? catalystId,
+    CatalystId? authorId,
   }) {
     final localDocs = _localDocuments
         .watchAll(
       limit: limit,
       unique: unique,
       type: type,
-      catalystId: catalystId,
+      authorId: authorId,
     )
         .asyncMap((documents) async {
       final typedDocuments = documents.cast<DocumentData>();
@@ -296,9 +296,8 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     final localDrafts = _drafts
         .watchAll(
       limit: limit,
-      unique: unique,
       type: type,
-      catalystId: catalystId,
+      authorId: authorId,
     )
         .asyncMap((documents) async {
       final typedDocuments = documents.cast<DocumentData>();
@@ -374,13 +373,13 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     int? limit,
     bool unique = false,
     bool getLocalDrafts = false,
-    CatalystId? catalystId,
+    CatalystId? authorId,
   }) {
     return watchAllDocuments(
       limit: limit,
       type: type,
       getLocalDrafts: getLocalDrafts,
-      catalystId: catalystId,
+      authorId: authorId,
     );
   }
 

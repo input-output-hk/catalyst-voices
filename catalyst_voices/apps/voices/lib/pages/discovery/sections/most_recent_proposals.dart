@@ -69,18 +69,23 @@ class _LatestProposalsState extends State<MostRecentProposals> {
                   itemCount: widget.proposals.length,
                   itemBuilder: (context, index) {
                     final proposal = widget.proposals[index];
-                    final id = proposal.id;
+                    final ref = proposal.ref;
                     return Skeletonizer(
                       enabled: widget.isLoading,
                       child: PendingProposalCard(
-                        key: Key('PendingProposalCard_$id'),
+                        key: Key('PendingProposalCard_$ref'),
                         proposal: proposal,
                         onTap: () {
                           unawaited(
-                            ProposalRoute(proposalId: id.id).push(context),
+                            ProposalRoute(
+                              proposalId: ref.id,
+                              version: ref.version,
+                            ).push(context),
                           );
                         },
-                        onFavoriteChanged: (value) {},
+                        onFavoriteChanged: (value) {
+                          // TODO(LynxLynxx): add on change logic
+                        },
                       ),
                     );
                   },

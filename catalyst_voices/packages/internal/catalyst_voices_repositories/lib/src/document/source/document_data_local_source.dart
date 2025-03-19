@@ -9,13 +9,6 @@ abstract interface class DocumentDataLocalSource implements DocumentDataSource {
   Future<void> save({required DocumentData data});
 
   Stream<DocumentData?> watch({required DocumentRef ref});
-
-  Stream<List<DocumentData>> watchAll({
-    int? limit,
-    required bool unique,
-    DocumentType? type,
-    CatalystId? catalystId,
-  });
 }
 
 /// See [DatabaseDraftsDataSource].
@@ -31,6 +24,12 @@ abstract interface class DraftDataSource implements DocumentDataLocalSource {
     required DraftRef ref,
     required DocumentDataContent content,
   });
+
+  Stream<List<DocumentData>> watchAll({
+    int? limit,
+    DocumentType? type,
+    CatalystId? authorId,
+  });
 }
 
 /// See [DatabaseDocumentsDataSource].
@@ -39,6 +38,13 @@ abstract interface class SignedDocumentDataSource
   Future<int> getRefCount({
     required DocumentRef ref,
     required DocumentType type,
+  });
+
+  Stream<List<DocumentData>> watchAll({
+    int? limit,
+    required bool unique,
+    DocumentType? type,
+    CatalystId? authorId,
   });
 
   Stream<int> watchCount({

@@ -94,7 +94,7 @@ abstract interface class ProposalRepository {
   Stream<List<ProposalDocument>> watchLatestProposals({int? limit});
 
   Stream<List<ProposalDocument>> watchUserProposals({
-    required CatalystId userCatalystId,
+    required CatalystId authorId,
   });
 }
 
@@ -140,7 +140,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     final documentData = await _documentRepository.getDocumentData(ref: ref);
     final commentsCount = await _documentRepository.getRefCount(
       ref: ref,
-      type: DocumentType.commentTemplate,
+      type: DocumentType.commentDocument,
     );
     final templateRef = documentData.metadata.template!;
     final documentTemplate =
@@ -333,13 +333,13 @@ final class ProposalRepositoryImpl implements ProposalRepository {
 
   @override
   Stream<List<ProposalDocument>> watchUserProposals({
-    required CatalystId userCatalystId,
+    required CatalystId authorId,
   }) {
     return _documentRepository
         .watchDocuments(
           type: DocumentType.proposalDocument,
           getLocalDrafts: true,
-          catalystId: userCatalystId,
+          authorId: authorId,
         )
         .whereNotNull()
         .map(

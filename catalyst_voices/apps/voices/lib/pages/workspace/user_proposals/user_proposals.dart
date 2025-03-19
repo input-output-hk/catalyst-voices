@@ -111,6 +111,7 @@ class _NotPublishedHeader extends StatelessWidget {
       title: context.l10n.notPublished,
       info: '',
       learnMoreUrl: 'learnMoreUrl',
+      // TODO(LynxLynxx): update when we get info from designers
     );
   }
 }
@@ -124,6 +125,7 @@ class _SharedForPublicHeader extends StatelessWidget {
       title: context.l10n.sharedForPublicInProgress,
       info: 'info',
       learnMoreUrl: 'learnMoreUrl',
+      // TODO(LynxLynxx): update when we get info from designers
     );
   }
 }
@@ -142,6 +144,7 @@ class _SubmittedForReviewHeader extends StatelessWidget {
       title: context.l10n.submittedForReview(submittedCount, maxCount),
       info: 'Info',
       learnMoreUrl: '',
+      // TODO(LynxLynxx): update when we get info from designers
     );
   }
 }

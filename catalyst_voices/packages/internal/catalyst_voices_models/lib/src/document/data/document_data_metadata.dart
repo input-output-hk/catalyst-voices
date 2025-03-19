@@ -19,7 +19,7 @@ final class DocumentDataMetadata extends Equatable {
 
   /// If the document was formed from a template, this is a reference to that
   /// template document
-  final DocumentRef? template;
+  final SignedDocumentRef? template;
 
   /// uuid-v4
   /// Represents a "brand" who is running the voting, e.g. Catalyst, Midnight.
@@ -82,7 +82,7 @@ final class DocumentDataMetadata extends Equatable {
     DocumentRef? selfRef,
     Optional<DocumentRef>? ref,
     Optional<SecuredDocumentRef>? refHash,
-    Optional<DocumentRef>? template,
+    Optional<SignedDocumentRef>? template,
     Optional<String>? brandId,
     Optional<String>? campaignId,
     Optional<String>? electionId,

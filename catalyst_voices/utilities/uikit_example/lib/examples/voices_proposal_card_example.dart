@@ -32,7 +32,7 @@ class VoicesProposalCardExample extends StatelessWidget {
             ProposalCard(
               image: VoicesAssets.images.proposalBackground1,
               proposal: FundedProposal(
-                id: SignedDocumentRef.generateFirstRef(),
+                ref: SignedDocumentRef.generateFirstRef(),
                 campaignName: 'F14',
                 category: 'Cardano Use Cases / MVP',
                 title: 'Proposal Title that rocks the world',
@@ -45,7 +45,7 @@ class VoicesProposalCardExample extends StatelessWidget {
             ProposalCard(
               image: VoicesAssets.images.proposalBackground2,
               proposal: PendingProposal(
-                id: SignedDocumentRef.generateFirstRef(),
+                ref: SignedDocumentRef.generateFirstRef(),
                 campaignName: 'F14',
                 category: 'Cardano Use Cases / MVP',
                 title: 'Proposal Title that rocks the world',

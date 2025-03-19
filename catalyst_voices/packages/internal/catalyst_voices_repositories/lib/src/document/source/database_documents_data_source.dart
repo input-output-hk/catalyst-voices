@@ -81,14 +81,14 @@ final class DatabaseDocumentsDataSource implements SignedDocumentDataSource {
     int? limit,
     required bool unique,
     DocumentType? type,
-    CatalystId? catalystId,
+    CatalystId? authorId,
   }) {
     return _database.documentsDao
         .watchAll(
       limit: limit,
       unique: unique,
       type: type,
-      catalystId: catalystId,
+      authorId: authorId,
     )
         .map((entities) {
       return List<DocumentData>.from(entities.map((e) => e.toModel()));

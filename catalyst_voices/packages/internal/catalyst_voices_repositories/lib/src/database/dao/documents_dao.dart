@@ -73,7 +73,7 @@ abstract interface class DocumentsDao {
     bool unique = false,
     int? limit,
     DocumentType? type,
-    CatalystId? catalystId,
+    CatalystId? authorId,
   });
 
   /// Watches for new comments that are reference by ref.
@@ -247,54 +247,46 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
     bool unique = false,
     int? limit,
     DocumentType? type,
-    CatalystId? catalystId,
+    CatalystId? authorId,
   }) {
     final query = select(documents);
 
     if (type != null) {
       query.where((doc) => doc.type.equals(type.uuid));
     }
-    if (catalystId != null) {
+    if (authorId != null) {
       query.where(
         (doc) => CustomExpression<bool>(
-          "json_extract(metadata, '\$.signers') LIKE '%$catalystId%'",
+          "json_extract(metadata, '\$.signers') LIKE '%$authorId%'",
         ),
       );
     }
 
-    return query.watch().map((documents) {
-      if (unique) {
-        // Group by document ID and take latest version
-        final uniqueDocs = documents
-            .groupListsBy((doc) => '${doc.idHi}-${doc.idLo}')
-            .values
-            .map(
-              (versions) => versions.reduce((a, b) {
-                // Compare versions (higher version wins)
-                final compareHi = b.verHi.compareTo(a.verHi);
-                if (compareHi != 0) return compareHi > 0 ? b : a;
-                return b.verLo.compareTo(a.verLo) > 0 ? b : a;
-              }),
-            )
-            .toList()
-          ..sort((a, b) {
-            // Sort by version descending
-            final compareHi = b.verHi.compareTo(a.verHi);
-            if (compareHi != 0) return compareHi;
-            return b.verLo.compareTo(a.verLo);
-          });
+    query.orderBy([
+      (t) => OrderingTerm(
+            expression: t.verHi,
+            mode: OrderingMode.desc,
+          ),
+    ]);
 
-        if (limit != null) {
-          return uniqueDocs.take(limit).toList();
+    if (limit != null) {
+      query.limit(limit);
+    }
+
+    if (unique) {
+      return query.watch().map((list) {
+        final latestVersions = <String, DocumentEntity>{};
+        for (final entity in list) {
+          final id = '${entity.idHi}_${entity.idLo}';
+          if (!latestVersions.containsKey(id)) {
+            latestVersions[id] = entity;
+          }
         }
-        return uniqueDocs;
-      }
+        return latestVersions.values.toList();
+      });
+    }
 
-      if (limit != null) {
-        return documents.take(limit).toList();
-      }
-      return documents;
-    });
+    return query.watch();
   }
 
   @override
