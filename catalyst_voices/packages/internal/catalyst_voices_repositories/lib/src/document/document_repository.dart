@@ -113,6 +113,10 @@ abstract interface class DocumentRepository {
     required DocumentRef ref,
   });
 
+  /// When [unique] is true, only latest versions of each document are returned.
+  /// When [getLocalDrafts] is true, local drafts are also returned.
+  /// When [authorId] is not null, only documents from
+  /// the given author are returned.
   Stream<List<DocumentsDataWithRefData>> watchDocuments({
     required DocumentType type,
     int? limit,
