@@ -54,16 +54,13 @@ pub(crate) async fn endpoint(doc_bytes: Vec<u8>, token: CatalystRBACTokenV1) -> 
     };
 
     match catalyst_signed_doc::validator::validate(&doc, &DocProvider).await {
-        Ok(result) => {
-            if !result {
-                return Responses::UnprocessableContent(Json(
-                    PutDocumentUnprocessableContent::new(
-                        "Failed validating document integrity",
-                        serde_json::to_value(doc.problem_report()).ok(),
-                    ),
-                ))
-                .into();
-            }
+        Ok(true) => (),
+        Ok(false) => {
+            return Responses::UnprocessableContent(Json(PutDocumentUnprocessableContent::new(
+                "Failed validating document integrity",
+                serde_json::to_value(doc.problem_report()).ok(),
+            )))
+            .into();
         },
         Err(e) => {
             // means that something happened inside the `DocProvider`, some db error.
@@ -76,16 +73,13 @@ pub(crate) async fn endpoint(doc_bytes: Vec<u8>, token: CatalystRBACTokenV1) -> 
     )
     .await
     {
-        Ok(result) => {
-            if !result {
-                return Responses::UnprocessableContent(Json(
-                    PutDocumentUnprocessableContent::new(
-                        "Failed validating document signatures",
-                        serde_json::to_value(doc.problem_report()).ok(),
-                    ),
-                ))
-                .into();
-            }
+        Ok(true) => (),
+        Ok(false) => {
+            return Responses::UnprocessableContent(Json(PutDocumentUnprocessableContent::new(
+                "Failed validating document signatures",
+                serde_json::to_value(doc.problem_report()).ok(),
+            )))
+            .into();
         },
         Err(e) => {
             return AllResponses::handle_error(&e);
