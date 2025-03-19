@@ -389,7 +389,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
       selfRef: documentData.metadata.selfRef,
       templateRef: documentData.metadata.template!,
       categoryId: documentData.metadata.categoryId!,
-      signers: const [],
+      signers: documentData.metadata.signers,
     );
 
     final content = DocumentDataContentDto.fromModel(

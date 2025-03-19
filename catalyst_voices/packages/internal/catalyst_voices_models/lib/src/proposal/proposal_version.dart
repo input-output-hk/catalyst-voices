@@ -17,8 +17,7 @@ final class ProposalVersion extends Equatable
   });
 
   factory ProposalVersion.fromData(BaseProposalData data) {
-    final version = data.document.metadata.selfRef.version!;
-    final createdAt = version.dateTime;
+    final createdAt = data.document.metadata.selfRef.version!.dateTime;
     return ProposalVersion(
       selfRef: data.document.metadata.selfRef,
       title: BaseProposalData.getProposalTitle(data.document) ?? '',
