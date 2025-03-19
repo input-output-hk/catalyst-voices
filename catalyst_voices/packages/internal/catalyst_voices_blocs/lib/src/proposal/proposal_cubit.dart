@@ -52,6 +52,7 @@ final class ProposalCubit extends Cubit<ProposalState>
 
       _ref = ref;
       _proposal = proposal;
+      _commentTemplate = _buildCommentTemplate();
       _comments = comments;
       _isFavorite = isFavorite;
 
@@ -69,6 +70,7 @@ final class ProposalCubit extends Cubit<ProposalState>
 
       _ref = null;
       _proposal = null;
+      _commentTemplate = null;
       _comments = null;
       _isFavorite = null;
 
@@ -78,6 +80,7 @@ final class ProposalCubit extends Cubit<ProposalState>
 
       _ref = null;
       _proposal = null;
+      _commentTemplate = null;
       _comments = null;
       _isFavorite = null;
 
