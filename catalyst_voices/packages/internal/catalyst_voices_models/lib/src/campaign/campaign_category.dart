@@ -227,6 +227,8 @@ class CampaignCategory extends Equatable {
     required this.submissionCloseDate,
   });
 
+  String get categoryText => '$categoryName $categorySubname';
+
   @override
   List<Object?> get props => [
         selfRef,

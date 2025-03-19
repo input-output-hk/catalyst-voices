@@ -283,11 +283,12 @@ final class ProposalBuilderBloc
       final proposal = Proposal.fromData(proposalData);
 
       final versions = proposalData.versions.mapIndexed((index, version) {
+        final versionRef = version.document.metadata.selfRef;
+        final versionId = versionRef.version ?? versionRef.id;
         return DocumentVersion(
-          id: version.document.metadata.selfRef.version ?? '',
+          id: versionId,
           number: index + 1,
-          isCurrent: version.document.metadata.selfRef.version ==
-              event.proposalId.version,
+          isCurrent: versionId == event.proposalId.version,
           isLatest: index == proposalData.versions.length - 1,
         );
       }).toList();
@@ -298,8 +299,9 @@ final class ProposalBuilderBloc
           publish: proposal.publish,
           documentRef: proposal.selfRef,
           originalDocumentRef: proposal.selfRef,
+          templateRef: proposalData.templateRef,
+          categoryId: proposalData.categoryId,
           versions: versions,
-          categoryId: proposal.categoryId,
         ),
       );
     });

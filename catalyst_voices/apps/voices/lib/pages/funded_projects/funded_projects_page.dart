@@ -2,9 +2,12 @@ import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.da
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
+
+final _favoriteProposals = ValueNotifier<List<FundedProposal>>([]);
 
 final _proposalDescription = """
 Zanzibar is becoming one of the hotspots for DID's through
@@ -14,9 +17,16 @@ and PRISM, but its potential is only barely exploited.
 """
     .replaceAll('\n', ' ');
 
+final _proposalImages = {
+  for (final (index, proposal) in _proposals.indexed)
+    proposal.ref: index.isEven
+        ? VoicesAssets.images.proposalBackground1
+        : VoicesAssets.images.proposalBackground2,
+};
+
 final _proposals = [
   FundedProposal(
-    id: 'f14/0',
+    ref: SignedDocumentRef.generateFirstRef(),
     campaignName: 'F14',
     category: 'Cardano Use Cases / MVP',
     title: 'Proposal Title that rocks the world',
@@ -26,7 +36,7 @@ final _proposals = [
     description: _proposalDescription,
   ),
   FundedProposal(
-    id: 'f14/1',
+    ref: SignedDocumentRef.generateFirstRef(),
     campaignName: 'F14',
     category: 'Cardano Use Cases / MVP',
     title: 'Proposal Title that rocks the world',
@@ -36,7 +46,7 @@ final _proposals = [
     description: _proposalDescription,
   ),
   FundedProposal(
-    id: 'f14/2',
+    ref: SignedDocumentRef.generateFirstRef(),
     campaignName: 'F14',
     category: 'Cardano Use Cases / MVP',
     title: 'Proposal Title that rocks the world',
@@ -47,14 +57,15 @@ final _proposals = [
   ),
 ];
 
-final _proposalImages = {
-  for (final (index, proposal) in _proposals.indexed)
-    proposal.id: index.isEven
-        ? VoicesAssets.images.proposalBackground1
-        : VoicesAssets.images.proposalBackground2,
-};
-
-final _favoriteProposals = ValueNotifier<List<FundedProposal>>([]);
+void _onFavoriteChanged(FundedProposal proposal, bool isFavorite) {
+  final proposals = Set.of(_favoriteProposals.value);
+  if (isFavorite) {
+    proposals.add(proposal);
+  } else {
+    proposals.remove(proposal);
+  }
+  _favoriteProposals.value = proposals.toList();
+}
 
 class FundedProjectsPage extends StatelessWidget {
   const FundedProjectsPage({super.key});
@@ -72,6 +83,60 @@ class FundedProjectsPage extends StatelessWidget {
         const SizedBox(height: 44),
         const _Tabs(),
       ],
+    );
+  }
+}
+
+class _AllProposals extends StatelessWidget {
+  const _AllProposals();
+
+  @override
+  Widget build(BuildContext context) {
+    return ValueListenableBuilder<List<FundedProposal>>(
+      valueListenable: _favoriteProposals,
+      builder: (context, favoriteProposals, child) {
+        return Wrap(
+          spacing: 16,
+          runSpacing: 16,
+          children: [
+            for (final proposal in _proposals)
+              FundedProposalCard(
+                image: _proposalImages[proposal.ref]!,
+                proposal: proposal,
+                isFavorite: favoriteProposals.contains(proposal),
+                onFavoriteChanged: (isFavorite) =>
+                    _onFavoriteChanged(proposal, isFavorite),
+              ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class _FavoriteProposals extends StatelessWidget {
+  const _FavoriteProposals();
+
+  @override
+  Widget build(BuildContext context) {
+    return ValueListenableBuilder<List<FundedProposal>>(
+      valueListenable: _favoriteProposals,
+      builder: (context, favoriteProposals, child) {
+        return Wrap(
+          spacing: 16,
+          runSpacing: 16,
+          children: [
+            for (final proposal in favoriteProposals)
+              FundedProposalCard(
+                image: _proposalImages[proposal.ref]!,
+                proposal: proposal,
+                isFavorite: true,
+                onFavoriteChanged: (isFavorite) =>
+                    _onFavoriteChanged(proposal, isFavorite),
+              ),
+          ],
+        );
+      },
     );
   }
 }
@@ -117,68 +182,4 @@ class _Tabs extends StatelessWidget {
       ),
     );
   }
-}
-
-class _AllProposals extends StatelessWidget {
-  const _AllProposals();
-
-  @override
-  Widget build(BuildContext context) {
-    return ValueListenableBuilder<List<FundedProposal>>(
-      valueListenable: _favoriteProposals,
-      builder: (context, favoriteProposals, child) {
-        return Wrap(
-          spacing: 16,
-          runSpacing: 16,
-          children: [
-            for (final proposal in _proposals)
-              FundedProposalCard(
-                image: _proposalImages[proposal.id]!,
-                proposal: proposal,
-                isFavorite: favoriteProposals.contains(proposal),
-                onFavoriteChanged: (isFavorite) =>
-                    _onFavoriteChanged(proposal, isFavorite),
-              ),
-          ],
-        );
-      },
-    );
-  }
-}
-
-class _FavoriteProposals extends StatelessWidget {
-  const _FavoriteProposals();
-
-  @override
-  Widget build(BuildContext context) {
-    return ValueListenableBuilder<List<FundedProposal>>(
-      valueListenable: _favoriteProposals,
-      builder: (context, favoriteProposals, child) {
-        return Wrap(
-          spacing: 16,
-          runSpacing: 16,
-          children: [
-            for (final proposal in favoriteProposals)
-              FundedProposalCard(
-                image: _proposalImages[proposal.id]!,
-                proposal: proposal,
-                isFavorite: true,
-                onFavoriteChanged: (isFavorite) =>
-                    _onFavoriteChanged(proposal, isFavorite),
-              ),
-          ],
-        );
-      },
-    );
-  }
-}
-
-void _onFavoriteChanged(FundedProposal proposal, bool isFavorite) {
-  final proposals = Set.of(_favoriteProposals.value);
-  if (isFavorite) {
-    proposals.add(proposal);
-  } else {
-    proposals.remove(proposal);
-  }
-  _favoriteProposals.value = proposals.toList();
 }
