@@ -2,9 +2,9 @@
 
 import 'dart:typed_data';
 
-import 'package:catalyst_voices_models/src/crypto/catalyst_public_key.dart';
 import 'package:catalyst_voices_models/src/document/data/document_type.dart';
 import 'package:catalyst_voices_models/src/document/document_ref.dart';
+import 'package:catalyst_voices_models/src/user/catalyst_id.dart';
 import 'package:equatable/equatable.dart';
 
 /// Represents an abstract document that is protected
@@ -22,12 +22,15 @@ abstract interface class SignedDocument<T extends SignedDocumentPayload> {
   /// A getter that returns a parsed document payload.
   T get payload;
 
+  /// Returns a list of [CatalystId] that signed the document.
+  List<CatalystId> get signers;
+
   /// Converts the document into binary representation.
   Uint8List toBytes();
 
   /// Verifies if the [payload] has been signed by a private key
-  /// that belongs to the given [publicKey].
-  Future<bool> verifySignature(CatalystPublicKey publicKey);
+  /// that belongs to the given [catalystId].
+  Future<bool> verifySignature(CatalystId catalystId);
 }
 
 /// Defines the content type of the [SignedDocumentPayload].

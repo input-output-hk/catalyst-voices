@@ -1,7 +1,7 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 
 class ProposalPaginationRequest extends PaginationPage<String?> {
-  final String? categoryId;
+  final SignedDocumentRef? categoryId;
   final String? searchValue;
   final ProposalPublish? stage;
   final bool usersProposals;
@@ -19,8 +19,18 @@ class ProposalPaginationRequest extends PaginationPage<String?> {
   });
 
   @override
+  List<Object?> get props => [
+        categoryId,
+        searchValue,
+        stage,
+        usersProposals,
+        usersFavorite,
+        ...super.props,
+      ];
+
+  @override
   ProposalPaginationRequest copyWith({
-    String? categoryId,
+    SignedDocumentRef? categoryId,
     String? searchValue,
     ProposalPublish? stage,
     int? pageKey,
@@ -41,14 +51,4 @@ class ProposalPaginationRequest extends PaginationPage<String?> {
       usersFavorite: usersFavorite ?? this.usersFavorite,
     );
   }
-
-  @override
-  List<Object?> get props => [
-        categoryId,
-        searchValue,
-        stage,
-        usersProposals,
-        usersFavorite,
-        ...super.props,
-      ];
 }

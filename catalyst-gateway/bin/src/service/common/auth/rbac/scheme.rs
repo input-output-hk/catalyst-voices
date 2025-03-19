@@ -192,13 +192,15 @@ async fn checker_api_catalyst_auth(
     Ok(token)
 }
 
-/// Returns a list of all registrations for the given Catalyst ID from the database.
+/// Returns a sorted list of all registrations for the given Catalyst ID from the
+/// database.
 async fn indexed_registrations(catalyst_id: &IdUri) -> poem::Result<Vec<Query>> {
     let session = CassandraSession::get(true).ok_or_else(|| {
         error!("Failed to acquire db session");
         service_unavailable()
     })?;
-    Query::execute(&session, QueryParams {
+
+    let mut result: Vec<_> = Query::execute(&session, QueryParams {
         catalyst_id: catalyst_id.clone().into(),
     })
     .and_then(|r| r.try_collect().map_err(Into::into))
@@ -212,7 +214,10 @@ async fn indexed_registrations(catalyst_id: &IdUri) -> poem::Result<Vec<Query>> 
             error!(id=%error.id(), error=?e);
             ErrorResponses::ServerError(Json(error)).into()
         }
-    })
+    })?;
+
+    result.sort_by_key(|r| r.slot_no);
+    Ok(result)
 }
 
 /// Returns a 503 error instance.
@@ -232,7 +237,7 @@ async fn last_signing_key(
         .role_data()
         .get(&RoleNumber::ROLE_0)
         .context("Missing role 0 data")?
-        .1
+        .data()
         .signing_key()
         .context("Missing signing key")?;
     let key_offset = usize::try_from(key_ref.key_offset).context("Invalid signing key offset")?;
@@ -242,7 +247,9 @@ async fn last_signing_key(
                 .x509_certs()
                 .get(&key_offset)
                 .context("Missing X509 role 0 certificate")?
-                .1;
+                .last()
+                .and_then(|p| p.data().as_ref())
+                .context("Unable to get last X509 role 0 certificate")?;
             x509_key(cert)
         },
         LocalRefInt::C509Certs => {
@@ -250,7 +257,9 @@ async fn last_signing_key(
                 .c509_certs()
                 .get(&key_offset)
                 .context("Missing C509 role 0 certificate")?
-                .1;
+                .last()
+                .and_then(|p| p.data().as_ref())
+                .context("Unable to get last C509 role 0 certificate")?;
             c509_key(cert)
         },
         LocalRefInt::PubKeys => {

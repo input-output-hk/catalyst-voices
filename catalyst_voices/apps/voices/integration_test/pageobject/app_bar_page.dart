@@ -32,14 +32,14 @@ class AppBarPage {
 
   Future<void> getStartedBtnIsVisible() async {
     expect($(getStartedBtn), findsOneWidget);
-    expect($(getStartedBtn).$(Text).text, T.get('Get Started'));
+    expect($(getStartedBtn).$(Text).text, (await t()).getStarted);
   }
 
   Future<void> finishAccountCreationBtnIsVisible() async {
     expect($(finishRegistrationBtn), findsOneWidget);
     expect(
       $(finishRegistrationBtn).$(Text).text,
-      T.get('Finish account creation'),
+      (await t()).finishAccountCreation,
     );
   }
 
@@ -48,7 +48,7 @@ class AppBarPage {
   }
 
   Future<void> accountPopupBtnClick() async {
-    await $(accountPopupBtn).tap();
+    await $(sessionAccountPopupMenuAvatar).tap();
   }
 
   Future<void> lockBtnClick() async {

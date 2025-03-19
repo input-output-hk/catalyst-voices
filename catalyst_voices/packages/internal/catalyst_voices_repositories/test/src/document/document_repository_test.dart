@@ -7,7 +7,7 @@ import 'package:drift/drift.dart' show DatabaseConnection;
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:uuid/uuid.dart';
+import 'package:uuid_plus/uuid_plus.dart';
 
 import '../utils/test_factories.dart';
 
@@ -88,8 +88,9 @@ void main() {
         content: const DocumentDataContent({}),
       );
 
-      when(() => remoteDocuments.get(ref: templateRef))
-          .thenAnswer((_) => Future.error(DocumentNotFound(ref: templateRef)));
+      when(() => remoteDocuments.get(ref: templateRef)).thenAnswer(
+        (_) => Future.error(DocumentNotFoundException(ref: templateRef)),
+      );
       when(() => remoteDocuments.get(ref: proposal.ref))
           .thenAnswer((_) => Future.value(proposal));
 
@@ -102,7 +103,7 @@ void main() {
       // Then
       expect(
         () async => proposalDocumentFuture,
-        throwsA(isA<DocumentNotFound>()),
+        throwsA(isA<DocumentNotFoundException>()),
       );
     });
 
@@ -233,93 +234,27 @@ void main() {
       });
     });
 
-    group('createDocumentDraft', () {
-      test('version should equals id', () async {
+    group('upsertDocumentDraft', () {
+      test('document data is saved', () async {
         // Given
-        const content = DocumentDataContent({});
-        final templateRef = DocumentRefFactory.buildSigned();
-
-        // When
-        final draftRef = await repository.createDocumentDraft(
-          type: DocumentType.proposalDocument,
-          content: content,
-          template: templateRef,
+        final documentDataToSave = DocumentDataFactory.build(
+          selfRef: DocumentRefFactory.buildDraft(),
         );
 
-        // Then
-        expect(draftRef.id, draftRef.version);
-      });
-
-      test(
-          'of document should use same '
-          'id but assign new version', () async {
-        // Given
-        final docRef = DocumentRefFactory.buildSigned();
-        const content = DocumentDataContent({});
-        final templateRef = DocumentRefFactory.buildSigned();
-
         // When
-        final draftRef = await repository.createDocumentDraft(
-          type: DocumentType.proposalDocument,
-          content: content,
-          template: templateRef,
-          of: docRef,
+        await repository.upsertDocumentDraft(document: documentDataToSave);
+
+        // Then
+        final savedDocumentData = await repository.getDocumentData(
+          ref: documentDataToSave.metadata.selfRef,
         );
 
-        // Then
-        expect(draftRef.id, docRef.id);
-        expect(draftRef.version, isNot(docRef.version));
-      });
-
-      test('document data type should be proposal document', () async {
-        // Given
-        const content = DocumentDataContent({});
-        final templateRef = DocumentRefFactory.buildSigned();
-
-        // When
-        final draftRef = await repository.createDocumentDraft(
-          type: DocumentType.proposalDocument,
-          content: content,
-          template: templateRef,
-        );
-
-        // Then
-        final documentData = await repository.getDocumentData(ref: draftRef);
-
-        expect(documentData.metadata.type, DocumentType.proposalDocument);
+        expect(savedDocumentData, equals(documentDataToSave));
       });
     });
 
     test(
-        'updating proposal draft content '
-        'should change it correctly', () async {
-      // Given
-      const initialContent = DocumentDataContent({});
-      const updatedContent = DocumentDataContent({'title': 'My proposal'});
-
-      final templateRef = DocumentRefFactory.buildSigned();
-
-      // When
-      final draftRef = await repository.createDocumentDraft(
-        type: DocumentType.proposalDocument,
-        content: initialContent,
-        template: templateRef,
-      );
-
-      await repository.updateDocumentDraft(
-        ref: draftRef,
-        content: updatedContent,
-      );
-
-      // Then
-      final documentData = await repository.getDocumentData(ref: draftRef);
-
-      expect(documentData.ref, draftRef);
-      expect(documentData.content, updatedContent);
-    });
-
-    test(
-        'updating proposal draft content '
+        'updating proposal draft '
         'should emit changes', () async {
       // Given
       const initialContent = DocumentDataContent({});
@@ -339,15 +274,22 @@ void main() {
         content: initialContent,
       );
 
+      final updatedData = DocumentDataFactory.build(
+        type: DocumentType.proposalDocument,
+        selfRef: draftRef,
+        template: templateRef,
+        content: updatedContent,
+      );
+
       // When
       await localDocuments.save(data: templateData);
       await draftsSource.save(data: draftData);
 
       // Then
-      await repository.updateDocumentDraft(
-        ref: draftRef,
-        content: updatedContent,
+      await repository.upsertDocumentDraft(
+        document: updatedData,
       );
+
       final draftStream = repository.watchDocumentWithRef(
         ref: draftRef,
         refGetter: (data) => data.metadata.template!,

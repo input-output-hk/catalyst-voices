@@ -20,21 +20,21 @@ final class ProposalBuilderBloc
     with
         BlocErrorEmitterMixin,
         BlocSignalEmitterMixin<ProposalBuilderSignal, ProposalBuilderState> {
-  final CampaignService _campaignService;
   final ProposalService _proposalService;
+  final CampaignService _campaignService;
   final DownloaderService _downloaderService;
   final DocumentMapper _documentMapper;
 
   DocumentBuilder? _documentBuilder;
 
   ProposalBuilderBloc(
-    this._campaignService,
     this._proposalService,
+    this._campaignService,
     this._downloaderService,
     this._documentMapper,
   ) : super(const ProposalBuilderState()) {
-    on<LoadDefaultProposalTemplateEvent>(_loadDefaultProposalTemplate);
-    on<LoadProposalTemplateEvent>(_loadProposalTemplate);
+    on<LoadDefaultProposalCategoryEvent>(_loadDefaultProposalCategory);
+    on<LoadProposalCategoryEvent>(_loadProposalCategory);
     on<LoadProposalEvent>(_loadProposal);
     on<ActiveNodeChangedEvent>(
       _handleActiveNodeChangedEvent,
@@ -62,11 +62,19 @@ final class ProposalBuilderBloc
     return documentBuilder!.build();
   }
 
-  DocumentDataMetadata _buildDocumentMetadata() {
+  DocumentData _buildDocumentData([DocumentRef? selfRef]) {
+    return DocumentData(
+      metadata: _buildDocumentMetadata(selfRef),
+      content: _documentMapper.toContent(_buildDocument()),
+    );
+  }
+
+  DocumentDataMetadata _buildDocumentMetadata([DocumentRef? selfRef]) {
     return DocumentDataMetadata(
       type: DocumentType.proposalDocument,
-      selfRef: state.metadata.documentRef!,
+      selfRef: selfRef ?? state.metadata.documentRef!,
       template: state.metadata.templateRef,
+      categoryId: state.metadata.categoryId,
     );
   }
 
@@ -121,11 +129,8 @@ final class ProposalBuilderBloc
     try {
       final documentRef = state.metadata.documentRef!;
       final proposalId = documentRef.id;
-      final document = _buildDocument();
-
       final encodedProposal = await _proposalService.encodeProposalForExport(
-        metadata: _buildDocumentMetadata(),
-        content: _documentMapper.toContent(document),
+        document: _buildDocumentData(),
       );
 
       final filename = '${event.filePrefix}_$proposalId';
@@ -234,25 +239,22 @@ final class ProposalBuilderBloc
     emit(newState);
 
     // then proceed slow async operations
-    final ref = state.metadata.documentRef!;
-    await _saveDocumentLocally(emit, ref, document);
+    await _saveDocumentLocally(emit, document);
   }
 
-  Future<void> _loadDefaultProposalTemplate(
-    LoadDefaultProposalTemplateEvent event,
+  Future<void> _loadDefaultProposalCategory(
+    LoadDefaultProposalCategoryEvent event,
     Emitter<ProposalBuilderState> emit,
   ) async {
-    _logger.info('Loading default proposal template');
+    _logger.info('Loading default proposal category');
 
     await _loadState(emit, () async {
-      final campaign = await _campaignService.getActiveCampaign();
-      final proposalTemplateRef = campaign?.proposalTemplateRef;
-      if (proposalTemplateRef == null) {
-        throw const ActiveCampaignNotFoundException();
-      }
+      final categories = await _campaignService.getCampaignCategories();
+      final category = categories.first;
+      final templateRef = category.proposalTemplateRef;
 
       final proposalTemplate = await _proposalService.getProposalTemplate(
-        ref: proposalTemplateRef,
+        ref: templateRef,
       );
 
       final documentBuilder =
@@ -261,7 +263,8 @@ final class ProposalBuilderBloc
       return _createState(
         document: documentBuilder.build(),
         metadata: ProposalBuilderMetadata.newDraft(
-          templateRef: proposalTemplateRef,
+          templateRef: templateRef,
+          categoryId: category.selfRef,
         ),
       );
     });
@@ -271,34 +274,49 @@ final class ProposalBuilderBloc
     LoadProposalEvent event,
     Emitter<ProposalBuilderState> emit,
   ) async {
-    _logger.info('Loading proposal[${event.ref}]');
+    _logger.info('Loading proposal: ${event.proposalId}');
 
     await _loadState(emit, () async {
-      final proposalData = await _proposalService.getProposal(ref: event.ref);
+      final proposalData = await _proposalService.getProposal(
+        ref: event.proposalId,
+      );
       final proposal = Proposal.fromData(proposalData);
+
+      final versions = proposalData.versions.mapIndexed((index, version) {
+        return DocumentVersion(
+          id: version.document.metadata.selfRef.version ?? '',
+          number: index + 1,
+          isCurrent: version.document.metadata.selfRef.version ==
+              event.proposalId.version,
+          isLatest: index == proposalData.versions.length - 1,
+        );
+      }).toList();
 
       return _createState(
         document: proposalData.document.document,
         metadata: ProposalBuilderMetadata(
           publish: proposal.publish,
           documentRef: proposal.selfRef,
-          currentIteration: proposal.versionCount,
+          originalDocumentRef: proposal.selfRef,
+          versions: versions,
+          categoryId: proposal.categoryId,
         ),
       );
     });
   }
 
-  Future<void> _loadProposalTemplate(
-    LoadProposalTemplateEvent event,
+  Future<void> _loadProposalCategory(
+    LoadProposalCategoryEvent event,
     Emitter<ProposalBuilderState> emit,
   ) async {
-    final ref = event.ref;
-
-    _logger.info('Loading proposal template[$ref]');
+    final categoryId = event.categoryId;
+    _logger.info('Loading proposal category: $categoryId');
 
     await _loadState(emit, () async {
+      final category = await _campaignService.getCategory(categoryId);
+      final templateRef = category.proposalTemplateRef;
       final proposalTemplate = await _proposalService.getProposalTemplate(
-        ref: ref,
+        ref: templateRef,
       );
 
       final documentBuilder =
@@ -307,7 +325,8 @@ final class ProposalBuilderBloc
       return _createState(
         document: documentBuilder.build(),
         metadata: ProposalBuilderMetadata.newDraft(
-          templateRef: ref,
+          templateRef: templateRef,
+          categoryId: categoryId,
         ),
       );
     });
@@ -319,7 +338,11 @@ final class ProposalBuilderBloc
   ) async {
     try {
       _logger.info('load state');
-      emit(const ProposalBuilderState(isChanging: true));
+      emit(
+        const ProposalBuilderState(
+          isChanging: true,
+        ),
+      );
       _documentBuilder = null;
 
       final newState = await stateBuilder();
@@ -365,16 +388,45 @@ final class ProposalBuilderBloc
     }).toList();
   }
 
+  Future<void> _publishAndSubmitProposalForReview(
+    Emitter<ProposalBuilderState> emit,
+  ) async {
+    final updatedRef = await _proposalService.publishProposal(
+      document: _buildDocumentData(),
+    );
+
+    _updateMetadata(
+      emit,
+      documentRef: updatedRef,
+      publish: ProposalPublish.localDraft,
+    );
+
+    await _proposalService.submitProposalForReview(
+      ref: updatedRef,
+      categoryId: state.metadata.categoryId!,
+    );
+
+    _updateMetadata(
+      emit,
+      publish: ProposalPublish.submittedProposal,
+    );
+  }
+
   Future<void> _publishProposal(
     PublishProposalEvent event,
     Emitter<ProposalBuilderState> emit,
   ) async {
     try {
       _logger.info('Publishing proposal');
-      final document = _buildDocument();
-      await _proposalService.publishProposal(
-        metadata: _buildDocumentMetadata(),
-        content: _documentMapper.toContent(document),
+
+      final updatedRef = await _proposalService.publishProposal(
+        document: _buildDocumentData(),
+      );
+
+      _updateMetadata(
+        emit,
+        documentRef: updatedRef,
+        publish: ProposalPublish.publishedDraft,
       );
     } catch (error, stackTrace) {
       _logger.severe('PublishProposal', error, stackTrace);
@@ -384,22 +436,16 @@ final class ProposalBuilderBloc
 
   Future<void> _saveDocumentLocally(
     Emitter<ProposalBuilderState> emit,
-    DocumentRef ref,
     Document document,
   ) async {
-    final ref = state.metadata.documentRef!;
-    final nextRef = await _updateDraftProposal(
-      ref,
+    // TODO(dtscalac): if a new version has been created
+    // update the version in the metadata
+    final updatedRef = await _upsertDraftProposal(
+      state.metadata.documentRef!,
       _documentMapper.toContent(document),
     );
 
-    if (nextRef != null && ref != nextRef) {
-      final updatedMetadata = state.metadata.copyWith(
-        documentRef: Optional(nextRef),
-      );
-      final updatedState = state.copyWith(metadata: updatedMetadata);
-      emit(updatedState);
-    }
+    _updateMetadata(emit, documentRef: updatedRef);
   }
 
   Future<void> _submitProposal(
@@ -408,26 +454,76 @@ final class ProposalBuilderBloc
   ) async {
     try {
       _logger.info('Submitting proposal for review');
-      final document = _buildDocument();
-      await _proposalService.submitProposalForReview(
-        metadata: _buildDocumentMetadata(),
-        content: _documentMapper.toContent(document),
-      );
+
+      switch (state.metadata.publish) {
+        case ProposalPublish.localDraft:
+          await _publishAndSubmitProposalForReview(emit);
+        case ProposalPublish.publishedDraft:
+          await _submitProposalForReview(emit);
+        case ProposalPublish.submittedProposal:
+          // already submitted, do nothing
+          break;
+      }
     } catch (error, stackTrace) {
       _logger.severe('SubmitProposalForReview', error, stackTrace);
       emitError(error);
     }
   }
 
-  Future<DraftRef?> _updateDraftProposal(
+  Future<void> _submitProposalForReview(
+    Emitter<ProposalBuilderState> emit,
+  ) async {
+    await _proposalService.submitProposalForReview(
+      ref: state.metadata.documentRef! as SignedDocumentRef,
+      categoryId: state.metadata.categoryId!,
+    );
+
+    _updateMetadata(emit, publish: ProposalPublish.submittedProposal);
+  }
+
+  // TODO(dtscalac): update versions accordingly
+  void _updateMetadata(
+    Emitter<ProposalBuilderState> emit, {
+    DocumentRef? documentRef,
+    ProposalPublish? publish,
+  }) {
+    final updatedMetadata = state.metadata.copyWith(
+      documentRef: documentRef != null ? Optional(documentRef) : null,
+      originalDocumentRef: documentRef != null ? Optional(documentRef) : null,
+      publish: publish,
+    );
+
+    final updatedState = state.copyWith(
+      metadata: updatedMetadata,
+    );
+
+    emit(updatedState);
+  }
+
+  Future<DraftRef> _upsertDraftProposal(
     DocumentRef currentRef,
     DocumentDataContent document,
   ) async {
-    final nextRef = currentRef.nextVersion();
-    await _proposalService.updateDraftProposal(
-      ref: nextRef,
-      content: document,
-    );
+    final originalRef = state.metadata.originalDocumentRef;
+    final template = state.metadata.templateRef!;
+    final categoryId = state.metadata.categoryId!;
+
+    DraftRef nextRef;
+    if (originalRef == null) {
+      nextRef = await _proposalService.createDraftProposal(
+        content: document,
+        template: template,
+        categoryId: categoryId,
+      );
+    } else {
+      nextRef = currentRef.nextVersion();
+      await _proposalService.upsertDraftProposal(
+        selfRef: nextRef,
+        content: document,
+        template: template,
+        categoryId: categoryId,
+      );
+    }
 
     return nextRef;
   }

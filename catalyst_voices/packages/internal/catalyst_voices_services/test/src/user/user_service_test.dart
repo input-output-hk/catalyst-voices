@@ -8,7 +8,7 @@ import 'package:shared_preferences_platform_interface/in_memory_shared_preferenc
 import 'package:shared_preferences_platform_interface/shared_preferences_async_platform_interface.dart';
 import 'package:test/expect.dart';
 import 'package:test/scaffolding.dart';
-import 'package:uuid/uuid.dart';
+import 'package:uuid_plus/uuid_plus.dart';
 
 void main() {
   late final KeychainProvider keychainProvider;
@@ -21,6 +21,7 @@ void main() {
     final store = InMemorySharedPreferencesAsync.empty();
     SharedPreferencesAsyncPlatform.instance = store;
     FlutterSecureStorage.setMockInitialValues({});
+    DummyCatalystIdFactory.registerDummyKeyFactory();
 
     keychainProvider = VaultKeychainProvider(
       secureStorage: const FlutterSecureStorage(),
@@ -53,7 +54,10 @@ void main() {
 
       // When
       final keychain = await keychainProvider.create(keychainId);
-      final account = Account.dummy(keychain: keychain);
+      final account = Account.dummy(
+        catalystId: DummyCatalystIdFactory.create(),
+        keychain: keychain,
+      );
 
       await service.useAccount(account);
 
@@ -72,8 +76,17 @@ void main() {
       // When
       final keychainOne = await keychainProvider.create(keychainIdOne);
       final keychainTwo = await keychainProvider.create(keychainIdTwo);
-      final accountOne = Account.dummy(keychain: keychainOne);
-      final accountTwo = Account.dummy(keychain: keychainTwo);
+      final catalystIdOne = DummyCatalystIdFactory.create();
+      final catalystIdTwo = DummyCatalystIdFactory.create();
+
+      final accountOne = Account.dummy(
+        catalystId: catalystIdOne,
+        keychain: keychainOne,
+      );
+      final accountTwo = Account.dummy(
+        catalystId: catalystIdTwo,
+        keychain: keychainTwo,
+      );
 
       final accountStream = service.watchUser.map((user) => user.activeAccount);
 
@@ -107,7 +120,10 @@ void main() {
       final accounts = <Account>[];
       for (final id in ids) {
         final keychain = await keychainProvider.create(id);
-        final account = Account.dummy(keychain: keychain);
+        final account = Account.dummy(
+          catalystId: DummyCatalystIdFactory.create(),
+          keychain: keychain,
+        );
 
         accounts.add(account);
       }
@@ -130,6 +146,7 @@ void main() {
       // When
       final keychain = await keychainProvider.create(keychainId);
       final lastAccount = Account.dummy(
+        catalystId: DummyCatalystIdFactory.create(),
         keychain: keychain,
         isActive: true,
       );
@@ -160,6 +177,7 @@ void main() {
       // When
       final keychain = await keychainProvider.create(keychainId);
       final account = Account.dummy(
+        catalystId: DummyCatalystIdFactory.create(),
         keychain: keychain,
         isActive: true,
       );

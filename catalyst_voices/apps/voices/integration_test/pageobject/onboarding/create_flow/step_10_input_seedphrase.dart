@@ -10,10 +10,16 @@ class InputSeedphrasePanel extends OnboardingPageBase {
   InputSeedphrasePanel(super.$);
 
   static const seedPhrasesPicker = Key('SeedPhrasesPicker');
-  static const resetButton = Key('ResetButton');
+  final resetButton = const Key('ResetButton');
 
   Future<void> clickNext() async {
     await $(nextButton).tap();
+  }
+
+  @override
+  Future<void> goto() async {
+    await WritedownSeedphraseInfoPanel($).goto();
+    await WritedownSeedphraseInfoPanel($).clickNext();
   }
 
   Future<void> inputSeedPhraseWords() async {
@@ -26,29 +32,50 @@ class InputSeedphrasePanel extends OnboardingPageBase {
   }
 
   @override
-  Future<void> goto() async {
-    await WritedownSeedphraseInfoPanel($).goto();
-    await WritedownSeedphraseInfoPanel($).clickNext();
-  }
-
-  @override
   Future<void> verifyPageElements() async {
+    await clickResetButton();
     await verifyInfoPanel();
+    await verifyDetailsPanel();
   }
 
-  Future<void> verifyDetailsPanel() async {}
+  Future<void> clickResetButton() async {
+    await $(resetButton).tap();
+  }
 
   Future<void> verifyInfoPanel() async {
     expect(
       $(registrationInfoPanel).$(headerTitle).text,
-      T.get('Catalyst Keychain'),
+      (await t()).catalystKeychain,
     );
     expect(infoPartTaskPicture(), findsOneWidget);
     expect($(progressBar), findsOneWidget);
+    expect($(learnMoreButton).$(Text).text, (await t()).learnMore);
     expect(
-      await infoPartLearnMoreText(),
-      T.get('Learn More'),
+      $(registrationInfoPanel).$(headerSubtitle).text,
+      (await t()).createKeychainSeedPhraseCheckSubtitle,
+    );
+    expect(
+      $(registrationInfoPanel).$(headerBody).text,
+      (await t()).createKeychainSeedPhraseCheckBody,
+    );
+    expect(
+      $(learnMoreButton).$(Text).text,
+      (await t()).learnMore,
     );
     expect(await closeButton(), findsOneWidget);
+  }
+
+  Future<void> verifyDetailsPanel() async {
+    for (var i = 0; i < 12; i++) {
+      expect(find.text('Slot ${i + 1}'), findsOneWidget);
+    }
+    for (var i = 0; i < 12; i++) {
+      expect(
+        $(seedPhrasesPicker).$(find.text(TestContext.get('word$i'))),
+        findsWidgets,
+      );
+    }
+    expect($(backButton), findsOneWidget);
+    expect($(nextButton), findsOneWidget);
   }
 }

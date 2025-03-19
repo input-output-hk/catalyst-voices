@@ -29,11 +29,11 @@ class CategoryDetailCubit extends Cubit<CategoryDetailState> {
     );
   }
 
-  void getCategoryDetail(String categoryId) {
+  Future<void> getCategoryDetail(SignedDocumentRef categoryId) async {
     emit(state.copyWith(isLoading: true));
 
     try {
-      final category = _campaignService.getCategory(categoryId);
+      final category = await _campaignService.getCategory(categoryId);
       emit(
         state.copyWith(
           isLoading: false,

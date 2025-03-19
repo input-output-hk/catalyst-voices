@@ -30,7 +30,7 @@ class ProposalPage extends StatefulWidget {
 }
 
 class _ProposalPageState extends State<ProposalPage>
-    with SignalHandlerStateMixin<ProposalBloc, ProposalSignal, ProposalPage> {
+    with SignalHandlerStateMixin<ProposalCubit, ProposalSignal, ProposalPage> {
   late final SegmentsController _segmentsController;
   late final ItemScrollController _segmentsScrollController;
 
@@ -74,7 +74,7 @@ class _ProposalPageState extends State<ProposalPage>
     super.didUpdateWidget(oldWidget);
 
     if (widget.ref != oldWidget.ref) {
-      context.read<ProposalBloc>().add(ShowProposalEvent(ref: widget.ref));
+      unawaited(context.read<ProposalCubit>().load(ref: widget.ref));
     }
   }
 
@@ -102,7 +102,7 @@ class _ProposalPageState extends State<ProposalPage>
   void initState() {
     super.initState();
 
-    final bloc = context.read<ProposalBloc>();
+    final bloc = context.read<ProposalCubit>();
 
     _segmentsController = SegmentsController();
     _segmentsScrollController = ItemScrollController();
@@ -116,13 +116,13 @@ class _ProposalPageState extends State<ProposalPage>
         .distinct(listEquals)
         .listen(_updateSegments);
 
-    bloc.add(ShowProposalEvent(ref: widget.ref));
+    unawaited(bloc.load(ref: widget.ref));
   }
 
   void _changeVersion(String? version) {
     Router.neglect(context, () {
       final ref = widget.ref.copyWith(version: Optional(version));
-      ProposalRoute.from(ref: ref).replace(context);
+      ProposalRoute.fromRef(ref: ref).replace(context);
     });
   }
 

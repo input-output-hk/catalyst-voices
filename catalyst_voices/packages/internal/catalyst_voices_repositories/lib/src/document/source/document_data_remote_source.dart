@@ -1,7 +1,7 @@
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
-import 'package:uuid/uuid.dart';
+import 'package:uuid_plus/uuid_plus.dart';
 
 const mockedDocumentUuid = '0194f567-65f5-7ec6-b4f2-f744c0f74844';
 const mockedTemplateUuid = '0194d492-1daa-75b5-b4a4-5cf331cd8d1a';
@@ -91,7 +91,7 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
   }
 
   @override
-  Future<void> upload(SignedDocument document) async {
+  Future<void> publish(SignedDocument document) async {
     final bytes = document.toBytes();
     await _api.gateway.apiV1DocumentPut(body: bytes);
   }
@@ -104,5 +104,5 @@ abstract interface class DocumentDataRemoteSource
   @override
   Future<List<SignedDocumentRef>> index();
 
-  Future<void> upload(SignedDocument document);
+  Future<void> publish(SignedDocument document);
 }

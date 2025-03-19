@@ -226,16 +226,17 @@ void main() async {
           (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await UnlockPasswordInputPanel($).goto();
+        await UnlockPasswordInputPanel($).verifyPageElements();
 
         // Test invalid password
         await UnlockPasswordInputPanel($).enterPassword('short', 'short');
-        UnlockPasswordInputPanel($)
+        await UnlockPasswordInputPanel($)
             .verifyValidationIndicator(PasswordValidationStatus.weak);
 
         // Test valid password
         await UnlockPasswordInputPanel($)
             .enterPassword('ValidPass123', 'ValidPass123');
-        UnlockPasswordInputPanel($)
+        await UnlockPasswordInputPanel($)
             .verifyValidationIndicator(PasswordValidationStatus.good);
       });
 
@@ -256,7 +257,7 @@ void main() async {
 
         await UnlockPasswordInputPanel($)
             .enterPassword('Test1234', 'WrongPassword');
-        UnlockPasswordInputPanel($)
+        await UnlockPasswordInputPanel($)
             .verifyPasswordConfirmErrorIcon(isShown: true);
       });
 

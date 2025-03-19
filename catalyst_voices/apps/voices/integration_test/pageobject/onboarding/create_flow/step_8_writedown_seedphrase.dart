@@ -57,23 +57,18 @@ class WriteDownSeedphrasePanel extends OnboardingPageBase {
   }
 
   Future<void> verifyInfoPanel() async {
-    expect(await infoPartHeaderTitleText(), T.get('Catalyst Keychain'));
+    expect(await infoPartHeaderTitleText(), (await t()).catalystKeychain);
     expect(
       await infoPartHeaderSubtitleText(),
-      T.get('Write down your Catalyst seed phrase'),
+      (await t()).createKeychainSeedPhraseSubtitle,
     );
     expect(
       await infoPartHeaderBodyText(),
-      T.get(
-        'Make sure you write down your 12-words in a safe place as well.',
-      ),
+      (await t()).createKeychainSeedPhraseBody,
     );
     expect(infoPartTaskPicture(), findsOneWidget);
     expect($(progressBar), findsOneWidget);
-    expect(
-      infoPartLearnMoreText(),
-      T.get('Learn More'),
-    );
+    expect($(learnMoreButton).$(Text).text, (await t()).learnMore);
   }
 
   Future<void> verifyDetailsPanel() async {
@@ -81,12 +76,12 @@ class WriteDownSeedphrasePanel extends OnboardingPageBase {
     expect($(downloadSeedPhraseButton), findsOneWidget);
     expect(
       $(downloadSeedPhraseButton).$(CommonPage($).decorData).$(Text).text,
-      T.get('Export Security Words'),
+      (await t()).createKeychainSeedPhraseExport,
     );
     expect($(seedPhraseStoredCheckbox), findsOneWidget);
     expect(
       $(seedPhraseStoredCheckbox).$(Text).text,
-      T.get('I have written down/downloaded my 12 words'),
+      (await t()).createKeychainSeedPhraseStoreConfirmation,
     );
     expect($(backButton), findsOneWidget);
     expect($(nextButton), findsOneWidget);

@@ -6,12 +6,11 @@ import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:uuid/uuid.dart';
+import 'package:uuid_plus/uuid_plus.dart';
 
 void main() {
   late MockDocumentRepository mockDocumentRepository;
   late MockProposalRepository mockProposalRepository;
-  late MockSignedDocumentManager mockSignedDocumentManager;
   late MockUserService mockUserService;
   late MockKeyDerivationService mockKeyDerivationService;
 
@@ -20,14 +19,12 @@ void main() {
   setUp(() {
     mockDocumentRepository = MockDocumentRepository();
     mockProposalRepository = MockProposalRepository();
-    mockSignedDocumentManager = MockSignedDocumentManager();
     mockKeyDerivationService = MockKeyDerivationService();
     mockUserService = MockUserService();
 
     proposalService = ProposalService(
       mockProposalRepository,
       mockDocumentRepository,
-      mockSignedDocumentManager,
       mockUserService,
       mockKeyDerivationService,
     );
@@ -92,10 +89,10 @@ void main() {
       ).thenAnswer((_) => Stream.value([proposalData1, proposalData2]));
 
       when(
-        () => mockDocumentRepository.queryVersionIds(
+        () => mockDocumentRepository.queryVersionsOfId(
           id: any(named: 'id'),
         ),
-      ).thenAnswer((_) => Future.value([versionId1]));
+      ).thenAnswer((_) => Future.value([proposalData1]));
 
       when(
         () => mockDocumentRepository.watchCount(
@@ -116,7 +113,7 @@ void main() {
       ).called(1);
 
       verify(
-        () => mockDocumentRepository.queryVersionIds(
+        () => mockDocumentRepository.queryVersionsOfId(
           id: any(named: 'id'),
         ),
       ).called(2);
@@ -182,10 +179,10 @@ void main() {
         ).thenAnswer((_) => proposalsStream);
 
         when(
-          () => mockDocumentRepository.queryVersionIds(
+          () => mockDocumentRepository.queryVersionsOfId(
             id: any(named: 'id'),
           ),
-        ).thenAnswer((_) => Future.value([versionId]));
+        ).thenAnswer((_) => Future.value([proposalData1, proposalData2]));
 
         final commentsStream1 =
             Stream.fromIterable([5, 10]).asBroadcastStream();
@@ -226,7 +223,5 @@ class MockDocumentRepository extends Mock implements DocumentRepository {}
 class MockKeyDerivationService extends Mock implements KeyDerivationService {}
 
 class MockProposalRepository extends Mock implements ProposalRepository {}
-
-class MockSignedDocumentManager extends Mock implements SignedDocumentManager {}
 
 class MockUserService extends Mock implements UserService {}

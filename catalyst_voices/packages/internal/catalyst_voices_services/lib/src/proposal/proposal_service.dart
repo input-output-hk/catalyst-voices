@@ -5,32 +5,36 @@ import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_services/src/crypto/key_derivation_service.dart';
 import 'package:catalyst_voices_services/src/user/user_service.dart';
 import 'package:rxdart/rxdart.dart';
-import 'package:uuid/uuid.dart';
 
 abstract interface class ProposalService {
   const factory ProposalService(
     ProposalRepository proposalRepository,
     DocumentRepository documentRepository,
-    SignedDocumentManager signedDocumentManager,
     UserService userService,
     KeyDerivationService keyDerivationService,
   ) = ProposalServiceImpl;
 
   Future<List<String>> addFavoriteProposal(String proposalId);
 
+  /// Creates a new proposal draft locally.
+  Future<DraftRef> createDraftProposal({
+    required DocumentDataContent content,
+    required SignedDocumentRef template,
+    required SignedDocumentRef categoryId,
+  });
+
   /// Delete a draft proposal from local storage.
   ///
   /// Published proposals cannot be deleted.
   Future<void> deleteDraftProposal(DraftRef ref);
 
-  /// Encodes the [content] to exportable format.
+  /// Encodes the [document] to exportable format.
   ///
   /// It does not save the document anywhere on the disk,
   /// it only encodes a document as [Uint8List]
   /// so that it can be saved as a file.
   Future<Uint8List> encodeProposalForExport({
-    required DocumentDataMetadata metadata,
-    required DocumentDataContent content,
+    required DocumentData document,
   });
 
   /// Fetches favorites proposals ids of the user
@@ -62,23 +66,28 @@ abstract interface class ProposalService {
   Future<DocumentRef> importProposal(Uint8List data);
 
   /// Publishes a public proposal draft.
-  Future<void> publishProposal({
-    required DocumentDataMetadata metadata,
-    required DocumentDataContent content,
+  /// The local draft referenced by the [document] is removed.
+  ///
+  /// The [DocumentRef] is retained but it's promoted from [DraftRef]
+  /// instance to [SignedDocumentRef] instance.
+  Future<SignedDocumentRef> publishProposal({
+    required DocumentData document,
   });
 
   Future<List<String>> removeFavoriteProposal(String proposalId);
 
   /// Submits a proposal draft into review.
   Future<void> submitProposalForReview({
-    required DocumentDataMetadata metadata,
-    required DocumentDataContent content,
+    required SignedDocumentRef ref,
+    required SignedDocumentRef categoryId,
   });
 
-  /// Saves a new proposal draft in the local storage.
-  Future<void> updateDraftProposal({
-    required DraftRef ref,
+  /// Upserts a proposal draft in the local storage.
+  Future<void> upsertDraftProposal({
+    required DraftRef selfRef,
     required DocumentDataContent content,
+    required SignedDocumentRef template,
+    required SignedDocumentRef categoryId,
   });
 
   Stream<List<Proposal>> watchLatestProposals({int? limit});
@@ -87,14 +96,12 @@ abstract interface class ProposalService {
 final class ProposalServiceImpl implements ProposalService {
   final ProposalRepository _proposalRepository;
   final DocumentRepository _documentRepository;
-  final SignedDocumentManager _signedDocumentManager;
   final UserService _userService;
   final KeyDerivationService _keyDerivationService;
 
   const ProposalServiceImpl(
     this._proposalRepository,
     this._documentRepository,
-    this._signedDocumentManager,
     this._userService,
     this._keyDerivationService,
   );
@@ -105,18 +112,38 @@ final class ProposalServiceImpl implements ProposalService {
   }
 
   @override
+  Future<DraftRef> createDraftProposal({
+    required DocumentDataContent content,
+    required SignedDocumentRef template,
+    required SignedDocumentRef categoryId,
+  }) async {
+    final draftRef = DraftRef.generateFirstRef();
+    await _documentRepository.upsertDocumentDraft(
+      document: DocumentData(
+        metadata: DocumentDataMetadata(
+          type: DocumentType.proposalDocument,
+          selfRef: draftRef,
+          template: template,
+          categoryId: categoryId,
+        ),
+        content: content,
+      ),
+    );
+
+    return draftRef;
+  }
+
+  @override
   Future<void> deleteDraftProposal(DraftRef ref) {
     return _documentRepository.deleteDocumentDraft(ref: ref);
   }
 
   @override
   Future<Uint8List> encodeProposalForExport({
-    required DocumentDataMetadata metadata,
-    required DocumentDataContent content,
+    required DocumentData document,
   }) {
     return _documentRepository.encodeDocumentForExport(
-      metadata: metadata,
-      content: content,
+      document: document,
     );
   }
 
@@ -143,7 +170,7 @@ final class ProposalServiceImpl implements ProposalService {
 
     return ProposalData(
       document: mergedDocument,
-      categoryId: const Uuid().v7(),
+      categoryId: proposal.categoryId,
       commentsCount: 10,
       versions: proposal.versions,
     );
@@ -187,47 +214,25 @@ final class ProposalServiceImpl implements ProposalService {
   }
 
   @override
-  Future<void> publishProposal({
-    required DocumentDataMetadata metadata,
-    required DocumentDataContent content,
+  Future<SignedDocumentRef> publishProposal({
+    required DocumentData document,
   }) async {
-    final account = _userService.user.activeAccount;
-    if (account == null) {
-      throw StateError('Cannot publish a proposal, account missing');
+    await _useProposerRoleCredentials(
+      (catalystId, privateKey) {
+        return _proposalRepository.publishProposal(
+          document: document,
+          catalystId: catalystId,
+          privateKey: privateKey,
+        );
+      },
+    );
+
+    final ref = document.ref;
+    if (ref is DraftRef) {
+      await _documentRepository.deleteDocumentDraft(ref: ref);
     }
 
-    final masterKey = await account.keychain.getMasterKey();
-    if (masterKey == null) {
-      throw StateError('Cannot publish a proposal, master key missing');
-    }
-
-    final role0KeyPair = await _keyDerivationService.deriveAccountRoleKeyPair(
-      masterKey: masterKey,
-      role: AccountRole.root,
-    );
-
-    // TODO(dtscalac): catalyst id should come from the profile
-    // TODO(dtscalac): don't hardcode the host, it should be injected by DI
-    final catalystId = CatalystId(
-      host: CatalystIdHost.cardanoPreprod.host,
-      role0Key: role0KeyPair.publicKey,
-      role: AccountRole.proposer,
-      rotation: 0,
-    );
-
-    final keyPair = await _keyDerivationService.deriveAccountRoleKeyPair(
-      masterKey: masterKey,
-      role: AccountRole.proposer,
-    );
-
-    final signedDocument = await _signedDocumentManager.signDocument(
-      SignedDocumentJsonPayload(content.data),
-      metadata: _createProposalMetadata(metadata),
-      catalystId: catalystId,
-      privateKey: keyPair.privateKey,
-    );
-
-    await _documentRepository.uploadDocument(document: signedDocument);
+    return ref.toSignedDocumentRef();
   }
 
   @override
@@ -237,20 +242,39 @@ final class ProposalServiceImpl implements ProposalService {
 
   @override
   Future<void> submitProposalForReview({
-    required DocumentDataMetadata metadata,
-    required DocumentDataContent content,
-  }) async {
-    // TODO(dtscalac): implement
+    required SignedDocumentRef ref,
+    required SignedDocumentRef categoryId,
+  }) {
+    return _useProposerRoleCredentials(
+      (catalystId, privateKey) {
+        return _proposalRepository.publishProposalAction(
+          ref: ref,
+          categoryId: categoryId,
+          action: ProposalSubmissionAction.aFinal,
+          catalystId: catalystId,
+          privateKey: privateKey,
+        );
+      },
+    );
   }
 
   @override
-  Future<void> updateDraftProposal({
-    required DraftRef ref,
+  Future<void> upsertDraftProposal({
+    required DraftRef selfRef,
     required DocumentDataContent content,
-  }) {
-    return _documentRepository.updateDocumentDraft(
-      ref: ref,
-      content: content,
+    required SignedDocumentRef template,
+    required SignedDocumentRef categoryId,
+  }) async {
+    await _documentRepository.upsertDocumentDraft(
+      document: DocumentData(
+        metadata: DocumentDataMetadata(
+          type: DocumentType.proposalDocument,
+          selfRef: selfRef,
+          template: template,
+          categoryId: categoryId,
+        ),
+        content: content,
+      ),
     );
   }
 
@@ -261,9 +285,17 @@ final class ProposalServiceImpl implements ProposalService {
         .switchMap((documents) async* {
       final proposalsStreams = await Future.wait(
         documents.map((doc) async {
-          final versionIds = await _documentRepository.queryVersionIds(
+          final versionIds = await _documentRepository.queryVersionsOfId(
             id: doc.metadata.selfRef.id,
           );
+          final versionsData = versionIds
+              .map(
+                (e) => BaseProposalData(
+                  document: e,
+                  categoryId: SignedDocumentRef.generateFirstRef(),
+                ),
+              )
+              .toList();
 
           return _documentRepository
               .watchCount(
@@ -273,8 +305,10 @@ final class ProposalServiceImpl implements ProposalService {
               .map((commentsCount) {
             final proposalData = ProposalData(
               document: doc,
-              categoryId: DocumentType.categoryParametersDocument.uuid,
-              versions: versionIds,
+              categoryId: SignedDocumentRef(
+                id: DocumentType.categoryParametersDocument.uuid,
+              ),
+              versions: versionsData,
               commentsCount: commentsCount,
             );
             return Proposal.fromData(proposalData);
@@ -291,19 +325,33 @@ final class ProposalServiceImpl implements ProposalService {
     });
   }
 
-  SignedDocumentMetadata _createProposalMetadata(
-    DocumentDataMetadata metadata,
-  ) {
-    final template = metadata.template;
+  Future<void> _useProposerRoleCredentials(
+    Future<void> Function(
+      CatalystId catalystId,
+      CatalystPrivateKey privateKey,
+    ) callback,
+  ) async {
+    final account = _userService.user.activeAccount;
+    if (account == null) {
+      throw StateError(
+        'Cannot obtain proposer credentials, account missing',
+      );
+    }
 
-    return SignedDocumentMetadata(
-      contentType: SignedDocumentContentType.json,
-      documentType: DocumentType.proposalDocument,
-      id: metadata.id,
-      ver: metadata.selfRef.version,
-      template: template == null
-          ? null
-          : SignedDocumentMetadataRef.fromDocumentRef(template),
+    final catalystId = account.catalystId.copyWith(
+      role: const Optional(AccountRole.proposer),
+      rotation: const Optional(0),
     );
+
+    await account.keychain.getMasterKey().use((masterKey) async {
+      final keyPair = _keyDerivationService.deriveAccountRoleKeyPair(
+        masterKey: masterKey,
+        role: AccountRole.proposer,
+      );
+
+      await keyPair.use(
+        (keyPair) => callback(catalystId, keyPair.privateKey),
+      );
+    });
   }
 }

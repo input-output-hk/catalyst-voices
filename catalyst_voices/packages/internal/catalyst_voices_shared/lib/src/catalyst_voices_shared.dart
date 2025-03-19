@@ -31,6 +31,7 @@ export 'storage/secure_storage.dart';
 export 'storage/storage.dart';
 export 'storage/vault/secure_storage_vault.dart';
 export 'storage/vault/vault.dart';
+export 'user/dummy_catalyst_id_factory.dart';
 export 'user/user_observer.dart';
 export 'utils/active_aware.dart';
 export 'utils/date_time_ext.dart';

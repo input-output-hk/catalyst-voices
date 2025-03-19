@@ -21,12 +21,6 @@ final class App extends StatefulWidget {
 
 class _AppState extends State<App> {
   @override
-  void initState() {
-    super.initState();
-    unawaited(Dependencies.instance.get<UserService>().useLastAccount());
-  }
-
-  @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: _multiBlocProviders(),
@@ -34,6 +28,12 @@ class _AppState extends State<App> {
         routerConfig: widget.routerConfig,
       ),
     );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    unawaited(Dependencies.instance.get<UserService>().useLastAccount());
   }
 
   List<BlocProvider> _multiBlocProviders() {
@@ -68,8 +68,11 @@ class _AppState extends State<App> {
       BlocProvider<AccountCubit>(
         create: (context) => Dependencies.instance.get<AccountCubit>(),
       ),
-      BlocProvider<ProposalBloc>(
-        create: (_) => Dependencies.instance.get<ProposalBloc>(),
+      BlocProvider<ProposalCubit>(
+        create: (_) => Dependencies.instance.get<ProposalCubit>(),
+      ),
+      BlocProvider<NewProposalCubit>(
+        create: (_) => Dependencies.instance.get<NewProposalCubit>(),
       ),
     ];
   }

@@ -1,8 +1,8 @@
 import 'dart:math';
 
 import 'package:catalyst_voices/pages/proposal/tiles/proposal_add_comment_tile.dart';
+import 'package:catalyst_voices/pages/proposal/tiles/proposal_comment_tile.dart';
 import 'package:catalyst_voices/pages/proposal/tiles/proposal_comments_header_tile.dart';
-import 'package:catalyst_voices/pages/proposal/tiles/proposal_comments_tile.dart';
 import 'package:catalyst_voices/pages/proposal/tiles/proposal_document_section_tile.dart';
 import 'package:catalyst_voices/pages/proposal/tiles/proposal_document_segment_title.dart';
 import 'package:catalyst_voices/pages/proposal/tiles/proposal_metadata_tile.dart';
@@ -61,14 +61,15 @@ class _SegmentsListView extends StatelessWidget {
         final isLast = index == max(items.length - 1, 0);
 
         return ProposalTileDecoration(
-          key: ValueKey('Proposal[${item.id.value}]Tile'),
+          key: ValueKey('Proposal.${item.id.value}.Tile'),
           corners: (
             isFirst: isFirst || item is ProposalCommentsSegment,
             isLast: isLast || nextItem is ProposalCommentsSegment,
           ),
           verticalPadding: (
             isFirst: item is Segment,
-            isLast: nextItem is! Section,
+            isLast: (nextItem is! Section && nextItem is! CommentListItem) ||
+                (item is ProposalCommentsSegment),
           ),
           child: _buildItem(context, item),
         );
@@ -83,6 +84,10 @@ class _SegmentsListView extends StatelessWidget {
 
         if (item is DocumentSection && nextItem is DocumentSection) {
           return const ProposalSeparatorBox(height: 24);
+        }
+
+        if (nextItem is AddCommentSection) {
+          return const ProposalDivider(height: 48);
         }
 
         if (nextItem is ProposalCommentsSegment) {
@@ -128,11 +133,21 @@ class _SegmentsListView extends StatelessWidget {
       DocumentSection(:final property) => ProposalDocumentSectionTile(
           property: property,
         ),
-      ProposalCommentsSegment() => const ProposalCommentsHeaderTile(),
+      ProposalCommentsSegment(:final sort) => ProposalCommentsHeaderTile(
+          sort: sort,
+        ),
       ProposalCommentsSection() => switch (item) {
-          ViewCommentsSection() => const ProposalCommentsTile(),
-          AddCommentSection() => const ProposalAddCommentTile(),
+          ViewCommentsSection() => throw ArgumentError(
+              'View comments not supported',
+            ),
+          AddCommentSection(:final schema) => ProposalAddCommentTile(
+              schema: schema,
+            ),
         },
+      CommentListItem(:final comment) => ProposalCommentTile(
+          key: ValueKey(comment.comment.metadata.selfRef),
+          comment: comment,
+        ),
       _ => throw ArgumentError('Not supported type ${item.runtimeType}'),
     };
   }
