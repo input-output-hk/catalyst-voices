@@ -16,7 +16,7 @@ class ProposalVersion extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<ProposalBloc, ProposalState, List<DocumentVersion>>(
+    return BlocSelector<ProposalCubit, ProposalState, List<DocumentVersion>>(
       selector: (state) => state.data.header.versions,
       builder: (context, state) {
         return _ProposalVersion(
@@ -48,7 +48,7 @@ class _ProposalVersion extends StatelessWidget {
           ? null
           : (value) {
               final signal = ChangeVersionSignal(to: value);
-              context.read<ProposalBloc>().emitSignal(signal);
+              context.read<ProposalCubit>().emitSignal(signal);
             },
       readOnly: readOnly,
       showBorder: showBorder,
