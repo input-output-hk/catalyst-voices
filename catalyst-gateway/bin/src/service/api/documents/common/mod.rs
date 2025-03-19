@@ -6,7 +6,7 @@ use catalyst_signed_doc::CatalystSignedDocument;
 use super::templates::get_doc_static_template;
 use crate::{
     db::event::{error::NotFoundError, signed_docs::FullSignedDoc},
-    service::common::auth::rbac::token::CatalystRBACTokenV1,
+    service::common::auth::rbac::{scheme, token::CatalystRBACTokenV1},
 };
 
 /// Get document from the database
@@ -60,5 +60,27 @@ impl From<CatalystRBACTokenV1> for VerifyingKeyProvider {
         let cat_id = value.catalyst_id();
 
         Self(Vec::from([(cat_id.clone().as_uri(), cat_id.role0_pk())]))
+    }
+}
+
+impl VerifyingKeyProvider {
+    pub(crate) async fn from_token(token: CatalystRBACTokenV1) -> anyhow::Result<Self> {
+        let cat_id = token.catalyst_id();
+
+        let registrations = scheme::indexed_registrations(cat_id).await?;
+
+        if registrations.is_empty() {
+            return Err(anyhow::anyhow!(
+                "Unable to find registrations for {cat_id} Catalyst ID"
+            ));
+        }
+
+        let pk = scheme::last_signing_key(token.network(), &registrations)
+            .await
+            .map_err(|e| {
+                anyhow::anyhow!("Unable to get last signing key for {cat_id} Catalyst ID: {e:?}")
+            })?;
+
+        Ok(Self(Vec::from([(cat_id.clone().as_uri(), pk)])))
     }
 }

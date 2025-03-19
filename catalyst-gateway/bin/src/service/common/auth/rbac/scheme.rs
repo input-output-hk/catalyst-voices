@@ -194,7 +194,7 @@ async fn checker_api_catalyst_auth(
 
 /// Returns a sorted list of all registrations for the given Catalyst ID from the
 /// database.
-async fn indexed_registrations(catalyst_id: &IdUri) -> poem::Result<Vec<Query>> {
+pub(crate) async fn indexed_registrations(catalyst_id: &IdUri) -> poem::Result<Vec<Query>> {
     let session = CassandraSession::get(true).ok_or_else(|| {
         error!("Failed to acquire db session");
         service_unavailable()
@@ -227,7 +227,7 @@ fn service_unavailable() -> poem::Error {
 }
 
 /// Returns the last signing key from the registration chain.
-async fn last_signing_key(
+pub(crate) async fn last_signing_key(
     network: Network, indexed_registrations: &[Query],
 ) -> anyhow::Result<VerifyingKey> {
     let chain = registration_chain(network, indexed_registrations)
