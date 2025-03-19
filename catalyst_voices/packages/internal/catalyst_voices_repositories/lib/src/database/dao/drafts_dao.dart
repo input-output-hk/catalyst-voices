@@ -53,10 +53,9 @@ abstract interface class DraftsDao {
   Stream<DocumentDraftEntity?> watch({required DocumentRef ref});
 
   Stream<List<DocumentDraftEntity>> watchAll({
-    bool unique = false,
     int? limit,
     DocumentType? type,
-    CatalystId? catalystId,
+    CatalystId? authorId,
   });
 }
 
@@ -175,54 +174,32 @@ class DriftDraftsDao extends DatabaseAccessor<DriftCatalystDatabase>
 
   @override
   Stream<List<DocumentDraftEntity>> watchAll({
-    bool unique = false,
     int? limit,
     DocumentType? type,
-    CatalystId? catalystId,
+    CatalystId? authorId,
   }) {
     final query = select(drafts);
 
     if (type != null) {
       query.where((doc) => doc.type.equals(type.uuid));
     }
-    if (catalystId != null) {
+    if (authorId != null) {
       // TODO(LynxLynxx): filter when catalystId is implemented as metadata
       // query.where((doc) => doc.metadata.catalystId.equals(catalystId.uuid));
     }
 
-    return query.watch().map((documents) {
-      if (unique) {
-        // Group by document ID and take latest version
-        final uniqueDocs = documents
-            .groupListsBy((doc) => '${doc.idHi}-${doc.idLo}')
-            .values
-            .map(
-              (versions) => versions.reduce((a, b) {
-                // Compare versions (higher version wins)
-                final compareHi = b.verHi.compareTo(a.verHi);
-                if (compareHi != 0) return compareHi > 0 ? b : a;
-                return b.verLo.compareTo(a.verLo) > 0 ? b : a;
-              }),
-            )
-            .toList()
-          ..sort((a, b) {
-            // Sort by version descending
-            final compareHi = b.verHi.compareTo(a.verHi);
-            if (compareHi != 0) return compareHi;
-            return b.verLo.compareTo(a.verLo);
-          });
+    query.orderBy([
+      (t) => OrderingTerm(
+            expression: t.verHi,
+            mode: OrderingMode.desc,
+          ),
+    ]);
 
-        if (limit != null) {
-          return uniqueDocs.take(limit).toList();
-        }
-        return uniqueDocs;
-      }
+    if (limit != null) {
+      query.limit(limit);
+    }
 
-      if (limit != null) {
-        return documents.take(limit).toList();
-      }
-      return documents;
-    });
+    return query.watch();
   }
 
   Expression<bool> _filterRef($DraftsTable row, DocumentRef ref) {

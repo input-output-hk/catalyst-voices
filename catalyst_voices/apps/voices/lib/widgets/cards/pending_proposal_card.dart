@@ -179,7 +179,7 @@ class _PendingProposalCardState extends State<PendingProposalCard> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       _Topbar(
-                        proposalRef: widget.proposal.id,
+                        proposalRef: widget.proposal.ref,
                         showStatus: widget.showStatus,
                         isFavorite: widget.isFavorite,
                         onFavoriteChanged: widget.onFavoriteChanged,
@@ -407,7 +407,6 @@ class _Topbar extends StatelessWidget {
           circle: false,
           onTap: () async {
             // TODO(LynxLynxx): Change to proposal view route when implemented
-            // TODO(LynxLynxx): change proposalRef to use DocumentRef
             final url = ProposalBuilderRoute(
               proposalId: proposalRef.id,
               proposalVersion: proposalRef.version,

@@ -19,14 +19,14 @@ and PRISM, but its potential is only barely exploited.
 
 final _proposalImages = {
   for (final (index, proposal) in _proposals.indexed)
-    proposal.id: index.isEven
+    proposal.ref: index.isEven
         ? VoicesAssets.images.proposalBackground1
         : VoicesAssets.images.proposalBackground2,
 };
 
 final _proposals = [
   FundedProposal(
-    id: SignedDocumentRef.generateFirstRef(),
+    ref: SignedDocumentRef.generateFirstRef(),
     campaignName: 'F14',
     category: 'Cardano Use Cases / MVP',
     title: 'Proposal Title that rocks the world',
@@ -36,7 +36,7 @@ final _proposals = [
     description: _proposalDescription,
   ),
   FundedProposal(
-    id: SignedDocumentRef.generateFirstRef(),
+    ref: SignedDocumentRef.generateFirstRef(),
     campaignName: 'F14',
     category: 'Cardano Use Cases / MVP',
     title: 'Proposal Title that rocks the world',
@@ -46,7 +46,7 @@ final _proposals = [
     description: _proposalDescription,
   ),
   FundedProposal(
-    id: SignedDocumentRef.generateFirstRef(),
+    ref: SignedDocumentRef.generateFirstRef(),
     campaignName: 'F14',
     category: 'Cardano Use Cases / MVP',
     title: 'Proposal Title that rocks the world',
@@ -101,7 +101,7 @@ class _AllProposals extends StatelessWidget {
           children: [
             for (final proposal in _proposals)
               FundedProposalCard(
-                image: _proposalImages[proposal.id]!,
+                image: _proposalImages[proposal.ref]!,
                 proposal: proposal,
                 isFavorite: favoriteProposals.contains(proposal),
                 onFavoriteChanged: (isFavorite) =>
@@ -128,7 +128,7 @@ class _FavoriteProposals extends StatelessWidget {
           children: [
             for (final proposal in favoriteProposals)
               FundedProposalCard(
-                image: _proposalImages[proposal.id]!,
+                image: _proposalImages[proposal.ref]!,
                 proposal: proposal,
                 isFavorite: true,
                 onFavoriteChanged: (isFavorite) =>

@@ -78,15 +78,14 @@ final class DatabaseDraftsDataSource implements DraftDataSource {
   @override
   Stream<List<DocumentData>> watchAll({
     int? limit,
-    required bool unique,
     DocumentType? type,
-    CatalystId? catalystId,
+    CatalystId? authorId,
   }) {
     return _database.draftsDao
         .watchAll(
       limit: limit,
-      unique: unique,
       type: type,
+      authorId: authorId,
     )
         .map((event) {
       final list = List<DocumentData>.from(event.map((e) => e.toModel()));

@@ -276,7 +276,7 @@ void main() {
         final documentsStream =
             database.documentsDao.watchAll(limit: 7, unique: true);
 
-        await database.documentsDao.saveAll(documentsWithMetadata);
+        await database.documentsDao.saveAll(documentsWithMetadata.reversed);
 
         // Then
         expect(

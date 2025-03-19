@@ -309,10 +309,10 @@ final class ProposalServiceImpl implements ProposalService {
 
   @override
   Stream<List<Proposal>> watchUserProposals() async* {
-    final userCatalystId = await _getUserCatalystId();
+    final authorId = await _getUserCatalystId();
     yield* _proposalRepository
         .watchUserProposals(
-      userCatalystId: userCatalystId,
+      authorId: authorId,
     )
         .switchMap((documents) async* {
       final proposals = documents.map((e) async {

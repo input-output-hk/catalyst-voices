@@ -90,7 +90,7 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
       },
       onError: (Object error) {
         if (isClosed) return;
-        _logger.info(error.toString());
+        _logger.info('Users proposals stream error', error);
         add(const ErrorLoadProposalsEvent(LocalizedUnknownException()));
       },
     );
