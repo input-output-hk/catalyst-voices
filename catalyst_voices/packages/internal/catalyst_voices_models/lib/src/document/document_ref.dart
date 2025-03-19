@@ -1,8 +1,9 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:equatable/equatable.dart';
 import 'package:uuid_plus/uuid_plus.dart';
 
-sealed class DocumentRef extends Equatable {
+sealed class DocumentRef extends Equatable implements Comparable<DocumentRef> {
   final String id;
   final String? version;
 
@@ -26,6 +27,26 @@ sealed class DocumentRef extends Equatable {
 
   @override
   List<Object?> get props => [id, version];
+
+  @override
+  int compareTo(DocumentRef other) {
+    final dateTime = version?.tryDateTime;
+    final otherDateTime = other.version?.tryDateTime;
+
+    if (dateTime != null && otherDateTime != null) {
+      return dateTime.compareTo(otherDateTime);
+    }
+
+    if (dateTime != null && otherDateTime == null) {
+      return 1;
+    }
+
+    if (dateTime == null && otherDateTime != null) {
+      return -1;
+    }
+
+    return 0;
+  }
 
   DocumentRef copyWith({
     String? id,
