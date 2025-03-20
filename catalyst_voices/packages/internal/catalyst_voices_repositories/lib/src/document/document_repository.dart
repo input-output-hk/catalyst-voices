@@ -83,8 +83,8 @@ abstract interface class DocumentRepository {
   /// Returns the reference to the imported document.
   Future<DocumentRef> importDocument({required Uint8List data});
 
-  /// Similar to [watchDocumentsFavorite] but stops after first emit.
-  Future<bool> isDocumentsFavorite({
+  /// Similar to [watchIsDocumentFavorite] but stops after first emit.
+  Future<bool> isDocumentFavorite({
     required DocumentRef ref,
   });
 
@@ -146,7 +146,7 @@ abstract interface class DocumentRepository {
   });
 
   /// Emits changes to fav status of [ref].
-  Stream<bool> watchDocumentsFavorite({
+  Stream<bool> watchIsDocumentFavorite({
     required DocumentRef ref,
   });
 }
@@ -255,7 +255,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   }
 
   @override
-  Future<bool> isDocumentsFavorite({required DocumentRef ref}) {
+  Future<bool> isDocumentFavorite({required DocumentRef ref}) {
     assert(!ref.isExact, 'Favorite ref have to be loose!');
 
     return _favoriteDocuments.watchIsDocumentFavorite(ref.id).first;
@@ -442,13 +442,6 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     );
   }
 
-  @override
-  Stream<bool> watchDocumentsFavorite({required DocumentRef ref}) {
-    assert(!ref.isExact, 'Favorite ref have to be loose!');
-
-    return _favoriteDocuments.watchIsDocumentFavorite(ref.id);
-  }
-
   @visibleForTesting
   Stream<DocumentsDataWithRefData?> watchDocumentWithRef({
     required DocumentRef ref,
@@ -481,6 +474,13 @@ final class DocumentRepositoryImpl implements DocumentRepository {
         },
       );
     });
+  }
+
+  @override
+  Stream<bool> watchIsDocumentFavorite({required DocumentRef ref}) {
+    assert(!ref.isExact, 'Favorite ref have to be loose!');
+
+    return _favoriteDocuments.watchIsDocumentFavorite(ref.id);
   }
 
   Future<DocumentData> _getDraftDocumentData({
