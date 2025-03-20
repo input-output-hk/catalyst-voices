@@ -3,26 +3,6 @@ import 'package:catalyst_voices_repositories/src/dto/document/schema/document_de
 import 'package:catalyst_voices_repositories/src/dto/document/schema/document_property_schema_dto.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 
-enum _DocumentIntegerDefinition {
-  tokenValueCardanoAda('tokenValueCardanoADA'),
-  durationInMonths('durationInMonths'),
-  unknown('unknown');
-
-  final String def;
-
-  const _DocumentIntegerDefinition(this.def);
-
-  factory _DocumentIntegerDefinition.fromDef(String? def) {
-    for (final value in values) {
-      if (value.def.equalsIgnoreCase(def)) {
-        return value;
-      }
-    }
-
-    return _DocumentIntegerDefinition.unknown;
-  }
-}
-
 final class DocumentIntegerSchemaMapper {
   static DocumentIntegerSchema toModel({
     required DocumentDefinitionsDto definitions,
@@ -43,7 +23,7 @@ final class DocumentIntegerSchemaMapper {
     final constValue = schema.constValue as int?;
     final enumValues = schema.enumValues?.cast<int>();
     final numRange =
-        Range.optionalRangeOf(min: schema.minimum, max: schema.maximum);
+        NumRange.optionalRangeOf(min: schema.minimum, max: schema.maximum);
     final definition = _DocumentIntegerDefinition.fromDef(schema.definition());
 
     switch (definition) {
@@ -93,5 +73,25 @@ final class DocumentIntegerSchemaMapper {
           numRange: numRange,
         );
     }
+  }
+}
+
+enum _DocumentIntegerDefinition {
+  tokenValueCardanoAda('tokenValueCardanoADA'),
+  durationInMonths('durationInMonths'),
+  unknown('unknown');
+
+  final String def;
+
+  const _DocumentIntegerDefinition(this.def);
+
+  factory _DocumentIntegerDefinition.fromDef(String? def) {
+    for (final value in values) {
+      if (value.def.equalsIgnoreCase(def)) {
+        return value;
+      }
+    }
+
+    return _DocumentIntegerDefinition.unknown;
   }
 }

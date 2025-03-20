@@ -1,3 +1,4 @@
+import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_models/src/campaign/campaign_timeline.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:equatable/equatable.dart';
@@ -8,7 +9,7 @@ final class CurrentCampaign extends Equatable {
   final String description;
   final int allFunds;
   final int totalAsk;
-  final Range<int> askRange;
+  final ComparableRange<Coin> askRange;
   final List<CampaignTimeline> timeline;
 
   const CurrentCampaign({
@@ -38,7 +39,7 @@ final class CurrentCampaign extends Equatable {
     String? description,
     int? allFunds,
     int? totalAsk,
-    Range<int>? askRange,
+    ComparableRange<Coin>? askRange,
     List<CampaignTimeline>? timeline,
   }) {
     return CurrentCampaign(
@@ -61,7 +62,10 @@ extension CurrentCampaignX on CurrentCampaign {
 Project Catalyst turns economic power into innovation power by using the Cardano Treasury to incentivize and fund community-approved ideas.''',
     allFunds: 50000000,
     totalAsk: 4020000,
-    askRange: const Range(min: 30000, max: 150000),
+    askRange: const ComparableRange(
+      min: Coin.fromWholeAda(30000),
+      max: Coin.fromWholeAda(150000),
+    ),
     timeline: CampaignTimelineX.staticContent,
   );
 }

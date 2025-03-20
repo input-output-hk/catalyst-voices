@@ -11,6 +11,9 @@ class DocumentBuilderSectionTile extends StatefulWidget {
   /// True if the section is currently selected.
   final bool isSelected;
 
+  /// True if the section can be edited, false if it is view-only.
+  final bool isEditable;
+
   /// The mode for the validation in this section.
   final AutovalidateMode autovalidateMode;
 
@@ -23,12 +26,17 @@ class DocumentBuilderSectionTile extends StatefulWidget {
   /// (Usually single property)
   final ValueChanged<List<model.DocumentChange>> onChanged;
 
+  /// See [DocumentPropertyBuilderOverrides].
+  final DocumentPropertyBuilderOverrides? overrides;
+
   const DocumentBuilderSectionTile({
     required super.key,
     required this.section,
     this.isSelected = false,
+    this.isEditable = true,
     this.autovalidateMode = AutovalidateMode.disabled,
     required this.onChanged,
+    this.overrides,
   });
 
   @override
@@ -66,6 +74,7 @@ class _DocumentBuilderSectionTileState
       isSelected: widget.isSelected,
       isEditMode: _isEditMode,
       isSaveEnabled: true,
+      isEditEnabled: widget.isEditable,
       errorText: _errorText,
       onChanged: _onEditModeChange,
       child: Form(
@@ -76,6 +85,7 @@ class _DocumentBuilderSectionTileState
           property: _editedSection,
           isEditMode: _isEditMode,
           onChanged: _handlePropertyChanges,
+          overrides: widget.overrides,
         ),
       ),
     );
@@ -85,10 +95,11 @@ class _DocumentBuilderSectionTileState
   void didUpdateWidget(DocumentBuilderSectionTile oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    if (oldWidget.section != widget.section) {
-      _editedSection = widget.section;
-      _builder = _editedSection.toBuilder();
-      _pendingChanges.clear();
+    if (!widget.isEditable && oldWidget.isEditable) {
+      _isEditMode = false;
+      _resetBuilder();
+    } else if (oldWidget.section != widget.section) {
+      _resetBuilder();
     }
   }
 
@@ -112,9 +123,7 @@ class _DocumentBuilderSectionTileState
 
   void _onCancel() {
     setState(() {
-      _pendingChanges.clear();
-      _editedSection = widget.section;
-      _builder = _editedSection.toBuilder();
+      _resetBuilder();
       _isEditMode = false;
     });
 
@@ -150,5 +159,11 @@ class _DocumentBuilderSectionTileState
       _pendingChanges.clear();
       _isEditMode = false;
     });
+  }
+
+  void _resetBuilder() {
+    _editedSection = widget.section;
+    _builder = _editedSection.toBuilder();
+    _pendingChanges.clear();
   }
 }

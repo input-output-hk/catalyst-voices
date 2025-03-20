@@ -25,6 +25,7 @@ void main() {
 
     proposalService = ProposalService(
       mockProposalRepository,
+      mockDocumentRepository,
       mockUserService,
       mockKeyDerivationService,
       mockCampaignRepository,
