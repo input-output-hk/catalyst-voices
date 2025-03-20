@@ -3,6 +3,7 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_repositories/src/database/catalyst_database.dart';
 import 'package:catalyst_voices_repositories/src/document/document_repository.dart';
+import 'package:catalyst_voices_repositories/src/dto/document_data_with_ref_dat.dart';
 import 'package:drift/drift.dart' show DatabaseConnection;
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -22,6 +23,7 @@ void main() {
   late DraftDataSource draftsSource;
   late SignedDocumentDataSource localDocuments;
   late DocumentDataRemoteSource remoteDocuments;
+  late DocumentFavoriteSource favoriteDocuments;
 
   setUp(() {
     final inMemory = DatabaseConnection(NativeDatabase.memory());
@@ -30,11 +32,13 @@ void main() {
     draftsSource = DatabaseDraftsDataSource(database);
     localDocuments = DatabaseDocumentsDataSource(database);
     remoteDocuments = _MockDocumentDataRemoteSource();
+    favoriteDocuments = DatabaseDocumentFavoriteSource(database);
 
     repository = DocumentRepositoryImpl(
       draftsSource,
       localDocuments,
       remoteDocuments,
+      favoriteDocuments,
     );
   });
 
@@ -43,39 +47,48 @@ void main() {
   });
 
   group(DocumentRepository, () {
-    test('getProposalDocument returns correct model', () async {
-      // Given
-      final templateData = await VoicesDocumentsTemplates.proposalF14Schema;
-      final proposalData = await VoicesDocumentsTemplates.proposalF14Document;
+    // TODO(LynxLynxx): change test to new implementation
+    test(
+      'getDocument returns correct model',
+      () async {
+        // Given
+        final templateData = await VoicesDocumentsTemplates.proposalF14Schema;
+        final proposalData = await VoicesDocumentsTemplates.proposalF14Document;
 
-      final template = DocumentDataFactory.build(
-        selfRef: DocumentRefFactory.buildSigned(id: mockedTemplateUuid),
-        type: DocumentType.proposalTemplate,
-        content: DocumentDataContent(templateData),
-      );
-      final proposal = DocumentDataFactory.build(
-        selfRef: DocumentRefFactory.buildSigned(id: mockedDocumentUuid),
-        type: DocumentType.proposalDocument,
-        template: template.ref,
-        content: DocumentDataContent(proposalData),
-      );
+        final templateRef =
+            DocumentRefFactory.buildSigned(id: mockedTemplateUuid);
+        final template = DocumentDataFactory.build(
+          selfRef: templateRef,
+          type: DocumentType.proposalTemplate,
+          content: DocumentDataContent(templateData),
+        );
+        final proposal = DocumentDataFactory.build(
+          selfRef: DocumentRefFactory.buildSigned(id: mockedDocumentUuid),
+          type: DocumentType.proposalDocument,
+          template: templateRef,
+          content: DocumentDataContent(proposalData),
+        );
 
-      when(() => remoteDocuments.get(ref: template.ref))
-          .thenAnswer((_) => Future.value(template));
-      when(() => remoteDocuments.get(ref: proposal.ref))
-          .thenAnswer((_) => Future.value(proposal));
+        when(() => remoteDocuments.get(ref: template.ref))
+            .thenAnswer((_) => Future.value(template));
+        when(() => remoteDocuments.get(ref: proposal.ref))
+            .thenAnswer((_) => Future.value(proposal));
 
-      // When
-      final ref = proposal.ref;
-      final proposalDocument = await repository.getProposalDocument(
-        ref: ref,
-      );
+        // When
+        final ref = proposal.ref;
+        final proposalDocument = await repository.getDocumentData(
+          ref: ref,
+        );
 
-      // Then
-      expect(proposalDocument.metadata.selfRef, proposal.metadata.selfRef);
-    });
+        // Then
+        expect(
+          proposalDocument.metadata.selfRef,
+          proposal.metadata.selfRef,
+        );
+      },
+    );
 
-    test('getProposalDocument correctly propagates errors', () async {
+    test('getDocument correctly propagates errors', () async {
       // Given
       final templateRef = SignedDocumentRef(
         id: mockedTemplateUuid,
@@ -91,12 +104,13 @@ void main() {
       when(() => remoteDocuments.get(ref: templateRef)).thenAnswer(
         (_) => Future.error(DocumentNotFoundException(ref: templateRef)),
       );
-      when(() => remoteDocuments.get(ref: proposal.ref))
-          .thenAnswer((_) => Future.value(proposal));
+      when(() => remoteDocuments.get(ref: proposal.ref)).thenAnswer(
+        (_) => Future.error(DocumentNotFoundException(ref: templateRef)),
+      );
 
       // When
       final ref = proposal.ref;
-      final proposalDocumentFuture = repository.getProposalDocument(
+      final proposalDocumentFuture = repository.getDocumentData(
         ref: ref,
       );
 
@@ -160,10 +174,12 @@ void main() {
     group('watchDocumentWithRef', () {
       test('template reference is watched and combined correctly', () async {
         // Given
+        final templateRef = DocumentRefFactory.buildSigned();
         final template = DocumentDataFactory.build(
           type: DocumentType.proposalTemplate,
+          selfRef: templateRef,
         );
-        final proposal = DocumentDataFactory.build(template: template.ref);
+        final proposal = DocumentDataFactory.build(template: templateRef);
 
         when(() => remoteDocuments.get(ref: template.ref))
             .thenAnswer((_) => Future.value(template));
@@ -197,11 +213,13 @@ void main() {
 
       test('loads template once when two documents refers to it', () async {
         // Given
+        final templateRef = DocumentRefFactory.buildSigned();
         final template = DocumentDataFactory.build(
           type: DocumentType.proposalTemplate,
+          selfRef: templateRef,
         );
-        final proposal1 = DocumentDataFactory.build(template: template.ref);
-        final proposal2 = DocumentDataFactory.build(template: template.ref);
+        final proposal1 = DocumentDataFactory.build(template: templateRef);
+        final proposal2 = DocumentDataFactory.build(template: templateRef);
 
         when(() => remoteDocuments.get(ref: template.ref))
             .thenAnswer((_) => Future.value(template));
@@ -322,7 +340,7 @@ void main() {
         final publicDraftData = DocumentDataFactory.build(
           type: DocumentType.proposalDocument,
           selfRef: publicDraftRef,
-          template: templateData.ref,
+          template: templateRef,
           content: publicDraftContent,
         );
 

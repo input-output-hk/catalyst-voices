@@ -5,19 +5,14 @@ import 'package:uuid_plus/uuid_plus.dart';
 
 class BaseProposalData extends Equatable {
   final ProposalDocument document;
-  final SignedDocumentRef categoryId;
-  final int commentsCount;
 
   const BaseProposalData({
     required this.document,
-    required this.categoryId,
-    this.commentsCount = 0,
   });
 
   @override
   List<Object?> get props => [
         document,
-        commentsCount,
       ];
 
   ProposalVersion toProposalVersion() {
@@ -75,13 +70,17 @@ class BaseProposalData extends Equatable {
 
 class ProposalData extends BaseProposalData {
   final List<BaseProposalData> versions;
+  final int commentsCount;
+  final String categoryName;
 
   const ProposalData({
     required super.document,
-    required super.categoryId,
-    super.commentsCount = 0,
+    this.commentsCount = 0,
+    this.categoryName = '',
     this.versions = const [],
   });
+
+  SignedDocumentRef get categoryId => document.metadata.categoryId;
 
   List<ProposalVersion> get proposalVersions =>
       versions.map((v) => v.toProposalVersion()).toList();
@@ -89,7 +88,10 @@ class ProposalData extends BaseProposalData {
   @override
   List<Object?> get props => [
         ...super.props,
-        categoryId,
+        commentsCount,
+        categoryName,
         versions,
       ];
+
+  SignedDocumentRef get templateRef => document.metadata.templateRef;
 }

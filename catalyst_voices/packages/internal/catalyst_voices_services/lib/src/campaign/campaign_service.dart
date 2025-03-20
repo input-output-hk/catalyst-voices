@@ -49,22 +49,19 @@ final class CampaignServiceImpl implements CampaignService {
 
   @override
   Future<List<CampaignCategory>> getCampaignCategories() async {
-    return staticCampaignCategories;
+    return _campaignRepository.getCampaignCategories();
   }
 
   @override
   Future<CampaignCategory> getCategory(SignedDocumentRef ref) async {
     // TODO(LynxLynxx): call backend for current ask amount
     // and submitted proposal count
-    return staticCampaignCategories.firstWhere(
-      (e) => e.selfRef == ref,
-      orElse: () => throw const NotFoundException(),
-    );
+    return _campaignRepository.getCategory(ref);
   }
 
   @override
   Future<CurrentCampaign> getCurrentCampaign() async {
     // TODO(LynxLynxx): call backend for current ask amount
-    return CurrentCampaignX.staticContent;
+    return _campaignRepository.getCurrentCampaign();
   }
 }

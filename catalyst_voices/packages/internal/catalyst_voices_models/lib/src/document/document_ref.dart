@@ -59,6 +59,9 @@ sealed class DocumentRef extends Equatable implements Comparable<DocumentRef> {
   /// i.e. by proposal builder.
   DraftRef nextVersion();
 
+  /// Creates ref without version.
+  DocumentRef toLoose();
+
   /// Converts the [DocumentRef] to [SignedDocumentRef].
   ///
   /// Useful when a draft becomes a signed document after publishing.
@@ -94,6 +97,9 @@ final class DraftRef extends DocumentRef {
   DraftRef nextVersion() => this;
 
   @override
+  DraftRef toLoose() => copyWith(version: const Optional.empty());
+
+  @override
   SignedDocumentRef toSignedDocumentRef() => SignedDocumentRef(
         id: id,
         version: version,
@@ -123,6 +129,11 @@ final class SignedDocumentRef extends DocumentRef {
     super.version,
   });
 
+  const SignedDocumentRef.exact({
+    required super.id,
+    required String super.version,
+  });
+
   /// Creates ref for first version of [id] document.
   const SignedDocumentRef.first(String id) : this(id: id, version: id);
 
@@ -133,6 +144,8 @@ final class SignedDocumentRef extends DocumentRef {
       version: id,
     );
   }
+
+  const SignedDocumentRef.loose({required super.id});
 
   @override
   SignedDocumentRef copyWith({
@@ -152,6 +165,9 @@ final class SignedDocumentRef extends DocumentRef {
       version: const Uuid().v7(),
     );
   }
+
+  @override
+  SignedDocumentRef toLoose() => copyWith(version: const Optional.empty());
 
   @override
   SignedDocumentRef toSignedDocumentRef() => this;

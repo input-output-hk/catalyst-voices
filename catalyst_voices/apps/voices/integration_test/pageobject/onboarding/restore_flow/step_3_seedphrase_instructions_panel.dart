@@ -35,7 +35,7 @@ class SeedPhraseInstructionsPanel extends OnboardingPageBase {
       (await t()).recoverCatalystKeychain,
     );
     expect(infoPartTaskPicture(), findsOneWidget);
-    expect(infoPartLearnMoreText(), (await t()).learnMore);
+    expect($(learnMoreButton).$(Text).text, (await t()).learnMore);
   }
 
   Future<void> verifyDetailsPanel() async {

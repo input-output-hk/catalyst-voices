@@ -13,7 +13,7 @@ class TokenField extends StatelessWidget {
   final String? labelText;
   final String? errorText;
   final FocusNode? focusNode;
-  final Range<int>? range;
+  final NumRange<int>? range;
   final Currency currency;
   final bool showHelper;
   final bool enabled;
@@ -91,7 +91,7 @@ class TokenField extends StatelessWidget {
 
 class _Helper extends StatelessWidget {
   final Currency currency;
-  final Range<int> range;
+  final NumRange<int> range;
 
   const _Helper({
     required this.currency,
