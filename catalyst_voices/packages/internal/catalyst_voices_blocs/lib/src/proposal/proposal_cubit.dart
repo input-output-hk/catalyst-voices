@@ -44,11 +44,8 @@ final class ProposalCubit extends Cubit<ProposalState>
 
       final proposal = await _proposalService.getProposal(ref: ref);
       final comments = _buildComments();
-      final isFavorite = await _proposalService
-          .watchIsFavoritesProposal(
-            ref: ref,
-          )
-          .first;
+      final isFavorite =
+          await _proposalService.watchIsFavoritesProposal(ref: ref).first;
 
       _ref = ref;
       _proposal = proposal;
