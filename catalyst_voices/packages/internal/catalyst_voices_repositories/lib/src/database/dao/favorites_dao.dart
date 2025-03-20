@@ -21,7 +21,10 @@ class DriftFavoritesDao extends DatabaseAccessor<DriftCatalystDatabase>
 
     final query = delete(documentsFavorites)
       ..where((tbl) {
-        return tbl.idHi.equals(idHiLo.high) & tbl.idLo.equals(idHiLo.low);
+        return Expression.and([
+          tbl.idHi.equals(idHiLo.high),
+          tbl.idLo.equals(idHiLo.low),
+        ]);
       });
 
     await query.go();

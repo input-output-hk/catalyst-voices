@@ -60,7 +60,7 @@ sealed class DocumentRef extends Equatable implements Comparable<DocumentRef> {
   DraftRef nextVersion();
 
   /// Creates ref without version.
-  DocumentRef toLose();
+  DocumentRef toLoose();
 
   /// Converts the [DocumentRef] to [SignedDocumentRef].
   ///
@@ -97,7 +97,7 @@ final class DraftRef extends DocumentRef {
   DraftRef nextVersion() => this;
 
   @override
-  DraftRef toLose() => copyWith(version: const Optional.empty());
+  DraftRef toLoose() => copyWith(version: const Optional.empty());
 
   @override
   SignedDocumentRef toSignedDocumentRef() => SignedDocumentRef(
@@ -167,7 +167,7 @@ final class SignedDocumentRef extends DocumentRef {
   }
 
   @override
-  SignedDocumentRef toLose() => copyWith(version: const Optional.empty());
+  SignedDocumentRef toLoose() => copyWith(version: const Optional.empty());
 
   @override
   SignedDocumentRef toSignedDocumentRef() => this;
