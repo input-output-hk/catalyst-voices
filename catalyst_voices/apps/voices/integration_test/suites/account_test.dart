@@ -1,9 +1,7 @@
 import 'package:catalyst_voices/app/view/app.dart';
 import 'package:catalyst_voices/configs/bootstrap.dart';
 import 'package:catalyst_voices/routes/routes.dart';
-// import 'package:catalyst_voices/widgets/text_field/voices_text_field.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-// import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:patrol_finders/patrol_finders.dart';
@@ -81,7 +79,20 @@ void main() async {
         await $(UnlockModalPage.unlockConfirmPasswordButton).tap();
         await AppBarPage($).unlockBtnIsVisible();
       });
-      patrolWidgetTest('user changing email works', (PatrolTester $) async {
+      patrolWidgetTest('user - unlocking - wrong password error appears',
+          (PatrolTester $) async {
+        await $.pumpWidgetAndSettle(App(routerConfig: router));
+        await UnlockPasswordSuccessPanel($).goto();
+        await UnlockPasswordSuccessPanel($).clickGoToDashboard();
+        await AppBarPage($).lockBtnClick();
+        await AppBarPage($).unlockBtnClick();
+        await $(UnlockModalPage.unlockPasswordTextField).enterText('Test12345');
+        await $(UnlockModalPage.unlockConfirmPasswordButton).tap();
+        await UnlockModalPage($).incorrectPasswordErrorShowsUp();
+      });
+
+      patrolWidgetTest(skip: true, 'user changing email works',
+          (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await UnlockPasswordSuccessPanel($).goto();
         await UnlockPasswordSuccessPanel($).clickGoToDashboard();
@@ -95,7 +106,7 @@ void main() async {
         // TODO(emiride): uncomment above when backend is ready
         // https://github.com/input-output-hk/catalyst-voices/issues/1597
       });
-      patrolWidgetTest('user deletes keychain works', skip: true,
+      patrolWidgetTest('removing keychain logs out the user', skip: true,
           (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await UnlockPasswordSuccessPanel($).goto();
