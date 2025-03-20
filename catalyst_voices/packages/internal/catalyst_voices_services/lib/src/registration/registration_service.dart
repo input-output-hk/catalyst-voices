@@ -130,7 +130,7 @@ final class RegistrationServiceImpl implements RegistrationService {
       final changeAddress = await enabledWallet.getChangeAddress();
       final rewardAddresses = await enabledWallet.getRewardAddresses();
       final utxos = await enabledWallet.getUtxos(
-        amount: Balance(
+        amount: const Balance(
           coin: CardanoWalletDetails.minAdaForRegistration,
         ),
       );
@@ -186,7 +186,7 @@ final class RegistrationServiceImpl implements RegistrationService {
       roles: roles,
       walletInfo: WalletInfo(
         metadata: const WalletMetadata(name: 'Dummy Wallet'),
-        balance: Coin.fromAda(10),
+        balance: const Coin.fromWholeAda(10),
         address: _testNetAddress,
       ),
     );
@@ -294,7 +294,7 @@ final class RegistrationServiceImpl implements RegistrationService {
         roles: roles,
         walletInfo: WalletInfo(
           metadata: const WalletMetadata(name: 'Dummy Wallet'),
-          balance: Coin.fromAda(10),
+          balance: const Coin.fromWholeAda(10),
           address: _testNetAddress,
         ),
       );

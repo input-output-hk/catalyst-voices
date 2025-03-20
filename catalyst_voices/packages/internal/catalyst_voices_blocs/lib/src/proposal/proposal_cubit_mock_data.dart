@@ -107,7 +107,7 @@ DocumentSchema _buildSchema() {
           DocumentMultiLineTextEntrySchema.optional(
             nodeId: DocumentNodeId.fromString('comment.content'),
             description: const MarkdownData('The comment text content'),
-            strLengthRange: const Range(min: 1, max: 5000),
+            strLengthRange: const NumRange(min: 1, max: 5000),
             isRequired: true,
           ),
         ],
