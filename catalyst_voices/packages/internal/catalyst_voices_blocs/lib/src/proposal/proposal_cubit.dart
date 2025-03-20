@@ -148,7 +148,7 @@ final class ProposalCubit extends Cubit<ProposalState>
   }
 
   Future<void> updateIsFavorite({required bool value}) async {
-    final ref = _ref?.toLoose();
+    final ref = _ref;
     assert(ref != null, 'Proposal ref not found. Load doc first');
 
     emit(state.copyWithFavorite(isFavorite: value));
