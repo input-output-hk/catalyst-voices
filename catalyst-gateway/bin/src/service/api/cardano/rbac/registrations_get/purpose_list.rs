@@ -8,6 +8,7 @@ use poem_openapi::{
 use crate::service::common::types::{array_types::impl_array_types, generic::uuidv4::UUIDv4};
 
 impl_array_types!(
+    /// A list of RBAC registration purposes.
     PurposeList,
     UUIDv4,
     Some(MetaSchema {

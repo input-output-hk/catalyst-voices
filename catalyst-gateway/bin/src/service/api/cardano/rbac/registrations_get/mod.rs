@@ -34,7 +34,8 @@ use crate::{
     },
     service::{
         api::cardano::rbac::registrations_get::{
-            response::Responses, unprocessable_content::RbacUnprocessableContent,
+            registration_chain::RbacRegistrationChain, response::Responses,
+            unprocessable_content::RbacUnprocessableContent,
         },
         common::types::{
             cardano::query::cat_id_or_stake::CatIdOrStake, headers::retry_after::RetryAfterOption,
@@ -47,23 +48,34 @@ use crate::{
 pub(crate) async fn endpoint(
     lookup: Option<CatIdOrStake>, auth_catalyst_id: Option<IdUri>,
 ) -> AllResponses {
-    let Some(session) = CassandraSession::get(true) else {
-        error!("Failed to acquire db session");
-        let err = anyhow!("Failed to acquire db session");
+    let Some(persistent_session) = CassandraSession::get(true) else {
+        let err = anyhow!("Failed to acquire persistent db session");
+        error!("{err:?}");
+        return AllResponses::service_unavailable(&err, RetryAfterOption::Default);
+    };
+    let Some(volatile_session) = CassandraSession::get(false) else {
+        let err = anyhow!("Failed to acquire volatile db session");
+        error!("{err:?}");
         return AllResponses::service_unavailable(&err, RetryAfterOption::Default);
     };
 
     let catalyst_id = match lookup {
         Some(CatIdOrStake::CatId(v)) => v.into(),
         Some(CatIdOrStake::Address(address)) => {
-            let address = match address.try_into() {
+            let address: StakeAddress = match address.try_into() {
                 Ok(a) => a,
                 Err(e) => return AllResponses::handle_error(&e),
             };
-            match catalyst_id_from_stake(&session, address).await {
+            match catalyst_id_from_stake(&persistent_session, address.clone()).await {
                 Ok(Some(v)) => v,
-                Ok(None) => return Responses::NotFound.into(),
                 Err(e) => return AllResponses::handle_error(&e),
+                Ok(None) => {
+                    match catalyst_id_from_stake(&volatile_session, address).await {
+                        Ok(Some(v)) => v,
+                        Err(e) => return AllResponses::handle_error(&e),
+                        Ok(None) => return Responses::NotFound.into(),
+                    }
+                },
             }
         },
         None => {
@@ -79,8 +91,10 @@ pub(crate) async fn endpoint(
         },
     };
 
-    match registration_chain(&session, &catalyst_id).await {
-        Ok(Some(c)) => Responses::Ok(Json(Box::new(c.into()))).into(),
+    match registration_chain(&persistent_session, &volatile_session, &catalyst_id).await {
+        Ok(Some((c, volatile))) => {
+            Responses::Ok(Json(Box::new(RbacRegistrationChain::new(c, volatile)))).into()
+        },
         Ok(None) => Responses::NotFound.into(),
         Err(e) => AllResponses::handle_error(&e),
     }
@@ -107,44 +121,30 @@ async fn catalyst_id_from_stake(
     }
 }
 
-/// Returns a registration chain for the given Catalyst ID.
+/// Returns a registration chain and the number of present volatile registrations for the
+/// given Catalyst ID.
 async fn registration_chain(
-    session: &CassandraSession, catalyst_id: &IdUri,
-) -> anyhow::Result<Option<RegistrationChain>> {
-    let indexed_registrations = indexed_registrations(session, catalyst_id).await?;
-    let mut indexed_registrations = indexed_registrations.iter();
-    let Some(root) = indexed_registrations.next() else {
-        return Ok(None);
-    };
-
+    persistent_session: &CassandraSession, volatile_session: &CassandraSession, catalyst_id: &IdUri,
+) -> anyhow::Result<Option<(RegistrationChain, usize)>> {
+    let persistent_registrations = indexed_registrations(persistent_session, catalyst_id).await?;
+    let volatile_registrations = indexed_registrations(volatile_session, catalyst_id).await?;
     let network = Settings::cardano_network();
-    let root = registration(network, root.slot_no.into(), root.txn_index.into())
-        .await
-        .context("Failed to get root registration")?;
-    let mut chain = RegistrationChain::new(root).context("Invalid root registration")?;
 
-    for reg in indexed_registrations {
-        // We only store valid registrations in this table, so an error here indicates a bug in
-        // our indexing logic.
-        let cip509 = registration(network, reg.slot_no.into(), reg.txn_index.into())
-            .await
-            .with_context(|| {
-                format!(
-                    "Invalid or missing registration at {:?} block {:?} transaction",
-                    reg.slot_no, reg.txn_index,
-                )
-            })?;
-        match chain.update(cip509) {
-            Ok(c) => chain = c,
-            Err(_) => {
-                // This isn't a hard error because while the individual registration can
-                // be valid it can be invalid in the context of the whole registration
-                // chain.
-            },
-        }
-    }
+    let chain = apply_registrations(network, None, persistent_registrations).await?;
+    // Purpose is a required field for the registration, so the number of purposes is equal to
+    // the number of registrations in the chain.
+    let persistent_count = chain
+        .as_ref()
+        .map(|c| c.purpose().len())
+        .unwrap_or_default();
+    let chain = apply_registrations(network, chain, volatile_registrations).await?;
+    let volatile_count = chain
+        .as_ref()
+        .map(|c| c.purpose().len())
+        .unwrap_or_default()
+        - persistent_count;
 
-    Ok(Some(chain))
+    Ok(chain.map(|c| (c, volatile_count)))
 }
 
 /// Returns a sorted list of all registrations for the given Catalyst ID from the
@@ -160,6 +160,42 @@ async fn indexed_registrations(
 
     result.sort_by_key(|r| r.slot_no);
     Ok(result)
+}
+
+/// Applies the given list of indexed registrations to the chain. If the given chain is
+/// `None` - new root will be possibly created.
+async fn apply_registrations(
+    network: Network, mut chain: Option<RegistrationChain>, indexed_registrations: Vec<RbacQuery>,
+) -> anyhow::Result<Option<RegistrationChain>> {
+    for reg in indexed_registrations {
+        // We perform validation during indexing, so this normally should never fail.
+        let cip509 = registration(network, reg.slot_no.into(), reg.txn_index.into())
+            .await
+            .with_context(|| {
+                format!(
+                    "Failed to get Cip509 registration from {:?} slot and {:?} txn index",
+                    reg.slot_no, reg.txn_index
+                )
+            })?;
+
+        match chain {
+            None => {
+                if let Ok(root) = RegistrationChain::new(cip509) {
+                    chain = Some(root);
+                }
+            },
+            Some(ref current) => {
+                // This isn't a hard error because while the individual registration can
+                // be valid it can be invalid in the context of the whole registration
+                // chain.
+                if let Ok(new) = current.update(cip509) {
+                    chain = Some(new);
+                }
+            },
+        }
+    }
+
+    Ok(chain)
 }
 
 /// Returns a RBAC registration from the given block and slot.
