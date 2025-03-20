@@ -95,7 +95,7 @@ class _DocumentBuilderSectionTileState
   void didUpdateWidget(DocumentBuilderSectionTile oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    if (!widget.isEditable) {
+    if (!widget.isEditable && oldWidget.isEditable) {
       _isEditMode = false;
       _resetBuilder();
     } else if (oldWidget.section != widget.section) {
