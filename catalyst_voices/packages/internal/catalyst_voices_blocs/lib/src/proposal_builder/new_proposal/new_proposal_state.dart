@@ -13,6 +13,14 @@ class NewProposalState extends Equatable {
     this.categories = const [],
   });
 
+  factory NewProposalState.reset() {
+    return const NewProposalState(
+      title: ProposalTitle.pure(),
+      categoryId: null,
+      categories: [],
+    );
+  }
+
   bool get isValid => title.isValid && categoryId != null;
 
   @override

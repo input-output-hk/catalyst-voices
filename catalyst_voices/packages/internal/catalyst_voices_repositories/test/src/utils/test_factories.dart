@@ -136,7 +136,7 @@ abstract final class DocumentDataFactory {
   static DocumentData build({
     DocumentType type = DocumentType.proposalDocument,
     DocumentRef? selfRef,
-    DocumentRef? template,
+    SignedDocumentRef? template,
     DocumentDataContent content = const DocumentDataContent({}),
   }) {
     return DocumentData(

@@ -1,3 +1,4 @@
+import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -7,7 +8,7 @@ import 'step_11_seedphrase_success.dart';
 
 class PasswordInfoPanel extends OnboardingPageBase {
   PasswordInfoPanel(super.$);
-
+  final lockedPictureConstrainedBox = const Key('LockedPictureConstrainedBox');
   Future<void> clickNext() async {
     await $(nextButton).tap();
   }
@@ -38,11 +39,20 @@ class PasswordInfoPanel extends OnboardingPageBase {
   }
 
   Future<void> verifyInfoPanel() async {
-    expect(await infoPartHeaderTitleText(), (await t()).catalystKeychain);
-    //temporary: check for specific picture (locked icon)
+    expect($(headerTitle).text, (await t()).catalystKeychain);
+    expect(
+      find.byWidgetPredicate(
+        (widget) =>
+            widget is CatalystSvgPicture &&
+            (widget.bytesLoader as dynamic).assetName ==
+                'assets/icons/lock-closed.svg',
+      ),
+      findsOneWidget,
+    );
+    expect($(lockedPictureConstrainedBox), findsOneWidget);
     expect(infoPartTaskPicture(), findsOneWidget);
     expect($(progressBar), findsOneWidget);
-    expect(infoPartLearnMoreText(), (await t()).learnMore);
+    expect($(learnMoreButton).$(Text).text, (await t()).learnMore);
     expect(await closeButton(), findsOneWidget);
   }
 }
