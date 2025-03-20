@@ -24,7 +24,7 @@ void main() {
       description: '',
       duration: 6,
       author: 'Alex Wells',
-      versionCount: 1,
+      versions: const [],
     );
   });
 

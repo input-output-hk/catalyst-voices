@@ -80,7 +80,7 @@ class _Header extends StatelessWidget {
 
     return Row(
       spacing: 8,
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         if (username != null) _UsernameText(username),
         if (catalystId != null)

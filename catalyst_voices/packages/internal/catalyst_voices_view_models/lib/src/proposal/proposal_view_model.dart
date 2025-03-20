@@ -3,7 +3,6 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/src/campaign/campaign_stage.dart';
 import 'package:equatable/equatable.dart';
-import 'package:uuid_plus/uuid_plus.dart';
 
 /// Defines the already funded proposal.
 final class FundedProposal extends ProposalViewModel {
@@ -16,7 +15,7 @@ final class FundedProposal extends ProposalViewModel {
   final String description;
 
   const FundedProposal({
-    required super.id,
+    required super.ref,
     super.isFavorite = false,
     required this.campaignName,
     required this.category,
@@ -31,7 +30,7 @@ final class FundedProposal extends ProposalViewModel {
     Proposal proposal, {
     required String campaignName,
   }) : this(
-          id: proposal.selfRef.id,
+          ref: proposal.selfRef,
           campaignName: campaignName,
           category: proposal.category,
           title: proposal.title,
@@ -62,7 +61,7 @@ final class FundedProposal extends ProposalViewModel {
 
   @override
   FundedProposal copyWith({
-    String? id,
+    DocumentRef? ref,
     bool? isFavorite,
     String? campaignName,
     String? category,
@@ -73,7 +72,7 @@ final class FundedProposal extends ProposalViewModel {
     String? description,
   }) {
     return FundedProposal(
-      id: id ?? this.id,
+      ref: ref ?? this.ref,
       isFavorite: isFavorite ?? this.isFavorite,
       campaignName: campaignName ?? this.campaignName,
       category: category ?? this.category,
@@ -101,7 +100,7 @@ final class PendingProposal extends ProposalViewModel {
   final String author;
 
   const PendingProposal({
-    required super.id,
+    required super.ref,
     super.isFavorite = false,
     required this.campaignName,
     required this.category,
@@ -118,7 +117,7 @@ final class PendingProposal extends ProposalViewModel {
 
   factory PendingProposal.dummy() {
     return PendingProposal(
-      id: const Uuid().v7(),
+      ref: SignedDocumentRef.generateFirstRef(),
       campaignName: 'F14',
       category: 'Cardano Use Cases: Concept',
       title: 'Proposal Title that rocks the world',
@@ -143,7 +142,7 @@ and PRISM, but its potential is only barely exploited.
     Proposal proposal, {
     required String campaignName,
   }) : this(
-          id: proposal.selfRef.id,
+          ref: proposal.selfRef,
           campaignName: campaignName,
           category: proposal.category,
           title: proposal.title,
@@ -182,7 +181,7 @@ and PRISM, but its potential is only barely exploited.
 
   @override
   PendingProposal copyWith({
-    String? id,
+    DocumentRef? ref,
     bool? isFavorite,
     String? campaignName,
     String? category,
@@ -197,7 +196,7 @@ and PRISM, but its potential is only barely exploited.
     String? author,
   }) {
     return PendingProposal(
-      id: id ?? this.id,
+      ref: ref ?? this.ref,
       isFavorite: isFavorite ?? this.isFavorite,
       campaignName: campaignName ?? this.campaignName,
       category: category ?? this.category,
@@ -216,11 +215,11 @@ and PRISM, but its potential is only barely exploited.
 
 /// A proposal view model spanning proposals in different stages.
 sealed class ProposalViewModel extends Equatable {
-  final String id;
+  final DocumentRef ref;
   final bool isFavorite;
 
   const ProposalViewModel({
-    required this.id,
+    required this.ref,
     required this.isFavorite,
   });
 
@@ -251,10 +250,10 @@ sealed class ProposalViewModel extends Equatable {
   bool get isLocal;
 
   @override
-  List<Object?> get props => [id, isFavorite];
+  List<Object?> get props => [ref, isFavorite];
 
   ProposalViewModel copyWith({
-    String? id,
+    DocumentRef? ref,
     bool? isFavorite,
   });
 }

@@ -91,7 +91,7 @@ class _NotPublishedProposals extends StatelessWidget {
       duration: 6,
       author: 'Alex Wells',
       updateDate: DateTime.now(),
-      versionCount: 1,
+      versions: const [],
     );
     return Column(
       mainAxisSize: MainAxisSize.min,

@@ -123,8 +123,11 @@ final class Dependencies extends DependencyProvider {
       ..registerFactory<AccountCubit>(() {
         return AccountCubit(get<UserService>());
       })
-      ..registerFactory<ProposalBloc>(() {
-        return ProposalBloc(get<ProposalService>());
+      ..registerFactory<ProposalCubit>(() {
+        return ProposalCubit(
+          get<UserService>(),
+          get<ProposalService>(),
+        );
       })
       ..registerFactory<NewProposalCubit>(() {
         return NewProposalCubit(
@@ -241,9 +244,9 @@ final class Dependencies extends DependencyProvider {
     registerLazySingleton<ProposalService>(() {
       return ProposalService(
         get<ProposalRepository>(),
-        get<DocumentRepository>(),
         get<UserService>(),
         get<KeyDerivationService>(),
+        get<CampaignRepository>(),
       );
     });
     registerLazySingleton<ConfigService>(() {

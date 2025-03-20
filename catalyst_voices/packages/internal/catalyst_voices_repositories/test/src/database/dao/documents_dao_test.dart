@@ -116,60 +116,63 @@ void main() {
         expect(ver.uuid, ref.version);
       });
 
-      test('returns newest version when ver is not specified', () async {
-        // Given
-        final id = const Uuid().v7();
-        final firstVersionId = const Uuid().v7(
-          config: V7Options(
-            DateTime(2025, 2, 10).millisecondsSinceEpoch,
-            null,
-          ),
-        );
-        final secondVersionId = const Uuid().v7(
-          config: V7Options(
-            DateTime(2025, 2, 11).millisecondsSinceEpoch,
-            null,
-          ),
-        );
+      test(
+        'returns newest version when ver is not specified',
+        () async {
+          // Given
+          final id = const Uuid().v7();
+          final firstVersionId = const Uuid().v7(
+            config: V7Options(
+              DateTime(2025, 2, 10).millisecondsSinceEpoch,
+              null,
+            ),
+          );
+          final secondVersionId = const Uuid().v7(
+            config: V7Options(
+              DateTime(2025, 2, 11).millisecondsSinceEpoch,
+              null,
+            ),
+          );
 
-        const secondContent = DocumentDataContent({'title': 'Dev'});
-        final documentsWithMetadata = <DocumentEntityWithMetadata>[
-          DocumentWithMetadataFactory.build(
-            content: const DocumentDataContent({'title': 'D'}),
-            metadata: DocumentDataMetadata(
-              type: DocumentType.proposalDocument,
-              selfRef: DocumentRefFactory.buildSigned(
-                id: id,
-                version: firstVersionId,
+          const secondContent = DocumentDataContent({'title': 'Dev'});
+          final documentsWithMetadata = <DocumentEntityWithMetadata>[
+            DocumentWithMetadataFactory.build(
+              content: const DocumentDataContent({'title': 'D'}),
+              metadata: DocumentDataMetadata(
+                type: DocumentType.proposalDocument,
+                selfRef: DocumentRefFactory.buildSigned(
+                  id: id,
+                  version: firstVersionId,
+                ),
               ),
             ),
-          ),
-          DocumentWithMetadataFactory.build(
-            content: secondContent,
-            metadata: DocumentDataMetadata(
-              type: DocumentType.proposalDocument,
-              selfRef: DocumentRefFactory.buildSigned(
-                id: id,
-                version: secondVersionId,
+            DocumentWithMetadataFactory.build(
+              content: secondContent,
+              metadata: DocumentDataMetadata(
+                type: DocumentType.proposalDocument,
+                selfRef: DocumentRefFactory.buildSigned(
+                  id: id,
+                  version: secondVersionId,
+                ),
               ),
             ),
-          ),
-        ];
-        final document = documentsWithMetadata.first.document;
-        final ref = SignedDocumentRef(id: document.metadata.id);
+          ];
+          final document = documentsWithMetadata.first.document;
+          final ref = SignedDocumentRef(id: document.metadata.id);
 
-        // When
-        await database.documentsDao.saveAll(documentsWithMetadata);
+          // When
+          await database.documentsDao.saveAll(documentsWithMetadata);
 
-        // Then
-        final entity = await database.documentsDao.query(ref: ref);
+          // Then
+          final entity = await database.documentsDao.query(ref: ref);
 
-        expect(entity, isNotNull);
+          expect(entity, isNotNull);
 
-        expect(entity!.metadata.id, id);
-        expect(entity.metadata.version, secondVersionId);
-        expect(entity.content, secondContent);
-      });
+          expect(entity!.metadata.id, id);
+          expect(entity.metadata.version, secondVersionId);
+          expect(entity.content, secondContent);
+        },
+      );
 
       test('returns null when id does not match any id', () async {
         // Given
@@ -276,7 +279,7 @@ void main() {
         final documentsStream =
             database.documentsDao.watchAll(limit: 7, unique: true);
 
-        await database.documentsDao.saveAll(documentsWithMetadata);
+        await database.documentsDao.saveAll(documentsWithMetadata.reversed);
 
         // Then
         expect(
@@ -694,16 +697,13 @@ void main() {
               .asBroadcastStream();
 
           final firstEmission = await documentCount.first;
-          // TODO(damian-molinski): JSONB filtering
-          // After proper filtering this test should pass
+
           expect(firstEmission, equals(1));
 
-          // Save second comment and wait for update
           await database.documentsDao.saveAll([comments.last]);
           final secondEmission = await documentCount.first;
           expect(secondEmission, equals(2));
         },
-        skip: true,
       );
     });
 

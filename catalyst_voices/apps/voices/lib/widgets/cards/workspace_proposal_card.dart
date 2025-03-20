@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
+import 'package:catalyst_voices/routes/routing/proposal_builder_route.dart';
 import 'package:catalyst_voices/widgets/cards/proposal_card_widgets.dart';
 import 'package:catalyst_voices/widgets/cards/proposal_iteration_history_card.dart';
 import 'package:catalyst_voices/widgets/text/last_edit_date.dart';
@@ -10,7 +13,7 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 
 class WorkspaceProposalCard extends StatelessWidget {
-  final ProposalWithVersions proposal;
+  final Proposal proposal;
 
   const WorkspaceProposalCard({
     super.key,
@@ -20,32 +23,41 @@ class WorkspaceProposalCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isSubmitted = proposal.publish.isPublished;
+    final isLocalDraft = proposal.publish.isLocal;
 
-    return _ProposalSubmitState(
-      isSubmitted: isSubmitted,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 6),
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: isSubmitted
-                ? context.colors.iconsPrimary
-                : context.colors.elevationsOnSurfaceNeutralLv1White,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Column(
-            spacing: 12,
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              _Body(proposal),
-              Offstage(
-                offstage: isSubmitted,
-                child: ProposalIterationHistory(
-                  proposal: proposal,
+    return GestureDetector(
+      // TODO(LynxLynxx): When menu is implemented, remove this widget
+      onTap: () {
+        unawaited(
+          ProposalBuilderRoute.fromRef(ref: proposal.selfRef).push(context),
+        );
+      },
+      child: _ProposalSubmitState(
+        isSubmitted: isSubmitted,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 6),
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: isSubmitted
+                  ? context.colors.iconsPrimary
+                  : context.colors.elevationsOnSurfaceNeutralLv1White,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Column(
+              spacing: 12,
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _Body(proposal),
+                Offstage(
+                  offstage: isSubmitted || isLocalDraft,
+                  child: ProposalIterationHistory(
+                    proposal: proposal,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -54,7 +66,7 @@ class WorkspaceProposalCard extends StatelessWidget {
 }
 
 class _Body extends StatelessWidget {
-  final ProposalWithVersions proposal;
+  final Proposal proposal;
 
   const _Body(this.proposal);
 
@@ -122,25 +134,28 @@ class _BodyHeader extends StatelessWidget {
     final headerColor = _ProposalSubmitState.of(context)?.headerColor(context);
     final labelColor =
         _ProposalSubmitState.of(context)?.headerLabelColor(context);
-    return Column(
-      spacing: 2,
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          title,
-          style: context.textTheme.titleSmall?.copyWith(
-            color: headerColor,
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: 439),
+      child: Column(
+        spacing: 2,
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(
+            title,
+            style: context.textTheme.titleSmall?.copyWith(
+              color: headerColor,
+            ),
           ),
-        ),
-        LastEditDate(
-          dateTime: lastUpdate,
-          showTimezone: false,
-          textStyle: context.textTheme.labelMedium?.copyWith(
-            color: labelColor,
+          LastEditDate(
+            dateTime: lastUpdate,
+            showTimezone: false,
+            textStyle: context.textTheme.labelMedium?.copyWith(
+              color: labelColor,
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

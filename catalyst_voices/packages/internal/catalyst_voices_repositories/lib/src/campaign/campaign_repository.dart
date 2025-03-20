@@ -7,6 +7,12 @@ abstract interface class CampaignRepository {
   Future<CampaignBase> getCampaign({
     required String id,
   });
+
+  Future<List<CampaignCategory>> getCampaignCategories();
+
+  Future<CampaignCategory> getCategory(SignedDocumentRef ref);
+
+  Future<CurrentCampaign> getCurrentCampaign();
 }
 
 final class CampaignRepositoryImpl implements CampaignRepository {
@@ -29,5 +35,25 @@ final class CampaignRepositoryImpl implements CampaignRepository {
       proposalsCount: 0,
       publish: CampaignPublish.draft,
     );
+  }
+
+  @override
+  Future<List<CampaignCategory>> getCampaignCategories() async {
+    return staticCampaignCategories;
+  }
+
+  @override
+  Future<CampaignCategory> getCategory(SignedDocumentRef ref) async {
+    return staticCampaignCategories.firstWhere(
+      (e) => e.selfRef == ref,
+      orElse: () => throw NotFoundException(
+        message: 'Did not find category with ref $ref',
+      ),
+    );
+  }
+
+  @override
+  Future<CurrentCampaign> getCurrentCampaign() async {
+    return CurrentCampaignX.staticContent;
   }
 }
