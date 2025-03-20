@@ -1,7 +1,9 @@
 import 'dart:async';
 
 import 'package:catalyst_voices_blocs/src/common/bloc_error_emitter_mixin.dart';
+import 'package:catalyst_voices_blocs/src/common/bloc_signal_emitter_mixin.dart';
 import 'package:catalyst_voices_blocs/src/workspace/workspace_event.dart';
+import 'package:catalyst_voices_blocs/src/workspace/workspace_signal.dart';
 import 'package:catalyst_voices_blocs/src/workspace/workspace_state.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
@@ -12,7 +14,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 final _logger = Logger('WorkspaceBloc');
 
 final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
-    with BlocErrorEmitterMixin {
+    with
+        BlocSignalEmitterMixin<WorkspaceSignal, WorkspaceState>,
+        BlocErrorEmitterMixin {
   // ignore: unused_field
   final CampaignService _campaignService;
   final ProposalService _proposalService;
@@ -28,9 +32,7 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     on<LoadProposalsEvent>(_loadProposals);
     on<ImportProposalEvent>(_importProposal);
     on<ErrorLoadProposalsEvent>(_errorLoadProposals);
-    on<WatchUserProposalsEvent>(
-      _watchUserProposals,
-    );
+    on<WatchUserProposalsEvent>(_watchUserProposals);
   }
 
   @override
@@ -61,7 +63,7 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
   ) async {
     try {
       final ref = await _proposalService.importProposal(event.proposalData);
-      emit(state.copyWith(importedProposalRef: Optional(ref)));
+      emitSignal(ImportedProposalWorkspaceSignal(proposalRef: ref));
     } catch (error, stackTrace) {
       _logger.severe('Importing proposal failed', error, stackTrace);
       emitError(const LocalizedUnknownException());
