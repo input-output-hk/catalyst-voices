@@ -2,10 +2,10 @@
 
 pub(crate) use response::AllResponses;
 
-mod certificate_map;
 mod purpose_list;
 mod registration_chain;
 mod response;
+mod role_map;
 mod unprocessable_content;
 
 // TODO: FIXME: Remove.
@@ -14,7 +14,7 @@ mod unprocessable_content;
 // mod reg_chain;
 
 use anyhow::{anyhow, bail, Context};
-use cardano_blockchain_types::{Network, Point, Slot, StakeAddress, TxnIndex};
+use cardano_blockchain_types::{Network, Point, Slot, StakeAddress, TransactionId, TxnIndex};
 use cardano_chain_follower::ChainFollower;
 use catalyst_types::id_uri::IdUri;
 use futures::{StreamExt, TryFutureExt, TryStreamExt};
@@ -92,8 +92,13 @@ pub(crate) async fn endpoint(
     };
 
     match registration_chain(&persistent_session, &volatile_session, &catalyst_id).await {
-        Ok(Some((c, volatile))) => {
-            Responses::Ok(Json(Box::new(RbacRegistrationChain::new(c, volatile)))).into()
+        Ok(Some((c, persistent_id, volatile_id))) => {
+            Responses::Ok(Json(Box::new(RbacRegistrationChain::new(
+                c,
+                persistent_id,
+                volatile_id,
+            ))))
+            .into()
         },
         Ok(None) => Responses::NotFound.into(),
         Err(e) => AllResponses::handle_error(&e),
@@ -121,30 +126,27 @@ async fn catalyst_id_from_stake(
     }
 }
 
-/// Returns a registration chain and the number of present volatile registrations for the
-/// given Catalyst ID.
+/// Returns a registration chain and optional transaction IDs of the latest persistent and
+/// volatile registrations.
 async fn registration_chain(
     persistent_session: &CassandraSession, volatile_session: &CassandraSession, catalyst_id: &IdUri,
-) -> anyhow::Result<Option<(RegistrationChain, usize)>> {
+) -> anyhow::Result<
+    Option<(
+        RegistrationChain,
+        Option<TransactionId>,
+        Option<TransactionId>,
+    )>,
+> {
     let persistent_registrations = indexed_registrations(persistent_session, catalyst_id).await?;
     let volatile_registrations = indexed_registrations(volatile_session, catalyst_id).await?;
     let network = Settings::cardano_network();
 
     let chain = apply_registrations(network, None, persistent_registrations).await?;
-    // Purpose is a required field for the registration, so the number of purposes is equal to
-    // the number of registrations in the chain.
-    let persistent_count = chain
-        .as_ref()
-        .map(|c| c.purpose().len())
-        .unwrap_or_default();
+    let persistent_id = chain.as_ref().map(|c| c.current_tx_id_hash());
     let chain = apply_registrations(network, chain, volatile_registrations).await?;
-    let volatile_count = chain
-        .as_ref()
-        .map(|c| c.purpose().len())
-        .unwrap_or_default()
-        - persistent_count;
+    let volatile_id = chain.as_ref().map(|c| c.current_tx_id_hash());
 
-    Ok(chain.map(|c| (c, volatile_count)))
+    Ok(chain.map(|c| (c, persistent_id, volatile_id)))
 }
 
 /// Returns a sorted list of all registrations for the given Catalyst ID from the
