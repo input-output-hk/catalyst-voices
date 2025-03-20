@@ -111,7 +111,7 @@ final class ProposalsCubit extends Cubit<ProposalsState> {
     emit(state.copyWith(favoritesIds: favoritesList));
   }
 
-  /// Changes the favorite status of the proposal with [proposalId].
+  /// Changes the favorite status of the proposal with [ref].
   Future<void> onChangeFavoriteProposal(
     DocumentRef ref, {
     required bool isFavorite,
