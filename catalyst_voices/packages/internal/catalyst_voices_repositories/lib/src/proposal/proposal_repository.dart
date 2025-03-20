@@ -389,6 +389,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
       selfRef: documentData.metadata.selfRef,
       templateRef: documentData.metadata.template!,
       categoryId: documentData.metadata.categoryId!,
+      authors: documentData.metadata.authors ?? [],
     );
 
     final content = DocumentDataContentDto.fromModel(

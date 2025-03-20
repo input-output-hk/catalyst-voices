@@ -119,6 +119,7 @@ final class ProposalServiceImpl implements ProposalService {
     required SignedDocumentRef categoryId,
   }) async {
     final draftRef = DraftRef.generateFirstRef();
+    final catalystId = await _getUserCatalystId();
     await _proposalRepository.upsertDraftProposal(
       document: DocumentData(
         metadata: DocumentDataMetadata(
@@ -126,6 +127,7 @@ final class ProposalServiceImpl implements ProposalService {
           selfRef: draftRef,
           template: template,
           categoryId: categoryId,
+          authors: [catalystId],
         ),
         content: content,
       ),
@@ -250,6 +252,9 @@ final class ProposalServiceImpl implements ProposalService {
     required SignedDocumentRef template,
     required SignedDocumentRef categoryId,
   }) async {
+    // TODO(LynxLynxx): when we start supporting multiple authors
+    // we need to get the list of authors actually stored in the db and
+    // add them to the authors list if they are not already there
     await _proposalRepository.upsertDraftProposal(
       document: DocumentData(
         metadata: DocumentDataMetadata(
