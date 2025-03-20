@@ -17,34 +17,47 @@ class ProposalNavigationControls extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        const SizedBox(height: 8),
-        const _BackButton(),
-        const SizedBox(height: 20),
-        Row(
-          children: [
-            _ToggleRailButton(onTap: onToggleTap),
-            const Spacer(),
-            const ProposalVersion(showBorder: false),
-          ],
-        ),
-        const SizedBox(height: 12),
-        const _Divider(),
-      ],
-    );
+    return isCompact
+        ? _CompactControls(onToggleTap: onToggleTap)
+        : _StandardControls(onToggleTap: onToggleTap);
   }
 }
 
 class _BackButton extends StatelessWidget {
-  const _BackButton();
+  final bool isCompact;
+
+  const _BackButton({
+    this.isCompact = false,
+  });
 
   @override
   Widget build(BuildContext context) {
     return NavigationBack(
       label: context.l10n.backToList,
-      padding: const EdgeInsets.all(8),
+      isCompact: isCompact,
+    );
+  }
+}
+
+class _CompactControls extends StatelessWidget {
+  final VoidCallback onToggleTap;
+
+  const _CompactControls({
+    required this.onToggleTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: Alignment.topRight,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const SizedBox(height: 56),
+          const _BackButton(isCompact: true),
+          _ToggleRailButton(onTap: onToggleTap),
+        ],
+      ),
     );
   }
 }
@@ -61,6 +74,37 @@ class _Divider extends StatelessWidget {
   }
 }
 
+class _StandardControls extends StatelessWidget {
+  final VoidCallback onToggleTap;
+
+  const _StandardControls({
+    required this.onToggleTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 8),
+        const _BackButton(),
+        const SizedBox(height: 20),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            _ToggleRailButton(onTap: onToggleTap),
+            const Spacer(),
+            const ProposalVersion(showBorder: false),
+          ],
+        ),
+        const SizedBox(height: 12),
+        const _Divider(),
+      ],
+    );
+  }
+}
+
 class _ToggleRailButton extends StatelessWidget {
   final VoidCallback onTap;
 
@@ -72,6 +116,9 @@ class _ToggleRailButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return VoicesIconButton(
       onTap: onTap,
+      style: IconButton.styleFrom(
+        foregroundColor: context.colors.textOnPrimaryLevel1,
+      ),
       child: VoicesAssets.icons.leftRailToggle.buildIcon(),
     );
   }

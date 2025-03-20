@@ -26,7 +26,6 @@ export 'containers/roles_chooser_container.dart';
 export 'containers/roles_summary_container.dart';
 export 'containers/sidebar/sidebar_panel.dart';
 export 'containers/sidebar/sidebar_scaffold.dart';
-export 'containers/sidebar/sidebar_scaffold_controller.dart';
 export 'containers/sidebar/space_scaffold.dart';
 export 'containers/sidebar/space_side_panel.dart';
 export 'containers/workspace_text_tile_container.dart';
