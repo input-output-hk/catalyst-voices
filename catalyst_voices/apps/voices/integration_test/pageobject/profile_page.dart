@@ -1,9 +1,6 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:patrol_finders/patrol_finders.dart';
-
 import '../utils/translations_utils.dart';
 import 'common_page.dart';
 
@@ -29,8 +26,8 @@ class ProfilePage {
   final profileAndKeychainText = const Key('ProfileAndKeychainText');
   final accountEmailTextField = const Key('AccountEmailTextField');
   final emailTileSaveBtn = const Key('EmailTileSaveButton');
-  final deleteKeychainContinueButton = 
-  const Key('DeleteKeychainContinueButton');
+  final deleteKeychainContinueButton =
+      const Key('DeleteKeychainContinueButton');
   final deleteKeychainTextField = const Key('DeleteKeychainTextField');
   final keychainDeletedDialogCloseButton =
       const Key('KeychainDeletedDialogCloseButton');
@@ -51,7 +48,6 @@ class ProfilePage {
   }
 
   Future<void> verifyPageElements() async {
-
     expect(
       $(profileAndKeychainText).text,
       (await t()).profileAndKeychain,

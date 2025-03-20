@@ -37,7 +37,9 @@ class _AccountPageState extends State<AccountPage> {
       appBar: const VoicesAppBar(
         automaticallyImplyLeading: false,
         actions: [
-          VoicesStartProposalButton(key: Key('StartProposalBtn'),),
+          VoicesStartProposalButton(
+            key: Key('StartProposalBtn'),
+          ),
           SessionActionHeader(),
           SessionAccountAvatar(),
         ],
@@ -50,7 +52,9 @@ class _AccountPageState extends State<AccountPage> {
             child: ListView(
               padding: const EdgeInsets.all(24),
               children: [
-                const AccountPageTitle( key: Key('AccountPageTitle'),),
+                const AccountPageTitle(
+                  key: Key('AccountPageTitle'),
+                ),
                 const SizedBox(height: 42),
                 const Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -79,7 +83,9 @@ class _AccountPageState extends State<AccountPage> {
                         mainAxisSize: MainAxisSize.min,
                         children: const <Widget>[
                           AccountRolesTile(),
-                          AccountKeychainTile(key: Key('AccountKeychainTile'),),
+                          AccountKeychainTile(
+                            key: Key('AccountKeychainTile'),
+                          ),
                         ].separatedBy(const SizedBox(height: 20)).toList(),
                       ),
                     ),

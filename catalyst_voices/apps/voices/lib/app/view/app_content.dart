@@ -8,6 +8,7 @@ import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localized_locales/flutter_localized_locales.dart';
+import 'package:flutter_quill/flutter_quill.dart';
 
 const _restorationScopeId = 'rootVoices';
 
@@ -46,6 +47,7 @@ final class _AppContent extends StatelessWidget {
     return const [
       ...VoicesLocalizations.localizationsDelegates,
       LocaleNamesLocalizationsDelegate(),
+      FlutterQuillLocalizations.delegate,
     ];
   }
 

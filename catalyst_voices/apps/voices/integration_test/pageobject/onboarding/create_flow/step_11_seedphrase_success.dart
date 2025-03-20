@@ -10,7 +10,6 @@ class SeedphraseSuccessPanel extends OnboardingPageBase {
   SeedphraseSuccessPanel(super.$);
 
   final nextStepBody = const Key('NextStepBody');
-  final greenImageLayoutBuilder = const Key('GreenImageLayoutBuilder');
 
   Future<void> clickNext() async {
     await $(nextButton).tap();
