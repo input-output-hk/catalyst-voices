@@ -1,4 +1,4 @@
-import 'package:catalyst_voices/widgets/containers/space_side_panel.dart';
+import 'package:catalyst_voices/widgets/containers/sidebar/space_side_panel.dart';
 import 'package:flutter/material.dart';
 
 /// Widget that creates 'rails' screen structure where two side panels
@@ -12,8 +12,8 @@ import 'package:flutter/material.dart';
 /// sufficient screen width for all content. Medium and small screens behaviour
 /// will be implemented later. Right now only desktops are focused.
 class SidebarScaffold extends StatelessWidget {
-  final Widget leftRail;
-  final Widget rightRail;
+  final Widget? leftRail;
+  final Widget? rightRail;
   final double railWidth;
   final double railsGap;
   final double bodyMaxWidth;
@@ -21,8 +21,8 @@ class SidebarScaffold extends StatelessWidget {
 
   const SidebarScaffold({
     super.key,
-    this.leftRail = const SizedBox(),
-    this.rightRail = const SizedBox(),
+    this.leftRail,
+    this.rightRail,
     this.railWidth = 326,
     this.railsGap = 56,
     this.bodyMaxWidth = 612,
@@ -35,14 +35,17 @@ class SidebarScaffold extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         ConstrainedBox(
-          constraints: BoxConstraints.tightFor(width: railWidth),
+          constraints: BoxConstraints(maxWidth: railWidth),
           child: leftRail,
         ),
         SizedBox(width: railsGap),
         Expanded(child: body),
         SizedBox(width: railsGap),
         ConstrainedBox(
-          constraints: BoxConstraints.tightFor(width: railWidth),
+          constraints: BoxConstraints(
+            maxWidth: railWidth,
+            minWidth: railWidth,
+          ),
           child: rightRail,
         ),
       ],

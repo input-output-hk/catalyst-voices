@@ -1,11 +1,10 @@
 import 'dart:async';
 
 import 'package:catalyst_voices/common/signal_handler.dart';
-import 'package:catalyst_voices/pages/proposal/proposal_back_button.dart';
 import 'package:catalyst_voices/pages/proposal/proposal_content.dart';
-import 'package:catalyst_voices/pages/proposal/proposal_header.dart';
-import 'package:catalyst_voices/pages/proposal/proposal_navigation_panel.dart';
 import 'package:catalyst_voices/pages/proposal/snack_bar/viewing_older_version_snack_bar.dart';
+import 'package:catalyst_voices/pages/proposal/widget/proposal_header.dart';
+import 'package:catalyst_voices/pages/proposal/widget/proposal_navigation_panel.dart';
 import 'package:catalyst_voices/routes/routes.dart';
 import 'package:catalyst_voices/widgets/snackbar/voices_snackbar.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
@@ -41,29 +40,16 @@ class _ProposalPageState extends State<ProposalPage>
     return SegmentsControllerScope(
       controller: _segmentsController,
       child: Scaffold(
-        appBar: const VoicesAppBar(
-          automaticallyImplyLeading: false,
-        ),
-        body: Stack(
-          children: [
-            Column(
-              children: [
-                const ProposalBackButton(),
-                Expanded(
-                  child: SpaceScaffold(
-                    left: const ProposalNavigationPanel(),
-                    body: SelectionArea(
-                      child: ProposalContent(
-                        scrollController: _segmentsScrollController,
-                      ),
-                    ),
-                    right: const Offstage(),
-                  ),
-                ),
-              ],
+        appBar: const VoicesAppBar(automaticallyImplyLeading: false),
+        body: ProposalHeaderWrapper(
+          child: SpaceScaffold(
+            left: const ProposalNavigationPanel(),
+            body: SelectionArea(
+              child: ProposalContent(
+                scrollController: _segmentsScrollController,
+              ),
             ),
-            const ProposalHeader(),
-          ],
+          ),
         ),
       ),
     );
