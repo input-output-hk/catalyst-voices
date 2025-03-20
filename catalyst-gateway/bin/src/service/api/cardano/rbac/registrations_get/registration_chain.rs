@@ -1,17 +1,16 @@
 //! RBAC registration chain.
 
-use c509_certificate::c509::C509;
+use std::collections::HashMap;
+
 use cardano_blockchain_types::TransactionId;
-use minicbor::{Encode, Encoder};
-use poem_openapi::types::Example;
-use poem_openapi_derive::Object;
-use rbac_registration::{cardano::cip509::PointData, registration::cardano::RegistrationChain};
-use x509_cert::{certificate::Certificate as X509Certificate, der::Encode as _};
+use poem_openapi::{types::Example, Object};
+use rbac_registration::{
+    cardano::cip509::{PointData, RoleData, RoleNumber},
+    registration::cardano::RegistrationChain,
+};
 
 use crate::service::{
-    api::cardano::rbac::registrations_get::{
-        certificate_map::CertificateMap, purpose_list::PurposeList, role_map::RoleMap,
-    },
+    api::cardano::rbac::registrations_get::{purpose_list::PurposeList, role_data::RbacRoleData},
     common::types::{
         cardano::{catalyst_id::CatalystId, transaction_id::TxnId},
         generic::uuidv4::UUIDv4,
@@ -35,10 +34,10 @@ pub(crate) struct RbacRegistrationChain {
     /// A list of registration purposes.
     #[oai(skip_serializing_if_is_empty)]
     purpose: PurposeList,
-    /// A map of roles.
+    /// A map of role number to role data.
     // This map is never empty, so there is no need to add the `skip_serializing_if_is_none`
     // attribute.
-    roles: RoleMap,
+    roles: HashMap<u8, RbacRoleData>,
 }
 
 impl Example for RbacRegistrationChain {
@@ -48,7 +47,7 @@ impl Example for RbacRegistrationChain {
             purpose: PurposeList::example(),
             last_persistent_txn_id: Some(TxnId::example()),
             last_volatile_txn_id: Some(TxnId::example()),
-            roles: RoleMap::example(),
+            roles: [(0, RbacRoleData::example())].into_iter().collect(),
         }
     }
 }
@@ -69,18 +68,27 @@ impl RbacRegistrationChain {
             .map(UUIDv4::from)
             .collect::<Vec<_>>()
             .into();
-        let roles = RoleMap::new();
+        let roles = role_data(chain.role_data());
 
         Self {
             catalyst_id,
             last_persistent_txn_id,
             last_volatile_txn_id,
             purpose,
+            roles,
         }
     }
 }
 
+fn role_data(role_data: &HashMap<RoleNumber, PointData<RoleData>>) -> HashMap<u8, RbacRoleData> {
+    // TODO: FIXME:
+    todo!()
+}
+
 // TODO: FIXME:
+//
+// use x509_cert::{certificate::Certificate as X509Certificate, der::Encode as _};
+//
 // /// Converts X509 certificates.
 // fn convert_x509_map(
 //     certs: &HashMap<usize, Vec<PointData<Option<X509Certificate>>>>,

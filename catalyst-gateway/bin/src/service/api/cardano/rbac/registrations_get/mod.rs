@@ -2,16 +2,13 @@
 
 pub(crate) use response::AllResponses;
 
+mod key_data;
+mod payment_data;
 mod purpose_list;
 mod registration_chain;
 mod response;
-mod role_map;
+mod role_data;
 mod unprocessable_content;
-
-// TODO: FIXME: Remove.
-// mod cip509;
-// mod rbac_reg;
-// mod reg_chain;
 
 use anyhow::{anyhow, bail, Context};
 use cardano_blockchain_types::{Network, Point, Slot, StakeAddress, TransactionId, TxnIndex};
