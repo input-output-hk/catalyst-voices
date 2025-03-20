@@ -92,7 +92,7 @@ class _ProposalsPaginationState extends State<ProposalsPagination> {
               },
               onFavoriteChanged: (isFavorite) async {
                 await context.read<ProposalsCubit>().onChangeFavoriteProposal(
-                      item.ref.id,
+                      item.ref,
                       isFavorite: isFavorite,
                     );
               },

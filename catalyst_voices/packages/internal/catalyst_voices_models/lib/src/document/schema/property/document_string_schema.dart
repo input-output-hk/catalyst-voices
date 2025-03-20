@@ -370,7 +370,7 @@ final class DocumentSingleLineTextEntrySchema extends DocumentStringSchema {
 
 sealed class DocumentStringSchema extends DocumentValueSchema<String> {
   final DocumentContentMediaType? contentMediaType;
-  final Range<int>? strLengthRange;
+  final NumRange<int>? strLengthRange;
   final RegExp? pattern;
 
   const DocumentStringSchema({

@@ -3,24 +3,6 @@ import 'package:catalyst_voices_repositories/src/dto/document/schema/document_de
 import 'package:catalyst_voices_repositories/src/dto/document/schema/document_property_schema_dto.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 
-enum _DocumentNumberDefinition {
-  unknown('unknown');
-
-  final String def;
-
-  const _DocumentNumberDefinition(this.def);
-
-  factory _DocumentNumberDefinition.fromDef(String? def) {
-    for (final value in values) {
-      if (value.def.equalsIgnoreCase(def)) {
-        return value;
-      }
-    }
-
-    return _DocumentNumberDefinition.unknown;
-  }
-}
-
 final class DocumentNumberSchemaMapper {
   static DocumentNumberSchema toModel({
     required DocumentDefinitionsDto definitions,
@@ -40,7 +22,7 @@ final class DocumentNumberSchemaMapper {
     final defaultValue = schema.defaultValue as double?;
     final constValue = schema.constValue as double?;
     final enumValues = schema.enumValues?.cast<double>();
-    final numRange = Range.optionalRangeOf(
+    final numRange = NumRange.optionalRangeOf(
       min: schema.minimum?.toDouble(),
       max: schema.maximum?.toDouble(),
     );
@@ -63,5 +45,23 @@ final class DocumentNumberSchemaMapper {
           numRange: numRange,
         );
     }
+  }
+}
+
+enum _DocumentNumberDefinition {
+  unknown('unknown');
+
+  final String def;
+
+  const _DocumentNumberDefinition(this.def);
+
+  factory _DocumentNumberDefinition.fromDef(String? def) {
+    for (final value in values) {
+      if (value.def.equalsIgnoreCase(def)) {
+        return value;
+      }
+    }
+
+    return _DocumentNumberDefinition.unknown;
   }
 }
