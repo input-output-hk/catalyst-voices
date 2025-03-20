@@ -56,7 +56,7 @@ final class Account extends Equatable {
       },
       walletInfo: WalletInfo(
         metadata: const WalletMetadata(name: 'Dummy Wallet', icon: null),
-        balance: Coin.fromAda(10),
+        balance: const Coin.fromWholeAda(10),
         /* cSpell:disable */
         address: ShelleyAddress.fromBech32(
           'addr_test1vzpwq95z3xyum8vqndgdd'

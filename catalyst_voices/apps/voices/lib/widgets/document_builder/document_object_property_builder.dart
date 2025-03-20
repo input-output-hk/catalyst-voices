@@ -11,12 +11,14 @@ class DocumentObjectPropertyBuilder extends StatelessWidget {
   final DocumentObjectProperty property;
   final bool isEditMode;
   final ValueChanged<List<DocumentChange>> onChanged;
+  final DocumentPropertyBuilderOverrides? overrides;
 
   const DocumentObjectPropertyBuilder({
     super.key,
     required this.property,
     required this.isEditMode,
     required this.onChanged,
+    this.overrides,
   });
 
   @override
@@ -42,6 +44,7 @@ class DocumentObjectPropertyBuilder extends StatelessWidget {
           property: property,
           isEditMode: isEditMode,
           onChanged: onChanged,
+          overrides: overrides,
         );
     }
   }
@@ -54,6 +57,7 @@ class _FormField extends VoicesFormField<DocumentObjectProperty> {
     super.autovalidateMode,
     required bool isEditMode,
     required ValueChanged<List<DocumentChange>> onDocumentChanged,
+    required DocumentPropertyBuilderOverrides? overrides,
   }) : super(
           enabled: isEditMode,
           builder: (field) {
@@ -93,6 +97,7 @@ class _FormField extends VoicesFormField<DocumentObjectProperty> {
                       property: child,
                       isEditMode: isEditMode,
                       onChanged: onDocumentChanged,
+                      overrides: overrides,
                     );
                   }).separatedBy(const SizedBox(height: 24)),
                   if (error != null) ...[
@@ -114,12 +119,14 @@ class _GenericDocumentObjectPropertyBuilder extends StatefulWidget {
   final DocumentObjectProperty property;
   final bool isEditMode;
   final ValueChanged<List<DocumentChange>> onChanged;
+  final DocumentPropertyBuilderOverrides? overrides;
 
   const _GenericDocumentObjectPropertyBuilder({
     required this.schema,
     required this.property,
     required this.isEditMode,
     required this.onChanged,
+    this.overrides,
   });
 
   @override
@@ -139,6 +146,7 @@ class _GenericDocumentObjectPropertyBuilderState
       autovalidateMode: _autovalidateMode,
       isEditMode: widget.isEditMode,
       onDocumentChanged: _onDocumentChanged,
+      overrides: widget.overrides,
     );
   }
 
