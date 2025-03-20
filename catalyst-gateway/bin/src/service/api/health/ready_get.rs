@@ -1,4 +1,79 @@
-//! Implementation of the GET /health/ready endpoint
+//! # Implementation of the GET /health/ready endpoint
+//!
+//! This module provides an HTTP endpoint to monitor the readiness of the service's
+//! database connections and attempt to reconnect to any databases that are not currently
+//! live. It uses the `LIVE_INDEX_DB` and `LIVE_EVENT_DB` atomic booleans defined in the
+//! parent module to track the status of the Index DB and Event DB, respectively.
+//!
+//! ## Key Features
+//!
+//! 1. **Reconnection Logic**:
+//!    - If either `LIVE_INDEX_DB` or `LIVE_EVENT_DB` is `false`, the service will attempt
+//!      to reconnect to the corresponding database.
+//!    - If the reconnection attempt is successful, the respective flag (`LIVE_INDEX_DB`
+//!      or `LIVE_EVENT_DB`) is set to `true`.
+//!    - If the reconnection attempt fails, the flag remains `false`.
+//!
+//! 2. **Readiness Check Logic**:
+//!    - After attempting to reconnect to any non-live databases, the endpoint checks the
+//!      status of both `LIVE_INDEX_DB` and `LIVE_EVENT_DB`.
+//!    - If both flags are `true`, the endpoint returns a `204 No Content` response,
+//!      indicating that all databases are live and the service is healthy.
+//!    - If either flag is `false`, the endpoint returns a `503 Service Unavailable`
+//!      response, indicating that at least one database is not live and the service is
+//!      unhealthy.
+//!
+//! ## How It Works
+//!
+//! - When the endpoint is called, it first checks the status of `LIVE_INDEX_DB` and
+//!   `LIVE_EVENT_DB`.
+//! - For any database that is not live (i.e., its flag is `false`), the service attempts
+//!   to reconnect to that database.
+//! - If the reconnection attempt is successful, the corresponding flag is set to `true`.
+//! - After attempting to reconnect, the endpoint checks the status of both flags:
+//!   - If both `LIVE_INDEX_DB` and `LIVE_EVENT_DB` are `true`, the endpoint returns `204
+//!     No Content`.
+//!   - If either flag is `false`, the endpoint returns `503 Service Unavailable`.
+//!
+//! ## Example Scenarios
+//!
+//! 1. **Both Databases Live**:
+//!    - `LIVE_INDEX_DB` and `LIVE_EVENT_DB` are both `true`.
+//!    - No reconnection attempts are made.
+//!    - The endpoint returns `204 No Content`.
+//!
+//! 2. **Index DB Not Live, Reconnection Successful**:
+//!    - `LIVE_INDEX_DB` is `false`, and `LIVE_EVENT_DB` is `true`.
+//!    - The service attempts to reconnect to the Index DB and succeeds.
+//!    - `LIVE_INDEX_DB` is set to `true`.
+//!    - The endpoint returns `204 No Content`.
+//!
+//! 3. **Event DB Not Live, Reconnection Fails**:
+//!    - `LIVE_INDEX_DB` is `true`, and `LIVE_EVENT_DB` is `false`.
+//!    - The service attempts to reconnect to the Event DB but fails.
+//!    - `LIVE_EVENT_DB` remains `false`.
+//!    - The endpoint returns `503 Service Unavailable`.
+//!
+//! 4. **Both Databases Not Live, Reconnection Partially Successful**:
+//!    - `LIVE_INDEX_DB` and `LIVE_EVENT_DB` are both `false`.
+//!    - The service attempts to reconnect to both databases.
+//!    - Reconnection to the Index DB succeeds (`LIVE_INDEX_DB` is set to `true`), but
+//!      reconnection to the Event DB fails (`LIVE_EVENT_DB` remains `false`).
+//!    - The endpoint returns `503 Service Unavailable`.
+//!
+//! ## Notes
+//!
+//! - The reconnection logic ensures that the service actively attempts to restore
+//!   connectivity to any non-live databases, improving robustness and reliability.
+//! - The atomic booleans (`LIVE_INDEX_DB` and `LIVE_EVENT_DB`) are thread-safe, allowing
+//!   concurrent access without issues.
+//! - This endpoint is useful for monitoring and automatically recovering from transient
+//!   database connectivity issues, ensuring that the service remains operational whenever
+//!   possible.
+//!
+//! This endpoint complements the initialization and readiness monitoring endpoints by
+//! providing ongoing connectivity checks and recovery attempts for the service's
+//! databases.
 use poem_openapi::ApiResponse;
 use tracing::error;
 
