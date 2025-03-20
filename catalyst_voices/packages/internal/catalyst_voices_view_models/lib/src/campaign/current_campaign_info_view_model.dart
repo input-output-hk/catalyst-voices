@@ -1,3 +1,4 @@
+import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
@@ -9,7 +10,7 @@ class CurrentCampaignInfoViewModel extends Equatable {
   final int allFunds;
   final int totalAsk;
   final List<CampaignTimelineViewModel> timeline;
-  final Range<int> askRange;
+  final ComparableRange<Coin> askRange;
 
   const CurrentCampaignInfoViewModel({
     required this.title,
@@ -27,7 +28,10 @@ class CurrentCampaignInfoViewModel extends Equatable {
       description: '',
       allFunds: 50000000,
       totalAsk: 4020000,
-      askRange: Range(min: 30000, max: 150000),
+      askRange: ComparableRange(
+        min: Coin.fromWholeAda(30000),
+        max: Coin.fromWholeAda(150000),
+      ),
     );
   }
 
@@ -58,7 +62,10 @@ class NullCurrentCampaignInfoViewModel extends CurrentCampaignInfoViewModel {
     super.description = '',
     super.allFunds = 50000000,
     super.totalAsk = 4020000,
-    super.askRange = const Range(min: 30000, max: 150000),
+    super.askRange = const ComparableRange(
+      min: Coin.fromWholeAda(30000),
+      max: Coin.fromWholeAda(150000),
+    ),
     super.timeline = const [],
   });
 }

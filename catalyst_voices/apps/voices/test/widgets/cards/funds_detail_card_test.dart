@@ -1,3 +1,4 @@
+import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices/widgets/cards/funds_detail_card.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
@@ -5,26 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../helpers/helpers.dart';
-
-class _FakeVoicesLocalizations extends Fake implements VoicesLocalizations {
-  @override
-  String get campaignTreasury => 'Campaign Treasury';
-  @override
-  String get categoryBudget => 'Category Budget';
-  @override
-  String get campaignTotalAsk => 'Campaign Total Ask';
-  @override
-  String get currentAsk => 'Current Ask';
-  @override
-  String get campaignTreasuryDescription =>
-      'Total budget, including ecosystem incentives';
-  @override
-  String get fundsAvailableForCategory => 'Funds available for this category';
-  @override
-  String get maximumAsk => 'Maximum Ask';
-  @override
-  String get minimumAsk => 'MinimumAsk';
-}
 
 void main() {
   late _FakeVoicesLocalizations l10n;
@@ -42,7 +23,10 @@ void main() {
               child: FundsDetailCard(
                 allFunds: 100,
                 totalAsk: 100,
-                askRange: Range(min: 100, max: 100),
+                askRange: ComparableRange(
+                  min: Coin.fromWholeAda(100),
+                  max: Coin.fromWholeAda(100),
+                ),
                 type: FundsDetailCardType.category,
               ),
             ),
@@ -62,7 +46,10 @@ void main() {
               child: FundsDetailCard(
                 allFunds: 1,
                 totalAsk: 2,
-                askRange: Range(min: 3, max: 4),
+                askRange: ComparableRange(
+                  min: Coin.fromWholeAda(3),
+                  max: Coin.fromWholeAda(4),
+                ),
                 type: FundsDetailCardType.category,
               ),
             ),
@@ -85,7 +72,10 @@ void main() {
               child: FundsDetailCard(
                 allFunds: 100,
                 totalAsk: 100,
-                askRange: Range(min: 100, max: 100),
+                askRange: ComparableRange(
+                  min: Coin.fromWholeAda(100),
+                  max: Coin.fromWholeAda(100),
+                ),
               ),
             ),
           ),
@@ -104,7 +94,10 @@ void main() {
               child: FundsDetailCard(
                 allFunds: 1,
                 totalAsk: 2,
-                askRange: Range(min: 3, max: 4),
+                askRange: ComparableRange(
+                  min: Coin.fromWholeAda(3),
+                  max: Coin.fromWholeAda(4),
+                ),
               ),
             ),
           ),
@@ -118,4 +111,24 @@ void main() {
       });
     });
   });
+}
+
+class _FakeVoicesLocalizations extends Fake implements VoicesLocalizations {
+  @override
+  String get campaignTotalAsk => 'Campaign Total Ask';
+  @override
+  String get campaignTreasury => 'Campaign Treasury';
+  @override
+  String get campaignTreasuryDescription =>
+      'Total budget, including ecosystem incentives';
+  @override
+  String get categoryBudget => 'Category Budget';
+  @override
+  String get currentAsk => 'Current Ask';
+  @override
+  String get fundsAvailableForCategory => 'Funds available for this category';
+  @override
+  String get maximumAsk => 'Maximum Ask';
+  @override
+  String get minimumAsk => 'MinimumAsk';
 }

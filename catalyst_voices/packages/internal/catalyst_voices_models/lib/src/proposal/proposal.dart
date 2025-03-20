@@ -68,7 +68,7 @@ final class Proposal extends Equatable {
       updateDate: updateDate,
       fundsRequested:
           BaseProposalData.getProposalFundsRequested(data.document) ??
-              Coin.fromAda(0),
+              const Coin.fromWholeAda(0),
       status: ProposalStatus.inProgress,
       // TODO(LynxLynxx): from where we need to get the real publish
       publish: ProposalPublish.localDraft,
