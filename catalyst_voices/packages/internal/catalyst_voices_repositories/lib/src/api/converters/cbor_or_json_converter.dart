@@ -4,14 +4,14 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:chopper/chopper.dart';
 import 'package:http/http.dart' as http;
 
-/// A [Converter] which maintains a set of hardcoded [_cborRequests]
+/// A [Converter] which maintains a set of hardcoded [cborRequests]
 /// to decide between cbor/json content converters.
 ///
 /// The swagger_dart_code_generator package incorrectly generates
 /// request handlers for application/cbor requests therefore we are
 /// mapping out these requests to a proper converter type.
 class CborOrJsonDelegateConverter implements Converter {
-  static const _cborRequests = [
+  static const cborRequests = [
     (method: 'PUT', path: '/api/v1/document'),
   ];
 
@@ -47,7 +47,7 @@ class CborOrJsonDelegateConverter implements Converter {
   }
 
   bool _isCborRequest(http.BaseRequest request) {
-    for (final cborRequest in _cborRequests) {
+    for (final cborRequest in cborRequests) {
       if (cborRequest.method.equalsIgnoreCase(request.method) &&
           cborRequest.path.equalsIgnoreCase(request.url.path)) {
         return true;
