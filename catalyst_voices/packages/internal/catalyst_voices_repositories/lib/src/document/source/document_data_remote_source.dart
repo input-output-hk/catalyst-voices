@@ -3,8 +3,7 @@ import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_repositories/generated/api/cat_gateway.models.swagger.dart';
 import 'package:catalyst_voices_repositories/src/document/document_data_factory.dart';
 import 'package:catalyst_voices_repositories/src/dto/api/document_index_list_dto.dart';
-import 'package:flutter/foundation.dart';
-import 'package:uuid_plus/uuid_plus.dart';
+import 'package:catalyst_voices_repositories/src/dto/api/document_index_query_filters_dto.dart';
 
 final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
   final ApiServices _api;
@@ -34,13 +33,36 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
     return DocumentDataFactory.create(signedDocument);
   }
 
-  // TODO(damian-molinski): ask index api
   @override
-  Future<String?> getLatestVersion(String id) async => const Uuid().v7();
+  Future<String?> getLatestVersion(String id) async {
+    final response = await _api.gateway.apiV1DocumentIndexPost(
+      body: DocumentIndexQueryFilter(id: EqOrRangedIdDto.eq(id)),
+      limit: 1,
+    );
+
+    if (response.statusCode == ApiErrorResponseException.notFound) {
+      return null;
+    }
+
+    if (!response.isSuccessful) {
+      final statusCode = response.statusCode;
+      final error = response.error;
+
+      throw ApiErrorResponseException(statusCode: statusCode, error: error);
+    }
+
+    return response.body?.docs
+        .cast<Map<String, dynamic>>()
+        .map(DocumentIndexListDto.fromJson)
+        .firstOrNull
+        ?.ver
+        .firstOrNull
+        ?.ver;
+  }
 
   @override
   Future<List<SignedDocumentRef>> index() async {
-    final allRefs = <SignedDocumentRef>[];
+    final allRefs = <SignedDocumentRef>{};
 
     var page = 0;
     const maxPerPage = 100;
@@ -51,32 +73,14 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
         page: page,
         limit: maxPerPage,
       );
-      final refs = response.refs;
 
-      if (kDebugMode) {
-        print(
-          'page[$page] '
-          'response.docs.count[${response.docs.length}] '
-          'refs.count[${refs.length}] '
-          'remaining[${response.page.remaining}]',
-        );
-      }
-
-      allRefs.addAll(refs);
+      allRefs.addAll(response.refs);
 
       remaining = response.page.remaining;
       page = response.page.page + 1;
     } while (remaining > 0);
 
-    final uniqueRefs = allRefs.toSet().toList();
-    if (kDebugMode) {
-      print(
-        'allRefs.count[${allRefs.length}] '
-        'uniqueRefs.count[${uniqueRefs.length}]',
-      );
-    }
-
-    return uniqueRefs;
+    return allRefs.toList();
   }
 
   @override
