@@ -27,34 +27,9 @@ void main() async {
   tearDown(() async {
     await restartDependencies();
   });
-
   group(
-    'Account dropdown -',
+    'Account page -',
     () {
-      patrolWidgetTest(
-        tags: 'issues_1715',
-        skip: true,
-        'user - Account dropdown button opens account dropdown',
-        (PatrolTester $) async {
-          await $.pumpWidgetAndSettle(App(routerConfig: router));
-          await UnlockPasswordSuccessPanel($).goto();
-          await UnlockPasswordSuccessPanel($).clickGoToDashboard();
-          await AppBarPage($).accountPopupBtnClick();
-          await AccountDropdownPage($).accountDropdownLooksAsExpected();
-        },
-      );
-      patrolWidgetTest(
-        skip: true,
-        'user - Account dropdown Profile & Keychain button works',
-        (PatrolTester $) async {
-          await $.pumpWidgetAndSettle(App(routerConfig: router));
-          await UnlockPasswordSuccessPanel($).goto();
-          await UnlockPasswordSuccessPanel($).clickGoToDashboard();
-          await AppBarPage($).accountPopupBtnClick();
-          await AccountDropdownPage($).clickProfileAndKeychain();
-          await ProfilePage($).verifyPageElements();
-        },
-      );
       patrolWidgetTest(
           tags: 'issues_1715',
           skip: true,
@@ -121,6 +96,35 @@ void main() async {
         await AppBarPage($).visitorBtnIsVisible();
         await AppBarPage($).getStartedBtnIsVisible();
       });
+    },
+  );
+  group(
+    'Account dropdown -',
+    () {
+      patrolWidgetTest(
+        tags: 'issues_1715',
+        skip: true,
+        'user - Account dropdown button opens account dropdown',
+        (PatrolTester $) async {
+          await $.pumpWidgetAndSettle(App(routerConfig: router));
+          await UnlockPasswordSuccessPanel($).goto();
+          await UnlockPasswordSuccessPanel($).clickGoToDashboard();
+          await AppBarPage($).accountPopupBtnClick();
+          await AccountDropdownPage($).accountDropdownLooksAsExpected();
+        },
+      );
+      patrolWidgetTest(
+        skip: true,
+        'user - Account dropdown Profile & Keychain button works',
+        (PatrolTester $) async {
+          await $.pumpWidgetAndSettle(App(routerConfig: router));
+          await UnlockPasswordSuccessPanel($).goto();
+          await UnlockPasswordSuccessPanel($).clickGoToDashboard();
+          await AppBarPage($).accountPopupBtnClick();
+          await AccountDropdownPage($).clickProfileAndKeychain();
+          await ProfilePage($).verifyPageElements();
+        },
+      );
     },
   );
 }
