@@ -43,6 +43,7 @@ class KeychainDeletedDialog extends StatelessWidget {
             ),
             const SizedBox(height: 24),
             VoicesFilledButton(
+              key: const Key('KeychainDeletedDialogCloseButton'),
               onTap: () => Navigator.of(context).pop(),
               child: Text(context.l10n.close),
             ),

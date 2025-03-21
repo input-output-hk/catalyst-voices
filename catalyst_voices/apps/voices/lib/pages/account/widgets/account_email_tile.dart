@@ -61,6 +61,7 @@ class _AccountEmailTileState extends State<AccountEmailTile> {
       isEditMode: _isEditMode,
       isSaveEnabled: _email.isValid,
       child: VoicesEmailTextField(
+        key: const Key('AccountEmailTextField'),
         controller: _controller,
         focusNode: _focusNode,
         decoration: VoicesTextFieldDecoration(
