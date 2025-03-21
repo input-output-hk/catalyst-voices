@@ -29,6 +29,7 @@ final class DocumentDataFactory {
       campaignId: document.metadata.campaignId?.toModel(),
       electionId: document.metadata.electionId,
       categoryId: document.metadata.categoryId?.toModel(),
+      authors: document.signers,
     );
 
     final content = switch (document.payload) {
