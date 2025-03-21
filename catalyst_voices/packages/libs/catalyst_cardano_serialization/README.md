@@ -46,20 +46,19 @@ would be rejected.
 The caller must prove that they are eligible to spend the input UTXOs.
 
 ```dart
+// ignore_for_file: avoid_print
+
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
-import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
 import 'package:cbor/cbor.dart';
 import 'package:convert/convert.dart';
 
 /* cSpell:disable */
 Future<void> main() async {
-  await CatalystKeyDerivation.init();
-
   const txBuilderConfig = TransactionBuilderConfig(
     feeAlgo: TieredFee(
       constant: 155381,
       coefficient: 44,
-      refScriptByteCost: 0,
+      refScriptByteCost: 15,
     ),
     maxTxSize: 16384,
     maxValueSize: 5000,
@@ -131,9 +130,7 @@ Future<void> main() async {
   final unsignedTx = Transaction(
     body: txBody,
     isValid: true,
-    witnessSet: const TransactionWitnessSet(
-      vkeyWitnesses: {},
-    ),
+    witnessSet: const TransactionWitnessSet(),
   );
 
   final witnessSet = _signTransaction(unsignedTx);
