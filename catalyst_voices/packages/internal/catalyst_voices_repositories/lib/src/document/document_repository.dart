@@ -16,6 +16,7 @@ abstract interface class DocumentRepository {
     DraftDataSource drafts,
     SignedDocumentDataSource localDocuments,
     DocumentDataRemoteSource remoteDocuments,
+    DocumentFavoriteSource favoriteDocuments,
   ) = DocumentRepositoryImpl;
 
   /// Making sure document from [ref] is available locally.
@@ -82,6 +83,11 @@ abstract interface class DocumentRepository {
   /// Returns the reference to the imported document.
   Future<DocumentRef> importDocument({required Uint8List data});
 
+  /// Similar to [watchIsDocumentFavorite] but stops after first emit.
+  Future<bool> isDocumentFavorite({
+    required DocumentRef ref,
+  });
+
   Future<void> publishDocument({
     required SignedDocument document,
   });
@@ -93,12 +99,26 @@ abstract interface class DocumentRepository {
     required String id,
   });
 
+  /// Updates fav status matching [ref].
+  Future<void> updateDocumentFavorite({
+    required DocumentRef ref,
+    required DocumentType type,
+    required bool isFavorite,
+  });
+
   /// Creates/updates a local document draft.
   ///
   /// If watching same draft with [watchDocument] it will emit
   /// change.
   Future<void> upsertDocumentDraft({
     required DocumentData document,
+  });
+
+  /// Emits list of all favorite ids.
+  ///
+  /// All returned ids are loose and won't specify version.
+  Stream<List<String>> watchAllDocumentsFavoriteIds({
+    DocumentType? type,
   });
 
   Stream<int> watchCount({
@@ -124,13 +144,18 @@ abstract interface class DocumentRepository {
     bool getLocalDrafts = false,
     CatalystId? authorId,
   });
+
+  /// Emits changes to fav status of [ref].
+  Stream<bool> watchIsDocumentFavorite({
+    required DocumentRef ref,
+  });
 }
 
 final class DocumentRepositoryImpl implements DocumentRepository {
-  // ignore: unused_field
   final DraftDataSource _drafts;
   final SignedDocumentDataSource _localDocuments;
   final DocumentDataRemoteSource _remoteDocuments;
+  final DocumentFavoriteSource _favoriteDocuments;
 
   final _documentDataLock = Lock();
 
@@ -138,6 +163,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     this._drafts,
     this._localDocuments,
     this._remoteDocuments,
+    this._favoriteDocuments,
   );
 
   @override
@@ -229,6 +255,13 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   }
 
   @override
+  Future<bool> isDocumentFavorite({required DocumentRef ref}) {
+    assert(!ref.isExact, 'Favorite ref have to be loose!');
+
+    return _favoriteDocuments.watchIsDocumentFavorite(ref.id).first;
+  }
+
+  @override
   Future<void> publishDocument({required SignedDocument document}) async {
     await _remoteDocuments.publish(document);
   }
@@ -250,6 +283,21 @@ final class DocumentRepositoryImpl implements DocumentRepository {
           ),
         )
         .toList();
+  }
+
+  @override
+  Future<void> updateDocumentFavorite({
+    required DocumentRef ref,
+    required DocumentType type,
+    required bool isFavorite,
+  }) {
+    assert(!ref.isExact, 'Favorite ref have to be loose!');
+
+    return _favoriteDocuments.updateDocumentFavorite(
+      ref.id,
+      type: type,
+      isFavorite: isFavorite,
+    );
   }
 
   @override
@@ -338,6 +386,13 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   }
 
   @override
+  Stream<List<String>> watchAllDocumentsFavoriteIds({
+    DocumentType? type,
+  }) {
+    return _favoriteDocuments.watchAllFavoriteIds(type: type);
+  }
+
+  @override
   Stream<int> watchCount({
     required DocumentRef ref,
     required DocumentType type,
@@ -419,6 +474,13 @@ final class DocumentRepositoryImpl implements DocumentRepository {
         },
       );
     });
+  }
+
+  @override
+  Stream<bool> watchIsDocumentFavorite({required DocumentRef ref}) {
+    assert(!ref.isExact, 'Favorite ref have to be loose!');
+
+    return _favoriteDocuments.watchIsDocumentFavorite(ref.id);
   }
 
   Future<DocumentData> _getDraftDocumentData({

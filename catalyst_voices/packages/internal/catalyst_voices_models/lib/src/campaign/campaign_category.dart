@@ -16,7 +16,10 @@ final staticCampaignCategories = [
     availableFunds: const Coin(0),
     imageUrl: '',
     totalAsk: const Coin(0),
-    range: const Range(min: 0, max: 0),
+    range: const ComparableRange(
+      min: Coin.fromWholeAda(30000),
+      max: Coin.fromWholeAda(100000),
+    ),
     descriptions: const [],
     requirements: const [],
     submissionCloseDate: DateTime.now(),
@@ -32,7 +35,10 @@ final staticCampaignCategories = [
     availableFunds: const Coin(0),
     imageUrl: '',
     totalAsk: const Coin(0),
-    range: const Range(min: 0, max: 0),
+    range: const ComparableRange(
+      min: Coin.fromWholeAda(30000),
+      max: Coin.fromWholeAda(100000),
+    ),
     descriptions: const [],
     requirements: const [],
     submissionCloseDate: DateTime.now(),
@@ -49,7 +55,10 @@ Accepts early stage ideas to deliver proof of concept, design research and basic
     availableFunds: const Coin(0),
     imageUrl: '',
     totalAsk: const Coin(0),
-    range: const Range(min: 0, max: 0),
+    range: const ComparableRange(
+      min: Coin.fromWholeAda(30000),
+      max: Coin.fromWholeAda(100000),
+    ),
     descriptions: const [],
     requirements: const [],
     submissionCloseDate: DateTime.now(),
@@ -65,7 +74,10 @@ Accepts early stage ideas to deliver proof of concept, design research and basic
     availableFunds: const Coin(0),
     imageUrl: '',
     totalAsk: const Coin(0),
-    range: const Range(min: 0, max: 0),
+    range: const ComparableRange(
+      min: Coin.fromWholeAda(30000),
+      max: Coin.fromWholeAda(100000),
+    ),
     descriptions: const [],
     requirements: const [],
     submissionCloseDate: DateTime.now(),
@@ -82,7 +94,10 @@ Fuels the fly-wheels of innovation to ignite premium R&D projects that benefit C
     availableFunds: const Coin(0),
     imageUrl: '',
     totalAsk: const Coin(0),
-    range: const Range(min: 0, max: 0),
+    range: const ComparableRange(
+      min: Coin.fromWholeAda(30000),
+      max: Coin.fromWholeAda(100000),
+    ),
     descriptions: const [],
     requirements: const [],
     submissionCloseDate: DateTime.now(),
@@ -99,7 +114,10 @@ Fuels adoption by igniting premium advertising or venture building partnerships 
     availableFunds: const Coin(0),
     imageUrl: '',
     totalAsk: const Coin(0),
-    range: const Range(min: 0, max: 0),
+    range: const ComparableRange(
+      min: Coin.fromWholeAda(30000),
+      max: Coin.fromWholeAda(100000),
+    ),
     descriptions: const [],
     requirements: const [],
     submissionCloseDate: DateTime.now(),
@@ -114,7 +132,10 @@ Fuels adoption by igniting premium advertising or venture building partnerships 
     availableFunds: const Coin(0),
     imageUrl: '',
     totalAsk: const Coin(0),
-    range: const Range(min: 0, max: 0),
+    range: const ComparableRange(
+      min: Coin.fromWholeAda(30000),
+      max: Coin.fromWholeAda(100000),
+    ),
     descriptions: const [],
     requirements: const [],
     submissionCloseDate: DateTime.now(),
@@ -129,7 +150,10 @@ Fuels adoption by igniting premium advertising or venture building partnerships 
     availableFunds: const Coin(0),
     imageUrl: '',
     totalAsk: const Coin(0),
-    range: const Range(min: 0, max: 0),
+    range: const ComparableRange(
+      min: Coin.fromWholeAda(30000),
+      max: Coin.fromWholeAda(100000),
+    ),
     descriptions: const [],
     requirements: const [],
     submissionCloseDate: DateTime.now(),
@@ -144,7 +168,10 @@ Fuels adoption by igniting premium advertising or venture building partnerships 
     availableFunds: const Coin(0),
     imageUrl: '',
     totalAsk: const Coin(0),
-    range: const Range(min: 0, max: 0),
+    range: const ComparableRange(
+      min: Coin.fromWholeAda(30000),
+      max: Coin.fromWholeAda(100000),
+    ),
     descriptions: const [],
     requirements: const [],
     submissionCloseDate: DateTime.now(),
@@ -159,7 +186,10 @@ Fuels adoption by igniting premium advertising or venture building partnerships 
     availableFunds: const Coin(0),
     imageUrl: '',
     totalAsk: const Coin(0),
-    range: const Range(min: 0, max: 0),
+    range: const ComparableRange(
+      min: Coin.fromWholeAda(30000),
+      max: Coin.fromWholeAda(100000),
+    ),
     descriptions: const [],
     requirements: const [],
     submissionCloseDate: DateTime.now(),
@@ -174,7 +204,10 @@ Fuels adoption by igniting premium advertising or venture building partnerships 
     availableFunds: const Coin(0),
     imageUrl: '',
     totalAsk: const Coin(0),
-    range: const Range(min: 0, max: 0),
+    range: const ComparableRange(
+      min: Coin.fromWholeAda(30000),
+      max: Coin.fromWholeAda(100000),
+    ),
     descriptions: const [],
     requirements: const [],
     submissionCloseDate: DateTime.now(),
@@ -189,7 +222,10 @@ Fuels adoption by igniting premium advertising or venture building partnerships 
     availableFunds: const Coin(0),
     imageUrl: '',
     totalAsk: const Coin(0),
-    range: const Range(min: 0, max: 0),
+    range: const ComparableRange(
+      min: Coin.fromWholeAda(30000),
+      max: Coin.fromWholeAda(100000),
+    ),
     descriptions: const [],
     requirements: const [],
     submissionCloseDate: DateTime.now(),
@@ -205,7 +241,7 @@ class CampaignCategory extends Equatable {
   final int proposalsCount;
   final Coin availableFunds;
   final Coin totalAsk;
-  final Range<int> range;
+  final ComparableRange<Coin> range;
   final List<CategoryDescription> descriptions;
   final String imageUrl;
   final List<String> requirements;
@@ -256,7 +292,7 @@ class CampaignCategory extends Equatable {
     Coin? availableFunds,
     String? imageUrl,
     Coin? totalAsk,
-    Range<int>? range,
+    ComparableRange<Coin>? range,
     List<CategoryDescription>? descriptions,
     List<String>? requirements,
     DateTime? submissionCloseDate,

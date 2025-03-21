@@ -12,6 +12,7 @@ export 'document/source/database_drafts_data_source.dart';
 export 'document/source/document_data_local_source.dart';
 export 'document/source/document_data_remote_source.dart';
 export 'document/source/document_data_source.dart';
+export 'document/source/document_favorites_source.dart';
 export 'dto/document/document_dto.dart' show DocumentExt;
 export 'proposal/proposal_repository.dart' show ProposalRepository;
 export 'signed_document/signed_document_json_payload.dart';

@@ -5,13 +5,11 @@ import 'package:equatable/equatable.dart';
 final class WorkspaceState extends Equatable {
   final bool isLoading;
   final LocalizedException? error;
-  final DocumentRef? importedProposalRef;
   final List<Proposal> userProposals;
 
   const WorkspaceState({
     this.isLoading = false,
     this.error,
-    this.importedProposalRef,
     this.userProposals = const [],
   });
 
@@ -19,7 +17,6 @@ final class WorkspaceState extends Equatable {
   List<Object?> get props => [
         isLoading,
         error,
-        importedProposalRef,
         userProposals,
       ];
 
@@ -35,13 +32,11 @@ final class WorkspaceState extends Equatable {
     String? searchQuery,
     List<WorkspaceProposalListItem>? proposals,
     Optional<LocalizedException>? error,
-    Optional<DocumentRef>? importedProposalRef,
     List<Proposal>? userProposals,
   }) {
     return WorkspaceState(
       isLoading: isLoading ?? this.isLoading,
       error: error.dataOr(this.error),
-      importedProposalRef: importedProposalRef.dataOr(this.importedProposalRef),
       userProposals: userProposals ?? this.userProposals,
     );
   }
