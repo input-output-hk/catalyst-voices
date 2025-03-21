@@ -58,6 +58,7 @@ export 'proposal/proposal_pagination_request.dart';
 export 'proposal/proposal_version.dart';
 export 'registration/registration.dart';
 export 'signed_document/signed_document.dart';
+export 'signed_document/signed_document_payload.dart';
 export 'user/account.dart';
 export 'user/account_role.dart';
 export 'user/catalyst_id.dart';
