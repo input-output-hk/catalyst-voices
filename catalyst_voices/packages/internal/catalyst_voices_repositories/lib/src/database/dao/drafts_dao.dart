@@ -184,8 +184,11 @@ class DriftDraftsDao extends DatabaseAccessor<DriftCatalystDatabase>
       query.where((doc) => doc.type.equals(type.uuid));
     }
     if (authorId != null) {
-      // TODO(LynxLynxx): filter when catalystId is implemented as metadata
-      // query.where((doc) => doc.metadata.catalystId.equals(catalystId.uuid));
+      query.where(
+        (doc) => CustomExpression<bool>(
+          "json_extract(metadata, '\$.authors') LIKE '%$authorId%'",
+        ),
+      );
     }
 
     query.orderBy([
