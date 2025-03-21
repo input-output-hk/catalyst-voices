@@ -50,7 +50,9 @@ class WorkspaceProposalCard extends StatelessWidget {
               children: [
                 _Body(proposal),
                 Offstage(
-                  offstage: isSubmitted || isLocalDraft,
+                  offstage: isSubmitted ||
+                      isLocalDraft ||
+                      proposal.versions.length < 2,
                   child: ProposalIterationHistory(
                     proposal: proposal,
                   ),
