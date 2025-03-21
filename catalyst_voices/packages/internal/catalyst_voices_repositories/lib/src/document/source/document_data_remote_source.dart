@@ -134,7 +134,6 @@ extension on DocumentIndexList {
         .map(DocumentIndexListDto.fromJson)
         .map((ref) {
           return <SignedDocumentRef>[
-            SignedDocumentRef(id: ref.id),
             ...ref.ver.map((ver) {
               return <SignedDocumentRef>[
                 SignedDocumentRef(id: ref.id, version: ver.ver),
