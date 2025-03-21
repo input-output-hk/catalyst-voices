@@ -1,27 +1,12 @@
 import 'package:catalyst_voices/widgets/buttons/voices_buttons.dart';
 import 'package:catalyst_voices/widgets/common/tab_bar_stack_view.dart';
-import 'package:catalyst_voices/widgets/containers/space_scaffold.dart';
 import 'package:catalyst_voices/widgets/headers/section_header.dart';
+import 'package:catalyst_voices/widgets/widgets.dart' show SidebarScaffold;
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:flutter/material.dart';
 
-/// Defines [Tab] inside [SpaceSidePanel].
-class SpaceSidePanelTab {
-  /// Displayed label for this tab.
-  final String name;
-
-  /// What is shown when this tab is selected.
-  // Note. This maybe should be [WidgetBuilder].
-  final Widget body;
-
-  SpaceSidePanelTab({
-    required this.name,
-    required this.body,
-  });
-}
-
 /// Defines usual space panel. This widget is opinionated and should
-/// be used together with [SpaceScaffold].
+/// be used together with [SidebarScaffold].
 ///
 /// Always have [name], [tabs] and tabs content [SpaceSidePanelTab.body].
 class SpaceSidePanel extends StatefulWidget {
@@ -49,36 +34,73 @@ class SpaceSidePanel extends StatefulWidget {
   State<SpaceSidePanel> createState() => _SpaceSidePanelState();
 }
 
+/// Defines [Tab] inside [SpaceSidePanel].
+class SpaceSidePanelTab {
+  /// Displayed label for this tab.
+  final String name;
+
+  /// What is shown when this tab is selected.
+  // Note. This maybe should be [WidgetBuilder].
+  final Widget body;
+
+  SpaceSidePanelTab({
+    required this.name,
+    required this.body,
+  });
+}
+
+class _Container extends StatelessWidget {
+  final EdgeInsetsGeometry margin;
+  final BorderRadiusGeometry borderRadius;
+  final Widget child;
+
+  const _Container({
+    required this.margin,
+    required this.borderRadius,
+    required this.child,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: margin,
+      decoration: BoxDecoration(
+        color: Theme.of(context).colors.elevationsOnSurfaceNeutralLv1White,
+        borderRadius: borderRadius,
+      ),
+      padding: const EdgeInsets.all(12),
+      child: child,
+    );
+  }
+}
+
+class _Header extends StatelessWidget {
+  final String name;
+  final VoidCallback? onCollapseTap;
+  final bool isLeft;
+
+  const _Header({
+    required this.name,
+    this.onCollapseTap,
+    required this.isLeft,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SectionHeader(
+      leading: isLeft ? LeftArrowButton(onTap: onCollapseTap) : null,
+      title: Text(name),
+      trailing: [
+        if (!isLeft) RightArrowButton(onTap: onCollapseTap),
+      ],
+    );
+  }
+}
+
 class _SpaceSidePanelState extends State<SpaceSidePanel>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<Offset> _offsetAnimation;
-
-  @override
-  void initState() {
-    super.initState();
-
-    _controller = AnimationController(
-      duration: const Duration(milliseconds: 300),
-      vsync: this,
-    );
-
-    _offsetAnimation = Tween<Offset>(
-      begin: Offset.zero,
-      end: widget.isLeft ? const Offset(-1, 0) : const Offset(1, 0),
-    ).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: Curves.easeInOut,
-      ),
-    );
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -148,52 +170,30 @@ class _SpaceSidePanelState extends State<SpaceSidePanel>
       ),
     );
   }
-}
-
-class _Container extends StatelessWidget {
-  final EdgeInsetsGeometry margin;
-  final BorderRadiusGeometry borderRadius;
-  final Widget child;
-
-  const _Container({
-    required this.margin,
-    required this.borderRadius,
-    required this.child,
-  });
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: margin,
-      decoration: BoxDecoration(
-        color: Theme.of(context).colors.elevationsOnSurfaceNeutralLv1White,
-        borderRadius: borderRadius,
-      ),
-      padding: const EdgeInsets.all(12),
-      child: child,
-    );
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
-}
-
-class _Header extends StatelessWidget {
-  final String name;
-  final VoidCallback? onCollapseTap;
-  final bool isLeft;
-
-  const _Header({
-    required this.name,
-    this.onCollapseTap,
-    required this.isLeft,
-  });
 
   @override
-  Widget build(BuildContext context) {
-    return SectionHeader(
-      leading: isLeft ? LeftArrowButton(onTap: onCollapseTap) : null,
-      title: Text(name),
-      trailing: [
-        if (!isLeft) RightArrowButton(onTap: onCollapseTap),
-      ],
+  void initState() {
+    super.initState();
+
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
+
+    _offsetAnimation = Tween<Offset>(
+      begin: Offset.zero,
+      end: widget.isLeft ? const Offset(-1, 0) : const Offset(1, 0),
+    ).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: Curves.easeInOut,
+      ),
     );
   }
 }

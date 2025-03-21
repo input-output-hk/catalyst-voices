@@ -23,6 +23,23 @@ class ProposalContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return SelectionArea(
+      child: _SegmentsListenable(
+        scrollController: scrollController,
+      ),
+    );
+  }
+}
+
+class _SegmentsListenable extends StatelessWidget {
+  final ItemScrollController scrollController;
+
+  const _SegmentsListenable({
+    required this.scrollController,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return ValueListenableBuilder(
       valueListenable: SegmentsControllerScope.of(context),
       builder: (context, value, child) {
@@ -52,7 +69,7 @@ class _SegmentsListView extends StatelessWidget {
       key: const ValueKey('ProposalSegmentsListView'),
       items: items,
       itemScrollController: scrollController,
-      padding: const EdgeInsets.only(top: 16, bottom: 64),
+      padding: const EdgeInsets.only(top: 56, bottom: 64),
       itemBuilder: (context, index) {
         final item = items[index];
         final nextItem = items.elementAtOrNull(index + 1);

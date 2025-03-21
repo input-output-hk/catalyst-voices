@@ -18,13 +18,17 @@ class ProposalDeliveryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      width: double.infinity,
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
       decoration: BoxDecoration(
         color: context.colors.onSurfaceNeutralOpaqueLv1,
         borderRadius: BorderRadius.circular(8),
       ),
-      child: Row(
+      child: Wrap(
         spacing: 16,
+        runSpacing: 8,
+        alignment: WrapAlignment.spaceAround,
+        runAlignment: WrapAlignment.center,
         children: [
           _ValueCell(
             title: context.l10n.proposalViewFundingRequested,
@@ -50,7 +54,7 @@ class ProposalDeliveryCard extends StatelessWidget {
                 .trim(),
             valueSuffix: '$milestoneCount',
           ),
-        ].map<Widget>((e) => Expanded(child: e)).toList(),
+        ],
       ),
     );
   }
@@ -94,6 +98,8 @@ class _ValueCell extends StatelessWidget {
           children: <Widget>[
             Text(
               valueSuffix,
+              maxLines: 1,
+              overflow: TextOverflow.clip,
               style: textTheme.headlineSmall
                   ?.copyWith(color: colors.textOnPrimaryLevel1),
             ),
