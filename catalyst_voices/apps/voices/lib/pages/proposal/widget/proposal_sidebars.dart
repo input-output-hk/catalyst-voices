@@ -24,12 +24,12 @@ class ProposalSidebars extends StatelessWidget {
             padding: EdgeInsets.symmetric(horizontal: spacing / 2),
             child: navPanel,
           ),
-          bodyConstraints: const BoxConstraints.expand(),
           spacing: 0,
           body: Padding(
             padding: EdgeInsets.only(right: spacing),
             child: body,
           ),
+          bodyConstraints: const BoxConstraints.expand(),
         );
       },
     );

@@ -92,6 +92,7 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
             controller: _segmentsScrollController,
             onRetryTap: _updateSource,
           ),
+          bodyConstraints: const BoxConstraints.expand(),
           rightRail: const ProposalBuilderSetupPanel(),
         ),
       ),
