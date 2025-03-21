@@ -2,6 +2,7 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_repositories/generated/api/cat_gateway.models.swagger.dart';
 import 'package:catalyst_voices_repositories/src/document/document_data_factory.dart';
+import 'package:catalyst_voices_repositories/src/dto/api/document_index_list_dto.dart';
 import 'package:flutter/foundation.dart';
 import 'package:uuid_plus/uuid_plus.dart';
 
@@ -39,7 +40,7 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
 
   @override
   Future<List<SignedDocumentRef>> index() async {
-    final refs = <SignedDocumentRef>[];
+    final allRefs = <SignedDocumentRef>[];
 
     var page = 0;
     const maxPerPage = 100;
@@ -50,22 +51,32 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
         page: page,
         limit: maxPerPage,
       );
+      final refs = response.refs;
 
       if (kDebugMode) {
         print(
           'page[$page] '
-          'refs.count[${response.docs.length}] '
+          'response.docs.count[${response.docs.length}] '
+          'refs.count[${refs.length}] '
           'remaining[${response.page.remaining}]',
         );
       }
 
-      refs.addAll(response.refs);
+      allRefs.addAll(refs);
 
       remaining = response.page.remaining;
       page = response.page.page + 1;
     } while (remaining > 0);
 
-    return refs;
+    final uniqueRefs = allRefs.toSet().toList();
+    if (kDebugMode) {
+      print(
+        'allRefs.count[${allRefs.length}] '
+        'uniqueRefs.count[${uniqueRefs.length}]',
+      );
+    }
+
+    return uniqueRefs;
   }
 
   @override
@@ -87,6 +98,8 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
   }) async {
     final response = await _api.gateway.apiV1DocumentIndexPost(
       body: const DocumentIndexQueryFilter(),
+      limit: limit,
+      page: page,
     );
 
     if (!response.isSuccessful) {
@@ -112,6 +125,30 @@ abstract interface class DocumentDataRemoteSource
 
 extension on DocumentIndexList {
   List<SignedDocumentRef> get refs {
-    return [];
+    return docs
+        .cast<Map<String, dynamic>>()
+        .map(DocumentIndexListDto.fromJson)
+        .map((ref) {
+          return <SignedDocumentRef>[
+            SignedDocumentRef(id: ref.id),
+            ...ref.ver.map((ver) {
+              return <SignedDocumentRef>[
+                SignedDocumentRef(id: ref.id, version: ver.ver),
+                if (ver.ref != null) ver.ref!.toRef(),
+                if (ver.reply != null) ver.reply!.toRef(),
+                if (ver.template != null) ver.template!.toRef(),
+                if (ver.brand != null) ver.brand!.toRef(),
+                if (ver.campaign != null) ver.campaign!.toRef(),
+                if (ver.category != null) ver.category!.toRef(),
+              ];
+            }).expand((element) => element),
+          ];
+        })
+        .expand((element) => element)
+        .toList();
   }
+}
+
+extension on DocumentRefForFilteredDocuments {
+  SignedDocumentRef toRef() => SignedDocumentRef(id: id, version: ver);
 }
