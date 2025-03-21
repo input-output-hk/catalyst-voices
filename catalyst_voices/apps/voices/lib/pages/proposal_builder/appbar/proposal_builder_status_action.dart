@@ -10,6 +10,7 @@ import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -24,7 +25,9 @@ class ProposalBuilderStatusAction extends StatelessWidget {
       selector: (state) {
         return (
           offstage: state.isChanging || state.error != null,
-          items: ProposalMenuItemAction.availableOptions(state.metadata.publish)
+          items: ProposalMenuItemAction.availableOptions(
+            state.metadata.publish,
+          )
         );
       },
       builder: (context, state) {
@@ -87,9 +90,8 @@ class _MenuItem extends StatelessWidget {
     final description = item.description(context, metadata);
 
     return ListTile(
-      title: Text(
-        title,
-        style: Theme.of(context).textTheme.bodyLarge,
+      title: MarkdownText(
+        MarkdownData(title),
       ),
       subtitle: description == null
           ? null
@@ -99,7 +101,7 @@ class _MenuItem extends StatelessWidget {
                     color: Theme.of(context).colors.textOnPrimaryLevel1,
                   ),
             ),
-      leading: item.icon(workspace: true).buildIcon(),
+      leading: item.icon().buildIcon(),
       mouseCursor: item.clickable ? SystemMouseCursors.click : null,
     );
   }

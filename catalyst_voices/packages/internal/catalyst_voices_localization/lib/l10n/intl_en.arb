@@ -1553,7 +1553,7 @@
       }
     }
   },
-  "proposalEditorStatusDropdownPublishTitle": "Publish new iteration · Draft Iteration {iteration}",
+  "proposalEditorStatusDropdownPublishTitle": "**Share new draft** · Draft Iteration {iteration}",
   "@proposalEditorStatusDropdownPublishTitle": {
     "description": "Action title to publish a new version of the draft proposal.",
     "placeholders": {
@@ -1562,11 +1562,11 @@
       }
     }
   },
-  "proposalEditorStatusDropdownPublishDescription": "Share draft for public feedback",
+  "proposalEditorStatusDropdownPublishDescription": "Share draft for feedback",
   "@proposalEditorStatusDropdownPublishDescription": {
     "description": "Action description to publish a new version of the draft proposal."
   },
-  "proposalEditorStatusDropdownSubmitTitle": "Submit to review stage · Iteration {iteration} as Final",
+  "proposalEditorStatusDropdownSubmitTitle": "**Submit For Review** · Iteration {iteration} as Final",
   "@proposalEditorStatusDropdownSubmitTitle": {
     "description": "Action title to submit the final proposal.",
     "placeholders": {
@@ -1575,7 +1575,7 @@
       }
     }
   },
-  "proposalEditorStatusDropdownSubmitDescription": "Enter proposal into the next governance round",
+  "proposalEditorStatusDropdownSubmitDescription": "Submit as final proposal for review / voting",
   "@proposalEditorStatusDropdownSubmitDescription": {
     "description": "Action description to submit the final proposal."
   },
@@ -2023,5 +2023,25 @@
   "shortSummary": "Short summary",
   "@shortSummary": {
     "description": "A short description of something"
+  },
+  "view": "View",
+  "@view": {
+    "description": "A label for the view button. Used to see more details."
+  },
+  "share": "Share",
+  "@share": {
+    "description": "A label for the share button. Used to share something."
+  },
+  "forgetProposal": "Forget proposal",
+  "@forgetProposal": {
+    "description": "A label for the forget proposal button. Used to make hide action on document."
+  },
+  "export": "Export",
+  "@export": {
+    "description": "A label for the export button. Used to export something."
+  },
+  "unlockAndEdit": "Unlock & Edit",
+  "@unlockAndEdit": {
+    "description": "Used for making new draft proposal from final proposal."
   }
 }

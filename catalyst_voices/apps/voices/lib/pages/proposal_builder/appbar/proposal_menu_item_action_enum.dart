@@ -75,6 +75,7 @@ enum ProposalMenuItemAction {
         context.l10n.proposalEditorStatusDropdownPublishTitle(nextIteration),
       ProposalMenuItemAction.submit =>
         context.l10n.proposalEditorStatusDropdownSubmitTitle(nextIteration),
+      ProposalMenuItemAction.forget => context.l10n.forgetProposal,
       ProposalMenuItemAction.export =>
         context.l10n.proposalEditorStatusDropdownExportTitle,
       ProposalMenuItemAction.delete =>
@@ -86,12 +87,13 @@ enum ProposalMenuItemAction {
   String workspaceTitle(BuildContext context, ProposalPublish proposalPublish) {
     final isFinal = proposalPublish.isPublished;
     return switch (this) {
-      ProposalMenuItemAction.edit => isFinal ? 'Unlock & Edit' : 'Edit',
-      ProposalMenuItemAction.view => 'View',
-      ProposalMenuItemAction.share => 'Share',
-      ProposalMenuItemAction.forget => 'Forget proposal',
-      ProposalMenuItemAction.export => 'Export',
-      ProposalMenuItemAction.delete => 'Delete',
+      ProposalMenuItemAction.edit =>
+        isFinal ? context.l10n.unlockAndEdit : context.l10n.editButtonText,
+      ProposalMenuItemAction.view => context.l10n.view,
+      ProposalMenuItemAction.share => context.l10n.share,
+      ProposalMenuItemAction.forget => context.l10n.share,
+      ProposalMenuItemAction.export => context.l10n.export,
+      ProposalMenuItemAction.delete => context.l10n.delete,
       _ => '',
     };
   }
@@ -128,8 +130,7 @@ enum ProposalMenuItemAction {
       case ProposalPublish.localDraft:
         return [view, back, publish, submit, export, delete];
       case ProposalPublish.publishedDraft:
-        // TODO(dtscalac): delete? revert?
-        return [view, back, submit, export];
+        return [view, back, submit, forget, export];
       case ProposalPublish.submittedProposal:
         // Submitted can't be open in editor
         return [];
