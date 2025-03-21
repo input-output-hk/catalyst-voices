@@ -55,15 +55,16 @@ void main() {
         final templateData = await VoicesDocumentsTemplates.proposalF14Schema;
         final proposalData = await VoicesDocumentsTemplates.proposalF14Document;
 
-        final templateRef =
-            DocumentRefFactory.buildSigned(id: mockedTemplateUuid);
+        final templateRef = DocumentRefFactory.buildSigned(
+          id: const Uuid().v7(),
+        );
         final template = DocumentDataFactory.build(
           selfRef: templateRef,
           type: DocumentType.proposalTemplate,
           content: DocumentDataContent(templateData),
         );
         final proposal = DocumentDataFactory.build(
-          selfRef: DocumentRefFactory.buildSigned(id: mockedDocumentUuid),
+          selfRef: DocumentRefFactory.buildSigned(id: const Uuid().v7()),
           type: DocumentType.proposalDocument,
           template: templateRef,
           content: DocumentDataContent(proposalData),
@@ -91,11 +92,11 @@ void main() {
     test('getDocument correctly propagates errors', () async {
       // Given
       final templateRef = SignedDocumentRef(
-        id: mockedTemplateUuid,
+        id: const Uuid().v7(),
         version: const Uuid().v7(),
       );
       final proposal = DocumentDataFactory.build(
-        selfRef: DocumentRefFactory.buildSigned(id: mockedDocumentUuid),
+        selfRef: DocumentRefFactory.buildSigned(id: const Uuid().v7()),
         type: DocumentType.proposalDocument,
         template: templateRef,
         content: const DocumentDataContent({}),

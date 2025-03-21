@@ -407,9 +407,6 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   Stream<DocumentsDataWithRefData> watchDocument({
     required DocumentRef ref,
   }) {
-    // TODO(damian-molinski): remove this override once we have API
-    ref = ref.copyWith(id: mockedDocumentUuid);
-
     return watchDocumentWithRef(
       ref: ref,
       refGetter: (data) => data.metadata.template!,

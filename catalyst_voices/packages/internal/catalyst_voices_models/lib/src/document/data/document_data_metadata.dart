@@ -23,11 +23,11 @@ final class DocumentDataMetadata extends Equatable {
 
   /// uuid-v4
   /// Represents a "brand" who is running the voting, e.g. Catalyst, Midnight.
-  final String? brandId;
+  final SignedDocumentRef? brandId;
 
   /// uuid-v4
   /// Defines a "campaign" of voting, e.g. "treasury campaign".
-  final String? campaignId;
+  final SignedDocumentRef? campaignId;
 
   /// uuid-v4
   /// Defines an election, e.g. "Catalyst Fund 1", "Catalyst Fund 2".
@@ -77,8 +77,8 @@ final class DocumentDataMetadata extends Equatable {
     Optional<DocumentRef>? ref,
     Optional<SecuredDocumentRef>? refHash,
     Optional<SignedDocumentRef>? template,
-    Optional<String>? brandId,
-    Optional<String>? campaignId,
+    Optional<SignedDocumentRef>? brandId,
+    Optional<SignedDocumentRef>? campaignId,
     Optional<String>? electionId,
     Optional<SignedDocumentRef>? categoryId,
   }) {
