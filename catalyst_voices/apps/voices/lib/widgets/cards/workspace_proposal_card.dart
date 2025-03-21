@@ -1,12 +1,11 @@
 import 'dart:async';
 
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
+import 'package:catalyst_voices/pages/workspace/proposal_menu_action_button.dart';
 import 'package:catalyst_voices/routes/routing/proposal_builder_route.dart';
 import 'package:catalyst_voices/widgets/cards/proposal_card_widgets.dart';
 import 'package:catalyst_voices/widgets/cards/proposal_iteration_history_card.dart';
 import 'package:catalyst_voices/widgets/text/last_edit_date.dart';
-import 'package:catalyst_voices/widgets/widgets.dart';
-import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
@@ -105,15 +104,9 @@ class _Body extends StatelessWidget {
               : commentsCount.toString(),
           subValue: context.l10n.comments,
         ),
-        VoicesIconButton(
-          onTap: () {
-            // TODO(dtscalac): call menu actions
-          },
-          style: IconButton.styleFrom(
-            foregroundColor:
-                isSubmitted ? context.colors.textOnPrimaryWhite : null,
-          ),
-          child: VoicesAssets.icons.dotsVertical.buildIcon(),
+        ProposalMenuActionButton(
+          ref: proposal.selfRef,
+          proposalPublish: proposal.publish,
         ),
       ],
     );

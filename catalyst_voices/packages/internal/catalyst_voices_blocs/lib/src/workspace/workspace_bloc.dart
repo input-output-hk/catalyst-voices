@@ -88,7 +88,15 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
       (proposals) {
         if (isClosed) return;
         _logger.info('Stream received ${proposals.length} proposals');
-        add(LoadProposalsEvent(proposals));
+        // TODO(LynxLynxx): only for testing delete before PR
+        final proposalsToDelete = <Proposal>[];
+        for (var i = 0; i < proposals.length; i++) {
+          proposalsToDelete.add(
+            proposals[i].copyWith(publish: ProposalPublish.values[i]),
+          );
+        }
+
+        add(LoadProposalsEvent(proposalsToDelete));
       },
       onError: (Object error) {
         if (isClosed) return;
