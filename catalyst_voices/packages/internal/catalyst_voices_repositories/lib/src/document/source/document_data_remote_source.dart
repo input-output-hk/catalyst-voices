@@ -21,21 +21,16 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
         version: ref.version,
       );
 
-      // TODO(damian-molinski): mapping errors if response not successful
       if (!response.isSuccessful) {
-        // throw exception.
+        final statusCode = response.statusCode;
+        final error = response.error;
+
+        throw ApiErrorResponseException(statusCode: statusCode, error: error);
       }
 
       final bytes = response.bodyBytes;
-
       final signedDocument = await _signedDocumentManager.parseDocument(bytes);
-      final documentData = DocumentDataFactory.create(signedDocument);
-
-      if (kDebugMode) {
-        debugPrint('DocumentData: $documentData');
-      }
-
-      return documentData;
+      return DocumentDataFactory.create(signedDocument);
     } catch (error, stack) {
       if (kDebugMode) {
         debugPrint(error.toString());
