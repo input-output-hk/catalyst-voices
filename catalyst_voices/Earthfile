@@ -1,8 +1,7 @@
 VERSION 0.8
 
 IMPORT ../catalyst-gateway AS catalyst-gateway
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:v3.2.40 AS flutter-ci
-
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:v3.3.1 AS flutter-ci
 
 # repo-catalyst-voices - Creates artifacts of all configuration files,
 # packages and folders related to catalyst_voices frontend.
@@ -98,9 +97,13 @@ check-license:
     RUN melos run license-check
 
 # Run unit tests
-test-unit:
+test-unit-native:
     FROM +code-generator
-    DO flutter-ci+UNIT_TESTS
+    DO flutter-ci+UNIT_TESTS --PLATFORM=native --REPORT=true
+
+test-unit-web:
+    FROM +code-generator
+    DO flutter-ci+UNIT_TESTS --PLATFORM=web --REPORT=false
 
 # Runs static analysis on the code.
 build-static-analysis:
