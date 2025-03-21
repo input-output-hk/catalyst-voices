@@ -30,7 +30,7 @@ final class AccountRoleData extends Equatable {
 ///
 /// The order of enums must be kept since the RegistrationTransactionBuilder
 /// depends on it to inject keys/certificates in slots related to enum indexes.
-/// 
+///
 /// New roles should be added at the bottom so that
 /// existing indexes are not misplaced.
 enum AccountRole {

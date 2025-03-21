@@ -81,7 +81,7 @@ final class Ed25519PublicKey extends Equatable implements CborEncodable {
 
   /// Returns a hex representation of the [Ed25519PublicKey].
   String toHex() => hex.encode(bytes);
-  
+
   @override
   List<Object?> get props => bytes;
 }

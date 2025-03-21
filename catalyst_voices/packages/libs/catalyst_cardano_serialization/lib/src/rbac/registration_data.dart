@@ -48,7 +48,8 @@ final class RegistrationData extends Equatable implements CborEncodable {
     return RegistrationData(
       derCerts: _parseRbacFieldCborList(derCerts, X509DerCertificate.fromCbor),
       cborCerts: _parseRbacFieldCborList(cborCerts, C509Certificate.fromCbor),
-      publicKeys:_parseRbacFieldCborList(publicKeys, Ed25519PublicKey.fromCbor),
+      publicKeys:
+          _parseRbacFieldCborList(publicKeys, Ed25519PublicKey.fromCbor),
       revocationSet: revocationSet?.map(CertificateHash.fromCbor).toList(),
       roleDataSet: roleDataSet?.map(RoleData.fromCbor).toSet(),
     );
