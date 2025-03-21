@@ -133,6 +133,7 @@ void main() {
           allOf(hasLength(refs.length), containsAll(refs)),
         );
       });
+      
       test('authors are correctly extracted', () async {
         final authorId1 = CatalystId(host: 'test', role0Key: Uint8List(32));
         final authorId2 = CatalystId(host: 'test1', role0Key: Uint8List(32));
