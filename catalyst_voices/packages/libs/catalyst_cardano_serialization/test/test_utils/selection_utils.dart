@@ -1,7 +1,13 @@
 import 'dart:math';
 import 'package:bip32_ed25519/bip32_ed25519.dart';
-import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
+import 'package:catalyst_cardano_serialization/src/address.dart';
+import 'package:catalyst_cardano_serialization/src/builders/transaction_builder.dart';
+import 'package:catalyst_cardano_serialization/src/fees.dart';
+import 'package:catalyst_cardano_serialization/src/hashes.dart';
 import 'package:catalyst_cardano_serialization/src/signature.dart';
+import 'package:catalyst_cardano_serialization/src/transaction.dart';
+import 'package:catalyst_cardano_serialization/src/transaction_output.dart';
+import 'package:catalyst_cardano_serialization/src/types.dart';
 import 'package:convert/convert.dart';
 
 /// A utility class for generating random data and performing selection-related

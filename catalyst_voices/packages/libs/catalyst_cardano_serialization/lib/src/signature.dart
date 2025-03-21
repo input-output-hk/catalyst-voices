@@ -1,3 +1,4 @@
+import 'package:catalyst_cardano_serialization/src/types.dart';
 import 'package:cbor/cbor.dart';
 import 'package:convert/convert.dart';
 import 'package:cryptography/cryptography.dart';
@@ -41,9 +42,12 @@ final class Ed25519KeyPair extends Equatable {
 }
 
 /// The ED25519 public key that is 256 bits long.
-extension type Ed25519PublicKey._(List<int> bytes) {
+final class Ed25519PublicKey extends Equatable implements CborEncodable {
   /// The length of the [Ed25519PublicKey] in bytes.
   static const int length = 32;
+
+  /// The public key bytes.
+  final List<int> bytes;
 
   /// The default constructor for [Ed25519PublicKey].
   Ed25519PublicKey.fromBytes(this.bytes) {
@@ -70,12 +74,16 @@ extension type Ed25519PublicKey._(List<int> bytes) {
   }
 
   /// Serializes the type as cbor.
+  @override
   CborValue toCbor({List<int> tags = const []}) {
     return CborBytes(bytes, tags: tags);
   }
 
   /// Returns a hex representation of the [Ed25519PublicKey].
   String toHex() => hex.encode(bytes);
+
+  @override
+  List<Object?> get props => bytes;
 }
 
 /// The Ed25519 private key that is 256 bits long.
