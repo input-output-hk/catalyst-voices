@@ -1,9 +1,6 @@
-import 'dart:convert';
-
 import 'package:catalyst_compression/catalyst_compression.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/signed_document/signed_document_manager.dart';
-import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -20,7 +17,7 @@ void main() {
     test(
         'signDocument creates a signed document '
         'that can be converted from/to bytes', () async {
-      const document = _JsonDocument('title');
+      const document = SignedDocumentJsonPayload({'title': 'hey'});
 
       final signedDocument = await documentManager.signDocument(
         document,
@@ -37,7 +34,6 @@ void main() {
       final signedDocumentBytes = signedDocument.toBytes();
       final parsedDocument = await documentManager.parseDocument(
         signedDocumentBytes,
-        parser: _JsonDocument.fromBytes,
       );
 
       expect(parsedDocument, equals(signedDocument));
@@ -141,33 +137,4 @@ final class _FakeCompressor implements CatalystCompressor {
 
   @override
   Future<List<int>> decompress(List<int> bytes) async => bytes;
-}
-
-final class _JsonDocument extends Equatable implements SignedDocumentPayload {
-  final String title;
-
-  const _JsonDocument(this.title);
-
-  factory _JsonDocument.fromBytes(Uint8List bytes) {
-    final string = utf8.decode(bytes);
-    final map = json.decode(string);
-    return _JsonDocument.fromJson(map as Map<String, dynamic>);
-  }
-
-  factory _JsonDocument.fromJson(Map<String, dynamic> map) {
-    return _JsonDocument(map['title'] as String);
-  }
-
-  @override
-  List<Object?> get props => [title];
-
-  @override
-  Uint8List toBytes() {
-    final jsonString = json.encode(toJson());
-    return utf8.encode(jsonString);
-  }
-
-  Map<String, dynamic> toJson() {
-    return {'title': title};
-  }
 }
