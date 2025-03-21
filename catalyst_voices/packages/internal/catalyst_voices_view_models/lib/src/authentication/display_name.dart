@@ -6,11 +6,11 @@ import 'package:formz/formz.dart';
 
 final class DisplayName
     extends FormzInput<String, DisplayNameValidationException> {
+  static const NumRange<int> lengthRange = NumRange(min: 1, max: 30);
+
   const DisplayName.dirty([super.value = '']) : super.dirty();
 
   const DisplayName.pure([super.value = '']) : super.pure();
-
-  static const Range<int> lengthRange = Range(min: 1, max: 30);
 
   @override
   DisplayNameValidationException? validator(String value) {

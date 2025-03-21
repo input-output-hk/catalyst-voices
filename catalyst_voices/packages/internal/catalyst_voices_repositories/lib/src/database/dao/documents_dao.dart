@@ -7,6 +7,7 @@ import 'package:catalyst_voices_repositories/src/database/table/documents_metada
 import 'package:catalyst_voices_repositories/src/database/typedefs.dart';
 import 'package:collection/collection.dart';
 import 'package:drift/drift.dart';
+import 'package:drift/extensions/json1.dart';
 import 'package:flutter/foundation.dart';
 
 /// Exposes only public operation on documents, and related, tables.
@@ -72,6 +73,7 @@ abstract interface class DocumentsDao {
     bool unique = false,
     int? limit,
     DocumentType? type,
+    CatalystId? authorId,
   });
 
   /// Watches for new comments that are reference by ref.
@@ -139,20 +141,21 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
   Future<int> countRefDocumentByType({
     required DocumentRef ref,
     required DocumentType type,
-  }) {
+  }) async {
     final query = select(documents)
       ..where(
         (row) => Expression.and([
-          row.type.equals(type.uuid),
+          row.metadata.jsonExtract<String>(r'$.type').equals(type.uuid),
+          row.metadata.jsonExtract<String>(r'$.ref.id').equals(ref.id),
+          if (ref.version != null)
+            row.metadata
+                .jsonExtract<String>(r'$.ref.version')
+                .equals(ref.version!),
         ]),
       );
 
-    return query.get().then(
-          (docs) => docs.where((doc) {
-            // TODO(damian-molinski): JSONB filter
-            return doc.metadata.ref == ref;
-          }).length,
-        );
+    final docs = await query.get();
+    return docs.length;
   }
 
   @override
@@ -239,51 +242,52 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
         .distinct(_entitiesEquals);
   }
 
+  /// When [unique] is true, only latest versions of each document are returned.
   @override
   Stream<List<DocumentEntity>> watchAll({
     bool unique = false,
     int? limit,
     DocumentType? type,
+    CatalystId? authorId,
   }) {
     final query = select(documents);
 
     if (type != null) {
       query.where((doc) => doc.type.equals(type.uuid));
     }
+    if (authorId != null) {
+      query.where(
+        (doc) => CustomExpression<bool>(
+          "json_extract(metadata, '\$.authors') LIKE '%$authorId%'",
+        ),
+      );
+    }
 
-    return query.watch().map((documents) {
-      if (unique) {
-        // Group by document ID and take latest version
-        final uniqueDocs = documents
-            .groupListsBy((doc) => '${doc.idHi}-${doc.idLo}')
-            .values
-            .map(
-              (versions) => versions.reduce((a, b) {
-                // Compare versions (higher version wins)
-                final compareHi = b.verHi.compareTo(a.verHi);
-                if (compareHi != 0) return compareHi > 0 ? b : a;
-                return b.verLo.compareTo(a.verLo) > 0 ? b : a;
-              }),
-            )
-            .toList()
-          ..sort((a, b) {
-            // Sort by version descending
-            final compareHi = b.verHi.compareTo(a.verHi);
-            if (compareHi != 0) return compareHi;
-            return b.verLo.compareTo(a.verLo);
-          });
+    query.orderBy([
+      (t) => OrderingTerm(
+            expression: t.verHi,
+            mode: OrderingMode.desc,
+          ),
+    ]);
 
-        if (limit != null) {
-          return uniqueDocs.take(limit).toList();
+    if (limit != null) {
+      query.limit(limit);
+    }
+
+    if (unique) {
+      return query.watch().map((list) {
+        final latestVersions = <String, DocumentEntity>{};
+        for (final entity in list) {
+          final id = '${entity.idHi}_${entity.idLo}';
+          if (!latestVersions.containsKey(id)) {
+            latestVersions[id] = entity;
+          }
         }
-        return uniqueDocs;
-      }
+        return latestVersions.values.toList();
+      });
+    }
 
-      if (limit != null) {
-        return documents.take(limit).toList();
-      }
-      return documents;
-    });
+    return query.watch();
   }
 
   @override
@@ -293,16 +297,16 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
   }) {
     final query = select(documents)
       ..where(
-        (row) => Expression.and([
-          // TODO(damian-molinski): JSONB filtering
-          row.metadata.equalsValue(
-            DocumentDataMetadata(
-              type: type,
-              ref: ref,
-              selfRef: ref,
-            ),
-          ),
-        ]),
+        (row) {
+          return Expression.and([
+            row.metadata.jsonExtract<String>(r'$.type').equals(type.uuid),
+            row.metadata.jsonExtract<String>(r'$.ref.id').equals(ref.id),
+            if (ref.version != null)
+              row.metadata
+                  .jsonExtract<String>(r'$.ref.version')
+                  .equals(ref.version!),
+          ]);
+        },
       );
 
     return query.watch().map((comments) => comments.length).distinct();

@@ -17,14 +17,14 @@ void main() {
       categoryId: const SignedDocumentRef(id: 'dummy_category_id'),
       title: 'Proposal Title that rocks the world',
       updateDate: DateTime.now().minusDays(2),
-      fundsRequested: Coin.fromAda(100000),
+      fundsRequested: const Coin.fromWholeAda(100000),
       status: ProposalStatus.draft,
       publish: ProposalPublish.publishedDraft,
       commentsCount: 0,
       description: '',
       duration: 6,
       author: 'Alex Wells',
-      versionCount: 1,
+      versions: const [],
     );
   });
 

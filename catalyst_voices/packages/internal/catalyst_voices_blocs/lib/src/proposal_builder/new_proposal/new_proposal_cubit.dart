@@ -67,6 +67,11 @@ class NewProposalCubit extends Cubit<NewProposalState> {
     );
   }
 
+  void reset() {
+    emit(NewProposalState.reset());
+    unawaited(getCampaignCategories());
+  }
+
   void updateSelectedCategory(SignedDocumentRef? categoryId) {
     emit(state.copyWith(categoryId: Optional(categoryId)));
   }

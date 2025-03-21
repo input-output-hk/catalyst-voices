@@ -81,6 +81,7 @@ final class ProposalBuilderBloc
   ProposalBuilderState _createState({
     required Document document,
     required ProposalBuilderMetadata metadata,
+    required CampaignCategory category,
   }) {
     final segments = _mapDocumentToSegments(
       document,
@@ -90,12 +91,14 @@ final class ProposalBuilderBloc
     final firstSegment = segments.firstOrNull;
     final firstSection = firstSegment?.sections.firstOrNull;
     final guidance = _getGuidanceForSection(firstSegment, firstSection);
+    final categoryVM = CampaignCategoryDetailsViewModel.fromModel(category);
 
     return ProposalBuilderState(
       segments: segments,
       guidance: guidance,
       document: document,
       metadata: metadata,
+      category: categoryVM,
       activeNodeId: firstSection?.id,
     );
   }
@@ -266,6 +269,7 @@ final class ProposalBuilderBloc
           templateRef: templateRef,
           categoryId: category.selfRef,
         ),
+        category: category,
       );
     });
   }
@@ -283,14 +287,18 @@ final class ProposalBuilderBloc
       final proposal = Proposal.fromData(proposalData);
 
       final versions = proposalData.versions.mapIndexed((index, version) {
+        final versionRef = version.document.metadata.selfRef;
+        final versionId = versionRef.version ?? versionRef.id;
         return DocumentVersion(
-          id: version.document.metadata.selfRef.version ?? '',
+          id: versionId,
           number: index + 1,
-          isCurrent: version.document.metadata.selfRef.version ==
-              event.proposalId.version,
+          isCurrent: versionId == event.proposalId.version,
           isLatest: index == proposalData.versions.length - 1,
         );
       }).toList();
+
+      final categoryId = proposalData.categoryId;
+      final category = await _campaignService.getCategory(categoryId);
 
       return _createState(
         document: proposalData.document.document,
@@ -298,9 +306,11 @@ final class ProposalBuilderBloc
           publish: proposal.publish,
           documentRef: proposal.selfRef,
           originalDocumentRef: proposal.selfRef,
+          templateRef: proposalData.templateRef,
+          categoryId: categoryId,
           versions: versions,
-          categoryId: proposal.categoryId,
         ),
+        category: category,
       );
     });
   }
@@ -328,6 +338,7 @@ final class ProposalBuilderBloc
           templateRef: templateRef,
           categoryId: categoryId,
         ),
+        category: category,
       );
     });
   }
