@@ -35,7 +35,7 @@ Future<BootstrapArgs> bootstrap({
   GoRouter? router,
 }) async {
   _loggingService
-    ..level = kDebugMode ? Level.FINER : Level.OFF
+    ..level = kDebugMode ? Level.ALL : Level.OFF
     ..printLogs = kDebugMode;
 
   GoRouter.optionURLReflectsImperativeAPIs = true;
@@ -53,9 +53,6 @@ Future<BootstrapArgs> bootstrap({
   router ??= buildAppRouter();
 
   Bloc.observer = AppBlocObserver();
-
-  // TODO(damian-molinski): delete it before merge. (only leave one time clear)
-  await Dependencies.instance.get<CatalystDatabase>().clear();
 
   Dependencies.instance.get<SyncManager>().start().ignore();
 
@@ -80,7 +77,6 @@ Future<void> bootstrapAndRun([
 }
 
 // TODO(damian-molinski): Add Isolate.current.addErrorListener
-//
 @visibleForTesting
 GoRouter buildAppRouter({
   String? initialLocation,
