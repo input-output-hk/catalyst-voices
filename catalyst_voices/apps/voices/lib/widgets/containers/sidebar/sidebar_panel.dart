@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 
 class SidebarPanel extends StatefulWidget {
@@ -21,20 +22,40 @@ class SidebarPanel extends StatefulWidget {
 class _SidebarPanelState extends State<SidebarPanel>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
-  late final Animation<Offset> _animation;
+  late final Animation<double> _sizeAnimation;
+  late final Animation<double> _fadeAnimation;
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        widget.header,
-        Expanded(
-          child: SlideTransition(
-            position: _animation,
-            child: widget.body,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return AnimatedBuilder(
+          animation: _controller,
+          builder: (context, child) {
+            final width = constraints.constrainWidth() * _sizeAnimation.value;
+
+            return ConstrainedBox(
+              constraints: BoxConstraints.tightFor(width: width),
+              child: child,
+            );
+          },
+          child: Column(
+            children: [
+              widget.header,
+              Expanded(
+                child: PageOverflow(
+                  width: constraints.maxWidth,
+                  alignment: Alignment.centerRight,
+                  child: FadeTransition(
+                    opacity: _fadeAnimation,
+                    child: widget.body,
+                  ),
+                ),
+              ),
+            ],
           ),
-        ),
-      ],
+        );
+      },
     );
   }
 
@@ -62,14 +83,17 @@ class _SidebarPanelState extends State<SidebarPanel>
 
     _controller = AnimationController(
       value: widget.isCollapsed ? 1.0 : 0.0,
-      duration: const Duration(milliseconds: 300),
+      duration: const Duration(milliseconds: 250),
       vsync: this,
     );
 
-    _animation = Tween<Offset>(
-      begin: Offset.zero,
-      end: widget.isLeft ? const Offset(-1, 0) : const Offset(1, 0),
-    ).animate(
+    _sizeAnimation = Tween<double>(begin: 1, end: 0.2).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: Curves.easeIn,
+      ),
+    );
+    _fadeAnimation = Tween<double>(begin: 1, end: 0).animate(
       CurvedAnimation(
         parent: _controller,
         curve: Curves.easeIn,

@@ -23,6 +23,23 @@ class ProposalContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return SelectionArea(
+      child: _SegmentsListenable(
+        scrollController: scrollController,
+      ),
+    );
+  }
+}
+
+class _SegmentsListenable extends StatelessWidget {
+  final ItemScrollController scrollController;
+
+  const _SegmentsListenable({
+    required this.scrollController,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return ValueListenableBuilder(
       valueListenable: SegmentsControllerScope.of(context),
       builder: (context, value, child) {

@@ -5,6 +5,7 @@ import 'package:catalyst_voices/pages/proposal/proposal_content.dart';
 import 'package:catalyst_voices/pages/proposal/snack_bar/viewing_older_version_snack_bar.dart';
 import 'package:catalyst_voices/pages/proposal/widget/proposal_header.dart';
 import 'package:catalyst_voices/pages/proposal/widget/proposal_navigation_panel.dart';
+import 'package:catalyst_voices/pages/proposal/widget/proposal_sidebars.dart';
 import 'package:catalyst_voices/routes/routes.dart';
 import 'package:catalyst_voices/widgets/snackbar/voices_snackbar.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
@@ -42,12 +43,10 @@ class _ProposalPageState extends State<ProposalPage>
       child: Scaffold(
         appBar: const VoicesAppBar(automaticallyImplyLeading: false),
         body: ProposalHeaderWrapper(
-          child: SpaceScaffold(
-            left: const ProposalNavigationPanel(),
-            body: SelectionArea(
-              child: ProposalContent(
-                scrollController: _segmentsScrollController,
-              ),
+          child: ProposalSidebars(
+            navPanel: const ProposalNavigationPanel(),
+            body: ProposalContent(
+              scrollController: _segmentsScrollController,
             ),
           ),
         ),

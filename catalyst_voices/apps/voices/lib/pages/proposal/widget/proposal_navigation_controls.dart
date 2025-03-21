@@ -17,9 +17,14 @@ class ProposalNavigationControls extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return isCompact
-        ? _CompactControls(onToggleTap: onToggleTap)
-        : _StandardControls(onToggleTap: onToggleTap);
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.maxWidth < 250) {
+          return _CompactControls(onToggleTap: onToggleTap);
+        }
+        return _StandardControls(onToggleTap: onToggleTap);
+      },
+    );
   }
 }
 
@@ -48,16 +53,14 @@ class _CompactControls extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Align(
-      alignment: Alignment.topRight,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const SizedBox(height: 56),
-          const _BackButton(isCompact: true),
-          _ToggleRailButton(onTap: onToggleTap),
-        ],
-      ),
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        const SizedBox(height: 56),
+        const _BackButton(isCompact: true),
+        _ToggleRailButton(onTap: onToggleTap),
+      ],
     );
   }
 }

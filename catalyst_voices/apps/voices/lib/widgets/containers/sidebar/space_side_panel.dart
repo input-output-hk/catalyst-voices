@@ -1,6 +1,5 @@
 import 'package:catalyst_voices/widgets/buttons/voices_buttons.dart';
 import 'package:catalyst_voices/widgets/common/tab_bar_stack_view.dart';
-import 'package:catalyst_voices/widgets/containers/sidebar/space_scaffold.dart';
 import 'package:catalyst_voices/widgets/headers/section_header.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:flutter/material.dart';

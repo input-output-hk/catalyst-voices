@@ -14,40 +14,48 @@ import 'package:flutter/material.dart';
 class SidebarScaffold extends StatelessWidget {
   final Widget? leftRail;
   final Widget? rightRail;
-  final double railWidth;
-  final double railsGap;
-  final double bodyMaxWidth;
+  final BoxConstraints railConstraints;
+  final BoxConstraints bodyConstraints;
+  final double spacing;
   final Widget body;
 
   const SidebarScaffold({
     super.key,
     this.leftRail,
     this.rightRail,
-    this.railWidth = 326,
-    this.railsGap = 56,
-    this.bodyMaxWidth = 612,
+    this.railConstraints = const BoxConstraints(maxWidth: 326),
+    this.bodyConstraints = const BoxConstraints(maxWidth: 612),
+    this.spacing = 56,
     required this.body,
   });
 
   @override
   Widget build(BuildContext context) {
+    final leftRail = this.leftRail;
+    final rightRail = this.rightRail;
+
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: spacing,
       children: [
-        ConstrainedBox(
-          constraints: BoxConstraints(maxWidth: railWidth),
-          child: leftRail,
-        ),
-        SizedBox(width: railsGap),
-        Expanded(child: body),
-        SizedBox(width: railsGap),
-        ConstrainedBox(
-          constraints: BoxConstraints(
-            maxWidth: railWidth,
-            minWidth: railWidth,
+        if (leftRail != null)
+          ConstrainedBox(
+            constraints: railConstraints,
+            child: leftRail,
           ),
-          child: rightRail,
+        Flexible(
+          child: Center(
+            child: ConstrainedBox(
+              constraints: bodyConstraints,
+              child: body,
+            ),
+          ),
         ),
+        if (rightRail != null)
+          ConstrainedBox(
+            constraints: railConstraints,
+            child: rightRail,
+          ),
       ],
     );
   }

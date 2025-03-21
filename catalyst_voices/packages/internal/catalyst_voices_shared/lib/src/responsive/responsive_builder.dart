@@ -53,6 +53,7 @@ const Map<ResponsiveBreakpointKey, ({int min, int max})> _breakpoints = {
   ResponsiveBreakpointKey.lg: (min: 1440, max: 2048),
 };
 
+// TODO(damian-molinski): Rename to AdaptiveBuilder
 class ResponsiveBuilder<T extends Object> extends StatelessWidget {
   final DataWidgetBuilder<T> builder;
   final Map<ResponsiveBreakpointKey, T> _responsiveData;
