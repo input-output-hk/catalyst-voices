@@ -22,16 +22,18 @@ final class SignedDocumentJsonPayload extends SignedDocumentPayload {
   Uint8List toBytes() => Uint8List.fromList(json.fuse(utf8).encode(data));
 }
 
-/// Represents an abstract document that can be represented in binary format.
+/// Represents [SignedDocument] payload. Type of payload depends on a
+/// [SignedDocumentMetadata.contentType] and subclasses
+/// of [SignedDocumentPayload] are meant to reflect that.
+///
+/// Use [SignedDocumentPayload.fromBytes] factory to create correct
+/// payload type.
 sealed class SignedDocumentPayload extends Equatable {
   const SignedDocumentPayload();
 
-  /// Parses the document from the bytes obtained
-  /// from [SignedDocumentPayload.toBytes].
-  ///
-  /// Usually this would convert the [bytes] into a [String],
-  /// decode a [String] into a json and then parse the data class
-  /// from the json representation.
+  /// Creates corresponding payload base on [contentType].
+  /// In case of unknown type falling back to [SignedDocumentUnknownPayload]
+  /// which keeps [bytes] as is.
   factory SignedDocumentPayload.fromBytes(
     Uint8List bytes, {
     required SignedDocumentContentType contentType,
