@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["BACKTRACE","LOCATION"],"fn":["set_panic_hook"],"struct":["ServicePanicHandler"]};
