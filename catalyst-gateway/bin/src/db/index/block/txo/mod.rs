@@ -140,11 +140,6 @@ impl TxoInsertQuery {
         txn_hash: TransactionId, index: TxnIndex,
     ) {
         let txn_id = txn_hash.to_string();
-        tracing::info!(
-            txn_id=txn_id,
-            slot_no=?slot_no,
-            "Index transaction outputs"
-        );
 
         // Accumulate all the data we want to insert from this transaction here.
         for (txo_index, txo) in txn.outputs().iter().enumerate() {
@@ -152,11 +147,6 @@ impl TxoInsertQuery {
             let Some((stake_address, address)) =
                 Self::extract_stake_address(network, txo, slot_no, &txn_id)
             else {
-                tracing::info!(
-                    txn_id=txn_id,
-                    slot_no=?slot_no,
-                    "Skip indexing transaction outputs"
-                );
                 continue;
             };
 
