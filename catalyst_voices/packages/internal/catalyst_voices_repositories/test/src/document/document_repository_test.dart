@@ -4,6 +4,7 @@ import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_repositories/src/database/catalyst_database.dart';
 import 'package:catalyst_voices_repositories/src/document/document_repository.dart';
 import 'package:catalyst_voices_repositories/src/dto/document_data_with_ref_dat.dart';
+import 'package:collection/collection.dart';
 import 'package:drift/drift.dart' show DatabaseConnection;
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -267,6 +268,144 @@ void main() {
         );
 
         expect(savedDocumentData, equals(documentDataToSave));
+      });
+    });
+
+    group('getAllDocumentsRefs', () {
+      test('duplicated refs are filtered out', () async {
+        // Given
+        final refs = List.generate(
+          10,
+          (_) => SignedDocumentRef.generateFirstRef(),
+        );
+        final remoteRefs = [...refs, ...refs];
+        final expectedRefs = [
+          ...categoriesTemplatesRefs.expand((e) => [e.proposal, e.comment]),
+          ...refs,
+        ];
+
+        when(() => remoteDocuments.index())
+            .thenAnswer((_) => Future.value(remoteRefs));
+
+        // When
+        final allRefs = await repository.getAllDocumentsRefs();
+
+        // Then
+        expect(
+          allRefs,
+          allOf(hasLength(expectedRefs.length), containsAll(expectedRefs)),
+        );
+      });
+
+      test(
+          'does not call get latest version when '
+          'all refs are exact', () async {
+        // Given
+        final refs = List.generate(
+          10,
+          (_) => SignedDocumentRef.exact(
+            id: const Uuid().v7(),
+            version: const Uuid().v7(),
+          ),
+        );
+
+        // When
+        when(() => remoteDocuments.index())
+            .thenAnswer((_) => Future.value(refs));
+
+        await repository.getAllDocumentsRefs();
+
+        // Then
+        verifyNever(() => remoteDocuments.getLatestVersion(any()));
+      });
+
+      test('loose refs are are specified to latest version', () async {
+        // Given
+        final exactRefs = List.generate(
+          10,
+          (_) => SignedDocumentRef.exact(
+            id: const Uuid().v7(),
+            version: const Uuid().v7(),
+          ),
+        );
+        final looseRefs = List.generate(
+          10,
+          (_) => SignedDocumentRef.loose(id: const Uuid().v7()),
+        );
+        final refs = [...exactRefs, ...looseRefs];
+
+        // When
+        when(() => remoteDocuments.index())
+            .thenAnswer((_) => Future.value(refs));
+        when(() => remoteDocuments.getLatestVersion(any()))
+            .thenAnswer((_) => Future(() => const Uuid().v7()));
+
+        final allRefs = await repository.getAllDocumentsRefs();
+
+        // Then
+        verify(() => remoteDocuments.getLatestVersion(any()))
+            .called(looseRefs.length);
+
+        expect(allRefs.every((element) => element.isExact), isTrue);
+      });
+
+      test('remote loose refs to const documents are removed', () async {
+        // Given
+        final constTemplatesRefs = categoriesTemplatesRefs
+            .expand((element) => [element.proposal])
+            .toList();
+
+        final docsRefs = List.generate(
+          10,
+          (_) => SignedDocumentRef.generateFirstRef(),
+        );
+        final looseTemplatesRefs = constTemplatesRefs.map((e) => e.toLoose());
+        final refs = [
+          ...docsRefs,
+          ...looseTemplatesRefs,
+        ];
+
+        // When
+        when(() => remoteDocuments.index())
+            .thenAnswer((_) => Future.value(refs));
+
+        final allRefs = await repository.getAllDocumentsRefs();
+
+        // Then
+        expect(allRefs, isNot(containsAll(looseTemplatesRefs)));
+        expect(allRefs, containsAll(constTemplatesRefs));
+
+        verifyNever(() => remoteDocuments.getLatestVersion(any()));
+      });
+
+      test('categories refs are filtered out', () async {
+        // Given
+        final categoriesRefs = categoriesTemplatesRefs
+            .expand((element) => [element.category])
+            .toList();
+        final categoriesIds = categoriesRefs.map((e) => e.id).toList();
+
+        final docsRefs = List.generate(
+          10,
+          (_) => SignedDocumentRef.generateFirstRef(),
+        );
+        final looseCategoriesRefs = categoriesRefs.map((e) => e.toLoose());
+        final refs = [
+          ...docsRefs,
+          ...looseCategoriesRefs,
+        ];
+
+        // When
+        when(() => remoteDocuments.index())
+            .thenAnswer((_) => Future.value(refs));
+
+        final allRefs = await repository.getAllDocumentsRefs();
+
+        // Then
+        expect(allRefs, isNot(containsAll(categoriesRefs)));
+        expect(allRefs.none((ref) => categoriesIds.contains(ref.id)), isTrue);
+
+        verifyNever(() => remoteDocuments.getLatestVersion(any()));
       });
     });
 
