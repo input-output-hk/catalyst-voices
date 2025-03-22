@@ -51,7 +51,13 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
       throw ApiErrorResponseException(statusCode: statusCode, error: error);
     }
 
-    return response.body?.docs
+    final docs = response.body?.docs;
+    if (docs == null || docs.isEmpty) {
+      return null;
+    }
+
+    return docs
+        .sublist(0, 1)
         .cast<Map<String, dynamic>>()
         .map(DocumentIndexListDto.fromJson)
         .firstOrNull
