@@ -4,52 +4,21 @@ import 'package:catalyst_voices_repositories/src/database/database.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_metadata.dart';
 import 'package:uuid_plus/uuid_plus.dart';
 
-abstract final class DocumentRefFactory {
-  static SignedDocumentRef buildSigned({
-    String? id,
-    String? version,
+abstract final class DocumentDataFactory {
+  static DocumentData build({
+    DocumentType type = DocumentType.proposalDocument,
+    DocumentRef? selfRef,
+    SignedDocumentRef? template,
+    DocumentDataContent content = const DocumentDataContent({}),
   }) {
-    return SignedDocumentRef(
-      id: id ?? const Uuid().v7(),
-      version: version ?? const Uuid().v7(),
-    );
-  }
-
-  static DraftRef buildDraft({
-    String? id,
-    String? version,
-  }) {
-    return DraftRef(
-      id: id ?? const Uuid().v7(),
-      version: version ?? const Uuid().v7(),
-    );
-  }
-}
-
-abstract final class DocumentWithMetadataFactory {
-  static DocumentEntityWithMetadata build({
-    DocumentDataContent? content,
-    DocumentDataMetadata? metadata,
-    DateTime? createdAt,
-  }) {
-    final document = DocumentFactory.build(
+    return DocumentData(
+      metadata: DocumentDataMetadata(
+        type: type,
+        selfRef: selfRef ?? SignedDocumentRef.generateFirstRef(),
+        template: template,
+      ),
       content: content,
-      metadata: metadata,
-      createdAt: createdAt,
     );
-
-    final documentMetadata = DocumentMetadataFieldKey.values.map((fieldKey) {
-      return switch (fieldKey) {
-        DocumentMetadataFieldKey.title => DocumentMetadataFactory.build(
-            ver: document.metadata.version,
-            fieldKey: fieldKey,
-            // This should come from document.metadata
-            fieldValue: 'Document[${document.metadata.version}] title',
-          ),
-      };
-    }).toList();
-
-    return (document: document, metadata: documentMetadata);
   }
 }
 
@@ -63,7 +32,7 @@ abstract final class DocumentFactory {
 
     metadata ??= DocumentDataMetadata(
       type: DocumentType.proposalDocument,
-      selfRef: DocumentRefFactory.buildSigned(),
+      selfRef: SignedDocumentRef.generateFirstRef(),
     );
 
     final id = UuidHiLo.from(metadata.id);
@@ -101,6 +70,33 @@ abstract final class DocumentMetadataFactory {
   }
 }
 
+abstract final class DocumentWithMetadataFactory {
+  static DocumentEntityWithMetadata build({
+    DocumentDataContent? content,
+    DocumentDataMetadata? metadata,
+    DateTime? createdAt,
+  }) {
+    final document = DocumentFactory.build(
+      content: content,
+      metadata: metadata,
+      createdAt: createdAt,
+    );
+
+    final documentMetadata = DocumentMetadataFieldKey.values.map((fieldKey) {
+      return switch (fieldKey) {
+        DocumentMetadataFieldKey.title => DocumentMetadataFactory.build(
+            ver: document.metadata.version,
+            fieldKey: fieldKey,
+            // This should come from document.metadata
+            fieldValue: 'Document[${document.metadata.version}] title',
+          ),
+      };
+    }).toList();
+
+    return (document: document, metadata: documentMetadata);
+  }
+}
+
 abstract final class DraftFactory {
   static DocumentDraftEntity build({
     DocumentDataContent? content,
@@ -111,7 +107,7 @@ abstract final class DraftFactory {
 
     metadata ??= DocumentDataMetadata(
       type: DocumentType.proposalDocument,
-      selfRef: DocumentRefFactory.buildDraft(),
+      selfRef: DraftRef.generateFirstRef(),
     );
 
     title ??= 'Draft[${metadata.id}] title';
@@ -128,24 +124,6 @@ abstract final class DraftFactory {
       content: content,
       metadata: metadata,
       title: title,
-    );
-  }
-}
-
-abstract final class DocumentDataFactory {
-  static DocumentData build({
-    DocumentType type = DocumentType.proposalDocument,
-    DocumentRef? selfRef,
-    SignedDocumentRef? template,
-    DocumentDataContent content = const DocumentDataContent({}),
-  }) {
-    return DocumentData(
-      metadata: DocumentDataMetadata(
-        type: type,
-        selfRef: selfRef ?? DocumentRefFactory.buildSigned(),
-        template: template,
-      ),
-      content: content,
     );
   }
 }

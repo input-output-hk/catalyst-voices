@@ -1,5 +1,6 @@
 library catalyst_voices_models;
 
+export 'api/exception/api_exception.dart';
 export 'auth/password_strength.dart';
 export 'auth/seed_phrase.dart';
 export 'campaign/campaign.dart';
@@ -58,6 +59,7 @@ export 'proposal/proposal_pagination_request.dart';
 export 'proposal/proposal_version.dart';
 export 'registration/registration.dart';
 export 'signed_document/signed_document.dart';
+export 'signed_document/signed_document_payload.dart';
 export 'user/account.dart';
 export 'user/account_role.dart';
 export 'user/catalyst_id.dart';
