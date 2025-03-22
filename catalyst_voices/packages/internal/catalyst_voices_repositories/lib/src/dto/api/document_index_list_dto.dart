@@ -1,10 +1,11 @@
+import 'package:flutter/foundation.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'document_index_list_dto.g.dart';
 
 // Node. OpenAPI spec is incorrect at the moment. This dto is here as
 // temporary workaround.
-@JsonSerializable(createToJson: false)
+@JsonSerializable()
 final class DocumentIndexListDto {
   final String id;
   final List<IndividualDocumentVersion> ver;
@@ -17,9 +18,12 @@ final class DocumentIndexListDto {
   factory DocumentIndexListDto.fromJson(Map<String, dynamic> json) {
     return _$DocumentIndexListDtoFromJson(json);
   }
+
+  @visibleForTesting
+  Map<String, dynamic> toJson() => _$DocumentIndexListDtoToJson(this);
 }
 
-@JsonSerializable(createToJson: false)
+@JsonSerializable()
 final class DocumentRefForFilteredDocuments {
   final String id;
   final String? ver;
@@ -32,9 +36,14 @@ final class DocumentRefForFilteredDocuments {
   factory DocumentRefForFilteredDocuments.fromJson(Map<String, dynamic> json) {
     return _$DocumentRefForFilteredDocumentsFromJson(json);
   }
+
+  @visibleForTesting
+  Map<String, dynamic> toJson() {
+    return _$DocumentRefForFilteredDocumentsToJson(this);
+  }
 }
 
-@JsonSerializable(createToJson: false)
+@JsonSerializable()
 final class IndividualDocumentVersion {
   final String ver;
   final String type;
@@ -59,4 +68,7 @@ final class IndividualDocumentVersion {
   factory IndividualDocumentVersion.fromJson(Map<String, dynamic> json) {
     return _$IndividualDocumentVersionFromJson(json);
   }
+
+  @visibleForTesting
+  Map<String, dynamic> toJson() => _$IndividualDocumentVersionToJson(this);
 }
