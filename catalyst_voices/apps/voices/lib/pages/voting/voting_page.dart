@@ -9,7 +9,6 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:uuid_plus/uuid_plus.dart';
 
 final _favoriteProposals = ValueNotifier<List<PendingProposal>>([]);
 
@@ -23,12 +22,12 @@ and PRISM, but its potential is only barely exploited.
 
 final _proposals = [
   PendingProposal(
-    id: const Uuid().v7(),
+    ref: SignedDocumentRef.generateFirstRef(),
     campaignName: 'F14',
     category: 'Cardano Use Cases / MVP',
     title: 'Proposal Title that rocks the world',
     lastUpdateDate: DateTime.now().minusDays(2),
-    fundsRequested: Coin.fromAda(100000),
+    fundsRequested: const Coin.fromWholeAda(100000),
     commentsCount: 0,
     description: _proposalDescription,
     publishStage: ProposalPublish.publishedDraft,
@@ -37,12 +36,12 @@ final _proposals = [
     author: 'Alex Wells',
   ),
   PendingProposal(
-    id: const Uuid().v7(),
+    ref: SignedDocumentRef.generateFirstRef(),
     campaignName: 'F14',
     category: 'Cardano Use Cases / MVP',
     title: 'Proposal Title that rocks the world',
     lastUpdateDate: DateTime.now().minusDays(2),
-    fundsRequested: Coin.fromAda(100000),
+    fundsRequested: const Coin.fromWholeAda(100000),
     commentsCount: 0,
     description: _proposalDescription,
     publishStage: ProposalPublish.submittedProposal,
@@ -51,12 +50,12 @@ final _proposals = [
     author: 'Alex Wells',
   ),
   PendingProposal(
-    id: const Uuid().v7(),
+    ref: SignedDocumentRef.generateFirstRef(),
     campaignName: 'F14',
     category: 'Cardano Use Cases / MVP',
     title: 'Proposal Title that rocks the world',
     lastUpdateDate: DateTime.now().minusDays(2),
-    fundsRequested: Coin.fromAda(100000),
+    fundsRequested: const Coin.fromWholeAda(100000),
     commentsCount: 0,
     description: _proposalDescription,
     publishStage: ProposalPublish.publishedDraft,

@@ -2,9 +2,11 @@ import 'package:catalyst_voices_repositories/src/database/catalyst_database.drif
 import 'package:catalyst_voices_repositories/src/database/catalyst_database_config.dart';
 import 'package:catalyst_voices_repositories/src/database/dao/documents_dao.dart';
 import 'package:catalyst_voices_repositories/src/database/dao/drafts_dao.dart';
+import 'package:catalyst_voices_repositories/src/database/dao/favorites_dao.dart';
 import 'package:catalyst_voices_repositories/src/database/migration/drift_migration_strategy.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents.drift.dart';
+import 'package:catalyst_voices_repositories/src/database/table/documents_favorite.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_metadata.dart';
 import 'package:catalyst_voices_repositories/src/database/table/drafts.dart';
 import 'package:catalyst_voices_repositories/src/database/table/drafts.drift.dart';
@@ -32,6 +34,9 @@ abstract interface class CatalystDatabase {
   /// specific. Do not confuse it with other documents / drafts.
   DraftsDao get draftsDao;
 
+  /// Contains all operations related to fav status of documents.
+  FavoritesDao get favoritesDao;
+
   /// Removes all data from this db.
   Future<void> clear();
 }
@@ -40,10 +45,12 @@ abstract interface class CatalystDatabase {
   tables: [
     Documents,
     DocumentsMetadata,
+    DocumentsFavorites,
     Drafts,
   ],
   daos: [
     DriftDocumentsDao,
+    DriftFavoritesDao,
     DriftDraftsDao,
   ],
   queries: {},
@@ -79,7 +86,7 @@ class DriftCatalystDatabase extends $DriftCatalystDatabase
   DraftsDao get draftsDao => driftDraftsDao;
 
   @override
-  int get schemaVersion => 1;
+  FavoritesDao get favoritesDao => driftFavoritesDao;
 
   @override
   MigrationStrategy get migration {
@@ -88,6 +95,9 @@ class DriftCatalystDatabase extends $DriftCatalystDatabase
       destructiveFallback: destructiveFallback,
     );
   }
+
+  @override
+  int get schemaVersion => 2;
 
   @override
   Future<void> clear() {

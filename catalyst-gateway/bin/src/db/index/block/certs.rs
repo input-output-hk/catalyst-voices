@@ -33,9 +33,9 @@ impl CertInsertQuery {
         register: Option<bool>, deregister: Option<bool>, cip36: Option<bool>,
         delegation: Option<Vec<u8>>, block: &MultiEraBlock,
     ) {
-        let (stake_address, pubkey, script) = match cred {
+        let (stake_address, pubkey, script) = match *cred {
             conway::StakeCredential::AddrKeyhash(cred) => {
-                let stake_address = StakeAddress::new(block.network(), false, (*cred).into());
+                let stake_address = StakeAddress::new(block.network(), false, cred.into());
                 let addr = block.witness_for_tx(&VKeyHash::from(*cred), txn);
                 // Note: it is totally possible for the Registration Certificate to not be
                 // witnessed.
@@ -43,7 +43,7 @@ impl CertInsertQuery {
             },
             conway::StakeCredential::Scripthash(h) => {
                 (
-                    StakeAddress::new(block.network(), true, (*h).into()),
+                    StakeAddress::new(block.network(), true, h.into()),
                     None,
                     true,
                 )

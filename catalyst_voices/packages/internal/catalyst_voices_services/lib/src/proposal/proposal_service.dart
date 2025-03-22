@@ -2,8 +2,7 @@ import 'dart:typed_data';
 
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
-import 'package:catalyst_voices_services/src/crypto/key_derivation_service.dart';
-import 'package:catalyst_voices_services/src/user/user_service.dart';
+import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:rxdart/rxdart.dart';
 
 abstract interface class ProposalService {
@@ -12,9 +11,12 @@ abstract interface class ProposalService {
     DocumentRepository documentRepository,
     UserService userService,
     KeyDerivationService keyDerivationService,
+    CampaignRepository campaignRepository,
   ) = ProposalServiceImpl;
 
-  Future<List<String>> addFavoriteProposal(String proposalId);
+  Future<void> addFavoriteProposal({
+    required DocumentRef ref,
+  });
 
   /// Creates a new proposal draft locally.
   Future<DraftRef> createDraftProposal({
@@ -37,7 +39,7 @@ abstract interface class ProposalService {
     required DocumentData document,
   });
 
-  /// Fetches favorites proposals ids of the user
+  /// Similar to [watchFavoritesProposalsIds] stops after first emit.
   Future<List<String>> getFavoritesProposalsIds();
 
   Future<ProposalData> getProposal({
@@ -74,7 +76,9 @@ abstract interface class ProposalService {
     required DocumentData document,
   });
 
-  Future<List<String>> removeFavoriteProposal(String proposalId);
+  Future<void> removeFavoriteProposal({
+    required DocumentRef ref,
+  });
 
   /// Submits a proposal draft into review.
   Future<void> submitProposalForReview({
@@ -90,7 +94,17 @@ abstract interface class ProposalService {
     required SignedDocumentRef categoryId,
   });
 
+  /// Fetches favorites proposals ids of the user
+  Stream<List<String>> watchFavoritesProposalsIds();
+
+  /// Emits when proposal fav status changes.
+  Stream<bool> watchIsFavoritesProposal({
+    required DocumentRef ref,
+  });
+
   Stream<List<Proposal>> watchLatestProposals({int? limit});
+
+  Stream<List<Proposal>> watchUserProposals();
 }
 
 final class ProposalServiceImpl implements ProposalService {
@@ -98,17 +112,23 @@ final class ProposalServiceImpl implements ProposalService {
   final DocumentRepository _documentRepository;
   final UserService _userService;
   final KeyDerivationService _keyDerivationService;
+  final CampaignRepository _campaignRepository;
 
   const ProposalServiceImpl(
     this._proposalRepository,
     this._documentRepository,
     this._userService,
     this._keyDerivationService,
+    this._campaignRepository,
   );
 
   @override
-  Future<List<String>> addFavoriteProposal(String proposalId) async {
-    return _proposalRepository.addFavoriteProposal(proposalId);
+  Future<void> addFavoriteProposal({required DocumentRef ref}) {
+    return _documentRepository.updateDocumentFavorite(
+      ref: ref.toLoose(),
+      type: DocumentType.proposalDocument,
+      isFavorite: true,
+    );
   }
 
   @override
@@ -118,13 +138,15 @@ final class ProposalServiceImpl implements ProposalService {
     required SignedDocumentRef categoryId,
   }) async {
     final draftRef = DraftRef.generateFirstRef();
-    await _documentRepository.upsertDocumentDraft(
+    final catalystId = await _getUserCatalystId();
+    await _proposalRepository.upsertDraftProposal(
       document: DocumentData(
         metadata: DocumentDataMetadata(
           type: DocumentType.proposalDocument,
           selfRef: draftRef,
           template: template,
           categoryId: categoryId,
+          authors: [catalystId],
         ),
         content: content,
       ),
@@ -135,45 +157,30 @@ final class ProposalServiceImpl implements ProposalService {
 
   @override
   Future<void> deleteDraftProposal(DraftRef ref) {
-    return _documentRepository.deleteDocumentDraft(ref: ref);
+    return _proposalRepository.deleteDraftProposal(ref);
   }
 
   @override
   Future<Uint8List> encodeProposalForExport({
     required DocumentData document,
   }) {
-    return _documentRepository.encodeDocumentForExport(
+    return _proposalRepository.encodeProposalForExport(
       document: document,
     );
   }
 
   @override
-  Future<List<String>> getFavoritesProposalsIds() async {
-    final proposalsIds = await _proposalRepository.getFavoritesProposalsIds();
-    return proposalsIds;
+  Future<List<String>> getFavoritesProposalsIds() {
+    return _documentRepository
+        .watchAllDocumentsFavoriteIds(type: DocumentType.proposalDocument)
+        .first;
   }
 
   @override
   Future<ProposalData> getProposal({
     required DocumentRef ref,
   }) async {
-    final proposal = await _proposalRepository.getProposal(ref: ref);
-    final document = await _documentRepository.getProposalDocument(
-      ref: ref,
-    );
-
-    // TODO(damian-molinski): Delete this after documents sync is ready.
-    final mergedDocument = ProposalDocument(
-      metadata: proposal.document.metadata,
-      document: document.document,
-    );
-
-    return ProposalData(
-      document: mergedDocument,
-      categoryId: proposal.categoryId,
-      commentsCount: 10,
-      versions: proposal.versions,
-    );
+    return _proposalRepository.getProposal(ref: ref);
   }
 
   @override
@@ -195,7 +202,7 @@ final class ProposalServiceImpl implements ProposalService {
   Future<ProposalTemplate> getProposalTemplate({
     required DocumentRef ref,
   }) async {
-    final proposalTemplate = await _documentRepository.getProposalTemplate(
+    final proposalTemplate = await _proposalRepository.getProposalTemplate(
       ref: ref,
     );
 
@@ -210,7 +217,7 @@ final class ProposalServiceImpl implements ProposalService {
 
   @override
   Future<DocumentRef> importProposal(Uint8List data) {
-    return _documentRepository.importDocument(data: data);
+    return _proposalRepository.importProposal(data);
   }
 
   @override
@@ -229,15 +236,19 @@ final class ProposalServiceImpl implements ProposalService {
 
     final ref = document.ref;
     if (ref is DraftRef) {
-      await _documentRepository.deleteDocumentDraft(ref: ref);
+      await _proposalRepository.deleteDraftProposal(ref);
     }
 
     return ref.toSignedDocumentRef();
   }
 
   @override
-  Future<List<String>> removeFavoriteProposal(String proposalId) async {
-    return _proposalRepository.removeFavoriteProposal(proposalId);
+  Future<void> removeFavoriteProposal({required DocumentRef ref}) {
+    return _documentRepository.updateDocumentFavorite(
+      ref: ref.toLoose(),
+      type: DocumentType.proposalDocument,
+      isFavorite: false,
+    );
   }
 
   @override
@@ -265,7 +276,10 @@ final class ProposalServiceImpl implements ProposalService {
     required SignedDocumentRef template,
     required SignedDocumentRef categoryId,
   }) async {
-    await _documentRepository.upsertDocumentDraft(
+    // TODO(LynxLynxx): when we start supporting multiple authors
+    // we need to get the list of authors actually stored in the db and
+    // add them to the authors list if they are not already there
+    await _proposalRepository.upsertDraftProposal(
       document: DocumentData(
         metadata: DocumentDataMetadata(
           type: DocumentType.proposalDocument,
@@ -279,25 +293,36 @@ final class ProposalServiceImpl implements ProposalService {
   }
 
   @override
+  Stream<List<String>> watchFavoritesProposalsIds() {
+    return _documentRepository.watchAllDocumentsFavoriteIds(
+      type: DocumentType.proposalDocument,
+    );
+  }
+
+  @override
+  Stream<bool> watchIsFavoritesProposal({required DocumentRef ref}) {
+    return _documentRepository.watchIsDocumentFavorite(ref: ref.toLoose());
+  }
+
+  @override
   Stream<List<Proposal>> watchLatestProposals({int? limit}) {
-    return _documentRepository
-        .watchProposalsDocuments(limit: limit)
+    return _proposalRepository
+        .watchLatestProposals(limit: limit)
         .switchMap((documents) async* {
       final proposalsStreams = await Future.wait(
         documents.map((doc) async {
-          final versionIds = await _documentRepository.queryVersionsOfId(
+          final versionIds = await _proposalRepository.queryVersionsOfId(
             id: doc.metadata.selfRef.id,
           );
+          final category =
+              await _campaignRepository.getCategory(doc.metadata.categoryId);
           final versionsData = versionIds
               .map(
-                (e) => BaseProposalData(
-                  document: e,
-                  categoryId: SignedDocumentRef.generateFirstRef(),
-                ),
+                (e) => BaseProposalData(document: e),
               )
               .toList();
 
-          return _documentRepository
+          return _proposalRepository
               .watchCount(
             ref: doc.metadata.selfRef,
             type: DocumentType.commentTemplate,
@@ -305,9 +330,7 @@ final class ProposalServiceImpl implements ProposalService {
               .map((commentsCount) {
             final proposalData = ProposalData(
               document: doc,
-              categoryId: SignedDocumentRef(
-                id: DocumentType.categoryParametersDocument.uuid,
-              ),
+              categoryName: category.categoryText,
               versions: versionsData,
               commentsCount: commentsCount,
             );
@@ -325,6 +348,38 @@ final class ProposalServiceImpl implements ProposalService {
     });
   }
 
+  @override
+  Stream<List<Proposal>> watchUserProposals() async* {
+    final authorId = await _getUserCatalystId();
+    yield* _proposalRepository
+        .watchUserProposals(
+      authorId: authorId,
+    )
+        .switchMap((documents) async* {
+      final proposals = documents.map((e) async {
+        final campaign =
+            await _campaignRepository.getCategory(e.metadata.categoryId);
+        final proposalData = ProposalData(
+          document: e,
+          categoryName: campaign.categoryText,
+        );
+        return Proposal.fromData(proposalData);
+      }).toList();
+      yield await Future.wait(proposals);
+    });
+  }
+
+  Future<CatalystId> _getUserCatalystId() async {
+    final account = _userService.user.activeAccount;
+    if (account == null) {
+      throw StateError(
+        'Cannot obtain proposer credentials, account missing',
+      );
+    }
+
+    return account.catalystId;
+  }
+
   Future<void> _useProposerRoleCredentials(
     Future<void> Function(
       CatalystId catalystId,
@@ -339,6 +394,7 @@ final class ProposalServiceImpl implements ProposalService {
     }
 
     final catalystId = account.catalystId.copyWith(
+      username: const Optional.empty(),
       role: const Optional(AccountRole.proposer),
       rotation: const Optional(0),
     );

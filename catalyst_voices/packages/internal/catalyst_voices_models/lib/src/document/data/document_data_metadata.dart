@@ -19,7 +19,7 @@ final class DocumentDataMetadata extends Equatable {
 
   /// If the document was formed from a template, this is a reference to that
   /// template document
-  final DocumentRef? template;
+  final SignedDocumentRef? template;
 
   /// uuid-v4
   /// Represents a "brand" who is running the voting, e.g. Catalyst, Midnight.
@@ -39,6 +39,9 @@ final class DocumentDataMetadata extends Equatable {
   /// "Products & Integrations".
   final SignedDocumentRef? categoryId;
 
+  /// List of authors represented by CatalystId
+  final List<CatalystId>? authors;
+
   DocumentDataMetadata({
     required this.type,
     required this.selfRef,
@@ -49,6 +52,7 @@ final class DocumentDataMetadata extends Equatable {
     this.campaignId,
     this.electionId,
     this.categoryId,
+    this.authors,
   }) : assert(
           selfRef.isExact,
           'selfRef have to be exact. Make sure version is not null',
@@ -67,6 +71,7 @@ final class DocumentDataMetadata extends Equatable {
         campaignId,
         electionId,
         categoryId,
+        authors,
       ];
 
   String get version => selfRef.version!;
@@ -76,11 +81,12 @@ final class DocumentDataMetadata extends Equatable {
     DocumentRef? selfRef,
     Optional<DocumentRef>? ref,
     Optional<SecuredDocumentRef>? refHash,
-    Optional<DocumentRef>? template,
+    Optional<SignedDocumentRef>? template,
     Optional<String>? brandId,
     Optional<String>? campaignId,
     Optional<String>? electionId,
     Optional<SignedDocumentRef>? categoryId,
+    Optional<List<CatalystId>>? authors,
   }) {
     return DocumentDataMetadata(
       type: type ?? this.type,
@@ -92,6 +98,7 @@ final class DocumentDataMetadata extends Equatable {
       campaignId: campaignId.dataOr(this.campaignId),
       electionId: electionId.dataOr(this.electionId),
       categoryId: categoryId.dataOr(this.categoryId),
+      authors: authors.dataOr(this.authors),
     );
   }
 }

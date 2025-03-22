@@ -55,38 +55,46 @@
     "campaign_category": {
         "category_questions": {
             "informational_content": {
-                "answer": true
+                "answer": false
             },
             "foundational_rd": {
-                "answer": true
+                "answer": false
             },
             "financial_products": {
-                "answer": true
+                "answer": false
             },
             "early_stage_product": {
-                "answer": true
+                "answer": false
             },
             "developer_tools": {
-                "answer": true
+                "answer": false
             },
             "enterprise_partnership": {
                 "answer": true,
-                "secondary_question": {}
+                "secondary_question": {
+                    "question": "Example Enterprise with proven track record"
+                }
             },
             "working_product": {
                 "answer": true,
-                "secondary_question": {}
+                "secondary_question": {
+                    "question": "Example product with measurable adoption metrics"
+                }
             },
             "timeline": {
                 "answer": true
             },
             "matching_funds": {
                 "answer": true,
-                "secondary_question": {}
+                "secondary_question": {
+                    "question": "Example matching funds details"
+                }
             },
             "adoption_potential": {
                 "answer": true,
-                "secondary_question": {}
+                "secondary_question": {
+                    "question": "Example measurable outcomes and assessment methods"
+                }
             }
         }
     },
@@ -144,7 +152,7 @@
     },
     "pitch": {
         "team": {
-            "who": "Our team consists of experienced blockchain developers with proven track records..."
+            "who": "Our team consists of experienced blockchain developers with proven track records...\n- **This is a test of the image which can be rendered**. ![](https://images.pexels.com/photos/30432517/pexels-photo-30432517/free-photo-of-people-walking-on-historic-railway-platform.jpeg) \n- **This is a test of the image  which can't be rendered**.  ![](https://picography.co/wp-content/uploads/2024/10/picography-rustic-wood-slices-768x1152.jpg)"
         },
         "budget": {
             "costs": "Budget breakdown:\n- Development (70%): 105,000 ADA\n- Testing (15%): 22,500 ADA\n- Documentation (15%): 22,500 ADA"

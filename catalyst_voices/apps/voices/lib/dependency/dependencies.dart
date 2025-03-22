@@ -123,8 +123,11 @@ final class Dependencies extends DependencyProvider {
       ..registerFactory<AccountCubit>(() {
         return AccountCubit(get<UserService>());
       })
-      ..registerFactory<ProposalBloc>(() {
-        return ProposalBloc(get<ProposalService>());
+      ..registerFactory<ProposalCubit>(() {
+        return ProposalCubit(
+          get<UserService>(),
+          get<ProposalService>(),
+        );
       })
       ..registerFactory<NewProposalCubit>(() {
         return NewProposalCubit(
@@ -166,6 +169,11 @@ final class Dependencies extends DependencyProvider {
           get<CatalystDatabase>(),
         );
       })
+      ..registerLazySingleton<DocumentFavoriteSource>(() {
+        return DatabaseDocumentFavoriteSource(
+          get<CatalystDatabase>(),
+        );
+      })
       ..registerLazySingleton<CatGatewayDocumentDataSource>(() {
         return CatGatewayDocumentDataSource(
           get<ApiServices>(),
@@ -179,6 +187,7 @@ final class Dependencies extends DependencyProvider {
           get<DatabaseDraftsDataSource>(),
           get<SignedDocumentDataSource>(),
           get<CatGatewayDocumentDataSource>(),
+          get<DocumentFavoriteSource>(),
         );
       })
       ..registerLazySingleton<DocumentMapper>(() => const DocumentMapperImpl())
@@ -244,6 +253,7 @@ final class Dependencies extends DependencyProvider {
         get<DocumentRepository>(),
         get<UserService>(),
         get<KeyDerivationService>(),
+        get<CampaignRepository>(),
       );
     });
     registerLazySingleton<ConfigService>(() {
