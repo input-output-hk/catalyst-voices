@@ -55,16 +55,14 @@ void main() {
         final templateData = await VoicesDocumentsTemplates.proposalF14Schema;
         final proposalData = await VoicesDocumentsTemplates.proposalF14Document;
 
-        final templateRef = DocumentRefFactory.buildSigned(
-          id: const Uuid().v7(),
-        );
+        final templateRef = SignedDocumentRef.first(const Uuid().v7());
         final template = DocumentDataFactory.build(
           selfRef: templateRef,
           type: DocumentType.proposalTemplate,
           content: DocumentDataContent(templateData),
         );
         final proposal = DocumentDataFactory.build(
-          selfRef: DocumentRefFactory.buildSigned(id: const Uuid().v7()),
+          selfRef: SignedDocumentRef.first(const Uuid().v7()),
           type: DocumentType.proposalDocument,
           template: templateRef,
           content: DocumentDataContent(proposalData),
@@ -96,7 +94,7 @@ void main() {
         version: const Uuid().v7(),
       );
       final proposal = DocumentDataFactory.build(
-        selfRef: DocumentRefFactory.buildSigned(id: const Uuid().v7()),
+        selfRef: SignedDocumentRef.first(const Uuid().v7()),
         type: DocumentType.proposalDocument,
         template: templateRef,
         content: const DocumentDataContent({}),
@@ -129,7 +127,7 @@ void main() {
         final version = id;
 
         final documentData = DocumentDataFactory.build(
-          selfRef: DocumentRefFactory.buildSigned(id: id, version: version),
+          selfRef: SignedDocumentRef(id: id, version: version),
         );
 
         final ref = documentData.ref;
@@ -151,7 +149,7 @@ void main() {
         final version = id;
 
         final documentData = DocumentDataFactory.build(
-          selfRef: DocumentRefFactory.buildSigned(id: id, version: version),
+          selfRef: SignedDocumentRef(id: id, version: version),
         );
 
         final ref = SignedDocumentRef(id: id);
@@ -175,7 +173,7 @@ void main() {
     group('watchDocumentWithRef', () {
       test('template reference is watched and combined correctly', () async {
         // Given
-        final templateRef = DocumentRefFactory.buildSigned();
+        final templateRef = SignedDocumentRef.generateFirstRef();
         final template = DocumentDataFactory.build(
           type: DocumentType.proposalTemplate,
           selfRef: templateRef,
@@ -214,7 +212,7 @@ void main() {
 
       test('loads template once when two documents refers to it', () async {
         // Given
-        final templateRef = DocumentRefFactory.buildSigned();
+        final templateRef = SignedDocumentRef.generateFirstRef();
         final template = DocumentDataFactory.build(
           type: DocumentType.proposalTemplate,
           selfRef: templateRef,
@@ -257,7 +255,7 @@ void main() {
       test('document data is saved', () async {
         // Given
         final documentDataToSave = DocumentDataFactory.build(
-          selfRef: DocumentRefFactory.buildDraft(),
+          selfRef: DraftRef.generateFirstRef(),
         );
 
         // When
@@ -279,13 +277,13 @@ void main() {
       const initialContent = DocumentDataContent({});
       const updatedContent = DocumentDataContent({'title': 'My proposal'});
 
-      final templateRef = DocumentRefFactory.buildSigned();
+      final templateRef = SignedDocumentRef.generateFirstRef();
       final templateData = DocumentDataFactory.build(
         selfRef: templateRef,
         type: DocumentType.proposalTemplate,
       );
 
-      final draftRef = DocumentRefFactory.buildDraft();
+      final draftRef = DraftRef.generateFirstRef();
       final draftData = DocumentDataFactory.build(
         type: DocumentType.proposalDocument,
         selfRef: draftRef,
@@ -330,14 +328,14 @@ void main() {
     test(
       'watchProposalsDocuments returns correct model',
       () async {
-        final templateRef = DocumentRefFactory.buildSigned();
+        final templateRef = SignedDocumentRef.generateFirstRef();
         final templateData = DocumentDataFactory.build(
           selfRef: templateRef,
           type: DocumentType.proposalTemplate,
         );
         const publicDraftContent =
             DocumentDataContent({'title': 'My proposal'});
-        final publicDraftRef = DocumentRefFactory.buildDraft();
+        final publicDraftRef = DraftRef.generateFirstRef();
         final publicDraftData = DocumentDataFactory.build(
           type: DocumentType.proposalDocument,
           selfRef: publicDraftRef,

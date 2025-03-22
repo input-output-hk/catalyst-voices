@@ -75,6 +75,9 @@ final class DraftRef extends DocumentRef {
     super.version,
   });
 
+  /// Creates ref for first version of [id] draft.
+  const DraftRef.first(String id) : this(id: id, version: id);
+
   factory DraftRef.generateFirstRef() {
     final id = const Uuid().v7();
     return DraftRef(
