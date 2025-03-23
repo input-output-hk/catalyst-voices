@@ -2,6 +2,7 @@ import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
 
 /// Defines possible account roles.
+// TODO(damian-molinski): rename AccountRoleType
 enum AccountRole {
   /// An account role that is assigned to every account.
   /// Allows to vote for proposals.
@@ -57,8 +58,6 @@ enum AccountRole {
   }
 }
 
-// TODO(damian-molinski): rename AccountRoleType
-//
 // TODO(damian-molinski): rename to AccountRole
 final class AccountRoleData extends Equatable {
   final AccountRole type;
