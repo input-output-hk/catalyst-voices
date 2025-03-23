@@ -7,14 +7,14 @@ use crate::service::common;
 /// Rbac Registration Validation Error.
 #[derive(Object)]
 #[oai(example = true)]
-pub(crate) struct RbacUnprocessableContent {
+pub struct RbacUnprocessableContent {
     /// Error message.
     error: common::types::generic::error_msg::ErrorMessage,
 }
 
 impl RbacUnprocessableContent {
     /// Create a new instance of `ConfigBadRequest`.
-    pub(crate) fn new(error: &(impl ToString + ?Sized)) -> Self {
+    pub fn new(error: &(impl ToString + ?Sized)) -> Self {
         Self {
             error: error.to_string().into(),
         }

@@ -10,7 +10,7 @@ use crate::service::{
 
 /// An `/rbac/registrations` endpoint responses.
 #[derive(ApiResponse)]
-pub(crate) enum Responses {
+pub enum Responses {
     /// ## Ok
     ///
     /// Success returns a list of registration transaction ids.
@@ -26,4 +26,4 @@ pub(crate) enum Responses {
     UnprocessableContent(Json<RbacUnprocessableContent>),
 }
 
-pub(crate) type AllResponses = WithErrorResponses<Responses>;
+pub type AllResponses = WithErrorResponses<Responses>;
