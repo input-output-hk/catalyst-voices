@@ -186,11 +186,11 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
       ),
       builder: (context) {
         return VoicesAlertDialog(
-          title: Text(error.title(context)),
           icon: VoicesAssets.icons.exclamation.buildIcon(
             size: 48,
             color: Theme.of(context).colors.iconsWarning,
           ),
+          subtitle: Text(error.title(context)),
           content: Text(error.message(context)),
           buttons: [
             VoicesFilledButton(
@@ -211,11 +211,11 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
       ),
       builder: (context) {
         return VoicesAlertDialog(
-          title: Text(error.title(context)),
           icon: VoicesAssets.icons.exclamation.buildIcon(
             size: 48,
             color: Theme.of(context).colors.iconsWarning,
           ),
+          subtitle: Text(error.title(context)),
           content: Text(error.message(context)),
           buttons: [
             VoicesFilledButton(

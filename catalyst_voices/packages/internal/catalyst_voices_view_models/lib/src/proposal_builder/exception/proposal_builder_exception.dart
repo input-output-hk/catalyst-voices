@@ -7,7 +7,7 @@ final class ProposalBuilderPublishException extends LocalizedException {
 
   @override
   String message(BuildContext context) {
-    return context.l10n.proposalEditorPublishErrorDialogTitle;
+    return context.l10n.proposalEditorPublishErrorDialogMessage;
   }
 
   String title(BuildContext context) {
