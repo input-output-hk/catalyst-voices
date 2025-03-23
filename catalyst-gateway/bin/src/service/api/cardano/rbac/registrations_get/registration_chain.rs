@@ -68,7 +68,8 @@ impl RbacRegistrationChain {
             .map(UUIDv4::from)
             .collect::<Vec<_>>()
             .into();
-        let roles = role_data(chain.role_data());
+        // TODO: FIXME: Update catalyst libs.
+        let roles = role_data(chain.all_role_data());
 
         Self {
             catalyst_id,
@@ -80,67 +81,14 @@ impl RbacRegistrationChain {
     }
 }
 
-fn role_data(role_data: &HashMap<RoleNumber, PointData<RoleData>>) -> HashMap<u8, RbacRoleData> {
-    // TODO: FIXME:
-    todo!()
+fn role_data(
+    role_data: &HashMap<RoleNumber, Vec<PointData<RoleData>>>,
+) -> HashMap<u8, RbacRoleData> {
+    role_data
+        .iter()
+        .map(|(&number, data)| {
+            let data = RbacRoleData::new(data);
+            (number.into(), data)
+        })
+        .collect()
 }
-
-// TODO: FIXME:
-//
-// use x509_cert::{certificate::Certificate as X509Certificate, der::Encode as _};
-//
-// /// Converts X509 certificates.
-// fn convert_x509_map(
-//     certs: &HashMap<usize, Vec<PointData<Option<X509Certificate>>>>,
-// ) -> CertificateMap {
-//     certs
-//         .iter()
-//         .map(|(index, point_data)| (*index, encode_x509_list(point_data)))
-//         .collect::<HashMap<_, _>>()
-//         .into()
-// }
-//
-// /// Encodes the given list of X509 certificates.
-// fn encode_x509_list(certs: &Vec<PointData<Option<X509Certificate>>>) ->
-// Vec<Option<Vec<u8>>> {     certs
-//         .iter()
-//         .map(|point_data| {
-//             point_data
-//                 .data()
-//                 .as_ref()
-//                 .map(|cert| {
-//                     let mut buffer = Vec::new();
-//                     let mut e = Encoder::new(&mut buffer);
-//                     cert.encode(&mut e).ok().map(|()| buffer)
-//                 })
-//                 .flatten()
-//         })
-//         .collect()
-// }
-//
-// /// Converts a map of C509 certificates.
-// fn convert_c509_map(certs: &HashMap<usize, Vec<PointData<Option<C509>>>>) ->
-// CertificateMap {     certs
-//         .iter()
-//         .map(|(index, point_data)| (*index, encode_c509_list(point_data)))
-//         .collect::<HashMap<_, _>>()
-//         .into()
-// }
-//
-// /// Encodes the given list of C509 certificates.
-// fn encode_c509_list(certs: &Vec<PointData<Option<C509>>>) -> Vec<Option<Vec<u8>>> {
-//     certs
-//         .iter()
-//         .map(|point_data| {
-//             point_data
-//                 .data()
-//                 .as_ref()
-//                 .map(|cert| {
-//                     let mut buffer = Vec::new();
-//                     let mut e = Encoder::new(&mut buffer);
-//                     cert.encode(&mut e, &mut ()).ok().map(|()| buffer)
-//                 })
-//                 .flatten()
-//         })
-//         .collect()
-// }
