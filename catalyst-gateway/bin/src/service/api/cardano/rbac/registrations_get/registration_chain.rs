@@ -2,9 +2,7 @@
 
 use std::collections::HashMap;
 
-use cardano_blockchain_types::Slot;
 use poem_openapi::{types::Example, Object};
-use rbac_registration::cardano::cip509::{PointData, RoleData, RoleNumber};
 
 use crate::service::{
     api::cardano::rbac::registrations_get::{
@@ -65,7 +63,7 @@ impl RbacRegistrationChain {
             .map(UUIDv4::from)
             .collect::<Vec<_>>()
             .into();
-        let roles = role_data(info.chain.all_role_data(), info.last_persistent_slot);
+        let roles = role_data(&info);
 
         Self {
             catalyst_id,
@@ -77,13 +75,12 @@ impl RbacRegistrationChain {
     }
 }
 
-fn role_data(
-    role_data: &HashMap<RoleNumber, Vec<PointData<RoleData>>>, last_persistent_slot: Slot,
-) -> HashMap<u8, RbacRoleData> {
-    role_data
+fn role_data(info: &ChainInfo) -> HashMap<u8, RbacRoleData> {
+    info.chain
+        .all_role_data()
         .iter()
         .map(|(&number, data)| {
-            let data = RbacRoleData::new(data, last_persistent_slot);
+            let data = RbacRoleData::new(data, info.last_persistent_slot, &info.chain);
             (number.into(), data)
         })
         .collect()
