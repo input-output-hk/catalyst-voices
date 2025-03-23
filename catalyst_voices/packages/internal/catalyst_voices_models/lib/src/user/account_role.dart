@@ -32,7 +32,6 @@ enum AccountRole {
   /// role the signing key belongs.
   final int registrationOffset;
   final bool isDefault;
-
   final bool isHidden;
 
   const AccountRole({
