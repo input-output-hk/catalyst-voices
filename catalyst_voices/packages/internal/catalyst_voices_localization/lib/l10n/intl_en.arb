@@ -135,6 +135,13 @@
   },
   "refresh": "Refresh",
   "ok": "Ok",
+  "@ok": {
+    "description": "Short confirmation (ok)."
+  },
+  "okay": "Okay",
+  "@okay": {
+    "description": "Short confirmation (okay.)"
+  },
   "seedPhraseSlotNr": "Slot {nr}",
   "@seedPhraseSlotNr": {
     "description": "When user arranges seed phrases this text is shown when phrase was not selected",
@@ -1606,6 +1613,22 @@
   "proposalEditorDeleteDialogDeleteButton": "Delete Proposal",
   "@proposalEditorDeleteDialogDeleteButton": {
     "description": "A button label for the dialog to confirm proposal deletion."
+  },
+  "proposalEditorSubmitErrorDialogTitle": "Unable to Submit Proposal",
+  "@proposalEditorSubmitErrorDialogTitle": {
+    "description": "Dialog title in proposal editor when submitting proposal for review failed."
+  },
+  "proposalEditorSubmitErrorDialogMessage": "We couldn't submit your proposal. Please try again in 5-10 minutes, as it may take some time for your information to update.\n\nIf the issue persists, feel free to contact support.",
+  "@proposalEditorSubmitErrorDialogMessage": {
+    "description": "Dialog message in proposal editor when submitting proposal for review failed."
+  },
+  "proposalEditorPublishErrorDialogTitle": "Unable to Publish Proposal",
+  "@proposalEditorPublishErrorDialogTitle": {
+    "description": "Dialog title in proposal editor when publishing proposal to the serverfailed."
+  },
+  "proposalEditorPublishErrorDialogMessage": "We couldn't publish your proposal. Please try again in 5-10 minutes, as it may take some time for your information to update.\n\nIf the issue persists, feel free to contact support.",
+  "@proposalEditorPublishErrorDialogMessage": {
+    "description": "Dialog message in proposal editor when publishing proposal to the serverfailed."
   },
   "showAll": "Show All",
   "@showAll": {

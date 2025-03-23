@@ -15,7 +15,9 @@ import 'package:catalyst_voices/widgets/snackbar/voices_snackbar.dart';
 import 'package:catalyst_voices/widgets/snackbar/voices_snackbar_action.dart';
 import 'package:catalyst_voices/widgets/snackbar/voices_snackbar_type.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
+import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
+import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
@@ -120,10 +122,15 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
 
   @override
   void handleError(Object error) {
-    if (error is ProposalBuilderValidationException) {
-      _showValidationErrorSnackbar(error);
-    } else {
-      super.handleError(error);
+    switch (error) {
+      case ProposalBuilderValidationException():
+        _showValidationErrorSnackbar(error);
+      case ProposalBuilderPublishException():
+        unawaited(_showPublishException(error));
+      case ProposalBuilderSubmitException():
+        unawaited(_showSubmitException(error));
+      default:
+        super.handleError(error);
     }
   }
 
@@ -169,6 +176,56 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
     Router.neglect(context, () {
       const WorkspaceRoute().replace(context);
     });
+  }
+
+  Future<void> _showPublishException(ProposalBuilderPublishException error) {
+    return VoicesDialog.show(
+      context: context,
+      routeSettings: const RouteSettings(
+        name: '/proposal-builder/publish-error',
+      ),
+      builder: (context) {
+        return VoicesAlertDialog(
+          title: Text(error.title(context)),
+          icon: VoicesAssets.icons.exclamation.buildIcon(
+            size: 48,
+            color: Theme.of(context).colors.iconsWarning,
+          ),
+          content: Text(error.message(context)),
+          buttons: [
+            VoicesFilledButton(
+              onTap: () => Navigator.of(context).pop(),
+              child: Text(context.l10n.okay),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _showSubmitException(ProposalBuilderSubmitException error) {
+    return VoicesDialog.show(
+      context: context,
+      routeSettings: const RouteSettings(
+        name: '/proposal-builder/submit-error',
+      ),
+      builder: (context) {
+        return VoicesAlertDialog(
+          title: Text(error.title(context)),
+          icon: VoicesAssets.icons.exclamation.buildIcon(
+            size: 48,
+            color: Theme.of(context).colors.iconsWarning,
+          ),
+          content: Text(error.message(context)),
+          buttons: [
+            VoicesFilledButton(
+              onTap: () => Navigator.of(context).pop(),
+              child: Text(context.l10n.okay),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   void _showValidationErrorSnackbar(ProposalBuilderValidationException error) {

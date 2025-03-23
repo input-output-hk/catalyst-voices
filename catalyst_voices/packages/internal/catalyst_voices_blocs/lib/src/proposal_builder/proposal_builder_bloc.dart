@@ -441,7 +441,7 @@ final class ProposalBuilderBloc
       );
     } catch (error, stackTrace) {
       _logger.severe('PublishProposal', error, stackTrace);
-      emitError(error);
+      emitError(const ProposalBuilderPublishException());
     }
   }
 
@@ -477,7 +477,7 @@ final class ProposalBuilderBloc
       }
     } catch (error, stackTrace) {
       _logger.severe('SubmitProposalForReview', error, stackTrace);
-      emitError(error);
+      emitError(const ProposalBuilderSubmitException());
     }
   }
 
