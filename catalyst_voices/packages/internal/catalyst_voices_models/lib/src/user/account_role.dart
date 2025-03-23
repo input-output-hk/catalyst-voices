@@ -2,12 +2,6 @@ import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
 
 /// Defines possible account roles.
-///
-/// The order of enums must be kept since the RegistrationTransactionBuilder
-/// depends on it to inject keys/certificates in slots related to enum indexes.
-///
-/// New roles should be added at the bottom so that
-/// existing indexes are not misplaced.
 enum AccountRole {
   /// An account role that is assigned to every account.
   /// Allows to vote for proposals.
