@@ -1,21 +1,18 @@
-import 'package:catalyst_voices/common/ext/build_context_ext.dart';
-import 'package:catalyst_voices/pages/proposal/widget/proposal_version.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
-import 'package:catalyst_voices_models/catalyst_voices_models.dart'
-    hide ProposalVersion;
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
-class ProposalNavigationPanel extends StatelessWidget {
-  const ProposalNavigationPanel({super.key});
+class ProposalSegmentsNavigation extends StatelessWidget {
+  const ProposalSegmentsNavigation({super.key});
 
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder(
       valueListenable: SegmentsControllerScope.of(context),
       builder: (context, value, _) {
-        return _ProposalNavigationPanel(
+        return _ProposalSegmentsNavigation(
           segments: value.segments,
           openedSegments: value.openedSegments,
           selectedSectionId: value.activeSectionId,
@@ -25,42 +22,12 @@ class ProposalNavigationPanel extends StatelessWidget {
   }
 }
 
-class _ControlsTile extends StatelessWidget {
-  const _ControlsTile({
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final bottomBorder = BorderSide(
-      color: context.colors.outlineBorderVariant,
-    );
-
-    return Container(
-      decoration: BoxDecoration(border: Border(bottom: bottomBorder)),
-      padding: const EdgeInsets.symmetric(vertical: 12),
-      child: Row(
-        children: [
-          VoicesIconButton(
-            onTap: () {
-              // TODO(damian-molinski): Implement toggling panel
-            },
-            child: VoicesAssets.icons.leftRailToggle.buildIcon(),
-          ),
-          const Spacer(),
-          const ProposalVersion(showBorder: false),
-        ],
-      ),
-    );
-  }
-}
-
-class _ProposalNavigationPanel extends StatelessWidget {
+class _ProposalSegmentsNavigation extends StatelessWidget {
   final List<Segment> segments;
   final Set<NodeId> openedSegments;
   final NodeId? selectedSectionId;
 
-  const _ProposalNavigationPanel({
+  const _ProposalSegmentsNavigation({
     required this.segments,
     this.openedSegments = const {},
     this.selectedSectionId,
@@ -71,11 +38,7 @@ class _ProposalNavigationPanel extends StatelessWidget {
     return ListView.separated(
       padding: const EdgeInsets.symmetric(vertical: 16),
       itemBuilder: (context, index) {
-        if (index == 0) {
-          return const _ControlsTile(key: ValueKey('NavigationControls'));
-        }
-
-        final segment = segments[index - 1];
+        final segment = segments[index];
 
         return _SegmentMenuTile(
           key: ValueKey('Segment[$index]NodeMenu'),
@@ -84,7 +47,7 @@ class _ProposalNavigationPanel extends StatelessWidget {
         );
       },
       separatorBuilder: (_, __) => const SizedBox(height: 12),
-      itemCount: segments.length + 1,
+      itemCount: segments.length,
     );
   }
 }
