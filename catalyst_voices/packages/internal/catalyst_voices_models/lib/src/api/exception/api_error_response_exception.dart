@@ -45,10 +45,13 @@ final class ApiErrorResponseException extends ApiException {
   final int statusCode;
   final Object? error;
 
-  ApiErrorResponseException({
+  const ApiErrorResponseException({
     required this.statusCode,
     this.error,
   });
+
+  @override
+  List<Object?> get props => [statusCode, error];
 
   @override
   String toString() {
