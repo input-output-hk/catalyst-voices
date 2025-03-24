@@ -25,9 +25,7 @@ impl PaymentData {
     pub fn new(
         is_persistent: bool, time: DateTime<Utc>, address: Option<ShelleyAddress>,
     ) -> anyhow::Result<Self> {
-        let address = address
-            .map(|a| Cip19ShelleyAddress::try_from(a))
-            .transpose()?;
+        let address = address.map(Cip19ShelleyAddress::try_from).transpose()?;
 
         Ok(Self {
             is_persistent: is_persistent.into(),

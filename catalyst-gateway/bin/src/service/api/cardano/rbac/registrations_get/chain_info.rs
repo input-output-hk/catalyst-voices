@@ -39,10 +39,10 @@ impl ChainInfo {
 
         let (chain, last_persistent_slot) =
             apply_registrations(network, None, persistent_registrations).await?;
-        let last_persistent_txn = chain.as_ref().map(|c| c.current_tx_id_hash());
+        let last_persistent_txn = chain.as_ref().map(RegistrationChain::current_tx_id_hash);
 
         let (chain, _) = apply_registrations(network, chain, volatile_registrations).await?;
-        let last_volatile_txn = chain.as_ref().map(|c| c.current_tx_id_hash());
+        let last_volatile_txn = chain.as_ref().map(RegistrationChain::current_tx_id_hash);
 
         Ok(chain.map(|chain| {
             Self {
@@ -60,7 +60,7 @@ impl ChainInfo {
 async fn indexed_registrations(
     session: &CassandraSession, catalyst_id: &IdUri,
 ) -> anyhow::Result<Vec<Query>> {
-    let mut result: Vec<_> = Query::execute(&session, QueryParams {
+    let mut result: Vec<_> = Query::execute(session, QueryParams {
         catalyst_id: catalyst_id.clone().into(),
     })
     .and_then(|r| r.try_collect().map_err(Into::into))

@@ -134,5 +134,5 @@ fn convert_pub_key(
         .find(|d| d.point() == point)
         .with_context(|| format!("Unable to find pub key for the given point {point}"))?
         .data()
-        .map(|k| k.into()))
+        .map(Into::into))
 }

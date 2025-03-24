@@ -38,8 +38,7 @@ pub struct RbacRoleData {
 
 impl RbacRoleData {
     pub fn new(
-        point_data: &Vec<PointData<RoleData>>, last_persistent_slot: Slot,
-        chain: &RegistrationChain,
+        point_data: &[PointData<RoleData>], last_persistent_slot: Slot, chain: &RegistrationChain,
     ) -> anyhow::Result<Self> {
         let network = Settings::cardano_network();
 
@@ -48,7 +47,7 @@ impl RbacRoleData {
         let mut payment_address = Vec::new();
         let mut extended_data = HashMap::new();
 
-        for point in point_data.iter() {
+        for point in point_data {
             let slot = point.point().slot_or_default();
             let is_persistent = slot <= last_persistent_slot;
             let time = network.slot_to_time(slot);
@@ -96,7 +95,7 @@ impl Example for RbacRoleData {
             signing_keys: vec![KeyData::example()],
             encryption_keys: vec![],
             payment_address: vec![PaymentData::example()],
-            extended_data: Default::default(),
+            extended_data: HashMap::default(),
         }
     }
 }
