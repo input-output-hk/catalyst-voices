@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:developer';
 
 import 'package:async/async.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -349,7 +348,6 @@ final class DocumentRepositoryImpl implements DocumentRepository {
       authorId: authorId,
     )
         .asyncMap((documents) async {
-      log(documents.length.toString());
       final typedDocuments = documents.cast<DocumentData>();
       final results = await Future.wait(
         typedDocuments
