@@ -1,5 +1,6 @@
 export 'account/my_account_role_item.dart';
 export 'account/my_account_status_notification.dart';
+export 'api/exception/localized_api_exception.dart';
 export 'authentication/authentication.dart';
 export 'campaign/campaign_category_section.dart';
 export 'campaign/campaign_category_view_model.dart';

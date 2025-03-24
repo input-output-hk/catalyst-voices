@@ -32,9 +32,7 @@ final class ProposalCubit extends Cubit<ProposalState>
   StreamSubscription<CatalystId?>? _activeAccountIdSub;
 
   // Note for integration.
-  // 1. Fetch proposal document
   // 2. Observe document comments
-  // 4. Sort comments.
   ProposalCubit(
     this._userService,
     this._proposalService,
@@ -56,17 +54,22 @@ final class ProposalCubit extends Cubit<ProposalState>
 
   Future<void> load({required DocumentRef ref}) async {
     try {
+      _ref = ref;
+
       _logger.info('Loading $ref');
 
       emit(state.copyWith(isLoading: true));
 
-      final proposal = await _proposalService.getProposal(ref: ref);
+      await Future<void>.delayed(const Duration(seconds: 2));
+
+      throw ErrorResponseException(statusCode: 404);
+
+      // final proposal = await _proposalService.getProposal(ref: ref);
       final comments = _buildComments();
       final isFavorite =
           await _proposalService.watchIsFavoritesProposal(ref: ref).first;
 
-      _ref = ref;
-      _proposal = proposal;
+      _proposal = null;
       _commentTemplate = _buildCommentTemplate();
       _comments = comments;
       _isFavorite = isFavorite;
@@ -83,7 +86,6 @@ final class ProposalCubit extends Cubit<ProposalState>
     } on LocalizedException catch (error, stack) {
       _logger.severe('Loading $ref failed', error, stack);
 
-      _ref = null;
       _proposal = null;
       _commentTemplate = null;
       _comments = null;
@@ -93,7 +95,6 @@ final class ProposalCubit extends Cubit<ProposalState>
     } catch (error, stack) {
       _logger.severe('Loading $ref failed', error, stack);
 
-      _ref = null;
       _proposal = null;
       _commentTemplate = null;
       _comments = null;
@@ -102,6 +103,13 @@ final class ProposalCubit extends Cubit<ProposalState>
       emit(const ProposalState(error: LocalizedUnknownException()));
     } finally {
       emit(state.copyWith(isLoading: false));
+    }
+  }
+
+  Future<void> retryLastRef() async {
+    final ref = _ref;
+    if (ref != null) {
+      await load(ref: ref);
     }
   }
 
