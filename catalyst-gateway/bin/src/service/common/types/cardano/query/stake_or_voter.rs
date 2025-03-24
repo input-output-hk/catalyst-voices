@@ -10,6 +10,7 @@ use std::{
 
 use anyhow::{bail, Result};
 use const_format::concatcp;
+use poem::http::HeaderMap;
 use poem_openapi::{
     registry::{MetaSchema, MetaSchemaRef},
     types::{ParseFromParameter, ParseResult, Type},
@@ -19,6 +20,7 @@ use serde_json::Value;
 
 use crate::service::common::{
     self,
+    auth::api_key::check_api_key,
     types::{
         cardano::cip19_stake_address::Cip19StakeAddress,
         generic::ed25519_public_key::Ed25519HexEncodedPublicKey,
@@ -146,17 +148,21 @@ impl ParseFromParameter for StakeOrVoter {
 
 impl StakeOrVoter {
     /// Is this for ALL results?
-    pub(crate) fn is_all(&self) -> bool {
-        matches!(self, Self::All)
+    pub(crate) fn is_all(&self, headers: &HeaderMap) -> Result<bool> {
+        match self {
+            StakeOrVoter::All => {
+                check_api_key(headers)?;
+                Ok(true)
+            },
+            _ => Ok(false),
+        }
     }
 }
 
-impl TryInto<common::types::cardano::cip19_stake_address::Cip19StakeAddress> for StakeOrVoter {
+impl TryInto<Cip19StakeAddress> for StakeOrVoter {
     type Error = anyhow::Error;
 
-    fn try_into(
-        self,
-    ) -> Result<common::types::cardano::cip19_stake_address::Cip19StakeAddress, Self::Error> {
+    fn try_into(self) -> Result<Cip19StakeAddress, Self::Error> {
         match self {
             Self::Address(addr) => Ok(addr),
             _ => bail!("Not a Stake Address"),

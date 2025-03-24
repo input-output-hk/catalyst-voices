@@ -1,12 +1,12 @@
 //! CIP36 Registration Endpoints
 
+use poem::http::HeaderMap;
 use poem_openapi::{param::Query, payload::Json, OpenApi};
 use response::Cip36RegistrationUnprocessableContent;
 
-use self::cardano::slot_no::SlotNo;
+use self::{cardano::slot_no::SlotNo, common::auth::none::NoAuthorization};
 use crate::service::common::{
     self,
-    auth::none_or_api_key::NoneOrApiKey,
     tags::ApiTags,
     types::cardano::{self},
 };
@@ -47,13 +47,16 @@ impl Api {
         asat: Query<Option<cardano::query::AsAt>>,
         page: Query<Option<common::types::generic::query::pagination::Page>>,
         limit: Query<Option<common::types::generic::query::pagination::Limit>>,
-        api_key: NoneOrApiKey,
+        /// Headers, used if the query is requesting ALL to determine if the secret API
+        /// Key is also defined.
+        headers: &HeaderMap,
+        _auth: NoAuthorization,
     ) -> response::AllRegistration {
         // Special validation for the `lookup` parameter.
         // If the parameter is ALL, BUT we do not have a valid API Key, just report the parameter
         // is invalid.
         if let Some(lookup) = lookup.0.clone() {
-            if lookup.is_all() && matches!(api_key, NoneOrApiKey::None(_)) {
+            if lookup.is_all(headers).is_err() {
                 return response::Cip36Registration::UnprocessableContent(Json(
                     Cip36RegistrationUnprocessableContent::new(
                         "Invalid Stake Address or Voter key",
