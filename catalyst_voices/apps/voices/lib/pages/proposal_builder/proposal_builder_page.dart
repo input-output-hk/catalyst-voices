@@ -140,6 +140,9 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
     switch (signal) {
       case DeletedProposalBuilderSignal():
         _onProposalDeleted();
+      case PublishedProposalBuilderSignal():
+      case SubmittedProposalBuilderSignal():
+        const WorkspaceRoute().go(context);
     }
   }
 

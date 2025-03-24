@@ -421,6 +421,8 @@ final class ProposalBuilderBloc
       emit,
       publish: ProposalPublish.submittedProposal,
     );
+
+    emitSignal(const SubmittedProposalBuilderSignal());
   }
 
   Future<void> _publishProposal(
@@ -439,6 +441,7 @@ final class ProposalBuilderBloc
         documentRef: updatedRef,
         publish: ProposalPublish.publishedDraft,
       );
+      emitSignal(const PublishedProposalBuilderSignal());
     } catch (error, stackTrace) {
       _logger.severe('PublishProposal', error, stackTrace);
       emitError(const ProposalBuilderPublishException());
@@ -449,8 +452,6 @@ final class ProposalBuilderBloc
     Emitter<ProposalBuilderState> emit,
     Document document,
   ) async {
-    // TODO(dtscalac): if a new version has been created
-    // update the version in the metadata
     final updatedRef = await _upsertDraftProposal(
       state.metadata.documentRef!,
       _documentMapper.toContent(document),
@@ -490,9 +491,9 @@ final class ProposalBuilderBloc
     );
 
     _updateMetadata(emit, publish: ProposalPublish.submittedProposal);
+    emitSignal(const SubmittedProposalBuilderSignal());
   }
 
-  // TODO(dtscalac): update versions accordingly
   void _updateMetadata(
     Emitter<ProposalBuilderState> emit, {
     DocumentRef? documentRef,
