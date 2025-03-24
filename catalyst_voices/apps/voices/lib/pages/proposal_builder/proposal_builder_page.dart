@@ -11,13 +11,13 @@ import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_segments
 import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_setup_panel.dart';
 import 'package:catalyst_voices/pages/spaces/appbar/session_state_header.dart';
 import 'package:catalyst_voices/routes/routing/spaces_route.dart';
+import 'package:catalyst_voices/widgets/modals/proposals/publish_proposal_error_dialog.dart';
+import 'package:catalyst_voices/widgets/modals/proposals/submit_proposal_error_dialog.dart';
 import 'package:catalyst_voices/widgets/snackbar/voices_snackbar.dart';
 import 'package:catalyst_voices/widgets/snackbar/voices_snackbar_action.dart';
 import 'package:catalyst_voices/widgets/snackbar/voices_snackbar_type.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
-import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
-import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
@@ -179,52 +179,16 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
   }
 
   Future<void> _showPublishException(ProposalBuilderPublishException error) {
-    return VoicesDialog.show(
+    return PublishProposalErrorDialog.show(
       context: context,
-      routeSettings: const RouteSettings(
-        name: '/proposal-builder/publish-error',
-      ),
-      builder: (context) {
-        return VoicesAlertDialog(
-          icon: VoicesAssets.icons.exclamation.buildIcon(
-            size: 48,
-            color: Theme.of(context).colors.iconsWarning,
-          ),
-          subtitle: Text(error.title(context)),
-          content: Text(error.message(context)),
-          buttons: [
-            VoicesFilledButton(
-              onTap: () => Navigator.of(context).pop(),
-              child: Text(context.l10n.okay),
-            ),
-          ],
-        );
-      },
+      exception: error,
     );
   }
 
   Future<void> _showSubmitException(ProposalBuilderSubmitException error) {
-    return VoicesDialog.show(
+    return SubmitProposalErrorDialog.show(
       context: context,
-      routeSettings: const RouteSettings(
-        name: '/proposal-builder/submit-error',
-      ),
-      builder: (context) {
-        return VoicesAlertDialog(
-          icon: VoicesAssets.icons.exclamation.buildIcon(
-            size: 48,
-            color: Theme.of(context).colors.iconsWarning,
-          ),
-          subtitle: Text(error.title(context)),
-          content: Text(error.message(context)),
-          buttons: [
-            VoicesFilledButton(
-              onTap: () => Navigator.of(context).pop(),
-              child: Text(context.l10n.okay),
-            ),
-          ],
-        );
-      },
+      exception: error,
     );
   }
 
