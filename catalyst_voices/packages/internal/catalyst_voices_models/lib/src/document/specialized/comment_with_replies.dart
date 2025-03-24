@@ -16,8 +16,6 @@ final class CommentWithReplies extends Equatable {
       : replies = const [],
         depth = 1;
 
-  SignedDocumentRef get ref => comment.metadata.selfRef;
-
   @override
   List<Object?> get props => [
         comment,
@@ -25,8 +23,10 @@ final class CommentWithReplies extends Equatable {
         depth,
       ];
 
+  SignedDocumentRef get ref => comment.metadata.selfRef;
+
   CommentWithReplies addReply(CommentDocument reply) {
-    final parent = reply.metadata.parent;
+    final parent = reply.metadata.reply;
     assert(parent != null, 'Invalid reply');
 
     if (isA(parent!)) {
@@ -60,7 +60,7 @@ final class CommentWithReplies extends Equatable {
 
   CommentWithReplies _addReply(CommentDocument reply) {
     assert(
-      comment.metadata.selfRef == reply.metadata.parent,
+      comment.metadata.selfRef == reply.metadata.reply,
       'Reply parent ref does not match with comment selfRef',
     );
 

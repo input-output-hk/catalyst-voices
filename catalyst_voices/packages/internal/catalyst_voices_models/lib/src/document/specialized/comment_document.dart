@@ -29,16 +29,19 @@ final class CommentDocument extends Equatable {
 }
 
 final class CommentMetadata extends DocumentMetadata {
-  final SignedDocumentRef? parent;
+  // at the moment ref should point only to ProposalDocument
+  final DocumentRef ref;
+  final SignedDocumentRef? reply;
 
   CommentMetadata({
     // Note. no drafts for comments
     required SignedDocumentRef super.selfRef,
-    this.parent,
+    required this.ref,
+    this.reply,
   });
 
   @override
-  List<Object?> get props => super.props + [parent];
+  List<Object?> get props => super.props + [ref, reply];
 
   @override
   SignedDocumentRef get selfRef => super.selfRef as SignedDocumentRef;

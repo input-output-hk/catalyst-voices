@@ -133,10 +133,10 @@ final class ViewCommentsSection extends ProposalCommentsSection
 
   ViewCommentsSection addComment(CommentDocument comment) {
     final comments = List.of(this.comments);
-    final parent = comment.metadata.parent;
+    final reply = comment.metadata.reply;
 
-    if (parent != null) {
-      final index = comments.indexWhere((comment) => comment.contains(parent));
+    if (reply != null) {
+      final index = comments.indexWhere((comment) => comment.contains(reply));
       if (index != -1) {
         final updated = comments.removeAt(index).addReply(comment);
         comments.insert(index, updated);

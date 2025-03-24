@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_blocs/src/document/document_to_segment_mixin.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -20,21 +22,37 @@ final class ProposalCubit extends Cubit<ProposalState>
   final ProposalService _proposalService;
 
   // Cache
+  CatalystId? _activeAccountId;
   DocumentRef? _ref;
   ProposalData? _proposal;
   CommentTemplate? _commentTemplate;
   List<CommentWithReplies>? _comments;
   bool? _isFavorite;
 
+  StreamSubscription<CatalystId?>? _activeAccountIdSub;
+
   // Note for integration.
   // 1. Fetch proposal document
   // 2. Observe document comments
-  // 3. Observe active account
   // 4. Sort comments.
   ProposalCubit(
     this._userService,
     this._proposalService,
-  ) : super(const ProposalState());
+  ) : super(const ProposalState()) {
+    _activeAccountId = _userService.user.activeAccount?.catalystId;
+    _activeAccountIdSub = _userService.watchUser
+        .map((event) => event.activeAccount?.catalystId)
+        .distinct()
+        .listen(_handleActiveAccountIdChanged);
+  }
+
+  @override
+  Future<void> close() async {
+    await _activeAccountIdSub?.cancel();
+    _activeAccountIdSub = null;
+
+    return super.close();
+  }
 
   Future<void> load({required DocumentRef ref}) async {
     try {
@@ -89,12 +107,16 @@ final class ProposalCubit extends Cubit<ProposalState>
 
   Future<void> submitComment({
     required Document document,
-    SignedDocumentRef? parent,
+    SignedDocumentRef? reply,
   }) async {
+    final proposalRef = _ref;
+    assert(proposalRef != null, 'Proposal ref not found. Load document first!');
+
     final comment = CommentDocument(
       metadata: CommentMetadata(
         selfRef: SignedDocumentRef.generateFirstRef(),
-        parent: parent,
+        ref: proposalRef!,
+        reply: reply,
       ),
       document: document,
     );
@@ -266,6 +288,13 @@ final class ProposalCubit extends Cubit<ProposalState>
     ];
   }
 
+  void _handleActiveAccountIdChanged(CatalystId? data) {
+    if (_activeAccountId != data) {
+      _activeAccountId = data;
+      _rebuildProposalState();
+    }
+  }
+
   /* cSpell:enable */
 
   ProposalViewData _rebuildProposalState() {
@@ -274,10 +303,10 @@ final class ProposalCubit extends Cubit<ProposalState>
     final comments = _comments ?? const [];
     final commentsSort = state.data.commentsSort;
     final isFavorite = _isFavorite ?? false;
-    final activeAccount = _userService.user.activeAccount;
+    final activeAccountId = _activeAccountId;
 
     return _buildProposalViewData(
-      hasActiveAccount: activeAccount != null,
+      hasActiveAccount: activeAccountId != null,
       proposal: proposal,
       comments: comments,
       commentSchema: commentTemplate?.document.schema,

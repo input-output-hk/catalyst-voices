@@ -5,7 +5,8 @@ part of 'proposal_cubit.dart';
 // TODO(damian-molinski): delete this after integration.
 CommentDocument _buildComment({
   SignedDocumentRef? selfRef,
-  SignedDocumentRef? parent,
+  SignedDocumentRef? ref,
+  SignedDocumentRef? reply,
   String? message,
 }) {
   final commentTemplate = _buildSchema();
@@ -25,7 +26,8 @@ CommentDocument _buildComment({
   return CommentDocument(
     metadata: CommentMetadata(
       selfRef: selfRef ?? SignedDocumentRef.generateFirstRef(),
-      parent: parent,
+      ref: ref ?? SignedDocumentRef.generateFirstRef(),
+      reply: reply,
     ),
     document: document,
   );
@@ -51,7 +53,7 @@ List<CommentWithReplies> _buildComments() {
       replies: [
         CommentWithReplies(
           comment: _buildComment(
-            parent: firstComment.metadata.selfRef,
+            reply: firstComment.metadata.selfRef,
             message: 'Don’t talk about fight club',
             selfRef: buildRefAt(now.subtract(const Duration(hours: 2))),
           ),
@@ -59,7 +61,7 @@ List<CommentWithReplies> _buildComments() {
         ),
         CommentWithReplies(
           comment: _buildComment(
-            parent: firstComment.metadata.selfRef,
+            reply: firstComment.metadata.selfRef,
             message: 'Quiet!',
             selfRef: buildRefAt(now.subtract(const Duration(hours: 1))),
           ),
