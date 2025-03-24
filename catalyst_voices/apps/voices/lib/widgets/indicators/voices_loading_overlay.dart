@@ -78,6 +78,13 @@ class _VoicesLoadingOverlayState extends State<VoicesLoadingOverlay> {
   }
 
   @override
+  void dispose() {
+    _timer?.cancel();
+    _timer = null;
+    super.dispose();
+  }
+
+  @override
   void initState() {
     super.initState();
     _show = widget.show;
