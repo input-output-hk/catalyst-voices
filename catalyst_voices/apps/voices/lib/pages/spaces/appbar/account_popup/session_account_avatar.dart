@@ -17,6 +17,7 @@ class SessionAccountAvatar extends StatelessWidget {
       selector: (state) => state.account?.username,
       builder: (context, state) {
         return ProfileAvatar(
+          key: const Key('ProfileAvatar'),
           size: 40,
           username: state,
           onTap: onTap,
