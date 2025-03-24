@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_blocs/src/document/document_to_segment_mixin.dart';
+import 'package:catalyst_voices_blocs/src/proposal/proposal_cubit_cache.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
@@ -21,13 +22,7 @@ final class ProposalCubit extends Cubit<ProposalState>
   final UserService _userService;
   final ProposalService _proposalService;
 
-  // Cache
-  CatalystId? _activeAccountId;
-  DocumentRef? _ref;
-  ProposalData? _proposal;
-  CommentTemplate? _commentTemplate;
-  List<CommentWithReplies>? _comments;
-  bool? _isFavorite;
+  ProposalCubitCache _cache = const ProposalCubitCache();
 
   StreamSubscription<CatalystId?>? _activeAccountIdSub;
 
@@ -37,7 +32,9 @@ final class ProposalCubit extends Cubit<ProposalState>
     this._userService,
     this._proposalService,
   ) : super(const ProposalState()) {
-    _activeAccountId = _userService.user.activeAccount?.catalystId;
+    _cache = _cache.copyWith(
+      activeAccountId: Optional(_userService.user.activeAccount?.catalystId),
+    );
     _activeAccountIdSub = _userService.watchUser
         .map((event) => event.activeAccount?.catalystId)
         .distinct()
@@ -56,19 +53,22 @@ final class ProposalCubit extends Cubit<ProposalState>
     try {
       _logger.info('Loading $ref');
 
-      _ref = ref;
+      _cache = _cache.copyWith(ref: Optional.of(ref));
 
       emit(state.copyWith(isLoading: true));
 
       final proposal = await _proposalService.getProposal(ref: ref);
+      final commentTemplate = _buildCommentTemplate();
       final comments = _buildComments();
       final isFavorite =
           await _proposalService.watchIsFavoritesProposal(ref: ref).first;
 
-      _proposal = proposal;
-      _commentTemplate = _buildCommentTemplate();
-      _comments = comments;
-      _isFavorite = isFavorite;
+      _cache = _cache.copyWith(
+        proposal: Optional(proposal),
+        commentTemplate: Optional(commentTemplate),
+        comments: Optional(comments),
+        isFavorite: Optional(isFavorite),
+      );
 
       if (!isClosed) {
         final proposalState = _rebuildProposalState();
@@ -107,7 +107,7 @@ final class ProposalCubit extends Cubit<ProposalState>
   }
 
   Future<void> retryLastRef() async {
-    final ref = _ref;
+    final ref = _cache.ref;
     if (ref != null) {
       await load(ref: ref);
     }
@@ -117,7 +117,7 @@ final class ProposalCubit extends Cubit<ProposalState>
     required Document document,
     SignedDocumentRef? reply,
   }) async {
-    final proposalRef = _ref;
+    final proposalRef = _cache.ref;
     assert(proposalRef != null, 'Proposal ref not found. Load document first!');
 
     final comment = CommentDocument(
@@ -175,7 +175,7 @@ final class ProposalCubit extends Cubit<ProposalState>
   }
 
   Future<void> updateIsFavorite({required bool value}) async {
-    final ref = _ref;
+    final ref = _cache.ref;
     assert(ref != null, 'Proposal ref not found. Load doc first');
 
     emit(state.copyWithFavorite(isFavorite: value));
@@ -297,15 +297,17 @@ final class ProposalCubit extends Cubit<ProposalState>
   }
 
   void _clearProposalCache() {
-    _proposal = null;
-    _commentTemplate = null;
-    _comments = null;
-    _isFavorite = null;
+    _cache = _cache.copyWith(
+      proposal: const Optional.empty(),
+      commentTemplate: const Optional.empty(),
+      comments: const Optional.empty(),
+      isFavorite: const Optional.empty(),
+    );
   }
 
   void _handleActiveAccountIdChanged(CatalystId? data) {
-    if (_activeAccountId != data) {
-      _activeAccountId = data;
+    if (_cache.activeAccountId != data) {
+      _cache = _cache.copyWith(activeAccountId: Optional(data));
       _rebuildProposalState();
     }
   }
@@ -313,12 +315,12 @@ final class ProposalCubit extends Cubit<ProposalState>
   /* cSpell:enable */
 
   ProposalViewData _rebuildProposalState() {
-    final proposal = _proposal;
-    final commentTemplate = _commentTemplate;
-    final comments = _comments ?? const [];
+    final proposal = _cache.proposal;
+    final commentTemplate = _cache.commentTemplate;
+    final comments = _cache.comments ?? const [];
     final commentsSort = state.data.commentsSort;
-    final isFavorite = _isFavorite ?? false;
-    final activeAccountId = _activeAccountId;
+    final isFavorite = _cache.isFavorite ?? false;
+    final activeAccountId = _cache.activeAccountId;
 
     return _buildProposalViewData(
       hasActiveAccount: activeAccountId != null,
