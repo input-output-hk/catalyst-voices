@@ -8,10 +8,10 @@ use std::sync::atomic::{
 /// Flag to determine if the service has started
 static STARTED: AtomicBool = AtomicBool::new(false);
 
-/// Flag to determine if the service has started.
+/// Flag to determine if the Indexing DB has started.
 static LIVE_INDEX_DB: AtomicBool = AtomicBool::new(false);
 
-/// Flag to determine if the service has started.
+/// Flag to determine if the Event DB has started.
 static LIVE_EVENT_DB: AtomicBool = AtomicBool::new(false);
 
 /// Flag to determine if the chain follower has synchronized with the Tip for the first
