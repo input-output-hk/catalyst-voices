@@ -447,12 +447,12 @@ final class ProposalBuilderBloc
         documentRef: updatedRef,
         publish: ProposalPublish.publishedDraft,
       );
-      // emitSignal(const PublishedProposalBuilderSignal());
+      emitSignal(const PublishedProposalBuilderSignal());
     } catch (error, stackTrace) {
       _logger.severe('PublishProposal', error, stackTrace);
       emitError(const ProposalBuilderPublishException());
     } finally {
-      // emit(state.copyWith(isChanging: false));
+      emit(state.copyWith(isChanging: false));
     }
   }
 
