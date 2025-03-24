@@ -100,7 +100,9 @@ final class ProposalCubit extends Cubit<ProposalState>
 
       emit(const ProposalState(error: LocalizedUnknownException()));
     } finally {
-      emit(state.copyWith(isLoading: false));
+      if (!isClosed) {
+        emit(state.copyWith(isLoading: false));
+      }
     }
   }
 
