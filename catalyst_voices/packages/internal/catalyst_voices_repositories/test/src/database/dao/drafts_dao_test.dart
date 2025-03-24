@@ -112,7 +112,7 @@ void main() {
 
       test('all refs return as expected', () async {
         // Given
-        final refs = List.generate(10, (_) => DocumentRefFactory.buildDraft());
+        final refs = List.generate(10, (_) => DraftRef.generateFirstRef());
         final drafts = refs.map((ref) {
           return DraftFactory.build(
             metadata: DocumentDataMetadata(
@@ -220,7 +220,7 @@ void main() {
             return DraftFactory.build(
               metadata: DocumentDataMetadata(
                 type: DocumentType.proposalDocument,
-                selfRef: DocumentRefFactory.buildDraft(id: id),
+                selfRef: DraftRef(id: id, version: const Uuid().v7()),
               ),
             );
           },
@@ -244,13 +244,13 @@ void main() {
           DraftFactory.build(
             metadata: DocumentDataMetadata(
               type: DocumentType.proposalDocument,
-              selfRef: DocumentRefFactory.buildDraft(id: id, version: version),
+              selfRef: DraftRef(id: id, version: version),
             ),
           ),
           DraftFactory.build(
             metadata: DocumentDataMetadata(
               type: DocumentType.proposalDocument,
-              selfRef: DocumentRefFactory.buildDraft(id: id),
+              selfRef: DraftRef.first(id),
             ),
           ),
         ];
@@ -318,7 +318,7 @@ void main() {
           (index) => DraftFactory.build(
             metadata: DocumentDataMetadata(
               type: DocumentType.proposalDocument,
-              selfRef: DocumentRefFactory.buildDraft(id: id),
+              selfRef: DraftRef(id: id, version: const Uuid().v7()),
             ),
           ),
         );

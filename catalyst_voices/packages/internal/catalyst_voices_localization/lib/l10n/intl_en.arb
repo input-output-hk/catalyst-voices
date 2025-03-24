@@ -2045,5 +2045,25 @@
   "shortSummary": "Short summary",
   "@shortSummary": {
     "description": "A short description of something"
+  },
+  "apiErrorUnknown": "Unknown error response",
+  "@apiErrorUnknown": {
+    "description": "A fallback error message when api returns error code"
+  },
+  "apiErrorNotFound": "Not found",
+  "@apiErrorNotFound": {
+    "description": "Message of an error when api returns not found status code, depends on context."
+  },
+  "apiErrorTooManyRequests": "Too many requests",
+  "@apiErrorTooManyRequests": {
+    "description": "Message of an error when api returns matching status code."
+  },
+  "apiErrorInternalServerError": "Internal server error",
+  "@apiErrorInternalServerError": {
+    "description": "Message of an error when api returns matching status code."
+  },
+  "apiErrorServiceUnavailable": "Service Unavailable",
+  "@apiErrorServiceUnavailable": {
+    "description": "Message of an error when api returns matching status code."
   }
 }
