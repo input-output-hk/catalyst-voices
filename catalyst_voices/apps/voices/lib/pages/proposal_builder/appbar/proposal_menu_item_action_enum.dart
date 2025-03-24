@@ -91,7 +91,7 @@ enum ProposalMenuItemAction {
         isFinal ? context.l10n.unlockAndEdit : context.l10n.editButtonText,
       ProposalMenuItemAction.view => context.l10n.view,
       ProposalMenuItemAction.share => context.l10n.share,
-      ProposalMenuItemAction.forget => context.l10n.share,
+      ProposalMenuItemAction.forget => context.l10n.forgetProposal,
       ProposalMenuItemAction.export => context.l10n.export,
       ProposalMenuItemAction.delete => context.l10n.delete,
       _ => '',

@@ -1,13 +1,23 @@
+import 'dart:async';
+
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/pages/proposal_builder/appbar/proposal_menu_item_action_enum.dart';
+import 'package:catalyst_voices/routes/routes.dart';
+import 'package:catalyst_voices/routes/routing/proposal_builder_route.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_icon_button.dart';
+import 'package:catalyst_voices/widgets/modals/proposals/proposal_builder_delete_confirmation_dialog.dart';
+import 'package:catalyst_voices/widgets/modals/proposals/share_proposal_dialog.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
+import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
+import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ProposalMenuActionButton extends StatefulWidget {
   final DocumentRef ref;
   final ProposalPublish proposalPublish;
+
   const ProposalMenuActionButton({
     super.key,
     required this.ref,
@@ -17,6 +27,27 @@ class ProposalMenuActionButton extends StatefulWidget {
   @override
   State<ProposalMenuActionButton> createState() =>
       _ProposalMenuActionButtonState();
+}
+
+class _MenuItem extends StatelessWidget {
+  final ProposalMenuItemAction item;
+  final ProposalPublish proposalPublish;
+
+  const _MenuItem({
+    required this.item,
+    required this.proposalPublish,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      leading: item.icon(workspace: true).buildIcon(),
+      title: Text(
+        item.workspaceTitle(context, proposalPublish),
+      ),
+      mouseCursor: item.clickable ? SystemMouseCursors.click : null,
+    );
+  }
 }
 
 class _ProposalMenuActionButtonState extends State<ProposalMenuActionButton> {
@@ -40,16 +71,14 @@ class _ProposalMenuActionButtonState extends State<ProposalMenuActionButton> {
         return <PopupMenuEntry<int>>[
           for (final item in items)
             PopupMenuItem(
+              value: item.index,
               padding: const EdgeInsets.symmetric(
                 horizontal: 16,
                 vertical: 4,
               ),
-              child: ListTile(
-                leading: item.icon(workspace: true).buildIcon(),
-                title: Text(
-                  item.workspaceTitle(context, widget.proposalPublish),
-                ),
-                mouseCursor: item.clickable ? SystemMouseCursors.click : null,
+              child: _MenuItem(
+                item: item,
+                proposalPublish: widget.proposalPublish,
               ),
             ),
         ];
@@ -62,10 +91,74 @@ class _ProposalMenuActionButtonState extends State<ProposalMenuActionButton> {
         ),
         child: VoicesAssets.icons.dotsVertical.buildIcon(),
       ),
+      onSelected: (value) {
+        final item = ProposalMenuItemAction.values[value];
+        _onSelected(item);
+      },
     );
+  }
+
+  Future<void> _deleteProposal() async {
+    final ref = widget.ref;
+    if (ref is DraftRef) {
+      final confirmed = await ProposalBuilderDeleteConfirmationDialog.show(
+        context,
+        routeSettings: const RouteSettings(
+          name: '/proposal_builder/delete-confirmation',
+        ),
+      );
+
+      if (confirmed && mounted) {
+        context
+            .read<WorkspaceBloc>()
+            .add(DeleteDraftProposalEvent(ref: widget.ref as DraftRef));
+      }
+    }
+    return;
+  }
+
+  void _editProposal() {
+    unawaited(
+      ProposalBuilderRoute.fromRef(ref: widget.ref).push(context),
+    );
+  }
+
+  void _exportProposal() {
+    final prefix = context.l10n.proposal.toLowerCase();
+    context.read<WorkspaceBloc>().add(ExportProposal(widget.ref, prefix));
+  }
+
+  void _forgetProposal() {}
+
+  void _onSelected(ProposalMenuItemAction item) {
+    switch (item) {
+      case ProposalMenuItemAction.edit:
+        _editProposal();
+      case ProposalMenuItemAction.view:
+        _viewProposal();
+      case ProposalMenuItemAction.share:
+        _shareProposal();
+      case ProposalMenuItemAction.export:
+        _exportProposal();
+      case ProposalMenuItemAction.delete:
+        unawaited(_deleteProposal());
+      case ProposalMenuItemAction.forget:
+        _forgetProposal();
+      case _:
+        break;
+    }
+  }
+
+  void _shareProposal() {
+    final url = ProposalRoute.fromRef(ref: widget.ref).location;
+    unawaited(ShareProposalDialog.show(context, url));
   }
 
   void _showMenu() {
     _buttonKey.currentState?.showButtonMenu();
+  }
+
+  void _viewProposal() {
+    unawaited(ProposalRoute.fromRef(ref: widget.ref).push(context));
   }
 }

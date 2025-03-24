@@ -172,6 +172,7 @@ class _PopupMenuButtonState extends State<_PopupMenuButton> {
       },
       onSelected: (value) {
         final item = ProposalMenuItemAction.values[value];
+
         _onSelected(item);
       },
     );

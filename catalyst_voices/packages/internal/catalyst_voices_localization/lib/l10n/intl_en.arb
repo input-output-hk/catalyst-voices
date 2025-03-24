@@ -2043,5 +2043,21 @@
   "unlockAndEdit": "Unlock & Edit",
   "@unlockAndEdit": {
     "description": "Used for making new draft proposal from final proposal."
+  },
+  "successProposalDeleted": "Proposal deleted successfully",
+  "@successProposalDeleted": {
+    "description": "Success message when draft is deleted"
+  },
+  "successProposalDeletedDescription": "Your local proposal has been deleted",
+  "@successProposalDeletedDescription": {
+    "description": "Description of success message when draft is deleted"
+  },
+  "errorProposalDeleted": "Error deleting proposal",
+  "@errorProposalDeleted": {
+    "description": "Error message when draft is not deleted"
+  },
+  "errorProposalDeletedDescription": "Something went wrong, please try again later",
+  "@errorProposalDeletedDescription": {
+    "description": "Description of error message when draft is not deleted"
   }
 }

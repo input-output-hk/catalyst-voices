@@ -20,6 +20,9 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
   // ignore: unused_field
   final CampaignService _campaignService;
   final ProposalService _proposalService;
+  final DocumentMapper _documentMapper;
+  final DownloaderService _downloaderService;
+
   StreamSubscription<List<Proposal>>? _proposalsSubscription;
 
   // ignore: unused_field
@@ -28,11 +31,15 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
   WorkspaceBloc(
     this._campaignService,
     this._proposalService,
+    this._documentMapper,
+    this._downloaderService,
   ) : super(const WorkspaceState()) {
     on<LoadProposalsEvent>(_loadProposals);
     on<ImportProposalEvent>(_importProposal);
     on<ErrorLoadProposalsEvent>(_errorLoadProposals);
     on<WatchUserProposalsEvent>(_watchUserProposals);
+    on<ExportProposal>(_exportProposal);
+    on<DeleteDraftProposalEvent>(_deleteProposal);
   }
 
   @override
@@ -40,6 +47,36 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     _proposalsSubscription?.cancel();
     _proposalsSubscription = null;
     return super.close();
+  }
+
+  DocumentDataContent _buildDocumentContent(Document document) {
+    return _documentMapper.toContent(document);
+  }
+
+  DocumentDataMetadata _buildDocumentMetadata(ProposalDocument document) {
+    final selfRef = document.metadata.selfRef;
+    final categoryId = document.metadata.categoryId;
+    final templateRef = document.metadata.templateRef;
+
+    return DocumentDataMetadata(
+      type: DocumentType.proposalDocument,
+      selfRef: selfRef,
+      template: templateRef,
+      categoryId: categoryId,
+    );
+  }
+
+  Future<void> _deleteProposal(
+    DeleteDraftProposalEvent event,
+    Emitter<WorkspaceState> emit,
+  ) async {
+    try {
+      await _proposalService.deleteDraftProposal(event.ref);
+      emitSignal(const DeletedDraftWorkspaceSignal());
+    } catch (error, stackTrace) {
+      _logger.severe('Delete proposal failed', error, stackTrace);
+      emitError(const LocalizedProposalDeletionException());
+    }
   }
 
   Future<void> _errorLoadProposals(
@@ -55,6 +92,36 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     );
     await _proposalsSubscription?.cancel();
     _proposalsSubscription = null;
+  }
+
+  Future<void> _exportProposal(
+    ExportProposal event,
+    Emitter<WorkspaceState> emit,
+  ) async {
+    try {
+      final docData = await _proposalService.getProposal(ref: event.ref);
+
+      final docMetadata = _buildDocumentMetadata(docData.document);
+      final documentContent = _buildDocumentContent(docData.document.document);
+
+      final encodedProposal = await _proposalService.encodeProposalForExport(
+        document: DocumentData(
+          metadata: docMetadata,
+          content: documentContent,
+        ),
+      );
+
+      final filename = '${event.prefix}_${event.ref.id}';
+      const extension = ProposalDocument.exportFileExt;
+
+      await _downloaderService.download(
+        data: encodedProposal,
+        filename: '$filename.$extension',
+      );
+    } catch (error, stackTrace) {
+      _logger.severe('Exportin proposal failed', error, stackTrace);
+      emitError(const LocalizedUnknownException());
+    }
   }
 
   Future<void> _importProposal(
@@ -91,9 +158,13 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
         // TODO(LynxLynxx): only for testing delete before PR
         final proposalsToDelete = <Proposal>[];
         for (var i = 0; i < proposals.length; i++) {
-          proposalsToDelete.add(
-            proposals[i].copyWith(publish: ProposalPublish.values[i]),
-          );
+          if (i < 3) {
+            proposalsToDelete.add(
+              proposals[i].copyWith(publish: ProposalPublish.values[i]),
+            );
+          } else {
+            proposalsToDelete.add(proposals[i]);
+          }
         }
 
         add(LoadProposalsEvent(proposalsToDelete));
