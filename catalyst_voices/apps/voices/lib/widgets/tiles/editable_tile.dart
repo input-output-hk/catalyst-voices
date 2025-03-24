@@ -137,6 +137,7 @@ class _Footer extends StatelessWidget {
         Visibility.maintain(
           visible: showSaveButton,
           child: VoicesFilledButton(
+            key: const Key('EmailTileSaveButton'),
             onTap: isSaveEnabled ? onSave : null,
             child: Text(context.l10n.saveButtonText.toUpperCase()),
           ),
