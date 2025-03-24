@@ -73,3 +73,11 @@ typedef CategoryTemplatesRefs = ({
   SignedDocumentRef proposal,
   SignedDocumentRef comment,
 });
+
+extension on CategoryTemplatesRefs {
+  Iterable<SignedDocumentRef> get all => [category, proposal, comment];
+}
+
+extension CategoryTemplatesRefsListExt on List<CategoryTemplatesRefs> {
+  Iterable<SignedDocumentRef> get all => expand((element) => element.all);
+}

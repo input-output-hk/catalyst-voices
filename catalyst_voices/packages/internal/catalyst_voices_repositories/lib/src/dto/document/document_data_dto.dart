@@ -85,10 +85,11 @@ final class DocumentDataMetadataDto {
   final DocumentRefDto? ref;
   final SecuredDocumentRefDto? refHash;
   final DocumentRefDto? template;
-  final String? brandId;
-  final String? campaignId;
+  final DocumentRefDto? brandId;
+  final DocumentRefDto? campaignId;
   final String? electionId;
   final DocumentRefDto? categoryId;
+  final List<String>? authors;
 
   DocumentDataMetadataDto({
     required this.type,
@@ -100,10 +101,12 @@ final class DocumentDataMetadataDto {
     this.campaignId,
     this.electionId,
     this.categoryId,
+    this.authors,
   });
 
   factory DocumentDataMetadataDto.fromJson(Map<String, dynamic> json) {
-    final migrated = _migrateJson1(json);
+    var migrated = _migrateJson1(json);
+    migrated = _migrateJson2(migrated);
 
     return _$DocumentDataMetadataDtoFromJson(migrated);
   }
@@ -115,10 +118,11 @@ final class DocumentDataMetadataDto {
           ref: data.ref?.toDto(),
           refHash: data.refHash?.toDto(),
           template: data.template?.toDto(),
-          brandId: data.brandId,
-          campaignId: data.campaignId,
+          brandId: data.brandId?.toDto(),
+          campaignId: data.campaignId?.toDto(),
           electionId: data.electionId,
           categoryId: data.categoryId?.toDto(),
+          authors: data.authors?.map((e) => e.toString()).toList(),
         );
 
   Map<String, dynamic> toJson() => _$DocumentDataMetadataDtoToJson(this);
@@ -129,11 +133,12 @@ final class DocumentDataMetadataDto {
       selfRef: selfRef.toModel(),
       ref: ref?.toModel(),
       refHash: refHash?.toModel(),
-      template: template?.toSignedModel(),
-      brandId: brandId,
-      campaignId: campaignId,
+      template: template?.toModel().toSignedDocumentRef(),
+      brandId: brandId?.toModel().toSignedDocumentRef(),
+      campaignId: campaignId?.toModel().toSignedDocumentRef(),
       electionId: electionId,
-      categoryId: categoryId?.toSignedModel(),
+      categoryId: categoryId?.toModel().toSignedDocumentRef(),
+      authors: authors?.map((e) => CatalystId.fromUri(e.getUri())).toList(),
     );
   }
 
@@ -149,6 +154,29 @@ final class DocumentDataMetadataDto {
         'version': version,
         'type': DocumentRefDtoType.signed.name,
       };
+    }
+
+    return modified;
+  }
+
+  static Map<String, dynamic> _migrateJson2(Map<String, dynamic> json) {
+    final modified = Map<String, dynamic>.from(json);
+
+    if (modified['brandId'] is String) {
+      final id = modified.remove('brandId') as String;
+      final dto = DocumentRefDto(
+        id: id,
+        type: DocumentRefDtoType.signed,
+      );
+      modified['brandId'] = dto.toJson();
+    }
+    if (modified['campaignId'] is String) {
+      final id = modified.remove('campaignId') as String;
+      final dto = DocumentRefDto(
+        id: id,
+        type: DocumentRefDtoType.signed,
+      );
+      modified['campaignId'] = dto.toJson();
     }
 
     return modified;

@@ -240,10 +240,12 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     required CatalystId catalystId,
     required CatalystPrivateKey privateKey,
   }) async {
+    final dto = ProposalSubmissionActionDocumentDto(
+      action: ProposalSubmissionActionDto.fromModel(action),
+    );
+
     final signedDocument = await _signedDocumentManager.signDocument(
-      ProposalSubmissionActionDocumentDto(
-        action: ProposalSubmissionActionDto.fromModel(action),
-      ),
+      SignedDocumentJsonPayload(dto.toJson()),
       metadata: SignedDocumentMetadata(
         contentType: SignedDocumentContentType.json,
         documentType: DocumentType.proposalActionDocument,
@@ -365,6 +367,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
       selfRef: documentData.metadata.selfRef,
       templateRef: documentData.metadata.template!,
       categoryId: documentData.metadata.categoryId!,
+      authors: documentData.metadata.authors ?? [],
     );
 
     final content = DocumentDataContentDto.fromModel(

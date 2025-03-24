@@ -128,10 +128,10 @@ void main() async {
     );
 
     patrolWidgetTest(
-      'visitor - share links are displayed',
+      'visitor - share links are working',
       (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
-        await ProposalsPage($).proposalLinksAreDisplayedFor(0);
+        await ProposalsPage($).proposalLinksAreWorkingFor(0);
       },
     );
 
