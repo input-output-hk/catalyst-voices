@@ -1,15 +1,12 @@
-import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
-import 'package:uuid_plus/uuid_plus.dart';
-
-const mockedDocumentUuid = '0194f567-65f5-7ec6-b4f2-f744c0f74844';
-const mockedTemplateUuid = '0194d492-1daa-75b5-b4a4-5cf331cd8d1a';
+import 'package:catalyst_voices_repositories/generated/api/cat_gateway.models.swagger.dart';
+import 'package:catalyst_voices_repositories/src/document/document_data_factory.dart';
+import 'package:catalyst_voices_repositories/src/dto/api/document_index_list_dto.dart';
+import 'package:catalyst_voices_repositories/src/dto/api/document_index_query_filters_dto.dart';
 
 final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
   final ApiServices _api;
-
-  // ignore: unused_field
   final SignedDocumentManager _signedDocumentManager;
 
   CatGatewayDocumentDataSource(
@@ -17,84 +14,112 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
     this._signedDocumentManager,
   );
 
-  // TODO(damian-molinski): make API call and use _signedDocumentManager.
   @override
   Future<DocumentData> get({required DocumentRef ref}) async {
-    // TODO(damian-molinski): uncomment when documents sync is ready.
-    /*try {
-      final response = await _api.gateway.apiV1DocumentDocumentIdGet(
-        documentId: ref.id,
-        version: ref.version,
-      );
-
-      // TODO(damian-molinski): mapping errors if response not successful
-      if (!response.isSuccessful) {
-        // throw exception.
-      }
-
-      final bytes = response.bodyBytes;
-
-      final signedDocument = await _signedDocumentManager.parseDocument(
-        bytes,
-        parser: SignedDocumentJsonPayload.fromBytes,
-      );
-
-      // TODO(damian-molinski): parsing metadata
-      // TODO(damian-molinski): mapping signedDocument to DocumentData.
-      if (kDebugMode) {
-        debugPrint('Document');
-        debugPrint(json.encode(signedDocument.payload.data));
-      }
-    } catch (error, stack) {
-      if (kDebugMode) {
-        debugPrint(error.toString());
-        debugPrintStack(stackTrace: stack);
-      }
-      rethrow;
-    }*/
-
-    final isSchema = ref.id == mockedTemplateUuid;
-
-    final signedDocument = await (isSchema
-        ? VoicesDocumentsTemplates.proposalF14Schema
-        : VoicesDocumentsTemplates.proposalF14Document);
-
-    final type = isSchema
-        ? DocumentType.proposalTemplate
-        : DocumentType.proposalDocument;
-    final ver = ref.version ?? ref.id;
-    final template =
-        !isSchema ? const SignedDocumentRef(id: mockedTemplateUuid) : null;
-
-    final metadata = DocumentDataMetadata(
-      type: type,
-      selfRef: SignedDocumentRef(id: ref.id, version: ver),
-      template: template,
-      categoryId: categoriesTemplatesRefs.first.category,
+    final response = await _api.gateway.apiV1DocumentDocumentIdGet(
+      documentId: ref.id,
+      version: ref.version,
     );
 
-    final content = DocumentDataContent(signedDocument);
+    if (!response.isSuccessful) {
+      final statusCode = response.statusCode;
+      final error = response.error;
 
-    return DocumentData(
-      metadata: metadata,
-      content: content,
-    );
+      throw ApiErrorResponseException(statusCode: statusCode, error: error);
+    }
+
+    final bytes = response.bodyBytes;
+    final signedDocument = await _signedDocumentManager.parseDocument(bytes);
+    return DocumentDataFactory.create(signedDocument);
   }
 
-  // TODO(damian-molinski): ask index api
   @override
-  Future<String?> getLatestVersion(String id) async => const Uuid().v7();
+  Future<String?> getLatestVersion(String id) async {
+    final response = await _api.gateway.apiV1DocumentIndexPost(
+      body: DocumentIndexQueryFilter(id: EqOrRangedIdDto.eq(id)),
+      limit: 1,
+    );
 
-  // TODO(damian-molinski): ask index api
+    if (response.statusCode == ApiErrorResponseException.notFound) {
+      return null;
+    }
+
+    if (!response.isSuccessful) {
+      final statusCode = response.statusCode;
+      final error = response.error;
+
+      throw ApiErrorResponseException(statusCode: statusCode, error: error);
+    }
+
+    final docs = response.body?.docs;
+    if (docs == null || docs.isEmpty) {
+      return null;
+    }
+
+    return docs
+        .sublist(0, 1)
+        .cast<Map<String, dynamic>>()
+        .map(DocumentIndexListDto.fromJson)
+        .firstOrNull
+        ?.ver
+        .firstOrNull
+        ?.ver;
+  }
+
   @override
   Future<List<SignedDocumentRef>> index() async {
-    return [];
+    final allRefs = <SignedDocumentRef>{};
+
+    var page = 0;
+    const maxPerPage = 100;
+    var remaining = 0;
+
+    do {
+      final response = await _getDocumentIndexList(
+        page: page,
+        limit: maxPerPage,
+      );
+
+      allRefs.addAll(response.refs);
+
+      remaining = response.page.remaining;
+      page = response.page.page + 1;
+    } while (remaining > 0);
+
+    return allRefs.toList();
   }
 
   @override
   Future<void> publish(SignedDocument document) async {
     final bytes = document.toBytes();
-    await _api.gateway.apiV1DocumentPut(body: bytes);
+    final response = await _api.gateway.apiV1DocumentPut(body: bytes);
+
+    if (!response.isSuccessful) {
+      final statusCode = response.statusCode;
+      final error = response.error;
+
+      throw ApiErrorResponseException(statusCode: statusCode, error: error);
+    }
+  }
+
+  Future<DocumentIndexList> _getDocumentIndexList({
+    required int page,
+    required int limit,
+  }) async {
+    final response = await _api.gateway.apiV1DocumentIndexPost(
+      body: const DocumentIndexQueryFilter(),
+      limit: limit,
+      page: page,
+    );
+
+    if (!response.isSuccessful) {
+      final statusCode = response.statusCode;
+      final error = response.error;
+
+      throw ApiErrorResponseException(statusCode: statusCode, error: error);
+    }
+
+    return response.bodyOrThrow;
   }
 }
 
@@ -106,4 +131,33 @@ abstract interface class DocumentDataRemoteSource
   Future<List<SignedDocumentRef>> index();
 
   Future<void> publish(SignedDocument document);
+}
+
+extension on DocumentIndexList {
+  List<SignedDocumentRef> get refs {
+    return docs
+        .cast<Map<String, dynamic>>()
+        .map(DocumentIndexListDto.fromJson)
+        .map((ref) {
+          return <SignedDocumentRef>[
+            ...ref.ver.map((ver) {
+              return <SignedDocumentRef>[
+                SignedDocumentRef(id: ref.id, version: ver.ver),
+                if (ver.ref != null) ver.ref!.toRef(),
+                if (ver.reply != null) ver.reply!.toRef(),
+                if (ver.template != null) ver.template!.toRef(),
+                if (ver.brand != null) ver.brand!.toRef(),
+                if (ver.campaign != null) ver.campaign!.toRef(),
+                if (ver.category != null) ver.category!.toRef(),
+              ];
+            }).expand((element) => element),
+          ];
+        })
+        .expand((element) => element)
+        .toList();
+  }
+}
+
+extension on DocumentRefForFilteredDocuments {
+  SignedDocumentRef toRef() => SignedDocumentRef(id: id, version: ver);
 }

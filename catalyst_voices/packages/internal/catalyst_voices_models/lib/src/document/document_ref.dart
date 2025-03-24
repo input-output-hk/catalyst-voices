@@ -1,6 +1,7 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/foundation.dart' show Uint8List;
 import 'package:uuid_plus/uuid_plus.dart';
 
 sealed class DocumentRef extends Equatable implements Comparable<DocumentRef> {
@@ -74,6 +75,9 @@ final class DraftRef extends DocumentRef {
     super.version,
   });
 
+  /// Creates ref for first version of [id] draft.
+  const DraftRef.first(String id) : this(id: id, version: id);
+
   factory DraftRef.generateFirstRef() {
     final id = const Uuid().v7();
     return DraftRef(
@@ -112,7 +116,7 @@ final class DraftRef extends DocumentRef {
 
 final class SecuredDocumentRef extends Equatable {
   final DocumentRef ref;
-  final String hash;
+  final Uint8List hash;
 
   const SecuredDocumentRef({
     required this.ref,
