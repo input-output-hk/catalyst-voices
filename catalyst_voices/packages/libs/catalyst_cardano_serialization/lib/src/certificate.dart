@@ -1,11 +1,12 @@
 // ignore_for_file: avoid_equals_and_hash_code_on_mutable_classes
 
+import 'package:catalyst_cardano_serialization/src/types.dart';
 import 'package:cbor/cbor.dart';
 import 'package:convert/convert.dart';
 
 /// Implements a common base of certificate that holds
 /// binary [bytes].
-abstract base class BaseCertificate {
+abstract base class BaseCertificate implements CborEncodable {
   /// The raw [bytes] of a certificate.
   final List<int> bytes;
 
@@ -17,6 +18,7 @@ abstract base class BaseCertificate {
       : this.fromBytes(bytes: (value as CborBytes).bytes);
 
   /// Serializes the type as cbor.
+  @override
   CborValue toCbor() => CborBytes(bytes);
 
   /// Constructs the [BaseCertificate] from a hex string representation
