@@ -1,12 +1,18 @@
+import 'dart:async';
+
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/common/ext/proposal_publish_ext.dart';
 import 'package:catalyst_voices/common/formatters/date_formatter.dart';
+import 'package:catalyst_voices/routes/routing/proposal_builder_route.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_text_button.dart';
 import 'package:catalyst_voices/widgets/common/affix_decorator.dart';
+import 'package:catalyst_voices/widgets/modals/proposals/proposal_builder_delete_confirmation_dialog.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
+import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ProposalIterationHistory extends StatefulWidget {
   final Proposal proposal;
@@ -34,24 +40,47 @@ class _Actions extends StatelessWidget {
       children: [
         VoicesTextButton(
           child: Text(context.l10n.delete),
-          onTap: () {
-            // TODO(dtscalac): call delete method
-          },
+          onTap: () async => _deleteProposal(context),
         ),
         VoicesTextButton(
           child: Text(context.l10n.exportButtonText),
-          onTap: () {
-            // TODO(dtscalac): call export method
-          },
+          onTap: () => _exportProposal(context),
         ),
         VoicesTextButton(
           child: Text(context.l10n.open),
-          onTap: () {
-            // TODO(dtscalac): call open method
-          },
+          onTap: () => _editProposal(context),
         ),
       ],
     );
+  }
+
+  Future<void> _deleteProposal(BuildContext context) async {
+    if (ref is DraftRef) {
+      final confirmed = await ProposalBuilderDeleteConfirmationDialog.show(
+        context,
+        routeSettings: const RouteSettings(
+          name: '/proposal_builder/delete-confirmation',
+        ),
+      );
+
+      if (confirmed) {
+        context
+            .read<WorkspaceBloc>()
+            .add(DeleteDraftProposalEvent(ref: ref as DraftRef));
+      }
+    }
+    return;
+  }
+
+  void _editProposal(BuildContext context) {
+    unawaited(
+      ProposalBuilderRoute.fromRef(ref: ref).push(context),
+    );
+  }
+
+  void _exportProposal(BuildContext context) {
+    final prefix = context.l10n.proposal.toLowerCase();
+    context.read<WorkspaceBloc>().add(ExportProposal(ref, prefix));
   }
 }
 

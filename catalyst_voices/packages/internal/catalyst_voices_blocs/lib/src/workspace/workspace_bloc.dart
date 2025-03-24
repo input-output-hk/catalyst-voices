@@ -10,6 +10,7 @@ import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:uuid_plus/uuid_plus.dart';
 
 final _logger = Logger('WorkspaceBloc');
 
@@ -119,7 +120,7 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
         filename: '$filename.$extension',
       );
     } catch (error, stackTrace) {
-      _logger.severe('Exportin proposal failed', error, stackTrace);
+      _logger.severe('Exporting proposal failed', error, stackTrace);
       emitError(const LocalizedUnknownException());
     }
   }
@@ -160,7 +161,25 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
         for (var i = 0; i < proposals.length; i++) {
           if (i < 3) {
             proposalsToDelete.add(
-              proposals[i].copyWith(publish: ProposalPublish.values[i]),
+              proposals[i].copyWith(
+                publish: ProposalPublish.values[i],
+                versions: [
+                  ProposalVersion(
+                    selfRef: proposals[i].selfRef.copyWith(
+                          version: Optional(const UuidV7().toString()),
+                        ),
+                    title: 'Title ver ${i + 1}',
+                    createdAt: DateTime.now(),
+                    publish: ProposalPublish.localDraft,
+                  ),
+                  ProposalVersion(
+                    selfRef: proposals[i].selfRef,
+                    title: 'Title ver ${i + 1}',
+                    createdAt: DateTime.now(),
+                    publish: ProposalPublish.publishedDraft,
+                  ),
+                ],
+              ),
             );
           } else {
             proposalsToDelete.add(proposals[i]);
