@@ -54,22 +54,18 @@ final class ProposalCubit extends Cubit<ProposalState>
 
   Future<void> load({required DocumentRef ref}) async {
     try {
-      _ref = ref;
-
       _logger.info('Loading $ref');
+
+      _ref = ref;
 
       emit(state.copyWith(isLoading: true));
 
-      await Future<void>.delayed(const Duration(seconds: 2));
-
-      throw ErrorResponseException(statusCode: 404);
-
-      // final proposal = await _proposalService.getProposal(ref: ref);
+      final proposal = await _proposalService.getProposal(ref: ref);
       final comments = _buildComments();
       final isFavorite =
           await _proposalService.watchIsFavoritesProposal(ref: ref).first;
 
-      _proposal = null;
+      _proposal = proposal;
       _commentTemplate = _buildCommentTemplate();
       _comments = comments;
       _isFavorite = isFavorite;
@@ -86,19 +82,21 @@ final class ProposalCubit extends Cubit<ProposalState>
     } on LocalizedException catch (error, stack) {
       _logger.severe('Loading $ref failed', error, stack);
 
-      _proposal = null;
-      _commentTemplate = null;
-      _comments = null;
-      _isFavorite = null;
+      _clearProposalCache();
 
       emit(ProposalState(error: error));
+    } on ApiException catch (error, stack) {
+      _logger.severe('Loading $ref failed', error, stack);
+
+      _clearProposalCache();
+
+      final localizedError = LocalizedApiException.from(error);
+
+      emit(ProposalState(error: localizedError));
     } catch (error, stack) {
       _logger.severe('Loading $ref failed', error, stack);
 
-      _proposal = null;
-      _commentTemplate = null;
-      _comments = null;
-      _isFavorite = null;
+      _clearProposalCache();
 
       emit(const ProposalState(error: LocalizedUnknownException()));
     } finally {
@@ -294,6 +292,13 @@ final class ProposalCubit extends Cubit<ProposalState>
       ...proposalSegments,
       commentsSegment,
     ];
+  }
+
+  void _clearProposalCache() {
+    _proposal = null;
+    _commentTemplate = null;
+    _comments = null;
+    _isFavorite = null;
   }
 
   void _handleActiveAccountIdChanged(CatalystId? data) {
