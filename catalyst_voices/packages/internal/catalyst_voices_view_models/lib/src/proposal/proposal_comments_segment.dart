@@ -65,20 +65,6 @@ final class ProposalCommentsSegment
   @override
   List<Object?> get props => super.props + [sort];
 
-  ProposalCommentsSegment addComment(CommentDocument comment) {
-    final sections = this
-        .sections
-        .map(
-          (section) => switch (section) {
-            AddCommentSection() => section,
-            ViewCommentsSection() => section.addComment(comment),
-          },
-        )
-        .toList();
-
-    return copyWith(sections: sections);
-  }
-
   ProposalCommentsSegment copySorted({
     required ProposalCommentsSort sort,
   }) {
@@ -139,23 +125,6 @@ final class ViewCommentsSection extends ProposalCommentsSection
 
   @override
   List<Object?> get props => super.props + [comments, canReply];
-
-  ViewCommentsSection addComment(CommentDocument comment) {
-    final comments = List.of(this.comments);
-    final reply = comment.metadata.reply;
-
-    if (reply != null) {
-      final index = comments.indexWhere((comment) => comment.contains(reply));
-      if (index != -1) {
-        final updated = comments.removeAt(index).addReply(comment);
-        comments.insert(index, updated);
-      }
-    } else {
-      comments.add(CommentWithReplies.direct(comment));
-    }
-
-    return copyWith(comments: comments);
-  }
 
   ViewCommentsSection copyWith({
     NodeId? id,

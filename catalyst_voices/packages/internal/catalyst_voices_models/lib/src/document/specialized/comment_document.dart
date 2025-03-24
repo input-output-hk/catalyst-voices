@@ -13,19 +13,23 @@ final class CommentDocument extends Equatable {
     required this.document,
   });
 
-  Profile? get author {
-    /* cSpell:disable */
-    final uri = Uri.parse(
-      'id.catalyst://cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE',
-    );
-    var catId = CatalystId.fromUri(uri);
-    catId = catId.copyWith(username: const Optional('Daniel Ribar'));
-    return Profile(catalystId: catId);
-    /* cSpell:enable */
-  }
-
   @override
   List<Object?> get props => [metadata, document];
+
+  DocumentData toDocumentData({
+    required DocumentMapper mapper,
+  }) {
+    return DocumentData(
+      metadata: DocumentDataMetadata(
+        type: DocumentType.commentDocument,
+        selfRef: metadata.selfRef,
+        ref: metadata.ref,
+        reply: metadata.reply,
+        authors: [metadata.authorId],
+      ),
+      content: mapper.toContent(document),
+    );
+  }
 }
 
 final class CommentMetadata extends DocumentMetadata {
@@ -43,7 +47,10 @@ final class CommentMetadata extends DocumentMetadata {
     required this.ref,
     this.reply,
     required this.authorId,
-  });
+  }) : assert(
+          ref.isExact,
+          'Comments can refer only exact documents',
+        );
 
   @override
   List<Object?> get props => super.props + [ref, reply, authorId];

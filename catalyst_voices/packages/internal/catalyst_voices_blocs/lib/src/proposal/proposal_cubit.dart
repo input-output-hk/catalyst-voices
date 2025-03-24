@@ -16,6 +16,7 @@ final _logger = Logger('ProposalBloc');
 final class ProposalCubit extends Cubit<ProposalState>
     with
         DocumentToSegmentMixin,
+        BlocErrorEmitterMixin<ProposalState>,
         BlocSignalEmitterMixin<ProposalSignal, ProposalState> {
   final UserService _userService;
   final ProposalService _proposalService;
@@ -138,9 +139,10 @@ final class ProposalCubit extends Cubit<ProposalState>
     final activeAccountId = _cache.activeAccountId;
     assert(activeAccountId != null, 'No active account found!');
 
+    final commentRef = SignedDocumentRef.generateFirstRef();
     final comment = CommentDocument(
       metadata: CommentMetadata(
-        selfRef: SignedDocumentRef.generateFirstRef(),
+        selfRef: commentRef,
         ref: proposalRef! as SignedDocumentRef,
         reply: reply,
         authorId: activeAccountId!,
@@ -148,11 +150,42 @@ final class ProposalCubit extends Cubit<ProposalState>
       document: document,
     );
 
-    final data = state.data;
-    final updatedData = data.addComment(comment);
-    emit(state.copyWith(data: updatedData));
+    final comments = _addCommentTo(_cache.comments ?? [], comment: comment);
+    _cache = _cache.copyWith(comments: Optional(comments));
+    emit(state.copyWith(data: _rebuildProposalState()));
 
-    // TODO(damian-molinski): send document
+    final documentData = comment.toDocumentData(mapper: _documentMapper);
+
+    var isSuccess = true;
+
+    try {
+      await _commentService.submitComment(document: documentData);
+    } on ApiException catch (error, stack) {
+      _logger.info('Publishing comment failed', error, stack);
+
+      isSuccess = false;
+      emitError(LocalizedApiException.from(error));
+    } on LocalizedException catch (error, stack) {
+      _logger.info('Publishing comment failed', error, stack);
+
+      isSuccess = false;
+      emitError(error);
+    } catch (error, stack) {
+      _logger.info('Publishing comment failed', error, stack);
+
+      isSuccess = false;
+      emitError(const LocalizedUnknownPublishCommentException());
+    } finally {
+      if (!isSuccess) {
+        final source = _cache.comments;
+        final comments = _removeCommentFrom(source ?? [], ref: commentRef);
+        _cache = _cache.copyWith(comments: Optional(comments));
+
+        if (!isClosed) {
+          emit(state.copyWith(data: _rebuildProposalState()));
+        }
+      }
+    }
   }
 
   void updateCommentBuilder({
@@ -204,6 +237,26 @@ final class ProposalCubit extends Cubit<ProposalState>
     } else {
       await _proposalService.removeFavoriteProposal(ref: ref!);
     }
+  }
+
+  List<CommentWithReplies> _addCommentTo(
+    List<CommentWithReplies> source, {
+    required CommentDocument comment,
+  }) {
+    final comments = List.of(source);
+    final reply = comment.metadata.reply;
+
+    if (reply != null) {
+      final index = comments.indexWhere((comment) => comment.contains(reply));
+      if (index != -1) {
+        final updated = comments.removeAt(index).addReply(comment);
+        comments.insert(index, updated);
+      }
+    } else {
+      comments.add(CommentWithReplies.direct(comment));
+    }
+
+    return comments;
   }
 
   ProposalViewData _buildProposalViewData({
@@ -331,14 +384,14 @@ final class ProposalCubit extends Cubit<ProposalState>
   void _handleActiveAccountIdChanged(CatalystId? data) {
     if (_cache.activeAccountId != data) {
       _cache = _cache.copyWith(activeAccountId: Optional(data));
-      _rebuildProposalState();
+      emit(state.copyWith(data: _rebuildProposalState()));
     }
   }
 
   void _handleCommentsChange(List<CommentWithReplies> comments) {
     _cache = _cache.copyWith(comments: Optional(comments));
 
-    _rebuildProposalState();
+    emit(state.copyWith(data: _rebuildProposalState()));
   }
 
   /* cSpell:enable */
@@ -359,5 +412,15 @@ final class ProposalCubit extends Cubit<ProposalState>
       commentsSort: commentsSort,
       isFavorite: isFavorite,
     );
+  }
+
+  List<CommentWithReplies> _removeCommentFrom(
+    List<CommentWithReplies> source, {
+    required SignedDocumentRef ref,
+  }) {
+    final comments = List.of(source);
+    //
+
+    return comments;
   }
 }

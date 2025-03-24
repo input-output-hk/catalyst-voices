@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:catalyst_voices/common/error_handler.dart';
 import 'package:catalyst_voices/common/signal_handler.dart';
 import 'package:catalyst_voices/pages/proposal/proposal_content.dart';
 import 'package:catalyst_voices/pages/proposal/proposal_error.dart';
@@ -32,7 +33,9 @@ class ProposalPage extends StatefulWidget {
 }
 
 class _ProposalPageState extends State<ProposalPage>
-    with SignalHandlerStateMixin<ProposalCubit, ProposalSignal, ProposalPage> {
+    with
+        ErrorHandlerStateMixin<ProposalCubit, ProposalPage>,
+        SignalHandlerStateMixin<ProposalCubit, ProposalSignal, ProposalPage> {
   late final SegmentsController _segmentsController;
   late final ItemScrollController _segmentsScrollController;
 
