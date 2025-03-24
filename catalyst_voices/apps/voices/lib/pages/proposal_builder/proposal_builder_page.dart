@@ -86,13 +86,14 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
       ),
       body: SegmentsControllerScope(
         controller: _segmentsController,
-        child: SpaceScaffold(
-          left: const ProposalBuilderNavigationPanel(),
+        child: SidebarScaffold(
+          leftRail: const ProposalBuilderNavigationPanel(),
           body: _ProposalBuilderContent(
             controller: _segmentsScrollController,
             onRetryTap: _updateSource,
           ),
-          right: const ProposalBuilderSetupPanel(),
+          bodyConstraints: const BoxConstraints.expand(),
+          rightRail: const ProposalBuilderSetupPanel(),
         ),
       ),
     );

@@ -82,16 +82,23 @@ class _Header extends StatelessWidget {
       spacing: 8,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        if (username != null) _UsernameText(username),
-        if (catalystId != null)
-          CatalystIdText(
-            catalystId,
-            isCompact: true,
-            showCopy: false,
-            style: context.textTheme.bodySmall,
+        Expanded(
+          child: Wrap(
+            spacing: 8,
+            runSpacing: 4,
+            children: [
+              if (username != null) _UsernameText(username),
+              if (catalystId != null)
+                CatalystIdText(
+                  catalystId,
+                  isCompact: true,
+                  showCopy: false,
+                  style: context.textTheme.bodySmall,
+                ),
+              if (createAt != null) TimestampText(createAt),
+            ],
           ),
-        if (createAt != null) TimestampText(createAt),
-        const Spacer(),
+        ),
         ...actions,
       ],
     );

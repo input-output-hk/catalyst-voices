@@ -70,6 +70,7 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
       type: type,
       selfRef: SignedDocumentRef(id: ref.id, version: ver),
       template: template,
+      categoryId: categoriesTemplatesRefs.first.category,
     );
 
     final content = DocumentDataContent(signedDocument);
