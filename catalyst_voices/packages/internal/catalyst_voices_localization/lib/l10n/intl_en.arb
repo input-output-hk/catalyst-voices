@@ -1624,11 +1624,11 @@
   },
   "proposalEditorPublishErrorDialogTitle": "Unable to Publish Proposal",
   "@proposalEditorPublishErrorDialogTitle": {
-    "description": "Dialog title in proposal editor when publishing proposal to the serverfailed."
+    "description": "Dialog title in proposal editor when publishing proposal to the server failed."
   },
   "proposalEditorPublishErrorDialogMessage": "We couldn't publish your proposal. Please try again in 5-10 minutes, as it may take some time for your information to update.\n\nIf the issue persists, feel free to contact support.",
   "@proposalEditorPublishErrorDialogMessage": {
-    "description": "Dialog message in proposal editor when publishing proposal to the serverfailed."
+    "description": "Dialog message in proposal editor when publishing proposal to the server failed."
   },
   "showAll": "Show All",
   "@showAll": {
