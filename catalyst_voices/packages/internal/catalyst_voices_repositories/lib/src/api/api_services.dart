@@ -60,14 +60,15 @@ final class ApiServices {
       ],
     );
 
-    return ApiServices._(
+    return ApiServices.internal(
       gateway: cat,
       vit: vit,
       reviews: review,
     );
   }
 
-  const ApiServices._({
+  @visibleForTesting
+  const ApiServices.internal({
     required this.gateway,
     required this.vit,
     required this.reviews,

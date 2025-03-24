@@ -140,7 +140,7 @@ void main() {
               content: const DocumentDataContent({'title': 'D'}),
               metadata: DocumentDataMetadata(
                 type: DocumentType.proposalDocument,
-                selfRef: DocumentRefFactory.buildSigned(
+                selfRef: SignedDocumentRef(
                   id: id,
                   version: firstVersionId,
                 ),
@@ -150,7 +150,7 @@ void main() {
               content: secondContent,
               metadata: DocumentDataMetadata(
                 type: DocumentType.proposalDocument,
-                selfRef: DocumentRefFactory.buildSigned(
+                selfRef: SignedDocumentRef(
                   id: id,
                   version: secondVersionId,
                 ),
@@ -193,7 +193,10 @@ void main() {
 
       test('all refs return as expected', () async {
         // Given
-        final refs = List.generate(10, (_) => DocumentRefFactory.buildSigned());
+        final refs = List.generate(
+          10,
+          (_) => SignedDocumentRef.generateFirstRef(),
+        );
         final documentsWithMetadata = refs.map((ref) {
           return DocumentWithMetadataFactory.build(
             metadata: DocumentDataMetadata(
@@ -314,7 +317,7 @@ void main() {
         final documentsWithMetadata = [v1, v2].map((version) {
           final metadata = DocumentDataMetadata(
             type: DocumentType.proposalDocument,
-            selfRef: DocumentRefFactory.buildSigned(
+            selfRef: SignedDocumentRef(
               id: id,
               version: version,
             ),
@@ -356,7 +359,7 @@ void main() {
         final documentsWithMetadata = DocumentWithMetadataFactory.build(
           metadata: DocumentDataMetadata(
             type: DocumentType.proposalDocument,
-            selfRef: DocumentRefFactory.buildSigned(
+            selfRef: SignedDocumentRef(
               id: id,
               version: v1,
             ),
@@ -366,7 +369,7 @@ void main() {
         final newVersion = DocumentWithMetadataFactory.build(
           metadata: DocumentDataMetadata(
             type: DocumentType.proposalDocument,
-            selfRef: DocumentRefFactory.buildSigned(
+            selfRef: SignedDocumentRef(
               id: id,
               version: v2,
             ),
@@ -405,7 +408,7 @@ void main() {
         final document1 = DocumentWithMetadataFactory.build(
           metadata: DocumentDataMetadata(
             type: DocumentType.proposalDocument,
-            selfRef: DocumentRefFactory.buildSigned(
+            selfRef: SignedDocumentRef(
               id: id1,
               version: v1,
             ),
@@ -415,7 +418,7 @@ void main() {
         final document2 = DocumentWithMetadataFactory.build(
           metadata: DocumentDataMetadata(
             type: DocumentType.proposalDocument,
-            selfRef: DocumentRefFactory.buildSigned(
+            selfRef: SignedDocumentRef(
               id: id2,
               version: v2,
             ),
@@ -467,7 +470,7 @@ void main() {
           (index) {
             final metadata = DocumentDataMetadata(
               type: DocumentType.proposalDocument,
-              selfRef: DocumentRefFactory.buildSigned(id: id),
+              selfRef: SignedDocumentRef(id: id, version: const Uuid().v7()),
             );
             return DocumentWithMetadataFactory.build(metadata: metadata);
           },
@@ -490,7 +493,7 @@ void main() {
           (index) {
             final metadata = DocumentDataMetadata(
               type: DocumentType.proposalDocument,
-              selfRef: DocumentRefFactory.buildSigned(id: id),
+              selfRef: SignedDocumentRef(id: id, version: const Uuid().v7()),
             );
             return DocumentWithMetadataFactory.build(metadata: metadata);
           },
@@ -516,7 +519,7 @@ void main() {
           (index) {
             final metadata = DocumentDataMetadata(
               type: DocumentType.proposalDocument,
-              selfRef: DocumentRefFactory.buildSigned(id: id),
+              selfRef: SignedDocumentRef(id: id, version: const Uuid().v7()),
             );
             return DocumentWithMetadataFactory.build(metadata: metadata);
           },
@@ -542,7 +545,7 @@ void main() {
           (index) {
             final metadata = DocumentDataMetadata(
               type: DocumentType.proposalDocument,
-              selfRef: DocumentRefFactory.buildSigned(),
+              selfRef: SignedDocumentRef.generateFirstRef(),
             );
             return DocumentWithMetadataFactory.build(metadata: metadata);
           },
@@ -564,7 +567,7 @@ void main() {
       test('Counts comments for specific proposal document version', () async {
         final proposalId = const Uuid().v7();
         final versionId = const Uuid().v7();
-        final proposalRef = DocumentRefFactory.buildSigned(
+        final proposalRef = SignedDocumentRef(
           id: proposalId,
           version: versionId,
         );
@@ -582,7 +585,7 @@ void main() {
           (index) => DocumentWithMetadataFactory.build(
             metadata: DocumentDataMetadata(
               type: DocumentType.commentTemplate,
-              selfRef: DocumentRefFactory.buildSigned(),
+              selfRef: SignedDocumentRef.generateFirstRef(),
               ref: proposalRef,
             ),
           ),
@@ -592,8 +595,8 @@ void main() {
           (index) => DocumentWithMetadataFactory.build(
             metadata: DocumentDataMetadata(
               type: DocumentType.commentTemplate,
-              selfRef: DocumentRefFactory.buildSigned(),
-              ref: DocumentRefFactory.buildSigned(),
+              selfRef: SignedDocumentRef.generateFirstRef(),
+              ref: SignedDocumentRef.generateFirstRef(),
             ),
           ),
         );
@@ -610,7 +613,7 @@ void main() {
       test('Count versions of specific document', () async {
         final proposalId = const Uuid().v7();
         final versionId = const Uuid().v7();
-        final proposalRef = DocumentRefFactory.buildSigned(
+        final proposalRef = SignedDocumentRef(
           id: proposalId,
           version: versionId,
         );
@@ -629,8 +632,9 @@ void main() {
             return DocumentWithMetadataFactory.build(
               metadata: DocumentDataMetadata(
                 type: DocumentType.proposalDocument,
-                selfRef: DocumentRefFactory.buildSigned(
+                selfRef: SignedDocumentRef(
                   id: proposalId,
+                  version: const Uuid().v7(),
                 ),
                 ref: proposalRef,
               ),
@@ -654,7 +658,7 @@ void main() {
           await Future<void>.delayed(const Duration(milliseconds: 1));
           final versionId = const Uuid().v7();
           final proposalId2 = const Uuid().v7();
-          final proposalRef = DocumentRefFactory.buildSigned(
+          final proposalRef = SignedDocumentRef(
             id: proposalId,
             version: versionId,
           );
@@ -665,7 +669,7 @@ void main() {
             ),
           );
 
-          final proposalRef2 = DocumentRefFactory.buildSigned(
+          final proposalRef2 = SignedDocumentRef(
             id: proposalId2,
             version: versionId,
           );
@@ -676,7 +680,7 @@ void main() {
             return DocumentWithMetadataFactory.build(
               metadata: DocumentDataMetadata(
                 type: DocumentType.commentTemplate,
-                selfRef: DocumentRefFactory.buildSigned(),
+                selfRef: SignedDocumentRef.generateFirstRef(),
                 ref: proposalRef,
               ),
             );
@@ -685,7 +689,7 @@ void main() {
           final otherComment = DocumentWithMetadataFactory.build(
             metadata: DocumentDataMetadata(
               type: DocumentType.commentTemplate,
-              selfRef: DocumentRefFactory.buildSigned(),
+              selfRef: SignedDocumentRef.generateFirstRef(),
               ref: proposalRef2,
             ),
           );
