@@ -69,7 +69,6 @@ class _Actions extends StatelessWidget {
             .add(DeleteDraftProposalEvent(ref: ref as DraftRef));
       }
     }
-    return;
   }
 
   void _editProposal(BuildContext context) {

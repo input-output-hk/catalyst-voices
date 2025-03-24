@@ -308,7 +308,7 @@ final class ProposalServiceImpl implements ProposalService {
         return _proposalRepository.publishProposalAction(
           ref: ref,
           categoryId: categoryId,
-          action: ProposalSubmissionAction.aFinal,
+          action: ProposalSubmissionAction.draft,
           catalystId: catalystId,
           privateKey: privateKey,
         );

@@ -44,6 +44,7 @@ class ForgetProposalDialog extends StatefulWidget {
 
 class _ActionButtons extends StatelessWidget {
   final bool agreement;
+  
   const _ActionButtons({
     required this.agreement,
   });
@@ -224,6 +225,7 @@ class _VersionUnlock extends StatelessWidget {
   final String version;
   final String title;
   final ProposalPublish publish;
+  
   const _VersionUnlock({
     required this.version,
     required this.title,

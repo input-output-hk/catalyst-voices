@@ -120,11 +120,10 @@ class _ProposalMenuActionButtonState extends State<ProposalMenuActionButton> {
             .add(DeleteDraftProposalEvent(ref: widget.ref as DraftRef));
       }
     }
-    return;
   }
 
   Future<void> _editProposal() async {
-    if (widget.proposalPublish.isLocal) {
+    if (widget.proposalPublish.isPublished) {
       final edit = await UnlockEditProposalDialog.show(
             context: context,
             title: widget.title,

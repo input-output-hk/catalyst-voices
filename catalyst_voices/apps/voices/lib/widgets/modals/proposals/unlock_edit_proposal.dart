@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 class UnlockEditProposalDialog extends StatefulWidget {
   final String title;
   final int version;
+
   const UnlockEditProposalDialog({
     super.key,
     required this.title,
@@ -40,6 +41,7 @@ class UnlockEditProposalDialog extends StatefulWidget {
 
 class _ActionButtons extends StatelessWidget {
   final bool agreement;
+
   const _ActionButtons({
     required this.agreement,
   });
@@ -221,6 +223,7 @@ class _UnlockEditProposalDialogState extends State<UnlockEditProposalDialog> {
 class _VersionUnlock extends StatelessWidget {
   final String version;
   final String title;
+
   const _VersionUnlock({
     required this.version,
     required this.title,
