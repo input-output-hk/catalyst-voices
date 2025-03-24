@@ -65,6 +65,10 @@ class _WorkspacePageState extends State<WorkspacePage>
         );
       case DeletedDraftWorkspaceSignal():
         _showDeleteSuccessSnackBar();
+      case OpenProposalBuilderSignal():
+        unawaited(
+          ProposalBuilderRoute.fromRef(ref: signal.ref).push(context),
+        );
     }
   }
 

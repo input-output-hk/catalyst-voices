@@ -50,6 +50,15 @@ final class LoadProposalsEvent extends WorkspaceEvent {
   List<Object?> get props => [proposals];
 }
 
+final class UnlockProposalEvent extends WorkspaceEvent {
+  final DocumentRef ref;
+
+  const UnlockProposalEvent(this.ref);
+
+  @override
+  List<Object?> get props => [ref];
+}
+
 final class WatchUserProposalsEvent extends WorkspaceEvent {
   const WatchUserProposalsEvent();
 

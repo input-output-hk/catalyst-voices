@@ -267,7 +267,9 @@ final class DocumentRepositoryImpl implements DocumentRepository {
 
     final newMetadata = document.metadata.copyWith(
       selfRef: DraftRef.generateFirstRef(),
-      authors: Optional([authorId]),
+      authors: Optional(
+        [authorId],
+      ),
     );
 
     final newDocument = DocumentData(

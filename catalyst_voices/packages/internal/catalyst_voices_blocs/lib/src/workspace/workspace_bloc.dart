@@ -9,6 +9,7 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 final _logger = Logger('WorkspaceBloc');
@@ -40,6 +41,7 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     on<WatchUserProposalsEvent>(_watchUserProposals);
     on<ExportProposal>(_exportProposal);
     on<DeleteDraftProposalEvent>(_deleteProposal);
+    on<UnlockProposalEvent>(_unlockProposal);
   }
 
   @override
@@ -155,35 +157,6 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
       (proposals) {
         if (isClosed) return;
         _logger.info('Stream received ${proposals.length} proposals');
-        // // TODO(LynxLynxx): only for testing delete before PR
-        // final proposalsToDelete = <Proposal>[];
-        // for (var i = 0; i < proposals.length; i++) {
-        //   if (i < 3) {
-        //     proposalsToDelete.add(
-        //       proposals[i].copyWith(
-        //         publish: ProposalPublish.values[i],
-        //         versions: [
-        //           ProposalVersion(
-        //             selfRef: proposals[i].selfRef.copyWith(
-        //                   version: Optional(const UuidV7().toString()),
-        //                 ),
-        //             title: 'Title ver ${i + 1}',
-        //             createdAt: DateTime.now(),
-        //             publish: ProposalPublish.localDraft,
-        //           ),
-        //           ProposalVersion(
-        //             selfRef: proposals[i].selfRef,
-        //             title: 'Title ver ${i + 1}',
-        //             createdAt: DateTime.now(),
-        //             publish: ProposalPublish.publishedDraft,
-        //           ),
-        //         ],
-        //       ),
-        //     );
-        //   } else {
-        //     proposalsToDelete.add(proposals[i]);
-        //   }
-        // }
 
         add(LoadProposalsEvent(proposals));
       },
@@ -193,6 +166,22 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
         add(const ErrorLoadProposalsEvent(LocalizedUnknownException()));
       },
     );
+  }
+
+  Future<void> _unlockProposal(
+    UnlockProposalEvent event,
+    Emitter<WorkspaceState> emit,
+  ) async {
+    final proposal =
+        state.userProposals.firstWhereOrNull((e) => e.selfRef == event.ref);
+    if (proposal == null || proposal.selfRef is! SignedDocumentRef) {
+      return emitError(const LocalizedUnknownException());
+    }
+    await _proposalService.unlockProposal(
+      ref: proposal.selfRef as SignedDocumentRef,
+      categoryId: proposal.categoryId,
+    );
+    emitSignal(OpenProposalBuilderSignal(ref: event.ref));
   }
 
   Future<void> _watchUserProposals(

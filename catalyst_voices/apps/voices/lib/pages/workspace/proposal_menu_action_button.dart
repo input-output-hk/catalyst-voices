@@ -7,6 +7,7 @@ import 'package:catalyst_voices/routes/routing/proposal_builder_route.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_icon_button.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/proposal_builder_delete_confirmation_dialog.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/share_proposal_dialog.dart';
+import 'package:catalyst_voices/widgets/modals/proposals/unlock_edit_proposal.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
@@ -17,11 +18,15 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 class ProposalMenuActionButton extends StatefulWidget {
   final DocumentRef ref;
   final ProposalPublish proposalPublish;
+  final int version;
+  final String title;
 
   const ProposalMenuActionButton({
     super.key,
     required this.ref,
     required this.proposalPublish,
+    required this.version,
+    required this.title,
   });
 
   @override
@@ -117,10 +122,24 @@ class _ProposalMenuActionButtonState extends State<ProposalMenuActionButton> {
     return;
   }
 
-  void _editProposal() {
-    unawaited(
-      ProposalBuilderRoute.fromRef(ref: widget.ref).push(context),
-    );
+  Future<void> _editProposal() async {
+    if (widget.proposalPublish.isLocal) {
+      final edit = await UnlockEditProposalDialog.show(
+            context: context,
+            title: widget.title,
+            version: widget.version,
+          ) ??
+          false;
+      if (edit && mounted) {
+        context.read<WorkspaceBloc>().add(UnlockProposalEvent(widget.ref));
+      }
+    } else {
+      if (mounted) {
+        unawaited(
+          ProposalBuilderRoute.fromRef(ref: widget.ref).push(context),
+        );
+      }
+    }
   }
 
   void _exportProposal() {
@@ -133,7 +152,7 @@ class _ProposalMenuActionButtonState extends State<ProposalMenuActionButton> {
   void _onSelected(ProposalMenuItemAction item) {
     switch (item) {
       case ProposalMenuItemAction.edit:
-        _editProposal();
+        unawaited(_editProposal());
       case ProposalMenuItemAction.view:
         _viewProposal();
       case ProposalMenuItemAction.share:

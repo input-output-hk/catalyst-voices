@@ -2101,5 +2101,33 @@
   "apiErrorServiceUnavailable": "Service Unavailable",
   "@apiErrorServiceUnavailable": {
     "description": "Message of an error when api returns matching status code."
+  },
+  "degradeFinalToDraftProposal": "You remove this proposal from review/voting stage.",
+  "@degradeFinalToDraftProposal": {
+    "description": "Information for user that his proposal is going back to draft. "
+  },
+  "resubmitAsFinalWarning": "You need to resubmit this proposal as final, to be eligible for funding, so make sure to Submit to review stage (Final) after editing.",
+  "@resubmitAsFinalWarning": {
+    "description": "Information for user that proposal needs to be resubmitted as final to be eligible for funding."
+  },
+  "removingProposalFromFinalStage": "You remove this proposal from review/voting stage.",
+  "@removingProposalFromFinalStage": {
+    "description": "Information for user that his proposal is going back to draft. "
+  },
+  "acknowledgeToResubmitProposal": "I acknowledge that I have to re-submit my draft proposal as Final to be eligible for funding.",
+  "@acknowledgeToResubmitProposal": {
+    "description": "Information for user that he needs to resubmit his proposal. "
+  },
+  "caution": "Caution:",
+  "@caution": {
+    "description": "Title of caution information"
+  },
+  "youAreSettingFinalToDraft": "You are setting your final proposal back to draft.",
+  "@youAreSettingFinalToDraft": {
+    "description": "Information for user that his proposal is going back to draft. "
+  },
+  "unlockEditProposalDialogTitle": "Unlock & Edit ?",
+  "@unlockEditProposalDialogTitle": {
+    "description": "Title of Unlock & Edit Dialog"
   }
 }

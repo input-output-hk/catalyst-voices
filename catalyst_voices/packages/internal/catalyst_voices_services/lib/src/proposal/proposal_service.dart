@@ -86,6 +86,11 @@ abstract interface class ProposalService {
     required SignedDocumentRef categoryId,
   });
 
+  Future<void> unlockProposal({
+    required SignedDocumentRef ref,
+    required SignedDocumentRef categoryId,
+  });
+
   /// Upserts a proposal draft in the local storage.
   Future<void> upsertDraftProposal({
     required DraftRef selfRef,
@@ -257,6 +262,24 @@ final class ProposalServiceImpl implements ProposalService {
     required SignedDocumentRef ref,
     required SignedDocumentRef categoryId,
   }) {
+    return _useProposerRoleCredentials(
+      (catalystId, privateKey) {
+        return _proposalRepository.publishProposalAction(
+          ref: ref,
+          categoryId: categoryId,
+          action: ProposalSubmissionAction.aFinal,
+          catalystId: catalystId,
+          privateKey: privateKey,
+        );
+      },
+    );
+  }
+
+  @override
+  Future<void> unlockProposal({
+    required SignedDocumentRef ref,
+    required SignedDocumentRef categoryId,
+  }) async {
     return _useProposerRoleCredentials(
       (catalystId, privateKey) {
         return _proposalRepository.publishProposalAction(

@@ -91,6 +91,7 @@ class _MenuItem extends StatelessWidget {
 
     return ListTile(
       title: MarkdownText(
+        selectable: false,
         MarkdownData(title),
       ),
       subtitle: description == null

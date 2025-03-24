@@ -17,6 +17,15 @@ final class ImportedProposalWorkspaceSignal extends WorkspaceSignal {
   List<Object?> get props => [proposalRef];
 }
 
+final class OpenProposalBuilderSignal extends WorkspaceSignal {
+  final DocumentRef ref;
+
+  const OpenProposalBuilderSignal({required this.ref});
+
+  @override
+  List<Object?> get props => [ref];
+}
+
 sealed class WorkspaceSignal extends Equatable {
   const WorkspaceSignal();
 }
