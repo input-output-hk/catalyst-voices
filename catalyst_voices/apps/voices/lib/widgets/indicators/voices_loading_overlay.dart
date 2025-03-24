@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:flutter/material.dart';
 
@@ -24,10 +25,21 @@ class VoicesLoadingOverlay extends StatelessWidget {
             width: double.infinity,
             height: double.infinity,
             color: Theme.of(context).colors.onSurfaceNeutral016.withAlpha(50),
-            child: Center(
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 3, sigmaY: 3),
-                child: const CircularProgressIndicator(),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 3, sigmaY: 3),
+              child: Center(
+                child: Container(
+                  padding: const EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.surface,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: VoicesAssets.lottie.voicesLoader.buildLottie(
+                    width: 92,
+                    height: 92,
+                    repeat: true,
+                  ),
+                ),
               ),
             ),
           ),
