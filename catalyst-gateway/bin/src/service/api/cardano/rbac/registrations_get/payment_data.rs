@@ -22,12 +22,18 @@ pub struct PaymentData {
 
 impl PaymentData {
     /// Creates a new `PaymentData` instance.
-    pub fn new(is_persistent: bool, time: DateTime<Utc>, address: Option<ShelleyAddress>) -> Self {
-        Self {
+    pub fn new(
+        is_persistent: bool, time: DateTime<Utc>, address: Option<ShelleyAddress>,
+    ) -> anyhow::Result<Self> {
+        let address = address
+            .map(|a| Cip19ShelleyAddress::try_from(a))
+            .transpose()?;
+
+        Ok(Self {
             is_persistent: is_persistent.into(),
             time: time.into(),
-            address: address.map(|a| a.try_into().ok()).flatten(),
-        }
+            address,
+        })
     }
 }
 

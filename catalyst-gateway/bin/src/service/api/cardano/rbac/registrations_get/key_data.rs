@@ -1,11 +1,19 @@
 //! A role data key information.
 
+use std::collections::HashMap;
+
+use anyhow::Context;
+use c509_certificate::c509::C509;
+use cardano_blockchain_types::Point;
 use chrono::{DateTime, Utc};
+use ed25519_dalek::VerifyingKey;
+use minicbor::{encode::Encode, Encoder};
 use poem_openapi::{types::Example, Object};
 use rbac_registration::{
-    cardano::cip509::{KeyLocalRef, LocalRefInt},
+    cardano::cip509::{KeyLocalRef, LocalRefInt, PointData},
     registration::cardano::RegistrationChain,
 };
+use x509_cert::{certificate::Certificate as X509Certificate, der::Encode as _};
 
 use crate::service::common::types::generic::{
     boolean::BooleanFlag, date_time::DateTime as ServiceDateTime,
@@ -22,42 +30,45 @@ pub struct KeyData {
     is_persistent: BooleanFlag,
     /// A time when the address was added.
     time: ServiceDateTime,
+    /// A binary encoded X509 certificate.
+    x509_cert: Option<Vec<u8>>,
+    /// A binary encoded C509 certificate.
+    c509_cert: Option<Vec<u8>>,
     /// An ed25519 public key.
     pub_key: Option<Ed25519HexEncodedPublicKey>,
-    // TODO: FIXME:
-    x509_cert: Option<()>,
-    // TODO: FIXME:
-    c509_cert: Option<()>,
 }
 
 impl KeyData {
     /// Creates a new `KeyData` instance.
     pub fn new(
-        is_persistent: bool, time: DateTime<Utc>, key_ref: Option<&KeyLocalRef>,
+        is_persistent: bool, time: DateTime<Utc>, key_ref: Option<&KeyLocalRef>, point: &Point,
         chain: &RegistrationChain,
-    ) -> Self {
-        let mut pub_key = None;
+    ) -> anyhow::Result<Self> {
         let mut x509_cert = None;
         let mut c509_cert = None;
+        let mut pub_key = None;
 
-        // TODO: FIXME:
         if let Some(key_ref) = key_ref {
             match key_ref.local_ref {
-                LocalRefInt::X509Certs => {},
-                LocalRefInt::C509Certs => {},
+                LocalRefInt::X509Certs => {
+                    x509_cert = encode_x509(chain.x509_certs(), key_ref.key_offset, point)?;
+                },
+                LocalRefInt::C509Certs => {
+                    c509_cert = encode_c509(chain.c509_certs(), key_ref.key_offset, point)?;
+                },
                 LocalRefInt::PubKeys => {
-                    let a = chain.simple_keys().get(&usize::from(key_ref.key_offset));
+                    pub_key = convert_pub_key(chain.simple_keys(), key_ref.key_offset, point)?;
                 },
             }
         }
 
-        Self {
+        Ok(Self {
             is_persistent: is_persistent.into(),
             time: time.into(),
             pub_key,
             x509_cert,
             c509_cert,
-        }
+        })
     }
 }
 
@@ -73,62 +84,55 @@ impl Example for KeyData {
     }
 }
 
-// TODO: FIXME:
-//
-// use x509_cert::{certificate::Certificate as X509Certificate, der::Encode as _};
-//
-// /// Converts X509 certificates.
-// fn convert_x509_map(
-//     certs: &HashMap<usize, Vec<PointData<Option<X509Certificate>>>>,
-// ) -> CertificateMap {
-//     certs
-//         .iter()
-//         .map(|(index, point_data)| (*index, encode_x509_list(point_data)))
-//         .collect::<HashMap<_, _>>()
-//         .into()
-// }
-//
-// /// Encodes the given list of X509 certificates.
-// fn encode_x509_list(certs: &Vec<PointData<Option<X509Certificate>>>) ->
-// Vec<Option<Vec<u8>>> {     certs
-//         .iter()
-//         .map(|point_data| {
-//             point_data
-//                 .data()
-//                 .as_ref()
-//                 .map(|cert| {
-//                     let mut buffer = Vec::new();
-//                     let mut e = Encoder::new(&mut buffer);
-//                     cert.encode(&mut e).ok().map(|()| buffer)
-//                 })
-//                 .flatten()
-//         })
-//         .collect()
-// }
-//
-// /// Converts a map of C509 certificates.
-// fn convert_c509_map(certs: &HashMap<usize, Vec<PointData<Option<C509>>>>) ->
-// CertificateMap {     certs
-//         .iter()
-//         .map(|(index, point_data)| (*index, encode_c509_list(point_data)))
-//         .collect::<HashMap<_, _>>()
-//         .into()
-// }
-//
-// /// Encodes the given list of C509 certificates.
-// fn encode_c509_list(certs: &Vec<PointData<Option<C509>>>) -> Vec<Option<Vec<u8>>> {
-//     certs
-//         .iter()
-//         .map(|point_data| {
-//             point_data
-//                 .data()
-//                 .as_ref()
-//                 .map(|cert| {
-//                     let mut buffer = Vec::new();
-//                     let mut e = Encoder::new(&mut buffer);
-//                     cert.encode(&mut e, &mut ()).ok().map(|()| buffer)
-//                 })
-//                 .flatten()
-//         })
-//         .collect()
-// }
+/// Finds a X509 certificate with given offset and point and binary encodes it.
+fn encode_x509(
+    certs: &HashMap<usize, Vec<PointData<Option<X509Certificate>>>>, offset: usize, point: &Point,
+) -> anyhow::Result<Option<Vec<u8>>> {
+    certs
+        .get(&offset)
+        .with_context(|| format!("Invalid X509 certificate offset: {offset:?}"))?
+        .iter()
+        .find(|d| d.point() == point)
+        .with_context(|| format!("Unable to find X509 certificate for the given point {point}"))?
+        .data()
+        .as_ref()
+        .map(|cert| cert.to_der().context("Failed to encode X509 certificate"))
+        .transpose()
+}
+
+/// Finds a C509 certificate with given offset and point and binary encodes it.
+fn encode_c509(
+    certs: &HashMap<usize, Vec<PointData<Option<C509>>>>, offset: usize, point: &Point,
+) -> anyhow::Result<Option<Vec<u8>>> {
+    certs
+        .get(&offset)
+        .with_context(|| format!("Invalid C509 certificate offset: {offset:?}"))?
+        .iter()
+        .find(|d| d.point() == point)
+        .with_context(|| format!("Unable to find C509 certificate for the given point {point}"))?
+        .data()
+        .as_ref()
+        .map(|cert| {
+            let mut buffer = Vec::new();
+            let mut e = Encoder::new(&mut buffer);
+            cert.encode(&mut e, &mut ())
+                .ok()
+                .map(|()| buffer)
+                .context("Failed to encode C509 certificate")
+        })
+        .transpose()
+}
+
+/// Finds a public key with the given offset and point and converts it.
+fn convert_pub_key(
+    keys: &HashMap<usize, Vec<PointData<Option<VerifyingKey>>>>, offset: usize, point: &Point,
+) -> anyhow::Result<Option<Ed25519HexEncodedPublicKey>> {
+    Ok(keys
+        .get(&offset)
+        .with_context(|| format!("Invalid pub key offset: {offset}"))?
+        .iter()
+        .find(|d| d.point() == point)
+        .with_context(|| format!("Unable to find pub key for the given point {point}"))?
+        .data()
+        .map(|k| k.into()))
+}

@@ -2,6 +2,7 @@
 
 use std::collections::HashMap;
 
+use anyhow::Context;
 use cardano_blockchain_types::Slot;
 use poem_openapi::{types::Example, Object};
 use rbac_registration::{
@@ -39,7 +40,7 @@ impl RbacRoleData {
     pub fn new(
         point_data: &Vec<PointData<RoleData>>, last_persistent_slot: Slot,
         chain: &RegistrationChain,
-    ) -> Self {
+    ) -> anyhow::Result<Self> {
         let network = Settings::cardano_network();
 
         let mut signing_keys = Vec::new();
@@ -53,27 +54,39 @@ impl RbacRoleData {
             let time = network.slot_to_time(slot);
             let data = point.data();
 
-            signing_keys.push(KeyData::new(is_persistent, time, data.signing_key(), chain));
-            encryption_keys.push(KeyData::new(
-                is_persistent,
-                time,
-                data.encryption_key(),
-                chain,
-            ));
-            payment_address.push(PaymentData::new(
-                is_persistent,
-                time,
-                data.payment_key().cloned(),
-            ));
+            signing_keys.push(
+                KeyData::new(
+                    is_persistent,
+                    time,
+                    data.signing_key(),
+                    point.point(),
+                    chain,
+                )
+                .context("Invalid signing key")?,
+            );
+            encryption_keys.push(
+                KeyData::new(
+                    is_persistent,
+                    time,
+                    data.encryption_key(),
+                    point.point(),
+                    chain,
+                )
+                .context("Invalid encryption key")?,
+            );
+            payment_address.push(
+                PaymentData::new(is_persistent, time, data.payment_key().cloned())
+                    .context("Invalid payment address")?,
+            );
             extended_data.extend(data.extended_data().clone().into_iter());
         }
 
-        Self {
+        Ok(Self {
             signing_keys,
             encryption_keys,
             payment_address,
             extended_data,
-        }
+        })
     }
 }
 

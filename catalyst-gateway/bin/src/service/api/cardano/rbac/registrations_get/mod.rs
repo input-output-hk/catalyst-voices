@@ -82,7 +82,12 @@ pub(crate) async fn endpoint(
     };
 
     match ChainInfo::new(&persistent_session, &volatile_session, &catalyst_id).await {
-        Ok(Some(info)) => Responses::Ok(Json(Box::new(RbacRegistrationChain::new(info)))).into(),
+        Ok(Some(info)) => {
+            match RbacRegistrationChain::new(info) {
+                Ok(c) => Responses::Ok(Json(Box::new(c))).into(),
+                Err(e) => AllResponses::handle_error(&e),
+            }
+        },
         Ok(None) => Responses::NotFound.into(),
         Err(e) => AllResponses::handle_error(&e),
     }

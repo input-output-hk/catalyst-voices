@@ -51,7 +51,7 @@ impl Example for RbacRegistrationChain {
 
 impl RbacRegistrationChain {
     /// Creates a new registration chain instance.
-    pub fn new(info: ChainInfo) -> Self {
+    pub fn new(info: ChainInfo) -> anyhow::Result<Self> {
         let catalyst_id = info.chain.catalyst_id().clone().into();
         let last_persistent_txn = info.last_persistent_txn.map(Into::into);
         let last_volatile_txn = info.last_volatile_txn.map(Into::into);
@@ -63,25 +63,25 @@ impl RbacRegistrationChain {
             .map(UUIDv4::from)
             .collect::<Vec<_>>()
             .into();
-        let roles = role_data(&info);
+        let roles = role_data(&info)?;
 
-        Self {
+        Ok(Self {
             catalyst_id,
             last_persistent_txn,
             last_volatile_txn,
             purpose,
             roles,
-        }
+        })
     }
 }
 
-fn role_data(info: &ChainInfo) -> HashMap<u8, RbacRoleData> {
+fn role_data(info: &ChainInfo) -> anyhow::Result<HashMap<u8, RbacRoleData>> {
     info.chain
         .all_role_data()
         .iter()
         .map(|(&number, data)| {
-            let data = RbacRoleData::new(data, info.last_persistent_slot, &info.chain);
-            (number.into(), data)
+            RbacRoleData::new(data, info.last_persistent_slot, &info.chain)
+                .map(|r| (number.into(), r))
         })
         .collect()
 }
