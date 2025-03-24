@@ -48,6 +48,8 @@ final class DocumentDataMetadata extends Equatable {
   /// List of authors represented by CatalystId
   final List<CatalystId>? authors;
 
+  // TODO(damian-molinski): refactor with factory constructors for
+  //  proposal/comment to centralize required fields for each type.
   DocumentDataMetadata({
     required this.type,
     required this.selfRef,
