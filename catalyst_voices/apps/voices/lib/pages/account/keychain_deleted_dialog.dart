@@ -13,6 +13,7 @@ class KeychainDeletedDialog extends StatelessWidget {
       title: Text(context.l10n.keychainDeletedDialogTitle),
       message: Text(context.l10n.keychainDeletedDialogSubtitle),
       action: VoicesFilledButton(
+        key: const Key('KeychainDeletedDialogCloseButton'),
         onTap: () => Navigator.of(context).pop(),
         child: Text(context.l10n.close),
       ),
