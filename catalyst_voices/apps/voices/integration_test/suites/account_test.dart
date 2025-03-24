@@ -41,19 +41,19 @@ void main() async {
         await AppBarPage($).unlockBtnIsVisible();
       });
 
-      patrolWidgetTest(
-          tags: 'issues_1715',
-          skip: true,
-          'user - locking and unlocking account', (PatrolTester $) async {
+      patrolWidgetTest('user - locking and unlocking account',
+          (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await UnlockPasswordSuccessPanel($).goto();
         await UnlockPasswordSuccessPanel($).clickGoToDashboard();
         await AppBarPage($).lockBtnClick();
         await AppBarPage($).unlockBtnClick();
-        await $(UnlockModalPage.unlockPasswordTextField).enterText('Test1234');
-        await $(UnlockModalPage.unlockConfirmPasswordButton).tap();
+        await $(UnlockModalPage($).unlockPasswordTextField)
+            .enterText('Test1234');
+        await $(UnlockModalPage($).unlockConfirmPasswordButton).tap();
         await AppBarPage($).unlockBtnIsVisible();
       });
+
       patrolWidgetTest('user - unlocking - wrong password error appears',
           (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
@@ -61,13 +61,16 @@ void main() async {
         await UnlockPasswordSuccessPanel($).clickGoToDashboard();
         await AppBarPage($).lockBtnClick();
         await AppBarPage($).unlockBtnClick();
-        await $(UnlockModalPage.unlockPasswordTextField).enterText('Test12345');
-        await $(UnlockModalPage.unlockConfirmPasswordButton).tap();
+        await $(UnlockModalPage($).unlockPasswordTextField)
+            .enterText('Test12345');
+        await $(UnlockModalPage($).unlockConfirmPasswordButton).tap();
         await UnlockModalPage($).incorrectPasswordErrorShowsUp();
       });
 
-      patrolWidgetTest(skip: true, 'user changing email works',
-          (PatrolTester $) async {
+      patrolWidgetTest(
+          tags: 'issues_1597',
+          skip: true,
+          'user changing email works', (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await UnlockPasswordSuccessPanel($).goto();
         await UnlockPasswordSuccessPanel($).clickGoToDashboard();
@@ -81,7 +84,8 @@ void main() async {
         // TODO(emiride): uncomment above when backend is ready
         // https://github.com/input-output-hk/catalyst-voices/issues/1597
       });
-      patrolWidgetTest('removing keychain logs out the user', skip: true,
+
+      patrolWidgetTest('removing keychain logs out the user',
           (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await UnlockPasswordSuccessPanel($).goto();
@@ -98,6 +102,7 @@ void main() async {
       });
     },
   );
+
   group(
     'Account dropdown -',
     () {
@@ -113,7 +118,9 @@ void main() async {
           await AccountDropdownPage($).accountDropdownLooksAsExpected();
         },
       );
+
       patrolWidgetTest(
+        tags: 'issues_1715',
         skip: true,
         'user - Account dropdown Profile & Keychain button works',
         (PatrolTester $) async {
