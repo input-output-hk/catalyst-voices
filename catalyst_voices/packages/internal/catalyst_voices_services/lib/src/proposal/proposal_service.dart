@@ -216,8 +216,9 @@ final class ProposalServiceImpl implements ProposalService {
   }
 
   @override
-  Future<DocumentRef> importProposal(Uint8List data) {
-    return _proposalRepository.importProposal(data);
+  Future<DocumentRef> importProposal(Uint8List data) async {
+    final authorId = await _getUserCatalystId();
+    return _proposalRepository.importProposal(data, authorId);
   }
 
   @override

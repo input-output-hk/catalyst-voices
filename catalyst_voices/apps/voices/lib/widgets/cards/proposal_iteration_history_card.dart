@@ -63,7 +63,7 @@ class _Actions extends StatelessWidget {
         ),
       );
 
-      if (confirmed) {
+      if (confirmed && context.mounted) {
         context
             .read<WorkspaceBloc>()
             .add(DeleteDraftProposalEvent(ref: ref as DraftRef));

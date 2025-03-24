@@ -60,7 +60,7 @@ abstract interface class ProposalRepository {
 
   Future<List<String>> getUserProposalsIds(String userId);
 
-  Future<DocumentRef> importProposal(Uint8List data);
+  Future<DocumentRef> importProposal(Uint8List data, CatalystId authorId);
 
   Future<void> publishProposal({
     required DocumentData document,
@@ -212,8 +212,8 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   }
 
   @override
-  Future<DocumentRef> importProposal(Uint8List data) {
-    return _documentRepository.importDocument(data: data);
+  Future<DocumentRef> importProposal(Uint8List data, CatalystId authorId) {
+    return _documentRepository.importDocument(data: data, authorId: authorId);
   }
 
   @override
@@ -317,6 +317,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
         .watchDocuments(
           type: DocumentType.proposalDocument,
           getLocalDrafts: true,
+          unique: true,
           authorId: authorId,
         )
         .whereNotNull()

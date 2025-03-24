@@ -131,6 +131,8 @@ abstract interface class DocumentDataRemoteSource
   Future<List<SignedDocumentRef>> index();
 
   Future<void> publish(SignedDocument document);
+
+  
 }
 
 extension on DocumentIndexList {
