@@ -3,7 +3,7 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'document_index_list_dto.g.dart';
 
-// Node. OpenAPI spec is incorrect at the moment. This dto is here as
+// Note. OpenAPI spec is incorrect at the moment. This dto is here as
 // temporary workaround.
 @JsonSerializable()
 final class DocumentIndexListDto {

@@ -4,7 +4,7 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'document_index_query_filters_dto.g.dart';
 
-// Node. OpenAPI spec is incorrect at the moment. This dto is here as
+// Note. OpenAPI spec is incorrect at the moment. This dto is here as
 // temporary workaround.
 @JsonSerializable(createFactory: false, includeIfNull: false)
 final class EqOrRangedIdDto extends EqOrRangedId {
