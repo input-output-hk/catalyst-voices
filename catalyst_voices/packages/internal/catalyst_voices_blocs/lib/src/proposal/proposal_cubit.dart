@@ -21,6 +21,8 @@ final class ProposalCubit extends Cubit<ProposalState>
         BlocSignalEmitterMixin<ProposalSignal, ProposalState> {
   final UserService _userService;
   final ProposalService _proposalService;
+  final CommentService _commentService;
+  final DocumentMapper _documentMapper;
 
   ProposalCubitCache _cache = const ProposalCubitCache();
 
@@ -31,6 +33,8 @@ final class ProposalCubit extends Cubit<ProposalState>
   ProposalCubit(
     this._userService,
     this._proposalService,
+    this._commentService,
+    this._documentMapper,
   ) : super(const ProposalState()) {
     _cache = _cache.copyWith(
       activeAccountId: Optional(_userService.user.activeAccount?.catalystId),
@@ -119,11 +123,15 @@ final class ProposalCubit extends Cubit<ProposalState>
   }) async {
     final proposalRef = _cache.ref;
     assert(proposalRef != null, 'Proposal ref not found. Load document first!');
+    assert(
+      proposalRef is SignedDocumentRef,
+      'Can comment only on signed documents',
+    );
 
     final comment = CommentDocument(
       metadata: CommentMetadata(
         selfRef: SignedDocumentRef.generateFirstRef(),
-        ref: proposalRef!,
+        ref: proposalRef! as SignedDocumentRef,
         reply: reply,
       ),
       document: document,
@@ -326,7 +334,7 @@ final class ProposalCubit extends Cubit<ProposalState>
       hasActiveAccount: activeAccountId != null,
       proposal: proposal,
       comments: comments,
-      commentSchema: commentTemplate?.document.schema,
+      commentSchema: commentTemplate?.schema,
       commentsSort: commentsSort,
       isFavorite: isFavorite,
     );

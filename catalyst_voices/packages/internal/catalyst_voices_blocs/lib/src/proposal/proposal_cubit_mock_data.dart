@@ -87,15 +87,11 @@ List<CommentWithReplies> _buildComments() {
 }
 
 CommentTemplate _buildCommentTemplate() {
-  final schema = _buildSchema();
-
-  final document = DocumentBuilder.fromSchema(schema: schema).build();
-
   return CommentTemplate(
     metadata: CommentTemplateMetadata(
       selfRef: SignedDocumentRef.generateFirstRef(),
     ),
-    document: document,
+    schema: _buildSchema(),
   );
 }
 

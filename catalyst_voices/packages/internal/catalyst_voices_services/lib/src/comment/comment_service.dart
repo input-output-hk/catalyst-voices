@@ -1,25 +1,24 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
+import 'package:catalyst_voices_services/catalyst_voices_services.dart';
+import 'package:collection/collection.dart';
 
 abstract interface class CommentService {
+  const factory CommentService(
+    CommentRepository commentRepository,
+    SignerService signerService,
+  ) = CommentServiceImpl;
+
   /// [CommentTemplate] is connected to category.
   Future<CommentTemplate> getCommentTemplateFor({
-    required SignedDocumentRef category,
+    required DocumentRef category,
   });
 
   /// Send new comment.
   ///
-  /// [data] body of comment itself.
-  ///
-  /// [ref] is document ref that this comment refers to. Comment can not
-  /// exist on its own but just in a context of other documents.
-  ///
-  /// [reply] equals other comment of this is a reply to it.
-  ///
-  /// Returns [SignedDocumentRef] to newly created document.
+  /// [document] body of comment itself.
   Future<SignedDocumentRef> submitComment({
-    required DocumentData data,
-    required DocumentRef ref,
-    SignedDocumentRef? reply,
+    required DocumentData document,
   });
 
   /// Emits list of comment which are matching [ref].
@@ -31,24 +30,46 @@ abstract interface class CommentService {
 }
 
 final class CommentServiceImpl implements CommentService {
+  final CommentRepository _commentRepository;
+  final SignerService _signerService;
+
+  const CommentServiceImpl(
+    this._commentRepository,
+    this._signerService,
+  );
+
   @override
   Future<CommentTemplate> getCommentTemplateFor({
-    required SignedDocumentRef category,
-  }) {
-    throw UnimplementedError();
+    required DocumentRef category,
+  }) async {
+    final commentTemplateRef = categoriesTemplatesRefs
+        .firstWhereOrNull((element) => element.category.id == category.id)
+        ?.comment;
+
+    if (commentTemplateRef == null) {
+      throw const ApiErrorResponseException(statusCode: 404);
+    }
+
+    return _commentRepository.getCommentTemplate(ref: commentTemplateRef);
   }
 
   @override
   Future<SignedDocumentRef> submitComment({
-    required DocumentData data,
-    required DocumentRef ref,
-    SignedDocumentRef? reply,
-  }) {
-    throw UnimplementedError();
+    required DocumentData document,
+  }) async {
+    await _signerService.useVoterCredentials((catalystId, privateKey) {
+      return _commentRepository.publishComment(
+        document: document,
+        catalystId: catalystId,
+        privateKey: privateKey,
+      );
+    });
+
+    return document.ref.toSignedDocumentRef();
   }
 
   @override
   Stream<List<CommentDocument>> watchCommentsWith({required DocumentRef ref}) {
-    throw UnimplementedError();
+    return _commentRepository.watchCommentsWith(ref: ref);
   }
 }
