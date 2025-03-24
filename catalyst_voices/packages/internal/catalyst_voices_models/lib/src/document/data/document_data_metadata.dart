@@ -21,6 +21,12 @@ final class DocumentDataMetadata extends Equatable {
   /// template document
   final SignedDocumentRef? template;
 
+  /// A reply to another document.
+  final SignedDocumentRef? reply;
+
+  /// A reference to a section of a document.
+  final String? section;
+
   /// uuid-v4
   /// Represents a "brand" who is running the voting, e.g. Catalyst, Midnight.
   final SignedDocumentRef? brandId;
@@ -48,6 +54,8 @@ final class DocumentDataMetadata extends Equatable {
     this.ref,
     this.refHash,
     this.template,
+    this.reply,
+    this.section,
     this.brandId,
     this.campaignId,
     this.electionId,
@@ -67,6 +75,8 @@ final class DocumentDataMetadata extends Equatable {
         ref,
         refHash,
         template,
+        reply,
+        section,
         brandId,
         campaignId,
         electionId,
@@ -82,6 +92,8 @@ final class DocumentDataMetadata extends Equatable {
     Optional<DocumentRef>? ref,
     Optional<SecuredDocumentRef>? refHash,
     Optional<SignedDocumentRef>? template,
+    Optional<SignedDocumentRef>? reply,
+    Optional<String>? section,
     Optional<SignedDocumentRef>? brandId,
     Optional<SignedDocumentRef>? campaignId,
     Optional<String>? electionId,
@@ -94,6 +106,8 @@ final class DocumentDataMetadata extends Equatable {
       ref: ref.dataOr(this.ref),
       refHash: refHash.dataOr(this.refHash),
       template: template.dataOr(this.template),
+      reply: reply.dataOr(this.reply),
+      section: section.dataOr(this.section),
       brandId: brandId.dataOr(this.brandId),
       campaignId: campaignId.dataOr(this.campaignId),
       electionId: electionId.dataOr(this.electionId),

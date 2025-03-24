@@ -29,8 +29,11 @@ final class CommentDocument extends Equatable {
 }
 
 final class CommentMetadata extends DocumentMetadata {
-  // at the moment ref should point only to ProposalDocument
-  final DocumentRef ref;
+  /// [ref] is document ref that this comment refers to. Comment can not
+  /// exist on its own but just in a context of other documents.
+  final SignedDocumentRef ref;
+
+  /// [reply] equals other comment of this is a reply to it.
   final SignedDocumentRef? reply;
 
   CommentMetadata({

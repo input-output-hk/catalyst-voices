@@ -33,6 +33,8 @@ final class DocumentDataFactory {
       ref: document.metadata.ref?.toModel(),
       refHash: document.metadata.refHash?.toModel(),
       template: document.metadata.template?.toModel(),
+      reply: document.metadata.reply?.toModel(),
+      section: document.metadata.section,
       brandId: document.metadata.brandId?.toModel(),
       campaignId: document.metadata.campaignId?.toModel(),
       electionId: document.metadata.electionId,
