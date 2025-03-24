@@ -1,9 +1,10 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart'
     show ApiConfig;
-import 'package:catalyst_voices_repositories/generated/api/cat_gateway.models.swagger.dart';
+import 'package:catalyst_voices_repositories/generated/api/cat_gateway.swagger.dart';
 import 'package:catalyst_voices_repositories/generated/api/client_index.dart';
 import 'package:catalyst_voices_repositories/generated/api/client_mapping.dart';
-import 'package:catalyst_voices_repositories/src/api/interceptors/cbor_content_type_interceptor.dart';
+import 'package:catalyst_voices_repositories/src/api/converters/cbor_or_json_converter.dart';
+import 'package:catalyst_voices_repositories/src/api/converters/cbor_serializable_converter.dart';
 import 'package:catalyst_voices_repositories/src/api/interceptors/rbac_auth_interceptor.dart';
 import 'package:catalyst_voices_repositories/src/auth/auth_token_provider.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart'
@@ -35,9 +36,12 @@ final class ApiServices {
     final cat = CatGateway.create(
       authenticator: null,
       baseUrl: Uri.parse(config.gatewayUrl),
+      converter: CborOrJsonDelegateConverter(
+        cborConverter: CborSerializableConverter(),
+        jsonConverter: $JsonSerializableConverter(),
+      ),
       interceptors: [
         RbacAuthInterceptor(userObserver, authTokenProvider),
-        const CborContentTypeInterceptor(),
         if (kDebugMode) HttpLoggingInterceptor(onlyErrors: true),
       ],
     );
@@ -52,19 +56,19 @@ final class ApiServices {
       baseUrl: Uri.parse(config.reviewsUrl),
       interceptors: [
         RbacAuthInterceptor(userObserver, authTokenProvider),
-        const CborContentTypeInterceptor(),
         if (kDebugMode) HttpLoggingInterceptor(onlyErrors: true),
       ],
     );
 
-    return ApiServices._(
+    return ApiServices.internal(
       gateway: cat,
       vit: vit,
       reviews: review,
     );
   }
 
-  const ApiServices._({
+  @visibleForTesting
+  const ApiServices.internal({
     required this.gateway,
     required this.vit,
     required this.reviews,

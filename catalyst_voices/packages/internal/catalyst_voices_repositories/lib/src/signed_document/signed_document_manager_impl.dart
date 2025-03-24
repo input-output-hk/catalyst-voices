@@ -14,17 +14,17 @@ final class SignedDocumentManagerImpl implements SignedDocumentManager {
   const SignedDocumentManagerImpl();
 
   @override
-  Future<SignedDocument<T>> parseDocument<T extends SignedDocumentPayload>(
-    Uint8List bytes, {
-    required SignedDocumentPayloadParser<T> parser,
-  }) async {
+  Future<SignedDocument> parseDocument(Uint8List bytes) async {
     final coseSign = CoseSign.fromCbor(cbor.decode(bytes));
-    final payloadBytes = await _brotliDecompressPayload(coseSign);
-    final payload = parser(payloadBytes);
-
     final metadata = _SignedDocumentMetadataExt.fromCose(
       protectedHeaders: coseSign.protectedHeaders,
       unprotectedHeaders: coseSign.unprotectedHeaders,
+    );
+
+    final payloadBytes = await _brotliDecompressPayload(coseSign);
+    final payload = SignedDocumentPayload.fromBytes(
+      payloadBytes,
+      contentType: metadata.contentType,
     );
 
     return _CoseSignedDocument(
@@ -39,8 +39,8 @@ final class SignedDocumentManagerImpl implements SignedDocumentManager {
   }
 
   @override
-  Future<SignedDocument<T>> signDocument<T extends SignedDocumentPayload>(
-    T document, {
+  Future<SignedDocument> signDocument(
+    SignedDocumentPayload document, {
     required SignedDocumentMetadata metadata,
     required CatalystId catalystId,
     required CatalystPrivateKey privateKey,
@@ -89,7 +89,7 @@ final class _CatalystSigner implements CatalystCoseSigner {
   );
 
   @override
-  StringOrInt? get alg => null;
+  StringOrInt? get alg => const IntValue(CoseValues.eddsaAlg);
 
   @override
   Future<Uint8List?> get kid async {
@@ -127,13 +127,11 @@ final class _CatalystVerifier implements CatalystCoseVerifier {
   }
 }
 
-final class _CoseSignedDocument<T extends SignedDocumentPayload>
-    with EquatableMixin
-    implements SignedDocument<T> {
+final class _CoseSignedDocument with EquatableMixin implements SignedDocument {
   final CoseSign _coseSign;
 
   @override
-  final T payload;
+  final SignedDocumentPayload payload;
 
   @override
   final SignedDocumentMetadata metadata;

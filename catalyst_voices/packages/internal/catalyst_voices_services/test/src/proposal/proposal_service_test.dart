@@ -25,6 +25,7 @@ void main() {
 
     proposalService = ProposalService(
       mockProposalRepository,
+      mockDocumentRepository,
       mockUserService,
       mockKeyDerivationService,
       mockCampaignRepository,
@@ -64,6 +65,7 @@ void main() {
           ),
           templateRef: SignedDocumentRef.generateFirstRef(),
           categoryId: SignedDocumentRef.generateFirstRef(),
+          authors: const [],
         ),
         document: const Document(
           schema: proposalTemplate,
@@ -78,6 +80,7 @@ void main() {
           ),
           templateRef: SignedDocumentRef.generateFirstRef(),
           categoryId: SignedDocumentRef.generateFirstRef(),
+          authors: const [],
         ),
         document: const Document(
           schema: proposalTemplate,
@@ -165,6 +168,7 @@ void main() {
             selfRef: proposalRef1,
             templateRef: SignedDocumentRef.generateFirstRef(),
             categoryId: SignedDocumentRef.generateFirstRef(),
+            authors: const [],
           ),
           document: const Document(
             schema: proposalTemplate,
@@ -177,6 +181,7 @@ void main() {
             selfRef: proposalRef2,
             templateRef: SignedDocumentRef.generateFirstRef(),
             categoryId: SignedDocumentRef.generateFirstRef(),
+            authors: const [],
           ),
           document: const Document(
             schema: proposalTemplate,

@@ -6,19 +6,19 @@ import 'package:equatable/equatable.dart';
 final class CardanoWalletDetails extends Equatable {
   /// The minimum amount of ADA the user
   /// must posses to proceed with the registration.
-  static final Coin minAdaForRegistration = Coin.fromAda(1);
+  static const Coin minAdaForRegistration = Coin.fromWholeAda(1);
 
   final CardanoWallet wallet;
   final Coin balance;
   final ShelleyAddress address;
-
-  bool get hasEnoughBalance => balance >= minAdaForRegistration;
 
   const CardanoWalletDetails({
     required this.wallet,
     required this.balance,
     required this.address,
   });
+
+  bool get hasEnoughBalance => balance >= minAdaForRegistration;
 
   @override
   List<Object?> get props => [wallet, balance, address];

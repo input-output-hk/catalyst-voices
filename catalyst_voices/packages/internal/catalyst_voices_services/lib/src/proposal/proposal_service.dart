@@ -8,12 +8,15 @@ import 'package:rxdart/rxdart.dart';
 abstract interface class ProposalService {
   const factory ProposalService(
     ProposalRepository proposalRepository,
+    DocumentRepository documentRepository,
     UserService userService,
     KeyDerivationService keyDerivationService,
     CampaignRepository campaignRepository,
   ) = ProposalServiceImpl;
 
-  Future<List<String>> addFavoriteProposal(String proposalId);
+  Future<void> addFavoriteProposal({
+    required DocumentRef ref,
+  });
 
   /// Creates a new proposal draft locally.
   Future<DraftRef> createDraftProposal({
@@ -36,7 +39,7 @@ abstract interface class ProposalService {
     required DocumentData document,
   });
 
-  /// Fetches favorites proposals ids of the user
+  /// Similar to [watchFavoritesProposalsIds] stops after first emit.
   Future<List<String>> getFavoritesProposalsIds();
 
   Future<ProposalData> getProposal({
@@ -73,7 +76,9 @@ abstract interface class ProposalService {
     required DocumentData document,
   });
 
-  Future<List<String>> removeFavoriteProposal(String proposalId);
+  Future<void> removeFavoriteProposal({
+    required DocumentRef ref,
+  });
 
   /// Submits a proposal draft into review.
   Future<void> submitProposalForReview({
@@ -89,6 +94,14 @@ abstract interface class ProposalService {
     required SignedDocumentRef categoryId,
   });
 
+  /// Fetches favorites proposals ids of the user
+  Stream<List<String>> watchFavoritesProposalsIds();
+
+  /// Emits when proposal fav status changes.
+  Stream<bool> watchIsFavoritesProposal({
+    required DocumentRef ref,
+  });
+
   Stream<List<Proposal>> watchLatestProposals({int? limit});
 
   Stream<List<Proposal>> watchUserProposals();
@@ -96,20 +109,26 @@ abstract interface class ProposalService {
 
 final class ProposalServiceImpl implements ProposalService {
   final ProposalRepository _proposalRepository;
+  final DocumentRepository _documentRepository;
   final UserService _userService;
   final KeyDerivationService _keyDerivationService;
   final CampaignRepository _campaignRepository;
 
   const ProposalServiceImpl(
     this._proposalRepository,
+    this._documentRepository,
     this._userService,
     this._keyDerivationService,
     this._campaignRepository,
   );
 
   @override
-  Future<List<String>> addFavoriteProposal(String proposalId) async {
-    return _proposalRepository.addFavoriteProposal(proposalId);
+  Future<void> addFavoriteProposal({required DocumentRef ref}) {
+    return _documentRepository.updateDocumentFavorite(
+      ref: ref.toLoose(),
+      type: DocumentType.proposalDocument,
+      isFavorite: true,
+    );
   }
 
   @override
@@ -119,6 +138,7 @@ final class ProposalServiceImpl implements ProposalService {
     required SignedDocumentRef categoryId,
   }) async {
     final draftRef = DraftRef.generateFirstRef();
+    final catalystId = await _getUserCatalystId();
     await _proposalRepository.upsertDraftProposal(
       document: DocumentData(
         metadata: DocumentDataMetadata(
@@ -126,6 +146,7 @@ final class ProposalServiceImpl implements ProposalService {
           selfRef: draftRef,
           template: template,
           categoryId: categoryId,
+          authors: [catalystId],
         ),
         content: content,
       ),
@@ -149,9 +170,10 @@ final class ProposalServiceImpl implements ProposalService {
   }
 
   @override
-  Future<List<String>> getFavoritesProposalsIds() async {
-    final proposalsIds = await _proposalRepository.getFavoritesProposalsIds();
-    return proposalsIds;
+  Future<List<String>> getFavoritesProposalsIds() {
+    return _documentRepository
+        .watchAllDocumentsFavoriteIds(type: DocumentType.proposalDocument)
+        .first;
   }
 
   @override
@@ -221,8 +243,12 @@ final class ProposalServiceImpl implements ProposalService {
   }
 
   @override
-  Future<List<String>> removeFavoriteProposal(String proposalId) async {
-    return _proposalRepository.removeFavoriteProposal(proposalId);
+  Future<void> removeFavoriteProposal({required DocumentRef ref}) {
+    return _documentRepository.updateDocumentFavorite(
+      ref: ref.toLoose(),
+      type: DocumentType.proposalDocument,
+      isFavorite: false,
+    );
   }
 
   @override
@@ -250,6 +276,9 @@ final class ProposalServiceImpl implements ProposalService {
     required SignedDocumentRef template,
     required SignedDocumentRef categoryId,
   }) async {
+    // TODO(LynxLynxx): when we start supporting multiple authors
+    // we need to get the list of authors actually stored in the db and
+    // add them to the authors list if they are not already there
     await _proposalRepository.upsertDraftProposal(
       document: DocumentData(
         metadata: DocumentDataMetadata(
@@ -261,6 +290,18 @@ final class ProposalServiceImpl implements ProposalService {
         content: content,
       ),
     );
+  }
+
+  @override
+  Stream<List<String>> watchFavoritesProposalsIds() {
+    return _documentRepository.watchAllDocumentsFavoriteIds(
+      type: DocumentType.proposalDocument,
+    );
+  }
+
+  @override
+  Stream<bool> watchIsFavoritesProposal({required DocumentRef ref}) {
+    return _documentRepository.watchIsDocumentFavorite(ref: ref.toLoose());
   }
 
   @override

@@ -17,6 +17,9 @@ final class ProposalDocument extends Equatable {
       DocumentNodeId.fromString('summary.time.duration');
   static final authorNameNodeId =
       DocumentNodeId.fromString('summary.proposer.applicant');
+  static final categoryDetailsNodeId =
+      DocumentNodeId.fromString('campaign_category.category_details.details');
+
   static const String exportFileExt = 'json';
 
   final ProposalMetadata metadata;
@@ -37,13 +40,15 @@ final class ProposalDocument extends Equatable {
 final class ProposalMetadata extends DocumentMetadata {
   final SignedDocumentRef templateRef;
   final SignedDocumentRef categoryId;
+  final List<CatalystId> authors;
 
   ProposalMetadata({
     required super.selfRef,
     required this.templateRef,
     required this.categoryId,
+    required this.authors,
   });
 
   @override
-  List<Object?> get props => super.props + [templateRef, categoryId];
+  List<Object?> get props => super.props + [templateRef, categoryId, authors];
 }

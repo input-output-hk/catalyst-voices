@@ -36,15 +36,11 @@ abstract interface class ProposalRepository {
     DocumentRepository documentRepository,
   ) = ProposalRepositoryImpl;
 
-  Future<List<String>> addFavoriteProposal(String proposalId);
-
   Future<void> deleteDraftProposal(DraftRef ref);
 
   Future<Uint8List> encodeProposalForExport({
     required DocumentData document,
   });
-
-  Future<List<String>> getFavoritesProposalsIds();
 
   Future<ProposalData> getProposal({
     required DocumentRef ref,
@@ -82,8 +78,6 @@ abstract interface class ProposalRepository {
 
   Future<List<ProposalDocument>> queryVersionsOfId({required String id});
 
-  Future<List<String>> removeFavoriteProposal(String proposalId);
-
   Future<void> upsertDraftProposal({required DocumentData document});
 
   Stream<int> watchCount({
@@ -108,12 +102,6 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   );
 
   @override
-  Future<List<String>> addFavoriteProposal(String proposalId) async {
-    // TODO(LynxLynxx): add proposal to favorites
-    return getFavoritesProposalsIds();
-  }
-
-  @override
   Future<void> deleteDraftProposal(DraftRef ref) {
     return _documentRepository.deleteDocumentDraft(ref: ref);
   }
@@ -125,12 +113,6 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     return _documentRepository.encodeDocumentForExport(
       document: document,
     );
-  }
-
-  @override
-  Future<List<String>> getFavoritesProposalsIds() async {
-    // TODO(LynxLynxx): read db to get favorites proposals ids
-    return <String>[];
   }
 
   @override
@@ -195,7 +177,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
           categoryId: const SignedDocumentRef(id: 'dummy_category_id'),
           title: 'Proposal Title that rocks the world',
           updateDate: DateTime.now().minusDays(2),
-          fundsRequested: Coin.fromAda(100000),
+          fundsRequested: const Coin.fromWholeAda(100000),
           status: ProposalStatus.draft,
           publish: request.stage ?? stage,
           commentsCount: 0,
@@ -258,10 +240,12 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     required CatalystId catalystId,
     required CatalystPrivateKey privateKey,
   }) async {
+    final dto = ProposalSubmissionActionDocumentDto(
+      action: ProposalSubmissionActionDto.fromModel(action),
+    );
+
     final signedDocument = await _signedDocumentManager.signDocument(
-      ProposalSubmissionActionDocumentDto(
-        action: ProposalSubmissionActionDto.fromModel(action),
-      ),
+      SignedDocumentJsonPayload(dto.toJson()),
       metadata: SignedDocumentMetadata(
         contentType: SignedDocumentContentType.json,
         documentType: DocumentType.proposalActionDocument,
@@ -287,12 +271,6 @@ final class ProposalRepositoryImpl implements ProposalRepository {
           ),
         )
         .toList();
-  }
-
-  @override
-  Future<List<String>> removeFavoriteProposal(String proposalId) async {
-    // TODO(LynxLynxx): remove proposal from favorites
-    return getFavoritesProposalsIds();
   }
 
   @override
@@ -389,6 +367,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
       selfRef: documentData.metadata.selfRef,
       templateRef: documentData.metadata.template!,
       categoryId: documentData.metadata.categoryId!,
+      authors: documentData.metadata.authors ?? [],
     );
 
     final content = DocumentDataContentDto.fromModel(
@@ -447,28 +426,30 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   Future<ProposalsSearchResult> _getFavoritesProposalsSearchResult(
     ProposalPaginationRequest request,
   ) async {
-    final favoritesIds = await getFavoritesProposalsIds();
+    final favoritesRefs = await _documentRepository
+        .watchAllDocumentsFavoriteIds(type: DocumentType.proposalDocument)
+        .map((event) => event.map((e) => SignedDocumentRef(id: e)).toList())
+        .first;
     final proposals = <Proposal>[];
     final range = PagingRange.calculateRange(
       pageKey: request.pageKey,
       itemsPerPage: request.pageSize,
-      maxResults: favoritesIds.length,
+      maxResults: favoritesRefs.length,
     );
-    if (favoritesIds.isEmpty) {
+    if (favoritesRefs.isEmpty) {
       return const ProposalsSearchResult(
         maxResults: 0,
         proposals: [],
       );
     }
     for (var i = range.from; i <= range.to; i++) {
-      final ref = SignedDocumentRef(id: favoritesIds[i]);
-      final proposalData = await getProposal(ref: ref);
+      final proposalData = await getProposal(ref: favoritesRefs[i]);
       final proposal = Proposal.fromData(proposalData);
       proposals.add(proposal);
     }
 
     return ProposalsSearchResult(
-      maxResults: favoritesIds.length,
+      maxResults: favoritesRefs.length,
       proposals: proposals,
     );
   }

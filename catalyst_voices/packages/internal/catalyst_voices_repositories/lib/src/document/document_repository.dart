@@ -7,6 +7,7 @@ import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/document_data_dto.dart';
 import 'package:catalyst_voices_repositories/src/dto/document_data_with_ref_dat.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:synchronized/synchronized.dart';
@@ -16,6 +17,7 @@ abstract interface class DocumentRepository {
     DraftDataSource drafts,
     SignedDocumentDataSource localDocuments,
     DocumentDataRemoteSource remoteDocuments,
+    DocumentFavoriteSource favoriteDocuments,
   ) = DocumentRepositoryImpl;
 
   /// Making sure document from [ref] is available locally.
@@ -82,6 +84,11 @@ abstract interface class DocumentRepository {
   /// Returns the reference to the imported document.
   Future<DocumentRef> importDocument({required Uint8List data});
 
+  /// Similar to [watchIsDocumentFavorite] but stops after first emit.
+  Future<bool> isDocumentFavorite({
+    required DocumentRef ref,
+  });
+
   Future<void> publishDocument({
     required SignedDocument document,
   });
@@ -93,12 +100,26 @@ abstract interface class DocumentRepository {
     required String id,
   });
 
+  /// Updates fav status matching [ref].
+  Future<void> updateDocumentFavorite({
+    required DocumentRef ref,
+    required DocumentType type,
+    required bool isFavorite,
+  });
+
   /// Creates/updates a local document draft.
   ///
   /// If watching same draft with [watchDocument] it will emit
   /// change.
   Future<void> upsertDocumentDraft({
     required DocumentData document,
+  });
+
+  /// Emits list of all favorite ids.
+  ///
+  /// All returned ids are loose and won't specify version.
+  Stream<List<String>> watchAllDocumentsFavoriteIds({
+    DocumentType? type,
   });
 
   Stream<int> watchCount({
@@ -124,13 +145,18 @@ abstract interface class DocumentRepository {
     bool getLocalDrafts = false,
     CatalystId? authorId,
   });
+
+  /// Emits changes to fav status of [ref].
+  Stream<bool> watchIsDocumentFavorite({
+    required DocumentRef ref,
+  });
 }
 
 final class DocumentRepositoryImpl implements DocumentRepository {
-  // ignore: unused_field
   final DraftDataSource _drafts;
   final SignedDocumentDataSource _localDocuments;
   final DocumentDataRemoteSource _remoteDocuments;
+  final DocumentFavoriteSource _favoriteDocuments;
 
   final _documentDataLock = Lock();
 
@@ -138,6 +164,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     this._drafts,
     this._localDocuments,
     this._remoteDocuments,
+    this._favoriteDocuments,
   );
 
   @override
@@ -163,16 +190,33 @@ final class DocumentRepositoryImpl implements DocumentRepository {
 
   @override
   Future<List<SignedDocumentRef>> getAllDocumentsRefs() async {
-    final remoteRefs = await _remoteDocuments.index();
+    final allRefs = await _remoteDocuments.index();
+    final allConstRefs = categoriesTemplatesRefs.all;
 
-    return {
+    final nonConstRefs = allRefs
+        .where((ref) => allConstRefs.none((e) => e.id == ref.id))
+        .toList();
+
+    final exactRefs = nonConstRefs.where((ref) => ref.isExact).toList();
+    final looseRefs = nonConstRefs.where((ref) => !ref.isExact).toList();
+
+    final latestLooseRefs = await looseRefs.map((ref) async {
+      final latestVer = await _remoteDocuments.getLatestVersion(ref.id);
+      return ref.copyWith(version: Optional(latestVer));
+    }).wait;
+
+    final allLatestRefs = [
+      ...exactRefs,
+      ...latestLooseRefs,
+    ];
+
+    final uniqueRefs = {
       // Note. categories are mocked on backend so we can't not fetch them.
       ...categoriesTemplatesRefs.expand((e) => [e.proposal, e.comment]),
-      ...remoteRefs,
-    }
-        .toList()
-        // TODO(damian-molinski): delete it after parsing it ready.
-        .sublist(0, 1);
+      ...allLatestRefs,
+    };
+
+    return uniqueRefs.toList();
   }
 
   @override
@@ -229,6 +273,13 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   }
 
   @override
+  Future<bool> isDocumentFavorite({required DocumentRef ref}) {
+    assert(!ref.isExact, 'Favorite ref have to be loose!');
+
+    return _favoriteDocuments.watchIsDocumentFavorite(ref.id).first;
+  }
+
+  @override
   Future<void> publishDocument({required SignedDocument document}) async {
     await _remoteDocuments.publish(document);
   }
@@ -250,6 +301,21 @@ final class DocumentRepositoryImpl implements DocumentRepository {
           ),
         )
         .toList();
+  }
+
+  @override
+  Future<void> updateDocumentFavorite({
+    required DocumentRef ref,
+    required DocumentType type,
+    required bool isFavorite,
+  }) {
+    assert(!ref.isExact, 'Favorite ref have to be loose!');
+
+    return _favoriteDocuments.updateDocumentFavorite(
+      ref.id,
+      type: type,
+      isFavorite: isFavorite,
+    );
   }
 
   @override
@@ -338,6 +404,13 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   }
 
   @override
+  Stream<List<String>> watchAllDocumentsFavoriteIds({
+    DocumentType? type,
+  }) {
+    return _favoriteDocuments.watchAllFavoriteIds(type: type);
+  }
+
+  @override
   Stream<int> watchCount({
     required DocumentRef ref,
     required DocumentType type,
@@ -352,9 +425,6 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   Stream<DocumentsDataWithRefData> watchDocument({
     required DocumentRef ref,
   }) {
-    // TODO(damian-molinski): remove this override once we have API
-    ref = ref.copyWith(id: mockedDocumentUuid);
-
     return watchDocumentWithRef(
       ref: ref,
       refGetter: (data) => data.metadata.template!,
@@ -419,6 +489,13 @@ final class DocumentRepositoryImpl implements DocumentRepository {
         },
       );
     });
+  }
+
+  @override
+  Stream<bool> watchIsDocumentFavorite({required DocumentRef ref}) {
+    assert(!ref.isExact, 'Favorite ref have to be loose!');
+
+    return _favoriteDocuments.watchIsDocumentFavorite(ref.id);
   }
 
   Future<DocumentData> _getDraftDocumentData({
