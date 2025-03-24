@@ -4,7 +4,8 @@ use std::collections::{HashMap, HashSet};
 
 use cardano_blockchain_types::{Slot, StakeAddress, TransactionId, TxnIndex};
 use futures::TryStreamExt;
-use poem_openapi::{payload::Json, types::Example, ApiResponse};
+use poem_openapi::{payload::Json, ApiResponse};
+use tracing::debug;
 
 use crate::{
     db::index::{
@@ -28,8 +29,7 @@ use crate::{
         responses::WithErrorResponses,
         types::{
             cardano::{
-                asset_name::AssetName, asset_value::AssetValue,
-                cip19_stake_address::Cip19StakeAddress, slot_no::SlotNo,
+                asset_name::AssetName, cip19_stake_address::Cip19StakeAddress, slot_no::SlotNo,
             },
             headers::retry_after::RetryAfterOption,
         },
@@ -281,12 +281,18 @@ fn build_stake_info(
 
         let key = (txo_info.slot_no, txo_info.txn_index, txo_info.txo);
         if let Some(native_token) = tokens.remove(&key) {
-            stake_info.native_tokens.push(StakedNativeTokenInfo {
-                policy_hash: native_token.id.try_into()?,
-                asset_name: native_token.name,
-                // amount: native_token.amount.try_into().context("Invalid token amount")?,
-                amount: AssetValue::example(),
-            });
+            match native_token.amount.try_into() {
+                Ok(amount) => {
+                    stake_info.native_tokens.push(StakedNativeTokenInfo {
+                        policy_hash: native_token.id.try_into()?,
+                        asset_name: native_token.name,
+                        amount,
+                    });
+                },
+                Err(e) => {
+                    debug!("Invalid Staked Native Token for {key:?}: {e}");
+                },
+            }
         }
 
         let slot_no = txo_info.slot_no.into();
