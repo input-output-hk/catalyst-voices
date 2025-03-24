@@ -906,8 +906,7 @@
     "description": "Refers to a dark theme mode."
   },
   "keychainDeletedDialogTitle": "Catalyst keychain removed",
-  "keychainDeletedDialogSubtitle": "Your Catalyst Keychain is removed successfully from this device.",
-  "keychainDeletedDialogInfo": "We reverted this device to Catalyst first use.",
+  "keychainDeletedDialogSubtitle": "Your Catalyst Keychain is removed successfully from this device.\n\nWe reverted this device to Catalyst first use.",
   "registrationCompletedTitle": "Catalyst account setup",
   "registrationCompletedSubtitle": "Completed!",
   "registrationCompletedSummaryHeader": "Summary",

@@ -1,6 +1,6 @@
 import 'package:catalyst_voices/widgets/buttons/voices_filled_button.dart';
-import 'package:catalyst_voices/widgets/modals/voices_alert_dialog.dart';
 import 'package:catalyst_voices/widgets/modals/voices_dialog.dart';
+import 'package:catalyst_voices/widgets/modals/voices_info_dialog.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
@@ -19,19 +19,16 @@ class SubmitProposalErrorDialog {
         name: '/proposal-builder/submit-error',
       ),
       builder: (context) {
-        return VoicesAlertDialog(
+        return VoicesDesktopInfoDialog(
           icon: VoicesAssets.icons.exclamation.buildIcon(
-            size: 48,
             color: Theme.of(context).colors.iconsWarning,
           ),
-          subtitle: Text(exception.title(context)),
-          content: Text(exception.message(context)),
-          buttons: [
-            VoicesFilledButton(
-              onTap: () => Navigator.of(context).pop(),
-              child: Text(context.l10n.okay),
-            ),
-          ],
+          title: Text(exception.title(context)),
+          message: Text(exception.message(context)),
+          action: VoicesFilledButton(
+            onTap: () => Navigator.of(context).pop(),
+            child: Text(context.l10n.okay),
+          ),
         );
       },
     );
