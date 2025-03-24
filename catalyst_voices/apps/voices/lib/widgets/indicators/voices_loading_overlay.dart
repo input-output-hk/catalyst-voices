@@ -88,6 +88,7 @@ class _VoicesLoadingOverlayState extends State<VoicesLoadingOverlay> {
   void initState() {
     super.initState();
     _show = widget.show;
+    _showingSince = _show ? DateTimeExt.now() : null;
   }
 
   void _hideNow() {
