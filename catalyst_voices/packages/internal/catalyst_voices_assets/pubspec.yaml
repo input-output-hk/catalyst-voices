@@ -24,6 +24,7 @@ flutter:
   assets:
     - assets/images/
     - assets/images/category/
+    - assets/images/opportunities/
     - assets/icons/
     - assets/videos/
     - assets/document_templates/proposal/F14-Generic/
