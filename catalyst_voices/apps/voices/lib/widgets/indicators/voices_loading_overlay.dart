@@ -100,6 +100,8 @@ class _VoicesLoadingOverlayState extends State<VoicesLoadingOverlay> {
   }
 
   void _scheduleHide() {
+    _timer?.cancel();
+    
     final showingSince = _showingSince;
     if (showingSince == null) {
       _hideNow();
