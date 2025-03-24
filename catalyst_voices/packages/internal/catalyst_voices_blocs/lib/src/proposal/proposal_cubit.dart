@@ -267,6 +267,8 @@ final class ProposalCubit extends Cubit<ProposalState>
     required ProposalCommentsSort commentsSort,
     required bool hasActiveAccount,
   }) {
+    final isDraftProposal = proposal.document.metadata.selfRef is DraftRef;
+
     final overviewSegment = ProposalOverviewSegment.build(
       categoryName: 'Cardano Partners: Growth & Acceleration',
       proposalTitle: 'Project Mayhem: Freedom by Chaos',
@@ -292,6 +294,7 @@ final class ProposalCubit extends Cubit<ProposalState>
 
     final proposalSegments = mapDocumentToSegments(proposal.document.document);
 
+    final canComment = !isDraftProposal && hasActiveAccount;
     final commentsSegment = ProposalCommentsSegment(
       id: const NodeId('comments'),
       sort: commentsSort,
@@ -299,8 +302,9 @@ final class ProposalCubit extends Cubit<ProposalState>
         ViewCommentsSection(
           id: const NodeId('comments.view'),
           comments: commentsSort.applyTo(comments),
+          canReply: canComment,
         ),
-        if (hasActiveAccount && commentSchema != null)
+        if (canComment && commentSchema != null)
           AddCommentSection(
             id: const NodeId('comments.add'),
             schema: commentSchema,

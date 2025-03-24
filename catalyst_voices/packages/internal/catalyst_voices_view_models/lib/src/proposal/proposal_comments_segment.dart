@@ -27,14 +27,20 @@ final class CommentListItem extends Equatable implements SegmentsListViewItem {
   @override
   final NodeId id;
   final CommentWithReplies comment;
+  final bool canReply;
 
   const CommentListItem({
     required this.id,
     required this.comment,
+    required this.canReply,
   });
 
   @override
-  List<Object?> get props => [id, comment];
+  List<Object?> get props => [
+        id,
+        comment,
+        canReply,
+      ];
 }
 
 sealed class ProposalCommentsSection extends BaseSection {
@@ -112,10 +118,12 @@ final class ProposalCommentsSegment
 final class ViewCommentsSection extends ProposalCommentsSection
     implements SegmentGroupedListViewItems {
   final List<CommentWithReplies> comments;
+  final bool canReply;
 
   const ViewCommentsSection({
     required super.id,
     required this.comments,
+    required this.canReply,
   });
 
   @override
@@ -124,12 +132,13 @@ final class ViewCommentsSection extends ProposalCommentsSection
       return CommentListItem(
         id: id.child(comment.comment.metadata.selfRef.id),
         comment: comment,
+        canReply: canReply,
       );
     });
   }
 
   @override
-  List<Object?> get props => super.props + [comments];
+  List<Object?> get props => super.props + [comments, canReply];
 
   ViewCommentsSection addComment(CommentDocument comment) {
     final comments = List.of(this.comments);
@@ -151,10 +160,12 @@ final class ViewCommentsSection extends ProposalCommentsSection
   ViewCommentsSection copyWith({
     NodeId? id,
     List<CommentWithReplies>? comments,
+    bool? canReply,
   }) {
     return ViewCommentsSection(
       id: id ?? this.id,
       comments: comments ?? this.comments,
+      canReply: canReply ?? this.canReply,
     );
   }
 

@@ -184,9 +184,14 @@ class _SegmentsListView extends StatelessWidget {
               schema: schema,
             ),
         },
-      CommentListItem(:final comment) => ProposalCommentTile(
+      CommentListItem(
+        :final comment,
+        :final canReply,
+      ) =>
+        ProposalCommentTile(
           key: ValueKey(comment.comment.metadata.selfRef),
           comment: comment,
+          canReply: canReply,
         ),
       _ => throw ArgumentError('Not supported type ${item.runtimeType}'),
     };
