@@ -24,7 +24,7 @@ abstract interface class CommentService {
   /// Emits list of comment which are matching [ref].
   ///
   /// See [submitComment] for more context.
-  Stream<List<CommentDocument>> watchCommentsWith({
+  Stream<List<CommentWithReplies>> watchCommentsWith({
     required DocumentRef ref,
   });
 }
@@ -69,7 +69,20 @@ final class CommentServiceImpl implements CommentService {
   }
 
   @override
-  Stream<List<CommentDocument>> watchCommentsWith({required DocumentRef ref}) {
-    return _commentRepository.watchCommentsWith(ref: ref);
+  Stream<List<CommentWithReplies>> watchCommentsWith({
+    required DocumentRef ref,
+  }) {
+    assert(ref.isExact, 'Comments are linked to exact version of document');
+
+    return _commentRepository
+        .watchCommentsWith(ref: ref)
+        .map(_buildCommentTree);
+  }
+
+  List<CommentWithReplies> _buildCommentTree(List<CommentDocument> comments) {
+    return comments
+        .where((element) => element.metadata.reply == null)
+        .map((e) => CommentWithReplies.build(e, comments: comments))
+        .toList();
   }
 }

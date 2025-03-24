@@ -12,6 +12,28 @@ final class CommentWithReplies extends Equatable {
     this.depth = 1,
   });
 
+  factory CommentWithReplies.build(
+    CommentDocument comment, {
+    required List<CommentDocument> comments,
+    int depth = 1,
+  }) {
+    final replies = comments
+        .where((element) => element.metadata.reply == comment.metadata.selfRef)
+        .map((e) {
+      return CommentWithReplies.build(
+        e,
+        comments: comments,
+        depth: depth + 1,
+      );
+    }).toList();
+
+    return CommentWithReplies(
+      comment: comment,
+      replies: replies,
+      depth: 1,
+    );
+  }
+
   const CommentWithReplies.direct(this.comment)
       : replies = const [],
         depth = 1;

@@ -10,9 +10,6 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:uuid_plus/uuid_plus.dart';
-
-part 'proposal_cubit_mock_data.dart';
 
 final _logger = Logger('ProposalBloc');
 
@@ -28,9 +25,8 @@ final class ProposalCubit extends Cubit<ProposalState>
   ProposalCubitCache _cache = const ProposalCubitCache();
 
   StreamSubscription<CatalystId?>? _activeAccountIdSub;
+  StreamSubscription<List<CommentWithReplies>>? _commentsSub;
 
-  // Note for integration.
-  // 2. Observe document comments
   ProposalCubit(
     this._userService,
     this._proposalService,
@@ -51,6 +47,9 @@ final class ProposalCubit extends Cubit<ProposalState>
     await _activeAccountIdSub?.cancel();
     _activeAccountIdSub = null;
 
+    await _commentsSub?.cancel();
+    _commentsSub = null;
+
     return super.close();
   }
 
@@ -63,17 +62,25 @@ final class ProposalCubit extends Cubit<ProposalState>
       emit(state.copyWith(isLoading: true));
 
       final proposal = await _proposalService.getProposal(ref: ref);
-      final commentTemplate = _buildCommentTemplate();
-      final comments = _buildComments();
+      final commentTemplate = await _commentService.getCommentTemplateFor(
+        category: proposal.categoryId,
+      );
       final isFavorite =
           await _proposalService.watchIsFavoritesProposal(ref: ref).first;
 
       _cache = _cache.copyWith(
         proposal: Optional(proposal),
         commentTemplate: Optional(commentTemplate),
-        comments: Optional(comments),
+        comments: const Optional([]),
         isFavorite: Optional(isFavorite),
       );
+
+      await _commentsSub?.cancel();
+      _commentsSub = _commentService
+          // Note. watch comments on exact version of proposal.
+          .watchCommentsWith(ref: proposal.document.metadata.selfRef)
+          .distinct(listEquals)
+          .listen(_handleCommentsChange);
 
       if (!isClosed) {
         final proposalState = _rebuildProposalState();
@@ -322,6 +329,12 @@ final class ProposalCubit extends Cubit<ProposalState>
       _cache = _cache.copyWith(activeAccountId: Optional(data));
       _rebuildProposalState();
     }
+  }
+
+  void _handleCommentsChange(List<CommentWithReplies> comments) {
+    _cache = _cache.copyWith(comments: Optional(comments));
+
+    _rebuildProposalState();
   }
 
   /* cSpell:enable */
