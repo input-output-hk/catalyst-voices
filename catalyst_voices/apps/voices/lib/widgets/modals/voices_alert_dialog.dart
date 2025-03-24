@@ -98,8 +98,8 @@ class VoicesAlertDialog extends StatelessWidget {
                     ),
                   if (icon != null)
                     Padding(
-                      padding: const EdgeInsets.only(
-                        top: 24,
+                      padding: EdgeInsets.only(
+                        top: title != null ? 24 : 0,
                         left: 20,
                         right: 20,
                       ),
