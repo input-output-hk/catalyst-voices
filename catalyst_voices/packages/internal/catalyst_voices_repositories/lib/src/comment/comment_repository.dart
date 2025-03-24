@@ -1,5 +1,7 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
+import 'package:catalyst_voices_repositories/src/dto/document/document_data_dto.dart';
+import 'package:catalyst_voices_repositories/src/dto/document/document_dto.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/schema/document_schema_dto.dart';
 
 abstract interface class CommentRepository {
@@ -75,8 +77,62 @@ final class DocumentsCommentRepository implements CommentRepository {
   Stream<List<CommentDocument>> watchCommentsWith({
     required DocumentRef ref,
   }) {
-    // TODO: implement watchCommentsWith
-    throw UnimplementedError();
+    return _documentRepository
+        .watchDocuments(
+      type: DocumentType.commentDocument,
+      refGetter: (data) => data.metadata.template!,
+      refTo: ref,
+    )
+        .map(
+      (documents) {
+        return documents.map((documentWithRef) {
+          final commentData = documentWithRef.data;
+          final templateData = documentWithRef.refData;
+
+          return _buildCommentDocument(
+            documentData: commentData,
+            templateData: templateData,
+          );
+        }).toList();
+      },
+    );
+  }
+
+  CommentDocument _buildCommentDocument({
+    required DocumentData documentData,
+    required DocumentData templateData,
+  }) {
+    assert(
+      documentData.metadata.type == DocumentType.commentDocument,
+      'Not a commentDocument document data type',
+    );
+    assert(
+      documentData.metadata.selfRef is SignedDocumentRef,
+      'Comment only supports signed documents',
+    );
+    assert(
+      documentData.metadata.ref is SignedDocumentRef,
+      'Comment have to have a ref to other document',
+    );
+
+    final template = _buildCommentTemplate(documentData: templateData);
+
+    final authors = documentData.metadata.authors;
+    final metadata = CommentMetadata(
+      selfRef: documentData.metadata.selfRef as SignedDocumentRef,
+      ref: documentData.metadata.ref! as SignedDocumentRef,
+      authorId: authors!.single,
+    );
+    final content = DocumentDataContentDto.fromModel(
+      documentData.content,
+    );
+    final schema = template.schema;
+    final document = DocumentDto.fromJsonSchema(content, schema).toModel();
+
+    return CommentDocument(
+      metadata: metadata,
+      document: document,
+    );
   }
 
   CommentTemplate _buildCommentTemplate({

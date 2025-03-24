@@ -8,6 +8,7 @@ import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:collection/collection.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:uuid_plus/uuid_plus.dart';
 
@@ -127,12 +128,15 @@ final class ProposalCubit extends Cubit<ProposalState>
       proposalRef is SignedDocumentRef,
       'Can comment only on signed documents',
     );
+    final activeAccountId = _cache.activeAccountId;
+    assert(activeAccountId != null, 'No active account found!');
 
     final comment = CommentDocument(
       metadata: CommentMetadata(
         selfRef: SignedDocumentRef.generateFirstRef(),
         ref: proposalRef! as SignedDocumentRef,
         reply: reply,
+        authorId: activeAccountId!,
       ),
       document: document,
     );

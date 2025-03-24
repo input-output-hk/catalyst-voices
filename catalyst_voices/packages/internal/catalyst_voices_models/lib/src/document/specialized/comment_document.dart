@@ -35,16 +35,18 @@ final class CommentMetadata extends DocumentMetadata {
 
   /// [reply] equals other comment of this is a reply to it.
   final SignedDocumentRef? reply;
+  final CatalystId authorId;
 
   CommentMetadata({
     // Note. no drafts for comments
     required SignedDocumentRef super.selfRef,
     required this.ref,
     this.reply,
+    required this.authorId,
   });
 
   @override
-  List<Object?> get props => super.props + [ref, reply];
+  List<Object?> get props => super.props + [ref, reply, authorId];
 
   @override
   SignedDocumentRef get selfRef => super.selfRef as SignedDocumentRef;

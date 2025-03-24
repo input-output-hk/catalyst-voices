@@ -485,7 +485,9 @@ void main() {
         await localDocuments.save(data: templateData);
         await localDocuments.save(data: publicDraftData);
 
-        final latestProposals = repository.watchAllDocuments();
+        final latestProposals = repository.watchAllDocuments(
+          refGetter: (data) => data.metadata.template!,
+        );
 
         expect(
           latestProposals,

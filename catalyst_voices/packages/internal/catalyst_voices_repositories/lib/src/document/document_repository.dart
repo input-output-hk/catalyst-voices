@@ -12,6 +12,8 @@ import 'package:flutter/foundation.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:synchronized/synchronized.dart';
 
+DocumentRef _templateResolver(DocumentData data) => data.metadata.template!;
+
 abstract interface class DocumentRepository {
   factory DocumentRepository(
     DraftDataSource drafts,
@@ -127,23 +129,28 @@ abstract interface class DocumentRepository {
     required DocumentType type,
   });
 
-  /// Observes matching [ProposalDocument] and emits updates.
+  /// Observes matching [DocumentData] as well as [DocumentData] resolved
+  /// by [refGetter], usually template, and emits updates.
   ///
   /// Source of data depends whether [ref] is [SignedDocumentRef] or [DraftRef].
   Stream<DocumentsDataWithRefData> watchDocument({
     required DocumentRef ref,
+    ValueResolver<DocumentData, DocumentRef> refGetter,
   });
 
   /// When [unique] is true, only latest versions of each document are returned.
   /// When [getLocalDrafts] is true, local drafts are also returned.
   /// When [authorId] is not null, only documents from
   /// the given author are returned.
+  // TODO(damian-molinski): refactor all params into object
   Stream<List<DocumentsDataWithRefData>> watchDocuments({
     required DocumentType type,
+    ValueResolver<DocumentData, DocumentRef> refGetter,
     int? limit,
     bool unique = false,
     bool getLocalDrafts = false,
     CatalystId? authorId,
+    DocumentRef? refTo,
   });
 
   /// Emits changes to fav status of [ref].
@@ -327,11 +334,13 @@ final class DocumentRepositoryImpl implements DocumentRepository {
 
   @visibleForTesting
   Stream<List<DocumentsDataWithRefData>> watchAllDocuments({
+    required ValueResolver<DocumentData, DocumentRef> refGetter,
     int? limit,
     bool unique = false,
     bool getLocalDrafts = false,
     DocumentType? type,
     CatalystId? authorId,
+    DocumentRef? refTo,
   }) {
     final localDocs = _localDocuments
         .watchAll(
@@ -339,6 +348,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
       unique: unique,
       type: type,
       authorId: authorId,
+      refTo: refTo,
     )
         .asyncMap((documents) async {
       final typedDocuments = documents.cast<DocumentData>();
@@ -346,13 +356,13 @@ final class DocumentRepositoryImpl implements DocumentRepository {
         typedDocuments
             .where((doc) => doc.metadata.template != null)
             .map((documentData) async {
-          final templateRef = documentData.metadata.template!;
-          final templateData = await _documentDataLock.synchronized(
-            () => getDocumentData(ref: templateRef),
+          final resolvedRef = refGetter(documentData);
+          final refData = await _documentDataLock.synchronized(
+            () => getDocumentData(ref: resolvedRef),
           );
           return DocumentsDataWithRefData(
             data: documentData,
-            refData: templateData,
+            refData: refData,
           );
         }).toList(),
       );
@@ -424,10 +434,11 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   @override
   Stream<DocumentsDataWithRefData> watchDocument({
     required DocumentRef ref,
+    ValueResolver<DocumentData, DocumentRef> refGetter = _templateResolver,
   }) {
     return watchDocumentWithRef(
       ref: ref,
-      refGetter: (data) => data.metadata.template!,
+      refGetter: refGetter,
     ).whereNotNull().map(
       (event) {
         final documentData = event.data;
@@ -444,16 +455,20 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   @override
   Stream<List<DocumentsDataWithRefData>> watchDocuments({
     required DocumentType type,
+    ValueResolver<DocumentData, DocumentRef> refGetter = _templateResolver,
     int? limit,
     bool unique = false,
     bool getLocalDrafts = false,
     CatalystId? authorId,
+    DocumentRef? refTo,
   }) {
     return watchAllDocuments(
+      refGetter: refGetter,
       limit: limit,
       type: type,
       getLocalDrafts: getLocalDrafts,
       authorId: authorId,
+      refTo: refTo,
     );
   }
 

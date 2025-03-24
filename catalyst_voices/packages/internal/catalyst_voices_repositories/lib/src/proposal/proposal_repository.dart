@@ -293,7 +293,6 @@ final class ProposalRepositoryImpl implements ProposalRepository {
           limit: limit,
           type: DocumentType.proposalDocument,
         )
-        .whereNotNull()
         .map(
           (documents) => documents.map(
             (doc) {
