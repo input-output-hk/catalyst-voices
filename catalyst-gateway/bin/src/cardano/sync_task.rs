@@ -18,7 +18,10 @@ use crate::{
             index_block,
             roll_forward::{self, PurgeCondition},
         },
-        queries::sync_status::get::{get_sync_status, SyncStatus},
+        queries::sync_status::{
+            get::{get_sync_status, SyncStatus},
+            update::update_sync_status,
+        },
         session::CassandraSession,
     },
     settings::{chain_follower, Settings},
@@ -239,6 +242,16 @@ impl SyncTask {
             info!(chain=%self.cfg.chain, report=%finished,
                 "The Follower sync task completed successfully."
             );
+
+            if !finished.is_live() {
+                // Update sync status in the Immutable DB.
+                // Can fire and forget, because failure to update DB will simply cause the chunk to
+                // be re-indexed, on recovery.
+                update_sync_status(
+                    finished.end().slot_or_default(),
+                    finished.start().slot_or_default(),
+                );
+            }
 
             finished.last_indexed_block().inspect(|block| {
                 self.dispatch_event(ChainIndexerEvent::IndexedSlotProgressed {

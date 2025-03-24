@@ -6,8 +6,6 @@ use cardano_blockchain_types::{MultiEraBlock, Network, Point};
 use duration_string::DurationString;
 use rand::{Rng, SeedableRng};
 
-use crate::db::index::queries::sync_status::update::update_sync_status;
-
 /// The range we generate random backoffs within given a base backoff value.
 const BACKOFF_RANGE_MULTIPLIER: u32 = 3;
 
@@ -145,12 +143,6 @@ impl SyncParams {
 
     /// Convert Params into the result of the sync.
     pub(crate) fn done(mut self, error: Option<anyhow::Error>) -> Self {
-        if error.is_none() && !self.is_live() {
-            // Update sync status in the Immutable DB.
-            // Can fire and forget, because failure to update DB will simply cause the chunk to be
-            // re-indexed, on recovery.
-            update_sync_status(self.end.slot_or_default(), self.start.slot_or_default());
-        }
         self.total_blocks_synced = self
             .total_blocks_synced
             .saturating_add(self.last_blocks_synced);
@@ -206,6 +198,11 @@ impl SyncParams {
             .as_ref()
             .unwrap_or(&self.start)
             .clone()
+    }
+
+    /// Returns an start point of this sync
+    pub(crate) fn start(&self) -> &Point {
+        &self.start
     }
 
     /// Returns an ending point of this sync
