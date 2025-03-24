@@ -9,8 +9,8 @@ import 'package:flutter/material.dart';
 /// A full screen overlay that blurs the background
 /// and shows a loading animation at the center.
 ///
-/// The overlay is always shown for a minimum duration even when
-/// [show] is false, this mechanism ensures that animations are smooth.
+/// The overlay once shown is displayed for at least a minimum duration,
+/// this mechanism ensures that animations are smooth.
 class VoicesLoadingOverlay extends StatefulWidget {
   final bool show;
 
