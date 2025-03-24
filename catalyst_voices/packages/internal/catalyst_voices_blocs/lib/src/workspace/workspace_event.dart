@@ -32,6 +32,15 @@ final class ExportProposal extends WorkspaceEvent {
   List<Object?> get props => [ref, prefix];
 }
 
+final class ForgetProposalEvent extends WorkspaceEvent {
+  final DocumentRef ref;
+
+  const ForgetProposalEvent(this.ref);
+
+  @override
+  List<Object?> get props => [ref];
+}
+
 final class ImportProposalEvent extends WorkspaceEvent {
   final Uint8List proposalData;
 

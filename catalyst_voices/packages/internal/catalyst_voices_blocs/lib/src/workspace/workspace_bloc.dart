@@ -42,6 +42,7 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     on<ExportProposal>(_exportProposal);
     on<DeleteDraftProposalEvent>(_deleteProposal);
     on<UnlockProposalEvent>(_unlockProposal);
+    on<ForgetProposalEvent>(_forgetProposal);
   }
 
   @override
@@ -182,6 +183,21 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
       categoryId: proposal.categoryId,
     );
     emitSignal(OpenProposalBuilderSignal(ref: event.ref));
+  }
+
+  Future<void> _forgetProposal(
+    ForgetProposalEvent event,
+    Emitter<WorkspaceState> emit,
+  ) async {
+    final proposal =
+        state.userProposals.firstWhereOrNull((e) => e.selfRef == event.ref);
+    if (proposal == null || proposal.selfRef is! SignedDocumentRef) {
+      return emitError(const LocalizedUnknownException());
+    }
+    await _proposalService.unlockProposal(
+      ref: proposal.selfRef as SignedDocumentRef,
+      categoryId: proposal.categoryId,
+    );
   }
 
   Future<void> _watchUserProposals(

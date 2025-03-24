@@ -39,6 +39,11 @@ abstract interface class ProposalService {
     required DocumentData document,
   });
 
+  Future<void> forgetProposal({
+    required SignedDocumentRef ref,
+    required SignedDocumentRef categoryId,
+  });
+
   /// Similar to [watchFavoritesProposalsIds] stops after first emit.
   Future<List<String>> getFavoritesProposalsIds();
 
@@ -171,6 +176,24 @@ final class ProposalServiceImpl implements ProposalService {
   }) {
     return _proposalRepository.encodeProposalForExport(
       document: document,
+    );
+  }
+
+  @override
+  Future<void> forgetProposal({
+    required SignedDocumentRef ref,
+    required SignedDocumentRef categoryId,
+  }) {
+    return _useProposerRoleCredentials(
+      (catalystId, privateKey) {
+        return _proposalRepository.publishProposalAction(
+          ref: ref,
+          categoryId: categoryId,
+          action: ProposalSubmissionAction.hide,
+          catalystId: catalystId,
+          privateKey: privateKey,
+        );
+      },
     );
   }
 

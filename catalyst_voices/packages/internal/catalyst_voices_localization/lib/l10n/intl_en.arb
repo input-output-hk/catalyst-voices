@@ -2129,5 +2129,25 @@
   "unlockEditProposalDialogTitle": "Unlock & Edit ?",
   "@unlockEditProposalDialogTitle": {
     "description": "Title of Unlock & Edit Dialog"
+  },
+  "forgetProposalDialogDescription": "You are about to remove this proposal from the app.",
+  "@forgetProposalDialogDescription": {
+    "description": "Description of Forget Proposal Dialog"
+  },
+  "forgetProposalCantEditWarning": "You will no longer be able to view, edit, or publish this proposal",
+  "@forgetProposalCantEditWarning": {
+    "description": "Warning for user that his proposal can't be edited"
+  },
+  "forgetProposalCantGetFundingWarning": "This proposal will not be eligible to win funding, even if it has been previously published.",
+  "@forgetProposalCantGetFundingWarning": {
+    "description": "Warning for user that his proposal can't get funding"
+  },
+  "forgetProposalInvisibleWarning": "Your proposal will not be visible to other users.",
+  "@forgetProposalInvisibleWarning": {
+    "description": "Warning for user that his proposal will be invisible"
+  },
+  "forgetProposalAgreement": "I acknowledge that this action cannot be undone.",
+  "@forgetProposalAgreement": {
+    "description": "Text for user that agrees to forget proposal"
   }
 }

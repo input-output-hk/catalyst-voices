@@ -5,6 +5,7 @@ import 'package:catalyst_voices/pages/proposal_builder/appbar/proposal_menu_item
 import 'package:catalyst_voices/routes/routes.dart';
 import 'package:catalyst_voices/routes/routing/proposal_builder_route.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_icon_button.dart';
+import 'package:catalyst_voices/widgets/modals/proposals/forget_proposal_dialog.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/proposal_builder_delete_confirmation_dialog.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/share_proposal_dialog.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/unlock_edit_proposal.dart';
@@ -147,7 +148,23 @@ class _ProposalMenuActionButtonState extends State<ProposalMenuActionButton> {
     context.read<WorkspaceBloc>().add(ExportProposal(widget.ref, prefix));
   }
 
-  void _forgetProposal() {}
+  Future<void> _forgetProposal() async {
+    final action = await ForgetProposalDialog.show(
+      context: context,
+      title: widget.title,
+      version: widget.version,
+      publish: widget.proposalPublish,
+    );
+    if (action == null) return;
+    switch (action) {
+      case ExportProposalForgetAction():
+        _exportProposal();
+      case ForgetProposalForgetAction():
+        if (mounted) {
+          context.read<WorkspaceBloc>().add(ForgetProposalEvent(widget.ref));
+        }
+    }
+  }
 
   void _onSelected(ProposalMenuItemAction item) {
     switch (item) {
@@ -162,7 +179,7 @@ class _ProposalMenuActionButtonState extends State<ProposalMenuActionButton> {
       case ProposalMenuItemAction.delete:
         unawaited(_deleteProposal());
       case ProposalMenuItemAction.forget:
-        _forgetProposal();
+        unawaited(_forgetProposal());
       case _:
         break;
     }
