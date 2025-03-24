@@ -55,16 +55,9 @@ impl catalyst_signed_doc::providers::VerifyingKeyProvider for VerifyingKeyProvid
     }
 }
 
-impl From<CatalystRBACTokenV1> for VerifyingKeyProvider {
-    fn from(value: CatalystRBACTokenV1) -> Self {
-        let cat_id = value.catalyst_id();
-
-        Self(Vec::from([(cat_id.clone().as_uri(), cat_id.role0_pk())]))
-    }
-}
-
 impl VerifyingKeyProvider {
-    pub(crate) async fn from_token(token: CatalystRBACTokenV1) -> anyhow::Result<Self> {
+    /// Prepares a list of registrations related to `catid` from the token.
+    pub(crate) async fn try_from_token(token: CatalystRBACTokenV1) -> anyhow::Result<Self> {
         let cat_id = token.catalyst_id();
 
         let registrations = scheme::indexed_registrations(cat_id).await?;
