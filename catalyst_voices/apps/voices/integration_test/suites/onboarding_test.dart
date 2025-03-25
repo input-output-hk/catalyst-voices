@@ -56,18 +56,21 @@ void main() async {
         await GetStartedPanel($).goto();
         await GetStartedPanel($).verifyPageElements();
       });
+
       patrolWidgetTest('visitor - create - base profile info screen looks OK',
           (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await BaseProfileInfoPanel($).goto();
         await BaseProfileInfoPanel($).verifyPageElements();
       });
+
       patrolWidgetTest('visitor - create - base profile setup screen looks OK',
           (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await SetupBaseProfilePanel($).goto();
         await SetupBaseProfilePanel($).verifyPageElements();
       });
+
       patrolWidgetTest(
           'visitor - create - keychain acknowledgement screen looks OK',
           (PatrolTester $) async {
@@ -75,6 +78,7 @@ void main() async {
         await AcknowledgmentsPanel($).goto();
         await AcknowledgmentsPanel($).verifyPageElements();
       });
+
       patrolWidgetTest('visitor - create - base profile setup screen looks OK',
           (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
@@ -137,6 +141,7 @@ void main() async {
         await WriteDownSeedphrasePanel($).verifyPageElements();
         await WriteDownSeedphrasePanel($).verifyNextButtonIsDisabled();
       });
+
       patrolWidgetTest('visitor - create - mnemonic input info screen looks OK',
           (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
@@ -177,6 +182,7 @@ void main() async {
         await InputSeedphrasePanel($).inputSeedPhraseWords();
         await InputSeedphrasePanel($).verifyNextButtonIsEnabled();
       });
+
       patrolWidgetTest(
           'visitor - create - mnemonic input verified screen looks OK',
           (PatrolTester $) async {
@@ -209,6 +215,7 @@ void main() async {
         await PasswordInfoPanel($).clickBack();
         await PasswordInfoPanel($).verifyInfoPanel();
       });
+
       patrolWidgetTest('visitor - create - password input screen looks OK',
           (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
@@ -301,6 +308,7 @@ void main() async {
         await KeychainFinalPanel($).goto();
         await KeychainFinalPanel($).verifyInfoPanel();
       });
+
       patrolWidgetTest('visitor - create - link wallet info screen looks OK',
           (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
@@ -553,6 +561,7 @@ void main() async {
         await OnboardingPageBase($).incompleteDialogClickClose();
         await PasswordInfoPanel($).verifyDetailsPanel();
       });
+
       patrolWidgetTest(
           tags: 'issues_2004',
           skip: true,

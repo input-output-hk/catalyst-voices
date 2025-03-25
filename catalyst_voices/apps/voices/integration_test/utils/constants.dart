@@ -7,3 +7,10 @@ enum Time {
 
   const Time(this.duration);
 }
+
+class Urls {
+  static String urlTos =
+      'https://docs.projectcatalyst.io/current-fund/fund-basics/project-catalyst-terms-and-conditions';
+  static String urlPrivacyPolicy =
+      'https://docs.projectcatalyst.io/current-fund/fund-basics/project-catalyst-terms-and-conditions/catalyst-fc-privacy-policy';
+}
