@@ -148,9 +148,4 @@ class _VoicesMenuExampleState extends State<VoicesMenuExample> {
       ),
     );
   }
-
-  @override
-  void dispose() {
-    super.dispose();
-  }
 }
