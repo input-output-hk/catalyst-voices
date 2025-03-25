@@ -1,3 +1,4 @@
+import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_models/src/document/document_metadata.dart';
 import 'package:equatable/equatable.dart';
@@ -31,11 +32,64 @@ final class ProposalDocument extends Equatable {
     required this.document,
   });
 
+  String? get authorName {
+    final property = document.getProperty(ProposalDocument.authorNameNodeId);
+
+    if (property is! DocumentValueProperty<String>) {
+      return null;
+    }
+
+    return property.value;
+  }
+
+  String? get description {
+    final property = document.getProperty(ProposalDocument.descriptionNodeId);
+
+    if (property is! DocumentValueProperty<String>) {
+      return null;
+    }
+
+    return property.value;
+  }
+
+  int? get duration {
+    final property = document.getProperty(ProposalDocument.durationNodeId);
+
+    if (property is! DocumentValueProperty<int>) {
+      return null;
+    }
+
+    return property.value;
+  }
+
+  Coin? get fundsRequested {
+    final nodeId = ProposalDocument.requestedFundsNodeId;
+    final property = document.getProperty(nodeId);
+
+    if (property is! DocumentValueProperty<int>) {
+      return null;
+    }
+
+    final value = property.value;
+    if (value == null) return null;
+    return Coin(value);
+  }
+
   @override
   List<Object?> get props => [
         metadata,
         document,
       ];
+
+  String? get title {
+    final property = document.getProperty(ProposalDocument.titleNodeId);
+
+    if (property is! DocumentValueProperty<String>) {
+      return null;
+    }
+
+    return property.value;
+  }
 }
 
 final class ProposalMetadata extends DocumentMetadata {
