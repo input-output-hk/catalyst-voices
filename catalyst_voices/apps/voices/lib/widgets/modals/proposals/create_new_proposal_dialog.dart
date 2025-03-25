@@ -180,15 +180,19 @@ class _CreateNewProposalDialogState extends State<CreateNewProposalDialog> {
   }
 
   Future<void> _onOpenInEditor() async {
-    // TODO(dtscalac): create a draft but dont store locally,
-    // open proposal builder with it
-  }
-
-  Future<void> _onSave() async {
     final cubit = context.read<NewProposalCubit>();
     final draftRef = await cubit.createDraft();
     if (mounted) {
       ProposalBuilderRoute.fromRef(ref: draftRef).go(context);
+    }
+  }
+
+  Future<void> _onSave() async {
+    final cubit = context.read<NewProposalCubit>();
+    await cubit.createDraft();
+
+    if (mounted) {
+      Navigator.of(context).pop();
     }
   }
 
