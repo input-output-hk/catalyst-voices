@@ -1,3 +1,5 @@
+//! An `/rbac/registrations` endpoint responses.
+
 use poem_openapi::payload::Json;
 use poem_openapi_derive::ApiResponse;
 

@@ -37,6 +37,7 @@ pub struct RbacRoleData {
 }
 
 impl RbacRoleData {
+    /// Creates a new `RbacRoleData` instance.
     pub fn new(
         point_data: &[PointData<RoleData>], last_persistent_slot: Slot, chain: &RegistrationChain,
     ) -> anyhow::Result<Self> {

@@ -75,6 +75,7 @@ impl RbacRegistrationChain {
     }
 }
 
+/// Gets and converts a role data from the given chain info.
 fn role_data(info: &ChainInfo) -> anyhow::Result<HashMap<u8, RbacRoleData>> {
     info.chain
         .all_role_data()

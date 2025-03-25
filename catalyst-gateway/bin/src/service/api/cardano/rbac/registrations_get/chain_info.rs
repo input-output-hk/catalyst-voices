@@ -28,6 +28,7 @@ pub struct ChainInfo {
 }
 
 impl ChainInfo {
+    /// Creates a new `ChainInfo` instance.
     pub(crate) async fn new(
         persistent_session: &CassandraSession, volatile_session: &CassandraSession,
         catalyst_id: &IdUri,
