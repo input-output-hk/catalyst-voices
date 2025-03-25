@@ -4,6 +4,7 @@ import 'package:catalyst_voices/common/error_handler.dart';
 import 'package:catalyst_voices/common/signal_handler.dart';
 import 'package:catalyst_voices/pages/proposal_builder/appbar/proposal_builder_back_action.dart';
 import 'package:catalyst_voices/pages/proposal_builder/appbar/proposal_builder_status_action.dart';
+import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_changing.dart';
 import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_error.dart';
 import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_loading.dart';
 import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_navigation_panel.dart';
@@ -77,25 +78,27 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: const VoicesAppBar(
-        automaticallyImplyLeading: false,
-        actions: [
-          ProposalBuilderBackAction(),
-          ProposalBuilderStatusAction(),
-          SessionStateHeader(),
-        ],
-      ),
-      body: SegmentsControllerScope(
-        controller: _segmentsController,
-        child: SidebarScaffold(
-          leftRail: const ProposalBuilderNavigationPanel(),
-          body: _ProposalBuilderContent(
-            controller: _segmentsScrollController,
-            onRetryTap: _updateSource,
+    return ProposalBuilderChangingOverlay(
+      child: Scaffold(
+        appBar: const VoicesAppBar(
+          automaticallyImplyLeading: false,
+          actions: [
+            ProposalBuilderBackAction(),
+            ProposalBuilderStatusAction(),
+            SessionStateHeader(),
+          ],
+        ),
+        body: SegmentsControllerScope(
+          controller: _segmentsController,
+          child: SidebarScaffold(
+            leftRail: const ProposalBuilderNavigationPanel(),
+            body: _ProposalBuilderContent(
+              controller: _segmentsScrollController,
+              onRetryTap: _updateSource,
+            ),
+            bodyConstraints: const BoxConstraints.expand(),
+            rightRail: const ProposalBuilderSetupPanel(),
           ),
-          bodyConstraints: const BoxConstraints.expand(),
-          rightRail: const ProposalBuilderSetupPanel(),
         ),
       ),
     );
