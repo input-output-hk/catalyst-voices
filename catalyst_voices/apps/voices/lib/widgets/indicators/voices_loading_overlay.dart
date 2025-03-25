@@ -50,7 +50,7 @@ class _Overlay extends StatelessWidget {
 
 class _VoicesLoadingOverlayState extends State<VoicesLoadingOverlay>
     with SingleTickerProviderStateMixin {
-  static const Duration _minimumShowDuration = Duration(seconds: 5);
+  static const Duration _minimumShowDuration = Duration(milliseconds: 600);
 
   late final AnimationController _fadeInAnimController;
 
