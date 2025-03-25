@@ -86,6 +86,18 @@ abstract interface class DocumentRepository {
   /// Returns the reference to the imported document.
   Future<DocumentRef> importDocument({required Uint8List data});
 
+  /// In context of [document] selfRef:
+  ///
+  /// - [DraftRef] -> Creates/updates a local document draft.
+  /// - [SignedDocumentRef] -> Creates a local document. If matching ref
+  /// already exists it will be ignored.
+  ///
+  /// If watching same draft with [watchDocument] it will emit
+  /// change.
+  Future<void> insertDocument({
+    required DocumentData document,
+  });
+
   /// Similar to [watchIsDocumentFavorite] but stops after first emit.
   Future<bool> isDocumentFavorite({
     required DocumentRef ref,
@@ -107,14 +119,6 @@ abstract interface class DocumentRepository {
     required DocumentRef ref,
     required DocumentType type,
     required bool isFavorite,
-  });
-
-  /// Creates/updates a local document draft.
-  ///
-  /// If watching same draft with [watchDocument] it will emit
-  /// change.
-  Future<void> upsertDocumentDraft({
-    required DocumentData document,
   });
 
   /// Emits list of all favorite ids.
@@ -280,6 +284,18 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   }
 
   @override
+  Future<void> insertDocument({
+    required DocumentData document,
+  }) async {
+    switch (document.metadata.selfRef) {
+      case DraftRef():
+        await _drafts.save(data: document);
+      case SignedDocumentRef():
+        await _localDocuments.save(data: document);
+    }
+  }
+
+  @override
   Future<bool> isDocumentFavorite({required DocumentRef ref}) {
     assert(!ref.isExact, 'Favorite ref have to be loose!');
 
@@ -323,13 +339,6 @@ final class DocumentRepositoryImpl implements DocumentRepository {
       type: type,
       isFavorite: isFavorite,
     );
-  }
-
-  @override
-  Future<void> upsertDocumentDraft({
-    required DocumentData document,
-  }) async {
-    await _drafts.save(data: document);
   }
 
   @visibleForTesting

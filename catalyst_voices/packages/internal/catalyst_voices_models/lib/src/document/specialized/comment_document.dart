@@ -43,6 +43,8 @@ final class CommentMetadata extends DocumentMetadata {
 
   /// [reply] equals other comment of this is a reply to it.
   final SignedDocumentRef? reply;
+
+  /// Creator of document.
   final CatalystId authorId;
 
   CommentMetadata({

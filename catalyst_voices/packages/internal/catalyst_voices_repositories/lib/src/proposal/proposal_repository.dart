@@ -275,7 +275,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
 
   @override
   Future<void> upsertDraftProposal({required DocumentData document}) {
-    return _documentRepository.upsertDocumentDraft(document: document);
+    return _documentRepository.insertDocument(document: document);
   }
 
   @override

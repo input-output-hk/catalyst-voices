@@ -20,6 +20,10 @@ abstract interface class CommentRepository {
     required CatalystPrivateKey privateKey,
   });
 
+  Future<void> saveComment({
+    required DocumentData document,
+  });
+
   Stream<List<CommentDocument>> watchCommentsWith({
     required DocumentRef ref,
   });
@@ -71,6 +75,13 @@ final class DocumentsCommentRepository implements CommentRepository {
     );
 
     await _documentRepository.publishDocument(document: signedDocument);
+  }
+
+  @override
+  Future<void> saveComment({
+    required DocumentData document,
+  }) async {
+    await _documentRepository.insertDocument(document: document);
   }
 
   @override
