@@ -65,6 +65,10 @@ final class ProposalCommentsSegment
   @override
   List<Object?> get props => super.props + [sort];
 
+  bool get hasComments => sections
+      .whereType<ViewCommentsSection>()
+      .any((element) => element.comments.isNotEmpty);
+
   ProposalCommentsSegment copySorted({
     required ProposalCommentsSort sort,
   }) {

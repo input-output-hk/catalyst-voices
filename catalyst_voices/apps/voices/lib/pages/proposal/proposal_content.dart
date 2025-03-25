@@ -100,16 +100,21 @@ class _SegmentsListView extends StatelessWidget {
         final isFirst = index == 0;
         final isLast = index == max(items.length - 1, 0);
 
+        final isSegment = item is Segment;
+        final isNextComment = nextItem is CommentListItem;
+        final isNextSectionOrComment = nextItem is Section || isNextComment;
+        final isCommentsSegment = item is ProposalCommentsSegment;
+        final isNotEmptyCommentsSegment = isCommentsSegment && item.hasComments;
+
         return ProposalTileDecoration(
           key: ValueKey('Proposal.${item.id.value}.Tile'),
           corners: (
-            isFirst: isFirst || item is ProposalCommentsSegment,
+            isFirst: isFirst || isCommentsSegment,
             isLast: isLast || nextItem is ProposalCommentsSegment,
           ),
           verticalPadding: (
-            isFirst: item is Segment,
-            isLast: (nextItem is! Section && nextItem is! CommentListItem) ||
-                (item is ProposalCommentsSegment),
+            isFirst: isSegment,
+            isLast: !isNextSectionOrComment || isNotEmptyCommentsSegment,
           ),
           child: _buildItem(context, item),
         );
