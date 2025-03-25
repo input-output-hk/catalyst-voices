@@ -65,12 +65,12 @@ class AcknowledgmentsPanel extends OnboardingPageBase {
 
   Future<void> verifyOpeningLinks() async {
     final tosLinkText = (await t()).catalystTos;
-    await SelectorUtils.checkOpeningLinkByMocking($, tosLinkText, Urls.urlTos);
+    await SelectorUtils.checkOpeningLinkByMocking($, tosLinkText, Urls.tos);
     final policyLinkText = (await t()).catalystPrivacyPolicy;
     await SelectorUtils.checkOpeningLinkByMocking(
       $,
       policyLinkText,
-      Urls.urlPrivacyPolicy,
+      Urls.privacyPolicy,
     );
   }
 }

@@ -146,7 +146,7 @@ void main() async {
           (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await WritedownSeedphraseInfoPanel($).goto();
-        await WritedownSeedphraseInfoPanel($).verifyInfoPanel();
+        await WritedownSeedphraseInfoPanel($).verifyPageElements();
       });
 
       patrolWidgetTest(
@@ -162,7 +162,7 @@ void main() async {
           (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await InputSeedphrasePanel($).goto();
-        await InputSeedphrasePanel($).verifyInfoPanel();
+        await InputSeedphrasePanel($).verifyPageElements();
       });
 
       patrolWidgetTest(
@@ -188,7 +188,7 @@ void main() async {
           (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await SeedphraseSuccessPanel($).goto();
-        await SeedphraseSuccessPanel($).verifyInfoPanel();
+        await SeedphraseSuccessPanel($).verifyPageElements();
       });
 
       patrolWidgetTest(
@@ -204,7 +204,7 @@ void main() async {
           (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await PasswordInfoPanel($).goto();
-        await PasswordInfoPanel($).verifyInfoPanel();
+        await PasswordInfoPanel($).verifyPageElements();
       });
 
       patrolWidgetTest(
@@ -220,7 +220,7 @@ void main() async {
           (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await PasswordInputPanel($).goto();
-        await PasswordInputPanel($).verifyInfoPanel();
+        await PasswordInputPanel($).verifyPageElements();
       });
 
       patrolWidgetTest(
@@ -306,14 +306,21 @@ void main() async {
           (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await KeychainFinalPanel($).goto();
-        await KeychainFinalPanel($).verifyInfoPanel();
+        await KeychainFinalPanel($).verifyPageElements();
       });
 
       patrolWidgetTest('visitor - create - link wallet info screen looks OK',
           (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await LinkWalletInfoPanel($).goto();
-        await LinkWalletInfoPanel($).verifyInfoPanel();
+        await LinkWalletInfoPanel($).verifyPageElements();
+      });
+
+      patrolWidgetTest('visitor - create - link wallet select screen looks OK',
+          (PatrolTester $) async {
+        await $.pumpWidgetAndSettle(App(routerConfig: router));
+        await WalletListPanel($).goto();
+        await WalletListPanel($).verifyPageElements();
       });
 
       patrolWidgetTest(
