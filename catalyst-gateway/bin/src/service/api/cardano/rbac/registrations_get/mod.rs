@@ -4,6 +4,7 @@ pub use response::AllResponses;
 
 mod binary_data;
 mod chain_info;
+mod extended_data;
 mod key_data;
 mod key_data_list;
 mod payment_data;

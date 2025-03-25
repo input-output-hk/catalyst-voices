@@ -12,7 +12,8 @@ use rbac_registration::{
 
 use crate::{
     service::api::cardano::rbac::registrations_get::{
-        key_data::KeyData, key_data_list::KeyDataList, payment_data::PaymentData,
+        extended_data::ExtendedData, key_data::KeyData, key_data_list::KeyDataList,
+        payment_data::PaymentData,
     },
     settings::Settings,
 };
@@ -34,7 +35,7 @@ pub struct RbacRoleData {
     ///
     /// Unlike other fields, we don't track history for this data.
     #[oai(skip_serializing_if_is_empty)]
-    extended_data: HashMap<u8, Vec<u8>>,
+    extended_data: ExtendedData,
 }
 
 impl RbacRoleData {
@@ -86,7 +87,7 @@ impl RbacRoleData {
             signing_keys: signing_keys.into(),
             encryption_keys: encryption_keys.into(),
             payment_address,
-            extended_data,
+            extended_data: extended_data.into(),
         })
     }
 }
@@ -97,7 +98,7 @@ impl Example for RbacRoleData {
             signing_keys: KeyDataList::example(),
             encryption_keys: KeyDataList::example(),
             payment_address: vec![PaymentData::example()],
-            extended_data: HashMap::default(),
+            extended_data: ExtendedData::example(),
         }
     }
 }
