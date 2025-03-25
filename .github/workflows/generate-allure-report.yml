@@ -56,7 +56,7 @@ jobs:
         continue-on-error: true
         with:
           command: run
-          args: ./catalyst_voices+test-unit
+          args: ./catalyst_voices+test-unit-native
 
       - name: Get python api test report
         uses: input-output-hk/catalyst-forge/actions/run@ci/v1.7.1
