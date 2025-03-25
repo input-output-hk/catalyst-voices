@@ -18,4 +18,6 @@ dependencies:
 
 dev_dependencies:
   catalyst_analysis: ^3.0.0
+  flutter_test:
+    sdk: flutter
   test: ^1.24.9
