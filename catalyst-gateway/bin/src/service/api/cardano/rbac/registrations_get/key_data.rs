@@ -16,11 +16,11 @@ use rbac_registration::{
 use x509_cert::{certificate::Certificate as X509Certificate, der::Encode as _};
 
 use crate::service::{
+    api::cardano::rbac::registrations_get::binary_data::HexEncodedBinaryData,
     common::types::generic::{
         boolean::BooleanFlag, date_time::DateTime as ServiceDateTime,
         ed25519_public_key::Ed25519HexEncodedPublicKey,
     },
-    utilities::as_hex_string,
 };
 
 /// A role data key information.
@@ -35,9 +35,9 @@ pub struct KeyData {
     /// A time when the address was added.
     time: ServiceDateTime,
     /// A hex encoded X509 certificate.
-    x509_cert: Option<String>,
+    x509_cert: Option<HexEncodedBinaryData>,
     /// A hex encoded C509 certificate.
-    c509_cert: Option<String>,
+    c509_cert: Option<HexEncodedBinaryData>,
     /// An ed25519 public key.
     pub_key: Option<Ed25519HexEncodedPublicKey>,
 }
@@ -91,7 +91,7 @@ impl Example for KeyData {
 /// Finds a X509 certificate with given offset and point and hex encodes it.
 fn encode_x509(
     certs: &HashMap<usize, Vec<PointData<Option<X509Certificate>>>>, offset: usize, point: &Point,
-) -> anyhow::Result<Option<String>> {
+) -> anyhow::Result<Option<HexEncodedBinaryData>> {
     certs
         .get(&offset)
         .with_context(|| format!("Invalid X509 certificate offset: {offset:?}"))?
@@ -103,7 +103,7 @@ fn encode_x509(
         .map(|cert| {
             cert.to_der()
                 .context("Failed to encode X509 certificate")
-                .map(|c| as_hex_string(&c))
+                .map(Into::into)
         })
         .transpose()
 }
@@ -111,7 +111,7 @@ fn encode_x509(
 /// Finds a C509 certificate with given offset and point and hex encodes it.
 fn encode_c509(
     certs: &HashMap<usize, Vec<PointData<Option<C509>>>>, offset: usize, point: &Point,
-) -> anyhow::Result<Option<String>> {
+) -> anyhow::Result<Option<HexEncodedBinaryData>> {
     certs
         .get(&offset)
         .with_context(|| format!("Invalid C509 certificate offset: {offset:?}"))?
@@ -125,7 +125,7 @@ fn encode_c509(
             let mut e = Encoder::new(&mut buffer);
             cert.encode(&mut e, &mut ())
                 .ok()
-                .map(|()| as_hex_string(&buffer))
+                .map(|()| buffer.into())
                 .context("Failed to encode C509 certificate")
         })
         .transpose()
