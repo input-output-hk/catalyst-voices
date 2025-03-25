@@ -82,8 +82,8 @@ impl Example for KeyData {
             is_persistent: BooleanFlag::example(),
             time: ServiceDateTime::example(),
             pub_key: Some(Ed25519HexEncodedPublicKey::example()),
-            x509_cert: None,
-            c509_cert: None,
+            x509_cert: Some(HexEncodedBinaryData::example()),
+            c509_cert: Some(HexEncodedBinaryData::example()),
         }
     }
 }

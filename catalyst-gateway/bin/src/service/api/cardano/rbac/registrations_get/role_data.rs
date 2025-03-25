@@ -12,7 +12,7 @@ use rbac_registration::{
 
 use crate::{
     service::api::cardano::rbac::registrations_get::{
-        key_data::KeyData, payment_data::PaymentData,
+        key_data::KeyData, key_data_list::KeyDataList, payment_data::PaymentData,
     },
     settings::Settings,
 };
@@ -23,10 +23,10 @@ use crate::{
 pub struct RbacRoleData {
     /// A list of role signing keys.
     #[oai(skip_serializing_if_is_empty)]
-    signing_keys: Vec<KeyData>,
+    signing_keys: KeyDataList,
     /// A list of role encryption keys.
     #[oai(skip_serializing_if_is_empty)]
-    encryption_keys: Vec<KeyData>,
+    encryption_keys: KeyDataList,
     /// A list of role payment addresses.
     #[oai(skip_serializing_if_is_empty)]
     payment_address: Vec<PaymentData>,
@@ -83,8 +83,8 @@ impl RbacRoleData {
         }
 
         Ok(Self {
-            signing_keys,
-            encryption_keys,
+            signing_keys: signing_keys.into(),
+            encryption_keys: encryption_keys.into(),
             payment_address,
             extended_data,
         })
@@ -94,8 +94,8 @@ impl RbacRoleData {
 impl Example for RbacRoleData {
     fn example() -> Self {
         Self {
-            signing_keys: vec![KeyData::example()],
-            encryption_keys: vec![KeyData::example()],
+            signing_keys: KeyDataList::example(),
+            encryption_keys: KeyDataList::example(),
             payment_address: vec![PaymentData::example()],
             extended_data: HashMap::default(),
         }
