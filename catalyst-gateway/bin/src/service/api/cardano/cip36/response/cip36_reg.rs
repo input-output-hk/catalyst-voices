@@ -45,10 +45,8 @@ pub(crate) struct Cip36Details {
     #[oai(skip_serializing_if_is_none)]
     pub payment_address: Option<Cip19Address>,
     /// If the payment address is a script, then it can not be payed rewards.
-    #[oai(default)]
     pub is_payable: BooleanFlag,
     /// If this field is set, then the registration was in CIP15 format.
-    #[oai(default)]
     pub cip15: BooleanFlag,
     /// If there are errors with this registration, they are listed here.
     /// This field is *NEVER* returned for a valid registration.

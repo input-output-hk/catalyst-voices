@@ -7,15 +7,8 @@ use poem_openapi::{types::Example, NewType};
 #[oai(example = true)]
 pub(crate) struct BooleanFlag(bool);
 
-impl Default for BooleanFlag {
-    /// Explicit default implementation of `Flag`.
-    fn default() -> Self {
-        Self(true)
-    }
-}
-
 impl Example for BooleanFlag {
     fn example() -> Self {
-        Self::default()
+        Self(true)
     }
 }
