@@ -12,56 +12,6 @@ class VoicesMenuExample extends StatefulWidget {
   State<VoicesMenuExample> createState() => _VoicesMenuExampleState();
 }
 
-class _VoicesMenuExampleState extends State<VoicesMenuExample> {
-  String? _selectedItemId;
-
-  @override
-  void dispose() {
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Voices Menu')),
-      body: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                const _MenuExample1(),
-                const _MenuExample2(),
-                VoicesNodeMenu(
-                  name: 'Problem-sensing stage',
-                  onItemTap: (value) {
-                    setState(() {
-                      if (_selectedItemId == value) {
-                        _selectedItemId = null;
-                      } else {
-                        _selectedItemId = value;
-                      }
-                    });
-                  },
-                  selectedItemId: _selectedItemId,
-                  items: const [
-                    VoicesNodeMenuItem(id: '0', label: 'Start'),
-                    VoicesNodeMenuItem(id: '1', label: 'Vote'),
-                    VoicesNodeMenuItem(id: '2', label: 'Results'),
-                  ],
-                ),
-              ].separatedBy(const SizedBox(height: 12)).toList(),
-            ),
-          ),
-          Expanded(
-            child: Container(),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
 class _MenuExample1 extends StatelessWidget {
   const _MenuExample1();
 
@@ -152,5 +102,55 @@ class _MenuExample2 extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+class _VoicesMenuExampleState extends State<VoicesMenuExample> {
+  String? _selectedItemId;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Voices Menu')),
+      body: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                const _MenuExample1(),
+                const _MenuExample2(),
+                VoicesNodeMenu(
+                  name: const Text('Problem-sensing stage'),
+                  onItemTap: (value) {
+                    setState(() {
+                      if (_selectedItemId == value) {
+                        _selectedItemId = null;
+                      } else {
+                        _selectedItemId = value;
+                      }
+                    });
+                  },
+                  selectedItemId: _selectedItemId,
+                  items: const [
+                    VoicesNodeMenuItem(id: '0', label: 'Start'),
+                    VoicesNodeMenuItem(id: '1', label: 'Vote'),
+                    VoicesNodeMenuItem(id: '2', label: 'Results'),
+                  ],
+                ),
+              ].separatedBy(const SizedBox(height: 12)).toList(),
+            ),
+          ),
+          Expanded(
+            child: Container(),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 }
