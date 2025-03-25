@@ -23,44 +23,63 @@ class VoicesLoadingOverlay extends StatefulWidget {
   State<VoicesLoadingOverlay> createState() => _VoicesLoadingOverlayState();
 }
 
-class _VoicesLoadingOverlayState extends State<VoicesLoadingOverlay> {
-  static const Duration _minimumShowDuration = Duration(seconds: 1);
+class _Overlay extends StatelessWidget {
+  const _Overlay();
+
+  @override
+  Widget build(BuildContext context) {
+    return ColoredBox(
+      color: Theme.of(context).colors.onSurfaceNeutral016.withAlpha(50),
+      child: Center(
+        child: Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surface,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: VoicesAssets.lottie.voicesLoader.buildLottie(
+            width: 92,
+            height: 92,
+            repeat: true,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _VoicesLoadingOverlayState extends State<VoicesLoadingOverlay>
+    with SingleTickerProviderStateMixin {
+  static const Duration _minimumShowDuration = Duration(seconds: 5);
+
+  late final AnimationController _fadeInAnimController;
 
   Timer? _timer;
-  late bool _show;
   DateTime? _showingSince;
 
   @override
   Widget build(BuildContext context) {
-    return Offstage(
-      offstage: !_show,
-      child: TickerMode(
-        enabled: _show,
-        child: AbsorbPointer(
-          child: Container(
-            width: double.infinity,
-            height: double.infinity,
-            color: Theme.of(context).colors.onSurfaceNeutral016.withAlpha(50),
+    return AnimatedBuilder(
+      animation: _fadeInAnimController,
+      builder: (context, child) {
+        final isShown = !_fadeInAnimController.isDismissed;
+        return Offstage(
+          offstage: !isShown,
+          child: AbsorbPointer(
             child: BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 3, sigmaY: 3),
-              child: Center(
-                child: Container(
-                  padding: const EdgeInsets.all(24),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.surface,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: VoicesAssets.lottie.voicesLoader.buildLottie(
-                    width: 92,
-                    height: 92,
-                    repeat: true,
-                  ),
+              child: Opacity(
+                opacity: _fadeInAnimController.value,
+                child: TickerMode(
+                  enabled: isShown,
+                  child: child!,
                 ),
               ),
             ),
           ),
-        ),
-      ),
+        );
+      },
+      child: const _Overlay(),
     );
   }
 
@@ -79,6 +98,7 @@ class _VoicesLoadingOverlayState extends State<VoicesLoadingOverlay> {
 
   @override
   void dispose() {
+    _fadeInAnimController.dispose();
     _timer?.cancel();
     _timer = null;
     super.dispose();
@@ -87,15 +107,20 @@ class _VoicesLoadingOverlayState extends State<VoicesLoadingOverlay> {
   @override
   void initState() {
     super.initState();
-    _show = widget.show;
-    _showingSince = _show ? DateTimeExt.now() : null;
+    _fadeInAnimController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+      reverseDuration: const Duration(milliseconds: 300),
+    );
+
+    _showingSince = widget.show ? DateTimeExt.now() : null;
   }
 
   void _hideNow() {
     setState(() {
       _timer?.cancel();
-      _show = false;
       _showingSince = null;
+      _fadeInAnimController.reverse();
     });
   }
 
@@ -119,8 +144,8 @@ class _VoicesLoadingOverlayState extends State<VoicesLoadingOverlay> {
   void _showNow() {
     setState(() {
       _timer?.cancel();
-      _show = true;
       _showingSince = DateTimeExt.now();
+      _fadeInAnimController.forward();
     });
   }
 }
