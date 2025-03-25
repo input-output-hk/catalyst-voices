@@ -121,6 +121,8 @@ final class DocumentsCommentRepository implements CommentRepository {
     final metadata = CommentMetadata(
       selfRef: documentData.metadata.selfRef as SignedDocumentRef,
       ref: documentData.metadata.ref! as SignedDocumentRef,
+      template: templateData.metadata.selfRef as SignedDocumentRef,
+      reply: documentData.metadata.reply,
       authorId: authors!.single,
     );
     final content = DocumentDataContentDto.fromModel(

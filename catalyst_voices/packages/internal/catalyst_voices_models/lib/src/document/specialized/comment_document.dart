@@ -24,6 +24,7 @@ final class CommentDocument extends Equatable {
         type: DocumentType.commentDocument,
         selfRef: metadata.selfRef,
         ref: metadata.ref,
+        template: metadata.template,
         reply: metadata.reply,
         authors: [metadata.authorId],
       ),
@@ -37,6 +38,9 @@ final class CommentMetadata extends DocumentMetadata {
   /// exist on its own but just in a context of other documents.
   final SignedDocumentRef ref;
 
+  /// against which [CommentDocument] is valid.
+  final SignedDocumentRef template;
+
   /// [reply] equals other comment of this is a reply to it.
   final SignedDocumentRef? reply;
   final CatalystId authorId;
@@ -45,6 +49,7 @@ final class CommentMetadata extends DocumentMetadata {
     // Note. no drafts for comments
     required SignedDocumentRef super.selfRef,
     required this.ref,
+    required this.template,
     this.reply,
     required this.authorId,
   }) : assert(
@@ -53,7 +58,7 @@ final class CommentMetadata extends DocumentMetadata {
         );
 
   @override
-  List<Object?> get props => super.props + [ref, reply, authorId];
+  List<Object?> get props => super.props + [ref, template, reply, authorId];
 
   @override
   SignedDocumentRef get selfRef => super.selfRef as SignedDocumentRef;

@@ -136,14 +136,19 @@ final class ProposalCubit extends Cubit<ProposalState>
       proposalRef is SignedDocumentRef,
       'Can comment only on signed documents',
     );
+
     final activeAccountId = _cache.activeAccountId;
     assert(activeAccountId != null, 'No active account found!');
+
+    final commentTemplate = _cache.commentTemplate;
+    assert(commentTemplate != null, 'No comment template found!');
 
     final commentRef = SignedDocumentRef.generateFirstRef();
     final comment = CommentDocument(
       metadata: CommentMetadata(
         selfRef: commentRef,
         ref: proposalRef! as SignedDocumentRef,
+        template: commentTemplate!.metadata.selfRef as SignedDocumentRef,
         reply: reply,
         authorId: activeAccountId!,
       ),
