@@ -1,6 +1,5 @@
 import pytest
 import json
-import glob
 import re
 import os
 from typing import Dict, Any, List
@@ -17,9 +16,8 @@ class Snapshot:
 def snapshot() -> Snapshot:
     # snapshot file should follow the following pattern:
     # snapshot-<slot_no>-<network>.json
-    files = glob.glob("./test_data/snapshot-*.json")
-    print(files)
-    with open(files[3]) as snapshot_file:
+    snapshot_path = "./test_data/snapshot-150156313-mainnet.json"
+    with open(snapshot_path) as snapshot_file:
         snapshot_data = json.load(snapshot_file)
         file_name = os.path.basename(snapshot_file.name)
         res = re.split(r"[-.]+", file_name)

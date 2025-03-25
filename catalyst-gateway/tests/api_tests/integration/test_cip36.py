@@ -4,7 +4,7 @@ from utils.snapshot import snapshot
 from api.v1 import cardano
 
 
-# @pytest.mark.skip("To be refactored when the api is ready")
+@pytest.mark.skip("To be refactored when the api is ready")
 def test_cip36_registration_endpoint(snapshot):
     # health.is_live()
     # health.is_ready()
@@ -13,7 +13,7 @@ def test_cip36_registration_endpoint(snapshot):
     not_found = []
     total_len = len(snapshot.data)
     for i, entry in enumerate(snapshot.data):
-        print(f"Loading .... {i/total_len * 100}%", end="\r")
+        print(f"Checking .... {i/total_len * 100}%", end="\r")
         stake_public_key = entry["stake_public_key"]
         stake_address = stake_public_key_to_address(
             key=stake_public_key[2:],

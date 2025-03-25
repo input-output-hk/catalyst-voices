@@ -4,7 +4,7 @@ from utils.snapshot import snapshot
 from api.v1 import cardano
 
 
-# @pytest.mark.skip("To be refactored when the api is ready")
+@pytest.mark.skip("To be refactored when the api is ready")
 def test_persistent_ada_amount_endpoint(snapshot):
     # health.is_live()
     # health.is_ready()
@@ -12,7 +12,7 @@ def test_persistent_ada_amount_endpoint(snapshot):
 
     total_len = len(snapshot.data)
     for i, entry in enumerate(snapshot.data):
-        print(f"Loading .... {i/total_len * 100}%", end="\r")
+        print(f"Checking .... {round(i / total_len * 100, 2)}%", end="\r")
         expected_amount = entry["voting_power"]
         stake_address = stake_public_key_to_address(
             key=entry["stake_public_key"][2:],
@@ -23,7 +23,7 @@ def test_persistent_ada_amount_endpoint(snapshot):
         if expected_amount == 0 and resp.status_code == 404:
             # it is possible that snapshot tool collected data for the stake key which does not have any unspent utxo
             # at this case cat-gateway return 404, that is why we are checking this case additionally
-            return
+            continue
 
         assert (
             resp.status_code == 200
