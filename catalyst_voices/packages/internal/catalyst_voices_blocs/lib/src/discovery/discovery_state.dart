@@ -28,11 +28,13 @@ final class DiscoveryCurrentCampaignState extends Equatable {
   final bool isLoading;
   final LocalizedException? error;
   final CurrentCampaignInfoViewModel currentCampaign;
+  final List<CampaignTimeline> campaignTimeline;
 
   const DiscoveryCurrentCampaignState({
     this.isLoading = true,
     this.error,
     CurrentCampaignInfoViewModel? currentCampaign,
+    this.campaignTimeline = const [],
   }) : currentCampaign =
             currentCampaign ?? const NullCurrentCampaignInfoViewModel();
 
@@ -41,12 +43,21 @@ final class DiscoveryCurrentCampaignState extends Equatable {
         isLoading,
         error,
         currentCampaign,
+        campaignTimeline,
       ];
 
   bool get showCurrentCampaign =>
       !isLoading && currentCampaign is! NullCurrentCampaignInfoViewModel;
 
   bool get showError => !isLoading && error != null;
+
+  DateTime get votingStartsAt {
+    return campaignTimeline
+            .firstWhere((e) => e.stage == CampaignTimelineStage.communityVoting)
+            .timeline
+            .from ??
+        DateTime.now();
+  }
 }
 
 final class DiscoveryMostRecentProposalsState extends Equatable {

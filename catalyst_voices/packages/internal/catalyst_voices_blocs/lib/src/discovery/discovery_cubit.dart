@@ -62,12 +62,14 @@ class DiscoveryCubit extends Cubit<DiscoveryState> {
       ),
     );
     final campaign = await _campaignService.getCurrentCampaign();
+    final campaignTimeline = await _campaignService.getCampaignTimeline();
     final currentCampaign = CurrentCampaignInfoViewModel.fromModel(campaign);
 
     emit(
       state.copyWith(
         currentCampaign: DiscoveryCurrentCampaignState(
           currentCampaign: currentCampaign,
+          campaignTimeline: campaignTimeline,
           error: null,
           isLoading: false,
         ),
