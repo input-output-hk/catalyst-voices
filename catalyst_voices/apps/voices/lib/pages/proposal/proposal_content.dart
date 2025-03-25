@@ -180,6 +180,7 @@ class _SegmentsListView extends StatelessWidget {
         ),
       ProposalCommentsSegment(:final sort) => ProposalCommentsHeaderTile(
           sort: sort,
+          showSort: item.hasComments,
         ),
       ProposalCommentsSection() => switch (item) {
           ViewCommentsSection() => throw ArgumentError(
