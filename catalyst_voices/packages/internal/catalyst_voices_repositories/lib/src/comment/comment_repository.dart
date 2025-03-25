@@ -54,22 +54,27 @@ final class DocumentsCommentRepository implements CommentRepository {
     required CatalystPrivateKey privateKey,
   }) async {
     final ref = document.metadata.ref;
-    final reply = document.metadata.ref;
-
+    final reply = document.metadata.reply;
     assert(ref != null, 'CommentDocument have to have a ref to other document');
 
-    final signedDocument = await _signedDocumentManager.signDocument(
-      SignedDocumentJsonPayload(document.content.data),
-      metadata: SignedDocumentMetadata(
-        contentType: SignedDocumentContentType.json,
-        documentType: DocumentType.commentDocument,
-        id: document.metadata.id,
-        ver: document.metadata.version,
-        ref: SignedDocumentMetadataRef.fromDocumentRef(ref!),
-        reply: reply != null
-            ? SignedDocumentMetadataRef.fromDocumentRef(reply)
-            : null,
+    final payload = SignedDocumentJsonPayload(document.content.data);
+    final metadata = SignedDocumentMetadata(
+      contentType: SignedDocumentContentType.json,
+      documentType: DocumentType.commentDocument,
+      id: document.metadata.id,
+      ver: document.metadata.version,
+      ref: SignedDocumentMetadataRef.fromDocumentRef(ref!),
+      template: SignedDocumentMetadataRef.fromDocumentRef(
+        document.metadata.template!,
       ),
+      reply: reply != null
+          ? SignedDocumentMetadataRef.fromDocumentRef(reply)
+          : null,
+    );
+
+    final signedDocument = await _signedDocumentManager.signDocument(
+      payload,
+      metadata: metadata,
       catalystId: catalystId,
       privateKey: privateKey,
     );
