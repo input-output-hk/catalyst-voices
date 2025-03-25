@@ -11,11 +11,12 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_svg: ^2.0.10+1
+  lottie: ^3.3.1
 
 dev_dependencies:
   build_runner: ^2.4.12
   catalyst_analysis: ^3.0.0
-  flutter_gen_runner: ^5.3.2
+  flutter_gen_runner: ^5.10.0
   flutter_test:
     sdk: flutter
 
@@ -26,6 +27,7 @@ flutter:
     - assets/images/category/
     - assets/images/opportunities/
     - assets/icons/
+    - assets/lottie/
     - assets/videos/
     - assets/document_templates/proposal/F14-Generic/
   fonts:
@@ -54,3 +56,4 @@ flutter_gen:
       - assets/colors/colors.xml
   integrations:
     flutter_svg: true
+    lottie: true

@@ -9,7 +9,7 @@ class ProposalBuilderLoadingSelector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocSelector<ProposalBuilderBloc, ProposalBuilderState, bool>(
-      selector: (state) => state.isChanging,
+      selector: (state) => state.isLoading,
       builder: (context, state) {
         return Offstage(
           offstage: !state,
