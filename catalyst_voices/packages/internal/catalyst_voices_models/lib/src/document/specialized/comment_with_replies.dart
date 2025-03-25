@@ -80,6 +80,17 @@ final class CommentWithReplies extends Equatable {
 
   bool isA(SignedDocumentRef ref) => comment.metadata.selfRef == ref;
 
+  CommentWithReplies removeReply({
+    required SignedDocumentRef ref,
+  }) {
+    final replies = List.of(this.replies)
+        .map((e) => e.removeReply(ref: ref))
+        .toList()
+      ..removeWhere((element) => element.ref == ref);
+
+    return copyWith(replies: replies);
+  }
+
   CommentWithReplies _addReply(CommentDocument reply) {
     assert(
       comment.metadata.selfRef == reply.metadata.reply,

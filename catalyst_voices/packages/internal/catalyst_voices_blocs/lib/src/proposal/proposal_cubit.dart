@@ -419,9 +419,9 @@ final class ProposalCubit extends Cubit<ProposalState>
     List<CommentWithReplies> source, {
     required SignedDocumentRef ref,
   }) {
-    final comments = List.of(source);
-    //
-
-    return comments;
+    return List.of(source)
+        .where((e) => e.ref != ref)
+        .map((e) => e.removeReply(ref: ref))
+        .toList();
   }
 }
