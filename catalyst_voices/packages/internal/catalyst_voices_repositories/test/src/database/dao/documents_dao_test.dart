@@ -1,6 +1,7 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/database/catalyst_database.dart';
 import 'package:catalyst_voices_repositories/src/database/database.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:collection/collection.dart';
 import 'package:drift/drift.dart' show DatabaseConnection;
 import 'package:drift/native.dart';
@@ -447,10 +448,16 @@ void main() {
 
     group('count', () {
       test('document returns expected number', () async {
+        final dateTime = DateTimeExt.now();
         // Given
         final documentsWithMetadata = List<DocumentEntityWithMetadata>.generate(
           20,
-          (index) => DocumentWithMetadataFactory.build(),
+          (index) => DocumentWithMetadataFactory.build(
+            metadata: DocumentDataMetadata(
+              type: DocumentType.proposalDocument,
+              selfRef: _buildRefAt(dateTime.add(Duration(seconds: index))),
+            ),
+          ),
         );
 
         // When
@@ -753,4 +760,10 @@ void main() {
       });
     });
   });
+}
+
+SignedDocumentRef _buildRefAt(DateTime dateTime) {
+  final config = V7Options(dateTime.millisecondsSinceEpoch, null);
+  final val = const Uuid().v7(config: config);
+  return SignedDocumentRef.first(val);
 }
