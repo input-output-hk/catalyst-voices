@@ -32,6 +32,7 @@ class _ProposalBuilderLoading extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListView(
       children: const [
+        SizedBox(height: 12),
         _SectionHeaderPlaceholder(isOpen: true),
         SizedBox(height: 12),
         _SectionPlaceholder(blocks: 1),
