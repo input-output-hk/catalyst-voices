@@ -5,6 +5,7 @@ final class ProposalCubitCache extends Equatable {
   final CatalystId? activeAccountId;
   final DocumentRef? ref;
   final ProposalData? proposal;
+  final CampaignCategory? category;
   final CommentTemplate? commentTemplate;
   final List<CommentWithReplies>? comments;
   final bool? isFavorite;
@@ -13,6 +14,7 @@ final class ProposalCubitCache extends Equatable {
     this.activeAccountId,
     this.ref,
     this.proposal,
+    this.category,
     this.commentTemplate,
     this.comments,
     this.isFavorite,
@@ -23,6 +25,7 @@ final class ProposalCubitCache extends Equatable {
         activeAccountId,
         ref,
         proposal,
+        category,
         commentTemplate,
         comments,
         isFavorite,
@@ -32,6 +35,7 @@ final class ProposalCubitCache extends Equatable {
     Optional<CatalystId>? activeAccountId,
     Optional<DocumentRef>? ref,
     Optional<ProposalData>? proposal,
+    Optional<CampaignCategory>? category,
     Optional<CommentTemplate>? commentTemplate,
     Optional<List<CommentWithReplies>>? comments,
     Optional<bool>? isFavorite,
@@ -40,6 +44,7 @@ final class ProposalCubitCache extends Equatable {
       activeAccountId: activeAccountId.dataOr(this.activeAccountId),
       ref: ref.dataOr(this.ref),
       proposal: proposal.dataOr(this.proposal),
+      category: category.dataOr(this.category),
       commentTemplate: commentTemplate.dataOr(this.commentTemplate),
       comments: comments.dataOr(this.comments),
       isFavorite: isFavorite.dataOr(this.isFavorite),

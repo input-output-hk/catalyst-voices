@@ -16,11 +16,8 @@ final class Currency extends Equatable {
           symbol: '₳',
         );
 
-  String format(
-    num money, {
-    String separator = '',
-  }) {
-    return '$symbol$separator$money';
+  String format(num money) {
+    return '$symbol$money';
   }
 
   @override

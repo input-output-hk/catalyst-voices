@@ -1,6 +1,7 @@
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_models/src/document/document_metadata.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:equatable/equatable.dart';
 
 final class ProposalDocument extends Equatable {
@@ -21,6 +22,11 @@ final class ProposalDocument extends Equatable {
   static final categoryNodeId = DocumentNodeId.fromString('campaign_category');
   static final categoryDetailsNodeId =
       DocumentNodeId.fromString('campaign_category.category_details.details');
+  static final milestonesNodeId =
+      DocumentNodeId.fromString('milestones.milestones');
+  static final milestoneListNodeId =
+      DocumentNodeId.fromString('milestones.milestones.milestone_list');
+  static final tagNodeId = DocumentNodeId.fromString('theme.theme.grouped_tag');
 
   static const String exportFileExt = 'json';
 
@@ -33,7 +39,7 @@ final class ProposalDocument extends Equatable {
   });
 
   String? get authorName {
-    final property = document.getProperty(ProposalDocument.authorNameNodeId);
+    final property = document.getProperty(authorNameNodeId);
 
     if (property is! DocumentValueProperty<String>) {
       return null;
@@ -43,7 +49,7 @@ final class ProposalDocument extends Equatable {
   }
 
   String? get description {
-    final property = document.getProperty(ProposalDocument.descriptionNodeId);
+    final property = document.getProperty(descriptionNodeId);
 
     if (property is! DocumentValueProperty<String>) {
       return null;
@@ -53,7 +59,7 @@ final class ProposalDocument extends Equatable {
   }
 
   int? get duration {
-    final property = document.getProperty(ProposalDocument.durationNodeId);
+    final property = document.getProperty(durationNodeId);
 
     if (property is! DocumentValueProperty<int>) {
       return null;
@@ -63,8 +69,7 @@ final class ProposalDocument extends Equatable {
   }
 
   Coin? get fundsRequested {
-    final nodeId = ProposalDocument.requestedFundsNodeId;
-    final property = document.getProperty(nodeId);
+    final property = document.getProperty(requestedFundsNodeId);
 
     if (property is! DocumentValueProperty<int>) {
       return null;
@@ -75,14 +80,38 @@ final class ProposalDocument extends Equatable {
     return Coin(value);
   }
 
+  int? get milestoneCount {
+    final property = document.getProperty(milestonesNodeId);
+
+    if (property is! DocumentObjectProperty) {
+      return null;
+    }
+
+    return DocumentNodeTraverser.findSectionsAndSubsections(property)
+        .where((element) => element.nodeId.isChildOf(milestoneListNodeId))
+        .length;
+  }
+
   @override
   List<Object?> get props => [
         metadata,
         document,
       ];
 
+  String? get tag {
+    final property = document.getProperty(tagNodeId);
+    final scheme = property?.schema;
+
+    if (property is! DocumentObjectProperty ||
+        scheme is! DocumentSingleGroupedTagSelectorSchema) {
+      return null;
+    }
+
+    return scheme.groupedTagsSelection(property)?.toString();
+  }
+
   String? get title {
-    final property = document.getProperty(ProposalDocument.titleNodeId);
+    final property = document.getProperty(titleNodeId);
 
     if (property is! DocumentValueProperty<String>) {
       return null;
