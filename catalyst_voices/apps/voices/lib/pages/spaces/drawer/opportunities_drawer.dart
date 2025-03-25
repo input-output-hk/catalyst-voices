@@ -98,6 +98,7 @@ class _BecomeReviewerCard extends StatelessWidget with LaunchUrlMixin {
             const SizedBox(height: 4),
             VoicesFilledButton(
               onTap: () {
+                // TODO(LynxLynxx): add url;
                 // launchUri();
               },
               trailing: VoicesAssets.icons.externalLink.buildIcon(),
@@ -236,6 +237,7 @@ class _RegisterAsVoter extends StatelessWidget with LaunchUrlMixin {
               const SizedBox(height: 20),
               VoicesFilledButton(
                 onTap: () {
+                  // TODO(LynxLynxx): add url;
                   // launchUri();
                 },
                 trailing: VoicesAssets.icons.externalLink.buildIcon(),
