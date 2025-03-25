@@ -95,7 +95,7 @@ impl Example for RbacRoleData {
     fn example() -> Self {
         Self {
             signing_keys: vec![KeyData::example()],
-            encryption_keys: vec![],
+            encryption_keys: vec![KeyData::example()],
             payment_address: vec![PaymentData::example()],
             extended_data: HashMap::default(),
         }

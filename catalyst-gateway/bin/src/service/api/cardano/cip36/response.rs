@@ -141,10 +141,8 @@ pub(crate) struct Cip36Details {
     #[oai(skip_serializing_if_is_none)]
     pub payment_address: Option<common::types::cardano::cip19_shelley_address::Cip19ShelleyAddress>,
     /// If the payment address is a script, then it can not be payed rewards.
-    #[oai(default)]
     pub is_payable: common::types::generic::boolean::BooleanFlag,
     /// If this field is set, then the registration was in CIP15 format.
-    #[oai(default)]
     pub cip15: common::types::generic::boolean::BooleanFlag,
     /// If there are errors with this registration, they are listed here.
     /// This field is *NEVER* returned for a valid registration.
