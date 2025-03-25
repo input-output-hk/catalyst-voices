@@ -452,6 +452,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     return watchAllDocuments(
       limit: limit,
       type: type,
+      unique: unique,
       getLocalDrafts: getLocalDrafts,
       authorId: authorId,
     );
