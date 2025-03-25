@@ -108,9 +108,9 @@ final class ProposalBuilderBloc
     Emitter<ProposalBuilderState> emit,
   ) async {
     try {
-      emit(state.copyWith(isChanging: true));
-
       final ref = state.metadata.documentRef! as DraftRef;
+      _logger.info('deleteProposal: $ref');
+      emit(state.copyWith(isChanging: true));
 
       // removing all versions of this proposal
       final unversionedRef = ref.copyWith(version: const Optional.empty());
@@ -132,6 +132,9 @@ final class ProposalBuilderBloc
     try {
       final documentRef = state.metadata.documentRef!;
       final proposalId = documentRef.id;
+      _logger.info('export proposal: $documentRef');
+      emit(state.copyWith(isChanging: true));
+
       final encodedProposal = await _proposalService.encodeProposalForExport(
         document: _buildDocumentData(),
       );
@@ -146,6 +149,8 @@ final class ProposalBuilderBloc
     } catch (error, stackTrace) {
       _logger.severe('Exporting proposal failed', error, stackTrace);
       emitError(const LocalizedUnknownException());
+    } finally {
+      emit(state.copyWith(isChanging: false));
     }
   }
 
@@ -354,7 +359,7 @@ final class ProposalBuilderBloc
       _logger.info('load state');
       emit(
         const ProposalBuilderState(
-          isChanging: true,
+          isLoading: true,
         ),
       );
       _documentBuilder = null;
@@ -369,7 +374,7 @@ final class ProposalBuilderBloc
       _logger.severe('load state error', error, stackTrace);
       emit(const ProposalBuilderState(error: LocalizedUnknownException()));
     } finally {
-      emit(state.copyWith(isChanging: false));
+      emit(state.copyWith(isLoading: false));
     }
   }
 
@@ -434,6 +439,7 @@ final class ProposalBuilderBloc
   ) async {
     try {
       _logger.info('Publishing proposal');
+      emit(state.copyWith(isChanging: true));
 
       final updatedRef = await _proposalService.publishProposal(
         document: _buildDocumentData(),
@@ -448,6 +454,8 @@ final class ProposalBuilderBloc
     } catch (error, stackTrace) {
       _logger.severe('PublishProposal', error, stackTrace);
       emitError(const ProposalBuilderPublishException());
+    } finally {
+      emit(state.copyWith(isChanging: false));
     }
   }
 
@@ -469,6 +477,7 @@ final class ProposalBuilderBloc
   ) async {
     try {
       _logger.info('Submitting proposal for review');
+      emit(state.copyWith(isChanging: true));
 
       switch (state.metadata.publish) {
         case ProposalPublish.localDraft:
@@ -482,6 +491,8 @@ final class ProposalBuilderBloc
     } catch (error, stackTrace) {
       _logger.severe('SubmitProposalForReview', error, stackTrace);
       emitError(const ProposalBuilderSubmitException());
+    } finally {
+      emit(state.copyWith(isChanging: false));
     }
   }
 
