@@ -4,6 +4,7 @@
 
 use std::{borrow::Cow, sync::LazyLock};
 
+use anyhow::Context;
 use catalyst_types::id_uri::IdUri;
 use ed25519_dalek::SigningKey;
 use poem_openapi::{
@@ -76,11 +77,10 @@ impl TryFrom<&str> for CatalystId {
     type Error = anyhow::Error;
 
     fn try_from(value: &str) -> Result<Self, Self::Error> {
-        let id: IdUri = match value.parse() {
-            Ok(v) => v,
-            Err(e) => anyhow::bail!("Invalid Catalyst ID: {e:?}"),
-        };
-        Ok(Self(id.as_short_id()))
+        value
+            .parse()
+            .context("Invalid Catalyst ID")
+            .map(|id: IdUri| Self(id.as_short_id()))
     }
 }
 

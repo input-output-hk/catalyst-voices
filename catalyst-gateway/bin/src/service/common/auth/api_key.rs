@@ -34,7 +34,7 @@ async fn api_checker(_req: &Request, api_key: ApiKey) -> Option<String> {
     }
 }
 
-// Check if the API Key is correctly set.
+/// Check if the API Key is correctly set.
 /// Returns an error if it is not.
 pub(crate) fn check_api_key(headers: &HeaderMap) -> Result<()> {
     if let Some(key) = headers.get(API_KEY_HEADER) {
