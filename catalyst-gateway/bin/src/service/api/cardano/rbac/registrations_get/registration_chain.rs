@@ -7,6 +7,7 @@ use poem_openapi::{types::Example, Object};
 use crate::service::{
     api::cardano::rbac::registrations_get::{
         chain_info::ChainInfo, purpose_list::PurposeList, role_data::RbacRoleData,
+        role_map::RoleMap,
     },
     common::types::{
         cardano::{catalyst_id::CatalystId, transaction_id::TxnId},
@@ -34,7 +35,7 @@ pub struct RbacRegistrationChain {
     /// A map of role number to role data.
     // This map is never empty, so there is no need to add the `skip_serializing_if_is_empty`
     // attribute.
-    roles: HashMap<u8, RbacRoleData>,
+    roles: RoleMap,
 }
 
 impl Example for RbacRegistrationChain {
@@ -44,7 +45,7 @@ impl Example for RbacRegistrationChain {
             purpose: PurposeList::example(),
             last_persistent_txn: Some(TxnId::example()),
             last_volatile_txn: Some(TxnId::example()),
-            roles: [(0, RbacRoleData::example())].into_iter().collect(),
+            roles: RoleMap::example(),
         }
     }
 }
@@ -63,7 +64,7 @@ impl RbacRegistrationChain {
             .map(UUIDv4::from)
             .collect::<Vec<_>>()
             .into();
-        let roles = role_data(info)?;
+        let roles = role_data(info)?.into();
 
         Ok(Self {
             catalyst_id,
