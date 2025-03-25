@@ -131,9 +131,7 @@ class _Opportunities extends StatelessWidget {
   Widget build(BuildContext context) {
     return MenuItemTile(
       key: const Key('MyOpportunitiesMenuItem'),
-      title: Text(
-        context.l10n.myOpportunities,
-      ),
+      title: Text(context.l10n.myOpportunities),
       leading: VoicesAssets.icons.lightBulb.buildIcon(),
       onTap: () => Navigator.pop(context, const _MyOpportunities()),
     );

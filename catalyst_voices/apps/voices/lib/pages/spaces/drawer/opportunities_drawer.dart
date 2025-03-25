@@ -26,7 +26,7 @@ class OpportunitiesDrawer extends StatelessWidget {
       ),
       child: Padding(
         padding: EdgeInsets.symmetric(
-          horizontal: 31,
+          horizontal: 32,
           vertical: 24,
         ),
         child: Column(
@@ -126,20 +126,7 @@ class _BecomeReviewerCard extends StatelessWidget with LaunchUrlMixin {
       builder: (context) => Positioned(
         left: tooltipPosition.dx,
         top: tooltipPosition.dy,
-        child: Material(
-          color: Colors.transparent,
-          child: Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: Colors.black87,
-              borderRadius: BorderRadius.circular(4),
-            ),
-            child: Text(
-              context.l10n.copied,
-              style: const TextStyle(color: Colors.white),
-            ),
-          ),
-        ),
+        child: const _CopyTooltip(),
       ),
     );
 
@@ -148,6 +135,28 @@ class _BecomeReviewerCard extends StatelessWidget with LaunchUrlMixin {
     Future.delayed(const Duration(seconds: 1), () {
       overlayEntry.remove();
     });
+  }
+}
+
+class _CopyTooltip extends StatelessWidget {
+  const _CopyTooltip();
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: Colors.black87,
+          borderRadius: BorderRadius.circular(4),
+        ),
+        child: Text(
+          context.l10n.copied,
+          style: const TextStyle(color: Colors.white),
+        ),
+      ),
+    );
   }
 }
 
