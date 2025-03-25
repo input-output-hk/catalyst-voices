@@ -17,8 +17,9 @@ use crate::{
     settings::Settings,
 };
 
-/// A role data.
+/// A RBAC registration role data.
 #[derive(Object, Debug, Clone)]
+#[oai(example)]
 pub struct RbacRoleData {
     /// A list of role signing keys.
     #[oai(skip_serializing_if_is_empty)]

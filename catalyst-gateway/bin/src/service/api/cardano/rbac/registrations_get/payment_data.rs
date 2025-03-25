@@ -11,6 +11,7 @@ use crate::service::common::types::{
 
 /// A role payment address information.
 #[derive(Object, Debug, Clone)]
+#[oai(example)]
 pub struct PaymentData {
     /// Indicates if the data is persistent or volatile.
     is_persistent: BooleanFlag,

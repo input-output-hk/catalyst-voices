@@ -25,6 +25,7 @@ use crate::service::common::types::generic::{
 /// Only one of the `pub_key`, `x509_cert` and `c509_cert` fields can be present at the
 /// same time.
 #[derive(Object, Debug, Clone)]
+#[oai(example)]
 pub struct KeyData {
     /// Indicates if the data is persistent or volatile.
     is_persistent: BooleanFlag,

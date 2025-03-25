@@ -18,7 +18,7 @@ use crate::service::{
 ///
 /// A unified data of multiple RBAC registrations.
 #[derive(Object, Debug, Clone)]
-#[oai(example = true)]
+#[oai(example)]
 pub struct RbacRegistrationChain {
     /// A Catalyst ID.
     catalyst_id: CatalystId,
