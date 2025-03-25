@@ -78,6 +78,7 @@ class _DeleteKeychainDialogState extends State<DeleteKeychainDialog> {
                 SizedBox(
                   width: 300,
                   child: VoicesTextField(
+                    key: const Key('DeleteKeychainTextField'),
                     controller: _textEditingController,
                     onFieldSubmitted: _removeKeychain,
                     decoration: VoicesTextFieldDecoration(
@@ -97,6 +98,7 @@ class _DeleteKeychainDialogState extends State<DeleteKeychainDialog> {
             Wrap(
               children: [
                 VoicesFilledButton(
+                  key: const Key('DeleteKeychainContinueButton'),
                   backgroundColor: Theme.of(context).colors.iconsError,
                   onTap: _removeKeychain,
                   child: Text(context.l10n.continueText),

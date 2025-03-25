@@ -52,12 +52,12 @@ class _TreasuryPageState extends State<TreasuryPage> {
   Widget build(BuildContext context) {
     return SegmentsControllerScope(
       controller: _segmentsController,
-      child: SpaceScaffold(
-        left: const TreasuryNavigationPanel(),
+      child: SidebarScaffold(
+        leftRail: const TreasuryNavigationPanel(),
         body: TreasuryBody(
           itemScrollController: _bodyItemScrollController,
         ),
-        right: const TreasuryDetailsPanel(),
+        rightRail: const TreasuryDetailsPanel(),
       ),
     );
   }

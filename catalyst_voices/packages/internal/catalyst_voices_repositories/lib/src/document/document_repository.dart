@@ -7,6 +7,7 @@ import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/document_data_dto.dart';
 import 'package:catalyst_voices_repositories/src/dto/document_data_with_ref_dat.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:synchronized/synchronized.dart';
@@ -189,16 +190,33 @@ final class DocumentRepositoryImpl implements DocumentRepository {
 
   @override
   Future<List<SignedDocumentRef>> getAllDocumentsRefs() async {
-    final remoteRefs = await _remoteDocuments.index();
+    final allRefs = await _remoteDocuments.index();
+    final allConstRefs = categoriesTemplatesRefs.all;
 
-    return {
+    final nonConstRefs = allRefs
+        .where((ref) => allConstRefs.none((e) => e.id == ref.id))
+        .toList();
+
+    final exactRefs = nonConstRefs.where((ref) => ref.isExact).toList();
+    final looseRefs = nonConstRefs.where((ref) => !ref.isExact).toList();
+
+    final latestLooseRefs = await looseRefs.map((ref) async {
+      final latestVer = await _remoteDocuments.getLatestVersion(ref.id);
+      return ref.copyWith(version: Optional(latestVer));
+    }).wait;
+
+    final allLatestRefs = [
+      ...exactRefs,
+      ...latestLooseRefs,
+    ];
+
+    final uniqueRefs = {
       // Note. categories are mocked on backend so we can't not fetch them.
       ...categoriesTemplatesRefs.expand((e) => [e.proposal, e.comment]),
-      ...remoteRefs,
-    }
-        .toList()
-        // TODO(damian-molinski): delete it after parsing it ready.
-        .sublist(0, 1);
+      ...allLatestRefs,
+    };
+
+    return uniqueRefs.toList();
   }
 
   @override
@@ -407,9 +425,6 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   Stream<DocumentsDataWithRefData> watchDocument({
     required DocumentRef ref,
   }) {
-    // TODO(damian-molinski): remove this override once we have API
-    ref = ref.copyWith(id: mockedDocumentUuid);
-
     return watchDocumentWithRef(
       ref: ref,
       refGetter: (data) => data.metadata.template!,
@@ -437,6 +452,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     return watchAllDocuments(
       limit: limit,
       type: type,
+      unique: unique,
       getLocalDrafts: getLocalDrafts,
       authorId: authorId,
     );

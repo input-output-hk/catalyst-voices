@@ -4,6 +4,7 @@ import 'package:catalyst_voices/common/error_handler.dart';
 import 'package:catalyst_voices/common/signal_handler.dart';
 import 'package:catalyst_voices/pages/proposal_builder/appbar/proposal_builder_back_action.dart';
 import 'package:catalyst_voices/pages/proposal_builder/appbar/proposal_builder_status_action.dart';
+import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_changing.dart';
 import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_error.dart';
 import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_loading.dart';
 import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_navigation_panel.dart';
@@ -11,6 +12,8 @@ import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_segments
 import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_setup_panel.dart';
 import 'package:catalyst_voices/pages/spaces/appbar/session_state_header.dart';
 import 'package:catalyst_voices/routes/routing/spaces_route.dart';
+import 'package:catalyst_voices/widgets/modals/proposals/publish_proposal_error_dialog.dart';
+import 'package:catalyst_voices/widgets/modals/proposals/submit_proposal_error_dialog.dart';
 import 'package:catalyst_voices/widgets/snackbar/voices_snackbar.dart';
 import 'package:catalyst_voices/widgets/snackbar/voices_snackbar_action.dart';
 import 'package:catalyst_voices/widgets/snackbar/voices_snackbar_type.dart';
@@ -75,24 +78,27 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: const VoicesAppBar(
-        automaticallyImplyLeading: false,
-        actions: [
-          ProposalBuilderBackAction(),
-          ProposalBuilderStatusAction(),
-          SessionStateHeader(),
-        ],
-      ),
-      body: SegmentsControllerScope(
-        controller: _segmentsController,
-        child: SpaceScaffold(
-          left: const ProposalBuilderNavigationPanel(),
-          body: _ProposalBuilderContent(
-            controller: _segmentsScrollController,
-            onRetryTap: _updateSource,
+    return ProposalBuilderChangingOverlay(
+      child: Scaffold(
+        appBar: const VoicesAppBar(
+          automaticallyImplyLeading: false,
+          actions: [
+            ProposalBuilderBackAction(),
+            ProposalBuilderStatusAction(),
+            SessionStateHeader(),
+          ],
+        ),
+        body: SegmentsControllerScope(
+          controller: _segmentsController,
+          child: SidebarScaffold(
+            leftRail: const ProposalBuilderNavigationPanel(),
+            body: _ProposalBuilderContent(
+              controller: _segmentsScrollController,
+              onRetryTap: _updateSource,
+            ),
+            bodyConstraints: const BoxConstraints.expand(),
+            rightRail: const ProposalBuilderSetupPanel(),
           ),
-          right: const ProposalBuilderSetupPanel(),
         ),
       ),
     );
@@ -120,10 +126,15 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
 
   @override
   void handleError(Object error) {
-    if (error is ProposalBuilderValidationException) {
-      _showValidationErrorSnackbar(error);
-    } else {
-      super.handleError(error);
+    switch (error) {
+      case ProposalBuilderValidationException():
+        _showValidationErrorSnackbar(error);
+      case ProposalBuilderPublishException():
+        unawaited(_showPublishException(error));
+      case ProposalBuilderSubmitException():
+        unawaited(_showSubmitException(error));
+      default:
+        super.handleError(error);
     }
   }
 
@@ -132,6 +143,9 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
     switch (signal) {
       case DeletedProposalBuilderSignal():
         _onProposalDeleted();
+      case PublishedProposalBuilderSignal():
+      case SubmittedProposalBuilderSignal():
+        const WorkspaceRoute().go(context);
     }
   }
 
@@ -169,6 +183,20 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
     Router.neglect(context, () {
       const WorkspaceRoute().replace(context);
     });
+  }
+
+  Future<void> _showPublishException(ProposalBuilderPublishException error) {
+    return PublishProposalErrorDialog.show(
+      context: context,
+      exception: error,
+    );
+  }
+
+  Future<void> _showSubmitException(ProposalBuilderSubmitException error) {
+    return SubmitProposalErrorDialog.show(
+      context: context,
+      exception: error,
+    );
   }
 
   void _showValidationErrorSnackbar(ProposalBuilderValidationException error) {

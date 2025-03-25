@@ -23,7 +23,7 @@ check-code:
 
 # Runs unit tests
 test-code:
-    earthly +test-unit
+    earthly +test-unit-native
 
 # Pre Push Checks
 pre-push: check-code

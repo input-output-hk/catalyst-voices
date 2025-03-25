@@ -3,7 +3,7 @@ import 'package:catalyst_voices/widgets/modals/voices_dialog.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:flutter/material.dart';
 
-/// Opinionated, two panels, dialog that is tailored for desktop
+/// Opinionated, single panel, dialog that is tailored for desktop
 /// form factors.
 ///
 /// Uses [VoicesTwoPaneDialog] for base structure.
