@@ -448,8 +448,9 @@ void main() {
 
     group('count', () {
       test('document returns expected number', () async {
-        final dateTime = DateTimeExt.now();
         // Given
+        final dateTime = DateTimeExt.now();
+
         final documentsWithMetadata = List<DocumentEntityWithMetadata>.generate(
           20,
           (index) => DocumentWithMetadataFactory.build(
