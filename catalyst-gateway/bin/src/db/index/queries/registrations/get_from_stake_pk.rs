@@ -23,7 +23,7 @@ const GET_REGISTRATIONS_FROM_STAKE_PK_QUERY: &str =
 /// Get registration
 #[derive(SerializeRow)]
 pub(crate) struct GetRegistrationParams {
-    /// Stake address.
+    /// Stake public key.
     stake_public_key: Vec<u8>,
     /// Block Slot Number.
     slot_no: DbSlot,

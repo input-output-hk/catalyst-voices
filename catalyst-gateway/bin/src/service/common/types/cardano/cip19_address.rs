@@ -36,9 +36,10 @@ pub(crate) const STAKE_PROD: &str = "stake";
 pub(crate) const STAKE_TEST: &str = "stake_test";
 /// Bech32 Match Pattern
 const BECH32: &str = "[a,c-h,j-n,p-z,0,2-9]";
-/// Length of the encoded address (for type 0 - 3).
+/// Length of the encoded address that have 2 parts (for Shelley address type 0 - 3).
 const ENCODED_STAKED_ADDR_LEN: usize = 98;
-/// Length of the encoded address (for type 6 - 7).
+/// Length of the encoded address that have 1 part (for Shelley address type 6 - 7, and
+/// stake address).
 const ENCODED_UNSTAKED_ADDR_LEN: usize = 53;
 /// Regex Pattern
 const PATTERN: &str = concatcp!(

@@ -18,7 +18,7 @@ use crate::db::{
 
 /// Get invalid registrations from stake public key query.
 const GET_INVALID_REGISTRATIONS_FROM_STAKE_PK_QUERY: &str =
-    include_str!("../cql/get_invalid_registration_w_stake_pk.cql");
+    include_str!("../cql/get_invalid_registrations_w_stake_pk.cql");
 
 /// Get registration
 #[derive(SerializeRow)]

@@ -33,7 +33,7 @@ use crate::{
 };
 
 /// Get registrations given a stake address, it can be time specific based on asat param,
-/// or the latest registration returned if no asat given.
+/// or the all registrations returned if no asat given.
 pub(crate) async fn get_registrations_given_stake_addr(
     stake_address: StakeAddress, session: Arc<CassandraSession>, asat: Option<SlotNo>, page: Page,
     limit: Limit, invalid: bool,
