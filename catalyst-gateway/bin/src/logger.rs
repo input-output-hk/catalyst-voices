@@ -126,13 +126,10 @@ pub(crate) fn init(log_level: LogLevel) {
 pub(crate) fn modify_logger_level(level: LogLevel) {
     if let Some(logger_handle) = LOGGER_HANDLE.get() {
         if let Err(error) = logger_handle.modify(|f| *f = LevelFilter::from_level(level.into())) {
-            error!("Failed to modify log level to {:?} : {}", level, error);
+            error!("Failed to modify log level to {level:?} : {error}");
         }
     } else {
         // This should never happen.
-        error!(
-            "Failed to modify log level to {:?} : Logger handle not available.",
-            level
-        );
+        error!("Failed to modify log level to {level:?} : Logger handle not available.",);
     }
 }
