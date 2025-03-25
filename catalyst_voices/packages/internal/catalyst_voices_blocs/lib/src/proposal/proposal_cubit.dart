@@ -350,7 +350,12 @@ final class ProposalCubit extends Cubit<ProposalState>
       ),
     );
 
-    final proposalSegments = mapDocumentToSegments(proposal.document.document);
+    final proposalSegments = mapDocumentToSegments(
+      proposal.document.document,
+      filterOut: [
+        ProposalDocument.categoryNodeId,
+      ],
+    );
 
     final canReply = !isDraftProposal && hasActiveAccount;
     final canComment = canReply && commentSchema != null;
