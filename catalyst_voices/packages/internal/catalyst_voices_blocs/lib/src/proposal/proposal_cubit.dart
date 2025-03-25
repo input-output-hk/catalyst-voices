@@ -347,7 +347,8 @@ final class ProposalCubit extends Cubit<ProposalState>
 
     final proposalSegments = mapDocumentToSegments(proposal.document.document);
 
-    final canComment = !isDraftProposal && hasActiveAccount;
+    final canReply = !isDraftProposal && hasActiveAccount;
+    final canComment = canReply && commentSchema != null;
     final commentsSegment = ProposalCommentsSegment(
       id: const NodeId('comments'),
       sort: commentsSort,
@@ -355,9 +356,9 @@ final class ProposalCubit extends Cubit<ProposalState>
         ViewCommentsSection(
           id: const NodeId('comments.view'),
           comments: commentsSort.applyTo(comments),
-          canReply: canComment,
+          canReply: canReply,
         ),
-        if (canComment && commentSchema != null)
+        if (canReply && commentSchema != null)
           AddCommentSection(
             id: const NodeId('comments.add'),
             schema: commentSchema,
@@ -368,7 +369,7 @@ final class ProposalCubit extends Cubit<ProposalState>
     return [
       overviewSegment,
       ...proposalSegments,
-      commentsSegment,
+      if (canComment || comments.isNotEmpty) commentsSegment,
     ];
   }
 
