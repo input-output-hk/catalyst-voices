@@ -33,6 +33,25 @@ class ProposalHeader extends StatelessWidget {
   }
 }
 
+class ProposalHeaderWrapper extends StatelessWidget {
+  final Widget child;
+
+  const ProposalHeaderWrapper({
+    super.key,
+    required this.child,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        child,
+        const ProposalHeader(),
+      ],
+    );
+  }
+}
+
 class _ProposalControls extends StatelessWidget {
   const _ProposalControls();
 
