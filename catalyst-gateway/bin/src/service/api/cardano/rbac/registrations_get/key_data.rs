@@ -15,9 +15,12 @@ use rbac_registration::{
 };
 use x509_cert::{certificate::Certificate as X509Certificate, der::Encode as _};
 
-use crate::service::common::types::generic::{
-    boolean::BooleanFlag, date_time::DateTime as ServiceDateTime,
-    ed25519_public_key::Ed25519HexEncodedPublicKey,
+use crate::service::{
+    common::types::generic::{
+        boolean::BooleanFlag, date_time::DateTime as ServiceDateTime,
+        ed25519_public_key::Ed25519HexEncodedPublicKey,
+    },
+    utilities::as_hex_string,
 };
 
 /// A role data key information.
@@ -31,10 +34,10 @@ pub struct KeyData {
     is_persistent: BooleanFlag,
     /// A time when the address was added.
     time: ServiceDateTime,
-    /// A binary encoded X509 certificate.
-    x509_cert: Option<Vec<u8>>,
-    /// A binary encoded C509 certificate.
-    c509_cert: Option<Vec<u8>>,
+    /// A hex encoded X509 certificate.
+    x509_cert: Option<String>,
+    /// A hex encoded C509 certificate.
+    c509_cert: Option<String>,
     /// An ed25519 public key.
     pub_key: Option<Ed25519HexEncodedPublicKey>,
 }
@@ -85,10 +88,10 @@ impl Example for KeyData {
     }
 }
 
-/// Finds a X509 certificate with given offset and point and binary encodes it.
+/// Finds a X509 certificate with given offset and point and hex encodes it.
 fn encode_x509(
     certs: &HashMap<usize, Vec<PointData<Option<X509Certificate>>>>, offset: usize, point: &Point,
-) -> anyhow::Result<Option<Vec<u8>>> {
+) -> anyhow::Result<Option<String>> {
     certs
         .get(&offset)
         .with_context(|| format!("Invalid X509 certificate offset: {offset:?}"))?
@@ -97,14 +100,18 @@ fn encode_x509(
         .with_context(|| format!("Unable to find X509 certificate for the given point {point}"))?
         .data()
         .as_ref()
-        .map(|cert| cert.to_der().context("Failed to encode X509 certificate"))
+        .map(|cert| {
+            cert.to_der()
+                .context("Failed to encode X509 certificate")
+                .map(|c| as_hex_string(&c))
+        })
         .transpose()
 }
 
-/// Finds a C509 certificate with given offset and point and binary encodes it.
+/// Finds a C509 certificate with given offset and point and hex encodes it.
 fn encode_c509(
     certs: &HashMap<usize, Vec<PointData<Option<C509>>>>, offset: usize, point: &Point,
-) -> anyhow::Result<Option<Vec<u8>>> {
+) -> anyhow::Result<Option<String>> {
     certs
         .get(&offset)
         .with_context(|| format!("Invalid C509 certificate offset: {offset:?}"))?
@@ -118,7 +125,7 @@ fn encode_c509(
             let mut e = Encoder::new(&mut buffer);
             cert.encode(&mut e, &mut ())
                 .ok()
-                .map(|()| buffer)
+                .map(|()| as_hex_string(&buffer))
                 .context("Failed to encode C509 certificate")
         })
         .transpose()
