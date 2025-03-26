@@ -13,7 +13,7 @@ pub(crate) enum ChainIndexerEvent {
     /// Event triggered when the number of current synchronization tasks changes.
     SyncTasksChanged {
         /// The current number of synchronization tasks.
-        current_sync_tasks: usize,
+        current_sync_tasks: u16,
     },
     /// Event triggered when the live tip slot changes.
     LiveTipSlotChanged {

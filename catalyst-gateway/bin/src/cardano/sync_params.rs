@@ -19,9 +19,11 @@ pub(crate) struct SyncParams {
     /// The ending point of this sync.
     end: Point,
     /// The first block we successfully synced.
-    first_indexed_block: Option<Point>,
+    /// Includes also is immutable flag (True - is immutable, False - is volatile).
+    first_indexed_block: Option<(Point, bool)>,
     /// The last block we successfully synced.
-    last_indexed_block: Option<Point>,
+    /// Includes also is immutable flag (True - is immutable, False - is volatile).
+    last_indexed_block: Option<(Point, bool)>,
     /// The number of blocks we successfully synced overall.
     total_blocks_synced: u64,
     /// The number of blocks we successfully synced, in the last attempt.
@@ -46,12 +48,18 @@ impl Display for SyncParams {
 
         write!(f, "start: {}, end: {}", self.start, self.end)?;
 
-        if let Some(first) = self.first_indexed_block.as_ref() {
-            write!(f, ", first_indexed_block: {first}",)?;
+        if let Some((point, is_immutable)) = self.first_indexed_block.as_ref() {
+            write!(
+                f,
+                ", first_indexed_block {{ point: {point}, is_immutable: {is_immutable} }}",
+            )?;
         }
 
-        if let Some(last) = self.last_indexed_block.as_ref() {
-            write!(f, ", last_indexed_block: {last}",)?;
+        if let Some((point, is_immutable)) = self.last_indexed_block.as_ref() {
+            write!(
+                f,
+                ", last_indexed_block {{ point: {point}, is_immutable: {is_immutable} }}",
+            )?;
         }
 
         if self.retries > 0 {
@@ -155,9 +163,9 @@ impl SyncParams {
 
     /// During indexing block updating corresponding sync parameters
     pub(crate) fn update_block_state(&mut self, block: &MultiEraBlock) {
-        self.last_indexed_block = Some(block.point());
+        self.last_indexed_block = Some((block.point(), block.is_immutable()));
         if self.first_indexed_block.is_none() {
-            self.first_indexed_block = Some(block.point());
+            self.first_indexed_block = Some((block.point(), block.is_immutable()));
         }
         self.last_blocks_synced = self.last_blocks_synced.saturating_add(1);
     }
@@ -174,7 +182,7 @@ impl SyncParams {
 
     /// Returns the last block we successfully synced.
     pub(crate) fn last_indexed_block(&self) -> Option<&Point> {
-        self.last_indexed_block.as_ref()
+        self.last_indexed_block.as_ref().map(|(point, _)| point)
     }
 
     /// Returns if the sync completed without error or not.
@@ -196,7 +204,7 @@ impl SyncParams {
     pub(crate) fn actual_start(&self) -> Point {
         self.last_indexed_block
             .as_ref()
-            .unwrap_or(&self.start)
+            .map_or(&self.start, |(point, _)| point)
             .clone()
     }
 

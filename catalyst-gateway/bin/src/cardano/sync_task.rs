@@ -152,7 +152,7 @@ impl SyncTask {
         // Nothing to do if the start_slot is not less than the end of the immutable chain.
         if self.start_slot < self.immutable_tip_slot {
             // We will start at most the number of configured sync tasks.
-            while self.sync_tasks.len() < self.cfg.sync_tasks {
+            while self.sync_tasks.len() < usize::from(self.cfg.sync_tasks) {
                 let end_slot = self.immutable_tip_slot.min(
                     (u64::from(self.start_slot).saturating_add(self.cfg.sync_chunk_max_slots))
                         .into(),
@@ -167,7 +167,18 @@ impl SyncTask {
                     ));
                     started = true;
                     self.dispatch_event(ChainIndexerEvent::SyncTasksChanged {
-                        current_sync_tasks: self.sync_tasks.len(),
+                        current_sync_tasks: self
+                            .sync_tasks
+                            .len()
+                            .try_into()
+                            .inspect(|_| {
+                                error!(
+                                    sync_tasks = self.sync_tasks.len(),
+                                    max_sync_tasks = self.cfg.sync_tasks,
+                                    "Follower sync tasks amount overflow."
+                                );
+                            })
+                            .unwrap_or(self.cfg.sync_tasks),
                     });
                 }
 
@@ -186,11 +197,27 @@ impl SyncTask {
     /// Try to start only one live chain follower.
     /// Returns `true` if task was started, `false` otherwise.
     fn try_start_live_chain_follower(&mut self) -> bool {
-        if self.sync_tasks.len() < self.cfg.sync_tasks {
+        if self.sync_tasks.len() < usize::from(self.cfg.sync_tasks) {
             self.sync_tasks.push(sync_subchain(
                 SyncParams::new_live(self.cfg.chain, Point::fuzzy(self.immutable_tip_slot)),
                 self.event_channel.0.clone(),
             ));
+
+            self.dispatch_event(ChainIndexerEvent::SyncTasksChanged {
+                current_sync_tasks: self
+                    .sync_tasks
+                    .len()
+                    .try_into()
+                    .inspect(|_| {
+                        error!(
+                            sync_tasks = self.sync_tasks.len(),
+                            max_sync_tasks = self.cfg.sync_tasks,
+                            "Follower sync tasks amount overflow."
+                        );
+                    })
+                    .unwrap_or(self.cfg.sync_tasks),
+            });
+
             return true;
         }
         false
@@ -259,7 +286,18 @@ impl SyncTask {
                 });
             });
             self.dispatch_event(ChainIndexerEvent::SyncTasksChanged {
-                current_sync_tasks: self.sync_tasks.len(),
+                current_sync_tasks: self
+                    .sync_tasks
+                    .len()
+                    .try_into()
+                    .inspect(|_| {
+                        error!(
+                            sync_tasks = self.sync_tasks.len(),
+                            max_sync_tasks = self.cfg.sync_tasks,
+                            "Follower sync tasks amount overflow."
+                        );
+                    })
+                    .unwrap_or(self.cfg.sync_tasks),
             });
 
             // If we need more immutable chain followers to sync the block
