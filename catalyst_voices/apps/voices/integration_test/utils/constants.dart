@@ -7,3 +7,12 @@ enum Time {
 
   const Time(this.duration);
 }
+
+class Urls {
+  static String tos =
+      'https://docs.projectcatalyst.io/current-fund/fund-basics/project-catalyst-terms-and-conditions';
+  static String privacyPolicy =
+      'https://docs.projectcatalyst.io/current-fund/fund-basics/project-catalyst-terms-and-conditions/catalyst-fc-privacy-policy';
+  static String supportedWallets =
+      'https://docs.projectcatalyst.io/current-fund/voter-registration/supported-wallets';
+}

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:patrol_finders/patrol_finders.dart';
 
-import '../utils/mock_url_launcher_platform.dart';
+import '../utils/selector_utils.dart';
 import '../utils/translations_utils.dart';
 import 'app_bar_page.dart';
 import 'common_page.dart';
@@ -379,16 +379,13 @@ class ProposalsPage {
         .$(itemTitle)
         .text;
     if (linkTitleText!.contains((await t()).copyLink) == false) {
-      final mockUrlLauncherPlatform = MockUrlLauncherPlatform();
       final linkPartialTextToMatch =
           'https://${linkTitleText.split(' ').last.toLowerCase()}.com';
-      await $(shareProposalDialog).$(shareItem).at(proposalNumber).tap();
-      expect(
-        mockUrlLauncherPlatform.capturedUrl.startsWith(linkPartialTextToMatch),
-        true,
-        reason: 'Link URL does not match the expected URL',
+      await SelectorUtils.checkOpeningLinkByMocking(
+        $,
+        linkTitleText,
+        linkPartialTextToMatch,
       );
-      mockUrlLauncherPlatform.tearDownMock();
     }
   }
 
