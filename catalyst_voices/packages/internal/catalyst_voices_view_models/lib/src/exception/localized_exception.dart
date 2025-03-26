@@ -12,10 +12,11 @@ abstract base class LocalizedException
 
   factory LocalizedException.create(
     Object error, {
-    required ValueGetter<LocalizedException> fallback,
+    ValueGetter<LocalizedException> fallback = LocalizedUnknownException.new,
   }) {
     if (error is LocalizedException) return error;
     if (error is ApiException) return LocalizedApiException.from(error);
+    if (error is NotFoundException) return const LocalizedNotFoundException();
 
     return fallback();
   }

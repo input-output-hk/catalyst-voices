@@ -102,12 +102,7 @@ final class ProposalCubit extends Cubit<ProposalState>
         isFavorite: const Optional.empty(),
       );
 
-      final localizedException = LocalizedException.create(
-        error,
-        fallback: LocalizedUnknownException.new,
-      );
-
-      emit(ProposalState(error: localizedException));
+      emit(ProposalState(error: LocalizedException.create(error)));
     } finally {
       if (!isClosed) {
         emit(state.copyWith(isLoading: false));
