@@ -86,7 +86,7 @@ final class DocumentsCommentRepository implements CommentRepository {
   Future<void> saveComment({
     required DocumentData document,
   }) async {
-    await _documentRepository.insertDocument(document: document);
+    await _documentRepository.upsertDocument(document: document);
   }
 
   @override

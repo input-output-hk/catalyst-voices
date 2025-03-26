@@ -260,7 +260,7 @@ void main() {
         );
 
         // When
-        await repository.insertDocument(document: documentDataToSave);
+        await repository.upsertDocument(document: documentDataToSave);
 
         // Then
         final savedDocumentData = await repository.getDocumentData(
@@ -442,7 +442,7 @@ void main() {
       await draftsSource.save(data: draftData);
 
       // Then
-      await repository.insertDocument(document: updatedData);
+      await repository.upsertDocument(document: updatedData);
 
       final draftStream = repository.watchDocumentWithRef(
         ref: draftRef,

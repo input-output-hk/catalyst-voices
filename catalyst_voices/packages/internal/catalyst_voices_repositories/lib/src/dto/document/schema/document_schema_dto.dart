@@ -5,31 +5,6 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'document_schema_dto.g.dart';
 
-Map<String, dynamic> _adaptJson(Map<String, dynamic> source) {
-  final adapted = Map.of(source);
-
-  // 1.
-  if (adapted.containsKey('properties')) {
-    final properties = adapted['properties'];
-
-    // 2.
-    if (properties is Map<String, dynamic>) {
-      // 3.
-      if (properties.containsKey(r'$schema')) {
-        final schemaObject = properties[r'$schema'];
-
-        // 4.
-        if (schemaObject is Map<String, dynamic> &&
-            schemaObject.containsKey('const')) {
-          adapted['propertiesSchema'] = schemaObject['const'];
-        }
-      }
-    }
-  }
-
-  return adapted;
-}
-
 @JsonSerializable(includeIfNull: false)
 final class DocumentSchemaDto {
   @JsonKey(name: r'$schema')
@@ -90,5 +65,30 @@ final class DocumentSchemaDto {
       properties: mappedProperties,
       order: order.map(nodeId.child).toList(),
     );
+  }
+
+  static Map<String, dynamic> _adaptJson(Map<String, dynamic> source) {
+    final adapted = Map.of(source);
+
+    // 1.
+    if (adapted.containsKey('properties')) {
+      final properties = adapted['properties'];
+
+      // 2.
+      if (properties is Map<String, dynamic>) {
+        // 3.
+        if (properties.containsKey(r'$schema')) {
+          final schemaObject = properties[r'$schema'];
+
+          // 4.
+          if (schemaObject is Map<String, dynamic> &&
+              schemaObject.containsKey('const')) {
+            adapted['propertiesSchema'] = schemaObject['const'];
+          }
+        }
+      }
+    }
+
+    return adapted;
   }
 }
