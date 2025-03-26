@@ -77,7 +77,7 @@ final class ProposalDocument extends Equatable {
 
     final value = property.value;
     if (value == null) return null;
-    return Coin(value);
+    return Coin.fromWholeAda(value);
   }
 
   int? get milestoneCount {
