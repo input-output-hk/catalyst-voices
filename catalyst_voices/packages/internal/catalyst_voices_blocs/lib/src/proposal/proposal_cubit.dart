@@ -21,6 +21,7 @@ final class ProposalCubit extends Cubit<ProposalState>
   final UserService _userService;
   final ProposalService _proposalService;
   final CommentService _commentService;
+  final CampaignService _campaignService;
   final DocumentMapper _documentMapper;
 
   ProposalCubitCache _cache = const ProposalCubitCache();
@@ -32,6 +33,7 @@ final class ProposalCubit extends Cubit<ProposalState>
     this._userService,
     this._proposalService,
     this._commentService,
+    this._campaignService,
     this._documentMapper,
   ) : super(const ProposalState()) {
     _cache = _cache.copyWith(
@@ -63,6 +65,7 @@ final class ProposalCubit extends Cubit<ProposalState>
       emit(state.copyWith(isLoading: true));
 
       final proposal = await _proposalService.getProposal(ref: ref);
+      final category = await _campaignService.getCategory(proposal.categoryId);
       final commentTemplate = await _commentService.getCommentTemplateFor(
         category: proposal.categoryId,
       );
@@ -71,6 +74,7 @@ final class ProposalCubit extends Cubit<ProposalState>
 
       _cache = _cache.copyWith(
         proposal: Optional(proposal),
+        category: Optional(category),
         commentTemplate: Optional(commentTemplate),
         comments: const Optional([]),
         isFavorite: Optional(isFavorite),
@@ -248,6 +252,7 @@ final class ProposalCubit extends Cubit<ProposalState>
   ProposalViewData _buildProposalViewData({
     required bool hasActiveAccount,
     required ProposalData? proposal,
+    required CampaignCategory? category,
     required List<CommentWithReplies> comments,
     required DocumentSchema? commentSchema,
     required ProposalCommentsSort commentsSort,
@@ -256,7 +261,6 @@ final class ProposalCubit extends Cubit<ProposalState>
     final proposalDocument = proposal?.document;
     final proposalDocumentRef = proposalDocument?.metadata.selfRef;
 
-    /* cSpell:disable */
     final proposalVersions = proposal?.versions ?? const [];
     final versions = proposalVersions.mapIndexed((index, version) {
       final ver = version.document.metadata.selfRef.version;
@@ -273,6 +277,7 @@ final class ProposalCubit extends Cubit<ProposalState>
     final segments = proposal != null
         ? _buildSegments(
             proposal: proposal,
+            category: category,
             version: currentVersion,
             comments: comments,
             commentSchema: commentSchema,
@@ -281,57 +286,58 @@ final class ProposalCubit extends Cubit<ProposalState>
           )
         : const <Segment>[];
 
+    final header = ProposalViewHeader(
+      title: proposalDocument?.title ?? '',
+      authorDisplayName: proposalDocument?.authorName ?? '',
+      createdAt: proposalDocumentRef?.version?.tryDateTime,
+      commentsCount: comments.length,
+      versions: versions,
+      isFavorite: isFavorite,
+    );
+
     return ProposalViewData(
       isCurrentVersionLatest: currentVersion?.isLatest,
-      header: ProposalViewHeader(
-        title: 'Project Mayhem: Freedom by Chaos',
-        authorDisplayName: 'Tyler Durden',
-        createdAt: DateTime.timestamp(),
-        commentsCount: comments.length,
-        versions: versions,
-        isFavorite: isFavorite,
-      ),
+      header: header,
       segments: segments,
       commentsSort: commentsSort,
     );
-    /* cSpell:enable */
   }
 
-  /* cSpell:disable */
   List<Segment> _buildSegments({
     required ProposalData proposal,
+    required CampaignCategory? category,
     required DocumentVersion? version,
     required List<CommentWithReplies> comments,
     required DocumentSchema? commentSchema,
     required ProposalCommentsSort commentsSort,
     required bool hasActiveAccount,
   }) {
-    final isDraftProposal = proposal.document.metadata.selfRef is DraftRef;
+    final document = proposal.document;
+    final isDraftProposal = document.metadata.selfRef is DraftRef;
 
     final overviewSegment = ProposalOverviewSegment.build(
-      categoryName: 'Cardano Partners: Growth & Acceleration',
-      proposalTitle: 'Project Mayhem: Freedom by Chaos',
+      categoryName: category?.categoryName ?? '',
+      proposalTitle: document.title ?? '',
       data: ProposalViewMetadata(
         author: Profile(catalystId: DummyCatalystIdFactory.create()),
-        description: 'Project Mayhem is a disruptive initiative to dismantle '
-            'societal hierarchies through acts of controlled chaos. '
-            'By targeting oppressive systems like credit structures and '
-            'consumerist propaganda, we empower individuals to reclaim their '
-            'agency. This ?decentralised movement fosters self-replication, '
-            'inspiring global action for liberation and a return to human '
-            'authenticity.',
+        description: document.description,
         status: ProposalStatus.draft,
         createdAt: version?.id.tryDateTime ?? DateTime.now(),
         warningCreatedAt: version?.isLatest == false,
-        tag: 'Community Outreach',
+        tag: document.tag,
         commentsCount: comments.length,
-        fundsRequested: 200000,
-        projectDuration: 12,
-        milestoneCount: 3,
+        fundsRequested: document.fundsRequested,
+        projectDuration: document.duration,
+        milestoneCount: document.milestoneCount,
       ),
     );
 
-    final proposalSegments = mapDocumentToSegments(proposal.document.document);
+    final proposalSegments = mapDocumentToSegments(
+      document.document,
+      filterOut: [
+        ProposalDocument.categoryNodeId,
+      ],
+    );
 
     final canReply = !isDraftProposal && hasActiveAccount;
     final canComment = canReply && commentSchema != null;
@@ -372,10 +378,9 @@ final class ProposalCubit extends Cubit<ProposalState>
     emit(state.copyWith(data: _rebuildProposalState()));
   }
 
-  /* cSpell:enable */
-
   ProposalViewData _rebuildProposalState() {
     final proposal = _cache.proposal;
+    final category = _cache.category;
     final commentTemplate = _cache.commentTemplate;
     final comments = _cache.comments ?? const [];
     final commentsSort = state.data.commentsSort;
@@ -385,6 +390,7 @@ final class ProposalCubit extends Cubit<ProposalState>
     return _buildProposalViewData(
       hasActiveAccount: activeAccountId != null,
       proposal: proposal,
+      category: category,
       comments: comments,
       commentSchema: commentTemplate?.schema,
       commentsSort: commentsSort,

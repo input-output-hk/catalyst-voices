@@ -56,24 +56,23 @@ final class Proposal extends Equatable {
   }
 
   factory Proposal.fromData(ProposalData data) {
-    final updateDate = data.document.metadata.selfRef.version!.dateTime;
+    final document = data.document;
+    final updateDate = document.metadata.selfRef.version!.dateTime;
 
     final versions = data.versions.map(ProposalVersion.fromData).toList()
       ..sort();
 
     return Proposal._(
-      selfRef: data.document.metadata.selfRef,
-      title: BaseProposalData.getProposalTitle(data.document) ?? '',
-      description: BaseProposalData.getProposalDescription(data.document) ?? '',
+      selfRef: document.metadata.selfRef,
+      title: document.title ?? '',
+      description: document.description ?? '',
       updateDate: updateDate,
-      fundsRequested:
-          BaseProposalData.getProposalFundsRequested(data.document) ??
-              const Coin.fromWholeAda(0),
+      fundsRequested: document.fundsRequested ?? const Coin.fromWholeAda(0),
       status: ProposalStatus.inProgress,
       // TODO(LynxLynxx): from where we need to get the real publish
       publish: ProposalPublish.localDraft,
-      duration: BaseProposalData.getProposalDuration(data.document) ?? 0,
-      author: BaseProposalData.getProposalAuthor(data.document) ?? '',
+      duration: document.duration ?? 0,
+      author: document.authorName ?? '',
       commentsCount: data.commentsCount,
       categoryId: data.categoryId,
       category: data.categoryName,
