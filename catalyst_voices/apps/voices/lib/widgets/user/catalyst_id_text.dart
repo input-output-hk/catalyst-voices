@@ -82,7 +82,8 @@ class _CatalystIdTextState extends State<CatalystIdText> {
 
     if (widget.data != oldWidget.data ||
         widget.isCompact != oldWidget.isCompact) {
-      _fullDataAsString = widget.data.toUri().toStringWithoutScheme();
+      final id = widget.data;
+      _fullDataAsString = id.toSignificant().toUri().toStringWithoutScheme();
       _effectiveData = _buildTextData();
       _tooltipVisible = _isTooltipVisible();
     }
@@ -100,7 +101,8 @@ class _CatalystIdTextState extends State<CatalystIdText> {
   void initState() {
     super.initState();
 
-    _fullDataAsString = widget.data.toUri().toStringWithoutScheme();
+    final id = widget.data;
+    _fullDataAsString = id.toSignificant().toUri().toStringWithoutScheme();
     _effectiveData = _buildTextData();
     _tooltipVisible = _isTooltipVisible();
   }
