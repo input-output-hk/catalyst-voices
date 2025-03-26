@@ -16,7 +16,6 @@ export 'document/document_property_value_read_item.dart';
 export 'document/document_segment.dart';
 export 'document/document_version.dart';
 export 'document/validation/localized_document_validation_result.dart';
-export 'exception/exception_mapper.dart';
 export 'exception/localized_exception.dart';
 export 'exception/localized_not_found_exception.dart';
 export 'exception/localized_unknown_exception.dart';

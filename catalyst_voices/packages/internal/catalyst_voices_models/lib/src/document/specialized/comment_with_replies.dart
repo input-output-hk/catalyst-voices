@@ -30,7 +30,7 @@ final class CommentWithReplies extends Equatable {
     return CommentWithReplies(
       comment: comment,
       replies: replies,
-      depth: 1,
+      depth: depth,
     );
   }
 

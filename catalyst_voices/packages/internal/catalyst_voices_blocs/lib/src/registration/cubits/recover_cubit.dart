@@ -144,7 +144,7 @@ final class RecoverCubit extends Cubit<RecoverStateData>
 
       _recoveredAccount = null;
 
-      const exception = LocalizedUnknownException();
+      final exception = LocalizedException.create(error);
       emit(state.copyWith(accountDetails: Optional(Failure(exception))));
 
       return false;
