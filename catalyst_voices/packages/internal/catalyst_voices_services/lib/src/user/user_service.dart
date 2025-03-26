@@ -14,17 +14,19 @@ abstract interface class UserService implements ActiveAware {
 
   Stream<User> get watchUser;
 
+  Future<void> dispose();
+
   Future<User> getUser();
-
-  Future<void> useLastAccount();
-
-  Future<void> useAccount(Account account);
 
   Future<void> removeAccount(Account account);
 
+  Future<void> updateAccount(Account account);
+
   Future<void> updateSettings(UserSettings newValue);
 
-  Future<void> dispose();
+  Future<void> useAccount(Account account);
+
+  Future<void> useLastAccount();
 }
 
 final class UserServiceImpl implements UserService {
@@ -37,58 +39,54 @@ final class UserServiceImpl implements UserService {
   );
 
   @override
-  User get user => _userObserver.user;
-
-  @override
-  Stream<User> get watchUser => _userObserver.watchUser;
-
-  @override
   bool get isActive => _userObserver.isActive;
 
   @override
   set isActive(bool value) => _userObserver.isActive = value;
 
   @override
+  User get user => _userObserver.user;
+
+  @override
+  Stream<User> get watchUser => _userObserver.watchUser;
+
+  @override
+  Future<void> dispose() async {}
+
+  @override
   Future<User> getUser() => _userRepository.getUser();
-
-  @override
-  Future<void> useLastAccount() async {
-    final user = await _userRepository.getUser();
-
-    await _updateUser(user);
-  }
-
-  @override
-  Future<void> useAccount(Account account) async {
-    var user = await getUser();
-
-    if (!user.hasAccount(catalystId: account.catalystId)) {
-      user = user.addAccount(account);
-    }
-
-    user = user.useAccount(catalystId: account.catalystId);
-
-    await _updateUser(user);
-  }
 
   @override
   Future<void> removeAccount(Account account) async {
     var user = await getUser();
 
-    if (user.hasAccount(catalystId: account.catalystId)) {
-      user = user.removeAccount(catalystId: account.catalystId);
+    if (user.hasAccount(id: account.catalystId)) {
+      user = user.removeAccount(id: account.catalystId);
     }
 
     if (user.activeAccount == null) {
       final firstAccount = user.accounts.firstOrNull;
       if (firstAccount != null) {
-        user = user.useAccount(catalystId: firstAccount.catalystId);
+        user = user.useAccount(id: firstAccount.catalystId);
       }
     }
 
     await _updateUser(user);
 
     await account.keychain.erase();
+  }
+
+  @override
+  Future<void> updateAccount(Account account) async {
+    final user = await getUser();
+
+    if (!user.hasAccount(id: account.catalystId)) {
+      return;
+    }
+
+    final updatedUser = user.updateAccount(account);
+
+    await _updateUser(updatedUser);
   }
 
   @override
@@ -100,11 +98,28 @@ final class UserServiceImpl implements UserService {
     await _updateUser(updatedUser);
   }
 
+  @override
+  Future<void> useAccount(Account account) async {
+    var user = await getUser();
+
+    if (!user.hasAccount(id: account.catalystId)) {
+      user = user.addAccount(account);
+    }
+
+    user = user.useAccount(id: account.catalystId);
+
+    await _updateUser(user);
+  }
+
+  @override
+  Future<void> useLastAccount() async {
+    final user = await _userRepository.getUser();
+
+    await _updateUser(user);
+  }
+
   Future<void> _updateUser(User user) async {
     await _userRepository.saveUser(user);
     _userObserver.user = user;
   }
-
-  @override
-  Future<void> dispose() async {}
 }

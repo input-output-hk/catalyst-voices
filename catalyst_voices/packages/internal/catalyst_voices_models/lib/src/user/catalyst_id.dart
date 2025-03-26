@@ -115,13 +115,6 @@ final class CatalystId extends Equatable {
     return listEquals(role0Key, other.role0Key);
   }
 
-  /// Syntax sugar for comparing agings Significant parts.
-  ///
-  /// See [toSignificant].
-  bool refersToSameAs(CatalystId other) {
-    return toSignificant() == other.toSignificant();
-  }
-
   /// Objects which holds [CatalystId] can be uniquely identified only by
   /// comparing [role0Key] and [host] thus they're significant parts of
   /// [CatalystId].

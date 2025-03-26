@@ -181,23 +181,6 @@ void main() {
       expect(significantSame, isFalse);
     });
 
-    test('refersToSameAs works same as comparing toSignificant', () {
-      // Given
-      final idOne = CatalystId(
-        host: CatalystIdHost.cardano.host,
-        username: 'testuser',
-        role0Key: role0Key,
-      );
-      final idTwo = idOne.copyWith(username: const Optional('developer'));
-
-      // When
-      final significantSame = idOne.toSignificant() == idTwo.toSignificant();
-      final refersSame = idOne.refersToSameAs(idTwo);
-
-      // Then
-      expect(significantSame == refersSame, isTrue);
-    });
-
     test('isSameRegistration compares only role0Key', () {
       // Given
       final idOne = CatalystId(
