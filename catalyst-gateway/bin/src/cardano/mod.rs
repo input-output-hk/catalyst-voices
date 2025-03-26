@@ -231,8 +231,7 @@ impl SyncParams {
     fn actual_start(&self) -> Point {
         self.last_indexed_block
             .as_ref()
-            .map(|(point, _)| point)
-            .unwrap_or(&self.start)
+            .map_or(&self.start, |(point, _)| point)
             .clone()
     }
 
@@ -273,14 +272,14 @@ fn sync_subchain(
         while let Some(chain_update) = follower.next().await {
             match chain_update.kind {
                 cardano_chain_follower::Kind::ImmutableBlockRollForward => {
-                    // What we need to do here is tell the primary follower to start a new sync
-                    // for the new immutable data, and then purge the volatile database of the
-                    // old data (after the immutable data has synced).
-                    info!(chain=%params.chain, "Immutable chain rolled forward, point {}.", chain_update.block_data().point());
-                    // Signal the point the immutable chain rolled forward to.
-                    params.follower_roll_forward = Some(chain_update.block_data().point());
-                    // If this is live chain immediately stops to later run immutable sync tasks
                     if params.is_live() {
+                        // What we need to do here is tell the primary follower to start a new sync
+                        // for the new immutable data, and then purge the volatile database of the
+                        // old data (after the immutable data has synced).
+                        info!(chain=%params.chain, "Immutable chain rolled forward, point {}.", chain_update.block_data().point());
+                        // Signal the point the immutable chain rolled forward to.
+                        params.follower_roll_forward = Some(chain_update.block_data().point());
+                        // If this is live chain immediately stops to later run immutable sync tasks
                         return params.done(None);
                     }
                 },
