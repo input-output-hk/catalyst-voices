@@ -1,5 +1,4 @@
-import 'package:catalyst_voices_models/src/user/account_role.dart';
-import 'package:catalyst_voices_models/src/user/catalyst_id.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/foundation.dart';
 import 'package:test/test.dart';
@@ -148,6 +147,71 @@ void main() {
           ':123456@cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE',
         ),
       );
+    });
+
+    test('should ignore username when checking comparing significant part', () {
+      // Given
+      final idOne = CatalystId(
+        host: CatalystIdHost.cardano.host,
+        username: 'testuser',
+        role0Key: role0Key,
+      );
+      final idTwo = idOne.copyWith(username: const Optional('developer'));
+
+      // When
+      final significantSame = idOne.toSignificant() == idTwo.toSignificant();
+
+      // Then
+      expect(significantSame, isTrue);
+    });
+
+    test('different host makes id significant different', () {
+      // Given
+      final idOne = CatalystId(
+        host: CatalystIdHost.cardano.host,
+        username: 'testuser',
+        role0Key: role0Key,
+      );
+      final idTwo = idOne.copyWith(host: CatalystIdHost.cardanoPreprod.host);
+
+      // When
+      final significantSame = idOne.toSignificant() == idTwo.toSignificant();
+
+      // Then
+      expect(significantSame, isFalse);
+    });
+
+    test('refersToSameAs works same as comparing toSignificant', () {
+      // Given
+      final idOne = CatalystId(
+        host: CatalystIdHost.cardano.host,
+        username: 'testuser',
+        role0Key: role0Key,
+      );
+      final idTwo = idOne.copyWith(username: const Optional('developer'));
+
+      // When
+      final significantSame = idOne.toSignificant() == idTwo.toSignificant();
+      final refersSame = idOne.refersToSameAs(idTwo);
+
+      // Then
+      expect(significantSame == refersSame, isTrue);
+    });
+
+    test('isSameRegistration compares only role0Key', () {
+      // Given
+      final idOne = CatalystId(
+        host: CatalystIdHost.cardano.host,
+        username: 'testuser',
+        role0Key: role0Key,
+      );
+      final idTwo = idOne.copyWith(host: CatalystIdHost.cardanoPreprod.host);
+
+      // When
+      final isSameRegistration = idOne.isSameRegistration(idTwo);
+
+      // Then
+      expect(isSameRegistration, isTrue);
     });
   });
 }

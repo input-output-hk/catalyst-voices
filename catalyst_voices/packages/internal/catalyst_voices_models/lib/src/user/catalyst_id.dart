@@ -1,8 +1,7 @@
-import 'dart:typed_data';
-
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/foundation.dart';
 
 /// Definition of a URI, which allows for RBAC keys used for different
 /// purposes to be easily and unambiguously identified.
@@ -110,6 +109,23 @@ final class CatalystId extends Equatable {
       encrypt: encrypt ?? this.encrypt,
     );
   }
+
+  /// Compares only [role0Key] as they are unique.
+  bool isSameRegistration(CatalystId other) {
+    return listEquals(role0Key, other.role0Key);
+  }
+
+  /// Syntax sugar for comparing agings Significant parts.
+  ///
+  /// See [toSignificant].
+  bool refersToSameAs(CatalystId other) {
+    return toSignificant() == other.toSignificant();
+  }
+
+  /// Objects which holds [CatalystId] can be uniquely identified only by
+  /// comparing [role0Key] and [host] thus they're significant parts of
+  /// [CatalystId].
+  CatalystId toSignificant() => CatalystId(host: host, role0Key: role0Key);
 
   @override
   String toString() => toUri().toString();
