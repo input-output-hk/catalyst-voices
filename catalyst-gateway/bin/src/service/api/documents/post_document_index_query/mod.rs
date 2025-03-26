@@ -55,7 +55,7 @@ pub(crate) async fn endpoint(
         Err(e) => return AllResponses::handle_error(&e),
     };
 
-    let (docs, counts) = tokio::join!(
+    let (fetched_docs, total_doc_count) = tokio::join!(
         fetch_docs(&conditions, &query_limits),
         SignedDocBody::retrieve_count(&conditions)
     );
@@ -64,7 +64,7 @@ pub(crate) async fn endpoint(
     let page = page.unwrap_or_default();
     let limit = limit.unwrap_or_default();
 
-    let total: u32 = match counts {
+    let total: u32 = match total_doc_count {
         Ok(total) => {
             match total.try_into() {
                 Ok(t) => t,
@@ -76,13 +76,8 @@ pub(crate) async fn endpoint(
         Err(e) => return AllResponses::handle_error(&e),
     };
 
-    match docs {
-        Ok(docs) => {
-            let doc_count: u32 = match docs.len().try_into() {
-                Ok(d) => d,
-                Err(e) => return AllResponses::handle_error(&e.into()),
-            };
-
+    match fetched_docs {
+        Ok((docs, doc_count)) => {
             let remaining = Remaining::calculate(page.into(), limit.into(), total, doc_count);
 
             Responses::Ok(Json(DocumentIndexListDocumented(DocumentIndexList {
@@ -101,16 +96,21 @@ pub(crate) async fn endpoint(
 }
 
 /// Fetch documents from the event db
+///
+/// NOTE: If the number of fetched document is greater than `u32::MAX`, the document count
+/// will return the saturated value.
 async fn fetch_docs(
     conditions: &DocsQueryFilter, query_limits: &QueryLimits,
-) -> anyhow::Result<Vec<IndexedDocumentDocumented>> {
+) -> anyhow::Result<(Vec<IndexedDocumentDocumented>, u32)> {
     let docs_stream = SignedDocBody::retrieve(conditions, query_limits).await?;
     let indexed_docs = DashMap::new();
 
+    let mut total_fetched_doc_count: u32 = 0;
     docs_stream
         .try_for_each(|doc: SignedDocBody| {
             let id = *doc.id();
             indexed_docs.entry(id).or_insert_with(Vec::new).push(doc);
+            total_fetched_doc_count = total_fetched_doc_count.saturating_add(1);
             future::ready(Ok(()))
         })
         .await?;
@@ -130,5 +130,5 @@ async fn fetch_docs(
             }))
         })
         .collect::<Result<_, _>>()?;
-    Ok(docs)
+    Ok((docs, total_fetched_doc_count))
 }
