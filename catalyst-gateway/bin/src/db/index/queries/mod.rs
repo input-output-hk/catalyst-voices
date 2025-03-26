@@ -31,8 +31,11 @@ use sync_status::update::SyncStatusInsertQuery;
 use tracing::error;
 
 use super::block::{
-    certs::CertInsertQuery, cip36::Cip36InsertQuery, rbac509::Rbac509InsertQuery,
-    txi::TxiInsertQuery, txo::TxoInsertQuery,
+    cip36::{insert_cip36, insert_cip36_for_vote_key, insert_cip36_invalid},
+    rbac509::Rbac509InsertQuery,
+    stake_reg,
+    txi::TxiInsertQuery,
+    txo::TxoInsertQuery,
 };
 use crate::{
     db::index::queries::rbac::{
@@ -65,8 +68,8 @@ pub(crate) enum PreparedQuery {
     Cip36RegistrationInsertQuery,
     /// CIP 36 Registration Error Insert query.
     Cip36RegistrationInsertErrorQuery,
-    /// CIP 36 Registration for stake address Insert query.
-    Cip36RegistrationForStakeAddrInsertQuery,
+    /// CIP 36 Registration for voting key Insert query.
+    Cip36RegistrationForVoteKeyInsertQuery,
     /// TXO spent Update query.
     TxoSpentUpdateQuery,
     /// RBAC 509 Registration Insert query.
@@ -135,7 +138,7 @@ pub(crate) struct PreparedQueries {
     /// CIP36 Registration errors.
     cip36_registration_error_insert_queries: SizedBatch,
     /// CIP36 Registration for Stake Address Insert query.
-    cip36_registration_for_stake_address_insert_queries: SizedBatch,
+    cip36_registration_for_vote_key_insert_queries: SizedBatch,
     /// Update TXO spent query.
     txo_spent_update_queries: SizedBatch,
     /// Get TXO by stake address query.
@@ -191,8 +194,7 @@ impl PreparedQueries {
         let txi_insert_queries = TxiInsertQuery::prepare_batch(&session, cfg).await?;
         let all_txo_queries = TxoInsertQuery::prepare_batch(&session, cfg).await;
         let stake_registration_insert_queries =
-            CertInsertQuery::prepare_batch(&session, cfg).await?;
-        let all_cip36_queries = Cip36InsertQuery::prepare_batch(&session, cfg).await;
+            stake_reg::StakeRegistrationInsertQuery::prepare_batch(&session, cfg).await?;
         let txo_spent_update_queries =
             UpdateTxoSpentQuery::prepare_batch(session.clone(), cfg).await?;
         let txo_by_stake_address_query = GetTxoByStakeAddressQuery::prepare(session.clone()).await;
@@ -225,11 +227,12 @@ impl PreparedQueries {
             unstaked_txo_asset_insert_queries,
         ) = all_txo_queries?;
 
-        let (
-            cip36_registration_insert_queries,
-            cip36_registration_error_insert_queries,
-            cip36_registration_for_stake_address_insert_queries,
-        ) = all_cip36_queries?;
+        let cip36_registration_insert_queries =
+            insert_cip36::Params::prepare_batch(&session, cfg).await?;
+        let cip36_registration_error_insert_queries =
+            insert_cip36_invalid::Params::prepare_batch(&session, cfg).await?;
+        let cip36_registration_for_vote_key_insert_queries =
+            insert_cip36_for_vote_key::Params::prepare_batch(&session, cfg).await?;
 
         let (
             rbac509_registration_insert_queries,
@@ -247,7 +250,7 @@ impl PreparedQueries {
             stake_registration_insert_queries,
             cip36_registration_insert_queries,
             cip36_registration_error_insert_queries,
-            cip36_registration_for_stake_address_insert_queries,
+            cip36_registration_for_vote_key_insert_queries,
             txo_spent_update_queries,
             txo_by_stake_address_query: txo_by_stake_address_query?,
             txi_by_txn_hash_query: txi_by_txn_hash_query?,
@@ -396,8 +399,8 @@ impl PreparedQueries {
             PreparedQuery::Cip36RegistrationInsertErrorQuery => {
                 &self.cip36_registration_error_insert_queries
             },
-            PreparedQuery::Cip36RegistrationForStakeAddrInsertQuery => {
-                &self.cip36_registration_for_stake_address_insert_queries
+            PreparedQuery::Cip36RegistrationForVoteKeyInsertQuery => {
+                &self.cip36_registration_for_vote_key_insert_queries
             },
             PreparedQuery::TxoSpentUpdateQuery => &self.txo_spent_update_queries,
             PreparedQuery::Rbac509InsertQuery => &self.rbac509_registration_insert_queries,
