@@ -32,6 +32,7 @@ abstract interface class UserService implements ActiveAware {
   Future<void> useLastAccount();
 }
 
+// TODO(damian-molinski): Refactor to move most logic to UserRepository
 final class UserServiceImpl implements UserService {
   final UserRepository _userRepository;
   final UserObserver _userObserver;
