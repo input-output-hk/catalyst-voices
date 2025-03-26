@@ -239,8 +239,7 @@ def test_comment_doc(comment_doc_factory):
 
 def test_document_index_endpoint(proposal_doc_factory):
     # submiting 10 proposal documents
-    total_amount = 10
-    proposals = [proposal_doc_factory() for _ in range(total_amount)]
+    proposals = [proposal_doc_factory() for _ in range(10)]
 
     filter = {
         "id": {
@@ -262,7 +261,7 @@ def test_document_index_endpoint(proposal_doc_factory):
     data = resp.json()
     assert data["page"]["limit"] == limit
     assert data["page"]["page"] == page
-    assert data["page"]["remaining"] == total_amount - 1 - page
+    assert data["page"]["remaining"] == len(proposals) - 1 - page
 
     page += 1
     resp = document.post(
@@ -275,7 +274,7 @@ def test_document_index_endpoint(proposal_doc_factory):
     data = resp.json()
     assert data["page"]["limit"] == limit
     assert data["page"]["page"] == page
-    assert data["page"]["remaining"] == total_amount - 1 - page
+    assert data["page"]["remaining"] == len(proposals) - 1 - page
 
     # Pagination out of range
     resp = document.post(
