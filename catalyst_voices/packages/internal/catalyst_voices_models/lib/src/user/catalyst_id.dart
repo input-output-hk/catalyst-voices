@@ -110,11 +110,6 @@ final class CatalystId extends Equatable {
     );
   }
 
-  /// Compares only [role0Key] as they are unique.
-  bool isSameRegistration(CatalystId other) {
-    return listEquals(role0Key, other.role0Key);
-  }
-
   /// Objects which holds [CatalystId] can be uniquely identified only by
   /// comparing [role0Key] and [host] thus they're significant parts of
   /// [CatalystId].

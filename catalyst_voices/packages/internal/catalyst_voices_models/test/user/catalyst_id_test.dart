@@ -181,22 +181,6 @@ void main() {
       expect(significantSame, isFalse);
     });
 
-    test('isSameRegistration compares only role0Key', () {
-      // Given
-      final idOne = CatalystId(
-        host: CatalystIdHost.cardano.host,
-        username: 'testuser',
-        role0Key: role0Key,
-      );
-      final idTwo = idOne.copyWith(host: CatalystIdHost.cardanoPreprod.host);
-
-      // When
-      final isSameRegistration = idOne.isSameRegistration(idTwo);
-
-      // Then
-      expect(isSameRegistration, isTrue);
-    });
-
     test('username with spaces is decoded correctly', () {
       const rawUri = 'id.catalyst://'
           'damian%20m@cardano/'
