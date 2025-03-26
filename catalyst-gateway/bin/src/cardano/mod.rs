@@ -60,13 +60,11 @@ struct SyncParams {
     /// The ending point of this sync.
     end: Point,
     /// The first block we successfully synced.
-    first_indexed_block: Option<Point>,
-    /// Is the starting point immutable? (True = immutable, false = don't know.)
-    first_is_immutable: bool,
+    /// Includes also is immutable flag (True - is immutable, False - is volatile).
+    first_indexed_block: Option<(Point, bool)>,
     /// The last block we successfully synced.
-    last_indexed_block: Option<Point>,
-    /// Is the ending point immutable? (True = immutable, false = don't know.)
-    last_is_immutable: bool,
+    /// Includes also is immutable flag (True - is immutable, False - is volatile).
+    last_indexed_block: Option<(Point, bool)>,
     /// The number of blocks we successfully synced overall.
     total_blocks_synced: u64,
     /// The number of blocks we successfully synced, in the last attempt.
@@ -76,14 +74,14 @@ struct SyncParams {
     /// The number of retries so far on this sync task.
     backoff_delay: Option<Duration>,
     /// If the sync completed without error or not.
-    result: Arc<Option<anyhow::Result<()>>>,
+    error: Arc<Option<anyhow::Error>>,
     /// Chain follower roll forward.
     follower_roll_forward: Option<Point>,
 }
 
 impl Display for SyncParams {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        if self.result.is_none() {
+        if self.error.is_none() {
             write!(f, "Sync_Params {{ ")?;
         } else {
             write!(f, "Sync_Result {{ ")?;
@@ -91,19 +89,19 @@ impl Display for SyncParams {
 
         write!(f, "start: {}, end: {}", self.start, self.end)?;
 
-        if let Some(first) = self.first_indexed_block.as_ref() {
+        if let Some((point, is_immutable)) = self.first_indexed_block.as_ref() {
             write!(
                 f,
-                ", first_indexed_block: {first}{}",
-                if self.first_is_immutable { ":I" } else { "" }
+                ", first_indexed_block: {point}{}",
+                if *is_immutable { ":I" } else { ":V" }
             )?;
         }
 
-        if let Some(last) = self.last_indexed_block.as_ref() {
+        if let Some((point, is_immutable)) = self.last_indexed_block.as_ref() {
             write!(
                 f,
-                ", last_indexed_block: {last}{}",
-                if self.last_is_immutable { ":I" } else { "" }
+                ", last_indexed_block: {point}{}",
+                if *is_immutable { ":I" } else { ":V" }
             )?;
         }
 
@@ -111,11 +109,11 @@ impl Display for SyncParams {
             write!(f, ", retries: {}", self.retries)?;
         }
 
-        if self.retries > 0 || self.result.is_some() {
+        if self.retries > 0 || self.error.is_some() {
             write!(f, ", synced_blocks: {}", self.total_blocks_synced)?;
         }
 
-        if self.result.is_some() {
+        if self.error.is_some() {
             write!(f, ", last_sync: {}", self.last_blocks_synced)?;
         }
 
@@ -123,11 +121,9 @@ impl Display for SyncParams {
             write!(f, ", backoff: {}", DurationString::from(*backoff))?;
         }
 
-        if let Some(result) = self.result.as_ref() {
-            match result {
-                Ok(()) => write!(f, ", Success")?,
-                Err(error) => write!(f, ", {error}")?,
-            };
+        match self.error.as_ref() {
+            None => write!(f, ", Success")?,
+            Some(error) => write!(f, ", {error}")?,
         }
 
         f.write_str(" }")
@@ -138,21 +134,36 @@ impl Display for SyncParams {
 const BACKOFF_RANGE_MULTIPLIER: u32 = 3;
 
 impl SyncParams {
-    /// Create a new `SyncParams`.
-    fn new(chain: Network, start: Point, end: Point) -> Self {
+    /// Create a new `SyncParams` for the immutable chain sync task.
+    pub(crate) fn new_immutable(chain: Network, start: Point, end: Point) -> Self {
         Self {
             chain,
             start,
             end,
             first_indexed_block: None,
-            first_is_immutable: false,
             last_indexed_block: None,
-            last_is_immutable: false,
             total_blocks_synced: 0,
             last_blocks_synced: 0,
             retries: 0,
             backoff_delay: None,
-            result: Arc::new(None),
+            error: Arc::new(None),
+            follower_roll_forward: None,
+        }
+    }
+
+    /// Create a new `SyncParams` for the live chain sync task.
+    pub(crate) fn new_live(chain: Network, start: Point) -> Self {
+        Self {
+            chain,
+            start,
+            end: Point::TIP,
+            first_indexed_block: None,
+            last_indexed_block: None,
+            total_blocks_synced: 0,
+            last_blocks_synced: 0,
+            retries: 0,
+            backoff_delay: None,
+            error: Arc::new(None),
             follower_roll_forward: None,
         }
     }
@@ -178,41 +189,49 @@ impl SyncParams {
         retry.last_blocks_synced = 0;
         retry.retries = retry_count;
         retry.backoff_delay = backoff;
-        retry.result = Arc::new(None);
+        retry.error = Arc::new(None);
         retry.follower_roll_forward = None;
 
         retry
     }
 
     /// Convert Params into the result of the sync.
-    fn done(
-        &self, first: Option<Point>, first_immutable: bool, last: Option<Point>,
-        last_immutable: bool, synced: u64, result: anyhow::Result<()>,
-    ) -> Self {
-        if result.is_ok() && first_immutable && last_immutable {
+    pub(crate) fn done(mut self, error: Option<anyhow::Error>) -> Self {
+        if error.is_none() && !self.is_live() {
             // Update sync status in the Immutable DB.
             // Can fire and forget, because failure to update DB will simply cause the chunk to be
             // re-indexed, on recovery.
             update_sync_status(self.end.slot_or_default(), self.start.slot_or_default());
         }
+        self.total_blocks_synced = self
+            .total_blocks_synced
+            .saturating_add(self.last_blocks_synced);
+        self.last_blocks_synced = 0;
 
-        let mut done = self.clone();
-        done.first_indexed_block = first;
-        done.first_is_immutable = first_immutable;
-        done.last_indexed_block = last;
-        done.last_is_immutable = last_immutable;
-        done.total_blocks_synced = done.total_blocks_synced.saturating_add(synced);
-        done.last_blocks_synced = synced;
+        self.error = Arc::new(error);
 
-        done.result = Arc::new(Some(result));
+        self
+    }
 
-        done
+    /// During indexing block updating corresponding sync parameters
+    pub(crate) fn update_block_state(&mut self, block: &MultiEraBlock) {
+        self.last_indexed_block = Some((block.point(), block.is_immutable()));
+        if self.first_indexed_block.is_none() {
+            self.first_indexed_block = Some((block.point(), block.is_immutable()));
+        }
+        self.last_blocks_synced = self.last_blocks_synced.saturating_add(1);
+    }
+
+    /// Returns if the running sync task was defined as live chain sync task
+    pub(crate) fn is_live(&self) -> bool {
+        self.end == Point::TIP
     }
 
     /// Get where this sync run actually needs to start from.
     fn actual_start(&self) -> Point {
         self.last_indexed_block
             .as_ref()
+            .map(|(point, _)| point)
             .unwrap_or(&self.start)
             .clone()
     }
@@ -237,7 +256,7 @@ impl SyncParams {
 /// Set end to `Point::TIP` to sync the tip continuously.
 #[allow(clippy::too_many_lines)]
 fn sync_subchain(
-    params: SyncParams, event_sender: broadcast::Sender<event::ChainIndexerEvent>,
+    mut params: SyncParams, event_sender: broadcast::Sender<event::ChainIndexerEvent>,
 ) -> tokio::task::JoinHandle<SyncParams> {
     tokio::spawn(async move {
         info!(chain = %params.chain, params=%params, "Indexing Blockchain");
@@ -249,35 +268,21 @@ fn sync_subchain(
         drop(CassandraSession::wait_until_ready(INDEXING_DB_READY_WAIT_INTERVAL, true).await);
         info!(chain=%params.chain, params=%params,"Indexing DB is ready");
 
-        let mut first_indexed_block = params.first_indexed_block.clone();
-        let mut first_immutable = params.first_is_immutable;
-        let mut last_indexed_block = params.last_indexed_block.clone();
-        let mut last_immutable = params.last_is_immutable;
-        let mut blocks_synced = 0u64;
-
         let mut follower =
             ChainFollower::new(params.chain, params.actual_start(), params.end.clone()).await;
         while let Some(chain_update) = follower.next().await {
             match chain_update.kind {
                 cardano_chain_follower::Kind::ImmutableBlockRollForward => {
-                    // We only process these on the follower tracking the TIP.
-                    if params.end == Point::TIP {
-                        // What we need to do here is tell the primary follower to start a new sync
-                        // for the new immutable data, and then purge the volatile database of the
-                        // old data (after the immutable data has synced).
-                        info!(chain=%params.chain, "Immutable chain rolled forward.");
-                        let mut result = params.done(
-                            first_indexed_block,
-                            first_immutable,
-                            last_indexed_block,
-                            last_immutable,
-                            blocks_synced,
-                            Ok(()),
-                        );
-                        // Signal the point the immutable chain rolled forward to.
-                        result.follower_roll_forward = Some(chain_update.block_data().point());
-                        return result;
-                    };
+                    // What we need to do here is tell the primary follower to start a new sync
+                    // for the new immutable data, and then purge the volatile database of the
+                    // old data (after the immutable data has synced).
+                    info!(chain=%params.chain, "Immutable chain rolled forward, point {}.", chain_update.block_data().point());
+                    // Signal the point the immutable chain rolled forward to.
+                    params.follower_roll_forward = Some(chain_update.block_data().point());
+                    // If this is live chain immediately stops to later run immutable sync tasks
+                    if params.is_live() {
+                        return params.done(None);
+                    }
                 },
                 cardano_chain_follower::Kind::Block => {
                     let block = chain_update.block_data();
@@ -285,105 +290,60 @@ fn sync_subchain(
                     if let Err(error) = index_block(block).await {
                         let error_msg = format!("Failed to index block {}", block.point());
                         error!(chain=%params.chain, error=%error, params=%params, error_msg);
-                        return params.done(
-                            first_indexed_block,
-                            first_immutable,
-                            last_indexed_block,
-                            last_immutable,
-                            blocks_synced,
-                            Err(error.context(error_msg)),
-                        );
+                        return params.done(Some(error.context(error_msg)));
                     }
 
-                    update_block_state(
-                        block,
-                        &mut first_indexed_block,
-                        &mut first_immutable,
-                        &mut last_indexed_block,
-                        &mut last_immutable,
-                        &mut blocks_synced,
-                    );
+                    params.update_block_state(block);
                 },
 
                 cardano_chain_follower::Kind::Rollback => {
-                    // Rollback occurs, need to purge forward
-                    let rollback_slot = chain_update.block_data().slot();
+                    if params.is_live() {
+                        // Rollback occurs, need to purge forward
+                        let rollback_slot = chain_update.block_data().slot();
 
-                    let purge_condition = PurgeCondition::PurgeForwards(rollback_slot);
-                    if let Err(error) = roll_forward::purge_live_index(purge_condition).await {
-                        error!(chain=%params.chain, error=%error, "Chain follower
-                    rollback, purging volatile data task failed.");
-                    } else {
-                        // How many slots are purged
-                        #[allow(clippy::arithmetic_side_effects)]
-                        let purge_slots = params
-                            .last_indexed_block
-                            .as_ref()
-                            // Slots arithmetic has saturating semantic, so this is ok
-                            .map_or(0.into(), |l| l.slot_or_default() - rollback_slot);
-
-                        let _ = event_sender.send(event::ChainIndexerEvent::ForwardDataPurged {
-                            purge_slots: purge_slots.into(),
-                        });
-
-                        // Purge success, now index the current block
-                        let block = chain_update.block_data();
-                        if let Err(error) = index_block(block).await {
-                            let error_msg =
-                                format!("Failed to index block after rollback {}", block.point());
-                            error!(chain=%params.chain, error=%error, params=%params, error_msg);
-                            return params.done(
-                                first_indexed_block,
-                                first_immutable,
-                                last_indexed_block,
-                                last_immutable,
-                                blocks_synced,
-                                Err(error.context(error_msg)),
+                        let purge_condition = PurgeCondition::PurgeForwards(rollback_slot);
+                        if let Err(error) = roll_forward::purge_live_index(purge_condition).await {
+                            error!(chain=%params.chain, error=%error,
+                                "Chain follower rollback, purging volatile data task failed."
                             );
-                        }
+                        } else {
+                            // How many slots are purged
+                            #[allow(clippy::arithmetic_side_effects)]
+                            let purge_slots = params
+                                .last_indexed_block
+                                .as_ref()
+                                // Slots arithmetic has saturating semantic, so this is ok
+                                .map_or(0.into(), |(l, _)| l.slot_or_default() - rollback_slot);
 
-                        update_block_state(
-                            block,
-                            &mut first_indexed_block,
-                            &mut first_immutable,
-                            &mut last_indexed_block,
-                            &mut last_immutable,
-                            &mut blocks_synced,
-                        );
+                            let _ =
+                                event_sender.send(event::ChainIndexerEvent::ForwardDataPurged {
+                                    purge_slots: purge_slots.into(),
+                                });
+
+                            // Purge success, now index the current block
+                            let block = chain_update.block_data();
+                            if let Err(error) = index_block(block).await {
+                                let error_msg = format!(
+                                    "Failed to index block after rollback {}",
+                                    block.point()
+                                );
+                                error!(chain=%params.chain, error=%error, params=%params, error_msg);
+                                return params.done(Some(error.context(error_msg)));
+                            }
+
+                            params.update_block_state(block);
+                        }
                     }
                 },
             }
         }
 
-        let result = params.done(
-            first_indexed_block,
-            first_immutable,
-            last_indexed_block,
-            last_immutable,
-            blocks_synced,
-            Ok(()),
-        );
+        let result = params.done(None);
 
-        info!(chain = %params.chain, result=%result, "Indexing Blockchain Completed: OK");
+        info!(chain = %result.chain, result=%result, "Indexing Blockchain Completed: OK");
 
         result
     })
-}
-
-/// Update block related state.
-fn update_block_state(
-    block: &MultiEraBlock, first_indexed_block: &mut Option<Point>, first_immutable: &mut bool,
-    last_indexed_block: &mut Option<Point>, last_immutable: &mut bool, blocks_synced: &mut u64,
-) {
-    *last_immutable = block.is_immutable();
-    *last_indexed_block = Some(block.point());
-
-    if first_indexed_block.is_none() {
-        *first_immutable = *last_immutable;
-        *first_indexed_block = Some(block.point());
-    }
-
-    *blocks_synced = blocks_synced.saturating_add(1);
 }
 
 /// The synchronisation task, and its state.
@@ -461,11 +421,7 @@ impl SyncTask {
         // Start the Live Chain sync task - This can never end because it is syncing to TIP.
         // So, if it fails, it will automatically be restarted.
         self.sync_tasks.push(sync_subchain(
-            SyncParams::new(
-                self.cfg.chain,
-                Point::fuzzy(self.immutable_tip_slot),
-                Point::TIP,
-            ),
+            SyncParams::new_live(self.cfg.chain, Point::fuzzy(self.immutable_tip_slot)),
             self.event_channel.0.clone(),
         ));
 
@@ -488,7 +444,7 @@ impl SyncTask {
                     // or there is an error.  If this is not a roll forward, log an error.
                     // It can fail if the index DB goes down in some way.
                     // Restart it always.
-                    if finished.end == Point::TIP {
+                    if finished.is_live() {
                         if let Some(ref roll_forward_point) = finished.follower_roll_forward {
                             // Advance the known immutable tip, and try and start followers to reach
                             // it.
@@ -511,46 +467,43 @@ impl SyncTask {
                             finished.retry(),
                             self.event_channel.0.clone(),
                         ));
-                    } else if let Some(result) = finished.result.as_ref() {
-                        match result {
-                            Ok(()) => {
-                                self.current_sync_tasks =
-                                    self.current_sync_tasks.checked_sub(1).unwrap_or_else(|| {
-                                        error!("current_sync_tasks -= 1 overflow");
-                                        0
-                                    });
-                                info!(chain=%self.cfg.chain, report=%finished,
-                                    "The Immutable follower completed successfully.");
-
-                                finished.last_indexed_block.as_ref().inspect(|block| {
-                                    self.dispatch_event(
-                                        event::ChainIndexerEvent::IndexedSlotProgressed {
-                                            slot: block.slot_or_default(),
-                                        },
-                                    );
+                    }
+                    match finished.error.as_ref() {
+                        None => {
+                            self.current_sync_tasks =
+                                self.current_sync_tasks.checked_sub(1).unwrap_or_else(|| {
+                                    error!("current_sync_tasks -= 1 overflow");
+                                    0
                                 });
-                                self.dispatch_event(event::ChainIndexerEvent::SyncTasksChanged {
-                                    current_sync_tasks: self.current_sync_tasks,
-                                });
+                            info!(chain=%self.cfg.chain, report=%finished,
+                                "The Immutable follower completed successfully.");
 
-                                // If we need more immutable chain followers to sync the block
-                                // chain, we can now start them.
-                                self.start_immutable_followers();
-                            },
-                            Err(error) => {
-                                error!(chain=%self.cfg.chain, report=%finished, error=%error,
-                                    "An Immutable follower failed, restarting it.");
-                                // Restart the Immutable Chain sync task again from where it left
-                                // off.
-                                self.sync_tasks.push(sync_subchain(
-                                    finished.retry(),
-                                    self.event_channel.0.clone(),
-                                ));
-                            },
-                        }
-                    } else {
-                        error!(chain=%self.cfg.chain, report=%finished,
-                                 "BUG: The Immutable follower completed, but without a proper result.");
+                            finished.last_indexed_block.as_ref().inspect(|(block, _)| {
+                                self.dispatch_event(
+                                    event::ChainIndexerEvent::IndexedSlotProgressed {
+                                        slot: block.slot_or_default(),
+                                    },
+                                );
+                            });
+                            self.dispatch_event(event::ChainIndexerEvent::SyncTasksChanged {
+                                current_sync_tasks: self.current_sync_tasks,
+                            });
+
+                            // If we need more immutable chain followers to sync the block
+                            // chain, we can now start them.
+                            self.start_immutable_followers();
+                        },
+                        Some(error) => {
+                            error!(chain=%self.cfg.chain, report=%finished, error=%error,
+                                "An Immutable follower failed, restarting it."
+                            );
+                            // Restart the Immutable Chain sync task again from where it left
+                            // off.
+                            self.sync_tasks.push(sync_subchain(
+                                finished.retry(),
+                                self.event_channel.0.clone(),
+                            ));
+                        },
                     }
                 },
                 Err(error) => {
@@ -605,7 +558,7 @@ impl SyncTask {
                     self.get_syncable_range(self.start_slot, end_slot)
                 {
                     self.sync_tasks.push(sync_subchain(
-                        SyncParams::new(self.cfg.chain, first_point, last_point.clone()),
+                        SyncParams::new_immutable(self.cfg.chain, first_point, last_point.clone()),
                         self.event_channel.0.clone(),
                     ));
                     self.current_sync_tasks = self.current_sync_tasks.saturating_add(1);
