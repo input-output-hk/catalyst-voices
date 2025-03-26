@@ -4,34 +4,8 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/widgets.dart';
 import 'package:formz/formz.dart';
 
-final class DisplayName
-    extends FormzInput<String, DisplayNameValidationException> {
-  static const NumRange<int> lengthRange = NumRange(min: 1, max: 30);
-
-  const DisplayName.dirty([super.value = '']) : super.dirty();
-
-  const DisplayName.pure([super.value = '']) : super.pure();
-
-  @override
-  DisplayNameValidationException? validator(String value) {
-    if (value.isEmpty) {
-      return const EmptyDisplayNameException();
-    }
-
-    if (!lengthRange.contains(value.trim().length)) {
-      return const OutOfRangeDisplayNameException();
-    }
-
-    return null;
-  }
-}
-
-sealed class DisplayNameValidationException extends LocalizedException {
-  const DisplayNameValidationException();
-}
-
-final class EmptyDisplayNameException extends DisplayNameValidationException {
-  const EmptyDisplayNameException();
+final class EmptyUsernameException extends UsernameValidationException {
+  const EmptyUsernameException();
 
   @override
   String message(BuildContext context) {
@@ -39,12 +13,36 @@ final class EmptyDisplayNameException extends DisplayNameValidationException {
   }
 }
 
-final class OutOfRangeDisplayNameException
-    extends DisplayNameValidationException {
-  const OutOfRangeDisplayNameException();
+final class OutOfRangeUsernameException extends UsernameValidationException {
+  const OutOfRangeUsernameException();
 
   @override
   String message(BuildContext context) {
     return context.l10n.errorDisplayNameValidationOutOfRange;
   }
+}
+
+final class Username extends FormzInput<String, UsernameValidationException> {
+  static const NumRange<int> lengthRange = NumRange(min: 1, max: 30);
+
+  const Username.dirty([super.value = '']) : super.dirty();
+
+  const Username.pure([super.value = '']) : super.pure();
+
+  @override
+  UsernameValidationException? validator(String value) {
+    if (value.isEmpty) {
+      return const EmptyUsernameException();
+    }
+
+    if (!lengthRange.contains(value.trim().length)) {
+      return const OutOfRangeUsernameException();
+    }
+
+    return null;
+  }
+}
+
+sealed class UsernameValidationException extends LocalizedException {
+  const UsernameValidationException();
 }

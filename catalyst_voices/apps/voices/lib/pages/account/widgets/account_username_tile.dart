@@ -8,22 +8,22 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class AccountDisplayNameTile extends StatefulWidget {
-  const AccountDisplayNameTile({
+class AccountUsernameTile extends StatefulWidget {
+  const AccountUsernameTile({
     super.key,
   });
 
   @override
-  State<AccountDisplayNameTile> createState() => _AccountDisplayNameTileState();
+  State<AccountUsernameTile> createState() => _AccountUsernameTileState();
 }
 
-class _AccountDisplayNameTileState extends State<AccountDisplayNameTile> {
+class _AccountUsernameTileState extends State<AccountUsernameTile> {
   late final TextEditingController _controller;
   late final FocusNode _focusNode;
 
   bool _isEditMode = false;
-  DisplayName _displayName = const DisplayName.pure();
-  StreamSubscription<DisplayName>? _sub;
+  Username _username = const Username.pure();
+  StreamSubscription<Username>? _sub;
 
   @override
   Widget build(BuildContext context) {
@@ -32,19 +32,19 @@ class _AccountDisplayNameTileState extends State<AccountDisplayNameTile> {
       title: context.l10n.displayName,
       onChanged: _onEditModeChange,
       isEditMode: _isEditMode,
-      isSaveEnabled: _displayName.isValid,
+      isSaveEnabled: _username.isValid,
       isEditEnabled: true,
-      child: VoicesDisplayNameTextField(
+      child: VoicesUsernameTextField(
         key: const Key('AccountDisplayNameTextField'),
         controller: _controller,
         focusNode: _focusNode,
         decoration: VoicesTextFieldDecoration(
           hintText: context.l10n.displayName,
-          errorText: _displayName.displayError?.message(context),
+          errorText: _username.displayError?.message(context),
         ),
         onFieldSubmitted: null,
         readOnly: !_isEditMode,
-        maxLength: _isEditMode ? DisplayName.lengthRange.max : null,
+        maxLength: _isEditMode ? Username.lengthRange.max : null,
       ),
     );
   }
@@ -64,27 +64,27 @@ class _AccountDisplayNameTileState extends State<AccountDisplayNameTile> {
     super.initState();
 
     final bloc = context.read<AccountCubit>();
-    final text = bloc.state.displayName.value;
+    final text = bloc.state.username.value;
     final value = TextEditingValueExt.collapsedAtEndOf(text);
     _controller = TextEditingController.fromValue(value);
     _controller.addListener(_handleControllerChange);
-    _displayName = bloc.state.displayName;
+    _username = bloc.state.username;
 
     _focusNode = FocusNode();
 
     _sub = bloc.stream
-        .map((event) => event.displayName)
+        .map((event) => event.username)
         .distinct()
-        .listen(_handleDisplayNameChange);
+        .listen(_handleUsernameChange);
   }
 
   void _handleControllerChange() {
     setState(() {
-      _displayName = DisplayName.dirty(_controller.text);
+      _username = Username.dirty(_controller.text);
     });
   }
 
-  void _handleDisplayNameChange(DisplayName displayName) {
+  void _handleUsernameChange(Username displayName) {
     if (_isEditMode) {
       return;
     }
@@ -93,7 +93,7 @@ class _AccountDisplayNameTileState extends State<AccountDisplayNameTile> {
   }
 
   void _onCancel() {
-    final displayName = context.read<AccountCubit>().state.displayName;
+    final displayName = context.read<AccountCubit>().state.username;
     _controller.textWithSelection = displayName.value;
   }
 
@@ -118,6 +118,6 @@ class _AccountDisplayNameTileState extends State<AccountDisplayNameTile> {
   }
 
   void _onSave() {
-    unawaited(context.read<AccountCubit>().updateDisplayName(_displayName));
+    unawaited(context.read<AccountCubit>().updateUsername(_username));
   }
 }

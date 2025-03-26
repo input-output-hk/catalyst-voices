@@ -39,20 +39,6 @@ final class AccountCubit extends Cubit<AccountState> {
     // TODO(damian-molinski): Integration
   }
 
-  Future<void> updateDisplayName(DisplayName displayName) async {
-    if (displayName.isNotValid) {
-      return;
-    }
-
-    final value = displayName.value;
-
-    await _userService.updateActiveAccount(
-      username: value.isNotEmpty ? Optional(value) : const Optional.empty(),
-    );
-
-    emit(state.copyWith(displayName: displayName));
-  }
-
   Future<void> updateEmail(Email email) async {
     if (email.isNotValid) {
       return;
@@ -61,6 +47,20 @@ final class AccountCubit extends Cubit<AccountState> {
     await _userService.updateActiveAccount(email: email.value);
 
     emit(state.copyWith(email: email));
+  }
+
+  Future<void> updateUsername(Username username) async {
+    if (username.isNotValid) {
+      return;
+    }
+
+    final value = username.value;
+
+    await _userService.updateActiveAccount(
+      username: value.isNotEmpty ? Optional(value) : const Optional.empty(),
+    );
+
+    emit(state.copyWith(username: username));
   }
 
   void _handleActiveAccountChange(Account? account) {
@@ -84,7 +84,7 @@ final class AccountCubit extends Cubit<AccountState> {
     return AccountState(
       status: const AccountFinalized(),
       catalystId: catalystId,
-      displayName: DisplayName.pure(catalystId?.username ?? ''),
+      username: Username.pure(catalystId?.username ?? ''),
       email: Email.pure(from?.email ?? ''),
       roles: AccountRolesState(
         items: accountRolesItems,

@@ -210,7 +210,7 @@ final class RegistrationCubit extends Cubit<RegistrationState>
 
     if (baseProfileProgress != null) {
       _baseProfileCubit
-        ..updateDisplayName(DisplayName.dirty(baseProfileProgress.displayName))
+        ..updateUsername(Username.dirty(baseProfileProgress.username))
         ..updateEmail(Email.dirty(baseProfileProgress.email))
         ..updateToS(isAccepted: true)
         ..updatePrivacyPolicy(isAccepted: true)
@@ -248,7 +248,7 @@ final class RegistrationCubit extends Cubit<RegistrationState>
         ),
       );
 
-      final displayName = _baseProfileCubit.state.displayName;
+      final username = _baseProfileCubit.state.username;
       final email = _baseProfileCubit.state.email;
 
       final masterKey = _masterKey!;
@@ -261,7 +261,7 @@ final class RegistrationCubit extends Cubit<RegistrationState>
       final roles = _walletLinkCubit.roles;
 
       final account = await _registrationService.register(
-        displayName: displayName.value,
+        username: username.value,
         email: email.value,
         wallet: wallet,
         unsignedTx: transaction,

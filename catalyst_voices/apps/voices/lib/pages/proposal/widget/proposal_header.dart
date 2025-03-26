@@ -155,7 +155,7 @@ class _ProposalMetadataSelector extends StatelessWidget {
       builder: (context, state) {
         return _ProposalMetadata(
           title: state.title,
-          author: state.authorDisplayName,
+          author: state.authorName,
           createdAt: state.createdAt,
           commentsCount: state.commentsCount,
         );
