@@ -33,7 +33,7 @@ class _AccountDisplayNameTileState extends State<AccountDisplayNameTile> {
       onChanged: _onEditModeChange,
       isEditMode: _isEditMode,
       isSaveEnabled: _displayName.isValid,
-      isEditEnabled: false,
+      isEditEnabled: true,
       child: VoicesDisplayNameTextField(
         key: const Key('AccountDisplayNameTextField'),
         controller: _controller,
@@ -118,7 +118,6 @@ class _AccountDisplayNameTileState extends State<AccountDisplayNameTile> {
   }
 
   void _onSave() {
-    // Note. not supported atm.
-    // unawaited(context.read<AccountCubit>().updateDisplayName(_displayName));
+    unawaited(context.read<AccountCubit>().updateDisplayName(_displayName));
   }
 }

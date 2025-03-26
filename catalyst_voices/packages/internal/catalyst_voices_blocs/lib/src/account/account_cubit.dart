@@ -9,15 +9,22 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 final class AccountCubit extends Cubit<AccountState> {
   final UserService _userService;
 
+  StreamSubscription<Account?>? _accountSub;
+
   AccountCubit(
     this._userService,
   ) : super(_buildState(from: _userService.user.activeAccount)) {
-    // TODO(damian-molinski): watch active account from _userService
+    _accountSub = _userService.watchUser
+        .map((user) => user.activeAccount)
+        .distinct()
+        .listen(_handleActiveAccountChange);
   }
 
   @override
-  Future<void> close() {
-    // TODO(damian-molinski): cancel user subscription to _userService
+  Future<void> close() async {
+    await _accountSub?.cancel();
+    _accountSub = null;
+
     return super.close();
   }
 
@@ -32,8 +39,32 @@ final class AccountCubit extends Cubit<AccountState> {
     // TODO(damian-molinski): Integration
   }
 
-  Future<void> updateEmail(Email value) async {
-    // TODO(damian-molinski): Integration
+  Future<void> updateDisplayName(DisplayName displayName) async {
+    if (displayName.isNotValid) {
+      return;
+    }
+
+    final value = displayName.value;
+
+    await _userService.updateActiveAccount(
+      username: value.isNotEmpty ? Optional(value) : const Optional.empty(),
+    );
+
+    emit(state.copyWith(displayName: displayName));
+  }
+
+  Future<void> updateEmail(Email email) async {
+    if (email.isNotValid) {
+      return;
+    }
+
+    await _userService.updateActiveAccount(email: email.value);
+
+    emit(state.copyWith(email: email));
+  }
+
+  void _handleActiveAccountChange(Account? account) {
+    emit(_buildState(from: account));
   }
 
   static AccountState _buildState({Account? from}) {

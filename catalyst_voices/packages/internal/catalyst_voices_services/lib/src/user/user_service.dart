@@ -20,7 +20,10 @@ abstract interface class UserService implements ActiveAware {
 
   Future<void> removeAccount(Account account);
 
-  Future<void> updateAccount(Account account);
+  Future<void> updateActiveAccount({
+    Optional<String>? username,
+    String? email,
+  });
 
   Future<void> updateSettings(UserSettings newValue);
 
@@ -77,14 +80,29 @@ final class UserServiceImpl implements UserService {
   }
 
   @override
-  Future<void> updateAccount(Account account) async {
+  Future<void> updateActiveAccount({
+    Optional<String>? username,
+    String? email,
+  }) async {
     final user = await getUser();
-
-    if (!user.hasAccount(id: account.catalystId)) {
+    final activeAccount = user.activeAccount;
+    if (activeAccount == null) {
       return;
     }
 
-    final updatedUser = user.updateAccount(account);
+    var updatedAccount = activeAccount.copyWith();
+
+    if (username != null) {
+      final catalystId = activeAccount.catalystId.copyWith(username: username);
+      updatedAccount = activeAccount.copyWith(catalystId: catalystId);
+    }
+
+    // TODO(damian-molinski): post it to cat-reviews
+    if (email != null) {
+      // updatedAccount = activeAccount.copyWith(email: email);
+    }
+
+    final updatedUser = user.updateAccount(updatedAccount);
 
     await _updateUser(updatedUser);
   }

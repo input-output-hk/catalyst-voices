@@ -18,7 +18,7 @@ final class DisplayName
       return const EmptyDisplayNameException();
     }
 
-    if (!lengthRange.contains(value.length)) {
+    if (!lengthRange.contains(value.trim().length)) {
       return const OutOfRangeDisplayNameException();
     }
 
