@@ -168,7 +168,7 @@ final class CatalystId extends Equatable {
     AccountRole? role,
     int? rotation,
   ) _parsePath(String path) {
-    final sanitizedPath = _sanitizePath(path);
+    final sanitizedPath = _sanitizePath(Uri.decodeComponent(path));
     final parts = sanitizedPath.split('/');
 
     final role0Key = parts.elementAt(0);
@@ -186,7 +186,8 @@ final class CatalystId extends Equatable {
   ///
   /// Format: [username][:nonce]
   static (String? username, int? nonce) _parseUserInfo(String userInfo) {
-    final parts = userInfo.split(':');
+    final decoded = Uri.decodeComponent(userInfo);
+    final parts = decoded.split(':');
     final username = parts.elementAtOrNull(0) ?? '';
     final nonce = parts.elementAtOrNull(1) ?? '';
 

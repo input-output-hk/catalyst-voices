@@ -196,6 +196,39 @@ void main() {
       // Then
       expect(isSameRegistration, isTrue);
     });
+
+    test('username with spaces is decoded correctly', () {
+      const rawUri = 'id.catalyst://'
+          'damian%20m@cardano/'
+          'FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE';
+      final id = CatalystId.fromUri(Uri.parse(rawUri));
+
+      const expectedUsername = 'damian m';
+
+      // When
+      final username = id.username;
+
+      // Then
+      expect(username, expectedUsername);
+    });
+
+    test('username with spaces is encoded correctly', () {
+      const username = 'damian m';
+      final id = CatalystId(
+        host: CatalystIdHost.cardano.host,
+        role0Key: role0Key,
+        username: 'damian m',
+      );
+
+      final encodedUsername = Uri.encodeComponent(username);
+
+      // When
+      final uri = id.toUri();
+      final userInfo = uri.userInfo;
+
+      // Then
+      expect(userInfo, contains(encodedUsername));
+    });
   });
 }
 
