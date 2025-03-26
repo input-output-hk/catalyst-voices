@@ -66,7 +66,7 @@ class _SegmentMenuTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return VoicesNodeMenu(
       key: ValueKey('Segment[${segment.id}]NodeMenu'),
-      name: segment.resolveTitle(context),
+      name: Text(segment.resolveTitle(context)),
       icon: segment.icon.buildIcon(),
       onHeaderTap: () {
         SegmentsControllerScope.of(context).toggleSegment(segment.id);

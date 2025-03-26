@@ -275,7 +275,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
 
   @override
   Future<void> upsertDraftProposal({required DocumentData document}) {
-    return _documentRepository.insertDocument(document: document);
+    return _documentRepository.upsertDocument(document: document);
   }
 
   @override
@@ -291,6 +291,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     return _documentRepository
         .watchDocuments(
           limit: limit,
+          unique: true,
           type: DocumentType.proposalDocument,
         )
         .map(

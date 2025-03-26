@@ -28,6 +28,7 @@ final class AccountSignerService implements SignerService {
   Future<void> _useRoleCredentials(
     RoleCredentialsCallback callback, {
     required AccountRole role,
+    int rotation = 0,
   }) async {
     final account = _userService.user.activeAccount;
     if (account == null) {
@@ -36,7 +37,7 @@ final class AccountSignerService implements SignerService {
 
     final catalystId = account.catalystId.copyWith(
       role: Optional(role),
-      rotation: const Optional(0),
+      rotation: Optional(rotation),
     );
 
     await account.keychain.getMasterKey().use((masterKey) async {
