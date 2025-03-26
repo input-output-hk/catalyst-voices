@@ -49,7 +49,7 @@ pub(crate) async fn endpoint(doc_bytes: Vec<u8>, token: CatalystRBACTokenV1) -> 
         doc_bytes.as_slice().try_into()
     else {
         return Responses::UnprocessableContent(Json(PutDocumentUnprocessableContent::new(
-            "Invalid CBOR bytes, cannot decode Catalyst Signed Document.",
+            "Invalid CBOR bytes, cannot decode Catalyst Signed Document",
             None,
         )))
         .into();
@@ -64,7 +64,7 @@ pub(crate) async fn endpoint(doc_bytes: Vec<u8>, token: CatalystRBACTokenV1) -> 
         .any(|id_uri| id_uri.as_id().to_string() != token_catid.to_string())
     {
         return Responses::UnprocessableContent(Json(PutDocumentUnprocessableContent::new(
-            "RBAC Token CatID does not match with the providing document KIDs.",
+            "RBAC Token CatID does not match with the providing document KIDs",
             None,
         )))
         .into();
