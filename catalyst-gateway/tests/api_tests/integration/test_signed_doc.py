@@ -238,18 +238,22 @@ def test_comment_doc(comment_doc_factory):
 
 
 def test_document_index_endpoint(proposal_doc_factory):
-    # submiting 10 proposal documents, so we will have at least 10 proposal documents in our db
-    # we say at least, because this test could run after some other tests which could also submit proposal documents
+    # submiting 10 proposal documents
     total_amount = 10
-    for _ in range(total_amount):
-        proposal_doc_factory()
+    proposals = [proposal_doc_factory() for _ in range(total_amount)]
+
+    filter = {
+        "id": {
+            "min": proposals[0].metadata["id"],
+            "max": proposals[-1].metadata["id"],
+        }
+    }
 
     limit = 1
     page = 0
     resp = document.post(
         f"/index?limit={limit}&page={page}",
-        # proposal doc type
-        filter={"type": "7808d2ba-d511-40af-84e8-c0d1625fdfdc"},
+        filter=filter,
     )
     assert (
         resp.status_code == 200
@@ -258,14 +262,12 @@ def test_document_index_endpoint(proposal_doc_factory):
     data = resp.json()
     assert data["page"]["limit"] == limit
     assert data["page"]["page"] == page
-    assert data["page"]["remaining"] >= total_amount - 1 - page
-    previous_remaining = data["page"]["remaining"]
+    assert data["page"]["remaining"] == total_amount - 1 - page
 
     page += 1
     resp = document.post(
         f"/index?limit={limit}&page={page}",
-        # proposal doc type
-        filter={"type": "7808d2ba-d511-40af-84e8-c0d1625fdfdc"},
+        filter=filter,
     )
     assert (
         resp.status_code == 200
@@ -273,7 +275,7 @@ def test_document_index_endpoint(proposal_doc_factory):
     data = resp.json()
     assert data["page"]["limit"] == limit
     assert data["page"]["page"] == page
-    assert data["page"]["remaining"] == previous_remaining - 1
+    assert data["page"]["remaining"] == total_amount - 1 - page
 
     # Pagination out of range
     resp = document.post(
