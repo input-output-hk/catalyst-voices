@@ -149,7 +149,7 @@ class _ProposalCommentBuilderState extends State<ProposalCommentBuilder> {
 
     final cubit = context.read<ProposalCubit>();
 
-    unawaited(cubit.submitComment(document: _comment, parent: widget.parent));
+    unawaited(cubit.submitComment(document: _comment, reply: widget.parent));
 
     setState(() {
       _formKey.currentState?.reset();

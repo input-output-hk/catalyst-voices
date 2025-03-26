@@ -74,6 +74,7 @@ abstract interface class DocumentsDao {
     int? limit,
     DocumentType? type,
     CatalystId? authorId,
+    DocumentRef? refTo,
   });
 
   /// Watches for new comments that are reference by ref.
@@ -249,6 +250,7 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
     int? limit,
     DocumentType? type,
     CatalystId? authorId,
+    DocumentRef? refTo,
   }) {
     final query = select(documents);
 
@@ -260,6 +262,17 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
         (doc) => CustomExpression<bool>(
           "json_extract(metadata, '\$.authors') LIKE '%$authorId%'",
         ),
+      );
+    }
+    if (refTo != null) {
+      query.where(
+        (row) => Expression.and([
+          row.metadata.jsonExtract<String>(r'$.ref.id').equals(refTo.id),
+          if (refTo.version != null)
+            row.metadata
+                .jsonExtract<String>(r'$.ref.version')
+                .equals(refTo.version!),
+        ]),
       );
     }
 

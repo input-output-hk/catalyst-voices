@@ -6,17 +6,16 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ProposalCommentTile extends StatelessWidget {
   final CommentWithReplies comment;
+  final bool canReply;
 
   const ProposalCommentTile({
     super.key,
     required this.comment,
+    required this.canReply,
   });
 
   @override
   Widget build(BuildContext context) {
-    final hasActiveAccount = context
-        .select<SessionCubit, bool>((value) => value.state.account != null);
-
     final showReplies = context.select<ProposalCubit, bool>((value) {
       return value.state.data.showReplies[comment.ref] ?? true;
     });
@@ -30,7 +29,7 @@ class ProposalCommentTile extends StatelessWidget {
     return ProposalCommentWithRepliesCard(
       key: ValueKey('ProposalComment.$id.WithReplies'),
       comment: comment,
-      canReply: hasActiveAccount,
+      canReply: canReply,
       showReplies: showReplies,
       showReplyBuilder: showReplyBuilder,
     );

@@ -1,7 +1,10 @@
 import 'dart:async';
 
+import 'package:catalyst_voices/common/error_handler.dart';
 import 'package:catalyst_voices/common/signal_handler.dart';
 import 'package:catalyst_voices/pages/proposal/proposal_content.dart';
+import 'package:catalyst_voices/pages/proposal/proposal_error.dart';
+import 'package:catalyst_voices/pages/proposal/proposal_loading.dart';
 import 'package:catalyst_voices/pages/proposal/snack_bar/viewing_older_version_snack_bar.dart';
 import 'package:catalyst_voices/pages/proposal/widget/proposal_header.dart';
 import 'package:catalyst_voices/pages/proposal/widget/proposal_navigation_panel.dart';
@@ -30,7 +33,9 @@ class ProposalPage extends StatefulWidget {
 }
 
 class _ProposalPageState extends State<ProposalPage>
-    with SignalHandlerStateMixin<ProposalCubit, ProposalSignal, ProposalPage> {
+    with
+        ErrorHandlerStateMixin<ProposalCubit, ProposalPage>,
+        SignalHandlerStateMixin<ProposalCubit, ProposalSignal, ProposalPage> {
   late final SegmentsController _segmentsController;
   late final ItemScrollController _segmentsScrollController;
 
@@ -45,8 +50,14 @@ class _ProposalPageState extends State<ProposalPage>
         body: ProposalHeaderWrapper(
           child: ProposalSidebars(
             navPanel: const ProposalNavigationPanel(),
-            body: ProposalContent(
-              scrollController: _segmentsScrollController,
+            body: Stack(
+              children: [
+                ProposalContent(
+                  scrollController: _segmentsScrollController,
+                ),
+                const ProposalLoading(),
+                const ProposalError(),
+              ],
             ),
           ),
         ),

@@ -20,7 +20,7 @@ class ProposalCommentCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final author = document.author;
+    final authorId = document.metadata.authorId;
     final footer = this.footer;
 
     return Row(
@@ -28,7 +28,7 @@ class ProposalCommentCard extends StatelessWidget {
       children: [
         ProfileAvatar(
           size: 40,
-          username: author?.catalystId.username,
+          username: authorId.username,
         ),
         const SizedBox(width: 16),
         Expanded(
@@ -37,8 +37,8 @@ class ProposalCommentCard extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               _Header(
-                username: author?.catalystId.username,
-                catalystId: author?.catalystId,
+                username: authorId.username,
+                catalystId: authorId,
                 createAt: document.metadata.selfRef.version!.tryDateTime,
                 actions: [
                   if (canReply) ReplyButton(onTap: onReplyTap),
