@@ -16,10 +16,10 @@ part 'proposal_builder_route.g.dart';
 )
 final class ProposalBuilderDraftRoute extends GoRouteData
     with FadePageTransitionMixin, CompositeRouteGuardMixin {
-  final String? categoryId;
+  final String categoryId;
 
   const ProposalBuilderDraftRoute({
-    this.categoryId,
+    required this.categoryId,
   });
 
   factory ProposalBuilderDraftRoute.fromRef({
@@ -37,8 +37,7 @@ final class ProposalBuilderDraftRoute extends GoRouteData
   @override
   Widget build(BuildContext context, GoRouterState state) {
     final categoryId = this.categoryId;
-    final categoryRef =
-        categoryId != null ? SignedDocumentRef(id: categoryId) : null;
+    final categoryRef = SignedDocumentRef(id: categoryId);
     return ProposalBuilderPage(categoryId: categoryRef);
   }
 }
