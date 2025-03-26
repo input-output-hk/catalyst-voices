@@ -82,7 +82,8 @@ final class AccountCubit extends Cubit<AccountState> {
         .toList();
 
     return AccountState(
-      status: const AccountFinalized(),
+      // Note. acccount status is not supported for f14.
+      status: const None(),
       catalystId: catalystId,
       username: Username.pure(catalystId?.username ?? ''),
       email: Email.pure(from?.email ?? ''),
