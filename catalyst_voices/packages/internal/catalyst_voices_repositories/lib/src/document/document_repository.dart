@@ -475,6 +475,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
       refGetter: refGetter,
       limit: limit,
       type: type,
+      unique: unique,
       getLocalDrafts: getLocalDrafts,
       authorId: authorId,
       refTo: refTo,

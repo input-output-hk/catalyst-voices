@@ -291,6 +291,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     return _documentRepository
         .watchDocuments(
           limit: limit,
+          unique: true,
           type: DocumentType.proposalDocument,
         )
         .map(
