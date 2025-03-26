@@ -276,7 +276,7 @@ fn sync_subchain(
                         // What we need to do here is tell the primary follower to start a new sync
                         // for the new immutable data, and then purge the volatile database of the
                         // old data (after the immutable data has synced).
-                        info!(chain=%params.chain, "Immutable chain rolled forward, point {}.", chain_update.block_data().point());
+                        info!(chain=%params.chain, point=?chain_update.block_data().point(), "Immutable chain rolled forward.");
                         // Signal the point the immutable chain rolled forward to.
                         params.follower_roll_forward = Some(chain_update.block_data().point());
                         // If this is live chain immediately stops to later run immutable sync tasks
