@@ -32,7 +32,13 @@ static SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| {
     }
 });
 
-impl_string_types!(HexEncodedBinaryData, "string", FORMAT, Some(SCHEMA.clone()));
+impl_string_types!(
+    /// A hex encoded binary data.
+    HexEncodedBinaryData,
+    "string",
+    FORMAT,
+    Some(SCHEMA.clone())
+);
 
 impl From<Vec<u8>> for HexEncodedBinaryData {
     fn from(value: Vec<u8>) -> Self {

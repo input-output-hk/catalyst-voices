@@ -4,7 +4,7 @@ use anyhow::{bail, Context};
 use cardano_blockchain_types::{Network, Point, Slot, TransactionId, TxnIndex};
 use cardano_chain_follower::ChainFollower;
 use catalyst_types::id_uri::IdUri;
-use futures::{TryFutureExt, TryStreamExt};
+use futures::{future::try_join, TryFutureExt, TryStreamExt};
 use rbac_registration::{cardano::cip509::Cip509, registration::cardano::RegistrationChain};
 
 use crate::{
@@ -33,9 +33,11 @@ impl ChainInfo {
         persistent_session: &CassandraSession, volatile_session: &CassandraSession,
         catalyst_id: &IdUri,
     ) -> anyhow::Result<Option<Self>> {
-        let persistent_registrations =
-            indexed_registrations(persistent_session, catalyst_id).await?;
-        let volatile_registrations = indexed_registrations(volatile_session, catalyst_id).await?;
+        let (persistent_registrations, volatile_registrations) = try_join(
+            indexed_registrations(persistent_session, catalyst_id),
+            indexed_registrations(volatile_session, catalyst_id),
+        )
+        .await?;
         let network = Settings::cardano_network();
 
         let (chain, last_persistent_slot) =
