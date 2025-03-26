@@ -82,6 +82,7 @@ final class DatabaseDocumentsDataSource implements SignedDocumentDataSource {
     required bool unique,
     DocumentType? type,
     CatalystId? authorId,
+    DocumentRef? refTo,
   }) {
     return _database.documentsDao
         .watchAll(
@@ -89,6 +90,7 @@ final class DatabaseDocumentsDataSource implements SignedDocumentDataSource {
       unique: unique,
       type: type,
       authorId: authorId,
+      refTo: refTo,
     )
         .map((entities) {
       return List<DocumentData>.from(entities.map((e) => e.toModel()));

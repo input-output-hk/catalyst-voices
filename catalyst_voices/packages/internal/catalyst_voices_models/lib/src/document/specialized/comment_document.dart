@@ -13,32 +13,54 @@ final class CommentDocument extends Equatable {
     required this.document,
   });
 
-  Profile? get author {
-    /* cSpell:disable */
-    final uri = Uri.parse(
-      'id.catalyst://cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE',
-    );
-    var catId = CatalystId.fromUri(uri);
-    catId = catId.copyWith(username: const Optional('Daniel Ribar'));
-    return Profile(catalystId: catId);
-    /* cSpell:enable */
-  }
-
   @override
   List<Object?> get props => [metadata, document];
+
+  DocumentData toDocumentData({
+    required DocumentMapper mapper,
+  }) {
+    return DocumentData(
+      metadata: DocumentDataMetadata(
+        type: DocumentType.commentDocument,
+        selfRef: metadata.selfRef,
+        ref: metadata.ref,
+        template: metadata.template,
+        reply: metadata.reply,
+        authors: [metadata.authorId],
+      ),
+      content: mapper.toContent(document),
+    );
+  }
 }
 
 final class CommentMetadata extends DocumentMetadata {
-  final SignedDocumentRef? parent;
+  /// [ref] is document ref that this comment refers to. Comment can not
+  /// exist on its own but just in a context of other documents.
+  final SignedDocumentRef ref;
+
+  /// against which [CommentDocument] is valid.
+  final SignedDocumentRef template;
+
+  /// [reply] equals other comment of this is a reply to it.
+  final SignedDocumentRef? reply;
+
+  /// Creator of document.
+  final CatalystId authorId;
 
   CommentMetadata({
     // Note. no drafts for comments
     required SignedDocumentRef super.selfRef,
-    this.parent,
-  });
+    required this.ref,
+    required this.template,
+    this.reply,
+    required this.authorId,
+  }) : assert(
+          ref.isExact,
+          'Comments can refer only exact documents',
+        );
 
   @override
-  List<Object?> get props => super.props + [parent];
+  List<Object?> get props => super.props + [ref, template, reply, authorId];
 
   @override
   SignedDocumentRef get selfRef => super.selfRef as SignedDocumentRef;

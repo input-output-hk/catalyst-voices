@@ -12,14 +12,14 @@ void main() {
   late MockProposalRepository mockProposalRepository;
   late MockUserService mockUserService;
   late MockCampaignRepository mockCampaignRepository;
-  late MockKeyDerivationService mockKeyDerivationService;
+  late MockSignerService mockSignerService;
 
   late ProposalService proposalService;
 
   setUp(() {
     mockDocumentRepository = MockDocumentRepository();
     mockProposalRepository = MockProposalRepository();
-    mockKeyDerivationService = MockKeyDerivationService();
+    mockSignerService = MockSignerService();
     mockCampaignRepository = MockCampaignRepository();
     mockUserService = MockUserService();
 
@@ -27,7 +27,7 @@ void main() {
       mockProposalRepository,
       mockDocumentRepository,
       mockUserService,
-      mockKeyDerivationService,
+      mockSignerService,
       mockCampaignRepository,
     );
 
@@ -251,8 +251,8 @@ class MockCampaignRepository extends Mock implements CampaignRepository {}
 
 class MockDocumentRepository extends Mock implements DocumentRepository {}
 
-class MockKeyDerivationService extends Mock implements KeyDerivationService {}
-
 class MockProposalRepository extends Mock implements ProposalRepository {}
+
+class MockSignerService extends Mock implements SignerService {}
 
 class MockUserService extends Mock implements UserService {}

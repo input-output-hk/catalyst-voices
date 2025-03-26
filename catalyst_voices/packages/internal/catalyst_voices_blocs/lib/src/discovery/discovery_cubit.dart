@@ -110,14 +110,14 @@ class DiscoveryCubit extends Cubit<DiscoveryState> {
           ),
         );
       },
-      onError: (error) {
+      onError: (Object error) {
         if (isClosed) return;
         emit(
           state.copyWith(
-            mostRecentProposals: const DiscoveryMostRecentProposalsState(
+            mostRecentProposals: DiscoveryMostRecentProposalsState(
               isLoading: false,
-              error: LocalizedUnknownException(),
-              proposals: [],
+              error: LocalizedException.create(error),
+              proposals: const [],
             ),
           ),
         );
