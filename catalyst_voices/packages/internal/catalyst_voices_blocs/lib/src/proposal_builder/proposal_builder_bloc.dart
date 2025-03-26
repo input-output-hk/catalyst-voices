@@ -357,6 +357,7 @@ final class ProposalBuilderBloc
       emit(
         const ProposalBuilderState(
           isLoading: true,
+          isChanging: true,
         ),
       );
       _documentBuilder = null;
@@ -371,7 +372,12 @@ final class ProposalBuilderBloc
       _logger.severe('load state error', error, stackTrace);
       emit(const ProposalBuilderState(error: LocalizedUnknownException()));
     } finally {
-      emit(state.copyWith(isLoading: false));
+      emit(
+        state.copyWith(
+          isLoading: false,
+          isChanging: false,
+        ),
+      );
     }
   }
 
