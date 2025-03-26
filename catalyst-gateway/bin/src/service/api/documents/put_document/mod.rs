@@ -45,7 +45,9 @@ pub(crate) type AllResponses = WithErrorResponses<Responses>;
 
 /// # PUT `/document`
 pub(crate) async fn endpoint(doc_bytes: Vec<u8>, token: CatalystRBACTokenV1) -> AllResponses {
-    let Ok(doc) = doc_bytes.as_slice().try_into() else {
+    let Ok(doc): Result<catalyst_signed_doc::CatalystSignedDocument, _> =
+        doc_bytes.as_slice().try_into()
+    else {
         return Responses::UnprocessableContent(Json(PutDocumentUnprocessableContent::new(
             "Invalid CBOR bytes, cannot decode Catalyst Signed Document.",
             None,
@@ -53,6 +55,22 @@ pub(crate) async fn endpoint(doc_bytes: Vec<u8>, token: CatalystRBACTokenV1) -> 
         .into();
     };
 
+    // validate rbac token and document KIDs
+    let token_catid = token.catalyst_id().clone().as_id();
+    if doc
+        .kids()
+        .iter()
+        .cloned()
+        .any(|id_uri| id_uri.as_id().to_string() != token_catid.to_string())
+    {
+        return Responses::UnprocessableContent(Json(PutDocumentUnprocessableContent::new(
+            "RBAC Token CatID does not match with the providing document KIDs.",
+            None,
+        )))
+        .into();
+    }
+
+    // validate document integrity
     match catalyst_signed_doc::validator::validate(&doc, &DocProvider).await {
         Ok(true) => (),
         Ok(false) => {
@@ -68,16 +86,12 @@ pub(crate) async fn endpoint(doc_bytes: Vec<u8>, token: CatalystRBACTokenV1) -> 
         },
     }
 
+    // validate document signatures
     let verifying_key_provider = match VerifyingKeyProvider::try_from_token(token).await {
         Ok(value) => value,
-        Err(e) => return AllResponses::handle_error(&e)
+        Err(e) => return AllResponses::handle_error(&e),
     };
-    match catalyst_signed_doc::validator::validate_signatures(
-        &doc,
-        &verifying_key_provider,
-    )
-    .await
-    {
+    match catalyst_signed_doc::validator::validate_signatures(&doc, &verifying_key_provider).await {
         Ok(true) => (),
         Ok(false) => {
             return Responses::UnprocessableContent(Json(PutDocumentUnprocessableContent::new(
