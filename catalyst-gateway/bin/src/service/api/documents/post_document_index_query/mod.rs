@@ -110,7 +110,16 @@ async fn fetch_docs(
         .try_for_each(|doc: SignedDocBody| {
             let id = *doc.id();
             indexed_docs.entry(id).or_insert_with(Vec::new).push(doc);
-            total_fetched_doc_count = total_fetched_doc_count.saturating_add(1);
+            match total_fetched_doc_count.checked_add(1) {
+                Some(updated_count) => {
+                    total_fetched_doc_count = updated_count;
+                },
+                None => {
+                    return future::ready(Err(anyhow::anyhow!(
+                        "Fetched Signed Documents overflow"
+                    )));
+                },
+            };
             future::ready(Ok(()))
         })
         .await?;
