@@ -100,7 +100,7 @@ derive_more = { version = "2.0.1", default-features = false, features = ["from",
 rayon = "1.10"
 oid-registry = "0.7.1"
 x509-cert = "0.2.5"
-minicbor = { version = "0.25.1", features = ["alloc", "derive", "half"] }
+minicbor = { version = "0.25.1", features = ["alloc"] }
 
 # Its a transitive dependency of the "poem-openapi" crate,
 # but its breaks API after version "5.1.8".
