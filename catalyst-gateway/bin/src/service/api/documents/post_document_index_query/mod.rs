@@ -96,9 +96,6 @@ pub(crate) async fn endpoint(
 }
 
 /// Fetch documents from the event db
-///
-/// NOTE: If the number of fetched document is greater than `u32::MAX`, the document count
-/// will return the saturated value.
 async fn fetch_docs(
     conditions: &DocsQueryFilter, query_limits: &QueryLimits,
 ) -> anyhow::Result<(Vec<IndexedDocumentDocumented>, u32)> {
