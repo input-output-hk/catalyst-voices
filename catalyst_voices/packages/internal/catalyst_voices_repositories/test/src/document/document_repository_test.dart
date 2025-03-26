@@ -252,15 +252,15 @@ void main() {
       });
     });
 
-    group('upsertDocumentDraft', () {
-      test('document data is saved', () async {
+    group('insertDocument', () {
+      test('draft document data is saved', () async {
         // Given
         final documentDataToSave = DocumentDataFactory.build(
           selfRef: DraftRef.generateFirstRef(),
         );
 
         // When
-        await repository.upsertDocumentDraft(document: documentDataToSave);
+        await repository.upsertDocument(document: documentDataToSave);
 
         // Then
         final savedDocumentData = await repository.getDocumentData(
@@ -442,9 +442,7 @@ void main() {
       await draftsSource.save(data: draftData);
 
       // Then
-      await repository.upsertDocumentDraft(
-        document: updatedData,
-      );
+      await repository.upsertDocument(document: updatedData);
 
       final draftStream = repository.watchDocumentWithRef(
         ref: draftRef,
@@ -485,7 +483,9 @@ void main() {
         await localDocuments.save(data: templateData);
         await localDocuments.save(data: publicDraftData);
 
-        final latestProposals = repository.watchAllDocuments();
+        final latestProposals = repository.watchAllDocuments(
+          refGetter: (data) => data.metadata.template!,
+        );
 
         expect(
           latestProposals,

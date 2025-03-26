@@ -80,7 +80,7 @@ final class KeychainCreationCubit extends Cubit<KeychainStateData>
       );
     } catch (error, stackTrace) {
       _logger.severe('Downloading keychain failed', error, stackTrace);
-      emitError(const LocalizedUnknownException());
+      emitError(LocalizedException.create(error));
     }
   }
 

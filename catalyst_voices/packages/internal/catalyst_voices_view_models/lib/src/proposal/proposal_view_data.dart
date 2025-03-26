@@ -29,19 +29,6 @@ final class ProposalViewData extends Equatable {
         showReplyBuilder,
       ];
 
-  ProposalViewData addComment(CommentDocument comment) {
-    final segments = List.of(this.segments)
-        .map((segment) {
-          return segment is ProposalCommentsSegment
-              ? segment.addComment(comment)
-              : segment;
-        })
-        .sortWith(sort: commentsSort)
-        .toList();
-
-    return copyWith(segments: segments);
-  }
-
   ProposalViewData copyWith({
     Optional<bool>? isCurrentVersionLatest,
     ProposalViewHeader? header,

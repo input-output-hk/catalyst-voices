@@ -27,14 +27,20 @@ final class CommentListItem extends Equatable implements SegmentsListViewItem {
   @override
   final NodeId id;
   final CommentWithReplies comment;
+  final bool canReply;
 
   const CommentListItem({
     required this.id,
     required this.comment,
+    required this.canReply,
   });
 
   @override
-  List<Object?> get props => [id, comment];
+  List<Object?> get props => [
+        id,
+        comment,
+        canReply,
+      ];
 }
 
 sealed class ProposalCommentsSection extends BaseSection {
@@ -59,19 +65,9 @@ final class ProposalCommentsSegment
   @override
   List<Object?> get props => super.props + [sort];
 
-  ProposalCommentsSegment addComment(CommentDocument comment) {
-    final sections = this
-        .sections
-        .map(
-          (section) => switch (section) {
-            AddCommentSection() => section,
-            ViewCommentsSection() => section.addComment(comment),
-          },
-        )
-        .toList();
-
-    return copyWith(sections: sections);
-  }
+  bool get hasComments => sections
+      .whereType<ViewCommentsSection>()
+      .any((element) => element.comments.isNotEmpty);
 
   ProposalCommentsSegment copySorted({
     required ProposalCommentsSort sort,
@@ -112,10 +108,12 @@ final class ProposalCommentsSegment
 final class ViewCommentsSection extends ProposalCommentsSection
     implements SegmentGroupedListViewItems {
   final List<CommentWithReplies> comments;
+  final bool canReply;
 
   const ViewCommentsSection({
     required super.id,
     required this.comments,
+    required this.canReply,
   });
 
   @override
@@ -124,37 +122,23 @@ final class ViewCommentsSection extends ProposalCommentsSection
       return CommentListItem(
         id: id.child(comment.comment.metadata.selfRef.id),
         comment: comment,
+        canReply: canReply,
       );
     });
   }
 
   @override
-  List<Object?> get props => super.props + [comments];
-
-  ViewCommentsSection addComment(CommentDocument comment) {
-    final comments = List.of(this.comments);
-    final parent = comment.metadata.parent;
-
-    if (parent != null) {
-      final index = comments.indexWhere((comment) => comment.contains(parent));
-      if (index != -1) {
-        final updated = comments.removeAt(index).addReply(comment);
-        comments.insert(index, updated);
-      }
-    } else {
-      comments.add(CommentWithReplies.direct(comment));
-    }
-
-    return copyWith(comments: comments);
-  }
+  List<Object?> get props => super.props + [comments, canReply];
 
   ViewCommentsSection copyWith({
     NodeId? id,
     List<CommentWithReplies>? comments,
+    bool? canReply,
   }) {
     return ViewCommentsSection(
       id: id ?? this.id,
       comments: comments ?? this.comments,
+      canReply: canReply ?? this.canReply,
     );
   }
 
