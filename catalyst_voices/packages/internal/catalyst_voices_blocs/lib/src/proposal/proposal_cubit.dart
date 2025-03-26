@@ -92,26 +92,22 @@ final class ProposalCubit extends Cubit<ProposalState>
           emitSignal(const ViewingOlderVersionSignal());
         }
       }
-    } on LocalizedException catch (error, stack) {
-      _logger.severe('Loading $ref failed', error, stack);
-
-      _clearProposalCache();
-
-      emit(ProposalState(error: error));
-    } on ApiException catch (error, stack) {
-      _logger.severe('Loading $ref failed', error, stack);
-
-      _clearProposalCache();
-
-      final localizedError = LocalizedApiException.from(error);
-
-      emit(ProposalState(error: localizedError));
     } catch (error, stack) {
       _logger.severe('Loading $ref failed', error, stack);
 
-      _clearProposalCache();
+      _cache = _cache.copyWith(
+        proposal: const Optional.empty(),
+        commentTemplate: const Optional.empty(),
+        comments: const Optional.empty(),
+        isFavorite: const Optional.empty(),
+      );
 
-      emit(const ProposalState(error: LocalizedUnknownException()));
+      final localizedException = LocalizedException.create(
+        error,
+        fallback: LocalizedUnknownException.new,
+      );
+
+      emit(ProposalState(error: localizedException));
     } finally {
       if (!isClosed) {
         emit(state.copyWith(isLoading: false));
@@ -161,34 +157,24 @@ final class ProposalCubit extends Cubit<ProposalState>
 
     final documentData = comment.toDocumentData(mapper: _documentMapper);
 
-    var isSuccess = true;
-
     try {
       await _commentService.submitComment(document: documentData);
-    } on ApiException catch (error, stack) {
-      _logger.info('Publishing comment failed', error, stack);
-
-      isSuccess = false;
-      emitError(LocalizedApiException.from(error));
-    } on LocalizedException catch (error, stack) {
-      _logger.info('Publishing comment failed', error, stack);
-
-      isSuccess = false;
-      emitError(error);
     } catch (error, stack) {
       _logger.info('Publishing comment failed', error, stack);
 
-      isSuccess = false;
-      emitError(const LocalizedUnknownPublishCommentException());
-    } finally {
-      if (!isSuccess) {
-        final source = _cache.comments;
-        final comments = _removeCommentFrom(source ?? [], ref: commentRef);
-        _cache = _cache.copyWith(comments: Optional(comments));
+      final localizedException = LocalizedException.create(
+        error,
+        fallback: LocalizedUnknownPublishCommentException.new,
+      );
 
-        if (!isClosed) {
-          emit(state.copyWith(data: _rebuildProposalState()));
-        }
+      emitError(localizedException);
+
+      final source = _cache.comments;
+      final comments = _removeCommentFrom(source ?? [], ref: commentRef);
+      _cache = _cache.copyWith(comments: Optional(comments));
+
+      if (!isClosed) {
+        emit(state.copyWith(data: _rebuildProposalState()));
       }
     }
   }
@@ -376,15 +362,6 @@ final class ProposalCubit extends Cubit<ProposalState>
       ...proposalSegments,
       if (canComment || comments.isNotEmpty) commentsSegment,
     ];
-  }
-
-  void _clearProposalCache() {
-    _cache = _cache.copyWith(
-      proposal: const Optional.empty(),
-      commentTemplate: const Optional.empty(),
-      comments: const Optional.empty(),
-      isFavorite: const Optional.empty(),
-    );
   }
 
   void _handleActiveAccountIdChanged(CatalystId? data) {

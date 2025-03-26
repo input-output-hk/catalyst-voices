@@ -1,4 +1,6 @@
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 
@@ -8,12 +10,22 @@ abstract base class LocalizedException
     implements Exception {
   const LocalizedException();
 
+  factory LocalizedException.create(
+    Object error, {
+    required ValueGetter<LocalizedException> fallback,
+  }) {
+    if (error is LocalizedException) return error;
+    if (error is ApiException) return LocalizedApiException.from(error);
+
+    return fallback();
+  }
+
+  @override
+  List<Object?> get props => [];
+
   /// Returns a message describing the exception that can be shown the user.
   ///
   /// Use the [BuildContext] to get the [VoicesLocalizations]
   /// or any other context dependent formatting utilities.
   String message(BuildContext context);
-
-  @override
-  List<Object?> get props => [];
 }
