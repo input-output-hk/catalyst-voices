@@ -92,12 +92,12 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
           controller: _segmentsController,
           child: SidebarScaffold(
             leftRail: const ProposalBuilderNavigationPanel(),
+            rightRail: const ProposalBuilderSetupPanel(),
             body: _ProposalBuilderContent(
               controller: _segmentsScrollController,
               onRetryTap: _updateSource,
             ),
             bodyConstraints: const BoxConstraints.expand(),
-            rightRail: const ProposalBuilderSetupPanel(),
           ),
         ),
       ),
