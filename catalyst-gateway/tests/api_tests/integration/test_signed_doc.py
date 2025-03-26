@@ -239,17 +239,20 @@ def test_comment_doc(comment_doc_factory):
 
 def test_document_index_endpoint(proposal_doc_factory):
     # submiting 10 proposal documents
-    proposals = [proposal_doc_factory() for _ in range(10)]
-
-    filter = {
-        "id": {
-            "min": proposals[0].metadata["id"],
-            "max": proposals[-1].metadata["id"],
-        }
-    }
+    total_amount = 10
+    first_proposal = proposal_doc_factory()
+    for _ in range(total_amount - 1):
+        doc = first_proposal.copy()
+        # keep the same id, but different version
+        doc.metadata["ver"] = uuid7str()
+        resp = document.put(data=doc.hex())
+        assert (
+            resp.status_code == 201
+        ), f"Failed to publish document: {resp.status_code} - {resp.text}"
 
     limit = 1
     page = 0
+    filter = {"id": {"eq": first_proposal.metadata["id"]}}
     resp = document.post(
         f"/index?limit={limit}&page={page}",
         filter=filter,
@@ -261,7 +264,7 @@ def test_document_index_endpoint(proposal_doc_factory):
     data = resp.json()
     assert data["page"]["limit"] == limit
     assert data["page"]["page"] == page
-    assert data["page"]["remaining"] == len(proposals) - 1 - page
+    assert data["page"]["remaining"] == total_amount - 1 - page
 
     page += 1
     resp = document.post(
@@ -272,9 +275,22 @@ def test_document_index_endpoint(proposal_doc_factory):
         resp.status_code == 200
     ), f"Failed to post document: {resp.status_code} - {resp.text}"
     data = resp.json()
+    print(data)
     assert data["page"]["limit"] == limit
     assert data["page"]["page"] == page
-    assert data["page"]["remaining"] == len(proposals) - 1 - page
+    assert data["page"]["remaining"] == total_amount - 1 - page
+
+    resp = document.post(
+        f"/index?limit={total_amount}",
+        filter=filter,
+    )
+    assert (
+        resp.status_code == 200
+    ), f"Failed to post document: {resp.status_code} - {resp.text}"
+    data = resp.json()
+    assert data["page"]["limit"] == total_amount
+    assert data["page"]["page"] == 0  # default value
+    assert data["page"]["remaining"] == 0
 
     # Pagination out of range
     resp = document.post(
