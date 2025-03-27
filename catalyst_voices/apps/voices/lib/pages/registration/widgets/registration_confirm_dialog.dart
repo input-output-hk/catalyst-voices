@@ -83,6 +83,24 @@ class RegistrationExitConfirmDialog extends StatelessWidget {
   }
 }
 
+class WalletLinkExitConfirmDialog extends StatelessWidget {
+  const WalletLinkExitConfirmDialog({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return RegistrationConfirmDialog(
+      title: context.l10n.warning,
+      subtitle: context.l10n.walletLinkExitConfirmDialogSubtitle,
+      content: Text(
+        key: const Key('RegistrationExitDialogContent'),
+        context.l10n.walletLinkExitConfirmDialogContent,
+      ),
+      negativeText: context.l10n.cancelAnyways,
+      positiveText: context.l10n.walletLinkExitConfirmDialogContinue,
+    );
+  }
+}
+
 class _WarningIcon extends StatelessWidget {
   const _WarningIcon();
 

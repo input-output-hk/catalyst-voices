@@ -240,12 +240,11 @@ pub(crate) async fn last_signing_key(
         .data()
         .signing_key()
         .context("Missing signing key")?;
-    let key_offset = usize::try_from(key_ref.key_offset).context("Invalid signing key offset")?;
     match key_ref.local_ref {
         LocalRefInt::X509Certs => {
             let cert = &chain
                 .x509_certs()
-                .get(&key_offset)
+                .get(&key_ref.key_offset)
                 .context("Missing X509 role 0 certificate")?
                 .last()
                 .and_then(|p| p.data().as_ref())
@@ -255,7 +254,7 @@ pub(crate) async fn last_signing_key(
         LocalRefInt::C509Certs => {
             let cert = &chain
                 .c509_certs()
-                .get(&key_offset)
+                .get(&key_ref.key_offset)
                 .context("Missing C509 role 0 certificate")?
                 .last()
                 .and_then(|p| p.data().as_ref())

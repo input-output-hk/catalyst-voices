@@ -2,6 +2,7 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_repositories/src/database/catalyst_database.dart';
 import 'package:catalyst_voices_repositories/src/database/dao/drafts_dao.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:drift/drift.dart' show DatabaseConnection, Uint8List;
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -205,6 +206,52 @@ void main() {
           equals([
             authorId1,
             authorId2,
+          ]),
+        );
+      });
+
+      test(
+          'all drafts with from same account are returned '
+          'even when username changes', () async {
+        // Given
+        final originalId = DummyCatalystIdFactory.create(username: 'damian');
+        final updatedId = originalId.copyWith(username: const Optional('dev'));
+
+        final draft1 = DraftFactory.build(
+          metadata: DocumentDataMetadata(
+            type: DocumentType.proposalDocument,
+            selfRef: SignedDocumentRef.generateFirstRef(),
+            authors: [originalId],
+          ),
+        );
+        final draft2 = DraftFactory.build(
+          metadata: DocumentDataMetadata(
+            type: DocumentType.proposalDocument,
+            selfRef: SignedDocumentRef.generateFirstRef(),
+            authors: [updatedId],
+          ),
+        );
+
+        final drafts = [draft1, draft2];
+        final refs = drafts.map((e) => e.metadata.selfRef).toList();
+
+        // When
+        await database.draftsDao.saveAll(drafts);
+
+        // Then
+        final stream = database.draftsDao.watchAll(authorId: updatedId);
+
+        expect(
+          stream,
+          emitsInOrder([
+            allOf(
+              hasLength(drafts.length),
+              everyElement(
+                predicate<DocumentDraftEntity>((document) {
+                  return refs.contains(document.metadata.selfRef);
+                }),
+              ),
+            ),
           ]),
         );
       });

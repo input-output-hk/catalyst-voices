@@ -18,7 +18,7 @@ final class AccountRolesState extends Equatable {
 final class AccountState extends Equatable {
   final MyAccountStatusNotification status;
   final CatalystId? catalystId;
-  final DisplayName displayName;
+  final Username username;
   final Email email;
   final AccountRolesState roles;
   final String walletConnected;
@@ -26,7 +26,7 @@ final class AccountState extends Equatable {
   const AccountState({
     this.status = const None(),
     this.catalystId,
-    this.displayName = const DisplayName.pure(),
+    this.username = const Username.pure(),
     this.email = const Email.pure(),
     this.roles = const AccountRolesState(),
     this.walletConnected = '',
@@ -36,7 +36,7 @@ final class AccountState extends Equatable {
   List<Object?> get props => [
         status,
         catalystId,
-        displayName,
+        username,
         email,
         roles,
         walletConnected,
@@ -45,7 +45,7 @@ final class AccountState extends Equatable {
   AccountState copyWith({
     MyAccountStatusNotification? status,
     Optional<CatalystId>? catalystId,
-    DisplayName? displayName,
+    Username? username,
     Email? email,
     AccountRolesState? roles,
     String? walletConnected,
@@ -53,7 +53,7 @@ final class AccountState extends Equatable {
     return AccountState(
       status: status ?? this.status,
       catalystId: catalystId.dataOr(this.catalystId),
-      displayName: displayName ?? this.displayName,
+      username: username ?? this.username,
       email: email ?? this.email,
       roles: roles ?? this.roles,
       walletConnected: walletConnected ?? this.walletConnected,

@@ -2,17 +2,17 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:test/test.dart';
 
 void main() {
-  group(DisplayName, () {
+  group(Username, () {
     group('validator', () {
       test('correct value returns no errors', () {
         // Given
         const value = 'Dev';
 
         // When
-        const displayName = DisplayName.pure(value);
+        const username = Username.pure(value);
 
         // Then
-        final error = displayName.error;
+        final error = username.error;
 
         expect(error, isNull);
       });
@@ -22,28 +22,28 @@ void main() {
         const value = '';
 
         // When
-        const displayName = DisplayName.pure(value);
+        const username = Username.pure(value);
 
         // Then
-        final error = displayName.error;
+        final error = username.error;
 
-        expect(error, isA<EmptyDisplayNameException>());
+        expect(error, isA<EmptyUsernameException>());
       });
 
       test('too long value returns error', () {
         // Given
         final value = List.generate(
-          (DisplayName.lengthRange.max ?? 0) + 1,
+          (Username.lengthRange.max ?? 0) + 1,
           (_) => 'A',
         ).join();
 
         // When
-        final displayName = DisplayName.pure(value);
+        final username = Username.pure(value);
 
         // Then
-        final error = displayName.error;
+        final error = username.error;
 
-        expect(error, isA<OutOfRangeDisplayNameException>());
+        expect(error, isA<OutOfRangeUsernameException>());
       });
     });
   });
