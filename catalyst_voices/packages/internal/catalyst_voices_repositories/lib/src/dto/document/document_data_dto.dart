@@ -85,6 +85,8 @@ final class DocumentDataMetadataDto {
   final DocumentRefDto? ref;
   final SecuredDocumentRefDto? refHash;
   final DocumentRefDto? template;
+  final DocumentRefDto? reply;
+  final String? section;
   final DocumentRefDto? brandId;
   final DocumentRefDto? campaignId;
   final String? electionId;
@@ -97,6 +99,8 @@ final class DocumentDataMetadataDto {
     this.ref,
     this.refHash,
     this.template,
+    this.reply,
+    this.section,
     this.brandId,
     this.campaignId,
     this.electionId,
@@ -118,6 +122,8 @@ final class DocumentDataMetadataDto {
           ref: data.ref?.toDto(),
           refHash: data.refHash?.toDto(),
           template: data.template?.toDto(),
+          reply: data.reply?.toDto(),
+          section: data.section,
           brandId: data.brandId?.toDto(),
           campaignId: data.campaignId?.toDto(),
           electionId: data.electionId,
@@ -134,6 +140,8 @@ final class DocumentDataMetadataDto {
       ref: ref?.toModel(),
       refHash: refHash?.toModel(),
       template: template?.toModel().toSignedDocumentRef(),
+      reply: reply?.toModel().toSignedDocumentRef(),
+      section: section,
       brandId: brandId?.toModel().toSignedDocumentRef(),
       campaignId: campaignId?.toModel().toSignedDocumentRef(),
       electionId: electionId,

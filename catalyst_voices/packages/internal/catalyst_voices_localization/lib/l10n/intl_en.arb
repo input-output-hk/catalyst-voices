@@ -2118,5 +2118,9 @@
   "votingRegistrationForF14": "Voting Registration for Fund14.",
   "@votingRegistrationForF14": {
     "description": "Title for the voting registration for f14 card in stay involved section"
+  },
+  "errorUnknownPublishComment": "Can not publish comment",
+  "@errorUnknownPublishComment": {
+    "description": "Fallback message when can not publish comment for any reason."
   }
 }

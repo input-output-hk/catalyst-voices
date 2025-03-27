@@ -13,7 +13,7 @@ class ProfileContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final displayName = profile.username;
+    final username = profile.username;
 
     return Row(
       mainAxisSize: MainAxisSize.min,
@@ -21,11 +21,11 @@ class ProfileContainer extends StatelessWidget {
       children: [
         ProfileAvatar(
           size: 32,
-          username: displayName,
+          username: username,
         ),
-        if (displayName != null)
+        if (username != null)
           Text(
-            displayName,
+            username,
             style: context.textTheme.titleSmall?.copyWith(
               color: context.colors.textOnPrimaryLevel1,
             ),

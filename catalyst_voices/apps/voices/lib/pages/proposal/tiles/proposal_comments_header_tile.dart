@@ -9,10 +9,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ProposalCommentsHeaderTile extends StatelessWidget {
   final ProposalCommentsSort sort;
+  final bool showSort;
 
   const ProposalCommentsHeaderTile({
     super.key,
     required this.sort,
+    required this.showSort,
   });
 
   @override
@@ -21,7 +23,10 @@ class ProposalCommentsHeaderTile extends StatelessWidget {
       children: [
         const _TitleText(),
         const Spacer(),
-        _SortDropdownButton(selected: sort),
+        Offstage(
+          offstage: !showSort,
+          child: _SortDropdownButton(selected: sort),
+        ),
       ],
     );
   }

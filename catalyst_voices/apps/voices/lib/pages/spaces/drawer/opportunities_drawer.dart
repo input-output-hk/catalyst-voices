@@ -1,6 +1,9 @@
 import 'dart:async';
 
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
+import 'package:catalyst_voices/widgets/buttons/copy_catalyst_id_button.dart';
+import 'package:catalyst_voices/widgets/snackbar/voices_snackbar.dart';
+import 'package:catalyst_voices/widgets/snackbar/voices_snackbar_type.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
@@ -73,38 +76,15 @@ class _BecomeReviewerCard extends StatelessWidget with LaunchUrlMixin {
               ),
             ),
             const SizedBox(height: 15),
-            BlocSelector<SessionCubit, SessionState, CatalystId?>(
-              selector: (state) {
-                return state.account?.catalystId;
-              },
-              builder: (context, state) {
-                return VoicesTextButton(
-                  onTap: () {
-                    unawaited(
-                      Clipboard.setData(
-                        ClipboardData(text: state.toString()),
-                      ),
-                    );
-
-                    _showTooltip(context);
-                  },
-                  leading: VoicesAssets.icons.duplicate.buildIcon(),
-                  child: Text(
-                    context.l10n.copyMyCatalystId,
-                  ),
-                );
-              },
-            ),
+            CopyCatalystIdButton(onTap: () => _handleCopyCatalystId(context)),
             const SizedBox(height: 4),
-            VoicesFilledButton(
+            _OpportunityActionButton(
               onTap: () {
                 // TODO(LynxLynxx): add url;
                 // launchUri();
               },
+              title: context.l10n.becomeReviewer,
               trailing: VoicesAssets.icons.externalLink.buildIcon(),
-              child: Text(
-                context.l10n.becomeReviewer,
-              ),
             ),
           ],
         ),
@@ -112,51 +92,24 @@ class _BecomeReviewerCard extends StatelessWidget with LaunchUrlMixin {
     );
   }
 
-  void _showTooltip(BuildContext context) {
-    final box = context.findRenderObject()! as RenderBox;
-    final position = box.localToGlobal(Offset.zero);
-
-    final tooltipPosition = Offset(
-      position.dx,
-      position.dy + box.size.height + 5,
-    );
-    OverlayEntry overlayEntry;
-
-    overlayEntry = OverlayEntry(
-      builder: (context) => Positioned(
-        left: tooltipPosition.dx,
-        top: tooltipPosition.dy,
-        child: const _CopyTooltip(),
-      ),
-    );
-
-    Overlay.of(context).insert(overlayEntry);
-
-    Future.delayed(const Duration(seconds: 1), () {
-      overlayEntry.remove();
-    });
+  void _copyToClipboard(CatalystId? text) {
+    unawaited(Clipboard.setData(ClipboardData(text: text.toString())));
   }
-}
 
-class _CopyTooltip extends StatelessWidget {
-  const _CopyTooltip();
+  void _handleCopyCatalystId(BuildContext context) {
+    final catalystId = context.read<SessionCubit>().state.account?.catalystId;
+    _copyToClipboard(catalystId);
+    _showSuccessSnackbar(context);
+  }
 
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: Container(
-        padding: const EdgeInsets.all(8),
-        decoration: BoxDecoration(
-          color: Colors.black87,
-          borderRadius: BorderRadius.circular(4),
-        ),
-        child: Text(
-          context.l10n.copied,
-          style: const TextStyle(color: Colors.white),
-        ),
-      ),
-    );
+  void _showSuccessSnackbar(BuildContext context) {
+    VoicesSnackBar.hideCurrent(context);
+
+    VoicesSnackBar(
+      type: VoicesSnackBarType.success,
+      behavior: SnackBarBehavior.floating,
+      message: context.l10n.copied,
+    ).show(context);
   }
 }
 
@@ -192,9 +145,33 @@ class _Header extends StatelessWidget {
   }
 }
 
+class _OpportunityActionButton extends StatelessWidget {
+  final VoidCallback? onTap;
+  final String title;
+  final Widget? trailing;
+
+  const _OpportunityActionButton({
+    this.onTap,
+    required this.title,
+    this.trailing,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return VoicesFilledButton(
+      onTap: onTap,
+      trailing: trailing,
+      child: Text(
+        title,
+      ),
+    );
+  }
+}
+
 class _OpportunityCard extends StatelessWidget {
   final String background;
   final Widget child;
+
   const _OpportunityCard({
     required this.background,
     required this.child,
@@ -244,15 +221,13 @@ class _RegisterAsVoter extends StatelessWidget with LaunchUrlMixin {
                 ),
               ),
               const SizedBox(height: 20),
-              VoicesFilledButton(
+              _OpportunityActionButton(
                 onTap: () {
                   // TODO(LynxLynxx): add url;
                   // launchUri();
                 },
+                title: context.l10n.votingRegistration,
                 trailing: VoicesAssets.icons.externalLink.buildIcon(),
-                child: Text(
-                  context.l10n.votingRegistration,
-                ),
               ),
             ],
           ),

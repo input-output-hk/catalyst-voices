@@ -38,9 +38,7 @@ class _Account extends StatelessWidget {
         MenuItemTile(
           leading: VoicesAssets.icons.userCircle.buildIcon(),
           key: const Key('ProfileAndKeychain'),
-          title: Text(
-            context.l10n.profileAndKeychain,
-          ),
+          title: Text(context.l10n.profileAndKeychain),
           trailing: VoicesAssets.icons.chevronRight.buildIcon(),
           onTap: () => Navigator.pop(context, const _OpenAccountDetails()),
         ),
@@ -85,11 +83,14 @@ class _Links extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        MenuItemTile(
-          key: const Key('SetupRolesMenuItem'),
-          leading: VoicesAssets.icons.userGroup.buildIcon(),
-          title: Text(context.l10n.setupCatalystRoles),
-          onTap: () => Navigator.pop(context, const _SetupRoles()),
+        // Note. This is not supported atm.
+        Offstage(
+          child: MenuItemTile(
+            key: const Key('SetupRolesMenuItem'),
+            leading: VoicesAssets.icons.userGroup.buildIcon(),
+            title: Text(context.l10n.setupCatalystRoles),
+            onTap: () => Navigator.pop(context, const _SetupRoles()),
+          ),
         ),
         MenuItemTile(
           key: const Key('SubmitSupportRequest'),

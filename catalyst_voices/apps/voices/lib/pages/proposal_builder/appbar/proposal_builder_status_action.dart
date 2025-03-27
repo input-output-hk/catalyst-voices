@@ -23,7 +23,7 @@ class ProposalBuilderStatusAction extends StatelessWidget {
         ({bool offstage, List<_MenuItemEnum> items})>(
       selector: (state) {
         return (
-          offstage: state.isChanging || state.error != null,
+          offstage: state.isLoading || state.error != null,
           items: _MenuItemEnum.availableOptions(state.metadata.publish)
         );
       },
