@@ -194,7 +194,7 @@ class _BubblePainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(CustomPainter oldDelegate) => false;
+  bool shouldRepaint(CustomPainter oldDelegate) => isMobile != oldDelegate.isMobile;
 
   void _drawBubble(
     Canvas canvas, {
