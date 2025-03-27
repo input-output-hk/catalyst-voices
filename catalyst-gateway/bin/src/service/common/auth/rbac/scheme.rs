@@ -79,7 +79,9 @@ impl ResponseError for AuthTokenError {
 
     /// Convert this error to a HTTP response.
     fn as_response(&self) -> poem::Response
-    where Self: Error + Send + Sync + 'static {
+    where
+        Self: Error + Send + Sync + 'static,
+    {
         ErrorResponses::unauthorized().into_response()
     }
 }
@@ -98,7 +100,9 @@ impl ResponseError for AuthTokenAccessViolation {
 
     /// Convert this error to a HTTP response.
     fn as_response(&self) -> poem::Response
-    where Self: Error + Send + Sync + 'static {
+    where
+        Self: Error + Send + Sync + 'static,
+    {
         // TODO: Actually check permissions needed for an endpoint.
         ErrorResponses::forbidden(Some(self.0.clone())).into_response()
     }
@@ -131,21 +135,21 @@ async fn checker_api_catalyst_auth(
         return Ok(token);
     };
 
+    // Step 6: Verify that the nonce is in the acceptable range.
+    if !token.is_young(MAX_TOKEN_AGE, MAX_TOKEN_SKEW) {
+        // Token is too old or too far in the future.
+        error!("Auth token expired: {token}");
+        Err(AuthTokenAccessViolation(vec!["EXPIRED".to_string()]))?;
+    }
+
     let registrations = indexed_registrations(token.catalyst_id()).await?;
-    // Step 6: return 401 if the token isn't known.
+    // Step 7: return 401 if the token isn't known.
     if registrations.is_empty() {
         error!(
             "Unable to find registrations for {} Catalyst ID",
             token.catalyst_id()
         );
         return Err(AuthTokenError.into());
-    }
-
-    // Step 7: Verify that the nonce is in the acceptable range.
-    if !token.is_young(MAX_TOKEN_AGE, MAX_TOKEN_SKEW) {
-        // Token is too old or too far in the future.
-        error!("Auth token expired: {token}");
-        Err(AuthTokenAccessViolation(vec!["EXPIRED".to_string()]))?;
     }
 
     // TODO: Caching is currently disabled because we want to measure the performance without
@@ -159,6 +163,16 @@ async fn checker_api_catalyst_auth(
     // if let Some(token) = CACHE.get(&bearer.token).await {
     //     return Ok(token);
     // }
+
+    let reg_chain = registration_chain(token.network(), &registrations)
+        .await
+        .map_err(|e| {
+            error!(
+                "Unable to build a registration chain for {} Catalyst ID: {e:?}",
+                token.catalyst_id()
+            );
+            AuthTokenError
+        })?;
 
     // Step 8: get the latest stable signing certificate registered for Role 0.
     let public_key = last_signing_key(token.network(), &registrations)
@@ -200,9 +214,12 @@ pub(crate) async fn indexed_registrations(catalyst_id: &IdUri) -> poem::Result<V
         service_unavailable()
     })?;
 
-    let mut result: Vec<_> = Query::execute(&session, QueryParams {
-        catalyst_id: catalyst_id.clone().into(),
-    })
+    let mut result: Vec<_> = Query::execute(
+        &session,
+        QueryParams {
+            catalyst_id: catalyst_id.clone().into(),
+        },
+    )
     .and_then(|r| r.try_collect().map_err(Into::into))
     .await
     .map_err(|e| {
