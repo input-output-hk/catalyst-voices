@@ -25,7 +25,6 @@ flutter:
   assets:
     - assets/images/
     - assets/images/category/
-    - assets/images/mobile_access/
     - assets/icons/
     - assets/lottie/
     - assets/videos/
