@@ -2069,6 +2069,34 @@
   "@apiErrorServiceUnavailable": {
     "description": "Message of an error when api returns matching status code."
   },
+  "myOpportunities": "My Opportunities",
+  "@myOpportunities": {
+    "description": "Options available to user to make more impact in the app"
+  },
+  "newUpdates": "New updates - see what's new!",
+  "@newUpdates": {
+    "description": "A message shown when user has new updates"
+  },
+  "turnOpinionsIntoActions": "Turn Your Opinions into Impact.",
+  "@turnOpinionsIntoActions": {
+    "description": "Title for becoming a reviewer"
+  },
+  "becomeReviewer": "Become a Reviewer",
+  "@becomeReviewer": {
+    "description": "Title for becoming a reviewer"
+  },
+  "f14Voting": "F14 Voting: Make sure you're ready.",
+  "@f14Voting": {
+    "description": "Title for registration for F14 voting"
+  },
+  "votingRegistration": "Voting Registration",
+  "@votingRegistration": {
+    "description": "Title for registration for voting"
+  },
+  "copyMyCatalystId": "Copy my Catalyst ID",
+  "@copyMyCatalystId": {
+    "description": "Action to copy my catalyst id"
+  },
   "mobileAccessDescription": "For the best experience, head over to a desktop to get started. But don't worry - mobile is coming.\n\nStay tuned for more updates, or visit our Gitbook to learn more.\n\nSee you on the other side!",
   "@mobileAccessDescription": {
     "description": "Description for the mobile restricted access page"
