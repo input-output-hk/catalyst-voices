@@ -5,6 +5,7 @@ import 'package:catalyst_voices/pages/campaign/admin_tools/campaign_admin_tools_
 import 'package:catalyst_voices/pages/campaign/details/widgets/campaign_management.dart';
 import 'package:catalyst_voices/pages/spaces/appbar/session_action_header.dart';
 import 'package:catalyst_voices/pages/spaces/appbar/session_state_header.dart';
+import 'package:catalyst_voices/pages/spaces/drawer/opportunities_drawer.dart';
 import 'package:catalyst_voices/pages/spaces/drawer/spaces_drawer.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
@@ -122,6 +123,7 @@ class _SpacesShellPageState extends State<SpacesShellPage> {
                           SpacesShellPage._spacesShortcutsActivators,
                       isUnlocked: state.isUnlocked,
                     ),
+              endDrawer: const OpportunitiesDrawer(),
               body: widget.child,
             );
           },
