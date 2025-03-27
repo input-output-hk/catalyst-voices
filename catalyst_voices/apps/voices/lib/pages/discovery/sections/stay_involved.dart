@@ -1,13 +1,16 @@
 import 'dart:async';
 
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
+import 'package:catalyst_voices/widgets/buttons/copy_catalyst_id_button.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_filled_button.dart';
-import 'package:catalyst_voices/widgets/buttons/voices_text_button.dart';
+import 'package:catalyst_voices/widgets/snackbar/voices_snackbar.dart';
+import 'package:catalyst_voices/widgets/snackbar/voices_snackbar_type.dart';
 import 'package:catalyst_voices/widgets/text/voting_start_at_time_text.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -50,80 +53,39 @@ class __ReviewerCardState extends State<_ReviewerCard> {
       description: context.l10n.stayInvolvedReviewerDescription,
       actions: Row(
         children: [
-          BlocSelector<SessionCubit, SessionState, CatalystId?>(
-            selector: (state) {
-              return state.account?.catalystId;
-            },
-            builder: (context, state) {
-              return VoicesTextButton(
-                onTap: () {
-                  unawaited(
-                    Clipboard.setData(
-                      ClipboardData(text: state.toString()),
-                    ),
-                  );
-
-                  _showTooltip(context);
-                },
-                leading: VoicesAssets.icons.duplicate.buildIcon(),
-                child: Text(
-                  context.l10n.copyMyCatalystId,
-                ),
-              );
-            },
+          CopyCatalystIdButton(
+            onTap: () => _handleCopyCatalystId(context),
           ),
           const SizedBox(height: 4),
-          VoicesFilledButton(
-            onTap: () {
-              // TODO(LynxLynxx): add url;
-              // launchUri();
-            },
+          _StayInvolvedActionButton(
+            title: context.l10n.becomeReviewer,
+            // TODO(LynxLynxx): add url;
+            urlString: 'https://google.com',
             trailing: VoicesAssets.icons.externalLink.buildIcon(),
-            child: Text(
-              context.l10n.becomeReviewer,
-            ),
           ),
         ],
       ),
     );
   }
 
-  void _showTooltip(BuildContext context) {
-    final box = context.findRenderObject()! as RenderBox;
-    final position = box.localToGlobal(Offset.zero);
+  void _copyToClipboard(CatalystId? text) {
+    unawaited(Clipboard.setData(ClipboardData(text: text.toString())));
+  }
 
-    final tooltipPosition = Offset(
-      position.dx,
-      position.dy - 10,
-    );
-    OverlayEntry overlayEntry;
+  void _handleCopyCatalystId(BuildContext context) {
+    final catalystId = context.read<SessionCubit>().state.account?.catalystId;
+    _copyToClipboard(catalystId);
+    _showSuccessSnackbar(context);
+  }
 
-    overlayEntry = OverlayEntry(
-      builder: (context) => Positioned(
-        left: tooltipPosition.dx,
-        top: tooltipPosition.dy,
-        child: Material(
-          color: Colors.transparent,
-          child: Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: Colors.black87,
-              borderRadius: BorderRadius.circular(4),
-            ),
-            child: Text(
-              context.l10n.copied,
-              style: const TextStyle(color: Colors.white),
-            ),
-          ),
-        ),
-      ),
-    );
+  void _showSuccessSnackbar(BuildContext context) {
+    VoicesSnackBar.hideCurrent(context);
 
-    Overlay.of(context).insert(overlayEntry);
-
-    Future.delayed(const Duration(seconds: 1), () {
-      overlayEntry.remove();
-    });
+    VoicesSnackBar(
+      type: VoicesSnackBarType.success,
+      behavior: SnackBarBehavior.floating,
+      message: context.l10n.copied,
+    ).show(context);
   }
 }
 
@@ -144,6 +106,32 @@ class _ReviewerCard extends StatefulWidget {
 
   @override
   State<_ReviewerCard> createState() => __ReviewerCardState();
+}
+
+class _StayInvolvedActionButton extends StatelessWidget with LaunchUrlMixin {
+  final String title;
+  final String urlString;
+  final Widget? trailing;
+
+  const _StayInvolvedActionButton({
+    required this.title,
+    required this.urlString,
+    this.trailing,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return VoicesFilledButton(
+      onTap: _handleUrlTap,
+      trailing: trailing,
+      child: Text(title),
+    );
+  }
+
+  Future<void> _handleUrlTap() async {
+    final url = urlString.getUri();
+    await launchUri(url);
+  }
 }
 
 class _StayInvolvedCard extends StatelessWidget {
@@ -214,29 +202,27 @@ class _VoterCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<DiscoveryCubit, DiscoveryState, DateTime>(
-      selector: (state) {
-        return state.currentCampaign.votingStartsAt;
-      },
-      builder: (context, votingStartDate) {
-        return _StayInvolvedCard(
-          icon: VoicesAssets.icons.vote,
-          title: context.l10n.votingRegistrationForF14,
-          description: context.l10n.stayInvolvedVoterDescription,
-          actions: VoicesFilledButton(
-            child: Text(
-              context.l10n.votingRegistration,
-            ),
-            onTap: () {
-              // TODO(LynxLynxx): add url;
-              // launchUri();
-            },
-          ),
-          additionalInfo: VotingStartAtTimeText(
-            data: votingStartDate,
-          ),
-        );
-      },
+    return _StayInvolvedCard(
+      icon: VoicesAssets.icons.vote,
+      title: context.l10n.votingRegistrationForF14,
+      description: context.l10n.stayInvolvedVoterDescription,
+      actions: _StayInvolvedActionButton(
+        title: context.l10n.votingRegistration,
+        // TODO(LynxLynxx): add url;
+        urlString: 'https://google.com',
+      ),
+      additionalInfo: BlocSelector<DiscoveryCubit, DiscoveryState, DateTime?>(
+        selector: (state) {
+          return state.currentCampaign.votingStartsAt;
+        },
+        builder: (context, date) {
+          return date == null
+              ? const SizedBox.shrink()
+              : VotingStartAtTimeText(
+                  data: date,
+                );
+        },
+      ),
     );
   }
 }

@@ -51,12 +51,11 @@ final class DiscoveryCurrentCampaignState extends Equatable {
 
   bool get showError => !isLoading && error != null;
 
-  DateTime get votingStartsAt {
+  DateTime? get votingStartsAt {
     return campaignTimeline
-            .firstWhere((e) => e.stage == CampaignTimelineStage.communityVoting)
-            .timeline
-            .from ??
-        DateTime.now();
+        .firstWhere((e) => e.stage == CampaignTimelineStage.communityVoting)
+        .timeline
+        .from;
   }
 }
 
