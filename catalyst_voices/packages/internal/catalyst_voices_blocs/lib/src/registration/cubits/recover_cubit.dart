@@ -109,8 +109,6 @@ final class RecoverCubit extends Cubit<RecoverStateData>
 
       _recoveredAccount = account;
 
-      await _userService.useAccount(account);
-
       final walletInfo = account.walletInfo;
 
       final accountDetails = AccountSummaryData(
