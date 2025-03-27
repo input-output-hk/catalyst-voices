@@ -192,6 +192,7 @@ loguru
 lovelace
 lovelaces
 LTRB
+ltwh
 LynxLynxx
 Lynxx
 mdlint
@@ -259,6 +260,7 @@ pytest
 qrcode
 rapidoc
 ratelimit
+RGBO
 redoc
 reloadable
 Replayability
@@ -361,6 +363,7 @@ vsync
 wallclock
 wasmtime
 Wconditional
+webos
 Werror
 Wireframes
 Wmissing
