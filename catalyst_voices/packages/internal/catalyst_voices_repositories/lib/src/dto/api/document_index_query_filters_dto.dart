@@ -21,6 +21,11 @@ final class EqOrRangedIdDto extends EqOrRangedId {
     required this.max,
   }) : eq = null;
 
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  // ignore: hash_and_equals, avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => super.hashCode;
+
   @override
   Map<String, dynamic> toJson() => _$EqOrRangedIdDtoToJson(this);
 }

@@ -161,9 +161,7 @@ class _OpportunityActionButton extends StatelessWidget {
     return VoicesFilledButton(
       onTap: onTap,
       trailing: trailing,
-      child: Text(
-        title,
-      ),
+      child: Text(title),
     );
   }
 }
