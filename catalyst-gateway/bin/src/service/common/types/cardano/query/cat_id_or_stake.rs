@@ -19,7 +19,7 @@ use crate::service::common::types::cardano::{
 };
 
 /// A Query Parameter that can take a CIP-19 stake address, or a Catalyst Id
-/// identifier.. Defining these are mutually exclusive, as a single parameter is required
+/// identifier. Defining these are mutually exclusive, as a single parameter is required
 /// to be used.
 #[derive(Clone)]
 #[allow(clippy::large_enum_variant, dead_code)]
@@ -47,8 +47,7 @@ impl TryFrom<&str> for CatIdOrStake {
 /// Title.
 const TITLE: &str = "Catalyst Id or Stake Address.";
 /// Description.
-const DESCRIPTION: &str = "Restrict the query to this Catalyst Id or Stake Address .
-If neither are defined, the stake address(es) from the auth tokens role0 registration are used.";
+const DESCRIPTION: &str = "Restrict the query to this Catalyst Id or Stake Address. If neither are defined, the auth token is used.";
 /// Example
 const EXAMPLE: &str = cip19_stake_address::EXAMPLE;
 /// Validation Regex Pattern

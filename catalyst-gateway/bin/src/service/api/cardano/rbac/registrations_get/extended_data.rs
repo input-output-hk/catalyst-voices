@@ -84,6 +84,6 @@ impl ParseFromJSON for ExtendedData {
 
 impl Example for ExtendedData {
     fn example() -> Self {
-        Self([(0, vec![1, 2, 3])].into_iter().collect())
+        Self([(10, vec![1, 2, 3])].into_iter().collect())
     }
 }

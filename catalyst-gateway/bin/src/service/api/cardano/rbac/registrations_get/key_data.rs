@@ -32,7 +32,7 @@ use crate::service::{
 pub struct KeyData {
     /// Indicates if the data is persistent or volatile.
     is_persistent: BooleanFlag,
-    /// A time when the address was added.
+    /// A time when the data was added.
     time: ServiceDateTime,
     /// A hex encoded X509 certificate.
     x509_cert: Option<HexEncodedBinaryData>,
