@@ -56,7 +56,7 @@ final class Account extends Equatable {
       },
       walletInfo: WalletInfo(
         metadata: const WalletMetadata(name: 'Dummy Wallet', icon: null),
-        balance: Coin.fromAda(10),
+        balance: const Coin.fromWholeAda(10),
         /* cSpell:disable */
         address: ShelleyAddress.fromBech32(
           'addr_test1vzpwq95z3xyum8vqndgdd'
@@ -112,5 +112,14 @@ final class Account extends Equatable {
       isActive: isActive ?? this.isActive,
       isProvisional: isProvisional ?? this.isProvisional,
     );
+  }
+
+  bool isSameRef(Account other) => catalystId.isReferringTo(other);
+}
+
+extension CatalystIdExt on CatalystId {
+  /// Compares accounts against significant parts of [Account] catalystId.
+  bool isReferringTo(Account account) {
+    return toSignificant() == account.catalystId.toSignificant();
   }
 }

@@ -3,33 +3,6 @@ import 'package:catalyst_voices_repositories/src/dto/document/schema/document_de
 import 'package:catalyst_voices_repositories/src/dto/document/schema/document_property_schema_dto.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 
-enum _DocumentStringDefinition {
-  singleLineTextEntry('singleLineTextEntry'),
-  singleLineHttpsUrlEntry('singleLineHttpsURLEntry'),
-  multiLineTextEntry('multiLineTextEntry'),
-  multiLineTextEntryMarkdown('multiLineTextEntryMarkdown'),
-  dropDownSingleSelect('dropDownSingleSelect'),
-  tagGroup('tagGroup'),
-  tagSelection('tagSelection'),
-  languageCode('languageCode'),
-  radioButtonSelect('radioButtonSelect'),
-  unknown('unknown');
-
-  final String def;
-
-  const _DocumentStringDefinition(this.def);
-
-  factory _DocumentStringDefinition.fromDef(String? def) {
-    for (final value in values) {
-      if (value.def.equalsIgnoreCase(def)) {
-        return value;
-      }
-    }
-
-    return _DocumentStringDefinition.unknown;
-  }
-}
-
 final class DocumentStringSchemaMapper {
   static DocumentStringSchema toModel({
     required DocumentDefinitionsDto definitions,
@@ -52,7 +25,7 @@ final class DocumentStringSchemaMapper {
     final constValue = schema.constValue as String?;
     final enumValues = schema.enumValues?.cast<String>();
     final strLengthRange =
-        Range.optionalRangeOf(min: schema.minLength, max: schema.maxLength);
+        NumRange.optionalRangeOf(min: schema.minLength, max: schema.maxLength);
     final pattern = schema.pattern;
     final patternRegExp = pattern != null ? RegExp(pattern) : null;
     final definition = _DocumentStringDefinition.fromDef(schema.definition());
@@ -231,5 +204,32 @@ final class DocumentStringSchemaMapper {
           pattern: patternRegExp,
         );
     }
+  }
+}
+
+enum _DocumentStringDefinition {
+  singleLineTextEntry('singleLineTextEntry'),
+  singleLineHttpsUrlEntry('singleLineHttpsURLEntry'),
+  multiLineTextEntry('multiLineTextEntry'),
+  multiLineTextEntryMarkdown('multiLineTextEntryMarkdown'),
+  dropDownSingleSelect('dropDownSingleSelect'),
+  tagGroup('tagGroup'),
+  tagSelection('tagSelection'),
+  languageCode('languageCode'),
+  radioButtonSelect('radioButtonSelect'),
+  unknown('unknown');
+
+  final String def;
+
+  const _DocumentStringDefinition(this.def);
+
+  factory _DocumentStringDefinition.fromDef(String? def) {
+    for (final value in values) {
+      if (value.def.equalsIgnoreCase(def)) {
+        return value;
+      }
+    }
+
+    return _DocumentStringDefinition.unknown;
   }
 }

@@ -1,6 +1,33 @@
 import 'package:equatable/equatable.dart';
 
-/// A numerical range between [min] and [max].
+/// A comparable range between [min] and [max].
+///
+/// Both [min] and [max] must be constrained.
+class ComparableRange<T extends Comparable<T>> extends Equatable {
+  /// The minimum range value (inclusive).
+  final T min;
+
+  /// The maximum range value (inclusive).
+  final T max;
+
+  const ComparableRange({
+    required this.min,
+    required this.max,
+  });
+
+  @override
+  List<Object?> get props => [min, max];
+
+  /// Returns true if this range contains the [value], false otherwise.
+  bool contains(T value) {
+    final min = this.min;
+    final max = this.max;
+
+    return min.compareTo(value) <= 0 && max.compareTo(value) >= 0;
+  }
+}
+
+/// An open range between [min] and [max].
 ///
 /// Both [min] and [max] might be unconstrained,
 /// this allows to create ranges like:
@@ -8,7 +35,7 @@ import 'package:equatable/equatable.dart';
 /// - <-∞, ∞> // from minus infinity to infinity (practically all values).
 /// - <0, ∞> // from zero to infinity (negative values are not accepted).
 /// - <-∞, 0> // from minus infinity to zero (positive values are not accepted).
-class Range<T extends num> extends Equatable {
+class NumRange<T extends num> extends Equatable {
   /// The minimum range value (inclusive).
   ///
   /// `null` means that the [min] is not constrained.
@@ -19,28 +46,41 @@ class Range<T extends num> extends Equatable {
   /// `null` means that the [max] is not constrained.
   final T? max;
 
-  const Range({
+  const NumRange({
     required this.min,
     required this.max,
   });
 
-  /// Creates a [Range] which assumes if
+  @override
+  List<Object?> get props => [min, max];
+
+  /// Returns true if this range contains the [value], false otherwise.
+  bool contains(T value) {
+    final min = this.min;
+    final max = this.max;
+
+    if (min == null && max == null) {
+      // infinite range contains every possible value
+      return true;
+    } else if (min != null && max != null) {
+      return min.compareTo(value) <= 0 && max.compareTo(value) >= 0;
+    } else if (min != null) {
+      return min.compareTo(value) <= 0;
+    } else if (max != null) {
+      return max.compareTo(value) >= 0;
+    } else {
+      throw UnsupportedError('All possible combinations were checked, '
+          'this line should never be executed');
+    }
+  }
+
+  /// Creates a [NumRange] which assumes if
   /// [min] or [max] are null then they are unconstrained.
-  static Range<T>? optionalRangeOf<T extends num>({T? min, T? max}) {
+  static NumRange<T>? optionalRangeOf<T extends num>({T? min, T? max}) {
     if (min == null && max == null) {
       return null;
     }
 
-    return Range(min: min, max: max);
+    return NumRange(min: min, max: max);
   }
-
-  /// Returns true if this range contains the [value], false otherwise.
-  bool contains(num value) {
-    final min = this.min ?? double.negativeInfinity;
-    final max = this.max ?? double.infinity;
-    return value >= min && value <= max;
-  }
-
-  @override
-  List<Object?> get props => [min, max];
 }

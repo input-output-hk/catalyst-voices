@@ -31,20 +31,6 @@ class _LatestProposalsState extends State<MostRecentProposals> {
   late double _scrollPercentage;
 
   @override
-  void initState() {
-    super.initState();
-    _scrollController = ScrollController();
-    _scrollController.addListener(_onScroll);
-    _scrollPercentage = 0.0;
-  }
-
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Container(
       key: const Key('MostRecentProposals'),
@@ -75,31 +61,39 @@ class _LatestProposalsState extends State<MostRecentProposals> {
               onHorizontalDragUpdate: _onHorizontalDrag,
               child: SizedBox(
                 height: 440,
-                child: ListView.separated(
-                  controller: _scrollController,
-                  physics: const ClampingScrollPhysics(),
-                  padding: const EdgeInsets.symmetric(horizontal: 120),
-                  scrollDirection: Axis.horizontal,
-                  itemCount: widget.proposals.length,
-                  itemBuilder: (context, index) {
-                    final proposal = widget.proposals[index];
-                    final id = proposal.id;
-                    return Skeletonizer(
-                      enabled: widget.isLoading,
-                      child: PendingProposalCard(
-                        key: Key('PendingProposalCard_$id'),
-                        proposal: proposal,
-                        onTap: () {
-                          unawaited(
-                            ProposalRoute(proposalId: id).push(context),
-                          );
-                        },
-                        onFavoriteChanged: (value) {},
-                      ),
-                    );
-                  },
-                  separatorBuilder: (context, index) =>
-                      const SizedBox(width: 24),
+                child: Center(
+                  child: ListView.separated(
+                    controller: _scrollController,
+                    shrinkWrap: true,
+                    physics: const ClampingScrollPhysics(),
+                    padding: const EdgeInsets.symmetric(horizontal: 120),
+                    scrollDirection: Axis.horizontal,
+                    itemCount: widget.proposals.length,
+                    itemBuilder: (context, index) {
+                      final proposal = widget.proposals[index];
+                      final ref = proposal.ref;
+                      return Skeletonizer(
+                        enabled: widget.isLoading,
+                        child: PendingProposalCard(
+                          key: Key('PendingProposalCard_$ref'),
+                          proposal: proposal,
+                          onTap: () {
+                            unawaited(
+                              ProposalRoute(
+                                proposalId: ref.id,
+                                version: ref.version,
+                              ).push(context),
+                            );
+                          },
+                          onFavoriteChanged: (value) {
+                            // TODO(LynxLynxx): add on change logic
+                          },
+                        ),
+                      );
+                    },
+                    separatorBuilder: (context, index) =>
+                        const SizedBox(width: 24),
+                  ),
                 ),
               ),
             ),
@@ -127,6 +121,20 @@ class _LatestProposalsState extends State<MostRecentProposals> {
         ],
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController = ScrollController();
+    _scrollController.addListener(_onScroll);
+    _scrollPercentage = 0.0;
   }
 
   void _onHorizontalDrag(DragUpdateDetails details) {

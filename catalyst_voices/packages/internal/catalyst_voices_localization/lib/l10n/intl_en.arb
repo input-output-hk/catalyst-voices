@@ -135,6 +135,13 @@
   },
   "refresh": "Refresh",
   "ok": "Ok",
+  "@ok": {
+    "description": "Short confirmation (ok)."
+  },
+  "okay": "Okay",
+  "@okay": {
+    "description": "Short confirmation (okay.)"
+  },
   "seedPhraseSlotNr": "Slot {nr}",
   "@seedPhraseSlotNr": {
     "description": "When user arranges seed phrases this text is shown when phrase was not selected",
@@ -899,8 +906,7 @@
     "description": "Refers to a dark theme mode."
   },
   "keychainDeletedDialogTitle": "Catalyst keychain removed",
-  "keychainDeletedDialogSubtitle": "Your Catalyst Keychain is removed successfully from this device.",
-  "keychainDeletedDialogInfo": "We reverted this device to Catalyst first use.",
+  "keychainDeletedDialogSubtitle": "Your Catalyst Keychain is removed successfully from this device.\n\nWe reverted this device to Catalyst first use.",
   "registrationCompletedTitle": "Catalyst account setup",
   "registrationCompletedSubtitle": "Completed!",
   "registrationCompletedSummaryHeader": "Summary",
@@ -1443,6 +1449,14 @@
   "errorEmailValidationOutOfRange": "Invalid length",
   "categoryDetails": "Category Details",
   "fundsAvailable": "Funds Available",
+  "minBudgetRequest": "Min budget request",
+  "@minBudgetRequest": {
+    "description": "A label for the minimum budget request for a proposal."
+  },
+  "maxBudgetRequest": "Max budget request",
+  "@maxBudgetRequest": {
+    "description": "A label for the maximum budget request for a proposal."
+  },
   "duration": "Duration",
   "valueMonths": "{value} {value, plural, =0{Months} =1{Month} other{Months}}",
   "@valueMonths": {
@@ -1598,6 +1612,22 @@
   "proposalEditorDeleteDialogDeleteButton": "Delete Proposal",
   "@proposalEditorDeleteDialogDeleteButton": {
     "description": "A button label for the dialog to confirm proposal deletion."
+  },
+  "proposalEditorSubmitErrorDialogTitle": "Unable to Submit Proposal",
+  "@proposalEditorSubmitErrorDialogTitle": {
+    "description": "Dialog title in proposal editor when submitting proposal for review failed."
+  },
+  "proposalEditorSubmitErrorDialogMessage": "We couldn't submit your proposal. Please try again in 5-10 minutes, as it may take some time for your information to update.\n\nIf the issue persists, feel free to contact support.",
+  "@proposalEditorSubmitErrorDialogMessage": {
+    "description": "Dialog message in proposal editor when submitting proposal for review failed."
+  },
+  "proposalEditorPublishErrorDialogTitle": "Unable to Publish Proposal",
+  "@proposalEditorPublishErrorDialogTitle": {
+    "description": "Dialog title in proposal editor when publishing proposal to the server failed."
+  },
+  "proposalEditorPublishErrorDialogMessage": "We couldn't publish your proposal. Please try again in 5-10 minutes, as it may take some time for your information to update.\n\nIf the issue persists, feel free to contact support.",
+  "@proposalEditorPublishErrorDialogMessage": {
+    "description": "Dialog message in proposal editor when publishing proposal to the server failed."
   },
   "showAll": "Show All",
   "@showAll": {
@@ -1980,6 +2010,22 @@
       }
     }
   },
+  "emptyUserProposalDescriptionHelp": "Use Create Proposal in the top menu to get started.",
+  "@emptyUserProposalDescriptionHelp": {
+    "description": "Description shown when user has no proposals in workspace"
+  },
+  "noFinalUserProposals": "No Final proposals found",
+  "@noFinalUserProposals": {
+    "description": "Title shown when user has no final proposals in workspace"
+  },
+  "noDraftUserProposals": "No Draft proposals found",
+  "@noDraftUserProposals": {
+    "description": "Title shown when user has no draft proposals in workspace"
+  },
+  "noLocalUserProposals": "No Local proposals found",
+  "@noLocalUserProposals": {
+    "description": "Title shown when user has no local proposals in workspace"
+  },
   "cancelCommit": "Cancel",
   "@cancelCommit": {
     "description": "Cancel comment submission"
@@ -1995,5 +2041,33 @@
   "proposalCommentsSortOldest": "Newest Oldest",
   "@proposalCommentsSortOldest": {
     "description": "One of options for sorting comments under proposal"
+  },
+  "shortSummary": "Short summary",
+  "@shortSummary": {
+    "description": "A short description of something"
+  },
+  "apiErrorUnknown": "Unknown error response",
+  "@apiErrorUnknown": {
+    "description": "A fallback error message when api returns error code"
+  },
+  "apiErrorNotFound": "Not found",
+  "@apiErrorNotFound": {
+    "description": "Message of an error when api returns not found status code, depends on context."
+  },
+  "apiErrorTooManyRequests": "Too many requests",
+  "@apiErrorTooManyRequests": {
+    "description": "Message of an error when api returns matching status code."
+  },
+  "apiErrorInternalServerError": "Internal server error",
+  "@apiErrorInternalServerError": {
+    "description": "Message of an error when api returns matching status code."
+  },
+  "apiErrorServiceUnavailable": "Service Unavailable",
+  "@apiErrorServiceUnavailable": {
+    "description": "Message of an error when api returns matching status code."
+  },
+  "errorUnknownPublishComment": "Can not publish comment",
+  "@errorUnknownPublishComment": {
+    "description": "Fallback message when can not publish comment for any reason."
   }
 }

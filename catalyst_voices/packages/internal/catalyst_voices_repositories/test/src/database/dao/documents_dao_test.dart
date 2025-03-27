@@ -1,6 +1,7 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/database/catalyst_database.dart';
 import 'package:catalyst_voices_repositories/src/database/database.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:collection/collection.dart';
 import 'package:drift/drift.dart' show DatabaseConnection;
 import 'package:drift/native.dart';
@@ -11,6 +12,11 @@ import '../../utils/test_factories.dart';
 
 void main() {
   late DriftCatalystDatabase database;
+
+  // ignore: unnecessary_lambdas
+  setUpAll(() {
+    DummyCatalystIdFactory.registerDummyKeyFactory();
+  });
 
   setUp(() {
     final inMemory = DatabaseConnection(NativeDatabase.memory());
@@ -116,60 +122,63 @@ void main() {
         expect(ver.uuid, ref.version);
       });
 
-      test('returns newest version when ver is not specified', () async {
-        // Given
-        final id = const Uuid().v7();
-        final firstVersionId = const Uuid().v7(
-          config: V7Options(
-            DateTime(2025, 2, 10).millisecondsSinceEpoch,
-            null,
-          ),
-        );
-        final secondVersionId = const Uuid().v7(
-          config: V7Options(
-            DateTime(2025, 2, 11).millisecondsSinceEpoch,
-            null,
-          ),
-        );
+      test(
+        'returns newest version when ver is not specified',
+        () async {
+          // Given
+          final id = const Uuid().v7();
+          final firstVersionId = const Uuid().v7(
+            config: V7Options(
+              DateTime(2025, 2, 10).millisecondsSinceEpoch,
+              null,
+            ),
+          );
+          final secondVersionId = const Uuid().v7(
+            config: V7Options(
+              DateTime(2025, 2, 11).millisecondsSinceEpoch,
+              null,
+            ),
+          );
 
-        const secondContent = DocumentDataContent({'title': 'Dev'});
-        final documentsWithMetadata = <DocumentEntityWithMetadata>[
-          DocumentWithMetadataFactory.build(
-            content: const DocumentDataContent({'title': 'D'}),
-            metadata: DocumentDataMetadata(
-              type: DocumentType.proposalDocument,
-              selfRef: DocumentRefFactory.buildSigned(
-                id: id,
-                version: firstVersionId,
+          const secondContent = DocumentDataContent({'title': 'Dev'});
+          final documentsWithMetadata = <DocumentEntityWithMetadata>[
+            DocumentWithMetadataFactory.build(
+              content: const DocumentDataContent({'title': 'D'}),
+              metadata: DocumentDataMetadata(
+                type: DocumentType.proposalDocument,
+                selfRef: SignedDocumentRef(
+                  id: id,
+                  version: firstVersionId,
+                ),
               ),
             ),
-          ),
-          DocumentWithMetadataFactory.build(
-            content: secondContent,
-            metadata: DocumentDataMetadata(
-              type: DocumentType.proposalDocument,
-              selfRef: DocumentRefFactory.buildSigned(
-                id: id,
-                version: secondVersionId,
+            DocumentWithMetadataFactory.build(
+              content: secondContent,
+              metadata: DocumentDataMetadata(
+                type: DocumentType.proposalDocument,
+                selfRef: SignedDocumentRef(
+                  id: id,
+                  version: secondVersionId,
+                ),
               ),
             ),
-          ),
-        ];
-        final document = documentsWithMetadata.first.document;
-        final ref = SignedDocumentRef(id: document.metadata.id);
+          ];
+          final document = documentsWithMetadata.first.document;
+          final ref = SignedDocumentRef(id: document.metadata.id);
 
-        // When
-        await database.documentsDao.saveAll(documentsWithMetadata);
+          // When
+          await database.documentsDao.saveAll(documentsWithMetadata);
 
-        // Then
-        final entity = await database.documentsDao.query(ref: ref);
+          // Then
+          final entity = await database.documentsDao.query(ref: ref);
 
-        expect(entity, isNotNull);
+          expect(entity, isNotNull);
 
-        expect(entity!.metadata.id, id);
-        expect(entity.metadata.version, secondVersionId);
-        expect(entity.content, secondContent);
-      });
+          expect(entity!.metadata.id, id);
+          expect(entity.metadata.version, secondVersionId);
+          expect(entity.content, secondContent);
+        },
+      );
 
       test('returns null when id does not match any id', () async {
         // Given
@@ -190,7 +199,10 @@ void main() {
 
       test('all refs return as expected', () async {
         // Given
-        final refs = List.generate(10, (_) => DocumentRefFactory.buildSigned());
+        final refs = List.generate(
+          10,
+          (_) => SignedDocumentRef.generateFirstRef(),
+        );
         final documentsWithMetadata = refs.map((ref) {
           return DocumentWithMetadataFactory.build(
             metadata: DocumentDataMetadata(
@@ -276,7 +288,7 @@ void main() {
         final documentsStream =
             database.documentsDao.watchAll(limit: 7, unique: true);
 
-        await database.documentsDao.saveAll(documentsWithMetadata);
+        await database.documentsDao.saveAll(documentsWithMetadata.reversed);
 
         // Then
         expect(
@@ -311,7 +323,7 @@ void main() {
         final documentsWithMetadata = [v1, v2].map((version) {
           final metadata = DocumentDataMetadata(
             type: DocumentType.proposalDocument,
-            selfRef: DocumentRefFactory.buildSigned(
+            selfRef: SignedDocumentRef(
               id: id,
               version: version,
             ),
@@ -353,7 +365,7 @@ void main() {
         final documentsWithMetadata = DocumentWithMetadataFactory.build(
           metadata: DocumentDataMetadata(
             type: DocumentType.proposalDocument,
-            selfRef: DocumentRefFactory.buildSigned(
+            selfRef: SignedDocumentRef(
               id: id,
               version: v1,
             ),
@@ -363,7 +375,7 @@ void main() {
         final newVersion = DocumentWithMetadataFactory.build(
           metadata: DocumentDataMetadata(
             type: DocumentType.proposalDocument,
-            selfRef: DocumentRefFactory.buildSigned(
+            selfRef: SignedDocumentRef(
               id: id,
               version: v2,
             ),
@@ -402,7 +414,7 @@ void main() {
         final document1 = DocumentWithMetadataFactory.build(
           metadata: DocumentDataMetadata(
             type: DocumentType.proposalDocument,
-            selfRef: DocumentRefFactory.buildSigned(
+            selfRef: SignedDocumentRef(
               id: id1,
               version: v1,
             ),
@@ -412,7 +424,7 @@ void main() {
         final document2 = DocumentWithMetadataFactory.build(
           metadata: DocumentDataMetadata(
             type: DocumentType.proposalDocument,
-            selfRef: DocumentRefFactory.buildSigned(
+            selfRef: SignedDocumentRef(
               id: id2,
               version: v2,
             ),
@@ -437,14 +449,67 @@ void main() {
           equals([document2.document]),
         );
       });
+
+      test(
+          'all documents with from same account are returned '
+          'even when username changes', () async {
+        // Given
+        final originalId = DummyCatalystIdFactory.create(username: 'damian');
+        final updatedId = originalId.copyWith(username: const Optional('dev'));
+
+        final document1 = DocumentWithMetadataFactory.build(
+          metadata: DocumentDataMetadata(
+            type: DocumentType.proposalDocument,
+            selfRef: SignedDocumentRef.generateFirstRef(),
+            authors: [originalId],
+          ),
+        );
+        final document2 = DocumentWithMetadataFactory.build(
+          metadata: DocumentDataMetadata(
+            type: DocumentType.proposalDocument,
+            selfRef: SignedDocumentRef.generateFirstRef(),
+            authors: [updatedId],
+          ),
+        );
+
+        final docs = [document1, document2];
+        final refs = docs.map((e) => e.document.metadata.selfRef).toList();
+
+        // When
+        await database.documentsDao.saveAll(docs);
+
+        // Then
+        final stream = database.documentsDao.watchAll(authorId: updatedId);
+
+        expect(
+          stream,
+          emitsInOrder([
+            allOf(
+              hasLength(docs.length),
+              everyElement(
+                predicate<DocumentEntity>((document) {
+                  return refs.contains(document.metadata.selfRef);
+                }),
+              ),
+            ),
+          ]),
+        );
+      });
     });
 
     group('count', () {
       test('document returns expected number', () async {
         // Given
+        final dateTime = DateTimeExt.now();
+
         final documentsWithMetadata = List<DocumentEntityWithMetadata>.generate(
           20,
-          (index) => DocumentWithMetadataFactory.build(),
+          (index) => DocumentWithMetadataFactory.build(
+            metadata: DocumentDataMetadata(
+              type: DocumentType.proposalDocument,
+              selfRef: _buildRefAt(dateTime.add(Duration(seconds: index))),
+            ),
+          ),
         );
 
         // When
@@ -464,7 +529,7 @@ void main() {
           (index) {
             final metadata = DocumentDataMetadata(
               type: DocumentType.proposalDocument,
-              selfRef: DocumentRefFactory.buildSigned(id: id),
+              selfRef: SignedDocumentRef(id: id, version: const Uuid().v7()),
             );
             return DocumentWithMetadataFactory.build(metadata: metadata);
           },
@@ -487,7 +552,7 @@ void main() {
           (index) {
             final metadata = DocumentDataMetadata(
               type: DocumentType.proposalDocument,
-              selfRef: DocumentRefFactory.buildSigned(id: id),
+              selfRef: SignedDocumentRef(id: id, version: const Uuid().v7()),
             );
             return DocumentWithMetadataFactory.build(metadata: metadata);
           },
@@ -513,7 +578,7 @@ void main() {
           (index) {
             final metadata = DocumentDataMetadata(
               type: DocumentType.proposalDocument,
-              selfRef: DocumentRefFactory.buildSigned(id: id),
+              selfRef: SignedDocumentRef(id: id, version: const Uuid().v7()),
             );
             return DocumentWithMetadataFactory.build(metadata: metadata);
           },
@@ -539,7 +604,7 @@ void main() {
           (index) {
             final metadata = DocumentDataMetadata(
               type: DocumentType.proposalDocument,
-              selfRef: DocumentRefFactory.buildSigned(),
+              selfRef: SignedDocumentRef.generateFirstRef(),
             );
             return DocumentWithMetadataFactory.build(metadata: metadata);
           },
@@ -561,7 +626,7 @@ void main() {
       test('Counts comments for specific proposal document version', () async {
         final proposalId = const Uuid().v7();
         final versionId = const Uuid().v7();
-        final proposalRef = DocumentRefFactory.buildSigned(
+        final proposalRef = SignedDocumentRef(
           id: proposalId,
           version: versionId,
         );
@@ -579,7 +644,7 @@ void main() {
           (index) => DocumentWithMetadataFactory.build(
             metadata: DocumentDataMetadata(
               type: DocumentType.commentTemplate,
-              selfRef: DocumentRefFactory.buildSigned(),
+              selfRef: SignedDocumentRef.generateFirstRef(),
               ref: proposalRef,
             ),
           ),
@@ -589,8 +654,8 @@ void main() {
           (index) => DocumentWithMetadataFactory.build(
             metadata: DocumentDataMetadata(
               type: DocumentType.commentTemplate,
-              selfRef: DocumentRefFactory.buildSigned(),
-              ref: DocumentRefFactory.buildSigned(),
+              selfRef: SignedDocumentRef.generateFirstRef(),
+              ref: SignedDocumentRef.generateFirstRef(),
             ),
           ),
         );
@@ -607,7 +672,7 @@ void main() {
       test('Count versions of specific document', () async {
         final proposalId = const Uuid().v7();
         final versionId = const Uuid().v7();
-        final proposalRef = DocumentRefFactory.buildSigned(
+        final proposalRef = SignedDocumentRef(
           id: proposalId,
           version: versionId,
         );
@@ -626,8 +691,9 @@ void main() {
             return DocumentWithMetadataFactory.build(
               metadata: DocumentDataMetadata(
                 type: DocumentType.proposalDocument,
-                selfRef: DocumentRefFactory.buildSigned(
+                selfRef: SignedDocumentRef(
                   id: proposalId,
+                  version: const Uuid().v7(),
                 ),
                 ref: proposalRef,
               ),
@@ -651,7 +717,7 @@ void main() {
           await Future<void>.delayed(const Duration(milliseconds: 1));
           final versionId = const Uuid().v7();
           final proposalId2 = const Uuid().v7();
-          final proposalRef = DocumentRefFactory.buildSigned(
+          final proposalRef = SignedDocumentRef(
             id: proposalId,
             version: versionId,
           );
@@ -662,7 +728,7 @@ void main() {
             ),
           );
 
-          final proposalRef2 = DocumentRefFactory.buildSigned(
+          final proposalRef2 = SignedDocumentRef(
             id: proposalId2,
             version: versionId,
           );
@@ -673,7 +739,7 @@ void main() {
             return DocumentWithMetadataFactory.build(
               metadata: DocumentDataMetadata(
                 type: DocumentType.commentTemplate,
-                selfRef: DocumentRefFactory.buildSigned(),
+                selfRef: SignedDocumentRef.generateFirstRef(),
                 ref: proposalRef,
               ),
             );
@@ -682,7 +748,7 @@ void main() {
           final otherComment = DocumentWithMetadataFactory.build(
             metadata: DocumentDataMetadata(
               type: DocumentType.commentTemplate,
-              selfRef: DocumentRefFactory.buildSigned(),
+              selfRef: SignedDocumentRef.generateFirstRef(),
               ref: proposalRef2,
             ),
           );
@@ -694,16 +760,13 @@ void main() {
               .asBroadcastStream();
 
           final firstEmission = await documentCount.first;
-          // TODO(damian-molinski): JSONB filtering
-          // After proper filtering this test should pass
+
           expect(firstEmission, equals(1));
 
-          // Save second comment and wait for update
           await database.documentsDao.saveAll([comments.last]);
           final secondEmission = await documentCount.first;
           expect(secondEmission, equals(2));
         },
-        skip: true,
       );
     });
 
@@ -749,4 +812,10 @@ void main() {
       });
     });
   });
+}
+
+SignedDocumentRef _buildRefAt(DateTime dateTime) {
+  final config = V7Options(dateTime.millisecondsSinceEpoch, null);
+  final val = const Uuid().v7(config: config);
+  return SignedDocumentRef.first(val);
 }

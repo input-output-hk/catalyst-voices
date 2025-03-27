@@ -22,7 +22,7 @@ final class ProposalBuilderMetadata extends Equatable {
 
   factory ProposalBuilderMetadata.newDraft({
     required SignedDocumentRef templateRef,
-    required SignedDocumentRef? categoryId,
+    required SignedDocumentRef categoryId,
   }) {
     final firstRef = DraftRef.generateFirstRef();
     return ProposalBuilderMetadata(
@@ -67,22 +67,26 @@ final class ProposalBuilderMetadata extends Equatable {
 }
 
 final class ProposalBuilderState extends Equatable {
+  final bool isLoading;
   final bool isChanging;
   final LocalizedException? error;
   final Document? document;
   final ProposalBuilderMetadata metadata;
   final List<DocumentSegment> segments;
   final ProposalGuidance guidance;
+  final CampaignCategoryDetailsViewModel? category;
   final NodeId? activeNodeId;
   final bool showValidationErrors;
 
   const ProposalBuilderState({
+    this.isLoading = false,
     this.isChanging = false,
     this.error,
     this.document,
     this.metadata = const ProposalBuilderMetadata(),
     this.segments = const [],
     this.guidance = const ProposalGuidance(),
+    this.category,
     this.activeNodeId,
     this.showValidationErrors = false,
   });
@@ -96,37 +100,43 @@ final class ProposalBuilderState extends Equatable {
 
   @override
   List<Object?> get props => [
+        isLoading,
         isChanging,
         error,
         document,
         metadata,
         segments,
         guidance,
+        category,
         activeNodeId,
         showValidationErrors,
       ];
 
-  bool get showError => !isChanging && error != null;
+  bool get showError => !isLoading && error != null;
 
-  bool get showSegments => !isChanging && segments.isNotEmpty && error == null;
+  bool get showSegments => !isLoading && segments.isNotEmpty && error == null;
 
   ProposalBuilderState copyWith({
+    bool? isLoading,
     bool? isChanging,
     Optional<LocalizedException>? error,
     Optional<Document>? document,
     ProposalBuilderMetadata? metadata,
     List<DocumentSegment>? segments,
     ProposalGuidance? guidance,
+    Optional<CampaignCategoryDetailsViewModel>? category,
     Optional<NodeId>? activeNodeId,
     bool? showValidationErrors,
   }) {
     return ProposalBuilderState(
+      isLoading: isLoading ?? this.isLoading,
       isChanging: isChanging ?? this.isChanging,
       error: error.dataOr(this.error),
       document: document.dataOr(this.document),
       metadata: metadata ?? this.metadata,
       segments: segments ?? this.segments,
       guidance: guidance ?? this.guidance,
+      category: category.dataOr(this.category),
       activeNodeId: activeNodeId.dataOr(this.activeNodeId),
       showValidationErrors: showValidationErrors ?? this.showValidationErrors,
     );

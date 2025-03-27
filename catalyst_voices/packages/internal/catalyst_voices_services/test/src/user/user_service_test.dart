@@ -76,8 +76,12 @@ void main() {
       // When
       final keychainOne = await keychainProvider.create(keychainIdOne);
       final keychainTwo = await keychainProvider.create(keychainIdTwo);
-      final catalystIdOne = DummyCatalystIdFactory.create();
-      final catalystIdTwo = DummyCatalystIdFactory.create();
+      final catalystIdOne = DummyCatalystIdFactory.create(
+        host: CatalystIdHost.cardanoPreprod,
+      );
+      final catalystIdTwo = DummyCatalystIdFactory.create(
+        host: CatalystIdHost.cardanoPreview,
+      );
 
       final accountOne = Account.dummy(
         catalystId: catalystIdOne,

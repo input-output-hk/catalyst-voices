@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_dynamic_calls
+
 import 'dart:async';
 
 import 'package:catalyst_voices/common/codecs/markdown_codec.dart';
@@ -12,7 +14,7 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_quill/flutter_quill.dart' as quill;
-import 'package:flutter_quill/flutter_quill_internal.dart' as quill_int;
+import 'package:flutter_quill/internal.dart' as quill_int;
 import 'package:flutter_quill_extensions/flutter_quill_extensions.dart'
     as quill_ext;
 
@@ -240,7 +242,7 @@ class _EditorState extends State<_Editor> {
         controller: widget.controller,
         focusNode: widget.focusNode,
         scrollController: widget.scrollController,
-        configurations: quill.QuillEditorConfigurations(
+        config: quill.QuillEditorConfig(
           padding: const EdgeInsets.all(16),
           placeholder: context.l10n.placeholderRichText,
           characterShortcutEvents: quill.standardCharactersShortcutEvents,
@@ -351,9 +353,9 @@ class _Toolbar extends StatelessWidget {
     return Container(
       color: Theme.of(context).colors.onSurfaceNeutralOpaqueLv1,
       padding: const EdgeInsets.symmetric(horizontal: 18),
-      child: quill.QuillToolbar(
-        configurations: const quill.QuillToolbarConfigurations(),
-        child: Row(
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Wrap(
           children: [
             _ToolbarAttributeIconButton(
               controller: controller,
@@ -407,12 +409,15 @@ class _ToolbarAttributeIconButton extends StatelessWidget {
       controller: controller,
       attribute: attribute,
       options: quill.QuillToolbarToggleStyleButtonOptions(
-        childBuilder: (options, extraOptions) {
+        // TODO(minikin): We need to use dynamic here because
+        // of the bug in the quill package.
+        // https://github.com/singerdmx/flutter-quill/issues/2511
+        childBuilder: (dynamic options, dynamic extraOptions) {
           return _ToolbarIconButton(
             icon: icon,
-            tooltip: options.tooltip,
-            isToggled: extraOptions.isToggled,
-            onPressed: extraOptions.onPressed,
+            tooltip: options.tooltip as String?,
+            isToggled: extraOptions.isToggled as bool,
+            onPressed: extraOptions.onPressed as VoidCallback?,
           );
         },
       ),
@@ -454,12 +459,15 @@ class _ToolbarImageOptionButton extends StatelessWidget {
     return quill_ext.QuillToolbarImageButton(
       controller: controller,
       options: quill_ext.QuillToolbarImageButtonOptions(
-        childBuilder: (options, extraOptions) {
+        // TODO(minikin): We need to use dynamic here because
+        // of the bug in the quill package.
+        // https://github.com/singerdmx/flutter-quill/issues/2511
+        childBuilder: (dynamic options, dynamic extraOptions) {
           return _ToolbarIconButton(
             icon: VoicesAssets.icons.photograph,
-            tooltip: options.tooltip,
+            tooltip: options.tooltip as String?,
             isToggled: false,
-            onPressed: extraOptions.onPressed,
+            onPressed: extraOptions.onPressed as VoidCallback?,
           );
         },
       ),

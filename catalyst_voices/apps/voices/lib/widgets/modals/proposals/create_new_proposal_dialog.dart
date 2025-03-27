@@ -169,20 +169,30 @@ class _CreateNewProposalDialogState extends State<CreateNewProposalDialog> {
     super.dispose();
   }
 
+  @override
+  void initState() {
+    super.initState();
+    context.read<NewProposalCubit>().reset();
+  }
+
   void onTitleSubmitted(String title) {
     _categoryFocusNode.requestFocus();
   }
 
   Future<void> _onOpenInEditor() async {
-    // TODO(dtscalac): create a draft but dont store locally,
-    // open proposal builder with it
-  }
-
-  Future<void> _onSave() async {
     final cubit = context.read<NewProposalCubit>();
     final draftRef = await cubit.createDraft();
     if (mounted) {
       ProposalBuilderRoute.fromRef(ref: draftRef).go(context);
+    }
+  }
+
+  Future<void> _onSave() async {
+    final cubit = context.read<NewProposalCubit>();
+    await cubit.createDraft();
+
+    if (mounted) {
+      Navigator.of(context).pop();
     }
   }
 

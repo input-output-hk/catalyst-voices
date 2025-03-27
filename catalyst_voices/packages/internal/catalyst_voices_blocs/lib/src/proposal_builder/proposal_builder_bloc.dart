@@ -81,6 +81,7 @@ final class ProposalBuilderBloc
   ProposalBuilderState _createState({
     required Document document,
     required ProposalBuilderMetadata metadata,
+    required CampaignCategory category,
   }) {
     final segments = _mapDocumentToSegments(
       document,
@@ -90,12 +91,14 @@ final class ProposalBuilderBloc
     final firstSegment = segments.firstOrNull;
     final firstSection = firstSegment?.sections.firstOrNull;
     final guidance = _getGuidanceForSection(firstSegment, firstSection);
+    final categoryVM = CampaignCategoryDetailsViewModel.fromModel(category);
 
     return ProposalBuilderState(
       segments: segments,
       guidance: guidance,
       document: document,
       metadata: metadata,
+      category: categoryVM,
       activeNodeId: firstSection?.id,
     );
   }
@@ -105,9 +108,9 @@ final class ProposalBuilderBloc
     Emitter<ProposalBuilderState> emit,
   ) async {
     try {
-      emit(state.copyWith(isChanging: true));
-
       final ref = state.metadata.documentRef! as DraftRef;
+      _logger.info('deleteProposal: $ref');
+      emit(state.copyWith(isChanging: true));
 
       // removing all versions of this proposal
       final unversionedRef = ref.copyWith(version: const Optional.empty());
@@ -116,7 +119,7 @@ final class ProposalBuilderBloc
       emitSignal(const DeletedProposalBuilderSignal());
     } catch (error, stackTrace) {
       _logger.severe('Deleting proposal failed', error, stackTrace);
-      emitError(const LocalizedUnknownException());
+      emitError(LocalizedException.create(error));
     } finally {
       emit(state.copyWith(isChanging: false));
     }
@@ -129,6 +132,9 @@ final class ProposalBuilderBloc
     try {
       final documentRef = state.metadata.documentRef!;
       final proposalId = documentRef.id;
+      _logger.info('export proposal: $documentRef');
+      emit(state.copyWith(isChanging: true));
+
       final encodedProposal = await _proposalService.encodeProposalForExport(
         document: _buildDocumentData(),
       );
@@ -142,7 +148,9 @@ final class ProposalBuilderBloc
       );
     } catch (error, stackTrace) {
       _logger.severe('Exporting proposal failed', error, stackTrace);
-      emitError(const LocalizedUnknownException());
+      emitError(LocalizedException.create(error));
+    } finally {
+      emit(state.copyWith(isChanging: false));
     }
   }
 
@@ -266,6 +274,7 @@ final class ProposalBuilderBloc
           templateRef: templateRef,
           categoryId: category.selfRef,
         ),
+        category: category,
       );
     });
   }
@@ -283,14 +292,18 @@ final class ProposalBuilderBloc
       final proposal = Proposal.fromData(proposalData);
 
       final versions = proposalData.versions.mapIndexed((index, version) {
+        final versionRef = version.document.metadata.selfRef;
+        final versionId = versionRef.version ?? versionRef.id;
         return DocumentVersion(
-          id: version.document.metadata.selfRef.version ?? '',
+          id: versionId,
           number: index + 1,
-          isCurrent: version.document.metadata.selfRef.version ==
-              event.proposalId.version,
+          isCurrent: versionId == event.proposalId.version,
           isLatest: index == proposalData.versions.length - 1,
         );
       }).toList();
+
+      final categoryId = proposalData.categoryId;
+      final category = await _campaignService.getCategory(categoryId);
 
       return _createState(
         document: proposalData.document.document,
@@ -298,9 +311,11 @@ final class ProposalBuilderBloc
           publish: proposal.publish,
           documentRef: proposal.selfRef,
           originalDocumentRef: proposal.selfRef,
+          templateRef: proposalData.templateRef,
+          categoryId: categoryId,
           versions: versions,
-          categoryId: proposal.categoryId,
         ),
+        category: category,
       );
     });
   }
@@ -328,6 +343,7 @@ final class ProposalBuilderBloc
           templateRef: templateRef,
           categoryId: categoryId,
         ),
+        category: category,
       );
     });
   }
@@ -340,6 +356,7 @@ final class ProposalBuilderBloc
       _logger.info('load state');
       emit(
         const ProposalBuilderState(
+          isLoading: true,
           isChanging: true,
         ),
       );
@@ -348,14 +365,17 @@ final class ProposalBuilderBloc
       final newState = await stateBuilder();
       _documentBuilder = newState.document?.toBuilder();
       emit(newState);
-    } on LocalizedException catch (error, stackTrace) {
-      _logger.severe('load state error', error, stackTrace);
-      emit(ProposalBuilderState(error: error));
     } catch (error, stackTrace) {
       _logger.severe('load state error', error, stackTrace);
-      emit(const ProposalBuilderState(error: LocalizedUnknownException()));
+
+      emit(ProposalBuilderState(error: LocalizedException.create(error)));
     } finally {
-      emit(state.copyWith(isChanging: false));
+      emit(
+        state.copyWith(
+          isLoading: false,
+          isChanging: false,
+        ),
+      );
     }
   }
 
@@ -410,6 +430,8 @@ final class ProposalBuilderBloc
       emit,
       publish: ProposalPublish.submittedProposal,
     );
+
+    emitSignal(const SubmittedProposalBuilderSignal());
   }
 
   Future<void> _publishProposal(
@@ -418,6 +440,7 @@ final class ProposalBuilderBloc
   ) async {
     try {
       _logger.info('Publishing proposal');
+      emit(state.copyWith(isChanging: true));
 
       final updatedRef = await _proposalService.publishProposal(
         document: _buildDocumentData(),
@@ -428,9 +451,12 @@ final class ProposalBuilderBloc
         documentRef: updatedRef,
         publish: ProposalPublish.publishedDraft,
       );
+      emitSignal(const PublishedProposalBuilderSignal());
     } catch (error, stackTrace) {
       _logger.severe('PublishProposal', error, stackTrace);
-      emitError(error);
+      emitError(const ProposalBuilderPublishException());
+    } finally {
+      emit(state.copyWith(isChanging: false));
     }
   }
 
@@ -438,8 +464,6 @@ final class ProposalBuilderBloc
     Emitter<ProposalBuilderState> emit,
     Document document,
   ) async {
-    // TODO(dtscalac): if a new version has been created
-    // update the version in the metadata
     final updatedRef = await _upsertDraftProposal(
       state.metadata.documentRef!,
       _documentMapper.toContent(document),
@@ -454,6 +478,7 @@ final class ProposalBuilderBloc
   ) async {
     try {
       _logger.info('Submitting proposal for review');
+      emit(state.copyWith(isChanging: true));
 
       switch (state.metadata.publish) {
         case ProposalPublish.localDraft:
@@ -466,7 +491,9 @@ final class ProposalBuilderBloc
       }
     } catch (error, stackTrace) {
       _logger.severe('SubmitProposalForReview', error, stackTrace);
-      emitError(error);
+      emitError(const ProposalBuilderSubmitException());
+    } finally {
+      emit(state.copyWith(isChanging: false));
     }
   }
 
@@ -479,9 +506,9 @@ final class ProposalBuilderBloc
     );
 
     _updateMetadata(emit, publish: ProposalPublish.submittedProposal);
+    emitSignal(const SubmittedProposalBuilderSignal());
   }
 
-  // TODO(dtscalac): update versions accordingly
   void _updateMetadata(
     Emitter<ProposalBuilderState> emit, {
     DocumentRef? documentRef,

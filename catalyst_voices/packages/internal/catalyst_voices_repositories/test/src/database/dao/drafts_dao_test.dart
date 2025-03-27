@@ -2,7 +2,8 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_repositories/src/database/catalyst_database.dart';
 import 'package:catalyst_voices_repositories/src/database/dao/drafts_dao.dart';
-import 'package:drift/drift.dart' show DatabaseConnection;
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:drift/drift.dart' show DatabaseConnection, Uint8List;
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:uuid_plus/uuid_plus.dart';
@@ -112,7 +113,7 @@ void main() {
 
       test('all refs return as expected', () async {
         // Given
-        final refs = List.generate(10, (_) => DocumentRefFactory.buildDraft());
+        final refs = List.generate(10, (_) => DraftRef.generateFirstRef());
         final drafts = refs.map((ref) {
           return DraftFactory.build(
             metadata: DocumentDataMetadata(
@@ -133,6 +134,127 @@ void main() {
           allOf(hasLength(refs.length), containsAll(refs)),
         );
       });
+
+      test('authors are correctly extracted', () async {
+        final authorId1 = CatalystId(host: 'test', role0Key: Uint8List(32));
+        final authorId2 = CatalystId(host: 'test1', role0Key: Uint8List(32));
+
+        final ref = DraftRef.generateFirstRef();
+        // Given
+        final draft = DraftFactory.build(
+          metadata: DocumentDataMetadata(
+            type: DocumentType.proposalDocument,
+            selfRef: ref,
+            authors: [
+              authorId1,
+              authorId2,
+            ],
+          ),
+        );
+
+        await database.draftsDao.save(draft);
+        final doc = await database.draftsDao.query(ref: ref);
+        expect(
+          doc?.metadata.authors,
+          [
+            authorId1,
+            authorId2,
+          ],
+        );
+      });
+
+      test('when updating proposal author list is not deleted', () async {
+        final authorId1 = CatalystId(host: 'test', role0Key: Uint8List(32));
+        final authorId2 = CatalystId(host: 'test1', role0Key: Uint8List(32));
+
+        final ref = DraftRef.generateFirstRef();
+        // Given
+        final draft = DraftFactory.build(
+          metadata: DocumentDataMetadata(
+            type: DocumentType.proposalDocument,
+            selfRef: ref,
+            authors: [
+              authorId1,
+              authorId2,
+            ],
+          ),
+          content: const DocumentDataContent({
+            'title': 'Dev',
+          }),
+        );
+
+        final updateDraft = draft.copyWith(
+          metadata: draft.metadata.copyWith(
+            authors: null,
+          ),
+          content: const DocumentDataContent({
+            'title': 'Update',
+          }),
+        );
+
+        await database.draftsDao.save(draft);
+        await database.draftsDao.save(updateDraft);
+
+        final updated = await database.draftsDao.query(ref: ref);
+
+        expect(
+          updated?.metadata.authors?.length,
+          equals(2),
+        );
+        expect(
+          updated?.metadata.authors,
+          equals([
+            authorId1,
+            authorId2,
+          ]),
+        );
+      });
+
+      test(
+          'all drafts with from same account are returned '
+          'even when username changes', () async {
+        // Given
+        final originalId = DummyCatalystIdFactory.create(username: 'damian');
+        final updatedId = originalId.copyWith(username: const Optional('dev'));
+
+        final draft1 = DraftFactory.build(
+          metadata: DocumentDataMetadata(
+            type: DocumentType.proposalDocument,
+            selfRef: SignedDocumentRef.generateFirstRef(),
+            authors: [originalId],
+          ),
+        );
+        final draft2 = DraftFactory.build(
+          metadata: DocumentDataMetadata(
+            type: DocumentType.proposalDocument,
+            selfRef: SignedDocumentRef.generateFirstRef(),
+            authors: [updatedId],
+          ),
+        );
+
+        final drafts = [draft1, draft2];
+        final refs = drafts.map((e) => e.metadata.selfRef).toList();
+
+        // When
+        await database.draftsDao.saveAll(drafts);
+
+        // Then
+        final stream = database.draftsDao.watchAll(authorId: updatedId);
+
+        expect(
+          stream,
+          emitsInOrder([
+            allOf(
+              hasLength(drafts.length),
+              everyElement(
+                predicate<DocumentDraftEntity>((document) {
+                  return refs.contains(document.metadata.selfRef);
+                }),
+              ),
+            ),
+          ]),
+        );
+      });
     });
 
     group('count', () {
@@ -145,7 +267,7 @@ void main() {
             return DraftFactory.build(
               metadata: DocumentDataMetadata(
                 type: DocumentType.proposalDocument,
-                selfRef: DocumentRefFactory.buildDraft(id: id),
+                selfRef: DraftRef(id: id, version: const Uuid().v7()),
               ),
             );
           },
@@ -169,13 +291,13 @@ void main() {
           DraftFactory.build(
             metadata: DocumentDataMetadata(
               type: DocumentType.proposalDocument,
-              selfRef: DocumentRefFactory.buildDraft(id: id, version: version),
+              selfRef: DraftRef(id: id, version: version),
             ),
           ),
           DraftFactory.build(
             metadata: DocumentDataMetadata(
               type: DocumentType.proposalDocument,
-              selfRef: DocumentRefFactory.buildDraft(id: id),
+              selfRef: DraftRef.first(id),
             ),
           ),
         ];
@@ -243,7 +365,7 @@ void main() {
           (index) => DraftFactory.build(
             metadata: DocumentDataMetadata(
               type: DocumentType.proposalDocument,
-              selfRef: DocumentRefFactory.buildDraft(id: id),
+              selfRef: DraftRef(id: id, version: const Uuid().v7()),
             ),
           ),
         );

@@ -1,12 +1,13 @@
+import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
-import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 
 class ProposalDeliveryCard extends StatelessWidget {
-  final int fundsRequested;
-  final int projectDuration;
-  final int milestoneCount;
+  final Coin? fundsRequested;
+  final int? projectDuration;
+  final int? milestoneCount;
 
   const ProposalDeliveryCard({
     super.key,
@@ -17,40 +18,50 @@ class ProposalDeliveryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final fundsRequested = this.fundsRequested;
+    final projectDuration = this.projectDuration;
+    final milestoneCount = this.milestoneCount;
+
     return Container(
+      width: double.infinity,
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
       decoration: BoxDecoration(
         color: context.colors.onSurfaceNeutralOpaqueLv1,
         borderRadius: BorderRadius.circular(8),
       ),
-      child: Row(
+      child: Wrap(
         spacing: 16,
+        runSpacing: 8,
+        alignment: WrapAlignment.spaceAround,
+        runAlignment: WrapAlignment.center,
         children: [
-          _ValueCell(
-            title: context.l10n.proposalViewFundingRequested,
-            value: '',
-            valueSuffix: const Currency.ada().format(
-              fundsRequested,
-              separator: ' ',
+          if (fundsRequested != null)
+            _ValueCell(
+              title: context.l10n.proposalViewFundingRequested,
+              value: '',
+              valueSuffix: CryptocurrencyFormatter.decimalFormat(
+                fundsRequested,
+              ),
             ),
-          ),
-          _ValueCell(
-            title: context.l10n.proposalViewProjectDuration,
-            value: context.l10n
-                .valueMonths(projectDuration)
-                .replaceAll('$projectDuration', '')
-                .trim(),
-            valueSuffix: '$projectDuration',
-          ),
-          _ValueCell(
-            title: context.l10n.proposalViewProjectDelivery,
-            value: context.l10n
-                .valueMilestones(milestoneCount)
-                .replaceAll('$milestoneCount', '')
-                .trim(),
-            valueSuffix: '$milestoneCount',
-          ),
-        ].map<Widget>((e) => Expanded(child: e)).toList(),
+          if (projectDuration != null)
+            _ValueCell(
+              title: context.l10n.proposalViewProjectDuration,
+              value: context.l10n
+                  .valueMonths(projectDuration)
+                  .replaceAll('$projectDuration', '')
+                  .trim(),
+              valueSuffix: '$projectDuration',
+            ),
+          if (milestoneCount != null)
+            _ValueCell(
+              title: context.l10n.proposalViewProjectDelivery,
+              value: context.l10n
+                  .valueMilestones(milestoneCount)
+                  .replaceAll('$milestoneCount', '')
+                  .trim(),
+              valueSuffix: '$milestoneCount',
+            ),
+        ],
       ),
     );
   }
@@ -94,6 +105,8 @@ class _ValueCell extends StatelessWidget {
           children: <Widget>[
             Text(
               valueSuffix,
+              maxLines: 1,
+              overflow: TextOverflow.clip,
               style: textTheme.headlineSmall
                   ?.copyWith(color: colors.textOnPrimaryLevel1),
             ),

@@ -31,6 +31,7 @@ class _AccountHeaderTile extends StatelessWidget {
     return Row(
       children: [
         ProfileAvatar(
+          key: const Key('AccountAvatar'),
           size: 155,
           username: data?.username,
         ),
