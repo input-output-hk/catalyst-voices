@@ -2065,5 +2065,25 @@
   "apiErrorServiceUnavailable": "Service Unavailable",
   "@apiErrorServiceUnavailable": {
     "description": "Message of an error when api returns matching status code."
+  },
+  "mobileAccessDescription": "For the best experience, head over to a desktop to get started. But don't worry - mobile is coming.\n\nStay tuned for more updates, or visit our Gitbook to learn more.\n\nSee you on the other side!",
+  "@mobileAccessDescription": {
+    "description": "Description for the mobile restricted access page"
+  },
+  "mobileAccessSubtitle": "We’re not quite ready for you on mobile just yet...",
+  "@mobileAccessSubtitle": {
+    "description": "Subtitle for the mobile restricted access page"
+  },
+  "mobileAccessTitle": "Easy there, trailblazer",
+  "@mobileAccessTitle": {
+    "description": "Title for the mobile restricted access page"
+  },
+  "joinNewsletter": "Join Newsletter",
+  "@joinNewsletter": {
+    "description": "Action to join newsletter"
+  },
+  "visitGitbook": "Visit Gitbook",
+  "@visitGitbook": {
+    "description": "Action to visit gitbook"
   }
 }
