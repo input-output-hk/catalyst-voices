@@ -38,9 +38,7 @@ class _Account extends StatelessWidget {
         MenuItemTile(
           leading: VoicesAssets.icons.userCircle.buildIcon(),
           key: const Key('ProfileAndKeychain'),
-          title: Text(
-            context.l10n.profileAndKeychain,
-          ),
+          title: Text(context.l10n.profileAndKeychain),
           trailing: VoicesAssets.icons.chevronRight.buildIcon(),
           onTap: () => Navigator.pop(context, const _OpenAccountDetails()),
         ),
@@ -119,11 +117,9 @@ sealed class _MenuItemEvent {
   const _MenuItemEvent();
 }
 
-
 final class _MyOpportunities extends _MenuItemEvent {
   const _MyOpportunities();
 }
-
 
 final class _OpenAccountDetails extends _MenuItemEvent {
   const _OpenAccountDetails();
@@ -161,36 +157,6 @@ class _PopupMenu extends StatelessWidget {
           _AccountHeader(),
           VoicesDivider.expanded(),
           _Opportunities(),
-          VoicesDivider.expanded(),
-          _Account(),
-          _Settings(),
-          VoicesDivider.expanded(height: 17),
-          _Links(),
-          VoicesDivider.expanded(height: 17),
-          _Session(),
-          SizedBox(height: 8),
-        ],
-      ),
-    );
-  }
-}
-
-class _PopupMenu extends StatelessWidget {
-  const _PopupMenu();
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = PopupMenuTheme.of(context);
-    return DecoratedBox(
-      decoration: ShapeDecoration(
-        color: theme.color,
-        shape: theme.shape ?? const RoundedRectangleBorder(),
-      ),
-      child: const Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          _AccountHeader(),
           VoicesDivider.expanded(),
           _Account(),
           _Settings(),
