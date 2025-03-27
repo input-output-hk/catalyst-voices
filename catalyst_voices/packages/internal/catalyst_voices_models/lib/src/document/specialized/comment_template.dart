@@ -4,15 +4,15 @@ import 'package:equatable/equatable.dart';
 
 final class CommentTemplate extends Equatable {
   final CommentTemplateMetadata metadata;
-  final Document document;
+  final DocumentSchema schema;
 
   const CommentTemplate({
     required this.metadata,
-    required this.document,
+    required this.schema,
   });
 
   @override
-  List<Object?> get props => [metadata, document];
+  List<Object?> get props => [metadata, schema];
 }
 
 final class CommentTemplateMetadata extends DocumentMetadata {

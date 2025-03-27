@@ -13,6 +13,11 @@ import '../../utils/test_factories.dart';
 void main() {
   late DriftCatalystDatabase database;
 
+  // ignore: unnecessary_lambdas
+  setUpAll(() {
+    DummyCatalystIdFactory.registerDummyKeyFactory();
+  });
+
   setUp(() {
     final inMemory = DatabaseConnection(NativeDatabase.memory());
     database = DriftCatalystDatabase(inMemory);
@@ -442,6 +447,52 @@ void main() {
         expect(
           secondEmission,
           equals([document2.document]),
+        );
+      });
+
+      test(
+          'all documents with from same account are returned '
+          'even when username changes', () async {
+        // Given
+        final originalId = DummyCatalystIdFactory.create(username: 'damian');
+        final updatedId = originalId.copyWith(username: const Optional('dev'));
+
+        final document1 = DocumentWithMetadataFactory.build(
+          metadata: DocumentDataMetadata(
+            type: DocumentType.proposalDocument,
+            selfRef: SignedDocumentRef.generateFirstRef(),
+            authors: [originalId],
+          ),
+        );
+        final document2 = DocumentWithMetadataFactory.build(
+          metadata: DocumentDataMetadata(
+            type: DocumentType.proposalDocument,
+            selfRef: SignedDocumentRef.generateFirstRef(),
+            authors: [updatedId],
+          ),
+        );
+
+        final docs = [document1, document2];
+        final refs = docs.map((e) => e.document.metadata.selfRef).toList();
+
+        // When
+        await database.documentsDao.saveAll(docs);
+
+        // Then
+        final stream = database.documentsDao.watchAll(authorId: updatedId);
+
+        expect(
+          stream,
+          emitsInOrder([
+            allOf(
+              hasLength(docs.length),
+              everyElement(
+                predicate<DocumentEntity>((document) {
+                  return refs.contains(document.metadata.selfRef);
+                }),
+              ),
+            ),
+          ]),
         );
       });
     });

@@ -2093,5 +2093,9 @@
   "copyMyCatalystId": "Copy my Catalyst ID",
   "@copyMyCatalystId": {
     "description": "Action to copy my catalyst id"
+  },
+  "errorUnknownPublishComment": "Can not publish comment",
+  "@errorUnknownPublishComment": {
+    "description": "Fallback message when can not publish comment for any reason."
   }
 }

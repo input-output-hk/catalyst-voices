@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 class CategoryDetailCubit extends Cubit<CategoryDetailState> {
   final CampaignService _campaignService;
+
   CategoryDetailCubit(
     this._campaignService,
   ) : super(const CategoryDetailState(isLoading: true));
@@ -41,12 +42,12 @@ class CategoryDetailCubit extends Cubit<CategoryDetailState> {
           error: const Optional.empty(),
         ),
       );
-    } on Exception catch (exception) {
+    } catch (error) {
       emit(
         state.copyWith(
           category: CampaignCategoryDetailsViewModel.dummy(),
           isLoading: false,
-          error: Optional.of(exception.toLocalizedException()),
+          error: Optional.of(LocalizedException.create(error)),
         ),
       );
     }

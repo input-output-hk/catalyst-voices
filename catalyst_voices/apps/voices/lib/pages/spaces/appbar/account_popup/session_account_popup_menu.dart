@@ -85,11 +85,14 @@ class _Links extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        MenuItemTile(
-          key: const Key('SetupRolesMenuItem'),
-          leading: VoicesAssets.icons.userGroup.buildIcon(),
-          title: Text(context.l10n.setupCatalystRoles),
-          onTap: () => Navigator.pop(context, const _SetupRoles()),
+        // Note. This is not supported atm.
+        Offstage(
+          child: MenuItemTile(
+            key: const Key('SetupRolesMenuItem'),
+            leading: VoicesAssets.icons.userGroup.buildIcon(),
+            title: Text(context.l10n.setupCatalystRoles),
+            onTap: () => Navigator.pop(context, const _SetupRoles()),
+          ),
         ),
         MenuItemTile(
           key: const Key('SubmitSupportRequest'),
@@ -116,9 +119,11 @@ sealed class _MenuItemEvent {
   const _MenuItemEvent();
 }
 
+
 final class _MyOpportunities extends _MenuItemEvent {
   const _MyOpportunities();
 }
+
 
 final class _OpenAccountDetails extends _MenuItemEvent {
   const _OpenAccountDetails();
@@ -156,6 +161,36 @@ class _PopupMenu extends StatelessWidget {
           _AccountHeader(),
           VoicesDivider.expanded(),
           _Opportunities(),
+          VoicesDivider.expanded(),
+          _Account(),
+          _Settings(),
+          VoicesDivider.expanded(height: 17),
+          _Links(),
+          VoicesDivider.expanded(height: 17),
+          _Session(),
+          SizedBox(height: 8),
+        ],
+      ),
+    );
+  }
+}
+
+class _PopupMenu extends StatelessWidget {
+  const _PopupMenu();
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = PopupMenuTheme.of(context);
+    return DecoratedBox(
+      decoration: ShapeDecoration(
+        color: theme.color,
+        shape: theme.shape ?? const RoundedRectangleBorder(),
+      ),
+      child: const Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          _AccountHeader(),
           VoicesDivider.expanded(),
           _Account(),
           _Settings(),
