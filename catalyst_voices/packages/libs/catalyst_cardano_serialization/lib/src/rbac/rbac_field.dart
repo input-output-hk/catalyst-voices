@@ -12,11 +12,8 @@ final class AbsentRbacField<T extends CborEncodable> extends RbacField<T> {
   List<Object?> get props => [];
 
   @override
-  CborValue toCbor({List<int> tags = const []}) => CborUndefined(
-        tags: [
-          CborCustomTags.absent,
-          ...tags,
-        ],
+  CborValue toCbor({List<int> tags = const []}) => const CborUndefined(
+        tags: [CborCustomTags.absent],
       );
 }
 
@@ -69,6 +66,11 @@ sealed class RbacField<T extends CborEncodable> extends Equatable
 
   /// See [AbsentRbacField].
   const factory RbacField.unset() = AbsentRbacField;
+
+  /// Serializes the type as cbor.
+  /// The [tags] are only used for [DefinedRbacField].
+  @override
+  CborValue toCbor({List<int> tags = const []});
 }
 
 /// The field is undefined, meaning it should not be modified.
@@ -80,5 +82,5 @@ final class UndefinedRbacField<T extends CborEncodable> extends RbacField<T> {
   List<Object?> get props => [];
 
   @override
-  CborValue toCbor({List<int> tags = const []}) => CborUndefined(tags: tags);
+  CborValue toCbor({List<int> tags = const []}) => const CborUndefined();
 }
