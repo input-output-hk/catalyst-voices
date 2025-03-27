@@ -61,7 +61,7 @@ pub(crate) async fn endpoint(doc_bytes: Vec<u8>, token: CatalystRBACTokenV1) -> 
         .kids()
         .iter()
         .cloned()
-        .any(|id_uri| id_uri.as_id().to_string() != token_catid.to_string())
+        .any(|id_uri| id_uri.as_id() != token_catid)
     {
         return Responses::UnprocessableContent(Json(PutDocumentUnprocessableContent::new(
             "RBAC Token CatID does not match with the providing document KIDs",
