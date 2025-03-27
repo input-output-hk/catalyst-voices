@@ -2070,7 +2070,7 @@
   "@mobileAccessDescription": {
     "description": "Description for the mobile restricted access page"
   },
-  "mobileAccessSubtitle": "We’re not quite ready for you on mobile just yet...",
+  "mobileAccessSubtitle": "We’re not quite ready for you on mobile just yet…",
   "@mobileAccessSubtitle": {
     "description": "Subtitle for the mobile restricted access page"
   },
