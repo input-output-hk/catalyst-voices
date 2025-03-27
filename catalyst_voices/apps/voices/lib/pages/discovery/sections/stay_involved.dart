@@ -182,7 +182,7 @@ class _StayInvolvedCard extends StatelessWidget {
           Text(
             description,
             style: context.textTheme.bodyMedium?.copyWith(
-              color: context.colors.textOnPrimaryLevel0,
+              color: context.colors.textOnPrimaryLevel1,
             ),
           ),
           if (additionalInfo != null) ...[
