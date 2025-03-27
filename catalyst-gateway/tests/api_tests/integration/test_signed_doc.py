@@ -66,58 +66,65 @@ def comment_templates() -> List[str]:
 
 # return a Proposal document which is already published to the cat-gateway
 @pytest.fixture
-def proposal_doc(proposal_templates) -> SignedDocument:
-    proposal_doc_id = uuid7str()
-    proposal_metadata_json = {
-        "alg": "EdDSA",
-        "id": proposal_doc_id,
-        "ver": proposal_doc_id,
-        # Proposal document type
-        "type": "7808d2ba-d511-40af-84e8-c0d1625fdfdc",
-        "content-type": "application/json",
-        "content-encoding": "br",
-        # referenced to the defined proposal template id, comes from the 'templates/data.rs' file
-        "template": {"id": proposal_templates[0]},
-        # referenced to the defined category id, comes from the 'templates/data.rs' file
-        "category_id": {"id": "0194d490-30bf-7473-81c8-a0eaef369619"},
-    }
-    with open("./test_data/signed_docs/proposal.json", "r") as proposal_json_file:
-        proposal_json = json.load(proposal_json_file)
+def proposal_doc_factory(proposal_templates):
+    def __proposal_doc_factory() -> SignedDocument:
+        proposal_doc_id = uuid7str()
+        proposal_metadata_json = {
+            "alg": "EdDSA",
+            "id": proposal_doc_id,
+            "ver": proposal_doc_id,
+            # Proposal document type
+            "type": "7808d2ba-d511-40af-84e8-c0d1625fdfdc",
+            "content-type": "application/json",
+            "content-encoding": "br",
+            # referenced to the defined proposal template id, comes from the 'templates/data.rs' file
+            "template": {"id": proposal_templates[0]},
+            # referenced to the defined category id, comes from the 'templates/data.rs' file
+            "category_id": {"id": "0194d490-30bf-7473-81c8-a0eaef369619"},
+        }
+        with open("./test_data/signed_docs/proposal.json", "r") as proposal_json_file:
+            proposal_json = json.load(proposal_json_file)
 
-    doc = SignedDocument(proposal_metadata_json, proposal_json)
-    resp = document.put(data=doc.hex())
-    assert (
-        resp.status_code == 201
-    ), f"Failed to publish document: {resp.status_code} - {resp.text}"
+        doc = SignedDocument(proposal_metadata_json, proposal_json)
+        resp = document.put(data=doc.hex())
+        assert (
+            resp.status_code == 201
+        ), f"Failed to publish document: {resp.status_code} - {resp.text}"
 
-    return doc
+        return doc
+
+    return __proposal_doc_factory
 
 
 # return a Comment document which is already published to the cat-gateway
 @pytest.fixture
-def comment_doc(proposal_doc, comment_templates) -> SignedDocument:
-    comment_doc_id = uuid7str()
-    comment_metadata_json = {
-        "alg": "EdDSA",
-        "id": comment_doc_id,
-        "ver": comment_doc_id,
-        # Comment document type
-        "type": "b679ded3-0e7c-41ba-89f8-da62a17898ea",
-        "content-type": "application/json",
-        "content-encoding": "br",
-        "ref": {"id": proposal_doc.metadata["id"]},
-        "template": {"id": comment_templates[0]},
-    }
-    with open("./test_data/signed_docs/comment.json", "r") as comment_json_file:
-        comment_json = json.load(comment_json_file)
+def comment_doc_factory(proposal_doc_factory, comment_templates) -> SignedDocument:
+    def __comment_doc_factory() -> SignedDocument:
+        proposal_doc = proposal_doc_factory()
+        comment_doc_id = uuid7str()
+        comment_metadata_json = {
+            "alg": "EdDSA",
+            "id": comment_doc_id,
+            "ver": comment_doc_id,
+            # Comment document type
+            "type": "b679ded3-0e7c-41ba-89f8-da62a17898ea",
+            "content-type": "application/json",
+            "content-encoding": "br",
+            "ref": {"id": proposal_doc.metadata["id"]},
+            "template": {"id": comment_templates[0]},
+        }
+        with open("./test_data/signed_docs/comment.json", "r") as comment_json_file:
+            comment_json = json.load(comment_json_file)
 
-    doc = SignedDocument(comment_metadata_json, comment_json)
-    resp = document.put(data=doc.hex())
-    assert (
-        resp.status_code == 201
-    ), f"Failed to publish document: {resp.status_code} - {resp.text}"
+        doc = SignedDocument(comment_metadata_json, comment_json)
+        resp = document.put(data=doc.hex())
+        assert (
+            resp.status_code == 201
+        ), f"Failed to publish document: {resp.status_code} - {resp.text}"
 
-    return doc
+        return doc
+
+    return __comment_doc_factory
 
 
 def test_templates(proposal_templates, comment_templates):
@@ -129,7 +136,8 @@ def test_templates(proposal_templates, comment_templates):
         ), f"Failed to get document: {resp.status_code} - {resp.text} for id {template_id}"
 
 
-def test_proposal_doc(proposal_doc):
+def test_proposal_doc(proposal_doc_factory):
+    proposal_doc = proposal_doc_factory()
     proposal_doc_id = proposal_doc.metadata["id"]
 
     # Put a proposal document again
@@ -187,7 +195,8 @@ def test_proposal_doc(proposal_doc):
     logger.info("Proposal document test successful.")
 
 
-def test_comment_doc(comment_doc):
+def test_comment_doc(comment_doc_factory):
+    comment_doc = comment_doc_factory()
     comment_doc_id = comment_doc.metadata["id"]
 
     # Put a comment document again
@@ -228,7 +237,61 @@ def test_comment_doc(comment_doc):
     logger.info("Comment document test successful.")
 
 
-def test_pagination_out_of_range():
+def test_document_index_endpoint(proposal_doc_factory):
+    # submiting 10 proposal documents
+    total_amount = 10
+    first_proposal = proposal_doc_factory()
+    for _ in range(total_amount - 1):
+        doc = first_proposal.copy()
+        # keep the same id, but different version
+        doc.metadata["ver"] = uuid7str()
+        resp = document.put(data=doc.hex())
+        assert (
+            resp.status_code == 201
+        ), f"Failed to publish document: {resp.status_code} - {resp.text}"
+
+    limit = 1
+    page = 0
+    filter = {"id": {"eq": first_proposal.metadata["id"]}}
+    resp = document.post(
+        f"/index?limit={limit}&page={page}",
+        filter=filter,
+    )
+    assert (
+        resp.status_code == 200
+    ), f"Failed to post document: {resp.status_code} - {resp.text}"
+
+    data = resp.json()
+    assert data["page"]["limit"] == limit
+    assert data["page"]["page"] == page
+    assert data["page"]["remaining"] == total_amount - 1 - page
+
+    page += 1
+    resp = document.post(
+        f"/index?limit={limit}&page={page}",
+        filter=filter,
+    )
+    assert (
+        resp.status_code == 200
+    ), f"Failed to post document: {resp.status_code} - {resp.text}"
+    data = resp.json()
+    print(data)
+    assert data["page"]["limit"] == limit
+    assert data["page"]["page"] == page
+    assert data["page"]["remaining"] == total_amount - 1 - page
+
+    resp = document.post(
+        f"/index?limit={total_amount}",
+        filter=filter,
+    )
+    assert (
+        resp.status_code == 200
+    ), f"Failed to post document: {resp.status_code} - {resp.text}"
+    data = resp.json()
+    assert data["page"]["limit"] == total_amount
+    assert data["page"]["page"] == 0  # default value
+    assert data["page"]["remaining"] == 0
+
     # Pagination out of range
     resp = document.post(
         "/index?page=92233720368547759",
@@ -238,4 +301,4 @@ def test_pagination_out_of_range():
         resp.status_code == 412
     ), f"Post document, expected 412 Precondition Failed: {resp.status_code} - {resp.text}"
 
-    logger.info("Templates test successful.")
+    logger.info("Document POST /index endpoint test successful.")
