@@ -119,7 +119,7 @@ final class ProposalBuilderBloc
       emitSignal(const DeletedProposalBuilderSignal());
     } catch (error, stackTrace) {
       _logger.severe('Deleting proposal failed', error, stackTrace);
-      emitError(const LocalizedUnknownException());
+      emitError(LocalizedException.create(error));
     } finally {
       emit(state.copyWith(isChanging: false));
     }
@@ -148,7 +148,7 @@ final class ProposalBuilderBloc
       );
     } catch (error, stackTrace) {
       _logger.severe('Exporting proposal failed', error, stackTrace);
-      emitError(const LocalizedUnknownException());
+      emitError(LocalizedException.create(error));
     } finally {
       emit(state.copyWith(isChanging: false));
     }
@@ -365,12 +365,10 @@ final class ProposalBuilderBloc
       final newState = await stateBuilder();
       _documentBuilder = newState.document?.toBuilder();
       emit(newState);
-    } on LocalizedException catch (error, stackTrace) {
-      _logger.severe('load state error', error, stackTrace);
-      emit(ProposalBuilderState(error: error));
     } catch (error, stackTrace) {
       _logger.severe('load state error', error, stackTrace);
-      emit(const ProposalBuilderState(error: LocalizedUnknownException()));
+
+      emit(ProposalBuilderState(error: LocalizedException.create(error)));
     } finally {
       emit(
         state.copyWith(

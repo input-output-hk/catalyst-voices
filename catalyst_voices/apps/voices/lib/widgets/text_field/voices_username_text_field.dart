@@ -2,8 +2,8 @@ import 'package:catalyst_voices/widgets/text_field/voices_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-final class VoicesDisplayNameTextField extends VoicesTextField {
-  VoicesDisplayNameTextField({
+final class VoicesUsernameTextField extends VoicesTextField {
+  VoicesUsernameTextField({
     super.key,
     super.initialText,
     super.controller,

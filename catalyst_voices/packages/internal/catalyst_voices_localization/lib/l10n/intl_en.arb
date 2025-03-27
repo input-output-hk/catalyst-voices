@@ -2085,5 +2085,9 @@
   "visitGitbook": "Visit Gitbook",
   "@visitGitbook": {
     "description": "Action to visit gitbook"
+  },
+  "errorUnknownPublishComment": "Can not publish comment",
+  "@errorUnknownPublishComment": {
+    "description": "Fallback message when can not publish comment for any reason."
   }
 }

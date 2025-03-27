@@ -64,15 +64,15 @@ class _DisplayNameSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBaseProfileSelector<DisplayName>(
-      selector: (state) => state.displayName,
+    return BlocBaseProfileSelector<Username>(
+      selector: (state) => state.username,
       builder: (context, state) => _DisplayNameTextField(displayName: state),
     );
   }
 }
 
 class _DisplayNameTextField extends StatelessWidget {
-  final DisplayName displayName;
+  final Username displayName;
 
   const _DisplayNameTextField({
     required this.displayName,
@@ -82,13 +82,13 @@ class _DisplayNameTextField extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
 
-    return VoicesDisplayNameTextField(
+    return VoicesUsernameTextField(
       key: const Key('DisplayNameTextField'),
       initialText: displayName.value,
       onChanged: (value) {
         RegistrationCubit.of(context)
             .baseProfile
-            .updateDisplayName(DisplayName.dirty(value ?? ''));
+            .updateUsername(Username.dirty(value ?? ''));
       },
       onFieldSubmitted: null,
       decoration: VoicesTextFieldDecoration(
@@ -97,7 +97,7 @@ class _DisplayNameTextField extends StatelessWidget {
         helperText: l10n.createBaseProfileSetupDisplayNameHelper,
         errorText: displayName.displayError?.message(context),
       ),
-      maxLength: DisplayName.lengthRange.max,
+      maxLength: Username.lengthRange.max,
     );
   }
 }

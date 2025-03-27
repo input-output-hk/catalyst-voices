@@ -20,7 +20,7 @@ final class ProposalVersion extends Equatable
     final createdAt = data.document.metadata.selfRef.version!.dateTime;
     return ProposalVersion(
       selfRef: data.document.metadata.selfRef,
-      title: BaseProposalData.getProposalTitle(data.document) ?? '',
+      title: data.document.title ?? '',
       createdAt: createdAt,
       // TODO(LynxLynxx): change when we get this from doc actions
       publish: ProposalPublish.publishedDraft,
