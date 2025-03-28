@@ -1,9 +1,9 @@
 import 'dart:math';
 
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart'
-    hide Ed25519PublicKey;
-import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart'
     as cs show Ed25519PublicKey;
+import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart'
+    hide Ed25519PublicKey;
 import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/src/crypto/key_derivation_service.dart';
@@ -106,7 +106,8 @@ final class RegistrationTransactionBuilder {
                   offset: AccountRole.root.registrationOffset,
                 ),
                 // Refer to first key in transaction outputs,
-                // in our case it's the change address (which the user controls).
+                // in our case it's the change address
+                // (which the user controls).
                 paymentKey: -1,
               ),
             if (roles.any((element) => element.setProposer))
