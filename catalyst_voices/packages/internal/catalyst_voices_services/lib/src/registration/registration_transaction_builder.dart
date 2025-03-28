@@ -1,9 +1,9 @@
 import 'dart:math';
 
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart'
-    as cs show Ed25519PublicKey;
-import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart'
     hide Ed25519PublicKey;
+import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart'
+as cs showhide Ed25519PublicKey;
 import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/src/crypto/key_derivation_service.dart';
@@ -97,16 +97,17 @@ final class RegistrationTransactionBuilder {
           derCerts: [RbacField.set(derCert)],
           publicKeys: publicKeys,
           roleDataSet: {
-            RoleData(
-              roleNumber: AccountRole.root.number,
-              roleSigningKey: LocalKeyReference(
-                keyType: LocalKeyReferenceType.x509Certs,
-                offset: AccountRole.root.registrationOffset,
+            if (roles.contains(AccountRole.voter))
+              RoleData(
+                roleNumber: AccountRole.root.number,
+                roleSigningKey: LocalKeyReference(
+                  keyType: LocalKeyReferenceType.x509Certs,
+                  offset: AccountRole.root.registrationOffset,
+                ),
+                // Refer to first key in transaction outputs,
+                // in our case it's the change address (which the user controls).
+                paymentKey: -1,
               ),
-              // Refer to first key in transaction outputs,
-              // in our case it's the change address (which the user controls).
-              paymentKey: -1,
-            ),
             if (roles.contains(AccountRole.proposer))
               RoleData(
                 roleNumber: AccountRole.proposer.number,
@@ -177,7 +178,11 @@ final class RegistrationTransactionBuilder {
     final role = AccountRole.fromRegistrationOffset(registrationOffset);
     switch (role) {
       case AccountRole.voter:
-        return RbacField.set(rootKeyPair.publicKey.toEd25519());
+        if (roles.contains(AccountRole.voter)) {
+          return RbacField.set(rootKeyPair.publicKey.toEd25519());
+        } else {
+          return const RbacField.undefined();
+        }
       case AccountRole.drep:
         return const RbacField.undefined();
       case AccountRole.proposer:
