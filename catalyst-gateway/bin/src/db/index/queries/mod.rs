@@ -31,11 +31,8 @@ use sync_status::update::SyncStatusInsertQuery;
 use tracing::error;
 
 use super::block::{
-    certs::{self, CertInsertQuery},
-    cip36::Cip36InsertQuery,
-    rbac509::Rbac509InsertQuery,
-    txi::TxiInsertQuery,
-    txo::TxoInsertQuery,
+    certs::CertInsertQuery, cip36::Cip36InsertQuery, rbac509::Rbac509InsertQuery,
+    txi::TxiInsertQuery, txo::TxoInsertQuery,
 };
 use crate::{
     db::index::queries::rbac::{
@@ -196,7 +193,6 @@ impl PreparedQueries {
         let stake_registration_insert_queries =
             CertInsertQuery::prepare_batch(&session, cfg).await?;
         let all_cip36_queries = Cip36InsertQuery::prepare_batch(&session, cfg).await;
-        certs::StakeRegistrationInsertQuery::prepare_batch(&session, cfg).await?;
         let txo_spent_update_queries =
             UpdateTxoSpentQuery::prepare_batch(session.clone(), cfg).await?;
         let txo_by_stake_address_query = GetTxoByStakeAddressQuery::prepare(session.clone()).await;

@@ -81,15 +81,15 @@ const INSERT_STAKE_REGISTRATION_QUERY: &str = include_str!("./cql/insert_stake_r
 
 impl StakeRegistrationInsertQuery {
     /// Create a new Insert Query.
-    #[allow(clippy::too_many_arguments)]
+    #[allow(clippy::too_many_arguments, clippy::fn_params_excessive_bools)]
     pub fn new<
         StakeAddressT: Into<DbStakeAddress>,
         SlotT: Into<DbSlot>,
         TxIndexT: Into<DbTxnIndex>,
     >(
         stake_address: StakeAddressT, slot_no: SlotT, txn_index: TxIndexT,
-        stake_public_key: VerifyingKey, script: bool, register: Option<bool>,
-        deregister: Option<bool>, cip36: Option<bool>, pool_delegation: Option<Vec<u8>>,
+        stake_public_key: VerifyingKey, script: bool, register: bool, deregister: bool,
+        cip36: bool, pool_delegation: Option<Vec<u8>>,
     ) -> Self {
         StakeRegistrationInsertQuery {
             stake_address: stake_address.into(),
@@ -97,10 +97,26 @@ impl StakeRegistrationInsertQuery {
             txn_index: txn_index.into(),
             stake_public_key: stake_public_key.into(),
             script,
-            register: register.map_or(MaybeUnset::Unset, MaybeUnset::Set),
-            deregister: deregister.map_or(MaybeUnset::Unset, MaybeUnset::Set),
-            cip36: cip36.map_or(MaybeUnset::Unset, MaybeUnset::Set),
-            pool_delegation: pool_delegation.map_or(MaybeUnset::Unset, MaybeUnset::Set),
+            register: if register {
+                MaybeUnset::Set(true)
+            } else {
+                MaybeUnset::Unset
+            },
+            deregister: if deregister {
+                MaybeUnset::Set(true)
+            } else {
+                MaybeUnset::Unset
+            },
+            cip36: if cip36 {
+                MaybeUnset::Set(true)
+            } else {
+                MaybeUnset::Unset
+            },
+            pool_delegation: if let Some(pool_delegation) = pool_delegation {
+                MaybeUnset::Set(pool_delegation)
+            } else {
+                MaybeUnset::Unset
+            },
         }
     }
 
@@ -150,9 +166,8 @@ impl CertInsertQuery {
     /// Get the stake address for a hash, return an empty address if one can not be found.
     #[allow(clippy::too_many_arguments)]
     fn stake_address(
-        &mut self, cred: &alonzo::StakeCredential, slot_no: Slot, txn: TxnIndex,
-        register: Option<bool>, deregister: Option<bool>, cip36: Option<bool>,
-        delegation: Option<Vec<u8>>, block: &MultiEraBlock,
+        &mut self, cred: &alonzo::StakeCredential, slot_no: Slot, txn: TxnIndex, register: bool,
+        deregister: bool, delegation: Option<Vec<u8>>, block: &MultiEraBlock,
     ) {
         let (stake_address, pubkey, script) = match *cred {
             conway::StakeCredential::AddrKeyhash(cred) => {
@@ -171,7 +186,7 @@ impl CertInsertQuery {
             },
         };
 
-        if pubkey.is_none() && !script && deregister.is_some_and(|v| v) {
+        if pubkey.is_none() && !script && deregister {
             error!("Stake Deregistration Certificate {stake_address} is NOT Witnessed.");
         }
 
@@ -189,7 +204,7 @@ impl CertInsertQuery {
                 script,
                 register,
                 deregister,
-                cip36,
+                false,
                 delegation,
             ));
         }
@@ -203,22 +218,13 @@ impl CertInsertQuery {
         match cert {
             alonzo::Certificate::StakeRegistration(cred) => {
                 // This may not be witnessed, its normal but disappointing.
-                self.stake_address(cred, slot, index, Some(true), None, None, None, block);
+                self.stake_address(cred, slot, index, true, false, None, block);
             },
             alonzo::Certificate::StakeDeregistration(cred) => {
-                self.stake_address(cred, slot, index, None, Some(true), None, None, block);
+                self.stake_address(cred, slot, index, false, true, None, block);
             },
             alonzo::Certificate::StakeDelegation(cred, pool) => {
-                self.stake_address(
-                    cred,
-                    slot,
-                    index,
-                    None,
-                    None,
-                    None,
-                    Some(pool.to_vec()),
-                    block,
-                );
+                self.stake_address(cred, slot, index, false, false, Some(pool.to_vec()), block);
             },
             alonzo::Certificate::PoolRegistration { .. } => {},
             alonzo::Certificate::PoolRetirement(..) => {},
@@ -235,22 +241,13 @@ impl CertInsertQuery {
         match cert {
             conway::Certificate::StakeRegistration(cred) => {
                 // This may not be witnessed, its normal but disappointing.
-                self.stake_address(cred, slot_no, txn, Some(true), None, None, None, block);
+                self.stake_address(cred, slot_no, txn, true, false, None, block);
             },
             conway::Certificate::StakeDeregistration(cred) => {
-                self.stake_address(cred, slot_no, txn, None, Some(true), None, None, block);
+                self.stake_address(cred, slot_no, txn, false, true, None, block);
             },
             conway::Certificate::StakeDelegation(cred, pool) => {
-                self.stake_address(
-                    cred,
-                    slot_no,
-                    txn,
-                    None,
-                    None,
-                    None,
-                    Some(pool.to_vec()),
-                    block,
-                );
+                self.stake_address(cred, slot_no, txn, false, false, Some(pool.to_vec()), block);
             },
             conway::Certificate::PoolRegistration { .. } => {},
             conway::Certificate::PoolRetirement(..) => {},

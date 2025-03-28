@@ -96,9 +96,9 @@ impl Cip36InsertQuery {
                         index,
                         *stake_pk,
                         false,
-                        None,
-                        None,
-                        Some(true),
+                        false,
+                        false,
+                        true,
                         None,
                     ));
             },
@@ -134,9 +134,9 @@ impl Cip36InsertQuery {
                             index,
                             *stake_pk,
                             false,
-                            None,
-                            None,
-                            Some(true),
+                            false,
+                            false,
+                            true,
                             None,
                         ));
                 }
