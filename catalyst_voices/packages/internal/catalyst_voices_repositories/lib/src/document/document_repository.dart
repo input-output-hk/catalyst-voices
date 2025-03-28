@@ -84,7 +84,10 @@ abstract interface class DocumentRepository {
   /// a new standalone document not related to the previous one.
   ///
   /// Returns the reference to the imported document.
-  Future<DocumentRef> importDocument({required Uint8List data});
+  Future<DocumentRef> importDocument({
+    required Uint8List data,
+    required CatalystId authorId,
+  });
 
   /// Similar to [watchIsDocumentFavorite] but stops after first emit.
   Future<bool> isDocumentFavorite({
@@ -266,12 +269,16 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   }
 
   @override
-  Future<DocumentRef> importDocument({required Uint8List data}) async {
+  Future<DocumentRef> importDocument({
+    required Uint8List data,
+    required CatalystId authorId,
+  }) async {
     final jsonData = json.fuse(utf8).decode(data)! as Map<String, dynamic>;
     final document = DocumentDataDto.fromJson(jsonData).toModel();
 
     final newMetadata = document.metadata.copyWith(
       selfRef: DraftRef.generateFirstRef(),
+      authors: Optional([authorId]),
     );
 
     final newDocument = DocumentData(
@@ -375,6 +382,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
           );
         }).toList(),
       );
+
       return results;
     });
 

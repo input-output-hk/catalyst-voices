@@ -54,6 +54,7 @@ export 'pagination/pagination_page.dart';
 export 'proposal/proposal.dart';
 export 'proposal/proposal_data.dart';
 export 'proposal/proposal_enums.dart';
+export 'proposal/proposal_forget_actions.dart';
 export 'proposal/proposal_pagination_items.dart';
 export 'proposal/proposal_pagination_request.dart';
 export 'proposal/proposal_version.dart';
