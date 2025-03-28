@@ -74,14 +74,14 @@ struct SyncParams {
     /// The number of retries so far on this sync task.
     backoff_delay: Option<Duration>,
     /// If the sync completed without error or not.
-    error: Arc<Option<anyhow::Error>>,
+    result: Arc<Option<anyhow::Result<()>>>,
     /// Chain follower roll forward.
     follower_roll_forward: Option<Point>,
 }
 
 impl Display for SyncParams {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        if self.error.is_none() {
+        if self.result.is_none() {
             write!(f, "Sync_Params {{ ")?;
         } else {
             write!(f, "Sync_Result {{ ")?;
@@ -109,11 +109,11 @@ impl Display for SyncParams {
             write!(f, ", retries: {}", self.retries)?;
         }
 
-        if self.retries > 0 || self.error.is_some() {
+        if self.retries > 0 || self.result.is_some() {
             write!(f, ", synced_blocks: {}", self.total_blocks_synced)?;
         }
 
-        if self.error.is_some() {
+        if self.result.is_some() {
             write!(f, ", last_sync: {}", self.last_blocks_synced)?;
         }
 
@@ -121,9 +121,11 @@ impl Display for SyncParams {
             write!(f, ", backoff: {}", DurationString::from(*backoff))?;
         }
 
-        match self.error.as_ref() {
-            None => write!(f, ", Success")?,
-            Some(error) => write!(f, ", {error}")?,
+        if let Some(result) = self.result.as_ref() {
+            match result {
+                Ok(()) => write!(f, ", Success")?,
+                Err(error) => write!(f, ", {error}")?,
+            };
         }
 
         f.write_str(" }")
@@ -135,7 +137,7 @@ const BACKOFF_RANGE_MULTIPLIER: u32 = 3;
 
 impl SyncParams {
     /// Create a new `SyncParams` for the immutable chain sync task.
-    pub(crate) fn new_immutable(chain: Network, start: Point, end: Point) -> Self {
+    pub(crate) fn new(chain: Network, start: Point, end: Point) -> Self {
         Self {
             chain,
             start,
@@ -146,24 +148,7 @@ impl SyncParams {
             last_blocks_synced: 0,
             retries: 0,
             backoff_delay: None,
-            error: Arc::new(None),
-            follower_roll_forward: None,
-        }
-    }
-
-    /// Create a new `SyncParams` for the live chain sync task.
-    pub(crate) fn new_live(chain: Network, start: Point) -> Self {
-        Self {
-            chain,
-            start,
-            end: Point::TIP,
-            first_indexed_block: None,
-            last_indexed_block: None,
-            total_blocks_synced: 0,
-            last_blocks_synced: 0,
-            retries: 0,
-            backoff_delay: None,
-            error: Arc::new(None),
+            result: Arc::new(None),
             follower_roll_forward: None,
         }
     }
@@ -189,15 +174,15 @@ impl SyncParams {
         retry.last_blocks_synced = 0;
         retry.retries = retry_count;
         retry.backoff_delay = backoff;
-        retry.error = Arc::new(None);
+        retry.result = Arc::new(None);
         retry.follower_roll_forward = None;
 
         retry
     }
 
     /// Convert Params into the result of the sync.
-    pub(crate) fn done(mut self, error: Option<anyhow::Error>) -> Self {
-        if error.is_none() && !self.is_live() {
+    pub(crate) fn done(mut self, result: anyhow::Result<()>) -> Self {
+        if result.is_ok() && !self.is_live() {
             // Update sync status in the Immutable DB.
             // Can fire and forget, because failure to update DB will simply cause the chunk to be
             // re-indexed, on recovery.
@@ -208,7 +193,7 @@ impl SyncParams {
             .saturating_add(self.last_blocks_synced);
         self.last_blocks_synced = 0;
 
-        self.error = Arc::new(error);
+        self.result = Arc::new(Some(result));
 
         self
     }
@@ -280,7 +265,7 @@ fn sync_subchain(
                         // Signal the point the immutable chain rolled forward to.
                         params.follower_roll_forward = Some(chain_update.block_data().point());
                         // If this is live chain immediately stops to later run immutable sync tasks
-                        return params.done(None);
+                        return params.done(Ok(()));
                     }
                 },
                 cardano_chain_follower::Kind::Block => {
@@ -289,7 +274,7 @@ fn sync_subchain(
                     if let Err(error) = index_block(block).await {
                         let error_msg = format!("Failed to index block {}", block.point());
                         error!(chain=%params.chain, error=%error, params=%params, error_msg);
-                        return params.done(Some(error.context(error_msg)));
+                        return params.done(Err(error.context(error_msg)));
                     }
 
                     params.update_block_state(block);
@@ -327,7 +312,7 @@ fn sync_subchain(
                                     block.point()
                                 );
                                 error!(chain=%params.chain, error=%error, params=%params, error_msg);
-                                return params.done(Some(error.context(error_msg)));
+                                return params.done(Err(error.context(error_msg)));
                             }
 
                             params.update_block_state(block);
@@ -337,7 +322,7 @@ fn sync_subchain(
             }
         }
 
-        let result = params.done(None);
+        let result = params.done(Ok(()));
 
         info!(chain = %result.chain, result=%result, "Indexing Blockchain Completed: OK");
 
@@ -420,7 +405,11 @@ impl SyncTask {
         // Start the Live Chain sync task - This can never end because it is syncing to TIP.
         // So, if it fails, it will automatically be restarted.
         self.sync_tasks.push(sync_subchain(
-            SyncParams::new_live(self.cfg.chain, Point::fuzzy(self.immutable_tip_slot)),
+            SyncParams::new(
+                self.cfg.chain,
+                Point::fuzzy(self.immutable_tip_slot),
+                Point::TIP,
+            ),
             self.event_channel.0.clone(),
         ));
 
@@ -466,43 +455,44 @@ impl SyncTask {
                             finished.retry(),
                             self.event_channel.0.clone(),
                         ));
-                    }
-                    match finished.error.as_ref() {
-                        None => {
-                            self.current_sync_tasks =
-                                self.current_sync_tasks.checked_sub(1).unwrap_or_else(|| {
-                                    error!("current_sync_tasks -= 1 overflow");
-                                    0
+                    } else if let Some(result) = finished.result.as_ref() {
+                        match result {
+                            Ok(()) => {
+                                self.current_sync_tasks =
+                                    self.current_sync_tasks.checked_sub(1).unwrap_or_else(|| {
+                                        error!("current_sync_tasks -= 1 overflow");
+                                        0
+                                    });
+                                info!(chain=%self.cfg.chain, report=%finished,
+                                    "The Immutable follower completed successfully.");
+
+                                finished.last_indexed_block.as_ref().inspect(|(block, _)| {
+                                    self.dispatch_event(
+                                        event::ChainIndexerEvent::IndexedSlotProgressed {
+                                            slot: block.slot_or_default(),
+                                        },
+                                    );
                                 });
-                            info!(chain=%self.cfg.chain, report=%finished,
-                                "The Immutable follower completed successfully.");
-
-                            finished.last_indexed_block.as_ref().inspect(|(block, _)| {
-                                self.dispatch_event(
-                                    event::ChainIndexerEvent::IndexedSlotProgressed {
-                                        slot: block.slot_or_default(),
-                                    },
-                                );
-                            });
-                            self.dispatch_event(event::ChainIndexerEvent::SyncTasksChanged {
-                                current_sync_tasks: self.current_sync_tasks,
-                            });
-
-                            // If we need more immutable chain followers to sync the block
-                            // chain, we can now start them.
-                            self.start_immutable_followers();
-                        },
-                        Some(error) => {
-                            error!(chain=%self.cfg.chain, report=%finished, error=%error,
-                                "An Immutable follower failed, restarting it."
-                            );
-                            // Restart the Immutable Chain sync task again from where it left
-                            // off.
-                            self.sync_tasks.push(sync_subchain(
-                                finished.retry(),
-                                self.event_channel.0.clone(),
-                            ));
-                        },
+                                self.dispatch_event(event::ChainIndexerEvent::SyncTasksChanged {
+                                    current_sync_tasks: self.current_sync_tasks,
+                                }); // If we need more immutable chain followers to sync the block
+                                    // chain, we can now start them.
+                                self.start_immutable_followers();
+                            },
+                            Err(error) => {
+                                error!(chain=%self.cfg.chain, report=%finished, error=%error,
+                                        "An Immutable follower failed, restarting it.");
+                                // Restart the Immutable Chain sync task again from where it left
+                                // off.
+                                self.sync_tasks.push(sync_subchain(
+                                    finished.retry(),
+                                    self.event_channel.0.clone(),
+                                ));
+                            },
+                        }
+                    } else {
+                        error!(chain=%self.cfg.chain, report=%finished,
+                        "BUG: The Immutable follower completed, but without a proper result.");
                     }
                 },
                 Err(error) => {
@@ -557,7 +547,7 @@ impl SyncTask {
                     self.get_syncable_range(self.start_slot, end_slot)
                 {
                     self.sync_tasks.push(sync_subchain(
-                        SyncParams::new_immutable(self.cfg.chain, first_point, last_point.clone()),
+                        SyncParams::new(self.cfg.chain, first_point, last_point.clone()),
                         self.event_channel.0.clone(),
                     ));
                     self.current_sync_tasks = self.current_sync_tasks.saturating_add(1);
