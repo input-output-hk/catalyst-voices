@@ -27,8 +27,6 @@ pub(crate) struct QueryParams {
 }
 
 /// Get Catalyst ID by stake address query.
-// TODO: Remove the `dead_code` annotation when the query is used.
-#[allow(dead_code)]
 #[derive(Debug, Clone, DeserializeRow)]
 pub(crate) struct Query {
     /// Catalyst ID for the queries stake address.
@@ -46,8 +44,6 @@ impl Query {
     }
 
     /// Executes a get Catalyst ID by stake address query.
-    // TODO: Remove the `dead_code` annotation when the query is used.
-    #[allow(dead_code)]
     pub(crate) async fn execute(
         session: &CassandraSession, params: QueryParams,
     ) -> anyhow::Result<TypedRowStream<Query>> {

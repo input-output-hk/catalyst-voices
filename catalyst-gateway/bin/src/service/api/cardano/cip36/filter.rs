@@ -15,18 +15,21 @@ use super::{
         AllRegistration, Cip36Details, Cip36Registration, Cip36RegistrationList,
         Cip36RegistrationsForVotingPublicKey,
     },
-    Ed25519HexEncodedPublicKey, SlotNo,
+    SlotNo,
 };
-use crate::db::index::{
-    queries::registrations::{
-        get_all_invalids::{GetAllInvalidRegistrationsParams, GetAllInvalidRegistrationsQuery},
-        get_all_registrations::{GetAllRegistrationsParams, GetAllRegistrationsQuery},
-        get_from_stake_addr::{GetRegistrationParams, GetRegistrationQuery},
-        get_from_stake_address::{GetStakeAddrParams, GetStakeAddrQuery},
-        get_from_vote_key::{GetStakeAddrFromVoteKeyParams, GetStakeAddrFromVoteKeyQuery},
-        get_invalid::{GetInvalidRegistrationParams, GetInvalidRegistrationQuery},
+use crate::{
+    db::index::{
+        queries::registrations::{
+            get_all_invalids::{GetAllInvalidRegistrationsParams, GetAllInvalidRegistrationsQuery},
+            get_all_registrations::{GetAllRegistrationsParams, GetAllRegistrationsQuery},
+            get_from_stake_addr::{GetRegistrationParams, GetRegistrationQuery},
+            get_from_stake_address::{GetStakeAddrParams, GetStakeAddrQuery},
+            get_from_vote_key::{GetStakeAddrFromVoteKeyParams, GetStakeAddrFromVoteKeyQuery},
+            get_invalid::{GetInvalidRegistrationParams, GetInvalidRegistrationQuery},
+        },
+        session::CassandraSession,
     },
-    session::CassandraSession,
+    service::common::types::generic::ed25519_public_key::Ed25519HexEncodedPublicKey,
 };
 
 /// Get registration given a stake key hash, it can be time specific based on asat param,

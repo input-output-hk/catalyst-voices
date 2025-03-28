@@ -104,23 +104,16 @@ impl ToJSON for TxnIndex {
     }
 }
 
-impl<
-        T: Copy
-            + TryInto<u16>
-            + std::ops::Sub<Output = T>
-            + PartialOrd<T>
-            + num_traits::identities::Zero,
-    > From<T> for TxnIndex
-{
-    fn from(value: T) -> Self {
-        Self(from_saturating(value))
-    }
-}
-
 impl From<DbTxnIndex> for TxnIndex {
     fn from(val: DbTxnIndex) -> Self {
         let txn: i16 = val.into();
-        TxnIndex::from(txn)
+        Self(from_saturating(txn))
+    }
+}
+
+impl From<cardano_blockchain_types::TxnIndex> for TxnIndex {
+    fn from(value: cardano_blockchain_types::TxnIndex) -> Self {
+        Self(value.into())
     }
 }
 
