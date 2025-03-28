@@ -32,7 +32,7 @@ abstract base class BaseHash extends Equatable implements CborEncodable {
 
   /// Serializes the type as cbor.
   @override
-  CborValue toCbor() => CborBytes(bytes);
+  CborValue toCbor({List<int> tags = const []}) => CborBytes(bytes, tags: tags);
 
   /// Constructs the [BaseHash] from a hex string representation
   /// of [bytes].
