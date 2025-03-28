@@ -631,6 +631,10 @@
   "@registrationSeedPhraseNotFound": {
     "description": "Error message shown when attempting to register or recover account but seed phrase was not found"
   },
+  "registrationKeychainNotFound": "Keychain was not found or locked",
+  "@registrationKeychainNotFound": {
+    "description": "Error message shown when attempting to prepare registration transaction but keychain was not found or locked. Should not happen."
+  },
   "registrationUnlockPasswordNotFound": "Password was not found. Make sure valid password was created.",
   "@registrationUnlockPasswordNotFound": {
     "description": "Error message shown when attempting to register or recover account but password was not found"
@@ -992,6 +996,9 @@
   "walletLinkExitConfirmDialogSubtitle": "Link wallet incomplete!",
   "walletLinkExitConfirmDialogContent": "Leaving before linking wallet means account creation is incomplete. \u2028\u2028You cannot login without \u2028completing your account setup.",
   "walletLinkExitConfirmDialogContinue": "Continue to link wallet",
+  "accountUpdateExitConfirmDialogSubtitle": "Account update incomplete!",
+  "accountUpdateExitConfirmDialogContent": "Leaving before submitting means no change.",
+  "accountUpdateExitConfirmDialogContinue": "Continue to update",
   "cancelAnyways": "Cancel anyway",
   "recoverCatalystKeychain": "Restore Catalyst keychain",
   "recoverKeychainMethodsTitle": "Restore your Catalyst Keychain",

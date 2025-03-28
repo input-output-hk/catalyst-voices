@@ -16,8 +16,12 @@ class RoleChooserCard extends StatelessWidget {
   /// The text label displaying on the card.
   final String label;
 
+  /// Whether can change [value]. This is different from [isViewOnly] as it
+  /// does not affect UI
+  final bool isLocked;
+
   /// Locks the value and shows it as default, only the selected value appears.
-  final bool lockValueAsDefault;
+  final bool isDefault;
 
   /// Hides the "Learn More" link.
   final bool isLearnMoreHidden;
@@ -36,7 +40,8 @@ class RoleChooserCard extends StatelessWidget {
     required this.value,
     required this.icon,
     required this.label,
-    this.lockValueAsDefault = false,
+    this.isLocked = false,
+    this.isDefault = false,
     this.isLearnMoreHidden = false,
     this.isViewOnly = false,
     this.onChanged,
@@ -91,12 +96,13 @@ class RoleChooserCard extends StatelessWidget {
                     if (isViewOnly)
                       _DisplayingValueAsChips(
                         value: value,
-                        lockValueAsDefault: lockValueAsDefault,
+                        isDefault: isDefault,
                       )
                     else
                       _DisplayingValueAsSegmentedButton(
                         value: value,
-                        lockValueAsDefault: lockValueAsDefault,
+                        isLocked: isLocked,
+                        isDefault: isDefault,
                         onChanged: onChanged,
                       ),
                   ],
@@ -110,31 +116,13 @@ class RoleChooserCard extends StatelessWidget {
   }
 }
 
-class _LearnMoreText extends StatelessWidget {
-  final VoidCallback? onTap;
-
-  const _LearnMoreText({
-    this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return LinkText(
-      context.l10n.learnMore,
-      onTap: onTap,
-      style: Theme.of(context).textTheme.labelMedium,
-      underline: false,
-    );
-  }
-}
-
 class _DisplayingValueAsChips extends StatelessWidget {
   final bool value;
-  final bool lockValueAsDefault;
+  final bool isDefault;
 
   const _DisplayingValueAsChips({
     required this.value,
-    required this.lockValueAsDefault,
+    required this.isDefault,
   });
 
   @override
@@ -160,7 +148,7 @@ class _DisplayingValueAsChips extends StatelessWidget {
               ? Theme.of(context).colors.success
               : Theme.of(context).colors.iconsError,
         ),
-        if (lockValueAsDefault)
+        if (isDefault)
           VoicesChip.round(
             content: Text(
               context.l10n.defaultRole,
@@ -181,12 +169,14 @@ class _DisplayingValueAsChips extends StatelessWidget {
 
 class _DisplayingValueAsSegmentedButton extends StatelessWidget {
   final bool value;
-  final bool lockValueAsDefault;
+  final bool isLocked;
+  final bool isDefault;
   final ValueChanged<bool>? onChanged;
 
   const _DisplayingValueAsSegmentedButton({
     required this.value,
-    required this.lockValueAsDefault,
+    required this.isLocked,
+    required this.isDefault,
     this.onChanged,
   });
 
@@ -194,14 +184,14 @@ class _DisplayingValueAsSegmentedButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Expanded(
       child: VoicesSegmentedButton<bool>(
-        segments: lockValueAsDefault
+        segments: isLocked
             ? [
                 ButtonSegment(
                   value: value,
                   label: Text(
                     [
                       if (value) context.l10n.yes else context.l10n.no,
-                      '(${context.l10n.defaultRole})',
+                      if (isDefault) '(${context.l10n.defaultRole})',
                     ].join(' '),
                   ),
                   icon: Icon(
@@ -238,6 +228,24 @@ class _DisplayingValueAsSegmentedButton extends StatelessWidget {
         selected: {value},
         onChanged: (selected) => onChanged?.call(selected.first),
       ),
+    );
+  }
+}
+
+class _LearnMoreText extends StatelessWidget {
+  final VoidCallback? onTap;
+
+  const _LearnMoreText({
+    this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return LinkText(
+      context.l10n.learnMore,
+      onTap: onTap,
+      style: Theme.of(context).textTheme.labelMedium,
+      underline: false,
     );
   }
 }

@@ -2,25 +2,18 @@ import 'package:catalyst_voices/common/ext/account_role_ext.dart';
 import 'package:catalyst_voices/widgets/cards/role_chooser_card.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
-import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:collection/collection.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 /// A panel that displays a series of [RoleChooserCard] widgets for selecting
 /// various account roles (e.g., voter, proposer, drep) in summary.
 class RolesSummaryContainer extends StatelessWidget {
-  /// A set where items are [AccountRole] enums
-  /// representing whether the corresponding role is selected.
-  final Set<AccountRole> selected;
-
-  /// A set similar to [selected], indicating which roles
-  /// should be locked in their default state.
-  final Set<AccountRole>? lockedValuesAsDefault;
+  /// List with information's about roles.
+  final List<RegistrationRole> roles;
 
   const RolesSummaryContainer({
     super.key,
-    required this.selected,
-    this.lockedValuesAsDefault,
+    required this.roles,
   });
 
   @override
@@ -36,18 +29,15 @@ class RolesSummaryContainer extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(12),
         child: Column(
-          children: AccountRole.values
-              .whereNot((role) => role.isHidden)
-              .map<Widget>((role) {
+          children: roles.map<Widget>((role) {
             return RoleChooserCard(
-              icon: role.icon.buildIcon(
+              icon: role.type.icon.buildIcon(
                 size: 66,
                 allowColorFilter: false,
               ),
-              value: selected.contains(role),
-              label: role.getName(context),
-              lockValueAsDefault:
-                  lockedValuesAsDefault?.contains(role) ?? false,
+              value: role.isSelected,
+              label: role.type.getName(context),
+              isDefault: role.type.isDefault,
               isLearnMoreHidden: true,
               isViewOnly: true,
             );
