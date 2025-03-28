@@ -70,6 +70,7 @@ final class Dependencies extends DependencyProvider {
           downloaderService: get<DownloaderService>(),
           userService: get<UserService>(),
           registrationService: get<RegistrationService>(),
+          keyDerivationService: get<KeyDerivationService>(),
           progressNotifier: get<RegistrationProgressNotifier>(),
           blockchainConfig: get<AppConfig>().blockchain,
         );

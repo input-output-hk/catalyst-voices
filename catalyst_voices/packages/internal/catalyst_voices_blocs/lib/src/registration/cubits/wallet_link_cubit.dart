@@ -12,19 +12,12 @@ import 'package:result_type/result_type.dart';
 
 final _logger = Logger('WalletLinkCubit');
 
-abstract interface class WalletLinkManager {
-  Future<void> refreshWallets();
-
-  Future<bool> selectWallet(WalletMetadata meta);
-
-  void selectRoles(Set<AccountRole> roles);
-}
-
 final class WalletLinkCubit extends Cubit<WalletLinkStateData>
     with BlocErrorEmitterMixin
     implements WalletLinkManager {
   final RegistrationService registrationService;
 
+  final _lockedRoles = <AccountRole>[];
   final _wallets = <CardanoWallet>[];
   CardanoWallet? _selectedWallet;
 
@@ -36,6 +29,14 @@ final class WalletLinkCubit extends Cubit<WalletLinkStateData>
   }
 
   CardanoWallet? get selectedWallet => _selectedWallet;
+
+  void lockRoles(Set<AccountRole> roles) {
+    _lockedRoles
+      ..clear()
+      ..addAll(roles);
+
+    // TODO(damian-molinski): update state
+  }
 
   @override
   Future<void> refreshWallets() async {
@@ -61,6 +62,11 @@ final class WalletLinkCubit extends Cubit<WalletLinkStateData>
 
       emit(state.copyWith(wallets: Optional(Failure(error))));
     }
+  }
+
+  @override
+  void selectRoles(Set<AccountRole> roles) {
+    emit(state.copyWith(selectedRoles: Optional(roles)));
   }
 
   @override
@@ -141,9 +147,12 @@ final class WalletLinkCubit extends Cubit<WalletLinkStateData>
       return false;
     }
   }
+}
 
-  @override
-  void selectRoles(Set<AccountRole> roles) {
-    emit(state.copyWith(selectedRoles: Optional(roles)));
-  }
+abstract interface class WalletLinkManager {
+  Future<void> refreshWallets();
+
+  void selectRoles(Set<AccountRole> roles);
+
+  Future<bool> selectWallet(WalletMetadata meta);
 }

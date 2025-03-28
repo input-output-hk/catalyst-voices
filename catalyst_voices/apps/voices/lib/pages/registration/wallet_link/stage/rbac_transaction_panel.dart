@@ -264,7 +264,7 @@ class _BlocTxSubmitError extends StatelessWidget {
   }
 
   void _onRetry(BuildContext context) {
-    unawaited(RegistrationCubit.of(context).submitRegistration());
+    unawaited(RegistrationCubit.of(context).finishRegistration());
   }
 }
 
@@ -317,7 +317,7 @@ class _Navigation extends StatelessWidget {
   }
 
   void _submitRegistration(BuildContext context) {
-    unawaited(RegistrationCubit.of(context).submitRegistration());
+    unawaited(RegistrationCubit.of(context).finishRegistration());
   }
 }
 

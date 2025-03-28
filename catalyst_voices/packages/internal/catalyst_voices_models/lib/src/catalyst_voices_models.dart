@@ -57,6 +57,7 @@ export 'proposal/proposal_enums.dart';
 export 'proposal/proposal_pagination_items.dart';
 export 'proposal/proposal_pagination_request.dart';
 export 'proposal/proposal_version.dart';
+export 'registration/account_submit_data.dart';
 export 'registration/registration.dart';
 export 'signed_document/signed_document.dart';
 export 'signed_document/signed_document_payload.dart';
