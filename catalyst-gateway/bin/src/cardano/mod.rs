@@ -471,8 +471,10 @@ impl SyncTask {
                                 });
                                 self.dispatch_event(event::ChainIndexerEvent::SyncTasksChanged {
                                     current_sync_tasks: self.current_sync_tasks,
-                                }); // If we need more immutable chain followers to sync the block
-                                    // chain, we can now start them.
+                                });
+
+                                // If we need more immutable chain followers to sync the block
+                                // chain, we can now start them.
                                 self.start_immutable_followers();
                             },
                             Err(error) => {
