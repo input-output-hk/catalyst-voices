@@ -189,6 +189,7 @@ class DriftDraftsDao extends DatabaseAccessor<DriftCatalystDatabase>
 
       query.where(
         (doc) => CustomExpression<bool>(
+          // ignore: lines_longer_than_80_chars
           "json_extract(metadata, '\$.authors') LIKE '%$searchId%'",
         ),
       );
