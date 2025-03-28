@@ -1,0 +1,49 @@
+import 'package:catalyst_voices_blocs/src/proposal_builder/proposal_builder.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:equatable/equatable.dart';
+
+final class ProposalBuilderBlocCache extends Equatable {
+  final DocumentBuilder? proposalBuilder;
+  final Document? proposalDocument;
+  final ProposalBuilderMetadata? proposalMetadata;
+  final CampaignCategory? category;
+  final CommentTemplate? commentTemplate;
+  final List<CommentWithReplies>? comments;
+
+  const ProposalBuilderBlocCache({
+    this.proposalBuilder,
+    this.proposalDocument,
+    this.proposalMetadata,
+    this.category,
+    this.commentTemplate,
+    this.comments,
+  });
+
+  @override
+  List<Object?> get props => [
+        proposalBuilder,
+        proposalDocument,
+        proposalMetadata,
+        category,
+        commentTemplate,
+        comments,
+      ];
+
+  ProposalBuilderBlocCache copyWith({
+    Optional<DocumentBuilder>? proposalBuilder,
+    Optional<Document>? proposalDocument,
+    Optional<ProposalBuilderMetadata>? proposalMetadata,
+    Optional<CampaignCategory>? category,
+    Optional<CommentTemplate>? commentTemplate,
+    Optional<List<CommentWithReplies>>? comments,
+  }) {
+    return ProposalBuilderBlocCache(
+      proposalBuilder: proposalBuilder.dataOr(this.proposalBuilder),
+      proposalDocument: proposalDocument.dataOr(this.proposalDocument),
+      proposalMetadata: proposalMetadata.dataOr(this.proposalMetadata),
+      category: category.dataOr(this.category),
+      commentTemplate: commentTemplate.dataOr(this.commentTemplate),
+      comments: comments.dataOr(this.comments),
+    );
+  }
+}

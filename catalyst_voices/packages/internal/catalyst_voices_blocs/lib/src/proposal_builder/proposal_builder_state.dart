@@ -72,7 +72,9 @@ final class ProposalBuilderState extends Equatable {
   final LocalizedException? error;
   final Document? document;
   final ProposalBuilderMetadata metadata;
-  final List<DocumentSegment> segments;
+  final List<DocumentSegment> documentSegments;
+  final Segment? commentsSegment;
+  final ProposalCommentsSort commentsSort;
   final ProposalGuidance guidance;
   final CampaignCategoryDetailsViewModel? category;
   final NodeId? activeNodeId;
@@ -84,12 +86,19 @@ final class ProposalBuilderState extends Equatable {
     this.error,
     this.document,
     this.metadata = const ProposalBuilderMetadata(),
-    this.segments = const [],
+    this.documentSegments = const [],
+    this.commentsSegment,
+    this.commentsSort = ProposalCommentsSort.newest,
     this.guidance = const ProposalGuidance(),
     this.category,
     this.activeNodeId,
     this.showValidationErrors = false,
   });
+
+  List<Segment> get allSegments => [
+        ...documentSegments,
+        if (commentsSegment case final value?) value,
+      ];
 
   String? get proposalTitle {
     final property = document?.getProperty(ProposalDocument.titleNodeId)
@@ -105,7 +114,9 @@ final class ProposalBuilderState extends Equatable {
         error,
         document,
         metadata,
-        segments,
+        documentSegments,
+        commentsSegment,
+        commentsSort,
         guidance,
         category,
         activeNodeId,
@@ -114,7 +125,8 @@ final class ProposalBuilderState extends Equatable {
 
   bool get showError => !isLoading && error != null;
 
-  bool get showSegments => !isLoading && segments.isNotEmpty && error == null;
+  bool get showSegments =>
+      !isLoading && allSegments.isNotEmpty && error == null;
 
   ProposalBuilderState copyWith({
     bool? isLoading,
@@ -122,7 +134,8 @@ final class ProposalBuilderState extends Equatable {
     Optional<LocalizedException>? error,
     Optional<Document>? document,
     ProposalBuilderMetadata? metadata,
-    List<DocumentSegment>? segments,
+    List<DocumentSegment>? documentSegments,
+    Optional<Segment>? commentsSegment,
     ProposalGuidance? guidance,
     Optional<CampaignCategoryDetailsViewModel>? category,
     Optional<NodeId>? activeNodeId,
@@ -134,7 +147,8 @@ final class ProposalBuilderState extends Equatable {
       error: error.dataOr(this.error),
       document: document.dataOr(this.document),
       metadata: metadata ?? this.metadata,
-      segments: segments ?? this.segments,
+      documentSegments: documentSegments ?? this.documentSegments,
+      commentsSegment: commentsSegment.dataOr(this.commentsSegment),
       guidance: guidance ?? this.guidance,
       category: category.dataOr(this.category),
       activeNodeId: activeNodeId.dataOr(this.activeNodeId),

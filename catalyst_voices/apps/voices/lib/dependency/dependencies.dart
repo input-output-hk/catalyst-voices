@@ -105,6 +105,7 @@ final class Dependencies extends DependencyProvider {
         return ProposalBuilderBloc(
           get<ProposalService>(),
           get<CampaignService>(),
+          get<CommentService>(),
           get<DownloaderService>(),
           get<DocumentMapper>(),
         );

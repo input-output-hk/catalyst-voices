@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:catalyst_voices_blocs/src/common/bloc_error_emitter_mixin.dart';
 import 'package:catalyst_voices_blocs/src/common/bloc_event_transformers.dart';
 import 'package:catalyst_voices_blocs/src/common/bloc_signal_emitter_mixin.dart';
+import 'package:catalyst_voices_blocs/src/proposal_builder/proposal_builder_bloc_cache.dart';
 import 'package:catalyst_voices_blocs/src/proposal_builder/proposal_builder_event.dart';
 import 'package:catalyst_voices_blocs/src/proposal_builder/proposal_builder_signal.dart';
 import 'package:catalyst_voices_blocs/src/proposal_builder/proposal_builder_state.dart';
@@ -11,6 +12,7 @@ import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:collection/collection.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 final _logger = Logger('ProposalBuilderBloc');
@@ -22,14 +24,17 @@ final class ProposalBuilderBloc
         BlocSignalEmitterMixin<ProposalBuilderSignal, ProposalBuilderState> {
   final ProposalService _proposalService;
   final CampaignService _campaignService;
+  final CommentService _commentService;
   final DownloaderService _downloaderService;
   final DocumentMapper _documentMapper;
 
-  DocumentBuilder? _documentBuilder;
+  ProposalBuilderBlocCache _cache = const ProposalBuilderBlocCache();
+  StreamSubscription<List<CommentWithReplies>>? _commentsSub;
 
   ProposalBuilderBloc(
     this._proposalService,
     this._campaignService,
+    this._commentService,
     this._downloaderService,
     this._documentMapper,
   ) : super(const ProposalBuilderState()) {
@@ -44,8 +49,17 @@ final class ProposalBuilderBloc
     on<DeleteProposalEvent>(_deleteProposal);
     on<ExportProposalEvent>(_exportProposal);
     on<PublishProposalEvent>(_publishProposal);
+    on<RebuildCommentsProposalEvent>(_rebuildComments);
     on<SubmitProposalEvent>(_submitProposal);
     on<ValidateProposalEvent>(_validateProposal);
+  }
+
+  @override
+  Future<void> close() async {
+    await _commentsSub?.cancel();
+    _commentsSub = null;
+
+    return super.close();
   }
 
   bool validate() {
@@ -57,9 +71,9 @@ final class ProposalBuilderBloc
   }
 
   Document _buildDocument() {
-    final documentBuilder = _documentBuilder;
-    assert(documentBuilder != null, 'DocumentBuilder not initialized');
-    return documentBuilder!.build();
+    final proposalBuilder = _cache.proposalBuilder;
+    assert(proposalBuilder != null, 'proposal builder not initialized');
+    return proposalBuilder!.build();
   }
 
   DocumentData _buildDocumentData([DocumentRef? selfRef]) {
@@ -78,29 +92,69 @@ final class ProposalBuilderBloc
     );
   }
 
-  ProposalBuilderState _createState({
-    required Document document,
-    required ProposalBuilderMetadata metadata,
+  ProposalBuilderState _buildState({
+    required Document proposalDocument,
+    required ProposalBuilderMetadata proposalMetadata,
     required CampaignCategory category,
+    required DocumentSchema? commentSchema,
+    required List<CommentWithReplies> comments,
+    required ProposalCommentsSort commentsSort,
   }) {
-    final segments = _mapDocumentToSegments(
-      document,
+    final documentSegments = _mapDocumentToSegments(
+      proposalDocument,
       showValidationErrors: state.showValidationErrors,
     );
 
-    final firstSegment = segments.firstOrNull;
+    final commentsSegment = _mapToCommentsSegment(
+      proposalRef: proposalMetadata.documentRef!,
+      comments: comments,
+      commentSchema: commentSchema,
+      commentsSort: commentsSort,
+    );
+
+    final firstSegment = documentSegments.firstOrNull;
     final firstSection = firstSegment?.sections.firstOrNull;
     final guidance = _getGuidanceForSection(firstSegment, firstSection);
     final categoryVM = CampaignCategoryDetailsViewModel.fromModel(category);
 
     return ProposalBuilderState(
-      segments: segments,
+      documentSegments: documentSegments,
+      commentsSegment: commentsSegment,
       guidance: guidance,
-      document: document,
-      metadata: metadata,
+      document: proposalDocument,
+      metadata: proposalMetadata,
       category: categoryVM,
       activeNodeId: firstSection?.id,
     );
+  }
+
+  Future<ProposalBuilderState> _cacheAndCreateState({
+    required Document proposalDocument,
+    required DocumentBuilder proposalBuilder,
+    required ProposalBuilderMetadata proposalMetadata,
+    required CampaignCategory category,
+  }) async {
+    final commentTemplate =
+        await _commentService.getCommentTemplateFor(category: category.selfRef);
+
+    _cache = _cache.copyWith(
+      proposalBuilder: Optional(proposalDocument.toBuilder()),
+      proposalDocument: Optional(proposalDocument),
+      proposalMetadata: Optional(proposalMetadata),
+      category: Optional(category),
+      commentTemplate: Optional(commentTemplate),
+      comments: const Optional.empty(),
+    );
+
+    await _commentsSub?.cancel();
+    _commentsSub = _commentService
+        // TODO(dtscalac): exact version or loose version
+        // Note. watch comments on exact version of proposal.
+        .watchCommentsWith(ref: proposalMetadata.documentRef!)
+        .distinct(listEquals)
+        .listen((value) => add(RebuildCommentsProposalEvent(comments: value)));
+
+    return _rebuildState();
   }
 
   Future<void> _deleteProposal(
@@ -186,8 +240,8 @@ final class ProposalBuilderBloc
     if (nodeId == null) {
       return const ProposalGuidance(isNoneSelected: true);
     } else {
-      final segment =
-          state.segments.firstWhereOrNull((e) => nodeId.isChildOf(e.id));
+      final segment = state.documentSegments
+          .firstWhereOrNull((e) => nodeId.isChildOf(e.id));
       final section = segment?.sections.firstWhereOrNull((e) => e.id == nodeId);
 
       return _getGuidanceForSection(segment, section);
@@ -227,20 +281,20 @@ final class ProposalBuilderBloc
     SectionChangedEvent event,
     Emitter<ProposalBuilderState> emit,
   ) async {
-    final documentBuilder = _documentBuilder;
-    assert(documentBuilder != null, 'DocumentBuilder not initialized');
+    final proposalBuilder = _cache.proposalBuilder;
+    assert(proposalBuilder != null, 'proposal builder not initialized');
 
-    documentBuilder!.addChanges(event.changes);
-    final document = documentBuilder.build();
+    proposalBuilder!.addChanges(event.changes);
+    final document = proposalBuilder.build();
 
-    final segments = _mapDocumentToSegments(
+    final documentSegments = _mapDocumentToSegments(
       document,
       showValidationErrors: state.showValidationErrors,
     );
 
     final newState = state.copyWith(
       document: Optional(document),
-      segments: segments,
+      documentSegments: documentSegments,
     );
 
     // early emit new state to make the UI responsive
@@ -268,9 +322,10 @@ final class ProposalBuilderBloc
       final documentBuilder =
           DocumentBuilder.fromSchema(schema: proposalTemplate.schema);
 
-      return _createState(
-        document: documentBuilder.build(),
-        metadata: ProposalBuilderMetadata.newDraft(
+      return _cacheAndCreateState(
+        proposalDocument: documentBuilder.build(),
+        proposalBuilder: documentBuilder,
+        proposalMetadata: ProposalBuilderMetadata.newDraft(
           templateRef: templateRef,
           categoryId: category.selfRef,
         ),
@@ -305,9 +360,10 @@ final class ProposalBuilderBloc
       final categoryId = proposalData.categoryId;
       final category = await _campaignService.getCategory(categoryId);
 
-      return _createState(
-        document: proposalData.document.document,
-        metadata: ProposalBuilderMetadata(
+      return _cacheAndCreateState(
+        proposalDocument: proposalData.document.document,
+        proposalBuilder: proposalData.document.document.toBuilder(),
+        proposalMetadata: ProposalBuilderMetadata(
           publish: proposal.publish,
           documentRef: proposal.selfRef,
           originalDocumentRef: proposal.selfRef,
@@ -337,9 +393,10 @@ final class ProposalBuilderBloc
       final documentBuilder =
           DocumentBuilder.fromSchema(schema: proposalTemplate.schema);
 
-      return _createState(
-        document: documentBuilder.build(),
-        metadata: ProposalBuilderMetadata.newDraft(
+      return _cacheAndCreateState(
+        proposalDocument: documentBuilder.build(),
+        proposalBuilder: documentBuilder,
+        proposalMetadata: ProposalBuilderMetadata.newDraft(
           templateRef: templateRef,
           categoryId: categoryId,
         ),
@@ -354,21 +411,21 @@ final class ProposalBuilderBloc
   ) async {
     try {
       _logger.info('load state');
-      emit(
-        const ProposalBuilderState(
-          isLoading: true,
-          isChanging: true,
-        ),
+      const loadingState = ProposalBuilderState(
+        isLoading: true,
+        isChanging: true,
       );
-      _documentBuilder = null;
+
+      emit(loadingState);
+      _cache = const ProposalBuilderBlocCache();
 
       final newState = await stateBuilder();
-      _documentBuilder = newState.document?.toBuilder();
       emit(newState);
     } catch (error, stackTrace) {
       _logger.severe('load state error', error, stackTrace);
 
       emit(ProposalBuilderState(error: LocalizedException.create(error)));
+      _cache = const ProposalBuilderBlocCache();
     } finally {
       emit(
         state.copyWith(
@@ -406,6 +463,34 @@ final class ProposalBuilderBloc
         schema: segment.schema as DocumentSegmentSchema,
       );
     }).toList();
+  }
+
+  ProposalCommentsSegment? _mapToCommentsSegment({
+    required DocumentRef proposalRef,
+    required List<CommentWithReplies> comments,
+    required DocumentSchema? commentSchema,
+    required ProposalCommentsSort commentsSort,
+  }) {
+    // TODO(dtscalac): should not allow comments if never published
+    if (commentSchema == null) {
+      return null;
+    }
+
+    return ProposalCommentsSegment(
+      id: const NodeId('comments'),
+      sort: commentsSort,
+      sections: [
+        ViewCommentsSection(
+          id: const NodeId('comments.view'),
+          comments: commentsSort.applyTo(comments),
+          canReply: true,
+        ),
+        AddCommentSection(
+          id: const NodeId('comments.add'),
+          schema: commentSchema,
+        ),
+      ],
+    );
   }
 
   Future<void> _publishAndSubmitProposalForReview(
@@ -458,6 +543,33 @@ final class ProposalBuilderBloc
     } finally {
       emit(state.copyWith(isChanging: false));
     }
+  }
+
+  void _rebuildComments(
+    RebuildCommentsProposalEvent event,
+    Emitter<ProposalBuilderState> emit,
+  ) {
+    _cache = _cache.copyWith(comments: Optional(event.comments));
+
+    emit(_rebuildState());
+  }
+
+  ProposalBuilderState _rebuildState() {
+    final proposalDocument = _cache.proposalDocument!;
+    final proposalMetadata = _cache.proposalMetadata!;
+    final category = _cache.category!;
+    final commentTemplate = _cache.commentTemplate!;
+    final comments = _cache.comments ?? [];
+    final commentsSort = state.commentsSort;
+
+    return _buildState(
+      proposalDocument: proposalDocument,
+      proposalMetadata: proposalMetadata,
+      category: category,
+      commentSchema: commentTemplate.schema,
+      comments: comments,
+      commentsSort: commentsSort,
+    );
   }
 
   Future<void> _saveDocumentLocally(
@@ -562,7 +674,7 @@ final class ProposalBuilderBloc
     final document = _buildDocument();
     final showErrors = !document.isValid;
 
-    final segments = _mapDocumentToSegments(
+    final documentSegments = _mapDocumentToSegments(
       document,
       showValidationErrors: showErrors,
     );
@@ -577,7 +689,7 @@ final class ProposalBuilderBloc
     }
 
     final newState = state.copyWith(
-      segments: segments,
+      documentSegments: documentSegments,
       showValidationErrors: showErrors,
     );
 

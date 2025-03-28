@@ -67,6 +67,15 @@ final class PublishProposalEvent extends ProposalBuilderEvent {
   List<Object?> get props => [];
 }
 
+final class RebuildCommentsProposalEvent extends ProposalBuilderEvent {
+  final List<CommentWithReplies> comments;
+
+  const RebuildCommentsProposalEvent({required this.comments});
+
+  @override
+  List<Object?> get props => [comments];
+}
+
 final class SectionChangedEvent extends ProposalBuilderEvent {
   final List<DocumentChange> changes;
 
