@@ -258,6 +258,7 @@ fn sync_subchain(
         while let Some(chain_update) = follower.next().await {
             match chain_update.kind {
                 cardano_chain_follower::Kind::ImmutableBlockRollForward => {
+                    // We only process these on the follower tracking the TIP.
                     if params.end == Point::TIP {
                         // What we need to do here is tell the primary follower to start a new sync
                         // for the new immutable data, and then purge the volatile database of the
