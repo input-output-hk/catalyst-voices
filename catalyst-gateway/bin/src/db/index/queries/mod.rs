@@ -31,9 +31,9 @@ use sync_status::update::SyncStatusInsertQuery;
 use tracing::error;
 
 use super::block::{
+    certs,
     cip36::{insert_cip36, insert_cip36_for_vote_key, insert_cip36_invalid},
     rbac509::Rbac509InsertQuery,
-    stake_reg,
     txi::TxiInsertQuery,
     txo::TxoInsertQuery,
 };
@@ -194,7 +194,7 @@ impl PreparedQueries {
         let txi_insert_queries = TxiInsertQuery::prepare_batch(&session, cfg).await?;
         let all_txo_queries = TxoInsertQuery::prepare_batch(&session, cfg).await;
         let stake_registration_insert_queries =
-            stake_reg::StakeRegistrationInsertQuery::prepare_batch(&session, cfg).await?;
+            certs::StakeRegistrationInsertQuery::prepare_batch(&session, cfg).await?;
         let txo_spent_update_queries =
             UpdateTxoSpentQuery::prepare_batch(session.clone(), cfg).await?;
         let txo_by_stake_address_query = GetTxoByStakeAddressQuery::prepare(session.clone()).await;

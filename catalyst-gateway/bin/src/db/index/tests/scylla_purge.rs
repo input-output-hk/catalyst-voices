@@ -538,7 +538,7 @@ async fn test_stake_registration() {
     ])
     .unwrap();
     let data = vec![
-        stake_reg::StakeRegistrationInsertQuery::new(
+        certs::StakeRegistrationInsertQuery::new(
             stake_address_1(),
             0,
             0,
@@ -549,7 +549,7 @@ async fn test_stake_registration() {
             Some(false),
             None,
         ),
-        stake_reg::StakeRegistrationInsertQuery::new(
+        certs::StakeRegistrationInsertQuery::new(
             stake_address_2(),
             1,
             1,

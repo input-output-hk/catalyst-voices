@@ -9,7 +9,7 @@ use std::sync::Arc;
 use cardano_blockchain_types::{Cip36, MultiEraBlock, Slot, StakeAddress, TxnIndex};
 use catalyst_types::hashes::Blake2b224Hash;
 
-use super::stake_reg;
+use super::certs;
 use crate::db::index::{
     queries::{FallibleQueryTasks, PreparedQuery},
     session::CassandraSession,
@@ -18,21 +18,21 @@ use crate::db::index::{
 /// Insert CIP-36 Registration Queries
 pub(crate) struct Cip36InsertQuery {
     /// Stake Registration Data captured during indexing.
-    valid_regs: Vec<insert_cip36::Params>,
+    registrations: Vec<insert_cip36::Params>,
     /// Stake Registration Data captured during indexing.
-    invalid_regs: Vec<insert_cip36_invalid::Params>,
+    invalid: Vec<insert_cip36_invalid::Params>,
     /// Stake Registration Data captured during indexing.
     for_vote_key: Vec<insert_cip36_for_vote_key::Params>,
     /// Stake Registration Data captured during indexing.
-    stake_regs: Vec<stake_reg::StakeRegistrationInsertQuery>,
+    stake_regs: Vec<certs::StakeRegistrationInsertQuery>,
 }
 
 impl Cip36InsertQuery {
     /// Create new data set for CIP-36 Registrations Insert Query Batch.
     pub(crate) fn new() -> Self {
         Cip36InsertQuery {
-            valid_regs: Vec::new(),
-            invalid_regs: Vec::new(),
+            registrations: Vec::new(),
+            invalid: Vec::new(),
             for_vote_key: Vec::new(),
             stake_regs: Vec::new(),
         }
@@ -58,7 +58,7 @@ impl Cip36InsertQuery {
                 let stake_pk_hash = Blake2b224Hash::new(&stake_pk.to_bytes());
                 let stake_address = StakeAddress::new(block.network(), false, stake_pk_hash);
 
-                self.valid_regs.push(insert_cip36::Params::new(
+                self.registrations.push(insert_cip36::Params::new(
                     voting_key, slot_no, index, &cip36,
                 ));
                 self.for_vote_key
@@ -66,7 +66,7 @@ impl Cip36InsertQuery {
                         voting_key, slot_no, index, &cip36, true,
                     ));
                 self.stake_regs
-                    .push(stake_reg::StakeRegistrationInsertQuery::new(
+                    .push(certs::StakeRegistrationInsertQuery::new(
                         stake_address,
                         slot_no,
                         index,
@@ -83,12 +83,12 @@ impl Cip36InsertQuery {
                 // Cannot index an invalid CIP36, if there is no stake public key.
                 if let Some(stake_pk) = cip36.stake_pk() {
                     if cip36.voting_pks().is_empty() {
-                        self.invalid_regs.push(insert_cip36_invalid::Params::new(
+                        self.invalid.push(insert_cip36_invalid::Params::new(
                             None, slot_no, index, &cip36,
                         ));
                     } else {
                         for voting_key in cip36.voting_pks() {
-                            self.invalid_regs.push(insert_cip36_invalid::Params::new(
+                            self.invalid.push(insert_cip36_invalid::Params::new(
                                 Some(voting_key),
                                 slot_no,
                                 index,
@@ -104,7 +104,7 @@ impl Cip36InsertQuery {
                     let stake_pk_hash = Blake2b224Hash::new(&stake_pk.to_bytes());
                     let stake_address = StakeAddress::new(block.network(), false, stake_pk_hash);
                     self.stake_regs
-                        .push(stake_reg::StakeRegistrationInsertQuery::new(
+                        .push(certs::StakeRegistrationInsertQuery::new(
                             stake_address,
                             slot_no,
                             index,
@@ -128,22 +128,22 @@ impl Cip36InsertQuery {
     pub(crate) fn execute(self, session: &Arc<CassandraSession>) -> FallibleQueryTasks {
         let mut query_handles: FallibleQueryTasks = Vec::new();
 
-        if !self.valid_regs.is_empty() {
+        if !self.registrations.is_empty() {
             let inner_session = session.clone();
             query_handles.push(tokio::spawn(async move {
                 inner_session
-                    .execute_batch(PreparedQuery::Cip36RegistrationInsertQuery, self.valid_regs)
+                    .execute_batch(PreparedQuery::Cip36RegistrationInsertQuery, self.registrations)
                     .await
             }));
         }
 
-        if !self.invalid_regs.is_empty() {
+        if !self.invalid.is_empty() {
             let inner_session = session.clone();
             query_handles.push(tokio::spawn(async move {
                 inner_session
                     .execute_batch(
                         PreparedQuery::Cip36RegistrationInsertErrorQuery,
-                        self.invalid_regs,
+                        self.invalid,
                     )
                     .await
             }));
@@ -184,8 +184,8 @@ mod tests {
         let block = test_utils::block_2();
         let mut query = Cip36InsertQuery::new();
         query.index(0.into(), 0.into(), &block).unwrap();
-        assert_eq!(1, query.valid_regs.len());
-        assert!(query.invalid_regs.is_empty());
+        assert_eq!(1, query.registrations.len());
+        assert!(query.invalid.is_empty());
         assert_eq!(1, query.for_vote_key.len());
         assert_eq!(1, query.stake_regs.len());
     }
