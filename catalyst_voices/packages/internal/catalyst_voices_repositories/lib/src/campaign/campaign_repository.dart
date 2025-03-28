@@ -10,6 +10,8 @@ abstract interface class CampaignRepository {
 
   Future<List<CampaignCategory>> getCampaignCategories();
 
+  Future<List<CampaignTimeline>> getCampaignTimeline();
+
   Future<CampaignCategory> getCategory(SignedDocumentRef ref);
 
   Future<CurrentCampaign> getCurrentCampaign();
@@ -40,6 +42,11 @@ final class CampaignRepositoryImpl implements CampaignRepository {
   @override
   Future<List<CampaignCategory>> getCampaignCategories() async {
     return staticCampaignCategories;
+  }
+
+  @override
+  Future<List<CampaignTimeline>> getCampaignTimeline() async {
+    return CampaignTimelineX.staticContent;
   }
 
   @override
