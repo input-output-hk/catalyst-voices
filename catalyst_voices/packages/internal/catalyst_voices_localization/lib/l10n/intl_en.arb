@@ -2181,6 +2181,31 @@
   "@copyMyCatalystId": {
     "description": "Action to copy my catalyst id"
   },
+  "stayInvolved": "Stay Involved",
+  "@stayInvolved": {
+    "description": "Title for the stay involved section"
+  },
+  "stayInvolvedReviewerDescription": "Your voice has power. Use it to guide others and help improve the Cardano community.\n\nAs a reviewer, you’ll make a real impact by sharing thoughtful feedback and influencing decisions.",
+  "@stayInvolvedReviewerDescription": {
+    "description": "Description for the reviewer cards in stay involved section"
+  },
+  "stayInvolvedVoterDescription": "Get Ready! This is your chance to have a say in where the funds go. To make sure you're ready to participate.\n\nRemember, by casting your vote, you're not only influencing the development of Cardano but also helping to build a community that reflects the values you care about.",
+  "@stayInvolvedVoterDescription": {
+    "description": "Description for the voter cards in stay involved section"
+  },
+  "votingForF14StartsIn": "Voting for Fund14 start {date}",
+  "@votingForF14StartsIn": {
+    "description": "Description for the voting for f14 card in stay involved section",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "votingRegistrationForF14": "Voting Registration for Fund14.",
+  "@votingRegistrationForF14": {
+    "description": "Title for the voting registration for f14 card in stay involved section"
+  },
   "mobileAccessDescription": "For the best experience, head over to a desktop to get started. But don't worry - mobile is coming.\n\nStay tuned for more updates, or visit our Gitbook to learn more.\n\nSee you on the other side!",
   "@mobileAccessDescription": {
     "description": "Description for the mobile restricted access page"
