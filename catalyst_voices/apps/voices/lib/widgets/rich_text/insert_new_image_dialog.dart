@@ -1,4 +1,5 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
+import 'package:catalyst_voices/common/formatters/input_formatters.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_filled_button.dart';
 import 'package:catalyst_voices/widgets/text_field/voices_text_field.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
@@ -14,8 +15,8 @@ class InsertNewImageDialog extends StatefulWidget {
 
 class _InsertNewImageDialogState extends State<InsertNewImageDialog> {
   final _textController = TextEditingController();
-  bool isValidImageUrl = true;
-  bool hasText = false;
+  bool _isValidImageUrl = true;
+  bool _inputFieldIsEmpty = true;
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +32,7 @@ class _InsertNewImageDialogState extends State<InsertNewImageDialog> {
       ),
       child: Container(
         width: 450,
-        height: 412,
+        height: 450,
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
           color: colors.elevationsOnSurfaceNeutralLv1Grey,
@@ -79,7 +80,7 @@ class _InsertNewImageDialogState extends State<InsertNewImageDialog> {
                 hintText: l10n.insertNewImageDialogTextPlaceholder,
                 borderRadius: const BorderRadius.all(Radius.circular(8)),
                 fillColor: colorScheme.surface,
-                errorText: hasText && !isValidImageUrl
+                errorText: !_inputFieldIsEmpty && !_isValidImageUrl
                     ? l10n.insertNewImageDialogInvalidUrl
                     : null,
               ),
@@ -128,7 +129,7 @@ class _InsertNewImageDialogState extends State<InsertNewImageDialog> {
                 ],
               ),
             ),
-            const SizedBox(height: 18),
+            const SizedBox(height: 36),
             Divider(
               color: colorScheme.outline,
             ),
@@ -142,7 +143,7 @@ class _InsertNewImageDialogState extends State<InsertNewImageDialog> {
                 ),
                 const SizedBox(width: 8),
                 VoicesFilledButton(
-                  onTap: hasText && isValidImageUrl
+                  onTap: !_inputFieldIsEmpty && _isValidImageUrl
                       ? () => Navigator.pop(context, _textController.text)
                       : null,
                   child: Text(l10n.insertNewImageDialogInsert),
@@ -165,28 +166,14 @@ class _InsertNewImageDialogState extends State<InsertNewImageDialog> {
   void initState() {
     super.initState();
     _textController.addListener(() {
-      validateUrl(_textController.text);
+      _validateUrl(_textController.text);
     });
   }
 
-  void validateUrl(String url) {
+  void _validateUrl(String url) {
     setState(() {
-      hasText = url.trim().isNotEmpty;
-      if (!hasText) {
-        isValidImageUrl = true;
-        return;
-      }
-
-      // Check if URL is a valid image URL
-      final lowercaseUrl = url.toLowerCase();
-      isValidImageUrl = Uri.tryParse(url)?.hasAbsolutePath == true &&
-          (lowercaseUrl.endsWith('.jpg') ||
-              lowercaseUrl.endsWith('.jpeg') ||
-              lowercaseUrl.endsWith('.png') ||
-              lowercaseUrl.endsWith('.gif') ||
-              lowercaseUrl.endsWith('.webp') ||
-              lowercaseUrl.endsWith('.bmp') ||
-              lowercaseUrl.endsWith('.svg'));
+      _inputFieldIsEmpty = url.trim().isEmpty;
+      _isValidImageUrl = _inputFieldIsEmpty || ImageUrlValidator.isValid(url);
     });
   }
 }
