@@ -110,11 +110,11 @@ final class RegistrationCubit extends Cubit<RegistrationState>
     final password = _keychainCreationCubit.password;
 
     if (seedPhrase == null) {
-      // emit error
+      emitError(const LocalizedRegistrationSeedPhraseNotFoundException());
       return;
     }
     if (password.isNotValid) {
-      // emit error
+      emitError(const LocalizedRegistrationUnlockPasswordNotFoundException());
       return;
     }
 
@@ -229,7 +229,7 @@ final class RegistrationCubit extends Cubit<RegistrationState>
       final accountId = _accountId;
       final masterKey = await _keychain?.getMasterKey();
       if (masterKey == null) {
-        // emit error
+        emitError(const LocalizedRegistrationKeychainNotFoundException());
         return;
       }
 

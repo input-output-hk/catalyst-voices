@@ -631,6 +631,10 @@
   "@registrationSeedPhraseNotFound": {
     "description": "Error message shown when attempting to register or recover account but seed phrase was not found"
   },
+  "registrationKeychainNotFound": "Keychain was not found or locked",
+  "@registrationKeychainNotFound": {
+    "description": "Error message shown when attempting to prepare registration transaction but keychain was not found or locked. Should not happen."
+  },
   "registrationUnlockPasswordNotFound": "Password was not found. Make sure valid password was created.",
   "@registrationUnlockPasswordNotFound": {
     "description": "Error message shown when attempting to register or recover account but password was not found"
