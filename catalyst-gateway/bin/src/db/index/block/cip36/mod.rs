@@ -132,7 +132,10 @@ impl Cip36InsertQuery {
             let inner_session = session.clone();
             query_handles.push(tokio::spawn(async move {
                 inner_session
-                    .execute_batch(PreparedQuery::Cip36RegistrationInsertQuery, self.registrations)
+                    .execute_batch(
+                        PreparedQuery::Cip36RegistrationInsertQuery,
+                        self.registrations,
+                    )
                     .await
             }));
         }
