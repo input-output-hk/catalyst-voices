@@ -106,7 +106,7 @@ class _InsertNewImageDialogState extends State<InsertNewImageDialog> {
                   WidgetSpan(
                     child: InkWell(
                       onTap: () {
-                        // TODO: Open knowledge base link
+                        // TODO(minikin): Open knowledge base link
                       },
                       child: Text(
                         l10n.knowledgeBase,
