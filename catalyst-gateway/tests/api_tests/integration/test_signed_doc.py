@@ -2,7 +2,6 @@ import pytest
 from loguru import logger
 from utils import health, signed_doc
 from api.v1 import document
-import os
 import json
 from typing import Dict, Any, List
 from uuid_extensions import uuid7str

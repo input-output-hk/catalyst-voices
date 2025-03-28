@@ -61,7 +61,7 @@ impl EnvVars {
     /// Create a config for a cassandra cluster, identified by a default namespace.
     pub(super) fn new() -> Self {
         let chain = StringEnvVar::new_as_enum("CHAIN_NETWORK", DEFAULT_NETWORK, false);
-        let sync_tasks: u16 = StringEnvVar::new_as_int(
+        let sync_tasks = StringEnvVar::new_as_int(
             "CHAIN_FOLLOWER_SYNC_TASKS",
             DEFAULT_SYNC_TASKS,
             1,
