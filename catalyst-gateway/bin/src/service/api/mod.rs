@@ -19,8 +19,6 @@ mod config;
 mod documents;
 mod health;
 
-pub(crate) use health::started;
-
 /// The name of the API
 const API_TITLE: &str = "Catalyst Gateway";
 
