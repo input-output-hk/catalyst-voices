@@ -82,7 +82,7 @@ class _RegistrationDialogState extends State<RegistrationDialog>
   void initState() {
     super.initState();
 
-    s   witch (widget.type) {
+    switch (widget.type) {
       case FreshRegistration():
         break;
       case UpdateAccount(:final id):
