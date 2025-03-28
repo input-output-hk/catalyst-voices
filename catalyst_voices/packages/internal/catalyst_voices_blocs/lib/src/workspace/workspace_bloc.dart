@@ -136,7 +136,7 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
       emitSignal(ImportedProposalWorkspaceSignal(proposalRef: ref));
     } catch (error, stackTrace) {
       _logger.severe('Importing proposal failed', error, stackTrace);
-      emitError(const LocalizedUnknownException());
+      emitError(LocalizedException.create(error));
     }
   }
 
@@ -164,7 +164,7 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
       onError: (Object error) {
         if (isClosed) return;
         _logger.info('Users proposals stream error', error);
-        add(const ErrorLoadProposalsEvent(LocalizedUnknownException()));
+        add(ErrorLoadProposalsEvent(LocalizedException.create(error)));
       },
     );
   }

@@ -16,30 +16,6 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-sealed class _MenuItemEvent {
-  const _MenuItemEvent();
-}
-
-final class _OpenAccountDetails extends _MenuItemEvent {
-  const _OpenAccountDetails();
-}
-
-final class _SetupRoles extends _MenuItemEvent {
-  const _SetupRoles();
-}
-
-final class _RedirectToSupport extends _MenuItemEvent {
-  const _RedirectToSupport();
-}
-
-final class _RedirectToDocs extends _MenuItemEvent {
-  const _RedirectToDocs();
-}
-
-final class _Lock extends _MenuItemEvent {
-  const _Lock();
-}
-
 class SessionAccountPopupMenu extends StatefulWidget {
   const SessionAccountPopupMenu({
     super.key,
@@ -48,6 +24,230 @@ class SessionAccountPopupMenu extends StatefulWidget {
   @override
   State<SessionAccountPopupMenu> createState() {
     return _SessionAccountPopupMenuState();
+  }
+}
+
+class _Account extends StatelessWidget {
+  const _Account();
+
+  @override
+  Widget build(BuildContext context) {
+    return _Section(
+      name: context.l10n.account,
+      children: [
+        MenuItemTile(
+          leading: VoicesAssets.icons.userCircle.buildIcon(),
+          key: const Key('ProfileAndKeychain'),
+          title: Text(context.l10n.profileAndKeychain),
+          trailing: VoicesAssets.icons.chevronRight.buildIcon(),
+          onTap: () => Navigator.pop(context, const _OpenAccountDetails()),
+        ),
+      ],
+    );
+  }
+}
+
+class _AccountHeader extends StatelessWidget {
+  const _AccountHeader();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      constraints: const BoxConstraints.tightFor(height: 60),
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: const Row(
+        children: [
+          SessionAccountAvatar(),
+          SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SessionAccountDisplayName(),
+                SessionAccountPopupCatalystId(),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _Links extends StatelessWidget {
+  const _Links();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        // Note. This is not supported atm.
+        Offstage(
+          child: MenuItemTile(
+            key: const Key('SetupRolesMenuItem'),
+            leading: VoicesAssets.icons.userGroup.buildIcon(),
+            title: Text(context.l10n.setupCatalystRoles),
+            onTap: () => Navigator.pop(context, const _SetupRoles()),
+          ),
+        ),
+        MenuItemTile(
+          key: const Key('SubmitSupportRequest'),
+          leading: VoicesAssets.icons.support.buildIcon(),
+          title: Text(context.l10n.submitSupportRequest),
+          onTap: () => Navigator.pop(context, const _RedirectToSupport()),
+        ),
+        MenuItemTile(
+          key: const Key('CatalystKnowledgeBase'),
+          leading: VoicesAssets.icons.academicCap.buildIcon(),
+          title: Text(context.l10n.catalystKnowledgeBase),
+          onTap: () => Navigator.pop(context, const _RedirectToDocs()),
+        ),
+      ],
+    );
+  }
+}
+
+final class _Lock extends _MenuItemEvent {
+  const _Lock();
+}
+
+sealed class _MenuItemEvent {
+  const _MenuItemEvent();
+}
+
+final class _MyOpportunities extends _MenuItemEvent {
+  const _MyOpportunities();
+}
+
+final class _OpenAccountDetails extends _MenuItemEvent {
+  const _OpenAccountDetails();
+}
+
+class _Opportunities extends StatelessWidget {
+  const _Opportunities();
+
+  @override
+  Widget build(BuildContext context) {
+    return MenuItemTile(
+      key: const Key('MyOpportunitiesMenuItem'),
+      title: Text(context.l10n.myOpportunities),
+      leading: VoicesAssets.icons.lightBulb.buildIcon(),
+      onTap: () => Navigator.pop(context, const _MyOpportunities()),
+    );
+  }
+}
+
+class _PopupMenu extends StatelessWidget {
+  const _PopupMenu();
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = PopupMenuTheme.of(context);
+    return DecoratedBox(
+      decoration: ShapeDecoration(
+        color: theme.color,
+        shape: theme.shape ?? const RoundedRectangleBorder(),
+      ),
+      child: const Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          _AccountHeader(),
+          VoicesDivider.expanded(),
+          _Opportunities(),
+          VoicesDivider.expanded(),
+          _Account(),
+          _Settings(),
+          VoicesDivider.expanded(height: 17),
+          _Links(),
+          VoicesDivider.expanded(height: 17),
+          _Session(),
+          SizedBox(height: 8),
+        ],
+      ),
+    );
+  }
+}
+
+class _PopupMenuItem extends PopupMenuItem<_MenuItemEvent> {
+  const _PopupMenuItem()
+      : super(
+          // disabled because PopupMenuItem always adds InkWell
+          // and ripple which we don't want.
+          enabled: false,
+          padding: EdgeInsets.zero,
+          value: null,
+          child: const _PopupMenu(),
+        );
+}
+
+final class _RedirectToDocs extends _MenuItemEvent {
+  const _RedirectToDocs();
+}
+
+final class _RedirectToSupport extends _MenuItemEvent {
+  const _RedirectToSupport();
+}
+
+class _Section extends StatelessWidget {
+  final String name;
+  final List<Widget> children;
+
+  const _Section({
+    required this.name,
+    required this.children,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        _SectionName(name),
+        ...children,
+      ],
+    );
+  }
+}
+
+class _SectionName extends StatelessWidget {
+  final String data;
+
+  const _SectionName(this.data);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      constraints: const BoxConstraints.tightFor(height: 40),
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      alignment: Alignment.centerLeft,
+      child: Text(
+        data,
+        style: context.textTheme.bodyMedium?.copyWith(
+          color: context.colors.textOnPrimaryLevel1,
+        ),
+      ),
+    );
+  }
+}
+
+class _Session extends StatelessWidget {
+  const _Session();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        MenuItemTile(
+          key: const Key('LockAccountButton'),
+          leading: VoicesAssets.icons.lockClosed.buildIcon(),
+          title: Text(context.l10n.lockAccount),
+          onTap: () => Navigator.pop(context, const _Lock()),
+        ),
+      ],
+    );
   }
 }
 
@@ -93,99 +293,9 @@ class _SessionAccountPopupMenuState extends State<SessionAccountPopupMenu>
         unawaited(launchUri(uri));
       case _Lock():
         unawaited(context.read<SessionCubit>().lock());
+      case _MyOpportunities():
+        Scaffold.maybeOf(context)?.openEndDrawer();
     }
-  }
-}
-
-class _PopupMenuItem extends PopupMenuItem<_MenuItemEvent> {
-  const _PopupMenuItem()
-      : super(
-          // disabled because PopupMenuItem always adds InkWell
-          // and ripple which we don't want.
-          enabled: false,
-          padding: EdgeInsets.zero,
-          value: null,
-          child: const _PopupMenu(),
-        );
-}
-
-class _PopupMenu extends StatelessWidget {
-  const _PopupMenu();
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = PopupMenuTheme.of(context);
-    return DecoratedBox(
-      decoration: ShapeDecoration(
-        color: theme.color,
-        shape: theme.shape ?? const RoundedRectangleBorder(),
-      ),
-      child: const Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          _AccountHeader(),
-          VoicesDivider.expanded(),
-          _Account(),
-          _Settings(),
-          VoicesDivider.expanded(height: 17),
-          _Links(),
-          VoicesDivider.expanded(height: 17),
-          _Session(),
-          SizedBox(height: 8),
-        ],
-      ),
-    );
-  }
-}
-
-class _AccountHeader extends StatelessWidget {
-  const _AccountHeader();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      constraints: const BoxConstraints.tightFor(height: 60),
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: const Row(
-        children: [
-          SessionAccountAvatar(),
-          SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SessionAccountDisplayName(),
-                SessionAccountPopupCatalystId(),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _Account extends StatelessWidget {
-  const _Account();
-
-  @override
-  Widget build(BuildContext context) {
-    return _Section(
-      name: context.l10n.account,
-      children: [
-        MenuItemTile(
-          leading: VoicesAssets.icons.userCircle.buildIcon(),
-          key: const Key('ProfileAndKeychain'),
-          title: Text(
-            context.l10n.profileAndKeychain,
-          ),
-          trailing: VoicesAssets.icons.chevronRight.buildIcon(),
-          onTap: () => Navigator.pop(context, const _OpenAccountDetails()),
-        ),
-      ],
-    );
   }
 }
 
@@ -204,93 +314,6 @@ class _Settings extends StatelessWidget {
   }
 }
 
-class _Links extends StatelessWidget {
-  const _Links();
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        MenuItemTile(
-          key: const Key('SetupRolesMenuItem'),
-          leading: VoicesAssets.icons.userGroup.buildIcon(),
-          title: Text(context.l10n.setupCatalystRoles),
-          onTap: () => Navigator.pop(context, const _SetupRoles()),
-        ),
-        MenuItemTile(
-          key: const Key('SubmitSupportRequest'),
-          leading: VoicesAssets.icons.support.buildIcon(),
-          title: Text(context.l10n.submitSupportRequest),
-          onTap: () => Navigator.pop(context, const _RedirectToSupport()),
-        ),
-        MenuItemTile(
-          key: const Key('CatalystKnowledgeBase'),
-          leading: VoicesAssets.icons.academicCap.buildIcon(),
-          title: Text(context.l10n.catalystKnowledgeBase),
-          onTap: () => Navigator.pop(context, const _RedirectToDocs()),
-        ),
-      ],
-    );
-  }
-}
-
-class _Session extends StatelessWidget {
-  const _Session();
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        MenuItemTile(
-          key: const Key('LockAccountButton'),
-          leading: VoicesAssets.icons.lockClosed.buildIcon(),
-          title: Text(context.l10n.lockAccount),
-          onTap: () => Navigator.pop(context, const _Lock()),
-        ),
-      ],
-    );
-  }
-}
-
-class _Section extends StatelessWidget {
-  final String name;
-  final List<Widget> children;
-
-  const _Section({
-    required this.name,
-    required this.children,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        _SectionName(name),
-        ...children,
-      ],
-    );
-  }
-}
-
-class _SectionName extends StatelessWidget {
-  final String data;
-
-  const _SectionName(this.data);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      constraints: const BoxConstraints.tightFor(height: 40),
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      alignment: Alignment.centerLeft,
-      child: Text(
-        data,
-        style: context.textTheme.bodyMedium?.copyWith(
-          color: context.colors.textOnPrimaryLevel1,
-        ),
-      ),
-    );
-  }
+final class _SetupRoles extends _MenuItemEvent {
+  const _SetupRoles();
 }

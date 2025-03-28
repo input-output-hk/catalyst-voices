@@ -61,18 +61,21 @@ class ProposalCommentWithRepliesCard extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 for (final reply in comment.replies)
-                  ProposalCommentWithRepliesCard(
+                  _RepliesCard(
+                    key: ValueKey(
+                      'ReplyComment.${reply.comment.metadata.selfRef.id}',
+                    ),
                     comment: reply,
-                    canReply: false,
-                    showReplies: showReplies,
-                    showReplyBuilder: false,
                   ),
               ],
             ),
           ),
         if (showReplyBuilder)
           Padding(
-            padding: EdgeInsets.only(left: repliesIndent.toDouble()),
+            padding: EdgeInsets.only(
+              left: repliesIndent.toDouble(),
+              bottom: 16,
+            ),
             child: ProposalCommentBuilder(
               schema: comment.comment.document.schema,
               parent: comment.comment.metadata.selfRef,
@@ -85,6 +88,29 @@ class ProposalCommentWithRepliesCard extends StatelessWidget {
             ),
           ),
       ],
+    );
+  }
+}
+
+class _RepliesCard extends StatelessWidget {
+  final CommentWithReplies comment;
+
+  const _RepliesCard({
+    required super.key,
+    required this.comment,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final showReplies = context.select<ProposalCubit, bool>((value) {
+      return value.state.data.showReplies[comment.ref] ?? true;
+    });
+
+    return ProposalCommentWithRepliesCard(
+      comment: comment,
+      canReply: false,
+      showReplies: showReplies,
+      showReplyBuilder: false,
     );
   }
 }

@@ -10,7 +10,7 @@ abstract interface class ProposalService {
     ProposalRepository proposalRepository,
     DocumentRepository documentRepository,
     UserService userService,
-    KeyDerivationService keyDerivationService,
+    SignerService signerService,
     CampaignRepository campaignRepository,
   ) = ProposalServiceImpl;
 
@@ -121,14 +121,14 @@ final class ProposalServiceImpl implements ProposalService {
   final ProposalRepository _proposalRepository;
   final DocumentRepository _documentRepository;
   final UserService _userService;
-  final KeyDerivationService _keyDerivationService;
+  final SignerService _signerService;
   final CampaignRepository _campaignRepository;
 
   const ProposalServiceImpl(
     this._proposalRepository,
     this._documentRepository,
     this._userService,
-    this._keyDerivationService,
+    this._signerService,
     this._campaignRepository,
   );
 
@@ -253,7 +253,7 @@ final class ProposalServiceImpl implements ProposalService {
   Future<SignedDocumentRef> publishProposal({
     required DocumentData document,
   }) async {
-    await _useProposerRoleCredentials(
+    await _signerService.useProposerCredentials(
       (catalystId, privateKey) {
         return _proposalRepository.publishProposal(
           document: document,
@@ -285,7 +285,7 @@ final class ProposalServiceImpl implements ProposalService {
     required SignedDocumentRef ref,
     required SignedDocumentRef categoryId,
   }) {
-    return _useProposerRoleCredentials(
+    return _signerService.useProposerCredentials(
       (catalystId, privateKey) {
         return _proposalRepository.publishProposalAction(
           ref: ref,
@@ -425,36 +425,5 @@ final class ProposalServiceImpl implements ProposalService {
     }
 
     return account.catalystId;
-  }
-
-  Future<void> _useProposerRoleCredentials(
-    Future<void> Function(
-      CatalystId catalystId,
-      CatalystPrivateKey privateKey,
-    ) callback,
-  ) async {
-    final account = _userService.user.activeAccount;
-    if (account == null) {
-      throw StateError(
-        'Cannot obtain proposer credentials, account missing',
-      );
-    }
-
-    final catalystId = account.catalystId.copyWith(
-      username: const Optional.empty(),
-      role: const Optional(AccountRole.proposer),
-      rotation: const Optional(0),
-    );
-
-    await account.keychain.getMasterKey().use((masterKey) async {
-      final keyPair = _keyDerivationService.deriveAccountRoleKeyPair(
-        masterKey: masterKey,
-        role: AccountRole.proposer,
-      );
-
-      await keyPair.use(
-        (keyPair) => callback(catalystId, keyPair.privateKey),
-      );
-    });
   }
 }

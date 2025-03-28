@@ -6,31 +6,6 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
-class SegmentsMenuListener extends StatelessWidget {
-  final SegmentsController controller;
-
-  const SegmentsMenuListener({
-    super.key,
-    required this.controller,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return ValueListenableBuilder(
-      valueListenable: controller,
-      builder: (context, value, _) {
-        return SegmentsMenu(
-          segments: value.segments,
-          openedSegments: value.openedSegments,
-          selectedSectionId: value.activeSectionId,
-          onSegmentTap: controller.toggleSegment,
-          onSectionSelected: controller.selectSectionStep,
-        );
-      },
-    );
-  }
-}
-
 class SegmentsMenu extends StatelessWidget {
   final List<Segment> segments;
   final Set<NodeId> openedSegments;
@@ -56,7 +31,7 @@ class SegmentsMenu extends StatelessWidget {
             (segment) {
               return VoicesNodeMenu(
                 key: ValueKey('Segment[${segment.id}]NodeMenu'),
-                name: segment.resolveTitle(context),
+                name: Text(segment.resolveTitle(context)),
                 icon: segment.icon.buildIcon(),
                 onHeaderTap: () {
                   onSegmentTap(segment.id);
@@ -84,6 +59,31 @@ class SegmentsMenu extends StatelessWidget {
           )
           .separatedBy(const SizedBox(height: 12))
           .toList(),
+    );
+  }
+}
+
+class SegmentsMenuListener extends StatelessWidget {
+  final SegmentsController controller;
+
+  const SegmentsMenuListener({
+    super.key,
+    required this.controller,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ValueListenableBuilder(
+      valueListenable: controller,
+      builder: (context, value, _) {
+        return SegmentsMenu(
+          segments: value.segments,
+          openedSegments: value.openedSegments,
+          selectedSectionId: value.activeSectionId,
+          onSegmentTap: controller.toggleSegment,
+          onSectionSelected: controller.selectSectionStep,
+        );
+      },
     );
   }
 }

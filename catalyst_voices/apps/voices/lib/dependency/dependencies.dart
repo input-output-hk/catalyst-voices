@@ -129,6 +129,9 @@ final class Dependencies extends DependencyProvider {
         return ProposalCubit(
           get<UserService>(),
           get<ProposalService>(),
+          get<CommentService>(),
+          get<CampaignService>(),
+          get<DocumentMapper>(),
         );
       })
       ..registerFactory<NewProposalCubit>(() {
@@ -198,6 +201,12 @@ final class Dependencies extends DependencyProvider {
           get<SignedDocumentManager>(),
           get<DocumentRepository>(),
         ),
+      )
+      ..registerLazySingleton<CommentRepository>(
+        () => CommentRepository(
+          get<SignedDocumentManager>(),
+          get<DocumentRepository>(),
+        ),
       );
   }
 
@@ -242,6 +251,12 @@ final class Dependencies extends DependencyProvider {
       },
       dispose: (service) => unawaited(service.dispose()),
     );
+    registerLazySingleton<SignerService>(() {
+      return AccountSignerService(
+        get<UserService>(),
+        get<KeyDerivationService>(),
+      );
+    });
     registerLazySingleton<AccessControl>(AccessControl.new);
     registerLazySingleton<CampaignService>(() {
       return CampaignService(
@@ -254,8 +269,14 @@ final class Dependencies extends DependencyProvider {
         get<ProposalRepository>(),
         get<DocumentRepository>(),
         get<UserService>(),
-        get<KeyDerivationService>(),
+        get<SignerService>(),
         get<CampaignRepository>(),
+      );
+    });
+    registerLazySingleton<CommentService>(() {
+      return CommentService(
+        get<CommentRepository>(),
+        get<SignerService>(),
       );
     });
     registerLazySingleton<ConfigService>(() {

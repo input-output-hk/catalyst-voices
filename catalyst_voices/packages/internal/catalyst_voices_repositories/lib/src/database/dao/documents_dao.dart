@@ -5,6 +5,7 @@ import 'package:catalyst_voices_repositories/src/database/table/documents.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents.drift.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_metadata.dart';
 import 'package:catalyst_voices_repositories/src/database/typedefs.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:collection/collection.dart';
 import 'package:drift/drift.dart';
 import 'package:drift/extensions/json1.dart';
@@ -74,6 +75,7 @@ abstract interface class DocumentsDao {
     int? limit,
     DocumentType? type,
     CatalystId? authorId,
+    DocumentRef? refTo,
   });
 
   /// Watches for new comments that are reference by ref.
@@ -249,6 +251,7 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
     int? limit,
     DocumentType? type,
     CatalystId? authorId,
+    DocumentRef? refTo,
   }) {
     final query = select(documents);
 
@@ -256,11 +259,24 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
       query.where((doc) => doc.type.equals(type.uuid));
     }
     if (authorId != null) {
+      final searchId = authorId.toSignificant().toUri().toStringWithoutScheme();
+
       query.where(
         (doc) => CustomExpression<bool>(
           // ignore: lines_longer_than_80_chars
           "json_extract(metadata, '\$.authors') LIKE '%${authorId.toUri().path}%'",
         ),
+      );
+    }
+    if (refTo != null) {
+      query.where(
+        (row) => Expression.and([
+          row.metadata.jsonExtract<String>(r'$.ref.id').equals(refTo.id),
+          if (refTo.version != null)
+            row.metadata
+                .jsonExtract<String>(r'$.ref.version')
+                .equals(refTo.version!),
+        ]),
       );
     }
 

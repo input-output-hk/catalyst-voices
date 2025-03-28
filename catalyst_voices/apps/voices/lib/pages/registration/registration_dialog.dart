@@ -91,7 +91,19 @@ class _RegistrationDialogState extends State<RegistrationDialog>
   Future<bool> _confirmExit(
     BuildContext context, {
     required RegistrationStep step,
+    required double progress,
   }) async {
+    if (step.isWalletLinkFlow) {
+      final stayInTheFlow = await VoicesQuestionDialog.show(
+        context,
+        routeSettings: const RouteSettings(name: '/registration-confirm-exit'),
+        builder: (_) => const WalletLinkExitConfirmDialog(),
+        fallback: true,
+      );
+
+      return !stayInTheFlow;
+    }
+
     if (step.isRegistrationFlow) {
       final stayInTheFlow = await VoicesQuestionDialog.show(
         context,
@@ -126,13 +138,11 @@ class _RegistrationDialogState extends State<RegistrationDialog>
     }
 
     final state = _cubit.state;
-    final hasProgress = (state.progress ?? 0.0) > 0.0;
-    if (!hasProgress) {
-      Navigator.of(context).pop();
-      return;
-    }
-
-    final confirmed = await _confirmExit(context, step: state.step);
+    final confirmed = await _confirmExit(
+      context,
+      step: state.step,
+      progress: state.progress ?? 0.0,
+    );
 
     if (context.mounted && confirmed) {
       Navigator.of(context).pop();

@@ -45,6 +45,7 @@ abstract interface class SignedDocumentDataSource
     required bool unique,
     DocumentType? type,
     CatalystId? authorId,
+    DocumentRef? refTo,
   });
 
   Stream<int> watchCount({
