@@ -47,7 +47,7 @@ abstract interface class RegistrationService {
     required CardanoWallet wallet,
     required NetworkId networkId,
     required CatalystPrivateKey masterKey,
-    required Set<AccountRole> roles,
+    required Set<RegistrationTransactionRole> roles,
   });
 
   /// Loads account related to this [seedPhrase]. Throws exception if non found.
@@ -136,7 +136,7 @@ final class RegistrationServiceImpl implements RegistrationService {
     required CardanoWallet wallet,
     required NetworkId networkId,
     required CatalystPrivateKey masterKey,
-    required Set<AccountRole> roles,
+    required Set<RegistrationTransactionRole> roles,
   }) async {
     try {
       final config = _blockchainConfig.transactionBuilderConfig;

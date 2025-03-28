@@ -235,19 +235,33 @@ final class RegistrationCubit extends Cubit<RegistrationState>
 
       final wallet = _walletLinkCubit.selectedWallet!;
       final roles = _walletLinkCubit.roles;
-      final effectiveRoles = Set.of(roles);
+      final accountRoles = <AccountRole>{};
 
       if (accountId != null) {
         final account = _userService.user.getAccount(accountId);
-
-        effectiveRoles.removeWhere(account.roles.contains);
+        accountRoles.addAll(account.roles);
       }
+
+      final transactionRoles = AccountRole.values.map((role) {
+        final isSelected = roles.contains(role);
+        final isAccountRole = accountRoles.contains(role);
+
+        if (isSelected && !isAccountRole) {
+          return RegistrationTransactionRole.set(role);
+        }
+
+        if (!isSelected && isAccountRole) {
+          return RegistrationTransactionRole.unset(role);
+        }
+
+        return RegistrationTransactionRole.undefined(role);
+      }).toSet();
 
       final transaction = await _registrationService.prepareRegistration(
         wallet: wallet,
         networkId: _blockchainConfig.networkId,
         masterKey: masterKey,
-        roles: effectiveRoles,
+        roles: transactionRoles,
       );
 
       _transaction = transaction;
