@@ -25,7 +25,7 @@ class ProposalBuilderStatusAction extends StatelessWidget {
       selector: (state) {
         return (
           offstage: state.isLoading || state.error != null,
-          items: ProposalMenuItemAction.availableOptions(
+          items: ProposalMenuItemAction.proposalBuilderAvailableOptions(
             state.metadata.publish,
           )
         );

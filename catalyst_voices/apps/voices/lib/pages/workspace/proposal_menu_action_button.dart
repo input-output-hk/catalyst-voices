@@ -59,13 +59,13 @@ class _MenuItem extends StatelessWidget {
 class _ProposalMenuActionButtonState extends State<ProposalMenuActionButton> {
   final GlobalKey<PopupMenuButtonState<int>> _buttonKey = GlobalKey();
 
-  bool get isSubmitted => widget.proposalPublish.isPublished;
+  bool get _isSubmitted => widget.proposalPublish.isPublished;
 
-  List<ProposalMenuItemAction> get items =>
-      ProposalMenuItemAction.availableOptions(
+  List<ProposalMenuItemAction> get _items =>
+      ProposalMenuItemAction.workspaceAvailableOptions(
         widget.proposalPublish,
-        workspace: true,
       );
+
   @override
   Widget build(BuildContext context) {
     return PopupMenuButton<int>(
@@ -75,7 +75,7 @@ class _ProposalMenuActionButtonState extends State<ProposalMenuActionButton> {
       offset: const Offset(-40, 0),
       itemBuilder: (context) {
         return <PopupMenuEntry<int>>[
-          for (final item in items)
+          for (final item in _items)
             PopupMenuItem(
               value: item.index,
               padding: const EdgeInsets.symmetric(
@@ -93,7 +93,7 @@ class _ProposalMenuActionButtonState extends State<ProposalMenuActionButton> {
         onTap: _showMenu,
         style: IconButton.styleFrom(
           foregroundColor:
-              isSubmitted ? context.colors.textOnPrimaryWhite : null,
+              _isSubmitted ? context.colors.textOnPrimaryWhite : null,
         ),
         child: VoicesAssets.icons.dotsVertical.buildIcon(),
       ),
@@ -133,12 +133,10 @@ class _ProposalMenuActionButtonState extends State<ProposalMenuActionButton> {
       if (edit && mounted) {
         context.read<WorkspaceBloc>().add(UnlockProposalEvent(widget.ref));
       }
-    } else {
-      if (mounted) {
-        unawaited(
-          ProposalBuilderRoute.fromRef(ref: widget.ref).push(context),
-        );
-      }
+    } else if (mounted) {
+      unawaited(
+        ProposalBuilderRoute.fromRef(ref: widget.ref).push(context),
+      );
     }
   }
 

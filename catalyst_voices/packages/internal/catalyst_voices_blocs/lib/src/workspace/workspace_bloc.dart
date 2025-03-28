@@ -123,8 +123,23 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
       );
     } catch (error, stackTrace) {
       _logger.severe('Exporting proposal failed', error, stackTrace);
-      emitError(const LocalizedUnknownException());
+      emitError(LocalizedException.create(error));
     }
+  }
+
+  Future<void> _forgetProposal(
+    ForgetProposalEvent event,
+    Emitter<WorkspaceState> emit,
+  ) async {
+    final proposal =
+        state.userProposals.firstWhereOrNull((e) => e.selfRef == event.ref);
+    if (proposal == null || proposal.selfRef is! SignedDocumentRef) {
+      return emitError(const LocalizedUnknownException());
+    }
+    await _proposalService.unlockProposal(
+      ref: proposal.selfRef as SignedDocumentRef,
+      categoryId: proposal.categoryId,
+    );
   }
 
   Future<void> _importProposal(
@@ -183,21 +198,6 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
       categoryId: proposal.categoryId,
     );
     emitSignal(OpenProposalBuilderSignal(ref: event.ref));
-  }
-
-  Future<void> _forgetProposal(
-    ForgetProposalEvent event,
-    Emitter<WorkspaceState> emit,
-  ) async {
-    final proposal =
-        state.userProposals.firstWhereOrNull((e) => e.selfRef == event.ref);
-    if (proposal == null || proposal.selfRef is! SignedDocumentRef) {
-      return emitError(const LocalizedUnknownException());
-    }
-    await _proposalService.unlockProposal(
-      ref: proposal.selfRef as SignedDocumentRef,
-      categoryId: proposal.categoryId,
-    );
   }
 
   Future<void> _watchUserProposals(

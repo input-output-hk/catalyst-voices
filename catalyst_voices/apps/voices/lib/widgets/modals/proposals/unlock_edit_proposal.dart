@@ -174,7 +174,8 @@ class _Header extends StatelessWidget {
 }
 
 class _UnlockEditProposalDialogState extends State<UnlockEditProposalDialog> {
-  bool agreement = false;
+  bool _agreement = false;
+
   @override
   Widget build(BuildContext context) {
     const padding = EdgeInsets.symmetric(horizontal: 24);
@@ -201,12 +202,12 @@ class _UnlockEditProposalDialogState extends State<UnlockEditProposalDialog> {
           const _Warnings(),
           const _Divider(),
           _Agreement(
-            value: agreement,
+            value: _agreement,
             onChanged: _agreementChanged,
           ),
           const Spacer(),
           _ActionButtons(
-            agreement: agreement,
+            agreement: _agreement,
           ),
         ],
       ),
@@ -215,7 +216,7 @@ class _UnlockEditProposalDialogState extends State<UnlockEditProposalDialog> {
 
   void _agreementChanged(bool value) {
     setState(() {
-      agreement = value;
+      _agreement = value;
     });
   }
 }

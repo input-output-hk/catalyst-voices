@@ -109,23 +109,9 @@ enum ProposalMenuItemAction {
     );
   }
 
-  static List<ProposalMenuItemAction> availableOptions(
-    ProposalPublish proposalPublish, {
-    bool workspace = false,
-  }) {
-    if (workspace) {
-      return switch (proposalPublish) {
-        ProposalPublish.localDraft => [edit, export, delete],
-        _ => [
-            edit,
-            view,
-            share,
-            forget,
-            export,
-          ],
-      };
-    }
-
+  static List<ProposalMenuItemAction> proposalBuilderAvailableOptions(
+    ProposalPublish proposalPublish,
+  ) {
     switch (proposalPublish) {
       case ProposalPublish.localDraft:
         return [view, back, publish, submit, export, delete];
@@ -135,5 +121,20 @@ enum ProposalMenuItemAction {
         // Submitted can't be open in editor
         return [];
     }
+  }
+
+  static List<ProposalMenuItemAction> workspaceAvailableOptions(
+    ProposalPublish proposalPublish,
+  ) {
+    return switch (proposalPublish) {
+      ProposalPublish.localDraft => [edit, export, delete],
+      _ => [
+          edit,
+          view,
+          share,
+          forget,
+          export,
+        ],
+    };
   }
 }

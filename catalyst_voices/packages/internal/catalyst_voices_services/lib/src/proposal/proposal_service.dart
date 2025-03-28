@@ -184,7 +184,7 @@ final class ProposalServiceImpl implements ProposalService {
     required SignedDocumentRef ref,
     required SignedDocumentRef categoryId,
   }) {
-    return _useProposerRoleCredentials(
+    return _signerService.useProposerCredentials(
       (catalystId, privateKey) {
         return _proposalRepository.publishProposalAction(
           ref: ref,
@@ -303,7 +303,7 @@ final class ProposalServiceImpl implements ProposalService {
     required SignedDocumentRef ref,
     required SignedDocumentRef categoryId,
   }) async {
-    return _useProposerRoleCredentials(
+    return _signerService.useProposerCredentials(
       (catalystId, privateKey) {
         return _proposalRepository.publishProposalAction(
           ref: ref,

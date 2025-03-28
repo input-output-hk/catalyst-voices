@@ -13,6 +13,7 @@ class ForgetProposalDialog extends StatefulWidget {
   final String title;
   final int version;
   final ProposalPublish publish;
+
   const ForgetProposalDialog({
     super.key,
     required this.title,
@@ -44,7 +45,7 @@ class ForgetProposalDialog extends StatefulWidget {
 
 class _ActionButtons extends StatelessWidget {
   final bool agreement;
-  
+
   const _ActionButtons({
     required this.agreement,
   });
@@ -159,7 +160,8 @@ class _Divider extends StatelessWidget {
 }
 
 class _ForgetProposalDialogState extends State<ForgetProposalDialog> {
-  bool agreement = false;
+  bool _agreement = false;
+
   @override
   Widget build(BuildContext context) {
     const padding = EdgeInsets.symmetric(horizontal: 24);
@@ -187,12 +189,12 @@ class _ForgetProposalDialogState extends State<ForgetProposalDialog> {
           const _Warnings(),
           const _Divider(),
           _Agreement(
-            value: agreement,
+            value: _agreement,
             onChanged: _agreementChanged,
           ),
           const Spacer(),
           _ActionButtons(
-            agreement: agreement,
+            agreement: _agreement,
           ),
         ],
       ),
@@ -201,7 +203,7 @@ class _ForgetProposalDialogState extends State<ForgetProposalDialog> {
 
   void _agreementChanged(bool value) {
     setState(() {
-      agreement = value;
+      _agreement = value;
     });
   }
 }
@@ -225,7 +227,7 @@ class _VersionUnlock extends StatelessWidget {
   final String version;
   final String title;
   final ProposalPublish publish;
-  
+
   const _VersionUnlock({
     required this.version,
     required this.title,
