@@ -138,6 +138,15 @@ impl CertInsertQuery {
         }
     }
 
+    /// Prepare Batch of Insert TXI Index Data Queries
+    pub(crate) async fn prepare_batch(
+        session: &Arc<Session>, cfg: &cassandra_db::EnvVars,
+    ) -> anyhow::Result<SizedBatch> {
+        // Note: for now we have one query, but there are many certs, and later we may have more
+        // to add here.
+        StakeRegistrationInsertQuery::prepare_batch(session, cfg).await
+    }
+
     /// Get the stake address for a hash, return an empty address if one can not be found.
     #[allow(clippy::too_many_arguments)]
     fn stake_address(

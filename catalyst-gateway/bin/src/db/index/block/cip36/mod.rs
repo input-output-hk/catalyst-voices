@@ -8,11 +8,15 @@ use std::sync::Arc;
 
 use cardano_blockchain_types::{Cip36, MultiEraBlock, Slot, StakeAddress, TxnIndex};
 use catalyst_types::hashes::Blake2b224Hash;
+use scylla::Session;
 
 use super::certs;
-use crate::db::index::{
-    queries::{FallibleQueryTasks, PreparedQuery},
-    session::CassandraSession,
+use crate::{
+    db::index::{
+        queries::{FallibleQueryTasks, PreparedQuery, SizedBatch},
+        session::CassandraSession,
+    },
+    settings::cassandra_db,
 };
 
 /// Insert CIP-36 Registration Queries
@@ -36,6 +40,26 @@ impl Cip36InsertQuery {
             for_vote_key: Vec::new(),
             stake_regs: Vec::new(),
         }
+    }
+
+    /// Prepare Batch of Insert Cip36 Registration Data Queries
+    pub(crate) async fn prepare_batch(
+        session: &Arc<Session>, cfg: &cassandra_db::EnvVars,
+    ) -> anyhow::Result<(SizedBatch, SizedBatch, SizedBatch)> {
+        let insert_cip36_batch = insert_cip36::Params::prepare_batch(session, cfg).await;
+        let insert_cip36_invalid_batch =
+            insert_cip36_invalid::Params::prepare_batch(session, cfg).await;
+        let insert_cip36_for_vote_key_addr_batch =
+            insert_cip36_for_vote_key::Params::prepare_batch(session, cfg).await;
+        // Its a hack of inserting `stake_regs` during the indexing CIP 36 registrations.
+        // Its done because some of the CIP 36 registrations contains some stake addresses which
+        // are not actually some how registered using cardano certs.
+        // Preparation of the `stake_regs` batch done under the `certs.rs`
+        Ok((
+            insert_cip36_batch?,
+            insert_cip36_invalid_batch?,
+            insert_cip36_for_vote_key_addr_batch?,
+        ))
     }
 
     /// Index the CIP-36 registrations in a transaction.
