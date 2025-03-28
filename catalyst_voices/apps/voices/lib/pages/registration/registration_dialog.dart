@@ -99,6 +99,17 @@ class _RegistrationDialogState extends State<RegistrationDialog>
     required RegistrationStep step,
     required double progress,
   }) async {
+    if (widget.type is UpdateAccount) {
+      final stayInTheFlow = await VoicesQuestionDialog.show(
+        context,
+        routeSettings: const RouteSettings(name: '/registration-confirm-exit'),
+        builder: (_) => const AccountUpdateExitConfirmDialog(),
+        fallback: true,
+      );
+
+      return !stayInTheFlow;
+    }
+
     if (step.isWalletLinkFlow) {
       final stayInTheFlow = await VoicesQuestionDialog.show(
         context,
