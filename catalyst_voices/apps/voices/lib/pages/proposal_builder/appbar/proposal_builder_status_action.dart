@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
+import 'package:catalyst_voices/pages/proposal_builder/appbar/proposal_menu_item_action_enum.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/proposal_builder_delete_confirmation_dialog.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/publish_proposal_iteration_dialog.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/submit_proposal_for_review_dialog.dart';
@@ -20,11 +21,13 @@ class ProposalBuilderStatusAction extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocSelector<ProposalBuilderBloc, ProposalBuilderState,
-        ({bool offstage, List<_MenuItemEnum> items})>(
+        ({bool offstage, List<ProposalMenuItemAction> items})>(
       selector: (state) {
         return (
           offstage: state.isLoading || state.error != null,
-          items: _MenuItemEnum.availableOptions(state.metadata.publish)
+          items: ProposalMenuItemAction.proposalBuilderAvailableOptions(
+            state.metadata.publish,
+          )
         );
       },
       builder: (context, state) {
@@ -66,7 +69,7 @@ class _Button extends StatelessWidget {
 }
 
 class _MenuItem extends StatelessWidget {
-  final _MenuItemEnum item;
+  final ProposalMenuItemAction item;
   final String? proposalTitle;
   final ProposalBuilderMetadata metadata;
 
@@ -87,9 +90,9 @@ class _MenuItem extends StatelessWidget {
     final description = item.description(context, metadata);
 
     return ListTile(
-      title: Text(
-        title,
-        style: Theme.of(context).textTheme.bodyLarge,
+      title: MarkdownText(
+        selectable: false,
+        MarkdownData(title),
       ),
       subtitle: description == null
           ? null
@@ -99,97 +102,14 @@ class _MenuItem extends StatelessWidget {
                     color: Theme.of(context).colors.textOnPrimaryLevel1,
                   ),
             ),
-      leading: item.icon.buildIcon(),
+      leading: item.icon().buildIcon(),
       mouseCursor: item.clickable ? SystemMouseCursors.click : null,
     );
   }
 }
 
-enum _MenuItemEnum {
-  view(clickable: false),
-  publish,
-  submit,
-  export,
-  delete;
-
-  final bool clickable;
-
-  const _MenuItemEnum({this.clickable = true});
-
-  SvgGenImage get icon {
-    switch (this) {
-      case _MenuItemEnum.view:
-        return VoicesAssets.icons.documentText;
-      case _MenuItemEnum.publish:
-        return VoicesAssets.icons.chatAlt2;
-      case _MenuItemEnum.submit:
-        return VoicesAssets.icons.badgeCheck;
-      case _MenuItemEnum.export:
-        return VoicesAssets.icons.folderOpen;
-      case _MenuItemEnum.delete:
-        return VoicesAssets.icons.trash;
-    }
-  }
-
-  String? description(BuildContext context, ProposalBuilderMetadata metadata) {
-    return switch (this) {
-      _MenuItemEnum.view => _formatProposalDescription(context, metadata),
-      _MenuItemEnum.publish =>
-        context.l10n.proposalEditorStatusDropdownPublishDescription,
-      _MenuItemEnum.submit =>
-        context.l10n.proposalEditorStatusDropdownSubmitDescription,
-      _MenuItemEnum.export || _MenuItemEnum.delete => null,
-    };
-  }
-
-  String title(
-    BuildContext context,
-    String? proposalTitle,
-    int currentIteration,
-  ) {
-    final nextIteration = currentIteration + 1;
-    return switch (this) {
-      _MenuItemEnum.view => (proposalTitle != null && proposalTitle.isNotBlank)
-          ? proposalTitle
-          : context.l10n.proposalEditorStatusDropdownViewTitle,
-      _MenuItemEnum.publish =>
-        context.l10n.proposalEditorStatusDropdownPublishTitle(nextIteration),
-      _MenuItemEnum.submit =>
-        context.l10n.proposalEditorStatusDropdownSubmitTitle(nextIteration),
-      _MenuItemEnum.export =>
-        context.l10n.proposalEditorStatusDropdownExportTitle,
-      _MenuItemEnum.delete =>
-        context.l10n.proposalEditorStatusDropdownDeleteTitle,
-    };
-  }
-
-  String _formatProposalDescription(
-    BuildContext context,
-    ProposalBuilderMetadata metadata,
-  ) {
-    final currentIteration = metadata.latestVersion?.number ?? 0;
-    final nextIteration = currentIteration + 1;
-    return context.l10n.proposalEditorStatusDropdownViewDescription(
-      nextIteration,
-    );
-  }
-
-  static List<_MenuItemEnum> availableOptions(ProposalPublish proposalPublish) {
-    switch (proposalPublish) {
-      case ProposalPublish.localDraft:
-        return _MenuItemEnum.values;
-      case ProposalPublish.publishedDraft:
-        // TODO(dtscalac): delete? revert?
-        return [view, submit, export];
-      case ProposalPublish.submittedProposal:
-        // TODO(dtscalac): delete? revert?
-        return [view, export];
-    }
-  }
-}
-
 class _MenuItemSelector extends StatelessWidget {
-  final _MenuItemEnum item;
+  final ProposalMenuItemAction item;
 
   const _MenuItemSelector({required this.item});
 
@@ -218,7 +138,7 @@ class _MenuItemSelector extends StatelessWidget {
 }
 
 class _PopupMenuButton extends StatefulWidget {
-  final List<_MenuItemEnum> items;
+  final List<ProposalMenuItemAction> items;
 
   const _PopupMenuButton({required this.items});
 
@@ -252,7 +172,8 @@ class _PopupMenuButtonState extends State<_PopupMenuButton> {
         ].separatedBy(const PopupMenuDivider(height: 0)).toList();
       },
       onSelected: (value) {
-        final item = _MenuItemEnum.values[value];
+        final item = ProposalMenuItemAction.values[value];
+
         _onSelected(item);
       },
     );
@@ -278,19 +199,18 @@ class _PopupMenuButtonState extends State<_PopupMenuButton> {
         .add(ExportProposalEvent(filePrefix: prefix));
   }
 
-  void _onSelected(_MenuItemEnum item) {
+  void _onSelected(ProposalMenuItemAction item) {
     switch (item) {
-      case _MenuItemEnum.view:
-        // do nothing
-        break;
-      case _MenuItemEnum.publish:
+      case ProposalMenuItemAction.publish:
         unawaited(_publishIteration());
-      case _MenuItemEnum.submit:
+      case ProposalMenuItemAction.submit:
         unawaited(_submitForReview());
-      case _MenuItemEnum.export:
+      case ProposalMenuItemAction.export:
         _exportProposal();
-      case _MenuItemEnum.delete:
+      case ProposalMenuItemAction.delete:
         unawaited(_deleteProposal());
+      case _:
+        break;
     }
   }
 
