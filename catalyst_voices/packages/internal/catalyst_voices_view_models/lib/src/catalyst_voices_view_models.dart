@@ -18,6 +18,7 @@ export 'document/document_version.dart';
 export 'document/validation/localized_document_validation_result.dart';
 export 'exception/localized_exception.dart';
 export 'exception/localized_not_found_exception.dart';
+export 'exception/localized_proposal_deletion_exception.dart';
 export 'exception/localized_unknown_exception.dart';
 export 'menu/menu_item.dart';
 export 'menu/popup_menu_item.dart';
