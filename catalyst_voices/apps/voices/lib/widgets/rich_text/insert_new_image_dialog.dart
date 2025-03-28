@@ -21,15 +21,20 @@ class _InsertNewImageDialogState extends State<InsertNewImageDialog> {
     final l10n = context.l10n;
     final textTheme = Theme.of(context).textTheme;
     const images = VoicesAssets.images;
+    final colorScheme = Theme.of(context).colorScheme;
+    final colors = context.colors;
 
     return Dialog(
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(28),
       ),
       child: Container(
         width: 450,
         height: 412,
         padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          color: colors.elevationsOnSurfaceNeutralLv1Grey,
+        ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -52,20 +57,18 @@ class _InsertNewImageDialogState extends State<InsertNewImageDialog> {
             Text(
               l10n.insertNewImageDialogDescription,
               style: textTheme.bodyLarge?.copyWith(
-                color: context.colors.textOnPrimaryLevel1,
+                color: colors.textOnPrimaryLevel1,
               ),
             ),
             const SizedBox(height: 16),
             Divider(
-              indent: 0,
-              endIndent: 0,
-              color: Theme.of(context).colorScheme.outline,
+              color: colorScheme.outline,
             ),
             const SizedBox(height: 22),
             Text(
               l10n.insertNewImageDialogImageUrl,
               style: textTheme.titleSmall?.copyWith(
-                color: context.colors.textOnPrimaryLevel0,
+                color: colors.textOnPrimaryLevel0,
               ),
             ),
             const SizedBox(height: 4),
@@ -74,20 +77,23 @@ class _InsertNewImageDialogState extends State<InsertNewImageDialog> {
               decoration: VoicesTextFieldDecoration(
                 hintText: l10n.insertNewImageDialogTextPlaceholder,
                 borderRadius: const BorderRadius.all(Radius.circular(8)),
-                fillColor: Theme.of(context).colorScheme.surface,
+                fillColor: colorScheme.surface,
               ),
               keyboardType: TextInputType.text,
               onFieldSubmitted: (value) {},
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
             RichText(
               text: TextSpan(
                 style: textTheme.bodySmall?.copyWith(
-                  color: Theme.of(context).colorScheme.onPrimary,
+                  color: colorScheme.onPrimary,
                 ),
                 children: [
                   TextSpan(
                     text: l10n.richTextEditorImageSupportInfo,
+                    style: textTheme.bodySmall?.copyWith(
+                      color: colors.textOnPrimaryLevel1,
+                    ),
                   ),
                   const WidgetSpan(
                     child: SizedBox(width: 4),
@@ -100,8 +106,8 @@ class _InsertNewImageDialogState extends State<InsertNewImageDialog> {
                       child: Text(
                         l10n.knowledgeBase,
                         style: textTheme.bodySmall?.copyWith(
-                          color: Theme.of(context).colorScheme.primary,
                           decoration: TextDecoration.underline,
+                          color: colors.primaryContainer,
                         ),
                       ),
                     ),
@@ -111,9 +117,16 @@ class _InsertNewImageDialogState extends State<InsertNewImageDialog> {
                   ),
                   TextSpan(
                     text: l10n.toLearnMore,
+                    style: textTheme.bodySmall?.copyWith(
+                      color: colors.textOnPrimaryLevel1,
+                    ),
                   ),
                 ],
               ),
+            ),
+            const SizedBox(height: 18),
+            Divider(
+              color: colorScheme.outline,
             ),
             const SizedBox(height: 24),
             Row(
