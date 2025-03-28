@@ -17,25 +17,29 @@ final class WalletLinkCubit extends Cubit<WalletLinkStateData>
     implements WalletLinkManager {
   final RegistrationService registrationService;
 
-  final _lockedRoles = <AccountRole>[];
   final _wallets = <CardanoWallet>[];
   CardanoWallet? _selectedWallet;
 
   WalletLinkCubit({required this.registrationService})
-      : super(const WalletLinkStateData());
+      : super(WalletLinkStateData.initial());
 
-  Set<AccountRole> get roles {
-    return state.selectedRoles ?? state.defaultRoles;
-  }
+  Set<AccountRole> get roles => state.roles
+      .where((element) => element.isSelected)
+      .map((e) => e.type)
+      .toSet();
 
   CardanoWallet? get selectedWallet => _selectedWallet;
 
   void lockRoles(Set<AccountRole> roles) {
-    _lockedRoles
-      ..clear()
-      ..addAll(roles);
+    final updatedRoles = state.roles.map(
+      (role) {
+        return role.copyWith(
+          isLocked: role.type.isDefault || roles.contains(role.type),
+        );
+      },
+    ).toList();
 
-    // TODO(damian-molinski): update state
+    emit(state.copyWith(roles: updatedRoles));
   }
 
   @override
@@ -66,7 +70,15 @@ final class WalletLinkCubit extends Cubit<WalletLinkStateData>
 
   @override
   void selectRoles(Set<AccountRole> roles) {
-    emit(state.copyWith(selectedRoles: Optional(roles)));
+    final updatedRoles = state.roles.map(
+      (role) {
+        return role.copyWith(
+          isSelected: role.type.isDefault || roles.contains(role.type),
+        );
+      },
+    ).toList();
+
+    emit(state.copyWith(roles: updatedRoles));
   }
 
   @override

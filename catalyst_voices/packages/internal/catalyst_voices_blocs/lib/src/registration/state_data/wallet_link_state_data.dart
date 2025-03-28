@@ -10,7 +10,7 @@ final class WalletLinkStateData extends Equatable {
   final bool hasEnoughBalance;
   final WalletConnectionData? walletConnection;
   final WalletSummaryData? walletSummary;
-  final Set<AccountRole>? selectedRoles;
+  final List<RegistrationRole> roles;
 
   const WalletLinkStateData({
     this.wallets,
@@ -18,34 +18,26 @@ final class WalletLinkStateData extends Equatable {
     this.hasEnoughBalance = false,
     this.walletConnection,
     this.walletSummary,
-    this.selectedRoles,
+    this.roles = const [],
   });
+
+  factory WalletLinkStateData.initial() {
+    final roles = AccountRole.values
+        .where((element) => !element.isHidden)
+        .map(
+          (e) => RegistrationRole(
+            type: e,
+            isSelected: e.isDefault,
+            isLocked: e.isDefault,
+          ),
+        )
+        .toList();
+
+    return WalletLinkStateData(roles: roles);
+  }
 
   /// Returns the minimum required ADA in user balance to register.
   Coin get minAdaForRegistration => CardanoWalletDetails.minAdaForRegistration;
-
-  /// Returns the default roles every account will have.
-  Set<AccountRole> get defaultRoles {
-    return AccountRole.values.where((role) => role.isDefault).toSet();
-  }
-
-  WalletLinkStateData copyWith({
-    Optional<Result<List<WalletMetadata>, Exception>>? wallets,
-    Optional<WalletInfo>? selectedWallet,
-    bool? hasEnoughBalance,
-    Optional<WalletConnectionData>? walletConnection,
-    Optional<WalletSummaryData>? walletSummary,
-    Optional<Set<AccountRole>>? selectedRoles,
-  }) {
-    return WalletLinkStateData(
-      wallets: wallets.dataOr(this.wallets),
-      selectedWallet: selectedWallet.dataOr(this.selectedWallet),
-      hasEnoughBalance: hasEnoughBalance ?? this.hasEnoughBalance,
-      walletConnection: walletConnection.dataOr(this.walletConnection),
-      walletSummary: walletSummary.dataOr(this.walletSummary),
-      selectedRoles: selectedRoles.dataOr(this.selectedRoles),
-    );
-  }
 
   @override
   List<Object?> get props => [
@@ -54,6 +46,28 @@ final class WalletLinkStateData extends Equatable {
         hasEnoughBalance,
         walletConnection,
         walletSummary,
-        selectedRoles,
+        roles,
       ];
+
+  Set<AccountRole> get selectedRoleTypes {
+    return roles.where((role) => role.isSelected).map((e) => e.type).toSet();
+  }
+
+  WalletLinkStateData copyWith({
+    Optional<Result<List<WalletMetadata>, Exception>>? wallets,
+    Optional<WalletInfo>? selectedWallet,
+    bool? hasEnoughBalance,
+    Optional<WalletConnectionData>? walletConnection,
+    Optional<WalletSummaryData>? walletSummary,
+    List<RegistrationRole>? roles,
+  }) {
+    return WalletLinkStateData(
+      wallets: wallets.dataOr(this.wallets),
+      selectedWallet: selectedWallet.dataOr(this.selectedWallet),
+      hasEnoughBalance: hasEnoughBalance ?? this.hasEnoughBalance,
+      walletConnection: walletConnection.dataOr(this.walletConnection),
+      walletSummary: walletSummary.dataOr(this.walletSummary),
+      roles: roles ?? this.roles,
+    );
+  }
 }

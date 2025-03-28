@@ -4,7 +4,7 @@ import 'package:catalyst_voices/pages/registration/widgets/registration_stage_na
 import 'package:catalyst_voices/widgets/containers/roles_chooser_container.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
-import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 class RolesChooserPanel extends StatelessWidget {
@@ -37,19 +37,11 @@ class _BlocRolesChooserContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocWalletLinkSelector<
-        ({
-          Set<AccountRole> selected,
-          Set<AccountRole> defaultRoles,
-        })>(
-      selector: (state) => (
-        selected: state.selectedRoles ?? state.defaultRoles,
-        defaultRoles: state.defaultRoles,
-      ),
+    return BlocWalletLinkSelector<List<RegistrationRole>>(
+      selector: (state) => state.roles,
       builder: (context, state) {
         return RolesChooserContainer(
-          selected: state.selected,
-          lockedValuesAsDefault: state.defaultRoles,
+          roles: state,
           onChanged: RegistrationCubit.of(context).walletLink.selectRoles,
           onLearnMore: (role) async {
             await AccountRoleDialog.show(

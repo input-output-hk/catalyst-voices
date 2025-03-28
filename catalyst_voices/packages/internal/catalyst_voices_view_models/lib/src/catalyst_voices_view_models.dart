@@ -34,6 +34,7 @@ export 'proposal/proposal_view_model.dart';
 export 'proposal_builder/exception/proposal_builder_exception.dart';
 export 'registration/exception/localized_registration_exception.dart';
 export 'registration/registration.dart';
+export 'registration/registration_role.dart';
 export 'segments/segments_navigation.dart';
 export 'session/session_account.dart';
 export 'session/session_settings.dart';
