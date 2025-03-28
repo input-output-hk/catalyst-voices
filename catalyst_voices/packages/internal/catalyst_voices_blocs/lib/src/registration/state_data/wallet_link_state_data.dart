@@ -11,6 +11,7 @@ final class WalletLinkStateData extends Equatable {
   final WalletConnectionData? walletConnection;
   final WalletSummaryData? walletSummary;
   final List<RegistrationRole> roles;
+  final Set<AccountRole> accountRoles;
 
   const WalletLinkStateData({
     this.wallets,
@@ -19,6 +20,7 @@ final class WalletLinkStateData extends Equatable {
     this.walletConnection,
     this.walletSummary,
     this.roles = const [],
+    this.accountRoles = const {},
   });
 
   factory WalletLinkStateData.initial() {
@@ -36,6 +38,15 @@ final class WalletLinkStateData extends Equatable {
     return WalletLinkStateData(roles: roles);
   }
 
+  bool get areRolesValid {
+    final selectedRoleTypes = this.selectedRoleTypes;
+    if (selectedRoleTypes.length != accountRoles.length) {
+      return true;
+    }
+
+    return !selectedRoleTypes.containsAll(accountRoles);
+  }
+
   /// Returns the minimum required ADA in user balance to register.
   Coin get minAdaForRegistration => CardanoWalletDetails.minAdaForRegistration;
 
@@ -47,6 +58,7 @@ final class WalletLinkStateData extends Equatable {
         walletConnection,
         walletSummary,
         roles,
+        accountRoles,
       ];
 
   Set<AccountRole> get selectedRoleTypes {
@@ -60,6 +72,7 @@ final class WalletLinkStateData extends Equatable {
     Optional<WalletConnectionData>? walletConnection,
     Optional<WalletSummaryData>? walletSummary,
     List<RegistrationRole>? roles,
+    Set<AccountRole>? accountRoles,
   }) {
     return WalletLinkStateData(
       wallets: wallets.dataOr(this.wallets),
@@ -68,6 +81,7 @@ final class WalletLinkStateData extends Equatable {
       walletConnection: walletConnection.dataOr(this.walletConnection),
       walletSummary: walletSummary.dataOr(this.walletSummary),
       roles: roles ?? this.roles,
+      accountRoles: accountRoles ?? this.accountRoles,
     );
   }
 }

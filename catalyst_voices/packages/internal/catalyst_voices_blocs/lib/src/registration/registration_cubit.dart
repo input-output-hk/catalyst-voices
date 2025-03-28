@@ -341,7 +341,7 @@ final class RegistrationCubit extends Cubit<RegistrationState>
     _accountId = id;
     _keychain = account.keychain;
 
-    _walletLinkCubit.lockRoles(account.roles);
+    _walletLinkCubit.setAccountRoles(account.roles);
 
     _goToStep(const WalletLinkStep());
   }

@@ -26,7 +26,7 @@ class RolesChooserPanel extends StatelessWidget {
         const SizedBox(height: 12),
         const _BlocRolesChooserContainer(),
         const Spacer(),
-        const RegistrationBackNextNavigation(),
+        const _Navigation(),
       ],
     );
   }
@@ -49,6 +49,22 @@ class _BlocRolesChooserContainer extends StatelessWidget {
               role: role,
             );
           },
+        );
+      },
+    );
+  }
+}
+
+class _Navigation extends StatelessWidget {
+  const _Navigation();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocWalletLinkSelector<bool>(
+      selector: (state) => state.areRolesValid,
+      builder: (context, state) {
+        return RegistrationBackNextNavigation(
+          isNextEnabled: state,
         );
       },
     );

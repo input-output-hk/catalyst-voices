@@ -30,18 +30,6 @@ final class WalletLinkCubit extends Cubit<WalletLinkStateData>
 
   CardanoWallet? get selectedWallet => _selectedWallet;
 
-  void lockRoles(Set<AccountRole> roles) {
-    final updatedRoles = state.roles.map(
-      (role) {
-        return role.copyWith(
-          isLocked: role.type.isDefault || roles.contains(role.type),
-        );
-      },
-    ).toList();
-
-    emit(state.copyWith(roles: updatedRoles));
-  }
-
   @override
   Future<void> refreshWallets() async {
     try {
@@ -158,6 +146,22 @@ final class WalletLinkCubit extends Cubit<WalletLinkStateData>
 
       return false;
     }
+  }
+
+  void setAccountRoles(Set<AccountRole> roles) {
+    final updatedRoles = state.roles.map(
+      (role) {
+        final isAccountRole = roles.contains(role.type);
+        final isLocked = role.type.isDefault || isAccountRole;
+
+        return role.copyWith(
+          isLocked: isLocked,
+          isSelected: isAccountRole ? true : null,
+        );
+      },
+    ).toList();
+
+    emit(state.copyWith(roles: updatedRoles, accountRoles: roles));
   }
 }
 
