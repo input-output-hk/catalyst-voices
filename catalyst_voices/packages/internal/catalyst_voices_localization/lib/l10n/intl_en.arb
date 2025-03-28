@@ -1562,7 +1562,7 @@
       }
     }
   },
-  "proposalEditorStatusDropdownPublishTitle": "Publish new iteration · Draft Iteration {iteration}",
+  "proposalEditorStatusDropdownPublishTitle": "**Share new draft** · Draft Iteration {iteration}",
   "@proposalEditorStatusDropdownPublishTitle": {
     "description": "Action title to publish a new version of the draft proposal.",
     "placeholders": {
@@ -1571,11 +1571,11 @@
       }
     }
   },
-  "proposalEditorStatusDropdownPublishDescription": "Share draft for public feedback",
+  "proposalEditorStatusDropdownPublishDescription": "Share draft for feedback",
   "@proposalEditorStatusDropdownPublishDescription": {
     "description": "Action description to publish a new version of the draft proposal."
   },
-  "proposalEditorStatusDropdownSubmitTitle": "Submit to review stage · Iteration {iteration} as Final",
+  "proposalEditorStatusDropdownSubmitTitle": "**Submit For Review** · Iteration {iteration} as Final",
   "@proposalEditorStatusDropdownSubmitTitle": {
     "description": "Action title to submit the final proposal.",
     "placeholders": {
@@ -1584,7 +1584,7 @@
       }
     }
   },
-  "proposalEditorStatusDropdownSubmitDescription": "Enter proposal into the next governance round",
+  "proposalEditorStatusDropdownSubmitDescription": "Submit as final proposal for review / voting",
   "@proposalEditorStatusDropdownSubmitDescription": {
     "description": "Action description to submit the final proposal."
   },
@@ -2049,6 +2049,42 @@
   "@shortSummary": {
     "description": "A short description of something"
   },
+  "view": "View",
+  "@view": {
+    "description": "A label for the view button. Used to see more details."
+  },
+  "share": "Share",
+  "@share": {
+    "description": "A label for the share button. Used to share something."
+  },
+  "forgetProposal": "Forget proposal",
+  "@forgetProposal": {
+    "description": "A label for the forget proposal button. Used to make hide action on document."
+  },
+  "export": "Export",
+  "@export": {
+    "description": "A label for the export button. Used to export something."
+  },
+  "unlockAndEdit": "Unlock & Edit",
+  "@unlockAndEdit": {
+    "description": "Used for making new draft proposal from final proposal."
+  },
+  "successProposalDeleted": "Proposal deleted successfully",
+  "@successProposalDeleted": {
+    "description": "Success message when draft is deleted"
+  },
+  "successProposalDeletedDescription": "Your local proposal has been deleted",
+  "@successProposalDeletedDescription": {
+    "description": "Description of success message when draft is deleted"
+  },
+  "errorProposalDeleted": "Error deleting proposal",
+  "@errorProposalDeleted": {
+    "description": "Error message when draft is not deleted"
+  },
+  "errorProposalDeletedDescription": "Something went wrong, please try again later",
+  "@errorProposalDeletedDescription": {
+    "description": "Description of error message when draft is not deleted"
+  },
   "apiErrorUnknown": "Unknown error response",
   "@apiErrorUnknown": {
     "description": "A fallback error message when api returns error code"
@@ -2068,6 +2104,54 @@
   "apiErrorServiceUnavailable": "Service Unavailable",
   "@apiErrorServiceUnavailable": {
     "description": "Message of an error when api returns matching status code."
+  },
+  "degradeFinalToDraftProposal": "You remove this proposal from review/voting stage.",
+  "@degradeFinalToDraftProposal": {
+    "description": "Information for user that his proposal is going back to draft. "
+  },
+  "resubmitAsFinalWarning": "You need to resubmit this proposal as final, to be eligible for funding, so make sure to Submit to review stage (Final) after editing.",
+  "@resubmitAsFinalWarning": {
+    "description": "Information for user that proposal needs to be resubmitted as final to be eligible for funding."
+  },
+  "removingProposalFromFinalStage": "You remove this proposal from review/voting stage.",
+  "@removingProposalFromFinalStage": {
+    "description": "Information for user that his proposal is going back to draft. "
+  },
+  "acknowledgeToResubmitProposal": "I acknowledge that I have to re-submit my draft proposal as Final to be eligible for funding.",
+  "@acknowledgeToResubmitProposal": {
+    "description": "Information for user that he needs to resubmit his proposal. "
+  },
+  "caution": "Caution:",
+  "@caution": {
+    "description": "Title of caution information"
+  },
+  "youAreSettingFinalToDraft": "You are setting your final proposal back to draft.",
+  "@youAreSettingFinalToDraft": {
+    "description": "Information for user that his proposal is going back to draft. "
+  },
+  "unlockEditProposalDialogTitle": "Unlock & Edit ?",
+  "@unlockEditProposalDialogTitle": {
+    "description": "Title of Unlock & Edit Dialog"
+  },
+  "forgetProposalDialogDescription": "You are about to remove this proposal from the app.",
+  "@forgetProposalDialogDescription": {
+    "description": "Description of Forget Proposal Dialog"
+  },
+  "forgetProposalCantEditWarning": "You will no longer be able to view, edit, or publish this proposal",
+  "@forgetProposalCantEditWarning": {
+    "description": "Warning for user that his proposal can't be edited"
+  },
+  "forgetProposalCantGetFundingWarning": "This proposal will not be eligible to win funding, even if it has been previously published.",
+  "@forgetProposalCantGetFundingWarning": {
+    "description": "Warning for user that his proposal can't get funding"
+  },
+  "forgetProposalInvisibleWarning": "Your proposal will not be visible to other users.",
+  "@forgetProposalInvisibleWarning": {
+    "description": "Warning for user that his proposal will be invisible"
+  },
+  "forgetProposalAgreement": "I acknowledge that this action cannot be undone.",
+  "@forgetProposalAgreement": {
+    "description": "Text for user that agrees to forget proposal"
   },
   "myOpportunities": "My Opportunities",
   "@myOpportunities": {
