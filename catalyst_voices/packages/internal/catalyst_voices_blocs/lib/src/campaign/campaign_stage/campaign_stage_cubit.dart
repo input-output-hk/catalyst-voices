@@ -36,4 +36,8 @@ class CampaignStageCubit extends Cubit<CampaignStageState> {
     }
     _logger.info(state.toString());
   }
+
+  void proposalSubmissionStarted() {
+    emit(const ProposalSubmissionStage());
+  }
 }

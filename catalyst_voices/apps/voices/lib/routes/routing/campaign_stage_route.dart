@@ -27,7 +27,9 @@ final class CampaignStageRoute extends GoRouteData
     final campaignState = context.read<CampaignStageCubit>().state;
 
     if (campaignState is PreProposalSubmissionStage) {
-      return const PreProposalSubmissionPage();
+      return PreProposalSubmissionPage(
+        startDate: campaignState.startDate,
+      );
     } else {
       return const AfterProposalSubmissionPage();
     }
