@@ -1,4 +1,5 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
+import 'package:catalyst_voices/widgets/buttons/voices_filled_button.dart';
 import 'package:catalyst_voices/widgets/text_field/voices_text_field.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
@@ -78,6 +79,9 @@ class _InsertNewImageDialogState extends State<InsertNewImageDialog> {
                 hintText: l10n.insertNewImageDialogTextPlaceholder,
                 borderRadius: const BorderRadius.all(Radius.circular(8)),
                 fillColor: colorScheme.surface,
+                errorText: hasText && !isValidImageUrl
+                    ? l10n.insertNewImageDialogInvalidUrl
+                    : null,
               ),
               keyboardType: TextInputType.text,
               onFieldSubmitted: (value) {},
@@ -137,8 +141,8 @@ class _InsertNewImageDialogState extends State<InsertNewImageDialog> {
                   child: Text(l10n.cancelButtonText),
                 ),
                 const SizedBox(width: 8),
-                ElevatedButton(
-                  onPressed: isValidImageUrl
+                VoicesFilledButton(
+                  onTap: hasText && isValidImageUrl
                       ? () => Navigator.pop(context, _textController.text)
                       : null,
                   child: Text(l10n.insertNewImageDialogInsert),
@@ -157,10 +161,32 @@ class _InsertNewImageDialogState extends State<InsertNewImageDialog> {
     super.dispose();
   }
 
+  @override
+  void initState() {
+    super.initState();
+    _textController.addListener(() {
+      validateUrl(_textController.text);
+    });
+  }
+
   void validateUrl(String url) {
     setState(() {
       hasText = url.trim().isNotEmpty;
-      isValidImageUrl = true;
+      if (!hasText) {
+        isValidImageUrl = true;
+        return;
+      }
+
+      // Check if URL is a valid image URL
+      final lowercaseUrl = url.toLowerCase();
+      isValidImageUrl = Uri.tryParse(url)?.hasAbsolutePath == true &&
+          (lowercaseUrl.endsWith('.jpg') ||
+              lowercaseUrl.endsWith('.jpeg') ||
+              lowercaseUrl.endsWith('.png') ||
+              lowercaseUrl.endsWith('.gif') ||
+              lowercaseUrl.endsWith('.webp') ||
+              lowercaseUrl.endsWith('.bmp') ||
+              lowercaseUrl.endsWith('.svg'));
     });
   }
 }
