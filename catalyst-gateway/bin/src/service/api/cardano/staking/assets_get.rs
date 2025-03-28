@@ -104,7 +104,6 @@ struct NativeTokens {
     /// Asset name.
     name: AssetName,
     /// Asset amount.
-    #[allow(dead_code)]
     amount: num_bigint::BigInt,
 }
 
