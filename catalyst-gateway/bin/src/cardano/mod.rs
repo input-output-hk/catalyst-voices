@@ -136,8 +136,8 @@ impl Display for SyncParams {
 const BACKOFF_RANGE_MULTIPLIER: u32 = 3;
 
 impl SyncParams {
-    /// Create a new `SyncParams` for the immutable chain sync task.
-    pub(crate) fn new(chain: Network, start: Point, end: Point) -> Self {
+    /// Create a new `SyncParams`.
+    fn new(chain: Network, start: Point, end: Point) -> Self {
         Self {
             chain,
             start,
@@ -182,7 +182,7 @@ impl SyncParams {
 
     /// Convert Params into the result of the sync.
     pub(crate) fn done(mut self, result: anyhow::Result<()>) -> Self {
-        if result.is_ok() && !self.is_live() {
+        if result.is_ok() && self.end != Point::TIP {
             // Update sync status in the Immutable DB.
             // Can fire and forget, because failure to update DB will simply cause the chunk to be
             // re-indexed, on recovery.
@@ -205,11 +205,6 @@ impl SyncParams {
             self.first_indexed_block = Some((block.point(), block.is_immutable()));
         }
         self.last_blocks_synced = self.last_blocks_synced.saturating_add(1);
-    }
-
-    /// Returns if the running sync task was defined as live chain sync task
-    pub(crate) fn is_live(&self) -> bool {
-        self.end == Point::TIP
     }
 
     /// Get where this sync run actually needs to start from.
@@ -257,7 +252,7 @@ fn sync_subchain(
         while let Some(chain_update) = follower.next().await {
             match chain_update.kind {
                 cardano_chain_follower::Kind::ImmutableBlockRollForward => {
-                    if params.is_live() {
+                    if params.end == Point::TIP {
                         // What we need to do here is tell the primary follower to start a new sync
                         // for the new immutable data, and then purge the volatile database of the
                         // old data (after the immutable data has synced).
@@ -281,42 +276,37 @@ fn sync_subchain(
                 },
 
                 cardano_chain_follower::Kind::Rollback => {
-                    if params.is_live() {
-                        // Rollback occurs, need to purge forward
-                        let rollback_slot = chain_update.block_data().slot();
+                    // Rollback occurs, need to purge forward
+                    let rollback_slot = chain_update.block_data().slot();
 
-                        let purge_condition = PurgeCondition::PurgeForwards(rollback_slot);
-                        if let Err(error) = roll_forward::purge_live_index(purge_condition).await {
-                            error!(chain=%params.chain, error=%error,
-                                "Chain follower rollback, purging volatile data task failed."
-                            );
-                        } else {
-                            // How many slots are purged
-                            #[allow(clippy::arithmetic_side_effects)]
-                            let purge_slots = params
-                                .last_indexed_block
-                                .as_ref()
-                                // Slots arithmetic has saturating semantic, so this is ok
-                                .map_or(0.into(), |(l, _)| l.slot_or_default() - rollback_slot);
+                    let purge_condition = PurgeCondition::PurgeForwards(rollback_slot);
+                    if let Err(error) = roll_forward::purge_live_index(purge_condition).await {
+                        error!(chain=%params.chain, error=%error,
+                            "Chain follower rollback, purging volatile data task failed."
+                        );
+                    } else {
+                        // How many slots are purged
+                        #[allow(clippy::arithmetic_side_effects)]
+                        let purge_slots = params
+                            .last_indexed_block
+                            .as_ref()
+                            // Slots arithmetic has saturating semantic, so this is ok
+                            .map_or(0.into(), |(l, _)| l.slot_or_default() - rollback_slot);
 
-                            let _ =
-                                event_sender.send(event::ChainIndexerEvent::ForwardDataPurged {
-                                    purge_slots: purge_slots.into(),
-                                });
+                        let _ = event_sender.send(event::ChainIndexerEvent::ForwardDataPurged {
+                            purge_slots: purge_slots.into(),
+                        });
 
-                            // Purge success, now index the current block
-                            let block = chain_update.block_data();
-                            if let Err(error) = index_block(block).await {
-                                let error_msg = format!(
-                                    "Failed to index block after rollback {}",
-                                    block.point()
-                                );
-                                error!(chain=%params.chain, error=%error, params=%params, error_msg);
-                                return params.done(Err(error.context(error_msg)));
-                            }
-
-                            params.update_block_state(block);
+                        // Purge success, now index the current block
+                        let block = chain_update.block_data();
+                        if let Err(error) = index_block(block).await {
+                            let error_msg =
+                                format!("Failed to index block after rollback {}", block.point());
+                            error!(chain=%params.chain, error=%error, params=%params, error_msg);
+                            return params.done(Err(error.context(error_msg)));
                         }
+
+                        params.update_block_state(block);
                     }
                 },
             }
@@ -432,7 +422,7 @@ impl SyncTask {
                     // or there is an error.  If this is not a roll forward, log an error.
                     // It can fail if the index DB goes down in some way.
                     // Restart it always.
-                    if finished.is_live() {
+                    if finished.end == Point::TIP {
                         if let Some(ref roll_forward_point) = finished.follower_roll_forward {
                             // Advance the known immutable tip, and try and start followers to reach
                             // it.
