@@ -74,6 +74,10 @@ class _AppState extends State<App> {
       BlocProvider<NewProposalCubit>(
         create: (_) => Dependencies.instance.get<NewProposalCubit>(),
       ),
+      BlocProvider<CampaignStageCubit>(
+        lazy: false,
+        create: (_) => Dependencies.instance.get<CampaignStageCubit>(),
+      ),
     ];
   }
 }
