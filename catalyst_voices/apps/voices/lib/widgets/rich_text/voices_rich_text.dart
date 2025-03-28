@@ -4,6 +4,7 @@ import 'dart:async';
 
 import 'package:catalyst_voices/common/codecs/markdown_codec.dart';
 import 'package:catalyst_voices/widgets/form/voices_form_field.dart';
+import 'package:catalyst_voices/widgets/rich_text/insert_new_image_dialog.dart';
 import 'package:catalyst_voices/widgets/rich_text/voices_rich_text_limit.dart';
 import 'package:catalyst_voices/widgets/rich_text/voices_rich_text_rules.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
@@ -470,6 +471,10 @@ class _ToolbarImageOptionButton extends StatelessWidget {
             onPressed: extraOptions.onPressed as VoidCallback?,
           );
         },
+        imageButtonConfig: quill_ext.QuillToolbarImageConfig(
+          insertImageUrlDialogBuilder: (context) =>
+              const InsertNewImageDialog(),
+        ),
       ),
     );
   }
