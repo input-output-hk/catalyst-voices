@@ -82,12 +82,8 @@ const INSERT_STAKE_REGISTRATION_QUERY: &str = include_str!("./cql/insert_stake_r
 impl StakeRegistrationInsertQuery {
     /// Create a new Insert Query.
     #[allow(clippy::too_many_arguments, clippy::fn_params_excessive_bools)]
-    pub fn new<
-        StakeAddressT: Into<DbStakeAddress>,
-        SlotT: Into<DbSlot>,
-        TxIndexT: Into<DbTxnIndex>,
-    >(
-        stake_address: StakeAddressT, slot_no: SlotT, txn_index: TxIndexT,
+    pub fn new(
+        stake_address: StakeAddress, slot_no: Slot, txn_index: TxnIndex,
         stake_public_key: VerifyingKey, script: bool, register: bool, deregister: bool,
         cip36: bool, pool_delegation: Option<Vec<u8>>,
     ) -> Self {
