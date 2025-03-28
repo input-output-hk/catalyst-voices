@@ -57,7 +57,10 @@ final class RegistrationData extends Equatable implements CborEncodable {
 
   /// Serializes the type as cbor.
   @override
-  CborValue toCbor() => CborMap(_buildCborMap());
+  CborValue toCbor({List<int> tags = const []}) => CborMap(
+        _buildCborMap(),
+        tags: tags,
+      );
 
   /// Builds a CborMap from the class properties.
   Map<CborSmallInt, CborValue> _buildCborMap() {
@@ -233,18 +236,22 @@ class RoleData extends Equatable implements CborEncodable {
 
   /// Serializes the type as cbor.
   @override
-  CborValue toCbor() {
-    return CborMap({
-      const CborSmallInt(0): CborSmallInt(roleNumber),
-      if (roleSigningKey != null)
-        const CborSmallInt(1): roleSigningKey!.toCbor(),
-      if (roleEncryptionKey != null)
-        const CborSmallInt(2): roleEncryptionKey!.toCbor(),
-      if (paymentKey != null) const CborSmallInt(3): CborSmallInt(paymentKey!),
-      if (roleSpecificData != null)
-        for (final entry in roleSpecificData!.entries)
-          CborSmallInt(entry.key): entry.value,
-    });
+  CborValue toCbor({List<int> tags = const []}) {
+    return CborMap(
+      {
+        const CborSmallInt(0): CborSmallInt(roleNumber),
+        if (roleSigningKey != null)
+          const CborSmallInt(1): roleSigningKey!.toCbor(),
+        if (roleEncryptionKey != null)
+          const CborSmallInt(2): roleEncryptionKey!.toCbor(),
+        if (paymentKey != null)
+          const CborSmallInt(3): CborSmallInt(paymentKey!),
+        if (roleSpecificData != null)
+          for (final entry in roleSpecificData!.entries)
+            CborSmallInt(entry.key): entry.value,
+      },
+      tags: tags,
+    );
   }
 
   @override
@@ -287,11 +294,14 @@ class LocalKeyReference extends Equatable implements CborEncodable {
 
   /// Serializes the type as cbor.
   @override
-  CborValue toCbor() {
-    return CborList([
-      CborSmallInt(keyType.tag),
-      CborSmallInt(offset),
-    ]);
+  CborValue toCbor({List<int> tags = const []}) {
+    return CborList(
+      [
+        CborSmallInt(keyType.tag),
+        CborSmallInt(offset),
+      ],
+      tags: tags,
+    );
   }
 
   @override

@@ -11,7 +11,7 @@ abstract interface class CborEncodable {
   const CborEncodable();
 
   /// Converts this instance to its CBOR representation.
-  CborValue toCbor();
+  CborValue toCbor({List<int> tags = const []});
 }
 
 /// Specifies on which network the code will run.
@@ -154,16 +154,19 @@ final class Balance extends Equatable implements CborEncodable {
 
   /// Serializes the type as cbor.
   @override
-  CborValue toCbor() {
+  CborValue toCbor({List<int> tags = const []}) {
     final multiAsset = this.multiAsset;
     if (multiAsset == null) {
       return coin.toCbor();
     }
 
-    return CborList([
-      coin.toCbor(),
-      multiAsset.toCbor(),
-    ]);
+    return CborList(
+      [
+        coin.toCbor(),
+        multiAsset.toCbor(),
+      ],
+      tags: tags,
+    );
   }
 
   /// Adds [other] value to this value and returns a new [Balance].
@@ -276,14 +279,17 @@ final class MultiAsset extends Equatable implements CborEncodable {
 
   /// Serializes the type as cbor.
   @override
-  CborValue toCbor() {
-    return CborMap({
-      for (final policy in bundle.entries)
-        policy.key.toCbor(): CborMap({
-          for (final asset in policy.value.entries)
-            asset.key.toCbor(): asset.value.toCbor(),
-        }),
-    });
+  CborValue toCbor({List<int> tags = const []}) {
+    return CborMap(
+      {
+        for (final policy in bundle.entries)
+          policy.key.toCbor(): CborMap({
+            for (final asset in policy.value.entries)
+              asset.key.toCbor(): asset.value.toCbor(),
+          }),
+      },
+      tags: tags,
+    );
   }
 
   /// Adds [other] value to this value and returns a new [MultiAsset].

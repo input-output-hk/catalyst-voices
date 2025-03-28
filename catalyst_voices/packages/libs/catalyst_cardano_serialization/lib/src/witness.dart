@@ -115,15 +115,18 @@ final class TransactionWitnessSet extends Equatable implements CborEncodable {
 
   /// Serializes the type as cbor.
   @override
-  CborValue toCbor() {
-    return CborMap({
-      ..._generateCborPair(WitnessType.vkeyWitness, vkeyWitnesses),
-      ..._generateCborPair(WitnessType.nativeScript, nativeScripts),
-      ..._generateCborPair(WitnessType.plutusV1Script, plutusV1Scripts),
-      ..._generateCborPair(WitnessType.redeemers, redeemers),
-      ..._generateCborPair(WitnessType.plutusV2Script, plutusV2Scripts),
-      ..._generateCborPair(WitnessType.plutusV3Script, plutusV3Scripts),
-    });
+  CborValue toCbor({List<int> tags = const []}) {
+    return CborMap(
+      {
+        ..._generateCborPair(WitnessType.vkeyWitness, vkeyWitnesses),
+        ..._generateCborPair(WitnessType.nativeScript, nativeScripts),
+        ..._generateCborPair(WitnessType.plutusV1Script, plutusV1Scripts),
+        ..._generateCborPair(WitnessType.redeemers, redeemers),
+        ..._generateCborPair(WitnessType.plutusV2Script, plutusV2Scripts),
+        ..._generateCborPair(WitnessType.plutusV3Script, plutusV3Scripts),
+      },
+      tags: tags,
+    );
   }
 
   Map<CborValue, CborValue> _generateCborPair(
@@ -192,11 +195,14 @@ final class VkeyWitness extends Equatable implements CborEncodable {
 
   /// Serializes the type as cbor.
   @override
-  CborValue toCbor() {
-    return CborList([
-      vkey.toCbor(),
-      signature.toCbor(),
-    ]);
+  CborValue toCbor({List<int> tags = const []}) {
+    return CborList(
+      [
+        vkey.toCbor(),
+        signature.toCbor(),
+      ],
+      tags: tags,
+    );
   }
 
   @override

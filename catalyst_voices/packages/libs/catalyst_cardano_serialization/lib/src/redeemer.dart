@@ -19,7 +19,7 @@ final class Redeemer extends Equatable implements CborEncodable {
 
   /// Converts the [Redeemer] to a CBOR-encoded value.
   @override
-  CborValue toCbor() => redeemer;
+  CborValue toCbor({List<int> tags = const []}) => redeemer;
 
   @override
   List<Object?> get props => [redeemer];
@@ -40,7 +40,7 @@ class ScriptData extends Equatable implements CborEncodable {
 
   /// Converts the [ScriptData] to a CBOR-encoded value.
   @override
-  CborValue toCbor() => data;
+  CborValue toCbor({List<int> tags = const []}) => data;
 
   @override
   List<Object?> get props => [data];
