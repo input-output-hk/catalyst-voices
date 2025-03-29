@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["apply_registrations","indexed_registrations","registration"],"struct":["ChainInfo"]};
