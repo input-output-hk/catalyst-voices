@@ -92,7 +92,7 @@ class _ListOfProposals extends StatelessWidget {
         children: items
             .map(
               (e) => WorkspaceProposalCard(
-                key: Key(e.selfRef.id),
+                key: ValueKey(e.selfRef),
                 proposal: e,
               ),
             )
