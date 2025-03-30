@@ -9,7 +9,7 @@ use rayon::iter::{IntoParallelIterator, ParallelIterator};
 use tracing::error;
 
 use super::{
-    cardano::{cip19_shelley_address::Cip19ShelleyAddress, nonce::Nonce},
+    cardano::{cip19_address::Cip19ShelleyAddress, nonce::Nonce},
     common::types::generic::error_msg::ErrorMessage,
     response::{
         AllRegistration, Cip36Details, Cip36Registration, Cip36RegistrationList,

@@ -9,7 +9,10 @@ use super::Ed25519HexEncodedPublicKey;
 use crate::service::common::{
     self,
     tags::ApiTags,
-    types::cardano::{self},
+    types::{
+        cardano::{self},
+        generic::boolean::BooleanFlag,
+    },
 };
 
 pub(crate) mod endpoint;
@@ -43,11 +46,15 @@ impl Api {
         method = "get",
         operation_id = "cardanoRegistrationCip36"
     )]
+    #[allow(clippy::too_many_arguments)]
     async fn get_registration(
         &self, lookup: Query<Option<cardano::query::stake_or_voter::StakeOrVoter>>,
         asat: Query<Option<cardano::query::AsAt>>,
         page: Query<Option<common::types::generic::query::pagination::Page>>,
         limit: Query<Option<common::types::generic::query::pagination::Limit>>,
+        /// Flag for returning invalid registrations, if not provided or set to false,
+        /// returns only valid registrations
+        Query(invalid): Query<Option<BooleanFlag>>,
         /// Headers, used if the query is requesting ALL to determine if the secret API
         /// Key is also defined.
         headers: &HeaderMap,
@@ -72,7 +79,7 @@ impl Api {
             SlotNo::into_option(asat.0),
             page.0.unwrap_or_default(),
             limit.0.unwrap_or_default(),
-            headers,
+            invalid.is_some_and(Into::into),
         )
         .await
     }

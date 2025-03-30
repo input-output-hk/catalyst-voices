@@ -1,6 +1,5 @@
 //! Implementation of the GET `/cardano/cip36` endpoint
 
-use poem::http::HeaderMap;
 use tracing::error;
 
 use self::cardano::query::stake_or_voter::StakeAddressOrPublicKey;
@@ -21,7 +20,7 @@ use crate::{
 pub(crate) async fn cip36_registrations(
     lookup: Option<cardano::query::stake_or_voter::StakeOrVoter>, asat: Option<SlotNo>,
     _page: common::types::generic::query::pagination::Page,
-    _limit: common::types::generic::query::pagination::Limit, _headers: &HeaderMap,
+    _limit: common::types::generic::query::pagination::Limit, _invalid: bool,
 ) -> AllRegistration {
     let Some(session) = CassandraSession::get(true) else {
         error!("Failed to acquire db session");
