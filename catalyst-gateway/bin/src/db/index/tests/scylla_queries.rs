@@ -194,7 +194,7 @@ async fn test_get_stake_addr_w_vote_key() {
     };
 
     let mut row_stream =
-        GetStakeAddrFromVoteKeyQuery::execute(&session, GetStakeAddrFromVoteKeyParams {
+        GetStakePublicKeyFromVoteKeyQuery::execute(&session, GetStakePublicKeyFromVoteKeyParams {
             vote_key: vec![],
         })
         .await

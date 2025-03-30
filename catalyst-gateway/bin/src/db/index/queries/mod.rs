@@ -15,8 +15,8 @@ use crossbeam_skiplist::SkipMap;
 use registrations::{
     get_all_invalids::GetAllInvalidRegistrationsQuery,
     get_all_registrations::GetAllRegistrationsQuery, get_from_stake_addr::GetRegistrationQuery,
-    get_from_stake_address::GetStakeAddrQuery, get_from_vote_key::GetStakeAddrFromVoteKeyQuery,
-    get_invalid::GetInvalidRegistrationQuery,
+    get_from_stake_address::GetStakeAddrQuery,
+    get_from_vote_key::GetStakePublicKeyFromVoteKeyQuery, get_invalid::GetInvalidRegistrationQuery,
 };
 use scylla::{
     batch::Batch, prepared_statement::PreparedStatement, serialize::row::SerializeRow,
@@ -203,7 +203,8 @@ impl PreparedQueries {
         let registration_from_stake_addr_query =
             GetRegistrationQuery::prepare(session.clone()).await;
         let stake_addr_from_stake_address = GetStakeAddrQuery::prepare(session.clone()).await;
-        let stake_addr_from_vote_key = GetStakeAddrFromVoteKeyQuery::prepare(session.clone()).await;
+        let stake_addr_from_vote_key =
+            GetStakePublicKeyFromVoteKeyQuery::prepare(session.clone()).await;
         let invalid_registrations = GetInvalidRegistrationQuery::prepare(session.clone()).await;
         let get_all_registrations_query = GetAllRegistrationsQuery::prepare(session.clone()).await;
         let get_all_invalid_registrations_query =
