@@ -485,7 +485,7 @@ final class ProposalBuilderBloc
               id: const NodeId('comments.view'),
               sort: commentsState.commentsSort,
               comments: commentsState.commentsSort.applyTo(comments),
-              canReply: true,
+              canReply: canReply,
             ),
             if (canReply && commentSchema != null)
               ProposalAddCommentSection(
