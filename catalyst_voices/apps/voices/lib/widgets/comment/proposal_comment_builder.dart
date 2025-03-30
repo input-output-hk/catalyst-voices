@@ -152,10 +152,7 @@ class _ProposalCommentBuilderState extends State<ProposalCommentBuilder> {
     }
 
     unawaited(
-      widget.onSubmit(
-        document: _comment,
-        reply: widget.parent,
-      ),
+      widget.onSubmit(document: _comment, reply: widget.parent),
     );
 
     setState(() {

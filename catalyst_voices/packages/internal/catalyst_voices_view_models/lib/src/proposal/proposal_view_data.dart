@@ -11,7 +11,6 @@ final class ProposalViewData extends Equatable {
     this.isCurrentVersionLatest,
     this.header = const ProposalViewHeader(),
     this.segments = const [],
-
   });
 
   @override

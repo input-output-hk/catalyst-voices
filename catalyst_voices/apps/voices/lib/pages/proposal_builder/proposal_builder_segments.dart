@@ -1,8 +1,8 @@
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
-import 'package:catalyst_voices/pages/proposal/tiles/proposal_tile_decoration.dart';
 import 'package:catalyst_voices/pages/proposal_builder/tiles/proposal_builder_comment_tile.dart';
 import 'package:catalyst_voices/widgets/comment/proposal_add_comment_tile.dart';
 import 'package:catalyst_voices/widgets/comment/proposal_comments_header_tile.dart';
+import 'package:catalyst_voices/widgets/tiles/specialized/proposal_tile_decoration.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
@@ -38,6 +38,51 @@ class ProposalBuilderSegmentsSelector extends StatelessWidget {
           child: _ProposalBuilderSegments(
             itemScrollController: itemScrollController,
           ),
+        );
+      },
+    );
+  }
+}
+
+class _DocumentSection extends StatelessWidget {
+  final DocumentProperty property;
+  final bool isSelected;
+
+  const _DocumentSection({
+    required this.property,
+    required this.isSelected,
+  });
+
+  bool get _isEditable {
+    for (final overriddenNodeId in _widgetOverrides.keys) {
+      final sectionHasOverrides = overriddenNodeId.isChildOf(property.nodeId);
+      if (sectionHasOverrides) {
+        // disable editing for overridden widgets
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocSelector<ProposalBuilderBloc, ProposalBuilderState, bool>(
+      selector: (state) => state.showValidationErrors,
+      builder: (context, showValidationErrors) {
+        return DocumentBuilderSectionTile(
+          key: key,
+          section: property,
+          isSelected: isSelected,
+          isEditable: _isEditable,
+          autovalidateMode: showValidationErrors
+              ? AutovalidateMode.always
+              : AutovalidateMode.disabled,
+          onChanged: (value) {
+            final event = SectionChangedEvent(changes: value);
+            context.read<ProposalBuilderBloc>().add(event);
+          },
+          overrides: _widgetOverrides,
         );
       },
     );
@@ -93,8 +138,7 @@ class _ProposalBuilderSegments extends StatelessWidget {
               return const ProposalSeparatorBox(height: 24);
             }
 
-            if ((item is ProposalViewCommentsSection ||
-                    item is ProposalCommentListItem) &&
+            if (item is ProposalViewCommentsSection &&
                 nextItem is ProposalAddCommentSection) {
               return const ProposalDivider(height: 48);
             }
@@ -183,7 +227,7 @@ class _ProposalBuilderSegments extends StatelessWidget {
           id: item.id,
           name: item.resolveTitle(context),
         ),
-      DocumentSection() => _Section(
+      DocumentSection() => _DocumentSection(
           property: item.property,
           isSelected: item.property.nodeId == selectedNodeId,
         ),
@@ -194,50 +238,5 @@ class _ProposalBuilderSegments extends StatelessWidget {
           nextItem: nextItem,
         ),
     };
-  }
-}
-
-class _Section extends StatelessWidget {
-  final DocumentProperty property;
-  final bool isSelected;
-
-  const _Section({
-    required this.property,
-    required this.isSelected,
-  });
-
-  bool get _isEditable {
-    for (final overriddenNodeId in _widgetOverrides.keys) {
-      final sectionHasOverrides = overriddenNodeId.isChildOf(property.nodeId);
-      if (sectionHasOverrides) {
-        // disable editing for overridden widgets
-        return false;
-      }
-    }
-
-    return true;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocSelector<ProposalBuilderBloc, ProposalBuilderState, bool>(
-      selector: (state) => state.showValidationErrors,
-      builder: (context, showValidationErrors) {
-        return DocumentBuilderSectionTile(
-          key: key,
-          section: property,
-          isSelected: isSelected,
-          isEditable: _isEditable,
-          autovalidateMode: showValidationErrors
-              ? AutovalidateMode.always
-              : AutovalidateMode.disabled,
-          onChanged: (value) {
-            final event = SectionChangedEvent(changes: value);
-            context.read<ProposalBuilderBloc>().add(event);
-          },
-          overrides: _widgetOverrides,
-        );
-      },
-    );
   }
 }

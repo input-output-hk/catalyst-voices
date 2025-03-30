@@ -5,9 +5,9 @@ import 'package:catalyst_voices/pages/proposal/tiles/proposal_document_section_t
 import 'package:catalyst_voices/pages/proposal/tiles/proposal_document_segment_title.dart';
 import 'package:catalyst_voices/pages/proposal/tiles/proposal_metadata_tile.dart';
 import 'package:catalyst_voices/pages/proposal/tiles/proposal_overview_tile.dart';
-import 'package:catalyst_voices/pages/proposal/tiles/proposal_tile_decoration.dart';
 import 'package:catalyst_voices/widgets/comment/proposal_add_comment_tile.dart';
 import 'package:catalyst_voices/widgets/comment/proposal_comments_header_tile.dart';
+import 'package:catalyst_voices/widgets/tiles/specialized/proposal_tile_decoration.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
