@@ -36,8 +36,8 @@ enum CommentsSort {
 
   String localizedName(BuildContext context) {
     return switch (this) {
-      CommentsSort.newest => context.l10n.proposalCommentsSortNewest,
-      CommentsSort.oldest => context.l10n.proposalCommentsSortOldest,
+      CommentsSort.newest => context.l10n.commentsSortNewest,
+      CommentsSort.oldest => context.l10n.commentsSortOldest,
     };
   }
 }

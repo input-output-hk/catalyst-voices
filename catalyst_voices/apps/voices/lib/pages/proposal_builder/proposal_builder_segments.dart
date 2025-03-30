@@ -1,10 +1,10 @@
 import 'dart:math';
 
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
-import 'package:catalyst_voices/pages/proposal/tiles/proposal_add_comment_tile.dart';
-import 'package:catalyst_voices/pages/proposal/tiles/proposal_comment_tile.dart';
-import 'package:catalyst_voices/pages/proposal/tiles/proposal_comments_header_tile.dart';
 import 'package:catalyst_voices/pages/proposal/tiles/proposal_tile_decoration.dart';
+import 'package:catalyst_voices/pages/proposal_builder/tiles/proposal_builder_comment_tile.dart';
+import 'package:catalyst_voices/widgets/comment/proposal_add_comment_tile.dart';
+import 'package:catalyst_voices/widgets/comment/proposal_comments_header_tile.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
@@ -139,7 +139,7 @@ class _ProposalBuilderSegments extends StatelessWidget {
           onChanged: (value) {
             context
                 .read<ProposalBuilderBloc>()
-                .add(UpdateCommentsSortEvent(sort: sort));
+                .add(UpdateCommentsSortEvent(sort: value));
           },
         ),
       DocumentSection() => _Section(
@@ -165,27 +165,10 @@ class _ProposalBuilderSegments extends StatelessWidget {
         :final comment,
         :final canReply,
       ) =>
-        ProposalCommentTile(
+        ProposalBuilderCommentTile(
           key: ValueKey(comment.comment.metadata.selfRef),
           comment: comment,
           canReply: canReply,
-          onSubmit: ({required document, reply}) async {
-            final event = SubmitCommentEvent(
-              document: document,
-              reply: reply,
-            );
-            context.read<ProposalBuilderBloc>().add(event);
-          },
-          onCancel: () {
-            context
-                .read<ProposalBuilderBloc>()
-                .add(UpdateCommentBuilderEvent(ref: comment.ref, show: false));
-          },
-          onToggleReply: (show) {
-            context
-                .read<ProposalBuilderBloc>()
-                .add(UpdateCommentBuilderEvent(ref: comment.ref, show: show));
-          },
         ),
       _ => throw ArgumentError('Not supported type ${item.runtimeType}'),
     };

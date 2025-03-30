@@ -130,6 +130,19 @@ final class UpdateCommentBuilderEvent extends ProposalBuilderEvent {
   List<Object?> get props => [ref, show];
 }
 
+final class UpdateCommentRepliesEvent extends ProposalBuilderEvent {
+  final SignedDocumentRef ref;
+  final bool show;
+
+  const UpdateCommentRepliesEvent({
+    required this.ref,
+    required this.show,
+  });
+
+  @override
+  List<Object?> get props => [ref, show];
+}
+
 final class UpdateCommentsSortEvent extends ProposalBuilderEvent {
   final CommentsSort sort;
 

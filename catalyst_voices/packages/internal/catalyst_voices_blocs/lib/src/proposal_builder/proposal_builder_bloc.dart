@@ -59,6 +59,7 @@ final class ProposalBuilderBloc
     on<ValidateProposalEvent>(_validateProposal);
     on<UpdateCommentsSortEvent>(_updateCommentsSort);
     on<UpdateCommentBuilderEvent>(_updateCommentBuilder);
+    on<UpdateCommentRepliesEvent>(_updateCommentReplies);
     on<SubmitCommentEvent>(_submitComment);
 
     _cache = _cache.copyWith(
@@ -730,6 +731,16 @@ final class ProposalBuilderBloc
   ) async {
     final updatedComments =
         state.comments.updateCommentBuilder(ref: event.ref, show: event.show);
+
+    emit(state.copyWith(comments: updatedComments));
+  }
+
+  Future<void> _updateCommentReplies(
+    UpdateCommentRepliesEvent event,
+    Emitter<ProposalBuilderState> emit,
+  ) async {
+    final updatedComments =
+        state.comments.updateCommentReplies(ref: event.ref, show: event.show);
 
     emit(state.copyWith(comments: updatedComments));
   }

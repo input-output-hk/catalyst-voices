@@ -2037,12 +2037,12 @@
   "@submitCommit": {
     "description": "Send comment"
   },
-  "proposalCommentsSortNewest": "Newest First",
-  "@proposalCommentsSortNewest": {
+  "commentsSortNewest": "Newest First",
+  "@commentsSortNewest": {
     "description": "One of options for sorting comments under proposal"
   },
-  "proposalCommentsSortOldest": "Newest Oldest",
-  "@proposalCommentsSortOldest": {
+  "commentsSortOldest": "Oldest First",
+  "@commentsSortOldest": {
     "description": "One of options for sorting comments under proposal"
   },
   "shortSummary": "Short summary",

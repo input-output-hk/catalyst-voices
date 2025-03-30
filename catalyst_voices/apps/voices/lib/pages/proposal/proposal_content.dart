@@ -1,13 +1,13 @@
 import 'dart:math';
 
-import 'package:catalyst_voices/pages/proposal/tiles/proposal_add_comment_tile.dart';
 import 'package:catalyst_voices/pages/proposal/tiles/proposal_comment_tile.dart';
-import 'package:catalyst_voices/pages/proposal/tiles/proposal_comments_header_tile.dart';
 import 'package:catalyst_voices/pages/proposal/tiles/proposal_document_section_tile.dart';
 import 'package:catalyst_voices/pages/proposal/tiles/proposal_document_segment_title.dart';
 import 'package:catalyst_voices/pages/proposal/tiles/proposal_metadata_tile.dart';
 import 'package:catalyst_voices/pages/proposal/tiles/proposal_overview_tile.dart';
 import 'package:catalyst_voices/pages/proposal/tiles/proposal_tile_decoration.dart';
+import 'package:catalyst_voices/widgets/comment/proposal_add_comment_tile.dart';
+import 'package:catalyst_voices/widgets/comment/proposal_comments_header_tile.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
@@ -192,8 +192,9 @@ class _SegmentsListView extends StatelessWidget {
           AddCommentSection(:final schema) => ProposalAddCommentTile(
               schema: schema,
               onSubmit: ({required document, reply}) async {
-                final cubit = context.read<ProposalCubit>();
-                return cubit.submitComment(document: document, reply: reply);
+                return context
+                    .read<ProposalCubit>()
+                    .submitComment(document: document, reply: reply);
               },
             ),
         },
@@ -205,20 +206,6 @@ class _SegmentsListView extends StatelessWidget {
           key: ValueKey(comment.comment.metadata.selfRef),
           comment: comment,
           canReply: canReply,
-          onSubmit: ({required document, reply}) async {
-            final cubit = context.read<ProposalCubit>();
-            return cubit.submitComment(document: document, reply: reply);
-          },
-          onCancel: () {
-            context
-                .read<ProposalCubit>()
-                .updateCommentBuilder(ref: comment.ref, show: false);
-          },
-          onToggleReply: (show) {
-            context
-                .read<ProposalCubit>()
-                .updateCommentBuilder(ref: comment.ref, show: show);
-          },
         ),
       _ => throw ArgumentError('Not supported type ${item.runtimeType}'),
     };
