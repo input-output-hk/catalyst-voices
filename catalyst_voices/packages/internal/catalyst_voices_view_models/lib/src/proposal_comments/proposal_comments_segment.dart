@@ -108,11 +108,13 @@ final class ProposalCommentsSegment
 
 final class ProposalViewCommentsSection extends ProposalCommentsSection
     implements SegmentGroupedListViewItems {
+  final ProposalCommentsSort sort;
   final List<CommentWithReplies> comments;
   final bool canReply;
 
   const ProposalViewCommentsSection({
     required super.id,
+    required this.sort,
     required this.comments,
     required this.canReply,
   });
@@ -129,15 +131,17 @@ final class ProposalViewCommentsSection extends ProposalCommentsSection
   }
 
   @override
-  List<Object?> get props => super.props + [comments, canReply];
+  List<Object?> get props => super.props + [sort, comments, canReply];
 
   ProposalViewCommentsSection copyWith({
     NodeId? id,
+    ProposalCommentsSort? sort,
     List<CommentWithReplies>? comments,
     bool? canReply,
   }) {
     return ProposalViewCommentsSection(
       id: id ?? this.id,
+      sort: sort ?? this.sort,
       comments: comments ?? this.comments,
       canReply: canReply ?? this.canReply,
     );

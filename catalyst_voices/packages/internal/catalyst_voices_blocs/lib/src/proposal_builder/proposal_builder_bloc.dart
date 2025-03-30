@@ -483,6 +483,7 @@ final class ProposalBuilderBloc
           sections: [
             ProposalViewCommentsSection(
               id: const NodeId('comments.view'),
+              sort: commentsState.commentsSort,
               comments: commentsState.commentsSort.applyTo(comments),
               canReply: true,
             ),
@@ -749,16 +750,9 @@ final class ProposalBuilderBloc
     UpdateCommentsSortEvent event,
     Emitter<ProposalBuilderState> emit,
   ) async {
-    final sort = event.sort;
-    final updatedSegments = state.commentSegments.sortWith(sort: sort).toList();
-    final updatedComments = state.comments.copyWith(commentsSort: sort);
-
-    final updatedState = state.copyWith(
-      commentSegments: updatedSegments,
-      comments: updatedComments,
-    );
-
-    emit(updatedState);
+    final updatedComments = state.comments.copyWith(commentsSort: event.sort);
+    emit(state.copyWith(comments: updatedComments));
+    emit(_rebuildState());
   }
 
   void _updateMetadata(

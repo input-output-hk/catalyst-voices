@@ -324,6 +324,7 @@ final class ProposalCubit extends Cubit<ProposalState>
       sections: [
         ProposalViewCommentsSection(
           id: const NodeId('comments.view'),
+          sort: commentsSort,
           comments: commentsSort.applyTo(comments),
           canReply: canReply,
         ),

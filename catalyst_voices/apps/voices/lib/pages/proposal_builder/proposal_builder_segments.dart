@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices/pages/proposal/tiles/proposal_tile_decoration.dart';
 import 'package:catalyst_voices/pages/proposal_builder/tiles/proposal_builder_comment_tile.dart';
@@ -67,53 +65,42 @@ class _ProposalBuilderSegments extends StatelessWidget {
           padding: const EdgeInsets.only(top: 16, bottom: 64),
           itemBuilder: (context, index) {
             final item = items[index];
+            final previousItem =
+                index == 0 ? null : items.elementAtOrNull(index - 1);
             final nextItem = items.elementAtOrNull(index + 1);
 
-            final isFirst = index == 0;
-            final isLast = index == max(items.length - 1, 0);
-
-            final isSegment = item is Segment;
-            final isNextComment = nextItem is ProposalCommentListItem;
-            final isNextSectionOrComment = nextItem is Section || isNextComment;
-            final isCommentsSegment = item is ProposalCommentsSegment;
-            final isNotEmptyCommentsSegment =
-                isCommentsSegment && item.hasComments;
-
-            return ProposalTileDecoration(
-              key: ValueKey('Proposal.${item.id.value}.Tile'),
-              corners: (
-                isFirst: isFirst || isCommentsSegment,
-                isLast: isLast || nextItem is ProposalCommentsSegment,
-              ),
-              verticalPadding: (
-                isFirst: isSegment,
-                isLast: !isNextSectionOrComment || isNotEmptyCommentsSegment,
-              ),
-              child: _buildItem(context, item, selectedNodeId),
+            return _buildItem(
+              context: context,
+              item: item,
+              previousItem: previousItem,
+              nextItem: nextItem,
+              selectedNodeId: selectedNodeId,
             );
           },
           separatorBuilder: (context, index) {
             final item = items[index];
             final nextItem = items.elementAtOrNull(index + 1);
 
-            if (item is DocumentSegment && nextItem is DocumentSection) {
-              return const ProposalSeparatorBox(height: 24);
-            }
-
-            if (item is DocumentSection && nextItem is DocumentSection) {
-              return const ProposalSeparatorBox(height: 24);
-            }
-
-            if (nextItem is ProposalAddCommentSection) {
-              return const ProposalDivider(height: 48);
-            }
-
             if (nextItem is ProposalCommentsSegment) {
               return const SizedBox(height: 32);
             }
 
-            if (nextItem is Segment) {
-              return const VoicesDivider.expanded(height: 1);
+            if (item is ProposalCommentsSegment && nextItem != null) {
+              return const SizedBox(height: 32);
+            }
+
+            if (item is ProposalViewCommentsSection && nextItem != null) {
+              return const ProposalSeparatorBox(height: 24);
+            }
+
+            if ((item is ProposalViewCommentsSection ||
+                    item is ProposalCommentListItem) &&
+                nextItem is ProposalAddCommentSection) {
+              return const ProposalDivider(height: 48);
+            }
+
+            if (item is DocumentSegment || item is DocumentSection) {
+              return const SizedBox(height: 12);
             }
 
             return const SizedBox.shrink();
@@ -123,54 +110,89 @@ class _ProposalBuilderSegments extends StatelessWidget {
     );
   }
 
-  Widget _buildItem(
-    BuildContext context,
-    SegmentsListViewItem item,
-    NodeId? selectedNodeId,
-  ) {
+  Widget _buildCommentSection({
+    required BuildContext context,
+    required SegmentsListViewItem item,
+  }) {
     return switch (item) {
-      DocumentSegment() => SegmentHeaderTile(
-          id: item.id,
-          name: item.resolveTitle(context),
-        ),
-      ProposalCommentsSegment(:final sort) => ProposalCommentsHeaderTile(
+      ProposalViewCommentsSection(:final sort) => ProposalCommentsHeaderTile(
           sort: sort,
-          showSort: item.hasComments,
+          showSort: item.comments.isNotEmpty,
           onChanged: (value) {
             context
                 .read<ProposalBuilderBloc>()
                 .add(UpdateCommentsSortEvent(sort: value));
           },
         ),
-      DocumentSection() => _Section(
-          property: item.property,
-          isSelected: item.property.nodeId == selectedNodeId,
-        ),
-      ProposalCommentsSection() => switch (item) {
-          ProposalViewCommentsSection() => throw ArgumentError(
-              'View comments not supported',
-            ),
-          ProposalAddCommentSection(:final schema) => ProposalAddCommentTile(
-              schema: schema,
-              onSubmit: ({required document, reply}) async {
-                final event = SubmitCommentEvent(
-                  document: document,
-                  reply: reply,
-                );
-                context.read<ProposalBuilderBloc>().add(event);
-              },
-            ),
-        },
-      ProposalCommentListItem(
-        :final comment,
-        :final canReply,
-      ) =>
+      ProposalCommentListItem(:final comment, :final canReply) =>
         ProposalBuilderCommentTile(
           key: ValueKey(comment.comment.metadata.selfRef),
           comment: comment,
           canReply: canReply,
         ),
+      ProposalAddCommentSection(:final schema) => ProposalAddCommentTile(
+          schema: schema,
+          onSubmit: ({required document, reply}) async {
+            final event = SubmitCommentEvent(
+              document: document,
+              reply: reply,
+            );
+            context.read<ProposalBuilderBloc>().add(event);
+          },
+        ),
       _ => throw ArgumentError('Not supported type ${item.runtimeType}'),
+    };
+  }
+
+  Widget _buildDecoratedCommentSection({
+    required BuildContext context,
+    required SegmentsListViewItem item,
+    required SegmentsListViewItem? previousItem,
+    required SegmentsListViewItem? nextItem,
+  }) {
+    final isFirst = previousItem is ProposalCommentsSegment;
+    final isLast = nextItem == null;
+
+    return ProposalTileDecoration(
+      key: ValueKey('Proposal.${item.id.value}.Tile'),
+      corners: (
+        isFirst: isFirst,
+        isLast: isLast,
+      ),
+      verticalPadding: (
+        isFirst: isFirst,
+        isLast: isLast,
+      ),
+      child: _buildCommentSection(context: context, item: item),
+    );
+  }
+
+  Widget _buildItem({
+    required BuildContext context,
+    required SegmentsListViewItem item,
+    required SegmentsListViewItem? previousItem,
+    required SegmentsListViewItem? nextItem,
+    required NodeId? selectedNodeId,
+  }) {
+    return switch (item) {
+      DocumentSegment() => SegmentHeaderTile(
+          id: item.id,
+          name: item.resolveTitle(context),
+        ),
+      ProposalCommentsSegment() => SegmentHeaderTile(
+          id: item.id,
+          name: item.resolveTitle(context),
+        ),
+      DocumentSection() => _Section(
+          property: item.property,
+          isSelected: item.property.nodeId == selectedNodeId,
+        ),
+      _ => _buildDecoratedCommentSection(
+          context: context,
+          item: item,
+          previousItem: previousItem,
+          nextItem: nextItem,
+        ),
     };
   }
 }

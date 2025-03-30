@@ -186,9 +186,7 @@ class _SegmentsListView extends StatelessWidget {
           },
         ),
       ProposalCommentsSection() => switch (item) {
-          ProposalViewCommentsSection() => throw ArgumentError(
-              'View comments not supported',
-            ),
+          ProposalViewCommentsSection() => const SizedBox.shrink(),
           ProposalAddCommentSection(:final schema) => ProposalAddCommentTile(
               schema: schema,
               onSubmit: ({required document, reply}) async {
