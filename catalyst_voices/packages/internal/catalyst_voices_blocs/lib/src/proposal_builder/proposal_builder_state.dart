@@ -1,3 +1,4 @@
+import 'package:catalyst_voices_blocs/src/comments/comments_state.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:collection/collection.dart';
@@ -73,8 +74,8 @@ final class ProposalBuilderState extends Equatable {
   final Document? document;
   final ProposalBuilderMetadata metadata;
   final List<DocumentSegment> documentSegments;
-  final Segment? commentsSegment;
-  final ProposalCommentsSort commentsSort;
+  final List<Segment> commentSegments;
+  final CommentsState comments;
   final ProposalGuidance guidance;
   final CampaignCategoryDetailsViewModel? category;
   final NodeId? activeNodeId;
@@ -87,8 +88,8 @@ final class ProposalBuilderState extends Equatable {
     this.document,
     this.metadata = const ProposalBuilderMetadata(),
     this.documentSegments = const [],
-    this.commentsSegment,
-    this.commentsSort = ProposalCommentsSort.newest,
+    this.commentSegments = const [],
+    this.comments = const CommentsState(),
     this.guidance = const ProposalGuidance(),
     this.category,
     this.activeNodeId,
@@ -97,7 +98,7 @@ final class ProposalBuilderState extends Equatable {
 
   List<Segment> get allSegments => [
         ...documentSegments,
-        if (commentsSegment case final value?) value,
+        ...commentSegments,
       ];
 
   String? get proposalTitle {
@@ -115,8 +116,8 @@ final class ProposalBuilderState extends Equatable {
         document,
         metadata,
         documentSegments,
-        commentsSegment,
-        commentsSort,
+        commentSegments,
+        comments,
         guidance,
         category,
         activeNodeId,
@@ -135,7 +136,8 @@ final class ProposalBuilderState extends Equatable {
     Optional<Document>? document,
     ProposalBuilderMetadata? metadata,
     List<DocumentSegment>? documentSegments,
-    Optional<Segment>? commentsSegment,
+    List<Segment>? commentSegments,
+    CommentsState? comments,
     ProposalGuidance? guidance,
     Optional<CampaignCategoryDetailsViewModel>? category,
     Optional<NodeId>? activeNodeId,
@@ -148,7 +150,8 @@ final class ProposalBuilderState extends Equatable {
       document: document.dataOr(this.document),
       metadata: metadata ?? this.metadata,
       documentSegments: documentSegments ?? this.documentSegments,
-      commentsSegment: commentsSegment.dataOr(this.commentsSegment),
+      commentSegments: commentSegments ?? this.commentSegments,
+      comments: comments ?? this.comments,
       guidance: guidance ?? this.guidance,
       category: category.dataOr(this.category),
       activeNodeId: activeNodeId.dataOr(this.activeNodeId),

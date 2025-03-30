@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:catalyst_voices_blocs/src/comments/comments_state.dart';
 import 'package:catalyst_voices_blocs/src/common/bloc_error_emitter_mixin.dart';
 import 'package:catalyst_voices_blocs/src/common/bloc_event_transformers.dart';
 import 'package:catalyst_voices_blocs/src/common/bloc_signal_emitter_mixin.dart';
@@ -25,16 +26,19 @@ final class ProposalBuilderBloc
   final ProposalService _proposalService;
   final CampaignService _campaignService;
   final CommentService _commentService;
+  final UserService _userService;
   final DownloaderService _downloaderService;
   final DocumentMapper _documentMapper;
 
   ProposalBuilderBlocCache _cache = const ProposalBuilderBlocCache();
+  StreamSubscription<CatalystId?>? _activeAccountIdSub;
   StreamSubscription<List<CommentWithReplies>>? _commentsSub;
 
   ProposalBuilderBloc(
     this._proposalService,
     this._campaignService,
     this._commentService,
+    this._userService,
     this._downloaderService,
     this._documentMapper,
   ) : super(const ProposalBuilderState()) {
@@ -50,12 +54,30 @@ final class ProposalBuilderBloc
     on<ExportProposalEvent>(_exportProposal);
     on<PublishProposalEvent>(_publishProposal);
     on<RebuildCommentsProposalEvent>(_rebuildComments);
+    on<RebuildActiveAccountProposalEvent>(_rebuildActiveAccount);
     on<SubmitProposalEvent>(_submitProposal);
     on<ValidateProposalEvent>(_validateProposal);
+    on<UpdateCommentsSortEvent>(_updateCommentsSort);
+    on<UpdateCommentBuilderEvent>(_updateCommentBuilder);
+    on<SubmitCommentEvent>(_submitComment);
+
+    _cache = _cache.copyWith(
+      activeAccountId: Optional(_userService.user.activeAccount?.catalystId),
+    );
+
+    _activeAccountIdSub = _userService.watchUser
+        .map((event) => event.activeAccount?.catalystId)
+        .distinct()
+        .listen(
+          (value) => add(RebuildActiveAccountProposalEvent(catalystId: value)),
+        );
   }
 
   @override
   Future<void> close() async {
+    await _activeAccountIdSub?.cancel();
+    _activeAccountIdSub = null;
+
     await _commentsSub?.cancel();
     _commentsSub = null;
 
@@ -98,18 +120,20 @@ final class ProposalBuilderBloc
     required CampaignCategory category,
     required DocumentSchema? commentSchema,
     required List<CommentWithReplies> comments,
-    required ProposalCommentsSort commentsSort,
+    required CommentsState commentsState,
+    required bool hasActiveAccount,
   }) {
     final documentSegments = _mapDocumentToSegments(
       proposalDocument,
       showValidationErrors: state.showValidationErrors,
     );
 
-    final commentsSegment = _mapToCommentsSegment(
+    final commentSegments = _mapCommentToSegments(
       proposalRef: proposalMetadata.documentRef!,
       comments: comments,
       commentSchema: commentSchema,
-      commentsSort: commentsSort,
+      commentsState: commentsState,
+      hasActiveAccount: hasActiveAccount,
     );
 
     final firstSegment = documentSegments.firstOrNull;
@@ -119,7 +143,7 @@ final class ProposalBuilderBloc
 
     return ProposalBuilderState(
       documentSegments: documentSegments,
-      commentsSegment: commentsSegment,
+      commentSegments: commentSegments,
       guidance: guidance,
       document: proposalDocument,
       metadata: proposalMetadata,
@@ -439,6 +463,41 @@ final class ProposalBuilderBloc
     }
   }
 
+  List<Segment> _mapCommentToSegments({
+    required DocumentRef proposalRef,
+    required List<CommentWithReplies> comments,
+    required DocumentSchema? commentSchema,
+    required CommentsState commentsState,
+    required bool hasActiveAccount,
+  }) {
+    final isDraftProposal = proposalRef is DraftRef;
+    final canReply = !isDraftProposal && hasActiveAccount;
+    final canComment = canReply && commentSchema != null;
+
+    if (canComment || comments.isNotEmpty) {
+      return [
+        CommentsSegment(
+          id: const NodeId('comments'),
+          sort: commentsState.commentsSort,
+          sections: [
+            ViewCommentsSection(
+              id: const NodeId('comments.view'),
+              comments: commentsState.commentsSort.applyTo(comments),
+              canReply: true,
+            ),
+            if (canReply && commentSchema != null)
+              AddCommentSection(
+                id: const NodeId('comments.add'),
+                schema: commentSchema,
+              ),
+          ],
+        ),
+      ];
+    }
+
+    return const [];
+  }
+
   List<DocumentSegment> _mapDocumentToSegments(
     Document document, {
     required bool showValidationErrors,
@@ -466,34 +525,6 @@ final class ProposalBuilderBloc
         schema: segment.schema as DocumentSegmentSchema,
       );
     }).toList();
-  }
-
-  ProposalCommentsSegment? _mapToCommentsSegment({
-    required DocumentRef proposalRef,
-    required List<CommentWithReplies> comments,
-    required DocumentSchema? commentSchema,
-    required ProposalCommentsSort commentsSort,
-  }) {
-    // TODO(dtscalac): should not allow comments if never published
-    if (commentSchema == null) {
-      return null;
-    }
-
-    return ProposalCommentsSegment(
-      id: const NodeId('comments'),
-      sort: commentsSort,
-      sections: [
-        ViewCommentsSection(
-          id: const NodeId('comments.view'),
-          comments: commentsSort.applyTo(comments),
-          canReply: true,
-        ),
-        AddCommentSection(
-          id: const NodeId('comments.add'),
-          schema: commentSchema,
-        ),
-      ],
-    );
   }
 
   Future<void> _publishAndSubmitProposalForReview(
@@ -548,6 +579,16 @@ final class ProposalBuilderBloc
     }
   }
 
+  void _rebuildActiveAccount(
+    RebuildActiveAccountProposalEvent event,
+    Emitter<ProposalBuilderState> emit,
+  ) {
+    if (_cache.activeAccountId != event.catalystId) {
+      _cache = _cache.copyWith(activeAccountId: Optional(event.catalystId));
+      emit(_rebuildState());
+    }
+  }
+
   void _rebuildComments(
     RebuildCommentsProposalEvent event,
     Emitter<ProposalBuilderState> emit,
@@ -558,20 +599,22 @@ final class ProposalBuilderBloc
   }
 
   ProposalBuilderState _rebuildState() {
+    final activeAccountId = _cache.activeAccountId;
     final proposalDocument = _cache.proposalDocument!;
     final proposalMetadata = _cache.proposalMetadata!;
     final category = _cache.category!;
     final commentTemplate = _cache.commentTemplate!;
     final comments = _cache.comments ?? [];
-    final commentsSort = state.commentsSort;
+    final commentsState = state.comments;
 
     return _buildState(
+      hasActiveAccount: activeAccountId != null,
       proposalDocument: proposalDocument,
       proposalMetadata: proposalMetadata,
       category: category,
       commentSchema: commentTemplate.schema,
       comments: comments,
-      commentsSort: commentsSort,
+      commentsState: commentsState,
     );
   }
 
@@ -585,6 +628,63 @@ final class ProposalBuilderBloc
     );
 
     _updateMetadata(emit, documentRef: updatedRef);
+  }
+
+  Future<void> _submitComment(
+    SubmitCommentEvent event,
+    Emitter<ProposalBuilderState> emit,
+  ) async {
+    final proposalRef = state.metadata.documentRef;
+    assert(proposalRef != null, 'Proposal ref not found. Load document first!');
+    assert(
+      proposalRef is SignedDocumentRef,
+      'Can comment only on signed documents',
+    );
+
+    final activeAccountId = _cache.activeAccountId;
+    assert(activeAccountId != null, 'No active account found!');
+
+    final commentTemplate = _cache.commentTemplate;
+    assert(commentTemplate != null, 'No comment template found!');
+
+    final commentRef = SignedDocumentRef.generateFirstRef();
+    final comment = CommentDocument(
+      metadata: CommentMetadata(
+        selfRef: commentRef,
+        ref: proposalRef! as SignedDocumentRef,
+        template: commentTemplate!.metadata.selfRef as SignedDocumentRef,
+        reply: event.reply,
+        authorId: activeAccountId!,
+      ),
+      document: event.document,
+    );
+
+    final comments = (_cache.comments ?? []).addComment(comment: comment);
+    _cache = _cache.copyWith(comments: Optional(comments));
+    emit(_rebuildState());
+
+    final documentData = comment.toDocumentData(mapper: _documentMapper);
+
+    try {
+      await _commentService.submitComment(document: documentData);
+    } catch (error, stack) {
+      _logger.info('Publishing comment failed', error, stack);
+
+      final localizedException = LocalizedException.create(
+        error,
+        fallback: LocalizedUnknownPublishCommentException.new,
+      );
+
+      emitError(localizedException);
+
+      final source = _cache.comments;
+      final comments = (source ?? []).removeComment(ref: commentRef);
+      _cache = _cache.copyWith(comments: Optional(comments));
+
+      if (!isClosed) {
+        emit(_rebuildState());
+      }
+    }
   }
 
   Future<void> _submitProposal(
@@ -622,6 +722,32 @@ final class ProposalBuilderBloc
 
     _updateMetadata(emit, publish: ProposalPublish.submittedProposal);
     emitSignal(const SubmittedProposalBuilderSignal());
+  }
+
+  Future<void> _updateCommentBuilder(
+    UpdateCommentBuilderEvent event,
+    Emitter<ProposalBuilderState> emit,
+  ) async {
+    final updatedComments =
+        state.comments.updateCommentBuilder(ref: event.ref, show: event.show);
+
+    emit(state.copyWith(comments: updatedComments));
+  }
+
+  Future<void> _updateCommentsSort(
+    UpdateCommentsSortEvent event,
+    Emitter<ProposalBuilderState> emit,
+  ) async {
+    final sort = event.sort;
+    final updatedSegments = state.commentSegments.sortWith(sort: sort).toList();
+    final updatedComments = state.comments.copyWith(commentsSort: sort);
+
+    final updatedState = state.copyWith(
+      commentSegments: updatedSegments,
+      comments: updatedComments,
+    );
+
+    emit(updatedState);
   }
 
   void _updateMetadata(

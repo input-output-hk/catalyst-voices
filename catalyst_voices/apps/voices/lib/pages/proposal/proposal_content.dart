@@ -103,14 +103,14 @@ class _SegmentsListView extends StatelessWidget {
         final isSegment = item is Segment;
         final isNextComment = nextItem is CommentListItem;
         final isNextSectionOrComment = nextItem is Section || isNextComment;
-        final isCommentsSegment = item is ProposalCommentsSegment;
+        final isCommentsSegment = item is CommentsSegment;
         final isNotEmptyCommentsSegment = isCommentsSegment && item.hasComments;
 
         return ProposalTileDecoration(
           key: ValueKey('Proposal.${item.id.value}.Tile'),
           corners: (
             isFirst: isFirst || isCommentsSegment,
-            isLast: isLast || nextItem is ProposalCommentsSegment,
+            isLast: isLast || nextItem is CommentsSegment,
           ),
           verticalPadding: (
             isFirst: isSegment,
@@ -135,7 +135,7 @@ class _SegmentsListView extends StatelessWidget {
           return const ProposalDivider(height: 48);
         }
 
-        if (nextItem is ProposalCommentsSegment) {
+        if (nextItem is CommentsSegment) {
           return const SizedBox(height: 32);
         }
 
@@ -178,16 +178,23 @@ class _SegmentsListView extends StatelessWidget {
       DocumentSection(:final property) => ProposalDocumentSectionTile(
           property: property,
         ),
-      ProposalCommentsSegment(:final sort) => ProposalCommentsHeaderTile(
+      CommentsSegment(:final sort) => ProposalCommentsHeaderTile(
           sort: sort,
           showSort: item.hasComments,
+          onChanged: (value) {
+            context.read<ProposalCubit>().updateCommentsSort(sort: value);
+          },
         ),
-      ProposalCommentsSection() => switch (item) {
+      CommentsSection() => switch (item) {
           ViewCommentsSection() => throw ArgumentError(
               'View comments not supported',
             ),
           AddCommentSection(:final schema) => ProposalAddCommentTile(
               schema: schema,
+              onSubmit: ({required document, reply}) async {
+                final cubit = context.read<ProposalCubit>();
+                return cubit.submitComment(document: document, reply: reply);
+              },
             ),
         },
       CommentListItem(
@@ -198,6 +205,20 @@ class _SegmentsListView extends StatelessWidget {
           key: ValueKey(comment.comment.metadata.selfRef),
           comment: comment,
           canReply: canReply,
+          onSubmit: ({required document, reply}) async {
+            final cubit = context.read<ProposalCubit>();
+            return cubit.submitComment(document: document, reply: reply);
+          },
+          onCancel: () {
+            context
+                .read<ProposalCubit>()
+                .updateCommentBuilder(ref: comment.ref, show: false);
+          },
+          onToggleReply: (show) {
+            context
+                .read<ProposalCubit>()
+                .updateCommentBuilder(ref: comment.ref, show: show);
+          },
         ),
       _ => throw ArgumentError('Not supported type ${item.runtimeType}'),
     };

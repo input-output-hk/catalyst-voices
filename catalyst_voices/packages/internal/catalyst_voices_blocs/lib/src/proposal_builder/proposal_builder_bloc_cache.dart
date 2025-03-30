@@ -3,6 +3,7 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:equatable/equatable.dart';
 
 final class ProposalBuilderBlocCache extends Equatable {
+  final CatalystId? activeAccountId;
   final DocumentBuilder? proposalBuilder;
   final Document? proposalDocument;
   final ProposalBuilderMetadata? proposalMetadata;
@@ -11,6 +12,7 @@ final class ProposalBuilderBlocCache extends Equatable {
   final List<CommentWithReplies>? comments;
 
   const ProposalBuilderBlocCache({
+    this.activeAccountId,
     this.proposalBuilder,
     this.proposalDocument,
     this.proposalMetadata,
@@ -21,6 +23,7 @@ final class ProposalBuilderBlocCache extends Equatable {
 
   @override
   List<Object?> get props => [
+        activeAccountId,
         proposalBuilder,
         proposalDocument,
         proposalMetadata,
@@ -30,6 +33,7 @@ final class ProposalBuilderBlocCache extends Equatable {
       ];
 
   ProposalBuilderBlocCache copyWith({
+    Optional<CatalystId>? activeAccountId,
     Optional<DocumentBuilder>? proposalBuilder,
     Optional<Document>? proposalDocument,
     Optional<ProposalBuilderMetadata>? proposalMetadata,
@@ -38,6 +42,7 @@ final class ProposalBuilderBlocCache extends Equatable {
     Optional<List<CommentWithReplies>>? comments,
   }) {
     return ProposalBuilderBlocCache(
+      activeAccountId: activeAccountId.dataOr(this.activeAccountId),
       proposalBuilder: proposalBuilder.dataOr(this.proposalBuilder),
       proposalDocument: proposalDocument.dataOr(this.proposalDocument),
       proposalMetadata: proposalMetadata.dataOr(this.proposalMetadata),

@@ -1,4 +1,5 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:equatable/equatable.dart';
 
 final class ActiveNodeChangedEvent extends ProposalBuilderEvent {
@@ -67,6 +68,15 @@ final class PublishProposalEvent extends ProposalBuilderEvent {
   List<Object?> get props => [];
 }
 
+final class RebuildActiveAccountProposalEvent extends ProposalBuilderEvent {
+  final CatalystId? catalystId;
+
+  const RebuildActiveAccountProposalEvent({required this.catalystId});
+
+  @override
+  List<Object?> get props => [catalystId];
+}
+
 final class RebuildCommentsProposalEvent extends ProposalBuilderEvent {
   final List<CommentWithReplies> comments;
 
@@ -87,11 +97,46 @@ final class SectionChangedEvent extends ProposalBuilderEvent {
   List<Object?> get props => [changes];
 }
 
+final class SubmitCommentEvent extends ProposalBuilderEvent {
+  final Document document;
+  final SignedDocumentRef? reply;
+
+  const SubmitCommentEvent({
+    required this.document,
+    required this.reply,
+  });
+
+  @override
+  List<Object?> get props => [document, reply];
+}
+
 final class SubmitProposalEvent extends ProposalBuilderEvent {
   const SubmitProposalEvent();
 
   @override
   List<Object?> get props => [];
+}
+
+final class UpdateCommentBuilderEvent extends ProposalBuilderEvent {
+  final SignedDocumentRef ref;
+  final bool show;
+
+  const UpdateCommentBuilderEvent({
+    required this.ref,
+    required this.show,
+  });
+
+  @override
+  List<Object?> get props => [ref, show];
+}
+
+final class UpdateCommentsSortEvent extends ProposalBuilderEvent {
+  final CommentsSort sort;
+
+  const UpdateCommentsSortEvent({required this.sort});
+
+  @override
+  List<Object?> get props => [sort];
 }
 
 final class ValidateProposalEvent extends ProposalBuilderEvent {

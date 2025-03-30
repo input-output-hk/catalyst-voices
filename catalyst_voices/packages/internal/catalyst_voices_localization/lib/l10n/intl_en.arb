@@ -1872,16 +1872,16 @@
   "@proposalViewMetadataSection": {
     "description": "Viewing proposal navigation section"
   },
-  "proposalViewCommentsSegment": "Comments",
-  "@proposalViewCommentsSegment": {
+  "commentsSegment": "Comments",
+  "@commentsSegment": {
     "description": "Viewing proposal navigation section"
   },
-  "proposalViewAddCommentSection": "Add comment",
-  "@proposalViewAddCommentSection": {
+  "addCommentSection": "Add comment",
+  "@addCommentSection": {
     "description": "Viewing proposal navigation section"
   },
-  "proposalViewViewCommentsSection": "View comments",
-  "@proposalViewViewCommentsSection": {
+  "viewCommentsSection": "View comments",
+  "@viewCommentsSection": {
     "description": "Viewing proposal navigation section"
   },
   "proposalViewFundingRequested": "Funding Requested",

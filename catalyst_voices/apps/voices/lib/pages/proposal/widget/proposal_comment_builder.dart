@@ -9,10 +9,16 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart'
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+typedef OnSubmitProposalComment = Future<void> Function({
+  required Document document,
+  SignedDocumentRef? reply,
+});
+
 class ProposalCommentBuilder extends StatefulWidget {
   final DocumentSchema schema;
   final SignedDocumentRef? parent;
   final bool showCancel;
+  final OnSubmitProposalComment onSubmit;
   final VoidCallback? onCancelTap;
 
   const ProposalCommentBuilder({
@@ -20,6 +26,7 @@ class ProposalCommentBuilder extends StatefulWidget {
     required this.schema,
     this.parent,
     this.showCancel = false,
+    required this.onSubmit,
     this.onCancelTap,
   });
 
@@ -144,12 +151,12 @@ class _ProposalCommentBuilderState extends State<ProposalCommentBuilder> {
       return;
     }
 
-    final catalystId = context.read<SessionCubit>().state.account?.catalystId;
-    assert(catalystId != null, 'No active account found!');
-
-    final cubit = context.read<ProposalCubit>();
-
-    unawaited(cubit.submitComment(document: _comment, reply: widget.parent));
+    unawaited(
+      widget.onSubmit(
+        document: _comment,
+        reply: widget.parent,
+      ),
+    );
 
     setState(() {
       _formKey.currentState?.reset();

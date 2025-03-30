@@ -4,16 +4,19 @@ import 'package:flutter/material.dart';
 
 class ProposalAddCommentTile extends StatelessWidget {
   final DocumentSchema schema;
+  final OnSubmitProposalComment onSubmit;
 
   const ProposalAddCommentTile({
     super.key,
     required this.schema,
+    required this.onSubmit,
   });
 
   @override
   Widget build(BuildContext context) {
     return ProposalCommentBuilder(
       schema: schema,
+      onSubmit: onSubmit,
     );
   }
 }

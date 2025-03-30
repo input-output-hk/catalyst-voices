@@ -150,7 +150,7 @@ final class ProposalCubit extends Cubit<ProposalState>
       document: document,
     );
 
-    final comments = _addCommentTo(_cache.comments ?? [], comment: comment);
+    final comments = (_cache.comments ?? []).addComment(comment: comment);
     _cache = _cache.copyWith(comments: Optional(comments));
     emit(state.copyWith(data: _rebuildProposalState()));
 
@@ -169,7 +169,7 @@ final class ProposalCubit extends Cubit<ProposalState>
       emitError(localizedException);
 
       final source = _cache.comments;
-      final comments = _removeCommentFrom(source ?? [], ref: commentRef);
+      final comments = (source ?? []).removeComment(ref: commentRef);
       _cache = _cache.copyWith(comments: Optional(comments));
 
       if (!isClosed) {
@@ -182,38 +182,36 @@ final class ProposalCubit extends Cubit<ProposalState>
     required SignedDocumentRef ref,
     required bool show,
   }) {
-    final showReplyBuilder = Map.of(state.data.showReplyBuilder);
+    final updatedComments =
+        state.comments.updateCommentBuilder(ref: ref, show: show);
 
-    showReplyBuilder[ref] = show;
-
-    final updatedData = state.data.copyWith(showReplyBuilder: showReplyBuilder);
-
-    emit(state.copyWith(data: updatedData));
+    emit(state.copyWith(comments: updatedComments));
   }
 
   void updateCommentReplies({
     required SignedDocumentRef ref,
     required bool show,
   }) {
-    final showReplies = Map.of(state.data.showReplies);
+    final updatedComments =
+        state.comments.updateCommentReplies(ref: ref, show: show);
 
-    showReplies[ref] = show;
-
-    final updatedData = state.data.copyWith(showReplies: showReplies);
-
-    emit(state.copyWith(data: updatedData));
+    emit(state.copyWith(comments: updatedComments));
   }
 
-  void updateCommentsSort({required ProposalCommentsSort sort}) {
+  void updateCommentsSort({required CommentsSort sort}) {
     final data = state.data;
+    final comments = state.comments;
     final segments = data.segments.sortWith(sort: sort).toList();
 
-    final updatedData = data.copyWith(
-      segments: segments,
-      commentsSort: sort,
-    );
+    final updatedData = data.copyWith(segments: segments);
+    final updatedComments = comments.copyWith(commentsSort: sort);
 
-    emit(state.copyWith(data: updatedData));
+    emit(
+      state.copyWith(
+        data: updatedData,
+        comments: updatedComments,
+      ),
+    );
   }
 
   Future<void> updateIsFavorite({required bool value}) async {
@@ -229,33 +227,13 @@ final class ProposalCubit extends Cubit<ProposalState>
     }
   }
 
-  List<CommentWithReplies> _addCommentTo(
-    List<CommentWithReplies> source, {
-    required CommentDocument comment,
-  }) {
-    final comments = List.of(source);
-    final reply = comment.metadata.reply;
-
-    if (reply != null) {
-      final index = comments.indexWhere((comment) => comment.contains(reply));
-      if (index != -1) {
-        final updated = comments.removeAt(index).addReply(comment);
-        comments.insert(index, updated);
-      }
-    } else {
-      comments.add(CommentWithReplies.direct(comment));
-    }
-
-    return comments;
-  }
-
   ProposalViewData _buildProposalViewData({
     required bool hasActiveAccount,
     required ProposalData? proposal,
     required CampaignCategory? category,
     required List<CommentWithReplies> comments,
     required DocumentSchema? commentSchema,
-    required ProposalCommentsSort commentsSort,
+    required CommentsSort commentsSort,
     required bool isFavorite,
   }) {
     final proposalDocument = proposal?.document;
@@ -299,7 +277,6 @@ final class ProposalCubit extends Cubit<ProposalState>
       isCurrentVersionLatest: currentVersion?.isLatest,
       header: header,
       segments: segments,
-      commentsSort: commentsSort,
     );
   }
 
@@ -309,7 +286,7 @@ final class ProposalCubit extends Cubit<ProposalState>
     required DocumentVersion? version,
     required List<CommentWithReplies> comments,
     required DocumentSchema? commentSchema,
-    required ProposalCommentsSort commentsSort,
+    required CommentsSort commentsSort,
     required bool hasActiveAccount,
   }) {
     final document = proposal.document;
@@ -341,7 +318,7 @@ final class ProposalCubit extends Cubit<ProposalState>
 
     final canReply = !isDraftProposal && hasActiveAccount;
     final canComment = canReply && commentSchema != null;
-    final commentsSegment = ProposalCommentsSegment(
+    final commentsSegment = CommentsSegment(
       id: const NodeId('comments'),
       sort: commentsSort,
       sections: [
@@ -383,7 +360,7 @@ final class ProposalCubit extends Cubit<ProposalState>
     final category = _cache.category;
     final commentTemplate = _cache.commentTemplate;
     final comments = _cache.comments ?? const [];
-    final commentsSort = state.data.commentsSort;
+    final commentsSort = state.comments.commentsSort;
     final isFavorite = _cache.isFavorite ?? false;
     final activeAccountId = _cache.activeAccountId;
 
@@ -396,15 +373,5 @@ final class ProposalCubit extends Cubit<ProposalState>
       commentsSort: commentsSort,
       isFavorite: isFavorite,
     );
-  }
-
-  List<CommentWithReplies> _removeCommentFrom(
-    List<CommentWithReplies> source, {
-    required SignedDocumentRef ref,
-  }) {
-    return List.of(source)
-        .where((e) => e.ref != ref)
-        .map((e) => e.removeReply(ref: ref))
-        .toList();
   }
 }

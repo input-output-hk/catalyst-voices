@@ -14,6 +14,9 @@ class ProposalCommentWithRepliesCard extends StatelessWidget {
   final bool canReply;
   final bool showReplies;
   final bool showReplyBuilder;
+  final OnSubmitProposalComment onSubmit;
+  final VoidCallback onCancel;
+  final ValueChanged<bool> onToggleReply;
 
   const ProposalCommentWithRepliesCard({
     super.key,
@@ -21,6 +24,9 @@ class ProposalCommentWithRepliesCard extends StatelessWidget {
     required this.canReply,
     required this.showReplies,
     required this.showReplyBuilder,
+    required this.onSubmit,
+    required this.onCancel,
+    required this.onToggleReply,
   });
 
   @override
@@ -34,11 +40,7 @@ class ProposalCommentWithRepliesCard extends StatelessWidget {
         ProposalCommentCard(
           document: comment.comment,
           canReply: canReply,
-          onReplyTap: () {
-            context
-                .read<ProposalCubit>()
-                .updateCommentBuilder(ref: comment.ref, show: true);
-          },
+          onReplyTap: () => onToggleReply(true),
           footer: Offstage(
             offstage: comment.replies.isEmpty,
             child: _ToggleRepliesChip(
@@ -66,6 +68,9 @@ class ProposalCommentWithRepliesCard extends StatelessWidget {
                       'ReplyComment.${reply.comment.metadata.selfRef.id}',
                     ),
                     comment: reply,
+                    onSubmit: onSubmit,
+                    onCancel: onCancel,
+                    onToggleReply: onToggleReply,
                   ),
               ],
             ),
@@ -80,11 +85,8 @@ class ProposalCommentWithRepliesCard extends StatelessWidget {
               schema: comment.comment.document.schema,
               parent: comment.comment.metadata.selfRef,
               showCancel: true,
-              onCancelTap: () {
-                context
-                    .read<ProposalCubit>()
-                    .updateCommentBuilder(ref: comment.ref, show: false);
-              },
+              onCancelTap: () => onToggleReply(false),
+              onSubmit: onSubmit,
             ),
           ),
       ],
@@ -94,16 +96,22 @@ class ProposalCommentWithRepliesCard extends StatelessWidget {
 
 class _RepliesCard extends StatelessWidget {
   final CommentWithReplies comment;
+  final OnSubmitProposalComment onSubmit;
+  final VoidCallback onCancel;
+  final ValueChanged<bool> onToggleReply;
 
   const _RepliesCard({
     required super.key,
     required this.comment,
+    required this.onSubmit,
+    required this.onCancel,
+    required this.onToggleReply,
   });
 
   @override
   Widget build(BuildContext context) {
     final showReplies = context.select<ProposalCubit, bool>((value) {
-      return value.state.data.showReplies[comment.ref] ?? true;
+      return value.state.comments.showReplies[comment.ref] ?? true;
     });
 
     return ProposalCommentWithRepliesCard(
@@ -111,6 +119,9 @@ class _RepliesCard extends StatelessWidget {
       canReply: false,
       showReplies: showReplies,
       showReplyBuilder: false,
+      onSubmit: onSubmit,
+      onCancel: onCancel,
+      onToggleReply: onToggleReply,
     );
   }
 }

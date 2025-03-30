@@ -108,6 +108,7 @@ final class Dependencies extends DependencyProvider {
           get<ProposalService>(),
           get<CampaignService>(),
           get<CommentService>(),
+          get<UserService>(),
           get<DownloaderService>(),
           get<DocumentMapper>(),
         );
