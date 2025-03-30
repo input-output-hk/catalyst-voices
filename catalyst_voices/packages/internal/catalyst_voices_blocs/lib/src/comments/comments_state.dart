@@ -3,12 +3,12 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:equatable/equatable.dart';
 
 final class CommentsState extends Equatable {
-  final CommentsSort commentsSort;
+  final ProposalCommentsSort commentsSort;
   final Map<DocumentRef, bool> showReplies;
   final Map<DocumentRef, bool> showReplyBuilder;
 
   const CommentsState({
-    this.commentsSort = CommentsSort.newest,
+    this.commentsSort = ProposalCommentsSort.newest,
     this.showReplies = const {},
     this.showReplyBuilder = const {},
   });
@@ -21,7 +21,7 @@ final class CommentsState extends Equatable {
       ];
 
   CommentsState copyWith({
-    CommentsSort? commentsSort,
+    ProposalCommentsSort? commentsSort,
     Map<DocumentRef, bool>? showReplies,
     Map<DocumentRef, bool>? showReplyBuilder,
   }) {

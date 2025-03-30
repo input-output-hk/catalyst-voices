@@ -477,17 +477,17 @@ final class ProposalBuilderBloc
 
     if (canComment || comments.isNotEmpty) {
       return [
-        CommentsSegment(
+        ProposalCommentsSegment(
           id: const NodeId('comments'),
           sort: commentsState.commentsSort,
           sections: [
-            ViewCommentsSection(
+            ProposalViewCommentsSection(
               id: const NodeId('comments.view'),
               comments: commentsState.commentsSort.applyTo(comments),
               canReply: true,
             ),
             if (canReply && commentSchema != null)
-              AddCommentSection(
+              ProposalAddCommentSection(
                 id: const NodeId('comments.add'),
                 schema: commentSchema,
               ),

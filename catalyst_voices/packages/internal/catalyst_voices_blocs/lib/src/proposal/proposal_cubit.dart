@@ -198,7 +198,7 @@ final class ProposalCubit extends Cubit<ProposalState>
     emit(state.copyWith(comments: updatedComments));
   }
 
-  void updateCommentsSort({required CommentsSort sort}) {
+  void updateCommentsSort({required ProposalCommentsSort sort}) {
     final data = state.data;
     final comments = state.comments;
     final segments = data.segments.sortWith(sort: sort).toList();
@@ -233,7 +233,7 @@ final class ProposalCubit extends Cubit<ProposalState>
     required CampaignCategory? category,
     required List<CommentWithReplies> comments,
     required DocumentSchema? commentSchema,
-    required CommentsSort commentsSort,
+    required ProposalCommentsSort commentsSort,
     required bool isFavorite,
   }) {
     final proposalDocument = proposal?.document;
@@ -286,7 +286,7 @@ final class ProposalCubit extends Cubit<ProposalState>
     required DocumentVersion? version,
     required List<CommentWithReplies> comments,
     required DocumentSchema? commentSchema,
-    required CommentsSort commentsSort,
+    required ProposalCommentsSort commentsSort,
     required bool hasActiveAccount,
   }) {
     final document = proposal.document;
@@ -318,17 +318,17 @@ final class ProposalCubit extends Cubit<ProposalState>
 
     final canReply = !isDraftProposal && hasActiveAccount;
     final canComment = canReply && commentSchema != null;
-    final commentsSegment = CommentsSegment(
+    final commentsSegment = ProposalCommentsSegment(
       id: const NodeId('comments'),
       sort: commentsSort,
       sections: [
-        ViewCommentsSection(
+        ProposalViewCommentsSection(
           id: const NodeId('comments.view'),
           comments: commentsSort.applyTo(comments),
           canReply: canReply,
         ),
         if (canReply && commentSchema != null)
-          AddCommentSection(
+          ProposalAddCommentSection(
             id: const NodeId('comments.add'),
             schema: commentSchema,
           ),

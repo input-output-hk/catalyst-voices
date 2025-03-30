@@ -6,10 +6,10 @@ import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 
-final class AddCommentSection extends CommentsSection {
+final class ProposalAddCommentSection extends ProposalCommentsSection {
   final DocumentSchema schema;
 
-  const AddCommentSection({
+  const ProposalAddCommentSection({
     required super.id,
     required this.schema,
   });
@@ -23,13 +23,14 @@ final class AddCommentSection extends CommentsSection {
   }
 }
 
-final class CommentListItem extends Equatable implements SegmentsListViewItem {
+final class ProposalCommentListItem extends Equatable
+    implements SegmentsListViewItem {
   @override
   final NodeId id;
   final CommentWithReplies comment;
   final bool canReply;
 
-  const CommentListItem({
+  const ProposalCommentListItem({
     required this.id,
     required this.comment,
     required this.canReply,
@@ -43,23 +44,24 @@ final class CommentListItem extends Equatable implements SegmentsListViewItem {
       ];
 }
 
-sealed class CommentsSection extends BaseSection {
-  const CommentsSection({
+sealed class ProposalCommentsSection extends BaseSection {
+  const ProposalCommentsSection({
     required super.id,
   });
 }
 
-final class CommentsSegment extends BaseSegment<CommentsSection> {
-  final CommentsSort sort;
+final class ProposalCommentsSegment
+    extends BaseSegment<ProposalCommentsSection> {
+  final ProposalCommentsSort sort;
 
-  const CommentsSegment({
+  const ProposalCommentsSegment({
     required super.id,
     required this.sort,
     required super.sections,
   });
 
   bool get hasComments => sections
-      .whereType<ViewCommentsSection>()
+      .whereType<ProposalViewCommentsSection>()
       .any((element) => element.comments.isNotEmpty);
 
   @override
@@ -68,13 +70,13 @@ final class CommentsSegment extends BaseSegment<CommentsSection> {
   @override
   List<Object?> get props => super.props + [sort];
 
-  CommentsSegment copySorted({
-    required CommentsSort sort,
+  ProposalCommentsSegment copySorted({
+    required ProposalCommentsSort sort,
   }) {
     final sortedSection = sections.map((section) {
       return switch (section) {
-        AddCommentSection() => section,
-        ViewCommentsSection() => section.copyWith(
+        ProposalAddCommentSection() => section,
+        ProposalViewCommentsSection() => section.copyWith(
             comments: sort.applyTo(section.comments),
           ),
       };
@@ -86,12 +88,12 @@ final class CommentsSegment extends BaseSegment<CommentsSection> {
     );
   }
 
-  CommentsSegment copyWith({
+  ProposalCommentsSegment copyWith({
     NodeId? id,
-    CommentsSort? sort,
-    List<CommentsSection>? sections,
+    ProposalCommentsSort? sort,
+    List<ProposalCommentsSection>? sections,
   }) {
-    return CommentsSegment(
+    return ProposalCommentsSegment(
       id: id ?? this.id,
       sort: sort ?? this.sort,
       sections: sections ?? this.sections,
@@ -104,12 +106,12 @@ final class CommentsSegment extends BaseSegment<CommentsSection> {
   }
 }
 
-final class ViewCommentsSection extends CommentsSection
+final class ProposalViewCommentsSection extends ProposalCommentsSection
     implements SegmentGroupedListViewItems {
   final List<CommentWithReplies> comments;
   final bool canReply;
 
-  const ViewCommentsSection({
+  const ProposalViewCommentsSection({
     required super.id,
     required this.comments,
     required this.canReply,
@@ -118,7 +120,7 @@ final class ViewCommentsSection extends CommentsSection
   @override
   Iterable<SegmentsListViewItem> get children {
     return comments.mapIndexed((index, comment) {
-      return CommentListItem(
+      return ProposalCommentListItem(
         id: id.child(comment.comment.metadata.selfRef.id),
         comment: comment,
         canReply: canReply,
@@ -129,12 +131,12 @@ final class ViewCommentsSection extends CommentsSection
   @override
   List<Object?> get props => super.props + [comments, canReply];
 
-  ViewCommentsSection copyWith({
+  ProposalViewCommentsSection copyWith({
     NodeId? id,
     List<CommentWithReplies>? comments,
     bool? canReply,
   }) {
-    return ViewCommentsSection(
+    return ProposalViewCommentsSection(
       id: id ?? this.id,
       comments: comments ?? this.comments,
       canReply: canReply ?? this.canReply,

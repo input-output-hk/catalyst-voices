@@ -73,9 +73,9 @@ class _ProposalBuilderSegments extends StatelessWidget {
             final isLast = index == max(items.length - 1, 0);
 
             final isSegment = item is Segment;
-            final isNextComment = nextItem is CommentListItem;
+            final isNextComment = nextItem is ProposalCommentListItem;
             final isNextSectionOrComment = nextItem is Section || isNextComment;
-            final isCommentsSegment = item is CommentsSegment;
+            final isCommentsSegment = item is ProposalCommentsSegment;
             final isNotEmptyCommentsSegment =
                 isCommentsSegment && item.hasComments;
 
@@ -83,7 +83,7 @@ class _ProposalBuilderSegments extends StatelessWidget {
               key: ValueKey('Proposal.${item.id.value}.Tile'),
               corners: (
                 isFirst: isFirst || isCommentsSegment,
-                isLast: isLast || nextItem is CommentsSegment,
+                isLast: isLast || nextItem is ProposalCommentsSegment,
               ),
               verticalPadding: (
                 isFirst: isSegment,
@@ -104,11 +104,11 @@ class _ProposalBuilderSegments extends StatelessWidget {
               return const ProposalSeparatorBox(height: 24);
             }
 
-            if (nextItem is AddCommentSection) {
+            if (nextItem is ProposalAddCommentSection) {
               return const ProposalDivider(height: 48);
             }
 
-            if (nextItem is CommentsSegment) {
+            if (nextItem is ProposalCommentsSegment) {
               return const SizedBox(height: 32);
             }
 
@@ -133,7 +133,7 @@ class _ProposalBuilderSegments extends StatelessWidget {
           id: item.id,
           name: item.resolveTitle(context),
         ),
-      CommentsSegment(:final sort) => ProposalCommentsHeaderTile(
+      ProposalCommentsSegment(:final sort) => ProposalCommentsHeaderTile(
           sort: sort,
           showSort: item.hasComments,
           onChanged: (value) {
@@ -146,11 +146,11 @@ class _ProposalBuilderSegments extends StatelessWidget {
           property: item.property,
           isSelected: item.property.nodeId == selectedNodeId,
         ),
-      CommentsSection() => switch (item) {
-          ViewCommentsSection() => throw ArgumentError(
+      ProposalCommentsSection() => switch (item) {
+          ProposalViewCommentsSection() => throw ArgumentError(
               'View comments not supported',
             ),
-          AddCommentSection(:final schema) => ProposalAddCommentTile(
+          ProposalAddCommentSection(:final schema) => ProposalAddCommentTile(
               schema: schema,
               onSubmit: ({required document, reply}) async {
                 final event = SubmitCommentEvent(
@@ -161,7 +161,7 @@ class _ProposalBuilderSegments extends StatelessWidget {
               },
             ),
         },
-      CommentListItem(
+      ProposalCommentListItem(
         :final comment,
         :final canReply,
       ) =>
