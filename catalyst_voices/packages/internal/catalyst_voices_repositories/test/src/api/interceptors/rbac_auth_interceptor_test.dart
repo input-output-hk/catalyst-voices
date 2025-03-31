@@ -191,5 +191,7 @@ const _authHeaderName = 'Authorization';
 
 class _FakeAuthTokenProvider extends Fake implements AuthTokenProvider {
   @override
-  Future<String> createRbacToken() async => 'auth_token';
+  Future<String> createRbacToken({bool forceRefresh = false}) async {
+    return 'auth_token';
+  }
 }

@@ -4,6 +4,7 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_services/src/crypto/key_derivation_service.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:flutter/foundation.dart';
 
 abstract interface class AuthService implements AuthTokenProvider {
   const factory AuthService(
@@ -12,7 +13,9 @@ abstract interface class AuthService implements AuthTokenProvider {
   ) = AuthServiceImpl;
 }
 
+/// Note. token age 1h.
 final class AuthServiceImpl implements AuthService {
+  @visibleForTesting
   static const String tokenPrefix = 'catid';
 
   final UserObserver _userObserver;
@@ -24,7 +27,9 @@ final class AuthServiceImpl implements AuthService {
   );
 
   @override
-  Future<String> createRbacToken() async {
+  Future<String> createRbacToken({
+    bool forceRefresh = false,
+  }) async {
     final account = await _getAccount();
 
     return account.keychain.getMasterKey().use((masterKey) {
