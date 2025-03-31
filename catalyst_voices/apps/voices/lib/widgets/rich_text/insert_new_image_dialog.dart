@@ -51,7 +51,7 @@ class _InsertNewImageDialogState extends State<InsertNewImageDialog> {
             InsertNewImageDialogFooter(
               isValidImageUrl: _isValidImageUrl,
               inputFieldIsEmpty: _inputFieldIsEmpty,
-              onInserImage: () => Navigator.pop(context, _textController.text),
+              onInsertImage: () => Navigator.pop(context, _textController.text),
             ),
           ],
         ),

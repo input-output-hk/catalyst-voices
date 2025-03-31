@@ -5,12 +5,12 @@ import 'package:flutter/material.dart';
 class InsertNewImageDialogFooter extends StatelessWidget {
   final bool isValidImageUrl;
   final bool inputFieldIsEmpty;
-  final VoidCallback onInserImage;
+  final VoidCallback onInsertImage;
 
   const InsertNewImageDialogFooter({
     required this.isValidImageUrl,
     required this.inputFieldIsEmpty,
-    required this.onInserImage,
+    required this.onInsertImage,
     super.key,
   });
 
@@ -29,7 +29,7 @@ class InsertNewImageDialogFooter extends StatelessWidget {
           ),
           const SizedBox(width: 8),
           VoicesFilledButton(
-            onTap: !inputFieldIsEmpty && isValidImageUrl ? onInserImage : null,
+            onTap: !inputFieldIsEmpty && isValidImageUrl ? onInsertImage : null,
             child: Text(l10n.insertNewImageDialogInsertButtonText),
           ),
         ],
