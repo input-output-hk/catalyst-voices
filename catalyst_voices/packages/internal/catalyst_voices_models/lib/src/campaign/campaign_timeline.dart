@@ -50,7 +50,7 @@ extension CampaignTimelineX on CampaignTimeline {
           '''Participants submit initial proposals for ideas to solve challenges. A set amount of ada is allocated to the new funding round.''',
       timeline: DateRange(
         from: DateTime(2025, 3, 28, 16, 50),
-        to: DateTime(2025, 3, 30),
+        to: DateTime(2025, 4, 2),
       ),
       stage: CampaignTimelineStage.proposalSubmission,
     ),

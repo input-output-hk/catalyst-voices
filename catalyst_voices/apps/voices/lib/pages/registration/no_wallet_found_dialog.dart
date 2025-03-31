@@ -1,10 +1,12 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
+import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class NoWalletFoundDialog extends StatelessWidget {
   const NoWalletFoundDialog({super.key});
@@ -17,12 +19,13 @@ class NoWalletFoundDialog extends StatelessWidget {
     );
   }
 
-  static Future<void> show(BuildContext context) async {
-    await VoicesDialog.show<void>(
+  static Future<bool> show(BuildContext context) async {
+    final result = await VoicesDialog.show<bool?>(
       context: context,
       routeSettings: const RouteSettings(name: '/no-wallet-found'),
       builder: (context) => const NoWalletFoundDialog(),
     );
+    return result ?? false;
   }
 }
 
@@ -30,6 +33,7 @@ class SupportedWallet extends StatelessWidget with LaunchUrlMixin {
   final AssetGenImage image;
   final String name;
   final String url;
+
   const SupportedWallet({
     super.key,
     required this.image,
@@ -167,12 +171,54 @@ class _LeftSide extends StatelessWidget {
           description: context.l10n.noWalletInstalledDescription,
         ),
         VoicesTextButton(
-          onTap: () {},
+          onTap: () {
+            // TODO(LynxLynxx): implement url launching
+          },
           trailing: VoicesAssets.icons.externalLink.buildIcon(),
           child: Text(context.l10n.visitCatalystWalletDocumentationTextButton),
         ),
       ],
     );
+  }
+}
+
+class _NoWalletAction extends StatefulWidget {
+  const _NoWalletAction();
+
+  @override
+  State<_NoWalletAction> createState() => _NoWalletActionState();
+}
+
+class _NoWalletActionState extends State<_NoWalletAction> {
+  bool isLoading = false;
+  @override
+  Widget build(BuildContext context) {
+    return isLoading
+        ? const Center(child: VoicesCircularProgressIndicator())
+        : SizedBox(
+            width: double.infinity,
+            child: VoicesErrorIndicator(
+              message: context.l10n.somethingWentWrong,
+              onRetry: () async => _checkAvailableWallets(context),
+            ),
+          );
+  }
+
+  void _changeIsLoading() {
+    setState(() {
+      isLoading = !isLoading;
+    });
+  }
+
+  Future<void> _checkAvailableWallets(BuildContext context) async {
+    _changeIsLoading();
+    final hasWallets =
+        await context.read<SessionCubit>().checkAvailableWallets();
+    if (hasWallets && context.mounted) {
+      Navigator.of(context).pop(true);
+    } else {
+      _changeIsLoading();
+    }
   }
 }
 
@@ -275,13 +321,7 @@ class _RightSide extends StatelessWidget {
         ),
         const VoicesDivider.expanded(),
         const Spacer(),
-        SizedBox(
-          width: double.infinity,
-          child: VoicesErrorIndicator(
-            message: context.l10n.somethingWentWrong,
-            onRetry: () {},
-          ),
-        ),
+        const _NoWalletAction(),
         const Spacer(),
         const _GoodToKnow(),
       ],
