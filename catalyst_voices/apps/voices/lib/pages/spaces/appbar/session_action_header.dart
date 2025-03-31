@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:catalyst_voices/pages/registration/registration_dialog.dart';
+import 'package:catalyst_voices/pages/registration/registration_type.dart';
 import 'package:catalyst_voices/pages/spaces/appbar/account_popup/session_lock_button.dart';
 import 'package:catalyst_voices/pages/spaces/appbar/account_popup/session_unlock_button.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_filled_button.dart';
@@ -39,7 +40,12 @@ class _FinishRegistrationButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return VoicesFilledButton(
       key: const Key('FinishRegistrationButton'),
-      onTap: () => unawaited(RegistrationDialog.show(context)),
+      onTap: () => unawaited(
+        RegistrationDialog.show(
+          context,
+          type: const ContinueRegistration(),
+        ),
+      ),
       child: Text(context.l10n.finishAccountCreation),
     );
   }
@@ -52,7 +58,10 @@ class _GetStartedButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return VoicesFilledButton(
       key: const Key('GetStartedButton'),
-      onTap: () async => RegistrationDialog.show(context),
+      onTap: () async => RegistrationDialog.show(
+                context,
+                type: const FreshRegistration(),
+              ),
       child: Text(context.l10n.getStarted),
     );
   }

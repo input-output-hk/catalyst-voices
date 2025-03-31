@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:catalyst_voices/common/ext/text_editing_controller_ext.dart';
 import 'package:catalyst_voices/pages/registration/widgets/registration_stage_navigation.dart';
 import 'package:catalyst_voices/pages/registration/widgets/unlock_password_form.dart';
@@ -64,10 +66,15 @@ class _UnlockPasswordPanelState extends State<UnlockPasswordPanel> {
         ),
         const SizedBox(height: 22),
         _BlocNavigation(
+          onNextTap: _createKeychain,
           onBackTap: _clearPasswordAndGoBack,
         ),
       ],
     );
+  }
+
+  void _createKeychain() {
+    unawaited(RegistrationCubit.of(context).createKeychain());
   }
 
   void _onPasswordChanged() {
@@ -134,9 +141,11 @@ class _BlocUnlockPasswordForm extends StatelessWidget {
 }
 
 class _BlocNavigation extends StatelessWidget {
+  final VoidCallback onNextTap;
   final VoidCallback onBackTap;
 
   const _BlocNavigation({
+    required this.onNextTap,
     required this.onBackTap,
   });
 
@@ -148,6 +157,7 @@ class _BlocNavigation extends StatelessWidget {
       builder: (context, state) {
         return RegistrationBackNextNavigation(
           isNextEnabled: state,
+          onNextTap: onNextTap,
           onBackTap: onBackTap,
         );
       },

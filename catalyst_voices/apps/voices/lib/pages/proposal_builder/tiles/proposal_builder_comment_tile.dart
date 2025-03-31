@@ -4,11 +4,11 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class ProposalCommentTile extends StatelessWidget {
+class ProposalBuilderCommentTile extends StatelessWidget {
   final CommentWithReplies comment;
   final bool canReply;
 
-  const ProposalCommentTile({
+  const ProposalBuilderCommentTile({
     super.key,
     required this.comment,
     required this.canReply,
@@ -17,16 +17,16 @@ class ProposalCommentTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final showReplies =
-        context.select<ProposalCubit, Map<DocumentRef, bool>>((value) {
+        context.select<ProposalBuilderBloc, Map<DocumentRef, bool>>((value) {
       return value.state.comments.showReplies;
     });
 
-    final showReplyBuilder = context.select<ProposalCubit, bool>((value) {
+    final showReplyBuilder = context.select<ProposalBuilderBloc, bool>((value) {
       return value.state.comments.showReplyBuilder[comment.ref] ?? false;
     });
 
     final id = comment.comment.metadata.selfRef.id;
-    final cubit = context.read<ProposalCubit>();
+    final bloc = context.read<ProposalBuilderBloc>();
 
     return ProposalCommentWithRepliesCard(
       key: ValueKey('ProposalComment.$id.WithReplies'),
@@ -35,16 +35,20 @@ class ProposalCommentTile extends StatelessWidget {
       showReplies: showReplies,
       showReplyBuilder: showReplyBuilder,
       onSubmit: ({required document, reply}) async {
-        return cubit.submitComment(document: document, reply: reply);
+        final event = SubmitCommentEvent(
+          document: document,
+          reply: reply,
+        );
+        bloc.add(event);
       },
       onCancel: () {
-        cubit.updateCommentBuilder(ref: comment.ref, show: false);
+        bloc.add(UpdateCommentBuilderEvent(ref: comment.ref, show: false));
       },
       onToggleBuilder: (show) {
-        cubit.updateCommentBuilder(ref: comment.ref, show: show);
+        bloc.add(UpdateCommentBuilderEvent(ref: comment.ref, show: show));
       },
       onToggleReplies: (show) {
-        cubit.updateCommentReplies(ref: comment.ref, show: show);
+        bloc.add(UpdateCommentRepliesEvent(ref: comment.ref, show: show));
       },
     );
   }

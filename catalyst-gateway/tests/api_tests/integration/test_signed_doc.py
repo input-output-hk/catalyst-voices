@@ -70,7 +70,6 @@ def proposal_doc_factory(proposal_templates):
     def __proposal_doc_factory() -> SignedDocument:
         proposal_doc_id = uuid7str()
         proposal_metadata_json = {
-            "alg": "EdDSA",
             "id": proposal_doc_id,
             "ver": proposal_doc_id,
             # Proposal document type
@@ -103,7 +102,6 @@ def comment_doc_factory(proposal_doc_factory, comment_templates) -> SignedDocume
         proposal_doc = proposal_doc_factory()
         comment_doc_id = uuid7str()
         comment_metadata_json = {
-            "alg": "EdDSA",
             "id": comment_doc_id,
             "ver": comment_doc_id,
             # Comment document type

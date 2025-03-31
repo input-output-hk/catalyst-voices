@@ -7,7 +7,7 @@ final class RegistrationStateData extends Equatable {
   final Result<bool, LocalizedException>? canSubmitTx;
   final String? transactionFee;
   final bool isSubmittingTx;
-  final Result<Account, LocalizedException>? account;
+  final Result<bool, LocalizedException>? account;
 
   const RegistrationStateData({
     this.canSubmitTx,
@@ -20,7 +20,7 @@ final class RegistrationStateData extends Equatable {
     Optional<Result<bool, LocalizedException>>? canSubmitTx,
     Optional<String>? transactionFee,
     bool? isSubmittingTx,
-    Optional<Result<Account, LocalizedException>>? account,
+    Optional<Result<bool, LocalizedException>>? account,
   }) {
     return RegistrationStateData(
       canSubmitTx: canSubmitTx.dataOr(this.canSubmitTx),

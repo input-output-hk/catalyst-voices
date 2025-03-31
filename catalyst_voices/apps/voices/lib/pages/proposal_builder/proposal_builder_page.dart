@@ -96,7 +96,7 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
             rightRail: const ProposalBuilderSetupPanel(),
             body: _ProposalBuilderContent(
               controller: _segmentsScrollController,
-              onRetryTap: _updateSource,
+              onRetryTap: _loadData,
             ),
             bodyConstraints: const BoxConstraints.expand(),
           ),
@@ -111,7 +111,7 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
 
     if (widget.proposalId != oldWidget.proposalId ||
         widget.categoryId != oldWidget.categoryId) {
-      _updateSource();
+      _loadData();
     }
   }
 
@@ -166,14 +166,16 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
       ..attachItemsScrollController(_segmentsScrollController);
 
     _segmentsSub = bloc.stream
-        .map((event) => (segments: event.segments, nodeId: event.activeNodeId))
+        .map(
+          (event) => (segments: event.allSegments, nodeId: event.activeNodeId),
+        )
         .distinct(
           (a, b) => listEquals(a.segments, b.segments) && a.nodeId == b.nodeId,
         )
         .listen((record) => _updateSegments(record.segments, record.nodeId));
 
     _updateSource(bloc: bloc);
-    bloc.add(const ProposalSubmittionCloseDateEvent());
+    _loadData(bloc: bloc);
   }
 
   void _dontShowAgain(bool value) {
@@ -268,7 +270,7 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
     _segmentsController.value = newState;
   }
 
-  void _updateSource({ProposalBuilderBloc? bloc}) {
+  void _loadData({ProposalBuilderBloc? bloc}) {
     bloc ??= context.read<ProposalBuilderBloc>();
 
     final proposalId = widget.proposalId;
@@ -281,5 +283,6 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
     } else {
       bloc.add(const LoadDefaultProposalCategoryEvent());
     }
+    bloc.add(const ProposalSubmittionCloseDateEvent());
   }
 }
