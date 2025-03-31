@@ -1,9 +1,9 @@
 import 'dart:math';
 
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart'
-    as cs show Ed25519PublicKey;
-import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart'
     hide Ed25519PublicKey;
+import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart'
+    as cs show Ed25519PublicKey;
 import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/src/crypto/key_derivation_service.dart';
@@ -138,7 +138,7 @@ final class RegistrationTransactionBuilder {
     });
   }
 
-  Future<cs.Ed25519PublicKey> _buildRoleCert(
+  Future<cs.Ed25519PublicKey> _buildRolePublicKey(
     AccountRole role, {
     required CatalystKeyPair rootKeyPair,
   }) async {
@@ -206,8 +206,11 @@ final class RegistrationTransactionBuilder {
 
     switch (roleAction) {
       case RegistrationTransactionRoleAction.set:
-        final cert = await _buildRoleCert(role, rootKeyPair: rootKeyPair);
-        return RbacField.set(cert);
+        final publicKey = await _buildRolePublicKey(
+          role,
+          rootKeyPair: rootKeyPair,
+        );
+        return RbacField.set(publicKey);
       case RegistrationTransactionRoleAction.undefined:
         return const RbacField.undefined();
       case RegistrationTransactionRoleAction.unset:
