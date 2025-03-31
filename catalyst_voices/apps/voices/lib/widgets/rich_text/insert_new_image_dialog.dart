@@ -14,8 +14,13 @@ class InsertNewImageDialog extends StatefulWidget {
 
 class _InsertNewImageDialogState extends State<InsertNewImageDialog> {
   final _textController = TextEditingController();
-  bool _isValidImageUrl = true;
-  bool _inputFieldIsEmpty = true;
+
+  bool get _inputFieldIsEmpty => _url.isEmpty;
+
+  bool get _isValidImageUrl =>
+      _inputFieldIsEmpty || ImageUrlValidator.isValid(_url);
+
+  String get _url => _textController.text.trim();
 
   @override
   Widget build(BuildContext context) {
@@ -23,37 +28,40 @@ class _InsertNewImageDialogState extends State<InsertNewImageDialog> {
     final colors = context.colors;
 
     return Dialog(
+      backgroundColor: colors.elevationsOnSurfaceNeutralLv1Grey,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(28),
       ),
-      child: Container(
+      child: SizedBox(
         width: 450,
-        height: 432,
-        decoration: BoxDecoration(
-          color: colors.elevationsOnSurfaceNeutralLv1Grey,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const InsertNewImageDialogHeader(),
-            Divider(
-              color: colorScheme.outline,
-            ),
-            InsertNewImageDialogBody(
-              textController: _textController,
-              isValidImageUrl: _isValidImageUrl,
-              inputFieldIsEmpty: _inputFieldIsEmpty,
-            ),
-            Divider(
-              color: colorScheme.outline,
-            ),
-            InsertNewImageDialogFooter(
-              isValidImageUrl: _isValidImageUrl,
-              inputFieldIsEmpty: _inputFieldIsEmpty,
-              onInsertImage: () => Navigator.pop(context, _textController.text),
-            ),
-          ],
+        child: ValueListenableBuilder(
+          valueListenable: _textController,
+          builder: (context, _, __) {
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const InsertNewImageDialogHeader(),
+                Divider(
+                  color: colorScheme.outline,
+                ),
+                InsertNewImageDialogBody(
+                  textController: _textController,
+                  isValidImageUrl: _isValidImageUrl,
+                  inputFieldIsEmpty: _inputFieldIsEmpty,
+                  onSubmit: _onSubmit,
+                ),
+                Divider(
+                  color: colorScheme.outline,
+                ),
+                InsertNewImageDialogFooter(
+                  isValidImageUrl: _isValidImageUrl,
+                  inputFieldIsEmpty: _inputFieldIsEmpty,
+                  onInsertImage: _onSubmit,
+                ),
+              ],
+            );
+          },
         ),
       ),
     );
@@ -65,18 +73,7 @@ class _InsertNewImageDialogState extends State<InsertNewImageDialog> {
     super.dispose();
   }
 
-  @override
-  void initState() {
-    super.initState();
-    _textController.addListener(() {
-      _validateUrl(_textController.text);
-    });
-  }
-
-  void _validateUrl(String url) {
-    setState(() {
-      _inputFieldIsEmpty = url.trim().isEmpty;
-      _isValidImageUrl = _inputFieldIsEmpty || ImageUrlValidator.isValid(url);
-    });
+  void _onSubmit() {
+    Navigator.pop(context, _url);
   }
 }

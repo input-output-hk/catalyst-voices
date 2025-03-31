@@ -7,11 +7,13 @@ class InsertNewImageDialogBody extends StatelessWidget {
   final TextEditingController textController;
   final bool isValidImageUrl;
   final bool inputFieldIsEmpty;
+  final VoidCallback onSubmit;
 
   const InsertNewImageDialogBody({
     required this.textController,
     required this.isValidImageUrl,
     required this.inputFieldIsEmpty,
+    required this.onSubmit,
     super.key,
   });
 
@@ -45,7 +47,7 @@ class InsertNewImageDialogBody extends StatelessWidget {
                   : null,
             ),
             keyboardType: TextInputType.text,
-            onFieldSubmitted: (_) {},
+            onFieldSubmitted: isValidImageUrl ? (_) => onSubmit() : null,
           ),
           const SizedBox(height: 20),
           RichText(
