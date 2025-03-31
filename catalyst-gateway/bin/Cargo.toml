@@ -15,12 +15,11 @@ repository.workspace = true
 workspace = true
 
 [dependencies]
-cardano-chain-follower = { version = "0.0.8", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "r20250325-00" }
-rbac-registration = { version = "0.0.4", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "r20250325-00" }
-catalyst-types = { version = "0.0.3", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "r20250325-00" }
-cardano-blockchain-types = { version = "0.0.3", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "r20250325-00" }
-catalyst-signed-doc = { version = "0.0.4", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "r20250325-00" }
-c509-certificate = { version = "0.0.3", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "r20250325-00" }
+cardano-chain-follower = { version = "0.0.8", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "r20250331-01" }
+rbac-registration = { version = "0.0.4", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "r20250331-01" }
+catalyst-types = { version = "0.0.3", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "r20250331-01" }
+cardano-blockchain-types = { version = "0.0.3", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "r20250331-01" }
+catalyst-signed-doc = { version = "0.0.4", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "r20250331-01" }
 
 pallas = { version = "0.30.1", git = "https://github.com/input-output-hk/catalyst-pallas.git", rev = "9b5183c8b90b90fe2cc319d986e933e9518957b3" }
 pallas-traverse = { version = "0.30.1", git = "https://github.com/input-output-hk/catalyst-pallas.git", rev = "9b5183c8b90b90fe2cc319d986e933e9518957b3" }
@@ -66,7 +65,7 @@ futures = "0.3.31"
 rand = "0.8.5"
 moka = { version = "0.12.8", features = ["future"] }
 crossbeam-skiplist = "0.1.3"
-poem = { version = "3.1.6", features = ["embed", "prometheus", "compression"] }
+poem = { version = "=3.1.6", features = ["embed", "prometheus", "compression"] }
 poem-openapi = { version = "=5.1.5", features = [
     "openapi-explorer",
     "rapidoc",
@@ -98,19 +97,19 @@ stats_alloc = "0.1.10"
 memory-stats = "1.0.0"
 derive_more = { version = "2.0.1", default-features = false, features = ["from", "into"] }
 rayon = "1.10"
-oid-registry = "0.7.1"
-x509-cert = "0.2.5"
 
 # Its a transitive dependency of the "poem-openapi" crate,
 # but its breaks API after version "5.1.8".
 poem-openapi-derive = { version = "=5.1.4" }
+# Its a transitive dependency of the "poem-openapi-derive" crate,
+# but its breaks API after version "0.20.11".
+darling = { version = "=0.20.10" }
 
 [dev-dependencies]
-x509-cert = { version = "0.2.5", features = ["builder"] }
 
 [build-dependencies]
 build-info-build = "0.0.39"
 
 [package.metadata.cargo-machete]
 # remove that after fixing issues with latest crates
-ignored = ["poem-openapi-derive"]
+ignored = ["poem-openapi-derive", "darling"]

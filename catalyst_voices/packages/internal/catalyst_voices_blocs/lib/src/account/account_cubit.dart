@@ -44,7 +44,13 @@ final class AccountCubit extends Cubit<AccountState> {
       return;
     }
 
-    await _userService.updateActiveAccount(email: email.value);
+    final activeAccount = _userService.user.activeAccount;
+    if (activeAccount != null) {
+      await _userService.updateAccount(
+        id: activeAccount.catalystId,
+        email: email.value,
+      );
+    }
 
     emit(state.copyWith(email: email));
   }
@@ -54,11 +60,15 @@ final class AccountCubit extends Cubit<AccountState> {
       return;
     }
 
-    final value = username.value;
+    final activeAccount = _userService.user.activeAccount;
+    if (activeAccount != null) {
+      final value = username.value;
 
-    await _userService.updateActiveAccount(
-      username: value.isNotEmpty ? Optional(value) : const Optional.empty(),
-    );
+      await _userService.updateAccount(
+        id: activeAccount.catalystId,
+        username: value.isNotEmpty ? Optional(value) : const Optional.empty(),
+      );
+    }
 
     emit(state.copyWith(username: username));
   }

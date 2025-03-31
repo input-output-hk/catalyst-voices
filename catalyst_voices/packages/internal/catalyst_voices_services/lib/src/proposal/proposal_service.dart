@@ -39,6 +39,11 @@ abstract interface class ProposalService {
     required DocumentData document,
   });
 
+  Future<void> forgetProposal({
+    required SignedDocumentRef ref,
+    required SignedDocumentRef categoryId,
+  });
+
   /// Similar to [watchFavoritesProposalsIds] stops after first emit.
   Future<List<String>> getFavoritesProposalsIds();
 
@@ -82,6 +87,11 @@ abstract interface class ProposalService {
 
   /// Submits a proposal draft into review.
   Future<void> submitProposalForReview({
+    required SignedDocumentRef ref,
+    required SignedDocumentRef categoryId,
+  });
+
+  Future<void> unlockProposal({
     required SignedDocumentRef ref,
     required SignedDocumentRef categoryId,
   });
@@ -170,6 +180,24 @@ final class ProposalServiceImpl implements ProposalService {
   }
 
   @override
+  Future<void> forgetProposal({
+    required SignedDocumentRef ref,
+    required SignedDocumentRef categoryId,
+  }) {
+    return _signerService.useProposerCredentials(
+      (catalystId, privateKey) {
+        return _proposalRepository.publishProposalAction(
+          ref: ref,
+          categoryId: categoryId,
+          action: ProposalSubmissionAction.hide,
+          catalystId: catalystId,
+          privateKey: privateKey,
+        );
+      },
+    );
+  }
+
+  @override
   Future<List<String>> getFavoritesProposalsIds() {
     return _documentRepository
         .watchAllDocumentsFavoriteIds(type: DocumentType.proposalDocument)
@@ -216,8 +244,9 @@ final class ProposalServiceImpl implements ProposalService {
   }
 
   @override
-  Future<DocumentRef> importProposal(Uint8List data) {
-    return _proposalRepository.importProposal(data);
+  Future<DocumentRef> importProposal(Uint8List data) async {
+    final authorId = await _getUserCatalystId();
+    return _proposalRepository.importProposal(data, authorId);
   }
 
   @override
@@ -262,6 +291,24 @@ final class ProposalServiceImpl implements ProposalService {
           ref: ref,
           categoryId: categoryId,
           action: ProposalSubmissionAction.aFinal,
+          catalystId: catalystId,
+          privateKey: privateKey,
+        );
+      },
+    );
+  }
+
+  @override
+  Future<void> unlockProposal({
+    required SignedDocumentRef ref,
+    required SignedDocumentRef categoryId,
+  }) async {
+    return _signerService.useProposerCredentials(
+      (catalystId, privateKey) {
+        return _proposalRepository.publishProposalAction(
+          ref: ref,
+          categoryId: categoryId,
+          action: ProposalSubmissionAction.draft,
           catalystId: catalystId,
           privateKey: privateKey,
         );
