@@ -130,7 +130,7 @@ final class ProposalBuilderBloc
     );
 
     final commentSegments = _mapCommentToSegments(
-      proposalRef: proposalMetadata.documentRef!,
+      originalProposalRef: proposalMetadata.originalDocumentRef,
       comments: comments,
       commentSchema: commentSchema,
       commentsState: commentsState,
@@ -172,12 +172,17 @@ final class ProposalBuilderBloc
     );
 
     await _commentsSub?.cancel();
-    _commentsSub = _commentService
-        // TODO(dtscalac): exact version or loose version
-        // Note. watch comments on exact version of proposal.
-        .watchCommentsWith(ref: proposalMetadata.documentRef!)
-        .distinct(listEquals)
-        .listen((value) => add(RebuildCommentsProposalEvent(comments: value)));
+
+    final originalRef = proposalMetadata.originalDocumentRef;
+    if (originalRef is SignedDocumentRef) {
+      _commentsSub = _commentService
+          // Note. watch comments on exact version of proposal.
+          .watchCommentsWith(ref: originalRef)
+          .distinct(listEquals)
+          .listen(
+            (value) => add(RebuildCommentsProposalEvent(comments: value)),
+          );
+    }
 
     return _rebuildState();
   }
@@ -465,13 +470,14 @@ final class ProposalBuilderBloc
   }
 
   List<Segment> _mapCommentToSegments({
-    required DocumentRef proposalRef,
+    required DocumentRef? originalProposalRef,
     required List<CommentWithReplies> comments,
     required DocumentSchema? commentSchema,
     required CommentsState commentsState,
     required bool hasActiveAccount,
   }) {
-    final isDraftProposal = proposalRef is DraftRef;
+    final isDraftProposal =
+        originalProposalRef == null || originalProposalRef is DraftRef;
     final canReply = !isDraftProposal && hasActiveAccount;
     final canComment = canReply && commentSchema != null;
 
@@ -539,6 +545,7 @@ final class ProposalBuilderBloc
     _updateMetadata(
       emit,
       documentRef: updatedRef,
+      originalDocumentRef: updatedRef,
       publish: ProposalPublish.localDraft,
     );
 
@@ -570,6 +577,7 @@ final class ProposalBuilderBloc
       _updateMetadata(
         emit,
         documentRef: updatedRef,
+        originalDocumentRef: updatedRef,
         publish: ProposalPublish.publishedDraft,
       );
       emitSignal(const PublishedProposalBuilderSignal());
@@ -636,11 +644,14 @@ final class ProposalBuilderBloc
     SubmitCommentEvent event,
     Emitter<ProposalBuilderState> emit,
   ) async {
-    final proposalRef = state.metadata.documentRef;
-    assert(proposalRef != null, 'Proposal ref not found. Load document first!');
+    final originalProposalRef = state.metadata.originalDocumentRef;
     assert(
-      proposalRef is SignedDocumentRef,
-      'Can comment only on signed documents',
+      originalProposalRef != null,
+      'Proposal ref not found. Load document first!',
+    );
+    assert(
+      originalProposalRef is SignedDocumentRef,
+      'Can comment only on signed documents.',
     );
 
     final activeAccountId = _cache.activeAccountId;
@@ -653,7 +664,7 @@ final class ProposalBuilderBloc
     final comment = CommentDocument(
       metadata: CommentMetadata(
         selfRef: commentRef,
-        ref: proposalRef! as SignedDocumentRef,
+        ref: originalProposalRef! as SignedDocumentRef,
         template: commentTemplate!.metadata.selfRef as SignedDocumentRef,
         reply: event.reply,
         authorId: activeAccountId!,
@@ -758,11 +769,13 @@ final class ProposalBuilderBloc
   void _updateMetadata(
     Emitter<ProposalBuilderState> emit, {
     DocumentRef? documentRef,
+    DocumentRef? originalDocumentRef,
     ProposalPublish? publish,
   }) {
     final updatedMetadata = state.metadata.copyWith(
       documentRef: documentRef != null ? Optional(documentRef) : null,
-      originalDocumentRef: documentRef != null ? Optional(documentRef) : null,
+      originalDocumentRef:
+          originalDocumentRef != null ? Optional(originalDocumentRef) : null,
       publish: publish,
     );
 
