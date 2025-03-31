@@ -35,6 +35,7 @@ export 'proposal_comments/proposal_comments_segment.dart';
 export 'proposal_comments/proposal_comments_sort.dart';
 export 'registration/exception/localized_registration_exception.dart';
 export 'registration/registration.dart';
+export 'registration/registration_role.dart';
 export 'segments/segments_navigation.dart';
 export 'session/session_account.dart';
 export 'session/session_settings.dart';
