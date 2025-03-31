@@ -59,7 +59,6 @@ pub(crate) async fn endpoint(doc_bytes: Vec<u8>, token: CatalystRBACTokenV1) -> 
     if doc
         .kids()
         .iter()
-        .cloned()
         .any(|kid| kid.as_short_id() != token.catalyst_id().as_short_id())
     {
         return Responses::UnprocessableContent(Json(PutDocumentUnprocessableContent::new(
