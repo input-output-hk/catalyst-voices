@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart'
     hide Ed25519PublicKey;
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart'
-    as cs show Ed25519PublicKey;
+as cs showhide Ed25519PublicKey;
 import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/src/crypto/key_derivation_service.dart';
@@ -82,20 +82,25 @@ final class RegistrationTransactionBuilder {
   }
 
   Future<RegistrationMetadata> _buildMetadataEnvelope() async {
+    final isFirsRegistration = roles.any((element) => element.setVoter);
     final rootKeyPair = keyDerivationService.deriveAccountRoleKeyPair(
       masterKey: masterKey,
       role: AccountRole.root,
     );
 
     return rootKeyPair.use((rootKeyPair) async {
-      final derCert = await _generateX509Certificate(keyPair: rootKeyPair);
+      final derCert = isFirsRegistration
+          ? await _generateX509Certificate(keyPair: rootKeyPair)
+          : null;
       final publicKeys = await _generatePublicKeysForAllRoles(rootKeyPair);
 
       final x509Envelope = X509MetadataEnvelope.unsigned(
         purpose: UuidV4.fromString(_catalystUserRoleRegistrationPurpose),
         txInputsHash: TransactionInputsHash.fromTransactionInputs(utxos),
         chunkedData: RegistrationData(
-          derCerts: [RbacField.set(derCert)],
+          derCerts: [
+            if (derCert != null) RbacField.set(derCert),
+          ],
           publicKeys: publicKeys,
           roleDataSet: {
             if (roles.any((element) => element.setVoter))
