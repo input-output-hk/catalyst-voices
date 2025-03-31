@@ -147,7 +147,7 @@ class _Background extends StatelessWidget {
           center: Alignment(0.2822, -0.3306),
           radius: 0.5,
           colors: [Color(0x99F9E7FD), Color(0x99F6CEFF)],
-          stops: [0.0, 0.0],
+          stops: [1.0, 0.0],
         ),
       ),
       ShapeConfig(

@@ -77,28 +77,20 @@ class _BubbleShapes extends StatelessWidget {
             211,
           ),
         ],
-        gradientStops: [
-          1,
-        ],
+        gradientStops: [1],
       ),
       BubbleConfig(
         x: size.width * .7,
         y: -220,
         radius: 372,
-        gradientColors: [
-          const Color(0x9FC01CEB),
-        ],
-        gradientStops: [
-          0,
-        ],
+        gradientColors: [const Color(0x9FC01CEB)],
+        gradientStops: [0],
       ),
       BubbleConfig(
         x: size.width * .92,
         y: size.height * .85,
         radius: 140,
-        gradientColors: const [
-          Color(0xFFE5F6FF),
-        ],
+        gradientColors: const [Color(0xFFE5F6FF)],
         gradientStops: const [0],
         shadowBlur: 250,
         shadowOffset: const Offset(-40, -44),
@@ -127,8 +119,8 @@ class _BubbleShapes extends StatelessWidget {
           center: Alignment(0.8321, 0.2873),
           radius: 0.7135,
           colors: [
+            Color(0xAFC6C5FF),
             Color(0xBFDCD5FE),
-            Color(0xFFC6C5FF),
           ],
           stops: [0.0, 1.0],
         ),

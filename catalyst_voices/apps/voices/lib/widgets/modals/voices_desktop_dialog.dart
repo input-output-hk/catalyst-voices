@@ -105,6 +105,27 @@ class VoicesTwoPaneDialog extends StatelessWidget {
   }
 }
 
+class _CloseButton extends StatelessWidget {
+  const _CloseButton();
+
+  @override
+  Widget build(BuildContext context) {
+    const buttonStyle = ButtonStyle(
+      fixedSize: WidgetStatePropertyAll(Size.square(48)),
+    );
+
+    return IconButtonTheme(
+      data: const IconButtonThemeData(style: buttonStyle),
+      child: XButton(
+        key: const Key('DialogCloseButton'),
+        onTap: () {
+          unawaited(Navigator.of(context).maybePop());
+        },
+      ),
+    );
+  }
+}
+
 class _VoicesDesktopDialog extends StatelessWidget {
   final BoxConstraints constraints;
   final Color? backgroundColor;
@@ -135,27 +156,6 @@ class _VoicesDesktopDialog extends StatelessWidget {
       child: ConstrainedBox(
         constraints: constraints,
         child: child,
-      ),
-    );
-  }
-}
-
-class _CloseButton extends StatelessWidget {
-  const _CloseButton();
-
-  @override
-  Widget build(BuildContext context) {
-    const buttonStyle = ButtonStyle(
-      fixedSize: WidgetStatePropertyAll(Size.square(48)),
-    );
-
-    return IconButtonTheme(
-      data: const IconButtonThemeData(style: buttonStyle),
-      child: XButton(
-        key: const Key('DialogCloseButton'),
-        onTap: () {
-          unawaited(Navigator.of(context).maybePop());
-        },
       ),
     );
   }
