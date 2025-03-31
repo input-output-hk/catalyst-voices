@@ -6,6 +6,7 @@ import 'package:catalyst_voices/pages/workspace/header/workspace_header.dart';
 import 'package:catalyst_voices/pages/workspace/page/workspace_error.dart';
 import 'package:catalyst_voices/pages/workspace/page/workspace_loading.dart';
 import 'package:catalyst_voices/pages/workspace/page/workspace_user_proposals.dart';
+import 'package:catalyst_voices/pages/workspace/submission_closing_warning_dialog.dart';
 import 'package:catalyst_voices/routes/routing/proposal_builder_route.dart';
 import 'package:catalyst_voices/widgets/snackbar/voices_snackbar.dart';
 import 'package:catalyst_voices/widgets/snackbar/voices_snackbar_type.dart';
@@ -69,6 +70,8 @@ class _WorkspacePageState extends State<WorkspacePage>
         unawaited(
           ProposalBuilderRoute.fromRef(ref: signal.ref).push(context),
         );
+      case SubmittionCloseDate():
+        unawaited(_showSubmittionClosingWarningDialog(signal.date));
     }
   }
 
@@ -77,7 +80,15 @@ class _WorkspacePageState extends State<WorkspacePage>
     super.initState();
     final bloc = context.read<WorkspaceBloc>();
     // ignore: cascade_invocations
-    bloc.add(const WatchUserProposalsEvent());
+    bloc
+      ..add(const WatchUserProposalsEvent())
+      ..add(const GetTimelineItemsEvent());
+  }
+
+  void _dontShowAgain(bool value) {
+    context
+        .read<SessionCubit>()
+        .updateShowSubmittionClosingWarrning(value: value);
   }
 
   void _showDeleteErrorSnackBar() {
@@ -100,5 +111,26 @@ class _WorkspacePageState extends State<WorkspacePage>
       title: context.l10n.successProposalDeleted,
       message: context.l10n.successProposalDeletedDescription,
     ).show(context);
+  }
+
+  Future<void> _showSubmittionClosingWarningDialog([
+    DateTime? submittionCloseDate,
+  ]) async {
+    final canShow = context
+        .read<SessionCubit>()
+        .state
+        .settings
+        .showSubmittionClosingWarning;
+
+    if (submittionCloseDate == null || !canShow) {
+      return;
+    }
+    if (mounted) {
+      await SubmissionClosingWarningDialog.showNDaysBefore(
+        context: context,
+        submissionCloseAt: submittionCloseDate,
+        dontShowAgain: _dontShowAgain,
+      );
+    }
   }
 }

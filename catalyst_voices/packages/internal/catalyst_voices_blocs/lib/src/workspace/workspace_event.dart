@@ -41,6 +41,13 @@ final class ForgetProposalEvent extends WorkspaceEvent {
   List<Object?> get props => [ref];
 }
 
+final class GetTimelineItemsEvent extends WorkspaceEvent {
+  const GetTimelineItemsEvent();
+
+  @override
+  List<Object?> get props => [];
+}
+
 final class ImportProposalEvent extends WorkspaceEvent {
   final Uint8List proposalData;
 

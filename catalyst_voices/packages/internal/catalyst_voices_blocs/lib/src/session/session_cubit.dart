@@ -138,6 +138,15 @@ final class SessionCubit extends Cubit<SessionState>
     return keychain.unlock(lockFactor);
   }
 
+  void updateShowSubmittionClosingWarrning({required bool value}) {
+    final settings = _userService.user.settings;
+
+    final updatedSettings =
+        settings.copyWith(showSubmittionClosingWarrning: Optional.of(value));
+
+    unawaited(_userService.updateSettings(updatedSettings));
+  }
+
   void updateTheme(ThemePreferences value) {
     final settings = _userService.user.settings;
 
@@ -184,6 +193,7 @@ final class SessionCubit extends Cubit<SessionState>
   SessionState _createSessionState() {
     final account = _account;
     final userSettings = _userSettings;
+    _logger.info('UserSettings: $userSettings');
     final isUnlocked = _account?.keychain.lastIsUnlocked ?? false;
     final canCreateAccount = _alwaysAllowRegistration || _hasWallets;
 

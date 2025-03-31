@@ -60,6 +60,13 @@ sealed class ProposalBuilderEvent extends Equatable {
   const ProposalBuilderEvent();
 }
 
+final class ProposalSubmittionCloseDateEvent extends ProposalBuilderEvent {
+  const ProposalSubmittionCloseDateEvent();
+
+  @override
+  List<Object?> get props => [];
+}
+
 final class PublishProposalEvent extends ProposalBuilderEvent {
   const PublishProposalEvent();
 

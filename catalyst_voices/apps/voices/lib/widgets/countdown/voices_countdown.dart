@@ -1,74 +1,32 @@
 import 'dart:async';
 
-import 'package:catalyst_voices/common/ext/build_context_ext.dart';
-import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
+typedef CountdownBuilder = Widget Function(
+  BuildContext context,
+  int days,
+  int hours,
+  int minutes,
+  int seconds,
+);
+
 class VoicesCountdown extends StatefulWidget {
   final DateTime dateTime;
+  final CountdownBuilder builder;
   final ValueChanged<bool>? onCountdownEnd;
   final ValueChanged<bool>? onCountdownStart;
 
   const VoicesCountdown({
     super.key,
     required this.dateTime,
+    required this.builder,
     this.onCountdownEnd,
     this.onCountdownStart,
   });
 
   @override
   State<VoicesCountdown> createState() => _VoicesCountdownState();
-}
-
-class _TimePartCard extends StatelessWidget {
-  final int value;
-  final String unit;
-
-  const _TimePartCard({
-    required this.value,
-    required this.unit,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 12),
-      height: 167,
-      width: 144,
-      decoration: BoxDecoration(
-        color: context.colors.onSurfaceSecondary08,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Column(
-        spacing: 12,
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            value.toString(),
-            style: TextStyle(
-              fontSize: 72,
-              fontWeight: FontWeight.w700,
-              letterSpacing: 0,
-              height: 1,
-              color: context.colorScheme.primary,
-            ),
-          ),
-          Text(
-            unit.toUpperCase(),
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w400,
-              letterSpacing: 0.24,
-              height: 1,
-              color: context.colorScheme.primary,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 }
 
 class _VoicesCountdownState extends State<VoicesCountdown> {
@@ -78,27 +36,12 @@ class _VoicesCountdownState extends State<VoicesCountdown> {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        _TimePartCard(
-          value: _timeLeft.inDays,
-          unit: context.l10n.days,
-        ),
-        _TimePartCard(
-          value: _timeLeft.inHours % 24,
-          unit: context.l10n.hours,
-        ),
-        _TimePartCard(
-          value: _timeLeft.inMinutes % 60,
-          unit: context.l10n.minutes,
-        ),
-        _TimePartCard(
-          value: _timeLeft.inSeconds % 60,
-          unit: context.l10n.seconds,
-        ),
-      ],
+    return widget.builder(
+      context,
+      _timeLeft.inDays,
+      _timeLeft.inHours % 24,
+      _timeLeft.inMinutes % 60,
+      _timeLeft.inSeconds % 60,
     );
   }
 

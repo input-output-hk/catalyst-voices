@@ -2341,5 +2341,68 @@
   "namiWallet": "Nami Wallet",
   "@namiWallet": {
     "description": "Name of the nami wallet"
+  },
+  "dontShowAgain": "Don't show again",
+  "@dontShowAgain": {
+    "description": "Action to not show again"
+  },
+  "proposalSubmittionWindowClosesAt": "The proposal submission window closes {date}",
+  "@proposalSubmittionWindowClosesAt": {
+    "description": "Description for the proposal submission window closes at",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "submitProposalBeforeClosing": "Submit your final proposals to Review stage well before the App closes.",
+  "@submitProposalBeforeClosing": {
+    "description": "Information for user to submit proposal before the submission window closes"
+  },
+  "checkMaxProposal": "Check your finals (max 5) in My proposals.",
+  "@checkMaxProposal": {
+    "description": "Information for user to check their final proposals before subittion window closes"
+  },
+  "catalystAppNotAvailableAfterSubmittionCloses": "The Catalyst App won’t be available after submission close.",
+  "@catalystAppNotAvailableAfterSubmittionCloses": {
+    "description": "Information that app won't be available after submission closes"
+  },
+  "wantToBackUpProposals": "Want to back up your proposals?",
+  "@wantToBackUpProposals": {
+    "description": "Title for section informing user that they can backup their proposals"
+  },
+  "goMyProposals": "Go My proposals",
+  "@goMyProposals": {
+    "description": "Action to go to my proposals"
+  },
+  "exportProposalsIndividually": "Export proposals individually",
+  "@exportProposalsIndividually": {
+    "description": "Title for section informing user that they can export their proposals individually"
+  },
+  "storeInSafeLocation": "Store in safe location",
+  "@storeInSafeLocation": {
+    "description": "Title for section informing user that they can store their proposals in a safe location"
+  },
+  "catalystAppClosesIn": "Catalyst App closes in {days}d, {hours}h, {minutes}m, {seconds}s.",
+  "@catalystAppClosesIn": {
+    "description": "Message displayed when the app closes in a few seconds",
+    "placeholders": {
+      "days": {
+        "type": "int",
+        "example": "1"
+      },
+      "hours": {
+        "type": "int",
+        "example": "1"
+      },
+      "minutes": {
+        "type": "int",
+        "example": "1"
+      },
+      "seconds": {
+        "type": "int",
+        "example": "10"
+      }
+    }
   }
 }

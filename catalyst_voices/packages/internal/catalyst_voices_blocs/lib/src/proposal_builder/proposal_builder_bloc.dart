@@ -46,6 +46,7 @@ final class ProposalBuilderBloc
     on<PublishProposalEvent>(_publishProposal);
     on<SubmitProposalEvent>(_submitProposal);
     on<ValidateProposalEvent>(_validateProposal);
+    on<ProposalSubmittionCloseDateEvent>(_proposalSubmissionCloseDate);
   }
 
   bool validate() {
@@ -409,6 +410,21 @@ final class ProposalBuilderBloc
         schema: segment.schema as DocumentSegmentSchema,
       );
     }).toList();
+  }
+
+  Future<void> _proposalSubmissionCloseDate(
+    ProposalSubmittionCloseDateEvent event,
+    Emitter<ProposalBuilderState> emit,
+  ) async {
+    final timeline = await _campaignService.getCampaignTimeline();
+    final closeDate = timeline
+        .firstWhereOrNull(
+          (e) => e.stage == CampaignTimelineStage.proposalSubmission,
+        )
+        ?.timeline
+        .to;
+
+    emitSignal(ProposalSubmittionCloseDate(date: closeDate));
   }
 
   Future<void> _publishAndSubmitProposalForReview(

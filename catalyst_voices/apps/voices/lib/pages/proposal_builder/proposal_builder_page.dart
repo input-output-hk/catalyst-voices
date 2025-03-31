@@ -11,6 +11,7 @@ import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_navigati
 import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_segments.dart';
 import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_setup_panel.dart';
 import 'package:catalyst_voices/pages/spaces/appbar/session_state_header.dart';
+import 'package:catalyst_voices/pages/workspace/submission_closing_warning_dialog.dart';
 import 'package:catalyst_voices/routes/routing/spaces_route.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/publish_proposal_error_dialog.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/submit_proposal_error_dialog.dart';
@@ -146,6 +147,8 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
       case PublishedProposalBuilderSignal():
       case SubmittedProposalBuilderSignal():
         const WorkspaceRoute().go(context);
+      case ProposalSubmittionCloseDate():
+        unawaited(_showSubmittionClosingWarningDialog(signal.date));
     }
   }
 
@@ -170,6 +173,13 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
         .listen((record) => _updateSegments(record.segments, record.nodeId));
 
     _updateSource(bloc: bloc);
+    bloc.add(const ProposalSubmittionCloseDateEvent());
+  }
+
+  void _dontShowAgain(bool value) {
+    context
+        .read<SessionCubit>()
+        .updateShowSubmittionClosingWarrning(value: value);
   }
 
   void _handleSegmentsControllerChange() {
@@ -197,6 +207,27 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
       context: context,
       exception: error,
     );
+  }
+
+  Future<void> _showSubmittionClosingWarningDialog([
+    DateTime? submittionCloseDate,
+  ]) async {
+    final canShow = context
+        .read<SessionCubit>()
+        .state
+        .settings
+        .showSubmittionClosingWarning;
+
+    if (submittionCloseDate == null || !canShow) {
+      return;
+    }
+    if (mounted) {
+      await SubmissionClosingWarningDialog.showNDaysBefore(
+        context: context,
+        submissionCloseAt: submittionCloseDate,
+        dontShowAgain: _dontShowAgain,
+      );
+    }
   }
 
   void _showValidationErrorSnackbar(ProposalBuilderValidationException error) {

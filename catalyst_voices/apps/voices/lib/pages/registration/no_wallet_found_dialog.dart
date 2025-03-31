@@ -1,4 +1,5 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
+import 'package:catalyst_voices/widgets/cards/tip_card.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
@@ -66,66 +67,6 @@ class SupportedWallet extends StatelessWidget with LaunchUrlMixin {
 
   Future<void> _launchUrl() async {
     await launchUri(url.getUri());
-  }
-}
-
-class _GoodToKnow extends StatelessWidget {
-  const _GoodToKnow();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        vertical: 12,
-        horizontal: 16,
-      ),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        color: context.colors.onSurfaceNeutralOpaqueLv1,
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(7),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8),
-              color: context.colorScheme.primary,
-            ),
-            child: VoicesAssets.icons.lightBulb.buildIcon(
-              size: 38,
-              color: context.colors.iconsBackground,
-            ),
-          ),
-          SizedBox(
-            width: 268,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  context.l10n.goodToKnow,
-                  style: context.textTheme.titleSmall?.copyWith(
-                    color: context.colors.textOnPrimaryLevel1,
-                  ),
-                ),
-                Text(
-                  context.l10n.registrationTransactionFeeDescription,
-                  style: context.textTheme.bodySmall?.copyWith(
-                    color: context.colors.textOnPrimaryLevel1,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          VoicesAvatar(
-            foregroundColor: context.colors.iconsPrimary,
-            backgroundColor: context.colors.iconsBackground,
-            icon: VoicesAssets.icons.informationCircle.buildIcon(),
-          ),
-        ],
-      ),
-    );
   }
 }
 
@@ -323,7 +264,10 @@ class _RightSide extends StatelessWidget {
         const Spacer(),
         const _NoWalletAction(),
         const Spacer(),
-        const _GoodToKnow(),
+        TipCard(
+          headerText: context.l10n.goodToKnow,
+          tips: [context.l10n.registrationTransactionFeeDescription],
+        ),
       ],
     );
   }
