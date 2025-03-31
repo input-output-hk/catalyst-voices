@@ -17,10 +17,7 @@ use tracing::{error, warn};
 
 use super::token::CatalystRBACTokenV1;
 use crate::{
-    db::index::{
-        queries::rbac::get_rbac_registrations::{Query, QueryParams},
-        session::CassandraSession,
-    },
+    db::index::{queries::rbac::get_rbac_registrations, session::CassandraSession},
     service::common::{
         responses::{
             code_500_internal_server_error::InternalServerError,
@@ -156,7 +153,7 @@ async fn checker_api_catalyst_auth(
     //     return Ok(token);
     // }
 
-    let reg_chain = registration_chain(token.network(), &registrations)
+    let reg_chain = build_reg_chain(token.network(), &registrations)
         .await
         .map_err(|e| {
             error!(
@@ -200,47 +197,65 @@ async fn checker_api_catalyst_auth(
 
 /// Returns a sorted list of all registrations for the given Catalyst ID from the
 /// database.
-pub(crate) async fn indexed_registrations(catalyst_id: &IdUri) -> poem::Result<Vec<Query>> {
+pub(crate) async fn indexed_registrations(
+    catalyst_id: &IdUri,
+) -> poem::Result<Vec<get_rbac_registrations::Query>> {
     let session = CassandraSession::get(true).ok_or_else(|| {
         error!("Failed to acquire db session");
-        service_unavailable()
+        let e = ServiceUnavailable::new(None);
+        return ErrorResponses::ServiceUnavailable(Json(e), Some(RetryAfterHeader::default()));
     })?;
 
-    let mut result: Vec<_> = Query::execute(&session, QueryParams {
-        catalyst_id: catalyst_id.clone().into(),
-    })
-    .and_then(|r| r.try_collect().map_err(Into::into))
-    .await
-    .map_err(|e| {
-        error!("Failed to get RBAC registrations for {catalyst_id} Catalyst ID: {e:?}");
-        if e.is::<bb8::RunError<tokio_postgres::Error>>() {
-            service_unavailable()
-        } else {
-            let error = InternalServerError::new(None);
-            error!(id=%error.id(), error=?e);
-            ErrorResponses::ServerError(Json(error)).into()
-        }
-    })?;
+    let mut result: Vec<_> =
+        get_rbac_registrations::Query::execute(&session, get_rbac_registrations::QueryParams {
+            catalyst_id: catalyst_id.clone().into(),
+        })
+        .and_then(|r| r.try_collect().map_err(Into::into))
+        .await
+        .map_err(|e| {
+            error!("Failed to get RBAC registrations for {catalyst_id} Catalyst ID: {e:?}");
+            if e.is::<bb8::RunError<tokio_postgres::Error>>() {
+                let e = ServiceUnavailable::new(None);
+                ErrorResponses::ServiceUnavailable(Json(e), Some(RetryAfterHeader::default()))
+            } else {
+                let error = InternalServerError::new(None);
+                error!(id=%error.id(), error=?e);
+                ErrorResponses::ServerError(Json(error))
+            }
+        })?;
 
     result.sort_by_key(|r| r.slot_no);
     Ok(result)
 }
 
-/// Returns a 503 error instance.
-fn service_unavailable() -> poem::Error {
-    let error = ServiceUnavailable::new(None);
-    ErrorResponses::ServiceUnavailable(Json(error), Some(RetryAfterHeader::default())).into()
-}
-
 /// Build a registration chain from the given indexed data.
-async fn registration_chain(
-    network: Network, indexed_registrations: &[Query],
+async fn build_reg_chain(
+    network: Network, indexed_registrations: &[get_rbac_registrations::Query],
 ) -> anyhow::Result<RegistrationChain> {
     let mut indexed_registrations = indexed_registrations.iter();
     let Some(root) = indexed_registrations.next() else {
         // We already checked that the registrations aren't empty, so we shouldn't get there.
         return Err(anyhow!("Empty registrations list"));
     };
+
+    // a helper function to return a RBAC registration from the given block and slot.
+    let registration =
+        async |network: Network, slot: Slot, txn_index: TxnIndex| -> anyhow::Result<Cip509> {
+            let point = Point::fuzzy(slot);
+            let block = ChainFollower::get_block(network, point)
+                .await
+                .context("Unable to get block")?
+                .data;
+            if block.point().slot_or_default() != slot {
+                // The `ChainFollower::get_block` function can return the next consecutive block if
+                // it cannot find the exact one. This shouldn't happen, but we need
+                // to check anyway.
+                return Err(anyhow!("Unable to find exact block"));
+            }
+            Cip509::new(&block, txn_index, &[])
+                .context("Invalid RBAC registration")?
+                .context("No RBAC registration at this block and txn index")
+        };
 
     let root = registration(network, root.slot_no.into(), root.txn_index.into())
         .await
@@ -272,21 +287,4 @@ async fn registration_chain(
     }
 
     Ok(chain)
-}
-
-/// Returns a RBAC registration from the given block and slot.
-async fn registration(network: Network, slot: Slot, txn_index: TxnIndex) -> anyhow::Result<Cip509> {
-    let point = Point::fuzzy(slot);
-    let block = ChainFollower::get_block(network, point)
-        .await
-        .context("Unable to get block")?
-        .data;
-    if block.point().slot_or_default() != slot {
-        // The `ChainFollower::get_block` function can return the next consecutive block if it
-        // cannot find the exact one. This shouldn't happen, but we need to check anyway.
-        return Err(anyhow!("Unable to find exact block"));
-    }
-    Cip509::new(&block, txn_index, &[])
-        .context("Invalid RBAC registration")?
-        .context("No RBAC registration at this block and txn index")
 }
