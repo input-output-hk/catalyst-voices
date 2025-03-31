@@ -1,5 +1,6 @@
 //! Implementation of the PUT `/document` endpoint
 
+use catalyst_types::id_uri::{key_rotation::KeyRotation, role_index::RoleIndex};
 use poem_openapi::{payload::Json, ApiResponse};
 use unprocessable_content_request::PutDocumentUnprocessableContent;
 
@@ -60,12 +61,12 @@ pub(crate) async fn endpoint(doc_bytes: Vec<u8>, token: CatalystRBACTokenV1) -> 
         .catalyst_id()
         .clone()
         .as_id()
-        .with_role(Default::default())
-        .with_rotation(Default::default());
+        .with_role(RoleIndex::default())
+        .with_rotation(KeyRotation::default());
     if doc.kids().iter().cloned().any(|kid| {
         !kid.as_id()
-            .with_role(Default::default())
-            .with_rotation(Default::default())
+            .with_role(RoleIndex::default())
+            .with_rotation(KeyRotation::default())
             .eq(&token_catid)
     }) {
         return Responses::UnprocessableContent(Json(PutDocumentUnprocessableContent::new(

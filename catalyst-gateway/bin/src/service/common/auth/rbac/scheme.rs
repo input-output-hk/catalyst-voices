@@ -203,7 +203,7 @@ pub(crate) async fn indexed_registrations(
     let session = CassandraSession::get(true).ok_or_else(|| {
         error!("Failed to acquire db session");
         let e = ServiceUnavailable::new(None);
-        return ErrorResponses::ServiceUnavailable(Json(e), Some(RetryAfterHeader::default()));
+        ErrorResponses::ServiceUnavailable(Json(e), Some(RetryAfterHeader::default()))
     })?;
 
     let mut result: Vec<_> =
