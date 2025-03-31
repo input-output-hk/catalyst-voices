@@ -24,7 +24,7 @@ use crate::{
     service::common::{
         objects::cardano::{
             network::Network,
-            stake_info::{FullStakeInfo, StakeInfo, StakedNativeTokenInfo},
+            stake_info::{FullStakeInfo, StakeInfo, StakedTxoAssetInfo},
         },
         responses::WithErrorResponses,
         types::{
@@ -97,8 +97,8 @@ pub(crate) async fn endpoint(
     .into()
 }
 
-/// TXO Native Token information.
-struct NativeTokens {
+/// TXO aseet information.
+struct TxoAssetInfo {
     /// Asset hash.
     id: Vec<u8>,
     /// Asset name.
@@ -131,9 +131,9 @@ async fn calculate_stake_info(
     let address: StakeAddress = stake_address.try_into()?;
     let adjusted_slot_num = slot_num.unwrap_or(SlotNo::MAXIMUM);
 
-    let (mut txos, native_tokens) = futures::try_join!(
+    let (mut txos, txo_assets) = futures::try_join!(
         get_txo(session, &address, adjusted_slot_num),
-        get_native_tokens(session, &address, adjusted_slot_num)
+        get_txo_assets(session, &address, adjusted_slot_num)
     )?;
     if txos.is_empty() {
         return Ok(None);
@@ -141,7 +141,7 @@ async fn calculate_stake_info(
 
     set_and_update_spent(session, &address, &mut txos).await?;
 
-    let stake_info = build_stake_info(txos, native_tokens, adjusted_slot_num)?;
+    let stake_info = build_stake_info(txos, txo_assets, adjusted_slot_num)?;
 
     Ok(Some(stake_info))
 }
@@ -178,13 +178,13 @@ async fn get_txo(
     Ok(txo_map)
 }
 
-/// Native Tokes map type alias
-type NativeTokensMap = HashMap<(Slot, TxnIndex, i16), NativeTokens>;
+/// TXO Assets map type alias
+type TxoAssetsMap = HashMap<(Slot, TxnIndex, i16), TxoAssetInfo>;
 
-/// Returns a map of native token infos for the given stake address.
-async fn get_native_tokens(
+/// Returns a map of txo asset infos for the given stake address.
+async fn get_txo_assets(
     session: &CassandraSession, stake_address: &StakeAddress, slot_num: SlotNo,
-) -> anyhow::Result<NativeTokensMap> {
+) -> anyhow::Result<TxoAssetsMap> {
     let assets_txos_stream = GetAssetsByStakeAddressQuery::execute(
         session,
         GetAssetsByStakeAddressParams::new(stake_address.clone(), slot_num),
@@ -196,7 +196,7 @@ async fn get_native_tokens(
         .try_fold(HashMap::new(), |mut tokens_map, row| {
             async move {
                 let key = (row.slot_no.into(), row.txn_index.into(), row.txo.into());
-                tokens_map.insert(key, NativeTokens {
+                tokens_map.insert(key, TxoAssetInfo {
                     id: row.policy_id,
                     name: row.asset_name.into(),
                     amount: row.value,
@@ -253,7 +253,7 @@ async fn set_and_update_spent(
 
 /// Builds an instance of [`StakeInfo`] based on the TXOs given.
 fn build_stake_info(
-    txos: TxoMap, mut tokens: NativeTokensMap, slot_num: SlotNo,
+    txos: TxoMap, mut tokens: TxoAssetsMap, slot_num: SlotNo,
 ) -> anyhow::Result<StakeInfo> {
     let slot_num = slot_num.into();
     let mut stake_info = StakeInfo::default();
@@ -281,14 +281,14 @@ fn build_stake_info(
         if let Some(native_token) = tokens.remove(&key) {
             match native_token.amount.try_into() {
                 Ok(amount) => {
-                    stake_info.native_tokens.push(StakedNativeTokenInfo {
+                    stake_info.assets.push(StakedTxoAssetInfo {
                         policy_hash: native_token.id.try_into()?,
                         asset_name: native_token.name,
                         amount,
                     });
                 },
                 Err(e) => {
-                    debug!("Invalid Staked Native Token for {key:?}: {e}");
+                    debug!("Invalid TXO Asset for {key:?}: {e}");
                 },
             }
         }
