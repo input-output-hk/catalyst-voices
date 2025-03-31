@@ -38,9 +38,7 @@ class _Account extends StatelessWidget {
         MenuItemTile(
           leading: VoicesAssets.icons.userCircle.buildIcon(),
           key: const Key('ProfileAndKeychain'),
-          title: Text(
-            context.l10n.profileAndKeychain,
-          ),
+          title: Text(context.l10n.profileAndKeychain),
           trailing: VoicesAssets.icons.chevronRight.buildIcon(),
           onTap: () => Navigator.pop(context, const _OpenAccountDetails()),
         ),
@@ -119,8 +117,26 @@ sealed class _MenuItemEvent {
   const _MenuItemEvent();
 }
 
+final class _MyOpportunities extends _MenuItemEvent {
+  const _MyOpportunities();
+}
+
 final class _OpenAccountDetails extends _MenuItemEvent {
   const _OpenAccountDetails();
+}
+
+class _Opportunities extends StatelessWidget {
+  const _Opportunities();
+
+  @override
+  Widget build(BuildContext context) {
+    return MenuItemTile(
+      key: const Key('MyOpportunitiesMenuItem'),
+      title: Text(context.l10n.myOpportunities),
+      leading: VoicesAssets.icons.lightBulb.buildIcon(),
+      onTap: () => Navigator.pop(context, const _MyOpportunities()),
+    );
+  }
 }
 
 class _PopupMenu extends StatelessWidget {
@@ -139,6 +155,8 @@ class _PopupMenu extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           _AccountHeader(),
+          VoicesDivider.expanded(),
+          _Opportunities(),
           VoicesDivider.expanded(),
           _Account(),
           _Settings(),
@@ -275,6 +293,8 @@ class _SessionAccountPopupMenuState extends State<SessionAccountPopupMenu>
         unawaited(launchUri(uri));
       case _Lock():
         unawaited(context.read<SessionCubit>().lock());
+      case _MyOpportunities():
+        Scaffold.maybeOf(context)?.openEndDrawer();
     }
   }
 }
