@@ -1,13 +1,13 @@
 import 'dart:math';
 
-import 'package:catalyst_voices/pages/proposal/tiles/proposal_add_comment_tile.dart';
 import 'package:catalyst_voices/pages/proposal/tiles/proposal_comment_tile.dart';
-import 'package:catalyst_voices/pages/proposal/tiles/proposal_comments_header_tile.dart';
 import 'package:catalyst_voices/pages/proposal/tiles/proposal_document_section_tile.dart';
 import 'package:catalyst_voices/pages/proposal/tiles/proposal_document_segment_title.dart';
 import 'package:catalyst_voices/pages/proposal/tiles/proposal_metadata_tile.dart';
 import 'package:catalyst_voices/pages/proposal/tiles/proposal_overview_tile.dart';
-import 'package:catalyst_voices/pages/proposal/tiles/proposal_tile_decoration.dart';
+import 'package:catalyst_voices/widgets/comment/proposal_add_comment_tile.dart';
+import 'package:catalyst_voices/widgets/comment/proposal_comments_header_tile.dart';
+import 'package:catalyst_voices/widgets/tiles/specialized/proposal_tile_decoration.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
@@ -101,7 +101,7 @@ class _SegmentsListView extends StatelessWidget {
         final isLast = index == max(items.length - 1, 0);
 
         final isSegment = item is Segment;
-        final isNextComment = nextItem is CommentListItem;
+        final isNextComment = nextItem is ProposalCommentListItem;
         final isNextSectionOrComment = nextItem is Section || isNextComment;
         final isCommentsSegment = item is ProposalCommentsSegment;
         final isNotEmptyCommentsSegment = isCommentsSegment && item.hasComments;
@@ -131,7 +131,7 @@ class _SegmentsListView extends StatelessWidget {
           return const ProposalSeparatorBox(height: 24);
         }
 
-        if (nextItem is AddCommentSection) {
+        if (nextItem is ProposalAddCommentSection) {
           return const ProposalDivider(height: 48);
         }
 
@@ -181,16 +181,22 @@ class _SegmentsListView extends StatelessWidget {
       ProposalCommentsSegment(:final sort) => ProposalCommentsHeaderTile(
           sort: sort,
           showSort: item.hasComments,
+          onChanged: (value) {
+            context.read<ProposalCubit>().updateCommentsSort(sort: value);
+          },
         ),
       ProposalCommentsSection() => switch (item) {
-          ViewCommentsSection() => throw ArgumentError(
-              'View comments not supported',
-            ),
-          AddCommentSection(:final schema) => ProposalAddCommentTile(
+          ProposalViewCommentsSection() => const SizedBox.shrink(),
+          ProposalAddCommentSection(:final schema) => ProposalAddCommentTile(
               schema: schema,
+              onSubmit: ({required document, reply}) async {
+                return context
+                    .read<ProposalCubit>()
+                    .submitComment(document: document, reply: reply);
+              },
             ),
         },
-      CommentListItem(
+      ProposalCommentListItem(
         :final comment,
         :final canReply,
       ) =>
