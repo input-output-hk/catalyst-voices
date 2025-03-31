@@ -24,6 +24,6 @@ abstract final class Routes {
   ];
 
   static String get initialLocation {
-    return const proposal_builder.ProposalBuilderDraftRoute().location;
+    return const coming_soon.ComingSoonRoute().location;
   }
 }
