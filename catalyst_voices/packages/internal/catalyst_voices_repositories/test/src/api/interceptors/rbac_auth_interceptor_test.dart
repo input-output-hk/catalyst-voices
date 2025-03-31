@@ -7,6 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:uuid_plus/uuid_plus.dart';
 
+import '../matcher/request_matchers.dart';
 import 'mock_chain.dart';
 import 'mock_keychain.dart';
 import 'mock_response.dart';
@@ -14,6 +15,7 @@ import 'mock_response.dart';
 void main() {
   group(RbacAuthInterceptor, () {
     late final UserObserver userObserver;
+    late final AuthTokenProvider authTokenProvider;
     late final RbacAuthInterceptor interceptor;
     late final Chain<String> chain;
 
@@ -21,9 +23,10 @@ void main() {
 
     setUpAll(() {
       userObserver = StreamUserObserver();
+      authTokenProvider = _MockAuthTokenProvider();
       interceptor = RbacAuthInterceptor(
         userObserver,
-        _FakeAuthTokenProvider(),
+        authTokenProvider,
       );
 
       chain = MockChain<String>();
@@ -37,6 +40,12 @@ void main() {
 
     setUp(() {
       when(() => keychain.id).thenAnswer((_) => const Uuid().v4());
+      when(
+        // ignore: discarded_futures
+        () => authTokenProvider.createRbacToken(
+          forceRefresh: any(named: 'forceRefresh'),
+        ),
+      ).thenAnswer((_) => Future(() => const Uuid().v4()));
 
       userObserver.user = const User.empty();
     });
@@ -57,6 +66,7 @@ void main() {
       when(() => keychain.isUnlocked).thenAnswer((_) => Future.value(true));
       when(() => chain.request).thenReturn(request);
       when(() => chain.proceed(any())).thenAnswer((_) => requestResponse);
+      when(() => requestResponse.statusCode).thenAnswer((_) => 200);
 
       final user = User(
         accounts: [
@@ -91,6 +101,7 @@ void main() {
       when(() => keychain.isUnlocked).thenAnswer((_) => Future.value(true));
       when(() => chain.request).thenReturn(request);
       when(() => chain.proceed(any())).thenAnswer((_) => requestResponse);
+      when(() => requestResponse.statusCode).thenAnswer((_) => 200);
 
       final user = User(
         accounts: [
@@ -127,6 +138,7 @@ void main() {
       when(() => keychain.isUnlocked).thenAnswer((_) => Future.value(false));
       when(() => chain.request).thenReturn(request);
       when(() => chain.proceed(any())).thenAnswer((_) => requestResponse);
+      when(() => requestResponse.statusCode).thenAnswer((_) => 200);
 
       final user = User(
         accounts: [
@@ -160,6 +172,7 @@ void main() {
       // When
       when(() => chain.request).thenReturn(request);
       when(() => chain.proceed(any())).thenAnswer((_) => requestResponse);
+      when(() => requestResponse.statusCode).thenAnswer((_) => 200);
 
       final user = User(
         accounts: [
@@ -184,14 +197,238 @@ void main() {
         isFalse,
       );
     });
+
+    test('401 response code triggers force token update', () async {
+      // Given
+      const originalToken = 'expired_token';
+      const refreshedToken = 'refreshed_token';
+
+      final request = Request('GET', Uri(), Uri());
+
+      final originalResponse = MockResponse<String>();
+      final retryResponse = MockResponse<String>();
+
+      // When
+      when(() => keychain.isUnlocked).thenAnswer((_) => Future.value(true));
+      when(() => chain.request).thenReturn(request);
+
+      // Original token
+      when(
+        () => authTokenProvider.createRbacToken(
+          forceRefresh: any(named: 'forceRefresh'),
+        ),
+      ).thenAnswer((_) => Future.value(originalToken));
+      when(() {
+        return chain.proceed(
+          any(
+            that: containsHeaderValue(_buildAuthHeaderValue(originalToken)),
+          ),
+        );
+      }).thenAnswer((_) => originalResponse);
+
+      // Refreshed token
+      when(() => authTokenProvider.createRbacToken(forceRefresh: true))
+          .thenAnswer((_) => Future.value(refreshedToken));
+      when(() {
+        return chain.proceed(
+          any(
+            that: containsHeaderValue(_buildAuthHeaderValue(refreshedToken)),
+          ),
+        );
+      }).thenAnswer((_) => retryResponse);
+
+      // Responses
+      when(() => originalResponse.statusCode).thenAnswer((_) => 401);
+      when(() => retryResponse.statusCode).thenAnswer((_) => 200);
+
+      final user = User(
+        accounts: [
+          Account.dummy(
+            catalystId: DummyCatalystIdFactory.create(),
+            keychain: keychain,
+            isActive: true,
+          ),
+        ],
+        settings: const UserSettings(),
+      );
+
+      userObserver.user = user;
+
+      await interceptor.intercept(chain);
+
+      // Then
+      final captured = verify(() => chain.proceed(captureAny())).captured;
+
+      expect(captured, hasLength(2));
+
+      expect(
+        captured.first,
+        allOf(
+          isA<Request>(),
+          containsHeaderValue(_buildAuthHeaderValue(originalToken)),
+          isNot(containsHeaderKey('Retry-Count')),
+        ),
+      );
+      expect(
+        captured[1],
+        allOf(
+          isA<Request>(),
+          containsHeaderValue(_buildAuthHeaderValue(refreshedToken)),
+          containsHeaderKey('Retry-Count'),
+          containsHeaderValue('1'),
+        ),
+      );
+    });
+
+    test('403 response code triggers force token update', () async {
+      // Given
+      const originalToken = 'expired_token';
+      const refreshedToken = 'refreshed_token';
+
+      final request = Request('GET', Uri(), Uri());
+
+      final originalResponse = MockResponse<String>();
+      final retryResponse = MockResponse<String>();
+
+      // When
+      when(() => keychain.isUnlocked).thenAnswer((_) => Future.value(true));
+      when(() => chain.request).thenReturn(request);
+
+      // Original token
+      when(
+        () => authTokenProvider.createRbacToken(
+          forceRefresh: any(named: 'forceRefresh'),
+        ),
+      ).thenAnswer((_) => Future.value(originalToken));
+      when(() {
+        return chain.proceed(
+          any(
+            that: containsHeaderValue(_buildAuthHeaderValue(originalToken)),
+          ),
+        );
+      }).thenAnswer((_) => originalResponse);
+
+      // Refreshed token
+      when(() => authTokenProvider.createRbacToken(forceRefresh: true))
+          .thenAnswer((_) => Future.value(refreshedToken));
+      when(() {
+        return chain.proceed(
+          any(
+            that: containsHeaderValue(_buildAuthHeaderValue(refreshedToken)),
+          ),
+        );
+      }).thenAnswer((_) => retryResponse);
+
+      // Responses
+      when(() => originalResponse.statusCode).thenAnswer((_) => 403);
+      when(() => retryResponse.statusCode).thenAnswer((_) => 200);
+
+      final user = User(
+        accounts: [
+          Account.dummy(
+            catalystId: DummyCatalystIdFactory.create(),
+            keychain: keychain,
+            isActive: true,
+          ),
+        ],
+        settings: const UserSettings(),
+      );
+
+      userObserver.user = user;
+
+      await interceptor.intercept(chain);
+
+      // Then
+      final captured = verify(() => chain.proceed(captureAny())).captured;
+
+      expect(captured, hasLength(2));
+
+      expect(
+        captured.first,
+        allOf(
+          isA<Request>(),
+          containsHeaderValue(_buildAuthHeaderValue(originalToken)),
+          isNot(containsHeaderKey('Retry-Count')),
+        ),
+      );
+      expect(
+        captured[1],
+        allOf(
+          isA<Request>(),
+          containsHeaderValue(_buildAuthHeaderValue(refreshedToken)),
+          containsHeaderKey('Retry-Count'),
+          containsHeaderValue('1'),
+        ),
+      );
+    });
+
+    test('token refresh gives up after 1st try', () async {
+      // Given
+      const originalToken = 'expired_token';
+      final request = Request(
+        'GET',
+        Uri(),
+        Uri(),
+        headers: {'Retry-Count': '1'},
+      );
+      final originalResponse = MockResponse<String>();
+
+      // When
+      when(() => keychain.isUnlocked).thenAnswer((_) => Future.value(true));
+      when(() => chain.request).thenReturn(request);
+
+      // Original token
+      when(
+        () => authTokenProvider.createRbacToken(
+          forceRefresh: any(named: 'forceRefresh'),
+        ),
+      ).thenAnswer((_) => Future.value(originalToken));
+      when(() {
+        return chain.proceed(
+          any(
+            that: containsHeaderValue(_buildAuthHeaderValue(originalToken)),
+          ),
+        );
+      }).thenAnswer((_) => originalResponse);
+
+      // Responses
+      when(() => originalResponse.statusCode).thenAnswer((_) => 403);
+
+      final user = User(
+        accounts: [
+          Account.dummy(
+            catalystId: DummyCatalystIdFactory.create(),
+            keychain: keychain,
+            isActive: true,
+          ),
+        ],
+        settings: const UserSettings(),
+      );
+
+      userObserver.user = user;
+
+      await interceptor.intercept(chain);
+
+      // Then
+      final captured = verify(() => chain.proceed(captureAny())).captured;
+
+      expect(captured, hasLength(1));
+
+      expect(
+        captured.first,
+        allOf(
+          isA<Request>(),
+          containsHeaderValue(_buildAuthHeaderValue(originalToken)),
+          containsHeaderKey('Retry-Count'),
+          containsHeaderValue('1'),
+        ),
+      );
+    });
   });
 }
 
 const _authHeaderName = 'Authorization';
 
-class _FakeAuthTokenProvider extends Fake implements AuthTokenProvider {
-  @override
-  Future<String> createRbacToken({bool forceRefresh = false}) async {
-    return 'auth_token';
-  }
-}
+String _buildAuthHeaderValue(String value) => 'Bearer $value';
+
+class _MockAuthTokenProvider extends Mock implements AuthTokenProvider {}
