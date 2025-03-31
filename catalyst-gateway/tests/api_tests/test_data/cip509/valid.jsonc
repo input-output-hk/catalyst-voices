@@ -83,5 +83,15 @@
         "txn_id": "e799a1a48cb495885120428a1596fc6de7a7dc0ff77b8e3997a0afe7eb035a0e",
         "slot_no": 87396001,
         "txn_index": 4
+    },
+    /// 10. New chain: sending transaction with multiple roles (0 and 3)
+    /// - x509 = [cert]
+    /// - pk = [undefined, undefined, pk]
+    /// - Role 0 signing key ref x509[0] -> key rotation 0
+    /// - Role 3 signing key ref pk[2] -> key rotation 0
+    {
+        "txn_id": "6ff5d40257778968c87c6ad53a44d10c3d7f011f0aa072b365dd6a22da25e96f",
+        "slot_no": 87737901,
+        "txn_index": 2
     }
 ]
