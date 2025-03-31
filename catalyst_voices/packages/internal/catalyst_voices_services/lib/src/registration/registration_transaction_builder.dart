@@ -113,7 +113,7 @@ final class RegistrationTransactionBuilder {
                 // Refer to first key in transaction outputs,
                 // in our case it's the change address
                 // (which the user controls).
-                paymentKey: -1,
+                paymentKey: 0,
               ),
             if (roles.any((element) => element.setProposer))
               RoleData(
@@ -124,7 +124,7 @@ final class RegistrationTransactionBuilder {
                 ),
                 // Refer to first key in transaction outputs, in our case
                 // it's the change address (which the user controls).
-                paymentKey: -1,
+                paymentKey: 0,
               ),
           },
         ),
@@ -207,8 +207,7 @@ final class RegistrationTransactionBuilder {
       return const RbacField.undefined();
     }
 
-    final roleAction = _getRoleAction(role);
-
+    final roleAction = _getPublicKeyRoleAction(role);
     switch (roleAction) {
       case RegistrationTransactionRoleAction.set:
         final publicKey = await _buildRolePublicKey(
@@ -288,7 +287,13 @@ final class RegistrationTransactionBuilder {
     return cert.toDer();
   }
 
-  RegistrationTransactionRoleAction _getRoleAction(AccountRole role) {
+  RegistrationTransactionRoleAction _getPublicKeyRoleAction(AccountRole role) {
+    if (role == AccountRole.voter) {
+      // Voters must not register their own public keys,
+      // they are only allowed to use der certs.
+      return RegistrationTransactionRoleAction.undefined;
+    }
+
     return roles
         .singleWhere(
           (element) => element.type == role,
