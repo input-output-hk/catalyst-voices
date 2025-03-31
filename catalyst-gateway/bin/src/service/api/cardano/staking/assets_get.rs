@@ -1,6 +1,9 @@
 //! Implementation of the GET `../assets` endpoint
 
-use std::collections::{HashMap, HashSet};
+use std::{
+    collections::{HashMap, HashSet},
+    sync::Arc,
+};
 
 use cardano_blockchain_types::{Slot, StakeAddress, TransactionId, TxnIndex};
 use futures::TryStreamExt;
@@ -74,8 +77,8 @@ pub(crate) async fn endpoint(
     };
 
     let (persistent_res, volatile_res) = futures::join!(
-        calculate_stake_info(&persistent_session, stake_address.clone(), slot_num),
-        calculate_stake_info(&volatile_session, stake_address, slot_num)
+        calculate_stake_info(persistent_session, stake_address.clone(), slot_num),
+        calculate_stake_info(volatile_session, stake_address, slot_num)
     );
     let persistent_stake_info = match persistent_res {
         Ok(stake_info) => stake_info,
@@ -126,20 +129,27 @@ struct TxoInfo {
 /// This function also updates the spent column if it detects that a TXO was spent
 /// between lookups.
 async fn calculate_stake_info(
-    session: &CassandraSession, stake_address: Cip19StakeAddress, slot_num: Option<SlotNo>,
+    session: Arc<CassandraSession>, stake_address: Cip19StakeAddress, slot_num: Option<SlotNo>,
 ) -> anyhow::Result<Option<StakeInfo>> {
     let address: StakeAddress = stake_address.try_into()?;
     let adjusted_slot_num = slot_num.unwrap_or(SlotNo::MAXIMUM);
 
     let (mut txos, txo_assets) = futures::try_join!(
-        get_txo(session, &address, adjusted_slot_num),
-        get_txo_assets(session, &address, adjusted_slot_num)
+        get_txo(&session, &address, adjusted_slot_num),
+        get_txo_assets(&session, &address, adjusted_slot_num)
     )?;
     if txos.is_empty() {
         return Ok(None);
     }
 
-    set_and_update_spent(session, &address, &mut txos).await?;
+    let params = update_spent(&session, &address, &mut txos).await?;
+
+    // Sets TXOs as spent in the database in the background.
+    tokio::spawn(async move {
+        if let Err(err) = UpdateTxoSpentQuery::execute(&session, params).await {
+            tracing::error!("Failed to update TXO spent info, err: {err}");
+        }
+    });
 
     let stake_info = build_stake_info(txos, txo_assets, adjusted_slot_num)?;
 
@@ -209,10 +219,9 @@ async fn get_txo_assets(
 }
 
 /// Checks if the given TXOs were spent and mark then as such.
-/// Sets TXOs as spent in the database if they are marked as spent in the map.
-async fn set_and_update_spent(
+async fn update_spent(
     session: &CassandraSession, stake_address: &StakeAddress, txos: &mut TxoMap,
-) -> anyhow::Result<()> {
+) -> anyhow::Result<Vec<UpdateTxoSpentQueryParams>> {
     let txn_hashes = txos
         .iter()
         .filter(|(_, txo)| txo.spent_slot_no.is_none())
@@ -246,9 +255,7 @@ async fn set_and_update_spent(
         }
     }
 
-    UpdateTxoSpentQuery::execute(session, params).await?;
-
-    Ok(())
+    Ok(params)
 }
 
 /// Builds an instance of [`StakeInfo`] based on the TXOs given.
