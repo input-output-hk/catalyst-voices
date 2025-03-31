@@ -241,7 +241,10 @@ async fn test_get_txo_by_stake_address() {
 
     let mut row_stream = GetTxoByStakeAddressQuery::execute(
         &session,
-        GetTxoByStakeAddressQueryParams::new(stake_address_1(), u64::try_from(i64::MAX).unwrap()),
+        GetTxoByStakeAddressQueryParams::new(
+            stake_address_1(),
+            u64::try_from(i64::MAX).unwrap().into(),
+        ),
     )
     .await
     .unwrap();

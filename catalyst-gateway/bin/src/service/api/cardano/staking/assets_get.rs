@@ -155,7 +155,7 @@ async fn get_txo(
 ) -> anyhow::Result<TxoMap> {
     let txos_stream = GetTxoByStakeAddressQuery::execute(
         session,
-        GetTxoByStakeAddressQueryParams::new(stake_address.clone(), slot_num),
+        GetTxoByStakeAddressQueryParams::new(stake_address.clone(), slot_num.into()),
     )
     .await?;
 
