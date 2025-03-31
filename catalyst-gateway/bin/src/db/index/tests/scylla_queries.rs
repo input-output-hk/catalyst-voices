@@ -13,8 +13,8 @@ use crate::{
         queries::{
             rbac,
             registrations::{
-                get_from_stake_pk::*, get_stake_pk_from_stake_addr::*, get_from_vote_key::*,
-                get_invalid::*,
+                get_from_stake_pk::*, get_from_vote_key::*, get_invalid::*,
+                get_stake_pk_from_stake_addr::*,
             },
             staked_ada::{
                 get_assets_by_stake_address::*, get_txi_by_txn_hash::*,
@@ -94,7 +94,7 @@ async fn test_get_invalid_registration_w_stake_addr() {
 
     let mut row_stream = GetInvalidRegistrationQuery::execute(
         &session,
-        GetInvalidRegistrationParams::new(vec![], SlotNo::default()),
+        GetInvalidRegistrationParams::new(vec![], SlotNo::default().into()),
     )
     .await
     .unwrap();
@@ -157,9 +157,10 @@ async fn test_get_registrations_w_stake_addr() {
         panic!("{SESSION_ERR_MSG}");
     };
 
-    let mut row_stream = GetRegistrationQuery::execute(&session, GetRegistrationParams {
-        stake_public_key: vec![],
-    })
+    let mut row_stream = GetRegistrationQuery::execute(
+        &session,
+        GetRegistrationParams::new(vec![], SlotNo::default().into()),
+    )
     .await
     .unwrap();
 
@@ -175,9 +176,10 @@ async fn test_get_stake_addr_w_stake_key_hash() {
         panic!("{SESSION_ERR_MSG}");
     };
 
-    let mut row_stream = GetStakeAddrQuery::execute(&session, GetStakeAddrParams {
-        stake_address: stake_address_1().into(),
-    })
+    let mut row_stream = GetStakePublicKeyFromStakeAddrQuery::execute(
+        &session,
+        GetStakePublicKeyFromStakeAddrParams::new(stake_address_1()),
+    )
     .await
     .unwrap();
 
