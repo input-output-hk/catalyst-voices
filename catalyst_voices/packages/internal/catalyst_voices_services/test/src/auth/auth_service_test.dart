@@ -42,22 +42,76 @@ void main() {
       await userObserver.dispose();
     });
 
-    test('createRbacToken returns a valid token', () async {
+    group('createRbacToken', () {
       final keychain = _MockKeychain();
-      when(() => keychain.id).thenReturn('keychain_id');
-      when(keychain.getMasterKey)
-          .thenAnswer((_) async => _FakeCatalystPrivateKey(Uint8List(32)));
 
-      final account = Account.dummy(
-        catalystId: DummyCatalystIdFactory.create(),
-        keychain: keychain,
-        isActive: true,
-      );
-      final user = User.optional(accounts: [account]);
-      userObserver.user = user;
+      setUp(() {
+        when(() => keychain.id).thenReturn('keychain_id');
+        when(keychain.getMasterKey)
+            .thenAnswer((_) async => _FakeCatalystPrivateKey(Uint8List(32)));
+      });
 
-      final token = await authService.createRbacToken();
-      expect(token, startsWith(AuthServiceImpl.tokenPrefix));
+      tearDown(() {
+        reset(keychain);
+      });
+
+      test('returns a valid token', () async {
+        // Given
+        final account = Account.dummy(
+          catalystId: DummyCatalystIdFactory.create(),
+          keychain: keychain,
+          isActive: true,
+        );
+        final user = User.optional(accounts: [account]);
+
+        // When
+        userObserver.user = user;
+
+        final token = await authService.createRbacToken();
+
+        // Then
+        expect(token, startsWith(AuthServiceImpl.tokenPrefix));
+      });
+
+      test('keeps token cached and calls keychain once', () async {
+        // Given
+        final account = Account.dummy(
+          catalystId: DummyCatalystIdFactory.create(),
+          keychain: keychain,
+          isActive: true,
+        );
+        final user = User.optional(accounts: [account]);
+
+        // When
+        userObserver.user = user;
+
+        await List.generate(4, (_) => authService.createRbacToken()).wait;
+
+        // Then
+        verify(keychain.getMasterKey).called(1);
+      });
+
+      test('creates new token each time when force update is set', () async {
+        // Given
+        const tokensCount = 4;
+        final account = Account.dummy(
+          catalystId: DummyCatalystIdFactory.create(),
+          keychain: keychain,
+          isActive: true,
+        );
+        final user = User.optional(accounts: [account]);
+
+        // When
+        userObserver.user = user;
+
+        await List.generate(
+          tokensCount,
+          (_) => authService.createRbacToken(forceRefresh: true),
+        ).wait;
+
+        // Then
+        verify(keychain.getMasterKey).called(tokensCount);
+      });
     });
   });
 }
