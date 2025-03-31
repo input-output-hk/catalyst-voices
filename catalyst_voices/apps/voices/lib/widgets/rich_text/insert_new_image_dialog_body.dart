@@ -23,7 +23,7 @@ class InsertNewImageDialogBody extends StatelessWidget {
     final colors = context.colors;
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 22, 24, 32),
+      padding: const EdgeInsets.fromLTRB(24, 22, 24, 18),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -45,7 +45,7 @@ class InsertNewImageDialogBody extends StatelessWidget {
                   : null,
             ),
             keyboardType: TextInputType.text,
-            onFieldSubmitted: (value) {},
+            onFieldSubmitted: (_) {},
           ),
           const SizedBox(height: 20),
           RichText(
