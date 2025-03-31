@@ -51,6 +51,10 @@ final class User extends Equatable {
     );
   }
 
+  Account getAccount(CatalystId id) {
+    return accounts.singleWhere((account) => id.isReferringTo(account));
+  }
+
   bool hasAccount({
     required CatalystId id,
   }) {

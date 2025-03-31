@@ -7,6 +7,7 @@ import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.da
 import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/src/crypto/key_derivation_service.dart';
+import 'package:catalyst_voices_services/src/registration/registration_transaction_role.dart';
 import 'package:collection/collection.dart';
 
 /// The transaction metadata used for registration.
@@ -32,7 +33,7 @@ final class RegistrationTransactionBuilder {
   final NetworkId networkId;
 
   /// The user selected roles for which the user is registering.
-  final Set<AccountRole> roles;
+  final Set<RegistrationTransactionRole> roles;
 
   /// The change address where the change from the transaction should go.
   final ShelleyAddress changeAddress;
@@ -81,33 +82,40 @@ final class RegistrationTransactionBuilder {
   }
 
   Future<RegistrationMetadata> _buildMetadataEnvelope() async {
+    final isFirsRegistration = roles.any((element) => element.setVoter);
     final rootKeyPair = keyDerivationService.deriveAccountRoleKeyPair(
       masterKey: masterKey,
       role: AccountRole.root,
     );
 
     return rootKeyPair.use((rootKeyPair) async {
-      final derCert = await _generateX509Certificate(keyPair: rootKeyPair);
+      final derCert = isFirsRegistration
+          ? await _generateX509Certificate(keyPair: rootKeyPair)
+          : null;
       final publicKeys = await _generatePublicKeysForAllRoles(rootKeyPair);
 
       final x509Envelope = X509MetadataEnvelope.unsigned(
         purpose: UuidV4.fromString(_catalystUserRoleRegistrationPurpose),
         txInputsHash: TransactionInputsHash.fromTransactionInputs(utxos),
         chunkedData: RegistrationData(
-          derCerts: [RbacField.set(derCert)],
+          derCerts: [
+            if (derCert != null) RbacField.set(derCert),
+          ],
           publicKeys: publicKeys,
           roleDataSet: {
-            RoleData(
-              roleNumber: AccountRole.root.number,
-              roleSigningKey: LocalKeyReference(
-                keyType: LocalKeyReferenceType.x509Certs,
-                offset: AccountRole.root.registrationOffset,
+            if (roles.any((element) => element.setVoter))
+              RoleData(
+                roleNumber: AccountRole.root.number,
+                roleSigningKey: LocalKeyReference(
+                  keyType: LocalKeyReferenceType.x509Certs,
+                  offset: AccountRole.root.registrationOffset,
+                ),
+                // Refer to first key in transaction outputs,
+                // in our case it's the change address
+                // (which the user controls).
+                paymentKey: -1,
               ),
-              // Refer to first key in transaction outputs,
-              // in our case it's the change address (which the user controls).
-              paymentKey: -1,
-            ),
-            if (roles.contains(AccountRole.proposer))
+            if (roles.any((element) => element.setProposer))
               RoleData(
                 roleNumber: AccountRole.proposer.number,
                 roleSigningKey: LocalKeyReference(
@@ -133,6 +141,17 @@ final class RegistrationTransactionBuilder {
         );
       });
     });
+  }
+
+  Future<cs.Ed25519PublicKey> _buildRolePublicKey(
+    AccountRole role, {
+    required CatalystKeyPair rootKeyPair,
+  }) async {
+    return switch (role) {
+      AccountRole.voter => rootKeyPair.publicKey.toEd25519(),
+      AccountRole.drep => await _deriveDrepPublicKey(),
+      AccountRole.proposer => await _deriveProposerPublicKey(),
+    };
   }
 
   Transaction _buildUnsignedRbacTx({required AuxiliaryData auxiliaryData}) {
@@ -161,6 +180,15 @@ final class RegistrationTransactionBuilder {
     );
   }
 
+  Future<cs.Ed25519PublicKey> _deriveDrepPublicKey() {
+    final keyPair = keyDerivationService.deriveAccountRoleKeyPair(
+      masterKey: masterKey,
+      role: AccountRole.drep,
+    );
+
+    return keyPair.use((keyPair) => keyPair.publicKey.toEd25519());
+  }
+
   Future<cs.Ed25519PublicKey> _deriveProposerPublicKey() {
     final keyPair = keyDerivationService.deriveAccountRoleKeyPair(
       masterKey: masterKey,
@@ -175,19 +203,23 @@ final class RegistrationTransactionBuilder {
     CatalystKeyPair rootKeyPair,
   ) async {
     final role = AccountRole.fromRegistrationOffset(registrationOffset);
-    switch (role) {
-      case AccountRole.voter:
-        return RbacField.set(rootKeyPair.publicKey.toEd25519());
-      case AccountRole.drep:
+    if (role == null) {
+      return const RbacField.undefined();
+    }
+
+    final roleAction = _getRoleAction(role);
+
+    switch (roleAction) {
+      case RegistrationTransactionRoleAction.set:
+        final publicKey = await _buildRolePublicKey(
+          role,
+          rootKeyPair: rootKeyPair,
+        );
+        return RbacField.set(publicKey);
+      case RegistrationTransactionRoleAction.undefined:
         return const RbacField.undefined();
-      case AccountRole.proposer:
-        if (roles.contains(AccountRole.proposer)) {
-          return RbacField.set(await _deriveProposerPublicKey());
-        } else {
-          return const RbacField.undefined();
-        }
-      case null:
-        return const RbacField.undefined();
+      case RegistrationTransactionRoleAction.unset:
+        return const RbacField.unset();
     }
   }
 
@@ -254,6 +286,15 @@ final class RegistrationTransactionBuilder {
     });
 
     return cert.toDer();
+  }
+
+  RegistrationTransactionRoleAction _getRoleAction(AccountRole role) {
+    return roles
+        .singleWhere(
+          (element) => element.type == role,
+          orElse: () => RegistrationTransactionRole.undefined(role),
+        )
+        .action;
   }
 }
 

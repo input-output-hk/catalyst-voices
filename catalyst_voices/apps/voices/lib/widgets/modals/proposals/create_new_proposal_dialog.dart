@@ -51,6 +51,7 @@ class _ActionButtons extends StatelessWidget {
       children: [
         VoicesFilledButton(
           onTap: () {
+            Navigator.of(context).pop();
             const DiscoveryRoute().go(context);
           },
           leading: VoicesAssets.icons.informationCircle.buildIcon(),

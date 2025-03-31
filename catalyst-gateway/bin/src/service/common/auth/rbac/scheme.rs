@@ -153,6 +153,7 @@ async fn checker_api_catalyst_auth(
     //     return Ok(token);
     // }
 
+    // Step 8: get the latest stable signing certificate registered for Role 0.
     let reg_chain = build_reg_chain(token.network(), &registrations)
         .await
         .map_err(|e| {
