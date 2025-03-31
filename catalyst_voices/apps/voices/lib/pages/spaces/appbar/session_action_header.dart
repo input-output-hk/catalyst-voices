@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:catalyst_voices/pages/registration/registration_dialog.dart';
+import 'package:catalyst_voices/pages/registration/registration_type.dart';
 import 'package:catalyst_voices/pages/spaces/appbar/account_popup/session_lock_button.dart';
 import 'package:catalyst_voices/pages/spaces/appbar/account_popup/session_unlock_button.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_filled_button.dart';
@@ -32,6 +33,24 @@ class SessionActionHeader extends StatelessWidget {
   }
 }
 
+class _FinishRegistrationButton extends StatelessWidget {
+  const _FinishRegistrationButton();
+
+  @override
+  Widget build(BuildContext context) {
+    return VoicesFilledButton(
+      key: const Key('FinishRegistrationButton'),
+      onTap: () => unawaited(
+        RegistrationDialog.show(
+          context,
+          type: const ContinueRegistration(),
+        ),
+      ),
+      child: Text(context.l10n.finishAccountCreation),
+    );
+  }
+}
+
 class _GetStartedButton extends StatelessWidget {
   final bool isEnabled;
 
@@ -43,21 +62,13 @@ class _GetStartedButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return VoicesFilledButton(
       key: const Key('GetStartedButton'),
-      onTap: isEnabled ? () async => RegistrationDialog.show(context) : null,
+      onTap: isEnabled
+          ? () async => RegistrationDialog.show(
+                context,
+                type: const FreshRegistration(),
+              )
+          : null,
       child: Text(context.l10n.getStarted),
-    );
-  }
-}
-
-class _FinishRegistrationButton extends StatelessWidget {
-  const _FinishRegistrationButton();
-
-  @override
-  Widget build(BuildContext context) {
-    return VoicesFilledButton(
-      key: const Key('FinishRegistrationButton'),
-      onTap: () => unawaited(RegistrationDialog.show(context)),
-      child: Text(context.l10n.finishAccountCreation),
     );
   }
 }

@@ -25,6 +25,7 @@ flutter:
   assets:
     - assets/images/
     - assets/images/category/
+    - assets/images/opportunities/
     - assets/icons/
     - assets/lottie/
     - assets/videos/

@@ -32,6 +32,7 @@ final class RecoverCubit extends Cubit<RecoverStateData>
     implements RecoverManager {
   final UserService _userService;
   final RegistrationService _registrationService;
+  final KeyDerivationService _keyDerivationService;
 
   SeedPhrase? _seedPhrase;
   Account? _recoveredAccount;
@@ -39,8 +40,10 @@ final class RecoverCubit extends Cubit<RecoverStateData>
   RecoverCubit({
     required UserService userService,
     required RegistrationService registrationService,
+    required KeyDerivationService keyDerivationService,
   })  : _userService = userService,
         _registrationService = registrationService,
+        _keyDerivationService = keyDerivationService,
         super(const RecoverStateData()) {
     /// pre-populate all available words
     emit(state.copyWith(seedPhraseWords: SeedPhrase.wordList));
@@ -56,34 +59,6 @@ final class RecoverCubit extends Cubit<RecoverStateData>
   @override
   Future<void> checkLocalKeychains() async {
     // TODO(damian-molinski): to be implemented
-  }
-
-  @override
-  Future<bool> createKeychain() async {
-    final account = _recoveredAccount;
-    final seedPhrase = _seedPhrase;
-    final password = this.password;
-
-    if (account == null || seedPhrase == null || password.isNotValid) {
-      emitError(const LocalizedRegistrationUnknownException());
-      return false;
-    }
-
-    final lockFactor = PasswordLockFactor(password.value);
-    final masterKey = _registrationService.deriveMasterKey(
-      seedPhrase: seedPhrase,
-    );
-
-    return masterKey.use((masterKey) async {
-      final keychain = account.keychain;
-      await keychain.setLock(lockFactor);
-      await keychain.unlock(lockFactor);
-      await keychain.setMasterKey(masterKey);
-
-      await _userService.useAccount(account);
-
-      return true;
-    });
   }
 
   @override
@@ -108,8 +83,6 @@ final class RecoverCubit extends Cubit<RecoverStateData>
       );
 
       _recoveredAccount = account;
-
-      await _userService.useAccount(account);
 
       final walletInfo = account.walletInfo;
 
@@ -177,16 +150,44 @@ final class RecoverCubit extends Cubit<RecoverStateData>
       ),
     );
   }
+
+  @override
+  Future<bool> setupKeychain() async {
+    final account = _recoveredAccount;
+    final seedPhrase = _seedPhrase;
+    final password = this.password;
+
+    if (account == null || seedPhrase == null || password.isNotValid) {
+      emitError(const LocalizedRegistrationUnknownException());
+      return false;
+    }
+
+    final lockFactor = PasswordLockFactor(password.value);
+    final masterKey = _keyDerivationService.deriveMasterKey(
+      seedPhrase: seedPhrase,
+    );
+
+    await masterKey.use((masterKey) async {
+      final keychain = account.keychain;
+      await keychain.setLock(lockFactor);
+      await keychain.unlock(lockFactor);
+      await keychain.setMasterKey(masterKey);
+    });
+
+    await _userService.useAccount(account);
+
+    return true;
+  }
 }
 
 abstract interface class RecoverManager implements UnlockPasswordManager {
   Future<void> checkLocalKeychains();
-
-  Future<bool> createKeychain();
 
   Future<bool> recoverAccount();
 
   Future<void> reset();
 
   void setSeedPhraseWords(List<SeedPhraseWord> words);
+
+  Future<bool> setupKeychain();
 }

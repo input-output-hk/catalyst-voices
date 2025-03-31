@@ -70,6 +70,7 @@ final class Dependencies extends DependencyProvider {
           downloaderService: get<DownloaderService>(),
           userService: get<UserService>(),
           registrationService: get<RegistrationService>(),
+          keyDerivationService: get<KeyDerivationService>(),
           progressNotifier: get<RegistrationProgressNotifier>(),
           blockchainConfig: get<AppConfig>().blockchain,
         );
@@ -99,12 +100,16 @@ final class Dependencies extends DependencyProvider {
         return WorkspaceBloc(
           get<CampaignService>(),
           get<ProposalService>(),
+          get<DocumentMapper>(),
+          get<DownloaderService>(),
         );
       })
       ..registerFactory<ProposalBuilderBloc>(() {
         return ProposalBuilderBloc(
           get<ProposalService>(),
           get<CampaignService>(),
+          get<CommentService>(),
+          get<UserService>(),
           get<DownloaderService>(),
           get<DocumentMapper>(),
         );

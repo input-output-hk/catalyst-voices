@@ -107,3 +107,33 @@ final class CommentWithReplies extends Equatable {
     return copyWith(replies: replies);
   }
 }
+
+extension CommentWithRepliesListExt on List<CommentWithReplies> {
+  List<CommentWithReplies> addComment({
+    required CommentDocument comment,
+  }) {
+    final comments = List.of(this);
+    final reply = comment.metadata.reply;
+
+    if (reply != null) {
+      final index = comments.indexWhere((comment) => comment.contains(reply));
+      if (index != -1) {
+        final updated = comments.removeAt(index).addReply(comment);
+        comments.insert(index, updated);
+      }
+    } else {
+      comments.add(CommentWithReplies.direct(comment));
+    }
+
+    return comments;
+  }
+
+  List<CommentWithReplies> removeComment({
+    required SignedDocumentRef ref,
+  }) {
+    return List.of(this)
+        .where((e) => e.ref != ref)
+        .map((e) => e.removeReply(ref: ref))
+        .toList();
+  }
+}
