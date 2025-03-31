@@ -610,12 +610,19 @@ final class ProposalBuilderBloc
 
   ProposalBuilderState _rebuildState() {
     final activeAccountId = _cache.activeAccountId;
-    final proposalDocument = _cache.proposalDocument!;
-    final proposalMetadata = _cache.proposalMetadata!;
-    final category = _cache.category!;
-    final commentTemplate = _cache.commentTemplate!;
+    final proposalDocument = _cache.proposalDocument;
+    final proposalMetadata = _cache.proposalMetadata;
+    final category = _cache.category;
+    final commentTemplate = _cache.commentTemplate;
     final comments = _cache.comments ?? [];
     final commentsState = state.comments;
+
+    if (proposalDocument == null ||
+        proposalMetadata == null ||
+        category == null ||
+        commentTemplate == null) {
+      return const ProposalBuilderState(isLoading: true, isChanging: true);
+    }
 
     return _buildState(
       hasActiveAccount: activeAccountId != null,
