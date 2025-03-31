@@ -217,32 +217,30 @@ final class RegistrationServiceImpl implements RegistrationService {
       );
 
       final keychain = data.keychain;
-      final masterKey = await keychain.getMasterKey();
-      if (masterKey == null) {
-        throw ArgumentError('Keychain not unlocked or master key not set');
-      }
 
-      final role0KeyPair = _keyDerivationService.deriveAccountRoleKeyPair(
-        masterKey: masterKey,
-        role: AccountRole.root,
-      );
-
-      return role0KeyPair.use((keyPair) {
-        final role0key = keyPair.publicKey;
-
-        final catalystId = CatalystId(
-          host: _blockchainConfig.host.host,
-          username: data.username,
-          role0Key: role0key.publicKeyBytes,
+      return keychain.getMasterKey().use((masterKey) {
+        final role0KeyPair = _keyDerivationService.deriveAccountRoleKeyPair(
+          masterKey: masterKey,
+          role: AccountRole.root,
         );
 
-        return Account(
-          catalystId: catalystId,
-          email: data.email,
-          keychain: keychain,
-          roles: data.roles,
-          walletInfo: walletInfo,
-        );
+        return role0KeyPair.use((keyPair) {
+          final role0key = keyPair.publicKey;
+
+          final catalystId = CatalystId(
+            host: _blockchainConfig.host.host,
+            username: data.username,
+            role0Key: role0key.publicKeyBytes,
+          );
+
+          return Account(
+            catalystId: catalystId,
+            email: data.email,
+            keychain: keychain,
+            roles: data.roles,
+            walletInfo: walletInfo,
+          );
+        });
       });
     } on RegistrationException {
       rethrow;
