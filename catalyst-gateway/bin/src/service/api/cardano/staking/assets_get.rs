@@ -197,7 +197,7 @@ async fn get_txo_assets(
 ) -> anyhow::Result<TxoAssetsMap> {
     let assets_txos_stream = GetAssetsByStakeAddressQuery::execute(
         session,
-        GetAssetsByStakeAddressParams::new(stake_address.clone(), slot_num),
+        GetAssetsByStakeAddressParams::new(stake_address.clone(), slot_num.into()),
     )
     .await?;
 

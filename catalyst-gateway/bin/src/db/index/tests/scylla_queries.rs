@@ -36,7 +36,7 @@ async fn test_get_assets_by_stake_addr() {
 
     let mut row_stream = GetAssetsByStakeAddressQuery::execute(
         &session,
-        GetAssetsByStakeAddressParams::new(stake_address_1(), u64::MAX),
+        GetAssetsByStakeAddressParams::new(stake_address_1(), u64::MAX.into()),
     )
     .await
     .unwrap();
