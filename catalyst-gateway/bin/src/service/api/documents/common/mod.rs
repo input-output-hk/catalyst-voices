@@ -78,8 +78,9 @@ impl catalyst_signed_doc::providers::VerifyingKeyProvider for VerifyingKeyProvid
 impl VerifyingKeyProvider {
     /// Gets the latest public key for the proposer role for the given `catid` from the
     /// token.
-    pub(crate) async fn try_from_token(token: CatalystRBACTokenV1) -> anyhow::Result<Self> {
+    pub(crate) async fn try_from_token(token: &CatalystRBACTokenV1) -> anyhow::Result<Self> {
         let cat_id = token.catalyst_id();
+        let network = token.network();
 
         let reg_quuries = scheme::indexed_registrations(cat_id).await?;
 
@@ -89,7 +90,7 @@ impl VerifyingKeyProvider {
             ));
         }
 
-        let reg_chain = scheme::build_reg_chain(token.network(), &reg_quuries)
+        let reg_chain = scheme::build_reg_chain(network, &reg_quuries)
             .await
             .map_err(|e| {
                 anyhow::anyhow!(

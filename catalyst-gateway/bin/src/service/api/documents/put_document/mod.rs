@@ -86,7 +86,7 @@ pub(crate) async fn endpoint(doc_bytes: Vec<u8>, token: CatalystRBACTokenV1) -> 
     }
 
     // validate document signatures
-    let verifying_key_provider = match VerifyingKeyProvider::try_from_token(token).await {
+    let verifying_key_provider = match VerifyingKeyProvider::try_from_token(&token).await {
         Ok(value) => value,
         Err(e) => return AllResponses::handle_error(&e),
     };
