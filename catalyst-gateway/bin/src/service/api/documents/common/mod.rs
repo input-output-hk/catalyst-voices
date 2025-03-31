@@ -43,6 +43,7 @@ impl catalyst_signed_doc::providers::CatalystSignedDocumentProvider for DocProvi
     }
 }
 
+// TODO: make the struct to support multi sigs validation
 /// A struct which implements a
 /// `catalyst_signed_doc::providers::CatalystSignedDocumentProvider` trait
 pub(crate) struct VerifyingKeyProvider((ed25519_dalek::VerifyingKey, usize));
