@@ -55,14 +55,19 @@ pub(crate) async fn endpoint(doc_bytes: Vec<u8>, token: CatalystRBACTokenV1) -> 
         .into();
     };
 
-    // validate rbac token and document KIDs
-    let token_catid = token.catalyst_id().clone().as_id();
-    if doc
-        .kids()
-        .iter()
-        .cloned()
-        .any(|id_uri| id_uri.as_id() != token_catid)
-    {
+    // validate rbac token and document KIDs (ignoring the role/rotation)
+    let token_catid = token
+        .catalyst_id()
+        .clone()
+        .as_id()
+        .with_role(Default::default())
+        .with_rotation(Default::default());
+    if doc.kids().iter().cloned().any(|kid| {
+        !kid.as_id()
+            .with_role(Default::default())
+            .with_rotation(Default::default())
+            .eq(&token_catid)
+    }) {
         return Responses::UnprocessableContent(Json(PutDocumentUnprocessableContent::new(
             "RBAC Token CatID does not match with the providing document KIDs",
             None,

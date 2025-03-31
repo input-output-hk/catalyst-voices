@@ -2,6 +2,8 @@
 //! endpoint module not specified to a specific endpoint.
 
 use catalyst_signed_doc::CatalystSignedDocument;
+use catalyst_types::id_uri::key_rotation::KeyRotation;
+use rbac_registration::cardano::cip509::RoleNumber;
 
 use super::templates::get_doc_static_template;
 use crate::{
@@ -43,39 +45,52 @@ impl catalyst_signed_doc::providers::CatalystSignedDocumentProvider for DocProvi
 
 /// A struct which implements a
 /// `catalyst_signed_doc::providers::CatalystSignedDocumentProvider` trait
-pub(crate) struct VerifyingKeyProvider(
-    Vec<(catalyst_signed_doc::IdUri, ed25519_dalek::VerifyingKey)>,
-);
+pub(crate) struct VerifyingKeyProvider((ed25519_dalek::VerifyingKey, usize));
 
 impl catalyst_signed_doc::providers::VerifyingKeyProvider for VerifyingKeyProvider {
     async fn try_get_key(
         &self, kid: &catalyst_signed_doc::IdUri,
     ) -> anyhow::Result<Option<ed25519_dalek::VerifyingKey>> {
-        Ok(self.0.iter().find(|item| &(item.0) == kid).map(|v| v.1))
+        // check if the doc is using the latest kid
+        if kid.role_and_rotation().1 == KeyRotation::from(self.0 .1 as u16) {
+            return Err(anyhow::anyhow!(
+                "Failed to validate the document: not using the latest key"
+            ));
+        }
+
+        Ok(Some(self.0 .0))
     }
 }
 
 impl VerifyingKeyProvider {
-    /// Prepares a list of registrations related to `catid` from the token.
+    /// Gets the latest public key for the proposer role for the given `catid` from the token.
     pub(crate) async fn try_from_token(token: CatalystRBACTokenV1) -> anyhow::Result<Self> {
         let cat_id = token.catalyst_id();
 
-        let registrations = scheme::indexed_registrations(cat_id).await?;
+        let reg_quuries = scheme::indexed_registrations(cat_id).await?;
 
-        if registrations.is_empty() {
+        if reg_quuries.is_empty() {
             return Err(anyhow::anyhow!(
                 "Unable to find registrations for {cat_id} Catalyst ID"
             ));
         }
 
-        // let pk = scheme::last_signing_key(token.network(), &registrations)
-        //     .await
-        //     .map_err(|e| {
-        //         anyhow::anyhow!("Unable to get last signing key for {cat_id} Catalyst ID:
-        // {e:?}")     })?;
+        let reg_chain = scheme::build_reg_chain(token.network(), &reg_quuries)
+            .await
+            .map_err(|e| {
+                anyhow::anyhow!(
+                    "Failed to build a registration chain for {cat_id} Catalyst ID: {e:?}"
+                )
+            })?;
 
-        // Ok(Self(Vec::from([(cat_id.clone().as_uri(), pk)])))
+        let (latest_pk, rotation) = reg_chain
+            .get_latest_signing_pk_for_role(&RoleNumber::from(2))
+            .ok_or_else(|| {
+                anyhow::anyhow!(
+                    "Failed to get last signing key for the proposer role for {cat_id} Catalyst ID"
+                )
+            })?;
 
-        unimplemented!()
+        Ok(Self((latest_pk, rotation)))
     }
 }

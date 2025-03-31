@@ -229,7 +229,7 @@ pub(crate) async fn indexed_registrations(
 }
 
 /// Build a registration chain from the given indexed data.
-async fn build_reg_chain(
+pub(crate) async fn build_reg_chain(
     network: Network, indexed_registrations: &[get_rbac_registrations::Query],
 ) -> anyhow::Result<RegistrationChain> {
     let mut indexed_registrations = indexed_registrations.iter();
