@@ -12,14 +12,6 @@ import 'package:result_type/result_type.dart';
 
 final _logger = Logger('WalletLinkCubit');
 
-abstract interface class WalletLinkManager {
-  Future<void> refreshWallets();
-
-  Future<bool> selectWallet(WalletMetadata meta);
-
-  void selectRoles(Set<AccountRole> roles);
-}
-
 final class WalletLinkCubit extends Cubit<WalletLinkStateData>
     with BlocErrorEmitterMixin
     implements WalletLinkManager {
@@ -29,11 +21,12 @@ final class WalletLinkCubit extends Cubit<WalletLinkStateData>
   CardanoWallet? _selectedWallet;
 
   WalletLinkCubit({required this.registrationService})
-      : super(const WalletLinkStateData());
+      : super(WalletLinkStateData.initial());
 
-  Set<AccountRole> get roles {
-    return state.selectedRoles ?? state.defaultRoles;
-  }
+  Set<AccountRole> get roles => state.roles
+      .where((element) => element.isSelected)
+      .map((e) => e.type)
+      .toSet();
 
   CardanoWallet? get selectedWallet => _selectedWallet;
 
@@ -61,6 +54,19 @@ final class WalletLinkCubit extends Cubit<WalletLinkStateData>
 
       emit(state.copyWith(wallets: Optional(Failure(error))));
     }
+  }
+
+  @override
+  void selectRoles(Set<AccountRole> roles) {
+    final updatedRoles = state.roles.map(
+      (role) {
+        return role.copyWith(
+          isSelected: role.type.isDefault || roles.contains(role.type),
+        );
+      },
+    ).toList();
+
+    emit(state.copyWith(roles: updatedRoles));
   }
 
   @override
@@ -142,8 +148,27 @@ final class WalletLinkCubit extends Cubit<WalletLinkStateData>
     }
   }
 
-  @override
-  void selectRoles(Set<AccountRole> roles) {
-    emit(state.copyWith(selectedRoles: Optional(roles)));
+  void setAccountRoles(Set<AccountRole> roles) {
+    final updatedRoles = state.roles.map(
+      (role) {
+        final isAccountRole = roles.contains(role.type);
+        final isLocked = role.type.isDefault || isAccountRole;
+
+        return role.copyWith(
+          isLocked: isLocked,
+          isSelected: isAccountRole ? true : null,
+        );
+      },
+    ).toList();
+
+    emit(state.copyWith(roles: updatedRoles, accountRoles: roles));
   }
+}
+
+abstract interface class WalletLinkManager {
+  Future<void> refreshWallets();
+
+  void selectRoles(Set<AccountRole> roles);
+
+  Future<bool> selectWallet(WalletMetadata meta);
 }
