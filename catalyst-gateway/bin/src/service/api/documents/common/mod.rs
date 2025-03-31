@@ -68,12 +68,14 @@ impl VerifyingKeyProvider {
             ));
         }
 
-        let pk = scheme::last_signing_key(token.network(), &registrations)
-            .await
-            .map_err(|e| {
-                anyhow::anyhow!("Unable to get last signing key for {cat_id} Catalyst ID: {e:?}")
-            })?;
+        // let pk = scheme::last_signing_key(token.network(), &registrations)
+        //     .await
+        //     .map_err(|e| {
+        //         anyhow::anyhow!("Unable to get last signing key for {cat_id} Catalyst ID:
+        // {e:?}")     })?;
 
-        Ok(Self(Vec::from([(cat_id.clone().as_uri(), pk)])))
+        // Ok(Self(Vec::from([(cat_id.clone().as_uri(), pk)])))
+
+        unimplemented!()
     }
 }
