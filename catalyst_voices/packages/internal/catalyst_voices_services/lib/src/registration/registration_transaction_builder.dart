@@ -144,8 +144,8 @@ final class RegistrationTransactionBuilder {
   }) async {
     return switch (role) {
       AccountRole.voter => rootKeyPair.publicKey.toEd25519(),
-      AccountRole.drep => await _deriveProposerPublicKey(),
-      AccountRole.proposer => await _deriveDrepPublicKey(),
+      AccountRole.drep => await _deriveDrepPublicKey(),
+      AccountRole.proposer => await _deriveProposerPublicKey(),
     };
   }
 
