@@ -116,4 +116,4 @@ build-info-build = "0.0.39"
 
 [package.metadata.cargo-machete]
 # remove that after fixing issues with latest crates
-ignored = ["poem-openapi-derive"]
+ignored = ["poem-openapi-derive", "darling"]
