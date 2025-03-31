@@ -193,7 +193,7 @@ async fn get_invalid_registrations(
 ) -> anyhow::Result<Vec<Cip36Details>> {
     let invalid_regs_stream = GetInvalidRegistrationQuery::execute(
         session,
-        GetInvalidRegistrationParams::new(stake_public_key, slot_no),
+        GetInvalidRegistrationParams::new(stake_public_key, slot_no.into()),
     )
     .await?;
 
@@ -245,7 +245,8 @@ async fn get_all_valid_registrations(
     session: &CassandraSession, slot_no: SlotNo,
 ) -> Result<Vec<Cip36Details>, anyhow::Error> {
     let regs_stream =
-        GetAllRegistrationsQuery::execute(session, GetAllRegistrationsParams::new(slot_no)).await?;
+        GetAllRegistrationsQuery::execute(session, GetAllRegistrationsParams::new(slot_no.into()))
+            .await?;
 
     regs_stream.map_err(Into::<anyhow::Error>::into).try_fold(Vec::new(), |mut regs, row|
     async move {

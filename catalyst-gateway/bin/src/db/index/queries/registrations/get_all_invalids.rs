@@ -2,15 +2,19 @@
 
 use std::sync::Arc;
 
+use cardano_blockchain_types::Slot;
 use scylla::{
     prepared_statement::PreparedStatement, transport::iterator::TypedRowStream, DeserializeRow,
     SerializeRow, Session,
 };
 use tracing::error;
 
-use crate::db::index::{
-    queries::{PreparedQueries, PreparedSelectQuery},
-    session::CassandraSession,
+use crate::db::{
+    index::{
+        queries::{PreparedQueries, PreparedSelectQuery},
+        session::CassandraSession,
+    },
+    types::{DbSlot, DbTxnIndex},
 };
 
 /// Get all invalid registrations
@@ -18,17 +22,35 @@ const GET_ALL_INVALIDS: &str = include_str!("../cql/get_all_invalids.cql");
 
 /// Get all invalid registrations
 #[derive(SerializeRow)]
-pub(crate) struct GetAllInvalidRegistrationsParams {}
+pub(crate) struct GetAllInvalidRegistrationsParams {
+    /// Block Slot Number.
+    slot_no: DbSlot,
+}
+
+impl GetAllInvalidRegistrationsParams {
+    /// Create a new instance of [`GetAllInvalidRegistrationsParams`]
+    pub(crate) fn new(slot_no: Slot) -> Self {
+        Self {
+            slot_no: slot_no.into(),
+        }
+    }
+}
 
 /// Get all invalid registrations details for snapshot.
 #[derive(DeserializeRow)]
 pub(crate) struct GetAllInvalidRegistrationsQuery {
+    /// Nonce value after normalization.
+    pub nonce: num_bigint::BigInt,
+    /// Raw Nonce value.
+    pub raw_nonce: num_bigint::BigInt,
+    /// Slot Number the invalid CIP36 registration is in.
+    pub slot_no: DbSlot,
+    /// Transaction Index.
+    pub txn_index: DbTxnIndex,
     /// Error report
     pub problem_report: String,
     /// Full Stake Address (not hashed, 32 byte ED25519 Public key).
     pub stake_public_key: Vec<u8>,
-    /// Slot Number
-    pub slot_no: num_bigint::BigInt,
     /// Voting Public Key
     pub vote_key: Vec<u8>,
     /// Full Payment Address (not hashed, 32 byte ED25519 Public key).

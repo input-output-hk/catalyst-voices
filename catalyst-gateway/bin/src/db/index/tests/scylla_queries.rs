@@ -13,7 +13,7 @@ use crate::{
         queries::{
             rbac,
             registrations::{
-                get_from_stake_addr::*, get_from_stake_address::*, get_from_vote_key::*,
+                get_from_stake_pk::*, get_stake_pk_from_stake_addr::*, get_from_vote_key::*,
                 get_invalid::*,
             },
             staked_ada::{
