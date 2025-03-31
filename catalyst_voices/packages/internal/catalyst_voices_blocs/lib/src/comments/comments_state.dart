@@ -37,9 +37,7 @@ final class CommentsState extends Equatable {
     required bool show,
   }) {
     final updatedBuilders = Map.of(showReplyBuilder);
-
     updatedBuilders[ref] = show;
-
     return copyWith(showReplyBuilder: updatedBuilders);
   }
 
