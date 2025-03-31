@@ -66,7 +66,7 @@ futures = "0.3.31"
 rand = "0.8.5"
 moka = { version = "0.12.8", features = ["future"] }
 crossbeam-skiplist = "0.1.3"
-poem = { version = "3.1.6", features = ["embed", "prometheus", "compression"] }
+poem = { version = "=3.1.6", features = ["embed", "prometheus", "compression"] }
 poem-openapi = { version = "=5.1.5", features = [
     "openapi-explorer",
     "rapidoc",
@@ -104,6 +104,9 @@ x509-cert = "0.2.5"
 # Its a transitive dependency of the "poem-openapi" crate,
 # but its breaks API after version "5.1.8".
 poem-openapi-derive = { version = "=5.1.4" }
+# Its a transitive dependency of the "poem-openapi-derive" crate,
+# but its breaks API after version "0.20.11".
+darling = { version = "=0.20.10" }
 
 [dev-dependencies]
 x509-cert = { version = "0.2.5", features = ["builder"] }
