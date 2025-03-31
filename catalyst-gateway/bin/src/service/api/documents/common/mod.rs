@@ -82,15 +82,15 @@ impl VerifyingKeyProvider {
         let cat_id = token.catalyst_id();
         let network = token.network();
 
-        let reg_quuries = scheme::indexed_registrations(cat_id).await?;
+        let reg_queries = scheme::indexed_registrations(cat_id).await?;
 
-        if reg_quuries.is_empty() {
+        if reg_queries.is_empty() {
             return Err(anyhow::anyhow!(
                 "Unable to find registrations for {cat_id} Catalyst ID"
             ));
         }
 
-        let reg_chain = scheme::build_reg_chain(network, &reg_quuries)
+        let reg_chain = scheme::build_reg_chain(network, &reg_queries)
             .await
             .map_err(|e| {
                 anyhow::anyhow!(
