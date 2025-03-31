@@ -122,7 +122,7 @@ async fn get_valid_registrations(
 
     let regs_stream = GetRegistrationQuery::execute(
         session,
-        GetRegistrationParams::new(stake_public_key, slot_no),
+        GetRegistrationParams::new(stake_public_key, slot_no.into()),
     )
     .await?;
 
@@ -309,7 +309,7 @@ async fn get_all_invalid_registrations(
 ) -> Result<Vec<Cip36Details>, anyhow::Error> {
     let invalid_regs_stream = GetAllInvalidRegistrationsQuery::execute(
         session,
-        GetAllInvalidRegistrationsParams::new(slot_no),
+        GetAllInvalidRegistrationsParams::new(slot_no.into()),
     )
     .await?;
 
