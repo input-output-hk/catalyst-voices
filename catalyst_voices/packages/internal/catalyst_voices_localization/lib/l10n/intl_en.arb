@@ -1879,16 +1879,16 @@
   "@proposalViewMetadataSection": {
     "description": "Viewing proposal navigation section"
   },
-  "proposalViewCommentsSegment": "Comments",
-  "@proposalViewCommentsSegment": {
+  "commentsSegment": "Comments",
+  "@commentsSegment": {
     "description": "Viewing proposal navigation section"
   },
-  "proposalViewAddCommentSection": "Add comment",
-  "@proposalViewAddCommentSection": {
+  "addCommentSection": "Add comment",
+  "@addCommentSection": {
     "description": "Viewing proposal navigation section"
   },
-  "proposalViewViewCommentsSection": "View comments",
-  "@proposalViewViewCommentsSection": {
+  "viewCommentsSection": "View comments",
+  "@viewCommentsSection": {
     "description": "Viewing proposal navigation section"
   },
   "proposalViewFundingRequested": "Funding Requested",
@@ -2044,12 +2044,12 @@
   "@submitCommit": {
     "description": "Send comment"
   },
-  "proposalCommentsSortNewest": "Newest First",
-  "@proposalCommentsSortNewest": {
+  "commentsSortNewest": "Newest First",
+  "@commentsSortNewest": {
     "description": "One of options for sorting comments under proposal"
   },
-  "proposalCommentsSortOldest": "Newest Oldest",
-  "@proposalCommentsSortOldest": {
+  "commentsSortOldest": "Oldest First",
+  "@commentsSortOldest": {
     "description": "One of options for sorting comments under proposal"
   },
   "shortSummary": "Short summary",
