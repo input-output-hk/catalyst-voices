@@ -1,4 +1,5 @@
 export 'auth/auth_service.dart' show AuthService;
+export 'auth/auth_token_cache.dart';
 export 'campaign/campaign_service.dart' show CampaignService;
 export 'comment/comment_service.dart' show CommentService;
 export 'config/config_service.dart' show ConfigService;

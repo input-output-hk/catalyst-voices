@@ -5,21 +5,37 @@ import 'package:catalyst_voices_services/src/auth/auth_service.dart';
 import 'package:catalyst_voices_services/src/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shared_preferences_platform_interface/in_memory_shared_preferences_async.dart';
+import 'package:shared_preferences_platform_interface/shared_preferences_async_platform_interface.dart';
 import 'package:test/test.dart';
 
 void main() {
   group(AuthService, () {
+    late final AuthTokenCache cache;
     late UserObserver userObserver;
     late _FakeKeyDerivationService keyDerivationService;
     late AuthService authService;
+
+    setUpAll(() {
+      final store = InMemorySharedPreferencesAsync.empty();
+      SharedPreferencesAsyncPlatform.instance = store;
+
+      cache = LocalAuthTokenCache(sharedPreferences: SharedPreferencesAsync());
+    });
 
     setUp(() {
       userObserver = StreamUserObserver();
       keyDerivationService = _FakeKeyDerivationService();
       authService = AuthService(
+        cache,
         userObserver,
         keyDerivationService,
       );
+    });
+
+    tearDown(() async {
+      await SharedPreferencesAsync().clear();
     });
 
     tearDownAll(() async {

@@ -15,7 +15,7 @@ final _logger = Logger('RbacAuthInterceptor');
 /// - 403: The token is valid, we know who they are but either the timestamp is
 /// wrong (out of date) or the signature is wrong.
 final class RbacAuthInterceptor implements Interceptor {
-  static const _retryCountHeader = 'Retry-Count';
+  static const _retryCountHeaderName = 'Retry-Count';
   static const _retryStatusCodes = [401, 403];
 
   final UserObserver _userObserver;
@@ -54,7 +54,7 @@ final class RbacAuthInterceptor implements Interceptor {
 
   Future<Request?> _retryRequest(Request request) async {
     try {
-      final rawRetryCount = request.headers[_retryCountHeader];
+      final rawRetryCount = request.headers[_retryCountHeaderName];
       final retryCount = int.tryParse(rawRetryCount ?? '') ?? 0;
       if (retryCount > 0) {
         _logger.severe('Giving up on ${request.uri} auth retry[$retryCount]');
@@ -67,7 +67,7 @@ final class RbacAuthInterceptor implements Interceptor {
 
       return request
           .applyAuthToken(newToken)
-          .applyHeader(name: _retryCountHeader, value: '${retryCount + 1}');
+          .applyHeader(name: _retryCountHeaderName, value: '${retryCount + 1}');
     } catch (error, stack) {
       _logger.severe('Re-authentication failed', error, stack);
       return null;

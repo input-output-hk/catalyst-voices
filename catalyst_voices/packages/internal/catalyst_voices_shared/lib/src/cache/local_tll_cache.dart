@@ -2,6 +2,14 @@ import 'dart:async';
 
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 
+String _buildExpireKey(String key) => '$key.expireDate';
+
+Set<String> _extendAllowList(Set<String> allowList) {
+  return allowList
+      .expand((element) => [element, _buildExpireKey(element)])
+      .toSet();
+}
+
 base class LocalTllCache extends LocalStorage
     implements TtlCache<String, String> {
   final Duration _defaultTtl;
@@ -15,33 +23,6 @@ base class LocalTllCache extends LocalStorage
         super(
           allowList: allowList != null ? _extendAllowList(allowList) : null,
         );
-
-  @override
-  Future<String?> get({
-    required String key,
-  }) async {
-    final isExpired = await _isExpired(key: key);
-    if (isExpired) {
-      await delete(key: key);
-      await delete(key: _buildExpireKey(key));
-      return null;
-    }
-
-    return readString(key: key);
-  }
-
-  @override
-  Future<void> set(
-    String value, {
-    required String key,
-    Duration? ttl,
-  }) async {
-    await writeString(value, key: key);
-    await extendExpiration(key: key, ttl: ttl);
-  }
-
-  @override
-  Future<bool> isExpired({required String key}) => _isExpired(key: key);
 
   @override
   Future<void> extendExpiration({
@@ -64,7 +45,45 @@ base class LocalTllCache extends LocalStorage
     await writeString(expireDateTimestamp, key: expireDateKey);
   }
 
-  Future<bool> _isExpired({required String key}) async {
+  @override
+  Future<String?> get({
+    required String key,
+  }) async {
+    final isExpired = await _isExpired(key: key);
+    if (isExpired) {
+      await delete(key: key);
+      await delete(key: _buildExpireKey(key));
+      return null;
+    }
+
+    return readString(key: key);
+  }
+
+  @override
+  Future<bool> isAboutToExpire({
+    required String key,
+    Duration tolerance = const Duration(minutes: 1),
+  }) {
+    return _isExpired(key: key, tolerance: tolerance);
+  }
+
+  @override
+  Future<bool> isExpired({required String key}) => _isExpired(key: key);
+
+  @override
+  Future<void> set(
+    String value, {
+    required String key,
+    Duration? ttl,
+  }) async {
+    await writeString(value, key: key);
+    await extendExpiration(key: key, ttl: ttl);
+  }
+
+  Future<bool> _isExpired({
+    required String key,
+    Duration tolerance = Duration.zero,
+  }) async {
     final expireDate = await _readExpireDate(key: key);
     final now = DateTimeExt.now();
 
@@ -73,7 +92,15 @@ base class LocalTllCache extends LocalStorage
     final after = now.isAfter(other);
     final atSameMoment = now.isAtSameMomentAs(other);
 
-    return after || atSameMoment;
+    if (after || atSameMoment) {
+      return true;
+    }
+
+    if (other.difference(now) <= tolerance) {
+      return true;
+    }
+
+    return false;
   }
 
   Future<DateTime?> _readExpireDate({required String key}) async {
@@ -81,12 +108,4 @@ base class LocalTllCache extends LocalStorage
     final expireTimestamp = await readString(key: expireKey);
     return DateTime.tryParse(expireTimestamp ?? '');
   }
-}
-
-String _buildExpireKey(String key) => '$key.expireDate';
-
-Set<String> _extendAllowList(Set<String> allowList) {
-  return allowList
-      .expand((element) => [element, _buildExpireKey(element)])
-      .toSet();
 }
