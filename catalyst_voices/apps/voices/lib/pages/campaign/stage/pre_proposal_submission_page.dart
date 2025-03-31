@@ -55,7 +55,6 @@ class _ActionButton extends StatelessWidget {
     return VoicesFilledButton(
       onTap: () {
         // TODO(LynxLynxx): implement url launching
-        const DiscoveryRoute().pushReplacement(context);
       },
       child: Text(
         context.l10n.learnMore,

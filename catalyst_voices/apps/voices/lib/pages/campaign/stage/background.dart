@@ -1,3 +1,6 @@
+import 'dart:math';
+
+import 'package:catalyst_voices/widgets/painter/bubble_painter.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:flutter/material.dart';
@@ -13,6 +16,7 @@ class Background extends StatelessWidget {
         alignment: Alignment.center,
         children: [
           const _Background(),
+          const _BubbleShapes(),
           const _Logo(),
           child,
         ],
@@ -40,6 +44,96 @@ class _Background extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+class _BubbleShapes extends StatelessWidget {
+  const _BubbleShapes();
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomPaint(
+      painter: BubblePainter(
+        bubbles: _buildBubbles(context),
+        shapes: _buildShapes(context),
+      ),
+      size: Size.infinite,
+    );
+  }
+
+  List<BubbleConfig> _buildBubbles(BuildContext context) {
+    final size = MediaQuery.sizeOf(context);
+
+    return [
+      BubbleConfig(
+        x: 0 - 110,
+        y: size.height * .45,
+        radius: 224,
+        gradientColors: [
+          Color.fromARGB(
+            (255 * 0.5).toInt(),
+            18,
+            60,
+            211,
+          ),
+        ],
+        gradientStops: [
+          1,
+        ],
+      ),
+      BubbleConfig(
+        x: size.width * .7,
+        y: -220,
+        radius: 372,
+        gradientColors: [
+          const Color(0x9FC01CEB),
+        ],
+        gradientStops: [
+          0,
+        ],
+      ),
+      BubbleConfig(
+        x: size.width * .92,
+        y: size.height * .85,
+        radius: 140,
+        gradientColors: const [
+          Color(0xFFE5F6FF),
+        ],
+        gradientStops: const [0],
+        shadowBlur: 250,
+        shadowOffset: const Offset(-40, -44),
+        shadowColor: const Color.fromRGBO(
+          150,
+          142,
+          253,
+          0.4,
+        ),
+      ),
+    ];
+  }
+
+  List<ShapeConfig> _buildShapes(BuildContext context) {
+    final size = MediaQuery.sizeOf(context);
+
+    return [
+      ShapeConfig(
+        controlPoints: [
+          Point(size.width * .8, 0),
+          Point(size.width * .7, size.height * .25),
+          Point(size.width, size.height * .5),
+          Point(size.width, 0),
+        ],
+        gradient: const RadialGradient(
+          center: Alignment(0.8321, 0.2873),
+          radius: 0.7135,
+          colors: [
+            Color(0xBFDCD5FE),
+            Color(0xFFC6C5FF),
+          ],
+          stops: [0.0, 1.0],
+        ),
+      ),
+    ];
   }
 }
 

@@ -12,7 +12,7 @@ import 'package:catalyst_voices/routes/routing/spaces_route.dart' as spaces;
 import 'package:go_router/go_router.dart';
 
 /// Semantic anchor for generated routes so only this class
-/// knows how to work with them.
+/// knows how to work with them. 
 abstract final class Routes {
   static const currentMilestone = 'm4';
 

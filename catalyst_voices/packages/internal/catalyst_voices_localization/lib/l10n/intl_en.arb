@@ -2261,5 +2261,13 @@
   "seconds": "Seconds",
   "@seconds": {
     "description": "To represent seconds"
+  },
+  "proposalSubmissionIsClosed": "Proposal submission  is closed for Fund14.",
+  "@proposalSubmissionIsClosed": {
+    "description": "Title text when proposal submission is closed."
+  },
+  "proposalSubmissionClosedDescription": "We’re moving into the Community Review stage!\nWant to stay involved and earn rewards? Check out our knowledge base.",
+  "@proposalSubmissionClosedDescription": {
+    "description": "Text used to gave user more information about proposal submission close stage and what to do next."
   }
 }
