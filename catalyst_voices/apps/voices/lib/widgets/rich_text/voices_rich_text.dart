@@ -249,7 +249,9 @@ class _EditorState extends State<_Editor> {
           padding: const EdgeInsets.all(16),
           placeholder: context.l10n.placeholderRichText,
           characterShortcutEvents: quill.standardCharactersShortcutEvents,
+           /* cSpell:disable */
           spaceShortcutEvents: quill.standardSpaceShorcutEvents,
+          /* cSpell:enable */
           customStyles: quill.DefaultStyles(
             placeHolder: quill.DefaultTextBlockStyle(
               textTheme.bodyLarge?.copyWith(color: theme.colors.textDisabled) ??
