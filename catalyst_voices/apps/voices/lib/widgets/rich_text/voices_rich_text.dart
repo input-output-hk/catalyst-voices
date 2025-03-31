@@ -4,6 +4,7 @@ import 'dart:async';
 
 import 'package:catalyst_voices/common/codecs/markdown_codec.dart';
 import 'package:catalyst_voices/widgets/form/voices_form_field.dart';
+import 'package:catalyst_voices/widgets/rich_text/insert_image_error.dart';
 import 'package:catalyst_voices/widgets/rich_text/insert_new_image_dialog.dart';
 import 'package:catalyst_voices/widgets/rich_text/voices_rich_text_limit.dart';
 import 'package:catalyst_voices/widgets/rich_text/voices_rich_text_rules.dart';
@@ -18,6 +19,7 @@ import 'package:flutter_quill/flutter_quill.dart' as quill;
 import 'package:flutter_quill/internal.dart' as quill_int;
 import 'package:flutter_quill_extensions/flutter_quill_extensions.dart'
     as quill_ext;
+import 'package:flutter_quill_extensions/flutter_quill_extensions.dart';
 
 class VoicesRichText extends VoicesFormField<MarkdownData> {
   final VoicesRichTextController controller;
@@ -247,9 +249,7 @@ class _EditorState extends State<_Editor> {
           padding: const EdgeInsets.all(16),
           placeholder: context.l10n.placeholderRichText,
           characterShortcutEvents: quill.standardCharactersShortcutEvents,
-          /* cSpell:disable */
           spaceShortcutEvents: quill.standardSpaceShorcutEvents,
-          /* cSpell:enable */
           customStyles: quill.DefaultStyles(
             placeHolder: quill.DefaultTextBlockStyle(
               textTheme.bodyLarge?.copyWith(color: theme.colors.textDisabled) ??
@@ -261,7 +261,11 @@ class _EditorState extends State<_Editor> {
             ),
           ),
           embedBuilders: CatalystPlatform.isWeb
-              ? quill_ext.FlutterQuillEmbeds.editorWebBuilders()
+              ? quill_ext.FlutterQuillEmbeds.editorWebBuilders(
+                  imageEmbedConfig: const QuillEditorImageEmbedConfig(
+                    errorWidget: InsertImageError(),
+                  ),
+                )
               : quill_ext.FlutterQuillEmbeds.editorBuilders(),
         ),
       ),

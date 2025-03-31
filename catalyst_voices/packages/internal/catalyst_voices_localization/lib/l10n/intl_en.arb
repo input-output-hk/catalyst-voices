@@ -2249,8 +2249,8 @@
   "@insertNewImageDialogImageUrl": {
     "description": "Label for the image URL input field"
   },
-  "insertNewImageDialogInsert": "Insert Image",
-  "@insertNewImageDialogInsert": {
+  "insertNewImageDialogInsertButtonText": "Insert Image",
+  "@insertNewImageDialogInsertButtonText": {
     "description": "Label for the insert button"
   },
   "insertNewImageDialogInvalidUrl": "Please provide a valid image URL to proceed",
@@ -2272,5 +2272,9 @@
   "toLearnMore": "to learn more.",
   "@toLearnMore": {
     "description": "Text for the to learn more link"
+  },
+  "insertNewImageFailedToLoad": "Image failed to load",
+  "@insertNewImageFailedToLoad": {
+    "description": "Text for the image failed to load"
   }
 }

@@ -10,7 +10,6 @@ final class ImageUrlValidator {
       return false;
     }
 
-    // Check if URL is a valid image URL
     final lowercaseUrl = url.toLowerCase();
     return (Uri.tryParse(url)?.hasAbsolutePath ?? false) &&
         (lowercaseUrl.endsWith('.jpg') ||

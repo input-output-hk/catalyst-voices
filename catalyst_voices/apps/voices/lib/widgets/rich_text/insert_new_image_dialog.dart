@@ -146,7 +146,7 @@ class _InsertNewImageDialogState extends State<InsertNewImageDialog> {
                   onTap: !_inputFieldIsEmpty && _isValidImageUrl
                       ? () => Navigator.pop(context, _textController.text)
                       : null,
-                  child: Text(l10n.insertNewImageDialogInsert),
+                  child: Text(l10n.insertNewImageDialogInsertButtonText),
                 ),
               ],
             ),
