@@ -39,8 +39,9 @@ abstract interface class ProposalService {
     required DocumentData document,
   });
 
+  /// Returns the [SignedDocumentRef] of the created [ProposalSubmissionAction].
   Future<void> forgetProposal({
-    required SignedDocumentRef ref,
+    required SignedDocumentRef proposalRef,
     required SignedDocumentRef categoryId,
   });
 
@@ -86,13 +87,16 @@ abstract interface class ProposalService {
   });
 
   /// Submits a proposal draft into review.
-  Future<void> submitProposalForReview({
-    required SignedDocumentRef ref,
+  ///
+  /// Returns the [SignedDocumentRef] of the created [ProposalSubmissionAction].
+  Future<SignedDocumentRef> submitProposalForReview({
+    required SignedDocumentRef proposalRef,
     required SignedDocumentRef categoryId,
   });
 
-  Future<void> unlockProposal({
-    required SignedDocumentRef ref,
+  /// Returns the [SignedDocumentRef] of the created [ProposalSubmissionAction].
+  Future<SignedDocumentRef> unlockProposal({
+    required SignedDocumentRef proposalRef,
     required SignedDocumentRef categoryId,
   });
 
@@ -180,19 +184,24 @@ final class ProposalServiceImpl implements ProposalService {
   }
 
   @override
-  Future<void> forgetProposal({
-    required SignedDocumentRef ref,
+  Future<SignedDocumentRef> forgetProposal({
+    required SignedDocumentRef proposalRef,
     required SignedDocumentRef categoryId,
   }) {
     return _signerService.useProposerCredentials(
-      (catalystId, privateKey) {
-        return _proposalRepository.publishProposalAction(
-          ref: ref,
+      (catalystId, privateKey) async {
+        final actionRef = SignedDocumentRef.generateFirstRef();
+
+        await _proposalRepository.publishProposalAction(
+          actionRef: actionRef,
+          proposalRef: proposalRef,
           categoryId: categoryId,
           action: ProposalSubmissionAction.hide,
           catalystId: catalystId,
           privateKey: privateKey,
         );
+
+        return actionRef;
       },
     );
   }
@@ -281,37 +290,47 @@ final class ProposalServiceImpl implements ProposalService {
   }
 
   @override
-  Future<void> submitProposalForReview({
-    required SignedDocumentRef ref,
+  Future<SignedDocumentRef> submitProposalForReview({
+    required SignedDocumentRef proposalRef,
     required SignedDocumentRef categoryId,
   }) {
     return _signerService.useProposerCredentials(
-      (catalystId, privateKey) {
-        return _proposalRepository.publishProposalAction(
-          ref: ref,
+      (catalystId, privateKey) async {
+        final actionRef = SignedDocumentRef.generateFirstRef();
+
+        await _proposalRepository.publishProposalAction(
+          actionRef: actionRef,
+          proposalRef: proposalRef,
           categoryId: categoryId,
           action: ProposalSubmissionAction.aFinal,
           catalystId: catalystId,
           privateKey: privateKey,
         );
+
+        return actionRef;
       },
     );
   }
 
   @override
-  Future<void> unlockProposal({
-    required SignedDocumentRef ref,
+  Future<SignedDocumentRef> unlockProposal({
+    required SignedDocumentRef proposalRef,
     required SignedDocumentRef categoryId,
   }) async {
     return _signerService.useProposerCredentials(
-      (catalystId, privateKey) {
-        return _proposalRepository.publishProposalAction(
-          ref: ref,
+      (catalystId, privateKey) async {
+        final actionRef = SignedDocumentRef.generateFirstRef();
+
+        await _proposalRepository.publishProposalAction(
+          actionRef: actionRef,
+          proposalRef: proposalRef,
           categoryId: categoryId,
           action: ProposalSubmissionAction.draft,
           catalystId: catalystId,
           privateKey: privateKey,
         );
+
+        return actionRef;
       },
     );
   }
