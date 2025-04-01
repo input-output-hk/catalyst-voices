@@ -254,7 +254,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
         id: actionRef.id,
         ver: actionRef.version,
         ref: SignedDocumentMetadataRef.fromDocumentRef(proposalRef),
-        categoryId: SignedDocumentMetadataRef.fromDocumentRef(proposalRef),
+        categoryId: SignedDocumentMetadataRef.fromDocumentRef(categoryId),
       ),
       catalystId: catalystId,
       privateKey: privateKey,
