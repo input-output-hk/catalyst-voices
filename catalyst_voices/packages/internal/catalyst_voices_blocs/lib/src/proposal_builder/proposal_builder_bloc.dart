@@ -556,7 +556,7 @@ final class ProposalBuilderBloc
     );
 
     await _proposalService.submitProposalForReview(
-      ref: updatedRef,
+      proposalRef: updatedRef,
       categoryId: state.metadata.categoryId!,
     );
 
@@ -746,7 +746,7 @@ final class ProposalBuilderBloc
     Emitter<ProposalBuilderState> emit,
   ) async {
     await _proposalService.submitProposalForReview(
-      ref: state.metadata.documentRef! as SignedDocumentRef,
+      proposalRef: state.metadata.documentRef! as SignedDocumentRef,
       categoryId: state.metadata.categoryId!,
     );
 
