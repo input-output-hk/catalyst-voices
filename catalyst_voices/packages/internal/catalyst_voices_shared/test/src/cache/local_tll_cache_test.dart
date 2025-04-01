@@ -75,5 +75,27 @@ void main() {
 
       expect(cachedValue, '$value');
     });
+
+    test(
+        'is about to expire returns true when is still valid '
+        'but in tolerance duration', () async {
+      // Given
+      final cache = LocalTllCache(sharedPreferences: sharedPreferences);
+      const key = 'rbacToken.catv1.111';
+      const value = 'token1234';
+      const ttl = Duration(hours: 1);
+
+      // When
+      await cache.set(value, key: key, ttl: ttl);
+
+      DateTimeExt.mockedDateTime = now.add(ttl - const Duration(seconds: 30));
+
+      // Then
+      final isExpired = await cache.isExpired(key: key);
+      final isAboutToExpire = await cache.isAboutToExpire(key: key);
+
+      expect(isExpired, isFalse);
+      expect(isAboutToExpire, isTrue);
+    });
   });
 }
