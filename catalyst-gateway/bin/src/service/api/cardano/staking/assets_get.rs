@@ -100,7 +100,7 @@ pub(crate) async fn endpoint(
     .into()
 }
 
-/// TXO aseet information.
+/// TXO asset information.
 struct TxoAssetInfo {
     /// Asset hash.
     id: Vec<u8>,
