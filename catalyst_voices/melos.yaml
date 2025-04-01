@@ -115,12 +115,12 @@ command:
       flutter_quill:
         git:
           url: https://github.com/input-output-hk/flutter-quill
-          ref: 41f37dcf56b97b1bffe10f012dc667795a30e74e
+          ref: 532172254c3cee957bbdbb08be922f2c870b7fff
       flutter_quill_extensions:
         git:
           url: https://github.com/input-output-hk/flutter-quill
           path: flutter_quill_extensions
-          ref: 41f37dcf56b97b1bffe10f012dc667795a30e74e
+          ref: 532172254c3cee957bbdbb08be922f2c870b7fff
       flutter_rust_bridge: 2.5.1
       flutter_secure_storage: ^9.2.2
       formz: ^0.7.0
@@ -132,7 +132,7 @@ command:
       markdown_quill:
         git:
           url: https://github.com/input-output-hk/markdown_quill
-          ref: 059703222cae65bf5ad96ec75049c0c146d76b11
+          ref: a523a6128e6b2677739ac5d68d1d9c65a2af8b98
       meta: ^1.16.0
       result_type: ^0.2.0
       rxdart: ^0.27.7

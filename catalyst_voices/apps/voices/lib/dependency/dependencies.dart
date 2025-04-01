@@ -238,6 +238,7 @@ final class Dependencies extends DependencyProvider {
     });
     registerLazySingleton<AuthService>(() {
       return AuthService(
+        get<AuthTokenCache>(),
         get<UserObserver>(),
         get<KeyDerivationService>(),
       );
@@ -320,6 +321,11 @@ final class Dependencies extends DependencyProvider {
             driftWorker: Uri.parse(config.webDriftWorker),
           ),
         ),
+      );
+    });
+    registerLazySingleton<AuthTokenCache>(() {
+      return LocalAuthTokenCache(
+        sharedPreferences: get<SharedPreferencesAsync>(),
       );
     });
   }
