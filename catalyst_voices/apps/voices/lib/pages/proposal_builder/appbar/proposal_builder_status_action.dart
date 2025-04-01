@@ -201,6 +201,11 @@ class _PopupMenuButtonState extends State<_PopupMenuButton> {
         .add(ExportProposalEvent(filePrefix: prefix));
   }
 
+  bool _isLocal(ProposalPublish publish, int iteration) {
+    return publish == ProposalPublish.localDraft &&
+        iteration == DocumentVersion.firstNumber;
+  }
+
   void _onSelected(ProposalMenuItemAction item) {
     switch (item) {
       case ProposalMenuItemAction.publish:
@@ -230,11 +235,9 @@ class _PopupMenuButtonState extends State<_PopupMenuButton> {
 
     // if it's local draft and the first version then
     // it should be shown as local which corresponds to null
-    final currentIteration =
-        (state.metadata.publish == ProposalPublish.localDraft &&
-                nextIteration == DocumentVersion.firstNumber)
-            ? null
-            : nextIteration - 1;
+    final currentIteration = _isLocal(state.metadata.publish, nextIteration)
+        ? null
+        : nextIteration - 1;
 
     final shouldPublish = await PublishProposalIterationDialog.show(
           context: context,
@@ -269,10 +272,7 @@ class _PopupMenuButtonState extends State<_PopupMenuButton> {
     // if it's local draft and the first version then
     // it should be shown as local which corresponds to null
     final currentIteration =
-        (state.metadata.publish == ProposalPublish.localDraft &&
-                nextIteration == DocumentVersion.firstNumber)
-            ? null
-            : nextIteration;
+        _isLocal(state.metadata.publish, nextIteration) ? null : nextIteration;
 
     final shouldSubmit = await SubmitProposalForReviewDialog.show(
           context: context,
