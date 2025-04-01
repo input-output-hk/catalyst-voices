@@ -1,4 +1,4 @@
-//! Get stake addr from stake address
+//! Get stake public key from stake address.
 
 use std::sync::Arc;
 
@@ -17,34 +17,34 @@ use crate::db::{
     types::DbStakeAddress,
 };
 
-/// Get stake addr from stake hash query string.
-const GET_QUERY: &str = include_str!("../cql/get_stake_addr_w_stake_address.cql");
+/// Get stake public key from stake address query string.
+const GET_QUERY: &str = include_str!("../cql/get_stake_pk_w_stake_addr.cql");
 
-/// Get stake addr
+/// Get stake public key from stake address parameters
 #[derive(SerializeRow)]
-pub(crate) struct GetStakeAddrParams {
-    /// Stake hash.
+pub(crate) struct GetStakePublicKeyFromStakeAddrParams {
+    /// Stake address.
     pub stake_address: DbStakeAddress,
 }
 
-impl GetStakeAddrParams {
-    /// Create a new instance of [`GetStakeAddrParams`]
-    pub(crate) fn new(stake_address: StakeAddress) -> GetStakeAddrParams {
+impl GetStakePublicKeyFromStakeAddrParams {
+    /// Create a new instance of [`GetStakePublicKeyFromStakeAddrParams`]
+    pub(crate) fn new(stake_address: StakeAddress) -> GetStakePublicKeyFromStakeAddrParams {
         Self {
             stake_address: stake_address.into(),
         }
     }
 }
 
-/// Get stake addr from stake hash query.
+/// Get stake public key from stake address query.
 #[derive(DeserializeRow)]
-pub(crate) struct GetStakeAddrQuery {
+pub(crate) struct GetStakePublicKeyFromStakeAddrQuery {
     /// Full Stake Address (not hashed, 32 byte ED25519 Public key).
     pub stake_public_key: Vec<u8>,
 }
 
-impl GetStakeAddrQuery {
-    /// Prepares a get get stake addr from stake hash query.
+impl GetStakePublicKeyFromStakeAddrQuery {
+    /// Prepares a get get stake public key from stake address query.
     pub(crate) async fn prepare(session: Arc<Session>) -> anyhow::Result<PreparedStatement> {
         PreparedQueries::prepare(
             session,
@@ -54,19 +54,19 @@ impl GetStakeAddrQuery {
         )
         .await
         .inspect_err(
-            |error| error!(error=%error, "Failed to prepare get stake addr from stake hash query."),
+            |error| error!(error=%error, "Failed to prepare get stake public key from stake address query."),
         )
         .map_err(|error| anyhow::anyhow!("{error}\n--\n{GET_QUERY}"))
     }
 
     /// Executes a get txi by transaction hashes query.
     pub(crate) async fn execute(
-        session: &CassandraSession, params: GetStakeAddrParams,
-    ) -> anyhow::Result<TypedRowStream<GetStakeAddrQuery>> {
+        session: &CassandraSession, params: GetStakePublicKeyFromStakeAddrParams,
+    ) -> anyhow::Result<TypedRowStream<GetStakePublicKeyFromStakeAddrQuery>> {
         let iter = session
-            .execute_iter(PreparedSelectQuery::StakeAddrFromStakeHash, params)
+            .execute_iter(PreparedSelectQuery::StakePublicKeyFromStakeAddr, params)
             .await?
-            .rows_stream::<GetStakeAddrQuery>()?;
+            .rows_stream::<GetStakePublicKeyFromStakeAddrQuery>()?;
 
         Ok(iter)
     }

@@ -1,12 +1,11 @@
 //! Implementation of the GET `/cardano/cip36` endpoint
 
-use poem::http::HeaderMap;
 use tracing::error;
 
 use self::cardano::query::stake_or_voter::StakeAddressOrPublicKey;
 use super::{
     cardano::{self},
-    filter::{get_registration_given_stake_key_hash, get_registration_given_vote_key, snapshot},
+    filter::{get_registrations_given_stake_addr, get_registrations_given_vote_key, snapshot},
     response, SlotNo,
 };
 use crate::{
@@ -20,8 +19,8 @@ use crate::{
 /// Process the endpoint operation
 pub(crate) async fn cip36_registrations(
     lookup: Option<cardano::query::stake_or_voter::StakeOrVoter>, asat: Option<SlotNo>,
-    _page: common::types::generic::query::pagination::Page,
-    _limit: common::types::generic::query::pagination::Limit, _headers: &HeaderMap,
+    page: common::types::generic::query::pagination::Page,
+    limit: common::types::generic::query::pagination::Limit, invalid: bool,
 ) -> AllRegistration {
     let Some(session) = CassandraSession::get(true) else {
         error!("Failed to acquire db session");
@@ -32,7 +31,7 @@ pub(crate) async fn cip36_registrations(
     };
 
     if let Some(stake_or_voter) = lookup {
-        match StakeAddressOrPublicKey::from(stake_or_voter) {
+        let res = match StakeAddressOrPublicKey::from(stake_or_voter) {
             StakeAddressOrPublicKey::Address(cip19_stake_address) => {
                 // Typically, a stake address will start with 'stake1',
                 // We need to convert this to a stake hash as per our data model to then find the,
@@ -44,37 +43,45 @@ pub(crate) async fn cip36_registrations(
                     Ok(a) => a,
                     Err(err) => {
                         return AllRegistration::handle_error(&anyhow::anyhow!(
-                            "Given stake pub key is corrupt {:?}",
+                            "Given stake address is corrupted {:?}",
                             err
                         ));
                     },
                 };
 
-                return get_registration_given_stake_key_hash(address, session, asat).await;
+                get_registrations_given_stake_addr(address, session, asat, page, limit, invalid)
+                    .await
             },
             StakeAddressOrPublicKey::PublicKey(ed25519_hex_encoded_public_key) => {
                 // As above...
                 // Except using a voting key.
-                return get_registration_given_vote_key(
+                get_registrations_given_vote_key(
                     ed25519_hex_encoded_public_key,
                     session,
                     asat,
+                    page,
+                    limit,
+                    invalid,
                 )
-                .await;
+                .await
             },
-            StakeAddressOrPublicKey::All =>
-            // As above...
-            // Snapshot replacement, returns all registrations or returns a
-            // subset of registrations if constrained by a given time.
-            {
-                return snapshot(session, asat).await
+            StakeAddressOrPublicKey::All => {
+                // As above...
+                // Snapshot replacement, returns all registrations or returns a
+                // subset of registrations if constrained by a given time.
+                snapshot(session, asat, page, limit, invalid).await
             },
         };
-    };
 
-    // If _for is not defined, use the stake addresses defined for Role0 in the _auth
-    // parameter. _auth not yet implemented, so put placeholder for that, and return not
-    // found until _auth is implemented.
+        match res {
+            Ok(res) => res.into(),
+            Err(err) => AllRegistration::handle_error(&err),
+        }
+    } else {
+        // If _for is not defined, use the stake addresses defined for Role0 in the _auth
+        // parameter. _auth not yet implemented, so put placeholder for that, and return not
+        // found until _auth is implemented.
 
-    response::Cip36Registration::NotFound.into()
+        response::Cip36Registration::NotFound.into()
+    }
 }

@@ -2,42 +2,40 @@
 
 use std::sync::Arc;
 
+use cardano_blockchain_types::Slot;
 use scylla::{
     prepared_statement::PreparedStatement, transport::iterator::TypedRowStream, DeserializeRow,
     SerializeRow, Session,
 };
 use tracing::error;
 
-use crate::{
-    db::{
-        index::{
-            queries::{PreparedQueries, PreparedSelectQuery},
-            session::CassandraSession,
-        },
-        types::DbSlot,
+use crate::db::{
+    index::{
+        queries::{PreparedQueries, PreparedSelectQuery},
+        session::CassandraSession,
     },
-    service::common::types::cardano::slot_no::SlotNo,
+    types::{DbSlot, DbTxnIndex},
 };
 
-/// Get invalid registrations from stake addr query.
-const GET_INVALID_REGISTRATIONS_FROM_STAKE_ADDR_QUERY: &str =
+/// Get invalid registrations from stake public key query.
+const GET_INVALID_REGISTRATIONS_FROM_STAKE_PK_QUERY: &str =
     include_str!("../cql/get_invalid_registration_w_stake_addr.cql");
 
 /// Get registration
 #[derive(SerializeRow)]
 pub(crate) struct GetInvalidRegistrationParams {
-    /// Stake address.
-    pub stake_public_key: Vec<u8>,
-    /// Block Slot Number when spend occurred.
+    /// Stake public key.
+    stake_public_key: Vec<u8>,
+    /// Block Slot Number.
     slot_no: DbSlot,
 }
 
 impl GetInvalidRegistrationParams {
     /// Create a new instance of [`GetInvalidRegistrationParams`]
-    pub(crate) fn new(stake_public_key: Vec<u8>, slot_no: SlotNo) -> GetInvalidRegistrationParams {
+    pub(crate) fn new(stake_public_key: Vec<u8>, slot_no: Slot) -> GetInvalidRegistrationParams {
         Self {
             stake_public_key,
-            slot_no: u64::from(slot_no).into(),
+            slot_no: slot_no.into(),
         }
     }
 }
@@ -45,9 +43,17 @@ impl GetInvalidRegistrationParams {
 /// Get invalid registrations given stake address.
 #[derive(DeserializeRow)]
 pub(crate) struct GetInvalidRegistrationQuery {
+    /// Nonce value after normalization.
+    pub nonce: num_bigint::BigInt,
+    /// Raw Nonce value.
+    pub raw_nonce: num_bigint::BigInt,
+    /// Slot Number the invalid CIP 36 registration is in.
+    pub slot_no: DbSlot,
+    /// Transaction Index.
+    pub txn_index: DbTxnIndex,
     /// Error report
     pub problem_report: String,
-    /// Full Stake Address (not hashed, 32 byte ED25519 Public key).
+    /// Full Stake Public Key (not hashed, 32 byte ED25519 Public key).
     pub stake_public_key: Vec<u8>,
     /// Voting Public Key
     pub vote_key: Vec<u8>,
@@ -64,14 +70,14 @@ impl GetInvalidRegistrationQuery {
     pub(crate) async fn prepare(session: Arc<Session>) -> anyhow::Result<PreparedStatement> {
         PreparedQueries::prepare(
             session,
-            GET_INVALID_REGISTRATIONS_FROM_STAKE_ADDR_QUERY,
+            GET_INVALID_REGISTRATIONS_FROM_STAKE_PK_QUERY,
             scylla::statement::Consistency::All,
             true,
         )
         .await
         .inspect_err(|error| error!(error=%error, "Failed to prepare get invalid registration from stake address query."))
         .map_err(|error| {
-            anyhow::anyhow!("{error}\n--\n{GET_INVALID_REGISTRATIONS_FROM_STAKE_ADDR_QUERY}")
+            anyhow::anyhow!("{error}\n--\n{GET_INVALID_REGISTRATIONS_FROM_STAKE_PK_QUERY}")
         })
     }
 
