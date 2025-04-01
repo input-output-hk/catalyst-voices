@@ -646,6 +646,7 @@ final class ProposalBuilderBloc
     _updateMetadata(
       emit,
       documentRef: updatedRef,
+      originalDocumentRef: state.metadata.originalDocumentRef ?? updatedRef,
       publish: ProposalPublish.localDraft,
     );
   }
