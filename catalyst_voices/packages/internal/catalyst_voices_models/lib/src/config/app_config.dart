@@ -54,8 +54,6 @@ final class BlockchainConfig extends Equatable {
   const BlockchainConfig({
     this.networkId = NetworkId.testnet,
     this.host = CatalystIdHost.cardanoPreprod,
-    // TODO(dtscalac): don't hardcode the transaction config,
-    // fetch it from server
     this.transactionBuilderConfig = const TransactionBuilderConfig(
       feeAlgo: TieredFee(
         constant: 155381,
@@ -117,12 +115,26 @@ final class SentryConfig extends Equatable {
   final String dns;
   final String environment;
   final String release;
+  final double tracesSampleRate;
+  final double profilesSampleRate;
+  final bool enableAutoSessionTracking;
+  final bool attachScreenshot;
+  final bool attachViewHierarchy;
+  final bool debug;
+  final String diagnosticLevel;
 
   const SentryConfig({
-    // TODO(damian-molinski): default values should be changed.
-    this.dns = 'https://example.com',
-    this.environment = 'dev',
+    this.dns =
+        'https://8e333ddbed1e096c70e4ed006892c355@o622089.ingest.us.sentry.io/4507113601433600',
+    this.environment = 'catalyst-voices@dev',
     this.release = '1.0.0',
+    this.tracesSampleRate = 1.0,
+    this.profilesSampleRate = 1.0,
+    this.enableAutoSessionTracking = true,
+    this.attachScreenshot = true,
+    this.attachViewHierarchy = true,
+    this.debug = true,
+    this.diagnosticLevel = 'debug',
   });
 
   @override
@@ -130,5 +142,12 @@ final class SentryConfig extends Equatable {
         dns,
         environment,
         release,
+        tracesSampleRate,
+        profilesSampleRate,
+        enableAutoSessionTracking,
+        attachScreenshot,
+        attachViewHierarchy,
+        debug,
+        diagnosticLevel,
       ];
 }

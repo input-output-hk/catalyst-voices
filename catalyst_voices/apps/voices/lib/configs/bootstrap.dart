@@ -56,7 +56,10 @@ Future<BootstrapArgs> bootstrap({
 
   Dependencies.instance.get<SyncManager>().start().ignore();
 
-  return BootstrapArgs(routerConfig: router);
+  return BootstrapArgs(
+    routerConfig: router,
+    sentryConfig: config.sentry,
+  );
 }
 
 /// The entry point for Catalyst Voices,
@@ -124,7 +127,7 @@ Future<void> _doBootstrapAndRun(BootstrapWidgetBuilder builder) async {
 
   final args = await bootstrap();
   final app = await builder(args);
-  await _runApp(app);
+  await _runApp(app, sentryConfig: args.sentryConfig);
 }
 
 Future<void> _initCryptoUtils() async {
@@ -162,9 +165,12 @@ void _reportUncaughtZoneError(Object error, StackTrace stack) {
   _uncaughtZoneLogger.severe('Uncaught Error', error, stack);
 }
 
-Future<void> _runApp(Widget app) async {
+Future<void> _runApp(
+  Widget app, {
+  required SentryConfig sentryConfig,
+}) async {
   if (kReleaseMode) {
-    await SentryService.init(app);
+    await SentryService.init(app, config: sentryConfig);
   } else {
     runApp(app);
   }
@@ -182,8 +188,10 @@ typedef BootstrapWidgetBuilder = FutureOr<Widget> Function(BootstrapArgs args);
 
 final class BootstrapArgs {
   final RouterConfig<Object> routerConfig;
+  final SentryConfig sentryConfig;
 
   BootstrapArgs({
     required this.routerConfig,
+    required this.sentryConfig,
   });
 }
