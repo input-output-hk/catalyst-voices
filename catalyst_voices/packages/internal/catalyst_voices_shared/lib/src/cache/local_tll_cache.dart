@@ -36,7 +36,7 @@ base class LocalTllCache extends LocalStorage
     }
 
     final effectiveTtl = ttl ?? _defaultTtl;
-    final now = DateTimeExt.now();
+    final now = DateTimeExt.now(utc: true);
 
     final expireDate = now.add(effectiveTtl);
     final expireDateTimestamp = expireDate.toIso8601String();
@@ -85,9 +85,9 @@ base class LocalTllCache extends LocalStorage
     Duration tolerance = Duration.zero,
   }) async {
     final expireDate = await _readExpireDate(key: key);
-    final now = DateTimeExt.now();
+    final now = DateTimeExt.now(utc: true);
 
-    final other = expireDate ?? now;
+    final other = expireDate?.toUtc() ?? now;
 
     final after = now.isAfter(other);
     final atSameMoment = now.isAtSameMomentAs(other);
@@ -106,6 +106,12 @@ base class LocalTllCache extends LocalStorage
   Future<DateTime?> _readExpireDate({required String key}) async {
     final expireKey = _buildExpireKey(key);
     final expireTimestamp = await readString(key: expireKey);
-    return DateTime.tryParse(expireTimestamp ?? '');
+    final dateTime = DateTime.tryParse(expireTimestamp ?? '');
+
+    if (dateTime != null && !dateTime.isUtc) {
+      return dateTime.toUtc();
+    }
+
+    return dateTime;
   }
 }
