@@ -45,7 +45,10 @@ impl ChainInfo {
         let last_persistent_txn = chain.as_ref().map(RegistrationChain::current_tx_id_hash);
 
         let (chain, _) = apply_registrations(network, chain, volatile_registrations).await?;
-        let last_volatile_txn = chain.as_ref().map(RegistrationChain::current_tx_id_hash);
+        let mut last_volatile_txn = chain.as_ref().map(RegistrationChain::current_tx_id_hash);
+        if last_persistent_txn == last_volatile_txn {
+            last_volatile_txn = None;
+        }
 
         Ok(chain.map(|chain| {
             Self {
