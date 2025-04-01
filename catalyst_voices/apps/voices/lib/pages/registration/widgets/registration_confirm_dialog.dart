@@ -4,6 +4,24 @@ import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
 
+class AccountUpdateExitConfirmDialog extends StatelessWidget {
+  const AccountUpdateExitConfirmDialog({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return RegistrationConfirmDialog(
+      title: context.l10n.warning,
+      subtitle: context.l10n.accountUpdateExitConfirmDialogSubtitle,
+      content: Text(
+        key: const Key('RegistrationExitDialogContent'),
+        context.l10n.accountUpdateExitConfirmDialogContent,
+      ),
+      negativeText: context.l10n.cancelAnyways,
+      positiveText: context.l10n.accountUpdateExitConfirmDialogContinue,
+    );
+  }
+}
+
 class RecoveryExitConfirmDialog extends StatelessWidget {
   const RecoveryExitConfirmDialog({super.key});
 
@@ -79,6 +97,24 @@ class RegistrationExitConfirmDialog extends StatelessWidget {
       ),
       negativeText: context.l10n.cancelAnyways,
       positiveText: context.l10n.registrationExitConfirmDialogContinue,
+    );
+  }
+}
+
+class WalletLinkExitConfirmDialog extends StatelessWidget {
+  const WalletLinkExitConfirmDialog({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return RegistrationConfirmDialog(
+      title: context.l10n.warning,
+      subtitle: context.l10n.walletLinkExitConfirmDialogSubtitle,
+      content: Text(
+        key: const Key('RegistrationExitDialogContent'),
+        context.l10n.walletLinkExitConfirmDialogContent,
+      ),
+      negativeText: context.l10n.cancelAnyways,
+      positiveText: context.l10n.walletLinkExitConfirmDialogContinue,
     );
   }
 }

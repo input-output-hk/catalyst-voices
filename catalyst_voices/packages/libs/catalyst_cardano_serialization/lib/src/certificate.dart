@@ -19,7 +19,7 @@ abstract base class BaseCertificate implements CborEncodable {
 
   /// Serializes the type as cbor.
   @override
-  CborValue toCbor() => CborBytes(bytes);
+  CborValue toCbor({List<int> tags = const []}) => CborBytes(bytes, tags: tags);
 
   /// Constructs the [BaseCertificate] from a hex string representation
   /// of [bytes].

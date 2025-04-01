@@ -3,7 +3,7 @@ import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:collection/collection.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 
 enum ProposalCommentsSort {
   newest,
@@ -36,8 +36,8 @@ enum ProposalCommentsSort {
 
   String localizedName(BuildContext context) {
     return switch (this) {
-      ProposalCommentsSort.newest => context.l10n.proposalCommentsSortNewest,
-      ProposalCommentsSort.oldest => context.l10n.proposalCommentsSortOldest,
+      ProposalCommentsSort.newest => context.l10n.commentsSortNewest,
+      ProposalCommentsSort.oldest => context.l10n.commentsSortOldest,
     };
   }
 }

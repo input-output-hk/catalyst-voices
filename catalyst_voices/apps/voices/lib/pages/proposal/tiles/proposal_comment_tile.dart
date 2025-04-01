@@ -1,4 +1,4 @@
-import 'package:catalyst_voices/pages/proposal/widget/proposal_comment_with_replies_card.dart';
+import 'package:catalyst_voices/widgets/comment/proposal_comment_with_replies_card.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
@@ -16,15 +16,17 @@ class ProposalCommentTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final showReplies = context.select<ProposalCubit, bool>((value) {
-      return value.state.data.showReplies[comment.ref] ?? true;
+    final showReplies =
+        context.select<ProposalCubit, Map<DocumentRef, bool>>((value) {
+      return value.state.comments.showReplies;
     });
 
     final showReplyBuilder = context.select<ProposalCubit, bool>((value) {
-      return value.state.data.showReplyBuilder[comment.ref] ?? false;
+      return value.state.comments.showReplyBuilder[comment.ref] ?? false;
     });
 
     final id = comment.comment.metadata.selfRef.id;
+    final cubit = context.read<ProposalCubit>();
 
     return ProposalCommentWithRepliesCard(
       key: ValueKey('ProposalComment.$id.WithReplies'),
@@ -32,6 +34,18 @@ class ProposalCommentTile extends StatelessWidget {
       canReply: canReply,
       showReplies: showReplies,
       showReplyBuilder: showReplyBuilder,
+      onSubmit: ({required document, reply}) async {
+        return cubit.submitComment(document: document, reply: reply);
+      },
+      onCancel: () {
+        cubit.updateCommentBuilder(ref: comment.ref, show: false);
+      },
+      onToggleBuilder: (show) {
+        cubit.updateCommentBuilder(ref: comment.ref, show: show);
+      },
+      onToggleReplies: (show) {
+        cubit.updateCommentReplies(ref: comment.ref, show: show);
+      },
     );
   }
 }
