@@ -37,6 +37,7 @@ use crate::{
             headers::retry_after::RetryAfterOption,
         },
     },
+    settings::Settings,
 };
 
 /// Endpoint responses.
@@ -59,8 +60,15 @@ pub(crate) type AllResponses = WithErrorResponses<Responses>;
 
 /// # GET `/staked_ada`
 pub(crate) async fn endpoint(
-    stake_address: Cip19StakeAddress, _provided_network: Option<Network>, slot_num: Option<SlotNo>,
+    stake_address: Cip19StakeAddress, provided_network: Option<Network>, slot_num: Option<SlotNo>,
 ) -> AllResponses {
+    if let Some(provided_network) = provided_network {
+        if cardano_blockchain_types::Network::from(provided_network) != Settings::cardano_network()
+        {
+            return Responses::NotFound.into();
+        }
+    }
+
     let Some(persistent_session) = CassandraSession::get(true) else {
         tracing::error!("Failed to acquire persistent db session");
         return AllResponses::service_unavailable(

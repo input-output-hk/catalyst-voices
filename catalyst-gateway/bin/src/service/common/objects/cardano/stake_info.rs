@@ -38,7 +38,7 @@ impl Example for StakedTxoAssetInfo {
 
 // List of User's Staked Native Token Info
 impl_array_types!(
-    StakedNativeTokenInfoList,
+    StakedAssetInfoList,
     StakedTxoAssetInfo,
     Some(poem_openapi::registry::MetaSchema {
         example: Self::example().to_json(),
@@ -48,7 +48,7 @@ impl_array_types!(
     })
 );
 
-impl Example for StakedNativeTokenInfoList {
+impl Example for StakedAssetInfoList {
     fn example() -> Self {
         Self(vec![Example::example()])
     }
