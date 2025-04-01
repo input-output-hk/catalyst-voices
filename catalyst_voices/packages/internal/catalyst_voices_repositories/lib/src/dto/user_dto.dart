@@ -193,12 +193,12 @@ final class UserSettingsDto {
   final TimezonePreferences? timezone;
   @JsonKey(unknownEnumValue: JsonKey.nullForUndefinedEnumValue)
   final ThemePreferences? theme;
-  final bool? showSubmittionClosingWarining;
+  final bool? showSubmissionClosingWarining;
 
   const UserSettingsDto({
     this.timezone,
     this.theme,
-    this.showSubmittionClosingWarining,
+    this.showSubmissionClosingWarining,
   });
 
   factory UserSettingsDto.fromJson(Map<String, dynamic> json) {
@@ -209,7 +209,7 @@ final class UserSettingsDto {
       : this(
           timezone: data.timezone,
           theme: data.theme,
-          showSubmittionClosingWarining: data.showSubmittionClosingWarrning,
+          showSubmissionClosingWarining: data.showSubmissionClosingWarning,
         );
 
   Map<String, dynamic> toJson() => _$UserSettingsDtoToJson(this);
@@ -218,7 +218,7 @@ final class UserSettingsDto {
     return UserSettings(
       timezone: timezone,
       theme: theme,
-      showSubmittionClosingWarrning: showSubmittionClosingWarining,
+      showSubmissionClosingWarning: showSubmissionClosingWarining,
     );
   }
 }

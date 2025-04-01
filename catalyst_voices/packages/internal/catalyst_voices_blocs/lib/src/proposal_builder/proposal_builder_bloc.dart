@@ -57,7 +57,7 @@ final class ProposalBuilderBloc
     on<RebuildActiveAccountProposalEvent>(_rebuildActiveAccount);
     on<SubmitProposalEvent>(_submitProposal);
     on<ValidateProposalEvent>(_validateProposal);
-    on<ProposalSubmittionCloseDateEvent>(_proposalSubmissionCloseDate);
+    on<ProposalSubmissionCloseDateEvent>(_proposalSubmissionCloseDate);
     on<UpdateCommentsSortEvent>(_updateCommentsSort);
     on<UpdateCommentBuilderEvent>(_updateCommentBuilder);
     on<UpdateCommentRepliesEvent>(_updateCommentReplies);
@@ -537,7 +537,7 @@ final class ProposalBuilderBloc
   }
 
   Future<void> _proposalSubmissionCloseDate(
-    ProposalSubmittionCloseDateEvent event,
+    ProposalSubmissionCloseDateEvent event,
     Emitter<ProposalBuilderState> emit,
   ) async {
     final timeline = await _campaignService.getCampaignTimeline();
@@ -548,7 +548,7 @@ final class ProposalBuilderBloc
         ?.timeline
         .to;
 
-    emitSignal(ProposalSubmittionCloseDate(date: closeDate));
+    emitSignal(ProposalSubmissionCloseDate(date: closeDate));
   }
 
   Future<void> _publishAndSubmitProposalForReview(

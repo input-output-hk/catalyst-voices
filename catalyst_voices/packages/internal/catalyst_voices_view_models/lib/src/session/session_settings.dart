@@ -4,38 +4,37 @@ import 'package:equatable/equatable.dart';
 final class SessionSettings extends Equatable {
   static const _defaultTimezone = TimezonePreferences.local;
   static const _defaultTheme = ThemePreferences.light;
-  static const _defaultShowSubmittionClosingWarning = true;
+  static const _defaultShowSubmissionClosingWarning = true;
 
   final TimezonePreferences timezone;
   final ThemePreferences theme;
-  final bool showSubmittionClosingWarning;
+  final bool showSubmissionClosingWarning;
 
   const SessionSettings({
     required this.timezone,
     required this.theme,
-    required this.showSubmittionClosingWarning,
+    required this.showSubmissionClosingWarning,
   });
 
   const SessionSettings.fallback()
       : this(
           timezone: _defaultTimezone,
           theme: _defaultTheme,
-          showSubmittionClosingWarning: _defaultShowSubmittionClosingWarning,
+          showSubmissionClosingWarning: _defaultShowSubmissionClosingWarning,
         );
 
   SessionSettings.fromUser(UserSettings settings)
       : this(
           timezone: settings.timezone ?? _defaultTimezone,
           theme: settings.theme ?? _defaultTheme,
-          showSubmittionClosingWarning:
-              settings.showSubmittionClosingWarrning ??
-                  _defaultShowSubmittionClosingWarning,
+          showSubmissionClosingWarning: settings.showSubmissionClosingWarning ??
+              _defaultShowSubmissionClosingWarning,
         );
 
   @override
   List<Object?> get props => [
         timezone,
         theme,
-        showSubmittionClosingWarning,
+        showSubmissionClosingWarning,
       ];
 }

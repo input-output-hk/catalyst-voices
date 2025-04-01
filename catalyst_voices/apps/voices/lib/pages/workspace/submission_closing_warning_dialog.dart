@@ -197,7 +197,7 @@ class _RightSide extends StatelessWidget {
         _HeadsUpInfo(context.l10n.submitProposalBeforeClosing),
         _HeadsUpInfo(context.l10n.checkMaxProposal),
         _HeadsUpInfo(
-          context.l10n.catalystAppNotAvailableAfterSubmittionCloses,
+          context.l10n.catalystAppNotAvailableAfterSubmissionCloses,
           isBold: true,
         ),
         const Spacer(),

@@ -29,7 +29,7 @@ class ProposalSubmissionClosesText extends StatelessWidget {
         formatter: (context, dateTime) {
           final date = DateFormatter.formatFullDateTime(dateTime);
 
-          return context.l10n.proposalSubmittionWindowClosesAt(date);
+          return context.l10n.proposalSubmissionWindowClosesAt(date);
         },
       ),
     );

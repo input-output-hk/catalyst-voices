@@ -11,10 +11,10 @@ sealed class ProposalBuilderSignal extends Equatable {
   const ProposalBuilderSignal();
 }
 
-final class ProposalSubmittionCloseDate extends ProposalBuilderSignal {
+final class ProposalSubmissionCloseDate extends ProposalBuilderSignal {
   final DateTime? date;
 
-  const ProposalSubmittionCloseDate({required this.date});
+  const ProposalSubmissionCloseDate({required this.date});
 
   @override
   List<Object?> get props => [date];

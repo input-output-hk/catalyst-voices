@@ -152,7 +152,7 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
         timelineItems.map(CampaignTimelineViewModel.fromModel).toList();
 
     emit(state.copyWith(timelineItems: timeline));
-    emitSignal(SubmittionCloseDate(date: state.submittionCloseDate));
+    emitSignal(SubmissionCloseDate(date: state.submissionCloseDate));
   }
 
   Future<void> _importProposal(

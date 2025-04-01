@@ -70,8 +70,8 @@ class _WorkspacePageState extends State<WorkspacePage>
         unawaited(
           ProposalBuilderRoute.fromRef(ref: signal.ref).push(context),
         );
-      case SubmittionCloseDate():
-        unawaited(_showSubmittionClosingWarningDialog(signal.date));
+      case SubmissionCloseDate():
+        unawaited(_showSubmissionClosingWarningDialog(signal.date));
     }
   }
 
@@ -88,7 +88,7 @@ class _WorkspacePageState extends State<WorkspacePage>
   void _dontShowAgain(bool value) {
     context
         .read<SessionCubit>()
-        .updateShowSubmittionClosingWarrning(value: value);
+        .updateShowSubmissionClosingWarning(value: value);
   }
 
   void _showDeleteErrorSnackBar() {
@@ -113,21 +113,21 @@ class _WorkspacePageState extends State<WorkspacePage>
     ).show(context);
   }
 
-  Future<void> _showSubmittionClosingWarningDialog([
-    DateTime? submittionCloseDate,
+  Future<void> _showSubmissionClosingWarningDialog([
+    DateTime? submissionCloseDate,
   ]) async {
     final canShow = context
         .read<SessionCubit>()
         .state
         .settings
-        .showSubmittionClosingWarning;
+        .showSubmissionClosingWarning;
 
-    if (submittionCloseDate == null || !canShow || !mounted) {
+    if (submissionCloseDate == null || !canShow || !mounted) {
       return;
     }
     await SubmissionClosingWarningDialog.showNDaysBefore(
       context: context,
-      submissionCloseAt: submittionCloseDate,
+      submissionCloseAt: submissionCloseDate,
       dontShowAgain: _dontShowAgain,
     );
   }

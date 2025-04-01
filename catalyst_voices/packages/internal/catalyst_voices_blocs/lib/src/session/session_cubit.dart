@@ -138,11 +138,11 @@ final class SessionCubit extends Cubit<SessionState>
     return keychain.unlock(lockFactor);
   }
 
-  void updateShowSubmittionClosingWarrning({required bool value}) {
+  void updateShowSubmissionClosingWarning({required bool value}) {
     final settings = _userService.user.settings;
 
     final updatedSettings =
-        settings.copyWith(showSubmittionClosingWarrning: Optional.of(value));
+        settings.copyWith(showSubmissionClosingWarning: Optional.of(value));
 
     unawaited(_userService.updateSettings(updatedSettings));
   }

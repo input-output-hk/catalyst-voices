@@ -59,9 +59,9 @@ class _GetStartedButton extends StatelessWidget {
     return VoicesFilledButton(
       key: const Key('GetStartedButton'),
       onTap: () async => RegistrationDialog.show(
-                context,
-                type: const FreshRegistration(),
-              ),
+        context,
+        type: const FreshRegistration(),
+      ),
       child: Text(context.l10n.getStarted),
     );
   }

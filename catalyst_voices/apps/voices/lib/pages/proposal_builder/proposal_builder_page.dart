@@ -147,8 +147,8 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
       case PublishedProposalBuilderSignal():
       case SubmittedProposalBuilderSignal():
         const WorkspaceRoute().go(context);
-      case ProposalSubmittionCloseDate():
-        unawaited(_showSubmittionClosingWarningDialog(signal.date));
+      case ProposalSubmissionCloseDate():
+        unawaited(_showSubmissionClosingWarningDialog(signal.date));
     }
   }
 
@@ -174,14 +174,13 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
         )
         .listen((record) => _updateSegments(record.segments, record.nodeId));
 
-    _updateSource(bloc: bloc);
     _loadData(bloc: bloc);
   }
 
   void _dontShowAgain(bool value) {
     context
         .read<SessionCubit>()
-        .updateShowSubmittionClosingWarrning(value: value);
+        .updateShowSubmissionClosingWarning(value: value);
   }
 
   void _handleSegmentsControllerChange() {
@@ -189,6 +188,22 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
 
     final event = ActiveNodeChangedEvent(activeSectionId);
     context.read<ProposalBuilderBloc>().add(event);
+  }
+
+  void _loadData({ProposalBuilderBloc? bloc}) {
+    bloc ??= context.read<ProposalBuilderBloc>();
+
+    final proposalId = widget.proposalId;
+    final categoryId = widget.categoryId;
+
+    if (proposalId != null) {
+      bloc.add(LoadProposalEvent(proposalId: proposalId));
+    } else if (categoryId != null) {
+      bloc.add(LoadProposalCategoryEvent(categoryId: categoryId));
+    } else {
+      bloc.add(const LoadDefaultProposalCategoryEvent());
+    }
+    bloc.add(const ProposalSubmissionCloseDateEvent());
   }
 
   void _onProposalDeleted() {
@@ -204,29 +219,29 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
     );
   }
 
-  Future<void> _showSubmitException(ProposalBuilderSubmitException error) {
-    return SubmitProposalErrorDialog.show(
-      context: context,
-      exception: error,
-    );
-  }
-
-  Future<void> _showSubmittionClosingWarningDialog([
-    DateTime? submittionCloseDate,
+  Future<void> _showSubmissionClosingWarningDialog([
+    DateTime? submissionCloseDate,
   ]) async {
     final canShow = context
         .read<SessionCubit>()
         .state
         .settings
-        .showSubmittionClosingWarning;
+        .showSubmissionClosingWarning;
 
-    if (submittionCloseDate == null || !canShow || !mounted) {
+    if (submissionCloseDate == null || !canShow || !mounted) {
       return;
     }
     await SubmissionClosingWarningDialog.showNDaysBefore(
       context: context,
-      submissionCloseAt: submittionCloseDate,
+      submissionCloseAt: submissionCloseDate,
       dontShowAgain: _dontShowAgain,
+    );
+  }
+
+  Future<void> _showSubmitException(ProposalBuilderSubmitException error) {
+    return SubmitProposalErrorDialog.show(
+      context: context,
+      exception: error,
     );
   }
 
@@ -266,21 +281,5 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
           );
 
     _segmentsController.value = newState;
-  }
-
-  void _loadData({ProposalBuilderBloc? bloc}) {
-    bloc ??= context.read<ProposalBuilderBloc>();
-
-    final proposalId = widget.proposalId;
-    final categoryId = widget.categoryId;
-
-    if (proposalId != null) {
-      bloc.add(LoadProposalEvent(proposalId: proposalId));
-    } else if (categoryId != null) {
-      bloc.add(LoadProposalCategoryEvent(categoryId: categoryId));
-    } else {
-      bloc.add(const LoadDefaultProposalCategoryEvent());
-    }
-    bloc.add(const ProposalSubmittionCloseDateEvent());
   }
 }
