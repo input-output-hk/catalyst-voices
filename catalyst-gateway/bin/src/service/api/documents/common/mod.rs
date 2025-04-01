@@ -51,7 +51,7 @@ pub(crate) struct VerifyingKeyProvider((ed25519_dalek::VerifyingKey, usize));
 impl VerifyingKeyProvider {
     // TODO: cat-lib add support for this role
     /// Role index for the proposer role.
-    const PROPOSER_ROLE: u8 = 2;
+    const PROPOSER_ROLE: u8 = 3;
 }
 
 impl catalyst_signed_doc::providers::VerifyingKeyProvider for VerifyingKeyProvider {
