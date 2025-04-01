@@ -368,11 +368,17 @@ final class ProposalBuilderBloc
     LoadProposalEvent event,
     Emitter<ProposalBuilderState> emit,
   ) async {
-    _logger.info('Loading proposal: ${event.proposalId}');
+    final proposalRef = event.proposalId;
+    if (state.metadata.documentRef == proposalRef) {
+      _logger.info('Loading proposal: $proposalRef ignored, already loaded');
+      return;
+    } else {
+      _logger.info('Loading proposal: $proposalRef');
+    }
 
     await _loadState(emit, () async {
       final proposalData = await _proposalService.getProposal(
-        ref: event.proposalId,
+        ref: proposalRef,
       );
       // TODO(LynxLynxx): check if new local proposal is created
       // when SignedDocumentRef is used instead of DraftRef
@@ -385,7 +391,7 @@ final class ProposalBuilderBloc
         return DocumentVersion(
           id: versionId,
           number: index + 1,
-          isCurrent: versionId == event.proposalId.version,
+          isCurrent: versionId == proposalRef.version,
           isLatest: index == proposalData.versions.length - 1,
         );
       }).toList();
