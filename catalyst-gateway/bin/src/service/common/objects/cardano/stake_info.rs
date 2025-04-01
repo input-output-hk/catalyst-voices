@@ -65,7 +65,7 @@ pub(crate) struct StakeInfo {
     pub(crate) slot_number: SlotNo,
 
     /// TXO assets infos.
-    pub(crate) assets: StakedNativeTokenInfoList,
+    pub(crate) assets: StakedAssetInfoList,
 }
 
 impl Example for StakeInfo {
