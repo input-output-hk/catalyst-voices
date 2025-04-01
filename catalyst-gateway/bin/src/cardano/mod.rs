@@ -202,17 +202,16 @@ impl SyncParams {
     }
 
     /// Convert Params into the result of the sync.
-    fn done(
+    pub(crate) fn done(
         &self, first: Option<Point>, first_immutable: bool, last: Option<Point>,
         last_immutable: bool, synced: u64, result: anyhow::Result<()>,
     ) -> Self {
-        if result.is_ok() && first_immutable && last_immutable {
+        if result.is_ok() && self.end != Point::TIP {
             // Update sync status in the Immutable DB.
             // Can fire and forget, because failure to update DB will simply cause the chunk to be
             // re-indexed, on recovery.
             update_sync_status(self.end.slot_or_default(), self.start.slot_or_default());
         }
-
         let mut done = self.clone();
         done.first_indexed_block = first;
         done.first_is_immutable = first_immutable;
@@ -220,7 +219,6 @@ impl SyncParams {
         done.last_is_immutable = last_immutable;
         done.total_blocks_synced = done.total_blocks_synced.saturating_add(synced);
         done.last_blocks_synced = synced;
-
         done.result = Arc::new(Some(result));
 
         done
@@ -284,7 +282,7 @@ fn sync_subchain(
                         // What we need to do here is tell the primary follower to start a new sync
                         // for the new immutable data, and then purge the volatile database of the
                         // old data (after the immutable data has synced).
-                        info!(chain=%params.chain, "Immutable chain rolled forward.");
+                        info!(chain=%params.chain, point=?chain_update.block_data().point(), "Immutable chain rolled forward.");
                         let mut result = params.done(
                             first_indexed_block,
                             first_immutable,
@@ -294,9 +292,10 @@ fn sync_subchain(
                             Ok(()),
                         );
                         // Signal the point the immutable chain rolled forward to.
+                        // If this is live chain immediately stops to later run immutable sync tasks
                         result.follower_roll_forward = Some(chain_update.block_data().point());
                         return result;
-                    };
+                    }
                 },
                 cardano_chain_follower::Kind::Block => {
                     let block = chain_update.block_data();
@@ -330,8 +329,9 @@ fn sync_subchain(
 
                     let purge_condition = PurgeCondition::PurgeForwards(rollback_slot);
                     if let Err(error) = roll_forward::purge_live_index(purge_condition).await {
-                        error!(chain=%params.chain, error=%error, "Chain follower
-                    rollback, purging volatile data task failed.");
+                        error!(chain=%params.chain, error=%error,
+                            "Chain follower rollback, purging volatile data task failed."
+                        );
                     } else {
                         // How many slots are purged
                         #[allow(clippy::arithmetic_side_effects)]
@@ -383,7 +383,7 @@ fn sync_subchain(
             Ok(()),
         );
 
-        info!(chain = %params.chain, result=%result, "Indexing Blockchain Completed: OK");
+        info!(chain = %result.chain, result=%result, "Indexing Blockchain Completed: OK");
 
         result
     })
@@ -574,7 +574,7 @@ impl SyncTask {
                             },
                             Err(error) => {
                                 error!(chain=%self.cfg.chain, report=%finished, error=%error,
-                                    "An Immutable follower failed, restarting it.");
+                                        "An Immutable follower failed, restarting it.");
                                 // Restart the Immutable Chain sync task again from where it left
                                 // off.
                                 self.sync_tasks.push(sync_subchain(
@@ -585,7 +585,7 @@ impl SyncTask {
                         }
                     } else {
                         error!(chain=%self.cfg.chain, report=%finished,
-                                 "BUG: The Immutable follower completed, but without a proper result.");
+                        "BUG: The Immutable follower completed, but without a proper result.");
                     }
                 },
                 Err(error) => {
