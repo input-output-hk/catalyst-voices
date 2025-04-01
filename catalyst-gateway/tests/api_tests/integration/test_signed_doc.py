@@ -290,7 +290,7 @@ def test_submission_action(submission_action_factory):
         resp.status_code == 200
     ), f"Failed to post document: {resp.status_code} - {resp.text}"
 
-    # Put a submission action document MUST have a ref
+    # Submission action document MUST have a ref
     invalid_doc = submission_action.copy()
     invalid_doc.metadata["ref"] = {}
     resp = document.put(data=invalid_doc.hex())
