@@ -546,7 +546,7 @@ final class ProposalBuilderBloc
       emit,
       documentRef: updatedRef,
       originalDocumentRef: updatedRef,
-      publish: ProposalPublish.localDraft,
+      publish: ProposalPublish.publishedDraft,
     );
 
     await _proposalService.submitProposalForReview(
@@ -640,11 +640,14 @@ final class ProposalBuilderBloc
     Document document,
   ) async {
     final updatedRef = await _upsertDraftProposal(
-      state.metadata.documentRef!,
       _documentMapper.toContent(document),
     );
 
-    _updateMetadata(emit, documentRef: updatedRef);
+    _updateMetadata(
+      emit,
+      documentRef: updatedRef,
+      publish: ProposalPublish.localDraft,
+    );
   }
 
   Future<void> _submitComment(
@@ -793,10 +796,8 @@ final class ProposalBuilderBloc
     emit(updatedState);
   }
 
-  Future<DraftRef> _upsertDraftProposal(
-    DocumentRef currentRef,
-    DocumentDataContent document,
-  ) async {
+  Future<DraftRef> _upsertDraftProposal(DocumentDataContent document) async {
+    final currentRef = state.metadata.documentRef!;
     final originalRef = state.metadata.originalDocumentRef;
     final template = state.metadata.templateRef!;
     final categoryId = state.metadata.categoryId!;
