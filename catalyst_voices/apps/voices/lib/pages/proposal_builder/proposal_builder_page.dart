@@ -167,11 +167,31 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
       ..addListener(_handleSegmentsControllerChange)
       ..attachItemsScrollController(_segmentsScrollController);
 
+    _listenForProposalRef(bloc);
+    _listenForSegments(bloc);
+    _loadData(bloc: bloc);
+  }
+
+  void _handleSegmentsControllerChange() {
+    final activeSectionId = _segmentsController.value.activeSectionId;
+
+    final event = ActiveNodeChangedEvent(activeSectionId);
+    context.read<ProposalBuilderBloc>().add(event);
+  }
+
+  void _listenForProposalRef(ProposalBuilderBloc bloc) {
+    // listen for updates
     _proposalRefSub = bloc.stream
         .map((event) => event.metadata.documentRef)
         .distinct()
         .listen(_onProposalRefChanged);
 
+    // update with current state
+    _onProposalRefChanged(bloc.state.metadata.documentRef);
+  }
+
+  void _listenForSegments(ProposalBuilderBloc bloc) {
+    // listen for updates
     _segmentsSub = bloc.stream
         .map(
           (event) => (segments: event.allSegments, nodeId: event.activeNodeId),
@@ -181,14 +201,8 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
         )
         .listen((record) => _updateSegments(record.segments, record.nodeId));
 
-    _loadData(bloc: bloc);
-  }
-
-  void _handleSegmentsControllerChange() {
-    final activeSectionId = _segmentsController.value.activeSectionId;
-
-    final event = ActiveNodeChangedEvent(activeSectionId);
-    context.read<ProposalBuilderBloc>().add(event);
+    // update with current state
+    _updateSegments(bloc.state.allSegments, bloc.state.activeNodeId);
   }
 
   void _loadData({ProposalBuilderBloc? bloc}) {
