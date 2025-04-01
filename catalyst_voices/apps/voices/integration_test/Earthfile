@@ -25,20 +25,12 @@ integration-test-web:
     WORKDIR /frontend/apps/voices
 
     RUN ($driver --port=$driver_port > $driver.log &) && \
+        flutter doctor -v && \
+        cat /usr/local/bin/chrome-patch.sh && \
         sleep 5 && \
         flutter drive --driver=test_driver/integration_tests.dart \
-            --target=integration_test/all_test.dart \
-            -d web-server --browser-name=$browser --driver-port=$driver_port \
-            # https://github.com/flutter/flutter/issues/154727
-            --web-browser-flag=--disable-web-security \
-            --web-browser-flag=--disable-gpu \
-            --web-browser-flag=--headless \
-            --web-browser-flag=--disable-search-engine-choice-screen \
-            # flutter_rust_bridge: https://cjycode.com/flutter_rust_bridge/manual/miscellaneous/web-cross-origin#when-flutter-run
-            # drift: https://drift.simonbinder.eu/platforms/web/#additional-headers
-            --web-header Cross-Origin-Opener-Policy=same-origin \
-            --web-header Cross-Origin-Embedder-Policy=require-corp \
-            --profile || echo fail > fail
+            --target=integration_test/all_test1.dart \
+            -d $browser --driver-port=$driver_port || echo fail > fail
     WAIT
         SAVE ARTIFACT $driver.log AS LOCAL $driver.log
     END
@@ -51,6 +43,6 @@ integration-test-web:
     END
 
 # TODO(oldgreg): investigate failures in ci
-disabled-nightly-test-web-all:
+nightly-test-web-all:
     BUILD +integration-test-web \
             --browser=chrome
