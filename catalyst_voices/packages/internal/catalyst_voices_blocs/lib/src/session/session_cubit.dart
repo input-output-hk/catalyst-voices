@@ -193,7 +193,6 @@ final class SessionCubit extends Cubit<SessionState>
   SessionState _createSessionState() {
     final account = _account;
     final userSettings = _userSettings;
-    _logger.info('UserSettings: $userSettings');
     final isUnlocked = _account?.keychain.lastIsUnlocked ?? false;
     final canCreateAccount = _alwaysAllowRegistration || _hasWallets;
 

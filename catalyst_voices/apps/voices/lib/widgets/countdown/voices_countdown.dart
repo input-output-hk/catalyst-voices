@@ -30,7 +30,7 @@ class VoicesCountdown extends StatefulWidget {
 }
 
 class _VoicesCountdownState extends State<VoicesCountdown> {
-  late Timer _timer;
+  Timer? _timer;
   Duration _timeLeft = Duration.zero;
   bool _hasStarted = false;
 
@@ -49,7 +49,8 @@ class _VoicesCountdownState extends State<VoicesCountdown> {
   void didUpdateWidget(covariant VoicesCountdown oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.dateTime != oldWidget.dateTime) {
-      _timer.cancel();
+      _timer?.cancel();
+      _timer = null;
       _startCountdown();
     }
   }
@@ -57,7 +58,8 @@ class _VoicesCountdownState extends State<VoicesCountdown> {
   @override
   void dispose() {
     super.dispose();
-    _timer.cancel();
+    _timer?.cancel();
+    _timer = null;
   }
 
   @override
@@ -84,7 +86,7 @@ class _VoicesCountdownState extends State<VoicesCountdown> {
       final diff = widget.dateTime.difference(now);
 
       if (diff.isNegative) {
-        _timer.cancel();
+        _timer?.cancel();
         setState(() {
           _timeLeft = Duration.zero;
         });

@@ -218,16 +218,14 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
         .settings
         .showSubmittionClosingWarning;
 
-    if (submittionCloseDate == null || !canShow) {
+    if (submittionCloseDate == null || !canShow || !mounted) {
       return;
     }
-    if (mounted) {
-      await SubmissionClosingWarningDialog.showNDaysBefore(
-        context: context,
-        submissionCloseAt: submittionCloseDate,
-        dontShowAgain: _dontShowAgain,
-      );
-    }
+    await SubmissionClosingWarningDialog.showNDaysBefore(
+      context: context,
+      submissionCloseAt: submittionCloseDate,
+      dontShowAgain: _dontShowAgain,
+    );
   }
 
   void _showValidationErrorSnackbar(ProposalBuilderValidationException error) {

@@ -122,15 +122,13 @@ class _WorkspacePageState extends State<WorkspacePage>
         .settings
         .showSubmittionClosingWarning;
 
-    if (submittionCloseDate == null || !canShow) {
+    if (submittionCloseDate == null || !canShow || !mounted) {
       return;
     }
-    if (mounted) {
-      await SubmissionClosingWarningDialog.showNDaysBefore(
-        context: context,
-        submissionCloseAt: submittionCloseDate,
-        dontShowAgain: _dontShowAgain,
-      );
-    }
+    await SubmissionClosingWarningDialog.showNDaysBefore(
+      context: context,
+      submissionCloseAt: submittionCloseDate,
+      dontShowAgain: _dontShowAgain,
+    );
   }
 }

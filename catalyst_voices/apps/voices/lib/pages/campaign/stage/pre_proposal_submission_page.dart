@@ -13,6 +13,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 class PreProposalSubmissionPage extends StatelessWidget {
   final DateTime? startDate;
+
   const PreProposalSubmissionPage({super.key, this.startDate});
 
   @override
@@ -83,9 +84,7 @@ class _ActionButton extends StatelessWidget {
       onTap: () {
         // TODO(LynxLynxx): implement url launching
       },
-      child: Text(
-        context.l10n.learnMore,
-      ),
+      child: Text(context.l10n.learnMore),
     );
   }
 }

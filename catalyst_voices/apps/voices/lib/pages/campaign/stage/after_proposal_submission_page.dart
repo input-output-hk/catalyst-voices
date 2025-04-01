@@ -43,9 +43,7 @@ class _ActionButton extends StatelessWidget {
       onPressed: () {
         // TODO(LynxLynxx): implement url launching
       },
-      child: Text(
-        context.l10n.learnMore,
-      ),
+      child: Text(context.l10n.learnMore),
     );
   }
 }

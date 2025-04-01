@@ -135,6 +135,7 @@ class _LeftSide extends StatefulWidget {
 
 class _LeftSideState extends State<_LeftSide> {
   bool isChecked = false;
+
   @override
   Widget build(BuildContext context) {
     return Stack(
