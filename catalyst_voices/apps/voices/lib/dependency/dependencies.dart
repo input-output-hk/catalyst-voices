@@ -28,10 +28,12 @@ final class Dependencies extends DependencyProvider {
   }
 
   Future<void> init({
+    required AppEnvironment environment,
     required AppConfig config,
   }) async {
     DependencyProvider.instance = this;
 
+    registerSingleton<AppEnvironment>(environment);
     registerSingleton<AppConfig>(config);
 
     _registerStorages();
@@ -188,8 +190,17 @@ final class Dependencies extends DependencyProvider {
           get<SignedDocumentManager>(),
         );
       })
+      ..registerLazySingleton<RemoteConfigSource>(() {
+        return UrlRemoteConfigSource(
+          url: get<AppEnvironment>().configUrl,
+        );
+      })
       ..registerLazySingleton<CampaignRepository>(CampaignRepository.new)
-      ..registerLazySingleton<ConfigRepository>(ConfigRepository.new)
+      ..registerLazySingleton<ConfigRepository>(() {
+        return ConfigRepository(
+          get<RemoteConfigSource>(),
+        );
+      })
       ..registerLazySingleton<DocumentRepository>(() {
         return DocumentRepository(
           get<DatabaseDraftsDataSource>(),

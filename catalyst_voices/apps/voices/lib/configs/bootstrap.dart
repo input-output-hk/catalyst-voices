@@ -41,13 +41,16 @@ Future<BootstrapArgs> bootstrap({
   GoRouter.optionURLReflectsImperativeAPIs = true;
   setPathUrlStrategy();
 
-  final configService = ConfigService(ConfigRepository());
+  final environment = AppEnvironment.fromEnv();
+
+  final configSource = UrlRemoteConfigSource(url: environment.configUrl);
+  final configService = ConfigService(ConfigRepository(configSource));
   final config = await configService
       .getAppConfig()
       .onError((error, stackTrace) => const AppConfig());
 
   await _cleanupOldStorages();
-  await registerDependencies(config: config);
+  await registerDependencies(environment: environment, config: config);
   await _initCryptoUtils();
 
   router ??= buildAppRouter();
@@ -93,9 +96,15 @@ GoRouter buildAppRouter({
 }
 
 @visibleForTesting
-Future<void> registerDependencies({required AppConfig config}) async {
+Future<void> registerDependencies({
+  AppEnvironment environment = const AppEnvironment.fallback(),
+  AppConfig config = const AppConfig.fallback(),
+}) async {
   if (!Dependencies.instance.isInitialized) {
-    await Dependencies.instance.init(config: config);
+    await Dependencies.instance.init(
+      environment: environment,
+      config: config,
+    );
   }
 }
 

@@ -7,6 +7,7 @@ import 'package:flutter/foundation.dart';
 const _envVarConfigUrl = 'API_URL';
 const _envVarType = 'ENV_NAME';
 
+// TODO(damian-molinski): provide valid url
 const _fallbackConfigUrl = '';
 const _fallbackEnvType = AppEnvironmentType.dev;
 
@@ -14,7 +15,19 @@ final class AppEnvironment extends Equatable {
   final AppEnvironmentType type;
   final String configUrl;
 
-  factory AppEnvironment() {
+  @visibleForTesting
+  const AppEnvironment.custom({
+    required this.type,
+    required this.configUrl,
+  });
+
+  const AppEnvironment.fallback()
+      : this._(
+          type: _fallbackEnvType,
+          configUrl: _fallbackConfigUrl,
+        );
+
+  factory AppEnvironment.fromEnv() {
     const envTypeName = bool.hasEnvironment(_envVarType)
         ? String.fromEnvironment(_envVarType)
         : null;

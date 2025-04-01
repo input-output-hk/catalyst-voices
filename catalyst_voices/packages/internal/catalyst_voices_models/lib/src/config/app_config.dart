@@ -36,6 +36,8 @@ final class AppConfig extends Equatable {
     this.blockchain = const BlockchainConfig(),
   });
 
+  const AppConfig.fallback() : this();
+
   @override
   List<Object?> get props => [
         api,
