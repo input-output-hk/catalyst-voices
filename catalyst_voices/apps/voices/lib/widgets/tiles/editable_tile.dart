@@ -16,6 +16,7 @@ class EditableTile extends StatelessWidget {
   final bool isSaveEnabled;
   final bool isEditEnabled;
   final String? errorText;
+  final VoicesEditSaveButtonStyle editSaveButtonStyle;
   final ValueChanged<EditableTileChange>? onChanged;
   final Widget child;
 
@@ -27,6 +28,7 @@ class EditableTile extends StatelessWidget {
     this.isSaveEnabled = false,
     this.isEditEnabled = true,
     this.errorText,
+    this.editSaveButtonStyle = VoicesEditSaveButtonStyle.text,
     this.onChanged,
     required this.child,
   });
@@ -43,6 +45,7 @@ class EditableTile extends StatelessWidget {
         offstage: !isEditEnabled,
         child: VoicesEditSaveButton(
           key: const Key('EditableTileEditSaveButton'),
+          style: editSaveButtonStyle,
           onTap: _toggleEditMode,
           isEditing: isEditMode,
           hasError: errorText != null,
@@ -139,7 +142,12 @@ class _Footer extends StatelessWidget {
           child: VoicesFilledButton(
             key: const Key('EmailTileSaveButton'),
             onTap: isSaveEnabled ? onSave : null,
-            child: Text(context.l10n.saveButtonText.toUpperCase()),
+            child: Text(
+              context.l10n.saveButtonText.toUpperCase(),
+              style: Theme.of(context).textTheme.labelSmall!.copyWith(
+                    color: Theme.of(context).colorScheme.onPrimary,
+                  ),
+            ),
           ),
         ),
       ],

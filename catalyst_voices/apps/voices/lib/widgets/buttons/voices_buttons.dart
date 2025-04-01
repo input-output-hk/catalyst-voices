@@ -271,12 +271,14 @@ class VoicesBackButton extends StatelessWidget {
 }
 
 class VoicesEditSaveButton extends StatelessWidget {
+  final VoicesEditSaveButtonStyle style;
   final VoidCallback? onTap;
   final bool isEditing;
   final bool hasError;
 
   const VoicesEditSaveButton({
     super.key,
+    this.style = VoicesEditSaveButtonStyle.text,
     this.onTap,
     required this.isEditing,
     this.hasError = false,
@@ -284,25 +286,52 @@ class VoicesEditSaveButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final text =
         isEditing ? context.l10n.cancelButtonText : context.l10n.editButtonText;
+    final textStyle = theme.textTheme.labelSmall!;
 
     if (hasError) {
       return VoicesFilledButton(
-        backgroundColor: Theme.of(context).colorScheme.error,
+        backgroundColor: theme.colorScheme.error,
         onTap: onTap,
-        child: Text(text),
+        child: Text(
+          text,
+          style: textStyle.copyWith(color: theme.colorScheme.onError),
+        ),
       );
-    } else {
+    }
+
+    if (isEditing) {
       return VoicesTextButton(
         onTap: onTap,
         child: Text(
           text,
-          style: Theme.of(context).textTheme.labelSmall,
+          style: textStyle.copyWith(color: theme.colorScheme.error),
         ),
       );
     }
+
+    return switch (style) {
+      VoicesEditSaveButtonStyle.text => VoicesTextButton(
+          onTap: onTap,
+          child: Text(text, style: textStyle),
+        ),
+      VoicesEditSaveButtonStyle.outlinedWithIcon => VoicesOutlinedButton(
+          onTap: onTap,
+          leading: VoicesAssets.icons.pencilAlt.buildIcon(),
+          child: Text(
+            text,
+            style: textStyle.copyWith(color: theme.colorScheme.primary),
+          ),
+        ),
+    };
   }
+}
+
+enum VoicesEditSaveButtonStyle {
+  text,
+  outlinedWithIcon,
 }
 
 /// A "Learn More" button that redirects usually to an external content.

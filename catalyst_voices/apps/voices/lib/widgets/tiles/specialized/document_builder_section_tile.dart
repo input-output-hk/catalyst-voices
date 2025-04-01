@@ -76,6 +76,7 @@ class _DocumentBuilderSectionTileState
       isSaveEnabled: true,
       isEditEnabled: widget.isEditable,
       errorText: _errorText,
+      editSaveButtonStyle: VoicesEditSaveButtonStyle.outlinedWithIcon,
       onChanged: _onEditModeChange,
       child: Form(
         key: _formKey,
