@@ -82,6 +82,8 @@ impl VerifyingKeyProvider {
     pub(crate) async fn try_from_token(token: &CatalystRBACTokenV1) -> anyhow::Result<Self> {
         let cat_id = token.catalyst_id();
         let network = token.network();
+        let (role_index, _) = token.catalyst_id().role_and_rotation();
+        let role_index = RoleNumber::from(role_index.to_string().parse::<u8>()?);
 
         let reg_queries = scheme::indexed_registrations(cat_id).await?;
 
@@ -100,7 +102,7 @@ impl VerifyingKeyProvider {
             })?;
 
         let (latest_pk, rotation) = reg_chain
-            .get_latest_signing_pk_for_role(&RoleNumber::from(Self::PROPOSER_ROLE))
+            .get_latest_signing_pk_for_role(&role_index)
             .ok_or_else(|| {
                 anyhow::anyhow!(
                     "Failed to get last signing key for the proposer role for {cat_id} Catalyst ID"
