@@ -56,26 +56,18 @@ impl RbacRoleData {
             let time = network.slot_to_time(slot);
             let data = point.data();
 
-            signing_keys.push(
-                KeyData::new(
-                    is_persistent,
-                    time,
-                    data.signing_key(),
-                    point.point(),
-                    chain,
-                )
-                .context("Invalid signing key")?,
-            );
-            encryption_keys.push(
-                KeyData::new(
-                    is_persistent,
-                    time,
-                    data.encryption_key(),
-                    point.point(),
-                    chain,
-                )
-                .context("Invalid encryption key")?,
-            );
+            if let Some(signing_key) = data.signing_key() {
+                signing_keys.push(
+                    KeyData::new(is_persistent, time, signing_key, point.point(), chain)
+                        .context("Invalid signing key")?,
+                );
+            }
+            if let Some(encryption_key) = data.encryption_key() {
+                encryption_keys.push(
+                    KeyData::new(is_persistent, time, encryption_key, point.point(), chain)
+                        .context("Invalid encryption key")?,
+                );
+            }
             payment_addresses.push(
                 PaymentData::new(is_persistent, time, data.payment_key().cloned())
                     .context("Invalid payment address")?,

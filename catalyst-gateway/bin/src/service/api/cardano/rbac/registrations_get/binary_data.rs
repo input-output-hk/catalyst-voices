@@ -8,7 +8,12 @@ use poem_openapi::{
 };
 use serde_json::Value;
 
-use crate::service::{common::types::string_types::impl_string_types, utilities::as_hex_string};
+use crate::service::{
+    common::types::{
+        generic::ed25519_public_key::Ed25519HexEncodedPublicKey, string_types::impl_string_types,
+    },
+    utilities::as_hex_string,
+};
 
 /// A title.
 const TITLE: &str = "Hex encoded binary data";
@@ -43,6 +48,12 @@ impl_string_types!(
 impl From<Vec<u8>> for HexEncodedBinaryData {
     fn from(value: Vec<u8>) -> Self {
         Self(as_hex_string(&value))
+    }
+}
+
+impl From<Ed25519HexEncodedPublicKey> for HexEncodedBinaryData {
+    fn from(value: Ed25519HexEncodedPublicKey) -> Self {
+        Self(value.into())
     }
 }
 

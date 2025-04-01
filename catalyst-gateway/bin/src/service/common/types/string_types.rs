@@ -61,6 +61,12 @@ macro_rules! impl_string_types {
             }
         }
 
+        impl From<$ty> for String {
+            fn from(val: $ty) -> Self {
+                val.0
+            }
+        }
+
         impl Type for $ty {
             const IS_REQUIRED: bool = true;
 

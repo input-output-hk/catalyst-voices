@@ -16,7 +16,7 @@ use rbac_registration::{
 use x509_cert::{certificate::Certificate as X509Certificate, der::Encode as _};
 
 use crate::service::{
-    api::cardano::rbac::registrations_get::binary_data::HexEncodedBinaryData,
+    api::cardano::rbac::registrations_get::{binary_data::HexEncodedBinaryData, key_type::KeyType},
     common::types::generic::{
         boolean::BooleanFlag, date_time::DateTime as ServiceDateTime,
         ed25519_public_key::Ed25519HexEncodedPublicKey,
@@ -24,9 +24,6 @@ use crate::service::{
 };
 
 /// A role data key information.
-///
-/// Only one of the `pub_key`, `x509_cert` and `c509_cert` fields can be present at the
-/// same time.
 #[derive(Object, Debug, Clone)]
 #[oai(example)]
 pub struct KeyData {
@@ -34,44 +31,40 @@ pub struct KeyData {
     is_persistent: BooleanFlag,
     /// A time when the data was added.
     time: ServiceDateTime,
-    /// A hex encoded X509 certificate.
-    x509_cert: Option<HexEncodedBinaryData>,
-    /// A hex encoded C509 certificate.
-    c509_cert: Option<HexEncodedBinaryData>,
-    /// An ed25519 public key.
-    pub_key: Option<Ed25519HexEncodedPublicKey>,
+    /// A type of the key.
+    key_type: KeyType,
+    /// A value of the key.
+    key_value: Option<HexEncodedBinaryData>,
 }
 
 impl KeyData {
     /// Creates a new `KeyData` instance.
     pub fn new(
-        is_persistent: bool, time: DateTime<Utc>, key_ref: Option<&KeyLocalRef>, point: &Point,
+        is_persistent: bool, time: DateTime<Utc>, key_ref: &KeyLocalRef, point: &Point,
         chain: &RegistrationChain,
     ) -> anyhow::Result<Self> {
-        let mut x509_cert = None;
-        let mut c509_cert = None;
-        let mut pub_key = None;
+        let key_value;
 
-        if let Some(key_ref) = key_ref {
-            match key_ref.local_ref {
-                LocalRefInt::X509Certs => {
-                    x509_cert = encode_x509(chain.x509_certs(), key_ref.key_offset, point)?;
-                },
-                LocalRefInt::C509Certs => {
-                    c509_cert = encode_c509(chain.c509_certs(), key_ref.key_offset, point)?;
-                },
-                LocalRefInt::PubKeys => {
-                    pub_key = convert_pub_key(chain.simple_keys(), key_ref.key_offset, point)?;
-                },
-            }
-        }
+        let key_type = match key_ref.local_ref {
+            LocalRefInt::X509Certs => {
+                key_value = encode_x509(chain.x509_certs(), key_ref.key_offset, point)?;
+                KeyType::X509
+            },
+            LocalRefInt::C509Certs => {
+                key_value = encode_c509(chain.c509_certs(), key_ref.key_offset, point)?;
+                KeyType::C509
+            },
+            LocalRefInt::PubKeys => {
+                key_value = convert_pub_key(chain.simple_keys(), key_ref.key_offset, point)?;
+                KeyType::Pubkey
+            },
+        };
 
         Ok(Self {
             is_persistent: is_persistent.into(),
             time: time.into(),
-            pub_key,
-            x509_cert,
-            c509_cert,
+            key_type,
+            key_value,
         })
     }
 }
@@ -81,9 +74,8 @@ impl Example for KeyData {
         Self {
             is_persistent: BooleanFlag::example(),
             time: ServiceDateTime::example(),
-            pub_key: Some(Ed25519HexEncodedPublicKey::example()),
-            x509_cert: Some(HexEncodedBinaryData::example()),
-            c509_cert: Some(HexEncodedBinaryData::example()),
+            key_type: KeyType::X509,
+            key_value: Some(HexEncodedBinaryData::example()),
         }
     }
 }
@@ -134,7 +126,7 @@ fn encode_c509(
 /// Finds a public key with the given offset and point and converts it.
 fn convert_pub_key(
     keys: &HashMap<usize, Vec<PointData<Option<VerifyingKey>>>>, offset: usize, point: &Point,
-) -> anyhow::Result<Option<Ed25519HexEncodedPublicKey>> {
+) -> anyhow::Result<Option<HexEncodedBinaryData>> {
     Ok(keys
         .get(&offset)
         .with_context(|| format!("Invalid pub key offset: {offset}"))?
@@ -142,5 +134,5 @@ fn convert_pub_key(
         .find(|d| d.point() == point)
         .with_context(|| format!("Unable to find pub key for the given point {point}"))?
         .data()
-        .map(Into::into))
+        .map(|k| Ed25519HexEncodedPublicKey::from(k).into()))
 }
