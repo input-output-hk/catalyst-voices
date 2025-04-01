@@ -81,13 +81,18 @@ class _DocumentBuilderSectionTileState
       child: Form(
         key: _formKey,
         autovalidateMode: widget.autovalidateMode,
-        child: DocumentPropertyBuilder(
-          key: ValueKey(_editedSection.schema.nodeId),
-          property: _editedSection,
-          isEditMode: _isEditMode,
-          onChanged: _handlePropertyChanges,
-          overrides: widget.overrides,
-        ),
+        child: _isEditMode
+            ? DocumentPropertyBuilder(
+                key: ValueKey(_editedSection.schema.nodeId),
+                property: _editedSection,
+                isEditMode: _isEditMode,
+                onChanged: _handlePropertyChanges,
+                overrides: widget.overrides,
+              )
+            : DocumentPropertyReadBuilder(
+                key: ValueKey(_editedSection.schema.nodeId),
+                property: _editedSection,
+              ),
       ),
     );
   }

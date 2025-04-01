@@ -1,5 +1,5 @@
-import 'package:catalyst_voices/widgets/document_builder/common/document_property_builder_title.dart';
 import 'package:catalyst_voices/widgets/document_builder/common/document_error_text.dart';
+import 'package:catalyst_voices/widgets/document_builder/common/document_property_builder_title.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
