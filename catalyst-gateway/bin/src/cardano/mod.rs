@@ -313,6 +313,11 @@ fn sync_subchain(
                         );
                     }
 
+                    // Update flag if this is the first time reaching TIP.
+                    if chain_update.tip && !follower_has_first_reached_tip() {
+                        set_follower_first_reached_tip();
+                    }
+
                     update_block_state(
                         block,
                         &mut first_indexed_block,
@@ -531,11 +536,6 @@ impl SyncTask {
                             );
 
                             self.start_immutable_followers();
-
-                            // Update flag if this is the first time reaching TIP.
-                            if !follower_has_first_reached_tip() {
-                                set_follower_first_reached_tip();
-                            }
                         } else {
                             error!(chain=%self.cfg.chain, report=%finished,
                             "The TIP follower failed, restarting it.");
