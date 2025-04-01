@@ -1,5 +1,5 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
-import 'package:catalyst_voices/widgets/document_builder/value/document_error_text.dart';
+import 'package:catalyst_voices/widgets/document_builder/common/document_error_text.dart';
 import 'package:catalyst_voices/widgets/form/voices_form_field.dart';
 import 'package:catalyst_voices/widgets/toggles/voices_radio.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';

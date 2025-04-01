@@ -1,8 +1,8 @@
-import 'package:catalyst_voices/widgets/document_builder/value/document_error_text.dart';
+import 'package:catalyst_voices/widgets/document_builder/common/document_property_builder_title.dart';
+import 'package:catalyst_voices/widgets/document_builder/common/document_error_text.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
@@ -22,50 +22,6 @@ class YesNoChoiceWidget extends StatefulWidget {
 
   @override
   State<YesNoChoiceWidget> createState() => _YesNoChoiceWidgetState();
-}
-
-class _YesNoChoiceWidgetState extends State<YesNoChoiceWidget> {
-  bool? get _value => widget.property.value ?? widget.schema.defaultValue;
-
-  String get _title => widget.schema.title;
-
-  bool get _isRequired => widget.schema.isRequired;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        if (_title.isNotEmpty) ...[
-          Text(
-            _title.starred(isEnabled: _isRequired),
-            style: Theme.of(context).textTheme.titleSmall,
-          ),
-          const SizedBox(height: 8),
-        ],
-        _YesNoChoiceSegmentButton(
-          value: _value,
-          enabled: widget.isEditMode,
-          onChanged: _onChanged,
-          validator: _validate,
-        ),
-      ],
-    );
-  }
-
-  void _onChanged(bool? value) {
-    final change = DocumentValueChange(
-      nodeId: widget.schema.nodeId,
-      value: value,
-    );
-    widget.onChanged([change]);
-  }
-
-  String? _validate(bool? value) {
-    final result = widget.schema.validate(value);
-    return LocalizedDocumentValidationResult.from(result).message(context);
-  }
 }
 
 class _YesNoChoiceSegmentButton extends VoicesFormField<bool?> {
@@ -134,5 +90,49 @@ class _YesNoChoiceSegmentButton extends VoicesFormField<bool?> {
         ),
       ),
     );
+  }
+}
+
+class _YesNoChoiceWidgetState extends State<YesNoChoiceWidget> {
+  bool get _isRequired => widget.schema.isRequired;
+
+  String get _title => widget.schema.title;
+
+  bool? get _value => widget.property.value ?? widget.schema.defaultValue;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (_title.isNotEmpty) ...[
+          DocumentPropertyBuilderTitle(
+            title: _title,
+            isRequired: _isRequired,
+          ),
+          const SizedBox(height: 8),
+        ],
+        _YesNoChoiceSegmentButton(
+          value: _value,
+          enabled: widget.isEditMode,
+          onChanged: _onChanged,
+          validator: _validate,
+        ),
+      ],
+    );
+  }
+
+  void _onChanged(bool? value) {
+    final change = DocumentValueChange(
+      nodeId: widget.schema.nodeId,
+      value: value,
+    );
+    widget.onChanged([change]);
+  }
+
+  String? _validate(bool? value) {
+    final result = widget.schema.validate(value);
+    return LocalizedDocumentValidationResult.from(result).message(context);
   }
 }

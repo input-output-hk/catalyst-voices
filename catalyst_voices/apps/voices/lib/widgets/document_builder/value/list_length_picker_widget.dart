@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/widgets/document_builder/common/document_property_builder_title.dart';
 import 'package:catalyst_voices/widgets/dropdown/voices_dropdown.dart';
 import 'package:catalyst_voices/widgets/rich_text/markdown_text.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -30,9 +31,9 @@ class ListLengthPickerWidget extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         if (title.isNotEmpty) ...[
-          Text(
-            title.starred(isEnabled: isRequired),
-            style: Theme.of(context).textTheme.titleSmall,
+         DocumentPropertyBuilderTitle(
+            title: title,
+            isRequired: isRequired,
           ),
           const SizedBox(height: 8),
         ],
