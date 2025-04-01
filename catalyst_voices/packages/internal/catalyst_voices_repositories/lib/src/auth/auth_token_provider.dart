@@ -6,5 +6,7 @@ abstract interface class AuthTokenProvider {
   /// Creates a new authentication token.
   ///
   /// The returned token might be cached if it is still valid.
-  Future<String> createRbacToken();
+  ///
+  /// Use [forceRefresh] if you want newly created token.
+  Future<String> createRbacToken({bool forceRefresh});
 }

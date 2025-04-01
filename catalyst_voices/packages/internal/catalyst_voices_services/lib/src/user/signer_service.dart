@@ -1,7 +1,7 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 
-typedef RoleCredentialsCallback = Future<void> Function(
+typedef RoleCredentialsCallback<T> = Future<T> Function(
   CatalystId catalystId,
   CatalystPrivateKey privateKey,
 );
@@ -16,17 +16,17 @@ final class AccountSignerService implements SignerService {
   );
 
   @override
-  Future<void> useProposerCredentials(RoleCredentialsCallback callback) {
+  Future<T> useProposerCredentials<T>(RoleCredentialsCallback<T> callback) {
     return _useRoleCredentials(callback, role: AccountRole.proposer);
   }
 
   @override
-  Future<void> useVoterCredentials(RoleCredentialsCallback callback) {
+  Future<T> useVoterCredentials<T>(RoleCredentialsCallback<T> callback) {
     return _useRoleCredentials(callback, role: AccountRole.voter);
   }
 
-  Future<void> _useRoleCredentials(
-    RoleCredentialsCallback callback, {
+  Future<T> _useRoleCredentials<T>(
+    RoleCredentialsCallback<T> callback, {
     required AccountRole role,
     int rotation = 0,
   }) async {
@@ -40,13 +40,13 @@ final class AccountSignerService implements SignerService {
       rotation: Optional(rotation),
     );
 
-    await account.keychain.getMasterKey().use((masterKey) async {
+    return account.keychain.getMasterKey().use((masterKey) {
       final keyPair = _keyDerivationService.deriveAccountRoleKeyPair(
         masterKey: masterKey,
         role: role,
       );
 
-      await keyPair.use(
+      return keyPair.use(
         (keyPair) => callback(catalystId, keyPair.privateKey),
       );
     });
@@ -54,7 +54,7 @@ final class AccountSignerService implements SignerService {
 }
 
 abstract interface class SignerService {
-  Future<void> useProposerCredentials(RoleCredentialsCallback callback);
+  Future<T> useProposerCredentials<T>(RoleCredentialsCallback<T> callback);
 
-  Future<void> useVoterCredentials(RoleCredentialsCallback callback);
+  Future<T> useVoterCredentials<T>(RoleCredentialsCallback<T> callback);
 }
