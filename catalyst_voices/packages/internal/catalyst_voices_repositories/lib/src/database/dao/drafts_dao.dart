@@ -3,6 +3,7 @@ import 'package:catalyst_voices_repositories/src/database/catalyst_database.dart
 import 'package:catalyst_voices_repositories/src/database/dao/drafts_dao.drift.dart';
 import 'package:catalyst_voices_repositories/src/database/table/drafts.dart';
 import 'package:catalyst_voices_repositories/src/database/table/drafts.drift.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:collection/collection.dart';
 import 'package:drift/drift.dart';
 import 'package:flutter/foundation.dart';
@@ -184,9 +185,12 @@ class DriftDraftsDao extends DatabaseAccessor<DriftCatalystDatabase>
       query.where((doc) => doc.type.equals(type.uuid));
     }
     if (authorId != null) {
+      final searchId = authorId.toSignificant().toUri().toStringWithoutScheme();
+
       query.where(
         (doc) => CustomExpression<bool>(
-          "json_extract(metadata, '\$.authors') LIKE '%$authorId%'",
+          // ignore: lines_longer_than_80_chars
+          "json_extract(metadata, '\$.authors') LIKE '%$searchId%'",
         ),
       );
     }

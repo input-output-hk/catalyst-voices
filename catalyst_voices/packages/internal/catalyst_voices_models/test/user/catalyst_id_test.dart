@@ -1,5 +1,4 @@
-import 'package:catalyst_voices_models/src/user/account_role.dart';
-import 'package:catalyst_voices_models/src/user/catalyst_id.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/foundation.dart';
 import 'package:test/test.dart';
@@ -148,6 +147,71 @@ void main() {
           ':123456@cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE',
         ),
       );
+    });
+
+    test('should ignore username when checking comparing significant part', () {
+      // Given
+      final idOne = CatalystId(
+        host: CatalystIdHost.cardano.host,
+        username: 'testuser',
+        role0Key: role0Key,
+      );
+      final idTwo = idOne.copyWith(username: const Optional('developer'));
+
+      // When
+      final significantSame = idOne.toSignificant() == idTwo.toSignificant();
+
+      // Then
+      expect(significantSame, isTrue);
+    });
+
+    test('different host makes id significant different', () {
+      // Given
+      final idOne = CatalystId(
+        host: CatalystIdHost.cardano.host,
+        username: 'testuser',
+        role0Key: role0Key,
+      );
+      final idTwo = idOne.copyWith(host: CatalystIdHost.cardanoPreprod.host);
+
+      // When
+      final significantSame = idOne.toSignificant() == idTwo.toSignificant();
+
+      // Then
+      expect(significantSame, isFalse);
+    });
+
+    test('username with spaces is decoded correctly', () {
+      const rawUri = 'id.catalyst://'
+          'damian%20m@cardano/'
+          'FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE';
+      final id = CatalystId.fromUri(Uri.parse(rawUri));
+
+      const expectedUsername = 'damian m';
+
+      // When
+      final username = id.username;
+
+      // Then
+      expect(username, expectedUsername);
+    });
+
+    test('username with spaces is encoded correctly', () {
+      const username = 'damian m';
+      final id = CatalystId(
+        host: CatalystIdHost.cardano.host,
+        role0Key: role0Key,
+        username: 'damian m',
+      );
+
+      final encodedUsername = Uri.encodeComponent(username);
+
+      // When
+      final uri = id.toUri();
+      final userInfo = uri.userInfo;
+
+      // Then
+      expect(userInfo, contains(encodedUsername));
     });
   });
 }

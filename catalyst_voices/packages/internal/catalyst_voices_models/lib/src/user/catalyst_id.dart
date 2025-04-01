@@ -1,8 +1,7 @@
-import 'dart:typed_data';
-
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/foundation.dart';
 
 /// Definition of a URI, which allows for RBAC keys used for different
 /// purposes to be easily and unambiguously identified.
@@ -111,6 +110,11 @@ final class CatalystId extends Equatable {
     );
   }
 
+  /// Objects which holds [CatalystId] can be uniquely identified only by
+  /// comparing [role0Key] and [host] thus they're significant parts of
+  /// [CatalystId].
+  CatalystId toSignificant() => CatalystId(host: host, role0Key: role0Key);
+
   @override
   String toString() => toUri().toString();
 
@@ -159,7 +163,7 @@ final class CatalystId extends Equatable {
     AccountRole? role,
     int? rotation,
   ) _parsePath(String path) {
-    final sanitizedPath = _sanitizePath(path);
+    final sanitizedPath = _sanitizePath(Uri.decodeComponent(path));
     final parts = sanitizedPath.split('/');
 
     final role0Key = parts.elementAt(0);
@@ -177,7 +181,8 @@ final class CatalystId extends Equatable {
   ///
   /// Format: [username][:nonce]
   static (String? username, int? nonce) _parseUserInfo(String userInfo) {
-    final parts = userInfo.split(':');
+    final decoded = Uri.decodeComponent(userInfo);
+    final parts = decoded.split(':');
     final username = parts.elementAtOrNull(0) ?? '';
     final nonce = parts.elementAtOrNull(1) ?? '';
 

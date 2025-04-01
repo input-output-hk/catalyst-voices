@@ -113,4 +113,13 @@ final class Account extends Equatable {
       isProvisional: isProvisional ?? this.isProvisional,
     );
   }
+
+  bool isSameRef(Account other) => catalystId.isReferringTo(other);
+}
+
+extension CatalystIdExt on CatalystId {
+  /// Compares accounts against significant parts of [Account] catalystId.
+  bool isReferringTo(Account account) {
+    return toSignificant() == account.catalystId.toSignificant();
+  }
 }

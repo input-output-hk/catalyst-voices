@@ -6,10 +6,10 @@ import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 
-final class AddCommentSection extends ProposalCommentsSection {
+final class ProposalAddCommentSection extends ProposalCommentsSection {
   final DocumentSchema schema;
 
-  const AddCommentSection({
+  const ProposalAddCommentSection({
     required super.id,
     required this.schema,
   });
@@ -19,22 +19,29 @@ final class AddCommentSection extends ProposalCommentsSection {
 
   @override
   String resolveTitle(BuildContext context) {
-    return context.l10n.proposalViewAddCommentSection;
+    return context.l10n.addCommentSection;
   }
 }
 
-final class CommentListItem extends Equatable implements SegmentsListViewItem {
+final class ProposalCommentListItem extends Equatable
+    implements SegmentsListViewItem {
   @override
   final NodeId id;
   final CommentWithReplies comment;
+  final bool canReply;
 
-  const CommentListItem({
+  const ProposalCommentListItem({
     required this.id,
     required this.comment,
+    required this.canReply,
   });
 
   @override
-  List<Object?> get props => [id, comment];
+  List<Object?> get props => [
+        id,
+        comment,
+        canReply,
+      ];
 }
 
 sealed class ProposalCommentsSection extends BaseSection {
@@ -53,33 +60,23 @@ final class ProposalCommentsSegment
     required super.sections,
   });
 
+  bool get hasComments => sections
+      .whereType<ProposalViewCommentsSection>()
+      .any((element) => element.comments.isNotEmpty);
+
   @override
   SvgGenImage get icon => VoicesAssets.icons.chatAlt2;
 
   @override
   List<Object?> get props => super.props + [sort];
 
-  ProposalCommentsSegment addComment(CommentDocument comment) {
-    final sections = this
-        .sections
-        .map(
-          (section) => switch (section) {
-            AddCommentSection() => section,
-            ViewCommentsSection() => section.addComment(comment),
-          },
-        )
-        .toList();
-
-    return copyWith(sections: sections);
-  }
-
   ProposalCommentsSegment copySorted({
     required ProposalCommentsSort sort,
   }) {
     final sortedSection = sections.map((section) {
       return switch (section) {
-        AddCommentSection() => section,
-        ViewCommentsSection() => section.copyWith(
+        ProposalAddCommentSection() => section,
+        ProposalViewCommentsSection() => section.copyWith(
             comments: sort.applyTo(section.comments),
           ),
       };
@@ -105,61 +102,53 @@ final class ProposalCommentsSegment
 
   @override
   String resolveTitle(BuildContext context) {
-    return context.l10n.proposalViewCommentsSegment;
+    return context.l10n.commentsSegment;
   }
 }
 
-final class ViewCommentsSection extends ProposalCommentsSection
+final class ProposalViewCommentsSection extends ProposalCommentsSection
     implements SegmentGroupedListViewItems {
+  final ProposalCommentsSort sort;
   final List<CommentWithReplies> comments;
+  final bool canReply;
 
-  const ViewCommentsSection({
+  const ProposalViewCommentsSection({
     required super.id,
+    required this.sort,
     required this.comments,
+    required this.canReply,
   });
 
   @override
   Iterable<SegmentsListViewItem> get children {
     return comments.mapIndexed((index, comment) {
-      return CommentListItem(
+      return ProposalCommentListItem(
         id: id.child(comment.comment.metadata.selfRef.id),
         comment: comment,
+        canReply: canReply,
       );
     });
   }
 
   @override
-  List<Object?> get props => super.props + [comments];
+  List<Object?> get props => super.props + [sort, comments, canReply];
 
-  ViewCommentsSection addComment(CommentDocument comment) {
-    final comments = List.of(this.comments);
-    final parent = comment.metadata.parent;
-
-    if (parent != null) {
-      final index = comments.indexWhere((comment) => comment.contains(parent));
-      if (index != -1) {
-        final updated = comments.removeAt(index).addReply(comment);
-        comments.insert(index, updated);
-      }
-    } else {
-      comments.add(CommentWithReplies.direct(comment));
-    }
-
-    return copyWith(comments: comments);
-  }
-
-  ViewCommentsSection copyWith({
+  ProposalViewCommentsSection copyWith({
     NodeId? id,
+    ProposalCommentsSort? sort,
     List<CommentWithReplies>? comments,
+    bool? canReply,
   }) {
-    return ViewCommentsSection(
+    return ProposalViewCommentsSection(
       id: id ?? this.id,
+      sort: sort ?? this.sort,
       comments: comments ?? this.comments,
+      canReply: canReply ?? this.canReply,
     );
   }
 
   @override
   String resolveTitle(BuildContext context) {
-    return context.l10n.proposalViewViewCommentsSection;
+    return context.l10n.viewCommentsSection;
   }
 }

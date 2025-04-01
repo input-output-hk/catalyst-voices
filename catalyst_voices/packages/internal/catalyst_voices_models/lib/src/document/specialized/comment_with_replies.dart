@@ -12,11 +12,31 @@ final class CommentWithReplies extends Equatable {
     this.depth = 1,
   });
 
+  factory CommentWithReplies.build(
+    CommentDocument comment, {
+    required List<CommentDocument> comments,
+    int depth = 1,
+  }) {
+    final replies = comments
+        .where((element) => element.metadata.reply == comment.metadata.selfRef)
+        .map((e) {
+      return CommentWithReplies.build(
+        e,
+        comments: comments,
+        depth: depth + 1,
+      );
+    }).toList();
+
+    return CommentWithReplies(
+      comment: comment,
+      replies: replies,
+      depth: depth,
+    );
+  }
+
   const CommentWithReplies.direct(this.comment)
       : replies = const [],
         depth = 1;
-
-  SignedDocumentRef get ref => comment.metadata.selfRef;
 
   @override
   List<Object?> get props => [
@@ -25,8 +45,10 @@ final class CommentWithReplies extends Equatable {
         depth,
       ];
 
+  SignedDocumentRef get ref => comment.metadata.selfRef;
+
   CommentWithReplies addReply(CommentDocument reply) {
-    final parent = reply.metadata.parent;
+    final parent = reply.metadata.reply;
     assert(parent != null, 'Invalid reply');
 
     if (isA(parent!)) {
@@ -58,9 +80,20 @@ final class CommentWithReplies extends Equatable {
 
   bool isA(SignedDocumentRef ref) => comment.metadata.selfRef == ref;
 
+  CommentWithReplies removeReply({
+    required SignedDocumentRef ref,
+  }) {
+    final replies = List.of(this.replies)
+        .map((e) => e.removeReply(ref: ref))
+        .toList()
+      ..removeWhere((element) => element.ref == ref);
+
+    return copyWith(replies: replies);
+  }
+
   CommentWithReplies _addReply(CommentDocument reply) {
     assert(
-      comment.metadata.selfRef == reply.metadata.parent,
+      comment.metadata.selfRef == reply.metadata.reply,
       'Reply parent ref does not match with comment selfRef',
     );
 
@@ -72,5 +105,35 @@ final class CommentWithReplies extends Equatable {
     final replies = List.of(this.replies)..add(commentWithReplies);
 
     return copyWith(replies: replies);
+  }
+}
+
+extension CommentWithRepliesListExt on List<CommentWithReplies> {
+  List<CommentWithReplies> addComment({
+    required CommentDocument comment,
+  }) {
+    final comments = List.of(this);
+    final reply = comment.metadata.reply;
+
+    if (reply != null) {
+      final index = comments.indexWhere((comment) => comment.contains(reply));
+      if (index != -1) {
+        final updated = comments.removeAt(index).addReply(comment);
+        comments.insert(index, updated);
+      }
+    } else {
+      comments.add(CommentWithReplies.direct(comment));
+    }
+
+    return comments;
+  }
+
+  List<CommentWithReplies> removeComment({
+    required SignedDocumentRef ref,
+  }) {
+    return List.of(this)
+        .where((e) => e.ref != ref)
+        .map((e) => e.removeReply(ref: ref))
+        .toList();
   }
 }

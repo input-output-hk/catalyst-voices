@@ -12,6 +12,8 @@ import 'package:flutter/foundation.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:synchronized/synchronized.dart';
 
+DocumentRef _templateResolver(DocumentData data) => data.metadata.template!;
+
 abstract interface class DocumentRepository {
   factory DocumentRepository(
     DraftDataSource drafts,
@@ -82,7 +84,10 @@ abstract interface class DocumentRepository {
   /// a new standalone document not related to the previous one.
   ///
   /// Returns the reference to the imported document.
-  Future<DocumentRef> importDocument({required Uint8List data});
+  Future<DocumentRef> importDocument({
+    required Uint8List data,
+    required CatalystId authorId,
+  });
 
   /// Similar to [watchIsDocumentFavorite] but stops after first emit.
   Future<bool> isDocumentFavorite({
@@ -107,11 +112,15 @@ abstract interface class DocumentRepository {
     required bool isFavorite,
   });
 
-  /// Creates/updates a local document draft.
+  /// In context of [document] selfRef:
+  ///
+  /// - [DraftRef] -> Creates/updates a local document draft.
+  /// - [SignedDocumentRef] -> Creates a local document. If matching ref
+  /// already exists it will be ignored.
   ///
   /// If watching same draft with [watchDocument] it will emit
   /// change.
-  Future<void> upsertDocumentDraft({
+  Future<void> upsertDocument({
     required DocumentData document,
   });
 
@@ -127,23 +136,28 @@ abstract interface class DocumentRepository {
     required DocumentType type,
   });
 
-  /// Observes matching [ProposalDocument] and emits updates.
+  /// Observes matching [DocumentData] as well as [DocumentData] resolved
+  /// by [refGetter], usually template, and emits updates.
   ///
   /// Source of data depends whether [ref] is [SignedDocumentRef] or [DraftRef].
   Stream<DocumentsDataWithRefData> watchDocument({
     required DocumentRef ref,
+    ValueResolver<DocumentData, DocumentRef> refGetter,
   });
 
   /// When [unique] is true, only latest versions of each document are returned.
   /// When [getLocalDrafts] is true, local drafts are also returned.
   /// When [authorId] is not null, only documents from
   /// the given author are returned.
+  // TODO(damian-molinski): refactor all params into object
   Stream<List<DocumentsDataWithRefData>> watchDocuments({
     required DocumentType type,
+    ValueResolver<DocumentData, DocumentRef> refGetter,
     int? limit,
     bool unique = false,
     bool getLocalDrafts = false,
     CatalystId? authorId,
+    DocumentRef? refTo,
   });
 
   /// Emits changes to fav status of [ref].
@@ -255,12 +269,16 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   }
 
   @override
-  Future<DocumentRef> importDocument({required Uint8List data}) async {
+  Future<DocumentRef> importDocument({
+    required Uint8List data,
+    required CatalystId authorId,
+  }) async {
     final jsonData = json.fuse(utf8).decode(data)! as Map<String, dynamic>;
     final document = DocumentDataDto.fromJson(jsonData).toModel();
 
     final newMetadata = document.metadata.copyWith(
       selfRef: DraftRef.generateFirstRef(),
+      authors: Optional([authorId]),
     );
 
     final newDocument = DocumentData(
@@ -319,19 +337,26 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   }
 
   @override
-  Future<void> upsertDocumentDraft({
+  Future<void> upsertDocument({
     required DocumentData document,
   }) async {
-    await _drafts.save(data: document);
+    switch (document.metadata.selfRef) {
+      case DraftRef():
+        await _drafts.save(data: document);
+      case SignedDocumentRef():
+        await _localDocuments.save(data: document);
+    }
   }
 
   @visibleForTesting
   Stream<List<DocumentsDataWithRefData>> watchAllDocuments({
+    required ValueResolver<DocumentData, DocumentRef> refGetter,
     int? limit,
     bool unique = false,
     bool getLocalDrafts = false,
     DocumentType? type,
     CatalystId? authorId,
+    DocumentRef? refTo,
   }) {
     final localDocs = _localDocuments
         .watchAll(
@@ -339,6 +364,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
       unique: unique,
       type: type,
       authorId: authorId,
+      refTo: refTo,
     )
         .asyncMap((documents) async {
       final typedDocuments = documents.cast<DocumentData>();
@@ -346,16 +372,17 @@ final class DocumentRepositoryImpl implements DocumentRepository {
         typedDocuments
             .where((doc) => doc.metadata.template != null)
             .map((documentData) async {
-          final templateRef = documentData.metadata.template!;
-          final templateData = await _documentDataLock.synchronized(
-            () => getDocumentData(ref: templateRef),
+          final resolvedRef = refGetter(documentData);
+          final refData = await _documentDataLock.synchronized(
+            () => getDocumentData(ref: resolvedRef),
           );
           return DocumentsDataWithRefData(
             data: documentData,
-            refData: templateData,
+            refData: refData,
           );
         }).toList(),
       );
+
       return results;
     });
 
@@ -424,10 +451,11 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   @override
   Stream<DocumentsDataWithRefData> watchDocument({
     required DocumentRef ref,
+    ValueResolver<DocumentData, DocumentRef> refGetter = _templateResolver,
   }) {
     return watchDocumentWithRef(
       ref: ref,
-      refGetter: (data) => data.metadata.template!,
+      refGetter: refGetter,
     ).whereNotNull().map(
       (event) {
         final documentData = event.data;
@@ -444,16 +472,21 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   @override
   Stream<List<DocumentsDataWithRefData>> watchDocuments({
     required DocumentType type,
+    ValueResolver<DocumentData, DocumentRef> refGetter = _templateResolver,
     int? limit,
     bool unique = false,
     bool getLocalDrafts = false,
     CatalystId? authorId,
+    DocumentRef? refTo,
   }) {
     return watchAllDocuments(
+      refGetter: refGetter,
       limit: limit,
       type: type,
+      unique: unique,
       getLocalDrafts: getLocalDrafts,
       authorId: authorId,
+      refTo: refTo,
     );
   }
 

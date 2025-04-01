@@ -1,3 +1,4 @@
+import 'package:catalyst_voices_blocs/src/comments/comments_state.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:collection/collection.dart';
@@ -67,27 +68,38 @@ final class ProposalBuilderMetadata extends Equatable {
 }
 
 final class ProposalBuilderState extends Equatable {
+  final bool isLoading;
   final bool isChanging;
   final LocalizedException? error;
   final Document? document;
   final ProposalBuilderMetadata metadata;
-  final List<DocumentSegment> segments;
+  final List<DocumentSegment> documentSegments;
+  final List<Segment> commentSegments;
+  final CommentsState comments;
   final ProposalGuidance guidance;
   final CampaignCategoryDetailsViewModel? category;
   final NodeId? activeNodeId;
   final bool showValidationErrors;
 
   const ProposalBuilderState({
+    this.isLoading = false,
     this.isChanging = false,
     this.error,
     this.document,
     this.metadata = const ProposalBuilderMetadata(),
-    this.segments = const [],
+    this.documentSegments = const [],
+    this.commentSegments = const [],
+    this.comments = const CommentsState(),
     this.guidance = const ProposalGuidance(),
     this.category,
     this.activeNodeId,
     this.showValidationErrors = false,
   });
+
+  List<Segment> get allSegments => [
+        ...documentSegments,
+        ...commentSegments,
+      ];
 
   String? get proposalTitle {
     final property = document?.getProperty(ProposalDocument.titleNodeId)
@@ -98,38 +110,48 @@ final class ProposalBuilderState extends Equatable {
 
   @override
   List<Object?> get props => [
+        isLoading,
         isChanging,
         error,
         document,
         metadata,
-        segments,
+        documentSegments,
+        commentSegments,
+        comments,
         guidance,
         category,
         activeNodeId,
         showValidationErrors,
       ];
 
-  bool get showError => !isChanging && error != null;
+  bool get showError => !isLoading && error != null;
 
-  bool get showSegments => !isChanging && segments.isNotEmpty && error == null;
+  bool get showSegments =>
+      !isLoading && allSegments.isNotEmpty && error == null;
 
   ProposalBuilderState copyWith({
+    bool? isLoading,
     bool? isChanging,
     Optional<LocalizedException>? error,
     Optional<Document>? document,
     ProposalBuilderMetadata? metadata,
-    List<DocumentSegment>? segments,
+    List<DocumentSegment>? documentSegments,
+    List<Segment>? commentSegments,
+    CommentsState? comments,
     ProposalGuidance? guidance,
     Optional<CampaignCategoryDetailsViewModel>? category,
     Optional<NodeId>? activeNodeId,
     bool? showValidationErrors,
   }) {
     return ProposalBuilderState(
+      isLoading: isLoading ?? this.isLoading,
       isChanging: isChanging ?? this.isChanging,
       error: error.dataOr(this.error),
       document: document.dataOr(this.document),
       metadata: metadata ?? this.metadata,
-      segments: segments ?? this.segments,
+      documentSegments: documentSegments ?? this.documentSegments,
+      commentSegments: commentSegments ?? this.commentSegments,
+      comments: comments ?? this.comments,
       guidance: guidance ?? this.guidance,
       category: category.dataOr(this.category),
       activeNodeId: activeNodeId.dataOr(this.activeNodeId),

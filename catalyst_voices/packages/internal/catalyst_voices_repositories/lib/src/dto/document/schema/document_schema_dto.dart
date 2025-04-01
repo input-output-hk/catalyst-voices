@@ -35,11 +35,9 @@ final class DocumentSchemaDto {
   });
 
   factory DocumentSchemaDto.fromJson(Map<String, dynamic> json) {
-    final segmentsMap = json['properties'] as Map<String, dynamic>;
-    json['propertiesSchema'] =
-        (segmentsMap[r'$schema'] as Map<String, dynamic>)['const'];
+    final adaptedJson = _adaptJson(json);
 
-    return _$DocumentSchemaDtoFromJson(json);
+    return _$DocumentSchemaDtoFromJson(adaptedJson);
   }
 
   Map<String, dynamic> toJson() => _$DocumentSchemaDtoToJson(this);
@@ -67,5 +65,30 @@ final class DocumentSchemaDto {
       properties: mappedProperties,
       order: order.map(nodeId.child).toList(),
     );
+  }
+
+  static Map<String, dynamic> _adaptJson(Map<String, dynamic> source) {
+    final adapted = Map.of(source);
+
+    // 1.
+    if (adapted.containsKey('properties')) {
+      final properties = adapted['properties'];
+
+      // 2.
+      if (properties is Map<String, dynamic>) {
+        // 3.
+        if (properties.containsKey(r'$schema')) {
+          final schemaObject = properties[r'$schema'];
+
+          // 4.
+          if (schemaObject is Map<String, dynamic> &&
+              schemaObject.containsKey('const')) {
+            adapted['propertiesSchema'] = schemaObject['const'];
+          }
+        }
+      }
+    }
+
+    return adapted;
   }
 }

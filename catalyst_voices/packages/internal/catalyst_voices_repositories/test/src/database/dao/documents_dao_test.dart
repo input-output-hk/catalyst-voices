@@ -1,6 +1,7 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/database/catalyst_database.dart';
 import 'package:catalyst_voices_repositories/src/database/database.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:collection/collection.dart';
 import 'package:drift/drift.dart' show DatabaseConnection;
 import 'package:drift/native.dart';
@@ -11,6 +12,11 @@ import '../../utils/test_factories.dart';
 
 void main() {
   late DriftCatalystDatabase database;
+
+  // ignore: unnecessary_lambdas
+  setUpAll(() {
+    DummyCatalystIdFactory.registerDummyKeyFactory();
+  });
 
   setUp(() {
     final inMemory = DatabaseConnection(NativeDatabase.memory());
@@ -443,14 +449,67 @@ void main() {
           equals([document2.document]),
         );
       });
+
+      test(
+          'all documents with from same account are returned '
+          'even when username changes', () async {
+        // Given
+        final originalId = DummyCatalystIdFactory.create(username: 'damian');
+        final updatedId = originalId.copyWith(username: const Optional('dev'));
+
+        final document1 = DocumentWithMetadataFactory.build(
+          metadata: DocumentDataMetadata(
+            type: DocumentType.proposalDocument,
+            selfRef: SignedDocumentRef.generateFirstRef(),
+            authors: [originalId],
+          ),
+        );
+        final document2 = DocumentWithMetadataFactory.build(
+          metadata: DocumentDataMetadata(
+            type: DocumentType.proposalDocument,
+            selfRef: SignedDocumentRef.generateFirstRef(),
+            authors: [updatedId],
+          ),
+        );
+
+        final docs = [document1, document2];
+        final refs = docs.map((e) => e.document.metadata.selfRef).toList();
+
+        // When
+        await database.documentsDao.saveAll(docs);
+
+        // Then
+        final stream = database.documentsDao.watchAll(authorId: updatedId);
+
+        expect(
+          stream,
+          emitsInOrder([
+            allOf(
+              hasLength(docs.length),
+              everyElement(
+                predicate<DocumentEntity>((document) {
+                  return refs.contains(document.metadata.selfRef);
+                }),
+              ),
+            ),
+          ]),
+        );
+      });
     });
 
     group('count', () {
       test('document returns expected number', () async {
         // Given
+        final dateTime = DateTimeExt.now();
+
         final documentsWithMetadata = List<DocumentEntityWithMetadata>.generate(
           20,
-          (index) => DocumentWithMetadataFactory.build(),
+          (index) => DocumentWithMetadataFactory.build(
+            metadata: DocumentDataMetadata(
+              type: DocumentType.proposalDocument,
+              selfRef: _buildRefAt(dateTime.add(Duration(seconds: index))),
+            ),
+          ),
         );
 
         // When
@@ -753,4 +812,10 @@ void main() {
       });
     });
   });
+}
+
+SignedDocumentRef _buildRefAt(DateTime dateTime) {
+  final config = V7Options(dateTime.millisecondsSinceEpoch, null);
+  final val = const Uuid().v7(config: config);
+  return SignedDocumentRef.first(val);
 }

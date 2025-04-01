@@ -10,7 +10,7 @@ abstract interface class ProposalService {
     ProposalRepository proposalRepository,
     DocumentRepository documentRepository,
     UserService userService,
-    KeyDerivationService keyDerivationService,
+    SignerService signerService,
     CampaignRepository campaignRepository,
   ) = ProposalServiceImpl;
 
@@ -37,6 +37,11 @@ abstract interface class ProposalService {
   /// so that it can be saved as a file.
   Future<Uint8List> encodeProposalForExport({
     required DocumentData document,
+  });
+
+  Future<void> forgetProposal({
+    required SignedDocumentRef ref,
+    required SignedDocumentRef categoryId,
   });
 
   /// Similar to [watchFavoritesProposalsIds] stops after first emit.
@@ -86,6 +91,11 @@ abstract interface class ProposalService {
     required SignedDocumentRef categoryId,
   });
 
+  Future<void> unlockProposal({
+    required SignedDocumentRef ref,
+    required SignedDocumentRef categoryId,
+  });
+
   /// Upserts a proposal draft in the local storage.
   Future<void> upsertDraftProposal({
     required DraftRef selfRef,
@@ -111,14 +121,14 @@ final class ProposalServiceImpl implements ProposalService {
   final ProposalRepository _proposalRepository;
   final DocumentRepository _documentRepository;
   final UserService _userService;
-  final KeyDerivationService _keyDerivationService;
+  final SignerService _signerService;
   final CampaignRepository _campaignRepository;
 
   const ProposalServiceImpl(
     this._proposalRepository,
     this._documentRepository,
     this._userService,
-    this._keyDerivationService,
+    this._signerService,
     this._campaignRepository,
   );
 
@@ -170,6 +180,24 @@ final class ProposalServiceImpl implements ProposalService {
   }
 
   @override
+  Future<void> forgetProposal({
+    required SignedDocumentRef ref,
+    required SignedDocumentRef categoryId,
+  }) {
+    return _signerService.useProposerCredentials(
+      (catalystId, privateKey) {
+        return _proposalRepository.publishProposalAction(
+          ref: ref,
+          categoryId: categoryId,
+          action: ProposalSubmissionAction.hide,
+          catalystId: catalystId,
+          privateKey: privateKey,
+        );
+      },
+    );
+  }
+
+  @override
   Future<List<String>> getFavoritesProposalsIds() {
     return _documentRepository
         .watchAllDocumentsFavoriteIds(type: DocumentType.proposalDocument)
@@ -216,15 +244,16 @@ final class ProposalServiceImpl implements ProposalService {
   }
 
   @override
-  Future<DocumentRef> importProposal(Uint8List data) {
-    return _proposalRepository.importProposal(data);
+  Future<DocumentRef> importProposal(Uint8List data) async {
+    final authorId = await _getUserCatalystId();
+    return _proposalRepository.importProposal(data, authorId);
   }
 
   @override
   Future<SignedDocumentRef> publishProposal({
     required DocumentData document,
   }) async {
-    await _useProposerRoleCredentials(
+    await _signerService.useProposerCredentials(
       (catalystId, privateKey) {
         return _proposalRepository.publishProposal(
           document: document,
@@ -256,12 +285,30 @@ final class ProposalServiceImpl implements ProposalService {
     required SignedDocumentRef ref,
     required SignedDocumentRef categoryId,
   }) {
-    return _useProposerRoleCredentials(
+    return _signerService.useProposerCredentials(
       (catalystId, privateKey) {
         return _proposalRepository.publishProposalAction(
           ref: ref,
           categoryId: categoryId,
           action: ProposalSubmissionAction.aFinal,
+          catalystId: catalystId,
+          privateKey: privateKey,
+        );
+      },
+    );
+  }
+
+  @override
+  Future<void> unlockProposal({
+    required SignedDocumentRef ref,
+    required SignedDocumentRef categoryId,
+  }) async {
+    return _signerService.useProposerCredentials(
+      (catalystId, privateKey) {
+        return _proposalRepository.publishProposalAction(
+          ref: ref,
+          categoryId: categoryId,
+          action: ProposalSubmissionAction.draft,
           catalystId: catalystId,
           privateKey: privateKey,
         );
@@ -378,36 +425,5 @@ final class ProposalServiceImpl implements ProposalService {
     }
 
     return account.catalystId;
-  }
-
-  Future<void> _useProposerRoleCredentials(
-    Future<void> Function(
-      CatalystId catalystId,
-      CatalystPrivateKey privateKey,
-    ) callback,
-  ) async {
-    final account = _userService.user.activeAccount;
-    if (account == null) {
-      throw StateError(
-        'Cannot obtain proposer credentials, account missing',
-      );
-    }
-
-    final catalystId = account.catalystId.copyWith(
-      username: const Optional.empty(),
-      role: const Optional(AccountRole.proposer),
-      rotation: const Optional(0),
-    );
-
-    await account.keychain.getMasterKey().use((masterKey) async {
-      final keyPair = _keyDerivationService.deriveAccountRoleKeyPair(
-        masterKey: masterKey,
-        role: AccountRole.proposer,
-      );
-
-      await keyPair.use(
-        (keyPair) => callback(catalystId, keyPair.privateKey),
-      );
-    });
   }
 }

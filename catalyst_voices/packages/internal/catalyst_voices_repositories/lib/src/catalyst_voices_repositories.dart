@@ -1,6 +1,7 @@
 export 'api/api.dart';
 export 'auth/auth_token_provider.dart' show AuthTokenProvider;
 export 'campaign/campaign_repository.dart' show CampaignRepository;
+export 'comment/comment_repository.dart' show CommentRepository;
 export 'config/config_repository.dart' show ConfigRepository;
 export 'database/database.dart';
 export 'document/constants.dart';

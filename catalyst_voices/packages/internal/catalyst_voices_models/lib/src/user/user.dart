@@ -13,54 +13,30 @@ final class User extends Equatable {
     required this.settings,
   });
 
-  @visibleForTesting
-  const User.optional({
-    this.accounts = const [],
-    this.settings = const UserSettings(),
-  });
-
   const User.empty()
       : this(
           accounts: const [],
           settings: const UserSettings(),
         );
 
+  @visibleForTesting
+  const User.optional({
+    this.accounts = const [],
+    this.settings = const UserSettings(),
+  });
+
   Account? get activeAccount {
     return accounts.singleWhereOrNull((account) => account.isActive);
   }
 
-  User useAccount({
-    required CatalystId catalystId,
-  }) {
-    if (this.accounts.none((e) => e.catalystId == catalystId)) {
-      throw ArgumentError('Account[$catalystId] is not on the list');
-    }
-
-    final accounts = [...this.accounts]
-        .map((e) => e.copyWith(isActive: e.catalystId == catalystId))
-        .toList();
-
-    return copyWith(accounts: accounts);
-  }
-
-  bool hasAccount({
-    required CatalystId catalystId,
-  }) {
-    return accounts.any((element) => element.catalystId == catalystId);
-  }
+  @override
+  List<Object?> get props => [
+        accounts,
+        settings,
+      ];
 
   User addAccount(Account account) {
     final accounts = [...this.accounts, account];
-
-    return copyWith(accounts: accounts);
-  }
-
-  User removeAccount({
-    required CatalystId catalystId,
-  }) {
-    final accounts = [...this.accounts]
-        .where((element) => element.catalystId != catalystId)
-        .toList();
 
     return copyWith(accounts: accounts);
   }
@@ -75,9 +51,45 @@ final class User extends Equatable {
     );
   }
 
-  @override
-  List<Object?> get props => [
-        accounts,
-        settings,
-      ];
+  Account getAccount(CatalystId id) {
+    return accounts.singleWhere((account) => id.isReferringTo(account));
+  }
+
+  bool hasAccount({
+    required CatalystId id,
+  }) {
+    return accounts.any((account) => id.isReferringTo(account));
+  }
+
+  User removeAccount({
+    required CatalystId id,
+  }) {
+    final accounts = [...this.accounts]
+        .where((account) => !id.isReferringTo(account))
+        .toList();
+
+    return copyWith(accounts: accounts);
+  }
+
+  User updateAccount(Account account) {
+    final accounts = List.of(this.accounts)
+        .map((e) => e.isSameRef(account) ? account : e)
+        .toList();
+
+    return copyWith(accounts: accounts);
+  }
+
+  User useAccount({
+    required CatalystId id,
+  }) {
+    if (this.accounts.none((account) => id.isReferringTo(account))) {
+      throw ArgumentError('Account[$id] is not on the list');
+    }
+
+    final accounts = [...this.accounts]
+        .map((account) => account.copyWith(isActive: id.isReferringTo(account)))
+        .toList();
+
+    return copyWith(accounts: accounts);
+  }
 }

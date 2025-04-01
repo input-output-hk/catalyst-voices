@@ -4,6 +4,7 @@ import 'package:catalyst_voices/common/error_handler.dart';
 import 'package:catalyst_voices/common/signal_handler.dart';
 import 'package:catalyst_voices/pages/proposal_builder/appbar/proposal_builder_back_action.dart';
 import 'package:catalyst_voices/pages/proposal_builder/appbar/proposal_builder_status_action.dart';
+import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_changing.dart';
 import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_error.dart';
 import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_loading.dart';
 import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_navigation_panel.dart';
@@ -77,25 +78,27 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: const VoicesAppBar(
-        automaticallyImplyLeading: false,
-        actions: [
-          ProposalBuilderBackAction(),
-          ProposalBuilderStatusAction(),
-          SessionStateHeader(),
-        ],
-      ),
-      body: SegmentsControllerScope(
-        controller: _segmentsController,
-        child: SidebarScaffold(
-          leftRail: const ProposalBuilderNavigationPanel(),
-          body: _ProposalBuilderContent(
-            controller: _segmentsScrollController,
-            onRetryTap: _updateSource,
+    return ProposalBuilderChangingOverlay(
+      child: Scaffold(
+        appBar: const VoicesAppBar(
+          automaticallyImplyLeading: false,
+          actions: [
+            ProposalBuilderBackAction(),
+            ProposalBuilderStatusAction(),
+            SessionStateHeader(),
+          ],
+        ),
+        body: SegmentsControllerScope(
+          controller: _segmentsController,
+          child: SidebarScaffold(
+            leftRail: const ProposalBuilderNavigationPanel(),
+            rightRail: const ProposalBuilderSetupPanel(),
+            body: _ProposalBuilderContent(
+              controller: _segmentsScrollController,
+              onRetryTap: _loadData,
+            ),
+            bodyConstraints: const BoxConstraints.expand(),
           ),
-          bodyConstraints: const BoxConstraints.expand(),
-          rightRail: const ProposalBuilderSetupPanel(),
         ),
       ),
     );
@@ -107,7 +110,7 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
 
     if (widget.proposalId != oldWidget.proposalId ||
         widget.categoryId != oldWidget.categoryId) {
-      _updateSource();
+      _loadData();
     }
   }
 
@@ -160,13 +163,15 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
       ..attachItemsScrollController(_segmentsScrollController);
 
     _segmentsSub = bloc.stream
-        .map((event) => (segments: event.segments, nodeId: event.activeNodeId))
+        .map(
+          (event) => (segments: event.allSegments, nodeId: event.activeNodeId),
+        )
         .distinct(
           (a, b) => listEquals(a.segments, b.segments) && a.nodeId == b.nodeId,
         )
         .listen((record) => _updateSegments(record.segments, record.nodeId));
 
-    _updateSource(bloc: bloc);
+    _loadData(bloc: bloc);
   }
 
   void _handleSegmentsControllerChange() {
@@ -234,7 +239,7 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
     _segmentsController.value = newState;
   }
 
-  void _updateSource({ProposalBuilderBloc? bloc}) {
+  void _loadData({ProposalBuilderBloc? bloc}) {
     bloc ??= context.read<ProposalBuilderBloc>();
 
     final proposalId = widget.proposalId;

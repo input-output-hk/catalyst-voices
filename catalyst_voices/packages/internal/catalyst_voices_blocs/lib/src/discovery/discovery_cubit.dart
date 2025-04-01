@@ -62,12 +62,14 @@ class DiscoveryCubit extends Cubit<DiscoveryState> {
       ),
     );
     final campaign = await _campaignService.getCurrentCampaign();
+    final campaignTimeline = await _campaignService.getCampaignTimeline();
     final currentCampaign = CurrentCampaignInfoViewModel.fromModel(campaign);
 
     emit(
       state.copyWith(
         currentCampaign: DiscoveryCurrentCampaignState(
           currentCampaign: currentCampaign,
+          campaignTimeline: campaignTimeline,
           error: null,
           isLoading: false,
         ),
@@ -110,14 +112,14 @@ class DiscoveryCubit extends Cubit<DiscoveryState> {
           ),
         );
       },
-      onError: (error) {
+      onError: (Object error) {
         if (isClosed) return;
         emit(
           state.copyWith(
-            mostRecentProposals: const DiscoveryMostRecentProposalsState(
+            mostRecentProposals: DiscoveryMostRecentProposalsState(
               isLoading: false,
-              error: LocalizedUnknownException(),
-              proposals: [],
+              error: LocalizedException.create(error),
+              proposals: const [],
             ),
           ),
         );
