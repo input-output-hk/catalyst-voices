@@ -17,6 +17,7 @@ final _logger = Logger('RbacAuthInterceptor');
 final class RbacAuthInterceptor implements Interceptor {
   static const _retryCountHeaderName = 'Retry-Count';
   static const _retryStatusCodes = [401, 403];
+  static const _maxRetries = 1;
 
   final UserObserver _userObserver;
   final AuthTokenProvider _authTokenProvider;
@@ -56,7 +57,7 @@ final class RbacAuthInterceptor implements Interceptor {
     try {
       final rawRetryCount = request.headers[_retryCountHeaderName];
       final retryCount = int.tryParse(rawRetryCount ?? '') ?? 0;
-      if (retryCount > 0) {
+      if (retryCount >= _maxRetries) {
         _logger.severe('Giving up on ${request.uri} auth retry[$retryCount]');
         return null;
       }
