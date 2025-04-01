@@ -48,7 +48,7 @@ abstract interface class DocumentsDao {
 
   /// Returns all entities. If same document have different versions
   /// all will be returned.
-  Future<List<DocumentEntity>> queryAll();
+  Future<List<DocumentEntity>> queryAll({DocumentType? type});
 
   /// Returns all known document refs.
   Future<List<SignedDocumentRef>> queryAllRefs();
@@ -81,6 +81,11 @@ abstract interface class DocumentsDao {
   /// Watches for new comments that are reference by ref.
   Stream<int> watchCount({
     required DocumentRef ref,
+    required DocumentType type,
+  });
+
+  Stream<DocumentEntity?> watchRefToDocument({
+    required SignedDocumentRef refTo,
     required DocumentType type,
   });
 }
@@ -175,8 +180,13 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
   }
 
   @override
-  Future<List<DocumentEntity>> queryAll() {
-    return select(documents).get();
+  Future<List<DocumentEntity>> queryAll({DocumentType? type}) {
+    final query = select(documents);
+    if (type != null) {
+      query.where((doc) => doc.type.equals(type.uuid));
+    }
+
+    return query.get();
   }
 
   @override
@@ -326,6 +336,35 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
       );
 
     return query.watch().map((comments) => comments.length).distinct();
+  }
+
+  @override
+  Stream<DocumentEntity?> watchRefToDocument({
+    required SignedDocumentRef refTo,
+    required DocumentType type,
+  }) {
+    final query = select(documents)
+      ..where(
+        (row) => Expression.and([
+          row.metadata.jsonExtract<String>(r'$.type').equals(type.uuid),
+          row.metadata.jsonExtract<String>(r'$.ref.id').equals(refTo.id),
+          if (refTo.version != null)
+            row.metadata
+                .jsonExtract<String>(r'$.ref.version')
+                .equals(refTo.version!),
+        ]),
+      )
+      ..orderBy([
+        (t) => OrderingTerm(
+              expression: t.verHi,
+              mode: OrderingMode.desc,
+            ),
+      ]);
+
+    return query
+        .watch()
+        .map((event) => event.firstOrNull)
+        .distinct(_entitiesEquals);
   }
 
   bool _entitiesEquals(DocumentEntity? previous, DocumentEntity? next) {

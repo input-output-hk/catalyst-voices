@@ -3,7 +3,10 @@ import 'dart:typed_data';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:rxdart/rxdart.dart';
+
+final _logger = Logger('ProposalService');
 
 abstract interface class ProposalService {
   const factory ProposalService(
@@ -326,6 +329,8 @@ final class ProposalServiceImpl implements ProposalService {
     // TODO(LynxLynxx): when we start supporting multiple authors
     // we need to get the list of authors actually stored in the db and
     // add them to the authors list if they are not already there
+    final catalystId = await _getUserCatalystId();
+
     await _proposalRepository.upsertDraftProposal(
       document: DocumentData(
         metadata: DocumentDataMetadata(
@@ -333,6 +338,7 @@ final class ProposalServiceImpl implements ProposalService {
           selfRef: selfRef,
           template: template,
           categoryId: categoryId,
+          authors: [catalystId],
         ),
         content: content,
       ),
@@ -399,20 +405,48 @@ final class ProposalServiceImpl implements ProposalService {
   Stream<List<Proposal>> watchUserProposals() async* {
     final authorId = await _getUserCatalystId();
     yield* _proposalRepository
-        .watchUserProposals(
-      authorId: authorId,
-    )
+        .watchUserProposals(authorId: authorId)
         .switchMap((documents) async* {
-      final proposals = documents.map((e) async {
-        final campaign =
-            await _campaignRepository.getCategory(e.metadata.categoryId);
-        final proposalData = ProposalData(
-          document: e,
-          categoryName: campaign.categoryText,
-        );
-        return Proposal.fromData(proposalData);
-      }).toList();
-      yield await Future.wait(proposals);
+      final proposalsStreams = await Future.wait(
+        documents.map((doc) async {
+          final campaign =
+              await _campaignRepository.getCategory(doc.metadata.categoryId);
+
+          if (doc.metadata.selfRef is DraftRef) {
+            return Stream.value(
+              Proposal.fromData(
+                ProposalData(
+                  document: doc,
+                  categoryName: campaign.categoryText,
+                ),
+              ),
+            );
+          }
+
+          return _proposalRepository
+              .watchProposalSubmissionAction(
+            refTo: doc.metadata.selfRef as SignedDocumentRef,
+          )
+              .map((action) {
+            _logger.info(
+              'Proposal action updated for [${doc.metadata}] action: $action',
+            );
+            return Proposal.fromData(
+              ProposalData(
+                document: doc,
+                categoryName: campaign.categoryText,
+              ),
+            );
+          });
+        }),
+      );
+
+      await for (final proposals in Rx.combineLatest(
+        proposalsStreams,
+        (List<Proposal> proposals) => proposals,
+      )) {
+        yield proposals;
+      }
     });
   }
 

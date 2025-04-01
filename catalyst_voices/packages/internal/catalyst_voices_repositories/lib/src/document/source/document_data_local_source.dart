@@ -52,4 +52,9 @@ abstract interface class SignedDocumentDataSource
     required DocumentRef ref,
     required DocumentType type,
   });
+
+  Stream<DocumentData?> watchRefToDocument({
+    required SignedDocumentRef refTo,
+    required DocumentType type,
+  });
 }

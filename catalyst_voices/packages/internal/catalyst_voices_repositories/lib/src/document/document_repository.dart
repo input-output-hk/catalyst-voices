@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:async/async.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
+import 'package:catalyst_voices_repositories/src/document/document_data_factory.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/document_data_dto.dart';
 import 'package:catalyst_voices_repositories/src/dto/document_data_with_ref_dat.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
@@ -11,6 +12,8 @@ import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:synchronized/synchronized.dart';
+
+final _logger = Logger('DocumentRepository');
 
 DocumentRef _templateResolver(DocumentData data) => data.metadata.template!;
 
@@ -164,6 +167,20 @@ abstract interface class DocumentRepository {
   Stream<bool> watchIsDocumentFavorite({
     required DocumentRef ref,
   });
+
+  /// Looking for document with matching refTo and type.
+  /// It return documents that have a reference that matches [refTo]
+  ///
+  /// This method is used when we want to find a document that has a reference
+  /// to a document that we are looking for.
+  ///
+  /// For example, we want to find latest document action that were made
+  /// on a [refTo] document.
+  Stream<DocumentsDataWithRefData?> watchRefToDocument({
+    required SignedDocumentRef refTo,
+    required DocumentType type,
+    ValueResolver<DocumentData, DocumentRef> refGetter,
+  });
 }
 
 final class DocumentRepositoryImpl implements DocumentRepository {
@@ -299,7 +316,11 @@ final class DocumentRepositoryImpl implements DocumentRepository {
 
   @override
   Future<void> publishDocument({required SignedDocument document}) async {
-    await _remoteDocuments.publish(document);
+    // await _remoteDocuments.publish(document);
+
+    final doc = DocumentDataFactory.create(document);
+    _logger.info('Saving document [${doc.content.data}]');
+    await _localDocuments.save(data: doc);
   }
 
   @override
@@ -529,6 +550,42 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     assert(!ref.isExact, 'Favorite ref have to be loose!');
 
     return _favoriteDocuments.watchIsDocumentFavorite(ref.id);
+  }
+
+  @override
+  Stream<DocumentsDataWithRefData?> watchRefToDocument({
+    required SignedDocumentRef refTo,
+    required DocumentType type,
+    ValueResolver<DocumentData, DocumentRef> refGetter = _templateResolver,
+  }) {
+    return _localDocuments
+        .watchRefToDocument(refTo: refTo, type: type)
+        .distinct()
+        .switchMap<DocumentsDataWithRefData?>((document) {
+      if (document == null) {
+        return Stream.value(null);
+      }
+
+      final ref = refGetter(document);
+      final refDocumentStream = _watchDocumentData(
+        ref: ref,
+        // Synchronized because we may have many documents which are referring
+        // to the same template. When loading multiple documents at the same
+        // time we want to fetch only once template.
+        synchronizedUpdate: true,
+      );
+
+      return refDocumentStream.map<DocumentsDataWithRefData?>(
+        (refDocumentData) {
+          return refDocumentData != null
+              ? DocumentsDataWithRefData(
+                  data: document,
+                  refData: refDocumentData,
+                )
+              : null;
+        },
+      );
+    });
   }
 
   Future<DocumentData> _getDraftDocumentData({

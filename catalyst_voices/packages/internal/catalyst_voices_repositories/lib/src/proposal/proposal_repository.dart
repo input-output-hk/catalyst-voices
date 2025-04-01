@@ -11,6 +11,8 @@ import 'package:catalyst_voices_repositories/src/dto/proposal/proposal_submissio
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:rxdart/rxdart.dart';
 
+final _logger = Logger('ProposalRepository');
+
 final _proposalDescription = """
 Zanzibar is becoming one of the hotspots for DID's through
 World Mobile and PRISM, but its potential is only barely exploited.
@@ -86,6 +88,15 @@ abstract interface class ProposalRepository {
   });
 
   Stream<List<ProposalDocument>> watchLatestProposals({int? limit});
+
+  /// Watches for [ProposalSubmissionAction] that were made on [refTo] document.
+  ///
+  /// As making action on document not always creates a new document ref
+  /// we need to watch for actions on a document that has a reference to
+  /// [refTo] document.
+  Stream<ProposalSubmissionAction?> watchProposalSubmissionAction({
+    required SignedDocumentRef refTo,
+  });
 
   Stream<List<ProposalDocument>> watchUserProposals({
     required CatalystId authorId,
@@ -243,6 +254,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     final dto = ProposalSubmissionActionDocumentDto(
       action: ProposalSubmissionActionDto.fromModel(action),
     );
+    _logger.info('Publishing document [$ref] action: ${dto.action}');
 
     final signedDocument = await _signedDocumentManager.signDocument(
       SignedDocumentJsonPayload(dto.toJson()),
@@ -307,6 +319,25 @@ final class ProposalRepositoryImpl implements ProposalRepository {
             },
           ).toList(),
         );
+  }
+
+  @override
+  Stream<ProposalSubmissionAction?> watchProposalSubmissionAction({
+    required SignedDocumentRef refTo,
+  }) {
+    return _documentRepository
+        .watchRefToDocument(
+      refTo: refTo,
+      type: DocumentType.proposalActionDocument,
+    )
+        .map((action) {
+      if (action == null) {
+        return null;
+      }
+
+      _logger.info('Watching proposal action for [$refTo] $action');
+      return null;
+    });
   }
 
   @override
