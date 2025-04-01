@@ -79,6 +79,6 @@ impl TryFrom<Vec<u8>> for TxnId {
 
 impl From<TransactionId> for TxnId {
     fn from(value: TransactionId) -> Self {
-        Self(format!("0x{value}"))
+        Self(value.to_string())
     }
 }
