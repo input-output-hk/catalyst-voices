@@ -39,7 +39,7 @@ jobs:
           version: 0.10.0
 
       - name: Setup CI
-        uses: input-output-hk/catalyst-forge/actions/setup@ci/v1.7.1
+        uses: input-output-hk/catalyst-forge/actions/setup@ci/v1.7.2
 
       - name: Get python api test report
         uses: input-output-hk/catalyst-forge/actions/run@ci/v1.7.1
