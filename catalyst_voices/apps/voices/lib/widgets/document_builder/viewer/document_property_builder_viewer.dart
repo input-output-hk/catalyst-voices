@@ -4,7 +4,6 @@ import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
-import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localized_locales/flutter_localized_locales.dart';
@@ -12,10 +11,12 @@ import 'package:flutter_localized_locales/flutter_localized_locales.dart';
 /// A view-mode for [DocumentBuilder] components.
 class DocumentPropertyBuilderViewer extends StatefulWidget {
   final DocumentProperty property;
+  final DocumentPropertyBuilderOverrides? overrides;
 
   const DocumentPropertyBuilderViewer({
     super.key,
     required this.property,
+    this.overrides,
   });
 
   @override
@@ -26,7 +27,7 @@ class DocumentPropertyBuilderViewer extends StatefulWidget {
 
 class _DocumentPropertyBuilderViewerState
     extends State<DocumentPropertyBuilderViewer> {
-  final List<DocumentPropertyValueListItem<Object>> _items = [];
+  final List<Widget> _items = [];
 
   @override
   Widget build(BuildContext context) {
@@ -34,13 +35,7 @@ class _DocumentPropertyBuilderViewerState
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       spacing: 16,
-      children: [
-        for (final item in _items)
-          _ListItemBuilder(
-            key: ObjectKey(item.id),
-            item: item,
-          ),
-      ],
+      children: _items,
     );
   }
 
@@ -62,24 +57,11 @@ class _DocumentPropertyBuilderViewerState
     }
   }
 
-  Iterable<DocumentPropertyValueListItem<Object>> _calculateItemsFrom(
-    DocumentProperty property,
-  ) sync* {
-    switch (property) {
-      case DocumentListProperty():
-        yield* _calculateItemsFromList(property);
-      case DocumentObjectProperty():
-        yield* _calculateItemsFromObject(property);
-      case DocumentValueProperty<Object>():
-        yield _mapDocumentPropertyToListItem(property);
-    }
-  }
-
-  Iterable<DocumentPropertyValueListItem<Object>> _calculateItemsFromList(
+  Iterable<Widget> _buildListProperty(
     DocumentListProperty property,
   ) sync* {
     final schema = property.schema;
-    yield DocumentTextListItem(
+    yield _TextListItem(
       id: property.nodeId,
       title: schema.title,
       isRequired: schema.isRequired,
@@ -89,11 +71,11 @@ class _DocumentPropertyBuilderViewerState
 
     for (final property in property.properties
         .whereNot((element) => element.schema.isSectionOrSubsection)) {
-      yield* _calculateItemsFrom(property);
+      yield* _buildProperty(property);
     }
   }
 
-  Iterable<DocumentPropertyValueListItem<Object>> _calculateItemsFromObject(
+  Iterable<Widget> _buildObjectProperty(
     DocumentObjectProperty property,
   ) sync* {
     final schema = property.schema;
@@ -101,7 +83,7 @@ class _DocumentPropertyBuilderViewerState
       case DocumentSingleGroupedTagSelectorSchema():
         final value = schema.groupedTagsSelection(property);
 
-        yield DocumentTextListItem(
+        yield _TextListItem(
           id: property.nodeId,
           title: '',
           isRequired: schema.isRequired,
@@ -114,14 +96,29 @@ class _DocumentPropertyBuilderViewerState
       case DocumentGenericObjectSchema():
         for (final property in property.properties
             .whereNot((element) => element.schema.isSectionOrSubsection)) {
-          yield* _calculateItemsFrom(property);
+          yield* _buildProperty(property);
         }
     }
   }
 
-  DocumentPropertyValueListItem<Object> _mapDocumentPropertyToListItem(
-    DocumentValueProperty property,
-  ) {
+  Iterable<Widget> _buildProperty(DocumentProperty property) sync* {
+    final overrideBuilder = _getOverrideBuilder(property.nodeId);
+    if (overrideBuilder != null) {
+      yield overrideBuilder(context, property);
+      return;
+    }
+
+    switch (property) {
+      case DocumentListProperty():
+        yield* _buildListProperty(property);
+      case DocumentObjectProperty():
+        yield* _buildObjectProperty(property);
+      case DocumentValueProperty<Object>():
+        yield _buildValueProperty(property);
+    }
+  }
+
+  Widget _buildValueProperty(DocumentValueProperty property) {
     final schema = property.schema;
     final value = property.value;
 
@@ -136,7 +133,7 @@ class _DocumentPropertyBuilderViewerState
                 : context.l10n.no
             : null;
 
-        return DocumentTextListItem(
+        return _TextListItem(
           id: property.nodeId,
           title: schema.title,
           isRequired: schema.isRequired,
@@ -146,7 +143,7 @@ class _DocumentPropertyBuilderViewerState
         final num = schema.castValue(value);
         final text = num != null ? const Currency.ada().format(num) : null;
 
-        return DocumentTextListItem(
+        return _TextListItem(
           id: property.nodeId,
           title: schema.title,
           isRequired: schema.isRequired,
@@ -156,7 +153,7 @@ class _DocumentPropertyBuilderViewerState
         final months = schema.castValue(value);
         final text = months != null ? context.l10n.valueMonths(months) : null;
 
-        return DocumentTextListItem(
+        return _TextListItem(
           id: property.nodeId,
           title: schema.title,
           isRequired: schema.isRequired,
@@ -165,16 +162,17 @@ class _DocumentPropertyBuilderViewerState
       case DocumentSingleLineHttpsUrlEntrySchema():
         final link = schema.castValue(value);
 
-        return DocumentLinkReadItem(
+        return _TextListItem(
           id: property.nodeId,
           title: schema.title,
           isRequired: schema.isRequired,
           value: link,
+          isLink: true,
         );
       case DocumentMultiLineTextEntrySchema():
         final text = schema.castValue(value);
 
-        return DocumentTextListItem(
+        return _TextListItem(
           id: property.nodeId,
           title: schema.title,
           isRequired: schema.isRequired,
@@ -185,7 +183,7 @@ class _DocumentPropertyBuilderViewerState
         final text = schema.castValue(value);
         final data = text != null ? MarkdownData(text) : null;
 
-        return DocumentMarkdownListItem(
+        return _MarkdownListItem(
           id: property.nodeId,
           title: schema.title,
           isRequired: schema.isRequired,
@@ -199,7 +197,7 @@ class _DocumentPropertyBuilderViewerState
         final localeNames = LocaleNames.of(context);
         final text = code != null ? localeNames?.nameOf(code) : null;
 
-        return DocumentTextListItem(
+        return _TextListItem(
           id: property.nodeId,
           title: schema.title,
           isRequired: schema.isRequired,
@@ -211,7 +209,7 @@ class _DocumentPropertyBuilderViewerState
       case DocumentSingleLineTextEntrySchema():
       case DocumentRadioButtonSelect():
       case DocumentGenericStringSchema():
-        return DocumentTextListItem(
+        return _TextListItem(
           id: property.nodeId,
           title: schema.title,
           isRequired: schema.isRequired,
@@ -220,10 +218,17 @@ class _DocumentPropertyBuilderViewerState
     }
   }
 
+  DocumentPropertyWidgetBuilder? _getOverrideBuilder(DocumentNodeId nodeId) {
+    final overrides = widget.overrides;
+    if (overrides == null) return null;
+
+    return overrides[nodeId];
+  }
+
   void _updateItems() {
     _items
       ..clear()
-      ..addAll(_calculateItemsFrom(widget.property));
+      ..addAll(_buildProperty(widget.property));
   }
 }
 
@@ -235,6 +240,7 @@ class _ListItem extends StatelessWidget {
   final bool isAnswered;
 
   const _ListItem({
+    required super.key,
     required this.title,
     required this.isRequired,
     required this.value,
@@ -277,42 +283,79 @@ class _ListItem extends StatelessWidget {
   }
 }
 
-class _ListItemBuilder extends StatelessWidget {
-  final DocumentPropertyValueListItem<Object> item;
+class _MarkdownListItem extends StatelessWidget {
+  final DocumentNodeId id;
+  final String title;
+  final bool isRequired;
+  final MarkdownData? value;
 
-  const _ListItemBuilder({
-    required super.key,
-    required this.item,
+  const _MarkdownListItem({
+    required this.id,
+    required this.title,
+    required this.isRequired,
+    required this.value,
   });
 
   @override
   Widget build(BuildContext context) {
-    return switch (item) {
-      DocumentLinkReadItem(:final value) => _ListItem(
-          title: item.title,
-          isRequired: item.isRequired,
-          value: value != null
-              ? LinkText(value)
-              : Text(context.l10n.proposalEditorNotAnswered),
-          isMultiline: true,
-          isAnswered: value != null,
-        ),
-      DocumentMarkdownListItem(:final value) => _ListItem(
-          title: item.title,
-          isRequired: item.isRequired,
-          value: (value != null && value.data.isNotBlank)
-              ? MarkdownText(value)
-              : Text(context.l10n.proposalEditorNotAnswered),
-          isMultiline: true,
-          isAnswered: value != null && value.data.isNotBlank,
-        ),
-      DocumentTextListItem(:final value, :final isMultiline) => _ListItem(
-          title: item.title,
-          isRequired: item.isRequired,
-          value: Text(value ?? context.l10n.proposalEditorNotAnswered),
-          isMultiline: isMultiline,
-          isAnswered: value != null,
-        ),
-    };
+    final value = this.value;
+    final isAnswered = value != null && value.data.isNotBlank;
+
+    final Widget child;
+    if (!isAnswered) {
+      child = Text(context.l10n.proposalEditorNotAnswered);
+    } else {
+      child = MarkdownText(value);
+    }
+
+    return _ListItem(
+      key: ValueKey(id),
+      title: title,
+      isRequired: isRequired,
+      value: child,
+      isAnswered: isAnswered,
+    );
+  }
+}
+
+class _TextListItem extends StatelessWidget {
+  final DocumentNodeId id;
+  final String title;
+  final bool isRequired;
+  final String? value;
+  final bool isLink;
+  final bool isMultiline;
+
+  const _TextListItem({
+    required this.id,
+    required this.title,
+    required this.isRequired,
+    required this.value,
+    this.isLink = false,
+    this.isMultiline = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final value = this.value;
+    final isAnswered = value != null && value.isNotBlank;
+
+    final Widget child;
+    if (!isAnswered) {
+      child = Text(context.l10n.proposalEditorNotAnswered);
+    } else if (isLink) {
+      child = LinkText(value);
+    } else {
+      child = Text(value);
+    }
+
+    return _ListItem(
+      key: ValueKey(id),
+      title: title,
+      isRequired: isRequired,
+      value: child,
+      isMultiline: isMultiline,
+      isAnswered: isAnswered,
+    );
   }
 }

@@ -93,6 +93,7 @@ class _DocumentBuilderSectionTileState
             : DocumentPropertyBuilderViewer(
                 key: ValueKey(_editedSection.schema.nodeId),
                 property: _editedSection,
+                overrides: widget.overrides,
               ),
       ),
     );
