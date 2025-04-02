@@ -270,15 +270,15 @@ class VoicesBackButton extends StatelessWidget {
   }
 }
 
-class VoicesEditSaveButton extends StatelessWidget {
-  final VoicesEditSaveButtonStyle style;
+class VoicesEditCancelButton extends StatelessWidget {
+  final VoicesEditCancelButtonStyle style;
   final VoidCallback? onTap;
   final bool isEditing;
   final bool hasError;
 
-  const VoicesEditSaveButton({
+  const VoicesEditCancelButton({
     super.key,
-    this.style = VoicesEditSaveButtonStyle.text,
+    this.style = VoicesEditCancelButtonStyle.text,
     this.onTap,
     required this.isEditing,
     this.hasError = false,
@@ -313,11 +313,11 @@ class VoicesEditSaveButton extends StatelessWidget {
     }
 
     return switch (style) {
-      VoicesEditSaveButtonStyle.text => VoicesTextButton(
+      VoicesEditCancelButtonStyle.text => VoicesTextButton(
           onTap: onTap,
           child: Text(text, style: textStyle),
         ),
-      VoicesEditSaveButtonStyle.outlinedWithIcon => VoicesOutlinedButton(
+      VoicesEditCancelButtonStyle.outlinedWithIcon => VoicesOutlinedButton(
           onTap: onTap,
           leading: VoicesAssets.icons.pencilAlt.buildIcon(),
           child: Text(
@@ -329,7 +329,7 @@ class VoicesEditSaveButton extends StatelessWidget {
   }
 }
 
-enum VoicesEditSaveButtonStyle {
+enum VoicesEditCancelButtonStyle {
   text,
   outlinedWithIcon,
 }

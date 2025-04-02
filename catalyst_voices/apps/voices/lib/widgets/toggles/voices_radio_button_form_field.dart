@@ -91,7 +91,7 @@ class _RadioButtonList extends StatelessWidget {
       return textStyle;
     }
     return textStyle?.copyWith(
-      color: context.colors.textDisabled,
+      color: context.colors.textOnPrimaryLevel1,
     );
   }
 }

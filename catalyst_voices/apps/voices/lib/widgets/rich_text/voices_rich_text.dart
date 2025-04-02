@@ -254,7 +254,8 @@ class _EditorState extends State<_Editor> {
           /* cSpell:enable */
           customStyles: quill.DefaultStyles(
             placeHolder: quill.DefaultTextBlockStyle(
-              textTheme.bodyLarge?.copyWith(color: theme.colors.textDisabled) ??
+              textTheme.bodyLarge
+                      ?.copyWith(color: theme.colors.textOnPrimaryLevel1) ??
                   DefaultTextStyle.of(context).style,
               quill.HorizontalSpacing.zero,
               quill.VerticalSpacing.zero,

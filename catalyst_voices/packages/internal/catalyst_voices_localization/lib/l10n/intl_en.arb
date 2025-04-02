@@ -45,6 +45,10 @@
   "@saveButtonText": {
     "description": "Text shown in save button"
   },
+  "saveChangesButtonText": "Save Changes",
+  "@saveChangesButtonText": {
+    "description": "Text shown in save button"
+  },
   "passwordLabelText": "Password",
   "@passwordLabelText": {
     "description": "Text shown in password field"
