@@ -163,7 +163,7 @@ async fn validate_against_original_doc(
         Err(e) => anyhow::bail!("Database error: {e}"),
     };
     if let Some(original_doc) = original_doc {
-        if original_doc.id() != &doc_id.uuid() && original_doc.ver() != &doc_ver.uuid() {
+        if original_doc.id() != &doc_id.uuid() || original_doc.ver() != &doc_ver.uuid() {
             let Ok(original_authors) = original_doc
                 .body()
                 .authors()
