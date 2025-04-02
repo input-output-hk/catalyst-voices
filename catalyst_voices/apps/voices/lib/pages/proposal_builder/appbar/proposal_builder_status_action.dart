@@ -269,10 +269,19 @@ class _PopupMenuButtonState extends State<_PopupMenuButton> {
 
     final nextIteration = latestVersion.number;
 
-    // if it's local draft and the first version then
-    // it should be shown as local which corresponds to null
-    final currentIteration =
-        _isLocal(state.metadata.publish, nextIteration) ? null : nextIteration;
+    final int? currentIteration;
+    if (_isLocal(state.metadata.publish, nextIteration)) {
+      // if it's local draft and the first version then
+      // it should be shown as local which corresponds to null
+      currentIteration = null;
+    } else if (state.metadata.publish == ProposalPublish.localDraft) {
+      // current iteration is a local draft
+      // so next iteration must increment the version
+      currentIteration = nextIteration - 1;
+    } else {
+      // only changing status of the iteration, no need to increment the version
+      currentIteration = nextIteration;
+    }
 
     final shouldSubmit = await SubmitProposalForReviewDialog.show(
           context: context,
