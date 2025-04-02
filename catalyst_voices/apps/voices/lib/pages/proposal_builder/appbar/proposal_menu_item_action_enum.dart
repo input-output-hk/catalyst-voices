@@ -3,11 +3,11 @@ import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/widgets.dart';
 
 enum ProposalMenuItemAction {
   view(clickable: false),
-  back,
   edit,
   publish,
   submit,
@@ -38,8 +38,6 @@ enum ProposalMenuItemAction {
         return workspace
             ? VoicesAssets.icons.eye
             : VoicesAssets.icons.documentText;
-      case ProposalMenuItemAction.back:
-        return VoicesAssets.icons.logout1;
       case ProposalMenuItemAction.publish:
         return VoicesAssets.icons.chatAlt2;
       case ProposalMenuItemAction.submit:
@@ -64,17 +62,15 @@ enum ProposalMenuItemAction {
     String? proposalTitle,
     int currentIteration,
   ) {
-    final nextIteration = currentIteration + 1;
     return switch (this) {
       ProposalMenuItemAction.view =>
         (proposalTitle != null && proposalTitle.isNotBlank)
             ? proposalTitle
             : context.l10n.proposalEditorStatusDropdownViewTitle,
-      ProposalMenuItemAction.back => context.l10n.proposalEditorBackToProposals,
       ProposalMenuItemAction.publish =>
-        context.l10n.proposalEditorStatusDropdownPublishTitle(nextIteration),
+        context.l10n.proposalEditorStatusDropdownPublishTitle(currentIteration),
       ProposalMenuItemAction.submit =>
-        context.l10n.proposalEditorStatusDropdownSubmitTitle(nextIteration),
+        context.l10n.proposalEditorStatusDropdownSubmitTitle(currentIteration),
       ProposalMenuItemAction.forget => context.l10n.forgetProposal,
       ProposalMenuItemAction.export =>
         context.l10n.proposalEditorStatusDropdownExportTitle,
@@ -102,10 +98,10 @@ enum ProposalMenuItemAction {
     BuildContext context,
     ProposalBuilderMetadata metadata,
   ) {
-    final currentIteration = metadata.latestVersion?.number ?? 0;
-    final nextIteration = currentIteration + 1;
+    final currentIteration =
+        metadata.latestVersion?.number ?? DocumentVersion.firstNumber;
     return context.l10n.proposalEditorStatusDropdownViewDescription(
-      nextIteration,
+      currentIteration,
     );
   }
 
@@ -114,9 +110,9 @@ enum ProposalMenuItemAction {
   ) {
     switch (proposalPublish) {
       case ProposalPublish.localDraft:
-        return [view, back, publish, submit, export, delete];
+        return [view, publish, submit, export, delete];
       case ProposalPublish.publishedDraft:
-        return [view, back, submit, forget, export];
+        return [view, submit, forget, export];
       case ProposalPublish.submittedProposal:
         // Submitted can't be open in editor
         return [];
