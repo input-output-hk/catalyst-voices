@@ -5,7 +5,6 @@ final class DocumentLinkReadItem extends DocumentPropertyValueListItem<String> {
   const DocumentLinkReadItem({
     required super.id,
     required super.title,
-    required super.isRequired,
     required super.value,
   });
 }
@@ -15,7 +14,6 @@ final class DocumentMarkdownListItem
   const DocumentMarkdownListItem({
     required super.id,
     required super.title,
-    required super.isRequired,
     required super.value,
   });
 }
@@ -23,20 +21,18 @@ final class DocumentMarkdownListItem
 sealed class DocumentPropertyValueListItem<T> extends Equatable {
   final DocumentNodeId id;
   final String title;
-  final bool isRequired;
   final T? value;
 
   const DocumentPropertyValueListItem({
     required this.id,
     required this.title,
-    required this.isRequired,
     required this.value,
   });
 
   bool get isEmpty => title.isEmpty && value == null;
 
   @override
-  List<Object?> get props => [id, title, isRequired, value];
+  List<Object?> get props => [id, title, value];
 }
 
 final class DocumentTextListItem extends DocumentPropertyValueListItem<String> {
@@ -45,7 +41,6 @@ final class DocumentTextListItem extends DocumentPropertyValueListItem<String> {
   const DocumentTextListItem({
     required super.id,
     required super.title,
-    required super.isRequired,
     required super.value,
     this.isMultiline = false,
   });

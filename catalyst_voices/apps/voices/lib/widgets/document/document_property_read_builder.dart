@@ -77,7 +77,6 @@ class _DocumentPropertyReadBuilderState
             yield DocumentTextListItem(
               id: property.nodeId,
               title: '',
-              isRequired: schema.isRequired,
               value: value?.toString(),
             );
           case DocumentSegmentSchema():
@@ -115,7 +114,6 @@ class _DocumentPropertyReadBuilderState
         return DocumentTextListItem(
           id: property.nodeId,
           title: schema.title,
-          isRequired: schema.isRequired,
           value: text,
         );
       case DocumentTokenValueCardanoAdaSchema():
@@ -125,7 +123,6 @@ class _DocumentPropertyReadBuilderState
         return DocumentTextListItem(
           id: property.nodeId,
           title: schema.title,
-          isRequired: schema.isRequired,
           value: text,
         );
       case DocumentDurationInMonthsSchema():
@@ -135,7 +132,6 @@ class _DocumentPropertyReadBuilderState
         return DocumentTextListItem(
           id: property.nodeId,
           title: schema.title,
-          isRequired: schema.isRequired,
           value: text,
         );
       case DocumentSingleLineHttpsUrlEntrySchema():
@@ -144,7 +140,6 @@ class _DocumentPropertyReadBuilderState
         return DocumentLinkReadItem(
           id: property.nodeId,
           title: schema.title,
-          isRequired: schema.isRequired,
           value: link,
         );
       case DocumentMultiLineTextEntrySchema():
@@ -153,7 +148,6 @@ class _DocumentPropertyReadBuilderState
         return DocumentTextListItem(
           id: property.nodeId,
           title: schema.title,
-          isRequired: schema.isRequired,
           value: text,
           isMultiline: true,
         );
@@ -164,7 +158,6 @@ class _DocumentPropertyReadBuilderState
         return DocumentMarkdownListItem(
           id: property.nodeId,
           title: schema.title,
-          isRequired: schema.isRequired,
           value: data,
         );
       case DocumentTagGroupSchema():
@@ -178,7 +171,6 @@ class _DocumentPropertyReadBuilderState
         return DocumentTextListItem(
           id: property.nodeId,
           title: schema.title,
-          isRequired: schema.isRequired,
           value: text,
         );
       case DocumentDropDownSingleSelectSchema():
@@ -190,7 +182,6 @@ class _DocumentPropertyReadBuilderState
         return DocumentTextListItem(
           id: property.nodeId,
           title: schema.title,
-          isRequired: schema.isRequired,
           value: value?.toString(),
         );
     }
