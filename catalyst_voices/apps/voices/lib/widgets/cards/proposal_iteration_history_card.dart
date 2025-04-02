@@ -177,7 +177,7 @@ class _ProposalIterationHistoryState extends State<ProposalIterationHistory> {
             Padding(
               padding: const EdgeInsets.symmetric(
                 vertical: 6,
-                horizontal: 17,
+                horizontal: 16,
               ),
               child: Row(
                 children: [
@@ -197,10 +197,15 @@ class _ProposalIterationHistoryState extends State<ProposalIterationHistory> {
                       boldTitle: true,
                     )
                   else
-                    Text(
-                      context.l10n.publishingHistory,
-                      style: context.textTheme.labelMedium?.copyWith(
-                        color: context.colors.textOnPrimaryLevel1,
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 14,
+                      ),
+                      child: Text(
+                        context.l10n.publishingHistory,
+                        style: context.textTheme.labelMedium?.copyWith(
+                          color: context.colors.textOnPrimaryLevel1,
+                        ),
                       ),
                     ),
                   const Spacer(),

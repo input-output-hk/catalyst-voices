@@ -399,31 +399,18 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   }) {
     final localDocs = _localDocuments
         .watchAll(
-      limit: limit,
-      unique: unique,
-      type: type,
-      authorId: authorId,
-      refTo: refTo,
-    )
-        .asyncMap((documents) async {
-      final typedDocuments = documents.cast<DocumentData>();
-      final results = await Future.wait(
-        typedDocuments
-            .where((doc) => doc.metadata.template != null)
-            .map((documentData) async {
-          final resolvedRef = refGetter(documentData);
-          final refData = await _documentDataLock.synchronized(
-            () => getDocumentData(ref: resolvedRef),
-          );
-          return DocumentsDataWithRefData(
-            data: documentData,
-            refData: refData,
-          );
-        }).toList(),
-      );
-
-      return results;
-    });
+          limit: limit,
+          unique: unique,
+          type: type,
+          authorId: authorId,
+          refTo: refTo,
+        )
+        .asyncMap(
+          (documents) async => _processDocuments(
+            documents: documents,
+            refGetter: refGetter,
+          ),
+        );
 
     if (!getLocalDrafts) {
       return localDocs;
@@ -431,42 +418,27 @@ final class DocumentRepositoryImpl implements DocumentRepository {
 
     final localDrafts = _drafts
         .watchAll(
-      limit: limit,
-      type: type,
-      authorId: authorId,
-    )
-        .asyncMap((documents) async {
-      final typedDocuments = documents.cast<DocumentData>();
-      final results = await Future.wait(
-        typedDocuments
-            .where((doc) => doc.metadata.template != null)
-            .map((documentData) async {
-          final templateRef = documentData.metadata.template!;
-          final templateData = await _documentDataLock.synchronized(
-            () => getDocumentData(ref: templateRef),
-          );
-          return DocumentsDataWithRefData(
-            data: documentData,
-            refData: templateData,
-          );
-        }).toList(),
-      );
-      return results;
-    });
+          limit: limit,
+          type: type,
+          authorId: authorId,
+        )
+        .asyncMap(
+          (documents) async => _processDocuments(
+            documents: documents,
+            useTemplate: true,
+          ),
+        );
 
-    return Rx.combineLatest2(
+    // Combine streams
+    return Rx.combineLatest2<List<DocumentsDataWithRefData>,
+        List<DocumentsDataWithRefData>, List<DocumentsDataWithRefData>>(
       localDocs,
       localDrafts,
-      (
-        List<DocumentsDataWithRefData> docs,
-        List<DocumentsDataWithRefData> drafts,
-      ) {
+      (docs, drafts) {
         final combined = {...docs, ...drafts};
         return combined.toList();
       },
-    ).distinct(
-      listEquals,
-    );
+    ).distinct(listEquals);
   }
 
   @override
@@ -608,6 +580,39 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     await _localDocuments.save(data: remoteData);
 
     return remoteData;
+  }
+
+  Future<List<DocumentsDataWithRefData>> _processDocuments({
+    required List<dynamic> documents,
+    ValueResolver<DocumentData, DocumentRef>? refGetter,
+    bool useTemplate = false,
+  }) async {
+    final typedDocuments = documents.cast<DocumentData>();
+    final results = <DocumentsDataWithRefData>[];
+
+    // Process documents sequentially instead of parallel
+    for (final documentData in typedDocuments) {
+      if (documentData.metadata.template == null) continue;
+
+      try {
+        final ref = useTemplate
+            ? documentData.metadata.template!
+            : refGetter!(documentData);
+
+        final refData = await getDocumentData(ref: ref);
+
+        results.add(
+          DocumentsDataWithRefData(
+            data: documentData,
+            refData: refData,
+          ),
+        );
+      } catch (e) {
+        continue;
+      }
+    }
+
+    return results;
   }
 
   Stream<DocumentData?> _watchDocumentData({
