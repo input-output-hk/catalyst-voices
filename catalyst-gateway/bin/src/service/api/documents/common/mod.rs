@@ -2,13 +2,12 @@
 //! endpoint module not specified to a specific endpoint.
 
 use catalyst_signed_doc::CatalystSignedDocument;
-use catalyst_types::id_uri::{key_rotation::KeyRotation, role_index::RoleIndex};
 use rbac_registration::cardano::cip509::RoleNumber;
 
 use super::templates::get_doc_static_template;
 use crate::{
     db::event::{error::NotFoundError, signed_docs::FullSignedDoc},
-    service::common::auth::rbac::{scheme, token::CatalystRBACTokenV1},
+    service::common::auth::rbac::scheme,
 };
 
 /// Get document from the database
@@ -46,69 +45,56 @@ impl catalyst_signed_doc::providers::CatalystSignedDocumentProvider for DocProvi
 // TODO: make the struct to support multi sigs validation
 /// A struct which implements a
 /// `catalyst_signed_doc::providers::CatalystSignedDocumentProvider` trait
-pub(crate) struct VerifyingKeyProvider((ed25519_dalek::VerifyingKey, usize));
-
-impl VerifyingKeyProvider {
-    // TODO: cat-lib add support for this role
-    /// Role index for the proposer role.
-    const PROPOSER_ROLE: u8 = 3;
-}
+pub(crate) struct VerifyingKeyProvider(
+    Vec<(
+        catalyst_signed_doc::IdUri,
+        ed25519_dalek::VerifyingKey,
+        usize,
+    )>,
+);
 
 impl catalyst_signed_doc::providers::VerifyingKeyProvider for VerifyingKeyProvider {
     async fn try_get_key(
         &self, kid: &catalyst_signed_doc::IdUri,
     ) -> anyhow::Result<Option<ed25519_dalek::VerifyingKey>> {
-        // check if the doc is using the latest kid
-        let kid_rotation =
-            KeyRotation::from(u16::try_from(self.0 .1).map_err(anyhow::Error::from)?);
-        if kid.role_and_rotation()
-            == (
-                RoleIndex::from(u16::from(Self::PROPOSER_ROLE)),
-                kid_rotation,
-            )
-        {
-            return Err(anyhow::anyhow!(
-                "Failed to validate the document: not using the latest key"
-            ));
-        }
+        let res = self.0.iter().find(|(id, ..)| id == kid).map(|item| item.1);
 
-        Ok(Some(self.0 .0))
+        Ok(res)
     }
 }
 
 impl VerifyingKeyProvider {
     /// Gets the latest public key for the proposer role for the given `catid` from the
     /// token.
-    pub(crate) async fn try_from_token(token: &CatalystRBACTokenV1) -> anyhow::Result<Self> {
-        let cat_id = token.catalyst_id();
-        let network = token.network();
-        let (role_index, _) = token.catalyst_id().role_and_rotation();
-        let role_index = RoleNumber::from(role_index.to_string().parse::<u8>()?);
+    pub(crate) async fn try_from_kids(
+        network: cardano_blockchain_types::Network, kids: &[catalyst_signed_doc::IdUri],
+    ) -> anyhow::Result<Self> {
+        let mut result = Vec::with_capacity(kids.len());
+        for kid in kids {
+            let (role_index, _) = kid.role_and_rotation();
+            let role_index = RoleNumber::from(role_index.to_string().parse::<u8>()?);
 
-        let reg_queries = scheme::indexed_registrations(cat_id).await?;
+            let reg_queries = scheme::indexed_registrations(kid).await?;
 
-        if reg_queries.is_empty() {
-            return Err(anyhow::anyhow!(
-                "Unable to find registrations for {cat_id} Catalyst ID"
-            ));
+            let reg_chain = scheme::build_reg_chain(network, &reg_queries)
+                .await
+                .map_err(|e| {
+                    anyhow::anyhow!(
+                        "Failed to build a registration chain for {kid} Catalyst ID: {e:?}"
+                    )
+                })?;
+
+            let (latest_pk, rotation) = reg_chain
+                .get_latest_signing_pk_for_role(&role_index)
+                .ok_or_else(|| {
+                    anyhow::anyhow!(
+                        "Failed to get last signing key for the proposer role for {kid} Catalyst ID"
+                    )
+                })?;
+
+            result.push((kid.clone(), latest_pk, rotation));
         }
 
-        let reg_chain = scheme::build_reg_chain(network, &reg_queries)
-            .await
-            .map_err(|e| {
-                anyhow::anyhow!(
-                    "Failed to build a registration chain for {cat_id} Catalyst ID: {e:?}"
-                )
-            })?;
-
-        let (latest_pk, rotation) = reg_chain
-            .get_latest_signing_pk_for_role(&role_index)
-            .ok_or_else(|| {
-                anyhow::anyhow!(
-                    "Failed to get last signing key for the proposer role for {cat_id} Catalyst ID"
-                )
-            })?;
-
-        Ok(Self((latest_pk, rotation)))
+        Ok(Self(result))
     }
 }
