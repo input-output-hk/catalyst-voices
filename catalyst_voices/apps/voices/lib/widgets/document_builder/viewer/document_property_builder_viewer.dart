@@ -232,12 +232,14 @@ class _ListItem extends StatelessWidget {
   final bool isRequired;
   final Widget value;
   final bool isMultiline;
+  final bool isAnswered;
 
   const _ListItem({
     required this.title,
     required this.isRequired,
     required this.value,
     this.isMultiline = false,
+    this.isAnswered = false,
   });
 
   @override
@@ -254,12 +256,17 @@ class _ListItem extends StatelessWidget {
           DocumentPropertyBuilderTitle(
             title: title,
             isRequired: isRequired,
+            color: isAnswered
+                ? colors.textOnPrimaryLevel1
+                : colors.textOnPrimaryLevel0,
           ),
           const SizedBox(height: 8),
         ],
         DefaultTextStyle(
           style: (textTheme.bodyMedium ?? const TextStyle()).copyWith(
-            color: colors.textOnPrimaryLevel0,
+            color: isAnswered
+                ? colors.textOnPrimaryLevel0
+                : colors.textOnPrimaryLevel1,
           ),
           maxLines: !isMultiline ? 1 : null,
           overflow: !isMultiline ? TextOverflow.ellipsis : TextOverflow.clip,
@@ -288,6 +295,7 @@ class _ListItemBuilder extends StatelessWidget {
               ? LinkText(value)
               : Text(context.l10n.proposalEditorNotAnswered),
           isMultiline: true,
+          isAnswered: value != null,
         ),
       DocumentMarkdownListItem(:final value) => _ListItem(
           title: item.title,
@@ -296,12 +304,14 @@ class _ListItemBuilder extends StatelessWidget {
               ? MarkdownText(value)
               : Text(context.l10n.proposalEditorNotAnswered),
           isMultiline: true,
+          isAnswered: value != null && value.data.isNotBlank,
         ),
       DocumentTextListItem(:final value, :final isMultiline) => _ListItem(
           title: item.title,
           isRequired: item.isRequired,
           value: Text(value ?? context.l10n.proposalEditorNotAnswered),
           isMultiline: isMultiline,
+          isAnswered: value != null,
         ),
     };
   }

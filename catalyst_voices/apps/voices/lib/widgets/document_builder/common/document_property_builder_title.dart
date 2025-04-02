@@ -5,11 +5,13 @@ import 'package:flutter/material.dart';
 class DocumentPropertyBuilderTitle extends StatelessWidget {
   final String title;
   final bool isRequired;
+  final Color? color;
 
   const DocumentPropertyBuilderTitle({
     super.key,
     required this.title,
     required this.isRequired,
+    this.color,
   });
 
   @override
@@ -19,7 +21,7 @@ class DocumentPropertyBuilderTitle extends StatelessWidget {
       maxLines: 1,
       overflow: TextOverflow.ellipsis,
       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-            color: Theme.of(context).colors.textOnPrimaryLevel1,
+            color: color ?? Theme.of(context).colors.textOnPrimaryLevel1,
           ),
     );
   }
