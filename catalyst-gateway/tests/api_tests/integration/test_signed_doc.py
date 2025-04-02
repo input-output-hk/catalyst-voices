@@ -125,6 +125,39 @@ def comment_doc_factory(proposal_doc_factory, comment_templates) -> SignedDocume
     return __comment_doc_factory
 
 
+# return a submission action document.
+@pytest.fixture
+def submission_action_factory(
+    proposal_doc_factory, comment_templates
+) -> SignedDocument:
+    def __submission_action_factory() -> SignedDocument:
+        proposal_doc = proposal_doc_factory()
+        submission_action_id = uuid7str()
+        sub_action_metadata_json = {
+            "id": submission_action_id,
+            "ver": submission_action_id,
+            # submission action type
+            "type": "5e60e623-ad02-4a1b-a1ac-406db978ee48",
+            "content-type": "application/json",
+            "content-encoding": "br",
+            "ref": {"id": proposal_doc.metadata["id"]},
+        }
+        with open(
+            "./test_data/signed_docs/submission_action.json", "r"
+        ) as comment_json_file:
+            comment_json = json.load(comment_json_file)
+
+        doc = SignedDocument(sub_action_metadata_json, comment_json)
+        resp = document.put(data=doc.hex())
+        assert (
+            resp.status_code == 201
+        ), f"Failed to publish sub_action: {resp.status_code} - {resp.text}"
+
+        return doc
+
+    return __submission_action_factory
+
+
 def test_templates(proposal_templates, comment_templates):
     templates = proposal_templates + comment_templates
     for template_id in templates:
@@ -233,6 +266,47 @@ def test_comment_doc(comment_doc_factory):
     ), f"Publish document, expected 422 Unprocessable Content: {resp.status_code} - {resp.text}"
 
     logger.info("Comment document test successful.")
+
+
+def test_submission_action(submission_action_factory):
+    submission_action = submission_action_factory()
+    submission_action_id = submission_action.metadata["id"]
+
+    # Put a submission action document
+    resp = document.put(data=submission_action.hex())
+    assert (
+        resp.status_code == 204
+    ), f"Failed to publish document: {resp.status_code} - {resp.text}"
+
+    # Get the submission action doc
+    resp = document.get(document_id=submission_action_id)
+    assert (
+        resp.status_code == 200
+    ), f"Failed to get document: {resp.status_code} - {resp.text}"
+
+    # Post a signed document with filter ID
+    resp = document.post("/index", filter={"id": {"eq": submission_action_id}})
+    assert (
+        resp.status_code == 200
+    ), f"Failed to post document: {resp.status_code} - {resp.text}"
+
+    # Submission action document MUST have a ref
+    invalid_doc = submission_action.copy()
+    invalid_doc.metadata["ref"] = {}
+    resp = document.put(data=invalid_doc.hex())
+    assert (
+        resp.status_code == 422
+    ), f"Publish document, expected 422 Unprocessable Content: {resp.status_code} - {resp.text}"
+
+    # Put a submission action document referencing an unknown proposal
+    invalid_doc = submission_action.copy()
+    invalid_doc.metadata["ref"] = {"id": uuid7str()}
+    resp = document.put(data=invalid_doc.hex())
+    assert (
+        resp.status_code == 422
+    ), f"Publish document, expected 422 Unprocessable Content: {resp.status_code} - {resp.text}"
+
+    logger.info("Submission action document test successful.")
 
 
 def test_document_index_endpoint(proposal_doc_factory):
