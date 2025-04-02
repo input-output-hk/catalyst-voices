@@ -7,7 +7,7 @@ import 'package:catalyst_voices_repositories/src/dto/config/config.dart';
 import 'package:http/http.dart' as http;
 
 abstract interface class RemoteConfigSource {
-  Future<RemoteConfig> fetch();
+  Future<RemoteConfig> get();
 }
 
 final class UrlRemoteConfigSource implements RemoteConfigSource {
@@ -18,7 +18,7 @@ final class UrlRemoteConfigSource implements RemoteConfigSource {
   });
 
   @override
-  Future<RemoteConfig> fetch() async {
+  Future<RemoteConfig> get() async {
     final response = await http.get(Uri.parse(url));
     final isSuccess = response.statusCode >= 200 && response.statusCode < 300;
 

@@ -724,8 +724,29 @@ final class TransactionBuilderConfig extends Equatable {
   });
 
   @override
-  List<Object?> get props =>
-      [feeAlgo, maxTxSize, maxValueSize, coinsPerUtxoByte];
+  List<Object?> get props => [
+        feeAlgo,
+        maxTxSize,
+        maxValueSize,
+        coinsPerUtxoByte,
+      ];
+
+  /// Creates copy of this config with updated parameters.
+  TransactionBuilderConfig copyWith({
+    TieredFee? feeAlgo,
+    int? maxTxSize,
+    int? maxValueSize,
+    Coin? coinsPerUtxoByte,
+    CoinSelectionStrategy? selectionStrategy,
+  }) {
+    return TransactionBuilderConfig(
+      feeAlgo: feeAlgo ?? this.feeAlgo,
+      maxTxSize: maxTxSize ?? this.maxTxSize,
+      maxValueSize: maxValueSize ?? this.maxValueSize,
+      coinsPerUtxoByte: coinsPerUtxoByte ?? this.coinsPerUtxoByte,
+      selectionStrategy: selectionStrategy ?? this.selectionStrategy,
+    );
+  }
 }
 
 /// Builder and utils around [TransactionOutput].

@@ -45,9 +45,7 @@ Future<BootstrapArgs> bootstrap({
 
   final configSource = UrlRemoteConfigSource(url: environment.configUrl);
   final configService = ConfigService(ConfigRepository(configSource));
-  final config = await configService
-      .getAppConfig()
-      .onError((error, stackTrace) => const AppConfig());
+  final config = await configService.getAppConfig(env: environment.type);
 
   await _cleanupOldStorages();
   await registerDependencies(environment: environment, config: config);

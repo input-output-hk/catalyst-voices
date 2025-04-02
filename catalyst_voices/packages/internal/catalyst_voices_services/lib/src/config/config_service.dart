@@ -3,20 +3,28 @@ import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 
 // ignore: one_member_abstracts
 abstract interface class ConfigService {
-  factory ConfigService(ConfigRepository repository) {
-    return ConfigServiceImpl(repository);
-  }
+  const factory ConfigService(ConfigRepository repository) = ConfigServiceImpl;
 
-  Future<AppConfig> getAppConfig();
+  Future<AppConfig> getAppConfig({
+    required AppEnvironmentType env,
+  });
 }
 
 final class ConfigServiceImpl implements ConfigService {
   final ConfigRepository _repository;
 
-  ConfigServiceImpl(
+  const ConfigServiceImpl(
     this._repository,
   );
 
   @override
-  Future<AppConfig> getAppConfig() => _repository.getAppConfig();
+  Future<AppConfig> getAppConfig({
+    required AppEnvironmentType env,
+  }) async {
+    final appConfigs = await _repository.getAppConfig();
+
+    final envConfig = appConfigs.environments[env];
+
+    return envConfig ?? const AppConfig.fallback();
+  }
 }

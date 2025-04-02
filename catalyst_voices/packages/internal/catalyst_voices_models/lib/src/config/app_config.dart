@@ -1,5 +1,5 @@
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
-import 'package:catalyst_voices_models/src/user/catalyst_id.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:equatable/equatable.dart';
 
 final class ApiConfig extends Equatable {
@@ -19,6 +19,18 @@ final class ApiConfig extends Equatable {
         vitUrl,
         reviewsUrl,
       ];
+
+  ApiConfig copyWith({
+    String? gatewayUrl,
+    String? vitUrl,
+    String? reviewsUrl,
+  }) {
+    return ApiConfig(
+      gatewayUrl: gatewayUrl ?? this.gatewayUrl,
+      vitUrl: vitUrl ?? this.vitUrl,
+      reviewsUrl: reviewsUrl ?? this.reviewsUrl,
+    );
+  }
 }
 
 final class AppConfig extends Equatable {
@@ -38,6 +50,12 @@ final class AppConfig extends Equatable {
 
   const AppConfig.fallback() : this();
 
+  factory AppConfig.env(AppEnvironmentType env) {
+    // TODO(damian-molinski): build default config for each env.
+
+    return AppConfig.fallback();
+  }
+
   @override
   List<Object?> get props => [
         api,
@@ -46,6 +64,22 @@ final class AppConfig extends Equatable {
         sentry,
         blockchain,
       ];
+
+  AppConfig copyWith({
+    ApiConfig? api,
+    CacheConfig? cache,
+    DatabaseConfig? database,
+    SentryConfig? sentry,
+    BlockchainConfig? blockchain,
+  }) {
+    return AppConfig(
+      api: api ?? this.api,
+      cache: cache ?? this.cache,
+      database: database ?? this.database,
+      sentry: sentry ?? this.sentry,
+      blockchain: blockchain ?? this.blockchain,
+    );
+  }
 }
 
 final class BlockchainConfig extends Equatable {
@@ -70,6 +104,19 @@ final class BlockchainConfig extends Equatable {
 
   @override
   List<Object?> get props => [networkId, host, transactionBuilderConfig];
+
+  BlockchainConfig copyWith({
+    NetworkId? networkId,
+    CatalystIdHost? host,
+    TransactionBuilderConfig? transactionBuilderConfig,
+  }) {
+    return BlockchainConfig(
+      networkId: networkId ?? this.networkId,
+      host: host ?? this.host,
+      transactionBuilderConfig:
+          transactionBuilderConfig ?? this.transactionBuilderConfig,
+    );
+  }
 }
 
 final class CacheConfig extends Equatable {
@@ -81,6 +128,14 @@ final class CacheConfig extends Equatable {
 
   @override
   List<Object?> get props => [expiryDuration];
+
+  CacheConfig copyWith({
+    ExpiryDuration? expiryDuration,
+  }) {
+    return CacheConfig(
+      expiryDuration: expiryDuration ?? this.expiryDuration,
+    );
+  }
 }
 
 final class DatabaseConfig extends Equatable {
@@ -111,6 +166,14 @@ final class ExpiryDuration extends Equatable {
 
   @override
   List<Object?> get props => [keychainUnlock];
+
+  ExpiryDuration copyWith({
+    Duration? keychainUnlock,
+  }) {
+    return ExpiryDuration(
+      keychainUnlock: keychainUnlock ?? this.keychainUnlock,
+    );
+  }
 }
 
 final class SentryConfig extends Equatable {
@@ -126,8 +189,7 @@ final class SentryConfig extends Equatable {
   final String diagnosticLevel;
 
   const SentryConfig({
-    this.dns =
-        'https://8e333ddbed1e096c70e4ed006892c355@o622089.ingest.us.sentry.io/4507113601433600',
+    this.dns = '',
     this.environment = 'catalyst-voices@dev',
     this.release = '1.0.0',
     this.tracesSampleRate = 1.0,
@@ -152,4 +214,31 @@ final class SentryConfig extends Equatable {
         debug,
         diagnosticLevel,
       ];
+
+  SentryConfig copyWith({
+    String? dns,
+    String? environment,
+    String? release,
+    double? tracesSampleRate,
+    double? profilesSampleRate,
+    bool? enableAutoSessionTracking,
+    bool? attachScreenshot,
+    bool? attachViewHierarchy,
+    bool? debug,
+    String? diagnosticLevel,
+  }) {
+    return SentryConfig(
+      dns: dns ?? this.dns,
+      environment: environment ?? this.environment,
+      release: release ?? this.release,
+      tracesSampleRate: tracesSampleRate ?? this.tracesSampleRate,
+      profilesSampleRate: profilesSampleRate ?? this.profilesSampleRate,
+      enableAutoSessionTracking:
+          enableAutoSessionTracking ?? this.enableAutoSessionTracking,
+      attachScreenshot: attachScreenshot ?? this.attachScreenshot,
+      attachViewHierarchy: attachViewHierarchy ?? this.attachViewHierarchy,
+      debug: debug ?? this.debug,
+      diagnosticLevel: diagnosticLevel ?? this.diagnosticLevel,
+    );
+  }
 }

@@ -7,13 +7,11 @@ part 'remote_config.g.dart';
 final class RemoteConfig {
   final String? version;
   final DateTime? createdAt;
-  final DateTime? updatedAt;
   final Map<String, Map<String, dynamic>> environments;
 
   const RemoteConfig({
     this.version,
     this.createdAt,
-    this.updatedAt,
     this.environments = const {},
   });
 
