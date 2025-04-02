@@ -135,7 +135,6 @@ class _IterationVersionList extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 spacing: 6,
                 children: versions
-                    .skip(1)
                     .map(
                       (e) => _IterationVersion(
                         version: e,
@@ -157,7 +156,8 @@ class _ProposalIterationHistoryState extends State<ProposalIterationHistory> {
 
   bool get _hasNewerLocalIteration {
     if (widget.proposal.versions.isEmpty) return false;
-    return widget.proposal.versions.first.isLatestVersion(
+    final latestVersion = widget.proposal.versions.first;
+    return latestVersion.isLatestVersion(
       widget.proposal.selfRef.version ?? '',
     );
   }
@@ -207,7 +207,7 @@ class _ProposalIterationHistoryState extends State<ProposalIterationHistory> {
                   Offstage(
                     offstage: !_hasNewerLocalIteration,
                     child: _Actions(
-                      ref: widget.proposal.selfRef,
+                      ref: widget.proposal.versions.first.selfRef,
                     ),
                   ),
                 ],

@@ -32,6 +32,16 @@ final class DatabaseDocumentsDataSource implements SignedDocumentDataSource {
   }
 
   @override
+  Future<DocumentData?> getRefToDocumentData({
+    required DocumentRef refTo,
+    DocumentType? type,
+  }) {
+    return _database.documentsDao
+        .queryRefToDocumentData(refTo: refTo, type: type)
+        .then((e) => e?.toModel());
+  }
+
+  @override
   Future<List<DocumentRef>> index() {
     return _database.documentsDao.queryAllRefs();
   }

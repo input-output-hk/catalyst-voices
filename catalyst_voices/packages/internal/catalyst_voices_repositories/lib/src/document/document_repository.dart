@@ -78,6 +78,11 @@ abstract interface class DocumentRepository {
     required DocumentType type,
   });
 
+  Future<DocumentData?> getRefToDocumentData({
+    required DocumentRef refTo,
+    required DocumentType type,
+  });
+
   /// Imports a document [data] previously encoded by [encodeDocumentForExport].
   ///
   /// The document reference will be altered to avoid linking
@@ -283,6 +288,14 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     required DocumentType type,
   }) {
     return _localDocuments.getRefCount(ref: ref, type: type);
+  }
+
+  @override
+  Future<DocumentData?> getRefToDocumentData({
+    required DocumentRef refTo,
+    required DocumentType type,
+  }) {
+    return _localDocuments.getRefToDocumentData(refTo: refTo, type: type);
   }
 
   @override

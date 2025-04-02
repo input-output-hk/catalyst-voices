@@ -48,6 +48,10 @@ abstract interface class ProposalRepository {
     required DocumentRef ref,
   });
 
+  Future<ProposalPublish?> getProposalPublishForRef({
+    required DocumentRef ref,
+  });
+
   /// Fetches all proposals.
   Future<ProposalsSearchResult> getProposals({
     required ProposalPaginationRequest request,
@@ -98,7 +102,7 @@ abstract interface class ProposalRepository {
   /// As making action on document not always creates a new document ref
   /// we need to watch for actions on a document that has a reference to
   /// [refTo] document.
-  Stream<ProposalSubmissionAction?> watchProposalSubmissionAction({
+  Stream<ProposalPublish?> watchProposalPublish({
     required SignedDocumentRef refTo,
   });
 
@@ -139,6 +143,11 @@ final class ProposalRepositoryImpl implements ProposalRepository {
       ref: ref,
       type: DocumentType.commentDocument,
     );
+    final proposalPublish = await getProposalPublishForRef(ref: ref);
+    if (proposalPublish == null) {
+      // TODO(LynxLynxx): handle this case
+      throw StateError('Proposal not found/ Proposal is forgotten');
+    }
     final templateRef = documentData.metadata.template!;
     final documentTemplate =
         await _documentRepository.getDocumentData(ref: templateRef);
@@ -151,22 +160,41 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     );
     final proposalVersions = documentVersions
         .map(
-          (e) => _buildProposalData(
-            documentData: e,
-            documentTemplate: documentTemplate,
-            // TODO(LynxLynxx): implement method to get publish status
-            publish: ProposalPublish.publishedDraft,
-          ),
+          (e) async {
+            final proposalPublish =
+                await getProposalPublishForRef(ref: e.metadata.selfRef);
+            if (proposalPublish == null) {
+              return null;
+            }
+            return _buildProposalData(
+              documentData: e,
+              documentTemplate: documentTemplate,
+              publish: proposalPublish,
+            );
+          },
         )
+        .whereType<ProposalData>()
         .toList();
 
     return ProposalData(
       document: proposalDocument,
       commentsCount: commentsCount,
       versions: proposalVersions,
-      // TODO(LynxLynxx): implement method to get publish status
-      publish: ProposalPublish.publishedDraft,
+      publish: proposalPublish,
     );
+  }
+
+  @override
+  Future<ProposalPublish?> getProposalPublishForRef({
+    required DocumentRef ref,
+  }) async {
+    final data = await _documentRepository.getRefToDocumentData(
+      refTo: ref,
+      type: DocumentType.proposalActionDocument,
+    );
+
+    final action = _buildProposalActionData(data);
+    return _getProposalPublish(ref: ref, action: action);
   }
 
   @override
@@ -339,7 +367,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   }
 
   @override
-  Stream<ProposalSubmissionAction?> watchProposalSubmissionAction({
+  Stream<ProposalPublish?> watchProposalPublish({
     required SignedDocumentRef refTo,
   }) {
     return _documentRepository
@@ -347,15 +375,9 @@ final class ProposalRepositoryImpl implements ProposalRepository {
       refTo: refTo,
       type: DocumentType.proposalActionDocument,
     )
-        .map((action) {
-      if (action == null) {
-        return null;
-      }
-      final proposalAction = ProposalSubmissionActionDocumentDto.fromJson(
-        action.content.data,
-      ).action.toModel();
-
-      return proposalAction;
+        .map((data) {
+      final action = _buildProposalActionData(data);
+      return _getProposalPublish(ref: refTo, action: action);
     });
   }
 
@@ -384,6 +406,19 @@ final class ProposalRepositoryImpl implements ProposalRepository {
             },
           ).toList(),
         );
+  }
+
+  ProposalSubmissionAction? _buildProposalActionData(
+    DocumentData? action,
+  ) {
+    if (action == null) {
+      return null;
+    }
+    final proposalAction = ProposalSubmissionActionDocumentDto.fromJson(
+      action.content.data,
+    ).action.toModel();
+
+    return proposalAction;
   }
 
   BaseProposalData _buildProposalData({
@@ -504,6 +539,21 @@ final class ProposalRepositoryImpl implements ProposalRepository {
       maxResults: favoritesRefs.length,
       proposals: proposals,
     );
+  }
+
+  ProposalPublish? _getProposalPublish({
+    required DocumentRef ref,
+    required ProposalSubmissionAction? action,
+  }) {
+    if (ref is DraftRef) {
+      return ProposalPublish.localDraft;
+    } else {
+      return switch (action) {
+        ProposalSubmissionAction.aFinal => ProposalPublish.submittedProposal,
+        ProposalSubmissionAction.hide => null,
+        _ => ProposalPublish.publishedDraft,
+      };
+    }
   }
 
   Future<ProposalsSearchResult> _getUserProposalsSearchResult(

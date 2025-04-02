@@ -53,6 +53,13 @@ abstract interface class DocumentsDao {
   /// Returns all known document refs.
   Future<List<SignedDocumentRef>> queryAllRefs();
 
+  /// Returns document with matching refTo and type.
+  /// It return only lates version of document matching [refTo]
+  Future<DocumentEntity?> queryRefToDocumentData({
+    required DocumentRef refTo,
+    DocumentType? type,
+  });
+
   /// Returns a list of version of ref object.
   /// Can be used to get versions count.
   Future<List<DocumentEntity>> queryVersionsOfId({required String id});
@@ -211,6 +218,30 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
 
       return SignedDocumentRef(id: id.uuid, version: version.uuid);
     }).get();
+  }
+
+  @override
+  Future<DocumentEntity?> queryRefToDocumentData({
+    required DocumentRef refTo,
+    DocumentType? type,
+  }) async {
+    final query = select(documents)
+      ..where(
+        (row) => Expression.and([
+          if (type != null) row.type.equals(type.uuid),
+          row.metadata.jsonExtract<String>(r'$.ref.id').equals(refTo.id),
+          if (refTo.version != null)
+            row.metadata
+                .jsonExtract<String>(r'$.ref.version')
+                .equals(refTo.version!),
+        ]),
+      )
+      ..orderBy([
+        (u) => OrderingTerm.desc(u.verHi),
+      ])
+      ..limit(1);
+
+    return query.getSingleOrNull();
   }
 
   @override

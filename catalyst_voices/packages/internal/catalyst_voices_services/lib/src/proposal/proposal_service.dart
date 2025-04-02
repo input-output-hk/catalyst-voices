@@ -447,24 +447,15 @@ final class ProposalServiceImpl implements ProposalService {
           }
 
           return _proposalRepository
-              .watchProposalSubmissionAction(
-                refTo: doc.metadata.selfRef as SignedDocumentRef,
+              .watchProposalPublish(
+                refTo: selfRef as SignedDocumentRef,
               )
-              .where(
-                (action) => action != ProposalSubmissionAction.hide,
-              )
-              .map((action) {
-            final publishState = switch (action) {
-              ProposalSubmissionAction.aFinal =>
-                ProposalPublish.submittedProposal,
-              ProposalSubmissionAction.draft => ProposalPublish.publishedDraft,
-              _ => throw StateError('Hidden proposals should be filtered out'),
-            };
-
+              .where((event) => event != null)
+              .map((publishState) {
             return ProposalData(
               document: doc,
               categoryName: campaign.categoryText,
-              publish: publishState,
+              publish: publishState!,
             );
           });
         }),
@@ -496,13 +487,26 @@ final class ProposalServiceImpl implements ProposalService {
                 id: proposal.document.metadata.selfRef.id,
                 includeLocalDrafts: true,
               );
-              final proposalDataVersion = versions
-                  .map(
-                    (e) => ProposalData(
+              final proposalDataVersion = (await Future.wait(
+                versions.map(
+                  (e) async {
+                    final selfRef = e.metadata.selfRef;
+                    final action =
+                        await _proposalRepository.getProposalPublishForRef(
+                      ref: selfRef,
+                    );
+                    if (action == null) {
+                      return null;
+                    }
+
+                    return ProposalData(
                       document: e,
-                      publish: ProposalPublish.localDraft,
-                    ),
-                  )
+                      publish: action,
+                    );
+                  },
+                ).toList(),
+              ))
+                  .whereType<ProposalData>()
                   .toList();
               return proposal.copyWith(versions: proposalDataVersion);
             }),
