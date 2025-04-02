@@ -136,7 +136,7 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     if (proposal == null || proposal.selfRef is! SignedDocumentRef) {
       return emitError(const LocalizedUnknownException());
     }
-    await _proposalService.unlockProposal(
+    await _proposalService.forgetProposal(
       proposalRef: proposal.selfRef as SignedDocumentRef,
       categoryId: proposal.categoryId,
     );

@@ -384,6 +384,7 @@ final class ProposalServiceImpl implements ProposalService {
           final versionIds = await _proposalRepository.queryVersionsOfId(
             id: doc.metadata.selfRef.id,
           );
+
           final category =
               await _campaignRepository.getCategory(doc.metadata.categoryId);
           final versionsData = versionIds

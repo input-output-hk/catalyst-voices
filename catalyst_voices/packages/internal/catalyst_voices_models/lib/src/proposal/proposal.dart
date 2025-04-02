@@ -109,6 +109,8 @@ final class Proposal extends Equatable {
         category,
         categoryId,
         commentsCount,
+        versionCount,
+        versions,
       ];
 
   int get versionCount => versions.length;
