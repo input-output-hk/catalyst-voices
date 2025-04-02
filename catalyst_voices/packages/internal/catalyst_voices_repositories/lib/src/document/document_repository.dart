@@ -13,8 +13,6 @@ import 'package:flutter/foundation.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:synchronized/synchronized.dart';
 
-final _logger = Logger('DocumentRepository');
-
 DocumentRef _templateResolver(DocumentData data) => data.metadata.template!;
 
 abstract interface class DocumentRepository {

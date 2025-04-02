@@ -379,51 +379,19 @@ final class ProposalServiceImpl implements ProposalService {
     return _proposalRepository
         .watchLatestProposals(limit: limit)
         .switchMap((documents) async* {
-      final proposalsStreams = await Future.wait(
-        documents.map((doc) async {
-          final versionIds = await _proposalRepository.queryVersionsOfId(
-            id: doc.metadata.selfRef.id,
-          );
-          final proposalPublish = await _proposalRepository
-              .getProposalPublishForRef(ref: doc.metadata.selfRef);
-
-          final category =
-              await _campaignRepository.getCategory(doc.metadata.categoryId);
-          final versionsData = versionIds
-              .map(
-                (e) => BaseProposalData(
-                  document: e,
-                  // TODO(LynxLynxx): implement method to get publish status
-                  publish: ProposalPublish.publishedDraft,
-                ),
-              )
-              .toList();
-
-          return _proposalRepository
-              .watchCount(
-            ref: doc.metadata.selfRef,
-            type: DocumentType.commentTemplate,
-          )
-              .map((commentsCount) {
-            final proposalData = ProposalData(
-              document: doc,
-              categoryName: category.categoryText,
-              versions: versionsData,
-              commentsCount: commentsCount,
-              // TODO(LynxLynxx): implement method to get publish status
-              publish: ProposalPublish.publishedDraft,
-            );
-            return Proposal.fromData(proposalData);
-          });
-        }),
+      final proposalsDataStreams = await Future.wait(
+        documents.map(_createProposalDataStream).toList(),
       );
 
-      await for (final commentsUpdates in Rx.combineLatest(
-        proposalsStreams,
-        (List<Proposal> proposals) => proposals,
-      )) {
-        yield commentsUpdates;
-      }
+      yield* Rx.combineLatest(
+        proposalsDataStreams,
+        (List<ProposalData> proposalsData) async {
+          final proposalsWithVersions = await Future.wait(
+            proposalsData.map(_addVersionsToProposal),
+          );
+          return proposalsWithVersions.map(Proposal.fromData).toList();
+        },
+      ).switchMap(Stream.fromFuture);
     });
   }
 
@@ -434,26 +402,7 @@ final class ProposalServiceImpl implements ProposalService {
         .watchUserProposals(authorId: authorId)
         .switchMap((documents) async* {
       final proposalsDataStreams = await Future.wait(
-        documents.map((doc) async {
-          final selfRef = doc.metadata.selfRef;
-          final campaign =
-              await _campaignRepository.getCategory(doc.metadata.categoryId);
-
-          return _proposalRepository
-              .watchProposalPublish(
-                refTo: selfRef,
-              )
-              .where(
-                (publishState) => publishState != null,
-              )
-              .map(
-                (publishState) => ProposalData(
-                  document: doc,
-                  categoryName: campaign.categoryText,
-                  publish: publishState!,
-                ),
-              );
-        }).toList(),
+        documents.map(_createProposalDataStream).toList(),
       );
 
       yield* Rx.combineLatest(
@@ -475,42 +424,69 @@ final class ProposalServiceImpl implements ProposalService {
               .expand((group) => group)
               .toList();
 
-          // Create list to store proposals with versions
           final proposalsWithVersions = await Future.wait(
-            filteredProposalsData.map((proposal) async {
-              final versions = await _proposalRepository.queryVersionsOfId(
-                id: proposal.document.metadata.selfRef.id,
-                includeLocalDrafts: true,
-              );
-              final proposalDataVersion = (await Future.wait(
-                versions.map(
-                  (e) async {
-                    final selfRef = e.metadata.selfRef;
-                    final action =
-                        await _proposalRepository.getProposalPublishForRef(
-                      ref: selfRef,
-                    );
-                    if (action == null) {
-                      return null;
-                    }
-
-                    return ProposalData(
-                      document: e,
-                      publish: action,
-                    );
-                  },
-                ).toList(),
-              ))
-                  .whereType<ProposalData>()
-                  .toList();
-              return proposal.copyWith(versions: proposalDataVersion);
-            }),
+            filteredProposalsData.map(_addVersionsToProposal),
           );
-
           return proposalsWithVersions.map(Proposal.fromData).toList();
         },
       ).switchMap(Stream.fromFuture);
     });
+  }
+
+  // Helper method to fetch versions for a proposal
+  Future<ProposalData> _addVersionsToProposal(ProposalData proposal) async {
+    final versions = await _proposalRepository.queryVersionsOfId(
+      id: proposal.document.metadata.selfRef.id,
+      includeLocalDrafts: true,
+    );
+    final proposalDataVersion = (await Future.wait(
+      versions.map(
+        (e) async {
+          final selfRef = e.metadata.selfRef;
+          final action = await _proposalRepository.getProposalPublishForRef(
+            ref: selfRef,
+          );
+          if (action == null) {
+            return null;
+          }
+
+          return ProposalData(
+            document: e,
+            publish: action,
+          );
+        },
+      ).toList(),
+    ))
+        .whereType<ProposalData>()
+        .toList();
+
+    return proposal.copyWith(versions: proposalDataVersion);
+  }
+
+  Future<Stream<ProposalData>> _createProposalDataStream(
+    ProposalDocument doc,
+  ) async {
+    final selfRef = doc.metadata.selfRef;
+    final campaign =
+        await _campaignRepository.getCategory(doc.metadata.categoryId);
+
+    final commentsCountStream = _proposalRepository.watchCount(
+      ref: selfRef,
+      type: DocumentType.commentTemplate,
+    );
+
+    return Rx.combineLatest2(
+      _proposalRepository
+          .watchProposalPublish(refTo: selfRef)
+          .where((publishState) => publishState != null),
+      commentsCountStream,
+      (ProposalPublish? publishState, int commentsCount) => ProposalData(
+        document: doc,
+        categoryName: campaign.categoryText,
+        publish: publishState!,
+        commentsCount: commentsCount,
+      ),
+    );
   }
 
   Future<CatalystId> _getUserCatalystId() async {
