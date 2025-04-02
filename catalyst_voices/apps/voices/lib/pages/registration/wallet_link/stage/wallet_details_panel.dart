@@ -133,10 +133,15 @@ class _RegistrationTextBackNextNavigation extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        VoicesFilledButton(
-          onTap: () => RegistrationCubit.of(context).nextStep(),
-          leading: VoicesAssets.icons.users.buildIcon(),
-          child: Text(context.l10n.walletLinkRolesSubheader),
+        Semantics(
+          container: true,
+          button: true,
+          label: 'selectRolesBtn',
+          child: VoicesFilledButton(
+            onTap: () => RegistrationCubit.of(context).nextStep(),
+            leading: VoicesAssets.icons.users.buildIcon(),
+            child: Text(context.l10n.walletLinkRolesSubheader),
+          ),
         ),
         const SizedBox(height: 10),
         VoicesOutlinedButton(

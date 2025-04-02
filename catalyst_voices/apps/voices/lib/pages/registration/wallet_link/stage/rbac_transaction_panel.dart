@@ -338,17 +338,22 @@ class _BlocSubmitTxButton extends StatelessWidget {
         canSubmitTx: state.canSubmitTx?.isSuccess ?? false,
       ),
       builder: (context, state) {
-        return VoicesFilledButton(
-          leading: VoicesAssets.icons.wallet.buildIcon(),
-          onTap: state.canSubmitTx ? onSubmit : null,
-          trailing: state.isLoading
-              ? const SizedBox(
-                  width: 16,
-                  height: 16,
-                  child: VoicesCircularProgressIndicator(),
-                )
-              : null,
-          child: Text(context.l10n.walletLinkTransactionSign),
+        return Semantics(
+          button: true,
+          container: true,
+          label: 'SignBtn',
+          child: VoicesFilledButton(
+            leading: VoicesAssets.icons.wallet.buildIcon(),
+            onTap: state.canSubmitTx ? onSubmit : null,
+            trailing: state.isLoading
+                ? const SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: VoicesCircularProgressIndicator(),
+                  )
+                : null,
+            child: Text(context.l10n.walletLinkTransactionSign),
+          ),
         );
       },
     );

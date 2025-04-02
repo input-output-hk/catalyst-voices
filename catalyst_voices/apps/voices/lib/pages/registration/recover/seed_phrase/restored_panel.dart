@@ -36,17 +36,24 @@ class RestoredPanel extends StatelessWidget {
         ),
         const Spacer(),
         const SizedBox(height: 10),
-        VoicesFilledButton(
-          key: const Key('RecoverySuccessGoToDashboardButton'),
-          onTap: () => _redirectToDashboard(context),
-          child: Text(context.l10n.recoverySuccessGoToDashboard),
+        Semantics(container: true,
+        label: 'Go to dashboard',
+          child: VoicesFilledButton(
+            key: const Key('RecoverySuccessGoToDashboardButton'),
+            onTap: () => _redirectToDashboard(context),
+            child: Text(context.l10n.recoverySuccessGoToDashboard),
+          ),
         ),
         const SizedBox(height: 10),
-        VoicesTextButton(
+        Semantics( 
+          container: true,
+          button: true,
+          label: 'Go to account',
+          child: VoicesTextButton(
           key: const Key('RecoverySuccessGoAccountButton'),
           onTap: () => _redirectToMyAccount(context),
           child: Text(context.l10n.recoverySuccessGoAccount),
-        ),
+        )),
       ],
     );
   }

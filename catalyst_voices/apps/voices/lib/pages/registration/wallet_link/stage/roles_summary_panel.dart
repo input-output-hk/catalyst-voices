@@ -25,13 +25,16 @@ class RolesSummaryPanel extends StatelessWidget {
         const SizedBox(height: 12),
         const _BlocRolesSummaryContainer(),
         const Spacer(),
-        VoicesFilledButton(
+        Semantics( container: true,
+        label: 'reviewRegTransaction',
+        button: true,
+        child :VoicesFilledButton(
           leading: VoicesAssets.icons.wallet.buildIcon(),
           onTap: () {
             RegistrationCubit.of(context).nextStep();
           },
           child: Text(context.l10n.reviewRegistrationTransaction),
-        ),
+        ),),
         const SizedBox(height: 10),
         VoicesTextButton(
           onTap: () {

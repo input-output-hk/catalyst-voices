@@ -44,9 +44,13 @@ class _SelectWalletPanelState extends State<SelectWalletPanel> {
         ),
         const SizedBox(height: 40),
         Expanded(
-          child: _BlocWallets(
-            onRefreshTap: _refreshWallets,
-            onSelectWallet: _onSelectWallet,
+          child: Semantics(
+            container: true,
+            label: 'WalletsList',
+            child: _BlocWallets(
+              onRefreshTap: _refreshWallets,
+              onSelectWallet: _onSelectWallet,
+            ),
           ),
         ),
         const SizedBox(height: 24),
@@ -103,10 +107,14 @@ class _BlocWallets extends StatelessWidget {
       key: const Key('WalletsLinkBuilder'),
       selector: (state) => state.wallets,
       builder: (context, state) {
-        return _Wallets(
-          result: state,
-          onRefreshTap: onRefreshTap,
-          onSelectWallet: onSelectWallet,
+        return Semantics(
+          container: true,
+          label: 'Wallets',
+          child: _Wallets(
+            result: state,
+            onRefreshTap: onRefreshTap,
+            onSelectWallet: onSelectWallet,
+          ),
         );
       },
     );
@@ -178,11 +186,15 @@ class _WalletTileState extends State<_WalletTile> {
 
   @override
   Widget build(BuildContext context) {
-    return VoicesWalletTile(
-      iconSrc: widget.wallet.icon,
-      name: Text(widget.wallet.name),
-      isLoading: _isLoading,
-      onTap: _onSelectWallet,
+    return Semantics(
+      container: true,
+      label: 'WalletTile',
+      child: VoicesWalletTile(
+        iconSrc: widget.wallet.icon,
+        name: Text(widget.wallet.name),
+        isLoading: _isLoading,
+        onTap: _onSelectWallet,
+      ),
     );
   }
 
