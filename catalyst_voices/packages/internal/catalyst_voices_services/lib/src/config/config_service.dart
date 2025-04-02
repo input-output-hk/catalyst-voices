@@ -21,7 +21,7 @@ final class ConfigServiceImpl implements ConfigService {
   Future<AppConfig> getAppConfig({
     required AppEnvironmentType env,
   }) async {
-    final appConfigs = await _repository.getAppConfig();
+    final appConfigs = await _repository.getAppConfigs();
 
     final envConfig = appConfigs.environments[env];
 

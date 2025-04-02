@@ -48,7 +48,8 @@ final class AppConfigFactory {
       ),
       cache: defaultEnvConfig.cache.copyWith(
         expiryDuration: defaultEnvConfig.cache.expiryDuration.copyWith(
-          keychainUnlock: remote.cache?.expiryDuration?.keychainUnlock,
+          keychainUnlock:
+              remote.cache?.expiryDuration?.keychainUnlock?.asDuration(),
         ),
       ),
       sentry: defaultEnvConfig.sentry.copyWith(
@@ -82,6 +83,8 @@ extension on String {
 
 extension on int {
   Coin asCoin() => Coin(this);
+
+  Duration asDuration() => Duration(seconds: this);
 }
 
 extension on RemoteTransactionSelectionStrategyType {

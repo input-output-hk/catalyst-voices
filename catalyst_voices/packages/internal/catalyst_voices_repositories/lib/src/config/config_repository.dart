@@ -9,7 +9,7 @@ abstract interface class ConfigRepository {
     RemoteConfigSource remoteSource,
   ) = ConfigRepositoryImpl;
 
-  Future<AppConfigs> getAppConfig();
+  Future<AppConfigs> getAppConfigs();
 }
 
 final class ConfigRepositoryImpl implements ConfigRepository {
@@ -20,7 +20,7 @@ final class ConfigRepositoryImpl implements ConfigRepository {
   );
 
   @override
-  Future<AppConfigs> getAppConfig() async {
+  Future<AppConfigs> getAppConfigs() async {
     final remoteConfig = await remoteSource
         .get()
         .onError((error, stackTrace) => const RemoteConfig());

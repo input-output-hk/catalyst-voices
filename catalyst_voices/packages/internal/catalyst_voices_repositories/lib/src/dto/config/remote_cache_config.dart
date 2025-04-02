@@ -17,7 +17,7 @@ final class RemoteCacheConfig {
 
 @JsonSerializable(createToJson: false)
 final class RemoteExpiryDuration {
-  final Duration? keychainUnlock;
+  final int? keychainUnlock;
 
   const RemoteExpiryDuration({
     this.keychainUnlock,
