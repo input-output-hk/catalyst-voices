@@ -1,0 +1,172 @@
+// Cardano Preprod data
+[
+    // Missing 0: purpose
+    {
+        "txn_id": "39d617f6337ac59e3ec3c7209aea96228a6573505949958fe0bd15024e2056e0",
+        "slot_no": 86772106,
+        "txn_index": 1,
+        "error": "MissingField { field: \"Purpose\" }"
+    },
+    // Missing 1: tx_input_hash
+    {
+        "txn_id": "7c984122756f81ce0efc30187223541e17c7050b7c39b0d785e18b5800c36f8e",
+        "slot_no": 86772860,
+        "txn_index": 1,
+        "error": "MissingField { field: \"TxInputsHash\" }"
+    },
+    // Missing 10/11/12: x509_chunks
+    {
+        "txn_id": "b715414d54c9501818bd4885364cbe9e92292d90b1a21987050e074895d7d876",
+        "slot_no": 86774356,
+        "txn_index": 0,
+        "error": "MissingField { field: \"metadata (10, 11 or 12 chunks)\" }"
+    },
+    // Missing 99: validation_signature
+    {
+        "txn_id": "2d9fbacab7f979eb952f631a427c86e3d94645fce6e25e5fb47b9681a7ac9691",
+        "slot_no": 86774921,
+        "txn_index": 0,
+        "error": "MissingField { field: \"ValidationSignature\" }"
+    },
+    // Missing 0: role number in role_data
+    {
+        "txn_id": "5737fca6517458495a05344d1d4ed17c8a69eb79d0205419b6d5ddd3332e1487",
+        "slot_no": 86798906,
+        "txn_index": 0,
+        "error": "MissingField { field: \"RoleNumber\" }"
+    },
+    // Invalid transaction_input_hash length
+    {
+        "txn_id": "d4fa65cda378b4d9fd6381448834a2e4e8bcb937203f99bf32672560c88fef5a",
+        "slot_no": 86797634,
+        "txn_index": 0,
+        "error": "InvalidValue { field: \"transaction inputs hash\", value: \"32 bytes\", constraint: \"must be 16 bytes long\" }"
+    },
+    // Role 0: CIP134URI in certificate not witness
+    {
+        "txn_id": "71eac3e8af1f817ce5dafe0e98bbce3104d0ee0007162dc845154397a05e86f4",
+        "slot_no": 86799613,
+        "txn_index": 0,
+        "error": "Failed to compare public keys with witnesses: Public key hash not found in transaction witness set given"
+    },
+    // Role 0: c509 = [cert], x509 =[cert], pk = []
+    {
+        "txn_id": "2792d056db55e80bde7d2a4a2303e2fb10f80060369727d0730ec33819ea965c",
+        "slot_no": 87191337,
+        "txn_index": 2,
+        "error": "Only one certificate can be defined at index 0 for the role 0"
+    },
+    // Role 0: no certs, no pk
+    {
+        "txn_id": "2f5b911eb4bd99e85e5e3ee7cadf76e8c50f7ccb9bc8b5cdda366c6a038d5a15",
+        "slot_no": 86800783,
+        "txn_index": 2,
+        "error": "The role 0 certificate must be present"
+    },
+    // Role 0: x509 = [undefined, cert], no pk and c509
+    {
+        "txn_id": "3d90e6ababa232ecdd3af17d302b37e61642772575065679fc48ce90b1969f62",
+        "slot_no": 86839187,
+        "txn_index": 1,
+        "error": "Invalid X509 certificate value (Undefined) for role 0"
+    },
+    // Role 0: c509 = [undefined, cert], no pk and x509
+    {
+        "txn_id": "7215f4f5d61afb20ef7ba9a86635137d29be83caa7b1cf4438aa763990831213",
+        "slot_no": 87618942,
+        "txn_index": 1,
+        "error": "Invalid C509 certificate value (Undefined) for role 0"
+    },
+    // Role 0: x509 = [cert], pk = [pk], signing key ref to x509 cert index 0
+    {
+        "txn_id": "cef0ee2e9e7f43ea62ac1e8ba247a4173180aed965b4cdce1eaf5e7d19c6f37d",
+        "slot_no": 86802306,
+        "txn_index": 1,
+        "error": "The public key cannot be used at 0 index. Role 0 requires a certificate and other roles must set 0 public key to undefined if needed."
+    },
+    // Role 0: c509 = [cert], pk = [pk], signing key ref to c509 cert index 0
+    {
+        "txn_id": "70d4ed4c12c1367a9c3827eeb2abadca127fbd504241a0181022478df5f0a031",
+        "slot_no": 87619395,
+        "txn_index": 1,
+        "error": "The public key cannot be used at 0 index. Role 0 requires a certificate and other roles must set 0 public key to undefined if needed."
+    },
+    // Role 0: no signing key
+    {
+        "txn_id": "01416cb5c2554d51d9f134589cab24d0b35fed008573efd3d6bccc27356d0afc",
+        "slot_no": 86837620,
+        "txn_index": 0,
+        "error": "MissingField { field: \"(Role 0) RoleData::signing_key\" }"
+    },
+    // Role 0: have signing key and encryption key
+    {
+        "txn_id": "6fd0a0b37a2f898eb8aa4b2db0777271c374840593618849f9bb6eb8aa891f34",
+        "slot_no": 86838093,
+        "txn_index": 0,
+        "error": "The role 0 shouldn't have the encryption key" 
+    },
+    // Role 0: x509 = [deleted], signing key ref to x509 index 0
+    {
+        "txn_id": "da056acd157b1ed4e9329fdbf0fa25204dd4282de9d13ba608eac905c6c0079a",
+        "slot_no": 86863420,
+        "txn_index": 5,
+        "error": "Invalid X509 certificate value (Deleted) for role 0"
+    },
+    // Role 0: c509 = [deleted], no x509 and pk, signing key ref to c509 index 0
+    {
+        "txn_id": "828b1958045d228c37cd903c5b5d4086fccc93aa6a80713f6331d885e214a1b8",
+        "slot_no": 87620611,
+        "txn_index": 2,
+        "error": "Invalid C509 certificate value (Deleted) for role 0"
+    },
+    // Role 1: signing key ref to x509 cert index 0
+    {
+        "txn_id": "3267f5b6c42d9620e47422767d7203847bdd762e56f6654eeee3182d42fd51cb",
+        "slot_no": 86858119,
+        "txn_index": 0,
+        "error": "Invalid signing key: only role 0 can reference a certificate with 0 index"
+    },
+    // Role 1: signing key ref to c509 cert index 0
+    {
+        "txn_id": "6b5fd60afe16a382952834807e29a05471af5e665ecdc226290fce3a2c9fe22c",
+        "slot_no": 87620135,
+        "txn_index": 1,
+        "error": "Invalid signing key: only role 0 can reference a certificate with 0 index"
+    },
+    // Role 1: pk = [pk]
+    {
+        "txn_id": "ca962c265ed8534c6e7d0b780354886937c596f91bd00f732eba76658c10a5f9",
+        "slot_no": 86860298,
+        "txn_index": 1,
+        "error": "The public key cannot be used at 0 index. Role 0 requires a certificate and other roles must set 0 public key to undefined if needed"
+    },
+  
+    // Role 1: x509 = [deleted, cert], signing key ref to x509 index 1
+    {
+        "txn_id": "cc51554b706767abb1ede232c225156af60e402d68f2c925284aa95869c8fb63",
+        "slot_no": 87223943,
+        "txn_index": 5,
+        "error": "Only role 0 can delete a certificate at 0 index"
+    },
+    // Role 1: c509 = [deleted, cert], signing key ref to c509 index 1
+    {
+        "txn_id": "5acf1d91df773bf5142533630dd264f8f344fa2089df66747adabff0576631ee",
+        "slot_no": 87621116,
+        "txn_index": 1,
+        "error": "Only role 0 can delete a certificate at 0 index"
+    },
+    // Role 1: x509 = [cert, cert], signing key ref to x509 index 1
+    {
+        "txn_id": "e664fd4cb37b0176781daeb231c98b3f27148a76ec7cc3f8f9fd2649dff70dd4",
+        "slot_no": 86967888,
+        "txn_index": 0,
+        "error": "Only role 0 can contain a certificate at 0 index"
+    },
+    // Role 1: c509 = [cert, cert], signing key ref to c509 index 1
+    {
+        "txn_id": "c887fca053c6725ac056f99654d5a8b5198ce0f48e44166811f6595cf2f60978",
+        "slot_no": 87621265,
+        "txn_index": 3,
+        "error": "Only role 0 can contain a certificate at 0 index"
+    }
+]
