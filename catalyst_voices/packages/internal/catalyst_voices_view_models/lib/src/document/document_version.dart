@@ -2,6 +2,8 @@ import 'package:equatable/equatable.dart';
 
 // Note. Later we may want to add status enum.
 final class DocumentVersion extends Equatable {
+  static const int firstNumber = 1;
+
   final String id;
   final int number;
   final bool isCurrent;
