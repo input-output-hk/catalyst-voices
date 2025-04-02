@@ -106,6 +106,7 @@ abstract interface class DocumentRepository {
   /// Can be used to get versions count.
   Future<List<DocumentsDataWithRefData>> queryVersionsOfId({
     required String id,
+    bool includeLocalDrafts = false,
   });
 
   /// Updates fav status matching [ref].
@@ -169,17 +170,16 @@ abstract interface class DocumentRepository {
   });
 
   /// Looking for document with matching refTo and type.
-  /// It return documents that have a reference that matches [refTo]
+  /// It return documents data that have a reference that matches [refTo]
   ///
   /// This method is used when we want to find a document that has a reference
   /// to a document that we are looking for.
   ///
   /// For example, we want to find latest document action that were made
   /// on a [refTo] document.
-  Stream<DocumentsDataWithRefData?> watchRefToDocument({
+  Stream<DocumentData?> watchRefToDocumentData({
     required SignedDocumentRef refTo,
     required DocumentType type,
-    ValueResolver<DocumentData, DocumentRef> refGetter,
   });
 }
 
@@ -319,15 +319,23 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     // await _remoteDocuments.publish(document);
 
     final doc = DocumentDataFactory.create(document);
-    _logger.info('Saving document [${doc.content.data}]');
+    _logger.info('SAVING DOCUMENT: $doc');
     await _localDocuments.save(data: doc);
   }
 
   @override
   Future<List<DocumentsDataWithRefData>> queryVersionsOfId({
     required String id,
+    bool includeLocalDrafts = false,
   }) async {
-    final documents = await _localDocuments.queryVersionsOfId(id: id);
+    List<DocumentData> documents;
+    final localDocuments = await _localDocuments.queryVersionsOfId(id: id);
+    if (includeLocalDrafts) {
+      final localDrafts = await _drafts.queryVersionsOfId(id: id);
+      documents = [...localDocuments, ...localDrafts];
+    } else {
+      documents = localDocuments;
+    }
     if (documents.isEmpty) return [];
     final templateRef = documents.first.metadata.template!;
     final templateData = await getDocumentData(ref: templateRef);
@@ -553,39 +561,14 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   }
 
   @override
-  Stream<DocumentsDataWithRefData?> watchRefToDocument({
+  Stream<DocumentData?> watchRefToDocumentData({
     required SignedDocumentRef refTo,
     required DocumentType type,
     ValueResolver<DocumentData, DocumentRef> refGetter = _templateResolver,
   }) {
     return _localDocuments
-        .watchRefToDocument(refTo: refTo, type: type)
-        .distinct()
-        .switchMap<DocumentsDataWithRefData?>((document) {
-      if (document == null) {
-        return Stream.value(null);
-      }
-
-      final ref = refGetter(document);
-      final refDocumentStream = _watchDocumentData(
-        ref: ref,
-        // Synchronized because we may have many documents which are referring
-        // to the same template. When loading multiple documents at the same
-        // time we want to fetch only once template.
-        synchronizedUpdate: true,
-      );
-
-      return refDocumentStream.map<DocumentsDataWithRefData?>(
-        (refDocumentData) {
-          return refDocumentData != null
-              ? DocumentsDataWithRefData(
-                  data: document,
-                  refData: refDocumentData,
-                )
-              : null;
-        },
-      );
-    });
+        .watchRefToDocumentData(refTo: refTo, type: type)
+        .distinct();
   }
 
   Future<DocumentData> _getDraftDocumentData({

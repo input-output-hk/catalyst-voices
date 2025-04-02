@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/pages/proposal_builder/appbar/proposal_menu_item_action_enum.dart';
+import 'package:catalyst_voices/routes/routing/spaces_route.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/proposal_builder_delete_confirmation_dialog.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/publish_proposal_iteration_dialog.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/submit_proposal_for_review_dialog.dart';
@@ -179,6 +180,10 @@ class _PopupMenuButtonState extends State<_PopupMenuButton> {
     );
   }
 
+  void _backToProposals() {
+    const WorkspaceRoute().go(context);
+  }
+
   Future<void> _deleteProposal() async {
     final confirmed = await ProposalBuilderDeleteConfirmationDialog.show(
       context,
@@ -209,6 +214,8 @@ class _PopupMenuButtonState extends State<_PopupMenuButton> {
         _exportProposal();
       case ProposalMenuItemAction.delete:
         unawaited(_deleteProposal());
+      case ProposalMenuItemAction.back:
+        _backToProposals();
       case _:
         break;
     }

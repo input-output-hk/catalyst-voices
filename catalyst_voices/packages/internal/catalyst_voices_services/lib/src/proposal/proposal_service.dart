@@ -3,10 +3,8 @@ import 'dart:typed_data';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
-import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:collection/collection.dart';
 import 'package:rxdart/rxdart.dart';
-
-final _logger = Logger('ProposalService');
 
 abstract interface class ProposalService {
   const factory ProposalService(
@@ -390,7 +388,11 @@ final class ProposalServiceImpl implements ProposalService {
               await _campaignRepository.getCategory(doc.metadata.categoryId);
           final versionsData = versionIds
               .map(
-                (e) => BaseProposalData(document: e),
+                (e) => BaseProposalData(
+                  document: e,
+                  // TODO(LynxLynxx): implement method to get publish status
+                  publish: ProposalPublish.publishedDraft,
+                ),
               )
               .toList();
 
@@ -405,6 +407,8 @@ final class ProposalServiceImpl implements ProposalService {
               categoryName: category.categoryText,
               versions: versionsData,
               commentsCount: commentsCount,
+              // TODO(LynxLynxx): implement method to get publish status
+              publish: ProposalPublish.publishedDraft,
             );
             return Proposal.fromData(proposalData);
           });
@@ -426,46 +430,87 @@ final class ProposalServiceImpl implements ProposalService {
     yield* _proposalRepository
         .watchUserProposals(authorId: authorId)
         .switchMap((documents) async* {
-      final proposalsStreams = await Future.wait(
+      final proposalsDataStreams = await Future.wait(
         documents.map((doc) async {
+          final selfRef = doc.metadata.selfRef;
           final campaign =
               await _campaignRepository.getCategory(doc.metadata.categoryId);
 
-          if (doc.metadata.selfRef is DraftRef) {
+          if (selfRef is DraftRef) {
             return Stream.value(
-              Proposal.fromData(
-                ProposalData(
-                  document: doc,
-                  categoryName: campaign.categoryText,
-                ),
+              ProposalData(
+                document: doc,
+                categoryName: campaign.categoryText,
+                publish: ProposalPublish.localDraft,
               ),
             );
           }
 
           return _proposalRepository
               .watchProposalSubmissionAction(
-            refTo: doc.metadata.selfRef as SignedDocumentRef,
-          )
+                refTo: doc.metadata.selfRef as SignedDocumentRef,
+              )
+              .where(
+                (action) => action != ProposalSubmissionAction.hide,
+              )
               .map((action) {
-            _logger.info(
-              'Proposal action updated for [${doc.metadata}] action: $action',
-            );
-            return Proposal.fromData(
-              ProposalData(
-                document: doc,
-                categoryName: campaign.categoryText,
-              ),
+            final publishState = switch (action) {
+              ProposalSubmissionAction.aFinal =>
+                ProposalPublish.submittedProposal,
+              ProposalSubmissionAction.draft => ProposalPublish.publishedDraft,
+              _ => throw StateError('Hidden proposals should be filtered out'),
+            };
+
+            return ProposalData(
+              document: doc,
+              categoryName: campaign.categoryText,
+              publish: publishState,
             );
           });
         }),
       );
 
-      await for (final proposals in Rx.combineLatest(
-        proposalsStreams,
-        (List<Proposal> proposals) => proposals,
-      )) {
-        yield proposals;
-      }
+      yield* Rx.combineLatest(
+        proposalsDataStreams,
+        (List<ProposalData> proposalsData) async {
+          final groupedProposals = groupBy(
+            proposalsData,
+            (data) => data.document.metadata.selfRef.id,
+          );
+
+          final filteredProposalsData = groupedProposals.values
+              .map((group) {
+                if (group.any((p) => p.publish != ProposalPublish.localDraft)) {
+                  return group
+                      .where((p) => p.publish != ProposalPublish.localDraft);
+                }
+                return group;
+              })
+              .expand((group) => group)
+              .toList();
+
+          // Create list to store proposals with versions
+          final proposalsWithVersions = await Future.wait(
+            filteredProposalsData.map((proposal) async {
+              final versions = await _proposalRepository.queryVersionsOfId(
+                id: proposal.document.metadata.selfRef.id,
+                includeLocalDrafts: true,
+              );
+              final proposalDataVersion = versions
+                  .map(
+                    (e) => ProposalData(
+                      document: e,
+                      publish: ProposalPublish.localDraft,
+                    ),
+                  )
+                  .toList();
+              return proposal.copyWith(versions: proposalDataVersion);
+            }),
+          );
+
+          return proposalsWithVersions.map(Proposal.fromData).toList();
+        },
+      ).switchMap(Stream.fromFuture);
     });
   }
 

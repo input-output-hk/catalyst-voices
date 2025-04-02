@@ -79,7 +79,10 @@ abstract interface class ProposalRepository {
     required CatalystPrivateKey privateKey,
   });
 
-  Future<List<ProposalDocument>> queryVersionsOfId({required String id});
+  Future<List<ProposalDocument>> queryVersionsOfId({
+    required String id,
+    bool includeLocalDrafts = false,
+  });
 
   Future<void> upsertDraftProposal({required DocumentData document});
 
@@ -151,6 +154,8 @@ final class ProposalRepositoryImpl implements ProposalRepository {
           (e) => _buildProposalData(
             documentData: e,
             documentTemplate: documentTemplate,
+            // TODO(LynxLynxx): implement method to get publish status
+            publish: ProposalPublish.publishedDraft,
           ),
         )
         .toList();
@@ -159,6 +164,8 @@ final class ProposalRepositoryImpl implements ProposalRepository {
       document: proposalDocument,
       commentsCount: commentsCount,
       versions: proposalVersions,
+      // TODO(LynxLynxx): implement method to get publish status
+      publish: ProposalPublish.publishedDraft,
     );
   }
 
@@ -256,7 +263,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     final dto = ProposalSubmissionActionDocumentDto(
       action: ProposalSubmissionActionDto.fromModel(action),
     );
-    _logger.info('Publishing document [$ref] action: ${dto.action}');
+    _logger.info('Publishing document [$proposalRef] action: ${dto.action}');
 
     final signedDocument = await _signedDocumentManager.signDocument(
       SignedDocumentJsonPayload(dto.toJson()),
@@ -276,8 +283,14 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   }
 
   @override
-  Future<List<ProposalDocument>> queryVersionsOfId({required String id}) async {
-    final documents = await _documentRepository.queryVersionsOfId(id: id);
+  Future<List<ProposalDocument>> queryVersionsOfId({
+    required String id,
+    bool includeLocalDrafts = false,
+  }) async {
+    final documents = await _documentRepository.queryVersionsOfId(
+      id: id,
+      includeLocalDrafts: includeLocalDrafts,
+    );
 
     return documents
         .map(
@@ -330,7 +343,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     required SignedDocumentRef refTo,
   }) {
     return _documentRepository
-        .watchRefToDocument(
+        .watchRefToDocumentData(
       refTo: refTo,
       type: DocumentType.proposalActionDocument,
     )
@@ -338,9 +351,11 @@ final class ProposalRepositoryImpl implements ProposalRepository {
       if (action == null) {
         return null;
       }
+      final proposalAction = ProposalSubmissionActionDocumentDto.fromJson(
+        action.content.data,
+      ).action.toModel();
 
-      _logger.info('Watching proposal action for [$refTo] $action');
-      return null;
+      return proposalAction;
     });
   }
 
@@ -374,6 +389,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   BaseProposalData _buildProposalData({
     required DocumentData documentData,
     required DocumentData documentTemplate,
+    required ProposalPublish publish,
   }) {
     assert(
       documentData.metadata.type == DocumentType.proposalDocument,
@@ -385,7 +401,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
       templateData: documentTemplate,
     );
 
-    return BaseProposalData(document: document);
+    return BaseProposalData(document: document, publish: publish);
   }
 
   ProposalDocument _buildProposalDocument({

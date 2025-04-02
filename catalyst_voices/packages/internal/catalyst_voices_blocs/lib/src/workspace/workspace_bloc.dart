@@ -176,9 +176,9 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
 
         add(LoadProposalsEvent(proposals));
       },
-      onError: (Object error) {
+      onError: (Object error, StackTrace stackTrace) {
         if (isClosed) return;
-        _logger.info('Users proposals stream error', error);
+        _logger.info('Users proposals stream error', error, stackTrace);
         add(ErrorLoadProposalsEvent(LocalizedException.create(error)));
       },
     );

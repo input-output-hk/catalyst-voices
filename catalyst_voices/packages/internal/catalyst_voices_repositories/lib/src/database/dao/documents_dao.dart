@@ -84,7 +84,7 @@ abstract interface class DocumentsDao {
     required DocumentType type,
   });
 
-  Stream<DocumentEntity?> watchRefToDocument({
+  Stream<DocumentEntity?> watchRefToDocumentData({
     required SignedDocumentRef refTo,
     required DocumentType type,
   });
@@ -339,7 +339,7 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
   }
 
   @override
-  Stream<DocumentEntity?> watchRefToDocument({
+  Stream<DocumentEntity?> watchRefToDocumentData({
     required SignedDocumentRef refTo,
     required DocumentType type,
   }) {
