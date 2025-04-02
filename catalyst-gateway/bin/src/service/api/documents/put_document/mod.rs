@@ -142,8 +142,8 @@ pub(crate) async fn endpoint(doc_bytes: Vec<u8>, token: CatalystRBACTokenV1) -> 
             let Ok(original_authors) = original_doc
                 .body()
                 .authors()
-                .into_iter()
-                .map(|author| catalyst_signed_doc::IdUri::from_str(&author))
+                .iter()
+                .map(|author| catalyst_signed_doc::IdUri::from_str(author))
                 .collect::<Result<Vec<_>, _>>()
             else {
                 // FIXME: should be internal error
@@ -195,8 +195,8 @@ async fn store_document_in_db(
 ) -> anyhow::Result<bool> {
     let authors = doc
         .authors()
-        .into_iter()
-        .map(|kid| kid.to_string())
+        .iter()
+        .map(catalyst_signed_doc::IdUri::to_string)
         .collect();
 
     let doc_meta_json = match serde_json::to_value(doc.doc_meta()) {
