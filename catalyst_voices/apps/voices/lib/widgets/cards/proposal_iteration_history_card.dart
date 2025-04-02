@@ -2,11 +2,11 @@ import 'dart:async';
 
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/common/ext/proposal_publish_ext.dart';
-import 'package:catalyst_voices/common/formatters/date_formatter.dart';
 import 'package:catalyst_voices/routes/routing/proposal_builder_route.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_text_button.dart';
 import 'package:catalyst_voices/widgets/common/affix_decorator.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/proposal_builder_delete_confirmation_dialog.dart';
+import 'package:catalyst_voices/widgets/text/proposal_version_info_text.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
@@ -249,21 +249,15 @@ class _Title extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final datetime = DateFormatter.formatDayMonthTime(updateDate);
     final publishName = publish.localizedWorkspaceName(context.l10n);
     return AffixDecorator(
       prefix: VoicesAssets.icons.documentText.buildIcon(size: 18),
-      child: Text(
-        context.l10n.proposalIterationPublishUpdateAndTitle(
-          iteration,
-          publishName,
-          datetime,
-          title,
-        ),
-        style: context.textTheme.labelMedium?.copyWith(
-          color: context.colors.textOnPrimaryLevel1,
-          fontWeight: boldTitle ? FontWeight.bold : FontWeight.w100,
-        ),
+      child: ProposalVersionInfoText(
+        iteration: iteration,
+        publish: publishName,
+        updateDate: updateDate,
+        title: title,
+        boldTitle: boldTitle,
       ),
     );
   }

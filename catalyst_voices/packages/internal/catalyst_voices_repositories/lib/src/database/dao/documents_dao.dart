@@ -327,10 +327,6 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
           ),
     ]);
 
-    if (limit != null) {
-      query.limit(limit);
-    }
-
     if (unique) {
       return query.watch().map((list) {
         final latestVersions = <String, DocumentEntity>{};
@@ -340,10 +336,16 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
             latestVersions[id] = entity;
           }
         }
+        if (limit != null) {
+          return latestVersions.values.toList().take(limit).toList();
+        }
         return latestVersions.values.toList();
       });
     }
 
+    if (limit != null) {
+      query.limit(limit);
+    }
     return query.watch();
   }
 

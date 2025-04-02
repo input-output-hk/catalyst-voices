@@ -38,15 +38,6 @@ class WorkspaceProposalCard extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Row(
-                children: [
-                  Text(proposal.selfRef.id),
-                  const SizedBox(width: 4),
-                  const Text('|'),
-                  const SizedBox(width: 4),
-                  Text(proposal.selfRef.version.toString()),
-                ],
-              ),
               _Body(proposal),
               Offstage(
                 offstage:
