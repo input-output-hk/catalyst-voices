@@ -60,19 +60,6 @@ pub(crate) async fn endpoint(doc_bytes: Vec<u8>, token: CatalystRBACTokenV1) -> 
         .into();
     };
 
-    // validate rbac token and document KIDs (ignoring the role/rotation)
-    if doc
-        .kids()
-        .iter()
-        .any(|kid| kid.as_short_id() != token.catalyst_id().as_short_id())
-    {
-        return Responses::UnprocessableContent(Json(PutDocumentUnprocessableContent::new(
-            "RBAC Token CatID does not match with the providing document KIDs",
-            None,
-        )))
-        .into();
-    }
-
     // validate document integrity
     match catalyst_signed_doc::validator::validate(&doc, &DocProvider).await {
         Ok(true) => (),
@@ -91,9 +78,9 @@ pub(crate) async fn endpoint(doc_bytes: Vec<u8>, token: CatalystRBACTokenV1) -> 
 
     // validate document signatures
     let verifying_key_provider =
-        match VerifyingKeyProvider::try_from_kids(token.network(), &doc.kids()).await {
+        match VerifyingKeyProvider::try_from_kids(&token, &doc.kids()).await {
             Ok(value) => value,
-            Err(e) => return AllResponses::handle_error(&e),
+            Err(err) => return AllResponses::handle_error(&err),
         };
     match catalyst_signed_doc::validator::validate_signatures(&doc, &verifying_key_provider).await {
         Ok(true) => (),

@@ -7,7 +7,7 @@ use rbac_registration::cardano::cip509::RoleNumber;
 use super::templates::get_doc_static_template;
 use crate::{
     db::event::{error::NotFoundError, signed_docs::FullSignedDoc},
-    service::common::auth::rbac::scheme,
+    service::common::auth::rbac::{scheme, token::CatalystRBACTokenV1},
 };
 
 /// Get document from the database
@@ -67,13 +67,24 @@ impl VerifyingKeyProvider {
     /// Gets the latest public key for the proposer role for the given `catid` from the
     /// token.
     pub(crate) async fn try_from_kids(
-        network: cardano_blockchain_types::Network, kids: &[catalyst_signed_doc::IdUri],
+        token: &CatalystRBACTokenV1, kids: &[catalyst_signed_doc::IdUri],
     ) -> anyhow::Result<Self> {
+        let network = token.network();
+
+        // validate rbac token and document KIDs (ignoring the role/rotation)
+        if kids
+            .iter()
+            .any(|kid| kid.as_short_id() != token.catalyst_id().as_short_id())
+        {
+            anyhow::bail!("RBAC Token CatID does not match with the providing document KIDs");
+        }
+
         let mut result = Vec::with_capacity(kids.len());
         for kid in kids {
             let (role_index, _) = kid.role_and_rotation();
             let role_index = RoleNumber::from(role_index.to_string().parse::<u8>()?);
 
+            // TODO: should be able to get the reg chain from the processed rbac token
             let reg_queries = scheme::indexed_registrations(kid).await?;
 
             let reg_chain = scheme::build_reg_chain(network, &reg_queries)
