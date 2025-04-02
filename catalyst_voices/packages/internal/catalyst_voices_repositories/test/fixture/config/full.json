@@ -4,7 +4,7 @@
   "environments": {
     "prod": {
       "api": {
-        "gatewayUrl": "https://gateway.projectcatalyst.io",
+        "gateway": "https://gateway.projectcatalyst.io",
         "reviews": "https://api.reviews.projectcatalyst.io"
       },
       "cache": {
@@ -45,7 +45,7 @@
     },
     "preprod": {
       "api": {
-        "gatewayUrl": "https://gateway.preprod.projectcatalyst.io",
+        "gateway": "https://gateway.preprod.projectcatalyst.io",
         "reviews": "https://api.reviews.preprod.projectcatalyst.io"
       },
       "cache": {
@@ -86,7 +86,7 @@
     },
     "dev": {
       "api": {
-        "gatewayUrl": "https://gateway.dev.projectcatalyst.io",
+        "gateway": "https://gateway.dev.projectcatalyst.io",
         "reviews": "https://api.reviews.dev.projectcatalyst.io"
       },
       "cache": {

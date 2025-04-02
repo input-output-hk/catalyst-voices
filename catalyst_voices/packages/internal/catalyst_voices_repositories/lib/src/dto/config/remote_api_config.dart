@@ -4,12 +4,12 @@ part 'remote_api_config.g.dart';
 
 @JsonSerializable(createToJson: false)
 final class RemoteApiConfig {
-  final String? gatewayUrl;
-  final String? reviewsUrl;
+  final String? gateway;
+  final String? reviews;
 
   const RemoteApiConfig({
-    this.gatewayUrl,
-    this.reviewsUrl,
+    this.gateway,
+    this.reviews,
   });
 
   factory RemoteApiConfig.fromJson(Map<String, dynamic> json) {
