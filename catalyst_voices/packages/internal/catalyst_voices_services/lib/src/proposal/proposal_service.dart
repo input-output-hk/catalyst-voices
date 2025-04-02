@@ -384,6 +384,8 @@ final class ProposalServiceImpl implements ProposalService {
           final versionIds = await _proposalRepository.queryVersionsOfId(
             id: doc.metadata.selfRef.id,
           );
+          final proposalPublish = await _proposalRepository
+              .getProposalPublishForRef(ref: doc.metadata.selfRef);
 
           final category =
               await _campaignRepository.getCategory(doc.metadata.categoryId);
@@ -437,29 +439,21 @@ final class ProposalServiceImpl implements ProposalService {
           final campaign =
               await _campaignRepository.getCategory(doc.metadata.categoryId);
 
-          if (selfRef is DraftRef) {
-            return Stream.value(
-              ProposalData(
-                document: doc,
-                categoryName: campaign.categoryText,
-                publish: ProposalPublish.localDraft,
-              ),
-            );
-          }
-
           return _proposalRepository
               .watchProposalPublish(
-                refTo: selfRef as SignedDocumentRef,
+                refTo: selfRef,
               )
-              .where((event) => event != null)
-              .map((publishState) {
-            return ProposalData(
-              document: doc,
-              categoryName: campaign.categoryText,
-              publish: publishState!,
-            );
-          });
-        }),
+              .where(
+                (publishState) => publishState != null,
+              )
+              .map(
+                (publishState) => ProposalData(
+                  document: doc,
+                  categoryName: campaign.categoryText,
+                  publish: publishState!,
+                ),
+              );
+        }).toList(),
       );
 
       yield* Rx.combineLatest(

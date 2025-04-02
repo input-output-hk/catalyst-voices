@@ -11,8 +11,6 @@ import 'package:catalyst_voices_repositories/src/dto/proposal/proposal_submissio
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:rxdart/rxdart.dart';
 
-final _logger = Logger('ProposalRepository');
-
 final _proposalDescription = """
 Zanzibar is becoming one of the hotspots for DID's through
 World Mobile and PRISM, but its potential is only barely exploited.
@@ -103,7 +101,7 @@ abstract interface class ProposalRepository {
   /// we need to watch for actions on a document that has a reference to
   /// [refTo] document.
   Stream<ProposalPublish?> watchProposalPublish({
-    required SignedDocumentRef refTo,
+    required DocumentRef refTo,
   });
 
   Stream<List<ProposalDocument>> watchUserProposals({
@@ -145,8 +143,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     );
     final proposalPublish = await getProposalPublishForRef(ref: ref);
     if (proposalPublish == null) {
-      // TODO(LynxLynxx): handle this case
-      throw StateError('Proposal not found/ Proposal is forgotten');
+      throw const NotFoundException(message: 'Proposal is hidden');
     }
     final templateRef = documentData.metadata.template!;
     final documentTemplate =
@@ -291,8 +288,6 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     final dto = ProposalSubmissionActionDocumentDto(
       action: ProposalSubmissionActionDto.fromModel(action),
     );
-    _logger.info('Publishing document [$proposalRef] action: ${dto.action}');
-
     final signedDocument = await _signedDocumentManager.signDocument(
       SignedDocumentJsonPayload(dto.toJson()),
       metadata: SignedDocumentMetadata(
@@ -368,7 +363,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
 
   @override
   Stream<ProposalPublish?> watchProposalPublish({
-    required SignedDocumentRef refTo,
+    required DocumentRef refTo,
   }) {
     return _documentRepository
         .watchRefToDocumentData(

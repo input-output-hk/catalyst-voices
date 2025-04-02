@@ -120,7 +120,7 @@ final class DatabaseDocumentsDataSource implements SignedDocumentDataSource {
 
   @override
   Stream<DocumentData?> watchRefToDocumentData({
-    required SignedDocumentRef refTo,
+    required DocumentRef refTo,
     required DocumentType type,
   }) {
     return _database.documentsDao

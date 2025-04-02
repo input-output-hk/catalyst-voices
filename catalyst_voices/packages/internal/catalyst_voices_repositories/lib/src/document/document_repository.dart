@@ -183,7 +183,7 @@ abstract interface class DocumentRepository {
   /// For example, we want to find latest document action that were made
   /// on a [refTo] document.
   Stream<DocumentData?> watchRefToDocumentData({
-    required SignedDocumentRef refTo,
+    required DocumentRef refTo,
     required DocumentType type,
   });
 }
@@ -329,10 +329,9 @@ final class DocumentRepositoryImpl implements DocumentRepository {
 
   @override
   Future<void> publishDocument({required SignedDocument document}) async {
-    // await _remoteDocuments.publish(document);
+    await _remoteDocuments.publish(document);
 
     final doc = DocumentDataFactory.create(document);
-    _logger.info('SAVING DOCUMENT: $doc');
     await _localDocuments.save(data: doc);
   }
 
@@ -575,7 +574,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
 
   @override
   Stream<DocumentData?> watchRefToDocumentData({
-    required SignedDocumentRef refTo,
+    required DocumentRef refTo,
     required DocumentType type,
     ValueResolver<DocumentData, DocumentRef> refGetter = _templateResolver,
   }) {

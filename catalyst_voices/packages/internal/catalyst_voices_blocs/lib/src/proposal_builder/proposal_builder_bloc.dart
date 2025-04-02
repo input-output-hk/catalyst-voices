@@ -380,8 +380,6 @@ final class ProposalBuilderBloc
       final proposalData = await _proposalService.getProposal(
         ref: proposalRef,
       );
-      // TODO(LynxLynxx): check if new local proposal is created
-      // when SignedDocumentRef is used instead of DraftRef
 
       final proposal = Proposal.fromData(proposalData);
 
