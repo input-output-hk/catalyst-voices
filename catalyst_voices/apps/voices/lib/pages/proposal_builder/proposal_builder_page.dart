@@ -185,9 +185,6 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
         .map((event) => event.metadata.documentRef)
         .distinct()
         .listen(_onProposalRefChanged);
-
-    // update with current state
-    _onProposalRefChanged(bloc.state.metadata.documentRef);
   }
 
   void _listenForSegments(ProposalBuilderBloc bloc) {
