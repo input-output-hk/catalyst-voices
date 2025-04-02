@@ -33,7 +33,7 @@ extension StringExt on String {
     }
 
     if (endsWith('s')) {
-      // Do not append s at the end because the word already ends with it.
+      // Do not append "s" at the end because the word already ends with it.
       return '$count $this';
     }
 
