@@ -1,5 +1,7 @@
 //! Implementation of the PUT `/document` endpoint
 
+use std::str::FromStr;
+
 use poem_openapi::{payload::Json, ApiResponse};
 use unprocessable_content_request::PutDocumentUnprocessableContent;
 
@@ -115,7 +117,7 @@ pub(crate) async fn endpoint(doc_bytes: Vec<u8>, token: CatalystRBACTokenV1) -> 
         .into();
     }
 
-    // check if the incoming doc and current latest doc are the same ver/id
+    // check if the incoming doc and the current latest doc are the same ver/id
     let (Ok(doc_id), Ok(doc_ver)) = (doc.doc_id(), doc.doc_ver()) else {
         return Responses::UnprocessableContent(Json(PutDocumentUnprocessableContent::new(
             "Invalid Catalyst Signed Document",
@@ -123,10 +125,11 @@ pub(crate) async fn endpoint(doc_bytes: Vec<u8>, token: CatalystRBACTokenV1) -> 
         )))
         .into();
     };
-    let latest_doc = match FullSignedDoc::retrieve(&doc_id.uuid(), None).await {
+    let original_doc = match FullSignedDoc::retrieve(&doc_id.uuid(), None).await {
         Ok(doc) => Some(doc),
         Err(e) if e.is::<error::NotFoundError>() => None,
         Err(_) => {
+            // FIXME: should be internal error
             return Responses::UnprocessableContent(Json(PutDocumentUnprocessableContent::new(
                 "Database error",
                 None,
@@ -134,8 +137,42 @@ pub(crate) async fn endpoint(doc_bytes: Vec<u8>, token: CatalystRBACTokenV1) -> 
             .into();
         },
     };
-    if latest_doc.is_some_and(|doc| doc.id() != &doc_id.uuid() && doc.ver() != &doc_ver.uuid()) {}
+    if let Some(original_doc) = original_doc {
+        if original_doc.id() != &doc_id.uuid() && original_doc.ver() != &doc_ver.uuid() {
+            let Ok(original_authors) = original_doc
+                .body()
+                .authors()
+                .into_iter()
+                .map(|author| catalyst_signed_doc::IdUri::from_str(&author))
+                .collect::<Result<Vec<_>, _>>()
+            else {
+                // FIXME: should be internal error
+                return Responses::UnprocessableContent(Json(
+                    PutDocumentUnprocessableContent::new("Parsing db document error", None),
+                ))
+                .into();
+            };
 
+            let result = original_authors.iter().all(|original_author| {
+                let found = doc.kids().into_iter().find(|incoming_author| {
+                    incoming_author.as_short_id() == original_author.as_short_id()
+                });
+
+                found.is_some_and(|incoming_author| {
+                    incoming_author.role_and_rotation().0 == original_author.role_and_rotation().0
+                })
+            });
+
+            if !result {
+                return Responses::UnprocessableContent(Json(
+                    PutDocumentUnprocessableContent::new("Validation failed: Document has a different catalyst-id or role compared to its first version", None),
+                ))
+                .into();
+            }
+        }
+    }
+
+    // update the document storing in the db
     match store_document_in_db(&doc, doc_bytes).await {
         Ok(true) => Responses::Created.into(),
         Ok(false) => Responses::NoContent.into(),
