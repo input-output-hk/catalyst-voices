@@ -179,10 +179,10 @@ libatspi
 libavcodec
 libcatalyst
 libdrm
-libsqlite3
 libflutter
 libgbm
 libnss
+libsqlite3
 libxkbcommon
 libxshmfence
 Lifetimeable
@@ -260,13 +260,13 @@ pytest
 qrcode
 rapidoc
 ratelimit
-RGBO
 redoc
 reloadable
 Replayability
 repr
 reqwest
 rfwtxt
+RGBO
 rgloader
 ripgrep
 ristretto
