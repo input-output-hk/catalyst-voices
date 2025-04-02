@@ -83,9 +83,9 @@ pub(crate) async fn endpoint(doc_bytes: Vec<u8>, token: CatalystRBACTokenV1) -> 
             )))
             .into();
         },
-        Err(e) => {
+        Err(err) => {
             // means that something happened inside the `DocProvider`, some db error.
-            return AllResponses::handle_error(&e);
+            return AllResponses::handle_error(&err);
         },
     }
 
@@ -104,8 +104,8 @@ pub(crate) async fn endpoint(doc_bytes: Vec<u8>, token: CatalystRBACTokenV1) -> 
             )))
             .into();
         },
-        Err(e) => {
-            return AllResponses::handle_error(&e);
+        Err(err) => {
+            return AllResponses::handle_error(&err);
         },
     };
 
@@ -125,52 +125,16 @@ pub(crate) async fn endpoint(doc_bytes: Vec<u8>, token: CatalystRBACTokenV1) -> 
         )))
         .into();
     };
-    let original_doc = match FullSignedDoc::retrieve(&doc_id.uuid(), None).await {
-        Ok(doc) => Some(doc),
-        Err(e) if e.is::<error::NotFoundError>() => None,
-        Err(_) => {
-            // FIXME: should be internal error
-            return Responses::UnprocessableContent(Json(PutDocumentUnprocessableContent::new(
-                "Database error",
-                None,
-            )))
+    match validate_against_original_doc(doc_id, doc_ver, &doc.kids()).await {
+        Ok(true) => (),
+        Ok(false) => {
+            return Responses::UnprocessableContent(Json(
+                PutDocumentUnprocessableContent::new("Failed validating document: catalyst-id or role does not match the current version.", None),
+            ))
             .into();
         },
+        Err(err) => return AllResponses::handle_error(&err),
     };
-    if let Some(original_doc) = original_doc {
-        if original_doc.id() != &doc_id.uuid() && original_doc.ver() != &doc_ver.uuid() {
-            let Ok(original_authors) = original_doc
-                .body()
-                .authors()
-                .iter()
-                .map(|author| catalyst_signed_doc::IdUri::from_str(author))
-                .collect::<Result<Vec<_>, _>>()
-            else {
-                // FIXME: should be internal error
-                return Responses::UnprocessableContent(Json(
-                    PutDocumentUnprocessableContent::new("Parsing db document error", None),
-                ))
-                .into();
-            };
-
-            let result = original_authors.iter().all(|original_author| {
-                let found = doc.kids().into_iter().find(|incoming_author| {
-                    incoming_author.as_short_id() == original_author.as_short_id()
-                });
-
-                found.is_some_and(|incoming_author| {
-                    incoming_author.role_and_rotation().0 == original_author.role_and_rotation().0
-                })
-            });
-
-            if !result {
-                return Responses::UnprocessableContent(Json(
-                    PutDocumentUnprocessableContent::new("Failed validating document: catalyst-id or role does not match the current version.", None),
-                ))
-                .into();
-            }
-        }
-    }
 
     // update the document storing in the db
     match store_document_in_db(&doc, doc_bytes).await {
@@ -185,6 +149,46 @@ pub(crate) async fn endpoint(doc_bytes: Vec<u8>, token: CatalystRBACTokenV1) -> 
         },
         Err(err) => AllResponses::handle_error(&err),
     }
+}
+
+/// Checks if the document ID and version differ, fetch the latest version and ensure its
+/// catalyst-id and role entries match those in the newer or different version.
+async fn validate_against_original_doc(
+    doc_id: catalyst_signed_doc::UuidV7, doc_ver: catalyst_signed_doc::UuidV7,
+    kids: &[catalyst_signed_doc::IdUri],
+) -> anyhow::Result<bool> {
+    let original_doc = match FullSignedDoc::retrieve(&doc_id.uuid(), None).await {
+        Ok(doc) => Some(doc),
+        Err(e) if e.is::<error::NotFoundError>() => None,
+        Err(e) => anyhow::bail!("Database error: {e}"),
+    };
+    if let Some(original_doc) = original_doc {
+        if original_doc.id() != &doc_id.uuid() && original_doc.ver() != &doc_ver.uuid() {
+            let Ok(original_authors) = original_doc
+                .body()
+                .authors()
+                .iter()
+                .map(|author| catalyst_signed_doc::IdUri::from_str(author))
+                .collect::<Result<Vec<_>, _>>()
+            else {
+                anyhow::bail!("Parsing db document error")
+            };
+
+            let result = original_authors.iter().all(|original_author| {
+                let found = kids.iter().find(|incoming_author| {
+                    incoming_author.as_short_id() == original_author.as_short_id()
+                });
+
+                found.is_some_and(|incoming_author| {
+                    incoming_author.role_and_rotation().0 == original_author.role_and_rotation().0
+                })
+            });
+
+            return Ok(result);
+        }
+    }
+
+    Ok(true)
 }
 
 /// Store a provided and validated document inside the db.
