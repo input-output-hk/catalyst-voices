@@ -5,7 +5,10 @@ use unprocessable_content_request::PutDocumentUnprocessableContent;
 
 use super::common::{DocProvider, VerifyingKeyProvider};
 use crate::{
-    db::event::signed_docs::{FullSignedDoc, SignedDocBody, StoreError},
+    db::event::{
+        error,
+        signed_docs::{FullSignedDoc, SignedDocBody, StoreError},
+    },
     service::common::{auth::rbac::token::CatalystRBACTokenV1, responses::WithErrorResponses},
 };
 
@@ -111,6 +114,27 @@ pub(crate) async fn endpoint(doc_bytes: Vec<u8>, token: CatalystRBACTokenV1) -> 
         )))
         .into();
     }
+
+    // check if the incoming doc and current latest doc are the same ver/id
+    let (Ok(doc_id), Ok(doc_ver)) = (doc.doc_id(), doc.doc_ver()) else {
+        return Responses::UnprocessableContent(Json(PutDocumentUnprocessableContent::new(
+            "Invalid Catalyst Signed Document",
+            serde_json::to_value(doc.problem_report()).ok(),
+        )))
+        .into();
+    };
+    let latest_doc = match FullSignedDoc::retrieve(&doc_id.uuid(), None).await {
+        Ok(doc) => Some(doc),
+        Err(e) if e.is::<error::NotFoundError>() => None,
+        Err(_) => {
+            return Responses::UnprocessableContent(Json(PutDocumentUnprocessableContent::new(
+                "Database error",
+                None,
+            )))
+            .into();
+        },
+    };
+    if latest_doc.is_some_and(|doc| doc.id() != &doc_id.uuid() && doc.ver() != &doc_ver.uuid()) {}
 
     match store_document_in_db(&doc, doc_bytes).await {
         Ok(true) => Responses::Created.into(),
