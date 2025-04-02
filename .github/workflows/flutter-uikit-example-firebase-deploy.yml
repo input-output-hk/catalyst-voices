@@ -24,7 +24,7 @@ jobs:
         with:
           version: 0.14.0
       - name: Setup CI
-        uses: input-output-hk/catalyst-forge/actions/setup@ci/v1.7.1
+        uses: input-output-hk/catalyst-forge/actions/setup@ci/v1.7.2
       - name: Build Flutter Web
         uses: input-output-hk/catalyst-forge/actions/run@ci/v1.7.1
         if: always()
