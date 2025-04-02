@@ -1,28 +1,31 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
+import 'package:catalyst_voices/widgets/document_builder/common/document_property_builder_title.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localized_locales/flutter_localized_locales.dart';
 
-class DocumentPropertyReadBuilder extends StatefulWidget {
+/// A view-mode for [DocumentBuilder] components.
+class DocumentPropertyBuilderViewer extends StatefulWidget {
   final DocumentProperty property;
 
-  const DocumentPropertyReadBuilder({
+  const DocumentPropertyBuilderViewer({
     super.key,
     required this.property,
   });
 
   @override
-  State<DocumentPropertyReadBuilder> createState() {
-    return _DocumentPropertyReadBuilderState();
+  State<DocumentPropertyBuilderViewer> createState() {
+    return _DocumentPropertyBuilderViewerState();
   }
 }
 
-class _DocumentPropertyReadBuilderState
-    extends State<DocumentPropertyReadBuilder> {
+class _DocumentPropertyBuilderViewerState
+    extends State<DocumentPropertyBuilderViewer> {
   final List<DocumentPropertyValueListItem<Object>> _items = [];
 
   @override
@@ -51,7 +54,7 @@ class _DocumentPropertyReadBuilderState
   }
 
   @override
-  void didUpdateWidget(DocumentPropertyReadBuilder oldWidget) {
+  void didUpdateWidget(DocumentPropertyBuilderViewer oldWidget) {
     super.didUpdateWidget(oldWidget);
 
     if (widget.property != oldWidget.property) {
@@ -64,34 +67,55 @@ class _DocumentPropertyReadBuilderState
   ) sync* {
     switch (property) {
       case DocumentListProperty():
+        yield* _calculateItemsFromList(property);
+      case DocumentObjectProperty():
+        yield* _calculateItemsFromObject(property);
+      case DocumentValueProperty<Object>():
+        yield _mapDocumentPropertyToListItem(property);
+    }
+  }
+
+  Iterable<DocumentPropertyValueListItem<Object>> _calculateItemsFromList(
+    DocumentListProperty property,
+  ) sync* {
+    final schema = property.schema;
+    yield DocumentTextListItem(
+      id: property.nodeId,
+      title: schema.title,
+      isRequired: schema.isRequired,
+      value:
+          schema.itemsSchema.title.formatAsPlural(property.properties.length),
+    );
+
+    for (final property in property.properties
+        .whereNot((element) => element.schema.isSectionOrSubsection)) {
+      yield* _calculateItemsFrom(property);
+    }
+  }
+
+  Iterable<DocumentPropertyValueListItem<Object>> _calculateItemsFromObject(
+    DocumentObjectProperty property,
+  ) sync* {
+    final schema = property.schema;
+    switch (schema) {
+      case DocumentSingleGroupedTagSelectorSchema():
+        final value = schema.groupedTagsSelection(property);
+
+        yield DocumentTextListItem(
+          id: property.nodeId,
+          title: '',
+          isRequired: schema.isRequired,
+          value: value?.toString(),
+        );
+      case DocumentSegmentSchema():
+      case DocumentSectionSchema():
+      case DocumentNestedQuestionsSchema():
+      case DocumentBorderGroupSchema():
+      case DocumentGenericObjectSchema():
         for (final property in property.properties
             .whereNot((element) => element.schema.isSectionOrSubsection)) {
           yield* _calculateItemsFrom(property);
         }
-      case DocumentObjectProperty():
-        final schema = property.schema;
-        switch (schema) {
-          case DocumentSingleGroupedTagSelectorSchema():
-            final value = schema.groupedTagsSelection(property);
-
-            yield DocumentTextListItem(
-              id: property.nodeId,
-              title: '',
-              isRequired: schema.isRequired,
-              value: value?.toString(),
-            );
-          case DocumentSegmentSchema():
-          case DocumentSectionSchema():
-          case DocumentNestedQuestionsSchema():
-          case DocumentBorderGroupSchema():
-          case DocumentGenericObjectSchema():
-            for (final property in property.properties
-                .whereNot((element) => element.schema.isSectionOrSubsection)) {
-              yield* _calculateItemsFrom(property);
-            }
-        }
-      case DocumentValueProperty<Object>():
-        yield _mapDocumentPropertyToListItem(property);
     }
   }
 
@@ -199,18 +223,19 @@ class _DocumentPropertyReadBuilderState
   void _updateItems() {
     _items
       ..clear()
-      ..addAll(_calculateItemsFrom(widget.property))
-      ..removeWhere((element) => element.isEmpty);
+      ..addAll(_calculateItemsFrom(widget.property));
   }
 }
 
 class _ListItem extends StatelessWidget {
   final String title;
+  final bool isRequired;
   final Widget value;
   final bool isMultiline;
 
   const _ListItem({
     required this.title,
+    required this.isRequired,
     required this.value,
     this.isMultiline = false,
   });
@@ -226,15 +251,11 @@ class _ListItem extends StatelessWidget {
       children: [
         // Note. Links are single line https entry but do not have title
         if (title.isNotEmpty) ...[
-          Text(
-            title,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: textTheme.bodySmall?.copyWith(
-              color: colors.textOnPrimaryLevel1,
-            ),
+          DocumentPropertyBuilderTitle(
+            title: title,
+            isRequired: isRequired,
           ),
-          const SizedBox(height: 2),
+          const SizedBox(height: 8),
         ],
         DefaultTextStyle(
           style: (textTheme.bodyMedium ?? const TextStyle()).copyWith(
@@ -260,20 +281,26 @@ class _ListItemBuilder extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return switch (item) {
-      DocumentLinkReadItem(:final title, :final value) => _ListItem(
-          title: title,
-          value: value != null ? LinkText(value) : const Text('-'),
+      DocumentLinkReadItem(:final value) => _ListItem(
+          title: item.title,
+          isRequired: item.isRequired,
+          value: value != null
+              ? LinkText(value)
+              : Text(context.l10n.proposalEditorNotAnswered),
           isMultiline: true,
         ),
-      DocumentMarkdownListItem(:final title, :final value) => _ListItem(
-          title: title,
-          value: MarkdownText(value ?? const MarkdownData('-')),
+      DocumentMarkdownListItem(:final value) => _ListItem(
+          title: item.title,
+          isRequired: item.isRequired,
+          value: (value != null && value.data.isNotBlank)
+              ? MarkdownText(value)
+              : Text(context.l10n.proposalEditorNotAnswered),
           isMultiline: true,
         ),
-      DocumentTextListItem(:final title, :final value, :final isMultiline) =>
-        _ListItem(
-          title: title,
-          value: Text(value ?? '-'),
+      DocumentTextListItem(:final value, :final isMultiline) => _ListItem(
+          title: item.title,
+          isRequired: item.isRequired,
+          value: Text(value ?? context.l10n.proposalEditorNotAnswered),
           isMultiline: isMultiline,
         ),
     };

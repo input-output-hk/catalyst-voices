@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/widgets/document_builder/viewer/document_property_builder_viewer.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart' as model;
@@ -89,7 +90,7 @@ class _DocumentBuilderSectionTileState
                 onChanged: _handlePropertyChanges,
                 overrides: widget.overrides,
               )
-            : DocumentPropertyReadBuilder(
+            : DocumentPropertyBuilderViewer(
                 key: ValueKey(_editedSection.schema.nodeId),
                 property: _editedSection,
               ),

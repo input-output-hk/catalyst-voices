@@ -1639,6 +1639,10 @@
   "@proposalEditorPublishErrorDialogMessage": {
     "description": "Dialog message in proposal editor when publishing proposal to the server failed."
   },
+  "proposalEditorNotAnswered": "Not Answered",
+  "@proposalEditorNotAnswered": {
+    "description": "Placeholder text when a property has been not filled."
+  },
   "showAll": "Show All",
   "@showAll": {
     "description": "Show all for when using filtering by some criteria"
