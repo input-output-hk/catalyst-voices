@@ -1,7 +1,6 @@
 import 'package:catalyst_voices/app/view/app.dart';
 import 'package:catalyst_voices/configs/bootstrap.dart';
 import 'package:catalyst_voices/routes/routes.dart';
-import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:patrol_finders/patrol_finders.dart';
@@ -17,7 +16,7 @@ void main() async {
   });
 
   setUp(() async {
-    await registerDependencies(config: const AppConfig());
+    await registerDependencies();
     router.go(const ProposalsRoute().location);
   });
 

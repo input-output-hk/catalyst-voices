@@ -33,6 +33,7 @@ final _uncaughtZoneLogger = Logger('UncaughtZone');
 /// only should be added to [_doBootstrapAndRun], not here.
 Future<BootstrapArgs> bootstrap({
   GoRouter? router,
+  AppEnvironment? environment,
 }) async {
   _loggingService
     ..level = kDebugMode ? Level.FINER : Level.OFF
@@ -41,7 +42,7 @@ Future<BootstrapArgs> bootstrap({
   GoRouter.optionURLReflectsImperativeAPIs = true;
   setPathUrlStrategy();
 
-  final environment = AppEnvironment.fromEnv();
+  environment ??= AppEnvironment.fromEnv();
 
   final configSource = UrlRemoteConfigSource(url: environment.configUrl);
   final configService = ConfigService(ConfigRepository(configSource));
@@ -71,11 +72,12 @@ Future<BootstrapArgs> bootstrap({
 ///
 /// You can customize the default app by providing
 /// your own instance via [builder].
-Future<void> bootstrapAndRun([
+Future<void> bootstrapAndRun(
+  AppEnvironment environment, [
   BootstrapWidgetBuilder builder = _defaultBuilder,
 ]) async {
   await runZonedGuarded(
-    () => _safeBootstrapAndRun(builder),
+    () => _safeBootstrapAndRun(environment, builder),
     _reportUncaughtZoneError,
   );
 }
@@ -95,8 +97,8 @@ GoRouter buildAppRouter({
 
 @visibleForTesting
 Future<void> registerDependencies({
-  AppEnvironment environment = const AppEnvironment.fallback(),
-  AppConfig config = const AppConfig.fallback(),
+  AppEnvironment environment = const AppEnvironment.dev(),
+  AppConfig config = const AppConfig.dev(),
 }) async {
   if (!Dependencies.instance.isInitialized) {
     await Dependencies.instance.init(
@@ -121,7 +123,10 @@ Widget _defaultBuilder(BootstrapArgs args) {
   );
 }
 
-Future<void> _doBootstrapAndRun(BootstrapWidgetBuilder builder) async {
+Future<void> _doBootstrapAndRun(
+  AppEnvironment environment,
+  BootstrapWidgetBuilder builder,
+) async {
   // There's no need to call WidgetsFlutterBinding.ensureInitialized()
   // since this is already done internally by SentryFlutter.init()
   // More info here: https://github.com/getsentry/sentry-dart/issues/2063
@@ -132,7 +137,7 @@ Future<void> _doBootstrapAndRun(BootstrapWidgetBuilder builder) async {
   FlutterError.onError = _reportFlutterError;
   PlatformDispatcher.instance.onError = _reportPlatformDispatcherError;
 
-  final args = await bootstrap();
+  final args = await bootstrap(environment: environment);
   final app = await builder(args);
   await _runApp(app, sentryConfig: args.sentryConfig);
 }
@@ -183,9 +188,12 @@ Future<void> _runApp(
   }
 }
 
-Future<void> _safeBootstrapAndRun(BootstrapWidgetBuilder builder) async {
+Future<void> _safeBootstrapAndRun(
+  AppEnvironment environment,
+  BootstrapWidgetBuilder builder,
+) async {
   try {
-    await _doBootstrapAndRun(builder);
+    await _doBootstrapAndRun(environment, builder);
   } catch (error, stack) {
     await _reportBootstrapError(error, stack);
   }

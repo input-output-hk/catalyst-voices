@@ -1,11 +1,9 @@
 // ignore_for_file: avoid_print
 
+import 'package:catalyst_voices_models/src/config/env_vars/dart_define_env_vars.dart'
+    if (dart.library.js_interop) 'env_vars/web_env_vars.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
-
-/// Have to mach against --dart-define variables
-const _envVarConfigUrl = 'API_URL';
-const _envVarType = 'ENV_NAME';
 
 // TODO(damian-molinski): provide valid url
 const _fallbackConfigUrl = '';
@@ -21,38 +19,57 @@ final class AppEnvironment extends Equatable {
     required this.configUrl,
   });
 
-  const AppEnvironment.fallback()
+  const AppEnvironment.dev()
       : this._(
-          type: _fallbackEnvType,
-          configUrl: _fallbackConfigUrl,
+          type: AppEnvironmentType.dev,
+          // TODO(damian-molinski): update config url
+          configUrl: '',
         );
 
   factory AppEnvironment.fromEnv() {
-    const envTypeName = bool.hasEnvironment(_envVarType)
-        ? String.fromEnvironment(_envVarType)
-        : null;
-    const envConfigUrl = bool.hasEnvironment(_envVarConfigUrl)
-        ? String.fromEnvironment(_envVarConfigUrl)
-        : null;
+    final envVars = getEnvVars();
+    final envName = envVars.envName;
+    final configUrl = envVars.configUrl;
 
-    if (envTypeName == null && kDebugMode) {
-      print('Env name not defined! Using fallback');
+    if (envName == null && kDebugMode) {
+      print('ENV -> type not defined! Using fallback');
     }
-    if (envConfigUrl == null && kDebugMode) {
-      print('Config url not defined! Using fallback');
+    if (configUrl == null && kDebugMode) {
+      print('ENV -> config url not defined! Using fallback');
     }
 
-    final type = AppEnvironmentType.values.asNameMap()[envTypeName];
+    final type = AppEnvironmentType.values.asNameMap()[envName];
 
-    if (type == null && envTypeName != null && kDebugMode) {
-      print('Env name[$envTypeName] not supported!');
+    if (type == null && envName != null && kDebugMode) {
+      print('ENV -> type[$envName] not supported!');
+    }
+
+    final effectiveType = type ?? _fallbackEnvType;
+    final effectiveConfigUrl = configUrl ?? _fallbackConfigUrl;
+
+    if (kDebugMode) {
+      print('ENV -> type[$effectiveType], configUrl[$effectiveConfigUrl]');
     }
 
     return AppEnvironment._(
-      type: type ?? _fallbackEnvType,
-      configUrl: envConfigUrl ?? _fallbackConfigUrl,
+      type: effectiveType,
+      configUrl: effectiveConfigUrl,
     );
   }
+
+  const AppEnvironment.preprod()
+      : this._(
+          type: AppEnvironmentType.preprod,
+          // TODO(damian-molinski): update config url
+          configUrl: '',
+        );
+
+  const AppEnvironment.prod()
+      : this._(
+          type: AppEnvironmentType.prod,
+          // TODO(damian-molinski): update config url
+          configUrl: '',
+        );
 
   const AppEnvironment._({
     required this.type,

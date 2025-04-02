@@ -2,32 +2,38 @@ import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.da
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:equatable/equatable.dart';
 
+const _defaultTransactionBuilderConfig = TransactionBuilderConfig(
+  feeAlgo: TieredFee(
+    constant: 155381,
+    coefficient: 44,
+    refScriptByteCost: 15,
+  ),
+  maxTxSize: 16384,
+  maxValueSize: 5000,
+  coinsPerUtxoByte: Coin(4310),
+);
+
 final class ApiConfig extends Equatable {
   final String gatewayUrl;
-  final String vitUrl;
   final String reviewsUrl;
 
   const ApiConfig({
-    this.gatewayUrl = 'https://gateway.dev.projectcatalyst.io/',
-    this.vitUrl = 'https://core.dev.projectcatalyst.io/',
-    this.reviewsUrl = 'https://api.reviews.dev.projectcatalyst.io/',
+    required this.gatewayUrl,
+    required this.reviewsUrl,
   });
 
   @override
   List<Object?> get props => [
         gatewayUrl,
-        vitUrl,
         reviewsUrl,
       ];
 
   ApiConfig copyWith({
     String? gatewayUrl,
-    String? vitUrl,
     String? reviewsUrl,
   }) {
     return ApiConfig(
       gatewayUrl: gatewayUrl ?? this.gatewayUrl,
-      vitUrl: vitUrl ?? this.vitUrl,
       reviewsUrl: reviewsUrl ?? this.reviewsUrl,
     );
   }
@@ -41,20 +47,116 @@ final class AppConfig extends Equatable {
   final BlockchainConfig blockchain;
 
   const AppConfig({
-    this.api = const ApiConfig(),
-    this.cache = const CacheConfig(),
-    this.database = const DatabaseConfig(),
-    this.sentry = const SentryConfig(),
-    this.blockchain = const BlockchainConfig(),
+    required this.api,
+    required this.cache,
+    required this.database,
+    required this.sentry,
+    required this.blockchain,
   });
 
-  const AppConfig.fallback() : this();
+  const AppConfig.dev()
+      : this(
+          api: const ApiConfig(
+            gatewayUrl: 'https://gateway.dev.projectcatalyst.io',
+            reviewsUrl: 'https://api.reviews.dev.projectcatalyst.io',
+          ),
+          cache: const CacheConfig(
+            expiryDuration: ExpiryDuration(
+              keychainUnlock: Duration(hours: 1),
+            ),
+          ),
+          database: const DatabaseConfig(),
+          sentry: const SentryConfig(
+            dns:
+                'https://8e333ddbed1e096c70e4ed006892c355@o622089.ingest.us.sentry.io/4507113601433600',
+            environment: 'dev',
+            release: 'catalyst-voices@dev',
+            tracesSampleRate: 1,
+            profilesSampleRate: 1,
+            enableAutoSessionTracking: true,
+            attachScreenshot: true,
+            attachViewHierarchy: true,
+            debug: true,
+            diagnosticLevel: 'debug',
+          ),
+          blockchain: const BlockchainConfig(
+            networkId: NetworkId.testnet,
+            host: CatalystIdHost.cardanoPreprod,
+            transactionBuilderConfig: _defaultTransactionBuilderConfig,
+          ),
+        );
 
   factory AppConfig.env(AppEnvironmentType env) {
-    // TODO(damian-molinski): build default config for each env.
-
-    return AppConfig.fallback();
+    return switch (env) {
+      AppEnvironmentType.dev => const AppConfig.dev(),
+      AppEnvironmentType.preprod => const AppConfig.preprod(),
+      AppEnvironmentType.prod => const AppConfig.prod(),
+    };
   }
+
+  const AppConfig.preprod()
+      : this(
+          api: const ApiConfig(
+            gatewayUrl: 'https://gateway.preprod.projectcatalyst.io',
+            reviewsUrl: 'https://api.reviews.dev.projectcatalyst.io',
+          ),
+          cache: const CacheConfig(
+            expiryDuration: ExpiryDuration(
+              keychainUnlock: Duration(hours: 1),
+            ),
+          ),
+          database: const DatabaseConfig(),
+          sentry: const SentryConfig(
+            dns:
+                'https://8e333ddbed1e096c70e4ed006892c355@o622089.ingest.us.sentry.io/4507113601433600',
+            environment: 'preprod',
+            release: 'catalyst-voices@preprod',
+            tracesSampleRate: 0.2,
+            profilesSampleRate: 0.2,
+            enableAutoSessionTracking: true,
+            attachScreenshot: true,
+            attachViewHierarchy: true,
+            debug: false,
+            diagnosticLevel: 'warning',
+          ),
+          blockchain: const BlockchainConfig(
+            networkId: NetworkId.testnet,
+            host: CatalystIdHost.cardanoPreprod,
+            transactionBuilderConfig: _defaultTransactionBuilderConfig,
+          ),
+        );
+
+  const AppConfig.prod()
+      : this(
+          api: const ApiConfig(
+            gatewayUrl: 'https://gateway.projectcatalyst.io',
+            reviewsUrl: 'https://api.reviews.projectcatalyst.io',
+          ),
+          cache: const CacheConfig(
+            expiryDuration: ExpiryDuration(
+              keychainUnlock: Duration(hours: 1),
+            ),
+          ),
+          database: const DatabaseConfig(),
+          sentry: const SentryConfig(
+            dns:
+                'https://8e333ddbed1e096c70e4ed006892c355@o622089.ingest.us.sentry.io/4507113601433600',
+            environment: 'prod',
+            release: 'catalyst-voices@prod',
+            tracesSampleRate: 0.1,
+            profilesSampleRate: 0.1,
+            enableAutoSessionTracking: true,
+            attachScreenshot: false,
+            attachViewHierarchy: false,
+            debug: false,
+            diagnosticLevel: 'error',
+          ),
+          blockchain: const BlockchainConfig(
+            networkId: NetworkId.testnet,
+            host: CatalystIdHost.cardano,
+            transactionBuilderConfig: _defaultTransactionBuilderConfig,
+          ),
+        );
 
   @override
   List<Object?> get props => [
@@ -88,18 +190,9 @@ final class BlockchainConfig extends Equatable {
   final TransactionBuilderConfig transactionBuilderConfig;
 
   const BlockchainConfig({
-    this.networkId = NetworkId.testnet,
-    this.host = CatalystIdHost.cardanoPreprod,
-    this.transactionBuilderConfig = const TransactionBuilderConfig(
-      feeAlgo: TieredFee(
-        constant: 155381,
-        coefficient: 44,
-        refScriptByteCost: 15,
-      ),
-      maxTxSize: 16384,
-      maxValueSize: 5000,
-      coinsPerUtxoByte: Coin(4310),
-    ),
+    required this.networkId,
+    required this.host,
+    required this.transactionBuilderConfig,
   });
 
   @override
@@ -123,7 +216,7 @@ final class CacheConfig extends Equatable {
   final ExpiryDuration expiryDuration;
 
   const CacheConfig({
-    this.expiryDuration = const ExpiryDuration(),
+    required this.expiryDuration,
   });
 
   @override
@@ -161,7 +254,7 @@ final class ExpiryDuration extends Equatable {
   final Duration keychainUnlock;
 
   const ExpiryDuration({
-    this.keychainUnlock = const Duration(hours: 1),
+    required this.keychainUnlock,
   });
 
   @override
@@ -189,16 +282,16 @@ final class SentryConfig extends Equatable {
   final String diagnosticLevel;
 
   const SentryConfig({
-    this.dns = '',
-    this.environment = 'catalyst-voices@dev',
-    this.release = '1.0.0',
-    this.tracesSampleRate = 1.0,
-    this.profilesSampleRate = 1.0,
-    this.enableAutoSessionTracking = true,
-    this.attachScreenshot = true,
-    this.attachViewHierarchy = true,
-    this.debug = true,
-    this.diagnosticLevel = 'debug',
+    required this.dns,
+    required this.environment,
+    required this.release,
+    required this.tracesSampleRate,
+    required this.profilesSampleRate,
+    required this.enableAutoSessionTracking,
+    required this.attachScreenshot,
+    required this.attachViewHierarchy,
+    required this.debug,
+    required this.diagnosticLevel,
   });
 
   @override

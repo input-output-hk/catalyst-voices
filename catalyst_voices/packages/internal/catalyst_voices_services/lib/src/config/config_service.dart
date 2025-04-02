@@ -25,6 +25,6 @@ final class ConfigServiceImpl implements ConfigService {
 
     final envConfig = appConfigs.environments[env];
 
-    return envConfig ?? const AppConfig.fallback();
+    return envConfig ?? const AppConfig.dev();
   }
 }

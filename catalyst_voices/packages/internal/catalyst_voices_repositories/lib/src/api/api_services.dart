@@ -23,7 +23,6 @@ void _fixModelsMapping() {
 
 final class ApiServices {
   final CatGateway gateway;
-  final Vit vit;
   final CatReviews reviews;
 
   factory ApiServices({
@@ -45,12 +44,6 @@ final class ApiServices {
         if (kDebugMode) HttpLoggingInterceptor(onlyErrors: true),
       ],
     );
-    final vit = Vit.create(
-      baseUrl: Uri.parse(config.vitUrl),
-      interceptors: [
-        if (kDebugMode) HttpLoggingInterceptor(onlyErrors: true),
-      ],
-    );
     final review = CatReviews.create(
       authenticator: null,
       baseUrl: Uri.parse(config.reviewsUrl),
@@ -62,7 +55,6 @@ final class ApiServices {
 
     return ApiServices.internal(
       gateway: cat,
-      vit: vit,
       reviews: review,
     );
   }
@@ -70,7 +62,6 @@ final class ApiServices {
   @visibleForTesting
   const ApiServices.internal({
     required this.gateway,
-    required this.vit,
     required this.reviews,
   });
 }
