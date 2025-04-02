@@ -165,7 +165,7 @@ pub(crate) async fn endpoint(doc_bytes: Vec<u8>, token: CatalystRBACTokenV1) -> 
 
             if !result {
                 return Responses::UnprocessableContent(Json(
-                    PutDocumentUnprocessableContent::new("Validation failed: Document has a different catalyst-id or role compared to its first version", None),
+                    PutDocumentUnprocessableContent::new("Failed validating document: catalyst-id or role does not match the current version.", None),
                 ))
                 .into();
             }
