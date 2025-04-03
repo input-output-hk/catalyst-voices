@@ -20,7 +20,7 @@ mod unprocessable_content;
 use anyhow::{anyhow, Context};
 use cardano_blockchain_types::StakeAddress;
 use catalyst_types::id_uri::IdUri;
-use futures::StreamExt;
+use futures::{TryFutureExt, TryStreamExt};
 use poem_openapi::payload::Json;
 use tracing::error;
 
@@ -62,11 +62,14 @@ pub(crate) async fn endpoint(
                 Ok(a) => a,
                 Err(e) => return AllResponses::handle_error(&e),
             };
-            match catalyst_id_from_stake(&persistent_session, address.clone()).await {
+            // TODO: For now we want to select the latest registration (so query the volatile
+            // database first), but ideally the logic should be more sophisticated. See the issue
+            // for more details: https://github.com/input-output-hk/catalyst-voices/issues/2152
+            match catalyst_id_from_stake(&volatile_session, address.clone()).await {
                 Ok(Some(v)) => v,
                 Err(e) => return AllResponses::handle_error(&e),
                 Ok(None) => {
-                    match catalyst_id_from_stake(&volatile_session, address).await {
+                    match catalyst_id_from_stake(&persistent_session, address).await {
                         Ok(Some(v)) => v,
                         Err(e) => return AllResponses::handle_error(&e),
                         Ok(None) => return Responses::NotFound.into(),
@@ -103,19 +106,12 @@ pub(crate) async fn endpoint(
 async fn catalyst_id_from_stake(
     session: &CassandraSession, address: StakeAddress,
 ) -> anyhow::Result<Option<IdUri>> {
-    let mut iter = Query::execute(session, QueryParams {
+    let mut result: Vec<_> = Query::execute(session, QueryParams {
         stake_address: address.into(),
     })
+    .and_then(|r| r.try_collect().map_err(Into::into))
     .await
-    .context("Failed to query Catalyst ID from stake address {e:?}")?;
+    .context("Failed to query Catalyst ID from stake address")?;
 
-    match iter.next().await {
-        Some(Ok(v)) => Ok(Some(v.catalyst_id.into())),
-        Some(Err(e)) => {
-            Err(anyhow!(
-                "Failed to query Catalyst ID from stake address {e:?}"
-            ))
-        },
-        None => Ok(None),
-    }
+    Ok(result.pop().map(|v| v.catalyst_id.into()))
 }
