@@ -13,6 +13,8 @@ import 'package:flutter/foundation.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:synchronized/synchronized.dart';
 
+final _logger = Logger('DocumentRepository');
+
 DocumentRef _templateResolver(DocumentData data) => data.metadata.template!;
 
 abstract interface class DocumentRepository {
@@ -425,7 +427,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
         .asyncMap(
           (documents) async => _processDocuments(
             documents: documents,
-            useTemplate: true,
+            refGetter: refGetter,
           ),
         );
 
@@ -583,36 +585,30 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   }
 
   Future<List<DocumentsDataWithRefData>> _processDocuments({
-    required List<dynamic> documents,
-    ValueResolver<DocumentData, DocumentRef>? refGetter,
-    bool useTemplate = false,
+    required List<DocumentData> documents,
+    required ValueResolver<DocumentData, DocumentRef> refGetter,
   }) async {
-    final typedDocuments = documents.cast<DocumentData>();
-    final results = <DocumentsDataWithRefData>[];
-
-    // Process documents sequentially instead of parallel
-    for (final documentData in typedDocuments) {
-      if (documentData.metadata.template == null) continue;
-
-      try {
-        final ref = useTemplate
-            ? documentData.metadata.template!
-            : refGetter!(documentData);
-
-        final refData = await getDocumentData(ref: ref);
-
-        results.add(
-          DocumentsDataWithRefData(
+    try {
+      final results = await Future.wait(
+        documents
+            .where((doc) => doc.metadata.template != null)
+            .map((documentData) async {
+          final templateRef = documentData.metadata.template!;
+          final templateData = await _documentDataLock.synchronized(
+            () => getDocumentData(ref: templateRef),
+          );
+          return DocumentsDataWithRefData(
             data: documentData,
-            refData: refData,
-          ),
-        );
-      } catch (e) {
-        continue;
-      }
+            refData: templateData,
+          );
+        }).toList(),
+      );
+      return results;
+    } catch (e, st) {
+      _logger.severe('Error processing document', e, st);
     }
 
-    return results;
+    return [];
   }
 
   Stream<DocumentData?> _watchDocumentData({
