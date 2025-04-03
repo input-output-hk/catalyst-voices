@@ -68,7 +68,8 @@ impl VerifyingKeyProvider {
     /// Catalyst Document KIDs against a provided RBAC token.
     ///
     /// This method performs the following steps:
-    /// 1. Verifies that **all** provided `kids` match the Catalyst ID from the RBAC token.
+    /// 1. Verifies that **all** provided `kids` match the Catalyst ID from the RBAC
+    ///    token.
     /// 2. Extracts the role index from each KID and attempts to build a registration
     ///    chain from the indexed registration data.
     /// 3. Retrieves the latest signing public key and rotation state associated with the
