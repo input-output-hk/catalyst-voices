@@ -16,7 +16,7 @@ class SubmitCommentErrorDialog {
     return VoicesDialog.show(
       context: context,
       routeSettings: const RouteSettings(
-        name: '/proposal-builder/submit-error',
+        name: '/comments/submit-error',
       ),
       builder: (context) {
         return VoicesDesktopInfoDialog(
