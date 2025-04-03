@@ -51,7 +51,7 @@ pub struct CatalystRBACSecurityScheme(pub CatalystRBACTokenV1);
 ///
 /// Can be related to database session failure.
 #[derive(Debug, thiserror::Error)]
-#[error("Service unavailable while procssing a Catalyst RBAC Token")]
+#[error("Service unavailable while processing a Catalyst RBAC Token")]
 pub struct ServiceUnavailableError(pub anyhow::Error);
 
 impl ResponseError for ServiceUnavailableError {
