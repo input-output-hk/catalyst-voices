@@ -14,4 +14,21 @@ final class EnvVars extends Equatable {
         envName,
         configUrl,
       ];
+
+  EnvVars copyWith({
+    String? envName,
+    String? configUrl,
+  }) {
+    return EnvVars(
+      envName: envName ?? this.envName,
+      configUrl: configUrl ?? this.configUrl,
+    );
+  }
+
+  EnvVars mergeWith(EnvVars other) {
+    return copyWith(
+      envName: other.envName,
+      configUrl: other.configUrl,
+    );
+  }
 }

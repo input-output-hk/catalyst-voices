@@ -1,7 +1,7 @@
 // ignore_for_file: avoid_print
 
-import 'package:catalyst_voices_models/src/config/env_vars/dart_define_env_vars.dart'
-    if (dart.library.js_interop) 'env_vars/web_env_vars.dart';
+import 'package:catalyst_voices_models/src/config/env_vars/dart_define_env_vars.dart';
+import 'package:catalyst_voices_models/src/config/env_vars/web_env_vars.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 
@@ -22,12 +22,16 @@ final class AppEnvironment extends Equatable {
   const AppEnvironment.dev()
       : this._(
           type: AppEnvironmentType.dev,
-          // TODO(damian-molinski): update config url
-          configUrl: '',
+          configUrl: _fallbackConfigUrl,
         );
 
   factory AppEnvironment.fromEnv() {
-    final envVars = getEnvVars();
+    var envVars = getDartEnvVars();
+
+    if (kIsWeb) {
+      envVars = envVars.mergeWith(getWebEnvVars());
+    }
+
     final envName = envVars.envName;
     final configUrl = envVars.configUrl;
 
@@ -60,15 +64,13 @@ final class AppEnvironment extends Equatable {
   const AppEnvironment.preprod()
       : this._(
           type: AppEnvironmentType.preprod,
-          // TODO(damian-molinski): update config url
-          configUrl: '',
+          configUrl: _fallbackConfigUrl,
         );
 
   const AppEnvironment.prod()
       : this._(
           type: AppEnvironmentType.prod,
-          // TODO(damian-molinski): update config url
-          configUrl: '',
+          configUrl: _fallbackConfigUrl,
         );
 
   const AppEnvironment._({

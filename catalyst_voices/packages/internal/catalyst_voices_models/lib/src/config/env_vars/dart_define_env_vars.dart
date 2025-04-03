@@ -4,7 +4,7 @@ import 'package:catalyst_voices_models/src/config/env_vars/env_vars.dart';
 const _configUrlKey = 'CONFIG_URL';
 const _envNameKey = 'ENV_NAME';
 
-EnvVars getEnvVars() {
+EnvVars getDartEnvVars() {
   const envName = bool.hasEnvironment(_envNameKey)
       ? String.fromEnvironment(_envNameKey)
       : null;
