@@ -12,6 +12,8 @@ import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart'
+    show DocumentVersion;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -84,7 +86,7 @@ class _MenuItem extends StatelessWidget {
     final title = item.title(
       context,
       proposalTitle,
-      metadata.latestVersion?.number ?? 0,
+      metadata.latestVersion?.number ?? DocumentVersion.firstNumber,
     );
 
     final description = item.description(context, metadata);
@@ -199,6 +201,11 @@ class _PopupMenuButtonState extends State<_PopupMenuButton> {
         .add(ExportProposalEvent(filePrefix: prefix));
   }
 
+  bool _isLocal(ProposalPublish publish, int iteration) {
+    return publish == ProposalPublish.localDraft &&
+        iteration == DocumentVersion.firstNumber;
+  }
+
   void _onSelected(ProposalMenuItemAction item) {
     switch (item) {
       case ProposalMenuItemAction.publish:
@@ -223,13 +230,20 @@ class _PopupMenuButtonState extends State<_PopupMenuButton> {
     final state = bloc.state;
     final proposalTitle = state.proposalTitle ??
         context.l10n.proposalEditorStatusDropdownViewTitle;
-    final iteration = state.metadata.latestVersion?.number;
+    final nextIteration =
+        state.metadata.latestVersion?.number ?? DocumentVersion.firstNumber;
+
+    // if it's local draft and the first version then
+    // it should be shown as local which corresponds to null
+    final currentIteration = _isLocal(state.metadata.publish, nextIteration)
+        ? null
+        : nextIteration - 1;
 
     final shouldPublish = await PublishProposalIterationDialog.show(
           context: context,
           proposalTitle: proposalTitle,
-          currentIteration: iteration,
-          nextIteration: (iteration ?? 0) + 1,
+          currentIteration: currentIteration,
+          nextIteration: nextIteration,
         ) ??
         false;
 
@@ -251,13 +265,20 @@ class _PopupMenuButtonState extends State<_PopupMenuButton> {
     final state = bloc.state;
     final proposalTitle = state.proposalTitle ??
         context.l10n.proposalEditorStatusDropdownViewTitle;
-    final iteration = state.metadata.latestVersion!.number;
+    final latestVersion = state.metadata.latestVersion!;
+
+    final nextIteration = latestVersion.number;
+
+    // if it's local draft and the first version then
+    // it should be shown as local which corresponds to null
+    final currentIteration =
+        _isLocal(state.metadata.publish, nextIteration) ? null : nextIteration;
 
     final shouldSubmit = await SubmitProposalForReviewDialog.show(
           context: context,
           proposalTitle: proposalTitle,
-          currentIteration: iteration,
-          nextIteration: iteration + 1,
+          currentIteration: currentIteration,
+          nextIteration: nextIteration,
         ) ??
         false;
 
