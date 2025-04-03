@@ -8,7 +8,7 @@ extension StringExt on String {
 
   bool get isNotBlank => !isBlank;
 
-  String bullet() => withPrefix('• ');
+  String withBullet() => withPrefix('• ');
 
   String capitalize() {
     if (isNotEmpty) {

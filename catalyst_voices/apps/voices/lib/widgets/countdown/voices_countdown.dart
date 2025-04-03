@@ -1,15 +1,16 @@
 import 'dart:async';
 
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
 typedef CountdownBuilder = Widget Function(
-  BuildContext context,
-  int days,
-  int hours,
-  int minutes,
-  int seconds,
-);
+  BuildContext context, {
+  required int days,
+  required int hours,
+  required int minutes,
+  required int seconds,
+});
 
 class VoicesCountdown extends StatefulWidget {
   final DateTime dateTime;
@@ -38,10 +39,10 @@ class _VoicesCountdownState extends State<VoicesCountdown> {
   Widget build(BuildContext context) {
     return widget.builder(
       context,
-      _timeLeft.inDays,
-      _timeLeft.inHours % 24,
-      _timeLeft.inMinutes % 60,
-      _timeLeft.inSeconds % 60,
+      days: _timeLeft.inDays,
+      hours: _timeLeft.inHours % Duration.hoursPerDay,
+      minutes: _timeLeft.inMinutes % Duration.minutesPerHour,
+      seconds: _timeLeft.inSeconds % Duration.secondsPerMinute,
     );
   }
 
@@ -57,9 +58,9 @@ class _VoicesCountdownState extends State<VoicesCountdown> {
 
   @override
   void dispose() {
-    super.dispose();
     _timer?.cancel();
     _timer = null;
+    super.dispose();
   }
 
   @override
@@ -82,7 +83,7 @@ class _VoicesCountdownState extends State<VoicesCountdown> {
     widget.onCountdownStart?.call(true);
 
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      final now = DateTime.now();
+      final now = DateTimeExt.now();
       final diff = widget.dateTime.difference(now);
 
       if (diff.isNegative) {

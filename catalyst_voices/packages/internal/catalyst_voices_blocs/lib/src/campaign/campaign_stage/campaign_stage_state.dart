@@ -1,10 +1,8 @@
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:equatable/equatable.dart';
 
 final class AfterProposalSubmissionStage extends CampaignStageState {
   const AfterProposalSubmissionStage();
-
-  @override
-  List<Object?> get props => [...super.props];
 }
 
 sealed class CampaignStageState extends Equatable {
@@ -12,6 +10,15 @@ sealed class CampaignStageState extends Equatable {
 
   @override
   List<Object?> get props => [];
+}
+
+final class ErrorSubmissionStage extends CampaignStageState {
+  final LocalizedException error;
+
+  const ErrorSubmissionStage(this.error);
+
+  @override
+  List<Object?> get props => [...super.props, error];
 }
 
 final class PreProposalSubmissionStage extends CampaignStageState {
@@ -27,7 +34,4 @@ final class PreProposalSubmissionStage extends CampaignStageState {
 
 final class ProposalSubmissionStage extends CampaignStageState {
   const ProposalSubmissionStage();
-
-  @override
-  List<Object?> get props => [...super.props];
 }

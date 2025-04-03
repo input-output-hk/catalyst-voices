@@ -59,6 +59,7 @@ class VoicesTwoPaneDialog extends StatelessWidget {
   final Widget right;
   final bool showCloseButton;
   final EdgeInsets leftPadding;
+  final EdgeInsets rightPadding;
 
   const VoicesTwoPaneDialog({
     super.key,
@@ -66,6 +67,7 @@ class VoicesTwoPaneDialog extends StatelessWidget {
     required this.right,
     this.showCloseButton = true,
     this.leftPadding = const EdgeInsets.all(20),
+    this.rightPadding = const EdgeInsets.all(20),
   });
 
   @override
@@ -91,7 +93,7 @@ class VoicesTwoPaneDialog extends StatelessWidget {
               ),
               Expanded(
                 child: Container(
-                  padding: const EdgeInsets.all(20),
+                  padding: rightPadding,
                   child: right,
                 ),
               ),

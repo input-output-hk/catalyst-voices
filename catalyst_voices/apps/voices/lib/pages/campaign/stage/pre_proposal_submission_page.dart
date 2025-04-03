@@ -1,5 +1,5 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
-import 'package:catalyst_voices/pages/campaign/stage/background.dart';
+import 'package:catalyst_voices/pages/campaign/stage/campaign_background.dart';
 import 'package:catalyst_voices/routes/routing/spaces_route.dart';
 import 'package:catalyst_voices/widgets/cards/countdown_value_card.dart';
 import 'package:catalyst_voices/widgets/countdown/voices_countdown.dart';
@@ -20,7 +20,7 @@ class PreProposalSubmissionPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Theme(
       data: ThemeBuilder.buildTheme(),
-      child: Background(
+      child: CampaignBackground(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
@@ -33,25 +33,32 @@ class PreProposalSubmissionPage extends StatelessWidget {
               VoicesCountdown(
                 dateTime: startDate!,
                 onCountdownEnd: (value) => _onCountdownEnd(value, context),
-                builder: (context, days, hours, minutes, seconds) => Row(
+                builder: (
+                  context, {
+                  required days,
+                  required hours,
+                  required minutes,
+                  required seconds,
+                }) =>
+                    Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     CountDownValueCard(
                       value: days,
-                      unit: context.l10n.days,
+                      unit: context.l10n.days(days),
                     ),
                     CountDownValueCard(
                       value: hours,
-                      unit: context.l10n.hours,
+                      unit: context.l10n.hours(hours),
                     ),
                     CountDownValueCard(
                       value: minutes,
-                      unit: context.l10n.minutes,
+                      unit: context.l10n.minutes(minutes),
                     ),
                     CountDownValueCard(
                       value: seconds,
-                      unit: context.l10n.seconds,
+                      unit: context.l10n.seconds(seconds),
                     ),
                   ],
                 ),

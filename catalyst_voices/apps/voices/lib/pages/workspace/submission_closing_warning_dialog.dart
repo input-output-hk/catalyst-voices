@@ -74,7 +74,14 @@ class _Countdown extends StatelessWidget {
   Widget build(BuildContext context) {
     return VoicesCountdown(
       dateTime: date,
-      builder: (context, days, hours, minutes, seconds) => Text(
+      builder: (
+        context, {
+        required days,
+        required hours,
+        required minutes,
+        required seconds,
+      }) =>
+          Text(
         context.l10n.catalystAppClosesIn(
           days,
           hours,
@@ -115,7 +122,7 @@ class _HeadsUpInfo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Text(
-      text.bullet(),
+      text.withBullet(),
       style: context.textTheme.bodyLarge?.copyWith(
         color: context.colors.textOnPrimaryLevel1,
         fontWeight: isBold ? FontWeight.w700 : null,

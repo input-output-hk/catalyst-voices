@@ -98,20 +98,20 @@ class _Background extends StatelessWidget {
   Widget build(BuildContext context) {
     return CustomPaint(
       painter: BubblePainter(
-        bubbles: _buildBubbles(context),
-        shapes: _buildShapes(context),
+        bubbles: _buildBubbles(),
+        shapes: _buildShapes(),
       ),
       size: Size.infinite,
     );
   }
 
-  List<BubbleConfig> _buildBubbles(BuildContext context) {
-    final size = MediaQuery.sizeOf(context);
-
+  List<BubbleConfig> _buildBubbles() {
     return [
       BubbleConfig(
-        x: isMobile ? 0 - 70 : 0 - 90,
-        y: size.height * 0.25,
+        position: (size) => Offset(
+          isMobile ? 0 - 70 : 0 - 90,
+          size.height * 0.25,
+        ),
         radius: isMobile ? 110 : 200,
         gradientColors: const [Color(0xFFE5F6FF), Color(0xCCE5F6FF)],
         gradientStops: const [0.0, 1.0],
@@ -120,8 +120,10 @@ class _Background extends StatelessWidget {
         shadowColor: const Color.fromRGBO(150, 142, 253, 0.4),
       ),
       BubbleConfig(
-        x: isMobile ? size.width + 70 : size.width + 140,
-        y: isMobile ? size.height : size.height + 140,
+        position: (size) => Offset(
+          isMobile ? size.width + 70 : size.width + 140,
+          isMobile ? size.height : size.height + 140,
+        ),
         radius: isMobile ? 140 : 430,
         gradientColors: const [Color(0xFFE5F6FF), Color(0xCCE5F6FF)],
         gradientStops: const [0.0, 1.0],
@@ -132,12 +134,10 @@ class _Background extends StatelessWidget {
     ];
   }
 
-  List<ShapeConfig> _buildShapes(BuildContext context) {
-    final size = MediaQuery.sizeOf(context);
-
+  List<ShapeConfig> _buildShapes() {
     return [
       ShapeConfig(
-        controlPoints: [
+        controlPointsCalculator: (Size size) => [
           Point(0, size.height * .7),
           Point(size.width * .13, size.height * .82),
           Point(size.width * .15, size.height),
@@ -151,7 +151,7 @@ class _Background extends StatelessWidget {
         ),
       ),
       ShapeConfig(
-        controlPoints: [
+        controlPointsCalculator: (Size size) => [
           Point(size.width * .75, 0),
           Point(
             isMobile ? size.width * .8 : size.width * .7,
@@ -166,7 +166,7 @@ class _Background extends StatelessWidget {
         color: Color.fromARGB((255 * 0.1).toInt(), 192, 20, 235),
       ),
       ShapeConfig(
-        controlPoints: [
+        controlPointsCalculator: (Size size) => [
           Point(size.width, size.height * .2),
           Point(size.width * .7, size.height * .45),
           Point(size.width, size.height * .6),

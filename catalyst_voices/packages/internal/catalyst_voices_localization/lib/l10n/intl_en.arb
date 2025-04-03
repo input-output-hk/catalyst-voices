@@ -2253,21 +2253,41 @@
       }
     }
   },
-  "days": "Days",
+  "days": "{count, plural, =1{Day} other{Days}}",
   "@days": {
-    "description": "To represent days"
+    "description": "To represent days",
+    "placeholders": {
+      "count": {
+        "type": "num"
+      }
+    }
   },
-  "hours": "Hours",
+  "hours": "{count, plural, =1{Hour} other{Hours}}",
   "@hours": {
-    "description": "To represent hours"
+    "description": "To represent hours",
+    "placeholders": {
+      "count": {
+        "type": "num"
+      }
+    }
   },
-  "minutes": "Minutes",
+  "minutes": "{count, plural, =1{Minute} other{Minutes}}",
   "@minutes": {
-    "description": "To represent minutes"
+    "description": "To represent minutes",
+    "placeholders": {
+      "count": {
+        "type": "num"
+      }
+    }
   },
-  "seconds": "Seconds",
+  "seconds": "{count, plural, =1{Second} other{Seconds}}",
   "@seconds": {
-    "description": "To represent seconds"
+    "description": "To represent seconds",
+    "placeholders": {
+      "count": {
+        "type": "num"
+      }
+    }
   },
   "proposalSubmissionIsClosed": "Proposal submission  is closed for Fund14.",
   "@proposalSubmissionIsClosed": {

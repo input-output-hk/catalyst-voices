@@ -1,10 +1,14 @@
 import 'dart:math';
 
+import 'package:equatable/equatable.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
-class BubbleConfig {
-  final double x;
-  final double y;
+typedef PositionCalculator = Offset Function(Size size);
+typedef ShapePointCalculator = List<Point<double>> Function(Size size);
+
+class BubbleConfig extends Equatable {
+  final PositionCalculator position;
   final double radius;
   final List<Color> gradientColors;
   final List<double> gradientStops;
@@ -12,9 +16,8 @@ class BubbleConfig {
   final Offset? shadowOffset;
   final Color? shadowColor;
 
-  BubbleConfig({
-    required this.x,
-    required this.y,
+  const BubbleConfig({
+    required this.position,
     required this.radius,
     required this.gradientColors,
     required this.gradientStops,
@@ -22,6 +25,17 @@ class BubbleConfig {
     this.shadowOffset,
     this.shadowColor,
   });
+
+  @override
+  List<Object?> get props => [
+        position,
+        radius,
+        gradientColors,
+        gradientStops,
+        shadowBlur,
+        shadowOffset,
+        shadowColor,
+      ];
 }
 
 class BubblePainter extends CustomPainter {
@@ -39,7 +53,7 @@ class BubblePainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     _drawBackground(canvas, size);
     for (final bubble in bubbles) {
-      _drawBubble(canvas, bubble);
+      _drawBubble(canvas, bubble, size);
     }
     for (final shape in shapes) {
       _drawShape(canvas, size, shape: shape);
@@ -48,7 +62,8 @@ class BubblePainter extends CustomPainter {
 
   @override
   bool shouldRepaint(BubblePainter oldDelegate) =>
-      bubbles != oldDelegate.bubbles || shapes != oldDelegate.shapes;
+      !listEquals(bubbles, oldDelegate.bubbles) ||
+      !listEquals(shapes, oldDelegate.shapes);
 
   void _drawBackground(Canvas canvas, Size size) {
     if (backgroundColor == null) return;
@@ -58,9 +73,10 @@ class BubblePainter extends CustomPainter {
     );
   }
 
-  void _drawBubble(Canvas canvas, BubbleConfig bubble) {
+  void _drawBubble(Canvas canvas, BubbleConfig bubble, Size size) {
+    final position = bubble.position(size);
     final rect = Rect.fromCircle(
-      center: Offset(bubble.x, bubble.y),
+      center: position,
       radius: bubble.radius,
     );
 
@@ -85,7 +101,7 @@ class BubblePainter extends CustomPainter {
       ).createShader(rect)
       ..blendMode = BlendMode.softLight;
 
-    canvas.drawCircle(Offset(bubble.x, bubble.y), bubble.radius, paint);
+    canvas.drawCircle(position, bubble.radius, paint);
   }
 
   void _drawShape(
@@ -93,24 +109,24 @@ class BubblePainter extends CustomPainter {
     Size size, {
     required ShapeConfig shape,
   }) {
-    final path = Path()
-      ..moveTo(shape.controlPoints[0].x, shape.controlPoints[0].y);
+    final controlPoints = shape.controlPointsCalculator(size);
+    final path = Path()..moveTo(controlPoints[0].x, controlPoints[0].y);
 
-    if (shape.controlPoints.length == 4) {
+    if (controlPoints.length == 4) {
       path
         ..quadraticBezierTo(
-          shape.controlPoints[1].x,
-          shape.controlPoints[1].y,
-          shape.controlPoints[2].x,
-          shape.controlPoints[2].y,
+          controlPoints[1].x,
+          controlPoints[1].y,
+          controlPoints[2].x,
+          controlPoints[2].y,
         )
-        ..lineTo(shape.controlPoints[3].x, shape.controlPoints[3].y);
-    } else if (shape.controlPoints.length == 3) {
+        ..lineTo(controlPoints[3].x, controlPoints[3].y);
+    } else if (controlPoints.length == 3) {
       path.quadraticBezierTo(
-        shape.controlPoints[1].x,
-        shape.controlPoints[1].y,
-        shape.controlPoints[2].x,
-        shape.controlPoints[2].y,
+        controlPoints[1].x,
+        controlPoints[1].y,
+        controlPoints[2].x,
+        controlPoints[2].y,
       );
     }
 
@@ -130,14 +146,17 @@ class BubblePainter extends CustomPainter {
   }
 }
 
-class ShapeConfig {
-  final List<Point<double>> controlPoints;
+class ShapeConfig extends Equatable {
+  final ShapePointCalculator controlPointsCalculator;
   final Color? color;
   final RadialGradient? gradient;
 
-  ShapeConfig({
-    required this.controlPoints,
+  const ShapeConfig({
+    required this.controlPointsCalculator,
     this.color,
     this.gradient,
   });
+
+  @override
+  List<Object?> get props => [controlPointsCalculator, color, gradient];
 }

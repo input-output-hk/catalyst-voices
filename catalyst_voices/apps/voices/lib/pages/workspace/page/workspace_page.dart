@@ -85,7 +85,7 @@ class _WorkspacePageState extends State<WorkspacePage>
       ..add(const GetTimelineItemsEvent());
   }
 
-  void _dontShowAgain(bool value) {
+  void _dontShowCampaignSubmissionClosingDialog(bool value) {
     context
         .read<SessionCubit>()
         .updateShowSubmissionClosingWarning(value: value);
@@ -128,7 +128,7 @@ class _WorkspacePageState extends State<WorkspacePage>
     await SubmissionClosingWarningDialog.showNDaysBefore(
       context: context,
       submissionCloseAt: submissionCloseDate,
-      dontShowAgain: _dontShowAgain,
+      dontShowAgain: _dontShowCampaignSubmissionClosingDialog,
     );
   }
 }

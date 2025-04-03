@@ -5,10 +5,10 @@ import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:flutter/material.dart';
 
-class Background extends StatelessWidget {
+class CampaignBackground extends StatelessWidget {
   final Widget child;
 
-  const Background({super.key, required this.child});
+  const CampaignBackground({super.key, required this.child});
 
   @override
   Widget build(BuildContext context) {
@@ -55,20 +55,17 @@ class _BubbleShapes extends StatelessWidget {
   Widget build(BuildContext context) {
     return CustomPaint(
       painter: BubblePainter(
-        bubbles: _buildBubbles(context),
-        shapes: _buildShapes(context),
+        bubbles: _buildBubbles(),
+        shapes: _buildShapes(),
       ),
       size: Size.infinite,
     );
   }
 
-  List<BubbleConfig> _buildBubbles(BuildContext context) {
-    final size = MediaQuery.sizeOf(context);
-
+  List<BubbleConfig> _buildBubbles() {
     return [
       BubbleConfig(
-        x: 0 - 110,
-        y: size.height * .45,
+        position: (size) => Offset(0 - 110, size.height * .45),
         radius: 224,
         gradientColors: [
           Color.fromARGB(
@@ -78,18 +75,16 @@ class _BubbleShapes extends StatelessWidget {
             211,
           ),
         ],
-        gradientStops: [1],
+        gradientStops: const [1],
       ),
       BubbleConfig(
-        x: size.width * .7,
-        y: -220,
+        position: (size) => Offset(size.width * .7, -220),
         radius: 372,
-        gradientColors: [const Color(0x9FC01CEB)],
-        gradientStops: [0],
+        gradientColors: const [Color(0x9FC01CEB)],
+        gradientStops: const [0],
       ),
       BubbleConfig(
-        x: size.width * .92,
-        y: size.height * .85,
+        position: (size) => Offset(size.width * .92, size.height * .85),
         radius: 140,
         gradientColors: const [Color(0xFFE5F6FF)],
         gradientStops: const [0],
@@ -105,12 +100,10 @@ class _BubbleShapes extends StatelessWidget {
     ];
   }
 
-  List<ShapeConfig> _buildShapes(BuildContext context) {
-    final size = MediaQuery.sizeOf(context);
-
+  List<ShapeConfig> _buildShapes() {
     return [
       ShapeConfig(
-        controlPoints: [
+        controlPointsCalculator: (Size size) => [
           Point(size.width * .8, 0),
           Point(size.width * .7, size.height * .25),
           Point(size.width, size.height * .5),

@@ -54,7 +54,7 @@ class TipCard extends StatelessWidget {
                 ),
                 for (final tip in tips)
                   Text(
-                    tip.bullet(),
+                    tip.withBullet(),
                     style: context.textTheme.bodySmall?.copyWith(
                       color: context.colors.textOnPrimaryLevel1,
                     ),

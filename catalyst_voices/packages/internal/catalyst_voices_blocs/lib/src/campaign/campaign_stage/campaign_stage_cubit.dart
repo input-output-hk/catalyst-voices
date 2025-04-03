@@ -4,6 +4,7 @@ import 'package:catalyst_voices_blocs/src/campaign/campaign_stage/campaign_stage
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 final _logger = Logger('CampaignStageCubit');
@@ -17,24 +18,33 @@ class CampaignStageCubit extends Cubit<CampaignStageState> {
   }
 
   Future<void> getCampaignStage() async {
-    final campaignTimeline = await _campaignService.getCampaignTimeline();
+    try {
+      final campaignTimeline = await _campaignService.getCampaignTimeline();
 
-    final now = DateTime.now();
-    final proposalSubmissionStage = campaignTimeline
-        .firstWhere((e) => e.stage == CampaignTimelineStage.proposalSubmission);
-
-    if (proposalSubmissionStage.timeline.isInRange(now)) {
-      emit(const ProposalSubmissionStage());
-    } else if (proposalSubmissionStage.timeline.isBeforeRange(now)) {
-      emit(
-        PreProposalSubmissionStage(
-          startDate: proposalSubmissionStage.timeline.from,
+      final now = DateTime.now();
+      final proposalSubmissionStage = campaignTimeline.firstWhere(
+        (e) => e.stage == CampaignTimelineStage.proposalSubmission,
+        orElse: () => throw const NotFoundException(
+          message: 'Proposal submission stage not found',
         ),
       );
-    } else {
-      emit(const AfterProposalSubmissionStage());
+
+      if (proposalSubmissionStage.timeline.isInRange(now)) {
+        emit(const ProposalSubmissionStage());
+      } else if (proposalSubmissionStage.timeline.isBeforeRange(now)) {
+        emit(
+          PreProposalSubmissionStage(
+            startDate: proposalSubmissionStage.timeline.from,
+          ),
+        );
+      } else {
+        emit(const AfterProposalSubmissionStage());
+      }
+      _logger.info(state.toString());
+    } catch (error, stackTrace) {
+      _logger.severe('getCampaignStage error', error, stackTrace);
+      emit(const ErrorSubmissionStage(LocalizedUnknownException()));
     }
-    _logger.info(state.toString());
   }
 
   void proposalSubmissionStarted() {

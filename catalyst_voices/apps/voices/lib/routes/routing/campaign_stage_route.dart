@@ -1,4 +1,5 @@
 import 'package:catalyst_voices/pages/campaign/stage/after_proposal_submission_page.dart';
+import 'package:catalyst_voices/pages/campaign/stage/error_proposal_submission_page.dart';
 import 'package:catalyst_voices/pages/campaign/stage/pre_proposal_submission_page.dart';
 import 'package:catalyst_voices/routes/guards/composite_route_guard_mixin.dart';
 import 'package:catalyst_voices/routes/guards/proposal_submission_guard.dart';
@@ -30,8 +31,10 @@ final class CampaignStageRoute extends GoRouteData
       return PreProposalSubmissionPage(
         startDate: campaignState.startDate,
       );
-    } else {
+    } else if (campaignState is AfterProposalSubmissionStage) {
       return const AfterProposalSubmissionPage();
+    } else {
+      return const ErrorProposalSubmissionPage();
     }
   }
 }

@@ -1,5 +1,5 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
-import 'package:catalyst_voices/pages/campaign/stage/background.dart';
+import 'package:catalyst_voices/pages/campaign/stage/campaign_background.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
@@ -12,7 +12,7 @@ class AfterProposalSubmissionPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Theme(
       data: ThemeBuilder.buildTheme(),
-      child: Background(
+      child: CampaignBackground(
         child: ConstrainedBox(
           constraints: const BoxConstraints.tightFor(width: 560),
           child: Column(
