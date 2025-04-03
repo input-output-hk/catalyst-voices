@@ -98,7 +98,7 @@ class SingleSelectDropdown<T> extends VoicesFormField<T> {
                 onSelected: onChangedHandler,
                 inputDecorationTheme: InputDecorationTheme(
                   hintStyle: theme.textTheme.bodyLarge?.copyWith(
-                    color: theme.colors.textDisabled,
+                    color: theme.colors.textOnPrimaryLevel1,
                   ),
                   fillColor: theme.colors.elevationsOnSurfaceNeutralLv1Grey,
                   filled: filled,
