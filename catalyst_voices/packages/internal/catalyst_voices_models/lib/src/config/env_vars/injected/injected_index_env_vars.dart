@@ -8,7 +8,7 @@ const _configUrlPlaceholder = '{{$_configUrlKey}}';
 const _envNameKey = 'ENV_NAME';
 const _envNamePlaceholder = '{{$_envNameKey}}';
 
-EnvVars getWebEnvVars() {
+EnvVars getInjectedEnvVars() {
   try {
     final flutterEnvironment = globalContext['flutterEnvironment']?.dartify();
     if (flutterEnvironment is! Map) {

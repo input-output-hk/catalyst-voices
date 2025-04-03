@@ -1,7 +1,9 @@
 // ignore_for_file: avoid_print
 
 import 'package:catalyst_voices_models/src/config/env_vars/dart_define_env_vars.dart';
-import 'package:catalyst_voices_models/src/config/env_vars/web_env_vars.dart';
+import 'package:catalyst_voices_models/src/config/env_vars/injected/injected_env_vars_stub.dart'
+    if (dart.library.io) 'env_vars/injected/injected_no_op_env_vars.dart'
+    if (dart.library.js_interop) 'env_vars/injected/injected_index_env_vars.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 
@@ -26,14 +28,13 @@ final class AppEnvironment extends Equatable {
         );
 
   factory AppEnvironment.fromEnv() {
-    var envVars = getDartEnvVars();
+    final envVars = getDartEnvVars();
+    final injectedEnvVars = getInjectedEnvVars();
 
-    if (kIsWeb) {
-      envVars = envVars.mergeWith(getWebEnvVars());
-    }
+    final effectiveEnvVars = envVars.mergeWith(injectedEnvVars);
 
-    final envName = envVars.envName;
-    final configUrl = envVars.configUrl;
+    final envName = effectiveEnvVars.envName;
+    final configUrl = effectiveEnvVars.configUrl;
 
     if (envName == null && kDebugMode) {
       print('ENV -> type not defined! Using fallback');
