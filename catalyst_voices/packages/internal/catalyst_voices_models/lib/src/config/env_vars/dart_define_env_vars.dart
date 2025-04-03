@@ -1,4 +1,5 @@
 import 'package:catalyst_voices_models/src/config/env_vars/env_vars.dart';
+import 'package:flutter/services.dart';
 
 /// Have to mach against --dart-define variables
 const _configUrlKey = 'CONFIG_URL';
@@ -13,7 +14,7 @@ EnvVars getDartEnvVars() {
       : null;
 
   return const EnvVars(
-    envName: envName,
+    envName: envName ?? appFlavor,
     configUrl: configUrl,
   );
 }
