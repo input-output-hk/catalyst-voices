@@ -164,7 +164,6 @@ async fn checker_api_catalyst_auth(
             AuthTokenError
         })?;
 
-    // Step 8: get the latest stable signing certificate registered for Role 0.
     let (latest_pk, _) = reg_chain
         .get_latest_signing_pk_for_role(&RoleNumber::ROLE_0)
         .ok_or_else(|| {
