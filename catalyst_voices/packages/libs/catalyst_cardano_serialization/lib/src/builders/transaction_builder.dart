@@ -1,6 +1,5 @@
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_cardano_serialization/src/builders/input_builder.dart';
-import 'package:catalyst_cardano_serialization/src/builders/strategies/selection_strategies.dart';
 import 'package:catalyst_cardano_serialization/src/builders/types.dart';
 import 'package:catalyst_cardano_serialization/src/utils/cbor.dart';
 import 'package:cbor/cbor.dart';
