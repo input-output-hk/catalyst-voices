@@ -153,7 +153,6 @@ async fn checker_api_catalyst_auth(
         Err(AuthTokenAccessViolation(vec!["EXPIRED".to_string()]))?;
     }
 
-    // Step 8: return 401 if the token isn't known.
     let Some(reg_chain) = token.reg_chain() else {
         error!(
             "Unable to find registrations for {} Catalyst ID",
@@ -174,7 +173,7 @@ async fn checker_api_catalyst_auth(
     //     return Ok(token);
     // }
 
-    // Step 9: get the latest stable signing certificate registered for Role 0.
+    // Step 8: Get the latest stable signing certificate registered for Role 0.
     let (latest_pk, _) = reg_chain
         .get_latest_signing_pk_for_role(&RoleNumber::ROLE_0)
         .ok_or_else(|| {
@@ -185,7 +184,7 @@ async fn checker_api_catalyst_auth(
             AuthTokenError
         })?;
 
-    // Step 10: Verify the signature.
+    // Step 9: Verify the signature against the Role 0 pk.
     if let Err(error) = token.verify(&latest_pk) {
         error!(error=%error, "Invalid signature for token: {token}");
         Err(AuthTokenAccessViolation(vec![
@@ -193,7 +192,7 @@ async fn checker_api_catalyst_auth(
         ]))?;
     }
 
-    // Step 11 is optional and isn't currently implemented.
+    // Step 10 is optional and isn't currently implemented.
     //   - Get the latest unstable signing certificate registered for Role 0.
     //   - Verify the signature against the Role 0 Public Key and Algorithm identified by the
     //     certificate. If this fails, return 403.
@@ -203,5 +202,6 @@ async fn checker_api_catalyst_auth(
     // // This entry will expire after 5 minutes (TTI) if there is no more ().
     // CACHE.insert(bearer.token, token.clone()).await;
 
+    // Step 11: Token is valid
     Ok(token)
 }
