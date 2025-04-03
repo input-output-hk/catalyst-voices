@@ -760,7 +760,7 @@
   "createBaseProfileAcknowledgementsToS": "I confirm that I have read and agree to be bound by {tos}.",
   "catalystTos": "Project Catalyst Terms and Conditions",
   "createBaseProfileAcknowledgementsPrivacyPolicy": "I acknowledge and agree that any data I share in connection with my participation in Project Catalyst Funds will be collected, stored, used and processed in accordance with the {privacy_policy}.",
-  "catalystPrivacyPolicy": "Catalyst FC’s Privacy Policy",
+  "catalystPrivacyPolicy": "Catalyst FC's Privacy Policy",
   "createBaseProfileAcknowledgementsDataUsage": "I acknowledge that the Catalyst Ops team may use my email only for Catalyst communication.",
   "accountCreationSplashTitle": "Create your Catalyst Keychain",
   "accountCreationSplashMessage": "Catalyst Keychain is your ticket to participate in innovation on the global stage.  \u2028\u2028These next steps will create your Catalyst keychain so you can enter new spaces, discover awesome ideas, and share your feedback to help improve ideas.",
@@ -803,7 +803,7 @@
   "@removeKeychainDialogSubtitle": {
     "description": "A subtitle on delete keychain dialog"
   },
-  "deleteKeychainDialogTypingInfo": "To continue with the removal type: ‘Remove Keychain’.",
+  "deleteKeychainDialogTypingInfo": "To continue with the removal type: 'Remove Keychain'.",
   "@deleteKeychainDialogTypingInfo": {
     "description": "A typing info on delete keychain dialog"
   },
@@ -958,9 +958,9 @@
     "description": "Action to reset value in text field"
   },
   "createKeychainSeedPhraseCheckSuccessTitle": "Nice job! You've successfully verified your Catalyst seed phase",
-  "createKeychainSeedPhraseCheckSuccessSubtitle": "Enter your seed phrase to recover your Catalyst Keychain on any device.   \u2028\u2028It's kinda like your email and password all rolled into one, so keep it somewhere safe!\u2028\u2028In the next step we’ll add a password to your Catalyst Keychain, so you can lock/unlock access to Voices.",
+  "createKeychainSeedPhraseCheckSuccessSubtitle": "Enter your seed phrase to recover your Catalyst Keychain on any device.   \u2028\u2028It's kinda like your email and password all rolled into one, so keep it somewhere safe!\u2028\u2028In the next step we'll add a password to your Catalyst Keychain, so you can lock/unlock access to Voices.",
   "yourNextStep": "Your next step",
-  "createKeychainSeedPhraseCheckSuccessNextStep": "Now let’s set your Unlock password for this device!",
+  "createKeychainSeedPhraseCheckSuccessNextStep": "Now let's set your Unlock password for this device!",
   "createKeychainUnlockPasswordInstructionsTitle": "Set your Catalyst unlock password for this device",
   "createKeychainUnlockPasswordInstructionsSubtitle": "In this next step, you'll set your Unlock Password for this device. It's like a shortcut for proving ownership of your Keychain.  \u2028\u2028Whenever you recover your account for the first time on a new device, you'll need to use your Catalyst seed phrase to get started. Every time after that, you can use your Unlock Password to quickly regain access.",
   "createBaseProfileCreatedTitle": "Congratulations your Base profile is setup!",
@@ -1416,7 +1416,7 @@
   "@howItWorksCollaborate": {
     "description": "Used in discovery page in how it works section"
   },
-  "howItWorks": "Here’s how it works",
+  "howItWorks": "Here's how it works",
   "howItWorksCollaborateDescription": "Got an Idea? Create an impactful proposal and collaborate with the community to develop and refine it.",
   "howItWorksVote": "Vote for your favorite ideas",
   "@howItWorksVote": {
@@ -2192,7 +2192,7 @@
   "@stayInvolved": {
     "description": "Title for the stay involved section"
   },
-  "stayInvolvedReviewerDescription": "Your voice has power. Use it to guide others and help improve the Cardano community.\n\nAs a reviewer, you’ll make a real impact by sharing thoughtful feedback and influencing decisions.",
+  "stayInvolvedReviewerDescription": "Your voice has power. Use it to guide others and help improve the Cardano community.\n\nAs a reviewer, you'll make a real impact by sharing thoughtful feedback and influencing decisions.",
   "@stayInvolvedReviewerDescription": {
     "description": "Description for the reviewer cards in stay involved section"
   },
@@ -2217,7 +2217,7 @@
   "@mobileAccessDescription": {
     "description": "Description for the mobile restricted access page"
   },
-  "mobileAccessSubtitle": "We’re not quite ready for you on mobile just yet…",
+  "mobileAccessSubtitle": "We're not quite ready for you on mobile just yet…",
   "@mobileAccessSubtitle": {
     "description": "Subtitle for the mobile restricted access page"
   },
@@ -2430,6 +2430,45 @@
         "type": "int",
         "example": "10"
       }
-    }
+    },
+  "insertNewImageDialogTitle": "Insert New Image",
+  "@insertNewImageDialogTitle": {
+    "description": "Title of the dialog for inserting a new image"
+  },
+  "insertNewImageDialogDescription": "Bring your proposal to life with visuals",
+  "@insertNewImageDialogDescription": {
+    "description": "Description of the dialog for inserting a new image"
+  },
+  "insertNewImageDialogImageUrl": "Image URL",
+  "@insertNewImageDialogImageUrl": {
+    "description": "Label for the image URL input field"
+  },
+  "insertNewImageDialogInsertButtonText": "Insert Image",
+  "@insertNewImageDialogInsertButtonText": {
+    "description": "Label for the insert button"
+  },
+  "insertNewImageDialogInvalidUrl": "Please provide a valid image URL to proceed",
+  "@insertNewImageDialogInvalidUrl": {
+    "description": "Message shown when the image URL is invalid"
+  },
+  "insertNewImageDialogTextPlaceholder": "Paste link to image here",
+  "@insertNewImageDialogTextPlaceholder": {
+    "description": "Default text for the image URL input field"
+  },
+  "richTextEditorImageSupportInfo": "The editor supports images from web URLs, including both traditional web servers and decentralized storage solutions. For more information, visit our",
+  "@richTextEditorImageSupportInfo": {
+    "description": "Information about supported image sources in the editor"
+  },
+  "knowledgeBase": "knowledge base",
+  "@knowledgeBase": {
+    "description": "Text for the knowledge base link"
+  },
+  "toLearnMore": "to learn more.",
+  "@toLearnMore": {
+    "description": "Text for the to learn more link"
+  },
+  "insertNewImageFailedToLoad": "Image failed to load",
+  "@insertNewImageFailedToLoad": {
+    "description": "Text for the image failed to load"
   }
 }

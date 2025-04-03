@@ -12,6 +12,7 @@ import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_segments
 import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_setup_panel.dart';
 import 'package:catalyst_voices/pages/spaces/appbar/session_state_header.dart';
 import 'package:catalyst_voices/pages/workspace/submission_closing_warning_dialog.dart';
+import 'package:catalyst_voices/routes/routing/proposal_builder_route.dart';
 import 'package:catalyst_voices/routes/routing/spaces_route.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/publish_proposal_error_dialog.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/submit_proposal_error_dialog.dart';
@@ -75,6 +76,7 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
   late final SegmentsController _segmentsController;
   late final ItemScrollController _segmentsScrollController;
 
+  StreamSubscription<DocumentRef?>? _proposalRefSub;
   StreamSubscription<dynamic>? _segmentsSub;
 
   @override
@@ -118,6 +120,9 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
   @override
   void dispose() {
     _segmentsController.dispose();
+
+    unawaited(_proposalRefSub?.cancel());
+    _proposalRefSub = null;
 
     unawaited(_segmentsSub?.cancel());
     _segmentsSub = null;
@@ -165,18 +170,11 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
       ..addListener(_handleSegmentsControllerChange)
       ..attachItemsScrollController(_segmentsScrollController);
 
-    _segmentsSub = bloc.stream
-        .map(
-          (event) => (segments: event.allSegments, nodeId: event.activeNodeId),
-        )
-        .distinct(
-          (a, b) => listEquals(a.segments, b.segments) && a.nodeId == b.nodeId,
-        )
-        .listen((record) => _updateSegments(record.segments, record.nodeId));
-
+    _listenForProposalRef(bloc);
+    _listenForSegments(bloc);
     _loadData(bloc: bloc);
   }
-
+              
   void _dontShowCampaignSubmissionClosingDialog(bool value) {
     context
         .read<SessionCubit>()
@@ -188,6 +186,29 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
 
     final event = ActiveNodeChangedEvent(activeSectionId);
     context.read<ProposalBuilderBloc>().add(event);
+  }
+
+  void _listenForProposalRef(ProposalBuilderBloc bloc) {
+    // listen for updates
+    _proposalRefSub = bloc.stream
+        .map((event) => event.metadata.documentRef)
+        .distinct()
+        .listen(_onProposalRefChanged);
+  }
+
+  void _listenForSegments(ProposalBuilderBloc bloc) {
+    // listen for updates
+    _segmentsSub = bloc.stream
+        .map(
+          (event) => (segments: event.allSegments, nodeId: event.activeNodeId),
+        )
+        .distinct(
+          (a, b) => listEquals(a.segments, b.segments) && a.nodeId == b.nodeId,
+        )
+        .listen((record) => _updateSegments(record.segments, record.nodeId));
+
+    // update with current state
+    _updateSegments(bloc.state.allSegments, bloc.state.activeNodeId);
   }
 
   void _loadData({ProposalBuilderBloc? bloc}) {
@@ -210,6 +231,14 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
     Router.neglect(context, () {
       const WorkspaceRoute().replace(context);
     });
+  }
+
+  void _onProposalRefChanged(DocumentRef? ref) {
+    if (ref != null) {
+      Router.neglect(context, () {
+        ProposalBuilderRoute.fromRef(ref: ref).replace(context);
+      });
+    }
   }
 
   Future<void> _showPublishException(ProposalBuilderPublishException error) {

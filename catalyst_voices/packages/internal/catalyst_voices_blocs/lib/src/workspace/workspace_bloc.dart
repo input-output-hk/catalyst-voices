@@ -138,7 +138,7 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
       return emitError(const LocalizedUnknownException());
     }
     await _proposalService.unlockProposal(
-      ref: proposal.selfRef as SignedDocumentRef,
+      proposalRef: proposal.selfRef as SignedDocumentRef,
       categoryId: proposal.categoryId,
     );
   }
@@ -207,7 +207,7 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
       return emitError(const LocalizedUnknownException());
     }
     await _proposalService.unlockProposal(
-      ref: proposal.selfRef as SignedDocumentRef,
+      proposalRef: proposal.selfRef as SignedDocumentRef,
       categoryId: proposal.categoryId,
     );
     emitSignal(OpenProposalBuilderSignal(ref: event.ref));

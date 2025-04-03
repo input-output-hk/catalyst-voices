@@ -369,11 +369,17 @@ final class ProposalBuilderBloc
     LoadProposalEvent event,
     Emitter<ProposalBuilderState> emit,
   ) async {
-    _logger.info('Loading proposal: ${event.proposalId}');
+    final proposalRef = event.proposalId;
+    if (state.metadata.documentRef == proposalRef) {
+      _logger.info('Loading proposal: $proposalRef ignored, already loaded');
+      return;
+    } else {
+      _logger.info('Loading proposal: $proposalRef');
+    }
 
     await _loadState(emit, () async {
       final proposalData = await _proposalService.getProposal(
-        ref: event.proposalId,
+        ref: proposalRef,
       );
       // TODO(LynxLynxx): check if new local proposal is created
       // when SignedDocumentRef is used instead of DraftRef
@@ -386,7 +392,7 @@ final class ProposalBuilderBloc
         return DocumentVersion(
           id: versionId,
           number: index + 1,
-          isCurrent: versionId == event.proposalId.version,
+          isCurrent: versionId == proposalRef.version,
           isLatest: index == proposalData.versions.length - 1,
         );
       }).toList();
@@ -562,11 +568,11 @@ final class ProposalBuilderBloc
       emit,
       documentRef: updatedRef,
       originalDocumentRef: updatedRef,
-      publish: ProposalPublish.localDraft,
+      publish: ProposalPublish.publishedDraft,
     );
 
     await _proposalService.submitProposalForReview(
-      ref: updatedRef,
+      proposalRef: updatedRef,
       categoryId: state.metadata.categoryId!,
     );
 
@@ -656,11 +662,15 @@ final class ProposalBuilderBloc
     Document document,
   ) async {
     final updatedRef = await _upsertDraftProposal(
-      state.metadata.documentRef!,
       _documentMapper.toContent(document),
     );
 
-    _updateMetadata(emit, documentRef: updatedRef);
+    _updateMetadata(
+      emit,
+      documentRef: updatedRef,
+      originalDocumentRef: state.metadata.originalDocumentRef ?? updatedRef,
+      publish: ProposalPublish.localDraft,
+    );
   }
 
   Future<void> _submitComment(
@@ -752,7 +762,7 @@ final class ProposalBuilderBloc
     Emitter<ProposalBuilderState> emit,
   ) async {
     await _proposalService.submitProposalForReview(
-      ref: state.metadata.documentRef! as SignedDocumentRef,
+      proposalRef: state.metadata.documentRef! as SignedDocumentRef,
       categoryId: state.metadata.categoryId!,
     );
 
@@ -809,10 +819,8 @@ final class ProposalBuilderBloc
     emit(updatedState);
   }
 
-  Future<DraftRef> _upsertDraftProposal(
-    DocumentRef currentRef,
-    DocumentDataContent document,
-  ) async {
+  Future<DraftRef> _upsertDraftProposal(DocumentDataContent document) async {
+    final currentRef = state.metadata.documentRef!;
     final originalRef = state.metadata.originalDocumentRef;
     final template = state.metadata.templateRef!;
     final categoryId = state.metadata.categoryId!;
