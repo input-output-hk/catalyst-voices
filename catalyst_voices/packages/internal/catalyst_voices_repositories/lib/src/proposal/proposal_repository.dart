@@ -69,7 +69,8 @@ abstract interface class ProposalRepository {
   });
 
   Future<void> publishProposalAction({
-    required SignedDocumentRef ref,
+    required SignedDocumentRef actionRef,
+    required SignedDocumentRef proposalRef,
     required SignedDocumentRef categoryId,
     required ProposalSubmissionAction action,
     required CatalystId catalystId,
@@ -234,7 +235,8 @@ final class ProposalRepositoryImpl implements ProposalRepository {
 
   @override
   Future<void> publishProposalAction({
-    required SignedDocumentRef ref,
+    required SignedDocumentRef actionRef,
+    required SignedDocumentRef proposalRef,
     required SignedDocumentRef categoryId,
     required ProposalSubmissionAction action,
     required CatalystId catalystId,
@@ -249,8 +251,10 @@ final class ProposalRepositoryImpl implements ProposalRepository {
       metadata: SignedDocumentMetadata(
         contentType: SignedDocumentContentType.json,
         documentType: DocumentType.proposalActionDocument,
-        ref: SignedDocumentMetadataRef.fromDocumentRef(ref),
-        categoryId: SignedDocumentMetadataRef.fromDocumentRef(ref),
+        id: actionRef.id,
+        ver: actionRef.version,
+        ref: SignedDocumentMetadataRef.fromDocumentRef(proposalRef),
+        categoryId: SignedDocumentMetadataRef.fromDocumentRef(categoryId),
       ),
       catalystId: catalystId,
       privateKey: privateKey,

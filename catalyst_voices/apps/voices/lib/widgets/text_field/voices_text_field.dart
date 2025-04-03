@@ -531,19 +531,22 @@ class VoicesTextFieldState extends VoicesFormFieldState<String> {
           ? DefaultTextStyle(
               style: widget.enabled
                   ? textTheme.bodySmall!
-                  : textTheme.bodySmall!.copyWith(color: colors.textDisabled),
+                  : textTheme.bodySmall!
+                      .copyWith(color: colors.textOnPrimaryLevel1),
               child: widget.decoration!.helper!,
             )
           : null,
       helperText: widget.decoration?.helperText,
       helperStyle: widget.enabled
           ? textTheme.bodySmall
-          : textTheme.bodySmall!.copyWith(color: colors.textDisabled),
+          : textTheme.bodySmall!.copyWith(color: colors.textOnPrimaryLevel1),
       hintText: widget.decoration?.hintText,
       hintStyle: _getHintStyle(
         textTheme,
         theme,
-        orDefault: textTheme.bodyLarge!.copyWith(color: colors.textDisabled),
+        orDefault: textTheme.bodyLarge!.copyWith(
+          color: colors.textOnPrimaryLevel1,
+        ),
       ),
       errorText: widget.decoration?.errorText ?? _validation.errorMessage,
       errorMaxLines: widget.decoration?.errorMaxLines,
@@ -601,7 +604,8 @@ class VoicesTextFieldState extends VoicesFormFieldState<String> {
 
     return widget.enabled
         ? textTheme.bodySmall!.copyWith(color: theme.colorScheme.error)
-        : textTheme.bodySmall!.copyWith(color: theme.colors.textDisabled);
+        : textTheme.bodySmall!
+            .copyWith(color: theme.colors.textOnPrimaryLevel1);
   }
 
   TextStyle? _getHintStyle(

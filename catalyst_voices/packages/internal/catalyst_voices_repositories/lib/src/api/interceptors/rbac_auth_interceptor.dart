@@ -2,7 +2,10 @@ import 'dart:async';
 
 import 'package:catalyst_voices_repositories/src/auth/auth_token_provider.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
-import 'package:chopper/chopper.dart';
+import 'package:chopper/chopper.dart' as utils show applyHeader;
+import 'package:chopper/chopper.dart' hide applyHeader;
+
+final _logger = Logger('RbacAuthInterceptor');
 
 /// Token specification:
 /// https://github.com/input-output-hk/catalyst-voices/blob/main/docs/src/catalyst-standards/permissionless-auth/auth-header.md
@@ -12,26 +15,79 @@ import 'package:chopper/chopper.dart';
 /// - 403: The token is valid, we know who they are but either the timestamp is
 /// wrong (out of date) or the signature is wrong.
 final class RbacAuthInterceptor implements Interceptor {
+  static const _retryCountHeaderName = 'Retry-Count';
+  static const _retryStatusCodes = [401, 403];
+  static const _maxRetries = 1;
+
   final UserObserver _userObserver;
   final AuthTokenProvider _authTokenProvider;
 
-  const RbacAuthInterceptor(this._userObserver, this._authTokenProvider);
+  const RbacAuthInterceptor(
+    this._userObserver,
+    this._authTokenProvider,
+  );
 
   @override
   FutureOr<Response<BodyType>> intercept<BodyType>(
     Chain<BodyType> chain,
   ) async {
     final keychain = _userObserver.user.activeAccount?.keychain;
-    final isUnlocked = await keychain?.isUnlocked;
+    final isUnlocked = await keychain?.isUnlocked ?? false;
 
-    var request = chain.request;
-
-    if (isUnlocked ?? false) {
-      // TODO(damian-molinski): react to 401 and 403 statuses.
-      final token = await _authTokenProvider.createRbacToken();
-      request = applyHeader(request, 'Authorization', 'Bearer $token');
+    if (!isUnlocked) {
+      return chain.proceed(chain.request);
     }
 
-    return chain.proceed(request);
+    final token = await _authTokenProvider.createRbacToken();
+    final updatedRequest = chain.request.applyAuthToken(token);
+
+    final response = await chain.proceed(updatedRequest);
+
+    if (_retryStatusCodes.contains(response.statusCode)) {
+      final retryRequest = await _retryRequest(chain.request);
+      if (retryRequest != null) {
+        return await chain.proceed(retryRequest);
+      }
+    }
+
+    return response;
+  }
+
+  Future<Request?> _retryRequest(Request request) async {
+    try {
+      final rawRetryCount = request.headers[_retryCountHeaderName];
+      final retryCount = int.tryParse(rawRetryCount ?? '') ?? 0;
+      if (retryCount >= _maxRetries) {
+        _logger.severe('Giving up on ${request.uri} auth retry[$retryCount]');
+        return null;
+      }
+
+      final newToken = await _authTokenProvider.createRbacToken(
+        forceRefresh: true,
+      );
+
+      return request
+          .applyAuthToken(newToken)
+          .applyHeader(name: _retryCountHeaderName, value: '${retryCount + 1}');
+    } catch (error, stack) {
+      _logger.severe('Re-authentication failed', error, stack);
+      return null;
+    }
+  }
+}
+
+extension on Request {
+  Request applyAuthToken(String value) {
+    return applyHeader(
+      name: 'Authorization',
+      value: 'Bearer $value',
+    );
+  }
+
+  Request applyHeader({
+    required String name,
+    required String value,
+  }) {
+    return utils.applyHeader(this, name, value);
   }
 }

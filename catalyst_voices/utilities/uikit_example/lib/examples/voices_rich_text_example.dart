@@ -37,7 +37,6 @@ class _VoicesRichTextExampleState extends State<VoicesRichTextExample> {
       appBar: AppBar(title: const Text('Voices Rich Text')),
       body: SingleChildScrollView(
         child: VoicesRichText(
-          title: 'Rich text',
           controller: _controller,
           charsLimit: 800,
           enabled: true,
