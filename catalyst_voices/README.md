@@ -4,21 +4,21 @@
 
 This repository contains the Catalyst Voices app and packages.
 
-- [Catalyst Voices](#catalyst-voices)
-  - [Requirements](#requirements)
-  - [Getting Started](#getting-started)
-    - [Bootstrapping](#bootstrapping)
-    - [Packages](#packages)
-    - [Environment types / flavours](#environment-types--flavours)
-    - [Environment variables](#environment-variables)
-    - [Code Generation](#code-generation)
-      - [Running Code Generation](#running-code-generation)
-        - [Basic Generation](#basic-generation)
-        - [Local Saving](#local-saving)
-      - [GitHub Token / PAT Setup](#github-token--pat-setup)
-      - [Security Notes](#security-notes)
-  - [Running Tests](#running-tests)
-  - [Common issues](#common-issues)
+* [Catalyst Voices](#catalyst-voices)
+  * [Requirements](#requirements)
+  * [Getting Started](#getting-started)
+    * [Bootstrapping](#bootstrapping)
+    * [Packages](#packages)
+    * [Environment types / flavours](#environment-types--flavours)
+    * [Environment variables](#environment-variables)
+    * [Code Generation](#code-generation)
+      * [Running Code Generation](#running-code-generation)
+        * [Basic Generation](#basic-generation)
+        * [Local Saving](#local-saving)
+      * [GitHub Token / PAT Setup](#github-token--pat-setup)
+      * [Security Notes](#security-notes)
+  * [Running Tests](#running-tests)
+  * [Common issues](#common-issues)
 
 ## Requirements
 
@@ -110,7 +110,7 @@ Priority looks as follow:
 App will attempt to merge those sources so you can set for example `CONFIG_URL` in `index.html`
 and `ENV_NAME` using `dart-define`.
 
-Using following command will with not args will attempt to lookup `index.html` or fallback 
+Using following command will with not args will attempt to lookup `index.html` or fallback
 to defaults.
 
 ```sh
