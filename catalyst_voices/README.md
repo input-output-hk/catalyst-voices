@@ -4,21 +4,21 @@
 
 This repository contains the Catalyst Voices app and packages.
 
-* [Catalyst Voices](#catalyst-voices)
-  * [Requirements](#requirements)
-  * [Getting Started](#getting-started)
-    * [Bootstrapping](#bootstrapping)
-    * [Packages](#packages)
-    * [Flavors](#flavors)
-    * [Environment variables](#environment-variables)
-    * [Code Generation](#code-generation)
-      * [Running Code Generation](#running-code-generation)
-        * [Basic Generation](#basic-generation)
-        * [Local Saving](#local-saving)
-      * [GitHub Token / PAT Setup](#github-token--pat-setup)
-      * [Security Notes](#security-notes)
-  * [Running Tests](#running-tests)
-  * [Common issues](#common-issues)
+- [Catalyst Voices](#catalyst-voices)
+  - [Requirements](#requirements)
+  - [Getting Started](#getting-started)
+    - [Bootstrapping](#bootstrapping)
+    - [Packages](#packages)
+    - [Environment types / flavours](#environment-types--flavours)
+    - [Environment variables](#environment-variables)
+    - [Code Generation](#code-generation)
+      - [Running Code Generation](#running-code-generation)
+        - [Basic Generation](#basic-generation)
+        - [Local Saving](#local-saving)
+      - [GitHub Token / PAT Setup](#github-token--pat-setup)
+      - [Security Notes](#security-notes)
+  - [Running Tests](#running-tests)
+  - [Common issues](#common-issues)
 
 ## Requirements
 
@@ -63,44 +63,58 @@ just bootstrap
 | [catalyst_voices_shared](./packages/internal/catalyst_voices_shared/)             | Shared code  |[example](./packages/internal/catalyst_voices_shared/)|
 | [catalyst_voices_view_models](./packages/internal/catalyst_voices_view_models/)   | ViewModels  |[example](./packages/internal/catalyst_voices_view_models/)|
 
-### Flavors
+### Environment types / flavours
 
-This project contains four flavors:
+This project contains three flavors:
 
 * dev
-* qa
 * preprod
 * prod
 
-To run the desired flavor, either use the launch configuration in VSCode/Android Studio or use the following commands:
+To run the desired flavor, either use the launch configuration in VSCode/Android Studio or use the
+following commands:
 
 ```sh
 # Development
-flutter run --flavor dev --target apps/voices/lib/configs/main_dev.dart
-
-# QA
-flutter run --flavor qa --target apps/voices/lib/configs/main_qa.dart
+flutter run --target apps/voices/lib/configs/main_dev.dart
 
 # Pre-Production
-flutter run --flavor preprod --target apps/voices/lib/configs/main_preprod.dart
+flutter run --target apps/voices/lib/configs/main_preprod.dart
 
 # Production
-flutter run --flavor prod --target apps/voices/lib/configs/main_prod.dart
+flutter run --target apps/voices/lib/configs/main_prod.dart
+
+# Or
+flutter run --flavor prod --target apps/voices/lib/configs/main.dart
+
+# Or
+flutter run --target apps/voices/lib/configs/main.dart --dart-define=ENV_NAME=prod
 ```
 
->Catalyst Voices works on the Web only.
->We plan to add support for other targets later.
+> Catalyst Voices works on the Web only.
+> We plan to add support for other targets later.
 
 ### Environment variables
 
-We use [dart defines](https://dart.dev/guides/language/language-tour#using-variables)
-to manage environment variables.
+We use [dart defines](https://dart.dev/guides/language/language-tour#using-variables) as well
+as injected `flutterEnvironment` variables from [index.html](apps/voices/web/index.html) on the web.
 
-For example if you need to pass `SENTRY_DSN` as environment variable,
-you can use the following command:
+All of env variable are optional and you can define only what you want, where you want.
+
+Priority looks as follow:
+
+1. If web `flutterEnvironment` from [index.html](apps/voices/web/index.html)
+2. `dart-define` vars
+3. `flavor` var
+
+App will attempt to merge those sources so you can set for example `CONFIG_URL` in `index.html`
+and `ENV_NAME` using `dart-define`.
+
+Using following command will with not args will attempt to lookup `index.html` or fallback 
+to defaults.
 
 ```sh
-flutter build web --target apps/voices/lib/configs/main_web.dart --dart-define SENTRY_DSN=REPLACE_WITH_SENTRY_DSN_URL
+flutter build web --target apps/voices/lib/configs/main_web.dart
 ```
 
 ### Code Generation
