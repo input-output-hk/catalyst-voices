@@ -247,7 +247,13 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
   @override
   Future<List<DocumentEntity>> queryVersionsOfId({required String id}) {
     final query = select(documents)
-      ..where((tbl) => _filterRef(tbl, SignedDocumentRef(id: id)))
+      ..where(
+        (tbl) => _filterRef(
+          tbl,
+          SignedDocumentRef(id: id),
+          filterVersion: false,
+        ),
+      )
       ..orderBy([
         (u) => OrderingTerm.desc(u.verHi),
       ]);
@@ -410,14 +416,18 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
     return previousId == nextId && previousVer == nextVer;
   }
 
-  Expression<bool> _filterRef($DocumentsTable row, DocumentRef ref) {
+  Expression<bool> _filterRef(
+    $DocumentsTable row,
+    DocumentRef ref, {
+    bool filterVersion = true,
+  }) {
     final id = UuidHiLo.from(ref.id);
     final ver = UuidHiLo.fromNullable(ref.version);
 
     return Expression.and([
       row.idHi.equals(id.high),
       row.idLo.equals(id.low),
-      if (ver != null) ...[
+      if (ver != null && filterVersion) ...[
         row.verHi.equals(ver.high),
         row.verLo.equals(ver.low),
       ],

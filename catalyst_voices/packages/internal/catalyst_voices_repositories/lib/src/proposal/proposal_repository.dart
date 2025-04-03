@@ -152,24 +152,23 @@ final class ProposalRepositoryImpl implements ProposalRepository {
       documentData: documentData,
       templateData: documentTemplate,
     );
-    final documentVersions = await _documentRepository.getAllVersionsOfId(
+    final documentVersions = await queryVersionsOfId(
       id: ref.id,
+      includeLocalDrafts: true,
     );
-    final proposalVersions = documentVersions
-        .map(
-          (e) async {
-            final proposalPublish =
-                await getProposalPublishForRef(ref: e.metadata.selfRef);
-            if (proposalPublish == null) {
-              return null;
-            }
-            return _buildProposalData(
-              documentData: e,
-              documentTemplate: documentTemplate,
-              publish: proposalPublish,
-            );
-          },
-        )
+    final proposalVersions = (await Future.wait(
+      documentVersions.map(
+        (e) async {
+          final proposalPublish =
+              await getProposalPublishForRef(ref: e.metadata.selfRef);
+
+          if (proposalPublish == null) {
+            return null;
+          }
+          return ProposalData(document: e, publish: proposalPublish);
+        },
+      ).toList(),
+    ))
         .whereType<ProposalData>()
         .toList();
 
@@ -372,6 +371,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     )
         .map((data) {
       final action = _buildProposalActionData(data);
+
       return _getProposalPublish(ref: refTo, action: action);
     });
   }
@@ -414,24 +414,6 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     ).action.toModel();
 
     return proposalAction;
-  }
-
-  BaseProposalData _buildProposalData({
-    required DocumentData documentData,
-    required DocumentData documentTemplate,
-    required ProposalPublish publish,
-  }) {
-    assert(
-      documentData.metadata.type == DocumentType.proposalDocument,
-      'Not a proposalDocument document data type',
-    );
-
-    final document = _buildProposalDocument(
-      documentData: documentData,
-      templateData: documentTemplate,
-    );
-
-    return BaseProposalData(document: document, publish: publish);
   }
 
   ProposalDocument _buildProposalDocument({

@@ -385,9 +385,11 @@ final class ProposalServiceImpl implements ProposalService {
 
       yield* Rx.combineLatest(
         proposalsDataStreams,
-        (List<ProposalData> proposalsData) async {
+        (List<ProposalData?> proposalsData) async {
+          final validProposalsData =
+              proposalsData.whereType<ProposalData>().toList();
           final proposalsWithVersions = await Future.wait(
-            proposalsData.map(_addVersionsToProposal),
+            validProposalsData.map(_addVersionsToProposal),
           );
           return proposalsWithVersions.map(Proposal.fromData).toList();
         },
@@ -407,9 +409,12 @@ final class ProposalServiceImpl implements ProposalService {
 
       yield* Rx.combineLatest(
         proposalsDataStreams,
-        (List<ProposalData> proposalsData) async {
+        (List<ProposalData?> proposalsData) async {
+          final validProposalsData =
+              proposalsData.whereType<ProposalData>().toList();
+
           final groupedProposals = groupBy(
-            proposalsData,
+            validProposalsData,
             (data) => data.document.metadata.selfRef.id,
           );
 
@@ -463,7 +468,7 @@ final class ProposalServiceImpl implements ProposalService {
     return proposal.copyWith(versions: proposalDataVersion);
   }
 
-  Future<Stream<ProposalData>> _createProposalDataStream(
+  Future<Stream<ProposalData?>> _createProposalDataStream(
     ProposalDocument doc,
   ) async {
     final selfRef = doc.metadata.selfRef;
@@ -476,16 +481,18 @@ final class ProposalServiceImpl implements ProposalService {
     );
 
     return Rx.combineLatest2(
-      _proposalRepository
-          .watchProposalPublish(refTo: selfRef)
-          .where((publishState) => publishState != null),
+      _proposalRepository.watchProposalPublish(refTo: selfRef),
       commentsCountStream,
-      (ProposalPublish? publishState, int commentsCount) => ProposalData(
-        document: doc,
-        categoryName: campaign.categoryText,
-        publish: publishState!,
-        commentsCount: commentsCount,
-      ),
+      (ProposalPublish? publishState, int commentsCount) {
+        if (publishState == null) return null;
+
+        return ProposalData(
+          document: doc,
+          categoryName: campaign.categoryText,
+          publish: publishState,
+          commentsCount: commentsCount,
+        );
+      },
     );
   }
 

@@ -189,7 +189,9 @@ class _PendingProposalCardState extends State<PendingProposalCard> {
                       category: widget.proposal.category,
                     ),
                     const SizedBox(height: 4),
-                    Expanded(child: _Title(text: widget.proposal.title)),
+                    Expanded(
+                      child: _Title(text: widget.proposal.title),
+                    ),
                     _Author(author: widget.proposal.author),
                     _FundsAndDuration(
                       funds: widget.proposal.fundsRequested,

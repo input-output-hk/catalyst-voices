@@ -495,6 +495,31 @@ void main() {
           ]),
         );
       });
+
+      test('queryRefToDocumentData returns correct document', () async {
+        final document1 = DocumentWithMetadataFactory.build(
+          metadata: DocumentDataMetadata(
+            type: DocumentType.proposalDocument,
+            selfRef: SignedDocumentRef.generateFirstRef(),
+          ),
+        );
+        final document2 = DocumentWithMetadataFactory.build(
+          metadata: DocumentDataMetadata(
+            type: DocumentType.proposalDocument,
+            selfRef: SignedDocumentRef.generateFirstRef(),
+            ref: document1.document.metadata.selfRef,
+          ),
+        );
+
+        await database.documentsDao.saveAll([document1, document2]);
+
+        final document = await database.documentsDao.queryRefToDocumentData(
+          refTo: document1.document.metadata.selfRef,
+          type: DocumentType.proposalDocument,
+        );
+
+        expect(document?.metadata.selfRef, document2.document.metadata.selfRef);
+      });
     });
 
     group('count', () {

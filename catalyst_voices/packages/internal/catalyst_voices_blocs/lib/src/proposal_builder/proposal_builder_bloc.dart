@@ -393,7 +393,6 @@ final class ProposalBuilderBloc
           isLatest: index == proposalData.versions.length - 1,
         );
       }).toList();
-
       final categoryId = proposalData.categoryId;
       final category = await _campaignService.getCategory(categoryId);
 
