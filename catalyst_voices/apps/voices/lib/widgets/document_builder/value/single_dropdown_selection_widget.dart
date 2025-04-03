@@ -1,6 +1,6 @@
+import 'package:catalyst_voices/widgets/document_builder/common/document_property_builder_title.dart';
 import 'package:catalyst_voices/widgets/dropdown/voices_dropdown.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
@@ -25,8 +25,8 @@ class SingleDropdownSelectionWidget extends StatefulWidget {
 
 class _SingleDropdownSelectionWidgetState
     extends State<SingleDropdownSelectionWidget> {
-  String get _title => widget.schema.title;
   bool get _isRequired => widget.schema.isRequired;
+  String get _title => widget.schema.title;
 
   @override
   Widget build(BuildContext context) {
@@ -34,9 +34,9 @@ class _SingleDropdownSelectionWidgetState
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         if (_title.isNotEmpty) ...[
-          Text(
-            _title.starred(isEnabled: _isRequired),
-            style: Theme.of(context).textTheme.titleSmall,
+          DocumentPropertyBuilderTitle(
+            title: _title,
+            isRequired: _isRequired,
           ),
           const SizedBox(height: 8),
         ],
