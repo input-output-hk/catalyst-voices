@@ -174,7 +174,7 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
     _listenForSegments(bloc);
     _loadData(bloc: bloc);
   }
-              
+
   void _dontShowCampaignSubmissionClosingDialog(bool value) {
     context
         .read<SessionCubit>()

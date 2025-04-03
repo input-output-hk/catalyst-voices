@@ -2438,7 +2438,8 @@
         "type": "int",
         "example": "10"
       }
-    },
+    }
+  },
   "insertNewImageDialogTitle": "Insert New Image",
   "@insertNewImageDialogTitle": {
     "description": "Title of the dialog for inserting a new image"
