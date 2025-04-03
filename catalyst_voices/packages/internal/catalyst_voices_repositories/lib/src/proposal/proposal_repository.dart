@@ -60,7 +60,7 @@ abstract interface class ProposalRepository {
 
   Future<List<String>> getUserProposalsIds(String userId);
 
-  Future<DocumentRef> importProposal(Uint8List data);
+  Future<DocumentRef> importProposal(Uint8List data, CatalystId authorId);
 
   Future<void> publishProposal({
     required DocumentData document,
@@ -69,7 +69,8 @@ abstract interface class ProposalRepository {
   });
 
   Future<void> publishProposalAction({
-    required SignedDocumentRef ref,
+    required SignedDocumentRef actionRef,
+    required SignedDocumentRef proposalRef,
     required SignedDocumentRef categoryId,
     required ProposalSubmissionAction action,
     required CatalystId catalystId,
@@ -212,8 +213,8 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   }
 
   @override
-  Future<DocumentRef> importProposal(Uint8List data) {
-    return _documentRepository.importDocument(data: data);
+  Future<DocumentRef> importProposal(Uint8List data, CatalystId authorId) {
+    return _documentRepository.importDocument(data: data, authorId: authorId);
   }
 
   @override
@@ -234,7 +235,8 @@ final class ProposalRepositoryImpl implements ProposalRepository {
 
   @override
   Future<void> publishProposalAction({
-    required SignedDocumentRef ref,
+    required SignedDocumentRef actionRef,
+    required SignedDocumentRef proposalRef,
     required SignedDocumentRef categoryId,
     required ProposalSubmissionAction action,
     required CatalystId catalystId,
@@ -249,8 +251,10 @@ final class ProposalRepositoryImpl implements ProposalRepository {
       metadata: SignedDocumentMetadata(
         contentType: SignedDocumentContentType.json,
         documentType: DocumentType.proposalActionDocument,
-        ref: SignedDocumentMetadataRef.fromDocumentRef(ref),
-        categoryId: SignedDocumentMetadataRef.fromDocumentRef(ref),
+        id: actionRef.id,
+        ver: actionRef.version,
+        ref: SignedDocumentMetadataRef.fromDocumentRef(proposalRef),
+        categoryId: SignedDocumentMetadataRef.fromDocumentRef(categoryId),
       ),
       catalystId: catalystId,
       privateKey: privateKey,
@@ -317,6 +321,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
         .watchDocuments(
           type: DocumentType.proposalDocument,
           getLocalDrafts: true,
+          unique: true,
           authorId: authorId,
         )
         .whereNotNull()

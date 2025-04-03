@@ -179,10 +179,10 @@ libatspi
 libavcodec
 libcatalyst
 libdrm
-libsqlite3
 libflutter
 libgbm
 libnss
+libsqlite3
 libxkbcommon
 libxshmfence
 Lifetimeable
@@ -192,6 +192,7 @@ loguru
 lovelace
 lovelaces
 LTRB
+ltwh
 LynxLynxx
 Lynxx
 mdlint
@@ -265,6 +266,7 @@ Replayability
 repr
 reqwest
 rfwtxt
+RGBO
 rgloader
 ripgrep
 ristretto
@@ -361,6 +363,7 @@ vsync
 wallclock
 wasmtime
 Wconditional
+webos
 Werror
 Wireframes
 Wmissing

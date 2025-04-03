@@ -39,6 +39,12 @@ abstract interface class ProposalService {
     required DocumentData document,
   });
 
+  /// Returns the [SignedDocumentRef] of the created [ProposalSubmissionAction].
+  Future<void> forgetProposal({
+    required SignedDocumentRef proposalRef,
+    required SignedDocumentRef categoryId,
+  });
+
   /// Similar to [watchFavoritesProposalsIds] stops after first emit.
   Future<List<String>> getFavoritesProposalsIds();
 
@@ -81,8 +87,16 @@ abstract interface class ProposalService {
   });
 
   /// Submits a proposal draft into review.
-  Future<void> submitProposalForReview({
-    required SignedDocumentRef ref,
+  ///
+  /// Returns the [SignedDocumentRef] of the created [ProposalSubmissionAction].
+  Future<SignedDocumentRef> submitProposalForReview({
+    required SignedDocumentRef proposalRef,
+    required SignedDocumentRef categoryId,
+  });
+
+  /// Returns the [SignedDocumentRef] of the created [ProposalSubmissionAction].
+  Future<SignedDocumentRef> unlockProposal({
+    required SignedDocumentRef proposalRef,
     required SignedDocumentRef categoryId,
   });
 
@@ -170,6 +184,29 @@ final class ProposalServiceImpl implements ProposalService {
   }
 
   @override
+  Future<SignedDocumentRef> forgetProposal({
+    required SignedDocumentRef proposalRef,
+    required SignedDocumentRef categoryId,
+  }) {
+    return _signerService.useProposerCredentials(
+      (catalystId, privateKey) async {
+        final actionRef = SignedDocumentRef.generateFirstRef();
+
+        await _proposalRepository.publishProposalAction(
+          actionRef: actionRef,
+          proposalRef: proposalRef,
+          categoryId: categoryId,
+          action: ProposalSubmissionAction.hide,
+          catalystId: catalystId,
+          privateKey: privateKey,
+        );
+
+        return actionRef;
+      },
+    );
+  }
+
+  @override
   Future<List<String>> getFavoritesProposalsIds() {
     return _documentRepository
         .watchAllDocumentsFavoriteIds(type: DocumentType.proposalDocument)
@@ -216,8 +253,9 @@ final class ProposalServiceImpl implements ProposalService {
   }
 
   @override
-  Future<DocumentRef> importProposal(Uint8List data) {
-    return _proposalRepository.importProposal(data);
+  Future<DocumentRef> importProposal(Uint8List data) async {
+    final authorId = await _getUserCatalystId();
+    return _proposalRepository.importProposal(data, authorId);
   }
 
   @override
@@ -252,19 +290,47 @@ final class ProposalServiceImpl implements ProposalService {
   }
 
   @override
-  Future<void> submitProposalForReview({
-    required SignedDocumentRef ref,
+  Future<SignedDocumentRef> submitProposalForReview({
+    required SignedDocumentRef proposalRef,
     required SignedDocumentRef categoryId,
   }) {
     return _signerService.useProposerCredentials(
-      (catalystId, privateKey) {
-        return _proposalRepository.publishProposalAction(
-          ref: ref,
+      (catalystId, privateKey) async {
+        final actionRef = SignedDocumentRef.generateFirstRef();
+
+        await _proposalRepository.publishProposalAction(
+          actionRef: actionRef,
+          proposalRef: proposalRef,
           categoryId: categoryId,
           action: ProposalSubmissionAction.aFinal,
           catalystId: catalystId,
           privateKey: privateKey,
         );
+
+        return actionRef;
+      },
+    );
+  }
+
+  @override
+  Future<SignedDocumentRef> unlockProposal({
+    required SignedDocumentRef proposalRef,
+    required SignedDocumentRef categoryId,
+  }) async {
+    return _signerService.useProposerCredentials(
+      (catalystId, privateKey) async {
+        final actionRef = SignedDocumentRef.generateFirstRef();
+
+        await _proposalRepository.publishProposalAction(
+          actionRef: actionRef,
+          proposalRef: proposalRef,
+          categoryId: categoryId,
+          action: ProposalSubmissionAction.draft,
+          catalystId: catalystId,
+          privateKey: privateKey,
+        );
+
+        return actionRef;
       },
     );
   }
@@ -279,6 +345,8 @@ final class ProposalServiceImpl implements ProposalService {
     // TODO(LynxLynxx): when we start supporting multiple authors
     // we need to get the list of authors actually stored in the db and
     // add them to the authors list if they are not already there
+    final catalystId = await _getUserCatalystId();
+
     await _proposalRepository.upsertDraftProposal(
       document: DocumentData(
         metadata: DocumentDataMetadata(
@@ -286,6 +354,7 @@ final class ProposalServiceImpl implements ProposalService {
           selfRef: selfRef,
           template: template,
           categoryId: categoryId,
+          authors: [catalystId],
         ),
         content: content,
       ),

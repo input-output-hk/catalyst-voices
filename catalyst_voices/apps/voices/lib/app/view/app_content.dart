@@ -1,4 +1,5 @@
 import 'package:catalyst_voices/app/view/app_active_state_listener.dart';
+import 'package:catalyst_voices/app/view/app_mobile_access_restriction.dart';
 import 'package:catalyst_voices/app/view/app_precache_image_assets.dart';
 import 'package:catalyst_voices/app/view/app_session_listener.dart';
 import 'package:catalyst_voices/common/ext/preferences_ext.dart';
@@ -76,7 +77,9 @@ final class _AppContent extends StatelessWidget {
           body: AppActiveStateListener(
             child: GlobalPrecacheImages(
               child: GlobalSessionListener(
-                child: child ?? const SizedBox.shrink(),
+                child: AppMobileAccessRestriction(
+                  child: child ?? const SizedBox.shrink(),
+                ),
               ),
             ),
           ),

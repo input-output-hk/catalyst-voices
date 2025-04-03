@@ -2,22 +2,19 @@
 use std::{env, error::Error, sync::LazyLock, time::Duration};
 
 use anyhow::{anyhow, Context};
-use c509_certificate::c509::C509;
 use cardano_blockchain_types::{Network, Point, Slot, TxnIndex};
 use cardano_chain_follower::ChainFollower;
 use catalyst_types::id_uri::IdUri;
-use ed25519_dalek::{VerifyingKey, PUBLIC_KEY_LENGTH};
+use ed25519_dalek::VerifyingKey;
 use futures::{TryFutureExt, TryStreamExt};
 use moka::future::Cache;
-use oid_registry::{Oid, OID_SIG_ED25519};
 use poem::{error::ResponseError, http::StatusCode, IntoResponse, Request};
 use poem_openapi::{auth::Bearer, payload::Json, SecurityScheme};
 use rbac_registration::{
-    cardano::cip509::{Cip509, LocalRefInt, RoleNumber},
+    cardano::cip509::{Cip509, RoleNumber},
     registration::cardano::RegistrationChain,
 };
 use tracing::{error, warn};
-use x509_cert::Certificate;
 
 use super::token::CatalystRBACTokenV1;
 use crate::{
@@ -161,6 +158,7 @@ async fn checker_api_catalyst_auth(
     // }
 
     // Step 8: get the latest stable signing certificate registered for Role 0.
+
     let public_key = last_signing_key(token.network(), &registrations)
         .await
         .map_err(|e| {
@@ -233,42 +231,10 @@ async fn last_signing_key(
     let chain = registration_chain(network, indexed_registrations)
         .await
         .context("Failed to build registration chain")?;
-    let key_ref = chain
-        .role_data()
-        .get(&RoleNumber::ROLE_0)
-        .context("Missing role 0 data")?
-        .data()
-        .signing_key()
-        .context("Missing signing key")?;
-    let key_offset = usize::try_from(key_ref.key_offset).context("Invalid signing key offset")?;
-    match key_ref.local_ref {
-        LocalRefInt::X509Certs => {
-            let cert = &chain
-                .x509_certs()
-                .get(&key_offset)
-                .context("Missing X509 role 0 certificate")?
-                .last()
-                .and_then(|p| p.data().as_ref())
-                .context("Unable to get last X509 role 0 certificate")?;
-            x509_key(cert)
-        },
-        LocalRefInt::C509Certs => {
-            let cert = &chain
-                .c509_certs()
-                .get(&key_offset)
-                .context("Missing C509 role 0 certificate")?
-                .last()
-                .and_then(|p| p.data().as_ref())
-                .context("Unable to get last C509 role 0 certificate")?;
-            c509_key(cert)
-        },
-        LocalRefInt::PubKeys => {
-            // We check this during Cip509 validation.
-            Err(anyhow!(
-                "Invalid signing key for role 0: it must reference a certificate, not public key"
-            ))
-        },
-    }
+    chain
+        .get_latest_signing_pk_for_role(&RoleNumber::ROLE_0)
+        .ok_or(anyhow!("Cannot find latest role 0 public key"))
+        .map(|(pk, _)| pk)
 }
 
 /// Build a registration chain from the given indexed data.
@@ -328,69 +294,4 @@ async fn registration(network: Network, slot: Slot, txn_index: TxnIndex) -> anyh
     Cip509::new(&block, txn_index, &[])
         .context("Invalid RBAC registration")?
         .context("No RBAC registration at this block and txn index")
-}
-
-/// Returns `VerifyingKey` from the given X509 certificate.
-fn x509_key(cert: &Certificate) -> anyhow::Result<VerifyingKey> {
-    let oid: Oid = cert
-        .tbs_certificate
-        .subject_public_key_info
-        .algorithm
-        .oid
-        .to_string()
-        .parse()
-        // `Context` cannot be used here because `OidParseError` doesn't implement `std::Error`.
-        .map_err(|e| anyhow!("Invalid signature algorithm OID: {e:?}"))?;
-    check_signature_algorithm(&oid)?;
-    let extended_public_key = cert
-        .tbs_certificate
-        .subject_public_key_info
-        .subject_public_key
-        .as_bytes()
-        .context("Invalid subject_public_key value (has unused bits)")?;
-    verifying_key(extended_public_key).context("Unable to get verifying key from X509 certificate")
-}
-
-/// Returns `VerifyingKey` from the given C509 certificate.
-fn c509_key(cert: &C509) -> anyhow::Result<VerifyingKey> {
-    let oid = cert
-        .tbs_cert()
-        .subject_public_key_algorithm()
-        .algo_identifier()
-        .oid();
-    check_signature_algorithm(oid)?;
-    verifying_key(cert.tbs_cert().subject_public_key())
-        .context("Unable to get verifying key from C509 certificate")
-}
-
-/// Checks that the signature algorithm is supported.
-fn check_signature_algorithm(oid: &Oid) -> anyhow::Result<()> {
-    // Currently the only supported signature algorithm is ED25519.
-    if *oid != OID_SIG_ED25519 {
-        return Err(anyhow!("Unsupported signature algorithm: {oid}"));
-    }
-    Ok(())
-}
-
-// TODO: The very similar logic exists in the `rbac-registration` crate. It should be
-// moved somewhere and reused. See https://github.com/input-output-hk/catalyst-voices/issues/1952
-/// Creates `VerifyingKey` from the given extended public key.
-fn verifying_key(extended_public_key: &[u8]) -> anyhow::Result<VerifyingKey> {
-    /// An extender public key length in bytes.
-    const EXTENDED_PUBLIC_KEY_LENGTH: usize = 64;
-
-    if extended_public_key.len() != EXTENDED_PUBLIC_KEY_LENGTH {
-        return Err(anyhow!(
-            "Unexpected extended public key length in certificate: {}, expected {EXTENDED_PUBLIC_KEY_LENGTH}",
-            extended_public_key.len()
-        ));
-    }
-    // This should never fail because of the check above.
-    let public_key = extended_public_key
-        .get(0..PUBLIC_KEY_LENGTH)
-        .context("Unable to get public key part")?;
-    let bytes: &[u8; PUBLIC_KEY_LENGTH] = public_key
-        .try_into()
-        .context("Invalid public key length in X509 certificate")?;
-    VerifyingKey::from_bytes(bytes).context("Invalid public key in X509 certificate")
 }
