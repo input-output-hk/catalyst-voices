@@ -1,6 +1,6 @@
+import 'package:catalyst_voices/widgets/document_builder/common/document_property_builder_title.dart';
 import 'package:catalyst_voices/widgets/dropdown/voices_dropdown.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localized_locales/flutter_localized_locales.dart';
 
@@ -23,9 +23,9 @@ class LanguageCodeWidget extends StatefulWidget {
 }
 
 class _LanguageCodeWidgetState extends State<LanguageCodeWidget> {
-  String? get _value => widget.property.value ?? widget.schema.defaultValue;
-  String get _title => widget.schema.title;
   bool get _isRequired => widget.schema.isRequired;
+  String get _title => widget.schema.title;
+  String? get _value => widget.property.value ?? widget.schema.defaultValue;
 
   @override
   Widget build(BuildContext context) {
@@ -34,9 +34,9 @@ class _LanguageCodeWidgetState extends State<LanguageCodeWidget> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (_title.isNotEmpty) ...[
-          Text(
-            _title.starred(isEnabled: _isRequired),
-            style: Theme.of(context).textTheme.titleSmall,
+          DocumentPropertyBuilderTitle(
+            title: _title,
+            isRequired: _isRequired,
           ),
           const SizedBox(height: 8),
         ],
@@ -62,6 +62,10 @@ class _LanguageCodeWidgetState extends State<LanguageCodeWidget> {
         .toList();
   }
 
+  String? _getLocalizedLanguageName(String languageCode) {
+    return LocaleNames.of(context)?.nameOf(languageCode);
+  }
+
   void _onChanged(String? value) {
     final normalizedValue = widget.schema.normalizeValue(value);
     final change = DocumentValueChange(
@@ -69,9 +73,5 @@ class _LanguageCodeWidgetState extends State<LanguageCodeWidget> {
       value: normalizedValue,
     );
     widget.onChanged([change]);
-  }
-
-  String? _getLocalizedLanguageName(String languageCode) {
-    return LocaleNames.of(context)?.nameOf(languageCode);
   }
 }

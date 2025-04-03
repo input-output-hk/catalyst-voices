@@ -45,6 +45,10 @@
   "@saveButtonText": {
     "description": "Text shown in save button"
   },
+  "saveChangesButtonText": "Save Changes",
+  "@saveChangesButtonText": {
+    "description": "Text shown in save button"
+  },
   "passwordLabelText": "Password",
   "@passwordLabelText": {
     "description": "Text shown in password field"
@@ -1638,6 +1642,10 @@
   "proposalEditorPublishErrorDialogMessage": "We couldn't publish your proposal. Please try again in 5-10 minutes, as it may take some time for your information to update.\n\nIf the issue persists, feel free to contact support.",
   "@proposalEditorPublishErrorDialogMessage": {
     "description": "Dialog message in proposal editor when publishing proposal to the server failed."
+  },
+  "proposalEditorNotAnswered": "Not Answered",
+  "@proposalEditorNotAnswered": {
+    "description": "Placeholder text when a property has been not filled."
   },
   "showAll": "Show All",
   "@showAll": {
