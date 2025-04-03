@@ -140,10 +140,10 @@ async fn checker_api_catalyst_auth(
     if let Err(err) = token.reg_chain_mut().await {
         if err.is::<CassandraSessionError>() {
             return Err(ServiceUnavailableError(err).into());
-        } else {
-            error!("Unable to build a registration chain Catalyst ID: {err:?}");
-            return Err(AuthTokenError.into());
         }
+
+        error!("Unable to build a registration chain Catalyst ID: {err:?}");
+        return Err(AuthTokenError.into());
     }
 
     // Step 7: Verify that the nonce is in the acceptable range.
