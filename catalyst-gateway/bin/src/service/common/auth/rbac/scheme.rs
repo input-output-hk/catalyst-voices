@@ -8,7 +8,13 @@ use rbac_registration::cardano::cip509::RoleNumber;
 use tracing::error;
 
 use super::token::CatalystRBACTokenV1;
-use crate::service::common::responses::ErrorResponses;
+use crate::{
+    db::index::session::CassandraSessionError,
+    service::common::{
+        responses::{ErrorResponses, WithErrorResponses},
+        types::headers::retry_after::{RetryAfterHeader, RetryAfterOption},
+    },
+};
 
 /// Auth token in the form of catv1.
 pub type EncodedAuthToken = String;
@@ -40,6 +46,29 @@ static CACHE: LazyLock<Cache<EncodedAuthToken, CatalystRBACTokenV1>> = LazyLock:
 )]
 #[allow(dead_code, clippy::module_name_repetitions)]
 pub struct CatalystRBACSecurityScheme(pub CatalystRBACTokenV1);
+
+/// Error with the service while processing a Catalyst RBAC Token
+///
+/// Can be related to database session failure.
+#[derive(Debug, thiserror::Error)]
+#[error("Service unavailable while procssing a Catalyst RBAC Token")]
+pub struct ServiceUnavailableError(pub anyhow::Error);
+
+impl ResponseError for ServiceUnavailableError {
+    fn status(&self) -> StatusCode {
+        StatusCode::SERVICE_UNAVAILABLE
+    }
+
+    /// Convert this error to a HTTP response.
+    fn as_response(&self) -> poem::Response
+    where Self: Error + Send + Sync + 'static {
+        WithErrorResponses::<()>::service_unavailable(
+            &self.0,
+            RetryAfterOption::Some(RetryAfterHeader::default()),
+        )
+        .into_response()
+    }
+}
 
 /// Error with the Authorization Token
 ///
@@ -107,26 +136,25 @@ async fn checker_api_catalyst_auth(
         return Ok(token);
     };
 
-    // Step 6: Verify that the nonce is in the acceptable range.
+    // Step 6: get and build latest registration chain from the db.
+    if let Err(err) = token.reg_chain_mut().await {
+        if err.is::<CassandraSessionError>() {
+            return Err(ServiceUnavailableError(err).into());
+        } else {
+            error!("Unable to build a registration chain Catalyst ID: {err:?}");
+            return Err(AuthTokenError.into());
+        }
+    }
+
+    // Step 7: Verify that the nonce is in the acceptable range.
     if !token.is_young(MAX_TOKEN_AGE, MAX_TOKEN_SKEW) {
         // Token is too old or too far in the future.
         error!("Auth token expired: {token}");
         Err(AuthTokenAccessViolation(vec!["EXPIRED".to_string()]))?;
     }
 
-    // TODO properly handle failing acquiring db session, return
-    // ```
-    // let e = ServiceUnavailable::new(None);
-    // ErrorResponses::ServiceUnavailable(Json(e), Some(RetryAfterHeader::default()))
-    // ```
-    // Step 7: get and build latest registration chain from the db.
-    let reg_chain = token.get_reg_chain().await.map_err(|e| {
-        error!("Unable to build a registration chain Catalyst ID: {e:?}");
-        AuthTokenError
-    })?;
-
     // Step 8: return 401 if the token isn't known.
-    let Some(reg_chain) = reg_chain else {
+    let Some(reg_chain) = token.reg_chain() else {
         error!(
             "Unable to find registrations for {} Catalyst ID",
             token.catalyst_id()

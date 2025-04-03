@@ -168,9 +168,14 @@ impl CatalystRBACTokenV1 {
         self.network
     }
 
+    /// Returns a corresponded registration chain.
+    pub(crate) fn reg_chain(&self) -> Option<&RegistrationChain> {
+        self.reg_chain.as_ref()
+    }
+
     /// Returns a corresponded registration chain if any registrations present.
     /// If it is a first call, fetch all data from the database and initialize it.
-    pub(crate) async fn get_reg_chain(&mut self) -> anyhow::Result<Option<&RegistrationChain>> {
+    pub(crate) async fn reg_chain_mut(&mut self) -> anyhow::Result<Option<&RegistrationChain>> {
         if self.reg_chain.is_none() {
             let session =
                 CassandraSession::get(true).ok_or(CassandraSessionError::FailedAcquiringSession)?;
