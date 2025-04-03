@@ -44,10 +44,12 @@ class _Body extends StatelessWidget {
 class _DiscoveryPageState extends State<DiscoveryPage> {
   @override
   Widget build(BuildContext context) {
-    return const CustomScrollView(
-      slivers: [
-        _Body(),
-      ],
+    return const SelectionArea(
+      child: CustomScrollView(
+        slivers: [
+          _Body(),
+        ],
+      ),
     );
   }
 
