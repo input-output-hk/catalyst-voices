@@ -41,7 +41,7 @@ pub(crate) struct CatalystRBACTokenV1 {
     /// A corresponded RBAC chain, constructed from the most recent data from the
     /// database. Lazy initialized
     /// TODO: make `RegistrationChain` clonable, remove Arc
-    reg_chain: Option<Arc<RegistrationChain>>,
+    reg_chain: Option<RegistrationChain>,
 }
 
 impl CatalystRBACTokenV1 {
