@@ -2,10 +2,10 @@
 
 use super::str_env_var::StringEnvVar;
 
-/// Default number valud of `future_threshold`, 30 seconds.
+/// Default number value of `future_threshold`, 30 seconds.
 const DEFAULT_FUTURE_THRESHOLD: u64 = 30;
 
-/// Default number valud of `future_threshold`, 10 minutes.
+/// Default number value of `future_threshold`, 10 minutes.
 const DEFAULT_PAST_THRESHOLD: u64 = 10 * 60;
 
 /// Configuration for the Catalyst Signed Documents validation configuration.
