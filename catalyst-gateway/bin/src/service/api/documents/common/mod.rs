@@ -64,19 +64,34 @@ impl catalyst_signed_doc::providers::VerifyingKeyProvider for VerifyingKeyProvid
 }
 
 impl VerifyingKeyProvider {
-    /// Gets the latest public key for the proposer role for the given `catid` from the
-    /// token.
+    /// Attempts to construct an instance of `Self` by validating and resolving a list of
+    /// Catalyst Document KIDs against a provided RBAC token.
+    ///
+    /// This method performs the following steps:
+    /// 1. Verifies that **all** provided `kids` match the Catalyst ID from the RBAC token.
+    /// 2. Extracts the role index from each KID and attempts to build a registration
+    ///    chain from the indexed registration data.
+    /// 3. Retrieves the latest signing public key and rotation state associated with the
+    ///    role for each KID from the registration chain.
+    /// 4. Collects and returns a vector of tuples containing the KID, signing key, and
+    ///    rotation.
+    ///
+    /// # Errors
+    ///
+    /// Returns an `anyhow::Error` if:
+    /// - Any KID's short Catalyst ID does not match the one in the token.
+    /// - The role index parsing fails.
+    /// - Indexed registration queries or chain building fail.
+    /// - The latest signing key for a required role cannot be found.
     pub(crate) async fn try_from_kids(
         token: &CatalystRBACTokenV1, kids: &[catalyst_signed_doc::IdUri],
     ) -> anyhow::Result<Self> {
-        let network = token.network();
-
         // validate rbac token and document KIDs (ignoring the role/rotation)
         if kids
             .iter()
             .any(|kid| kid.as_short_id() != token.catalyst_id().as_short_id())
         {
-            anyhow::bail!("RBAC Token CatID does not match with the providing document KIDs");
+            anyhow::bail!("RBAC Token CatID does not match with the document KIDs");
         }
 
         let mut result = Vec::with_capacity(kids.len());
@@ -87,7 +102,7 @@ impl VerifyingKeyProvider {
             // TODO: should be able to get the reg chain from the processed rbac token
             let reg_queries = scheme::indexed_registrations(kid).await?;
 
-            let reg_chain = scheme::build_reg_chain(network, &reg_queries)
+            let reg_chain = scheme::build_reg_chain(token.network(), &reg_queries)
                 .await
                 .map_err(|e| {
                     anyhow::anyhow!(
