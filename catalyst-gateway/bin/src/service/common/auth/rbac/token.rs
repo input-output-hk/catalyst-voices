@@ -4,7 +4,6 @@
 
 use std::{
     fmt::{Display, Formatter},
-    sync::Arc,
     time::Duration,
 };
 
@@ -17,7 +16,8 @@ use ed25519_dalek::{ed25519::signature::Signer, Signature, SigningKey, Verifying
 use rbac_registration::registration::cardano::RegistrationChain;
 
 use crate::db::index::{
-    queries::rbac::get_rbac_registrations::build_reg_chain, session::CassandraSession,
+    queries::rbac::get_rbac_registrations::build_reg_chain,
+    session::{CassandraSession, CassandraSessionError},
 };
 
 /// A Catalyst RBAC Authorization Token.
@@ -40,7 +40,6 @@ pub(crate) struct CatalystRBACTokenV1 {
     raw: Vec<u8>,
     /// A corresponded RBAC chain, constructed from the most recent data from the
     /// database. Lazy initialized
-    /// TODO: make `RegistrationChain` clonable, remove Arc
     reg_chain: Option<RegistrationChain>,
 }
 
@@ -169,19 +168,16 @@ impl CatalystRBACTokenV1 {
         self.network
     }
 
-    /// Return a corresponded registration chain if any registrations present.
-    /// If it is a first call, fetch all data from the db and initialize it.
+    /// Returns a corresponded registration chain if any registrations present.
+    /// If it is a first call, fetch all data from the database and initialize it.
     pub(crate) async fn get_reg_chain(&mut self) -> anyhow::Result<Option<&RegistrationChain>> {
         if self.reg_chain.is_none() {
-            // TODO: properly handle failing acquiring db session, so the caller could handle this
-            // case properly
-            let session = CassandraSession::get(true)
-                .ok_or(anyhow::anyhow!("Failed to acquire persistent db session"))?;
-            let reg_chain = build_reg_chain(&session, self.catalyst_id(), self.network()).await?;
-            self.reg_chain = reg_chain.map(Into::into);
+            let session =
+                CassandraSession::get(true).ok_or(CassandraSessionError::FailedAcquiringSession)?;
+            self.reg_chain = build_reg_chain(&session, self.catalyst_id(), self.network()).await?;
         }
 
-        Ok(self.reg_chain.as_ref().map(Arc::as_ref))
+        Ok(self.reg_chain.as_ref())
     }
 }
 
