@@ -195,7 +195,7 @@ async fn store_document_in_db(
     let authors = doc
         .authors()
         .iter()
-        .map(catalyst_signed_doc::IdUri::to_string)
+        .map(|kid| kid.to_string())
         .collect();
 
     let doc_meta_json = match serde_json::to_value(doc.doc_meta()) {
