@@ -23,12 +23,6 @@ class _SpacesListViewState extends State<SpacesListView> {
   final _scrollController = ScrollController();
 
   @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return VoicesScrollbar(
       key: const Key('SpacesListView'),
@@ -71,5 +65,17 @@ class _SpacesListViewState extends State<SpacesListView> {
         },
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    context.read<WorkspaceBloc>().add(const WatchUserProposalsEvent());
   }
 }

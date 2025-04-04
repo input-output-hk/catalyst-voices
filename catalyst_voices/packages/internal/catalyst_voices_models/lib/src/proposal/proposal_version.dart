@@ -50,6 +50,14 @@ final class ProposalVersion extends Equatable
 }
 
 extension ProposalVersionsList on List<ProposalVersion> {
+  bool hasLatestLocalDraft(String? version) {
+    if (isEmpty) return false;
+    final latestVersion = first;
+    return latestVersion.isLatestVersion(
+      version ?? '',
+    );
+  }
+
   int versionNumber(String version) {
     return length - indexWhere((element) => element.selfRef.version == version);
   }
