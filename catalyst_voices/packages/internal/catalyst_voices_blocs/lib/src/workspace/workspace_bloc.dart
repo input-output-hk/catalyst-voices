@@ -43,6 +43,7 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     on<DeleteDraftProposalEvent>(_deleteProposal);
     on<UnlockProposalEvent>(_unlockProposal);
     on<ForgetProposalEvent>(_forgetProposal);
+    on<GetTimelineItemsEvent>(_getTimelineItems);
   }
 
   @override
@@ -136,10 +137,26 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     if (proposal == null || proposal.selfRef is! SignedDocumentRef) {
       return emitError(const LocalizedUnknownException());
     }
-    await _proposalService.unlockProposal(
-      proposalRef: proposal.selfRef as SignedDocumentRef,
-      categoryId: proposal.categoryId,
-    );
+    try {
+      await _proposalService.forgetProposal(
+        proposalRef: proposal.selfRef as SignedDocumentRef,
+        categoryId: proposal.categoryId,
+      );
+    } catch (e, stackTrace) {
+      _logger.severe('Error forgetting proposal', e, stackTrace);
+    }
+  }
+
+  Future<void> _getTimelineItems(
+    GetTimelineItemsEvent event,
+    Emitter<WorkspaceState> emit,
+  ) async {
+    final timelineItems = await _campaignService.getCampaignTimeline();
+    final timeline =
+        timelineItems.map(CampaignTimelineViewModel.fromModel).toList();
+
+    emit(state.copyWith(timelineItems: timeline));
+    emitSignal(SubmissionCloseDate(date: state.submissionCloseDate));
   }
 
   Future<void> _importProposal(
@@ -176,9 +193,9 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
 
         add(LoadProposalsEvent(proposals));
       },
-      onError: (Object error) {
+      onError: (Object error, StackTrace stackTrace) {
         if (isClosed) return;
-        _logger.info('Users proposals stream error', error);
+        _logger.info('Users proposals stream error', error, stackTrace);
         add(ErrorLoadProposalsEvent(LocalizedException.create(error)));
       },
     );
@@ -214,5 +231,6 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     await _proposalsSubscription?.cancel();
     _proposalsSubscription = null;
     _setupProposalsSubscription();
+    emit(state.copyWith(isLoading: false));
   }
 }

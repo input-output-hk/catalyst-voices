@@ -42,4 +42,15 @@ enum ProposalSubmissionActionDto {
         return ProposalSubmissionActionDto.hide;
     }
   }
+
+  ProposalSubmissionAction toModel() {
+    switch (this) {
+      case ProposalSubmissionActionDto.aFinal:
+        return ProposalSubmissionAction.aFinal;
+      case ProposalSubmissionActionDto.draft:
+        return ProposalSubmissionAction.draft;
+      case ProposalSubmissionActionDto.hide:
+        return ProposalSubmissionAction.hide;
+    }
+  }
 }
