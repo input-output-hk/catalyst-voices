@@ -7,7 +7,7 @@ use unprocessable_content_request::PutDocumentUnprocessableContent;
 
 use super::common::{DocProvider, VerifyingKeyProvider};
 use crate::{
-db::event::{
+    db::event::{
         error,
         signed_docs::{FullSignedDoc, SignedDocBody, StoreError},
     },
@@ -62,12 +62,15 @@ pub(crate) async fn endpoint(doc_bytes: Vec<u8>, token: CatalystRBACTokenV1) -> 
     };
 
     // validate document integrity
+    let signed_doc_cfg = Settings::signed_doc_cfg();
     match catalyst_signed_doc::validator::validate(
-            &doc,
-            signed_doc_cfg.future_threshold(),
-            signed_doc_cfg.past_threshold(),
-            &DocProvider,
-        ).await {
+        &doc,
+        signed_doc_cfg.future_threshold(),
+        signed_doc_cfg.past_threshold(),
+        &DocProvider,
+    )
+    .await
+    {
         Ok(true) => (),
         Ok(false) => {
             return Responses::UnprocessableContent(Json(PutDocumentUnprocessableContent::new(
@@ -83,11 +86,10 @@ pub(crate) async fn endpoint(doc_bytes: Vec<u8>, token: CatalystRBACTokenV1) -> 
     }
 
     // validate document signatures
-    let verifying_key_provider =
-        match VerifyingKeyProvider::try_from_kids(&token, &doc.kids()).await {
-            Ok(value) => value,
-            Err(err) => return AllResponses::handle_error(&err),
-        };
+    let verifying_key_provider = match VerifyingKeyProvider::try_from_kids(&token, &doc.kids()) {
+        Ok(value) => value,
+        Err(err) => return AllResponses::handle_error(&err),
+    };
     match catalyst_signed_doc::validator::validate_signatures(&doc, &verifying_key_provider).await {
         Ok(true) => (),
         Ok(false) => {

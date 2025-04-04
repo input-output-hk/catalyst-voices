@@ -7,7 +7,7 @@ use rbac_registration::cardano::cip509::RoleNumber;
 use super::templates::get_doc_static_template;
 use crate::{
     db::event::{error::NotFoundError, signed_docs::FullSignedDoc},
-    service::common::auth::rbac::{scheme, token::CatalystRBACTokenV1},
+    service::common::auth::rbac::token::CatalystRBACTokenV1,
 };
 
 /// Get document from the database
@@ -84,7 +84,7 @@ impl VerifyingKeyProvider {
     /// - The role index parsing fails.
     /// - Indexed registration queries or chain building fail.
     /// - The latest signing key for a required role cannot be found.
-    pub(crate) async fn try_from_kids(
+    pub(crate) fn try_from_kids(
         token: &CatalystRBACTokenV1, kids: &[catalyst_signed_doc::IdUri],
     ) -> anyhow::Result<Self> {
         // validate rbac token and document KIDs (ignoring the role/rotation)
@@ -100,16 +100,9 @@ impl VerifyingKeyProvider {
             let (role_index, _) = kid.role_and_rotation();
             let role_index = RoleNumber::from(role_index.to_string().parse::<u8>()?);
 
-            // TODO: should be able to get the reg chain from the processed rbac token
-            let reg_queries = scheme::indexed_registrations(kid).await?;
-
-            let reg_chain = scheme::build_reg_chain(token.network(), &reg_queries)
-                .await
-                .map_err(|e| {
-                    anyhow::anyhow!(
-                        "Failed to build a registration chain for {kid} Catalyst ID: {e:?}"
-                    )
-                })?;
+            let Some(reg_chain) = token.reg_chain() else {
+                anyhow::bail!("Failed to retrieve a registration chain for {kid} Catalyst ID")
+            };
 
             let (latest_pk, rotation) = reg_chain
                 .get_latest_signing_pk_for_role(&role_index)

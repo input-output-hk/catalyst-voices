@@ -204,4 +204,3 @@ async fn checker_api_catalyst_auth(
     // Step 11: Token is valid
     Ok(token)
 }
-         
