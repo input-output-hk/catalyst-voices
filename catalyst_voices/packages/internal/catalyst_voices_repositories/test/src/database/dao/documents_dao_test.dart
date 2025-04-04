@@ -497,6 +497,59 @@ void main() {
       });
     });
 
+    group('query significant proposals', () {
+      test(
+        'returns proposal with all relevant documents correctly',
+        () async {
+          // Given
+          final proposalRef = SignedDocumentRef.generateFirstRef();
+          final proposalDocument = DocumentWithMetadataFactory.build(
+            metadata: DocumentDataMetadata(
+              type: DocumentType.proposalDocument,
+              selfRef: proposalRef,
+            ),
+          );
+          final proposalActionDocument = DocumentWithMetadataFactory.build(
+            metadata: DocumentDataMetadata(
+              type: DocumentType.proposalActionDocument,
+              selfRef: SignedDocumentRef.generateFirstRef(),
+              ref: proposalRef,
+            ),
+          );
+          final commentDocuments = [
+            DocumentWithMetadataFactory.build(
+              metadata: DocumentDataMetadata(
+                type: DocumentType.commentDocument,
+                selfRef: SignedDocumentRef.generateFirstRef(),
+                ref: proposalRef,
+              ),
+            ),
+            DocumentWithMetadataFactory.build(
+              metadata: DocumentDataMetadata(
+                type: DocumentType.commentDocument,
+                selfRef: SignedDocumentRef.generateFirstRef(),
+                ref: proposalRef,
+              ),
+            ),
+          ];
+
+          // When
+          final docs = [
+            proposalDocument,
+            proposalActionDocument,
+            ...commentDocuments,
+          ];
+          await database.documentsDao.saveAll(docs);
+
+          // Then
+          final proposals =
+              await database.documentsDao.querySignificantProposals();
+
+          expect(proposals.length, 1);
+        },
+      );
+    });
+
     group('count', () {
       test('document returns expected number', () async {
         // Given
