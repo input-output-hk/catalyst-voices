@@ -24,7 +24,7 @@ class SessionActionHeader extends StatelessWidget {
         return switch (state.status) {
           SessionStatus.visitor => state.isRegistrationInProgress
               ? const _FinishRegistrationButton()
-              : _GetStartedButton(isEnabled: state.canCreateAccount),
+              : const _GetStartedButton(),
           SessionStatus.guest => const SessionUnlockButton(),
           SessionStatus.actor => const SessionLockButton(),
         };
@@ -52,22 +52,16 @@ class _FinishRegistrationButton extends StatelessWidget {
 }
 
 class _GetStartedButton extends StatelessWidget {
-  final bool isEnabled;
-
-  const _GetStartedButton({
-    required this.isEnabled,
-  });
+  const _GetStartedButton();
 
   @override
   Widget build(BuildContext context) {
     return VoicesFilledButton(
       key: const Key('GetStartedButton'),
-      onTap: isEnabled
-          ? () async => RegistrationDialog.show(
-                context,
-                type: const FreshRegistration(),
-              )
-          : null,
+      onTap: () async => RegistrationDialog.show(
+        context,
+        type: const FreshRegistration(),
+      ),
       child: Text(context.l10n.getStarted),
     );
   }

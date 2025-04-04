@@ -43,6 +43,7 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     on<DeleteDraftProposalEvent>(_deleteProposal);
     on<UnlockProposalEvent>(_unlockProposal);
     on<ForgetProposalEvent>(_forgetProposal);
+    on<GetTimelineItemsEvent>(_getTimelineItems);
   }
 
   @override
@@ -144,6 +145,18 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     } catch (e, stackTrace) {
       _logger.severe('Error forgetting proposal', e, stackTrace);
     }
+  }
+
+  Future<void> _getTimelineItems(
+    GetTimelineItemsEvent event,
+    Emitter<WorkspaceState> emit,
+  ) async {
+    final timelineItems = await _campaignService.getCampaignTimeline();
+    final timeline =
+        timelineItems.map(CampaignTimelineViewModel.fromModel).toList();
+
+    emit(state.copyWith(timelineItems: timeline));
+    emitSignal(SubmissionCloseDate(date: state.submissionCloseDate));
   }
 
   Future<void> _importProposal(

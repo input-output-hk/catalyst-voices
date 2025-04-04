@@ -39,13 +39,17 @@ final class ProposalsCubit extends Cubit<ProposalsState> {
       (index) => CampaignCategoryDetailsViewModel.dummy(id: '$index'),
     );
 
-    emit(state.copyWith(categories: categories));
+    if (!isClosed) {
+      emit(state.copyWith(categories: categories));
+    }
   }
 
   Future<void> getFavoritesList() async {
     final favoritesList = await _proposalService.getFavoritesProposalsIds();
 
-    emit(state.copyWith(favoritesIds: favoritesList));
+    if (!isClosed) {
+      emit(state.copyWith(favoritesIds: favoritesList));
+    }
   }
 
   Future<void> getProposals(
