@@ -13,7 +13,7 @@ use crate::db::{
         queries::{PreparedQueries, PreparedSelectQuery},
         session::CassandraSession,
     },
-    types::{DbCatalystId, DbStakeAddress},
+    types::{DbCatalystId, DbSlot, DbStakeAddress},
 };
 
 /// Get Catalyst ID by stake address query string.
@@ -31,6 +31,8 @@ pub(crate) struct QueryParams {
 pub(crate) struct Query {
     /// Catalyst ID for the queries stake address.
     pub catalyst_id: DbCatalystId,
+    /// A slot number.
+    pub slot_no: DbSlot,
 }
 
 impl Query {

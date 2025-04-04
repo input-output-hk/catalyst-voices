@@ -48,7 +48,9 @@ pub(crate) type AllResponses = WithErrorResponses<Responses>;
 pub(crate) async fn endpoint(doc_bytes: Vec<u8>) -> AllResponses {
     match doc_bytes.as_slice().try_into() {
         Ok(doc) => {
-            if let Err(e) = catalyst_signed_doc::validator::validate(&doc, &DocProvider).await {
+            // TODO: FIXME:
+            if let Err(e) = catalyst_signed_doc::validator::validate(&doc, 0, 0, &DocProvider).await
+            {
                 // means that something happened inside the `DocProvider`, some db error.
                 return AllResponses::handle_error(&e);
             }

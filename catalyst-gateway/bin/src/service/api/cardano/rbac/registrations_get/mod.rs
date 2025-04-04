@@ -111,6 +111,10 @@ async fn catalyst_id_from_stake(
     })
     .and_then(|r| r.try_collect().map_err(Into::into))
     .await
+    .map(|mut res: Vec<_>| {
+        res.sort_by(|a, b| a.slot_no.cmp(&b.slot_no));
+        res
+    })
     .context("Failed to query Catalyst ID from stake address")?;
 
     Ok(result.pop().map(|v| v.catalyst_id.into()))
