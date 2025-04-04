@@ -15,6 +15,7 @@ class VoicesDesktopInfoDialog extends StatelessWidget {
   final Widget title;
   final Widget message;
   final Widget action;
+  final bool fillPosition;
 
   const VoicesDesktopInfoDialog({
     super.key,
@@ -22,6 +23,7 @@ class VoicesDesktopInfoDialog extends StatelessWidget {
     required this.title,
     required this.message,
     required this.action,
+    this.fillPosition = false,
   });
 
   @override
@@ -45,6 +47,7 @@ class VoicesDesktopInfoDialog extends StatelessWidget {
     );
 
     return VoicesSinglePaneDialog(
+      fillPosition: fillPosition,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 83),
         child: Column(
