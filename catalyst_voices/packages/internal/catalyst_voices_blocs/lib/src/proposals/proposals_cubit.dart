@@ -10,7 +10,8 @@ import 'package:collection/collection.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 /// Manages the proposals.
-final class ProposalsCubit extends Cubit<ProposalsState> {
+final class ProposalsCubit extends Cubit<ProposalsState>
+    with BlocSignalEmitterMixin<ProposalsSignal, ProposalsState> {
   final CampaignService _campaignService;
   final ProposalService _proposalService;
 
@@ -20,6 +21,19 @@ final class ProposalsCubit extends Cubit<ProposalsState> {
     this._campaignService,
     this._proposalService,
   ) : super(const ProposalsState());
+
+  void changeFilters({
+    required bool? onlyMy,
+    required SignedDocumentRef? category,
+  }) {
+    _cache = _cache.copyWith(
+      onlyMy: Optional(onlyMy),
+      selectedCategory: Optional(category),
+    );
+    _rebuildCategories();
+
+    // TODO(damian-molinski): watch proposals
+  }
 
   void changeSearchValue(String searchValue) {
     emit(
@@ -32,21 +46,8 @@ final class ProposalsCubit extends Cubit<ProposalsState> {
   }
 
   void changeSelectedCategory(SignedDocumentRef? categoryId) {
-    // TODO(damian-molinski): emit signal
-    // emit(state.copyWith(selectedCategoryId: Optional(categoryId)));
+    emitSignal(ChangeCategorySignal(to: categoryId));
   }
-
-  // Future<void> getCampaignCategories() async {
-  //   await _campaignService.getCampaignCategories();
-  //   final categories = List.generate(
-  //     6,
-  //     (index) => CampaignCategoryDetailsViewModel.dummy(id: '$index'),
-  //   );
-  //
-  //   if (!isClosed) {
-  //     emit(state.copyWith(categories: categories));
-  //   }
-  // }
 
   Future<void> getFavoritesList() async {
     final favoritesList = await _proposalService.getFavoritesProposalsIds();
@@ -120,42 +121,13 @@ final class ProposalsCubit extends Cubit<ProposalsState> {
   }
 
   void init({
+    required bool onlyMyProposals,
     required SignedDocumentRef? category,
   }) {
     _cache = const ProposalsCubitCache();
 
     unawaited(_loadCampaignCategories());
-    changeCategory(category);
-  }
-
-  void changeCategory(SignedDocumentRef? category) {
-    _cache = _cache.copyWith(selectedCategory: Optional(category));
-    _rebuildCategories();
-  }
-
-  Future<void> _loadCampaignCategories() async {
-    final categories = await _campaignService.getCampaignCategories();
-
-    _cache = _cache.copyWith(categories: Optional(categories));
-
-    if (!isClosed) {
-      _rebuildCategories();
-    }
-  }
-
-  void _rebuildCategories() {
-    final selectedCategory = _cache.selectedCategory;
-    final categories = _cache.categories ?? const [];
-
-    final categorySelectorItems = categories.map((e) {
-      return ProposalsStateCategorySelectorItem(
-        ref: e.selfRef,
-        name: e.categoryName,
-        isSelected: e.selfRef.id == selectedCategory?.id,
-      );
-    }).toList();
-
-    emit(state.copyWith(categorySelectorItems: categorySelectorItems));
+    changeFilters(onlyMy: onlyMyProposals, category: category);
   }
 
   /// Changes the favorite status of the proposal with [ref].
@@ -335,5 +307,30 @@ final class ProposalsCubit extends Cubit<ProposalsState> {
         ),
       );
     }
+  }
+
+  Future<void> _loadCampaignCategories() async {
+    final categories = await _campaignService.getCampaignCategories();
+
+    _cache = _cache.copyWith(categories: Optional(categories));
+
+    if (!isClosed) {
+      _rebuildCategories();
+    }
+  }
+
+  void _rebuildCategories() {
+    final selectedCategory = _cache.selectedCategory;
+    final categories = _cache.categories ?? const [];
+
+    final categorySelectorItems = categories.map((e) {
+      return ProposalsStateCategorySelectorItem(
+        ref: e.selfRef,
+        name: e.categoryName,
+        isSelected: e.selfRef.id == selectedCategory?.id,
+      );
+    }).toList();
+
+    emit(state.copyWith(categorySelectorItems: categorySelectorItems));
   }
 }

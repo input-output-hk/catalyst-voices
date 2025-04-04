@@ -1,10 +1,12 @@
 import 'dart:async';
 
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
+import 'package:catalyst_voices/common/signal_handler.dart';
 import 'package:catalyst_voices/pages/campaign/details/campaign_details_dialog.dart';
 import 'package:catalyst_voices/pages/proposals/proposal_pagination_tabview.dart';
 import 'package:catalyst_voices/pages/proposals/widgets/category_selector.dart';
 import 'package:catalyst_voices/pages/proposals/widgets/proposals_tabs.dart';
+import 'package:catalyst_voices/routes/routes.dart';
 import 'package:catalyst_voices/widgets/search/search_text_field.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
@@ -159,7 +161,10 @@ class _Header extends StatelessWidget {
   }
 }
 
-class _ProposalsPageState extends State<ProposalsPage> {
+class _ProposalsPageState extends State<ProposalsPage>
+    with
+        SignalHandlerStateMixin<ProposalsCubit, ProposalsSignal,
+            ProposalsPage> {
   @override
   Widget build(BuildContext context) {
     return const CustomScrollView(
@@ -173,15 +178,40 @@ class _ProposalsPageState extends State<ProposalsPage> {
   void didUpdateWidget(ProposalsPage oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    if (widget.categoryId != oldWidget.categoryId) {
-      context.read<ProposalsCubit>().changeCategory(widget.categoryId);
+    if (widget.categoryId != oldWidget.categoryId ||
+        widget.selectMyProposalsView != oldWidget.selectMyProposalsView) {
+      context.read<ProposalsCubit>().changeFilters(
+            onlyMy: widget.selectMyProposalsView,
+            category: widget.categoryId,
+          );
+    }
+  }
+
+  @override
+  void handleSignal(ProposalsSignal signal) {
+    switch (signal) {
+      case ChangeCategorySignal(:final to):
+        _changeCategory(id: to?.id);
     }
   }
 
   @override
   void initState() {
     super.initState();
-    context.read<ProposalsCubit>().init(category: widget.categoryId);
+    context.read<ProposalsCubit>().init(
+          onlyMyProposals: widget.selectMyProposalsView,
+          category: widget.categoryId,
+        );
+  }
+
+  void _changeCategory({String? id}) {
+    Router.neglect(context, () {
+      if (widget.selectMyProposalsView) {
+        MyProposalsRoute(categoryId: id).replace(context);
+      } else {
+        ProposalsRoute(categoryId: id).replace(context);
+      }
+    });
   }
 }
 

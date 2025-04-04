@@ -44,7 +44,6 @@ class _CategorySelectorState extends State<_CategorySelector> {
 
   @override
   Widget build(BuildContext context) {
-    print('${widget.items}');
     return CategoryDropdown(
       items: [
         DropdownMenuViewModel.all(
