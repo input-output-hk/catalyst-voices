@@ -25,10 +25,12 @@ final class ProposalsCubit extends Cubit<ProposalsState>
   void changeFilters({
     required bool? onlyMy,
     required SignedDocumentRef? category,
+    required ProposalsFilterType type,
   }) {
     _cache = _cache.copyWith(
       onlyMy: Optional(onlyMy),
       selectedCategory: Optional(category),
+      type: Optional(type),
     );
     _rebuildCategories();
 
@@ -60,6 +62,7 @@ final class ProposalsCubit extends Cubit<ProposalsState>
   Future<void> getProposals(
     ProposalPaginationRequest request,
   ) async {
+    return;
     final campaign = await _campaignService.getActiveCampaign();
     if (campaign == null) {
       return;
@@ -123,11 +126,12 @@ final class ProposalsCubit extends Cubit<ProposalsState>
   void init({
     required bool onlyMyProposals,
     required SignedDocumentRef? category,
+    required ProposalsFilterType type,
   }) {
     _cache = const ProposalsCubitCache();
 
     unawaited(_loadCampaignCategories());
-    changeFilters(onlyMy: onlyMyProposals, category: category);
+    changeFilters(onlyMy: onlyMyProposals, category: category, type: type);
   }
 
   /// Changes the favorite status of the proposal with [ref].
@@ -324,7 +328,7 @@ final class ProposalsCubit extends Cubit<ProposalsState>
     final categories = _cache.categories ?? const [];
 
     final categorySelectorItems = categories.map((e) {
-      return ProposalsStateCategorySelectorItem(
+      return ProposalsCategorySelectorItem(
         ref: e.selfRef,
         name: e.categoryName,
         isSelected: e.selfRef.id == selectedCategory?.id,

@@ -15,7 +15,7 @@ class CategorySelector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocSelector<ProposalsCubit, ProposalsState,
-        List<ProposalsStateCategorySelectorItem>>(
+        List<ProposalsCategorySelectorItem>>(
       selector: (state) => state.categorySelectorItems,
       builder: (context, state) {
         return _CategorySelector(
@@ -28,7 +28,7 @@ class CategorySelector extends StatelessWidget {
 }
 
 class _CategorySelector extends StatefulWidget {
-  final List<ProposalsStateCategorySelectorItem> items;
+  final List<ProposalsCategorySelectorItem> items;
 
   const _CategorySelector({
     super.key,
@@ -90,7 +90,7 @@ class _CategorySelectorState extends State<_CategorySelector> {
   }
 }
 
-extension on ProposalsStateCategorySelectorItem {
+extension on ProposalsCategorySelectorItem {
   DropdownMenuViewModel<SignedDocumentRef> toDropdownItem() {
     return DropdownMenuViewModel(
       value: ref,

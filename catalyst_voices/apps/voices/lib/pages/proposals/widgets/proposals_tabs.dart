@@ -1,25 +1,37 @@
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
-import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ProposalsTabs extends StatelessWidget {
-  const ProposalsTabs({super.key});
+  final TabController controller;
+
+  const ProposalsTabs({
+    super.key,
+    required this.controller,
+  });
 
   @override
   Widget build(BuildContext context) {
     return BlocSelector<ProposalsCubit, ProposalsState, ProposalsTypeCount>(
       selector: (state) => state.count,
-      builder: (context, state) => _ProposalsTabs(data: state),
+      builder: (context, state) {
+        return _ProposalsTabs(
+          data: state,
+          controller: controller,
+        );
+      },
     );
   }
 }
 
 class _ProposalsTabs extends StatelessWidget {
   final ProposalsTypeCount data;
+  final TabController controller;
 
   const _ProposalsTabs({
     required this.data,
+    required this.controller,
   });
 
   @override
@@ -28,28 +40,27 @@ class _ProposalsTabs extends StatelessWidget {
       isScrollable: true,
       tabAlignment: TabAlignment.start,
       dividerHeight: 0,
-      tabs: [
-        Tab(
-          key: const Key('AllProposalsTab'),
-          text: context.l10n.noOfAll(data.total),
-        ),
-        Tab(
-          key: const Key('DraftProposalsTab'),
-          text: context.l10n.noOfDraft(data.drafts),
-        ),
-        Tab(
-          key: const Key('FinalProposalsTab'),
-          text: context.l10n.noOfFinal(data.finals),
-        ),
-        Tab(
-          key: const Key('FavoriteProposalsTab'),
-          text: context.l10n.noOfFavorites(data.favorites),
-        ),
-        Tab(
-          key: const Key('MyProposalsTab'),
-          text: context.l10n.noOfMyProposals(data.my),
-        ),
-      ],
+      controller: controller,
+      onTap: (index) {
+        final type = ProposalsFilterType.values[index];
+        context.read<ProposalsCubit>().emitSignal(ChangeFilterType(type));
+      },
+      tabs: ProposalsFilterType.values.map(
+        (value) {
+          final count = switch (value) {
+            ProposalsFilterType.total => data.total,
+            ProposalsFilterType.drafts => data.drafts,
+            ProposalsFilterType.finals => data.finals,
+            ProposalsFilterType.favorites => data.favorites,
+            ProposalsFilterType.my => data.my,
+          };
+
+          return Tab(
+            key: value.tabKey(),
+            text: value.noOf(context, count: count),
+          );
+        },
+      ).toList(),
     );
   }
 }

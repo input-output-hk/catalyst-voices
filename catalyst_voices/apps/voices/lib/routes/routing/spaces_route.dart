@@ -14,6 +14,7 @@ import 'package:catalyst_voices/routes/guards/user_access_guard.dart';
 import 'package:catalyst_voices/routes/routing/routes.dart';
 import 'package:catalyst_voices/routes/routing/transitions/transitions.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -77,9 +78,11 @@ final class FundedProjectsRoute extends GoRouteData
 final class MyProposalsRoute extends GoRouteData
     with FadePageTransitionMixin, CompositeRouteGuardMixin {
   final String? categoryId;
+  final String? type;
 
   const MyProposalsRoute({
     this.categoryId,
+    this.type,
   });
 
   @override
@@ -91,9 +94,12 @@ final class MyProposalsRoute extends GoRouteData
     final categoryRef =
         categoryId != null ? SignedDocumentRef(id: categoryId) : null;
 
+    final type = ProposalsFilterType.values.asNameMap()[this.type];
+
     return ProposalsPage(
       selectMyProposalsView: true,
       categoryId: categoryRef,
+      type: type,
     );
   }
 }
@@ -101,8 +107,12 @@ final class MyProposalsRoute extends GoRouteData
 final class ProposalsRoute extends GoRouteData
     with FadePageTransitionMixin, CompositeRouteGuardMixin {
   final String? categoryId;
+  final String? type;
 
-  const ProposalsRoute({this.categoryId});
+  const ProposalsRoute({
+    this.categoryId,
+    this.type,
+  });
 
   factory ProposalsRoute.fromRef({SignedDocumentRef? categoryId}) {
     return ProposalsRoute(categoryId: categoryId?.id);
@@ -117,7 +127,12 @@ final class ProposalsRoute extends GoRouteData
     final categoryRef =
         categoryId != null ? SignedDocumentRef(id: categoryId) : null;
 
-    return ProposalsPage(categoryId: categoryRef);
+    final type = ProposalsFilterType.values.asNameMap()[this.type];
+
+    return ProposalsPage(
+      categoryId: categoryRef,
+      type: type,
+    );
   }
 }
 
