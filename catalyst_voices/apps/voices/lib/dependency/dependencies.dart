@@ -143,6 +143,9 @@ final class Dependencies extends DependencyProvider {
           get<ProposalService>(),
           get<DocumentMapper>(),
         );
+      })
+      ..registerFactory<CampaignStageCubit>(() {
+        return CampaignStageCubit(get<CampaignService>());
       });
   }
 

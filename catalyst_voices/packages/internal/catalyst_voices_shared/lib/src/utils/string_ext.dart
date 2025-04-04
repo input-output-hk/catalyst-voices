@@ -8,6 +8,8 @@ extension StringExt on String {
 
   bool get isNotBlank => !isBlank;
 
+  String withBullet() => withPrefix('• ');
+
   String capitalize() {
     if (isNotEmpty) {
       return '${this[0].toUpperCase()}${substring(1).toLowerCase()}';
