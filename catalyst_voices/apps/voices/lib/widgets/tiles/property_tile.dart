@@ -40,10 +40,10 @@ class PropertyTile extends StatelessWidget {
             const SizedBox(height: 12),
             child,
             if (footer != null) ...[
-              const SizedBox(height: 12),
+              const SizedBox(height: 24),
               footer,
             ],
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
           ],
         ),
       ),

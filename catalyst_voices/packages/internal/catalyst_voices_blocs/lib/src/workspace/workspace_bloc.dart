@@ -172,9 +172,7 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     );
   }
 
-  void _setupProposalsSubscription(
-    Emitter<WorkspaceState> emit,
-  ) {
+  void _setupProposalsSubscription() {
     _proposalsSubscription = _proposalService.watchUserProposals().listen(
       (proposals) {
         if (isClosed) return;
@@ -188,7 +186,6 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
         add(ErrorLoadProposalsEvent(LocalizedException.create(error)));
       },
     );
-    emit(state.copyWith(isLoading: false));
   }
 
   Future<void> _unlockProposal(
@@ -220,6 +217,7 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     );
     await _proposalsSubscription?.cancel();
     _proposalsSubscription = null;
-    _setupProposalsSubscription(emit);
+    _setupProposalsSubscription();
+    emit(state.copyWith(isLoading: false));
   }
 }

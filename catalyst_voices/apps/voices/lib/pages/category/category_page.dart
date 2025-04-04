@@ -37,20 +37,22 @@ class _Body extends StatelessWidget {
   Widget build(BuildContext context) {
     return Skeletonizer(
       enabled: isLoading,
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            child: CategoryDetailView(
+      child: SelectionArea(
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: CategoryDetailView(
+                category: category,
+              ),
+            ),
+            const SizedBox(width: 48),
+            _CardInformation(
               category: category,
             ),
-          ),
-          const SizedBox(width: 48),
-          _CardInformation(
-            category: category,
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

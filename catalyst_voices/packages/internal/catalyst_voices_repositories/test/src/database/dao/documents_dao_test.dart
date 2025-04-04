@@ -520,6 +520,66 @@ void main() {
 
         expect(document?.metadata.selfRef, document2.document.metadata.selfRef);
       });
+
+      test('watchRefToDocumentData emits correct document and updates',
+          () async {
+        // Given
+        final baseDocument = DocumentWithMetadataFactory.build(
+          metadata: DocumentDataMetadata(
+            type: DocumentType.proposalDocument,
+            selfRef: SignedDocumentRef.generateFirstRef(),
+          ),
+        );
+
+        final referencingDocument = DocumentWithMetadataFactory.build(
+          metadata: DocumentDataMetadata(
+            type: DocumentType.commentTemplate,
+            selfRef: SignedDocumentRef.generateFirstRef(),
+            ref: baseDocument.document.metadata.selfRef,
+          ),
+        );
+
+        await Future<void>.delayed(const Duration(milliseconds: 1));
+        final newerVersion = DocumentWithMetadataFactory.build(
+          metadata: DocumentDataMetadata(
+            type: DocumentType.commentTemplate,
+            selfRef: SignedDocumentRef(
+              id: referencingDocument.document.metadata.id,
+              version: const Uuid().v7(),
+            ),
+            ref: baseDocument.document.metadata.selfRef,
+          ),
+        );
+
+        // When
+        final documentsStream = database.documentsDao
+            .watchRefToDocumentData(
+              refTo: baseDocument.document.metadata.selfRef,
+              type: DocumentType.commentTemplate,
+            )
+            .asBroadcastStream();
+
+        await database.documentsDao
+            .saveAll([baseDocument, referencingDocument]);
+        final firstEmission = await documentsStream.first;
+
+        await database.documentsDao.saveAll([newerVersion]);
+        final secondEmission = await documentsStream.first;
+
+        // Then
+        expect(
+          firstEmission?.metadata.selfRef,
+          referencingDocument.document.metadata.selfRef,
+        );
+        expect(
+          secondEmission?.metadata.selfRef,
+          newerVersion.document.metadata.selfRef,
+        );
+        expect(
+          secondEmission?.metadata.id,
+          referencingDocument.document.metadata.id,
+        );
+      });
     });
 
     group('count', () {
