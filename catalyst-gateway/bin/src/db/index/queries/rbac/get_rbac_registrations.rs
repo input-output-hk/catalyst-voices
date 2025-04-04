@@ -95,25 +95,6 @@ pub(crate) async fn build_reg_chain(
         return Ok(None);
     };
 
-    // a helper function to return a RBAC registration from the given block and slot.
-    let registration =
-        async |network: Network, slot: Slot, txn_index: TxnIndex| -> anyhow::Result<Cip509> {
-            let point = Point::fuzzy(slot);
-            let block = ChainFollower::get_block(network, point)
-                .await
-                .context("Unable to get block")?
-                .data;
-            if block.point().slot_or_default() != slot {
-                // The `ChainFollower::get_block` function can return the next consecutive block if
-                // it cannot find the exact one. This shouldn't happen, but we need
-                // to check anyway.
-                return Err(anyhow::anyhow!("Unable to find exact block"));
-            }
-            Cip509::new(&block, txn_index, &[])
-                .context("Invalid RBAC registration")?
-                .context("No RBAC registration at this block and txn index")
-        };
-
     let root = registration(network, root.slot_no.into(), root.txn_index.into())
         .await
         .context("Failed to get root registration")?;
@@ -144,4 +125,22 @@ pub(crate) async fn build_reg_chain(
     }
 
     Ok(Some(chain))
+}
+
+/// A helper function to return a RBAC registration from the given block and slot.
+async fn registration(network: Network, slot: Slot, txn_index: TxnIndex) -> anyhow::Result<Cip509> {
+    let point = Point::fuzzy(slot);
+    let block = ChainFollower::get_block(network, point)
+        .await
+        .context("Unable to get block")?
+        .data;
+    if block.point().slot_or_default() != slot {
+        // The `ChainFollower::get_block` function can return the next consecutive block if
+        // it cannot find the exact one. This shouldn't happen, but we need
+        // to check anyway.
+        return Err(anyhow::anyhow!("Unable to find exact block"));
+    }
+    Cip509::new(&block, txn_index, &[])
+        .context("Invalid RBAC registration")?
+        .context("No RBAC registration at this block and txn index")
 }
