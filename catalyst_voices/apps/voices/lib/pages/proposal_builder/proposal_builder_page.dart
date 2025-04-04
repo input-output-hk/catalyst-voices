@@ -11,6 +11,7 @@ import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_navigati
 import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_segments.dart';
 import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_setup_panel.dart';
 import 'package:catalyst_voices/pages/spaces/appbar/session_state_header.dart';
+import 'package:catalyst_voices/pages/workspace/submission_closing_warning_dialog.dart';
 import 'package:catalyst_voices/routes/routing/proposal_builder_route.dart';
 import 'package:catalyst_voices/routes/routing/spaces_route.dart';
 import 'package:catalyst_voices/widgets/modals/comment/submit_comment_error_dialog.dart';
@@ -154,6 +155,8 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
       case PublishedProposalBuilderSignal():
       case SubmittedProposalBuilderSignal():
         const WorkspaceRoute().go(context);
+      case ProposalSubmissionCloseDate():
+        unawaited(_showSubmissionClosingWarningDialog(signal.date));
     }
   }
 
@@ -173,6 +176,12 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
     _listenForProposalRef(bloc);
     _listenForSegments(bloc);
     _loadData(bloc: bloc);
+  }
+
+  void _dontShowCampaignSubmissionClosingDialog(bool value) {
+    context
+        .read<SessionCubit>()
+        .updateShowSubmissionClosingWarning(value: value);
   }
 
   void _handleSegmentsControllerChange() {
@@ -218,6 +227,7 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
     } else {
       bloc.add(const LoadDefaultProposalCategoryEvent());
     }
+    bloc.add(const ProposalSubmissionCloseDateEvent());
   }
 
   void _onProposalDeleted() {
@@ -247,6 +257,25 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
     return PublishProposalErrorDialog.show(
       context: context,
       exception: error,
+    );
+  }
+
+  Future<void> _showSubmissionClosingWarningDialog([
+    DateTime? submissionCloseDate,
+  ]) async {
+    final canShow = context
+        .read<SessionCubit>()
+        .state
+        .settings
+        .showSubmissionClosingWarning;
+
+    if (submissionCloseDate == null || !canShow || !mounted) {
+      return;
+    }
+    await SubmissionClosingWarningDialog.showNDaysBefore(
+      context: context,
+      submissionCloseAt: submissionCloseDate,
+      dontShowAgain: _dontShowCampaignSubmissionClosingDialog,
     );
   }
 
