@@ -7,23 +7,23 @@ import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
-/// Error dialog when submitting proposal for review fails.
-class SubmitProposalErrorDialog {
+/// Error dialog when submitting comment fails.
+class SubmitCommentErrorDialog {
   static Future<void> show({
     required BuildContext context,
-    required ProposalBuilderSubmitException exception,
+    required LocalizedException exception,
   }) {
     return VoicesDialog.show(
       context: context,
       routeSettings: const RouteSettings(
-        name: '/proposal-builder/submit-error',
+        name: '/comments/submit-error',
       ),
       builder: (context) {
         return VoicesDesktopInfoDialog(
           icon: VoicesAssets.icons.exclamation.buildIcon(
             color: Theme.of(context).colors.iconsWarning,
           ),
-          title: Text(exception.title(context)),
+          title: Text(context.l10n.submitCommentErrorDialogTitle),
           message: Text(exception.message(context)),
           action: VoicesFilledButton(
             onTap: () => Navigator.of(context).pop(),

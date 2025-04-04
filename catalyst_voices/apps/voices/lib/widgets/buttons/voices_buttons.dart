@@ -270,13 +270,15 @@ class VoicesBackButton extends StatelessWidget {
   }
 }
 
-class VoicesEditSaveButton extends StatelessWidget {
+class VoicesEditCancelButton extends StatelessWidget {
+  final VoicesEditCancelButtonStyle style;
   final VoidCallback? onTap;
   final bool isEditing;
   final bool hasError;
 
-  const VoicesEditSaveButton({
+  const VoicesEditCancelButton({
     super.key,
+    this.style = VoicesEditCancelButtonStyle.text,
     this.onTap,
     required this.isEditing,
     this.hasError = false,
@@ -284,25 +286,52 @@ class VoicesEditSaveButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final text =
         isEditing ? context.l10n.cancelButtonText : context.l10n.editButtonText;
+    final textStyle = theme.textTheme.labelSmall!;
 
     if (hasError) {
       return VoicesFilledButton(
-        backgroundColor: Theme.of(context).colorScheme.error,
+        backgroundColor: theme.colorScheme.error,
         onTap: onTap,
-        child: Text(text),
+        child: Text(
+          text,
+          style: textStyle.copyWith(color: theme.colorScheme.onError),
+        ),
       );
-    } else {
+    }
+
+    if (isEditing) {
       return VoicesTextButton(
         onTap: onTap,
         child: Text(
           text,
-          style: Theme.of(context).textTheme.labelSmall,
+          style: textStyle.copyWith(color: theme.colorScheme.error),
         ),
       );
     }
+
+    return switch (style) {
+      VoicesEditCancelButtonStyle.text => VoicesTextButton(
+          onTap: onTap,
+          child: Text(text, style: textStyle),
+        ),
+      VoicesEditCancelButtonStyle.outlinedWithIcon => VoicesOutlinedButton(
+          onTap: onTap,
+          leading: VoicesAssets.icons.pencilAlt.buildIcon(),
+          child: Text(
+            text,
+            style: textStyle.copyWith(color: theme.colorScheme.primary),
+          ),
+        ),
+    };
   }
+}
+
+enum VoicesEditCancelButtonStyle {
+  text,
+  outlinedWithIcon,
 }
 
 /// A "Learn More" button that redirects usually to an external content.

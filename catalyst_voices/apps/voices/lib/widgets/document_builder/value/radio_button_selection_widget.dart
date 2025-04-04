@@ -1,6 +1,6 @@
+import 'package:catalyst_voices/widgets/document_builder/common/document_property_builder_title.dart';
 import 'package:catalyst_voices/widgets/toggles/voices_radio_button_form_field.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
@@ -24,9 +24,9 @@ class RadioButtonSelectWidget extends StatefulWidget {
 }
 
 class _RadioButtonSelectionWidgetState extends State<RadioButtonSelectWidget> {
+  bool get _isRequired => widget.schema.isRequired;
   List<String> get _items => widget.schema.enumValues ?? <String>[];
   String get _title => widget.schema.title;
-  bool get _isRequired => widget.schema.isRequired;
 
   @override
   Widget build(BuildContext context) {
@@ -35,9 +35,9 @@ class _RadioButtonSelectionWidgetState extends State<RadioButtonSelectWidget> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (_title.isNotEmpty) ...[
-          Text(
-            _title.starred(isEnabled: _isRequired),
-            style: Theme.of(context).textTheme.titleSmall,
+          DocumentPropertyBuilderTitle(
+            title: _title,
+            isRequired: _isRequired,
           ),
           const SizedBox(height: 8),
           VoicesRadioButtonFormField(

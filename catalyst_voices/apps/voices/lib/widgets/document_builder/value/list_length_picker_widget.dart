@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/widgets/document_builder/common/document_property_builder_title.dart';
 import 'package:catalyst_voices/widgets/dropdown/voices_dropdown.dart';
 import 'package:catalyst_voices/widgets/rich_text/markdown_text.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -30,9 +31,9 @@ class ListLengthPickerWidget extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         if (title.isNotEmpty) ...[
-          Text(
-            title.starred(isEnabled: isRequired),
-            style: Theme.of(context).textTheme.titleSmall,
+          DocumentPropertyBuilderTitle(
+            title: title,
+            isRequired: isRequired,
           ),
           const SizedBox(height: 8),
         ],
@@ -45,7 +46,7 @@ class ListLengthPickerWidget extends StatelessWidget {
             for (int i = minCount; i <= maxCount; i++)
               DropdownMenuEntry(
                 value: i,
-                label: _formatAsPlural(list.schema.itemsSchema.title, i),
+                label: list.schema.itemsSchema.title.formatAsPlural(i),
               ),
           ],
           enabled: isEditMode,
@@ -76,23 +77,5 @@ class ListLengthPickerWidget extends StatelessWidget {
           .toList();
       onChanged(changes);
     }
-  }
-
-  // TODO(dtscalac): temporary solution to format dynamic strings as plural,
-  // after F14 the document schema must be altered to support
-  // other languages than English.
-  //
-  // The current workaround won't work for exceptions like "mouse" -> "mice",
-  // this was accepted for the time being.
-  String _formatAsPlural(String word, int count) {
-    if (word.isEmpty) {
-      // cannot make plural, lets just use the number
-      return count.toString();
-    }
-
-    return switch (count) {
-      1 => '$count $word',
-      _ => '$count ${word}s',
-    };
   }
 }

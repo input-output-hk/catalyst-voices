@@ -45,6 +45,10 @@
   "@saveButtonText": {
     "description": "Text shown in save button"
   },
+  "saveChangesButtonText": "Save Changes",
+  "@saveChangesButtonText": {
+    "description": "Text shown in save button"
+  },
   "passwordLabelText": "Password",
   "@passwordLabelText": {
     "description": "Text shown in password field"
@@ -1639,6 +1643,10 @@
   "@proposalEditorPublishErrorDialogMessage": {
     "description": "Dialog message in proposal editor when publishing proposal to the server failed."
   },
+  "proposalEditorNotAnswered": "Not Answered",
+  "@proposalEditorNotAnswered": {
+    "description": "Placeholder text when a property has been not filled."
+  },
   "showAll": "Show All",
   "@showAll": {
     "description": "Show all for when using filtering by some criteria"
@@ -2276,5 +2284,9 @@
   "insertNewImageFailedToLoad": "Image failed to load",
   "@insertNewImageFailedToLoad": {
     "description": "Text for the image failed to load"
+  },
+  "submitCommentErrorDialogTitle": "Unable to add Comment",
+  "@submitCommentErrorDialogTitle": {
+    "description": "Title for the error dialog when submitting a comment fails"
   }
 }

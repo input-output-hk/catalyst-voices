@@ -23,10 +23,10 @@ import 'package:flutter_quill_extensions/flutter_quill_extensions.dart';
 
 class VoicesRichText extends VoicesFormField<MarkdownData> {
   final VoicesRichTextController controller;
-  final String title;
   final FocusNode focusNode;
   final ScrollController scrollController;
   final int? charsLimit;
+  final double? minHeight;
 
   VoicesRichText({
     super.key,
@@ -35,10 +35,10 @@ class VoicesRichText extends VoicesFormField<MarkdownData> {
     super.enabled,
     super.validator,
     required this.controller,
-    required this.title,
     required this.focusNode,
     required this.scrollController,
     this.charsLimit,
+    this.minHeight,
   }) : super(
           value: controller.markdownData,
           builder: (field) {
@@ -51,22 +51,31 @@ class VoicesRichText extends VoicesFormField<MarkdownData> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                Offstage(
-                  offstage: !enabled,
-                  child: _Toolbar(
-                    controller: controller,
-                  ),
-                ),
-                _Title(title: title),
                 _EditorDecoration(
                   isEditMode: enabled,
                   isInvalid: field.hasError,
                   focusNode: focusNode,
-                  child: _Editor(
-                    controller: controller,
-                    focusNode: focusNode,
-                    scrollController: scrollController,
-                    onChanged: onChangedHandler,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Offstage(
+                        offstage: !enabled,
+                        child: Padding(
+                          padding: const EdgeInsets.all(2),
+                          child: _Toolbar(
+                            controller: controller,
+                          ),
+                        ),
+                      ),
+                      _Editor(
+                        controller: controller,
+                        focusNode: focusNode,
+                        scrollController: scrollController,
+                        minHeight: minHeight,
+                        onChanged: onChangedHandler,
+                      ),
+                    ],
                   ),
                 ),
                 Offstage(
@@ -167,12 +176,14 @@ class _Editor extends StatefulWidget {
   final VoicesRichTextController controller;
   final FocusNode focusNode;
   final ScrollController scrollController;
+  final double? minHeight;
   final ValueChanged<MarkdownData?>? onChanged;
 
   const _Editor({
     required this.controller,
     required this.focusNode,
     required this.scrollController,
+    required this.minHeight,
     required this.onChanged,
   });
 
@@ -246,6 +257,7 @@ class _EditorState extends State<_Editor> {
         focusNode: widget.focusNode,
         scrollController: widget.scrollController,
         config: quill.QuillEditorConfig(
+          minHeight: widget.minHeight,
           padding: const EdgeInsets.all(16),
           placeholder: context.l10n.placeholderRichText,
           characterShortcutEvents: quill.standardCharactersShortcutEvents,
@@ -254,7 +266,8 @@ class _EditorState extends State<_Editor> {
           /* cSpell:enable */
           customStyles: quill.DefaultStyles(
             placeHolder: quill.DefaultTextBlockStyle(
-              textTheme.bodyLarge?.copyWith(color: theme.colors.textDisabled) ??
+              textTheme.bodyLarge
+                      ?.copyWith(color: theme.colors.textOnPrimaryLevel1) ??
                   DefaultTextStyle.of(context).style,
               quill.HorizontalSpacing.zero,
               quill.VerticalSpacing.zero,
@@ -329,25 +342,6 @@ class _EditorState extends State<_Editor> {
   }
 }
 
-class _Title extends StatelessWidget {
-  final String title;
-
-  const _Title({
-    required this.title,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 12),
-      child: Text(
-        title,
-        style: Theme.of(context).textTheme.titleSmall,
-      ),
-    );
-  }
-}
-
 class _Toolbar extends StatelessWidget {
   final quill.QuillController controller;
 
@@ -357,9 +351,11 @@ class _Toolbar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Theme.of(context).colors.onSurfaceNeutralOpaqueLv1,
-      padding: const EdgeInsets.symmetric(horizontal: 18),
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: Theme.of(context).colors.elevationsOnSurfaceNeutralLv2,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
+      ),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: Wrap(
