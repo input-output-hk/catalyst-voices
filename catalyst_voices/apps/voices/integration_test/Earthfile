@@ -44,6 +44,6 @@ integration-test-web:
     END
 
 # TODO(oldgreg): investigate failures in ci
-disable-nightly-test-web-all:
+disabled-nightly-test-web-all:
     BUILD +integration-test-web \
             --browser=chrome
