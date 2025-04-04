@@ -4,7 +4,7 @@
 //! `OpenAPI`
 
 pub(crate) mod as_at;
-
+pub(crate) mod cat_id_or_stake;
 pub(crate) mod stake_or_voter;
 
 pub(crate) use as_at::AsAt;

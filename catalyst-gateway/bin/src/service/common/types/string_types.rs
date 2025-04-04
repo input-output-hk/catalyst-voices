@@ -41,7 +41,7 @@ macro_rules! impl_string_types {
         #[derive(Debug, Clone, Eq, PartialEq, Hash)]
         pub(crate) struct $ty(String);
 
-        impl Deref for $ty {
+        impl std::ops::Deref for $ty {
             type Target = String;
 
             fn deref(&self) -> &Self::Target {
@@ -49,7 +49,7 @@ macro_rules! impl_string_types {
             }
         }
 
-        impl DerefMut for $ty {
+        impl std::ops::DerefMut for $ty {
             fn deref_mut(&mut self) -> &mut Self::Target {
                 &mut self.0
             }
@@ -61,6 +61,12 @@ macro_rules! impl_string_types {
             }
         }
 
+        impl From<$ty> for String {
+            fn from(val: $ty) -> Self {
+                val.0
+            }
+        }
+
         impl Type for $ty {
             const IS_REQUIRED: bool = true;
 
@@ -68,7 +74,7 @@ macro_rules! impl_string_types {
 
             type RawElementValueType = Self;
 
-            fn name() -> Cow<'static, str> {
+            fn name() -> std::borrow::Cow<'static, str> {
                 format!("{}({})", $type_name, $format).into()
             }
 
