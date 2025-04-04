@@ -39,6 +39,11 @@ abstract interface class CatalystDatabase {
 
   /// Removes all data from this db.
   Future<void> clear();
+
+  /// Only once instance is allowed.
+  ///
+  /// In tests it can happen that database was opened and disposed later.
+  Future<void> close();
 }
 
 @DriftDatabase(

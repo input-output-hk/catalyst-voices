@@ -10,6 +10,7 @@ import 'package:catalyst_voices/pages/proposal/widget/proposal_header.dart';
 import 'package:catalyst_voices/pages/proposal/widget/proposal_navigation_panel.dart';
 import 'package:catalyst_voices/pages/proposal/widget/proposal_sidebars.dart';
 import 'package:catalyst_voices/routes/routes.dart';
+import 'package:catalyst_voices/widgets/modals/comment/submit_comment_error_dialog.dart';
 import 'package:catalyst_voices/widgets/snackbar/voices_snackbar.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
@@ -84,6 +85,16 @@ class _ProposalPageState extends State<ProposalPage>
   }
 
   @override
+  void handleError(Object error) {
+    switch (error) {
+      case LocalizedUnknownPublishCommentException():
+        unawaited(_showCommentException(error));
+      default:
+        super.handleError(error);
+    }
+  }
+
+  @override
   void handleSignal(ProposalSignal signal) {
     switch (signal) {
       case ViewingOlderVersionSignal():
@@ -123,6 +134,15 @@ class _ProposalPageState extends State<ProposalPage>
   }
 
   void _handleSegmentsControllerChange() {}
+
+  Future<void> _showCommentException(
+    LocalizedUnknownPublishCommentException error,
+  ) {
+    return SubmitCommentErrorDialog.show(
+      context: context,
+      exception: error,
+    );
+  }
 
   void _updateSegments(List<Segment> data) {
     final state = _segmentsController.value;
