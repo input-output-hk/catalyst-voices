@@ -39,7 +39,7 @@ class VoicesSinglePaneDialog extends StatelessWidget {
       child: Stack(
         alignment: closeAlignment,
         children: [
-          child,
+          Positioned.fill(child: child),
           Offstage(
             offstage: !showClose,
             child: const _CloseButton(),

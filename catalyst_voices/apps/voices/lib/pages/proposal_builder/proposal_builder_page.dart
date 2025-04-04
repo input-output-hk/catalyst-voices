@@ -14,6 +14,7 @@ import 'package:catalyst_voices/pages/spaces/appbar/session_state_header.dart';
 import 'package:catalyst_voices/pages/workspace/submission_closing_warning_dialog.dart';
 import 'package:catalyst_voices/routes/routing/proposal_builder_route.dart';
 import 'package:catalyst_voices/routes/routing/spaces_route.dart';
+import 'package:catalyst_voices/widgets/modals/comment/submit_comment_error_dialog.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/publish_proposal_error_dialog.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/submit_proposal_error_dialog.dart';
 import 'package:catalyst_voices/widgets/snackbar/voices_snackbar.dart';
@@ -139,6 +140,8 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
         unawaited(_showPublishException(error));
       case ProposalBuilderSubmitException():
         unawaited(_showSubmitException(error));
+      case LocalizedUnknownPublishCommentException():
+        unawaited(_showCommentException(error));
       default:
         super.handleError(error);
     }
@@ -239,6 +242,15 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
         ProposalBuilderRoute.fromRef(ref: ref).replace(context);
       });
     }
+  }
+
+  Future<void> _showCommentException(
+    LocalizedUnknownPublishCommentException error,
+  ) {
+    return SubmitCommentErrorDialog.show(
+      context: context,
+      exception: error,
+    );
   }
 
   Future<void> _showPublishException(ProposalBuilderPublishException error) {

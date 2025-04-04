@@ -2479,5 +2479,9 @@
   "insertNewImageFailedToLoad": "Image failed to load",
   "@insertNewImageFailedToLoad": {
     "description": "Text for the image failed to load"
+  },
+  "submitCommentErrorDialogTitle": "Unable to add Comment",
+  "@submitCommentErrorDialogTitle": {
+    "description": "Title for the error dialog when submitting a comment fails"
   }
 }
