@@ -1,4 +1,6 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart'
+    show JoinedProposal;
 import 'package:catalyst_voices_repositories/src/database/catalyst_database.dart';
 import 'package:catalyst_voices_repositories/src/database/dao/documents_dao.drift.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents.dart';
@@ -52,6 +54,8 @@ abstract interface class DocumentsDao {
 
   /// Returns all known document refs.
   Future<List<SignedDocumentRef>> queryAllRefs();
+
+  Future<List<JoinedProposal>> querySignificantProposals();
 
   /// Returns a list of version of ref object.
   /// Can be used to get versions count.
@@ -201,6 +205,16 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
 
       return SignedDocumentRef(id: id.uuid, version: version.uuid);
     }).get();
+  }
+
+  @override
+  Future<List<JoinedProposal>> querySignificantProposals() {
+    final newestProposalsQuery = select(documents)
+      ..where((tbl) => tbl.type.equals(DocumentType.proposalDocument.uuid))
+      ..orderBy([(tbl) => OrderingTerm.desc(tbl.verHi)])
+      ..join(joins);
+
+    return Future(List.empty);
   }
 
   @override
