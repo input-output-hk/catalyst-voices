@@ -340,10 +340,7 @@ async fn test_cip36_registration_for_vote_key() {
 
     // insert
     session
-        .execute_batch(
-            PreparedQuery::Cip36RegistrationForStakeAddrInsertQuery,
-            data,
-        )
+        .execute_batch(PreparedQuery::Cip36RegistrationForVoteKeyInsertQuery, data)
         .await
         .unwrap();
 
@@ -545,7 +542,8 @@ async fn test_stake_registration() {
             stake_address_1(),
             0.into(),
             0.into(),
-            Some(stake_public_key_1),
+            stake_public_key_1,
+            false,
             false,
             false,
             false,
@@ -555,7 +553,8 @@ async fn test_stake_registration() {
             stake_address_2(),
             1.into(),
             1.into(),
-            Some(stake_public_key_2),
+            stake_public_key_2,
+            true,
             true,
             true,
             true,
