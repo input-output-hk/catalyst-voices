@@ -20,6 +20,7 @@ class SubmitCommentErrorDialog {
       ),
       builder: (context) {
         return VoicesDesktopInfoDialog(
+          fillPosition: true,
           icon: VoicesAssets.icons.exclamation.buildIcon(
             color: Theme.of(context).colors.iconsWarning,
           ),

@@ -1,5 +1,6 @@
 import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_page.dart';
 import 'package:catalyst_voices/routes/guards/composite_route_guard_mixin.dart';
+import 'package:catalyst_voices/routes/guards/proposal_submission_guard.dart';
 import 'package:catalyst_voices/routes/guards/route_guard.dart';
 import 'package:catalyst_voices/routes/guards/session_unlocked_guard.dart';
 import 'package:catalyst_voices/routes/guards/user_access_guard.dart';
@@ -32,6 +33,7 @@ final class ProposalBuilderDraftRoute extends GoRouteData
   List<RouteGuard> get routeGuards => const [
         SessionUnlockedGuard(),
         UserAccessGuard(),
+        ProposalSubmissionGuard(),
       ];
 
   @override
@@ -72,6 +74,7 @@ final class ProposalBuilderRoute extends GoRouteData
   List<RouteGuard> get routeGuards => const [
         SessionUnlockedGuard(),
         UserAccessGuard(),
+        ProposalSubmissionGuard(),
       ];
 
   @override

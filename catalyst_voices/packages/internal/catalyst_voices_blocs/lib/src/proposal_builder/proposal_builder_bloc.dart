@@ -57,6 +57,7 @@ final class ProposalBuilderBloc
     on<RebuildActiveAccountProposalEvent>(_rebuildActiveAccount);
     on<SubmitProposalEvent>(_submitProposal);
     on<ValidateProposalEvent>(_validateProposal);
+    on<ProposalSubmissionCloseDateEvent>(_proposalSubmissionCloseDate);
     on<UpdateCommentsSortEvent>(_updateCommentsSort);
     on<UpdateCommentBuilderEvent>(_updateCommentBuilder);
     on<UpdateCommentRepliesEvent>(_updateCommentReplies);
@@ -380,8 +381,6 @@ final class ProposalBuilderBloc
       final proposalData = await _proposalService.getProposal(
         ref: proposalRef,
       );
-      // TODO(LynxLynxx): check if new local proposal is created
-      // when SignedDocumentRef is used instead of DraftRef
 
       final proposal = Proposal.fromData(proposalData);
 
@@ -395,7 +394,6 @@ final class ProposalBuilderBloc
           isLatest: index == proposalData.versions.length - 1,
         );
       }).toList();
-
       final categoryId = proposalData.categoryId;
       final category = await _campaignService.getCategory(categoryId);
 
@@ -539,6 +537,21 @@ final class ProposalBuilderBloc
         schema: segment.schema as DocumentSegmentSchema,
       );
     }).toList();
+  }
+
+  Future<void> _proposalSubmissionCloseDate(
+    ProposalSubmissionCloseDateEvent event,
+    Emitter<ProposalBuilderState> emit,
+  ) async {
+    final timeline = await _campaignService.getCampaignTimeline();
+    final closeDate = timeline
+        .firstWhereOrNull(
+          (e) => e.stage == CampaignTimelineStage.proposalSubmission,
+        )
+        ?.timeline
+        .to;
+
+    emitSignal(ProposalSubmissionCloseDate(date: closeDate));
   }
 
   Future<void> _publishAndSubmitProposalForReview(
