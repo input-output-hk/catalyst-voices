@@ -330,7 +330,7 @@ final class ProposalsCubit extends Cubit<ProposalsState>
     final categorySelectorItems = categories.map((e) {
       return ProposalsCategorySelectorItem(
         ref: e.selfRef,
-        name: e.categoryName,
+        name: e.categoryText,
         isSelected: e.selfRef.id == selectedCategory?.id,
       );
     }).toList();
