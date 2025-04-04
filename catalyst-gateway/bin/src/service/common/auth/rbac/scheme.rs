@@ -160,7 +160,6 @@ async fn checker_api_catalyst_auth(
         );
         return Err(AuthTokenError.into());
     };
-
     // TODO: Caching is currently disabled because we want to measure the performance without
     // it.
     // // Its valid and young enough, check if its in the auth cache.

@@ -1,0 +1,120 @@
+//! A module for placing common structs, functions, and variables across the `document`
+//! endpoint module not specified to a specific endpoint.
+
+use catalyst_signed_doc::CatalystSignedDocument;
+use rbac_registration::cardano::cip509::RoleNumber;
+
+use super::templates::get_doc_static_template;
+use crate::{
+    db::event::{error::NotFoundError, signed_docs::FullSignedDoc},
+    service::common::auth::rbac::token::CatalystRBACTokenV1,
+};
+
+/// Get document from the database
+pub(crate) async fn get_document(
+    document_id: &uuid::Uuid, version: Option<&uuid::Uuid>,
+) -> anyhow::Result<CatalystSignedDocument> {
+    // Find the doc in the static templates first
+    if let Some(doc) = get_doc_static_template(document_id) {
+        return Ok(doc);
+    }
+
+    // If doesn't exist in the static templates, try to find it in the database
+    let db_doc = FullSignedDoc::retrieve(document_id, version).await?;
+    db_doc.raw().try_into()
+}
+
+/// A struct which implements a
+/// `catalyst_signed_doc::providers::CatalystSignedDocumentProvider` trait
+pub(crate) struct DocProvider;
+
+impl catalyst_signed_doc::providers::CatalystSignedDocumentProvider for DocProvider {
+    async fn try_get_doc(
+        &self, doc_ref: &catalyst_signed_doc::DocumentRef,
+    ) -> anyhow::Result<Option<CatalystSignedDocument>> {
+        let id = doc_ref.id.uuid();
+        let ver = doc_ref.ver.map(|uuid| uuid.uuid());
+        match get_document(&id, ver.as_ref()).await {
+            Ok(doc) => Ok(Some(doc)),
+            Err(err) if err.is::<NotFoundError>() => Ok(None),
+            Err(err) => Err(err),
+        }
+    }
+}
+
+// TODO: make the struct to support multi sigs validation
+/// A struct which implements a
+/// `catalyst_signed_doc::providers::CatalystSignedDocumentProvider` trait
+pub(crate) struct VerifyingKeyProvider(
+    Vec<(
+        catalyst_signed_doc::IdUri,
+        ed25519_dalek::VerifyingKey,
+        usize,
+    )>,
+);
+
+impl catalyst_signed_doc::providers::VerifyingKeyProvider for VerifyingKeyProvider {
+    async fn try_get_key(
+        &self, kid: &catalyst_signed_doc::IdUri,
+    ) -> anyhow::Result<Option<ed25519_dalek::VerifyingKey>> {
+        let res = self.0.iter().find(|(id, ..)| id == kid).map(|item| item.1);
+
+        Ok(res)
+    }
+}
+
+impl VerifyingKeyProvider {
+    /// Attempts to construct an instance of `Self` by validating and resolving a list of
+    /// Catalyst Document KIDs against a provided RBAC token.
+    ///
+    /// This method performs the following steps:
+    /// 1. Verifies that **all** provided `kids` match the Catalyst ID from the RBAC
+    ///    token.
+    /// 2. Extracts the role index from each KID and attempts to build a registration
+    ///    chain from the indexed registration data.
+    /// 3. Retrieves the latest signing public key and rotation state associated with the
+    ///    role for each KID from the registration chain.
+    /// 4. Collects and returns a vector of tuples containing the KID, signing key, and
+    ///    rotation.
+    ///
+    /// # Errors
+    ///
+    /// Returns an `anyhow::Error` if:
+    /// - Any KID's short Catalyst ID does not match the one in the token.
+    /// - The role index parsing fails.
+    /// - Indexed registration queries or chain building fail.
+    /// - The latest signing key for a required role cannot be found.
+    pub(crate) fn try_from_kids(
+        token: &CatalystRBACTokenV1, kids: &[catalyst_signed_doc::IdUri],
+    ) -> anyhow::Result<Self> {
+        // validate rbac token and document KIDs (ignoring the role/rotation)
+        if kids
+            .iter()
+            .any(|kid| kid.as_short_id() != token.catalyst_id().as_short_id())
+        {
+            anyhow::bail!("RBAC Token CatID does not match with the document KIDs");
+        }
+
+        let mut result = Vec::with_capacity(kids.len());
+        for kid in kids {
+            let (role_index, _) = kid.role_and_rotation();
+            let role_index = RoleNumber::from(role_index.to_string().parse::<u8>()?);
+
+            let Some(reg_chain) = token.reg_chain() else {
+                anyhow::bail!("Failed to retrieve a registration chain for {kid} Catalyst ID")
+            };
+
+            let (latest_pk, rotation) = reg_chain
+                .get_latest_signing_pk_for_role(&role_index)
+                .ok_or_else(|| {
+                    anyhow::anyhow!(
+                        "Failed to get last signing key for the proposer role for {kid} Catalyst ID"
+                    )
+                })?;
+
+            result.push((kid.clone(), latest_pk, rotation));
+        }
+
+        Ok(Self(result))
+    }
+}
