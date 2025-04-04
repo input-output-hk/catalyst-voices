@@ -221,6 +221,10 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     WatchUserProposalsEvent event,
     Emitter<WorkspaceState> emit,
   ) async {
+    // As stream is needed in a few places we don't want to create it every time
+    if (_proposalsSubscription != null && state.error == null) {
+      return;
+    }
     _logger.info('Setup user proposals subscription');
     emit(
       state.copyWith(
@@ -228,9 +232,9 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
         error: const Optional.empty(),
       ),
     );
+    _logger.info('$state and ${state.showProposals}');
     await _proposalsSubscription?.cancel();
     _proposalsSubscription = null;
     _setupProposalsSubscription();
-    emit(state.copyWith(isLoading: false));
   }
 }
