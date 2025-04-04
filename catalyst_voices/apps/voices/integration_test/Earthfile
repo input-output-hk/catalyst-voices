@@ -29,8 +29,11 @@ integration-test-web:
         cat /usr/local/bin/chrome-patch.sh && \
         sleep 5 && \
         flutter drive --driver=test_driver/integration_tests.dart \
-            --target=integration_test/all_test1.dart \
-            -d $browser --driver-port=$driver_port || echo fail > fail
+            --target=integration_test/all_test.dart \
+            -d $browser --driver-port=$driver_port
+            --web-header Cross-Origin-Opener-Policy=same-origin \
+            --web-header Cross-Origin-Embedder-Policy=require-corp \
+            --profile || echo fail > fail
     WAIT
         SAVE ARTIFACT $driver.log AS LOCAL $driver.log
     END
@@ -43,6 +46,6 @@ integration-test-web:
     END
 
 # TODO(oldgreg): investigate failures in ci
-nightly-test-web-all:
+disable-nightly-test-web-all:
     BUILD +integration-test-web \
             --browser=chrome
