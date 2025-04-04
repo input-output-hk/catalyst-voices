@@ -5,24 +5,15 @@ import 'package:equatable/equatable.dart';
 
 /// The state of available proposals.
 class ProposalsState extends Equatable {
-  final ProposalPaginationItems<ProposalViewModel> draftProposals;
-  final ProposalPaginationItems<ProposalViewModel> finalProposals;
-  final ProposalPaginationItems<ProposalViewModel> favoriteProposals;
-  final ProposalPaginationItems<ProposalViewModel> userProposals;
-  final ProposalPaginationItems<ProposalViewModel> allProposals;
+  final ProposalPaginationItems<ProposalViewModel> proposals;
   final List<String> favoritesIds;
   final List<String> myProposalsIds;
   final String? searchValue;
-
   final ProposalsTypeCount count;
   final List<ProposalsCategorySelectorItem> categorySelectorItems;
 
   const ProposalsState({
-    this.draftProposals = const ProposalPaginationItems(),
-    this.finalProposals = const ProposalPaginationItems(),
-    this.favoriteProposals = const ProposalPaginationItems(),
-    this.userProposals = const ProposalPaginationItems(),
-    this.allProposals = const ProposalPaginationItems(),
+    this.proposals = const ProposalPaginationItems(),
     this.favoritesIds = const [],
     this.myProposalsIds = const [],
     this.searchValue,
@@ -32,11 +23,7 @@ class ProposalsState extends Equatable {
 
   @override
   List<Object?> get props => [
-        draftProposals,
-        finalProposals,
-        favoriteProposals,
-        userProposals,
-        allProposals,
+        proposals,
         favoritesIds,
         myProposalsIds,
         searchValue,
@@ -49,26 +36,17 @@ class ProposalsState extends Equatable {
       ?.ref;
 
   ProposalsState copyWith({
-    ProposalPaginationItems<ProposalViewModel>? draftProposals,
-    ProposalPaginationItems<ProposalViewModel>? finalProposals,
-    ProposalPaginationItems<ProposalViewModel>? favoriteProposals,
-    ProposalPaginationItems<ProposalViewModel>? userProposals,
-    ProposalPaginationItems<ProposalViewModel>? allProposals,
+    ProposalPaginationItems<ProposalViewModel>? proposals,
     List<String>? favoritesIds,
     List<String>? myProposalsIds,
     List<CampaignCategoryDetailsViewModel>? categories,
     Optional<SignedDocumentRef>? selectedCategoryId,
     Optional<String>? searchValue,
-    bool isLoading = false,
     ProposalsTypeCount? count,
     List<ProposalsCategorySelectorItem>? categorySelectorItems,
   }) {
     return ProposalsState(
-      draftProposals: draftProposals ?? this.draftProposals,
-      finalProposals: finalProposals ?? this.finalProposals,
-      favoriteProposals: favoriteProposals ?? this.favoriteProposals,
-      userProposals: userProposals ?? this.userProposals,
-      allProposals: allProposals ?? this.allProposals,
+      proposals: proposals ?? this.proposals,
       favoritesIds: favoritesIds ?? this.favoritesIds,
       myProposalsIds: myProposalsIds ?? this.myProposalsIds,
       searchValue: searchValue.dataOr(this.searchValue),
@@ -78,24 +56,11 @@ class ProposalsState extends Equatable {
     );
   }
 
-  bool isFavorite(String proposalId) {
-    return favoriteProposals.items.any((e) => e.ref.id == proposalId);
+  ProposalsState copyWithLoadingProposals({
+    required bool isLoading,
+  }) {
+    return copyWith(proposals: proposals.copyWith(isLoading: isLoading));
   }
-}
 
-extension ProposalsStateLoading on ProposalsState {
-  ProposalsState get allProposalsLoading =>
-      copyWith(allProposals: allProposals.copyWith(isLoading: true));
-
-  ProposalsState get draftProposalsLoading =>
-      copyWith(draftProposals: draftProposals.copyWith(isLoading: true));
-
-  ProposalsState get favoriteProposalsLoading =>
-      copyWith(favoriteProposals: favoriteProposals.copyWith(isLoading: true));
-
-  ProposalsState get finalProposalsLoading =>
-      copyWith(finalProposals: finalProposals.copyWith(isLoading: true));
-
-  ProposalsState get userProposalsLoading =>
-      copyWith(userProposals: userProposals.copyWith(isLoading: true));
+  bool isFavorite(String proposalId) => favoritesIds.contains(proposalId);
 }

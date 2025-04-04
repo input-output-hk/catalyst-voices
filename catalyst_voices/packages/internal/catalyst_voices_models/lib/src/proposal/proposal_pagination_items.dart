@@ -28,13 +28,13 @@ class ProposalPaginationItems<ProposalType> extends Equatable {
     int? pageKey,
     int? maxResults,
     List<ProposalType>? items,
-    bool isLoading = false,
+    bool? isLoading,
   }) {
     return ProposalPaginationItems<ProposalType>(
       pageKey: pageKey ?? this.pageKey,
       maxResults: maxResults ?? this.maxResults,
       items: items ?? this.items,
-      isLoading: isLoading,
+      isLoading: isLoading ?? this.isLoading,
     );
   }
 }

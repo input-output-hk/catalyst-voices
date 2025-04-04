@@ -6,31 +6,23 @@ class ProposalPaginationViewModel extends Equatable {
   final int pageKey;
   final int maxResults;
   final List<ProposalViewModel> items;
-  final SignedDocumentRef? categoryId;
-  final String? searchValue;
   final bool isLoading;
 
   const ProposalPaginationViewModel({
     required this.pageKey,
     required this.maxResults,
     required this.items,
-    this.categoryId,
-    this.searchValue,
     this.isLoading = false,
   });
 
   factory ProposalPaginationViewModel.fromPaginationItems({
     required ProposalPaginationItems<ProposalViewModel> paginItems,
-    SignedDocumentRef? categoryId,
-    String? searchValue,
     required bool isLoading,
   }) {
     return ProposalPaginationViewModel(
       pageKey: paginItems.pageKey,
       maxResults: paginItems.maxResults,
       items: paginItems.items,
-      categoryId: categoryId,
-      searchValue: searchValue,
       isLoading: isLoading,
     );
   }
@@ -40,8 +32,6 @@ class ProposalPaginationViewModel extends Equatable {
         pageKey,
         maxResults,
         items,
-        categoryId,
-        searchValue,
         isLoading,
       ];
 
@@ -49,17 +39,12 @@ class ProposalPaginationViewModel extends Equatable {
     int? pageKey,
     int? maxResults,
     List<ProposalViewModel>? items,
-    SignedDocumentRef? categoryId,
-    String? searchValue,
-    bool? canReload,
     bool? isLoading,
   }) {
     return ProposalPaginationViewModel(
       pageKey: pageKey ?? this.pageKey,
       maxResults: maxResults ?? this.maxResults,
       items: items ?? this.items,
-      categoryId: categoryId ?? this.categoryId,
-      searchValue: searchValue ?? this.searchValue,
       isLoading: isLoading ?? this.isLoading,
     );
   }

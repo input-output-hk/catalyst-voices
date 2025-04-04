@@ -1,11 +1,13 @@
-import 'package:catalyst_voices/common/ext/build_context_ext.dart';
+import 'dart:async';
+
 import 'package:catalyst_voices/common/signal_handler.dart';
-import 'package:catalyst_voices/pages/proposals/proposal_pagination_tabview.dart';
 import 'package:catalyst_voices/pages/proposals/widgets/proposals_controls.dart';
 import 'package:catalyst_voices/pages/proposals/widgets/proposals_header.dart';
+import 'package:catalyst_voices/pages/proposals/widgets/proposals_pagination.dart';
 import 'package:catalyst_voices/pages/proposals/widgets/proposals_tabs.dart';
+import 'package:catalyst_voices/pages/proposals/widgets/proposals_tabs_divider.dart';
 import 'package:catalyst_voices/routes/routes.dart';
-import 'package:catalyst_voices/widgets/widgets.dart';
+import 'package:catalyst_voices/widgets/pagination/paging_controller.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
@@ -34,6 +36,9 @@ class _ProposalsPageState extends State<ProposalsPage>
         SignalHandlerStateMixin<ProposalsCubit, ProposalsSignal,
             ProposalsPage> {
   late final TabController _tabController;
+  late final PagingController<ProposalViewModel> _pagingController;
+
+  StreamSubscription<ProposalPaginationItems<ProposalViewModel>>? _proposalsSub;
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +53,28 @@ class _ProposalsPageState extends State<ProposalsPage>
                 const SizedBox(height: 16),
                 const ProposalsHeader(),
                 const SizedBox(height: 40),
-                _Tabs(controller: _tabController),
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(
+                      width: double.infinity,
+                      child: Wrap(
+                        alignment: WrapAlignment.spaceBetween,
+                        crossAxisAlignment: WrapCrossAlignment.end,
+                        runSpacing: 10,
+                        children: [
+                          ProposalsTabs(controller: _tabController),
+                          const ProposalsControls(),
+                        ],
+                      ),
+                    ),
+                    const ProposalsTabsDivider(),
+                    const SizedBox(height: 24),
+                    ProposalsPagination(controller: _pagingController),
+                    const SizedBox(height: 12),
+                  ],
+                ),
               ],
             ),
           ),
@@ -69,6 +95,9 @@ class _ProposalsPageState extends State<ProposalsPage>
             category: widget.categoryId,
             type: widget.type ?? ProposalsFilterType.total,
           );
+
+      // Reset pagination.
+      _pagingController.notifyPageRequestListeners(0);
     }
 
     if (widget.type != oldWidget.type) {
@@ -78,7 +107,11 @@ class _ProposalsPageState extends State<ProposalsPage>
 
   @override
   void dispose() {
+    unawaited(_proposalsSub?.cancel());
+    _proposalsSub = null;
+
     _tabController.dispose();
+    _pagingController.dispose();
     super.dispose();
   }
 
@@ -103,12 +136,48 @@ class _ProposalsPageState extends State<ProposalsPage>
       length: ProposalsFilterType.values.length,
       vsync: this,
     );
+    _pagingController = PagingController(
+      initialPage: 0,
+      initialMaxResults: 0,
+    );
 
-    context.read<ProposalsCubit>().init(
-          onlyMyProposals: widget.selectMyProposalsView,
-          category: widget.categoryId,
-          type: proposalsFilterType,
-        );
+    final cubit = context.read<ProposalsCubit>()
+      ..init(
+        onlyMyProposals: widget.selectMyProposalsView,
+        category: widget.categoryId,
+        type: proposalsFilterType,
+      );
+
+    _proposalsSub = cubit.stream
+        .map((event) => event.proposals)
+        .distinct()
+        .listen(_handleProposalsChange);
+
+    _pagingController
+      ..addPageRequestListener(_handleProposalsPageRequest)
+      ..notifyPageRequestListeners(0);
+  }
+
+  void _handleProposalsChange(ProposalPaginationItems<ProposalViewModel> data) {
+    _pagingController.value = _pagingController.value.copyWith(
+      currentPage: data.pageKey,
+      maxResults: data.maxResults,
+      itemList: data.items,
+      isLoading: data.isLoading,
+    );
+  }
+
+  Future<void> _handleProposalsPageRequest(
+    int pageKey,
+    int pageSize,
+    ProposalViewModel? lastProposalId,
+  ) async {
+    final request = PaginationPage<String?>(
+      pageKey: pageKey,
+      pageSize: pageSize,
+      lastId: lastProposalId?.ref.id,
+    );
+    await context.read<ProposalsCubit>().getProposals(request);
   }
 
   void _updateRoute({
@@ -127,139 +196,5 @@ class _ProposalsPageState extends State<ProposalsPage>
             .replace(context);
       }
     });
-  }
-}
-
-class _Tabs extends StatelessWidget {
-  final TabController controller;
-
-  const _Tabs({
-    required this.controller,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SizedBox(
-          width: double.infinity,
-          child: Wrap(
-            alignment: WrapAlignment.spaceBetween,
-            crossAxisAlignment: WrapCrossAlignment.end,
-            runSpacing: 10,
-            children: [
-              ProposalsTabs(controller: controller),
-              const ProposalsControls(),
-            ],
-          ),
-        ),
-        Offstage(
-          offstage: MediaQuery.sizeOf(context).width < 1400,
-          child: Container(
-            height: 1,
-            width: double.infinity,
-            color: context.colors.primaryContainer,
-          ),
-        ),
-        const SizedBox(height: 24),
-        TabBarStackView(
-          key: const Key('ProposalsTabBarStackView'),
-          controller: controller,
-          children: [
-            BlocSelector<ProposalsCubit, ProposalsState,
-                ProposalPaginationViewModel>(
-              selector: (state) {
-                return ProposalPaginationViewModel.fromPaginationItems(
-                  paginItems: state.allProposals,
-                  isLoading: state.allProposals.isLoading,
-                  categoryId: state.selectedCategoryId,
-                  searchValue: state.searchValue,
-                );
-              },
-              builder: (context, state) {
-                return ProposalPaginationTabView(
-                  paginationViewModel: state,
-                );
-              },
-            ),
-            BlocSelector<ProposalsCubit, ProposalsState,
-                ProposalPaginationViewModel>(
-              selector: (state) {
-                return ProposalPaginationViewModel.fromPaginationItems(
-                  paginItems: state.draftProposals,
-                  isLoading: state.draftProposals.isLoading,
-                  categoryId: state.selectedCategoryId,
-                  searchValue: state.searchValue,
-                );
-              },
-              builder: (context, state) {
-                return ProposalPaginationTabView(
-                  key: const Key('draftProposalsPagination'),
-                  paginationViewModel: state,
-                  stage: ProposalPublish.publishedDraft,
-                );
-              },
-            ),
-            BlocSelector<ProposalsCubit, ProposalsState,
-                ProposalPaginationViewModel>(
-              selector: (state) {
-                return ProposalPaginationViewModel.fromPaginationItems(
-                  paginItems: state.finalProposals,
-                  isLoading: state.finalProposals.isLoading,
-                  categoryId: state.selectedCategoryId,
-                  searchValue: state.searchValue,
-                );
-              },
-              builder: (context, state) {
-                return ProposalPaginationTabView(
-                  key: const Key('finalProposalsPagination'),
-                  paginationViewModel: state,
-                  stage: ProposalPublish.submittedProposal,
-                );
-              },
-            ),
-            BlocSelector<ProposalsCubit, ProposalsState,
-                ProposalPaginationViewModel>(
-              selector: (state) {
-                return ProposalPaginationViewModel.fromPaginationItems(
-                  paginItems: state.favoriteProposals,
-                  isLoading: state.favoriteProposals.isLoading,
-                  categoryId: state.selectedCategoryId,
-                  searchValue: state.searchValue,
-                );
-              },
-              builder: (context, state) {
-                return ProposalPaginationTabView(
-                  key: const Key('favoriteProposalsPagination'),
-                  paginationViewModel: state,
-                  usersFavorite: true,
-                );
-              },
-            ),
-            BlocSelector<ProposalsCubit, ProposalsState,
-                ProposalPaginationViewModel>(
-              selector: (state) {
-                return ProposalPaginationViewModel.fromPaginationItems(
-                  paginItems: state.userProposals,
-                  isLoading: state.userProposals.isLoading,
-                  categoryId: state.selectedCategoryId,
-                  searchValue: state.searchValue,
-                );
-              },
-              builder: (context, state) {
-                return ProposalPaginationTabView(
-                  key: const Key('userProposalsPagination'),
-                  paginationViewModel: state,
-                  userProposals: true,
-                );
-              },
-            ),
-          ],
-        ),
-        const SizedBox(height: 12),
-      ],
-    );
   }
 }
