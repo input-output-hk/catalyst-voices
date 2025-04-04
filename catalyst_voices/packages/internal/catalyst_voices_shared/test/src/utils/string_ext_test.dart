@@ -44,6 +44,20 @@ void main() {
       expect('!@#'.equalsIgnoreCase('!@#'), isTrue);
       expect('Hello1'.equalsIgnoreCase('Hello2'), isFalse);
     });
+
+    group('formatAsPlural', () {
+      test('returns only the count if the string is empty', () {
+        expect(''.formatAsPlural(3), '3');
+      });
+
+      test('returns singular when count is 1', () {
+        expect('apple'.formatAsPlural(1), '1 apple');
+      });
+
+      test('returns plural when count is greater than 1', () {
+        expect('apple'.formatAsPlural(3), '3 apples');
+      });
+    });
   });
 
   group('UrlParser Tests', () {

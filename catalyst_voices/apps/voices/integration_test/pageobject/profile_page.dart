@@ -9,7 +9,7 @@ class ProfilePage {
   late PatrolTester $;
   final displayNameTile = const Key('AccountDisplayNameTile');
   final accountEmailTile = const Key('AccountEmailTile');
-  final editBtn = const Key('EditableTileEditSaveButton');
+  final editBtn = const Key('EditableTileEditCancelButton');
   final accountRolesTile = const Key('AddRoleTile');
   final addRole = const Key('EditRolesButton');
   final removeKeychain = const Key('RemoveKeychainButton');
