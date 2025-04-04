@@ -1,17 +1,12 @@
-import 'dart:async';
-
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/common/signal_handler.dart';
-import 'package:catalyst_voices/pages/campaign/details/campaign_details_dialog.dart';
 import 'package:catalyst_voices/pages/proposals/proposal_pagination_tabview.dart';
-import 'package:catalyst_voices/pages/proposals/widgets/category_selector.dart';
+import 'package:catalyst_voices/pages/proposals/widgets/proposals_controls.dart';
+import 'package:catalyst_voices/pages/proposals/widgets/proposals_header.dart';
 import 'package:catalyst_voices/pages/proposals/widgets/proposals_tabs.dart';
 import 'package:catalyst_voices/routes/routes.dart';
-import 'package:catalyst_voices/widgets/search/search_text_field.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
-import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
-import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
@@ -33,114 +28,6 @@ class ProposalsPage extends StatefulWidget {
   State<ProposalsPage> createState() => _ProposalsPageState();
 }
 
-class _CampaignDetailsButton extends StatelessWidget {
-  const _CampaignDetailsButton();
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocSelector<CampaignInfoCubit, CampaignInfoState, String?>(
-      selector: (state) => state.campaign?.id,
-      builder: (context, campaignId) {
-        return Offstage(
-          offstage: campaignId == null,
-          child: Padding(
-            key: const Key('CampaignDetailsButton'),
-            padding: const EdgeInsets.only(top: 32),
-            child: OutlinedButton.icon(
-              onPressed: () {
-                if (campaignId == null) {
-                  throw ArgumentError('Campaign ID is null');
-                }
-                unawaited(
-                  CampaignDetailsDialog.show(context, id: campaignId),
-                );
-              },
-              label: Text(context.l10n.campaignDetails),
-              icon: VoicesAssets.icons.arrowsExpand.buildIcon(),
-            ),
-          ),
-        );
-      },
-    );
-  }
-}
-
-class _Controls extends StatelessWidget {
-  const _Controls();
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const CategorySelector(),
-          const SizedBox(width: 8),
-          SearchTextField(
-            key: const Key('SearchProposalsField'),
-            hintText: context.l10n.searchProposals,
-            showClearButton: true,
-            onSearch: ({
-              required searchValue,
-              required isSubmitted,
-            }) {
-              context.read<ProposalsCubit>().changeSearchValue(searchValue);
-            },
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _FundInfo extends StatelessWidget {
-  const _FundInfo();
-
-  @override
-  Widget build(BuildContext context) {
-    return ConstrainedBox(
-      constraints: const BoxConstraints(maxWidth: 680),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            key: const Key('CurrentCampaignTitle'),
-            context.l10n.catalystF14,
-            style: Theme.of(context).textTheme.displayMedium,
-          ),
-          const SizedBox(height: 16),
-          Text(
-            key: const Key('CurrentCampaignDescription'),
-            context.l10n.currentCampaignDescription,
-            style: Theme.of(context).textTheme.bodyLarge,
-          ),
-          const _CampaignDetailsButton(),
-        ],
-      ),
-    );
-  }
-}
-
-class _Header extends StatelessWidget {
-  const _Header();
-
-  @override
-  Widget build(BuildContext context) {
-    return const Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        NavigationBack(),
-        SizedBox(height: 40),
-        _FundInfo(),
-      ],
-    );
-  }
-}
-
 class _ProposalsPageState extends State<ProposalsPage>
     with
         SingleTickerProviderStateMixin,
@@ -159,7 +46,7 @@ class _ProposalsPageState extends State<ProposalsPage>
             delegate: SliverChildListDelegate(
               [
                 const SizedBox(height: 16),
-                const _Header(),
+                const ProposalsHeader(),
                 const SizedBox(height: 40),
                 _Tabs(controller: _tabController),
               ],
@@ -264,7 +151,7 @@ class _Tabs extends StatelessWidget {
             runSpacing: 10,
             children: [
               ProposalsTabs(controller: controller),
-              const _Controls(),
+              const ProposalsControls(),
             ],
           ),
         ),
