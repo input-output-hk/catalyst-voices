@@ -28,7 +28,7 @@ integration-test-web:
         sleep 5 && \
         flutter drive --driver=test_driver/integration_tests.dart \
             --target=integration_test/all_test.dart \
-            -d $browser --driver-port=$driver_port
+            -d $browser --driver-port=$driver_port \
             --web-header Cross-Origin-Opener-Policy=same-origin \
             --web-header Cross-Origin-Embedder-Policy=require-corp \
             --profile || echo fail > fail
