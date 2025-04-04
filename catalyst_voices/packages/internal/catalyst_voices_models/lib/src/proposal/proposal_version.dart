@@ -22,8 +22,7 @@ final class ProposalVersion extends Equatable
       selfRef: data.document.metadata.selfRef,
       title: data.document.title ?? '',
       createdAt: createdAt,
-      // TODO(LynxLynxx): change when we get this from doc actions
-      publish: ProposalPublish.publishedDraft,
+      publish: data.publish,
     );
   }
 
