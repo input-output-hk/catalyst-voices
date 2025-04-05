@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["IdAndVerRef"],"struct":["DocumentReference","IdAndVerRefDocumented","IdRefOnly","IdRefOnlyDocumented","VerRefWithOptionalId","VerRefWithOptionalIdDocumented"]};
