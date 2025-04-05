@@ -6,17 +6,15 @@ import 'package:equatable/equatable.dart';
 /// The state of available proposals.
 class ProposalsState extends Equatable {
   final ProposalPaginationItems<ProposalViewModel> proposals;
+  final bool hasSearchQuery;
   final List<String> favoritesIds;
-  final List<String> myProposalsIds;
-  final String? searchValue;
   final ProposalsTypeCount count;
   final List<ProposalsCategorySelectorItem> categorySelectorItems;
 
   const ProposalsState({
     this.proposals = const ProposalPaginationItems(),
+    this.hasSearchQuery = false,
     this.favoritesIds = const [],
-    this.myProposalsIds = const [],
-    this.searchValue,
     this.count = const ProposalsTypeCount(),
     this.categorySelectorItems = const [],
   });
@@ -24,9 +22,8 @@ class ProposalsState extends Equatable {
   @override
   List<Object?> get props => [
         proposals,
+        hasSearchQuery,
         favoritesIds,
-        myProposalsIds,
-        searchValue,
         count,
         categorySelectorItems,
       ];
@@ -37,19 +34,15 @@ class ProposalsState extends Equatable {
 
   ProposalsState copyWith({
     ProposalPaginationItems<ProposalViewModel>? proposals,
+    bool? hasSearchQuery,
     List<String>? favoritesIds,
-    List<String>? myProposalsIds,
-    List<CampaignCategoryDetailsViewModel>? categories,
-    Optional<SignedDocumentRef>? selectedCategoryId,
-    Optional<String>? searchValue,
     ProposalsTypeCount? count,
     List<ProposalsCategorySelectorItem>? categorySelectorItems,
   }) {
     return ProposalsState(
       proposals: proposals ?? this.proposals,
+      hasSearchQuery: hasSearchQuery ?? this.hasSearchQuery,
       favoritesIds: favoritesIds ?? this.favoritesIds,
-      myProposalsIds: myProposalsIds ?? this.myProposalsIds,
-      searchValue: searchValue.dataOr(this.searchValue),
       count: count ?? this.count,
       categorySelectorItems:
           categorySelectorItems ?? this.categorySelectorItems,

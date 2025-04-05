@@ -11,7 +11,7 @@ class ProposalsPaginationEmptyState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocSelector<ProposalsCubit, ProposalsState, bool>(
-      selector: (state) => state.searchValue?.isNotEmpty ?? false,
+      selector: (state) => state.hasSearchQuery,
       builder: (context, state) {
         return _ProposalsPaginationEmptyState(hasSearchQuery: state);
       },

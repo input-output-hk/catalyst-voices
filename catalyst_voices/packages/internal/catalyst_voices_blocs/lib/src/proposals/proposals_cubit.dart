@@ -13,41 +13,63 @@ final _logger = Logger('ProposalsCubit');
 /// Manages the proposals.
 final class ProposalsCubit extends Cubit<ProposalsState>
     with BlocSignalEmitterMixin<ProposalsSignal, ProposalsState> {
+  final UserService _userService;
   final CampaignService _campaignService;
   final ProposalService _proposalService;
 
   ProposalsCubitCache _cache = const ProposalsCubitCache();
 
+  StreamSubscription<CatalystId?>? _activeAccountIdSub;
+
   ProposalsCubit(
+    this._userService,
     this._campaignService,
     this._proposalService,
-  ) : super(const ProposalsState());
+  ) : super(const ProposalsState()) {
+    final activeAccount = _userService.user.activeAccount;
+    final filters = ProposalsFilters(author: activeAccount?.catalystId);
+    _cache = _cache.copyWith(filters: filters);
 
-  void changeFilters({
-    required bool? onlyMy,
-    required SignedDocumentRef? category,
-    required ProposalsFilterType type,
-  }) {
-    _cache = _cache.copyWith(
-      onlyMy: Optional(onlyMy),
-      selectedCategory: Optional(category),
-      type: Optional(type),
-    );
-    _rebuildCategories();
+    _activeAccountIdSub = _userService.watchUser
+        .map((event) => event.activeAccount?.catalystId)
+        .distinct()
+        .listen(_handleActiveAccountIdChange);
   }
 
-  void changeSearchValue(String searchValue) {
-    emit(
-      state.copyWith(
-        searchValue: searchValue.isEmpty
-            ? const Optional.empty()
-            : Optional(searchValue),
-      ),
+  void changeFilters({
+    Optional<CatalystId>? author,
+    Optional<bool>? onlyMy,
+    Optional<SignedDocumentRef>? category,
+    ProposalsFilterType? type,
+    Optional<String>? searchQuery,
+  }) {
+    final filters = _cache.filters.copyWith(
+      type: type,
+      author: author,
+      onlyAuthor: onlyMy,
+      category: category,
+      searchQuery: searchQuery,
     );
+
+    _cache = _cache.copyWith(filters: filters);
+
+    _logger.finer('Filters changed to $filters');
+
+    if (category != null) _rebuildCategories();
+
+    emitSignal(const ResetProposalsPaginationSignal());
   }
 
   void changeSelectedCategory(SignedDocumentRef? categoryId) {
     emitSignal(ChangeCategorySignal(to: categoryId));
+  }
+
+  @override
+  Future<void> close() async {
+    await _activeAccountIdSub?.cancel();
+    _activeAccountIdSub = null;
+
+    return super.close();
   }
 
   Future<void> getProposals(PaginationPage<String?> request) async {
@@ -66,6 +88,11 @@ final class ProposalsCubit extends Cubit<ProposalsState>
         DateTimeExt.now(),
       );
 
+      final filters = _cache.filters;
+
+      _logger.finer('Requesting proposals page[$request] with [$filters]');
+
+      return;
       // TODO(damian-molinski): build add pass current filters.
       final proposals = await _proposalService.getProposals(
         request: request,
@@ -104,78 +131,35 @@ final class ProposalsCubit extends Cubit<ProposalsState>
     _cache = const ProposalsCubitCache();
 
     unawaited(_loadCampaignCategories());
-    changeFilters(onlyMy: onlyMyProposals, category: category, type: type);
+
+    changeFilters(
+      onlyMy: Optional(onlyMyProposals),
+      category: Optional(category),
+      type: type,
+    );
   }
 
   /// Changes the favorite status of the proposal with [ref].
   Future<void> onChangeFavoriteProposal(
     DocumentRef ref, {
     required bool isFavorite,
-  }) async {
-    /*if (isFavorite) {
-      // ignore: unused_local_variable
-      final favIds = await _proposalService.addFavoriteProposal(ref: ref);
-      // TODO(LynxLynxx): to mock data. remove after implementing db
-      final favoritesIds = [...state.favoritesIds, ref.id];
-      emit(state.copyWith(favoritesIds: favoritesIds));
-      // TODO(LynxLynxx): to mock data. should read proposal from db and change
-      // isFavorite
-      // await _proposalService.getProposal(id: proposalId);
+  }) async {}
 
-      // TODO(LynxLynxx): to mock data. remove after implementing db
-      final proposal = state.allProposals.items.first.copyWith(
-        ref: ref,
-        isFavorite: isFavorite,
-      );
-      await _favorite(isFavorite, proposal);
-    } else {
-      // TODO(LynxLynxx): to mock data. remove after implementing db
-      final proposal = state.allProposals.items.first.copyWith(
-        ref: ref,
-        isFavorite: isFavorite,
-      );
-      await _favorite(isFavorite, proposal);
-      await _proposalService.removeFavoriteProposal(ref: ref);
-      // TODO(LynxLynxx): to mock data. remove after implementing db
-      final favoritesIds = [...state.favoritesIds]..remove(ref.id);
+  void updateSearchQuery(String query) {
+    final asOptional =
+        query.isEmpty ? const Optional<String>.empty() : Optional(query);
 
-      emit(state.copyWith(favoritesIds: favoritesIds));
-    }*/
+    if (asOptional.data == _cache.filters.searchQuery) {
+      return;
+    }
+
+    changeFilters(searchQuery: asOptional);
+
+    emit(state.copyWith(hasSearchQuery: !asOptional.isEmpty));
   }
 
-  // TODO(LynxLynxx): to mock data. remove after implementing db
-  Future<void> _favorite(
-    bool isFavorite,
-    ProposalViewModel proposal,
-  ) async {
-    /*final favoritesProposals = state.favoriteProposals;
-
-    if (isFavorite) {
-      emit(
-        state.copyWith(
-          favoriteProposals: favoritesProposals.copyWith(
-            pageKey: 0,
-            maxResults: state.favoritesIds.length,
-            items: [
-              ...state.favoriteProposals.items,
-              proposal,
-            ],
-          ),
-        ),
-      );
-    } else {
-      final items = [...state.favoriteProposals.items]
-        ..removeWhere((e) => e.ref == proposal.ref);
-      emit(
-        state.copyWith(
-          favoriteProposals: favoritesProposals.copyWith(
-            pageKey: 0,
-            maxResults: state.favoritesIds.length,
-            items: items,
-          ),
-        ),
-      );
-    }*/
+  void _handleActiveAccountIdChange(CatalystId? id) {
+    changeFilters(author: Optional(id));
   }
 
   Future<void> _loadCampaignCategories() async {
@@ -189,7 +173,7 @@ final class ProposalsCubit extends Cubit<ProposalsState>
   }
 
   void _rebuildCategories() {
-    final selectedCategory = _cache.selectedCategory;
+    final selectedCategory = _cache.filters.category;
     final categories = _cache.categories ?? const [];
 
     final categorySelectorItems = categories.map((e) {

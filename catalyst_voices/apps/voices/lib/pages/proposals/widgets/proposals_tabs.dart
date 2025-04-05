@@ -1,4 +1,5 @@
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -43,7 +44,7 @@ class _ProposalsTabs extends StatelessWidget {
       controller: controller,
       onTap: (index) {
         final type = ProposalsFilterType.values[index];
-        context.read<ProposalsCubit>().emitSignal(ChangeFilterType(type));
+        context.read<ProposalsCubit>().emitSignal(ChangeFilterTypeSignal(type));
       },
       tabs: ProposalsFilterType.values.map(
         (value) {

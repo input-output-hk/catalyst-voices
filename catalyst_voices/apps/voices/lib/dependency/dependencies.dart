@@ -77,6 +77,7 @@ final class Dependencies extends DependencyProvider {
       })
       ..registerLazySingleton<ProposalsCubit>(
         () => ProposalsCubit(
+          get<UserService>(),
           get<CampaignService>(),
           get<ProposalService>(),
         ),

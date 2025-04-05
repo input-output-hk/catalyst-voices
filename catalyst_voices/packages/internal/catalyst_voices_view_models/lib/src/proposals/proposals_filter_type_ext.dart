@@ -1,13 +1,8 @@
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/widgets.dart';
 
-enum ProposalsFilterType {
-  total,
-  drafts,
-  finals,
-  favorites,
-  my;
-
+extension ProposalsFilterTypeExt on ProposalsFilterType {
   String noOf(
     BuildContext context, {
     required int count,

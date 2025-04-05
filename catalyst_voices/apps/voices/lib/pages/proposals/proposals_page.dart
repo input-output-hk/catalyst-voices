@@ -91,13 +91,10 @@ class _ProposalsPageState extends State<ProposalsPage>
         widget.selectMyProposalsView != oldWidget.selectMyProposalsView ||
         widget.type != oldWidget.type) {
       context.read<ProposalsCubit>().changeFilters(
-            onlyMy: widget.selectMyProposalsView,
-            category: widget.categoryId,
+            onlyMy: Optional(widget.selectMyProposalsView),
+            category: Optional(widget.categoryId),
             type: widget.type ?? ProposalsFilterType.total,
           );
-
-      // Reset pagination.
-      _pagingController.notifyPageRequestListeners(0);
     }
 
     if (widget.type != oldWidget.type) {
@@ -120,8 +117,10 @@ class _ProposalsPageState extends State<ProposalsPage>
     switch (signal) {
       case ChangeCategorySignal(:final to):
         _updateRoute(categoryId: Optional(to?.id));
-      case ChangeFilterType(:final type):
+      case ChangeFilterTypeSignal(:final type):
         _updateRoute(filterType: type);
+      case ResetProposalsPaginationSignal():
+        _pagingController.notifyPageRequestListeners(0);
     }
   }
 

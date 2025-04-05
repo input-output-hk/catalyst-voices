@@ -34,7 +34,7 @@ export 'proposal_builder/exception/proposal_builder_exception.dart';
 export 'proposal_comments/proposal_comments_segment.dart';
 export 'proposal_comments/proposal_comments_sort.dart';
 export 'proposals/proposals_category_selector_item.dart';
-export 'proposals/proposals_filter_type.dart';
+export 'proposals/proposals_filter_type_ext.dart';
 export 'proposals/proposals_type_count.dart';
 export 'registration/exception/localized_registration_exception.dart';
 export 'registration/registration.dart';
