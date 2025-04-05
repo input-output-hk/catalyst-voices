@@ -54,7 +54,7 @@ abstract interface class ProposalService {
   });
 
   Future<ProposalPaginationItems<Proposal>> getProposals({
-    required ProposalPaginationRequest request,
+    required PaginationPage<String?> request,
   });
 
   Future<ProposalTemplate> getProposalTemplate({
@@ -223,7 +223,7 @@ final class ProposalServiceImpl implements ProposalService {
 
   @override
   Future<ProposalPaginationItems<Proposal>> getProposals({
-    required ProposalPaginationRequest request,
+    required PaginationPage<String?> request,
   }) async {
     final proposals = await _proposalRepository.getProposals(
       request: request,

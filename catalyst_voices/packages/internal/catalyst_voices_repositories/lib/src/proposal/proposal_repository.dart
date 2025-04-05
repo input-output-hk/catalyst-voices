@@ -1,7 +1,5 @@
-import 'dart:math';
 import 'dart:typed_data';
 
-import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/document_data_dto.dart';
@@ -52,7 +50,7 @@ abstract interface class ProposalRepository {
 
   /// Fetches all proposals.
   Future<ProposalsSearchResult> getProposals({
-    required ProposalPaginationRequest request,
+    required PaginationPage<String?> request,
   });
 
   /// Returns [ProposalTemplate] for matching [ref].
@@ -195,9 +193,13 @@ final class ProposalRepositoryImpl implements ProposalRepository {
 
   @override
   Future<ProposalsSearchResult> getProposals({
-    required ProposalPaginationRequest request,
+    required PaginationPage<String?> request,
   }) async {
-    // optionally filter by status.
+    return const ProposalsSearchResult(
+      maxResults: 0,
+      proposals: [],
+    );
+/*    // optionally filter by status.
     final proposals = <Proposal>[];
 
     // Return users proposals match his account id with proposals metadata from
@@ -235,7 +237,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     return ProposalsSearchResult(
       maxResults: _maxResults(request.stage),
       proposals: proposals,
-    );
+    );*/
   }
 
   @override
@@ -488,7 +490,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   }
 
   Future<ProposalsSearchResult> _getFavoritesProposalsSearchResult(
-    ProposalPaginationRequest request,
+    PaginationPage<String?> request,
   ) async {
     final favoritesRefs = await _documentRepository
         .watchAllDocumentsFavoriteIds(type: DocumentType.proposalDocument)
@@ -534,7 +536,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   }
 
   Future<ProposalsSearchResult> _getUserProposalsSearchResult(
-    ProposalPaginationRequest request,
+    PaginationPage<String?> request,
   ) async {
     final userProposalsIds = await getUserProposalsIds('');
     final proposals = <Proposal>[];

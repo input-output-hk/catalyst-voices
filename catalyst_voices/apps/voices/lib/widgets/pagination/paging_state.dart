@@ -111,7 +111,6 @@ class PagingState<ItemType> extends Equatable {
 
   PagingState<ItemType> copyWith({
     int? currentPage,
-    int? currentLastPage,
     int? maxResults,
     int? itemsPerPage,
     List<ItemType>? itemList,
