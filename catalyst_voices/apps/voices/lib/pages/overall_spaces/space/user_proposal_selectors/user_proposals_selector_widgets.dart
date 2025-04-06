@@ -1,7 +1,5 @@
 part of 'user_proposal_selectors.dart';
 
-typedef _StateData = ({bool show, List<Proposal> data});
-
 class _DataProposalWidget extends StatelessWidget {
   final List<Proposal> proposals;
   final String emptyMessage;
@@ -16,10 +14,13 @@ class _DataProposalWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (proposals.isEmpty) {
-      return Text(
-        emptyMessage,
-        style: context.textTheme.bodyMedium?.copyWith(
-          color: context.colors.textOnPrimaryLevel1,
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: Text(
+          emptyMessage,
+          style: context.textTheme.bodyMedium?.copyWith(
+            color: context.colors.textOnPrimaryLevel1,
+          ),
         ),
       );
     }
@@ -75,10 +76,11 @@ class _Header extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 18)
-        ..add(
-          const EdgeInsets.only(left: 16),
-        ),
+      padding: const EdgeInsets.only(
+        left: 20,
+        top: 18,
+        bottom: 18,
+      ),
       child: Text(
         title,
         style: context.textTheme.titleMedium?.copyWith(
@@ -100,10 +102,13 @@ class _LoadingProposalSelector extends StatelessWidget {
       },
       builder: (context, isLoading) => Offstage(
         offstage: !isLoading,
-        child: const Padding(
-          padding: EdgeInsets.only(top: 60),
+        child: Padding(
+          padding: const EdgeInsets.only(top: 60),
           child: Center(
-            child: VoicesCircularProgressIndicator(),
+            child: TickerMode(
+              enabled: isLoading,
+              child: const VoicesCircularProgressIndicator(),
+            ),
           ),
         ),
       ),
