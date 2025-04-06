@@ -8,7 +8,6 @@ use super::get_document::DocProvider;
 use crate::{
     db::event::signed_docs::{FullSignedDoc, SignedDocBody, StoreError},
     service::common::responses::WithErrorResponses,
-    settings::Settings,
 };
 
 pub(crate) mod unprocessable_content_request;
@@ -47,17 +46,9 @@ pub(crate) type AllResponses = WithErrorResponses<Responses>;
 
 /// # PUT `/document`
 pub(crate) async fn endpoint(doc_bytes: Vec<u8>) -> AllResponses {
-    let signed_doc_cfg = Settings::signed_doc_cfg();
     match doc_bytes.as_slice().try_into() {
         Ok(doc) => {
-            if let Err(e) = catalyst_signed_doc::validator::validate(
-                &doc,
-                signed_doc_cfg.future_threshold(),
-                signed_doc_cfg.past_threshold(),
-                &DocProvider,
-            )
-            .await
-            {
+            if let Err(e) = catalyst_signed_doc::validator::validate(&doc, &DocProvider).await {
                 // means that something happened inside the `DocProvider`, some db error.
                 return AllResponses::handle_error(&e);
             }
