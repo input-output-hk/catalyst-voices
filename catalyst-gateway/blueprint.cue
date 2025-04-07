@@ -14,7 +14,7 @@ project: {
 		bundle: {
 			modules: main: {
 				name:    "app"
-				version: "0.6.0"
+				version: "0.4.2"
 				values: {
 					deployment: {
 						containers: gateway: {
@@ -224,17 +224,17 @@ project: {
 				}
 			}
 		}
-
-		release: {
-			docker: {
-				on: {
-					merge: {}
-					tag: {}
-				}
-				config: {
-					tag: _ @forge(name="GIT_COMMIT_HASH")
-				}
+	}
+	release: {
+		docker: {
+			on: {
+				merge: {}
+				tag: {}
+			}
+			config: {
+				tag: _ @forge(name="GIT_COMMIT_HASH")
 			}
 		}
 	}
+
 }
