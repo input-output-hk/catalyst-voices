@@ -153,7 +153,7 @@ final class ProposalServiceImpl implements ProposalService {
     required SignedDocumentRef categoryId,
   }) async {
     final draftRef = DraftRef.generateFirstRef();
-    final catalystId = await _getUserCatalystId();
+    final catalystId = _getUserCatalystId();
     await _proposalRepository.upsertDraftProposal(
       document: DocumentData(
         metadata: DocumentDataMetadata(
@@ -255,7 +255,7 @@ final class ProposalServiceImpl implements ProposalService {
 
   @override
   Future<DocumentRef> importProposal(Uint8List data) async {
-    final authorId = await _getUserCatalystId();
+    final authorId = _getUserCatalystId();
     return _proposalRepository.importProposal(data, authorId);
   }
 
@@ -346,7 +346,7 @@ final class ProposalServiceImpl implements ProposalService {
     // TODO(LynxLynxx): when we start supporting multiple authors
     // we need to get the list of authors actually stored in the db and
     // add them to the authors list if they are not already there
-    final catalystId = await _getUserCatalystId();
+    final catalystId = _getUserCatalystId();
 
     await _proposalRepository.upsertDraftProposal(
       document: DocumentData(
@@ -399,7 +399,12 @@ final class ProposalServiceImpl implements ProposalService {
 
   @override
   Stream<List<Proposal>> watchUserProposals() async* {
-    final authorId = await _getUserCatalystId();
+    final proposer = _isProposer();
+    if (!proposer) {
+      return;
+    }
+
+    final authorId = _getUserCatalystId();
     yield* _proposalRepository
         .watchUserProposals(authorId: authorId)
         .switchMap((documents) async* {
@@ -496,7 +501,7 @@ final class ProposalServiceImpl implements ProposalService {
     );
   }
 
-  Future<CatalystId> _getUserCatalystId() async {
+  CatalystId _getUserCatalystId() {
     final account = _userService.user.activeAccount;
     if (account == null) {
       throw StateError(
@@ -505,5 +510,13 @@ final class ProposalServiceImpl implements ProposalService {
     }
 
     return account.catalystId;
+  }
+
+  bool _isProposer() {
+    final proposer =
+        _userService.user.activeAccount?.roles.contains(AccountRole.proposer) ??
+            false;
+
+    return proposer;
   }
 }

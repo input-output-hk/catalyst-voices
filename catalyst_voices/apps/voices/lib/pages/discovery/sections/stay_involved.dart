@@ -24,11 +24,12 @@ class StayInvolved extends StatelessWidget {
       padding: EdgeInsets.symmetric(horizontal: 120, vertical: 72),
       child: Column(
         mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           _Header(),
           SizedBox(height: 24),
           Wrap(
+            alignment: WrapAlignment.center,
             spacing: 16,
             runSpacing: 16,
             children: [
