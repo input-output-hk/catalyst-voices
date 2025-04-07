@@ -95,8 +95,7 @@ impl VerifyingKeyProvider {
             anyhow::bail!("Failed to retrieve a registration from corresponding Catalyst ID");
         };
 
-        let mut result = Vec::with_capacity(kids.len());
-        for kid in kids {
+        let result: Vec<_> = kids.iter().map(|kid| {
             if !kid.is_signature_key() {
                 anyhow::bail!("Invalid KID {kid}: KID must be a signing key not an encryption key");
             }
@@ -117,8 +116,9 @@ impl VerifyingKeyProvider {
                 anyhow::bail!("Invalid KID {kid}: KID's rotation ({kid_rotation}) is not the latest rotation ({rotation})");
             }
 
-            result.push((kid.clone(), latest_pk));
-        }
+            Ok((kid.clone(), latest_pk))
+        })
+        .collect::<Result<_, _>>()?;
 
         Ok(Self(result))
     }
