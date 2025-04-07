@@ -6,10 +6,12 @@ import 'package:catalyst_voices/widgets/buttons/voices_filled_button.dart';
 import 'package:catalyst_voices/widgets/cards/pending_proposal_card.dart';
 import 'package:catalyst_voices/widgets/scrollbar/voices_slider.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
+import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 class MostRecentProposals extends StatefulWidget {
@@ -85,9 +87,15 @@ class _LatestProposalsState extends State<MostRecentProposals> {
                               ).push(context),
                             );
                           },
-                          onFavoriteChanged: (value) {
-                            // TODO(LynxLynxx): add on change logic
+                          onFavoriteChanged: (value) async {
+                            final bloc = context.read<DiscoveryCubit>();
+                            if (value) {
+                              await bloc.addFavorite(ref);
+                            } else {
+                              await bloc.removeFavorite(ref);
+                            }
                           },
+                          isFavorite: proposal.isFavorite,
                         ),
                       );
                     },
