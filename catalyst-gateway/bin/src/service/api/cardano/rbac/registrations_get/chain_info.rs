@@ -33,36 +33,92 @@ impl ChainInfo {
         persistent_session: &CassandraSession, volatile_session: &CassandraSession,
         catalyst_id: &IdUri,
     ) -> anyhow::Result<Option<Self>> {
-        let (persistent_registrations, volatile_registrations) = try_join(
-            indexed_registrations(persistent_session, catalyst_id),
-            indexed_registrations(volatile_session, catalyst_id),
-        )
-        .await?;
-        let network = Settings::cardano_network();
-
-        let (chain, last_persistent_slot) =
-            apply_registrations(network, None, persistent_registrations).await?;
-        let last_persistent_txn = chain.as_ref().map(RegistrationChain::current_tx_id_hash);
-
-        let (chain, _) = apply_registrations(network, chain, volatile_registrations).await?;
-        let mut last_volatile_txn = chain.as_ref().map(RegistrationChain::current_tx_id_hash);
-        if last_persistent_txn == last_volatile_txn {
-            last_volatile_txn = None;
+        let registrations =
+            last_registration_chain(persistent_session, volatile_session, catalyst_id).await?;
+        if registrations.is_empty() {
+            return Ok(None);
         }
 
-        Ok(chain.map(|chain| {
-            Self {
-                chain,
-                last_persistent_txn,
-                last_volatile_txn,
-                last_persistent_slot,
+        let network = Settings::cardano_network();
+
+        let mut last_persistent_txn = None;
+        let mut last_volatile_txn = None;
+        let mut last_persistent_slot = 0.into();
+
+        let mut iter = registrations.into_iter();
+        let (is_persistent, reg) = iter.next().context("No root registration found")?;
+        let cip509 = registration(network, reg.slot_no.into(), reg.txn_index.into()).await?;
+        let mut chain = RegistrationChain::new(cip509).context("Invalid root registration")?;
+        update_values(
+            is_persistent,
+            &reg,
+            &mut last_persistent_txn,
+            &mut last_volatile_txn,
+            &mut last_persistent_slot,
+        );
+
+        for (is_persistent, reg) in iter {
+            let cip509 = registration(network, reg.slot_no.into(), reg.txn_index.into()).await?;
+
+            // This isn't a hard error because while the individual registration can be valid it can
+            // be invalid in the context of the whole registration chain.
+            if let Ok(new) = chain.update(cip509) {
+                chain = new;
+                update_values(
+                    is_persistent,
+                    &reg,
+                    &mut last_persistent_txn,
+                    &mut last_volatile_txn,
+                    &mut last_persistent_slot,
+                );
             }
+        }
+
+        Ok(Some(Self {
+            chain,
+            last_persistent_txn,
+            last_volatile_txn,
+            last_persistent_slot,
         }))
     }
 }
 
-/// Returns a sorted list of all registrations for the given Catalyst ID from the
-/// database.
+/// Returns a last independent chain of both persistent and volatile registrations.
+async fn last_registration_chain(
+    persistent_session: &CassandraSession, volatile_session: &CassandraSession, catalyst_id: &IdUri,
+) -> anyhow::Result<Vec<(bool, Query)>> {
+    let (persistent_registrations, volatile_registrations) = try_join(
+        indexed_registrations(persistent_session, catalyst_id),
+        indexed_registrations(volatile_session, catalyst_id),
+    )
+    .await?;
+
+    // Combine persistent and volatile registrations.
+    let registrations: Vec<_> = persistent_registrations
+        .into_iter()
+        .map(|r| (true, r))
+        .chain(volatile_registrations.into_iter().map(|r| (false, r)))
+        .collect();
+    if registrations.is_empty() {
+        return Ok(Vec::new());
+    }
+
+    // Find the last independent registration chain.
+    let pos = registrations
+        .iter()
+        .rposition(|(_, r)| r.prv_txn_id.is_none())
+        // This should never happen because we don't index registrations with unknown Catalyst
+        // ID, and it can only be extracted from the root registration, so there must be at
+        // least one.
+        .context("Unable to find root registration")?;
+    registrations
+        .get(pos..)
+        .map(<[_]>::to_vec)
+        // This should never happen: the index is valid because of the check above.
+        .context("Invalid root registration index")
+}
+
+/// Returns a sorted list of registrations for the given Catalyst ID from the database.
 async fn indexed_registrations(
     session: &CassandraSession, catalyst_id: &IdUri,
 ) -> anyhow::Result<Vec<Query>> {
@@ -76,59 +132,37 @@ async fn indexed_registrations(
     Ok(result)
 }
 
-/// Applies the given list of indexed registrations to the chain. If the given chain is
-/// `None` - new root will be possibly created.
-async fn apply_registrations(
-    network: Network, mut chain: Option<RegistrationChain>, indexed_registrations: Vec<Query>,
-) -> anyhow::Result<(Option<RegistrationChain>, Slot)> {
-    let mut last_slot = 0.into();
-
-    for reg in indexed_registrations {
-        // We perform validation during indexing, so this normally should never fail.
-        let cip509 = registration(network, reg.slot_no.into(), reg.txn_index.into())
-            .await
-            .with_context(|| {
-                format!(
-                    "Failed to get Cip509 registration from {:?} slot and {:?} txn index",
-                    reg.slot_no, reg.txn_index
-                )
-            })?;
-
-        match chain {
-            None => {
-                if let Ok(root) = RegistrationChain::new(cip509) {
-                    chain = Some(root);
-                    last_slot = reg.slot_no.into();
-                }
-            },
-            Some(ref current) => {
-                // This isn't a hard error because while the individual registration can
-                // be valid it can be invalid in the context of the whole registration
-                // chain.
-                if let Ok(new) = current.update(cip509) {
-                    chain = Some(new);
-                    last_slot = reg.slot_no.into();
-                }
-            },
-        }
-    }
-
-    Ok((chain, last_slot))
-}
-
 /// Returns a RBAC registration from the given block and slot.
 async fn registration(network: Network, slot: Slot, txn_index: TxnIndex) -> anyhow::Result<Cip509> {
     let point = Point::fuzzy(slot);
     let block = ChainFollower::get_block(network, point)
         .await
-        .context("Unable to get block")?
+        .with_context(|| format!("Unable to get {slot:?} block"))?
         .data;
     if block.point().slot_or_default() != slot {
         // The `ChainFollower::get_block` function can return the next consecutive block if it
         // cannot find the exact one. This shouldn't happen, but we need to check anyway.
-        bail!("Unable to find exact block");
+        bail!("Unable to find exact {slot:?} block");
     }
+    // We perform validation during indexing, so this normally should never fail.
     Cip509::new(&block, txn_index, &[])
-        .context("Invalid RBAC registration")?
-        .context("No RBAC registration at this block and txn index")
+        .with_context(|| {
+            format!("Invalid RBAC registration, slot = {slot:?}, transaction index = {txn_index:?}")
+        })?
+        .with_context(|| {
+            format!("No RBAC registration, slot = {slot:?}, transaction index = {txn_index:?}")
+        })
+}
+
+/// Updates the values depending on if the given registration is persistent or not.
+fn update_values(
+    is_persistent: bool, reg: &Query, last_persistent_txn: &mut Option<TransactionId>,
+    last_volatile_txn: &mut Option<TransactionId>, last_persistent_slot: &mut Slot,
+) {
+    if is_persistent {
+        *last_persistent_txn = Some(reg.txn_id.into());
+        *last_persistent_slot = reg.slot_no.into();
+    } else {
+        *last_volatile_txn = Some(reg.txn_id.into());
+    }
 }
