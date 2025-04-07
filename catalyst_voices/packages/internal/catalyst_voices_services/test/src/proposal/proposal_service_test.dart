@@ -37,7 +37,7 @@ void main() {
     when(
       () => mockDocumentRepository.watchCount(
         ref: any(named: 'ref'),
-        type: DocumentType.commentTemplate,
+        type: DocumentType.commentDocument,
       ),
     ).thenAnswer((_) => Stream.fromIterable([5]));
   });
@@ -111,7 +111,7 @@ void main() {
       when(
         () => mockProposalRepository.watchCount(
           ref: any(named: 'ref'),
-          type: DocumentType.commentTemplate,
+          type: DocumentType.commentDocument,
         ),
       ).thenAnswer((_) => Stream.fromIterable([5]));
 
@@ -151,7 +151,7 @@ void main() {
       verify(
         () => mockProposalRepository.watchCount(
           ref: any(named: 'ref'),
-          type: DocumentType.commentTemplate,
+          type: DocumentType.commentDocument,
         ),
       ).called(2);
 
@@ -251,14 +251,14 @@ void main() {
         when(
           () => mockProposalRepository.watchCount(
             ref: proposalRef1,
-            type: DocumentType.commentTemplate,
+            type: DocumentType.commentDocument,
           ),
         ).thenAnswer((_) => comments1.stream);
 
         when(
           () => mockProposalRepository.watchCount(
             ref: proposalRef2,
-            type: DocumentType.commentTemplate,
+            type: DocumentType.commentDocument,
           ),
         ).thenAnswer((_) => comments2.stream);
 
