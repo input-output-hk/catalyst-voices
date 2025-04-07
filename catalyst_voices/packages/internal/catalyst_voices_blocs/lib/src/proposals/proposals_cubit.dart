@@ -6,6 +6,7 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 final _logger = Logger('ProposalsCubit');
@@ -20,6 +21,7 @@ final class ProposalsCubit extends Cubit<ProposalsState>
   ProposalsCubitCache _cache = const ProposalsCubitCache();
 
   StreamSubscription<CatalystId?>? _activeAccountIdSub;
+  StreamSubscription<List<String>>? _favouriteProposalsIdsSub;
 
   ProposalsCubit(
     this._userService,
@@ -34,6 +36,11 @@ final class ProposalsCubit extends Cubit<ProposalsState>
         .map((event) => event.activeAccount?.catalystId)
         .distinct()
         .listen(_handleActiveAccountIdChange);
+
+    _favouriteProposalsIdsSub = _favouriteProposalsIdsSub = _proposalService
+        .watchFavoritesProposalsIds()
+        .distinct(listEquals)
+        .listen(_handleFavouriteProposalsIds);
   }
 
   void changeFilters({
@@ -69,6 +76,9 @@ final class ProposalsCubit extends Cubit<ProposalsState>
     await _activeAccountIdSub?.cancel();
     _activeAccountIdSub = null;
 
+    await _favouriteProposalsIdsSub?.cancel();
+    _favouriteProposalsIdsSub = null;
+
     return super.close();
   }
 
@@ -92,15 +102,12 @@ final class ProposalsCubit extends Cubit<ProposalsState>
 
       _logger.finer('Requesting proposals page[$request] with [$filters]');
 
-      return;
-      // TODO(damian-molinski): build add pass current filters.
       final proposals = await _proposalService.getProposals(
         request: request,
       );
 
       final proposalsViewModels = proposals.items.map(
         (proposal) {
-          // TODO(damian-molinski): handle isFavorite rebuilds.
           return ProposalViewModel.fromProposalAtStage(
             proposal: proposal,
             campaignName: campaign.name,
@@ -140,10 +147,26 @@ final class ProposalsCubit extends Cubit<ProposalsState>
   }
 
   /// Changes the favorite status of the proposal with [ref].
-  Future<void> onChangeFavoriteProposal(
+  void onChangeFavoriteProposal(
     DocumentRef ref, {
     required bool isFavorite,
-  }) async {}
+  }) {
+    final favoritesIds = List.of(state.favoritesIds);
+
+    if (isFavorite) {
+      favoritesIds.add(ref.id);
+    } else {
+      favoritesIds.removeWhere((element) => element == ref.id);
+    }
+
+    emit(state.copyWith(favoritesIds: favoritesIds));
+
+    if (isFavorite) {
+      unawaited(_proposalService.addFavoriteProposal(ref: ref));
+    } else {
+      unawaited(_proposalService.removeFavoriteProposal(ref: ref));
+    }
+  }
 
   void updateSearchQuery(String query) {
     final asOptional =
@@ -160,6 +183,10 @@ final class ProposalsCubit extends Cubit<ProposalsState>
 
   void _handleActiveAccountIdChange(CatalystId? id) {
     changeFilters(author: Optional(id));
+  }
+
+  void _handleFavouriteProposalsIds(List<String> ids) {
+    emit(state.copyWith(favoritesIds: ids));
   }
 
   Future<void> _loadCampaignCategories() async {
