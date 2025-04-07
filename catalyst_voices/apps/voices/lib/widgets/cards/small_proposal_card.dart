@@ -1,5 +1,7 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/common/formatters/date_formatter.dart';
+import 'package:catalyst_voices/routes/routing/proposal_builder_route.dart';
+import 'package:catalyst_voices/routes/routing/routing.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_text_button.dart';
 import 'package:catalyst_voices/widgets/cards/proposal_card_widgets.dart';
 import 'package:catalyst_voices/widgets/common/affix_decorator.dart';
@@ -7,62 +9,72 @@ import 'package:catalyst_voices/widgets/text/day_month_time_text.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 
 class SmallProposalCard extends StatelessWidget {
   final Proposal proposal;
+  final bool showLatestLocal;
 
   const SmallProposalCard({
     super.key,
     required this.proposal,
+    this.showLatestLocal = false,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        border: Border.all(
-          color: context.colors.outlineBorder,
+    return GestureDetector(
+      onTap: () async {
+        if (!proposal.publish.isLocal) {
+          return ProposalRoute.fromRef(ref: proposal.selfRef).push(context);
+        }
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: context.colors.outlineBorder,
+          ),
+          borderRadius: BorderRadius.circular(8),
+          color:
+              proposal.publish.isPublished ? context.colors.iconsPrimary : null,
         ),
-        borderRadius: BorderRadius.circular(8),
-        color:
-            proposal.publish.isPublished ? context.colors.iconsPrimary : null,
-      ),
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            proposal.category,
-            style: context.textTheme.labelMedium?.copyWith(
-              color: proposal.publish.isPublished
-                  ? context.colors.primaryContainer
-                  : context.colors.textOnPrimaryLevel1,
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              proposal.category,
+              style: context.textTheme.labelMedium?.copyWith(
+                color: proposal.publish.isPublished
+                    ? context.colors.primaryContainer
+                    : context.colors.textOnPrimaryLevel1,
+              ),
             ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            proposal.title,
-            style: context.textTheme.titleSmall?.copyWith(
-              color: proposal.publish.isPublished
-                  ? context.colors.textOnPrimaryWhite
-                  : null,
+            const SizedBox(height: 4),
+            Text(
+              proposal.title,
+              style: context.textTheme.titleSmall?.copyWith(
+                color: proposal.publish.isPublished
+                    ? context.colors.textOnPrimaryWhite
+                    : null,
+              ),
             ),
-          ),
-          Offstage(
-            offstage: !proposal.publish.isLocal,
-            child: _NewIterationDetails(
-              title: proposal.title,
-              iteration: proposal.versionCount,
-              datetime: proposal.updateDate,
-              id: proposal.selfRef,
+            Offstage(
+              offstage: !proposal.versions
+                      .hasLatestLocalDraft(proposal.selfRef.version) ||
+                  !showLatestLocal,
+              child: _NewIterationDetails(
+                title: proposal.title,
+                iteration: proposal.versionCount,
+                datetime: proposal.updateDate,
+                ref: proposal.selfRef,
+              ),
             ),
-          ),
-          const SizedBox(height: 12),
-          // TODO(LynxLynxx): offstage if new local version is not published
-          _Details(proposal: proposal),
-        ],
+            const SizedBox(height: 12),
+            _Details(proposal: proposal),
+          ],
+        ),
       ),
     );
   }
@@ -112,13 +124,13 @@ class _NewIterationDetails extends StatelessWidget {
   final String title;
   final int iteration;
   final DateTime? datetime;
-  final DocumentRef id;
+  final DocumentRef ref;
 
   const _NewIterationDetails({
     required this.title,
     required this.iteration,
     required this.datetime,
-    required this.id,
+    required this.ref,
   });
 
   @override
@@ -160,7 +172,7 @@ class _NewIterationDetails extends StatelessWidget {
               VoicesTextButton(
                 child: Text(context.l10n.open),
                 onTap: () {
-                  // TODO(LynxLynxx): open proposal builder
+                  ProposalBuilderRoute.fromRef(ref: ref).go(context);
                 },
               ),
             ],
