@@ -8,14 +8,13 @@ project: {
 	}
 	deployment: {
 		on: {
-			// TODO: re-enable once we can better control number of deployments
-			//merge: {}
-			//tag: {}
+			merge: {}
+			tag: {}
 		}
 		bundle: {
 			modules: main: {
 				name:    "app"
-				version: "0.4.2"
+				version: "0.6.0"
 				values: {
 					deployment: {
 						containers: gateway: {
