@@ -78,12 +78,12 @@ class _GlobalPrecacheImagesState extends State<GlobalPrecacheImages> {
     _precacheFuture ??= Future.microtask(() async => _precacheImages());
   }
 
-  Future<void> _precacheImages() async {
+  Future<void> _precacheImages() {
     final theme = Theme.of(context);
 
     ImagePrecacheService.instance.resetCacheIfNeeded(theme);
 
-    await ImagePrecacheService.instance.precacheAssets(
+    return ImagePrecacheService.instance.precacheAssets(
       context,
       svgs: [
         theme.brandAssets.brand.logo(context),
