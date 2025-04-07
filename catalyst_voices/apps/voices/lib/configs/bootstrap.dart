@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
 import 'package:catalyst_voices/app/app.dart';
+import 'package:catalyst_voices/app/view/app_splash_screen_manager.dart';
 import 'package:catalyst_voices/configs/app_bloc_observer.dart';
 import 'package:catalyst_voices/configs/sentry_service.dart';
 import 'package:catalyst_voices/dependency/dependencies.dart';
@@ -14,7 +15,6 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_strategy/url_strategy.dart';
 
@@ -90,21 +90,6 @@ GoRouter buildAppRouter({
   );
 }
 
-/// Hides the splash screen.
-///
-/// https://pub.dev/packages/flutter_native_splash#3-set-up-app-initialization-optional
-void hideSplashScreen() {
-  FlutterNativeSplash.remove();
-}
-
-/// Flutter by default removes the splash screen when it draws the first frame,
-/// we'd like to preserve it until we've loaded the content.
-///
-/// https://pub.dev/packages/flutter_native_splash#3-set-up-app-initialization-optional
-void preserveSplashScreen(WidgetsBinding widgetsBinding) {
-  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
-}
-
 @visibleForTesting
 Future<void> registerDependencies({required AppConfig config}) async {
   if (!Dependencies.instance.isInitialized) {
@@ -129,7 +114,7 @@ Widget _defaultBuilder(BootstrapArgs args) {
 
 Future<void> _doBootstrapAndRun(BootstrapWidgetBuilder builder) async {
   final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
-  preserveSplashScreen(widgetsBinding);
+  AppSplashScreenManager.preserveSplashScreen(widgetsBinding);
 
   FlutterError.onError = _reportFlutterError;
   PlatformDispatcher.instance.onError = _reportPlatformDispatcherError;
