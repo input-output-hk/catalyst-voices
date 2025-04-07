@@ -1,5 +1,7 @@
 //! A RBAC registration chain information.
 
+// cspell: words rposition
+
 use anyhow::{bail, Context};
 use cardano_blockchain_types::{Network, Point, Slot, TransactionId, TxnIndex};
 use cardano_chain_follower::ChainFollower;
