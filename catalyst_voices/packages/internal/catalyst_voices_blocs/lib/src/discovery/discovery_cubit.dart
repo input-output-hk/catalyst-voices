@@ -27,8 +27,9 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
   Future<void> addFavorite(DocumentRef ref) async {
     try {
       await _proposalService.addFavoriteProposal(ref: ref);
-    } catch (e) {
-      emitError(const LocalizedUnknownException());
+    } catch (e, st) {
+      _logger.severe('Error adding favorite', e, st);
+      emitError(LocalizedException.create(e));
     }
   }
 
@@ -118,8 +119,9 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
   Future<void> removeFavorite(DocumentRef ref) async {
     try {
       await _proposalService.removeFavoriteProposal(ref: ref);
-    } catch (e) {
-      emitError(const LocalizedUnknownException());
+    } catch (e, st) {
+      _logger.severe('Error adding favorite', e, st);
+      emitError(LocalizedException.create(e));
     }
   }
 
