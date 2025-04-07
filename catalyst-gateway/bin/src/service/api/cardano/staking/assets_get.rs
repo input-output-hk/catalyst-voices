@@ -165,9 +165,6 @@ async fn calculate_stake_info(
         get_txo(&session, &address, adjusted_slot_num),
         get_txo_assets(&session, &address, adjusted_slot_num)
     )?;
-    if txos.is_empty() {
-        return Ok(None);
-    }
 
     let (mut txos, txo_assets) = if let Some(TxoAssetsState {
         txos: base_txos,
@@ -192,7 +189,11 @@ async fn calculate_stake_info(
         }
     });
 
-    let stake_info = build_stake_info(&txos, &txo_assets, adjusted_slot_num)?;
+    if txos.is_empty() && txo_assets.is_empty() {
+        return Ok(None);
+    }
+
+    let stake_info = build_stake_info(txos.clone(), txo_assets.clone(), adjusted_slot_num)?;
 
     Ok(Some((stake_info, TxoAssetsState { txos, txo_assets })))
 }
@@ -309,11 +310,11 @@ async fn update_spent(
 
 /// Builds an instance of [`StakeInfo`] based on the TXOs given.
 fn build_stake_info(
-    txos: &TxoMap, tokens: &TxoAssetsMap, slot_num: SlotNo,
+    txos: TxoMap, mut tokens: TxoAssetsMap, slot_num: SlotNo,
 ) -> anyhow::Result<StakeInfo> {
     let slot_num = slot_num.into();
     let mut stake_info = StakeInfo::default();
-    for txo_info in txos.clone().into_values() {
+    for txo_info in txos.into_values() {
         // Filter out spent TXOs.
         if let Some(spent_slot) = txo_info.spent_slot_no {
             if spent_slot <= slot_num {
@@ -334,7 +335,6 @@ fn build_stake_info(
             .into();
 
         let key = (txo_info.slot_no, txo_info.txn_index, txo_info.txo);
-        let mut tokens = tokens.clone();
         if let Some(native_token) = tokens.remove(&key) {
             match native_token.amount.try_into() {
                 Ok(amount) => {
