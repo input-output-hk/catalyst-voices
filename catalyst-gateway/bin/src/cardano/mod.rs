@@ -23,9 +23,7 @@ use crate::{
         },
         session::CassandraSession,
     },
-    service::utilities::health::{
-        follower_has_first_reached_tip, set_follower_first_reached_tip, set_index_db_liveness,
-    },
+    service::utilities::health::{follower_has_first_reached_tip, set_follower_first_reached_tip},
     settings::{chain_follower, Settings},
 };
 
@@ -34,21 +32,7 @@ pub(crate) mod event;
 pub(crate) mod util;
 
 /// How long we wait between checks for connection to the indexing DB to be ready.
-const INDEXING_DB_READY_WAIT_INTERVAL: Duration = Duration::from_secs(1);
-
-/// Wait for the Cassandra Indexing DB to be ready before continuing.
-///
-/// Returns boolean that is `true` if connection to the Indexing DB is `OK`.
-///
-/// NOTE: This function updates the Indexing DB liveness variables.
-pub async fn index_db_is_ready() -> bool {
-    let is_ready = CassandraSession::wait_until_ready(INDEXING_DB_READY_WAIT_INTERVAL, true)
-        .await
-        .is_ok();
-    // Set the Indexing DB service liveness flag
-    set_index_db_liveness(is_ready);
-    is_ready
-}
+pub(crate) const INDEXING_DB_READY_WAIT_INTERVAL: Duration = Duration::from_secs(1);
 
 /// Start syncing a particular network
 async fn start_sync_for(cfg: &chain_follower::EnvVars) -> anyhow::Result<()> {
@@ -261,9 +245,7 @@ fn sync_subchain(
         params.backoff().await;
 
         // Wait for indexing DB to be ready before continuing.
-        if !index_db_is_ready().await {
-            error!(chain=%params.chain, params=%params,"Indexing DB connection failed");
-        }
+        drop(CassandraSession::wait_until_ready(INDEXING_DB_READY_WAIT_INTERVAL, true).await);
         info!(chain=%params.chain, params=%params,"Indexing DB is ready");
 
         let mut first_indexed_block = params.first_indexed_block.clone();
@@ -485,9 +467,7 @@ impl SyncTask {
         // want to wait do any work they already completed while we were fetching the blockchain.
         //
         // After waiting, we set the liveness flag to true if it is not already set.
-        if !index_db_is_ready().await {
-            error!(chain=%self.cfg.chain, "Indexing DB connection failed");
-        }
+        drop(CassandraSession::wait_until_ready(INDEXING_DB_READY_WAIT_INTERVAL, true).await);
 
         info!(chain=%self.cfg.chain, "Indexing DB is ready - Getting recovery state");
         self.sync_status = get_sync_status().await;

@@ -75,10 +75,9 @@
 //! providing ongoing connectivity checks and recovery attempts for the service's
 //! databases.
 use poem_openapi::ApiResponse;
-use tracing::error;
 
 use crate::{
-    cardano::index_db_is_ready,
+    cardano::INDEXING_DB_READY_WAIT_INTERVAL,
     db::{
         event::{establish_connection, EventDB},
         index::session::CassandraSession,
@@ -138,9 +137,7 @@ pub(crate) async fn endpoint() -> AllResponses {
     if !index_db_live {
         CassandraSession::init();
         // Re-check connection to Indexing DB (internally updates the liveness flag)
-        if !index_db_is_ready().await {
-            error!("Index DB re-connection failed readiness check");
-        }
+        drop(CassandraSession::wait_until_ready(INDEXING_DB_READY_WAIT_INTERVAL, true).await);
     }
 
     let success_response = Responses::NoContent.into();
