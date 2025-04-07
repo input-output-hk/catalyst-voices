@@ -415,17 +415,6 @@ socks = ["pysocks (>=1.5.6,!=1.5.7,<2.0)"]
 zstd = ["zstandard (>=0.18.0)"]
 
 [[package]]
-name = "uuid7"
-version = "0.1.0"
-description = "UUID version 7, generating time-sorted UUIDs with 200ns time resolution and 48 bits of randomness"
-optional = false
-python-versions = ">=3.7"
-files = [
-    {file = "uuid7-0.1.0-py2.py3-none-any.whl", hash = "sha256:5e259bb63c8cb4aded5927ff41b444a80d0c7124e8a0ced7cf44efa1f5cccf61"},
-    {file = "uuid7-0.1.0.tar.gz", hash = "sha256:8c57aa32ee7456d3cc68c95c4530bc571646defac01895cfc73545449894a63c"},
-]
-
-[[package]]
 name = "win32-setctime"
 version = "1.1.0"
 description = "A small Python utility to set file creation time on Windows"
@@ -442,4 +431,4 @@ dev = ["black (>=19.3b0)", "pytest (>=4.6.2)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "40fdf8e14bfb033b519d5376a22a98957cae72bfd5abc434e5bb4e75b4864b54"
+content-hash = "9889db2769f76135c291a8afa7c37b81ee8467aacf7ce7237707ee4d4aaa664a"

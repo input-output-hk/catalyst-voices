@@ -1,6 +1,6 @@
 import pytest
 from loguru import logger
-from utils import health, signed_doc
+from utils import health, signed_doc, uuid_v7
 from api.v1 import document
 import os
 import json
@@ -68,7 +68,7 @@ def comment_templates() -> List[str]:
 @pytest.fixture
 def proposal_doc_factory(proposal_templates):
     def __proposal_doc_factory() -> SignedDocument:
-        proposal_doc_id = uuid7str()
+        proposal_doc_id = uuid_v7.uuid_v7()
         proposal_metadata_json = {
             "id": proposal_doc_id,
             "ver": proposal_doc_id,
@@ -100,7 +100,7 @@ def proposal_doc_factory(proposal_templates):
 def comment_doc_factory(proposal_doc_factory, comment_templates) -> SignedDocument:
     def __comment_doc_factory() -> SignedDocument:
         proposal_doc = proposal_doc_factory()
-        comment_doc_id = uuid7str()
+        comment_doc_id = uuid_v7.uuid_v7()
         comment_metadata_json = {
             "id": comment_doc_id,
             "ver": comment_doc_id,
@@ -132,7 +132,7 @@ def submission_action_factory(
 ) -> SignedDocument:
     def __submission_action_factory() -> SignedDocument:
         proposal_doc = proposal_doc_factory()
-        submission_action_id = uuid7str()
+        submission_action_id = uuid_v7.uuid_v7()
         sub_action_metadata_json = {
             "id": submission_action_id,
             "ver": submission_action_id,
@@ -199,7 +199,7 @@ def test_proposal_doc(proposal_doc_factory):
 
     # Put a signed document with same ID, but different version and different content
     new_doc = proposal_doc.copy()
-    new_doc.metadata["ver"] = uuid7str()
+    new_doc.metadata["ver"] = uuid_v7.uuid_v7()
     new_doc.content["setup"]["title"]["title"] = "another title"
     resp = document.put(data=new_doc.hex())
     assert (
@@ -208,7 +208,7 @@ def test_proposal_doc(proposal_doc_factory):
 
     # Put a proposal document with the not known template field
     invalid_doc = proposal_doc.copy()
-    invalid_doc.metadata["template"] = {"id": uuid7str()}
+    invalid_doc.metadata["template"] = {"id": uuid_v7.uuid_v7()}
     resp = document.put(data=invalid_doc.hex())
     assert (
         resp.status_code == 422
@@ -216,7 +216,7 @@ def test_proposal_doc(proposal_doc_factory):
 
     # Put a proposal document with empty content
     invalid_doc = proposal_doc.copy()
-    invalid_doc.metadata["ver"] = uuid7str()
+    invalid_doc.metadata["ver"] = uuid_v7.uuid_v7()
     invalid_doc.content = {}
     resp = document.put(data=invalid_doc.hex())
     assert (
@@ -250,7 +250,7 @@ def test_comment_doc(comment_doc_factory):
 
     # Put a comment document with empty content
     invalid_doc = comment_doc.copy()
-    invalid_doc.metadata["ver"] = uuid7str()
+    invalid_doc.metadata["ver"] = uuid_v7.uuid_v7()
     invalid_doc.content = {}
     resp = document.put(data=invalid_doc.hex())
     assert (
@@ -259,7 +259,7 @@ def test_comment_doc(comment_doc_factory):
 
     # Put a comment document referencing to the not known proposal
     invalid_doc = comment_doc.copy()
-    invalid_doc.metadata["ref"] = {"id": uuid7str()}
+    invalid_doc.metadata["ref"] = {"id": uuid_v7.uuid_v7()}
     resp = document.put(data=invalid_doc.hex())
     assert (
         resp.status_code == 422
@@ -300,7 +300,7 @@ def test_submission_action(submission_action_factory):
 
     # Put a submission action document referencing an unknown proposal
     invalid_doc = submission_action.copy()
-    invalid_doc.metadata["ref"] = {"id": uuid7str()}
+    invalid_doc.metadata["ref"] = {"id": uuid_v7.uuid_v7()}
     resp = document.put(data=invalid_doc.hex())
     assert (
         resp.status_code == 422
@@ -316,7 +316,7 @@ def test_document_index_endpoint(proposal_doc_factory):
     for _ in range(total_amount - 1):
         doc = first_proposal.copy()
         # keep the same id, but different version
-        doc.metadata["ver"] = uuid7str()
+        doc.metadata["ver"] = uuid_v7.uuid_v7()
         resp = document.put(data=doc.hex())
         assert (
             resp.status_code == 201
