@@ -92,7 +92,7 @@ impl VerifyingKeyProvider {
         }
 
         let Some(reg_chain) = token.reg_chain() else {
-            anyhow::bail!("Failed to retrieve a registration from coressponding Catalyst ID");
+            anyhow::bail!("Failed to retrieve a registration from corresponding Catalyst ID");
         };
 
         let mut result = Vec::with_capacity(kids.len());
