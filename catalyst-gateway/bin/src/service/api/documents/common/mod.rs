@@ -66,20 +66,20 @@ impl VerifyingKeyProvider {
     /// This method performs the following steps:
     /// 1. Verifies that **all** provided `kids` match the Catalyst ID from the RBAC
     ///    token.
-    /// 2. Extracts the role index from each KID and attempts to build a registration
-    ///    chain from the indexed registration data.
+    /// 2. Extracts the role index and rotation from each KID.
     /// 3. Retrieves the latest signing public key and rotation state associated with the
     ///    role for each KID from the registration chain.
-    /// 4. Collects and returns a vector of tuples containing the KID, signing key, and
-    ///    rotation.
+    /// 4. Collects and returns a vector of tuples containing the KID, signing key.
     ///
     /// # Errors
     ///
     /// Returns an `anyhow::Error` if:
     /// - Any KID's short Catalyst ID does not match the one in the token.
-    /// - The role index parsing fails.
     /// - Indexed registration queries or chain building fail.
+    /// - The KID's role index and rotation parsing fails.
+    /// - The KID is not a singing key.
     /// - The latest signing key for a required role cannot be found.
+    /// - The KID is not using the latest rotation.
     pub(crate) fn try_from_kids(
         token: &CatalystRBACTokenV1, kids: &[catalyst_signed_doc::IdUri],
     ) -> anyhow::Result<Self> {
