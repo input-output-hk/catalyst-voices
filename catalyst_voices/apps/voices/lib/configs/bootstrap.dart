@@ -14,6 +14,7 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_strategy/url_strategy.dart';
 
@@ -89,6 +90,21 @@ GoRouter buildAppRouter({
   );
 }
 
+/// Hides the splash screen.
+///
+/// https://pub.dev/packages/flutter_native_splash#3-set-up-app-initialization-optional
+void hideSplashScreen() {
+  FlutterNativeSplash.remove();
+}
+
+/// Flutter by default removes the splash screen when it draws the first frame,
+/// we'd like to preserve it until we've loaded the content.
+///
+/// https://pub.dev/packages/flutter_native_splash#3-set-up-app-initialization-optional
+void preserveSplashScreen(WidgetsBinding widgetsBinding) {
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+}
+
 @visibleForTesting
 Future<void> registerDependencies({required AppConfig config}) async {
   if (!Dependencies.instance.isInitialized) {
@@ -112,12 +128,8 @@ Widget _defaultBuilder(BootstrapArgs args) {
 }
 
 Future<void> _doBootstrapAndRun(BootstrapWidgetBuilder builder) async {
-  // There's no need to call WidgetsFlutterBinding.ensureInitialized()
-  // since this is already done internally by SentryFlutter.init()
-  // More info here: https://github.com/getsentry/sentry-dart/issues/2063
-  if (!kReleaseMode) {
-    WidgetsFlutterBinding.ensureInitialized();
-  }
+  final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  preserveSplashScreen(widgetsBinding);
 
   FlutterError.onError = _reportFlutterError;
   PlatformDispatcher.instance.onError = _reportPlatformDispatcherError;

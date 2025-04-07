@@ -1,4 +1,3 @@
-import 'package:catalyst_voices/widgets/indicators/voices_circular_progress_indicator.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:flutter/material.dart';
@@ -60,10 +59,13 @@ class _GlobalPrecacheImagesState extends State<GlobalPrecacheImages> {
     return FutureBuilder<void>(
       future: _precacheFuture,
       builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting &&
-            !ImagePrecacheService.instance.isInitialized) {
-          return const Center(child: VoicesCircularProgressIndicator());
+        final offstage = snapshot.connectionState == ConnectionState.waiting &&
+            !ImagePrecacheService.instance.isInitialized;
+
+        if (offstage) {
+          return const Offstage();
         }
+
         return widget.child;
       },
     );
@@ -76,12 +78,12 @@ class _GlobalPrecacheImagesState extends State<GlobalPrecacheImages> {
     _precacheFuture ??= Future.microtask(() async => _precacheImages());
   }
 
-  Future<void> _precacheImages() {
+  Future<void> _precacheImages() async {
     final theme = Theme.of(context);
 
     ImagePrecacheService.instance.resetCacheIfNeeded(theme);
 
-    return ImagePrecacheService.instance.precacheAssets(
+    await ImagePrecacheService.instance.precacheAssets(
       context,
       svgs: [
         theme.brandAssets.brand.logo(context),
