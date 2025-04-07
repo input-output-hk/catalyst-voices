@@ -16,7 +16,6 @@ def rbac_auth_token() -> str:
     pk_bytes = bytes.fromhex(pk_hex)
     pk = Ed25519PublicKey.from_public_bytes(pk_bytes)
     
-
     return generate_rbac_auth_token("cardano", "preprod", pk, sk)
 
 def generate_rbac_auth_token(network: str, subnet: str | None, role0_pk: Ed25519PublicKey, sk: Ed25519PrivateKey) -> str:
