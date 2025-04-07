@@ -16,16 +16,23 @@ class DiscoveryCubit extends Cubit<DiscoveryState> {
   final CampaignService _campaignService;
   final ProposalService _proposalService;
   StreamSubscription<List<Proposal>>? _proposalsSubscription;
+  StreamSubscription<List<String>>? _favoritesProposalsIdsSubscription;
 
   DiscoveryCubit(
     this._campaignService,
     this._proposalService,
   ) : super(const DiscoveryState());
 
+  Future<void> addFavorite(DocumentRef ref) async {
+    await _proposalService.addFavoriteProposal(ref: ref);
+  }
+
   @override
   Future<void> close() {
     _proposalsSubscription?.cancel();
     _proposalsSubscription = null;
+    _favoritesProposalsIdsSubscription?.cancel();
+    _favoritesProposalsIdsSubscription = null;
     return super.close();
   }
 
@@ -90,6 +97,84 @@ class DiscoveryCubit extends Cubit<DiscoveryState> {
     await _proposalsSubscription?.cancel();
     _proposalsSubscription = null;
     _setupProposalsSubscription();
+
+    await _favoritesProposalsIdsSubscription?.cancel();
+    _favoritesProposalsIdsSubscription = null;
+    _setupFavoritesProposalsIdsSubscription();
+
+    final mostRecentState = state.mostRecentProposals;
+    emit(
+      state.copyWith(
+        mostRecentProposals: mostRecentState.copyWith(isLoading: false),
+      ),
+    );
+  }
+
+  Future<void> removeFavorite(DocumentRef ref) async {
+    await _proposalService.removeFavoriteProposal(ref: ref);
+  }
+
+  void _emitMostRecentError(Object error) {
+    emit(
+      state.copyWith(
+        mostRecentProposals: state.mostRecentProposals.copyWith(
+          isLoading: false,
+          error: LocalizedException.create(error),
+          proposals: const [],
+        ),
+      ),
+    );
+  }
+
+  void _emitFavoritesIds(List<String> ids) {
+    final proposals = state.mostRecentProposals.proposals;
+
+    final newProposals = [...proposals]
+        .map((e) => e.copyWith(isFavorite: ids.contains(e.ref.id)))
+        .toList();
+    emit(
+      state.copyWith(
+        mostRecentProposals: state.mostRecentProposals.copyWith(
+          proposals: newProposals,
+        ),
+      ),
+    );
+  }
+
+  void _emitMostRecentProposals(List<Proposal> proposals) {
+    final proposalList = proposals
+        .map(
+          (e) => PendingProposal.fromProposal(
+            e,
+            campaignName: 'f14',
+          ),
+        )
+        .toList();
+    emit(
+      state.copyWith(
+        mostRecentProposals: state.mostRecentProposals.copyWith(
+          isLoading: false,
+          error: null,
+          proposals: proposalList,
+        ),
+      ),
+    );
+  }
+
+  void _setupFavoritesProposalsIdsSubscription() {
+    _logger.info('Setting up favorites proposals ids subscription');
+    _favoritesProposalsIdsSubscription =
+        _proposalService.watchFavoritesProposalsIds().listen(
+      (ids) {
+        if (isClosed) return;
+        _logger.info('Got favorites proposals ids: ${ids.length}');
+        _emitFavoritesIds(ids);
+      },
+      onError: (Object error) {
+        if (isClosed) return;
+        _emitMostRecentError(error);
+      },
+    );
   }
 
   void _setupProposalsSubscription() {
@@ -99,42 +184,12 @@ class DiscoveryCubit extends Cubit<DiscoveryState> {
       (proposals) {
         if (isClosed) return;
         _logger.info('Got proposals: ${proposals.length}');
-        final proposalList = proposals
-            .map(
-              (e) => PendingProposal.fromProposal(
-                e,
-                campaignName: 'f14',
-              ),
-            )
-            .toList();
-        emit(
-          state.copyWith(
-            mostRecentProposals: DiscoveryMostRecentProposalsState(
-              isLoading: false,
-              error: null,
-              proposals: proposalList,
-            ),
-          ),
-        );
+        _emitMostRecentProposals(proposals);
       },
       onError: (Object error) {
         if (isClosed) return;
-        emit(
-          state.copyWith(
-            mostRecentProposals: DiscoveryMostRecentProposalsState(
-              isLoading: false,
-              error: LocalizedException.create(error),
-              proposals: const [],
-            ),
-          ),
-        );
+        _emitMostRecentError(error);
       },
-    );
-    emit(
-      state.copyWith(
-        mostRecentProposals:
-            const DiscoveryMostRecentProposalsState(isLoading: false),
-      ),
     );
   }
 }
