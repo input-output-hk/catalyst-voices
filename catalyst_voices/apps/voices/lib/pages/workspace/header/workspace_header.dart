@@ -27,6 +27,62 @@ class WorkspaceHeader extends StatefulWidget {
   State<WorkspaceHeader> createState() => _WorkspaceHeaderState();
 }
 
+class _HasCommentCard extends StatelessWidget {
+  const _HasCommentCard();
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: () async => ProposalsRoute.myProposals().push(context),
+        child: Container(
+          decoration: BoxDecoration(
+            color: context.colors.elevationsOnSurfaceNeutralLv0,
+            borderRadius: BorderRadius.circular(16),
+          ),
+          padding: const EdgeInsets.all(16),
+          constraints: const BoxConstraints(
+            maxWidth: 300,
+            maxHeight: 190,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                children: [
+                  VoicesAssets.icons.chat.buildIcon(
+                    color: context.colors.iconsPrimary,
+                  ),
+                  const Spacer(),
+                  VoicesAssets.icons.arrowRight.buildIcon(
+                    color: context.colors.primaryContainer,
+                  ),
+                ],
+              ),
+              const Spacer(),
+              Text(
+                context.l10n.viewProposalComments,
+                style: context.textTheme.titleSmall?.copyWith(
+                  color: context.colors.textOnPrimaryLevel1,
+                ),
+              ),
+              Text(
+                context.l10n.viewProposalCommentsDescription,
+                style: context.textTheme.bodyMedium?.copyWith(
+                  color: context.colors.sysColorsNeutralN60,
+                ),
+              ),
+              const Spacer(),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _ViewComments extends StatelessWidget {
   const _ViewComments();
 
@@ -38,59 +94,11 @@ class _ViewComments extends StatelessWidget {
       },
       builder: (context, hasComments) {
         return hasComments
-            ? Row(
+            ? const Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  MouseRegion(
-                    cursor: SystemMouseCursors.click,
-                    child: GestureDetector(
-                      onTap: () async =>
-                          ProposalsRoute.myProposals().push(context),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: context.colors.elevationsOnSurfaceNeutralLv0,
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        padding: const EdgeInsets.all(16),
-                        constraints: const BoxConstraints(
-                          maxWidth: 300,
-                          maxHeight: 190,
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Row(
-                              children: [
-                                VoicesAssets.icons.chat.buildIcon(
-                                  color: context.colors.iconsPrimary,
-                                ),
-                                const Spacer(),
-                                VoicesAssets.icons.arrowRight.buildIcon(
-                                  color: context.colors.primaryContainer,
-                                ),
-                              ],
-                            ),
-                            const Spacer(),
-                            Text(
-                              context.l10n.viewProposalComments,
-                              style: context.textTheme.titleSmall?.copyWith(
-                                color: context.colors.textOnPrimaryLevel1,
-                              ),
-                            ),
-                            Text(
-                              context.l10n.viewProposalCommentsDescription,
-                              style: context.textTheme.bodyMedium?.copyWith(
-                                color: context.colors.sysColorsNeutralN60,
-                              ),
-                            ),
-                            const Spacer(),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 24),
+                  _HasCommentCard(),
+                  SizedBox(width: 24),
                 ],
               )
             : const SizedBox.shrink();

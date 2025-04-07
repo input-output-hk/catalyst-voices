@@ -304,7 +304,7 @@ class _ProposalsPageState extends State<ProposalsPage> {
 }
 
 class _TabBar extends StatelessWidget {
-  final TabController tabController;
+  final TabController? tabController;
 
   const _TabBar(this.tabController);
 
@@ -369,7 +369,7 @@ class _Tabs extends StatefulWidget {
 }
 
 class _TabsState extends State<_Tabs> with SingleTickerProviderStateMixin {
-  late final TabController _tabController;
+  TabController? _tabController;
 
   @override
   Widget build(BuildContext context) {
@@ -498,8 +498,21 @@ class _TabsState extends State<_Tabs> with SingleTickerProviderStateMixin {
   }
 
   @override
+  void didUpdateWidget(_Tabs oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.selectMyProposalsView != widget.selectMyProposalsView) {
+      _tabController?.dispose();
+      _tabController = null;
+      final initialIndex = widget.selectMyProposalsView ? 4 : 0;
+      _tabController =
+          TabController(length: 5, vsync: this, initialIndex: initialIndex);
+    }
+  }
+
+  @override
   void dispose() {
-    _tabController.dispose();
+    _tabController?.dispose();
+    _tabController = null;
     super.dispose();
   }
 
