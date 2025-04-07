@@ -14,7 +14,7 @@ project: {
 		bundle: {
 			modules: main: {
 				name:    "app"
-				version: "0.4.2"
+				version: "0.6.0"
 				values: {
 					deployment: {
 						containers: gateway: {
