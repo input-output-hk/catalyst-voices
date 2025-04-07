@@ -46,6 +46,10 @@ abstract interface class ProposalRepository {
     required DocumentRef ref,
   });
 
+  Future<ProposalPublish?> getProposalPublishForRef({
+    required DocumentRef ref,
+  });
+
   /// Fetches all proposals.
   Future<ProposalsSearchResult> getProposals({
     required ProposalPaginationRequest request,
@@ -69,14 +73,18 @@ abstract interface class ProposalRepository {
   });
 
   Future<void> publishProposalAction({
-    required SignedDocumentRef ref,
+    required SignedDocumentRef actionRef,
+    required SignedDocumentRef proposalRef,
     required SignedDocumentRef categoryId,
     required ProposalSubmissionAction action,
     required CatalystId catalystId,
     required CatalystPrivateKey privateKey,
   });
 
-  Future<List<ProposalDocument>> queryVersionsOfId({required String id});
+  Future<List<ProposalDocument>> queryVersionsOfId({
+    required String id,
+    bool includeLocalDrafts = false,
+  });
 
   Future<void> upsertDraftProposal({required DocumentData document});
 
@@ -86,6 +94,15 @@ abstract interface class ProposalRepository {
   });
 
   Stream<List<ProposalDocument>> watchLatestProposals({int? limit});
+
+  /// Watches for [ProposalSubmissionAction] that were made on [refTo] document.
+  ///
+  /// As making action on document not always creates a new document ref
+  /// we need to watch for actions on a document that has a reference to
+  /// [refTo] document.
+  Stream<ProposalPublish?> watchProposalPublish({
+    required DocumentRef refTo,
+  });
 
   Stream<List<ProposalDocument>> watchUserProposals({
     required CatalystId authorId,
@@ -124,6 +141,10 @@ final class ProposalRepositoryImpl implements ProposalRepository {
       ref: ref,
       type: DocumentType.commentDocument,
     );
+    final proposalPublish = await getProposalPublishForRef(ref: ref);
+    if (proposalPublish == null) {
+      throw const NotFoundException(message: 'Proposal is hidden');
+    }
     final templateRef = documentData.metadata.template!;
     final documentTemplate =
         await _documentRepository.getDocumentData(ref: templateRef);
@@ -131,23 +152,45 @@ final class ProposalRepositoryImpl implements ProposalRepository {
       documentData: documentData,
       templateData: documentTemplate,
     );
-    final documentVersions = await _documentRepository.getAllVersionsOfId(
+    final documentVersions = await queryVersionsOfId(
       id: ref.id,
+      includeLocalDrafts: true,
     );
-    final proposalVersions = documentVersions
-        .map(
-          (e) => _buildProposalData(
-            documentData: e,
-            documentTemplate: documentTemplate,
-          ),
-        )
+    final proposalVersions = (await Future.wait(
+      documentVersions.map(
+        (e) async {
+          final proposalPublish =
+              await getProposalPublishForRef(ref: e.metadata.selfRef);
+
+          if (proposalPublish == null) {
+            return null;
+          }
+          return ProposalData(document: e, publish: proposalPublish);
+        },
+      ).toList(),
+    ))
+        .whereType<ProposalData>()
         .toList();
 
     return ProposalData(
       document: proposalDocument,
       commentsCount: commentsCount,
       versions: proposalVersions,
+      publish: proposalPublish,
     );
+  }
+
+  @override
+  Future<ProposalPublish?> getProposalPublishForRef({
+    required DocumentRef ref,
+  }) async {
+    final data = await _documentRepository.getRefToDocumentData(
+      refTo: ref,
+      type: DocumentType.proposalActionDocument,
+    );
+
+    final action = _buildProposalActionData(data);
+    return _getProposalPublish(ref: ref, action: action);
   }
 
   @override
@@ -234,7 +277,8 @@ final class ProposalRepositoryImpl implements ProposalRepository {
 
   @override
   Future<void> publishProposalAction({
-    required SignedDocumentRef ref,
+    required SignedDocumentRef actionRef,
+    required SignedDocumentRef proposalRef,
     required SignedDocumentRef categoryId,
     required ProposalSubmissionAction action,
     required CatalystId catalystId,
@@ -243,14 +287,15 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     final dto = ProposalSubmissionActionDocumentDto(
       action: ProposalSubmissionActionDto.fromModel(action),
     );
-
     final signedDocument = await _signedDocumentManager.signDocument(
       SignedDocumentJsonPayload(dto.toJson()),
       metadata: SignedDocumentMetadata(
         contentType: SignedDocumentContentType.json,
         documentType: DocumentType.proposalActionDocument,
-        ref: SignedDocumentMetadataRef.fromDocumentRef(ref),
-        categoryId: SignedDocumentMetadataRef.fromDocumentRef(ref),
+        id: actionRef.id,
+        ver: actionRef.version,
+        ref: SignedDocumentMetadataRef.fromDocumentRef(proposalRef),
+        categoryId: SignedDocumentMetadataRef.fromDocumentRef(categoryId),
       ),
       catalystId: catalystId,
       privateKey: privateKey,
@@ -260,8 +305,14 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   }
 
   @override
-  Future<List<ProposalDocument>> queryVersionsOfId({required String id}) async {
-    final documents = await _documentRepository.queryVersionsOfId(id: id);
+  Future<List<ProposalDocument>> queryVersionsOfId({
+    required String id,
+    bool includeLocalDrafts = false,
+  }) async {
+    final documents = await _documentRepository.queryVersionsOfId(
+      id: id,
+      includeLocalDrafts: includeLocalDrafts,
+    );
 
     return documents
         .map(
@@ -310,6 +361,22 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   }
 
   @override
+  Stream<ProposalPublish?> watchProposalPublish({
+    required DocumentRef refTo,
+  }) {
+    return _documentRepository
+        .watchRefToDocumentData(
+      refTo: refTo,
+      type: DocumentType.proposalActionDocument,
+    )
+        .map((data) {
+      final action = _buildProposalActionData(data);
+
+      return _getProposalPublish(ref: refTo, action: action);
+    });
+  }
+
+  @override
   Stream<List<ProposalDocument>> watchUserProposals({
     required CatalystId authorId,
   }) {
@@ -336,21 +403,17 @@ final class ProposalRepositoryImpl implements ProposalRepository {
         );
   }
 
-  BaseProposalData _buildProposalData({
-    required DocumentData documentData,
-    required DocumentData documentTemplate,
-  }) {
-    assert(
-      documentData.metadata.type == DocumentType.proposalDocument,
-      'Not a proposalDocument document data type',
-    );
+  ProposalSubmissionAction? _buildProposalActionData(
+    DocumentData? action,
+  ) {
+    if (action == null) {
+      return null;
+    }
+    final proposalAction = ProposalSubmissionActionDocumentDto.fromJson(
+      action.content.data,
+    ).action.toModel();
 
-    final document = _buildProposalDocument(
-      documentData: documentData,
-      templateData: documentTemplate,
-    );
-
-    return BaseProposalData(document: document);
+    return proposalAction;
   }
 
   ProposalDocument _buildProposalDocument({
@@ -453,6 +516,21 @@ final class ProposalRepositoryImpl implements ProposalRepository {
       maxResults: favoritesRefs.length,
       proposals: proposals,
     );
+  }
+
+  ProposalPublish? _getProposalPublish({
+    required DocumentRef ref,
+    required ProposalSubmissionAction? action,
+  }) {
+    if (ref is DraftRef) {
+      return ProposalPublish.localDraft;
+    } else {
+      return switch (action) {
+        ProposalSubmissionAction.aFinal => ProposalPublish.submittedProposal,
+        ProposalSubmissionAction.hide => null,
+        _ => ProposalPublish.publishedDraft,
+      };
+    }
   }
 
   Future<ProposalsSearchResult> _getUserProposalsSearchResult(

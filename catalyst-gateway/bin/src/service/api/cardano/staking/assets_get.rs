@@ -69,46 +69,49 @@ pub(crate) async fn endpoint(
         }
     }
 
-    let Some(persistent_session) = CassandraSession::get(true) else {
-        tracing::error!("Failed to acquire persistent db session");
-        return AllResponses::service_unavailable(
-            &anyhow::anyhow!("Failed to acquire db session"),
-            RetryAfterOption::Default,
-        );
-    };
-    let Some(volatile_session) = CassandraSession::get(false) else {
-        tracing::error!("Failed to acquire volatile db session");
-        return AllResponses::service_unavailable(
-            &anyhow::anyhow!("Failed to acquire volatile db session"),
-            RetryAfterOption::Default,
-        );
-    };
-
-    let (persistent_res, volatile_res) = futures::join!(
-        calculate_stake_info(persistent_session, stake_address.clone(), slot_num),
-        calculate_stake_info(volatile_session, stake_address, slot_num)
-    );
-    let persistent_stake_info = match persistent_res {
-        Ok(stake_info) => stake_info,
-        Err(err) => return AllResponses::handle_error(&err),
-    };
-    let volatile_stake_info = match volatile_res {
-        Ok(stake_info) => stake_info,
-        Err(err) => return AllResponses::handle_error(&err),
+    let (persistent_stake_info, txo_state) = {
+        let Some(persistent_session) = CassandraSession::get(true) else {
+            tracing::error!("Failed to acquire persistent db session");
+            return AllResponses::service_unavailable(
+                &anyhow::anyhow!("Failed to acquire db session"),
+                RetryAfterOption::Default,
+            );
+        };
+        let persistent_res =
+            calculate_stake_info(persistent_session, stake_address.clone(), slot_num, None).await;
+        match persistent_res {
+            Ok(Some((stake_info, txo_state))) => (stake_info, txo_state),
+            Ok(None) => return Responses::NotFound.into(),
+            Err(err) => return AllResponses::handle_error(&err),
+        }
     };
 
-    if persistent_stake_info.is_none() && volatile_stake_info.is_none() {
-        return Responses::NotFound.into();
-    }
+    let volatile_stake_info = {
+        let Some(volatile_session) = CassandraSession::get(false) else {
+            tracing::error!("Failed to acquire volatile db session");
+            return AllResponses::service_unavailable(
+                &anyhow::anyhow!("Failed to acquire volatile db session"),
+                RetryAfterOption::Default,
+            );
+        };
+        let volatile_res =
+            calculate_stake_info(volatile_session, stake_address, slot_num, Some(txo_state)).await;
+        match volatile_res {
+            Ok(Some((stake_info, _))) => stake_info,
+            Ok(None) => return Responses::NotFound.into(),
+            Err(err) => return AllResponses::handle_error(&err),
+        }
+    };
 
     Responses::Ok(Json(FullStakeInfo {
-        volatile: volatile_stake_info.unwrap_or_default().into(),
-        persistent: persistent_stake_info.unwrap_or_default().into(),
+        volatile: volatile_stake_info.into(),
+        persistent: persistent_stake_info.into(),
     }))
     .into()
 }
 
 /// TXO asset information.
+#[derive(Clone)]
 struct TxoAssetInfo {
     /// Asset hash.
     id: Vec<u8>,
@@ -119,6 +122,7 @@ struct TxoAssetInfo {
 }
 
 /// TXO information used when calculating a user's stake info.
+#[derive(Clone)]
 struct TxoInfo {
     /// TXO value.
     value: num_bigint::BigInt,
@@ -138,17 +142,29 @@ struct TxoInfo {
 /// between lookups.
 async fn calculate_stake_info(
     session: Arc<CassandraSession>, stake_address: Cip19StakeAddress, slot_num: Option<SlotNo>,
-) -> anyhow::Result<Option<StakeInfo>> {
+    txo_base_state: Option<TxoAssetsState>,
+) -> anyhow::Result<Option<(StakeInfo, TxoAssetsState)>> {
     let address: StakeAddress = stake_address.try_into()?;
     let adjusted_slot_num = slot_num.unwrap_or(SlotNo::MAXIMUM);
 
-    let (mut txos, txo_assets) = futures::try_join!(
+    let (txos, txo_assets) = futures::try_join!(
         get_txo(&session, &address, adjusted_slot_num),
         get_txo_assets(&session, &address, adjusted_slot_num)
     )?;
-    if txos.is_empty() {
-        return Ok(None);
-    }
+
+    let (mut txos, txo_assets) = if let Some(TxoAssetsState {
+        txos: base_txos,
+        txo_assets: base_assets,
+    }) = txo_base_state
+    {
+        // Extend the base state with current session data (used to calculate volatile data)
+        (
+            base_txos.into_iter().chain(txos).collect(),
+            base_assets.into_iter().chain(txo_assets).collect(),
+        )
+    } else {
+        (txos, txo_assets)
+    };
 
     let params = update_spent(&session, &address, &mut txos).await?;
 
@@ -159,9 +175,13 @@ async fn calculate_stake_info(
         }
     });
 
-    let stake_info = build_stake_info(txos, txo_assets, adjusted_slot_num)?;
+    if txos.is_empty() && txo_assets.is_empty() {
+        return Ok(None);
+    }
 
-    Ok(Some(stake_info))
+    let stake_info = build_stake_info(txos.clone(), txo_assets.clone(), adjusted_slot_num)?;
+
+    Ok(Some((stake_info, TxoAssetsState { txos, txo_assets })))
 }
 
 /// `TxoInfo` map type alias
@@ -198,6 +218,14 @@ async fn get_txo(
 
 /// TXO Assets map type alias
 type TxoAssetsMap = HashMap<(Slot, TxnIndex, i16), TxoAssetInfo>;
+
+/// TXO Assets state
+struct TxoAssetsState {
+    /// TXO Info map
+    txos: TxoMap,
+    /// TXO Assets map
+    txo_assets: TxoAssetsMap,
+}
 
 /// Returns a map of txo asset infos for the given stake address.
 async fn get_txo_assets(

@@ -48,10 +48,17 @@ abstract interface class DocumentsDao {
 
   /// Returns all entities. If same document have different versions
   /// all will be returned.
-  Future<List<DocumentEntity>> queryAll();
+  Future<List<DocumentEntity>> queryAll({DocumentType? type});
 
   /// Returns all known document refs.
   Future<List<SignedDocumentRef>> queryAllRefs();
+
+  /// Returns document with matching refTo and type.
+  /// It return only lates version of document matching [refTo]
+  Future<DocumentEntity?> queryRefToDocumentData({
+    required DocumentRef refTo,
+    DocumentType? type,
+  });
 
   /// Returns a list of version of ref object.
   /// Can be used to get versions count.
@@ -81,6 +88,11 @@ abstract interface class DocumentsDao {
   /// Watches for new comments that are reference by ref.
   Stream<int> watchCount({
     required DocumentRef ref,
+    required DocumentType type,
+  });
+
+  Stream<DocumentEntity?> watchRefToDocumentData({
+    required DocumentRef refTo,
     required DocumentType type,
   });
 }
@@ -175,8 +187,13 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
   }
 
   @override
-  Future<List<DocumentEntity>> queryAll() {
-    return select(documents).get();
+  Future<List<DocumentEntity>> queryAll({DocumentType? type}) {
+    final query = select(documents);
+    if (type != null) {
+      query.where((doc) => doc.type.equals(type.uuid));
+    }
+
+    return query.get();
   }
 
   @override
@@ -204,9 +221,39 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
   }
 
   @override
+  Future<DocumentEntity?> queryRefToDocumentData({
+    required DocumentRef refTo,
+    DocumentType? type,
+  }) async {
+    final query = select(documents)
+      ..where(
+        (row) => Expression.and([
+          if (type != null) row.type.equals(type.uuid),
+          row.metadata.jsonExtract<String>(r'$.ref.id').equals(refTo.id),
+          if (refTo.version != null)
+            row.metadata
+                .jsonExtract<String>(r'$.ref.version')
+                .equals(refTo.version!),
+        ]),
+      )
+      ..orderBy([
+        (u) => OrderingTerm.desc(u.verHi),
+      ])
+      ..limit(1);
+
+    return query.getSingleOrNull();
+  }
+
+  @override
   Future<List<DocumentEntity>> queryVersionsOfId({required String id}) {
     final query = select(documents)
-      ..where((tbl) => _filterRef(tbl, SignedDocumentRef(id: id)))
+      ..where(
+        (tbl) => _filterRef(
+          tbl,
+          SignedDocumentRef(id: id),
+          filterVersion: false,
+        ),
+      )
       ..orderBy([
         (u) => OrderingTerm.desc(u.verHi),
       ]);
@@ -286,10 +333,6 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
           ),
     ]);
 
-    if (limit != null) {
-      query.limit(limit);
-    }
-
     if (unique) {
       return query.watch().map((list) {
         final latestVersions = <String, DocumentEntity>{};
@@ -299,10 +342,16 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
             latestVersions[id] = entity;
           }
         }
+        if (limit != null) {
+          return latestVersions.values.toList().take(limit).toList();
+        }
         return latestVersions.values.toList();
       });
     }
 
+    if (limit != null) {
+      query.limit(limit);
+    }
     return query.watch();
   }
 
@@ -328,6 +377,35 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
     return query.watch().map((comments) => comments.length).distinct();
   }
 
+  @override
+  Stream<DocumentEntity?> watchRefToDocumentData({
+    required DocumentRef refTo,
+    required DocumentType type,
+  }) {
+    final query = select(documents)
+      ..where(
+        (row) => Expression.and([
+          row.metadata.jsonExtract<String>(r'$.type').equals(type.uuid),
+          row.metadata.jsonExtract<String>(r'$.ref.id').equals(refTo.id),
+          if (refTo.version != null)
+            row.metadata
+                .jsonExtract<String>(r'$.ref.version')
+                .equals(refTo.version!),
+        ]),
+      )
+      ..orderBy([
+        (t) => OrderingTerm(
+              expression: t.verHi,
+              mode: OrderingMode.desc,
+            ),
+      ]);
+
+    return query
+        .watch()
+        .map((event) => event.firstOrNull)
+        .distinct(_entitiesEquals);
+  }
+
   bool _entitiesEquals(DocumentEntity? previous, DocumentEntity? next) {
     final previousId = (previous?.idHi, previous?.idLo);
     final nextId = (next?.idHi, next?.idLo);
@@ -338,14 +416,18 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
     return previousId == nextId && previousVer == nextVer;
   }
 
-  Expression<bool> _filterRef($DocumentsTable row, DocumentRef ref) {
+  Expression<bool> _filterRef(
+    $DocumentsTable row,
+    DocumentRef ref, {
+    bool filterVersion = true,
+  }) {
     final id = UuidHiLo.from(ref.id);
     final ver = UuidHiLo.fromNullable(ref.version);
 
     return Expression.and([
       row.idHi.equals(id.high),
       row.idLo.equals(id.low),
-      if (ver != null) ...[
+      if (ver != null && filterVersion) ...[
         row.verHi.equals(ver.high),
         row.verLo.equals(ver.low),
       ],

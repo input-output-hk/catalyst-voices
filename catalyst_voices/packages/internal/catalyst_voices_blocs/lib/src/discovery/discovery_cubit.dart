@@ -2,11 +2,14 @@ import 'dart:async';
 
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 part 'discovery_state.dart';
+
+final _logger = Logger('DiscoveryCubit');
 
 class DiscoveryCubit extends Cubit<DiscoveryState> {
   // ignore: unused_field
@@ -90,10 +93,12 @@ class DiscoveryCubit extends Cubit<DiscoveryState> {
   }
 
   void _setupProposalsSubscription() {
+    _logger.info('Setting up proposals subscription');
     _proposalsSubscription =
         _proposalService.watchLatestProposals(limit: 7).listen(
       (proposals) {
         if (isClosed) return;
+        _logger.info('Got proposals: ${proposals.length}');
         final proposalList = proposals
             .map(
               (e) => PendingProposal.fromProposal(

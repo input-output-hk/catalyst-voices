@@ -143,6 +143,9 @@ final class Dependencies extends DependencyProvider {
           get<ProposalService>(),
           get<DocumentMapper>(),
         );
+      })
+      ..registerFactory<CampaignStageCubit>(() {
+        return CampaignStageCubit(get<CampaignService>());
       });
   }
 
@@ -227,6 +230,7 @@ final class Dependencies extends DependencyProvider {
     });
     registerLazySingleton<AuthService>(() {
       return AuthService(
+        get<AuthTokenCache>(),
         get<UserObserver>(),
         get<KeyDerivationService>(),
       );
@@ -298,17 +302,25 @@ final class Dependencies extends DependencyProvider {
     registerLazySingleton<FlutterSecureStorage>(FlutterSecureStorage.new);
     registerLazySingleton<SharedPreferencesAsync>(SharedPreferencesAsync.new);
     registerLazySingleton<UserStorage>(SecureUserStorage.new);
-    registerLazySingleton<CatalystDatabase>(() {
-      final config = get<AppConfig>().database;
+    registerLazySingleton<CatalystDatabase>(
+      () {
+        final config = get<AppConfig>().database;
 
-      return CatalystDatabase.drift(
-        config: CatalystDriftDatabaseConfig(
-          name: config.name,
-          web: CatalystDriftDatabaseWebConfig(
-            sqlite3Wasm: Uri.parse(config.webSqlite3Wasm),
-            driftWorker: Uri.parse(config.webDriftWorker),
+        return CatalystDatabase.drift(
+          config: CatalystDriftDatabaseConfig(
+            name: config.name,
+            web: CatalystDriftDatabaseWebConfig(
+              sqlite3Wasm: Uri.parse(config.webSqlite3Wasm),
+              driftWorker: Uri.parse(config.webDriftWorker),
+            ),
           ),
-        ),
+        );
+      },
+      dispose: (database) async => database.close(),
+    );
+    registerLazySingleton<AuthTokenCache>(() {
+      return LocalAuthTokenCache(
+        sharedPreferences: get<SharedPreferencesAsync>(),
       );
     });
   }

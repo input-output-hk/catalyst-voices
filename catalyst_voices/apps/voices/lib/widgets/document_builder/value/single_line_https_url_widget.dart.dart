@@ -1,8 +1,8 @@
 import 'package:catalyst_voices/common/ext/text_editing_controller_ext.dart';
+import 'package:catalyst_voices/widgets/document_builder/common/document_property_builder_title.dart';
 import 'package:catalyst_voices/widgets/text_field/voices_https_text_field.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
@@ -29,19 +29,33 @@ class _SingleLineHttpsUrlWidgetState extends State<SingleLineHttpsUrlWidget> {
   late final TextEditingController _textEditingController;
   late final FocusNode _focusNode;
 
+  bool get _isRequired => widget.schema.isRequired;
+  String get _title => widget.schema.title;
   String get _value =>
       widget.property.value ?? widget.schema.defaultValue ?? '';
-  String get _title => widget.schema.title;
-  bool get _isRequired => widget.schema.isRequired;
 
   @override
-  void initState() {
-    super.initState();
-
-    final textValue = TextEditingValueExt.collapsedAtEndOf(_value);
-
-    _textEditingController = TextEditingController.fromValue(textValue);
-    _focusNode = FocusNode(canRequestFocus: widget.isEditMode);
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (_title.isNotEmpty) ...[
+          DocumentPropertyBuilderTitle(
+            title: _title,
+            isRequired: _isRequired,
+          ),
+          const SizedBox(height: 8),
+        ],
+        VoicesHttpsTextField(
+          controller: _textEditingController,
+          focusNode: _focusNode,
+          onChanged: _onChanged,
+          validator: _validator,
+          enabled: widget.isEditMode,
+        ),
+      ],
+    );
   }
 
   @override
@@ -65,27 +79,13 @@ class _SingleLineHttpsUrlWidgetState extends State<SingleLineHttpsUrlWidget> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        if (_title.isNotEmpty) ...[
-          Text(
-            _title.starred(isEnabled: _isRequired),
-            style: Theme.of(context).textTheme.titleSmall,
-          ),
-          const SizedBox(height: 8),
-        ],
-        VoicesHttpsTextField(
-          controller: _textEditingController,
-          focusNode: _focusNode,
-          onChanged: _onChanged,
-          validator: _validator,
-          enabled: widget.isEditMode,
-        ),
-      ],
-    );
+  void initState() {
+    super.initState();
+
+    final textValue = TextEditingValueExt.collapsedAtEndOf(_value);
+
+    _textEditingController = TextEditingController.fromValue(textValue);
+    _focusNode = FocusNode(canRequestFocus: widget.isEditMode);
   }
 
   void _onChanged(String? value) {
@@ -95,6 +95,16 @@ class _SingleLineHttpsUrlWidgetState extends State<SingleLineHttpsUrlWidget> {
       value: normalizedValue,
     );
     widget.onChanged([change]);
+  }
+
+  void _onEditModeChanged() {
+    _focusNode.canRequestFocus = widget.isEditMode;
+
+    if (widget.isEditMode) {
+      _focusNode.requestFocus();
+    } else {
+      _focusNode.unfocus();
+    }
   }
 
   VoicesTextFieldValidationResult _validator(String? value) {
@@ -110,16 +120,6 @@ class _SingleLineHttpsUrlWidgetState extends State<SingleLineHttpsUrlWidget> {
     } else {
       final localized = LocalizedDocumentValidationResult.from(result);
       return VoicesTextFieldValidationResult.error(localized.message(context));
-    }
-  }
-
-  void _onEditModeChanged() {
-    _focusNode.canRequestFocus = widget.isEditMode;
-
-    if (widget.isEditMode) {
-      _focusNode.requestFocus();
-    } else {
-      _focusNode.unfocus();
     }
   }
 }

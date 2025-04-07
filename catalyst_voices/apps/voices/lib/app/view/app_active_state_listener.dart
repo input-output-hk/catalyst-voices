@@ -18,32 +18,38 @@ class AppActiveStateListener extends StatefulWidget {
 
 class _AppActiveStateListenerState extends State<AppActiveStateListener> {
   late final AppLifecycleListener _listener;
-
-  @override
-  void initState() {
-    super.initState();
-    _listener = AppLifecycleListener(
-      onResume: _handleResumed,
-      onInactive: _handleInactive,
-    );
-  }
-
-  @override
-  void dispose() {
-    _listener.dispose();
-    super.dispose();
-  }
+  UserService? _userService;
 
   @override
   Widget build(BuildContext context) {
     return widget.child;
   }
 
-  Future<void> _handleResumed() async {
-    Dependencies.instance.get<UserService>().isActive = true;
+  @override
+  void dispose() {
+    _userService = null;
+    _listener.dispose();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    _userService = Dependencies.instance.isRegistered<UserService>()
+        ? Dependencies.instance.get<UserService>()
+        : null;
+    _listener = AppLifecycleListener(
+      onResume: _handleResumed,
+      onInactive: _handleInactive,
+    );
   }
 
   Future<void> _handleInactive() async {
-    Dependencies.instance.get<UserService>().isActive = false;
+    _userService?.isActive = false;
+  }
+
+  Future<void> _handleResumed() async {
+    _userService?.isActive = true;
   }
 }
