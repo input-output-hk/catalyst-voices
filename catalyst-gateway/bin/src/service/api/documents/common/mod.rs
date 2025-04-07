@@ -46,11 +46,7 @@ impl catalyst_signed_doc::providers::CatalystSignedDocumentProvider for DocProvi
 /// A struct which implements a
 /// `catalyst_signed_doc::providers::CatalystSignedDocumentProvider` trait
 pub(crate) struct VerifyingKeyProvider(
-    Vec<(
-        catalyst_signed_doc::IdUri,
-        ed25519_dalek::VerifyingKey,
-        usize,
-    )>,
+    Vec<(catalyst_signed_doc::IdUri, ed25519_dalek::VerifyingKey)>,
 );
 
 impl catalyst_signed_doc::providers::VerifyingKeyProvider for VerifyingKeyProvider {
@@ -95,24 +91,33 @@ impl VerifyingKeyProvider {
             anyhow::bail!("RBAC Token CatID does not match with the document KIDs");
         }
 
+        let Some(reg_chain) = token.reg_chain() else {
+            anyhow::bail!("Failed to retrieve a registration from coressponding Catalyst ID");
+        };
+
         let mut result = Vec::with_capacity(kids.len());
         for kid in kids {
-            let (role_index, _) = kid.role_and_rotation();
-            let role_index = RoleNumber::from(role_index.to_string().parse::<u8>()?);
+            if !kid.is_signature_key() {
+                anyhow::bail!("Invalid KID {kid}: KID must be a signing key not an encryption key");
+            }
 
-            let Some(reg_chain) = token.reg_chain() else {
-                anyhow::bail!("Failed to retrieve a registration chain for {kid} Catalyst ID")
-            };
+            let (kid_role_index, kid_rotation) = kid.role_and_rotation();
+            let kid_role_index = RoleNumber::from(kid_role_index.to_string().parse::<u8>()?);
+            let kid_rotation = kid_rotation.to_string().parse::<usize>()?;
 
             let (latest_pk, rotation) = reg_chain
-                .get_latest_signing_pk_for_role(&role_index)
+                .get_latest_signing_pk_for_role(&kid_role_index)
                 .ok_or_else(|| {
-                    anyhow::anyhow!(
-                        "Failed to get last signing key for the proposer role for {kid} Catalyst ID"
-                    )
-                })?;
+                anyhow::anyhow!(
+                    "Failed to get last signing key for the proposer role for {kid} Catalyst ID"
+                )
+            })?;
 
-            result.push((kid.clone(), latest_pk, rotation));
+            if rotation != kid_rotation {
+                anyhow::bail!("Invalid KID {kid}: KID's rotation ({kid_rotation}) is not the latest rotation ({rotation})");
+            }
+
+            result.push((kid.clone(), latest_pk));
         }
 
         Ok(Self(result))

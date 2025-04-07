@@ -192,11 +192,7 @@ async fn validate_against_original_doc(
 async fn store_document_in_db(
     doc: &catalyst_signed_doc::CatalystSignedDocument, doc_bytes: Vec<u8>,
 ) -> anyhow::Result<bool> {
-    let authors = doc
-        .authors()
-        .iter()
-        .map(|kid| kid.to_string())
-        .collect();
+    let authors = doc.authors().iter().map(ToString::to_string).collect();
 
     let doc_meta_json = match serde_json::to_value(doc.doc_meta()) {
         Ok(json) => json,
