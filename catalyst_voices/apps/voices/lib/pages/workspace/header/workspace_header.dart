@@ -41,49 +41,52 @@ class _ViewComments extends StatelessWidget {
             ? Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  GestureDetector(
-                    onTap: () async =>
-                        ProposalsRoute.myProposals().push(context),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: context.colors.elevationsOnSurfaceNeutralLv0,
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      padding: const EdgeInsets.all(16),
-                      constraints: const BoxConstraints(
-                        maxWidth: 300,
-                        maxHeight: 190,
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Row(
-                            children: [
-                              VoicesAssets.icons.chat.buildIcon(
-                                color: context.colors.iconsPrimary,
-                              ),
-                              const Spacer(),
-                              VoicesAssets.icons.arrowRight.buildIcon(
-                                color: context.colors.primaryContainer,
-                              ),
-                            ],
-                          ),
-                          const Spacer(),
-                          Text(
-                            context.l10n.viewProposalComments,
-                            style: context.textTheme.titleSmall?.copyWith(
-                              color: context.colors.textOnPrimaryLevel1,
+                  MouseRegion(
+                    cursor: SystemMouseCursors.click,
+                    child: GestureDetector(
+                      onTap: () async =>
+                          ProposalsRoute.myProposals().push(context),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: context.colors.elevationsOnSurfaceNeutralLv0,
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        padding: const EdgeInsets.all(16),
+                        constraints: const BoxConstraints(
+                          maxWidth: 300,
+                          maxHeight: 190,
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Row(
+                              children: [
+                                VoicesAssets.icons.chat.buildIcon(
+                                  color: context.colors.iconsPrimary,
+                                ),
+                                const Spacer(),
+                                VoicesAssets.icons.arrowRight.buildIcon(
+                                  color: context.colors.primaryContainer,
+                                ),
+                              ],
                             ),
-                          ),
-                          Text(
-                            context.l10n.viewProposalCommentsDescription,
-                            style: context.textTheme.bodyMedium?.copyWith(
-                              color: context.colors.sysColorsNeutralN60,
+                            const Spacer(),
+                            Text(
+                              context.l10n.viewProposalComments,
+                              style: context.textTheme.titleSmall?.copyWith(
+                                color: context.colors.textOnPrimaryLevel1,
+                              ),
                             ),
-                          ),
-                          const Spacer(),
-                        ],
+                            Text(
+                              context.l10n.viewProposalCommentsDescription,
+                              style: context.textTheme.bodyMedium?.copyWith(
+                                color: context.colors.sysColorsNeutralN60,
+                              ),
+                            ),
+                            const Spacer(),
+                          ],
+                        ),
                       ),
                     ),
                   ),
