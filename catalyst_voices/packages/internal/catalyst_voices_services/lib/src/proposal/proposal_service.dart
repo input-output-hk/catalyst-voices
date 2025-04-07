@@ -477,7 +477,7 @@ final class ProposalServiceImpl implements ProposalService {
 
     final commentsCountStream = _proposalRepository.watchCount(
       ref: selfRef,
-      type: DocumentType.commentTemplate,
+      type: DocumentType.commentDocument,
     );
 
     return Rx.combineLatest2(
