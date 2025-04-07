@@ -6,27 +6,7 @@ import 'package:catalyst_voices_repositories/src/dto/document/document_data_dto.
 import 'package:catalyst_voices_repositories/src/dto/document/document_dto.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/schema/document_schema_dto.dart';
 import 'package:catalyst_voices_repositories/src/dto/proposal/proposal_submission_action_dto.dart';
-import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:rxdart/rxdart.dart';
-
-final _proposalDescription = """
-Zanzibar is becoming one of the hotspots for DID's through
-World Mobile and PRISM, but its potential is only barely exploited.
-Zanzibar is becoming one of the hotspots for DID's through World Mobile
-and PRISM, but its potential is only barely exploited.
-"""
-    .replaceAll('\n', ' ');
-
-// TODO(LynxLynxx): remove after implementing reading db
-int _maxResults(ProposalPublish? stage) {
-  if (stage == null) {
-    return 64;
-  }
-  if (stage == ProposalPublish.submittedProposal) {
-    return 48;
-  }
-  return 32;
-}
 
 abstract interface class ProposalRepository {
   const factory ProposalRepository(
@@ -51,6 +31,7 @@ abstract interface class ProposalRepository {
   /// Fetches all proposals.
   Future<ProposalsSearchResult> getProposals({
     required PaginationPage<String?> request,
+    required ProposalsFilters filters,
   });
 
   /// Returns [ProposalTemplate] for matching [ref].
@@ -59,8 +40,6 @@ abstract interface class ProposalRepository {
   Future<ProposalTemplate> getProposalTemplate({
     required DocumentRef ref,
   });
-
-  Future<List<String>> getUserProposalsIds(String userId);
 
   Future<DocumentRef> importProposal(Uint8List data, CatalystId authorId);
 
@@ -194,50 +173,13 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   @override
   Future<ProposalsSearchResult> getProposals({
     required PaginationPage<String?> request,
+    required ProposalsFilters filters,
   }) async {
+    // TODO(damian-molinski): integrate it
     return const ProposalsSearchResult(
       maxResults: 0,
       proposals: [],
     );
-/*    // optionally filter by status.
-    final proposals = <Proposal>[];
-
-    // Return users proposals match his account id with proposals metadata from
-    // author field.
-    if (request.usersProposals) {
-      return _getUserProposalsSearchResult(request);
-    } else if (request.usersFavorite) {
-      return _getFavoritesProposalsSearchResult(request);
-    }
-
-    for (var i = 0; i < request.pageSize; i++) {
-      // ignore: lines_longer_than_80_chars
-      final stage = Random().nextBool()
-          ? ProposalPublish.submittedProposal
-          : ProposalPublish.publishedDraft;
-      proposals.add(
-        Proposal(
-          selfRef: SignedDocumentRef.generateFirstRef(),
-          category: 'Cardano Use Cases / MVP',
-          categoryId: const SignedDocumentRef(id: 'dummy_category_id'),
-          title: 'Proposal Title that rocks the world',
-          updateDate: DateTime.now().minusDays(2),
-          fundsRequested: const Coin.fromWholeAda(100000),
-          status: ProposalStatus.draft,
-          publish: request.stage ?? stage,
-          commentsCount: 0,
-          description: _proposalDescription,
-          duration: 6,
-          author: 'Alex Wells',
-          versions: const [],
-        ),
-      );
-    }
-
-    return ProposalsSearchResult(
-      maxResults: _maxResults(request.stage),
-      proposals: proposals,
-    );*/
   }
 
   @override
@@ -248,12 +190,6 @@ final class ProposalRepositoryImpl implements ProposalRepository {
         await _documentRepository.getDocumentData(ref: ref);
 
     return _buildProposalTemplate(documentData: proposalDocument);
-  }
-
-  @override
-  Future<List<String>> getUserProposalsIds(String userId) async {
-    // TODO(LynxLynxx): read db to get user's proposals
-    return <String>[];
   }
 
   @override
@@ -489,37 +425,6 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     );
   }
 
-  Future<ProposalsSearchResult> _getFavoritesProposalsSearchResult(
-    PaginationPage<String?> request,
-  ) async {
-    final favoritesRefs = await _documentRepository
-        .watchAllDocumentsFavoriteIds(type: DocumentType.proposalDocument)
-        .map((event) => event.map((e) => SignedDocumentRef(id: e)).toList())
-        .first;
-    final proposals = <Proposal>[];
-    final range = PagingRange.calculateRange(
-      pageKey: request.pageKey,
-      itemsPerPage: request.pageSize,
-      maxResults: favoritesRefs.length,
-    );
-    if (favoritesRefs.isEmpty) {
-      return const ProposalsSearchResult(
-        maxResults: 0,
-        proposals: [],
-      );
-    }
-    for (var i = range.from; i <= range.to; i++) {
-      final proposalData = await getProposal(ref: favoritesRefs[i]);
-      final proposal = Proposal.fromData(proposalData);
-      proposals.add(proposal);
-    }
-
-    return ProposalsSearchResult(
-      maxResults: favoritesRefs.length,
-      proposals: proposals,
-    );
-  }
-
   ProposalPublish? _getProposalPublish({
     required DocumentRef ref,
     required ProposalSubmissionAction? action,
@@ -533,34 +438,5 @@ final class ProposalRepositoryImpl implements ProposalRepository {
         _ => ProposalPublish.publishedDraft,
       };
     }
-  }
-
-  Future<ProposalsSearchResult> _getUserProposalsSearchResult(
-    PaginationPage<String?> request,
-  ) async {
-    final userProposalsIds = await getUserProposalsIds('');
-    final proposals = <Proposal>[];
-    final range = PagingRange.calculateRange(
-      pageKey: request.pageKey,
-      itemsPerPage: request.pageSize,
-      maxResults: userProposalsIds.length,
-    );
-    if (userProposalsIds.isEmpty) {
-      return const ProposalsSearchResult(
-        maxResults: 0,
-        proposals: [],
-      );
-    }
-    for (var i = range.from; i <= range.to; i++) {
-      final ref = SignedDocumentRef(id: userProposalsIds[i]);
-      final proposalData = await getProposal(ref: ref);
-      final proposal = Proposal.fromData(proposalData);
-      proposals.add(proposal);
-    }
-
-    return ProposalsSearchResult(
-      maxResults: userProposalsIds.length,
-      proposals: proposals,
-    );
   }
 }

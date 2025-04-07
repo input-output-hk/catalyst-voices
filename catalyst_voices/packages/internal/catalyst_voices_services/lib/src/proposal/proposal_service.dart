@@ -55,15 +55,12 @@ abstract interface class ProposalService {
 
   Future<ProposalPaginationItems<Proposal>> getProposals({
     required PaginationPage<String?> request,
+    required ProposalsFilters filters,
   });
 
   Future<ProposalTemplate> getProposalTemplate({
     required DocumentRef ref,
   });
-
-  /// Fetches user's proposals ids  depending on his id that is saved
-  /// in metadata of proposal document
-  Future<List<String>> getUserProposalsIds(String userId);
 
   /// Imports the proposal from [data] encoded by [encodeProposalForExport].
   ///
@@ -224,9 +221,11 @@ final class ProposalServiceImpl implements ProposalService {
   @override
   Future<ProposalPaginationItems<Proposal>> getProposals({
     required PaginationPage<String?> request,
+    required ProposalsFilters filters,
   }) async {
     final proposals = await _proposalRepository.getProposals(
       request: request,
+      filters: filters,
     );
 
     return ProposalPaginationItems(
@@ -245,12 +244,6 @@ final class ProposalServiceImpl implements ProposalService {
     );
 
     return proposalTemplate;
-  }
-
-  @override
-  Future<List<String>> getUserProposalsIds(String userId) async {
-    final proposalsIds = await _proposalRepository.getUserProposalsIds(userId);
-    return proposalsIds;
   }
 
   @override

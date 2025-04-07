@@ -104,6 +104,7 @@ final class ProposalsCubit extends Cubit<ProposalsState>
 
       final proposals = await _proposalService.getProposals(
         request: request,
+        filters: filters,
       );
 
       final proposalsViewModels = proposals.items.map(
