@@ -85,7 +85,6 @@ final class DiscoveryMostRecentProposalsState extends Equatable {
     bool? isLoading,
     LocalizedException? error,
     List<PendingProposal>? proposals,
-    List<String>? favoritesProposalsIds,
   }) {
     return DiscoveryMostRecentProposalsState(
       isLoading: isLoading ?? this.isLoading,

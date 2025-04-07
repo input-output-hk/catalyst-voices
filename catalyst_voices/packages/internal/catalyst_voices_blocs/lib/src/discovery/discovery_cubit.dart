@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
@@ -11,7 +12,7 @@ part 'discovery_state.dart';
 
 final _logger = Logger('DiscoveryCubit');
 
-class DiscoveryCubit extends Cubit<DiscoveryState> {
+class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
   // ignore: unused_field
   final CampaignService _campaignService;
   final ProposalService _proposalService;
@@ -24,7 +25,11 @@ class DiscoveryCubit extends Cubit<DiscoveryState> {
   ) : super(const DiscoveryState());
 
   Future<void> addFavorite(DocumentRef ref) async {
-    await _proposalService.addFavoriteProposal(ref: ref);
+    try {
+      await _proposalService.addFavoriteProposal(ref: ref);
+    } catch (e) {
+      emitError(const LocalizedUnknownException());
+    }
   }
 
   @override
@@ -111,7 +116,11 @@ class DiscoveryCubit extends Cubit<DiscoveryState> {
   }
 
   Future<void> removeFavorite(DocumentRef ref) async {
-    await _proposalService.removeFavoriteProposal(ref: ref);
+    try {
+      await _proposalService.removeFavoriteProposal(ref: ref);
+    } catch (e) {
+      emitError(const LocalizedUnknownException());
+    }
   }
 
   void _emitFavoritesIds(List<String> ids) {
@@ -166,12 +175,8 @@ class DiscoveryCubit extends Cubit<DiscoveryState> {
     _logger.info('Setting up favorites proposals ids subscription');
     _favoritesProposalsIdsSubscription =
         _proposalService.watchFavoritesProposalsIds().listen(
-      (ids) {
-        if (isClosed) return;
-        _emitFavoritesIds(ids);
-      },
+      _emitFavoritesIds,
       onError: (Object error) {
-        if (isClosed) return;
         _emitMostRecentError(error);
       },
     );
@@ -182,7 +187,6 @@ class DiscoveryCubit extends Cubit<DiscoveryState> {
     _proposalsSubscription =
         _proposalService.watchLatestProposals(limit: 7).listen(
       (proposals) async {
-        if (isClosed) return;
         _logger.info('Got proposals: ${proposals.length}');
         _emitMostRecentProposals(proposals);
         final currentFavorites =
@@ -190,7 +194,6 @@ class DiscoveryCubit extends Cubit<DiscoveryState> {
         _emitFavoritesIds(currentFavorites);
       },
       onError: (Object error) {
-        if (isClosed) return;
         _emitMostRecentError(error);
       },
     );
