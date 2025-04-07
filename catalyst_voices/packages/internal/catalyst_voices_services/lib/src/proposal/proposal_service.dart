@@ -53,7 +53,7 @@ abstract interface class ProposalService {
     required DocumentRef ref,
   });
 
-  Future<ProposalPaginationItems<Proposal>> getProposals({
+  Future<ProposalPaginationItems<Proposal>> getProposalsPage({
     required PaginationPage<String?> request,
     required ProposalsFilters filters,
   });
@@ -115,6 +115,10 @@ abstract interface class ProposalService {
   });
 
   Stream<List<Proposal>> watchLatestProposals({int? limit});
+
+  Stream<ProposalsFiltersCount> watchProposalsCount({
+    required ProposalsFilters filters,
+  });
 
   Stream<List<Proposal>> watchUserProposals();
 }
@@ -219,11 +223,11 @@ final class ProposalServiceImpl implements ProposalService {
   }
 
   @override
-  Future<ProposalPaginationItems<Proposal>> getProposals({
+  Future<ProposalPaginationItems<Proposal>> getProposalsPage({
     required PaginationPage<String?> request,
     required ProposalsFilters filters,
   }) async {
-    final proposals = await _proposalRepository.getProposals(
+    final proposals = await _proposalRepository.getProposalsPage(
       request: request,
       filters: filters,
     );
@@ -388,6 +392,13 @@ final class ProposalServiceImpl implements ProposalService {
         },
       ).switchMap(Stream.fromFuture);
     });
+  }
+
+  @override
+  Stream<ProposalsFiltersCount> watchProposalsCount({
+    required ProposalsFilters filters,
+  }) {
+    return _proposalRepository.watchProposalsCount(filters: filters);
   }
 
   @override

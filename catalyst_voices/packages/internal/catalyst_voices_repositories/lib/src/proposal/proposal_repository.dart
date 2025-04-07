@@ -28,8 +28,9 @@ abstract interface class ProposalRepository {
     required DocumentRef ref,
   });
 
-  /// Fetches all proposals.
-  Future<ProposalsSearchResult> getProposals({
+  /// Fetches all proposals for page matching [request] as well as
+  /// [filters].
+  Future<ProposalsSearchResult> getProposalsPage({
     required PaginationPage<String?> request,
     required ProposalsFilters filters,
   });
@@ -79,6 +80,10 @@ abstract interface class ProposalRepository {
   /// [refTo] document.
   Stream<ProposalPublish?> watchProposalPublish({
     required DocumentRef refTo,
+  });
+
+  Stream<ProposalsFiltersCount> watchProposalsCount({
+    required ProposalsFilters filters,
   });
 
   Stream<List<ProposalDocument>> watchUserProposals({
@@ -171,7 +176,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   }
 
   @override
-  Future<ProposalsSearchResult> getProposals({
+  Future<ProposalsSearchResult> getProposalsPage({
     required PaginationPage<String?> request,
     required ProposalsFilters filters,
   }) async {
@@ -312,6 +317,14 @@ final class ProposalRepositoryImpl implements ProposalRepository {
 
       return _getProposalPublish(ref: refTo, action: action);
     });
+  }
+
+  @override
+  Stream<ProposalsFiltersCount> watchProposalsCount({
+    required ProposalsFilters filters,
+  }) {
+    // TODO(damian-molinski): implement watchProposalsCount
+    return Stream.value(const ProposalsFiltersCount({}));
   }
 
   @override

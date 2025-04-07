@@ -22,6 +22,7 @@ final class ProposalsCubit extends Cubit<ProposalsState>
 
   StreamSubscription<CatalystId?>? _activeAccountIdSub;
   StreamSubscription<List<String>>? _favouriteProposalsIdsSub;
+  StreamSubscription<ProposalsFiltersCount>? _proposalsCountSub;
 
   ProposalsCubit(
     this._userService,
@@ -64,6 +65,8 @@ final class ProposalsCubit extends Cubit<ProposalsState>
 
     if (category != null) _rebuildCategories();
 
+    _watchProposalsCount(filters: filters);
+
     emitSignal(const ResetProposalsPaginationSignal());
   }
 
@@ -78,6 +81,9 @@ final class ProposalsCubit extends Cubit<ProposalsState>
 
     await _favouriteProposalsIdsSub?.cancel();
     _favouriteProposalsIdsSub = null;
+
+    await _proposalsCountSub?.cancel();
+    _proposalsCountSub = null;
 
     return super.close();
   }
@@ -100,14 +106,14 @@ final class ProposalsCubit extends Cubit<ProposalsState>
 
       final filters = _cache.filters;
 
-      _logger.finer('Requesting proposals page[$request] with [$filters]');
+      _logger.finer('Requesting page[$request] with [$filters]');
 
-      final proposals = await _proposalService.getProposals(
+      final page = await _proposalService.getProposalsPage(
         request: request,
         filters: filters,
       );
 
-      final proposalsViewModels = proposals.items.map(
+      final proposals = page.items.map(
         (proposal) {
           return ProposalViewModel.fromProposalAtStage(
             proposal: proposal,
@@ -118,14 +124,14 @@ final class ProposalsCubit extends Cubit<ProposalsState>
       ).toList();
 
       final proposalsPagination = ProposalPaginationItems(
-        pageKey: proposals.pageKey,
-        maxResults: proposals.maxResults,
-        items: proposalsViewModels,
+        pageKey: page.pageKey,
+        maxResults: page.maxResults,
+        items: proposals,
       );
 
       emit(state.copyWith(proposals: proposalsPagination));
     } catch (error, stackTrace) {
-      _logger.severe('Failed loading proposals $request', error, stackTrace);
+      _logger.severe('Failed loading page $request', error, stackTrace);
     } finally {
       emit(state.copyWithLoadingProposals(isLoading: false));
     }
@@ -190,6 +196,20 @@ final class ProposalsCubit extends Cubit<ProposalsState>
     emit(state.copyWith(favoritesIds: ids));
   }
 
+  void _handleProposalsCount(ProposalsFiltersCount count) {
+    _cache = _cache.copyWith(count: count);
+
+    final typeCount = ProposalsTypeCount(
+      total: count.countOf(type: ProposalsFilterType.total),
+      drafts: count.countOf(type: ProposalsFilterType.drafts),
+      finals: count.countOf(type: ProposalsFilterType.finals),
+      favorites: count.countOf(type: ProposalsFilterType.favorites),
+      my: count.countOf(type: ProposalsFilterType.my),
+    );
+
+    emit(state.copyWith(count: typeCount));
+  }
+
   Future<void> _loadCampaignCategories() async {
     final categories = await _campaignService.getCampaignCategories();
 
@@ -213,5 +233,15 @@ final class ProposalsCubit extends Cubit<ProposalsState>
     }).toList();
 
     emit(state.copyWith(categorySelectorItems: categorySelectorItems));
+  }
+
+  void _watchProposalsCount({
+    required ProposalsFilters filters,
+  }) {
+    unawaited(_proposalsCountSub?.cancel());
+    _proposalsCountSub = _proposalService
+        .watchProposalsCount(filters: filters)
+        .distinct()
+        .listen(_handleProposalsCount);
   }
 }

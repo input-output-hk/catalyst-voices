@@ -58,6 +58,7 @@ export 'proposal/proposal_forget_actions.dart';
 export 'proposal/proposal_pagination_items.dart';
 export 'proposal/proposal_version.dart';
 export 'proposals/proposals_filters.dart';
+export 'proposals/proposals_filters_count.dart';
 export 'registration/account_submit_data.dart';
 export 'registration/registration.dart';
 export 'signed_document/signed_document.dart';
