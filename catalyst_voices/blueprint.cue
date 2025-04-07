@@ -6,25 +6,27 @@ project: {
 			merge: {}
 			tag: {}
 		}
-		modules: main: {
-			name:    "app"
-			version: "0.4.2"
-			values: {
-				deployment: containers: main: {
-					image: {
-						name: _ @forge(name="CONTAINER_IMAGE")
-						tag:  _ @forge(name="GIT_HASH_OR_TAG")
+		bundle: {
+			modules: main: {
+				name:    "app"
+				version: "0.6.0"
+				values: {
+					deployment: containers: main: {
+						image: {
+							name: _ @forge(name="CONTAINER_IMAGE")
+							tag:  _ @forge(name="GIT_HASH_OR_TAG")
+						}
+						port: 80
+						probes: {
+							liveness: path:  "/"
+							readiness: path: "/"
+						}
 					}
-					port: 80
-					probes: {
-						liveness: path:  "/"
-						readiness: path: "/"
+					ingress: subdomain: "voices"
+					service: {
+						targetPort: 80
+						port:       80
 					}
-				}
-				ingress: subdomain: "voices"
-				service: {
-					targetPort: 80
-					port:       80
 				}
 			}
 		}
