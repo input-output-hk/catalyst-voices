@@ -2,6 +2,7 @@ export 'account/account.dart';
 export 'admin_tools/admin_tools.dart';
 export 'brand/brand.dart';
 export 'campaign/campaign_builder/campaign_builder.dart';
+export 'campaign/campaign_stage/campaign_stage.dart';
 export 'campaign/details/campaign_details.dart';
 export 'campaign/info/campaign_info.dart';
 export 'category/category_detail.dart';

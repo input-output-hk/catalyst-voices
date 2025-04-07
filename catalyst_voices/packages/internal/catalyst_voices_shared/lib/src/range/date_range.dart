@@ -9,18 +9,8 @@ class DateRange extends Equatable {
     required this.to,
   });
 
-  bool isInRange(DateTime value) {
-    final min = from?.millisecondsSinceEpoch ?? 0;
-    final max =
-        to?.millisecondsSinceEpoch ?? DateTime(2099).millisecondsSinceEpoch;
-    final valueMillis = value.millisecondsSinceEpoch;
-
-    return min <= valueMillis && valueMillis <= max;
-  }
-
-  bool isTodayInRange() {
-    return isInRange(DateTime.now());
-  }
+  @override
+  List<Object?> get props => [from, to];
 
   /// Checks if the date [from] is the first day of the week
   /// and [to] is the last day
@@ -49,6 +39,31 @@ class DateRange extends Equatable {
     return adjustedFromWeekday == 0 && adjustedToWeekday == 6;
   }
 
-  @override
-  List<Object?> get props => [from, to];
+  bool isAfterRange(DateTime value) {
+    final max =
+        to?.millisecondsSinceEpoch ?? DateTime(2099).millisecondsSinceEpoch;
+    final valueMillis = value.millisecondsSinceEpoch;
+
+    return max < valueMillis;
+  }
+
+  bool isBeforeRange(DateTime value) {
+    final min = from?.millisecondsSinceEpoch ?? 0;
+    final valueMillis = value.millisecondsSinceEpoch;
+
+    return min > valueMillis;
+  }
+
+  bool isInRange(DateTime value) {
+    final min = from?.millisecondsSinceEpoch ?? 0;
+    final max =
+        to?.millisecondsSinceEpoch ?? DateTime(2099).millisecondsSinceEpoch;
+    final valueMillis = value.millisecondsSinceEpoch;
+
+    return min <= valueMillis && valueMillis <= max;
+  }
+
+  bool isTodayInRange() {
+    return isInRange(DateTime.now());
+  }
 }

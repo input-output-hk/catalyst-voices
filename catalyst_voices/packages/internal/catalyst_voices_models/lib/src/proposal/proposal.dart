@@ -69,8 +69,7 @@ final class Proposal extends Equatable {
       updateDate: updateDate,
       fundsRequested: document.fundsRequested ?? const Coin.fromWholeAda(0),
       status: ProposalStatus.inProgress,
-      // TODO(LynxLynxx): from where we need to get the real publish
-      publish: ProposalPublish.localDraft,
+      publish: data.publish,
       duration: document.duration ?? 0,
       author: document.authorName ?? '',
       commentsCount: data.commentsCount,
@@ -110,6 +109,8 @@ final class Proposal extends Equatable {
         category,
         categoryId,
         commentsCount,
+        versionCount,
+        versions,
       ];
 
   int get versionCount => versions.length;

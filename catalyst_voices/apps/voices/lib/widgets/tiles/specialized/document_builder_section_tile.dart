@@ -1,4 +1,6 @@
+import 'package:catalyst_voices/widgets/document_builder/viewer/document_property_builder_viewer.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
+import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart' as model;
 import 'package:flutter/material.dart';
@@ -75,18 +77,27 @@ class _DocumentBuilderSectionTileState
       isEditMode: _isEditMode,
       isSaveEnabled: true,
       isEditEnabled: widget.isEditable,
+      saveText: context.l10n.saveChangesButtonText,
       errorText: _errorText,
+      saveButtonLeading: VoicesAssets.icons.check.buildIcon(),
+      editCancelButtonStyle: VoicesEditCancelButtonStyle.outlinedWithIcon,
       onChanged: _onEditModeChange,
       child: Form(
         key: _formKey,
         autovalidateMode: widget.autovalidateMode,
-        child: DocumentPropertyBuilder(
-          key: ValueKey(_editedSection.schema.nodeId),
-          property: _editedSection,
-          isEditMode: _isEditMode,
-          onChanged: _handlePropertyChanges,
-          overrides: widget.overrides,
-        ),
+        child: _isEditMode
+            ? DocumentPropertyBuilder(
+                key: ValueKey(_editedSection.schema.nodeId),
+                property: _editedSection,
+                isEditMode: _isEditMode,
+                onChanged: _handlePropertyChanges,
+                overrides: widget.overrides,
+              )
+            : DocumentPropertyBuilderViewer(
+                key: ValueKey(_editedSection.schema.nodeId),
+                property: _editedSection,
+                overrides: widget.overrides,
+              ),
       ),
     );
   }

@@ -7,7 +7,7 @@ import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
-/// Error dialog when submitting proposal for review fails..
+/// Error dialog when submitting proposal for review fails.
 class SubmitProposalErrorDialog {
   static Future<void> show({
     required BuildContext context,
