@@ -20,8 +20,8 @@ class AppSplashScreenManager extends StatefulWidget {
     FlutterNativeSplash.remove();
   }
 
-  /// Flutter by default removes the splash screen when it draws the first frame,
-  /// we'd like to preserve it until we've loaded the content.
+  /// Flutter by default removes the splash screen when it draws the first
+  /// frame, we'd like to preserve it until we've loaded the content.
   ///
   /// https://pub.dev/packages/flutter_native_splash#3-set-up-app-initialization-optional
   static void preserveSplashScreen(WidgetsBinding widgetsBinding) {
