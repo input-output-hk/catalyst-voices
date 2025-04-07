@@ -136,20 +136,6 @@ struct TxoInfo {
     spent_slot_no: Option<Slot>,
 }
 
-/// Calculate TXO State
-async fn _calculate_address_txo_data(
-    session: Arc<CassandraSession>, stake_address: Cip19StakeAddress, slot_num: Option<SlotNo>,
-) -> anyhow::Result<(TxoMap, TxoAssetsMap)> {
-    let address: StakeAddress = stake_address.try_into()?;
-    let adjusted_slot_num = slot_num.unwrap_or(SlotNo::MAXIMUM);
-
-    let (txos, txo_assets) = futures::try_join!(
-        get_txo(&session, &address, adjusted_slot_num),
-        get_txo_assets(&session, &address, adjusted_slot_num)
-    )?;
-    Ok((txos, txo_assets))
-}
-
 /// Calculate the stake info for a given stake address.
 ///
 /// This function also updates the spent column if it detects that a TXO was spent
