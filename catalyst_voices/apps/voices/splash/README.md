@@ -5,7 +5,7 @@ The splash screen is created using the
 
 To regenerate modify the flutter_native_splash.yaml and run the command:
 
-```
+```sh
 cd <the-same-directory-where-application's-pubspec.yaml-is>
 dart run flutter_native_splash:create --path=splash/flutter_native_splash.yaml
 ```
