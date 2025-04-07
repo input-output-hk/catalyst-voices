@@ -114,6 +114,22 @@ class DiscoveryCubit extends Cubit<DiscoveryState> {
     await _proposalService.removeFavoriteProposal(ref: ref);
   }
 
+  void _emitFavoritesIds(List<String> ids) {
+    final proposals = state.mostRecentProposals.proposals;
+
+    final newProposals = [...proposals]
+        .map((e) => e.copyWith(isFavorite: ids.contains(e.ref.id)))
+        .toList();
+
+    emit(
+      state.copyWith(
+        mostRecentProposals: state.mostRecentProposals.copyWith(
+          proposals: newProposals,
+        ),
+      ),
+    );
+  }
+
   void _emitMostRecentError(Object error) {
     emit(
       state.copyWith(
@@ -121,21 +137,6 @@ class DiscoveryCubit extends Cubit<DiscoveryState> {
           isLoading: false,
           error: LocalizedException.create(error),
           proposals: const [],
-        ),
-      ),
-    );
-  }
-
-  void _emitFavoritesIds(List<String> ids) {
-    final proposals = state.mostRecentProposals.proposals;
-
-    final newProposals = [...proposals]
-        .map((e) => e.copyWith(isFavorite: ids.contains(e.ref.id)))
-        .toList();
-    emit(
-      state.copyWith(
-        mostRecentProposals: state.mostRecentProposals.copyWith(
-          proposals: newProposals,
         ),
       ),
     );
@@ -167,7 +168,6 @@ class DiscoveryCubit extends Cubit<DiscoveryState> {
         _proposalService.watchFavoritesProposalsIds().listen(
       (ids) {
         if (isClosed) return;
-        _logger.info('Got favorites proposals ids: ${ids.length}');
         _emitFavoritesIds(ids);
       },
       onError: (Object error) {
@@ -181,10 +181,13 @@ class DiscoveryCubit extends Cubit<DiscoveryState> {
     _logger.info('Setting up proposals subscription');
     _proposalsSubscription =
         _proposalService.watchLatestProposals(limit: 7).listen(
-      (proposals) {
+      (proposals) async {
         if (isClosed) return;
         _logger.info('Got proposals: ${proposals.length}');
         _emitMostRecentProposals(proposals);
+        final currentFavorites =
+            await _proposalService.watchFavoritesProposalsIds().first;
+        _emitFavoritesIds(currentFavorites);
       },
       onError: (Object error) {
         if (isClosed) return;
