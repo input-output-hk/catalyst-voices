@@ -7,7 +7,7 @@ use super::str_env_var::StringEnvVar;
 /// Default number value of `future_threshold`, 30 seconds.
 const DEFAULT_FUTURE_THRESHOLD: Duration = Duration::from_secs(30);
 
-/// Default number value of `future_threshold`, 10 minutes.
+/// Default number value of `past_threshold`, 10 minutes.
 const DEFAULT_PAST_THRESHOLD: Duration = Duration::from_secs(60 * 10);
 
 /// Configuration for the Catalyst Signed Documents validation configuration.
