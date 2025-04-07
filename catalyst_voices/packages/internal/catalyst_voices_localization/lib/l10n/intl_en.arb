@@ -45,6 +45,10 @@
   "@saveButtonText": {
     "description": "Text shown in save button"
   },
+  "saveChangesButtonText": "Save Changes",
+  "@saveChangesButtonText": {
+    "description": "Text shown in save button"
+  },
   "passwordLabelText": "Password",
   "@passwordLabelText": {
     "description": "Text shown in password field"
@@ -1431,7 +1435,7 @@
   "heroSectionTitle": "Create, fund and deliver the future of Cardano.",
   "projectCatalystDescription": "Project Catalyst is an experiment in community innovation, providing a framework to turn ideas into impactful real world projects.\n\nWe're putting the community at the heart of Cardano's future development. Are you ready for the Challenge?",
   "viewCurrentCampaign": "View Current Campaign",
-  "catalystF14": "Catalyst Fund 14",
+  "catalystF14": "Catalyst Fund14",
   "@catalystF14": {
     "description": "Used in discovery page in hero section"
   },
@@ -1638,6 +1642,10 @@
   "proposalEditorPublishErrorDialogMessage": "We couldn't publish your proposal. Please try again in 5-10 minutes, as it may take some time for your information to update.\n\nIf the issue persists, feel free to contact support.",
   "@proposalEditorPublishErrorDialogMessage": {
     "description": "Dialog message in proposal editor when publishing proposal to the server failed."
+  },
+  "proposalEditorNotAnswered": "Not Answered",
+  "@proposalEditorNotAnswered": {
+    "description": "Placeholder text when a property has been not filled."
   },
   "showAll": "Show All",
   "@showAll": {
@@ -2237,6 +2245,201 @@
   "@errorUnknownPublishComment": {
     "description": "Fallback message when can not publish comment for any reason."
   },
+  "preSubmitProposalStageDescription": "Curious? Learn more about the new Catalyst App\nand prepare yourself for success.",
+  "@preSubmitProposalStageDescription": {
+    "description": "Description for the pre-submission stage"
+  },
+  "proposalSubmissionStageStartAt": "Proposal submission opens {date} at {time}",
+  "@proposalSubmissionStageStartAt": {
+    "description": "Description for the pre-submission stage",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "days": "{count, plural, =1{Day} other{Days}}",
+  "@days": {
+    "description": "To represent days",
+    "placeholders": {
+      "count": {
+        "type": "num"
+      }
+    }
+  },
+  "hours": "{count, plural, =1{Hour} other{Hours}}",
+  "@hours": {
+    "description": "To represent hours",
+    "placeholders": {
+      "count": {
+        "type": "num"
+      }
+    }
+  },
+  "minutes": "{count, plural, =1{Minute} other{Minutes}}",
+  "@minutes": {
+    "description": "To represent minutes",
+    "placeholders": {
+      "count": {
+        "type": "num"
+      }
+    }
+  },
+  "seconds": "{count, plural, =1{Second} other{Seconds}}",
+  "@seconds": {
+    "description": "To represent seconds",
+    "placeholders": {
+      "count": {
+        "type": "num"
+      }
+    }
+  },
+  "proposalSubmissionIsClosed": "Proposal submission  is closed for Fund14.",
+  "@proposalSubmissionIsClosed": {
+    "description": "Title text when proposal submission is closed."
+  },
+  "proposalSubmissionClosedDescription": "We’re moving into the Community Review stage!\nWant to stay involved and earn rewards? Check out our knowledge base.",
+  "@proposalSubmissionClosedDescription": {
+    "description": "Text used to gave user more information about proposal submission close stage and what to do next."
+  },
+  "cantFindYourWallet": "We can't find your wallet",
+  "@cantFindYourWallet": {
+    "description": "Error message when user doesn't have a wallet extension installed"
+  },
+  "potentialReasons": "Potential reasons",
+  "@potentialReasons": {
+    "description": "Title for potential reasons for no wallet found"
+  },
+  "wrongBrowserTitle": "Wrong Browser",
+  "@wrongBrowserTitle": {
+    "description": "Title for wrong browser reason to not find wallet"
+  },
+  "wrongBrowserDescription": "Please launch the browser with your wallets extension and revisit Catalyst.",
+  "@wrongBrowserDescription": {
+    "description": "Description for wrong browser reason to not find wallet"
+  },
+  "disableExtensionTitle": "Disable Extension",
+  "@disableExtensionTitle": {
+    "description": "Title for disable extension reason to not find wallet"
+  },
+  "disableExtensionDescription": "Please enable to continue your wallet extension, and refresh the application.",
+  "@disableExtensionDescription": {
+    "description": "Description for disable extensions in the browser to not find wallet"
+  },
+  "failedAuthenticationTitle": "No/Failed Authorisation",
+  "@failedAuthenticationTitle": {
+    "description": "Title for failed authentication reason to not find wallet"
+  },
+  "failedAuthenticationDescription": "You did not authorise the Catalyst App in your wallet, follow specific wallet instructions.",
+  "@failedAuthenticationDescription": {
+    "description": "Description for failed authentication reason to not find wallet"
+  },
+  "noWalletInstalledTitle": "No wallet installed",
+  "@noWalletInstalledTitle": {
+    "description": "Title for no wallet installed reason to not find wallet"
+  },
+  "noWalletInstalledDescription": "You don’t have a (compatible) wallet installed, please select one of the Cardano wallets on the right, and follow installation instructions.",
+  "@noWalletInstalledDescription": {
+    "description": "Description for no wallet installed reason to not find wallet"
+  },
+  "visitCatalystWalletDocumentationTextButton": "Visit Catalyst wallet documentation",
+  "@visitCatalystWalletDocumentationTextButton": {
+    "description": "Text button to visit catalyst wallet documentation"
+  },
+  "installCardanoWallet": "Install a Cardano wallet",
+  "@installCardanoWallet": {
+    "description": "Text to install a cardano wallet"
+  },
+  "currentlySupportedWallets": "We currently support the following wallets:",
+  "@currentlySupportedWallets": {
+    "description": "Text to show currently supported wallets"
+  },
+  "goodToKnow": "Good to know",
+  "@goodToKnow": {
+    "description": "Text to show when some tip will be presented to user"
+  },
+  "registrationTransactionFeeDescription": "The creation of a Catalyst account costs, a transaction fee of (0,21 ADA), be sure your wallet has a minimum of 1 ADA.",
+  "@registrationTransactionFeeDescription": {
+    "description": "Description for the registration transaction fee"
+  },
+  "eternlWallet": "Eternl Wallet",
+  "@eternlWallet": {
+    "description": "Name of the eternl wallet"
+  },
+  "laceWallet": "Lace Wallet",
+  "@laceWallet": {
+    "description": "Name of the lace wallet"
+  },
+  "namiWallet": "Nami Wallet",
+  "@namiWallet": {
+    "description": "Name of the nami wallet"
+  },
+  "dontShowAgain": "Don't show again",
+  "@dontShowAgain": {
+    "description": "Action to not show again"
+  },
+  "proposalSubmissionWindowClosesAt": "The proposal submission window closes {date}",
+  "@proposalSubmissionWindowClosesAt": {
+    "description": "Description for the proposal submission window closes at",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "submitProposalBeforeClosing": "Submit your final proposals to Review stage well before the App closes.",
+  "@submitProposalBeforeClosing": {
+    "description": "Information for user to submit proposal before the submission window closes"
+  },
+  "checkMaxProposal": "Check your finals (max 5) in My proposals.",
+  "@checkMaxProposal": {
+    "description": "Information for user to check their final proposals before submission window closes"
+  },
+  "catalystAppNotAvailableAfterSubmissionCloses": "The Catalyst App won’t be available after submission close.",
+  "@catalystAppNotAvailableAfterSubmissionCloses": {
+    "description": "Information that app won't be available after submission closes"
+  },
+  "wantToBackUpProposals": "Want to back up your proposals?",
+  "@wantToBackUpProposals": {
+    "description": "Title for section informing user that they can backup their proposals"
+  },
+  "goMyProposals": "Go My proposals",
+  "@goMyProposals": {
+    "description": "Action to go to my proposals"
+  },
+  "exportProposalsIndividually": "Export proposals individually",
+  "@exportProposalsIndividually": {
+    "description": "Title for section informing user that they can export their proposals individually"
+  },
+  "storeInSafeLocation": "Store in safe location",
+  "@storeInSafeLocation": {
+    "description": "Title for section informing user that they can store their proposals in a safe location"
+  },
+  "catalystAppClosesIn": "Catalyst App closes in {days}d, {hours}h, {minutes}m, {seconds}s.",
+  "@catalystAppClosesIn": {
+    "description": "Message displayed when the app closes in a few seconds",
+    "placeholders": {
+      "days": {
+        "type": "int",
+        "example": "1"
+      },
+      "hours": {
+        "type": "int",
+        "example": "1"
+      },
+      "minutes": {
+        "type": "int",
+        "example": "1"
+      },
+      "seconds": {
+        "type": "int",
+        "example": "10"
+      }
+    }
+  },
   "insertNewImageDialogTitle": "Insert New Image",
   "@insertNewImageDialogTitle": {
     "description": "Title of the dialog for inserting a new image"
@@ -2276,5 +2479,9 @@
   "insertNewImageFailedToLoad": "Image failed to load",
   "@insertNewImageFailedToLoad": {
     "description": "Text for the image failed to load"
+  },
+  "submitCommentErrorDialogTitle": "Unable to add Comment",
+  "@submitCommentErrorDialogTitle": {
+    "description": "Title for the error dialog when submitting a comment fails"
   }
 }
