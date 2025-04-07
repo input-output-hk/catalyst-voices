@@ -22,7 +22,6 @@ project: {
 								name: _ @forge(name="CONTAINER_IMAGE")
 								tag:  _ @forge(name="GIT_HASH_OR_TAG")
 							}
-
 							env: {
 								"RBAC_OFF": {
 									value: "True"
@@ -92,7 +91,6 @@ project: {
 									}
 								}
 							}
-
 							port: 3030
 							probes: {
 								liveness: path:  "/api/v1/health/live"
@@ -114,7 +112,6 @@ project: {
 								}
 							}
 						}
-
 						nodeSelector: {
 							"node-group": "catalyst-gateway"
 						}
