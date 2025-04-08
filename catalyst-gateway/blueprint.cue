@@ -51,7 +51,6 @@ project: {
 										key:  "cassandra-volatile-password"
 									}
 								}
-
 								"CASSANDRA_VOLATILE_DEPLOYMENT": {
 									secret: {
 										name: "gateway"
