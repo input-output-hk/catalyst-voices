@@ -86,14 +86,14 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
 
     await for (final allRefs in stream) {
       final finalsRefs = await _getFinalProposalsRefs();
-      final favouriteRefs = await _getFavoritesRefs();
+      final favoritesRefs = await _getFavoritesRefs();
       final myRefs = await _maybeGetAuthorProposalsLooseRefs(author: author);
 
       final total = allRefs.length;
       final finals = allRefs.where(finalsRefs.contains).length;
       final drafts = total - finals;
       final favorites = allRefs
-          .where((ref) => favouriteRefs.any((fav) => fav.id == ref.id))
+          .where((ref) => favoritesRefs.any((fav) => fav.id == ref.id))
           .length;
       final my = allRefs
           .where((ref) => myRefs.any((myRef) => myRef.id == ref.id))
