@@ -72,7 +72,6 @@ class _WorkspaceHeaderState extends State<WorkspaceHeader> {
               children: [
                 Expanded(
                   child: Container(
-                    // height: _isTimelineExpanded ? 340 : 190,
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
                       color: theme.colorScheme.surface,
