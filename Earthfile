@@ -1,8 +1,8 @@
 VERSION 0.8
 
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/mdlint:v3.3.1 AS mdlint-ci
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/cspell:v3.3.1 AS cspell-ci
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/postgresql:v3.3.1 AS postgresql-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/mdlint:feat/bump-flutter-rust-bridge AS mdlint-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/cspell:feat/bump-flutter-rust-bridge AS cspell-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/postgresql:feat/bump-flutter-rust-bridge AS postgresql-ci
 
 FROM debian:stable-slim
 

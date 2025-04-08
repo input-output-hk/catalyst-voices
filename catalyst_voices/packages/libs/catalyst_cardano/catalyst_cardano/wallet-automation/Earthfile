@@ -1,6 +1,6 @@
 VERSION 0.8
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:v3.3.1 AS flutter-ci
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/playwright:v3.3.1 AS playwright-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:feat/bump-flutter-rust-bridge AS flutter-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/playwright:feat/bump-flutter-rust-bridge AS playwright-ci
 
 deps:
     DO playwright-ci+SETUP --workdir=/wallet-automation
