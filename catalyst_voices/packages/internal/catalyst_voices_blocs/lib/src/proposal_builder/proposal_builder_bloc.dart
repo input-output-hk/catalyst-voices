@@ -654,19 +654,49 @@ final class ProposalBuilderBloc
     );
   }
 
+  List<DocumentVersion> _recreateDocumentVersionsWithNewRef(
+    DocumentRef newRef,
+  ) {
+    final current = state.metadata.versions;
+
+    return [
+      ...current.map(
+        (e) => e.copyWith(
+          isCurrent: false,
+          isLatest: false,
+        ),
+      ),
+      DocumentVersion(
+        id: newRef.version!,
+        number: current.length + 1,
+        isCurrent: true,
+        isLatest: true,
+      ),
+    ];
+  }
+
   Future<void> _saveDocumentLocally(
     Emitter<ProposalBuilderState> emit,
     Document document,
   ) async {
+    final currentRef = state.metadata.documentRef!;
     final updatedRef = await _upsertDraftProposal(
       _documentMapper.toContent(document),
     );
+
+    List<DocumentVersion>? updatedVersions;
+    if (updatedRef != currentRef) {
+      // if a new ref has been created we need to recreate
+      // the version history to reflect it
+      updatedVersions = _recreateDocumentVersionsWithNewRef(updatedRef);
+    }
 
     _updateMetadata(
       emit,
       documentRef: updatedRef,
       originalDocumentRef: state.metadata.originalDocumentRef ?? updatedRef,
       publish: ProposalPublish.localDraft,
+      versions: updatedVersions,
     );
   }
 
@@ -801,12 +831,14 @@ final class ProposalBuilderBloc
     DocumentRef? documentRef,
     DocumentRef? originalDocumentRef,
     ProposalPublish? publish,
+    List<DocumentVersion>? versions,
   }) {
     final updatedMetadata = state.metadata.copyWith(
       documentRef: documentRef != null ? Optional(documentRef) : null,
       originalDocumentRef:
           originalDocumentRef != null ? Optional(originalDocumentRef) : null,
       publish: publish,
+      versions: versions,
     );
 
     final updatedState = state.copyWith(
