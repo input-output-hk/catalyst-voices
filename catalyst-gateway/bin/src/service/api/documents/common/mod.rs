@@ -1,6 +1,8 @@
 //! A module for placing common structs, functions, and variables across the `document`
 //! endpoint module not specified to a specific endpoint.
 
+use std::collections::HashMap;
+
 use catalyst_signed_doc::CatalystSignedDocument;
 use rbac_registration::cardano::cip509::RoleNumber;
 
@@ -57,16 +59,14 @@ impl catalyst_signed_doc::providers::CatalystSignedDocumentProvider for DocProvi
 /// A struct which implements a
 /// `catalyst_signed_doc::providers::CatalystSignedDocumentProvider` trait
 pub(crate) struct VerifyingKeyProvider(
-    Vec<(catalyst_signed_doc::IdUri, ed25519_dalek::VerifyingKey)>,
+    HashMap<catalyst_signed_doc::IdUri, ed25519_dalek::VerifyingKey>,
 );
 
 impl catalyst_signed_doc::providers::VerifyingKeyProvider for VerifyingKeyProvider {
     async fn try_get_key(
         &self, kid: &catalyst_signed_doc::IdUri,
     ) -> anyhow::Result<Option<ed25519_dalek::VerifyingKey>> {
-        let res = self.0.iter().find(|(id, ..)| id == kid).map(|item| item.1);
-
-        Ok(res)
+        Ok(self.0.get(kid).copied())
     }
 }
 
@@ -113,7 +113,7 @@ impl VerifyingKeyProvider {
             anyhow::bail!("Failed to retrieve a registration from corresponding Catalyst ID");
         };
 
-        let result: Vec<_> = kids.iter().map(|kid| {
+        let result = kids.iter().map(|kid| {
             if !kid.is_signature_key() {
                 anyhow::bail!("Invalid KID {kid}: KID must be a signing key not an encryption key");
             }
