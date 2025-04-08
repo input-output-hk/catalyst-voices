@@ -2,6 +2,7 @@
 
 use std::sync::Arc;
 
+use cardano_blockchain_types::Slot;
 use scylla::{
     prepared_statement::PreparedStatement, transport::iterator::TypedRowStream, DeserializeRow,
     SerializeRow, Session,
@@ -16,21 +17,25 @@ use crate::db::{
     types::{DbSlot, DbTxnIndex},
 };
 
-/// Get registrations from stake addr query.
-const GET_REGISTRATIONS_FROM_STAKE_ADDR_QUERY: &str =
+/// Get registrations from stake public key query.
+const GET_REGISTRATIONS_FROM_STAKE_PK_QUERY: &str =
     include_str!("../cql/get_registrations_w_stake_addr.cql");
 
 /// Get registration
 #[derive(SerializeRow)]
 pub(crate) struct GetRegistrationParams {
-    /// Stake address.
-    pub stake_public_key: Vec<u8>,
+    /// Stake public key.
+    stake_public_key: Vec<u8>,
+    /// Block Slot Number.
+    slot_no: DbSlot,
 }
 
-impl From<Vec<u8>> for GetRegistrationParams {
-    fn from(value: Vec<u8>) -> Self {
-        GetRegistrationParams {
-            stake_public_key: value,
+impl GetRegistrationParams {
+    /// Create a new instance of [`GetRegistrationParams`]
+    pub(crate) fn new(stake_public_key: Vec<u8>, slot_no: Slot) -> Self {
+        Self {
+            stake_public_key,
+            slot_no: slot_no.into(),
         }
     }
 }
@@ -44,6 +49,8 @@ pub(crate) struct GetRegistrationQuery {
     pub slot_no: DbSlot,
     /// Transaction Index.
     pub txn_index: DbTxnIndex,
+    /// Raw Nonce value.
+    pub raw_nonce: num_bigint::BigInt,
     /// Voting Public Key
     pub vote_key: Vec<u8>,
     /// Full Payment Address (not hashed, 32 byte ED25519 Public key).
@@ -59,13 +66,13 @@ impl GetRegistrationQuery {
     pub(crate) async fn prepare(session: Arc<Session>) -> anyhow::Result<PreparedStatement> {
         PreparedQueries::prepare(
             session,
-            GET_REGISTRATIONS_FROM_STAKE_ADDR_QUERY,
+            GET_REGISTRATIONS_FROM_STAKE_PK_QUERY,
             scylla::statement::Consistency::All,
             true,
         )
         .await
         .inspect_err(|error| error!(error=%error, "Failed to prepare get registration from stake address query."))
-        .map_err(|error| anyhow::anyhow!("{error}\n--\n{GET_REGISTRATIONS_FROM_STAKE_ADDR_QUERY}"))
+        .map_err(|error| anyhow::anyhow!("{error}\n--\n{GET_REGISTRATIONS_FROM_STAKE_PK_QUERY}"))
     }
 
     /// Executes get registration info for given stake addr query.

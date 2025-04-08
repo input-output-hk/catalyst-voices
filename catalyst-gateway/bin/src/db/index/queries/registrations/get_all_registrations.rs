@@ -2,6 +2,7 @@
 
 use std::sync::Arc;
 
+use cardano_blockchain_types::Slot;
 use scylla::{
     prepared_statement::PreparedStatement, transport::iterator::TypedRowStream, DeserializeRow,
     SerializeRow, Session,
@@ -13,7 +14,7 @@ use crate::db::{
         queries::{PreparedQueries, PreparedSelectQuery},
         session::CassandraSession,
     },
-    types::DbTxnIndex,
+    types::{DbSlot, DbTxnIndex},
 };
 
 /// Get all registrations
@@ -21,7 +22,19 @@ const GET_ALL_REGISTRATIONS: &str = include_str!("../cql/get_all_registrations.c
 
 /// Get all registrations
 #[derive(SerializeRow)]
-pub(crate) struct GetAllRegistrationsParams {}
+pub(crate) struct GetAllRegistrationsParams {
+    /// Block Slot Number.
+    slot_no: DbSlot,
+}
+
+impl GetAllRegistrationsParams {
+    /// Create a new instance of [`GetAllRegistrationsParams`]
+    pub(crate) fn new(slot_no: Slot) -> Self {
+        Self {
+            slot_no: slot_no.into(),
+        }
+    }
+}
 
 /// Get all registration details for snapshot.
 #[derive(DeserializeRow)]
@@ -30,10 +43,12 @@ pub(crate) struct GetAllRegistrationsQuery {
     pub stake_public_key: Vec<u8>,
     /// Nonce value after normalization.
     pub nonce: num_bigint::BigInt,
-    /// Slot Number the cert is in.
-    pub slot_no: num_bigint::BigInt,
+    /// Slot Number the CIP36 registration is in.
+    pub slot_no: DbSlot,
     /// Transaction Index.
     pub txn_index: DbTxnIndex,
+    /// Raw Nonce value.
+    pub raw_nonce: num_bigint::BigInt,
     /// Voting Public Key
     pub vote_key: Vec<u8>,
     /// Full Payment Address (not hashed, 32 byte ED25519 Public key).
