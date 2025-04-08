@@ -46,7 +46,7 @@ class _BrowseMyProposals extends StatelessWidget {
         context.l10n.browseMyProposals,
         style: Theme.of(context).textTheme.bodyLarge,
       ),
-      onTap: () => const MyProposalsRoute().go(context),
+      onTap: () => ProposalsRoute.myProposals().go(context),
     );
   }
 }
