@@ -22,7 +22,7 @@ jobs:
       - name: Install Forge
         uses: input-output-hk/catalyst-forge/actions/install@ci/v1.7.2
         with:
-          version: 0.14.0
+          version: 0.16.0
       - name: Setup CI
         uses: input-output-hk/catalyst-forge/actions/setup@ci/v1.7.2
       - name: Build Flutter Web
