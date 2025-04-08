@@ -21,9 +21,7 @@ class BackFab extends StatelessWidget {
         if (goRouter.canPop()) {
           goRouter.pop();
         } else {
-          // TODO(damian-molinski): should go to initial route later
-          // goRouter.go(Routes.initialLocation);
-          const TreasuryRoute().go(context);
+          goRouter.go(Routes.initialLocation);
         }
       },
     );
