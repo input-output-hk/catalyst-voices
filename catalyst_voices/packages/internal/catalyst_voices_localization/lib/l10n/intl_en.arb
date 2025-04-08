@@ -2483,5 +2483,13 @@
   "submitCommentErrorDialogTitle": "Unable to add Comment",
   "@submitCommentErrorDialogTitle": {
     "description": "Title for the error dialog when submitting a comment fails"
+  },
+  "noPublishedProposals": "No published proposals.",
+  "@noPublishedProposals": {
+    "description": "Text when there are no published proposals"
+  },
+  "noProposalsToPublish": "You have no proposals to publish, start a new proposal, or create a new iteration of an existing proposal to be able to publish.",
+  "@noProposalsToPublish": {
+    "description": "Text when there are no proposals to publish"
   }
 }
