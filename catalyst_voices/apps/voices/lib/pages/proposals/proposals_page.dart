@@ -501,11 +501,8 @@ class _TabsState extends State<_Tabs> with SingleTickerProviderStateMixin {
   void didUpdateWidget(_Tabs oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.selectMyProposalsView != widget.selectMyProposalsView) {
-      _tabController?.dispose();
-      _tabController = null;
-      final initialIndex = widget.selectMyProposalsView ? 4 : 0;
-      _tabController =
-          TabController(length: 5, vsync: this, initialIndex: initialIndex);
+      final index = widget.selectMyProposalsView ? 4 : 0;
+      _tabController?.animateTo(index);
     }
   }
 

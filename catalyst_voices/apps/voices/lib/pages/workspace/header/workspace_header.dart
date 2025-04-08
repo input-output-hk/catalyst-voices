@@ -94,12 +94,9 @@ class _ViewComments extends StatelessWidget {
       },
       builder: (context, hasComments) {
         return hasComments
-            ? const Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  _HasCommentCard(),
-                  SizedBox(width: 24),
-                ],
+            ? const Padding(
+                padding: EdgeInsets.only(right: 24),
+                child: _HasCommentCard(),
               )
             : const SizedBox.shrink();
       },
