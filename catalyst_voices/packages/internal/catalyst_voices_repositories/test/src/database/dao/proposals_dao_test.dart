@@ -4,6 +4,7 @@ import 'package:catalyst_voices_repositories/src/database/catalyst_database.dart
 import 'package:catalyst_voices_repositories/src/database/dao/proposals_dao.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_metadata.dart';
 import 'package:catalyst_voices_repositories/src/dto/proposal/proposal_submission_action_dto.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -13,6 +14,11 @@ import '../../utils/test_factories.dart';
 
 void main() {
   late DriftCatalystDatabase database;
+
+  // ignore: unnecessary_lambdas
+  setUpAll(() {
+    DummyCatalystIdFactory.registerDummyKeyFactory();
+  });
 
   setUp(() {
     final inMemory = DatabaseConnection(NativeDatabase.memory());
@@ -284,6 +290,32 @@ void main() {
         expect(count.total, 2);
         expect(count.favorites, 1);
       });
+
+      test('returns correct my count base on author', () async {
+        // Given
+        final userId = DummyCatalystIdFactory.create(username: 'damian');
+        final proposalOneRef = SignedDocumentRef.generateFirstRef();
+        final proposalTwoRef = SignedDocumentRef.generateFirstRef();
+        final proposals = [
+          _buildProposal(selfRef: proposalOneRef),
+          _buildProposal(selfRef: proposalTwoRef, author: userId),
+        ];
+
+        final filters = ProposalsCountFilters(author: userId);
+
+        // When
+        await database.documentsDao.saveAll(proposals);
+
+        // Then
+        final count = await database.proposalsDao
+            .watchCount(
+              filters: filters,
+            )
+            .first;
+
+        expect(count.total, 2);
+        expect(count.my, 1);
+      });
     });
   });
 }
@@ -291,10 +323,14 @@ void main() {
 DocumentEntityWithMetadata _buildProposal({
   SignedDocumentRef? selfRef,
   String? title,
+  CatalystId? author,
 }) {
   final metadata = DocumentDataMetadata(
     type: DocumentType.proposalDocument,
     selfRef: selfRef ?? SignedDocumentRef.generateFirstRef(),
+    authors: [
+      if (author != null) author,
+    ],
   );
   final content = DocumentDataContent({
     if (title != null) 'title': title,

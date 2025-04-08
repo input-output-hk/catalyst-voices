@@ -8,6 +8,7 @@ import 'package:catalyst_voices_repositories/src/database/table/documents.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_favorite.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_metadata.dart';
 import 'package:catalyst_voices_repositories/src/dto/proposal/proposal_submission_action_dto.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:drift/drift.dart';
 import 'package:drift/extensions/json1.dart';
 
@@ -40,6 +41,8 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
   Stream<ProposalsCount> watchCount({
     required ProposalsCountFilters filters,
   }) async* {
+    final author = filters.author;
+
     final proposalsCount = (documents.idHi + documents.idLo).count(
       distinct: true,
       filter: documents.type.equalsValue(DocumentType.proposalDocument),
@@ -59,15 +62,42 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
       final finals = await _getFinalProposalsCount();
       final drafts = total - finals;
       final favorites = await _getFavoritesCount();
+      final my = await (author != null
+          ? _getAuthorProposalsCount(author: author)
+          : Future.value(0));
 
       yield ProposalsCount(
         total: total,
         drafts: drafts,
         finals: finals,
         favorites: favorites,
-        my: 0,
+        my: my,
       );
     }
+  }
+
+  Future<int> _getAuthorProposalsCount({required CatalystId author}) {
+    final searchId = author.toSignificant().toUri().toStringWithoutScheme();
+
+    final proposalsCount = (documents.idHi + documents.idLo).count(
+      distinct: true,
+      filter: Expression.and([
+        documents.type.equalsValue(DocumentType.proposalDocument),
+        CustomExpression<bool>(
+          "json_extract(metadata, '\$.authors') LIKE '%$searchId%'",
+        ),
+      ]),
+    );
+
+    final select = selectOnly(documents)
+      ..addColumns([
+        proposalsCount,
+      ]);
+
+    return select
+        .map((row) => row.read(proposalsCount))
+        .getSingleOrNull()
+        .then((value) => value ?? 0);
   }
 
   Future<int> _getFavoritesCount() {
