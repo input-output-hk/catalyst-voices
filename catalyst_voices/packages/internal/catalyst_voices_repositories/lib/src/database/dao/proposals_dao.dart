@@ -149,7 +149,7 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
     return select
         .map((row) {
           final id = utf8.decode(row.read(refId)!);
-          final ver = utf8.decode(row.read(refId)!);
+          final ver = utf8.decode(row.read(refVer)!);
           final proposalRef = SignedDocumentRef(id: id, version: ver);
 
           final content = row.readWithConverter(documents.content);
