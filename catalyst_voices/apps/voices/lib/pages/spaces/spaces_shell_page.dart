@@ -148,6 +148,12 @@ class _SpacesShellPageState extends State<SpacesShellPage> {
     super.dispose();
   }
 
+  @override
+  void initState() {
+    super.initState();
+    context.read<WorkspaceBloc>().add(const WatchUserProposalsEvent());
+  }
+
   OverlayEntry _createAdminToolsOverlay() {
     return OverlayEntry(
       builder: (BuildContext context) {

@@ -22,7 +22,7 @@ jobs:
   ci_nightly:
     uses: input-output-hk/catalyst-forge/.github/workflows/ci.yml@ci/v1.7.2
     with:
-      forge_version: 0.14.0
+      forge_version: 0.16.0
       nightly: true
 
   generate-test-reports:

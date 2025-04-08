@@ -23,6 +23,7 @@ use crate::{
 
 pub(crate) mod cassandra_db;
 pub(crate) mod chain_follower;
+pub(crate) mod signed_doc;
 mod str_env_var;
 
 /// Default address to start service on, '0.0.0.0:3030'.
@@ -136,6 +137,9 @@ struct EnvVars {
     /// The Chain Follower configuration
     chain_follower: chain_follower::EnvVars,
 
+    /// The Catalyst Signed Documents configuration
+    signed_doc: signed_doc::EnvVars,
+
     /// Internal API Access API Key
     internal_api_key: Option<StringEnvVar>,
 
@@ -211,6 +215,7 @@ static ENV_VARS: LazyLock<EnvVars> = LazyLock::new(|| {
             cassandra_db::VOLATILE_NAMESPACE_DEFAULT,
         ),
         chain_follower: chain_follower::EnvVars::new(),
+        signed_doc: signed_doc::EnvVars::new(),
         internal_api_key: StringEnvVar::new_optional("INTERNAL_API_KEY", true),
         check_config_tick: StringEnvVar::new_as_duration(
             "CHECK_CONFIG_TICK",
@@ -305,6 +310,11 @@ impl Settings {
     /// Get the configuration of the chain follower.
     pub(crate) fn follower_cfg() -> chain_follower::EnvVars {
         ENV_VARS.chain_follower.clone()
+    }
+
+    /// Get the configuration of the Catalyst Signed Documents.
+    pub(crate) fn signed_doc_cfg() -> signed_doc::EnvVars {
+        ENV_VARS.signed_doc.clone()
     }
 
     /// Chain Follower network (The Blockchain network we are configured to use).
