@@ -16,6 +16,8 @@ final class WorkspaceState extends Equatable {
     this.timelineItems = const [],
   });
 
+  bool get hasComments => userProposals.any((e) => e.commentsCount > 0);
+
   List<Proposal> get notPublished => userProposals
       .where(
         (element) =>
@@ -31,7 +33,6 @@ final class WorkspaceState extends Equatable {
         userProposals,
         timelineItems,
       ];
-
   List<Proposal> get published => userProposals
       .where(
         (e) => (e.publish.isPublished || e.publish.isDraft),
@@ -46,6 +47,7 @@ final class WorkspaceState extends Equatable {
       )
       ?.timeline
       .to;
+
   int get totalPublishedProposals => published.length;
 
   WorkspaceState copyWith({
