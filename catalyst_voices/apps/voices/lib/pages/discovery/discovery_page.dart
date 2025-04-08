@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:catalyst_voices/common/error_handler.dart';
 import 'package:catalyst_voices/pages/discovery/sections/campaign_hero.dart';
 import 'package:catalyst_voices/pages/discovery/sections/how_it_works.dart';
 import 'package:catalyst_voices/pages/discovery/sections/stay_involved.dart';
@@ -41,7 +42,8 @@ class _Body extends StatelessWidget {
   }
 }
 
-class _DiscoveryPageState extends State<DiscoveryPage> {
+class _DiscoveryPageState extends State<DiscoveryPage>
+    with ErrorHandlerStateMixin<DiscoveryCubit, DiscoveryPage> {
   @override
   Widget build(BuildContext context) {
     return const SelectionArea(

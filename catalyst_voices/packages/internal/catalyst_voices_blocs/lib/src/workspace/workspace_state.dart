@@ -16,6 +16,16 @@ final class WorkspaceState extends Equatable {
     this.timelineItems = const [],
   });
 
+  bool get hasComments => userProposals.any((e) => e.commentsCount > 0);
+
+  List<Proposal> get notPublished => userProposals
+      .where(
+        (element) =>
+            element.versions.hasLatestLocalDraft(element.selfRef.version) ||
+            element.publish == ProposalPublish.localDraft,
+      )
+      .toList();
+
   @override
   List<Object?> get props => [
         isLoading,
@@ -23,7 +33,11 @@ final class WorkspaceState extends Equatable {
         userProposals,
         timelineItems,
       ];
-
+  List<Proposal> get published => userProposals
+      .where(
+        (e) => (e.publish.isPublished || e.publish.isDraft),
+      )
+      .toList();
   bool get showError => error != null && !isLoading;
   bool get showLoading => isLoading;
   bool get showProposals => error == null && !isLoading;
@@ -33,6 +47,8 @@ final class WorkspaceState extends Equatable {
       )
       ?.timeline
       .to;
+
+  int get totalPublishedProposals => published.length;
 
   WorkspaceState copyWith({
     WorkspaceTabType? tab,

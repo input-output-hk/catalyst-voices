@@ -61,8 +61,6 @@ final class ProposalsCubit extends Cubit<ProposalsState>
 
     _cache = _cache.copyWith(filters: filters);
 
-    _logger.finer('Filters changed to $filters');
-
     if (category != null) _rebuildCategories();
 
     _watchProposalsCount(filters: filters.toCountFilters());

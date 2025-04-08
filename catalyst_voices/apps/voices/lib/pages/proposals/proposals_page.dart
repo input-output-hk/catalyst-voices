@@ -16,13 +16,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ProposalsPage extends StatefulWidget {
   final SignedDocumentRef? categoryId;
-  final bool selectMyProposalsView;
+  final bool myProposals;
   final ProposalsFilterType? type;
 
   const ProposalsPage({
     super.key,
     this.categoryId,
-    this.selectMyProposalsView = false,
+    this.myProposals = false,
     this.type,
   });
 
@@ -86,10 +86,10 @@ class _ProposalsPageState extends State<ProposalsPage>
     super.didUpdateWidget(oldWidget);
 
     if (widget.categoryId != oldWidget.categoryId ||
-        widget.selectMyProposalsView != oldWidget.selectMyProposalsView ||
+        widget.myProposals != oldWidget.myProposals ||
         widget.type != oldWidget.type) {
       context.read<ProposalsCubit>().changeFilters(
-            onlyMy: Optional(widget.selectMyProposalsView),
+            onlyMy: Optional(widget.myProposals),
             category: Optional(widget.categoryId),
             type: widget.type ?? ProposalsFilterType.total,
           );
@@ -130,7 +130,10 @@ class _ProposalsPageState extends State<ProposalsPage>
   void initState() {
     super.initState();
 
-    final proposalsFilterType = widget.type ?? ProposalsFilterType.total;
+    final proposalsFilterType = widget.type ??
+        (widget.myProposals
+            ? ProposalsFilterType.my
+            : ProposalsFilterType.total);
 
     _tabController = TabController(
       initialIndex: proposalsFilterType.index,
@@ -143,7 +146,7 @@ class _ProposalsPageState extends State<ProposalsPage>
     );
 
     context.read<ProposalsCubit>().init(
-          onlyMyProposals: widget.selectMyProposalsView,
+          onlyMyProposals: widget.myProposals,
           category: widget.categoryId,
           type: proposalsFilterType,
         );
@@ -170,13 +173,11 @@ class _ProposalsPageState extends State<ProposalsPage>
       final effectiveCategoryId = categoryId.dataOr(widget.categoryId?.id);
       final effectiveType = filterType?.name ?? widget.type?.name;
 
-      if (widget.selectMyProposalsView) {
-        MyProposalsRoute(categoryId: effectiveCategoryId, type: effectiveType)
-            .replace(context);
-      } else {
-        ProposalsRoute(categoryId: effectiveCategoryId, type: effectiveType)
-            .replace(context);
-      }
+      ProposalsRoute(
+        categoryId: effectiveCategoryId,
+        type: effectiveType,
+        myProposals: widget.myProposals,
+      ).replace(context);
     });
   }
 }

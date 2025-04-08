@@ -215,4 +215,4 @@ Authorization: Bearer * catid.:173710179@preprod.cardano/FftxFnOrj2qmTuB2oZG2v0Y
 <!-- markdownlint-enable MD013-->
 
 [base64-url]: https://base64.guru/standards/base64url
-[Catalyst ID]: https://input-output-hk.github.io/catalyst-libs/branch/feat_cat_kid_to_cat_id/architecture/08_concepts/rbac_id_uri/catalyst-id-uri/
+[Catalyst ID]: https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/rbac_id_uri/catalyst-id-uri/

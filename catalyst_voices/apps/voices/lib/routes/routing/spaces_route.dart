@@ -75,49 +75,26 @@ final class FundedProjectsRoute extends GoRouteData
   }
 }
 
-final class MyProposalsRoute extends GoRouteData
-    with FadePageTransitionMixin, CompositeRouteGuardMixin {
-  final String? categoryId;
-  final String? type;
-
-  const MyProposalsRoute({
-    this.categoryId,
-    this.type,
-  });
-
-  @override
-  List<RouteGuard> get routeGuards => const [ProposalSubmissionGuard()];
-
-  @override
-  Widget build(BuildContext context, GoRouterState state) {
-    final categoryId = this.categoryId;
-    final categoryRef =
-        categoryId != null ? SignedDocumentRef(id: categoryId) : null;
-
-    final type = ProposalsFilterType.values.asNameMap()[this.type];
-
-    return ProposalsPage(
-      selectMyProposalsView: true,
-      categoryId: categoryRef,
-      type: type,
-    );
-  }
-}
-
 final class ProposalsRoute extends GoRouteData
     with FadePageTransitionMixin, CompositeRouteGuardMixin {
   final String? categoryId;
   final String? type;
+  final bool myProposals;
 
   const ProposalsRoute({
     this.categoryId,
     this.type,
+    this.myProposals = false,
   });
 
   factory ProposalsRoute.fromRef({SignedDocumentRef? categoryId}) {
     return ProposalsRoute(categoryId: categoryId?.id);
   }
 
+  factory ProposalsRoute.myProposals() {
+    return const ProposalsRoute(myProposals: true);
+  }
+
   @override
   List<RouteGuard> get routeGuards => const [ProposalSubmissionGuard()];
 
@@ -132,6 +109,7 @@ final class ProposalsRoute extends GoRouteData
     return ProposalsPage(
       categoryId: categoryRef,
       type: type,
+      myProposals: myProposals,
     );
   }
 }
@@ -143,9 +121,6 @@ final class ProposalsRoute extends GoRouteData
       routes: [
         TypedGoRoute<ProposalsRoute>(
           path: 'proposals',
-        ),
-        TypedGoRoute<MyProposalsRoute>(
-          path: 'my-proposals',
         ),
         TypedGoRoute<CategoryDetailRoute>(
           path: 'category/:categoryId',
