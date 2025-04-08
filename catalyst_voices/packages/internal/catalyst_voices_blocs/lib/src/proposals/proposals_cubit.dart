@@ -104,8 +104,6 @@ final class ProposalsCubit extends Cubit<ProposalsState>
 
       final filters = _cache.filters;
 
-      _logger.finer('Requesting page[$request] with [$filters]');
-
       final page = await _proposalService.getProposalsPage(
         request: request,
         filters: filters,

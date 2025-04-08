@@ -1,7 +1,7 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/database/catalyst_database.dart';
 import 'package:catalyst_voices_repositories/src/database/dao/documents_dao.drift.dart';
-import 'package:catalyst_voices_repositories/src/database/expression/is_author.dart';
+import 'package:catalyst_voices_repositories/src/database/query/jsonb_expressions.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents.drift.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_metadata.dart';
@@ -306,7 +306,7 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
       query.where((doc) => doc.type.equals(type.uuid));
     }
     if (authorId != null) {
-      query.where((tbl) => tbl.metadata.author(authorId));
+      query.where((tbl) => tbl.metadata.isAuthor(authorId));
     }
     if (refTo != null) {
       query.where(

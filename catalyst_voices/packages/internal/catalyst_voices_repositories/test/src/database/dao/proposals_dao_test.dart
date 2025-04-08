@@ -367,6 +367,89 @@ void main() {
 
         expect(count, expectedCount);
       });
+
+      test('returns correct count when category filter is on', () async {
+        // Given
+        final userId = DummyCatalystIdFactory.create(username: 'damian');
+        final categoryId = categoriesTemplatesRefs.first.category;
+
+        final proposalOneRef = SignedDocumentRef.generateFirstRef();
+        final proposalTwoRef = SignedDocumentRef.generateFirstRef();
+        final proposals = [
+          _buildProposal(selfRef: proposalOneRef),
+          _buildProposal(
+            selfRef: proposalTwoRef,
+            author: userId,
+            categoryId: categoryId,
+          ),
+        ];
+        final favorites = [
+          _buildProposalFavorite(proposalRef: proposalOneRef),
+        ];
+        final actions = [
+          _buildProposalAction(
+            action: ProposalSubmissionActionDto.aFinal,
+            proposalRef: proposalTwoRef,
+          ),
+        ];
+
+        final filters = ProposalsCountFilters(category: categoryId);
+        const expectedCount = ProposalsCount(
+          total: 1,
+          drafts: 0,
+          finals: 1,
+          favorites: 0,
+          my: 0,
+        );
+
+        // When
+        await database.documentsDao.saveAll([...proposals, ...actions]);
+
+        for (final fav in favorites) {
+          await database.favoritesDao.save(fav);
+        }
+
+        // Then
+        final count = await database.proposalsDao
+            .watchCount(
+              filters: filters,
+            )
+            .first;
+
+        expect(count, expectedCount);
+      });
+
+      test('returns correct count when search query is not empty', () async {
+        // Given
+        final proposals = [
+          _buildProposal(),
+          _buildProposal(title: 'Explore'),
+          _buildProposal(title: 'Not this one'),
+        ];
+
+        /* cSpell:disable */
+        const filters = ProposalsCountFilters(searchQuery: 'Expl');
+        /* cSpell:enable */
+        const expectedCount = ProposalsCount(
+          total: 1,
+          drafts: 1,
+          finals: 0,
+          favorites: 0,
+          my: 0,
+        );
+
+        // When
+        await database.documentsDao.saveAll(proposals);
+
+        // Then
+        final count = await database.proposalsDao
+            .watchCount(
+              filters: filters,
+            )
+            .first;
+
+        expect(count, expectedCount);
+      });
     });
   });
 }
@@ -375,6 +458,7 @@ DocumentEntityWithMetadata _buildProposal({
   SignedDocumentRef? selfRef,
   String? title,
   CatalystId? author,
+  SignedDocumentRef? categoryId,
 }) {
   final metadata = DocumentDataMetadata(
     type: DocumentType.proposalDocument,
@@ -382,9 +466,15 @@ DocumentEntityWithMetadata _buildProposal({
     authors: [
       if (author != null) author,
     ],
+    categoryId: categoryId,
   );
   final content = DocumentDataContent({
-    if (title != null) 'title': title,
+    if (title != null)
+      'setup': {
+        'title': {
+          'title': title,
+        },
+      },
   });
 
   final document = DocumentFactory.build(
@@ -395,6 +485,7 @@ DocumentEntityWithMetadata _buildProposal({
   final metadataEntities = [
     if (title != null)
       DocumentMetadataFactory.build(
+        ver: metadata.selfRef.version,
         fieldKey: DocumentMetadataFieldKey.title,
         fieldValue: title,
       ),

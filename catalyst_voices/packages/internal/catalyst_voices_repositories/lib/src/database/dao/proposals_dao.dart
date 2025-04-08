@@ -4,7 +4,7 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_repositories/src/database/catalyst_database.dart';
 import 'package:catalyst_voices_repositories/src/database/dao/proposals_dao.drift.dart';
-import 'package:catalyst_voices_repositories/src/database/expression/is_author.dart';
+import 'package:catalyst_voices_repositories/src/database/query/jsonb_expressions.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_favorite.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_metadata.dart';
@@ -45,6 +45,7 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
     required ProposalsCountFilters filters,
   }) async* {
     final author = filters.author;
+    final searchQuery = filters.searchQuery;
 
     final select = selectOnly(documents)
       ..addColumns([
@@ -58,7 +59,16 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
       ..groupBy([documents.idHi + documents.idLo]);
 
     if ((filters.onlyAuthor ?? false) && author != null) {
-      select.where(documents.metadata.author(author));
+      select.where(documents.metadata.isAuthor(author));
+    }
+
+    if (filters.category != null) {
+      select.where(documents.metadata.isCategory(filters.category!));
+    }
+
+    if (searchQuery != null) {
+      // TODO(damian-molinski): Check if documentsMetadata can be used.
+      select.where(documents.content.hasTitle(searchQuery));
     }
 
     final stream = select.map((row) {
@@ -110,7 +120,7 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
       ..where(
         Expression.and([
           documents.type.equalsValue(DocumentType.proposalDocument),
-          documents.metadata.author(author),
+          documents.metadata.isAuthor(author),
         ]),
       );
 
@@ -171,8 +181,16 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
 
     return select
         .map((row) {
-          final id = utf8.decode(row.read(refId)!);
-          final ver = utf8.decode(row.read(refVer)!);
+          final rawId = row.read(refId);
+          final rawVer = row.read(refVer);
+
+          final id = rawId != null ? utf8.decode(rawId) : null;
+          final ver = rawVer != null ? utf8.decode(rawVer) : null;
+
+          if (id == null) {
+            return null;
+          }
+
           final proposalRef = SignedDocumentRef(id: id, version: ver);
 
           final content = row.readWithConverter(documents.content);
@@ -189,7 +207,7 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
           final grouped = <String, _RefAction>{};
 
           for (final entry
-              in entities.where((element) => element.value != null)) {
+              in entities.nonNulls.where((element) => element.value != null)) {
             // 1st element per ref is latest. See orderBy.
             final id = entry.key.id;
             if (!grouped.containsKey(id)) {

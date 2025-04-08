@@ -138,8 +138,7 @@ final class DatabaseDocumentsDataSource
   Stream<ProposalsCount> watchProposalsCount({
     required ProposalsCountFilters filters,
   }) {
-    // TODO(damian-molinski): integrate
-    return Stream.value(const ProposalsCount());
+    return _database.proposalsDao.watchCount(filters: filters);
   }
 
   @override
