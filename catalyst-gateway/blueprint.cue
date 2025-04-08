@@ -11,6 +11,7 @@ project: {
 			merge: {}
 			tag: {}
 		}
+
 		bundle: {
 			modules: main: {
 				name:    "app"
@@ -185,13 +186,10 @@ project: {
 						}
 					}
 
-					ingress: {
-						health: {
-							path:         "/api/v1/health/live"
-							successCodes: "204"
-						}
-						subdomain: "gateway"
-					}
+					dns: subdomain: "gateway"
+					route: rules: [{
+						matchPrefix: "/"
+					}]
 
 					secrets: {
 						db: {
@@ -222,6 +220,7 @@ project: {
 			}
 		}
 	}
+
 	release: {
 		docker: {
 			on: {
