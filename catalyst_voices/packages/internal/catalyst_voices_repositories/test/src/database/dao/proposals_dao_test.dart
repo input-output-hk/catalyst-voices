@@ -219,7 +219,7 @@ void main() {
         expect(count.finals, 2);
       });
 
-      test('returns calculated drafts count', () async {
+      test('returns calculated drafts and finals count', () async {
         // Given
         final proposalOneRef = SignedDocumentRef.generateFirstRef();
         final proposalTwoRef = SignedDocumentRef.generateFirstRef();
@@ -252,6 +252,37 @@ void main() {
         expect(count.total, 2);
         expect(count.drafts, 1);
         expect(count.finals, 1);
+      });
+
+      test('returns correct favorites count', () async {
+        // Given
+        final proposalOneRef = SignedDocumentRef.generateFirstRef();
+        final proposalTwoRef = SignedDocumentRef.generateFirstRef();
+        final proposals = [
+          _buildProposal(selfRef: proposalOneRef),
+          _buildProposal(selfRef: proposalTwoRef),
+        ];
+        final favorites = [
+          _buildProposalFavorite(proposalRef: proposalOneRef),
+        ];
+
+        const filters = ProposalsCountFilters();
+
+        // When
+        await database.documentsDao.saveAll(proposals);
+        for (final fav in favorites) {
+          await database.favoritesDao.save(fav);
+        }
+
+        // Then
+        final count = await database.proposalsDao
+            .watchCount(
+              filters: filters,
+            )
+            .first;
+
+        expect(count.total, 2);
+        expect(count.favorites, 1);
       });
     });
   });
@@ -306,6 +337,18 @@ DocumentEntityWithMetadata _buildProposalAction({
   const metadataEntities = <DocumentMetadataEntity>[];
 
   return (document: document, metadata: metadataEntities);
+}
+
+DocumentFavoriteEntity _buildProposalFavorite({
+  required DocumentRef proposalRef,
+}) {
+  final hilo = UuidHiLo.from(proposalRef.id);
+  return DocumentFavoriteEntity(
+    idHi: hilo.high,
+    idLo: hilo.low,
+    isFavorite: true,
+    type: DocumentType.proposalDocument,
+  );
 }
 
 SignedDocumentRef _buildRefAt(DateTime dateTime) {

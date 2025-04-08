@@ -5,6 +5,7 @@ import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_repositories/src/database/catalyst_database.dart';
 import 'package:catalyst_voices_repositories/src/database/dao/proposals_dao.drift.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents.dart';
+import 'package:catalyst_voices_repositories/src/database/table/documents_favorite.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_metadata.dart';
 import 'package:catalyst_voices_repositories/src/dto/proposal/proposal_submission_action_dto.dart';
 import 'package:drift/drift.dart';
@@ -14,6 +15,7 @@ import 'package:drift/extensions/json1.dart';
   tables: [
     Documents,
     DocumentsMetadata,
+    DocumentsFavorites,
   ],
 )
 class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
@@ -56,18 +58,41 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
     await for (final total in stream) {
       final finals = await _getFinalProposalsCount();
       final drafts = total - finals;
+      final favorites = await _getFavoritesCount();
 
       yield ProposalsCount(
         total: total,
         drafts: drafts,
         finals: finals,
+        favorites: favorites,
+        my: 0,
       );
     }
   }
 
+  Future<int> _getFavoritesCount() {
+    final joinedId = documentsFavorites.idHi + documentsFavorites.idLo;
+    const docType = DocumentType.proposalDocument;
+
+    final count = (joinedId).count(
+      distinct: true,
+      filter: Expression.and([
+        documentsFavorites.type.equalsValue(docType),
+        documentsFavorites.isFavorite.equals(true),
+      ]),
+    );
+
+    final select = selectOnly(documentsFavorites)..addColumns([count]);
+
+    return select
+        .map((row) => row.read(count))
+        .getSingleOrNull()
+        .then((value) => value ?? 0);
+  }
+
   Future<int> _getFinalProposalsCount() {
     final refId = documents.metadata.jsonExtract<Uint8List>(r'$.ref.id');
-    final select = selectOnly(documents)
+    final select = selectOnly(documents, distinct: true)
       ..addColumns([
         refId,
         documents.content,
