@@ -23,10 +23,8 @@ final class ProposalSubmissionActionDocumentDto {
 enum ProposalSubmissionActionDto {
   @JsonValue('final')
   aFinal,
-
   @JsonValue('draft')
   draft,
-
   @JsonValue('hide')
   hide;
 
@@ -42,6 +40,8 @@ enum ProposalSubmissionActionDto {
         return ProposalSubmissionActionDto.hide;
     }
   }
+
+  String get key => _$ProposalSubmissionActionDtoEnumMap[this]!;
 
   ProposalSubmissionAction toModel() {
     switch (this) {

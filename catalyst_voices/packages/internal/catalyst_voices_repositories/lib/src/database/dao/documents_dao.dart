@@ -268,6 +268,19 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
     final documents = documentsWithMetadata.map((e) => e.document);
     final metadata = documentsWithMetadata.expand((e) => e.metadata);
 
+    // TODO(damian-molinski): remove
+    if (kDebugMode) {
+      final refs = documents.map((e) {
+        return SignedDocumentRef(
+          id: UuidHiLo(high: e.idHi, low: e.idLo).uuid,
+          version: UuidHiLo(high: e.verHi, low: e.verHi).uuid,
+        );
+      }).join('\n');
+
+      print('Saving refs');
+      print(refs);
+    }
+
     await batch((batch) {
       batch
         ..insertAll(
