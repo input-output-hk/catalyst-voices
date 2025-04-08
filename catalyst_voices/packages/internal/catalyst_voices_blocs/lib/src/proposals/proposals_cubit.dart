@@ -88,8 +88,6 @@ final class ProposalsCubit extends Cubit<ProposalsState>
 
   Future<void> getProposals(PageRequest request) async {
     try {
-      await Future<void>.delayed(const Duration(seconds: 1));
-
       final campaign = await _campaignService.getActiveCampaign();
       if (campaign == null) {
         return;
