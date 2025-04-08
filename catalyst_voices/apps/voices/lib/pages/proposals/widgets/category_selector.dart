@@ -94,7 +94,7 @@ extension on ProposalsCategorySelectorItem {
   DropdownMenuViewModel<SignedDocumentRef> toDropdownItem() {
     return DropdownMenuViewModel(
       value: ref,
-      name: name.isNotEmpty ? name : '-TBD-',
+      name: name.trim().isNotEmpty ? name : '-TBD-',
       isSelected: isSelected,
     );
   }
