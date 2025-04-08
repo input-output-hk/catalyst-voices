@@ -20,11 +20,11 @@ class LastEditDate extends StatelessWidget {
   Widget build(BuildContext context) {
     return TimezoneDateTimeText(
       dateTime,
-      formatter: (context, dateTime) {
-        final date = DateFormatter.formatDayMonthTime(
-          dateTime,
+      formatter: (context, date) {
+        final dt = DateFormatter.formatDayMonthTime(
+          date,
         );
-        return context.l10n.lastEditDate(date);
+        return context.l10n.lastEditDate(dt);
       },
       style: textStyle ??
           context.textTheme.labelMedium?.copyWith(

@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
+import 'package:collection/collection.dart';
 import 'package:rxdart/rxdart.dart';
 
 abstract interface class ProposalService {
@@ -378,42 +379,21 @@ final class ProposalServiceImpl implements ProposalService {
     return _proposalRepository
         .watchLatestProposals(limit: limit)
         .switchMap((documents) async* {
-      final proposalsStreams = await Future.wait(
-        documents.map((doc) async {
-          final versionIds = await _proposalRepository.queryVersionsOfId(
-            id: doc.metadata.selfRef.id,
-          );
-          final category =
-              await _campaignRepository.getCategory(doc.metadata.categoryId);
-          final versionsData = versionIds
-              .map(
-                (e) => BaseProposalData(document: e),
-              )
-              .toList();
-
-          return _proposalRepository
-              .watchCount(
-            ref: doc.metadata.selfRef,
-            type: DocumentType.commentTemplate,
-          )
-              .map((commentsCount) {
-            final proposalData = ProposalData(
-              document: doc,
-              categoryName: category.categoryText,
-              versions: versionsData,
-              commentsCount: commentsCount,
-            );
-            return Proposal.fromData(proposalData);
-          });
-        }),
+      final proposalsDataStreams = await Future.wait(
+        documents.map(_createProposalDataStream).toList(),
       );
 
-      await for (final commentsUpdates in Rx.combineLatest(
-        proposalsStreams,
-        (List<Proposal> proposals) => proposals,
-      )) {
-        yield commentsUpdates;
-      }
+      yield* Rx.combineLatest(
+        proposalsDataStreams,
+        (List<ProposalData?> proposalsData) async {
+          final validProposalsData =
+              proposalsData.whereType<ProposalData>().toList();
+          final proposalsWithVersions = await Future.wait(
+            validProposalsData.map(_addVersionsToProposal),
+          );
+          return proposalsWithVersions.map(Proposal.fromData).toList();
+        },
+      ).switchMap(Stream.fromFuture);
     });
   }
 
@@ -421,21 +401,99 @@ final class ProposalServiceImpl implements ProposalService {
   Stream<List<Proposal>> watchUserProposals() async* {
     final authorId = await _getUserCatalystId();
     yield* _proposalRepository
-        .watchUserProposals(
-      authorId: authorId,
-    )
+        .watchUserProposals(authorId: authorId)
         .switchMap((documents) async* {
-      final proposals = documents.map((e) async {
-        final campaign =
-            await _campaignRepository.getCategory(e.metadata.categoryId);
-        final proposalData = ProposalData(
-          document: e,
-          categoryName: campaign.categoryText,
-        );
-        return Proposal.fromData(proposalData);
-      }).toList();
-      yield await Future.wait(proposals);
+      final proposalsDataStreams = await Future.wait(
+        documents.map(_createProposalDataStream).toList(),
+      );
+
+      yield* Rx.combineLatest(
+        proposalsDataStreams,
+        (List<ProposalData?> proposalsData) async {
+          final validProposalsData =
+              proposalsData.whereType<ProposalData>().toList();
+
+          final groupedProposals = groupBy(
+            validProposalsData,
+            (data) => data.document.metadata.selfRef.id,
+          );
+
+          final filteredProposalsData = groupedProposals.values
+              .map((group) {
+                if (group.any((p) => p.publish != ProposalPublish.localDraft)) {
+                  return group
+                      .where((p) => p.publish != ProposalPublish.localDraft);
+                }
+                return group;
+              })
+              .expand((group) => group)
+              .toList();
+
+          final proposalsWithVersions = await Future.wait(
+            filteredProposalsData.map(_addVersionsToProposal),
+          );
+          return proposalsWithVersions.map(Proposal.fromData).toList();
+        },
+      ).switchMap(Stream.fromFuture);
     });
+  }
+
+  // Helper method to fetch versions for a proposal
+  Future<ProposalData> _addVersionsToProposal(ProposalData proposal) async {
+    final versions = await _proposalRepository.queryVersionsOfId(
+      id: proposal.document.metadata.selfRef.id,
+      includeLocalDrafts: true,
+    );
+    final proposalDataVersion = (await Future.wait(
+      versions.map(
+        (e) async {
+          final selfRef = e.metadata.selfRef;
+          final action = await _proposalRepository.getProposalPublishForRef(
+            ref: selfRef,
+          );
+          if (action == null) {
+            return null;
+          }
+
+          return ProposalData(
+            document: e,
+            publish: action,
+          );
+        },
+      ).toList(),
+    ))
+        .whereType<ProposalData>()
+        .toList();
+
+    return proposal.copyWith(versions: proposalDataVersion);
+  }
+
+  Future<Stream<ProposalData?>> _createProposalDataStream(
+    ProposalDocument doc,
+  ) async {
+    final selfRef = doc.metadata.selfRef;
+    final campaign =
+        await _campaignRepository.getCategory(doc.metadata.categoryId);
+
+    final commentsCountStream = _proposalRepository.watchCount(
+      ref: selfRef,
+      type: DocumentType.commentDocument,
+    );
+
+    return Rx.combineLatest2(
+      _proposalRepository.watchProposalPublish(refTo: selfRef),
+      commentsCountStream,
+      (ProposalPublish? publishState, int commentsCount) {
+        if (publishState == null) return null;
+
+        return ProposalData(
+          document: doc,
+          categoryName: campaign.categoryText,
+          publish: publishState,
+          commentsCount: commentsCount,
+        );
+      },
+    );
   }
 
   Future<CatalystId> _getUserCatalystId() async {

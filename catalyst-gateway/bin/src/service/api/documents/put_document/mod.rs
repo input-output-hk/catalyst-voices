@@ -12,7 +12,6 @@ use crate::{
         signed_docs::{FullSignedDoc, SignedDocBody, StoreError},
     },
     service::common::{auth::rbac::token::CatalystRBACTokenV1, responses::WithErrorResponses},
-    settings::Settings,
 };
 
 pub(crate) mod unprocessable_content_request;
@@ -62,15 +61,7 @@ pub(crate) async fn endpoint(doc_bytes: Vec<u8>, token: CatalystRBACTokenV1) -> 
     };
 
     // validate document integrity
-    let signed_doc_cfg = Settings::signed_doc_cfg();
-    match catalyst_signed_doc::validator::validate(
-        &doc,
-        signed_doc_cfg.future_threshold(),
-        signed_doc_cfg.past_threshold(),
-        &DocProvider,
-    )
-    .await
-    {
+    match catalyst_signed_doc::validator::validate(&doc, &DocProvider).await {
         Ok(true) => (),
         Ok(false) => {
             return Responses::UnprocessableContent(Json(PutDocumentUnprocessableContent::new(

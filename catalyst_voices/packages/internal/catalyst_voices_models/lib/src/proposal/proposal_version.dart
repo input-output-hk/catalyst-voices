@@ -22,8 +22,7 @@ final class ProposalVersion extends Equatable
       selfRef: data.document.metadata.selfRef,
       title: data.document.title ?? '',
       createdAt: createdAt,
-      // TODO(LynxLynxx): change when we get this from doc actions
-      publish: ProposalPublish.publishedDraft,
+      publish: data.publish,
     );
   }
 
@@ -51,6 +50,14 @@ final class ProposalVersion extends Equatable
 }
 
 extension ProposalVersionsList on List<ProposalVersion> {
+  bool hasLatestLocalDraft(String? version) {
+    if (isEmpty) return false;
+    final latestVersion = first;
+    return latestVersion.isLatestVersion(
+      version ?? '',
+    );
+  }
+
   int versionNumber(String version) {
     return length - indexWhere((element) => element.selfRef.version == version);
   }

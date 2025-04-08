@@ -82,13 +82,21 @@ class _WorkspaceHeaderState extends State<WorkspaceHeader> {
                         color: Colors.grey.withAlpha(51),
                       ),
                     ),
-                    child: CampaignTimeline(
-                      timelineItems: CampaignTimelineViewModelX.mockData,
-                      placement: CampaignTimelinePlacement.workspace,
-                      onExpandedChanged: (isExpanded) {
-                        setState(() {
-                          _isTimelineExpanded = isExpanded;
-                        });
+                    child: BlocSelector<WorkspaceBloc, WorkspaceState,
+                        List<CampaignTimelineViewModel>>(
+                      selector: (state) {
+                        return state.timelineItems;
+                      },
+                      builder: (context, timelineItems) {
+                        return CampaignTimeline(
+                          timelineItems: timelineItems,
+                          placement: CampaignTimelinePlacement.workspace,
+                          onExpandedChanged: (isExpanded) {
+                            setState(() {
+                              _isTimelineExpanded = isExpanded;
+                            });
+                          },
+                        );
                       },
                     ),
                   ),
