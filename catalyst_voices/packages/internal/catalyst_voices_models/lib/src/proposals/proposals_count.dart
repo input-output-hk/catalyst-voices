@@ -1,13 +1,13 @@
 import 'package:equatable/equatable.dart';
 
-final class ProposalsTypeCount extends Equatable {
+final class ProposalsCount extends Equatable {
   final int total;
   final int drafts;
   final int finals;
   final int favorites;
   final int my;
 
-  const ProposalsTypeCount({
+  const ProposalsCount({
     this.total = 0,
     this.drafts = 0,
     this.finals = 0,
@@ -23,19 +23,4 @@ final class ProposalsTypeCount extends Equatable {
         favorites,
         my,
       ];
-
-  ProposalsTypeCount copyWith({
-    int? total,
-    int? drafts,
-    int? finals,
-    int? favorites,
-    int? my,
-  }) {
-    return ProposalsTypeCount(
-      total: total ?? this.total,
-      drafts: drafts ?? this.drafts,
-      finals: finals ?? this.finals,
-      my: my ?? this.my,
-    );
-  }
 }

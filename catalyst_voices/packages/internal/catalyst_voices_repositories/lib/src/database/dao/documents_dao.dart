@@ -87,8 +87,8 @@ abstract interface class DocumentsDao {
 
   /// Watches for new comments that are reference by ref.
   Stream<int> watchCount({
-    required DocumentRef ref,
-    required DocumentType type,
+    DocumentRef? refTo,
+    DocumentType? type,
   });
 
   Stream<DocumentEntity?> watchRefToDocumentData({
@@ -357,19 +357,21 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
 
   @override
   Stream<int> watchCount({
-    required DocumentRef ref,
-    required DocumentType type,
+    DocumentRef? refTo,
+    DocumentType? type,
   }) {
     final query = select(documents)
       ..where(
         (row) {
           return Expression.and([
-            row.metadata.jsonExtract<String>(r'$.type').equals(type.uuid),
-            row.metadata.jsonExtract<String>(r'$.ref.id').equals(ref.id),
-            if (ref.version != null)
+            if (type != null)
+              row.metadata.jsonExtract<String>(r'$.type').equals(type.uuid),
+            if (refTo != null)
+              row.metadata.jsonExtract<String>(r'$.ref.id').equals(refTo.id),
+            if (refTo?.version != null)
               row.metadata
                   .jsonExtract<String>(r'$.ref.version')
-                  .equals(ref.version!),
+                  .equals(refTo!.version!),
           ]);
         },
       );

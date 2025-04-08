@@ -2,6 +2,7 @@ import 'dart:typed_data';
 
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
+import 'package:catalyst_voices_repositories/src/document/source/proposal_document_data_local_source.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/document_data_dto.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/document_dto.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/schema/document_schema_dto.dart';
@@ -12,6 +13,7 @@ abstract interface class ProposalRepository {
   const factory ProposalRepository(
     SignedDocumentManager signedDocumentManager,
     DocumentRepository documentRepository,
+    ProposalDocumentDataLocalSource proposalsLocalSource,
   ) = ProposalRepositoryImpl;
 
   Future<void> deleteDraftProposal(DraftRef ref);
@@ -30,8 +32,8 @@ abstract interface class ProposalRepository {
 
   /// Fetches all proposals for page matching [request] as well as
   /// [filters].
-  Future<ProposalsSearchResult> getProposalsPage({
-    required PaginationPage<String?> request,
+  Future<Page<ProposalData>> getProposalsPage({
+    required PageRequest request,
     required ProposalsFilters filters,
   });
 
@@ -66,9 +68,8 @@ abstract interface class ProposalRepository {
 
   Future<void> upsertDraftProposal({required DocumentData document});
 
-  Stream<int> watchCount({
-    required DocumentRef ref,
-    required DocumentType type,
+  Stream<int> watchCommentsCount({
+    DocumentRef? refTo,
   });
 
   Stream<List<ProposalDocument>> watchLatestProposals({int? limit});
@@ -82,8 +83,8 @@ abstract interface class ProposalRepository {
     required DocumentRef refTo,
   });
 
-  Stream<ProposalsFiltersCount> watchProposalsCount({
-    required ProposalsFilters filters,
+  Stream<ProposalsCount> watchProposalsCount({
+    required ProposalsCountFilters filters,
   });
 
   Stream<List<ProposalDocument>> watchUserProposals({
@@ -94,10 +95,12 @@ abstract interface class ProposalRepository {
 final class ProposalRepositoryImpl implements ProposalRepository {
   final SignedDocumentManager _signedDocumentManager;
   final DocumentRepository _documentRepository;
+  final ProposalDocumentDataLocalSource _proposalsLocalSource;
 
   const ProposalRepositoryImpl(
     this._signedDocumentManager,
     this._documentRepository,
+    this._proposalsLocalSource,
   );
 
   @override
@@ -176,15 +179,13 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   }
 
   @override
-  Future<ProposalsSearchResult> getProposalsPage({
-    required PaginationPage<String?> request,
+  Future<Page<ProposalData>> getProposalsPage({
+    required PageRequest request,
     required ProposalsFilters filters,
-  }) async {
-    // TODO(damian-molinski): integrate it
-    return const ProposalsSearchResult(
-      maxResults: 0,
-      proposals: [],
-    );
+  }) {
+    return _proposalsLocalSource
+        .getProposalsPage(request: request, filters: filters)
+        .then((value) => value.map(_buildProposalData));
   }
 
   @override
@@ -273,11 +274,13 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   }
 
   @override
-  Stream<int> watchCount({
-    required DocumentRef ref,
-    required DocumentType type,
+  Stream<int> watchCommentsCount({
+    DocumentRef? refTo,
   }) {
-    return _documentRepository.watchCount(ref: ref, type: type);
+    return _documentRepository.watchCount(
+      refTo: refTo,
+      type: DocumentType.commentDocument,
+    );
   }
 
   @override
@@ -320,11 +323,10 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   }
 
   @override
-  Stream<ProposalsFiltersCount> watchProposalsCount({
-    required ProposalsFilters filters,
+  Stream<ProposalsCount> watchProposalsCount({
+    required ProposalsCountFilters filters,
   }) {
-    // TODO(damian-molinski): implement watchProposalsCount
-    return Stream.value(const ProposalsFiltersCount({}));
+    return _proposalsLocalSource.watchProposalsCount(filters: filters);
   }
 
   @override
@@ -365,6 +367,22 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     ).action.toModel();
 
     return proposalAction;
+  }
+
+  ProposalData _buildProposalData(ProposalDocumentData data) {
+    final document = _buildProposalDocument(
+      documentData: data.proposal,
+      templateData: data.template,
+    );
+
+    return ProposalData(
+      document: document,
+      // TODO(damian-molinski): not integrated.
+      publish: ProposalPublish.submittedProposal,
+      commentsCount: 0,
+      categoryName: '',
+      versions: const [],
+    );
   }
 
   ProposalDocument _buildProposalDocument({

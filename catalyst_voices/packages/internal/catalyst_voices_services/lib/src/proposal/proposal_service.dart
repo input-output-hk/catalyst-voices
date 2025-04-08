@@ -53,8 +53,8 @@ abstract interface class ProposalService {
     required DocumentRef ref,
   });
 
-  Future<ProposalPaginationItems<Proposal>> getProposalsPage({
-    required PaginationPage<String?> request,
+  Future<Page<Proposal>> getProposalsPage({
+    required PageRequest request,
     required ProposalsFilters filters,
   });
 
@@ -116,8 +116,8 @@ abstract interface class ProposalService {
 
   Stream<List<Proposal>> watchLatestProposals({int? limit});
 
-  Stream<ProposalsFiltersCount> watchProposalsCount({
-    required ProposalsFilters filters,
+  Stream<ProposalsCount> watchProposalsCount({
+    required ProposalsCountFilters filters,
   });
 
   Stream<List<Proposal>> watchUserProposals();
@@ -223,20 +223,13 @@ final class ProposalServiceImpl implements ProposalService {
   }
 
   @override
-  Future<ProposalPaginationItems<Proposal>> getProposalsPage({
-    required PaginationPage<String?> request,
+  Future<Page<Proposal>> getProposalsPage({
+    required PageRequest request,
     required ProposalsFilters filters,
-  }) async {
-    final proposals = await _proposalRepository.getProposalsPage(
-      request: request,
-      filters: filters,
-    );
-
-    return ProposalPaginationItems(
-      items: proposals.proposals,
-      pageKey: request.pageKey,
-      maxResults: proposals.maxResults,
-    );
+  }) {
+    return _proposalRepository
+        .getProposalsPage(request: request, filters: filters)
+        .then((value) => value.map(Proposal.fromData));
   }
 
   @override
@@ -395,8 +388,8 @@ final class ProposalServiceImpl implements ProposalService {
   }
 
   @override
-  Stream<ProposalsFiltersCount> watchProposalsCount({
-    required ProposalsFilters filters,
+  Stream<ProposalsCount> watchProposalsCount({
+    required ProposalsCountFilters filters,
   }) {
     return _proposalRepository.watchProposalsCount(filters: filters);
   }
@@ -479,9 +472,8 @@ final class ProposalServiceImpl implements ProposalService {
     final campaign =
         await _campaignRepository.getCategory(doc.metadata.categoryId);
 
-    final commentsCountStream = _proposalRepository.watchCount(
-      ref: selfRef,
-      type: DocumentType.commentTemplate,
+    final commentsCountStream = _proposalRepository.watchCommentsCount(
+      refTo: selfRef,
     );
 
     return Rx.combineLatest2(

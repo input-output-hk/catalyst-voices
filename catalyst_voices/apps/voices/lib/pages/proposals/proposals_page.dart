@@ -38,8 +38,6 @@ class _ProposalsPageState extends State<ProposalsPage>
   late final TabController _tabController;
   late final PagingController<ProposalViewModel> _pagingController;
 
-  StreamSubscription<ProposalPaginationItems<ProposalViewModel>>? _proposalsSub;
-
   @override
   Widget build(BuildContext context) {
     return CustomScrollView(
@@ -104,9 +102,6 @@ class _ProposalsPageState extends State<ProposalsPage>
 
   @override
   void dispose() {
-    unawaited(_proposalsSub?.cancel());
-    _proposalsSub = null;
-
     _tabController.dispose();
     _pagingController.dispose();
     super.dispose();
@@ -121,6 +116,13 @@ class _ProposalsPageState extends State<ProposalsPage>
         _updateRoute(filterType: type);
       case ResetProposalsPaginationSignal():
         _pagingController.notifyPageRequestListeners(0);
+      case ProposalsPageReadySignal(:final page):
+        _pagingController.value = _pagingController.value.copyWith(
+          currentPage: page.page,
+          maxResults: page.total,
+          itemList: page.items,
+          isLoading: false,
+        );
     }
   }
 
@@ -140,30 +142,15 @@ class _ProposalsPageState extends State<ProposalsPage>
       initialMaxResults: 0,
     );
 
-    final cubit = context.read<ProposalsCubit>()
-      ..init(
-        onlyMyProposals: widget.selectMyProposalsView,
-        category: widget.categoryId,
-        type: proposalsFilterType,
-      );
-
-    _proposalsSub = cubit.stream
-        .map((event) => event.proposals)
-        .distinct()
-        .listen(_handleProposalsChange);
+    context.read<ProposalsCubit>().init(
+          onlyMyProposals: widget.selectMyProposalsView,
+          category: widget.categoryId,
+          type: proposalsFilterType,
+        );
 
     _pagingController
       ..addPageRequestListener(_handleProposalsPageRequest)
       ..notifyPageRequestListeners(0);
-  }
-
-  void _handleProposalsChange(ProposalPaginationItems<ProposalViewModel> data) {
-    _pagingController.value = _pagingController.value.copyWith(
-      currentPage: data.pageKey,
-      maxResults: data.maxResults,
-      itemList: data.items,
-      isLoading: data.isLoading,
-    );
   }
 
   Future<void> _handleProposalsPageRequest(
@@ -171,11 +158,7 @@ class _ProposalsPageState extends State<ProposalsPage>
     int pageSize,
     ProposalViewModel? lastProposalId,
   ) async {
-    final request = PaginationPage<String?>(
-      pageKey: pageKey,
-      pageSize: pageSize,
-      lastId: lastProposalId?.ref.id,
-    );
+    final request = PageRequest(page: pageKey, size: pageSize);
     await context.read<ProposalsCubit>().getProposals(request);
   }
 

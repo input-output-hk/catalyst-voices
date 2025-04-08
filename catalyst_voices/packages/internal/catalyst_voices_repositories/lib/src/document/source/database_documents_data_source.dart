@@ -1,7 +1,9 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
+import 'package:catalyst_voices_repositories/src/document/source/proposal_document_data_local_source.dart';
 
-final class DatabaseDocumentsDataSource implements SignedDocumentDataSource {
+final class DatabaseDocumentsDataSource
+    implements SignedDocumentDataSource, ProposalDocumentDataLocalSource {
   final CatalystDatabase _database;
 
   DatabaseDocumentsDataSource(
@@ -21,6 +23,20 @@ final class DatabaseDocumentsDataSource implements SignedDocumentDataSource {
     }
 
     return entity.toModel();
+  }
+
+  @override
+  Future<Page<ProposalDocumentData>> getProposalsPage({
+    required PageRequest request,
+    required ProposalsFilters filters,
+  }) async {
+    // TODO(damian-molinski): integrate
+    return Page(
+      page: request.page,
+      maxPerPage: request.size,
+      total: 0,
+      items: [],
+    );
   }
 
   @override
@@ -109,13 +125,21 @@ final class DatabaseDocumentsDataSource implements SignedDocumentDataSource {
 
   @override
   Stream<int> watchCount({
-    required DocumentRef ref,
-    required DocumentType type,
+    DocumentRef? refTo,
+    DocumentType? type,
   }) {
     return _database.documentsDao.watchCount(
-      ref: ref,
+      refTo: refTo,
       type: type,
     );
+  }
+
+  @override
+  Stream<ProposalsCount> watchProposalsCount({
+    required ProposalsCountFilters filters,
+  }) {
+    // TODO(damian-molinski): integrate
+    return Stream.value(const ProposalsCount());
   }
 
   @override

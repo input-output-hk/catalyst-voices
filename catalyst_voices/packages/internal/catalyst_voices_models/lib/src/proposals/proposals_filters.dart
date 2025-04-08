@@ -41,6 +41,15 @@ final class ProposalsFilters extends Equatable {
     );
   }
 
+  ProposalsCountFilters toCountFilters() {
+    return ProposalsCountFilters(
+      author: author,
+      onlyAuthor: onlyAuthor,
+      category: category,
+      searchQuery: searchQuery,
+    );
+  }
+
   @override
   String toString() => 'ProposalsFilters('
       'type[${type.name}], '

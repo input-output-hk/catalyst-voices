@@ -8,3 +8,4 @@ export 'table/documents_favorite.drift.dart' show DocumentFavoriteEntity;
 export 'table/documents_metadata.drift.dart' show DocumentMetadataEntity;
 export 'table/drafts.drift.dart' show DocumentDraftEntity;
 export 'typedefs.dart';
+export 'view/joined_proposal_entity.dart';

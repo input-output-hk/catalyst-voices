@@ -36,8 +36,8 @@ void main() {
 
     when(
       () => mockDocumentRepository.watchCount(
-        ref: any(named: 'ref'),
-        type: DocumentType.commentTemplate,
+        refTo: any(named: 'refTo'),
+        type: DocumentType.commentDocument,
       ),
     ).thenAnswer((_) => Stream.fromIterable([5]));
   });
@@ -109,9 +109,8 @@ void main() {
       ).thenAnswer((_) => Future.value([proposalData1]));
 
       when(
-        () => mockProposalRepository.watchCount(
-          ref: any(named: 'ref'),
-          type: DocumentType.commentTemplate,
+        () => mockProposalRepository.watchCommentsCount(
+          refTo: any(named: 'refTo'),
         ),
       ).thenAnswer((_) => Stream.fromIterable([5]));
 
@@ -149,9 +148,8 @@ void main() {
       ).called(2);
 
       verify(
-        () => mockProposalRepository.watchCount(
-          ref: any(named: 'ref'),
-          type: DocumentType.commentTemplate,
+        () => mockProposalRepository.watchCommentsCount(
+          refTo: any(named: 'refTo'),
         ),
       ).called(2);
 
@@ -249,16 +247,14 @@ void main() {
         );
 
         when(
-          () => mockProposalRepository.watchCount(
-            ref: proposalRef1,
-            type: DocumentType.commentTemplate,
+          () => mockProposalRepository.watchCommentsCount(
+            refTo: proposalRef1,
           ),
         ).thenAnswer((_) => comments1.stream);
 
         when(
-          () => mockProposalRepository.watchCount(
-            ref: proposalRef2,
-            type: DocumentType.commentTemplate,
+          () => mockProposalRepository.watchCommentsCount(
+            refTo: proposalRef2,
           ),
         ).thenAnswer((_) => comments2.stream);
 

@@ -14,7 +14,7 @@ class ProposalsTabs extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<ProposalsCubit, ProposalsState, ProposalsTypeCount>(
+    return BlocSelector<ProposalsCubit, ProposalsState, ProposalsCount>(
       selector: (state) => state.count,
       builder: (context, state) {
         return _ProposalsTabs(
@@ -27,7 +27,7 @@ class ProposalsTabs extends StatelessWidget {
 }
 
 class _ProposalsTabs extends StatelessWidget {
-  final ProposalsTypeCount data;
+  final ProposalsCount data;
   final TabController controller;
 
   const _ProposalsTabs({

@@ -22,7 +22,7 @@ final class ProposalsCubit extends Cubit<ProposalsState>
 
   StreamSubscription<CatalystId?>? _activeAccountIdSub;
   StreamSubscription<List<String>>? _favouriteProposalsIdsSub;
-  StreamSubscription<ProposalsFiltersCount>? _proposalsCountSub;
+  StreamSubscription<ProposalsCount>? _proposalsCountSub;
 
   ProposalsCubit(
     this._userService,
@@ -65,7 +65,7 @@ final class ProposalsCubit extends Cubit<ProposalsState>
 
     if (category != null) _rebuildCategories();
 
-    _watchProposalsCount(filters: filters);
+    _watchProposalsCount(filters: filters.toCountFilters());
 
     emitSignal(const ResetProposalsPaginationSignal());
   }
@@ -88,10 +88,8 @@ final class ProposalsCubit extends Cubit<ProposalsState>
     return super.close();
   }
 
-  Future<void> getProposals(PaginationPage<String?> request) async {
+  Future<void> getProposals(PageRequest request) async {
     try {
-      emit(state.copyWithLoadingProposals(isLoading: true));
-
       await Future<void>.delayed(const Duration(seconds: 1));
 
       final campaign = await _campaignService.getActiveCampaign();
@@ -113,7 +111,9 @@ final class ProposalsCubit extends Cubit<ProposalsState>
         filters: filters,
       );
 
-      final proposals = page.items.map(
+      _cache = _cache.copyWith(page: Optional(page));
+
+      final mappedPage = page.map(
         (proposal) {
           return ProposalViewModel.fromProposalAtStage(
             proposal: proposal,
@@ -121,19 +121,12 @@ final class ProposalsCubit extends Cubit<ProposalsState>
             campaignStage: campaignStage,
           );
         },
-      ).toList();
-
-      final proposalsPagination = ProposalPaginationItems(
-        pageKey: page.pageKey,
-        maxResults: page.maxResults,
-        items: proposals,
       );
 
-      emit(state.copyWith(proposals: proposalsPagination));
+      final signal = ProposalsPageReadySignal(page: mappedPage);
+      emitSignal(signal);
     } catch (error, stackTrace) {
       _logger.severe('Failed loading page $request', error, stackTrace);
-    } finally {
-      emit(state.copyWithLoadingProposals(isLoading: false));
     }
   }
 
@@ -196,18 +189,10 @@ final class ProposalsCubit extends Cubit<ProposalsState>
     emit(state.copyWith(favoritesIds: ids));
   }
 
-  void _handleProposalsCount(ProposalsFiltersCount count) {
+  void _handleProposalsCount(ProposalsCount count) {
     _cache = _cache.copyWith(count: count);
 
-    final typeCount = ProposalsTypeCount(
-      total: count.countOf(type: ProposalsFilterType.total),
-      drafts: count.countOf(type: ProposalsFilterType.drafts),
-      finals: count.countOf(type: ProposalsFilterType.finals),
-      favorites: count.countOf(type: ProposalsFilterType.favorites),
-      my: count.countOf(type: ProposalsFilterType.my),
-    );
-
-    emit(state.copyWith(count: typeCount));
+    emit(state.copyWith(count: count));
   }
 
   Future<void> _loadCampaignCategories() async {
@@ -236,7 +221,7 @@ final class ProposalsCubit extends Cubit<ProposalsState>
   }
 
   void _watchProposalsCount({
-    required ProposalsFilters filters,
+    required ProposalsCountFilters filters,
   }) {
     unawaited(_proposalsCountSub?.cancel());
     _proposalsCountSub = _proposalService
