@@ -75,12 +75,16 @@ impl VerifyingKeyProvider {
     /// Catalyst Document KIDs against a provided RBAC token.
     ///
     /// This method performs the following steps:
-    /// 1. Verifies that **all** provided `kids` match the Catalyst ID from the RBAC
-    ///    token.
-    /// 2. Extracts the role index and rotation from each KID.
-    /// 3. Retrieves the latest signing public key and rotation state associated with the
+    /// 1. Verifies that only a single KID is provided with a document (as multi-signature
+    ///    is currently unsupported).
+    /// 2. Verifies that **all** provided KIDs match the Catalyst ID from the RBAC token.
+    /// 3. Verifies that each provided KID is actually a signing key.
+    /// 4. Extracts the role index and rotation from each KID.
+    /// 5. Retrieves the latest signing public key and rotation state associated with the
     ///    role for each KID from the registration chain.
-    /// 4. Collects and returns a vector of tuples containing the KID, signing key.
+    /// 6. Verifies that each provided KID uses its latest rotation.
+    /// 7. Collects and returns a vector of tuples containing the KID, and its latest
+    ///    signing key.
     ///
     /// # Errors
     ///
