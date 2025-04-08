@@ -12,7 +12,6 @@ code-generator:
     ARG local = false
     FROM +builder
     DO flutter_rust_bridge+CODE_GENERATOR_WEB
-    RUN echo something
 
     IF [ $local = true ]
         SAVE ARTIFACT ./assets/js AS LOCAL ./assets/js
