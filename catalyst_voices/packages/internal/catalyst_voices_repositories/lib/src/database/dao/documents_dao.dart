@@ -1,11 +1,11 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/database/catalyst_database.dart';
 import 'package:catalyst_voices_repositories/src/database/dao/documents_dao.drift.dart';
+import 'package:catalyst_voices_repositories/src/database/expression/is_author.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents.drift.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_metadata.dart';
 import 'package:catalyst_voices_repositories/src/database/typedefs.dart';
-import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:collection/collection.dart';
 import 'package:drift/drift.dart';
 import 'package:drift/extensions/json1.dart';
@@ -306,13 +306,7 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
       query.where((doc) => doc.type.equals(type.uuid));
     }
     if (authorId != null) {
-      final searchId = authorId.toSignificant().toUri().toStringWithoutScheme();
-
-      query.where(
-        (doc) => CustomExpression<bool>(
-          "json_extract(metadata, '\$.authors') LIKE '%$searchId%'",
-        ),
-      );
+      query.where((tbl) => tbl.metadata.author(authorId));
     }
     if (refTo != null) {
       query.where(

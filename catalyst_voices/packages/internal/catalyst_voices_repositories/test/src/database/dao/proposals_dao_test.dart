@@ -319,6 +319,54 @@ void main() {
         expect(count.total, 2);
         expect(count.my, 1);
       });
+
+      test('returns correct count when only author filter is on', () async {
+        // Given
+        final userId = DummyCatalystIdFactory.create(username: 'damian');
+        final proposalOneRef = SignedDocumentRef.generateFirstRef();
+        final proposalTwoRef = SignedDocumentRef.generateFirstRef();
+        final proposals = [
+          _buildProposal(selfRef: proposalOneRef),
+          _buildProposal(selfRef: proposalTwoRef, author: userId),
+        ];
+        final favorites = [
+          _buildProposalFavorite(proposalRef: proposalOneRef),
+        ];
+        final actions = [
+          _buildProposalAction(
+            action: ProposalSubmissionActionDto.aFinal,
+            proposalRef: proposalTwoRef,
+          ),
+        ];
+
+        final filters = ProposalsCountFilters(
+          author: userId,
+          onlyAuthor: true,
+        );
+        const expectedCount = ProposalsCount(
+          total: 1,
+          drafts: 0,
+          finals: 1,
+          favorites: 0,
+          my: 1,
+        );
+
+        // When
+        await database.documentsDao.saveAll([...proposals, ...actions]);
+
+        for (final fav in favorites) {
+          await database.favoritesDao.save(fav);
+        }
+
+        // Then
+        final count = await database.proposalsDao
+            .watchCount(
+              filters: filters,
+            )
+            .first;
+
+        expect(count, expectedCount);
+      });
     });
   });
 }

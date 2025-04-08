@@ -4,16 +4,16 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_repositories/src/database/catalyst_database.dart';
 import 'package:catalyst_voices_repositories/src/database/dao/proposals_dao.drift.dart';
+import 'package:catalyst_voices_repositories/src/database/expression/is_author.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_favorite.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_metadata.dart';
 import 'package:catalyst_voices_repositories/src/dto/proposal/proposal_submission_action_dto.dart';
-import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:drift/drift.dart';
 import 'package:drift/extensions/json1.dart';
 
 typedef _ProposalsActions = Map<SignedDocumentRef, ProposalSubmissionAction>;
-typedef _RefAction = (SignedDocumentRef ref, ProposalSubmissionAction action);
+typedef _RefAction = ({SignedDocumentRef ref, ProposalSubmissionAction action});
 
 @DriftAccessor(
   tables: [
@@ -46,26 +46,48 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
   }) async* {
     final author = filters.author;
 
-    final proposalsCount = (documents.idHi + documents.idLo).count(
-      distinct: true,
-      filter: documents.type.equalsValue(DocumentType.proposalDocument),
-    );
-
     final select = selectOnly(documents)
       ..addColumns([
-        proposalsCount,
-      ]);
+        documents.idHi,
+        documents.idLo,
+        documents.verHi,
+        documents.verLo,
+      ])
+      ..where(documents.type.equalsValue(DocumentType.proposalDocument))
+      ..orderBy([OrderingTerm.desc(documents.verHi)])
+      ..groupBy([documents.idHi + documents.idLo]);
 
-    final stream = select
-        .map((row) => row.read(proposalsCount))
-        .watchSingleOrNull()
-        .map((event) => event ?? 0);
+    if ((filters.onlyAuthor ?? false) && author != null) {
+      select.where(documents.metadata.author(author));
+    }
 
-    await for (final total in stream) {
-      final finals = await _getFinalProposalsCount();
+    final stream = select.map((row) {
+      final id = UuidHiLo(
+        high: row.read(documents.idHi)!,
+        low: row.read(documents.idLo)!,
+      );
+      final ver = UuidHiLo(
+        high: row.read(documents.verHi)!,
+        low: row.read(documents.verLo)!,
+      );
+
+      return SignedDocumentRef(id: id.uuid, version: ver.uuid);
+    }).watch();
+
+    await for (final allRefs in stream) {
+      final finalsRefs = await _getFinalProposalsRefs();
+      final favouriteRefs = await _getFavoritesRefs();
+      final myRefs = await _maybeGetAuthorProposalsLooseRefs(author: author);
+
+      final total = allRefs.length;
+      final finals = allRefs.where(finalsRefs.contains).length;
       final drafts = total - finals;
-      final favorites = await _getFavoritesCount();
-      final my = await _maybeGetAuthorProposalsCount(author: author);
+      final favorites = allRefs
+          .where((ref) => favouriteRefs.any((fav) => fav.id == ref.id))
+          .length;
+      final my = allRefs
+          .where((ref) => myRefs.any((myRef) => myRef.id == ref.id))
+          .length;
 
       yield ProposalsCount(
         total: total,
@@ -77,54 +99,61 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
     }
   }
 
-  Future<int> _getAuthorProposalsCount({required CatalystId author}) {
-    final searchId = author.toSignificant().toUri().toStringWithoutScheme();
-
-    final proposalsCount = (documents.idHi + documents.idLo).count(
-      distinct: true,
-      filter: Expression.and([
-        documents.type.equalsValue(DocumentType.proposalDocument),
-        CustomExpression<bool>(
-          "json_extract(metadata, '\$.authors') LIKE '%$searchId%'",
-        ),
-      ]),
-    );
-
+  Future<List<SignedDocumentRef>> _getAuthorProposalsLooseRefs({
+    required CatalystId author,
+  }) {
     final select = selectOnly(documents)
       ..addColumns([
-        proposalsCount,
-      ]);
+        documents.idHi,
+        documents.idLo,
+      ])
+      ..where(
+        Expression.and([
+          documents.type.equalsValue(DocumentType.proposalDocument),
+          documents.metadata.author(author),
+        ]),
+      );
 
-    return select
-        .map((row) => row.read(proposalsCount))
-        .getSingleOrNull()
-        .then((value) => value ?? 0);
+    return select.map((row) {
+      final id = UuidHiLo(
+        high: row.read(documents.idHi)!,
+        low: row.read(documents.idLo)!,
+      );
+
+      return SignedDocumentRef.loose(id: id.uuid);
+    }).get();
   }
 
-  Future<int> _getFavoritesCount() {
-    final joinedId = documentsFavorites.idHi + documentsFavorites.idLo;
-    const docType = DocumentType.proposalDocument;
+  Future<List<SignedDocumentRef>> _getFavoritesRefs() {
+    final select = selectOnly(documentsFavorites)
+      ..addColumns([
+        documentsFavorites.idHi,
+        documentsFavorites.idLo,
+      ])
+      ..where(
+        Expression.and([
+          documentsFavorites.type.equalsValue(DocumentType.proposalDocument),
+          documentsFavorites.isFavorite.equals(true),
+        ]),
+      );
 
-    final count = (joinedId).count(
-      distinct: true,
-      filter: Expression.and([
-        documentsFavorites.type.equalsValue(docType),
-        documentsFavorites.isFavorite.equals(true),
-      ]),
+    return select.map((row) {
+      final id = UuidHiLo(
+        high: row.read(documentsFavorites.idHi)!,
+        low: row.read(documentsFavorites.idLo)!,
+      );
+
+      return SignedDocumentRef.loose(id: id.uuid);
+    }).get();
+  }
+
+  Future<List<SignedDocumentRef>> _getFinalProposalsRefs() {
+    return _getProposalsLatestAction().then(
+      (value) => value.entries
+          .where((element) => element.value.isFinal)
+          .map((e) => e.key)
+          .toList(),
     );
-
-    final select = selectOnly(documentsFavorites)..addColumns([count]);
-
-    return select
-        .map((row) => row.read(count))
-        .getSingleOrNull()
-        .then((value) => value ?? 0);
-  }
-
-  Future<int> _getFinalProposalsCount() {
-    return _getProposalsLatestAction()
-        .then((value) => value.values.where((element) => element.isFinal))
-        .then((value) => value.length);
   }
 
   Future<_ProposalsActions> _getProposalsLatestAction() {
@@ -164,20 +193,22 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
             // 1st element per ref is latest. See orderBy.
             final id = entry.key.id;
             if (!grouped.containsKey(id)) {
-              grouped[id] = (entry.key, entry.value!);
+              grouped[id] = (ref: entry.key, action: entry.value!);
             }
           }
 
-          return grouped.map((_, value) => MapEntry(value.$1, value.$2));
+          return grouped.map((_, value) => MapEntry(value.ref, value.action));
         });
   }
 
-  Future<int> _maybeGetAuthorProposalsCount({CatalystId? author}) {
+  Future<List<SignedDocumentRef>> _maybeGetAuthorProposalsLooseRefs({
+    CatalystId? author,
+  }) {
     if (author == null) {
-      return Future(() => 0);
+      return Future(List.empty);
     }
 
-    return _getAuthorProposalsCount(author: author);
+    return _getAuthorProposalsLooseRefs(author: author);
   }
 }
 
