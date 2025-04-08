@@ -142,7 +142,6 @@ project: {
 							name: "332405224602.dkr.ecr.eu-central-1.amazonaws.com/catalyst-voices/gateway-event-db"
 							tag:  _ @forge(name="GIT_HASH_OR_TAG")
 						}
-
 						env: {
 							DB_HOST: {
 								secret: {
