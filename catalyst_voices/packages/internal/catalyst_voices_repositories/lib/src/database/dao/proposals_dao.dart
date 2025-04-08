@@ -67,7 +67,7 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
 
   Future<int> _getFinalProposalsCount() {
     final refId = documents.metadata.jsonExtract<Uint8List>(r'$.ref.id');
-    final select = selectOnly(documents, distinct: true)
+    final select = selectOnly(documents)
       ..addColumns([
         refId,
         documents.content,
@@ -82,16 +82,21 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
           final finalKey = ProposalSubmissionActionDto.aFinal.key;
           final isFinal = content?.data['action'] == finalKey;
 
-          print(
-            'proposalId[$proposalId], '
-            'isFinal[$isFinal] -> '
-            'content[$content]',
-          );
-
-          return isFinal ? 1 : 0;
+          return MapEntry(proposalId, isFinal);
         })
         .get()
-        .then((value) => value.fold<int>(0, (total, count) => total + count));
+        .then(
+          (value) {
+            final grouped = <String, bool>{};
+
+            for (final entry in value) {
+              // 1st element per ref is latest. See orderBy.
+              grouped.putIfAbsent(entry.key, () => entry.value);
+            }
+
+            return grouped.entries.where((element) => element.value).length;
+          },
+        );
   }
 }
 

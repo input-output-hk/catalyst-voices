@@ -7,6 +7,7 @@ import 'package:catalyst_voices_repositories/src/dto/proposal/proposal_submissio
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:uuid_plus/uuid_plus.dart';
 
 import '../../utils/test_factories.dart';
 
@@ -109,6 +110,10 @@ void main() {
         ];
         final actions = [
           _buildProposalAction(
+            action: ProposalSubmissionActionDto.aFinal,
+            proposalRef: ref,
+          ),
+          _buildProposalAction(
             action: ProposalSubmissionActionDto.draft,
             proposalRef: ref,
           ),
@@ -129,6 +134,123 @@ void main() {
             )
             .first;
 
+        expect(count.finals, 1);
+      });
+
+      test(
+          'returns zero final proposal if latest '
+          'submission is draft', () async {
+        // Given
+        final ref = SignedDocumentRef.generateFirstRef();
+        final proposals = [
+          _buildProposal(selfRef: ref),
+        ];
+        final actions = [
+          _buildProposalAction(
+            selfRef: _buildRefAt(DateTime(2025, 04, 7)),
+            action: ProposalSubmissionActionDto.aFinal,
+            proposalRef: ref,
+          ),
+          _buildProposalAction(
+            selfRef: _buildRefAt(DateTime(2025, 04, 8)),
+            action: ProposalSubmissionActionDto.draft,
+            proposalRef: ref,
+          ),
+        ];
+        const filters = ProposalsCountFilters();
+
+        // When
+        await database.documentsDao.saveAll([...proposals, ...actions]);
+
+        // Then
+        final count = await database.proposalsDao
+            .watchCount(
+              filters: filters,
+            )
+            .first;
+
+        expect(count.finals, 0);
+      });
+
+      test(
+          'returns two final proposal when each have '
+          'complex action history', () async {
+        // Given
+        final proposalOneRef = SignedDocumentRef.generateFirstRef();
+        final proposalTwoRef = SignedDocumentRef.generateFirstRef();
+        final proposals = [
+          _buildProposal(selfRef: proposalOneRef),
+          _buildProposal(selfRef: proposalTwoRef),
+        ];
+        final actions = [
+          _buildProposalAction(
+            selfRef: _buildRefAt(DateTime(2025, 04, 1)),
+            action: ProposalSubmissionActionDto.draft,
+            proposalRef: proposalOneRef,
+          ),
+          _buildProposalAction(
+            selfRef: _buildRefAt(DateTime(2025, 04, 2)),
+            action: ProposalSubmissionActionDto.aFinal,
+            proposalRef: proposalOneRef,
+          ),
+          _buildProposalAction(
+            selfRef: _buildRefAt(DateTime(2025, 04, 7)),
+            action: ProposalSubmissionActionDto.hide,
+            proposalRef: proposalTwoRef,
+          ),
+          _buildProposalAction(
+            selfRef: _buildRefAt(DateTime(2025, 04, 8)),
+            action: ProposalSubmissionActionDto.aFinal,
+            proposalRef: proposalTwoRef,
+          ),
+        ];
+        const filters = ProposalsCountFilters();
+
+        // When
+        await database.documentsDao.saveAll([...proposals, ...actions]);
+
+        // Then
+        final count = await database.proposalsDao
+            .watchCount(
+              filters: filters,
+            )
+            .first;
+
+        expect(count.finals, 2);
+      });
+
+      test('returns calculated drafts count', () async {
+        // Given
+        final proposalOneRef = SignedDocumentRef.generateFirstRef();
+        final proposalTwoRef = SignedDocumentRef.generateFirstRef();
+        final proposals = [
+          _buildProposal(selfRef: proposalOneRef),
+          _buildProposal(selfRef: proposalTwoRef),
+        ];
+        final actions = [
+          _buildProposalAction(
+            action: ProposalSubmissionActionDto.aFinal,
+            proposalRef: proposalOneRef,
+          ),
+          _buildProposalAction(
+            action: ProposalSubmissionActionDto.draft,
+            proposalRef: proposalTwoRef,
+          ),
+        ];
+        const filters = ProposalsCountFilters();
+
+        // When
+        await database.documentsDao.saveAll([...proposals, ...actions]);
+
+        // Then
+        final count = await database.proposalsDao
+            .watchCount(
+              filters: filters,
+            )
+            .first;
+
+        expect(count.total, 2);
+        expect(count.drafts, 1);
         expect(count.finals, 1);
       });
     });
@@ -184,4 +306,10 @@ DocumentEntityWithMetadata _buildProposalAction({
   const metadataEntities = <DocumentMetadataEntity>[];
 
   return (document: document, metadata: metadataEntities);
+}
+
+SignedDocumentRef _buildRefAt(DateTime dateTime) {
+  final config = V7Options(dateTime.millisecondsSinceEpoch, null);
+  final val = const Uuid().v7(config: config);
+  return SignedDocumentRef.first(val);
 }
