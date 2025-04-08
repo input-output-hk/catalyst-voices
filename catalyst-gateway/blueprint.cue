@@ -236,7 +236,7 @@ project: {
 				tag: {}
 			}
 			config: {
-				tag: _ @forge(name="GIT_COMMIT_HASH")
+				tag: _ @forge(name="GIT_HASH_OR_TAG")
 			}
 		}
 	}
