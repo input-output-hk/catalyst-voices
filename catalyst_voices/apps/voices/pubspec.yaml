@@ -47,6 +47,7 @@ dependencies:
   flutter_dropzone_web: 4.0.2
   flutter_localized_locales: ^2.0.5
   flutter_markdown: ^0.7.4+3
+  flutter_native_splash: ^2.4.6
   # TODO(minikin): We use our forks as a temporary workaround for F14.
   flutter_quill:
     git:
