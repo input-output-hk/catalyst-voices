@@ -94,6 +94,10 @@ impl VerifyingKeyProvider {
     pub(crate) fn try_from_kids(
         token: &CatalystRBACTokenV1, kids: &[catalyst_signed_doc::IdUri],
     ) -> anyhow::Result<Self> {
+        if kids.len() > 1 {
+            anyhow::bail!("Multi-signature document is currently unsupported");
+        }
+
         // validate rbac token and document KIDs (ignoring the role/rotation)
         if kids
             .iter()
