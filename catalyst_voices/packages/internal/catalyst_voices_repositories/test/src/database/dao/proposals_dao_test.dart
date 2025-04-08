@@ -107,7 +107,7 @@ void main() {
       });
 
       test(
-          'returns one final proposal if final submission is '
+          'returns one final proposal when final submission is '
           'latest action but old draft action exists', () async {
         // Given
         final ref = SignedDocumentRef.generateFirstRef();
@@ -116,14 +116,17 @@ void main() {
         ];
         final actions = [
           _buildProposalAction(
+            selfRef: _buildRefAt(DateTime(2025, 04, 1)),
             action: ProposalSubmissionActionDto.aFinal,
             proposalRef: ref,
           ),
           _buildProposalAction(
+            selfRef: _buildRefAt(DateTime(2025, 04, 2)),
             action: ProposalSubmissionActionDto.draft,
             proposalRef: ref,
           ),
           _buildProposalAction(
+            selfRef: _buildRefAt(DateTime(2025, 04, 8)),
             action: ProposalSubmissionActionDto.aFinal,
             proposalRef: ref,
           ),

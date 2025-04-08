@@ -41,8 +41,6 @@ enum ProposalSubmissionActionDto {
     }
   }
 
-  String get key => _$ProposalSubmissionActionDtoEnumMap[this]!;
-
   ProposalSubmissionAction toModel() {
     switch (this) {
       case ProposalSubmissionActionDto.aFinal:
@@ -52,5 +50,13 @@ enum ProposalSubmissionActionDto {
       case ProposalSubmissionActionDto.hide:
         return ProposalSubmissionAction.hide;
     }
+  }
+
+  static ProposalSubmissionActionDto? fromJson(String value) {
+    return $enumDecodeNullable(
+      _$ProposalSubmissionActionDtoEnumMap,
+      value,
+      unknownValue: JsonKey.nullForUndefinedEnumValue,
+    );
   }
 }

@@ -12,6 +12,9 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:drift/drift.dart';
 import 'package:drift/extensions/json1.dart';
 
+typedef _ProposalsActions = Map<SignedDocumentRef, ProposalSubmissionAction>;
+typedef _RefAction = (SignedDocumentRef ref, ProposalSubmissionAction action);
+
 @DriftAccessor(
   tables: [
     Documents,
@@ -121,10 +124,23 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
   }
 
   Future<int> _getFinalProposalsCount() {
+    return _getProposalsActions().then(
+      (value) {
+        return value.values
+            .where((element) => element == ProposalSubmissionAction.aFinal)
+            .length;
+      },
+    );
+  }
+
+  Future<_ProposalsActions> _getProposalsActions() {
     final refId = documents.metadata.jsonExtract<Uint8List>(r'$.ref.id');
+    final refVer = documents.metadata.jsonExtract<Uint8List>(r'$.ref.version');
     final select = selectOnly(documents, distinct: true)
       ..addColumns([
+        documents.verHi,
         refId,
+        refVer,
         documents.content,
       ])
       ..where(documents.type.equalsValue(DocumentType.proposalActionDocument))
@@ -132,26 +148,34 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
 
     return select
         .map((row) {
-          final proposalId = utf8.decode(row.read(refId)!);
-          final content = row.readWithConverter(documents.content);
-          final finalKey = ProposalSubmissionActionDto.aFinal.key;
-          final isFinal = content?.data['action'] == finalKey;
+          final id = utf8.decode(row.read(refId)!);
+          final ver = utf8.decode(row.read(refId)!);
+          final proposalRef = SignedDocumentRef(id: id, version: ver);
 
-          return MapEntry(proposalId, isFinal);
+          final content = row.readWithConverter(documents.content);
+          final rawAction = content?.data['action'];
+          final actionDto = rawAction is String
+              ? ProposalSubmissionActionDto.fromJson(rawAction)
+              : null;
+          final action = actionDto?.toModel();
+
+          return MapEntry(proposalRef, action);
         })
         .get()
-        .then(
-          (value) {
-            final grouped = <String, bool>{};
+        .then((entities) {
+          final grouped = <String, _RefAction>{};
 
-            for (final entry in value) {
-              // 1st element per ref is latest. See orderBy.
-              grouped.putIfAbsent(entry.key, () => entry.value);
+          for (final entry
+              in entities.where((element) => element.value != null)) {
+            // 1st element per ref is latest. See orderBy.
+            final id = entry.key.id;
+            if (!grouped.containsKey(id)) {
+              grouped[id] = (entry.key, entry.value!);
             }
+          }
 
-            return grouped.entries.where((element) => element.value).length;
-          },
-        );
+          return grouped.map((_, value) => MapEntry(value.$1, value.$2));
+        });
   }
 }
 
