@@ -92,9 +92,8 @@ class TimezoneDateTimeText extends StatelessWidget {
     final timezoneTextStyle = timezoneTheme?.timezoneTextStyle ??
         WidgetStatePropertyAll(textTheme.labelSmall);
 
-    // TODO(damian-molinski): update this color from schema.
     final backgroundColor = timezoneTheme?.backgroundColor ??
-        const WidgetStatePropertyAll(Color(0xFFE8ECFD));
+        WidgetStatePropertyAll(theme.colors.primary98);
     final foregroundColor = timezoneTheme?.foregroundColor ??
         WidgetStatePropertyAll(theme.colors.textOnPrimaryLevel1);
 

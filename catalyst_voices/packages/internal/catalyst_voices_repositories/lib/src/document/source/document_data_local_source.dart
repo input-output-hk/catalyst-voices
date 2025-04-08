@@ -40,6 +40,11 @@ abstract interface class SignedDocumentDataSource
     required DocumentType type,
   });
 
+  Future<DocumentData?> getRefToDocumentData({
+    required DocumentRef refTo,
+    required DocumentType type,
+  });
+
   Stream<List<DocumentData>> watchAll({
     int? limit,
     required bool unique,
@@ -50,6 +55,11 @@ abstract interface class SignedDocumentDataSource
 
   Stream<int> watchCount({
     required DocumentRef ref,
+    required DocumentType type,
+  });
+
+  Stream<DocumentData?> watchRefToDocumentData({
+    required DocumentRef refTo,
     required DocumentType type,
   });
 }
