@@ -5,14 +5,12 @@ import 'package:flutter/material.dart';
 class CampaignTimeline extends StatefulWidget {
   final List<CampaignTimelineViewModel> timelineItems;
   final CampaignTimelinePlacement placement;
-  final ValueChanged<bool>? onExpandedChanged;
   final SizedBox horizontalPadding;
 
   const CampaignTimeline({
     super.key,
     required this.timelineItems,
     required this.placement,
-    this.onExpandedChanged,
     this.horizontalPadding = const SizedBox.shrink(),
   });
 
@@ -22,40 +20,30 @@ class CampaignTimeline extends StatefulWidget {
 
 class CampaignTimelineState extends State<CampaignTimeline> {
   final _scrollController = ScrollController();
-  final Set<int> _expandedIndices = {};
 
   @override
   Widget build(BuildContext context) {
-    return MouseRegion(
-      cursor: SystemMouseCursors.click,
-      child: SizedBox(
-        height: _expandedIndices.isNotEmpty ? 300 : 150,
-        child: GestureDetector(
-          onHorizontalDragUpdate: _handleHorizontalScroll,
-          // Why not ListView? It forces children to full height
-          // (parent constraint).The SingleChildScrollView+Row
-          // reserves natural card heights from content.
-          child: SingleChildScrollView(
-            controller: _scrollController,
-            physics: const BouncingScrollPhysics(),
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                widget.horizontalPadding,
-                ...widget.timelineItems.asMap().entries.map(
-                      (entry) => CampaignTimelineCard(
-                        timelineItem: entry.value,
-                        placement: widget.placement,
-                        onExpandedChanged: (isExpanded) {
-                          _onCardExpanded(isExpanded, entry);
-                        },
-                      ),
+    return GestureDetector(
+      onHorizontalDragUpdate: _handleHorizontalScroll,
+      child: MouseRegion(
+        cursor: SystemMouseCursors.click,
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          controller: _scrollController,
+          physics: const BouncingScrollPhysics(),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              widget.horizontalPadding,
+              ...widget.timelineItems.asMap().entries.map(
+                    (entry) => CampaignTimelineCard(
+                      timelineItem: entry.value,
+                      placement: widget.placement,
                     ),
-                widget.horizontalPadding,
-              ],
-            ),
+                  ),
+              widget.horizontalPadding,
+            ],
           ),
         ),
       ),
@@ -82,19 +70,5 @@ class CampaignTimelineState extends State<CampaignTimeline> {
     _scrollController.jumpTo(
       _scrollController.offset - details.delta.dx,
     );
-  }
-
-  void _onCardExpanded(
-    bool isExpanded,
-    MapEntry<int, CampaignTimelineViewModel> entry,
-  ) {
-    setState(() {
-      if (isExpanded) {
-        _expandedIndices.add(entry.key);
-      } else {
-        _expandedIndices.remove(entry.key);
-      }
-    });
-    widget.onExpandedChanged?.call(_expandedIndices.isNotEmpty);
   }
 }

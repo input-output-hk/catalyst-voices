@@ -157,14 +157,13 @@ void main() {
       'calls onExpandedChanged when any card is expanded or collapsed',
       (tester) async {
         await tester.binding.setSurfaceSize(const Size(1200, 800));
-        var expanded = false;
+        const expanded = false;
         final widget = Center(
           child: SizedBox(
             width: 1100,
             child: CampaignTimeline(
               timelineItems: timelineItems,
               placement: CampaignTimelinePlacement.discovery,
-              onExpandedChanged: (isExpanded) => expanded = isExpanded,
             ),
           ),
         );

@@ -158,13 +158,18 @@ class _StayInvolvedCard extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 32),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
-        gradient: const LinearGradient(
+        gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [
-            Color(0xFFD1EAFF),
-            Color(0xFFCAD6FE),
-          ],
+          colors: Theme.of(context).brightness == Brightness.light
+              ? [
+                  const Color(0xFFD1EAFF),
+                  const Color(0xFFCAD6FE),
+                ]
+              : [
+                  const Color(0xFF2D3953),
+                  const Color(0xFF242C42),
+                ],
         ),
       ),
       child: Column(
