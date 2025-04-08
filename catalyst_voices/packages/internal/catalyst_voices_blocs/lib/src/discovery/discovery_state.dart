@@ -80,6 +80,18 @@ final class DiscoveryMostRecentProposalsState extends Equatable {
   bool get showError => !isLoading && error != null;
 
   bool get showProposals => !isLoading && proposals.isNotEmpty && error == null;
+
+  DiscoveryMostRecentProposalsState copyWith({
+    bool? isLoading,
+    LocalizedException? error,
+    List<PendingProposal>? proposals,
+  }) {
+    return DiscoveryMostRecentProposalsState(
+      isLoading: isLoading ?? this.isLoading,
+      error: error ?? this.error,
+      proposals: proposals ?? this.proposals,
+    );
+  }
 }
 
 final class DiscoveryState extends Equatable {
