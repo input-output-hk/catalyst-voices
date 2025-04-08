@@ -65,9 +65,7 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
       final finals = await _getFinalProposalsCount();
       final drafts = total - finals;
       final favorites = await _getFavoritesCount();
-      final my = await (author != null
-          ? _getAuthorProposalsCount(author: author)
-          : Future.value(0));
+      final my = await _maybeGetAuthorProposalsCount(author: author);
 
       yield ProposalsCount(
         total: total,
@@ -124,16 +122,12 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
   }
 
   Future<int> _getFinalProposalsCount() {
-    return _getProposalsActions().then(
-      (value) {
-        return value.values
-            .where((element) => element == ProposalSubmissionAction.aFinal)
-            .length;
-      },
-    );
+    return _getProposalsLatestAction()
+        .then((value) => value.values.where((element) => element.isFinal))
+        .then((value) => value.length);
   }
 
-  Future<_ProposalsActions> _getProposalsActions() {
+  Future<_ProposalsActions> _getProposalsLatestAction() {
     final refId = documents.metadata.jsonExtract<Uint8List>(r'$.ref.id');
     final refVer = documents.metadata.jsonExtract<Uint8List>(r'$.ref.version');
     final select = selectOnly(documents, distinct: true)
@@ -177,6 +171,14 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
           return grouped.map((_, value) => MapEntry(value.$1, value.$2));
         });
   }
+
+  Future<int> _maybeGetAuthorProposalsCount({CatalystId? author}) {
+    if (author == null) {
+      return Future(() => 0);
+    }
+
+    return _getAuthorProposalsCount(author: author);
+  }
 }
 
 abstract interface class ProposalsDao {
@@ -188,4 +190,8 @@ abstract interface class ProposalsDao {
   Stream<ProposalsCount> watchCount({
     required ProposalsCountFilters filters,
   });
+}
+
+extension on ProposalSubmissionAction {
+  bool get isFinal => this == ProposalSubmissionAction.aFinal;
 }
