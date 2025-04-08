@@ -98,7 +98,6 @@ impl VerifyingKeyProvider {
             anyhow::bail!("Multi-signature document is currently unsupported");
         }
 
-        // validate rbac token and document KIDs (ignoring the role/rotation)
         if kids
             .iter()
             .any(|kid| kid.as_short_id() != token.catalyst_id().as_short_id())
