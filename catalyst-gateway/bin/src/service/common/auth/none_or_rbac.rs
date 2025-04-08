@@ -1,5 +1,6 @@
 //! Either has No Authorization, or RBAC Token.
 
+use catalyst_types::id_uri::IdUri;
 use poem_openapi::SecurityScheme;
 
 use super::{none::NoAuthorization, rbac::scheme::CatalystRBACSecurityScheme};
@@ -12,4 +13,13 @@ pub(crate) enum NoneOrRBAC {
     RBAC(CatalystRBACSecurityScheme),
     /// Has No Authorization.
     None(NoAuthorization),
+}
+
+impl From<NoneOrRBAC> for Option<IdUri> {
+    fn from(value: NoneOrRBAC) -> Self {
+        match value {
+            NoneOrRBAC::RBAC(auth) => Some(auth.into()),
+            NoneOrRBAC::None(_) => None,
+        }
+    }
 }
