@@ -24,17 +24,14 @@ project: {
 								tag:  _ @forge(name="GIT_HASH_OR_TAG")
 							}
 							env: {
-								"RBAC_OFF": {
-									value: "True"
+								"CHAIN_NETWORK": {
+									value: string | *"Preprod"
 								}
-								"SIGNED_DOC_SK": {
-    								secret: {
-        								name: "gateway"
-        								key:  "signed-doc-secret-key"
-    								}
+								"RBAC_OFF": {
+									value: string | *"True"
 								}
 								"RUST_LOG": {
-									value: "debug,cat_gateway=debug,cardano_chain_follower=info"
+									value: string | *"debug,cat_gateway=debug,cardano_chain_follower=info"
 								}
 								"CASSANDRA_VOLATILE_URL": {
 									secret: {
@@ -85,16 +82,22 @@ project: {
 										key:  "cassandra-persistent-deployment"
 									}
 								}
+								"EVENT_DB_URL": {
+									secret: {
+										name: "db-url"
+										key:  "url"
+									}
+								}
 								"INTERNAL_API_KEY": {
 									secret: {
 										name: "gateway"
 										key:  "api-key"
 									}
 								}
-								"EVENT_DB_URL": {
+								"SIGNED_DOC_SK": {
 									secret: {
-										name: "db-url"
-										key:  "url"
+										name: "gateway"
+										key:  "signed-doc-secret-key"
 									}
 								}
 							}
