@@ -21,7 +21,7 @@ final class ProposalsCubit extends Cubit<ProposalsState>
   ProposalsCubitCache _cache = const ProposalsCubitCache();
 
   StreamSubscription<CatalystId?>? _activeAccountIdSub;
-  StreamSubscription<List<String>>? _favouriteProposalsIdsSub;
+  StreamSubscription<List<String>>? _favoritesProposalsIdsSub;
   StreamSubscription<ProposalsCount>? _proposalsCountSub;
 
   ProposalsCubit(
@@ -38,10 +38,10 @@ final class ProposalsCubit extends Cubit<ProposalsState>
         .distinct()
         .listen(_handleActiveAccountIdChange);
 
-    _favouriteProposalsIdsSub = _favouriteProposalsIdsSub = _proposalService
+    _favoritesProposalsIdsSub = _favoritesProposalsIdsSub = _proposalService
         .watchFavoritesProposalsIds()
         .distinct(listEquals)
-        .listen(_handleFavouriteProposalsIds);
+        .listen(_handleFavoriteProposalsIds);
   }
 
   void changeFilters({
@@ -77,8 +77,8 @@ final class ProposalsCubit extends Cubit<ProposalsState>
     await _activeAccountIdSub?.cancel();
     _activeAccountIdSub = null;
 
-    await _favouriteProposalsIdsSub?.cancel();
-    _favouriteProposalsIdsSub = null;
+    await _favoritesProposalsIdsSub?.cancel();
+    _favoritesProposalsIdsSub = null;
 
     await _proposalsCountSub?.cancel();
     _proposalsCountSub = null;
@@ -181,7 +181,7 @@ final class ProposalsCubit extends Cubit<ProposalsState>
     changeFilters(author: Optional(id));
   }
 
-  void _handleFavouriteProposalsIds(List<String> ids) {
+  void _handleFavoriteProposalsIds(List<String> ids) {
     emit(state.copyWith(favoritesIds: ids));
   }
 

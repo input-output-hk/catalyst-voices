@@ -520,10 +520,10 @@ DocumentEntityWithMetadata _buildProposalAction({
 DocumentFavoriteEntity _buildProposalFavorite({
   required DocumentRef proposalRef,
 }) {
-  final hilo = UuidHiLo.from(proposalRef.id);
+  final hiLo = UuidHiLo.from(proposalRef.id);
   return DocumentFavoriteEntity(
-    idHi: hilo.high,
-    idLo: hilo.low,
+    idHi: hiLo.high,
+    idLo: hiLo.low,
     isFavorite: true,
     type: DocumentType.proposalDocument,
   );
