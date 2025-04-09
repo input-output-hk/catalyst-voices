@@ -494,14 +494,10 @@ void main() {
         expect(page.items.length, 2);
         expect(page.items.length, page.total);
 
-        final proposalsRefs = page.items.map((e) => e.proposal).map(
-          (entity) {
-            return SignedDocumentRef(
-              id: UuidHiLo(high: entity.idHi, low: entity.idLo).uuid,
-              version: UuidHiLo(high: entity.verHi, low: entity.verLo).uuid,
-            );
-          },
-        ).toList();
+        final proposalsRefs = page.items
+            .map((e) => e.proposal)
+            .map((entity) => entity.ref)
+            .toList();
 
         expect(
           proposalsRefs,
@@ -550,6 +546,56 @@ void main() {
         expect(pageOne.page, 1);
         expect(pageOne.total, proposals.length);
         expect(pageOne.items.length, proposals.length - pageZero.items.length);
+      });
+
+      test('proposals category filter works as expected', () async {
+        // Given
+        final templateRef = SignedDocumentRef.generateFirstRef();
+        final categoryId = categoriesTemplatesRefs.first.category;
+
+        final templates = [
+          _buildProposalTemplate(selfRef: templateRef),
+        ];
+
+        final proposals = [
+          _buildProposal(
+            selfRef: _buildRefAt(DateTime(2025, 4, 1)),
+            template: templateRef,
+            categoryId: categoryId,
+          ),
+          _buildProposal(
+            selfRef: _buildRefAt(DateTime(2025, 4, 2)),
+            template: templateRef,
+            categoryId: categoryId,
+          ),
+          _buildProposal(
+            selfRef: _buildRefAt(DateTime(2025, 4, 3)),
+            template: templateRef,
+            categoryId: categoryId,
+          ),
+          _buildProposal(template: templateRef),
+        ];
+
+        final expectedRefs = proposals
+            .sublist(0, 3)
+            .map((proposal) => proposal.document.ref)
+            .toList();
+
+        final filters = ProposalsFilters(category: categoryId);
+
+        // When
+        await database.documentsDao.saveAll([...templates, ...proposals]);
+
+        // Then
+        const request = PageRequest(page: 0, size: 25);
+        final page = await database.proposalsDao.queryProposalsPage(
+          request: request,
+          filters: filters,
+        );
+
+        expect(page.page, 0);
+        expect(page.total, 3);
+        expect(page.items.map((e) => e.proposal.ref), expectedRefs);
       });
     });
   });
@@ -655,4 +701,13 @@ SignedDocumentRef _buildRefAt(DateTime dateTime) {
   final config = V7Options(dateTime.millisecondsSinceEpoch, null);
   final val = const Uuid().v7(config: config);
   return SignedDocumentRef.first(val);
+}
+
+extension on DocumentEntity {
+  SignedDocumentRef get ref {
+    return SignedDocumentRef(
+      id: UuidHiLo(high: idHi, low: idLo).uuid,
+      version: UuidHiLo(high: verHi, low: verLo).uuid,
+    );
+  }
 }

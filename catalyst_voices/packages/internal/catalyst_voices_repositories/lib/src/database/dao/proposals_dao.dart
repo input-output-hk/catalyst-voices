@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert' show utf8;
 
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -39,7 +40,6 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
 
     final latestProposalRef = alias(documents, 'latestProposalRef');
     final proposal = alias(documents, 'proposal');
-    final template = alias(documents, 'template');
 
     final maxVerHi = latestProposalRef.verHi.max();
     final latestProposalsQuery = selectOnly(latestProposalRef, distinct: true)
@@ -80,41 +80,10 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
       mainQuery.where(proposal.content.hasTitle(searchQuery));
     }
 
-    final proposals =
-        await mainQuery.map((row) => row.readTable(proposal)).get();
-
-    final joinedProposals = <JoinedProposalEntity>[];
-
-    for (final proposal in proposals) {
-      final templateRef = proposal.metadata.template!;
-      final templateId = UuidHiLo.from(templateRef.id);
-      final templateVer = UuidHiLo.fromNullable(templateRef.version);
-
-      final templateQuery = select(template)
-        ..where(
-          (tbl) => Expression.and([
-            tbl.type.equalsValue(DocumentType.proposalTemplate),
-            tbl.idHi.equals(templateId.high),
-            tbl.idLo.equals(templateId.low),
-            if (templateVer != null) ...[
-              tbl.verHi.equals(templateVer.high),
-              tbl.verLo.equals(templateVer.low),
-            ],
-          ]),
-        )
-        ..limit(1);
-
-      final templateEntity = await templateQuery.getSingleOrNull();
-
-      if (templateEntity != null) {
-        final joined = JoinedProposalEntity(
-          proposal: proposal,
-          template: templateEntity,
-        );
-
-        joinedProposals.add(joined);
-      }
-    }
+    final proposals = await mainQuery
+        .map((row) => row.readTable(proposal))
+        .get()
+        .then((entities) => entities.map(_buildJoinedProposal).toList().wait);
 
     final total = await watchCount(filters: filters.toCountFilters())
         .first
@@ -124,7 +93,7 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
       page: request.page,
       maxPerPage: request.size,
       total: total,
-      items: joinedProposals,
+      items: proposals,
     );
   }
 
@@ -135,6 +104,40 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
     final stream = _getProposalsRefsStream(filters: filters);
 
     return _transformRefsStreamToCount(stream, author: filters.author);
+  }
+
+  Future<JoinedProposalEntity> _buildJoinedProposal(
+    DocumentEntity proposal,
+  ) async {
+    assert(
+      proposal.type == DocumentType.proposalDocument,
+      'Invalid document type',
+    );
+
+    final templateRef = proposal.metadata.template!;
+    final templateId = UuidHiLo.from(templateRef.id);
+    final templateVer = UuidHiLo.fromNullable(templateRef.version);
+
+    final templateQuery = select(documents)
+      ..where(
+        (tbl) => Expression.and([
+          tbl.type.equalsValue(DocumentType.proposalTemplate),
+          tbl.idHi.equals(templateId.high),
+          tbl.idLo.equals(templateId.low),
+          if (templateVer != null) ...[
+            tbl.verHi.equals(templateVer.high),
+            tbl.verLo.equals(templateVer.low),
+          ],
+        ]),
+      )
+      ..limit(1);
+
+    final template = await templateQuery.getSingle();
+
+    return JoinedProposalEntity(
+      proposal: proposal,
+      template: template,
+    );
   }
 
   Future<List<SignedDocumentRef>> _getAuthorProposalsLooseRefs({
