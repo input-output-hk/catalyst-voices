@@ -451,11 +451,113 @@ void main() {
         expect(count, expectedCount);
       });
     });
+
+    group('queryProposalsPage', () {
+      test('only newest version of proposal is returned', () async {
+        // Given
+        final templateRef = SignedDocumentRef.generateFirstRef();
+
+        final ref = _buildRefAt(DateTime(2025, 4, 7));
+        final nextRef = _buildRefAt(DateTime(2025, 4, 8)).copyWith(id: ref.id);
+        final latestRef =
+            _buildRefAt(DateTime(2025, 4, 9)).copyWith(id: ref.id);
+
+        final differentRef = _buildRefAt(DateTime(2025, 4, 12));
+
+        final templates = [
+          _buildProposalTemplate(selfRef: templateRef),
+        ];
+
+        final proposals = [
+          _buildProposal(selfRef: ref, template: templateRef),
+          _buildProposal(selfRef: nextRef, template: templateRef),
+          _buildProposal(selfRef: latestRef, template: templateRef),
+          _buildProposal(selfRef: differentRef, template: templateRef),
+        ];
+        const request = PageRequest(page: 0, size: 10);
+        const filters = ProposalsFilters();
+
+        final expectedRefs = [
+          latestRef,
+          differentRef,
+        ];
+
+        // When
+        await database.documentsDao.saveAll([...templates, ...proposals]);
+
+        // Then
+        final page = await database.proposalsDao.queryProposalsPage(
+          request: request,
+          filters: filters,
+        );
+
+        expect(page.items.length, 2);
+        expect(page.items.length, page.total);
+
+        final proposalsRefs = page.items.map((e) => e.proposal).map(
+          (entity) {
+            return SignedDocumentRef(
+              id: UuidHiLo(high: entity.idHi, low: entity.idLo).uuid,
+              version: UuidHiLo(high: entity.verHi, low: entity.verLo).uuid,
+            );
+          },
+        ).toList();
+
+        expect(
+          proposalsRefs,
+          expectedRefs,
+        );
+      });
+
+      test('proposals are split into pages correctly', () async {
+        // Given
+        final templateRef = SignedDocumentRef.generateFirstRef();
+
+        final templates = [
+          _buildProposalTemplate(selfRef: templateRef),
+        ];
+
+        final now = DateTime(2024, 4, 9);
+        final proposals = List.generate(45, (index) {
+          return _buildProposal(
+            selfRef: _buildRefAt(now.subtract(Duration(days: index))),
+            template: templateRef,
+          );
+        });
+        const filters = ProposalsFilters();
+
+        // When
+        await database.documentsDao.saveAll([...templates, ...proposals]);
+
+        // Then
+        const firstRequest = PageRequest(page: 0, size: 25);
+        final pageZero = await database.proposalsDao.queryProposalsPage(
+          request: firstRequest,
+          filters: filters,
+        );
+
+        expect(pageZero.page, 0);
+        expect(pageZero.total, proposals.length);
+        expect(pageZero.items.length, firstRequest.size);
+
+        const secondRequest = PageRequest(page: 1, size: 25);
+
+        final pageOne = await database.proposalsDao.queryProposalsPage(
+          request: secondRequest,
+          filters: filters,
+        );
+
+        expect(pageOne.page, 1);
+        expect(pageOne.total, proposals.length);
+        expect(pageOne.items.length, proposals.length - pageZero.items.length);
+      });
+    });
   });
 }
 
 DocumentEntityWithMetadata _buildProposal({
   SignedDocumentRef? selfRef,
+  SignedDocumentRef? template,
   String? title,
   CatalystId? author,
   SignedDocumentRef? categoryId,
@@ -463,6 +565,7 @@ DocumentEntityWithMetadata _buildProposal({
   final metadata = DocumentDataMetadata(
     type: DocumentType.proposalDocument,
     selfRef: selfRef ?? SignedDocumentRef.generateFirstRef(),
+    template: template,
     authors: [
       if (author != null) author,
     ],
@@ -527,6 +630,25 @@ DocumentFavoriteEntity _buildProposalFavorite({
     isFavorite: true,
     type: DocumentType.proposalDocument,
   );
+}
+
+DocumentEntityWithMetadata _buildProposalTemplate({
+  SignedDocumentRef? selfRef,
+}) {
+  final metadata = DocumentDataMetadata(
+    type: DocumentType.proposalTemplate,
+    selfRef: selfRef ?? SignedDocumentRef.generateFirstRef(),
+  );
+  const content = DocumentDataContent({});
+
+  final document = DocumentFactory.build(
+    content: content,
+    metadata: metadata,
+  );
+
+  final metadataEntities = <DocumentMetadataEntity>[];
+
+  return (document: document, metadata: metadataEntities);
 }
 
 SignedDocumentRef _buildRefAt(DateTime dateTime) {

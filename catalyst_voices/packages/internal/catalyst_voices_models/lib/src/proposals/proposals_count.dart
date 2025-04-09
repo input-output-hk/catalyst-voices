@@ -1,3 +1,5 @@
+import 'package:catalyst_voices_models/catalyst_voices_models.dart'
+    show ProposalsFilterType;
 import 'package:equatable/equatable.dart';
 
 final class ProposalsCount extends Equatable {
@@ -14,6 +16,16 @@ final class ProposalsCount extends Equatable {
     this.favorites = 0,
     this.my = 0,
   });
+
+  int ofType(ProposalsFilterType type) {
+    return switch (type) {
+      ProposalsFilterType.total => total,
+      ProposalsFilterType.drafts => drafts,
+      ProposalsFilterType.finals => finals,
+      ProposalsFilterType.favorites => favorites,
+      ProposalsFilterType.my => my,
+    };
+  }
 
   @override
   List<Object?> get props => [
