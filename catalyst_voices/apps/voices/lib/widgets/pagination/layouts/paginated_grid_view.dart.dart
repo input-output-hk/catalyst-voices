@@ -57,6 +57,7 @@ class PaginatedGridView<ItemType> extends StatelessWidget {
                 key: const Key('PaginatedGridView'),
                 spacing: 16,
                 runSpacing: 16,
+                alignment: WrapAlignment.spaceEvenly,
                 children: [
                   for (var i = pagingState.currentFrom;
                       i <= pagingState.currentTo;
