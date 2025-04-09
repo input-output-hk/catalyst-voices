@@ -51,7 +51,6 @@ project: {
 										key:  "cassandra-volatile-password"
 									}
 								}
-
 								"CASSANDRA_VOLATILE_DEPLOYMENT": {
 									secret: {
 										name: "gateway"
@@ -236,7 +235,7 @@ project: {
 				tag: {}
 			}
 			config: {
-				tag: _ @forge(name="GIT_COMMIT_HASH")
+				tag: _ @forge(name="GIT_HASH_OR_TAG")
 			}
 		}
 	}
