@@ -158,6 +158,12 @@ impl CatalystRBACTokenV1 {
     }
 }
 
+impl From<CatalystRBACTokenV1> for IdUri {
+    fn from(value: CatalystRBACTokenV1) -> Self {
+        value.catalyst_id
+    }
+}
+
 impl Display for CatalystRBACTokenV1 {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         write!(

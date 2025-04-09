@@ -30,23 +30,17 @@ use crate::service::common::{
 /// A Query Parameter that can take a CIP-19 stake address, or a public key.
 /// Defining these are mutually exclusive, as a single parameter is required to be used.
 #[derive(Clone)]
-pub(crate) enum StakeAddressOrPublicKey {
+pub(crate) enum StakeOrVoter {
     /// A CIP-19 stake address
     Address(common::types::cardano::cip19_stake_address::Cip19StakeAddress),
     /// A Ed25519 Public Key
     PublicKey(common::types::generic::ed25519_public_key::Ed25519HexEncodedPublicKey),
     /// Special value that means we try to fetch all possible results.  Must be protected
-    /// with an  `APIKey`.
+    /// with an `APIKey`.
     All,
 }
 
-impl From<StakeOrVoter> for StakeAddressOrPublicKey {
-    fn from(value: StakeOrVoter) -> Self {
-        value.0 .1
-    }
-}
-
-impl TryFrom<&str> for StakeAddressOrPublicKey {
+impl TryFrom<&str> for StakeOrVoter {
     type Error = anyhow::Error;
 
     fn try_from(value: &str) -> std::result::Result<Self, Self::Error> {
@@ -76,12 +70,14 @@ const DESCRIPTION: &str = "Restrict the query to this Stake address, or Voters P
 If neither are defined, the stake address(es) from the auth tokens role0 registration are used.";
 /// Example
 const EXAMPLE: &str = common::types::cardano::cip19_stake_address::EXAMPLE;
-/// Stake Address Pattern
-const STAKE_PATTERN: &str = common::types::cardano::cip19_stake_address::PATTERN;
-/// Voting Key Pattern
-const VOTING_KEY_PATTERN: &str = common::types::generic::ed25519_public_key::PATTERN;
 /// Validation Regex Pattern
-const PATTERN: &str = concatcp!("^(", STAKE_PATTERN, ")|(", VOTING_KEY_PATTERN, ")$");
+const PATTERN: &str = concatcp!(
+    "^(",
+    common::types::cardano::cip19_stake_address::PATTERN,
+    ")|(",
+    common::types::generic::ed25519_public_key::PATTERN,
+    ")$"
+);
 /// Minimum parameter length
 static MIN_LENGTH: LazyLock<usize> = LazyLock::new(|| {
     min(
@@ -117,18 +113,6 @@ static SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| {
     }
 });
 
-/// Either a Stake Address or a ED25519 Public key.
-#[derive(Clone)]
-pub(crate) struct StakeOrVoter((String, StakeAddressOrPublicKey));
-
-impl TryFrom<&str> for StakeOrVoter {
-    type Error = anyhow::Error;
-
-    fn try_from(value: &str) -> std::result::Result<Self, Self::Error> {
-        Ok(Self((value.to_string(), value.try_into()?)))
-    }
-}
-
 impl Type for StakeOrVoter {
     type RawElementValueType = Self;
     type RawValueType = Self;
@@ -158,15 +142,15 @@ impl Type for StakeOrVoter {
 
 impl ParseFromParameter for StakeOrVoter {
     fn parse_from_parameter(value: &str) -> ParseResult<Self> {
-        Ok(Self((value.to_string(), value.try_into()?)))
+        Ok(value.try_into()?)
     }
 }
 
 impl StakeOrVoter {
     /// Is this for ALL results?
     pub(crate) fn is_all(&self, headers: &HeaderMap) -> Result<bool> {
-        match self.0 .1 {
-            StakeAddressOrPublicKey::All => {
+        match self {
+            StakeOrVoter::All => {
                 check_api_key(headers)?;
                 Ok(true)
             },
@@ -175,14 +159,12 @@ impl StakeOrVoter {
     }
 }
 
-impl TryInto<common::types::cardano::cip19_stake_address::Cip19StakeAddress> for StakeOrVoter {
+impl TryInto<Cip19StakeAddress> for StakeOrVoter {
     type Error = anyhow::Error;
 
-    fn try_into(
-        self,
-    ) -> Result<common::types::cardano::cip19_stake_address::Cip19StakeAddress, Self::Error> {
-        match self.0 .1 {
-            StakeAddressOrPublicKey::Address(addr) => Ok(addr),
+    fn try_into(self) -> Result<Cip19StakeAddress, Self::Error> {
+        match self {
+            Self::Address(addr) => Ok(addr),
             _ => bail!("Not a Stake Address"),
         }
     }
@@ -197,8 +179,8 @@ impl TryInto<common::types::generic::ed25519_public_key::Ed25519HexEncodedPublic
         self,
     ) -> Result<common::types::generic::ed25519_public_key::Ed25519HexEncodedPublicKey, Self::Error>
     {
-        match self.0 .1 {
-            StakeAddressOrPublicKey::PublicKey(key) => Ok(key),
+        match self {
+            Self::PublicKey(key) => Ok(key),
             _ => bail!("Not a Stake Address"),
         }
     }
@@ -206,17 +188,17 @@ impl TryInto<common::types::generic::ed25519_public_key::Ed25519HexEncodedPublic
 
 #[cfg(test)]
 mod tests {
-    use super::StakeAddressOrPublicKey;
+    use super::StakeOrVoter;
 
     #[test]
     fn hex_to_stake_or_voter() {
         // https://cexplorer.io/article/understanding-cardano-addresses
-        assert!(StakeAddressOrPublicKey::try_from(
+        assert!(StakeOrVoter::try_from(
             "stake1u94ullc9nj9gawc08990nx8hwgw80l9zpmr8re44kydqy9cdjq6rq",
         )
         .is_ok());
 
-        assert!(StakeAddressOrPublicKey::try_from(
+        assert!(StakeOrVoter::try_from(
             "0x83B3B55589797EF953E24F4F0DBEE4D50B6363BCF041D15F6DBD33E014E54711",
         )
         .is_ok());
