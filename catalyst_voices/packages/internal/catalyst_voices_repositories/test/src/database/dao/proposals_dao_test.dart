@@ -597,6 +597,137 @@ void main() {
         expect(page.total, 3);
         expect(page.items.map((e) => e.proposal.ref), expectedRefs);
       });
+
+      test('final proposals filter works as expected', () async {
+        // Given
+        final templateRef = SignedDocumentRef.generateFirstRef();
+
+        final templates = [
+          _buildProposalTemplate(selfRef: templateRef),
+        ];
+
+        final proposalRef1 = _buildRefAt(DateTime(2025, 4, 1));
+        final proposalRef2 = _buildRefAt(DateTime(2025, 4, 2));
+        final proposalRef3 = _buildRefAt(DateTime(2025, 4, 3));
+
+        final proposals = [
+          _buildProposal(
+            selfRef: proposalRef1,
+            template: templateRef,
+          ),
+          _buildProposal(
+            selfRef: proposalRef2,
+            template: templateRef,
+          ),
+          _buildProposal(
+            selfRef: proposalRef3,
+            template: templateRef,
+          ),
+          _buildProposal(template: templateRef),
+        ];
+
+        final actions = [
+          _buildProposalAction(
+            action: ProposalSubmissionActionDto.aFinal,
+            proposalRef: proposalRef1,
+          ),
+          _buildProposalAction(
+            action: ProposalSubmissionActionDto.aFinal,
+            proposalRef: proposalRef2,
+          ),
+        ];
+
+        final expectedRefs = [
+          proposalRef1,
+          proposalRef2,
+        ];
+
+        const filters = ProposalsFilters(type: ProposalsFilterType.finals);
+
+        // When
+        await database.documentsDao.saveAll([
+          ...templates,
+          ...proposals,
+          ...actions,
+        ]);
+
+        // Then
+        const request = PageRequest(page: 0, size: 25);
+        final page = await database.proposalsDao.queryProposalsPage(
+          request: request,
+          filters: filters,
+        );
+
+        expect(page.page, 0);
+        expect(page.total, 2);
+        expect(page.items.map((e) => e.proposal.ref), expectedRefs);
+      });
+
+      test('final proposals is one with latest action as final', () async {
+        // Given
+        final templateRef = SignedDocumentRef.generateFirstRef();
+
+        final templates = [
+          _buildProposalTemplate(selfRef: templateRef),
+        ];
+
+        final proposalRef1 = _buildRefAt(DateTime(2025, 4, 1));
+        final proposalRef2 = _buildRefAt(DateTime(2025, 4, 2));
+        final proposalRef3 = _buildRefAt(DateTime(2025, 4, 3));
+
+        final proposals = [
+          _buildProposal(
+            selfRef: proposalRef1,
+            template: templateRef,
+          ),
+          _buildProposal(
+            selfRef: proposalRef2,
+            template: templateRef,
+          ),
+          _buildProposal(
+            selfRef: proposalRef3,
+            template: templateRef,
+          ),
+          _buildProposal(template: templateRef),
+        ];
+
+        final actions = [
+          _buildProposalAction(
+            selfRef: _buildRefAt(DateTime(2025, 4, 5)),
+            action: ProposalSubmissionActionDto.aFinal,
+            proposalRef: proposalRef1,
+          ),
+          _buildProposalAction(
+            selfRef: _buildRefAt(DateTime(2025, 4, 1)),
+            action: ProposalSubmissionActionDto.draft,
+            proposalRef: proposalRef1,
+          ),
+        ];
+
+        final expectedRefs = [
+          proposalRef1,
+        ];
+
+        const filters = ProposalsFilters(type: ProposalsFilterType.finals);
+
+        // When
+        await database.documentsDao.saveAll([
+          ...templates,
+          ...proposals,
+          ...actions,
+        ]);
+
+        // Then
+        const request = PageRequest(page: 0, size: 25);
+        final page = await database.proposalsDao.queryProposalsPage(
+          request: request,
+          filters: filters,
+        );
+
+        expect(page.page, 0);
+        expect(page.total, 1);
+        expect(page.items.map((e) => e.proposal.ref), expectedRefs);
+      });
     });
   });
 }

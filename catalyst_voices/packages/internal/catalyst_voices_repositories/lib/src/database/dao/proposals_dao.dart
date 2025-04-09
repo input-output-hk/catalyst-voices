@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert' show utf8;
 
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
@@ -15,6 +14,10 @@ import 'package:catalyst_voices_repositories/src/dto/proposal/proposal_submissio
 import 'package:drift/drift.dart';
 import 'package:drift/extensions/json1.dart';
 
+typedef _IdsFilter = ({
+  Iterable<UuidHiLo>? include,
+  Iterable<UuidHiLo>? exclude
+});
 typedef _ProposalsActions = Map<SignedDocumentRef, ProposalSubmissionAction>;
 typedef _RefAction = ({SignedDocumentRef ref, ProposalSubmissionAction action});
 
@@ -66,6 +69,33 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
     ])
       ..orderBy([OrderingTerm.asc(proposal.verHi)])
       ..limit(request.size, offset: request.page * request.size);
+
+    final ids = await _getFilterTypeIds(filters.type);
+
+    final include = ids.include;
+    if (include != null) {
+      final highs = include.map((e) => e.high);
+      final lows = include.map((e) => e.low);
+      mainQuery.where(
+        Expression.and([
+          proposal.idHi.isIn(highs),
+          proposal.idLo.isIn(lows),
+        ]),
+      );
+    }
+
+    final exclude = ids.exclude;
+    if (exclude != null) {
+      final highs = exclude.map((e) => e.high);
+      final lows = exclude.map((e) => e.low);
+
+      mainQuery.where(
+        Expression.and([
+          proposal.idHi.isNotIn(highs),
+          proposal.idLo.isNotIn(lows),
+        ]),
+      );
+    }
 
     if ((filters.onlyAuthor ?? false) && author != null) {
       mainQuery.where(proposal.metadata.isAuthor(author));
@@ -188,6 +218,37 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
     }).get();
   }
 
+  Future<_IdsFilter> _getFilterTypeIds(ProposalsFilterType type) {
+    switch (type) {
+      case ProposalsFilterType.total:
+        return Future.value((include: null, exclude: null));
+      case ProposalsFilterType.drafts:
+        return _getProposalsLatestAction().then(
+          (value) {
+            return value.entries
+                .where((element) => element.value.isNotDraft)
+                .map((e) => e.key.id)
+                .map(UuidHiLo.from);
+          },
+        ).then((value) => (include: null, exclude: value));
+      case ProposalsFilterType.finals:
+        return _getProposalsLatestAction().then(
+          (value) {
+            return value.entries
+                .where((element) => element.value.isFinal)
+                .map((e) => e.key.id)
+                .map(UuidHiLo.from);
+          },
+        ).then((value) => (include: value, exclude: null));
+      case ProposalsFilterType.favorites:
+        return _getFavoritesRefs()
+            .then((value) => value.map((e) => e.id).map(UuidHiLo.from))
+            .then((value) => (include: value, exclude: null));
+      case ProposalsFilterType.my:
+        return Future.value((include: null, exclude: null));
+    }
+  }
+
   Future<List<SignedDocumentRef>> _getFinalProposalsRefs() {
     return _getProposalsLatestAction().then(
       (value) => value.entries
@@ -198,8 +259,8 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
   }
 
   Future<_ProposalsActions> _getProposalsLatestAction() {
-    final refId = documents.metadata.jsonExtract<Uint8List>(r'$.ref.id');
-    final refVer = documents.metadata.jsonExtract<Uint8List>(r'$.ref.version');
+    final refId = documents.metadata.jsonExtract<String>(r'$.ref.id');
+    final refVer = documents.metadata.jsonExtract<String>(r'$.ref.version');
     final query = selectOnly(documents, distinct: true)
       ..addColumns([
         documents.verHi,
@@ -212,11 +273,8 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
 
     return query
         .map((row) {
-          final rawId = row.read(refId);
-          final rawVer = row.read(refVer);
-
-          final id = rawId != null ? utf8.decode(rawId) : null;
-          final ver = rawVer != null ? utf8.decode(rawVer) : null;
+          final id = row.read(refId);
+          final ver = row.read(refVer);
 
           if (id == null) {
             return null;
@@ -336,6 +394,10 @@ abstract interface class ProposalsDao {
 
 extension on ProposalSubmissionAction {
   bool get isFinal => this == ProposalSubmissionAction.aFinal;
+
+  bool get isHidden => this == ProposalSubmissionAction.hide;
+
+  bool get isNotDraft => isFinal || isHidden;
 }
 
 extension on TypedResult {
