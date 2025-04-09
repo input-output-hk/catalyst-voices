@@ -83,6 +83,7 @@ final class UserServiceImpl implements UserService {
     user = user.useAccount(id: account.catalystId);
 
     await _updateUser(user);
+
     // updating email must be after updating user so that
     // the request is sent with correct access token
     unawaited(_userRepository.updateEmail(account.email));
