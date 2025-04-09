@@ -1,13 +1,17 @@
 //! Implementation of the PUT `/document` endpoint
 
-use anyhow::anyhow;
+use std::str::FromStr;
+
 use poem_openapi::{payload::Json, ApiResponse};
 use unprocessable_content_request::PutDocumentUnprocessableContent;
 
-use super::get_document::DocProvider;
+use super::common::{DocProvider, VerifyingKeyProvider};
 use crate::{
-    db::event::signed_docs::{FullSignedDoc, SignedDocBody, StoreError},
-    service::common::responses::WithErrorResponses,
+    db::event::{
+        error,
+        signed_docs::{FullSignedDoc, SignedDocBody, StoreError},
+    },
+    service::common::{auth::rbac::token::CatalystRBACTokenV1, responses::WithErrorResponses},
 };
 
 pub(crate) mod unprocessable_content_request;
@@ -45,40 +49,137 @@ pub(crate) enum Responses {
 pub(crate) type AllResponses = WithErrorResponses<Responses>;
 
 /// # PUT `/document`
-pub(crate) async fn endpoint(doc_bytes: Vec<u8>) -> AllResponses {
-    match doc_bytes.as_slice().try_into() {
-        Ok(doc) => {
-            if let Err(e) = catalyst_signed_doc::validator::validate(&doc, &DocProvider).await {
-                // means that something happened inside the `DocProvider`, some db error.
-                return AllResponses::handle_error(&e);
-            }
+pub(crate) async fn endpoint(doc_bytes: Vec<u8>, token: CatalystRBACTokenV1) -> AllResponses {
+    let Ok(doc): Result<catalyst_signed_doc::CatalystSignedDocument, _> =
+        doc_bytes.as_slice().try_into()
+    else {
+        return Responses::UnprocessableContent(Json(PutDocumentUnprocessableContent::new(
+            "Invalid CBOR bytes, cannot decode Catalyst Signed Document",
+            None,
+        )))
+        .into();
+    };
 
-            let report = doc.problem_report();
-            if report.is_problematic() {
-                return return_error_report(&report);
-            }
-
-            match store_document_in_db(&doc, doc_bytes).await {
-                Ok(true) => Responses::Created.into(),
-                Ok(false) => Responses::NoContent.into(),
-                Err(err) if err.is::<StoreError>() => {
-                    Responses::UnprocessableContent(Json(PutDocumentUnprocessableContent::new(
-                        "Document with the same `id` and `ver` already exists",
-                        None,
-                    )))
-                    .into()
-                },
-                Err(err) => AllResponses::handle_error(&err),
-            }
+    // validate document integrity
+    match catalyst_signed_doc::validator::validate(&doc, &DocProvider).await {
+        Ok(true) => (),
+        Ok(false) => {
+            return Responses::UnprocessableContent(Json(PutDocumentUnprocessableContent::new(
+                "Failed validating document integrity",
+                serde_json::to_value(doc.problem_report()).ok(),
+            )))
+            .into();
         },
-        Err(_) => {
-            Responses::UnprocessableContent(Json(PutDocumentUnprocessableContent::new(
-                "Invalid CBOR bytes, cannot decode Catalyst Signed Document.",
-                None,
+        Err(err) => {
+            // means that something happened inside the `DocProvider`, some db error.
+            return AllResponses::handle_error(&err);
+        },
+    }
+
+    // validate document signatures
+    let verifying_key_provider = match VerifyingKeyProvider::try_from_kids(&token, &doc.kids()) {
+        Ok(value) => value,
+        Err(err) => {
+            return Responses::UnprocessableContent(Json(PutDocumentUnprocessableContent::new(
+                &err, None,
             )))
             .into()
         },
+    };
+    match catalyst_signed_doc::validator::validate_signatures(&doc, &verifying_key_provider).await {
+        Ok(true) => (),
+        Ok(false) => {
+            return Responses::UnprocessableContent(Json(PutDocumentUnprocessableContent::new(
+                "Failed validating document signatures",
+                serde_json::to_value(doc.problem_report()).ok(),
+            )))
+            .into();
+        },
+        Err(err) => {
+            return AllResponses::handle_error(&err);
+        },
+    };
+
+    if doc.problem_report().is_problematic() {
+        return Responses::UnprocessableContent(Json(PutDocumentUnprocessableContent::new(
+            "Invalid Catalyst Signed Document",
+            serde_json::to_value(doc.problem_report()).ok(),
+        )))
+        .into();
     }
+
+    // check if the incoming doc and the current latest doc are the same ver/id
+    let (Ok(doc_id), Ok(doc_ver)) = (doc.doc_id(), doc.doc_ver()) else {
+        return Responses::UnprocessableContent(Json(PutDocumentUnprocessableContent::new(
+            "Invalid Catalyst Signed Document",
+            serde_json::to_value(doc.problem_report()).ok(),
+        )))
+        .into();
+    };
+    match validate_against_original_doc(doc_id, doc_ver, &doc.kids()).await {
+        Ok(true) => (),
+        Ok(false) => {
+            return Responses::UnprocessableContent(Json(
+                PutDocumentUnprocessableContent::new("Failed validating document: catalyst-id or role does not match the current version.", None),
+            ))
+            .into();
+        },
+        Err(err) => return AllResponses::handle_error(&err),
+    };
+
+    // update the document storing in the db
+    match store_document_in_db(&doc, doc_bytes).await {
+        Ok(true) => Responses::Created.into(),
+        Ok(false) => Responses::NoContent.into(),
+        Err(err) if err.is::<StoreError>() => {
+            Responses::UnprocessableContent(Json(PutDocumentUnprocessableContent::new(
+                "Document with the same `id` and `ver` already exists",
+                serde_json::to_value(doc.problem_report()).ok(),
+            )))
+            .into()
+        },
+        Err(err) => AllResponses::handle_error(&err),
+    }
+}
+
+/// Checks if the document ID and version differ, fetch the latest version and ensure its
+/// catalyst-id and role entries match those in the newer or different version.
+async fn validate_against_original_doc(
+    doc_id: catalyst_signed_doc::UuidV7, doc_ver: catalyst_signed_doc::UuidV7,
+    kids: &[catalyst_signed_doc::IdUri],
+) -> anyhow::Result<bool> {
+    let original_doc = match FullSignedDoc::retrieve(&doc_id.uuid(), None).await {
+        Ok(doc) => Some(doc),
+        Err(e) if e.is::<error::NotFoundError>() => None,
+        Err(e) => anyhow::bail!("Database error: {e}"),
+    };
+    if let Some(original_doc) = original_doc {
+        if original_doc.id() != &doc_id.uuid() || original_doc.ver() != &doc_ver.uuid() {
+            let Ok(original_authors) = original_doc
+                .body()
+                .authors()
+                .iter()
+                .map(|author| catalyst_signed_doc::IdUri::from_str(author))
+                .collect::<Result<Vec<_>, _>>()
+            else {
+                anyhow::bail!("Parsing db document error")
+            };
+
+            let result = original_authors.iter().all(|original_author| {
+                let found = kids.iter().find(|incoming_author| {
+                    incoming_author.as_short_id() == original_author.as_short_id()
+                });
+
+                found.is_some_and(|incoming_author| {
+                    incoming_author.role_and_rotation().0 == original_author.role_and_rotation().0
+                })
+            });
+
+            return Ok(result);
+        }
+    }
+
+    Ok(true)
 }
 
 /// Store a provided and validated document inside the db.
@@ -87,11 +188,7 @@ pub(crate) async fn endpoint(doc_bytes: Vec<u8>) -> AllResponses {
 async fn store_document_in_db(
     doc: &catalyst_signed_doc::CatalystSignedDocument, doc_bytes: Vec<u8>,
 ) -> anyhow::Result<bool> {
-    let authors = doc
-        .authors()
-        .into_iter()
-        .map(|kid| kid.to_string())
-        .collect();
+    let authors = doc.authors().iter().map(ToString::to_string).collect();
 
     let doc_meta_json = match serde_json::to_value(doc.doc_meta()) {
         Ok(json) => json,
@@ -125,21 +222,4 @@ async fn store_document_in_db(
     FullSignedDoc::new(doc_body, payload, doc_bytes)
         .store()
         .await
-}
-
-/// Return a response with the full error report from `CatalystSignedDocError`
-fn return_error_report(report: &catalyst_signed_doc::ProblemReport) -> AllResponses {
-    let json_report = match serde_json::to_value(report) {
-        Ok(json_report) => json_report,
-        Err(e) => {
-            return AllResponses::internal_error(&anyhow!(
-                "Invalid Signed Document Problem Report, not Json encoded: {e}"
-            ))
-        },
-    };
-    Responses::UnprocessableContent(Json(PutDocumentUnprocessableContent::new(
-        "Invalid Catalyst Signed Document",
-        Some(json_report),
-    )))
-    .into()
 }
