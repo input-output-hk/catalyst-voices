@@ -102,9 +102,9 @@ final class UserServiceImpl implements UserService {
       updatedAccount = updatedAccount.copyWith(catalystId: catalystId);
     }
 
-    // TODO(damian-molinski): post it to cat-reviews
     if (email != null) {
-      // updatedAccount = updatedAccount.copyWith(email: email);
+      await _userRepository.updateEmail(email);
+      updatedAccount = updatedAccount.copyWith(email: email);
     }
 
     if (roles != null) {
