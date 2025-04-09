@@ -115,7 +115,7 @@ class _ReviewMyAccountButton extends StatelessWidget {
 }
 
 class _RolesFooter extends StatelessWidget {
-  final List<AccountRole> roles;
+  final Set<AccountRole> roles;
 
   const _RolesFooter(this.roles);
 
@@ -169,7 +169,7 @@ class _RolesFooter extends StatelessWidget {
 }
 
 class _RolesSelectedCard extends StatelessWidget {
-  final List<AccountRole> roles;
+  final Set<AccountRole> roles;
 
   const _RolesSelectedCard({
     required this.roles,
@@ -193,12 +193,8 @@ class _RolesSelectedCardSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<RegistrationCubit, RegistrationState,
-        List<AccountRole>>(
-      selector: (state) {
-        return state.walletLinkStateData.selectedRoles?.toList() ??
-            state.walletLinkStateData.defaultRoles.toList();
-      },
+    return BlocSelector<RegistrationCubit, RegistrationState, Set<AccountRole>>(
+      selector: (state) => state.walletLinkStateData.selectedRoleTypes,
       builder: (context, roles) {
         return _RolesSelectedCard(roles: roles);
       },

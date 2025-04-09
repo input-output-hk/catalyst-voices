@@ -27,6 +27,7 @@ class _AccountKeychainTileState extends State<AccountKeychainTile> {
     return PropertyTile(
       title: context.l10n.catalystKeychain,
       action: VoicesTextButton.danger(
+        key: const Key('RemoveKeychainButton'),
         style: ButtonStyle(
           textStyle: WidgetStatePropertyAll(context.textTheme.labelSmall),
         ),
@@ -34,6 +35,7 @@ class _AccountKeychainTileState extends State<AccountKeychainTile> {
         child: Text(context.l10n.removeKeychain),
       ),
       child: VoicesTextField(
+        key: const Key('AccountKeychainTextField'),
         controller: _controller,
         onFieldSubmitted: null,
         readOnly: true,

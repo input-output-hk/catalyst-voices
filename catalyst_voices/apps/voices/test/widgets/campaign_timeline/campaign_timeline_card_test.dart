@@ -1,6 +1,7 @@
 import 'package:catalyst_voices/widgets/campaign_timeline/campaign_timeline_card.dart';
 import 'package:catalyst_voices/widgets/chips/voices_chip.dart';
 import 'package:catalyst_voices_brands/src/themes/catalyst.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
@@ -19,6 +20,7 @@ void main() {
       title: 'Test Title',
       description: 'Test Description',
       timeline: timeline,
+      stage: CampaignTimelineStage.proposalSubmission,
     );
 
     testWidgets(
@@ -127,6 +129,7 @@ void main() {
             from: DateTime.now().subtract(const Duration(days: 1)),
             to: DateTime.now().add(const Duration(days: 1)),
           ),
+          stage: CampaignTimelineStage.proposalSubmission,
         );
 
         final widget = CampaignTimelineCard(

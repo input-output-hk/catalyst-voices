@@ -8,38 +8,37 @@ import 'package:go_router/go_router.dart';
 
 class NavigationBack extends StatelessWidget {
   final String? label;
-  final EdgeInsetsGeometry padding;
+  final bool isCompact;
 
   const NavigationBack({
     super.key,
     this.label,
-    this.padding = EdgeInsets.zero,
+    this.isCompact = false,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: padding,
-      child: Row(
-        children: [
-          VoicesTextButton(
-            key: const Key('NavigationBackBtn'),
-            onTap: () {
-              if (Navigator.canPop(context)) {
-                Navigator.pop(context);
-              } else {
-                GoRouter.of(context).go(Routes.initialLocation);
-              }
-            },
-            leading: VoicesAssets.icons.arrowLeft.buildIcon(size: 18),
-            style: TextButton.styleFrom(
-              foregroundColor: context.colors.textOnPrimaryLevel1,
-              iconColor: context.colors.textOnPrimaryLevel1,
-            ),
-            child: Text(label ?? context.l10n.back),
-          ),
-        ],
+    return VoicesTextButton(
+      key: const Key('NavigationBackBtn'),
+      onTap: () => _popRoute(context),
+      leading: isCompact ? null : VoicesAssets.icons.arrowLeft.buildIcon(),
+      style: TextButton.styleFrom(
+        foregroundColor: context.colors.textOnPrimaryLevel1,
+        iconColor: context.colors.textOnPrimaryLevel1,
+        iconSize: isCompact ? 24 : 18,
+        shape: isCompact ? const CircleBorder() : null,
       ),
+      child: isCompact
+          ? VoicesAssets.icons.arrowLeft.buildIcon()
+          : Text(label ?? context.l10n.back),
     );
+  }
+
+  void _popRoute(BuildContext context) {
+    if (Navigator.canPop(context)) {
+      Navigator.pop(context);
+    } else {
+      GoRouter.of(context).go(Routes.initialLocation);
+    }
   }
 }

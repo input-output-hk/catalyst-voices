@@ -53,6 +53,6 @@ final class GreedySelectionStrategy implements CoinSelectionStrategy {
         ? otherBalance.coin
         : otherBalance.multiAsset?.bundle[pid]?[assetName] ?? const Coin(0);
 
-    return (thisAssetBalance as int).compareTo(otherAssetBalance as int);
+    return thisAssetBalance.compareTo(otherAssetBalance);
   }
 }

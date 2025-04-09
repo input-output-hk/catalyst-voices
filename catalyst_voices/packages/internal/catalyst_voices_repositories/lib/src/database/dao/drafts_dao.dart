@@ -3,6 +3,8 @@ import 'package:catalyst_voices_repositories/src/database/catalyst_database.dart
 import 'package:catalyst_voices_repositories/src/database/dao/drafts_dao.drift.dart';
 import 'package:catalyst_voices_repositories/src/database/table/drafts.dart';
 import 'package:catalyst_voices_repositories/src/database/table/drafts.drift.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:collection/collection.dart';
 import 'package:drift/drift.dart';
 import 'package:flutter/foundation.dart';
 
@@ -31,6 +33,8 @@ abstract interface class DraftsDao {
   /// Returns all known document drafts refs.
   Future<List<DraftRef>> queryAllRefs();
 
+  Future<List<DocumentDraftEntity>> queryVersionsOfId({required String id});
+
   /// Singular version of [saveAll]. Does not run in transaction.
   Future<void> save(DocumentDraftEntity draft);
 
@@ -48,6 +52,12 @@ abstract interface class DraftsDao {
 
   /// Same as [query] but emits updates.
   Stream<DocumentDraftEntity?> watch({required DocumentRef ref});
+
+  Stream<List<DocumentDraftEntity>> watchAll({
+    int? limit,
+    DocumentType? type,
+    CatalystId? authorId,
+  });
 }
 
 @DriftAccessor(
@@ -113,6 +123,23 @@ class DriftDraftsDao extends DatabaseAccessor<DriftCatalystDatabase>
   }
 
   @override
+  Future<List<DocumentDraftEntity>> queryVersionsOfId({required String id}) {
+    final query = select(drafts)
+      ..where(
+        (tbl) => _filterRef(
+          tbl,
+          DraftRef(id: id),
+          filterVersion: false,
+        ),
+      )
+      ..orderBy([
+        (u) => OrderingTerm.desc(u.verHi),
+      ]);
+
+    return query.get();
+  }
+
+  @override
   Future<void> save(DocumentDraftEntity draft) async {
     await into(drafts).insert(draft, mode: InsertMode.insertOrReplace);
   }
@@ -133,7 +160,11 @@ class DriftDraftsDao extends DatabaseAccessor<DriftCatalystDatabase>
     required DocumentRef ref,
     required DocumentDataContent content,
   }) async {
-    final insertable = DraftsCompanion(content: Value(content));
+    final insertable = DraftsCompanion(
+      content: Value(content),
+      title:
+          content.title != null ? Value(content.title!) : const Value.absent(),
+    );
     final query = update(drafts)..where((tbl) => _filterRef(tbl, ref));
 
     final updatedRows = await query.write(insertable);
@@ -148,14 +179,54 @@ class DriftDraftsDao extends DatabaseAccessor<DriftCatalystDatabase>
     return _selectRef(ref).watch().map((event) => event.firstOrNull);
   }
 
-  Expression<bool> _filterRef($DraftsTable row, DocumentRef ref) {
+  @override
+  Stream<List<DocumentDraftEntity>> watchAll({
+    int? limit,
+    DocumentType? type,
+    CatalystId? authorId,
+  }) {
+    final query = select(drafts);
+
+    if (type != null) {
+      query.where((doc) => doc.type.equals(type.uuid));
+    }
+    if (authorId != null) {
+      final searchId = authorId.toSignificant().toUri().toStringWithoutScheme();
+
+      query.where(
+        (doc) => CustomExpression<bool>(
+          // ignore: lines_longer_than_80_chars
+          "json_extract(metadata, '\$.authors') LIKE '%$searchId%'",
+        ),
+      );
+    }
+
+    query.orderBy([
+      (t) => OrderingTerm(
+            expression: t.verHi,
+            mode: OrderingMode.desc,
+          ),
+    ]);
+
+    if (limit != null) {
+      query.limit(limit);
+    }
+
+    return query.watch();
+  }
+
+  Expression<bool> _filterRef(
+    $DraftsTable row,
+    DocumentRef ref, {
+    bool filterVersion = true,
+  }) {
     final id = UuidHiLo.from(ref.id);
     final ver = UuidHiLo.fromNullable(ref.version);
 
     return Expression.and([
       row.idHi.equals(id.high),
       row.idLo.equals(id.low),
-      if (ver != null) ...[
+      if (ver != null && filterVersion) ...[
         row.verHi.equals(ver.high),
         row.verLo.equals(ver.low),
       ],

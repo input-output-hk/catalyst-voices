@@ -1,6 +1,8 @@
 import 'package:catalyst_voices/common/ext/account_role_ext.dart';
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/pages/account/edit_roles_dialog.dart';
+import 'package:catalyst_voices/pages/registration/registration_dialog.dart';
+import 'package:catalyst_voices/pages/registration/registration_type.dart';
 import 'package:catalyst_voices/widgets/common/affix_decorator.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
@@ -39,6 +41,7 @@ class _AccountRolesTileState extends State<_AccountRolesTile> {
   Widget build(BuildContext context) {
     return PropertyTile(
       title: context.l10n.myRoles,
+      key: const Key('AddRoleTile'),
       action: _EditButton(
         onTap: widget.state.canAddRole ? _addAccountRole : null,
       ),
@@ -53,7 +56,15 @@ class _AccountRolesTileState extends State<_AccountRolesTile> {
       return;
     }
 
-    // TODO(damian-molinski): Registration dialog
+    final accountId = context.read<SessionCubit>().state.account?.catalystId;
+    if (accountId == null) {
+      return;
+    }
+
+    await RegistrationDialog.show(
+      context,
+      type: UpdateAccount(id: accountId),
+    );
   }
 }
 
@@ -68,6 +79,7 @@ class _EditButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return VoicesTextButton(
       onTap: onTap,
+      key: const Key('EditRolesButton'),
       child: Text(
         context.l10n.addRole,
         style: Theme.of(context).textTheme.labelSmall,
@@ -76,20 +88,18 @@ class _EditButton extends StatelessWidget {
   }
 }
 
-class _Roles extends StatelessWidget {
-  final List<MyAccountRoleItem> items;
+class _IconColor implements WidgetStateProperty<Color> {
+  final VoicesColorScheme colors;
 
-  const _Roles({
-    required this.items,
-  });
+  const _IconColor(this.colors);
 
   @override
-  Widget build(BuildContext context) {
-    return Wrap(
-      spacing: 12,
-      runSpacing: 12,
-      children: items.map((item) => _RoleCell(item: item)).toList(),
-    );
+  Color resolve(Set<WidgetState> states) {
+    if (states.contains(WidgetState.disabled)) {
+      return colors.iconsDisabled;
+    }
+
+    return colors.iconsForeground;
   }
 }
 
@@ -148,18 +158,20 @@ class _RoleCellBorder implements WidgetStateProperty<Border> {
   }
 }
 
-class _IconColor implements WidgetStateProperty<Color> {
-  final VoicesColorScheme colors;
+class _Roles extends StatelessWidget {
+  final List<MyAccountRoleItem> items;
 
-  const _IconColor(this.colors);
+  const _Roles({
+    required this.items,
+  });
 
   @override
-  Color resolve(Set<WidgetState> states) {
-    if (states.contains(WidgetState.disabled)) {
-      return colors.iconsDisabled;
-    }
-
-    return colors.iconsForeground;
+  Widget build(BuildContext context) {
+    return Wrap(
+      spacing: 12,
+      runSpacing: 12,
+      children: items.map((item) => _RoleCell(item: item)).toList(),
+    );
   }
 }
 

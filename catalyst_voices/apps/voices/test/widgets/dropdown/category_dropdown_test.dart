@@ -1,4 +1,5 @@
 import 'package:catalyst_voices/widgets/dropdown/category_dropdown.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -9,12 +10,12 @@ void main() {
   final items = [
     const DropdownMenuViewModel(
       name: 'Item 1',
-      value: 'value1',
+      value: SignedDocumentRef(id: 'value1'),
       isSelected: false,
     ),
     const DropdownMenuViewModel(
       name: 'Item 2',
-      value: 'value2',
+      value: SignedDocumentRef(id: 'value2'),
       isSelected: true,
     ),
   ];
@@ -23,7 +24,7 @@ void main() {
     testWidgets('$CategoryDropdown renders correctly',
         (WidgetTester tester) async {
       final popupMenuButtonKey = GlobalKey<PopupMenuButtonState<dynamic>>();
-      String? selectedValue;
+      SignedDocumentRef? selectedValue;
 
       await tester.pumpApp(
         MaterialApp(
@@ -53,7 +54,7 @@ void main() {
 
       await tester.tap(find.text('Item 1'));
       await tester.pumpAndSettle();
-      expect(selectedValue, equals('value1'));
+      expect(selectedValue, equals(const SignedDocumentRef(id: 'value1')));
     });
 
     testWidgets('$CategoryDropdown handles callbacks',

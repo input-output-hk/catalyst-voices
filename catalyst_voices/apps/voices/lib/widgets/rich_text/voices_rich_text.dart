@@ -1,7 +1,11 @@
+// ignore_for_file: avoid_dynamic_calls
+
 import 'dart:async';
 
 import 'package:catalyst_voices/common/codecs/markdown_codec.dart';
 import 'package:catalyst_voices/widgets/form/voices_form_field.dart';
+import 'package:catalyst_voices/widgets/rich_text/insert_image_error.dart';
+import 'package:catalyst_voices/widgets/rich_text/insert_new_image_dialog.dart';
 import 'package:catalyst_voices/widgets/rich_text/voices_rich_text_limit.dart';
 import 'package:catalyst_voices/widgets/rich_text/voices_rich_text_rules.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
@@ -12,16 +16,17 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_quill/flutter_quill.dart' as quill;
-import 'package:flutter_quill/flutter_quill_internal.dart' as quill_int;
+import 'package:flutter_quill/internal.dart' as quill_int;
 import 'package:flutter_quill_extensions/flutter_quill_extensions.dart'
     as quill_ext;
+import 'package:flutter_quill_extensions/flutter_quill_extensions.dart';
 
 class VoicesRichText extends VoicesFormField<MarkdownData> {
   final VoicesRichTextController controller;
-  final String title;
   final FocusNode focusNode;
   final ScrollController scrollController;
   final int? charsLimit;
+  final double? minHeight;
 
   VoicesRichText({
     super.key,
@@ -30,10 +35,10 @@ class VoicesRichText extends VoicesFormField<MarkdownData> {
     super.enabled,
     super.validator,
     required this.controller,
-    required this.title,
     required this.focusNode,
     required this.scrollController,
     this.charsLimit,
+    this.minHeight,
   }) : super(
           value: controller.markdownData,
           builder: (field) {
@@ -46,22 +51,31 @@ class VoicesRichText extends VoicesFormField<MarkdownData> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                Offstage(
-                  offstage: !enabled,
-                  child: _Toolbar(
-                    controller: controller,
-                  ),
-                ),
-                _Title(title: title),
                 _EditorDecoration(
                   isEditMode: enabled,
                   isInvalid: field.hasError,
                   focusNode: focusNode,
-                  child: _Editor(
-                    controller: controller,
-                    focusNode: focusNode,
-                    scrollController: scrollController,
-                    onChanged: onChangedHandler,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Offstage(
+                        offstage: !enabled,
+                        child: Padding(
+                          padding: const EdgeInsets.all(2),
+                          child: _Toolbar(
+                            controller: controller,
+                          ),
+                        ),
+                      ),
+                      _Editor(
+                        controller: controller,
+                        focusNode: focusNode,
+                        scrollController: scrollController,
+                        minHeight: minHeight,
+                        onChanged: onChangedHandler,
+                      ),
+                    ],
                   ),
                 ),
                 Offstage(
@@ -162,12 +176,14 @@ class _Editor extends StatefulWidget {
   final VoicesRichTextController controller;
   final FocusNode focusNode;
   final ScrollController scrollController;
+  final double? minHeight;
   final ValueChanged<MarkdownData?>? onChanged;
 
   const _Editor({
     required this.controller,
     required this.focusNode,
     required this.scrollController,
+    required this.minHeight,
     required this.onChanged,
   });
 
@@ -240,7 +256,8 @@ class _EditorState extends State<_Editor> {
         controller: widget.controller,
         focusNode: widget.focusNode,
         scrollController: widget.scrollController,
-        configurations: quill.QuillEditorConfigurations(
+        config: quill.QuillEditorConfig(
+          minHeight: widget.minHeight,
           padding: const EdgeInsets.all(16),
           placeholder: context.l10n.placeholderRichText,
           characterShortcutEvents: quill.standardCharactersShortcutEvents,
@@ -249,7 +266,8 @@ class _EditorState extends State<_Editor> {
           /* cSpell:enable */
           customStyles: quill.DefaultStyles(
             placeHolder: quill.DefaultTextBlockStyle(
-              textTheme.bodyLarge?.copyWith(color: theme.colors.textDisabled) ??
+              textTheme.bodyLarge
+                      ?.copyWith(color: theme.colors.textOnPrimaryLevel1) ??
                   DefaultTextStyle.of(context).style,
               quill.HorizontalSpacing.zero,
               quill.VerticalSpacing.zero,
@@ -258,7 +276,11 @@ class _EditorState extends State<_Editor> {
             ),
           ),
           embedBuilders: CatalystPlatform.isWeb
-              ? quill_ext.FlutterQuillEmbeds.editorWebBuilders()
+              ? quill_ext.FlutterQuillEmbeds.editorWebBuilders(
+                  imageEmbedConfig: const QuillEditorImageEmbedConfig(
+                    errorWidget: InsertImageError(),
+                  ),
+                )
               : quill_ext.FlutterQuillEmbeds.editorBuilders(),
         ),
       ),
@@ -320,25 +342,6 @@ class _EditorState extends State<_Editor> {
   }
 }
 
-class _Title extends StatelessWidget {
-  final String title;
-
-  const _Title({
-    required this.title,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 12),
-      child: Text(
-        title,
-        style: Theme.of(context).textTheme.titleSmall,
-      ),
-    );
-  }
-}
-
 class _Toolbar extends StatelessWidget {
   final quill.QuillController controller;
 
@@ -348,12 +351,14 @@ class _Toolbar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Theme.of(context).colors.onSurfaceNeutralOpaqueLv1,
-      padding: const EdgeInsets.symmetric(horizontal: 18),
-      child: quill.QuillToolbar(
-        configurations: const quill.QuillToolbarConfigurations(),
-        child: Row(
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: Theme.of(context).colors.elevationsOnSurfaceNeutralLv2,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
+      ),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Wrap(
           children: [
             _ToolbarAttributeIconButton(
               controller: controller,
@@ -407,12 +412,15 @@ class _ToolbarAttributeIconButton extends StatelessWidget {
       controller: controller,
       attribute: attribute,
       options: quill.QuillToolbarToggleStyleButtonOptions(
-        childBuilder: (options, extraOptions) {
+        // TODO(minikin): We need to use dynamic here because
+        // of the bug in the quill package.
+        // https://github.com/singerdmx/flutter-quill/issues/2511
+        childBuilder: (dynamic options, dynamic extraOptions) {
           return _ToolbarIconButton(
             icon: icon,
-            tooltip: options.tooltip,
-            isToggled: extraOptions.isToggled,
-            onPressed: extraOptions.onPressed,
+            tooltip: options.tooltip as String?,
+            isToggled: extraOptions.isToggled as bool,
+            onPressed: extraOptions.onPressed as VoidCallback?,
           );
         },
       ),
@@ -454,14 +462,21 @@ class _ToolbarImageOptionButton extends StatelessWidget {
     return quill_ext.QuillToolbarImageButton(
       controller: controller,
       options: quill_ext.QuillToolbarImageButtonOptions(
-        childBuilder: (options, extraOptions) {
+        // TODO(minikin): We need to use dynamic here because
+        // of the bug in the quill package.
+        // https://github.com/singerdmx/flutter-quill/issues/2511
+        childBuilder: (dynamic options, dynamic extraOptions) {
           return _ToolbarIconButton(
             icon: VoicesAssets.icons.photograph,
-            tooltip: options.tooltip,
+            tooltip: options.tooltip as String?,
             isToggled: false,
-            onPressed: extraOptions.onPressed,
+            onPressed: extraOptions.onPressed as VoidCallback?,
           );
         },
+        imageButtonConfig: quill_ext.QuillToolbarImageConfig(
+          insertImageUrlDialogBuilder: (context) =>
+              const InsertNewImageDialog(),
+        ),
       ),
     );
   }

@@ -7,6 +7,7 @@ import 'package:catalyst_voices/pages/treasury/treasury.dart';
 import 'package:catalyst_voices/pages/voting/voting_page.dart';
 import 'package:catalyst_voices/pages/workspace/workspace.dart';
 import 'package:catalyst_voices/routes/guards/composite_route_guard_mixin.dart';
+import 'package:catalyst_voices/routes/guards/proposal_submission_guard.dart';
 import 'package:catalyst_voices/routes/guards/route_guard.dart';
 import 'package:catalyst_voices/routes/guards/session_unlocked_guard.dart';
 import 'package:catalyst_voices/routes/guards/user_access_guard.dart';
@@ -21,19 +22,34 @@ part 'spaces_route.g.dart';
 const _prefix = Routes.currentMilestone;
 
 final class CategoryDetailRoute extends GoRouteData
-    with FadePageTransitionMixin {
+    with FadePageTransitionMixin, CompositeRouteGuardMixin {
   final String categoryId;
 
-  const CategoryDetailRoute(this.categoryId);
+  const CategoryDetailRoute({required this.categoryId});
+
+  factory CategoryDetailRoute.fromRef({
+    required SignedDocumentRef categoryId,
+  }) {
+    return CategoryDetailRoute(categoryId: categoryId.id);
+  }
+
+  @override
+  List<RouteGuard> get routeGuards => const [ProposalSubmissionGuard()];
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
-    return CategoryPage(categoryId: categoryId);
+    return CategoryPage(
+      categoryId: SignedDocumentRef(id: categoryId),
+    );
   }
 }
 
-final class DiscoveryRoute extends GoRouteData with FadePageTransitionMixin {
+final class DiscoveryRoute extends GoRouteData
+    with FadePageTransitionMixin, CompositeRouteGuardMixin {
   const DiscoveryRoute();
+
+  @override
+  List<RouteGuard> get routeGuards => [const ProposalSubmissionGuard()];
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
@@ -49,6 +65,7 @@ final class FundedProjectsRoute extends GoRouteData
   List<RouteGuard> get routeGuards => const [
         SessionUnlockedGuard(),
         UserAccessGuard(),
+        ProposalSubmissionGuard(),
       ];
 
   @override
@@ -57,32 +74,36 @@ final class FundedProjectsRoute extends GoRouteData
   }
 }
 
-final class MyProposalsRoute extends GoRouteData with FadePageTransitionMixin {
+final class ProposalsRoute extends GoRouteData
+    with FadePageTransitionMixin, CompositeRouteGuardMixin {
   final String? categoryId;
-  const MyProposalsRoute({
-    this.categoryId,
-  });
-
-  @override
-  Widget build(BuildContext context, GoRouterState state) {
-    return ProposalsPage(
-      selectMyProposalsView: true,
-      categoryId: categoryId,
-    );
-  }
-}
-
-final class ProposalsRoute extends GoRouteData with FadePageTransitionMixin {
-  final String? categoryId;
+  final bool myProposals;
 
   const ProposalsRoute({
     this.categoryId,
+    this.myProposals = false,
   });
+
+  factory ProposalsRoute.fromRef({SignedDocumentRef? categoryId}) {
+    return ProposalsRoute(categoryId: categoryId?.id);
+  }
+
+  factory ProposalsRoute.myProposals() {
+    return const ProposalsRoute(myProposals: true);
+  }
+
+  @override
+  List<RouteGuard> get routeGuards => const [ProposalSubmissionGuard()];
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
+    final categoryId = this.categoryId;
+    final categoryRef =
+        categoryId != null ? SignedDocumentRef(id: categoryId) : null;
+
     return ProposalsPage(
-      categoryId: categoryId,
+      categoryId: categoryRef,
+      selectMyProposalsView: myProposals,
     );
   }
 }
@@ -94,9 +115,6 @@ final class ProposalsRoute extends GoRouteData with FadePageTransitionMixin {
       routes: [
         TypedGoRoute<ProposalsRoute>(
           path: 'proposals',
-        ),
-        TypedGoRoute<MyProposalsRoute>(
-          path: 'my-proposals',
         ),
         TypedGoRoute<CategoryDetailRoute>(
           path: 'category/:categoryId',
@@ -153,6 +171,7 @@ final class TreasuryRoute extends GoRouteData
   List<RouteGuard> get routeGuards => const [
         SessionUnlockedGuard(),
         AdminAccessGuard(),
+        ProposalSubmissionGuard(),
       ];
 
   @override
@@ -169,6 +188,7 @@ final class VotingRoute extends GoRouteData
   List<RouteGuard> get routeGuards => const [
         SessionUnlockedGuard(),
         UserAccessGuard(),
+        ProposalSubmissionGuard(),
       ];
 
   @override
@@ -185,6 +205,7 @@ final class WorkspaceRoute extends GoRouteData
   List<RouteGuard> get routeGuards => const [
         SessionUnlockedGuard(),
         UserAccessGuard(),
+        ProposalSubmissionGuard(),
       ];
 
   @override

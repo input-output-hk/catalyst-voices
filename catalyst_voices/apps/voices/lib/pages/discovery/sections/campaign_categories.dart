@@ -19,19 +19,21 @@ class CampaignCategories extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 120),
       child: Column(
         mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Wrap(
-            spacing: 12,
-            runSpacing: 12,
-            children: categories
-                .map(
-                  (e) => Skeletonizer(
-                    enabled: isLoading,
-                    child: CampaignCategoryCard(category: e),
-                  ),
-                )
-                .toList(),
+          Center(
+            child: Wrap(
+              spacing: 12,
+              runSpacing: 12,
+              children: categories
+                  .map(
+                    (e) => Skeletonizer(
+                      enabled: isLoading,
+                      child: CampaignCategoryCard(category: e),
+                    ),
+                  )
+                  .toList(),
+            ),
           ),
           const SizedBox(height: 24),
         ],

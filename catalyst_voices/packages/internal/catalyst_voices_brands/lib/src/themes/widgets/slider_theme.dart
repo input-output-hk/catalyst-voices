@@ -16,5 +16,6 @@ class VoicesSliderThemeData extends SliderThemeData {
           ),
           overlayColor: Colors.transparent,
           inactiveTickMarkColor: Colors.transparent,
+          activeTickMarkColor: Colors.transparent,
         );
 }

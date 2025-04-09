@@ -26,6 +26,10 @@ class UnlockPasswordSuccessPanel extends OnboardingPageBase {
     await $(recoverySuccessGoToDashboardButton).tap();
   }
 
+  Future<void> clickGoToAccount() async {
+    await $(recoverySuccessGoAccountButton).tap();
+  }
+
   @override
   Future<void> verifyPageElements() async {
     await verifyInfoPanel();
@@ -33,26 +37,20 @@ class UnlockPasswordSuccessPanel extends OnboardingPageBase {
   }
 
   Future<void> verifyInfoPanel() async {
-    expect(await infoPartHeaderTitleText(), T.get('Restore Catalyst keychain'));
+    expect(
+      await infoPartHeaderTitleText(),
+      (await t()).recoverCatalystKeychain,
+    );
     expect(infoPartTaskPicture(), findsOneWidget);
     expect($(progressBar), findsOneWidget);
-    expect(
-      infoPartLearnMoreText(),
-      T.get('Learn More'),
-    );
+    expect(infoPartLearnMoreText(), (await t()).learnMore);
   }
 
   Future<void> verifyDetailsPanel() async {
-    expect(
-      $(recoverySuccessTitle).text,
-      T.get('Congratulations your Catalyst \nKeychain is restored!'),
-    );
+    expect($(recoverySuccessTitle).text, (await t()).recoverySuccessTitle);
     expect(
       $(recoverySuccessSubtitle).text,
-      T.get(
-        'You have successfully restored your Catalyst Keychain, and unlocked'
-        ' Catalyst Voices on this device.',
-      ),
+      (await t()).recoverySuccessSubtitle,
     );
     expect($(recoverySuccessGoToDashboardButton), findsOneWidget);
   }

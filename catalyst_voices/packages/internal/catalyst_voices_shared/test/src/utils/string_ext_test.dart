@@ -3,9 +3,9 @@ import 'package:test/test.dart';
 
 void main() {
   group('StringExt', () {
-    test('firstLetter returns first letter or null', () {
-      expect('Hello'.firstLetter, 'H');
-      expect(''.firstLetter, isNull);
+    test('first returns value letter or null', () {
+      expect('Hello'.first, 'H');
+      expect(''.first, isNull);
     });
 
     test('isBlank and isNotBlank correctly identify blank strings', () {
@@ -15,7 +15,7 @@ void main() {
       expect('Hello'.isNotBlank, isTrue);
     });
 
-    test('capitalize converts first letter to uppercase', () {
+    test('capitalize converts value letter to uppercase', () {
       expect('hello'.capitalize(), 'Hello');
       expect('HELLO'.capitalize(), 'Hello');
       expect('hELLO'.capitalize(), 'Hello');
@@ -43,6 +43,20 @@ void main() {
       expect('123'.equalsIgnoreCase('123'), isTrue);
       expect('!@#'.equalsIgnoreCase('!@#'), isTrue);
       expect('Hello1'.equalsIgnoreCase('Hello2'), isFalse);
+    });
+
+    group('formatAsPlural', () {
+      test('returns only the count if the string is empty', () {
+        expect(''.formatAsPlural(3), '3');
+      });
+
+      test('returns singular when count is 1', () {
+        expect('apple'.formatAsPlural(1), '1 apple');
+      });
+
+      test('returns plural when count is greater than 1', () {
+        expect('apple'.formatAsPlural(3), '3 apples');
+      });
     });
   });
 

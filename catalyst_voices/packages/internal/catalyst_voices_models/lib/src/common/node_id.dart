@@ -6,10 +6,12 @@ base class NodeId extends Equatable {
 
   const NodeId(this.value);
 
-  /// Returns true if this node is a child of [parent] node, false otherwise.
-  bool isChildOf(NodeId parent) => value.startsWith(parent.value);
-
   @override
   @mustCallSuper
   List<Object?> get props => [value];
+
+  NodeId child(String value) => NodeId('${this.value}.$value');
+
+  /// Returns true if this node is a child of [parent] node, false otherwise.
+  bool isChildOf(NodeId parent) => value.startsWith(parent.value);
 }

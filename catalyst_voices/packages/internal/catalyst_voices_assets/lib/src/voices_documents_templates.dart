@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 
 // TODO(damian-molinski): This class should be removed once Repository does not
 // build document's base on it.
+// TODO(damian-molinski): remove it in favour of fixtures in repository
 class VoicesDocumentsTemplates {
   VoicesDocumentsTemplates._();
 

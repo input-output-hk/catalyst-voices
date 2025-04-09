@@ -2,7 +2,7 @@ import 'package:catalyst_cardano_serialization/src/types.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:test/test.dart';
-import 'package:uuid/uuid.dart';
+import 'package:uuid_plus/uuid_plus.dart';
 
 void main() {
   late Proposal baseProposal;
@@ -14,16 +14,17 @@ void main() {
         version: const Uuid().v7(),
       ),
       category: 'Cardano Use Cases / MVP',
+      categoryId: const SignedDocumentRef(id: 'dummy_category_id'),
       title: 'Proposal Title that rocks the world',
       updateDate: DateTime.now().minusDays(2),
-      fundsRequested: Coin.fromAda(100000),
+      fundsRequested: const Coin.fromWholeAda(100000),
       status: ProposalStatus.draft,
       publish: ProposalPublish.publishedDraft,
       commentsCount: 0,
       description: '',
       duration: 6,
       author: 'Alex Wells',
-      versionCount: 1,
+      versions: const [],
     );
   });
 

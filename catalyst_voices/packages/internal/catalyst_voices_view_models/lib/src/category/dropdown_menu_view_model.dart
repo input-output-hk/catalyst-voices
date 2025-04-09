@@ -1,8 +1,8 @@
 import 'package:catalyst_voices_localization/generated/catalyst_voices_localizations.dart';
 import 'package:equatable/equatable.dart';
 
-class DropdownMenuViewModel extends Equatable {
-  final String? value;
+class DropdownMenuViewModel<T extends Object> extends Equatable {
+  final T? value;
   final String name;
   final bool isSelected;
 

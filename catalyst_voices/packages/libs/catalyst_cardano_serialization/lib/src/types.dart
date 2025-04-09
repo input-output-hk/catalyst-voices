@@ -11,7 +11,7 @@ abstract interface class CborEncodable {
   const CborEncodable();
 
   /// Converts this instance to its CBOR representation.
-  CborValue toCbor();
+  CborValue toCbor({List<int> tags = const []});
 }
 
 /// Specifies on which network the code will run.
@@ -39,14 +39,23 @@ enum NetworkId {
 }
 
 /// Specifies an amount of ADA in terms of lovelace.
-extension type const Coin(int value) {
+final class Coin extends Equatable implements Comparable<Coin> {
   /// The amount of lovelaces in one ADA.
   static const int adaInLovelaces = 1000000;
+
+  /// The amount of lovelaces.
+  final int value;
+
+  /// The default constructor for the [Coin].
+  const Coin(this.value);
 
   /// Creates a [Coin] from [amount] specified in ADAs.
   factory Coin.fromAda(double amount) {
     return Coin((amount * adaInLovelaces).toInt());
   }
+
+  /// Creates a [Coin] from [amount] specified in ADAs (without lovelaces).
+  const Coin.fromWholeAda(int amount) : this(amount * adaInLovelaces);
 
   /// Deserializes the type from cbor.
   factory Coin.fromCbor(CborValue value) {
@@ -83,6 +92,12 @@ extension type const Coin(int value) {
 
   /// Returns true if [value] is smaller than or equal [other] value.
   bool operator <=(Coin other) => value < other.value || value == other.value;
+
+  @override
+  int compareTo(Coin other) => value.compareTo(other.value);
+
+  @override
+  List<Object?> get props => [value];
 }
 
 /// A blockchain slot number.
@@ -139,16 +154,19 @@ final class Balance extends Equatable implements CborEncodable {
 
   /// Serializes the type as cbor.
   @override
-  CborValue toCbor() {
+  CborValue toCbor({List<int> tags = const []}) {
     final multiAsset = this.multiAsset;
     if (multiAsset == null) {
       return coin.toCbor();
     }
 
-    return CborList([
-      coin.toCbor(),
-      multiAsset.toCbor(),
-    ]);
+    return CborList(
+      [
+        coin.toCbor(),
+        multiAsset.toCbor(),
+      ],
+      tags: tags,
+    );
   }
 
   /// Adds [other] value to this value and returns a new [Balance].
@@ -261,14 +279,17 @@ final class MultiAsset extends Equatable implements CborEncodable {
 
   /// Serializes the type as cbor.
   @override
-  CborValue toCbor() {
-    return CborMap({
-      for (final policy in bundle.entries)
-        policy.key.toCbor(): CborMap({
-          for (final asset in policy.value.entries)
-            asset.key.toCbor(): asset.value.toCbor(),
-        }),
-    });
+  CborValue toCbor({List<int> tags = const []}) {
+    return CborMap(
+      {
+        for (final policy in bundle.entries)
+          policy.key.toCbor(): CborMap({
+            for (final asset in policy.value.entries)
+              asset.key.toCbor(): asset.value.toCbor(),
+          }),
+      },
+      tags: tags,
+    );
   }
 
   /// Adds [other] value to this value and returns a new [MultiAsset].

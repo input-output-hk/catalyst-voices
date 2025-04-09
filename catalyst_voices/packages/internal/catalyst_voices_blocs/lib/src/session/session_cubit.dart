@@ -69,8 +69,22 @@ final class SessionCubit extends Cubit<SessionState>
     _adminToolsSub = _adminTools.stream.listen(_onAdminToolsChanged);
 
     if (!_alwaysAllowRegistration) {
-      unawaited(_checkAvailableWallets());
+      unawaited(checkAvailableWallets());
     }
+  }
+
+  Future<bool> checkAvailableWallets() async {
+    final wallets = await _registrationService
+        .getCardanoWallets()
+        .onError((_, __) => const []);
+
+    _hasWallets = wallets.isNotEmpty;
+
+    if (!isClosed) {
+      _updateState();
+    }
+
+    return _hasWallets;
   }
 
   @override
@@ -124,6 +138,15 @@ final class SessionCubit extends Cubit<SessionState>
     return keychain.unlock(lockFactor);
   }
 
+  void updateShowSubmissionClosingWarning({required bool value}) {
+    final settings = _userService.user.settings;
+
+    final updatedSettings =
+        settings.copyWith(showSubmissionClosingWarning: Optional.of(value));
+
+    unawaited(_userService.updateSettings(updatedSettings));
+  }
+
   void updateTheme(ThemePreferences value) {
     final settings = _userService.user.settings;
 
@@ -140,24 +163,12 @@ final class SessionCubit extends Cubit<SessionState>
     unawaited(_userService.updateSettings(updatedSettings));
   }
 
-  Future<void> _checkAvailableWallets() async {
-    final wallets = await _registrationService
-        .getCardanoWallets()
-        .onError((_, __) => const []);
-
-    _hasWallets = wallets.isNotEmpty;
-
-    if (!isClosed) {
-      _updateState();
-    }
-  }
-
   SessionState _createMockedSessionState() {
     switch (_adminToolsState.sessionStatus) {
       case SessionStatus.actor:
         return SessionState(
           status: SessionStatus.actor,
-          account: const SessionAccount.mocked(),
+          account: SessionAccount.mocked(),
           spaces: Space.values,
           availableSpaces: Space.values,
           overallSpaces: Space.values,

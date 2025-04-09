@@ -1,8 +1,62 @@
 part of 'document_property_schema.dart';
 
+final class DocumentGenericListSchema extends DocumentListSchema {
+  const DocumentGenericListSchema({
+    required super.nodeId,
+    required super.format,
+    required super.title,
+    required super.description,
+    required super.placeholder,
+    required super.guidance,
+    required super.isSubsection,
+    required super.isRequired,
+    required super.itemsSchema,
+    required super.itemsRange,
+    required super.uniqueItems,
+  });
+
+  const DocumentGenericListSchema.optional({
+    required super.nodeId,
+    super.format,
+    super.title = '',
+    super.description,
+    super.placeholder,
+    super.guidance,
+    super.isSubsection = false,
+    super.isRequired = false,
+    super.itemsSchema =
+        const DocumentGenericStringSchema.optional(nodeId: DocumentNodeId.root),
+    super.itemsRange,
+    super.uniqueItems = false,
+  });
+
+  @override
+  DocumentGenericListSchema copyWith({
+    DocumentNodeId? nodeId,
+    String? title,
+  }) {
+    final newNodeId = nodeId ?? this.nodeId;
+    final newTitle = title ?? this.title;
+
+    return DocumentGenericListSchema(
+      nodeId: newNodeId,
+      format: format,
+      title: newTitle,
+      description: description,
+      placeholder: placeholder,
+      guidance: guidance,
+      isSubsection: isSubsection,
+      isRequired: isRequired,
+      itemsSchema: itemsSchema.copyWith(nodeId: newNodeId),
+      itemsRange: itemsRange,
+      uniqueItems: uniqueItems,
+    );
+  }
+}
+
 sealed class DocumentListSchema extends DocumentPropertySchema {
   final DocumentPropertySchema itemsSchema;
-  final Range<int>? itemsRange;
+  final NumRange<int>? itemsRange;
   final bool uniqueItems;
 
   const DocumentListSchema({
@@ -21,6 +75,11 @@ sealed class DocumentListSchema extends DocumentPropertySchema {
           type: DocumentPropertyType.list,
         );
 
+  @override
+  @mustCallSuper
+  List<Object?> get props =>
+      super.props + [itemsSchema, itemsRange, uniqueItems];
+
   /// A method that builds typed properties.
   ///
   /// Helps to create properties which generic type
@@ -34,6 +93,9 @@ sealed class DocumentListSchema extends DocumentPropertySchema {
       validationResult: validate(properties),
     );
   }
+
+  @override
+  DocumentListSchema copyWith({DocumentNodeId? nodeId, String? title});
 
   @override
   DocumentListProperty createChildPropertyAt({
@@ -50,8 +112,14 @@ sealed class DocumentListSchema extends DocumentPropertySchema {
     );
   }
 
-  @override
-  DocumentListSchema copyWith({DocumentNodeId? nodeId, String? title});
+  /// The title of the child created from [itemsSchema].
+  String getChildItemTitle(int index) {
+    if (itemsSchema.title.isEmpty) {
+      return '';
+    } else {
+      return '${itemsSchema.title} #${index + 1}';
+    }
+  }
 
   /// Validates the property against document rules.
   DocumentValidationResult validate(List<DocumentProperty> properties) {
@@ -62,20 +130,46 @@ sealed class DocumentListSchema extends DocumentPropertySchema {
       DocumentValidator.validateListItemsUnique(this, values),
     ]);
   }
+}
 
-  /// The title of the child created from [itemsSchema].
-  String getChildItemTitle(int index) {
-    if (itemsSchema.title.isEmpty) {
-      return '';
-    } else {
-      return '${itemsSchema.title} #${index + 1}';
-    }
-  }
+final class DocumentMultiLineTextEntryListMarkdownSchema
+    extends DocumentListSchema {
+  const DocumentMultiLineTextEntryListMarkdownSchema({
+    required super.nodeId,
+    required super.format,
+    required super.title,
+    required super.description,
+    required super.placeholder,
+    required super.guidance,
+    required super.isSubsection,
+    required super.isRequired,
+    required super.itemsSchema,
+    required super.itemsRange,
+    required super.uniqueItems,
+  });
 
   @override
-  @mustCallSuper
-  List<Object?> get props =>
-      super.props + [itemsSchema, itemsRange, uniqueItems];
+  DocumentMultiLineTextEntryListMarkdownSchema copyWith({
+    DocumentNodeId? nodeId,
+    String? title,
+  }) {
+    final newNodeId = nodeId ?? this.nodeId;
+    final newTitle = title ?? this.title;
+
+    return DocumentMultiLineTextEntryListMarkdownSchema(
+      nodeId: newNodeId,
+      format: format,
+      title: newTitle,
+      description: description,
+      placeholder: placeholder,
+      guidance: guidance,
+      isSubsection: isSubsection,
+      isRequired: isRequired,
+      itemsSchema: itemsSchema.copyWith(nodeId: newNodeId),
+      itemsRange: itemsRange,
+      uniqueItems: uniqueItems,
+    );
+  }
 }
 
 final class DocumentMultiSelectSchema extends DocumentListSchema {
@@ -117,8 +211,8 @@ final class DocumentMultiSelectSchema extends DocumentListSchema {
   }
 }
 
-final class DocumentSingleLineTextEntryListSchema extends DocumentListSchema {
-  const DocumentSingleLineTextEntryListSchema({
+final class DocumentNestedQuestionsListSchema extends DocumentListSchema {
+  const DocumentNestedQuestionsListSchema({
     required super.nodeId,
     required super.format,
     required super.title,
@@ -133,54 +227,14 @@ final class DocumentSingleLineTextEntryListSchema extends DocumentListSchema {
   });
 
   @override
-  DocumentSingleLineTextEntryListSchema copyWith({
+  DocumentNestedQuestionsListSchema copyWith({
     DocumentNodeId? nodeId,
     String? title,
   }) {
     final newNodeId = nodeId ?? this.nodeId;
     final newTitle = title ?? this.title;
 
-    return DocumentSingleLineTextEntryListSchema(
-      nodeId: newNodeId,
-      format: format,
-      title: newTitle,
-      description: description,
-      placeholder: placeholder,
-      guidance: guidance,
-      isSubsection: isSubsection,
-      isRequired: isRequired,
-      itemsSchema: itemsSchema.copyWith(nodeId: newNodeId),
-      itemsRange: itemsRange,
-      uniqueItems: uniqueItems,
-    );
-  }
-}
-
-final class DocumentMultiLineTextEntryListMarkdownSchema
-    extends DocumentListSchema {
-  const DocumentMultiLineTextEntryListMarkdownSchema({
-    required super.nodeId,
-    required super.format,
-    required super.title,
-    required super.description,
-    required super.placeholder,
-    required super.guidance,
-    required super.isSubsection,
-    required super.isRequired,
-    required super.itemsSchema,
-    required super.itemsRange,
-    required super.uniqueItems,
-  });
-
-  @override
-  DocumentMultiLineTextEntryListMarkdownSchema copyWith({
-    DocumentNodeId? nodeId,
-    String? title,
-  }) {
-    final newNodeId = nodeId ?? this.nodeId;
-    final newTitle = title ?? this.title;
-
-    return DocumentMultiLineTextEntryListMarkdownSchema(
+    return DocumentNestedQuestionsListSchema(
       nodeId: newNodeId,
       format: format,
       title: newTitle,
@@ -236,8 +290,8 @@ final class DocumentSingleLineHttpsUrlEntryListSchema
   }
 }
 
-final class DocumentNestedQuestionsListSchema extends DocumentListSchema {
-  const DocumentNestedQuestionsListSchema({
+final class DocumentSingleLineTextEntryListSchema extends DocumentListSchema {
+  const DocumentSingleLineTextEntryListSchema({
     required super.nodeId,
     required super.format,
     required super.title,
@@ -252,68 +306,14 @@ final class DocumentNestedQuestionsListSchema extends DocumentListSchema {
   });
 
   @override
-  DocumentNestedQuestionsListSchema copyWith({
+  DocumentSingleLineTextEntryListSchema copyWith({
     DocumentNodeId? nodeId,
     String? title,
   }) {
     final newNodeId = nodeId ?? this.nodeId;
     final newTitle = title ?? this.title;
 
-    return DocumentNestedQuestionsListSchema(
-      nodeId: newNodeId,
-      format: format,
-      title: newTitle,
-      description: description,
-      placeholder: placeholder,
-      guidance: guidance,
-      isSubsection: isSubsection,
-      isRequired: isRequired,
-      itemsSchema: itemsSchema.copyWith(nodeId: newNodeId),
-      itemsRange: itemsRange,
-      uniqueItems: uniqueItems,
-    );
-  }
-}
-
-final class DocumentGenericListSchema extends DocumentListSchema {
-  const DocumentGenericListSchema({
-    required super.nodeId,
-    required super.format,
-    required super.title,
-    required super.description,
-    required super.placeholder,
-    required super.guidance,
-    required super.isSubsection,
-    required super.isRequired,
-    required super.itemsSchema,
-    required super.itemsRange,
-    required super.uniqueItems,
-  });
-
-  const DocumentGenericListSchema.optional({
-    required super.nodeId,
-    super.format,
-    super.title = '',
-    super.description,
-    super.placeholder,
-    super.guidance,
-    super.isSubsection = false,
-    super.isRequired = false,
-    super.itemsSchema =
-        const DocumentGenericStringSchema.optional(nodeId: DocumentNodeId.root),
-    super.itemsRange,
-    super.uniqueItems = false,
-  });
-
-  @override
-  DocumentGenericListSchema copyWith({
-    DocumentNodeId? nodeId,
-    String? title,
-  }) {
-    final newNodeId = nodeId ?? this.nodeId;
-    final newTitle = title ?? this.title;
-
-    return DocumentGenericListSchema(
+    return DocumentSingleLineTextEntryListSchema(
       nodeId: newNodeId,
       format: format,
       title: newTitle,

@@ -6,10 +6,12 @@ import 'package:catalyst_voices/widgets/buttons/voices_filled_button.dart';
 import 'package:catalyst_voices/widgets/cards/pending_proposal_card.dart';
 import 'package:catalyst_voices/widgets/scrollbar/voices_slider.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
+import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 class MostRecentProposals extends StatefulWidget {
@@ -29,20 +31,6 @@ class MostRecentProposals extends StatefulWidget {
 class _LatestProposalsState extends State<MostRecentProposals> {
   late final ScrollController _scrollController;
   late double _scrollPercentage;
-
-  @override
-  void initState() {
-    super.initState();
-    _scrollController = ScrollController();
-    _scrollController.addListener(_onScroll);
-    _scrollPercentage = 0.0;
-  }
-
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -75,31 +63,45 @@ class _LatestProposalsState extends State<MostRecentProposals> {
               onHorizontalDragUpdate: _onHorizontalDrag,
               child: SizedBox(
                 height: 440,
-                child: ListView.separated(
-                  controller: _scrollController,
-                  physics: const ClampingScrollPhysics(),
-                  padding: const EdgeInsets.symmetric(horizontal: 120),
-                  scrollDirection: Axis.horizontal,
-                  itemCount: widget.proposals.length,
-                  itemBuilder: (context, index) {
-                    final proposal = widget.proposals[index];
-                    final id = proposal.id;
-                    return Skeletonizer(
-                      enabled: widget.isLoading,
-                      child: PendingProposalCard(
-                        key: Key('PendingProposalCard_$id'),
-                        proposal: proposal,
-                        onTap: () {
-                          unawaited(
-                            ProposalRoute(proposalId: id).push(context),
-                          );
-                        },
-                        onFavoriteChanged: (value) {},
-                      ),
-                    );
-                  },
-                  separatorBuilder: (context, index) =>
-                      const SizedBox(width: 24),
+                child: Center(
+                  child: ListView.separated(
+                    controller: _scrollController,
+                    shrinkWrap: true,
+                    physics: const ClampingScrollPhysics(),
+                    padding: const EdgeInsets.symmetric(horizontal: 120),
+                    scrollDirection: Axis.horizontal,
+                    itemCount: widget.proposals.length,
+                    itemBuilder: (context, index) {
+                      final proposal = widget.proposals[index];
+                      final ref = proposal.ref;
+                      return Skeletonizer(
+                        enabled: widget.isLoading,
+                        child: PendingProposalCard(
+                          key: Key('PendingProposalCard_$ref'),
+                          proposal: proposal,
+                          onTap: () {
+                            unawaited(
+                              ProposalRoute(
+                                proposalId: ref.id,
+                                version: ref.version,
+                              ).push(context),
+                            );
+                          },
+                          onFavoriteChanged: (value) async {
+                            final bloc = context.read<DiscoveryCubit>();
+                            if (value) {
+                              await bloc.addFavorite(ref);
+                            } else {
+                              await bloc.removeFavorite(ref);
+                            }
+                          },
+                          isFavorite: proposal.isFavorite,
+                        ),
+                      );
+                    },
+                    separatorBuilder: (context, index) =>
+                        const SizedBox(width: 24),
+                  ),
                 ),
               ),
             ),
@@ -127,6 +129,20 @@ class _LatestProposalsState extends State<MostRecentProposals> {
         ],
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController = ScrollController();
+    _scrollController.addListener(_onScroll);
+    _scrollPercentage = 0.0;
   }
 
   void _onHorizontalDrag(DragUpdateDetails details) {

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:patrol_finders/patrol_finders.dart';
+
 import '../../utils/translations_utils.dart';
 
 class CampaignHeroSection {
@@ -23,24 +24,20 @@ class CampaignHeroSection {
   Future<void> campaignBriefTitleIsRenderedCorrectly() async {
     expect(
       $(campaignBriefTitle).text,
-      T.get('Create, fund and deliver the future of '
-          'Cardano.'),
+      (await t()).heroSectionTitle,
     );
   }
 
   Future<void> campaignBriefDescriptionIsRenderedCorrectly() async {
     expect(
       $(campaignBriefDescription).text,
-      T.get('Project Catalyst is an experiment in community innovation,'
-          ' providing a framework to turn ideas into impactful real world'
-          " projects.\n\nWe're putting the community at the heart of Cardano's "
-          'future development. Are you ready for the Challenge?'),
+      (await t()).projectCatalystDescription,
     );
   }
 
   Future<void> viewProposalsButtonIsVisible() async {
     expect($(viewProposalsButton), findsOneWidget);
-    expect($(viewProposalsButton).$(Text).text, T.get('View proposals'));
+    expect($(viewProposalsButton).$(Text).text, (await t()).viewProposals);
   }
 
   Future<void> loadingErrorIsVisible() async {

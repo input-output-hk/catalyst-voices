@@ -23,6 +23,7 @@ use crate::{
 
 pub(crate) mod cassandra_db;
 pub(crate) mod chain_follower;
+pub(crate) mod signed_doc;
 mod str_env_var;
 
 /// Default address to start service on, '0.0.0.0:3030'.
@@ -57,7 +58,7 @@ const EVENT_DB_URL_DEFAULT: &str =
     "postgresql://postgres:postgres@localhost/catalyst_events?sslmode=disable";
 
 /// Default number of slots used as overlap when purging Live Index data.
-const PURGE_SLOT_BUFFER_DEFAULT: u64 = 100;
+const PURGE_BACKWARD_SLOT_BUFFER_DEFAULT: u64 = 100;
 
 /// Default `SERVICE_LIVE_TIMEOUT_INTERVAL`, that is used to determine if the service is
 /// live, 30 seconds.
@@ -136,6 +137,9 @@ struct EnvVars {
     /// The Chain Follower configuration
     chain_follower: chain_follower::EnvVars,
 
+    /// The Catalyst Signed Documents configuration
+    signed_doc: signed_doc::EnvVars,
+
     /// Internal API Access API Key
     internal_api_key: Option<StringEnvVar>,
 
@@ -144,7 +148,7 @@ struct EnvVars {
     check_config_tick: Duration,
 
     /// Slot buffer used as overlap when purging Live Index data.
-    purge_slot_buffer: u64,
+    purge_backward_slot_buffer: u64,
 
     /// Interval for updating and sending memory metrics.
     metrics_memory_interval: Duration,
@@ -179,8 +183,12 @@ static ENV_VARS: LazyLock<EnvVars> = LazyLock::new(|| {
             );
         }).unwrap_or(ADDRESS_DEFAULT);
 
-    let purge_slot_buffer =
-        StringEnvVar::new_as_int("PURGE_SLOT_BUFFER", PURGE_SLOT_BUFFER_DEFAULT, 0, u64::MAX);
+    let purge_backward_slot_buffer = StringEnvVar::new_as_int(
+        "PURGE_BACKWARD_SLOT_BUFFER",
+        PURGE_BACKWARD_SLOT_BUFFER_DEFAULT,
+        0,
+        u64::MAX,
+    );
 
     EnvVars {
         github_repo_owner: StringEnvVar::new("GITHUB_REPO_OWNER", GITHUB_REPO_OWNER_DEFAULT.into()),
@@ -207,12 +215,13 @@ static ENV_VARS: LazyLock<EnvVars> = LazyLock::new(|| {
             cassandra_db::VOLATILE_NAMESPACE_DEFAULT,
         ),
         chain_follower: chain_follower::EnvVars::new(),
+        signed_doc: signed_doc::EnvVars::new(),
         internal_api_key: StringEnvVar::new_optional("INTERNAL_API_KEY", true),
         check_config_tick: StringEnvVar::new_as_duration(
             "CHECK_CONFIG_TICK",
             CHECK_CONFIG_TICK_DEFAULT,
         ),
-        purge_slot_buffer,
+        purge_backward_slot_buffer,
         metrics_memory_interval: StringEnvVar::new_as_duration(
             "METRICS_MEMORY_INTERVAL",
             METRICS_MEMORY_INTERVAL_DEFAULT,
@@ -301,6 +310,11 @@ impl Settings {
     /// Get the configuration of the chain follower.
     pub(crate) fn follower_cfg() -> chain_follower::EnvVars {
         ENV_VARS.chain_follower.clone()
+    }
+
+    /// Get the configuration of the Catalyst Signed Documents.
+    pub(crate) fn signed_doc_cfg() -> signed_doc::EnvVars {
+        ENV_VARS.signed_doc.clone()
     }
 
     /// Chain Follower network (The Blockchain network we are configured to use).
@@ -410,8 +424,8 @@ impl Settings {
     }
 
     /// Slot buffer used as overlap when purging Live Index data.
-    pub(crate) fn purge_slot_buffer() -> Slot {
-        ENV_VARS.purge_slot_buffer.into()
+    pub(crate) fn purge_backward_slot_buffer() -> Slot {
+        ENV_VARS.purge_backward_slot_buffer.into()
     }
 
     /// Duration in seconds used to determine if the system is live during checks.

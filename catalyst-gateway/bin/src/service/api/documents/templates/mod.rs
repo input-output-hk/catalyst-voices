@@ -93,7 +93,6 @@ fn build_signed_doc(data: &SignedDocData, sk: &SigningKey) -> (Uuid, CatalystSig
     const KID_NETWORK: &str = "cardano";
 
     let metadata = serde_json::json!({
-        "alg": catalyst_signed_doc::Algorithm::EdDSA.to_string(),
         "type": data.doc_type,
         "id": data.id,
         "ver": data.ver,

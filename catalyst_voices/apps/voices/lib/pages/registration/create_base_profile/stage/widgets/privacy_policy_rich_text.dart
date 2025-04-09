@@ -38,6 +38,7 @@ class _PrivacyPolicyRichTextState extends State<PrivacyPolicyRichText>
   @override
   Widget build(BuildContext context) {
     return PlaceholderRichText(
+      key: const Key('PrivacyPolicyRichText'),
       context.l10n.createBaseProfileAcknowledgementsPrivacyPolicy,
       placeholderSpanBuilder: (context, placeholder) {
         return switch (placeholder) {

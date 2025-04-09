@@ -1,13 +1,14 @@
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart'
     hide PopupMenuItem;
 import 'package:flutter/material.dart';
 
 class CategoryDropdown extends StatelessWidget {
-  final List<DropdownMenuViewModel> items;
+  final List<DropdownMenuViewModel<SignedDocumentRef>> items;
   final Color? highlightColor;
   final Clip clipBehavior;
   final GlobalKey<PopupMenuButtonState<dynamic>> popupMenuButtonKey;
-  final ValueChanged<String?>? onSelected;
+  final ValueChanged<SignedDocumentRef?>? onSelected;
   final VoidCallback? onCanceled;
   final VoidCallback? onOpened;
   final Offset offset;

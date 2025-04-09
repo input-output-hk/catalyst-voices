@@ -5,6 +5,8 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:patrol_finders/patrol_finders.dart';
+
+import '../pageobject/discovery/current_campaign_selector_page.dart';
 import '../pageobject/discovery_page.dart';
 import '../pageobject/proposals_page.dart';
 
@@ -39,6 +41,14 @@ void main() async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await DiscoveryPage($).viewProposalsBtnClick();
         await ProposalsPage($).currentCampaignDetailsLooksAsExpected();
+      },
+    );
+
+    patrolWidgetTest(
+      'visitor - timeline cards data is rendered',
+      (PatrolTester $) async {
+        await $.pumpWidgetAndSettle(App(routerConfig: router));
+        await CurrentCampaignSection($).timelineCardsDataIsRendered();
       },
     );
   });

@@ -30,6 +30,8 @@ abstract class DependencyProvider {
     return _getIt.allReady();
   }
 
+  bool isRegistered<T extends Object>() => _getIt.isRegistered<T>();
+
   T get<T extends Object>() => _getIt.get<T>();
 
   Future<T> getAsync<T extends Object>() => _getIt.getAsync<T>();

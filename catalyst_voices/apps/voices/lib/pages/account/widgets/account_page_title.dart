@@ -22,6 +22,7 @@ class AccountPageTitle extends StatelessWidget {
         ),
         const SizedBox(height: 4),
         Text(
+          key: const Key('ProfileAndKeychainText'),
           context.l10n.profileAndKeychain,
           style: context.textTheme.displaySmall
               ?.copyWith(color: context.colorScheme.primary),

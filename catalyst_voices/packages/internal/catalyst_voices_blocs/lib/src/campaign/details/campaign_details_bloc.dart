@@ -44,13 +44,19 @@ final class CampaignDetailsBloc
     const sections = <CampaignCategorySection>[
       CampaignCategorySection(
         id: '1',
-        category: CampaignCategoryViewModel(id: '1', name: 'Concept'),
+        category: CampaignCategoryViewModel(
+          id: SignedDocumentRef(id: '1'),
+          name: 'Concept',
+        ),
         title: 'Introduction',
         body: _tmpBody,
       ),
       CampaignCategorySection(
         id: '2',
-        category: CampaignCategoryViewModel(id: '2', name: 'Product'),
+        category: CampaignCategoryViewModel(
+          id: SignedDocumentRef(id: '2'),
+          name: 'Product',
+        ),
         title: 'Motivation',
         body: 'Different body here\n$_tmpBody',
       ),

@@ -28,11 +28,13 @@ final class DiscoveryCurrentCampaignState extends Equatable {
   final bool isLoading;
   final LocalizedException? error;
   final CurrentCampaignInfoViewModel currentCampaign;
+  final List<CampaignTimeline> campaignTimeline;
 
   const DiscoveryCurrentCampaignState({
     this.isLoading = true,
     this.error,
     CurrentCampaignInfoViewModel? currentCampaign,
+    this.campaignTimeline = const [],
   }) : currentCampaign =
             currentCampaign ?? const NullCurrentCampaignInfoViewModel();
 
@@ -41,12 +43,20 @@ final class DiscoveryCurrentCampaignState extends Equatable {
         isLoading,
         error,
         currentCampaign,
+        campaignTimeline,
       ];
 
   bool get showCurrentCampaign =>
       !isLoading && currentCampaign is! NullCurrentCampaignInfoViewModel;
 
   bool get showError => !isLoading && error != null;
+
+  DateTime? get votingStartsAt {
+    return campaignTimeline
+        .firstWhere((e) => e.stage == CampaignTimelineStage.communityVoting)
+        .timeline
+        .from;
+  }
 }
 
 final class DiscoveryMostRecentProposalsState extends Equatable {
@@ -70,6 +80,18 @@ final class DiscoveryMostRecentProposalsState extends Equatable {
   bool get showError => !isLoading && error != null;
 
   bool get showProposals => !isLoading && proposals.isNotEmpty && error == null;
+
+  DiscoveryMostRecentProposalsState copyWith({
+    bool? isLoading,
+    LocalizedException? error,
+    List<PendingProposal>? proposals,
+  }) {
+    return DiscoveryMostRecentProposalsState(
+      isLoading: isLoading ?? this.isLoading,
+      error: error ?? this.error,
+      proposals: proposals ?? this.proposals,
+    );
+  }
 }
 
 final class DiscoveryState extends Equatable {

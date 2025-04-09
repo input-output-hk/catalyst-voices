@@ -28,7 +28,7 @@ final class ProposalsCubit extends Cubit<ProposalsState> {
     );
   }
 
-  void changeSelectedCategory(String? categoryId) {
+  void changeSelectedCategory(SignedDocumentRef? categoryId) {
     emit(state.copyWith(selectedCategoryId: Optional(categoryId)));
   }
 
@@ -39,13 +39,17 @@ final class ProposalsCubit extends Cubit<ProposalsState> {
       (index) => CampaignCategoryDetailsViewModel.dummy(id: '$index'),
     );
 
-    emit(state.copyWith(categories: categories));
+    if (!isClosed) {
+      emit(state.copyWith(categories: categories));
+    }
   }
 
   Future<void> getFavoritesList() async {
     final favoritesList = await _proposalService.getFavoritesProposalsIds();
 
-    emit(state.copyWith(favoritesIds: favoritesList));
+    if (!isClosed) {
+      emit(state.copyWith(favoritesIds: favoritesList));
+    }
   }
 
   Future<void> getProposals(
@@ -111,16 +115,16 @@ final class ProposalsCubit extends Cubit<ProposalsState> {
     emit(state.copyWith(favoritesIds: favoritesList));
   }
 
-  /// Changes the favorite status of the proposal with [proposalId].
+  /// Changes the favorite status of the proposal with [ref].
   Future<void> onChangeFavoriteProposal(
-    String proposalId, {
+    DocumentRef ref, {
     required bool isFavorite,
   }) async {
     if (isFavorite) {
       // ignore: unused_local_variable
-      final favIds = await _proposalService.addFavoriteProposal(proposalId);
+      final favIds = await _proposalService.addFavoriteProposal(ref: ref);
       // TODO(LynxLynxx): to mock data. remove after implementing db
-      final favoritesIds = [...state.favoritesIds, proposalId];
+      final favoritesIds = [...state.favoritesIds, ref.id];
       emit(state.copyWith(favoritesIds: favoritesIds));
       // TODO(LynxLynxx): to mock data. should read proposal from db and change
       // isFavorite
@@ -128,20 +132,20 @@ final class ProposalsCubit extends Cubit<ProposalsState> {
 
       // TODO(LynxLynxx): to mock data. remove after implementing db
       final proposal = state.allProposals.items.first.copyWith(
-        id: proposalId,
+        ref: ref,
         isFavorite: isFavorite,
       );
       await _favorite(isFavorite, proposal);
     } else {
       // TODO(LynxLynxx): to mock data. remove after implementing db
       final proposal = state.allProposals.items.first.copyWith(
-        id: proposalId,
+        ref: ref,
         isFavorite: isFavorite,
       );
       await _favorite(isFavorite, proposal);
-      await _proposalService.removeFavoriteProposal(proposalId);
+      await _proposalService.removeFavoriteProposal(ref: ref);
       // TODO(LynxLynxx): to mock data. remove after implementing db
-      final favoritesIds = [...state.favoritesIds]..remove(proposalId);
+      final favoritesIds = [...state.favoritesIds]..remove(ref.id);
 
       emit(state.copyWith(favoritesIds: favoritesIds));
     }
@@ -277,7 +281,7 @@ final class ProposalsCubit extends Cubit<ProposalsState> {
       );
     } else {
       final items = [...state.favoriteProposals.items]
-        ..removeWhere((e) => e.id == proposal.id);
+        ..removeWhere((e) => e.ref == proposal.ref);
       emit(
         state.copyWith(
           favoriteProposals: favoritesProposals.copyWith(

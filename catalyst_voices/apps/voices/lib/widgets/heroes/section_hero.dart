@@ -21,9 +21,37 @@ class HeroSection extends StatefulWidget {
   State<HeroSection> createState() => _HeroSectionState();
 }
 
+class _Background extends StatelessWidget {
+  final VideoPlayerController controller;
+  const _Background({
+    required this.controller,
+  });
+  @override
+  Widget build(BuildContext context) {
+    return controller.value.isInitialized
+        ? ConstrainedBox(
+            constraints: const BoxConstraints(maxHeight: 650),
+            child: FittedBox(
+              fit: BoxFit.cover,
+              clipBehavior: Clip.hardEdge,
+              child: SizedBox(
+                key: const Key('HeroBackgroundVideo'),
+                width: controller.value.size.width,
+                height: controller.value.size.height,
+                child: VideoPlayer(controller),
+              ),
+            ),
+          )
+        : const SizedBox.shrink();
+  }
+}
+
 class _HeroSectionState extends State<HeroSection>
     with AutomaticKeepAliveClientMixin {
   VideoPlayerController? _controller;
+
+  @override
+  bool get wantKeepAlive => true;
 
   VideoPlayerController get _effectiveController {
     return _controller ??
@@ -31,40 +59,6 @@ class _HeroSectionState extends State<HeroSection>
           widget.asset,
           package: widget.assetPackageName,
         ));
-  }
-
-  @override
-  bool get wantKeepAlive => true;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = VideoPlayerController.asset(
-      widget.asset,
-      package: widget.assetPackageName,
-    );
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      if (mounted) {
-        await _initalizedVideoPlayer();
-      }
-    });
-  }
-
-  @override
-  void didUpdateWidget(HeroSection oldWidget) {
-    super.didUpdateWidget(oldWidget);
-
-    if (oldWidget.asset != widget.asset ||
-        oldWidget.assetPackageName != widget.assetPackageName) {
-      unawaited(_disposeAndReinitializeVideoPlayer());
-    }
-  }
-
-  @override
-  void dispose() {
-    unawaited(_controller?.dispose());
-    _controller = null;
-    super.dispose();
   }
 
   @override
@@ -86,15 +80,35 @@ class _HeroSectionState extends State<HeroSection>
     );
   }
 
-  Future<void> _initalizedVideoPlayer() async {
-    await _controller?.initialize().then((_) async {
-      await _controller?.setVolume(0);
-      await _controller?.play();
-      await _controller?.setLooping(true);
-    });
-    if (mounted) {
-      setState(() {});
+  @override
+  void didUpdateWidget(HeroSection oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (oldWidget.asset != widget.asset ||
+        oldWidget.assetPackageName != widget.assetPackageName) {
+      unawaited(_disposeAndReinitializeVideoPlayer());
     }
+  }
+
+  @override
+  void dispose() {
+    unawaited(_controller?.dispose());
+    _controller = null;
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = VideoPlayerController.asset(
+      widget.asset,
+      package: widget.assetPackageName,
+    );
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (mounted) {
+        await _initalizedVideoPlayer();
+      }
+    });
   }
 
   Future<void> _disposeAndReinitializeVideoPlayer() async {
@@ -109,28 +123,15 @@ class _HeroSectionState extends State<HeroSection>
       await _initalizedVideoPlayer();
     }
   }
-}
 
-class _Background extends StatelessWidget {
-  final VideoPlayerController controller;
-  const _Background({
-    required this.controller,
-  });
-  @override
-  Widget build(BuildContext context) {
-    return controller.value.isInitialized
-        ? ConstrainedBox(
-            constraints: const BoxConstraints(maxHeight: 650),
-            child: FittedBox(
-              fit: BoxFit.cover,
-              child: SizedBox(
-                key: const Key('HeroBackgroundVideo'),
-                width: controller.value.size.width,
-                height: controller.value.size.height,
-                child: VideoPlayer(controller),
-              ),
-            ),
-          )
-        : const SizedBox.shrink();
+  Future<void> _initalizedVideoPlayer() async {
+    await _controller?.initialize().then((_) async {
+      await _controller?.setVolume(0);
+      await _controller?.play();
+      await _controller?.setLooping(true);
+    });
+    if (mounted) {
+      setState(() {});
+    }
   }
 }

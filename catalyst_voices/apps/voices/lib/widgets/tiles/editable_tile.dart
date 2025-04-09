@@ -14,7 +14,11 @@ class EditableTile extends StatelessWidget {
   final bool isSelected;
   final bool isEditMode;
   final bool isSaveEnabled;
+  final bool isEditEnabled;
+  final Widget? saveButtonLeading;
+  final String? saveText;
   final String? errorText;
+  final VoicesEditCancelButtonStyle editCancelButtonStyle;
   final ValueChanged<EditableTileChange>? onChanged;
   final Widget child;
 
@@ -24,7 +28,11 @@ class EditableTile extends StatelessWidget {
     this.isSelected = false,
     this.isEditMode = false,
     this.isSaveEnabled = false,
+    this.isEditEnabled = true,
+    this.saveButtonLeading,
+    this.saveText,
     this.errorText,
+    this.editCancelButtonStyle = VoicesEditCancelButtonStyle.text,
     this.onChanged,
     required this.child,
   });
@@ -37,13 +45,20 @@ class EditableTile extends StatelessWidget {
     return PropertyTile(
       title: title,
       isSelected: isSelected,
-      action: VoicesEditSaveButton(
-        onTap: _toggleEditMode,
-        isEditing: isEditMode,
-        hasError: errorText != null,
+      action: Offstage(
+        offstage: !isEditEnabled,
+        child: VoicesEditCancelButton(
+          key: const Key('EditableTileEditCancelButton'),
+          style: editCancelButtonStyle,
+          onTap: _toggleEditMode,
+          isEditing: isEditMode,
+          hasError: errorText != null,
+        ),
       ),
       footer: showFooter
           ? _Footer(
+              saveButtonLeading: saveButtonLeading,
+              saveText: saveText,
               errorText: errorText,
               showSaveButton: showSaveButton,
               isSaveEnabled: isSaveEnabled,
@@ -105,12 +120,16 @@ class _ErrorText extends StatelessWidget {
 }
 
 class _Footer extends StatelessWidget {
+  final Widget? saveButtonLeading;
+  final String? saveText;
   final String? errorText;
   final bool showSaveButton;
   final bool isSaveEnabled;
   final VoidCallback onSave;
 
   const _Footer({
+    required this.saveButtonLeading,
+    required this.saveText,
     required this.errorText,
     required this.showSaveButton,
     required this.isSaveEnabled,
@@ -131,8 +150,15 @@ class _Footer extends StatelessWidget {
         Visibility.maintain(
           visible: showSaveButton,
           child: VoicesFilledButton(
+            key: const Key('EmailTileSaveButton'),
             onTap: isSaveEnabled ? onSave : null,
-            child: Text(context.l10n.saveButtonText.toUpperCase()),
+            leading: saveButtonLeading,
+            child: Text(
+              saveText ?? context.l10n.saveButtonText.toUpperCase(),
+              style: Theme.of(context).textTheme.labelMedium!.copyWith(
+                    color: Theme.of(context).colorScheme.onPrimary,
+                  ),
+            ),
           ),
         ),
       ],

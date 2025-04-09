@@ -5,7 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 abstract interface class BaseProfileManager {
-  void updateDisplayName(DisplayName value);
+  void updateUsername(Username value);
 
   void updateEmail(Email value);
 
@@ -24,7 +24,7 @@ final class BaseProfileCubit extends Cubit<BaseProfileStateData>
           kDebugMode
               ? const BaseProfileStateData(
                   email: Email.dirty('dev@iokh.com'),
-                  displayName: DisplayName.dirty('Dev'),
+                  username: Username.dirty('Dev'),
                   isToSAccepted: true,
                   isPrivacyPolicyAccepted: true,
                   isDataUsageAccepted: true,
@@ -33,8 +33,8 @@ final class BaseProfileCubit extends Cubit<BaseProfileStateData>
         );
 
   @override
-  void updateDisplayName(DisplayName value) {
-    emit(state.copyWith(displayName: value));
+  void updateUsername(Username value) {
+    emit(state.copyWith(username: value));
   }
 
   @override
@@ -65,7 +65,7 @@ final class BaseProfileCubit extends Cubit<BaseProfileStateData>
 
   BaseProfileProgress createRecoverProgress() {
     return BaseProfileProgress(
-      displayName: state.displayName.value,
+      username: state.username.value,
       email: state.email.value,
     );
   }

@@ -29,6 +29,7 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
+    namespace "io.projectcatalyst.catalyst_voices"
     compileSdkVersion flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 

@@ -15,7 +15,9 @@ abstract interface class CampaignService {
 
   Future<List<CampaignCategory>> getCampaignCategories();
 
-  CampaignCategory getCategory(String uuid);
+  Future<List<CampaignTimeline>> getCampaignTimeline();
+
+  Future<CampaignCategory> getCategory(SignedDocumentRef ref);
 
   Future<CurrentCampaign> getCurrentCampaign();
 }
@@ -49,22 +51,24 @@ final class CampaignServiceImpl implements CampaignService {
 
   @override
   Future<List<CampaignCategory>> getCampaignCategories() async {
-    return staticCampaignCategories;
+    return _campaignRepository.getCampaignCategories();
   }
 
   @override
-  CampaignCategory getCategory(String uuid) {
+  Future<List<CampaignTimeline>> getCampaignTimeline() {
+    return _campaignRepository.getCampaignTimeline();
+  }
+
+  @override
+  Future<CampaignCategory> getCategory(SignedDocumentRef ref) async {
     // TODO(LynxLynxx): call backend for current ask amount
     // and submitted proposal count
-    return staticCampaignCategories.firstWhere(
-      (e) => e.uuid == uuid,
-      orElse: () => throw const NotFoundException(),
-    );
+    return _campaignRepository.getCategory(ref);
   }
 
   @override
   Future<CurrentCampaign> getCurrentCampaign() async {
     // TODO(LynxLynxx): call backend for current ask amount
-    return CurrentCampaignX.staticContent;
+    return _campaignRepository.getCurrentCampaign();
   }
 }

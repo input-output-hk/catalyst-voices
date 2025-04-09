@@ -3,11 +3,13 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_repositories/src/database/catalyst_database.dart';
 import 'package:catalyst_voices_repositories/src/document/document_repository.dart';
+import 'package:catalyst_voices_repositories/src/dto/document_data_with_ref_dat.dart';
+import 'package:collection/collection.dart';
 import 'package:drift/drift.dart' show DatabaseConnection;
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:uuid/uuid.dart';
+import 'package:uuid_plus/uuid_plus.dart';
 
 import '../utils/test_factories.dart';
 
@@ -22,6 +24,7 @@ void main() {
   late DraftDataSource draftsSource;
   late SignedDocumentDataSource localDocuments;
   late DocumentDataRemoteSource remoteDocuments;
+  late DocumentFavoriteSource favoriteDocuments;
 
   setUp(() {
     final inMemory = DatabaseConnection(NativeDatabase.memory());
@@ -30,11 +33,13 @@ void main() {
     draftsSource = DatabaseDraftsDataSource(database);
     localDocuments = DatabaseDocumentsDataSource(database);
     remoteDocuments = _MockDocumentDataRemoteSource();
+    favoriteDocuments = DatabaseDocumentFavoriteSource(database);
 
     repository = DocumentRepositoryImpl(
       draftsSource,
       localDocuments,
       remoteDocuments,
+      favoriteDocuments,
     );
   });
 
@@ -43,66 +48,76 @@ void main() {
   });
 
   group(DocumentRepository, () {
-    test('getProposalDocument returns correct model', () async {
-      // Given
-      final templateData = await VoicesDocumentsTemplates.proposalF14Schema;
-      final proposalData = await VoicesDocumentsTemplates.proposalF14Document;
+    // TODO(LynxLynxx): change test to new implementation
+    test(
+      'getDocument returns correct model',
+      () async {
+        // Given
+        final templateData = await VoicesDocumentsTemplates.proposalF14Schema;
+        final proposalData = await VoicesDocumentsTemplates.proposalF14Document;
 
-      final template = DocumentDataFactory.build(
-        selfRef: DocumentRefFactory.buildSigned(id: mockedTemplateUuid),
-        type: DocumentType.proposalTemplate,
-        content: DocumentDataContent(templateData),
-      );
-      final proposal = DocumentDataFactory.build(
-        selfRef: DocumentRefFactory.buildSigned(id: mockedDocumentUuid),
-        type: DocumentType.proposalDocument,
-        template: template.ref,
-        content: DocumentDataContent(proposalData),
-      );
+        final templateRef = SignedDocumentRef.first(const Uuid().v7());
+        final template = DocumentDataFactory.build(
+          selfRef: templateRef,
+          type: DocumentType.proposalTemplate,
+          content: DocumentDataContent(templateData),
+        );
+        final proposal = DocumentDataFactory.build(
+          selfRef: SignedDocumentRef.first(const Uuid().v7()),
+          type: DocumentType.proposalDocument,
+          template: templateRef,
+          content: DocumentDataContent(proposalData),
+        );
 
-      when(() => remoteDocuments.get(ref: template.ref))
-          .thenAnswer((_) => Future.value(template));
-      when(() => remoteDocuments.get(ref: proposal.ref))
-          .thenAnswer((_) => Future.value(proposal));
+        when(() => remoteDocuments.get(ref: template.ref))
+            .thenAnswer((_) => Future.value(template));
+        when(() => remoteDocuments.get(ref: proposal.ref))
+            .thenAnswer((_) => Future.value(proposal));
 
-      // When
-      final ref = proposal.ref;
-      final proposalDocument = await repository.getProposalDocument(
-        ref: ref,
-      );
+        // When
+        final ref = proposal.ref;
+        final proposalDocument = await repository.getDocumentData(
+          ref: ref,
+        );
 
-      // Then
-      expect(proposalDocument.metadata.selfRef, proposal.metadata.selfRef);
-    });
+        // Then
+        expect(
+          proposalDocument.metadata.selfRef,
+          proposal.metadata.selfRef,
+        );
+      },
+    );
 
-    test('getProposalDocument correctly propagates errors', () async {
+    test('getDocument correctly propagates errors', () async {
       // Given
       final templateRef = SignedDocumentRef(
-        id: mockedTemplateUuid,
+        id: const Uuid().v7(),
         version: const Uuid().v7(),
       );
       final proposal = DocumentDataFactory.build(
-        selfRef: DocumentRefFactory.buildSigned(id: mockedDocumentUuid),
+        selfRef: SignedDocumentRef.first(const Uuid().v7()),
         type: DocumentType.proposalDocument,
         template: templateRef,
         content: const DocumentDataContent({}),
       );
 
-      when(() => remoteDocuments.get(ref: templateRef))
-          .thenAnswer((_) => Future.error(DocumentNotFound(ref: templateRef)));
-      when(() => remoteDocuments.get(ref: proposal.ref))
-          .thenAnswer((_) => Future.value(proposal));
+      when(() => remoteDocuments.get(ref: templateRef)).thenAnswer(
+        (_) => Future.error(DocumentNotFoundException(ref: templateRef)),
+      );
+      when(() => remoteDocuments.get(ref: proposal.ref)).thenAnswer(
+        (_) => Future.error(DocumentNotFoundException(ref: templateRef)),
+      );
 
       // When
       final ref = proposal.ref;
-      final proposalDocumentFuture = repository.getProposalDocument(
+      final proposalDocumentFuture = repository.getDocumentData(
         ref: ref,
       );
 
       // Then
       expect(
         () async => proposalDocumentFuture,
-        throwsA(isA<DocumentNotFound>()),
+        throwsA(isA<DocumentNotFoundException>()),
       );
     });
 
@@ -113,7 +128,7 @@ void main() {
         final version = id;
 
         final documentData = DocumentDataFactory.build(
-          selfRef: DocumentRefFactory.buildSigned(id: id, version: version),
+          selfRef: SignedDocumentRef(id: id, version: version),
         );
 
         final ref = documentData.ref;
@@ -135,7 +150,7 @@ void main() {
         final version = id;
 
         final documentData = DocumentDataFactory.build(
-          selfRef: DocumentRefFactory.buildSigned(id: id, version: version),
+          selfRef: SignedDocumentRef(id: id, version: version),
         );
 
         final ref = SignedDocumentRef(id: id);
@@ -159,10 +174,12 @@ void main() {
     group('watchDocumentWithRef', () {
       test('template reference is watched and combined correctly', () async {
         // Given
+        final templateRef = SignedDocumentRef.generateFirstRef();
         final template = DocumentDataFactory.build(
           type: DocumentType.proposalTemplate,
+          selfRef: templateRef,
         );
-        final proposal = DocumentDataFactory.build(template: template.ref);
+        final proposal = DocumentDataFactory.build(template: templateRef);
 
         when(() => remoteDocuments.get(ref: template.ref))
             .thenAnswer((_) => Future.value(template));
@@ -196,11 +213,13 @@ void main() {
 
       test('loads template once when two documents refers to it', () async {
         // Given
+        final templateRef = SignedDocumentRef.generateFirstRef();
         final template = DocumentDataFactory.build(
           type: DocumentType.proposalTemplate,
+          selfRef: templateRef,
         );
-        final proposal1 = DocumentDataFactory.build(template: template.ref);
-        final proposal2 = DocumentDataFactory.build(template: template.ref);
+        final proposal1 = DocumentDataFactory.build(template: templateRef);
+        final proposal2 = DocumentDataFactory.build(template: templateRef);
 
         when(() => remoteDocuments.get(ref: template.ref))
             .thenAnswer((_) => Future.value(template));
@@ -233,105 +252,177 @@ void main() {
       });
     });
 
-    group('createDocumentDraft', () {
-      test('version should equals id', () async {
+    group('insertDocument', () {
+      test('draft document data is saved', () async {
         // Given
-        const content = DocumentDataContent({});
-        final templateRef = DocumentRefFactory.buildSigned();
-
-        // When
-        final draftRef = await repository.createDocumentDraft(
-          type: DocumentType.proposalDocument,
-          content: content,
-          template: templateRef,
+        final documentDataToSave = DocumentDataFactory.build(
+          selfRef: DraftRef.generateFirstRef(),
         );
 
+        // When
+        await repository.upsertDocument(document: documentDataToSave);
+
         // Then
-        expect(draftRef.id, draftRef.version);
+        final savedDocumentData = await repository.getDocumentData(
+          ref: documentDataToSave.metadata.selfRef,
+        );
+
+        expect(savedDocumentData, equals(documentDataToSave));
+      });
+    });
+
+    group('getAllDocumentsRefs', () {
+      test('duplicated refs are filtered out', () async {
+        // Given
+        final refs = List.generate(
+          10,
+          (_) => SignedDocumentRef.generateFirstRef(),
+        );
+        final remoteRefs = [...refs, ...refs];
+        final expectedRefs = [
+          ...categoriesTemplatesRefs.expand((e) => [e.proposal, e.comment]),
+          ...refs,
+        ];
+
+        when(() => remoteDocuments.index())
+            .thenAnswer((_) => Future.value(remoteRefs));
+
+        // When
+        final allRefs = await repository.getAllDocumentsRefs();
+
+        // Then
+        expect(
+          allRefs,
+          allOf(hasLength(expectedRefs.length), containsAll(expectedRefs)),
+        );
       });
 
       test(
-          'of document should use same '
-          'id but assign new version', () async {
+          'does not call get latest version when '
+          'all refs are exact', () async {
         // Given
-        final docRef = DocumentRefFactory.buildSigned();
-        const content = DocumentDataContent({});
-        final templateRef = DocumentRefFactory.buildSigned();
-
-        // When
-        final draftRef = await repository.createDocumentDraft(
-          type: DocumentType.proposalDocument,
-          content: content,
-          template: templateRef,
-          of: docRef,
+        final refs = List.generate(
+          10,
+          (_) => SignedDocumentRef.exact(
+            id: const Uuid().v7(),
+            version: const Uuid().v7(),
+          ),
         );
 
+        // When
+        when(() => remoteDocuments.index())
+            .thenAnswer((_) => Future.value(refs));
+
+        await repository.getAllDocumentsRefs();
+
         // Then
-        expect(draftRef.id, docRef.id);
-        expect(draftRef.version, isNot(docRef.version));
+        verifyNever(() => remoteDocuments.getLatestVersion(any()));
       });
 
-      test('document data type should be proposal document', () async {
+      test('loose refs are are specified to latest version', () async {
         // Given
-        const content = DocumentDataContent({});
-        final templateRef = DocumentRefFactory.buildSigned();
+        final exactRefs = List.generate(
+          10,
+          (_) => SignedDocumentRef.exact(
+            id: const Uuid().v7(),
+            version: const Uuid().v7(),
+          ),
+        );
+        final looseRefs = List.generate(
+          10,
+          (_) => SignedDocumentRef.loose(id: const Uuid().v7()),
+        );
+        final refs = [...exactRefs, ...looseRefs];
 
         // When
-        final draftRef = await repository.createDocumentDraft(
-          type: DocumentType.proposalDocument,
-          content: content,
-          template: templateRef,
-        );
+        when(() => remoteDocuments.index())
+            .thenAnswer((_) => Future.value(refs));
+        when(() => remoteDocuments.getLatestVersion(any()))
+            .thenAnswer((_) => Future(() => const Uuid().v7()));
+
+        final allRefs = await repository.getAllDocumentsRefs();
 
         // Then
-        final documentData = await repository.getDocumentData(ref: draftRef);
+        verify(() => remoteDocuments.getLatestVersion(any()))
+            .called(looseRefs.length);
 
-        expect(documentData.metadata.type, DocumentType.proposalDocument);
+        expect(allRefs.every((element) => element.isExact), isTrue);
+      });
+
+      test('remote loose refs to const documents are removed', () async {
+        // Given
+        final constTemplatesRefs = categoriesTemplatesRefs
+            .expand((element) => [element.proposal])
+            .toList();
+
+        final docsRefs = List.generate(
+          10,
+          (_) => SignedDocumentRef.generateFirstRef(),
+        );
+        final looseTemplatesRefs = constTemplatesRefs.map((e) => e.toLoose());
+        final refs = [
+          ...docsRefs,
+          ...looseTemplatesRefs,
+        ];
+
+        // When
+        when(() => remoteDocuments.index())
+            .thenAnswer((_) => Future.value(refs));
+
+        final allRefs = await repository.getAllDocumentsRefs();
+
+        // Then
+        expect(allRefs, isNot(containsAll(looseTemplatesRefs)));
+        expect(allRefs, containsAll(constTemplatesRefs));
+
+        verifyNever(() => remoteDocuments.getLatestVersion(any()));
+      });
+
+      test('categories refs are filtered out', () async {
+        // Given
+        final categoriesRefs = categoriesTemplatesRefs
+            .expand((element) => [element.category])
+            .toList();
+        final categoriesIds = categoriesRefs.map((e) => e.id).toList();
+
+        final docsRefs = List.generate(
+          10,
+          (_) => SignedDocumentRef.generateFirstRef(),
+        );
+        final looseCategoriesRefs = categoriesRefs.map((e) => e.toLoose());
+        final refs = [
+          ...docsRefs,
+          ...looseCategoriesRefs,
+        ];
+
+        // When
+        when(() => remoteDocuments.index())
+            .thenAnswer((_) => Future.value(refs));
+
+        final allRefs = await repository.getAllDocumentsRefs();
+
+        // Then
+        expect(allRefs, isNot(containsAll(categoriesRefs)));
+        expect(allRefs.none((ref) => categoriesIds.contains(ref.id)), isTrue);
+
+        verifyNever(() => remoteDocuments.getLatestVersion(any()));
       });
     });
 
     test(
-        'updating proposal draft content '
-        'should change it correctly', () async {
-      // Given
-      const initialContent = DocumentDataContent({});
-      const updatedContent = DocumentDataContent({'title': 'My proposal'});
-
-      final templateRef = DocumentRefFactory.buildSigned();
-
-      // When
-      final draftRef = await repository.createDocumentDraft(
-        type: DocumentType.proposalDocument,
-        content: initialContent,
-        template: templateRef,
-      );
-
-      await repository.updateDocumentDraft(
-        ref: draftRef,
-        content: updatedContent,
-      );
-
-      // Then
-      final documentData = await repository.getDocumentData(ref: draftRef);
-
-      expect(documentData.ref, draftRef);
-      expect(documentData.content, updatedContent);
-    });
-
-    test(
-        'updating proposal draft content '
+        'updating proposal draft '
         'should emit changes', () async {
       // Given
       const initialContent = DocumentDataContent({});
       const updatedContent = DocumentDataContent({'title': 'My proposal'});
 
-      final templateRef = DocumentRefFactory.buildSigned();
+      final templateRef = SignedDocumentRef.generateFirstRef();
       final templateData = DocumentDataFactory.build(
         selfRef: templateRef,
         type: DocumentType.proposalTemplate,
       );
 
-      final draftRef = DocumentRefFactory.buildDraft();
+      final draftRef = DraftRef.generateFirstRef();
       final draftData = DocumentDataFactory.build(
         type: DocumentType.proposalDocument,
         selfRef: draftRef,
@@ -339,15 +430,20 @@ void main() {
         content: initialContent,
       );
 
+      final updatedData = DocumentDataFactory.build(
+        type: DocumentType.proposalDocument,
+        selfRef: draftRef,
+        template: templateRef,
+        content: updatedContent,
+      );
+
       // When
       await localDocuments.save(data: templateData);
       await draftsSource.save(data: draftData);
 
       // Then
-      await repository.updateDocumentDraft(
-        ref: draftRef,
-        content: updatedContent,
-      );
+      await repository.upsertDocument(document: updatedData);
+
       final draftStream = repository.watchDocumentWithRef(
         ref: draftRef,
         refGetter: (data) => data.metadata.template!,
@@ -369,25 +465,27 @@ void main() {
     test(
       'watchProposalsDocuments returns correct model',
       () async {
-        final templateRef = DocumentRefFactory.buildSigned();
+        final templateRef = SignedDocumentRef.generateFirstRef();
         final templateData = DocumentDataFactory.build(
           selfRef: templateRef,
           type: DocumentType.proposalTemplate,
         );
         const publicDraftContent =
             DocumentDataContent({'title': 'My proposal'});
-        final publicDraftRef = DocumentRefFactory.buildDraft();
+        final publicDraftRef = DraftRef.generateFirstRef();
         final publicDraftData = DocumentDataFactory.build(
           type: DocumentType.proposalDocument,
           selfRef: publicDraftRef,
-          template: templateData.ref,
+          template: templateRef,
           content: publicDraftContent,
         );
 
         await localDocuments.save(data: templateData);
         await localDocuments.save(data: publicDraftData);
 
-        final latestProposals = repository.watchAllDocuments();
+        final latestProposals = repository.watchAllDocuments(
+          refGetter: (data) => data.metadata.template!,
+        );
 
         expect(
           latestProposals,

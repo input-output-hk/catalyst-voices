@@ -86,13 +86,15 @@ final class PreBabbageTransactionOutput
   /// Converts the [PreBabbageTransactionOutput] to a CBOR-encoded value.
   /// The CBOR list contains the address, amount, and optionally the datum hash.
   @override
-  CborValue toCbor() {
-    final list = CborList([
-      address.toCbor(),
-      amount.toCbor(),
-      if (datumHash != null) datumHash!.toCbor(),
-    ]);
-    return list;
+  CborValue toCbor({List<int> tags = const []}) {
+    return CborList(
+      [
+        address.toCbor(),
+        amount.toCbor(),
+        if (datumHash != null) datumHash!.toCbor(),
+      ],
+      tags: tags,
+    );
   }
 
   /// Method for creating a copy of the [PreBabbageTransactionOutput] with
@@ -193,11 +195,14 @@ final class TransactionOutput extends ShelleyMultiAssetTransactionOutput {
   /// The CBOR map contains the address, amount, and optionally the datum option
   /// and script reference.
   @override
-  CborValue toCbor() {
-    final map = CborMap({
-      const CborSmallInt(0): address.toCbor(),
-      const CborSmallInt(1): amount.toCbor(),
-    });
+  CborValue toCbor({List<int> tags = const []}) {
+    final map = CborMap(
+      {
+        const CborSmallInt(0): address.toCbor(),
+        const CborSmallInt(1): amount.toCbor(),
+      },
+      tags: tags,
+    );
 
     if (datumOption != null) {
       map[const CborSmallInt(2)] = datumOption!.toCbor();

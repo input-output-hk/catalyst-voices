@@ -1,8 +1,9 @@
-//wrapper that we should adapt to read actual i18n translations we use in app
-//it will also support different locales once we have it
-//now this is here so we can easily replace this implementation and know where
-class T {
-  static String get(String key, {String? locale}) {
-    return key;
-  }
+import 'package:catalyst_voices_localization/generated/catalyst_voices_localizations.dart';
+import 'package:flutter/material.dart';
+
+Future<VoicesLocalizations> t() async {
+  // TODO(oldgreg): we can add getting locale from a file or a system variable
+  //  after we will support multiple languages, for now we only support 'en'
+  const locale = 'en';
+  return VoicesLocalizations.delegate.load(const Locale(locale));
 }

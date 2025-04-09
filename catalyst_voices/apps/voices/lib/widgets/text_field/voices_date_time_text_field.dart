@@ -83,7 +83,7 @@ class VoicesDateTimeTextField extends StatelessWidget {
         ),
         hintText: hintText,
         hintStyle: textTheme.bodyLarge?.copyWith(
-          color: theme.colors.textDisabled,
+          color: theme.colors.textOnPrimaryLevel1,
         ),
         errorStyle: textTheme.bodySmall?.copyWith(
           color: Theme.of(context).colorScheme.error,

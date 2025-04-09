@@ -3,29 +3,6 @@ import 'package:catalyst_voices_repositories/src/dto/document/schema/document_de
 import 'package:catalyst_voices_repositories/src/dto/document/schema/document_property_schema_dto.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 
-enum _DocumentArrayDefinition {
-  multiSelect('multiSelect'),
-  singleLineTextEntryList('singleLineTextEntryList'),
-  multiLineTextEntryListMarkdown('multiLineTextEntryListMarkdown'),
-  singleLineHttpsURLEntryList('singleLineHttpsURLEntryList'),
-  nestedQuestionsList('nestedQuestionsList'),
-  unknown('unknown');
-
-  final String def;
-
-  const _DocumentArrayDefinition(this.def);
-
-  factory _DocumentArrayDefinition.fromDef(String? def) {
-    for (final value in values) {
-      if (value.def.equalsIgnoreCase(def)) {
-        return value;
-      }
-    }
-
-    return _DocumentArrayDefinition.unknown;
-  }
-}
-
 final class DocumentListSchemaMapper {
   static DocumentListSchema toModel({
     required DocumentDefinitionsDto definitions,
@@ -47,7 +24,7 @@ final class DocumentListSchemaMapper {
       nodeId: nodeId,
       isRequired: true,
     );
-    final itemsRange = Range.optionalRangeOf(
+    final itemsRange = NumRange.optionalRangeOf(
       min: schema.minItems,
       max: schema.maxItems,
     );
@@ -140,5 +117,28 @@ final class DocumentListSchemaMapper {
           uniqueItems: uniqueItems,
         );
     }
+  }
+}
+
+enum _DocumentArrayDefinition {
+  multiSelect('multiSelect'),
+  singleLineTextEntryList('singleLineTextEntryList'),
+  multiLineTextEntryListMarkdown('multiLineTextEntryListMarkdown'),
+  singleLineHttpsURLEntryList('singleLineHttpsURLEntryList'),
+  nestedQuestionsList('nestedQuestionsList'),
+  unknown('unknown');
+
+  final String def;
+
+  const _DocumentArrayDefinition(this.def);
+
+  factory _DocumentArrayDefinition.fromDef(String? def) {
+    for (final value in values) {
+      if (value.def.equalsIgnoreCase(def)) {
+        return value;
+      }
+    }
+
+    return _DocumentArrayDefinition.unknown;
   }
 }

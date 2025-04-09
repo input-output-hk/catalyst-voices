@@ -49,13 +49,16 @@ final class Transaction extends Equatable implements CborEncodable {
 
   /// Serializes the type as cbor.
   @override
-  CborValue toCbor() {
-    return CborList([
-      body.toCbor(),
-      witnessSet.toCbor(),
-      CborBool(isValid),
-      auxiliaryData?.toCbor() ?? const CborNull(),
-    ]);
+  CborValue toCbor({List<int> tags = const []}) {
+    return CborList(
+      [
+        body.toCbor(),
+        witnessSet.toCbor(),
+        CborBool(isValid),
+        auxiliaryData?.toCbor() ?? const CborNull(),
+      ],
+      tags: tags,
+    );
   }
 
   @override
@@ -188,31 +191,35 @@ final class TransactionBody extends Equatable implements CborEncodable {
 
   /// Serializes the type as cbor.
   @override
-  CborValue toCbor() {
-    return CborMap({
-      const CborSmallInt(0): _toCborList(inputs),
-      const CborSmallInt(1): _toCborList(outputs),
-      const CborSmallInt(2): fee.toCbor(),
-      if (ttl != null) const CborSmallInt(3): ttl!.toCbor(),
-      if (auxiliaryDataHash != null)
-        const CborSmallInt(7): auxiliaryDataHash!.toCbor(),
-      if (validityStart != null) const CborSmallInt(8): validityStart!.toCbor(),
-      if (mint != null) const CborSmallInt(9): mint!.toCbor(),
-      if (scriptDataHash != null)
-        const CborSmallInt(11): scriptDataHash!.toCbor(),
-      if (collateralInputs != null && collateralInputs!.isNotEmpty)
-        const CborSmallInt(13): _toCborList(collateralInputs!),
-      if (requiredSigners != null && requiredSigners!.isNotEmpty)
-        const CborSmallInt(14): _toCborList(requiredSigners!),
-      if (networkId != null)
-        const CborSmallInt(15): CborSmallInt(networkId!.id),
-      if (collateralReturn != null)
-        const CborSmallInt(16): collateralReturn!.toCbor(),
-      if (totalCollateral != null)
-        const CborSmallInt(17): totalCollateral!.toCbor(),
-      if (referenceInputs != null && referenceInputs!.isNotEmpty)
-        const CborSmallInt(18): _toCborList(referenceInputs!),
-    });
+  CborValue toCbor({List<int> tags = const []}) {
+    return CborMap(
+      {
+        const CborSmallInt(0): _toCborList(inputs),
+        const CborSmallInt(1): _toCborList(outputs),
+        const CborSmallInt(2): fee.toCbor(),
+        if (ttl != null) const CborSmallInt(3): ttl!.toCbor(),
+        if (auxiliaryDataHash != null)
+          const CborSmallInt(7): auxiliaryDataHash!.toCbor(),
+        if (validityStart != null)
+          const CborSmallInt(8): validityStart!.toCbor(),
+        if (mint != null) const CborSmallInt(9): mint!.toCbor(),
+        if (scriptDataHash != null)
+          const CborSmallInt(11): scriptDataHash!.toCbor(),
+        if (collateralInputs != null && collateralInputs!.isNotEmpty)
+          const CborSmallInt(13): _toCborList(collateralInputs!),
+        if (requiredSigners != null && requiredSigners!.isNotEmpty)
+          const CborSmallInt(14): _toCborList(requiredSigners!),
+        if (networkId != null)
+          const CborSmallInt(15): CborSmallInt(networkId!.id),
+        if (collateralReturn != null)
+          const CborSmallInt(16): collateralReturn!.toCbor(),
+        if (totalCollateral != null)
+          const CborSmallInt(17): totalCollateral!.toCbor(),
+        if (referenceInputs != null && referenceInputs!.isNotEmpty)
+          const CborSmallInt(18): _toCborList(referenceInputs!),
+      },
+      tags: tags,
+    );
   }
 
   CborList _toCborList(Iterable<CborEncodable> iterable) {
@@ -269,11 +276,14 @@ final class TransactionInput extends Equatable implements CborEncodable {
 
   /// Serializes the type as cbor.
   @override
-  CborValue toCbor() {
-    return CborList([
-      transactionId.toCbor(),
-      CborSmallInt(index),
-    ]);
+  CborValue toCbor({List<int> tags = const []}) {
+    return CborList(
+      [
+        transactionId.toCbor(),
+        CborSmallInt(index),
+      ],
+      tags: tags,
+    );
   }
 
   @override
@@ -311,11 +321,14 @@ final class TransactionUnspentOutput extends Equatable
 
   /// Serializes the type as cbor.
   @override
-  CborValue toCbor() {
-    return CborList([
-      input.toCbor(),
-      output.toCbor(),
-    ]);
+  CborValue toCbor({List<int> tags = const []}) {
+    return CborList(
+      [
+        input.toCbor(),
+        output.toCbor(),
+      ],
+      tags: tags,
+    );
   }
 
   @override
@@ -338,10 +351,15 @@ final class AuxiliaryData extends Equatable implements CborEncodable {
 
   /// Serializes the type as cbor.
   @override
-  CborValue toCbor() {
+  CborValue toCbor({List<int> tags = const []}) {
     return CborMap(
       map,
-      tags: map.isNotEmpty ? const [] : [CborCustomTags.map],
+      tags: map.isNotEmpty
+          ? tags
+          : [
+              CborCustomTags.map,
+              ...tags,
+            ],
     );
   }
 

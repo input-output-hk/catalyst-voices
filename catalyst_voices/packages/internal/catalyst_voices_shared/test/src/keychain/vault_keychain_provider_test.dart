@@ -9,7 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shared_preferences_platform_interface/in_memory_shared_preferences_async.dart';
 import 'package:shared_preferences_platform_interface/shared_preferences_async_platform_interface.dart';
 import 'package:test/test.dart';
-import 'package:uuid/uuid.dart';
+import 'package:uuid_plus/uuid_plus.dart';
 
 void main() {
   late final CatalystPrivateKeyFactory keyFactory;
@@ -130,6 +130,19 @@ void main() {
       final keychains = await provider.getAll();
       expect(keychains.length, ids.length);
       expect(keychains.map((e) => e.id), containsAll(ids));
+    });
+
+    test('calling get for same keychain returns same instance', () async {
+      // Given
+      final id = const Uuid().v4();
+
+      // When
+      await provider.create(id);
+      final keychainOne = await provider.get(id);
+      final keychainTwo = await provider.get(id);
+
+      // Then
+      expect(keychainOne, same(keychainTwo));
     });
   });
 }

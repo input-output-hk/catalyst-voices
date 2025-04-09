@@ -70,7 +70,9 @@ final class Dependencies extends DependencyProvider {
           downloaderService: get<DownloaderService>(),
           userService: get<UserService>(),
           registrationService: get<RegistrationService>(),
+          keyDerivationService: get<KeyDerivationService>(),
           progressNotifier: get<RegistrationProgressNotifier>(),
+          blockchainConfig: get<AppConfig>().blockchain,
         );
       })
       ..registerLazySingleton<ProposalsCubit>(
@@ -98,12 +100,16 @@ final class Dependencies extends DependencyProvider {
         return WorkspaceBloc(
           get<CampaignService>(),
           get<ProposalService>(),
+          get<DocumentMapper>(),
+          get<DownloaderService>(),
         );
       })
       ..registerFactory<ProposalBuilderBloc>(() {
         return ProposalBuilderBloc(
-          get<CampaignService>(),
           get<ProposalService>(),
+          get<CampaignService>(),
+          get<CommentService>(),
+          get<UserService>(),
           get<DownloaderService>(),
           get<DocumentMapper>(),
         );
@@ -122,8 +128,24 @@ final class Dependencies extends DependencyProvider {
       ..registerFactory<AccountCubit>(() {
         return AccountCubit(get<UserService>());
       })
-      ..registerFactory<ProposalBloc>(() {
-        return ProposalBloc(get<ProposalService>());
+      ..registerFactory<ProposalCubit>(() {
+        return ProposalCubit(
+          get<UserService>(),
+          get<ProposalService>(),
+          get<CommentService>(),
+          get<CampaignService>(),
+          get<DocumentMapper>(),
+        );
+      })
+      ..registerFactory<NewProposalCubit>(() {
+        return NewProposalCubit(
+          get<CampaignService>(),
+          get<ProposalService>(),
+          get<DocumentMapper>(),
+        );
+      })
+      ..registerFactory<CampaignStageCubit>(() {
+        return CampaignStageCubit(get<CampaignService>());
       });
   }
 
@@ -132,6 +154,7 @@ final class Dependencies extends DependencyProvider {
       return ApiServices(
         config: get<AppConfig>().api,
         userObserver: get<UserObserver>(),
+        authTokenProvider: get<AuthTokenProvider>(),
       );
     });
   }
@@ -157,16 +180,17 @@ final class Dependencies extends DependencyProvider {
           get<CatalystDatabase>(),
         );
       })
+      ..registerLazySingleton<DocumentFavoriteSource>(() {
+        return DatabaseDocumentFavoriteSource(
+          get<CatalystDatabase>(),
+        );
+      })
       ..registerLazySingleton<CatGatewayDocumentDataSource>(() {
         return CatGatewayDocumentDataSource(
           get<ApiServices>(),
           get<SignedDocumentManager>(),
         );
       })
-      ..registerLazySingleton<TransactionConfigRepository>(
-        TransactionConfigRepository.new,
-      )
-      ..registerLazySingleton<ProposalRepository>(ProposalRepository.new)
       ..registerLazySingleton<CampaignRepository>(CampaignRepository.new)
       ..registerLazySingleton<ConfigRepository>(ConfigRepository.new)
       ..registerLazySingleton<DocumentRepository>(() {
@@ -174,9 +198,22 @@ final class Dependencies extends DependencyProvider {
           get<DatabaseDraftsDataSource>(),
           get<SignedDocumentDataSource>(),
           get<CatGatewayDocumentDataSource>(),
+          get<DocumentFavoriteSource>(),
         );
       })
-      ..registerLazySingleton<DocumentMapper>(() => const DocumentMapperImpl());
+      ..registerLazySingleton<DocumentMapper>(() => const DocumentMapperImpl())
+      ..registerLazySingleton<ProposalRepository>(
+        () => ProposalRepository(
+          get<SignedDocumentManager>(),
+          get<DocumentRepository>(),
+        ),
+      )
+      ..registerLazySingleton<CommentRepository>(
+        () => CommentRepository(
+          get<SignedDocumentManager>(),
+          get<DocumentRepository>(),
+        ),
+      );
   }
 
   void _registerServices() {
@@ -191,6 +228,14 @@ final class Dependencies extends DependencyProvider {
         cacheConfig: get<AppConfig>().cache,
       );
     });
+    registerLazySingleton<AuthService>(() {
+      return AuthService(
+        get<AuthTokenCache>(),
+        get<UserObserver>(),
+        get<KeyDerivationService>(),
+      );
+    });
+    registerLazySingleton<AuthTokenProvider>(() => get<AuthService>());
     registerLazySingleton<DownloaderService>(DownloaderService.new);
     registerLazySingleton<CatalystCardano>(() => CatalystCardano.instance);
     registerLazySingleton<RegistrationProgressNotifier>(
@@ -198,10 +243,10 @@ final class Dependencies extends DependencyProvider {
     );
     registerLazySingleton<RegistrationService>(() {
       return RegistrationService(
-        get<TransactionConfigRepository>(),
         get<KeychainProvider>(),
         get<CatalystCardano>(),
         get<KeyDerivationService>(),
+        get<AppConfig>().blockchain,
       );
     });
     registerLazySingleton<UserService>(
@@ -213,6 +258,12 @@ final class Dependencies extends DependencyProvider {
       },
       dispose: (service) => unawaited(service.dispose()),
     );
+    registerLazySingleton<SignerService>(() {
+      return AccountSignerService(
+        get<UserService>(),
+        get<KeyDerivationService>(),
+      );
+    });
     registerLazySingleton<AccessControl>(AccessControl.new);
     registerLazySingleton<CampaignService>(() {
       return CampaignService(
@@ -224,9 +275,15 @@ final class Dependencies extends DependencyProvider {
       return ProposalService(
         get<ProposalRepository>(),
         get<DocumentRepository>(),
-        get<SignedDocumentManager>(),
         get<UserService>(),
-        get<KeyDerivationService>(),
+        get<SignerService>(),
+        get<CampaignRepository>(),
+      );
+    });
+    registerLazySingleton<CommentService>(() {
+      return CommentService(
+        get<CommentRepository>(),
+        get<SignerService>(),
       );
     });
     registerLazySingleton<ConfigService>(() {
@@ -245,17 +302,25 @@ final class Dependencies extends DependencyProvider {
     registerLazySingleton<FlutterSecureStorage>(FlutterSecureStorage.new);
     registerLazySingleton<SharedPreferencesAsync>(SharedPreferencesAsync.new);
     registerLazySingleton<UserStorage>(SecureUserStorage.new);
-    registerLazySingleton<CatalystDatabase>(() {
-      final config = get<AppConfig>().database;
+    registerLazySingleton<CatalystDatabase>(
+      () {
+        final config = get<AppConfig>().database;
 
-      return CatalystDatabase.drift(
-        config: CatalystDriftDatabaseConfig(
-          name: config.name,
-          web: CatalystDriftDatabaseWebConfig(
-            sqlite3Wasm: Uri.parse(config.webSqlite3Wasm),
-            driftWorker: Uri.parse(config.webDriftWorker),
+        return CatalystDatabase.drift(
+          config: CatalystDriftDatabaseConfig(
+            name: config.name,
+            web: CatalystDriftDatabaseWebConfig(
+              sqlite3Wasm: Uri.parse(config.webSqlite3Wasm),
+              driftWorker: Uri.parse(config.webDriftWorker),
+            ),
           ),
-        ),
+        );
+      },
+      dispose: (database) async => database.close(),
+    );
+    registerLazySingleton<AuthTokenCache>(() {
+      return LocalAuthTokenCache(
+        sharedPreferences: get<SharedPreferencesAsync>(),
       );
     });
   }

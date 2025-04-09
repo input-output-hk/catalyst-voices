@@ -17,6 +17,10 @@ final class Bip32Ed25519XCatalystPublicKey extends Equatable
   List<Object?> get props => [_publicKey];
 
   @override
+  Uint8List get publicKeyBytes =>
+      Uint8List.fromList(_publicKey.toPublicKey().bytes);
+
+  @override
   Future<bool> verify(Uint8List data, {required CatalystSignature signature}) {
     final bip32Signature = Bip32Ed25519XSignatureFactory.instance.fromBytes(
       signature.bytes,

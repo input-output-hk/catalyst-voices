@@ -9,28 +9,23 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 final class AccountCubit extends Cubit<AccountState> {
   final UserService _userService;
 
+  StreamSubscription<Account?>? _accountSub;
+
   AccountCubit(
     this._userService,
   ) : super(_buildState(from: _userService.user.activeAccount)) {
-    // TODO(damian-molinski): watch active account from _userService
+    _accountSub = _userService.watchUser
+        .map((user) => user.activeAccount)
+        .distinct()
+        .listen(_handleActiveAccountChange);
   }
 
   @override
-  Future<void> close() {
-    // TODO(damian-molinski): cancel user subscription to _userService
+  Future<void> close() async {
+    await _accountSub?.cancel();
+    _accountSub = null;
+
     return super.close();
-  }
-
-  Future<void> loadAccountDetails() async {
-    // TODO(damian-molinski): Integration
-  }
-
-  Future<void> updateDisplayName(DisplayName value) async {
-    // TODO(damian-molinski): Integration
-  }
-
-  Future<void> updateEmail(Email value) async {
-    // TODO(damian-molinski): Integration
   }
 
   Future<void> deleteActiveKeychain() async {
@@ -40,8 +35,51 @@ final class AccountCubit extends Cubit<AccountState> {
     }
   }
 
+  Future<void> loadAccountDetails() async {
+    // TODO(damian-molinski): Integration
+  }
+
+  Future<void> updateEmail(Email email) async {
+    if (email.isNotValid) {
+      return;
+    }
+
+    final activeAccount = _userService.user.activeAccount;
+    if (activeAccount != null) {
+      await _userService.updateAccount(
+        id: activeAccount.catalystId,
+        email: email.value,
+      );
+    }
+
+    emit(state.copyWith(email: email));
+  }
+
+  Future<void> updateUsername(Username username) async {
+    if (username.isNotValid) {
+      return;
+    }
+
+    final activeAccount = _userService.user.activeAccount;
+    if (activeAccount != null) {
+      final value = username.value;
+
+      await _userService.updateAccount(
+        id: activeAccount.catalystId,
+        username: value.isNotEmpty ? Optional(value) : const Optional.empty(),
+      );
+    }
+
+    emit(state.copyWith(username: username));
+  }
+
+  void _handleActiveAccountChange(Account? account) {
+    emit(_buildState(from: account));
+  }
+
   static AccountState _buildState({Account? from}) {
     final roles = from?.roles ?? const {};
+    final catalystId = from?.catalystId;
 
     final accountRolesItems = AccountRole.values
         .where((role) => !role.isHidden)
@@ -54,9 +92,10 @@ final class AccountCubit extends Cubit<AccountState> {
         .toList();
 
     return AccountState(
-      status: const AccountFinalized(),
-      catalystId: from?.catalystId ?? '',
-      displayName: DisplayName.pure(from?.displayName ?? ''),
+      // Note. account status is not supported for f14.
+      status: const None(),
+      catalystId: catalystId,
+      username: Username.pure(catalystId?.username ?? ''),
       email: Email.pure(from?.email ?? ''),
       roles: AccountRolesState(
         items: accountRolesItems,

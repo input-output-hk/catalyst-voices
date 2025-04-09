@@ -102,8 +102,8 @@ Future<X509MetadataEnvelope<RegistrationData>> _buildMetadataEnvelope({
     txInputsHash: TransactionInputsHash.fromTransactionInputs(utxos),
     previousTransactionId: _transactionHash,
     chunkedData: RegistrationData(
-      derCerts: [derCert],
-      publicKeys: [keyPair.publicKey.toPublicKey()],
+      derCerts: [RbacField.set(derCert)],
+      publicKeys: [RbacField.set(keyPair.publicKey.toSerializableEd25519())],
       roleDataSet: {
         RoleData(
           roleNumber: 0,
@@ -229,4 +229,10 @@ Future<X509Certificate> generateX509Certificate({
     tbsCertificate: tbs,
     privateKey: keyPair.privateKey,
   );
+}
+
+extension on Bip32Ed25519XPublicKey {
+  Ed25519PublicKey toSerializableEd25519() {
+    return Ed25519PublicKey.fromBytes(toPublicKey().bytes);
+  }
 }

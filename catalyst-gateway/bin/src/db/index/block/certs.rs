@@ -158,16 +158,20 @@ impl CertInsertQuery {
         &mut self, cred: &alonzo::StakeCredential, slot_no: Slot, txn: TxnIndex, register: bool,
         deregister: bool, delegation: Option<Vec<u8>>, block: &MultiEraBlock,
     ) {
-        let (stake_address, pubkey, script) = match cred {
+        let (stake_address, pubkey, script) = match *cred {
             conway::StakeCredential::AddrKeyhash(cred) => {
-                let stake_address = StakeAddress::new(block.network(), false, *cred);
+                let stake_address = StakeAddress::new(block.network(), false, cred.into());
                 let addr = block.witness_for_tx(&VKeyHash::from(*cred), txn);
                 // Note: it is totally possible for the Registration Certificate to not be
                 // witnessed.
                 (stake_address, addr, false)
             },
             conway::StakeCredential::Scripthash(h) => {
-                (StakeAddress::new(block.network(), true, *h), None, true)
+                (
+                    StakeAddress::new(block.network(), true, h.into()),
+                    None,
+                    true,
+                )
             },
         };
 

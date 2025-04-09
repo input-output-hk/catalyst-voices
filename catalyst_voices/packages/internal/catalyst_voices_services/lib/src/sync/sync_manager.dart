@@ -35,7 +35,7 @@ final class SyncManagerImpl implements SyncManager {
   Future<void> start() {
     _syncTimer?.cancel();
     _syncTimer = Timer.periodic(
-      const Duration(minutes: 1),
+      const Duration(minutes: 15),
       (_) {
         _logger.finest('Scheduled synchronization starts');
         // ignore: discarded_futures

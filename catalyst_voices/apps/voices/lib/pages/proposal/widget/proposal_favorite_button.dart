@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:catalyst_voices/widgets/buttons/voices_buttons.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:flutter/material.dart';
@@ -8,7 +10,7 @@ class ProposalFavoriteButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<ProposalBloc, ProposalState, bool>(
+    return BlocSelector<ProposalCubit, ProposalState, bool>(
       selector: (state) => state.data.header.isFavorite,
       builder: (context, state) {
         return _ProposalFavoriteButton(isFavorite: state);
@@ -29,9 +31,7 @@ class _ProposalFavoriteButton extends StatelessWidget {
     return FavoriteButton(
       isFavorite: isFavorite,
       onChanged: (value) {
-        final event = UpdateProposalFavoriteEvent(isFavorite: value);
-
-        context.read<ProposalBloc>().add(event);
+        unawaited(context.read<ProposalCubit>().updateIsFavorite(value: value));
       },
     );
   }

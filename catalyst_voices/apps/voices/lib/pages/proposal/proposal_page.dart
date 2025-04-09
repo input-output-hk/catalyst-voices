@@ -1,10 +1,17 @@
 import 'dart:async';
 
-import 'package:catalyst_voices/pages/proposal/proposal_back_button.dart';
+import 'package:catalyst_voices/common/error_handler.dart';
+import 'package:catalyst_voices/common/signal_handler.dart';
 import 'package:catalyst_voices/pages/proposal/proposal_content.dart';
-import 'package:catalyst_voices/pages/proposal/proposal_header.dart';
-import 'package:catalyst_voices/pages/proposal/proposal_navigation_panel.dart';
+import 'package:catalyst_voices/pages/proposal/proposal_error.dart';
+import 'package:catalyst_voices/pages/proposal/proposal_loading.dart';
+import 'package:catalyst_voices/pages/proposal/snack_bar/viewing_older_version_snack_bar.dart';
+import 'package:catalyst_voices/pages/proposal/widget/proposal_header.dart';
+import 'package:catalyst_voices/pages/proposal/widget/proposal_navigation_panel.dart';
+import 'package:catalyst_voices/pages/proposal/widget/proposal_sidebars.dart';
 import 'package:catalyst_voices/routes/routes.dart';
+import 'package:catalyst_voices/widgets/modals/comment/submit_comment_error_dialog.dart';
+import 'package:catalyst_voices/widgets/snackbar/voices_snackbar.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -26,7 +33,10 @@ class ProposalPage extends StatefulWidget {
   State<ProposalPage> createState() => _ProposalPageState();
 }
 
-class _ProposalPageState extends State<ProposalPage> {
+class _ProposalPageState extends State<ProposalPage>
+    with
+        ErrorHandlerStateMixin<ProposalCubit, ProposalPage>,
+        SignalHandlerStateMixin<ProposalCubit, ProposalSignal, ProposalPage> {
   late final SegmentsController _segmentsController;
   late final ItemScrollController _segmentsScrollController;
 
@@ -37,29 +47,20 @@ class _ProposalPageState extends State<ProposalPage> {
     return SegmentsControllerScope(
       controller: _segmentsController,
       child: Scaffold(
-        appBar: const VoicesAppBar(
-          automaticallyImplyLeading: false,
-        ),
-        body: Stack(
-          children: [
-            Column(
+        appBar: const VoicesAppBar(automaticallyImplyLeading: false),
+        body: ProposalHeaderWrapper(
+          child: ProposalSidebars(
+            navPanel: const ProposalNavigationPanel(),
+            body: Stack(
               children: [
-                const ProposalBackButton(),
-                Expanded(
-                  child: SpaceScaffold(
-                    left: const ProposalNavigationPanel(),
-                    body: SelectionArea(
-                      child: ProposalContent(
-                        scrollController: _segmentsScrollController,
-                      ),
-                    ),
-                    right: const Offstage(),
-                  ),
+                ProposalContent(
+                  scrollController: _segmentsScrollController,
                 ),
+                const ProposalLoading(),
+                const ProposalError(),
               ],
             ),
-            const ProposalHeader(),
-          ],
+          ),
         ),
       ),
     );
@@ -70,7 +71,7 @@ class _ProposalPageState extends State<ProposalPage> {
     super.didUpdateWidget(oldWidget);
 
     if (widget.ref != oldWidget.ref) {
-      context.read<ProposalBloc>().add(ShowProposalEvent(ref: widget.ref));
+      unawaited(context.read<ProposalCubit>().load(ref: widget.ref));
     }
   }
 
@@ -84,10 +85,31 @@ class _ProposalPageState extends State<ProposalPage> {
   }
 
   @override
+  void handleError(Object error) {
+    switch (error) {
+      case LocalizedUnknownPublishCommentException():
+        unawaited(_showCommentException(error));
+      default:
+        super.handleError(error);
+    }
+  }
+
+  @override
+  void handleSignal(ProposalSignal signal) {
+    switch (signal) {
+      case ViewingOlderVersionSignal():
+        VoicesSnackBar.hideCurrent(context);
+        ViewingOlderVersionSnackBar(context).show(context);
+      case ChangeVersionSignal():
+        _changeVersion(signal.to);
+    }
+  }
+
+  @override
   void initState() {
     super.initState();
 
-    final bloc = context.read<ProposalBloc>();
+    final bloc = context.read<ProposalCubit>();
 
     _segmentsController = SegmentsController();
     _segmentsScrollController = ItemScrollController();
@@ -97,42 +119,37 @@ class _ProposalPageState extends State<ProposalPage> {
       ..attachItemsScrollController(_segmentsScrollController);
 
     _segmentsSub = bloc.stream
-        .map((event) {
-          return (
-            segments: event.data.segments,
-            nodeId: event.data.activeNodeId,
-          );
-        })
-        .distinct(
-          (a, b) => listEquals(a.segments, b.segments) && a.nodeId == b.nodeId,
-        )
-        .listen((record) => _updateSegments(record.segments, record.nodeId));
+        .map((event) => event.data.segments)
+        .distinct(listEquals)
+        .listen(_updateSegments);
 
-    bloc.add(ShowProposalEvent(ref: widget.ref));
+    unawaited(bloc.load(ref: widget.ref));
   }
 
-  // ignore: unused_element
-  void _changeVersion(String version) {
+  void _changeVersion(String? version) {
     Router.neglect(context, () {
-      final ref = widget.ref.copyWith(version: Optional.of(version));
-      ProposalRoute.from(ref: ref).replace(context);
+      final ref = widget.ref.copyWith(version: Optional(version));
+      ProposalRoute.fromRef(ref: ref).replace(context);
     });
   }
 
   void _handleSegmentsControllerChange() {}
 
-  void _updateSegments(List<Segment> data, NodeId? activeSectionId) {
+  Future<void> _showCommentException(
+    LocalizedUnknownPublishCommentException error,
+  ) {
+    return SubmitCommentErrorDialog.show(
+      context: context,
+      exception: error,
+    );
+  }
+
+  void _updateSegments(List<Segment> data) {
     final state = _segmentsController.value;
 
     final newState = state.segments.isEmpty
-        ? SegmentsControllerState.initial(
-            segments: data,
-            activeSectionId: activeSectionId,
-          )
-        : state.copyWith(
-            segments: data,
-            activeSectionId: Optional(activeSectionId),
-          );
+        ? SegmentsControllerState.initial(segments: data)
+        : state.copyWith(segments: data);
 
     _segmentsController.value = newState;
   }

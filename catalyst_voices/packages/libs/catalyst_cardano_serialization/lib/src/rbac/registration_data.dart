@@ -1,22 +1,25 @@
-import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
+import 'package:catalyst_cardano_serialization/src/certificate.dart';
+import 'package:catalyst_cardano_serialization/src/hashes.dart';
+import 'package:catalyst_cardano_serialization/src/rbac/rbac_field.dart';
+import 'package:catalyst_cardano_serialization/src/signature.dart';
+import 'package:catalyst_cardano_serialization/src/types.dart';
 import 'package:catalyst_cardano_serialization/src/utils/cbor.dart';
-import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
 import 'package:cbor/cbor.dart';
 import 'package:equatable/equatable.dart';
 
 /// Defines the X509 Role Based Access Control transaction metadata.
 final class RegistrationData extends Equatable implements CborEncodable {
   /// Un-ordered List of DER encoded x509 certificates.
-  final List<X509DerCertificate>? derCerts;
+  final List<RbacField<X509DerCertificate>>? derCerts;
 
   /// Un-ordered List of CBOR encoded C509 certificates
   /// (or metadatum references).
   //
   // TODO(dtscalac): support C509CertInMetadatumReference
-  final List<C509Certificate>? cborCerts;
+  final List<RbacField<C509Certificate>>? cborCerts;
 
   /// Ordered list of simple public keys that are registered.
-  final List<Ed25519PublicKey>? publicKeys;
+  final List<RbacField<Ed25519PublicKey>>? publicKeys;
 
   /// Revocation list of certs being revoked by an issuer.
   final List<CertificateHash>? revocationSet;
@@ -43,9 +46,10 @@ final class RegistrationData extends Equatable implements CborEncodable {
     final roleDataSet = map[const CborSmallInt(100)] as CborList?;
 
     return RegistrationData(
-      derCerts: derCerts?.map(X509DerCertificate.fromCbor).toList(),
-      cborCerts: cborCerts?.map(C509Certificate.fromCbor).toList(),
-      publicKeys: publicKeys?.map(Ed25519PublicKey.fromCbor).toList(),
+      derCerts: _parseRbacFieldCborList(derCerts, X509DerCertificate.fromCbor),
+      cborCerts: _parseRbacFieldCborList(cborCerts, C509Certificate.fromCbor),
+      publicKeys:
+          _parseRbacFieldCborList(publicKeys, Ed25519PublicKey.fromCbor),
       revocationSet: revocationSet?.map(CertificateHash.fromCbor).toList(),
       roleDataSet: roleDataSet?.map(RoleData.fromCbor).toSet(),
     );
@@ -53,44 +57,53 @@ final class RegistrationData extends Equatable implements CborEncodable {
 
   /// Serializes the type as cbor.
   @override
-  CborValue toCbor() => CborMap(_buildCborMap());
+  CborValue toCbor({List<int> tags = const []}) => CborMap(
+        _buildCborMap(),
+        tags: tags,
+      );
 
   /// Builds a CborMap from the class properties.
   Map<CborSmallInt, CborValue> _buildCborMap() {
     final entries = <CborSmallInt, CborValue?>{
-      const CborSmallInt(10): _createCborList<X509DerCertificate>(
-        derCerts,
-        (item) => item.toCbor(),
-      ),
-      const CborSmallInt(20): _createCborList<C509Certificate>(
-        cborCerts,
-        (item) => item.toCbor(),
-      ),
-      const CborSmallInt(30): _createCborList<Ed25519PublicKey>(
+      const CborSmallInt(10): _createCborList(derCerts),
+      const CborSmallInt(20): _createCborList(cborCerts),
+      const CborSmallInt(30): _createCborList(
         publicKeys,
-        (item) => item.toCbor(tags: [CborCustomTags.ed25519Bip32PublicKey]),
+        mapper: (item) => item.toCbor(
+          tags: [CborCustomTags.ed25519Bip32PublicKey],
+        ),
       ),
-      const CborSmallInt(40): _createCborList<CertificateHash>(
-        revocationSet,
-        (item) => item.toCbor(),
-      ),
-      const CborSmallInt(100): _createCborList<RoleData>(
-        roleDataSet?.toList(),
-        (item) => item.toCbor(),
-      ),
+      const CborSmallInt(40): _createCborList(revocationSet),
+      const CborSmallInt(100): _createCborList(roleDataSet?.toList()),
     }..removeWhere((key, value) => value == null);
 
     return entries.cast();
   }
 
-  CborList? _createCborList<T>(List<T>? items, CborValue Function(T) toCbor) {
+  CborList? _createCborList<T extends CborEncodable>(
+    List<T>? items, {
+    CborValue Function(T item)? mapper,
+  }) {
     if (items == null || items.isEmpty) return null;
-    return CborList(items.map(toCbor).toList());
+    return CborList(
+      items.map((e) => mapper != null ? mapper(e) : e.toCbor()).toList(),
+    );
   }
 
   @override
   List<Object?> get props =>
       [derCerts, cborCerts, publicKeys, revocationSet, roleDataSet];
+
+  static List<RbacField<T>>? _parseRbacFieldCborList<T extends CborEncodable>(
+    CborList? list,
+    T Function(CborValue) fromCbor,
+  ) {
+    return list
+        ?.map(
+          (item) => RbacField.fromCbor(item, fromCbor: fromCbor),
+        )
+        .toList();
+  }
 }
 
 /// Roles are defined in a list.
@@ -223,18 +236,22 @@ class RoleData extends Equatable implements CborEncodable {
 
   /// Serializes the type as cbor.
   @override
-  CborValue toCbor() {
-    return CborMap({
-      const CborSmallInt(0): CborSmallInt(roleNumber),
-      if (roleSigningKey != null)
-        const CborSmallInt(1): roleSigningKey!.toCbor(),
-      if (roleEncryptionKey != null)
-        const CborSmallInt(2): roleEncryptionKey!.toCbor(),
-      if (paymentKey != null) const CborSmallInt(3): CborSmallInt(paymentKey!),
-      if (roleSpecificData != null)
-        for (final entry in roleSpecificData!.entries)
-          CborSmallInt(entry.key): entry.value,
-    });
+  CborValue toCbor({List<int> tags = const []}) {
+    return CborMap(
+      {
+        const CborSmallInt(0): CborSmallInt(roleNumber),
+        if (roleSigningKey != null)
+          const CborSmallInt(1): roleSigningKey!.toCbor(),
+        if (roleEncryptionKey != null)
+          const CborSmallInt(2): roleEncryptionKey!.toCbor(),
+        if (paymentKey != null)
+          const CborSmallInt(3): CborSmallInt(paymentKey!),
+        if (roleSpecificData != null)
+          for (final entry in roleSpecificData!.entries)
+            CborSmallInt(entry.key): entry.value,
+      },
+      tags: tags,
+    );
   }
 
   @override
@@ -277,11 +294,14 @@ class LocalKeyReference extends Equatable implements CborEncodable {
 
   /// Serializes the type as cbor.
   @override
-  CborValue toCbor() {
-    return CborList([
-      CborSmallInt(keyType.tag),
-      CborSmallInt(offset),
-    ]);
+  CborValue toCbor({List<int> tags = const []}) {
+    return CborList(
+      [
+        CborSmallInt(keyType.tag),
+        CborSmallInt(offset),
+      ],
+      tags: tags,
+    );
   }
 
   @override

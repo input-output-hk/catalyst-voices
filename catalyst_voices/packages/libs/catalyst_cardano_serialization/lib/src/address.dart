@@ -87,7 +87,7 @@ class ShelleyAddress extends Equatable implements CborEncodable {
 
   /// Serializes the type as cbor.
   @override
-  CborValue toCbor() => CborBytes(bytes);
+  CborValue toCbor({List<int> tags = const []}) => CborBytes(bytes, tags: tags);
 
   /// Returns the [NetworkId] related to this address.
   NetworkId get network => _extractNetworkId(bytes);

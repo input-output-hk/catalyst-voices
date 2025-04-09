@@ -49,6 +49,7 @@ final class DocumentNodeId extends NodeId {
   /// Returns a child node at given [path].
   ///
   /// The [path] is appended to the parent's [path].
+  @override
   DocumentNodeId child(String path) {
     return DocumentNodeId._fromPaths([
       ...paths,

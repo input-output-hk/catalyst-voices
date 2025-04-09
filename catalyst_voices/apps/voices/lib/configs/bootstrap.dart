@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
 import 'package:catalyst_voices/app/app.dart';
+import 'package:catalyst_voices/app/view/app_splash_screen_manager.dart';
 import 'package:catalyst_voices/configs/app_bloc_observer.dart';
 import 'package:catalyst_voices/configs/sentry_service.dart';
 import 'package:catalyst_voices/dependency/dependencies.dart';
@@ -54,11 +55,7 @@ Future<BootstrapArgs> bootstrap({
 
   Bloc.observer = AppBlocObserver();
 
-  // TODO(damian-molinski): delete it before merge.
-  // TODO(damian-molinski): enable it after after docs sync is ready.
-  /*await Dependencies.instance.get<CatalystDatabase>().clear();
-
-  Dependencies.instance.get<SyncManager>().start().ignore();*/
+  Dependencies.instance.get<SyncManager>().start().ignore();
 
   return BootstrapArgs(routerConfig: router);
 }
@@ -81,7 +78,6 @@ Future<void> bootstrapAndRun([
 }
 
 // TODO(damian-molinski): Add Isolate.current.addErrorListener
-//
 @visibleForTesting
 GoRouter buildAppRouter({
   String? initialLocation,
@@ -117,12 +113,8 @@ Widget _defaultBuilder(BootstrapArgs args) {
 }
 
 Future<void> _doBootstrapAndRun(BootstrapWidgetBuilder builder) async {
-  // There's no need to call WidgetsFlutterBinding.ensureInitialized()
-  // since this is already done internally by SentryFlutter.init()
-  // More info here: https://github.com/getsentry/sentry-dart/issues/2063
-  if (!kReleaseMode) {
-    WidgetsFlutterBinding.ensureInitialized();
-  }
+  final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  AppSplashScreenManager.preserveSplashScreen(widgetsBinding);
 
   FlutterError.onError = _reportFlutterError;
   PlatformDispatcher.instance.onError = _reportPlatformDispatcherError;

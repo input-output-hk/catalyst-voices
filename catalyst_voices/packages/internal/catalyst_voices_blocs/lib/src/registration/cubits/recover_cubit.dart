@@ -10,25 +10,29 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:result_type/result_type.dart';
 
+const _testWords = [
+  SeedPhraseWord('broken', nr: 1),
+  SeedPhraseWord('member', nr: 2),
+  SeedPhraseWord('repeat', nr: 3),
+  SeedPhraseWord('liquid', nr: 4),
+  SeedPhraseWord('barely', nr: 5),
+  SeedPhraseWord('electric', nr: 6),
+  SeedPhraseWord('theory', nr: 7),
+  SeedPhraseWord('paddle', nr: 8),
+  SeedPhraseWord('coyote', nr: 9),
+  SeedPhraseWord('behind', nr: 10),
+  SeedPhraseWord('unique', nr: 11),
+  SeedPhraseWord('member', nr: 12),
+];
+
 final _logger = Logger('RecoverCubit');
-
-abstract interface class RecoverManager implements UnlockPasswordManager {
-  Future<void> checkLocalKeychains();
-
-  void setSeedPhraseWords(List<SeedPhraseWord> words);
-
-  Future<bool> recoverAccount();
-
-  Future<bool> createKeychain();
-
-  Future<void> reset();
-}
 
 final class RecoverCubit extends Cubit<RecoverStateData>
     with BlocErrorEmitterMixin, UnlockPasswordMixin
     implements RecoverManager {
   final UserService _userService;
   final RegistrationService _registrationService;
+  final KeyDerivationService _keyDerivationService;
 
   SeedPhrase? _seedPhrase;
   Account? _recoveredAccount;
@@ -36,8 +40,10 @@ final class RecoverCubit extends Cubit<RecoverStateData>
   RecoverCubit({
     required UserService userService,
     required RegistrationService registrationService,
+    required KeyDerivationService keyDerivationService,
   })  : _userService = userService,
         _registrationService = registrationService,
+        _keyDerivationService = keyDerivationService,
         super(const RecoverStateData()) {
     /// pre-populate all available words
     emit(state.copyWith(seedPhraseWords: SeedPhrase.wordList));
@@ -56,18 +62,8 @@ final class RecoverCubit extends Cubit<RecoverStateData>
   }
 
   @override
-  void setSeedPhraseWords(List<SeedPhraseWord> words) {
-    final isValid = SeedPhrase.isValid(words: words);
-    if (isValid) {
-      _seedPhrase = SeedPhrase.fromWords(words);
-    }
-
-    emit(
-      state.copyWith(
-        userSeedPhraseWords: words,
-        isSeedPhraseValid: isValid,
-      ),
-    );
+  void onUnlockPasswordStateChanged(UnlockPasswordState data) {
+    emit(state.copyWith(unlockPasswordState: data));
   }
 
   @override
@@ -87,8 +83,6 @@ final class RecoverCubit extends Cubit<RecoverStateData>
       );
 
       _recoveredAccount = account;
-
-      await _userService.useAccount(account);
 
       final walletInfo = account.walletInfo;
 
@@ -123,42 +117,11 @@ final class RecoverCubit extends Cubit<RecoverStateData>
 
       _recoveredAccount = null;
 
-      const exception = LocalizedUnknownException();
+      final exception = LocalizedException.create(error);
       emit(state.copyWith(accountDetails: Optional(Failure(exception))));
 
       return false;
     }
-  }
-
-  @override
-  Future<bool> createKeychain() async {
-    final account = _recoveredAccount;
-    final seedPhrase = _seedPhrase;
-    final password = this.password;
-
-    if (account == null || seedPhrase == null || password.isNotValid) {
-      emitError(const LocalizedRegistrationUnknownException());
-      return false;
-    }
-
-    final lockFactor = PasswordLockFactor(password.value);
-    final masterKey = await _registrationService.deriveMasterKey(
-      seedPhrase: seedPhrase,
-    );
-
-    final keychain = account.keychain;
-    await keychain.setLock(lockFactor);
-    await keychain.unlock(lockFactor);
-    await keychain.setMasterKey(masterKey);
-
-    await _userService.useAccount(account);
-
-    return true;
-  }
-
-  @override
-  void onUnlockPasswordStateChanged(UnlockPasswordState data) {
-    emit(state.copyWith(unlockPasswordState: data));
   }
 
   @override
@@ -172,19 +135,59 @@ final class RecoverCubit extends Cubit<RecoverStateData>
 
     setSeedPhraseWords([]);
   }
+
+  @override
+  void setSeedPhraseWords(List<SeedPhraseWord> words) {
+    final isValid = SeedPhrase.isValid(words: words);
+    if (isValid) {
+      _seedPhrase = SeedPhrase.fromWords(words);
+    }
+
+    emit(
+      state.copyWith(
+        userSeedPhraseWords: words,
+        isSeedPhraseValid: isValid,
+      ),
+    );
+  }
+
+  @override
+  Future<bool> setupKeychain() async {
+    final account = _recoveredAccount;
+    final seedPhrase = _seedPhrase;
+    final password = this.password;
+
+    if (account == null || seedPhrase == null || password.isNotValid) {
+      emitError(const LocalizedRegistrationUnknownException());
+      return false;
+    }
+
+    final lockFactor = PasswordLockFactor(password.value);
+    final masterKey = _keyDerivationService.deriveMasterKey(
+      seedPhrase: seedPhrase,
+    );
+
+    await masterKey.use((masterKey) async {
+      final keychain = account.keychain;
+      await keychain.setLock(lockFactor);
+      await keychain.unlock(lockFactor);
+      await keychain.setMasterKey(masterKey);
+    });
+
+    await _userService.useAccount(account);
+
+    return true;
+  }
 }
 
-const _testWords = [
-  SeedPhraseWord('broken', nr: 1),
-  SeedPhraseWord('member', nr: 2),
-  SeedPhraseWord('repeat', nr: 3),
-  SeedPhraseWord('liquid', nr: 4),
-  SeedPhraseWord('barely', nr: 5),
-  SeedPhraseWord('electric', nr: 6),
-  SeedPhraseWord('theory', nr: 7),
-  SeedPhraseWord('paddle', nr: 8),
-  SeedPhraseWord('coyote', nr: 9),
-  SeedPhraseWord('behind', nr: 10),
-  SeedPhraseWord('unique', nr: 11),
-  SeedPhraseWord('member', nr: 12),
-];
+abstract interface class RecoverManager implements UnlockPasswordManager {
+  Future<void> checkLocalKeychains();
+
+  Future<bool> recoverAccount();
+
+  Future<void> reset();
+
+  void setSeedPhraseWords(List<SeedPhraseWord> words);
+
+  Future<bool> setupKeychain();
+}

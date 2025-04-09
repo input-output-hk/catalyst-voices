@@ -1,3 +1,4 @@
+import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/common/formatters/amount_formatter.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
@@ -7,36 +8,10 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
-enum FundsDetailCardType {
-  found,
-  category;
-
-  String localizedTypeName(VoicesLocalizations l10n) {
-    return switch (this) {
-      FundsDetailCardType.found => l10n.campaignTreasury,
-      FundsDetailCardType.category => l10n.categoryBudget,
-    };
-  }
-
-  String localizedTotalAsk(VoicesLocalizations l10n) {
-    return switch (this) {
-      FundsDetailCardType.found => l10n.campaignTotalAsk,
-      FundsDetailCardType.category => l10n.currentAsk,
-    };
-  }
-
-  String localizedTypeDescription(VoicesLocalizations l10n) {
-    return switch (this) {
-      FundsDetailCardType.found => l10n.campaignTreasuryDescription,
-      FundsDetailCardType.category => l10n.fundsAvailableForCategory,
-    };
-  }
-}
-
 class FundsDetailCard extends StatelessWidget {
   final int allFunds;
   final int totalAsk;
-  final Range<int> askRange;
+  final ComparableRange<Coin> askRange;
   final FundsDetailCardType type;
 
   const FundsDetailCard({
@@ -91,6 +66,32 @@ class FundsDetailCard extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+enum FundsDetailCardType {
+  found,
+  category;
+
+  String localizedTotalAsk(VoicesLocalizations l10n) {
+    return switch (this) {
+      FundsDetailCardType.found => l10n.campaignTotalAsk,
+      FundsDetailCardType.category => l10n.currentAsk,
+    };
+  }
+
+  String localizedTypeDescription(VoicesLocalizations l10n) {
+    return switch (this) {
+      FundsDetailCardType.found => l10n.campaignTreasuryDescription,
+      FundsDetailCardType.category => l10n.fundsAvailableForCategory,
+    };
+  }
+
+  String localizedTypeName(VoicesLocalizations l10n) {
+    return switch (this) {
+      FundsDetailCardType.found => l10n.campaignTreasury,
+      FundsDetailCardType.category => l10n.categoryBudget,
+    };
   }
 }
 
@@ -156,7 +157,7 @@ class _CampaignFundsDetail extends StatelessWidget {
 }
 
 class _RangeAsk extends StatelessWidget {
-  final Range<int> range;
+  final ComparableRange<Coin> range;
 
   const _RangeAsk({
     required this.range,
@@ -180,13 +181,13 @@ class _RangeAsk extends StatelessWidget {
           _RangeValue(
             key: const Key('RangeMax'),
             title: context.l10n.maximumAsk,
-            value: range.max ?? 0,
+            value: range.max,
           ),
           const SizedBox(height: 19),
           _RangeValue(
             key: const Key('RangeMin'),
             title: context.l10n.minimumAsk,
-            value: range.min ?? 0,
+            value: range.min,
           ),
         ],
       ),
@@ -196,7 +197,7 @@ class _RangeAsk extends StatelessWidget {
 
 class _RangeValue extends StatelessWidget {
   final String title;
-  final int value;
+  final Coin value;
 
   const _RangeValue({
     super.key,
@@ -204,7 +205,7 @@ class _RangeValue extends StatelessWidget {
     required this.value,
   });
 
-  String get _formattedValue => AmountFormatter.decimalFormat(value);
+  String get _formattedValue => CryptocurrencyFormatter.formatAmount(value);
 
   @override
   Widget build(BuildContext context) {
@@ -224,7 +225,7 @@ class _RangeValue extends StatelessWidget {
         ),
         Text(
           key: const Key('Value'),
-          '${const Currency.ada().symbol} $_formattedValue',
+          _formattedValue,
           style: context.textTheme.bodyMedium?.copyWith(
             color: context.colors.sysColorsNeutralN60,
           ),

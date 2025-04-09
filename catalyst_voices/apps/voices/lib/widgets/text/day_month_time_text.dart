@@ -1,7 +1,7 @@
-import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/common/formatters/date_formatter.dart';
 import 'package:catalyst_voices/widgets/text/timezone_date_time_text.dart';
 import 'package:catalyst_voices/widgets/tooltips/voices_plain_tooltip.dart';
+import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
 
@@ -19,15 +19,19 @@ class DayMonthTimeText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TimezoneDateTimeText(
-      dateTime,
-      formatter: (context, datetime) {
-        return DateFormatter.formatDayMonthTime(datetime);
-      },
-      style: context.textTheme.labelLarge?.copyWith(
-        color: color ?? context.colors.textOnPrimaryLevel1,
+    final color = this.color;
+
+    return TimezoneDateTimeTextTheme(
+      data: TimezoneDateTimeTextThemeData(
+        foregroundColor: color != null ? WidgetStatePropertyAll(color) : null,
       ),
-      showTimezone: showTimezone,
+      child: TimezoneDateTimeText(
+        dateTime,
+        formatter: (context, datetime) {
+          return DateFormatter.formatDayMonthTime(datetime);
+        },
+        showTimezone: showTimezone,
+      ),
     );
   }
 }

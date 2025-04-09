@@ -13,7 +13,7 @@ use crate::db::{
         queries::{PreparedQueries, PreparedSelectQuery},
         session::CassandraSession,
     },
-    types::{DbCatalystId, DbStakeAddress},
+    types::{DbCatalystId, DbSlot, DbStakeAddress},
 };
 
 /// Get Catalyst ID by stake address query string.
@@ -27,12 +27,12 @@ pub(crate) struct QueryParams {
 }
 
 /// Get Catalyst ID by stake address query.
-// TODO: Remove the `dead_code` annotation when the query is used.
-#[allow(dead_code)]
 #[derive(Debug, Clone, DeserializeRow)]
 pub(crate) struct Query {
     /// Catalyst ID for the queries stake address.
     pub catalyst_id: DbCatalystId,
+    /// A slot number.
+    pub slot_no: DbSlot,
 }
 
 impl Query {
@@ -46,8 +46,6 @@ impl Query {
     }
 
     /// Executes a get Catalyst ID by stake address query.
-    // TODO: Remove the `dead_code` annotation when the query is used.
-    #[allow(dead_code)]
     pub(crate) async fn execute(
         session: &CassandraSession, params: QueryParams,
     ) -> anyhow::Result<TypedRowStream<Query>> {

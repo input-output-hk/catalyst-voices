@@ -247,11 +247,12 @@ class ScriptPubkey extends NativeScript {
 
   /// Converts the [ScriptPubkey] to its CBOR format.
   @override
-  CborValue toCbor() => CborList(
+  CborValue toCbor({List<int> tags = const []}) => CborList(
         [
           CborSmallInt(NativeScriptType.pubkey.value),
           CborBytes(addrKeyHash.bytes),
         ],
+        tags: tags,
       );
 
   /// Equatable props for value comparison.
@@ -278,10 +279,13 @@ class ScriptAll extends NativeScript {
 
   /// Converts the [ScriptAll] to its CBOR format.
   @override
-  CborValue toCbor() => CborList([
-        CborSmallInt(NativeScriptType.all.value),
-        CborList(nativeScripts.map((s) => s.toCbor()).toList()),
-      ]);
+  CborValue toCbor({List<int> tags = const []}) => CborList(
+        [
+          CborSmallInt(NativeScriptType.all.value),
+          CborList(nativeScripts.map((s) => s.toCbor()).toList()),
+        ],
+        tags: tags,
+      );
 
   /// Equatable props for value comparison.
   @override
@@ -307,10 +311,13 @@ class ScriptAny extends NativeScript {
 
   /// Converts the [ScriptAny] to its CBOR format.
   @override
-  CborValue toCbor() => CborList([
-        CborSmallInt(NativeScriptType.any.value),
-        CborList(nativeScripts.map((s) => s.toCbor()).toList()),
-      ]);
+  CborValue toCbor({List<int> tags = const []}) => CborList(
+        [
+          CborSmallInt(NativeScriptType.any.value),
+          CborList(nativeScripts.map((s) => s.toCbor()).toList()),
+        ],
+        tags: tags,
+      );
 
   /// Equatable props for value comparison.
   @override
@@ -345,11 +352,14 @@ class ScriptNOfK extends NativeScript {
 
   /// Converts the [ScriptNOfK] to its CBOR format.
   @override
-  CborValue toCbor() => CborList([
-        CborSmallInt(NativeScriptType.nOfK.value),
-        CborSmallInt(n),
-        CborList(nativeScripts.map((s) => s.toCbor()).toList()),
-      ]);
+  CborValue toCbor({List<int> tags = const []}) => CborList(
+        [
+          CborSmallInt(NativeScriptType.nOfK.value),
+          CborSmallInt(n),
+          CborList(nativeScripts.map((s) => s.toCbor()).toList()),
+        ],
+        tags: tags,
+      );
 
   /// Equatable props for value comparison.
   @override
@@ -372,10 +382,13 @@ class InvalidBefore extends NativeScript {
 
   /// Converts the [InvalidBefore] to its CBOR format.
   @override
-  CborValue toCbor() => CborList([
-        CborSmallInt(NativeScriptType.invalidBefore.value),
-        CborSmallInt(timestamp),
-      ]);
+  CborValue toCbor({List<int> tags = const []}) => CborList(
+        [
+          CborSmallInt(NativeScriptType.invalidBefore.value),
+          CborSmallInt(timestamp),
+        ],
+        tags: tags,
+      );
 
   /// Equatable props for value comparison.
   @override
@@ -398,10 +411,13 @@ class InvalidAfter extends NativeScript {
 
   /// Converts the [InvalidAfter] to its CBOR format.
   @override
-  CborValue toCbor() => CborList([
-        CborSmallInt(NativeScriptType.invalidAfter.value),
-        CborSmallInt(timestamp),
-      ]);
+  CborValue toCbor({List<int> tags = const []}) => CborList(
+        [
+          CborSmallInt(NativeScriptType.invalidAfter.value),
+          CborSmallInt(timestamp),
+        ],
+        tags: tags,
+      );
 
   /// Equatable props for value comparison.
   @override
@@ -421,7 +437,7 @@ sealed class PlutusScript extends Script {
   /// Converts the [PlutusScript] to its CBOR format.
   /// All Plutus scripts are serialized CBOR bytes.
   @override
-  CborValue toCbor() => CborBytes(bytes);
+  CborValue toCbor({List<int> tags = const []}) => CborBytes(bytes, tags: tags);
 
   /// Validates if the CBOR value is a valid Plutus script.
   static CborValue _plutusScriptValidity(CborValue value) {
@@ -526,7 +542,7 @@ class ScriptRef extends Script {
   }
 
   @override
-  CborValue toCbor() {
+  CborValue toCbor({List<int> tags = const []}) {
     final index = switch (script) {
       NativeScript _ => RefScriptType.native,
       PlutusV1Script _ => RefScriptType.plutusV1,
@@ -538,7 +554,10 @@ class ScriptRef extends Script {
           'Invalid script reference type',
         ),
     };
-    return CborList([CborSmallInt(index.value), script.toCbor()]);
+    return CborList(
+      [CborSmallInt(index.value), script.toCbor()],
+      tags: tags,
+    );
   }
 
   /// Equatable props for value comparison.

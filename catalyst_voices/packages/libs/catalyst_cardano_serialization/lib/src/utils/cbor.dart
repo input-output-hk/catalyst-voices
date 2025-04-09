@@ -2,6 +2,9 @@
 final class CborCustomTags {
   const CborCustomTags._();
 
+  /// The value is absent (a gap in the array).
+  static const int absent = 31;
+
   /// A cbor tag describing a uuid.
   static const int uuid = 37;
 

@@ -1,8 +1,10 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:equatable/equatable.dart';
-import 'package:uuid/uuid.dart';
+import 'package:flutter/foundation.dart' show Uint8List;
+import 'package:uuid_plus/uuid_plus.dart';
 
-sealed class DocumentRef extends Equatable {
+sealed class DocumentRef extends Equatable implements Comparable<DocumentRef> {
   final String id;
   final String? version;
 
@@ -21,10 +23,31 @@ sealed class DocumentRef extends Equatable {
         : SignedDocumentRef(id: id, version: version);
   }
 
+  /// Whether the ref specifies the document [version].
   bool get isExact => version != null;
 
   @override
   List<Object?> get props => [id, version];
+
+  @override
+  int compareTo(DocumentRef other) {
+    final dateTime = version?.tryDateTime;
+    final otherDateTime = other.version?.tryDateTime;
+
+    if (dateTime != null && otherDateTime != null) {
+      return dateTime.compareTo(otherDateTime);
+    }
+
+    if (dateTime != null && otherDateTime == null) {
+      return 1;
+    }
+
+    if (dateTime == null && otherDateTime != null) {
+      return -1;
+    }
+
+    return 0;
+  }
 
   DocumentRef copyWith({
     String? id,
@@ -36,6 +59,14 @@ sealed class DocumentRef extends Equatable {
   /// The version can be used as next version for updated document,
   /// i.e. by proposal builder.
   DraftRef nextVersion();
+
+  /// Creates ref without version.
+  DocumentRef toLoose();
+
+  /// Converts the [DocumentRef] to [SignedDocumentRef].
+  ///
+  /// Useful when a draft becomes a signed document after publishing.
+  SignedDocumentRef toSignedDocumentRef();
 }
 
 final class DraftRef extends DocumentRef {
@@ -43,6 +74,9 @@ final class DraftRef extends DocumentRef {
     required super.id,
     super.version,
   });
+
+  /// Creates ref for first version of [id] draft.
+  const DraftRef.first(String id) : this(id: id, version: id);
 
   factory DraftRef.generateFirstRef() {
     final id = const Uuid().v7();
@@ -67,13 +101,22 @@ final class DraftRef extends DocumentRef {
   DraftRef nextVersion() => this;
 
   @override
+  DraftRef toLoose() => copyWith(version: const Optional.empty());
+
+  @override
+  SignedDocumentRef toSignedDocumentRef() => SignedDocumentRef(
+        id: id,
+        version: version,
+      );
+
+  @override
   String toString() =>
       isExact ? 'ExactDraftRef($id.v$version)' : 'LooseDraftRef($id)';
 }
 
 final class SecuredDocumentRef extends Equatable {
   final DocumentRef ref;
-  final String hash;
+  final Uint8List hash;
 
   const SecuredDocumentRef({
     required this.ref,
@@ -90,6 +133,11 @@ final class SignedDocumentRef extends DocumentRef {
     super.version,
   });
 
+  const SignedDocumentRef.exact({
+    required super.id,
+    required String super.version,
+  });
+
   /// Creates ref for first version of [id] document.
   const SignedDocumentRef.first(String id) : this(id: id, version: id);
 
@@ -100,6 +148,8 @@ final class SignedDocumentRef extends DocumentRef {
       version: id,
     );
   }
+
+  const SignedDocumentRef.loose({required super.id});
 
   @override
   SignedDocumentRef copyWith({
@@ -119,6 +169,12 @@ final class SignedDocumentRef extends DocumentRef {
       version: const Uuid().v7(),
     );
   }
+
+  @override
+  SignedDocumentRef toLoose() => copyWith(version: const Optional.empty());
+
+  @override
+  SignedDocumentRef toSignedDocumentRef() => this;
 
   @override
   String toString() => isExact

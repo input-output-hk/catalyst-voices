@@ -1,0 +1,97 @@
+// Cardano Preprod data
+[
+    // 1. Role 0: chain root (no prv_tx) 
+    // - x509 = [cert], no pk and c509
+    // - signing key ref x509[0] -> key rotation 0
+    {
+		"txn_id": "760fd99479771d32388e8865a22c4ed2b7badca1443cffe87854f491eba96e51",
+		"slot_no": 87374283,
+		"txn_index": 1
+	},
+    // 2. Role 0: item 2
+    // - prv_tx: point to 1
+    // - x509 = [cert], no pk and c509
+    // - signing key ref x509[0] -> key rotation 1
+    {
+        "txn_id": "3c0f2965e0a974cf45f10ba0fb2547eb9d3f8764e8608d47fbe7ff16af7f7e32",
+        "slot_no": 87374696,
+        "txn_index": 4
+    },
+    // 3. Role 0: Break the chain
+    // - prv_tx: point to 2
+    // - x509 = [deleted], no pk and c509
+    // - signing key ref [deleted] -> no rotation because invalid
+    {
+        "txn_id": "357778f16fd4a62d28339896cf768b51cd8df51fe852f94dafcc8fdf497eb7e2",
+        "slot_no": 87375052,
+        "txn_index": 1
+    },
+    // 4. Role 0: item 3
+    // - prv_tx: point to 2
+    // - x509 = [cert], no pk and c509
+    // - signing key ref x509[0] -> key rotation 2
+    {
+        "txn_id": "a6b785aad1244ad7ce4c5e7882724f06631168988f813142a498cb2099c0b2ee",
+        "slot_no": 87375776,
+        "txn_index": 0
+    },
+    // 5. Role 0: Same prv_tx and 4. so won't add to the chain
+    // - prv_tx: point to 2 
+    // - x509 = [cert], no pk and c509
+    // - signing key ref x509[0] -> No key rotation
+    {
+        "txn_id": "be090d4d2b452759bb85c4b4b20e82938744fbf78a763c27d5b740dd10c4c54a",
+        "slot_no": 87376055,
+        "txn_index": 1
+    },
+    // 6. Role 3: item 4
+    // - prv_tx: point to 4
+    // - pk = [undefined, pk], no certs
+    // - signing key ref pk[1] -> key rotation 0
+    // - encryption key ref pk[1] -> key rotation 0
+    {
+        "txn_id": "848511f5b5437b0d2e39d828ed87c0e9b622ca955fa458a2facbda918818c1fd",
+        "slot_no": 87394960,
+        "txn_index": 3
+    },
+    // 7. Role 3: item 5
+    // - prv_tx: point to 6
+    // - pk = [undefined, undefined, pk], no certs
+    // - signing key ref pk[2] -> key rotation 1
+    // - encryption key ref pk[1] -> no key rotation
+    {
+        "txn_id": "560348a14557db80933aa56bf495f796c475bc328c3e083889ee31cdc4edcf2f",
+        "slot_no": 87395245,
+        "txn_index": 2
+    },
+    // 8. Role 3: item 6
+    // - prv_tx: point to 7
+    // - x509 = [undefined, cert]
+    // - pk = [undefined, deleted, undefined]
+    // - signing key ref pk[1] -> key rotation 2
+    // - encryption key ref x509[1] -> key rotation 1
+    {
+        "txn_id": "94f01793cd8eea6fdda1dadf04445aa44ea08bd7ea37b70dc0883fa36ab9a3d5",
+        "slot_no": 87395715,
+        "txn_index": 3
+    },
+    // 9. Role 0: item 7
+    // - prv_tx: point to 8
+    // - x509 = [cert], no pk and c509
+    // - signing key ref x509[0] -> key rotation 3
+    {
+        "txn_id": "e799a1a48cb495885120428a1596fc6de7a7dc0ff77b8e3997a0afe7eb035a0e",
+        "slot_no": 87396001,
+        "txn_index": 4
+    },
+    /// 10. New chain: sending transaction with multiple roles (0 and 3)
+    /// - x509 = [cert]
+    /// - pk = [undefined, undefined, pk]
+    /// - Role 0 signing key ref x509[0] -> key rotation 0
+    /// - Role 3 signing key ref pk[2] -> key rotation 0
+    {
+        "txn_id": "6ff5d40257778968c87c6ad53a44d10c3d7f011f0aa072b365dd6a22da25e96f",
+        "slot_no": 87737901,
+        "txn_index": 2
+    }
+]

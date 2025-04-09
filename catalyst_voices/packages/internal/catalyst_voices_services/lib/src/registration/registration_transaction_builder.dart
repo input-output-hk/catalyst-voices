@@ -1,9 +1,14 @@
 import 'dart:math';
 
-import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
+import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart'
+    as cs show Ed25519PublicKey;
+import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart'
+    hide Ed25519PublicKey;
 import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/src/crypto/key_derivation_service.dart';
+import 'package:catalyst_voices_services/src/registration/registration_transaction_role.dart';
+import 'package:collection/collection.dart';
 
 /// The transaction metadata used for registration.
 typedef RegistrationMetadata = X509MetadataEnvelope<RegistrationData>;
@@ -28,7 +33,7 @@ final class RegistrationTransactionBuilder {
   final NetworkId networkId;
 
   /// The user selected roles for which the user is registering.
-  final Set<AccountRole> roles;
+  final Set<RegistrationTransactionRole> roles;
 
   /// The change address where the change from the transaction should go.
   final ShelleyAddress changeAddress;
@@ -77,60 +82,76 @@ final class RegistrationTransactionBuilder {
   }
 
   Future<RegistrationMetadata> _buildMetadataEnvelope() async {
-    final rootKeyPair = await keyDerivationService.deriveAccountRoleKeyPair(
+    final isFirsRegistration = roles.any((element) => element.setVoter);
+    final rootKeyPair = keyDerivationService.deriveAccountRoleKeyPair(
       masterKey: masterKey,
       role: AccountRole.root,
     );
 
-    final cert = await _generateX509Certificate(keyPair: rootKeyPair);
-    final derCerts = {
-      AccountRole.root: cert.toDer(),
-    };
+    return rootKeyPair.use((rootKeyPair) async {
+      final derCert = isFirsRegistration
+          ? await _generateX509Certificate(keyPair: rootKeyPair)
+          : null;
+      final publicKeys = await _generatePublicKeysForAllRoles(rootKeyPair);
 
-    final publicKeys = {
-      AccountRole.root: rootKeyPair.publicKey.toEd25519(),
-      if (roles.contains(AccountRole.proposer))
-        AccountRole.proposer: await _deriveProposerPublicKey(),
-    };
-
-    final x509Envelope = X509MetadataEnvelope.unsigned(
-      purpose: UuidV4.fromString(_catalystUserRoleRegistrationPurpose),
-      txInputsHash: TransactionInputsHash.fromTransactionInputs(utxos),
-      chunkedData: RegistrationData(
-        derCerts: derCerts.values.toList(),
-        publicKeys: publicKeys.values.toList(),
-        roleDataSet: {
-          RoleData(
-            roleNumber: AccountRole.root.number,
-            roleSigningKey: LocalKeyReference(
-              keyType: LocalKeyReferenceType.x509Certs,
-              offset: derCerts.keys.toList().indexOf(AccountRole.root),
-            ),
-            // Refer to first key in transaction outputs,
-            // in our case it's the change address (which the user controls).
-            paymentKey: -1,
-          ),
-          if (roles.contains(AccountRole.proposer))
-            RoleData(
-              roleNumber: AccountRole.proposer.number,
-              roleSigningKey: LocalKeyReference(
-                keyType: LocalKeyReferenceType.pubKeys,
-                offset: publicKeys.keys.toList().indexOf(AccountRole.proposer),
+      final x509Envelope = X509MetadataEnvelope.unsigned(
+        purpose: UuidV4.fromString(_catalystUserRoleRegistrationPurpose),
+        txInputsHash: TransactionInputsHash.fromTransactionInputs(utxos),
+        chunkedData: RegistrationData(
+          derCerts: [
+            if (derCert != null) RbacField.set(derCert),
+          ],
+          publicKeys: publicKeys,
+          roleDataSet: {
+            if (roles.any((element) => element.setVoter))
+              RoleData(
+                roleNumber: AccountRole.root.number,
+                roleSigningKey: LocalKeyReference(
+                  keyType: LocalKeyReferenceType.x509Certs,
+                  offset: AccountRole.root.registrationOffset,
+                ),
+                // Refer to first key in transaction outputs,
+                // in our case it's the change address
+                // (which the user controls).
+                paymentKey: 0,
               ),
-              // Refer to first key in transaction outputs,
-              // in our case it's the change address (which the user controls).
-              paymentKey: -1,
-            ),
-        },
-      ),
-    );
+            if (roles.any((element) => element.setProposer))
+              RoleData(
+                roleNumber: AccountRole.proposer.number,
+                roleSigningKey: LocalKeyReference(
+                  keyType: LocalKeyReferenceType.pubKeys,
+                  offset: AccountRole.proposer.registrationOffset,
+                ),
+                // Refer to first key in transaction outputs, in our case
+                // it's the change address (which the user controls).
+                paymentKey: 0,
+              ),
+          },
+        ),
+      );
 
-    return x509Envelope.sign(
-      privateKey: Bip32Ed25519XPrivateKeyFactory.instance.fromBytes(
+      final privateKey = Bip32Ed25519XPrivateKeyFactory.instance.fromBytes(
         rootKeyPair.privateKey.bytes,
-      ),
-      serializer: (e) => e.toCbor(),
-    );
+      );
+
+      return privateKey.use((privateKey) {
+        return x509Envelope.sign(
+          privateKey: privateKey,
+          serializer: (e) => e.toCbor(),
+        );
+      });
+    });
+  }
+
+  Future<cs.Ed25519PublicKey> _buildRolePublicKey(
+    AccountRole role, {
+    required CatalystKeyPair rootKeyPair,
+  }) async {
+    return switch (role) {
+      AccountRole.voter => rootKeyPair.publicKey.toEd25519(),
+      AccountRole.drep => await _deriveDrepPublicKey(),
+      AccountRole.proposer => await _deriveProposerPublicKey(),
+    };
   }
 
   Transaction _buildUnsignedRbacTx({required AuxiliaryData auxiliaryData}) {
@@ -159,16 +180,59 @@ final class RegistrationTransactionBuilder {
     );
   }
 
-  Future<Ed25519PublicKey> _deriveProposerPublicKey() async {
-    final keyPair = await keyDerivationService.deriveAccountRoleKeyPair(
+  Future<cs.Ed25519PublicKey> _deriveDrepPublicKey() {
+    final keyPair = keyDerivationService.deriveAccountRoleKeyPair(
+      masterKey: masterKey,
+      role: AccountRole.drep,
+    );
+
+    return keyPair.use((keyPair) => keyPair.publicKey.toEd25519());
+  }
+
+  Future<cs.Ed25519PublicKey> _deriveProposerPublicKey() {
+    final keyPair = keyDerivationService.deriveAccountRoleKeyPair(
       masterKey: masterKey,
       role: AccountRole.proposer,
     );
 
-    return keyPair.publicKey.toEd25519();
+    return keyPair.use((keyPair) => keyPair.publicKey.toEd25519());
   }
 
-  Future<X509Certificate> _generateX509Certificate({
+  Future<RbacField<cs.Ed25519PublicKey>> _generatePublicKeyForOffset(
+    int registrationOffset,
+    CatalystKeyPair rootKeyPair,
+  ) async {
+    final role = AccountRole.fromRegistrationOffset(registrationOffset);
+    if (role == null) {
+      return const RbacField.undefined();
+    }
+
+    final roleAction = _getPublicKeyRoleAction(role);
+    switch (roleAction) {
+      case RegistrationTransactionRoleAction.set:
+        final publicKey = await _buildRolePublicKey(
+          role,
+          rootKeyPair: rootKeyPair,
+        );
+        return RbacField.set(publicKey);
+      case RegistrationTransactionRoleAction.undefined:
+        return const RbacField.undefined();
+      case RegistrationTransactionRoleAction.unset:
+        return const RbacField.unset();
+    }
+  }
+
+  Future<List<RbacField<cs.Ed25519PublicKey>>> _generatePublicKeysForAllRoles(
+    CatalystKeyPair rootKeyPair,
+  ) async {
+    final maxOffset = AccountRole.values.map((e) => e.registrationOffset).max;
+    return [
+      for (int i = 0; i <= maxOffset; i++)
+        await _generatePublicKeyForOffset(i, rootKeyPair),
+    ];
+  }
+
+  Future<X509DerCertificate> _generateX509Certificate({
     required CatalystKeyPair keyPair,
   }) async {
     // TODO(dtscalac): once serial number generation is defined come up with
@@ -209,19 +273,43 @@ final class RegistrationTransactionBuilder {
     );
     /* cSpell:enable */
 
-    return X509Certificate.generateSelfSigned(
-      tbsCertificate: tbs,
-      privateKey: Bip32Ed25519XPrivateKeyFactory.instance.fromBytes(
-        keyPair.privateKey.bytes,
-      ),
+    final privateKey = Bip32Ed25519XPrivateKeyFactory.instance.fromBytes(
+      keyPair.privateKey.bytes,
     );
+
+    final cert = await privateKey.use((privateKey) {
+      return X509Certificate.generateSelfSigned(
+        tbsCertificate: tbs,
+        privateKey: privateKey,
+      );
+    });
+
+    return cert.toDer();
+  }
+
+  RegistrationTransactionRoleAction _getPublicKeyRoleAction(AccountRole role) {
+    if (role == AccountRole.voter) {
+      // Voters must not register their own public keys,
+      // they are only allowed to use der certs.
+      return RegistrationTransactionRoleAction.undefined;
+    }
+
+    return roles
+        .singleWhere(
+          (element) => element.type == role,
+          orElse: () => RegistrationTransactionRole.undefined(role),
+        )
+        .action;
   }
 }
 
 extension on CatalystPublicKey {
-  Ed25519PublicKey toEd25519() {
-    return Bip32Ed25519XPublicKeyFactory.instance
+  cs.Ed25519PublicKey toEd25519() {
+    final publicKey = Bip32Ed25519XPublicKeyFactory.instance
         .fromBytes(bytes)
-        .toPublicKey();
+        .toPublicKey()
+        .bytes;
+
+    return cs.Ed25519PublicKey.fromBytes(publicKey);
   }
 }

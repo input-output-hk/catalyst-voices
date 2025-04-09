@@ -1,8 +1,7 @@
 //! Document Index Query
 
-use std::future;
+use std::collections::HashMap;
 
-use dashmap::DashMap;
 use futures::TryStreamExt;
 use poem_openapi::{payload::Json, ApiResponse};
 use query_filter::DocumentIndexQueryFilter;
@@ -55,7 +54,7 @@ pub(crate) async fn endpoint(
         Err(e) => return AllResponses::handle_error(&e),
     };
 
-    let (docs, counts) = tokio::join!(
+    let (fetched_docs, total_doc_count) = tokio::join!(
         fetch_docs(&conditions, &query_limits),
         SignedDocBody::retrieve_count(&conditions)
     );
@@ -64,7 +63,7 @@ pub(crate) async fn endpoint(
     let page = page.unwrap_or_default();
     let limit = limit.unwrap_or_default();
 
-    let total: u32 = match counts {
+    let total: u32 = match total_doc_count {
         Ok(total) => {
             match total.try_into() {
                 Ok(t) => t,
@@ -76,13 +75,8 @@ pub(crate) async fn endpoint(
         Err(e) => return AllResponses::handle_error(&e),
     };
 
-    match docs {
-        Ok(docs) => {
-            let doc_count: u32 = match docs.len().try_into() {
-                Ok(d) => d,
-                Err(e) => return AllResponses::handle_error(&e.into()),
-            };
-
+    match fetched_docs {
+        Ok((docs, doc_count)) => {
             let remaining = Remaining::calculate(page.into(), limit.into(), total, doc_count);
 
             Responses::Ok(Json(DocumentIndexListDocumented(DocumentIndexList {
@@ -103,16 +97,23 @@ pub(crate) async fn endpoint(
 /// Fetch documents from the event db
 async fn fetch_docs(
     conditions: &DocsQueryFilter, query_limits: &QueryLimits,
-) -> anyhow::Result<Vec<IndexedDocumentDocumented>> {
+) -> anyhow::Result<(Vec<IndexedDocumentDocumented>, u32)> {
     let docs_stream = SignedDocBody::retrieve(conditions, query_limits).await?;
-    let indexed_docs = DashMap::new();
 
-    docs_stream
-        .try_for_each(|doc: SignedDocBody| {
-            let id = *doc.id();
-            indexed_docs.entry(id).or_insert_with(Vec::new).push(doc);
-            future::ready(Ok(()))
-        })
+    let (indexed_docs, total_fetched_doc_count) = docs_stream
+        .try_fold(
+            (HashMap::new(), 0u32),
+            |(mut indexed_docs, mut total_fetched_doc_count), doc| {
+                async move {
+                    let id = *doc.id();
+                    indexed_docs.entry(id).or_insert_with(Vec::new).push(doc);
+                    total_fetched_doc_count = total_fetched_doc_count
+                        .checked_add(1)
+                        .ok_or(anyhow::anyhow!("Fetched Signed Documents overflow"))?;
+                    Ok((indexed_docs, total_fetched_doc_count))
+                }
+            },
+        )
         .await?;
 
     let docs = indexed_docs
@@ -130,5 +131,5 @@ async fn fetch_docs(
             }))
         })
         .collect::<Result<_, _>>()?;
-    Ok(docs)
+    Ok((docs, total_fetched_doc_count))
 }

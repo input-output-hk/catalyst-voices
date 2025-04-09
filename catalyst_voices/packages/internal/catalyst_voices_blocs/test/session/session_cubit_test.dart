@@ -33,6 +33,8 @@ void main() {
     final store = InMemorySharedPreferencesAsync.empty();
     SharedPreferencesAsyncPlatform.instance = store;
 
+    DummyCatalystIdFactory.registerDummyKeyFactory();
+
     keychainProvider = VaultKeychainProvider(
       secureStorage: const FlutterSecureStorage(),
       sharedPreferences: SharedPreferencesAsync(),
@@ -180,7 +182,10 @@ void main() {
       await keychain.setLock(lockFactor);
       await keychain.lock();
 
-      final account = Account.dummy(keychain: keychain);
+      final account = Account.dummy(
+        catalystId: DummyCatalystIdFactory.create(),
+        keychain: keychain,
+      );
 
       await userService.useAccount(account);
 
@@ -203,7 +208,10 @@ void main() {
       final keychain = await keychainProvider.create(keychainId);
       await keychain.setLock(lockFactor);
 
-      final account = Account.dummy(keychain: keychain);
+      final account = Account.dummy(
+        catalystId: DummyCatalystIdFactory.create(),
+        keychain: keychain,
+      );
 
       await userService.useAccount(account);
       await account.keychain.unlock(lockFactor);
@@ -324,6 +332,9 @@ class _MockRegistrationService extends Mock implements RegistrationService {
     await keychain.setLock(lockFactor);
     await keychain.unlock(lockFactor);
 
-    return Account.dummy(keychain: keychain);
+    return Account.dummy(
+      catalystId: DummyCatalystIdFactory.create(),
+      keychain: keychain,
+    );
   }
 }

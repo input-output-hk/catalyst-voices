@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:catalyst_voices/pages/registration/registration_dialog.dart';
+import 'package:catalyst_voices/pages/registration/registration_type.dart';
 import 'package:catalyst_voices/pages/spaces/appbar/account_popup/session_lock_button.dart';
 import 'package:catalyst_voices/pages/spaces/appbar/account_popup/session_unlock_button.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_filled_button.dart';
@@ -23,28 +24,11 @@ class SessionActionHeader extends StatelessWidget {
         return switch (state.status) {
           SessionStatus.visitor => state.isRegistrationInProgress
               ? const _FinishRegistrationButton()
-              : _GetStartedButton(isEnabled: state.canCreateAccount),
+              : const _GetStartedButton(),
           SessionStatus.guest => const SessionUnlockButton(),
           SessionStatus.actor => const SessionLockButton(),
         };
       },
-    );
-  }
-}
-
-class _GetStartedButton extends StatelessWidget {
-  final bool isEnabled;
-
-  const _GetStartedButton({
-    required this.isEnabled,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return VoicesFilledButton(
-      key: const Key('GetStartedButton'),
-      onTap: isEnabled ? () async => RegistrationDialog.show(context) : null,
-      child: Text(context.l10n.getStarted),
     );
   }
 }
@@ -55,8 +39,30 @@ class _FinishRegistrationButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return VoicesFilledButton(
-      onTap: () => unawaited(RegistrationDialog.show(context)),
+      key: const Key('FinishRegistrationButton'),
+      onTap: () => unawaited(
+        RegistrationDialog.show(
+          context,
+          type: const ContinueRegistration(),
+        ),
+      ),
       child: Text(context.l10n.finishAccountCreation),
+    );
+  }
+}
+
+class _GetStartedButton extends StatelessWidget {
+  const _GetStartedButton();
+
+  @override
+  Widget build(BuildContext context) {
+    return VoicesFilledButton(
+      key: const Key('GetStartedButton'),
+      onTap: () async => RegistrationDialog.show(
+        context,
+        type: const FreshRegistration(),
+      ),
+      child: Text(context.l10n.getStarted),
     );
   }
 }

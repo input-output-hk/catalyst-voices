@@ -1,9 +1,9 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:convert/convert.dart' show hex;
+import 'package:flutter/foundation.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'document_ref_dto.g.dart';
-
-enum DocumentRefDtoType { signed, draft }
 
 @JsonSerializable()
 final class DocumentRefDto {
@@ -18,6 +18,10 @@ final class DocumentRefDto {
     required this.type,
   });
 
+  factory DocumentRefDto.fromJson(Map<String, dynamic> json) {
+    return _$DocumentRefDtoFromJson(json);
+  }
+
   factory DocumentRefDto.fromModel(DocumentRef data) {
     final type = switch (data) {
       SignedDocumentRef() => DocumentRefDtoType.signed,
@@ -31,10 +35,6 @@ final class DocumentRefDto {
     );
   }
 
-  factory DocumentRefDto.fromJson(Map<String, dynamic> json) {
-    return _$DocumentRefDtoFromJson(json);
-  }
-
   Map<String, dynamic> toJson() => _$DocumentRefDtoToJson(this);
 
   DocumentRef toModel() {
@@ -44,6 +44,8 @@ final class DocumentRefDto {
     };
   }
 }
+
+enum DocumentRefDtoType { signed, draft }
 
 @JsonSerializable()
 final class SecuredDocumentRefDto {
@@ -55,22 +57,22 @@ final class SecuredDocumentRefDto {
     required this.hash,
   });
 
-  SecuredDocumentRefDto.fromModel(SecuredDocumentRef data)
-      : this(
-          ref: DocumentRefDto.fromModel(data.ref),
-          hash: data.hash,
-        );
-
   factory SecuredDocumentRefDto.fromJson(Map<String, dynamic> json) {
     return _$SecuredDocumentRefDtoFromJson(json);
   }
+
+  SecuredDocumentRefDto.fromModel(SecuredDocumentRef data)
+      : this(
+          ref: DocumentRefDto.fromModel(data.ref),
+          hash: hex.encode(data.hash),
+        );
 
   Map<String, dynamic> toJson() => _$SecuredDocumentRefDtoToJson(this);
 
   SecuredDocumentRef toModel() {
     return SecuredDocumentRef(
       ref: ref.toModel(),
-      hash: hash,
+      hash: Uint8List.fromList(hex.decode(hash)),
     );
   }
 }

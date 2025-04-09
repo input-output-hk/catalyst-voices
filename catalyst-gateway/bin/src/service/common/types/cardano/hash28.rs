@@ -2,11 +2,7 @@
 //!
 //! Hex encoded string which represents a 28 byte hash.
 
-use std::{
-    borrow::Cow,
-    ops::{Deref, DerefMut},
-    sync::LazyLock,
-};
+use std::sync::LazyLock;
 
 use anyhow::bail;
 use poem_openapi::{

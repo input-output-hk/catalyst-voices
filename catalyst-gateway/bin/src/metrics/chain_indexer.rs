@@ -70,6 +70,16 @@ pub(crate) mod reporter {
         .unwrap()
     });
 
+    /// Chain Indexer number of purged slots.
+    pub(crate) static PURGED_SLOTS: LazyLock<IntGaugeVec> = LazyLock::new(|| {
+        register_int_gauge_vec!(
+            "indexer_triggered_purged_slots",
+            "Chain Indexer total number of slots that have already been purged",
+            &METRIC_LABELS
+        )
+        .unwrap()
+    });
+
     /// Chain Indexer indicator whether tip is reached or in progress.
     pub(crate) static REACHED_TIP: LazyLock<IntGaugeVec> = LazyLock::new(|| {
         register_int_gauge_vec!(

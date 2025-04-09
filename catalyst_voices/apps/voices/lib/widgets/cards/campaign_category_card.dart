@@ -3,6 +3,7 @@ import 'package:catalyst_voices/routes/routing/spaces_route.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
@@ -72,7 +73,7 @@ class CampaignCategoryCard extends StatelessWidget {
 }
 
 class _Buttons extends StatelessWidget {
-  final String categoryId;
+  final SignedDocumentRef categoryId;
 
   const _Buttons({
     required this.categoryId,
@@ -87,7 +88,7 @@ class _Buttons extends StatelessWidget {
         VoicesFilledButton(
           key: const Key('CategoryDetailsBtn'),
           onTap: () {
-            CategoryDetailRoute(categoryId).go(context);
+            CategoryDetailRoute.fromRef(categoryId: categoryId).go(context);
           },
           child: Text(context.l10n.categoryDetails),
         ),
@@ -95,7 +96,7 @@ class _Buttons extends StatelessWidget {
         VoicesFilledButton(
           key: const Key('ViewProposalsBtn'),
           onTap: () {
-            ProposalsRoute(categoryId: categoryId).go(context);
+            ProposalsRoute.fromRef(categoryId: categoryId).go(context);
           },
           backgroundColor: context.colors.elevationsOnSurfaceNeutralLv2,
           foregroundColor: context.colorScheme.primary,

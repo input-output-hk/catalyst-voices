@@ -1,3 +1,5 @@
+import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
+import 'package:catalyst_voices_models/src/user/catalyst_id.dart';
 import 'package:equatable/equatable.dart';
 
 final class ApiConfig extends Equatable {
@@ -24,12 +26,14 @@ final class AppConfig extends Equatable {
   final CacheConfig cache;
   final DatabaseConfig database;
   final SentryConfig sentry;
+  final BlockchainConfig blockchain;
 
   const AppConfig({
     this.api = const ApiConfig(),
     this.cache = const CacheConfig(),
     this.database = const DatabaseConfig(),
     this.sentry = const SentryConfig(),
+    this.blockchain = const BlockchainConfig(),
   });
 
   @override
@@ -38,7 +42,34 @@ final class AppConfig extends Equatable {
         cache,
         database,
         sentry,
+        blockchain,
       ];
+}
+
+final class BlockchainConfig extends Equatable {
+  final NetworkId networkId;
+  final CatalystIdHost host;
+  final TransactionBuilderConfig transactionBuilderConfig;
+
+  const BlockchainConfig({
+    this.networkId = NetworkId.testnet,
+    this.host = CatalystIdHost.cardanoPreprod,
+    // TODO(dtscalac): don't hardcode the transaction config,
+    // fetch it from server
+    this.transactionBuilderConfig = const TransactionBuilderConfig(
+      feeAlgo: TieredFee(
+        constant: 155381,
+        coefficient: 44,
+        refScriptByteCost: 15,
+      ),
+      maxTxSize: 16384,
+      maxValueSize: 5000,
+      coinsPerUtxoByte: Coin(4310),
+    ),
+  });
+
+  @override
+  List<Object?> get props => [networkId, host, transactionBuilderConfig];
 }
 
 final class CacheConfig extends Equatable {

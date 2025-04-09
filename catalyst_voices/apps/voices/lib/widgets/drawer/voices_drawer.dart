@@ -28,11 +28,17 @@ class VoicesDrawer extends StatelessWidget {
   /// This widget is main "body" of [VoicesDrawer].
   final Widget child;
 
+  final ShapeBorder shape;
+
+  final double width;
+
   /// The default constructor for the [VoicesDrawer].
   const VoicesDrawer({
     super.key,
     this.bottom,
     required this.child,
+    this.shape = const RoundedRectangleBorder(),
+    this.width = 360,
   });
 
   @override
@@ -50,8 +56,8 @@ class VoicesDrawer extends StatelessWidget {
         ),
       ),
       child: Drawer(
-        width: 360,
-        shape: const RoundedRectangleBorder(),
+        width: width,
+        shape: shape,
         child: Column(
           children: [
             Expanded(child: child),

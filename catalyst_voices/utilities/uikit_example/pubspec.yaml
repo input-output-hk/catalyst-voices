@@ -30,12 +30,15 @@ dependencies:
     sdk: flutter
   flutter_bloc: ^8.1.5
   flutter_localized_locales: ^2.0.5
-  flutter_quill: ^10.8.2
+  flutter_quill:
+    git:
+      url: https://github.com/input-output-hk/flutter-quill
+      ref: 532172254c3cee957bbdbb08be922f2c870b7fff
 
 dev_dependencies:
   build_runner: ^2.4.12
   catalyst_analysis: ^3.0.0
-  flutter_gen_runner: ^5.3.2
+  flutter_gen_runner: ^5.10.0
   flutter_test:
     sdk: flutter
 

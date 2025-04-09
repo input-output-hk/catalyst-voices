@@ -1,21 +1,30 @@
-import 'dart:math';
+import 'dart:async';
 
 import 'package:catalyst_voices_blocs/src/common/bloc_error_emitter_mixin.dart';
+import 'package:catalyst_voices_blocs/src/common/bloc_signal_emitter_mixin.dart';
 import 'package:catalyst_voices_blocs/src/workspace/workspace_event.dart';
+import 'package:catalyst_voices_blocs/src/workspace/workspace_signal.dart';
 import 'package:catalyst_voices_blocs/src/workspace/workspace_state.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 final _logger = Logger('WorkspaceBloc');
 
 final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
-    with BlocErrorEmitterMixin {
+    with
+        BlocSignalEmitterMixin<WorkspaceSignal, WorkspaceState>,
+        BlocErrorEmitterMixin {
   // ignore: unused_field
   final CampaignService _campaignService;
   final ProposalService _proposalService;
+  final DocumentMapper _documentMapper;
+  final DownloaderService _downloaderService;
+
+  StreamSubscription<List<Proposal>>? _proposalsSubscription;
 
   // ignore: unused_field
   final List<Proposal> _proposals = [];
@@ -23,35 +32,131 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
   WorkspaceBloc(
     this._campaignService,
     this._proposalService,
+    this._documentMapper,
+    this._downloaderService,
   ) : super(const WorkspaceState()) {
     on<LoadProposalsEvent>(_loadProposals);
-    on<TabChangedEvent>(_handleTabChange);
     on<ImportProposalEvent>(_importProposal);
-    on<SearchQueryChangedEvent>(
-      _handleQueryChange,
-      // TODO(damian-molinski): implement debounce
-      transformer: null,
+    on<ErrorLoadProposalsEvent>(_errorLoadProposals);
+    on<WatchUserProposalsEvent>(_watchUserProposals);
+    on<ExportProposal>(_exportProposal);
+    on<DeleteDraftProposalEvent>(_deleteProposal);
+    on<UnlockProposalEvent>(_unlockProposal);
+    on<ForgetProposalEvent>(_forgetProposal);
+    on<GetTimelineItemsEvent>(_getTimelineItems);
+  }
+
+  @override
+  Future<void> close() {
+    _proposalsSubscription?.cancel();
+    _proposalsSubscription = null;
+    return super.close();
+  }
+
+  DocumentDataContent _buildDocumentContent(Document document) {
+    return _documentMapper.toContent(document);
+  }
+
+  DocumentDataMetadata _buildDocumentMetadata(ProposalDocument document) {
+    final selfRef = document.metadata.selfRef;
+    final categoryId = document.metadata.categoryId;
+    final templateRef = document.metadata.templateRef;
+
+    return DocumentDataMetadata(
+      type: DocumentType.proposalDocument,
+      selfRef: selfRef,
+      template: templateRef,
+      categoryId: categoryId,
     );
   }
 
-  Future<void> _handleQueryChange(
-    SearchQueryChangedEvent event,
+  Future<void> _deleteProposal(
+    DeleteDraftProposalEvent event,
     Emitter<WorkspaceState> emit,
   ) async {
-    // TODO(damian-molinski): implement filtering of _proposals
-
-    final query = event.query;
-
-    emit(state.copyWith(searchQuery: query));
+    try {
+      await _proposalService.deleteDraftProposal(event.ref);
+      emitSignal(const DeletedDraftWorkspaceSignal());
+    } catch (error, stackTrace) {
+      _logger.severe('Delete proposal failed', error, stackTrace);
+      emitError(const LocalizedProposalDeletionException());
+    }
   }
 
-  Future<void> _handleTabChange(
-    TabChangedEvent event,
+  Future<void> _errorLoadProposals(
+    ErrorLoadProposalsEvent event,
     Emitter<WorkspaceState> emit,
   ) async {
-    // TODO(damian-molinski): implement filtering of _proposals
+    _logger.info('Error loading proposals');
+    emit(
+      state.copyWith(
+        error: Optional(event.error),
+        isLoading: false,
+      ),
+    );
+    await _proposalsSubscription?.cancel();
+    _proposalsSubscription = null;
+  }
 
-    emit(state.copyWith(tab: event.tab));
+  Future<void> _exportProposal(
+    ExportProposal event,
+    Emitter<WorkspaceState> emit,
+  ) async {
+    try {
+      final docData = await _proposalService.getProposal(ref: event.ref);
+
+      final docMetadata = _buildDocumentMetadata(docData.document);
+      final documentContent = _buildDocumentContent(docData.document.document);
+
+      final encodedProposal = await _proposalService.encodeProposalForExport(
+        document: DocumentData(
+          metadata: docMetadata,
+          content: documentContent,
+        ),
+      );
+
+      final filename = '${event.prefix}_${event.ref.id}';
+      const extension = ProposalDocument.exportFileExt;
+
+      await _downloaderService.download(
+        data: encodedProposal,
+        filename: '$filename.$extension',
+      );
+    } catch (error, stackTrace) {
+      _logger.severe('Exporting proposal failed', error, stackTrace);
+      emitError(LocalizedException.create(error));
+    }
+  }
+
+  Future<void> _forgetProposal(
+    ForgetProposalEvent event,
+    Emitter<WorkspaceState> emit,
+  ) async {
+    final proposal =
+        state.userProposals.firstWhereOrNull((e) => e.selfRef == event.ref);
+    if (proposal == null || proposal.selfRef is! SignedDocumentRef) {
+      return emitError(const LocalizedUnknownException());
+    }
+    try {
+      await _proposalService.forgetProposal(
+        proposalRef: proposal.selfRef as SignedDocumentRef,
+        categoryId: proposal.categoryId,
+      );
+    } catch (e, stackTrace) {
+      _logger.severe('Error forgetting proposal', e, stackTrace);
+    }
+  }
+
+  Future<void> _getTimelineItems(
+    GetTimelineItemsEvent event,
+    Emitter<WorkspaceState> emit,
+  ) async {
+    final timelineItems = await _campaignService.getCampaignTimeline();
+    final timeline =
+        timelineItems.map(CampaignTimelineViewModel.fromModel).toList();
+
+    emit(state.copyWith(timelineItems: timeline));
+    emitSignal(SubmissionCloseDate(date: state.submissionCloseDate));
   }
 
   Future<void> _importProposal(
@@ -60,10 +165,10 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
   ) async {
     try {
       final ref = await _proposalService.importProposal(event.proposalData);
-      emit(state.copyWith(importedProposalRef: Optional(ref)));
+      emitSignal(ImportedProposalWorkspaceSignal(proposalRef: ref));
     } catch (error, stackTrace) {
       _logger.severe('Importing proposal failed', error, stackTrace);
-      emitError(const LocalizedUnknownException());
+      emitError(LocalizedException.create(error));
     }
   }
 
@@ -73,44 +178,64 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
   ) async {
     emit(
       state.copyWith(
+        isLoading: false,
+        error: const Optional.empty(),
+        userProposals: event.proposals,
+      ),
+    );
+  }
+
+  void _setupProposalsSubscription() {
+    _proposalsSubscription = _proposalService.watchUserProposals().listen(
+      (proposals) {
+        if (isClosed) return;
+        _logger.info('Stream received ${proposals.length} proposals');
+
+        add(LoadProposalsEvent(proposals));
+      },
+      onError: (Object error, StackTrace stackTrace) {
+        if (isClosed) return;
+        _logger.info('Users proposals stream error', error, stackTrace);
+        add(ErrorLoadProposalsEvent(LocalizedException.create(error)));
+      },
+    );
+  }
+
+  Future<void> _unlockProposal(
+    UnlockProposalEvent event,
+    Emitter<WorkspaceState> emit,
+  ) async {
+    final proposal =
+        state.userProposals.firstWhereOrNull((e) => e.selfRef == event.ref);
+    if (proposal == null || proposal.selfRef is! SignedDocumentRef) {
+      return emitError(const LocalizedUnknownException());
+    }
+    await _proposalService.unlockProposal(
+      proposalRef: proposal.selfRef as SignedDocumentRef,
+      categoryId: proposal.categoryId,
+    );
+    emitSignal(OpenProposalBuilderSignal(ref: event.ref));
+  }
+
+  Future<void> _watchUserProposals(
+    WatchUserProposalsEvent event,
+    Emitter<WorkspaceState> emit,
+  ) async {
+    // As stream is needed in a few places we don't want to create it every time
+    if (_proposalsSubscription != null && state.error == null) {
+      return;
+    }
+    _logger.info('Setup user proposals subscription');
+    emit(
+      state.copyWith(
         isLoading: true,
-        draftProposalCount: 0,
-        finalProposalCount: 0,
-        proposals: const [],
         error: const Optional.empty(),
       ),
     );
-
-    // TODO(damian-molinski): implement fetching proposals
-    // TODO(damian-molinski): implement filtering of _proposals
-
-    final isSuccess = await Future.delayed(
-      const Duration(milliseconds: 300),
-      () => Random().nextBool(),
-    );
-    if (isClosed) return;
-
-    final proposals = isSuccess
-        ? List<WorkspaceProposalListItem>.generate(
-            20,
-            (index) => WorkspaceProposalListItem(
-              id: '$index',
-              name: 'Proposal [${index + 1}]',
-            ),
-          )
-        : const <WorkspaceProposalListItem>[];
-
-    final LocalizedException? error =
-        isSuccess ? null : const LocalizedUnknownException();
-
-    final newState = state.copyWith(
-      isLoading: false,
-      draftProposalCount: isSuccess ? 2 : 0,
-      finalProposalCount: isSuccess ? 1 : 0,
-      proposals: proposals,
-      error: Optional(error),
-    );
-
-    emit(newState);
+    _logger.info('$state and ${state.showProposals}');
+    await _proposalsSubscription?.cancel();
+    _proposalsSubscription = null;
+    _setupProposalsSubscription();
+    emit(state.copyWith(isLoading: false));
   }
 }

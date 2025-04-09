@@ -1,6 +1,8 @@
 import 'package:catalyst_voices/app/view/app_active_state_listener.dart';
+import 'package:catalyst_voices/app/view/app_mobile_access_restriction.dart';
 import 'package:catalyst_voices/app/view/app_precache_image_assets.dart';
 import 'package:catalyst_voices/app/view/app_session_listener.dart';
+import 'package:catalyst_voices/app/view/app_splash_screen_manager.dart';
 import 'package:catalyst_voices/common/ext/preferences_ext.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
@@ -8,6 +10,7 @@ import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localized_locales/flutter_localized_locales.dart';
+import 'package:flutter_quill/flutter_quill.dart';
 
 const _restorationScopeId = 'rootVoices';
 
@@ -46,6 +49,7 @@ final class _AppContent extends StatelessWidget {
     return const [
       ...VoicesLocalizations.localizationsDelegates,
       LocaleNamesLocalizationsDelegate(),
+      FlutterQuillLocalizations.delegate,
     ];
   }
 
@@ -74,7 +78,11 @@ final class _AppContent extends StatelessWidget {
           body: AppActiveStateListener(
             child: GlobalPrecacheImages(
               child: GlobalSessionListener(
-                child: child ?? const SizedBox.shrink(),
+                child: AppMobileAccessRestriction(
+                  child: AppSplashScreenManager(
+                    child: child ?? const SizedBox.shrink(),
+                  ),
+                ),
               ),
             ),
           ),

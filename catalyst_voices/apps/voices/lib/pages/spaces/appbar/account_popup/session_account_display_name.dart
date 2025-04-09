@@ -9,7 +9,7 @@ class SessionAccountDisplayName extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocSelector<SessionCubit, SessionState, String>(
-      selector: (state) => state.account?.displayName ?? '',
+      selector: (state) => state.account?.username ?? '',
       builder: (context, state) => _Text(state),
     );
   }

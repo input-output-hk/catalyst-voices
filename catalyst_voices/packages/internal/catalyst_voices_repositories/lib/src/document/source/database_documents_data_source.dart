@@ -17,10 +17,28 @@ final class DatabaseDocumentsDataSource implements SignedDocumentDataSource {
   Future<DocumentData> get({required DocumentRef ref}) async {
     final entity = await _database.documentsDao.query(ref: ref);
     if (entity == null) {
-      throw DocumentNotFound(ref: ref);
+      throw DocumentNotFoundException(ref: ref);
     }
 
     return entity.toModel();
+  }
+
+  @override
+  Future<int> getRefCount({
+    required DocumentRef ref,
+    required DocumentType type,
+  }) {
+    return _database.documentsDao.countRefDocumentByType(ref: ref, type: type);
+  }
+
+  @override
+  Future<DocumentData?> getRefToDocumentData({
+    required DocumentRef refTo,
+    DocumentType? type,
+  }) {
+    return _database.documentsDao
+        .queryRefToDocumentData(refTo: refTo, type: type)
+        .then((e) => e?.toModel());
   }
 
   @override
@@ -29,8 +47,10 @@ final class DatabaseDocumentsDataSource implements SignedDocumentDataSource {
   }
 
   @override
-  Future<List<String>> queryVersionIds({required String id}) {
-    return _database.documentsDao.queryVersionIds(id: id);
+  Future<List<DocumentData>> queryVersionsOfId({required String id}) async {
+    final documentEntities =
+        await _database.documentsDao.queryVersionsOfId(id: id);
+    return documentEntities.map((e) => e.toModel()).toList();
   }
 
   @override
@@ -71,10 +91,20 @@ final class DatabaseDocumentsDataSource implements SignedDocumentDataSource {
     int? limit,
     required bool unique,
     DocumentType? type,
+    CatalystId? authorId,
+    DocumentRef? refTo,
   }) {
     return _database.documentsDao
-        .watchAll(limit: limit, unique: unique, type: type)
-        .map((entities) => entities.map((e) => e.toModel()).toList());
+        .watchAll(
+      limit: limit,
+      unique: unique,
+      type: type,
+      authorId: authorId,
+      refTo: refTo,
+    )
+        .map((entities) {
+      return List<DocumentData>.from(entities.map((e) => e.toModel()));
+    });
   }
 
   @override
@@ -82,7 +112,20 @@ final class DatabaseDocumentsDataSource implements SignedDocumentDataSource {
     required DocumentRef ref,
     required DocumentType type,
   }) {
-    return _database.documentsDao.watchCount(ref: ref, type: type);
+    return _database.documentsDao.watchCount(
+      ref: ref,
+      type: type,
+    );
+  }
+
+  @override
+  Stream<DocumentData?> watchRefToDocumentData({
+    required DocumentRef refTo,
+    required DocumentType type,
+  }) {
+    return _database.documentsDao
+        .watchRefToDocumentData(refTo: refTo, type: type)
+        .map((e) => e?.toModel());
   }
 }
 

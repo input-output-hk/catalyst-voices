@@ -23,7 +23,7 @@ final class DatabaseDraftsDataSource implements DraftDataSource {
   Future<DocumentData> get({required DocumentRef ref}) async {
     final entity = await _database.draftsDao.query(ref: ref);
     if (entity == null) {
-      throw DraftNotFound(ref: ref);
+      throw DraftNotFoundException(ref: ref);
     }
 
     return entity.toModel();
@@ -32,6 +32,13 @@ final class DatabaseDraftsDataSource implements DraftDataSource {
   @override
   Future<List<DraftRef>> index() {
     return _database.draftsDao.queryAllRefs();
+  }
+
+  @override
+  Future<List<DocumentData>> queryVersionsOfId({required String id}) async {
+    final documentEntities =
+        await _database.draftsDao.queryVersionsOfId(id: id);
+    return documentEntities.map((e) => e.toModel()).toList();
   }
 
   @override
@@ -66,6 +73,24 @@ final class DatabaseDraftsDataSource implements DraftDataSource {
     return _database.draftsDao
         .watch(ref: ref)
         .map((entity) => entity?.toModel());
+  }
+
+  @override
+  Stream<List<DocumentData>> watchAll({
+    int? limit,
+    DocumentType? type,
+    CatalystId? authorId,
+  }) {
+    return _database.draftsDao
+        .watchAll(
+      limit: limit,
+      type: type,
+      authorId: authorId,
+    )
+        .map((event) {
+      final list = List<DocumentData>.from(event.map((e) => e.toModel()));
+      return list;
+    });
   }
 }
 

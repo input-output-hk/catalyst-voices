@@ -6,11 +6,11 @@ import 'package:flutter/widgets.dart';
 import 'package:formz/formz.dart';
 
 final class Email extends FormzInput<String, EmailValidationException> {
+  static const NumRange<int> lengthRange = NumRange(min: 1, max: 100);
+
   const Email.dirty([super.value = '']) : super.dirty();
 
   const Email.pure([super.value = '']) : super.pure();
-
-  static const Range<int> lengthRange = Range(min: 1, max: 100);
 
   @override
   EmailValidationException? validator(String value) {
@@ -26,10 +26,6 @@ final class Email extends FormzInput<String, EmailValidationException> {
   }
 }
 
-sealed class EmailValidationException extends LocalizedException {
-  const EmailValidationException();
-}
-
 final class EmailPatternInvalidException extends EmailValidationException {
   const EmailPatternInvalidException();
 
@@ -37,6 +33,10 @@ final class EmailPatternInvalidException extends EmailValidationException {
   String message(BuildContext context) {
     return context.l10n.errorEmailValidationPattern;
   }
+}
+
+sealed class EmailValidationException extends LocalizedException {
+  const EmailValidationException();
 }
 
 final class OutOfRangeEmailException extends EmailValidationException {

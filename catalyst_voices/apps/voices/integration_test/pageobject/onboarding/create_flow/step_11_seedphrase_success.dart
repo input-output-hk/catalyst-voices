@@ -1,3 +1,4 @@
+import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -27,20 +28,38 @@ class SeedphraseSuccessPanel extends OnboardingPageBase {
     await verifyDetailsPanel();
   }
 
-  Future<void> verifyDetailsPanel() async {}
-
-  Future<void> verifyInfoPanel() async {
-    expect(await infoPartHeaderTitleText(), T.get('Catalyst Keychain'));
-    //temporary: check for specific picture (green checked icon)
-    expect(infoPartTaskPicture(), findsOneWidget);
-    expect($(progressBar), findsOneWidget);
-    expect(
-      infoPartLearnMoreText(),
-      T.get('Learn More'),
-    );
+  Future<void> verifyDetailsPanel() async {
     expect(
       $(nextStepBody).text,
-      T.get('Now let’s set your Unlock password for this device!'),
+      (await t()).createKeychainSeedPhraseCheckSuccessNextStep,
+    );
+    expect(
+      $(registrationDetailsTitle).text,
+      (await t()).createKeychainSeedPhraseCheckSuccessTitle,
+    );
+    expect(
+      $(registrationDetailsBody).text,
+      (await t()).createKeychainSeedPhraseCheckSuccessSubtitle,
+    );
+  }
+
+  Future<void> verifyInfoPanel() async {
+    expect(await infoPartHeaderTitleText(), (await t()).catalystKeychain);
+    expect(
+      find.byWidgetPredicate(
+        (widget) =>
+            widget is CatalystSvgPicture &&
+            (widget.bytesLoader as dynamic).assetName ==
+                'assets/icons/check.svg',
+      ),
+      findsOneWidget,
+    );
+    expect(infoPartTaskPicture(), findsOneWidget);
+    expect($(progressBar), findsOneWidget);
+    expect($(learnMoreButton).$(Text).text, (await t()).learnMore);
+    expect(
+      $(nextStepBody).text,
+      (await t()).createKeychainSeedPhraseCheckSuccessNextStep,
     );
     expect(await closeButton(), findsOneWidget);
   }

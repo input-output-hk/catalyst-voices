@@ -39,39 +39,37 @@ class SetupBaseProfilePanel extends OnboardingPageBase {
   Future<void> verifyInfoPanel() async {
     expect(
       $(registrationInfoPanel).$(headerTitle).text,
-      T.get('Welcome to Catalyst'),
+      (await t()).accountCreationGetStartedTitle,
     );
     expect($(pictureContainer).$(IconTheme), findsOneWidget);
-    expect(
-      $(learnMoreButton).$(Text).text,
-      T.get('Learn More'),
-    );
+    expect($(learnMoreButton).$(Text).text, (await t()).learnMore);
   }
 
   Future<void> verifyDetailsPanel() async {
     expect(
       $(baseProfileDetailsPanel).$(titleText).text,
-      T.get('Setup your base profile'),
+      (await t()).createBaseProfileSetupTitle,
     );
     expect($(displayNameTextField), findsOneWidget);
     expect(
       $(displayNameTextField).$(Text).text,
-      T.get('*What should we call you?'),
+      '*${(await t()).createBaseProfileSetupDisplayNameLabel}',
     );
     expect($(emailTextField), findsOneWidget);
     expect(
       $(emailTextField).$(Text).text,
-      T.get('*Your e-mail'),
+      '*${(await t()).createBaseProfileSetupEmailLabel}',
     );
     expect($(backButton), findsOneWidget);
     expect($(nextButton), findsOneWidget);
     expect($(ideascaleInfoCard), findsOneWidget);
-    expect(infoCardTitleLocator.text, T.get('Ideascale account'));
+    expect(
+      infoCardTitleLocator.text,
+      (await t()).createBaseProfileSetupIdeascaleAccount,
+    );
     expect(
       infoCardDescriptionLocator.text,
-      T.get(
-        'Please use the e-mail you use on cardano.ideascale.com',
-      ),
+      (await t()).createBaseProfileSetupIdeascaleReason1,
     );
   }
 }

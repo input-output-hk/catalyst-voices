@@ -68,6 +68,12 @@ final class CoseSign extends Equatable {
     required Uint8List payload,
     required List<CatalystCoseSigner> signers,
   }) async {
+    // TODO(dtscalac): remove when server stops
+    // requiring alg header in body protected headers.
+    protectedHeaders = protectedHeaders.copyWith(
+      alg: () => signers.firstOrNull?.alg,
+    );
+
     final signatures = <CoseSignature>[];
     for (final signer in signers) {
       final signatureProtectedHeaders = CoseHeaders.protected(
@@ -138,7 +144,7 @@ final class CoseSign extends Equatable {
   }
 
   /// Serializes the type as cbor.
-  CborValue toCbor() {
+  CborValue toCbor({bool tagged = true}) {
     return CborList(
       [
         protectedHeaders.toCbor(),
@@ -148,7 +154,9 @@ final class CoseSign extends Equatable {
           for (final signature in signatures) signature.toCbor(),
         ]),
       ],
-      tags: [CoseTags.coseSign],
+      tags: [
+        if (tagged) CoseTags.coseSign,
+      ],
     );
   }
 

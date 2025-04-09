@@ -1,8 +1,7 @@
 import 'package:catalyst_voices_models/src/hi_lo/hi_lo.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/foundation.dart';
-import 'package:uuid/parsing.dart';
-import 'package:uuid/validation.dart';
+import 'package:uuid_plus/uuid_plus.dart';
 
 // 2^64 - 1 (Unsigned 64-bit max)
 final _mask = BigInt.parse('18446744073709551615');

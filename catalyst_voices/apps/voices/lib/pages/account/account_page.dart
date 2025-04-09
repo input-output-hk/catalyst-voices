@@ -1,13 +1,13 @@
 import 'dart:async';
 
 import 'package:catalyst_voices/pages/account/widgets/account_action_tile.dart';
-import 'package:catalyst_voices/pages/account/widgets/account_display_name_tile.dart';
 import 'package:catalyst_voices/pages/account/widgets/account_email_tile.dart';
 import 'package:catalyst_voices/pages/account/widgets/account_header_tile.dart';
 import 'package:catalyst_voices/pages/account/widgets/account_keychain_tile.dart';
 import 'package:catalyst_voices/pages/account/widgets/account_page_title.dart';
 import 'package:catalyst_voices/pages/account/widgets/account_roles_tile.dart';
 import 'package:catalyst_voices/pages/account/widgets/account_status_banner.dart';
+import 'package:catalyst_voices/pages/account/widgets/account_username_tile.dart';
 import 'package:catalyst_voices/pages/spaces/appbar/account_popup/session_account_avatar.dart';
 import 'package:catalyst_voices/pages/spaces/appbar/session_action_header.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
@@ -37,7 +37,9 @@ class _AccountPageState extends State<AccountPage> {
       appBar: const VoicesAppBar(
         automaticallyImplyLeading: false,
         actions: [
-          VoicesStartProposalButton(),
+          VoicesStartProposalButton(
+            key: Key('StartProposalBtn'),
+          ),
           SessionActionHeader(),
           SessionAccountAvatar(),
         ],
@@ -50,7 +52,9 @@ class _AccountPageState extends State<AccountPage> {
             child: ListView(
               padding: const EdgeInsets.all(24),
               children: [
-                const AccountPageTitle(),
+                const AccountPageTitle(
+                  key: Key('AccountPageTitle'),
+                ),
                 const SizedBox(height: 42),
                 const Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -68,7 +72,7 @@ class _AccountPageState extends State<AccountPage> {
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: const <Widget>[
-                          AccountDisplayNameTile(),
+                          AccountUsernameTile(),
                           AccountEmailTile(),
                         ].separatedBy(const SizedBox(height: 20)).toList(),
                       ),
@@ -79,7 +83,9 @@ class _AccountPageState extends State<AccountPage> {
                         mainAxisSize: MainAxisSize.min,
                         children: const <Widget>[
                           AccountRolesTile(),
-                          AccountKeychainTile(),
+                          AccountKeychainTile(
+                            key: Key('AccountKeychainTile'),
+                          ),
                         ].separatedBy(const SizedBox(height: 20)).toList(),
                       ),
                     ),

@@ -66,13 +66,16 @@ final class DatumOption extends Datum {
   /// Converts the [DatumOption] to a CBOR-encoded value.
   /// The CBOR list contains an index indicating the type and the encoded datum.
   @override
-  CborValue toCbor() {
+  CborValue toCbor({List<int> tags = const []}) {
     final index = switch (datum) {
       DatumHash _ => DatumOptionType.datumHash,
       Data _ => DatumOptionType.data,
       _ => throw ArgumentError.value(datum, 'datum', 'Invalid datum type'),
     };
-    return CborList([CborSmallInt(index.value), datum.toCbor()]);
+    return CborList(
+      [CborSmallInt(index.value), datum.toCbor()],
+      tags: tags,
+    );
   }
 
   @override
@@ -105,7 +108,7 @@ final class DatumHash extends Datum {
   /// Converts the [DatumHash] to a CBOR-encoded value.
   /// The CBOR value is a byte string representing the hash.
   @override
-  CborValue toCbor() => CborBytes(hash);
+  CborValue toCbor({List<int> tags = const []}) => CborBytes(hash, tags: tags);
 
   @override
   List<Object?> get props => [hash];
@@ -130,7 +133,7 @@ final class Data extends Datum {
 
   /// The CBOR value represents the actual data.
   @override
-  CborValue toCbor() => data;
+  CborValue toCbor({List<int> tags = const []}) => data;
 
   /// Override of the [Equatable] properties for value comparison.
   /// This allows comparing [Data] instances based on their [data] values.

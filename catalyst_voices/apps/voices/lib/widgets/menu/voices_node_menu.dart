@@ -5,30 +5,8 @@ import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 
-final class VoicesNodeMenuItem extends Equatable {
-  final String id;
-  final String label;
-  final bool isEnabled;
-  final bool hasError;
-
-  const VoicesNodeMenuItem({
-    required this.id,
-    required this.label,
-    this.isEnabled = true,
-    this.hasError = false,
-  });
-
-  @override
-  List<Object?> get props => [
-        id,
-        label,
-        isEnabled,
-        hasError,
-      ];
-}
-
 class VoicesNodeMenu extends StatelessWidget {
-  final String name;
+  final Widget name;
   final Widget? icon;
   final VoidCallback? onHeaderTap;
   final String? selectedItemId;
@@ -59,10 +37,10 @@ class VoicesNodeMenu extends StatelessWidget {
       root: SimpleTreeViewRootRow(
         onTap: isExpandable ? onHeaderTap : null,
         leading: [
-          _NodeIcon(isOpen: isExpanded),
+          VoicesNodeMenuIcon(isOpen: isExpanded),
           icon ?? VoicesAssets.icons.viewGrid.buildIcon(),
         ],
-        child: Text(name),
+        child: name,
       ),
       children: items.mapIndexed(
         (index, item) {
@@ -80,10 +58,11 @@ class VoicesNodeMenu extends StatelessWidget {
   }
 }
 
-class _NodeIcon extends StatelessWidget {
+class VoicesNodeMenuIcon extends StatelessWidget {
   final bool isOpen;
 
-  const _NodeIcon({
+  const VoicesNodeMenuIcon({
+    super.key,
     this.isOpen = true,
   });
 
@@ -96,4 +75,26 @@ class _NodeIcon extends StatelessWidget {
           : VoicesAssets.icons.nodeClosed.buildIcon(),
     );
   }
+}
+
+final class VoicesNodeMenuItem extends Equatable {
+  final String id;
+  final String label;
+  final bool isEnabled;
+  final bool hasError;
+
+  const VoicesNodeMenuItem({
+    required this.id,
+    required this.label,
+    this.isEnabled = true,
+    this.hasError = false,
+  });
+
+  @override
+  List<Object?> get props => [
+        id,
+        label,
+        isEnabled,
+        hasError,
+      ];
 }

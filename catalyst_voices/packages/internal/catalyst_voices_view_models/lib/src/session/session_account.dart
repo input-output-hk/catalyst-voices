@@ -1,16 +1,15 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:equatable/equatable.dart';
 
 final class SessionAccount extends Equatable {
-  final String catalystId;
-  final String displayName;
+  final CatalystId? catalystId;
   final bool isAdmin;
   final bool isProposer;
   final bool isDrep;
 
   const SessionAccount({
-    this.catalystId = '',
-    this.displayName = '',
+    this.catalystId,
     this.isAdmin = false,
     this.isProposer = false,
     this.isDrep = false,
@@ -19,27 +18,27 @@ final class SessionAccount extends Equatable {
   factory SessionAccount.fromAccount(Account account) {
     return SessionAccount(
       catalystId: account.catalystId,
-      displayName: account.displayName,
       isAdmin: account.isAdmin,
       isProposer: account.roles.contains(AccountRole.proposer),
       isDrep: account.roles.contains(AccountRole.drep),
     );
   }
 
-  const SessionAccount.mocked()
-      : this(
-          catalystId: 'cardano/uuid',
-          displayName: 'Account Mocked',
-          isAdmin: true,
-          isProposer: true,
-        );
+  factory SessionAccount.mocked() {
+    return SessionAccount(
+      catalystId: DummyCatalystIdFactory.create(username: 'Account Mocked'),
+      isAdmin: true,
+      isProposer: true,
+    );
+  }
 
   @override
   List<Object?> get props => [
         catalystId,
-        displayName,
         isAdmin,
         isProposer,
         isDrep,
       ];
+
+  String? get username => catalystId?.username;
 }

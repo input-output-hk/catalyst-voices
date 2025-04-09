@@ -10,7 +10,7 @@ import 'package:flutter/material.dart';
 /// A dialog for submitting a proposal into review.
 class SubmitProposalForReviewDialog extends StatefulWidget {
   final String proposalTitle;
-  final int currentVersion;
+  final int? currentVersion;
   final int nextVersion;
 
   const SubmitProposalForReviewDialog({
@@ -30,7 +30,7 @@ class SubmitProposalForReviewDialog extends StatefulWidget {
   static Future<bool?> show({
     required BuildContext context,
     required String proposalTitle,
-    required int currentIteration,
+    required int? currentIteration,
     required int nextIteration,
   }) {
     return VoicesDialog.show(
@@ -213,7 +213,7 @@ class _SubmitProposalForReviewDialogState
 }
 
 class _VersionUpdate extends StatelessWidget {
-  final int current;
+  final int? current;
   final int next;
 
   const _VersionUpdate({
@@ -225,9 +225,11 @@ class _VersionUpdate extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        const DraftProposalChip(),
-        const SizedBox(width: 4),
-        ProposalVersionChip(version: current.toString()),
+        if (current != null) ...[
+          const DraftProposalChip(),
+          const SizedBox(width: 4),
+        ],
+        ProposalVersionChip(version: current?.toString() ?? context.l10n.local),
         const SizedBox(width: 16),
         const Expanded(child: _Arrow()),
         const SizedBox(width: 16),
@@ -241,7 +243,7 @@ class _VersionUpdate extends StatelessWidget {
 
 class _VersionUpdateSection extends StatelessWidget {
   final String proposalTitle;
-  final int currentVersion;
+  final int? currentVersion;
   final int nextVersion;
 
   const _VersionUpdateSection({

@@ -5,9 +5,9 @@ import 'dart:typed_data';
 import 'package:catalyst_cardano_serialization/src/certificate.dart';
 import 'package:catalyst_cardano_serialization/src/exceptions.dart';
 import 'package:catalyst_cardano_serialization/src/redeemer.dart';
+import 'package:catalyst_cardano_serialization/src/signature.dart';
 import 'package:catalyst_cardano_serialization/src/transaction.dart';
 import 'package:catalyst_cardano_serialization/src/types.dart';
-import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
 import 'package:cbor/cbor.dart';
 import 'package:convert/convert.dart';
 import 'package:equatable/equatable.dart';
@@ -32,7 +32,7 @@ abstract base class BaseHash extends Equatable implements CborEncodable {
 
   /// Serializes the type as cbor.
   @override
-  CborValue toCbor() => CborBytes(bytes);
+  CborValue toCbor({List<int> tags = const []}) => CborBytes(bytes, tags: tags);
 
   /// Constructs the [BaseHash] from a hex string representation
   /// of [bytes].

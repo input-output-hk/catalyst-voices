@@ -2,6 +2,7 @@ import 'package:catalyst_voices/common/ext/account_role_ext.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 class VoicesRoleContainersExample extends StatefulWidget {
@@ -55,7 +56,8 @@ class _VoicesRoleContainersExampleState
             value: true,
             label: 'very long label, ' * 20,
             isLearnMoreHidden: true,
-            lockValueAsDefault: true,
+            isLocked: true,
+            isDefault: true,
           ),
           const SizedBox(height: 16),
           const Text('Role Chooser Card (State #1, View Only)'),
@@ -82,16 +84,20 @@ class _VoicesRoleContainersExampleState
             ),
             value: true,
             label: 'very long label, ' * 20,
-            lockValueAsDefault: true,
+            isLocked: true,
+            isDefault: true,
             isViewOnly: true,
           ),
           const SizedBox(height: 16),
           const Text('Roles Chooser Container (State #1)'),
           RolesChooserContainer(
-            selected: _rolesChooserPanelState1,
-            lockedValuesAsDefault: const {
-              AccountRole.voter,
-            },
+            roles: AccountRole.values.map((role) {
+              return RegistrationRole(
+                type: role,
+                isSelected: _rolesChooserPanelState1.contains(role),
+                isLocked: role == AccountRole.voter,
+              );
+            }).toList(),
             onChanged: (changedValue) => {
               setState(() {
                 _rolesChooserPanelState1 = changedValue;
@@ -101,10 +107,13 @@ class _VoicesRoleContainersExampleState
           const SizedBox(height: 16),
           const Text('Roles Summary Container (State #1)'),
           RolesSummaryContainer(
-            selected: _rolesChooserPanelState1,
-            lockedValuesAsDefault: const {
-              AccountRole.voter,
-            },
+            roles: AccountRole.values.map((role) {
+              return RegistrationRole(
+                type: role,
+                isSelected: _rolesChooserPanelState1.contains(role),
+                isLocked: role == AccountRole.voter,
+              );
+            }).toList(),
           ),
         ],
       ),
