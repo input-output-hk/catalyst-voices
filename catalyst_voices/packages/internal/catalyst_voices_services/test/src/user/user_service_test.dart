@@ -3,6 +3,7 @@ import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_services/src/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shared_preferences_platform_interface/in_memory_shared_preferences_async.dart';
 import 'package:shared_preferences_platform_interface/shared_preferences_async_platform_interface.dart';
@@ -28,7 +29,11 @@ void main() {
       sharedPreferences: SharedPreferencesAsync(),
       cacheConfig: const CacheConfig(),
     );
-    userRepository = UserRepository(SecureUserStorage(), keychainProvider);
+    userRepository = UserRepository(
+      SecureUserStorage(),
+      _MockUserDataSource(),
+      keychainProvider,
+    );
     userObserver = StreamUserObserver();
   });
 
@@ -258,3 +263,5 @@ void main() {
     });
   });
 }
+
+class _MockUserDataSource extends Mock implements UserDataSource {}

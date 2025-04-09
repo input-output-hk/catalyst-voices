@@ -161,9 +161,13 @@ final class Dependencies extends DependencyProvider {
 
   void _registerRepositories() {
     this
+      ..registerLazySingleton<UserDataSource>(() {
+        return ApiUserDataSource(get<ApiServices>());
+      })
       ..registerLazySingleton<UserRepository>(() {
         return UserRepository(
           get<UserStorage>(),
+          get<UserDataSource>(),
           get<KeychainProvider>(),
         );
       })
