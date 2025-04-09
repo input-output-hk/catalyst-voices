@@ -6,6 +6,8 @@ import 'package:catalyst_voices_repositories/src/database/catalyst_database.dart
 import 'package:catalyst_voices_repositories/src/database/dao/proposals_dao.drift.dart';
 import 'package:catalyst_voices_repositories/src/database/query/jsonb_expressions.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents.dart';
+import 'package:catalyst_voices_repositories/src/database/table/documents.drift.dart'
+    show $DocumentsTable;
 import 'package:catalyst_voices_repositories/src/database/table/documents_favorite.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_metadata.dart';
 import 'package:catalyst_voices_repositories/src/dto/proposal/proposal_submission_action_dto.dart';
@@ -43,76 +45,16 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
   @override
   Stream<ProposalsCount> watchCount({
     required ProposalsCountFilters filters,
-  }) async* {
-    final author = filters.author;
-    final searchQuery = filters.searchQuery;
+  }) {
+    final stream = _getProposalsRefsStream(filters: filters);
 
-    final select = selectOnly(documents)
-      ..addColumns([
-        documents.idHi,
-        documents.idLo,
-        documents.verHi,
-        documents.verLo,
-      ])
-      ..where(documents.type.equalsValue(DocumentType.proposalDocument))
-      ..orderBy([OrderingTerm.desc(documents.verHi)])
-      ..groupBy([documents.idHi + documents.idLo]);
-
-    if ((filters.onlyAuthor ?? false) && author != null) {
-      select.where(documents.metadata.isAuthor(author));
-    }
-
-    if (filters.category != null) {
-      select.where(documents.metadata.isCategory(filters.category!));
-    }
-
-    if (searchQuery != null) {
-      // TODO(damian-molinski): Check if documentsMetadata can be used.
-      select.where(documents.content.hasTitle(searchQuery));
-    }
-
-    final stream = select.map((row) {
-      final id = UuidHiLo(
-        high: row.read(documents.idHi)!,
-        low: row.read(documents.idLo)!,
-      );
-      final ver = UuidHiLo(
-        high: row.read(documents.verHi)!,
-        low: row.read(documents.verLo)!,
-      );
-
-      return SignedDocumentRef(id: id.uuid, version: ver.uuid);
-    }).watch();
-
-    await for (final allRefs in stream) {
-      final finalsRefs = await _getFinalProposalsRefs();
-      final favoritesRefs = await _getFavoritesRefs();
-      final myRefs = await _maybeGetAuthorProposalsLooseRefs(author: author);
-
-      final total = allRefs.length;
-      final finals = allRefs.where(finalsRefs.contains).length;
-      final drafts = total - finals;
-      final favorites = allRefs
-          .where((ref) => favoritesRefs.any((fav) => fav.id == ref.id))
-          .length;
-      final my = allRefs
-          .where((ref) => myRefs.any((myRef) => myRef.id == ref.id))
-          .length;
-
-      yield ProposalsCount(
-        total: total,
-        drafts: drafts,
-        finals: finals,
-        favorites: favorites,
-        my: my,
-      );
-    }
+    return _transformRefsStreamToCount(stream, author: filters.author);
   }
 
   Future<List<SignedDocumentRef>> _getAuthorProposalsLooseRefs({
     required CatalystId author,
   }) {
-    final select = selectOnly(documents)
+    final query = selectOnly(documents)
       ..addColumns([
         documents.idHi,
         documents.idLo,
@@ -124,7 +66,7 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
         ]),
       );
 
-    return select.map((row) {
+    return query.map((row) {
       final id = UuidHiLo(
         high: row.read(documents.idHi)!,
         low: row.read(documents.idLo)!,
@@ -135,7 +77,7 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
   }
 
   Future<List<SignedDocumentRef>> _getFavoritesRefs() {
-    final select = selectOnly(documentsFavorites)
+    final query = selectOnly(documentsFavorites)
       ..addColumns([
         documentsFavorites.idHi,
         documentsFavorites.idLo,
@@ -147,7 +89,7 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
         ]),
       );
 
-    return select.map((row) {
+    return query.map((row) {
       final id = UuidHiLo(
         high: row.read(documentsFavorites.idHi)!,
         low: row.read(documentsFavorites.idLo)!,
@@ -169,7 +111,7 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
   Future<_ProposalsActions> _getProposalsLatestAction() {
     final refId = documents.metadata.jsonExtract<Uint8List>(r'$.ref.id');
     final refVer = documents.metadata.jsonExtract<Uint8List>(r'$.ref.version');
-    final select = selectOnly(documents, distinct: true)
+    final query = selectOnly(documents, distinct: true)
       ..addColumns([
         documents.verHi,
         refId,
@@ -179,7 +121,7 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
       ..where(documents.type.equalsValue(DocumentType.proposalActionDocument))
       ..orderBy([OrderingTerm.desc(documents.verHi)]);
 
-    return select
+    return query
         .map((row) {
           final rawId = row.read(refId);
           final rawVer = row.read(refVer);
@@ -219,6 +161,39 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
         });
   }
 
+  Stream<List<SignedDocumentRef>> _getProposalsRefsStream({
+    ProposalsCountFilters? filters,
+  }) {
+    final author = filters?.author;
+    final searchQuery = filters?.searchQuery;
+
+    final query = selectOnly(documents)
+      ..addColumns([
+        documents.idHi,
+        documents.idLo,
+        documents.verHi,
+        documents.verLo,
+      ])
+      ..where(documents.type.equalsValue(DocumentType.proposalDocument))
+      ..orderBy([OrderingTerm.desc(documents.verHi)])
+      ..groupBy([documents.idHi + documents.idLo]);
+
+    if ((filters?.onlyAuthor ?? false) && author != null) {
+      query.where(documents.metadata.isAuthor(author));
+    }
+
+    if (filters?.category != null) {
+      query.where(documents.metadata.isCategory(filters!.category!));
+    }
+
+    if (searchQuery != null) {
+      // TODO(damian-molinski): Check if documentsMetadata can be used.
+      query.where(documents.content.hasTitle(searchQuery));
+    }
+
+    return query.map((row) => row.readSelfRef(documents)).watch();
+  }
+
   Future<List<SignedDocumentRef>> _maybeGetAuthorProposalsLooseRefs({
     CatalystId? author,
   }) {
@@ -227,6 +202,35 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
     }
 
     return _getAuthorProposalsLooseRefs(author: author);
+  }
+
+  Stream<ProposalsCount> _transformRefsStreamToCount(
+    Stream<List<SignedDocumentRef>> source, {
+    CatalystId? author,
+  }) async* {
+    await for (final allRefs in source) {
+      final finalsRefs = await _getFinalProposalsRefs();
+      final favoritesRefs = await _getFavoritesRefs();
+      final myRefs = await _maybeGetAuthorProposalsLooseRefs(author: author);
+
+      final total = allRefs.length;
+      final finals = allRefs.where(finalsRefs.contains).length;
+      final drafts = total - finals;
+      final favorites = allRefs
+          .where((ref) => favoritesRefs.any((fav) => fav.id == ref.id))
+          .length;
+      final my = allRefs
+          .where((ref) => myRefs.any((myRef) => myRef.id == ref.id))
+          .length;
+
+      yield ProposalsCount(
+        total: total,
+        drafts: drafts,
+        finals: finals,
+        favorites: favorites,
+        my: my,
+      );
+    }
   }
 }
 
@@ -243,4 +247,16 @@ abstract interface class ProposalsDao {
 
 extension on ProposalSubmissionAction {
   bool get isFinal => this == ProposalSubmissionAction.aFinal;
+}
+
+extension on TypedResult {
+  SignedDocumentRef readSelfRef($DocumentsTable table) {
+    final idHiLo = (read(table.idHi)!, read(table.idLo)!);
+    final verHiLo = (read(table.verHi)!, read(table.verLo)!);
+
+    final id = UuidHiLo(high: idHiLo.$1, low: idHiLo.$2).uuid;
+    final ver = UuidHiLo(high: verHiLo.$1, low: verHiLo.$2).uuid;
+
+    return SignedDocumentRef(id: id, version: ver);
+  }
 }
