@@ -346,10 +346,7 @@
                                         },
                                         "tag": {
                                             "$ref": "#/definitions/tagSelection",
-                                            "enum": [
-                                                "Governance",
-                                                "DAO"
-                                            ]
+                                            "enum": ["Governance", "DAO"]
                                         }
                                     }
                                 },
@@ -582,8 +579,6 @@
                         }
                     },
                     "x-order": ["theme"]
-
-
                 },
                 "openSource": {
                     "$ref": "#/definitions/section",
@@ -1266,21 +1261,4 @@
             "x-order": ["categoryRules", "fundRules"]
         }
     }
-}
-"properties": {
-    "fundAcknowledgements": {
-        "$ref": "#/definitions/agreementConfirmation",
-        "title": "Fund Acknowledgements",
-        "description": "I have read and agree to the Catalyst Fund rules and guidelines",
-        "default": false,
-        "x-guidance": "By confirming this statement, you acknowledge that you have read, understood, and agree to abide by all the Catalyst Fund rules and guidelines. These include reporting requirements, funding distribution procedures, and project completion expectations.",
-        "x-placeholder": "Confirm that you agree to the fund rules"
-    }
-},
-"x-order": ["fundAcknowledgements"]
-}
-},
-"x-order": ["categoryRules", "fundRules"]
-}
-}
 }
