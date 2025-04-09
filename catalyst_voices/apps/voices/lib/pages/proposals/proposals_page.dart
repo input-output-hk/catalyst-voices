@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:catalyst_voices/common/error_handler.dart';
 import 'package:catalyst_voices/common/signal_handler.dart';
 import 'package:catalyst_voices/pages/proposals/widgets/proposals_controls.dart';
 import 'package:catalyst_voices/pages/proposals/widgets/proposals_header.dart';
@@ -33,6 +34,7 @@ class ProposalsPage extends StatefulWidget {
 class _ProposalsPageState extends State<ProposalsPage>
     with
         SingleTickerProviderStateMixin,
+        ErrorHandlerStateMixin<ProposalsCubit, ProposalsPage>,
         SignalHandlerStateMixin<ProposalsCubit, ProposalsSignal,
             ProposalsPage> {
   late final TabController _tabController;
