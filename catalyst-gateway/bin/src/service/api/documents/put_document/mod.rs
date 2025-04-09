@@ -7,11 +7,17 @@ use unprocessable_content_request::PutDocumentUnprocessableContent;
 
 use super::common::{DocProvider, VerifyingKeyProvider};
 use crate::{
-    db::event::{
-        error,
-        signed_docs::{FullSignedDoc, SignedDocBody, StoreError},
+    db::{
+        event::{
+            error,
+            signed_docs::{FullSignedDoc, SignedDocBody, StoreError},
+        },
+        index::session::CassandraSessionError,
     },
-    service::common::{auth::rbac::token::CatalystRBACTokenV1, responses::WithErrorResponses},
+    service::common::{
+        auth::rbac::token::CatalystRBACTokenV1, responses::WithErrorResponses,
+        types::headers::retry_after::RetryAfterOption,
+    },
 };
 
 pub(crate) mod unprocessable_content_request;
@@ -80,6 +86,9 @@ pub(crate) async fn endpoint(doc_bytes: Vec<u8>, mut token: CatalystRBACTokenV1)
     let verifying_key_provider =
         match VerifyingKeyProvider::try_from_kids(&mut token, &doc.kids()).await {
             Ok(value) => value,
+            Err(err) if err.is::<CassandraSessionError>() => {
+                return AllResponses::service_unavailable(&err, RetryAfterOption::Default)
+            },
             Err(err) => {
                 return Responses::UnprocessableContent(Json(PutDocumentUnprocessableContent::new(
                     &err, None,
