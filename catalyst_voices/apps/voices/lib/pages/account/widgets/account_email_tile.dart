@@ -24,35 +24,6 @@ class _AccountEmailTileState extends State<AccountEmailTile> {
   StreamSubscription<Email>? _sub;
 
   @override
-  void initState() {
-    super.initState();
-
-    final bloc = context.read<AccountCubit>();
-    final text = bloc.state.email.value;
-    final value = TextEditingValueExt.collapsedAtEndOf(text);
-    _controller = TextEditingController.fromValue(value);
-    _controller.addListener(_handleControllerChange);
-    _email = bloc.state.email;
-
-    _focusNode = FocusNode();
-
-    _sub = bloc.stream
-        .map((event) => event.email)
-        .distinct()
-        .listen(_handleEmailChange);
-  }
-
-  @override
-  void dispose() {
-    unawaited(_sub?.cancel());
-    _sub = null;
-
-    _focusNode.dispose();
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return EditableTile(
       title: context.l10n.emailAddress,
@@ -75,32 +46,33 @@ class _AccountEmailTileState extends State<AccountEmailTile> {
     );
   }
 
-  void _onEditModeChange(EditableTileChange value) {
-    setState(() {
-      _isEditMode = value.isEditMode;
+  @override
+  void dispose() {
+    unawaited(_sub?.cancel());
+    _sub = null;
 
-      if (value.isEditMode) {
-        _focusNode.requestFocus();
-      }
-
-      switch (value.source) {
-        case EditableTileChangeSource.cancel:
-          if (!value.isEditMode) {
-            _onCancel();
-          }
-        case EditableTileChangeSource.save:
-          _onSave();
-      }
-    });
+    _focusNode.dispose();
+    _controller.dispose();
+    super.dispose();
   }
 
-  void _onCancel() {
-    final email = context.read<AccountCubit>().state.email;
-    _controller.textWithSelection = email.value;
-  }
+  @override
+  void initState() {
+    super.initState();
 
-  void _onSave() {
-    unawaited(context.read<AccountCubit>().updateEmail(_email));
+    final bloc = context.read<AccountCubit>();
+    final text = bloc.state.email.value;
+    final value = TextEditingValueExt.collapsedAtEndOf(text);
+    _controller = TextEditingController.fromValue(value);
+    _controller.addListener(_handleControllerChange);
+    _email = bloc.state.email;
+
+    _focusNode = FocusNode();
+
+    _sub = bloc.stream
+        .map((event) => event.email)
+        .distinct()
+        .listen(_handleEmailChange);
   }
 
   void _handleControllerChange() {
@@ -115,5 +87,41 @@ class _AccountEmailTileState extends State<AccountEmailTile> {
     }
 
     _controller.textWithSelection = email.value;
+  }
+
+  void _onCancel() {
+    final email = context.read<AccountCubit>().state.email;
+    _controller.textWithSelection = email.value;
+  }
+
+  void _onEditModeChange(EditableTileChange value) {
+    setState(() {
+      _isEditMode = value.isEditMode;
+
+      if (value.isEditMode) {
+        _focusNode.requestFocus();
+      }
+
+      switch (value.source) {
+        case EditableTileChangeSource.cancel:
+          if (!value.isEditMode) {
+            _onCancel();
+          }
+        case EditableTileChangeSource.save:
+          unawaited(_onSave());
+      }
+    });
+  }
+
+  Future<void> _onSave() async {
+    final cubit = context.read<AccountCubit>();
+    final updated = await cubit.updateEmail(_email);
+
+    if (!updated && mounted) {
+      setState(() {
+        _email = cubit.state.email;
+        _controller.textWithSelection = _email.value;
+      });
+    }
   }
 }

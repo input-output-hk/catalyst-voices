@@ -43,10 +43,11 @@ final class AccountCubit extends Cubit<AccountState>
     // TODO(damian-molinski): Integration
   }
 
-  Future<void> updateEmail(Email email) async {
+  /// Returns true if updated, false otherwise.
+  Future<bool> updateEmail(Email email) async {
     try {
       if (email.isNotValid) {
-        return;
+        return false;
       }
 
       final activeAccount = _userService.user.activeAccount;
@@ -58,16 +59,19 @@ final class AccountCubit extends Cubit<AccountState>
       }
 
       emit(state.copyWith(email: email));
+      return true;
     } catch (error, stackTrace) {
       _logger.severe('Update email', error, stackTrace);
       emitError(LocalizedException.create(error));
+      return false;
     }
   }
 
-  Future<void> updateUsername(Username username) async {
+  /// Returns true if updated, false otherwise.
+  Future<bool> updateUsername(Username username) async {
     try {
       if (username.isNotValid) {
-        return;
+        return false;
       }
 
       final activeAccount = _userService.user.activeAccount;
@@ -81,9 +85,11 @@ final class AccountCubit extends Cubit<AccountState>
       }
 
       emit(state.copyWith(username: username));
+      return true;
     } catch (error, stackTrace) {
       _logger.severe('Update username', error, stackTrace);
       emitError(LocalizedException.create(error));
+      return false;
     }
   }
 
