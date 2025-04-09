@@ -73,15 +73,18 @@ final class UserServiceImpl implements UserService {
   Future<void> registerAccount(Account account) async {
     var user = await getUser();
 
-    assert(
-      !user.hasAccount(id: account.catalystId),
-      'The account must not be registered already!',
-    );
+    if (user.hasAccount(id: account.catalystId)) {
+      throw StateError(
+        'The account must not be registered, id: ${account.catalystId}',
+      );
+    }
 
     user = user.addAccount(account);
     user = user.useAccount(id: account.catalystId);
 
     await _updateUser(user);
+    // updating email must be after updating user so that
+    // the request is sent with correct access token
     unawaited(_userRepository.updateEmail(account.email));
   }
 
