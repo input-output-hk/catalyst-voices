@@ -150,7 +150,7 @@ enum CampaignTimelinePlacement {
 
     return switch ((this, isOngoing)) {
       (discovery, _) => colors.onSurfaceNeutralOpaqueLv0,
-      (workspace, true) => colors.onSurfacePrimary08,
+      (workspace, true) => colors.onSurfaceNeutralOpaqueLv0,
       (workspace, false) => colors.onSurfaceNeutralOpaqueLv1,
     };
   }

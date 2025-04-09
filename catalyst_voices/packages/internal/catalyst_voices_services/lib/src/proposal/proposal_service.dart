@@ -399,47 +399,56 @@ final class ProposalServiceImpl implements ProposalService {
 
   @override
   Stream<List<Proposal>> watchUserProposals() async* {
-    final proposer = _isProposer();
-    if (!proposer) {
-      return;
-    }
+    yield* _userService.watchUser.distinct().switchMap((user) {
+      final authorId = user.activeAccount?.catalystId;
+      if (!_isProposer(user) || authorId == null) {
+        return const Stream.empty();
+      }
 
-    final authorId = _getUserCatalystId();
-    yield* _proposalRepository
-        .watchUserProposals(authorId: authorId)
-        .switchMap((documents) async* {
-      final proposalsDataStreams = await Future.wait(
-        documents.map(_createProposalDataStream).toList(),
-      );
+      return _proposalRepository
+          .watchUserProposals(authorId: authorId)
+          .distinct()
+          .switchMap((documents) async* {
+        if (documents.isEmpty) {
+          yield [];
+          return;
+        }
+        final proposalsDataStreams = await Future.wait(
+          documents.map(_createProposalDataStream).toList(),
+        );
 
-      yield* Rx.combineLatest(
-        proposalsDataStreams,
-        (List<ProposalData?> proposalsData) async {
-          final validProposalsData =
-              proposalsData.whereType<ProposalData>().toList();
+        yield* Rx.combineLatest(
+          proposalsDataStreams,
+          (List<ProposalData?> proposalsData) async {
+            final validProposalsData =
+                proposalsData.whereType<ProposalData>().toList();
 
-          final groupedProposals = groupBy(
-            validProposalsData,
-            (data) => data.document.metadata.selfRef.id,
-          );
+            final groupedProposals = groupBy(
+              validProposalsData,
+              (data) => data.document.metadata.selfRef.id,
+            );
 
-          final filteredProposalsData = groupedProposals.values
-              .map((group) {
-                if (group.any((p) => p.publish != ProposalPublish.localDraft)) {
-                  return group
-                      .where((p) => p.publish != ProposalPublish.localDraft);
-                }
-                return group;
-              })
-              .expand((group) => group)
-              .toList();
+            final filteredProposalsData = groupedProposals.values
+                .map((group) {
+                  if (group.any(
+                    (p) => p.publish != ProposalPublish.localDraft,
+                  )) {
+                    return group.where(
+                      (p) => p.publish != ProposalPublish.localDraft,
+                    );
+                  }
+                  return group;
+                })
+                .expand((group) => group)
+                .toList();
 
-          final proposalsWithVersions = await Future.wait(
-            filteredProposalsData.map(_addVersionsToProposal),
-          );
-          return proposalsWithVersions.map(Proposal.fromData).toList();
-        },
-      ).switchMap(Stream.fromFuture);
+            final proposalsWithVersions = await Future.wait(
+              filteredProposalsData.map(_addVersionsToProposal),
+            );
+            return proposalsWithVersions.map(Proposal.fromData).toList();
+          },
+        ).switchMap(Stream.fromFuture);
+      });
     });
   }
 
@@ -512,11 +521,7 @@ final class ProposalServiceImpl implements ProposalService {
     return account.catalystId;
   }
 
-  bool _isProposer() {
-    final proposer =
-        _userService.user.activeAccount?.roles.contains(AccountRole.proposer) ??
-            false;
-
-    return proposer;
+  bool _isProposer(User user) {
+    return user.activeAccount?.roles.contains(AccountRole.proposer) ?? false;
   }
 }
