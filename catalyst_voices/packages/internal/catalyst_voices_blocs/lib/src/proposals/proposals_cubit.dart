@@ -13,7 +13,9 @@ final _logger = Logger('ProposalsCubit');
 
 /// Manages the proposals.
 final class ProposalsCubit extends Cubit<ProposalsState>
-    with BlocSignalEmitterMixin<ProposalsSignal, ProposalsState> {
+    with
+        BlocErrorEmitterMixin,
+        BlocSignalEmitterMixin<ProposalsSignal, ProposalsState> {
   final UserService _userService;
   final CampaignService _campaignService;
   final ProposalService _proposalService;
@@ -155,11 +157,7 @@ final class ProposalsCubit extends Cubit<ProposalsState>
 
     emit(state.copyWith(favoritesIds: favoritesIds));
 
-    if (isFavorite) {
-      unawaited(_proposalService.addFavoriteProposal(ref: ref));
-    } else {
-      unawaited(_proposalService.removeFavoriteProposal(ref: ref));
-    }
+    unawaited(_updateFavoriteProposal(ref, isFavorite: isFavorite));
   }
 
   void updateSearchQuery(String query) {
@@ -212,6 +210,23 @@ final class ProposalsCubit extends Cubit<ProposalsState>
     }).toList();
 
     emit(state.copyWith(categorySelectorItems: categorySelectorItems));
+  }
+
+  Future<void> _updateFavoriteProposal(
+    DocumentRef ref, {
+    required bool isFavorite,
+  }) async {
+    try {
+      if (isFavorite) {
+        await _proposalService.addFavoriteProposal(ref: ref);
+      } else {
+        await _proposalService.removeFavoriteProposal(ref: ref);
+      }
+    } catch (error, stack) {
+      _logger.severe('Updating proposal[$ref] favorite failed', error, stack);
+
+      emitError(LocalizedException.create(error));
+    }
   }
 
   void _watchProposalsCount({
