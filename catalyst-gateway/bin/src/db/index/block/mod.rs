@@ -23,7 +23,7 @@ use super::{queries::FallibleQueryTasks, session::CassandraSession};
 pub(crate) async fn index_block(block: &MultiEraBlock) -> anyhow::Result<()> {
     // Get the session.  This should never fail.
     let Some(session) = CassandraSession::get(block.is_immutable()) else {
-        anyhow::bail!("Failed to get Index DB Session.  Can not index block.");
+        anyhow::bail!("Failed to get Index DB Session. Can not index block.");
     };
 
     let mut cert_index = CertInsertQuery::new();
