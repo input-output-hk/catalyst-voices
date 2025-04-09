@@ -91,7 +91,7 @@ impl FullSignedDoc {
             Ok(()) => Ok(true),
             Err(_) => {
                 // Attempt to retrieve the document now that we failed to insert
-                match Self::retrieve(self.id(), Some(self.ver())).await {
+                match Self::retrieve(self.id(), self.ver()).await {
                     Ok(res_doc) => {
                         anyhow::ensure!(&res_doc == self, StoreError);
                         // Document already exists and matches, return false
@@ -116,9 +116,7 @@ impl FullSignedDoc {
     /// # Arguments:
     ///  - `id` is a UUID v7
     ///  - `ver` is a UUID v7
-    pub(crate) async fn retrieve(
-        id: &uuid::Uuid, ver: Option<&uuid::Uuid>,
-    ) -> anyhow::Result<Self> {
+    pub(crate) async fn retrieve(id: &uuid::Uuid, ver: &uuid::Uuid) -> anyhow::Result<Self> {
         let query_template = get_template(&SELECT_SIGNED_DOCS_TEMPLATE)?;
         let query = query_template.render(serde_json::json!({
             "id": id,
@@ -145,18 +143,12 @@ impl FullSignedDoc {
 
     /// Creates a  `FullSignedDoc` from postgresql row object.
     fn from_row(
-        id: &uuid::Uuid, ver: Option<&uuid::Uuid>, row: &tokio_postgres::Row,
+        id: &uuid::Uuid, ver: &uuid::Uuid, row: &tokio_postgres::Row,
     ) -> anyhow::Result<Self> {
-        let ver = if let Some(ver) = ver {
-            *ver
-        } else {
-            row.try_get("ver")?
-        };
-
         Ok(FullSignedDoc {
             body: SignedDocBody::new(
                 *id,
-                ver,
+                *ver,
                 row.try_get("type")?,
                 row.try_get("authors")?,
                 row.try_get("metadata")?,
