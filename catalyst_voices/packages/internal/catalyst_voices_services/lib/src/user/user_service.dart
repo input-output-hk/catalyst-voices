@@ -18,6 +18,12 @@ abstract interface class UserService implements ActiveAware {
 
   Future<User> getUser();
 
+  /// Registers a new [account] and makes it active.
+  ///
+  /// It can invoke some one-time registration logic,
+  /// contrary to [useAccount] which doesn't have such logic.
+  Future<void> registerAccount(Account account);
+
   Future<void> removeAccount(Account account);
 
   Future<void> updateAccount({
@@ -29,6 +35,7 @@ abstract interface class UserService implements ActiveAware {
 
   Future<void> updateSettings(UserSettings newValue);
 
+  /// Make the [account] active one. If it doesn't exist then it'll be created.
   Future<void> useAccount(Account account);
 
   Future<void> useLastAccount();
@@ -61,6 +68,22 @@ final class UserServiceImpl implements UserService {
 
   @override
   Future<User> getUser() => _userRepository.getUser();
+
+  @override
+  Future<void> registerAccount(Account account) async {
+    var user = await getUser();
+
+    assert(
+      !user.hasAccount(id: account.catalystId),
+      'The account must not be registered already!',
+    );
+
+    user = user.addAccount(account);
+    user = user.useAccount(id: account.catalystId);
+
+    await _updateUser(user);
+    unawaited(_userRepository.updateEmail(account.email));
+  }
 
   @override
   Future<void> removeAccount(Account account) async {

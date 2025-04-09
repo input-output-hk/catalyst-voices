@@ -13,6 +13,7 @@ import 'package:uuid_plus/uuid_plus.dart';
 
 void main() {
   late final KeychainProvider keychainProvider;
+  late final _MockUserDataSource userDataSource;
   late final UserRepository userRepository;
   late final UserObserver userObserver;
 
@@ -29,9 +30,10 @@ void main() {
       sharedPreferences: SharedPreferencesAsync(),
       cacheConfig: const CacheConfig(),
     );
+    userDataSource = _MockUserDataSource();
     userRepository = UserRepository(
       SecureUserStorage(),
-      _MockUserDataSource(),
+      userDataSource,
       keychainProvider,
     );
     userObserver = StreamUserObserver();
@@ -46,6 +48,7 @@ void main() {
   });
 
   tearDown(() async {
+    reset(userDataSource);
     userObserver.user = const User.empty();
 
     await const FlutterSecureStorage().deleteAll();
@@ -53,6 +56,29 @@ void main() {
   });
 
   group(UserService, () {
+    test('when registering account getter returns that account', () async {
+      // Given
+      final keychainId = const Uuid().v4();
+
+      // When
+      final keychain = await keychainProvider.create(keychainId);
+      final account = Account.dummy(
+        catalystId: DummyCatalystIdFactory.create(),
+        keychain: keychain,
+      );
+
+      when(() => userDataSource.updateEmail(account.email))
+          .thenAnswer((_) async => {});
+
+      await service.registerAccount(account);
+
+      // Then
+      final currentAccount = service.user.activeAccount;
+
+      expect(currentAccount?.catalystId, account.catalystId);
+      expect(currentAccount?.isActive, isTrue);
+    });
+
     test('when using account getter returns that account', () async {
       // Given
       final keychainId = const Uuid().v4();
