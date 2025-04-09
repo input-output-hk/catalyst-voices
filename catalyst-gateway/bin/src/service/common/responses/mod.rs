@@ -33,6 +33,7 @@ use super::types::headers::{
     ratelimit::RateLimitHeader,
     retry_after::{RetryAfterHeader, RetryAfterOption},
 };
+use crate::db::index::session::CassandraSessionError;
 
 /// Default error responses
 #[derive(ApiResponse)]
@@ -146,6 +147,9 @@ impl<T> WithErrorResponses<T> {
     pub(crate) fn handle_error(err: &anyhow::Error) -> Self {
         match err {
             err if err.is::<bb8::RunError<tokio_postgres::Error>>() => {
+                Self::service_unavailable(err, RetryAfterOption::Default)
+            },
+            err if err.is::<CassandraSessionError>() => {
                 Self::service_unavailable(err, RetryAfterOption::Default)
             },
             err => Self::internal_error(err),

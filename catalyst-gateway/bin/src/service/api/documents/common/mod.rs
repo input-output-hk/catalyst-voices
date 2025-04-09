@@ -95,8 +95,8 @@ impl VerifyingKeyProvider {
     /// - The KID is not a singing key.
     /// - The latest signing key for a required role cannot be found.
     /// - The KID is not using the latest rotation.
-    pub(crate) fn try_from_kids(
-        token: &CatalystRBACTokenV1, kids: &[catalyst_signed_doc::IdUri],
+    pub(crate) async fn try_from_kids(
+        token: &mut CatalystRBACTokenV1, kids: &[catalyst_signed_doc::IdUri],
     ) -> anyhow::Result<Self> {
         if kids.len() > 1 {
             anyhow::bail!("Multi-signature document is currently unsupported");
@@ -109,7 +109,7 @@ impl VerifyingKeyProvider {
             anyhow::bail!("RBAC Token CatID does not match with the document KIDs");
         }
 
-        let Some(reg_chain) = token.reg_chain() else {
+        let Some(reg_chain) = token.reg_chain().await? else {
             anyhow::bail!("Failed to retrieve a registration from corresponding Catalyst ID");
         };
 
