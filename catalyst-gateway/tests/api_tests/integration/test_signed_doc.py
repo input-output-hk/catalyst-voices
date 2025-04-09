@@ -173,6 +173,7 @@ def test_templates(proposal_templates, comment_templates, rbac_auth_token_factor
         ), f"Failed to get document: {resp.status_code} - {resp.text} for id {template_id}"
 
 
+@pytest.mark.skip("Enable when it will ready run Cardano indexing in CI")
 def test_proposal_doc(proposal_doc_factory, rbac_auth_token_factory):
     rbac_auth_token = rbac_auth_token_factory()
     proposal_doc = proposal_doc_factory()
@@ -235,6 +236,7 @@ def test_proposal_doc(proposal_doc_factory, rbac_auth_token_factory):
     logger.info("Proposal document test successful.")
 
 
+@pytest.mark.skip("Enable when it will ready run Cardano indexing in CI")
 def test_comment_doc(comment_doc_factory, rbac_auth_token_factory):
     rbac_auth_token = rbac_auth_token_factory()
     comment_doc = comment_doc_factory()
@@ -280,6 +282,7 @@ def test_comment_doc(comment_doc_factory, rbac_auth_token_factory):
     logger.info("Comment document test successful.")
 
 
+@pytest.mark.skip("Enable when it will ready run Cardano indexing in CI")
 def test_submission_action(submission_action_factory, rbac_auth_token_factory):
     rbac_auth_token = rbac_auth_token_factory()
     submission_action = submission_action_factory()
@@ -324,6 +327,7 @@ def test_submission_action(submission_action_factory, rbac_auth_token_factory):
     logger.info("Submission action document test successful.")
 
 
+@pytest.mark.skip("Enable when it will ready run Cardano indexing in CI")
 def test_document_index_endpoint(proposal_doc_factory, rbac_auth_token_factory):
     rbac_auth_token = rbac_auth_token_factory()
     # submiting 10 proposal documents
