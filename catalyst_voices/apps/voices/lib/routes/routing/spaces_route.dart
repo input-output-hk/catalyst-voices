@@ -14,7 +14,6 @@ import 'package:catalyst_voices/routes/guards/user_access_guard.dart';
 import 'package:catalyst_voices/routes/routing/routes.dart';
 import 'package:catalyst_voices/routes/routing/transitions/transitions.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 

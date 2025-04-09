@@ -32,7 +32,7 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
     required PageRequest request,
     required ProposalsFilters filters,
   }) async {
-    return Page(
+    return const Page(
       page: 0,
       maxPerPage: 0,
       total: 0,

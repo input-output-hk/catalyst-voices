@@ -35,7 +35,7 @@ final class DatabaseDocumentsDataSource
       page: request.page,
       maxPerPage: request.size,
       total: 0,
-      items: [],
+      items: const [],
     );
   }
 
