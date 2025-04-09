@@ -137,14 +137,23 @@ async fn checker_api_catalyst_auth(
     };
 
     // Step 6: get and build latest registration chain from the db.
-    if let Err(err) = token.reg_chain_mut().await {
-        if err.is::<CassandraSessionError>() {
-            return Err(ServiceUnavailableError(err).into());
-        }
-
-        error!("Unable to build a registration chain Catalyst ID: {err:?}");
-        return Err(AuthTokenError.into());
-    }
+    let reg_chain = match token.reg_chain().await {
+        Ok(Some(reg_chain)) => reg_chain,
+        Ok(None) => {
+            error!(
+                "Unable to find registrations for {} Catalyst ID",
+                token.catalyst_id()
+            );
+            return Err(AuthTokenError.into());
+        },
+        Err(err) if err.is::<CassandraSessionError>() => {
+            return Err(ServiceUnavailableError(err).into())
+        },
+        Err(err) => {
+            error!("Unable to build a registration chain Catalyst ID: {err:?}");
+            return Err(AuthTokenError.into());
+        },
+    };
 
     // Step 7: Verify that the nonce is in the acceptable range.
     if !token.is_young(MAX_TOKEN_AGE, MAX_TOKEN_SKEW) {
@@ -153,13 +162,6 @@ async fn checker_api_catalyst_auth(
         Err(AuthTokenAccessViolation(vec!["EXPIRED".to_string()]))?;
     }
 
-    let Some(reg_chain) = token.reg_chain() else {
-        error!(
-            "Unable to find registrations for {} Catalyst ID",
-            token.catalyst_id()
-        );
-        return Err(AuthTokenError.into());
-    };
     // TODO: Caching is currently disabled because we want to measure the performance without
     // it.
     // // Its valid and young enough, check if its in the auth cache.
