@@ -14,11 +14,9 @@
             ]
         },
         "theme": {
-            "themeSelection": {
-                "grouped_tag": {
-                    "group": "DeFi",
-                    "tag": "Staking"
-                }
+            "grouped_tag": {
+                "group": "DeFi",
+                "tag": "Staking"
             }
         },
         "openSource": {
@@ -109,8 +107,7 @@
         "milestoneSetup": {
             "numberOfMilestones": 3
         },
-        "milestone_list": [
-            {
+        "milestone_list": [{
                 "title": "Initial Setup and Planning",
                 "outputs": "Project infrastructure setup and detailed planning documents",
                 "acceptance_criteria": "- Development environment configured\n- Detailed project plan approved",
