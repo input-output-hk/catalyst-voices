@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'dart:typed_data';
 
+import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/common/ext/space_ext.dart';
+import 'package:catalyst_voices/routes/routing/routing.dart';
 import 'package:catalyst_voices/widgets/campaign_timeline/campaign_timeline_card.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/create_new_proposal_dialog.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
@@ -23,6 +25,83 @@ class WorkspaceHeader extends StatefulWidget {
 
   @override
   State<WorkspaceHeader> createState() => _WorkspaceHeaderState();
+}
+
+class _HasCommentCard extends StatelessWidget {
+  const _HasCommentCard();
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: () async => ProposalsRoute.myProposals().push(context),
+        child: Container(
+          decoration: BoxDecoration(
+            color: context.colors.elevationsOnSurfaceNeutralLv0,
+            borderRadius: BorderRadius.circular(16),
+          ),
+          padding: const EdgeInsets.all(16),
+          constraints: const BoxConstraints(
+            maxWidth: 300,
+            maxHeight: 190,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                children: [
+                  VoicesAssets.icons.chat.buildIcon(
+                    color: context.colors.iconsPrimary,
+                  ),
+                  const Spacer(),
+                  VoicesAssets.icons.arrowRight.buildIcon(
+                    color: context.colors.primaryContainer,
+                  ),
+                ],
+              ),
+              const Spacer(),
+              Text(
+                context.l10n.viewProposalComments,
+                style: context.textTheme.titleSmall?.copyWith(
+                  color: context.colors.textOnPrimaryLevel1,
+                ),
+              ),
+              Text(
+                context.l10n.viewProposalCommentsDescription,
+                style: context.textTheme.bodyMedium?.copyWith(
+                  color: context.colors.sysColorsNeutralN60,
+                ),
+              ),
+              const Spacer(),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ViewComments extends StatelessWidget {
+  const _ViewComments();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocSelector<WorkspaceBloc, WorkspaceState, bool>(
+      selector: (state) {
+        return state.hasComments;
+      },
+      builder: (context, hasComments) {
+        return hasComments
+            ? const Padding(
+                padding: EdgeInsets.only(right: 24),
+                child: _HasCommentCard(),
+              )
+            : const SizedBox.shrink();
+      },
+    );
+  }
 }
 
 class _WorkspaceHeaderState extends State<WorkspaceHeader> {
@@ -70,6 +149,7 @@ class _WorkspaceHeaderState extends State<WorkspaceHeader> {
           if (_isTimelineVisible) ...[
             Row(
               children: [
+                const _ViewComments(),
                 Expanded(
                   child: Container(
                     padding: const EdgeInsets.all(16),

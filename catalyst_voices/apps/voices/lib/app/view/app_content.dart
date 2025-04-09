@@ -2,6 +2,7 @@ import 'package:catalyst_voices/app/view/app_active_state_listener.dart';
 import 'package:catalyst_voices/app/view/app_mobile_access_restriction.dart';
 import 'package:catalyst_voices/app/view/app_precache_image_assets.dart';
 import 'package:catalyst_voices/app/view/app_session_listener.dart';
+import 'package:catalyst_voices/app/view/app_splash_screen_manager.dart';
 import 'package:catalyst_voices/common/ext/preferences_ext.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
@@ -78,7 +79,9 @@ final class _AppContent extends StatelessWidget {
             child: GlobalPrecacheImages(
               child: GlobalSessionListener(
                 child: AppMobileAccessRestriction(
-                  child: child ?? const SizedBox.shrink(),
+                  child: AppSplashScreenManager(
+                    child: child ?? const SizedBox.shrink(),
+                  ),
                 ),
               ),
             ),
