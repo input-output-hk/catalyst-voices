@@ -728,6 +728,87 @@ void main() {
         expect(page.total, 1);
         expect(page.items.map((e) => e.proposal.ref), expectedRefs);
       });
+
+      test('JoinedProposal is build correctly ', () async {
+        // Given
+        final templateRef = SignedDocumentRef.generateFirstRef();
+
+        final templates = [
+          _buildProposalTemplate(selfRef: templateRef),
+        ];
+
+        final proposalRef1 = _buildRefAt(DateTime(2025, 4, 1));
+        final proposalRef2 =
+            _buildRefAt(DateTime(2025, 4, 2)).copyWith(id: proposalRef1.id);
+        final proposalRef3 =
+            _buildRefAt(DateTime(2025, 4, 3)).copyWith(id: proposalRef1.id);
+
+        final proposals = [
+          _buildProposal(
+            selfRef: proposalRef1,
+            template: templateRef,
+          ),
+          _buildProposal(
+            selfRef: proposalRef2,
+            template: templateRef,
+          ),
+          _buildProposal(
+            selfRef: proposalRef3,
+            template: templateRef,
+          ),
+        ];
+
+        final actions = [
+          _buildProposalAction(
+            selfRef: _buildRefAt(DateTime(2025, 4, 5)),
+            action: ProposalSubmissionActionDto.aFinal,
+            proposalRef: proposalRef2,
+          ),
+          _buildProposalAction(
+            selfRef: _buildRefAt(DateTime(2025, 4, 1)),
+            action: ProposalSubmissionActionDto.draft,
+            proposalRef: proposalRef1,
+          ),
+        ];
+
+        final comments = [
+          _buildProposalComment(proposalRef: proposalRef1),
+          _buildProposalComment(proposalRef: proposalRef2),
+          _buildProposalComment(proposalRef: proposalRef2),
+          _buildProposalComment(proposalRef: proposalRef3),
+        ];
+
+        const filters = ProposalsFilters();
+
+        // When
+        await database.documentsDao.saveAll([
+          ...templates,
+          ...proposals,
+          ...actions,
+          ...comments,
+        ]);
+
+        // Then
+        const request = PageRequest(page: 0, size: 25);
+        final page = await database.proposalsDao.queryProposalsPage(
+          request: request,
+          filters: filters,
+        );
+
+        expect(page.page, 0);
+        expect(page.total, 1);
+
+        final joinedProposal = page.items.single;
+
+        expect(joinedProposal.proposal, proposals[1].document);
+        expect(joinedProposal.template, templates[0].document);
+        expect(joinedProposal.action, actions[0].document);
+        expect(joinedProposal.commentsCount, 2);
+        expect(
+          joinedProposal.versions,
+          proposals.map((e) => e.document.ref.version).toList().reversed,
+        );
+      });
     });
   });
 }
@@ -793,6 +874,27 @@ DocumentEntityWithMetadata _buildProposalAction({
   );
 
   const metadataEntities = <DocumentMetadataEntity>[];
+
+  return (document: document, metadata: metadataEntities);
+}
+
+DocumentEntityWithMetadata _buildProposalComment({
+  SignedDocumentRef? selfRef,
+  required DocumentRef proposalRef,
+}) {
+  final metadata = DocumentDataMetadata(
+    type: DocumentType.commentDocument,
+    selfRef: selfRef ?? SignedDocumentRef.generateFirstRef(),
+    ref: proposalRef,
+  );
+  const content = DocumentDataContent({});
+
+  final document = DocumentFactory.build(
+    content: content,
+    metadata: metadata,
+  );
+
+  final metadataEntities = <DocumentMetadataEntity>[];
 
   return (document: document, metadata: metadataEntities);
 }

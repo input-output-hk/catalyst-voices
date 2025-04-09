@@ -13,13 +13,7 @@ import 'package:catalyst_voices_repositories/src/database/table/documents_metada
 import 'package:catalyst_voices_repositories/src/dto/proposal/proposal_submission_action_dto.dart';
 import 'package:drift/drift.dart';
 import 'package:drift/extensions/json1.dart';
-
-typedef _IdsFilter = ({
-  Iterable<UuidHiLo>? include,
-  Iterable<UuidHiLo>? exclude
-});
-typedef _ProposalsActions = Map<SignedDocumentRef, ProposalSubmissionAction>;
-typedef _RefAction = ({SignedDocumentRef ref, ProposalSubmissionAction action});
+import 'package:equatable/equatable.dart';
 
 @DriftAccessor(
   tables: [
@@ -67,6 +61,14 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
         useColumns: false,
       ),
     ])
+      ..where(
+        Expression.and([
+          proposal.type.equalsValue(DocumentType.proposalDocument),
+          // Safe check for invalid proposals
+          proposal.metadata.jsonExtract(r'$.template').isNotNull(),
+          proposal.metadata.jsonExtract(r'$.categoryId').isNotNull(),
+        ]),
+      )
       ..orderBy([OrderingTerm.asc(proposal.verHi)])
       ..limit(request.size, offset: request.page * request.size);
 
@@ -144,29 +146,33 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
       'Invalid document type',
     );
 
-    final templateRef = proposal.metadata.template!;
-    final templateId = UuidHiLo.from(templateRef.id);
-    final templateVer = UuidHiLo.fromNullable(templateRef.version);
+    var proposalRef = proposal.metadata.selfRef;
 
-    final templateQuery = select(documents)
-      ..where(
-        (tbl) => Expression.and([
-          tbl.type.equalsValue(DocumentType.proposalTemplate),
-          tbl.idHi.equals(templateId.high),
-          tbl.idLo.equals(templateId.low),
-          if (templateVer != null) ...[
-            tbl.verHi.equals(templateVer.high),
-            tbl.verLo.equals(templateVer.low),
-          ],
-        ]),
-      )
-      ..limit(1);
+    final latestAction =
+        await _getProposalsLatestAction(proposalId: proposalRef.id)
+            .then((value) => value.singleOrNull);
 
-    final template = await templateQuery.getSingle();
+    var effectiveProposal = proposal;
+
+    if (latestAction != null && latestAction.proposalRef != proposalRef) {
+      final latestActionProposal = await _getDocument(latestAction.proposalRef);
+
+      effectiveProposal = latestActionProposal;
+    }
+
+    proposalRef = effectiveProposal.metadata.selfRef;
+
+    final template = await _getDocument(effectiveProposal.metadata.template!);
+    final action = await _maybeGetDocument(latestAction?.selfRef);
+    final commentsCount = await _getProposalCommentsCount(proposalRef);
+    final versions = await _getProposalVersions(proposalRef.id);
 
     return JoinedProposalEntity(
-      proposal: proposal,
+      proposal: effectiveProposal,
       template: template,
+      action: action,
+      commentsCount: commentsCount,
+      versions: versions,
     );
   }
 
@@ -195,6 +201,12 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
     }).get();
   }
 
+  Future<DocumentEntity> _getDocument(DocumentRef ref) async {
+    final document = await _maybeGetDocument(ref);
+    assert(document != null, 'Did not found document with ref[$ref]');
+    return document!;
+  }
+
   Future<List<SignedDocumentRef>> _getFavoritesRefs() {
     final query = selectOnly(documentsFavorites)
       ..addColumns([
@@ -221,66 +233,109 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
   Future<_IdsFilter> _getFilterTypeIds(ProposalsFilterType type) {
     switch (type) {
       case ProposalsFilterType.total:
-        return Future.value((include: null, exclude: null));
+        return _getProposalsLatestAction().then(
+          (value) {
+            return value
+                .where((element) => element.action.isHidden)
+                .map((e) => e.proposalRef.id)
+                .map(UuidHiLo.from);
+          },
+        ).then(_IdsFilter.exclude);
       case ProposalsFilterType.drafts:
         return _getProposalsLatestAction().then(
           (value) {
-            return value.entries
-                .where((element) => element.value.isNotDraft)
-                .map((e) => e.key.id)
+            return value
+                .where((element) => element.action.isNotDraft)
+                .map((e) => e.proposalRef.id)
                 .map(UuidHiLo.from);
           },
-        ).then((value) => (include: null, exclude: value));
+        ).then(_IdsFilter.exclude);
       case ProposalsFilterType.finals:
         return _getProposalsLatestAction().then(
           (value) {
-            return value.entries
-                .where((element) => element.value.isFinal)
-                .map((e) => e.key.id)
+            return value
+                .where((element) => element.action.isFinal)
+                .map((e) => e.proposalRef.id)
                 .map(UuidHiLo.from);
           },
-        ).then((value) => (include: value, exclude: null));
+        ).then(_IdsFilter.include);
       case ProposalsFilterType.favorites:
         return _getFavoritesRefs()
             .then((value) => value.map((e) => e.id).map(UuidHiLo.from))
-            .then((value) => (include: value, exclude: null));
+            .then(_IdsFilter.include);
       case ProposalsFilterType.my:
-        return Future.value((include: null, exclude: null));
+        return Future.value(const _IdsFilter());
     }
   }
 
   Future<List<SignedDocumentRef>> _getFinalProposalsRefs() {
     return _getProposalsLatestAction().then(
-      (value) => value.entries
-          .where((element) => element.value.isFinal)
-          .map((e) => e.key)
+      (value) => value
+          .where((element) => element.action.isFinal)
+          .map((e) => e.proposalRef)
           .toList(),
     );
   }
 
-  Future<_ProposalsActions> _getProposalsLatestAction() {
+  Future<int> _getProposalCommentsCount(DocumentRef ref) {
+    final id = ref.id;
+    final ver = ref.version;
+
+    final amountOfComment = documents.rowId.count();
+
+    final query = selectOnly(documents)
+      ..addColumns([
+        amountOfComment,
+      ])
+      ..where(
+        Expression.and([
+          documents.type.equalsValue(DocumentType.commentDocument),
+          documents.metadata.jsonExtract<String>(r'$.ref.id').equals(id),
+          if (ver != null)
+            documents.metadata
+                .jsonExtract<String>(r'$.ref.version')
+                .equals(ver),
+        ]),
+      )
+      ..orderBy([OrderingTerm.desc(documents.verHi)]);
+
+    return query
+        .map((row) => row.read(amountOfComment))
+        .getSingleOrNull()
+        .then((value) => value ?? 0);
+  }
+
+  Future<List<_ProposalActions>> _getProposalsLatestAction({
+    String? proposalId,
+  }) {
     final refId = documents.metadata.jsonExtract<String>(r'$.ref.id');
     final refVer = documents.metadata.jsonExtract<String>(r'$.ref.version');
     final query = selectOnly(documents, distinct: true)
       ..addColumns([
+        documents.idHi,
+        documents.idLo,
         documents.verHi,
+        documents.verLo,
         refId,
         refVer,
         documents.content,
       ])
-      ..where(documents.type.equalsValue(DocumentType.proposalActionDocument))
+      ..where(
+        Expression.and([
+          documents.type.equalsValue(DocumentType.proposalActionDocument),
+          refId.isNotNull(),
+          if (proposalId != null) refId.equals(proposalId),
+        ]),
+      )
       ..orderBy([OrderingTerm.desc(documents.verHi)]);
 
     return query
         .map((row) {
-          final id = row.read(refId);
-          final ver = row.read(refVer);
-
-          if (id == null) {
-            return null;
-          }
-
-          final proposalRef = SignedDocumentRef(id: id, version: ver);
+          final selfRef = row.readSelfRef(documents);
+          final proposalRef = SignedDocumentRef(
+            id: row.read(refId)!,
+            version: row.read(refVer),
+          );
 
           final content = row.readWithConverter(documents.content);
           final rawAction = content?.data['action'];
@@ -289,22 +344,29 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
               : null;
           final action = actionDto?.toModel();
 
-          return MapEntry(proposalRef, action);
+          if (action == null) {
+            return null;
+          }
+
+          return _ProposalActions(
+            selfRef: selfRef,
+            proposalRef: proposalRef,
+            action: action,
+          );
         })
         .get()
         .then((entities) {
-          final grouped = <String, _RefAction>{};
+          final grouped = <String, _ProposalActions>{};
 
-          for (final entry
-              in entities.nonNulls.where((element) => element.value != null)) {
+          for (final entry in entities.nonNulls) {
             // 1st element per ref is latest. See orderBy.
-            final id = entry.key.id;
+            final id = entry.proposalRef.id;
             if (!grouped.containsKey(id)) {
-              grouped[id] = (ref: entry.key, action: entry.value!);
+              grouped[id] = entry;
             }
           }
 
-          return grouped.map((_, value) => MapEntry(value.ref, value.action));
+          return grouped.values.toList();
         });
   }
 
@@ -321,7 +383,14 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
         documents.verHi,
         documents.verLo,
       ])
-      ..where(documents.type.equalsValue(DocumentType.proposalDocument))
+      ..where(
+        Expression.and([
+          documents.type.equalsValue(DocumentType.proposalDocument),
+          // Safe check for invalid proposals
+          documents.metadata.jsonExtract(r'$.template').isNotNull(),
+          documents.metadata.jsonExtract(r'$.categoryId').isNotNull(),
+        ]),
+      )
       ..orderBy([OrderingTerm.desc(documents.verHi)])
       ..groupBy([documents.idHi + documents.idLo]);
 
@@ -341,6 +410,29 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
     return query.map((row) => row.readSelfRef(documents)).watch();
   }
 
+  Future<List<String>> _getProposalVersions(String id) {
+    final idHiLo = UuidHiLo.from(id);
+
+    final query = selectOnly(documents)
+      ..addColumns([
+        documents.verHi,
+        documents.verLo,
+      ])
+      ..where(
+        Expression.and([
+          documents.idHi.equals(idHiLo.high),
+          documents.idLo.equals(idHiLo.low),
+        ]),
+      )
+      ..orderBy([OrderingTerm.desc(documents.verHi)]);
+
+    return query.map((row) {
+      final high = row.read(documents.verHi)!;
+      final low = row.read(documents.verLo)!;
+      return UuidHiLo(high: high, low: low).uuid;
+    }).get();
+  }
+
   Future<List<SignedDocumentRef>> _maybeGetAuthorProposalsLooseRefs({
     CatalystId? author,
   }) {
@@ -349,6 +441,30 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
     }
 
     return _getAuthorProposalsLooseRefs(author: author);
+  }
+
+  Future<DocumentEntity?> _maybeGetDocument(DocumentRef? ref) {
+    if (ref == null) {
+      return Future.value(null);
+    }
+
+    final id = UuidHiLo.from(ref.id);
+    final ver = UuidHiLo.fromNullable(ref.version);
+
+    final query = select(documents)
+      ..where(
+        (tbl) => Expression.and([
+          tbl.idHi.equals(id.high),
+          tbl.idLo.equals(id.low),
+          if (ver != null) ...[
+            tbl.verHi.equals(ver.high),
+            tbl.verLo.equals(ver.low),
+          ],
+        ]),
+      )
+      ..limit(1);
+
+    return query.getSingleOrNull();
   }
 
   Stream<ProposalsCount> _transformRefsStreamToCount(
@@ -390,6 +506,36 @@ abstract interface class ProposalsDao {
   Stream<ProposalsCount> watchCount({
     required ProposalsCountFilters filters,
   });
+}
+
+final class _IdsFilter extends Equatable {
+  final Iterable<UuidHiLo>? include;
+  final Iterable<UuidHiLo>? exclude;
+
+  // ignore: unused_element_parameter
+  const _IdsFilter({this.include, this.exclude});
+
+  const _IdsFilter.exclude(this.exclude) : include = null;
+
+  const _IdsFilter.include(this.exclude) : include = null;
+
+  @override
+  List<Object?> get props => [include, exclude];
+}
+
+final class _ProposalActions extends Equatable {
+  final SignedDocumentRef selfRef;
+  final SignedDocumentRef proposalRef;
+  final ProposalSubmissionAction action;
+
+  const _ProposalActions({
+    required this.selfRef,
+    required this.proposalRef,
+    required this.action,
+  });
+
+  @override
+  List<Object?> get props => [selfRef, proposalRef, action];
 }
 
 extension on ProposalSubmissionAction {

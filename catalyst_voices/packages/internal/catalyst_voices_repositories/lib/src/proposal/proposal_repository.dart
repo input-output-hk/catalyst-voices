@@ -185,7 +185,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   }) {
     return _proposalsLocalSource
         .getProposalsPage(request: request, filters: filters)
-        .then((value) => value.map(_buildProposalData));
+        .then((value) => value.map((e) => _buildProposalData(e)!));
   }
 
   @override
@@ -369,7 +369,19 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     return proposalAction;
   }
 
-  ProposalData _buildProposalData(ProposalDocumentData data) {
+  ProposalData? _buildProposalData(ProposalDocumentData data) {
+    final action = _buildProposalActionData(data.action);
+
+    final publish = switch (action) {
+      ProposalSubmissionAction.aFinal => ProposalPublish.submittedProposal,
+      ProposalSubmissionAction.hide => null,
+      _ => ProposalPublish.publishedDraft,
+    };
+
+    if (publish == null) {
+      return null;
+    }
+
     final document = _buildProposalDocument(
       documentData: data.proposal,
       templateData: data.template,
@@ -377,10 +389,11 @@ final class ProposalRepositoryImpl implements ProposalRepository {
 
     return ProposalData(
       document: document,
-      // TODO(damian-molinski): not integrated.
-      publish: ProposalPublish.submittedProposal,
-      commentsCount: 0,
+      publish: publish,
+      commentsCount: data.commentsCount,
+      // TODO(damian-molinski): remove it or use different model.
       categoryName: '',
+      // TODO(damian-molinski): only Strings or use different model.
       versions: const [],
     );
   }
@@ -396,10 +409,16 @@ final class ProposalRepositoryImpl implements ProposalRepository {
 
     final template = _buildProposalTemplate(documentData: templateData);
 
+    final categoryId = documentData.metadata.categoryId;
+
+    if (categoryId == null) {
+      print('Found invalid proposal: $documentData');
+    }
+
     final metadata = ProposalMetadata(
       selfRef: documentData.metadata.selfRef,
       templateRef: documentData.metadata.template!,
-      categoryId: documentData.metadata.categoryId!,
+      categoryId: categoryId!,
       authors: documentData.metadata.authors ?? [],
     );
 
