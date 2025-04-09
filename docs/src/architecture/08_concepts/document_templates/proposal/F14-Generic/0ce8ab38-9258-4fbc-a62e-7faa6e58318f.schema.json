@@ -211,6 +211,11 @@
             ],
             "default": "en",
             "x-note": "Select the language code that represents the language of your content."
+        },
+        "borderGroup": {
+            "$comment": "UI - Border Group for better UI rendering",
+            "type": "object",
+            "x-border-color": "#ff0000"
         }
     },
     "type": "object",
@@ -325,266 +330,260 @@
                     "required": ["applicant", "type"],
                     "x-order": ["applicant", "type", "coproposers"]
                 },
+
                 "theme": {
                     "$ref": "#/definitions/section",
                     "title": "Theme",
-                    "description": "The theme of your submission",
-                    "required": ["themeSelection"],
+                    "description": "Long-term vision and categorization of your project",
                     "properties": {
-                        "theme": {
-                            "$ref": "#/definitions/section",
-                            "title": "Theme",
-                            "description": "Long-term vision and categorization of your project",
-                            "properties": {
-                                "grouped_tag": {
-                                    "$ref": "#/definitions/singleGroupedTagSelector",
-                                    "oneOf": [
-                                        {
-                                            "properties": {
-                                                "group": {
-                                                    "$ref": "#/definitions/tagGroup",
-                                                    "const": "Governance"
-                                                },
-                                                "tag": {
-                                                    "$ref": "#/definitions/tagSelection",
-                                                    "enum": [
-                                                        "Governance",
-                                                        "DAO"
-                                                    ]
-                                                }
-                                            }
+                        "grouped_tag": {
+                            "$ref": "#/definitions/singleGroupedTagSelector",
+                            "oneOf": [{
+                                    "properties": {
+                                        "group": {
+                                            "$ref": "#/definitions/tagGroup",
+                                            "const": "Governance"
                                         },
-                                        {
-                                            "properties": {
-                                                "group": {
-                                                    "$ref": "#/definitions/tagGroup",
-                                                    "const": "Education"
-                                                },
-                                                "tag": {
-                                                    "$ref": "#/definitions/tagSelection",
-                                                    "enum": [
-                                                        "Education",
-                                                        "Learn to Earn",
-                                                        "Training",
-                                                        "Translation"
-                                                    ]
-                                                }
-                                            }
-                                        },
-                                        {
-                                            "properties": {
-                                                "group": {
-                                                    "$ref": "#/definitions/tagGroup",
-                                                    "const": "Community & Outreach"
-                                                },
-                                                "tag": {
-                                                    "$ref": "#/definitions/tagSelection",
-                                                    "enum": [
-                                                        "Connected Community",
-                                                        "Community",
-                                                        "Community Outreach",
-                                                        "Social Media"
-                                                    ]
-                                                }
-                                            }
-                                        },
-                                        {
-                                            "properties": {
-                                                "group": {
-                                                    "$ref": "#/definitions/tagGroup",
-                                                    "const": "Development & Tools"
-                                                },
-                                                "tag": {
-                                                    "$ref": "#/definitions/tagSelection",
-                                                    "enum": [
-                                                        "Developer Tools",
-                                                        "L2",
-                                                        "Infrastructure",
-                                                        "Analytics",
-                                                        "AI",
-                                                        "Research",
-                                                        "UTXO",
-                                                        "P2P"
-                                                    ]
-                                                }
-                                            }
-                                        },
-                                        {
-                                            "properties": {
-                                                "group": {
-                                                    "$ref": "#/definitions/tagGroup",
-                                                    "const": "Identity & Security"
-                                                },
-                                                "tag": {
-                                                    "$ref": "#/definitions/tagSelection",
-                                                    "enum": [
-                                                        "Identity & Verification",
-                                                        "Cybersecurity",
-                                                        "Security",
-                                                        "Authentication",
-                                                        "Privacy"
-                                                    ]
-                                                }
-                                            }
-                                        },
-                                        {
-                                            "properties": {
-                                                "group": {
-                                                    "$ref": "#/definitions/tagGroup",
-                                                    "const": "DeFi"
-                                                },
-                                                "tag": {
-                                                    "$ref": "#/definitions/tagSelection",
-                                                    "enum": [
-                                                        "DeFi",
-                                                        "Payments",
-                                                        "Stablecoin",
-                                                        "Risk Management",
-                                                        "Yield",
-                                                        "Staking",
-                                                        "Lending"
-                                                    ]
-                                                }
-                                            }
-                                        },
-                                        {
-                                            "properties": {
-                                                "group": {
-                                                    "$ref": "#/definitions/tagGroup",
-                                                    "const": "Real World Applications"
-                                                },
-                                                "tag": {
-                                                    "$ref": "#/definitions/tagSelection",
-                                                    "enum": [
-                                                        "Wallet",
-                                                        "Marketplace",
-                                                        "Manufacturing",
-                                                        "IoT",
-                                                        "Financial Services",
-                                                        "E-commerce",
-                                                        "Business Services",
-                                                        "Supply Chain",
-                                                        "Real Estate",
-                                                        "Healthcare",
-                                                        "Tourism",
-                                                        "Entertainments",
-                                                        "RWA",
-                                                        "Music",
-                                                        "Tokenization"
-                                                    ]
-                                                }
-                                            }
-                                        },
-                                        {
-                                            "properties": {
-                                                "group": {
-                                                    "$ref": "#/definitions/tagGroup",
-                                                    "const": "Events & Marketing"
-                                                },
-                                                "tag": {
-                                                    "$ref": "#/definitions/tagSelection",
-                                                    "enum": [
-                                                        "Events",
-                                                        "Marketing",
-                                                        "Hackathons",
-                                                        "Accelerator",
-                                                        "Incubator"
-                                                    ]
-                                                }
-                                            }
-                                        },
-                                        {
-                                            "properties": {
-                                                "group": {
-                                                    "$ref": "#/definitions/tagGroup",
-                                                    "const": "Interoperability"
-                                                },
-                                                "tag": {
-                                                    "$ref": "#/definitions/tagSelection",
-                                                    "enum": [
-                                                        "Cross-chain",
-                                                        "Interoperability",
-                                                        "Off-chain",
-                                                        "Legal",
-                                                        "Policy Advocacy",
-                                                        "Standards"
-                                                    ]
-                                                }
-                                            }
-                                        },
-                                        {
-                                            "properties": {
-                                                "group": {
-                                                    "$ref": "#/definitions/tagGroup",
-                                                    "const": "Sustainability"
-                                                },
-                                                "tag": {
-                                                    "$ref": "#/definitions/tagSelection",
-                                                    "enum": [
-                                                        "Sustainability",
-                                                        "Environment",
-                                                        "Agriculture"
-                                                    ]
-                                                }
-                                            }
-                                        },
-                                        {
-                                            "properties": {
-                                                "group": {
-                                                    "$ref": "#/definitions/tagGroup",
-                                                    "const": "Smart Contracts"
-                                                },
-                                                "tag": {
-                                                    "$ref": "#/definitions/tagSelection",
-                                                    "enum": [
-                                                        "Smart Contract",
-                                                        "Smart Contracts",
-                                                        "Audit",
-                                                        "Oracles"
-                                                    ]
-                                                }
-                                            }
-                                        },
-                                        {
-                                            "properties": {
-                                                "group": {
-                                                    "$ref": "#/definitions/tagGroup",
-                                                    "const": "GameFi"
-                                                },
-                                                "tag": {
-                                                    "$ref": "#/definitions/tagSelection",
-                                                    "enum": [
-                                                        "Gaming",
-                                                        "Gaming (GameFi)",
-                                                        "Entertainment",
-                                                        "Metaverse"
-                                                    ]
-                                                }
-                                            }
-                                        },
-                                        {
-                                            "properties": {
-                                                "group": {
-                                                    "$ref": "#/definitions/tagGroup",
-                                                    "const": "NFT"
-                                                },
-                                                "tag": {
-                                                    "$ref": "#/definitions/tagSelection",
-                                                    "enum": [
-                                                        "NFT",
-                                                        "CNFT",
-                                                        "Collectibles",
-                                                        "Digital Twin"
-                                                    ]
-                                                }
-                                            }
+                                        "tag": {
+                                            "$ref": "#/definitions/tagSelection",
+                                            "enum": [
+                                                "Governance",
+                                                "DAO"
+                                            ]
                                         }
-                                    ]
+                                    }
+                                },
+                                {
+                                    "properties": {
+                                        "group": {
+                                            "$ref": "#/definitions/tagGroup",
+                                            "const": "Education"
+                                        },
+                                        "tag": {
+                                            "$ref": "#/definitions/tagSelection",
+                                            "enum": [
+                                                "Education",
+                                                "Learn to Earn",
+                                                "Training",
+                                                "Translation"
+                                            ]
+                                        }
+                                    }
+                                },
+                                {
+                                    "properties": {
+                                        "group": {
+                                            "$ref": "#/definitions/tagGroup",
+                                            "const": "Community & Outreach"
+                                        },
+                                        "tag": {
+                                            "$ref": "#/definitions/tagSelection",
+                                            "enum": [
+                                                "Connected Community",
+                                                "Community",
+                                                "Community Outreach",
+                                                "Social Media"
+                                            ]
+                                        }
+                                    }
+                                },
+                                {
+                                    "properties": {
+                                        "group": {
+                                            "$ref": "#/definitions/tagGroup",
+                                            "const": "Development & Tools"
+                                        },
+                                        "tag": {
+                                            "$ref": "#/definitions/tagSelection",
+                                            "enum": [
+                                                "Developer Tools",
+                                                "L2",
+                                                "Infrastructure",
+                                                "Analytics",
+                                                "AI",
+                                                "Research",
+                                                "UTXO",
+                                                "P2P"
+                                            ]
+                                        }
+                                    }
+                                },
+                                {
+                                    "properties": {
+                                        "group": {
+                                            "$ref": "#/definitions/tagGroup",
+                                            "const": "Identity & Security"
+                                        },
+                                        "tag": {
+                                            "$ref": "#/definitions/tagSelection",
+                                            "enum": [
+                                                "Identity & Verification",
+                                                "Cybersecurity",
+                                                "Security",
+                                                "Authentication",
+                                                "Privacy"
+                                            ]
+                                        }
+                                    }
+                                },
+                                {
+                                    "properties": {
+                                        "group": {
+                                            "$ref": "#/definitions/tagGroup",
+                                            "const": "DeFi"
+                                        },
+                                        "tag": {
+                                            "$ref": "#/definitions/tagSelection",
+                                            "enum": [
+                                                "DeFi",
+                                                "Payments",
+                                                "Stablecoin",
+                                                "Risk Management",
+                                                "Yield",
+                                                "Staking",
+                                                "Lending"
+                                            ]
+                                        }
+                                    }
+                                },
+                                {
+                                    "properties": {
+                                        "group": {
+                                            "$ref": "#/definitions/tagGroup",
+                                            "const": "Real World Applications"
+                                        },
+                                        "tag": {
+                                            "$ref": "#/definitions/tagSelection",
+                                            "enum": [
+                                                "Wallet",
+                                                "Marketplace",
+                                                "Manufacturing",
+                                                "IoT",
+                                                "Financial Services",
+                                                "E-commerce",
+                                                "Business Services",
+                                                "Supply Chain",
+                                                "Real Estate",
+                                                "Healthcare",
+                                                "Tourism",
+                                                "Entertainments",
+                                                "RWA",
+                                                "Music",
+                                                "Tokenization"
+                                            ]
+                                        }
+                                    }
+                                },
+                                {
+                                    "properties": {
+                                        "group": {
+                                            "$ref": "#/definitions/tagGroup",
+                                            "const": "Events & Marketing"
+                                        },
+                                        "tag": {
+                                            "$ref": "#/definitions/tagSelection",
+                                            "enum": [
+                                                "Events",
+                                                "Marketing",
+                                                "Hackathons",
+                                                "Accelerator",
+                                                "Incubator"
+                                            ]
+                                        }
+                                    }
+                                },
+                                {
+                                    "properties": {
+                                        "group": {
+                                            "$ref": "#/definitions/tagGroup",
+                                            "const": "Interoperability"
+                                        },
+                                        "tag": {
+                                            "$ref": "#/definitions/tagSelection",
+                                            "enum": [
+                                                "Cross-chain",
+                                                "Interoperability",
+                                                "Off-chain",
+                                                "Legal",
+                                                "Policy Advocacy",
+                                                "Standards"
+                                            ]
+                                        }
+                                    }
+                                },
+                                {
+                                    "properties": {
+                                        "group": {
+                                            "$ref": "#/definitions/tagGroup",
+                                            "const": "Sustainability"
+                                        },
+                                        "tag": {
+                                            "$ref": "#/definitions/tagSelection",
+                                            "enum": [
+                                                "Sustainability",
+                                                "Environment",
+                                                "Agriculture"
+                                            ]
+                                        }
+                                    }
+                                },
+                                {
+                                    "properties": {
+                                        "group": {
+                                            "$ref": "#/definitions/tagGroup",
+                                            "const": "Smart Contracts"
+                                        },
+                                        "tag": {
+                                            "$ref": "#/definitions/tagSelection",
+                                            "enum": [
+                                                "Smart Contract",
+                                                "Smart Contracts",
+                                                "Audit",
+                                                "Oracles"
+                                            ]
+                                        }
+                                    }
+                                },
+                                {
+                                    "properties": {
+                                        "group": {
+                                            "$ref": "#/definitions/tagGroup",
+                                            "const": "GameFi"
+                                        },
+                                        "tag": {
+                                            "$ref": "#/definitions/tagSelection",
+                                            "enum": [
+                                                "Gaming",
+                                                "Gaming (GameFi)",
+                                                "Entertainment",
+                                                "Metaverse"
+                                            ]
+                                        }
+                                    }
+                                },
+                                {
+                                    "properties": {
+                                        "group": {
+                                            "$ref": "#/definitions/tagGroup",
+                                            "const": "NFT"
+                                        },
+                                        "tag": {
+                                            "$ref": "#/definitions/tagSelection",
+                                            "enum": [
+                                                "NFT",
+                                                "CNFT",
+                                                "Collectibles",
+                                                "Digital Twin"
+                                            ]
+                                        }
+                                    }
                                 }
-                            },
-                            "x-order": ["theme"]
+                            ]
                         }
-                    }
+                    },
+                    "x-order": ["theme"]
+
+
                 },
                 "openSource": {
                     "$ref": "#/definitions/section",
