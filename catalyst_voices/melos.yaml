@@ -122,7 +122,7 @@ command:
           url: https://github.com/input-output-hk/flutter-quill
           path: flutter_quill_extensions
           ref: 532172254c3cee957bbdbb08be922f2c870b7fff
-      flutter_rust_bridge: 2.5.1
+      flutter_rust_bridge: 2.9.0
       flutter_secure_storage: ^9.2.2
       formz: ^0.7.0
       intl: ^0.19.0
