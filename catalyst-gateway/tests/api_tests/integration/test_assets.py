@@ -1,4 +1,5 @@
 import pytest
+from loguru import logger
 from utils.address import stake_public_key_to_address
 from utils.snapshot import snapshot
 from api.v1 import cardano
@@ -8,11 +9,11 @@ from api.v1 import cardano
 def test_persistent_ada_amount_endpoint(snapshot):
     # health.is_live()
     # health.is_ready()
-    print(f"{snapshot.network}, {snapshot.slot_no}")
+    logger.info(f"{snapshot.network}, {snapshot.slot_no}")
 
     total_len = len(snapshot.data)
     for i, entry in enumerate(snapshot.data):
-        print(f"Checking .... {round(i / total_len * 100, 2)}%", end="\r")
+        logger.info(f"Checking .... {round(i / total_len * 100, 1)}%")
         expected_amount = entry["voting_power"]
         stake_address = stake_public_key_to_address(
             key=entry["stake_public_key"][2:],
@@ -30,7 +31,7 @@ def test_persistent_ada_amount_endpoint(snapshot):
         ), f"Cannot find assets for stake_address: {stake_address}"
         assets = resp.json()
         if assets["persistent"]["ada_amount"] != expected_amount:
-            print(
+            logger.error(
                 f"Not expected ada amount for stake_address: {stake_address}, {entry["stake_public_key"]}"
             )
         # assert (
