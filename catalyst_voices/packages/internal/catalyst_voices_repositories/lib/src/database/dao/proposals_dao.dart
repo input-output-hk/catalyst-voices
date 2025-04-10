@@ -517,7 +517,7 @@ final class _IdsFilter extends Equatable {
 
   const _IdsFilter.exclude(this.exclude) : include = null;
 
-  const _IdsFilter.include(this.exclude) : include = null;
+  const _IdsFilter.include(this.include) : exclude = null;
 
   @override
   List<Object?> get props => [include, exclude];
