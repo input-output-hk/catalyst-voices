@@ -25,6 +25,7 @@ class CampaignTimelineState extends State<CampaignTimeline> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onHorizontalDragUpdate: _handleHorizontalScroll,
+      behavior: HitTestBehavior.translucent,
       child: MouseRegion(
         cursor: SystemMouseCursors.click,
         child: SingleChildScrollView(
