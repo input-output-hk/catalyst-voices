@@ -77,6 +77,7 @@ final class Dependencies extends DependencyProvider {
       })
       ..registerLazySingleton<ProposalsCubit>(
         () => ProposalsCubit(
+          get<UserService>(),
           get<CampaignService>(),
           get<ProposalService>(),
         ),
@@ -179,7 +180,7 @@ final class Dependencies extends DependencyProvider {
           get<CatalystDatabase>(),
         );
       })
-      ..registerLazySingleton<SignedDocumentDataSource>(() {
+      ..registerLazySingleton<DatabaseDocumentsDataSource>(() {
         return DatabaseDocumentsDataSource(
           get<CatalystDatabase>(),
         );
@@ -200,7 +201,7 @@ final class Dependencies extends DependencyProvider {
       ..registerLazySingleton<DocumentRepository>(() {
         return DocumentRepository(
           get<DatabaseDraftsDataSource>(),
-          get<SignedDocumentDataSource>(),
+          get<DatabaseDocumentsDataSource>(),
           get<CatGatewayDocumentDataSource>(),
           get<DocumentFavoriteSource>(),
         );
@@ -210,6 +211,7 @@ final class Dependencies extends DependencyProvider {
         () => ProposalRepository(
           get<SignedDocumentManager>(),
           get<DocumentRepository>(),
+          get<DatabaseDocumentsDataSource>(),
         ),
       )
       ..registerLazySingleton<CommentRepository>(

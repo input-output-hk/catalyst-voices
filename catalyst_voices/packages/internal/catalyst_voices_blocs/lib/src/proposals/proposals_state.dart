@@ -1,92 +1,48 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
+import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
 
 /// The state of available proposals.
 class ProposalsState extends Equatable {
-  final ProposalPaginationItems<ProposalViewModel> draftProposals;
-  final ProposalPaginationItems<ProposalViewModel> finalProposals;
-  final ProposalPaginationItems<ProposalViewModel> favoriteProposals;
-  final ProposalPaginationItems<ProposalViewModel> userProposals;
-  final ProposalPaginationItems<ProposalViewModel> allProposals;
+  final bool hasSearchQuery;
   final List<String> favoritesIds;
-  final List<String> myProposalsIds;
-  final List<CampaignCategoryDetailsViewModel> categories;
-  final SignedDocumentRef? selectedCategoryId;
-  final String? searchValue;
+  final ProposalsCount count;
+  final List<ProposalsCategorySelectorItem> categorySelectorItems;
 
   const ProposalsState({
-    this.draftProposals = const ProposalPaginationItems(),
-    this.finalProposals = const ProposalPaginationItems(),
-    this.favoriteProposals = const ProposalPaginationItems(),
-    this.userProposals = const ProposalPaginationItems(),
-    this.allProposals = const ProposalPaginationItems(),
+    this.hasSearchQuery = false,
     this.favoritesIds = const [],
-    this.myProposalsIds = const [],
-    this.categories = const [],
-    this.selectedCategoryId,
-    this.searchValue,
+    this.count = const ProposalsCount(),
+    this.categorySelectorItems = const [],
   });
 
   @override
   List<Object?> get props => [
-        draftProposals,
-        finalProposals,
-        favoriteProposals,
-        userProposals,
-        allProposals,
+        hasSearchQuery,
         favoritesIds,
-        myProposalsIds,
-        categories,
-        selectedCategoryId,
-        searchValue,
+        count,
+        categorySelectorItems,
       ];
 
+  SignedDocumentRef? get selectedCategoryId => categorySelectorItems
+      .firstWhereOrNull((element) => element.isSelected)
+      ?.ref;
+
   ProposalsState copyWith({
-    ProposalPaginationItems<ProposalViewModel>? draftProposals,
-    ProposalPaginationItems<ProposalViewModel>? finalProposals,
-    ProposalPaginationItems<ProposalViewModel>? favoriteProposals,
-    ProposalPaginationItems<ProposalViewModel>? userProposals,
-    ProposalPaginationItems<ProposalViewModel>? allProposals,
+    bool? hasSearchQuery,
     List<String>? favoritesIds,
-    List<String>? myProposalsIds,
-    List<CampaignCategoryDetailsViewModel>? categories,
-    Optional<SignedDocumentRef>? selectedCategoryId,
-    Optional<String>? searchValue,
-    bool isLoading = false,
+    ProposalsCount? count,
+    List<ProposalsCategorySelectorItem>? categorySelectorItems,
   }) {
     return ProposalsState(
-      draftProposals: draftProposals ?? this.draftProposals,
-      finalProposals: finalProposals ?? this.finalProposals,
-      favoriteProposals: favoriteProposals ?? this.favoriteProposals,
-      userProposals: userProposals ?? this.userProposals,
-      allProposals: allProposals ?? this.allProposals,
+      hasSearchQuery: hasSearchQuery ?? this.hasSearchQuery,
       favoritesIds: favoritesIds ?? this.favoritesIds,
-      myProposalsIds: myProposalsIds ?? this.myProposalsIds,
-      categories: categories ?? this.categories,
-      selectedCategoryId: selectedCategoryId.dataOr(this.selectedCategoryId),
-      searchValue: searchValue.dataOr(this.searchValue),
+      count: count ?? this.count,
+      categorySelectorItems:
+          categorySelectorItems ?? this.categorySelectorItems,
     );
   }
 
-  bool isFavorite(String proposalId) {
-    return favoriteProposals.items.any((e) => e.ref.id == proposalId);
-  }
-}
-
-extension ProposalsStateLoading on ProposalsState {
-  ProposalsState get allProposalsLoading =>
-      copyWith(allProposals: allProposals.copyWith(isLoading: true));
-
-  ProposalsState get draftProposalsLoading =>
-      copyWith(draftProposals: draftProposals.copyWith(isLoading: true));
-
-  ProposalsState get favoriteProposalsLoading =>
-      copyWith(favoriteProposals: favoriteProposals.copyWith(isLoading: true));
-
-  ProposalsState get finalProposalsLoading =>
-      copyWith(finalProposals: finalProposals.copyWith(isLoading: true));
-
-  ProposalsState get userProposalsLoading =>
-      copyWith(userProposals: userProposals.copyWith(isLoading: true));
+  bool isFavorite(String proposalId) => favoritesIds.contains(proposalId);
 }
