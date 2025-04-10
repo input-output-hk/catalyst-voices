@@ -1,5 +1,4 @@
 {
-    "$schema": "./0ce8ab38-9258-4fbc-a62e-7faa6e58318f.schema.json",
     "schemaReference": "https://raw.githubusercontent.com/input-output-hk/catalyst-voices/refs/heads/main/docs/src/architecture/08_concepts/document_templates/proposal/F14-Generic/0ce8ab38-9258-4fbc-a62e-7faa6e58318f.schema.json",
     "setup": {
         "title": {
@@ -51,7 +50,7 @@
             ]
         }
     },
-    "selectedCategory": {
+    "campaign_category": {
         "category_details": {
             "details": {}
         },
@@ -104,10 +103,8 @@
         }
     },
     "milestones": {
-        "milestoneSetup": {
-            "numberOfMilestones": 3
-        },
-        "milestone_list": [{
+        "milestone_list": [
+            {
                 "title": "Initial Setup and Planning",
                 "outputs": "Project infrastructure setup and detailed planning documents",
                 "acceptance_criteria": "- Development environment configured\n- Detailed project plan approved",
