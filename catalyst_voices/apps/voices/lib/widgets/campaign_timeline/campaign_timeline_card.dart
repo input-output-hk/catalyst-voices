@@ -35,6 +35,7 @@ class CampaignTimelineCardState extends State<CampaignTimelineCard> {
 
     return GestureDetector(
       onTap: _toggleExpanded,
+      behavior: HitTestBehavior.opaque,
       child: Container(
         constraints: const BoxConstraints(minHeight: 150),
         width: 288,
