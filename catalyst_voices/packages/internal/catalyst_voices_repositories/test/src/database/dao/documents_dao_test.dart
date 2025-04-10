@@ -841,7 +841,10 @@ void main() {
           await database.documentsDao.saveAll([comments.first, otherComment]);
 
           final documentCount = database.documentsDao
-              .watchCount(ref: proposalRef, type: DocumentType.commentTemplate)
+              .watchCount(
+                refTo: proposalRef,
+                type: DocumentType.commentTemplate,
+              )
               .asBroadcastStream();
 
           final firstEmission = await documentCount.first;

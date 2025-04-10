@@ -140,9 +140,10 @@ abstract interface class DocumentRepository {
     DocumentType? type,
   });
 
+  /// Emits number of matching documents
   Stream<int> watchCount({
-    required DocumentRef ref,
-    required DocumentType type,
+    DocumentRef? refTo,
+    DocumentType? type,
   });
 
   /// Observes matching [DocumentData] as well as [DocumentData] resolved
@@ -452,11 +453,11 @@ final class DocumentRepositoryImpl implements DocumentRepository {
 
   @override
   Stream<int> watchCount({
-    required DocumentRef ref,
-    required DocumentType type,
+    DocumentRef? refTo,
+    DocumentType? type,
   }) {
     return _localDocuments.watchCount(
-      ref: ref,
+      refTo: refTo,
       type: type,
     );
   }
