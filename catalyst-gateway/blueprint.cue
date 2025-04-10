@@ -8,218 +8,220 @@ project: {
 	}
 	deployment: {
 		on: {
-			// TODO: re-enable once we can better control number of deployments
-			//merge: {}
-			//tag: {}
+			merge: {}
+			tag: {}
 		}
-		modules: main: {
-			name:    "app"
-			version: "0.4.2"
-			values: {
-				deployment: {
-					containers: gateway: {
+
+		bundle: {
+			modules: main: {
+				name:    "app"
+				version: "0.6.0"
+				values: {
+					deployment: {
+						containers: gateway: {
+							image: {
+								name: _ @forge(name="CONTAINER_IMAGE")
+								tag:  _ @forge(name="GIT_HASH_OR_TAG")
+							}
+							env: {
+								"RBAC_OFF": {
+									value: "True"
+								}
+								"SIGNED_DOC_SK": {
+    								secret: {
+        								name: "gateway"
+        								key:  "signed-doc-secret-key"
+    								}
+								}
+								"RUST_LOG": {
+									value: "debug,cat_gateway=debug,cardano_chain_follower=info"
+								}
+								"CASSANDRA_VOLATILE_URL": {
+									secret: {
+										name: "gateway"
+										key:  "cassandra-volatile-url"
+									}
+								}
+								"CASSANDRA_VOLATILE_USERNAME": {
+									secret: {
+										name: "gateway"
+										key:  "cassandra-volatile-username"
+									}
+								}
+								"CASSANDRA_VOLATILE_PASSWORD": {
+									secret: {
+										name: "gateway"
+										key:  "cassandra-volatile-password"
+									}
+								}
+
+								"CASSANDRA_VOLATILE_DEPLOYMENT": {
+									secret: {
+										name: "gateway"
+										key:  "cassandra-volatile-deployment"
+									}
+								}
+								"CASSANDRA_PERSISTENT_URL": {
+									secret: {
+										name: "gateway"
+										key:  "cassandra-persistent-url"
+									}
+								}
+								"CASSANDRA_PERSISTENT_USERNAME": {
+									secret: {
+										name: "gateway"
+										key:  "cassandra-persistent-username"
+									}
+								}
+								"CASSANDRA_PERSISTENT_PASSWORD": {
+									secret: {
+										name: "gateway"
+										key:  "cassandra-persistent-password"
+									}
+								}
+								"CASSANDRA_PERSISTENT_DEPLOYMENT": {
+									secret: {
+										name: "gateway"
+										key:  "cassandra-persistent-deployment"
+									}
+								}
+								"INTERNAL_API_KEY": {
+									secret: {
+										name: "gateway"
+										key:  "api-key"
+									}
+								}
+								"EVENT_DB_URL": {
+									secret: {
+										name: "db-url"
+										key:  "url"
+									}
+								}
+							}
+							port: 3030
+							probes: {
+								liveness: path:  "/api/v1/health/live"
+								readiness: path: "/api/v1/health/ready"
+							}
+							mounts: data: {
+								ref: volume: name: "data"
+								path:     "/root/.local/share/cat-gateway"
+								readOnly: false
+							}
+							resources: {
+								requests: {
+									cpu:    "1"
+									memory: "8Gi"
+								}
+								limits: {
+									cpu:    "8"
+									memory: "12Gi"
+								}
+							}
+						}
+						nodeSelector: {
+							"node-group": "catalyst-gateway"
+						}
+						serviceAccount: "catalyst-gateway"
+						strategy:       "Recreate"
+						tolerations: [
+							{
+								key:      "app"
+								operator: "Equal"
+								value:    "catalyst-gateway"
+								effect:   "NoSchedule"
+							},
+						]
+					}
+
+					jobs: migration: containers: main: {
 						image: {
-							name: _ @forge(name="CONTAINER_IMAGE")
+							name: "332405224602.dkr.ecr.eu-central-1.amazonaws.com/catalyst-voices/gateway-event-db"
 							tag:  _ @forge(name="GIT_HASH_OR_TAG")
 						}
 
 						env: {
-							"RBAC_OFF": {
-								value: "True"
-							}
-							"RUST_LOG": {
-								value: "debug,cat_gateway=debug,cardano_chain_follower=info"
-							}
-							"CASSANDRA_VOLATILE_URL": {
+							DB_HOST: {
 								secret: {
-									name: "gateway"
-									key:  "cassandra-volatile-url"
+									name: "db"
+									key:  "host"
 								}
 							}
-							"CASSANDRA_VOLATILE_USERNAME": {
+							DB_PORT: {
 								secret: {
-									name: "gateway"
-									key:  "cassandra-volatile-username"
+									name: "db"
+									key:  "port"
 								}
 							}
-							"CASSANDRA_VOLATILE_PASSWORD": {
+							DB_NAME: {
+								value: "gateway"
+							}
+							DB_DESCRIPTION: {
+								value: "Gateway Event Database"
+							}
+							DB_SUPERUSER: {
 								secret: {
-									name: "gateway"
-									key:  "cassandra-volatile-password"
+									name: "db-root"
+									key:  "username"
 								}
 							}
-
-							"CASSANDRA_VOLATILE_DEPLOYMENT": {
+							DB_SUPERUSER_PASSWORD: {
 								secret: {
-									name: "gateway"
-									key:  "cassandra-volatile-deployment"
+									name: "db-root"
+									key:  "password"
 								}
 							}
-							"CASSANDRA_PERSISTENT_URL": {
+							DB_USER: {
 								secret: {
-									name: "gateway"
-									key:  "cassandra-persistent-url"
+									name: "db"
+									key:  "username"
 								}
 							}
-							"CASSANDRA_PERSISTENT_USERNAME": {
+							DB_USER_PASSWORD: {
 								secret: {
-									name: "gateway"
-									key:  "cassandra-persistent-username"
+									name: "db"
+									key:  "password"
 								}
 							}
-							"CASSANDRA_PERSISTENT_PASSWORD": {
-								secret: {
-									name: "gateway"
-									key:  "cassandra-persistent-password"
-								}
+							INIT_AND_DROP_DB: {
+								value: "true"
 							}
-							"CASSANDRA_PERSISTENT_DEPLOYMENT": {
-								secret: {
-									name: "gateway"
-									key:  "cassandra-persistent-deployment"
-								}
-							}
-							"INTERNAL_API_KEY": {
-								secret: {
-									name: "gateway"
-									key:  "api-key"
-								}
-							}
-							"EVENT_DB_URL": {
-								secret: {
-									name: "db-url"
-									key:  "url"
-								}
-							}
-						}
-
-						port: 3030
-						probes: {
-							liveness: path:  "/api/v1/health/live"
-							readiness: path: "/api/v1/health/ready"
-						}
-						mounts: data: {
-							ref: volume: name: "data"
-							path:     "/root/.local/share/cat-gateway"
-							readOnly: false
-						}
-						resources: {
-							requests: {
-								cpu:    "1"
-								memory: "8Gi"
-							}
-							limits: {
-								cpu:    "8"
-								memory: "12Gi"
+							WITH_MIGRATIONS: {
+								value: "true"
 							}
 						}
 					}
 
-					nodeSelector: {
-						"node-group": "catalyst-gateway"
-					}
-					serviceAccount: "catalyst-gateway"
-					strategy:       "Recreate"
-					tolerations: [
-						{
-							key:      "app"
-							operator: "Equal"
-							value:    "catalyst-gateway"
-							effect:   "NoSchedule"
-						},
-					]
-				}
+					dns: subdomain: "gateway"
+					route: rules: [{
+						matchPrefix: "/"
+					}]
 
-				jobs: migration: containers: main: {
-					image: {
-						name: "332405224602.dkr.ecr.eu-central-1.amazonaws.com/catalyst-voices/gateway-event-db"
-						tag:  _ @forge(name="GIT_HASH_OR_TAG")
+					secrets: {
+						db: {
+							ref: "db/gateway"
+						}
+						"db-root": {
+							ref: "db/root_account"
+						}
+						"db-url": {
+							ref: "db/gateway"
+							template: url: "postgres://{{ .username }}:{{ .password }}@{{ .host }}:{{ .port }}/gateway"
+						}
+						gateway: {
+							ref: "gateway"
+						}
 					}
 
-					env: {
-						DB_HOST: {
-							secret: {
-								name: "db"
-								key:  "host"
-							}
-						}
-						DB_PORT: {
-							secret: {
-								name: "db"
-								key:  "port"
-							}
-						}
-						DB_NAME: {
-							value: "gateway"
-						}
-						DB_DESCRIPTION: {
-							value: "Gateway Event Database"
-						}
-						DB_SUPERUSER: {
-							secret: {
-								name: "db-root"
-								key:  "username"
-							}
-						}
-						DB_SUPERUSER_PASSWORD: {
-							secret: {
-								name: "db-root"
-								key:  "password"
-							}
-						}
-						DB_USER: {
-							secret: {
-								name: "db"
-								key:  "username"
-							}
-						}
-						DB_USER_PASSWORD: {
-							secret: {
-								name: "db"
-								key:  "password"
-							}
-						}
-						INIT_AND_DROP_DB: {
-							value: "true"
-						}
-						WITH_MIGRATIONS: {
-							value: "true"
-						}
+					service: {
+						port: 80
+						scrape: {}
 					}
-				}
 
-				ingress: {
-					health: {
-						path:         "/api/v1/health/live"
-						successCodes: "204"
+					volumes: data: {
+						class: "ebs-io1"
+						size:  "250Gi"
 					}
-					subdomain: "gateway"
-				}
-
-				secrets: {
-					db: {
-						ref: "db/gateway"
-					}
-					"db-root": {
-						ref: "db/root_account"
-					}
-					"db-url": {
-						ref: "db/gateway"
-						template: url: "postgres://{{ .username }}:{{ .password }}@{{ .host }}:{{ .port }}/gateway"
-					}
-					gateway: {
-						ref: "gateway"
-					}
-				}
-
-				service: {
-					port: 80
-					scrape: {}
-				}
-
-				volumes: data: {
-					class: "ebs-io1"
-					size:  "250Gi"
 				}
 			}
 		}
@@ -236,4 +238,5 @@ project: {
 			}
 		}
 	}
+
 }

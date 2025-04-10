@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_filled_button.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_text_button.dart';
+import 'package:catalyst_voices/widgets/painter/bubble_painter.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
@@ -96,181 +97,91 @@ class _Background extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CustomPaint(
-      painter: _BubblePainter(isMobile: isMobile),
+      painter: BubblePainter(
+        bubbles: _buildBubbles(),
+        shapes: _buildShapes(),
+      ),
       size: Size.infinite,
     );
   }
-}
 
-class _BubblePainter extends CustomPainter {
-  final bool isMobile;
-
-  _BubblePainter({required this.isMobile});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    // Background
-    canvas.drawRect(
-      Rect.fromLTWH(0, 0, size.width, size.height),
-      Paint()..color = const Color(0xff9BDDF7),
-    );
-
-    // Left bubble
-    _drawBubble(
-      canvas,
-      x: isMobile ? 0 - 70 : 0 - 90,
-      y: size.height * 0.25,
-      radius: isMobile ? 110 : 200,
-      gradientColors: const [Color(0xFFE5F6FF), Color(0xCCE5F6FF)],
-      gradientStops: const [0.0, 1.0],
-    );
-
-    // Right bubble
-    _drawBubble(
-      canvas,
-      x: isMobile ? size.width + 70 : size.width + 140,
-      y: isMobile ? size.height : size.height + 140,
-      radius: isMobile ? 140 : 430,
-      gradientColors: const [Color(0xFFE5F6FF), Color(0xCCE5F6FF)],
-      gradientStops: const [0.0, 1.0],
-    );
-
-    // Left shape
-    _drawShape(
-      canvas,
-      size,
-      controlPoints: [
-        Point(0, size.height * .7),
-        Point(size.width * .13, size.height * .82),
-        Point(size.width * .15, size.height),
-        Point(0, size.height),
-      ],
-      gradient: const RadialGradient(
-        center: Alignment(0.2822, -0.3306),
-        radius: 0.5,
-        colors: [Color(0x99F9E7FD), Color(0x99F6CEFF)],
-        stops: [0.0, 0.0],
+  List<BubbleConfig> _buildBubbles() {
+    return [
+      BubbleConfig(
+        position: (size) => Offset(
+          isMobile ? 0 - 70 : 0 - 90,
+          size.height * 0.25,
+        ),
+        radius: isMobile ? 110 : 200,
+        gradientColors: const [Color(0xFFE5F6FF), Color(0xCCE5F6FF)],
+        gradientStops: const [0.0, 1.0],
+        shadowBlur: 62.46,
+        shadowOffset: const Offset(-9.99, -10.99),
+        shadowColor: const Color.fromRGBO(150, 142, 253, 0.4),
       ),
-    );
-
-    // First right shape
-    _drawShape(
-      canvas,
-      size,
-      controlPoints: [
-        Point(size.width * .75, 0),
-        Point(
-          isMobile ? size.width * .8 : size.width * .7,
-          isMobile ? size.height * .15 : size.height * .3,
+      BubbleConfig(
+        position: (size) => Offset(
+          isMobile ? size.width + 70 : size.width + 140,
+          isMobile ? size.height : size.height + 140,
         ),
-        Point(
-          size.width,
-          isMobile ? size.height * .25 : size.height * .4,
-        ),
-        Point(size.width, 0),
-      ],
-      color: Color.fromARGB((255 * 0.1).toInt(), 192, 20, 235),
-    );
+        radius: isMobile ? 140 : 430,
+        gradientColors: const [Color(0xFFE5F6FF), Color(0xCCE5F6FF)],
+        gradientStops: const [0.0, 1.0],
+        shadowBlur: 62.46,
+        shadowOffset: const Offset(-9.99, -10.99),
+        shadowColor: const Color.fromRGBO(150, 142, 253, 0.4),
+      ),
+    ];
+  }
 
-    // Second right shape
-    _drawShape(
-      canvas,
-      size,
-      controlPoints: [
-        Point(size.width, size.height * .2),
-        Point(size.width * .7, size.height * .45),
-        Point(size.width, size.height * .6),
-      ],
-      gradient: const RadialGradient(
-        center: Alignment(0.2814, -0.3306),
-        radius: 0.5,
-        colors: [
-          Color.fromRGBO(205, 213, 254, 0.7),
-          Color(0x99C6C5FF),
+  List<ShapeConfig> _buildShapes() {
+    return [
+      ShapeConfig(
+        controlPointsCalculator: (Size size) => [
+          Point(0, size.height * .7),
+          Point(size.width * .13, size.height * .82),
+          Point(size.width * .15, size.height),
+          Point(0, size.height),
         ],
-        stops: [0.0, 1.0],
+        gradient: const RadialGradient(
+          center: Alignment(0.2822, -0.3306),
+          radius: 0.5,
+          colors: [Color(0x99F9E7FD), Color(0x99F6CEFF)],
+          stops: [1.0, 0.0],
+        ),
       ),
-    );
-  }
-
-  @override
-  bool shouldRepaint(_BubblePainter oldDelegate) =>
-      isMobile != oldDelegate.isMobile;
-
-  void _drawBubble(
-    Canvas canvas, {
-    required double x,
-    required double y,
-    required double radius,
-    required List<Color> gradientColors,
-    required List<double> gradientStops,
-  }) {
-    final rect = Rect.fromCircle(center: Offset(x, y), radius: radius);
-    final shadowPath = Path()..addOval(rect);
-
-    canvas
-      ..save()
-      ..translate(-9.99, -10.99)
-      ..drawShadow(
-        shadowPath,
-        const Color.fromRGBO(150, 142, 253, 0.4),
-        62.46,
-        true,
-      )
-      ..restore();
-
-    final paintGradient = Paint()
-      ..shader = RadialGradient(
-        colors: gradientColors,
-        stops: gradientStops,
-        center: Alignment.center,
-        radius: 0.8,
-      ).createShader(rect)
-      ..blendMode = BlendMode.softLight;
-
-    canvas.drawCircle(Offset(x, y), radius, paintGradient);
-  }
-
-  void _drawShape(
-    Canvas canvas,
-    Size size, {
-    required List<Point<double>> controlPoints,
-    Color? color,
-    RadialGradient? gradient,
-  }) {
-    final path = Path()..moveTo(controlPoints[0].x, controlPoints[0].y);
-
-    if (controlPoints.length == 4) {
-      path
-        ..quadraticBezierTo(
-          controlPoints[1].x,
-          controlPoints[1].y,
-          controlPoints[2].x,
-          controlPoints[2].y,
-        )
-        ..lineTo(controlPoints[3].x, controlPoints[3].y);
-    } else if (controlPoints.length == 3) {
-      path.quadraticBezierTo(
-        controlPoints[1].x,
-        controlPoints[1].y,
-        controlPoints[2].x,
-        controlPoints[2].y,
-      );
-    }
-
-    path.close();
-
-    final paint = Paint()..style = PaintingStyle.fill;
-
-    if (gradient != null) {
-      paint.shader = gradient.createShader(
-        Rect.fromLTWH(0, 0, size.width, size.height),
-      );
-    } else if (color != null) {
-      paint.color = color;
-    }
-
-    canvas.drawPath(path, paint);
+      ShapeConfig(
+        controlPointsCalculator: (Size size) => [
+          Point(size.width * .75, 0),
+          Point(
+            isMobile ? size.width * .8 : size.width * .7,
+            isMobile ? size.height * .15 : size.height * .3,
+          ),
+          Point(
+            size.width,
+            isMobile ? size.height * .25 : size.height * .4,
+          ),
+          Point(size.width, 0),
+        ],
+        color: Color.fromARGB((255 * 0.1).toInt(), 192, 20, 235),
+      ),
+      ShapeConfig(
+        controlPointsCalculator: (Size size) => [
+          Point(size.width, size.height * .2),
+          Point(size.width * .7, size.height * .45),
+          Point(size.width, size.height * .6),
+        ],
+        gradient: const RadialGradient(
+          center: Alignment(0.2814, -0.3306),
+          radius: 0.5,
+          colors: [
+            Color.fromRGBO(205, 213, 254, 0.7),
+            Color(0x99C6C5FF),
+          ],
+          stops: [0.0, 1.0],
+        ),
+      ),
+    ];
   }
 }
 

@@ -15,6 +15,7 @@ class VoicesSinglePaneDialog extends StatelessWidget {
   final bool showClose;
   final Alignment closeAlignment;
   final Widget child;
+  final bool fillPosition;
 
   const VoicesSinglePaneDialog({
     super.key,
@@ -27,6 +28,7 @@ class VoicesSinglePaneDialog extends StatelessWidget {
     this.showBorder = false,
     this.showClose = true,
     this.closeAlignment = Alignment.topRight,
+    this.fillPosition = false,
     required this.child,
   });
 
@@ -39,7 +41,12 @@ class VoicesSinglePaneDialog extends StatelessWidget {
       child: Stack(
         alignment: closeAlignment,
         children: [
-          child,
+          if (fillPosition)
+            Positioned.fill(
+              child: child,
+            )
+          else
+            child,
           Offstage(
             offstage: !showClose,
             child: const _CloseButton(),
@@ -58,12 +65,16 @@ class VoicesTwoPaneDialog extends StatelessWidget {
   final Widget left;
   final Widget right;
   final bool showCloseButton;
+  final EdgeInsets leftPadding;
+  final EdgeInsets rightPadding;
 
   const VoicesTwoPaneDialog({
     super.key,
     required this.left,
     required this.right,
     this.showCloseButton = true,
+    this.leftPadding = const EdgeInsets.all(20),
+    this.rightPadding = const EdgeInsets.all(20),
   });
 
   @override
@@ -80,7 +91,7 @@ class VoicesTwoPaneDialog extends StatelessWidget {
             children: [
               Expanded(
                 child: Container(
-                  padding: const EdgeInsets.all(20),
+                  padding: leftPadding,
                   decoration: BoxDecoration(
                     color: theme.colors.elevationsOnSurfaceNeutralLv1Grey,
                   ),
@@ -89,7 +100,7 @@ class VoicesTwoPaneDialog extends StatelessWidget {
               ),
               Expanded(
                 child: Container(
-                  padding: const EdgeInsets.all(20),
+                  padding: rightPadding,
                   child: right,
                 ),
               ),
@@ -100,6 +111,27 @@ class VoicesTwoPaneDialog extends StatelessWidget {
             child: const _CloseButton(),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _CloseButton extends StatelessWidget {
+  const _CloseButton();
+
+  @override
+  Widget build(BuildContext context) {
+    const buttonStyle = ButtonStyle(
+      fixedSize: WidgetStatePropertyAll(Size.square(48)),
+    );
+
+    return IconButtonTheme(
+      data: const IconButtonThemeData(style: buttonStyle),
+      child: XButton(
+        key: const Key('DialogCloseButton'),
+        onTap: () {
+          unawaited(Navigator.of(context).maybePop());
+        },
       ),
     );
   }
@@ -135,27 +167,6 @@ class _VoicesDesktopDialog extends StatelessWidget {
       child: ConstrainedBox(
         constraints: constraints,
         child: child,
-      ),
-    );
-  }
-}
-
-class _CloseButton extends StatelessWidget {
-  const _CloseButton();
-
-  @override
-  Widget build(BuildContext context) {
-    const buttonStyle = ButtonStyle(
-      fixedSize: WidgetStatePropertyAll(Size.square(48)),
-    );
-
-    return IconButtonTheme(
-      data: const IconButtonThemeData(style: buttonStyle),
-      child: XButton(
-        key: const Key('DialogCloseButton'),
-        onTap: () {
-          unawaited(Navigator.of(context).maybePop());
-        },
       ),
     );
   }

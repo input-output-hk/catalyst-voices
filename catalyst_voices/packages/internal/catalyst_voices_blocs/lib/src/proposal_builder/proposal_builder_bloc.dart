@@ -57,6 +57,7 @@ final class ProposalBuilderBloc
     on<RebuildActiveAccountProposalEvent>(_rebuildActiveAccount);
     on<SubmitProposalEvent>(_submitProposal);
     on<ValidateProposalEvent>(_validateProposal);
+    on<ProposalSubmissionCloseDateEvent>(_proposalSubmissionCloseDate);
     on<UpdateCommentsSortEvent>(_updateCommentsSort);
     on<UpdateCommentBuilderEvent>(_updateCommentBuilder);
     on<UpdateCommentRepliesEvent>(_updateCommentReplies);
@@ -368,14 +369,18 @@ final class ProposalBuilderBloc
     LoadProposalEvent event,
     Emitter<ProposalBuilderState> emit,
   ) async {
-    _logger.info('Loading proposal: ${event.proposalId}');
+    final proposalRef = event.proposalId;
+    if (state.metadata.documentRef == proposalRef) {
+      _logger.info('Loading proposal: $proposalRef ignored, already loaded');
+      return;
+    } else {
+      _logger.info('Loading proposal: $proposalRef');
+    }
 
     await _loadState(emit, () async {
       final proposalData = await _proposalService.getProposal(
-        ref: event.proposalId,
+        ref: proposalRef,
       );
-      // TODO(LynxLynxx): check if new local proposal is created
-      // when SignedDocumentRef is used instead of DraftRef
 
       final proposal = Proposal.fromData(proposalData);
 
@@ -385,11 +390,10 @@ final class ProposalBuilderBloc
         return DocumentVersion(
           id: versionId,
           number: index + 1,
-          isCurrent: versionId == event.proposalId.version,
+          isCurrent: versionId == proposalRef.version,
           isLatest: index == proposalData.versions.length - 1,
         );
       }).toList();
-
       final categoryId = proposalData.categoryId;
       final category = await _campaignService.getCategory(categoryId);
 
@@ -535,6 +539,21 @@ final class ProposalBuilderBloc
     }).toList();
   }
 
+  Future<void> _proposalSubmissionCloseDate(
+    ProposalSubmissionCloseDateEvent event,
+    Emitter<ProposalBuilderState> emit,
+  ) async {
+    final timeline = await _campaignService.getCampaignTimeline();
+    final closeDate = timeline
+        .firstWhereOrNull(
+          (e) => e.stage == CampaignTimelineStage.proposalSubmission,
+        )
+        ?.timeline
+        .to;
+
+    emitSignal(ProposalSubmissionCloseDate(date: closeDate));
+  }
+
   Future<void> _publishAndSubmitProposalForReview(
     Emitter<ProposalBuilderState> emit,
   ) async {
@@ -546,11 +565,11 @@ final class ProposalBuilderBloc
       emit,
       documentRef: updatedRef,
       originalDocumentRef: updatedRef,
-      publish: ProposalPublish.localDraft,
+      publish: ProposalPublish.publishedDraft,
     );
 
     await _proposalService.submitProposalForReview(
-      ref: updatedRef,
+      proposalRef: updatedRef,
       categoryId: state.metadata.categoryId!,
     );
 
@@ -635,16 +654,50 @@ final class ProposalBuilderBloc
     );
   }
 
+  List<DocumentVersion> _recreateDocumentVersionsWithNewRef(
+    DocumentRef newRef,
+  ) {
+    final current = state.metadata.versions;
+
+    return [
+      ...current.map(
+        (e) => e.copyWith(
+          isCurrent: false,
+          isLatest: false,
+        ),
+      ),
+      DocumentVersion(
+        id: newRef.version!,
+        number: current.length + 1,
+        isCurrent: true,
+        isLatest: true,
+      ),
+    ];
+  }
+
   Future<void> _saveDocumentLocally(
     Emitter<ProposalBuilderState> emit,
     Document document,
   ) async {
+    final currentRef = state.metadata.documentRef!;
     final updatedRef = await _upsertDraftProposal(
-      state.metadata.documentRef!,
       _documentMapper.toContent(document),
     );
 
-    _updateMetadata(emit, documentRef: updatedRef);
+    List<DocumentVersion>? updatedVersions;
+    if (updatedRef != currentRef) {
+      // if a new ref has been created we need to recreate
+      // the version history to reflect it
+      updatedVersions = _recreateDocumentVersionsWithNewRef(updatedRef);
+    }
+
+    _updateMetadata(
+      emit,
+      documentRef: updatedRef,
+      originalDocumentRef: state.metadata.originalDocumentRef ?? updatedRef,
+      publish: ProposalPublish.localDraft,
+      versions: updatedVersions,
+    );
   }
 
   Future<void> _submitComment(
@@ -736,7 +789,7 @@ final class ProposalBuilderBloc
     Emitter<ProposalBuilderState> emit,
   ) async {
     await _proposalService.submitProposalForReview(
-      ref: state.metadata.documentRef! as SignedDocumentRef,
+      proposalRef: state.metadata.documentRef! as SignedDocumentRef,
       categoryId: state.metadata.categoryId!,
     );
 
@@ -778,12 +831,14 @@ final class ProposalBuilderBloc
     DocumentRef? documentRef,
     DocumentRef? originalDocumentRef,
     ProposalPublish? publish,
+    List<DocumentVersion>? versions,
   }) {
     final updatedMetadata = state.metadata.copyWith(
       documentRef: documentRef != null ? Optional(documentRef) : null,
       originalDocumentRef:
           originalDocumentRef != null ? Optional(originalDocumentRef) : null,
       publish: publish,
+      versions: versions,
     );
 
     final updatedState = state.copyWith(
@@ -793,10 +848,8 @@ final class ProposalBuilderBloc
     emit(updatedState);
   }
 
-  Future<DraftRef> _upsertDraftProposal(
-    DocumentRef currentRef,
-    DocumentDataContent document,
-  ) async {
+  Future<DraftRef> _upsertDraftProposal(DocumentDataContent document) async {
+    final currentRef = state.metadata.documentRef!;
     final originalRef = state.metadata.originalDocumentRef;
     final template = state.metadata.templateRef!;
     final categoryId = state.metadata.categoryId!;

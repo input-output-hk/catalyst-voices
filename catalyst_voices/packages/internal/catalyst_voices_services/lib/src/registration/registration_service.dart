@@ -163,7 +163,8 @@ final class RegistrationServiceImpl implements RegistrationService {
       return await registrationBuilder.build();
     } on RegistrationException {
       rethrow;
-    } catch (error) {
+    } catch (error, stackTrace) {
+      _logger.severe('Registration error', error, stackTrace);
       throw const RegistrationUnknownException();
     }
   }
@@ -244,7 +245,8 @@ final class RegistrationServiceImpl implements RegistrationService {
       });
     } on RegistrationException {
       rethrow;
-    } catch (error) {
+    } catch (error, stackTrace) {
+      _logger.severe('RegistractionTransaction: ', error, stackTrace);
       throw const RegistrationTransactionException();
     }
   }
