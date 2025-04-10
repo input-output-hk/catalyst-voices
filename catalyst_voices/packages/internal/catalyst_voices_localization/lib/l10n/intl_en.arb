@@ -2505,7 +2505,7 @@
   "@viewProposalCommentsDescription": {
     "description": "Text for the view proposal comments description in the card"
   },
-  "paginationProposalsCounter": "{from}-{to} of {max} proposals",
+  "paginationProposalsCounter": "{from}-{to} of {max, plural, =0{proposals} =1{proposal} other{proposals}}",
   "@paginationProposalsCounter": {
     "description": "Below pagination list, next to page switch controls",
     "placeholders": {
