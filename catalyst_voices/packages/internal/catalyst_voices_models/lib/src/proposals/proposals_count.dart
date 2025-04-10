@@ -17,6 +17,15 @@ final class ProposalsCount extends Equatable {
     this.my = 0,
   });
 
+  @override
+  List<Object?> get props => [
+        total,
+        drafts,
+        finals,
+        favorites,
+        my,
+      ];
+
   int ofType(ProposalsFilterType type) {
     return switch (type) {
       ProposalsFilterType.total => total,
@@ -26,13 +35,4 @@ final class ProposalsCount extends Equatable {
       ProposalsFilterType.my => my,
     };
   }
-
-  @override
-  List<Object?> get props => [
-        total,
-        drafts,
-        finals,
-        favorites,
-        my,
-      ];
 }
