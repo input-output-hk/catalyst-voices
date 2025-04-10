@@ -226,10 +226,25 @@ final class ProposalServiceImpl implements ProposalService {
   Future<Page<Proposal>> getProposalsPage({
     required PageRequest request,
     required ProposalsFilters filters,
-  }) {
-    return _proposalRepository
-        .getProposalsPage(request: request, filters: filters)
-        .then((value) => value.map(Proposal.fromData));
+  }) async {
+    final page = await _proposalRepository.getProposalsPage(
+      request: request,
+      filters: filters,
+    );
+
+    final proposals = await page.items.map(
+      (item) async {
+        final categoryId = item.categoryId;
+        final category = await _campaignRepository.getCategory(categoryId);
+
+        final withCategory = item.copyWith(categoryName: category.categoryText);
+
+        // TODO(damian-molinski): It should be different model.
+        return Proposal.fromData(withCategory);
+      },
+    ).wait;
+
+    return page.copyWithItems(proposals);
   }
 
   @override
