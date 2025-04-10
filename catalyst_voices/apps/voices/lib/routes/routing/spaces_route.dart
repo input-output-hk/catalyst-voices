@@ -74,13 +74,23 @@ final class FundedProjectsRoute extends GoRouteData
   }
 }
 
-final class MyProposalsRoute extends GoRouteData
+final class ProposalsRoute extends GoRouteData
     with FadePageTransitionMixin, CompositeRouteGuardMixin {
   final String? categoryId;
+  final bool myProposals;
 
-  const MyProposalsRoute({
+  const ProposalsRoute({
     this.categoryId,
+    this.myProposals = false,
   });
+
+  factory ProposalsRoute.fromRef({SignedDocumentRef? categoryId}) {
+    return ProposalsRoute(categoryId: categoryId?.id);
+  }
+
+  factory ProposalsRoute.myProposals() {
+    return const ProposalsRoute(myProposals: true);
+  }
 
   @override
   List<RouteGuard> get routeGuards => const [ProposalSubmissionGuard()];
@@ -92,32 +102,9 @@ final class MyProposalsRoute extends GoRouteData
         categoryId != null ? SignedDocumentRef(id: categoryId) : null;
 
     return ProposalsPage(
-      selectMyProposalsView: true,
       categoryId: categoryRef,
+      selectMyProposalsView: myProposals,
     );
-  }
-}
-
-final class ProposalsRoute extends GoRouteData
-    with FadePageTransitionMixin, CompositeRouteGuardMixin {
-  final String? categoryId;
-
-  const ProposalsRoute({this.categoryId});
-
-  factory ProposalsRoute.fromRef({SignedDocumentRef? categoryId}) {
-    return ProposalsRoute(categoryId: categoryId?.id);
-  }
-
-  @override
-  List<RouteGuard> get routeGuards => const [ProposalSubmissionGuard()];
-
-  @override
-  Widget build(BuildContext context, GoRouterState state) {
-    final categoryId = this.categoryId;
-    final categoryRef =
-        categoryId != null ? SignedDocumentRef(id: categoryId) : null;
-
-    return ProposalsPage(categoryId: categoryRef);
   }
 }
 
@@ -128,9 +115,6 @@ final class ProposalsRoute extends GoRouteData
       routes: [
         TypedGoRoute<ProposalsRoute>(
           path: 'proposals',
-        ),
-        TypedGoRoute<MyProposalsRoute>(
-          path: 'my-proposals',
         ),
         TypedGoRoute<CategoryDetailRoute>(
           path: 'category/:categoryId',

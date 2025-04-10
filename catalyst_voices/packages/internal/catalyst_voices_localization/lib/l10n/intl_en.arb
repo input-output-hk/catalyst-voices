@@ -1945,9 +1945,14 @@
       }
     }
   },
-  "comments": "Comments",
+  "comments": "{count, plural, =0{Comments} =1{Comment} other{Comments}}",
   "@comments": {
-    "description": "Describes comments"
+    "description": "Describes comments",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "proposalIterationPublishUpdateAndTitle": "Iteration {iteration} - {publish} - {datetime} - {title}",
   "@proposalIterationPublishUpdateAndTitle": {
@@ -2491,5 +2496,13 @@
   "noProposalsToPublish": "You have no proposals to publish, start a new proposal, or create a new iteration of an existing proposal to be able to publish.",
   "@noProposalsToPublish": {
     "description": "Text when there are no proposals to publish"
+  },
+  "viewProposalComments": "View proposal comments",
+  "@viewProposalComments": {
+    "description": "Text for the view proposal comments title in the card"
+  },
+  "viewProposalCommentsDescription": "Open My proposals in the Discovery Space",
+  "@viewProposalCommentsDescription": {
+    "description": "Text for the view proposal comments description in the card"
   }
 }

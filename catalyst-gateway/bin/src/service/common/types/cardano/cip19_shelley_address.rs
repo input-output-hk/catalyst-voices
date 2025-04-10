@@ -2,11 +2,7 @@
 //!
 //! More information can be found in [CIP-19](https://cips.cardano.org/cip/CIP-19)
 
-use std::{
-    borrow::Cow,
-    ops::{Deref, DerefMut},
-    sync::LazyLock,
-};
+use std::sync::LazyLock;
 
 use const_format::concatcp;
 use pallas::ledger::addresses::{Address, ShelleyAddress};
