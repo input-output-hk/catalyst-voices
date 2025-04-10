@@ -53,17 +53,14 @@ abstract interface class ProposalService {
     required DocumentRef ref,
   });
 
-  Future<ProposalPaginationItems<Proposal>> getProposals({
-    required ProposalPaginationRequest request,
+  Future<Page<Proposal>> getProposalsPage({
+    required PageRequest request,
+    required ProposalsFilters filters,
   });
 
   Future<ProposalTemplate> getProposalTemplate({
     required DocumentRef ref,
   });
-
-  /// Fetches user's proposals ids  depending on his id that is saved
-  /// in metadata of proposal document
-  Future<List<String>> getUserProposalsIds(String userId);
 
   /// Imports the proposal from [data] encoded by [encodeProposalForExport].
   ///
@@ -118,6 +115,10 @@ abstract interface class ProposalService {
   });
 
   Stream<List<Proposal>> watchLatestProposals({int? limit});
+
+  Stream<ProposalsCount> watchProposalsCount({
+    required ProposalsCountFilters filters,
+  });
 
   Stream<List<Proposal>> watchUserProposals();
 }
@@ -222,18 +223,29 @@ final class ProposalServiceImpl implements ProposalService {
   }
 
   @override
-  Future<ProposalPaginationItems<Proposal>> getProposals({
-    required ProposalPaginationRequest request,
+  Future<Page<Proposal>> getProposalsPage({
+    required PageRequest request,
+    required ProposalsFilters filters,
   }) async {
-    final proposals = await _proposalRepository.getProposals(
+    final page = await _proposalRepository.getProposalsPage(
       request: request,
+      filters: filters,
     );
 
-    return ProposalPaginationItems(
-      items: proposals.proposals,
-      pageKey: request.pageKey,
-      maxResults: proposals.maxResults,
-    );
+    // TODO(damian-molinski): this most likely should happen in ProposalsCubit.
+    final proposals = await page.items.map(
+      (item) async {
+        final categoryId = item.categoryId;
+        final category = await _campaignRepository.getCategory(categoryId);
+
+        final withCategory = item.copyWith(categoryName: category.categoryText);
+
+        // TODO(damian-molinski): It should be different model.
+        return Proposal.fromData(withCategory);
+      },
+    ).wait;
+
+    return page.copyWithItems(proposals);
   }
 
   @override
@@ -245,12 +257,6 @@ final class ProposalServiceImpl implements ProposalService {
     );
 
     return proposalTemplate;
-  }
-
-  @override
-  Future<List<String>> getUserProposalsIds(String userId) async {
-    final proposalsIds = await _proposalRepository.getUserProposalsIds(userId);
-    return proposalsIds;
   }
 
   @override
@@ -398,6 +404,13 @@ final class ProposalServiceImpl implements ProposalService {
   }
 
   @override
+  Stream<ProposalsCount> watchProposalsCount({
+    required ProposalsCountFilters filters,
+  }) {
+    return _proposalRepository.watchProposalsCount(filters: filters);
+  }
+
+  @override
   Stream<List<Proposal>> watchUserProposals() async* {
     final authorId = await _getUserCatalystId();
     yield* _proposalRepository
@@ -475,9 +488,8 @@ final class ProposalServiceImpl implements ProposalService {
     final campaign =
         await _campaignRepository.getCategory(doc.metadata.categoryId);
 
-    final commentsCountStream = _proposalRepository.watchCount(
-      ref: selfRef,
-      type: DocumentType.commentDocument,
+    final commentsCountStream = _proposalRepository.watchCommentsCount(
+      refTo: selfRef,
     );
 
     return Rx.combineLatest2(
