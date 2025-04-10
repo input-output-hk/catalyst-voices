@@ -134,8 +134,8 @@ final class DocumentPropertySchemaDto {
 
     final type = types.firstWhere(
       (e) => e != DocumentPropertyTypeDto.nullable,
-      orElse: () =>
-          throw ArgumentError('Property type cannot be empty or nullable'),
+      orElse: () => throw ArgumentError(
+          'Property type cannot be empty or nullable: $nodeId'),
     );
 
     switch (type) {
