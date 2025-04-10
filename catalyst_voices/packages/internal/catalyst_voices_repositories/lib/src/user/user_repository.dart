@@ -1,15 +1,18 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/dto/user_dto.dart';
-import 'package:catalyst_voices_repositories/src/user/user_storage.dart';
+import 'package:catalyst_voices_repositories/src/user/source/user_data_source.dart';
+import 'package:catalyst_voices_repositories/src/user/source/user_storage.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 
 abstract interface class UserRepository {
   factory UserRepository(
     UserStorage storage,
+    UserDataSource dataSource,
     KeychainProvider keychainProvider,
   ) {
     return UserRepositoryImpl(
       storage,
+      dataSource,
       keychainProvider,
     );
   }
@@ -17,14 +20,18 @@ abstract interface class UserRepository {
   Future<User> getUser();
 
   Future<void> saveUser(User user);
+
+  Future<void> updateEmail(String email);
 }
 
 final class UserRepositoryImpl implements UserRepository {
   final UserStorage _storage;
+  final UserDataSource _dataSource;
   final KeychainProvider _keychainProvider;
 
   UserRepositoryImpl(
     this._storage,
+    this._dataSource,
     this._keychainProvider,
   );
 
@@ -42,5 +49,10 @@ final class UserRepositoryImpl implements UserRepository {
     final dto = UserDto.fromModel(user);
 
     return _storage.writeUser(dto);
+  }
+
+  @override
+  Future<void> updateEmail(String email) async {
+    await _dataSource.updateEmail(email);
   }
 }
