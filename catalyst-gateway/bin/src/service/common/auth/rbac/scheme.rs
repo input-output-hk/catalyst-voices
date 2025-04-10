@@ -45,7 +45,13 @@ static CACHE: LazyLock<Cache<EncodedAuthToken, CatalystRBACTokenV1>> = LazyLock:
     checker = "checker_api_catalyst_auth"
 )]
 #[allow(dead_code, clippy::module_name_repetitions)]
-pub struct CatalystRBACSecurityScheme(pub CatalystRBACTokenV1);
+pub struct CatalystRBACSecurityScheme(CatalystRBACTokenV1);
+
+impl From<CatalystRBACSecurityScheme> for IdUri {
+    fn from(value: CatalystRBACSecurityScheme) -> Self {
+        value.0.into()
+    }
+}
 
 /// Error with the service while processing a Catalyst RBAC Token
 ///

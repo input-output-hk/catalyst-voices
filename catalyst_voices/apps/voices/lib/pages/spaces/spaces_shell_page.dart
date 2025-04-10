@@ -10,6 +10,7 @@ import 'package:catalyst_voices/pages/spaces/drawer/spaces_drawer.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -70,7 +71,8 @@ class _Shortcuts extends StatelessWidget {
           bindings: <ShortcutActivator, VoidCallback>{
             for (final entry in shortcuts.entries)
               entry.value: () => entry.key.go(context),
-            CampaignAdminToolsDialog.shortcut: onToggleAdminTools,
+            if (!kReleaseMode)
+              CampaignAdminToolsDialog.shortcut: onToggleAdminTools,
           },
           child: child,
         );
@@ -102,27 +104,23 @@ class _SpacesShellPageState extends State<SpacesShellPage> {
       },
       child: _Shortcuts(
         onToggleAdminTools: _toggleAdminTools,
-        child: BlocSelector<SessionCubit, SessionState,
-            ({bool isUnlocked, bool isVisitor})>(
-          selector: (state) => (
-            isUnlocked: state.isActive,
-            isVisitor: state.isVisitor,
-          ),
-          builder: (context, state) {
+        child: BlocSelector<SessionCubit, SessionState, bool>(
+          selector: (state) => state.isActive,
+          builder: (context, isActive) {
             return Scaffold(
               appBar: VoicesAppBar(
-                leading: state.isVisitor ? null : const DrawerToggleButton(),
+                leading: isActive ? const DrawerToggleButton() : null,
                 automaticallyImplyLeading: false,
                 actions: _getActions(widget.space),
               ),
-              drawer: state.isVisitor
-                  ? null
-                  : SpacesDrawer(
+              drawer: isActive
+                  ? SpacesDrawer(
                       space: widget.space,
                       spacesShortcutsActivators:
                           SpacesShellPage._spacesShortcutsActivators,
-                      isUnlocked: state.isUnlocked,
-                    ),
+                      isUnlocked: isActive,
+                    )
+                  : null,
               endDrawer: const OpportunitiesDrawer(),
               body: widget.child,
             );

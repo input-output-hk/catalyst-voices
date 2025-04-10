@@ -5,7 +5,6 @@ use poem_openapi::{param::Query, payload::Json, OpenApi};
 use response::Cip36RegistrationUnprocessableContent;
 
 use self::{cardano::slot_no::SlotNo, common::auth::none::NoAuthorization};
-use super::Ed25519HexEncodedPublicKey;
 use crate::service::common::{
     self,
     tags::ApiTags,
@@ -72,7 +71,6 @@ impl Api {
             SlotNo::into_option(asat.0),
             page.0.unwrap_or_default(),
             limit.0.unwrap_or_default(),
-            headers,
         )
         .await
     }
