@@ -40,7 +40,6 @@ class PaginatedGridView<ItemType> extends StatelessWidget {
       valueListenable: _pagingController,
       builder: (context, pagingState, _) {
         Widget child;
-        final itemList = _pagingController.itemList;
         switch (pagingState.status) {
           case PagingStatus.empty:
             child = builderDelegate.emptyIndicatorBuilder(context);
@@ -58,12 +57,11 @@ class PaginatedGridView<ItemType> extends StatelessWidget {
                 spacing: 16,
                 runSpacing: 16,
                 alignment: WrapAlignment.spaceEvenly,
-                children: [
-                  for (var i = pagingState.currentFrom;
-                      i <= pagingState.currentTo;
-                      i++)
-                    _itemBuilder(context, itemList[i]),
-                ],
+                crossAxisAlignment: WrapCrossAlignment.start,
+                runAlignment: WrapAlignment.start,
+                children: pagingState.itemList
+                    .map((item) => _itemBuilder(context, item))
+                    .toList(),
               ),
             );
             break;
