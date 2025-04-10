@@ -97,6 +97,9 @@ final class RegistrationTransactionBuilder {
       final x509Envelope = X509MetadataEnvelope.unsigned(
         purpose: UuidV4.fromString(_catalystUserRoleRegistrationPurpose),
         txInputsHash: TransactionInputsHash.fromTransactionInputs(utxos),
+        // TODO(dtscalac): when updating the registration need
+        // to send the previous transaction id
+        previousTransactionId: null,
         chunkedData: RegistrationData(
           derCerts: [
             if (derCert != null) RbacField.set(derCert),
