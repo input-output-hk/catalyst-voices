@@ -29,8 +29,8 @@ pub(crate) enum Responses {
 pub(crate) type AllResponses = WithErrorResponses<Responses>;
 
 /// # GET `/document`
-pub(crate) async fn endpoint(document_id: uuid::Uuid, version: uuid::Uuid) -> AllResponses {
-    match get_document(&document_id, &version).await {
+pub(crate) async fn endpoint(document_id: uuid::Uuid, version: Option<uuid::Uuid>) -> AllResponses {
+    match get_document(&document_id, version.as_ref()).await {
         Ok(doc) => {
             match doc.try_into() {
                 Ok(doc_cbor_bytes) => Responses::Ok(Cbor(doc_cbor_bytes)).into(),
@@ -44,7 +44,7 @@ pub(crate) async fn endpoint(document_id: uuid::Uuid, version: uuid::Uuid) -> Al
 
 /// Get document from the database
 pub(crate) async fn get_document(
-    document_id: &uuid::Uuid, version: &uuid::Uuid,
+    document_id: &uuid::Uuid, version: Option<&uuid::Uuid>,
 ) -> anyhow::Result<CatalystSignedDocument> {
     // Find the doc in the static templates first
     if let Some(doc) = get_doc_static_template(document_id) {
@@ -66,7 +66,7 @@ impl catalyst_signed_doc::providers::CatalystSignedDocumentProvider for DocProvi
     ) -> anyhow::Result<Option<CatalystSignedDocument>> {
         let id = doc_ref.id.uuid();
         let ver = doc_ref.ver.uuid();
-        match get_document(&id, &ver).await {
+        match get_document(&id, Some(&ver)).await {
             Ok(doc) => Ok(Some(doc)),
             Err(err) if err.is::<NotFoundError>() => Ok(None),
             Err(err) => Err(err),

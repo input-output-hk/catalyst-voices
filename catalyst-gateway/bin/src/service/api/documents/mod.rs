@@ -52,7 +52,7 @@ impl DocumentApi {
         document_id: Path<UUIDv7>,
         /// UUIDv7 Version of the Document to retrieve, if omitted, returns the latest
         /// version.
-        version: Query<UUIDv7>,
+        version: Query<Option<UUIDv7>>,
         /// No Authorization required, but Token permitted.
         _auth: NoneOrRBAC,
     ) -> get_document::AllResponses {
@@ -60,7 +60,7 @@ impl DocumentApi {
             let err = anyhow!("Invalid UUIDv7"); // Should not happen as UUIDv7 is validating.
             return get_document::AllResponses::internal_error(&err);
         };
-        let Ok(ver_id) = version.0.try_into() else {
+        let Ok(ver_id) = version.0.map(std::convert::TryInto::try_into).transpose() else {
             let err = anyhow!("Invalid UUIDv7"); // Should not happen as UUIDv7 is validating.
             return get_document::AllResponses::internal_error(&err);
         };

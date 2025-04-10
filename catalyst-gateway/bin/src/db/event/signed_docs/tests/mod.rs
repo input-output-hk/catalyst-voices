@@ -116,7 +116,9 @@ async fn store_full_signed_doc(doc: &FullSignedDoc, doc_type: uuid::Uuid) {
 }
 
 async fn retrieve_full_signed_doc(doc: &FullSignedDoc) {
-    let res_doc = FullSignedDoc::retrieve(doc.id(), doc.ver()).await.unwrap();
+    let res_doc = FullSignedDoc::retrieve(doc.id(), Some(doc.ver()))
+        .await
+        .unwrap();
     assert_eq!(doc, &res_doc);
 }
 
