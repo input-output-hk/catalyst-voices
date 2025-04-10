@@ -409,16 +409,10 @@ final class ProposalRepositoryImpl implements ProposalRepository {
 
     final template = _buildProposalTemplate(documentData: templateData);
 
-    final categoryId = documentData.metadata.categoryId;
-
-    if (categoryId == null) {
-      print('Found invalid proposal: $documentData');
-    }
-
     final metadata = ProposalMetadata(
       selfRef: documentData.metadata.selfRef,
       templateRef: documentData.metadata.template!,
-      categoryId: categoryId!,
+      categoryId: documentData.metadata.categoryId!,
       authors: documentData.metadata.authors ?? [],
     );
 
