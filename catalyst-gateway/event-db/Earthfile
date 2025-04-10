@@ -3,7 +3,7 @@
 # the database and its associated software.
 VERSION 0.8
 
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/postgresql:fix/flutter-rust-bridge AS postgresql-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/postgresql:v3.3.3 AS postgresql-ci
 
 # cspell: words
 
