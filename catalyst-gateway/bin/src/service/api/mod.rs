@@ -52,7 +52,11 @@ pub(crate) fn mk_api() -> OpenApiService<(HealthApi, CardanoApi, ConfigApi, Docu
     let mut service = OpenApiService::new(
         (
             HealthApi,
-            (cardano::Api, cardano::staking::Api, cardano::cip36::Api),
+            (
+                cardano::rbac::Api,
+                cardano::staking::Api,
+                cardano::cip36::Api,
+            ),
             ConfigApi,
             DocumentApi,
         ),
