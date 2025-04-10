@@ -24,7 +24,7 @@ MAX_ATTEMPT = 3
 # and extract this field from the cookies header using the `network` tab
 CF_CLEARANCE = ""
 
-# can be somehting like "Mozilla/5.0"
+# can be something like "Mozilla/5.0"
 USER_AGENT = ""
 
 # relative path to this script file for the output
