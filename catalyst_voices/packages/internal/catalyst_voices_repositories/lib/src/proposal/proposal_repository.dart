@@ -375,7 +375,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     final publish = switch (action) {
       ProposalSubmissionAction.aFinal => ProposalPublish.submittedProposal,
       ProposalSubmissionAction.hide => null,
-      _ => ProposalPublish.publishedDraft,
+      ProposalSubmissionAction.draft || null => ProposalPublish.publishedDraft,
     };
 
     if (publish == null) {
@@ -479,7 +479,9 @@ final class ProposalRepositoryImpl implements ProposalRepository {
       return switch (action) {
         ProposalSubmissionAction.aFinal => ProposalPublish.submittedProposal,
         ProposalSubmissionAction.hide => null,
-        _ => ProposalPublish.publishedDraft,
+        ProposalSubmissionAction.draft ||
+        null =>
+          ProposalPublish.publishedDraft,
       };
     }
   }
