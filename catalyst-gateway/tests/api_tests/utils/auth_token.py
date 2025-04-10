@@ -3,6 +3,8 @@ import base64
 import pytest
 from pycardano.crypto.bip32 import BIP32ED25519PrivateKey, BIP32ED25519PublicKey
 
+#cspell: words pycardano
+
 @pytest.fixture
 def rbac_auth_token_factory():
 
