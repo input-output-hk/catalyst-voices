@@ -376,7 +376,10 @@ void main() {
         final proposalOneRef = SignedDocumentRef.generateFirstRef();
         final proposalTwoRef = SignedDocumentRef.generateFirstRef();
         final proposals = [
-          _buildProposal(selfRef: proposalOneRef),
+          _buildProposal(
+            selfRef: proposalOneRef,
+            categoryId: categoriesTemplatesRefs[1].category,
+          ),
           _buildProposal(
             selfRef: proposalTwoRef,
             author: userId,
@@ -573,7 +576,10 @@ void main() {
             template: templateRef,
             categoryId: categoryId,
           ),
-          _buildProposal(template: templateRef),
+          _buildProposal(
+            template: templateRef,
+            categoryId: categoriesTemplatesRefs[1].category,
+          ),
         ];
 
         final expectedRefs = proposals
@@ -823,11 +829,11 @@ DocumentEntityWithMetadata _buildProposal({
   final metadata = DocumentDataMetadata(
     type: DocumentType.proposalDocument,
     selfRef: selfRef ?? SignedDocumentRef.generateFirstRef(),
-    template: template,
+    template: template ?? SignedDocumentRef.generateFirstRef(),
     authors: [
       if (author != null) author,
     ],
-    categoryId: categoryId,
+    categoryId: categoryId ?? categoriesTemplatesRefs.first.category,
   );
   final content = DocumentDataContent({
     if (title != null)
