@@ -86,6 +86,9 @@ final class DocumentPropertySchemaDto {
     required this.pattern,
   });
 
+  factory DocumentPropertySchemaDto.fromJson(Map<String, dynamic> json) =>
+      _$DocumentPropertySchemaDtoFromJson(json);
+
   const DocumentPropertySchemaDto.optional({
     this.ref,
     this.types,
@@ -115,10 +118,105 @@ final class DocumentPropertySchemaDto {
     this.pattern,
   });
 
-  factory DocumentPropertySchemaDto.fromJson(Map<String, dynamic> json) =>
-      _$DocumentPropertySchemaDtoFromJson(json);
+  String? definition() {
+    final ref = this.ref;
+    if (ref == null) {
+      return null;
+    }
+
+    final index = ref.lastIndexOf('/');
+    if (index < 0) {
+      return null;
+    }
+
+    return ref.substring(index + 1);
+  }
+
+  /// Returns a new copy of the [DocumentPropertySchemaDto],
+  /// fields from this and [other] instance are merged into a single instance.
+  ///
+  /// Fields from this instance have more priority than from the
+  /// [other] instance (in case they appear in both instances).
+  DocumentPropertySchemaDto mergeWith(DocumentPropertySchemaDto other) {
+    final mergedItems = _mergeItems(items, other.items);
+    final mergedOneOf = oneOf ?? other.oneOf;
+
+    var mergedProperties = _mergeProperties(properties, other.properties);
+    if (mergedOneOf != null) {
+      for (final item in mergedOneOf) {
+        mergedProperties = _mergeProperties(mergedProperties, item.properties);
+      }
+    }
+
+    return DocumentPropertySchemaDto(
+      ref: ref ?? other.ref,
+      types: types ?? other.types,
+      format: format ?? other.format,
+      contentMediaType: contentMediaType ?? other.contentMediaType,
+      title: title ?? other.title,
+      description: description ?? other.description,
+      defaultValue: defaultValue ?? other.defaultValue,
+      placeholder: placeholder ?? other.placeholder,
+      guidance: guidance ?? other.guidance,
+      icon: icon ?? other.icon,
+      subsection: subsection ?? other.subsection,
+      constValue: constValue ?? other.constValue,
+      enumValues: enumValues ?? other.enumValues,
+      uniqueItems: uniqueItems ?? other.uniqueItems,
+      properties: mergedProperties,
+      items: mergedItems,
+      minimum: minimum ?? other.minimum,
+      maximum: maximum ?? other.maximum,
+      minLength: minLength ?? other.minLength,
+      maxLength: maxLength ?? other.maxLength,
+      minItems: minItems ?? other.minItems,
+      maxItems: maxItems ?? other.maxItems,
+      oneOf: oneOf ?? other.oneOf,
+      required: required ?? other.required,
+      order: order ?? other.order,
+      pattern: pattern ?? other.pattern,
+    );
+  }
 
   Map<String, dynamic> toJson() => _$DocumentPropertySchemaDtoToJson(this);
+
+  DocumentSchemaLogicalCondition toLogicalCondition({
+    required DocumentDefinitionsDto definitions,
+    required DocumentNodeId nodeId,
+    required bool isRequired,
+  }) {
+    final definition = definitions.getDefinition(ref);
+    final schema = definition != null ? mergeWith(definition) : this;
+
+    return DocumentSchemaLogicalCondition(
+      schema: schema.toModel(
+        definitions: definitions,
+        nodeId: nodeId,
+        isRequired: isRequired,
+      ),
+      constValue: constValue,
+      enumValues: enumValues,
+    );
+  }
+
+  DocumentSchemaLogicalGroup toLogicalGroup({
+    required DocumentDefinitionsDto definitions,
+    required DocumentNodeId nodeId,
+    required bool isRequired,
+  }) {
+    final properties = this.properties?.values ?? [];
+
+    return DocumentSchemaLogicalGroup(
+      conditions: [
+        for (final property in properties)
+          property.toLogicalCondition(
+            definitions: definitions,
+            nodeId: nodeId,
+            isRequired: isRequired,
+          ),
+      ],
+    );
+  }
 
   DocumentPropertySchema toModel({
     required DocumentDefinitionsDto definitions,
@@ -134,8 +232,9 @@ final class DocumentPropertySchemaDto {
 
     final type = types.firstWhere(
       (e) => e != DocumentPropertyTypeDto.nullable,
-      orElse: () =>
-          throw ArgumentError('Property type cannot be empty or nullable'),
+      orElse: () => throw ArgumentError(
+        'Property type cannot be empty or nullable: $nodeId',
+      ),
     );
 
     switch (type) {
@@ -186,90 +285,6 @@ final class DocumentPropertySchemaDto {
     }
   }
 
-  DocumentSchemaLogicalGroup toLogicalGroup({
-    required DocumentDefinitionsDto definitions,
-    required DocumentNodeId nodeId,
-    required bool isRequired,
-  }) {
-    final properties = this.properties?.values ?? [];
-
-    return DocumentSchemaLogicalGroup(
-      conditions: [
-        for (final property in properties)
-          property.toLogicalCondition(
-            definitions: definitions,
-            nodeId: nodeId,
-            isRequired: isRequired,
-          ),
-      ],
-    );
-  }
-
-  DocumentSchemaLogicalCondition toLogicalCondition({
-    required DocumentDefinitionsDto definitions,
-    required DocumentNodeId nodeId,
-    required bool isRequired,
-  }) {
-    final definition = definitions.getDefinition(ref);
-    final schema = definition != null ? mergeWith(definition) : this;
-
-    return DocumentSchemaLogicalCondition(
-      schema: schema.toModel(
-        definitions: definitions,
-        nodeId: nodeId,
-        isRequired: isRequired,
-      ),
-      constValue: constValue,
-      enumValues: enumValues,
-    );
-  }
-
-  /// Returns a new copy of the [DocumentPropertySchemaDto],
-  /// fields from this and [other] instance are merged into a single instance.
-  ///
-  /// Fields from this instance have more priority than from the
-  /// [other] instance (in case they appear in both instances).
-  DocumentPropertySchemaDto mergeWith(DocumentPropertySchemaDto other) {
-    final mergedItems = _mergeItems(items, other.items);
-    final mergedOneOf = oneOf ?? other.oneOf;
-
-    var mergedProperties = _mergeProperties(properties, other.properties);
-    if (mergedOneOf != null) {
-      for (final item in mergedOneOf) {
-        mergedProperties = _mergeProperties(mergedProperties, item.properties);
-      }
-    }
-
-    return DocumentPropertySchemaDto(
-      ref: ref ?? other.ref,
-      types: types ?? other.types,
-      format: format ?? other.format,
-      contentMediaType: contentMediaType ?? other.contentMediaType,
-      title: title ?? other.title,
-      description: description ?? other.description,
-      defaultValue: defaultValue ?? other.defaultValue,
-      placeholder: placeholder ?? other.placeholder,
-      guidance: guidance ?? other.guidance,
-      icon: icon ?? other.icon,
-      subsection: subsection ?? other.subsection,
-      constValue: constValue ?? other.constValue,
-      enumValues: enumValues ?? other.enumValues,
-      uniqueItems: uniqueItems ?? other.uniqueItems,
-      properties: mergedProperties,
-      items: mergedItems,
-      minimum: minimum ?? other.minimum,
-      maximum: maximum ?? other.maximum,
-      minLength: minLength ?? other.minLength,
-      maxLength: maxLength ?? other.maxLength,
-      minItems: minItems ?? other.minItems,
-      maxItems: maxItems ?? other.maxItems,
-      oneOf: oneOf ?? other.oneOf,
-      required: required ?? other.required,
-      order: order ?? other.order,
-      pattern: pattern ?? other.pattern,
-    );
-  }
-
   DocumentPropertySchemaDto? _mergeItems(
     DocumentPropertySchemaDto? first,
     DocumentPropertySchemaDto? second,
@@ -300,19 +315,5 @@ final class DocumentPropertySchemaDto {
     }
 
     return map;
-  }
-
-  String? definition() {
-    final ref = this.ref;
-    if (ref == null) {
-      return null;
-    }
-
-    final index = ref.lastIndexOf('/');
-    if (index < 0) {
-      return null;
-    }
-
-    return ref.substring(index + 1);
   }
 }
