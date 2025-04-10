@@ -34,15 +34,19 @@ use crate::{
             chain_info::ChainInfo, registration_chain::RbacRegistrationChain, response::Responses,
             unprocessable_content::RbacUnprocessableContent,
         },
-        common::types::{
-            cardano::query::cat_id_or_stake::CatIdOrStake, headers::retry_after::RetryAfterOption,
+        common::{
+            auth::rbac::token::CatalystRBACTokenV1,
+            types::{
+                cardano::query::cat_id_or_stake::CatIdOrStake,
+                headers::retry_after::RetryAfterOption,
+            },
         },
     },
 };
 
 /// Get RBAC registration endpoint.
 pub(crate) async fn endpoint(
-    lookup: Option<CatIdOrStake>, auth_catalyst_id: Option<IdUri>,
+    lookup: Option<CatIdOrStake>, token: Option<CatalystRBACTokenV1>,
 ) -> AllResponses {
     let Some(persistent_session) = CassandraSession::get(true) else {
         let err = anyhow!("Failed to acquire persistent db session");
@@ -78,8 +82,8 @@ pub(crate) async fn endpoint(
             }
         },
         None => {
-            match auth_catalyst_id {
-                Some(id) => id,
+            match token {
+                Some(token) => token.catalyst_id().clone(),
                 None => {
                     return Responses::UnprocessableContent(Json(RbacUnprocessableContent::new(
                         "Either lookup parameter or token must be provided",

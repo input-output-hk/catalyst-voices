@@ -85,7 +85,7 @@ impl DocumentApi {
         auth: CatalystRBACSecurityScheme,
     ) -> put_document::AllResponses {
         match document.0.into_bytes_limit(MAXIMUM_DOCUMENT_SIZE).await {
-            Ok(doc_bytes) => put_document::endpoint(doc_bytes.to_vec(), auth.0).await,
+            Ok(doc_bytes) => put_document::endpoint(doc_bytes.to_vec(), auth.into()).await,
             Err(ReadBodyError::PayloadTooLarge) => put_document::Responses::PayloadTooLarge.into(),
             Err(_) => {
                 put_document::Responses::UnprocessableContent(Json(
