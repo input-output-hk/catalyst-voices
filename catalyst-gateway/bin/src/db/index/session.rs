@@ -24,7 +24,10 @@ use super::{
     },
     schema::create_schema,
 };
-use crate::settings::{cassandra_db, Settings};
+use crate::{
+    service::utilities::health::set_index_db_liveness,
+    settings::{cassandra_db, Settings},
+};
 
 /// Configuration Choices for compression
 #[derive(Clone, strum::EnumString, strum::Display, strum::VariantNames)]
@@ -130,11 +133,13 @@ impl CassandraSession {
         loop {
             if !ignore_err {
                 if let Some(err) = INIT_SESSION_ERROR.get() {
+                    set_index_db_liveness(false);
                     return Err(err.clone());
                 }
             }
 
             if Self::is_ready() {
+                set_index_db_liveness(true);
                 return Ok(());
             }
 

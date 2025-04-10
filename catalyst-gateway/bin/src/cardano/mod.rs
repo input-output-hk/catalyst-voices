@@ -23,6 +23,7 @@ use crate::{
         },
         session::CassandraSession,
     },
+    service::utilities::health::{follower_has_first_reached_tip, set_follower_first_reached_tip},
     settings::{chain_follower, Settings},
 };
 
@@ -31,7 +32,7 @@ pub(crate) mod event;
 pub(crate) mod util;
 
 /// How long we wait between checks for connection to the indexing DB to be ready.
-const INDEXING_DB_READY_WAIT_INTERVAL: Duration = Duration::from_secs(1);
+pub(crate) const INDEXING_DB_READY_WAIT_INTERVAL: Duration = Duration::from_secs(1);
 
 /// Start syncing a particular network
 async fn start_sync_for(cfg: &chain_follower::EnvVars) -> anyhow::Result<()> {
@@ -294,6 +295,11 @@ fn sync_subchain(
                         );
                     }
 
+                    // Update flag if this is the first time reaching TIP.
+                    if chain_update.tip && !follower_has_first_reached_tip() {
+                        set_follower_first_reached_tip();
+                    }
+
                     update_block_state(
                         block,
                         &mut first_indexed_block,
@@ -435,6 +441,12 @@ impl SyncTask {
     /// Primary Chain Follower task.
     ///
     /// This continuously runs in the background, and never terminates.
+    ///
+    /// Sets the Index DB liveness flag to true if it is not already set.
+    ///
+    /// Sets the Chain Follower Has First Reached Tip flag to true if it is not already
+    /// set.
+    #[allow(clippy::too_many_lines)]
     async fn run(&mut self) {
         // We can't sync until the local chain data is synced.
         // This call will wait until we sync.
@@ -453,7 +465,10 @@ impl SyncTask {
         // Wait for indexing DB to be ready before continuing.
         // We do this after the above, because other nodes may have finished already, and we don't
         // want to wait do any work they already completed while we were fetching the blockchain.
+        //
+        // After waiting, we set the liveness flag to true if it is not already set.
         drop(CassandraSession::wait_until_ready(INDEXING_DB_READY_WAIT_INTERVAL, true).await);
+
         info!(chain=%self.cfg.chain, "Indexing DB is ready - Getting recovery state");
         self.sync_status = get_sync_status().await;
         debug!(chain=%self.cfg.chain, "Sync Status: {:?}", self.sync_status);
