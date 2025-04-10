@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/pages/registration/scroll_control_widget.dart';
 import 'package:catalyst_voices/pages/registration/widgets/registration_stage_navigation.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
@@ -20,13 +21,16 @@ class SetupPanel extends StatelessWidget {
         const _Title(),
         Expanded(
           child: FocusScope(
-            child: ListView(
-              padding: const EdgeInsets.symmetric(vertical: 24),
-              children: const [
-                _DisplayNameSelector(),
-                SizedBox(height: 24),
-                _EmailSelector(),
-              ],
+            child: ScrollbarVisibilityWidget(
+              builder: (controller) => ListView(
+                controller: controller,
+                padding: const EdgeInsets.symmetric(vertical: 24),
+                children: const [
+                  _DisplayNameSelector(),
+                  SizedBox(height: 24),
+                  _EmailSelector(),
+                ],
+              ),
             ),
           ),
         ),
@@ -35,26 +39,6 @@ class SetupPanel extends StatelessWidget {
         const SizedBox(height: 24),
         const _NavigationSelector(),
       ],
-    );
-  }
-}
-
-class _Title extends StatelessWidget {
-  const _Title();
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final textTheme = theme.textTheme;
-
-    final textStyle = (textTheme.titleMedium ?? const TextStyle()).copyWith(
-      color: theme.colors.textOnPrimaryLevel1,
-    );
-
-    return Text(
-      key: const Key('TitleText'),
-      context.l10n.createBaseProfileSetupTitle,
-      style: textStyle,
     );
   }
 }
@@ -179,6 +163,21 @@ class _IdeascaleInfoCard extends StatelessWidget {
   }
 }
 
+class _Navigation extends StatelessWidget {
+  final bool isNextEnabled;
+
+  const _Navigation({
+    required this.isNextEnabled,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return RegistrationBackNextNavigation(
+      isNextEnabled: isNextEnabled,
+    );
+  }
+}
+
 class _NavigationSelector extends StatelessWidget {
   const _NavigationSelector();
 
@@ -191,17 +190,22 @@ class _NavigationSelector extends StatelessWidget {
   }
 }
 
-class _Navigation extends StatelessWidget {
-  final bool isNextEnabled;
-
-  const _Navigation({
-    required this.isNextEnabled,
-  });
+class _Title extends StatelessWidget {
+  const _Title();
 
   @override
   Widget build(BuildContext context) {
-    return RegistrationBackNextNavigation(
-      isNextEnabled: isNextEnabled,
+    final theme = Theme.of(context);
+    final textTheme = theme.textTheme;
+
+    final textStyle = (textTheme.titleMedium ?? const TextStyle()).copyWith(
+      color: theme.colors.textOnPrimaryLevel1,
+    );
+
+    return Text(
+      key: const Key('TitleText'),
+      context.l10n.createBaseProfileSetupTitle,
+      style: textStyle,
     );
   }
 }
