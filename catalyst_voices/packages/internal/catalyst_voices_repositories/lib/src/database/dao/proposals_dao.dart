@@ -99,8 +99,18 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
       );
     }
 
-    if ((filters.onlyAuthor ?? false) && author != null) {
-      mainQuery.where(proposal.metadata.isAuthor(author));
+    if ((filters.onlyAuthor ?? false) ||
+        filters.type == ProposalsFilterType.my) {
+      if (author != null) {
+        mainQuery.where(proposal.metadata.isAuthor(author));
+      } else {
+        return Page(
+          page: request.page,
+          maxPerPage: request.size,
+          total: 0,
+          items: List.empty(),
+        );
+      }
     }
 
     if (filters.category != null) {
