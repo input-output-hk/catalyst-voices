@@ -140,9 +140,7 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
       return emitError(const LocalizedUnknownException());
     }
     try {
-      emit(
-        state.copyWith(isLoading: true),
-      );
+      emit(state.copyWith(isLoading: true));
       await _proposalService.forgetProposal(
         proposalRef: proposal.selfRef as SignedDocumentRef,
         categoryId: proposal.categoryId,
