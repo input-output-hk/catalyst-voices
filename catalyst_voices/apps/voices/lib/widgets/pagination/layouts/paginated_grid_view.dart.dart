@@ -138,7 +138,11 @@ class _Controls extends StatelessWidget {
       children: [
         Text(
           key: const Key('PaginationText'),
-          '$fromNumber-$toNumber of $maxResults proposals',
+          context.l10n.paginationProposalsCounter(
+            fromNumber,
+            toNumber,
+            maxResults,
+          ),
         ),
         VoicesIconButton(
           key: const Key('PrevPageBtn'),
