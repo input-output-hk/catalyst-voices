@@ -97,37 +97,19 @@ final class ProposalsCubit extends Cubit<ProposalsState>
 
   Future<void> getProposals(PageRequest request) async {
     try {
-      final campaign = await _campaignService.getActiveCampaign();
-      if (campaign == null) {
-        return;
+      if (_cache.campaign == null) {
+        final campaign = await _campaignService.getActiveCampaign();
+        _cache = _cache.copyWith(campaign: Optional(campaign));
       }
-
-      final campaignStage = CampaignStage.fromCampaign(
-        campaign,
-        DateTimeExt.now(),
-      );
-
-      final filters = _cache.filters;
 
       final page = await _proposalService.getProposalsPage(
         request: request,
-        filters: filters,
+        filters: _cache.filters,
       );
 
       _cache = _cache.copyWith(page: Optional(page));
 
-      final mappedPage = page.map(
-        (proposal) {
-          return ProposalViewModel.fromProposalAtStage(
-            proposal: proposal,
-            campaignName: campaign.name,
-            campaignStage: campaignStage,
-          );
-        },
-      );
-
-      final signal = ProposalsPageReadySignal(page: mappedPage);
-      emitSignal(signal);
+      _emitCachedProposalsPage();
     } catch (error, stackTrace) {
       _logger.severe('Failed loading page $request', error, stackTrace);
     }
@@ -165,6 +147,21 @@ final class ProposalsCubit extends Cubit<ProposalsState>
 
     emit(state.copyWith(favoritesIds: favoritesIds));
 
+    if (!isFavorite && _cache.filters.type == ProposalsFilterType.favorites) {
+      final page = _cache.page;
+      if (page != null) {
+        final proposals = List.of(page.items)
+            .where((element) => element.selfRef != ref)
+            .toList();
+
+        final updatedPage = page.copyWithItems(proposals);
+
+        _cache = _cache.copyWith(page: Optional(updatedPage));
+
+        _emitCachedProposalsPage();
+      }
+    }
+
     unawaited(_updateFavoriteProposal(ref, isFavorite: isFavorite));
   }
 
@@ -179,6 +176,34 @@ final class ProposalsCubit extends Cubit<ProposalsState>
     changeFilters(searchQuery: asOptional);
 
     emit(state.copyWith(hasSearchQuery: !asOptional.isEmpty));
+  }
+
+  void _emitCachedProposalsPage() {
+    final campaign = _cache.campaign;
+    final page = _cache.page;
+
+    if (campaign == null || page == null) {
+      return;
+    }
+
+    final campaignStage = CampaignStage.fromCampaign(
+      campaign,
+      DateTimeExt.now(),
+    );
+
+    final mappedPage = page.map(
+      (proposal) {
+        return ProposalViewModel.fromProposalAtStage(
+          proposal: proposal,
+          campaignName: campaign.name,
+          campaignStage: campaignStage,
+        );
+      },
+    );
+
+    final signal = ProposalsPageReadySignal(page: mappedPage);
+
+    emitSignal(signal);
   }
 
   void _handleActiveAccountIdChange(CatalystId? id) {
