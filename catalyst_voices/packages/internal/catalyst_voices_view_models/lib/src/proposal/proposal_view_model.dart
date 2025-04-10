@@ -157,7 +157,7 @@ and PRISM, but its potential is only barely exploited.
         );
 
   String get fundsRequested {
-    return CryptocurrencyFormatter.decimalFormat(_fundsRequested);
+    return CryptocurrencyFormatter.formatAmount(_fundsRequested);
   }
 
   @override

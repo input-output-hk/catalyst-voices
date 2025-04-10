@@ -232,6 +232,7 @@ final class ProposalServiceImpl implements ProposalService {
       filters: filters,
     );
 
+    // TODO(damian-molinski): this most likely should happen in ProposalsCubit.
     final proposals = await page.items.map(
       (item) async {
         final categoryId = item.categoryId;
