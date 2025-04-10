@@ -3,6 +3,7 @@ import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_services/src/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shared_preferences_platform_interface/in_memory_shared_preferences_async.dart';
 import 'package:shared_preferences_platform_interface/shared_preferences_async_platform_interface.dart';
@@ -12,6 +13,7 @@ import 'package:uuid_plus/uuid_plus.dart';
 
 void main() {
   late final KeychainProvider keychainProvider;
+  late final _MockUserDataSource userDataSource;
   late final UserRepository userRepository;
   late final UserObserver userObserver;
 
@@ -28,7 +30,12 @@ void main() {
       sharedPreferences: SharedPreferencesAsync(),
       cacheConfig: const CacheConfig(),
     );
-    userRepository = UserRepository(SecureUserStorage(), keychainProvider);
+    userDataSource = _MockUserDataSource();
+    userRepository = UserRepository(
+      SecureUserStorage(),
+      userDataSource,
+      keychainProvider,
+    );
     userObserver = StreamUserObserver();
   });
 
@@ -41,6 +48,7 @@ void main() {
   });
 
   tearDown(() async {
+    reset(userDataSource);
     userObserver.user = const User.empty();
 
     await const FlutterSecureStorage().deleteAll();
@@ -48,6 +56,29 @@ void main() {
   });
 
   group(UserService, () {
+    test('when registering account getter returns that account', () async {
+      // Given
+      final keychainId = const Uuid().v4();
+
+      // When
+      final keychain = await keychainProvider.create(keychainId);
+      final account = Account.dummy(
+        catalystId: DummyCatalystIdFactory.create(),
+        keychain: keychain,
+      );
+
+      when(() => userDataSource.updateEmail(account.email))
+          .thenAnswer((_) async => {});
+
+      await service.registerAccount(account);
+
+      // Then
+      final currentAccount = service.user.activeAccount;
+
+      expect(currentAccount?.catalystId, account.catalystId);
+      expect(currentAccount?.isActive, isTrue);
+    });
+
     test('when using account getter returns that account', () async {
       // Given
       final keychainId = const Uuid().v4();
@@ -258,3 +289,5 @@ void main() {
     });
   });
 }
+
+class _MockUserDataSource extends Mock implements UserDataSource {}

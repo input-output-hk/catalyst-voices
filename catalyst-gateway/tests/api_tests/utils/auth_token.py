@@ -1,35 +1,39 @@
 from datetime import datetime, timezone
 import base64
 import pytest
-from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey, Ed25519PublicKey
+from pycardano.crypto.bip32 import BIP32ED25519PrivateKey, BIP32ED25519PublicKey
 
 @pytest.fixture
 def rbac_auth_token_factory():
 
     def __rbac_auth_token_factory(
         # Already registered as role 0
-        # https://preprod.cexplorer.io/tx/764139bb8924f436486fa686ec836c180e98cc8d3e8ff413e3c11222fcf23836
-        sk_hex: str = "e81127f0586aa9c6cf0b6048330f3200e1791187ea87ab780e14337f814e3f51a1f265eac3449c1109ba026d425c4b08f45088a4b47c3892157e740042a18e37",
-        pk_hex: str = "6e42f8e589a76ebb13ef279df7841efce978f106bee196f0e3cfd347bb31a2e8"
+        # https://preprod.cexplorer.io/tx/5fd71fb559d3ebf16bb0b8b30028a1d0fbbb3a983dbbe2e92eb87f851c6d205c
+        sk_hex: str = "a8f84dd9576f9b5224da38146df1dd4c80c6aa767cb71540bd86294f62cced568ecdf07352e0b48e1ae66370352e56aba4113461ec08e13b2fed10ecc056c65fd2a76829a3b53e66af79bb0cb1efade075f0ae65eaaabb75f5106bbeef59b866",
+        pk_hex: str = "42149f1a6f1da43fcf066a473e12515b5b6216fedfc52b87bee091456981d9c6d2a76829a3b53e66af79bb0cb1efade075f0ae65eaaabb75f5106bbeef59b866"
     ) -> str:
-        sk = Ed25519PrivateKey.from_private_bytes(bytes.fromhex(sk_hex)[:32])
-        pk = Ed25519PublicKey.from_public_bytes(bytes.fromhex(pk_hex))
-        return generate_rbac_auth_token("cardano", "preprod", pk, sk)
+        pk = bytes.fromhex(pk_hex)[:32]
+        sk = bytes.fromhex(sk_hex)[:64]
+        chain_code = bytes.fromhex(sk_hex)[64:]
+        return generate_rbac_auth_token("cardano", "preprod", pk, sk, chain_code)
+
     return __rbac_auth_token_factory
 
-def generate_rbac_auth_token(network: str, subnet: str | None, role0_pk: Ed25519PublicKey, sk: Ed25519PrivateKey) -> str:
+def generate_rbac_auth_token(network: str, subnet: str | None, pk: bytes, sk: bytes, chain_code: bytes) -> str:
+    bip32_ed25519_sk = BIP32ED25519PrivateKey(sk, chain_code)
+    bip32_ed25519_pk = BIP32ED25519PublicKey(pk, chain_code)
+    
     prefix = "catid.:"
     nonce = int(datetime.now(timezone.utc).timestamp())
     subnet = f"{subnet}." if subnet else ""
-    role0_pk_b64 = base64_url(role0_pk.public_bytes_raw())
-    
+    role0_pk_b64 = base64_url(pk)
     catid_without_sig = f"{prefix}{nonce}@{subnet}{network}/{role0_pk_b64}."
     
-    signature = sk.sign(catid_without_sig.encode()) 
+    signature = bip32_ed25519_sk.sign(catid_without_sig.encode()) 
+    bip32_ed25519_pk.verify(signature, catid_without_sig.encode())
     signature_b64 = base64_url(signature)
 
     return f"{catid_without_sig}{signature_b64}"
-    
 
 def base64_url(data: bytes) -> str:
     # URL safety and no padding base 64

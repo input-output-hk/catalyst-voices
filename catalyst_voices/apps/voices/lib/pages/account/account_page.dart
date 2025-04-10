@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:catalyst_voices/common/error_handler.dart';
 import 'package:catalyst_voices/pages/account/widgets/account_action_tile.dart';
 import 'package:catalyst_voices/pages/account/widgets/account_email_tile.dart';
 import 'package:catalyst_voices/pages/account/widgets/account_header_tile.dart';
@@ -23,14 +24,8 @@ final class AccountPage extends StatefulWidget {
   State<AccountPage> createState() => _AccountPageState();
 }
 
-class _AccountPageState extends State<AccountPage> {
-  @override
-  void initState() {
-    super.initState();
-
-    unawaited(context.read<AccountCubit>().loadAccountDetails());
-  }
-
+class _AccountPageState extends State<AccountPage>
+    with ErrorHandlerStateMixin<AccountCubit, AccountPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -97,5 +92,12 @@ class _AccountPageState extends State<AccountPage> {
         ],
       ),
     );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    unawaited(context.read<AccountCubit>().loadAccountDetails());
   }
 }

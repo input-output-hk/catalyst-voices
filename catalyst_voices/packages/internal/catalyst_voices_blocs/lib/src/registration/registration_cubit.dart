@@ -152,7 +152,8 @@ final class RegistrationCubit extends Cubit<RegistrationState>
         case AccountSubmitFullData():
           final account = await _registrationService.register(data: submitData);
 
-          await _userService.useAccount(account);
+          await _userService.registerAccount(account);
+
         case AccountSubmitUpdateData(
             :final metadata,
             :final accountId,

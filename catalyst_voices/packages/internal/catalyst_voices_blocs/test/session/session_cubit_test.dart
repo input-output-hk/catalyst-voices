@@ -42,6 +42,7 @@ void main() {
     );
     userRepository = UserRepository(
       SecureUserStorage(),
+      _MockUserDataSource(),
       keychainProvider,
     );
     userObserver = StreamUserObserver();
@@ -338,3 +339,5 @@ class _MockRegistrationService extends Mock implements RegistrationService {
     );
   }
 }
+
+class _MockUserDataSource extends Mock implements UserDataSource {}

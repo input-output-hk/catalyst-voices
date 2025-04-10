@@ -2,7 +2,7 @@ import schemathesis
 import random
 import time
 import os
-import hypothesis
+from hypothesis import given, strategies as st
 import cbor2
 
 
@@ -24,10 +24,12 @@ class MyAuth:
         return 1
 
     def set(self, case, data, context):
+        self.set_impl(case)
+
+    @given(data=st.data())
+    def set_impl(self, case, data):
         security_definitions = case.operation.definition.raw.get("security", [])
-        # randomly choose what kind of authentication would be applied
-        choosen_auth_st = hypothesis.strategies.sampled_from(security_definitions)
-        choosen_auth = hypothesis.find(choosen_auth_st, lambda x: True)
+        choosen_auth = data.draw(st.sampled_from(security_definitions), label="choosen_auth")
         if "NoAuthorization" in choosen_auth:
             case.headers.pop("Authorization", None)
             case.headers.pop("X-API-Key", None)

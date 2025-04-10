@@ -77,10 +77,12 @@ final class FundedProjectsRoute extends GoRouteData
 final class ProposalsRoute extends GoRouteData
     with FadePageTransitionMixin, CompositeRouteGuardMixin {
   final String? categoryId;
+  final String? type;
   final bool myProposals;
 
   const ProposalsRoute({
     this.categoryId,
+    this.type,
     this.myProposals = false,
   });
 
@@ -101,9 +103,12 @@ final class ProposalsRoute extends GoRouteData
     final categoryRef =
         categoryId != null ? SignedDocumentRef(id: categoryId) : null;
 
+    final type = ProposalsFilterType.values.asNameMap()[this.type];
+
     return ProposalsPage(
       categoryId: categoryRef,
-      selectMyProposalsView: myProposals,
+      type: type,
+      myProposals: myProposals,
     );
   }
 }

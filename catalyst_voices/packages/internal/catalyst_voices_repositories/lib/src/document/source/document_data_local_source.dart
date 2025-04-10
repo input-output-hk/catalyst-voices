@@ -54,8 +54,8 @@ abstract interface class SignedDocumentDataSource
   });
 
   Stream<int> watchCount({
-    required DocumentRef ref,
-    required DocumentType type,
+    DocumentRef? refTo,
+    DocumentType? type,
   });
 
   Stream<DocumentData?> watchRefToDocumentData({

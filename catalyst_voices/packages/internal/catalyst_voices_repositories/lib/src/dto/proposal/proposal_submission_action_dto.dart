@@ -23,10 +23,8 @@ final class ProposalSubmissionActionDocumentDto {
 enum ProposalSubmissionActionDto {
   @JsonValue('final')
   aFinal,
-
   @JsonValue('draft')
   draft,
-
   @JsonValue('hide')
   hide;
 
@@ -52,5 +50,13 @@ enum ProposalSubmissionActionDto {
       case ProposalSubmissionActionDto.hide:
         return ProposalSubmissionAction.hide;
     }
+  }
+
+  static ProposalSubmissionActionDto? fromJson(String value) {
+    return $enumDecodeNullable(
+      _$ProposalSubmissionActionDtoEnumMap,
+      value,
+      unknownValue: JsonKey.nullForUndefinedEnumValue,
+    );
   }
 }

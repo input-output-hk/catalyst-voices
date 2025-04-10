@@ -18,6 +18,12 @@ abstract interface class UserService implements ActiveAware {
 
   Future<User> getUser();
 
+  /// Registers a new [account] and makes it active.
+  ///
+  /// It can invoke some one-time registration logic,
+  /// contrary to [useAccount] which doesn't have such logic.
+  Future<void> registerAccount(Account account);
+
   Future<void> removeAccount(Account account);
 
   Future<void> updateAccount({
@@ -29,6 +35,7 @@ abstract interface class UserService implements ActiveAware {
 
   Future<void> updateSettings(UserSettings newValue);
 
+  /// Make the [account] active one. If it doesn't exist then it'll be created.
   Future<void> useAccount(Account account);
 
   Future<void> useLastAccount();
@@ -61,6 +68,26 @@ final class UserServiceImpl implements UserService {
 
   @override
   Future<User> getUser() => _userRepository.getUser();
+
+  @override
+  Future<void> registerAccount(Account account) async {
+    var user = await getUser();
+
+    if (user.hasAccount(id: account.catalystId)) {
+      throw StateError(
+        'The account must not be registered, id: ${account.catalystId}',
+      );
+    }
+
+    user = user.addAccount(account);
+    user = user.useAccount(id: account.catalystId);
+
+    await _updateUser(user);
+
+    // updating email must be after updating user so that
+    // the request is sent with correct access token
+    unawaited(_userRepository.updateEmail(account.email));
+  }
 
   @override
   Future<void> removeAccount(Account account) async {
@@ -102,9 +129,9 @@ final class UserServiceImpl implements UserService {
       updatedAccount = updatedAccount.copyWith(catalystId: catalystId);
     }
 
-    // TODO(damian-molinski): post it to cat-reviews
     if (email != null) {
-      // updatedAccount = updatedAccount.copyWith(email: email);
+      await _userRepository.updateEmail(email);
+      updatedAccount = updatedAccount.copyWith(email: email);
     }
 
     if (roles != null) {

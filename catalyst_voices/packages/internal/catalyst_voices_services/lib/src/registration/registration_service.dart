@@ -216,7 +216,6 @@ final class RegistrationServiceImpl implements RegistrationService {
         wallet: data.metadata.wallet,
         unsignedTx: data.metadata.transaction,
       );
-
       final keychain = data.keychain;
 
       return keychain.getMasterKey().use((masterKey) {

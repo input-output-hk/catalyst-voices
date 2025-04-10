@@ -256,6 +256,7 @@ Ptarget
 pubkey
 PUBLICKEY
 pubspec
+pycardano
 pytest
 qrcode
 rapidoc
