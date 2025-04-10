@@ -52,6 +52,7 @@ final class ProposalsCubit extends Cubit<ProposalsState>
     Optional<SignedDocumentRef>? category,
     ProposalsFilterType? type,
     Optional<String>? searchQuery,
+    bool sendResetSignal = true,
   }) {
     final filters = _cache.filters.copyWith(
       type: type,
@@ -61,13 +62,19 @@ final class ProposalsCubit extends Cubit<ProposalsState>
       searchQuery: searchQuery,
     );
 
+    if (_cache.filters == filters) {
+      return;
+    }
+
     _cache = _cache.copyWith(filters: filters);
 
     if (category != null) _rebuildCategories();
 
     _watchProposalsCount(filters: filters.toCountFilters());
 
-    emitSignal(const ResetProposalsPaginationSignal());
+    if (sendResetSignal) {
+      emitSignal(const ResetProposalsPaginationSignal());
+    }
   }
 
   void changeSelectedCategory(SignedDocumentRef? categoryId) {
@@ -139,6 +146,7 @@ final class ProposalsCubit extends Cubit<ProposalsState>
       onlyMy: Optional(onlyMyProposals),
       category: Optional(category),
       type: type,
+      sendResetSignal: false,
     );
   }
 
