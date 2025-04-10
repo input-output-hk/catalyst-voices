@@ -3,6 +3,8 @@ export 'catalyst_database_config.dart';
 export 'dao/documents_dao.dart' show DocumentsDao;
 export 'dao/drafts_dao.dart' show DraftsDao;
 export 'dao/favorites_dao.dart' show FavoritesDao;
+export 'dao/proposals_dao.dart' show ProposalsDao;
+export 'model/joined_proposal_entity.dart';
 export 'table/documents.drift.dart' show DocumentEntity;
 export 'table/documents_favorite.drift.dart' show DocumentFavoriteEntity;
 export 'table/documents_metadata.drift.dart' show DocumentMetadataEntity;

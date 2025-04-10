@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:catalyst_voices/widgets/pagination/paging_status.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
@@ -54,13 +52,7 @@ class PagingState<ItemType> extends Equatable {
   int get currentLastPage => (_itemCount / itemsPerPage).ceil() - 1;
 
   int get currentTo {
-    if (itemList.isEmpty) {
-      return 0;
-    }
-    return min(
-      min(currentFrom + itemsPerPage - 1, itemList.length - 1),
-      maxResults - 1,
-    );
+    return currentPage * itemsPerPage + itemsPerPage;
   }
 
   int get fromValue => currentFrom + 1;
@@ -111,7 +103,6 @@ class PagingState<ItemType> extends Equatable {
 
   PagingState<ItemType> copyWith({
     int? currentPage,
-    int? currentLastPage,
     int? maxResults,
     int? itemsPerPage,
     List<ItemType>? itemList,
