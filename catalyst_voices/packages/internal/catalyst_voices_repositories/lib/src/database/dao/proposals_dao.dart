@@ -148,6 +148,8 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
     return _transformRefsStreamToCount(stream, author: filters.author);
   }
 
+  // TODO(damian-molinski): Make this more specialized per case.
+  // for example proposals list does not need all versions, just count.
   Future<JoinedProposalEntity> _buildJoinedProposal(
     DocumentEntity proposal,
   ) async {
