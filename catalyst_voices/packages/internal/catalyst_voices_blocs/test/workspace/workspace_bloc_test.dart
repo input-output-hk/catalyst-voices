@@ -56,7 +56,7 @@ void main() {
     });
 
     blocTest<WorkspaceBloc, WorkspaceState>(
-      'emit loading state and loaded state when watchin proposals succeeds',
+      'emit loading state and loaded state when watching proposals succeeds',
       build: () {
         when(() => mockProposalService.watchUserProposals()).thenAnswer(
           (_) => Stream.value(

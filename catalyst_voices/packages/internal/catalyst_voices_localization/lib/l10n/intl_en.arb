@@ -2097,12 +2097,12 @@
   "@successProposalDeletedDescription": {
     "description": "Description of success message when draft is deleted"
   },
-  "successProposalForgetted": "Proposal forgotten",
-  "@successProposalForgetted": {
+  "successProposalForgotted": "Proposal forgotten",
+  "@successProposalForgotted": {
     "description": "Success message when public draft/final proposal is forgotten"
   },
-  "successProposalForgettedDescription": "Your local proposal has been forgotten. No one can see it anymore.",
-  "@successProposalForgettedDescription": {
+  "successProposalForgottedDescription": "Your local proposal has been forgotten. No one can see it anymore.",
+  "@successProposalForgottedDescription": {
     "description": "Description of success message when public draft/final proposal is forgotten"
   },
   "errorProposalDeleted": "Error deleting proposal",

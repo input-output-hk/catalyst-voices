@@ -122,8 +122,8 @@ class _WorkspacePageState extends State<WorkspacePage>
     VoicesSnackBar(
       type: VoicesSnackBarType.success,
       behavior: SnackBarBehavior.floating,
-      title: context.l10n.successProposalForgetted,
-      message: context.l10n.successProposalForgettedDescription,
+      title: context.l10n.successProposalForgotted,
+      message: context.l10n.successProposalForgottedDescription,
     ).show(context);
   }
 
