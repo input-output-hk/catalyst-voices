@@ -53,38 +53,6 @@
     "campaign_category": {
         "category_details": {
             "details": {}
-        },
-        "category_questions": {
-            "informational_content": { "answer": false },
-            "foundational_rd": { "answer": false },
-            "financial_products": { "answer": false },
-            "early_stage_product": { "answer": false },
-            "developer_tools": { "answer": false },
-            "enterprise_partnership": {
-                "answer": true,
-                "secondary_question": {
-                    "question": "Example Enterprise with proven track record"
-                }
-            },
-            "working_product": {
-                "answer": true,
-                "secondary_question": {
-                    "question": "Example product with measurable adoption metrics"
-                }
-            },
-            "timeline": { "answer": true },
-            "matching_funds": {
-                "answer": true,
-                "secondary_question": {
-                    "question": "Example matching funds details"
-                }
-            },
-            "adoption_potential": {
-                "answer": true,
-                "secondary_question": {
-                    "question": "Example measurable outcomes and assessment methods"
-                }
-            }
         }
     },
     "projectDetails": {
@@ -147,12 +115,36 @@
     },
     "acknowledgements": {
         "categoryRules": {
-            "categoryAcknowledgements": [
-                "I understand that my project must align with the chosen category requirements",
-                "I confirm the budget requested is within the allowed range for this category",
-                "I acknowledge that my submission will be evaluated based on category-specific criteria",
-                "I understand that failure to comply with category rules may result in disqualification"
-            ]
+            "informational_content": { "answer": false },
+            "foundational_rd": { "answer": false },
+            "financial_products": { "answer": false },
+            "early_stage_product": { "answer": false },
+            "developer_tools": { "answer": false },
+            "enterprise_partnership": {
+                "answer": true,
+                "secondary_question": {
+                    "question": "Example Enterprise with proven track record"
+                }
+            },
+            "working_product": {
+                "answer": true,
+                "secondary_question": {
+                    "question": "Example product with measurable adoption metrics"
+                }
+            },
+            "timeline": { "answer": true },
+            "matching_funds": {
+                "answer": true,
+                "secondary_question": {
+                    "question": "Example matching funds details"
+                }
+            },
+            "adoption_potential": {
+                "answer": true,
+                "secondary_question": {
+                    "question": "Example measurable outcomes and assessment methods"
+                }
+            }
         },
         "fundRules": {
             "fundAcknowledgements": true

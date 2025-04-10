@@ -4,7 +4,10 @@
     "title": "F14 Submission Form",
     "description": "Schema for the F14 Catalyst Submission Form",
     "maintainers": [
-        { "name": "Catalyst Team", "url": "https://projectcatalyst.io/" }
+        {
+            "name": "Catalyst Team",
+            "url": "https://projectcatalyst.io/"
+        }
     ],
     "x-changelog": {
         "2025-01-14": [
@@ -263,7 +266,9 @@
                     "$ref": "#/definitions/section",
                     "title": "Title",
                     "description": "The title of your submission",
-                    "required": ["titleText"],
+                    "required": [
+                        "titleText"
+                    ],
                     "properties": {
                         "titleText": {
                             "$ref": "#/definitions/singleLineTextEntry",
@@ -314,7 +319,9 @@
                             "minItems": 0,
                             "items": {
                                 "type": "object",
-                                "required": ["name"],
+                                "required": [
+                                    "name"
+                                ],
                                 "properties": {
                                     "name": {
                                         "type": "string",
@@ -327,10 +334,16 @@
                             }
                         }
                     },
-                    "required": ["applicant", "type"],
-                    "x-order": ["applicant", "type", "coproposers"]
+                    "required": [
+                        "applicant",
+                        "type"
+                    ],
+                    "x-order": [
+                        "applicant",
+                        "type",
+                        "coproposers"
+                    ]
                 },
-
                 "theme": {
                     "$ref": "#/definitions/section",
                     "title": "Theme",
@@ -338,7 +351,8 @@
                     "properties": {
                         "grouped_tag": {
                             "$ref": "#/definitions/singleGroupedTagSelector",
-                            "oneOf": [{
+                            "oneOf": [
+                                {
                                     "properties": {
                                         "group": {
                                             "$ref": "#/definitions/tagGroup",
@@ -346,7 +360,10 @@
                                         },
                                         "tag": {
                                             "$ref": "#/definitions/tagSelection",
-                                            "enum": ["Governance", "DAO"]
+                                            "enum": [
+                                                "Governance",
+                                                "DAO"
+                                            ]
                                         }
                                     }
                                 },
@@ -578,13 +595,18 @@
                             ]
                         }
                     },
-                    "x-order": ["theme"]
+                    "x-order": [
+                        "theme"
+                    ]
                 },
                 "openSource": {
                     "$ref": "#/definitions/section",
                     "title": "Open Source",
                     "description": "Open source status of your project",
-                    "required": ["isOpenSource", "licenseType"],
+                    "required": [
+                        "isOpenSource",
+                        "licenseType"
+                    ],
                     "properties": {
                         "isOpenSource": {
                             "$ref": "#/definitions/yesNoChoice",
@@ -670,10 +692,430 @@
                             "title": "Selected Category"
                         }
                     }
-                },
-                "category_questions": {
+                }
+            },
+            "x-order": [
+                "category_details"
+            ]
+        },
+        "summary": {
+            "$ref": "#/definitions/segment",
+            "title": "Summary",
+            "description": "A brief overview of your submission",
+            "required": [
+                "problemStatement",
+                "solutionSummary",
+                "expectedDuration",
+                "requestedBudget",
+                "relevantLinks"
+            ],
+            "properties": {
+                "problemStatement": {
                     "$ref": "#/definitions/section",
-                    "title": "Category Questions",
+                    "title": "Problem Statement",
+                    "description": "The problem you are trying to solve",
+                    "required": [
+                        "problemDescription"
+                    ],
+                    "properties": {
+                        "problemDescription": {
+                            "$ref": "#/definitions/multiLineTextEntryMarkdown",
+                            "title": "Problem Description",
+                            "description": "Describe the problem your project aims to solve",
+                            "maxLength": 2500,
+                            "minLength": 100,
+                            "x-guidance": "Ensure you present a well-defined problem. What is the core issue that you hope to fix? Remember: the reader might not recognize the problem unless you state it clearly. This answer will be displayed on the Catalyst voting app, so voters will see it even if they don't open your submission to read it in detail.",
+                            "x-placeholder": "Describe the problem you aim to solve"
+                        }
+                    }
+                },
+                "solutionSummary": {
+                    "$ref": "#/definitions/section",
+                    "title": "Solution Summary",
+                    "description": "A summary of your proposed solution",
+                    "required": [
+                        "summaryText"
+                    ],
+                    "properties": {
+                        "summaryText": {
+                            "$ref": "#/definitions/multiLineTextEntryMarkdown",
+                            "title": "Summary Text",
+                            "description": "Provide a brief summary of your solution",
+                            "maxLength": 2500,
+                            "minLength": 100,
+                            "x-guidance": "Focus on what you are going to do, or make, or change, to solve the problem. So not 'There should be a way to....' but 'We will make a...' Clearly state how the solution addresses the specific problem you have identified - connect the 'why' and the 'how'. This answer will be displayed on the Catalyst voting app, so voters will see it even if they do not open your submission and read it in detail.",
+                            "x-placeholder": "Describe how you'll solve the problem"
+                        }
+                    }
+                },
+                "expectedDuration": {
+                    "$ref": "#/definitions/section",
+                    "title": "Expected Duration",
+                    "description": "How long will your project take",
+                    "required": [
+                        "durationMonths"
+                    ],
+                    "properties": {
+                        "durationMonths": {
+                            "$ref": "#/definitions/durationInMonths",
+                            "title": "Duration (Months)",
+                            "description": "The expected duration of your project in months",
+                            "minimum": 2,
+                            "maximum": 12,
+                            "x-guidance": "Minimum 2 months-Maximum 12 months. The scope of your funding request and this project is expected to produce the deliverables you specify in the submission within 2-12 months. If you believe your project will take longer than 12 months, consider reducing the project's scope so that it becomes achievable within 12 months.",
+                            "x-placeholder": "Enter the expected duration of your project (2-12 months)"
+                        }
+                    }
+                },
+                "requestedBudget": {
+                    "$ref": "#/definitions/section",
+                    "title": "Requested Budget",
+                    "description": "The budget you are requesting",
+                    "required": [
+                        "budgetAmount"
+                    ],
+                    "properties": {
+                        "budgetAmount": {
+                            "$ref": "#/definitions/tokenValueCardanoADA",
+                            "title": "Budget Amount",
+                            "description": "The amount of ADA you are requesting",
+                            "minimum": 15000,
+                            "maximum": 2000000,
+                            "x-guidance": "There is a minimum and a maximum amount of funding that can be requested in a single Catalyst submission. Different categories have different funding limits, so ensure your request aligns with the category you selected.",
+                            "x-placeholder": "Enter the amount of funding you are requesting in ADA"
+                        }
+                    }
+                },
+                "relevantLinks": {
+                    "$ref": "#/definitions/section",
+                    "title": "Relevant Links",
+                    "description": "Links to relevant resources",
+                    "required": [
+                        "links"
+                    ],
+                    "properties": {
+                        "links": {
+                            "$ref": "#/definitions/singleLineHttpsURLEntryList",
+                            "title": "Links",
+                            "description": "Add links to relevant resources (GitHub, website, documentation, etc.)",
+                            "maxItems": 10,
+                            "x-guidance": "Here, provide links to yours or your partner organization's website, repository, or marketing. Alternatively, provide links to any whitepaper or other publication relevant to your submission. Note however that this is extra information that voters and Community Reviewers might choose not to read. You should not fail to include any vital information in this form because you feel the answers can be found elsewhere.",
+                            "x-placeholder": "Enter relevant links (website, GitHub, whitepaper, etc.)"
+                        }
+                    }
+                }
+            },
+            "x-order": [
+                "problemStatement",
+                "solutionSummary",
+                "expectedDuration",
+                "requestedBudget",
+                "relevantLinks"
+            ]
+        },
+        "projectDetails": {
+            "$ref": "#/definitions/segment",
+            "title": "Project Details",
+            "description": "Detailed information about your project",
+            "required": [
+                "solutionDescription",
+                "ecosystemImpact",
+                "capabilityFeasibility",
+                "projectDependencies"
+            ],
+            "properties": {
+                "solutionDescription": {
+                    "$ref": "#/definitions/section",
+                    "title": "Solution Description",
+                    "description": "Detailed description of your solution",
+                    "required": [
+                        "detailedDescription"
+                    ],
+                    "properties": {
+                        "detailedDescription": {
+                            "$ref": "#/definitions/multiLineTextEntryMarkdown",
+                            "title": "Detailed Description",
+                            "description": "Provide a comprehensive description of your solution",
+                            "maxLength": 10000,
+                            "minLength": 500,
+                            "x-guidance": "Describe your solution in detail. How will it work? What technologies will you use? What steps will you take to implement it? This is your opportunity to show that you have a well-thought-out plan.",
+                            "x-placeholder": "Enter a detailed description of your solution"
+                        }
+                    }
+                },
+                "ecosystemImpact": {
+                    "$ref": "#/definitions/section",
+                    "title": "Ecosystem Impact",
+                    "description": "The impact your project will have on the ecosystem",
+                    "required": [
+                        "impactDescription"
+                    ],
+                    "properties": {
+                        "impactDescription": {
+                            "$ref": "#/definitions/multiLineTextEntryMarkdown",
+                            "title": "Impact Description",
+                            "description": "Describe the impact your project will have on the Cardano ecosystem",
+                            "maxLength": 5000,
+                            "minLength": 200,
+                            "x-guidance": "Explain how your project will benefit the Cardano ecosystem. Will it bring new users? Will it improve the user experience? Will it solve an existing problem? Be specific about the impact and who will benefit.",
+                            "x-placeholder": "Explain the positive impacts your project will have"
+                        }
+                    }
+                },
+                "capabilityFeasibility": {
+                    "$ref": "#/definitions/section",
+                    "title": "Capability & Feasibility",
+                    "description": "Your ability to deliver the project",
+                    "required": [
+                        "capabilityAssessment"
+                    ],
+                    "properties": {
+                        "capabilityAssessment": {
+                            "$ref": "#/definitions/multiLineTextEntryMarkdown",
+                            "title": "Capability Assessment",
+                            "description": "Describe your team's capability to deliver this project and its overall feasibility",
+                            "maxLength": 5000,
+                            "minLength": 200,
+                            "x-guidance": "Demonstrate why your team is qualified to execute this project. Include relevant experience, skills, and past achievements. Also explain what makes this project feasible within the proposed timeframe and budget.",
+                            "x-placeholder": "Describe your team's capabilities and the project's feasibility"
+                        }
+                    }
+                },
+                "projectDependencies": {
+                    "$ref": "#/definitions/section",
+                    "title": "Project Dependencies",
+                    "description": "Dependencies for your project",
+                    "x-guidance": "If your project has any dependencies and prerequisites for your project's success, list them here. These are usually external factors (such as third-party suppliers, external resources, third-party software, etc.) that may cause a delay, since a project has less control over them. In case of third party software, indicate whether you have the necessary licenses and permission to use such software.",
+                    "properties": {
+                        "hasDependency": {
+                            "$ref": "#/definitions/yesNoChoice",
+                            "title": "Does the project have any dependency",
+                            "description": "Does your project have any dependencies on other organizations, technical or otherwise?",
+                            "x-guidance": "If YES, please describe what the dependency is and why you believe it is essential for your project's delivery. If NO, please write \"No dependencies\"",
+                            "x-placeholder": "Select if your project has any dependencies"
+                        },
+                        "dependencyDetail": {
+                            "$ref": "#/definitions/singleLineTextEntry",
+                            "title": "Dependency description",
+                            "description": "Here you should list any dependencies and prerequisites for your project's success. These are usually external factors (such as third-party suppliers, external resources, third-party software, etc.) that may cause a delay, since a project has less control over them. In case of third party software, indicate whether you have the necessary licenses and permission to use such software.",
+                            "x-placeholder": "Describe any dependencies or write 'No dependencies'."
+                        }
+                    }
+                }
+            },
+            "x-order": [
+                "solutionDescription",
+                "ecosystemImpact",
+                "capabilityFeasibility",
+                "projectDependencies"
+            ]
+        },
+        "milestones": {
+            "$ref": "#/definitions/segment",
+            "title": "Milestones",
+            "x-icon": "flag",
+            "properties": {
+                "milestones": {
+                    "$ref": "#/definitions/section",
+                    "title": "Project Milestones",
+                    "description": "What are the key milestones you need to achieve in order to complete your project successfully?",
+                    "x-guidance": "Please follow these guidelines to build your individual milestones. Each milestone must include:\n\n1. **Milestone Outputs**\n   - What will be delivered\n\n2. **Acceptance Criteria**\n   - What conditions must be met\n\n3. **Evidence of Completion**\n   - How you will prove the milestone is complete.",
+                    "properties": {
+                        "milestone_list": {
+                            "type": "array",
+                            "title": "What are the key milestones you need to achieve in order to complete your project successfully?",
+                            "description": "Your requested budget requires a minimum of 3 milestones. However you can add additional milestones, please confirm how many milestones you would like to submit.",
+                            "x-guidance": "**Milestone Requirements:**\n\n- For Grant Amounts of up to 75k ada: at least 2 milestones, plus the final one including Project Close-out Report and Video, must be included (**3 milestones in total**)\n- For Grant Amounts over 75k ada up to 150k ada: at least 3 milestones, plus the final one including Project Close-out Report and Video, must be included (**4 milestones in total**)\n- For Grant Amounts over 150k ada up to 300k ada: at least 4 milestones, plus the final one including Project Close-out Report and Video, must be included (**5 milestones in total**)\n- For Grant Amounts exceeding 300k ada: at least 5 milestones, plus the final one including Project Close-out Report and Video, must be included (**6 milestones in total**)",
+                            "minItems": 3,
+                            "maxItems": 6,
+                            "items": {
+                                "type": "object",
+                                "title": "Milestone",
+                                "required": [
+                                    "title",
+                                    "outputs",
+                                    "acceptance_criteria",
+                                    "evidence",
+                                    "delivery_month",
+                                    "cost",
+                                    "progress"
+                                ],
+                                "x-subsection": true,
+                                "properties": {
+                                    "title": {
+                                        "$ref": "#/definitions/singleLineTextEntry",
+                                        "title": "Milestone Title",
+                                        "description": "A clear, concise title for this milestone",
+                                        "x-placeholder": "Enter the title for this milestone",
+                                        "maxLength": 100
+                                    },
+                                    "outputs": {
+                                        "$ref": "#/definitions/multiLineTextEntryMarkdown",
+                                        "title": "Milestone Outputs",
+                                        "description": "What will be delivered in this milestone",
+                                        "x-placeholder": "Describe the deliverables or outcomes for this milestone",
+                                        "maxLength": 1000
+                                    },
+                                    "acceptance_criteria": {
+                                        "$ref": "#/definitions/multiLineTextEntryMarkdown",
+                                        "title": "Acceptance Criteria",
+                                        "description": "Specific conditions that must be met",
+                                        "x-placeholder": "Define the criteria for success in this milestone",
+                                        "maxLength": 1000
+                                    },
+                                    "evidence": {
+                                        "$ref": "#/definitions/multiLineTextEntryMarkdown",
+                                        "title": "Evidence of Completion",
+                                        "description": "How you will demonstrate achievement",
+                                        "x-placeholder": "Specify the evidence that will demonstrate this milestone is complete",
+                                        "maxLength": 1000
+                                    },
+                                    "delivery_month": {
+                                        "$ref": "#/definitions/durationInMonths",
+                                        "title": "Delivery Month",
+                                        "description": "The month when this milestone will be delivered",
+                                        "x-placeholder": "Enter the month when this milestone is expected to be delivered",
+                                        "minimum": 1,
+                                        "maximum": 12
+                                    },
+                                    "cost": {
+                                        "$ref": "#/definitions/tokenValueCardanoADA",
+                                        "title": "Cost in ADA",
+                                        "description": "The cost of this milestone in ADA",
+                                        "x-placeholder": "Enter the cost associated with this milestone"
+                                    },
+                                    "progress": {
+                                        "$ref": "#/definitions/dropDownSingleSelect",
+                                        "title": "Progress Status",
+                                        "description": "Current status of the milestone",
+                                        "x-placeholder": "Enter the percentage of overall project  completion progress for this milestone (0-100%)",
+                                        "enum": [
+                                            "Not Started",
+                                            "In Progress",
+                                            "Completed",
+                                            "Delayed"
+                                        ],
+                                        "default": "Not Started"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "required": [
+                        "milestone_list"
+                    ]
+                }
+            },
+            "x-order": [
+                "milestones"
+            ]
+        },
+        "fundingJustification": {
+            "$ref": "#/definitions/segment",
+            "title": "Funding Justification",
+            "description": "Justification for the requested funding",
+            "required": [
+                "teamExperience",
+                "costBreakdown",
+                "valueForMoney"
+            ],
+            "properties": {
+                "teamExperience": {
+                    "$ref": "#/definitions/section",
+                    "title": "Team & Experience",
+                    "description": "Information about your team and their experience",
+                    "required": [
+                        "teamMembers",
+                        "relevantExperience"
+                    ],
+                    "properties": {
+                        "teamMembers": {
+                            "$ref": "#/definitions/multiLineTextEntryMarkdown",
+                            "title": "Team Members",
+                            "description": "Provide information about your team members, their roles, and relevant experience",
+                            "maxLength": 5000,
+                            "minLength": 200,
+                            "x-guidance": "Describe each team member's role in the project and their relevant skills, qualifications, and experience. Be specific about how each person's expertise contributes to the project's success.",
+                            "x-placeholder": "Describe each team member's role, expertise, and experience"
+                        },
+                        "relevantExperience": {
+                            "$ref": "#/definitions/multiLineTextEntryMarkdown",
+                            "title": "Relevant Experience",
+                            "description": "Describe relevant experience and previous projects that demonstrate your team's capability",
+                            "maxLength": 5000,
+                            "minLength": 200,
+                            "x-guidance": "Highlight previous projects, achievements, or experiences that demonstrate your team's ability to execute this project successfully. Include links to prior work when possible.",
+                            "x-placeholder": "Describe your team's track record and relevant past work"
+                        }
+                    },
+                    "x-order": [
+                        "teamMembers",
+                        "relevantExperience"
+                    ]
+                },
+                "costBreakdown": {
+                    "$ref": "#/definitions/section",
+                    "title": "Cost Breakdown",
+                    "description": "Breakdown of the requested budget",
+                    "required": [
+                        "costItems"
+                    ],
+                    "properties": {
+                        "costItems": {
+                            "$ref": "#/definitions/multiLineTextEntryMarkdown",
+                            "title": "Cost Items",
+                            "description": "Provide a detailed breakdown of how the requested funds will be used",
+                            "maxLength": 5000,
+                            "minLength": 200,
+                            "x-guidance": "Provide a detailed, itemized breakdown of your budget. Include developer costs, infrastructure expenses, marketing, and any other relevant categories. Be as specific as possible to show that you've carefully planned your financial needs.",
+                            "x-placeholder": "Provide an itemized breakdown of your budget"
+                        }
+                    },
+                    "x-order": [
+                        "costItems"
+                    ]
+                },
+                "valueForMoney": {
+                    "$ref": "#/definitions/section",
+                    "title": "Value For Money",
+                    "description": "The value proposition of your project",
+                    "required": [
+                        "valueJustification"
+                    ],
+                    "properties": {
+                        "valueJustification": {
+                            "$ref": "#/definitions/multiLineTextEntryMarkdown",
+                            "title": "Value Justification",
+                            "description": "Explain why your project represents good value for the requested funding",
+                            "maxLength": 3000,
+                            "minLength": 200,
+                            "x-guidance": "Convince reviewers that your project offers good value for the requested funding. Explain the benefits in relation to the costs and how the project will generate value for the Cardano ecosystem. If applicable, mention how the project might become self-sustaining after initial funding.",
+                            "x-placeholder": "Explain why your project offers good return on investment"
+                        }
+                    },
+                    "x-order": [
+                        "valueJustification"
+                    ]
+                }
+            },
+            "x-order": [
+                "teamExperience",
+                "costBreakdown",
+                "valueForMoney"
+            ]
+        },
+        "acknowledgements": {
+            "$ref": "#/definitions/segment",
+            "title": "Acknowledgements",
+            "description": "Acknowledgement of rules and requirements",
+            "required": [
+                "categoryRules",
+                "fundRules"
+            ],
+            "properties": {
+                "categoryRules": {
+                    "$ref": "#/definitions/section",
+                    "title": "Category Rules",
                     "description": "Answer the following questions to determine the eligibility of your proposal.",
                     "properties": {
                         "informational_content": {
@@ -839,412 +1281,14 @@
                         "matching_funds",
                         "adoption_potential"
                     ]
-                }
-            },
-            "x-order": ["category_details", "category_questions"]
-        },
-        "summary": {
-            "$ref": "#/definitions/segment",
-            "title": "Summary",
-            "description": "A brief overview of your submission",
-            "required": [
-                "problemStatement",
-                "solutionSummary",
-                "expectedDuration",
-                "requestedBudget",
-                "relevantLinks"
-            ],
-            "properties": {
-                "problemStatement": {
-                    "$ref": "#/definitions/section",
-                    "title": "Problem Statement",
-                    "description": "The problem you are trying to solve",
-                    "required": ["problemDescription"],
-                    "properties": {
-                        "problemDescription": {
-                            "$ref": "#/definitions/multiLineTextEntryMarkdown",
-                            "title": "Problem Description",
-                            "description": "Describe the problem your project aims to solve",
-                            "maxLength": 2500,
-                            "minLength": 100,
-                            "x-guidance": "Ensure you present a well-defined problem. What is the core issue that you hope to fix? Remember: the reader might not recognize the problem unless you state it clearly. This answer will be displayed on the Catalyst voting app, so voters will see it even if they don't open your submission to read it in detail.",
-                            "x-placeholder": "Describe the problem you aim to solve"
-                        }
-                    }
-                },
-                "solutionSummary": {
-                    "$ref": "#/definitions/section",
-                    "title": "Solution Summary",
-                    "description": "A summary of your proposed solution",
-                    "required": ["summaryText"],
-                    "properties": {
-                        "summaryText": {
-                            "$ref": "#/definitions/multiLineTextEntryMarkdown",
-                            "title": "Summary Text",
-                            "description": "Provide a brief summary of your solution",
-                            "maxLength": 2500,
-                            "minLength": 100,
-                            "x-guidance": "Focus on what you are going to do, or make, or change, to solve the problem. So not 'There should be a way to....' but 'We will make a...' Clearly state how the solution addresses the specific problem you have identified - connect the 'why' and the 'how'. This answer will be displayed on the Catalyst voting app, so voters will see it even if they do not open your submission and read it in detail.",
-                            "x-placeholder": "Describe how you'll solve the problem"
-                        }
-                    }
-                },
-                "expectedDuration": {
-                    "$ref": "#/definitions/section",
-                    "title": "Expected Duration",
-                    "description": "How long will your project take",
-                    "required": ["durationMonths"],
-                    "properties": {
-                        "durationMonths": {
-                            "$ref": "#/definitions/durationInMonths",
-                            "title": "Duration (Months)",
-                            "description": "The expected duration of your project in months",
-                            "minimum": 2,
-                            "maximum": 12,
-                            "x-guidance": "Minimum 2 months-Maximum 12 months. The scope of your funding request and this project is expected to produce the deliverables you specify in the submission within 2-12 months. If you believe your project will take longer than 12 months, consider reducing the project's scope so that it becomes achievable within 12 months.",
-                            "x-placeholder": "Enter the expected duration of your project (2-12 months)"
-                        }
-                    }
-                },
-                "requestedBudget": {
-                    "$ref": "#/definitions/section",
-                    "title": "Requested Budget",
-                    "description": "The budget you are requesting",
-                    "required": ["budgetAmount"],
-                    "properties": {
-                        "budgetAmount": {
-                            "$ref": "#/definitions/tokenValueCardanoADA",
-                            "title": "Budget Amount",
-                            "description": "The amount of ADA you are requesting",
-                            "minimum": 15000,
-                            "maximum": 2000000,
-                            "x-guidance": "There is a minimum and a maximum amount of funding that can be requested in a single Catalyst submission. Different categories have different funding limits, so ensure your request aligns with the category you selected.",
-                            "x-placeholder": "Enter the amount of funding you are requesting in ADA"
-                        }
-                    }
-                },
-                "relevantLinks": {
-                    "$ref": "#/definitions/section",
-                    "title": "Relevant Links",
-                    "description": "Links to relevant resources",
-                    "required": ["links"],
-                    "properties": {
-                        "links": {
-                            "$ref": "#/definitions/singleLineHttpsURLEntryList",
-                            "title": "Links",
-                            "description": "Add links to relevant resources (GitHub, website, documentation, etc.)",
-                            "maxItems": 10,
-                            "x-guidance": "Here, provide links to yours or your partner organization's website, repository, or marketing. Alternatively, provide links to any whitepaper or other publication relevant to your submission. Note however that this is extra information that voters and Community Reviewers might choose not to read. You should not fail to include any vital information in this form because you feel the answers can be found elsewhere.",
-                            "x-placeholder": "Enter relevant links (website, GitHub, whitepaper, etc.)"
-                        }
-                    }
-                }
-            },
-            "x-order": [
-                "problemStatement",
-                "solutionSummary",
-                "expectedDuration",
-                "requestedBudget",
-                "relevantLinks"
-            ]
-        },
-        "projectDetails": {
-            "$ref": "#/definitions/segment",
-            "title": "Project Details",
-            "description": "Detailed information about your project",
-            "required": [
-                "solutionDescription",
-                "ecosystemImpact",
-                "capabilityFeasibility",
-                "projectDependencies"
-            ],
-            "properties": {
-                "solutionDescription": {
-                    "$ref": "#/definitions/section",
-                    "title": "Solution Description",
-                    "description": "Detailed description of your solution",
-                    "required": ["detailedDescription"],
-                    "properties": {
-                        "detailedDescription": {
-                            "$ref": "#/definitions/multiLineTextEntryMarkdown",
-                            "title": "Detailed Description",
-                            "description": "Provide a comprehensive description of your solution",
-                            "maxLength": 10000,
-                            "minLength": 500,
-                            "x-guidance": "Describe your solution in detail. How will it work? What technologies will you use? What steps will you take to implement it? This is your opportunity to show that you have a well-thought-out plan.",
-                            "x-placeholder": "Enter a detailed description of your solution"
-                        }
-                    }
-                },
-                "ecosystemImpact": {
-                    "$ref": "#/definitions/section",
-                    "title": "Ecosystem Impact",
-                    "description": "The impact your project will have on the ecosystem",
-                    "required": ["impactDescription"],
-                    "properties": {
-                        "impactDescription": {
-                            "$ref": "#/definitions/multiLineTextEntryMarkdown",
-                            "title": "Impact Description",
-                            "description": "Describe the impact your project will have on the Cardano ecosystem",
-                            "maxLength": 5000,
-                            "minLength": 200,
-                            "x-guidance": "Explain how your project will benefit the Cardano ecosystem. Will it bring new users? Will it improve the user experience? Will it solve an existing problem? Be specific about the impact and who will benefit.",
-                            "x-placeholder": "Explain the positive impacts your project will have"
-                        }
-                    }
-                },
-                "capabilityFeasibility": {
-                    "$ref": "#/definitions/section",
-                    "title": "Capability & Feasibility",
-                    "description": "Your ability to deliver the project",
-                    "required": ["capabilityAssessment"],
-                    "properties": {
-                        "capabilityAssessment": {
-                            "$ref": "#/definitions/multiLineTextEntryMarkdown",
-                            "title": "Capability Assessment",
-                            "description": "Describe your team's capability to deliver this project and its overall feasibility",
-                            "maxLength": 5000,
-                            "minLength": 200,
-                            "x-guidance": "Demonstrate why your team is qualified to execute this project. Include relevant experience, skills, and past achievements. Also explain what makes this project feasible within the proposed timeframe and budget.",
-                            "x-placeholder": "Describe your team's capabilities and the project's feasibility"
-                        }
-                    }
-                },
-                "projectDependencies": {
-                    "$ref": "#/definitions/section",
-                    "title": "Project Dependencies",
-                    "description": "Dependencies for your project",
-                    "x-guidance": "If your project has any dependencies and prerequisites for your project's success, list them here. These are usually external factors (such as third-party suppliers, external resources, third-party software, etc.) that may cause a delay, since a project has less control over them. In case of third party software, indicate whether you have the necessary licenses and permission to use such software.",
-                    "properties": {
-                        "hasDependency": {
-                            "$ref": "#/definitions/yesNoChoice",
-                            "title": "Does the project have any dependency",
-                            "description": "Does your project have any dependencies on other organizations, technical or otherwise?",
-                            "x-guidance": "If YES, please describe what the dependency is and why you believe it is essential for your project's delivery. If NO, please write \"No dependencies\"",
-                            "x-placeholder": "Select if your project has any dependencies"
-                        },
-                        "dependencyDetail": {
-                            "$ref": "#/definitions/singleLineTextEntry",
-                            "title": "Dependency description",
-                            "description": "Here you should list any dependencies and prerequisites for your project's success. These are usually external factors (such as third-party suppliers, external resources, third-party software, etc.) that may cause a delay, since a project has less control over them. In case of third party software, indicate whether you have the necessary licenses and permission to use such software.",
-                            "x-placeholder": "Describe any dependencies or write 'No dependencies'."
-                        }
-                    }
-                }
-            },
-            "x-order": [
-                "solutionDescription",
-                "ecosystemImpact",
-                "capabilityFeasibility",
-                "projectDependencies"
-            ]
-        },
-        "milestones": {
-            "$ref": "#/definitions/segment",
-            "title": "Milestones",
-            "x-icon": "flag",
-            "properties": {
-                "milestones": {
-                    "$ref": "#/definitions/section",
-                    "title": "Project Milestones",
-                    "description": "What are the key milestones you need to achieve in order to complete your project successfully?",
-                    "x-guidance": "Please follow these guidelines to build your individual milestones. Each milestone must include:\n\n1. **Milestone Outputs**\n   - What will be delivered\n\n2. **Acceptance Criteria**\n   - What conditions must be met\n\n3. **Evidence of Completion**\n   - How you will prove the milestone is complete.",
-                    "properties": {
-                        "milestone_list": {
-                            "type": "array",
-                            "title": "What are the key milestones you need to achieve in order to complete your project successfully?",
-                            "description": "Your requested budget requires a minimum of 3 milestones. However you can add additional milestones, please confirm how many milestones you would like to submit.",
-                            "x-guidance": "**Milestone Requirements:**\n\n- For Grant Amounts of up to 75k ada: at least 2 milestones, plus the final one including Project Close-out Report and Video, must be included (**3 milestones in total**)\n- For Grant Amounts over 75k ada up to 150k ada: at least 3 milestones, plus the final one including Project Close-out Report and Video, must be included (**4 milestones in total**)\n- For Grant Amounts over 150k ada up to 300k ada: at least 4 milestones, plus the final one including Project Close-out Report and Video, must be included (**5 milestones in total**)\n- For Grant Amounts exceeding 300k ada: at least 5 milestones, plus the final one including Project Close-out Report and Video, must be included (**6 milestones in total**)",
-                            "minItems": 3,
-                            "maxItems": 6,
-                            "items": {
-                                "type": "object",
-                                "title": "Milestone",
-                                "required": [
-                                    "title",
-                                    "outputs",
-                                    "acceptance_criteria",
-                                    "evidence",
-                                    "delivery_month",
-                                    "cost",
-                                    "progress"
-                                ],
-                                "x-subsection": true,
-                                "properties": {
-                                    "title": {
-                                        "$ref": "#/definitions/singleLineTextEntry",
-                                        "title": "Milestone Title",
-                                        "description": "A clear, concise title for this milestone",
-                                        "x-placeholder": "Enter the title for this milestone",
-                                        "maxLength": 100
-                                    },
-                                    "outputs": {
-                                        "$ref": "#/definitions/multiLineTextEntryMarkdown",
-                                        "title": "Milestone Outputs",
-                                        "description": "What will be delivered in this milestone",
-                                        "x-placeholder": "Describe the deliverables or outcomes for this milestone",
-                                        "maxLength": 1000
-                                    },
-                                    "acceptance_criteria": {
-                                        "$ref": "#/definitions/multiLineTextEntryMarkdown",
-                                        "title": "Acceptance Criteria",
-                                        "description": "Specific conditions that must be met",
-                                        "x-placeholder": "Define the criteria for success in this milestone",
-                                        "maxLength": 1000
-                                    },
-                                    "evidence": {
-                                        "$ref": "#/definitions/multiLineTextEntryMarkdown",
-                                        "title": "Evidence of Completion",
-                                        "description": "How you will demonstrate achievement",
-                                        "x-placeholder": "Specify the evidence that will demonstrate this milestone is complete",
-                                        "maxLength": 1000
-                                    },
-                                    "delivery_month": {
-                                        "$ref": "#/definitions/durationInMonths",
-                                        "title": "Delivery Month",
-                                        "description": "The month when this milestone will be delivered",
-                                        "x-placeholder": "Enter the month when this milestone is expected to be delivered",
-                                        "minimum": 1,
-                                        "maximum": 12
-                                    },
-                                    "cost": {
-                                        "$ref": "#/definitions/tokenValueCardanoADA",
-                                        "title": "Cost in ADA",
-                                        "description": "The cost of this milestone in ADA",
-                                        "x-placeholder": "Enter the cost associated with this milestone"
-                                    },
-                                    "progress": {
-                                        "$ref": "#/definitions/dropDownSingleSelect",
-                                        "title": "Progress Status",
-                                        "description": "Current status of the milestone",
-                                        "x-placeholder": "Enter the percentage of overall project  completion progress for this milestone (0-100%)",
-                                        "enum": [
-                                            "Not Started",
-                                            "In Progress",
-                                            "Completed",
-                                            "Delayed"
-                                        ],
-                                        "default": "Not Started"
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    "required": ["milestone_list"]
-                }
-            },
-            "x-order": ["milestones"]
-        },
-        "fundingJustification": {
-            "$ref": "#/definitions/segment",
-            "title": "Funding Justification",
-            "description": "Justification for the requested funding",
-            "required": ["teamExperience", "costBreakdown", "valueForMoney"],
-            "properties": {
-                "teamExperience": {
-                    "$ref": "#/definitions/section",
-                    "title": "Team & Experience",
-                    "description": "Information about your team and their experience",
-                    "required": ["teamMembers", "relevantExperience"],
-                    "properties": {
-                        "teamMembers": {
-                            "$ref": "#/definitions/multiLineTextEntryMarkdown",
-                            "title": "Team Members",
-                            "description": "Provide information about your team members, their roles, and relevant experience",
-                            "maxLength": 5000,
-                            "minLength": 200,
-                            "x-guidance": "Describe each team member's role in the project and their relevant skills, qualifications, and experience. Be specific about how each person's expertise contributes to the project's success.",
-                            "x-placeholder": "Describe each team member's role, expertise, and experience"
-                        },
-                        "relevantExperience": {
-                            "$ref": "#/definitions/multiLineTextEntryMarkdown",
-                            "title": "Relevant Experience",
-                            "description": "Describe relevant experience and previous projects that demonstrate your team's capability",
-                            "maxLength": 5000,
-                            "minLength": 200,
-                            "x-guidance": "Highlight previous projects, achievements, or experiences that demonstrate your team's ability to execute this project successfully. Include links to prior work when possible.",
-                            "x-placeholder": "Describe your team's track record and relevant past work"
-                        }
-                    },
-                    "x-order": ["teamMembers", "relevantExperience"]
-                },
-                "costBreakdown": {
-                    "$ref": "#/definitions/section",
-                    "title": "Cost Breakdown",
-                    "description": "Breakdown of the requested budget",
-                    "required": ["costItems"],
-                    "properties": {
-                        "costItems": {
-                            "$ref": "#/definitions/multiLineTextEntryMarkdown",
-                            "title": "Cost Items",
-                            "description": "Provide a detailed breakdown of how the requested funds will be used",
-                            "maxLength": 5000,
-                            "minLength": 200,
-                            "x-guidance": "Provide a detailed, itemized breakdown of your budget. Include developer costs, infrastructure expenses, marketing, and any other relevant categories. Be as specific as possible to show that you've carefully planned your financial needs.",
-                            "x-placeholder": "Provide an itemized breakdown of your budget"
-                        }
-                    },
-                    "x-order": ["costItems"]
-                },
-                "valueForMoney": {
-                    "$ref": "#/definitions/section",
-                    "title": "Value For Money",
-                    "description": "The value proposition of your project",
-                    "required": ["valueJustification"],
-                    "properties": {
-                        "valueJustification": {
-                            "$ref": "#/definitions/multiLineTextEntryMarkdown",
-                            "title": "Value Justification",
-                            "description": "Explain why your project represents good value for the requested funding",
-                            "maxLength": 3000,
-                            "minLength": 200,
-                            "x-guidance": "Convince reviewers that your project offers good value for the requested funding. Explain the benefits in relation to the costs and how the project will generate value for the Cardano ecosystem. If applicable, mention how the project might become self-sustaining after initial funding.",
-                            "x-placeholder": "Explain why your project offers good return on investment"
-                        }
-                    },
-                    "x-order": ["valueJustification"]
-                }
-            },
-            "x-order": ["teamExperience", "costBreakdown", "valueForMoney"]
-        },
-        "acknowledgements": {
-            "$ref": "#/definitions/segment",
-            "title": "Acknowledgements",
-            "description": "Acknowledgement of rules and requirements",
-            "required": ["categoryRules", "fundRules"],
-            "properties": {
-                "categoryRules": {
-                    "$ref": "#/definitions/section",
-                    "title": "Category Rules",
-                    "description": "Acknowledgement of category-specific rules",
-                    "required": ["categoryAcknowledgements"],
-                    "properties": {
-                        "categoryAcknowledgements": {
-                            "$ref": "#/definitions/multiSelect",
-                            "title": "Category Acknowledgements",
-                            "description": "Please acknowledge that you have read and agree to the category-specific rules",
-                            "items": {
-                                "type": "string",
-                                "enum": [
-                                    "I understand that my project must align with the chosen category requirements",
-                                    "I confirm the budget requested is within the allowed range for this category",
-                                    "I acknowledge that my submission will be evaluated based on category-specific criteria",
-                                    "I understand that failure to comply with category rules may result in disqualification"
-                                ]
-                            },
-                            "minItems": 4,
-                            "maxItems": 4,
-                            "x-guidance": "You must acknowledge all of these statements to confirm that you understand the category-specific rules for your submission. Each category has its own requirements and evaluation criteria.",
-                            "x-placeholder": "Check all acknowledgements to proceed"
-                        }
-                    },
-                    "x-order": ["categoryAcknowledgements"]
                 },
                 "fundRules": {
                     "$ref": "#/definitions/section",
                     "title": "Fund Rules",
                     "description": "Acknowledgement of general fund rules",
-                    "required": ["fundAcknowledgements"],
+                    "required": [
+                        "fundAcknowledgements"
+                    ],
                     "properties": {
                         "fundAcknowledgements": {
                             "$ref": "#/definitions/agreementConfirmation",
@@ -1255,10 +1299,15 @@
                             "x-placeholder": "Confirm that you agree to the fund rules"
                         }
                     },
-                    "x-order": ["fundAcknowledgements"]
+                    "x-order": [
+                        "fundAcknowledgements"
+                    ]
                 }
             },
-            "x-order": ["categoryRules", "fundRules"]
+            "x-order": [
+                "categoryRules",
+                "fundRules"
+            ]
         }
     }
 }
