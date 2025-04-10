@@ -2,14 +2,16 @@ import pytest
 from loguru import logger
 from utils.address import stake_public_key_to_address
 from utils.snapshot import snapshot
+from utils.auth_token import rbac_auth_token_factory
 from api.v1 import cardano
 
 
 @pytest.mark.skip("To be refactored when the api is ready")
-def test_persistent_ada_amount_endpoint(snapshot):
+def test_persistent_ada_amount_endpoint(snapshot, rbac_auth_token_factory):
     # health.is_live()
     # health.is_ready()
     logger.info(f"{snapshot.network}, {snapshot.slot_no}")
+    token = rbac_auth_token_factory()
 
     total_len = len(snapshot.data)
     for i, entry in enumerate(snapshot.data):
@@ -20,7 +22,7 @@ def test_persistent_ada_amount_endpoint(snapshot):
             is_stake=True,
             network_type=snapshot.network,
         )
-        resp = cardano.assets(stake_address, snapshot.slot_no)
+        resp = cardano.assets(stake_address, snapshot.slot_no, token)
         if expected_amount == 0 and resp.status_code == 404:
             # it is possible that snapshot tool collected data for the stake key which does not have any unspent utxo
             # at this case cat-gateway return 404, that is why we are checking this case additionally
