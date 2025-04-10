@@ -30,19 +30,20 @@ class _WorkspacePageState extends State<WorkspacePage>
   @override
   Widget build(BuildContext context) {
     return const Scaffold(
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            WorkspaceHeader(),
-            Stack(
-              children: [
-                WorkspaceErrorSelector(),
-                WorkspaceLoadingSelector(),
-                WorkspaceUserProposalsSelector(),
-              ],
-            ),
-            SizedBox(height: 50),
-          ],
+      body: WorkspaceLoadingSelector(
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              WorkspaceHeader(),
+              Stack(
+                children: [
+                  WorkspaceErrorSelector(),
+                  WorkspaceUserProposalsSelector(),
+                ],
+              ),
+              SizedBox(height: 50),
+            ],
+          ),
         ),
       ),
     );
@@ -72,6 +73,8 @@ class _WorkspacePageState extends State<WorkspacePage>
         );
       case SubmissionCloseDate():
         unawaited(_showSubmissionClosingWarningDialog(signal.date));
+      case ForgetProposalSuccessWorkspaceSignal():
+        _showForgetSuccessSnackBar();
     }
   }
 
@@ -110,6 +113,17 @@ class _WorkspacePageState extends State<WorkspacePage>
       behavior: SnackBarBehavior.floating,
       title: context.l10n.successProposalDeleted,
       message: context.l10n.successProposalDeletedDescription,
+    ).show(context);
+  }
+
+  void _showForgetSuccessSnackBar() {
+    VoicesSnackBar.hideCurrent(context);
+
+    VoicesSnackBar(
+      type: VoicesSnackBarType.success,
+      behavior: SnackBarBehavior.floating,
+      title: context.l10n.successProposalForgetted,
+      message: context.l10n.successProposalForgettedDescription,
     ).show(context);
   }
 

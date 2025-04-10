@@ -75,11 +75,13 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     Emitter<WorkspaceState> emit,
   ) async {
     try {
+      emit(state.copyWith(isLoading: true));
       await _proposalService.deleteDraftProposal(event.ref);
       emitSignal(const DeletedDraftWorkspaceSignal());
     } catch (error, stackTrace) {
       _logger.severe('Delete proposal failed', error, stackTrace);
       emitError(const LocalizedProposalDeletionException());
+      emit(state.copyWith(isLoading: false));
     }
   }
 
@@ -138,11 +140,18 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
       return emitError(const LocalizedUnknownException());
     }
     try {
+      emit(
+        state.copyWith(isLoading: true),
+      );
       await _proposalService.forgetProposal(
         proposalRef: proposal.selfRef as SignedDocumentRef,
         categoryId: proposal.categoryId,
       );
+      emitSignal(const ForgetProposalSuccessWorkspaceSignal());
     } catch (e, stackTrace) {
+      emitError(LocalizedException.create(e));
+      emit(state.copyWith(isLoading: false));
+
       _logger.severe('Error forgetting proposal', e, stackTrace);
     }
   }
@@ -164,12 +173,14 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     Emitter<WorkspaceState> emit,
   ) async {
     try {
+      emit(state.copyWith(isLoading: true));
       final ref = await _proposalService.importProposal(event.proposalData);
       emitSignal(ImportedProposalWorkspaceSignal(proposalRef: ref));
     } catch (error, stackTrace) {
       _logger.severe('Importing proposal failed', error, stackTrace);
       emitError(LocalizedException.create(error));
     }
+    emit(state.copyWith(isLoading: false));
   }
 
   Future<void> _loadProposals(
@@ -236,6 +247,5 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     await _proposalsSubscription?.cancel();
     _proposalsSubscription = null;
     _setupProposalsSubscription();
-    emit(state.copyWith(isLoading: false));
   }
 }
