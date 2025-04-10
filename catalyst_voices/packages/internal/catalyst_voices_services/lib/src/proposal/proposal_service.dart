@@ -416,6 +416,11 @@ final class ProposalServiceImpl implements ProposalService {
     yield* _proposalRepository
         .watchUserProposals(authorId: authorId)
         .switchMap((documents) async* {
+      if (documents.isEmpty) {
+        yield const [];
+        return;
+      }
+
       final proposalsDataStreams = await Future.wait(
         documents.map(_createProposalDataStream).toList(),
       );

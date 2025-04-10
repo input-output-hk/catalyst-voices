@@ -114,6 +114,10 @@ class _VoicesLoadingOverlayState extends State<VoicesLoadingOverlay>
     );
 
     _showingSince = widget.show ? DateTimeExt.now() : null;
+
+    if (widget.show) {
+      _fadeInAnimController.value = _fadeInAnimController.upperBound;
+    }
   }
 
   void _hideNow() {
