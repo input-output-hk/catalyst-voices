@@ -223,7 +223,7 @@
         "schemaReference",
         "setup",
         "summary",
-        "selectedCategory",
+        "campaign_category",
         "projectDetails",
         "milestones",
         "fundingJustification",
@@ -233,7 +233,7 @@
         "schemaReference",
         "setup",
         "summary",
-        "selectedCategory",
+        "campaign_category",
         "projectDetails",
         "milestones",
         "fundingJustification",
@@ -656,7 +656,7 @@
                 "translation"
             ]
         },
-        "selectedCategory": {
+        "campaign_category": {
             "$ref": "#/definitions/segment",
             "title": "Selected Category",
             "description": "The category of your submission",
