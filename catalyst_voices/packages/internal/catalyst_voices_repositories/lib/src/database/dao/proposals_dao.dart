@@ -174,10 +174,17 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
 
     proposalRef = effectiveProposal.metadata.selfRef;
 
-    final template = await _getDocument(effectiveProposal.metadata.template!);
-    final action = await _maybeGetDocument(latestAction?.selfRef);
-    final commentsCount = await _getProposalCommentsCount(proposalRef);
-    final versions = await _getProposalVersions(proposalRef.id);
+    final templateFuture = _getDocument(effectiveProposal.metadata.template!);
+    final actionFuture = _maybeGetDocument(latestAction?.selfRef);
+    final commentsCountFuture = _getProposalCommentsCount(proposalRef);
+    final versionsFuture = _getProposalVersions(proposalRef.id);
+
+    final (template, action, commentsCount, versions) = await (
+      templateFuture,
+      actionFuture,
+      commentsCountFuture,
+      versionsFuture
+    ).wait;
 
     return JoinedProposalEntity(
       proposal: effectiveProposal,
