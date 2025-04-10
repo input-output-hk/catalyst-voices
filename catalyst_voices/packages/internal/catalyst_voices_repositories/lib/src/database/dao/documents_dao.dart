@@ -1,11 +1,11 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/database/catalyst_database.dart';
 import 'package:catalyst_voices_repositories/src/database/dao/documents_dao.drift.dart';
+import 'package:catalyst_voices_repositories/src/database/query/jsonb_expressions.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents.drift.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_metadata.dart';
 import 'package:catalyst_voices_repositories/src/database/typedefs.dart';
-import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:collection/collection.dart';
 import 'package:drift/drift.dart';
 import 'package:drift/extensions/json1.dart';
@@ -87,8 +87,8 @@ abstract interface class DocumentsDao {
 
   /// Watches for new comments that are reference by ref.
   Stream<int> watchCount({
-    required DocumentRef ref,
-    required DocumentType type,
+    DocumentRef? refTo,
+    DocumentType? type,
   });
 
   Stream<DocumentEntity?> watchRefToDocumentData({
@@ -306,13 +306,7 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
       query.where((doc) => doc.type.equals(type.uuid));
     }
     if (authorId != null) {
-      final searchId = authorId.toSignificant().toUri().toStringWithoutScheme();
-
-      query.where(
-        (doc) => CustomExpression<bool>(
-          "json_extract(metadata, '\$.authors') LIKE '%$searchId%'",
-        ),
-      );
+      query.where((tbl) => tbl.metadata.isAuthor(authorId));
     }
     if (refTo != null) {
       query.where(
@@ -357,19 +351,21 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
 
   @override
   Stream<int> watchCount({
-    required DocumentRef ref,
-    required DocumentType type,
+    DocumentRef? refTo,
+    DocumentType? type,
   }) {
     final query = select(documents)
       ..where(
         (row) {
           return Expression.and([
-            row.metadata.jsonExtract<String>(r'$.type').equals(type.uuid),
-            row.metadata.jsonExtract<String>(r'$.ref.id').equals(ref.id),
-            if (ref.version != null)
+            if (type != null)
+              row.metadata.jsonExtract<String>(r'$.type').equals(type.uuid),
+            if (refTo != null)
+              row.metadata.jsonExtract<String>(r'$.ref.id').equals(refTo.id),
+            if (refTo?.version != null)
               row.metadata
                   .jsonExtract<String>(r'$.ref.version')
-                  .equals(ref.version!),
+                  .equals(refTo!.version!),
           ]);
         },
       );
