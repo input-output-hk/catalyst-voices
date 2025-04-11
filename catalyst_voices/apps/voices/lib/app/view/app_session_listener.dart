@@ -12,12 +12,10 @@ import 'package:go_router/go_router.dart';
 /// snackBars when a session changes.
 class GlobalSessionListener extends StatefulWidget {
   final Widget child;
-  final RouterConfig<Object> routerConfig;
 
   const GlobalSessionListener({
     super.key,
     required this.child,
-    required this.routerConfig,
   });
 
   @override
@@ -29,20 +27,11 @@ class _GlobalSessionListenerState extends State<GlobalSessionListener> {
 
   @override
   Widget build(BuildContext context) {
-    return Builder(
-      builder: (newContext) {
-        return BlocListener<SessionCubit, SessionState>(
-          listenWhen: _listenToSessionChangesWhen,
-          listener: _onSessionChanged,
-          child: widget.child,
-        );
-      },
+    return BlocListener<SessionCubit, SessionState>(
+      listenWhen: _listenToSessionChangesWhen,
+      listener: _onSessionChanged,
+      child: widget.child,
     );
-  }
-
-  @override
-  void initState() {
-    super.initState();
   }
 
   bool _listenToSessionChangesWhen(SessionState prev, SessionState next) {
