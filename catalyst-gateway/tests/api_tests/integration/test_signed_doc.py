@@ -6,7 +6,10 @@ import os
 import json
 from typing import Dict, Any, List
 import copy
-from utils.auth_token import rbac_auth_token_factory
+from utils.auth_token import rbac_auth_token_factory, RoleID
+
+
+NETWORK = "preprod"
 
 
 class SignedDocument:
@@ -164,7 +167,9 @@ def submission_action_factory(
 
 
 def test_templates(proposal_templates, comment_templates, rbac_auth_token_factory):
-    rbac_auth_token = rbac_auth_token_factory()
+    rbac_auth_token = rbac_auth_token_factory(RoleID.ROLE_0, NETWORK)
+    print(rbac_auth_token.secret_key_hex())
+    print(rbac_auth_token.cat_id)
     templates = proposal_templates + comment_templates
     for template_id in templates:
         resp = document.get(document_id=template_id, token=rbac_auth_token)

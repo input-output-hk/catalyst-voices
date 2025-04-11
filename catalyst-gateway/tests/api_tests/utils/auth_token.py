@@ -19,9 +19,6 @@ class RBACToken:
     def __str__(self) -> str:
         return f"{self.cat_id}{self.signature_b64}"
 
-    def cat_id(self) -> str:
-        return self.cat_id
-
     def secret_key_hex(self) -> str:
         return self.secret_key.hex()
 
@@ -33,20 +30,12 @@ def rbac_auth_token_factory():
         match role_id:
             case RoleID.ROLE_0:
                 # https://preprod.cexplorer.io/tx/5fd71fb559d3ebf16bb0b8b30028a1d0fbbb3a983dbbe2e92eb87f851c6d205c
-                sk_hex: str = (
-                    "a8f84dd9576f9b5224da38146df1dd4c80c6aa767cb71540bd86294f62cced568ecdf07352e0b48e1ae66370352e56aba4113461ec08e13b2fed10ecc056c65fd2a76829a3b53e66af79bb0cb1efade075f0ae65eaaabb75f5106bbeef59b866",
-                )
-                pk_hex: str = (
-                    "42149f1a6f1da43fcf066a473e12515b5b6216fedfc52b87bee091456981d9c6d2a76829a3b53e66af79bb0cb1efade075f0ae65eaaabb75f5106bbeef59b866"
-                )
+                sk_hex = "a8f84dd9576f9b5224da38146df1dd4c80c6aa767cb71540bd86294f62cced568ecdf07352e0b48e1ae66370352e56aba4113461ec08e13b2fed10ecc056c65fd2a76829a3b53e66af79bb0cb1efade075f0ae65eaaabb75f5106bbeef59b866"
+                pk_hex = "42149f1a6f1da43fcf066a473e12515b5b6216fedfc52b87bee091456981d9c6d2a76829a3b53e66af79bb0cb1efade075f0ae65eaaabb75f5106bbeef59b866"
             case RoleID.PROPOSER:
                 # https://preprod.cexplorer.io/tx/5fd71fb559d3ebf16bb0b8b30028a1d0fbbb3a983dbbe2e92eb87f851c6d205c
-                sk_hex: str = (
-                    "a8f84dd9576f9b5224da38146df1dd4c80c6aa767cb71540bd86294f62cced568ecdf07352e0b48e1ae66370352e56aba4113461ec08e13b2fed10ecc056c65fd2a76829a3b53e66af79bb0cb1efade075f0ae65eaaabb75f5106bbeef59b866",
-                )
-                pk_hex: str = (
-                    "42149f1a6f1da43fcf066a473e12515b5b6216fedfc52b87bee091456981d9c6d2a76829a3b53e66af79bb0cb1efade075f0ae65eaaabb75f5106bbeef59b866"
-                )
+                sk_hex = "a8f84dd9576f9b5224da38146df1dd4c80c6aa767cb71540bd86294f62cced568ecdf07352e0b48e1ae66370352e56aba4113461ec08e13b2fed10ecc056c65fd2a76829a3b53e66af79bb0cb1efade075f0ae65eaaabb75f5106bbeef59b866"
+                pk_hex = "42149f1a6f1da43fcf066a473e12515b5b6216fedfc52b87bee091456981d9c6d2a76829a3b53e66af79bb0cb1efade075f0ae65eaaabb75f5106bbeef59b866"
 
         pk = bytes.fromhex(pk_hex)[:32]
         sk = bytes.fromhex(sk_hex)[:64]
