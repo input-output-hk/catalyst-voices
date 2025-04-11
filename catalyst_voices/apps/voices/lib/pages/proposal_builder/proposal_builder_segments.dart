@@ -1,4 +1,8 @@
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
+import 'package:catalyst_voices/pages/proposal_builder/tiles/proposal_builder_comment_tile.dart';
+import 'package:catalyst_voices/widgets/comment/proposal_add_comment_tile.dart';
+import 'package:catalyst_voices/widgets/comment/proposal_comments_header_tile.dart';
+import 'package:catalyst_voices/widgets/tiles/specialized/proposal_tile_decoration.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
@@ -40,42 +44,11 @@ class ProposalBuilderSegmentsSelector extends StatelessWidget {
   }
 }
 
-class _ProposalBuilderSegments extends StatelessWidget {
-  final ItemScrollController itemScrollController;
-
-  const _ProposalBuilderSegments({
-    required this.itemScrollController,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return ValueListenableBuilder(
-      valueListenable: SegmentsControllerScope.of(context),
-      builder: (context, value, child) {
-        final items = value.listItems;
-        final selectedNodeId = value.activeSectionId;
-
-        return SegmentsListView<DocumentSegment, DocumentSection>(
-          itemScrollController: itemScrollController,
-          items: items,
-          padding: const EdgeInsets.only(top: 16, bottom: 64),
-          sectionBuilder: (context, data) {
-            return _Section(
-              property: data.property,
-              isSelected: data.property.nodeId == selectedNodeId,
-            );
-          },
-        );
-      },
-    );
-  }
-}
-
-class _Section extends StatelessWidget {
+class _DocumentSection extends StatelessWidget {
   final DocumentProperty property;
   final bool isSelected;
 
-  const _Section({
+  const _DocumentSection({
     required this.property,
     required this.isSelected,
   });
@@ -113,5 +86,157 @@ class _Section extends StatelessWidget {
         );
       },
     );
+  }
+}
+
+class _ProposalBuilderSegments extends StatelessWidget {
+  final ItemScrollController itemScrollController;
+
+  const _ProposalBuilderSegments({
+    required this.itemScrollController,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ValueListenableBuilder(
+      valueListenable: SegmentsControllerScope.of(context),
+      builder: (context, value, child) {
+        final items = value.listItems;
+        final selectedNodeId = value.activeSectionId;
+        return BasicSegmentsListView(
+          key: const ValueKey('ProposalBuilderSegmentsListView'),
+          items: items,
+          itemScrollController: itemScrollController,
+          padding: const EdgeInsets.only(top: 16, bottom: 64),
+          itemBuilder: (context, index) {
+            final item = items[index];
+            final previousItem =
+                index == 0 ? null : items.elementAtOrNull(index - 1);
+            final nextItem = items.elementAtOrNull(index + 1);
+
+            return _buildItem(
+              context: context,
+              item: item,
+              previousItem: previousItem,
+              nextItem: nextItem,
+              selectedNodeId: selectedNodeId,
+            );
+          },
+          separatorBuilder: (context, index) {
+            final item = items[index];
+            final nextItem = items.elementAtOrNull(index + 1);
+
+            if (nextItem is ProposalCommentsSegment) {
+              return const SizedBox(height: 32);
+            }
+
+            if (item is ProposalCommentsSegment && nextItem != null) {
+              return const SizedBox(height: 32);
+            }
+
+            if (item is ProposalViewCommentsSection && nextItem != null) {
+              return const ProposalSeparatorBox(height: 24);
+            }
+
+            if (item is ProposalViewCommentsSection &&
+                nextItem is ProposalAddCommentSection) {
+              return const ProposalDivider(height: 48);
+            }
+
+            if (item is DocumentSegment || item is DocumentSection) {
+              return const SizedBox(height: 12);
+            }
+
+            return const SizedBox.shrink();
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildCommentSection({
+    required BuildContext context,
+    required SegmentsListViewItem item,
+  }) {
+    return switch (item) {
+      ProposalViewCommentsSection(:final sort) => ProposalCommentsHeaderTile(
+          sort: sort,
+          showSort: item.comments.isNotEmpty,
+          onChanged: (value) {
+            context
+                .read<ProposalBuilderBloc>()
+                .add(UpdateCommentsSortEvent(sort: value));
+          },
+        ),
+      ProposalCommentListItem(:final comment, :final canReply) =>
+        ProposalBuilderCommentTile(
+          key: ValueKey(comment.comment.metadata.selfRef),
+          comment: comment,
+          canReply: canReply,
+        ),
+      ProposalAddCommentSection(:final schema) => ProposalAddCommentTile(
+          schema: schema,
+          onSubmit: ({required document, reply}) async {
+            final event = SubmitCommentEvent(
+              document: document,
+              reply: reply,
+            );
+            context.read<ProposalBuilderBloc>().add(event);
+          },
+        ),
+      _ => throw ArgumentError('Not supported type ${item.runtimeType}'),
+    };
+  }
+
+  Widget _buildDecoratedCommentSection({
+    required BuildContext context,
+    required SegmentsListViewItem item,
+    required SegmentsListViewItem? previousItem,
+    required SegmentsListViewItem? nextItem,
+  }) {
+    final isFirst = previousItem is ProposalCommentsSegment;
+    final isLast = nextItem == null;
+
+    return ProposalTileDecoration(
+      key: ValueKey('Proposal.${item.id.value}.Tile'),
+      corners: (
+        isFirst: isFirst,
+        isLast: isLast,
+      ),
+      verticalPadding: (
+        isFirst: isFirst,
+        isLast: isLast,
+      ),
+      child: _buildCommentSection(context: context, item: item),
+    );
+  }
+
+  Widget _buildItem({
+    required BuildContext context,
+    required SegmentsListViewItem item,
+    required SegmentsListViewItem? previousItem,
+    required SegmentsListViewItem? nextItem,
+    required NodeId? selectedNodeId,
+  }) {
+    return switch (item) {
+      DocumentSegment() => SegmentHeaderTile(
+          id: item.id,
+          name: item.resolveTitle(context),
+        ),
+      ProposalCommentsSegment() => SegmentHeaderTile(
+          id: item.id,
+          name: item.resolveTitle(context),
+        ),
+      DocumentSection() => _DocumentSection(
+          property: item.property,
+          isSelected: item.property.nodeId == selectedNodeId,
+        ),
+      _ => _buildDecoratedCommentSection(
+          context: context,
+          item: item,
+          previousItem: previousItem,
+          nextItem: nextItem,
+        ),
+    };
   }
 }

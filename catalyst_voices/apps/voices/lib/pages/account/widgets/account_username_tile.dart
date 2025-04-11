@@ -112,12 +112,20 @@ class _AccountUsernameTileState extends State<AccountUsernameTile> {
             _onCancel();
           }
         case EditableTileChangeSource.save:
-          _onSave();
+          unawaited(_onSave());
       }
     });
   }
 
-  void _onSave() {
-    unawaited(context.read<AccountCubit>().updateUsername(_username));
+  Future<void> _onSave() async {
+    final cubit = context.read<AccountCubit>();
+    final updated = await cubit.updateUsername(_username);
+
+    if (!updated && mounted) {
+      setState(() {
+        _username = cubit.state.username;
+        _controller.textWithSelection = _username.value;
+      });
+    }
   }
 }

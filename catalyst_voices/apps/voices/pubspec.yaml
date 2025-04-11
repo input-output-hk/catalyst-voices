@@ -47,16 +47,17 @@ dependencies:
   flutter_dropzone_web: 4.0.2
   flutter_localized_locales: ^2.0.5
   flutter_markdown: ^0.7.4+3
+  flutter_native_splash: ^2.4.6
   # TODO(minikin): We use our forks as a temporary workaround for F14.
   flutter_quill:
     git:
       url: https://github.com/input-output-hk/flutter-quill
-      ref: 41f37dcf56b97b1bffe10f012dc667795a30e74e
+      ref: 532172254c3cee957bbdbb08be922f2c870b7fff
   flutter_quill_extensions:
     git:
       url: https://github.com/input-output-hk/flutter-quill
       path: flutter_quill_extensions
-      ref: 41f37dcf56b97b1bffe10f012dc667795a30e74e
+      ref: 532172254c3cee957bbdbb08be922f2c870b7fff
   flutter_secure_storage: ^9.2.2
   flutter_web_plugins:
     sdk: flutter
@@ -70,7 +71,7 @@ dependencies:
   markdown_quill:
     git:
       url: https://github.com/input-output-hk/markdown_quill
-      ref: 059703222cae65bf5ad96ec75049c0c146d76b11
+      ref: a523a6128e6b2677739ac5d68d1d9c65a2af8b98
   mask_text_input_formatter: ^2.9.0
   result_type: ^0.2.0
   scrollable_positioned_list: ^0.3.8

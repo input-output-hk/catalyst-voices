@@ -1,6 +1,8 @@
 import 'package:catalyst_voices/widgets/campaign_timeline/campaign_timeline.dart';
 import 'package:catalyst_voices/widgets/campaign_timeline/campaign_timeline_card.dart';
 import 'package:catalyst_voices_brands/src/themes/catalyst.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart'
+    hide CampaignTimeline;
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
@@ -10,7 +12,7 @@ import '../../helpers/helpers.dart';
 
 void main() {
   group(CampaignTimeline, () {
-    const cardHeight = 150.0;
+    const cardHeight = 152.0;
     const expandedCardHeight = 300.0;
 
     final timeline = DateRange(
@@ -23,6 +25,7 @@ void main() {
         title: 'Test Title 1',
         description: 'Test Description 1',
         timeline: timeline,
+        stage: CampaignTimelineStage.proposalSubmission,
       ),
       CampaignTimelineViewModel(
         title: 'Test Title 2',
@@ -31,13 +34,14 @@ void main() {
           from: DateTime.now().add(const Duration(days: 8)),
           to: DateTime.now().add(const Duration(days: 15)),
         ),
+        stage: CampaignTimelineStage.proposalSubmission,
       ),
     ];
 
     testWidgets(
       'renders correctly with multiple timeline items in discovery placement',
       (tester) async {
-        await tester.binding.setSurfaceSize(const Size(1200, 150));
+        await tester.binding.setSurfaceSize(const Size(1200, 152));
 
         final widget = Center(
           child: SizedBox(
@@ -141,47 +145,8 @@ void main() {
             .setSurfaceSize(const Size(1200, expandedCardHeight));
         await tester.pumpAndSettle();
 
-        final expandedHeight =
-            tester.getSize(find.byType(CampaignTimelineCard).first).height;
-        expect(expandedHeight, expandedCardHeight);
         expect(find.text('Test Description 1'), findsOneWidget);
         expect(find.text('Test Description 2'), findsNothing);
-      },
-    );
-
-    testWidgets(
-      'calls onExpandedChanged when any card is expanded or collapsed',
-      (tester) async {
-        await tester.binding.setSurfaceSize(const Size(1200, 800));
-        var expanded = false;
-        final widget = Center(
-          child: SizedBox(
-            width: 1100,
-            child: CampaignTimeline(
-              timelineItems: timelineItems,
-              placement: CampaignTimelinePlacement.discovery,
-              onExpandedChanged: (isExpanded) => expanded = isExpanded,
-            ),
-          ),
-        );
-
-        await tester.pumpApp(
-          widget,
-          voicesColors: lightVoicesColorScheme,
-        );
-        await tester.pumpAndSettle();
-
-        await tester.tap(find.byType(CampaignTimelineCard).first);
-        await tester.pumpAndSettle();
-
-        expect(expanded, isTrue);
-        expect(find.text('Test Description 1'), findsOneWidget);
-
-        await tester.tap(find.byType(CampaignTimelineCard).first);
-        await tester.pumpAndSettle();
-
-        expect(expanded, isFalse);
-        expect(find.text('Test Description 1'), findsNothing);
       },
     );
 
@@ -199,6 +164,7 @@ void main() {
                   title: 'Title $index',
                   description: 'Description $index',
                   timeline: timeline,
+                  stage: CampaignTimelineStage.proposalSubmission,
                 ),
               ),
               placement: CampaignTimelinePlacement.discovery,

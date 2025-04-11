@@ -7,6 +7,7 @@ use super::templates::get_doc_static_template;
 use crate::{
     db::event::{error::NotFoundError, signed_docs::FullSignedDoc},
     service::common::{responses::WithErrorResponses, types::payload::cbor::Cbor},
+    settings::Settings,
 };
 
 /// Endpoint responses.
@@ -70,5 +71,15 @@ impl catalyst_signed_doc::providers::CatalystSignedDocumentProvider for DocProvi
             Err(err) if err.is::<NotFoundError>() => Ok(None),
             Err(err) => Err(err),
         }
+    }
+
+    fn future_threshold(&self) -> Option<std::time::Duration> {
+        let signed_doc_cfg = Settings::signed_doc_cfg();
+        Some(signed_doc_cfg.future_threshold())
+    }
+
+    fn past_threshold(&self) -> Option<std::time::Duration> {
+        let signed_doc_cfg = Settings::signed_doc_cfg();
+        Some(signed_doc_cfg.past_threshold())
     }
 }

@@ -1,7 +1,7 @@
 VERSION 0.8
 
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/python:v3.3.1 AS python-ci
-IMPORT github.com/input-output-hk/catalyst-libs/rust:r20250227-00 AS cat-libs-rust
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/python:v3.3.3 AS python-ci
+IMPORT github.com/input-output-hk/catalyst-libs/rust:r20250330-00 AS cat-libs-rust
 
 builder:
     FROM python-ci+python-base
@@ -21,8 +21,6 @@ test:
 
     ENV EVENT_DB_TEST_URL "postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev"
     ENV CAT_GATEWAY_TEST_URL "http://127.0.0.1:3030"
-    # cspell: disable-next-line
-    ENV BEARER_TOKEN = "catid.:1740660380@preprod.cardano/ycih6xARcuFGiRrtf1ETLWPvXGd_UBheZ4A5kccWNAU.2CB_ByoGhZ8xBjLveK6jcGbKZ7_5TDjCwbTyNtHWFXnyKuvkTp9zo9tmBOVkPRbHjSwzx85kX3lIoGtKF3_dDQ"
 
     WITH DOCKER \
         --compose docker-compose.yml \

@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/common/error_handler.dart';
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/routes/routes.dart';
 import 'package:catalyst_voices/routes/routing/proposal_builder_route.dart';
@@ -51,6 +52,7 @@ class _ActionButtons extends StatelessWidget {
       children: [
         VoicesFilledButton(
           onTap: () {
+            Navigator.of(context).pop();
             const DiscoveryRoute().go(context);
           },
           leading: VoicesAssets.icons.informationCircle.buildIcon(),
@@ -119,7 +121,8 @@ class _CategorySelection extends StatelessWidget {
   }
 }
 
-class _CreateNewProposalDialogState extends State<CreateNewProposalDialog> {
+class _CreateNewProposalDialogState extends State<CreateNewProposalDialog>
+    with ErrorHandlerStateMixin<NewProposalCubit, CreateNewProposalDialog> {
   final FocusNode _categoryFocusNode = FocusNode();
 
   @override
@@ -182,16 +185,16 @@ class _CreateNewProposalDialogState extends State<CreateNewProposalDialog> {
   Future<void> _onOpenInEditor() async {
     final cubit = context.read<NewProposalCubit>();
     final draftRef = await cubit.createDraft();
-    if (mounted) {
+    if (draftRef != null && mounted) {
       ProposalBuilderRoute.fromRef(ref: draftRef).go(context);
     }
   }
 
   Future<void> _onSave() async {
     final cubit = context.read<NewProposalCubit>();
-    await cubit.createDraft();
+    final draftRef = await cubit.createDraft();
 
-    if (mounted) {
+    if (draftRef != null && mounted) {
       Navigator.of(context).pop();
     }
   }

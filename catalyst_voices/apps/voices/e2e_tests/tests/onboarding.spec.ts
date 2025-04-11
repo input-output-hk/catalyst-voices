@@ -16,7 +16,7 @@ test(
     const page = browser.pages()[0];
 
     // await new WalletListPage(page).clickEnableWallet(walletConfig.extension.Name);
-    await page.goto("http://localhost:52199/m4/discovery");
+    await page.goto("http://localhost:56499/m4/discovery");
     await new WalletListPanel(page).goto();
     const [walletPopup] = await Promise.all([
       browser.waitForEvent("page"),

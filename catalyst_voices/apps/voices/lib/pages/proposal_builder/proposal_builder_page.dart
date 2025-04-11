@@ -11,7 +11,10 @@ import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_navigati
 import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_segments.dart';
 import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_setup_panel.dart';
 import 'package:catalyst_voices/pages/spaces/appbar/session_state_header.dart';
+import 'package:catalyst_voices/pages/workspace/submission_closing_warning_dialog.dart';
+import 'package:catalyst_voices/routes/routing/proposal_builder_route.dart';
 import 'package:catalyst_voices/routes/routing/spaces_route.dart';
+import 'package:catalyst_voices/widgets/modals/comment/submit_comment_error_dialog.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/publish_proposal_error_dialog.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/submit_proposal_error_dialog.dart';
 import 'package:catalyst_voices/widgets/snackbar/voices_snackbar.dart';
@@ -74,6 +77,7 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
   late final SegmentsController _segmentsController;
   late final ItemScrollController _segmentsScrollController;
 
+  StreamSubscription<DocumentRef?>? _proposalRefSub;
   StreamSubscription<dynamic>? _segmentsSub;
 
   @override
@@ -95,7 +99,7 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
             rightRail: const ProposalBuilderSetupPanel(),
             body: _ProposalBuilderContent(
               controller: _segmentsScrollController,
-              onRetryTap: _updateSource,
+              onRetryTap: _loadData,
             ),
             bodyConstraints: const BoxConstraints.expand(),
           ),
@@ -110,13 +114,16 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
 
     if (widget.proposalId != oldWidget.proposalId ||
         widget.categoryId != oldWidget.categoryId) {
-      _updateSource();
+      _loadData();
     }
   }
 
   @override
   void dispose() {
     _segmentsController.dispose();
+
+    unawaited(_proposalRefSub?.cancel());
+    _proposalRefSub = null;
 
     unawaited(_segmentsSub?.cancel());
     _segmentsSub = null;
@@ -133,6 +140,8 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
         unawaited(_showPublishException(error));
       case ProposalBuilderSubmitException():
         unawaited(_showSubmitException(error));
+      case LocalizedUnknownPublishCommentException():
+        unawaited(_showCommentException(error));
       default:
         super.handleError(error);
     }
@@ -146,6 +155,8 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
       case PublishedProposalBuilderSignal():
       case SubmittedProposalBuilderSignal():
         const WorkspaceRoute().go(context);
+      case ProposalSubmissionCloseDate():
+        unawaited(_showSubmissionClosingWarningDialog(signal.date));
     }
   }
 
@@ -162,14 +173,15 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
       ..addListener(_handleSegmentsControllerChange)
       ..attachItemsScrollController(_segmentsScrollController);
 
-    _segmentsSub = bloc.stream
-        .map((event) => (segments: event.segments, nodeId: event.activeNodeId))
-        .distinct(
-          (a, b) => listEquals(a.segments, b.segments) && a.nodeId == b.nodeId,
-        )
-        .listen((record) => _updateSegments(record.segments, record.nodeId));
+    _listenForProposalRef(bloc);
+    _listenForSegments(bloc);
+    _loadData(bloc: bloc);
+  }
 
-    _updateSource(bloc: bloc);
+  void _dontShowCampaignSubmissionClosingDialog(bool value) {
+    context
+        .read<SessionCubit>()
+        .updateShowSubmissionClosingWarning(value: value);
   }
 
   void _handleSegmentsControllerChange() {
@@ -179,16 +191,91 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
     context.read<ProposalBuilderBloc>().add(event);
   }
 
+  void _listenForProposalRef(ProposalBuilderBloc bloc) {
+    // listen for updates
+    _proposalRefSub = bloc.stream
+        .map((event) => event.metadata.documentRef)
+        .distinct()
+        .listen(_onProposalRefChanged);
+  }
+
+  void _listenForSegments(ProposalBuilderBloc bloc) {
+    // listen for updates
+    _segmentsSub = bloc.stream
+        .map(
+          (event) => (segments: event.allSegments, nodeId: event.activeNodeId),
+        )
+        .distinct(
+          (a, b) => listEquals(a.segments, b.segments) && a.nodeId == b.nodeId,
+        )
+        .listen((record) => _updateSegments(record.segments, record.nodeId));
+
+    // update with current state
+    _updateSegments(bloc.state.allSegments, bloc.state.activeNodeId);
+  }
+
+  void _loadData({ProposalBuilderBloc? bloc}) {
+    bloc ??= context.read<ProposalBuilderBloc>();
+
+    final proposalId = widget.proposalId;
+    final categoryId = widget.categoryId;
+
+    if (proposalId != null) {
+      bloc.add(LoadProposalEvent(proposalId: proposalId));
+    } else if (categoryId != null) {
+      bloc.add(LoadProposalCategoryEvent(categoryId: categoryId));
+    } else {
+      bloc.add(const LoadDefaultProposalCategoryEvent());
+    }
+    bloc.add(const ProposalSubmissionCloseDateEvent());
+  }
+
   void _onProposalDeleted() {
     Router.neglect(context, () {
       const WorkspaceRoute().replace(context);
     });
   }
 
+  void _onProposalRefChanged(DocumentRef? ref) {
+    if (ref != null) {
+      Router.neglect(context, () {
+        ProposalBuilderRoute.fromRef(ref: ref).replace(context);
+      });
+    }
+  }
+
+  Future<void> _showCommentException(
+    LocalizedUnknownPublishCommentException error,
+  ) {
+    return SubmitCommentErrorDialog.show(
+      context: context,
+      exception: error,
+    );
+  }
+
   Future<void> _showPublishException(ProposalBuilderPublishException error) {
     return PublishProposalErrorDialog.show(
       context: context,
       exception: error,
+    );
+  }
+
+  Future<void> _showSubmissionClosingWarningDialog([
+    DateTime? submissionCloseDate,
+  ]) async {
+    final canShow = context
+        .read<SessionCubit>()
+        .state
+        .settings
+        .showSubmissionClosingWarning;
+
+    if (submissionCloseDate == null || !canShow || !mounted) {
+      return;
+    }
+    await SubmissionClosingWarningDialog.showNDaysBefore(
+      context: context,
+      submissionCloseAt: submissionCloseDate,
+      dontShowAgain: _dontShowCampaignSubmissionClosingDialog,
     );
   }
 
@@ -235,20 +322,5 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
           );
 
     _segmentsController.value = newState;
-  }
-
-  void _updateSource({ProposalBuilderBloc? bloc}) {
-    bloc ??= context.read<ProposalBuilderBloc>();
-
-    final proposalId = widget.proposalId;
-    final categoryId = widget.categoryId;
-
-    if (proposalId != null) {
-      bloc.add(LoadProposalEvent(proposalId: proposalId));
-    } else if (categoryId != null) {
-      bloc.add(LoadProposalCategoryEvent(categoryId: categoryId));
-    } else {
-      bloc.add(const LoadDefaultProposalCategoryEvent());
-    }
   }
 }

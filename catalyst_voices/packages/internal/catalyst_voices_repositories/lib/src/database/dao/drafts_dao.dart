@@ -125,7 +125,13 @@ class DriftDraftsDao extends DatabaseAccessor<DriftCatalystDatabase>
   @override
   Future<List<DocumentDraftEntity>> queryVersionsOfId({required String id}) {
     final query = select(drafts)
-      ..where((tbl) => _filterRef(tbl, SignedDocumentRef(id: id)))
+      ..where(
+        (tbl) => _filterRef(
+          tbl,
+          DraftRef(id: id),
+          filterVersion: false,
+        ),
+      )
       ..orderBy([
         (u) => OrderingTerm.desc(u.verHi),
       ]);
@@ -189,6 +195,7 @@ class DriftDraftsDao extends DatabaseAccessor<DriftCatalystDatabase>
 
       query.where(
         (doc) => CustomExpression<bool>(
+          // ignore: lines_longer_than_80_chars
           "json_extract(metadata, '\$.authors') LIKE '%$searchId%'",
         ),
       );
@@ -208,14 +215,18 @@ class DriftDraftsDao extends DatabaseAccessor<DriftCatalystDatabase>
     return query.watch();
   }
 
-  Expression<bool> _filterRef($DraftsTable row, DocumentRef ref) {
+  Expression<bool> _filterRef(
+    $DraftsTable row,
+    DocumentRef ref, {
+    bool filterVersion = true,
+  }) {
     final id = UuidHiLo.from(ref.id);
     final ver = UuidHiLo.fromNullable(ref.version);
 
     return Expression.and([
       row.idHi.equals(id.high),
       row.idLo.equals(id.low),
-      if (ver != null) ...[
+      if (ver != null && filterVersion) ...[
         row.verHi.equals(ver.high),
         row.verLo.equals(ver.low),
       ],

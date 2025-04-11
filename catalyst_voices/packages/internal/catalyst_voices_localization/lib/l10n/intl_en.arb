@@ -45,6 +45,10 @@
   "@saveButtonText": {
     "description": "Text shown in save button"
   },
+  "saveChangesButtonText": "Save Changes",
+  "@saveChangesButtonText": {
+    "description": "Text shown in save button"
+  },
   "passwordLabelText": "Password",
   "@passwordLabelText": {
     "description": "Text shown in password field"
@@ -631,6 +635,10 @@
   "@registrationSeedPhraseNotFound": {
     "description": "Error message shown when attempting to register or recover account but seed phrase was not found"
   },
+  "registrationKeychainNotFound": "Keychain was not found or locked",
+  "@registrationKeychainNotFound": {
+    "description": "Error message shown when attempting to prepare registration transaction but keychain was not found or locked. Should not happen."
+  },
   "registrationUnlockPasswordNotFound": "Password was not found. Make sure valid password was created.",
   "@registrationUnlockPasswordNotFound": {
     "description": "Error message shown when attempting to register or recover account but password was not found"
@@ -756,7 +764,7 @@
   "createBaseProfileAcknowledgementsToS": "I confirm that I have read and agree to be bound by {tos}.",
   "catalystTos": "Project Catalyst Terms and Conditions",
   "createBaseProfileAcknowledgementsPrivacyPolicy": "I acknowledge and agree that any data I share in connection with my participation in Project Catalyst Funds will be collected, stored, used and processed in accordance with the {privacy_policy}.",
-  "catalystPrivacyPolicy": "Catalyst FC’s Privacy Policy",
+  "catalystPrivacyPolicy": "Catalyst FC's Privacy Policy",
   "createBaseProfileAcknowledgementsDataUsage": "I acknowledge that the Catalyst Ops team may use my email only for Catalyst communication.",
   "accountCreationSplashTitle": "Create your Catalyst Keychain",
   "accountCreationSplashMessage": "Catalyst Keychain is your ticket to participate in innovation on the global stage.  \u2028\u2028These next steps will create your Catalyst keychain so you can enter new spaces, discover awesome ideas, and share your feedback to help improve ideas.",
@@ -799,7 +807,7 @@
   "@removeKeychainDialogSubtitle": {
     "description": "A subtitle on delete keychain dialog"
   },
-  "deleteKeychainDialogTypingInfo": "To continue with the removal type: ‘Remove Keychain’.",
+  "deleteKeychainDialogTypingInfo": "To continue with the removal type: 'Remove Keychain'.",
   "@deleteKeychainDialogTypingInfo": {
     "description": "A typing info on delete keychain dialog"
   },
@@ -954,9 +962,9 @@
     "description": "Action to reset value in text field"
   },
   "createKeychainSeedPhraseCheckSuccessTitle": "Nice job! You've successfully verified your Catalyst seed phase",
-  "createKeychainSeedPhraseCheckSuccessSubtitle": "Enter your seed phrase to recover your Catalyst Keychain on any device.   \u2028\u2028It's kinda like your email and password all rolled into one, so keep it somewhere safe!\u2028\u2028In the next step we’ll add a password to your Catalyst Keychain, so you can lock/unlock access to Voices.",
+  "createKeychainSeedPhraseCheckSuccessSubtitle": "Enter your seed phrase to recover your Catalyst Keychain on any device.   \u2028\u2028It's kinda like your email and password all rolled into one, so keep it somewhere safe!\u2028\u2028In the next step we'll add a password to your Catalyst Keychain, so you can lock/unlock access to Voices.",
   "yourNextStep": "Your next step",
-  "createKeychainSeedPhraseCheckSuccessNextStep": "Now let’s set your Unlock password for this device!",
+  "createKeychainSeedPhraseCheckSuccessNextStep": "Now let's set your Unlock password for this device!",
   "createKeychainUnlockPasswordInstructionsTitle": "Set your Catalyst unlock password for this device",
   "createKeychainUnlockPasswordInstructionsSubtitle": "In this next step, you'll set your Unlock Password for this device. It's like a shortcut for proving ownership of your Keychain.  \u2028\u2028Whenever you recover your account for the first time on a new device, you'll need to use your Catalyst seed phrase to get started. Every time after that, you can use your Unlock Password to quickly regain access.",
   "createBaseProfileCreatedTitle": "Congratulations your Base profile is setup!",
@@ -992,6 +1000,9 @@
   "walletLinkExitConfirmDialogSubtitle": "Link wallet incomplete!",
   "walletLinkExitConfirmDialogContent": "Leaving before linking wallet means account creation is incomplete. \u2028\u2028You cannot login without \u2028completing your account setup.",
   "walletLinkExitConfirmDialogContinue": "Continue to link wallet",
+  "accountUpdateExitConfirmDialogSubtitle": "Account update incomplete!",
+  "accountUpdateExitConfirmDialogContent": "Leaving before submitting means no change.",
+  "accountUpdateExitConfirmDialogContinue": "Continue to update",
   "cancelAnyways": "Cancel anyway",
   "recoverCatalystKeychain": "Restore Catalyst keychain",
   "recoverKeychainMethodsTitle": "Restore your Catalyst Keychain",
@@ -1409,7 +1420,7 @@
   "@howItWorksCollaborate": {
     "description": "Used in discovery page in how it works section"
   },
-  "howItWorks": "Here’s how it works",
+  "howItWorks": "Here's how it works",
   "howItWorksCollaborateDescription": "Got an Idea? Create an impactful proposal and collaborate with the community to develop and refine it.",
   "howItWorksVote": "Vote for your favorite ideas",
   "@howItWorksVote": {
@@ -1424,7 +1435,7 @@
   "heroSectionTitle": "Create, fund and deliver the future of Cardano.",
   "projectCatalystDescription": "Project Catalyst is an experiment in community innovation, providing a framework to turn ideas into impactful real world projects.\n\nWe're putting the community at the heart of Cardano's future development. Are you ready for the Challenge?",
   "viewCurrentCampaign": "View Current Campaign",
-  "catalystF14": "Catalyst Fund 14",
+  "catalystF14": "Catalyst Fund14",
   "@catalystF14": {
     "description": "Used in discovery page in hero section"
   },
@@ -1562,7 +1573,7 @@
       }
     }
   },
-  "proposalEditorStatusDropdownPublishTitle": "Publish new iteration · Draft Iteration {iteration}",
+  "proposalEditorStatusDropdownPublishTitle": "**Share new draft** · Draft Iteration {iteration}",
   "@proposalEditorStatusDropdownPublishTitle": {
     "description": "Action title to publish a new version of the draft proposal.",
     "placeholders": {
@@ -1571,11 +1582,11 @@
       }
     }
   },
-  "proposalEditorStatusDropdownPublishDescription": "Share draft for public feedback",
+  "proposalEditorStatusDropdownPublishDescription": "Share draft for feedback",
   "@proposalEditorStatusDropdownPublishDescription": {
     "description": "Action description to publish a new version of the draft proposal."
   },
-  "proposalEditorStatusDropdownSubmitTitle": "Submit to review stage · Iteration {iteration} as Final",
+  "proposalEditorStatusDropdownSubmitTitle": "**Submit For Review** · Iteration {iteration} as Final",
   "@proposalEditorStatusDropdownSubmitTitle": {
     "description": "Action title to submit the final proposal.",
     "placeholders": {
@@ -1584,7 +1595,7 @@
       }
     }
   },
-  "proposalEditorStatusDropdownSubmitDescription": "Enter proposal into the next governance round",
+  "proposalEditorStatusDropdownSubmitDescription": "Submit as final proposal for review / voting",
   "@proposalEditorStatusDropdownSubmitDescription": {
     "description": "Action description to submit the final proposal."
   },
@@ -1631,6 +1642,10 @@
   "proposalEditorPublishErrorDialogMessage": "We couldn't publish your proposal. Please try again in 5-10 minutes, as it may take some time for your information to update.\n\nIf the issue persists, feel free to contact support.",
   "@proposalEditorPublishErrorDialogMessage": {
     "description": "Dialog message in proposal editor when publishing proposal to the server failed."
+  },
+  "proposalEditorNotAnswered": "Not Answered",
+  "@proposalEditorNotAnswered": {
+    "description": "Placeholder text when a property has been not filled."
   },
   "showAll": "Show All",
   "@showAll": {
@@ -1872,16 +1887,16 @@
   "@proposalViewMetadataSection": {
     "description": "Viewing proposal navigation section"
   },
-  "proposalViewCommentsSegment": "Comments",
-  "@proposalViewCommentsSegment": {
+  "commentsSegment": "Comments",
+  "@commentsSegment": {
     "description": "Viewing proposal navigation section"
   },
-  "proposalViewAddCommentSection": "Add comment",
-  "@proposalViewAddCommentSection": {
+  "addCommentSection": "Add comment",
+  "@addCommentSection": {
     "description": "Viewing proposal navigation section"
   },
-  "proposalViewViewCommentsSection": "View comments",
-  "@proposalViewViewCommentsSection": {
+  "viewCommentsSection": "View comments",
+  "@viewCommentsSection": {
     "description": "Viewing proposal navigation section"
   },
   "proposalViewFundingRequested": "Funding Requested",
@@ -1930,9 +1945,14 @@
       }
     }
   },
-  "comments": "Comments",
+  "comments": "{count, plural, =0{Comments} =1{Comment} other{Comments}}",
   "@comments": {
-    "description": "Describes comments"
+    "description": "Describes comments",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "proposalIterationPublishUpdateAndTitle": "Iteration {iteration} - {publish} - {datetime} - {title}",
   "@proposalIterationPublishUpdateAndTitle": {
@@ -2037,17 +2057,53 @@
   "@submitCommit": {
     "description": "Send comment"
   },
-  "proposalCommentsSortNewest": "Newest First",
-  "@proposalCommentsSortNewest": {
+  "commentsSortNewest": "Newest First",
+  "@commentsSortNewest": {
     "description": "One of options for sorting comments under proposal"
   },
-  "proposalCommentsSortOldest": "Newest Oldest",
-  "@proposalCommentsSortOldest": {
+  "commentsSortOldest": "Oldest First",
+  "@commentsSortOldest": {
     "description": "One of options for sorting comments under proposal"
   },
   "shortSummary": "Short summary",
   "@shortSummary": {
     "description": "A short description of something"
+  },
+  "view": "View",
+  "@view": {
+    "description": "A label for the view button. Used to see more details."
+  },
+  "share": "Share",
+  "@share": {
+    "description": "A label for the share button. Used to share something."
+  },
+  "forgetProposal": "Forget proposal",
+  "@forgetProposal": {
+    "description": "A label for the forget proposal button. Used to make hide action on document."
+  },
+  "export": "Export",
+  "@export": {
+    "description": "A label for the export button. Used to export something."
+  },
+  "unlockAndEdit": "Unlock & Edit",
+  "@unlockAndEdit": {
+    "description": "Used for making new draft proposal from final proposal."
+  },
+  "successProposalDeleted": "Proposal deleted successfully",
+  "@successProposalDeleted": {
+    "description": "Success message when draft is deleted"
+  },
+  "successProposalDeletedDescription": "Your local proposal has been deleted",
+  "@successProposalDeletedDescription": {
+    "description": "Description of success message when draft is deleted"
+  },
+  "errorProposalDeleted": "Error deleting proposal",
+  "@errorProposalDeleted": {
+    "description": "Error message when draft is not deleted"
+  },
+  "errorProposalDeletedDescription": "Something went wrong, please try again later",
+  "@errorProposalDeletedDescription": {
+    "description": "Description of error message when draft is not deleted"
   },
   "apiErrorUnknown": "Unknown error response",
   "@apiErrorUnknown": {
@@ -2068,6 +2124,54 @@
   "apiErrorServiceUnavailable": "Service Unavailable",
   "@apiErrorServiceUnavailable": {
     "description": "Message of an error when api returns matching status code."
+  },
+  "degradeFinalToDraftProposal": "You remove this proposal from review/voting stage.",
+  "@degradeFinalToDraftProposal": {
+    "description": "Information for user that his proposal is going back to draft. "
+  },
+  "resubmitAsFinalWarning": "You need to resubmit this proposal as final, to be eligible for funding, so make sure to Submit to review stage (Final) after editing.",
+  "@resubmitAsFinalWarning": {
+    "description": "Information for user that proposal needs to be resubmitted as final to be eligible for funding."
+  },
+  "removingProposalFromFinalStage": "You remove this proposal from review/voting stage.",
+  "@removingProposalFromFinalStage": {
+    "description": "Information for user that his proposal is going back to draft. "
+  },
+  "acknowledgeToResubmitProposal": "I acknowledge that I have to re-submit my draft proposal as Final to be eligible for funding.",
+  "@acknowledgeToResubmitProposal": {
+    "description": "Information for user that he needs to resubmit his proposal. "
+  },
+  "caution": "Caution:",
+  "@caution": {
+    "description": "Title of caution information"
+  },
+  "youAreSettingFinalToDraft": "You are setting your final proposal back to draft.",
+  "@youAreSettingFinalToDraft": {
+    "description": "Information for user that his proposal is going back to draft. "
+  },
+  "unlockEditProposalDialogTitle": "Unlock & Edit ?",
+  "@unlockEditProposalDialogTitle": {
+    "description": "Title of Unlock & Edit Dialog"
+  },
+  "forgetProposalDialogDescription": "You are about to remove this proposal from the app.",
+  "@forgetProposalDialogDescription": {
+    "description": "Description of Forget Proposal Dialog"
+  },
+  "forgetProposalCantEditWarning": "You will no longer be able to view, edit, or publish this proposal",
+  "@forgetProposalCantEditWarning": {
+    "description": "Warning for user that his proposal can't be edited"
+  },
+  "forgetProposalCantGetFundingWarning": "This proposal will not be eligible to win funding, even if it has been previously published.",
+  "@forgetProposalCantGetFundingWarning": {
+    "description": "Warning for user that his proposal can't get funding"
+  },
+  "forgetProposalInvisibleWarning": "Your proposal will not be visible to other users.",
+  "@forgetProposalInvisibleWarning": {
+    "description": "Warning for user that his proposal will be invisible"
+  },
+  "forgetProposalAgreement": "I acknowledge that this action cannot be undone.",
+  "@forgetProposalAgreement": {
+    "description": "Text for user that agrees to forget proposal"
   },
   "myOpportunities": "My Opportunities",
   "@myOpportunities": {
@@ -2097,11 +2201,36 @@
   "@copyMyCatalystId": {
     "description": "Action to copy my catalyst id"
   },
+  "stayInvolved": "Stay Involved",
+  "@stayInvolved": {
+    "description": "Title for the stay involved section"
+  },
+  "stayInvolvedReviewerDescription": "Your voice has power. Use it to guide others and help improve the Cardano community.\n\nAs a reviewer, you'll make a real impact by sharing thoughtful feedback and influencing decisions.",
+  "@stayInvolvedReviewerDescription": {
+    "description": "Description for the reviewer cards in stay involved section"
+  },
+  "stayInvolvedVoterDescription": "Get Ready! This is your chance to have a say in where the funds go. To make sure you're ready to participate.\n\nRemember, by casting your vote, you're not only influencing the development of Cardano but also helping to build a community that reflects the values you care about.",
+  "@stayInvolvedVoterDescription": {
+    "description": "Description for the voter cards in stay involved section"
+  },
+  "votingForF14StartsIn": "Voting for Fund14 start {date}",
+  "@votingForF14StartsIn": {
+    "description": "Description for the voting for f14 card in stay involved section",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "votingRegistrationForF14": "Voting Registration for Fund14.",
+  "@votingRegistrationForF14": {
+    "description": "Title for the voting registration for f14 card in stay involved section"
+  },
   "mobileAccessDescription": "For the best experience, head over to a desktop to get started. But don't worry - mobile is coming.\n\nStay tuned for more updates, or visit our Gitbook to learn more.\n\nSee you on the other side!",
   "@mobileAccessDescription": {
     "description": "Description for the mobile restricted access page"
   },
-  "mobileAccessSubtitle": "We’re not quite ready for you on mobile just yet…",
+  "mobileAccessSubtitle": "We're not quite ready for you on mobile just yet…",
   "@mobileAccessSubtitle": {
     "description": "Subtitle for the mobile restricted access page"
   },
@@ -2120,5 +2249,275 @@
   "errorUnknownPublishComment": "Can not publish comment",
   "@errorUnknownPublishComment": {
     "description": "Fallback message when can not publish comment for any reason."
+  },
+  "preSubmitProposalStageDescription": "Curious? Learn more about the new Catalyst App\nand prepare yourself for success.",
+  "@preSubmitProposalStageDescription": {
+    "description": "Description for the pre-submission stage"
+  },
+  "proposalSubmissionStageStartAt": "Proposal submission opens {date} at {time}",
+  "@proposalSubmissionStageStartAt": {
+    "description": "Description for the pre-submission stage",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "days": "{count, plural, =1{Day} other{Days}}",
+  "@days": {
+    "description": "To represent days",
+    "placeholders": {
+      "count": {
+        "type": "num"
+      }
+    }
+  },
+  "hours": "{count, plural, =1{Hour} other{Hours}}",
+  "@hours": {
+    "description": "To represent hours",
+    "placeholders": {
+      "count": {
+        "type": "num"
+      }
+    }
+  },
+  "minutes": "{count, plural, =1{Minute} other{Minutes}}",
+  "@minutes": {
+    "description": "To represent minutes",
+    "placeholders": {
+      "count": {
+        "type": "num"
+      }
+    }
+  },
+  "seconds": "{count, plural, =1{Second} other{Seconds}}",
+  "@seconds": {
+    "description": "To represent seconds",
+    "placeholders": {
+      "count": {
+        "type": "num"
+      }
+    }
+  },
+  "proposalSubmissionIsClosed": "Proposal submission  is closed for Fund14.",
+  "@proposalSubmissionIsClosed": {
+    "description": "Title text when proposal submission is closed."
+  },
+  "proposalSubmissionClosedDescription": "We’re moving into the Community Review stage!\nWant to stay involved and earn rewards? Check out our knowledge base.",
+  "@proposalSubmissionClosedDescription": {
+    "description": "Text used to gave user more information about proposal submission close stage and what to do next."
+  },
+  "cantFindYourWallet": "We can't find your wallet",
+  "@cantFindYourWallet": {
+    "description": "Error message when user doesn't have a wallet extension installed"
+  },
+  "potentialReasons": "Potential reasons",
+  "@potentialReasons": {
+    "description": "Title for potential reasons for no wallet found"
+  },
+  "wrongBrowserTitle": "Wrong Browser",
+  "@wrongBrowserTitle": {
+    "description": "Title for wrong browser reason to not find wallet"
+  },
+  "wrongBrowserDescription": "Please launch the browser with your wallets extension and revisit Catalyst.",
+  "@wrongBrowserDescription": {
+    "description": "Description for wrong browser reason to not find wallet"
+  },
+  "disableExtensionTitle": "Disable Extension",
+  "@disableExtensionTitle": {
+    "description": "Title for disable extension reason to not find wallet"
+  },
+  "disableExtensionDescription": "Please enable to continue your wallet extension, and refresh the application.",
+  "@disableExtensionDescription": {
+    "description": "Description for disable extensions in the browser to not find wallet"
+  },
+  "failedAuthenticationTitle": "No/Failed Authorisation",
+  "@failedAuthenticationTitle": {
+    "description": "Title for failed authentication reason to not find wallet"
+  },
+  "failedAuthenticationDescription": "You did not authorise the Catalyst App in your wallet, follow specific wallet instructions.",
+  "@failedAuthenticationDescription": {
+    "description": "Description for failed authentication reason to not find wallet"
+  },
+  "noWalletInstalledTitle": "No wallet installed",
+  "@noWalletInstalledTitle": {
+    "description": "Title for no wallet installed reason to not find wallet"
+  },
+  "noWalletInstalledDescription": "You don’t have a (compatible) wallet installed, please select one of the Cardano wallets on the right, and follow installation instructions.",
+  "@noWalletInstalledDescription": {
+    "description": "Description for no wallet installed reason to not find wallet"
+  },
+  "visitCatalystWalletDocumentationTextButton": "Visit Catalyst wallet documentation",
+  "@visitCatalystWalletDocumentationTextButton": {
+    "description": "Text button to visit catalyst wallet documentation"
+  },
+  "installCardanoWallet": "Install a Cardano wallet",
+  "@installCardanoWallet": {
+    "description": "Text to install a cardano wallet"
+  },
+  "currentlySupportedWallets": "We currently support the following wallets:",
+  "@currentlySupportedWallets": {
+    "description": "Text to show currently supported wallets"
+  },
+  "goodToKnow": "Good to know",
+  "@goodToKnow": {
+    "description": "Text to show when some tip will be presented to user"
+  },
+  "registrationTransactionFeeDescription": "The creation of a Catalyst account costs, a transaction fee of (0,21 ADA), be sure your wallet has a minimum of 1 ADA.",
+  "@registrationTransactionFeeDescription": {
+    "description": "Description for the registration transaction fee"
+  },
+  "eternlWallet": "Eternl Wallet",
+  "@eternlWallet": {
+    "description": "Name of the eternl wallet"
+  },
+  "laceWallet": "Lace Wallet",
+  "@laceWallet": {
+    "description": "Name of the lace wallet"
+  },
+  "namiWallet": "Nami Wallet",
+  "@namiWallet": {
+    "description": "Name of the nami wallet"
+  },
+  "dontShowAgain": "Don't show again",
+  "@dontShowAgain": {
+    "description": "Action to not show again"
+  },
+  "proposalSubmissionWindowClosesAt": "The proposal submission window closes {date}",
+  "@proposalSubmissionWindowClosesAt": {
+    "description": "Description for the proposal submission window closes at",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "submitProposalBeforeClosing": "Submit your final proposals to Review stage well before the App closes.",
+  "@submitProposalBeforeClosing": {
+    "description": "Information for user to submit proposal before the submission window closes"
+  },
+  "checkMaxProposal": "Check your finals (max 5) in My proposals.",
+  "@checkMaxProposal": {
+    "description": "Information for user to check their final proposals before submission window closes"
+  },
+  "catalystAppNotAvailableAfterSubmissionCloses": "The Catalyst App won’t be available after submission close.",
+  "@catalystAppNotAvailableAfterSubmissionCloses": {
+    "description": "Information that app won't be available after submission closes"
+  },
+  "wantToBackUpProposals": "Want to back up your proposals?",
+  "@wantToBackUpProposals": {
+    "description": "Title for section informing user that they can backup their proposals"
+  },
+  "goMyProposals": "Go My proposals",
+  "@goMyProposals": {
+    "description": "Action to go to my proposals"
+  },
+  "exportProposalsIndividually": "Export proposals individually",
+  "@exportProposalsIndividually": {
+    "description": "Title for section informing user that they can export their proposals individually"
+  },
+  "storeInSafeLocation": "Store in safe location",
+  "@storeInSafeLocation": {
+    "description": "Title for section informing user that they can store their proposals in a safe location"
+  },
+  "catalystAppClosesIn": "Catalyst App closes in {days}d, {hours}h, {minutes}m, {seconds}s.",
+  "@catalystAppClosesIn": {
+    "description": "Message displayed when the app closes in a few seconds",
+    "placeholders": {
+      "days": {
+        "type": "int",
+        "example": "1"
+      },
+      "hours": {
+        "type": "int",
+        "example": "1"
+      },
+      "minutes": {
+        "type": "int",
+        "example": "1"
+      },
+      "seconds": {
+        "type": "int",
+        "example": "10"
+      }
+    }
+  },
+  "insertNewImageDialogTitle": "Insert New Image",
+  "@insertNewImageDialogTitle": {
+    "description": "Title of the dialog for inserting a new image"
+  },
+  "insertNewImageDialogDescription": "Bring your proposal to life with visuals",
+  "@insertNewImageDialogDescription": {
+    "description": "Description of the dialog for inserting a new image"
+  },
+  "insertNewImageDialogImageUrl": "Image URL",
+  "@insertNewImageDialogImageUrl": {
+    "description": "Label for the image URL input field"
+  },
+  "insertNewImageDialogInsertButtonText": "Insert Image",
+  "@insertNewImageDialogInsertButtonText": {
+    "description": "Label for the insert button"
+  },
+  "insertNewImageDialogInvalidUrl": "Please provide a valid image URL to proceed",
+  "@insertNewImageDialogInvalidUrl": {
+    "description": "Message shown when the image URL is invalid"
+  },
+  "insertNewImageDialogTextPlaceholder": "Paste link to image here",
+  "@insertNewImageDialogTextPlaceholder": {
+    "description": "Default text for the image URL input field"
+  },
+  "richTextEditorImageSupportInfo": "The editor supports images from web URLs, including both traditional web servers and decentralized storage solutions. For more information, visit our",
+  "@richTextEditorImageSupportInfo": {
+    "description": "Information about supported image sources in the editor"
+  },
+  "knowledgeBase": "knowledge base",
+  "@knowledgeBase": {
+    "description": "Text for the knowledge base link"
+  },
+  "toLearnMore": "to learn more.",
+  "@toLearnMore": {
+    "description": "Text for the to learn more link"
+  },
+  "insertNewImageFailedToLoad": "Image failed to load",
+  "@insertNewImageFailedToLoad": {
+    "description": "Text for the image failed to load"
+  },
+  "submitCommentErrorDialogTitle": "Unable to add Comment",
+  "@submitCommentErrorDialogTitle": {
+    "description": "Title for the error dialog when submitting a comment fails"
+  },
+  "noPublishedProposals": "No published proposals.",
+  "@noPublishedProposals": {
+    "description": "Text when there are no published proposals"
+  },
+  "noProposalsToPublish": "You have no proposals to publish, start a new proposal, or create a new iteration of an existing proposal to be able to publish.",
+  "@noProposalsToPublish": {
+    "description": "Text when there are no proposals to publish"
+  },
+  "viewProposalComments": "View proposal comments",
+  "@viewProposalComments": {
+    "description": "Text for the view proposal comments title in the card"
+  },
+  "viewProposalCommentsDescription": "Open My proposals in the Discovery Space",
+  "@viewProposalCommentsDescription": {
+    "description": "Text for the view proposal comments description in the card"
+  },
+  "paginationProposalsCounter": "{from}-{to} of {max, plural, =0{proposals} =1{proposal} other{proposals}}",
+  "@paginationProposalsCounter": {
+    "description": "Below pagination list, next to page switch controls",
+    "placeholders": {
+      "from": {
+        "type": "int"
+      },
+      "to": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
   }
 }

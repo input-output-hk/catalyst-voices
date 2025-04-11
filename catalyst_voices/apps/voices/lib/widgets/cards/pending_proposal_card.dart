@@ -5,11 +5,13 @@ import 'package:catalyst_voices/widgets/cards/proposal_card_widgets.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/share_proposal_dialog.dart';
 import 'package:catalyst_voices/widgets/text/day_month_time_text.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
+import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 /// Displays a proposal in pending state on a card.
 class PendingProposalCard extends StatefulWidget {
@@ -118,7 +120,7 @@ class _FundsAndDuration extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(8),
@@ -153,61 +155,63 @@ class _PendingProposalCardState extends State<PendingProposalCard> {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      key: const Key('ProposalCard'),
-      color: Colors.transparent,
-      child: InkWell(
-        statesController: _statesController,
-        onTap: widget.onTap,
-        child: ValueListenableBuilder(
-          valueListenable: _statesController,
-          builder: (context, value, child) => Container(
-            constraints: const BoxConstraints(maxWidth: 326),
-            decoration: BoxDecoration(
-              color: context.colors.elevationsOnSurfaceNeutralLv1White,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: _border.resolve(_statesController.value),
-              ),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _Topbar(
-                        proposalRef: widget.proposal.ref,
-                        showStatus: widget.showStatus,
-                        isFavorite: widget.isFavorite,
-                        onFavoriteChanged: widget.onFavoriteChanged,
-                      ),
-                      _Category(
-                        category: widget.proposal.category,
-                      ),
-                      const SizedBox(height: 4),
-                      _Title(text: widget.proposal.title),
-                      _Author(author: widget.proposal.author),
-                      _FundsAndDuration(
-                        funds: widget.proposal.fundsRequested,
-                        duration: widget.proposal.duration,
-                      ),
-                      const SizedBox(height: 12),
-                      _Description(text: widget.proposal.description),
-                      const SizedBox(height: 24),
-                      _ProposalInfo(
-                        proposalStage: widget.proposal.publishStage,
-                        version: widget.proposal.version,
-                        lastUpdate: widget.proposal.lastUpdateDate,
-                        commentsCount: widget.proposal.commentsCount,
-                        showLastUpdate: widget.showLastUpdate,
-                      ),
-                    ],
-                  ),
+    return SizedBox(
+      height: 454,
+      child: Material(
+        key: const Key('ProposalCard'),
+        color: Colors.transparent,
+        child: InkWell(
+          statesController: _statesController,
+          onTap: widget.onTap,
+          child: ValueListenableBuilder(
+            valueListenable: _statesController,
+            builder: (context, value, child) => Container(
+              constraints: const BoxConstraints(maxWidth: 326),
+              decoration: BoxDecoration(
+                color: context.colors.elevationsOnSurfaceNeutralLv1White,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: _border.resolve(_statesController.value),
                 ),
-              ],
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _Topbar(
+                      proposalRef: widget.proposal.ref,
+                      showStatus: widget.showStatus,
+                      isFavorite: widget.isFavorite,
+                      onFavoriteChanged: widget.onFavoriteChanged,
+                    ),
+                    _Category(
+                      category: widget.proposal.category,
+                    ),
+                    const SizedBox(height: 4),
+                    Expanded(
+                      child: _Title(text: widget.proposal.title),
+                    ),
+                    _Author(author: widget.proposal.author),
+                    _FundsAndDuration(
+                      funds: widget.proposal.fundsRequested,
+                      duration: widget.proposal.duration,
+                    ),
+                    const SizedBox(height: 12),
+                    Expanded(
+                      child: _Description(text: widget.proposal.description),
+                    ),
+                    const SizedBox(height: 12),
+                    _ProposalInfo(
+                      proposalStage: widget.proposal.publishStage,
+                      version: widget.proposal.version,
+                      lastUpdate: widget.proposal.lastUpdateDate,
+                      commentsCount: widget.proposal.commentsCount,
+                      showLastUpdate: widget.showLastUpdate,
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
         ),
@@ -359,8 +363,16 @@ class _ProposalInfo extends StatelessWidget {
     if (lastUpdate == null) {
       return '';
     }
+    final timezone = context.select<SessionCubit?, TimezonePreferences>(
+      (value) => value?.state.settings.timezone ?? TimezonePreferences.local,
+    );
+
+    final effectiveData = switch (timezone) {
+      TimezonePreferences.utc => lastUpdate!.toUtc(),
+      TimezonePreferences.local => lastUpdate!.toLocal(),
+    };
     final dt =
-        DateFormatter.formatDateTimeParts(lastUpdate!, includeYear: true);
+        DateFormatter.formatDateTimeParts(effectiveData, includeYear: true);
 
     return context.l10n.publishedOn(dt.date, dt.time);
   }

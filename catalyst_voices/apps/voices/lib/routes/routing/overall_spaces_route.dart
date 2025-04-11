@@ -1,5 +1,6 @@
 import 'package:catalyst_voices/pages/overall_spaces/overall_spaces.dart';
 import 'package:catalyst_voices/routes/guards/composite_route_guard_mixin.dart';
+import 'package:catalyst_voices/routes/guards/proposal_submission_guard.dart';
 import 'package:catalyst_voices/routes/guards/route_guard.dart';
 import 'package:catalyst_voices/routes/guards/session_unlocked_guard.dart';
 import 'package:catalyst_voices/routes/routing/routes.dart';
@@ -17,7 +18,10 @@ final class OverallSpacesRoute extends GoRouteData
   const OverallSpacesRoute();
 
   @override
-  List<RouteGuard> get routeGuards => [const SessionUnlockedGuard()];
+  List<RouteGuard> get routeGuards => [
+        const SessionUnlockedGuard(),
+        const ProposalSubmissionGuard(),
+      ];
 
   @override
   Widget build(BuildContext context, GoRouterState state) {

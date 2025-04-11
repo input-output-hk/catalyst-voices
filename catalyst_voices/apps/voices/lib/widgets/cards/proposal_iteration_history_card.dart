@@ -1,12 +1,18 @@
+import 'dart:async';
+
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/common/ext/proposal_publish_ext.dart';
-import 'package:catalyst_voices/common/formatters/date_formatter.dart';
+import 'package:catalyst_voices/routes/routing/proposal_builder_route.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_text_button.dart';
 import 'package:catalyst_voices/widgets/common/affix_decorator.dart';
+import 'package:catalyst_voices/widgets/modals/proposals/proposal_builder_delete_confirmation_dialog.dart';
+import 'package:catalyst_voices/widgets/text/proposal_version_info_text.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
+import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ProposalIterationHistory extends StatefulWidget {
   final Proposal proposal;
@@ -34,24 +40,46 @@ class _Actions extends StatelessWidget {
       children: [
         VoicesTextButton(
           child: Text(context.l10n.delete),
-          onTap: () {
-            // TODO(dtscalac): call delete method
-          },
+          onTap: () async => _deleteProposal(context),
         ),
         VoicesTextButton(
           child: Text(context.l10n.exportButtonText),
-          onTap: () {
-            // TODO(dtscalac): call export method
-          },
+          onTap: () => _exportProposal(context),
         ),
         VoicesTextButton(
           child: Text(context.l10n.open),
-          onTap: () {
-            // TODO(dtscalac): call open method
-          },
+          onTap: () => _editProposal(context),
         ),
       ],
     );
+  }
+
+  Future<void> _deleteProposal(BuildContext context) async {
+    if (ref is DraftRef) {
+      final confirmed = await ProposalBuilderDeleteConfirmationDialog.show(
+        context,
+        routeSettings: const RouteSettings(
+          name: '/proposal_builder/delete-confirmation',
+        ),
+      );
+
+      if (confirmed && context.mounted) {
+        context
+            .read<WorkspaceBloc>()
+            .add(DeleteDraftProposalEvent(ref: ref as DraftRef));
+      }
+    }
+  }
+
+  void _editProposal(BuildContext context) {
+    unawaited(
+      ProposalBuilderRoute.fromRef(ref: ref).push(context),
+    );
+  }
+
+  void _exportProposal(BuildContext context) {
+    final prefix = context.l10n.proposal.toLowerCase();
+    context.read<WorkspaceBloc>().add(ExportProposal(ref, prefix));
   }
 }
 
@@ -107,7 +135,6 @@ class _IterationVersionList extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 spacing: 6,
                 children: versions
-                    .skip(1)
                     .map(
                       (e) => _IterationVersion(
                         version: e,
@@ -129,7 +156,8 @@ class _ProposalIterationHistoryState extends State<ProposalIterationHistory> {
 
   bool get _hasNewerLocalIteration {
     if (widget.proposal.versions.isEmpty) return false;
-    return widget.proposal.versions.first.isLatestVersion(
+    final latestVersion = widget.proposal.versions.first;
+    return latestVersion.isLatestVersion(
       widget.proposal.selfRef.version ?? '',
     );
   }
@@ -149,7 +177,7 @@ class _ProposalIterationHistoryState extends State<ProposalIterationHistory> {
             Padding(
               padding: const EdgeInsets.symmetric(
                 vertical: 6,
-                horizontal: 17,
+                horizontal: 16,
               ),
               child: Row(
                 children: [
@@ -169,17 +197,22 @@ class _ProposalIterationHistoryState extends State<ProposalIterationHistory> {
                       boldTitle: true,
                     )
                   else
-                    Text(
-                      context.l10n.publishingHistory,
-                      style: context.textTheme.labelMedium?.copyWith(
-                        color: context.colors.textOnPrimaryLevel1,
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 14,
+                      ),
+                      child: Text(
+                        context.l10n.publishingHistory,
+                        style: context.textTheme.labelMedium?.copyWith(
+                          color: context.colors.textOnPrimaryLevel1,
+                        ),
                       ),
                     ),
                   const Spacer(),
                   Offstage(
                     offstage: !_hasNewerLocalIteration,
                     child: _Actions(
-                      ref: widget.proposal.selfRef,
+                      ref: widget.proposal.versions.first.selfRef,
                     ),
                   ),
                 ],
@@ -221,21 +254,15 @@ class _Title extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final datetime = DateFormatter.formatDayMonthTime(updateDate);
     final publishName = publish.localizedWorkspaceName(context.l10n);
     return AffixDecorator(
       prefix: VoicesAssets.icons.documentText.buildIcon(size: 18),
-      child: Text(
-        context.l10n.proposalIterationPublishUpdateAndTitle(
-          iteration,
-          publishName,
-          datetime,
-          title,
-        ),
-        style: context.textTheme.labelMedium?.copyWith(
-          color: context.colors.textOnPrimaryLevel1,
-          fontWeight: boldTitle ? FontWeight.bold : FontWeight.w100,
-        ),
+      child: ProposalVersionInfoText(
+        iteration: iteration,
+        publish: publishName,
+        updateDate: updateDate,
+        title: title,
+        boldTitle: boldTitle,
       ),
     );
   }

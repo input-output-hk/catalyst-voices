@@ -7,6 +7,7 @@ import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class GetStartedPanel extends StatelessWidget {
   const GetStartedPanel({super.key});
@@ -45,10 +46,10 @@ class GetStartedPanel extends StatelessWidget {
                     icon: type._icon,
                     title: type._getTitle(context.l10n),
                     subtitle: type._getSubtitle(context.l10n),
-                    onTap: () {
+                    onTap: () async {
                       switch (type) {
                         case CreateAccountType.createNew:
-                          RegistrationCubit.of(context).createNewAccount();
+                          await _handleCreateNewAccount(context);
                         case CreateAccountType.recover:
                           RegistrationCubit.of(context).recoverKeychain();
                       }
@@ -62,6 +63,23 @@ class GetStartedPanel extends StatelessWidget {
       ],
     );
   }
+
+  Future<void> _handleCreateNewAccount(BuildContext context) async {
+    final hasWallets =
+        await context.read<SessionCubit>().checkAvailableWallets();
+
+    if (hasWallets && context.mounted) {
+      RegistrationCubit.of(context).createNewAccount();
+      return;
+    }
+
+    if (!context.mounted) return;
+    const canRegister = true;
+
+    if (canRegister && context.mounted) {
+      RegistrationCubit.of(context).createNewAccount();
+    }
+  }
 }
 
 extension _CreateAccountTypeExt on CreateAccountType {
@@ -70,12 +88,12 @@ extension _CreateAccountTypeExt on CreateAccountType {
         CreateAccountType.recover => VoicesAssets.icons.download,
       };
 
+  String _getSubtitle(VoicesLocalizations l10n) {
+    return l10n.accountCreationOnThisDevice;
+  }
+
   String _getTitle(VoicesLocalizations l10n) => switch (this) {
         CreateAccountType.createNew => l10n.accountCreationCreate,
         CreateAccountType.recover => l10n.accountCreationRecover,
       };
-
-  String _getSubtitle(VoicesLocalizations l10n) {
-    return l10n.accountCreationOnThisDevice;
-  }
 }

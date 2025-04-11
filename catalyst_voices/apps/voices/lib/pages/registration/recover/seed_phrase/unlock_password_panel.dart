@@ -84,7 +84,7 @@ class _UnlockPasswordPanelState extends State<UnlockPasswordPanel> {
   Future<void> _createKeychain() async {
     final cubit = RegistrationCubit.of(context);
 
-    final success = await cubit.recover.createKeychain();
+    final success = await cubit.recover.setupKeychain();
 
     if (success) {
       cubit.nextStep();

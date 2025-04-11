@@ -3,6 +3,7 @@ import 'package:catalyst_voices_repositories/src/database/catalyst_database_conf
 import 'package:catalyst_voices_repositories/src/database/dao/documents_dao.dart';
 import 'package:catalyst_voices_repositories/src/database/dao/drafts_dao.dart';
 import 'package:catalyst_voices_repositories/src/database/dao/favorites_dao.dart';
+import 'package:catalyst_voices_repositories/src/database/dao/proposals_dao.dart';
 import 'package:catalyst_voices_repositories/src/database/migration/drift_migration_strategy.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents.drift.dart';
@@ -37,8 +38,16 @@ abstract interface class CatalystDatabase {
   /// Contains all operations related to fav status of documents.
   FavoritesDao get favoritesDao;
 
+  /// Specialized version of [DocumentsDao].
+  ProposalsDao get proposalsDao;
+
   /// Removes all data from this db.
   Future<void> clear();
+
+  /// Only once instance is allowed.
+  ///
+  /// In tests it can happen that database was opened and disposed later.
+  Future<void> close();
 }
 
 @DriftDatabase(
@@ -52,6 +61,7 @@ abstract interface class CatalystDatabase {
     DriftDocumentsDao,
     DriftFavoritesDao,
     DriftDraftsDao,
+    DriftProposalsDao,
   ],
   queries: {},
   views: [],
@@ -95,6 +105,9 @@ class DriftCatalystDatabase extends $DriftCatalystDatabase
       destructiveFallback: destructiveFallback,
     );
   }
+
+  @override
+  ProposalsDao get proposalsDao => driftProposalsDao;
 
   @override
   int get schemaVersion => 3;

@@ -55,6 +55,15 @@ final class LocalizedRegistrationSeedPhraseNotFoundException
       context.l10n.registrationSeedPhraseNotFound;
 }
 
+final class LocalizedRegistrationKeychainNotFoundException
+    extends LocalizedRegistrationException {
+  const LocalizedRegistrationKeychainNotFoundException();
+
+  @override
+  String message(BuildContext context) =>
+      context.l10n.registrationKeychainNotFound;
+}
+
 /// Localized exception thrown when attempting to execute register operation
 /// which requires unlock password but non was found.
 final class LocalizedRegistrationUnlockPasswordNotFoundException

@@ -196,10 +196,9 @@ final class SegmentsControllerState extends Equatable {
         )
         .expand(
           (element) => [
+            element,
             if (element is SegmentGroupedListViewItems)
-              ...(element as SegmentGroupedListViewItems).children
-            else
-              element,
+              ...(element as SegmentGroupedListViewItems).children,
           ],
         )
         .toList();

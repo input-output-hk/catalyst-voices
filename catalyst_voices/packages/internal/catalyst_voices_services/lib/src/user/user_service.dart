@@ -18,15 +18,24 @@ abstract interface class UserService implements ActiveAware {
 
   Future<User> getUser();
 
+  /// Registers a new [account] and makes it active.
+  ///
+  /// It can invoke some one-time registration logic,
+  /// contrary to [useAccount] which doesn't have such logic.
+  Future<void> registerAccount(Account account);
+
   Future<void> removeAccount(Account account);
 
-  Future<void> updateActiveAccount({
+  Future<void> updateAccount({
+    required CatalystId id,
     Optional<String>? username,
     String? email,
+    Set<AccountRole>? roles,
   });
 
   Future<void> updateSettings(UserSettings newValue);
 
+  /// Make the [account] active one. If it doesn't exist then it'll be created.
   Future<void> useAccount(Account account);
 
   Future<void> useLastAccount();
@@ -61,6 +70,26 @@ final class UserServiceImpl implements UserService {
   Future<User> getUser() => _userRepository.getUser();
 
   @override
+  Future<void> registerAccount(Account account) async {
+    var user = await getUser();
+
+    if (user.hasAccount(id: account.catalystId)) {
+      throw StateError(
+        'The account must not be registered, id: ${account.catalystId}',
+      );
+    }
+
+    user = user.addAccount(account);
+    user = user.useAccount(id: account.catalystId);
+
+    await _updateUser(user);
+
+    // updating email must be after updating user so that
+    // the request is sent with correct access token
+    unawaited(_userRepository.updateEmail(account.email));
+  }
+
+  @override
   Future<void> removeAccount(Account account) async {
     var user = await getUser();
 
@@ -81,26 +110,32 @@ final class UserServiceImpl implements UserService {
   }
 
   @override
-  Future<void> updateActiveAccount({
+  Future<void> updateAccount({
+    required CatalystId id,
     Optional<String>? username,
     String? email,
+    Set<AccountRole>? roles,
   }) async {
     final user = await getUser();
-    final activeAccount = user.activeAccount;
-    if (activeAccount == null) {
+    if (!user.hasAccount(id: id)) {
       return;
     }
+    final account = user.getAccount(id);
 
-    var updatedAccount = activeAccount.copyWith();
+    var updatedAccount = account.copyWith();
 
     if (username != null) {
-      final catalystId = activeAccount.catalystId.copyWith(username: username);
-      updatedAccount = activeAccount.copyWith(catalystId: catalystId);
+      final catalystId = updatedAccount.catalystId.copyWith(username: username);
+      updatedAccount = updatedAccount.copyWith(catalystId: catalystId);
     }
 
-    // TODO(damian-molinski): post it to cat-reviews
     if (email != null) {
-      // updatedAccount = activeAccount.copyWith(email: email);
+      await _userRepository.updateEmail(email);
+      updatedAccount = updatedAccount.copyWith(email: email);
+    }
+
+    if (roles != null) {
+      updatedAccount = updatedAccount.copyWith(roles: roles);
     }
 
     final updatedUser = user.updateAccount(updatedAccount);

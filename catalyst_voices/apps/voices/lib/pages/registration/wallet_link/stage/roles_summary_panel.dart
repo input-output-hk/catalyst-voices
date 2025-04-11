@@ -4,6 +4,7 @@ import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 class RolesSummaryPanel extends StatelessWidget {
@@ -47,13 +48,25 @@ class RolesSummaryPanel extends StatelessWidget {
   }
 }
 
+class _BlocRolesSummaryContainer extends StatelessWidget {
+  const _BlocRolesSummaryContainer();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocWalletLinkSelector<List<RegistrationRole>>(
+      selector: (state) => state.roles,
+      builder: (context, state) => RolesSummaryContainer(roles: state),
+    );
+  }
+}
+
 class _BlocSubtitle extends StatelessWidget {
   const _BlocSubtitle();
 
   @override
   Widget build(BuildContext context) {
     return BlocWalletLinkSelector<Set<AccountRole>>(
-      selector: (state) => state.selectedRoles ?? state.defaultRoles,
+      selector: (state) => state.selectedRoleTypes,
       builder: (context, state) {
         return _Subtitle(selectedRoles: state);
       },
@@ -84,30 +97,6 @@ class _Subtitle extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-}
-
-class _BlocRolesSummaryContainer extends StatelessWidget {
-  const _BlocRolesSummaryContainer();
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocWalletLinkSelector<
-        ({
-          Set<AccountRole> selected,
-          Set<AccountRole> defaultRoles,
-        })>(
-      selector: (state) => (
-        selected: state.selectedRoles ?? state.defaultRoles,
-        defaultRoles: state.defaultRoles,
-      ),
-      builder: (context, state) {
-        return RolesSummaryContainer(
-          selected: state.selected,
-          lockedValuesAsDefault: state.defaultRoles,
-        );
-      },
     );
   }
 }
