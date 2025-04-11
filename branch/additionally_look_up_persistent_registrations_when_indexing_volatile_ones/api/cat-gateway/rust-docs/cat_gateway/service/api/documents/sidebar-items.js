@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"mod":["get_document","post_document_index_query","put_document","templates"],"struct":["DocumentApi"]};
