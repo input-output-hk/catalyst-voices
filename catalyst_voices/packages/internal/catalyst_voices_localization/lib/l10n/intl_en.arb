@@ -2519,5 +2519,9 @@
         "type": "int"
       }
     }
+  },
+  "shareProposalErrorDescription": "Something went wrong while sharing proposal. Please try again later.",
+  "@shareProposalErrorDescription": {
+    "description": "Error description when sharing proposal fails"
   }
 }
