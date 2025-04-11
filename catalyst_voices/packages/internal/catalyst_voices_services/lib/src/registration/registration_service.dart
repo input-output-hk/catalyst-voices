@@ -49,9 +49,20 @@ abstract interface class RegistrationService {
     required Set<RegistrationTransactionRole> roles,
   });
 
-  /// Loads account related to this [seedPhrase]. Throws exception if non found.
+  /// Loads account related to this [seedPhrase]. Throws exception if not found.
   Future<Account> recoverAccount({
     required SeedPhrase seedPhrase,
+  });
+
+  /// Loads wallet info related to this [seedPhrase].
+  ///
+  /// The [WalletInfo.balance] will reflect the balance
+  /// at the moment of the call.
+  ///
+  /// Throws exception if not found.
+  Future<WalletInfo> recoverWalletInfo({
+    required SeedPhrase seedPhrase,
+    required ShelleyAddress address,
   });
 
   /// Requests the user to sign the registration transaction
@@ -200,10 +211,24 @@ final class RegistrationServiceImpl implements RegistrationService {
           keychain: keychain,
           // TODO(dtscalac): fetch this data from backend
           roles: {AccountRole.root, AccountRole.proposer},
+          // TODO(dtscalac): fetch this data from backend
           address: _testNetAddress,
         );
       });
     });
+  }
+
+  @override
+  Future<WalletInfo> recoverWalletInfo({
+    required SeedPhrase seedPhrase,
+    required ShelleyAddress address,
+  }) async {
+    // TODO(dtscalac): fetch wallet info, etc
+    return WalletInfo(
+      metadata: const WalletMetadata(name: 'Recovered wallet'),
+      balance: const Coin(0),
+      address: address,
+    );
   }
 
   @override

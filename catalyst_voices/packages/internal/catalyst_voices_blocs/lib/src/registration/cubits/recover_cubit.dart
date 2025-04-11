@@ -83,14 +83,12 @@ final class RecoverCubit extends Cubit<RecoverStateData>
         seedPhrase: seedPhrase,
       );
 
-      _recoveredAccount = account;
-
-      // TODO(dtscalac): recover wallet info?
-      final walletInfo = WalletInfo(
-        metadata: const WalletMetadata(name: 'Recovered wallet'),
-        balance: const Coin(0),
+      final walletInfo = await _registrationService.recoverWalletInfo(
+        seedPhrase: seedPhrase,
         address: account.address!,
       );
+
+      _recoveredAccount = account;
 
       final accountDetails = AccountSummaryData(
         walletConnection: WalletConnectionData(
