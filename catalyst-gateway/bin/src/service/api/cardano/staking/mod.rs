@@ -51,6 +51,11 @@ impl Api {
         /// No Authorization required, but Token permitted.
         _auth: NoneOrRBAC,
     ) -> assets_get::AllResponses {
-        assets_get::endpoint(stake_address.0, network.0, SlotNo::into_option(asat.0)).await
+        Box::pin(assets_get::endpoint(
+            stake_address.0,
+            network.0,
+            SlotNo::into_option(asat.0),
+        ))
+        .await
     }
 }
