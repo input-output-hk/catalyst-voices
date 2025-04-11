@@ -30,7 +30,7 @@ impl Api {
         /// No Authorization required, but Token permitted.
         auth: NoneOrRBAC,
     ) -> registrations_get::AllResponses {
-        let auth_catalyst_id = auth.into();
-        registrations_get::endpoint(lookup, auth_catalyst_id).await
+        let token = auth.into();
+        registrations_get::endpoint(lookup, token).await
     }
 }

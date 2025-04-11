@@ -1,9 +1,11 @@
 //! Either has No Authorization, or RBAC Token.
 
-use catalyst_types::id_uri::IdUri;
 use poem_openapi::SecurityScheme;
 
-use super::{none::NoAuthorization, rbac::scheme::CatalystRBACSecurityScheme};
+use super::{
+    none::NoAuthorization,
+    rbac::{scheme::CatalystRBACSecurityScheme, token::CatalystRBACTokenV1},
+};
 
 #[derive(SecurityScheme)]
 #[allow(dead_code, clippy::upper_case_acronyms, clippy::large_enum_variant)]
@@ -15,7 +17,7 @@ pub(crate) enum NoneOrRBAC {
     None(NoAuthorization),
 }
 
-impl From<NoneOrRBAC> for Option<IdUri> {
+impl From<NoneOrRBAC> for Option<CatalystRBACTokenV1> {
     fn from(value: NoneOrRBAC) -> Self {
         match value {
             NoneOrRBAC::RBAC(auth) => Some(auth.into()),
