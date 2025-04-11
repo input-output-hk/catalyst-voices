@@ -6,27 +6,31 @@ import os
 import json
 from typing import Dict, Any, List
 import copy
-from utils.auth_token import rbac_auth_token_factory, RoleID
+from utils.auth_token import rbac_auth_token_factory, RoleID, RBACToken
 
 
 NETWORK = "preprod"
 
 
 class SignedDocument:
-    def __init__(self, metadata: Dict[str, Any], content: Dict[str, Any]):
+    def __init__(
+        self, metadata: Dict[str, Any], content: Dict[str, Any], rbac_token: RBACToken
+    ):
         self.metadata = metadata
         self.content = content
+        self.rbac_token = rbac_token
 
     def copy(self):
         new_copy = SignedDocument(
             metadata=copy.deepcopy(self.metadata),
             content=copy.deepcopy(self.content),
+            rbac_token=self.rbac_token,
         )
         return new_copy
 
     # return hex bytes
     def hex(self) -> str:
-        return signed_doc.build_signed_doc(self.metadata, self.content)
+        return signed_doc.build_signed_doc(self.metadata, self.content, self.rbac_token)
 
 
 @pytest.fixture
@@ -71,7 +75,7 @@ def comment_templates() -> List[str]:
 @pytest.fixture
 def proposal_doc_factory(proposal_templates, rbac_auth_token_factory):
     def __proposal_doc_factory() -> SignedDocument:
-        rbac_auth_token = rbac_auth_token_factory()
+        rbac_auth_token = rbac_auth_token_factory(RoleID.PROPOSER, NETWORK)
         proposal_doc_id = uuid_v7.uuid_v7()
         proposal_metadata_json = {
             "id": proposal_doc_id,
@@ -81,14 +85,20 @@ def proposal_doc_factory(proposal_templates, rbac_auth_token_factory):
             "content-type": "application/json",
             "content-encoding": "br",
             # referenced to the defined proposal template id, comes from the 'templates/data.rs' file
-            "template": {"id": proposal_templates[0]},
+            "template": {
+                "id": proposal_templates[0],
+                "ver": proposal_templates[0],
+            },
             # referenced to the defined category id, comes from the 'templates/data.rs' file
-            "category_id": {"id": "0194d490-30bf-7473-81c8-a0eaef369619"},
+            "category_id": {
+                "id": "0194d490-30bf-7473-81c8-a0eaef369619",
+                "ver": "0194d490-30bf-7473-81c8-a0eaef369619",
+            },
         }
         with open("./test_data/signed_docs/proposal.json", "r") as proposal_json_file:
             proposal_json = json.load(proposal_json_file)
 
-        doc = SignedDocument(proposal_metadata_json, proposal_json)
+        doc = SignedDocument(proposal_metadata_json, proposal_json, rbac_auth_token)
         resp = document.put(data=doc.hex(), token=rbac_auth_token)
         assert (
             resp.status_code == 201
@@ -168,8 +178,6 @@ def submission_action_factory(
 
 def test_templates(proposal_templates, comment_templates, rbac_auth_token_factory):
     rbac_auth_token = rbac_auth_token_factory(RoleID.ROLE_0, NETWORK)
-    print(rbac_auth_token.secret_key_hex())
-    print(rbac_auth_token.cat_id)
     templates = proposal_templates + comment_templates
     for template_id in templates:
         resp = document.get(document_id=template_id, token=rbac_auth_token)
@@ -178,9 +186,9 @@ def test_templates(proposal_templates, comment_templates, rbac_auth_token_factor
         ), f"Failed to get document: {resp.status_code} - {resp.text} for id {template_id}"
 
 
-@pytest.mark.skip("Enable when it will ready run Cardano indexing in CI")
+# @pytest.mark.skip("Enable when it will ready run Cardano indexing in CI")
 def test_proposal_doc(proposal_doc_factory, rbac_auth_token_factory):
-    rbac_auth_token = rbac_auth_token_factory()
+    rbac_auth_token = rbac_auth_token_factory(RoleID.PROPOSER, NETWORK)
     proposal_doc = proposal_doc_factory()
     proposal_doc_id = proposal_doc.metadata["id"]
 

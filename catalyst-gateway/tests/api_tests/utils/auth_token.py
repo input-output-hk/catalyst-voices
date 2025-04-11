@@ -10,17 +10,14 @@ class RoleID(Enum):
     PROPOSER = 3
 
 class RBACToken:
-    def __init__(self, cat_id: str, signature_b64: str, secret_key: bytes):
+    def __init__(self, cat_id: str, signature_b64: str, sk_hex: bytes):
         self.cat_id = cat_id
         self.signature_b64 = signature_b64
-        # corresponding to the role_0 public key secret key
-        self.secret_key = secret_key
+        # corresponding to the role_0 public key bip32 extended ed25519 secret key
+        self.sk_hex = sk_hex
 
     def __str__(self) -> str:
-        return f"{self.cat_id}{self.signature_b64}"
-
-    def secret_key_hex(self) -> str:
-        return self.secret_key.hex()
+        return f"{self.cat_id}.{self.signature_b64}"
 
 
 @pytest.fixture
@@ -34,20 +31,21 @@ def rbac_auth_token_factory():
                 pk_hex = "42149f1a6f1da43fcf066a473e12515b5b6216fedfc52b87bee091456981d9c6d2a76829a3b53e66af79bb0cb1efade075f0ae65eaaabb75f5106bbeef59b866"
             case RoleID.PROPOSER:
                 # https://preprod.cexplorer.io/tx/5fd71fb559d3ebf16bb0b8b30028a1d0fbbb3a983dbbe2e92eb87f851c6d205c
-                sk_hex = "a8f84dd9576f9b5224da38146df1dd4c80c6aa767cb71540bd86294f62cced568ecdf07352e0b48e1ae66370352e56aba4113461ec08e13b2fed10ecc056c65fd2a76829a3b53e66af79bb0cb1efade075f0ae65eaaabb75f5106bbeef59b866"
-                pk_hex = "42149f1a6f1da43fcf066a473e12515b5b6216fedfc52b87bee091456981d9c6d2a76829a3b53e66af79bb0cb1efade075f0ae65eaaabb75f5106bbeef59b866"
+                sk_hex = "284b1a3b46f00d99193aefe80df3797cfcd88d1058203da1b3c695315bcced5665a53e06fb76f5a5d3a5122cbaa4eba94b81d3f4c7db7ace8bf6c7340a34bfc7995bb20c59d086d671cfac83177857761a4f4badd65fee96f3b8e351ebe217b8"
+                pk_hex = "ac36a7c87a77de72c3404cca36029e63cdd5cc6e7b2538a52908eee983011b51995bb20c59d086d671cfac83177857761a4f4badd65fee96f3b8e351ebe217b8"
 
-        pk = bytes.fromhex(pk_hex)[:32]
-        sk = bytes.fromhex(sk_hex)[:64]
-        chain_code = bytes.fromhex(sk_hex)[64:]
-        return generate_rbac_auth_token("cardano", network, pk, sk, chain_code)
+        return generate_rbac_auth_token("cardano", network, pk_hex, sk_hex)
 
     return __rbac_auth_token_factory
 
 
 def generate_rbac_auth_token(
-    network: str, subnet: str | None, pk: bytes, sk: bytes, chain_code: bytes
+    network: str, subnet: str, pk_hex: str, sk_hex: str,
 ) -> RBACToken:
+    pk = bytes.fromhex(pk_hex)[:32]
+    sk = bytes.fromhex(sk_hex)[:64]
+    chain_code = bytes.fromhex(sk_hex)[64:]
+
     bip32_ed25519_sk = BIP32ED25519PrivateKey(sk, chain_code)
     bip32_ed25519_pk = BIP32ED25519PublicKey(pk, chain_code)
 
@@ -55,13 +53,13 @@ def generate_rbac_auth_token(
     nonce = int(datetime.now(timezone.utc).timestamp())
     subnet = f"{subnet}." if subnet else ""
     role0_pk_b64 = base64_url(pk)
-    catid_without_sig = f"{prefix}{nonce}@{subnet}{network}/{role0_pk_b64}."
+    catid_without_sig = f"{prefix}{nonce}@{subnet}{network}/{role0_pk_b64}"
 
     signature = bip32_ed25519_sk.sign(catid_without_sig.encode())
     bip32_ed25519_pk.verify(signature, catid_without_sig.encode())
     signature_b64 = base64_url(signature)
 
-    return RBACToken(catid_without_sig, signature_b64, sk)
+    return RBACToken(catid_without_sig, signature_b64, sk_hex)
 
 
 def base64_url(data: bytes) -> str:
