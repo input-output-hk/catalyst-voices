@@ -12,6 +12,7 @@ final class AccountDto {
   final String email;
   final String keychainId;
   final Set<AccountRole> roles;
+  final String? address;
   final AccountWalletInfoDto walletInfo;
   final bool isProvisional;
 
@@ -20,6 +21,7 @@ final class AccountDto {
     required this.email,
     required this.keychainId,
     required this.roles,
+    required this.address,
     required this.walletInfo,
     this.isProvisional = true,
   });
@@ -38,6 +40,7 @@ final class AccountDto {
           email: data.email,
           keychainId: data.keychain.id,
           roles: data.roles,
+          address: data.address?.toBech32(),
           walletInfo: AccountWalletInfoDto.fromModel(data.walletInfo),
           isProvisional: data.isProvisional,
         );
@@ -49,12 +52,14 @@ final class AccountDto {
     required KeychainProvider keychainProvider,
   }) async {
     final keychain = await keychainProvider.get(keychainId);
+    final address = this.address;
 
     return Account(
       catalystId: CatalystId.fromUri(Uri.parse(catalystId)),
       email: email,
       keychain: keychain,
       roles: roles,
+      address: address != null ? ShelleyAddress.fromBech32(address) : null,
       walletInfo: walletInfo.toModel(),
       isActive: keychainId == activeKeychainId,
       isProvisional: isProvisional,
@@ -62,8 +67,8 @@ final class AccountDto {
   }
 
   static void _jsonMigration(Map<String, dynamic> json) {
-    /// displayName and email were added later and some existing accounts
-    /// are already stored without them but we still don't want to make
+    /// email was added later and some existing accounts
+    /// are already stored without it but we still don't want to make
     /// those fields optional.
     void baseProfileMigration() {
       if (!json.containsKey(_$AccountDtoJsonKeys.email)) {

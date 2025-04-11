@@ -5,15 +5,14 @@ import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:uuid_plus/uuid_plus.dart';
 
-/* cSpell:enable */
-
 final _logger = Logger('RegistrationService');
-// TODO(damian-molinski): remove once recover account is implemented
+
 /* cSpell:disable */
 final _testNetAddress = ShelleyAddress.fromBech32(
   'addr_test1vzpwq95z3xyum8vqndgdd'
   '9mdnmafh3djcxnc6jemlgdmswcve6tkw',
 );
+/* cSpell:enable */
 
 // TODO(damian-molinski): Merge it with UserService
 abstract interface class RegistrationService {
@@ -169,42 +168,46 @@ final class RegistrationServiceImpl implements RegistrationService {
     }
   }
 
-  // TODO(damian-molinski): to be implemented
-  // Note. Returned type will be changed because we'll not be able to
-  // get a wallet from backend just from seed phrase.
-  // To be decided what data can we get from backend.
   @override
   Future<Account> recoverAccount({
     required SeedPhrase seedPhrase,
   }) async {
-    await Future<void>.delayed(const Duration(milliseconds: 200));
-
-    // TODO(damian-molinski): should come from backend
-    const email = 'recovered@iohk.com';
-    final catalystIdUri = Uri.parse(
-      'id.catalyst://recovered@preprod.cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE',
+    final masterKey = _keyDerivationService.deriveMasterKey(
+      seedPhrase: seedPhrase,
     );
-    final catalystId = CatalystId.fromUri(catalystIdUri);
 
-    // TODO(dtscalac): derive a key from the seed phrase and fetch
-    // from the backend info about the registration (roles, wallet, etc).
-    final roles = {AccountRole.root, AccountRole.proposer};
+    return masterKey.use((masterKey) async {
+      final role0Key = _keyDerivationService.deriveAccountRoleKeyPair(
+        masterKey: masterKey,
+        role: AccountRole.root,
+      );
 
-    final keychainId = const Uuid().v4();
-    final keychain = await _keychainProvider.create(keychainId);
+      return role0Key.use((role0Key) async {
+        final catalystId = CatalystId(
+          // TODO(dtscalac): what about username
+          username: '',
+          host: _blockchainConfig.host.host,
+          role0Key: role0Key.publicKey.bytes,
+        );
 
-    // Note. with rootKey query backend for account details.
-    return Account(
-      catalystId: catalystId,
-      email: email,
-      keychain: keychain,
-      roles: roles,
-      walletInfo: WalletInfo(
-        metadata: const WalletMetadata(name: 'Dummy Wallet'),
-        balance: const Coin.fromWholeAda(10),
-        address: _testNetAddress,
-      ),
-    );
+        final keychainId = const Uuid().v4();
+        final keychain = await _keychainProvider.create(keychainId);
+
+        // TODO(dtscalac): fetch this data from backend
+        return Account(
+          catalystId: catalystId,
+          email: 'recovered@iohk.com',
+          keychain: keychain,
+          roles: {AccountRole.root, AccountRole.proposer},
+          address: _testNetAddress,
+          walletInfo: WalletInfo(
+            metadata: const WalletMetadata(name: 'Dummy Wallet'),
+            balance: const Coin.fromWholeAda(10),
+            address: _testNetAddress,
+          ),
+        );
+      });
+    });
   }
 
   @override
@@ -238,6 +241,7 @@ final class RegistrationServiceImpl implements RegistrationService {
             email: data.email,
             keychain: keychain,
             roles: data.roles,
+            address: walletInfo.address,
             walletInfo: walletInfo,
           );
         });
@@ -245,7 +249,7 @@ final class RegistrationServiceImpl implements RegistrationService {
     } on RegistrationException {
       rethrow;
     } catch (error, stackTrace) {
-      _logger.severe('RegistractionTransaction: ', error, stackTrace);
+      _logger.severe('RegistrationTransaction: ', error, stackTrace);
       throw const RegistrationTransactionException();
     }
   }
@@ -285,6 +289,7 @@ final class RegistrationServiceImpl implements RegistrationService {
         email: 'dummy@iohk.com',
         keychain: keychain,
         roles: roles,
+        address: _testNetAddress,
         walletInfo: WalletInfo(
           metadata: const WalletMetadata(name: 'Dummy Wallet'),
           balance: const Coin.fromWholeAda(10),

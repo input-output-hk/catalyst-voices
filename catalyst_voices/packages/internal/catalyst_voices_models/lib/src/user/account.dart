@@ -21,6 +21,11 @@ final class Account extends Equatable {
   final String email;
   final Keychain keychain;
   final Set<AccountRole> roles;
+
+  /// The wallet change address used when submitting the initial registration.
+  ///
+  /// null for users created before this field was added here.
+  final ShelleyAddress? address;
   final WalletInfo walletInfo;
 
   /// Whether this account is being used.
@@ -36,6 +41,7 @@ final class Account extends Equatable {
     required this.email,
     required this.keychain,
     required this.roles,
+    required this.address,
     required this.walletInfo,
     this.isActive = false,
     this.isProvisional = true,
@@ -54,6 +60,12 @@ final class Account extends Equatable {
         AccountRole.voter,
         AccountRole.proposer,
       },
+      /* cSpell:disable */
+      address: ShelleyAddress.fromBech32(
+        'addr_test1vzpwq95z3xyum8vqndgdd'
+        '9mdnmafh3djcxnc6jemlgdmswcve6tkw',
+      ),
+      /* cSpell:enable */
       walletInfo: WalletInfo(
         metadata: const WalletMetadata(name: 'Dummy Wallet', icon: null),
         balance: const Coin.fromWholeAda(10),
@@ -79,18 +91,11 @@ final class Account extends Equatable {
         email,
         keychain.id,
         roles,
+        address,
         walletInfo,
         isActive,
         isProvisional,
       ];
-
-  // TODO(damian-molinski): Not integrated. Backend should return it.
-  String get stakeAddress {
-    /* cSpell:disable */
-    return 'addr1q9gkq75mt2hykrktnsgt2zxrj5h9jnd6gkwr5s4r8v'
-        '5x3dzp8n9h9mns5w7zx95jhtwz46yq4nr7y6hhlwtq75jflsqq9dxry2';
-    /* cSpell:enable */
-  }
 
   String? get username => catalystId.username;
 
@@ -99,6 +104,7 @@ final class Account extends Equatable {
     String? email,
     Keychain? keychain,
     Set<AccountRole>? roles,
+    ShelleyAddress? address,
     WalletInfo? walletInfo,
     bool? isActive,
     bool? isProvisional,
@@ -108,6 +114,7 @@ final class Account extends Equatable {
       email: email ?? this.email,
       keychain: keychain ?? this.keychain,
       roles: roles ?? this.roles,
+      address: address ?? this.address,
       walletInfo: walletInfo ?? this.walletInfo,
       isActive: isActive ?? this.isActive,
       isProvisional: isProvisional ?? this.isProvisional,
