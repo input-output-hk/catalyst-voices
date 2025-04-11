@@ -26,7 +26,6 @@ final class Account extends Equatable {
   ///
   /// null for users created before this field was added here.
   final ShelleyAddress? address;
-  final WalletInfo walletInfo;
 
   /// Whether this account is being used.
   final bool isActive;
@@ -42,7 +41,6 @@ final class Account extends Equatable {
     required this.keychain,
     required this.roles,
     required this.address,
-    required this.walletInfo,
     this.isActive = false,
     this.isProvisional = true,
   });
@@ -66,16 +64,6 @@ final class Account extends Equatable {
         '9mdnmafh3djcxnc6jemlgdmswcve6tkw',
       ),
       /* cSpell:enable */
-      walletInfo: WalletInfo(
-        metadata: const WalletMetadata(name: 'Dummy Wallet', icon: null),
-        balance: const Coin.fromWholeAda(10),
-        /* cSpell:disable */
-        address: ShelleyAddress.fromBech32(
-          'addr_test1vzpwq95z3xyum8vqndgdd'
-          '9mdnmafh3djcxnc6jemlgdmswcve6tkw',
-        ),
-        /* cSpell:enable */
-      ),
       isActive: isActive,
       isProvisional: true,
     );
@@ -92,7 +80,6 @@ final class Account extends Equatable {
         keychain.id,
         roles,
         address,
-        walletInfo,
         isActive,
         isProvisional,
       ];
@@ -105,7 +92,6 @@ final class Account extends Equatable {
     Keychain? keychain,
     Set<AccountRole>? roles,
     ShelleyAddress? address,
-    WalletInfo? walletInfo,
     bool? isActive,
     bool? isProvisional,
   }) {
@@ -115,7 +101,6 @@ final class Account extends Equatable {
       keychain: keychain ?? this.keychain,
       roles: roles ?? this.roles,
       address: address ?? this.address,
-      walletInfo: walletInfo ?? this.walletInfo,
       isActive: isActive ?? this.isActive,
       isProvisional: isProvisional ?? this.isProvisional,
     );

@@ -13,7 +13,6 @@ final class AccountDto {
   final String keychainId;
   final Set<AccountRole> roles;
   final String? address;
-  final AccountWalletInfoDto walletInfo;
   final bool isProvisional;
 
   AccountDto({
@@ -22,7 +21,6 @@ final class AccountDto {
     required this.keychainId,
     required this.roles,
     required this.address,
-    required this.walletInfo,
     this.isProvisional = true,
   });
 
@@ -41,7 +39,6 @@ final class AccountDto {
           keychainId: data.keychain.id,
           roles: data.roles,
           address: data.address?.toBech32(),
-          walletInfo: AccountWalletInfoDto.fromModel(data.walletInfo),
           isProvisional: data.isProvisional,
         );
 
@@ -60,7 +57,6 @@ final class AccountDto {
       keychain: keychain,
       roles: roles,
       address: address != null ? ShelleyAddress.fromBech32(address) : null,
-      walletInfo: walletInfo.toModel(),
       isActive: keychainId == activeKeychainId,
       isProvisional: isProvisional,
     );

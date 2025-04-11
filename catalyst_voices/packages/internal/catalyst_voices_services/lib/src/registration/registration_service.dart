@@ -193,18 +193,14 @@ final class RegistrationServiceImpl implements RegistrationService {
         final keychainId = const Uuid().v4();
         final keychain = await _keychainProvider.create(keychainId);
 
-        // TODO(dtscalac): fetch this data from backend
         return Account(
           catalystId: catalystId,
+          // TODO(dtscalac): fetch this data from backend
           email: 'recovered@iohk.com',
           keychain: keychain,
+          // TODO(dtscalac): fetch this data from backend
           roles: {AccountRole.root, AccountRole.proposer},
           address: _testNetAddress,
-          walletInfo: WalletInfo(
-            metadata: const WalletMetadata(name: 'Dummy Wallet'),
-            balance: const Coin.fromWholeAda(10),
-            address: _testNetAddress,
-          ),
         );
       });
     });
@@ -219,8 +215,8 @@ final class RegistrationServiceImpl implements RegistrationService {
         wallet: data.metadata.wallet,
         unsignedTx: data.metadata.transaction,
       );
-      final keychain = data.keychain;
 
+      final keychain = data.keychain;
       return keychain.getMasterKey().use((masterKey) {
         final role0KeyPair = _keyDerivationService.deriveAccountRoleKeyPair(
           masterKey: masterKey,
@@ -242,7 +238,6 @@ final class RegistrationServiceImpl implements RegistrationService {
             keychain: keychain,
             roles: data.roles,
             address: walletInfo.address,
-            walletInfo: walletInfo,
           );
         });
       });
@@ -290,11 +285,6 @@ final class RegistrationServiceImpl implements RegistrationService {
         keychain: keychain,
         roles: roles,
         address: _testNetAddress,
-        walletInfo: WalletInfo(
-          metadata: const WalletMetadata(name: 'Dummy Wallet'),
-          balance: const Coin.fromWholeAda(10),
-          address: _testNetAddress,
-        ),
       );
     });
   }
