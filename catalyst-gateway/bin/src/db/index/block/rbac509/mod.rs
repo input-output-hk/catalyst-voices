@@ -238,7 +238,7 @@ async fn query_catalyst_id(
 ) -> anyhow::Result<IdUri> {
     use crate::db::index::queries::rbac::get_catalyst_id_from_transaction_id::Query;
 
-    if let Some(q) = Query::get_latest(session, txn.into())
+    if let Some(q) = Query::get_latest(session, txn_id.into())
         .await
         .context("Failed to query Catalyst ID from transaction ID")?
     {
@@ -252,7 +252,7 @@ async fn query_catalyst_id(
         // persistent database.
         let persistent_session =
             CassandraSession::get(true).context("Failed to get persistent DB session")?;
-        Query::get_latest(&persistent_session, txn.into())
+        Query::get_latest(&persistent_session, txn_id.into())
             .await
             .transpose()
             .context("Unable to find Catalyst ID in the persistent DB")?
