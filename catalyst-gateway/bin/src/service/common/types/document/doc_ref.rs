@@ -204,14 +204,14 @@ pub(crate) struct DocumentReference {
     doc_id: DocumentId,
     /// Document Version
     #[oai(skip_serializing_if_is_none)]
-    ver: Option<DocumentVer>,
+    ver: DocumentVer,
 }
 
 impl Example for DocumentReference {
     fn example() -> Self {
         Self {
             doc_id: DocumentId::example(),
-            ver: Some(DocumentVer::example()),
+            ver: DocumentVer::example(),
         }
     }
 }
@@ -220,7 +220,7 @@ impl From<catalyst_signed_doc::DocumentRef> for DocumentReference {
     fn from(value: catalyst_signed_doc::DocumentRef) -> Self {
         Self {
             doc_id: value.id.into(),
-            ver: value.ver.map(Into::into),
+            ver: value.ver.into(),
         }
     }
 }
