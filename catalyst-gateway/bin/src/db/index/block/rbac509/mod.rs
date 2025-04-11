@@ -234,7 +234,7 @@ async fn catalyst_id(
 
 /// Queries a Catalyst ID from the database by the given transaction ID.
 async fn query_catalyst_id(
-    session: &Arc<CassandraSession>, txn: TransactionId, is_immutable: bool,
+    session: &Arc<CassandraSession>, txn_id: TransactionId, is_immutable: bool,
 ) -> anyhow::Result<IdUri> {
     use crate::db::index::queries::rbac::get_catalyst_id_from_transaction_id::Query;
 
