@@ -187,7 +187,7 @@ final class RegistrationServiceImpl implements RegistrationService {
           // TODO(dtscalac): what about username
           username: '',
           host: _blockchainConfig.host.host,
-          role0Key: role0Key.publicKey.bytes,
+          role0Key: role0Key.publicKey.publicKeyBytes,
         );
 
         final keychainId = const Uuid().v4();
