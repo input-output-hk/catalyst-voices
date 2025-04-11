@@ -72,16 +72,12 @@ final class _AppContent extends StatelessWidget {
       ),
       debugShowCheckedModeBanner: false,
       builder: (_, child) {
-        return Scaffold(
-          primary: false,
-          backgroundColor: Colors.transparent,
-          body: AppActiveStateListener(
-            child: GlobalPrecacheImages(
-              child: GlobalSessionListener(
-                child: AppMobileAccessRestriction(
-                  child: AppSplashScreenManager(
-                    child: child ?? const SizedBox.shrink(),
-                  ),
+        return AppActiveStateListener(
+          child: GlobalPrecacheImages(
+            child: GlobalSessionListener(
+              child: AppMobileAccessRestriction(
+                child: AppSplashScreenManager(
+                  child: child ?? const SizedBox.shrink(),
                 ),
               ),
             ),

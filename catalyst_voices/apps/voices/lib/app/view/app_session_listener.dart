@@ -53,7 +53,6 @@ class _GlobalSessionListenerState extends State<GlobalSessionListener> {
     ).show(context);
 
     final routerContext = AppRouter.rootNavigatorKey.currentContext;
-
     if (routerContext != null) {
       _lastLocation = GoRouter.of(routerContext).state.uri.toString();
       routerContext.go(const DiscoveryRoute().location);
