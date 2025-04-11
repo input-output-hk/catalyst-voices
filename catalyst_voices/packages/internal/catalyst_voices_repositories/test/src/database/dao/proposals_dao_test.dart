@@ -376,7 +376,10 @@ void main() {
         final proposalOneRef = SignedDocumentRef.generateFirstRef();
         final proposalTwoRef = SignedDocumentRef.generateFirstRef();
         final proposals = [
-          _buildProposal(selfRef: proposalOneRef),
+          _buildProposal(
+            selfRef: proposalOneRef,
+            categoryId: categoriesTemplatesRefs[1].category,
+          ),
           _buildProposal(
             selfRef: proposalTwoRef,
             author: userId,
@@ -451,11 +454,374 @@ void main() {
         expect(count, expectedCount);
       });
     });
+
+    group('queryProposalsPage', () {
+      test('only newest version of proposal is returned', () async {
+        // Given
+        final templateRef = SignedDocumentRef.generateFirstRef();
+
+        final ref = _buildRefAt(DateTime(2025, 4, 7));
+        final nextRef = _buildRefAt(DateTime(2025, 4, 8)).copyWith(id: ref.id);
+        final latestRef =
+            _buildRefAt(DateTime(2025, 4, 9)).copyWith(id: ref.id);
+
+        final differentRef = _buildRefAt(DateTime(2025, 4, 12));
+
+        final templates = [
+          _buildProposalTemplate(selfRef: templateRef),
+        ];
+
+        final proposals = [
+          _buildProposal(selfRef: ref, template: templateRef),
+          _buildProposal(selfRef: nextRef, template: templateRef),
+          _buildProposal(selfRef: latestRef, template: templateRef),
+          _buildProposal(selfRef: differentRef, template: templateRef),
+        ];
+        const request = PageRequest(page: 0, size: 10);
+        const filters = ProposalsFilters();
+
+        final expectedRefs = [
+          latestRef,
+          differentRef,
+        ];
+
+        // When
+        await database.documentsDao.saveAll([...templates, ...proposals]);
+
+        // Then
+        final page = await database.proposalsDao.queryProposalsPage(
+          request: request,
+          filters: filters,
+        );
+
+        expect(page.items.length, 2);
+        expect(page.items.length, page.total);
+
+        final proposalsRefs = page.items
+            .map((e) => e.proposal)
+            .map((entity) => entity.ref)
+            .toList();
+
+        expect(
+          proposalsRefs,
+          expectedRefs,
+        );
+      });
+
+      test('proposals are split into pages correctly', () async {
+        // Given
+        final templateRef = SignedDocumentRef.generateFirstRef();
+
+        final templates = [
+          _buildProposalTemplate(selfRef: templateRef),
+        ];
+
+        final now = DateTime(2024, 4, 9);
+        final proposals = List.generate(45, (index) {
+          return _buildProposal(
+            selfRef: _buildRefAt(now.subtract(Duration(days: index))),
+            template: templateRef,
+          );
+        });
+        const filters = ProposalsFilters();
+
+        // When
+        await database.documentsDao.saveAll([...templates, ...proposals]);
+
+        // Then
+        const firstRequest = PageRequest(page: 0, size: 25);
+        final pageZero = await database.proposalsDao.queryProposalsPage(
+          request: firstRequest,
+          filters: filters,
+        );
+
+        expect(pageZero.page, 0);
+        expect(pageZero.total, proposals.length);
+        expect(pageZero.items.length, firstRequest.size);
+
+        const secondRequest = PageRequest(page: 1, size: 25);
+
+        final pageOne = await database.proposalsDao.queryProposalsPage(
+          request: secondRequest,
+          filters: filters,
+        );
+
+        expect(pageOne.page, 1);
+        expect(pageOne.total, proposals.length);
+        expect(pageOne.items.length, proposals.length - pageZero.items.length);
+      });
+
+      test('proposals category filter works as expected', () async {
+        // Given
+        final templateRef = SignedDocumentRef.generateFirstRef();
+        final categoryId = categoriesTemplatesRefs.first.category;
+
+        final templates = [
+          _buildProposalTemplate(selfRef: templateRef),
+        ];
+
+        final proposals = [
+          _buildProposal(
+            selfRef: _buildRefAt(DateTime(2025, 4, 1)),
+            template: templateRef,
+            categoryId: categoryId,
+          ),
+          _buildProposal(
+            selfRef: _buildRefAt(DateTime(2025, 4, 2)),
+            template: templateRef,
+            categoryId: categoryId,
+          ),
+          _buildProposal(
+            selfRef: _buildRefAt(DateTime(2025, 4, 3)),
+            template: templateRef,
+            categoryId: categoryId,
+          ),
+          _buildProposal(
+            template: templateRef,
+            categoryId: categoriesTemplatesRefs[1].category,
+          ),
+        ];
+
+        final expectedRefs = proposals
+            .sublist(0, 3)
+            .map((proposal) => proposal.document.ref)
+            .toList();
+
+        final filters = ProposalsFilters(category: categoryId);
+
+        // When
+        await database.documentsDao.saveAll([...templates, ...proposals]);
+
+        // Then
+        const request = PageRequest(page: 0, size: 25);
+        final page = await database.proposalsDao.queryProposalsPage(
+          request: request,
+          filters: filters,
+        );
+
+        expect(page.page, 0);
+        expect(page.total, 3);
+        expect(page.items.map((e) => e.proposal.ref), expectedRefs);
+      });
+
+      test('final proposals filter works as expected', () async {
+        // Given
+        final templateRef = SignedDocumentRef.generateFirstRef();
+
+        final templates = [
+          _buildProposalTemplate(selfRef: templateRef),
+        ];
+
+        final proposalRef1 = _buildRefAt(DateTime(2025, 4, 1));
+        final proposalRef2 = _buildRefAt(DateTime(2025, 4, 2));
+        final proposalRef3 = _buildRefAt(DateTime(2025, 4, 3));
+
+        final proposals = [
+          _buildProposal(
+            selfRef: proposalRef1,
+            template: templateRef,
+          ),
+          _buildProposal(
+            selfRef: proposalRef2,
+            template: templateRef,
+          ),
+          _buildProposal(
+            selfRef: proposalRef3,
+            template: templateRef,
+          ),
+          _buildProposal(template: templateRef),
+        ];
+
+        final actions = [
+          _buildProposalAction(
+            action: ProposalSubmissionActionDto.aFinal,
+            proposalRef: proposalRef1,
+          ),
+          _buildProposalAction(
+            action: ProposalSubmissionActionDto.aFinal,
+            proposalRef: proposalRef2,
+          ),
+        ];
+
+        final expectedRefs = [
+          proposalRef1,
+          proposalRef2,
+        ];
+
+        const filters = ProposalsFilters(type: ProposalsFilterType.finals);
+
+        // When
+        await database.documentsDao.saveAll([
+          ...templates,
+          ...proposals,
+          ...actions,
+        ]);
+
+        // Then
+        const request = PageRequest(page: 0, size: 25);
+        final page = await database.proposalsDao.queryProposalsPage(
+          request: request,
+          filters: filters,
+        );
+
+        expect(page.page, 0);
+        expect(page.total, 2);
+        expect(page.items.map((e) => e.proposal.ref), expectedRefs);
+      });
+
+      test('final proposals is one with latest action as final', () async {
+        // Given
+        final templateRef = SignedDocumentRef.generateFirstRef();
+
+        final templates = [
+          _buildProposalTemplate(selfRef: templateRef),
+        ];
+
+        final proposalRef1 = _buildRefAt(DateTime(2025, 4, 1));
+        final proposalRef2 = _buildRefAt(DateTime(2025, 4, 2));
+        final proposalRef3 = _buildRefAt(DateTime(2025, 4, 3));
+
+        final proposals = [
+          _buildProposal(
+            selfRef: proposalRef1,
+            template: templateRef,
+          ),
+          _buildProposal(
+            selfRef: proposalRef2,
+            template: templateRef,
+          ),
+          _buildProposal(
+            selfRef: proposalRef3,
+            template: templateRef,
+          ),
+          _buildProposal(template: templateRef),
+        ];
+
+        final actions = [
+          _buildProposalAction(
+            selfRef: _buildRefAt(DateTime(2025, 4, 5)),
+            action: ProposalSubmissionActionDto.aFinal,
+            proposalRef: proposalRef1,
+          ),
+          _buildProposalAction(
+            selfRef: _buildRefAt(DateTime(2025, 4, 1)),
+            action: ProposalSubmissionActionDto.draft,
+            proposalRef: proposalRef1,
+          ),
+        ];
+
+        final expectedRefs = [
+          proposalRef1,
+        ];
+
+        const filters = ProposalsFilters(type: ProposalsFilterType.finals);
+
+        // When
+        await database.documentsDao.saveAll([
+          ...templates,
+          ...proposals,
+          ...actions,
+        ]);
+
+        // Then
+        const request = PageRequest(page: 0, size: 25);
+        final page = await database.proposalsDao.queryProposalsPage(
+          request: request,
+          filters: filters,
+        );
+
+        expect(page.page, 0);
+        expect(page.total, 1);
+        expect(page.items.map((e) => e.proposal.ref), expectedRefs);
+      });
+
+      test('JoinedProposal is build correctly ', () async {
+        // Given
+        final templateRef = SignedDocumentRef.generateFirstRef();
+
+        final templates = [
+          _buildProposalTemplate(selfRef: templateRef),
+        ];
+
+        final proposalRef1 = _buildRefAt(DateTime(2025, 4, 1));
+        final proposalRef2 =
+            _buildRefAt(DateTime(2025, 4, 2)).copyWith(id: proposalRef1.id);
+        final proposalRef3 =
+            _buildRefAt(DateTime(2025, 4, 3)).copyWith(id: proposalRef1.id);
+
+        final proposals = [
+          _buildProposal(
+            selfRef: proposalRef1,
+            template: templateRef,
+          ),
+          _buildProposal(
+            selfRef: proposalRef2,
+            template: templateRef,
+          ),
+          _buildProposal(
+            selfRef: proposalRef3,
+            template: templateRef,
+          ),
+        ];
+
+        final actions = [
+          _buildProposalAction(
+            selfRef: _buildRefAt(DateTime(2025, 4, 5)),
+            action: ProposalSubmissionActionDto.aFinal,
+            proposalRef: proposalRef2,
+          ),
+          _buildProposalAction(
+            selfRef: _buildRefAt(DateTime(2025, 4, 1)),
+            action: ProposalSubmissionActionDto.draft,
+            proposalRef: proposalRef1,
+          ),
+        ];
+
+        final comments = [
+          _buildProposalComment(proposalRef: proposalRef1),
+          _buildProposalComment(proposalRef: proposalRef2),
+          _buildProposalComment(proposalRef: proposalRef2),
+          _buildProposalComment(proposalRef: proposalRef3),
+        ];
+
+        const filters = ProposalsFilters();
+
+        // When
+        await database.documentsDao.saveAll([
+          ...templates,
+          ...proposals,
+          ...actions,
+          ...comments,
+        ]);
+
+        // Then
+        const request = PageRequest(page: 0, size: 25);
+        final page = await database.proposalsDao.queryProposalsPage(
+          request: request,
+          filters: filters,
+        );
+
+        expect(page.page, 0);
+        expect(page.total, 1);
+
+        final joinedProposal = page.items.single;
+
+        expect(joinedProposal.proposal, proposals[1].document);
+        expect(joinedProposal.template, templates[0].document);
+        expect(joinedProposal.action, actions[0].document);
+        expect(joinedProposal.commentsCount, 2);
+        expect(
+          joinedProposal.versions,
+          proposals.map((e) => e.document.ref.version).toList().reversed,
+        );
+      });
+    });
   });
 }
 
 DocumentEntityWithMetadata _buildProposal({
   SignedDocumentRef? selfRef,
+  SignedDocumentRef? template,
   String? title,
   CatalystId? author,
   SignedDocumentRef? categoryId,
@@ -463,10 +829,11 @@ DocumentEntityWithMetadata _buildProposal({
   final metadata = DocumentDataMetadata(
     type: DocumentType.proposalDocument,
     selfRef: selfRef ?? SignedDocumentRef.generateFirstRef(),
+    template: template ?? SignedDocumentRef.generateFirstRef(),
     authors: [
       if (author != null) author,
     ],
-    categoryId: categoryId,
+    categoryId: categoryId ?? categoriesTemplatesRefs.first.category,
   );
   final content = DocumentDataContent({
     if (title != null)
@@ -517,6 +884,27 @@ DocumentEntityWithMetadata _buildProposalAction({
   return (document: document, metadata: metadataEntities);
 }
 
+DocumentEntityWithMetadata _buildProposalComment({
+  SignedDocumentRef? selfRef,
+  required DocumentRef proposalRef,
+}) {
+  final metadata = DocumentDataMetadata(
+    type: DocumentType.commentDocument,
+    selfRef: selfRef ?? SignedDocumentRef.generateFirstRef(),
+    ref: proposalRef,
+  );
+  const content = DocumentDataContent({});
+
+  final document = DocumentFactory.build(
+    content: content,
+    metadata: metadata,
+  );
+
+  final metadataEntities = <DocumentMetadataEntity>[];
+
+  return (document: document, metadata: metadataEntities);
+}
+
 DocumentFavoriteEntity _buildProposalFavorite({
   required DocumentRef proposalRef,
 }) {
@@ -529,8 +917,36 @@ DocumentFavoriteEntity _buildProposalFavorite({
   );
 }
 
+DocumentEntityWithMetadata _buildProposalTemplate({
+  SignedDocumentRef? selfRef,
+}) {
+  final metadata = DocumentDataMetadata(
+    type: DocumentType.proposalTemplate,
+    selfRef: selfRef ?? SignedDocumentRef.generateFirstRef(),
+  );
+  const content = DocumentDataContent({});
+
+  final document = DocumentFactory.build(
+    content: content,
+    metadata: metadata,
+  );
+
+  final metadataEntities = <DocumentMetadataEntity>[];
+
+  return (document: document, metadata: metadataEntities);
+}
+
 SignedDocumentRef _buildRefAt(DateTime dateTime) {
   final config = V7Options(dateTime.millisecondsSinceEpoch, null);
   final val = const Uuid().v7(config: config);
   return SignedDocumentRef.first(val);
+}
+
+extension on DocumentEntity {
+  SignedDocumentRef get ref {
+    return SignedDocumentRef(
+      id: UuidHiLo(high: idHi, low: idLo).uuid,
+      version: UuidHiLo(high: verHi, low: verLo).uuid,
+    );
+  }
 }
