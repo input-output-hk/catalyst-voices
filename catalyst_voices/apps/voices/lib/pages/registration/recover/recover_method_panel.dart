@@ -48,18 +48,22 @@ class RecoverMethodPanel extends StatelessWidget {
             children: RegistrationRecoverMethod.values
                 .map<Widget>(
                   (method) {
-                    return RegistrationTile(
-                      key: ValueKey(method),
-                      icon: method._icon,
-                      title: method._getTitle(context.l10n),
-                      subtitle: method._getSubtitle(context.l10n),
-                      onTap: () {
-                        switch (method) {
-                          case RegistrationRecoverMethod.seedPhrase:
-                            RegistrationCubit.of(context)
-                                .recoverWithSeedPhrase();
-                        }
-                      },
+                    return Semantics(
+                      container: true,
+                      label: 'Restore seedphrase',
+                      child: RegistrationTile(
+                        key: ValueKey(method),
+                        icon: method._icon,
+                        title: method._getTitle(context.l10n),
+                        subtitle: method._getSubtitle(context.l10n),
+                        onTap: () {
+                          switch (method) {
+                            case RegistrationRecoverMethod.seedPhrase:
+                              RegistrationCubit.of(context)
+                                  .recoverWithSeedPhrase();
+                          }
+                        },
+                      ),
                     );
                   },
                 )

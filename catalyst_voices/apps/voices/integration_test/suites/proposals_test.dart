@@ -8,6 +8,7 @@ import 'package:patrol_finders/patrol_finders.dart';
 
 import '../pageobject/discovery/campaign_hero_section_page.dart';
 import '../pageobject/proposals_page.dart';
+import '../pageobject/proposals_page_sidebar_panel.dart';
 
 void main() async {
   late final GoRouter router;
@@ -18,9 +19,9 @@ void main() async {
 
   setUp(() async {
     await registerDependencies(config: const AppConfig());
-    router.go(const ProposalsRoute().location);
+    router.go('const ProposalsRoute().location');
   });
-
+//http://localhost:54319/m4/proposal/067dae82-5c96-76f0-8000-70739e06c8d0?version=067dae82-5c96-76f0-8000-70739e06c8d0
   tearDown(() async {
     await restartDependencies();
   });
@@ -151,5 +152,21 @@ void main() async {
         await CampaignHeroSection($).campaignBriefTitleIsRenderedCorrectly();
       },
     );
+  },skip: true,);
+
+  group('Proposals sidebar -', () {
+    patrolWidgetTest(
+      'overview selection tap',
+      (PatrolTester $) async {
+        final proposalsPageSidebarPanel = ProposalsPageSidebarPanel($);
+        await $.pumpWidgetAndSettle(App(routerConfig: router));
+        await proposalsPageSidebarPanel.overview.tap();
+        await proposalsPageSidebarPanel.overview.tap();
+        await proposalsPageSidebarPanel.overview.tap();
+        print(proposalsPageSidebarPanel.overview.isColapsed());
+
+      },
+    );
   });
+
 }

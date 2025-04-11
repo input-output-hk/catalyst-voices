@@ -1,4 +1,3 @@
-import 'package:catalyst_voices/pages/registration/no_wallet_found_dialog.dart';
 import 'package:catalyst_voices/pages/registration/widgets/registration_stage_message.dart';
 import 'package:catalyst_voices/pages/registration/widgets/registration_tile.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
@@ -75,7 +74,7 @@ class GetStartedPanel extends StatelessWidget {
     }
 
     if (!context.mounted) return;
-    final canRegister = await NoWalletFoundDialog.show(context);
+    const canRegister = true;
 
     if (canRegister && context.mounted) {
       RegistrationCubit.of(context).createNewAccount();

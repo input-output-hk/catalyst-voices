@@ -77,7 +77,12 @@ class _DeleteKeychainDialogState extends State<DeleteKeychainDialog> {
                 const SizedBox(height: 2),
                 SizedBox(
                   width: 300,
-                  child: VoicesTextField(
+                  child: 
+                  Semantics( 
+                    container: true,
+                    textField: true,
+                    label: 'DeleteKeychainTextField',
+                    child: VoicesTextField(
                     key: const Key('DeleteKeychainTextField'),
                     controller: _textEditingController,
                     onFieldSubmitted: _removeKeychain,
@@ -90,19 +95,23 @@ class _DeleteKeychainDialogState extends State<DeleteKeychainDialog> {
                           .elevationsOnSurfaceNeutralLv1White,
                       hintText: context.l10n.enterPhrase,
                     ),
-                  ),
+                  )),
                 ),
               ],
             ),
             const SizedBox(height: 24),
             Wrap(
               children: [
-                VoicesFilledButton(
+                Semantics( 
+                  container: true,
+                  button: true,
+                  label: 'DeleteKeychainContinueButton',
+                  child: VoicesFilledButton(
                   key: const Key('DeleteKeychainContinueButton'),
                   backgroundColor: Theme.of(context).colors.iconsError,
                   onTap: _removeKeychain,
                   child: Text(context.l10n.continueText),
-                ),
+                ),),
                 const SizedBox(width: 8),
                 VoicesTextButton.danger(
                   onTap: () => Navigator.of(context).pop(),

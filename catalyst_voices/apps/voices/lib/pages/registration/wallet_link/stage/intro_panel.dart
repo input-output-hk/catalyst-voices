@@ -19,13 +19,18 @@ class IntroPanel extends StatelessWidget {
           subtitle: Text(context.l10n.walletLinkIntroContent),
         ),
         const Spacer(),
-        VoicesFilledButton(
-          key: const Key('ChooseCardanoWalletButton'),
-          leading: VoicesAssets.icons.wallet.buildIcon(),
-          onTap: () {
-            RegistrationCubit.of(context).nextStep();
-          },
-          child: Text(context.l10n.chooseCardanoWallet),
+        Semantics(
+          container: true,
+          button: true,
+          label: 'ChooseCardanoWalletButton', // Stable test identifier
+          child: VoicesFilledButton(
+            key: const Key('ChooseCardanoWalletButton'),
+            leading: VoicesAssets.icons.wallet.buildIcon(),
+            onTap: () {
+              RegistrationCubit.of(context).nextStep();
+            },
+            child: Text(context.l10n.chooseCardanoWallet),
+          ),
         ),
       ],
     );
