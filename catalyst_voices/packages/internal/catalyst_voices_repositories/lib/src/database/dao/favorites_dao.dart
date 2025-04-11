@@ -28,6 +28,9 @@ class DriftFavoritesDao extends DatabaseAccessor<DriftCatalystDatabase>
       });
 
     await query.go();
+
+    // When marking document as fav we want to rebuild documents streams.
+    db.markTablesUpdated([db.documents]);
   }
 
   @override
@@ -36,6 +39,9 @@ class DriftFavoritesDao extends DatabaseAccessor<DriftCatalystDatabase>
       entity,
       mode: InsertMode.insertOrIgnore,
     );
+
+    // When marking document as fav we want to rebuild documents streams.
+    db.markTablesUpdated([db.documents]);
   }
 
   @override
