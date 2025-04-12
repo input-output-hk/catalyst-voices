@@ -83,7 +83,7 @@ class NewProposalCubit extends Cubit<NewProposalState>
 
       final newState = state.copyWith(
         isLoading: false,
-        isMissingProposerRole: account.hasRole(AccountRole.proposer),
+        isMissingProposerRole: !account.hasRole(AccountRole.proposer),
         categories: categories,
         categoryId: Optional(categories.first.id),
       );
