@@ -10,7 +10,9 @@ use crate::service::{
         role_map::RoleMap,
     },
     common::types::{
-        cardano::{catalyst_id::CatalystId, transaction_id::TxnId},
+        cardano::{
+            catalyst_id::CatalystId, cip19_stake_address::Cip19StakeAddress, transaction_id::TxnId,
+        },
         generic::uuidv4::UUIDv4,
     },
 };
@@ -23,6 +25,8 @@ use crate::service::{
 pub struct RbacRegistrationChain {
     /// A Catalyst ID.
     catalyst_id: CatalystId,
+    /// A list of stake addresses.
+    stake_addresses: Vec<Cip19StakeAddress>,
     /// An ID of the last persistent transaction.
     #[oai(skip_serializing_if_is_none)]
     last_persistent_txn: Option<TxnId>,
@@ -42,6 +46,7 @@ impl Example for RbacRegistrationChain {
     fn example() -> Self {
         Self {
             catalyst_id: CatalystId::example(),
+            stake_addresses: vec![Cip19StakeAddress::example()],
             purpose: PurposeList::example(),
             last_persistent_txn: Some(TxnId::example()),
             last_volatile_txn: Some(TxnId::example()),
@@ -54,6 +59,7 @@ impl RbacRegistrationChain {
     /// Creates a new registration chain instance.
     pub fn new(info: &ChainInfo) -> anyhow::Result<Self> {
         let catalyst_id = info.chain.catalyst_id().clone().into();
+        let stake_addresses = info.chain.role_0_stake_addresses();
         let last_persistent_txn = info.last_persistent_txn.map(Into::into);
         let last_volatile_txn = info.last_volatile_txn.map(Into::into);
         let purpose = info

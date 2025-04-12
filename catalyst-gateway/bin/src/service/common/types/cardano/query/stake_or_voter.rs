@@ -32,9 +32,9 @@ use crate::service::common::{
 #[derive(Clone)]
 pub(crate) enum StakeOrVoter {
     /// A CIP-19 stake address
-    Address(common::types::cardano::cip19_stake_address::Cip19StakeAddress),
+    Address(Cip19StakeAddress),
     /// A Ed25519 Public Key
-    PublicKey(common::types::generic::ed25519_public_key::Ed25519HexEncodedPublicKey),
+    PublicKey(Ed25519HexEncodedPublicKey),
     /// Special value that means we try to fetch all possible results.  Must be protected
     /// with an `APIKey`.
     All,
