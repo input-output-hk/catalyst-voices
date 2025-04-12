@@ -17,14 +17,14 @@ final class ApiUserDataSource implements UserDataSource {
     );
 
     final response = await reviews.apiCatalystIdsMeGet();
-    response.verifyIsSuccessful();
 
-    final body = response.body;
-    if (body == null) {
+    if (response.statusCode == ApiErrorResponseException.notFound) {
       // nothing to recover
       return null;
     }
+    response.verifyIsSuccessful();
 
+    final body = response.bodyOrThrow;
     return RecoveredAccount(
       username: body.username as String?,
       email: body.email as String?,
@@ -33,6 +33,10 @@ final class ApiUserDataSource implements UserDataSource {
 
   @override
   Future<void> updateEmail(String email) async {
+    // TODO(dtscalac): reimplement the endpoint with custom
+    // rbac token where catalystId is built with username in it.
+    // The reviews module stores the username from the token's
+    // catalyst ID and later on allows to recover it in recoverAccount.
     final response = await _apiServices.reviews
         .apiCatalystIdsMePost(body: CatalystIDCreate(email: email));
 
