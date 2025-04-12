@@ -40,8 +40,8 @@ class CreateNewProposalDialog extends StatefulWidget {
 }
 
 class _ActionButtons extends StatelessWidget {
-  final VoidCallback? onSave;
-  final VoidCallback? onOpenInEditor;
+  final VoidCallback onSave;
+  final VoidCallback onOpenInEditor;
 
   const _ActionButtons({
     required this.onSave,
