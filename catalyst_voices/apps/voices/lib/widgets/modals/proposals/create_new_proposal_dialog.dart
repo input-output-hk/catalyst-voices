@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:catalyst_voices/common/error_handler.dart';
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/routes/routes.dart';
@@ -38,8 +40,8 @@ class CreateNewProposalDialog extends StatefulWidget {
 }
 
 class _ActionButtons extends StatelessWidget {
-  final VoidCallback onSave;
-  final VoidCallback onOpenInEditor;
+  final VoidCallback? onSave;
+  final VoidCallback? onOpenInEditor;
 
   const _ActionButtons({
     required this.onSave,
@@ -60,20 +62,20 @@ class _ActionButtons extends StatelessWidget {
         ),
         const Spacer(),
         BlocSelector<NewProposalCubit, NewProposalState, bool>(
-          selector: (state) => state.isValid,
-          builder: (context, isValid) {
+          selector: (state) => state.isValid && !state.isCreatingProposal,
+          builder: (context, canTap) {
             return VoicesTextButton(
-              onTap: isValid ? onSave : null,
+              onTap: canTap ? onSave : null,
               child: Text(context.l10n.saveDraft),
             );
           },
         ),
         const SizedBox(width: 8),
         BlocSelector<NewProposalCubit, NewProposalState, bool>(
-          selector: (state) => state.isValid,
-          builder: (context, isValid) {
+          selector: (state) => state.isValid && !state.isCreatingProposal,
+          builder: (context, canTap) {
             return VoicesFilledButton(
-              onTap: isValid ? onOpenInEditor : null,
+              onTap: canTap ? onOpenInEditor : null,
               child: Text(context.l10n.openInEditor),
             );
           },
@@ -121,47 +123,66 @@ class _CategorySelection extends StatelessWidget {
   }
 }
 
-class _CreateNewProposalDialogState extends State<CreateNewProposalDialog>
-    with ErrorHandlerStateMixin<NewProposalCubit, CreateNewProposalDialog> {
+class _Content extends StatelessWidget {
+  const _Content();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocSelector<NewProposalCubit, NewProposalState,
+        ({bool isLoading, bool isMissingProposerRole})>(
+      selector: (state) => (
+        isLoading: state.isLoading,
+        isMissingProposerRole: state.isMissingProposerRole
+      ),
+      builder: (context, state) {
+        if (state.isLoading) {
+          return const _LoadingContent();
+        } else if (state.isMissingProposerRole) {
+          return const _MissingProposerRoleContent();
+        } else {
+          return const _CreateNewProposalContent();
+        }
+      },
+    );
+  }
+}
+
+class _CreateNewProposalContent extends StatefulWidget {
+  const _CreateNewProposalContent();
+
+  @override
+  State<_CreateNewProposalContent> createState() =>
+      _CreateNewProposalContentState();
+}
+
+class _CreateNewProposalContentState extends State<_CreateNewProposalContent> {
   final FocusNode _categoryFocusNode = FocusNode();
 
   @override
   Widget build(BuildContext context) {
-    return VoicesDetailsDialog(
-      constraints: const BoxConstraints(maxHeight: 390, maxWidth: 750),
-      header: VoicesAlignTitleHeader(
-        title: context.l10n.createProposal,
-        padding: const EdgeInsets.all(24),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.fromLTRB(
-          24,
-          16,
-          24,
-          24,
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            _SectionTitle(
-              text: context.l10n.title.starred(),
-            ),
-            _TitleTextField(
-              onFieldSubmitted: _onTitleSubmitted,
-            ),
-            const SizedBox(height: 16),
-            _SectionTitle(
-              text: context.l10n.selectedCategory.starred(),
-            ),
-            _CategorySelection(focusNode: _categoryFocusNode),
-            const SizedBox(height: 40),
-            _ActionButtons(
-              onSave: _onSave,
-              onOpenInEditor: _onOpenInEditor,
-            ),
-          ],
-        ),
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _SectionTitle(
+            text: context.l10n.title.starred(),
+          ),
+          _TitleTextField(
+            onFieldSubmitted: _onTitleSubmitted,
+          ),
+          const SizedBox(height: 16),
+          _SectionTitle(
+            text: context.l10n.selectedCategory.starred(),
+          ),
+          _CategorySelection(focusNode: _categoryFocusNode),
+          const SizedBox(height: 40),
+          _ActionButtons(
+            onSave: _onSave,
+            onOpenInEditor: _onOpenInEditor,
+          ),
+        ],
       ),
     );
   }
@@ -170,12 +191,6 @@ class _CreateNewProposalDialogState extends State<CreateNewProposalDialog>
   void dispose() {
     _categoryFocusNode.dispose();
     super.dispose();
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    context.read<NewProposalCubit>().reset();
   }
 
   void onTitleSubmitted(String title) {
@@ -201,6 +216,48 @@ class _CreateNewProposalDialogState extends State<CreateNewProposalDialog>
 
   void _onTitleSubmitted(String title) {
     _categoryFocusNode.requestFocus();
+  }
+}
+
+class _CreateNewProposalDialogState extends State<CreateNewProposalDialog>
+    with ErrorHandlerStateMixin<NewProposalCubit, CreateNewProposalDialog> {
+  @override
+  Widget build(BuildContext context) {
+    return VoicesDetailsDialog(
+      constraints: const BoxConstraints(maxHeight: 390, maxWidth: 750),
+      header: VoicesAlignTitleHeader(
+        title: context.l10n.createProposal,
+        padding: const EdgeInsets.all(24),
+      ),
+      body: const _Content(),
+    );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    unawaited(context.read<NewProposalCubit>().load());
+  }
+}
+
+class _LoadingContent extends StatelessWidget {
+  const _LoadingContent();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Center(
+      child: VoicesCircularProgressIndicator(),
+    );
+  }
+}
+
+class _MissingProposerRoleContent extends StatelessWidget {
+  const _MissingProposerRoleContent();
+
+  @override
+  Widget build(BuildContext context) {
+    // TODO(dtscalac): implement it when design is available
+    return const Placeholder();
   }
 }
 
