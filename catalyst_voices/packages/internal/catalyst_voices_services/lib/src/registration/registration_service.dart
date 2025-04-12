@@ -17,8 +17,10 @@ final _testNetAddress = ShelleyAddress.fromBech32(
 // TODO(damian-molinski): Merge it with UserService
 abstract interface class RegistrationService {
   factory RegistrationService(
+    UserService userService,
     KeychainProvider keychainProvider,
     CatalystCardano cardano,
+    AuthTokenGenerator authTokenGenerator,
     KeyDerivationService keyDerivationService,
     BlockchainConfig blockchainConfig,
   ) = RegistrationServiceImpl;
@@ -93,14 +95,18 @@ abstract interface class RegistrationService {
 
 /// Manages the user registration.
 final class RegistrationServiceImpl implements RegistrationService {
+  final UserService _userService;
   final KeychainProvider _keychainProvider;
   final CatalystCardano _cardano;
+  final AuthTokenGenerator _authTokenGenerator;
   final KeyDerivationService _keyDerivationService;
   final BlockchainConfig _blockchainConfig;
 
   const RegistrationServiceImpl(
+    this._userService,
     this._keychainProvider,
     this._cardano,
+    this._authTokenGenerator,
     this._keyDerivationService,
     this._blockchainConfig,
   );
@@ -195,19 +201,29 @@ final class RegistrationServiceImpl implements RegistrationService {
 
       return role0Key.use((role0Key) async {
         final catalystId = CatalystId(
-          // TODO(dtscalac): what about username
-          username: '',
           host: _blockchainConfig.host.host,
           role0Key: role0Key.publicKey.publicKeyBytes,
+        );
+
+        final rbacToken = await _authTokenGenerator.generate(
+          masterKey: masterKey,
+          catalystId: catalystId,
+        );
+
+        final recovered = await _userService.recoverAccount(
+          rbacToken: rbacToken,
         );
 
         final keychainId = const Uuid().v4();
         final keychain = await _keychainProvider.create(keychainId);
 
         return Account(
-          catalystId: catalystId,
-          // TODO(dtscalac): fetch this data from backend
-          email: 'recovered@iohk.com',
+          catalystId: catalystId.copyWith(
+            username: Optional(recovered?.username),
+          ),
+          // TODO(dtscalac): what if reviews module
+          // is not working or account not found
+          email: recovered?.email ?? 'recovered@iohk.com',
           keychain: keychain,
           // TODO(dtscalac): fetch this data from backend
           roles: {AccountRole.root, AccountRole.proposer},

@@ -1,6 +1,7 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_repositories/generated/api/cat_gateway.models.swagger.dart';
+import 'package:catalyst_voices_repositories/src/common/response_mapper.dart';
 import 'package:catalyst_voices_repositories/src/document/document_data_factory.dart';
 import 'package:catalyst_voices_repositories/src/dto/api/document_index_list_dto.dart';
 import 'package:catalyst_voices_repositories/src/dto/api/document_index_query_filters_dto.dart';
@@ -21,12 +22,7 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
       version: ref.version,
     );
 
-    if (!response.isSuccessful) {
-      final statusCode = response.statusCode;
-      final error = response.error;
-
-      throw ApiErrorResponseException(statusCode: statusCode, error: error);
-    }
+    response.verifyIsSuccessful();
 
     final bytes = response.bodyBytes;
     final signedDocument = await _signedDocumentManager.parseDocument(bytes);
@@ -44,12 +40,7 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
       return null;
     }
 
-    if (!response.isSuccessful) {
-      final statusCode = response.statusCode;
-      final error = response.error;
-
-      throw ApiErrorResponseException(statusCode: statusCode, error: error);
-    }
+    response.verifyIsSuccessful();
 
     final docs = response.body?.docs;
     if (docs == null || docs.isEmpty) {
@@ -93,13 +84,7 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
   Future<void> publish(SignedDocument document) async {
     final bytes = document.toBytes();
     final response = await _api.gateway.apiV1DocumentPut(body: bytes);
-
-    if (!response.isSuccessful) {
-      final statusCode = response.statusCode;
-      final error = response.error;
-
-      throw ApiErrorResponseException(statusCode: statusCode, error: error);
-    }
+    response.verifyIsSuccessful();
   }
 
   Future<DocumentIndexList> _getDocumentIndexList({
@@ -112,12 +97,7 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
       page: page,
     );
 
-    if (!response.isSuccessful) {
-      final statusCode = response.statusCode;
-      final error = response.error;
-
-      throw ApiErrorResponseException(statusCode: statusCode, error: error);
-    }
+    response.verifyIsSuccessful();
 
     return response.bodyOrThrow;
   }

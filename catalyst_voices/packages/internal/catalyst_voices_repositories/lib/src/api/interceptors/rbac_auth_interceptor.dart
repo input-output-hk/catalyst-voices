@@ -19,28 +19,21 @@ final class RbacAuthInterceptor implements Interceptor {
   static const _retryStatusCodes = [401, 403];
   static const _maxRetries = 1;
 
-  final UserObserver _userObserver;
   final AuthTokenProvider _authTokenProvider;
 
-  const RbacAuthInterceptor(
-    this._userObserver,
-    this._authTokenProvider,
-  );
+  const RbacAuthInterceptor(this._authTokenProvider);
 
   @override
   FutureOr<Response<BodyType>> intercept<BodyType>(
     Chain<BodyType> chain,
   ) async {
-    final keychain = _userObserver.user.activeAccount?.keychain;
-    final isUnlocked = await keychain?.isUnlocked ?? false;
-
-    if (!isUnlocked) {
+    final token = await _authTokenProvider.createRbacToken();
+    if (token == null) {
+      // keychain locked or not existing
       return chain.proceed(chain.request);
     }
 
-    final token = await _authTokenProvider.createRbacToken();
     final updatedRequest = chain.request.applyAuthToken(token);
-
     final response = await chain.proceed(updatedRequest);
 
     if (_retryStatusCodes.contains(response.statusCode)) {
@@ -65,6 +58,13 @@ final class RbacAuthInterceptor implements Interceptor {
       final newToken = await _authTokenProvider.createRbacToken(
         forceRefresh: true,
       );
+
+      if (newToken == null) {
+        throw StateError(
+          'Could not create a new RBAC token, '
+          'did the keychain become locked in the meantime?',
+        );
+      }
 
       return request
           .applyAuthToken(newToken)

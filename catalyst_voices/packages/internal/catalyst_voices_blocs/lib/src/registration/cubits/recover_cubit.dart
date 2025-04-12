@@ -1,6 +1,5 @@
 // ignore_for_file: one_member_abstracts
 
-import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_blocs/src/registration/cubits/unlock_password_manager.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';

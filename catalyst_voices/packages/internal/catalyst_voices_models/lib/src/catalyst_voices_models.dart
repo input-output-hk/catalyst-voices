@@ -70,6 +70,7 @@ export 'user/account_role.dart';
 export 'user/catalyst_id.dart';
 export 'user/preferences.dart';
 export 'user/profile.dart';
+export 'user/recovered_account.dart';
 export 'user/user.dart';
 export 'user/user_settings.dart';
 export 'wallet/cardano_wallet_details.dart';

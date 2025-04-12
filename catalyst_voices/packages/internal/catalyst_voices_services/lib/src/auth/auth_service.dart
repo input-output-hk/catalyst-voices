@@ -1,64 +1,55 @@
-import 'dart:convert';
-
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart'
     show AuthTokenCache;
-import 'package:catalyst_voices_services/src/crypto/key_derivation_service.dart';
+import 'package:catalyst_voices_services/src/auth/auth_token_generator.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
-import 'package:flutter/foundation.dart';
 import 'package:synchronized/synchronized.dart';
 
 abstract interface class AuthService implements AuthTokenProvider {
   factory AuthService(
     AuthTokenCache cache,
     UserObserver userObserver,
-    KeyDerivationService keyDerivationService,
+    AuthTokenGenerator authTokenGenerator,
   ) = AuthServiceImpl;
 }
 
 final class AuthServiceImpl implements AuthService {
-  @visibleForTesting
-  static const String tokenPrefix = 'catid';
-
   final AuthTokenCache _cache;
   final UserObserver _userObserver;
-  final KeyDerivationService _keyDerivationService;
+  final AuthTokenGenerator _authTokenGenerator;
 
   final _rbacTokenLock = Lock();
 
   AuthServiceImpl(
     this._cache,
     this._userObserver,
-    this._keyDerivationService,
+    this._authTokenGenerator,
   );
 
+  Future<bool> get _isUnlocked async {
+    final keychain = _userObserver.user.activeAccount?.keychain;
+    return await keychain?.isUnlocked ?? false;
+  }
+
   @override
-  Future<String> createRbacToken({
+  Future<String?> createRbacToken({
     bool forceRefresh = false,
   }) {
-    return _rbacTokenLock.synchronized(() {
+    return _rbacTokenLock.synchronized(() async {
       return _createRbacToken(forceRefresh: forceRefresh);
     });
   }
 
-  CatalystId _createCatalystId(Account account) {
-    final dateTime = DateTimeExt.now();
-    final secondsSinceEpoch =
-        dateTime.millisecondsSinceEpoch ~/ Duration.millisecondsPerSecond;
-
-    return account.catalystId.copyWith(
-      username: const Optional.empty(),
-      nonce: Optional(secondsSinceEpoch),
-      role: const Optional.empty(),
-      rotation: const Optional.empty(),
-      encrypt: false,
-    );
-  }
-
-  Future<String> _createRbacToken({
+  Future<String?> _createRbacToken({
     required bool forceRefresh,
   }) async {
+    if (!await _isUnlocked) {
+      // the keychain is locked or not existing,
+      // cannot generate a token
+      return null;
+    }
+
     final account = await _getAccount();
 
     if (!forceRefresh) {
@@ -68,31 +59,17 @@ final class AuthServiceImpl implements AuthService {
       }
     }
 
-    final token = await _createRbacTokenFor(account: account);
-
+    final token = await _createRbacTokenForAccount(account);
     await _cache.setRbac(token, id: account.catalystId);
-
     return token;
   }
 
-  Future<String> _createRbacTokenFor({
-    required Account account,
-  }) async {
-    return account.keychain.getMasterKey().use((masterKey) {
-      final keyPair = _keyDerivationService.deriveAccountRoleKeyPair(
+  Future<String> _createRbacTokenForAccount(Account account) async {
+    return account.keychain.getMasterKey().use((masterKey) async {
+      return _authTokenGenerator.generate(
         masterKey: masterKey,
-        role: AccountRole.root,
+        catalystId: account.catalystId,
       );
-
-      return keyPair.use((keyPair) async {
-        final catalystId = _createCatalystId(account);
-        final catalystIdString = catalystId.toUri().toStringWithoutScheme();
-        final toBeSigned = utf8.encode('$tokenPrefix.$catalystIdString.');
-        final signature = await keyPair.privateKey.sign(toBeSigned);
-        final encodedSignature = base64UrlNoPadEncode(signature.bytes);
-
-        return '$tokenPrefix.$catalystIdString.$encodedSignature';
-      });
     });
   }
 

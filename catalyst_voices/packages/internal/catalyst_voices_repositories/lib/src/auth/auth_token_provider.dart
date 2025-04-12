@@ -7,6 +7,9 @@ abstract interface class AuthTokenProvider {
   ///
   /// The returned token might be cached if it is still valid.
   ///
+  /// Returns null if creating a token is not possible,
+  /// i.e. due to account being locked or not existing.
+  ///
   /// Use [forceRefresh] if you want newly created token.
-  Future<String> createRbacToken({bool forceRefresh});
+  Future<String?> createRbacToken({bool forceRefresh});
 }

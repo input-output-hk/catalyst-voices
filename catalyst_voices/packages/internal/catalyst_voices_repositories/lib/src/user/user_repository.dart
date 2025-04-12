@@ -19,6 +19,8 @@ abstract interface class UserRepository {
 
   Future<User> getUser();
 
+  Future<RecoveredAccount?> recoverAccount({required String rbacToken});
+
   Future<void> saveUser(User user);
 
   Future<void> updateEmail(String email);
@@ -42,6 +44,11 @@ final class UserRepositoryImpl implements UserRepository {
     final user = await dto?.toModel(keychainProvider: _keychainProvider);
 
     return user ?? const User.empty();
+  }
+
+  @override
+  Future<RecoveredAccount?> recoverAccount({required String rbacToken}) {
+    return _dataSource.recoverAccount(rbacToken: rbacToken);
   }
 
   @override

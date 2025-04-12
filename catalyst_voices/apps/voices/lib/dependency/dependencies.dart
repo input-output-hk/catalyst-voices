@@ -154,7 +154,6 @@ final class Dependencies extends DependencyProvider {
     registerLazySingleton<ApiServices>(() {
       return ApiServices(
         config: get<AppConfig>().api,
-        userObserver: get<UserObserver>(),
         authTokenProvider: get<AuthTokenProvider>(),
       );
     });
@@ -234,11 +233,16 @@ final class Dependencies extends DependencyProvider {
         cacheConfig: get<AppConfig>().cache,
       );
     });
+    registerLazySingleton<AuthTokenGenerator>(() {
+      return AuthTokenGenerator(
+        get<KeyDerivationService>(),
+      );
+    });
     registerLazySingleton<AuthService>(() {
       return AuthService(
         get<AuthTokenCache>(),
         get<UserObserver>(),
-        get<KeyDerivationService>(),
+        get<AuthTokenGenerator>(),
       );
     });
     registerLazySingleton<AuthTokenProvider>(() => get<AuthService>());
@@ -249,8 +253,10 @@ final class Dependencies extends DependencyProvider {
     );
     registerLazySingleton<RegistrationService>(() {
       return RegistrationService(
+        get<UserService>(),
         get<KeychainProvider>(),
         get<CatalystCardano>(),
+        get<AuthTokenGenerator>(),
         get<KeyDerivationService>(),
         get<AppConfig>().blockchain,
       );

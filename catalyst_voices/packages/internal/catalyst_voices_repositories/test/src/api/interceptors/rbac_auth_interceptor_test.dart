@@ -1,7 +1,5 @@
-import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/api/interceptors/rbac_auth_interceptor.dart';
 import 'package:catalyst_voices_repositories/src/auth/auth_token_provider.dart';
-import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:chopper/chopper.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
@@ -9,50 +7,34 @@ import 'package:uuid_plus/uuid_plus.dart';
 
 import '../matcher/request_matchers.dart';
 import 'mock_chain.dart';
-import 'mock_keychain.dart';
 import 'mock_response.dart';
 
 void main() {
   group(RbacAuthInterceptor, () {
-    late final UserObserver userObserver;
     late final AuthTokenProvider authTokenProvider;
     late final RbacAuthInterceptor interceptor;
     late final Chain<String> chain;
 
-    final Keychain keychain = MockKeychain();
-
     setUpAll(() {
-      userObserver = StreamUserObserver();
       authTokenProvider = _MockAuthTokenProvider();
-      interceptor = RbacAuthInterceptor(
-        userObserver,
-        authTokenProvider,
-      );
+      interceptor = RbacAuthInterceptor(authTokenProvider);
 
       chain = MockChain<String>();
 
       registerFallbackValue(Request('X', Uri(), Uri()));
     });
 
-    tearDownAll(() async {
-      await userObserver.dispose();
-    });
-
     setUp(() {
-      when(() => keychain.id).thenAnswer((_) => const Uuid().v4());
       when(
         // ignore: discarded_futures
         () => authTokenProvider.createRbacToken(
           forceRefresh: any(named: 'forceRefresh'),
         ),
       ).thenAnswer((_) => Future(() => const Uuid().v4()));
-
-      userObserver.user = const User.empty();
     });
 
     tearDown(() {
       reset(chain);
-      reset(keychain);
     });
 
     test(
@@ -63,23 +45,9 @@ void main() {
       final requestResponse = MockResponse<String>();
 
       // When
-      when(() => keychain.isUnlocked).thenAnswer((_) => Future.value(true));
       when(() => chain.request).thenReturn(request);
       when(() => chain.proceed(any())).thenAnswer((_) => requestResponse);
       when(() => requestResponse.statusCode).thenAnswer((_) => 200);
-
-      final user = User(
-        accounts: [
-          Account.dummy(
-            catalystId: DummyCatalystIdFactory.create(),
-            keychain: keychain,
-            isActive: true,
-          ),
-        ],
-        settings: const UserSettings(),
-      );
-
-      userObserver.user = user;
 
       await interceptor.intercept(chain);
 
@@ -98,23 +66,9 @@ void main() {
       final requestResponse = MockResponse<String>();
 
       // When
-      when(() => keychain.isUnlocked).thenAnswer((_) => Future.value(true));
       when(() => chain.request).thenReturn(request);
       when(() => chain.proceed(any())).thenAnswer((_) => requestResponse);
       when(() => requestResponse.statusCode).thenAnswer((_) => 200);
-
-      final user = User(
-        accounts: [
-          Account.dummy(
-            catalystId: DummyCatalystIdFactory.create(),
-            keychain: keychain,
-            isActive: true,
-          ),
-        ],
-        settings: const UserSettings(),
-      );
-
-      userObserver.user = user;
 
       await interceptor.intercept(chain);
 
@@ -135,57 +89,11 @@ void main() {
       final requestResponse = MockResponse<String>();
 
       // When
-      when(() => keychain.isUnlocked).thenAnswer((_) => Future.value(false));
+      when(() => authTokenProvider.createRbacToken())
+          .thenAnswer((_) => Future.value(null));
       when(() => chain.request).thenReturn(request);
       when(() => chain.proceed(any())).thenAnswer((_) => requestResponse);
       when(() => requestResponse.statusCode).thenAnswer((_) => 200);
-
-      final user = User(
-        accounts: [
-          Account.dummy(
-            catalystId: DummyCatalystIdFactory.create(),
-            keychain: keychain,
-            isActive: true,
-          ),
-        ],
-        settings: const UserSettings(),
-      );
-
-      userObserver.user = user;
-
-      await interceptor.intercept(chain);
-
-      // Then
-      final captured = verify(() => chain.proceed(captureAny())).captured;
-
-      expect(
-        (captured.single as Request).headers.containsKey(_authHeaderName),
-        isFalse,
-      );
-    });
-
-    test('when none account is active auth header is not added', () async {
-      // Given
-      final request = Request('GET', Uri(), Uri());
-      final requestResponse = MockResponse<String>();
-
-      // When
-      when(() => chain.request).thenReturn(request);
-      when(() => chain.proceed(any())).thenAnswer((_) => requestResponse);
-      when(() => requestResponse.statusCode).thenAnswer((_) => 200);
-
-      final user = User(
-        accounts: [
-          Account.dummy(
-            catalystId: DummyCatalystIdFactory.create(),
-            keychain: keychain,
-            isActive: false,
-          ),
-        ],
-        settings: const UserSettings(),
-      );
-
-      userObserver.user = user;
 
       await interceptor.intercept(chain);
 
@@ -209,7 +117,6 @@ void main() {
       final retryResponse = MockResponse<String>();
 
       // When
-      when(() => keychain.isUnlocked).thenAnswer((_) => Future.value(true));
       when(() => chain.request).thenReturn(request);
 
       // Original token
@@ -240,19 +147,6 @@ void main() {
       // Responses
       when(() => originalResponse.statusCode).thenAnswer((_) => 401);
       when(() => retryResponse.statusCode).thenAnswer((_) => 200);
-
-      final user = User(
-        accounts: [
-          Account.dummy(
-            catalystId: DummyCatalystIdFactory.create(),
-            keychain: keychain,
-            isActive: true,
-          ),
-        ],
-        settings: const UserSettings(),
-      );
-
-      userObserver.user = user;
 
       await interceptor.intercept(chain);
 
@@ -291,7 +185,6 @@ void main() {
       final retryResponse = MockResponse<String>();
 
       // When
-      when(() => keychain.isUnlocked).thenAnswer((_) => Future.value(true));
       when(() => chain.request).thenReturn(request);
 
       // Original token
@@ -322,19 +215,6 @@ void main() {
       // Responses
       when(() => originalResponse.statusCode).thenAnswer((_) => 403);
       when(() => retryResponse.statusCode).thenAnswer((_) => 200);
-
-      final user = User(
-        accounts: [
-          Account.dummy(
-            catalystId: DummyCatalystIdFactory.create(),
-            keychain: keychain,
-            isActive: true,
-          ),
-        ],
-        settings: const UserSettings(),
-      );
-
-      userObserver.user = user;
 
       await interceptor.intercept(chain);
 
@@ -374,7 +254,6 @@ void main() {
       final originalResponse = MockResponse<String>();
 
       // When
-      when(() => keychain.isUnlocked).thenAnswer((_) => Future.value(true));
       when(() => chain.request).thenReturn(request);
 
       // Original token
@@ -393,19 +272,6 @@ void main() {
 
       // Responses
       when(() => originalResponse.statusCode).thenAnswer((_) => 403);
-
-      final user = User(
-        accounts: [
-          Account.dummy(
-            catalystId: DummyCatalystIdFactory.create(),
-            keychain: keychain,
-            isActive: true,
-          ),
-        ],
-        settings: const UserSettings(),
-      );
-
-      userObserver.user = user;
 
       await interceptor.intercept(chain);
 
