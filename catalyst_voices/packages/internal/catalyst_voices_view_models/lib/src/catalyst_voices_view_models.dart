@@ -5,6 +5,7 @@ export 'authentication/authentication.dart';
 export 'campaign/campaign_category_section.dart';
 export 'campaign/campaign_category_view_model.dart';
 export 'campaign/campaign_info.dart';
+export 'registration/network_id_ext.dart';
 export 'campaign/campaign_list_item.dart';
 export 'campaign/campaign_stage.dart';
 export 'campaign/campaign_timeline_view_model.dart';

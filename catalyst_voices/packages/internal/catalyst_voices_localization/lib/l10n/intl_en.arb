@@ -155,6 +155,14 @@
       }
     }
   },
+  "mainnetNetworkId": "Mainnet",
+  "@mainnetNetworkId": {
+    "description": "A mainnet cardano network name."
+  },
+  "preprodNetworkId": "PreProd",
+  "@preprodNetworkId": {
+    "description": "A preprod cardano network name."
+  },
   "proposalStatusReady": "Ready",
   "@proposalStatusReady": {
     "description": "Indicates to user that status is in ready mode"
@@ -626,6 +634,15 @@
   "registrationTransactionFailed": "Transaction failed",
   "@registrationTransactionFailed": {
     "description": "Indicates an error when submitting a registration transaction failed."
+  },
+  "registrationNetworkIdMismatch": "It seems like you're trying to use\u00A0a wallet on the wrong network.\nPlease switch to {network} to continue.",
+  "@registrationNetworkIdMismatch": {
+    "description": "An error when user attempts to use a wallet on the wrong network, i.e. using preprod wallet on production environment.",
+    "placeholders": {
+      "network": {
+        "type": "String"
+      }
+    }
   },
   "registrationInsufficientBalance": "Insufficient balance, please top up your wallet.",
   "@registrationInsufficientBalance": {

@@ -62,6 +62,7 @@ final class Account extends Equatable {
           'addr_test1vzpwq95z3xyum8vqndgdd'
           '9mdnmafh3djcxnc6jemlgdmswcve6tkw',
         ),
+        networkId: NetworkId.testnet,
         /* cSpell:enable */
       ),
       isActive: isActive,

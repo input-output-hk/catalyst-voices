@@ -1,8 +1,10 @@
 import 'package:catalyst_cardano/catalyst_cardano.dart';
+import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:catalyst_voices_view_models/src/exception/localized_exception.dart';
+import 'package:catalyst_voices_view_models/src/registration/network_id_ext.dart';
 import 'package:flutter/widgets.dart';
 
 /// A [LocalizedException] describing an error during a user registration.
@@ -20,6 +22,10 @@ sealed class LocalizedRegistrationException extends LocalizedException {
         const LocalizedRegistrationTransactionException(),
       RegistrationUnknownException() =>
         const LocalizedRegistrationUnknownException(),
+      RegistrationNetworkIdMismatchException(:final targetNetworkId) =>
+        LocalizedRegistrationNetworkIdMismatchException(
+          targetNetworkId: targetNetworkId,
+        ),
     };
   }
 }
@@ -34,14 +40,29 @@ final class LocalizedRegistrationInsufficientBalanceException
       context.l10n.registrationInsufficientBalance;
 }
 
-/// An exception thrown when submitting a registration transaction fails.
-final class LocalizedRegistrationTransactionException
+final class LocalizedRegistrationKeychainNotFoundException
     extends LocalizedRegistrationException {
-  const LocalizedRegistrationTransactionException();
+  const LocalizedRegistrationKeychainNotFoundException();
 
   @override
   String message(BuildContext context) =>
-      context.l10n.registrationTransactionFailed;
+      context.l10n.registrationKeychainNotFound;
+}
+
+final class LocalizedRegistrationNetworkIdMismatchException
+    extends LocalizedRegistrationException {
+  /// The [NetworkId] that the user should be using.
+  final NetworkId targetNetworkId;
+
+  const LocalizedRegistrationNetworkIdMismatchException({
+    required this.targetNetworkId,
+  });
+
+  @override
+  String message(BuildContext context) =>
+      context.l10n.registrationNetworkIdMismatch(
+        targetNetworkId.localizedName(context),
+      );
 }
 
 /// Localized exception thrown when attempting to execute register operation
@@ -55,13 +76,23 @@ final class LocalizedRegistrationSeedPhraseNotFoundException
       context.l10n.registrationSeedPhraseNotFound;
 }
 
-final class LocalizedRegistrationKeychainNotFoundException
+/// An exception thrown when submitting a registration transaction fails.
+final class LocalizedRegistrationTransactionException
     extends LocalizedRegistrationException {
-  const LocalizedRegistrationKeychainNotFoundException();
+  const LocalizedRegistrationTransactionException();
 
   @override
   String message(BuildContext context) =>
-      context.l10n.registrationKeychainNotFound;
+      context.l10n.registrationTransactionFailed;
+}
+
+/// A generic error for describing a failure during user registration.
+final class LocalizedRegistrationUnknownException
+    extends LocalizedRegistrationException {
+  const LocalizedRegistrationUnknownException();
+
+  @override
+  String message(BuildContext context) => context.l10n.somethingWentWrong;
 }
 
 /// Localized exception thrown when attempting to execute register operation
@@ -82,15 +113,6 @@ final class LocalizedRegistrationWalletNotFoundException
   @override
   String message(BuildContext context) =>
       context.l10n.registrationWalletNotFound;
-}
-
-/// A generic error for describing a failure during user registration.
-final class LocalizedRegistrationUnknownException
-    extends LocalizedRegistrationException {
-  const LocalizedRegistrationUnknownException();
-
-  @override
-  String message(BuildContext context) => context.l10n.somethingWentWrong;
 }
 
 final class LocalizedWalletLinkException

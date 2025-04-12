@@ -16,12 +16,15 @@ final class WalletLinkCubit extends Cubit<WalletLinkStateData>
     with BlocErrorEmitterMixin
     implements WalletLinkManager {
   final RegistrationService registrationService;
+  final BlockchainConfig blockchainConfig;
 
   final _wallets = <CardanoWallet>[];
   CardanoWallet? _selectedWallet;
 
-  WalletLinkCubit({required this.registrationService})
-      : super(WalletLinkStateData.initial());
+  WalletLinkCubit({
+    required this.registrationService,
+    required this.blockchainConfig,
+  }) : super(WalletLinkStateData.initial());
 
   Set<AccountRole> get roles => state.roles
       .where((element) => element.isSelected)
@@ -95,12 +98,17 @@ final class WalletLinkCubit extends Cubit<WalletLinkStateData>
         clipboardAddress: walletInfo.address.toBech32(),
         showLowBalance:
             walletInfo.balance < CardanoWalletDetails.minAdaForRegistration,
+        showExpectedNetworkId:
+            blockchainConfig.networkId != walletInfo.networkId
+                ? blockchainConfig.networkId
+                : null,
       );
 
       final newState = state.copyWith(
         selectedWallet: Optional(walletInfo),
         hasEnoughBalance:
             walletInfo.balance >= CardanoWalletDetails.minAdaForRegistration,
+        isNetworkIdMatching: walletInfo.networkId == blockchainConfig.networkId,
         walletConnection: Optional(walletConnection),
         walletSummary: Optional(walletSummary),
       );
