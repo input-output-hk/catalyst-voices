@@ -3,8 +3,6 @@ import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.da
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
-import 'package:catalyst_voices_view_models/src/exception/localized_exception.dart';
-import 'package:catalyst_voices_view_models/src/registration/network_id_ext.dart';
 import 'package:flutter/widgets.dart';
 
 /// A [LocalizedException] describing an error during a user registration.
