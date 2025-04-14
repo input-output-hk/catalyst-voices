@@ -7,12 +7,10 @@ use poem_openapi::{types::Example, Object};
 use crate::service::{
     api::cardano::rbac::registrations_get::{
         chain_info::ChainInfo, purpose_list::PurposeList, role_data::RbacRoleData,
-        role_map::RoleMap,
+        role_map::RoleMap, stake_address_list::Cip19StakeAddressList,
     },
     common::types::{
-        cardano::{
-            catalyst_id::CatalystId, cip19_stake_address::Cip19StakeAddress, transaction_id::TxnId,
-        },
+        cardano::{catalyst_id::CatalystId, transaction_id::TxnId},
         generic::uuidv4::UUIDv4,
     },
 };
@@ -26,7 +24,8 @@ pub struct RbacRegistrationChain {
     /// A Catalyst ID.
     catalyst_id: CatalystId,
     /// A list of stake addresses.
-    stake_addresses: Vec<Cip19StakeAddress>,
+    #[oai(skip_serializing_if_is_empty)]
+    stake_addresses: Cip19StakeAddressList,
     /// An ID of the last persistent transaction.
     #[oai(skip_serializing_if_is_none)]
     last_persistent_txn: Option<TxnId>,
@@ -46,7 +45,7 @@ impl Example for RbacRegistrationChain {
     fn example() -> Self {
         Self {
             catalyst_id: CatalystId::example(),
-            stake_addresses: vec![Cip19StakeAddress::example()],
+            stake_addresses: Cip19StakeAddressList::example(),
             purpose: PurposeList::example(),
             last_persistent_txn: Some(TxnId::example()),
             last_volatile_txn: Some(TxnId::example()),
@@ -64,7 +63,8 @@ impl RbacRegistrationChain {
             .role_0_stake_addresses()
             .into_iter()
             .map(Into::into)
-            .collect();
+            .collect::<Vec<_>>()
+            .into();
         let last_persistent_txn = info.last_persistent_txn.map(Into::into);
         let last_volatile_txn = info.last_volatile_txn.map(Into::into);
         let purpose = info

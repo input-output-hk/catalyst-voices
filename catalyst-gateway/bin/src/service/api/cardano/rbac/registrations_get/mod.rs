@@ -15,6 +15,7 @@ mod registration_chain;
 mod response;
 mod role_data;
 mod role_map;
+mod stake_address_list;
 mod unprocessable_content;
 
 use anyhow::{anyhow, Context};
