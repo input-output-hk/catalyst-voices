@@ -7,7 +7,7 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 
 class UploadSeedPhraseDialog {
-  static Future<List<SeedPhraseWord>> show(BuildContext context) async {
+  static Future<List<SeedPhraseWord>?> show(BuildContext context) async {
     final file = await VoicesUploadFileDialog.show(
       context,
       routeSettings: const RouteSettings(name: '/upload-seed-phrase'),
@@ -17,17 +17,17 @@ class UploadSeedPhraseDialog {
       allowedExtensions: ['txt'],
     );
 
-    final bytes = file?.bytes;
-    if (bytes != null) {
-      final decodedText = utf8.decode(bytes);
-      final words = decodedText
-          .split(' ')
-          .mapIndexed((i, e) => SeedPhraseWord(e, nr: i + 1))
-          .toList();
-
-      return words;
-    } else {
-      return [];
+    if (file == null) {
+      return null;
     }
+
+    final bytes = file.bytes;
+    final decodedText = utf8.decode(bytes);
+    final words = decodedText
+        .split(' ')
+        .mapIndexed((i, e) => SeedPhraseWord(e, nr: i + 1))
+        .toList();
+
+    return words;
   }
 }
