@@ -116,7 +116,7 @@ def comment_doc_factory(
     proposal_doc_factory, comment_templates, rbac_auth_token_factory
 ) -> SignedDocument:
     def __comment_doc_factory() -> SignedDocument:
-        rbac_auth_token = rbac_auth_token_factory()
+        rbac_auth_token = rbac_auth_token_factory(RoleID.ROLE_0, NETWORK)
         proposal_doc = proposal_doc_factory()
         comment_doc_id = uuid_v7.uuid_v7()
         comment_metadata_json = {
@@ -155,7 +155,7 @@ def submission_action_factory(
     proposal_doc_factory, comment_templates, rbac_auth_token_factory
 ) -> SignedDocument:
     def __submission_action_factory() -> SignedDocument:
-        rbac_auth_token = rbac_auth_token_factory()
+        rbac_auth_token = rbac_auth_token_factory(RoleID.PROPOSER, NETWORK)
         proposal_doc = proposal_doc_factory()
         submission_action_id = uuid_v7.uuid_v7()
         sub_action_metadata_json = {
@@ -261,7 +261,7 @@ def test_proposal_doc(proposal_doc_factory, rbac_auth_token_factory):
 
 @pytest.mark.preprod_indexing
 def test_comment_doc(comment_doc_factory, rbac_auth_token_factory):
-    rbac_auth_token = rbac_auth_token_factory()
+    rbac_auth_token = rbac_auth_token_factory(RoleID.ROLE_0, NETWORK)
     comment_doc = comment_doc_factory()
     comment_doc_id = comment_doc.metadata["id"]
 
@@ -307,7 +307,7 @@ def test_comment_doc(comment_doc_factory, rbac_auth_token_factory):
 
 @pytest.mark.preprod_indexing
 def test_submission_action(submission_action_factory, rbac_auth_token_factory):
-    rbac_auth_token = rbac_auth_token_factory()
+    rbac_auth_token = rbac_auth_token_factory(RoleID.PROPOSER, NETWORK)
     submission_action = submission_action_factory()
     submission_action_id = submission_action.metadata["id"]
 
@@ -352,7 +352,7 @@ def test_submission_action(submission_action_factory, rbac_auth_token_factory):
 
 @pytest.mark.preprod_indexing
 def test_document_index_endpoint(proposal_doc_factory, rbac_auth_token_factory):
-    rbac_auth_token = rbac_auth_token_factory()
+    rbac_auth_token = rbac_auth_token_factory(RoleID.PROPOSER, NETWORK)
     # submiting 10 proposal documents
     total_amount = 10
     first_proposal = proposal_doc_factory()
