@@ -7,6 +7,7 @@ use std::{
     time::Duration,
 };
 
+use cardano_blockchain_types::Network;
 use openssl::ssl::{SslContextBuilder, SslFiletype, SslMethod, SslVerifyMode};
 use scylla::{
     frame::Compression, serialize::row::SerializeRow, transport::iterator::QueryPager,
@@ -115,11 +116,14 @@ impl CassandraSession {
     /// Initialise the Cassandra Cluster Connections.
     pub(crate) fn init() {
         let (persistent, volatile) = Settings::cassandra_db_cfg();
+        let network = Settings::cardano_network();
 
         let _join_handle =
-            tokio::task::spawn(async move { Box::pin(retry_init(persistent, true)).await });
+            tokio::task::spawn(
+                async move { Box::pin(retry_init(persistent, network, true)).await },
+            );
         let _join_handle =
-            tokio::task::spawn(async move { Box::pin(retry_init(volatile, false)).await });
+            tokio::task::spawn(async move { Box::pin(retry_init(volatile, network, false)).await });
     }
 
     /// Check to see if the Cassandra Indexing DB is ready for use
@@ -319,13 +323,19 @@ async fn make_session(cfg: &cassandra_db::EnvVars) -> anyhow::Result<Arc<Session
 /// Continuously try and init the DB, if it fails, backoff.
 ///
 /// Display reasonable logs to help diagnose DB connection issues.
-async fn retry_init(cfg: cassandra_db::EnvVars, persistent: bool) {
+async fn retry_init(cfg: cassandra_db::EnvVars, network: Network, persistent: bool) {
     let mut retry_delay = Duration::from_secs(0);
     let db_type = if persistent { "Persistent" } else { "Volatile" };
 
-    info!(db_type = db_type, "Index DB Session Creation: Started.");
+    info!(
+        db_type = db_type,
+        network = %network,
+        "Index DB Session Creation: Started."
+    );
 
-    cfg.log(persistent);
+    if let Err(e) = cfg.log(persistent, network) {
+        error!(db_type = db_type, network = %network, "Error configuring logging for Cassandra DB: {e}");
+    };
 
     loop {
         tokio::time::sleep(retry_delay).await;
@@ -333,6 +343,7 @@ async fn retry_init(cfg: cassandra_db::EnvVars, persistent: bool) {
 
         info!(
             db_type = db_type,
+            network = %network,
             "Attempting to connect to Cassandra DB..."
         );
 
@@ -342,6 +353,7 @@ async fn retry_init(cfg: cassandra_db::EnvVars, persistent: bool) {
             Err(error) => {
                 error!(
                     db_type = db_type,
+                    network = %network,
                     error = format!("{error:?}"),
                     "Failed to Create Cassandra DB Session"
                 );
@@ -353,9 +365,10 @@ async fn retry_init(cfg: cassandra_db::EnvVars, persistent: bool) {
         };
 
         // Set up the Schema for it.
-        if let Err(error) = create_schema(&mut session.clone(), &cfg).await {
+        if let Err(error) = create_schema(&mut session.clone(), &cfg, network).await {
             error!(
                 db_type = db_type,
+                network = %network,
                 error = format!("{error:?}"),
                 "Failed to Create Cassandra DB Schema"
             );
@@ -372,6 +385,7 @@ async fn retry_init(cfg: cassandra_db::EnvVars, persistent: bool) {
             Err(error) => {
                 error!(
                     db_type = db_type,
+                    network = %network,
                     error = %error,
                     "Failed to Create Cassandra Prepared Queries"
                 );
@@ -388,6 +402,7 @@ async fn retry_init(cfg: cassandra_db::EnvVars, persistent: bool) {
             Err(error) => {
                 error!(
                     db_type = db_type,
+                    network = %network,
                     error = %error,
                     "Failed to Create Cassandra Prepared Purge Queries"
                 );
@@ -421,5 +436,5 @@ async fn retry_init(cfg: cassandra_db::EnvVars, persistent: bool) {
         break;
     }
 
-    info!(db_type = db_type, "Index DB Session Creation: OK.");
+    info!(db_type = db_type, network = %network, "Index DB Session Creation: OK.");
 }
