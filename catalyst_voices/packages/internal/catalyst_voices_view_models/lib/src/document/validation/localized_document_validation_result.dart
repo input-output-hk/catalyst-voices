@@ -15,8 +15,13 @@ final class LocalizedDocumentConstValueMismatch
 
   @override
   String? message(BuildContext context) {
-    return context.l10n
-        .errorValidationConstValueMismatch(constValue.toString());
+    final constValue = this.constValue;
+    if (constValue is bool && constValue) {
+      return context.l10n.errorValidationConstsValueBoolMismatch;
+    } else {
+      return context.l10n
+          .errorValidationConstValueMismatch(constValue.toString());
+    }
   }
 }
 

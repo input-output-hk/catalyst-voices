@@ -168,7 +168,9 @@ final class UserServiceImpl implements UserService {
   Future<void> useAccount(Account account) async {
     var user = await getUser();
 
-    if (!user.hasAccount(id: account.catalystId)) {
+    if (user.hasAccount(id: account.catalystId)) {
+      user = user.updateAccount(account);
+    } else {
       user = user.addAccount(account);
     }
 
