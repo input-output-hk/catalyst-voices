@@ -18,13 +18,13 @@ class ProposalShareButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocSelector<ProposalCubit, ProposalState, DocumentRef?>(
       selector: (state) {
-        return state.data.header.proposalId;
+        return state.data.header.proposalRef;
       },
-      builder: (context, proposalId) {
+      builder: (context, proposalRef) {
         return ShareButton(
           onTap: () {
-            if (proposalId != null) {
-              final url = ProposalRoute.fromRef(ref: proposalId).location;
+            if (proposalRef != null) {
+              final url = ProposalRoute.fromRef(ref: proposalRef).location;
               unawaited(ShareProposalDialog.show(context, url));
             } else {
               _showErrorSnackbar(context);
