@@ -10,17 +10,15 @@
 
 ## Context
 
-[JSON Schema Draft-07] is a standard chosen to describe templates for various documents with which
-the frontend app must work. The responsibilities of the frontend app are to understand the JSON Schema
-structure and build meaningful UI components from it. With the complexity of the JSON Schema it's important
-to understand the constraints that the frontend app has.
+[JSON Schema Draft-07] is a standard chosen to describe templates for various documents with which the frontend app must work.
+The responsibilities of the frontend app are to understand the JSON Schema structure and build meaningful UI components from it.
+With the complexity of the JSON Schema it's important to understand the constraints that the frontend app has.
 
 ## Assumptions
 
 * Some of the app logic needs are not encoded directly in the JSON Schema document templates
- therefore the app adds it's own logic on top of JSON Schema logic.
-* There is no immediate plan to update the JSON Schema to satisfy the needs of the app without the app
- custom logic due to resource constraints.
+ therefore the app adds it's own logic on top of the JSON Schema logic.
+* There is no immediate plan to update the JSON Schema templates to satisfy the needs of the app due to resource constraints.
 * Documenting the app custom logic will help to understand how to build document templates.
 
 ## Decision
@@ -36,8 +34,8 @@ App custom logic:
 
 | Document Type         | Node ID           | Property Type | App Needs        |
 |----------------|--------------------------|---------------|------------------|
-| `ProposalTemplate` | `setup.title.title`        | `string` | Programmatically prefill the text in a `title` property. The app needs to programmatically lookup in the template the related property. |
-| `ProposalTemplate` | `setup.title.title`        | `string` | Show the proposal title in the UI components. The app needs to programmatically lookup in the template the related property. |
+| `ProposalTemplate` | `setup.title.title` | `string` | Programmatically prefill the text in a `title` property. The app needs to programmatically lookup in the template the related property. |
+| `ProposalTemplate` | `setup.title.title` | `string` | Show the proposal title in the UI components. The app needs to programmatically lookup in the template the related property. |
 | `ProposalTemplate` | `summary.solution.summary` | `string` | Show the proposal description in the UI components. The app needs to programmatically lookup in the template the related property. |
 | `ProposalTemplate` | `summary.budget.requestedFunds` | `integer` | Show the requested funds in the UI components. The app needs to programmatically lookup in the template the related property. |
 | `ProposalTemplate` | `summary.time.duration` | `integer` | Show the project duration in the UI components. The app needs to programmatically lookup in the template the related property. |
