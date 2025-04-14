@@ -11,7 +11,6 @@ class UnlockPasswordForm extends StatelessWidget {
   final bool showPasswordStrength;
   final ValueChanged<String>? onSubmitted;
 
-
   const UnlockPasswordForm({
     super.key,
     required this.passwordController,
