@@ -2,7 +2,7 @@
     title: 0010 Frontend JSON Schema Constraints
     adr:
         author: Dominik Toton
-        created: 04-Apr-2025
+        created: 14-Apr-2025
         status:  draft
     tags:
         - flutter
@@ -23,14 +23,14 @@ With the complexity of the JSON Schema it's important to understand the constrai
 
 ## Decision
 
-* The app will add it's own custom logic on top of the JSON Schema document template whenever
+* The app will add it's own custom logic on top of the JSON Schema document template whenever the
  app needs cannot be satisfied by the standard set of JSON Schema features encoded within the template.
 * The app will create a naming system for JSON Schema properties referred to as `nodes` that will
  assign each `node` a `nodeId` consisting of the format: `{parent.nodeId}.{propertyName}` where
  for the root node the `{parent.nodeId}` is skipped.
 * The app will maintain a set of predefined `nodeIds` for which a custom app logic is added on top of JSON Schema.
 
-App custom logic:
+#### App custom logic
 
 <!-- markdownlint-disable max-one-sentence-per-line -->
 | Document Type         | Node ID           | Property Type | App Needs        |
@@ -50,17 +50,17 @@ App custom logic:
 
 ## Risks
 
-* Failure to understand app constraints will cause erroneous behavior if the document template
+* Failure to understand the app constraints will cause erroneous behavior if the document template
  is modified in a way that prevents the app from looking up predefined properties.
 * I.e. the UI components can start showing placeholders instead of actual titles because
  the app won't be able to lookup the related property.
- The same is true for other properties listed above.
+ The same is true for the other properties listed above.
 
 ## Consequences
 
 * Prevents erroneous app behavior however requires a careful editing to make sure `nodeIds` of the
  predefined properties are stable.
-* Predefining the properties reduces the flexibility to adjust templates.
+* Predefining the properties reduces the flexibility to adjust the templates.
 
 ## More Information
 
