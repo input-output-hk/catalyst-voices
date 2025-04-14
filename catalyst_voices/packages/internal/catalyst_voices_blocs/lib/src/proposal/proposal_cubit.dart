@@ -265,7 +265,7 @@ final class ProposalCubit extends Cubit<ProposalState>
         : const <Segment>[];
 
     final header = ProposalViewHeader(
-      selfRef: proposalDocumentRef,
+      proposalId: proposalDocumentRef,
       title: proposalDocument?.title ?? '',
       authorName: proposalDocument?.authorName ?? '',
       createdAt: proposalDocumentRef?.version?.tryDateTime,
