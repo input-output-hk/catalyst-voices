@@ -24,11 +24,12 @@ class StayInvolved extends StatelessWidget {
       padding: EdgeInsets.symmetric(horizontal: 120, vertical: 72),
       child: Column(
         mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           _Header(),
           SizedBox(height: 24),
           Wrap(
+            alignment: WrapAlignment.center,
             spacing: 16,
             runSpacing: 16,
             children: [
@@ -157,13 +158,18 @@ class _StayInvolvedCard extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 32),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
-        gradient: const LinearGradient(
+        gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [
-            Color(0xFFD1EAFF),
-            Color(0xFFCAD6FE),
-          ],
+          colors: Theme.of(context).brightness == Brightness.light
+              ? [
+                  const Color(0xFFD1EAFF),
+                  const Color(0xFFCAD6FE),
+                ]
+              : [
+                  const Color(0xFF2D3953),
+                  const Color(0xFF242C42),
+                ],
         ),
       ),
       child: Column(

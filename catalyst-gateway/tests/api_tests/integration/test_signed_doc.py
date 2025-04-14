@@ -70,6 +70,7 @@ def proposal_doc_factory(proposal_templates, rbac_auth_token_factory):
     def __proposal_doc_factory() -> SignedDocument:
         rbac_auth_token = rbac_auth_token_factory()
         proposal_doc_id = uuid_v7.uuid_v7()
+        category_id = "0194d490-30bf-7473-81c8-a0eaef369619"
         proposal_metadata_json = {
             "id": proposal_doc_id,
             "ver": proposal_doc_id,
@@ -78,9 +79,15 @@ def proposal_doc_factory(proposal_templates, rbac_auth_token_factory):
             "content-type": "application/json",
             "content-encoding": "br",
             # referenced to the defined proposal template id, comes from the 'templates/data.rs' file
-            "template": {"id": proposal_templates[0]},
+            "template": {
+                "id": proposal_templates[0],
+                "ver": proposal_templates[0],
+            },
             # referenced to the defined category id, comes from the 'templates/data.rs' file
-            "category_id": {"id": "0194d490-30bf-7473-81c8-a0eaef369619"},
+            "category_id": {
+                "id": category_id,
+                "ver": category_id,
+            },
         }
         with open("./test_data/signed_docs/proposal.json", "r") as proposal_json_file:
             proposal_json = json.load(proposal_json_file)
@@ -112,8 +119,14 @@ def comment_doc_factory(
             "type": "b679ded3-0e7c-41ba-89f8-da62a17898ea",
             "content-type": "application/json",
             "content-encoding": "br",
-            "ref": {"id": proposal_doc.metadata["id"]},
-            "template": {"id": comment_templates[0]},
+            "ref": {
+                "id": proposal_doc.metadata["id"],
+                "ver": proposal_doc.metadata["ver"],
+            },
+            "template": {
+                "id": comment_templates[0],
+                "ver": comment_templates[0],
+            },
         }
         with open("./test_data/signed_docs/comment.json", "r") as comment_json_file:
             comment_json = json.load(comment_json_file)
@@ -145,7 +158,10 @@ def submission_action_factory(
             "type": "5e60e623-ad02-4a1b-a1ac-406db978ee48",
             "content-type": "application/json",
             "content-encoding": "br",
-            "ref": {"id": proposal_doc.metadata["id"]},
+            "ref": {
+                "id": proposal_doc.metadata["id"],
+                "ver": proposal_doc.metadata["ver"],
+            },
         }
         with open(
             "./test_data/signed_docs/submission_action.json", "r"
