@@ -29,14 +29,10 @@ final class DatabaseDocumentsDataSource
   Future<Page<ProposalDocumentData>> getProposalsPage({
     required PageRequest request,
     required ProposalsFilters filters,
-  }) async {
-    // TODO(damian-molinski): integrate
-    return Page(
-      page: request.page,
-      maxPerPage: request.size,
-      total: 0,
-      items: const [],
-    );
+  }) {
+    return _database.proposalsDao
+        .queryProposalsPage(request: request, filters: filters)
+        .then((page) => page.map((e) => e.toModel()));
   }
 
   @override
@@ -157,6 +153,18 @@ extension on DocumentEntity {
     return DocumentData(
       metadata: metadata,
       content: content,
+    );
+  }
+}
+
+extension on JoinedProposalEntity {
+  ProposalDocumentData toModel() {
+    return ProposalDocumentData(
+      proposal: proposal.toModel(),
+      template: template.toModel(),
+      action: action?.toModel(),
+      commentsCount: commentsCount,
+      versions: versions,
     );
   }
 }

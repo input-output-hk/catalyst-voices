@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
@@ -24,7 +25,11 @@ class VoicesErrorIndicator extends StatelessWidget {
     return VoicesIndicator(
       type: VoicesIndicatorType.error,
       icon: VoicesAssets.icons.exclamation,
-      message: Text(message),
+      message: AutoSizeText(
+        message,
+        minFontSize: 8,
+        maxLines: 4,
+      ),
       action: Offstage(
         offstage: onRetry == null,
         child: VoicesTextButton(

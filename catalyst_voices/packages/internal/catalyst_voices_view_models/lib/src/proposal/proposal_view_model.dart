@@ -157,7 +157,7 @@ and PRISM, but its potential is only barely exploited.
         );
 
   String get fundsRequested {
-    return CryptocurrencyFormatter.decimalFormat(_fundsRequested);
+    return CryptocurrencyFormatter.formatAmount(_fundsRequested);
   }
 
   @override
@@ -214,6 +214,8 @@ and PRISM, but its potential is only barely exploited.
 }
 
 /// A proposal view model spanning proposals in different stages.
+// TODO(damian-molinski): try making this single model just for ProposalCard
+// widget which have to be single widget too.
 sealed class ProposalViewModel extends Equatable {
   final DocumentRef ref;
   final bool isFavorite;

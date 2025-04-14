@@ -42,9 +42,11 @@ class _AccountRolesTileState extends State<_AccountRolesTile> {
     return PropertyTile(
       title: context.l10n.myRoles,
       key: const Key('AddRoleTile'),
-      action: _EditButton(
-        onTap: widget.state.canAddRole ? _addAccountRole : null,
-      ),
+      action: widget.state.canAddRole
+          ? _EditButton(
+              onTap: _addAccountRole,
+            )
+          : null,
       child: _Roles(items: widget.state.items),
     );
   }

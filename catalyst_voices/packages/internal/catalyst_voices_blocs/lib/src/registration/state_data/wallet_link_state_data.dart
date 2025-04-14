@@ -8,6 +8,7 @@ final class WalletLinkStateData extends Equatable {
   final Result<List<WalletMetadata>, Exception>? wallets;
   final WalletInfo? selectedWallet;
   final bool hasEnoughBalance;
+  final bool isNetworkIdMatching;
   final WalletConnectionData? walletConnection;
   final WalletSummaryData? walletSummary;
   final List<RegistrationRole> roles;
@@ -17,6 +18,7 @@ final class WalletLinkStateData extends Equatable {
     this.wallets,
     this.selectedWallet,
     this.hasEnoughBalance = false,
+    this.isNetworkIdMatching = false,
     this.walletConnection,
     this.walletSummary,
     this.roles = const [],
@@ -55,6 +57,7 @@ final class WalletLinkStateData extends Equatable {
         wallets,
         selectedWallet,
         hasEnoughBalance,
+        isNetworkIdMatching,
         walletConnection,
         walletSummary,
         roles,
@@ -69,6 +72,7 @@ final class WalletLinkStateData extends Equatable {
     Optional<Result<List<WalletMetadata>, Exception>>? wallets,
     Optional<WalletInfo>? selectedWallet,
     bool? hasEnoughBalance,
+    bool? isNetworkIdMatching,
     Optional<WalletConnectionData>? walletConnection,
     Optional<WalletSummaryData>? walletSummary,
     List<RegistrationRole>? roles,
@@ -78,6 +82,7 @@ final class WalletLinkStateData extends Equatable {
       wallets: wallets.dataOr(this.wallets),
       selectedWallet: selectedWallet.dataOr(this.selectedWallet),
       hasEnoughBalance: hasEnoughBalance ?? this.hasEnoughBalance,
+      isNetworkIdMatching: isNetworkIdMatching ?? this.isNetworkIdMatching,
       walletConnection: walletConnection.dataOr(this.walletConnection),
       walletSummary: walletSummary.dataOr(this.walletSummary),
       roles: roles ?? this.roles,

@@ -13,11 +13,13 @@ final class WalletInfo extends Equatable {
   final WalletMetadata metadata;
   final Coin balance;
   final ShelleyAddress address;
+  final NetworkId networkId;
 
   const WalletInfo({
     required this.metadata,
     required this.balance,
     required this.address,
+    required this.networkId,
   });
 
   @override
@@ -25,5 +27,6 @@ final class WalletInfo extends Equatable {
         metadata,
         balance.value,
         address,
+        networkId,
       ];
 }

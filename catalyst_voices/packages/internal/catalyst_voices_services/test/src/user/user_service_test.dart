@@ -99,6 +99,39 @@ void main() {
       expect(currentAccount?.isActive, isTrue);
     });
 
+    test(
+        'when using a new account with the same catalystId'
+        ' the getter returns updated account', () async {
+      // Given
+      final oldKeychainId = const Uuid().v4();
+      final newKeychainId = const Uuid().v4();
+      final catalystId = DummyCatalystIdFactory.create();
+
+      // When
+      final oldKeychain = await keychainProvider.create(oldKeychainId);
+      final oldAccount = Account.dummy(
+        catalystId: catalystId,
+        keychain: oldKeychain,
+        isActive: false,
+      );
+
+      final newKeychain = await keychainProvider.create(newKeychainId);
+      final newAccount = Account.dummy(
+        catalystId: catalystId,
+        keychain: newKeychain,
+        isActive: true,
+      );
+
+      await service.useAccount(oldAccount);
+      await service.useAccount(newAccount);
+
+      // Then
+      final currentAccount = service.user.activeAccount;
+
+      expect(currentAccount, equals(newAccount));
+      expect(currentAccount, isNot(oldAccount));
+    });
+
     test('using different account emits update in stream', () async {
       // Given
       final keychainIdOne = const Uuid().v4();

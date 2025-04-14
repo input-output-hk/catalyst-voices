@@ -7,6 +7,8 @@ import 'package:flutter/material.dart';
 /// A proposal card spanning proposals in different stages.
 ///
 /// Designed to work with as many cases as [ProposalViewModel] will support.
+// TODO(damian-molinski): Refactor this widget to accept minimum data necessary
+// not entire ProposalViewModel.
 class ProposalCard extends StatelessWidget {
   final AssetGenImage? image;
   final ProposalViewModel proposal;

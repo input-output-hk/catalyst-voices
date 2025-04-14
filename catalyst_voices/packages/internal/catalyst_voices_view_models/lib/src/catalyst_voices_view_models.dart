@@ -35,6 +35,7 @@ export 'proposal_comments/proposal_comments_sort.dart';
 export 'proposals/proposals_category_selector_item.dart';
 export 'proposals/proposals_filter_type_ext.dart';
 export 'registration/exception/localized_registration_exception.dart';
+export 'registration/network_id_ext.dart';
 export 'registration/registration.dart';
 export 'registration/registration_role.dart';
 export 'segments/segments_navigation.dart';

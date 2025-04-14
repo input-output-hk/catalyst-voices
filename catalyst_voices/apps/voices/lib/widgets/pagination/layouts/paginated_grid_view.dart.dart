@@ -40,7 +40,6 @@ class PaginatedGridView<ItemType> extends StatelessWidget {
       valueListenable: _pagingController,
       builder: (context, pagingState, _) {
         Widget child;
-        final itemList = _pagingController.itemList;
         switch (pagingState.status) {
           case PagingStatus.empty:
             child = builderDelegate.emptyIndicatorBuilder(context);
@@ -57,12 +56,12 @@ class PaginatedGridView<ItemType> extends StatelessWidget {
                 key: const Key('PaginatedGridView'),
                 spacing: 16,
                 runSpacing: 16,
-                children: [
-                  for (var i = pagingState.currentFrom;
-                      i <= pagingState.currentTo;
-                      i++)
-                    _itemBuilder(context, itemList[i]),
-                ],
+                alignment: WrapAlignment.spaceEvenly,
+                crossAxisAlignment: WrapCrossAlignment.start,
+                runAlignment: WrapAlignment.start,
+                children: pagingState.itemList
+                    .map((item) => _itemBuilder(context, item))
+                    .toList(),
               ),
             );
             break;
@@ -137,7 +136,11 @@ class _Controls extends StatelessWidget {
       children: [
         Text(
           key: const Key('PaginationText'),
-          '$fromNumber-$toNumber of $maxResults proposals',
+          context.l10n.paginationProposalsCounter(
+            fromNumber,
+            toNumber,
+            maxResults,
+          ),
         ),
         VoicesIconButton(
           key: const Key('PrevPageBtn'),

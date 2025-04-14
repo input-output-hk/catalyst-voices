@@ -236,6 +236,5 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     await _proposalsSubscription?.cancel();
     _proposalsSubscription = null;
     _setupProposalsSubscription();
-    emit(state.copyWith(isLoading: false));
   }
 }

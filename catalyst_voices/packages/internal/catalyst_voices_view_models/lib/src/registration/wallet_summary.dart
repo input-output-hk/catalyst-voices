@@ -1,3 +1,4 @@
+import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:equatable/equatable.dart';
 
 final class WalletSummaryData extends Equatable {
@@ -6,6 +7,7 @@ final class WalletSummaryData extends Equatable {
   final String address;
   final String clipboardAddress;
   final bool showLowBalance;
+  final NetworkId? showExpectedNetworkId;
 
   const WalletSummaryData({
     required this.walletName,
@@ -13,6 +15,7 @@ final class WalletSummaryData extends Equatable {
     required this.address,
     required this.clipboardAddress,
     required this.showLowBalance,
+    required this.showExpectedNetworkId,
   });
 
   @override
@@ -22,5 +25,6 @@ final class WalletSummaryData extends Equatable {
         address,
         clipboardAddress,
         showLowBalance,
+        showExpectedNetworkId,
       ];
 }

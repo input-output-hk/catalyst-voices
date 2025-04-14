@@ -29,6 +29,8 @@ class BaseProposalData extends Equatable {
   }
 }
 
+// TODO(damian-molinski): delete this class and refactor it. categoryName
+// does not make sense here
 class ProposalData extends BaseProposalData {
   final List<BaseProposalData> versions;
   final int commentsCount;

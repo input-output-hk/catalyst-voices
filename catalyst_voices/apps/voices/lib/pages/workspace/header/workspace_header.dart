@@ -105,7 +105,6 @@ class _ViewComments extends StatelessWidget {
 }
 
 class _WorkspaceHeaderState extends State<WorkspaceHeader> {
-  bool _isTimelineExpanded = false;
   bool _isTimelineVisible = true;
 
   @override
@@ -153,7 +152,6 @@ class _WorkspaceHeaderState extends State<WorkspaceHeader> {
                 const _ViewComments(),
                 Expanded(
                   child: Container(
-                    height: _isTimelineExpanded ? 340 : 190,
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
                       color: theme.colorScheme.surface,
@@ -171,11 +169,6 @@ class _WorkspaceHeaderState extends State<WorkspaceHeader> {
                         return CampaignTimeline(
                           timelineItems: timelineItems,
                           placement: CampaignTimelinePlacement.workspace,
-                          onExpandedChanged: (isExpanded) {
-                            setState(() {
-                              _isTimelineExpanded = isExpanded;
-                            });
-                          },
                         );
                       },
                     ),
@@ -193,9 +186,6 @@ class _WorkspaceHeaderState extends State<WorkspaceHeader> {
   void _toggleTimelineVisibility() {
     setState(() {
       _isTimelineVisible = !_isTimelineVisible;
-      if (!_isTimelineVisible) {
-        _isTimelineExpanded = false;
-      }
     });
   }
 }

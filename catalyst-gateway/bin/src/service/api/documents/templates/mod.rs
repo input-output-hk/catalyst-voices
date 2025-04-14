@@ -12,9 +12,13 @@ use uuid::Uuid;
 
 /// Catalyst brand ID.
 const BRAND_ID: &str = "0194cfcd-bddc-7bb3-b5e9-455168bd3ff7";
+/// Catalyst brand Version (same as ID).
+const BRAND_VERSION: &str = BRAND_ID;
 
 /// Fund 14 Campaign ID.
 const CAMPAIGN_ID: &str = "0194cfcf-15a2-7e32-b559-386b93d0724e";
+/// Fund 14 Campaign Version (Same as ID).
+const CAMPAIGN_VERSION: &str = CAMPAIGN_ID;
 
 /// A map of signed document templates to its ID.
 pub(crate) static TEMPLATES: LazyLock<Option<HashMap<Uuid, CatalystSignedDocument>>> =
@@ -96,11 +100,11 @@ fn build_signed_doc(data: &SignedDocData, sk: &SigningKey) -> (Uuid, CatalystSig
         "type": data.doc_type,
         "id": data.id,
         "ver": data.ver,
-        "category_id": data.category_id.map(|v| serde_json::json!({"id": v})),
+        "category_id": data.category_id.map(|v| serde_json::json!({"id": v, "ver": v })),
         "content-type": ContentType::Json.to_string(),
         "content-encoding": ContentEncoding::Brotli.to_string(),
-        "campaign_id": {"id": CAMPAIGN_ID},
-        "brand_id":  {"id": BRAND_ID},
+        "campaign_id": {"id": CAMPAIGN_ID, "ver": CAMPAIGN_VERSION},
+        "brand_id":  {"id": BRAND_ID, "ver": BRAND_VERSION},
     });
 
     let kid = IdUri::new(KID_NETWORK, None, sk.verifying_key());

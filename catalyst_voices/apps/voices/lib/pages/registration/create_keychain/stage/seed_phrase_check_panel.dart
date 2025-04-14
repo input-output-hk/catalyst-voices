@@ -17,69 +17,6 @@ class SeedPhraseCheckPanel extends StatefulWidget {
   State<SeedPhraseCheckPanel> createState() => _SeedPhraseCheckPanelState();
 }
 
-class _SeedPhraseCheckPanelState extends State<SeedPhraseCheckPanel> {
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Expanded(
-          child: _BlocLoadable(
-            builder: (context) {
-              return _BlocSeedPhraseWords(
-                onUserWordsChanged: _onWordsSequenceChanged,
-                onImportTap: _importSeedPhrase,
-                onResetTap: _clearUserWords,
-              );
-            },
-          ),
-        ),
-        const SizedBox(height: 10),
-        const _BlocNavigation(),
-      ],
-    );
-  }
-
-  Future<void> _importSeedPhrase() async {
-    final showUpload = await UploadSeedPhraseConfirmationDialog.show(context);
-    if (showUpload) {
-      await _showUploadDialog();
-    }
-  }
-
-  Future<void> _showUploadDialog() async {
-    final words = await UploadSeedPhraseDialog.show(context);
-
-    if (!mounted) return;
-
-    final areWordsMatching =
-        RegistrationCubit.of(context).keychainCreation.areWordsMatching(words);
-
-    final isValid = areWordsMatching &&
-        SeedPhrase.isValid(
-          words: words,
-        );
-
-    if (isValid) {
-      _onWordsSequenceChanged(words);
-    } else {
-      final showUpload = await IncorrectSeedPhraseDialog.show(context);
-      if (showUpload) {
-        await _showUploadDialog();
-      }
-    }
-  }
-
-  void _clearUserWords() {
-    RegistrationCubit.of(context).keychainCreation.setUserSeedPhraseWords([]);
-  }
-
-  void _onWordsSequenceChanged(List<SeedPhraseWord> words) {
-    RegistrationCubit.of(context)
-        .keychainCreation
-        .setUserSeedPhraseWords(words);
-  }
-}
-
 class _BlocLoadable extends StatelessWidget {
   final WidgetBuilder builder;
 
@@ -101,16 +38,32 @@ class _BlocLoadable extends StatelessWidget {
   }
 }
 
+class _BlocNavigation extends StatelessWidget {
+  const _BlocNavigation();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocSeedPhraseSelector<bool>(
+      selector: (state) => state.areUserWordsCorrect,
+      builder: (context, state) {
+        return RegistrationBackNextNavigation(
+          isNextEnabled: state,
+        );
+      },
+    );
+  }
+}
+
 class _BlocSeedPhraseWords extends StatelessWidget {
+  final ValueChanged<List<SeedPhraseWord>> onUserWordsChanged;
+
+  final VoidCallback? onImportTap;
+  final VoidCallback? onResetTap;
   const _BlocSeedPhraseWords({
     required this.onUserWordsChanged,
     this.onImportTap,
     this.onResetTap,
   });
-
-  final ValueChanged<List<SeedPhraseWord>> onUserWordsChanged;
-  final VoidCallback? onImportTap;
-  final VoidCallback? onResetTap;
 
   @override
   Widget build(BuildContext context) {
@@ -136,6 +89,69 @@ class _BlocSeedPhraseWords extends StatelessWidget {
         );
       },
     );
+  }
+}
+
+class _SeedPhraseCheckPanelState extends State<SeedPhraseCheckPanel> {
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Expanded(
+          child: _BlocLoadable(
+            builder: (context) {
+              return _BlocSeedPhraseWords(
+                onUserWordsChanged: _onWordsSequenceChanged,
+                onImportTap: _importSeedPhrase,
+                onResetTap: _clearUserWords,
+              );
+            },
+          ),
+        ),
+        const SizedBox(height: 10),
+        const _BlocNavigation(),
+      ],
+    );
+  }
+
+  void _clearUserWords() {
+    RegistrationCubit.of(context).keychainCreation.setUserSeedPhraseWords([]);
+  }
+
+  Future<void> _importSeedPhrase() async {
+    final showUpload = await UploadSeedPhraseConfirmationDialog.show(context);
+    if (showUpload) {
+      await _showUploadDialog();
+    }
+  }
+
+  void _onWordsSequenceChanged(List<SeedPhraseWord> words) {
+    RegistrationCubit.of(context)
+        .keychainCreation
+        .setUserSeedPhraseWords(words);
+  }
+
+  Future<void> _showUploadDialog() async {
+    final words = await UploadSeedPhraseDialog.show(context);
+
+    if (!mounted || words == null) return;
+
+    final areWordsMatching =
+        RegistrationCubit.of(context).keychainCreation.areWordsMatching(words);
+
+    final isValid = areWordsMatching &&
+        SeedPhrase.isValid(
+          words: words,
+        );
+
+    if (isValid) {
+      _onWordsSequenceChanged(words);
+    } else {
+      final showUpload = await IncorrectSeedPhraseDialog.show(context);
+      if (showUpload) {
+        await _showUploadDialog();
+      }
+    }
   }
 }
 
@@ -174,22 +190,6 @@ class _SeedPhraseWords extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-}
-
-class _BlocNavigation extends StatelessWidget {
-  const _BlocNavigation();
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocSeedPhraseSelector<bool>(
-      selector: (state) => state.areUserWordsCorrect,
-      builder: (context, state) {
-        return RegistrationBackNextNavigation(
-          isNextEnabled: state,
-        );
-      },
     );
   }
 }

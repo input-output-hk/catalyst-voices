@@ -18,8 +18,6 @@ final class CardanoWalletDetails extends Equatable {
     required this.address,
   });
 
-  bool get hasEnoughBalance => balance >= minAdaForRegistration;
-
   @override
   List<Object?> get props => [wallet, balance, address];
 }

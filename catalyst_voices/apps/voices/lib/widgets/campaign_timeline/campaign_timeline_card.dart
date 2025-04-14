@@ -10,13 +10,11 @@ import 'package:flutter/material.dart';
 class CampaignTimelineCard extends StatefulWidget {
   final CampaignTimelineViewModel timelineItem;
   final CampaignTimelinePlacement placement;
-  final ValueChanged<bool>? onExpandedChanged;
 
   const CampaignTimelineCard({
     super.key,
     required this.timelineItem,
     required this.placement,
-    this.onExpandedChanged,
   });
 
   @override
@@ -37,17 +35,18 @@ class CampaignTimelineCardState extends State<CampaignTimelineCard> {
 
     return GestureDetector(
       onTap: _toggleExpanded,
-      child: SizedBox(
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        constraints: const BoxConstraints(minHeight: 150),
         width: 288,
-        height: _isExpanded ? 300 : 150,
         child: Card(
           key: const Key('TimelineCard'),
           color:
               widget.placement.backgroundColor(context, isOngoing: _isOngoing),
           shape: OutlineInputBorder(
-            borderSide: BorderSide(
-              color: _isOngoing ? colors.primary : Colors.white,
-              width: _isOngoing ? 2 : 1,
+            borderSide: widget.placement.borderSide(
+              context,
+              isOngoing: _isOngoing,
             ),
             borderRadius: BorderRadius.circular(8),
           ),
@@ -78,42 +77,40 @@ class CampaignTimelineCardState extends State<CampaignTimelineCard> {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
-                Expanded(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: Text(
-                          key: const Key('TimelineCardDate'),
-                          DateFormatter.formatDateRange(
-                            MaterialLocalizations.of(context),
-                            context.l10n,
-                            widget.timelineItem.timeline,
-                          ),
-                          style: context.textTheme.bodyMedium?.copyWith(
-                            color: context.colors.sysColorsNeutralN60,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        key: const Key('TimelineCardDate'),
+                        DateFormatter.formatDateRange(
+                          MaterialLocalizations.of(context),
+                          context.l10n,
+                          widget.timelineItem.timeline,
                         ),
+                        style: context.textTheme.bodyMedium?.copyWith(
+                          color: context.colors.sysColorsNeutralN60,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      if (_isOngoing) ...[
-                        const SizedBox(width: 8),
-                        Offstage(
-                          offstage: !_isOngoing,
-                          child: VoicesChip.round(
-                            backgroundColor: colors.primary,
-                            content: Text(
-                              context.l10n.ongoing,
-                              style: context.textTheme.labelSmall?.copyWith(
-                                color: Colors.white,
-                              ),
+                    ),
+                    if (_isOngoing) ...[
+                      const SizedBox(width: 8),
+                      Offstage(
+                        offstage: !_isOngoing,
+                        child: VoicesChip.round(
+                          backgroundColor: colors.primary,
+                          content: Text(
+                            context.l10n.ongoing,
+                            style: context.textTheme.labelSmall?.copyWith(
+                              color: Colors.white,
                             ),
                           ),
                         ),
-                      ],
+                      ),
                     ],
-                  ),
+                  ],
                 ),
                 const SizedBox(height: 16),
                 AnimatedSwitcher(
@@ -138,7 +135,6 @@ class CampaignTimelineCardState extends State<CampaignTimelineCard> {
   void _toggleExpanded() {
     setState(() {
       _isExpanded = !_isExpanded;
-      widget.onExpandedChanged?.call(_isExpanded);
     });
   }
 }
@@ -151,16 +147,27 @@ enum CampaignTimelinePlacement {
     BuildContext context, {
     required bool isOngoing,
   }) {
-    final colorScheme = context.colorScheme;
     final colors = Theme.of(context).colors;
 
     return switch ((this, isOngoing)) {
-      (discovery, _) => colorScheme.onPrimary,
-      // TODO(minikin): Discuss color inconsistency with the design team.
-      // The color on Figma files is #E3E8FA (measured),
-      //but the color on the design system is #123CD3 with alpha 0.12.
-      (workspace, true) => VoicesColors.lightIconsPrimary.withAlpha(31),
-      (workspace, false) => colors.iconsBackgroundVariant,
+      (discovery, _) => colors.onSurfaceNeutralOpaqueLv0,
+      (workspace, true) => colors.onSurfaceNeutralOpaqueLv0,
+      (workspace, false) => colors.onSurfaceNeutralOpaqueLv1,
+    };
+  }
+
+  BorderSide borderSide(
+    BuildContext context, {
+    required bool isOngoing,
+  }) {
+    final colorScheme = context.colorScheme;
+
+    return switch ((this, isOngoing)) {
+      (discovery, true) => BorderSide(
+          color: colorScheme.primary,
+          width: 2,
+        ),
+      (_, _) => BorderSide.none,
     };
   }
 }

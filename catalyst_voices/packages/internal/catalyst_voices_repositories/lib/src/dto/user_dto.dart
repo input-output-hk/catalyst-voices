@@ -107,6 +107,8 @@ final class AccountWalletInfoDto {
       metadata: metadata.toModel(),
       balance: balance,
       address: address,
+      // TODO(dtscalac): drop it in when account recovery is finished
+      networkId: NetworkId.testnet,
     );
   }
 }

@@ -35,6 +35,24 @@ class WalletDetailsPanel extends StatelessWidget {
   }
 }
 
+class _BlocNavigation extends StatelessWidget {
+  const _BlocNavigation();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocWalletLinkSelector<bool>(
+      selector: (state) => state.hasEnoughBalance && state.isNetworkIdMatching,
+      builder: (context, canContinue) {
+        if (canContinue) {
+          return const _RegistrationTextBackNextNavigation();
+        } else {
+          return const _ChooseOtherWalletNavigation();
+        }
+      },
+    );
+  }
+}
+
 class _BlocWalletConnectionStatus extends StatelessWidget {
   const _BlocWalletConnectionStatus();
 
@@ -85,6 +103,7 @@ class _BlocWalletSummary extends StatelessWidget {
             address: state.address,
             clipboardAddress: state.clipboardAddress,
             showLowBalance: state.showLowBalance,
+            showExpectedNetworkId: state.showExpectedNetworkId,
           );
         } else {
           return const Offstage();
@@ -94,26 +113,8 @@ class _BlocWalletSummary extends StatelessWidget {
   }
 }
 
-class _BlocNavigation extends StatelessWidget {
-  const _BlocNavigation();
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocWalletLinkSelector<bool>(
-      selector: (state) => state.hasEnoughBalance,
-      builder: (context, state) {
-        if (state) {
-          return const _RegistrationTextBackNextNavigation();
-        } else {
-          return const _NotEnoughBalanceNavigation();
-        }
-      },
-    );
-  }
-}
-
-class _NotEnoughBalanceNavigation extends StatelessWidget {
-  const _NotEnoughBalanceNavigation();
+class _ChooseOtherWalletNavigation extends StatelessWidget {
+  const _ChooseOtherWalletNavigation();
 
   @override
   Widget build(BuildContext context) {

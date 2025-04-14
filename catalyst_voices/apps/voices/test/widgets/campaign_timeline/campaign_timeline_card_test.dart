@@ -90,36 +90,6 @@ void main() {
     );
 
     testWidgets(
-      'calls onExpandedChanged when tapped',
-      (tester) async {
-        var expanded = false;
-        final widget = CampaignTimelineCard(
-          timelineItem: timelineItem,
-          placement: CampaignTimelinePlacement.discovery,
-          onExpandedChanged: (isExpanded) => expanded = isExpanded,
-        );
-
-        await tester.pumpApp(
-          widget,
-          voicesColors: lightVoicesColorScheme,
-        );
-        await tester.pumpAndSettle();
-
-        final gestureDetector = find
-            .descendant(
-              of: find.byType(CampaignTimelineCard),
-              matching: find.byType(GestureDetector),
-            )
-            .first;
-
-        await tester.tap(gestureDetector);
-        await tester.pumpAndSettle();
-
-        expect(expanded, isTrue);
-      },
-    );
-
-    testWidgets(
       'shows ongoing chip for current timeline',
       (tester) async {
         final currentTimelineItem = CampaignTimelineViewModel(

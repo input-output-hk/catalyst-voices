@@ -123,6 +123,7 @@ class _ProposalsPageState extends State<ProposalsPage>
           currentPage: page.page,
           maxResults: page.total,
           itemList: page.items,
+          error: const Optional.empty(),
           isLoading: false,
         );
     }

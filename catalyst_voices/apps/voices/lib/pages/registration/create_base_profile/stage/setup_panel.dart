@@ -39,26 +39,6 @@ class SetupPanel extends StatelessWidget {
   }
 }
 
-class _Title extends StatelessWidget {
-  const _Title();
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final textTheme = theme.textTheme;
-
-    final textStyle = (textTheme.titleMedium ?? const TextStyle()).copyWith(
-      color: theme.colors.textOnPrimaryLevel1,
-    );
-
-    return Text(
-      key: const Key('TitleText'),
-      context.l10n.createBaseProfileSetupTitle,
-      style: textStyle,
-    );
-  }
-}
-
 class _DisplayNameSelector extends StatelessWidget {
   const _DisplayNameSelector();
 
@@ -164,7 +144,7 @@ class _IdeascaleInfoCard extends StatelessWidget {
       key: const Key('IdeascaleInfoCard'),
       icon: VoicesAssets.icons.mailOpen.buildIcon(),
       title: Text(
-        context.l10n.createBaseProfileSetupIdeascaleAccount,
+        context.l10n.createBaseProfileHasIdeascaleAccountAlready,
         key: const Key('InfoCardTitle'),
       ),
       desc: BulletList(
@@ -175,6 +155,21 @@ class _IdeascaleInfoCard extends StatelessWidget {
         spacing: 0,
       ),
       statusIcon: VoicesAssets.icons.informationCircle.buildIcon(),
+    );
+  }
+}
+
+class _Navigation extends StatelessWidget {
+  final bool isNextEnabled;
+
+  const _Navigation({
+    required this.isNextEnabled,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return RegistrationBackNextNavigation(
+      isNextEnabled: isNextEnabled,
     );
   }
 }
@@ -191,17 +186,22 @@ class _NavigationSelector extends StatelessWidget {
   }
 }
 
-class _Navigation extends StatelessWidget {
-  final bool isNextEnabled;
-
-  const _Navigation({
-    required this.isNextEnabled,
-  });
+class _Title extends StatelessWidget {
+  const _Title();
 
   @override
   Widget build(BuildContext context) {
-    return RegistrationBackNextNavigation(
-      isNextEnabled: isNextEnabled,
+    final theme = Theme.of(context);
+    final textTheme = theme.textTheme;
+
+    final textStyle = (textTheme.titleMedium ?? const TextStyle()).copyWith(
+      color: theme.colors.textOnPrimaryLevel1,
+    );
+
+    return Text(
+      key: const Key('TitleText'),
+      context.l10n.createBaseProfileSetupTitle,
+      style: textStyle,
     );
   }
 }

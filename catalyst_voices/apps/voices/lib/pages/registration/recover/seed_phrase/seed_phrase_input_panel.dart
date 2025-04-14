@@ -19,26 +19,54 @@ class SeedPhraseInputPanel extends StatefulWidget {
   State<SeedPhraseInputPanel> createState() => _SeedPhraseInputPanelState();
 }
 
+class _BlocNavigation extends StatelessWidget {
+  final VoidCallback onNextTap;
+
+  const _BlocNavigation({
+    required this.onNextTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocRecoverSelector(
+      selector: (state) => state.isSeedPhraseValid,
+      builder: (context, state) {
+        return RegistrationBackNextNavigation(
+          onNextTap: onNextTap,
+          isNextEnabled: state,
+        );
+      },
+    );
+  }
+}
+
+class _BlocSeedPhraseField extends StatelessWidget {
+  final SeedPhraseFieldController controller;
+  final FocusNode focusNode;
+
+  const _BlocSeedPhraseField({
+    required this.controller,
+    required this.focusNode,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocRecoverSelector<List<String>>(
+      selector: (state) => state.seedPhraseWords,
+      builder: (context, state) {
+        return SeedPhraseField(
+          controller: controller,
+          focusNode: focusNode,
+          wordList: state,
+        );
+      },
+    );
+  }
+}
+
 class _SeedPhraseInputPanelState extends State<SeedPhraseInputPanel> {
   late final SeedPhraseFieldController _controller;
   final _focusNode = FocusNode();
-
-  @override
-  void initState() {
-    super.initState();
-    final recoverState = RegistrationCubit.of(context).state.recoverStateData;
-    final words = recoverState.userSeedPhraseWords;
-
-    _controller = SeedPhraseFieldController(words)
-      ..addListener(_onWordsChanged);
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    _focusNode.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -77,6 +105,29 @@ class _SeedPhraseInputPanelState extends State<SeedPhraseInputPanel> {
     );
   }
 
+  @override
+  void dispose() {
+    _controller.dispose();
+    _focusNode.dispose();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    final recoverState = RegistrationCubit.of(context).state.recoverStateData;
+    final words = recoverState.userSeedPhraseWords;
+
+    _controller = SeedPhraseFieldController(words)
+      ..addListener(_onWordsChanged);
+  }
+
+  void _onWordsChanged() {
+    final words = [..._controller.value];
+
+    RegistrationCubit.of(context).recover.setSeedPhraseWords(words);
+  }
+
   void _recoverAccountAndGoNextStage() {
     final registration = RegistrationCubit.of(context);
 
@@ -86,15 +137,17 @@ class _SeedPhraseInputPanelState extends State<SeedPhraseInputPanel> {
     registration.nextStep();
   }
 
-  Future<void> _uploadSeedPhrase() async {
-    final showUpload = await UploadSeedPhraseConfirmationDialog.show(context);
-    if (showUpload) {
-      await _showUploadDialog();
-    }
+  void _resetControllerWords() {
+    _controller.clear();
+    _focusNode.requestFocus();
   }
 
   Future<void> _showUploadDialog() async {
     final words = await UploadSeedPhraseDialog.show(context);
+
+    if (words == null) {
+      return;
+    }
 
     final isValid = SeedPhrase.isValid(
       words: words,
@@ -112,59 +165,10 @@ class _SeedPhraseInputPanelState extends State<SeedPhraseInputPanel> {
     }
   }
 
-  void _resetControllerWords() {
-    _controller.clear();
-    _focusNode.requestFocus();
-  }
-
-  void _onWordsChanged() {
-    final words = [..._controller.value];
-
-    RegistrationCubit.of(context).recover.setSeedPhraseWords(words);
-  }
-}
-
-class _BlocSeedPhraseField extends StatelessWidget {
-  final SeedPhraseFieldController controller;
-  final FocusNode focusNode;
-
-  const _BlocSeedPhraseField({
-    required this.controller,
-    required this.focusNode,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocRecoverSelector<List<String>>(
-      selector: (state) => state.seedPhraseWords,
-      builder: (context, state) {
-        return SeedPhraseField(
-          controller: controller,
-          focusNode: focusNode,
-          wordList: state,
-        );
-      },
-    );
-  }
-}
-
-class _BlocNavigation extends StatelessWidget {
-  final VoidCallback onNextTap;
-
-  const _BlocNavigation({
-    required this.onNextTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocRecoverSelector(
-      selector: (state) => state.isSeedPhraseValid,
-      builder: (context, state) {
-        return RegistrationBackNextNavigation(
-          onNextTap: onNextTap,
-          isNextEnabled: state,
-        );
-      },
-    );
+  Future<void> _uploadSeedPhrase() async {
+    final showUpload = await UploadSeedPhraseConfirmationDialog.show(context);
+    if (showUpload) {
+      await _showUploadDialog();
+    }
   }
 }
