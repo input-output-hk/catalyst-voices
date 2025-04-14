@@ -142,6 +142,7 @@ final class Dependencies extends DependencyProvider {
         return NewProposalCubit(
           get<CampaignService>(),
           get<ProposalService>(),
+          get<UserObserver>(),
           get<DocumentMapper>(),
         );
       })

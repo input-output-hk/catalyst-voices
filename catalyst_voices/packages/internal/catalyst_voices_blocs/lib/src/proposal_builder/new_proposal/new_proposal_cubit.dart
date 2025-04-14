@@ -14,22 +14,24 @@ class NewProposalCubit extends Cubit<NewProposalState>
     with BlocErrorEmitterMixin<NewProposalState> {
   final CampaignService _campaignService;
   final ProposalService _proposalService;
+  final UserObserver _userObserver;
   final DocumentMapper _documentMapper;
 
   NewProposalCubit(
     this._campaignService,
     this._proposalService,
+    this._userObserver,
     this._documentMapper,
   ) : super(
           const NewProposalState(
             title: ProposalTitle.pure(),
           ),
-        ) {
-    unawaited(getCampaignCategories());
-  }
+        );
 
   Future<DraftRef?> createDraft() async {
     try {
+      emit(state.copyWith(isCreatingProposal: true));
+
       final title = state.title.value;
       final categoryId = state.categoryId;
 
@@ -64,24 +66,36 @@ class NewProposalCubit extends Cubit<NewProposalState>
       _logger.severe('Create draft', error, stackTrace);
       emitError(LocalizedException.create(error));
       return null;
+    } finally {
+      emit(state.copyWith(isCreatingProposal: false));
     }
   }
 
-  Future<void> getCampaignCategories() async {
-    final categories = await _campaignService.getCampaignCategories();
-    final categoriesModel =
-        categories.map(CampaignCategoryDetailsViewModel.fromModel).toList();
-    emit(
-      state.copyWith(
-        categories: categoriesModel,
-        categoryId: Optional(categoriesModel.first.id),
-      ),
-    );
-  }
+  Future<void> load() async {
+    try {
+      emit(NewProposalState.loading());
 
-  void reset() {
-    emit(NewProposalState.reset());
-    unawaited(getCampaignCategories());
+      final account = _userObserver.user.activeAccount;
+      if (account == null) {
+        throw StateError('Account is missing');
+      }
+      final categories = await _getCategories();
+
+      final newState = state.copyWith(
+        isLoading: false,
+        isMissingProposerRole: !account.hasRole(AccountRole.proposer),
+        categories: categories,
+        categoryId: Optional(categories.first.id),
+      );
+
+      emit(newState);
+    } catch (error, stackTrace) {
+      _logger.severe('Load', error, stackTrace);
+
+      // TODO(dtscalac): handle error state as dialog content,
+      // don't emit the error
+      emitError(LocalizedException.create(error));
+    }
   }
 
   void updateSelectedCategory(SignedDocumentRef? categoryId) {
@@ -90,5 +104,10 @@ class NewProposalCubit extends Cubit<NewProposalState>
 
   void updateTitle(ProposalTitle title) {
     emit(state.copyWith(title: title));
+  }
+
+  Future<List<CampaignCategoryDetailsViewModel>> _getCategories() async {
+    final categories = await _campaignService.getCampaignCategories();
+    return categories.map(CampaignCategoryDetailsViewModel.fromModel).toList();
   }
 }
