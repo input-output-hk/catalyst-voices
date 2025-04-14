@@ -49,7 +49,7 @@ class _ExportCatalystKeyConfirmDialogState
           };
         },
       ),
-      negativeText: l10n.cancelAnyways,
+      negativeText: l10n.cancelButtonText,
       positiveText: l10n.exportKey,
     );
   }
