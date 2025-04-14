@@ -1406,6 +1406,10 @@
       }
     }
   },
+  "errorValidationConstsValueBoolMismatch": "Please select this field.",
+  "@errorValidationConstsValueBoolMismatch": {
+    "description": "Validation error when the user entered value does not match a boolean const value, typically a checkbox that asks for legal permission."
+  },
   "errorValidationEnumValuesMismatch": "The value must be one of {enumValues}.",
   "@errorValidationEnumValuesMismatch": {
     "description": "Validation error when the user entered value does not match the enum values",
