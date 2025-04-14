@@ -948,7 +948,7 @@
   "createKeychainSeedPhraseExportConfirmDialogContent": "Before using this feature, please read this {link}",
   "bestPracticesFAQ": "best practices FAQ",
   "exportKey": "Export Key",
-  "createKeychainSeedPhraseStoreConfirmation": "I have written down/downloaded my 12 words",
+  "createKeychainSeedPhraseStoreConfirmation": "I have written down/exported my 12 words",
   "createKeychainSeedPhraseCheckInstructionsTitle": "Write down your Catalyst seed phrase",
   "createKeychainSeedPhraseCheckInstructionsSubtitle": "Next, we're going to make sure that you've written down your Catalyst seed phrase correctly.   \u2028\u2028We don't save your Catalyst seed phrase, so it's important \u2028to make sure you have it right. Thats why we don't trust, we verify before continuing.   \u2028\u2028It's also good practice to get familiar with using a \nseed phrase if you're new to crypto.",
   "createKeychainSeedPhraseCheckSubtitle": "Input your Catalyst seed phrase",
@@ -1388,6 +1388,10 @@
         "type": "String"
       }
     }
+  },
+  "errorValidationConstsValueBoolMismatch": "Please select this field.",
+  "@errorValidationConstsValueBoolMismatch": {
+    "description": "Validation error when the user entered value does not match a boolean const value, typically a checkbox that asks for legal permission."
   },
   "errorValidationEnumValuesMismatch": "The value must be one of {enumValues}.",
   "@errorValidationEnumValuesMismatch": {
