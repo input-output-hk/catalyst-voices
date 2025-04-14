@@ -103,8 +103,6 @@ class _UnlockPasswordPanelState extends State<UnlockPasswordPanel> {
                   .isNextEnabled;
               if (isNextEnabled) {
                 return _createKeychain();
-              } else {
-                return;
               }
             },
           ),
