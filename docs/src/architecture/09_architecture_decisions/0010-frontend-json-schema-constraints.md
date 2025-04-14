@@ -30,7 +30,7 @@ With the complexity of the JSON Schema it's important to understand the constrai
  for the root node the `{parent.nodeId}` is skipped.
 * The app will maintain a set of predefined `nodeIds` for which a custom app logic is added on top of JSON Schema.
 
-#### App custom logic
+### App custom logic
 
 <!-- markdownlint-disable max-one-sentence-per-line -->
 | Document Type         | Node ID           | Property Type | App Needs        |
