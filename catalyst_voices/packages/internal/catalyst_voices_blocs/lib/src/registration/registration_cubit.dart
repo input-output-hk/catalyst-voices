@@ -50,6 +50,7 @@ final class RegistrationCubit extends Cubit<RegistrationState>
         ),
         _walletLinkCubit = WalletLinkCubit(
           registrationService: registrationService,
+          blockchainConfig: blockchainConfig,
         ),
         _recoverCubit = RecoverCubit(
           userService: userService,
@@ -141,7 +142,6 @@ final class RegistrationCubit extends Cubit<RegistrationState>
     try {
       _onRegistrationStateDataChanged(
         _registrationState.copyWith(
-          account: const Optional.empty(),
           isSubmittingTx: true,
         ),
       );
@@ -169,7 +169,6 @@ final class RegistrationCubit extends Cubit<RegistrationState>
 
       _onRegistrationStateDataChanged(
         _registrationState.copyWith(
-          account: Optional(Success(true)),
           isSubmittingTx: false,
         ),
       );
@@ -182,7 +181,7 @@ final class RegistrationCubit extends Cubit<RegistrationState>
 
       _onRegistrationStateDataChanged(
         _registrationState.copyWith(
-          account: Optional(Failure(exception)),
+          canSubmitTx: Optional(Failure(exception)),
           isSubmittingTx: false,
         ),
       );
@@ -193,7 +192,7 @@ final class RegistrationCubit extends Cubit<RegistrationState>
 
       _onRegistrationStateDataChanged(
         _registrationState.copyWith(
-          account: Optional(Failure(exception)),
+          canSubmitTx: Optional(Failure(exception)),
           isSubmittingTx: false,
         ),
       );
@@ -223,7 +222,6 @@ final class RegistrationCubit extends Cubit<RegistrationState>
           canSubmitTx: Optional.of(Success(false)),
           transactionFee: const Optional.empty(),
           isSubmittingTx: false,
-          account: const Optional.empty(),
         ),
       );
 
@@ -285,7 +283,7 @@ final class RegistrationCubit extends Cubit<RegistrationState>
 
       _onRegistrationStateDataChanged(
         _registrationState.copyWith(
-          canSubmitTx: Optional.of(Failure(exception)),
+          canSubmitTx: Optional(Failure(exception)),
           transactionFee: const Optional.empty(),
         ),
       );
