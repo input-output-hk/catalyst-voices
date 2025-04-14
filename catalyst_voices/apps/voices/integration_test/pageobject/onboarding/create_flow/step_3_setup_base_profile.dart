@@ -65,7 +65,7 @@ class SetupBaseProfilePanel extends OnboardingPageBase {
     expect($(ideascaleInfoCard), findsOneWidget);
     expect(
       infoCardTitleLocator.text,
-      (await t()).createBaseProfileSetupIdeascaleAccount,
+      (await t()).createBaseProfileHasIdeascaleAccountAlready,
     );
     expect(
       infoCardDescriptionLocator.text,
