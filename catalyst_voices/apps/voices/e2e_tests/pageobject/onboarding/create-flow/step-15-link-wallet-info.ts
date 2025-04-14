@@ -1,5 +1,5 @@
 import { Locator, Page } from "@playwright/test";
-import { KaychainFinalPanel } from "./step-14-keychain-final";
+import { KeychainFinalPanel } from "./step-14-keychain-final";
 
 export  class LinkWalletInfoPanel {
     page: Page
@@ -13,8 +13,8 @@ export  class LinkWalletInfoPanel {
     }
 
     async goto() {
-        await new KaychainFinalPanel(this.page).goto();
-        await new KaychainFinalPanel(this.page).clickLinkWalletAndRolesBtn();
+        await new KeychainFinalPanel(this.page).goto();
+        await new KeychainFinalPanel(this.page).clickLinkWalletAndRolesBtn();
     }
 
     async clickChooseWalletBtn() {

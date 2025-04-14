@@ -3,11 +3,11 @@ import { GetStartedPanel } from "../step-1-get-started";
 
 export class BaseProfileInfoPanel {
   page: Page;
-  ceateYourBaseProfilebtn: Locator;
+  createYourBaseProfileBtn: Locator;
 
   constructor(page: Page) {
     this.page = page;
-    this.ceateYourBaseProfilebtn = page.getByRole("button", {
+    this.createYourBaseProfileBtn = page.getByRole("button", {
       name: "CreateBaseProfileNext-test",
     });
   }
@@ -16,8 +16,8 @@ export class BaseProfileInfoPanel {
     await new GetStartedPanel(this.page).goto();
     await new GetStartedPanel(this.page).clickCreateNewCatalystKeychain();
   }
-    
+
   async clickCreateBaseProfileBtn() {
-    await this.ceateYourBaseProfilebtn.click();
+    await this.createYourBaseProfileBtn.click();
   }
 }

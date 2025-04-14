@@ -26,19 +26,19 @@ class _AccountKeychainTileState extends State<AccountKeychainTile> {
   Widget build(BuildContext context) {
     return PropertyTile(
       title: context.l10n.catalystKeychain,
-      action: 
-      Semantics( 
+      action: Semantics(
         container: true,
         button: true,
         label: 'RemoveKeychainButton',
         child: VoicesTextButton.danger(
-        key: const Key('RemoveKeychainButton'),
-        style: ButtonStyle(
-          textStyle: WidgetStatePropertyAll(context.textTheme.labelSmall),
+          key: const Key('RemoveKeychainButton'),
+          style: ButtonStyle(
+            textStyle: WidgetStatePropertyAll(context.textTheme.labelSmall),
+          ),
+          onTap: _removeKeychain,
+          child: Text(context.l10n.removeKeychain),
         ),
-        onTap: _removeKeychain,
-        child: Text(context.l10n.removeKeychain),
-      )),
+      ),
       child: VoicesTextField(
         key: const Key('AccountKeychainTextField'),
         controller: _controller,

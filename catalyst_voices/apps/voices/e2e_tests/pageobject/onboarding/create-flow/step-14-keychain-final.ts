@@ -2,7 +2,7 @@ import { Locator, Page } from "@playwright/test";
 import { OnboardingBasePage } from "../onboarding-base-page";
 import { PasswordInputPanel } from "./step-13-password-input";
 
-export class KaychainFinalPanel {
+export class KeychainFinalPanel {
   page: Page;
   linkWalletAndRolesBtn: Locator;
 

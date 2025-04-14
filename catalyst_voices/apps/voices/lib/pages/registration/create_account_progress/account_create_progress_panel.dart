@@ -122,16 +122,17 @@ class _LinkWalletAndRolesButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Semantics( 
+    return Semantics(
       container: true,
       button: true,
       label: 'LinkWalletAndRoles-test', // Stable test identifier
       child: VoicesFilledButton(
-      key: const Key('LinkWalletAndRolesButton'),
-      onTap: onTap,
-      leading: VoicesAssets.icons.wallet.buildIcon(size: 18),
-      child: Text(context.l10n.createKeychainLinkWalletAndRoles),
-    ),);
+        key: const Key('LinkWalletAndRolesButton'),
+        onTap: onTap,
+        leading: VoicesAssets.icons.wallet.buildIcon(size: 18),
+        child: Text(context.l10n.createKeychainLinkWalletAndRoles),
+      ),
+    );
   }
 }
 

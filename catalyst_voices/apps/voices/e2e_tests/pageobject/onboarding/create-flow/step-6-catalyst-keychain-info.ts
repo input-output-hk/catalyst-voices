@@ -16,7 +16,7 @@ export class CatalystKeychainInfoPanel {
     await new BaseProfileFinalPanel(this.page).goto();
     await new BaseProfileFinalPanel(
       this.page
-    ).clickCreateYourCatalystKeychainbtn();
+    ).clickCreateYourCatalystKeychainBtn();
   }
 
   async clickCreateCatalystKeychainNowBtn() {

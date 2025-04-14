@@ -3,11 +3,11 @@ import { AcknowledgementsPanel } from "./step-4-acknowledgements";
 
 export class BaseProfileFinalPanel {
   page: Page;
-  createYourCatalystKeychainbtn: Locator;
+  createYourCatalystKeychainBtn: Locator;
 
   constructor(page: Page) {
     this.page = page;
-    this.createYourCatalystKeychainbtn = page.getByRole("button", {
+    this.createYourCatalystKeychainBtn = page.getByRole("button", {
       name: "CreateKeychain-test",
     });
   }
@@ -17,7 +17,7 @@ export class BaseProfileFinalPanel {
     await new AcknowledgementsPanel(this.page).clickNextButton();
   }
 
-  async clickCreateYourCatalystKeychainbtn() {
-    await this.createYourCatalystKeychainbtn.click();
+  async clickCreateYourCatalystKeychainBtn() {
+    await this.createYourCatalystKeychainBtn.click();
   }
 }
