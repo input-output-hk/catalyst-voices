@@ -2504,5 +2504,20 @@
   "viewProposalCommentsDescription": "Open My proposals in the Discovery Space",
   "@viewProposalCommentsDescription": {
     "description": "Text for the view proposal comments description in the card"
+  },
+  "paginationProposalsCounter": "{from}-{to} of {max, plural, =0{proposals} =1{proposal} other{proposals}}",
+  "@paginationProposalsCounter": {
+    "description": "Below pagination list, next to page switch controls",
+    "placeholders": {
+      "from": {
+        "type": "int"
+      },
+      "to": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
   }
 }

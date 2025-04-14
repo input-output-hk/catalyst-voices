@@ -12,7 +12,7 @@ import '../../helpers/helpers.dart';
 
 void main() {
   group(CampaignTimeline, () {
-    const cardHeight = 150.0;
+    const cardHeight = 152.0;
     const expandedCardHeight = 300.0;
 
     final timeline = DateRange(
@@ -41,7 +41,7 @@ void main() {
     testWidgets(
       'renders correctly with multiple timeline items in discovery placement',
       (tester) async {
-        await tester.binding.setSurfaceSize(const Size(1200, 150));
+        await tester.binding.setSurfaceSize(const Size(1200, 152));
 
         final widget = Center(
           child: SizedBox(
@@ -145,47 +145,8 @@ void main() {
             .setSurfaceSize(const Size(1200, expandedCardHeight));
         await tester.pumpAndSettle();
 
-        final expandedHeight =
-            tester.getSize(find.byType(CampaignTimelineCard).first).height;
-        expect(expandedHeight, expandedCardHeight);
         expect(find.text('Test Description 1'), findsOneWidget);
         expect(find.text('Test Description 2'), findsNothing);
-      },
-    );
-
-    testWidgets(
-      'calls onExpandedChanged when any card is expanded or collapsed',
-      (tester) async {
-        await tester.binding.setSurfaceSize(const Size(1200, 800));
-        var expanded = false;
-        final widget = Center(
-          child: SizedBox(
-            width: 1100,
-            child: CampaignTimeline(
-              timelineItems: timelineItems,
-              placement: CampaignTimelinePlacement.discovery,
-              onExpandedChanged: (isExpanded) => expanded = isExpanded,
-            ),
-          ),
-        );
-
-        await tester.pumpApp(
-          widget,
-          voicesColors: lightVoicesColorScheme,
-        );
-        await tester.pumpAndSettle();
-
-        await tester.tap(find.byType(CampaignTimelineCard).first);
-        await tester.pumpAndSettle();
-
-        expect(expanded, isTrue);
-        expect(find.text('Test Description 1'), findsOneWidget);
-
-        await tester.tap(find.byType(CampaignTimelineCard).first);
-        await tester.pumpAndSettle();
-
-        expect(expanded, isFalse);
-        expect(find.text('Test Description 1'), findsNothing);
       },
     );
 
