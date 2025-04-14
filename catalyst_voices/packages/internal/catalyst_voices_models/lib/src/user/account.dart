@@ -114,6 +114,10 @@ final class Account extends Equatable {
     );
   }
 
+  bool hasRole(AccountRole role) {
+    return roles.contains(role);
+  }
+
   bool isSameRef(Account other) => catalystId.isReferringTo(other);
 }
 
