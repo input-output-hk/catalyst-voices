@@ -106,7 +106,7 @@ impl CatalystRBACTokenV1 {
             return Err(anyhow!("Catalyst ID must have nonce"));
         }
         let (role, rotation) = catalyst_id.role_and_rotation();
-        if role != RoleIndex::DEFAULT {
+        if role != RoleIndex::ROLE_0 {
             return Err(anyhow!("Catalyst ID mustn't have role specified"));
         }
         if rotation != KeyRotation::DEFAULT {

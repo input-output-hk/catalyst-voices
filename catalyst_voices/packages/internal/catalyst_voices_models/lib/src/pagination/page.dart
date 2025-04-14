@@ -29,6 +29,15 @@ base class Page<E> extends Equatable {
         items,
       ];
 
+  Page<T> copyWithItems<T>(List<T> items) {
+    return Page<T>(
+      page: page,
+      maxPerPage: maxPerPage,
+      total: total,
+      items: items,
+    );
+  }
+
   Page<T> map<T>(T Function(E e) mapper) {
     return Page<T>(
       page: page,
