@@ -1,4 +1,3 @@
-import 'package:catalyst_voices/pages/registration/scroll_control_widget.dart';
 import 'package:catalyst_voices/pages/registration/widgets/registration_stage_navigation.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
@@ -14,6 +13,7 @@ class SetupPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scrollController = ScrollController();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -21,9 +21,12 @@ class SetupPanel extends StatelessWidget {
         const _Title(),
         Expanded(
           child: FocusScope(
-            child: ScrollbarVisibilityWidget(
-              builder: (controller) => ListView(
-                controller: controller,
+            child: VoicesScrollbar(
+              controller: scrollController,
+              alwaysVisible: true,
+              padding: const EdgeInsets.only(left: 10),
+              child: ListView(
+                controller: scrollController,
                 padding: const EdgeInsets.symmetric(vertical: 24),
                 children: const [
                   _DisplayNameSelector(),
