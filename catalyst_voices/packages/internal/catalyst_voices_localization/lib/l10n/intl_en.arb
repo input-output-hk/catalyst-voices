@@ -775,8 +775,14 @@
   "createBaseProfileSetupEmailLabel": "Your e-mail",
   "createBaseProfileSetupEmailHint": "E-mail",
   "createBaseProfileSetupEmailHelper": "Please provide e-mail used for your Ideascale.",
-  "createBaseProfileSetupIdeascaleAccount": "Ideascale account",
-  "createBaseProfileSetupIdeascaleReason1": "Please use the e-mail you use on cardano.ideascale.com",
+  "createBaseProfileHasIdeascaleAccountAlready": "Submitted proposals in Ideascale before",
+  "@createBaseProfileHasIdeascaleAccountAlready": {
+    "description": "Label for info card to let user know to use the same email as in Ideascale if they have already submitted a proposal there."
+  },
+  "createBaseProfileSetupIdeascaleReason1": "Be sure to use the same email associated with your Ideascale account",
+  "@createBaseProfileSetupIdeascaleReason1": {
+    "description": "Description for info card to let user know to use the same email as in Ideascale if they have already submitted a proposal there."
+  },
   "createBaseProfileAcknowledgementsTitle": "Mandatory Acknowledgements",
   "createBaseProfileAcknowledgementsToS": "I confirm that I have read and agree to be bound by {tos}.",
   "catalystTos": "Project Catalyst Terms and Conditions",
