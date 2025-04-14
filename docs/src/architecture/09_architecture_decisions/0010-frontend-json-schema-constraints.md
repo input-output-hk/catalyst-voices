@@ -32,6 +32,7 @@ With the complexity of the JSON Schema it's important to understand the constrai
 
 App custom logic:
 
+<!-- markdownlint-disable max-one-sentence-per-line -->
 | Document Type         | Node ID           | Property Type | App Needs        |
 |----------------|--------------------------|---------------|------------------|
 | `ProposalTemplate` | `setup.title.title` | `string` | Programmatically prefill the text in a `title` property. The app needs to programmatically lookup in the template the related property. |
@@ -45,13 +46,15 @@ App custom logic:
 | `ProposalTemplate` | `milestones.milestones` | `object` | Show the milestone count in the UI components. The app needs to programmatically lookup in the template the related property. |
 | `ProposalTemplate` | `milestones.milestones.milestone_list` | `array` | Show the milestone count in the UI components. The app needs to programmatically lookup in the template the related property. |
 | `ProposalTemplate` | `theme.theme.grouped_tag` | `object` | Show the proposal theme in the UI components. The app needs to programmatically lookup in the template the related property. |
+<!-- markdownlint-enable max-one-sentence-per-line -->
 
 ## Risks
 
 * Failure to understand app constraints will cause erroneous behavior if the document template
  is modified in a way that prevents the app from looking up predefined properties.
 * I.e. the UI components can start showing placeholders instead of actual titles because
-the app won't be able to lookup the related property. The same is true for other properties listed above.
+ the app won't be able to lookup the related property.
+ The same is true for other properties listed above.
 
 ## Consequences
 
