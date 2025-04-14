@@ -1,17 +1,16 @@
-import 'package:catalyst_voices/widgets/buttons/voices_buttons.dart';
+import 'package:catalyst_voices/widgets/buttons/voices_icon_button.dart';
 import 'package:catalyst_voices/widgets/common/tab_bar_stack_view.dart';
-import 'package:catalyst_voices/widgets/headers/section_header.dart';
 import 'package:catalyst_voices/widgets/widgets.dart' show SidebarScaffold;
+import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:flutter/material.dart';
 
 /// Defines usual space panel. This widget is opinionated and should
 /// be used together with [SidebarScaffold].
 ///
-/// Always have [name], [tabs] and tabs content [SpaceSidePanelTab.body].
+/// Always have [tabs] and tabs content [SpaceSidePanelTab.body].
 class SpaceSidePanel extends StatefulWidget {
   final bool isLeft;
-  final String name;
   final VoidCallback? onCollapseTap;
   final TabController? tabController;
   final List<SpaceSidePanelTab> tabs;
@@ -20,7 +19,6 @@ class SpaceSidePanel extends StatefulWidget {
   const SpaceSidePanel({
     super.key,
     required this.isLeft,
-    required this.name,
     this.onCollapseTap,
     this.tabController,
     required this.tabs,
@@ -75,24 +73,24 @@ class _Container extends StatelessWidget {
 }
 
 class _Header extends StatelessWidget {
-  final String name;
   final VoidCallback? onCollapseTap;
   final bool isLeft;
 
   const _Header({
-    required this.name,
     this.onCollapseTap,
     required this.isLeft,
   });
 
   @override
   Widget build(BuildContext context) {
-    return SectionHeader(
-      leading: isLeft ? LeftArrowButton(onTap: onCollapseTap) : null,
-      title: Text(name),
-      trailing: [
-        if (!isLeft) RightArrowButton(onTap: onCollapseTap),
-      ],
+    return Align(
+      alignment: isLeft ? Alignment.centerLeft : Alignment.centerRight,
+      child: VoicesIconButton(
+        onTap: onCollapseTap,
+        child: isLeft
+            ? VoicesAssets.icons.leftRailToggle.buildIcon()
+            : VoicesAssets.icons.rightRailToggle.buildIcon(),
+      ),
     );
   }
 }
@@ -109,9 +107,10 @@ class _SpaceSidePanelState extends State<SpaceSidePanel>
         children: [
           if (widget.isLeft)
             Positioned(
-              top: 28,
-              left: 24,
-              child: RightArrowButton(
+              top: 24,
+              left: 16,
+              child: VoicesIconButton(
+                child: VoicesAssets.icons.leftRailToggle.buildIcon(),
                 onTap: () {
                   _controller.reverse();
                 },
@@ -119,9 +118,10 @@ class _SpaceSidePanelState extends State<SpaceSidePanel>
             )
           else
             Positioned(
-              top: 28,
+              top: 24,
               right: 16,
-              child: LeftArrowButton(
+              child: VoicesIconButton(
+                child: VoicesAssets.icons.rightRailToggle.buildIcon(),
                 onTap: () {
                   _controller.reverse();
                 },
@@ -140,7 +140,6 @@ class _SpaceSidePanelState extends State<SpaceSidePanel>
                   mainAxisSize: MainAxisSize.max,
                   children: [
                     _Header(
-                      name: widget.name,
                       onCollapseTap: () {
                         _controller.forward();
                         widget.onCollapseTap?.call();
