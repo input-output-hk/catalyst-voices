@@ -9,6 +9,8 @@ class UnlockPasswordForm extends StatelessWidget {
   final bool showError;
   final PasswordStrength passwordStrength;
   final bool showPasswordStrength;
+  final ValueChanged<String>? onSubmitted;
+
 
   const UnlockPasswordForm({
     super.key,
@@ -17,6 +19,7 @@ class UnlockPasswordForm extends StatelessWidget {
     this.showError = false,
     this.passwordStrength = PasswordStrength.weak,
     this.showPasswordStrength = false,
+    this.onSubmitted,
   });
 
   @override
@@ -33,6 +36,7 @@ class UnlockPasswordForm extends StatelessWidget {
           controller: confirmPasswordController,
           showError: showError,
           minimumLength: PasswordStrength.minimumLength,
+          onSubmitted: onSubmitted,
         ),
         const Spacer(),
         const SizedBox(height: 22),
@@ -69,11 +73,13 @@ class _ConfirmUnlockPasswordTextField extends StatelessWidget {
   final TextEditingController controller;
   final bool showError;
   final int minimumLength;
+  final ValueChanged<String>? onSubmitted;
 
   const _ConfirmUnlockPasswordTextField({
     required this.controller,
     this.showError = false,
     required this.minimumLength,
+    this.onSubmitted,
   });
 
   @override
@@ -86,6 +92,7 @@ class _ConfirmUnlockPasswordTextField extends StatelessWidget {
         helperText: context.l10n.xCharactersMinimum(minimumLength),
         errorText: showError ? context.l10n.passwordDoNotMatch : null,
       ),
+      onSubmitted: onSubmitted,
     );
   }
 }
