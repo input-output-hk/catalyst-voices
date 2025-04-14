@@ -120,6 +120,8 @@ async fn retrieve_full_signed_doc(doc: &FullSignedDoc) {
         .await
         .unwrap();
     assert_eq!(doc, &res_doc);
+    let res_doc = FullSignedDoc::retrieve(doc.id(), None).await.unwrap();
+    assert_eq!(doc, &res_doc);
 }
 
 async fn filter_by_id(doc: &FullSignedDoc) {
