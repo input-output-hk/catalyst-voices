@@ -100,6 +100,7 @@ final class RecoverCubit extends Cubit<RecoverStateData>
           address: WalletAddressFormatter.formatShort(walletInfo.address),
           clipboardAddress: walletInfo.address.toBech32(),
           showLowBalance: false,
+          showExpectedNetworkId: null,
         ),
       );
 

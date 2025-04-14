@@ -134,11 +134,13 @@ final class RegistrationServiceImpl implements RegistrationService {
     final enabledWallet = await wallet.enable();
     final balance = await enabledWallet.getBalance();
     final address = await enabledWallet.getChangeAddress();
+    final networkId = await enabledWallet.getNetworkId();
 
     return WalletInfo(
       metadata: WalletMetadata.fromCardanoWallet(wallet),
       balance: balance.coin,
       address: address,
+      networkId: networkId,
     );
   }
 
@@ -157,6 +159,13 @@ final class RegistrationServiceImpl implements RegistrationService {
     try {
       final config = _blockchainConfig.transactionBuilderConfig;
       final enabledWallet = await wallet.enable();
+      final walletNetworkId = await enabledWallet.getNetworkId();
+      if (walletNetworkId != networkId) {
+        throw RegistrationNetworkIdMismatchException(
+          targetNetworkId: networkId,
+        );
+      }
+
       final changeAddress = await enabledWallet.getChangeAddress();
       final rewardAddresses = await enabledWallet.getRewardAddresses();
       final utxos = await enabledWallet.getUtxos(
@@ -244,6 +253,7 @@ final class RegistrationServiceImpl implements RegistrationService {
       metadata: const WalletMetadata(name: 'Recovered wallet'),
       balance: const Coin(0),
       address: address,
+      networkId: NetworkId.testnet,
     );
   }
 
@@ -336,6 +346,15 @@ final class RegistrationServiceImpl implements RegistrationService {
     required Transaction unsignedTx,
   }) async {
     final enabledWallet = await wallet.enable();
+    final walletNetworkId = await enabledWallet.getNetworkId();
+    final targetNetworkId = unsignedTx.body.networkId;
+
+    if (targetNetworkId != null && walletNetworkId != targetNetworkId) {
+      throw RegistrationNetworkIdMismatchException(
+        targetNetworkId: targetNetworkId,
+      );
+    }
+
     final witnessSet = await enabledWallet.signTx(transaction: unsignedTx);
 
     final signedTx = Transaction(
@@ -351,11 +370,13 @@ final class RegistrationServiceImpl implements RegistrationService {
 
     final balance = await enabledWallet.getBalance();
     final address = await enabledWallet.getChangeAddress();
+    final networkId = await enabledWallet.getNetworkId();
 
     return WalletInfo(
       metadata: WalletMetadata.fromCardanoWallet(wallet),
       balance: balance.coin,
       address: address,
+      networkId: networkId,
     );
   }
 }
