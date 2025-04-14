@@ -59,7 +59,12 @@ impl RbacRegistrationChain {
     /// Creates a new registration chain instance.
     pub fn new(info: &ChainInfo) -> anyhow::Result<Self> {
         let catalyst_id = info.chain.catalyst_id().clone().into();
-        let stake_addresses = info.chain.role_0_stake_addresses();
+        let stake_addresses = info
+            .chain
+            .role_0_stake_addresses()
+            .into_iter()
+            .map(Into::into)
+            .collect();
         let last_persistent_txn = info.last_persistent_txn.map(Into::into);
         let last_volatile_txn = info.last_volatile_txn.map(Into::into);
         let purpose = info
@@ -74,6 +79,7 @@ impl RbacRegistrationChain {
 
         Ok(Self {
             catalyst_id,
+            stake_addresses,
             last_persistent_txn,
             last_volatile_txn,
             purpose,
