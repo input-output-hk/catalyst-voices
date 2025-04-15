@@ -64,7 +64,7 @@ def generate_cat_id(network: str, subnet: str, role_id: RoleID, pk_hex: str):
     if role_id == RoleID.ROLE_0:
         return f"{prefix}{nonce}@{subnet}{network}/{role0_pk_b64}"
 
-    return f"{prefix}{nonce}@{subnet}{network}/{role0_pk_b64}/{role_id}/1"
+    return f"{prefix}{nonce}@{subnet}{network}/{role0_pk_b64}/{role_id}"
 
 
 def generate_rbac_auth_token(
