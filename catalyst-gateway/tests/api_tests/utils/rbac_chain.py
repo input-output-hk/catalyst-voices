@@ -33,11 +33,17 @@ class RBACChain:
 
     # returns a role's catalyst id, with the provided role secret key
     def cat_id_for_role(self, role_id: RoleID) -> (str, str):
-        role_sk = self.keys_map[f"{role_id}"]["sk"]
+        role_data = self.keys_map[f"{role_id}"]
         role_0_pk = self.keys_map[f"{RoleID.ROLE_0}"]["pk"]
         return (
-            generate_cat_id("cardano", self.network, role_id, role_0_pk),
-            role_sk,
+            generate_cat_id(
+                "cardano",
+                self.network,
+                role_id,
+                role_0_pk,
+                role_data["rotation"],
+            ),
+            role_data["sk"],
         )
 
 
@@ -54,7 +60,9 @@ def rbac_chain_factory():
     return __rbac_chain_factory
 
 
-def generate_cat_id(network: str, subnet: str, role_id: RoleID, pk_hex: str):
+def generate_cat_id(
+    network: str, subnet: str, role_id: RoleID, pk_hex: str, rotation: int
+):
     pk = bytes.fromhex(pk_hex)[:32]
     prefix = "catid.:"
     nonce = int(datetime.now(timezone.utc).timestamp())
@@ -64,7 +72,7 @@ def generate_cat_id(network: str, subnet: str, role_id: RoleID, pk_hex: str):
     if role_id == RoleID.ROLE_0:
         return f"{prefix}{nonce}@{subnet}{network}/{role0_pk_b64}"
 
-    return f"{prefix}{nonce}@{subnet}{network}/{role0_pk_b64}/{role_id}"
+    return f"{prefix}{nonce}@{subnet}{network}/{role0_pk_b64}/{role_id}/{rotation}"
 
 
 def generate_rbac_auth_token(
@@ -80,7 +88,7 @@ def generate_rbac_auth_token(
     bip32_ed25519_sk = BIP32ED25519PrivateKey(sk, chain_code)
     bip32_ed25519_pk = BIP32ED25519PublicKey(pk, chain_code)
 
-    cat_id = generate_cat_id(network, subnet, RoleID.ROLE_0, pk_hex)
+    cat_id = generate_cat_id(network, subnet, RoleID.ROLE_0, pk_hex, 0)
 
     signature = bip32_ed25519_sk.sign(cat_id.encode())
     bip32_ed25519_pk.verify(signature, cat_id.encode())
