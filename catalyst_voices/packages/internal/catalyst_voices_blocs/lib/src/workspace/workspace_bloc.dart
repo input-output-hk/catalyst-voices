@@ -77,10 +77,12 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     try {
       emit(state.copyWith(isLoading: true));
       await _proposalService.deleteDraftProposal(event.ref);
+      emit(state.copyWith(userProposals: _removeProposal(event.ref)));
       emitSignal(const DeletedDraftWorkspaceSignal());
     } catch (error, stackTrace) {
       _logger.severe('Delete proposal failed', error, stackTrace);
       emitError(const LocalizedProposalDeletionException());
+    } finally {
       emit(state.copyWith(isLoading: false));
     }
   }
@@ -145,12 +147,13 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
         proposalRef: proposal.selfRef as SignedDocumentRef,
         categoryId: proposal.categoryId,
       );
+      emit(state.copyWith(userProposals: _removeProposal(event.ref)));
       emitSignal(const ForgetProposalSuccessWorkspaceSignal());
     } catch (e, stackTrace) {
       emitError(LocalizedException.create(e));
-      emit(state.copyWith(isLoading: false));
-
       _logger.severe('Error forgetting proposal', e, stackTrace);
+    } finally {
+      emit(state.copyWith(isLoading: false));
     }
   }
 
@@ -176,10 +179,11 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
       emitSignal(ImportedProposalWorkspaceSignal(proposalRef: ref));
     } catch (error, stackTrace) {
       _logger.severe('Importing proposal failed', error, stackTrace);
-      emitError(LocalizedException.create(error));
-    } finally {
       emit(state.copyWith(isLoading: false));
-    }
+      emitError(LocalizedException.create(error));
+    } 
+    // We don't need to emit isLoading false here because it will be emitted
+    // in the stream subscription.
   }
 
   Future<void> _loadProposals(
@@ -193,6 +197,13 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
         userProposals: event.proposals,
       ),
     );
+  }
+
+  List<Proposal> _removeProposal(
+    DocumentRef proposalRef,
+  ) {
+    return [...state.userProposals]
+      ..removeWhere((e) => e.selfRef.id == proposalRef.id);
   }
 
   void _setupProposalsSubscription() {

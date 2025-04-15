@@ -8,49 +8,48 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
 void main() {
-  late MockCampaignService mockCampaignService;
-  late MockProposalService mockProposalService;
-  late MockDocumentMapper mockDocumentMapper;
-  late MockDownloaderService mockDownloaderService;
-
-  late WorkspaceBloc workspaceBloc;
-
-  final proposalRef = SignedDocumentRef.generateFirstRef();
-  final documentData = DocumentData(
-    metadata: DocumentDataMetadata(
-      type: DocumentType.proposalDocument,
-      selfRef: proposalRef,
-      template: SignedDocumentRef.generateFirstRef(),
-      categoryId: SignedDocumentRef.generateFirstRef(),
-    ),
-    content: const DocumentDataContent({}),
-  );
-
-  setUpAll(() {
-    registerFallbackValue(SignedDocumentRef.generateFirstRef());
-    registerFallbackValue(documentData);
-    registerFallbackValue(Uint8List(0));
-  });
-
-  setUp(() async {
-    mockCampaignService = MockCampaignService();
-    mockProposalService = MockProposalService();
-    mockDocumentMapper = MockDocumentMapper();
-    mockDownloaderService = MockDownloaderService();
-
-    workspaceBloc = WorkspaceBloc(
-      mockCampaignService,
-      mockProposalService,
-      mockDocumentMapper,
-      mockDownloaderService,
-    );
-  });
-
-  tearDown(() async {
-    await workspaceBloc.close();
-  });
-
   group(WorkspaceBloc, () {
+    late MockCampaignService mockCampaignService;
+    late MockProposalService mockProposalService;
+    late MockDocumentMapper mockDocumentMapper;
+    late MockDownloaderService mockDownloaderService;
+
+    late WorkspaceBloc workspaceBloc;
+
+    final proposalRef = SignedDocumentRef.generateFirstRef();
+    final documentData = DocumentData(
+      metadata: DocumentDataMetadata(
+        type: DocumentType.proposalDocument,
+        selfRef: proposalRef,
+        template: SignedDocumentRef.generateFirstRef(),
+        categoryId: SignedDocumentRef.generateFirstRef(),
+      ),
+      content: const DocumentDataContent({}),
+    );
+
+    setUpAll(() {
+      registerFallbackValue(SignedDocumentRef.generateFirstRef());
+      registerFallbackValue(documentData);
+      registerFallbackValue(Uint8List(0));
+    });
+
+    setUp(() async {
+      mockCampaignService = MockCampaignService();
+      mockProposalService = MockProposalService();
+      mockDocumentMapper = MockDocumentMapper();
+      mockDownloaderService = MockDownloaderService();
+
+      workspaceBloc = WorkspaceBloc(
+        mockCampaignService,
+        mockProposalService,
+        mockDocumentMapper,
+        mockDownloaderService,
+      );
+    });
+
+    tearDown(() async {
+      await workspaceBloc.close();
+    });
     test('initial state is correct', () {
       expect(workspaceBloc.state, const WorkspaceState());
     });
