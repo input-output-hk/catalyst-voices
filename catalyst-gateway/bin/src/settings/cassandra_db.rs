@@ -41,6 +41,7 @@ pub(crate) struct EnvVars {
     pub(crate) url: StringEnvVar,
 
     /// The Namespace of Cassandra DB.
+    #[allow(dead_code)]
     pub(crate) namespace: StringEnvVar,
 
     /// The `UserName` to use for the Cassandra DB.
@@ -118,7 +119,7 @@ impl EnvVars {
 
         info!(
             url = self.url.as_str(),
-            namespace = db::index::schema::namespace(self, network)?,
+            namespace = db::index::schema::namespace(persistent, network)?,
             auth = auth,
             tls = self.tls.to_string(),
             cert = tls_cert,

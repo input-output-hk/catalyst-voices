@@ -365,7 +365,7 @@ async fn retry_init(cfg: cassandra_db::EnvVars, network: Network, persistent: bo
         };
 
         // Set up the Schema for it.
-        if let Err(error) = create_schema(&mut session.clone(), &cfg, network).await {
+        if let Err(error) = create_schema(&mut session.clone(), &cfg, persistent, network).await {
             error!(
                 db_type = db_type,
                 network = %network,
