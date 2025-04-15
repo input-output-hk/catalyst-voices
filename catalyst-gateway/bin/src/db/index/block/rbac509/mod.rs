@@ -7,6 +7,7 @@ pub(crate) mod insert_rbac509_invalid;
 
 use std::sync::Arc;
 
+use anyhow::{bail, Context};
 use cardano_blockchain_types::{
     Cip0134Uri, MultiEraBlock, Slot, StakeAddress, TransactionId, TxnIndex,
 };
@@ -99,9 +100,21 @@ impl Rbac509InsertQuery {
             );
         }
 
-        let Some(catalyst_id) = catalyst_id(session, &cip509, txn_hash, slot, index).await else {
-            error!("Unable to determine Catalyst id for registration: slot = {slot:?}, index = {index:?}, txn_hash = {txn_hash:?}");
-            return;
+        let catalyst_id = match catalyst_id(
+            session,
+            &cip509,
+            txn_hash,
+            slot,
+            index,
+            block.is_immutable(),
+        )
+        .await
+        {
+            Ok(v) => v,
+            Err(e) => {
+                error!("Unable to determine Catalyst id for registration: slot = {slot:?}, index = {index:?}, txn_hash = {txn_hash:?}: {e:?}");
+                return;
+            },
         };
 
         let previous_transaction = cip509.previous_transaction();
@@ -199,29 +212,52 @@ impl Rbac509InsertQuery {
 
 /// Returns a Catalyst ID of the given registration.
 async fn catalyst_id(
-    session: &Arc<CassandraSession>, cip509: &Cip509, txn_hash: TransactionId, slot: Slot,
-    index: TxnIndex,
-) -> Option<IdUri> {
-    use crate::db::index::queries::rbac::get_catalyst_id_from_transaction_id::{
-        cache_for_transaction_id, Query,
-    };
+    session: &Arc<CassandraSession>, cip509: &Cip509, txn_id: TransactionId, slot: Slot,
+    index: TxnIndex, is_immutable: bool,
+) -> anyhow::Result<IdUri> {
+    use crate::db::index::queries::rbac::get_catalyst_id_from_transaction_id::cache_for_transaction_id;
 
     let id = match cip509.previous_transaction() {
-        Some(previous) => {
-            Query::get_latest(session, previous.into())
-                .await
-                .inspect_err(|e| error!("{e:?}"))
-                .ok()
-                .flatten()?
-                .catalyst_id
-                .into()
+        Some(previous) => query_catalyst_id(session, previous, is_immutable).await?,
+        None => {
+            cip509
+                .catalyst_id()
+                .context("Empty Catalyst ID in root RBAC registration")?
+                .as_short_id()
         },
-        None => cip509.catalyst_id()?.as_short_id(),
     };
 
-    cache_for_transaction_id(txn_hash, id.clone(), slot, index);
+    cache_for_transaction_id(txn_id, id.clone(), slot, index);
 
-    Some(id)
+    Ok(id)
+}
+
+/// Queries a Catalyst ID from the database by the given transaction ID.
+async fn query_catalyst_id(
+    session: &Arc<CassandraSession>, txn_id: TransactionId, is_immutable: bool,
+) -> anyhow::Result<IdUri> {
+    use crate::db::index::queries::rbac::get_catalyst_id_from_transaction_id::Query;
+
+    if let Some(q) = Query::get_latest(session, txn_id.into())
+        .await
+        .context("Failed to query Catalyst ID from transaction ID")?
+    {
+        Ok(q.catalyst_id.into())
+    } else {
+        if is_immutable {
+            bail!("Unable to find Catalyst ID in the persistent DB");
+        }
+
+        // If this block is a volatile/mutable one then try to look up a Catalyst ID in the
+        // persistent database.
+        let persistent_session =
+            CassandraSession::get(true).context("Failed to get persistent DB session")?;
+        Query::get_latest(&persistent_session, txn_id.into())
+            .await
+            .transpose()
+            .context("Unable to find Catalyst ID in the persistent DB")?
+            .map(|q| q.catalyst_id.into())
+    }
 }
 
 /// Returns stake addresses of the role 0.
