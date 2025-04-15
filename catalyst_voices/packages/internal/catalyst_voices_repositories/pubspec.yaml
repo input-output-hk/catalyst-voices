@@ -41,7 +41,6 @@ dependencies:
   uuid_plus: ^0.1.0
 
 dev_dependencies:
-  analyzer: 7.3.0
   build_runner: ^2.4.12
   catalyst_analysis: ^3.0.0
   chopper_generator: ^8.0.4
