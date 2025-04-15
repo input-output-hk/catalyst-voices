@@ -31,8 +31,8 @@ dependencies:
   webdriver: ^3.0.3
 
 dev_dependencies:
-  catalyst_analysis: ^3.0.0
   analyzer: 7.3.0
+  catalyst_analysis: ^3.0.0
 
 flutter:
   uses-material-design: true

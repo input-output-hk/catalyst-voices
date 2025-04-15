@@ -7,6 +7,6 @@ environment:
   sdk: ">=3.5.0 <4.0.0"
 
 dev_dependencies:
+  analyzer: 7.3.0
   catalyst_analysis:
     path: ../
-  analyzer: 7.3.0
