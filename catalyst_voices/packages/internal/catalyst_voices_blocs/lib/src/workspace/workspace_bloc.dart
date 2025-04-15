@@ -177,8 +177,9 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     } catch (error, stackTrace) {
       _logger.severe('Importing proposal failed', error, stackTrace);
       emitError(LocalizedException.create(error));
+    } finally {
+      emit(state.copyWith(isLoading: false));
     }
-    emit(state.copyWith(isLoading: false));
   }
 
   Future<void> _loadProposals(

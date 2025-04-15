@@ -412,7 +412,6 @@ final class ProposalServiceImpl implements ProposalService {
 
   @override
   Stream<List<Proposal>> watchUserProposals() async* {
-    
     yield* _userService.watchUser.distinct().switchMap((user) {
       final authorId = user.activeAccount?.catalystId;
       if (!_isProposer(user) || authorId == null) {
