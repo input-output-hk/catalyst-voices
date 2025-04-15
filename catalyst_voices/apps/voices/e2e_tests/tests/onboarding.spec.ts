@@ -16,8 +16,8 @@ test(
     const page = browser.pages()[0];
 
     // await new WalletListPage(page).clickEnableWallet(walletConfig.extension.Name);
-    await page.goto("http://localhost:56499/m4/discovery");
-    await new WalletListPanel(page).goto();
+    await page.goto("http://localhost:51709/m4/discovery");
+    await new WalletListPanel(page).goto('test1234');
     const [walletPopup] = await Promise.all([
       browser.waitForEvent("page"),
       new WalletListPanel(page).clickYoroiWallet(),
@@ -37,8 +37,7 @@ test(
 );
 
 test("Refactored restore flow demo", async ({ page }) => {
-  await new UnlockPasswordSuccessPanel(page).goto();
+  await page.goto("http://localhost:51709/m4/discovery");
+  await new UnlockPasswordSuccessPanel(page).goto("test1234");
 });
-test("Refactored create flow demo", async ({ page }) => {
-  await new WalletListPanel(page).goto();
-});
+

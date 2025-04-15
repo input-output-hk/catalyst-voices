@@ -167,7 +167,7 @@ class _Navigation extends StatelessWidget {
       children: [
         Semantics(
           container: true,
-          label: 'SetUnlockPasswordButton',
+          label: 'Set unlock password for this device',
           child: VoicesFilledButton(
             key: const Key('SetUnlockPasswordButton'),
             onTap: isNextEnabled

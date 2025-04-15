@@ -50,7 +50,7 @@ class RecoverMethodPanel extends StatelessWidget {
                   (method) {
                     return Semantics(
                       container: true,
-                      label: 'Restore seedphrase',
+                      label: method._getTitle(context.l10n),
                       child: RegistrationTile(
                         key: ValueKey(method),
                         icon: method._icon,

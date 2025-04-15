@@ -1,4 +1,5 @@
 import { Locator, Page } from "@playwright/test";
+import intlEn from "../localization-util";
 import { AcknowledgementsPanel } from "./step-4-acknowledgements";
 
 export class BaseProfileFinalPanel {
@@ -8,7 +9,7 @@ export class BaseProfileFinalPanel {
   constructor(page: Page) {
     this.page = page;
     this.createYourCatalystKeychainBtn = page.getByRole("button", {
-      name: "CreateKeychain-test",
+      name: intlEn.accountCreationSplashTitle,
     });
   }
 

@@ -20,9 +20,6 @@ class IntroPanel extends StatelessWidget {
         ),
         const Spacer(),
         Semantics(
-          container: true,
-          button: true,
-          label: 'ChooseCardanoWalletButton',
           child: VoicesFilledButton(
             key: const Key('ChooseCardanoWalletButton'),
             leading: VoicesAssets.icons.wallet.buildIcon(),

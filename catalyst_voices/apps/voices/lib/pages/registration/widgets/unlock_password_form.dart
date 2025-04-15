@@ -57,12 +57,15 @@ class _UnlockPasswordTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return VoicesPasswordTextField(
-      key: const Key('PasswordInputField'),
-      controller: controller,
-      textInputAction: TextInputAction.next,
-      decoration: VoicesTextFieldDecoration(
-        labelText: context.l10n.enterPassword,
+    return Semantics(
+      container: true,
+      child: VoicesPasswordTextField(
+        key: const Key('PasswordInputField'),
+        controller: controller,
+        textInputAction: TextInputAction.next,
+        decoration: VoicesTextFieldDecoration(
+          labelText: context.l10n.enterPassword,
+        ),
       ),
     );
   }
@@ -83,15 +86,18 @@ class _ConfirmUnlockPasswordTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return VoicesPasswordTextField(
-      key: const Key('PasswordConfirmInputField'),
-      controller: controller,
-      decoration: VoicesTextFieldDecoration(
-        labelText: context.l10n.confirmPassword,
-        helperText: context.l10n.xCharactersMinimum(minimumLength),
-        errorText: showError ? context.l10n.passwordDoNotMatch : null,
+    return Semantics(
+      container: true,
+      child: VoicesPasswordTextField(
+        key: const Key('PasswordConfirmInputField'),
+        controller: controller,
+        decoration: VoicesTextFieldDecoration(
+          labelText: context.l10n.confirmPassword,
+          helperText: context.l10n.xCharactersMinimum(minimumLength),
+          errorText: showError ? context.l10n.passwordDoNotMatch : null,
+        ),
+        onSubmitted: onSubmitted,
       ),
-      onSubmitted: onSubmitted,
     );
   }
 }

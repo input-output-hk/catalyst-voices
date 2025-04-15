@@ -100,9 +100,6 @@ class _CreateKeychainButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Semantics(
-      container: true,
-      button: true,
-      label: 'CreateKeychain-test', 
       child: VoicesFilledButton(
         key: const Key('CreateKeychainButton'),
         onTap: onTap,
@@ -123,8 +120,6 @@ class _LinkWalletAndRolesButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Semantics(
-      container: true,
-      button: true,
       label: 'LinkWalletAndRoles-test',
       child: VoicesFilledButton(
         key: const Key('LinkWalletAndRolesButton'),

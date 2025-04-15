@@ -30,8 +30,6 @@ class RegistrationBackNextNavigation extends StatelessWidget {
               : null,
         ),
         Semantics(
-          container: true,
-          label: 'NextButton-test', 
           child: VoicesNextButton(
             key: const Key('NextButton'),
             onTap: isNextEnabled

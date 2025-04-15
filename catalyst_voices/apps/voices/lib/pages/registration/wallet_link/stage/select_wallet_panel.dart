@@ -187,8 +187,6 @@ class _WalletTileState extends State<_WalletTile> {
   @override
   Widget build(BuildContext context) {
     return Semantics(
-      container: true,
-      label: 'WalletTile',
       child: VoicesWalletTile(
         iconSrc: widget.wallet.icon,
         name: Text(widget.wallet.name),

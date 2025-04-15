@@ -19,9 +19,6 @@ class SplashPanel extends StatelessWidget {
         ),
         const Spacer(),
         Semantics(
-          container: true,
-          button: true,
-          label: 'CreateKeychainNow-test',
           child: VoicesFilledButton(
             key: const Key('CreateKeychainButton'),
             child: Text(context.l10n.accountCreationSplashNextButton),

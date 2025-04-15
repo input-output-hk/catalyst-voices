@@ -2,20 +2,14 @@ import { Page } from "@playwright/test";
 import { WalletListPanel } from "./step-16-wallet-list";
 
 export class WalletPopupSelection {
-    page: Page
+  page: Page;
 
-    constructor(page) {
-        this.page = page;
-    }
+  constructor(page) {
+    this.page = page;
+  }
 
-    async goto() { 
-        await new WalletListPanel(this.page).goto();
-        await new WalletListPanel(this.page).clickYoroiWallet();
-    }
-    async clickWalletPopup() { 
-        const [walletPopup] = await Promise.all([
-          browser.waitForEvent("page"),
-          new WalletListPanel(page).clickYoroiWallet(),
-        ]);
-    }
+  async goto(password: string) {
+    await new WalletListPanel(this.page).goto(password);
+    await new WalletListPanel(this.page).clickYoroiWallet();
+  }
 }

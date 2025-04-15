@@ -1,4 +1,5 @@
 import { Locator, Page } from "@playwright/test";
+import intlEn from "../localization-util";
 import { GetStartedPanel } from "../step-1-get-started";
 
 export class BaseProfileInfoPanel {
@@ -8,7 +9,7 @@ export class BaseProfileInfoPanel {
   constructor(page: Page) {
     this.page = page;
     this.createYourBaseProfileBtn = page.getByRole("button", {
-      name: "CreateBaseProfileNext-test",
+      name: intlEn.createBaseProfileInstructionsNext,
     });
   }
 

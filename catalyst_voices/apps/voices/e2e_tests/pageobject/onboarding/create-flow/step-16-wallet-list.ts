@@ -1,5 +1,6 @@
 import { Locator, Page } from "@playwright/test";
 import { LinkWalletInfoPanel } from "./step-15-link-wallet-info";
+import intlEn from "../localization-util";
 
 export class WalletListPanel {
   page: Page;
@@ -7,13 +8,13 @@ export class WalletListPanel {
 
   constructor(page: Page) {
     this.page = page;
-    this.yoroiWallet = page.locator(
-      'role=group[name="Wallets"] >> role=button'
-    );
+    this.yoroiWallet = page.getByRole("button", {
+      name:'yoroi',
+  });
   }
 
-  async goto() {
-    await new LinkWalletInfoPanel(this.page).goto();
+  async goto(password: string) {
+    await new LinkWalletInfoPanel(this.page).goto(password);
     await new LinkWalletInfoPanel(this.page).clickChooseWalletBtn();
   }
 

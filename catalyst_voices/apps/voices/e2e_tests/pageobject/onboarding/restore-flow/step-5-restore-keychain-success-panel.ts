@@ -7,8 +7,9 @@ export class RestoreKeychainSuccessPanel {
 
   constructor(page: Page) {
     this.page = page;
+    this.setUnlockPasswordBtn = page.locator('#user_login');
     this.setUnlockPasswordBtn = page.getByRole("group", {
-      name: "SetUnlockPasswordButton",
+      name: "Set unlock password for this device",
     });
   }
 
