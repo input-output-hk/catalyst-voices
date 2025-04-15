@@ -89,8 +89,8 @@ project: {
 								}
 								"EVENT_DB_MAX_CONNECTIONS_SIZE": {
 									secret: {
-										name: "db-max-size"
-										key:  "max-size"
+										name: "db-max-connections"
+										key:  "max-connections"
 									}
 								}
 								"EVENT_DB_MAX_LIFETIME": {
