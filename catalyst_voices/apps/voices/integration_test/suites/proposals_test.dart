@@ -11,6 +11,7 @@ import '../pageobject/proposals_page.dart';
 
 void main() async {
   late final GoRouter router;
+
   setUpAll(() async {
     router = buildAppRouter();
   });

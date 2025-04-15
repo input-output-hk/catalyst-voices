@@ -12,9 +12,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 class GetStartedPanel extends StatelessWidget {
   const GetStartedPanel({super.key});
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -66,6 +68,7 @@ class GetStartedPanel extends StatelessWidget {
   Future<void> _handleCreateNewAccount(BuildContext context) async {
     final hasWallets =
         await context.read<SessionCubit>().checkAvailableWallets();
+
     if (hasWallets && context.mounted) {
       RegistrationCubit.of(context).createNewAccount();
       return;
@@ -85,6 +88,7 @@ extension _CreateAccountTypeExt on CreateAccountType {
         CreateAccountType.createNew => VoicesAssets.icons.colorSwatch,
         CreateAccountType.recover => VoicesAssets.icons.download,
       };
+
   String _getSubtitle(VoicesLocalizations l10n) {
     return l10n.accountCreationOnThisDevice;
   }
