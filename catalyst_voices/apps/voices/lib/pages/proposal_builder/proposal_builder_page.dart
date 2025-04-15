@@ -181,7 +181,7 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
   void _dontShowCampaignSubmissionClosingDialog(bool value) {
     context
         .read<SessionCubit>()
-        .updateShowSubmissionClosingWarning(value: value);
+        .updateShowSubmissionClosingWarning(value: !value);
   }
 
   void _handleSegmentsControllerChange() {
