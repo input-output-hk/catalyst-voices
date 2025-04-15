@@ -21,9 +21,15 @@ class SignedDocument:
         )
         return new_copy
 
-    # return hex bytes
-    def hex(self) -> str:
-        return signed_doc.build_signed_doc(self.metadata, self.content)
+    # Build and sign document, returns hex str of document bytes
+    def build_and_sign(
+        self,
+        cat_id: str,
+        bip32_sk_hex: str,
+    ) -> str:
+        return signed_doc.build_signed_doc(
+            self.metadata, self.content, bip32_sk_hex, cat_id
+        )
 
 
 @pytest.fixture
@@ -93,7 +99,11 @@ def proposal_doc_factory(proposal_templates, rbac_chain_factory):
             proposal_json = json.load(proposal_json_file)
 
         doc = SignedDocument(proposal_metadata_json, proposal_json)
-        resp = document.put(data=doc.hex(), token=rbac_chain.auth_token())
+        (cat_id, sk_hex) = rbac_chain.cat_id_for_role(RoleID.PROPOSER)
+        resp = document.put(
+            data=doc.build_and_sign(cat_id, sk_hex),
+            token=rbac_chain.auth_token(),
+        )
         assert (
             resp.status_code == 201
         ), f"Failed to publish document: {resp.status_code} - {resp.text}"
@@ -132,7 +142,11 @@ def comment_doc_factory(
             comment_json = json.load(comment_json_file)
 
         doc = SignedDocument(comment_metadata_json, comment_json)
-        resp = document.put(data=doc.hex(), token=rbac_chain.auth_token())
+        (cat_id, sk_hex) = rbac_chain.cat_id_for_role(RoleID.ROLE_0)
+        resp = document.put(
+            data=doc.build_and_sign(cat_id, sk_hex),
+            token=rbac_chain.auth_token(),
+        )
         assert (
             resp.status_code == 201
         ), f"Failed to publish document: {resp.status_code} - {resp.text}"
@@ -169,7 +183,11 @@ def submission_action_factory(
             comment_json = json.load(comment_json_file)
 
         doc = SignedDocument(sub_action_metadata_json, comment_json)
-        resp = document.put(data=doc.hex(), token=rbac_chain.auth_token())
+        (cat_id, sk_hex) = rbac_chain.cat_id_for_role(RoleID.PROPOSER)
+        resp = document.put(
+            data=doc.build_and_sign(cat_id, sk_hex),
+            token=rbac_chain.auth_token(),
+        )
         assert (
             resp.status_code == 201
         ), f"Failed to publish sub_action: {resp.status_code} - {resp.text}"
@@ -192,11 +210,15 @@ def test_templates(proposal_templates, comment_templates, rbac_chain_factory):
 @pytest.mark.preprod_indexing
 def test_proposal_doc(proposal_doc_factory, rbac_chain_factory):
     rbac_chain = rbac_chain_factory(RoleID.PROPOSER)
+    (cat_id, sk_hex) = rbac_chain.cat_id_for_role(RoleID.PROPOSER)
     proposal_doc = proposal_doc_factory()
     proposal_doc_id = proposal_doc.metadata["id"]
 
     # Put a proposal document again
-    resp = document.put(data=proposal_doc.hex(), token=rbac_chain.auth_token())
+    resp = document.put(
+        data=proposal_doc.build_and_sign(cat_id, sk_hex),
+        token=rbac_chain.auth_token(),
+    )
     assert (
         resp.status_code == 204
     ), f"Failed to publish document: {resp.status_code} - {resp.text}"
@@ -218,7 +240,10 @@ def test_proposal_doc(proposal_doc_factory, rbac_chain_factory):
     # Put a proposal document with same ID different content
     invalid_doc = proposal_doc.copy()
     invalid_doc.content["setup"]["title"]["title"] = "another title"
-    resp = document.put(data=invalid_doc.hex(), token=rbac_chain.auth_token())
+    resp = document.put(
+        data=invalid_doc.build_and_sign(cat_id, sk_hex),
+        token=rbac_chain.auth_token(),
+    )
     assert (
         resp.status_code == 422
     ), f"Publish document, expected 422 Unprocessable Content: {resp.status_code} - {resp.text}"
@@ -227,7 +252,10 @@ def test_proposal_doc(proposal_doc_factory, rbac_chain_factory):
     new_doc = proposal_doc.copy()
     new_doc.metadata["ver"] = uuid_v7.uuid_v7()
     new_doc.content["setup"]["title"]["title"] = "another title"
-    resp = document.put(data=new_doc.hex(), token=rbac_chain.auth_token())
+    resp = document.put(
+        data=new_doc.build_and_sign(cat_id, sk_hex),
+        token=rbac_chain.auth_token(),
+    )
     assert (
         resp.status_code == 201
     ), f"Failed to publish document: {resp.status_code} - {resp.text}"
@@ -235,7 +263,10 @@ def test_proposal_doc(proposal_doc_factory, rbac_chain_factory):
     # Put a proposal document with the not known template field
     invalid_doc = proposal_doc.copy()
     invalid_doc.metadata["template"] = {"id": uuid_v7.uuid_v7()}
-    resp = document.put(data=invalid_doc.hex(), token=rbac_chain.auth_token())
+    resp = document.put(
+        data=invalid_doc.build_and_sign(cat_id, sk_hex),
+        token=rbac_chain.auth_token(),
+    )
     assert (
         resp.status_code == 422
     ), f"Publish document, expected 422 Unprocessable Content: {resp.status_code} - {resp.text}"
@@ -244,7 +275,10 @@ def test_proposal_doc(proposal_doc_factory, rbac_chain_factory):
     invalid_doc = proposal_doc.copy()
     invalid_doc.metadata["ver"] = uuid_v7.uuid_v7()
     invalid_doc.content = {}
-    resp = document.put(data=invalid_doc.hex(), token=rbac_chain.auth_token())
+    resp = document.put(
+        data=invalid_doc.build_and_sign(cat_id, sk_hex),
+        token=rbac_chain.auth_token(),
+    )
     assert (
         resp.status_code == 422
     ), f"Publish document, expected 422 Unprocessable Content: {resp.status_code} - {resp.text}"
@@ -255,11 +289,15 @@ def test_proposal_doc(proposal_doc_factory, rbac_chain_factory):
 @pytest.mark.preprod_indexing
 def test_comment_doc(comment_doc_factory, rbac_chain_factory):
     rbac_chain = rbac_chain_factory(RoleID.ROLE_0)
+    (cat_id, sk_hex) = rbac_chain.cat_id_for_role(RoleID.ROLE_0)
     comment_doc = comment_doc_factory()
     comment_doc_id = comment_doc.metadata["id"]
 
     # Put a comment document again
-    resp = document.put(data=comment_doc.hex(), token=rbac_chain.auth_token())
+    resp = document.put(
+        data=comment_doc.build_and_sign(cat_id, sk_hex),
+        token=rbac_chain.auth_token(),
+    )
     assert (
         resp.status_code == 204
     ), f"Failed to publish document: {resp.status_code} - {resp.text}"
@@ -282,7 +320,10 @@ def test_comment_doc(comment_doc_factory, rbac_chain_factory):
     invalid_doc = comment_doc.copy()
     invalid_doc.metadata["ver"] = uuid_v7.uuid_v7()
     invalid_doc.content = {}
-    resp = document.put(data=invalid_doc.hex(), token=rbac_chain.auth_token())
+    resp = document.put(
+        data=invalid_doc.build_and_sign(cat_id, sk_hex),
+        token=rbac_chain.auth_token(),
+    )
     assert (
         resp.status_code == 422
     ), f"Publish document, expected 422 Unprocessable Content: {resp.status_code} - {resp.text}"
@@ -290,7 +331,10 @@ def test_comment_doc(comment_doc_factory, rbac_chain_factory):
     # Put a comment document referencing to the not known proposal
     invalid_doc = comment_doc.copy()
     invalid_doc.metadata["ref"] = {"id": uuid_v7.uuid_v7()}
-    resp = document.put(data=invalid_doc.hex(), token=rbac_chain.auth_token())
+    resp = document.put(
+        data=invalid_doc.build_and_sign(cat_id, sk_hex),
+        token=rbac_chain.auth_token(),
+    )
     assert (
         resp.status_code == 422
     ), f"Publish document, expected 422 Unprocessable Content: {resp.status_code} - {resp.text}"
@@ -301,17 +345,24 @@ def test_comment_doc(comment_doc_factory, rbac_chain_factory):
 @pytest.mark.preprod_indexing
 def test_submission_action(submission_action_factory, rbac_chain_factory):
     rbac_chain = rbac_chain_factory(RoleID.PROPOSER)
+    (cat_id, sk_hex) = rbac_chain.cat_id_for_role(RoleID.PROPOSER)
     submission_action = submission_action_factory()
     submission_action_id = submission_action.metadata["id"]
 
     # Put a submission action document
-    resp = document.put(data=submission_action.hex(), token=rbac_chain.auth_token())
+    resp = document.put(
+        data=submission_action.build_and_sign(cat_id, sk_hex),
+        token=rbac_chain.auth_token(),
+    )
     assert (
         resp.status_code == 204
     ), f"Failed to publish document: {resp.status_code} - {resp.text}"
 
     # Get the submission action doc
-    resp = document.get(document_id=submission_action_id, token=rbac_chain.auth_token())
+    resp = document.get(
+        document_id=submission_action_id,
+        token=rbac_chain.auth_token(),
+    )
     assert (
         resp.status_code == 200
     ), f"Failed to get document: {resp.status_code} - {resp.text}"
@@ -329,7 +380,10 @@ def test_submission_action(submission_action_factory, rbac_chain_factory):
     # Submission action document MUST have a ref
     invalid_doc = submission_action.copy()
     invalid_doc.metadata["ref"] = {}
-    resp = document.put(data=invalid_doc.hex(), token=rbac_chain.auth_token())
+    resp = document.put(
+        data=invalid_doc.build_and_sign(cat_id, sk_hex),
+        token=rbac_chain.auth_token(),
+    )
     assert (
         resp.status_code == 422
     ), f"Publish document, expected 422 Unprocessable Content: {resp.status_code} - {resp.text}"
@@ -337,7 +391,10 @@ def test_submission_action(submission_action_factory, rbac_chain_factory):
     # Put a submission action document referencing an unknown proposal
     invalid_doc = submission_action.copy()
     invalid_doc.metadata["ref"] = {"id": uuid_v7.uuid_v7()}
-    resp = document.put(data=invalid_doc.hex(), token=rbac_chain.auth_token())
+    resp = document.put(
+        data=invalid_doc.build_and_sign(cat_id, sk_hex),
+        token=rbac_chain.auth_token(),
+    )
     assert (
         resp.status_code == 422
     ), f"Publish document, expected 422 Unprocessable Content: {resp.status_code} - {resp.text}"
@@ -348,6 +405,7 @@ def test_submission_action(submission_action_factory, rbac_chain_factory):
 @pytest.mark.preprod_indexing
 def test_document_index_endpoint(proposal_doc_factory, rbac_chain_factory):
     rbac_chain = rbac_chain_factory(RoleID.PROPOSER)
+    (cat_id, sk_hex) = rbac_chain.cat_id_for_role(RoleID.PROPOSER)
     # submiting 10 proposal documents
     total_amount = 10
     first_proposal = proposal_doc_factory()
@@ -355,7 +413,10 @@ def test_document_index_endpoint(proposal_doc_factory, rbac_chain_factory):
         doc = first_proposal.copy()
         # keep the same id, but different version
         doc.metadata["ver"] = uuid_v7.uuid_v7()
-        resp = document.put(data=doc.hex(), token=rbac_chain.auth_token())
+        resp = document.put(
+            data=doc.build_and_sign(cat_id, sk_hex),
+            token=rbac_chain.auth_token(),
+        )
         assert (
             resp.status_code == 201
         ), f"Failed to publish document: {resp.status_code} - {resp.text}"
@@ -387,7 +448,6 @@ def test_document_index_endpoint(proposal_doc_factory, rbac_chain_factory):
         resp.status_code == 200
     ), f"Failed to post document: {resp.status_code} - {resp.text}"
     data = resp.json()
-    print(data)
     assert data["page"]["limit"] == limit
     assert data["page"]["page"] == page
     assert data["page"]["remaining"] == total_amount - 1 - page

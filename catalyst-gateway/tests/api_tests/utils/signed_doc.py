@@ -7,6 +7,9 @@ from typing import Dict, Any
 def build_signed_doc(
     metadata_json: Dict[str, Any],
     doc_content_json: Dict[str, Any],
+    bip32_sk_hex: str,
+    # corresponded to the `bip32_sk_hex` `cat_id` string
+    cat_id: str,
 ) -> str:
     with NamedTemporaryFile() as metadata_file, NamedTemporaryFile() as doc_content_file, NamedTemporaryFile() as signed_doc_file:
 
@@ -28,15 +31,15 @@ def build_signed_doc(
             ],
         )
 
-        # subprocess.run(
-        #     [
-        #         "./mk_signed_doc",
-        #         "sign",
-        #         signed_doc_file.name,
-        #         rbac_token.sk_hex,
-        #         rbac_token.cat_id,
-        #     ]
-        # )
+        subprocess.run(
+            [
+                "./mk_signed_doc",
+                "sign",
+                signed_doc_file.name,
+                bip32_sk_hex,
+                cat_id,
+            ]
+        )
 
         signed_doc_hex = signed_doc_file.read().hex()
         return signed_doc_hex
