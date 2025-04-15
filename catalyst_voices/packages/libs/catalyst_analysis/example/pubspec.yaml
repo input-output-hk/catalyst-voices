@@ -9,3 +9,4 @@ environment:
 dev_dependencies:
   catalyst_analysis:
     path: ../
+  analyzer: 7.3.0

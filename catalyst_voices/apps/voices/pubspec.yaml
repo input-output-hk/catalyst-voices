@@ -89,9 +89,6 @@ dependencies:
   win32: ^5.5.4
 
 dev_dependencies:
-  # TODO(dtscalac): locked version until the migration is possible:
-  # https://github.com/dart-lang/sdk/blob/main/pkg/analyzer/doc/element_model_migration_guide.md
-  # Currently many of the packages have not been migrated yet therefore we cannot use newer analyzer in our project.
   analyzer: 7.3.0
   build_runner: ^2.4.12
   build_verify: ^3.1.0
