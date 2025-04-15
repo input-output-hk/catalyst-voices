@@ -9,6 +9,7 @@ class UnlockPasswordForm extends StatelessWidget {
   final bool showError;
   final PasswordStrength passwordStrength;
   final bool showPasswordStrength;
+  final ValueChanged<String>? onSubmitted;
 
   const UnlockPasswordForm({
     super.key,
@@ -17,6 +18,7 @@ class UnlockPasswordForm extends StatelessWidget {
     this.showError = false,
     this.passwordStrength = PasswordStrength.weak,
     this.showPasswordStrength = false,
+    this.onSubmitted,
   });
 
   @override
@@ -33,6 +35,7 @@ class UnlockPasswordForm extends StatelessWidget {
           controller: confirmPasswordController,
           showError: showError,
           minimumLength: PasswordStrength.minimumLength,
+          onSubmitted: onSubmitted,
         ),
         const Spacer(),
         const SizedBox(height: 22),
@@ -54,15 +57,12 @@ class _UnlockPasswordTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Semantics(
-      container: true,
-      child: VoicesPasswordTextField(
-        key: const Key('PasswordInputField'),
-        controller: controller,
-        textInputAction: TextInputAction.next,
-        decoration: VoicesTextFieldDecoration(
-          labelText: context.l10n.enterPassword,
-        ),
+    return VoicesPasswordTextField(
+      key: const Key('PasswordInputField'),
+      controller: controller,
+      textInputAction: TextInputAction.next,
+      decoration: VoicesTextFieldDecoration(
+        labelText: context.l10n.enterPassword,
       ),
     );
   }
@@ -72,26 +72,26 @@ class _ConfirmUnlockPasswordTextField extends StatelessWidget {
   final TextEditingController controller;
   final bool showError;
   final int minimumLength;
+  final ValueChanged<String>? onSubmitted;
 
   const _ConfirmUnlockPasswordTextField({
     required this.controller,
     this.showError = false,
     required this.minimumLength,
+    this.onSubmitted,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Semantics(
-      container: true,
-      child: VoicesPasswordTextField(
-        key: const Key('PasswordConfirmInputField'),
-        controller: controller,
-        decoration: VoicesTextFieldDecoration(
-          labelText: context.l10n.confirmPassword,
-          helperText: context.l10n.xCharactersMinimum(minimumLength),
-          errorText: showError ? context.l10n.passwordDoNotMatch : null,
-        ),
+    return VoicesPasswordTextField(
+      key: const Key('PasswordConfirmInputField'),
+      controller: controller,
+      decoration: VoicesTextFieldDecoration(
+        labelText: context.l10n.confirmPassword,
+        helperText: context.l10n.xCharactersMinimum(minimumLength),
+        errorText: showError ? context.l10n.passwordDoNotMatch : null,
       ),
+      onSubmitted: onSubmitted,
     );
   }
 }
