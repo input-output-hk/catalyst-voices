@@ -44,6 +44,22 @@ const CLIENT_ID_KEY_DEFAULT: &str = "3db5301e-40f2-47ed-ab11-55b37674631a";
 /// Default `API_URL_PREFIX` used in development.
 const API_URL_PREFIX_DEFAULT: &str = "/api";
 
+/// Sets the maximum number of connections managed by the pool.
+/// Defaults to 100.
+const EVENT_DB_MAX_SIZE: u32 = 100;
+
+/// Sets the maximum lifetime of connections in the pool.
+/// Defaults to 30 minutes.
+const EVENT_DB_MAX_LIFETIME: u32 = 30;
+
+/// Sets the minimum idle connection count maintained by the pool.
+/// Defaults to 0.
+const EVENT_DB_MIN_IDLE: u32 = 0;
+
+/// Sets the connection timeout used by the pool.
+/// Defaults to 300 seconds.
+const EVENT_DB_CONN_TIMEOUT: u32 = 300;
+
 /// Default `CHECK_CONFIG_TICK` used in development, 5 seconds.
 const CHECK_CONFIG_TICK_DEFAULT: Duration = Duration::from_secs(5);
 
@@ -127,6 +143,22 @@ struct EnvVars {
 
     /// The Address of the Event DB.
     event_db_password: Option<StringEnvVar>,
+
+    /// Sets the maximum number of connections managed by the pool.
+    /// Defaults to 10.
+    event_db_max_size: u32,
+
+    /// Sets the maximum lifetime of connections in the pool.
+    /// Defaults to 30 minutes.
+    event_db_max_lifetime: u32,
+
+    /// Sets the minimum idle connection count maintained by the pool.
+    /// Defaults to None.
+    event_db_min_idle: u32,
+
+    /// Sets the connection timeout used by the pool.
+    /// Defaults to 30 seconds.
+    event_db_connection_timeout: u32,
 
     /// The Config of the Persistent Cassandra DB.
     cassandra_persistent_db: cassandra_db::EnvVars,
@@ -240,6 +272,30 @@ static ENV_VARS: LazyLock<EnvVars> = LazyLock::new(|| {
             0,
             u64::MAX,
         ),
+        event_db_max_size: StringEnvVar::new_as_int(
+            "EVENT_DB_MAX_SIZE",
+            EVENT_DB_MAX_SIZE,
+            0,
+            u32::MAX,
+        ),
+        event_db_max_lifetime: StringEnvVar::new_as_int(
+            "EVENT_DB_MAX_LIFETIME",
+            EVENT_DB_MAX_LIFETIME,
+            0,
+            u32::MAX,
+        ),
+        event_db_min_idle: StringEnvVar::new_as_int(
+            "EVENT_DB_MIN_IDLE",
+            EVENT_DB_MIN_IDLE,
+            0,
+            u32::MAX,
+        ),
+        event_db_connection_timeout: StringEnvVar::new_as_int(
+            "EVENT_DB_CONN_TIMEOUT",
+            EVENT_DB_CONN_TIMEOUT,
+            0,
+            u32::MAX,
+        ),
     }
 });
 
@@ -284,8 +340,15 @@ impl Settings {
     }
 
     /// Get the current Event DB settings for this service.
-    pub(crate) fn event_db_settings() -> (&'static str, Option<&'static str>, Option<&'static str>)
-    {
+    pub(crate) fn event_db_settings() -> (
+        &'static str,
+        Option<&'static str>,
+        Option<&'static str>,
+        u32,
+        u32,
+        u32,
+        u32,
+    ) {
         let url = ENV_VARS.event_db_url.as_str();
         let user = ENV_VARS
             .event_db_username
@@ -296,7 +359,23 @@ impl Settings {
             .as_ref()
             .map(StringEnvVar::as_str);
 
-        (url, user, pass)
+        let max_size = ENV_VARS.event_db_max_size;
+
+        let max_lifetime = ENV_VARS.event_db_max_lifetime;
+
+        let min_idle = ENV_VARS.event_db_min_idle;
+
+        let connection_timeout = ENV_VARS.event_db_connection_timeout;
+
+        (
+            url,
+            user,
+            pass,
+            max_size,
+            max_lifetime,
+            min_idle,
+            connection_timeout,
+        )
     }
 
     /// Get the Persistent & Volatile Cassandra DB config for this service.

@@ -87,6 +87,30 @@ project: {
 										key:  "url"
 									}
 								}
+								"EVENT_DB_MAX_SIZE": {
+									secret: {
+										name: "db-max-size"
+										key:  "max-size"
+									}
+								}
+								"EVENT_DB_MAX_LIFETIME": {
+									secret: {
+										name: "db-max-lifetime"
+										key:  "max-lifetime"
+									}
+								}
+								"EVENT_DB_MIN_IDLE": {
+									secret: {
+										name: "db-min-idle"
+										key:  "min-idle"
+									}
+								}
+								"EVENT_DB_CONNECTION_TIMEOUT": {
+									secret: {
+										name: "db-connection-timeout"
+										key:  "connection-timeout"
+									}
+								}
 								"INTERNAL_API_KEY": {
 									secret: {
 										name: "gateway"
