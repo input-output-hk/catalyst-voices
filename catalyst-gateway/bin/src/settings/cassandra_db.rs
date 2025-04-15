@@ -40,7 +40,7 @@ pub(crate) struct EnvVars {
     /// The Address/s of the DB.
     pub(crate) url: StringEnvVar,
 
-    /// The Namespace of Cassandra DB.
+    /// The Namespace of Cassandra DB. NOTE: Currently not in use.
     #[allow(dead_code)]
     pub(crate) namespace: StringEnvVar,
 
