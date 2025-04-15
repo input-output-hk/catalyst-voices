@@ -151,7 +151,7 @@ class _IdeascaleInfoCard extends StatelessWidget {
       key: const Key('IdeascaleInfoCard'),
       icon: VoicesAssets.icons.mailOpen.buildIcon(),
       title: Text(
-        context.l10n.createBaseProfileSetupIdeascaleAccount,
+        context.l10n.createBaseProfileHasIdeascaleAccountAlready,
         key: const Key('InfoCardTitle'),
       ),
       desc: BulletList(

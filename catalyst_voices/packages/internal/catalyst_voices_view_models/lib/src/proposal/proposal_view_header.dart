@@ -3,6 +3,7 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:equatable/equatable.dart';
 
 final class ProposalViewHeader extends Equatable {
+  final DocumentRef? proposalRef;
   final String title;
   final String authorName;
   final DateTime? createdAt;
@@ -11,6 +12,7 @@ final class ProposalViewHeader extends Equatable {
   final bool isFavorite;
 
   const ProposalViewHeader({
+    this.proposalRef,
     this.title = '',
     this.authorName = '',
     this.createdAt,
@@ -21,6 +23,7 @@ final class ProposalViewHeader extends Equatable {
 
   @override
   List<Object?> get props => [
+        proposalRef,
         title,
         authorName,
         createdAt,
@@ -30,6 +33,7 @@ final class ProposalViewHeader extends Equatable {
       ];
 
   ProposalViewHeader copyWith({
+    Optional<DocumentRef>? proposalRef,
     String? title,
     String? authorName,
     Optional<DateTime>? createdAt,
@@ -38,6 +42,7 @@ final class ProposalViewHeader extends Equatable {
     bool? isFavorite,
   }) {
     return ProposalViewHeader(
+      proposalRef: proposalRef.dataOr(this.proposalRef),
       title: title ?? this.title,
       authorName: authorName ?? this.authorName,
       createdAt: createdAt.dataOr(this.createdAt),
