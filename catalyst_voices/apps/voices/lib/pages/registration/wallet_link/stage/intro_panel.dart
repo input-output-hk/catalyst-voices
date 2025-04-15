@@ -22,7 +22,7 @@ class IntroPanel extends StatelessWidget {
         Semantics(
           container: true,
           button: true,
-          label: 'ChooseCardanoWalletButton', // Stable test identifier
+          label: 'ChooseCardanoWalletButton',
           child: VoicesFilledButton(
             key: const Key('ChooseCardanoWalletButton'),
             leading: VoicesAssets.icons.wallet.buildIcon(),

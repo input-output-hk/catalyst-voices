@@ -102,7 +102,7 @@ class _CreateKeychainButton extends StatelessWidget {
     return Semantics(
       container: true,
       button: true,
-      label: 'CreateKeychain-test', // Stable test identifier
+      label: 'CreateKeychain-test', 
       child: VoicesFilledButton(
         key: const Key('CreateKeychainButton'),
         onTap: onTap,
@@ -125,7 +125,7 @@ class _LinkWalletAndRolesButton extends StatelessWidget {
     return Semantics(
       container: true,
       button: true,
-      label: 'LinkWalletAndRoles-test', // Stable test identifier
+      label: 'LinkWalletAndRoles-test',
       child: VoicesFilledButton(
         key: const Key('LinkWalletAndRolesButton'),
         onTap: onTap,

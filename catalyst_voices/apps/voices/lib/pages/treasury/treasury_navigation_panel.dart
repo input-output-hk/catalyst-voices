@@ -11,7 +11,6 @@ class TreasuryNavigationPanel extends StatelessWidget {
   Widget build(BuildContext context) {
     return SpaceSidePanel(
       isLeft: true,
-      name: context.l10n.treasuryCampaignBuilder,
       onCollapseTap: () {},
       tabs: [
         SpaceSidePanelTab(

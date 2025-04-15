@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/pages/registration/no_wallet_found_dialog.dart';
 import 'package:catalyst_voices/pages/registration/widgets/registration_stage_message.dart';
 import 'package:catalyst_voices/pages/registration/widgets/registration_tile.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
@@ -11,11 +12,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 class GetStartedPanel extends StatelessWidget {
   const GetStartedPanel({super.key});
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -67,14 +66,13 @@ class GetStartedPanel extends StatelessWidget {
   Future<void> _handleCreateNewAccount(BuildContext context) async {
     final hasWallets =
         await context.read<SessionCubit>().checkAvailableWallets();
-
     if (hasWallets && context.mounted) {
       RegistrationCubit.of(context).createNewAccount();
       return;
     }
 
     if (!context.mounted) return;
-    const canRegister = true;
+    final canRegister = await NoWalletFoundDialog.show(context);
 
     if (canRegister && context.mounted) {
       RegistrationCubit.of(context).createNewAccount();
@@ -87,7 +85,6 @@ extension _CreateAccountTypeExt on CreateAccountType {
         CreateAccountType.createNew => VoicesAssets.icons.colorSwatch,
         CreateAccountType.recover => VoicesAssets.icons.download,
       };
-
   String _getSubtitle(VoicesLocalizations l10n) {
     return l10n.accountCreationOnThisDevice;
   }
