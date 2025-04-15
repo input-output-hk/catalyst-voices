@@ -62,6 +62,7 @@ final class Account extends Equatable {
           'addr_test1vzpwq95z3xyum8vqndgdd'
           '9mdnmafh3djcxnc6jemlgdmswcve6tkw',
         ),
+        networkId: NetworkId.testnet,
         /* cSpell:enable */
       ),
       isActive: isActive,
@@ -112,6 +113,10 @@ final class Account extends Equatable {
       isActive: isActive ?? this.isActive,
       isProvisional: isProvisional ?? this.isProvisional,
     );
+  }
+
+  bool hasRole(AccountRole role) {
+    return roles.contains(role);
   }
 
   bool isSameRef(Account other) => catalystId.isReferringTo(other);

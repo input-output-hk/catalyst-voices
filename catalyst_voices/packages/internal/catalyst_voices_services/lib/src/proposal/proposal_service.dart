@@ -154,7 +154,7 @@ final class ProposalServiceImpl implements ProposalService {
     required SignedDocumentRef categoryId,
   }) async {
     final draftRef = DraftRef.generateFirstRef();
-    final catalystId = await _getUserCatalystId();
+    final catalystId = _getUserCatalystId();
     await _proposalRepository.upsertDraftProposal(
       document: DocumentData(
         metadata: DocumentDataMetadata(
@@ -261,7 +261,7 @@ final class ProposalServiceImpl implements ProposalService {
 
   @override
   Future<DocumentRef> importProposal(Uint8List data) async {
-    final authorId = await _getUserCatalystId();
+    final authorId = _getUserCatalystId();
     return _proposalRepository.importProposal(data, authorId);
   }
 
@@ -352,7 +352,7 @@ final class ProposalServiceImpl implements ProposalService {
     // TODO(LynxLynxx): when we start supporting multiple authors
     // we need to get the list of authors actually stored in the db and
     // add them to the authors list if they are not already there
-    final catalystId = await _getUserCatalystId();
+    final catalystId = _getUserCatalystId();
 
     await _proposalRepository.upsertDraftProposal(
       document: DocumentData(
@@ -412,42 +412,56 @@ final class ProposalServiceImpl implements ProposalService {
 
   @override
   Stream<List<Proposal>> watchUserProposals() async* {
-    final authorId = await _getUserCatalystId();
-    yield* _proposalRepository
-        .watchUserProposals(authorId: authorId)
-        .switchMap((documents) async* {
-      final proposalsDataStreams = await Future.wait(
-        documents.map(_createProposalDataStream).toList(),
-      );
+    yield* _userService.watchUser.distinct().switchMap((user) {
+      final authorId = user.activeAccount?.catalystId;
+      if (!_isProposer(user) || authorId == null) {
+        return const Stream.empty();
+      }
 
-      yield* Rx.combineLatest(
-        proposalsDataStreams,
-        (List<ProposalData?> proposalsData) async {
-          final validProposalsData =
-              proposalsData.whereType<ProposalData>().toList();
+      return _proposalRepository
+          .watchUserProposals(authorId: authorId)
+          .distinct()
+          .switchMap((documents) async* {
+        if (documents.isEmpty) {
+          yield [];
+          return;
+        }
+        final proposalsDataStreams = await Future.wait(
+          documents.map(_createProposalDataStream).toList(),
+        );
 
-          final groupedProposals = groupBy(
-            validProposalsData,
-            (data) => data.document.metadata.selfRef.id,
-          );
+        yield* Rx.combineLatest(
+          proposalsDataStreams,
+          (List<ProposalData?> proposalsData) async {
+            final validProposalsData =
+                proposalsData.whereType<ProposalData>().toList();
 
-          final filteredProposalsData = groupedProposals.values
-              .map((group) {
-                if (group.any((p) => p.publish != ProposalPublish.localDraft)) {
-                  return group
-                      .where((p) => p.publish != ProposalPublish.localDraft);
-                }
-                return group;
-              })
-              .expand((group) => group)
-              .toList();
+            final groupedProposals = groupBy(
+              validProposalsData,
+              (data) => data.document.metadata.selfRef.id,
+            );
 
-          final proposalsWithVersions = await Future.wait(
-            filteredProposalsData.map(_addVersionsToProposal),
-          );
-          return proposalsWithVersions.map(Proposal.fromData).toList();
-        },
-      ).switchMap(Stream.fromFuture);
+            final filteredProposalsData = groupedProposals.values
+                .map((group) {
+                  if (group.any(
+                    (p) => p.publish != ProposalPublish.localDraft,
+                  )) {
+                    return group.where(
+                      (p) => p.publish != ProposalPublish.localDraft,
+                    );
+                  }
+                  return group;
+                })
+                .expand((group) => group)
+                .toList();
+
+            final proposalsWithVersions = await Future.wait(
+              filteredProposalsData.map(_addVersionsToProposal),
+            );
+            return proposalsWithVersions.map(Proposal.fromData).toList();
+          },
+        ).switchMap(Stream.fromFuture);
+      });
     });
   }
 
@@ -508,7 +522,7 @@ final class ProposalServiceImpl implements ProposalService {
     );
   }
 
-  Future<CatalystId> _getUserCatalystId() async {
+  CatalystId _getUserCatalystId() {
     final account = _userService.user.activeAccount;
     if (account == null) {
       throw StateError(
@@ -517,5 +531,9 @@ final class ProposalServiceImpl implements ProposalService {
     }
 
     return account.catalystId;
+  }
+
+  bool _isProposer(User user) {
+    return user.activeAccount?.roles.contains(AccountRole.proposer) ?? false;
   }
 }
