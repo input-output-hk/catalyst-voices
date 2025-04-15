@@ -1,6 +1,6 @@
 //! Implementation of the PUT `/document` endpoint
 
-use std::str::FromStr;
+use std::{collections::HashSet, str::FromStr};
 
 use catalyst_signed_doc::CatalystSignedDocument;
 use poem_openapi::{payload::Json, ApiResponse};
@@ -119,14 +119,6 @@ pub(crate) async fn endpoint(doc_bytes: Vec<u8>, mut token: CatalystRBACTokenV1)
         .into();
     }
 
-    // check if the incoming doc and the current latest doc are the same ver/id
-    let Ok(doc_id) = doc.doc_id() else {
-        return Responses::UnprocessableContent(Json(PutDocumentUnprocessableContent::new(
-            "Invalid Catalyst Signed Document",
-            serde_json::to_value(doc.problem_report()).ok(),
-        )))
-        .into();
-    };
     match validate_against_original_doc(&doc).await {
         Ok(true) => (),
         Ok(false) => {
@@ -167,14 +159,9 @@ async fn validate_against_original_doc(doc: &CatalystSignedDocument) -> anyhow::
         .authors()
         .iter()
         .map(|author| catalyst_signed_doc::IdUri::from_str(author))
-        .collect::<Result<Vec<_>, _>>()?;
-
-    let authors = doc.authors();
-    let result = original_authors
-        .iter()
-        .all(|original_author| authors.contains(original_author));
-
-    Ok(result)
+        .collect::<Result<HashSet<_>, _>>()?;
+    let authors: HashSet<_> = doc.authors().into_iter().collect();
+    Ok(authors == original_authors)
 }
 
 /// Store a provided and validated document inside the db.
