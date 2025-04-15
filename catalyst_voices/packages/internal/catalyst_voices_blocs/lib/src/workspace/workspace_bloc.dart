@@ -181,7 +181,7 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
       _logger.severe('Importing proposal failed', error, stackTrace);
       emit(state.copyWith(isLoading: false));
       emitError(LocalizedException.create(error));
-    } 
+    }
     // We don't need to emit isLoading false here because it will be emitted
     // in the stream subscription.
   }
