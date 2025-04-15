@@ -87,7 +87,7 @@ project: {
 										key:  "url"
 									}
 								}
-								"EVENT_DB_MAX_SIZE": {
+								"EVENT_DB_MAX_CONNECTIONS_SIZE": {
 									secret: {
 										name: "db-max-size"
 										key:  "max-size"

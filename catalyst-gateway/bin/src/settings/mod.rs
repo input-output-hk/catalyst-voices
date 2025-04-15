@@ -23,6 +23,7 @@ use crate::{
 
 pub(crate) mod cassandra_db;
 pub(crate) mod chain_follower;
+pub(crate) mod event_db;
 pub(crate) mod signed_doc;
 mod str_env_var;
 
@@ -44,22 +45,6 @@ const CLIENT_ID_KEY_DEFAULT: &str = "3db5301e-40f2-47ed-ab11-55b37674631a";
 /// Default `API_URL_PREFIX` used in development.
 const API_URL_PREFIX_DEFAULT: &str = "/api";
 
-/// Sets the maximum number of connections managed by the pool.
-/// Defaults to 100.
-const EVENT_DB_MAX_SIZE: u32 = 100;
-
-/// Sets the maximum lifetime of connections in the pool.
-/// Defaults to 30 minutes.
-const EVENT_DB_MAX_LIFETIME: u32 = 30;
-
-/// Sets the minimum idle connection count maintained by the pool.
-/// Defaults to 0.
-const EVENT_DB_MIN_IDLE: u32 = 0;
-
-/// Sets the connection timeout used by the pool.
-/// Defaults to 300 seconds.
-const EVENT_DB_CONN_TIMEOUT: u32 = 300;
-
 /// Default `CHECK_CONFIG_TICK` used in development, 5 seconds.
 const CHECK_CONFIG_TICK_DEFAULT: Duration = Duration::from_secs(5);
 
@@ -68,10 +53,6 @@ const METRICS_MEMORY_INTERVAL_DEFAULT: Duration = Duration::from_secs(1);
 
 /// Default `METRICS_FOLLOWER_INTERVAL`, 1 second.
 const METRICS_FOLLOWER_INTERVAL_DEFAULT: Duration = Duration::from_secs(1);
-
-/// Default Event DB URL.
-const EVENT_DB_URL_DEFAULT: &str =
-    "postgresql://postgres:postgres@localhost/catalyst_events?sslmode=disable";
 
 /// Default number of slots used as overlap when purging Live Index data.
 const PURGE_BACKWARD_SLOT_BUFFER_DEFAULT: u64 = 100;
@@ -135,31 +116,6 @@ struct EnvVars {
     /// The base path the API is served at.
     api_url_prefix: StringEnvVar,
 
-    /// The Address of the Event DB.
-    event_db_url: StringEnvVar,
-
-    /// The `UserName` to use for the Event DB.
-    event_db_username: Option<StringEnvVar>,
-
-    /// The Address of the Event DB.
-    event_db_password: Option<StringEnvVar>,
-
-    /// Sets the maximum number of connections managed by the pool.
-    /// Defaults to 10.
-    event_db_max_size: u32,
-
-    /// Sets the maximum lifetime of connections in the pool.
-    /// Defaults to 30 minutes.
-    event_db_max_lifetime: u32,
-
-    /// Sets the minimum idle connection count maintained by the pool.
-    /// Defaults to None.
-    event_db_min_idle: u32,
-
-    /// Sets the connection timeout used by the pool.
-    /// Defaults to 30 seconds.
-    event_db_connection_timeout: u32,
-
     /// The Config of the Persistent Cassandra DB.
     cassandra_persistent_db: cassandra_db::EnvVars,
 
@@ -168,6 +124,9 @@ struct EnvVars {
 
     /// The Chain Follower configuration
     chain_follower: chain_follower::EnvVars,
+
+    /// The event db configuration
+    event_db: event_db::EnvVars,
 
     /// The Catalyst Signed Documents configuration
     signed_doc: signed_doc::EnvVars,
@@ -235,9 +194,7 @@ static ENV_VARS: LazyLock<EnvVars> = LazyLock::new(|| {
         client_id_key: StringEnvVar::new("CLIENT_ID_KEY", CLIENT_ID_KEY_DEFAULT.into()),
         api_host_names: StringEnvVar::new_optional("API_HOST_NAMES", false),
         api_url_prefix: StringEnvVar::new("API_URL_PREFIX", API_URL_PREFIX_DEFAULT.into()),
-        event_db_url: StringEnvVar::new("EVENT_DB_URL", EVENT_DB_URL_DEFAULT.into()),
-        event_db_username: StringEnvVar::new_optional("EVENT_DB_USERNAME", false),
-        event_db_password: StringEnvVar::new_optional("EVENT_DB_PASSWORD", true),
+
         cassandra_persistent_db: cassandra_db::EnvVars::new(
             cassandra_db::PERSISTENT_URL_DEFAULT,
             cassandra_db::PERSISTENT_NAMESPACE_DEFAULT,
@@ -247,6 +204,7 @@ static ENV_VARS: LazyLock<EnvVars> = LazyLock::new(|| {
             cassandra_db::VOLATILE_NAMESPACE_DEFAULT,
         ),
         chain_follower: chain_follower::EnvVars::new(),
+        event_db: event_db::EnvVars::new(),
         signed_doc: signed_doc::EnvVars::new(),
         internal_api_key: StringEnvVar::new_optional("INTERNAL_API_KEY", true),
         check_config_tick: StringEnvVar::new_as_duration(
@@ -272,30 +230,6 @@ static ENV_VARS: LazyLock<EnvVars> = LazyLock::new(|| {
             0,
             u64::MAX,
         ),
-        event_db_max_size: StringEnvVar::new_as_int(
-            "EVENT_DB_MAX_SIZE",
-            EVENT_DB_MAX_SIZE,
-            0,
-            u32::MAX,
-        ),
-        event_db_max_lifetime: StringEnvVar::new_as_int(
-            "EVENT_DB_MAX_LIFETIME",
-            EVENT_DB_MAX_LIFETIME,
-            0,
-            u32::MAX,
-        ),
-        event_db_min_idle: StringEnvVar::new_as_int(
-            "EVENT_DB_MIN_IDLE",
-            EVENT_DB_MIN_IDLE,
-            0,
-            u32::MAX,
-        ),
-        event_db_connection_timeout: StringEnvVar::new_as_int(
-            "EVENT_DB_CONN_TIMEOUT",
-            EVENT_DB_CONN_TIMEOUT,
-            0,
-            u32::MAX,
-        ),
     }
 });
 
@@ -304,7 +238,7 @@ impl EnvVars {
     pub(crate) fn validate() -> anyhow::Result<()> {
         let mut status = Ok(());
 
-        let url = ENV_VARS.event_db_url.as_str();
+        let url = ENV_VARS.event_db.url.as_str();
         if let Err(error) = tokio_postgres::config::Config::from_str(url) {
             error!(error=%error, url=url, "Invalid Postgres DB URL.");
             status = Err(anyhow!("Environment Variable Validation Error."));
@@ -349,29 +283,31 @@ impl Settings {
         u32,
         u32,
     ) {
-        let url = ENV_VARS.event_db_url.as_str();
+        let url = ENV_VARS.event_db.url.as_str();
         let user = ENV_VARS
-            .event_db_username
+            .event_db
+            .username
             .as_ref()
             .map(StringEnvVar::as_str);
         let pass = ENV_VARS
-            .event_db_password
+            .event_db
+            .password
             .as_ref()
             .map(StringEnvVar::as_str);
 
-        let max_size = ENV_VARS.event_db_max_size;
+        let max_connections = ENV_VARS.event_db.max_connections;
 
-        let max_lifetime = ENV_VARS.event_db_max_lifetime;
+        let max_lifetime = ENV_VARS.event_db.max_lifetime;
 
-        let min_idle = ENV_VARS.event_db_min_idle;
+        let min_idle = ENV_VARS.event_db.min_idle;
 
-        let connection_timeout = ENV_VARS.event_db_connection_timeout;
+        let connection_timeout = ENV_VARS.event_db.connection_timeout;
 
         (
             url,
             user,
             pass,
-            max_size,
+            max_connections,
             max_lifetime,
             min_idle,
             connection_timeout,

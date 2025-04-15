@@ -240,7 +240,7 @@ impl EventDB {
 /// The env var "`DATABASE_URL`" can be set directly as an anv var, or in a
 /// `.env` file.
 pub fn establish_connection() {
-    let (url, user, pass, max_size, max_lifetime, min_idle, connection_timeout) =
+    let (url, user, pass, max_connections, max_lifetime, min_idle, connection_timeout) =
         Settings::event_db_settings();
 
     // This was pre-validated and can't fail, but provide default in the impossible case it
@@ -259,7 +259,7 @@ pub fn establish_connection() {
     let pg_mgr = PostgresConnectionManager::new(config, tokio_postgres::NoTls);
 
     let pool = Pool::builder()
-        .max_size(max_size)
+        .max_size(max_connections)
         .max_lifetime(Some(core::time::Duration::from_secs(max_lifetime.into())))
         .min_idle(min_idle)
         .connection_timeout(core::time::Duration::from_secs(connection_timeout.into()))
