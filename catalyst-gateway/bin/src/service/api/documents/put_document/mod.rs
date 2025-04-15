@@ -2,6 +2,7 @@
 
 use std::str::FromStr;
 
+use catalyst_signed_doc::CatalystSignedDocument;
 use poem_openapi::{payload::Json, ApiResponse};
 use unprocessable_content_request::PutDocumentUnprocessableContent;
 
@@ -126,7 +127,7 @@ pub(crate) async fn endpoint(doc_bytes: Vec<u8>, mut token: CatalystRBACTokenV1)
         )))
         .into();
     };
-    match validate_against_original_doc(doc_id, &doc.kids()).await {
+    match validate_against_original_doc(&doc).await {
         Ok(true) => (),
         Ok(false) => {
             return Responses::UnprocessableContent(Json(
@@ -154,10 +155,8 @@ pub(crate) async fn endpoint(doc_bytes: Vec<u8>, mut token: CatalystRBACTokenV1)
 
 /// Checks if the document ID and version differ, fetch the latest version and ensure its
 /// catalyst-id and role entries match those in the newer or different version.
-async fn validate_against_original_doc(
-    doc_id: catalyst_signed_doc::UuidV7, kids: &[catalyst_signed_doc::IdUri],
-) -> anyhow::Result<bool> {
-    let original_doc = match FullSignedDoc::retrieve(&doc_id.uuid(), None).await {
+async fn validate_against_original_doc(doc: &CatalystSignedDocument) -> anyhow::Result<bool> {
+    let original_doc = match FullSignedDoc::retrieve(&doc.doc_id()?.uuid(), None).await {
         Ok(doc) => doc,
         Err(e) if e.is::<error::NotFoundError>() => return Ok(true),
         Err(e) => anyhow::bail!("Database error: {e}"),
@@ -170,9 +169,10 @@ async fn validate_against_original_doc(
         .map(|author| catalyst_signed_doc::IdUri::from_str(author))
         .collect::<Result<Vec<_>, _>>()?;
 
+    let authors = doc.authors();
     let result = original_authors
         .iter()
-        .all(|original_author| kids.contains(original_author));
+        .all(|original_author| authors.contains(original_author));
 
     Ok(result)
 }
