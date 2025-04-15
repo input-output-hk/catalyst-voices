@@ -155,6 +155,14 @@
       }
     }
   },
+  "mainnetNetworkId": "Mainnet",
+  "@mainnetNetworkId": {
+    "description": "A mainnet cardano network name."
+  },
+  "preprodNetworkId": "PreProd",
+  "@preprodNetworkId": {
+    "description": "A preprod cardano network name."
+  },
   "proposalStatusReady": "Ready",
   "@proposalStatusReady": {
     "description": "Indicates to user that status is in ready mode"
@@ -627,6 +635,15 @@
   "@registrationTransactionFailed": {
     "description": "Indicates an error when submitting a registration transaction failed."
   },
+  "registrationNetworkIdMismatch": "It seems like you're trying to use\u00A0a wallet on the wrong network.\nPlease switch to {network} to continue.",
+  "@registrationNetworkIdMismatch": {
+    "description": "An error when user attempts to use a wallet on the wrong network, i.e. using preprod wallet on production environment.",
+    "placeholders": {
+      "network": {
+        "type": "String"
+      }
+    }
+  },
   "registrationInsufficientBalance": "Insufficient balance, please top up your wallet.",
   "@registrationInsufficientBalance": {
     "description": "Indicates an error when preparing a transaction has failed due to low wallet balance."
@@ -758,8 +775,14 @@
   "createBaseProfileSetupEmailLabel": "Your e-mail",
   "createBaseProfileSetupEmailHint": "E-mail",
   "createBaseProfileSetupEmailHelper": "Please provide e-mail used for your Ideascale.",
-  "createBaseProfileSetupIdeascaleAccount": "Ideascale account",
-  "createBaseProfileSetupIdeascaleReason1": "Please use the e-mail you use on cardano.ideascale.com",
+  "createBaseProfileHasIdeascaleAccountAlready": "Submitted proposals in Ideascale before",
+  "@createBaseProfileHasIdeascaleAccountAlready": {
+    "description": "Label for info card to let user know to use the same email as in Ideascale if they have already submitted a proposal there."
+  },
+  "createBaseProfileSetupIdeascaleReason1": "Be sure to use the same email associated with your Ideascale account",
+  "@createBaseProfileSetupIdeascaleReason1": {
+    "description": "Description for info card to let user know to use the same email as in Ideascale if they have already submitted a proposal there."
+  },
   "createBaseProfileAcknowledgementsTitle": "Mandatory Acknowledgements",
   "createBaseProfileAcknowledgementsToS": "I confirm that I have read and agree to be bound by {tos}.",
   "catalystTos": "Project Catalyst Terms and Conditions",
@@ -948,7 +971,7 @@
   "createKeychainSeedPhraseExportConfirmDialogContent": "Before using this feature, please read this {link}",
   "bestPracticesFAQ": "best practices FAQ",
   "exportKey": "Export Key",
-  "createKeychainSeedPhraseStoreConfirmation": "I have written down/downloaded my 12 words",
+  "createKeychainSeedPhraseStoreConfirmation": "I have written down/exported my 12 words",
   "createKeychainSeedPhraseCheckInstructionsTitle": "Write down your Catalyst seed phrase",
   "createKeychainSeedPhraseCheckInstructionsSubtitle": "Next, we're going to make sure that you've written down your Catalyst seed phrase correctly.   \u2028\u2028We don't save your Catalyst seed phrase, so it's important \u2028to make sure you have it right. Thats why we don't trust, we verify before continuing.   \u2028\u2028It's also good practice to get familiar with using a \nseed phrase if you're new to crypto.",
   "createKeychainSeedPhraseCheckSubtitle": "Input your Catalyst seed phrase",
@@ -1388,6 +1411,10 @@
         "type": "String"
       }
     }
+  },
+  "errorValidationConstsValueBoolMismatch": "Please select this field.",
+  "@errorValidationConstsValueBoolMismatch": {
+    "description": "Validation error when the user entered value does not match a boolean const value, typically a checkbox that asks for legal permission."
   },
   "errorValidationEnumValuesMismatch": "The value must be one of {enumValues}.",
   "@errorValidationEnumValuesMismatch": {
@@ -2512,5 +2539,24 @@
   "viewProposalCommentsDescription": "Open My proposals in the Discovery Space",
   "@viewProposalCommentsDescription": {
     "description": "Text for the view proposal comments description in the card"
+  },
+  "paginationProposalsCounter": "{from}-{to} of {max, plural, =0{proposals} =1{proposal} other{proposals}}",
+  "@paginationProposalsCounter": {
+    "description": "Below pagination list, next to page switch controls",
+    "placeholders": {
+      "from": {
+        "type": "int"
+      },
+      "to": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "shareProposalErrorDescription": "Something went wrong while sharing proposal. Please try again later.",
+  "@shareProposalErrorDescription": {
+    "description": "Error description when sharing proposal fails"
   }
 }
