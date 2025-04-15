@@ -10,7 +10,6 @@ class ProposalBuilderSetupPanel extends StatelessWidget {
   Widget build(BuildContext context) {
     return SpaceSidePanel(
       isLeft: false,
-      name: context.l10n.workspaceProposalSetup,
       onCollapseTap: () {},
       tabs: [
         SpaceSidePanelTab(

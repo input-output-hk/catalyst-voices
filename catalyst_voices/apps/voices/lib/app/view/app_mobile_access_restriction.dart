@@ -100,6 +100,7 @@ class _Background extends StatelessWidget {
       painter: BubblePainter(
         bubbles: _buildBubbles(),
         shapes: _buildShapes(),
+        backgroundColor: const Color(0xFF9BDDF7),
       ),
       size: Size.infinite,
     );

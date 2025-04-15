@@ -2124,6 +2124,14 @@
   "@successProposalDeletedDescription": {
     "description": "Description of success message when draft is deleted"
   },
+  "successProposalForgot": "Proposal forgotten",
+  "@successProposalForgot": {
+    "description": "Success message when public draft/final proposal is forgotten"
+  },
+  "successProposalForgotDescription": "Your local proposal has been forgotten. No one can see it anymore.",
+  "@successProposalForgotDescription": {
+    "description": "Description of success message when public draft/final proposal is forgotten"
+  },
   "errorProposalDeleted": "Error deleting proposal",
   "@errorProposalDeleted": {
     "description": "Error message when draft is not deleted"

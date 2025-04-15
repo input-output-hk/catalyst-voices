@@ -12,7 +12,6 @@ class ProposalBuilderNavigationPanel extends StatelessWidget {
   Widget build(BuildContext context) {
     return SpaceSidePanel(
       isLeft: true,
-      name: context.l10n.workspaceProposalNavigation,
       onCollapseTap: () {},
       tabs: [
         SpaceSidePanelTab(

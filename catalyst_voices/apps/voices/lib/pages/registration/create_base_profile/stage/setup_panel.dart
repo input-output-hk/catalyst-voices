@@ -8,35 +8,11 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
-class SetupPanel extends StatelessWidget {
+class SetupPanel extends StatefulWidget {
   const SetupPanel({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const SizedBox(height: 24),
-        const _Title(),
-        Expanded(
-          child: FocusScope(
-            child: ListView(
-              padding: const EdgeInsets.symmetric(vertical: 24),
-              children: const [
-                _DisplayNameSelector(),
-                SizedBox(height: 24),
-                _EmailSelector(),
-              ],
-            ),
-          ),
-        ),
-        const SizedBox(height: 24),
-        const _IdeascaleInfoCard(),
-        const SizedBox(height: 24),
-        const _NavigationSelector(),
-      ],
-    );
-  }
+  State<SetupPanel> createState() => _SetupPanelState();
 }
 
 class _DisplayNameSelector extends StatelessWidget {
@@ -183,6 +159,55 @@ class _NavigationSelector extends StatelessWidget {
       selector: (state) => state.isBaseProfileDataValid,
       builder: (context, state) => _Navigation(isNextEnabled: state),
     );
+  }
+}
+
+class _SetupPanelState extends State<SetupPanel> {
+  late final ScrollController _scrollController;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 24),
+        const _Title(),
+        Expanded(
+          child: FocusScope(
+            child: VoicesScrollbar(
+              controller: _scrollController,
+              alwaysVisible: true,
+              padding: const EdgeInsets.only(left: 10),
+              child: ListView(
+                controller: _scrollController,
+                padding: const EdgeInsets.symmetric(vertical: 24),
+                children: const [
+                  _DisplayNameSelector(),
+                  SizedBox(height: 24),
+                  _EmailSelector(),
+                ],
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 24),
+        const _IdeascaleInfoCard(),
+        const SizedBox(height: 24),
+        const _NavigationSelector(),
+      ],
+    );
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController = ScrollController();
   }
 }
 
