@@ -8,7 +8,6 @@ class TreasuryDetailsPanel extends StatelessWidget {
   Widget build(BuildContext context) {
     return SpaceSidePanel(
       isLeft: false,
-      name: 'Campaign comments',
       onCollapseTap: () {},
       tabs: [
         SpaceSidePanelTab(
