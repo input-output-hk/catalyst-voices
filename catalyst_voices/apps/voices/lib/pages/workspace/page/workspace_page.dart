@@ -91,7 +91,7 @@ class _WorkspacePageState extends State<WorkspacePage>
   void _dontShowCampaignSubmissionClosingDialog(bool value) {
     context
         .read<SessionCubit>()
-        .updateShowSubmissionClosingWarning(value: value);
+        .updateShowSubmissionClosingWarning(value: !value);
   }
 
   void _showDeleteErrorSnackBar() {
