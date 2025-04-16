@@ -48,20 +48,120 @@ With the complexity of the JSON Schema it's important to understand the constrai
 | `ProposalTemplate` | `theme.theme.grouped_tag` | `object` | Show the proposal theme in the UI components. The app needs to programmatically lookup in the template the related property. |
 <!-- markdownlint-enable max-one-sentence-per-line -->
 
-## Risks
+## Schema Evolution Guidelines
 
-* Failure to understand the app constraints will cause erroneous behavior if the document template
- is modified in a way that prevents the app from looking up predefined properties.
-* I.e. the UI components can start showing placeholders instead of actual titles because
- the app won't be able to lookup the related property.
- The same is true for the other properties listed above.
+To safely evolve the schema over time while preserving functionality:
+
+1. **Never rename predefined `nodeId`s** - If structure needs to change, keep the old nodeId as an alias
+2. **Use versioning** - Include schema version in document metadata
+3. **Add new fields rather than changing existing ones** - Mark old fields as deprecated
+4. **Test template changes** - Automated testing should verify that all predefined nodeIds are still accessible
+
+## Risks and Mitigations
+
+| Risk | Impact | Mitigation |
+|------|--------|------------|
+| Template modifications break nodeId lookups | UI shows placeholders instead of actual content | Create automated tests that verify all required nodeIds exist in template updates |
+| Schema grows too complex with custom logic | Maintenance burden increases | Document all custom behaviors and create a clear process for adding new ones |
+| Template authors don't understand constraints | Templates created that don't work with the app | Create a template authoring guide with clear examples and validation tools |
+| Performance degrades with complex schemas | App becomes slow when rendering large documents | Implement performance testing for templates and optimize lookup algorithms |
+
+## Testing Strategy
+
+To ensure the integrity of our approach:
+
+1. **Unit Tests** - Verify nodeId resolution logic works correctly.
+2. **Integration Tests** - Check that UI components correctly display data from schema nodes.
+3. **Schema Validation** - Create validators that check for required nodeIds in templates.
+4. **Migration Tests** - Verify that document migrations preserve required fields.
+5. **Error Handling Tests** - Verify that the system gracefully handles missing or malformed nodes.
+6. **Performance Tests** (*Optional*) - Measure rendering time with different schema complexities.
+
+## Maintenance Plan
+
+### Current Issues
+
+The frontend team currently spends an excessive amount of time reviewing schema change PRs from architects who often make changes without validating against frontend constraints. This creates an unsustainable workflow where:
+
+1. Contributors create schema changes without understanding frontend requirements
+2. PRs reach review stage with fundamental issues that break nodeId lookups
+3. Frontend team must thoroughly review every schema change
+4. Cycles of revisions delay implementation and waste development resources
+
+### Improved Process
+
+To address these issues, we suggest implement the following improved maintenance process:
+
+#### Automated Validation
+
+* **CI/CD Integration**: Add an automated check in the CI pipeline that fails PRs with breaking schema changes
+* **Schema Validator Tool** (*Optional*): Develop a command-line tool that validates schema changes against nodeId requirements
+* **Pre-commit Hook** (*Optional*): Provide a pre-commit hook that architects can install to validate locally before pushing
+
+#### Schema Change Workflow
+
+1. **Intent Documentation**: Architects must document intended schema changes in a standardized format.
+2. **Pre-validation**: Before creating a PR, contributors must run the validation tool against their changes.
+3. **Breaking Change Protocol**: If a breaking change is necessary, architects must:
+   - Document the breaking change
+   - Provide a migration path
+   - Coordinate with the frontend team before submission
+4. **Automated Tests**: Add test cases for each predefined nodeId that verify it still works after schema changes
+
+#### Clear Responsibilities
+
+* **Schema Owners**: Designate specific team members as "schema owners" who understand both architectural and frontend requirements.
+* **Review Rotation**: Establish a rotation of frontend developers responsible for schema reviews to distribute the burden.
+* **Knowledge Transfer**: Conduct regular knowledge sharing sessions on schema constraints for architects.
+* **Documentation**: Create a living document that clearly outlines all nodeId constraints with examples of what would break them.
 
 ## Consequences
 
 * Prevents erroneous app behavior however requires a careful editing to make sure `nodeIds` of the
  predefined properties are stable.
 * Predefining the properties reduces the flexibility to adjust the templates.
+* Provides a clear structure for engineers to understand how to work with templates.
+* Enables powerful UI capabilities that go beyond standard form rendering.
+* Adds implementation complexity and maintenance overhead for custom logic.
+* Requires thorough documentation and knowledge sharing across teams.
+
+## Diagrams
+
+### NodeId Resolution Flow
+
+```txt
++----------------+      +-----------------+      +----------------+
+| JSON Schema    | ---> | NodeId Resolver | ---> | UI Component   |
+| Document       |      | {Maps path to   |      | {Renders based |
+|                |      |  nodeId}        |      |  on node type} |
++----------------+      +-----------------+      +----------------+
+                                |
+                                v
+                        +---------------+
+                        | Custom Logic  |
+                        | {Based on     |
+                        |  nodeId}      |
+                        +---------------+
+```
+
+### Document Processing Pipeline
+
+```txt
++----------------+      +----------------+      +----------------+
+| Parse Schema   | ---> | Apply Custom   | ---> | Generate UI    |
+| {Validate      |      | Logic          |      | {Render forms, |
+|  structure}    |      | {Based on      |      |  views based   |
+|                |      |  nodeIds}      |      |  on context}   |
++----------------+      +----------------+      +----------------+
+```
 
 ## More Information
 
 * [JSON Schema Draft-07](https://json-schema.org/draft-07)
+* [JSON Schema Validation](https://json-schema.org/draft-07/json-schema-validation.html)
+* [JSON Schema Draft 2020-12](https://json-schema.org/draft/2020-12/release-notes) - Latest standard for reference
+* [Understanding JSON Schema](https://json-schema.org/understanding-json-schema/)
+* [JSON Schema for Humans](https://github.com/coveooss/json-schema-for-humans)
+* [JSON Schema Validator](https://www.jsonschemavalidator.net/)
+* [Another JSON Validator](https://www.npmjs.com/package/ajv-cli)
+* [Visualize JSON into interactive graphs](https://jsoncrack.com/)
