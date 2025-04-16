@@ -2,7 +2,6 @@ import 'package:catalyst_voices_repositories/src/dto/document/schema/document_sc
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../../fixture/voices_document_templates.dart';
-import '../../utils/fixture_reader.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -27,7 +26,7 @@ void main() {
     group('CommentTemplate', () {
       test('schema can be decoded and encoded', () async {
         // Given
-        final json = await FixtureReader.readJson('comment_template');
+        final json = await VoicesDocumentsTemplates.commentF14Schema;
 
         // When
         final dto = DocumentSchemaDto.fromJson(json);
