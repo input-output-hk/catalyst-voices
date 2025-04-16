@@ -50,11 +50,6 @@
             ]
         }
     },
-    "campaign_category": {
-        "category_details": {
-            "details": {}
-        }
-    },
     "projectDetails": {
         "solutionDescription": {
             "detailedDescription": "Our solution involves developing a comprehensive toolkit that will enhance the Cardano developer experience..."
