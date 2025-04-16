@@ -7,14 +7,14 @@ where the DB schema version changes during execution, and creates a mismatch wit
 
 ## Running Locally
 
-1. Spin up `scylla-node` and `event-db` databases
+* Spin up `scylla-node` and `event-db` databases
 
 ```shell
 cd ..
 docker compose up scylla-node event-db --detach
 ```
 
-2. Running a `catatalyst gateway`
+* Running a `catatalyst gateway`
 
 ```shell
 cd ../..
@@ -25,9 +25,9 @@ export SIGNED_DOC_SK="0x6455585b5dcc565c8975bc136e215d6d4dd96540620f37783c564da3
 ./target/release/cat-gateway run
 ```
 
-3. Also you need to compile a `mk_singed_doc` cli tool,
-which is used for building and signing Catalyst Signed Document objects
-(https://github.com/input-output-hk/catalyst-libs/tree/main/rust/signed_doc, tag version (`r20250416-00`)).
+* Also you need to compile a [`mk_singed_doc` cli tool](https://github.com/input-output-hk/catalyst-libs/tree/main/rust/signed_doc)
+  (version `r20250416-00`),
+which is used for building and signing Catalyst Signed Document objects.
 And copy this binary under this directory `api_tests`.
 
 ```shell
@@ -37,7 +37,7 @@ cargo b --release -p catalyst-signed-doc
 cp ./target/release/mk_singed_doc <path>/api_tests
 ```
 
-4. Running tests
+* Running tests
 
 ```shell
 export EVENT_DB_TEST_URL="postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev"
