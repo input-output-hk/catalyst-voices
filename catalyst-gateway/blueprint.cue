@@ -89,26 +89,26 @@ project: {
 								}
 								"EVENT_DB_MAX_CONNECTIONS_SIZE": {
 									secret: {
-										name: "db-max-connections"
-										key:  "max-connections"
+										name: "gateway"
+										key:  "db-max-connections"
 									}
 								}
 								"EVENT_DB_MAX_LIFETIME": {
 									secret: {
-										name: "db-max-lifetime"
-										key:  "max-lifetime"
+										name: "gateway"
+										key:  "db-max-lifetime"
 									}
 								}
 								"EVENT_DB_MIN_IDLE": {
 									secret: {
-										name: "db-min-idle"
-										key:  "min-idle"
+										name: "gateway"
+										key:  "db-min-idle"
 									}
 								}
 								"EVENT_DB_CONNECTION_TIMEOUT": {
 									secret: {
-										name: "db-connection-timeout"
-										key:  "connection-timeout"
+										name: "gateway"
+										key:  "db-connection-timeout"
 									}
 								}
 								"INTERNAL_API_KEY": {

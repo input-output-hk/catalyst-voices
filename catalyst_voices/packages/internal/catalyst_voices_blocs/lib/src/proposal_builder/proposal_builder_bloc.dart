@@ -557,15 +557,28 @@ final class ProposalBuilderBloc
   Future<void> _publishAndSubmitProposalForReview(
     Emitter<ProposalBuilderState> emit,
   ) async {
+    final currentRef = state.metadata.documentRef!;
     final updatedRef = await _proposalService.publishProposal(
       document: _buildDocumentData(),
     );
+
+    List<DocumentVersion>? updatedVersions;
+    if (updatedRef != currentRef) {
+      // if a new ref has been created we need to recreate
+      // the version history to reflect it, drop the old one
+      // because the new one overrode it
+      updatedVersions = _recreateDocumentVersionsWithNewRef(
+        newRef: updatedRef,
+        removedRef: currentRef,
+      );
+    }
 
     _updateMetadata(
       emit,
       documentRef: updatedRef,
       originalDocumentRef: updatedRef,
       publish: ProposalPublish.publishedDraft,
+      versions: updatedVersions,
     );
 
     await _proposalService.submitProposalForReview(
@@ -589,15 +602,28 @@ final class ProposalBuilderBloc
       _logger.info('Publishing proposal');
       emit(state.copyWith(isChanging: true));
 
+      final currentRef = state.metadata.documentRef!;
       final updatedRef = await _proposalService.publishProposal(
         document: _buildDocumentData(),
       );
+
+      List<DocumentVersion>? updatedVersions;
+      if (updatedRef != currentRef) {
+        // if a new ref has been created we need to recreate
+        // the version history to reflect it, drop the old one
+        // because the new one overrode it
+        updatedVersions = _recreateDocumentVersionsWithNewRef(
+          newRef: updatedRef,
+          removedRef: currentRef,
+        );
+      }
 
       _updateMetadata(
         emit,
         documentRef: updatedRef,
         originalDocumentRef: updatedRef,
         publish: ProposalPublish.publishedDraft,
+        versions: updatedVersions,
       );
       emitSignal(const PublishedProposalBuilderSignal());
     } catch (error, stackTrace) {
@@ -654,24 +680,28 @@ final class ProposalBuilderBloc
     );
   }
 
-  List<DocumentVersion> _recreateDocumentVersionsWithNewRef(
-    DocumentRef newRef,
-  ) {
-    final current = state.metadata.versions;
+  List<DocumentVersion> _recreateDocumentVersionsWithNewRef({
+    DocumentRef? newRef,
+    DocumentRef? removedRef,
+  }) {
+    final current =
+        state.metadata.versions.whereNot((e) => e.id == removedRef?.version);
+    final currentId = newRef?.version ?? current.last.id;
 
     return [
-      ...current.map(
-        (e) => e.copyWith(
-          isCurrent: false,
-          isLatest: false,
+      for (final (index, ver) in current.indexed)
+        ver.copyWith(
+          number: index + 1,
+          isCurrent: ver.id == currentId,
+          isLatest: ver.id == currentId,
         ),
-      ),
-      DocumentVersion(
-        id: newRef.version!,
-        number: current.length + 1,
-        isCurrent: true,
-        isLatest: true,
-      ),
+      if (newRef != null)
+        DocumentVersion(
+          id: newRef.version!,
+          number: current.length + 1,
+          isCurrent: newRef.version == currentId,
+          isLatest: newRef.version == currentId,
+        ),
     ];
   }
 
@@ -688,7 +718,7 @@ final class ProposalBuilderBloc
     if (updatedRef != currentRef) {
       // if a new ref has been created we need to recreate
       // the version history to reflect it
-      updatedVersions = _recreateDocumentVersionsWithNewRef(updatedRef);
+      updatedVersions = _recreateDocumentVersionsWithNewRef(newRef: updatedRef);
     }
 
     _updateMetadata(

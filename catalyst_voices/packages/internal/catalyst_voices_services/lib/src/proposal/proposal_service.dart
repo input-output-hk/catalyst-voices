@@ -269,22 +269,29 @@ final class ProposalServiceImpl implements ProposalService {
   Future<SignedDocumentRef> publishProposal({
     required DocumentData document,
   }) async {
+    final originalRef = document.ref;
+
+    // There is a system requirement to publish fresh documents,
+    // where version timestamp is not older than a predefined interval.
+    // Because of it we're regenerating a version just before publishing.
+    final freshRef = originalRef.freshVersion();
+    final freshDocument = document.copyWithSelfRef(selfRef: freshRef);
+
     await _signerService.useProposerCredentials(
       (catalystId, privateKey) {
         return _proposalRepository.publishProposal(
-          document: document,
+          document: freshDocument,
           catalystId: catalystId,
           privateKey: privateKey,
         );
       },
     );
 
-    final ref = document.ref;
-    if (ref is DraftRef) {
-      await _proposalRepository.deleteDraftProposal(ref);
+    if (originalRef is DraftRef) {
+      await _proposalRepository.deleteDraftProposal(originalRef);
     }
 
-    return ref.toSignedDocumentRef();
+    return freshRef.toSignedDocumentRef();
   }
 
   @override
