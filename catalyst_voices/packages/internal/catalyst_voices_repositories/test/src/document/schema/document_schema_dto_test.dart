@@ -1,7 +1,7 @@
-import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/schema/document_schema_dto.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../../fixture/voices_document_templates.dart';
 import '../../utils/fixture_reader.dart';
 
 void main() {

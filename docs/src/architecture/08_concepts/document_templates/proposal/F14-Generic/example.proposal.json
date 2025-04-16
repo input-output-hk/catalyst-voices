@@ -53,9 +53,6 @@
         }
     },
     "campaign_category": {
-        "category_details": {
-            "details": {}
-        },
         "category_questions": {
             "informational_content": {
                 "answer": false
