@@ -82,7 +82,8 @@ To ensure the integrity of our approach:
 ### Current Issues
 
 The frontend team currently spends an excessive amount of time reviewing schema change PRs from architects
-who often make changes without validating against frontend constraints. This creates an unsustainable workflow where:
+who often make changes without validating against frontend constraints.
+This creates an unsustainable workflow where:
 
 1. Contributors create schema changes without understanding frontend requirements
 2. PRs reach review stage with fundamental issues that break nodeId lookups
@@ -104,9 +105,9 @@ To address these issues, we suggest implement the following improved maintenance
 1. **Intent Documentation**: Architects must document intended schema changes in a standardized format.
 2. **Pre-validation**: Before creating a PR, contributors must run the validation tool against their changes.
 3. **Breaking Change Protocol**: If a breaking change is necessary, architects must:
-   - Document the breaking change
-   - Provide a migration path
-   - Coordinate with the frontend team before submission
+   * Document the breaking change
+   * Provide a migration path
+   * Coordinate with the frontend team before submission
 4. **Automated Tests**: Add test cases for each predefined nodeId that verify it still works after schema changes
 
 #### Clear Responsibilities
