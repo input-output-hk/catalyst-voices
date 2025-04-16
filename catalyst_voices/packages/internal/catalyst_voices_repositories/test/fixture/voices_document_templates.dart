@@ -34,7 +34,10 @@ class VoicesDocumentsTemplates {
       } else {
         final parentDir = dir.parent;
         if (dir.path == parentDir.path) {
-          throw StateError('Cannot find /docs directory in the repo.');
+          throw StateError(
+            'Cannot find /docs directory in the repo. '
+            'Started lookup from ${Directory.current.path}.',
+          );
         } else {
           dir = dir.parent;
         }
