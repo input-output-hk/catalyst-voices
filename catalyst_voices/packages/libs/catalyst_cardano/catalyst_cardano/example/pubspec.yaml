@@ -31,6 +31,7 @@ dependencies:
   webdriver: ^3.0.3
 
 dev_dependencies:
+  analyzer: 7.3.0
   catalyst_analysis: ^3.0.0
 
 flutter:

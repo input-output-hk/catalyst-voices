@@ -20,6 +20,7 @@ dependencies:
   pointycastle: ^3.9.1
 
 dev_dependencies:
+  analyzer: 7.3.0
   catalyst_analysis: ^3.0.0
 
 dependency_overrides:
