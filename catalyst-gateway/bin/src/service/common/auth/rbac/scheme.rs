@@ -58,7 +58,7 @@ impl From<CatalystRBACSecurityScheme> for CatalystRBACTokenV1 {
 /// Can be related to database session failure.
 #[derive(Debug, thiserror::Error)]
 #[error("Service unavailable while processing a Catalyst RBAC Token")]
-struct ServiceUnavailableError(anyhow::Error);
+pub struct ServiceUnavailableError(pub anyhow::Error);
 
 impl ResponseError for ServiceUnavailableError {
     fn status(&self) -> StatusCode {
@@ -81,7 +81,7 @@ impl ResponseError for ServiceUnavailableError {
 /// We can not parse it, so its a 401 response.
 #[derive(Debug, thiserror::Error)]
 #[error("Invalid Catalyst RBAC Auth Token")]
-struct AuthTokenError;
+pub struct AuthTokenError;
 
 impl ResponseError for AuthTokenError {
     fn status(&self) -> StatusCode {
@@ -100,7 +100,7 @@ impl ResponseError for AuthTokenError {
 /// Not enough access rights, so its a 403 response.
 #[derive(Debug, thiserror::Error)]
 #[error("Insufficient Permission for Catalyst RBAC Token")]
-struct AuthTokenAccessViolation(Vec<String>);
+pub struct AuthTokenAccessViolation(Vec<String>);
 
 impl ResponseError for AuthTokenAccessViolation {
     fn status(&self) -> StatusCode {
@@ -165,7 +165,7 @@ async fn checker_api_catalyst_auth(
     if !token.is_young(MAX_TOKEN_AGE, MAX_TOKEN_SKEW) {
         // Token is too old or too far in the future.
         error!("Auth token expired: {token}");
-        return Err(AuthTokenAccessViolation(vec!["EXPIRED".to_string()]).into());
+        Err(AuthTokenAccessViolation(vec!["EXPIRED".to_string()]))?;
     }
 
     // TODO: Caching is currently disabled because we want to measure the performance without
@@ -194,7 +194,9 @@ async fn checker_api_catalyst_auth(
     // Step 9: Verify the signature against the Role 0 pk.
     if let Err(error) = token.verify(&latest_pk) {
         error!(error=%error, "Invalid signature for token: {token}");
-        return Err(AuthTokenAccessViolation(vec!["INVALID SIGNATURE".to_string()]).into());
+        Err(AuthTokenAccessViolation(vec![
+            "INVALID SIGNATURE".to_string()
+        ]))?;
     }
 
     // Step 10 is optional and isn't currently implemented.
