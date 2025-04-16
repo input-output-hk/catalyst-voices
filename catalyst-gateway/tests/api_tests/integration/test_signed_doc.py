@@ -197,8 +197,7 @@ def submission_action_factory(
     return __submission_action_factory
 
 
-def test_templates(proposal_templates, comment_templates, rbac_chain_factory):
-    rbac_chain = rbac_chain_factory(RoleID.ROLE_0)
+def test_templates(proposal_templates, comment_templates):
     templates = proposal_templates + comment_templates
     for template_id in templates:
         resp = document.get(document_id=template_id)
