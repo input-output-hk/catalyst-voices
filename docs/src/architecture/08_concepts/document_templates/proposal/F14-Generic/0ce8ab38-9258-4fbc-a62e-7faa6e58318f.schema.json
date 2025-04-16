@@ -678,26 +678,6 @@
                 "translation"
             ]
         },
-        "campaign_category": {
-            "$ref": "#/definitions/segment",
-            "title": "Selected Category",
-            "description": "The category of your submission",
-            "properties": {
-                "category_details": {
-                    "$ref": "#/definitions/section",
-                    "title": "Selected Category",
-                    "properties": {
-                        "details": {
-                            "type": "object",
-                            "title": "Selected Category"
-                        }
-                    }
-                }
-            },
-            "x-order": [
-                "category_details"
-            ]
-        },
         "summary": {
             "$ref": "#/definitions/segment",
             "title": "Summary",
@@ -811,6 +791,26 @@
                 "expectedDuration",
                 "requestedBudget",
                 "relevantLinks"
+            ]
+        },
+        "campaign_category": {
+            "$ref": "#/definitions/segment",
+            "title": "Selected Category",
+            "description": "The category of your submission",
+            "properties": {
+                "category_details": {
+                    "$ref": "#/definitions/section",
+                    "title": "Selected Category",
+                    "properties": {
+                        "details": {
+                            "type": "object",
+                            "title": "Selected Category"
+                        }
+                    }
+                }
+            },
+            "x-order": [
+                "category_details"
             ]
         },
         "projectDetails": {
