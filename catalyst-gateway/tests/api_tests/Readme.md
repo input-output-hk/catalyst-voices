@@ -14,7 +14,7 @@ cd ..
 docker compose up scylla-node event-db --detach
 ```
 
-* Running a `catatalyst gateway`
+* Running a `catalyst gateway`
 
 ```shell
 cd ../..
