@@ -27,7 +27,7 @@ export SIGNED_DOC_SK="0x6455585b5dcc565c8975bc136e215d6d4dd96540620f37783c564da3
 
 3. Also you need to compile a `mk_singed_doc` cli tool,
 which is used for building and signing Catalyst Signed Document objects
-(https://github.com/input-output-hk/catalyst-libs/tree/main/rust/signed_doc).
+(https://github.com/input-output-hk/catalyst-libs/tree/main/rust/signed_doc, tag version (`r20250416-00`)).
 And copy this binary under this directory `api_tests`.
 
 ```shell
