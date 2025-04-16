@@ -40,7 +40,7 @@ final class WorkspaceState extends Equatable {
       .toList();
   bool get showError => error != null && !isLoading;
   bool get showLoading => isLoading;
-  bool get showProposals => error == null && !isLoading;
+  bool get showProposals => error == null;
   DateTime? get submissionCloseDate => timelineItems
       .firstWhereOrNull(
         (e) => e.stage == CampaignTimelineStage.proposalSubmission,

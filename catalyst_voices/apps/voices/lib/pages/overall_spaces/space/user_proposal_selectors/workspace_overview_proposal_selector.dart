@@ -28,7 +28,10 @@ class _WorkspaceDataProposalSelector extends StatelessWidget {
         BlocSelector<WorkspaceBloc, WorkspaceState,
             DataVisibilityState<List<Proposal>>>(
           selector: (state) {
-            return (data: state.notPublished, show: state.showProposals);
+            return (
+              data: state.notPublished,
+              show: state.showProposals && !state.isLoading
+            );
           },
           builder: (context, state) {
             return Offstage(
