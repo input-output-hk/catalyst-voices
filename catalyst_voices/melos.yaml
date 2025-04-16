@@ -161,6 +161,11 @@ command:
       web: ^1.1.0
       webdriver: ^3.0.3
     dev_dependencies:
+      # TODO(dtscalac): locked version until the migration is possible:
+      # https://github.com/dart-lang/sdk/blob/main/pkg/analyzer/doc/element_model_migration_guide.md
+      # Currently many of the packages have not been migrated yet therefore we cannot use newer analyzer in our project.
+      # After the packages are migrated we can remove the direct dependency on analyzer and let it be a transitive dependency.
+      analyzer: 7.3.0
       test: ^1.24.9
       build_runner: ^2.4.12
       chopper_generator: ^8.0.4
