@@ -54,6 +54,16 @@ sealed class DocumentRef extends Equatable implements Comparable<DocumentRef> {
     Optional<String>? version,
   });
 
+  /// Generates a new (fresh) draft version of the document reference.
+  ///
+  /// The timestamp of the version will be set to DateTime.now().
+  DraftRef freshVersion() {
+    return DraftRef(
+      id: id,
+      version: const Uuid().v7(),
+    );
+  }
+
   /// Generates a draft version of the document reference.
   ///
   /// The version can be used as next version for updated document,
