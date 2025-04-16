@@ -52,8 +52,10 @@ def rbac_chain_factory():
     def __rbac_chain_factory(role_id: RoleID) -> RBACChain:
         network = "preprod"
         match role_id:
+            # RBAC registration chain that contains only Role 0 (voter)
             case RoleID.ROLE_0:
                 return RBACChain(ONLY_ROLE_0_REG_JSON, network)
+            # RBAC registration chain that contains both Role 0 -> Role 3 (proposer)
             case RoleID.PROPOSER:
                 return RBACChain(ROLE_3_REG_JSON, network)
 
@@ -69,7 +71,7 @@ def generate_cat_id(
     subnet = f"{subnet}." if subnet else ""
     role0_pk_b64 = base64_url(pk)
 
-    if role_id == RoleID.ROLE_0:
+    if role_id == RoleID.ROLE_0 and rotation == 0:
         return f"{prefix}{nonce}@{subnet}{network}/{role0_pk_b64}"
 
     return f"{prefix}{nonce}@{subnet}{network}/{role0_pk_b64}/{role_id}/{rotation}"

@@ -145,8 +145,7 @@ pub(crate) async fn endpoint(doc_bytes: Vec<u8>, mut token: CatalystRBACTokenV1)
     }
 }
 
-/// Checks if the document ID and version differ, fetch the latest version and ensure its
-/// catalyst-id and role entries match those in the newer or different version.
+/// Fetch the latest version and ensure its catalyst-id match those in the newer version.
 async fn validate_against_original_doc(doc: &CatalystSignedDocument) -> anyhow::Result<bool> {
     let original_doc = match FullSignedDoc::retrieve(&doc.doc_id()?.uuid(), None).await {
         Ok(doc) => doc,
