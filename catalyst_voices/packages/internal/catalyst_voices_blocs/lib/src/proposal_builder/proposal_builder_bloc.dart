@@ -686,20 +686,21 @@ final class ProposalBuilderBloc
   }) {
     final current =
         state.metadata.versions.whereNot((e) => e.id == removedRef?.version);
+    final currentId = newRef?.version ?? current.last.id;
 
     return [
-      ...current.map(
-        (e) => e.copyWith(
-          isCurrent: false,
-          isLatest: false,
+      for (final (index, ver) in current.indexed)
+        ver.copyWith(
+          number: index + 1,
+          isCurrent: ver.id == currentId,
+          isLatest: ver.id == currentId,
         ),
-      ),
       if (newRef != null)
         DocumentVersion(
           id: newRef.version!,
           number: current.length + 1,
-          isCurrent: true,
-          isLatest: true,
+          isCurrent: newRef.version == currentId,
+          isLatest: newRef.version == currentId,
         ),
     ];
   }
