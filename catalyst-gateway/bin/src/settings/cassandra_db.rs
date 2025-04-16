@@ -104,7 +104,7 @@ impl EnvVars {
     }
 
     /// Log the configuration of this Cassandra DB
-    pub(crate) fn log(&self, persistent: bool, network: Network) -> anyhow::Result<()> {
+    pub(crate) fn log(&self, persistent: bool, network: Network) {
         let db_type = if persistent { "Persistent" } else { "Volatile" };
 
         let auth = match (&self.username, &self.password) {
@@ -119,13 +119,12 @@ impl EnvVars {
 
         info!(
             url = self.url.as_str(),
-            namespace = db::index::schema::namespace(persistent, network)?,
+            namespace = db::index::schema::namespace(persistent, network),
             auth = auth,
             tls = self.tls.to_string(),
             cert = tls_cert,
             compression = self.compression.to_string(),
             "Cassandra {db_type} DB Configuration"
         );
-        Ok(())
     }
 }

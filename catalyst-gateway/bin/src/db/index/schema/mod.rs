@@ -163,13 +163,13 @@ fn generate_cql_schema_version() -> String {
 }
 
 /// Get the namespace for a particular db configuration
-pub(crate) fn namespace(persistent: bool, network: Network) -> anyhow::Result<String> {
+pub(crate) fn namespace(persistent: bool, network: Network) -> String {
     // Build and set the Keyspace to use.
     let namespace = if persistent { "p" } else { "v" };
-    Ok(format!(
+    format!(
         "{namespace}_{network}_{}",
         generate_cql_schema_version().replace('-', "_")
-    ))
+    )
 }
 
 /// Create the namespace we will use for this session
@@ -177,7 +177,7 @@ pub(crate) fn namespace(persistent: bool, network: Network) -> anyhow::Result<St
 async fn create_namespace(
     session: &mut Arc<Session>, cfg: &cassandra_db::EnvVars, persistent: bool, network: Network,
 ) -> anyhow::Result<()> {
-    let keyspace = namespace(persistent, network)?;
+    let keyspace = namespace(persistent, network);
 
     let mut reg = Handlebars::new();
     // disable default `html_escape` function

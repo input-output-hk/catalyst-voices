@@ -333,9 +333,7 @@ async fn retry_init(cfg: cassandra_db::EnvVars, network: Network, persistent: bo
         "Index DB Session Creation: Started."
     );
 
-    if let Err(e) = cfg.log(persistent, network) {
-        error!(db_type = db_type, network = %network, "Error configuring logging for Cassandra DB: {e}");
-    };
+    cfg.log(persistent, network);
 
     loop {
         tokio::time::sleep(retry_delay).await;
