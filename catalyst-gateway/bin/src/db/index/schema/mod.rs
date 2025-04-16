@@ -278,6 +278,26 @@ mod tests {
     }
 
     #[test]
+    fn test_namespace_persistent() {
+        let network = Network::Preprod;
+        let persistent = true;
+        let namespace = namespace(persistent, network);
+        let schema_version = generate_cql_schema_version().replace('-', "_");
+        let expected = format!("p_{network}_{schema_version}");
+        assert_eq!(namespace, expected);
+    }
+
+    #[test]
+    fn test_namespace_volatile() {
+        let network = Network::Preprod;
+        let persistent = false;
+        let namespace = namespace(persistent, network);
+        let schema_version = generate_cql_schema_version().replace('-', "_");
+        let expected = format!("v_{network}_{schema_version}");
+        assert_eq!(namespace, expected);
+    }
+
+    #[test]
     fn test_no_comments() {
         let input = "SELECT * FROM table1;";
         let expected_output = "SELECT * FROM table1;";
