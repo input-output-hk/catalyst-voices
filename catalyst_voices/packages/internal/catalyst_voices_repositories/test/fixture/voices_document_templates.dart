@@ -26,10 +26,13 @@ class VoicesDocumentsTemplates {
       final docs = list.firstWhereOrNull((e) => e.path.endsWith('/docs'));
       if (docs != null) {
         return Directory(docs.path);
-      } else if (dir.parent.existsSync()) {
-        dir = dir.parent;
       } else {
-        throw StateError('Cannot find /docs directory in the repo.');
+        final parentDir = dir.parent;
+        if (dir.path == parentDir.path) {
+          throw StateError('Cannot find /docs directory in the repo.');
+        } else {
+          dir = dir.parent;
+        }
       }
     }
   }
