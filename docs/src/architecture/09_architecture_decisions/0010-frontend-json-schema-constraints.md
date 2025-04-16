@@ -92,7 +92,7 @@ This creates an unsustainable workflow where:
 
 ### Improved Process
 
-To address these issues, we suggest implement the following improved maintenance process:
+To address these issues, we suggest implementing the following improved maintenance process:
 
 #### Automated Validation
 
