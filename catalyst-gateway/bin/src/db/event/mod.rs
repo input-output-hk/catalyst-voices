@@ -247,7 +247,8 @@ impl EventDB {
 ///
 /// If connection to the pool is `OK`, the `LIVE_EVENT_DB` atomic flag is set to `true`.
 pub fn establish_connection() {
-    let (url, user, pass) = Settings::event_db_settings();
+    let (url, user, pass, max_connections, max_lifetime, min_idle, connection_timeout) =
+        Settings::event_db_settings();
 
     // This was pre-validated and can't fail, but provide default in the impossible case it
     // does.
@@ -264,7 +265,12 @@ pub fn establish_connection() {
 
     let pg_mgr = PostgresConnectionManager::new(config, tokio_postgres::NoTls);
 
-    let pool = Pool::builder().build_unchecked(pg_mgr);
+    let pool = Pool::builder()
+        .max_size(max_connections)
+        .max_lifetime(Some(core::time::Duration::from_secs(max_lifetime.into())))
+        .min_idle(min_idle)
+        .connection_timeout(core::time::Duration::from_secs(connection_timeout.into()))
+        .build_unchecked(pg_mgr);
 
     if EVENT_DB_POOL.set(Arc::new(pool)).is_err() {
         error!("Failed to set event db pool. Called Twice?");

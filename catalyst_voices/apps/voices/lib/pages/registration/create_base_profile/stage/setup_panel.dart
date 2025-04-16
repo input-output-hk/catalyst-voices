@@ -8,55 +8,11 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
-class SetupPanel extends StatelessWidget {
+class SetupPanel extends StatefulWidget {
   const SetupPanel({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const SizedBox(height: 24),
-        const _Title(),
-        Expanded(
-          child: FocusScope(
-            child: ListView(
-              padding: const EdgeInsets.symmetric(vertical: 24),
-              children: const [
-                _DisplayNameSelector(),
-                SizedBox(height: 24),
-                _EmailSelector(),
-              ],
-            ),
-          ),
-        ),
-        const SizedBox(height: 24),
-        const _IdeascaleInfoCard(),
-        const SizedBox(height: 24),
-        const _NavigationSelector(),
-      ],
-    );
-  }
-}
-
-class _Title extends StatelessWidget {
-  const _Title();
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final textTheme = theme.textTheme;
-
-    final textStyle = (textTheme.titleMedium ?? const TextStyle()).copyWith(
-      color: theme.colors.textOnPrimaryLevel1,
-    );
-
-    return Text(
-      key: const Key('TitleText'),
-      context.l10n.createBaseProfileSetupTitle,
-      style: textStyle,
-    );
-  }
+  State<SetupPanel> createState() => _SetupPanelState();
 }
 
 class _DisplayNameSelector extends StatelessWidget {
@@ -164,7 +120,7 @@ class _IdeascaleInfoCard extends StatelessWidget {
       key: const Key('IdeascaleInfoCard'),
       icon: VoicesAssets.icons.mailOpen.buildIcon(),
       title: Text(
-        context.l10n.createBaseProfileSetupIdeascaleAccount,
+        context.l10n.createBaseProfileHasIdeascaleAccountAlready,
         key: const Key('InfoCardTitle'),
       ),
       desc: BulletList(
@@ -175,6 +131,21 @@ class _IdeascaleInfoCard extends StatelessWidget {
         spacing: 0,
       ),
       statusIcon: VoicesAssets.icons.informationCircle.buildIcon(),
+    );
+  }
+}
+
+class _Navigation extends StatelessWidget {
+  final bool isNextEnabled;
+
+  const _Navigation({
+    required this.isNextEnabled,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return RegistrationBackNextNavigation(
+      isNextEnabled: isNextEnabled,
     );
   }
 }
@@ -191,17 +162,71 @@ class _NavigationSelector extends StatelessWidget {
   }
 }
 
-class _Navigation extends StatelessWidget {
-  final bool isNextEnabled;
-
-  const _Navigation({
-    required this.isNextEnabled,
-  });
+class _SetupPanelState extends State<SetupPanel> {
+  late final ScrollController _scrollController;
 
   @override
   Widget build(BuildContext context) {
-    return RegistrationBackNextNavigation(
-      isNextEnabled: isNextEnabled,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 24),
+        const _Title(),
+        Expanded(
+          child: FocusScope(
+            child: VoicesScrollbar(
+              controller: _scrollController,
+              alwaysVisible: true,
+              padding: const EdgeInsets.only(left: 10),
+              child: ListView(
+                controller: _scrollController,
+                padding: const EdgeInsets.symmetric(vertical: 24),
+                children: const [
+                  _DisplayNameSelector(),
+                  SizedBox(height: 24),
+                  _EmailSelector(),
+                ],
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 24),
+        const _IdeascaleInfoCard(),
+        const SizedBox(height: 24),
+        const _NavigationSelector(),
+      ],
+    );
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController = ScrollController();
+  }
+}
+
+class _Title extends StatelessWidget {
+  const _Title();
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final textTheme = theme.textTheme;
+
+    final textStyle = (textTheme.titleMedium ?? const TextStyle()).copyWith(
+      color: theme.colors.textOnPrimaryLevel1,
+    );
+
+    return Text(
+      key: const Key('TitleText'),
+      context.l10n.createBaseProfileSetupTitle,
+      style: textStyle,
     );
   }
 }

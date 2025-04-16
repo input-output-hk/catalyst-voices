@@ -75,11 +75,15 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     Emitter<WorkspaceState> emit,
   ) async {
     try {
+      emit(state.copyWith(isLoading: true));
       await _proposalService.deleteDraftProposal(event.ref);
+      emit(state.copyWith(userProposals: _removeProposal(event.ref)));
       emitSignal(const DeletedDraftWorkspaceSignal());
     } catch (error, stackTrace) {
       _logger.severe('Delete proposal failed', error, stackTrace);
       emitError(const LocalizedProposalDeletionException());
+    } finally {
+      emit(state.copyWith(isLoading: false));
     }
   }
 
@@ -138,12 +142,18 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
       return emitError(const LocalizedUnknownException());
     }
     try {
+      emit(state.copyWith(isLoading: true));
       await _proposalService.forgetProposal(
         proposalRef: proposal.selfRef as SignedDocumentRef,
         categoryId: proposal.categoryId,
       );
+      emit(state.copyWith(userProposals: _removeProposal(event.ref)));
+      emitSignal(const ForgetProposalSuccessWorkspaceSignal());
     } catch (e, stackTrace) {
+      emitError(LocalizedException.create(e));
       _logger.severe('Error forgetting proposal', e, stackTrace);
+    } finally {
+      emit(state.copyWith(isLoading: false));
     }
   }
 
@@ -164,12 +174,16 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     Emitter<WorkspaceState> emit,
   ) async {
     try {
+      emit(state.copyWith(isLoading: true));
       final ref = await _proposalService.importProposal(event.proposalData);
       emitSignal(ImportedProposalWorkspaceSignal(proposalRef: ref));
     } catch (error, stackTrace) {
       _logger.severe('Importing proposal failed', error, stackTrace);
+      emit(state.copyWith(isLoading: false));
       emitError(LocalizedException.create(error));
     }
+    // We don't need to emit isLoading false here because it will be emitted
+    // in the stream subscription.
   }
 
   Future<void> _loadProposals(
@@ -183,6 +197,13 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
         userProposals: event.proposals,
       ),
     );
+  }
+
+  List<Proposal> _removeProposal(
+    DocumentRef proposalRef,
+  ) {
+    return [...state.userProposals]
+      ..removeWhere((e) => e.selfRef.id == proposalRef.id);
   }
 
   void _setupProposalsSubscription() {
@@ -236,6 +257,5 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     await _proposalsSubscription?.cancel();
     _proposalsSubscription = null;
     _setupProposalsSubscription();
-    emit(state.copyWith(isLoading: false));
   }
 }

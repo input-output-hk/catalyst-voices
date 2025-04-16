@@ -16,6 +16,7 @@ dependencies:
   google_fonts: ^6.2.1
 
 dev_dependencies:
+  analyzer: 7.3.0
   catalyst_analysis: ^3.0.0
   catalyst_voices_blocs:
     path: ../catalyst_voices_blocs

@@ -71,17 +71,17 @@ final class _AppContent extends StatelessWidget {
         brightness: Brightness.dark,
       ),
       debugShowCheckedModeBanner: false,
-      builder: (context, child) {
-        return Scaffold(
-          primary: false,
-          backgroundColor: Colors.transparent,
-          body: AppActiveStateListener(
-            child: GlobalPrecacheImages(
-              child: GlobalSessionListener(
+      builder: (_, child) {
+        return AppActiveStateListener(
+          child: GlobalPrecacheImages(
+            child: GlobalSessionListener(
+              // IMPORTANT: AppSplashScreenManager must be placed above all
+              // widgets that render visible UI elements. Any widget that
+              // displays content should be a descendant of
+              //AppSplashScreenManager to ensure proper splash screen behavior.
+              child: AppSplashScreenManager(
                 child: AppMobileAccessRestriction(
-                  child: AppSplashScreenManager(
-                    child: child ?? const SizedBox.shrink(),
-                  ),
+                  child: child ?? const SizedBox.shrink(),
                 ),
               ),
             ),

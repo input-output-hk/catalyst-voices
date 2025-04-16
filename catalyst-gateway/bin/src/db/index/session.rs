@@ -83,6 +83,10 @@ pub(crate) enum CassandraSessionError {
     /// Error indicating that the session has already been set.
     #[error("Session already set")]
     SessionAlreadySet,
+    /// Should be used by the caller when it fails to acquire the initialized database
+    /// session.
+    #[error("Failed acquiring database session")]
+    FailedAcquiringSession,
 }
 
 /// All interaction with cassandra goes through this struct.
