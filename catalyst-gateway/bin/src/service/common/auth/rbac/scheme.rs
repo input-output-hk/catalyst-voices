@@ -1,37 +1,22 @@
 //! Catalyst RBAC Security Scheme
 use std::{env, error::Error, sync::LazyLock, time::Duration};
 
-use anyhow::{anyhow, Context};
-use cardano_blockchain_types::{Network, Point, Slot, TxnIndex};
-use cardano_chain_follower::ChainFollower;
-use catalyst_types::id_uri::IdUri;
-use ed25519_dalek::VerifyingKey;
-use futures::{TryFutureExt, TryStreamExt};
 use moka::future::Cache;
 use poem::{error::ResponseError, http::StatusCode, IntoResponse, Request};
-use poem_openapi::{auth::Bearer, payload::Json, SecurityScheme};
-use rbac_registration::{
-    cardano::cip509::{Cip509, RoleNumber},
-    registration::cardano::RegistrationChain,
-};
-use tracing::{error, warn};
+use poem_openapi::{auth::Bearer, SecurityScheme};
+use rbac_registration::cardano::cip509::RoleNumber;
+use tracing::error;
 
 use super::token::CatalystRBACTokenV1;
 use crate::{
-    db::index::{
-        queries::rbac::get_rbac_registrations::{Query, QueryParams},
-        session::CassandraSession,
-    },
+    db::index::session::CassandraSessionError,
     service::common::{
-        responses::{
-            code_500_internal_server_error::InternalServerError,
-            code_503_service_unavailable::ServiceUnavailable, ErrorResponses,
-        },
-        types::headers::retry_after::RetryAfterHeader,
+        responses::{ErrorResponses, WithErrorResponses},
+        types::headers::retry_after::{RetryAfterHeader, RetryAfterOption},
     },
 };
 
-/// Auth token in the form of catv1..
+/// Auth token in the form of catv1.
 pub type EncodedAuthToken = String;
 
 /// The header name that holds the authorization RBAC token
@@ -60,11 +45,34 @@ static CACHE: LazyLock<Cache<EncodedAuthToken, CatalystRBACTokenV1>> = LazyLock:
     checker = "checker_api_catalyst_auth"
 )]
 #[allow(dead_code, clippy::module_name_repetitions)]
-pub struct CatalystRBACSecurityScheme(CatalystRBACTokenV1);
+pub(crate) struct CatalystRBACSecurityScheme(CatalystRBACTokenV1);
 
-impl From<CatalystRBACSecurityScheme> for IdUri {
+impl From<CatalystRBACSecurityScheme> for CatalystRBACTokenV1 {
     fn from(value: CatalystRBACSecurityScheme) -> Self {
-        value.0.into()
+        value.0
+    }
+}
+
+/// Error with the service while processing a Catalyst RBAC Token
+///
+/// Can be related to database session failure.
+#[derive(Debug, thiserror::Error)]
+#[error("Service unavailable while processing a Catalyst RBAC Token")]
+pub struct ServiceUnavailableError(pub anyhow::Error);
+
+impl ResponseError for ServiceUnavailableError {
+    fn status(&self) -> StatusCode {
+        StatusCode::SERVICE_UNAVAILABLE
+    }
+
+    /// Convert this error to a HTTP response.
+    fn as_response(&self) -> poem::Response
+    where Self: Error + Send + Sync + 'static {
+        WithErrorResponses::<()>::service_unavailable(
+            &self.0,
+            RetryAfterOption::Some(RetryAfterHeader::default()),
+        )
+        .into_response()
     }
 }
 
@@ -124,7 +132,7 @@ async fn checker_api_catalyst_auth(
     const RBAC_OFF: &str = "RBAC_OFF";
 
     // Deserialize the token: this performs the 1-5 steps of the validation.
-    let token = CatalystRBACTokenV1::parse(&bearer.token).map_err(|e| {
+    let mut token = CatalystRBACTokenV1::parse(&bearer.token).map_err(|e| {
         error!("Corrupt auth token: {e:?}");
         AuthTokenError
     })?;
@@ -134,15 +142,24 @@ async fn checker_api_catalyst_auth(
         return Ok(token);
     };
 
-    let registrations = indexed_registrations(token.catalyst_id()).await?;
-    // Step 6: return 401 if the token isn't known.
-    if registrations.is_empty() {
-        error!(
-            "Unable to find registrations for {} Catalyst ID",
-            token.catalyst_id()
-        );
-        return Err(AuthTokenError.into());
-    }
+    // Step 6: get and build latest registration chain from the db.
+    let reg_chain = match token.reg_chain().await {
+        Ok(Some(reg_chain)) => reg_chain,
+        Ok(None) => {
+            error!(
+                "Unable to find registrations for {} Catalyst ID",
+                token.catalyst_id()
+            );
+            return Err(AuthTokenError.into());
+        },
+        Err(err) if err.is::<CassandraSessionError>() => {
+            return Err(ServiceUnavailableError(err).into())
+        },
+        Err(err) => {
+            error!("Unable to build a registration chain Catalyst ID: {err:?}");
+            return Err(AuthTokenError.into());
+        },
+    };
 
     // Step 7: Verify that the nonce is in the acceptable range.
     if !token.is_young(MAX_TOKEN_AGE, MAX_TOKEN_SKEW) {
@@ -163,20 +180,19 @@ async fn checker_api_catalyst_auth(
     //     return Ok(token);
     // }
 
-    // Step 8: get the latest stable signing certificate registered for Role 0.
-
-    let public_key = last_signing_key(token.network(), &registrations)
-        .await
-        .map_err(|e| {
+    // Step 8: Get the latest stable signing certificate registered for Role 0.
+    let (latest_pk, _) = reg_chain
+        .get_latest_signing_pk_for_role(&RoleNumber::ROLE_0)
+        .ok_or_else(|| {
             error!(
-                "Unable to get last signing key for {} Catalyst ID: {e:?}",
+                "Unable to get last signing key for {} Catalyst ID",
                 token.catalyst_id()
             );
             AuthTokenError
         })?;
 
-    // Step 9: Verify the signature.
-    if let Err(error) = token.verify(&public_key) {
+    // Step 9: Verify the signature against the Role 0 pk.
+    if let Err(error) = token.verify(&latest_pk) {
         error!(error=%error, "Invalid signature for token: {token}");
         Err(AuthTokenAccessViolation(vec![
             "INVALID SIGNATURE".to_string()
@@ -193,111 +209,6 @@ async fn checker_api_catalyst_auth(
     // // This entry will expire after 5 minutes (TTI) if there is no more ().
     // CACHE.insert(bearer.token, token.clone()).await;
 
+    // Step 11: Token is valid
     Ok(token)
-}
-
-/// Returns a sorted list of all registrations for the given Catalyst ID from the
-/// database.
-async fn indexed_registrations(catalyst_id: &IdUri) -> poem::Result<Vec<Query>> {
-    let session = CassandraSession::get(true).ok_or_else(|| {
-        error!("Failed to acquire db session");
-        service_unavailable()
-    })?;
-
-    let mut result: Vec<_> = Query::execute(&session, QueryParams {
-        catalyst_id: catalyst_id.clone().into(),
-    })
-    .and_then(|r| r.try_collect().map_err(Into::into))
-    .await
-    .map_err(|e| {
-        error!("Failed to get RBAC registrations for {catalyst_id} Catalyst ID: {e:?}");
-        if e.is::<bb8::RunError<tokio_postgres::Error>>() {
-            service_unavailable()
-        } else {
-            let error = InternalServerError::new(None);
-            error!(id=%error.id(), error=?e);
-            ErrorResponses::ServerError(Json(error)).into()
-        }
-    })?;
-
-    result.sort_by_key(|r| r.slot_no);
-    Ok(result)
-}
-
-/// Returns a 503 error instance.
-fn service_unavailable() -> poem::Error {
-    let error = ServiceUnavailable::new(None);
-    ErrorResponses::ServiceUnavailable(Json(error), Some(RetryAfterHeader::default())).into()
-}
-
-/// Returns the last signing key from the registration chain.
-async fn last_signing_key(
-    network: Network, indexed_registrations: &[Query],
-) -> anyhow::Result<VerifyingKey> {
-    let chain = registration_chain(network, indexed_registrations)
-        .await
-        .context("Failed to build registration chain")?;
-    chain
-        .get_latest_signing_pk_for_role(&RoleNumber::ROLE_0)
-        .ok_or(anyhow!("Cannot find latest role 0 public key"))
-        .map(|(pk, _)| pk)
-}
-
-/// Build a registration chain from the given indexed data.
-async fn registration_chain(
-    network: Network, indexed_registrations: &[Query],
-) -> anyhow::Result<RegistrationChain> {
-    let mut indexed_registrations = indexed_registrations.iter();
-    let Some(root) = indexed_registrations.next() else {
-        // We already checked that the registrations aren't empty, so we shouldn't get there.
-        return Err(anyhow!("Empty registrations list"));
-    };
-
-    let root = registration(network, root.slot_no.into(), root.txn_index.into())
-        .await
-        .context("Failed to get root registration")?;
-    let mut chain = RegistrationChain::new(root).context("Invalid root registration")?;
-
-    for reg in indexed_registrations {
-        // We only store valid registrations in this table, so an error here indicates a bug in
-        // our indexing logic.
-        let cip509 = registration(network, reg.slot_no.into(), reg.txn_index.into())
-            .await
-            .with_context(|| {
-                format!(
-                    "Invalid or missing registration at {:?} block {:?} transaction",
-                    reg.slot_no, reg.txn_index,
-                )
-            })?;
-        match chain.update(cip509) {
-            Ok(c) => chain = c,
-            Err(e) => {
-                // This isn't a hard error because while the individual registration can be valid it
-                // can be invalid in the context of the whole registration chain.
-                warn!(
-                    "Unable to apply registration from {:?} block {:?} txn index: {e:?}",
-                    reg.slot_no, reg.txn_index
-                );
-            },
-        }
-    }
-
-    Ok(chain)
-}
-
-/// Returns a RBAC registration from the given block and slot.
-async fn registration(network: Network, slot: Slot, txn_index: TxnIndex) -> anyhow::Result<Cip509> {
-    let point = Point::fuzzy(slot);
-    let block = ChainFollower::get_block(network, point)
-        .await
-        .context("Unable to get block")?
-        .data;
-    if block.point().slot_or_default() != slot {
-        // The `ChainFollower::get_block` function can return the next consecutive block if it
-        // cannot find the exact one. This shouldn't happen, but we need to check anyway.
-        return Err(anyhow!("Unable to find exact block"));
-    }
-    Cip509::new(&block, txn_index, &[])
-        .context("Invalid RBAC registration")?
-        .context("No RBAC registration at this block and txn index")
 }

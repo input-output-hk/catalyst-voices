@@ -1,13 +1,15 @@
 //! Either has No Authorization, or RBAC Token.
 
-use catalyst_types::id_uri::IdUri;
 use poem::{
     web::headers::{authorization::Bearer, Authorization, HeaderMapExt},
     Request, RequestBody,
 };
 use poem_openapi::{registry::Registry, ApiExtractor, ApiExtractorType, ExtractParamOptions};
 
-use super::{none::NoAuthorization, rbac::scheme::CatalystRBACSecurityScheme};
+use super::{
+    none::NoAuthorization,
+    rbac::{scheme::CatalystRBACSecurityScheme, token::CatalystRBACTokenV1},
+};
 
 #[allow(dead_code, clippy::upper_case_acronyms, clippy::large_enum_variant)]
 /// Endpoint allows Authorization with or without RBAC Token.
@@ -48,7 +50,7 @@ impl<'a> ApiExtractor<'a> for NoneOrRBAC {
     }
 }
 
-impl From<NoneOrRBAC> for Option<IdUri> {
+impl From<NoneOrRBAC> for Option<CatalystRBACTokenV1> {
     fn from(value: NoneOrRBAC) -> Self {
         match value {
             NoneOrRBAC::RBAC(auth) => Some(auth.into()),
