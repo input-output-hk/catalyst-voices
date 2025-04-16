@@ -1,4 +1,4 @@
-# cspell: words bitcoinlib
+# cspell: words bitcoinlib addopts
 
 [tool.poetry]
 name = "api_tests"
