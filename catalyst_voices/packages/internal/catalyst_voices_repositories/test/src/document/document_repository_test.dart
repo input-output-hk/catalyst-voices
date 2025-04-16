@@ -1,4 +1,3 @@
-import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_repositories/src/database/catalyst_database.dart';
@@ -11,6 +10,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:uuid_plus/uuid_plus.dart';
 
+import '../../fixture/voices_document_templates.dart';
 import '../utils/test_factories.dart';
 
 void main() {

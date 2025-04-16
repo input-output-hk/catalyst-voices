@@ -1,5 +1,6 @@
 VERSION 0.8
 
+IMPORT ../ AS repo-ci
 IMPORT ../catalyst-gateway AS catalyst-gateway
 IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:v3.3.3 AS flutter-ci
 
@@ -9,6 +10,8 @@ repo-catalyst-voices:
     FROM scratch
     WORKDIR /repo
     COPY --dir . .
+    # Copy docs as some doc files are used for test inputs
+    COPY repo-ci+copy-docs/docs ./docs
 
     SAVE ARTIFACT /repo repo
 

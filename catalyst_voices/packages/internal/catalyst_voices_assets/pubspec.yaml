@@ -30,7 +30,6 @@ flutter:
     - assets/icons/
     - assets/lottie/
     - assets/videos/
-    - assets/document_templates/proposal/F14-Generic/
   fonts:
     - family: SF-Pro
       fonts:
