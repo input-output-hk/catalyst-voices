@@ -214,15 +214,6 @@ def test_proposal_doc(proposal_doc_factory, rbac_chain_factory):
     proposal_doc = proposal_doc_factory()
     proposal_doc_id = proposal_doc.metadata["id"]
 
-    # Put a proposal document again
-    resp = document.put(
-        data=proposal_doc.build_and_sign(cat_id, sk_hex),
-        token=rbac_chain.auth_token(),
-    )
-    assert (
-        resp.status_code == 204
-    ), f"Failed to publish document: {resp.status_code} - {resp.text}"
-
     # Get the proposal document
     resp = document.get(document_id=proposal_doc_id, token=rbac_chain.auth_token())
     assert (
@@ -236,6 +227,26 @@ def test_proposal_doc(proposal_doc_factory, rbac_chain_factory):
     assert (
         resp.status_code == 200
     ), f"Failed to post document: {resp.status_code} - {resp.text}"
+
+    # Put document with different ver
+    new_doc = proposal_doc.copy()
+    new_doc.metadata["ver"] = uuid_v7.uuid_v7()
+    resp = document.put(
+        data=new_doc.build_and_sign(cat_id, sk_hex),
+        token=rbac_chain.auth_token(),
+    )
+    assert (
+        resp.status_code == 201
+    ), f"Failed to publish document: {resp.status_code} - {resp.text}"
+
+    # Put a comment document again
+    resp = document.put(
+        data=new_doc.build_and_sign(cat_id, sk_hex),
+        token=rbac_chain.auth_token(),
+    )
+    assert (
+        resp.status_code == 204
+    ), f"Failed to publish document: {resp.status_code} - {resp.text}"
 
     # Put a proposal document with same ID different content
     invalid_doc = proposal_doc.copy()
@@ -293,15 +304,6 @@ def test_comment_doc(comment_doc_factory, rbac_chain_factory):
     comment_doc = comment_doc_factory()
     comment_doc_id = comment_doc.metadata["id"]
 
-    # Put a comment document again
-    resp = document.put(
-        data=comment_doc.build_and_sign(cat_id, sk_hex),
-        token=rbac_chain.auth_token(),
-    )
-    assert (
-        resp.status_code == 204
-    ), f"Failed to publish document: {resp.status_code} - {resp.text}"
-
     # Get the comment document
     resp = document.get(document_id=comment_doc_id, token=rbac_chain.auth_token())
     assert (
@@ -315,6 +317,26 @@ def test_comment_doc(comment_doc_factory, rbac_chain_factory):
     assert (
         resp.status_code == 200
     ), f"Failed to post document: {resp.status_code} - {resp.text}"
+
+    # Put document with different ver
+    new_doc = comment_doc.copy()
+    new_doc.metadata["ver"] = uuid_v7.uuid_v7()
+    resp = document.put(
+        data=new_doc.build_and_sign(cat_id, sk_hex),
+        token=rbac_chain.auth_token(),
+    )
+    assert (
+        resp.status_code == 201
+    ), f"Failed to publish document: {resp.status_code} - {resp.text}"
+
+    # Put a comment document again
+    resp = document.put(
+        data=new_doc.build_and_sign(cat_id, sk_hex),
+        token=rbac_chain.auth_token(),
+    )
+    assert (
+        resp.status_code == 204
+    ), f"Failed to publish document: {resp.status_code} - {resp.text}"
 
     # Put a comment document with empty content
     invalid_doc = comment_doc.copy()
@@ -349,15 +371,6 @@ def test_submission_action(submission_action_factory, rbac_chain_factory):
     submission_action = submission_action_factory()
     submission_action_id = submission_action.metadata["id"]
 
-    # Put a submission action document
-    resp = document.put(
-        data=submission_action.build_and_sign(cat_id, sk_hex),
-        token=rbac_chain.auth_token(),
-    )
-    assert (
-        resp.status_code == 204
-    ), f"Failed to publish document: {resp.status_code} - {resp.text}"
-
     # Get the submission action doc
     resp = document.get(
         document_id=submission_action_id,
@@ -376,6 +389,26 @@ def test_submission_action(submission_action_factory, rbac_chain_factory):
     assert (
         resp.status_code == 200
     ), f"Failed to post document: {resp.status_code} - {resp.text}"
+
+    # Put document with different ver
+    new_doc = submission_action.copy()
+    new_doc.metadata["ver"] = uuid_v7.uuid_v7()
+    resp = document.put(
+        data=new_doc.build_and_sign(cat_id, sk_hex),
+        token=rbac_chain.auth_token(),
+    )
+    assert (
+        resp.status_code == 201
+    ), f"Failed to publish document: {resp.status_code} - {resp.text}"
+
+    # Put a comment document again
+    resp = document.put(
+        data=new_doc.build_and_sign(cat_id, sk_hex),
+        token=rbac_chain.auth_token(),
+    )
+    assert (
+        resp.status_code == 204
+    ), f"Failed to publish document: {resp.status_code} - {resp.text}"
 
     # Submission action document MUST have a ref
     invalid_doc = submission_action.copy()
