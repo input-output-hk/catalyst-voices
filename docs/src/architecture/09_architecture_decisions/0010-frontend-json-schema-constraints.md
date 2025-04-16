@@ -81,7 +81,8 @@ To ensure the integrity of our approach:
 
 ### Current Issues
 
-The frontend team currently spends an excessive amount of time reviewing schema change PRs from architects who often make changes without validating against frontend constraints. This creates an unsustainable workflow where:
+The frontend team currently spends an excessive amount of time reviewing schema change PRs from architects
+who often make changes without validating against frontend constraints. This creates an unsustainable workflow where:
 
 1. Contributors create schema changes without understanding frontend requirements
 2. PRs reach review stage with fundamental issues that break nodeId lookups
