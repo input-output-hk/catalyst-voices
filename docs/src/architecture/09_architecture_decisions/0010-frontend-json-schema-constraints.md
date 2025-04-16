@@ -52,7 +52,7 @@ With the complexity of the JSON Schema it's important to understand the constrai
 
 To safely evolve the schema over time while preserving functionality:
 
-1. **Never rename predefined `nodeId`s** - If structure needs to change, keep the old nodeId as an alias
+1. **Never rename predefined `nodeId`s** - If structure needs to change, keep the old nodeId as an alias. The app must lookup both the new nodeId but fallback to old nodeId if new one not found.
 2. **Use versioning** - Include schema version in document metadata
 3. **Add new fields rather than changing existing ones** - Mark old fields as deprecated
 4. **Test template changes** - Automated testing should verify that all predefined nodeIds are still accessible
