@@ -51,6 +51,11 @@ impl SignedDocBody {
         &self.doc_type
     }
 
+    /// Returns the document authors.
+    pub(crate) fn authors(&self) -> &Vec<String> {
+        &self.authors
+    }
+
     /// Returns the document metadata.
     pub(crate) fn metadata(&self) -> Option<&serde_json::Value> {
         self.metadata.as_ref()
