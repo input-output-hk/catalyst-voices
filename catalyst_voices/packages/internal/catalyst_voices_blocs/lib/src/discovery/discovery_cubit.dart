@@ -189,7 +189,7 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
     _proposalsSubscription =
         _proposalService.watchLatestProposals(limit: 7).listen(
       (proposals) async {
-        _logger.finest('Got proposals: ${proposals.length}');
+        _logger.info('Got proposals: ${proposals.length}');
         _emitMostRecentProposals(proposals);
         final currentFavorites =
             await _proposalService.watchFavoritesProposalsIds().first;

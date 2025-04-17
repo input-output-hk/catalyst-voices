@@ -58,7 +58,15 @@ class _RegistrationDialogState extends State<RegistrationDialog>
           );
         },
         child: BlocSelector<RegistrationCubit, RegistrationState, bool>(
-          selector: (state) => state.step is! AccountCompletedStep,
+          selector: (state) {
+            final isAccountCompleted = state.step is AccountCompletedStep;
+            final isRecovered = state.step ==
+                const RecoverWithSeedPhraseStep(
+                  stage: RecoverWithSeedPhraseStage.success,
+                );
+
+            return !isAccountCompleted && !isRecovered;
+          },
           builder: (context, showCloseButton) {
             return VoicesTwoPaneDialog(
               key: const Key('RegistrationDialog'),
