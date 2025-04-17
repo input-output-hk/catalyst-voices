@@ -9,8 +9,9 @@ This repository contains the Catalyst Voices app and packages.
   * [Getting Started](#getting-started)
     * [Bootstrapping](#bootstrapping)
     * [Packages](#packages)
-    * [Environment types / flavours](#environment-types--flavours)
+    * [Environment types](#environment-types)
     * [Environment variables](#environment-variables)
+      * [Environment config](#environment-config)
     * [Code Generation](#code-generation)
       * [Running Code Generation](#running-code-generation)
         * [Basic Generation](#basic-generation)
@@ -63,13 +64,14 @@ just bootstrap
 | [catalyst_voices_shared](./packages/internal/catalyst_voices_shared/)             | Shared code  |[example](./packages/internal/catalyst_voices_shared/)|
 | [catalyst_voices_view_models](./packages/internal/catalyst_voices_view_models/)   | ViewModels  |[example](./packages/internal/catalyst_voices_view_models/)|
 
-### Environment types / flavours
+### Environment types
 
-This project contains three flavors:
+This project contains four env types:
 
 * dev
 * preprod
 * prod
+* relative
 
 To run the desired flavor, either use the launch configuration in VSCode/Android Studio or use the
 following commands:
@@ -96,26 +98,26 @@ flutter run --target apps/voices/lib/configs/main.dart --dart-define=ENV_NAME=pr
 
 ### Environment variables
 
-We use [dart defines](https://dart.dev/guides/language/language-tour#using-variables) as well
-as injected `flutterEnvironment` variables from [index.html](apps/voices/web/index.html) on the web.
+We use [dart defines](https://dart.dev/guides/language/language-tour#using-variables) as flavor run parameter.
 
 All of env variable are optional and you can define only what you want, where you want.
 
 Priority looks as follow:
 
-1. If web `flutterEnvironment` from [index.html](apps/voices/web/index.html)
-2. `dart-define` vars
-3. `flavor` var
+1. `dart-define` vars
+2. `flavor` var
 
-App will attempt to merge those sources so you can set for example `CONFIG_URL` in `index.html`
-and `ENV_NAME` using `dart-define`.
+If none of above is defined app will fallback to **relative** type for web or **dev** in other cases.
 
-Using following command will with not args will attempt to lookup `index.html` or fallback
-to defaults.
+Using following command below will resolve in **relative** env type because **ENV_NAME** nor **flavor** is defined.
 
 ```sh
 flutter build web --target apps/voices/lib/configs/main_web.dart
 ```
+
+#### Environment config
+
+Configuration is downloaded dynamically from **gateway** backend where **gateway** base url depends on used env type.
 
 ### Code Generation
 
