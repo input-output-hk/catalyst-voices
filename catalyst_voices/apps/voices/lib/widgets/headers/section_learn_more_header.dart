@@ -1,4 +1,5 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
+import 'package:catalyst_voices/widgets/buttons/learn_more_button.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
@@ -34,13 +35,7 @@ class SectionLearnMoreHeader extends StatelessWidget with LaunchUrlMixin {
           ),
         ),
         const Spacer(),
-        VoicesTextButton(
-          trailing: VoicesAssets.icons.externalLink.buildIcon(),
-          onTap: () async {
-            await launchUri(learnMoreUrl.getUri());
-          },
-          child: Text(context.l10n.learnMore),
-        ),
+        LearnMoreButton(learnMoreUrl: learnMoreUrl),
       ],
     );
   }
