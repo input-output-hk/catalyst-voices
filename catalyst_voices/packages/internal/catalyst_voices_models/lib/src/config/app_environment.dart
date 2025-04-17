@@ -1,90 +1,94 @@
-// ignore_for_file: avoid_print
-
 import 'package:catalyst_voices_models/src/config/env_vars/dart_define_env_vars.dart';
-import 'package:catalyst_voices_models/src/config/env_vars/injected/injected_env_vars_stub.dart'
-    if (dart.library.io) 'env_vars/injected/injected_no_op_env_vars.dart'
-    if (dart.library.js_interop) 'env_vars/injected/injected_index_env_vars.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 
-// TODO(damian-molinski): provide valid url
-const _fallbackConfigUrl = '';
-const _fallbackEnvType = AppEnvironmentType.dev;
+const _fallbackEnvType =
+    kIsWeb ? AppEnvironmentType.relative : AppEnvironmentType.dev;
 
 final class AppEnvironment extends Equatable {
   final AppEnvironmentType type;
-  final String configUrl;
 
   @visibleForTesting
   const AppEnvironment.custom({
     required this.type,
-    required this.configUrl,
   });
 
-  const AppEnvironment.dev()
-      : this._(
-          type: AppEnvironmentType.dev,
-          configUrl: _fallbackConfigUrl,
-        );
+  const AppEnvironment.dev() : this._(type: AppEnvironmentType.dev);
 
   factory AppEnvironment.fromEnv() {
     final envVars = getDartEnvVars();
-    final injectedEnvVars = getInjectedEnvVars();
-
-    final effectiveEnvVars = envVars.mergeWith(injectedEnvVars);
-
-    final envName = effectiveEnvVars.envName;
-    final configUrl = effectiveEnvVars.configUrl;
-
-    if (envName == null && kDebugMode) {
-      print('ENV -> type not defined! Using fallback');
-    }
-    if (configUrl == null && kDebugMode) {
-      print('ENV -> config url not defined! Using fallback');
-    }
-
+    final envName = envVars.envName;
     final type = AppEnvironmentType.values.asNameMap()[envName];
 
-    if (type == null && envName != null && kDebugMode) {
-      print('ENV -> type[$envName] not supported!');
+    if (type == null && envName != null) {
+      if (kDebugMode) {
+        print('ENV -> Found envName[$envName] but its not supported!');
+      }
     }
 
     final effectiveType = type ?? _fallbackEnvType;
-    final effectiveConfigUrl = configUrl ?? _fallbackConfigUrl;
 
     if (kDebugMode) {
-      print('ENV -> type[$effectiveType], configUrl[$effectiveConfigUrl]');
+      print('ENV -> type[$effectiveType]');
     }
 
-    return AppEnvironment._(
-      type: effectiveType,
-      configUrl: effectiveConfigUrl,
-    );
+    return AppEnvironment._(type: effectiveType);
   }
 
-  const AppEnvironment.preprod()
-      : this._(
-          type: AppEnvironmentType.preprod,
-          configUrl: _fallbackConfigUrl,
-        );
+  const AppEnvironment.preprod() : this._(type: AppEnvironmentType.preprod);
 
-  const AppEnvironment.prod()
-      : this._(
-          type: AppEnvironmentType.prod,
-          configUrl: _fallbackConfigUrl,
-        );
+  const AppEnvironment.prod() : this._(type: AppEnvironmentType.prod);
+
+  const AppEnvironment.relative() : this._(type: AppEnvironmentType.relative);
 
   const AppEnvironment._({
     required this.type,
-    required this.configUrl,
   });
 
   @override
-  List<Object?> get props => [type, configUrl];
+  List<Object?> get props => [type];
 }
 
 enum AppEnvironmentType {
+  /// This type tells app to always talk to full, hardcoded dev backend
+  /// url.
+  ///
+  /// Useful when building app locally at localhost but you want to
+  /// test against dev env.
   dev,
+
+  /// Same as [dev] but for preprod.
   preprod,
-  prod;
+
+  /// Same as [dev] but for prod.
+  prod,
+
+  /// This type means app should talk to cat services relative to where its
+  /// hosted.
+  ///
+  /// For example when hosted at "https://voices.dev.io" talk to
+  /// "https://voices.dev.io/api/gateway".
+  ///
+  /// It useful when building app one time and it can be deployed anywhere.
+  relative;
+
+  Uri get gateway {
+    return switch (this) {
+      AppEnvironmentType.dev ||
+      AppEnvironmentType.preprod =>
+        Uri.https('gateway.$name.projectcatalyst.io'),
+      AppEnvironmentType.prod => Uri.https('gateway.projectcatalyst.io'),
+      AppEnvironmentType.relative => Uri(path: '/api/gateway'),
+    };
+  }
+
+  Uri get reviews {
+    return switch (this) {
+      AppEnvironmentType.dev ||
+      AppEnvironmentType.preprod =>
+        Uri.https('api.reviews.$name.projectcatalyst.io'),
+      AppEnvironmentType.prod => Uri.https('api.reviews.projectcatalyst.io'),
+      AppEnvironmentType.relative => Uri(path: '/api/reviews'),
+    };
+  }
 }

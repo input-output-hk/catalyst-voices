@@ -13,41 +13,13 @@ const _defaultTransactionBuilderConfig = TransactionBuilderConfig(
   coinsPerUtxoByte: Coin(4310),
 );
 
-final class ApiConfig extends Equatable {
-  final String gatewayUrl;
-  final String reviewsUrl;
-
-  const ApiConfig({
-    required this.gatewayUrl,
-    required this.reviewsUrl,
-  });
-
-  @override
-  List<Object?> get props => [
-        gatewayUrl,
-        reviewsUrl,
-      ];
-
-  ApiConfig copyWith({
-    String? gatewayUrl,
-    String? reviewsUrl,
-  }) {
-    return ApiConfig(
-      gatewayUrl: gatewayUrl ?? this.gatewayUrl,
-      reviewsUrl: reviewsUrl ?? this.reviewsUrl,
-    );
-  }
-}
-
 final class AppConfig extends Equatable {
-  final ApiConfig api;
   final CacheConfig cache;
   final DatabaseConfig database;
   final SentryConfig sentry;
   final BlockchainConfig blockchain;
 
   const AppConfig({
-    required this.api,
     required this.cache,
     required this.database,
     required this.sentry,
@@ -56,10 +28,6 @@ final class AppConfig extends Equatable {
 
   const AppConfig.dev()
       : this(
-          api: const ApiConfig(
-            gatewayUrl: 'https://gateway.dev.projectcatalyst.io',
-            reviewsUrl: 'https://api.reviews.dev.projectcatalyst.io',
-          ),
           cache: const CacheConfig(
             expiryDuration: ExpiryDuration(
               keychainUnlock: Duration(hours: 1),
@@ -91,15 +59,12 @@ final class AppConfig extends Equatable {
       AppEnvironmentType.dev => const AppConfig.dev(),
       AppEnvironmentType.preprod => const AppConfig.preprod(),
       AppEnvironmentType.prod => const AppConfig.prod(),
+      AppEnvironmentType.relative => const AppConfig.dev(),
     };
   }
 
   const AppConfig.preprod()
       : this(
-          api: const ApiConfig(
-            gatewayUrl: 'https://gateway.preprod.projectcatalyst.io',
-            reviewsUrl: 'https://api.reviews.dev.projectcatalyst.io',
-          ),
           cache: const CacheConfig(
             expiryDuration: ExpiryDuration(
               keychainUnlock: Duration(hours: 1),
@@ -128,10 +93,6 @@ final class AppConfig extends Equatable {
 
   const AppConfig.prod()
       : this(
-          api: const ApiConfig(
-            gatewayUrl: 'https://gateway.projectcatalyst.io',
-            reviewsUrl: 'https://api.reviews.projectcatalyst.io',
-          ),
           cache: const CacheConfig(
             expiryDuration: ExpiryDuration(
               keychainUnlock: Duration(hours: 1),
@@ -160,7 +121,6 @@ final class AppConfig extends Equatable {
 
   @override
   List<Object?> get props => [
-        api,
         cache,
         database,
         sentry,
@@ -168,14 +128,12 @@ final class AppConfig extends Equatable {
       ];
 
   AppConfig copyWith({
-    ApiConfig? api,
     CacheConfig? cache,
     DatabaseConfig? database,
     SentryConfig? sentry,
     BlockchainConfig? blockchain,
   }) {
     return AppConfig(
-      api: api ?? this.api,
       cache: cache ?? this.cache,
       database: database ?? this.database,
       sentry: sentry ?? this.sentry,

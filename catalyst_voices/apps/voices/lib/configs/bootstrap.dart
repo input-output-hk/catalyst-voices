@@ -45,13 +45,17 @@ Future<BootstrapArgs> bootstrap({
 
   environment ??= AppEnvironment.fromEnv();
 
-  final configSource = UrlRemoteConfigSource(url: environment.configUrl);
+  // TODO(damian-molinski): replace it with API Service when endpoint
+  // is moved to v1
+  final configSource = UrlRemoteConfigSource(baseUrl: environment.type.gateway);
   final configService = ConfigService(ConfigRepository(configSource));
   final config = await configService.getAppConfig(env: environment.type);
 
   await _cleanupOldStorages();
-  await registerDependencies(environment: environment, config: config);
+  await registerDependencies(environment: environment, config: null);
   await _initCryptoUtils();
+
+  Dependencies.instance.registerConfig(config);
 
   router ??= buildAppRouter();
 
@@ -99,13 +103,16 @@ GoRouter buildAppRouter({
 @visibleForTesting
 Future<void> registerDependencies({
   AppEnvironment environment = const AppEnvironment.dev(),
-  AppConfig config = const AppConfig.dev(),
+  AppConfig? config = const AppConfig.dev(),
 }) async {
   if (!Dependencies.instance.isInitialized) {
     await Dependencies.instance.init(
       environment: environment,
-      config: config,
     );
+  }
+
+  if (config != null) {
+    Dependencies.instance.registerConfig(config);
   }
 }
 

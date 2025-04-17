@@ -1,5 +1,5 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart'
-    show ApiConfig;
+    show AppEnvironmentType;
 import 'package:catalyst_voices_repositories/generated/api/cat_gateway.swagger.dart';
 import 'package:catalyst_voices_repositories/generated/api/client_index.dart';
 import 'package:catalyst_voices_repositories/generated/api/client_mapping.dart';
@@ -26,7 +26,7 @@ final class ApiServices {
   final CatReviews reviews;
 
   factory ApiServices({
-    required ApiConfig config,
+    required AppEnvironmentType env,
     required UserObserver userObserver,
     required AuthTokenProvider authTokenProvider,
   }) {
@@ -34,7 +34,7 @@ final class ApiServices {
 
     final cat = CatGateway.create(
       authenticator: null,
-      baseUrl: Uri.parse(config.gatewayUrl),
+      baseUrl: env.gateway,
       converter: CborOrJsonDelegateConverter(
         cborConverter: CborSerializableConverter(),
         jsonConverter: $JsonSerializableConverter(),
@@ -46,7 +46,7 @@ final class ApiServices {
     );
     final review = CatReviews.create(
       authenticator: null,
-      baseUrl: Uri.parse(config.reviewsUrl),
+      baseUrl: env.reviews,
       interceptors: [
         RbacAuthInterceptor(userObserver, authTokenProvider),
         if (kDebugMode) HttpLoggingInterceptor(onlyErrors: true),

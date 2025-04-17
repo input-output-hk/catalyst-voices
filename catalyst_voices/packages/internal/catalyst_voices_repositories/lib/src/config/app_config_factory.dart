@@ -42,10 +42,6 @@ final class AppConfigFactory {
     );
 
     return defaultEnvConfig.copyWith(
-      api: defaultEnvConfig.api.copyWith(
-        gatewayUrl: remote.api?.gateway,
-        reviewsUrl: remote.api?.reviews,
-      ),
       cache: defaultEnvConfig.cache.copyWith(
         expiryDuration: defaultEnvConfig.cache.expiryDuration.copyWith(
           keychainUnlock:
