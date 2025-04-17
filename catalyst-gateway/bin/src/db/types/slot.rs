@@ -7,6 +7,8 @@ use scylla::_macro_internal::{
     SerializeValue, TypeCheckError, WrittenCellProof,
 };
 
+use crate::service::common::types::cardano::slot_no::SlotNo;
+
 /// A `Slot` wrapper that can be stored to and load from a database.\
 #[allow(clippy::module_name_repetitions)]
 #[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -39,6 +41,12 @@ impl From<DbSlot> for Slot {
 impl From<DbSlot> for BigInt {
     fn from(value: DbSlot) -> Self {
         value.0.into()
+    }
+}
+
+impl From<SlotNo> for DbSlot {
+    fn from(value: SlotNo) -> Self {
+        Self(value.into())
     }
 }
 

@@ -10,7 +10,10 @@ use poem::{
     Endpoint, EndpointExt, Route,
 };
 
-use super::common::auth::{api_key::API_KEY_HEADER, rbac::scheme::AUTHORIZATION_HEADER};
+use super::{
+    common::auth::{api_key::API_KEY_HEADER, rbac::scheme::AUTHORIZATION_HEADER},
+    utilities::middleware::db_check::DatabaseConnectionCheck,
+};
 use crate::{
     metrics::init_prometheus,
     service::{
@@ -46,6 +49,7 @@ fn mk_app(base_route: Option<Route>) -> impl Endpoint {
         .with(Compression::new().with_quality(CompressionLevel::Fastest))
         .with(CatchPanic::new().with_handler(ServicePanicHandler))
         .with(Tracing)
+        .with(DatabaseConnectionCheck)
         .with(
             SensitiveHeader::new()
                 .header(API_KEY_HEADER)
