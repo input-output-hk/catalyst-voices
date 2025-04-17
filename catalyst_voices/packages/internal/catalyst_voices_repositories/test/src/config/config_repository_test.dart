@@ -6,7 +6,7 @@ import 'package:catalyst_voices_repositories/src/dto/config/config.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
-import '../../fixture/fixture_reader.dart';
+import '../utils/fixture_reader.dart';
 
 void main() {
   final remoteSource = _MockRemoteConfigSource();
