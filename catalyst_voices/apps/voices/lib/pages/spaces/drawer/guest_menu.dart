@@ -18,6 +18,7 @@ class GuestMenu extends StatelessWidget {
       key: const ValueKey('GuestMenuItems'),
       mainAxisSize: MainAxisSize.min,
       children: [
+        const SizedBox(height: 30),
         VoicesNavTile(
           leading: VoicesAssets.icons.home.buildIcon(),
           name: 'Home',

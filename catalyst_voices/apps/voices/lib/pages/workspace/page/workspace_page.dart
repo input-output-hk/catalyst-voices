@@ -6,6 +6,7 @@ import 'package:catalyst_voices/pages/workspace/header/workspace_header.dart';
 import 'package:catalyst_voices/pages/workspace/page/workspace_error.dart';
 import 'package:catalyst_voices/pages/workspace/page/workspace_loading.dart';
 import 'package:catalyst_voices/pages/workspace/page/workspace_user_proposals.dart';
+import 'package:catalyst_voices/pages/workspace/submission_closing_warning_dialog.dart';
 import 'package:catalyst_voices/routes/routing/proposal_builder_route.dart';
 import 'package:catalyst_voices/widgets/snackbar/voices_snackbar.dart';
 import 'package:catalyst_voices/widgets/snackbar/voices_snackbar_type.dart';
@@ -29,19 +30,20 @@ class _WorkspacePageState extends State<WorkspacePage>
   @override
   Widget build(BuildContext context) {
     return const Scaffold(
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            WorkspaceHeader(),
-            Stack(
-              children: [
-                WorkspaceErrorSelector(),
-                WorkspaceLoadingSelector(),
-                WorkspaceUserProposalsSelector(),
-              ],
-            ),
-            SizedBox(height: 50),
-          ],
+      body: WorkspaceLoadingSelector(
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              WorkspaceHeader(),
+              Stack(
+                children: [
+                  WorkspaceErrorSelector(),
+                  WorkspaceUserProposalsSelector(),
+                ],
+              ),
+              SizedBox(height: 50),
+            ],
+          ),
         ),
       ),
     );
@@ -69,6 +71,10 @@ class _WorkspacePageState extends State<WorkspacePage>
         unawaited(
           ProposalBuilderRoute.fromRef(ref: signal.ref).push(context),
         );
+      case SubmissionCloseDate():
+        unawaited(_showSubmissionClosingWarningDialog(signal.date));
+      case ForgetProposalSuccessWorkspaceSignal():
+        _showForgetSuccessSnackBar();
     }
   }
 
@@ -77,7 +83,15 @@ class _WorkspacePageState extends State<WorkspacePage>
     super.initState();
     final bloc = context.read<WorkspaceBloc>();
     // ignore: cascade_invocations
-    bloc.add(const WatchUserProposalsEvent());
+    bloc
+      ..add(const WatchUserProposalsEvent())
+      ..add(const GetTimelineItemsEvent());
+  }
+
+  void _dontShowCampaignSubmissionClosingDialog(bool value) {
+    context
+        .read<SessionCubit>()
+        .updateShowSubmissionClosingWarning(value: !value);
   }
 
   void _showDeleteErrorSnackBar() {
@@ -100,5 +114,35 @@ class _WorkspacePageState extends State<WorkspacePage>
       title: context.l10n.successProposalDeleted,
       message: context.l10n.successProposalDeletedDescription,
     ).show(context);
+  }
+
+  void _showForgetSuccessSnackBar() {
+    VoicesSnackBar.hideCurrent(context);
+
+    VoicesSnackBar(
+      type: VoicesSnackBarType.success,
+      behavior: SnackBarBehavior.floating,
+      title: context.l10n.successProposalForgot,
+      message: context.l10n.successProposalForgotDescription,
+    ).show(context);
+  }
+
+  Future<void> _showSubmissionClosingWarningDialog([
+    DateTime? submissionCloseDate,
+  ]) async {
+    final canShow = context
+        .read<SessionCubit>()
+        .state
+        .settings
+        .showSubmissionClosingWarning;
+
+    if (submissionCloseDate == null || !canShow || !mounted) {
+      return;
+    }
+    await SubmissionClosingWarningDialog.showNDaysBefore(
+      context: context,
+      submissionCloseAt: submissionCloseDate,
+      dontShowAgain: _dontShowCampaignSubmissionClosingDialog,
+    );
   }
 }

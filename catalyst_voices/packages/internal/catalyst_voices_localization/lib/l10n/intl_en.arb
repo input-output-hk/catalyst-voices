@@ -45,6 +45,10 @@
   "@saveButtonText": {
     "description": "Text shown in save button"
   },
+  "saveChangesButtonText": "Save Changes",
+  "@saveChangesButtonText": {
+    "description": "Text shown in save button"
+  },
   "passwordLabelText": "Password",
   "@passwordLabelText": {
     "description": "Text shown in password field"
@@ -150,6 +154,14 @@
         "type": "int"
       }
     }
+  },
+  "mainnetNetworkId": "Mainnet",
+  "@mainnetNetworkId": {
+    "description": "A mainnet cardano network name."
+  },
+  "preprodNetworkId": "PreProd",
+  "@preprodNetworkId": {
+    "description": "A preprod cardano network name."
   },
   "proposalStatusReady": "Ready",
   "@proposalStatusReady": {
@@ -623,6 +635,15 @@
   "@registrationTransactionFailed": {
     "description": "Indicates an error when submitting a registration transaction failed."
   },
+  "registrationNetworkIdMismatch": "It seems like you're trying to use\u00A0a wallet on the wrong network.\nPlease switch to {network} to continue.",
+  "@registrationNetworkIdMismatch": {
+    "description": "An error when user attempts to use a wallet on the wrong network, i.e. using preprod wallet on production environment.",
+    "placeholders": {
+      "network": {
+        "type": "String"
+      }
+    }
+  },
   "registrationInsufficientBalance": "Insufficient balance, please top up your wallet.",
   "@registrationInsufficientBalance": {
     "description": "Indicates an error when preparing a transaction has failed due to low wallet balance."
@@ -754,8 +775,14 @@
   "createBaseProfileSetupEmailLabel": "Your e-mail",
   "createBaseProfileSetupEmailHint": "E-mail",
   "createBaseProfileSetupEmailHelper": "Please provide e-mail used for your Ideascale.",
-  "createBaseProfileSetupIdeascaleAccount": "Ideascale account",
-  "createBaseProfileSetupIdeascaleReason1": "Please use the e-mail you use on cardano.ideascale.com",
+  "createBaseProfileHasIdeascaleAccountAlready": "Submitted proposals in Ideascale before",
+  "@createBaseProfileHasIdeascaleAccountAlready": {
+    "description": "Label for info card to let user know to use the same email as in Ideascale if they have already submitted a proposal there."
+  },
+  "createBaseProfileSetupIdeascaleReason1": "Be sure to use the same email associated with your Ideascale account",
+  "@createBaseProfileSetupIdeascaleReason1": {
+    "description": "Description for info card to let user know to use the same email as in Ideascale if they have already submitted a proposal there."
+  },
   "createBaseProfileAcknowledgementsTitle": "Mandatory Acknowledgements",
   "createBaseProfileAcknowledgementsToS": "I confirm that I have read and agree to be bound by {tos}.",
   "catalystTos": "Project Catalyst Terms and Conditions",
@@ -944,7 +971,7 @@
   "createKeychainSeedPhraseExportConfirmDialogContent": "Before using this feature, please read this {link}",
   "bestPracticesFAQ": "best practices FAQ",
   "exportKey": "Export Key",
-  "createKeychainSeedPhraseStoreConfirmation": "I have written down/downloaded my 12 words",
+  "createKeychainSeedPhraseStoreConfirmation": "I have written down/exported my 12 words",
   "createKeychainSeedPhraseCheckInstructionsTitle": "Write down your Catalyst seed phrase",
   "createKeychainSeedPhraseCheckInstructionsSubtitle": "Next, we're going to make sure that you've written down your Catalyst seed phrase correctly.   \u2028\u2028We don't save your Catalyst seed phrase, so it's important \u2028to make sure you have it right. Thats why we don't trust, we verify before continuing.   \u2028\u2028It's also good practice to get familiar with using a \nseed phrase if you're new to crypto.",
   "createKeychainSeedPhraseCheckSubtitle": "Input your Catalyst seed phrase",
@@ -1385,6 +1412,10 @@
       }
     }
   },
+  "errorValidationConstsValueBoolMismatch": "Please select this field.",
+  "@errorValidationConstsValueBoolMismatch": {
+    "description": "Validation error when the user entered value does not match a boolean const value, typically a checkbox that asks for legal permission."
+  },
   "errorValidationEnumValuesMismatch": "The value must be one of {enumValues}.",
   "@errorValidationEnumValuesMismatch": {
     "description": "Validation error when the user entered value does not match the enum values",
@@ -1431,7 +1462,7 @@
   "heroSectionTitle": "Create, fund and deliver the future of Cardano.",
   "projectCatalystDescription": "Project Catalyst is an experiment in community innovation, providing a framework to turn ideas into impactful real world projects.\n\nWe're putting the community at the heart of Cardano's future development. Are you ready for the Challenge?",
   "viewCurrentCampaign": "View Current Campaign",
-  "catalystF14": "Catalyst Fund 14",
+  "catalystF14": "Catalyst Fund14",
   "@catalystF14": {
     "description": "Used in discovery page in hero section"
   },
@@ -1638,6 +1669,10 @@
   "proposalEditorPublishErrorDialogMessage": "We couldn't publish your proposal. Please try again in 5-10 minutes, as it may take some time for your information to update.\n\nIf the issue persists, feel free to contact support.",
   "@proposalEditorPublishErrorDialogMessage": {
     "description": "Dialog message in proposal editor when publishing proposal to the server failed."
+  },
+  "proposalEditorNotAnswered": "Not Answered",
+  "@proposalEditorNotAnswered": {
+    "description": "Placeholder text when a property has been not filled."
   },
   "showAll": "Show All",
   "@showAll": {
@@ -1937,9 +1972,14 @@
       }
     }
   },
-  "comments": "Comments",
+  "comments": "{count, plural, =0{Comments} =1{Comment} other{Comments}}",
   "@comments": {
-    "description": "Describes comments"
+    "description": "Describes comments",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "proposalIterationPublishUpdateAndTitle": "Iteration {iteration} - {publish} - {datetime} - {title}",
   "@proposalIterationPublishUpdateAndTitle": {
@@ -2083,6 +2123,14 @@
   "successProposalDeletedDescription": "Your local proposal has been deleted",
   "@successProposalDeletedDescription": {
     "description": "Description of success message when draft is deleted"
+  },
+  "successProposalForgot": "Proposal forgotten",
+  "@successProposalForgot": {
+    "description": "Success message when public draft/final proposal is forgotten"
+  },
+  "successProposalForgotDescription": "Your local proposal has been forgotten. No one can see it anymore.",
+  "@successProposalForgotDescription": {
+    "description": "Description of success message when public draft/final proposal is forgotten"
   },
   "errorProposalDeleted": "Error deleting proposal",
   "@errorProposalDeleted": {
@@ -2241,6 +2289,201 @@
   "@errorUnknownPublishComment": {
     "description": "Fallback message when can not publish comment for any reason."
   },
+  "preSubmitProposalStageDescription": "Curious? Learn more about the new Catalyst App\nand prepare yourself for success.",
+  "@preSubmitProposalStageDescription": {
+    "description": "Description for the pre-submission stage"
+  },
+  "proposalSubmissionStageStartAt": "Proposal submission opens {date} at {time}",
+  "@proposalSubmissionStageStartAt": {
+    "description": "Description for the pre-submission stage",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "days": "{count, plural, =1{Day} other{Days}}",
+  "@days": {
+    "description": "To represent days",
+    "placeholders": {
+      "count": {
+        "type": "num"
+      }
+    }
+  },
+  "hours": "{count, plural, =1{Hour} other{Hours}}",
+  "@hours": {
+    "description": "To represent hours",
+    "placeholders": {
+      "count": {
+        "type": "num"
+      }
+    }
+  },
+  "minutes": "{count, plural, =1{Minute} other{Minutes}}",
+  "@minutes": {
+    "description": "To represent minutes",
+    "placeholders": {
+      "count": {
+        "type": "num"
+      }
+    }
+  },
+  "seconds": "{count, plural, =1{Second} other{Seconds}}",
+  "@seconds": {
+    "description": "To represent seconds",
+    "placeholders": {
+      "count": {
+        "type": "num"
+      }
+    }
+  },
+  "proposalSubmissionIsClosed": "Proposal submission  is closed for Fund14.",
+  "@proposalSubmissionIsClosed": {
+    "description": "Title text when proposal submission is closed."
+  },
+  "proposalSubmissionClosedDescription": "We’re moving into the Community Review stage!\nWant to stay involved and earn rewards? Check out our knowledge base.",
+  "@proposalSubmissionClosedDescription": {
+    "description": "Text used to gave user more information about proposal submission close stage and what to do next."
+  },
+  "cantFindYourWallet": "We can't find your wallet",
+  "@cantFindYourWallet": {
+    "description": "Error message when user doesn't have a wallet extension installed"
+  },
+  "potentialReasons": "Potential reasons",
+  "@potentialReasons": {
+    "description": "Title for potential reasons for no wallet found"
+  },
+  "wrongBrowserTitle": "Wrong Browser",
+  "@wrongBrowserTitle": {
+    "description": "Title for wrong browser reason to not find wallet"
+  },
+  "wrongBrowserDescription": "Please launch the browser with your wallets extension and revisit Catalyst.",
+  "@wrongBrowserDescription": {
+    "description": "Description for wrong browser reason to not find wallet"
+  },
+  "disableExtensionTitle": "Disable Extension",
+  "@disableExtensionTitle": {
+    "description": "Title for disable extension reason to not find wallet"
+  },
+  "disableExtensionDescription": "Please enable to continue your wallet extension, and refresh the application.",
+  "@disableExtensionDescription": {
+    "description": "Description for disable extensions in the browser to not find wallet"
+  },
+  "failedAuthenticationTitle": "No/Failed Authorisation",
+  "@failedAuthenticationTitle": {
+    "description": "Title for failed authentication reason to not find wallet"
+  },
+  "failedAuthenticationDescription": "You did not authorise the Catalyst App in your wallet, follow specific wallet instructions.",
+  "@failedAuthenticationDescription": {
+    "description": "Description for failed authentication reason to not find wallet"
+  },
+  "noWalletInstalledTitle": "No wallet installed",
+  "@noWalletInstalledTitle": {
+    "description": "Title for no wallet installed reason to not find wallet"
+  },
+  "noWalletInstalledDescription": "You don’t have a (compatible) wallet installed, please select one of the Cardano wallets on the right, and follow installation instructions.",
+  "@noWalletInstalledDescription": {
+    "description": "Description for no wallet installed reason to not find wallet"
+  },
+  "visitCatalystWalletDocumentationTextButton": "Visit Catalyst wallet documentation",
+  "@visitCatalystWalletDocumentationTextButton": {
+    "description": "Text button to visit catalyst wallet documentation"
+  },
+  "installCardanoWallet": "Install a Cardano wallet",
+  "@installCardanoWallet": {
+    "description": "Text to install a cardano wallet"
+  },
+  "currentlySupportedWallets": "We currently support the following wallets:",
+  "@currentlySupportedWallets": {
+    "description": "Text to show currently supported wallets"
+  },
+  "goodToKnow": "Good to know",
+  "@goodToKnow": {
+    "description": "Text to show when some tip will be presented to user"
+  },
+  "registrationTransactionFeeDescription": "The creation of a Catalyst account costs, a transaction fee of (0,21 ADA), be sure your wallet has a minimum of 1 ADA.",
+  "@registrationTransactionFeeDescription": {
+    "description": "Description for the registration transaction fee"
+  },
+  "eternlWallet": "Eternl Wallet",
+  "@eternlWallet": {
+    "description": "Name of the eternl wallet"
+  },
+  "laceWallet": "Lace Wallet",
+  "@laceWallet": {
+    "description": "Name of the lace wallet"
+  },
+  "namiWallet": "Nami Wallet",
+  "@namiWallet": {
+    "description": "Name of the nami wallet"
+  },
+  "dontShowAgain": "Don't show again",
+  "@dontShowAgain": {
+    "description": "Action to not show again"
+  },
+  "proposalSubmissionWindowClosesAt": "The proposal submission window closes {date}",
+  "@proposalSubmissionWindowClosesAt": {
+    "description": "Description for the proposal submission window closes at",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "submitProposalBeforeClosing": "Submit your final proposals to Review stage well before the App closes.",
+  "@submitProposalBeforeClosing": {
+    "description": "Information for user to submit proposal before the submission window closes"
+  },
+  "checkMaxProposal": "Check your finals (max 5) in My proposals.",
+  "@checkMaxProposal": {
+    "description": "Information for user to check their final proposals before submission window closes"
+  },
+  "catalystAppNotAvailableAfterSubmissionCloses": "The Catalyst App won’t be available after submission close.",
+  "@catalystAppNotAvailableAfterSubmissionCloses": {
+    "description": "Information that app won't be available after submission closes"
+  },
+  "wantToBackUpProposals": "Want to back up your proposals?",
+  "@wantToBackUpProposals": {
+    "description": "Title for section informing user that they can backup their proposals"
+  },
+  "goMyProposals": "Go My proposals",
+  "@goMyProposals": {
+    "description": "Action to go to my proposals"
+  },
+  "exportProposalsIndividually": "Export proposals individually",
+  "@exportProposalsIndividually": {
+    "description": "Title for section informing user that they can export their proposals individually"
+  },
+  "storeInSafeLocation": "Store in safe location",
+  "@storeInSafeLocation": {
+    "description": "Title for section informing user that they can store their proposals in a safe location"
+  },
+  "catalystAppClosesIn": "Catalyst App closes in {days}d, {hours}h, {minutes}m, {seconds}s.",
+  "@catalystAppClosesIn": {
+    "description": "Message displayed when the app closes in a few seconds",
+    "placeholders": {
+      "days": {
+        "type": "int",
+        "example": "1"
+      },
+      "hours": {
+        "type": "int",
+        "example": "1"
+      },
+      "minutes": {
+        "type": "int",
+        "example": "1"
+      },
+      "seconds": {
+        "type": "int",
+        "example": "10"
+      }
+    }
+  },
   "insertNewImageDialogTitle": "Insert New Image",
   "@insertNewImageDialogTitle": {
     "description": "Title of the dialog for inserting a new image"
@@ -2280,5 +2523,44 @@
   "insertNewImageFailedToLoad": "Image failed to load",
   "@insertNewImageFailedToLoad": {
     "description": "Text for the image failed to load"
+  },
+  "submitCommentErrorDialogTitle": "Unable to add Comment",
+  "@submitCommentErrorDialogTitle": {
+    "description": "Title for the error dialog when submitting a comment fails"
+  },
+  "noPublishedProposals": "No published proposals.",
+  "@noPublishedProposals": {
+    "description": "Text when there are no published proposals"
+  },
+  "noProposalsToPublish": "You have no proposals to publish, start a new proposal, or create a new iteration of an existing proposal to be able to publish.",
+  "@noProposalsToPublish": {
+    "description": "Text when there are no proposals to publish"
+  },
+  "viewProposalComments": "View proposal comments",
+  "@viewProposalComments": {
+    "description": "Text for the view proposal comments title in the card"
+  },
+  "viewProposalCommentsDescription": "Open My proposals in the Discovery Space",
+  "@viewProposalCommentsDescription": {
+    "description": "Text for the view proposal comments description in the card"
+  },
+  "paginationProposalsCounter": "{from}-{to} of {max, plural, =0{proposals} =1{proposal} other{proposals}}",
+  "@paginationProposalsCounter": {
+    "description": "Below pagination list, next to page switch controls",
+    "placeholders": {
+      "from": {
+        "type": "int"
+      },
+      "to": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "shareProposalErrorDescription": "Something went wrong while sharing proposal. Please try again later.",
+  "@shareProposalErrorDescription": {
+    "description": "Error description when sharing proposal fails"
   }
 }

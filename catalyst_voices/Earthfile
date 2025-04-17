@@ -1,7 +1,8 @@
 VERSION 0.8
 
+IMPORT ../ AS repo-ci
 IMPORT ../catalyst-gateway AS catalyst-gateway
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:v3.3.1 AS flutter-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:v3.3.3 AS flutter-ci
 
 # repo-catalyst-voices - Creates artifacts of all configuration files,
 # packages and folders related to catalyst_voices frontend.
@@ -9,6 +10,8 @@ repo-catalyst-voices:
     FROM scratch
     WORKDIR /repo
     COPY --dir . .
+    # Copy docs as some doc files are used for test inputs
+    COPY repo-ci+copy-docs/docs ./docs
 
     SAVE ARTIFACT /repo repo
 
@@ -129,7 +132,11 @@ package:
     ARG tag='latest'
 
     COPY +build-web/web /app
+
+    # Note this is only used for local development, a different nginx.conf is
+    # used during deployment. See blueprint.cue.
     COPY ./nginx.conf /etc/nginx/nginx.conf
+
     EXPOSE 80
 
     SAVE IMAGE voices-frontend:$tag

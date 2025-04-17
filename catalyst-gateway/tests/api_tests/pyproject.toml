@@ -1,4 +1,4 @@
-# cspell: words bitcoinlib
+# cspell: words bitcoinlib addopts
 
 [tool.poetry]
 name = "api_tests"
@@ -20,7 +20,7 @@ requests = "^2.32.3"
 pytest = "^8.0.0"
 python-bitcoinlib = "^0.12.2"
 pytest-cov = "^5.0.0"
-uuid7 = "^0.1.0"
+pycardano = "^0.13.1"
 
 [build-system]
 requires = ["poetry-core"]
@@ -30,4 +30,6 @@ build-backend = "poetry.core.masonry.api"
 markers = [
     "ci: marks tests to be run in ci",
     "nightly: marks tests to be run nightly",
+    "preprod_indexing: marks test which requires indexing of the cardano preprod network",
 ]
+addopts = "-m 'not preprod_indexing'"

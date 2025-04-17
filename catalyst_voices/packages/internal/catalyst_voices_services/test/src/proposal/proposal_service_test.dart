@@ -5,6 +5,7 @@ import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:rxdart/rxdart.dart';
 import 'package:uuid_plus/uuid_plus.dart';
 
 void main() {
@@ -35,8 +36,8 @@ void main() {
 
     when(
       () => mockDocumentRepository.watchCount(
-        ref: any(named: 'ref'),
-        type: DocumentType.commentTemplate,
+        refTo: any(named: 'refTo'),
+        type: DocumentType.commentDocument,
       ),
     ).thenAnswer((_) => Stream.fromIterable([5]));
   });
@@ -88,7 +89,6 @@ void main() {
         ),
       );
 
-      // Setup repository responses
       when(
         () => mockProposalRepository.watchLatestProposals(
           limit: null,
@@ -96,27 +96,38 @@ void main() {
       ).thenAnswer((_) => Stream.value([proposalData1, proposalData2]));
 
       when(
+        () => mockProposalRepository.watchProposalPublish(
+          refTo: any(named: 'refTo'),
+        ),
+      ).thenAnswer((_) => Stream.value(ProposalPublish.publishedDraft));
+
+      when(
         () => mockProposalRepository.queryVersionsOfId(
           id: any(named: 'id'),
+          includeLocalDrafts: any(named: 'includeLocalDrafts'),
         ),
       ).thenAnswer((_) => Future.value([proposalData1]));
 
       when(
-        () => mockProposalRepository.watchCount(
-          ref: any(named: 'ref'),
-          type: DocumentType.commentTemplate,
+        () => mockProposalRepository.watchCommentsCount(
+          refTo: any(named: 'refTo'),
         ),
       ).thenAnswer((_) => Stream.fromIterable([5]));
+
+      when(
+        () => mockProposalRepository.getProposalPublishForRef(
+          ref: any(named: 'ref'),
+        ),
+      ).thenAnswer((_) => Future.value(ProposalPublish.publishedDraft));
 
       when(() => mockCampaignRepository.getCategory(any())).thenAnswer(
         (_) => Future.value(staticCampaignCategories.first),
       );
 
-      // Execute
       final proposals = await proposalService.watchLatestProposals().first;
 
-      // Verify
       expect(proposals.length, equals(2));
+
       verify(
         () => mockProposalRepository.watchLatestProposals(
           limit: null,
@@ -124,16 +135,26 @@ void main() {
       ).called(1);
 
       verify(
-        () => mockProposalRepository.queryVersionsOfId(
-          id: any(named: 'id'),
+        () => mockProposalRepository.watchProposalPublish(
+          refTo: any(named: 'refTo'),
         ),
       ).called(2);
 
       verify(
-        () => mockProposalRepository.watchCount(
-          ref: any(named: 'ref'),
-          type: DocumentType.commentTemplate,
+        () => mockProposalRepository.queryVersionsOfId(
+          id: any(named: 'id'),
+          includeLocalDrafts: any(named: 'includeLocalDrafts'),
         ),
+      ).called(2);
+
+      verify(
+        () => mockProposalRepository.watchCommentsCount(
+          refTo: any(named: 'refTo'),
+        ),
+      ).called(2);
+
+      verify(
+        () => mockCampaignRepository.getCategory(any()),
       ).called(2);
     });
 
@@ -189,6 +210,10 @@ void main() {
           ),
         );
 
+        final comments1 = ReplaySubject<int>();
+        final comments2 = ReplaySubject<int>();
+
+        // Create a broadcast stream for the proposals
         final proposalsStream =
             Stream.value([proposalData1, proposalData2]).asBroadcastStream();
 
@@ -199,49 +224,64 @@ void main() {
         ).thenAnswer((_) => proposalsStream);
 
         when(
+          () => mockProposalRepository.watchProposalPublish(
+            refTo: any(named: 'refTo'),
+          ),
+        ).thenAnswer((_) => Stream.value(ProposalPublish.publishedDraft));
+
+        when(
           () => mockProposalRepository.queryVersionsOfId(
-            id: proposalRef1.id,
+            id: any(named: 'id'),
+            includeLocalDrafts: any(named: 'includeLocalDrafts'),
           ),
         ).thenAnswer((_) => Future.value([proposalData1]));
 
         when(
-          () => mockProposalRepository.queryVersionsOfId(
-            id: proposalRef2.id,
+          () => mockProposalRepository.getProposalPublishForRef(
+            ref: any(named: 'ref'),
           ),
-        ).thenAnswer((_) => Future.value([proposalData2]));
+        ).thenAnswer((_) => Future.value(ProposalPublish.publishedDraft));
 
         when(() => mockCampaignRepository.getCategory(any())).thenAnswer(
           (_) => Future.value(staticCampaignCategories.first),
         );
 
-        final commentsStream1 =
-            Stream.fromIterable([5, 10]).asBroadcastStream();
-        final commentsStream2 = Stream.fromIterable([3, 7]).asBroadcastStream();
+        when(
+          () => mockProposalRepository.watchCommentsCount(
+            refTo: proposalRef1,
+          ),
+        ).thenAnswer((_) => comments1.stream);
 
         when(
-          () => mockProposalRepository.watchCount(
-            ref: proposalRef1,
-            type: DocumentType.commentTemplate,
+          () => mockProposalRepository.watchCommentsCount(
+            refTo: proposalRef2,
           ),
-        ).thenAnswer((_) => commentsStream1);
+        ).thenAnswer((_) => comments2.stream);
 
-        when(
-          () => mockProposalRepository.watchCount(
-            ref: proposalRef2,
-            type: DocumentType.commentTemplate,
-          ),
-        ).thenAnswer((_) => commentsStream2);
+        final testStream = proposalService.watchLatestProposals();
+        final subscription = testStream.listen((_) {});
+
+        comments1.add(5);
+        comments2
+          ..add(3)
+          ..add(7);
+        comments1.add(10);
 
         await expectLater(
-          proposalService.watchLatestProposals().map(
-                (proposals) => proposals.map((p) => p.commentsCount).toList(),
-              ),
-          emitsInOrder([
-            [5, 3],
-            [5, 7],
-            [10, 7],
-          ]),
+          testStream,
+          emitsThrough(
+            predicate<List<Proposal>>((proposals) {
+              expect(proposals.length, equals(2));
+              expect(proposals[0].commentsCount, equals(10));
+              expect(proposals[1].commentsCount, equals(7));
+              return true;
+            }),
+          ),
         );
+
+        await subscription.cancel();
+        await comments1.close();
+        await comments2.close();
       },
     );
   });

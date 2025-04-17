@@ -1,10 +1,8 @@
-import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
-import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/pages/overall_spaces/space/space_overview_header.dart';
 import 'package:catalyst_voices/pages/overall_spaces/space/space_overview_nav_tile.dart';
+import 'package:catalyst_voices/pages/overall_spaces/space/user_proposal_selectors/user_proposal_selectors.dart';
 import 'package:catalyst_voices/pages/overall_spaces/space_overview_container.dart';
 import 'package:catalyst_voices/routes/routing/spaces_route.dart';
-import 'package:catalyst_voices/widgets/cards/small_proposal_card.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
@@ -20,6 +18,7 @@ class WorkspaceOverview extends StatelessWidget {
   Widget build(BuildContext context) {
     return const SpaceOverviewContainer(
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SpaceOverviewHeader(Space.workspace),
           _BrowseMyProposals(),
@@ -47,61 +46,7 @@ class _BrowseMyProposals extends StatelessWidget {
         context.l10n.browseMyProposals,
         style: Theme.of(context).textTheme.bodyLarge,
       ),
-      onTap: () => const MyProposalsRoute().go(context),
-    );
-  }
-}
-
-class _Header extends StatelessWidget {
-  const _Header();
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 18)
-        ..add(
-          const EdgeInsets.only(left: 16),
-        ),
-      child: Text(
-        context.l10n.notPublishedProposals,
-        style: context.textTheme.titleMedium?.copyWith(
-          color: context.colors.textOnPrimaryLevel1,
-        ),
-      ),
-    );
-  }
-}
-
-class _NotPublishedProposals extends StatelessWidget {
-  const _NotPublishedProposals();
-
-  @override
-  Widget build(BuildContext context) {
-    // TODO(LynxLynxx): replace with real data
-    final proposal = Proposal(
-      selfRef: SignedDocumentRef.generateFirstRef(),
-      title: 'Latest proposal that is making its rounds.',
-      category: 'F14: Cardano Use Cases: Concept',
-      categoryId: const SignedDocumentRef(id: 'dummy_category_id'),
-      description: 'Lorem ipsum dolor sit ',
-      fundsRequested: const Coin(100000),
-      status: ProposalStatus.draft,
-      publish: ProposalPublish.localDraft,
-      commentsCount: 0,
-      duration: 6,
-      author: 'Alex Wells',
-      updateDate: DateTime.now(),
-      versions: const [],
-    );
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const _Header(),
-        SmallProposalCard(
-          proposal: proposal,
-        ),
-      ],
+      onTap: () => ProposalsRoute.myProposals().go(context),
     );
   }
 }
@@ -118,7 +63,7 @@ class _NotPublishedProposalSelector extends StatelessWidget {
       builder: (context, state) {
         return Offstage(
           offstage: state,
-          child: const _NotPublishedProposals(),
+          child: const WorkspaceOverviewProposalSelector(),
         );
       },
     );

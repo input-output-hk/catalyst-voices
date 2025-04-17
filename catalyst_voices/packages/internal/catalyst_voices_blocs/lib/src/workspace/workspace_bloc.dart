@@ -43,6 +43,7 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     on<DeleteDraftProposalEvent>(_deleteProposal);
     on<UnlockProposalEvent>(_unlockProposal);
     on<ForgetProposalEvent>(_forgetProposal);
+    on<GetTimelineItemsEvent>(_getTimelineItems);
   }
 
   @override
@@ -74,11 +75,15 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     Emitter<WorkspaceState> emit,
   ) async {
     try {
+      emit(state.copyWith(isLoading: true));
       await _proposalService.deleteDraftProposal(event.ref);
+      emit(state.copyWith(userProposals: _removeProposal(event.ref)));
       emitSignal(const DeletedDraftWorkspaceSignal());
     } catch (error, stackTrace) {
       _logger.severe('Delete proposal failed', error, stackTrace);
       emitError(const LocalizedProposalDeletionException());
+    } finally {
+      emit(state.copyWith(isLoading: false));
     }
   }
 
@@ -136,10 +141,32 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     if (proposal == null || proposal.selfRef is! SignedDocumentRef) {
       return emitError(const LocalizedUnknownException());
     }
-    await _proposalService.unlockProposal(
-      proposalRef: proposal.selfRef as SignedDocumentRef,
-      categoryId: proposal.categoryId,
-    );
+    try {
+      emit(state.copyWith(isLoading: true));
+      await _proposalService.forgetProposal(
+        proposalRef: proposal.selfRef as SignedDocumentRef,
+        categoryId: proposal.categoryId,
+      );
+      emit(state.copyWith(userProposals: _removeProposal(event.ref)));
+      emitSignal(const ForgetProposalSuccessWorkspaceSignal());
+    } catch (e, stackTrace) {
+      emitError(LocalizedException.create(e));
+      _logger.severe('Error forgetting proposal', e, stackTrace);
+    } finally {
+      emit(state.copyWith(isLoading: false));
+    }
+  }
+
+  Future<void> _getTimelineItems(
+    GetTimelineItemsEvent event,
+    Emitter<WorkspaceState> emit,
+  ) async {
+    final timelineItems = await _campaignService.getCampaignTimeline();
+    final timeline =
+        timelineItems.map(CampaignTimelineViewModel.fromModel).toList();
+
+    emit(state.copyWith(timelineItems: timeline));
+    emitSignal(SubmissionCloseDate(date: state.submissionCloseDate));
   }
 
   Future<void> _importProposal(
@@ -147,12 +174,16 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     Emitter<WorkspaceState> emit,
   ) async {
     try {
+      emit(state.copyWith(isLoading: true));
       final ref = await _proposalService.importProposal(event.proposalData);
       emitSignal(ImportedProposalWorkspaceSignal(proposalRef: ref));
     } catch (error, stackTrace) {
       _logger.severe('Importing proposal failed', error, stackTrace);
+      emit(state.copyWith(isLoading: false));
       emitError(LocalizedException.create(error));
     }
+    // We don't need to emit isLoading false here because it will be emitted
+    // in the stream subscription.
   }
 
   Future<void> _loadProposals(
@@ -168,6 +199,13 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     );
   }
 
+  List<Proposal> _removeProposal(
+    DocumentRef proposalRef,
+  ) {
+    return [...state.userProposals]
+      ..removeWhere((e) => e.selfRef.id == proposalRef.id);
+  }
+
   void _setupProposalsSubscription() {
     _proposalsSubscription = _proposalService.watchUserProposals().listen(
       (proposals) {
@@ -176,9 +214,9 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
 
         add(LoadProposalsEvent(proposals));
       },
-      onError: (Object error) {
+      onError: (Object error, StackTrace stackTrace) {
         if (isClosed) return;
-        _logger.info('Users proposals stream error', error);
+        _logger.info('Users proposals stream error', error, stackTrace);
         add(ErrorLoadProposalsEvent(LocalizedException.create(error)));
       },
     );
@@ -204,6 +242,10 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     WatchUserProposalsEvent event,
     Emitter<WorkspaceState> emit,
   ) async {
+    // As stream is needed in a few places we don't want to create it every time
+    if (_proposalsSubscription != null && state.error == null) {
+      return;
+    }
     _logger.info('Setup user proposals subscription');
     emit(
       state.copyWith(
@@ -211,6 +253,7 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
         error: const Optional.empty(),
       ),
     );
+    _logger.info('$state and ${state.showProposals}');
     await _proposalsSubscription?.cancel();
     _proposalsSubscription = null;
     _setupProposalsSubscription();

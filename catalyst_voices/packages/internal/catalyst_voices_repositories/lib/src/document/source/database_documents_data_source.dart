@@ -1,7 +1,9 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
+import 'package:catalyst_voices_repositories/src/document/source/proposal_document_data_local_source.dart';
 
-final class DatabaseDocumentsDataSource implements SignedDocumentDataSource {
+final class DatabaseDocumentsDataSource
+    implements SignedDocumentDataSource, ProposalDocumentDataLocalSource {
   final CatalystDatabase _database;
 
   DatabaseDocumentsDataSource(
@@ -24,11 +26,31 @@ final class DatabaseDocumentsDataSource implements SignedDocumentDataSource {
   }
 
   @override
+  Future<Page<ProposalDocumentData>> getProposalsPage({
+    required PageRequest request,
+    required ProposalsFilters filters,
+  }) {
+    return _database.proposalsDao
+        .queryProposalsPage(request: request, filters: filters)
+        .then((page) => page.map((e) => e.toModel()));
+  }
+
+  @override
   Future<int> getRefCount({
     required DocumentRef ref,
     required DocumentType type,
   }) {
     return _database.documentsDao.countRefDocumentByType(ref: ref, type: type);
+  }
+
+  @override
+  Future<DocumentData?> getRefToDocumentData({
+    required DocumentRef refTo,
+    DocumentType? type,
+  }) {
+    return _database.documentsDao
+        .queryRefToDocumentData(refTo: refTo, type: type)
+        .then((e) => e?.toModel());
   }
 
   @override
@@ -99,13 +121,30 @@ final class DatabaseDocumentsDataSource implements SignedDocumentDataSource {
 
   @override
   Stream<int> watchCount({
-    required DocumentRef ref,
-    required DocumentType type,
+    DocumentRef? refTo,
+    DocumentType? type,
   }) {
     return _database.documentsDao.watchCount(
-      ref: ref,
+      refTo: refTo,
       type: type,
     );
+  }
+
+  @override
+  Stream<ProposalsCount> watchProposalsCount({
+    required ProposalsCountFilters filters,
+  }) {
+    return _database.proposalsDao.watchCount(filters: filters);
+  }
+
+  @override
+  Stream<DocumentData?> watchRefToDocumentData({
+    required DocumentRef refTo,
+    required DocumentType type,
+  }) {
+    return _database.documentsDao
+        .watchRefToDocumentData(refTo: refTo, type: type)
+        .map((e) => e?.toModel());
   }
 }
 
@@ -114,6 +153,18 @@ extension on DocumentEntity {
     return DocumentData(
       metadata: metadata,
       content: content,
+    );
+  }
+}
+
+extension on JoinedProposalEntity {
+  ProposalDocumentData toModel() {
+    return ProposalDocumentData(
+      proposal: proposal.toModel(),
+      template: template.toModel(),
+      action: action?.toModel(),
+      commentsCount: commentsCount,
+      versions: versions,
     );
   }
 }

@@ -3,9 +3,10 @@ import 'package:equatable/equatable.dart';
 
 final class DeletedDraftWorkspaceSignal extends WorkspaceSignal {
   const DeletedDraftWorkspaceSignal();
+}
 
-  @override
-  List<Object?> get props => [];
+final class ForgetProposalSuccessWorkspaceSignal extends WorkspaceSignal {
+  const ForgetProposalSuccessWorkspaceSignal();
 }
 
 final class ImportedProposalWorkspaceSignal extends WorkspaceSignal {
@@ -26,6 +27,18 @@ final class OpenProposalBuilderSignal extends WorkspaceSignal {
   List<Object?> get props => [ref];
 }
 
+final class SubmissionCloseDate extends WorkspaceSignal {
+  final DateTime? date;
+
+  const SubmissionCloseDate({required this.date});
+
+  @override
+  List<Object?> get props => [date];
+}
+
 sealed class WorkspaceSignal extends Equatable {
   const WorkspaceSignal();
+
+  @override
+  List<Object?> get props => [];
 }

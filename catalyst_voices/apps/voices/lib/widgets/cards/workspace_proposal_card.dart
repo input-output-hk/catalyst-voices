@@ -92,7 +92,7 @@ class _Body extends StatelessWidget {
           leadValue: commentsCount == 0
               ? context.l10n.notAvailableAbbr
               : commentsCount.toString(),
-          subValue: context.l10n.comments,
+          subValue: context.l10n.comments(commentsCount),
         ),
         ProposalMenuActionButton(
           ref: proposal.selfRef,

@@ -13,6 +13,12 @@ use cardano_blockchain_types::Network;
 use catalyst_types::id_uri::{key_rotation::KeyRotation, role_index::RoleIndex, IdUri};
 use chrono::{TimeDelta, Utc};
 use ed25519_dalek::{ed25519::signature::Signer, Signature, SigningKey, VerifyingKey};
+use rbac_registration::registration::cardano::RegistrationChain;
+
+use crate::db::index::{
+    queries::rbac::get_rbac_registrations::build_reg_chain,
+    session::{CassandraSession, CassandraSessionError},
+};
 
 /// A Catalyst RBAC Authorization Token.
 ///
@@ -32,6 +38,9 @@ pub(crate) struct CatalystRBACTokenV1 {
     signature: Signature,
     /// Raw bytes of the token without the signature.
     raw: Vec<u8>,
+    /// A corresponded RBAC chain, constructed from the most recent data from the
+    /// database. Lazy initialized
+    reg_chain: Option<RegistrationChain>,
 }
 
 impl CatalystRBACTokenV1 {
@@ -54,6 +63,7 @@ impl CatalystRBACTokenV1 {
             network,
             signature,
             raw,
+            reg_chain: None,
         })
     }
 
@@ -96,7 +106,7 @@ impl CatalystRBACTokenV1 {
             return Err(anyhow!("Catalyst ID must have nonce"));
         }
         let (role, rotation) = catalyst_id.role_and_rotation();
-        if role != RoleIndex::DEFAULT {
+        if role != RoleIndex::ROLE_0 {
             return Err(anyhow!("Catalyst ID mustn't have role specified"));
         }
         if rotation != KeyRotation::DEFAULT {
@@ -109,6 +119,7 @@ impl CatalystRBACTokenV1 {
             network,
             signature,
             raw,
+            reg_chain: None,
         })
     }
 
@@ -155,6 +166,17 @@ impl CatalystRBACTokenV1 {
     /// Returns a network.
     pub(crate) fn network(&self) -> Network {
         self.network
+    }
+
+    /// Returns a corresponded registration chain if any registrations present.
+    /// If it is a first call, fetch all data from the database and initialize it.
+    pub(crate) async fn reg_chain(&mut self) -> anyhow::Result<Option<RegistrationChain>> {
+        if self.reg_chain.is_none() {
+            let session =
+                CassandraSession::get(true).ok_or(CassandraSessionError::FailedAcquiringSession)?;
+            self.reg_chain = build_reg_chain(&session, self.catalyst_id(), self.network()).await?;
+        }
+        Ok(self.reg_chain.clone())
     }
 }
 

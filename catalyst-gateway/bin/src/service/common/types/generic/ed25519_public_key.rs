@@ -2,11 +2,7 @@
 //!
 //! Hex encoded string which represents an Ed25519 public key.
 
-use std::{
-    borrow::Cow,
-    ops::{Deref, DerefMut},
-    sync::LazyLock,
-};
+use std::sync::LazyLock;
 
 use anyhow::bail;
 use poem_openapi::{
@@ -117,8 +113,7 @@ impl TryFrom<Vec<u8>> for Ed25519HexEncodedPublicKey {
 
     fn try_from(value: Vec<u8>) -> Result<Self, Self::Error> {
         let key = ed25519::verifying_key_from_vec(&value)?;
-
-        Ok(Self(as_hex_string(key.as_ref())))
+        Ok(key.into())
     }
 }
 
@@ -131,6 +126,12 @@ impl From<Ed25519HexEncodedPublicKey> for ed25519_dalek::VerifyingKey {
         #[allow(clippy::expect_used)]
         ed25519::verifying_key_from_hex(&val.0)
             .expect("This can only fail if the type was invalidly constructed.")
+    }
+}
+
+impl From<ed25519_dalek::VerifyingKey> for Ed25519HexEncodedPublicKey {
+    fn from(key: ed25519_dalek::VerifyingKey) -> Self {
+        Self(as_hex_string(key.as_ref()))
     }
 }
 

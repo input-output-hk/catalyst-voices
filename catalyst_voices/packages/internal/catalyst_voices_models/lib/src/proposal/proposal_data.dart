@@ -4,14 +4,17 @@ import 'package:uuid_plus/uuid_plus.dart';
 
 class BaseProposalData extends Equatable {
   final ProposalDocument document;
+  final ProposalPublish publish;
 
   const BaseProposalData({
     required this.document,
+    required this.publish,
   });
 
   @override
   List<Object?> get props => [
         document,
+        publish,
       ];
 
   ProposalVersion toProposalVersion() {
@@ -21,12 +24,13 @@ class BaseProposalData extends Equatable {
       createdAt: UuidV7.parseDateTime(
         document.metadata.selfRef.version ?? document.metadata.selfRef.id,
       ),
-      // TODO(LynxLynxx): from where we need to get the real status
-      publish: ProposalPublish.publishedDraft,
+      publish: publish,
     );
   }
 }
 
+// TODO(damian-molinski): delete this class and refactor it. categoryName
+// does not make sense here
 class ProposalData extends BaseProposalData {
   final List<BaseProposalData> versions;
   final int commentsCount;
@@ -34,6 +38,7 @@ class ProposalData extends BaseProposalData {
 
   const ProposalData({
     required super.document,
+    required super.publish,
     this.commentsCount = 0,
     this.categoryName = '',
     this.versions = const [],
@@ -53,4 +58,18 @@ class ProposalData extends BaseProposalData {
       ];
 
   SignedDocumentRef get templateRef => document.metadata.templateRef;
+
+  ProposalData copyWith({
+    int? commentsCount,
+    String? categoryName,
+    List<BaseProposalData>? versions,
+  }) {
+    return ProposalData(
+      document: document,
+      publish: publish,
+      commentsCount: commentsCount ?? this.commentsCount,
+      categoryName: categoryName ?? this.categoryName,
+      versions: versions ?? this.versions,
+    );
+  }
 }

@@ -1,4 +1,5 @@
 import 'package:catalyst_voices/common/ext/text_editing_controller_ext.dart';
+import 'package:catalyst_voices/widgets/document_builder/common/document_property_builder_title.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -46,9 +47,9 @@ class _SimpleTextEntryWidgetState extends State<SimpleTextEntryWidget> {
       mainAxisSize: MainAxisSize.min,
       children: [
         if (_title.isNotEmpty) ...[
-          Text(
-            _title.starred(isEnabled: _isRequired),
-            style: Theme.of(context).textTheme.titleSmall,
+          DocumentPropertyBuilderTitle(
+            title: _title,
+            isRequired: _isRequired,
           ),
           const SizedBox(height: 8),
         ],

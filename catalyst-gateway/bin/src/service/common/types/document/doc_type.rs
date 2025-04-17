@@ -2,11 +2,7 @@
 //!
 //! `UUIDv4` Encoded Document Type.
 
-use std::{
-    borrow::Cow,
-    ops::{Deref, DerefMut},
-    sync::LazyLock,
-};
+use std::sync::LazyLock;
 
 use anyhow::bail;
 use poem_openapi::{

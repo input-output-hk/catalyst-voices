@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
 import 'package:catalyst_voices/app/app.dart';
+import 'package:catalyst_voices/app/view/app_splash_screen_manager.dart';
 import 'package:catalyst_voices/configs/app_bloc_observer.dart';
 import 'package:catalyst_voices/configs/sentry_service.dart';
 import 'package:catalyst_voices/dependency/dependencies.dart';
@@ -127,12 +128,8 @@ Future<void> _doBootstrapAndRun(
   AppEnvironment environment,
   BootstrapWidgetBuilder builder,
 ) async {
-  // There's no need to call WidgetsFlutterBinding.ensureInitialized()
-  // since this is already done internally by SentryFlutter.init()
-  // More info here: https://github.com/getsentry/sentry-dart/issues/2063
-  if (!kReleaseMode) {
-    WidgetsFlutterBinding.ensureInitialized();
-  }
+  final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  AppSplashScreenManager.preserveSplashScreen(widgetsBinding);
 
   FlutterError.onError = _reportFlutterError;
   PlatformDispatcher.instance.onError = _reportPlatformDispatcherError;

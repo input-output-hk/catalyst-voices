@@ -8,7 +8,7 @@ import 'package:go_router/go_router.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
 abstract final class AppRouter {
-  static final _rootNavigatorKey = GlobalKey<NavigatorState>(
+  static final rootNavigatorKey = GlobalKey<NavigatorState>(
     debugLabel: 'rootNavigatorKey',
   );
 
@@ -18,7 +18,7 @@ abstract final class AppRouter {
     Listenable? refreshListenable,
   }) {
     return GoRouter(
-      navigatorKey: _rootNavigatorKey,
+      navigatorKey: rootNavigatorKey,
       initialLocation: initialLocation ?? Routes.initialLocation,
       redirect: (context, state) async => _guard(context, state, guards),
       observers: [

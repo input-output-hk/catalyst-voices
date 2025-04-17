@@ -57,6 +57,7 @@ final class ProposalBuilderBloc
     on<RebuildActiveAccountProposalEvent>(_rebuildActiveAccount);
     on<SubmitProposalEvent>(_submitProposal);
     on<ValidateProposalEvent>(_validateProposal);
+    on<ProposalSubmissionCloseDateEvent>(_proposalSubmissionCloseDate);
     on<UpdateCommentsSortEvent>(_updateCommentsSort);
     on<UpdateCommentBuilderEvent>(_updateCommentBuilder);
     on<UpdateCommentRepliesEvent>(_updateCommentReplies);
@@ -380,8 +381,6 @@ final class ProposalBuilderBloc
       final proposalData = await _proposalService.getProposal(
         ref: proposalRef,
       );
-      // TODO(LynxLynxx): check if new local proposal is created
-      // when SignedDocumentRef is used instead of DraftRef
 
       final proposal = Proposal.fromData(proposalData);
 
@@ -395,7 +394,6 @@ final class ProposalBuilderBloc
           isLatest: index == proposalData.versions.length - 1,
         );
       }).toList();
-
       final categoryId = proposalData.categoryId;
       final category = await _campaignService.getCategory(categoryId);
 
@@ -541,18 +539,46 @@ final class ProposalBuilderBloc
     }).toList();
   }
 
+  Future<void> _proposalSubmissionCloseDate(
+    ProposalSubmissionCloseDateEvent event,
+    Emitter<ProposalBuilderState> emit,
+  ) async {
+    final timeline = await _campaignService.getCampaignTimeline();
+    final closeDate = timeline
+        .firstWhereOrNull(
+          (e) => e.stage == CampaignTimelineStage.proposalSubmission,
+        )
+        ?.timeline
+        .to;
+
+    emitSignal(ProposalSubmissionCloseDate(date: closeDate));
+  }
+
   Future<void> _publishAndSubmitProposalForReview(
     Emitter<ProposalBuilderState> emit,
   ) async {
+    final currentRef = state.metadata.documentRef!;
     final updatedRef = await _proposalService.publishProposal(
       document: _buildDocumentData(),
     );
+
+    List<DocumentVersion>? updatedVersions;
+    if (updatedRef != currentRef) {
+      // if a new ref has been created we need to recreate
+      // the version history to reflect it, drop the old one
+      // because the new one overrode it
+      updatedVersions = _recreateDocumentVersionsWithNewRef(
+        newRef: updatedRef,
+        removedRef: currentRef,
+      );
+    }
 
     _updateMetadata(
       emit,
       documentRef: updatedRef,
       originalDocumentRef: updatedRef,
       publish: ProposalPublish.publishedDraft,
+      versions: updatedVersions,
     );
 
     await _proposalService.submitProposalForReview(
@@ -576,15 +602,28 @@ final class ProposalBuilderBloc
       _logger.info('Publishing proposal');
       emit(state.copyWith(isChanging: true));
 
+      final currentRef = state.metadata.documentRef!;
       final updatedRef = await _proposalService.publishProposal(
         document: _buildDocumentData(),
       );
+
+      List<DocumentVersion>? updatedVersions;
+      if (updatedRef != currentRef) {
+        // if a new ref has been created we need to recreate
+        // the version history to reflect it, drop the old one
+        // because the new one overrode it
+        updatedVersions = _recreateDocumentVersionsWithNewRef(
+          newRef: updatedRef,
+          removedRef: currentRef,
+        );
+      }
 
       _updateMetadata(
         emit,
         documentRef: updatedRef,
         originalDocumentRef: updatedRef,
         publish: ProposalPublish.publishedDraft,
+        versions: updatedVersions,
       );
       emitSignal(const PublishedProposalBuilderSignal());
     } catch (error, stackTrace) {
@@ -641,19 +680,53 @@ final class ProposalBuilderBloc
     );
   }
 
+  List<DocumentVersion> _recreateDocumentVersionsWithNewRef({
+    DocumentRef? newRef,
+    DocumentRef? removedRef,
+  }) {
+    final current =
+        state.metadata.versions.whereNot((e) => e.id == removedRef?.version);
+    final currentId = newRef?.version ?? current.last.id;
+
+    return [
+      for (final (index, ver) in current.indexed)
+        ver.copyWith(
+          number: index + 1,
+          isCurrent: ver.id == currentId,
+          isLatest: ver.id == currentId,
+        ),
+      if (newRef != null)
+        DocumentVersion(
+          id: newRef.version!,
+          number: current.length + 1,
+          isCurrent: newRef.version == currentId,
+          isLatest: newRef.version == currentId,
+        ),
+    ];
+  }
+
   Future<void> _saveDocumentLocally(
     Emitter<ProposalBuilderState> emit,
     Document document,
   ) async {
+    final currentRef = state.metadata.documentRef!;
     final updatedRef = await _upsertDraftProposal(
       _documentMapper.toContent(document),
     );
+
+    List<DocumentVersion>? updatedVersions;
+    if (updatedRef != currentRef) {
+      // if a new ref has been created we need to recreate
+      // the version history to reflect it
+      updatedVersions = _recreateDocumentVersionsWithNewRef(newRef: updatedRef);
+    }
 
     _updateMetadata(
       emit,
       documentRef: updatedRef,
       originalDocumentRef: state.metadata.originalDocumentRef ?? updatedRef,
       publish: ProposalPublish.localDraft,
+      versions: updatedVersions,
     );
   }
 
@@ -788,12 +861,14 @@ final class ProposalBuilderBloc
     DocumentRef? documentRef,
     DocumentRef? originalDocumentRef,
     ProposalPublish? publish,
+    List<DocumentVersion>? versions,
   }) {
     final updatedMetadata = state.metadata.copyWith(
       documentRef: documentRef != null ? Optional(documentRef) : null,
       originalDocumentRef:
           originalDocumentRef != null ? Optional(originalDocumentRef) : null,
       publish: publish,
+      versions: versions,
     );
 
     final updatedState = state.copyWith(

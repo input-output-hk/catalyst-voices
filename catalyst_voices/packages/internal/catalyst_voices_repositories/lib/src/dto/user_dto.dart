@@ -107,6 +107,8 @@ final class AccountWalletInfoDto {
       metadata: metadata.toModel(),
       balance: balance,
       address: address,
+      // TODO(dtscalac): drop it in when account recovery is finished
+      networkId: NetworkId.testnet,
     );
   }
 }
@@ -193,10 +195,12 @@ final class UserSettingsDto {
   final TimezonePreferences? timezone;
   @JsonKey(unknownEnumValue: JsonKey.nullForUndefinedEnumValue)
   final ThemePreferences? theme;
+  final bool? showSubmissionClosingWarning;
 
   const UserSettingsDto({
     this.timezone,
     this.theme,
+    this.showSubmissionClosingWarning,
   });
 
   factory UserSettingsDto.fromJson(Map<String, dynamic> json) {
@@ -207,6 +211,7 @@ final class UserSettingsDto {
       : this(
           timezone: data.timezone,
           theme: data.theme,
+          showSubmissionClosingWarning: data.showSubmissionClosingWarning,
         );
 
   Map<String, dynamic> toJson() => _$UserSettingsDtoToJson(this);
@@ -215,6 +220,7 @@ final class UserSettingsDto {
     return UserSettings(
       timezone: timezone,
       theme: theme,
+      showSubmissionClosingWarning: showSubmissionClosingWarning,
     );
   }
 }

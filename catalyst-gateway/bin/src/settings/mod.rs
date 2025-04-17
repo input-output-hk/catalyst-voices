@@ -23,6 +23,8 @@ use crate::{
 
 pub(crate) mod cassandra_db;
 pub(crate) mod chain_follower;
+pub(crate) mod event_db;
+pub(crate) mod signed_doc;
 mod str_env_var;
 
 /// Default address to start service on, '0.0.0.0:3030'.
@@ -51,10 +53,6 @@ const METRICS_MEMORY_INTERVAL_DEFAULT: Duration = Duration::from_secs(1);
 
 /// Default `METRICS_FOLLOWER_INTERVAL`, 1 second.
 const METRICS_FOLLOWER_INTERVAL_DEFAULT: Duration = Duration::from_secs(1);
-
-/// Default Event DB URL.
-const EVENT_DB_URL_DEFAULT: &str =
-    "postgresql://postgres:postgres@localhost/catalyst_events?sslmode=disable";
 
 /// Default number of slots used as overlap when purging Live Index data.
 const PURGE_BACKWARD_SLOT_BUFFER_DEFAULT: u64 = 100;
@@ -118,15 +116,6 @@ struct EnvVars {
     /// The base path the API is served at.
     api_url_prefix: StringEnvVar,
 
-    /// The Address of the Event DB.
-    event_db_url: StringEnvVar,
-
-    /// The `UserName` to use for the Event DB.
-    event_db_username: Option<StringEnvVar>,
-
-    /// The Address of the Event DB.
-    event_db_password: Option<StringEnvVar>,
-
     /// The Config of the Persistent Cassandra DB.
     cassandra_persistent_db: cassandra_db::EnvVars,
 
@@ -135,6 +124,12 @@ struct EnvVars {
 
     /// The Chain Follower configuration
     chain_follower: chain_follower::EnvVars,
+
+    /// The event db configuration
+    event_db: event_db::EnvVars,
+
+    /// The Catalyst Signed Documents configuration
+    signed_doc: signed_doc::EnvVars,
 
     /// Internal API Access API Key
     internal_api_key: Option<StringEnvVar>,
@@ -199,9 +194,7 @@ static ENV_VARS: LazyLock<EnvVars> = LazyLock::new(|| {
         client_id_key: StringEnvVar::new("CLIENT_ID_KEY", CLIENT_ID_KEY_DEFAULT.into()),
         api_host_names: StringEnvVar::new_optional("API_HOST_NAMES", false),
         api_url_prefix: StringEnvVar::new("API_URL_PREFIX", API_URL_PREFIX_DEFAULT.into()),
-        event_db_url: StringEnvVar::new("EVENT_DB_URL", EVENT_DB_URL_DEFAULT.into()),
-        event_db_username: StringEnvVar::new_optional("EVENT_DB_USERNAME", false),
-        event_db_password: StringEnvVar::new_optional("EVENT_DB_PASSWORD", true),
+
         cassandra_persistent_db: cassandra_db::EnvVars::new(
             cassandra_db::PERSISTENT_URL_DEFAULT,
             cassandra_db::PERSISTENT_NAMESPACE_DEFAULT,
@@ -211,6 +204,8 @@ static ENV_VARS: LazyLock<EnvVars> = LazyLock::new(|| {
             cassandra_db::VOLATILE_NAMESPACE_DEFAULT,
         ),
         chain_follower: chain_follower::EnvVars::new(),
+        event_db: event_db::EnvVars::new(),
+        signed_doc: signed_doc::EnvVars::new(),
         internal_api_key: StringEnvVar::new_optional("INTERNAL_API_KEY", true),
         check_config_tick: StringEnvVar::new_as_duration(
             "CHECK_CONFIG_TICK",
@@ -243,7 +238,7 @@ impl EnvVars {
     pub(crate) fn validate() -> anyhow::Result<()> {
         let mut status = Ok(());
 
-        let url = ENV_VARS.event_db_url.as_str();
+        let url = ENV_VARS.event_db.url.as_str();
         if let Err(error) = tokio_postgres::config::Config::from_str(url) {
             error!(error=%error, url=url, "Invalid Postgres DB URL.");
             status = Err(anyhow!("Environment Variable Validation Error."));
@@ -279,19 +274,44 @@ impl Settings {
     }
 
     /// Get the current Event DB settings for this service.
-    pub(crate) fn event_db_settings() -> (&'static str, Option<&'static str>, Option<&'static str>)
-    {
-        let url = ENV_VARS.event_db_url.as_str();
+    pub(crate) fn event_db_settings() -> (
+        &'static str,
+        Option<&'static str>,
+        Option<&'static str>,
+        u32,
+        u32,
+        u32,
+        u32,
+    ) {
+        let url = ENV_VARS.event_db.url.as_str();
         let user = ENV_VARS
-            .event_db_username
+            .event_db
+            .username
             .as_ref()
             .map(StringEnvVar::as_str);
         let pass = ENV_VARS
-            .event_db_password
+            .event_db
+            .password
             .as_ref()
             .map(StringEnvVar::as_str);
 
-        (url, user, pass)
+        let max_connections = ENV_VARS.event_db.max_connections;
+
+        let max_lifetime = ENV_VARS.event_db.max_lifetime;
+
+        let min_idle = ENV_VARS.event_db.min_idle;
+
+        let connection_timeout = ENV_VARS.event_db.connection_timeout;
+
+        (
+            url,
+            user,
+            pass,
+            max_connections,
+            max_lifetime,
+            min_idle,
+            connection_timeout,
+        )
     }
 
     /// Get the Persistent & Volatile Cassandra DB config for this service.
@@ -305,6 +325,11 @@ impl Settings {
     /// Get the configuration of the chain follower.
     pub(crate) fn follower_cfg() -> chain_follower::EnvVars {
         ENV_VARS.chain_follower.clone()
+    }
+
+    /// Get the configuration of the Catalyst Signed Documents.
+    pub(crate) fn signed_doc_cfg() -> signed_doc::EnvVars {
+        ENV_VARS.signed_doc.clone()
     }
 
     /// Chain Follower network (The Blockchain network we are configured to use).
