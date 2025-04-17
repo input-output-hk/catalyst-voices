@@ -1,4 +1,4 @@
-# cspell: words bitcoinlib addopts
+# cspell: words bitcoinlib addopts beautifulsoup
 
 [tool.poetry]
 name = "api_tests"
