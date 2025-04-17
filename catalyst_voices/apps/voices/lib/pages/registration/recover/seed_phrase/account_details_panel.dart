@@ -10,6 +10,7 @@ import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 import 'package:result_type/result_type.dart';
@@ -102,13 +103,15 @@ class _AccountSummaryDetails extends StatelessWidget {
           _SummaryDetails(
             label: Text(context.l10n.nickname),
             value: Text(
-              username ?? context.l10n.notAvailableAbbr.toLowerCase(),
+              username?.nullIfEmpty() ??
+                  context.l10n.notAvailableAbbr.toLowerCase(),
             ),
           ),
           _SummaryDetails(
             label: Text(context.l10n.email),
             value: Text(
-              username ?? context.l10n.notAvailableAbbr.toLowerCase(),
+              email?.nullIfEmpty() ??
+                  context.l10n.notAvailableAbbr.toLowerCase(),
             ),
           ),
           _SummaryDetails(
@@ -275,8 +278,9 @@ class _SummaryDetails extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final textStyle = Theme.of(context).textTheme.bodySmall!;
+    final textStyle = Theme.of(context).textTheme.bodyMedium!;
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Expanded(
           child: DefaultTextStyle(
