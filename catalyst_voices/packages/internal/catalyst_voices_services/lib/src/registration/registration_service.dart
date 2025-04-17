@@ -41,6 +41,12 @@ abstract interface class RegistrationService {
   /// Returns the available cardano wallet extensions.
   Future<List<CardanoWallet>> getCardanoWallets();
 
+  /// Loads the ballet balance for given [address].
+  Future<Coin> getWalletBalance({
+    required SeedPhrase seedPhrase,
+    required ShelleyAddress address,
+  });
+
   /// Builds an unsigned registration transaction from given parameters.
   ///
   /// Throws a subclass of [RegistrationException] in case of a failure.
@@ -54,17 +60,6 @@ abstract interface class RegistrationService {
   /// Loads account related to this [seedPhrase]. Throws exception if not found.
   Future<Account> recoverAccount({
     required SeedPhrase seedPhrase,
-  });
-
-  /// Loads wallet info related to this [seedPhrase].
-  ///
-  /// The [WalletInfo.balance] will reflect the balance
-  /// at the moment of the call.
-  ///
-  /// Throws exception if not found.
-  Future<WalletInfo> recoverWalletInfo({
-    required SeedPhrase seedPhrase,
-    required ShelleyAddress address,
   });
 
   /// Requests the user to sign the registration transaction
@@ -150,6 +145,15 @@ final class RegistrationServiceImpl implements RegistrationService {
   }
 
   @override
+  Future<Coin> getWalletBalance({
+    required SeedPhrase seedPhrase,
+    required ShelleyAddress address,
+  }) async {
+    // TODO(dtscalac): fetch wallet info, etc
+    return const Coin(0);
+  }
+
+  @override
   Future<Transaction> prepareRegistration({
     required CardanoWallet wallet,
     required NetworkId networkId,
@@ -230,9 +234,7 @@ final class RegistrationServiceImpl implements RegistrationService {
           catalystId: catalystId.copyWith(
             username: Optional(recovered?.username),
           ),
-          // TODO(dtscalac): what if reviews module
-          // is not working or account not found
-          email: recovered?.email ?? 'recovered@iohk.com',
+          email: recovered?.email ?? '',
           keychain: keychain,
           // TODO(dtscalac): fetch this data from backend
           roles: {AccountRole.root, AccountRole.proposer},
@@ -241,20 +243,6 @@ final class RegistrationServiceImpl implements RegistrationService {
         );
       });
     });
-  }
-
-  @override
-  Future<WalletInfo> recoverWalletInfo({
-    required SeedPhrase seedPhrase,
-    required ShelleyAddress address,
-  }) async {
-    // TODO(dtscalac): fetch wallet info, etc
-    return WalletInfo(
-      metadata: const WalletMetadata(name: 'Recovered wallet'),
-      balance: const Coin(0),
-      address: address,
-      networkId: NetworkId.testnet,
-    );
   }
 
   @override
