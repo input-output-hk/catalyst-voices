@@ -1,8 +1,11 @@
+import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_repositories/generated/api/cat_gateway.models.swagger.dart';
 import 'package:catalyst_voices_repositories/generated/api/cat_reviews.models.swagger.dart';
 import 'package:catalyst_voices_repositories/src/api/api_services.dart';
 import 'package:catalyst_voices_repositories/src/auth/auth_token_provider.dart';
 import 'package:catalyst_voices_repositories/src/common/response_mapper.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 
 final class ApiUserDataSource implements UserDataSource {
   final ApiServices _apiServices;
@@ -10,24 +13,22 @@ final class ApiUserDataSource implements UserDataSource {
   const ApiUserDataSource(this._apiServices);
 
   @override
-  Future<RecoveredAccount?> recoverAccount({required String rbacToken}) async {
-    final reviews = ApiServices.createReviews(
-      reviewsUrl: _apiServices.reviews.client.baseUrl,
-      authTokenProvider: _HardcodedAuthTokenProvider(token: rbacToken),
-    );
+  Future<RecoveredAccount> recoverAccount({
+    required CatalystId catalystId,
+    required String rbacToken,
+  }) async {
+    final tokenProvider = _HardcodedAuthTokenProvider(token: rbacToken);
+    final publicId = await _recoverCatalystIDPublic(tokenProvider);
+    final rbacRegistration =
+        await _recoverRbacRegistration(catalystId, tokenProvider);
 
-    final response = await reviews.apiCatalystIdsMeGet();
-
-    if (response.statusCode == ApiErrorResponseException.notFound) {
-      // nothing to recover
-      return null;
-    }
-    response.verifyIsSuccessful();
-
-    final body = response.bodyOrThrow;
     return RecoveredAccount(
-      username: body.username as String?,
-      email: body.email as String?,
+      username: publicId?.username as String?,
+      email: publicId?.email as String?,
+      roles: rbacRegistration.roles
+          as Set<AccountRole>, // TODO(dtscalac): extract roles
+      stakeAddress: rbacRegistration.roles
+          as ShelleyAddress, // TODO(dtscalac): extract stake address
     );
   }
 
@@ -42,11 +43,57 @@ final class ApiUserDataSource implements UserDataSource {
 
     response.verifyIsSuccessful();
   }
+
+  Future<CatalystIDPublic?> _recoverCatalystIDPublic(
+    AuthTokenProvider tokenProvider,
+  ) async {
+    final reviews = ApiServices.createReviews(
+      reviewsUrl: _apiServices.reviews.client.baseUrl,
+      authTokenProvider: tokenProvider,
+    );
+
+    final response = await reviews.apiCatalystIdsMeGet();
+
+    if (response.statusCode == ApiErrorResponseException.notFound) {
+      // nothing to recover
+      return null;
+    }
+    response.verifyIsSuccessful();
+
+    return response.bodyOrThrow;
+  }
+
+  Future<RbacRegistrationChain> _recoverRbacRegistration(
+    CatalystId catalystId,
+    AuthTokenProvider tokenProvider,
+  ) async {
+    final gateway = ApiServices.createGateway(
+      gatewayUri: _apiServices.gateway.client.baseUrl,
+      authTokenProvider: tokenProvider,
+    );
+
+    final response = await gateway.apiV1RbacRegistrationGet(
+      lookup: catalystId.toUri().toStringWithoutScheme(),
+    );
+
+    if (response.statusCode == ApiErrorResponseException.notFound) {
+      throw NotFoundException(
+        message: 'Registration for $catalystId not found',
+      );
+    }
+
+    response.verifyIsSuccessful();
+
+    return response.bodyOrThrow;
+  }
 }
 
 // ignore: one_member_abstracts
 abstract interface class UserDataSource {
-  Future<RecoveredAccount?> recoverAccount({required String rbacToken});
+  Future<RecoveredAccount> recoverAccount({
+    required CatalystId catalystId,
+    required String rbacToken,
+  });
 
   Future<void> updateEmail(String email);
 }

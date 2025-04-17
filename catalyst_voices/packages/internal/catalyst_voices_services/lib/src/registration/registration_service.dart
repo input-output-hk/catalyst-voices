@@ -224,6 +224,7 @@ final class RegistrationServiceImpl implements RegistrationService {
         );
 
         final recovered = await _userService.recoverAccount(
+          catalystId: catalystId,
           rbacToken: rbacToken,
         );
 
@@ -232,14 +233,12 @@ final class RegistrationServiceImpl implements RegistrationService {
 
         return Account(
           catalystId: catalystId.copyWith(
-            username: Optional(recovered?.username),
+            username: Optional(recovered.username),
           ),
-          email: recovered?.email ?? '',
+          email: recovered.email ?? '',
           keychain: keychain,
-          // TODO(dtscalac): fetch this data from backend
-          roles: {AccountRole.root, AccountRole.proposer},
-          // TODO(dtscalac): fetch this data from backend
-          address: _testNetAddress,
+          roles: recovered.roles,
+          address: recovered.stakeAddress,
         );
       });
     });

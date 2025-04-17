@@ -19,7 +19,10 @@ abstract interface class UserRepository {
 
   Future<User> getUser();
 
-  Future<RecoveredAccount?> recoverAccount({required String rbacToken});
+  Future<RecoveredAccount> recoverAccount({
+    required CatalystId catalystId,
+    required String rbacToken,
+  });
 
   Future<void> saveUser(User user);
 
@@ -47,8 +50,14 @@ final class UserRepositoryImpl implements UserRepository {
   }
 
   @override
-  Future<RecoveredAccount?> recoverAccount({required String rbacToken}) {
-    return _dataSource.recoverAccount(rbacToken: rbacToken);
+  Future<RecoveredAccount> recoverAccount({
+    required CatalystId catalystId,
+    required String rbacToken,
+  }) {
+    return _dataSource.recoverAccount(
+      catalystId: catalystId,
+      rbacToken: rbacToken,
+    );
   }
 
   @override
