@@ -28,6 +28,23 @@ final class ProposalDocument extends Equatable {
       DocumentNodeId.fromString('milestones.milestones.milestone_list');
   static final tagNodeId = DocumentNodeId.fromString('theme.theme.grouped_tag');
 
+  /// A list of all [DocumentNodeId] that are expected to appear
+  /// in the proposal template schema.
+  ///
+  /// The app builds custom logic on top of these node ids.
+  static final allNodeIds = [
+    titleNodeId,
+    descriptionNodeId,
+    requestedFundsNodeId,
+    durationNodeId,
+    authorNameNodeId,
+    categoryNodeId,
+    categoryDetailsNodeId,
+    milestonesNodeId,
+    milestoneListNodeId,
+    tagNodeId,
+  ];
+
   static const String exportFileExt = 'json';
 
   final ProposalMetadata metadata;

@@ -15,7 +15,7 @@ pub(crate) struct Api;
 #[OpenApi(tag = "ApiTags::Cardano")]
 impl Api {
     #[oai(
-        path = "/draft/rbac/registration",
+        path = "/v1/rbac/registration",
         method = "get",
         operation_id = "rbacRegistrations"
     )]
@@ -30,7 +30,7 @@ impl Api {
         /// No Authorization required, but Token permitted.
         auth: NoneOrRBAC,
     ) -> registrations_get::AllResponses {
-        let auth_catalyst_id = auth.into();
-        registrations_get::endpoint(lookup, auth_catalyst_id).await
+        let token = auth.into();
+        registrations_get::endpoint(lookup, token).await
     }
 }

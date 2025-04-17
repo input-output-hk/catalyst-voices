@@ -75,8 +75,12 @@ final class _AppContent extends StatelessWidget {
         return AppActiveStateListener(
           child: GlobalPrecacheImages(
             child: GlobalSessionListener(
-              child: AppMobileAccessRestriction(
-                child: AppSplashScreenManager(
+              // IMPORTANT: AppSplashScreenManager must be placed above all
+              // widgets that render visible UI elements. Any widget that
+              // displays content should be a descendant of
+              //AppSplashScreenManager to ensure proper splash screen behavior.
+              child: AppSplashScreenManager(
+                child: AppMobileAccessRestriction(
                   child: child ?? const SizedBox.shrink(),
                 ),
               ),
