@@ -40,10 +40,6 @@ pub(crate) struct EnvVars {
     /// The Address/s of the DB.
     pub(crate) url: StringEnvVar,
 
-    /// The Namespace of Cassandra DB. NOTE: Currently not in use.
-    #[allow(dead_code)]
-    pub(crate) namespace: StringEnvVar,
-
     /// The `UserName` to use for the Cassandra DB.
     pub(crate) username: Option<StringEnvVar>,
 
@@ -71,9 +67,6 @@ impl EnvVars {
     pub(super) fn new(url: &str, namespace: &str) -> Self {
         let name = namespace.to_uppercase();
 
-        // We can actually change the namespace, but can't change the name used for env vars.
-        let namespace = StringEnvVar::new(&format!("CASSANDRA_{name}_NAMESPACE"), namespace.into());
-
         let tls =
             StringEnvVar::new_as_enum(&format!("CASSANDRA_{name}_TLS"), TlsChoice::Disabled, false);
         let compression = StringEnvVar::new_as_enum(
@@ -84,7 +77,6 @@ impl EnvVars {
 
         Self {
             url: StringEnvVar::new(&format!("CASSANDRA_{name}_URL"), url.into()),
-            namespace,
             username: StringEnvVar::new_optional(&format!("CASSANDRA_{name}_USERNAME"), false),
             password: StringEnvVar::new_optional(&format!("CASSANDRA_{name}_PASSWORD"), true),
             tls,
