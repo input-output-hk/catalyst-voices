@@ -54,7 +54,7 @@ def get_stake_data_page(stake_addr: str) -> str:
     return request(f"https://preprod.cexplorer.io/stake/{stake_addr}")
 
 def get_index_page() -> str:
-    return request(f"https://preprod.cexplorer.io/")
+    return request("https://preprod.cexplorer.io/")
 
 def get_asset_page(asset: str) -> str:
     return request(f"https://preprod.cexplorer.io/asset/{asset}")
@@ -158,7 +158,7 @@ for (i, record) in enumerate(processing_records):
             print(f"ERROR: {e}")
             
             if attempt_count >= MAX_ATTEMPT:
-                print(f"    Skipped MAX ATTEMPT REACHED")
+                print("    Skipped MAX ATTEMPT REACHED")
                 break
 
             time.sleep(3)
