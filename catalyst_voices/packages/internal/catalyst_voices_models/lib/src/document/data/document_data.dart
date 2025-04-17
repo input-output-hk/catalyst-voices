@@ -28,4 +28,12 @@ final class DocumentData extends Equatable {
 
   /// Syntax sugar. Should use [DocumentDataMetadata.selfRef].
   DocumentRef get ref => metadata.selfRef;
+
+  /// Update document data with a new [ref].
+  DocumentData copyWithSelfRef({required DocumentRef selfRef}) {
+    return DocumentData(
+      metadata: metadata.copyWith(selfRef: selfRef),
+      content: content,
+    );
+  }
 }
