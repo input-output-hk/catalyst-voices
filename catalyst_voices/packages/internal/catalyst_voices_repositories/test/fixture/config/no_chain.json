@@ -17,23 +17,5 @@
     "attachViewHierarchy": false,
     "debug": false,
     "diagnosticLevel": "error"
-  },
-  "blockchain": {
-    "networkId": "mainnet",
-    "host": "cardano",
-    "transactionBuilderConfig": {
-      "feeAlgo": {
-        "constant": 155381,
-        "coefficient": 44,
-        "multiplier": 1.2,
-        "sizeIncrement": 25600,
-        "refScriptByteCost": 15,
-        "maxRefScriptSize": 204800
-      },
-      "maxTxSize": 16384,
-      "maxValueSize": 5000,
-      "coinsPerUtxoByte": 4310,
-      "selectionStrategy": "greedy"
-    }
   }
 }

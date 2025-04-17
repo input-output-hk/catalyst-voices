@@ -21,44 +21,38 @@ void main() {
       // Given
       const changedHost = 'midnight';
       final configJson = await FixtureReader.readJson('config/full');
-      configJson['environments']['prod']['blockchain']['host'] = changedHost;
+      configJson['blockchain']['host'] = changedHost;
       final remoteConfig = RemoteConfig.fromJson(configJson);
+
+      const env = AppEnvironmentType.dev;
 
       // When
       when(remoteSource.get).thenAnswer((_) => Future.value(remoteConfig));
 
-      final appConfigs = await repository.getAppConfigs();
+      final config = await repository.getConfig(env: env);
 
       // Then
-      expect(appConfigs.environments.length, AppEnvironmentType.values.length);
-
-      expect(appConfigs.version, remoteConfig.version);
-      expect(appConfigs.createdAt, remoteConfig.createdAt);
-
-      final prodConfig = appConfigs.environments[AppEnvironmentType.prod];
-
-      expect(prodConfig, isNotNull);
-      expect(prodConfig!.blockchain.host.name, changedHost);
+      expect(config.version, remoteConfig.version);
+      expect(config.blockchain.host.name, changedHost);
     });
 
     test(
         'partial remote config is using '
         'fallback values when missing', () async {
       // Given
-      final configJson = await FixtureReader.readJson('config/no_prod');
+      final configJson = await FixtureReader.readJson('config/no_chain');
       final remoteConfig = RemoteConfig.fromJson(configJson);
+
+      const env = AppEnvironmentType.dev;
+      final expectedChainConfig = AppConfig.env(env).blockchain;
 
       // When
       when(remoteSource.get).thenAnswer((_) => Future.value(remoteConfig));
 
-      final appConfigs = await repository.getAppConfigs();
+      final config = await repository.getConfig(env: env);
 
       // Then
-      expect(appConfigs.environments.length, AppEnvironmentType.values.length);
-      final prodConfig = appConfigs.environments[AppEnvironmentType.prod];
-
-      expect(prodConfig, isNotNull);
-      expect(prodConfig, equals(const AppConfig.prod()));
+      expect(config.blockchain, equals(expectedChainConfig));
     });
 
     test('empty config fallbacks to default values', () async {
@@ -66,13 +60,16 @@ void main() {
       final configJson = await FixtureReader.readJson('config/empty');
       final remoteConfig = RemoteConfig.fromJson(configJson);
 
+      const env = AppEnvironmentType.dev;
+      const expectedConfig = AppConfig.dev();
+
       // When
       when(remoteSource.get).thenAnswer((_) => Future.value(remoteConfig));
 
-      final appConfigs = await repository.getAppConfigs();
+      final config = await repository.getConfig(env: env);
 
       // Then
-      expect(appConfigs.environments.length, AppEnvironmentType.values.length);
+      expect(config, equals(expectedConfig));
     });
   });
 }

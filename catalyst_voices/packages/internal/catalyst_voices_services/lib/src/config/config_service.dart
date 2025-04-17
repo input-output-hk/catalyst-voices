@@ -20,11 +20,7 @@ final class ConfigServiceImpl implements ConfigService {
   @override
   Future<AppConfig> getAppConfig({
     required AppEnvironmentType env,
-  }) async {
-    final appConfigs = await _repository.getAppConfigs();
-
-    final envConfig = appConfigs.environments[env];
-
-    return envConfig ?? const AppConfig.dev();
+  }) {
+    return _repository.getConfig(env: env);
   }
 }

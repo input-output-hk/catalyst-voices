@@ -13,7 +13,6 @@ export 'common/node_id.dart';
 export 'common/optional.dart';
 export 'common/space.dart';
 export 'config/app_config.dart';
-export 'config/app_configs.dart';
 export 'config/app_environment.dart';
 export 'crypto/catalyst_key_factory.dart';
 export 'crypto/catalyst_key_pair.dart';

@@ -6,9 +6,9 @@ import 'package:collection/collection.dart';
 final class AppConfigFactory {
   const AppConfigFactory._();
 
-  static AppConfig build({
+  static AppConfig build(
+    RemoteConfig remote, {
     required AppEnvironmentType env,
-    RemoteEnvConfig remote = const RemoteEnvConfig(),
   }) {
     final defaultEnvConfig = AppConfig.env(env);
 
@@ -42,6 +42,7 @@ final class AppConfigFactory {
     );
 
     return defaultEnvConfig.copyWith(
+      version: remote.version,
       cache: defaultEnvConfig.cache.copyWith(
         expiryDuration: defaultEnvConfig.cache.expiryDuration.copyWith(
           keychainUnlock:

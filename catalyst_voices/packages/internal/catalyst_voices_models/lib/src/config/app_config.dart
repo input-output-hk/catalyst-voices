@@ -14,12 +14,14 @@ const _defaultTransactionBuilderConfig = TransactionBuilderConfig(
 );
 
 final class AppConfig extends Equatable {
+  final String version;
   final CacheConfig cache;
   final DatabaseConfig database;
   final SentryConfig sentry;
   final BlockchainConfig blockchain;
 
   const AppConfig({
+    required this.version,
     required this.cache,
     required this.database,
     required this.sentry,
@@ -28,6 +30,7 @@ final class AppConfig extends Equatable {
 
   const AppConfig.dev()
       : this(
+          version: '0.0.1',
           cache: const CacheConfig(
             expiryDuration: ExpiryDuration(
               keychainUnlock: Duration(hours: 1),
@@ -65,6 +68,7 @@ final class AppConfig extends Equatable {
 
   const AppConfig.preprod()
       : this(
+          version: '0.0.1',
           cache: const CacheConfig(
             expiryDuration: ExpiryDuration(
               keychainUnlock: Duration(hours: 1),
@@ -93,6 +97,7 @@ final class AppConfig extends Equatable {
 
   const AppConfig.prod()
       : this(
+          version: '0.0.1',
           cache: const CacheConfig(
             expiryDuration: ExpiryDuration(
               keychainUnlock: Duration(hours: 1),
@@ -121,6 +126,7 @@ final class AppConfig extends Equatable {
 
   @override
   List<Object?> get props => [
+        version,
         cache,
         database,
         sentry,
@@ -128,12 +134,14 @@ final class AppConfig extends Equatable {
       ];
 
   AppConfig copyWith({
+    String? version,
     CacheConfig? cache,
     DatabaseConfig? database,
     SentryConfig? sentry,
     BlockchainConfig? blockchain,
   }) {
     return AppConfig(
+      version: version ?? this.version,
       cache: cache ?? this.cache,
       database: database ?? this.database,
       sentry: sentry ?? this.sentry,

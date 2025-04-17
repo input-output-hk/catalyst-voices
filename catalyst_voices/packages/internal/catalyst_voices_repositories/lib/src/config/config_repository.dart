@@ -9,7 +9,9 @@ abstract interface class ConfigRepository {
     RemoteConfigSource remoteSource,
   ) = ConfigRepositoryImpl;
 
-  Future<AppConfigs> getAppConfigs();
+  Future<AppConfig> getConfig({
+    required AppEnvironmentType env,
+  });
 }
 
 final class ConfigRepositoryImpl implements ConfigRepository {
@@ -20,31 +22,13 @@ final class ConfigRepositoryImpl implements ConfigRepository {
   );
 
   @override
-  Future<AppConfigs> getAppConfigs() async {
+  Future<AppConfig> getConfig({
+    required AppEnvironmentType env,
+  }) async {
     final remoteConfig = await remoteSource
         .get()
         .onError((error, stackTrace) => const RemoteConfig());
 
-    final remoteEnvConfigs = remoteConfig.environments.map((key, value) {
-      final env = AppEnvironmentType.values.asNameMap()[key];
-      final config = RemoteEnvConfig.fromJson(value);
-
-      return MapEntry(env, config);
-    });
-
-    return AppConfigs(
-      version: remoteConfig.version ?? '0.0.1',
-      createdAt: remoteConfig.createdAt ?? DateTime.now(),
-      environments: AppEnvironmentType.values.map((env) {
-        final remote = remoteEnvConfigs[env] ?? const RemoteEnvConfig();
-        final envConfig = AppConfigFactory.build(env: env, remote: remote);
-
-        return MapEntry(env, envConfig);
-      }).toMap(),
-    );
+    return AppConfigFactory.build(remoteConfig, env: env);
   }
-}
-
-extension<K, V> on Iterable<MapEntry<K, V>> {
-  Map<K, V> toMap() => Map.fromEntries(this);
 }
