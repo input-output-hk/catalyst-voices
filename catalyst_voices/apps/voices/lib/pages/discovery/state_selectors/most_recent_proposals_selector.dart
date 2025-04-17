@@ -25,6 +25,8 @@ class MostRecentProposalsSelector extends StatelessWidget {
 }
 
 class _MostRecentProposalsData extends StatelessWidget {
+  static const _minProposalsToShowRecent = 6;
+
   const _MostRecentProposalsData();
 
   @override
@@ -32,7 +34,7 @@ class _MostRecentProposalsData extends StatelessWidget {
     return BlocSelector<DiscoveryCubit, DiscoveryState, _ListItems>(
       selector: (state) => state.mostRecentProposals.proposals,
       builder: (context, state) {
-        if (state.length < 6) {
+        if (state.length < _minProposalsToShowRecent) {
           return const ViewAllProposals();
         }
         return MostRecentProposals(proposals: state);
