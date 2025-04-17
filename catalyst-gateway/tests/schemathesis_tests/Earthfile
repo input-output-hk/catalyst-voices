@@ -61,7 +61,7 @@ test-ci-schemathesis:
         --service cat-gateway-with-scylla \
         --allow-privileged
         RUN sleep 120; docker run --net=host --name=st schemathesis:latest || echo fail > fail; \
-            docker logs -n all cat-gateway-with-scyll && \
+            docker logs -n all cat-gateway-with-scylla && \
             docker cp st:/results/junit-report.xml junit-report.xml && \
             docker cp st:/results/cassette.yaml cassette.yaml
     END
