@@ -453,6 +453,73 @@ void main() {
 
         expect(count, expectedCount);
       });
+
+      test('search is looking up author name in catalystId', () async {
+        // Given
+        const authorName = 'Damian';
+        final search = authorName.substring(0, 2);
+        final userId = DummyCatalystIdFactory.create(username: authorName);
+
+        final proposals = [
+          _buildProposal(contentAuthorName: 'Unknown'),
+          _buildProposal(author: userId),
+          _buildProposal(contentAuthorName: 'Other'),
+        ];
+
+        final filters = ProposalsCountFilters(searchQuery: search);
+        const expectedCount = ProposalsCount(
+          total: 1,
+          drafts: 1,
+          finals: 0,
+          favorites: 0,
+          my: 0,
+        );
+
+        // When
+        await database.documentsDao.saveAll(proposals);
+
+        // Then
+        final count = await database.proposalsDao
+            .watchCount(
+              filters: filters,
+            )
+            .first;
+
+        expect(count, expectedCount);
+      });
+
+      test('search is looking up author name in content', () async {
+        // Given
+        const authorName = 'Damian';
+        final search = authorName.substring(0, 2);
+
+        final proposals = [
+          _buildProposal(contentAuthorName: 'Unknown'),
+          _buildProposal(contentAuthorName: authorName),
+          _buildProposal(contentAuthorName: 'Other'),
+        ];
+
+        final filters = ProposalsCountFilters(searchQuery: search);
+        const expectedCount = ProposalsCount(
+          total: 1,
+          drafts: 1,
+          finals: 0,
+          favorites: 0,
+          my: 0,
+        );
+
+        // When
+        await database.documentsDao.saveAll(proposals);
+
+        // Then
+        final count = await database.proposalsDao
+            .watchCount(
+              filters: filters,
+            )
+            .first;
+
+        expect(count, expectedCount);
+      });
     });
 
     group('queryProposalsPage', () {
@@ -815,6 +882,73 @@ void main() {
           proposals.map((e) => e.document.ref.version).toList().reversed,
         );
       });
+
+      test(
+        'search query is looking up catalystId and proposal content ',
+        () async {
+          // Given
+          const authorName = 'Damian';
+          final searchQuery = authorName.substring(0, 3);
+
+          final templateRef = SignedDocumentRef.generateFirstRef();
+
+          final templates = [
+            _buildProposalTemplate(selfRef: templateRef),
+          ];
+
+          final proposals = [
+            _buildProposal(
+              template: templateRef,
+              author: DummyCatalystIdFactory.create(username: authorName),
+              title: '11',
+            ),
+            _buildProposal(
+              template: templateRef,
+              contentAuthorName: authorName,
+              title: '22',
+            ),
+            _buildProposal(
+              template: templateRef,
+              contentAuthorName: 'Different one',
+              title: 'Test',
+            ),
+          ];
+
+          final expectedRefs = [
+            proposals[0].document.metadata.selfRef,
+            proposals[1].document.metadata.selfRef,
+          ];
+
+          final actions = <DocumentEntityWithMetadata>[];
+          final comments = <DocumentEntityWithMetadata>[];
+
+          final filters = ProposalsFilters(searchQuery: searchQuery);
+
+          // When
+          await database.documentsDao.saveAll([
+            ...templates,
+            ...proposals,
+            ...actions,
+            ...comments,
+          ]);
+
+          // Then
+          const request = PageRequest(page: 0, size: 25);
+          final page = await database.proposalsDao.queryProposalsPage(
+            request: request,
+            filters: filters,
+          );
+
+          expect(page.page, 0);
+          expect(page.total, 2);
+
+          final refs =
+              page.items.map((e) => e.proposal.metadata.selfRef).toList();
+
+          expect(refs, hasLength(expectedRefs.length));
+          expect(refs, containsAll(expectedRefs));
+        },
+      );
     });
   });
 }
@@ -824,6 +958,7 @@ DocumentEntityWithMetadata _buildProposal({
   SignedDocumentRef? template,
   String? title,
   CatalystId? author,
+  String? contentAuthorName,
   SignedDocumentRef? categoryId,
 }) {
   final metadata = DocumentDataMetadata(
@@ -836,11 +971,16 @@ DocumentEntityWithMetadata _buildProposal({
     categoryId: categoryId ?? categoriesTemplatesRefs.first.category,
   );
   final content = DocumentDataContent({
-    if (title != null)
+    if (title != null || contentAuthorName != null)
       'setup': {
-        'title': {
-          'title': title,
-        },
+        if (contentAuthorName != null)
+          'proposer': {
+            'applicant': contentAuthorName,
+          },
+        if (title != null)
+          'title': {
+            'title': title,
+          },
       },
   });
 

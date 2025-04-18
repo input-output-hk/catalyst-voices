@@ -1,6 +1,6 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/common/typedefs.dart';
-import 'package:catalyst_voices/widgets/cards/small_proposal_card.dart';
+import 'package:catalyst_voices/widgets/cards/proposal/small_proposal_card.dart';
 import 'package:catalyst_voices/widgets/indicators/voices_circular_progress_indicator.dart';
 import 'package:catalyst_voices/widgets/indicators/voices_error_indicator.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';

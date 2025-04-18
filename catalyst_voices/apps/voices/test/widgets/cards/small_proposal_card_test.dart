@@ -1,6 +1,7 @@
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
-import 'package:catalyst_voices/widgets/cards/proposal_card_widgets.dart';
-import 'package:catalyst_voices/widgets/cards/small_proposal_card.dart';
+import 'package:catalyst_voices/widgets/cards/proposal/proposal_card_widgets.dart'
+    show DraftProposalChip, FinalProposalChip, PrivateProposalChip;
+import 'package:catalyst_voices/widgets/cards/proposal/small_proposal_card.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';

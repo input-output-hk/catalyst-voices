@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/routes/routes.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_filled_button.dart';
-import 'package:catalyst_voices/widgets/cards/pending_proposal_card.dart';
+import 'package:catalyst_voices/widgets/cards/proposal/pending_proposal_card.dart';
 import 'package:catalyst_voices/widgets/scrollbar/voices_slider.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';

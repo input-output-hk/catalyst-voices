@@ -1,6 +1,5 @@
 import 'package:catalyst_voices/common/constants/constants.dart';
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
-import 'package:catalyst_voices/widgets/cards/workspace_proposal_card.dart';
 import 'package:catalyst_voices/widgets/empty_state/empty_state.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
