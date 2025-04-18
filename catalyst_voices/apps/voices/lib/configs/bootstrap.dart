@@ -34,6 +34,7 @@ final _uncaughtZoneLogger = Logger('UncaughtZone');
 /// only should be added to [_doBootstrapAndRun], not here.
 Future<BootstrapArgs> bootstrap({
   GoRouter? router,
+  AppEnvironment? environment,
 }) async {
   _loggingService
     ..level = kDebugMode ? Level.FINER : Level.OFF
@@ -42,14 +43,19 @@ Future<BootstrapArgs> bootstrap({
   GoRouter.optionURLReflectsImperativeAPIs = true;
   setPathUrlStrategy();
 
-  final configService = ConfigService(ConfigRepository());
-  final config = await configService
-      .getAppConfig()
-      .onError((error, stackTrace) => const AppConfig());
+  environment ??= AppEnvironment.fromEnv();
+
+  // TODO(damian-molinski): replace it with API Service when endpoint
+  // is moved to v1
+  final configSource = UrlRemoteConfigSource(baseUrl: environment.type.gateway);
+  final configService = ConfigService(ConfigRepository(configSource));
+  final config = await configService.getAppConfig(env: environment.type);
 
   await _cleanupOldStorages();
-  await registerDependencies(config: config);
+  await registerDependencies(environment: environment, config: null);
   await _initCryptoUtils();
+
+  Dependencies.instance.registerConfig(config);
 
   router ??= buildAppRouter();
 
@@ -57,7 +63,10 @@ Future<BootstrapArgs> bootstrap({
 
   Dependencies.instance.get<SyncManager>().start().ignore();
 
-  return BootstrapArgs(routerConfig: router);
+  return BootstrapArgs(
+    routerConfig: router,
+    sentryConfig: config.sentry,
+  );
 }
 
 /// The entry point for Catalyst Voices,
@@ -68,11 +77,12 @@ Future<BootstrapArgs> bootstrap({
 ///
 /// You can customize the default app by providing
 /// your own instance via [builder].
-Future<void> bootstrapAndRun([
+Future<void> bootstrapAndRun(
+  AppEnvironment environment, [
   BootstrapWidgetBuilder builder = _defaultBuilder,
 ]) async {
   await runZonedGuarded(
-    () => _safeBootstrapAndRun(builder),
+    () => _safeBootstrapAndRun(environment, builder),
     _reportUncaughtZoneError,
   );
 }
@@ -91,9 +101,18 @@ GoRouter buildAppRouter({
 }
 
 @visibleForTesting
-Future<void> registerDependencies({required AppConfig config}) async {
+Future<void> registerDependencies({
+  AppEnvironment environment = const AppEnvironment.dev(),
+  AppConfig? config = const AppConfig.dev(),
+}) async {
   if (!Dependencies.instance.isInitialized) {
-    await Dependencies.instance.init(config: config);
+    await Dependencies.instance.init(
+      environment: environment,
+    );
+  }
+
+  if (config != null) {
+    Dependencies.instance.registerConfig(config);
   }
 }
 
@@ -112,16 +131,19 @@ Widget _defaultBuilder(BootstrapArgs args) {
   );
 }
 
-Future<void> _doBootstrapAndRun(BootstrapWidgetBuilder builder) async {
+Future<void> _doBootstrapAndRun(
+  AppEnvironment environment,
+  BootstrapWidgetBuilder builder,
+) async {
   final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   AppSplashScreenManager.preserveSplashScreen(widgetsBinding);
 
   FlutterError.onError = _reportFlutterError;
   PlatformDispatcher.instance.onError = _reportPlatformDispatcherError;
 
-  final args = await bootstrap();
+  final args = await bootstrap(environment: environment);
   final app = await builder(args);
-  await _runApp(app);
+  await _runApp(app, sentryConfig: args.sentryConfig);
 }
 
 Future<void> _initCryptoUtils() async {
@@ -159,17 +181,23 @@ void _reportUncaughtZoneError(Object error, StackTrace stack) {
   _uncaughtZoneLogger.severe('Uncaught Error', error, stack);
 }
 
-Future<void> _runApp(Widget app) async {
+Future<void> _runApp(
+  Widget app, {
+  required SentryConfig sentryConfig,
+}) async {
   if (kReleaseMode) {
-    await SentryService.init(app);
+    await SentryService.init(app, config: sentryConfig);
   } else {
     runApp(app);
   }
 }
 
-Future<void> _safeBootstrapAndRun(BootstrapWidgetBuilder builder) async {
+Future<void> _safeBootstrapAndRun(
+  AppEnvironment environment,
+  BootstrapWidgetBuilder builder,
+) async {
   try {
-    await _doBootstrapAndRun(builder);
+    await _doBootstrapAndRun(environment, builder);
   } catch (error, stack) {
     await _reportBootstrapError(error, stack);
   }
@@ -179,8 +207,10 @@ typedef BootstrapWidgetBuilder = FutureOr<Widget> Function(BootstrapArgs args);
 
 final class BootstrapArgs {
   final RouterConfig<Object> routerConfig;
+  final SentryConfig sentryConfig;
 
   BootstrapArgs({
     required this.routerConfig,
+    required this.sentryConfig,
   });
 }

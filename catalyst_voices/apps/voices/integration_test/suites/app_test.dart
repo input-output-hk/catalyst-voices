@@ -21,7 +21,7 @@ void main() async {
   });
 
   setUp(() async {
-    await registerDependencies(config: const AppConfig());
+    await registerDependencies();
     router.go(const DiscoveryRoute().location);
   });
 
