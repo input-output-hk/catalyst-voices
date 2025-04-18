@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:catalyst_voices/common/constants/constants.dart';
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/widgets/buttons/copy_catalyst_id_button.dart';
 import 'package:catalyst_voices/widgets/snackbar/voices_snackbar.dart';
@@ -79,9 +80,8 @@ class _BecomeReviewerCard extends StatelessWidget with LaunchUrlMixin {
             CopyCatalystIdButton(onTap: () => _handleCopyCatalystId(context)),
             const SizedBox(height: 4),
             _OpportunityActionButton(
-              onTap: () {
-                // TODO(LynxLynxx): add url;
-                // launchUri();
+              onTap: () async {
+                await launchUri(VoicesConstants.becomeReviewerUrl.getUri());
               },
               title: context.l10n.becomeReviewer,
               trailing: VoicesAssets.icons.externalLink.buildIcon(),
@@ -220,9 +220,10 @@ class _RegisterAsVoter extends StatelessWidget with LaunchUrlMixin {
               ),
               const SizedBox(height: 20),
               _OpportunityActionButton(
-                onTap: () {
-                  // TODO(LynxLynxx): add url;
-                  // launchUri();
+                onTap: () async {
+                  await launchUri(
+                    VoicesConstants.votingRegistrationUrl.getUri(),
+                  );
                 },
                 title: context.l10n.votingRegistration,
                 trailing: VoicesAssets.icons.externalLink.buildIcon(),
