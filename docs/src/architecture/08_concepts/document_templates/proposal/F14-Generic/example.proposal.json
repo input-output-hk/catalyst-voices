@@ -1,125 +1,75 @@
 {
-    "$schema": "./0ce8ab38-9258-4fbc-a62e-7faa6e58318f.schema.json",
+    "$schema": "https://raw.githubusercontent.com/input-output-hk/catalyst-voices/refs/heads/main/docs/src/architecture/08_concepts/document_templates/proposal/F14-Generic/0ce8ab38-9258-4fbc-a62e-7faa6e58318f.schema.json",
     "setup": {
         "title": {
-            "title": "Example Catalyst Proposal"
+            "titleText": "Example Catalyst Proposal"
         },
-        "proposer": {
+        "applicants": {
             "applicant": "John Smith",
             "type": "Individual",
             "coproposers": [
-                {
-                    "name": "Jane Doe"
-                },
-                {
-                    "name": "Bob Wilson"
-                }
+                { "name": "Jane Doe" },
+                { "name": "Bob Wilson" }
             ]
-        }
-    },
-    "summary": {
-        "budget": {
-            "requestedFunds": 150000
         },
-        "time": {
-            "duration": 6
+        "theme": {
+            "grouped_tag": {
+                "group": "DeFi",
+                "tag": "Staking"
+            }
+        },
+        "openSource": {
+            "isOpenSource": true,
+            "licenseType": "MIT"
         },
         "translation": {
             "isTranslated": true,
             "originalLanguage": "de",
-            "originalDocumentLink": "https://example.com/original-doc"
+            "translationNeeded": false
+        }
+    },
+    "summary": {
+        "problemStatement": {
+            "problemDescription": "Current challenge in the Cardano ecosystem..."
         },
-        "problem": {
-            "statement": "Current challenge in the Cardano ecosystem..."
+        "solutionSummary": {
+            "summaryText": "Our solution provides a comprehensive toolkit..."
         },
-        "solution": {
-            "summary": "Our solution provides a comprehensive toolkit..."
+        "expectedDuration": {
+            "durationMonths": 6
         },
-        "supportingLinks": {
+        "requestedBudget": {
+            "budgetAmount": 150000
+        },
+        "relevantLinks": {
             "links": [
                 "https://github.com/example/project",
                 "https://docs.example.com",
                 "https://example.com/whitepaper",
                 "https://example.com/roadmap"
             ]
+        }
+    },
+    "campaign_category": {},
+    "projectDetails": {
+        "solutionDescription": {
+            "detailedDescription": "Our solution involves developing a comprehensive toolkit that will enhance the Cardano developer experience..."
         },
-        "dependencies": {
+        "ecosystemImpact": {
+            "impactDescription": "The project will significantly impact developer productivity by reducing development time and improving code quality..."
+        },
+        "capabilityFeasibility": {
+            "capabilityAssessment": "Our team has extensive experience in blockchain development and has successfully delivered similar projects..."
+        },
+        "projectDependencies": {
             "hasDependency": true,
             "dependencyDetail": "Integration with third-party API service requires external dependencies..."
-        },
-        "open_source": {
-            "isOpenSource": true,
-            "licenseInformation": "All source code and documentation will be released under the MIT license."
-        }
-    },
-    "campaign_category": {
-        "category_questions": {
-            "informational_content": {
-                "answer": false
-            },
-            "foundational_rd": {
-                "answer": false
-            },
-            "financial_products": {
-                "answer": false
-            },
-            "early_stage_product": {
-                "answer": false
-            },
-            "developer_tools": {
-                "answer": false
-            },
-            "enterprise_partnership": {
-                "answer": true,
-                "secondary_question": {
-                    "question": "Example Enterprise with proven track record"
-                }
-            },
-            "working_product": {
-                "answer": true,
-                "secondary_question": {
-                    "question": "Example product with measurable adoption metrics"
-                }
-            },
-            "timeline": {
-                "answer": true
-            },
-            "matching_funds": {
-                "answer": true,
-                "secondary_question": {
-                    "question": "Example matching funds details"
-                }
-            },
-            "adoption_potential": {
-                "answer": true,
-                "secondary_question": {
-                    "question": "Example measurable outcomes and assessment methods"
-                }
-            }
-        }
-    },
-    "theme": {
-        "theme": {
-            "grouped_tag": {
-                "group": "DeFi",
-                "tag": "Staking"
-            }
-        }
-    },
-    "details": {
-        "solution": {
-            "solution": "Our solution involves developing a comprehensive toolkit that will enhance the Cardano developer experience..."
-        },
-        "impact": {
-            "impact": "The project will significantly impact developer productivity by reducing development time and improving code quality..."
-        },
-        "feasibility": {
-            "feasibility": "Our team has extensive experience in blockchain development and has successfully delivered similar projects..."
         }
     },
     "milestones": {
         "milestones": {
-            "milestone_list": [{
+            "milestone_list": [
+                {
                     "title": "Initial Setup and Planning",
                     "outputs": "Project infrastructure setup and detailed planning documents",
                     "acceptance_criteria": "- Development environment configured\n- Detailed project plan approved",
@@ -149,22 +99,53 @@
             ]
         }
     },
-    "pitch": {
-        "team": {
-            "who": "Our team consists of experienced blockchain developers with proven track records..."
+    "fundingJustification": {
+        "teamExperience": {
+            "teamMembers": "Our team consists of experienced blockchain developers with proven track records...",
+            "relevantExperience": "We have successfully delivered multiple blockchain projects, including..."
         },
-        "budget": {
-            "costs": "Budget breakdown:\n- Development (70%): 105,000 ADA\n- Testing (15%): 22,500 ADA\n- Documentation (15%): 22,500 ADA"
+        "costBreakdown": {
+            "costItems": "Budget breakdown:\n- Development (70%): 105,000 ADA\n- Testing (15%): 22,500 ADA\n- Documentation (15%): 22,500 ADA"
         },
-        "value": {
-            "note": "This project provides excellent value for money by delivering essential developer tools..."
+        "valueForMoney": {
+            "valueJustification": "This project provides excellent value for money by delivering essential developer tools..."
         }
     },
-    "agreements": {
-        "mandatory": {
-            "fund_rules": true,
-            "terms_and_conditions": true,
-            "privacy_policy": true
+    "acknowledgements": {
+        "categoryRules": {
+            "informational_content": { "answer": false },
+            "foundational_rd": { "answer": false },
+            "financial_products": { "answer": false },
+            "early_stage_product": { "answer": false },
+            "developer_tools": { "answer": false },
+            "enterprise_partnership": {
+                "answer": true,
+                "secondary_question": {
+                    "question": "Example Enterprise with proven track record"
+                }
+            },
+            "working_product": {
+                "answer": true,
+                "secondary_question": {
+                    "question": "Example product with measurable adoption metrics"
+                }
+            },
+            "timeline": { "answer": true },
+            "matching_funds": {
+                "answer": true,
+                "secondary_question": {
+                    "question": "Example matching funds details"
+                }
+            },
+            "adoption_potential": {
+                "answer": true,
+                "secondary_question": {
+                    "question": "Example measurable outcomes and assessment methods"
+                }
+            }
+        },
+        "fundRules": {
+            "fundAcknowledgements": true
         }
     }
 }
