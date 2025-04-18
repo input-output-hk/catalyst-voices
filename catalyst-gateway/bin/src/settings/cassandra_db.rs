@@ -1,5 +1,6 @@
 //! Command line and environment variable settings for the service
 
+use cardano_blockchain_types::Network;
 use tracing::info;
 
 use super::str_env_var::StringEnvVar;
@@ -39,9 +40,6 @@ pub(crate) struct EnvVars {
     /// The Address/s of the DB.
     pub(crate) url: StringEnvVar,
 
-    /// The Namespace of Cassandra DB.
-    pub(crate) namespace: StringEnvVar,
-
     /// The `UserName` to use for the Cassandra DB.
     pub(crate) username: Option<StringEnvVar>,
 
@@ -69,9 +67,6 @@ impl EnvVars {
     pub(super) fn new(url: &str, namespace: &str) -> Self {
         let name = namespace.to_uppercase();
 
-        // We can actually change the namespace, but can't change the name used for env vars.
-        let namespace = StringEnvVar::new(&format!("CASSANDRA_{name}_NAMESPACE"), namespace.into());
-
         let tls =
             StringEnvVar::new_as_enum(&format!("CASSANDRA_{name}_TLS"), TlsChoice::Disabled, false);
         let compression = StringEnvVar::new_as_enum(
@@ -82,7 +77,6 @@ impl EnvVars {
 
         Self {
             url: StringEnvVar::new(&format!("CASSANDRA_{name}_URL"), url.into()),
-            namespace,
             username: StringEnvVar::new_optional(&format!("CASSANDRA_{name}_USERNAME"), false),
             password: StringEnvVar::new_optional(&format!("CASSANDRA_{name}_PASSWORD"), true),
             tls,
@@ -102,7 +96,7 @@ impl EnvVars {
     }
 
     /// Log the configuration of this Cassandra DB
-    pub(crate) fn log(&self, persistent: bool) {
+    pub(crate) fn log(&self, persistent: bool, network: Network) {
         let db_type = if persistent { "Persistent" } else { "Volatile" };
 
         let auth = match (&self.username, &self.password) {
@@ -117,7 +111,7 @@ impl EnvVars {
 
         info!(
             url = self.url.as_str(),
-            namespace = db::index::schema::namespace(self),
+            namespace = db::index::schema::namespace(persistent, network),
             auth = auth,
             tls = self.tls.to_string(),
             cert = tls_cert,

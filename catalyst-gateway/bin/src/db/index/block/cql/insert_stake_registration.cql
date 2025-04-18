@@ -7,6 +7,7 @@ INSERT INTO stake_registration (
     script,
     register,
     deregister,
+    cip36,
     pool_delegation
 ) VALUES (
     :stake_address,
@@ -16,5 +17,6 @@ INSERT INTO stake_registration (
     :script,
     :register,
     :deregister,
+    :cip36,
     :pool_delegation
 );
