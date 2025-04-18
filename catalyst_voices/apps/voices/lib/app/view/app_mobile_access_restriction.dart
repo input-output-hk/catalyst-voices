@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:catalyst_voices/common/constants/constants.dart';
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_filled_button.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_text_button.dart';
@@ -57,7 +58,7 @@ class AppMobileAccessRestriction extends StatelessWidget {
   }
 }
 
-class _Actions extends StatelessWidget {
+class _Actions extends StatelessWidget with LaunchUrlMixin {
   const _Actions();
 
   @override
@@ -76,8 +77,8 @@ class _Actions extends StatelessWidget {
           const SizedBox(height: 12),
           VoicesTextButton(
             child: Text(context.l10n.visitGitbook),
-            onTap: () {
-              // TODO(LynxLynxx): implement url launching
+            onTap: () async {
+              await launchUri(VoicesConstants.mobileExperienceUrl.getUri());
             },
           ),
           const SizedBox(height: 50),

@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:catalyst_voices/common/constants/constants.dart';
 import 'package:catalyst_voices/pages/registration/pictures/account_completed_picture.dart';
 import 'package:catalyst_voices/pages/registration/pictures/base_profile_picture.dart';
 import 'package:catalyst_voices/pages/registration/pictures/keychain_picture.dart';
@@ -9,22 +12,11 @@ import 'package:catalyst_voices/pages/registration/widgets/information_panel.dar
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class _HeaderStrings {
-  final String title;
-  final String? subtitle;
-  final String? body;
-
-  _HeaderStrings({
-    required this.title,
-    this.subtitle,
-    this.body,
-  });
-}
-
-class RegistrationInfoPanel extends StatelessWidget {
+class RegistrationInfoPanel extends StatelessWidget with LaunchUrlMixin {
   const RegistrationInfoPanel({
     super.key,
   });
@@ -55,6 +47,7 @@ class RegistrationInfoPanel extends StatelessWidget {
           body: headerStrings.body,
           picture: _RegistrationPicture(step: state.step),
           progress: state.progress,
+          onTap: () => _learnMoreTap(state.step),
         );
       },
     );
@@ -141,6 +134,85 @@ class RegistrationInfoPanel extends StatelessWidget {
         ),
     };
   }
+
+  void _learnMoreTap(RegistrationStep step) {
+    final url = switch (step) {
+      CreateBaseProfileStep() => VoicesConstants.setupBaseProfileUrl,
+      CreateKeychainStep() => VoicesConstants.createCatalystKeychainUrl,
+      WalletLinkStep(:final stage) => switch (stage) {
+          WalletLinkStage.selectWallet =>
+            VoicesConstants.officiallySupportedWalletsUrl,
+          WalletLinkStage.rolesChooser ||
+          WalletLinkStage.rolesSummary =>
+            VoicesConstants.selectRolesUrl,
+          WalletLinkStage.rbacTransaction =>
+            VoicesConstants.submitRegistrationTransactionUrl,
+          _ => VoicesConstants.linkCardanoWalletUrl,
+        },
+      RecoverWithSeedPhraseStep() ||
+      RecoverMethodStep() =>
+        VoicesConstants.restoreKeychainUrl,
+      _ => VoicesConstants.getStartedUrl,
+    };
+    if (url.isNotEmpty) {
+      unawaited(launchUri(Uri.parse(url)));
+    }
+  }
+}
+
+class _BlocCreationPasswordPicture extends StatelessWidget {
+  const _BlocCreationPasswordPicture();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocUnlockPasswordSelector<TaskPictureType>(
+      stateSelector: (state) => state.keychainStateData.unlockPasswordState,
+      selector: (state) => state.pictureType,
+      builder: (context, state) => PasswordPicture(type: state),
+    );
+  }
+}
+
+class _BlocRecoveryPasswordPicture extends StatelessWidget {
+  const _BlocRecoveryPasswordPicture();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocUnlockPasswordSelector<TaskPictureType>(
+      stateSelector: (state) => state.recoverStateData.unlockPasswordState,
+      selector: (state) => state.pictureType,
+      builder: (context, state) => PasswordPicture(type: state),
+    );
+  }
+}
+
+class _BlocSeedPhraseResultPicture extends StatelessWidget {
+  const _BlocSeedPhraseResultPicture();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocSeedPhraseSelector<bool>(
+      selector: (state) => state.areUserWordsCorrect,
+      builder: (context, state) {
+        return SeedPhrasePicture(
+          type: state ? TaskPictureType.success : TaskPictureType.error,
+          indicateSelection: true,
+        );
+      },
+    );
+  }
+}
+
+class _HeaderStrings {
+  final String title;
+  final String? subtitle;
+  final String? body;
+
+  _HeaderStrings({
+    required this.title,
+    this.subtitle,
+    this.body,
+  });
 }
 
 class _RegistrationPicture extends StatelessWidget {
@@ -219,49 +291,6 @@ class _RegistrationPicture extends StatelessWidget {
       WalletLinkStep(:final stage) => buildWalletLinkStagePicture(stage),
       AccountCompletedStep() => const AccountCompletedPicture(),
     };
-  }
-}
-
-class _BlocSeedPhraseResultPicture extends StatelessWidget {
-  const _BlocSeedPhraseResultPicture();
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocSeedPhraseSelector<bool>(
-      selector: (state) => state.areUserWordsCorrect,
-      builder: (context, state) {
-        return SeedPhrasePicture(
-          type: state ? TaskPictureType.success : TaskPictureType.error,
-          indicateSelection: true,
-        );
-      },
-    );
-  }
-}
-
-class _BlocCreationPasswordPicture extends StatelessWidget {
-  const _BlocCreationPasswordPicture();
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocUnlockPasswordSelector<TaskPictureType>(
-      stateSelector: (state) => state.keychainStateData.unlockPasswordState,
-      selector: (state) => state.pictureType,
-      builder: (context, state) => PasswordPicture(type: state),
-    );
-  }
-}
-
-class _BlocRecoveryPasswordPicture extends StatelessWidget {
-  const _BlocRecoveryPasswordPicture();
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocUnlockPasswordSelector<TaskPictureType>(
-      stateSelector: (state) => state.recoverStateData.unlockPasswordState,
-      selector: (state) => state.pictureType,
-      builder: (context, state) => PasswordPicture(type: state),
-    );
   }
 }
 

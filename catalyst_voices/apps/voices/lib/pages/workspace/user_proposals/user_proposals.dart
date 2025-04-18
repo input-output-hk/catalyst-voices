@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/common/constants/constants.dart';
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/widgets/cards/workspace_proposal_card.dart';
 import 'package:catalyst_voices/widgets/empty_state/empty_state.dart';
@@ -109,9 +110,9 @@ class _NotPublishedHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return SectionLearnMoreHeader(
       title: context.l10n.notPublished,
-      info: '',
-      learnMoreUrl: 'learnMoreUrl',
       // TODO(LynxLynxx): update when we get info from designers
+      info: '',
+      learnMoreUrl: VoicesConstants.proposalPublishingDocsUrl,
     );
   }
 }
@@ -123,9 +124,9 @@ class _SharedForPublicHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return SectionLearnMoreHeader(
       title: context.l10n.sharedForPublicInProgress,
-      info: 'info',
-      learnMoreUrl: 'learnMoreUrl',
       // TODO(LynxLynxx): update when we get info from designers
+      info: 'info',
+      learnMoreUrl: VoicesConstants.proposalPublishingDocsUrl,
     );
   }
 }
@@ -142,9 +143,9 @@ class _SubmittedForReviewHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return SectionLearnMoreHeader(
       title: context.l10n.submittedForReview(submittedCount, maxCount),
-      info: 'Info',
-      learnMoreUrl: '',
       // TODO(LynxLynxx): update when we get info from designers
+      info: 'Info',
+      learnMoreUrl: VoicesConstants.proposalPublishingDocsUrl,
     );
   }
 }

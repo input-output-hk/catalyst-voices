@@ -1,9 +1,11 @@
+import 'package:catalyst_voices/common/constants/constants.dart';
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/widgets/text_field/voices_text_field.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 
-class InsertNewImageDialogBody extends StatelessWidget {
+class InsertNewImageDialogBody extends StatelessWidget with LaunchUrlMixin {
   final TextEditingController textController;
   final bool isValidImageUrl;
   final bool inputFieldIsEmpty;
@@ -67,9 +69,7 @@ class InsertNewImageDialogBody extends StatelessWidget {
                 ),
                 WidgetSpan(
                   child: InkWell(
-                    onTap: () {
-                      // TODO(minikin): Open knowledge base link
-                    },
+                    onTap: _launchUrl,
                     child: Text(
                       l10n.knowledgeBase,
                       style: textTheme.bodySmall?.copyWith(
@@ -94,5 +94,9 @@ class InsertNewImageDialogBody extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  Future<void> _launchUrl() async {
+    await launchUri(VoicesConstants.insertNewImageDocsUrl.getUri());
   }
 }
