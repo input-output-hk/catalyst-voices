@@ -22,6 +22,10 @@ pub(crate) enum Cip36Registration {
     /// No valid registration.
     #[oai(status = 404)]
     NotFound,
+    /// Response for unprocessable content.
+    #[oai(status = 422)]
+    #[allow(dead_code)]
+    UnprocessableContent(Json<Cip36RegistrationUnprocessableContent>),
 }
 
 /// All responses to a cip36 registration query
