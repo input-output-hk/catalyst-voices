@@ -197,11 +197,10 @@ def submission_action_factory(
     return __submission_action_factory
 
 
-def test_templates(proposal_templates, comment_templates, rbac_chain_factory):
-    rbac_chain = rbac_chain_factory(RoleID.ROLE_0)
+def test_templates(proposal_templates, comment_templates):
     templates = proposal_templates + comment_templates
     for template_id in templates:
-        resp = document.get(document_id=template_id, token=rbac_chain.auth_token())
+        resp = document.get(document_id=template_id)
         assert (
             resp.status_code == 200
         ), f"Failed to get document: {resp.status_code} - {resp.text} for id {template_id}"
@@ -215,15 +214,13 @@ def test_proposal_doc(proposal_doc_factory, rbac_chain_factory):
     proposal_doc_id = proposal_doc.metadata["id"]
 
     # Get the proposal document
-    resp = document.get(document_id=proposal_doc_id, token=rbac_chain.auth_token())
+    resp = document.get(document_id=proposal_doc_id)
     assert (
         resp.status_code == 200
     ), f"Failed to get document: {resp.status_code} - {resp.text}"
 
     # Post a signed document with filter ID
-    resp = document.post(
-        "/index", filter={"id": {"eq": proposal_doc_id}}, token=rbac_chain.auth_token()
-    )
+    resp = document.post("/index", filter={"id": {"eq": proposal_doc_id}})
     assert (
         resp.status_code == 200
     ), f"Failed to post document: {resp.status_code} - {resp.text}"
@@ -305,15 +302,13 @@ def test_comment_doc(comment_doc_factory, rbac_chain_factory):
     comment_doc_id = comment_doc.metadata["id"]
 
     # Get the comment document
-    resp = document.get(document_id=comment_doc_id, token=rbac_chain.auth_token())
+    resp = document.get(document_id=comment_doc_id)
     assert (
         resp.status_code == 200
     ), f"Failed to get document: {resp.status_code} - {resp.text}"
 
     # Post a signed document with filter ID
-    resp = document.post(
-        "/index", filter={"id": {"eq": comment_doc_id}}, token=rbac_chain.auth_token()
-    )
+    resp = document.post("/index", filter={"id": {"eq": comment_doc_id}})
     assert (
         resp.status_code == 200
     ), f"Failed to post document: {resp.status_code} - {resp.text}"
@@ -374,7 +369,6 @@ def test_submission_action(submission_action_factory, rbac_chain_factory):
     # Get the submission action doc
     resp = document.get(
         document_id=submission_action_id,
-        token=rbac_chain.auth_token(),
     )
     assert (
         resp.status_code == 200
@@ -384,7 +378,6 @@ def test_submission_action(submission_action_factory, rbac_chain_factory):
     resp = document.post(
         "/index",
         filter={"id": {"eq": submission_action_id}},
-        token=rbac_chain.auth_token(),
     )
     assert (
         resp.status_code == 200
@@ -460,7 +453,6 @@ def test_document_index_endpoint(proposal_doc_factory, rbac_chain_factory):
     resp = document.post(
         f"/index?limit={limit}&page={page}",
         filter=filter,
-        token=rbac_chain.auth_token(),
     )
     assert (
         resp.status_code == 200
@@ -475,7 +467,6 @@ def test_document_index_endpoint(proposal_doc_factory, rbac_chain_factory):
     resp = document.post(
         f"/index?limit={limit}&page={page}",
         filter=filter,
-        token=rbac_chain.auth_token(),
     )
     assert (
         resp.status_code == 200
@@ -486,7 +477,8 @@ def test_document_index_endpoint(proposal_doc_factory, rbac_chain_factory):
     assert data["page"]["remaining"] == total_amount - 1 - page
 
     resp = document.post(
-        f"/index?limit={total_amount}", filter=filter, token=rbac_chain.auth_token()
+        f"/index?limit={total_amount}",
+        filter=filter,
     )
     assert (
         resp.status_code == 200
@@ -498,7 +490,8 @@ def test_document_index_endpoint(proposal_doc_factory, rbac_chain_factory):
 
     # Pagination out of range
     resp = document.post(
-        "/index?page=92233720368547759", filter={}, token=rbac_chain.auth_token()
+        "/index?page=92233720368547759",
+        filter={},
     )
     assert (
         resp.status_code == 412
