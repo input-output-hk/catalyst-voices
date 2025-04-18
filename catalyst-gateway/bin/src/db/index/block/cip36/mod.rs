@@ -6,9 +6,11 @@ pub(crate) mod insert_cip36_invalid;
 
 use std::sync::Arc;
 
-use cardano_blockchain_types::{Cip36, MultiEraBlock, Slot, TxnIndex};
+use cardano_blockchain_types::{Cip36, MultiEraBlock, Slot, StakeAddress, TxnIndex};
+use catalyst_types::hashes::Blake2b224Hash;
 use scylla::Session;
 
+use super::certs;
 use crate::{
     db::index::{
         queries::{FallibleQueryTasks, PreparedQuery, SizedBatch},
@@ -25,6 +27,8 @@ pub(crate) struct Cip36InsertQuery {
     invalid: Vec<insert_cip36_invalid::Params>,
     /// Stake Registration Data captured during indexing.
     for_vote_key: Vec<insert_cip36_for_vote_key::Params>,
+    /// Stake Registration Data captured during indexing.
+    stake_regs: Vec<certs::StakeRegistrationInsertQuery>,
 }
 
 impl Cip36InsertQuery {
@@ -34,6 +38,7 @@ impl Cip36InsertQuery {
             registrations: Vec::new(),
             invalid: Vec::new(),
             for_vote_key: Vec::new(),
+            stake_regs: Vec::new(),
         }
     }
 
@@ -46,7 +51,10 @@ impl Cip36InsertQuery {
             insert_cip36_invalid::Params::prepare_batch(session, cfg).await;
         let insert_cip36_for_vote_key_addr_batch =
             insert_cip36_for_vote_key::Params::prepare_batch(session, cfg).await;
-
+        // Its a hack of inserting `stake_regs` during the indexing CIP 36 registrations.
+        // Its done because some of the CIP 36 registrations contains some stake addresses which
+        // are not actually some how registered using cardano certs.
+        // Preparation of the `stake_regs` batch done under the `certs.rs`
         Ok((
             insert_cip36_batch?,
             insert_cip36_invalid_batch?,
@@ -55,28 +63,49 @@ impl Cip36InsertQuery {
     }
 
     /// Index the CIP-36 registrations in a transaction.
-    pub(crate) fn index(&mut self, index: TxnIndex, slot_no: Slot, block: &MultiEraBlock) {
+    pub(crate) fn index(
+        &mut self, index: TxnIndex, slot_no: Slot, block: &MultiEraBlock,
+    ) -> anyhow::Result<()> {
         // Catalyst strict is set to true
         match Cip36::new(block, index, true) {
             // Check for CIP-36 validity and should be strict catalyst (only 1 voting key)
             // Note that in `validate_voting_keys` we already checked if the array has only one
-            Ok(Some(cip36)) if cip36.is_valid() && cip36.is_cip36().unwrap_or_default() => {
+            Ok(Some(cip36)) if cip36.is_valid() => {
                 // This should always pass, because we already checked if the array has only one
-                if let Some(voting_key) = cip36.voting_pks().first() {
-                    self.registrations.push(insert_cip36::Params::new(
-                        voting_key, slot_no, index, &cip36,
-                    ));
+                let voting_key = cip36.voting_pks().first().ok_or(anyhow::anyhow!(
+                    "Valid CIP36 registration must have one voting key"
+                ))?;
 
-                    self.for_vote_key
-                        .push(insert_cip36_for_vote_key::Params::new(
-                            voting_key, slot_no, index, &cip36, true,
-                        ));
-                }
+                let stake_pk = cip36.stake_pk().ok_or(anyhow::anyhow!(
+                    "Valid CIP36 registration must have one stake public key"
+                ))?;
+                let stake_pk_hash = Blake2b224Hash::new(&stake_pk.to_bytes());
+                let stake_address = StakeAddress::new(block.network(), false, stake_pk_hash);
+
+                self.registrations.push(insert_cip36::Params::new(
+                    voting_key, slot_no, index, &cip36,
+                ));
+                self.for_vote_key
+                    .push(insert_cip36_for_vote_key::Params::new(
+                        voting_key, slot_no, index, &cip36, true,
+                    ));
+                self.stake_regs
+                    .push(certs::StakeRegistrationInsertQuery::new(
+                        stake_address,
+                        slot_no,
+                        index,
+                        *stake_pk,
+                        false,
+                        false,
+                        false,
+                        true,
+                        None,
+                    ));
             },
             // Invalid CIP-36 Registration
-            Ok(Some(cip36)) if cip36.is_cip36().unwrap_or_default() => {
+            Ok(Some(cip36)) => {
                 // Cannot index an invalid CIP36, if there is no stake public key.
-                if cip36.stake_pk().is_some() {
+                if let Some(stake_pk) = cip36.stake_pk() {
                     if cip36.voting_pks().is_empty() {
                         self.invalid.push(insert_cip36_invalid::Params::new(
                             None, slot_no, index, &cip36,
@@ -95,10 +124,26 @@ impl Cip36InsertQuery {
                                 ));
                         }
                     }
+
+                    let stake_pk_hash = Blake2b224Hash::new(&stake_pk.to_bytes());
+                    let stake_address = StakeAddress::new(block.network(), false, stake_pk_hash);
+                    self.stake_regs
+                        .push(certs::StakeRegistrationInsertQuery::new(
+                            stake_address,
+                            slot_no,
+                            index,
+                            *stake_pk,
+                            false,
+                            false,
+                            false,
+                            true,
+                            None,
+                        ));
                 }
             },
             _ => {},
         }
+        Ok(())
     }
 
     /// Execute the CIP-36 Registration Indexing Queries.
@@ -136,9 +181,18 @@ impl Cip36InsertQuery {
             query_handles.push(tokio::spawn(async move {
                 inner_session
                     .execute_batch(
-                        PreparedQuery::Cip36RegistrationForStakeAddrInsertQuery,
+                        PreparedQuery::Cip36RegistrationForVoteKeyInsertQuery,
                         self.for_vote_key,
                     )
+                    .await
+            }));
+        }
+
+        if !self.stake_regs.is_empty() {
+            let inner_session = session.clone();
+            query_handles.push(tokio::spawn(async move {
+                inner_session
+                    .execute_batch(PreparedQuery::StakeRegistrationInsertQuery, self.stake_regs)
                     .await
             }));
         }
@@ -156,9 +210,10 @@ mod tests {
     fn index() {
         let block = test_utils::block_2();
         let mut query = Cip36InsertQuery::new();
-        query.index(0.into(), 0.into(), &block);
+        query.index(0.into(), 0.into(), &block).unwrap();
         assert_eq!(1, query.registrations.len());
         assert!(query.invalid.is_empty());
         assert_eq!(1, query.for_vote_key.len());
+        assert_eq!(1, query.stake_regs.len());
     }
 }

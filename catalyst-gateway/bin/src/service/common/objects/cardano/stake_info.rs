@@ -14,10 +14,10 @@ use crate::service::common::types::{
     },
 };
 
-/// User's staked native token info.
+/// User's staked txo asset info.
 #[derive(Object, Debug, Clone)]
 #[oai(example)]
-pub(crate) struct StakedNativeTokenInfo {
+pub(crate) struct StakedTxoAssetInfo {
     /// Token policy hash.
     pub(crate) policy_hash: HexEncodedHash28,
     /// Token policies Asset Name.
@@ -26,7 +26,7 @@ pub(crate) struct StakedNativeTokenInfo {
     pub(crate) amount: AssetValue,
 }
 
-impl Example for StakedNativeTokenInfo {
+impl Example for StakedTxoAssetInfo {
     fn example() -> Self {
         Self {
             policy_hash: Example::example(),
@@ -38,17 +38,17 @@ impl Example for StakedNativeTokenInfo {
 
 // List of User's Staked Native Token Info
 impl_array_types!(
-    StakedNativeTokenInfoList,
-    StakedNativeTokenInfo,
+    StakedAssetInfoList,
+    StakedTxoAssetInfo,
     Some(poem_openapi::registry::MetaSchema {
         example: Self::example().to_json(),
         max_items: Some(1000),
-        items: Some(Box::new(StakedNativeTokenInfo::schema_ref())),
+        items: Some(Box::new(StakedTxoAssetInfo::schema_ref())),
         ..poem_openapi::registry::MetaSchema::ANY
     })
 );
 
-impl Example for StakedNativeTokenInfoList {
+impl Example for StakedAssetInfoList {
     fn example() -> Self {
         Self(vec![Example::example()])
     }
@@ -64,8 +64,8 @@ pub(crate) struct StakeInfo {
     /// Block's slot number which contains the latest unspent UTXO.
     pub(crate) slot_number: SlotNo,
 
-    /// Native token infos.
-    pub(crate) native_tokens: StakedNativeTokenInfoList,
+    /// TXO assets infos.
+    pub(crate) assets: StakedAssetInfoList,
 }
 
 impl Example for StakeInfo {
@@ -73,7 +73,7 @@ impl Example for StakeInfo {
         Self {
             slot_number: SlotNo::example(),
             ada_amount: AdaValue::example(),
-            native_tokens: Vec::new().into(),
+            assets: Vec::new().into(),
         }
     }
 }
