@@ -71,8 +71,8 @@ final class Proposal extends Equatable {
       status: ProposalStatus.inProgress,
       publish: data.publish,
       duration: document.duration ?? 0,
-      author: document.metadata.authors.firstOrNull?.username ??
-          document.authorName ??
+      author: document.authorName ??
+          document.metadata.authors.firstOrNull?.username ??
           '',
       commentsCount: data.commentsCount,
       categoryId: data.categoryId,
