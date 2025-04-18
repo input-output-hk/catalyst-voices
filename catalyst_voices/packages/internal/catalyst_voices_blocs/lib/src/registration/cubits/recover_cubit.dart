@@ -94,7 +94,7 @@ final class RecoverCubit extends Cubit<RecoverStateData>
         username: account.username,
         email: account.email,
         roles: account.roles,
-        address:  WalletAddressFormatter.formatShort(address),
+        address: WalletAddressFormatter.formatShort(address),
         clipboardAddress: address.toBech32(),
         balance: CryptocurrencyFormatter.formatAmount(balance),
       );

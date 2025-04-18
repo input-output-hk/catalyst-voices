@@ -13,10 +13,8 @@ import 'package:uuid_plus/uuid_plus.dart';
 
 void main() {
   late final KeychainProvider keychainProvider;
-  late final _MockUserDataSource userDataSource;
-  late final UserRepository userRepository;
   late final UserObserver userObserver;
-
+  late UserRepository userRepository;
   late UserService service;
 
   setUpAll(() {
@@ -30,12 +28,6 @@ void main() {
       sharedPreferences: SharedPreferencesAsync(),
       cacheConfig: const CacheConfig(),
     );
-    userDataSource = _MockUserDataSource();
-    userRepository = UserRepository(
-      SecureUserStorage(),
-      userDataSource,
-      keychainProvider,
-    );
     userObserver = StreamUserObserver();
   });
 
@@ -44,11 +36,11 @@ void main() {
   });
 
   setUp(() {
+    userRepository = _FakeUserRepository();
     service = UserService(userRepository, userObserver);
   });
 
   tearDown(() async {
-    reset(userDataSource);
     userObserver.user = const User.empty();
 
     await const FlutterSecureStorage().deleteAll();
@@ -66,9 +58,6 @@ void main() {
         catalystId: DummyCatalystIdFactory.create(),
         keychain: keychain,
       );
-
-      when(() => userDataSource.updateEmail(account.email))
-          .thenAnswer((_) async => {});
 
       await service.registerAccount(account);
 
@@ -323,4 +312,17 @@ void main() {
   });
 }
 
-class _MockUserDataSource extends Mock implements UserDataSource {}
+class _FakeUserRepository extends Fake implements UserRepository {
+  User? _user;
+
+  @override
+  Future<User> getUser() async => _user ?? const User.empty();
+
+  @override
+  Future<void> saveUser(User user) async {
+    _user = user;
+  }
+
+  @override
+  Future<void> updateEmail(String email) async {}
+}
