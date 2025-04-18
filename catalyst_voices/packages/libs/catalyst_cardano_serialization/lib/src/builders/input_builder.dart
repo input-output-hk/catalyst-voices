@@ -192,7 +192,7 @@ final class InputBuilder implements CoinSelector {
   ///   - This method ensures the transaction remains valid by confirming that
   ///     the accumulated balance exceeds or equals the required amount plus
   ///     fees.
-  (List<TransactionOutput>, Coin)? _getChangeAndFee(
+  (List<ShelleyMultiAssetTransactionOutput>, Coin)? _getChangeAndFee(
     AssetId assetId,
     TransactionBuilder builder,
     Set<TransactionUnspentOutput> selectedInputs,
@@ -246,7 +246,7 @@ final class InputBuilder implements CoinSelector {
   ///     the fee remains unchanged.
   ///   - This method handles multi-asset balances and ensures they are included
   ///     in the change outputs, if applicable.
-  (List<TransactionOutput>, Coin) _buildChangeOutputs(
+  (List<ShelleyMultiAssetTransactionOutput>, Coin) _buildChangeOutputs(
     TransactionBuilder builder,
     Balance remainingBalance,
     Coin minFee,
@@ -261,7 +261,7 @@ final class InputBuilder implements CoinSelector {
         ? remainingBalance
         : Balance(coin: remainingBalance.coin);
 
-    final output = TransactionOutput(
+    final output = PreBabbageTransactionOutput(
       address: builder.changeAddress!,
       amount: normalizedBalance,
     );
@@ -275,7 +275,7 @@ final class InputBuilder implements CoinSelector {
       builder.config.coinsPerUtxoByte,
     );
 
-    final changeOutputs = <TransactionOutput>[];
+    final changeOutputs = <ShelleyMultiAssetTransactionOutput>[];
     if (normalizedBalance.coin >= minAda + changeFee) {
       changeOutputs.add(
         output.copyWith(amount: normalizedBalance - Balance(coin: changeFee)),
