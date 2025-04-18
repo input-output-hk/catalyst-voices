@@ -2,16 +2,15 @@
 
 // cspell: words rposition
 
-use anyhow::{bail, Context};
-use cardano_blockchain_types::{Network, Point, Slot, TransactionId, TxnIndex};
-use cardano_chain_follower::ChainFollower;
+use anyhow::Context;
+use cardano_blockchain_types::{Slot, TransactionId};
 use catalyst_types::id_uri::IdUri;
 use futures::{future::try_join, TryFutureExt, TryStreamExt};
-use rbac_registration::{cardano::cip509::Cip509, registration::cardano::RegistrationChain};
+use rbac_registration::registration::cardano::RegistrationChain;
 
 use crate::{
     db::index::{
-        queries::rbac::get_rbac_registrations::{Query, QueryParams},
+        queries::rbac::get_rbac_registrations::{registration, Query, QueryParams},
         session::CassandraSession,
     },
     settings::Settings,
@@ -132,28 +131,6 @@ async fn indexed_registrations(
 
     result.sort_by_key(|r| r.slot_no);
     Ok(result)
-}
-
-/// Returns a RBAC registration from the given block and slot.
-async fn registration(network: Network, slot: Slot, txn_index: TxnIndex) -> anyhow::Result<Cip509> {
-    let point = Point::fuzzy(slot);
-    let block = ChainFollower::get_block(network, point)
-        .await
-        .with_context(|| format!("Unable to get {slot:?} block"))?
-        .data;
-    if block.point().slot_or_default() != slot {
-        // The `ChainFollower::get_block` function can return the next consecutive block if it
-        // cannot find the exact one. This shouldn't happen, but we need to check anyway.
-        bail!("Unable to find exact {slot:?} block");
-    }
-    // We perform validation during indexing, so this normally should never fail.
-    Cip509::new(&block, txn_index, &[])
-        .with_context(|| {
-            format!("Invalid RBAC registration, slot = {slot:?}, transaction index = {txn_index:?}")
-        })?
-        .with_context(|| {
-            format!("No RBAC registration, slot = {slot:?}, transaction index = {txn_index:?}")
-        })
 }
 
 /// Updates the values depending on if the given registration is persistent or not.
