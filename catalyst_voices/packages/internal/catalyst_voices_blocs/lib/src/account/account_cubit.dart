@@ -54,7 +54,9 @@ final class AccountCubit extends Cubit<AccountState>
       if (activeAccount != null) {
         await _userService.updateAccount(
           id: activeAccount.catalystId,
-          email: email.value,
+          email: email.value.isNotEmpty
+              ? Optional(email.value)
+              : const Optional.empty(),
         );
       }
 
@@ -116,7 +118,7 @@ final class AccountCubit extends Cubit<AccountState>
       status: const None(),
       catalystId: catalystId,
       username: Username.pure(catalystId?.username ?? ''),
-      email: Email.pure(from?.email ?? ''),
+      email: Email.pure(from?.email?.email ?? ''),
       roles: AccountRolesState(
         items: accountRolesItems,
         canAddRole: accountRolesItems.any((item) => !item.isSelected),

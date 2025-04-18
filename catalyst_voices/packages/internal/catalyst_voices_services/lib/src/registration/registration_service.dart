@@ -189,7 +189,7 @@ final class RegistrationServiceImpl implements RegistrationService {
     await Future<void>.delayed(const Duration(milliseconds: 200));
 
     // TODO(damian-molinski): should come from backend
-    const email = 'recovered@iohk.com';
+    const email = AccountEmail.unknown('recovered@iohk.com');
     final catalystIdUri = Uri.parse(
       'id.catalyst://recovered@preprod.cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE',
     );
@@ -245,7 +245,7 @@ final class RegistrationServiceImpl implements RegistrationService {
 
           return Account(
             catalystId: catalystId,
-            email: data.email,
+            email: AccountEmail.pending(data.email),
             keychain: keychain,
             roles: data.roles,
             walletInfo: walletInfo,
@@ -292,7 +292,7 @@ final class RegistrationServiceImpl implements RegistrationService {
 
       return Account(
         catalystId: catalystId,
-        email: 'dummy@iohk.com',
+        email: null,
         keychain: keychain,
         roles: roles,
         walletInfo: WalletInfo(
