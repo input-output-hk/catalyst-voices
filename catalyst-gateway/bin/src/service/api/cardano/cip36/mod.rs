@@ -40,7 +40,8 @@ impl Api {
     #[oai(
         path = "/v1/cardano/registration/cip36",
         method = "get",
-        operation_id = "cardanoRegistrationCip36"
+        operation_id = "cardanoRegistrationCip36",
+        hidden = true
     )]
     async fn get_registration(
         &self, lookup: Query<Option<cardano::query::stake_or_voter::StakeOrVoter>>,

@@ -159,7 +159,8 @@ impl ConfigApi {
     #[oai(
         path = "/draft/config/frontend",
         method = "put",
-        operation_id = "put_config_frontend"
+        operation_id = "put_config_frontend",
+        hidden = true
     )]
     async fn put_frontend(
         &self,

@@ -74,7 +74,8 @@ impl HealthApi {
     #[oai(
         path = "/v1/health/inspection",
         method = "put",
-        operation_id = "healthInspection"
+        operation_id = "healthInspection",
+        hidden = true,
     )]
     async fn inspection(
         &self,
