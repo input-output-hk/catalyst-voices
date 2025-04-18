@@ -3,6 +3,7 @@
 use std::sync::Arc;
 
 use anyhow::Context;
+use cardano_blockchain_types::Network;
 use handlebars::Handlebars;
 use scylla::Session;
 use serde_json::json;
@@ -162,11 +163,11 @@ fn generate_cql_schema_version() -> String {
 }
 
 /// Get the namespace for a particular db configuration
-pub(crate) fn namespace(cfg: &cassandra_db::EnvVars) -> String {
+pub(crate) fn namespace(persistent: bool, network: Network) -> String {
     // Build and set the Keyspace to use.
+    let namespace = if persistent { "p" } else { "v" };
     format!(
-        "{}_{}",
-        cfg.namespace.as_str(),
+        "{namespace}_{network}_{}",
         generate_cql_schema_version().replace('-', "_")
     )
 }
@@ -174,9 +175,9 @@ pub(crate) fn namespace(cfg: &cassandra_db::EnvVars) -> String {
 /// Create the namespace we will use for this session
 /// Ok to run this if the namespace already exists.
 async fn create_namespace(
-    session: &mut Arc<Session>, cfg: &cassandra_db::EnvVars,
+    session: &mut Arc<Session>, cfg: &cassandra_db::EnvVars, persistent: bool, network: Network,
 ) -> anyhow::Result<()> {
-    let keyspace = namespace(cfg);
+    let keyspace = namespace(persistent, network);
 
     let mut reg = Handlebars::new();
     // disable default `html_escape` function
@@ -212,9 +213,9 @@ async fn create_namespace(
 
 /// Create the Schema on the connected Cassandra DB
 pub(crate) async fn create_schema(
-    session: &mut Arc<Session>, cfg: &cassandra_db::EnvVars,
+    session: &mut Arc<Session>, cfg: &cassandra_db::EnvVars, persistent: bool, network: Network,
 ) -> anyhow::Result<()> {
-    create_namespace(session, cfg)
+    create_namespace(session, cfg, persistent, network)
         .await
         .context("Creating Namespace")?;
 
@@ -274,6 +275,26 @@ mod tests {
     fn check_schema_version_has_not_changed() {
         let calculated_version = generate_cql_schema_version();
         assert_eq!(SCHEMA_VERSION, calculated_version);
+    }
+
+    #[test]
+    fn test_namespace_persistent() {
+        let network = Network::Preprod;
+        let persistent = true;
+        let namespace = namespace(persistent, network);
+        let schema_version = generate_cql_schema_version().replace('-', "_");
+        let expected = format!("p_{network}_{schema_version}");
+        assert_eq!(namespace, expected);
+    }
+
+    #[test]
+    fn test_namespace_volatile() {
+        let network = Network::Preprod;
+        let persistent = false;
+        let namespace = namespace(persistent, network);
+        let schema_version = generate_cql_schema_version().replace('-', "_");
+        let expected = format!("v_{network}_{schema_version}");
+        assert_eq!(namespace, expected);
     }
 
     #[test]
