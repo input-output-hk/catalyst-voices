@@ -18,7 +18,7 @@ final class Account extends Equatable {
   /* cSpell:enable */
 
   final CatalystId catalystId;
-  final String email;
+  final AccountEmail? email;
   final Keychain keychain;
   final Set<AccountRole> roles;
   final WalletInfo walletInfo;
@@ -33,7 +33,7 @@ final class Account extends Equatable {
 
   const Account({
     required this.catalystId,
-    required this.email,
+    this.email,
     required this.keychain,
     required this.roles,
     required this.walletInfo,
@@ -48,7 +48,7 @@ final class Account extends Equatable {
   }) {
     return Account(
       catalystId: catalystId,
-      email: 'dummy@iohk.com',
+      email: null,
       keychain: keychain,
       roles: const {
         AccountRole.voter,
@@ -97,7 +97,7 @@ final class Account extends Equatable {
 
   Account copyWith({
     CatalystId? catalystId,
-    String? email,
+    Optional<AccountEmail>? email,
     Keychain? keychain,
     Set<AccountRole>? roles,
     WalletInfo? walletInfo,
@@ -106,7 +106,7 @@ final class Account extends Equatable {
   }) {
     return Account(
       catalystId: catalystId ?? this.catalystId,
-      email: email ?? this.email,
+      email: email.dataOr(this.email),
       keychain: keychain ?? this.keychain,
       roles: roles ?? this.roles,
       walletInfo: walletInfo ?? this.walletInfo,

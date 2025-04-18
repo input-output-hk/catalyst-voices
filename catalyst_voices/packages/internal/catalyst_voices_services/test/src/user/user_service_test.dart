@@ -67,9 +67,6 @@ void main() {
         keychain: keychain,
       );
 
-      when(() => userDataSource.updateEmail(account.email))
-          .thenAnswer((_) async => {});
-
       await service.registerAccount(account);
 
       // Then

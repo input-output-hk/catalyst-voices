@@ -29,7 +29,7 @@ abstract interface class UserService implements ActiveAware {
   Future<void> updateAccount({
     required CatalystId id,
     Optional<String>? username,
-    String? email,
+    Optional<String>? email,
     Set<AccountRole>? roles,
   });
 
@@ -86,7 +86,10 @@ final class UserServiceImpl implements UserService {
 
     // updating email must be after updating user so that
     // the request is sent with correct access token
-    unawaited(_userRepository.updateEmail(account.email));
+    final accountEmail = account.email;
+    if (accountEmail != null) {
+      unawaited(_userRepository.updateEmail(accountEmail.email));
+    }
   }
 
   @override
@@ -113,7 +116,7 @@ final class UserServiceImpl implements UserService {
   Future<void> updateAccount({
     required CatalystId id,
     Optional<String>? username,
-    String? email,
+    Optional<String>? email,
     Set<AccountRole>? roles,
   }) async {
     final user = await getUser();
@@ -130,8 +133,15 @@ final class UserServiceImpl implements UserService {
     }
 
     if (email != null) {
-      await _userRepository.updateEmail(email);
-      updatedAccount = updatedAccount.copyWith(email: email);
+      final emailData = email.data;
+
+      if (emailData != null) {
+        await _userRepository.updateEmail(emailData);
+      }
+
+      final accountEmail =
+          emailData != null ? AccountEmail.pending(emailData) : null;
+      updatedAccount = updatedAccount.copyWith(email: Optional(accountEmail));
     }
 
     if (roles != null) {

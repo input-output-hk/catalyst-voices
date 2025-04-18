@@ -9,7 +9,7 @@ part 'user_dto.g.dart';
 @JsonSerializable(createJsonKeys: true)
 final class AccountDto {
   final String catalystId;
-  final String email;
+  final AccountEmailDto? email;
   final String keychainId;
   final Set<AccountRole> roles;
   final AccountWalletInfoDto walletInfo;
@@ -35,7 +35,7 @@ final class AccountDto {
   AccountDto.fromModel(Account data)
       : this(
           catalystId: data.catalystId.toUri().toString(),
-          email: data.email,
+          email: data.email?.toDto(),
           keychainId: data.keychain.id,
           roles: data.roles,
           walletInfo: AccountWalletInfoDto.fromModel(data.walletInfo),
@@ -52,7 +52,7 @@ final class AccountDto {
 
     return Account(
       catalystId: CatalystId.fromUri(Uri.parse(catalystId)),
-      email: email,
+      email: email?.toModel(),
       keychain: keychain,
       roles: roles,
       walletInfo: walletInfo.toModel(),
@@ -62,17 +62,45 @@ final class AccountDto {
   }
 
   static void _jsonMigration(Map<String, dynamic> json) {
-    /// displayName and email were added later and some existing accounts
-    /// are already stored without them but we still don't want to make
-    /// those fields optional.
-    void baseProfileMigration() {
-      if (!json.containsKey(_$AccountDtoJsonKeys.email)) {
-        json[_$AccountDtoJsonKeys.email] = 'migrated@iohk.com';
+    /// String email field is migrated into object with additional status
+    /// field.
+    void emailMigrationToStatus() {
+      if (json.containsKey(_$AccountDtoJsonKeys.email) &&
+          json[_$AccountDtoJsonKeys.email] is String) {
+        json[_$AccountDtoJsonKeys.email] = AccountEmailDto(
+          email: json[_$AccountDtoJsonKeys.email] as String,
+          status: AccountEmailVerificationStatus.unknown,
+        ).toJson();
       }
     }
 
-    baseProfileMigration();
+    emailMigrationToStatus();
   }
+}
+
+@JsonSerializable()
+final class AccountEmailDto {
+  final String email;
+  final AccountEmailVerificationStatus status;
+
+  AccountEmailDto({
+    required this.email,
+    this.status = AccountEmailVerificationStatus.unknown,
+  });
+
+  factory AccountEmailDto.fromJson(Map<String, dynamic> json) {
+    return _$AccountEmailDtoFromJson(json);
+  }
+
+  AccountEmailDto.fromModel(AccountEmail model)
+      : this(
+          email: model.email,
+          status: model.status,
+        );
+
+  Map<String, dynamic> toJson() => _$AccountEmailDtoToJson(this);
+
+  AccountEmail toModel() => AccountEmail(email: email, status: status);
 }
 
 @JsonSerializable()
@@ -223,4 +251,8 @@ final class UserSettingsDto {
       showSubmissionClosingWarning: showSubmissionClosingWarning,
     );
   }
+}
+
+extension on AccountEmail {
+  AccountEmailDto toDto() => AccountEmailDto.fromModel(this);
 }
