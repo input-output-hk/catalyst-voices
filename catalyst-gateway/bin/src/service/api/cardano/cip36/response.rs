@@ -24,6 +24,7 @@ pub(crate) enum Cip36Registration {
     NotFound,
     /// Response for unprocessable content.
     #[oai(status = 422)]
+    #[allow(dead_code)]
     UnprocessableContent(Json<Cip36RegistrationUnprocessableContent>),
 }
 

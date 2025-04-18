@@ -1,12 +1,11 @@
 //! CIP36 Registration Endpoints
 
-use poem::http::HeaderMap;
-use poem_openapi::{param::Query, payload::Json, OpenApi};
-use response::Cip36RegistrationUnprocessableContent;
+use poem_openapi::{param::Query, OpenApi};
 
-use self::{cardano::slot_no::SlotNo, common::auth::none::NoAuthorization};
+use self::cardano::slot_no::SlotNo;
 use crate::service::common::{
     self,
+    auth::api_key::InternalApiKeyAuthorization,
     tags::ApiTags,
     types::cardano::{self},
 };
@@ -40,32 +39,16 @@ impl Api {
     #[oai(
         path = "/v1/cardano/registration/cip36",
         method = "get",
-        operation_id = "cardanoRegistrationCip36"
+        operation_id = "cardanoRegistrationCip36",
+        hidden = true
     )]
     async fn get_registration(
         &self, lookup: Query<Option<cardano::query::stake_or_voter::StakeOrVoter>>,
         asat: Query<Option<cardano::query::AsAt>>,
         page: Query<Option<common::types::generic::query::pagination::Page>>,
         limit: Query<Option<common::types::generic::query::pagination::Limit>>,
-        /// Headers, used if the query is requesting ALL to determine if the secret API
-        /// Key is also defined.
-        headers: &HeaderMap,
-        _auth: NoAuthorization,
+        _auth: InternalApiKeyAuthorization,
     ) -> response::AllRegistration {
-        // Special validation for the `lookup` parameter.
-        // If the parameter is ALL, BUT we do not have a valid API Key, just report the parameter
-        // is invalid.
-        if let Some(lookup) = lookup.0.clone() {
-            if lookup.is_all(headers).is_err() {
-                return response::Cip36Registration::UnprocessableContent(Json(
-                    Cip36RegistrationUnprocessableContent::new(
-                        "Invalid Stake Address or Voter key",
-                    ),
-                ))
-                .into();
-            }
-        }
-
         endpoint::cip36_registrations(
             lookup.0,
             SlotNo::into_option(asat.0),
