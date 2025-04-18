@@ -8,7 +8,6 @@ import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 class GetStartedPanel extends StatelessWidget {
   const GetStartedPanel({super.key});
@@ -66,8 +65,7 @@ class GetStartedPanel extends StatelessWidget {
   }
 
   Future<void> _handleCreateNewAccount(BuildContext context) async {
-    final hasWallets =
-        await context.read<SessionCubit>().checkAvailableWallets();
+    const hasWallets = true;
 
     if (hasWallets && context.mounted) {
       RegistrationCubit.of(context).createNewAccount();

@@ -18,10 +18,12 @@ class SplashPanel extends StatelessWidget {
           subtitle: Text(context.l10n.accountCreationSplashMessage),
         ),
         const Spacer(),
-        VoicesFilledButton(
-          key: const Key('CreateKeychainButton'),
-          child: Text(context.l10n.accountCreationSplashNextButton),
-          onTap: () => RegistrationCubit.of(context).nextStep(),
+        Semantics(
+          child: VoicesFilledButton(
+            key: const Key('CreateKeychainButton'),
+            child: Text(context.l10n.accountCreationSplashNextButton),
+            onTap: () => RegistrationCubit.of(context).nextStep(),
+          ),
         ),
       ],
     );

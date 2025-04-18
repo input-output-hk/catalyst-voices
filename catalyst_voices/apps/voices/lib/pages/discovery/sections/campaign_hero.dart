@@ -48,12 +48,16 @@ class _CampaignBrief extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          key: const Key('CampaignBriefTitle'),
-          context.l10n.heroSectionTitle,
-          style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                color: ThemeBuilder.buildTheme().colorScheme.primary,
-              ),
+        Semantics(
+          label: context.l10n.projectCatalystDescription,
+          identifier: 'CampaignBriefTitle',
+          child: Text(
+            key: const Key('CampaignBriefTitle'),
+            context.l10n.heroSectionTitle,
+            style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                  color: ThemeBuilder.buildTheme().colorScheme.primary,
+                ),
+          ),
         ),
         const SizedBox(height: 32),
         Text(
@@ -66,14 +70,20 @@ class _CampaignBrief extends StatelessWidget {
         const SizedBox(height: 32),
         Row(
           children: [
-            VoicesFilledButton(
-              key: const Key('ViewProposalsBtn'),
-              onTap: () {
-                const ProposalsRoute().go(context);
-              },
-              backgroundColor: ThemeBuilder.buildTheme().colorScheme.primary,
-              foregroundColor: ThemeBuilder.buildTheme().colorScheme.onPrimary,
-              child: Text(context.l10n.viewProposals),
+            Semantics(
+              container: true,
+              label: context.l10n.viewProposals,
+              identifier: 'ViewProposalsBtn',
+              child: VoicesFilledButton(
+                key: const Key('ViewProposalsBtn'),
+                onTap: () {
+                  const ProposalsRoute().go(context);
+                },
+                backgroundColor: ThemeBuilder.buildTheme().colorScheme.primary,
+                foregroundColor:
+                    ThemeBuilder.buildTheme().colorScheme.onPrimary,
+                child: Text(context.l10n.viewProposals),
+              ),
             ),
             const SizedBox(width: 8),
             const _DiscoveryMyProposalsButton(),
