@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["INSERT_SIGNED_DOCS","SELECT_SIGNED_DOCS_TEMPLATE"],"struct":["FullSignedDoc","StoreError"]};

@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["ChainIndexerEvent"],"trait":["EventTarget"],"type":["EventListenerFn"]};
