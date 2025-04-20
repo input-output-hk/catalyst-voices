@@ -5,7 +5,8 @@ import 'package:catalyst_voices_repositories/generated/api/cat_reviews.models.sw
 import 'package:catalyst_voices_repositories/src/api/api_services.dart';
 import 'package:catalyst_voices_repositories/src/auth/auth_token_provider.dart';
 import 'package:catalyst_voices_repositories/src/common/response_mapper.dart';
-import 'package:catalyst_voices_repositories/src/dto/user_dto.dart';
+import 'package:catalyst_voices_repositories/src/dto/user/account_status_dto.dart';
+import 'package:catalyst_voices_repositories/src/dto/user/user_dto.dart';
 import 'package:catalyst_voices_repositories/src/user/source/user_storage.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 
