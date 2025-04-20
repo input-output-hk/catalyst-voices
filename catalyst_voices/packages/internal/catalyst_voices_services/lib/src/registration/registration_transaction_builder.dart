@@ -268,7 +268,7 @@ final class RegistrationTransactionBuilder {
       extensions: X509CertificateExtensions(
         subjectAltName: [
           X509String(
-            RegistrationCertificate.stakeAddressUri(_stakeAddress),
+            CardanoAddressUri(_stakeAddress).toString(),
             tag: X509String.uriTag,
           ),
         ],

@@ -4,37 +4,20 @@ import 'package:catalyst_voices_repositories/generated/api/cat_gateway.models.sw
 import 'package:collection/collection.dart';
 import 'package:convert/convert.dart';
 
+/// DTO utils for [RbacRegistrationChain], mostly helpers to decode **complex**
+/// data types that can't just be json deserialized.
 extension RbacRegistrationChainExt on RbacRegistrationChain {
   Set<AccountRole> get accountRoles {
-    final map = roles as Map<String, dynamic>;
-    final roleNumbers = map.keys.map(int.tryParse);
+    final roleNumbers = _roleData.keys.map(int.tryParse);
     final accountRoles =
         roleNumbers.map(AccountRole.maybeFromNumber).nonNulls.toSet();
-
-    if (!accountRoles.contains(AccountRole.root)) {
-      throw ArgumentError.value(
-        roles,
-        'roles',
-        'Did not contain mandatory root role.',
-      );
-    }
 
     return accountRoles;
   }
 
   ShelleyAddress get stakeAddress {
-    final map = roles as Map<String, dynamic>;
-    final rootRole =
-        map[AccountRole.root.number.toString()] as Map<String, dynamic>?;
-    if (rootRole == null) {
-      throw ArgumentError.value(
-        roles,
-        'roles',
-        'Did not contain mandatory root role.',
-      );
-    }
-
-    final signingKeys = rootRole['signing_keys'] as List<dynamic>;
+    final rootRoleData = _roleData[_rootRoleKey] as Map<String, dynamic>;
+    final signingKeys = rootRoleData['signing_keys'] as List<dynamic>;
     final signingKey = signingKeys.firstOrNull as Map<String, dynamic>?;
     if (signingKey == null) {
       throw ArgumentError.notNull('signingKey');
@@ -43,19 +26,37 @@ extension RbacRegistrationChainExt on RbacRegistrationChain {
     final signingKeyType = signingKey['key_type'] as String;
     final signingKeyValue = signingKey['key_value'] as String;
 
-    if (signingKeyType != 'x509') {
+    if (signingKeyType != RegistrationCertificate.certificateType) {
       throw ArgumentError.value(
         signingKeyType,
         'signingKeyType',
-        'Was not a x509 key.',
+        'Was not a ${RegistrationCertificate.certificateType} key.',
       );
     }
 
-    final certificateBytes = hex.decode(signingKeyValue.replaceFirst('0x', ''));
-    final derCertificate =
-        X509DerCertificate.fromBytes(bytes: certificateBytes);
-    final x509Certificate = X509Certificate.fromDer(derCertificate);
-    final extensions = x509Certificate.tbsCertificate.extensions;
+    final x509Certificate = _decodeX509Certificate(signingKeyValue);
+    return _decodeStakeAddressFromCertificate(x509Certificate);
+  }
+
+  Map<String, dynamic> get _roleData {
+    final roleData = roles as Map<String, dynamic>;
+    if (!roleData.containsKey(_rootRoleKey)) {
+      throw ArgumentError.value(
+        roleData,
+        'roleData',
+        'Did not contain mandatory root role.',
+      );
+    }
+
+    return roleData;
+  }
+
+  String get _rootRoleKey => AccountRole.root.number.toString();
+
+  ShelleyAddress _decodeStakeAddressFromCertificate(
+    X509Certificate certificate,
+  ) {
+    final extensions = certificate.tbsCertificate.extensions;
     if (extensions == null) {
       throw ArgumentError.notNull('extensions');
     }
@@ -65,18 +66,21 @@ extension RbacRegistrationChainExt on RbacRegistrationChain {
       throw ArgumentError.notNull('subjectAltName');
     }
 
-    final stakeAddressExt = subjectAltName.firstWhereOrNull(
-      (e) => e.value.startsWith(RegistrationCertificate.stakeAddressPrefix),
-    );
+    final stakeAddressUri = subjectAltName
+        .map((e) => e.value)
+        .firstWhereOrNull(CardanoAddressUri.isCardanoAddressUri);
 
-    if (stakeAddressExt == null) {
-      throw ArgumentError.notNull('stakeAddressExt');
+    if (stakeAddressUri == null) {
+      throw ArgumentError.notNull('stakeAddressUri');
     }
 
-    final index = stakeAddressExt.value
-        .indexOf(RegistrationCertificate.stakeAddressPrefix);
-    final stakeAddressBech32 = stakeAddressExt.value
-        .substring(index + RegistrationCertificate.stakeAddressPrefix.length);
-    return ShelleyAddress.fromBech32(stakeAddressBech32);
+    return CardanoAddressUri.fromString(stakeAddressUri).address;
+  }
+
+  X509Certificate _decodeX509Certificate(String hexString) {
+    final certificateBytes = hex.decode(hexString.replaceFirst('0x', ''));
+    final derCertificate =
+        X509DerCertificate.fromBytes(bytes: certificateBytes);
+    return X509Certificate.fromDer(derCertificate);
   }
 }

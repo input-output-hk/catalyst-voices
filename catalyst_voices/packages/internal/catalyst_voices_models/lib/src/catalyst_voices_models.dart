@@ -74,6 +74,7 @@ export 'user/profile.dart';
 export 'user/recovered_account.dart';
 export 'user/user.dart';
 export 'user/user_settings.dart';
+export 'wallet/cardano_address_uri.dart';
 export 'wallet/cardano_wallet_details.dart';
 export 'wallet/wallet_info.dart';
 export 'wallet/wallet_metadata.dart';
