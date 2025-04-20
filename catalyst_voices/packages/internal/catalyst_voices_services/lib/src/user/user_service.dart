@@ -18,8 +18,7 @@ abstract interface class UserService implements ActiveAware {
 
   Future<User> getUser();
 
-  /// Tries to fetch info about recovered account,
-  /// returns null if the account is not found.
+  /// Fetches info about recovered account.
   ///
   /// This does not recover the account,
   /// it only does the lookup if there's an account to recover.

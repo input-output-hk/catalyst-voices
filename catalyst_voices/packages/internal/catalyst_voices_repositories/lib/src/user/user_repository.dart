@@ -87,9 +87,9 @@ final class UserRepositoryImpl implements UserRepository {
     required String rbacToken,
   }) async {
     final tokenProvider = _HardcodedAuthTokenProvider(token: rbacToken);
-    final publicId = await _recoverCatalystIDPublic(tokenProvider);
     final rbacRegistration =
         await _recoverRbacRegistration(catalystId, tokenProvider);
+    final publicId = await _recoverCatalystIDPublic(tokenProvider);
 
     return RecoveredAccount(
       username: publicId?.username as String?,

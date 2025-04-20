@@ -461,15 +461,15 @@ class X509TBSCertificate with EquatableMixin {
     final extensionsASN1 = sequence.elements.elementAtOrNull(7);
 
     // validity
-    final validityNotBeforeASN1 = validityASN1.elements[0] as ASN1UtcTime;
-    final validityNotAfterASN1 = validityASN1.elements[1] as ASN1UtcTime;
+    final validityNotBeforeASN1 = validityASN1.elements[0];
+    final validityNotAfterASN1 = validityASN1.elements[1];
 
     return X509TBSCertificate(
       version: _readVersion(versionASN1),
       serialNumber: _readSerialNumber(serialNumberASN1),
       issuer: X509DistinguishedName.fromASN1(issuerASN1),
-      validityNotBefore: validityNotBeforeASN1.dateTimeValue,
-      validityNotAfter: validityNotAfterASN1.dateTimeValue,
+      validityNotBefore: validityNotBeforeASN1.asDateTime,
+      validityNotAfter: validityNotAfterASN1.asDateTime,
       subject: X509DistinguishedName.fromASN1(subjectASN1),
       subjectPublicKey: _readSubjectPublicKeyInfo(subjectPublicKeyASN1),
       extensions: extensionsASN1 != null
@@ -540,8 +540,8 @@ class X509TBSCertificate with EquatableMixin {
   ASN1Object _createValidity() {
     // Validity (not before and not after)
     return ASN1Sequence()
-      ..add(ASN1UtcTime(validityNotBefore.toUtc()))
-      ..add(ASN1UtcTime(validityNotAfter.toUtc()));
+      ..add(ASN1GeneralizedTime(validityNotBefore.toUtc()))
+      ..add(ASN1GeneralizedTime(validityNotAfter.toUtc()));
   }
 
   ASN1Object _createVersion(int version) {
@@ -568,6 +568,21 @@ class X509TBSCertificate with EquatableMixin {
 }
 
 extension on ASN1Object {
+  DateTime get asDateTime {
+    final object = this;
+    if (object is ASN1GeneralizedTime) {
+      return object.dateTimeValue;
+    } else if (object is ASN1UtcTime) {
+      return object.dateTimeValue;
+    } else {
+      throw ArgumentError.value(
+        object,
+        'object',
+        'Is not an instance of any known DateTime format.',
+      );
+    }
+  }
+
   ASN1OctetString get asOctetString {
     final object = this;
     if (object is ASN1OctetString) {

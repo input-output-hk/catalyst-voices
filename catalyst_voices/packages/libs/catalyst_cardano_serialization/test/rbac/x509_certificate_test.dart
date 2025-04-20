@@ -1,5 +1,6 @@
 import 'package:catalyst_cardano_serialization/src/rbac/x509_certificate.dart';
 import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
+import 'package:collection/collection.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
 
@@ -28,7 +29,7 @@ void main() {
       serialNumber: 1,
       subjectPublicKey: publicKey,
       issuer: issuer,
-      validityNotBefore: DateTime.now().toUtc(),
+      validityNotBefore: DateTime.utc(2025, 3, 1, 12, 0, 0),
       validityNotAfter: X509TBSCertificate.foreverValid,
       subject: issuer,
       extensions: const X509CertificateExtensions(
@@ -84,6 +85,15 @@ class _FakeBip32Ed25519XPublicKey extends Fake
     implements Bip32Ed25519XPublicKey {
   @override
   List<int> get bytes => [1, 2, 3];
+
+  @override
+  int get hashCode => bytes.hashCode;
+
+  @override
+  bool operator ==(Object other) {
+    return other is Bip32Ed25519XPublicKey &&
+        const DeepCollectionEquality().equals(bytes, other.bytes);
+  }
 }
 
 class _FakeBip32Ed25519XPublicKeyFactory extends Fake

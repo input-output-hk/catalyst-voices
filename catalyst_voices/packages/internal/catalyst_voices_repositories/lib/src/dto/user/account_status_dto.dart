@@ -4,21 +4,20 @@ import 'package:catalyst_voices_repositories/generated/api/cat_reviews.enums.swa
 extension CatalystIDStatusExt on CatalystIDStatus {
   AccountStatus toModel() {
     switch (this) {
-      // TODO(dtscalac): map it
       case CatalystIDStatus.swaggerGeneratedUnknown:
-        // TODO: Handle this case.
+        // TODO(dtscalac): map it when AccountStatus is defined
         throw UnimplementedError();
       case CatalystIDStatus.value_0:
-        // TODO: Handle this case.
+        // TODO(dtscalac): map it when AccountStatus is defined
         throw UnimplementedError();
       case CatalystIDStatus.value_1:
-        // TODO: Handle this case.
+        // TODO(dtscalac): map it when AccountStatus is defined
         throw UnimplementedError();
       case CatalystIDStatus.value_2:
-        // TODO: Handle this case.
+        // TODO(dtscalac): map it when AccountStatus is defined
         throw UnimplementedError();
       case CatalystIDStatus.value_3:
-        // TODO: Handle this case.
+        // TODO(dtscalac): map it when AccountStatus is defined
         throw UnimplementedError();
     }
   }

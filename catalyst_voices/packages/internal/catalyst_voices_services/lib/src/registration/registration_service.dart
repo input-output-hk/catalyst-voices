@@ -41,7 +41,7 @@ abstract interface class RegistrationService {
   /// Returns the available cardano wallet extensions.
   Future<List<CardanoWallet>> getCardanoWallets();
 
-  /// Loads the ballet balance for given [address].
+  /// Loads the wallet balance for given [address].
   Future<Coin> getWalletBalance({
     required SeedPhrase seedPhrase,
     required ShelleyAddress address,
@@ -149,7 +149,7 @@ final class RegistrationServiceImpl implements RegistrationService {
     required SeedPhrase seedPhrase,
     required ShelleyAddress address,
   }) async {
-    // TODO(dtscalac): fetch wallet info, etc
+    // TODO(dtscalac): fetch wallet balance from cat-gateway
     return const Coin(0);
   }
 
