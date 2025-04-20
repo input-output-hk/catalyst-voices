@@ -320,7 +320,6 @@ void main() {
         userObserver.user = emptyUser;
 
         // Then
-
         expect(
           () async => service.getPreviousRegistrationTransactionId(),
           throwsA(isArgumentError),
@@ -338,10 +337,7 @@ void main() {
           keychain: keychain,
           isActive: true,
         );
-        final user = User.optional(accounts: [account]);
-
-        // When
-        userObserver.user = user;
+        userObserver.user = User.optional(accounts: [account]);
 
         // Then
         expect(
