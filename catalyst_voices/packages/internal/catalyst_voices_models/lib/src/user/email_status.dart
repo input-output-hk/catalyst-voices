@@ -1,0 +1,4 @@
+enum AccountStatus {
+  verified,
+  verificationInProgress,
+}

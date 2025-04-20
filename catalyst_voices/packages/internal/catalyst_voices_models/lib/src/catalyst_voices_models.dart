@@ -68,6 +68,7 @@ export 'signed_document/signed_document_payload.dart';
 export 'user/account.dart';
 export 'user/account_role.dart';
 export 'user/catalyst_id.dart';
+export 'user/email_status.dart';
 export 'user/preferences.dart';
 export 'user/profile.dart';
 export 'user/recovered_account.dart';

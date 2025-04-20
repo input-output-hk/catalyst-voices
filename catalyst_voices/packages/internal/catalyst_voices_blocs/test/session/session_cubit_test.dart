@@ -308,6 +308,12 @@ class _FakeUserRepository extends Fake implements UserRepository {
   @override
   Future<User> getUser() async => _user ?? const User.empty();
 
+  @override
+  Future<void> publishUserProfile({
+    required CatalystId catalystId,
+    required String email,
+  }) async {}
+
   void reset() {
     _user = null;
   }
@@ -316,9 +322,6 @@ class _FakeUserRepository extends Fake implements UserRepository {
   Future<void> saveUser(User user) async {
     _user = user;
   }
-
-  @override
-  Future<void> updateEmail(String email) async {}
 }
 
 class _MockCardanoWallet extends Mock implements CardanoWallet {

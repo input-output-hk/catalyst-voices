@@ -105,9 +105,14 @@ final class UserServiceImpl implements UserService {
 
     await _updateUser(user);
 
-    // updating email must be after updating user so that
+    // updating user profile must be after updating user so that
     // the request is sent with correct access token
-    unawaited(_userRepository.updateEmail(account.email));
+    unawaited(
+      _userRepository.publishUserProfile(
+        catalystId: account.catalystId,
+        email: account.email,
+      ),
+    );
   }
 
   @override
@@ -151,12 +156,18 @@ final class UserServiceImpl implements UserService {
     }
 
     if (email != null) {
-      await _userRepository.updateEmail(email);
       updatedAccount = updatedAccount.copyWith(email: email);
     }
 
     if (roles != null) {
       updatedAccount = updatedAccount.copyWith(roles: roles);
+    }
+
+    if (username != null || email != null) {
+      await _userRepository.publishUserProfile(
+        catalystId: updatedAccount.catalystId,
+        email: updatedAccount.email,
+      );
     }
 
     final updatedUser = user.updateAccount(updatedAccount);

@@ -22,7 +22,14 @@ abstract interface class UserRepository {
     );
   }
 
+  Future<AccountStatus> getAccountStatus();
+
   Future<User> getUser();
+
+  Future<void> publishUserProfile({
+    required CatalystId catalystId,
+    required String email,
+  });
 
   Future<RecoveredAccount> recoverAccount({
     required CatalystId catalystId,
@@ -30,8 +37,6 @@ abstract interface class UserRepository {
   });
 
   Future<void> saveUser(User user);
-
-  Future<void> updateEmail(String email);
 }
 
 final class UserRepositoryImpl implements UserRepository {
@@ -46,12 +51,33 @@ final class UserRepositoryImpl implements UserRepository {
   );
 
   @override
+  Future<AccountStatus> getAccountStatus() async {
+    final response = await _apiServices.reviews.apiCatalystIdsMeGet();
+    response.verifyIsSuccessful();
+    final body = response.bodyOrThrow;
+    return body.status!.toModel();
+  }
+
+  @override
   Future<User> getUser() async {
     final dto = await _storage.readUser();
-
     final user = await dto?.toModel(keychainProvider: _keychainProvider);
-
     return user ?? const User.empty();
+  }
+
+  @override
+  Future<void> publishUserProfile({
+    required CatalystId catalystId,
+    required String email,
+  }) async {
+    final response = await _apiServices.reviews.apiCatalystIdsMePost(
+      body: CatalystIDCreate(
+        catalystIdUri: catalystId.toUri().toStringWithoutScheme(),
+        email: email,
+      ),
+    );
+
+    response.verifyIsSuccessful();
   }
 
   @override
@@ -60,9 +86,9 @@ final class UserRepositoryImpl implements UserRepository {
     required String rbacToken,
   }) async {
     final tokenProvider = _HardcodedAuthTokenProvider(token: rbacToken);
+    final publicId = await _recoverCatalystIDPublic(tokenProvider);
     final rbacRegistration =
         await _recoverRbacRegistration(catalystId, tokenProvider);
-    final publicId = await _recoverCatalystIDPublic(tokenProvider);
 
     return RecoveredAccount(
       username: publicId?.username as String?,
@@ -79,18 +105,6 @@ final class UserRepositoryImpl implements UserRepository {
     final dto = UserDto.fromModel(user);
 
     return _storage.writeUser(dto);
-  }
-
-  @override
-  Future<void> updateEmail(String email) async {
-    // TODO(dtscalac): reimplement the endpoint with custom
-    // rbac token where catalystId is built with username in it.
-    // The reviews module stores the username from the token's
-    // catalyst ID and later on allows to recover it in recoverAccount.
-    final response = await _apiServices.reviews
-        .apiCatalystIdsMePost(body: CatalystIDCreate(email: email));
-
-    response.verifyIsSuccessful();
   }
 
   Future<CatalystIDPublic?> _recoverCatalystIDPublic(
@@ -124,12 +138,6 @@ final class UserRepositoryImpl implements UserRepository {
     final response = await gateway.apiV1RbacRegistrationGet(
       lookup: catalystId.toUri().toStringWithoutScheme(),
     );
-
-    if (response.statusCode == ApiErrorResponseException.notFound) {
-      throw NotFoundException(
-        message: 'Registration for $catalystId not found',
-      );
-    }
 
     response.verifyIsSuccessful();
 

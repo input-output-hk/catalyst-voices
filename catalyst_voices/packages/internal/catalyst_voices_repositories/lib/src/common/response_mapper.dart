@@ -11,7 +11,11 @@ extension ResponseMapper on Response<dynamic> {
   }
 
   void verifyIsSuccessful() {
-    if (!isSuccessful) {
+    if (isSuccessful) {
+      return;
+    } else if (statusCode == ApiErrorResponseException.notFound) {
+      throw NotFoundException(message: error.toString());
+    } else {
       throw toApiException();
     }
   }
