@@ -268,7 +268,7 @@ final class RegistrationTransactionBuilder {
       extensions: X509CertificateExtensions(
         subjectAltName: [
           X509String(
-            'web+cardano://addr/${_stakeAddress.toBech32()}',
+            RegistrationCertificate.stakeAddressUri(_stakeAddress),
             tag: X509String.uriTag,
           ),
         ],

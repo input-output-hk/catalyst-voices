@@ -1,7 +1,7 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/generated/api/cat_reviews.enums.swagger.dart';
 
-extension AccountStatusDto on CatalystIDStatus {
+extension CatalystIDStatusExt on CatalystIDStatus {
   AccountStatus toModel() {
     switch (this) {
       // TODO(dtscalac): map it

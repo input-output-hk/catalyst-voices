@@ -1,4 +1,3 @@
-import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/generated/api/cat_gateway.swagger.dart';
 import 'package:catalyst_voices_repositories/generated/api/cat_reviews.models.swagger.dart';
@@ -6,6 +5,7 @@ import 'package:catalyst_voices_repositories/src/api/api_services.dart';
 import 'package:catalyst_voices_repositories/src/auth/auth_token_provider.dart';
 import 'package:catalyst_voices_repositories/src/common/response_mapper.dart';
 import 'package:catalyst_voices_repositories/src/dto/user/account_status_dto.dart';
+import 'package:catalyst_voices_repositories/src/dto/user/rbac_registration_chain_dto.dart';
 import 'package:catalyst_voices_repositories/src/dto/user/user_dto.dart';
 import 'package:catalyst_voices_repositories/src/user/source/user_storage.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
@@ -94,10 +94,8 @@ final class UserRepositoryImpl implements UserRepository {
     return RecoveredAccount(
       username: publicId?.username as String?,
       email: publicId?.email as String?,
-      roles: rbacRegistration.roles
-          as Set<AccountRole>, // TODO(dtscalac): extract roles
-      stakeAddress: rbacRegistration.roles
-          as ShelleyAddress, // TODO(dtscalac): extract stake address
+      roles: rbacRegistration.accountRoles,
+      stakeAddress: rbacRegistration.stakeAddress,
     );
   }
 

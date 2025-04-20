@@ -9,35 +9,40 @@ void main() {
     final privateKey = _FakeBip32Ed25519XPrivateKey(signature: signature);
     final publicKey = _FakeBip32Ed25519XPublicKey();
 
+    setUpAll(() {
+      Bip32Ed25519XPublicKeyFactory.instance =
+          _FakeBip32Ed25519XPublicKeyFactory();
+    });
+
+    /* cSpell:disable */
+    const issuer = X509DistinguishedName(
+      countryName: 'US',
+      stateOrProvinceName: 'California',
+      localityName: 'San Francisco',
+      organizationName: 'MyCompany',
+      organizationalUnitName: 'MyDepartment',
+      commonName: 'mydomain.com',
+    );
+
+    final tbs = X509TBSCertificate(
+      serialNumber: 1,
+      subjectPublicKey: publicKey,
+      issuer: issuer,
+      validityNotBefore: DateTime.now().toUtc(),
+      validityNotAfter: X509TBSCertificate.foreverValid,
+      subject: issuer,
+      extensions: const X509CertificateExtensions(
+        subjectAltName: [
+          X509String('mydomain.com', tag: X509String.domainNameTag),
+          X509String('www.mydomain.com', tag: X509String.domainNameTag),
+          X509String('example.com', tag: X509String.domainNameTag),
+          X509String('www.example.com', tag: X509String.domainNameTag),
+        ],
+      ),
+    );
+    /* cSpell:enable */
+
     test('generateSelfSigned X509 certificate', () async {
-      /* cSpell:disable */
-      const issuer = X509DistinguishedName(
-        countryName: 'US',
-        stateOrProvinceName: 'California',
-        localityName: 'San Francisco',
-        organizationName: 'MyCompany',
-        organizationalUnitName: 'MyDepartment',
-        commonName: 'mydomain.com',
-      );
-
-      final tbs = X509TBSCertificate(
-        serialNumber: 1,
-        subjectPublicKey: publicKey,
-        issuer: issuer,
-        validityNotBefore: DateTime.now().toUtc(),
-        validityNotAfter: X509TBSCertificate.foreverValid,
-        subject: issuer,
-        extensions: const X509CertificateExtensions(
-          subjectAltName: [
-            X509String('mydomain.com', tag: X509String.domainNameTag),
-            X509String('www.mydomain.com', tag: X509String.domainNameTag),
-            X509String('example.com', tag: X509String.domainNameTag),
-            X509String('www.example.com', tag: X509String.domainNameTag),
-          ],
-        ),
-      );
-      /* cSpell:enable */
-
       final certificate = await X509Certificate.generateSelfSigned(
         tbsCertificate: tbs,
         privateKey: privateKey,
@@ -48,6 +53,17 @@ void main() {
 
       expect(certificate.toPem(), isNotEmpty);
       expect(certificate.toDer().bytes, isNotEmpty);
+    });
+
+    test('generateSelfSigned and re-encode', () async {
+      final certificate = await X509Certificate.generateSelfSigned(
+        tbsCertificate: tbs,
+        privateKey: privateKey,
+      );
+
+      final derCertificate = certificate.toDer();
+      final decodedCertificate = X509Certificate.fromDer(derCertificate);
+      expect(decodedCertificate, equals(decodedCertificate));
     });
   });
 }
@@ -68,6 +84,14 @@ class _FakeBip32Ed25519XPublicKey extends Fake
     implements Bip32Ed25519XPublicKey {
   @override
   List<int> get bytes => [1, 2, 3];
+}
+
+class _FakeBip32Ed25519XPublicKeyFactory extends Fake
+    implements Bip32Ed25519XPublicKeyFactory {
+  @override
+  Bip32Ed25519XPublicKey fromBytes(List<int> bytes) {
+    return _FakeBip32Ed25519XPublicKey();
+  }
 }
 
 class _FakeBip32Ed25519XSignature extends Fake
