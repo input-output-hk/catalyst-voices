@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
@@ -15,6 +16,12 @@ abstract interface class UserService implements ActiveAware {
   Stream<User> get watchUser;
 
   Future<void> dispose();
+
+  /// If updating a registration the new registration must be
+  /// linked via the transaction hash to the last one.
+  ///
+  /// The method returns the last known transaction ID.
+  Future<TransactionHash> getPreviousRegistrationTransactionId();
 
   Future<User> getUser();
 
@@ -74,6 +81,18 @@ final class UserServiceImpl implements UserService {
 
   @override
   Future<void> dispose() async {}
+
+  @override
+  Future<TransactionHash> getPreviousRegistrationTransactionId() {
+    final activeAccount = user.activeAccount;
+    if (activeAccount == null) {
+      throw ArgumentError.notNull('activeAccount');
+    }
+
+    return _userRepository.getPreviousRegistrationTransactionId(
+      catalystId: activeAccount.catalystId,
+    );
+  }
 
   @override
   Future<User> getUser() => _userRepository.getUser();

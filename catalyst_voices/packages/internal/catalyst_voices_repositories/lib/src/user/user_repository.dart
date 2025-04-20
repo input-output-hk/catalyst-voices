@@ -1,3 +1,4 @@
+import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/generated/api/cat_gateway.swagger.dart';
 import 'package:catalyst_voices_repositories/generated/api/cat_reviews.models.swagger.dart';
@@ -5,7 +6,6 @@ import 'package:catalyst_voices_repositories/src/api/api_services.dart';
 import 'package:catalyst_voices_repositories/src/auth/auth_token_provider.dart';
 import 'package:catalyst_voices_repositories/src/common/response_mapper.dart';
 import 'package:catalyst_voices_repositories/src/dto/user/account_status_dto.dart';
-import 'package:catalyst_voices_repositories/src/dto/user/rbac_registration_chain_dto.dart';
 import 'package:catalyst_voices_repositories/src/dto/user/user_dto.dart';
 import 'package:catalyst_voices_repositories/src/user/source/user_storage.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
@@ -24,6 +24,10 @@ abstract interface class UserRepository {
   }
 
   Future<AccountStatus> getAccountStatus();
+
+  Future<TransactionHash> getPreviousRegistrationTransactionId({
+    required CatalystId catalystId,
+  });
 
   Future<User> getUser();
 
@@ -60,6 +64,30 @@ final class UserRepositoryImpl implements UserRepository {
   }
 
   @override
+  Future<TransactionHash> getPreviousRegistrationTransactionId({
+    required CatalystId catalystId,
+  }) async {
+    final lookup = catalystId
+        .copyWith(username: const Optional.empty())
+        .toUri()
+        .toStringWithoutScheme();
+
+    final response =
+        await _apiServices.gateway.apiV1RbacRegistrationGet(lookup: lookup);
+    response.verifyIsSuccessful();
+
+    final rbacChain = response.bodyOrThrow;
+    final transactionId =
+        rbacChain.lastVolatileTxn ?? rbacChain.lastPersistentTxn;
+
+    if (transactionId == null) {
+      throw ArgumentError.notNull('transactionId');
+    }
+
+    return TransactionHash.fromHex(transactionId);
+  }
+
+  @override
   Future<User> getUser() async {
     final dto = await _storage.readUser();
     final user = await dto?.toModel(keychainProvider: _keychainProvider);
@@ -87,15 +115,24 @@ final class UserRepositoryImpl implements UserRepository {
     required String rbacToken,
   }) async {
     final tokenProvider = _HardcodedAuthTokenProvider(token: rbacToken);
-    final rbacRegistration =
-        await _recoverRbacRegistration(catalystId, tokenProvider);
+    // TODO(dtscalac): enable when endpoint works correctly
+    // final rbacRegistration =
+    //     await _recoverRbacRegistration(catalystId, tokenProvider);
     final publicId = await _recoverCatalystIDPublic(tokenProvider);
 
     return RecoveredAccount(
       username: publicId?.username as String?,
       email: publicId?.email as String?,
-      roles: rbacRegistration.accountRoles,
-      stakeAddress: rbacRegistration.stakeAddress,
+      // TODO(dtscalac): enable when endpoint works correctly
+      // roles: rbacRegistration.accountRoles,
+      // stakeAddress: rbacRegistration.stakeAddress,
+      roles: const {AccountRole.voter, AccountRole.proposer},
+      stakeAddress: ShelleyAddress.fromBech32(
+        /* cSpell:disable */
+        'addr_test1vzpwq95z3xyum8vqndgdd'
+        '9mdnmafh3djcxnc6jemlgdmswcve6tkw',
+        /* cSpell:enable */
+      ),
     );
   }
 
@@ -125,6 +162,8 @@ final class UserRepositoryImpl implements UserRepository {
     return response.bodyOrThrow;
   }
 
+  // TODO(dtscalac): enable when endpoint works correctly
+  // ignore: unused_element
   Future<RbacRegistrationChain> _recoverRbacRegistration(
     CatalystId catalystId,
     AuthTokenProvider tokenProvider,

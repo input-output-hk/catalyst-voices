@@ -2,6 +2,7 @@ import 'package:catalyst_cardano/catalyst_cardano.dart';
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
+import 'package:catalyst_voices_services/src/registration/registration_transaction_role.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:uuid_plus/uuid_plus.dart';
 
@@ -128,14 +129,12 @@ final class RegistrationServiceImpl implements RegistrationService {
   Future<WalletInfo> getCardanoWalletInfo(CardanoWallet wallet) async {
     final enabledWallet = await wallet.enable();
     final balance = await enabledWallet.getBalance();
-    final address = await enabledWallet.getChangeAddress();
-    final networkId = await enabledWallet.getNetworkId();
+    final addresses = await enabledWallet.getRewardAddresses();
 
     return WalletInfo(
       metadata: WalletMetadata.fromCardanoWallet(wallet),
       balance: balance.coin,
-      address: address,
-      networkId: networkId,
+      address: addresses.first,
     );
   }
 
@@ -178,6 +177,10 @@ final class RegistrationServiceImpl implements RegistrationService {
         ),
       );
 
+      final previousTransactionId = await _fetchPreviousTransactionId(
+        isFirstRegistration: roles.isFirstRegistration,
+      );
+
       final registrationBuilder = RegistrationTransactionBuilder(
         transactionConfig: config,
         keyDerivationService: _keyDerivationService,
@@ -187,6 +190,7 @@ final class RegistrationServiceImpl implements RegistrationService {
         changeAddress: changeAddress,
         rewardAddresses: rewardAddresses,
         utxos: utxos,
+        previousTransactionId: previousTransactionId,
       );
 
       return await registrationBuilder.build();
@@ -356,14 +360,23 @@ final class RegistrationServiceImpl implements RegistrationService {
     _logger.info('Registration transaction submitted [$txHash]');
 
     final balance = await enabledWallet.getBalance();
-    final address = await enabledWallet.getChangeAddress();
-    final networkId = await enabledWallet.getNetworkId();
+    final addresses = await enabledWallet.getRewardAddresses();
 
     return WalletInfo(
       metadata: WalletMetadata.fromCardanoWallet(wallet),
       balance: balance.coin,
-      address: address,
-      networkId: networkId,
+      address: addresses.first,
     );
+  }
+
+  Future<TransactionHash?> _fetchPreviousTransactionId({
+    required bool isFirstRegistration,
+  }) async {
+    if (isFirstRegistration) {
+      // for first registration there is no previous transaction id
+      return null;
+    }
+
+    return _userService.getPreviousRegistrationTransactionId();
   }
 }

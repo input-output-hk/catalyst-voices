@@ -1,3 +1,4 @@
+import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_services/src/catalyst_voices_services.dart';
@@ -309,11 +310,62 @@ void main() {
         await service.dispose();
       });
     });
+
+    group('getPreviousTransactionId', () {
+      test('when no active account', () async {
+        // Given
+        const emptyUser = User.empty();
+
+        // When
+        userObserver.user = emptyUser;
+
+        // Then
+
+        expect(
+          () async => service.getPreviousRegistrationTransactionId(),
+          throwsA(isArgumentError),
+        );
+      });
+
+      test('when has active account', () async {
+        // Given
+        final keychainId = const Uuid().v4();
+
+        // When
+        final keychain = await keychainProvider.create(keychainId);
+        final account = Account.dummy(
+          catalystId: DummyCatalystIdFactory.create(),
+          keychain: keychain,
+          isActive: true,
+        );
+        final user = User.optional(accounts: [account]);
+
+        // When
+        userObserver.user = user;
+
+        // Then
+        expect(
+          await service.getPreviousRegistrationTransactionId(),
+          equals(_transactionHash),
+        );
+      });
+    });
   });
 }
 
+final _transactionHash = TransactionHash.fromHex(
+  '4d3f576f26db29139981a69443c2325daa812cc353a31b5a4db794a5bcbb06c2',
+);
+
 class _FakeUserRepository extends Fake implements UserRepository {
   User? _user;
+
+  @override
+  Future<TransactionHash> getPreviousRegistrationTransactionId({
+    required CatalystId catalystId,
+  }) async {
+    return _transactionHash;
+  }
 
   @override
   Future<User> getUser() async => _user ?? const User.empty();

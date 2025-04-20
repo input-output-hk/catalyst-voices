@@ -63,7 +63,7 @@ void main() {
 
       expect(
         () => registrationChain.accountRoles,
-        throwsA(isA<ArgumentError>()),
+        throwsA(isArgumentError),
       );
     });
 

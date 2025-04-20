@@ -47,6 +47,10 @@ final class RegistrationTransactionBuilder {
   /// The UTXOs that will be used as inputs for the transaction.
   final Set<TransactionUnspentOutput> utxos;
 
+  /// If updating a registration the new registration must be
+  /// linked via the transaction hash to the last one.
+  final TransactionHash? previousTransactionId;
+
   RegistrationTransactionBuilder({
     required this.transactionConfig,
     required this.keyDerivationService,
@@ -56,9 +60,15 @@ final class RegistrationTransactionBuilder {
     required this.changeAddress,
     required this.rewardAddresses,
     required this.utxos,
-  }) : assert(
+    required this.previousTransactionId,
+  })  : assert(
           masterKey.algorithm == CatalystSignatureAlgorithm.ed25519,
           'RegistrationTransaction requires Ed25519 signatures',
+        ),
+        assert(
+          roles.isFirstRegistration || previousTransactionId != null,
+          "When it's not a first registration then "
+          'previousTransactionId must be provided',
         );
 
   ShelleyAddress get _stakeAddress => rewardAddresses.first;
@@ -82,14 +92,17 @@ final class RegistrationTransactionBuilder {
   }
 
   Future<RegistrationMetadata> _buildMetadataEnvelope() async {
-    final isFirsRegistration = roles.any((element) => element.setVoter);
+    if (roles.isFirstRegistration && previousTransactionId == null) {
+      throw ArgumentError.notNull('previousTransactionId');
+    }
+
     final rootKeyPair = keyDerivationService.deriveAccountRoleKeyPair(
       masterKey: masterKey,
       role: AccountRole.root,
     );
 
     return rootKeyPair.use((rootKeyPair) async {
-      final derCert = isFirsRegistration
+      final derCert = roles.isFirstRegistration
           ? await _generateX509Certificate(keyPair: rootKeyPair)
           : null;
       final publicKeys = await _generatePublicKeysForAllRoles(rootKeyPair);
@@ -97,9 +110,8 @@ final class RegistrationTransactionBuilder {
       final x509Envelope = X509MetadataEnvelope.unsigned(
         purpose: UuidV4.fromString(_catalystUserRoleRegistrationPurpose),
         txInputsHash: TransactionInputsHash.fromTransactionInputs(utxos),
-        // TODO(dtscalac): when updating the registration need
-        // to send the previous transaction id
-        previousTransactionId: null,
+        previousTransactionId:
+            roles.isFirstRegistration ? null : previousTransactionId!,
         chunkedData: RegistrationData(
           derCerts: [
             if (derCert != null) RbacField.set(derCert),
@@ -238,26 +250,10 @@ final class RegistrationTransactionBuilder {
   Future<X509DerCertificate> _generateX509Certificate({
     required CatalystKeyPair keyPair,
   }) async {
-    // TODO(dtscalac): once serial number generation is defined come up with
-    // a better solution than assigning a random number
-    // as certificate serial number
-    const maxInt = 4294967296;
-
-    // TODO(dtscalac): define the issuer, since the cert is self signed this
-    // should represent the user that is about to register
-
-    /* cSpell:disable */
-    const issuer = X509DistinguishedName(
-      countryName: '',
-      stateOrProvinceName: '',
-      localityName: '',
-      organizationName: '',
-      organizationalUnitName: '',
-      commonName: '',
-    );
+    const issuer = X509DistinguishedName();
 
     final tbs = X509TBSCertificate(
-      serialNumber: Random().nextInt(maxInt),
+      serialNumber: _randomSerialNumber(),
       subjectPublicKey: Bip32Ed25519XPublicKeyFactory.instance.fromBytes(
         keyPair.publicKey.bytes,
       ),
@@ -274,7 +270,6 @@ final class RegistrationTransactionBuilder {
         ],
       ),
     );
-    /* cSpell:enable */
 
     final privateKey = Bip32Ed25519XPrivateKeyFactory.instance.fromBytes(
       keyPair.privateKey.bytes,
@@ -303,6 +298,11 @@ final class RegistrationTransactionBuilder {
           orElse: () => RegistrationTransactionRole.undefined(role),
         )
         .action;
+  }
+
+  int _randomSerialNumber() {
+    const maxInt = 4294967296;
+    return Random().nextInt(maxInt);
   }
 }
 

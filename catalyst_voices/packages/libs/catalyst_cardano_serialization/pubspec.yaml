@@ -4,6 +4,8 @@ repository: https://github.com/input-output-hk/catalyst-voices/tree/main/catalys
 issue_tracker: https://github.com/input-output-hk/catalyst-voices/issues
 topics: [blockchain, cardano, cryptocurrency, wallet]
 version: 1.0.0
+# TODO(dtscalac): when ans1lib is reverted to official version allow publishing
+publish_to: none
 
 environment:
   sdk: ">=3.5.0 <4.0.0"
