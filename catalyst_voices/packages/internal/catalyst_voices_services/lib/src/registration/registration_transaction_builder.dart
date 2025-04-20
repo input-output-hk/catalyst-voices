@@ -92,7 +92,7 @@ final class RegistrationTransactionBuilder {
   }
 
   Future<RegistrationMetadata> _buildMetadataEnvelope() async {
-    if (roles.isFirstRegistration && previousTransactionId == null) {
+    if (!roles.isFirstRegistration && previousTransactionId == null) {
       throw ArgumentError.notNull('previousTransactionId');
     }
 
