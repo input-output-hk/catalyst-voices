@@ -67,10 +67,7 @@ final class UserRepositoryImpl implements UserRepository {
   Future<TransactionHash> getPreviousRegistrationTransactionId({
     required CatalystId catalystId,
   }) async {
-    final lookup = catalystId
-        .copyWith(username: const Optional.empty())
-        .toUri()
-        .toStringWithoutScheme();
+    final lookup = catalystId.toSignificant().toUri().toStringWithoutScheme();
 
     final response =
         await _apiServices.gateway.apiV1RbacRegistrationGet(lookup: lookup);

@@ -90,10 +90,7 @@ command:
     dependencies:
       auto_size_text: ^3.0.0
       async: ^2.11.0
-      # TODO(dtscalac): revert to official version when https://github.com/wstrange/asn1lib/pull/75 is merged and released
-      asn1lib:
-        git:
-          url: https://github.com/dtscalac/asn1lib
+      asn1lib: ^1.6.3
       bip39: ^1.0.6
       bloc_concurrency: ^0.2.2
       chopper: ^8.0.3

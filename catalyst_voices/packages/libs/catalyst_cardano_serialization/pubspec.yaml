@@ -4,16 +4,13 @@ repository: https://github.com/input-output-hk/catalyst-voices/tree/main/catalys
 issue_tracker: https://github.com/input-output-hk/catalyst-voices/issues
 topics: [blockchain, cardano, cryptocurrency, wallet]
 version: 1.0.0
-# TODO(dtscalac): when ans1lib is reverted to official version allow publishing
-publish_to: none
 
 environment:
   sdk: ">=3.5.0 <4.0.0"
   flutter: ">=3.29.0"
 
 dependencies:
-  asn1lib:
-    git: https://github.com/dtscalac/asn1lib
+  asn1lib: ^1.6.3
   bech32: ^0.2.2
   bip32_ed25519: ^0.6.0
   catalyst_compression: ^1.0.0
