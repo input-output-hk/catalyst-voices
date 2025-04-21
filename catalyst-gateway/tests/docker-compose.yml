@@ -60,16 +60,18 @@ services:
       event-db:
         condition: service_healthy
 
-# it is a helper service to wait until the event-db will be ready
-# mainly its a trick for Earthly how to wait until service will be fully functional
+# A helper service that waits for the event-db to be fully initialized. 
+# This is a workaround for Earthly to handle service dependencies properly 
+# and ensure dependent services only start after the event-db is healthy and ready.
   event-db-is-running:
     image: alpine:3.20.3
     depends_on:
       event-db:
         condition: service_healthy
 
-# it is a helper service to wait until the cat-gateway-with-scylla will be ready
-# mainly its a trick for Earthly how to wait until service will be fully functional
+# A helper service that waits for the cat-gateway and Scylla to be fully initialized. 
+# This is a workaround for Earthly to handle service dependencies properly 
+# and ensure dependent services only start after the cat-gateway and Scylla are healthy and ready.
   cat-gateway-with-scylla-is-running:
     image: alpine:3.20.3
     depends_on:
