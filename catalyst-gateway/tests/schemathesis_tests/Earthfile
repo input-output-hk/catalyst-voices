@@ -58,8 +58,7 @@ test-ci-schemathesis:
                                     --hypothesis_max_examples=$hypothesis_max_examples) \
         --load event-db:latest=(../../event-db+build) \
         --load cat-gateway-with-scylla:latest=(./../+package-cat-gateway-with-scylla) \
-        --service cat-gateway-with-scylla \
-        --allow-privileged
+        --service cat-gateway-with-scylla-is-running \
         RUN sleep 180; docker run --net=host --name=st schemathesis:latest || \
             (echo fail > fail; docker logs -n all cat-gateway-with-scylla); \
             docker cp st:/results/junit-report.xml junit-report.xml && \

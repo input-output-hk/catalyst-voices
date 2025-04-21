@@ -36,7 +36,7 @@ services:
     image: cat-gateway-with-scylla:latest
     container_name: cat-gateway-with-scylla
     healthcheck:
-      test: "curl -s -i http://100.76.226.39:3030/api/v1/health/live | head -n 1 | grep 200"
+      test: "curl -s -i http://100.76.226.39:3030/api/v1/health/ready | head -n 1 | grep 200"
       interval: 10s
       timeout: 5s
       retries: 10
@@ -66,4 +66,12 @@ services:
     image: alpine:3.20.3
     depends_on:
       event-db:
+        condition: service_healthy
+
+# it is a helper service to wait until the cat-gateway-with-scylla will be ready
+# mainly its a trick for Earthly how to wait until service will be fully functional
+  cat-gateway-with-scylla-is-running:
+    image: alpine:3.20.3
+    depends_on:
+      cat-gateway-with-scylla:
         condition: service_healthy
