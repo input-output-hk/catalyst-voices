@@ -5,6 +5,10 @@
     "description": "Schema for the F14 Catalyst Proposal Submission Form",
     "maintainers": [{ "name": "Catalyst Team", "url": "https://projectcatalyst.io/" }],
     "x-changelog": {
+        "2025-04-21": [
+            "Updated schema to make optional text fields mandatory.",
+            "Assigned title to some anonymous properties."
+        ],
         "2025-01-14": [
             "Updated schema to include new fields for proposal details.",
             "Fixed validation issues with the URL pattern.",
@@ -71,7 +75,6 @@
             "contentMediaType": "text/plain",
             "pattern": "^[\\S\\s]*$",
             "x-note": "Enter multiple lines of plain text. You can use line breaks but no special formatting."
-
         },
         "multiLineTextEntryMarkdown": {
             "$comment": "UI - Multiline text entry with Markdown content.",
@@ -520,7 +523,6 @@
             "x-icon": "top-bar",
             "$ref": "#/definitions/segment",
             "description": "Determine the eligibility of the proposal for this category",
-
             "properties": {
                 "category_details": {
                     "$ref": "#/definitions/section",
@@ -705,7 +707,9 @@
                     "properties": {
                         "grouped_tag": {
                             "$ref": "#/definitions/singleGroupedTagSelector",
-                            "oneOf": [{
+                            "title": "Theme Selection",
+                            "oneOf": [
+                                {
                                     "properties": {
                                         "group": {
                                             "$ref": "#/definitions/tagGroup",
@@ -970,7 +974,8 @@
                             "description": "Please describe your proposed solution",
                             "x-placeholder": "Describe your proposed solution and how it addresses the problem"
                         }
-                    }
+                    },
+                    "required": ["solution"]
                 },
                 "impact": {
                     "$ref": "#/definitions/section",
@@ -984,7 +989,8 @@
                             "minLength": 1,
                             "maxLength": 10240
                         }
-                    }
+                    },
+                    "required": ["impact"]
                 },
                 "feasibility": {
                     "$ref": "#/definitions/section",
@@ -998,10 +1004,12 @@
                             "minLength": 1,
                             "maxLength": 10240
                         }
-                    }
+                    },
+                    "required": ["feasibility"]
                 }
             },
-            "x-order": ["solution", "impact", "feasibility"]
+            "x-order": ["solution", "impact", "feasibility"],
+            "required": ["solution", "impact", "feasibility"]
         },
         "milestones": {
             "$ref": "#/definitions/segment",
@@ -1104,7 +1112,8 @@
                             "minLength": 1,
                             "maxLength": 10240
                         }
-                    }
+                    },
+                    "required": ["who"]
                 },
                 "budget": {
                     "$ref": "#/definitions/section",
@@ -1119,7 +1128,8 @@
                             "minLength": 1,
                             "maxLength": 10240
                         }
-                    }
+                    },
+                    "required": ["costs"]
                 },
                 "value": {
                     "$ref": "#/definitions/section",
@@ -1134,10 +1144,12 @@
                             "minLength": 1,
                             "maxLength": 10240
                         }
-                    }
+                    },
+                    "required": ["note"]
                 }
             },
-            "x-order": ["team", "budget", "value"]
+            "x-order": ["team", "budget", "value"],
+            "required": ["team", "budget", "value"]
         },
         "agreements": {
             "$ref": "#/definitions/segment",
