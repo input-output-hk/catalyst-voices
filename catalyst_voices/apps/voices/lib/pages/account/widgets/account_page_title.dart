@@ -1,4 +1,6 @@
+import 'package:catalyst_voices/common/constants/constants.dart';
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
+import 'package:catalyst_voices/widgets/buttons/learn_more_button.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
@@ -21,11 +23,17 @@ class AccountPageTitle extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 4),
-        Text(
-          key: const Key('ProfileAndKeychainText'),
-          context.l10n.profileAndKeychain,
-          style: context.textTheme.displaySmall
-              ?.copyWith(color: context.colorScheme.primary),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              key: const Key('ProfileAndKeychainText'),
+              context.l10n.profileAndKeychain,
+              style: context.textTheme.displaySmall
+                  ?.copyWith(color: context.colorScheme.primary),
+            ),
+            const LearnMoreButton(learnMoreUrl: VoicesConstants.myAccountUrl),
+          ],
         ),
       ],
     );
