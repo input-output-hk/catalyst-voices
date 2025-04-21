@@ -254,7 +254,7 @@ final class ProposalBuilderBloc
     if (guidance != null) {
       yield ProposalGuidanceItem(
         segmentTitle: segment.schema.title,
-        sectionTitle: section.schema.title,
+        sectionTitle: property.schema.title,
         description: guidance,
       );
     }
