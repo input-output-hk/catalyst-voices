@@ -13,6 +13,7 @@ class SpaceSidePanel extends StatefulWidget {
   final bool isLeft;
   final VoidCallback? onCollapseTap;
   final TabController? tabController;
+  final ScrollController? scrollController;
   final List<SpaceSidePanelTab> tabs;
   final EdgeInsetsGeometry margin;
 
@@ -21,6 +22,7 @@ class SpaceSidePanel extends StatefulWidget {
     required this.isLeft,
     this.onCollapseTap,
     this.tabController,
+    this.scrollController,
     required this.tabs,
     this.margin = const EdgeInsets.only(
       top: 12,
@@ -153,6 +155,7 @@ class _SpaceSidePanelState extends State<SpaceSidePanel>
                     const SizedBox(height: 12),
                     Flexible(
                       child: SingleChildScrollView(
+                        controller: widget.scrollController,
                         padding: const EdgeInsets.only(bottom: 12),
                         child: TabBarStackView(
                           controller: widget.tabController,
