@@ -244,6 +244,12 @@ final class ProposalBuilderBloc
     DocumentSection section,
     DocumentProperty property,
   ) sync* {
+    if (property.schema.isSubsection && section.id != property.nodeId) {
+      // Since the property is a standalone subsection we cannot
+      // lookup guidance items for it in a context of given section.
+      return;
+    }
+
     final guidance = property.schema.guidance;
     if (guidance != null) {
       yield ProposalGuidanceItem(
