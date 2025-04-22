@@ -8,5 +8,5 @@ export 'radio_button_selection_widget.dart';
 export 'simple_text_entry_widget.dart';
 export 'single_dropdown_selection_widget.dart';
 export 'single_grouped_tag_selector_widget.dart';
-export 'single_line_https_url_widget.dart.dart';
+export 'single_line_https_url_widget.dart';
 export 'yes_no_choice_widget.dart';

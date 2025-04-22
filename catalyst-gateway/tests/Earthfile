@@ -22,7 +22,8 @@ INSTALL_SCYLLA:
         wget -O /etc/apt/sources.list.d/scylla.list http://downloads.scylladb.com/deb/debian/scylla-$VERSION.list && \
         apt-get update && \
         apt-get install -y --no-install-recommends \
-        scylla
+            scylla \
+            curl
     COPY ./scylla.yaml /etc/scylla/scylla.yaml
     COPY ./scylla_entry.sh .
 
