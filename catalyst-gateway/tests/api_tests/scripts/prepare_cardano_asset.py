@@ -2,16 +2,16 @@
 This script is a simple web scraper tool to prepare testing data for the `cardano/asset` endpoint.
 
 Prerequisites before running this script:
-- Make sure that you have `BeautifulSoup` installed, else install with `pip install beautifulsoup4`.
+- Make sure that you have `BeautifulSoup`, `cloudscraper`, and `certifi` installed.
 - Make sure that you have a snapshot file available for this script, can get one from the `catalyst-storage` repo.
 - Fill your own client params to `CF_CLEARANCE` and `USER_AGENT`. Other variables can be configured to fit the need.
 """
 
 import json
 import os
-import shlex
-import subprocess
 import time
+import cloudscraper
+import certifi
 from decimal import Decimal
 
 from utils import address
@@ -33,41 +33,49 @@ OUT_FILE = "./cardano-asset-80000000-preprod.json"
 # the snapshot file to read as a reference of scraping
 IN_FILE = "./snapshot-80000000-preprod.json"
 
+
 # ----- functions -----
 def request(url) -> str:
-    curl_command = f"curl '{url}' \
-    -b 'cf_clearance={CF_CLEARANCE}' \
-    -H 'user-agent: {USER_AGENT}'"
+    scraper = cloudscraper.create_scraper()
 
-    args = shlex.split(curl_command)
-    result = subprocess.run(args, capture_output=True, text=True)
+    response = scraper.get(
+        url,
+        headers={"User-Agent": USER_AGENT},
+        cookies={"cf_clearance": CF_CLEARANCE},
+        verify=certifi.where(),
+    )
 
-    if result.returncode != 0:
-        raise Exception(result.stderr)
+    if response.status_code != 200:
+        raise Exception(response.text)
 
-    return result.stdout
+    return response.text
+
 
 def get_stake_asset_page(stake_addr: str) -> str:
     return request(f"https://preprod.cexplorer.io/stake/{stake_addr}/asset")
 
+
 def get_stake_data_page(stake_addr: str) -> str:
     return request(f"https://preprod.cexplorer.io/stake/{stake_addr}")
+
 
 def get_index_page() -> str:
     return request("https://preprod.cexplorer.io/")
 
+
 def get_asset_page(asset: str) -> str:
     return request(f"https://preprod.cexplorer.io/asset/{asset}")
 
+
 def epoch_2_slot(epoch: int) -> int:
-  shelley_start_epoch = 208
-  shelley_start_slot = 88_416_000
-  slots_per_epoch = 432_000
+    shelley_start_epoch = 208
+    shelley_start_slot = 88_416_000
+    slots_per_epoch = 432_000
 
-  if epoch < shelley_start_epoch:
-    raise Exception("Epochs before 208 (Byron era) have a different slot timing")
+    if epoch < shelley_start_epoch:
+        raise Exception("Epochs before 208 (Byron era) have a different slot timing")
 
-  return shelley_start_slot + (epoch - shelley_start_epoch) * slots_per_epoch
+    return shelley_start_slot + (epoch - shelley_start_epoch) * slots_per_epoch
 
 # ----- process -----
 
@@ -79,7 +87,7 @@ with open(snapshot_path, "r", encoding="utf-8") as f:
 # process each record
 formatted_records = {}
 processing_records = snapshot_data[:]
-for (i, record) in enumerate(processing_records):
+for i, record in enumerate(processing_records):
     stake_addr = address.stake_public_key_to_address(
         key=record["stake_public_key"][2:],
         is_stake=True,
@@ -112,7 +120,7 @@ for (i, record) in enumerate(processing_records):
             # extracting - index
             index_html = get_index_page()
             index_dom = BeautifulSoup(index_html, "html.parser")
-            
+
             epoch_number_txt = index_dom.select_one("#_epoch_no")
             epoch_number = int(epoch_number_txt.attrs["data-value"])
             slot_number = epoch_2_slot(epoch_number)
@@ -124,7 +132,7 @@ for (i, record) in enumerate(processing_records):
             amount_rows = stake_asset_dom.select("div.table-responsive table > thead > tr > td:nth-child(6) > span")
 
             native_tokens = []
-            for (j, (item_row, amount_row)) in enumerate(zip(item_rows, amount_rows)):
+            for j, (item_row, amount_row) in enumerate(zip(item_rows, amount_rows)):
                 asset_name = "\n".join(item_row.get_text().split("\n")[2:-2]).strip()
                 asset_url = item_row.attrs["href"]
                 amount = int(Decimal(amount_row.attrs["title"].replace(",", "")))
@@ -150,13 +158,13 @@ for (i, record) in enumerate(processing_records):
             formatted_records[stake_addr] = {
                 "ada_amount": ada_amount,
                 "native_tokens": native_tokens,
-                "slot_number": slot_number
+                "slot_number": slot_number,
             }
 
             break
         except Exception as e:
             print(f"ERROR: {e}")
-            
+
             if attempt_count >= MAX_ATTEMPT:
                 print("    Skipped MAX ATTEMPT REACHED")
                 break

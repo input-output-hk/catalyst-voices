@@ -23,6 +23,8 @@ python-bitcoinlib = "^0.12.2"
 pytest-cov = "^5.0.0"
 pycardano = "^0.13.1"
 beautifulsoup4 = "^4.13.4"
+cloudscraper = "^1.2.71"
+certifi = "^2025.1.31"
 
 [build-system]
 requires = ["poetry-core"]
