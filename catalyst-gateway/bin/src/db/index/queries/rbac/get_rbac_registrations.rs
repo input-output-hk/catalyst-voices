@@ -33,7 +33,6 @@ pub(crate) struct QueryParams {
 }
 
 /// Get registrations by Catalyst ID query.
-#[allow(dead_code)]
 #[derive(DeserializeRow, Clone)]
 pub(crate) struct Query {
     /// Registration transaction id.
@@ -45,6 +44,7 @@ pub(crate) struct Query {
     /// A previous  transaction id.
     pub prv_txn_id: Option<DbTransactionId>,
     /// A registration purpose.
+    #[allow(dead_code)]
     pub purpose: DbUuidV4,
 }
 
