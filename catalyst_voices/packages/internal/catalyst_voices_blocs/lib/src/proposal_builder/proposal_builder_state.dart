@@ -129,6 +129,18 @@ final class ProposalBuilderState extends Equatable {
   bool get showSegments =>
       !isLoading && allSegments.isNotEmpty && error == null;
 
+  ProposalBuilderMenuItemData buildMenuItem({
+    required ProposalMenuItemAction action,
+  }) {
+    final latestVersion = metadata.latestVersion?.number;
+
+    return ProposalBuilderMenuItemData(
+      action: action,
+      proposalTitle: proposalTitle,
+      currentIteration: latestVersion ?? DocumentVersion.firstNumber,
+    );
+  }
+
   ProposalBuilderState copyWith({
     bool? isLoading,
     bool? isChanging,
