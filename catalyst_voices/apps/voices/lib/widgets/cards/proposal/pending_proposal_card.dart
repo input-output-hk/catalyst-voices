@@ -1,7 +1,7 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/common/formatters/date_formatter.dart';
 import 'package:catalyst_voices/routes/routing/proposal_builder_route.dart';
-import 'package:catalyst_voices/widgets/cards/proposal_card_widgets.dart';
+import 'package:catalyst_voices/widgets/cards/proposal/proposal_border.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/share_proposal_dialog.dart';
 import 'package:catalyst_voices/widgets/text/day_month_time_text.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
@@ -50,13 +50,6 @@ class _Author extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          ProfileAvatar(
-            key: const Key('AuthorAvatar'),
-            username: author,
-            backgroundColor: context.colors.primaryContainer,
-            foregroundColor: context.colors.textOnPrimaryWhite,
-          ),
-          const SizedBox(width: 8),
           Text(
             key: const Key('Author'),
             author,
@@ -149,96 +142,70 @@ class _FundsAndDuration extends StatelessWidget {
 
 class _PendingProposalCardState extends State<PendingProposalCard> {
   late final WidgetStatesController _statesController;
-  late _ProposalBorderColor _border;
-
-  bool isHovered = false;
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 454,
+    return ConstrainedBox(
+      constraints: const BoxConstraints(
+        minHeight: 454,
+        maxHeight: 454,
+        maxWidth: 326,
+      ),
       child: Material(
         key: const Key('ProposalCard'),
-        color: Colors.transparent,
+        color: context.colors.elevationsOnSurfaceNeutralLv1White,
+        borderRadius: BorderRadius.circular(12),
         child: InkWell(
           statesController: _statesController,
           onTap: widget.onTap,
-          child: ValueListenableBuilder(
-            valueListenable: _statesController,
-            builder: (context, value, child) => Container(
-              constraints: const BoxConstraints(maxWidth: 326),
-              decoration: BoxDecoration(
-                color: context.colors.elevationsOnSurfaceNeutralLv1White,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: _border.resolve(_statesController.value),
-                ),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _Topbar(
-                      proposalRef: widget.proposal.ref,
-                      showStatus: widget.showStatus,
-                      isFavorite: widget.isFavorite,
-                      onFavoriteChanged: widget.onFavoriteChanged,
-                    ),
-                    _Category(
-                      category: widget.proposal.category,
-                    ),
-                    const SizedBox(height: 4),
-                    Expanded(
-                      child: _Title(text: widget.proposal.title),
-                    ),
-                    _Author(author: widget.proposal.author),
-                    _FundsAndDuration(
-                      funds: widget.proposal.fundsRequested,
-                      duration: widget.proposal.duration,
-                    ),
-                    const SizedBox(height: 12),
-                    Expanded(
-                      child: _Description(text: widget.proposal.description),
-                    ),
-                    const SizedBox(height: 12),
-                    _ProposalInfo(
-                      proposalStage: widget.proposal.publishStage,
-                      version: widget.proposal.version,
-                      lastUpdate: widget.proposal.lastUpdateDate,
-                      commentsCount: widget.proposal.commentsCount,
-                      showLastUpdate: widget.showLastUpdate,
-                    ),
-                  ],
-                ),
+          canRequestFocus: true,
+          highlightColor: Colors.transparent,
+          borderRadius: BorderRadius.circular(12),
+          child: ProposalBorder(
+            publishStage: widget.proposal.publishStage,
+            statesController: _statesController,
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _Topbar(
+                    proposalRef: widget.proposal.ref,
+                    showStatus: widget.showStatus,
+                    isFavorite: widget.isFavorite,
+                    onFavoriteChanged: widget.onFavoriteChanged,
+                  ),
+                  _Category(
+                    category: widget.proposal.category,
+                  ),
+                  const SizedBox(height: 4),
+                  Expanded(
+                    child: _Title(text: widget.proposal.title),
+                  ),
+                  _Author(author: widget.proposal.author),
+                  _FundsAndDuration(
+                    funds: widget.proposal.fundsRequested,
+                    duration: widget.proposal.duration,
+                  ),
+                  const SizedBox(height: 12),
+                  Expanded(
+                    child: _Description(text: widget.proposal.description),
+                  ),
+                  const SizedBox(height: 12),
+                  _ProposalInfo(
+                    proposalStage: widget.proposal.publishStage,
+                    version: widget.proposal.version,
+                    lastUpdate: widget.proposal.lastUpdateDate,
+                    commentsCount: widget.proposal.commentsCount,
+                    showLastUpdate: widget.showLastUpdate,
+                  ),
+                ],
               ),
             ),
           ),
         ),
       ),
     );
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    _border = _ProposalBorderColor(
-      publishStage: widget.proposal.publishStage,
-      colorScheme: context.colorScheme,
-      colors: context.colors,
-    );
-  }
-
-  @override
-  void didUpdateWidget(PendingProposalCard oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (widget.proposal.publishStage != oldWidget.proposal.publishStage) {
-      _border = _ProposalBorderColor(
-        publishStage: widget.proposal.publishStage,
-        colors: context.colors,
-        colorScheme: context.colorScheme,
-      );
-    }
   }
 
   @override
@@ -287,32 +254,6 @@ class _PropertyValue extends StatelessWidget {
         ),
       ],
     );
-  }
-}
-
-final class _ProposalBorderColor extends WidgetStateColor {
-  final ProposalPublish publishStage;
-  final VoicesColorScheme colors;
-  final ColorScheme colorScheme;
-
-  _ProposalBorderColor({
-    required this.publishStage,
-    required this.colors,
-    required this.colorScheme,
-  }) : super(colors.outlineBorder.toARGB32());
-
-  @override
-  Color resolve(Set<WidgetState> states) {
-    if (states.contains(WidgetState.hovered)) {
-      return switch (publishStage) {
-        ProposalPublish.localDraft ||
-        ProposalPublish.publishedDraft =>
-          colorScheme.secondary,
-        ProposalPublish.submittedProposal => colorScheme.primary,
-      };
-    }
-
-    return colors.elevationsOnSurfaceNeutralLv1White;
   }
 }
 
