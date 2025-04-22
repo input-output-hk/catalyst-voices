@@ -111,7 +111,7 @@ final class UserRepositoryImpl implements UserRepository {
   }) async {
     // TODO(dtscalac): enable when endpoint works correctly
     // final rbacRegistration =
-    //     await _recoverRbacRegistration(catalystId, tokenProvider);
+    //     await _recoverRbacRegistration(catalystId, rbacToken);
     final publicId = await _recoverCatalystIDPublic(rbacToken);
 
     return RecoveredAccount(
