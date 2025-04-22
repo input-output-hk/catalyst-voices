@@ -3,7 +3,7 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/generated/api/cat_gateway.swagger.dart';
 import 'package:catalyst_voices_repositories/generated/api/cat_reviews.models.swagger.dart';
 import 'package:catalyst_voices_repositories/src/api/api_services.dart';
-import 'package:catalyst_voices_repositories/src/auth/auth_token_provider.dart';
+import 'package:catalyst_voices_repositories/src/common/rbac_token_ext.dart';
 import 'package:catalyst_voices_repositories/src/common/response_mapper.dart';
 import 'package:catalyst_voices_repositories/src/dto/user/account_status_dto.dart';
 import 'package:catalyst_voices_repositories/src/dto/user/user_dto.dart';
@@ -38,7 +38,7 @@ abstract interface class UserRepository {
 
   Future<RecoveredAccount> recoverAccount({
     required CatalystId catalystId,
-    required String rbacToken,
+    required RbacToken rbacToken,
   });
 
   Future<void> saveUser(User user);
@@ -107,13 +107,12 @@ final class UserRepositoryImpl implements UserRepository {
   @override
   Future<RecoveredAccount> recoverAccount({
     required CatalystId catalystId,
-    required String rbacToken,
+    required RbacToken rbacToken,
   }) async {
-    final tokenProvider = _HardcodedAuthTokenProvider(token: rbacToken);
     // TODO(dtscalac): enable when endpoint works correctly
     // final rbacRegistration =
     //     await _recoverRbacRegistration(catalystId, tokenProvider);
-    final publicId = await _recoverCatalystIDPublic(tokenProvider);
+    final publicId = await _recoverCatalystIDPublic(rbacToken);
 
     return RecoveredAccount(
       username: publicId?.username as String?,
@@ -139,15 +138,12 @@ final class UserRepositoryImpl implements UserRepository {
   }
 
   Future<CatalystIDPublic?> _recoverCatalystIDPublic(
-    AuthTokenProvider tokenProvider,
+    RbacToken token,
   ) async {
     try {
-      final reviews = ApiServices.createReviews(
-        reviewsUrl: _apiServices.reviews.client.baseUrl,
-        authTokenProvider: tokenProvider,
-      );
-
-      return await reviews.apiCatalystIdsMeGet().successBodyOrThrow();
+      return await _apiServices.reviews
+          .apiCatalystIdsMeGet(authorization: token.authHeader())
+          .successBodyOrThrow();
     } on NotFoundException {
       // nothing to recover
       return null;
@@ -158,26 +154,13 @@ final class UserRepositoryImpl implements UserRepository {
   // ignore: unused_element
   Future<RbacRegistrationChain> _recoverRbacRegistration(
     CatalystId catalystId,
-    AuthTokenProvider tokenProvider,
+    RbacToken token,
   ) async {
-    final gateway = ApiServices.createGateway(
-      gatewayUri: _apiServices.gateway.client.baseUrl,
-      authTokenProvider: tokenProvider,
-    );
-
-    return gateway
+    return _apiServices.gateway
         .apiV1RbacRegistrationGet(
           lookup: catalystId.toUri().toStringWithoutScheme(),
+          authorization: token.authHeader(),
         )
         .successBodyOrThrow();
   }
-}
-
-class _HardcodedAuthTokenProvider implements AuthTokenProvider {
-  final String token;
-
-  const _HardcodedAuthTokenProvider({required this.token});
-
-  @override
-  Future<String?> createRbacToken({bool forceRefresh = false}) async => token;
 }

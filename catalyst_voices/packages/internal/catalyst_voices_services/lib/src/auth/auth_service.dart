@@ -33,7 +33,7 @@ final class AuthServiceImpl implements AuthService {
   }
 
   @override
-  Future<String?> createRbacToken({
+  Future<RbacToken?> createRbacToken({
     bool forceRefresh = false,
   }) {
     return _rbacTokenLock.synchronized(() async {
@@ -41,7 +41,7 @@ final class AuthServiceImpl implements AuthService {
     });
   }
 
-  Future<String?> _createRbacToken({
+  Future<RbacToken?> _createRbacToken({
     required bool forceRefresh,
   }) async {
     if (!await _isUnlocked) {
@@ -55,16 +55,16 @@ final class AuthServiceImpl implements AuthService {
     if (!forceRefresh) {
       final cachedToken = await _cache.getRbac(id: account.catalystId);
       if (cachedToken != null) {
-        return cachedToken;
+        return RbacToken(cachedToken);
       }
     }
 
     final token = await _createRbacTokenForAccount(account);
-    await _cache.setRbac(token, id: account.catalystId);
+    await _cache.setRbac(token.value, id: account.catalystId);
     return token;
   }
 
-  Future<String> _createRbacTokenForAccount(Account account) async {
+  Future<RbacToken> _createRbacTokenForAccount(Account account) async {
     return account.keychain.getMasterKey().use((masterKey) async {
       return _authTokenGenerator.generate(
         masterKey: masterKey,

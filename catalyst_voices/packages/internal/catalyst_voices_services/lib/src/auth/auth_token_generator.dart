@@ -13,7 +13,7 @@ final class AuthTokenGenerator {
 
   const AuthTokenGenerator(this._keyDerivationService);
 
-  Future<String> generate({
+  Future<RbacToken> generate({
     required CatalystPrivateKey masterKey,
     required CatalystId catalystId,
   }) {
@@ -29,7 +29,7 @@ final class AuthTokenGenerator {
       final signature = await keyPair.privateKey.sign(toBeSigned);
       final encodedSignature = base64UrlNoPadEncode(signature.bytes);
 
-      return '$tokenPrefix.$catalystIdString.$encodedSignature';
+      return RbacToken('$tokenPrefix.$catalystIdString.$encodedSignature');
     });
   }
 

@@ -1,5 +1,7 @@
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/api/interceptors/rbac_auth_interceptor.dart';
 import 'package:catalyst_voices_repositories/src/auth/auth_token_provider.dart';
+import 'package:catalyst_voices_repositories/src/common/rbac_token_ext.dart';
 import 'package:chopper/chopper.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
@@ -30,7 +32,7 @@ void main() {
         () => authTokenProvider.createRbacToken(
           forceRefresh: any(named: 'forceRefresh'),
         ),
-      ).thenAnswer((_) => Future(() => const Uuid().v4()));
+      ).thenAnswer((_) => Future(() => RbacToken(const Uuid().v4())));
     });
 
     tearDown(() {
@@ -108,8 +110,8 @@ void main() {
 
     test('401 response code triggers force token update', () async {
       // Given
-      const originalToken = 'expired_token';
-      const refreshedToken = 'refreshed_token';
+      const originalToken = RbacToken('expired_token');
+      const refreshedToken = RbacToken('refreshed_token');
 
       final request = Request('GET', Uri(), Uri());
 
@@ -128,7 +130,7 @@ void main() {
       when(() {
         return chain.proceed(
           any(
-            that: containsHeaderValue(_buildAuthHeaderValue(originalToken)),
+            that: containsHeaderValue(originalToken.authHeader()),
           ),
         );
       }).thenAnswer((_) => originalResponse);
@@ -139,7 +141,7 @@ void main() {
       when(() {
         return chain.proceed(
           any(
-            that: containsHeaderValue(_buildAuthHeaderValue(refreshedToken)),
+            that: containsHeaderValue(refreshedToken.authHeader()),
           ),
         );
       }).thenAnswer((_) => retryResponse);
@@ -159,7 +161,7 @@ void main() {
         captured.first,
         allOf(
           isA<Request>(),
-          containsHeaderValue(_buildAuthHeaderValue(originalToken)),
+          containsHeaderValue(originalToken.authHeader()),
           isNot(containsHeaderKey('Retry-Count')),
         ),
       );
@@ -167,7 +169,7 @@ void main() {
         captured[1],
         allOf(
           isA<Request>(),
-          containsHeaderValue(_buildAuthHeaderValue(refreshedToken)),
+          containsHeaderValue(refreshedToken.authHeader()),
           containsHeaderKey('Retry-Count'),
           containsHeaderValue('1'),
         ),
@@ -176,8 +178,8 @@ void main() {
 
     test('403 response code triggers force token update', () async {
       // Given
-      const originalToken = 'expired_token';
-      const refreshedToken = 'refreshed_token';
+      const originalToken = RbacToken('expired_token');
+      const refreshedToken = RbacToken('refreshed_token');
 
       final request = Request('GET', Uri(), Uri());
 
@@ -196,7 +198,7 @@ void main() {
       when(() {
         return chain.proceed(
           any(
-            that: containsHeaderValue(_buildAuthHeaderValue(originalToken)),
+            that: containsHeaderValue(originalToken.authHeader()),
           ),
         );
       }).thenAnswer((_) => originalResponse);
@@ -207,7 +209,7 @@ void main() {
       when(() {
         return chain.proceed(
           any(
-            that: containsHeaderValue(_buildAuthHeaderValue(refreshedToken)),
+            that: containsHeaderValue(refreshedToken.authHeader()),
           ),
         );
       }).thenAnswer((_) => retryResponse);
@@ -227,7 +229,7 @@ void main() {
         captured.first,
         allOf(
           isA<Request>(),
-          containsHeaderValue(_buildAuthHeaderValue(originalToken)),
+          containsHeaderValue(originalToken.authHeader()),
           isNot(containsHeaderKey('Retry-Count')),
         ),
       );
@@ -235,7 +237,7 @@ void main() {
         captured[1],
         allOf(
           isA<Request>(),
-          containsHeaderValue(_buildAuthHeaderValue(refreshedToken)),
+          containsHeaderValue(refreshedToken.authHeader()),
           containsHeaderKey('Retry-Count'),
           containsHeaderValue('1'),
         ),
@@ -244,7 +246,7 @@ void main() {
 
     test('token refresh gives up after 1st try', () async {
       // Given
-      const originalToken = 'expired_token';
+      const originalToken = RbacToken('expired_token');
       final request = Request(
         'GET',
         Uri(),
@@ -265,7 +267,7 @@ void main() {
       when(() {
         return chain.proceed(
           any(
-            that: containsHeaderValue(_buildAuthHeaderValue(originalToken)),
+            that: containsHeaderValue(originalToken.authHeader()),
           ),
         );
       }).thenAnswer((_) => originalResponse);
@@ -284,7 +286,7 @@ void main() {
         captured.first,
         allOf(
           isA<Request>(),
-          containsHeaderValue(_buildAuthHeaderValue(originalToken)),
+          containsHeaderValue(originalToken.authHeader()),
           containsHeaderKey('Retry-Count'),
           containsHeaderValue('1'),
         ),
@@ -294,7 +296,5 @@ void main() {
 }
 
 const _authHeaderName = 'Authorization';
-
-String _buildAuthHeaderValue(String value) => 'Bearer $value';
 
 class _MockAuthTokenProvider extends Mock implements AuthTokenProvider {}

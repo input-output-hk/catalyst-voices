@@ -31,7 +31,7 @@ abstract interface class UserService implements ActiveAware {
   /// it only does the lookup if there's an account to recover.
   Future<RecoveredAccount> recoverAccount({
     required CatalystId catalystId,
-    required String rbacToken,
+    required RbacToken rbacToken,
   });
 
   /// Registers a new [account] and makes it active.
@@ -100,7 +100,7 @@ final class UserServiceImpl implements UserService {
   @override
   Future<RecoveredAccount> recoverAccount({
     required CatalystId catalystId,
-    required String rbacToken,
+    required RbacToken rbacToken,
   }) {
     return _userRepository.recoverAccount(
       catalystId: catalystId,
