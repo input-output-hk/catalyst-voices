@@ -25,13 +25,32 @@ class SelectWalletPanel extends StatefulWidget {
   State<SelectWalletPanel> createState() => _SelectWalletPanelState();
 }
 
-class _SelectWalletPanelState extends State<SelectWalletPanel> {
-  @override
-  void initState() {
-    super.initState();
-    _refreshWallets();
-  }
+class _BlocWallets extends StatelessWidget {
+  final _OnSelectWallet onSelectWallet;
+  final VoidCallback onRefreshTap;
 
+  const _BlocWallets({
+    required this.onSelectWallet,
+    required this.onRefreshTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocWalletLinkSelector<Result<List<WalletMetadata>, Exception>?>(
+      key: const Key('WalletsLinkBuilder'),
+      selector: (state) => state.wallets,
+      builder: (context, state) {
+        return _Wallets(
+          result: state,
+          onRefreshTap: onRefreshTap,
+          onSelectWallet: onSelectWallet,
+        );
+      },
+    );
+  }
+}
+
+class _SelectWalletPanelState extends State<SelectWalletPanel> {
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -71,8 +90,17 @@ class _SelectWalletPanelState extends State<SelectWalletPanel> {
     );
   }
 
-  void _refreshWallets() {
-    unawaited(RegistrationCubit.of(context).walletLink.refreshWallets());
+  @override
+  void initState() {
+    super.initState();
+    _refreshWallets();
+  }
+
+  Future<void> _launchSupportedWalletsLink() async {
+    final url = VoicesConstants.officiallySupportedWalletsUrl.getUri();
+    if (!await launchUrl(url)) {
+      throw Exception('Could not launch $url');
+    }
   }
 
   Future<void> _onSelectWallet(WalletMetadata wallet) async {
@@ -84,40 +112,8 @@ class _SelectWalletPanelState extends State<SelectWalletPanel> {
     }
   }
 
-  Future<void> _launchSupportedWalletsLink() async {
-    final url = VoicesConstants.supportedWalletsUrl.getUri();
-    if (!await launchUrl(url)) {
-      throw Exception('Could not launch $url');
-    }
-  }
-}
-
-class _BlocWallets extends StatelessWidget {
-  final _OnSelectWallet onSelectWallet;
-  final VoidCallback onRefreshTap;
-
-  const _BlocWallets({
-    required this.onSelectWallet,
-    required this.onRefreshTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocWalletLinkSelector<Result<List<WalletMetadata>, Exception>?>(
-      key: const Key('WalletsLinkBuilder'),
-      selector: (state) => state.wallets,
-      builder: (context, state) {
-        return Semantics(
-          container: true,
-          label: 'Wallets',
-          child: _Wallets(
-            result: state,
-            onRefreshTap: onRefreshTap,
-            onSelectWallet: onSelectWallet,
-          ),
-        );
-      },
-    );
+  void _refreshWallets() {
+    unawaited(RegistrationCubit.of(context).walletLink.refreshWallets());
   }
 }
 
@@ -164,6 +160,17 @@ class _WalletsList extends StatelessWidget {
           onSelectWallet: onSelectWallet,
         );
       },
+    );
+  }
+}
+
+class _WalletsLoading extends StatelessWidget {
+  const _WalletsLoading();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Center(
+      child: VoicesCircularProgressIndicator(),
     );
   }
 }
