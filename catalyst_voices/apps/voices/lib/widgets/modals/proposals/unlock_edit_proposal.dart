@@ -1,5 +1,4 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
-import 'package:catalyst_voices/widgets/cards/proposal_card_widgets.dart';
 import 'package:catalyst_voices/widgets/common/affix_decorator.dart';
 import 'package:catalyst_voices/widgets/painter/arrow_right_painter.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
