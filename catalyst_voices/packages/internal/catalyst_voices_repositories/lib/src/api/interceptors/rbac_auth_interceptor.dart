@@ -36,7 +36,7 @@ final class RbacAuthInterceptor implements Interceptor {
       return chain.proceed(chain.request);
     }
 
-    if (chain.request.headers.containsKey(_authHeaderName)) {
+    if (chain.request.headers[_authHeaderName] != null) {
       // token is already added
       return chain.proceed(chain.request);
     }
