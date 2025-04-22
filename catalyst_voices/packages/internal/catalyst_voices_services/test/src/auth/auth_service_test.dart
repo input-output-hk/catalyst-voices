@@ -1,7 +1,6 @@
 import 'dart:typed_data';
 
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_services/src/auth/auth_service.dart';
 import 'package:catalyst_voices_services/src/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:mocktail/mocktail.dart';
@@ -15,6 +14,7 @@ void main() {
     late final AuthTokenCache cache;
     late UserObserver userObserver;
     late _FakeKeyDerivationService keyDerivationService;
+    late AuthTokenGenerator authTokenGenerator;
     late AuthService authService;
 
     setUpAll(() {
@@ -27,10 +27,11 @@ void main() {
     setUp(() {
       userObserver = StreamUserObserver();
       keyDerivationService = _FakeKeyDerivationService();
+      authTokenGenerator = AuthTokenGenerator(keyDerivationService);
       authService = AuthService(
         cache,
         userObserver,
-        keyDerivationService,
+        authTokenGenerator,
       );
     });
 
@@ -55,6 +56,25 @@ void main() {
         reset(keychain);
       });
 
+      test('returns null when keychain is locked', () async {
+        // Given
+        final account = Account.dummy(
+          catalystId: DummyCatalystIdFactory.create(),
+          keychain: keychain,
+          isActive: true,
+        );
+        final user = User.optional(accounts: [account]);
+
+        // When
+        when(() => keychain.isUnlocked).thenAnswer((_) async => false);
+        userObserver.user = user;
+
+        final token = await authService.createRbacToken();
+
+        // Then
+        expect(token, isNull);
+      });
+
       test('returns a valid token', () async {
         // Given
         final account = Account.dummy(
@@ -65,12 +85,13 @@ void main() {
         final user = User.optional(accounts: [account]);
 
         // When
+        when(() => keychain.isUnlocked).thenAnswer((_) async => true);
         userObserver.user = user;
 
         final token = await authService.createRbacToken();
 
         // Then
-        expect(token, startsWith(AuthServiceImpl.tokenPrefix));
+        expect(token, startsWith(AuthTokenGenerator.tokenPrefix));
       });
 
       test('keeps token cached and calls keychain once', () async {
@@ -83,6 +104,7 @@ void main() {
         final user = User.optional(accounts: [account]);
 
         // When
+        when(() => keychain.isUnlocked).thenAnswer((_) async => true);
         userObserver.user = user;
 
         await List.generate(4, (_) => authService.createRbacToken()).wait;
@@ -102,6 +124,7 @@ void main() {
         final user = User.optional(accounts: [account]);
 
         // When
+        when(() => keychain.isUnlocked).thenAnswer((_) async => true);
         userObserver.user = user;
 
         await List.generate(
