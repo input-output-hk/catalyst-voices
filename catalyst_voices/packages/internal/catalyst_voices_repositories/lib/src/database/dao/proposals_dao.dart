@@ -119,7 +119,7 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
 
     if (searchQuery != null) {
       // TODO(damian-molinski): Check if documentsMetadata can be used.
-      mainQuery.where(proposal.content.hasTitle(searchQuery));
+      mainQuery.where(proposal.search(searchQuery));
     }
 
     final proposals = await mainQuery
@@ -423,7 +423,7 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
 
     if (searchQuery != null) {
       // TODO(damian-molinski): Check if documentsMetadata can be used.
-      query.where(documents.content.hasTitle(searchQuery));
+      query.where(documents.search(searchQuery));
     }
 
     return query.map((row) => row.readSelfRef(documents)).watch();
