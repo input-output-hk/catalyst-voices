@@ -1,8 +1,10 @@
+import 'package:catalyst_voices/common/constants/constants.dart';
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/pages/campaign/stage/campaign_background.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 
 class AfterProposalSubmissionPage extends StatelessWidget {
@@ -34,14 +36,14 @@ class AfterProposalSubmissionPage extends StatelessWidget {
   }
 }
 
-class _ActionButton extends StatelessWidget {
+class _ActionButton extends StatelessWidget with LaunchUrlMixin {
   const _ActionButton();
 
   @override
   Widget build(BuildContext context) {
     return FilledButton(
-      onPressed: () {
-        // TODO(LynxLynxx): implement url launching
+      onPressed: () async {
+        await launchUri(VoicesConstants.afterSubmissionUrl.getUri());
       },
       child: Text(context.l10n.learnMore),
     );
