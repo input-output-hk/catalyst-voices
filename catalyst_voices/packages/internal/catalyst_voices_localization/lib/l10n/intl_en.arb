@@ -2562,5 +2562,17 @@
   "optional": "Optional",
   "@optional": {
     "description": "Generic indicator that some field, for example Email, is optional."
+  },
+  "emailNotVerifiedDialogTitle": "Verified email not found!",
+  "@emailNotVerifiedDialogTitle": {
+    "description": "Title of dialog when trying to publish document but does not have verified email"
+  },
+  "emailNotVerifiedDialogMessage": "Before you can publish proposals, please make sure your \u2028account has a verified email address.",
+  "@emailNotVerifiedDialogMessage": {
+    "description": "Message of dialog when trying to publish document but does not have verified email"
+  },
+  "emailNotVerifiedDialogAction": "Go to My Account",
+  "@emailNotVerifiedDialogAction": {
+    "description": "Action of dialog when trying to publish document but does not have verified email"
   }
 }

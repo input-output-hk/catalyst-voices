@@ -150,6 +150,16 @@ class _PopupMenuButtonState extends State<_PopupMenuButton> {
 
   Future<void> _publishIteration() async {
     final bloc = context.read<ProposalBuilderBloc>();
+
+    if (!await bloc.isAccountEmailVerified()) {
+      bloc.emitSignal(const EmailNotVerifiedProposalBuilderSignal());
+      return;
+    }
+
+    if (!mounted || bloc.isClosed) {
+      return;
+    }
+
     if (!bloc.validate()) {
       return;
     }
@@ -186,6 +196,15 @@ class _PopupMenuButtonState extends State<_PopupMenuButton> {
   Future<void> _submitForReview() async {
     final bloc = context.read<ProposalBuilderBloc>();
     if (!bloc.validate()) {
+      return;
+    }
+
+    if (!await bloc.isAccountEmailVerified()) {
+      bloc.emitSignal(const EmailNotVerifiedProposalBuilderSignal());
+      return;
+    }
+
+    if (!mounted || bloc.isClosed) {
       return;
     }
 

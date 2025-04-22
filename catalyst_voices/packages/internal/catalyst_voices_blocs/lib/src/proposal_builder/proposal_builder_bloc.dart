@@ -86,6 +86,11 @@ final class ProposalBuilderBloc
     return super.close();
   }
 
+  // TODO(damian-molinski): implement
+  Future<bool> isAccountEmailVerified() async {
+    return true;
+  }
+
   bool validate() {
     final document = _buildDocument();
     final isValid = document.isValid;
