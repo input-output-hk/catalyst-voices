@@ -13,12 +13,13 @@ class CampaignStageCubit extends Cubit<CampaignStageState> {
   final CampaignService _campaignService;
 
   CampaignStageCubit(this._campaignService)
-      : super(const ProposalSubmissionStage()) {
+      : super(const LoadingCampaignStage()) {
     unawaited(getCampaignStage());
   }
 
   Future<void> getCampaignStage() async {
     try {
+      emit(const LoadingCampaignStage());
       final campaignTimeline = await _campaignService.getCampaignTimeline();
 
       final now = DateTime.now();
