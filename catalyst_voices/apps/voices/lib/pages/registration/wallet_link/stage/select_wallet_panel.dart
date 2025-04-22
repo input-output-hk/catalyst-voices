@@ -259,14 +259,3 @@ class _WalletsError extends StatelessWidget {
     );
   }
 }
-
-class _WalletsLoading extends StatelessWidget {
-  const _WalletsLoading();
-
-  @override
-  Widget build(BuildContext context) {
-    return const Center(
-      child: VoicesCircularProgressIndicator(),
-    );
-  }
-}

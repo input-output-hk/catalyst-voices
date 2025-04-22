@@ -25,7 +25,7 @@ final class TransactionBuilder extends Equatable {
 
   /// The list of transaction outputs which describes which address
   /// will receive what amount of [Coin].
-  final List<TransactionOutput> outputs;
+  final List<ShelleyMultiAssetTransactionOutput> outputs;
 
   /// The amount of lovelaces that will be charged as the fee
   /// for adding the transaction to the blockchain.
@@ -183,7 +183,7 @@ final class TransactionBuilder extends Equatable {
   /// The [output] must reach a minimum [Coin] value as calculated
   /// by [TransactionOutputBuilder.minimumAdaForOutput],
   /// otherwise [TxValueBelowMinUtxoValueException] is thrown.
-  TransactionBuilder withOutput(TransactionOutput output) {
+  TransactionBuilder withOutput(ShelleyMultiAssetTransactionOutput output) {
     final valueSize = cbor.encode(output.amount.toCbor()).length;
 
     if (!TransactionOutputBuilder.isOutputSizeValid(
@@ -464,7 +464,7 @@ final class TransactionBuilder extends Equatable {
     required Balance changeEstimator,
   }) {
     final minAda = TransactionOutputBuilder.minimumAdaForOutput(
-      TransactionOutput(
+      PreBabbageTransactionOutput(
         address: address,
         amount: changeEstimator,
       ),
@@ -478,7 +478,7 @@ final class TransactionBuilder extends Equatable {
       case true:
         final feeForChange = TransactionOutputBuilder.feeForOutput(
           config,
-          TransactionOutput(
+          PreBabbageTransactionOutput(
             address: address,
             amount: changeEstimator,
           ),
@@ -493,7 +493,7 @@ final class TransactionBuilder extends Equatable {
             return withFee(changeEstimator.coin);
           case true:
             return withFee(newFee).withOutput(
-              TransactionOutput(
+              PreBabbageTransactionOutput(
                 address: address,
                 amount: changeEstimator - Balance(coin: newFee),
               ),
@@ -663,7 +663,7 @@ final class TransactionBuilder extends Equatable {
   /// remain unchanged.
   TransactionBuilder copyWith({
     Set<TransactionUnspentOutput>? inputs,
-    List<TransactionOutput>? outputs,
+    List<ShelleyMultiAssetTransactionOutput>? outputs,
     Coin? fee,
     TransactionWitnessSetBuilder? witnessBuilder,
   }) {
@@ -742,12 +742,12 @@ final class TransactionOutputBuilder {
   ///
   /// Adds a minimum amount of [Coin] to the transaction to pass
   /// the [minimumAdaForOutput] validation.
-  static TransactionOutput withAssetAndMinRequiredCoin({
+  static ShelleyMultiAssetTransactionOutput withAssetAndMinRequiredCoin({
     required ShelleyAddress address,
     required MultiAsset multiAsset,
     required Coin coinsPerUtxoByte,
   }) {
-    final minOutput = TransactionOutput(
+    final minOutput = PreBabbageTransactionOutput(
       address: address,
       amount: const Balance.zero(),
     );
@@ -762,7 +762,7 @@ final class TransactionOutputBuilder {
     );
 
     final requiredCoin = minimumAdaForOutput(checkOutput, coinsPerUtxoByte);
-    return TransactionOutput(
+    return PreBabbageTransactionOutput(
       address: address,
       amount: Balance(coin: requiredCoin, multiAsset: multiAsset),
     );
@@ -879,7 +879,7 @@ final class TransactionOutputBuilder {
   /// These constraints ensure consistent and predictable transaction
   /// processing.
   static bool isOutputSizeValid(
-    TransactionOutput output,
+    ShelleyMultiAssetTransactionOutput output,
     int maxValueSize,
   ) =>
       cbor.encode(output.amount.toCbor()).length <= maxValueSize;

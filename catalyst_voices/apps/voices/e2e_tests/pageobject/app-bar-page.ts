@@ -1,5 +1,4 @@
 import { Locator, Page } from "@playwright/test";
-import intlEn from "./onboarding/localization-util";
 
 export class AppBarPage {
   getStartedBtn: Locator;
@@ -7,9 +6,7 @@ export class AppBarPage {
 
   constructor(page: Page) {
     this.page = page;
-    this.getStartedBtn = page.getByRole("button", {
-      name: intlEn.getStarted,
-    });
+    this.getStartedBtn = this.page.getByTestId("GetStartedBtn");
   }
   async GetStartedBtnClick() {
     await this.getStartedBtn.click();

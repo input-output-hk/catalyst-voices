@@ -1,5 +1,4 @@
 import { type Locator, type Page } from "@playwright/test";
-import intlEn from "./localization-util";
 
 export class OnboardingBasePage {
   page: Page;

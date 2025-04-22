@@ -9,6 +9,12 @@ import { WalletConfig } from "../utils/wallets/walletUtils";
 const walletConfig: WalletConfig = walletConfigs[3];
 
 // do some non-happy flows (wrong seed phrase, cancel connection, no wallet, etc)
+
+// test("Refactored restore flow demo", async ({ page }) => {
+//   await page.goto("http://localhost:51709/m4/discovery");
+//   await new UnlockPasswordSuccessPanel(page).goto("test1234");
+// });
+
 test(
   "Create keychain and link wallet for " + walletConfig.extension.Name,
   async ({ restoreWallet }) => {
@@ -16,8 +22,8 @@ test(
     const page = browser.pages()[0];
 
     // await new WalletListPage(page).clickEnableWallet(walletConfig.extension.Name);
-    await page.goto("http://localhost:51709/m4/discovery");
-    await new WalletListPanel(page).goto('test1234');
+    await page.goto("http://localhost:55338/m4/discovery");
+    await new WalletListPanel(page).goto("test1234");
     const [walletPopup] = await Promise.all([
       browser.waitForEvent("page"),
       new WalletListPanel(page).clickYoroiWallet(),
@@ -35,9 +41,3 @@ test(
     await signPopup.locator("#confirmButton").click();
   }
 );
-
-test("Refactored restore flow demo", async ({ page }) => {
-  await page.goto("http://localhost:51709/m4/discovery");
-  await new UnlockPasswordSuccessPanel(page).goto("test1234");
-});
-

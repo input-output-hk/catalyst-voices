@@ -57,6 +57,7 @@ class _GetStartedButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Semantics(
+      identifier: 'GetStartedButton',
       child: VoicesFilledButton(
         key: const Key('GetStartedButton'),
         onTap: () async => RegistrationDialog.show(

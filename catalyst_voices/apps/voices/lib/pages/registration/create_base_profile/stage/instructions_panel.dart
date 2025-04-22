@@ -100,12 +100,14 @@ class _NextButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Semantics(
-      button: true,
-      child: VoicesFilledButton(
-        key: const Key('CreateBaseProfileNext'),
-        onTap: () => RegistrationCubit.of(context).nextStep(),
-        child: Text(context.l10n.createBaseProfileInstructionsNext),
+    return VoicesFilledButton(
+      key: const Key('CreateBaseProfileNext'),
+      onTap: () => RegistrationCubit.of(context).nextStep(),
+      child: Semantics(
+        identifier: 'CreateBaseProfileNextButton',
+        child: Text(
+          context.l10n.createBaseProfileInstructionsNext,
+        ),
       ),
     );
   }

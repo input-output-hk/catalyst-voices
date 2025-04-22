@@ -36,8 +36,8 @@ export const onboardYoroiWallet = async (
   await page.locator('xpath=//*[@id="sidebar.settings"]').click();
   await page.locator('button:has-text("I Understand")').click();
   await page.locator('button:has-text("SWITCH NETWORK")').click();
-  await page.locator('xpath=//*[@id="selectedNetwork--55"]').click();
-  await page.locator("#selectNetwork-network_250-menuItem").click();
+  await page.locator("#switchNetworkDialog-selectNetwork-dropdown").click();
+  await page.locator("#switchNetworkDialog-selectNetwork_250-menuItem").click();
   await page.locator("#switchNetworkDialog-apply-button").click();
   await page.locator("#somewhere-checkbox").click();
   await page.locator('button:has-text("Continue")').click();

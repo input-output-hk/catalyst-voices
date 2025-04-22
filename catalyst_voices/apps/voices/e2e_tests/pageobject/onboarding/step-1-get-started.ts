@@ -1,6 +1,5 @@
 import { Locator, Page } from "@playwright/test";
 import { AppBarPage } from "../app-bar-page";
-import intlEn from "./localization-util";
 
 export class GetStartedPanel {
   createNewCatalystKeychain: Locator;
@@ -9,16 +8,8 @@ export class GetStartedPanel {
 
   constructor(page: Page) {
     this.page = page;
-    this.createNewCatalystKeychain = page.getByRole("group", {
-      name:
-        intlEn.accountCreationCreate + " " + intlEn.accountCreationOnThisDevice,
-    });
-    this.recoverCatalystKeychain = page.getByRole("group", {
-      name:
-        intlEn.accountCreationRecover +
-        " " +
-        intlEn.accountCreationOnThisDevice,
-    });
+    this.createNewCatalystKeychain = page.getByTestId("CreateAccountType.createNew");
+    this.recoverCatalystKeychain = page.getByTestId("CreateAccountType.recover");
   }
 
   async goto() {
