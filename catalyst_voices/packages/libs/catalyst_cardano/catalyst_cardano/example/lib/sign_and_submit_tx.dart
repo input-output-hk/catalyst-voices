@@ -1,5 +1,51 @@
 part of 'main.dart';
 
+TransactionBuilderConfig _buildTransactionBuilderConfig() {
+  return const TransactionBuilderConfig(
+    feeAlgo: TieredFee(
+      constant: 155381,
+      coefficient: 44,
+      refScriptByteCost: 15,
+    ),
+    maxTxSize: 16384,
+    maxValueSize: 5000,
+    coinsPerUtxoByte: Coin(4310),
+  );
+}
+
+Transaction _buildUnsignedTx({
+  required Set<TransactionUnspentOutput> utxos,
+  required ShelleyAddress changeAddress,
+}) {
+  /* cSpell:disable */
+  final preprodFaucetAddress = ShelleyAddress.fromBech32(
+    'addr_test1vzpwq95z3xyum8vqndgdd9mdnmafh3djcxnc6jemlgdmswcve6tkw',
+  );
+  /* cSpell:enable */
+
+  final txOutput = PreBabbageTransactionOutput(
+    address: preprodFaucetAddress,
+    amount: const Balance(coin: Coin(1000000)),
+  );
+
+  final txBuilder = TransactionBuilder(
+    config: _buildTransactionBuilderConfig(),
+    inputs: utxos,
+    networkId: NetworkId.testnet,
+  );
+
+  final txBody = txBuilder
+      .withOutput(txOutput)
+      .withChangeAddressIfNeeded(changeAddress)
+      .buildBody();
+
+  return Transaction(
+    body: txBody,
+    isValid: true,
+    witnessSet: const TransactionWitnessSet(),
+  );
+}
+
 Future<void> _signAndSubmitTx({
   required BuildContext context,
   required CardanoWalletApi api,
@@ -44,50 +90,4 @@ Future<void> _signAndSubmitTx({
       message: result,
     );
   }
-}
-
-Transaction _buildUnsignedTx({
-  required Set<TransactionUnspentOutput> utxos,
-  required ShelleyAddress changeAddress,
-}) {
-  /* cSpell:disable */
-  final preprodFaucetAddress = ShelleyAddress.fromBech32(
-    'addr_test1vzpwq95z3xyum8vqndgdd9mdnmafh3djcxnc6jemlgdmswcve6tkw',
-  );
-  /* cSpell:enable */
-
-  final txOutput = TransactionOutput(
-    address: preprodFaucetAddress,
-    amount: const Balance(coin: Coin(1000000)),
-  );
-
-  final txBuilder = TransactionBuilder(
-    config: _buildTransactionBuilderConfig(),
-    inputs: utxos,
-    networkId: NetworkId.testnet,
-  );
-
-  final txBody = txBuilder
-      .withOutput(txOutput)
-      .withChangeAddressIfNeeded(changeAddress)
-      .buildBody();
-
-  return Transaction(
-    body: txBody,
-    isValid: true,
-    witnessSet: const TransactionWitnessSet(),
-  );
-}
-
-TransactionBuilderConfig _buildTransactionBuilderConfig() {
-  return const TransactionBuilderConfig(
-    feeAlgo: TieredFee(
-      constant: 155381,
-      coefficient: 44,
-      refScriptByteCost: 15,
-    ),
-    maxTxSize: 16384,
-    maxValueSize: 5000,
-    coinsPerUtxoByte: Coin(4310),
-  );
 }
