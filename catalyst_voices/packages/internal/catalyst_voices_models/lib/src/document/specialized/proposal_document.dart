@@ -55,15 +55,7 @@ final class ProposalDocument extends Equatable {
     required this.document,
   });
 
-  String? get authorName {
-    final property = document.getProperty(authorNameNodeId);
-
-    if (property is! DocumentValueProperty<String>) {
-      return null;
-    }
-
-    return property.value;
-  }
+  String? get authorName => _contentAuthorName ?? _metadataAuthorName;
 
   String? get description {
     final property = document.getProperty(descriptionNodeId);
@@ -136,6 +128,18 @@ final class ProposalDocument extends Equatable {
 
     return property.value;
   }
+
+  String? get _contentAuthorName {
+    final property = document.getProperty(authorNameNodeId);
+
+    if (property is! DocumentValueProperty<String>) {
+      return null;
+    }
+
+    return property.value;
+  }
+
+  String? get _metadataAuthorName => metadata.authors.firstOrNull?.username;
 }
 
 final class ProposalMetadata extends DocumentMetadata {
