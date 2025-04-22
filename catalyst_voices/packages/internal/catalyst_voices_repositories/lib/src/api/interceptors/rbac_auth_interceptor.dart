@@ -30,14 +30,14 @@ final class RbacAuthInterceptor implements Interceptor {
   FutureOr<Response<BodyType>> intercept<BodyType>(
     Chain<BodyType> chain,
   ) async {
-    final token = await _authTokenProvider.createRbacToken();
-    if (token == null) {
-      // keychain locked or not existing
+    if (chain.request.headers[_authHeaderName] != null) {
+      // token is already added
       return chain.proceed(chain.request);
     }
 
-    if (chain.request.headers[_authHeaderName] != null) {
-      // token is already added
+    final token = await _authTokenProvider.createRbacToken();
+    if (token == null) {
+      // keychain locked or not existing
       return chain.proceed(chain.request);
     }
 
