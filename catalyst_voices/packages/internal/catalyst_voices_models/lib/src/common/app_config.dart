@@ -10,7 +10,7 @@ final class ApiConfig extends Equatable {
   const ApiConfig({
     this.gatewayUrl = 'https://gateway.dev.projectcatalyst.io/',
     this.vitUrl = 'https://core.dev.projectcatalyst.io/',
-    this.reviewsUrl = 'https://api.reviews.dev.projectcatalyst.io/',
+    this.reviewsUrl = 'https://reviews.dev.projectcatalyst.io/',
   });
 
   @override

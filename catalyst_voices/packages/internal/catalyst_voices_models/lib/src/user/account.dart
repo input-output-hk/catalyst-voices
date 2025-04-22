@@ -21,7 +21,11 @@ final class Account extends Equatable {
   final String email;
   final Keychain keychain;
   final Set<AccountRole> roles;
-  final WalletInfo walletInfo;
+
+  /// The wallet change address used when submitting the initial registration.
+  ///
+  /// null for users created before this field was added here.
+  final ShelleyAddress? address;
 
   /// Whether this account is being used.
   final bool isActive;
@@ -36,7 +40,7 @@ final class Account extends Equatable {
     required this.email,
     required this.keychain,
     required this.roles,
-    required this.walletInfo,
+    required this.address,
     this.isActive = false,
     this.isProvisional = true,
   });
@@ -54,17 +58,12 @@ final class Account extends Equatable {
         AccountRole.voter,
         AccountRole.proposer,
       },
-      walletInfo: WalletInfo(
-        metadata: const WalletMetadata(name: 'Dummy Wallet', icon: null),
-        balance: const Coin.fromWholeAda(10),
-        /* cSpell:disable */
-        address: ShelleyAddress.fromBech32(
-          'addr_test1vzpwq95z3xyum8vqndgdd'
-          '9mdnmafh3djcxnc6jemlgdmswcve6tkw',
-        ),
-        networkId: NetworkId.testnet,
-        /* cSpell:enable */
+      /* cSpell:disable */
+      address: ShelleyAddress.fromBech32(
+        'addr_test1vzpwq95z3xyum8vqndgdd'
+        '9mdnmafh3djcxnc6jemlgdmswcve6tkw',
       ),
+      /* cSpell:enable */
       isActive: isActive,
       isProvisional: true,
     );
@@ -80,18 +79,10 @@ final class Account extends Equatable {
         email,
         keychain.id,
         roles,
-        walletInfo,
+        address,
         isActive,
         isProvisional,
       ];
-
-  // TODO(damian-molinski): Not integrated. Backend should return it.
-  String get stakeAddress {
-    /* cSpell:disable */
-    return 'addr1q9gkq75mt2hykrktnsgt2zxrj5h9jnd6gkwr5s4r8v'
-        '5x3dzp8n9h9mns5w7zx95jhtwz46yq4nr7y6hhlwtq75jflsqq9dxry2';
-    /* cSpell:enable */
-  }
 
   String? get username => catalystId.username;
 
@@ -100,7 +91,7 @@ final class Account extends Equatable {
     String? email,
     Keychain? keychain,
     Set<AccountRole>? roles,
-    WalletInfo? walletInfo,
+    ShelleyAddress? address,
     bool? isActive,
     bool? isProvisional,
   }) {
@@ -109,7 +100,7 @@ final class Account extends Equatable {
       email: email ?? this.email,
       keychain: keychain ?? this.keychain,
       roles: roles ?? this.roles,
-      walletInfo: walletInfo ?? this.walletInfo,
+      address: address ?? this.address,
       isActive: isActive ?? this.isActive,
       isProvisional: isProvisional ?? this.isProvisional,
     );

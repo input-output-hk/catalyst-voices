@@ -1,11 +1,11 @@
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
+import 'package:catalyst_voices/widgets/buttons/clipboard_button.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 class WalletSummary extends StatelessWidget {
   final String walletName;
@@ -141,17 +141,7 @@ class _WalletSummaryAddress extends StatelessWidget {
             key: const Key('WalletAddressValue'),
           ),
           const SizedBox(width: 4),
-          InkWell(
-            onTap: () async {
-              await Clipboard.setData(
-                ClipboardData(text: clipboardAddress),
-              );
-            },
-            child: Padding(
-              padding: const EdgeInsets.only(top: 2),
-              child: VoicesAssets.icons.clipboardCopy.buildIcon(size: 16),
-            ),
-          ),
+          VoicesClipboardIconButton(clipboardData: clipboardAddress),
         ],
       ),
     );
