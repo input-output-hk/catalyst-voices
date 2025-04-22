@@ -18,6 +18,8 @@ abstract interface class UserService implements ActiveAware {
 
   Future<User> getUser();
 
+  Future<bool> isActiveAccountEmailVerified();
+
   /// Registers a new [account] and makes it active.
   ///
   /// It can invoke some one-time registration logic,
@@ -68,6 +70,36 @@ final class UserServiceImpl implements UserService {
 
   @override
   Future<User> getUser() => _userRepository.getUser();
+
+  @override
+  Future<bool> isActiveAccountEmailVerified() async {
+    final user = await getUser();
+    final activeAccount = user.activeAccount;
+    final email = activeAccount?.email;
+    if (activeAccount == null || email == null) {
+      return false;
+    }
+
+    // If already verified just return true.
+    if (email.status == AccountEmailVerificationStatus.verified) {
+      return true;
+    }
+
+    // Ask backend if status changed.
+    final status = await _userRepository.getEmailStatus();
+    if (status != email.status) {
+      final updatedEmail = email.copyWith(status: status);
+      final updatedAccount = activeAccount.copyWith(
+        email: Optional(updatedEmail),
+      );
+
+      final updatedUser = user.updateAccount(updatedAccount);
+
+      await _updateUser(updatedUser);
+    }
+
+    return status == AccountEmailVerificationStatus.verified;
+  }
 
   @override
   Future<void> registerAccount(Account account) async {

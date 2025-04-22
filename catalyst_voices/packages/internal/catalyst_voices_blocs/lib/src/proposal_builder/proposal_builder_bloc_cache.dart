@@ -10,6 +10,7 @@ final class ProposalBuilderBlocCache extends Equatable {
   final CampaignCategory? category;
   final CommentTemplate? commentTemplate;
   final List<CommentWithReplies>? comments;
+  final AccountEmailVerificationStatus? emailStatus;
 
   const ProposalBuilderBlocCache({
     this.activeAccountId,
@@ -19,6 +20,7 @@ final class ProposalBuilderBlocCache extends Equatable {
     this.category,
     this.commentTemplate,
     this.comments,
+    this.emailStatus,
   });
 
   @override
@@ -30,6 +32,7 @@ final class ProposalBuilderBlocCache extends Equatable {
         category,
         commentTemplate,
         comments,
+        emailStatus,
       ];
 
   ProposalBuilderBlocCache copyWith({
@@ -40,6 +43,7 @@ final class ProposalBuilderBlocCache extends Equatable {
     Optional<CampaignCategory>? category,
     Optional<CommentTemplate>? commentTemplate,
     Optional<List<CommentWithReplies>>? comments,
+    Optional<AccountEmailVerificationStatus>? emailStatus,
   }) {
     return ProposalBuilderBlocCache(
       activeAccountId: activeAccountId.dataOr(this.activeAccountId),
@@ -49,6 +53,7 @@ final class ProposalBuilderBlocCache extends Equatable {
       category: category.dataOr(this.category),
       commentTemplate: commentTemplate.dataOr(this.commentTemplate),
       comments: comments.dataOr(this.comments),
+      emailStatus: emailStatus.dataOr(this.emailStatus),
     );
   }
 }

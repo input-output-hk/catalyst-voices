@@ -17,6 +17,8 @@ abstract interface class UserRepository {
     );
   }
 
+  Future<AccountEmailVerificationStatus> getEmailStatus();
+
   Future<User> getUser();
 
   Future<void> saveUser(User user);
@@ -34,6 +36,11 @@ final class UserRepositoryImpl implements UserRepository {
     this._dataSource,
     this._keychainProvider,
   );
+
+  @override
+  Future<AccountEmailVerificationStatus> getEmailStatus() {
+    return _dataSource.getEmailStatus();
+  }
 
   @override
   Future<User> getUser() async {

@@ -31,4 +31,10 @@ final class AccountEmail extends Equatable {
   }
 }
 
-enum AccountEmailVerificationStatus { verified, pending, unknown }
+enum AccountEmailVerificationStatus {
+  verified,
+  pending,
+  unknown;
+
+  bool get isVerified => this == AccountEmailVerificationStatus.verified;
+}

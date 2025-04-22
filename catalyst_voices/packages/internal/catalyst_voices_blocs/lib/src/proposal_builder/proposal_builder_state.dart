@@ -80,6 +80,7 @@ final class ProposalBuilderState extends Equatable {
   final CampaignCategoryDetailsViewModel? category;
   final NodeId? activeNodeId;
   final bool showValidationErrors;
+  final bool canPublish;
 
   const ProposalBuilderState({
     this.isLoading = false,
@@ -94,6 +95,7 @@ final class ProposalBuilderState extends Equatable {
     this.category,
     this.activeNodeId,
     this.showValidationErrors = false,
+    this.canPublish = false,
   });
 
   List<Segment> get allSegments => [
@@ -122,6 +124,7 @@ final class ProposalBuilderState extends Equatable {
         category,
         activeNodeId,
         showValidationErrors,
+        canPublish,
       ];
 
   bool get showError => !isLoading && error != null;
@@ -138,6 +141,7 @@ final class ProposalBuilderState extends Equatable {
       action: action,
       proposalTitle: proposalTitle,
       currentIteration: latestVersion ?? DocumentVersion.firstNumber,
+      canPublish: canPublish,
     );
   }
 
@@ -154,6 +158,7 @@ final class ProposalBuilderState extends Equatable {
     Optional<CampaignCategoryDetailsViewModel>? category,
     Optional<NodeId>? activeNodeId,
     bool? showValidationErrors,
+    bool? canPublish,
   }) {
     return ProposalBuilderState(
       isLoading: isLoading ?? this.isLoading,
@@ -168,6 +173,7 @@ final class ProposalBuilderState extends Equatable {
       category: category.dataOr(this.category),
       activeNodeId: activeNodeId.dataOr(this.activeNodeId),
       showValidationErrors: showValidationErrors ?? this.showValidationErrors,
+      canPublish: canPublish ?? this.canPublish,
     );
   }
 }
