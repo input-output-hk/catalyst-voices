@@ -1,3 +1,5 @@
+# cspell: words cloudscraper
+
 """
 This script is a simple web scraper tool to prepare testing data for the `cardano/asset` endpoint.
 
