@@ -57,9 +57,8 @@ final class UserRepositoryImpl implements UserRepository {
 
   @override
   Future<AccountStatus> getAccountStatus() async {
-    final response = await _apiServices.reviews.apiCatalystIdsMeGet();
-    response.verifyIsSuccessful();
-    final body = response.bodyOrThrow;
+    final body =
+        await _apiServices.reviews.apiCatalystIdsMeGet().successBodyOrThrow();
     return body.status!.toModel();
   }
 
@@ -69,11 +68,10 @@ final class UserRepositoryImpl implements UserRepository {
   }) async {
     final lookup = catalystId.toSignificant().toUri().toStringWithoutScheme();
 
-    final response =
-        await _apiServices.gateway.apiV1RbacRegistrationGet(lookup: lookup);
-    response.verifyIsSuccessful();
+    final rbacChain = await _apiServices.gateway
+        .apiV1RbacRegistrationGet(lookup: lookup)
+        .successBodyOrThrow();
 
-    final rbacChain = response.bodyOrThrow;
     final transactionId =
         rbacChain.lastVolatileTxn ?? rbacChain.lastPersistentTxn;
 
@@ -96,14 +94,14 @@ final class UserRepositoryImpl implements UserRepository {
     required CatalystId catalystId,
     required String email,
   }) async {
-    final response = await _apiServices.reviews.apiCatalystIdsMePost(
-      body: CatalystIDCreate(
-        catalystIdUri: catalystId.toUri().toStringWithoutScheme(),
-        email: email,
-      ),
-    );
-
-    response.verifyIsSuccessful();
+    await _apiServices.reviews
+        .apiCatalystIdsMePost(
+          body: CatalystIDCreate(
+            catalystIdUri: catalystId.toUri().toStringWithoutScheme(),
+            email: email,
+          ),
+        )
+        .successBodyOrThrow();
   }
 
   @override
@@ -143,20 +141,17 @@ final class UserRepositoryImpl implements UserRepository {
   Future<CatalystIDPublic?> _recoverCatalystIDPublic(
     AuthTokenProvider tokenProvider,
   ) async {
-    final reviews = ApiServices.createReviews(
-      reviewsUrl: _apiServices.reviews.client.baseUrl,
-      authTokenProvider: tokenProvider,
-    );
+    try {
+      final reviews = ApiServices.createReviews(
+        reviewsUrl: _apiServices.reviews.client.baseUrl,
+        authTokenProvider: tokenProvider,
+      );
 
-    final response = await reviews.apiCatalystIdsMeGet();
-
-    if (response.statusCode == ApiErrorResponseException.notFound) {
+      return await reviews.apiCatalystIdsMeGet().successBodyOrThrow();
+    } on NotFoundException {
       // nothing to recover
       return null;
     }
-    response.verifyIsSuccessful();
-
-    return response.bodyOrThrow;
   }
 
   // TODO(dtscalac): enable when endpoint works correctly
@@ -170,13 +165,11 @@ final class UserRepositoryImpl implements UserRepository {
       authTokenProvider: tokenProvider,
     );
 
-    final response = await gateway.apiV1RbacRegistrationGet(
-      lookup: catalystId.toUri().toStringWithoutScheme(),
-    );
-
-    response.verifyIsSuccessful();
-
-    return response.bodyOrThrow;
+    return gateway
+        .apiV1RbacRegistrationGet(
+          lookup: catalystId.toUri().toStringWithoutScheme(),
+        )
+        .successBodyOrThrow();
   }
 }
 
