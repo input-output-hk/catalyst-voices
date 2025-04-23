@@ -1,3 +1,4 @@
+import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
@@ -8,28 +9,28 @@ final class AccountSummaryData extends Equatable {
   final String? username;
   final String email;
   final Set<AccountRole> roles;
-  final String? address;
-  final String? clipboardAddress;
+  final String? formattedAddress;
+  final ShelleyAddress? clipboardAddress;
   final String? balance;
 
   const AccountSummaryData({
     required this.username,
     required this.email,
     required this.roles,
-    required this.address,
+    required this.formattedAddress,
     required this.clipboardAddress,
     required this.balance,
   });
 
   @override
   List<Object?> get props => [
-        username,
-        email,
-        roles,
-        address,
-        clipboardAddress,
-        balance,
-      ];
+    username,
+    email,
+    roles,
+    formattedAddress,
+    clipboardAddress,
+    balance,
+  ];
 }
 
 final class RecoverStateData extends Equatable {
@@ -53,13 +54,13 @@ final class RecoverStateData extends Equatable {
 
   @override
   List<Object?> get props => [
-        foundKeychain,
-        userSeedPhraseWords,
-        seedPhraseWords,
-        isSeedPhraseValid,
-        accountDetails,
-        unlockPasswordState,
-      ];
+    foundKeychain,
+    userSeedPhraseWords,
+    seedPhraseWords,
+    isSeedPhraseValid,
+    accountDetails,
+    unlockPasswordState,
+  ];
 
   RecoverStateData copyWith({
     bool? foundKeychain,
