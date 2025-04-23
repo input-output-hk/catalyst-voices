@@ -24,13 +24,13 @@ final class AccountSummaryData extends Equatable {
 
   @override
   List<Object?> get props => [
-    username,
-    email,
-    roles,
-    formattedAddress,
-    clipboardAddress,
-    balance,
-  ];
+        username,
+        email,
+        roles,
+        formattedAddress,
+        clipboardAddress,
+        balance,
+      ];
 }
 
 final class RecoverStateData extends Equatable {
@@ -54,13 +54,13 @@ final class RecoverStateData extends Equatable {
 
   @override
   List<Object?> get props => [
-    foundKeychain,
-    userSeedPhraseWords,
-    seedPhraseWords,
-    isSeedPhraseValid,
-    accountDetails,
-    unlockPasswordState,
-  ];
+        foundKeychain,
+        userSeedPhraseWords,
+        seedPhraseWords,
+        isSeedPhraseValid,
+        accountDetails,
+        unlockPasswordState,
+      ];
 
   RecoverStateData copyWith({
     bool? foundKeychain,

@@ -41,10 +41,10 @@ final class RecoverCubit extends Cubit<RecoverStateData>
     required UserService userService,
     required RegistrationService registrationService,
     required KeyDerivationService keyDerivationService,
-  }) : _userService = userService,
-       _registrationService = registrationService,
-       _keyDerivationService = keyDerivationService,
-       super(const RecoverStateData()) {
+  })  : _userService = userService,
+        _registrationService = registrationService,
+        _keyDerivationService = keyDerivationService,
+        super(const RecoverStateData()) {
     /// pre-populate all available words
     emit(state.copyWith(seedPhraseWords: SeedPhrase.wordList));
 
@@ -143,7 +143,10 @@ final class RecoverCubit extends Cubit<RecoverStateData>
     }
 
     emit(
-      state.copyWith(userSeedPhraseWords: words, isSeedPhraseValid: isValid),
+      state.copyWith(
+        userSeedPhraseWords: words,
+        isSeedPhraseValid: isValid,
+      ),
     );
   }
 

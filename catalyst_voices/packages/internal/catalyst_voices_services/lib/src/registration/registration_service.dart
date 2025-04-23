@@ -60,7 +60,9 @@ abstract interface class RegistrationService {
   });
 
   /// Loads account related to this [seedPhrase]. Throws exception if not found.
-  Future<Account> recoverAccount({required SeedPhrase seedPhrase});
+  Future<Account> recoverAccount({
+    required SeedPhrase seedPhrase,
+  });
 
   /// Requests the user to sign the registration transaction
   /// and submits it to the blockchain.
@@ -71,7 +73,9 @@ abstract interface class RegistrationService {
   /// The transaction must be prepared earlier via [prepareRegistration].
   ///
   /// Throws a subclass of [RegistrationException] in case of a failure.
-  Future<Account> register({required AccountSubmitFullData data});
+  Future<Account> register({
+    required AccountSubmitFullData data,
+  });
 
   Future<Account> registerTestAccount({
     required String keychainId,
@@ -176,7 +180,9 @@ final class RegistrationServiceImpl implements RegistrationService {
       final changeAddress = await enabledWallet.getChangeAddress();
       final rewardAddresses = await enabledWallet.getRewardAddresses();
       final utxos = await enabledWallet.getUtxos(
-        amount: const Balance(coin: CardanoWalletDetails.minAdaForRegistration),
+        amount: const Balance(
+          coin: CardanoWalletDetails.minAdaForRegistration,
+        ),
       );
 
       final previousTransactionId = await _fetchPreviousTransactionId(
@@ -205,7 +211,9 @@ final class RegistrationServiceImpl implements RegistrationService {
   }
 
   @override
-  Future<Account> recoverAccount({required SeedPhrase seedPhrase}) async {
+  Future<Account> recoverAccount({
+    required SeedPhrase seedPhrase,
+  }) async {
     final masterKey = _keyDerivationService.deriveMasterKey(
       seedPhrase: seedPhrase,
     );
@@ -249,7 +257,9 @@ final class RegistrationServiceImpl implements RegistrationService {
   }
 
   @override
-  Future<Account> register({required AccountSubmitFullData data}) async {
+  Future<Account> register({
+    required AccountSubmitFullData data,
+  }) async {
     try {
       final walletInfo = await submitTransaction(
         wallet: data.metadata.wallet,

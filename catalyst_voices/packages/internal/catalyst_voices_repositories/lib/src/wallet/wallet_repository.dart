@@ -29,14 +29,13 @@ final class WalletRepositoryImpl implements WalletRepository {
     required NetworkId networkId,
     required RbacToken rbacToken,
   }) async {
-    final stakeInfo =
-        await _apiServices.gateway
-            .apiV1CardanoAssetsStakeAddressGet(
-              stakeAddress: stakeAddress.toBech32(),
-              network: networkId.toDto(),
-              authorization: rbacToken.authHeader(),
-            )
-            .successBodyOrThrow();
+    final stakeInfo = await _apiServices.gateway
+        .apiV1CardanoAssetsStakeAddressGet(
+          stakeAddress: stakeAddress.toBech32(),
+          network: networkId.toDto(),
+          authorization: rbacToken.authHeader(),
+        )
+        .successBodyOrThrow();
 
     return Coin(stakeInfo.volatile.adaAmount);
   }

@@ -63,10 +63,9 @@ final class UserRepositoryImpl implements UserRepository {
   }) async {
     final lookup = catalystId.toSignificant().toUri().toStringWithoutScheme();
 
-    final rbacChain =
-        await _apiServices.gateway
-            .apiV1RbacRegistrationGet(lookup: lookup)
-            .successBodyOrThrow();
+    final rbacChain = await _apiServices.gateway
+        .apiV1RbacRegistrationGet(lookup: lookup)
+        .successBodyOrThrow();
 
     final transactionId =
         rbacChain.lastVolatileTxn ?? rbacChain.lastPersistentTxn;
@@ -126,7 +125,9 @@ final class UserRepositoryImpl implements UserRepository {
     return _storage.writeUser(dto);
   }
 
-  Future<CatalystIDPublic?> _recoverCatalystIDPublic(RbacToken token) async {
+  Future<CatalystIDPublic?> _recoverCatalystIDPublic(
+    RbacToken token,
+  ) async {
     try {
       return await _apiServices.reviews
           .apiCatalystIdsMeGet(authorization: token.authHeader())
