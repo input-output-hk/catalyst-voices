@@ -296,7 +296,13 @@ void main() {
 
         final userStream = service.watchUser;
 
-        expect(userStream, emitsInOrder([initialUser, expectedUser]));
+        expect(
+          userStream,
+          emitsInOrder([
+            initialUser,
+            expectedUser,
+          ]),
+        );
 
         // Then
         await service.useLastAccount();
