@@ -1,8 +1,8 @@
 VERSION 0.8
 
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/mdlint:fix/revert-flutter-installer AS mdlint-ci
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/cspell:fix/revert-flutter-installer AS cspell-ci
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/postgresql:fix/revert-flutter-installer AS postgresql-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/mdlint:v3.3.4 AS mdlint-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/cspell:v3.3.4 AS cspell-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/postgresql:v3.3.4 AS postgresql-ci
 
 FROM debian:stable-slim
 
