@@ -167,6 +167,7 @@ final class Dependencies extends DependencyProvider {
           get<UserStorage>(),
           get<KeychainProvider>(),
           get<ApiServices>(),
+          get<DocumentRepository>(),
         );
       })
       ..registerLazySingleton<SignedDocumentManager>(() {

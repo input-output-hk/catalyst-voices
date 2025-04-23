@@ -1,27 +1,22 @@
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_repositories/generated/api/cat_gateway.swagger.dart';
 import 'package:catalyst_voices_repositories/generated/api/cat_reviews.models.swagger.dart';
-import 'package:catalyst_voices_repositories/src/api/api_services.dart';
 import 'package:catalyst_voices_repositories/src/common/rbac_token_ext.dart';
 import 'package:catalyst_voices_repositories/src/common/response_mapper.dart';
 import 'package:catalyst_voices_repositories/src/dto/user/reviews_catalyst_id_status_ext.dart';
 import 'package:catalyst_voices_repositories/src/dto/user/user_dto.dart';
-import 'package:catalyst_voices_repositories/src/user/source/user_storage.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:collection/collection.dart';
 
 abstract interface class UserRepository {
-  factory UserRepository(
+  const factory UserRepository(
     UserStorage storage,
     KeychainProvider keychainProvider,
     ApiServices apiServices,
-  ) {
-    return UserRepositoryImpl(
-      storage,
-      keychainProvider,
-      apiServices,
-    );
-  }
+    DocumentRepository documentRepository,
+  ) = UserRepositoryImpl;
 
   Future<AccountPublicStatus> getAccountPublicStatus();
 
@@ -48,11 +43,13 @@ final class UserRepositoryImpl implements UserRepository {
   final UserStorage _storage;
   final KeychainProvider _keychainProvider;
   final ApiServices _apiServices;
+  final DocumentRepository _documentRepository;
 
-  UserRepositoryImpl(
+  const UserRepositoryImpl(
     this._storage,
     this._keychainProvider,
     this._apiServices,
+    this._documentRepository,
   );
 
   @override
@@ -114,9 +111,13 @@ final class UserRepositoryImpl implements UserRepository {
     //     await _recoverRbacRegistration(catalystId, rbacToken);
     final publicId = await _getReviewsCatalystIDPublic(token: rbacToken);
 
+    final username = (publicId?.username as String?) ??
+        await _lookupUsernameFromDocuments(
+          catalystId: catalystId,
+        );
+
     return RecoveredAccount(
-      // TODO(damian-molinski): check latest document and see if there is username.
-      username: publicId?.username as String?,
+      username: username,
       email: publicId?.email as String?,
       // TODO(dtscalac): enable when endpoint works correctly
       // roles: rbacRegistration.accountRoles,
@@ -149,6 +150,21 @@ final class UserRepositoryImpl implements UserRepository {
         .successBodyOrThrow()
         .then<CatalystIDPublic?>((value) => value)
         .onError<NotFoundException>((error, stackTrace) => null);
+  }
+
+  Future<String?> _lookupUsernameFromDocuments({
+    required CatalystId catalystId,
+  }) {
+    final significantId = catalystId.toSignificant();
+    return _documentRepository
+        .getLatestDocument(authorId: significantId)
+        .then((value) => value?.metadata.authors ?? <CatalystId>[])
+        .then(
+      (authors) {
+        return authors
+            .firstWhereOrNull((id) => id.toSignificant() == significantId);
+      },
+    ).then((value) => value?.username);
   }
 
   // TODO(dtscalac): enable when endpoint works correctly

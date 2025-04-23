@@ -72,6 +72,11 @@ abstract interface class DocumentRepository {
     required DocumentRef ref,
   });
 
+  /// Useful when recovering account and we want to lookup latest [CatalystId].
+  Future<DocumentData?> getLatestDocument({
+    CatalystId? authorId,
+  });
+
   /// Returns count of documents matching [ref] id and [type].
   Future<int> getRefCount({
     required DocumentRef ref,
@@ -281,6 +286,19 @@ final class DocumentRepositoryImpl implements DocumentRepository {
       SignedDocumentRef() => _getSignedDocumentData(ref: ref),
       DraftRef() => _getDraftDocumentData(ref: ref),
     };
+  }
+
+  @override
+  Future<DocumentData?> getLatestDocument({
+    CatalystId? authorId,
+  }) async {
+    final latestDocument = await _localDocuments.getLatest(authorId: authorId);
+    final latestDraft = await _drafts.getLatest(authorId: authorId);
+
+    return [latestDocument, latestDraft]
+        .nonNulls
+        .sorted((a, b) => a.compareTo(b))
+        .firstOrNull;
   }
 
   @override
