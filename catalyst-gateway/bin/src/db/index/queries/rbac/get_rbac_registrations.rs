@@ -33,7 +33,6 @@ pub(crate) struct QueryParams {
 }
 
 /// Get registrations by Catalyst ID query.
-#[allow(dead_code)]
 #[derive(DeserializeRow, Clone)]
 pub(crate) struct Query {
     /// Registration transaction id.
@@ -45,6 +44,7 @@ pub(crate) struct Query {
     /// A previous  transaction id.
     pub prv_txn_id: Option<DbTransactionId>,
     /// A registration purpose.
+    #[allow(dead_code)]
     pub purpose: DbUuidV4,
 }
 
@@ -128,19 +128,28 @@ pub(crate) async fn build_reg_chain(
 }
 
 /// A helper function to return a RBAC registration from the given block and slot.
-async fn registration(network: Network, slot: Slot, txn_index: TxnIndex) -> anyhow::Result<Cip509> {
+pub(crate) async fn registration(
+    network: Network, slot: Slot, txn_index: TxnIndex,
+) -> anyhow::Result<Cip509> {
     let point = Point::fuzzy(slot);
     let block = ChainFollower::get_block(network, point)
         .await
         .context("Unable to get block")?
         .data;
     if block.point().slot_or_default() != slot {
-        // The `ChainFollower::get_block` function can return the next consecutive block if
-        // it cannot find the exact one. This shouldn't happen, but we need
-        // to check anyway.
-        return Err(anyhow::anyhow!("Unable to find exact block"));
+        // The `ChainFollower::get_block` function can return the next consecutive block if it
+        // cannot find the exact one. This shouldn't happen, but we need to check anyway.
+        anyhow::bail!(
+            "Unable to find exact {slot:?} block. Found block slot {:?}",
+            block.point().slot_or_default()
+        );
     }
+    // We perform validation during indexing, so this normally should never fail.
     Cip509::new(&block, txn_index, &[])
-        .context("Invalid RBAC registration")?
-        .context("No RBAC registration at this block and txn index")
+        .with_context(|| {
+            format!("Invalid RBAC registration, slot = {slot:?}, transaction index = {txn_index:?}")
+        })?
+        .with_context(|| {
+            format!("No RBAC registration, slot = {slot:?}, transaction index = {txn_index:?}")
+        })
 }
