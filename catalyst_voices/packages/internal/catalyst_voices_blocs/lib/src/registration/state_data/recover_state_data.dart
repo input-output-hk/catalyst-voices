@@ -4,6 +4,34 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:equatable/equatable.dart';
 import 'package:result_type/result_type.dart';
 
+final class AccountSummaryData extends Equatable {
+  final String? username;
+  final String email;
+  final Set<AccountRole> roles;
+  final String? address;
+  final String? clipboardAddress;
+  final String? balance;
+
+  const AccountSummaryData({
+    required this.username,
+    required this.email,
+    required this.roles,
+    required this.address,
+    required this.clipboardAddress,
+    required this.balance,
+  });
+
+  @override
+  List<Object?> get props => [
+        username,
+        email,
+        roles,
+        address,
+        clipboardAddress,
+        balance,
+      ];
+}
+
 final class RecoverStateData extends Equatable {
   final bool foundKeychain;
   final List<SeedPhraseWord> userSeedPhraseWords;
@@ -11,8 +39,6 @@ final class RecoverStateData extends Equatable {
   final bool isSeedPhraseValid;
   final Result<AccountSummaryData, LocalizedException>? accountDetails;
   final UnlockPasswordState unlockPasswordState;
-
-  bool get isAccountSummaryNextEnabled => accountDetails?.isSuccess ?? false;
 
   const RecoverStateData({
     this.foundKeychain = false,
@@ -22,6 +48,18 @@ final class RecoverStateData extends Equatable {
     this.accountDetails,
     this.unlockPasswordState = const UnlockPasswordState(),
   });
+
+  bool get isAccountSummaryNextEnabled => accountDetails?.isSuccess ?? false;
+
+  @override
+  List<Object?> get props => [
+        foundKeychain,
+        userSeedPhraseWords,
+        seedPhraseWords,
+        isSeedPhraseValid,
+        accountDetails,
+        unlockPasswordState,
+      ];
 
   RecoverStateData copyWith({
     bool? foundKeychain,
@@ -53,30 +91,4 @@ final class RecoverStateData extends Equatable {
         '$unlockPasswordState, '
         ')';
   }
-
-  @override
-  List<Object?> get props => [
-        foundKeychain,
-        userSeedPhraseWords,
-        seedPhraseWords,
-        isSeedPhraseValid,
-        accountDetails,
-        unlockPasswordState,
-      ];
-}
-
-final class AccountSummaryData extends Equatable {
-  final WalletConnectionData walletConnection;
-  final WalletSummaryData walletSummary;
-
-  const AccountSummaryData({
-    required this.walletConnection,
-    required this.walletSummary,
-  });
-
-  @override
-  List<Object?> get props => [
-        walletConnection,
-        walletSummary,
-      ];
 }

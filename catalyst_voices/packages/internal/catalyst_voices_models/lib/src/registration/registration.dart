@@ -1,5 +1,6 @@
 export 'create_account_type.dart';
 export 'exception/registration_exception.dart';
+export 'registration_certificate.dart';
 export 'registration_progress.dart';
 export 'registration_recover_method.dart';
 export 'steps/create_base_profile_stage.dart';

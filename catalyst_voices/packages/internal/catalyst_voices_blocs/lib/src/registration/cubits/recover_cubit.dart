@@ -82,23 +82,21 @@ final class RecoverCubit extends Cubit<RecoverStateData>
         seedPhrase: seedPhrase,
       );
 
+      final address = account.address!;
+      final balance = await _registrationService.getWalletBalance(
+        seedPhrase: seedPhrase,
+        address: address,
+      );
+
       _recoveredAccount = account;
 
-      final walletInfo = account.walletInfo;
-
       final accountDetails = AccountSummaryData(
-        walletConnection: WalletConnectionData(
-          name: walletInfo.metadata.name,
-          icon: walletInfo.metadata.icon,
-        ),
-        walletSummary: WalletSummaryData(
-          walletName: walletInfo.metadata.name,
-          balance: CryptocurrencyFormatter.formatAmount(walletInfo.balance),
-          address: WalletAddressFormatter.formatShort(walletInfo.address),
-          clipboardAddress: walletInfo.address.toBech32(),
-          showLowBalance: false,
-          showExpectedNetworkId: null,
-        ),
+        username: account.username,
+        email: account.email,
+        roles: account.roles,
+        address: WalletAddressFormatter.formatShort(address),
+        clipboardAddress: address.toBech32(),
+        balance: CryptocurrencyFormatter.formatAmount(balance),
       );
 
       emit(state.copyWith(accountDetails: Optional(Success(accountDetails))));
