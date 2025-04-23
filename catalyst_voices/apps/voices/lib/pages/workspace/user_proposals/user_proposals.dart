@@ -3,6 +3,7 @@ import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
 class UserProposals extends StatefulWidget {
@@ -160,9 +161,9 @@ class _SubmittedForReviewHeader extends StatelessWidget {
 }
 
 class _UserProposalsState extends State<UserProposals> {
-  late bool _isPublishedExpanded;
-  late bool _isLocalExpanded;
-  late bool _isDraftExpanded;
+  bool _isPublishedExpanded = false;
+  bool _isLocalExpanded = false;
+  bool _isDraftExpanded = false;
 
   List<Proposal> get _draft =>
       widget.items.where((e) => e.publish.isDraft).toList();
@@ -222,9 +223,9 @@ class _UserProposalsState extends State<UserProposals> {
   }
 
   @override
-  void didUpdateWidget(covariant UserProposals oldWidget) {
+  void didUpdateWidget(UserProposals oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.items != widget.items) {
+    if (listEquals(oldWidget.items, widget.items)) {
       _setVisibility();
     }
   }
