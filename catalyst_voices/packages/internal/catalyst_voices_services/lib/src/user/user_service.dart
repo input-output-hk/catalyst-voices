@@ -44,12 +44,16 @@ abstract interface class UserService implements ActiveAware {
 
   Future<void> removeAccount(Account account);
 
+  Future<void> reSendActiveAccountVerificationEmail();
+
   Future<void> updateAccount({
     required CatalystId id,
     Optional<String>? username,
     Optional<String>? email,
     Set<AccountRole>? roles,
   });
+
+  Future<void> updateActiveAccountDetails();
 
   Future<void> updateSettings(UserSettings newValue);
 
@@ -183,6 +187,28 @@ final class UserServiceImpl implements UserService {
   }
 
   @override
+  Future<void> reSendActiveAccountVerificationEmail() async {
+    final user = await getUser();
+    final activeAccount = user.activeAccount;
+    final email = activeAccount?.email;
+    if (activeAccount == null || email == null || email.isEmpty) {
+      return;
+    }
+
+    await _userRepository.publishUserProfile(
+      catalystId: activeAccount.catalystId,
+      email: email,
+    );
+
+    final updatedAccount = activeAccount.copyWith(
+      publicStatus: AccountPublicStatus.verifying,
+    );
+    final updatedUser = user.updateAccount(updatedAccount);
+
+    await _updateUser(updatedUser);
+  }
+
+  @override
   Future<void> updateAccount({
     required CatalystId id,
     Optional<String>? username,
@@ -225,6 +251,21 @@ final class UserServiceImpl implements UserService {
       }
     }
 
+    final updatedUser = user.updateAccount(updatedAccount);
+
+    await _updateUser(updatedUser);
+  }
+
+  @override
+  Future<void> updateActiveAccountDetails() async {
+    final user = await getUser();
+    final activeAccount = user.activeAccount;
+    if (activeAccount == null) {
+      return;
+    }
+
+    final publicStatus = await _userRepository.getAccountPublicStatus();
+    final updatedAccount = activeAccount.copyWith(publicStatus: publicStatus);
     final updatedUser = user.updateAccount(updatedAccount);
 
     await _updateUser(updatedUser);

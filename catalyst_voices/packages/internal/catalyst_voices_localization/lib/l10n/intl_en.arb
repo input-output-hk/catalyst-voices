@@ -2610,5 +2610,25 @@
   "notVerified": "Not verified",
   "@notVerified": {
     "description": "Message of account status chip next to email. Meaning Account is not verified."
+  },
+  "accountEmailVerifyHelper": "Please verify email above in your email. Email Title: Catalyst verification",
+  "@accountEmailVerifyHelper": {
+    "description": "Explanation message blow email field in account page"
+  },
+  "reSend": "Re-send",
+  "@reSend": {
+    "description": "In context of verification email"
+  },
+  "verificationEmailSendTitle": "Verify your email address",
+  "@verificationEmailSendTitle": {
+    "description": "Title of dialog account verification send"
+  },
+  "verificationEmailSendMessage": "We sent you an email with a Catalyst verification link.",
+  "@verificationEmailSendMessage": {
+    "description": "Message of dialog account verification send"
+  },
+  "verificationEmailSendSubMessage": "Please verify your new email address.",
+  "@verificationEmailSendSubMessage": {
+    "description": "Sub message of dialog account verification send"
   }
 }

@@ -1,7 +1,6 @@
 import 'dart:async';
 
-import 'package:catalyst_voices_blocs/src/account/account_state.dart';
-import 'package:catalyst_voices_blocs/src/common/bloc_error_emitter_mixin.dart';
+import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
@@ -9,7 +8,9 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 final class AccountCubit extends Cubit<AccountState>
-    with BlocErrorEmitterMixin {
+    with
+        BlocErrorEmitterMixin,
+        BlocSignalEmitterMixin<AccountSignal, AccountState> {
   final _logger = Logger('AccountCubit');
   final UserService _userService;
 
@@ -39,8 +40,30 @@ final class AccountCubit extends Cubit<AccountState>
     }
   }
 
-  Future<void> loadAccountDetails() async {
-    // TODO(damian-molinski): Integration
+  Future<void> reSendVerification() async {
+    final activeAccount = _userService.user.activeAccount;
+    final email = activeAccount?.email;
+    if (email == null) {
+      return;
+    }
+
+    try {
+      await _userService.reSendActiveAccountVerificationEmail();
+
+      emitSignal(const AccountVerificationEmailSendSignal());
+    } catch (error, stackTrace) {
+      _logger.severe('Re-send verification email', error, stackTrace);
+      emitError(LocalizedException.create(error));
+    }
+  }
+
+  Future<void> updateAccountDetails() async {
+    try {
+      await _userService.updateActiveAccountDetails();
+    } catch (error, stackTrace) {
+      _logger.severe('Updating active account failed', error, stackTrace);
+      emitError(LocalizedException.create(error));
+    }
   }
 
   /// Returns true if updated, false otherwise.
@@ -61,6 +84,8 @@ final class AccountCubit extends Cubit<AccountState>
       }
 
       emit(state.copyWith(email: email));
+      emitSignal(const AccountVerificationEmailSendSignal());
+
       return true;
     } catch (error, stackTrace) {
       _logger.severe('Update email', error, stackTrace);

@@ -2,9 +2,11 @@ import 'dart:async';
 
 import 'package:catalyst_voices/common/ext/text_editing_controller_ext.dart';
 import 'package:catalyst_voices/pages/account/widgets/account_public_verification_status_chip.dart';
+import 'package:catalyst_voices/pages/account/widgets/account_re_send_verification_button.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -23,11 +25,16 @@ class _AccountEmailTileState extends State<AccountEmailTile> {
 
   bool _isEditMode = false;
   Email _email = const Email.pure();
+  AccountPublicStatus _accountPublicStatus = AccountPublicStatus.unknown;
 
   StreamSubscription<Email>? _emailSub;
+  StreamSubscription<AccountPublicStatus>? _publicStatusSub;
 
   @override
   Widget build(BuildContext context) {
+    final isVerified = _accountPublicStatus.isVerified;
+    final hasEmail = _email.value.isNotEmpty && _email.isValid;
+
     return EditableTile(
       title: context.l10n.emailAddress,
       key: const Key('AccountEmailTile'),
@@ -35,6 +42,10 @@ class _AccountEmailTileState extends State<AccountEmailTile> {
       isEditMode: _isEditMode,
       isSaveEnabled: _email.value.isNotEmpty && _email.isValid,
       statesController: _statesController,
+      footerActions: [
+        if (!_isEditMode && !isVerified && hasEmail)
+          const AccountReSendVerificationButton(),
+      ],
       child: VoicesEmailTextField(
         key: const Key('AccountEmailTextField'),
         controller: _controller,
@@ -46,6 +57,9 @@ class _AccountEmailTileState extends State<AccountEmailTile> {
             offstage: _isEditMode || _email.value.isEmpty,
             child: const AccountPublicVerificationStatusChip(),
           ),
+          helperText: !_isEditMode && !isVerified
+              ? context.l10n.accountEmailVerifyHelper
+              : null,
         ),
         onFieldSubmitted: null,
         readOnly: !_isEditMode,
@@ -58,6 +72,9 @@ class _AccountEmailTileState extends State<AccountEmailTile> {
   void dispose() {
     unawaited(_emailSub?.cancel());
     _emailSub = null;
+
+    unawaited(_publicStatusSub?.cancel());
+    _publicStatusSub = null;
 
     _focusNode.dispose();
     _controller.dispose();
@@ -88,6 +105,17 @@ class _AccountEmailTileState extends State<AccountEmailTile> {
         .map((event) => event.email)
         .distinct()
         .listen(_handleEmailChange);
+
+    _publicStatusSub = bloc.stream
+        .map((event) => event.accountPublicStatus)
+        .distinct()
+        .listen(_handleAccountPublicStatusChanged);
+  }
+
+  void _handleAccountPublicStatusChanged(AccountPublicStatus status) {
+    setState(() {
+      _accountPublicStatus = status;
+    });
   }
 
   void _handleControllerChange() {
