@@ -1,6 +1,6 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/pages/workspace/proposal_menu_action_button.dart';
-import 'package:catalyst_voices/widgets/cards/proposal_card_widgets.dart';
+import 'package:catalyst_voices/widgets/cards/proposal/proposal_card_widgets.dart';
 import 'package:catalyst_voices/widgets/cards/proposal_iteration_history_card.dart';
 import 'package:catalyst_voices/widgets/text/last_edit_date.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';

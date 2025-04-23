@@ -8,8 +8,6 @@ extension StringExt on String {
 
   bool get isNotBlank => !isBlank;
 
-  String withBullet() => withPrefix('• ');
-
   String capitalize() {
     if (isNotEmpty) {
       return '${this[0].toUpperCase()}${substring(1).toLowerCase()}';
@@ -45,6 +43,13 @@ extension StringExt on String {
     };
   }
 
+  String? nullIfEmpty() {
+    if (isEmpty) {
+      return null;
+    }
+    return this;
+  }
+
   String starred({
     bool leading = true,
     bool isEnabled = true,
@@ -55,6 +60,8 @@ extension StringExt on String {
 
     return leading ? withPrefix('*') : withSuffix('*');
   }
+
+  String withBullet() => withPrefix('• ');
 
   String withPrefix(String value) => '$value$this';
 
