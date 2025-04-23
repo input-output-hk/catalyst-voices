@@ -32,7 +32,10 @@ final class CampaignStageRoute extends GoRouteData
         startDate: campaignState.startDate,
       );
     } else if (campaignState is AfterProposalSubmissionStage) {
-      return const AfterProposalSubmissionPage();
+      return AfterProposalSubmissionPage(
+        // It's needed to trick service worker to not use cache for this page
+        key: UniqueKey(),
+      );
     } else {
       return const ErrorProposalSubmissionPage();
     }
