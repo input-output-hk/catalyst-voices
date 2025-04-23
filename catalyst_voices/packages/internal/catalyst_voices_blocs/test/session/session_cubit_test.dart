@@ -14,7 +14,7 @@ import 'package:shared_preferences_platform_interface/shared_preferences_async_p
 
 void main() {
   late final KeychainProvider keychainProvider;
-  late final UserRepository userRepository;
+  late final _FakeUserRepository userRepository;
   late final UserObserver userObserver;
 
   late final UserService userService;
@@ -40,17 +40,14 @@ void main() {
       sharedPreferences: SharedPreferencesAsync(),
       cacheConfig: const CacheConfig(),
     );
-    userRepository = UserRepository(
-      SecureUserStorage(),
-      _MockUserDataSource(),
-      keychainProvider,
-    );
+    userRepository = _FakeUserRepository();
     userObserver = StreamUserObserver();
 
     userService = UserService(
       userRepository,
       userObserver,
     );
+
     registrationService = _MockRegistrationService(
       keychainProvider,
       [
@@ -93,6 +90,7 @@ void main() {
     for (final account in user.accounts) {
       await userService.removeAccount(account);
     }
+    userRepository.reset();
 
     await const FlutterSecureStorage().deleteAll();
     await SharedPreferencesAsync().clear();
@@ -304,6 +302,28 @@ void main() {
   });
 }
 
+class _FakeUserRepository extends Fake implements UserRepository {
+  User? _user;
+
+  @override
+  Future<User> getUser() async => _user ?? const User.empty();
+
+  @override
+  Future<void> publishUserProfile({
+    required CatalystId catalystId,
+    required String email,
+  }) async {}
+
+  void reset() {
+    _user = null;
+  }
+
+  @override
+  Future<void> saveUser(User user) async {
+    _user = user;
+  }
+}
+
 class _MockCardanoWallet extends Mock implements CardanoWallet {
   _MockCardanoWallet();
 }
@@ -339,5 +359,3 @@ class _MockRegistrationService extends Mock implements RegistrationService {
     );
   }
 }
-
-class _MockUserDataSource extends Mock implements UserDataSource {}

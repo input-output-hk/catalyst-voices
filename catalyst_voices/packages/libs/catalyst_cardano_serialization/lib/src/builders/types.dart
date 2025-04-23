@@ -19,7 +19,7 @@ typedef AssetsGroup = List<MapEntry<AssetId, List<TransactionUnspentOutput>>>;
 /// fee.
 typedef SelectionResult = (
   Set<TransactionUnspentOutput>,
-  List<TransactionOutput>,
+  List<ShelleyMultiAssetTransactionOutput>,
   Coin,
 );
 

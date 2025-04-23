@@ -2,24 +2,26 @@ import 'package:catalyst_cardano/catalyst_cardano.dart';
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
+import 'package:catalyst_voices_services/src/registration/registration_transaction_role.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:uuid_plus/uuid_plus.dart';
 
-/* cSpell:enable */
-
 final _logger = Logger('RegistrationService');
-// TODO(damian-molinski): remove once recover account is implemented
+
 /* cSpell:disable */
 final _testNetAddress = ShelleyAddress.fromBech32(
   'addr_test1vzpwq95z3xyum8vqndgdd'
   '9mdnmafh3djcxnc6jemlgdmswcve6tkw',
 );
+/* cSpell:enable */
 
 // TODO(damian-molinski): Merge it with UserService
 abstract interface class RegistrationService {
   factory RegistrationService(
+    UserService userService,
     KeychainProvider keychainProvider,
     CatalystCardano cardano,
+    AuthTokenGenerator authTokenGenerator,
     KeyDerivationService keyDerivationService,
     BlockchainConfig blockchainConfig,
   ) = RegistrationServiceImpl;
@@ -40,6 +42,12 @@ abstract interface class RegistrationService {
   /// Returns the available cardano wallet extensions.
   Future<List<CardanoWallet>> getCardanoWallets();
 
+  /// Loads the wallet balance for given [address].
+  Future<Coin> getWalletBalance({
+    required SeedPhrase seedPhrase,
+    required ShelleyAddress address,
+  });
+
   /// Builds an unsigned registration transaction from given parameters.
   ///
   /// Throws a subclass of [RegistrationException] in case of a failure.
@@ -50,7 +58,7 @@ abstract interface class RegistrationService {
     required Set<RegistrationTransactionRole> roles,
   });
 
-  /// Loads account related to this [seedPhrase]. Throws exception if non found.
+  /// Loads account related to this [seedPhrase]. Throws exception if not found.
   Future<Account> recoverAccount({
     required SeedPhrase seedPhrase,
   });
@@ -83,14 +91,18 @@ abstract interface class RegistrationService {
 
 /// Manages the user registration.
 final class RegistrationServiceImpl implements RegistrationService {
+  final UserService _userService;
   final KeychainProvider _keychainProvider;
   final CatalystCardano _cardano;
+  final AuthTokenGenerator _authTokenGenerator;
   final KeyDerivationService _keyDerivationService;
   final BlockchainConfig _blockchainConfig;
 
   const RegistrationServiceImpl(
+    this._userService,
     this._keychainProvider,
     this._cardano,
+    this._authTokenGenerator,
     this._keyDerivationService,
     this._blockchainConfig,
   );
@@ -117,20 +129,27 @@ final class RegistrationServiceImpl implements RegistrationService {
   Future<WalletInfo> getCardanoWalletInfo(CardanoWallet wallet) async {
     final enabledWallet = await wallet.enable();
     final balance = await enabledWallet.getBalance();
-    final address = await enabledWallet.getChangeAddress();
-    final networkId = await enabledWallet.getNetworkId();
+    final addresses = await enabledWallet.getRewardAddresses();
 
     return WalletInfo(
       metadata: WalletMetadata.fromCardanoWallet(wallet),
       balance: balance.coin,
-      address: address,
-      networkId: networkId,
+      address: addresses.first,
     );
   }
 
   @override
   Future<List<CardanoWallet>> getCardanoWallets() {
     return _cardano.getWallets();
+  }
+
+  @override
+  Future<Coin> getWalletBalance({
+    required SeedPhrase seedPhrase,
+    required ShelleyAddress address,
+  }) async {
+    // TODO(dtscalac): fetch wallet balance from cat-gateway
+    return const Coin(0);
   }
 
   @override
@@ -158,6 +177,10 @@ final class RegistrationServiceImpl implements RegistrationService {
         ),
       );
 
+      final previousTransactionId = await _fetchPreviousTransactionId(
+        isFirstRegistration: roles.isFirstRegistration,
+      );
+
       final registrationBuilder = RegistrationTransactionBuilder(
         transactionConfig: config,
         keyDerivationService: _keyDerivationService,
@@ -167,6 +190,7 @@ final class RegistrationServiceImpl implements RegistrationService {
         changeAddress: changeAddress,
         rewardAddresses: rewardAddresses,
         utxos: utxos,
+        previousTransactionId: previousTransactionId,
       );
 
       return await registrationBuilder.build();
@@ -178,43 +202,50 @@ final class RegistrationServiceImpl implements RegistrationService {
     }
   }
 
-  // TODO(damian-molinski): to be implemented
-  // Note. Returned type will be changed because we'll not be able to
-  // get a wallet from backend just from seed phrase.
-  // To be decided what data can we get from backend.
   @override
   Future<Account> recoverAccount({
     required SeedPhrase seedPhrase,
   }) async {
-    await Future<void>.delayed(const Duration(milliseconds: 200));
-
-    // TODO(damian-molinski): should come from backend
-    const email = AccountEmail.unknown('recovered@iohk.com');
-    final catalystIdUri = Uri.parse(
-      'id.catalyst://recovered@preprod.cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE',
+    final masterKey = _keyDerivationService.deriveMasterKey(
+      seedPhrase: seedPhrase,
     );
-    final catalystId = CatalystId.fromUri(catalystIdUri);
 
-    // TODO(dtscalac): derive a key from the seed phrase and fetch
-    // from the backend info about the registration (roles, wallet, etc).
-    final roles = {AccountRole.root, AccountRole.proposer};
+    return masterKey.use((masterKey) async {
+      final role0Key = _keyDerivationService.deriveAccountRoleKeyPair(
+        masterKey: masterKey,
+        role: AccountRole.root,
+      );
 
-    final keychainId = const Uuid().v4();
-    final keychain = await _keychainProvider.create(keychainId);
+      return role0Key.use((role0Key) async {
+        final catalystId = CatalystId(
+          host: _blockchainConfig.host.host,
+          role0Key: role0Key.publicKey.publicKeyBytes,
+        );
 
-    // Note. with rootKey query backend for account details.
-    return Account(
-      catalystId: catalystId,
-      email: email,
-      keychain: keychain,
-      roles: roles,
-      walletInfo: WalletInfo(
-        metadata: const WalletMetadata(name: 'Dummy Wallet'),
-        balance: const Coin.fromWholeAda(10),
-        address: _testNetAddress,
-        networkId: NetworkId.testnet,
-      ),
-    );
+        final rbacToken = await _authTokenGenerator.generate(
+          masterKey: masterKey,
+          catalystId: catalystId,
+        );
+
+        final recovered = await _userService.recoverAccount(
+          catalystId: catalystId,
+          rbacToken: rbacToken,
+        );
+
+        final keychainId = const Uuid().v4();
+        final keychain = await _keychainProvider.create(keychainId);
+
+        return Account(
+          catalystId: catalystId.copyWith(
+            username: Optional(recovered.username),
+          ),
+          email: recovered.email ?? '',
+          keychain: keychain,
+          roles: recovered.roles,
+          address: recovered.stakeAddress,
+        );
+      });
+    });
   }
 
   @override
@@ -226,8 +257,8 @@ final class RegistrationServiceImpl implements RegistrationService {
         wallet: data.metadata.wallet,
         unsignedTx: data.metadata.transaction,
       );
-      final keychain = data.keychain;
 
+      final keychain = data.keychain;
       return keychain.getMasterKey().use((masterKey) {
         final role0KeyPair = _keyDerivationService.deriveAccountRoleKeyPair(
           masterKey: masterKey,
@@ -248,14 +279,14 @@ final class RegistrationServiceImpl implements RegistrationService {
             email: AccountEmail.pending(data.email),
             keychain: keychain,
             roles: data.roles,
-            walletInfo: walletInfo,
+            address: walletInfo.address,
           );
         });
       });
     } on RegistrationException {
       rethrow;
     } catch (error, stackTrace) {
-      _logger.severe('RegistractionTransaction: ', error, stackTrace);
+      _logger.severe('RegistrationTransaction: ', error, stackTrace);
       throw const RegistrationTransactionException();
     }
   }
@@ -295,12 +326,7 @@ final class RegistrationServiceImpl implements RegistrationService {
         email: null,
         keychain: keychain,
         roles: roles,
-        walletInfo: WalletInfo(
-          metadata: const WalletMetadata(name: 'Dummy Wallet'),
-          balance: const Coin.fromWholeAda(10),
-          address: _testNetAddress,
-          networkId: NetworkId.testnet,
-        ),
+        address: _testNetAddress,
       );
     });
   }
@@ -334,14 +360,23 @@ final class RegistrationServiceImpl implements RegistrationService {
     _logger.info('Registration transaction submitted [$txHash]');
 
     final balance = await enabledWallet.getBalance();
-    final address = await enabledWallet.getChangeAddress();
-    final networkId = await enabledWallet.getNetworkId();
+    final addresses = await enabledWallet.getRewardAddresses();
 
     return WalletInfo(
       metadata: WalletMetadata.fromCardanoWallet(wallet),
       balance: balance.coin,
-      address: address,
-      networkId: networkId,
+      address: addresses.first,
     );
+  }
+
+  Future<TransactionHash?> _fetchPreviousTransactionId({
+    required bool isFirstRegistration,
+  }) async {
+    if (isFirstRegistration) {
+      // for first registration there is no previous transaction id
+      return null;
+    }
+
+    return _userService.getPreviousRegistrationTransactionId();
   }
 }

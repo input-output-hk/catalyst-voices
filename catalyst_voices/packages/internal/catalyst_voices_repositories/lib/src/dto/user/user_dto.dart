@@ -12,7 +12,7 @@ final class AccountDto {
   final AccountEmailDto? email;
   final String keychainId;
   final Set<AccountRole> roles;
-  final AccountWalletInfoDto walletInfo;
+  final String? address;
   final bool isProvisional;
 
   AccountDto({
@@ -20,7 +20,7 @@ final class AccountDto {
     required this.email,
     required this.keychainId,
     required this.roles,
-    required this.walletInfo,
+    required this.address,
     this.isProvisional = true,
   });
 
@@ -38,7 +38,7 @@ final class AccountDto {
           email: data.email?.toDto(),
           keychainId: data.keychain.id,
           roles: data.roles,
-          walletInfo: AccountWalletInfoDto.fromModel(data.walletInfo),
+          address: data.address?.toBech32(),
           isProvisional: data.isProvisional,
         );
 
@@ -49,13 +49,14 @@ final class AccountDto {
     required KeychainProvider keychainProvider,
   }) async {
     final keychain = await keychainProvider.get(keychainId);
+    final address = this.address;
 
     return Account(
       catalystId: CatalystId.fromUri(Uri.parse(catalystId)),
       email: email?.toModel(),
       keychain: keychain,
       roles: roles,
-      walletInfo: walletInfo.toModel(),
+      address: address != null ? ShelleyAddress.fromBech32(address) : null,
       isActive: keychainId == activeKeychainId,
       isProvisional: isProvisional,
     );
@@ -135,8 +136,6 @@ final class AccountWalletInfoDto {
       metadata: metadata.toModel(),
       balance: balance,
       address: address,
-      // TODO(dtscalac): drop it in when account recovery is finished
-      networkId: NetworkId.testnet,
     );
   }
 }

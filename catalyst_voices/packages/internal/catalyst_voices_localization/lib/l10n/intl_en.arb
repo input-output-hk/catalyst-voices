@@ -1291,6 +1291,10 @@
       }
     }
   },
+  "nickname": "Nickname",
+  "@nickname": {
+    "description": "A username / nickname of the user."
+  },
   "searchProposals": "Search Proposals",
   "search": "Search…",
   "agree": "I Agree",
@@ -1571,6 +1575,22 @@
   "currentAsk": "Current Ask",
   "displayName": "Display Name",
   "emailAddress": "Email address",
+  "email": "Email",
+  "@email": {
+    "description": "Email address (short)"
+  },
+  "registeredRoles": "Registered Roles",
+  "@registeredRoles": {
+    "description": "The roles with which the user registered."
+  },
+  "linkedWallet": "Linked Wallet",
+  "@linkedWallet": {
+    "description": "The wallet user has linked for the initial registration."
+  },
+  "balance": "Balance",
+  "@balance": {
+    "description": "The balance the user holds / amount of Ada in the wallet"
+  },
   "myAccount": "My account",
   "myRoles": "My Roles",
   "addRole": "Add role",

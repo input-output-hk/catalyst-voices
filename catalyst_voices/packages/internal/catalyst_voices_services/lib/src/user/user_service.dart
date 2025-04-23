@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
@@ -16,9 +17,24 @@ abstract interface class UserService implements ActiveAware {
 
   Future<void> dispose();
 
+  /// If updating a registration the new registration must be
+  /// linked via the transaction hash to the last one.
+  ///
+  /// The method returns the last known transaction ID.
+  Future<TransactionHash> getPreviousRegistrationTransactionId();
+
   Future<User> getUser();
 
   Future<bool> isActiveAccountEmailVerified();
+
+  /// Fetches info about recovered account.
+  ///
+  /// This does not recover the account,
+  /// it only does the lookup if there's an account to recover.
+  Future<RecoveredAccount> recoverAccount({
+    required CatalystId catalystId,
+    required RbacToken rbacToken,
+  });
 
   /// Registers a new [account] and makes it active.
   ///
@@ -69,6 +85,18 @@ final class UserServiceImpl implements UserService {
   Future<void> dispose() async {}
 
   @override
+  Future<TransactionHash> getPreviousRegistrationTransactionId() {
+    final activeAccount = user.activeAccount;
+    if (activeAccount == null) {
+      throw ArgumentError.notNull('activeAccount');
+    }
+
+    return _userRepository.getPreviousRegistrationTransactionId(
+      catalystId: activeAccount.catalystId,
+    );
+  }
+
+  @override
   Future<User> getUser() => _userRepository.getUser();
 
   @override
@@ -102,6 +130,17 @@ final class UserServiceImpl implements UserService {
   }
 
   @override
+  Future<RecoveredAccount> recoverAccount({
+    required CatalystId catalystId,
+    required RbacToken rbacToken,
+  }) {
+    return _userRepository.recoverAccount(
+      catalystId: catalystId,
+      rbacToken: rbacToken,
+    );
+  }
+
+  @override
   Future<void> registerAccount(Account account) async {
     var user = await getUser();
 
@@ -116,11 +155,16 @@ final class UserServiceImpl implements UserService {
 
     await _updateUser(user);
 
-    // updating email must be after updating user so that
-    // the request is sent with correct access token
-    final accountEmail = account.email;
-    if (accountEmail != null) {
-      unawaited(_userRepository.updateEmail(accountEmail.email));
+    final email = account.email;
+    if (email != null) {
+      // updating user profile must be after updating user so that
+      // the request is sent with correct access token
+      unawaited(
+        _userRepository.publishUserProfile(
+          catalystId: account.catalystId,
+          email: email.email,
+        ),
+      );
     }
   }
 
@@ -167,10 +211,6 @@ final class UserServiceImpl implements UserService {
     if (email != null) {
       final emailData = email.data;
 
-      if (emailData != null) {
-        await _userRepository.updateEmail(emailData);
-      }
-
       final accountEmail =
           emailData != null ? AccountEmail.pending(emailData) : null;
       updatedAccount = updatedAccount.copyWith(email: Optional(accountEmail));
@@ -179,6 +219,14 @@ final class UserServiceImpl implements UserService {
     if (roles != null) {
       updatedAccount = updatedAccount.copyWith(roles: roles);
     }
+
+    // TODO(damian-molinski): check if can be send separately.
+    /*if (username != null || email != null) {
+      await _userRepository.publishUserProfile(
+        catalystId: updatedAccount.catalystId,
+        email: updatedAccount.email,
+      );
+    }*/
 
     final updatedUser = user.updateAccount(updatedAccount);
 

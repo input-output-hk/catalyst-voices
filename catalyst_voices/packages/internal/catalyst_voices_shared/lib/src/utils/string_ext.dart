@@ -43,6 +43,13 @@ extension StringExt on String {
     };
   }
 
+  String? nullIfEmpty() {
+    if (isEmpty) {
+      return null;
+    }
+    return this;
+  }
+
   String starred({
     bool leading = true,
     bool isEnabled = true,
