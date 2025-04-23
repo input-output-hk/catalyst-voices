@@ -81,7 +81,7 @@ impl ConfigApi {
     ///
     /// Does not require any Catalyst RBAC Token to access.
     #[oai(
-        path = "/draft/config/frontend",
+        path = "/v1/config/frontend",
         method = "get",
         operation_id = "get_config_frontend"
     )]
@@ -135,7 +135,7 @@ impl ConfigApi {
     ///
     /// Does not require any Catalyst RBAC Token to access.
     #[oai(
-        path = "/draft/config/frontend/schema",
+        path = "/v1/config/frontend/schema",
         method = "get",
         operation_id = "get_config_frontend_schema"
     )]
@@ -157,7 +157,7 @@ impl ConfigApi {
     ///
     /// Requires Admin Authoritative RBAC Token.
     #[oai(
-        path = "/draft/config/frontend",
+        path = "/v1/config/frontend",
         method = "put",
         operation_id = "put_config_frontend",
         hidden = true
