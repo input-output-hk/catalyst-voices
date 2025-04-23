@@ -6,7 +6,7 @@ import 'package:result_type/result_type.dart';
 
 final class AccountSummaryData extends Equatable {
   final String? username;
-  final String email;
+  final String? email;
   final Set<AccountRole> roles;
   final String? address;
   final String? clipboardAddress;

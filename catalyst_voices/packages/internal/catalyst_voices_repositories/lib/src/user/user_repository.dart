@@ -5,7 +5,7 @@ import 'package:catalyst_voices_repositories/generated/api/cat_reviews.models.sw
 import 'package:catalyst_voices_repositories/src/api/api_services.dart';
 import 'package:catalyst_voices_repositories/src/common/rbac_token_ext.dart';
 import 'package:catalyst_voices_repositories/src/common/response_mapper.dart';
-import 'package:catalyst_voices_repositories/src/dto/user/account_status_dto.dart';
+import 'package:catalyst_voices_repositories/src/dto/user/reviews_catalyst_id_status_ext.dart';
 import 'package:catalyst_voices_repositories/src/dto/user/user_dto.dart';
 import 'package:catalyst_voices_repositories/src/user/source/user_storage.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
@@ -23,9 +23,7 @@ abstract interface class UserRepository {
     );
   }
 
-  Future<AccountStatus> getAccountStatus();
-
-  Future<AccountEmailVerificationStatus> getEmailStatus();
+  Future<AccountPublicStatus> getAccountPublicStatus();
 
   Future<TransactionHash> getPreviousRegistrationTransactionId({
     required CatalystId catalystId,
@@ -58,16 +56,10 @@ final class UserRepositoryImpl implements UserRepository {
   );
 
   @override
-  Future<AccountStatus> getAccountStatus() async {
-    final body =
-        await _apiServices.reviews.apiCatalystIdsMeGet().successBodyOrThrow();
-    return body.status!.toModel();
-  }
-
-  // TODO(damian-molinski): ask review api.
-  @override
-  Future<AccountEmailVerificationStatus> getEmailStatus() async {
-    return AccountEmailVerificationStatus.unknown;
+  Future<AccountPublicStatus> getAccountPublicStatus() {
+    return _getReviewsCatalystIDPublic()
+        .then((value) => value?.status?.toModel())
+        .then((value) => value ?? AccountPublicStatus.notSetup);
   }
 
   @override
@@ -120,9 +112,10 @@ final class UserRepositoryImpl implements UserRepository {
     // TODO(dtscalac): enable when endpoint works correctly
     // final rbacRegistration =
     //     await _recoverRbacRegistration(catalystId, rbacToken);
-    final publicId = await _recoverCatalystIDPublic(rbacToken);
+    final publicId = await _getReviewsCatalystIDPublic(token: rbacToken);
 
     return RecoveredAccount(
+      // TODO(damian-molinski): check latest document and see if there is username.
       username: publicId?.username as String?,
       email: publicId?.email as String?,
       // TODO(dtscalac): enable when endpoint works correctly
@@ -135,6 +128,7 @@ final class UserRepositoryImpl implements UserRepository {
         '9mdnmafh3djcxnc6jemlgdmswcve6tkw',
         /* cSpell:enable */
       ),
+      publicStatus: publicId?.status?.toModel() ?? AccountPublicStatus.notSetup,
     );
   }
 
@@ -145,17 +139,16 @@ final class UserRepositoryImpl implements UserRepository {
     return _storage.writeUser(dto);
   }
 
-  Future<CatalystIDPublic?> _recoverCatalystIDPublic(
-    RbacToken token,
-  ) async {
-    try {
-      return await _apiServices.reviews
-          .apiCatalystIdsMeGet(authorization: token.authHeader())
-          .successBodyOrThrow();
-    } on NotFoundException {
-      // nothing to recover
-      return null;
-    }
+  /// Looks up reviews module and receives status for active
+  /// account of [token] is not specified.
+  Future<CatalystIDPublic?> _getReviewsCatalystIDPublic({
+    RbacToken? token,
+  }) {
+    return _apiServices.reviews
+        .apiCatalystIdsMeGet(authorization: token?.authHeader())
+        .successBodyOrThrow()
+        .then<CatalystIDPublic?>((value) => value)
+        .onError<NotFoundException>((error, stackTrace) => null);
   }
 
   // TODO(dtscalac): enable when endpoint works correctly
@@ -163,7 +156,7 @@ final class UserRepositoryImpl implements UserRepository {
   Future<RbacRegistrationChain> _recoverRbacRegistration(
     CatalystId catalystId,
     RbacToken token,
-  ) async {
+  ) {
     return _apiServices.gateway
         .apiV1RbacRegistrationGet(
           lookup: catalystId.toUri().toStringWithoutScheme(),

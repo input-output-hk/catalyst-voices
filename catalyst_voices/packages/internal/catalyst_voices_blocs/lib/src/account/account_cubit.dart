@@ -118,7 +118,7 @@ final class AccountCubit extends Cubit<AccountState>
       status: const None(),
       catalystId: catalystId,
       username: Username.pure(catalystId?.username ?? ''),
-      email: Email.pure(from?.email?.email ?? ''),
+      email: Email.pure(from?.email ?? ''),
       roles: AccountRolesState(
         items: accountRolesItems,
         canAddRole: accountRolesItems.any((item) => !item.isSelected),

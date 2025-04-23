@@ -25,7 +25,7 @@ abstract interface class UserService implements ActiveAware {
 
   Future<User> getUser();
 
-  Future<bool> isActiveAccountEmailVerified();
+  Future<bool> isActiveAccountPubliclyVerified();
 
   /// Fetches info about recovered account.
   ///
@@ -100,33 +100,27 @@ final class UserServiceImpl implements UserService {
   Future<User> getUser() => _userRepository.getUser();
 
   @override
-  Future<bool> isActiveAccountEmailVerified() async {
+  Future<bool> isActiveAccountPubliclyVerified() async {
     final user = await getUser();
     final activeAccount = user.activeAccount;
-    final email = activeAccount?.email;
-    if (activeAccount == null || email == null) {
+    if (activeAccount == null) {
       return false;
     }
 
     // If already verified just return true.
-    if (email.status == AccountEmailVerificationStatus.verified) {
+    if (activeAccount.publicStatus.isVerified) {
       return true;
     }
 
     // Ask backend if status changed.
-    final status = await _userRepository.getEmailStatus();
-    if (status != email.status) {
-      final updatedEmail = email.copyWith(status: status);
-      final updatedAccount = activeAccount.copyWith(
-        email: Optional(updatedEmail),
-      );
-
+    final status = await _userRepository.getAccountPublicStatus();
+    if (status != activeAccount.publicStatus) {
+      final updatedAccount = activeAccount.copyWith(publicStatus: status);
       final updatedUser = user.updateAccount(updatedAccount);
-
       await _updateUser(updatedUser);
     }
 
-    return status == AccountEmailVerificationStatus.verified;
+    return status.isVerified;
   }
 
   @override
@@ -162,7 +156,7 @@ final class UserServiceImpl implements UserService {
       unawaited(
         _userRepository.publishUserProfile(
           catalystId: account.catalystId,
-          email: email.email,
+          email: email,
         ),
       );
     }
@@ -209,24 +203,24 @@ final class UserServiceImpl implements UserService {
     }
 
     if (email != null) {
-      final emailData = email.data;
-
-      final accountEmail =
-          emailData != null ? AccountEmail.pending(emailData) : null;
-      updatedAccount = updatedAccount.copyWith(email: Optional(accountEmail));
+      updatedAccount = updatedAccount.copyWith(
+        email: email,
+        publicStatus: email.isEmpty
+            ? AccountPublicStatus.notSetup
+            : AccountPublicStatus.verifying,
+      );
     }
 
     if (roles != null) {
       updatedAccount = updatedAccount.copyWith(roles: roles);
     }
 
-    // TODO(damian-molinski): check if can be send separately.
-    /*if (username != null || email != null) {
+    if (username != null || email != null) {
       await _userRepository.publishUserProfile(
         catalystId: updatedAccount.catalystId,
-        email: updatedAccount.email,
+        email: updatedAccount.email ?? '',
       );
-    }*/
+    }
 
     final updatedUser = user.updateAccount(updatedAccount);
 

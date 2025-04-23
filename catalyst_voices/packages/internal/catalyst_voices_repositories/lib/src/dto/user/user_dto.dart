@@ -9,19 +9,20 @@ part 'user_dto.g.dart';
 @JsonSerializable(createJsonKeys: true)
 final class AccountDto {
   final String catalystId;
-  final AccountEmailDto? email;
+  final String? email;
   final String keychainId;
   final Set<AccountRole> roles;
   final String? address;
-  final bool isProvisional;
+  @JsonKey(unknownEnumValue: JsonKey.nullForUndefinedEnumValue)
+  final AccountPublicStatus? publicStatus;
 
   AccountDto({
     required this.catalystId,
-    required this.email,
+    this.email,
     required this.keychainId,
     required this.roles,
     required this.address,
-    this.isProvisional = true,
+    this.publicStatus,
   });
 
   factory AccountDto.fromJson(Map<String, dynamic> json) {
@@ -35,12 +36,20 @@ final class AccountDto {
   AccountDto.fromModel(Account data)
       : this(
           catalystId: data.catalystId.toUri().toString(),
-          email: data.email?.toDto(),
+          email: data.email,
           keychainId: data.keychain.id,
           roles: data.roles,
           address: data.address?.toBech32(),
-          isProvisional: data.isProvisional,
+          publicStatus: data.publicStatus,
         );
+
+  // As part of migration falling back to unknown if email is not set.
+  AccountPublicStatus get _publicStatus {
+    return publicStatus ??
+        (email != null
+            ? AccountPublicStatus.unknown
+            : AccountPublicStatus.notSetup);
+  }
 
   Map<String, dynamic> toJson() => _$AccountDtoToJson(this);
 
@@ -53,55 +62,18 @@ final class AccountDto {
 
     return Account(
       catalystId: CatalystId.fromUri(Uri.parse(catalystId)),
-      email: email?.toModel(),
+      email: email,
       keychain: keychain,
       roles: roles,
       address: address != null ? ShelleyAddress.fromBech32(address) : null,
+      publicStatus: _publicStatus,
       isActive: keychainId == activeKeychainId,
-      isProvisional: isProvisional,
     );
   }
 
   static void _jsonMigration(Map<String, dynamic> json) {
-    /// String email field is migrated into object with additional status
-    /// field.
-    void emailMigrationToStatus() {
-      if (json.containsKey(_$AccountDtoJsonKeys.email) &&
-          json[_$AccountDtoJsonKeys.email] is String) {
-        json[_$AccountDtoJsonKeys.email] = AccountEmailDto(
-          email: json[_$AccountDtoJsonKeys.email] as String,
-          status: AccountEmailVerificationStatus.unknown,
-        ).toJson();
-      }
-    }
-
-    emailMigrationToStatus();
+    // empty at the moment.
   }
-}
-
-@JsonSerializable()
-final class AccountEmailDto {
-  final String email;
-  final AccountEmailVerificationStatus status;
-
-  AccountEmailDto({
-    required this.email,
-    this.status = AccountEmailVerificationStatus.unknown,
-  });
-
-  factory AccountEmailDto.fromJson(Map<String, dynamic> json) {
-    return _$AccountEmailDtoFromJson(json);
-  }
-
-  AccountEmailDto.fromModel(AccountEmail model)
-      : this(
-          email: model.email,
-          status: model.status,
-        );
-
-  Map<String, dynamic> toJson() => _$AccountEmailDtoToJson(this);
-
-  AccountEmail toModel() => AccountEmail(email: email, status: status);
 }
 
 @JsonSerializable()
@@ -250,8 +222,4 @@ final class UserSettingsDto {
       showSubmissionClosingWarning: showSubmissionClosingWarning,
     );
   }
-}
-
-extension on AccountEmail {
-  AccountEmailDto toDto() => AccountEmailDto.fromModel(this);
 }

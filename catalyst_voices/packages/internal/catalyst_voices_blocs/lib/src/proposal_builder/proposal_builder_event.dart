@@ -84,10 +84,10 @@ final class RebuildActiveAccountProposalEvent extends ProposalBuilderEvent {
   List<Object?> get props => [catalystId];
 }
 
-final class AccountEmailVerificationChangedEvent extends ProposalBuilderEvent {
-  final AccountEmailVerificationStatus status;
+final class AccountPublicStatusChangedEvent extends ProposalBuilderEvent {
+  final AccountPublicStatus status;
 
-  const AccountEmailVerificationChangedEvent({required this.status});
+  const AccountPublicStatusChangedEvent({required this.status});
 
   @override
   List<Object?> get props => [status];

@@ -239,10 +239,11 @@ final class RegistrationServiceImpl implements RegistrationService {
           catalystId: catalystId.copyWith(
             username: Optional(recovered.username),
           ),
-          email: recovered.email ?? '',
+          email: recovered.email,
           keychain: keychain,
           roles: recovered.roles,
           address: recovered.stakeAddress,
+          publicStatus: recovered.publicStatus,
         );
       });
     });
@@ -276,10 +277,13 @@ final class RegistrationServiceImpl implements RegistrationService {
 
           return Account(
             catalystId: catalystId,
-            email: AccountEmail.pending(data.email),
+            email: data.email,
             keychain: keychain,
             roles: data.roles,
             address: walletInfo.address,
+            publicStatus: data.email != null
+                ? AccountPublicStatus.verifying
+                : AccountPublicStatus.notSetup,
           );
         });
       });
@@ -327,6 +331,7 @@ final class RegistrationServiceImpl implements RegistrationService {
         keychain: keychain,
         roles: roles,
         address: _testNetAddress,
+        publicStatus: AccountPublicStatus.notSetup,
       );
     });
   }

@@ -43,14 +43,8 @@ void main() {
             'keychainId': 'uuid',
             'email': email,
             'roles': ['voter'],
-            'walletInfo': {
-              'metadata': {
-                'name': 'Eternl',
-              },
-              'balance': 0,
-              'address': 'addr_test1vzpwq95z3xyum8vqn'
-                  'dgdd9mdnmafh3djcxnc6jemlgdmswcve6tkw',
-            },
+            'address': 'addr_test1vzpwq95z3xyum8vqn'
+                'dgdd9mdnmafh3djcxnc6jemlgdmswcve6tkw',
             'isProvisional': true,
           };
           /* cSpell:enable */
@@ -60,33 +54,25 @@ void main() {
 
           // Then
           expect(dto.email, isNotNull);
-          expect(dto.email!.email, email);
-          expect(dto.email!.status, AccountEmailVerificationStatus.unknown);
+          expect(dto.email, email);
+          expect(dto.publicStatus, isNull);
         });
 
         test('correct email model is not affected', () {
           // Given
           const email = 'dev@iohk';
-          const status = AccountEmailVerificationStatus.verified;
+          const status = AccountPublicStatus.verified;
 
           /* cSpell:disable */
           final json = <String, dynamic>{
             'catalystId': 'cardano/uuid',
             'keychainId': 'uuid',
-            'email': {
-              'email': email,
-              'status': status.name,
-            },
+            'email': email,
             'roles': ['voter'],
-            'walletInfo': {
-              'metadata': {
-                'name': 'Eternl',
-              },
-              'balance': 0,
-              'address': 'addr_test1vzpwq95z3xyum8vqn'
-                  'dgdd9mdnmafh3djcxnc6jemlgdmswcve6tkw',
-            },
+            'address': 'addr_test1vzpwq95z3xyum8vqn'
+                'dgdd9mdnmafh3djcxnc6jemlgdmswcve6tkw',
             'isProvisional': true,
+            'publicStatus': status.name,
           };
           /* cSpell:enable */
 
@@ -95,8 +81,8 @@ void main() {
 
           // Then
           expect(dto.email, isNotNull);
-          expect(dto.email!.email, email);
-          expect(dto.email!.status, status);
+          expect(dto.email, email);
+          expect(dto.publicStatus, status);
         });
       });
     });
