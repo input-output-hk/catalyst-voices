@@ -13,42 +13,42 @@ import 'package:test/scaffolding.dart';
 import 'package:uuid_plus/uuid_plus.dart';
 
 void main() {
-  late final KeychainProvider keychainProvider;
-  late final UserObserver userObserver;
-  late UserRepository userRepository;
-  late UserService service;
-
-  setUpAll(() {
-    final store = InMemorySharedPreferencesAsync.empty();
-    SharedPreferencesAsyncPlatform.instance = store;
-    FlutterSecureStorage.setMockInitialValues({});
-    DummyCatalystIdFactory.registerDummyKeyFactory();
-
-    keychainProvider = VaultKeychainProvider(
-      secureStorage: const FlutterSecureStorage(),
-      sharedPreferences: SharedPreferencesAsync(),
-      cacheConfig: const CacheConfig(),
-    );
-    userObserver = StreamUserObserver();
-  });
-
-  tearDownAll(() async {
-    await userObserver.dispose();
-  });
-
-  setUp(() {
-    userRepository = _FakeUserRepository();
-    service = UserService(userRepository, userObserver);
-  });
-
-  tearDown(() async {
-    userObserver.user = const User.empty();
-
-    await const FlutterSecureStorage().deleteAll();
-    await SharedPreferencesAsync().clear();
-  });
-
   group(UserService, () {
+    late final KeychainProvider keychainProvider;
+    late final UserObserver userObserver;
+    late UserRepository userRepository;
+    late UserService service;
+
+    setUpAll(() {
+      final store = InMemorySharedPreferencesAsync.empty();
+      SharedPreferencesAsyncPlatform.instance = store;
+      FlutterSecureStorage.setMockInitialValues({});
+      DummyCatalystIdFactory.registerDummyKeyFactory();
+
+      keychainProvider = VaultKeychainProvider(
+        secureStorage: const FlutterSecureStorage(),
+        sharedPreferences: SharedPreferencesAsync(),
+        cacheConfig: const CacheConfig(),
+      );
+      userObserver = StreamUserObserver();
+    });
+
+    tearDownAll(() async {
+      await userObserver.dispose();
+    });
+
+    setUp(() {
+      userRepository = _FakeUserRepository();
+      service = UserService(userRepository, userObserver);
+    });
+
+    tearDown(() async {
+      userObserver.user = const User.empty();
+
+      await const FlutterSecureStorage().deleteAll();
+      await SharedPreferencesAsync().clear();
+    });
+
     test('when registering account getter returns that account', () async {
       // Given
       final keychainId = const Uuid().v4();
@@ -169,33 +169,35 @@ void main() {
       await service.dispose();
     });
 
-    test('accounts getter returns all keychains initialized local instances',
-        () async {
-      // Given
-      final ids = List.generate(5, (_) => const Uuid().v4());
+    test(
+      'accounts getter returns all keychains initialized local instances',
+      () async {
+        // Given
+        final ids = List.generate(5, (_) => const Uuid().v4());
 
-      // When
-      final accounts = <Account>[];
-      for (final id in ids) {
-        final keychain = await keychainProvider.create(id);
-        final account = Account.dummy(
-          catalystId: DummyCatalystIdFactory.create(),
-          keychain: keychain,
+        // When
+        final accounts = <Account>[];
+        for (final id in ids) {
+          final keychain = await keychainProvider.create(id);
+          final account = Account.dummy(
+            catalystId: DummyCatalystIdFactory.create(),
+            keychain: keychain,
+          );
+
+          accounts.add(account);
+        }
+
+        await userRepository.saveUser(User.optional(accounts: accounts));
+
+        // Then
+        final user = await service.getUser();
+
+        expect(
+          user.accounts.map((e) => e.catalystId),
+          accounts.map((e) => e.catalystId),
         );
-
-        accounts.add(account);
-      }
-
-      await userRepository.saveUser(User.optional(accounts: accounts));
-
-      // Then
-      final user = await service.getUser();
-
-      expect(
-        user.accounts.map((e) => e.catalystId),
-        accounts.map((e) => e.catalystId),
-      );
-    });
+      },
+    );
 
     test('use last account restores previously stored', () async {
       // Given
@@ -294,13 +296,7 @@ void main() {
 
         final userStream = service.watchUser;
 
-        expect(
-          userStream,
-          emitsInOrder([
-            initialUser,
-            expectedUser,
-          ]),
-        );
+        expect(userStream, emitsInOrder([initialUser, expectedUser]));
 
         // Then
         await service.useLastAccount();

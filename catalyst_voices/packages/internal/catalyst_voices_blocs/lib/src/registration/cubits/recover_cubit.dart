@@ -11,18 +11,18 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:result_type/result_type.dart';
 
 const _testWords = [
-  SeedPhraseWord('broken', nr: 1),
-  SeedPhraseWord('member', nr: 2),
-  SeedPhraseWord('repeat', nr: 3),
-  SeedPhraseWord('liquid', nr: 4),
-  SeedPhraseWord('barely', nr: 5),
-  SeedPhraseWord('electric', nr: 6),
-  SeedPhraseWord('theory', nr: 7),
-  SeedPhraseWord('paddle', nr: 8),
-  SeedPhraseWord('coyote', nr: 9),
-  SeedPhraseWord('behind', nr: 10),
-  SeedPhraseWord('unique', nr: 11),
-  SeedPhraseWord('member', nr: 12),
+  SeedPhraseWord('asthma', nr: 1),
+  SeedPhraseWord('moral', nr: 2),
+  SeedPhraseWord('actress', nr: 3),
+  SeedPhraseWord('venue', nr: 4),
+  SeedPhraseWord('waste', nr: 5),
+  SeedPhraseWord('include', nr: 6),
+  SeedPhraseWord('oven', nr: 7),
+  SeedPhraseWord('outdoor', nr: 8),
+  SeedPhraseWord('record', nr: 9),
+  SeedPhraseWord('blouse', nr: 10),
+  SeedPhraseWord('abuse', nr: 11),
+  SeedPhraseWord('vague', nr: 12),
 ];
 
 final _logger = Logger('RecoverCubit');
@@ -41,10 +41,10 @@ final class RecoverCubit extends Cubit<RecoverStateData>
     required UserService userService,
     required RegistrationService registrationService,
     required KeyDerivationService keyDerivationService,
-  })  : _userService = userService,
-        _registrationService = registrationService,
-        _keyDerivationService = keyDerivationService,
-        super(const RecoverStateData()) {
+  }) : _userService = userService,
+       _registrationService = registrationService,
+       _keyDerivationService = keyDerivationService,
+       super(const RecoverStateData()) {
     /// pre-populate all available words
     emit(state.copyWith(seedPhraseWords: SeedPhrase.wordList));
 
@@ -143,10 +143,7 @@ final class RecoverCubit extends Cubit<RecoverStateData>
     }
 
     emit(
-      state.copyWith(
-        userSeedPhraseWords: words,
-        isSeedPhraseValid: isValid,
-      ),
+      state.copyWith(userSeedPhraseWords: words, isSeedPhraseValid: isValid),
     );
   }
 

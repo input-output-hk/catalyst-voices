@@ -62,10 +62,7 @@ final class UserServiceImpl implements UserService {
   final UserRepository _userRepository;
   final UserObserver _userObserver;
 
-  UserServiceImpl(
-    this._userRepository,
-    this._userObserver,
-  );
+  UserServiceImpl(this._userRepository, this._userObserver);
 
   @override
   bool get isActive => _userObserver.isActive;
