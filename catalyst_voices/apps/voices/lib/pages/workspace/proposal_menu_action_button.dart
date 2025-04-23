@@ -12,7 +12,8 @@ import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_view_models/src/proposal_builder/proposal_menu_item_action_enum.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart'
+    hide PopupMenuItem;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
