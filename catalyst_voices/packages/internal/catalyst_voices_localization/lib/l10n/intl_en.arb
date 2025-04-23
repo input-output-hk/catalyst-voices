@@ -2594,5 +2594,21 @@
   "emailNotVerifiedDialogAction": "Go to My Account",
   "@emailNotVerifiedDialogAction": {
     "description": "Action of dialog when trying to publish document but does not have verified email"
+  },
+  "accountEmailHint": "Please provide an email for proposer and reviewer roles.",
+  "@accountEmailHint": {
+    "description": "When email is not provided this message is shown instead in Account page"
+  },
+  "verificationPending": "Verification pending",
+  "@verificationPending": {
+    "description": "Message of account status chip next to email. Meaning Account is not verified yet."
+  },
+  "verified": "Verified",
+  "@verified": {
+    "description": "Message of account status chip next to email. Meaning Account is verified."
+  },
+  "notVerified": "Not verified",
+  "@notVerified": {
+    "description": "Message of account status chip next to email. Meaning Account is not verified."
   }
 }

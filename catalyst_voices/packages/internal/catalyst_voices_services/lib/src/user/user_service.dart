@@ -216,10 +216,13 @@ final class UserServiceImpl implements UserService {
     }
 
     if (username != null || email != null) {
-      await _userRepository.publishUserProfile(
-        catalystId: updatedAccount.catalystId,
-        email: updatedAccount.email ?? '',
-      );
+      final accountEmail = updatedAccount.email;
+      if (accountEmail != null) {
+        await _userRepository.publishUserProfile(
+          catalystId: updatedAccount.catalystId,
+          email: accountEmail,
+        );
+      }
     }
 
     final updatedUser = user.updateAccount(updatedAccount);

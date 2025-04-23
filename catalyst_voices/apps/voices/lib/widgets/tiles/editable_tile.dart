@@ -11,7 +11,7 @@ typedef EditableTileChange = ({
 
 class EditableTile extends StatelessWidget {
   final String title;
-  final bool isSelected;
+  final WidgetStatesController? statesController;
   final bool isEditMode;
   final bool isSaveEnabled;
   final bool isEditEnabled;
@@ -25,7 +25,7 @@ class EditableTile extends StatelessWidget {
   const EditableTile({
     super.key,
     required this.title,
-    this.isSelected = false,
+    this.statesController,
     this.isEditMode = false,
     this.isSaveEnabled = false,
     this.isEditEnabled = true,
@@ -44,7 +44,7 @@ class EditableTile extends StatelessWidget {
 
     return PropertyTile(
       title: title,
-      isSelected: isSelected,
+      statesController: statesController,
       action: Offstage(
         offstage: !isEditEnabled,
         child: VoicesEditCancelButton(

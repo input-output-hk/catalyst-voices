@@ -124,6 +124,7 @@ final class AccountCubit extends Cubit<AccountState>
         canAddRole: accountRolesItems.any((item) => !item.isSelected),
       ),
       walletConnected: from?.address?.toBech32() ?? '',
+      accountPublicStatus: from?.publicStatus ?? AccountPublicStatus.unknown,
     );
   }
 }
