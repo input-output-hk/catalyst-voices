@@ -1,6 +1,6 @@
 VERSION 0.8
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:v3.3.3 AS flutter-ci
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/playwright:v3.3.3 AS playwright-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:fix/revert-flutter-installer AS flutter-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/playwright:fix/revert-flutter-installerAS playwright-ci
 
 deps:
     DO playwright-ci+SETUP --workdir=/wallet-automation

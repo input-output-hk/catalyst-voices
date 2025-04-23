@@ -4,8 +4,8 @@ version: 0.1.0+1
 publish_to: none
 
 environment:
-  sdk: ">=3.5.0 <4.0.0"
-  flutter: ">=3.29.0"
+  sdk: ">=3.7.0 <4.0.0"
+  flutter: ">=3.29.3"
 
 dependencies:
   async: ^2.11.0

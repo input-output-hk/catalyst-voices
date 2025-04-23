@@ -6,8 +6,8 @@ topics: [cryptography, encryption]
 version: 1.0.0
 
 environment:
-  sdk: ">=3.5.0 <4.0.0"
-  flutter: ">=3.29.0"
+  sdk: ">=3.7.0 <4.0.0"
+  flutter: ">=3.29.3"
 
 dependencies:
   cbor: ^6.2.0

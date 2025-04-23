@@ -1,6 +1,6 @@
 VERSION 0.8
 
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/python:v3.3.3 AS python-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/python:fix/revert-flutter-installer AS python-ci
 IMPORT github.com/input-output-hk/catalyst-libs/rust:r20250416-00 AS cat-libs-rust
 
 builder:
