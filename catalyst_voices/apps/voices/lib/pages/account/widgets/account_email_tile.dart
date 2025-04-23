@@ -98,7 +98,7 @@ class _AccountEmailTileState extends State<AccountEmailTile> {
 
     _statesController = WidgetStatesController({
       if (_email.value.isEmpty) WidgetState.error,
-      if (_focusNode.hasFocus) WidgetState.focused,
+      if (_isEditMode) WidgetState.selected,
     });
 
     _emailSub = bloc.stream
@@ -150,7 +150,9 @@ class _AccountEmailTileState extends State<AccountEmailTile> {
       }
 
       final addErrorState = !_isEditMode && _email.value.isEmpty;
-      _statesController.update(WidgetState.error, addErrorState);
+      _statesController
+        ..update(WidgetState.error, addErrorState)
+        ..update(WidgetState.selected, _isEditMode);
 
       switch (value.source) {
         case EditableTileChangeSource.cancel:

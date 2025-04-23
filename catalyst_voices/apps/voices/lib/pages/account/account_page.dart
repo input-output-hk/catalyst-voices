@@ -108,11 +108,6 @@ class _AccountPageState extends State<AccountPage>
     super.initState();
 
     unawaited(context.read<AccountCubit>().updateAccountDetails());
-
-    Future<void>.delayed(
-      const Duration(seconds: 1),
-      _showVerificationEmailSendDialog,
-    );
   }
 
   void _showVerificationEmailSendDialog() {
