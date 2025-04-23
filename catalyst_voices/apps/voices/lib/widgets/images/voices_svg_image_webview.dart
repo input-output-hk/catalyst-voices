@@ -50,16 +50,15 @@ class _VoicesSvgImageWebviewState extends State<VoicesSvgImageWebview> {
   String _fullScreenSvgHtmlPage(String svg) {
     return '''
     <!DOCTYPE html>
-    <html lang="en">
+    <html>
     <head>
       <meta charset="UTF-8">
-      <title>Full-Screen SVG</title>
       <style>
         html, body {
           margin: 0;
           padding: 0;
-          height: 100%;
           width: 100%;
+          height: 100%;
           overflow: hidden; /* disables scrollbars */
         }
 
