@@ -1,8 +1,12 @@
 import 'package:catalyst_cardano/catalyst_cardano.dart';
+import 'package:catalyst_voices/widgets/images/voices_svg_image_webview.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
+
+final Logger _logger = Logger('VoicesWalletTile');
 
 /// A replacement for the [ListTile] with customized
 /// styling that displays a [CardanoWallet].
@@ -69,18 +73,37 @@ class VoicesWalletTileIcon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final iconSrc = this.iconSrc;
+
+    Widget image;
+    if (iconSrc == null) {
+      image = const _IconPlaceholder();
+    } else if (iconSrc.contains('image/svg')) {
+      image = VoicesSvgImageWebview(
+        src: iconSrc,
+        errorBuilder: _errorBuilder,
+      );
+    } else {
+      image = Image.network(
+        iconSrc,
+        errorBuilder: _errorBuilder,
+      );
+    }
+
     return SizedBox(
       width: 40,
       height: 40,
-      child: iconSrc == null
-          ? const _IconPlaceholder()
-          : Image.network(
-              iconSrc,
-              errorBuilder: (context, error, stackTrace) {
-                return const _IconPlaceholder();
-              },
-            ),
+      child: image,
     );
+  }
+
+  Widget _errorBuilder(
+    BuildContext context,
+    Object error,
+    StackTrace? stackTrace,
+  ) {
+    _logger.severe('WalletIcon', error, stackTrace);
+
+    return const _IconPlaceholder();
   }
 }
 
