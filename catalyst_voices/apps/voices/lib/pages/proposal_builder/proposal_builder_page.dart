@@ -259,7 +259,9 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
     final openAccount = await EmailNotVerifiedDialog.show(context);
 
     if (openAccount && mounted) {
-      const AccountRoute().go(context);
+      Router.neglect(context, () {
+        unawaited(const AccountRoute().push(context));
+      });
     }
   }
 
