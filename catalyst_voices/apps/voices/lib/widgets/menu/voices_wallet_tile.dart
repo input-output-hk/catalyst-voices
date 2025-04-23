@@ -74,20 +74,17 @@ class VoicesWalletTileIcon extends StatelessWidget {
   Widget build(BuildContext context) {
     final iconSrc = this.iconSrc;
 
-    Widget image;
-    if (iconSrc == null) {
-      image = const _IconPlaceholder();
-    } else if (iconSrc.contains('image/svg')) {
-      image = VoicesSvgImageWebview(
-        src: iconSrc,
-        errorBuilder: _errorBuilder,
-      );
-    } else {
-      image = Image.network(
-        iconSrc,
-        errorBuilder: _errorBuilder,
-      );
-    }
+    final image = switch (iconSrc) {
+      null => const _IconPlaceholder(),
+      final src when src.contains('image/svg') => VoicesSvgImageWebview(
+          src: src,
+          errorBuilder: _errorBuilder,
+        ),
+      final src => Image.network(
+          src,
+          errorBuilder: _errorBuilder,
+        ),
+    };
 
     return SizedBox(
       width: 40,

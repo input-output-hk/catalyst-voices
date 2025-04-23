@@ -22,13 +22,13 @@ class VoicesSvgImageWebview extends StatefulWidget {
 }
 
 class _VoicesSvgImageWebviewState extends State<VoicesSvgImageWebview> {
-  Widget? _errorWidget;
+  WebResourceError? _error;
 
   @override
   Widget build(BuildContext context) {
-    final errorWidget = _errorWidget;
-    if (errorWidget != null) {
-      return errorWidget;
+    final error = _error;
+    if (error != null) {
+      return widget.errorBuilder(context, error, null);
     }
 
     return InAppWebView(
@@ -38,7 +38,7 @@ class _VoicesSvgImageWebviewState extends State<VoicesSvgImageWebview> {
       onReceivedError: (controller, request, error) {
         if (mounted) {
           setState(() {
-            _errorWidget = widget.errorBuilder(context, error, null);
+            _error = error;
           });
         }
       },
