@@ -590,6 +590,7 @@ impl SyncTask {
                 let purge_to_slot =
                     self.immutable_tip_slot - Settings::purge_backward_slot_buffer();
                 let purge_condition = PurgeCondition::PurgeBackwards(purge_to_slot);
+                info!(chain=%self.cfg.chain, purge_to_slot=?purge_to_slot, "Backwards purging volatile data.");
                 if let Err(error) = roll_forward::purge_live_index(purge_condition).await {
                     error!(chain=%self.cfg.chain, error=%error, "BUG: Purging volatile data task failed.");
                 } else {
