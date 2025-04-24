@@ -19,6 +19,7 @@ final _testNetAddress = ShelleyAddress.fromBech32(
 abstract interface class RegistrationService {
   factory RegistrationService(
     UserService userService,
+    WalletService walletService,
     KeychainProvider keychainProvider,
     CatalystCardano cardano,
     AuthTokenGenerator authTokenGenerator,
@@ -92,6 +93,7 @@ abstract interface class RegistrationService {
 /// Manages the user registration.
 final class RegistrationServiceImpl implements RegistrationService {
   final UserService _userService;
+  final WalletService _walletService;
   final KeychainProvider _keychainProvider;
   final CatalystCardano _cardano;
   final AuthTokenGenerator _authTokenGenerator;
@@ -100,6 +102,7 @@ final class RegistrationServiceImpl implements RegistrationService {
 
   const RegistrationServiceImpl(
     this._userService,
+    this._walletService,
     this._keychainProvider,
     this._cardano,
     this._authTokenGenerator,
@@ -148,8 +151,13 @@ final class RegistrationServiceImpl implements RegistrationService {
     required SeedPhrase seedPhrase,
     required ShelleyAddress address,
   }) async {
-    // TODO(dtscalac): fetch wallet balance from cat-gateway
-    return const Coin(0);
+    final rbacToken = await _deriveRbacToken(seedPhrase);
+
+    return _walletService.getWalletBalance(
+      stakeAddress: address,
+      networkId: _blockchainConfig.networkId,
+      rbacToken: rbacToken,
+    );
   }
 
   @override
@@ -367,6 +375,31 @@ final class RegistrationServiceImpl implements RegistrationService {
       balance: balance.coin,
       address: addresses.first,
     );
+  }
+
+  Future<RbacToken> _deriveRbacToken(SeedPhrase seedPhrase) {
+    final masterKey = _keyDerivationService.deriveMasterKey(
+      seedPhrase: seedPhrase,
+    );
+
+    return masterKey.use((masterKey) async {
+      final role0Key = _keyDerivationService.deriveAccountRoleKeyPair(
+        masterKey: masterKey,
+        role: AccountRole.root,
+      );
+
+      return role0Key.use((role0Key) async {
+        final catalystId = CatalystId(
+          host: _blockchainConfig.host.host,
+          role0Key: role0Key.publicKey.publicKeyBytes,
+        );
+
+        return _authTokenGenerator.generate(
+          masterKey: masterKey,
+          catalystId: catalystId,
+        );
+      });
+    });
   }
 
   Future<TransactionHash?> _fetchPreviousTransactionId({
