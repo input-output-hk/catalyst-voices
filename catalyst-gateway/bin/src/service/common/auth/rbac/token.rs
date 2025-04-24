@@ -4,7 +4,6 @@
 
 use std::{
     fmt::{Display, Formatter},
-    sync::LazyLock,
     time::Duration,
 };
 
@@ -14,12 +13,7 @@ use cardano_blockchain_types::Network;
 use catalyst_types::id_uri::{key_rotation::KeyRotation, role_index::RoleIndex, IdUri};
 use chrono::{TimeDelta, Utc};
 use ed25519_dalek::{ed25519::signature::Signer, Signature, SigningKey, VerifyingKey};
-use poem_openapi::{
-    registry::{MetaSchema, MetaSchemaRef},
-    types::{ParseError, ParseFromJSON, ParseFromParameter, ParseResult, Type},
-};
 use rbac_registration::registration::cardano::RegistrationChain;
-use serde_json::Value;
 
 use crate::db::index::{
     queries::rbac::get_rbac_registrations::build_reg_chain,
@@ -183,63 +177,6 @@ impl CatalystRBACTokenV1 {
             self.reg_chain = build_reg_chain(&session, self.catalyst_id(), self.network()).await?;
         }
         Ok(self.reg_chain.clone())
-    }
-}
-
-/// Catalyst RBAC Token String Format
-const FORMAT: &str = "catalyst_rbac_token";
-
-/// A schema.
-static SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| {
-    MetaSchema {
-        title: Some("Catalyst RBAC token".into()),
-        description: Some("Catalyst RBAC token in string format"),
-        example: None,
-        pattern: None,
-        ..MetaSchema::ANY
-    }
-});
-
-impl Type for CatalystRBACTokenV1 {
-    type RawElementValueType = Self;
-    type RawValueType = Self;
-
-    const IS_REQUIRED: bool = true;
-
-    fn name() -> std::borrow::Cow<'static, str> {
-        format!("string({FORMAT})").into()
-    }
-
-    fn schema_ref() -> MetaSchemaRef {
-        MetaSchemaRef::Inline(Box::new(MetaSchema::new_with_format("string", FORMAT)))
-            .merge(SCHEMA.clone())
-    }
-
-    fn as_raw_value(&self) -> Option<&Self::RawValueType> {
-        Some(self)
-    }
-
-    fn raw_element_iter<'a>(
-        &'a self,
-    ) -> Box<dyn Iterator<Item = &'a Self::RawElementValueType> + 'a> {
-        Box::new(self.as_raw_value().into_iter())
-    }
-}
-
-impl ParseFromJSON for CatalystRBACTokenV1 {
-    fn parse_from_json(value: Option<Value>) -> ParseResult<Self> {
-        let value = value.unwrap_or_default();
-        if let Value::String(value) = value {
-            CatalystRBACTokenV1::parse_from_parameter(&value)
-        } else {
-            Err(ParseError::expected_type(value))
-        }
-    }
-}
-
-impl ParseFromParameter for CatalystRBACTokenV1 {
-    fn parse_from_parameter(value: &str) -> ParseResult<Self> {
-        Ok(CatalystRBACTokenV1::parse(value)?)
     }
 }
 

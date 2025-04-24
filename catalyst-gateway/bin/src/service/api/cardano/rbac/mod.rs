@@ -1,13 +1,9 @@
 //! RBAC endpoints.
 
-use poem_openapi::{param::Query, payload::Json, OpenApi};
+use poem_openapi::{param::Query, OpenApi};
 
 use crate::service::common::{
-    auth::{
-        api_key::InternalApiKeyAuthorization, none_or_rbac::NoneOrRBAC,
-        rbac::token::CatalystRBACTokenV1,
-    },
-    tags::ApiTags,
+    auth::none_or_rbac::NoneOrRBAC, tags::ApiTags,
     types::cardano::query::cat_id_or_stake::CatIdOrStake,
 };
 
@@ -36,25 +32,5 @@ impl Api {
     ) -> registrations_get::AllResponses {
         let token = auth.into();
         registrations_get::endpoint(lookup, token).await
-    }
-
-    #[oai(
-        path = "/v1/rbac/token/validate",
-        method = "post",
-        operation_id = "rbacTokenValidation",
-        hidden = true
-    )]
-    #[allow(clippy::unused_async)]
-    /// Validate a RBAC token
-    ///
-    /// Make a not hard validation of the RBAC token, disabling
-    async fn validate_rbac_token(
-        &self,
-        /// RBAC token provided for validation
-        Json(_rbac_token): Json<CatalystRBACTokenV1>,
-        /// No Authorization required, but Token permitted.
-        _auth: InternalApiKeyAuthorization,
-    ) -> registrations_get::AllResponses {
-        registrations_get::AllResponses::unauthorized()
     }
 }
