@@ -1,3 +1,7 @@
+import 'dart:async';
+
+import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
+import 'package:catalyst_voices/common/constants/constants.dart';
 import 'package:catalyst_voices/common/ext/account_role_ext.dart';
 import 'package:catalyst_voices/widgets/buttons/clipboard_button.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_filled_button.dart';
@@ -160,6 +164,39 @@ class _BlocNavigation extends StatelessWidget {
   }
 }
 
+class _CheckOnCardanoScanButton extends StatelessWidget with LaunchUrlMixin {
+  final ShelleyAddress address;
+
+  const _CheckOnCardanoScanButton({required this.address});
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: Alignment.topLeft,
+      child: VoicesTextButton(
+        style: const ButtonStyle(
+          padding: WidgetStatePropertyAll(
+            EdgeInsets.symmetric(horizontal: 8),
+          ),
+        ),
+        child: Text(
+          context.l10n.checkOnCardanoScan,
+          style: Theme.of(context).textTheme.labelMedium!.copyWith(
+                color: Theme.of(context).colorScheme.primary,
+                fontWeight: FontWeight.w500,
+              ),
+        ),
+        onTap: () => _showOnCardanoScan(address),
+      ),
+    );
+  }
+
+  void _showOnCardanoScan(ShelleyAddress address) {
+    final uri = VoicesConstants.cardanoScanStakeAddressUrl(address).getUri();
+    unawaited(launchUri(uri));
+  }
+}
+
 class _Navigation extends StatelessWidget {
   final bool isNextEnabled;
 
@@ -224,7 +261,7 @@ class _RecoveredAccountSummary extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final address = account.address;
+    final address = account.formattedAddress;
     final balance = account.balance;
 
     return Column(
@@ -301,7 +338,7 @@ class _SummaryDetails extends StatelessWidget {
 
 class _WalletSummaryDetails extends StatelessWidget {
   final String address;
-  final String? clipboardAddress;
+  final ShelleyAddress? clipboardAddress;
   final String balance;
 
   const _WalletSummaryDetails({
@@ -314,7 +351,7 @@ class _WalletSummaryDetails extends StatelessWidget {
   Widget build(BuildContext context) {
     final clipboardAddress = this.clipboardAddress;
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.symmetric(vertical: 12),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
@@ -327,21 +364,36 @@ class _WalletSummaryDetails extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         spacing: 12,
         children: [
-          _SummaryDetails(
-            label: Text(context.l10n.linkedWallet),
-            value: Row(
-              spacing: 6,
-              children: [
-                Text(address),
-                if (clipboardAddress != null)
-                  VoicesClipboardIconButton(clipboardData: clipboardAddress),
-              ],
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: _SummaryDetails(
+              label: Text(context.l10n.linkedWallet),
+              value: Row(
+                spacing: 6,
+                children: [
+                  Text(address),
+                  if (clipboardAddress != null)
+                    VoicesClipboardIconButton(
+                      clipboardData: clipboardAddress.toBech32(),
+                    ),
+                ],
+              ),
             ),
           ),
-          _SummaryDetails(
-            label: Text(context.l10n.balance),
-            value: Text(balance),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: _SummaryDetails(
+              label: Text(context.l10n.balance),
+              value: Text(balance),
+            ),
           ),
+          if (clipboardAddress != null)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4),
+              child: _CheckOnCardanoScanButton(
+                address: clipboardAddress,
+              ),
+            ),
         ],
       ),
     );

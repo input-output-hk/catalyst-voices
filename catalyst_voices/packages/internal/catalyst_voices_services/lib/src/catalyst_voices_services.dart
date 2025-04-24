@@ -22,3 +22,4 @@ export 'registration/registration_transaction_role.dart'
 export 'sync/sync_manager.dart' show SyncManager;
 export 'user/signer_service.dart';
 export 'user/user_service.dart' show UserService;
+export 'wallet/wallet_service.dart' show WalletService;
