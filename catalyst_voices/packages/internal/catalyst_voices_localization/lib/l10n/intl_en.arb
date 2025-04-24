@@ -1829,7 +1829,7 @@
   "@change": {
     "description": "An action to change/modify something."
   },
-  "submittedForReview": "Submitted for Review ({submittedCount}/{maxCount})",
+  "submittedForReview": "Submitted for Review / Locked final ({submittedCount}/{maxCount})",
   "@submittedForReview": {
     "description": "Label for the submitted for review section",
     "placeholders": {
