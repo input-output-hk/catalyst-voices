@@ -14,7 +14,7 @@ abstract interface class WalletRepository {
   Future<Coin> getWalletBalance({
     required ShelleyAddress stakeAddress,
     required NetworkId networkId,
-    required RbacToken rbacToken,
+    RbacToken? rbacToken,
   });
 }
 
@@ -27,16 +27,15 @@ final class WalletRepositoryImpl implements WalletRepository {
   Future<Coin> getWalletBalance({
     required ShelleyAddress stakeAddress,
     required NetworkId networkId,
-    required RbacToken rbacToken,
-  }) async {
-    final stakeInfo = await _apiServices.gateway
+    RbacToken? rbacToken,
+  }) {
+    return _apiServices.gateway
         .apiV1CardanoAssetsStakeAddressGet(
           stakeAddress: stakeAddress.toBech32(),
           network: networkId.toDto(),
-          authorization: rbacToken.authHeader(),
+          authorization: rbacToken?.authHeader(),
         )
-        .successBodyOrThrow();
-
-    return Coin(stakeInfo.volatile.adaAmount);
+        .successBodyOrThrow()
+        .then((stakeInfo) => Coin(stakeInfo.volatile.adaAmount));
   }
 }

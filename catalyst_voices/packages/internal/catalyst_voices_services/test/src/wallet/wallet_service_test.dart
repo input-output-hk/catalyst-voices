@@ -45,7 +45,7 @@ class _FakeWalletRepository extends Fake implements WalletRepository {
   Future<Coin> getWalletBalance({
     required ShelleyAddress stakeAddress,
     required NetworkId networkId,
-    required RbacToken rbacToken,
+    RbacToken? rbacToken,
   }) async {
     return const Coin(0);
   }

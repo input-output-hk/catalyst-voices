@@ -11,7 +11,7 @@ abstract interface class WalletService {
   Future<Coin> getWalletBalance({
     required ShelleyAddress stakeAddress,
     required NetworkId networkId,
-    required RbacToken rbacToken,
+    RbacToken? rbacToken,
   });
 }
 
@@ -24,7 +24,7 @@ final class WalletServiceImpl implements WalletService {
   Future<Coin> getWalletBalance({
     required ShelleyAddress stakeAddress,
     required NetworkId networkId,
-    required RbacToken rbacToken,
+    RbacToken? rbacToken,
   }) {
     return _walletRepository.getWalletBalance(
       stakeAddress: stakeAddress,
