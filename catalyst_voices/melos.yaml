@@ -94,6 +94,7 @@ command:
       # and it's possible to configure the `dart format` with:
       #   trailing_commas: preserve
       # Official version enforces dart 3.7.0 which messes the formatting.
+      # https://github.com/dart-lang/sdk/blob/main/CHANGELOG.md#dart-format-1
       asn1lib:
         git:
           url: https://github.com/dtscalac/asn1lib
