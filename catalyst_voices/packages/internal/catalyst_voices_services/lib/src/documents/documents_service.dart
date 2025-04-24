@@ -4,6 +4,7 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/foundation.dart';
+import 'package:pool/pool.dart';
 import 'package:result_type/result_type.dart';
 
 final _logger = Logger('DocumentsService');
@@ -25,6 +26,7 @@ abstract interface class DocumentsService {
   /// Returns list of added refs.
   Future<List<SignedDocumentRef>> sync({
     ValueChanged<double>? onProgress,
+    int maxConcurrent,
   });
 }
 
@@ -38,6 +40,7 @@ final class DocumentsServiceImpl implements DocumentsService {
   @override
   Future<List<SignedDocumentRef>> sync({
     ValueChanged<double>? onProgress,
+    int maxConcurrent = 100,
   }) async {
     onProgress?.call(0.1);
 
@@ -60,31 +63,43 @@ final class DocumentsServiceImpl implements DocumentsService {
 
     var completed = 0;
     final total = missingRefs.length;
+    final pool = Pool(maxConcurrent);
 
-    // Note. Handling or errors as Outcome because we have to
-    // give a change to all refs to finish and keep all info about what
-    // failed.
-    final futures = <Future<Result<SignedDocumentRef, Exception>>>[
-      for (final ref in missingRefs)
-        _documentRepository
-            .cacheDocument(ref: ref)
-            .then<Result<SignedDocumentRef, Exception>>((_) => Success(ref))
-            .catchError((Object error, StackTrace stackTrace) {
+    final futures = <Future<void>>[];
+    final outcomes = <Result<SignedDocumentRef, Exception>>[];
+
+    /// Note. Handling or errors as Outcome because we have to
+    /// give a change to all refs to finish and keep all info about what
+    /// failed.
+    for (final ref in missingRefs) {
+      /// Note. its possible that missingRefs can be very large
+      /// and executing too many requests at once throws
+      /// net::ERR_INSUFFICIENT_RESOURCES in chrome.
+      /// That's reason for adding pool and limiting max requests.
+      final future = pool.withResource<void>(() async {
+        try {
+          await _documentRepository.cacheDocument(ref: ref);
+          outcomes.add(_RefSuccess(ref));
+        } catch (error, stackTrace) {
           final exception = RefSyncException(
             ref,
             error: error,
             stack: stackTrace,
           );
-          return _RefFailure(exception);
-        }).whenComplete(() {
+          outcomes.add(_RefFailure(exception));
+        } finally {
           completed += 1;
           final progress = completed / total;
           final totalProgress = 0.2 + (progress * 0.8);
           onProgress?.call(totalProgress);
-        }),
-    ];
+        }
+      });
 
-    final outcomes = await futures.wait;
+      futures.add(future);
+    }
+
+    // Wait for all operations managed by the pool to complete
+    await Future.wait(futures);
     final failures = outcomes.whereType<_RefFailure>();
 
     if (failures.isNotEmpty) {
