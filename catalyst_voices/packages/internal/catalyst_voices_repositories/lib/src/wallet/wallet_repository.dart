@@ -36,6 +36,7 @@ final class WalletRepositoryImpl implements WalletRepository {
           authorization: rbacToken?.authHeader(),
         )
         .successBodyOrThrow()
+        // get volatile balance to reflect latest transactions
         .then((stakeInfo) => Coin(stakeInfo.volatile.adaAmount));
   }
 }
