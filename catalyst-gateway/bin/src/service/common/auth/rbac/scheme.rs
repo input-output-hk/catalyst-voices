@@ -11,6 +11,7 @@ use super::token::CatalystRBACTokenV1;
 use crate::{
     db::index::session::CassandraSessionError,
     service::common::{
+        auth::api_key::check_api_key,
         responses::{ErrorResponses, WithErrorResponses},
         types::headers::retry_after::{RetryAfterHeader, RetryAfterOption},
     },
@@ -126,7 +127,7 @@ const MAX_TOKEN_SKEW: Duration = Duration::from_secs(5 * 60); // 5 minutes
 ///
 /// [here]: https://github.com/input-output-hk/catalyst-voices/blob/main/docs/src/catalyst-standards/permissionless-auth/auth-header.md#backend-processing-of-the-token
 async fn checker_api_catalyst_auth(
-    _req: &Request, bearer: Bearer,
+    req: &Request, bearer: Bearer,
 ) -> poem::Result<CatalystRBACTokenV1> {
     /// Temporary: Conditional RBAC for testing
     const RBAC_OFF: &str = "RBAC_OFF";
@@ -162,7 +163,8 @@ async fn checker_api_catalyst_auth(
     };
 
     // Step 7: Verify that the nonce is in the acceptable range.
-    if !token.is_young(MAX_TOKEN_AGE, MAX_TOKEN_SKEW) {
+    // If `InternalApiKeyAuthorization` auth is provided, skip validation.
+    if check_api_key(req.headers()).is_err() && !token.is_young(MAX_TOKEN_AGE, MAX_TOKEN_SKEW) {
         // Token is too old or too far in the future.
         error!("Auth token expired: {token}");
         Err(AuthTokenAccessViolation(vec!["EXPIRED".to_string()]))?;
