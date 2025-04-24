@@ -4,7 +4,8 @@
 //!
 //! It is NOT to be used on any endpoint intended to be publicly facing.
 
-use poem::Request;
+use anyhow::{bail, Result};
+use poem::{http::HeaderMap, Request};
 use poem_openapi::{auth::ApiKey, SecurityScheme};
 
 use crate::settings::Settings;
@@ -31,4 +32,15 @@ async fn api_checker(_req: &Request, api_key: ApiKey) -> Option<String> {
     } else {
         None
     }
+}
+
+/// Check if the API Key is correctly set.
+/// Returns an error if it is not.
+pub(crate) fn check_api_key(headers: &HeaderMap) -> Result<()> {
+    if let Some(key) = headers.get(API_KEY_HEADER) {
+        if Settings::check_internal_api_key(key.to_str()?) {
+            return Ok(());
+        }
+    }
+    bail!("Invalid API Key");
 }
