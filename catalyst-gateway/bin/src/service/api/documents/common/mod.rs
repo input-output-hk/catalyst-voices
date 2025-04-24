@@ -4,7 +4,7 @@
 use std::collections::HashMap;
 
 use catalyst_signed_doc::CatalystSignedDocument;
-use rbac_registration::cardano::cip509::RoleNumber;
+use catalyst_types::id_uri::role_index::RoleId;
 
 use super::templates::get_doc_static_template;
 use crate::{
@@ -119,7 +119,8 @@ impl VerifyingKeyProvider {
             }
 
             let (kid_role_index, kid_rotation) = kid.role_and_rotation();
-            let kid_role_index = RoleNumber::from(kid_role_index.to_string().parse::<u8>()?);
+            let kid_role_index = kid_role_index.to_string().parse::<u8>()?;
+            let kid_role_index = RoleId::try_from(kid_role_index)?;
             let kid_rotation = kid_rotation.to_string().parse::<usize>()?;
 
             let (latest_pk, rotation) = reg_chain

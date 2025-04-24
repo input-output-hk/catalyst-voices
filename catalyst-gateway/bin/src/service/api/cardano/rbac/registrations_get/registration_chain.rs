@@ -83,7 +83,7 @@ fn role_data(info: &ChainInfo) -> anyhow::Result<HashMap<u8, RbacRoleData>> {
         .iter()
         .map(|(&number, data)| {
             RbacRoleData::new(data, info.last_persistent_slot, &info.chain)
-                .map(|r| (number.into(), r))
+                .map(|r| (number as u8, r))
         })
         .collect()
 }

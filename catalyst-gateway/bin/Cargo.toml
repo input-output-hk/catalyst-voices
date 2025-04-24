@@ -15,12 +15,19 @@ repository.workspace = true
 workspace = true
 
 [dependencies]
-cardano-chain-follower = { version = "0.0.8", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "r20250423-00" }
-rbac-registration = { version = "0.0.4", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "r20250423-00" }
-catalyst-types = { version = "0.0.3", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "r20250423-00" }
-cardano-blockchain-types = { version = "0.0.3", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "r20250423-00" }
-catalyst-signed-doc = { version = "0.0.4", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "r20250423-00" }
-c509-certificate = { version = "0.0.3", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "r20250423-00" }
+#cardano-chain-follower = { version = "0.0.8", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "r20250423-00" }
+#rbac-registration = { version = "0.0.4", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "r20250423-00" }
+#catalyst-types = { version = "0.0.3", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "r20250423-00" }
+#cardano-blockchain-types = { version = "0.0.3", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "r20250423-00" }
+#catalyst-signed-doc = { version = "0.0.4", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "r20250423-00" }
+#c509-certificate = { version = "0.0.3", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "r20250423-00" }
+
+cardano-chain-follower = { git = "https://github.com/input-output-hk/catalyst-libs.git", rev = "154f0738c77fa406e22477ab099e40838d9c0ce4" }
+rbac-registration = { git = "https://github.com/input-output-hk/catalyst-libs.git", rev = "154f0738c77fa406e22477ab099e40838d9c0ce4" }
+catalyst-types = { git = "https://github.com/input-output-hk/catalyst-libs.git", rev = "154f0738c77fa406e22477ab099e40838d9c0ce4" }
+cardano-blockchain-types = { git = "https://github.com/input-output-hk/catalyst-libs.git", rev = "154f0738c77fa406e22477ab099e40838d9c0ce4" }
+catalyst-signed-doc = { git = "https://github.com/input-output-hk/catalyst-libs.git", rev = "154f0738c77fa406e22477ab099e40838d9c0ce4" }
+c509-certificate = { git = "https://github.com/input-output-hk/catalyst-libs.git", rev = "154f0738c77fa406e22477ab099e40838d9c0ce4" }
 
 pallas = { version = "0.30.1", git = "https://github.com/input-output-hk/catalyst-pallas.git", rev = "9b5183c8b90b90fe2cc319d986e933e9518957b3" }
 pallas-traverse = { version = "0.30.1", git = "https://github.com/input-output-hk/catalyst-pallas.git", rev = "9b5183c8b90b90fe2cc319d986e933e9518957b3" }
@@ -45,7 +52,7 @@ tokio-postgres = { version = "0.7.12", features = [
     "with-chrono-0_4",
     "with-serde_json-1",
     "with-time-0_3",
-    "with-uuid-1"
+    "with-uuid-1",
 ] }
 tokio = { version = "1.41.0", features = ["rt", "macros", "rt-multi-thread"] }
 dotenvy = "0.15.7"
@@ -96,7 +103,10 @@ bytes = "1.9.0"
 mime = "0.3.17"
 stats_alloc = "0.1.10"
 memory-stats = "1.0.0"
-derive_more = { version = "2.0.1", default-features = false, features = ["from", "into"] }
+derive_more = { version = "2.0.1", default-features = false, features = [
+    "from",
+    "into",
+] }
 rayon = "1.10"
 x509-cert = "0.2.5"
 minicbor = { version = "0.25.1", features = ["alloc"] }
