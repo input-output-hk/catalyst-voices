@@ -3,7 +3,7 @@ description: Demonstrates usage of UIKit.
 publish_to: "none"
 
 environment:
-  sdk: ">=3.7.0 <4.0.0"
+  sdk: ">=3.6.0 <4.0.0"
   flutter: ">=3.29.3"
 
 dependencies:

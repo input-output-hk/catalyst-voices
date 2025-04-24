@@ -23,7 +23,7 @@ This repository contains the Catalyst Voices app and packages.
 ## Requirements
 
 * flutter: 3.29.3+
-* Dart: 3.7.0+
+* Dart: 3.6.0+
 * Ruby: 2.5+
 * Xcode: 15.0+
 * Android Studio: Android Studio Electric Eel | 2022.1.1 +
