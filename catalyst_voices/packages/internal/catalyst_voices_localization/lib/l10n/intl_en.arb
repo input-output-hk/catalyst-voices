@@ -1045,6 +1045,10 @@
   "recoveryUnlockPasswordInstructionsTitle": "Set your Catalyst unlock password for this device",
   "recoveryUnlockPasswordInstructionsSubtitle": "In this next step, you'll set your Unlock Password for this device. It's like a shortcut for proving ownership of your Keychain.  \u2028\u2028Whenever you recover your account for the first time on a new device, you'll need to use your Catalyst seed phrase to get started. Every time after that, you can use your Unlock Password to quickly regain access.",
   "recoverDifferentKeychain": "Restore a different keychain",
+  "checkOnCardanoScan": "Check on Cardano scan",
+  "@checkOnCardanoScan": {
+    "description": "A button label to navigate to Cardano Scan to see wallet / transaction details."
+  },
   "unlockDialogHeader": "Unlock Catalyst",
   "@unlockDialogHeader": {
     "description": "The header label in unlock dialog."
