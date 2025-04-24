@@ -89,7 +89,7 @@ final class _CatalystSigner implements CatalystCoseSigner {
   );
 
   @override
-  StringOrInt? get alg => const IntValue(CoseValues.eddsaAlg);
+  StringOrInt? get alg => null;
 
   @override
   Future<Uint8List?> get kid async {
