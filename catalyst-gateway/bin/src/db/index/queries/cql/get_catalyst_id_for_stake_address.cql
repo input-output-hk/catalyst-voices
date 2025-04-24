@@ -1,6 +1,7 @@
 SELECT  
     catalyst_id,
-    slot_no
+    slot_no,
+    txn_index
 FROM 
     catalyst_id_for_stake_address
 WHERE 

@@ -139,6 +139,7 @@ impl Rbac509InsertQuery {
                         insert_catalyst_id_for_stake_address::Params::new(
                             address,
                             slot,
+                            index,
                             catalyst_id.clone(),
                         ),
                     );
