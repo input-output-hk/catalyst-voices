@@ -10,33 +10,53 @@ class SectionLearnMoreHeader extends StatelessWidget with LaunchUrlMixin {
   final String title;
   final String info;
   final String learnMoreUrl;
+  final bool isExpanded;
+  final ValueChanged<bool>? onExpandedChanged;
+
   const SectionLearnMoreHeader({
     super.key,
     required this.title,
     required this.info,
     required this.learnMoreUrl,
+    this.isExpanded = false,
+    this.onExpandedChanged,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Text(
-          title,
-          style: context.textTheme.titleSmall?.copyWith(
-            color: context.colors.textOnPrimaryLevel1,
+    return GestureDetector(
+      onTap: _onExpandedChanged,
+      behavior: HitTestBehavior.opaque,
+      child: Row(
+        children: [
+          AnimatedSwitcher(
+            duration: const Duration(milliseconds: 200),
+            reverseDuration: const Duration(milliseconds: 200),
+            child: isExpanded
+                ? VoicesAssets.icons.chevronDown.buildIcon()
+                : VoicesAssets.icons.chevronRight.buildIcon(),
           ),
-        ),
-        const SizedBox(width: 4),
-        VoicesPlainTooltip(
-          message: context.l10n.learnMore,
-          child: VoicesAssets.icons.informationCircle.buildIcon(
-            color: context.colors.textOnPrimaryLevel1,
+          Text(
+            title,
+            style: context.textTheme.titleMedium?.copyWith(
+              color: context.colors.textOnPrimaryLevel1,
+            ),
           ),
-        ),
-        const Spacer(),
-        LearnMoreButton(learnMoreUrl: learnMoreUrl),
-      ],
+          const SizedBox(width: 4),
+          VoicesPlainTooltip(
+            message: context.l10n.learnMore,
+            child: VoicesAssets.icons.informationCircle.buildIcon(
+              color: context.colors.textOnPrimaryLevel1,
+            ),
+          ),
+          const Spacer(),
+          LearnMoreButton(learnMoreUrl: learnMoreUrl),
+        ],
+      ),
     );
+  }
+
+  void _onExpandedChanged() {
+    onExpandedChanged?.call(!isExpanded);
   }
 }
