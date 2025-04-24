@@ -68,11 +68,11 @@ final class DocumentsServiceImpl implements DocumentsService {
     final futures = <Future<void>>[];
     final outcomes = <Result<SignedDocumentRef, Exception>>[];
 
-    /// Note. Handling or errors as Outcome because we have to
+    /// Handling or errors as Outcome because we have to
     /// give a change to all refs to finish and keep all info about what
     /// failed.
     for (final ref in missingRefs) {
-      /// Note. its possible that missingRefs can be very large
+      /// Its possible that missingRefs can be very large
       /// and executing too many requests at once throws
       /// net::ERR_INSUFFICIENT_RESOURCES in chrome.
       /// That's reason for adding pool and limiting max requests.
