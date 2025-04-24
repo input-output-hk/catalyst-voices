@@ -1,8 +1,8 @@
 VERSION 0.8
 
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/mdlint:v3.3.4 AS mdlint-ci
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/cspell:v3.3.4 AS cspell-ci
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/postgresql:v3.3.4 AS postgresql-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/mdlint:tmp-chrome-install-fix AS mdlint-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/cspell:tmp-chrome-install-fix AS cspell-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/postgresql:tmp-chrome-install-fix AS postgresql-ci
 
 FROM debian:stable-slim
 
