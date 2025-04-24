@@ -775,7 +775,7 @@
   "createBaseProfileSetupEmailLabel": "Your e-mail",
   "createBaseProfileSetupEmailHint": "E-mail",
   "createBaseProfileSetupEmailHelper": "Please provide e-mail used for your Ideascale.",
-  "createBaseProfileHasIdeascaleAccountAlready": "Submitted proposals in Ideascale before",
+  "createBaseProfileHasIdeascaleAccountAlready": "Submitted proposals in Ideascale before?",
   "@createBaseProfileHasIdeascaleAccountAlready": {
     "description": "Label for info card to let user know to use the same email as in Ideascale if they have already submitted a proposal there."
   },
