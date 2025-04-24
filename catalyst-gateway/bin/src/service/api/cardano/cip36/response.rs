@@ -22,9 +22,6 @@ pub(crate) enum Cip36Registration {
     /// No valid registration.
     #[oai(status = 404)]
     NotFound,
-    /// Response for unprocessable content.
-    #[oai(status = 422)]
-    UnprocessableContent(Json<Cip36RegistrationUnprocessableContent>),
 }
 
 /// All responses to a cip36 registration query
@@ -197,28 +194,5 @@ impl Cip36Details {
                 crate::service::common::types::generic::error_msg::ErrorMessage::from(errors),
             ),
         }
-    }
-}
-
-/// Cip36 Registration Validation Error.
-#[derive(Object)]
-#[oai(example = true)]
-pub(crate) struct Cip36RegistrationUnprocessableContent {
-    /// Error messages.
-    error: common::types::generic::error_msg::ErrorMessage,
-}
-
-impl Cip36RegistrationUnprocessableContent {
-    /// Create a new instance of `Cip36RegistrationUnprocessableContent`.
-    pub(crate) fn new(error: &(impl ToString + ?Sized)) -> Self {
-        Self {
-            error: error.to_string().into(),
-        }
-    }
-}
-
-impl Example for Cip36RegistrationUnprocessableContent {
-    fn example() -> Self {
-        Self::new("Cip36 Registration in request body")
     }
 }
