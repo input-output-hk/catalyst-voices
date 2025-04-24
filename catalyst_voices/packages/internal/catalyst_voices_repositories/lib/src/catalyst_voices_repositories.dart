@@ -21,6 +21,6 @@ export 'signed_document/signed_document_manager.dart'
     show SignedDocumentManager;
 export 'signed_document/signed_document_manager_impl.dart'
     show SignedDocumentManagerImpl;
-export 'user/source/user_data_source.dart';
 export 'user/source/user_storage.dart';
 export 'user/user_repository.dart' show UserRepository;
+export 'wallet/wallet_repository.dart' show WalletRepository;

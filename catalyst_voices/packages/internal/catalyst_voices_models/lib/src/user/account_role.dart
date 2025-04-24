@@ -42,10 +42,9 @@ enum AccountRole {
   });
 
   factory AccountRole.fromNumber(int number) {
-    for (final value in values) {
-      if (value.number == number) {
-        return value;
-      }
+    final role = maybeFromNumber(number);
+    if (role != null) {
+      return role;
     }
 
     throw ArgumentError('Unsupported role with number: $number');
@@ -54,6 +53,16 @@ enum AccountRole {
   static AccountRole? fromRegistrationOffset(int registrationOffset) {
     return values
         .firstWhereOrNull((e) => e.registrationOffset == registrationOffset);
+  }
+
+  static AccountRole? maybeFromNumber(int? number) {
+    for (final value in values) {
+      if (value.number == number) {
+        return value;
+      }
+    }
+
+    return null;
   }
 }
 

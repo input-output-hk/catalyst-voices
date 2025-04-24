@@ -1,3 +1,5 @@
+import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
+
 abstract class VoicesConstants {
   /// External urls
   static const supportedWalletsUrl =
@@ -9,4 +11,49 @@ abstract class VoicesConstants {
   static const supportUrl =
       'https://catalystiog.zendesk.com/hc/en-us/requests/new';
   static const docsUrl = 'https://docs.projectcatalyst.io/';
+  static const beforeSubmissionUrl =
+      'https://docs.projectcatalyst.io/catalyst-tools/catalyst-app/app-timeline#before-submission';
+  static const afterSubmissionUrl =
+      'https://docs.projectcatalyst.io/catalyst-tools/catalyst-app/app-timeline#after-submission';
+  static const becomeReviewerUrl =
+      'https://docs.projectcatalyst.io/catalyst-tools/catalyst-app/stay-involved#reviewer';
+  static const votingRegistrationUrl =
+      'https://docs.projectcatalyst.io/catalyst-tools/catalyst-app/stay-involved#voter';
+  static const walletTroubleshootingUrl =
+      'https://docs.projectcatalyst.io/catalyst-tools/catalyst-app/getting-started#wallet-connect-troubleshooting';
+  static const mobileExperienceUrl =
+      'https://docs.projectcatalyst.io/catalyst-tools/catalyst-app/mobile-experience';
+  static const catalystKnowledgeBaseUrl =
+      'https://docs.projectcatalyst.io/catalyst-tools/catalyst-app/my-account#catalyst-knowledge-base';
+  static const proposalPublishingDocsUrl =
+      'https://docs.projectcatalyst.io/catalyst-tools/catalyst-app/create-and-submit-proposals-in-workspace#proposal-publishing';
+  static const getStartedUrl =
+      'https://docs.projectcatalyst.io/catalyst-tools/catalyst-app/getting-started';
+  static const setupBaseProfileUrl =
+      'https://docs.projectcatalyst.io/catalyst-tools/catalyst-app/getting-started#setup-base-profile';
+  static const createCatalystKeychainUrl =
+      'https://docs.projectcatalyst.io/catalyst-tools/catalyst-app/getting-started#create-catalyst-keychain';
+  static const officiallySupportedWalletsUrl =
+      'https://docs.projectcatalyst.io/catalyst-tools/catalyst-app/getting-started#officially-supported-wallets';
+  static const linkCardanoWalletUrl =
+      'https://docs.projectcatalyst.io/catalyst-tools/catalyst-app/getting-started#link-cardano-wallet-and-roles';
+  static const selectRolesUrl =
+      'https://docs.projectcatalyst.io/catalyst-tools/catalyst-app/getting-started#select-roles';
+  static const submitRegistrationTransactionUrl =
+      'https://docs.projectcatalyst.io/catalyst-tools/catalyst-app/getting-started#submit-registration-transaction';
+  static const restoreKeychainUrl =
+      'https://docs.projectcatalyst.io/catalyst-tools/catalyst-app/restore-keychain';
+  static const myAccountUrl =
+      'https://docs.projectcatalyst.io/catalyst-tools/catalyst-app/my-account';
+  static const insertNewImageDocsUrl =
+      'https://docs.projectcatalyst.io/catalyst-tools/catalyst-app/create-and-submit-proposals-in-workspace/using-images';
+
+  static String cardanoScanStakeAddressUrl(ShelleyAddress stakeAddress) {
+    switch (stakeAddress.network) {
+      case NetworkId.mainnet:
+        return 'https://cardanoscan.io/stakekey/${stakeAddress.toBech32()}';
+      case NetworkId.testnet:
+        return 'https://preprod.cardanoscan.io/stakekey/${stakeAddress.toBech32()}';
+    }
+  }
 }

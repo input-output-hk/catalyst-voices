@@ -7,8 +7,6 @@ import 'package:catalyst_voices_repositories/src/api/converters/cbor_or_json_con
 import 'package:catalyst_voices_repositories/src/api/converters/cbor_serializable_converter.dart';
 import 'package:catalyst_voices_repositories/src/api/interceptors/rbac_auth_interceptor.dart';
 import 'package:catalyst_voices_repositories/src/auth/auth_token_provider.dart';
-import 'package:catalyst_voices_shared/catalyst_voices_shared.dart'
-    show UserObserver;
 import 'package:chopper/chopper.dart';
 import 'package:flutter/foundation.dart';
 
@@ -27,35 +25,19 @@ final class ApiServices {
 
   factory ApiServices({
     required AppEnvironmentType env,
-    required UserObserver userObserver,
     required AuthTokenProvider authTokenProvider,
   }) {
     _fixModelsMapping();
 
-    final cat = CatGateway.create(
-      authenticator: null,
-      baseUrl: env.gateway,
-      converter: CborOrJsonDelegateConverter(
-        cborConverter: CborSerializableConverter(),
-        jsonConverter: $JsonSerializableConverter(),
-      ),
-      interceptors: [
-        RbacAuthInterceptor(userObserver, authTokenProvider),
-        if (kDebugMode) HttpLoggingInterceptor(onlyErrors: true),
-      ],
-    );
-    final review = CatReviews.create(
-      authenticator: null,
-      baseUrl: env.reviews,
-      interceptors: [
-        RbacAuthInterceptor(userObserver, authTokenProvider),
-        if (kDebugMode) HttpLoggingInterceptor(onlyErrors: true),
-      ],
-    );
-
     return ApiServices.internal(
-      gateway: cat,
-      reviews: review,
+      gateway: createGateway(
+        gatewayUri: env.gateway,
+        authTokenProvider: authTokenProvider,
+      ),
+      reviews: createReviews(
+        reviewsUrl: env.reviews,
+        authTokenProvider: authTokenProvider,
+      ),
     );
   }
 
@@ -64,4 +46,36 @@ final class ApiServices {
     required this.gateway,
     required this.reviews,
   });
+
+  static CatGateway createGateway({
+    required Uri gatewayUri,
+    required AuthTokenProvider authTokenProvider,
+  }) {
+    return CatGateway.create(
+      authenticator: null,
+      baseUrl: gatewayUri,
+      converter: CborOrJsonDelegateConverter(
+        cborConverter: CborSerializableConverter(),
+        jsonConverter: $JsonSerializableConverter(),
+      ),
+      interceptors: [
+        RbacAuthInterceptor(authTokenProvider),
+        if (kDebugMode) HttpLoggingInterceptor(onlyErrors: true),
+      ],
+    );
+  }
+
+  static CatReviews createReviews({
+    required Uri reviewsUrl,
+    required AuthTokenProvider authTokenProvider,
+  }) {
+    return CatReviews.create(
+      authenticator: null,
+      baseUrl: reviewsUrl,
+      interceptors: [
+        RbacAuthInterceptor(authTokenProvider),
+        if (kDebugMode) HttpLoggingInterceptor(onlyErrors: true),
+      ],
+    );
+  }
 }

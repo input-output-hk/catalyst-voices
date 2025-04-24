@@ -9,6 +9,7 @@ class InformationPanel extends StatelessWidget {
   final String? body;
   final Widget picture;
   final double? progress;
+  final VoidCallback? onTap;
 
   const InformationPanel({
     super.key,
@@ -17,6 +18,7 @@ class InformationPanel extends StatelessWidget {
     this.body,
     required this.picture,
     this.progress,
+    this.onTap,
   });
 
   @override
@@ -37,6 +39,40 @@ class InformationPanel extends StatelessWidget {
         const SizedBox(height: 12),
         _Footer(
           progress: progress,
+          onTap: onTap,
+        ),
+      ],
+    );
+  }
+}
+
+class _Footer extends StatelessWidget {
+  final double? progress;
+  final VoidCallback? onTap;
+
+  const _Footer({
+    this.progress,
+    this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final progress = this.progress;
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Visibility.maintain(
+          visible: progress != null || progress == 0.0,
+          child: AnimatedVoicesLinearProgressIndicator(
+            key: const Key('ProgressBar'),
+            value: progress ?? 0,
+          ),
+        ),
+        const SizedBox(height: 10),
+        VoicesLearnMoreButton(
+          onTap: onTap ?? () {},
         ),
       ],
     );
@@ -84,35 +120,6 @@ class _Header extends StatelessWidget {
             style: theme.textTheme.bodyMedium?.copyWith(color: textColor),
           ),
       ].separatedBy(const SizedBox(height: 12)).toList(),
-    );
-  }
-}
-
-class _Footer extends StatelessWidget {
-  final double? progress;
-
-  const _Footer({
-    this.progress,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final progress = this.progress;
-
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Visibility.maintain(
-          visible: progress != null || progress == 0.0,
-          child: AnimatedVoicesLinearProgressIndicator(
-            key: const Key('ProgressBar'),
-            value: progress ?? 0,
-          ),
-        ),
-        const SizedBox(height: 10),
-        VoicesLearnMoreButton(onTap: () {}),
-      ],
     );
   }
 }

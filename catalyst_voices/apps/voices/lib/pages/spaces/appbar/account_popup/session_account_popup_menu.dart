@@ -289,7 +289,7 @@ class _SessionAccountPopupMenuState extends State<SessionAccountPopupMenu>
         final uri = Uri.parse(VoicesConstants.supportUrl);
         unawaited(launchUri(uri));
       case _RedirectToDocs():
-        final uri = Uri.parse(VoicesConstants.docsUrl);
+        final uri = Uri.parse(VoicesConstants.catalystKnowledgeBaseUrl);
         unawaited(launchUri(uri));
       case _Lock():
         unawaited(context.read<SessionCubit>().lock());

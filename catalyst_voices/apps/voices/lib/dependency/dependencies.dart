@@ -165,7 +165,6 @@ final class Dependencies extends DependencyProvider {
     registerLazySingleton<ApiServices>(() {
       return ApiServices(
         env: get<AppEnvironment>().type,
-        userObserver: get<UserObserver>(),
         authTokenProvider: get<AuthTokenProvider>(),
       );
     });
@@ -173,15 +172,15 @@ final class Dependencies extends DependencyProvider {
 
   void _registerRepositories() {
     this
-      ..registerLazySingleton<UserDataSource>(() {
-        return ApiUserDataSource(get<ApiServices>());
-      })
       ..registerLazySingleton<UserRepository>(() {
         return UserRepository(
           get<UserStorage>(),
-          get<UserDataSource>(),
           get<KeychainProvider>(),
+          get<ApiServices>(),
         );
+      })
+      ..registerLazySingleton<WalletRepository>(() {
+        return WalletRepository(get<ApiServices>());
       })
       ..registerLazySingleton<SignedDocumentManager>(() {
         return const SignedDocumentManager();
@@ -244,11 +243,16 @@ final class Dependencies extends DependencyProvider {
         cacheConfig: get<AppConfig>().cache,
       );
     });
+    registerLazySingleton<AuthTokenGenerator>(() {
+      return AuthTokenGenerator(
+        get<KeyDerivationService>(),
+      );
+    });
     registerLazySingleton<AuthService>(() {
       return AuthService(
         get<AuthTokenCache>(),
         get<UserObserver>(),
-        get<KeyDerivationService>(),
+        get<AuthTokenGenerator>(),
       );
     });
     registerLazySingleton<AuthTokenProvider>(() => get<AuthService>());
@@ -259,8 +263,11 @@ final class Dependencies extends DependencyProvider {
     );
     registerLazySingleton<RegistrationService>(() {
       return RegistrationService(
+        get<UserService>(),
+        get<WalletService>(),
         get<KeychainProvider>(),
         get<CatalystCardano>(),
+        get<AuthTokenGenerator>(),
         get<KeyDerivationService>(),
         get<AppConfig>().blockchain,
       );
@@ -274,6 +281,11 @@ final class Dependencies extends DependencyProvider {
       },
       dispose: (service) => unawaited(service.dispose()),
     );
+    registerLazySingleton<WalletService>(() {
+      return WalletService(
+        get<WalletRepository>(),
+      );
+    });
     registerLazySingleton<SignerService>(() {
       return AccountSignerService(
         get<UserService>(),

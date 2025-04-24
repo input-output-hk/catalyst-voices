@@ -7,6 +7,7 @@ use std::{
     time::Duration,
 };
 
+use cardano_blockchain_types::Network;
 use openssl::ssl::{SslContextBuilder, SslFiletype, SslMethod, SslVerifyMode};
 use scylla::{
     frame::Compression, serialize::row::SerializeRow, transport::iterator::QueryPager,
@@ -24,7 +25,10 @@ use super::{
     },
     schema::create_schema,
 };
-use crate::settings::{cassandra_db, Settings};
+use crate::{
+    service::utilities::health::set_index_db_liveness,
+    settings::{cassandra_db, Settings},
+};
 
 /// Configuration Choices for compression
 #[derive(Clone, strum::EnumString, strum::Display, strum::VariantNames)]
@@ -115,11 +119,14 @@ impl CassandraSession {
     /// Initialise the Cassandra Cluster Connections.
     pub(crate) fn init() {
         let (persistent, volatile) = Settings::cassandra_db_cfg();
+        let network = Settings::cardano_network();
 
         let _join_handle =
-            tokio::task::spawn(async move { Box::pin(retry_init(persistent, true)).await });
+            tokio::task::spawn(
+                async move { Box::pin(retry_init(persistent, network, true)).await },
+            );
         let _join_handle =
-            tokio::task::spawn(async move { Box::pin(retry_init(volatile, false)).await });
+            tokio::task::spawn(async move { Box::pin(retry_init(volatile, network, false)).await });
     }
 
     /// Check to see if the Cassandra Indexing DB is ready for use
@@ -134,11 +141,13 @@ impl CassandraSession {
         loop {
             if !ignore_err {
                 if let Some(err) = INIT_SESSION_ERROR.get() {
+                    set_index_db_liveness(false);
                     return Err(err.clone());
                 }
             }
 
             if Self::is_ready() {
+                set_index_db_liveness(true);
                 return Ok(());
             }
 
@@ -319,13 +328,17 @@ async fn make_session(cfg: &cassandra_db::EnvVars) -> anyhow::Result<Arc<Session
 /// Continuously try and init the DB, if it fails, backoff.
 ///
 /// Display reasonable logs to help diagnose DB connection issues.
-async fn retry_init(cfg: cassandra_db::EnvVars, persistent: bool) {
+async fn retry_init(cfg: cassandra_db::EnvVars, network: Network, persistent: bool) {
     let mut retry_delay = Duration::from_secs(0);
     let db_type = if persistent { "Persistent" } else { "Volatile" };
 
-    info!(db_type = db_type, "Index DB Session Creation: Started.");
+    info!(
+        db_type = db_type,
+        network = %network,
+        "Index DB Session Creation: Started."
+    );
 
-    cfg.log(persistent);
+    cfg.log(persistent, network);
 
     loop {
         tokio::time::sleep(retry_delay).await;
@@ -333,6 +346,7 @@ async fn retry_init(cfg: cassandra_db::EnvVars, persistent: bool) {
 
         info!(
             db_type = db_type,
+            network = %network,
             "Attempting to connect to Cassandra DB..."
         );
 
@@ -342,6 +356,7 @@ async fn retry_init(cfg: cassandra_db::EnvVars, persistent: bool) {
             Err(error) => {
                 error!(
                     db_type = db_type,
+                    network = %network,
                     error = format!("{error:?}"),
                     "Failed to Create Cassandra DB Session"
                 );
@@ -353,9 +368,10 @@ async fn retry_init(cfg: cassandra_db::EnvVars, persistent: bool) {
         };
 
         // Set up the Schema for it.
-        if let Err(error) = create_schema(&mut session.clone(), &cfg).await {
+        if let Err(error) = create_schema(&mut session.clone(), &cfg, persistent, network).await {
             error!(
                 db_type = db_type,
+                network = %network,
                 error = format!("{error:?}"),
                 "Failed to Create Cassandra DB Schema"
             );
@@ -372,6 +388,7 @@ async fn retry_init(cfg: cassandra_db::EnvVars, persistent: bool) {
             Err(error) => {
                 error!(
                     db_type = db_type,
+                    network = %network,
                     error = %error,
                     "Failed to Create Cassandra Prepared Queries"
                 );
@@ -388,6 +405,7 @@ async fn retry_init(cfg: cassandra_db::EnvVars, persistent: bool) {
             Err(error) => {
                 error!(
                     db_type = db_type,
+                    network = %network,
                     error = %error,
                     "Failed to Create Cassandra Prepared Purge Queries"
                 );
@@ -421,5 +439,5 @@ async fn retry_init(cfg: cassandra_db::EnvVars, persistent: bool) {
         break;
     }
 
-    info!(db_type = db_type, "Index DB Session Creation: OK.");
+    info!(db_type = db_type, network = %network, "Index DB Session Creation: OK.");
 }

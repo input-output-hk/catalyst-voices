@@ -1,3 +1,4 @@
+import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_services/src/catalyst_voices_services.dart';
@@ -12,50 +13,42 @@ import 'package:test/scaffolding.dart';
 import 'package:uuid_plus/uuid_plus.dart';
 
 void main() {
-  late final KeychainProvider keychainProvider;
-  late final _MockUserDataSource userDataSource;
-  late final UserRepository userRepository;
-  late final UserObserver userObserver;
-
-  late UserService service;
-
-  setUpAll(() {
-    final store = InMemorySharedPreferencesAsync.empty();
-    SharedPreferencesAsyncPlatform.instance = store;
-    FlutterSecureStorage.setMockInitialValues({});
-    DummyCatalystIdFactory.registerDummyKeyFactory();
-
-    keychainProvider = VaultKeychainProvider(
-      secureStorage: const FlutterSecureStorage(),
-      sharedPreferences: SharedPreferencesAsync(),
-      cacheConfig: const AppConfig.dev().cache,
-    );
-    userDataSource = _MockUserDataSource();
-    userRepository = UserRepository(
-      SecureUserStorage(),
-      userDataSource,
-      keychainProvider,
-    );
-    userObserver = StreamUserObserver();
-  });
-
-  tearDownAll(() async {
-    await userObserver.dispose();
-  });
-
-  setUp(() {
-    service = UserService(userRepository, userObserver);
-  });
-
-  tearDown(() async {
-    reset(userDataSource);
-    userObserver.user = const User.empty();
-
-    await const FlutterSecureStorage().deleteAll();
-    await SharedPreferencesAsync().clear();
-  });
-
   group(UserService, () {
+    late final KeychainProvider keychainProvider;
+    late final UserObserver userObserver;
+    late UserRepository userRepository;
+    late UserService service;
+
+    setUpAll(() {
+      final store = InMemorySharedPreferencesAsync.empty();
+      SharedPreferencesAsyncPlatform.instance = store;
+      FlutterSecureStorage.setMockInitialValues({});
+      DummyCatalystIdFactory.registerDummyKeyFactory();
+
+      keychainProvider = VaultKeychainProvider(
+        secureStorage: const FlutterSecureStorage(),
+        sharedPreferences: SharedPreferencesAsync(),
+        cacheConfig: const AppConfig.dev().cache,
+      );
+      userObserver = StreamUserObserver();
+    });
+
+    tearDownAll(() async {
+      await userObserver.dispose();
+    });
+
+    setUp(() {
+      userRepository = _FakeUserRepository();
+      service = UserService(userRepository, userObserver);
+    });
+
+    tearDown(() async {
+      userObserver.user = const User.empty();
+
+      await const FlutterSecureStorage().deleteAll();
+      await SharedPreferencesAsync().clear();
+    });
+
     test('when registering account getter returns that account', () async {
       // Given
       final keychainId = const Uuid().v4();
@@ -66,9 +59,6 @@ void main() {
         catalystId: DummyCatalystIdFactory.create(),
         keychain: keychain,
       );
-
-      when(() => userDataSource.updateEmail(account.email))
-          .thenAnswer((_) async => {});
 
       await service.registerAccount(account);
 
@@ -179,33 +169,35 @@ void main() {
       await service.dispose();
     });
 
-    test('accounts getter returns all keychains initialized local instances',
-        () async {
-      // Given
-      final ids = List.generate(5, (_) => const Uuid().v4());
+    test(
+      'accounts getter returns all keychains initialized local instances',
+      () async {
+        // Given
+        final ids = List.generate(5, (_) => const Uuid().v4());
 
-      // When
-      final accounts = <Account>[];
-      for (final id in ids) {
-        final keychain = await keychainProvider.create(id);
-        final account = Account.dummy(
-          catalystId: DummyCatalystIdFactory.create(),
-          keychain: keychain,
+        // When
+        final accounts = <Account>[];
+        for (final id in ids) {
+          final keychain = await keychainProvider.create(id);
+          final account = Account.dummy(
+            catalystId: DummyCatalystIdFactory.create(),
+            keychain: keychain,
+          );
+
+          accounts.add(account);
+        }
+
+        await userRepository.saveUser(User.optional(accounts: accounts));
+
+        // Then
+        final user = await service.getUser();
+
+        expect(
+          user.accounts.map((e) => e.catalystId),
+          accounts.map((e) => e.catalystId),
         );
-
-        accounts.add(account);
-      }
-
-      await userRepository.saveUser(User.optional(accounts: accounts));
-
-      // Then
-      final user = await service.getUser();
-
-      expect(
-        user.accounts.map((e) => e.catalystId),
-        accounts.map((e) => e.catalystId),
-      );
-    });
+      },
+    );
 
     test('use last account restores previously stored', () async {
       // Given
@@ -320,7 +312,70 @@ void main() {
         await service.dispose();
       });
     });
+
+    group('getPreviousTransactionId', () {
+      test('when no active account', () async {
+        // Given
+        const emptyUser = User.empty();
+
+        // When
+        userObserver.user = emptyUser;
+
+        // Then
+        expect(
+          () async => service.getPreviousRegistrationTransactionId(),
+          throwsA(isArgumentError),
+        );
+      });
+
+      test('when has active account', () async {
+        // Given
+        final keychainId = const Uuid().v4();
+
+        // When
+        final keychain = await keychainProvider.create(keychainId);
+        final account = Account.dummy(
+          catalystId: DummyCatalystIdFactory.create(),
+          keychain: keychain,
+          isActive: true,
+        );
+        userObserver.user = User.optional(accounts: [account]);
+
+        // Then
+        expect(
+          await service.getPreviousRegistrationTransactionId(),
+          equals(_transactionHash),
+        );
+      });
+    });
   });
 }
 
-class _MockUserDataSource extends Mock implements UserDataSource {}
+final _transactionHash = TransactionHash.fromHex(
+  '4d3f576f26db29139981a69443c2325daa812cc353a31b5a4db794a5bcbb06c2',
+);
+
+class _FakeUserRepository extends Fake implements UserRepository {
+  User? _user;
+
+  @override
+  Future<TransactionHash> getPreviousRegistrationTransactionId({
+    required CatalystId catalystId,
+  }) async {
+    return _transactionHash;
+  }
+
+  @override
+  Future<User> getUser() async => _user ?? const User.empty();
+
+  @override
+  Future<void> publishUserProfile({
+    required CatalystId catalystId,
+    required String email,
+  }) async {}
+
+  @override
+  Future<void> saveUser(User user) async {
+    _user = user;
+  }
+}

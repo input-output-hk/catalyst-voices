@@ -58,6 +58,17 @@ void main() {
         expect('apple'.formatAsPlural(3), '3 apples');
       });
     });
+
+    group('nullIfEmpty', () {
+      test('returns null if string is empty', () {
+        expect(''.nullIfEmpty(), isNull);
+      });
+
+      test('returns string if not null', () {
+        expect(' '.nullIfEmpty(), equals(' '));
+        expect('str'.nullIfEmpty(), equals('str'));
+      });
+    });
   });
 
   group('UrlParser Tests', () {

@@ -86,7 +86,7 @@ enum AppEnvironmentType {
     return switch (this) {
       AppEnvironmentType.dev ||
       AppEnvironmentType.preprod =>
-        Uri.https('api.reviews.$name.projectcatalyst.io'),
+        Uri.https('reviews.$name.projectcatalyst.io'),
       AppEnvironmentType.prod => Uri.https('api.reviews.projectcatalyst.io'),
       AppEnvironmentType.relative => Uri(path: '/api/reviews'),
     };
