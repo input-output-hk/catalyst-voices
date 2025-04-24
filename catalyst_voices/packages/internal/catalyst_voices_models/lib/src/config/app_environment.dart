@@ -66,29 +66,29 @@ enum AppEnvironmentType {
   /// This type means app should talk to cat services relative to where its
   /// hosted.
   ///
-  /// For example when hosted at "https://voices.dev.io" talk to
-  /// "https://voices.dev.io/api/gateway".
+  /// For example when hosted at "https://app.projectcatalyst.io" talk to
+  /// "https://app.projectcatalyst.io/api/gateway".
   ///
   /// It useful when building app one time and it can be deployed anywhere.
   relative;
 
-  Uri get gateway {
+  /// See https://github.com/input-output-hk/catalyst-internal-docs/issues/178
+  Uri get baseUrl {
     return switch (this) {
       AppEnvironmentType.dev ||
       AppEnvironmentType.preprod =>
-        Uri.https('gateway.$name.projectcatalyst.io'),
-      AppEnvironmentType.prod => Uri.https('gateway.projectcatalyst.io'),
-      AppEnvironmentType.relative => Uri(path: '/api/gateway'),
+        Uri.https('app.$name.projectcatalyst.io'),
+      AppEnvironmentType.prod => Uri.https('app.projectcatalyst.io'),
+
+      /// [AppEnvironmentType.relative] type does not now where its backends
+      /// are hosted.
+      AppEnvironmentType.relative => Uri(),
     };
   }
 
-  Uri get reviews {
-    return switch (this) {
-      AppEnvironmentType.dev ||
-      AppEnvironmentType.preprod =>
-        Uri.https('reviews.$name.projectcatalyst.io'),
-      AppEnvironmentType.prod => Uri.https('api.reviews.projectcatalyst.io'),
-      AppEnvironmentType.relative => Uri(path: '/api/reviews'),
-    };
-  }
+  /// See https://github.com/input-output-hk/catalyst-internal-docs/issues/178
+  Uri get gateway => baseUrl.replace(path: '/api/gateway');
+
+  /// See https://github.com/input-output-hk/catalyst-internal-docs/issues/178
+  Uri get reviews => baseUrl.replace(path: '/api/reviews');
 }
