@@ -5,6 +5,11 @@
     "description": "Schema for the F14 Catalyst Proposal Submission Form",
     "maintainers": [{ "name": "Catalyst Team", "url": "https://projectcatalyst.io/" }],
     "x-changelog": {
+        "2025-04-22": [
+            "Updated schema to make optional text fields mandatory.",
+            "Assigned title to theme property.",
+            "Fixed x-guidance for dependencies section."
+        ],
         "2025-01-14": [
             "Updated schema to include new fields for proposal details.",
             "Fixed validation issues with the URL pattern.",
@@ -71,7 +76,6 @@
             "contentMediaType": "text/plain",
             "pattern": "^[\\S\\s]*$",
             "x-note": "Enter multiple lines of plain text. You can use line breaks but no special formatting."
-
         },
         "multiLineTextEntryMarkdown": {
             "$comment": "UI - Multiline text entry with Markdown content.",
@@ -458,19 +462,19 @@
                     "$ref": "#/definitions/section",
                     "title": "Project Dependencies",
                     "description": "External dependencies and requirements for project success",
-                    "x-guidance": "If your project has any dependencies and prerequisites for your project's success, list them here. These are usually external factors (such as third-party suppliers, external resources, third-party software, etc.) that may cause a delay, since a project has less control over them. In case of third party software, indicate whether you have the necessary licenses and permission to use such software.",
                     "properties": {
                         "hasDependency": {
                             "$ref": "#/definitions/yesNoChoice",
                             "title": "Does the project have any dependency",
                             "description": "Does your project have any dependencies on other organizations, technical or otherwise?",
-                            "x-guidance": "If YES, please describe what the dependency is and why you believe it is essential for your project's delivery. If NO, please write \"No dependencies\"",
+                            "x-guidance": "If your project has any dependencies and prerequisites for your project's success, list them here. These are usually external factors (such as third-party suppliers, external resources, third-party software, etc.) that may cause a delay, since a project has less control over them. In case of third party software, indicate whether you have the necessary licenses and permission to use such software.",
                             "x-placeholder": "Select if your project has any dependencies"
                         },
                         "dependencyDetail": {
                             "$ref": "#/definitions/singleLineTextEntry",
                             "title": "Dependency description",
                             "description": "Here you should list any dependencies and prerequisites for your project's success. These are usually external factors (such as third-party suppliers, external resources, third-party software, etc.) that may cause a delay, since a project has less control over them. In case of third party software, indicate whether you have the necessary licenses and permission to use such software.",
+                            "x-guidance": "If YES, please describe what the dependency is and why you believe it is essential for your project's delivery. If NO, please write \"No dependencies\"",
                             "x-placeholder": "Describe any dependencies or write 'No dependencies'."
                         }
                     }
@@ -520,7 +524,6 @@
             "x-icon": "top-bar",
             "$ref": "#/definitions/segment",
             "description": "Determine the eligibility of the proposal for this category",
-
             "properties": {
                 "category_details": {
                     "$ref": "#/definitions/section",
@@ -705,7 +708,9 @@
                     "properties": {
                         "grouped_tag": {
                             "$ref": "#/definitions/singleGroupedTagSelector",
-                            "oneOf": [{
+                            "title": "Theme Selection",
+                            "oneOf": [
+                                {
                                     "properties": {
                                         "group": {
                                             "$ref": "#/definitions/tagGroup",
@@ -970,7 +975,8 @@
                             "description": "Please describe your proposed solution",
                             "x-placeholder": "Describe your proposed solution and how it addresses the problem"
                         }
-                    }
+                    },
+                    "required": ["solution"]
                 },
                 "impact": {
                     "$ref": "#/definitions/section",
@@ -984,7 +990,8 @@
                             "minLength": 1,
                             "maxLength": 10240
                         }
-                    }
+                    },
+                    "required": ["impact"]
                 },
                 "feasibility": {
                     "$ref": "#/definitions/section",
@@ -998,10 +1005,12 @@
                             "minLength": 1,
                             "maxLength": 10240
                         }
-                    }
+                    },
+                    "required": ["feasibility"]
                 }
             },
-            "x-order": ["solution", "impact", "feasibility"]
+            "x-order": ["solution", "impact", "feasibility"],
+            "required": ["solution", "impact", "feasibility"]
         },
         "milestones": {
             "$ref": "#/definitions/segment",
@@ -1104,7 +1113,8 @@
                             "minLength": 1,
                             "maxLength": 10240
                         }
-                    }
+                    },
+                    "required": ["who"]
                 },
                 "budget": {
                     "$ref": "#/definitions/section",
@@ -1119,7 +1129,8 @@
                             "minLength": 1,
                             "maxLength": 10240
                         }
-                    }
+                    },
+                    "required": ["costs"]
                 },
                 "value": {
                     "$ref": "#/definitions/section",
@@ -1134,10 +1145,12 @@
                             "minLength": 1,
                             "maxLength": 10240
                         }
-                    }
+                    },
+                    "required": ["note"]
                 }
             },
-            "x-order": ["team", "budget", "value"]
+            "x-order": ["team", "budget", "value"],
+            "required": ["team", "budget", "value"]
         },
         "agreements": {
             "$ref": "#/definitions/segment",
