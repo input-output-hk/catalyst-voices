@@ -875,7 +875,7 @@
   "@drepVerboseName": {
     "description": "A verbose name for drep"
   },
-  "contributorDescription": "The Contributors are the guardians of Cardano treasury.",
+  "contributorDescription": "Become a Catalyst contributor to help shape innovative ideas and have a voice in ecosystem decisions that matter.",
   "@contributorDescription": {
     "description": "A description for contributor"
   },
