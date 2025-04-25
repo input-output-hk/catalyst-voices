@@ -74,7 +74,7 @@ impl ConfigApi {
     )]
     async fn get_frontend(
         &self,
-        /// Bollean flag to get the provided config for the IP Address from "x-real-ip"
+        /// Boolean flag to get the provided config for the IP Address from "x-real-ip"
         /// header (if provided).
         Query(is_ip): Query<Option<BooleanFlag>>,
         ip_address: RealIp, _auth: NoneOrRBAC,
@@ -131,7 +131,7 @@ impl ConfigApi {
     )]
     async fn put_frontend(
         &self,
-        /// Bollean flag to set the provided config for the IP Address from "x-real-ip"
+        /// Boolean flag to set the provided config for the IP Address from "x-real-ip"
         /// header (if provided).
         Query(is_ip): Query<Option<BooleanFlag>>,
         Json(json_config): Json<Value>, ip_address: RealIp, _auth: InternalApiKeyAuthorization,
