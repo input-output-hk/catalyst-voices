@@ -18,6 +18,8 @@ void main() {
   late final ApiServices apiServices;
   late final CatGatewayDocumentDataSource source;
 
+  const maxPageSize = CatGatewayDocumentDataSource.indexPageSize;
+
   setUpAll(() {
     apiServices = ApiServices.internal(
       gateway: gateway,
@@ -43,17 +45,17 @@ void main() {
         // Given
         final pageZero = DocumentIndexList(
           docs: List.generate(
-            100,
+            maxPageSize,
             (_) => _buildDocumentIndexList().toJson(),
           ),
-          page: const CurrentPage(page: 0, limit: 100, remaining: 5),
+          page: const CurrentPage(page: 0, limit: maxPageSize, remaining: 5),
         );
         final pageOne = DocumentIndexList(
           docs: List.generate(
             5,
             (_) => _buildDocumentIndexList().toJson(),
           ),
-          page: const CurrentPage(page: 1, limit: 100, remaining: 0),
+          page: const CurrentPage(page: 1, limit: maxPageSize, remaining: 0),
         );
 
         final pageZeroResponse = Response(http.Response('', 200), pageZero);
@@ -63,14 +65,14 @@ void main() {
         when(
           () => gateway.apiV1DocumentIndexPost(
             body: const DocumentIndexQueryFilter(),
-            limit: 100,
+            limit: maxPageSize,
             page: 0,
           ),
         ).thenAnswer((_) => Future.value(pageZeroResponse));
         when(
           () => gateway.apiV1DocumentIndexPost(
             body: const DocumentIndexQueryFilter(),
-            limit: 100,
+            limit: maxPageSize,
             page: 1,
           ),
         ).thenAnswer((_) => Future.value(pageOneResponse));
@@ -111,7 +113,7 @@ void main() {
               }).toList(),
             ).toJson(),
           ],
-          page: const CurrentPage(page: 0, limit: 100, remaining: 0),
+          page: const CurrentPage(page: 0, limit: maxPageSize, remaining: 0),
         );
         final response = Response(http.Response('', 200), page);
 
@@ -124,7 +126,7 @@ void main() {
         when(
           () => gateway.apiV1DocumentIndexPost(
             body: const DocumentIndexQueryFilter(),
-            limit: 100,
+            limit: maxPageSize,
             page: 0,
           ),
         ).thenAnswer((_) => Future.value(response));

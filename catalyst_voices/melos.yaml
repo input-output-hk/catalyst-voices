@@ -148,6 +148,7 @@ command:
       convert: ^3.1.1
       path: ^1.9.1
       pinenacl: ^0.6.0
+      pool: ^1.5.1
       uuid_plus: ^0.1.0
       sentry_flutter: ^8.8.0
       scrollable_positioned_list: ^0.3.8
