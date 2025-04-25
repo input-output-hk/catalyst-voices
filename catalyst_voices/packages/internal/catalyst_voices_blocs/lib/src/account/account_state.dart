@@ -22,6 +22,7 @@ final class AccountState extends Equatable {
   final Email email;
   final AccountRolesState roles;
   final String walletConnected;
+  final AccountPublicStatus accountPublicStatus;
 
   const AccountState({
     this.status = const None(),
@@ -30,6 +31,7 @@ final class AccountState extends Equatable {
     this.email = const Email.pure(),
     this.roles = const AccountRolesState(),
     this.walletConnected = '',
+    this.accountPublicStatus = AccountPublicStatus.unknown,
   });
 
   @override
@@ -40,6 +42,7 @@ final class AccountState extends Equatable {
         email,
         roles,
         walletConnected,
+        accountPublicStatus,
       ];
 
   AccountState copyWith({
@@ -49,6 +52,7 @@ final class AccountState extends Equatable {
     Email? email,
     AccountRolesState? roles,
     String? walletConnected,
+    AccountPublicStatus? accountPublicStatus,
   }) {
     return AccountState(
       status: status ?? this.status,
@@ -57,6 +61,7 @@ final class AccountState extends Equatable {
       email: email ?? this.email,
       roles: roles ?? this.roles,
       walletConnected: walletConnected ?? this.walletConnected,
+      accountPublicStatus: accountPublicStatus ?? this.accountPublicStatus,
     );
   }
 }

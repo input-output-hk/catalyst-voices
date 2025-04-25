@@ -387,7 +387,7 @@ final class RegistrationCubit extends Cubit<RegistrationState>
       metadata: metadata,
       keychain: keychain,
       username: username,
-      email: email,
+      email: email.isNotEmpty ? email : null,
       roles: roles,
     );
   }

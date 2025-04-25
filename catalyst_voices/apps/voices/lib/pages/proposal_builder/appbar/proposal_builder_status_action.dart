@@ -1,19 +1,18 @@
 import 'dart:async';
 
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
-import 'package:catalyst_voices/pages/proposal_builder/appbar/proposal_menu_item_action_enum.dart';
+import 'package:catalyst_voices/pages/proposal_builder/appbar/widget/proposal_builder_menu_item.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/proposal_builder_delete_confirmation_dialog.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/publish_proposal_iteration_dialog.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/submit_proposal_for_review_dialog.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
-import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart'
-    show DocumentVersion;
+    show DocumentVersion, ProposalMenuItemAction;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -70,75 +69,6 @@ class _Button extends StatelessWidget {
   }
 }
 
-class _MenuItem extends StatelessWidget {
-  final ProposalMenuItemAction item;
-  final String? proposalTitle;
-  final ProposalBuilderMetadata metadata;
-
-  const _MenuItem({
-    required this.item,
-    required this.proposalTitle,
-    required this.metadata,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final title = item.title(
-      context,
-      proposalTitle,
-      metadata.latestVersion?.number ?? DocumentVersion.firstNumber,
-    );
-
-    final description = item.description(context, metadata);
-
-    return ListTile(
-      title: MarkdownText(
-        selectable: false,
-        MarkdownData(title),
-      ),
-      subtitle: description == null
-          ? null
-          : Text(
-              description,
-              style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                    color: Theme.of(context).colors.textOnPrimaryLevel1,
-                  ),
-            ),
-      leading: item.icon().buildIcon(),
-      mouseCursor: item.clickable ? SystemMouseCursors.click : null,
-    );
-  }
-}
-
-class _MenuItemSelector extends StatelessWidget {
-  final ProposalMenuItemAction item;
-
-  const _MenuItemSelector({required this.item});
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocSelector<
-        ProposalBuilderBloc,
-        ProposalBuilderState,
-        ({
-          String? proposalTitle,
-          ProposalBuilderMetadata metadata,
-        })>(
-      selector: (state) => (
-        proposalTitle: state.proposalTitle,
-        metadata: state.metadata,
-      ),
-      builder: (context, state) {
-        return _MenuItem(
-          item: item,
-          proposalTitle: state.proposalTitle,
-          metadata: state.metadata,
-        );
-      },
-    );
-  }
-}
-
 class _PopupMenuButton extends StatefulWidget {
   final List<ProposalMenuItemAction> items;
 
@@ -165,11 +95,8 @@ class _PopupMenuButtonState extends State<_PopupMenuButton> {
             PopupMenuItem(
               value: item.index,
               enabled: item.clickable,
-              padding: const EdgeInsets.symmetric(
-                horizontal: 16,
-                vertical: 4,
-              ),
-              child: _MenuItemSelector(item: item),
+              padding: EdgeInsets.zero,
+              child: ProposalBuilderMenuItem(item: item),
             ),
         ].separatedBy(const PopupMenuDivider(height: 0)).toList();
       },
@@ -223,6 +150,16 @@ class _PopupMenuButtonState extends State<_PopupMenuButton> {
 
   Future<void> _publishIteration() async {
     final bloc = context.read<ProposalBuilderBloc>();
+
+    if (!await bloc.isAccountEmailVerified()) {
+      bloc.emitSignal(const EmailNotVerifiedProposalBuilderSignal());
+      return;
+    }
+
+    if (!mounted || bloc.isClosed) {
+      return;
+    }
+
     if (!bloc.validate()) {
       return;
     }
@@ -259,6 +196,15 @@ class _PopupMenuButtonState extends State<_PopupMenuButton> {
   Future<void> _submitForReview() async {
     final bloc = context.read<ProposalBuilderBloc>();
     if (!bloc.validate()) {
+      return;
+    }
+
+    if (!await bloc.isAccountEmailVerified()) {
+      bloc.emitSignal(const EmailNotVerifiedProposalBuilderSignal());
+      return;
+    }
+
+    if (!mounted || bloc.isClosed) {
       return;
     }
 
