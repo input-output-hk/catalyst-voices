@@ -3,7 +3,6 @@ import 'package:catalyst_voices/widgets/dropdown/category_dropdown.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
-import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
@@ -46,15 +45,16 @@ class _CategorySelectorState extends State<_CategorySelector> {
   Widget build(BuildContext context) {
     return CategoryDropdown(
       items: [
-        DropdownMenuViewModel.all(
-          context.l10n,
+        DropdownMenuViewModel(
+          value: const ProposalsAnyCategoryFilter(),
+          name: context.l10n.showAll,
           isSelected: widget.items.none((e) => e.isSelected),
         ),
         ...widget.items.map((item) => item.toDropdownItem()),
       ],
       highlightColor: context.colors.onSurfacePrimary08,
       onSelected: (value) {
-        context.read<ProposalsCubit>().changeSelectedCategory(value);
+        context.read<ProposalsCubit>().changeSelectedCategory(value.ref);
       },
       popupMenuButtonKey: _popupMenuButtonKey,
       child: Container(
@@ -91,9 +91,9 @@ class _CategorySelectorState extends State<_CategorySelector> {
 }
 
 extension on ProposalsCategorySelectorItem {
-  DropdownMenuViewModel<SignedDocumentRef> toDropdownItem() {
+  DropdownMenuViewModel<ProposalsCategoryFilter> toDropdownItem() {
     return DropdownMenuViewModel(
-      value: ref,
+      value: ProposalsRefCategoryFilter(ref: ref),
       name: name.trim().isNotEmpty ? name : '-TBD-',
       isSelected: isSelected,
     );

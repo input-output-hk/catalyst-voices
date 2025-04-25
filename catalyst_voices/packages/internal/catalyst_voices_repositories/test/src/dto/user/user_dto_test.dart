@@ -1,4 +1,4 @@
-import 'package:catalyst_voices_repositories/src/dto/user_dto.dart';
+import 'package:catalyst_voices_repositories/src/dto/user/user_dto.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

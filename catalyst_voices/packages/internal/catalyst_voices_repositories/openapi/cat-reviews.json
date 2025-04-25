@@ -679,6 +679,106 @@
         ]
       }
     },
+    "/api/proposals/import/{event}": {
+      "post": {
+        "tags": [
+          "proposals"
+        ],
+        "summary": "Proposals:Import",
+        "description": "Import proposals in a specific event.",
+        "operationId": "proposals_import_api_proposals_import__event__post",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "event",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "title": "The event where to store proposals and categories."
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "boolean",
+                  "title": "Response Proposals Import Api Proposals Import  Event  Post"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authorized."
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/proposals/generate-results": {
+      "post": {
+        "tags": [
+          "proposals"
+        ],
+        "summary": "Proposals:Generate-Results",
+        "description": "Generate reviews results.",
+        "operationId": "proposals_generate_results_api_proposals_generate_results_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_proposals_generate_results_api_proposals_generate_results_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProposalResultsPublic"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
     "/api/proposal-reviews/": {
       "post": {
         "tags": [
@@ -1152,16 +1252,21 @@
             "description": "Used to filter by objective"
           },
           {
-            "name": "include_excluded",
+            "name": "rankings_included",
             "in": "query",
             "required": false,
             "schema": {
-              "type": "boolean",
-              "description": "Used to filter by include excluded",
-              "default": false,
-              "title": "Include Excluded"
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/ProposalReviewRanking"
+              },
+              "description": "Rankings to include in the filter",
+              "default": [
+                1
+              ],
+              "title": "Rankings Included"
             },
-            "description": "Used to filter by include excluded"
+            "description": "Rankings to include in the filter"
           }
         ],
         "responses": {
@@ -1251,16 +1356,21 @@
             "description": "Used to filter by objective"
           },
           {
-            "name": "include_excluded",
+            "name": "rankings_included",
             "in": "query",
             "required": false,
             "schema": {
-              "type": "boolean",
-              "description": "Used to filter by include excluded",
-              "default": false,
-              "title": "Include Excluded"
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/ProposalReviewRanking"
+              },
+              "description": "Rankings to include in the filter",
+              "default": [
+                1
+              ],
+              "title": "Rankings Included"
             },
-            "description": "Used to filter by include excluded"
+            "description": "Rankings to include in the filter"
           }
         ],
         "responses": {
@@ -1442,66 +1552,110 @@
         }
       }
     },
-    "/api/proposal-reviews/export/csv": {
+    "/api/proposal-reviews/export/csv/{event}/": {
       "get": {
         "tags": [
           "proposal reviews"
         ],
         "summary": "Moderations:Csv Export",
         "description": "Export the reviews with moderation info.",
-        "operationId": "moderations_csv_export_api_proposal_reviews_export_csv_get",
+        "operationId": "moderations_csv_export_api_proposal_reviews_export_csv__event___get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "event",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "title": "The ID of the event to fetch."
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "Successful Response",
             "content": {
               "application/json": {
                 "schema": {
+                  "type": "array",
                   "items": {
                     "$ref": "#/components/schemas/LightProposalReviewModerated"
                   },
-                  "type": "array",
-                  "title": "Response Moderations Csv Export Api Proposal Reviews Export Csv Get"
+                  "title": "Response Moderations Csv Export Api Proposal Reviews Export Csv  Event   Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             }
           }
-        },
-        "security": [
-          {
-            "OAuth2PasswordBearer": []
-          }
-        ]
+        }
       }
     },
-    "/api/proposal-reviews/export/full-csv": {
+    "/api/proposal-reviews/export/full-csv/{event}": {
       "get": {
         "tags": [
           "proposal reviews"
         ],
         "summary": "Moderations:Csv Export",
         "description": "Export the full reviews with moderation info.",
-        "operationId": "moderations_csv_export_api_proposal_reviews_export_full_csv_get",
+        "operationId": "moderations_csv_export_api_proposal_reviews_export_full_csv__event__get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "event",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "title": "The ID of the event to fetch."
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "Successful Response",
             "content": {
               "application/json": {
                 "schema": {
+                  "type": "array",
                   "items": {
                     "$ref": "#/components/schemas/ProposalReviewModerated"
                   },
-                  "type": "array",
-                  "title": "Response Moderations Csv Export Api Proposal Reviews Export Full Csv Get"
+                  "title": "Response Moderations Csv Export Api Proposal Reviews Export Full Csv  Event  Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             }
           }
-        },
-        "security": [
-          {
-            "OAuth2PasswordBearer": []
-          }
-        ]
+        }
       }
     },
     "/api/proposal-reviews/generate-allocations": {
@@ -1551,6 +1705,53 @@
         ]
       }
     },
+    "/api/proposal-reviews/generate-results": {
+      "post": {
+        "tags": [
+          "proposal reviews"
+        ],
+        "summary": "Proposal-Reviews:Generate-Results",
+        "description": "Generate reviews results.",
+        "operationId": "proposal_reviews_generate_results_api_proposal_reviews_generate_results_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_proposal_reviews_generate_results_api_proposal_reviews_generate_results_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProposalReviewResults"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
     "/api/users/": {
       "post": {
         "tags": [
@@ -1575,7 +1776,8 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UserPublic"
+                  "type": "boolean",
+                  "title": "Response Users Register New User Api Users  Post"
                 }
               }
             }
@@ -1784,8 +1986,8 @@
               }
             }
           },
-          "401": {
-            "description": "Not authorized."
+          "404": {
+            "description": "User not found."
           },
           "422": {
             "description": "Validation Error",
@@ -2225,6 +2427,50 @@
         }
       }
     },
+    "/api/configs/allocations/{event}/": {
+      "get": {
+        "tags": [
+          "config"
+        ],
+        "summary": "Configs:Get-Allocation-Generation",
+        "description": "Get a proposal by id.",
+        "operationId": "configs_get_allocation_generation_api_configs_allocations__event___get",
+        "parameters": [
+          {
+            "name": "event",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "title": "The event of the reviews config to get."
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AllocationGenerationPublic"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/sumsub/webhook/": {
       "post": {
         "tags": [
@@ -2272,9 +2518,7 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {
-
-                }
+                "schema": {}
               }
             }
           },
@@ -2348,47 +2592,41 @@
         ]
       }
     },
-    "/api/catalyst-ids/me": {
-      "get": {
+    "/api/subscriptions/invitation": {
+      "post": {
         "tags": [
-          "catalyst ids"
+          "reviewers subscriptions"
         ],
-        "summary": "Catalyst-Ids:Get-By-Current-User",
-        "description": "Get a catalyst id from request.",
-        "operationId": "catalyst_ids_get_by_current_user_api_catalyst_ids_me_get",
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "x-test-rbac-uri",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Test-Rbac-Uri"
+        "summary": "Reviewer-Subscription:Invitation",
+        "description": "Endpoint to be accept/refuse a reviewer subscription invitation.",
+        "operationId": "reviewer_subscription_invitation_api_subscriptions_invitation_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_reviewer_subscription_invitation_api_subscriptions_invitation_post"
+              }
             }
-          }
-        ],
+          },
+          "required": true
+        },
         "responses": {
-          "200": {
+          "201": {
             "description": "Successful Response",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CatalystIDPublic"
+                  "items": {
+                    "$ref": "#/components/schemas/ReviewerSubscriptionPublic"
+                  },
+                  "type": "array",
+                  "title": "Response Reviewer Subscription Invitation Api Subscriptions Invitation Post"
                 }
               }
             }
+          },
+          "401": {
+            "description": "Not authorized."
           },
           "422": {
             "description": "Validation Error",
@@ -2400,7 +2638,39 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/api/catalyst-ids/me": {
+      "get": {
+        "tags": [
+          "catalyst ids"
+        ],
+        "summary": "Catalyst-Ids:Get-By-Current-User",
+        "description": "Get a catalyst id from request.",
+        "operationId": "catalyst_ids_get_by_current_user_api_catalyst_ids_me_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CatalystIDPublic"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
       },
       "post": {
         "tags": [
@@ -2409,38 +2679,15 @@
         "summary": "Catalyst-Ids:Post-Info",
         "description": "Update info associated with a catalyst id.",
         "operationId": "catalyst_ids_post_info_api_catalyst_ids_me_post",
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "x-test-rbac-uri",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Test-Rbac-Uri"
-            }
-          }
-        ],
         "requestBody": {
-          "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/CatalystIDCreate"
               }
             }
-          }
+          },
+          "required": true
         },
         "responses": {
           "200": {
@@ -2463,7 +2710,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
       }
     },
     "/api/catalyst-ids/verify-email": {
@@ -2509,18 +2761,279 @@
         }
       }
     },
-    "/healthz": {
+    "/api/events/": {
       "get": {
-        "summary": "Endpoint",
-        "operationId": "endpoint_healthz_get",
+        "tags": [
+          "events"
+        ],
+        "summary": "Events:Get-All-Events",
+        "description": "Get all events.",
+        "operationId": "events_get_all_events_api_events__get",
+        "parameters": [
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 50,
+              "minimum": 1,
+              "description": "Used to determine how many events returns in the response",
+              "default": 20,
+              "title": "Size"
+            },
+            "description": "Used to determine how many events returns in the response"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Used to determine the page to display",
+              "default": 0,
+              "title": "Page"
+            },
+            "description": "Used to determine the page to display"
+          }
+        ],
         "responses": {
           "200": {
             "description": "Successful Response",
             "content": {
               "application/json": {
                 "schema": {
-
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/EventPublic"
+                  },
+                  "title": "Response Events Get All Events Api Events  Get"
                 }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "events"
+        ],
+        "summary": "Events-Reviews:Create-Event",
+        "description": "Create a new event.",
+        "operationId": "events_reviews_create_event_api_events__post",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_events_reviews_create_event_api_events__post"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventPublic"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/events/count/": {
+      "get": {
+        "tags": [
+          "events"
+        ],
+        "summary": "Events:Get-All-Events-Count",
+        "description": "Get all events count.",
+        "operationId": "events_get_all_events_count_api_events_count__get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "integer",
+                  "title": "Response Events Get All Events Count Api Events Count  Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/events/current/": {
+      "get": {
+        "tags": [
+          "events"
+        ],
+        "summary": "Events:Get-Current-Events",
+        "description": "Get all current events.",
+        "operationId": "events_get_current_events_api_events_current__get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/EventPublic"
+                  },
+                  "type": "array",
+                  "title": "Response Events Get Current Events Api Events Current  Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/events/{id}/": {
+      "put": {
+        "tags": [
+          "events"
+        ],
+        "summary": "Events-Reviews:Update-Event",
+        "description": "Update an event.",
+        "operationId": "events_reviews_update_event_api_events__id___put",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "title": "The ID of the event to update."
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_events_reviews_update_event_api_events__id___put"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventPublic"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/vitss-export": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Admin:Vitss-Export",
+        "description": "Generate export files for VITss.",
+        "operationId": "admin_vitss_export_api_admin_vitss_export_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_admin_vitss_export_api_admin_vitss_export_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/api/healthz": {
+      "get": {
+        "summary": "Endpoint",
+        "operationId": "endpoint_api_healthz_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
               }
             }
           }
@@ -2548,6 +3061,54 @@
         ],
         "title": "AccessToken",
         "description": "Access token model."
+      },
+      "AllocationGeneration": {
+        "properties": {
+          "moderation_allocation_generated": {
+            "type": "boolean",
+            "title": "Moderation Allocation Generated",
+            "default": false
+          },
+          "proposal_allocation_generated": {
+            "type": "boolean",
+            "title": "Proposal Allocation Generated",
+            "default": false
+          }
+        },
+        "type": "object",
+        "title": "AllocationGeneration",
+        "description": "Submodel to store allocation generation per event."
+      },
+      "AllocationGenerationPublic": {
+        "properties": {
+          "row_id": {
+            "type": "integer",
+            "title": "Row Id"
+          },
+          "config_type": {
+            "type": "string",
+            "title": "Config Type"
+          },
+          "event": {
+            "type": "string",
+            "title": "Event"
+          },
+          "value": {
+            "$ref": "#/components/schemas/AllocationGeneration",
+            "default": {
+              "moderation_allocation_generated": false,
+              "proposal_allocation_generated": false
+            }
+          }
+        },
+        "type": "object",
+        "required": [
+          "row_id",
+          "config_type",
+          "event"
+        ],
+        "title": "AllocationGenerationPublic",
+        "description": "Attributes for ReviewsLevelQualifiers public model in responses."
       },
       "AllocationStatsAverages": {
         "properties": {
@@ -2592,6 +3153,35 @@
         "type": "object",
         "title": "AllocationStatsReviewers",
         "description": "Model for stats of reviewers."
+      },
+      "AllocationWeights": {
+        "properties": {
+          "allocated": {
+            "type": "number",
+            "title": "Allocated",
+            "default": 0.2
+          },
+          "not_allocated": {
+            "type": "number",
+            "title": "Not Allocated",
+            "default": 0.8
+          }
+        },
+        "type": "object",
+        "title": "AllocationWeights",
+        "description": "Attributes for the weights to assign to allocation."
+      },
+      "Body_admin_vitss_export_api_admin_vitss_export_post": {
+        "properties": {
+          "export_config": {
+            "$ref": "#/components/schemas/VITssExportConfig"
+          }
+        },
+        "type": "object",
+        "required": [
+          "export_config"
+        ],
+        "title": "Body_admin_vitss_export_api_admin_vitss_export_post"
       },
       "Body_catalyst_ids_verify_email_api_catalyst_ids_verify_email_post": {
         "properties": {
@@ -2640,6 +3230,30 @@
           "new_email"
         ],
         "title": "Body_emails_send_api_email_send__post"
+      },
+      "Body_events_reviews_create_event_api_events__post": {
+        "properties": {
+          "new_event": {
+            "$ref": "#/components/schemas/EventCreate"
+          }
+        },
+        "type": "object",
+        "required": [
+          "new_event"
+        ],
+        "title": "Body_events_reviews_create_event_api_events__post"
+      },
+      "Body_events_reviews_update_event_api_events__id___put": {
+        "properties": {
+          "event_update": {
+            "$ref": "#/components/schemas/EventUpdate"
+          }
+        },
+        "type": "object",
+        "required": [
+          "event_update"
+        ],
+        "title": "Body_events_reviews_update_event_api_events__id___put"
       },
       "Body_moderations_create_moderation_api_moderations__post": {
         "properties": {
@@ -2701,6 +3315,18 @@
         ],
         "title": "Body_proposal_reviews_generate_allocations_api_proposal_reviews_generate_allocations_post"
       },
+      "Body_proposal_reviews_generate_results_api_proposal_reviews_generate_results_post": {
+        "properties": {
+          "results_params": {
+            "$ref": "#/components/schemas/ProposalReviewResultsCreate"
+          }
+        },
+        "type": "object",
+        "required": [
+          "results_params"
+        ],
+        "title": "Body_proposal_reviews_generate_results_api_proposal_reviews_generate_results_post"
+      },
       "Body_proposal_reviews_update_proposal_review_by_id_api_proposal_reviews__id___put": {
         "properties": {
           "proposal_review_update": {
@@ -2713,6 +3339,18 @@
         ],
         "title": "Body_proposal_reviews_update_proposal_review_by_id_api_proposal_reviews__id___put"
       },
+      "Body_proposals_generate_results_api_proposals_generate_results_post": {
+        "properties": {
+          "results_params": {
+            "$ref": "#/components/schemas/ProposalResultsCreate"
+          }
+        },
+        "type": "object",
+        "required": [
+          "results_params"
+        ],
+        "title": "Body_proposals_generate_results_api_proposals_generate_results_post"
+      },
       "Body_reviewer_subscription_create_api_subscriptions__post": {
         "properties": {
           "new_subscription": {
@@ -2724,6 +3362,18 @@
           "new_subscription"
         ],
         "title": "Body_reviewer_subscription_create_api_subscriptions__post"
+      },
+      "Body_reviewer_subscription_invitation_api_subscriptions_invitation_post": {
+        "properties": {
+          "invitation_answer": {
+            "$ref": "#/components/schemas/ReviewerSubscriptionInvitationAnswerCreate"
+          }
+        },
+        "type": "object",
+        "required": [
+          "invitation_answer"
+        ],
+        "title": "Body_reviewer_subscription_invitation_api_subscriptions_invitation_post"
       },
       "Body_users_activate_api_users_activate_post": {
         "properties": {
@@ -2739,18 +3389,6 @@
       },
       "Body_users_login_email_and_password_api_users_token_login_post": {
         "properties": {
-          "grant_type": {
-            "anyOf": [
-              {
-                "type": "string",
-                "pattern": "password"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Grant Type"
-          },
           "username": {
             "type": "string",
             "title": "Username"
@@ -2765,25 +3403,11 @@
             "default": ""
           },
           "client_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "type": "string",
             "title": "Client Id"
           },
           "client_secret": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "type": "string",
             "title": "Client Secret"
           }
         },
@@ -2848,11 +3472,16 @@
             "type": "string",
             "format": "email",
             "title": "Email"
+          },
+          "catalyst_id_uri": {
+            "type": "string",
+            "title": "Catalyst Id Uri"
           }
         },
         "type": "object",
         "required": [
-          "email"
+          "email",
+          "catalyst_id_uri"
         ],
         "title": "CatalystIDCreate",
         "description": "Model for the creation and the update of the email in DB."
@@ -2873,7 +3502,8 @@
           "email": {
             "anyOf": [
               {
-                "type": "string"
+                "type": "string",
+                "format": "email"
               },
               {
                 "type": "null"
@@ -2895,6 +3525,10 @@
           "status": {
             "$ref": "#/components/schemas/CatalystIDStatus",
             "default": 0
+          },
+          "rbac_reg_status": {
+            "$ref": "#/components/schemas/CatalystRBACRegistrationStatus",
+            "default": 0
           }
         },
         "type": "object",
@@ -2903,14 +3537,31 @@
       },
       "CatalystIDStatus": {
         "type": "integer",
-        "enum": [0, 1, 2, 3],
+        "enum": [
+          0,
+          1,
+          2,
+          3
+        ],
         "title": "CatalystIDStatus",
-        "description": "Enum to describe the catalyst_id status."
+        "description": "Enum to describe the catalyst_id status.\n\ninactive = 0\nemail_verified = 1\nactive = 2\nbanned = 3"
+      },
+      "CatalystRBACRegistrationStatus": {
+        "type": "integer",
+        "enum": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "title": "CatalystRBACRegistrationStatus",
+        "description": "Enum to describe the rbac registration status.\n\ninitialized = 0\nnot_found = 1\nvolatile = 2\npersistent = 3"
       },
       "CategoryInDB": {
         "properties": {
           "id": {
-            "type": "integer",
+            "type": "string",
+            "format": "uuid7",
             "title": "Id"
           },
           "event": {
@@ -2919,7 +3570,7 @@
           },
           "category": {
             "$ref": "#/components/schemas/CategoryType",
-            "default": "catalyst-simple"
+            "default": "simple"
           },
           "title": {
             "type": "string",
@@ -2934,7 +3585,8 @@
                 "type": "null"
               }
             ],
-            "title": "Description"
+            "title": "Description",
+            "default": ""
           },
           "rewards_currency": {
             "anyOf": [
@@ -2970,7 +3622,8 @@
       "CategoryPublic": {
         "properties": {
           "id": {
-            "type": "integer",
+            "type": "string",
+            "format": "uuid7",
             "title": "Id"
           },
           "event": {
@@ -2979,7 +3632,7 @@
           },
           "category": {
             "$ref": "#/components/schemas/CategoryType",
-            "default": "catalyst-simple"
+            "default": "simple"
           },
           "title": {
             "type": "string",
@@ -2994,7 +3647,8 @@
                 "type": "null"
               }
             ],
-            "title": "Description"
+            "title": "Description",
+            "default": ""
           },
           "rewards_currency": {
             "anyOf": [
@@ -3030,14 +3684,19 @@
       "CategoryType": {
         "type": "string",
         "enum": [
-          "catalyst-simple"
+          "simple",
+          "community-choice",
+          "native"
         ],
         "title": "CategoryType",
         "description": "Enum for available category types."
       },
       "ClassificationType": {
         "type": "integer",
-        "enum": [0, 1],
+        "enum": [
+          0,
+          1
+        ],
         "title": "ClassificationType",
         "description": "Enum to describe possible classification types."
       },
@@ -3136,6 +3795,11 @@
               }
             ],
             "title": "External Id"
+          },
+          "updated_at": {
+            "type": "number",
+            "title": "Updated At",
+            "default": 1744992225.207126
           }
         },
         "type": "object",
@@ -3166,7 +3830,13 @@
       },
       "DueDiligenceStatus": {
         "type": "integer",
-        "enum": [0, 1, 2, 3, 4],
+        "enum": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
         "title": "DueDiligenceStatus",
         "description": "Enum to describe possible user roles."
       },
@@ -3203,6 +3873,30 @@
         "title": "EmailMsg",
         "description": "Represents an email message."
       },
+      "EventCreate": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "active": {
+            "type": "boolean",
+            "title": "Active"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "description",
+          "active"
+        ],
+        "title": "EventCreate",
+        "description": "Model for event creation."
+      },
       "EventPublic": {
         "properties": {
           "name": {
@@ -3213,6 +3907,10 @@
             "type": "string",
             "title": "Description"
           },
+          "active": {
+            "type": "boolean",
+            "title": "Active"
+          },
           "row_id": {
             "type": "integer",
             "title": "Row Id"
@@ -3222,14 +3920,43 @@
         "required": [
           "name",
           "description",
+          "active",
           "row_id"
         ],
         "title": "EventPublic",
         "description": "Publicly exposed attributes."
       },
+      "EventUpdate": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "active": {
+            "type": "boolean",
+            "title": "Active"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "description",
+          "active"
+        ],
+        "title": "EventUpdate",
+        "description": "Model for event update."
+      },
       "FlagType": {
         "type": "integer",
-        "enum": [0, 1, 2],
+        "enum": [
+          0,
+          1,
+          2
+        ],
         "title": "FlagType",
         "description": "Enum to describe possible flag types."
       },
@@ -3306,11 +4033,43 @@
         "title": "LevelQualifier",
         "description": "Submodel to store a single level qualifier."
       },
+      "LevelWeights": {
+        "properties": {
+          "level_0": {
+            "type": "number",
+            "title": "Level 0",
+            "default": 1
+          },
+          "level_1": {
+            "type": "number",
+            "title": "Level 1",
+            "default": 1
+          }
+        },
+        "type": "object",
+        "title": "LevelWeights",
+        "description": "Attributes for the weights to assign to each level."
+      },
       "LightProposalReviewModerated": {
         "properties": {
+          "valid": {
+            "type": "boolean",
+            "title": "Valid"
+          },
           "row_id": {
             "type": "integer",
             "title": "Row Id"
+          },
+          "user_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "User Id"
           },
           "moderations_tot": {
             "type": "integer",
@@ -3323,6 +4082,7 @@
         },
         "type": "object",
         "required": [
+          "valid",
           "row_id",
           "moderations_tot",
           "moderations_as_valid"
@@ -3411,7 +4171,7 @@
           "per_reviewer": {
             "$ref": "#/components/schemas/AllocationStatsAverages",
             "default": {
-              "avg": 0,
+              "avg": 0.0,
               "min": 0,
               "max": 0
             }
@@ -3419,7 +4179,7 @@
           "per_review": {
             "$ref": "#/components/schemas/AllocationStatsAverages",
             "default": {
-              "avg": 0,
+              "avg": 0.0,
               "min": 0,
               "max": 0
             }
@@ -3427,7 +4187,7 @@
           "per_moderator": {
             "$ref": "#/components/schemas/AllocationStatsAverages",
             "default": {
-              "avg": 0,
+              "avg": 0.0,
               "min": 0,
               "max": 0
             }
@@ -3484,6 +4244,17 @@
           "user_id": {
             "type": "integer",
             "title": "User Id"
+          },
+          "public_contact": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Public Contact"
           }
         },
         "type": "object",
@@ -3629,17 +4400,24 @@
         "title": "PolicyAcknowledgment",
         "description": "Submodel to store the policy acknowledgments."
       },
-      "ProposalInDB": {
+      "ProposalExtra": {
         "properties": {
-          "pr_id": {
-            "type": "integer",
-            "title": "Pr Id"
-          },
-          "title": {
-            "type": "string",
-            "title": "Title"
-          },
-          "summary": {
+          "fields": {
+            "items": {
+              "$ref": "#/components/schemas/ProposalExtraField"
+            },
+            "type": "array",
+            "title": "Fields",
+            "default": []
+          }
+        },
+        "type": "object",
+        "title": "ProposalExtra",
+        "description": "Submodel to store extra info."
+      },
+      "ProposalExtraField": {
+        "properties": {
+          "ref": {
             "anyOf": [
               {
                 "type": "string"
@@ -3648,7 +4426,68 @@
                 "type": "null"
               }
             ],
-            "title": "Summary"
+            "title": "Ref"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "answer": {
+            "anyOf": [
+              {},
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Answer"
+          },
+          "sub_fields": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/ProposalExtraField"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sub Fields"
+          }
+        },
+        "type": "object",
+        "title": "ProposalExtraField",
+        "description": "Submodel to store extra fields."
+      },
+      "ProposalInDB": {
+        "properties": {
+          "pr_id": {
+            "type": "string",
+            "format": "uuid7",
+            "title": "Pr Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
           },
           "objective": {
             "anyOf": [
@@ -3672,7 +4511,7 @@
             ],
             "title": "Objective Title"
           },
-          "public_key": {
+          "summary": {
             "anyOf": [
               {
                 "type": "string"
@@ -3681,7 +4520,51 @@
                 "type": "null"
               }
             ],
-            "title": "Public Key"
+            "title": "Summary"
+          },
+          "solution": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Solution"
+          },
+          "proposer_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Proposer Name"
+          },
+          "proposer_relevant_experience": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Proposer Relevant Experience"
+          },
+          "url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Url"
           },
           "funds": {
             "anyOf": [
@@ -3694,7 +4577,46 @@
             ],
             "title": "Funds"
           },
-          "url": {
+          "extra": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ProposalExtra"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "links": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Links"
+          },
+          "open_source": {
+            "type": "boolean",
+            "title": "Open Source",
+            "default": false
+          },
+          "score": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ProposalScore"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "public_key": {
             "anyOf": [
               {
                 "type": "string"
@@ -3703,7 +4625,7 @@
                 "type": "null"
               }
             ],
-            "title": "Url"
+            "title": "Public Key"
           },
           "files_url": {
             "anyOf": [
@@ -3733,23 +4655,13 @@
       "ProposalPublic": {
         "properties": {
           "pr_id": {
-            "type": "integer",
+            "type": "string",
+            "format": "uuid7",
             "title": "Pr Id"
           },
           "title": {
             "type": "string",
             "title": "Title"
-          },
-          "summary": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Summary"
           },
           "objective": {
             "anyOf": [
@@ -3773,7 +4685,7 @@
             ],
             "title": "Objective Title"
           },
-          "public_key": {
+          "summary": {
             "anyOf": [
               {
                 "type": "string"
@@ -3782,7 +4694,51 @@
                 "type": "null"
               }
             ],
-            "title": "Public Key"
+            "title": "Summary"
+          },
+          "solution": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Solution"
+          },
+          "proposer_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Proposer Name"
+          },
+          "proposer_relevant_experience": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Proposer Relevant Experience"
+          },
+          "url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Url"
           },
           "funds": {
             "anyOf": [
@@ -3795,7 +4751,46 @@
             ],
             "title": "Funds"
           },
-          "url": {
+          "extra": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ProposalExtra"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "links": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Links"
+          },
+          "open_source": {
+            "type": "boolean",
+            "title": "Open Source",
+            "default": false
+          },
+          "score": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ProposalScore"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "public_key": {
             "anyOf": [
               {
                 "type": "string"
@@ -3804,7 +4799,7 @@
                 "type": "null"
               }
             ],
-            "title": "Url"
+            "title": "Public Key"
           },
           "files_url": {
             "anyOf": [
@@ -3831,6 +4826,136 @@
         "title": "ProposalPublic",
         "description": "Attributes that will be returned at any public request."
       },
+      "ProposalResultPublic": {
+        "properties": {
+          "proposal": {
+            "$ref": "#/components/schemas/ProposalPublic"
+          },
+          "nr_reviews": {
+            "type": "integer",
+            "title": "Nr Reviews",
+            "default": 0
+          },
+          "nr_allocated_reviews": {
+            "type": "integer",
+            "title": "Nr Allocated Reviews",
+            "default": 0
+          },
+          "nr_pending_reviews": {
+            "type": "integer",
+            "title": "Nr Pending Reviews",
+            "default": 0
+          },
+          "nr_included_reviews": {
+            "type": "integer",
+            "title": "Nr Included Reviews",
+            "default": 0
+          },
+          "nr_excluded_reviews": {
+            "type": "integer",
+            "title": "Nr Excluded Reviews",
+            "default": 0
+          },
+          "nr_excluded_by_moderation_reviews": {
+            "type": "integer",
+            "title": "Nr Excluded By Moderation Reviews",
+            "default": 0
+          },
+          "nr_excluded_by_threshold_reviews": {
+            "type": "integer",
+            "title": "Nr Excluded By Threshold Reviews",
+            "default": 0
+          },
+          "score_avg": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ProposalScore"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "score_weighted_avg": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ProposalScore"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "proposal"
+        ],
+        "title": "ProposalResultPublic",
+        "description": "Public attributes for the score of a single proposal."
+      },
+      "ProposalResultsCreate": {
+        "properties": {
+          "event_id": {
+            "type": "integer",
+            "title": "Event Id"
+          },
+          "allocation_weights": {
+            "$ref": "#/components/schemas/AllocationWeights"
+          },
+          "level_weights": {
+            "$ref": "#/components/schemas/LevelWeights"
+          },
+          "dry_run": {
+            "type": "boolean",
+            "title": "Dry Run",
+            "default": true
+          }
+        },
+        "type": "object",
+        "required": [
+          "event_id",
+          "allocation_weights",
+          "level_weights"
+        ],
+        "title": "ProposalResultsCreate",
+        "description": "Attributes for parameters of the generation of proposal results."
+      },
+      "ProposalResultsPublic": {
+        "properties": {
+          "event_id": {
+            "type": "integer",
+            "title": "Event Id"
+          },
+          "allocation_weights": {
+            "$ref": "#/components/schemas/AllocationWeights"
+          },
+          "level_weights": {
+            "$ref": "#/components/schemas/LevelWeights"
+          },
+          "dry_run": {
+            "type": "boolean",
+            "title": "Dry Run",
+            "default": true
+          },
+          "proposals": {
+            "items": {
+              "$ref": "#/components/schemas/ProposalResultPublic"
+            },
+            "type": "array",
+            "title": "Proposals",
+            "default": []
+          }
+        },
+        "type": "object",
+        "required": [
+          "event_id",
+          "allocation_weights",
+          "level_weights"
+        ],
+        "title": "ProposalResultsPublic",
+        "description": "Public Attributes for result score of proposals."
+      },
       "ProposalReviewCreate": {
         "properties": {
           "proposal_id": {
@@ -3839,8 +4964,8 @@
           },
           "impact_alignment_rating_given": {
             "type": "integer",
-            "maximum": 5,
-            "minimum": 1,
+            "maximum": 5.0,
+            "minimum": 1.0,
             "title": "Impact Alignment Rating Given"
           },
           "impact_alignment_note": {
@@ -3851,8 +4976,8 @@
           },
           "feasibility_rating_given": {
             "type": "integer",
-            "maximum": 5,
-            "minimum": 1,
+            "maximum": 5.0,
+            "minimum": 1.0,
             "title": "Feasibility Rating Given"
           },
           "feasibility_note": {
@@ -3863,8 +4988,8 @@
           },
           "auditability_rating_given": {
             "type": "integer",
-            "maximum": 5,
-            "minimum": 1,
+            "maximum": 5.0,
+            "minimum": 1.0,
             "title": "Auditability Rating Given"
           },
           "auditability_note": {
@@ -3929,9 +5054,24 @@
       },
       "ProposalReviewModerated": {
         "properties": {
+          "valid": {
+            "type": "boolean",
+            "title": "Valid"
+          },
           "row_id": {
             "type": "integer",
             "title": "Row Id"
+          },
+          "user_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "User Id"
           },
           "moderations_tot": {
             "type": "integer",
@@ -3987,13 +5127,12 @@
           "ranking": {
             "anyOf": [
               {
-                "type": "integer"
+                "$ref": "#/components/schemas/ProposalReviewRanking"
               },
               {
                 "type": "null"
               }
-            ],
-            "title": "Ranking"
+            ]
           },
           "proposal": {
             "anyOf": [
@@ -4008,6 +5147,7 @@
         },
         "type": "object",
         "required": [
+          "valid",
           "row_id",
           "moderations_tot",
           "moderations_as_valid",
@@ -4071,13 +5211,12 @@
           "ranking": {
             "anyOf": [
               {
-                "type": "integer"
+                "$ref": "#/components/schemas/ProposalReviewRanking"
               },
               {
                 "type": "null"
               }
-            ],
-            "title": "Ranking"
+            ]
           },
           "row_id": {
             "type": "integer",
@@ -4139,6 +5278,17 @@
             ],
             "title": "Allocated"
           },
+          "allocated_for_moderation": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Allocated For Moderation"
+          },
           "next_allocation": {
             "anyOf": [
               {
@@ -4166,12 +5316,128 @@
         "title": "ProposalReviewPublic",
         "description": "Attributes that will be returned at any public request."
       },
+      "ProposalReviewRanking": {
+        "type": "integer",
+        "enum": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "title": "ProposalReviewRanking",
+        "description": "Enum to describe possible review output."
+      },
+      "ProposalReviewResults": {
+        "properties": {
+          "dry_run": {
+            "type": "boolean",
+            "title": "Dry Run"
+          },
+          "event_id": {
+            "type": "integer",
+            "title": "Event Id"
+          },
+          "nr_of_reviewers": {
+            "type": "integer",
+            "title": "Nr Of Reviewers"
+          },
+          "nr_of_accepted_reviewers": {
+            "type": "integer",
+            "title": "Nr Of Accepted Reviewers"
+          },
+          "nr_of_excluded_reviewers": {
+            "type": "integer",
+            "title": "Nr Of Excluded Reviewers"
+          },
+          "nr_of_reviews": {
+            "type": "integer",
+            "title": "Nr Of Reviews"
+          },
+          "nr_of_accepted_reviews": {
+            "type": "integer",
+            "title": "Nr Of Accepted Reviews"
+          },
+          "nr_of_excluded_reviews": {
+            "type": "integer",
+            "title": "Nr Of Excluded Reviews"
+          },
+          "nr_of_excluded_reviews_by_moderation": {
+            "type": "integer",
+            "title": "Nr Of Excluded Reviews By Moderation"
+          },
+          "nr_of_excluded_reviews_by_threshold": {
+            "type": "integer",
+            "title": "Nr Of Excluded Reviews By Threshold"
+          },
+          "excluded_reviewers": {
+            "items": {
+              "$ref": "#/components/schemas/ReviewerSubscriptionPublic"
+            },
+            "type": "array",
+            "title": "Excluded Reviewers"
+          }
+        },
+        "type": "object",
+        "required": [
+          "dry_run",
+          "event_id",
+          "nr_of_reviewers",
+          "nr_of_accepted_reviewers",
+          "nr_of_excluded_reviewers",
+          "nr_of_reviews",
+          "nr_of_accepted_reviews",
+          "nr_of_excluded_reviews",
+          "nr_of_excluded_reviews_by_moderation",
+          "nr_of_excluded_reviews_by_threshold",
+          "excluded_reviewers"
+        ],
+        "title": "ProposalReviewResults",
+        "description": "Attributes for result of the generation of reviews results."
+      },
+      "ProposalReviewResultsCreate": {
+        "properties": {
+          "event_id": {
+            "type": "integer",
+            "title": "Event Id"
+          },
+          "validity_threshold": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Validity Threshold"
+          },
+          "acceptance_threshold": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Acceptance Threshold"
+          },
+          "minimum_sample": {
+            "type": "integer",
+            "title": "Minimum Sample",
+            "default": 10
+          },
+          "dry_run": {
+            "type": "boolean",
+            "title": "Dry Run",
+            "default": true
+          }
+        },
+        "type": "object",
+        "required": [
+          "event_id",
+          "validity_threshold",
+          "acceptance_threshold"
+        ],
+        "title": "ProposalReviewResultsCreate",
+        "description": "Attributes for parameters of the generation of reviews results."
+      },
       "ProposalReviewUpdate": {
         "properties": {
           "impact_alignment_rating_given": {
             "type": "integer",
-            "maximum": 5,
-            "minimum": 1,
+            "maximum": 5.0,
+            "minimum": 1.0,
             "title": "Impact Alignment Rating Given"
           },
           "impact_alignment_note": {
@@ -4182,8 +5448,8 @@
           },
           "feasibility_rating_given": {
             "type": "integer",
-            "maximum": 5,
-            "minimum": 1,
+            "maximum": 5.0,
+            "minimum": 1.0,
             "title": "Feasibility Rating Given"
           },
           "feasibility_note": {
@@ -4194,8 +5460,8 @@
           },
           "auditability_rating_given": {
             "type": "integer",
-            "maximum": 5,
-            "minimum": 1,
+            "maximum": 5.0,
+            "minimum": 1.0,
             "title": "Auditability Rating Given"
           },
           "auditability_note": {
@@ -4216,6 +5482,33 @@
         ],
         "title": "ProposalReviewUpdate",
         "description": "Attributes required to update a ProposalReview.\n\nUsed at PUT request."
+      },
+      "ProposalScore": {
+        "properties": {
+          "overall": {
+            "type": "number",
+            "title": "Overall",
+            "default": 0
+          },
+          "impact": {
+            "type": "number",
+            "title": "Impact",
+            "default": 0
+          },
+          "feasibility": {
+            "type": "number",
+            "title": "Feasibility",
+            "default": 0
+          },
+          "value_for_money": {
+            "type": "number",
+            "title": "Value For Money",
+            "default": 0
+          }
+        },
+        "type": "object",
+        "title": "ProposalScore",
+        "description": "Submodel to store the score."
       },
       "ReviewHistoricStats": {
         "properties": {
@@ -4252,16 +5545,22 @@
           },
           "preferred_categories": {
             "items": {
-              "type": "integer"
+              "type": "string",
+              "format": "uuid7"
             },
             "type": "array",
             "title": "Preferred Categories"
+          },
+          "event_id": {
+            "type": "integer",
+            "title": "Event Id"
           }
         },
         "type": "object",
         "required": [
           "fund_rules_acceptance",
-          "preferred_categories"
+          "preferred_categories",
+          "event_id"
         ],
         "title": "ReviewerSubscriptionCreate",
         "description": "Attributes for the creation of a Reviewer Subscription."
@@ -4283,16 +5582,39 @@
             "type": "string",
             "format": "date-time",
             "title": "Subscribed At",
-            "default": "2025-03-03T13:15:38.075120"
+            "default": "2025-04-18T16:03:45.190105"
+          },
+          "public_contact": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Public Contact"
+          },
+          "reward_address": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reward Address"
           },
           "preferred_categories": {
             "items": {
               "anyOf": [
                 {
-                  "type": "integer"
+                  "$ref": "#/components/schemas/CategoryInDB"
                 },
                 {
-                  "$ref": "#/components/schemas/CategoryInDB"
+                  "type": "string",
+                  "format": "uuid7"
                 }
               ]
             },
@@ -4304,6 +5626,70 @@
         "type": "object",
         "title": "ReviewerSubscriptionExtra",
         "description": "Extra attributes for a reviewer subscription."
+      },
+      "ReviewerSubscriptionInvitationAnswerCreate": {
+        "properties": {
+          "acknowledge_public_contact": {
+            "type": "boolean",
+            "title": "Acknowledge Public Contact"
+          },
+          "public_contact": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Public Contact"
+          },
+          "reward_address": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reward Address"
+          },
+          "role": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ReviewerSubscriptionRole"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "status": {
+            "$ref": "#/components/schemas/ReviewerSubscriptionInvitationAnswerStatus"
+          },
+          "event_id": {
+            "type": "integer",
+            "title": "Event Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "acknowledge_public_contact",
+          "status",
+          "event_id"
+        ],
+        "title": "ReviewerSubscriptionInvitationAnswerCreate",
+        "description": "Attributes for the answer to an invitation of a Reviewer Subscription."
+      },
+      "ReviewerSubscriptionInvitationAnswerStatus": {
+        "type": "integer",
+        "enum": [
+          0,
+          1
+        ],
+        "title": "ReviewerSubscriptionInvitationAnswerStatus",
+        "description": "List of possible status for ReviewerSubscriptionInvitationAnswer."
       },
       "ReviewerSubscriptionPublic": {
         "properties": {
@@ -4332,7 +5718,7 @@
           "extra": {
             "$ref": "#/components/schemas/ReviewerSubscriptionExtra",
             "default": {
-              "subscribed_at": "2025-03-03T13:15:38.075120",
+              "subscribed_at": "2025-04-18T16:03:45.190105",
               "preferred_categories": []
             }
           },
@@ -4356,13 +5742,23 @@
       },
       "ReviewerSubscriptionRole": {
         "type": "integer",
-        "enum": [0, 1, 2],
+        "enum": [
+          0,
+          1,
+          2
+        ],
         "title": "ReviewerSubscriptionRole",
         "description": "List of possible roles for Reviewers."
       },
       "ReviewerSubscriptionStatus": {
         "type": "integer",
-        "enum": [0, 1, 2],
+        "enum": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
         "title": "ReviewerSubscriptionStatus",
         "description": "List of possible status for ReviewerSubscription."
       },
@@ -4426,7 +5822,7 @@
           "per_reviewer": {
             "$ref": "#/components/schemas/AllocationStatsAverages",
             "default": {
-              "avg": 0,
+              "avg": 0.0,
               "min": 0,
               "max": 0
             }
@@ -4434,7 +5830,7 @@
           "per_proposal": {
             "$ref": "#/components/schemas/AllocationStatsAverages",
             "default": {
-              "avg": 0,
+              "avg": 0.0,
               "min": 0,
               "max": 0
             }
@@ -4509,7 +5905,7 @@
               "min_valid_reviews": 0,
               "max_valid_reviews": 10,
               "min_perc_valid_reviews": 0.8,
-              "max_perc_valid_reviews": 1,
+              "max_perc_valid_reviews": 1.0,
               "min_active_funds": 0,
               "max_active_funds": 10
             }
@@ -4520,7 +5916,7 @@
               "min_valid_reviews": 0,
               "max_valid_reviews": 10,
               "min_perc_valid_reviews": 0.8,
-              "max_perc_valid_reviews": 1,
+              "max_perc_valid_reviews": 1.0,
               "min_active_funds": 0,
               "max_active_funds": 10
             }
@@ -4538,7 +5934,7 @@
               "min_valid_reviews": 0,
               "max_valid_reviews": 10,
               "min_perc_valid_reviews": 0.8,
-              "max_perc_valid_reviews": 1,
+              "max_perc_valid_reviews": 1.0,
               "min_active_funds": 0,
               "max_active_funds": 10
             }
@@ -4549,7 +5945,7 @@
               "min_valid_reviews": 0,
               "max_valid_reviews": 10,
               "min_perc_valid_reviews": 0.8,
-              "max_perc_valid_reviews": 1,
+              "max_perc_valid_reviews": 1.0,
               "min_active_funds": 0,
               "max_active_funds": 10
             }
@@ -4578,7 +5974,7 @@
             "default": {
               "lv1": {
                 "max_active_funds": 10,
-                "max_perc_valid_reviews": 1,
+                "max_perc_valid_reviews": 1.0,
                 "max_valid_reviews": 10,
                 "min_active_funds": 0,
                 "min_perc_valid_reviews": 0.8,
@@ -4586,7 +5982,7 @@
               },
               "lv2": {
                 "max_active_funds": 10,
-                "max_perc_valid_reviews": 1,
+                "max_perc_valid_reviews": 1.0,
                 "max_valid_reviews": 10,
                 "min_active_funds": 0,
                 "min_perc_valid_reviews": 0.8,
@@ -4687,6 +6083,10 @@
       },
       "UserCreate": {
         "properties": {
+          "catalyst_id": {
+            "type": "string",
+            "title": "Catalyst Id"
+          },
           "password": {
             "type": "string",
             "maxLength": 100,
@@ -4701,18 +6101,14 @@
           },
           "extra": {
             "$ref": "#/components/schemas/UserCreateExtra"
-          },
-          "catalyst_id": {
-            "type": "string",
-            "title": "Catalyst Id"
           }
         },
         "type": "object",
         "required": [
+          "catalyst_id",
           "password",
           "password_confirmation",
-          "extra",
-          "catalyst_id"
+          "extra"
         ],
         "title": "UserCreate",
         "description": "Attributes required to create a new User.\n\nUsed at POST request."
@@ -4729,7 +6125,8 @@
           "due_diligence": {
             "$ref": "#/components/schemas/DueDiligence",
             "default": {
-              "status": 0
+              "status": 0,
+              "updated_at": 1744992225.207126
             }
           },
           "historic_stats": {
@@ -4817,7 +6214,7 @@
             "type": "string",
             "format": "date-time",
             "title": "Registered At",
-            "default": "2025-03-03T13:15:38.091013"
+            "default": "2025-04-18T16:03:45.209307"
           }
         },
         "type": "object",
@@ -4847,56 +6244,26 @@
         "title": "UserInfo",
         "description": "Attributes for generic user info."
       },
-      "UserPublic": {
-        "properties": {
-          "extra": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/UserExtraPublic"
-              },
-              {
-                "type": "null"
-              }
-            ]
-          },
-          "row_id": {
-            "type": "integer",
-            "title": "Row Id"
-          },
-          "access_token": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/AccessToken"
-              },
-              {
-                "type": "null"
-              }
-            ]
-          }
-        },
-        "type": "object",
-        "required": [
-          "row_id"
-        ],
-        "title": "UserPublic",
-        "description": "Attributes that will be returned at any public request."
-      },
       "UserRequestResetPassword": {
         "properties": {
-          "email": {
+          "catalyst_id": {
             "type": "string",
-            "title": "Email"
+            "title": "Catalyst Id"
           }
         },
         "type": "object",
         "required": [
-          "email"
+          "catalyst_id"
         ],
         "title": "UserRequestResetPassword",
         "description": "Attributes required to create a new password request User.\n\nUsed at POST request."
       },
       "UserResetPassword": {
         "properties": {
+          "catalyst_id": {
+            "type": "string",
+            "title": "Catalyst Id"
+          },
           "password": {
             "type": "string",
             "maxLength": 100,
@@ -4909,10 +6276,6 @@
             "minLength": 7,
             "title": "Password Confirmation"
           },
-          "email": {
-            "type": "string",
-            "title": "Email"
-          },
           "confirmation_token": {
             "type": "string",
             "title": "Confirmation Token"
@@ -4920,9 +6283,9 @@
         },
         "type": "object",
         "required": [
+          "catalyst_id",
           "password",
           "password_confirmation",
-          "email",
           "confirmation_token"
         ],
         "title": "UserResetPassword",
@@ -4930,7 +6293,10 @@
       },
       "UserRole": {
         "type": "integer",
-        "enum": [0, 100],
+        "enum": [
+          0,
+          100
+        ],
         "title": "UserRole",
         "description": "Enum to describe possible user roles."
       },
@@ -4963,6 +6329,56 @@
         ],
         "title": "UserUpdate",
         "description": "Fields accepted to allow users to change their info."
+      },
+      "VITssExportConfig": {
+        "properties": {
+          "events_id": {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array",
+            "title": "Events Id"
+          },
+          "fund_id": {
+            "type": "integer",
+            "title": "Fund Id"
+          },
+          "fund_name": {
+            "type": "string",
+            "title": "Fund Name"
+          },
+          "threshold": {
+            "type": "integer",
+            "title": "Threshold",
+            "default": 25
+          },
+          "themes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Themes",
+            "default": []
+          },
+          "chain_vote_options": {
+            "type": "string",
+            "title": "Chain Vote Options",
+            "default": "blank,yes,no"
+          },
+          "chain_vote_type": {
+            "type": "string",
+            "title": "Chain Vote Type",
+            "default": "private"
+          }
+        },
+        "type": "object",
+        "required": [
+          "events_id",
+          "fund_id",
+          "fund_name"
+        ],
+        "title": "VITssExportConfig",
+        "description": "The configuration for the VITss export."
       },
       "ValidationError": {
         "properties": {
@@ -5003,9 +6419,7 @@
         "type": "oauth2",
         "flows": {
           "password": {
-            "scopes": {
-
-            },
+            "scopes": {},
             "tokenUrl": "/api/users/token/login"
           }
         }

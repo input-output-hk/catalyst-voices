@@ -1,5 +1,6 @@
 export 'auth/auth_service.dart' show AuthService;
 export 'auth/auth_token_cache.dart';
+export 'auth/auth_token_generator.dart' show AuthTokenGenerator;
 export 'campaign/campaign_service.dart' show CampaignService;
 export 'comment/comment_service.dart' show CommentService;
 export 'config/config_service.dart' show ConfigService;
@@ -21,3 +22,4 @@ export 'registration/registration_transaction_role.dart'
 export 'sync/sync_manager.dart' show SyncManager;
 export 'user/signer_service.dart';
 export 'user/user_service.dart' show UserService;
+export 'wallet/wallet_service.dart' show WalletService;
