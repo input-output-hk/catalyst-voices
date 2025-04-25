@@ -1,12 +1,7 @@
 //! Configuration Endpoints
 
 use poem::web::RealIp;
-use poem_openapi::{
-    param::Query,
-    payload::Json,
-    types::{Example, ParseFromJSON},
-    ApiResponse, NewType, OpenApi,
-};
+use poem_openapi::{param::Query, payload::Json, types::Example, ApiResponse, NewType, OpenApi};
 use serde_json::Value;
 use tracing::error;
 
@@ -17,7 +12,6 @@ use crate::{
     },
     service::common::{
         auth::{api_key::InternalApiKeyAuthorization, none_or_rbac::NoneOrRBAC},
-        objects::config::frontend_config::FrontendConfig,
         responses::WithErrorResponses,
         tags::ApiTags,
     },
@@ -31,7 +25,7 @@ pub(crate) struct ConfigApi;
 enum GetConfigResponses {
     /// Configuration result.
     #[oai(status = 200)]
-    Ok(Json<FrontendConfig>),
+    Ok(Json<Value>),
 
     /// No frontend config.
     #[oai(status = 404)]
@@ -78,16 +72,20 @@ impl ConfigApi {
         operation_id = "get_config_frontend"
     )]
     async fn get_frontend(&self, ip_address: RealIp, _auth: NoneOrRBAC) -> GetConfigAllResponses {
-        // Fetch the general configuration
-        let general_config = Config::get(ConfigKey::Frontend).await;
+        let general_config = match Config::get(ConfigKey::Frontend).await {
+            Ok(value) => Some(value),
+            Err(err) if err.is::<NotFoundError>() => None,
+            Err(err) => {
+                error!(id="get_frontend_config_general", error=?err, "Failed to get general frontend configuration");
+                return GetConfigAllResponses::handle_error(&err);
+            },
+        };
 
         // Attempt to fetch the IP configuration
         let ip_config = if let Some(ip) = ip_address.0 {
             match Config::get(ConfigKey::FrontendForIp(ip)).await {
                 Ok(value) => Some(value),
-                Err(err) if err.is::<NotFoundError>() => {
-                    return GetConfigResponses::NotFound.into();
-                },
+                Err(err) if err.is::<NotFoundError>() => None,
                 Err(err) => {
                     error!(id="get_frontend_config_ip", error=?err, "Failed to get frontend configuration for IP");
                     return GetConfigAllResponses::handle_error(&err);
@@ -97,27 +95,14 @@ impl ConfigApi {
             None
         };
 
-        // Handle the response
-        match general_config {
-            Ok(general) => {
-                // If there is IP specific config, replace any key in the general config with
-                // the keys from the IP specific config
-                let response_config = if let Some(ip_specific) = ip_config {
-                    merge_configs(&general, &ip_specific)
-                } else {
-                    general
-                };
-
-                // Convert the merged Value to FrontendConfig
-                let frontend_config: FrontendConfig =
-                    FrontendConfig::parse_from_json(Some(response_config)).unwrap_or_default(); // Handle error as needed
-
-                GetConfigResponses::Ok(Json(frontend_config)).into()
+        match (general_config, ip_config) {
+            (Some(general_config), Some(ip_config)) => {
+                let config = merge_configs(&general_config, &ip_config);
+                GetConfigResponses::Ok(Json(config)).into()
             },
-            Err(err) => {
-                error!(id="get_frontend_config_general", error=?err, "Failed to get general frontend configuration");
-                GetConfigAllResponses::handle_error(&err)
-            },
+            (Some(general_config), None) => GetConfigResponses::Ok(Json(general_config)).into(),
+            (None, Some(ip_config)) => GetConfigResponses::Ok(Json(ip_config)).into(),
+            (None, None) => GetConfigResponses::NotFound.into(),
         }
     }
 
