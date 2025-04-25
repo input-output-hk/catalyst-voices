@@ -1,4 +1,3 @@
-import 'package:catalyst_voices_localization/generated/catalyst_voices_localizations.dart';
 import 'package:equatable/equatable.dart';
 
 class DropdownMenuViewModel<T extends Object> extends Equatable {
@@ -11,17 +10,6 @@ class DropdownMenuViewModel<T extends Object> extends Equatable {
     required this.name,
     required this.isSelected,
   });
-
-  factory DropdownMenuViewModel.all(
-    VoicesLocalizations l10n, {
-    required bool isSelected,
-  }) {
-    return DropdownMenuViewModel(
-      value: null,
-      name: l10n.showAll,
-      isSelected: isSelected,
-    );
-  }
 
   @override
   List<Object?> get props => [
