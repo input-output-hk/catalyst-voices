@@ -70,9 +70,9 @@ extension StringExt on String {
     bool space = false,
     bool brackets = false,
   }) {
-    final buffer = StringBuffer();
+    final buffer = StringBuffer(this);
 
-    if (space) {
+    if (buffer.isNotEmpty && space) {
       buffer.write(' ');
     }
 
@@ -84,9 +84,7 @@ extension StringExt on String {
       buffer.write(')');
     }
 
-    final effectiveValue = buffer.toString();
-
-    return '$this$effectiveValue';
+    return buffer.toString();
   }
 }
 
