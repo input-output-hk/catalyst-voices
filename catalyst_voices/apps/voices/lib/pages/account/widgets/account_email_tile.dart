@@ -40,7 +40,7 @@ class _AccountEmailTileState extends State<AccountEmailTile> {
       key: const Key('AccountEmailTile'),
       onChanged: _onEditModeChange,
       isEditMode: _isEditMode,
-      isSaveEnabled: _email.value.isNotEmpty && _email.isValid,
+      isSaveEnabled: hasEmail,
       statesController: _statesController,
       footerActions: [
         if (!_isEditMode && !isVerified && hasEmail)
