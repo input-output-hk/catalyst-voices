@@ -211,7 +211,7 @@ class _VoterCard extends StatelessWidget {
     return _StayInvolvedCard(
       icon: VoicesAssets.icons.vote,
       title: context.l10n.votingRegistrationForF14,
-      description: context.l10n.stayInvolvedVoterDescription,
+      description: context.l10n.stayInvolvedContributorDescription,
       actions: _StayInvolvedActionButton(
         title: context.l10n.votingRegistration,
         urlString: VoicesConstants.votingRegistrationUrl,

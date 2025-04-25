@@ -544,7 +544,7 @@
   "@walletLinkIntroTitle": {
     "description": "A title in link wallet flow on intro screen."
   },
-  "walletLinkIntroContent": "You're almost there! This is the final and most important step in your account setup. \u2028\u2028We're going to link a Cardano Wallet to your Catalyst Keychain, so you can start collecting Role Keys.  \u2028\u2028We'll start with your Voter/Commenter Key by default. You can decide to add a Proposer Key if you want.",
+  "walletLinkIntroContent": "You're almost there! This is the final and most important step in your account setup. \u2028\u2028We're going to link a Cardano Wallet to your Catalyst Keychain, so you can start collecting Role Keys.  \u2028\u2028We'll start with your Contributor Key by default. You can decide to add a Proposer Key if you want.",
   "@walletLinkIntroContent": {
     "description": "A message (content) in link wallet flow on intro screen."
   },
@@ -744,8 +744,8 @@
   "@currentRoleRegistrations": {
     "description": "Describes roles on Catalyst Keychain card"
   },
-  "voter": "Voter",
-  "@voter": {
+  "contributor": "Contributor",
+  "@contributor": {
     "description": "Account role"
   },
   "proposer": "Proposer",
@@ -863,9 +863,9 @@
       }
     }
   },
-  "voterVerboseName": "Treasury guardian",
-  "@voterVerboseName": {
-    "description": "A verbose name for voter"
+  "contributorVerboseName": "Treasury guardian",
+  "@contributorVerboseName": {
+    "description": "A verbose name for contributor"
   },
   "proposerVerboseName": "Main proposer",
   "@proposerVerboseName": {
@@ -875,9 +875,9 @@
   "@drepVerboseName": {
     "description": "A verbose name for drep"
   },
-  "voterDescription": "The Voters are the guardians of Cardano treasury. They vote in projects for the growth of the Cardano Ecosystem.",
-  "@voterDescription": {
-    "description": "A description for voter"
+  "contributorDescription": "The Contributors are the guardians of Cardano treasury.",
+  "@contributorDescription": {
+    "description": "A description for contributor"
   },
   "proposerDescription": "The Main Proposers are the Innovators in Project Catalyst, they are the shapers of the future.",
   "@proposerDescription": {
@@ -887,10 +887,8 @@
   "@drepDescription": {
     "description": "A description for drep"
   },
-  "voterSummarySelectFavorites": "Select favorites",
-  "voterSummaryComment": "Comment/Vote on Proposals",
-  "voterSummaryCastVotes": "Cast your votes",
-  "voterSummaryVoterRewards": "Voter rewards",
+  "contributorSummarySelectFavorites": "Select favorites",
+  "contributorSummaryComment": "Comment on Proposals",
   "proposerSummaryWriteEdit": "Write/edit functionality",
   "proposerSummarySubmitToFund": "Rights to Submit to Fund",
   "proposerSummaryInviteTeamMembers": "Invite Team Members",
@@ -1793,9 +1791,9 @@
   "@publishNewProposalIterationDialogList1": {
     "description": "The bullet point in the dialog for publishing a proposal iteration about proposals being public."
   },
-  "publishNewProposalIterationDialogList2": "Voters can comment on the latest iteration.",
+  "publishNewProposalIterationDialogList2": "Contributors can comment on the latest iteration.",
   "@publishNewProposalIterationDialogList2": {
-    "description": "The bullet point in the dialog for publishing a proposal iteration about voters being able to comment on drafts."
+    "description": "The bullet point in the dialog for publishing a proposal iteration about contributors being able to comment on drafts."
   },
   "publishNewProposalIterationDialogList3": "Drafts are not submitted for voting. Use 'Submit for review' to enter the community review stage.",
   "@publishNewProposalIterationDialogList3": {
@@ -1813,9 +1811,9 @@
   "@publishProposalForReviewDialogList1": {
     "description": "The bullet point in the dialog for submitting a proposal into review about proposals being public."
   },
-  "publishProposalForReviewDialogList2": "Voters can only comment on the latest iteration.",
+  "publishProposalForReviewDialogList2": "Contributors can only comment on the latest iteration.",
   "@publishProposalForReviewDialogList2": {
-    "description": "The bullet point in the dialog for submitting a proposal into review about voters being able to comment on drafts."
+    "description": "The bullet point in the dialog for submitting a proposal into review about contributors being able to comment on drafts."
   },
   "publishProposalForReviewDialogList3": "Proposals are entered into the review stage unless a later iteration is published before the deadline.",
   "@publishProposalForReviewDialogList3": {
@@ -2268,9 +2266,9 @@
   "@stayInvolvedReviewerDescription": {
     "description": "Description for the reviewer cards in stay involved section"
   },
-  "stayInvolvedVoterDescription": "Get Ready! This is your chance to have a say in where the funds go. To make sure you're ready to participate.\n\nRemember, by casting your vote, you're not only influencing the development of Cardano but also helping to build a community that reflects the values you care about.",
-  "@stayInvolvedVoterDescription": {
-    "description": "Description for the voter cards in stay involved section"
+  "stayInvolvedContributorDescription": "Get Ready! This is your chance to have a say in where the funds go. To make sure you're ready to participate.\n\nRemember, by casting your vote, you're not only influencing the development of Cardano but also helping to build a community that reflects the values you care about.",
+  "@stayInvolvedContributorDescription": {
+    "description": "Description for the contributor cards in stay involved section"
   },
   "votingForF14StartsIn": "Voting for Fund14 start {date}",
   "@votingForF14StartsIn": {
