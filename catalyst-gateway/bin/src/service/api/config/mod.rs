@@ -14,7 +14,6 @@ use crate::{
         auth::{api_key::InternalApiKeyAuthorization, none_or_rbac::NoneOrRBAC},
         responses::WithErrorResponses,
         tags::ApiTags,
-        types::generic::boolean::BooleanFlag,
     },
 };
 
@@ -72,13 +71,7 @@ impl ConfigApi {
         method = "get",
         operation_id = "get_config_frontend"
     )]
-    async fn get_frontend(
-        &self,
-        /// Boolean flag to get the provided config for the IP Address from "x-real-ip"
-        /// header (if provided).
-        Query(is_ip): Query<Option<BooleanFlag>>,
-        ip_address: RealIp, _auth: NoneOrRBAC,
-    ) -> GetConfigAllResponses {
+    async fn get_frontend(&self, ip_address: RealIp, _auth: NoneOrRBAC) -> GetConfigAllResponses {
         let general_config = match Config::get(ConfigKey::Frontend).await {
             Ok(value) => Some(value),
             Err(err) if err.is::<NotFoundError>() => None,
@@ -88,20 +81,18 @@ impl ConfigApi {
             },
         };
 
-        let is_ip: bool = is_ip.is_some_and(Into::into);
         // Attempt to fetch the IP configuration
-        let ip_config = match (is_ip, ip_address.0) {
-            (true, Some(ip)) => {
-                match Config::get(ConfigKey::FrontendForIp(ip)).await {
-                    Ok(value) => Some(value),
-                    Err(err) if err.is::<NotFoundError>() => None,
-                    Err(err) => {
-                        error!(id = "get_frontend_config_ip", error = ?err, "Failed to get frontend configuration for IP");
-                        return GetConfigAllResponses::handle_error(&err);
-                    },
-                }
-            },
-            _ => None,
+        let ip_config = if let Some(ip) = ip_address.0 {
+            match Config::get(ConfigKey::FrontendForIp(ip)).await {
+                Ok(value) => Some(value),
+                Err(err) if err.is::<NotFoundError>() => None,
+                Err(err) => {
+                    error!(id = "get_frontend_config_ip", error = ?err, "Failed to get frontend configuration for IP");
+                    return GetConfigAllResponses::handle_error(&err);
+                },
+            }
+        } else {
+            None
         };
 
         match (general_config, ip_config) {
@@ -131,18 +122,16 @@ impl ConfigApi {
     )]
     async fn put_frontend(
         &self,
-        /// Boolean flag to set the provided config for the IP Address from "x-real-ip"
-        /// header (if provided).
-        Query(is_ip): Query<Option<BooleanFlag>>,
-        Json(json_config): Json<Value>, ip_address: RealIp, _auth: InternalApiKeyAuthorization,
+        /// *OPTIONAL* The IP Address to set the configuration for.
+        #[oai(name = "IP")]
+        Query(ip_address): Query<Option<IpAddr>>,
+        Json(json_config): Json<Value>, _auth: InternalApiKeyAuthorization,
     ) -> SetConfigAllResponses {
-        let is_ip: bool = is_ip.is_some_and(Into::into);
-        if is_ip {
-            if let Some(ip) = ip_address.0 {
-                return set(ConfigKey::FrontendForIp(ip), json_config).await;
-            }
+        if let Some(ip) = ip_address {
+            set(ConfigKey::FrontendForIp(ip.0), json_config).await
+        } else {
+            set(ConfigKey::Frontend, json_config).await
         }
-        set(ConfigKey::Frontend, json_config).await
     }
 }
 
