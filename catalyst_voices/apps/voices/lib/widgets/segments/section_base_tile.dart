@@ -42,6 +42,15 @@ class _SectionBaseTileState extends State<SectionBaseTile> {
   }
 
   @override
+  void didUpdateWidget(covariant SectionBaseTile oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (widget.id != oldWidget.id) {
+      _updateSelection();
+    }
+  }
+
+  @override
   void dispose() {
     _segmentsController?.removeListener(_updateSelection);
     _segmentsController = null;
