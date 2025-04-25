@@ -2634,5 +2634,9 @@
   "verificationEmailSendSubMessage": "Please verify your new email address.",
   "@verificationEmailSendSubMessage": {
     "description": "Sub message of dialog account verification send"
+  },
+  "invalidSeedPhraseWord": "Invalid",
+  "@invalidSeedPhraseWord": {
+    "description": "Error shown when user inputs SeedPhrase word but invalid does not match any"
   }
 }
