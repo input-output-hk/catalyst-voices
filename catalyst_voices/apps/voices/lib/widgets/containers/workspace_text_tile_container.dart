@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 
 /// Opinionated container usual used inside space main body.
 class WorkspaceTextTileContainer extends StatelessWidget {
-  final bool isSelected;
   final String name;
   final List<Widget> headerActions;
   final String content;
@@ -12,7 +11,6 @@ class WorkspaceTextTileContainer extends StatelessWidget {
 
   const WorkspaceTextTileContainer({
     super.key,
-    this.isSelected = false,
     required this.name,
     this.headerActions = const [],
     required this.content,
@@ -21,61 +19,14 @@ class WorkspaceTextTileContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return AnimatedContainer(
-      duration: kThemeChangeDuration,
-      decoration: BoxDecoration(
-        color: theme.colors.elevationsOnSurfaceNeutralLv1White,
-        borderRadius: BorderRadius.horizontal(
-          left: isSelected ? Radius.zero : const Radius.circular(28),
-          right: const Radius.circular(28),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Theme.of(context).colors.elevationsOnSurfaceNeutralLv0,
-            offset: const Offset(0, 1),
-            blurRadius: 4,
-          ),
-        ],
-      ),
-      foregroundDecoration: BoxDecoration(
-        border: Border(
-          left: isSelected
-              ? BorderSide(
-                  color: theme.colorScheme.primary,
-                  width: 5,
-                )
-              : BorderSide.none,
-        ),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _Header(name, headerActions),
-          _Content(child: content),
-          _Footer(child: footer),
-        ],
-      ),
-    );
-  }
-}
-
-class _Header extends StatelessWidget {
-  final String name;
-  final List<Widget> actions;
-
-  const _Header(this.name, this.actions);
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: SegmentHeader(
-        name: name,
-        actions: actions,
-      ),
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _Header(name, headerActions),
+        _Content(child: content),
+        _Footer(child: footer),
+      ],
     );
   }
 }
@@ -117,6 +68,24 @@ class _Footer extends StatelessWidget {
     return ConstrainedBox(
       constraints: const BoxConstraints(minHeight: 16),
       child: child,
+    );
+  }
+}
+
+class _Header extends StatelessWidget {
+  final String name;
+  final List<Widget> actions;
+
+  const _Header(this.name, this.actions);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: SegmentHeader(
+        name: name,
+        actions: actions,
+      ),
     );
   }
 }

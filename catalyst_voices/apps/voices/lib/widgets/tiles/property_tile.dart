@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 class PropertyTile extends StatelessWidget {
   final String title;
-  final bool isSelected;
+  final WidgetStatesController? statesController;
   final Widget? action;
   final Widget? footer;
   final Widget child;
@@ -11,7 +11,7 @@ class PropertyTile extends StatelessWidget {
   const PropertyTile({
     super.key,
     required this.title,
-    this.isSelected = false,
+    this.statesController,
     this.action,
     this.footer,
     required this.child,
@@ -21,8 +21,8 @@ class PropertyTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final footer = this.footer;
 
-    return SelectableTile(
-      isSelected: isSelected,
+    return BaseTile(
+      statesController: statesController,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24),
         child: Column(

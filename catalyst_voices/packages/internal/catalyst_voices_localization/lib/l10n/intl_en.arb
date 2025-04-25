@@ -774,7 +774,7 @@
   "createBaseProfileSetupDisplayNameHelper": "Please provide a nickname or real name.",
   "createBaseProfileSetupEmailLabel": "Your e-mail",
   "createBaseProfileSetupEmailHint": "E-mail",
-  "createBaseProfileSetupEmailHelper": "Please provide e-mail used for your Ideascale.",
+  "createBaseProfileSetupEmailHelper": "You must provide your e-mail if you want to become a proposer or a reviewer.",
   "createBaseProfileHasIdeascaleAccountAlready": "Submitted proposals in Ideascale before?",
   "@createBaseProfileHasIdeascaleAccountAlready": {
     "description": "Label for info card to let user know to use the same email as in Ideascale if they have already submitted a proposal there."
@@ -2582,5 +2582,57 @@
   "shareProposalErrorDescription": "Something went wrong while sharing proposal. Please try again later.",
   "@shareProposalErrorDescription": {
     "description": "Error description when sharing proposal fails"
+  },
+  "optional": "Optional",
+  "@optional": {
+    "description": "Generic indicator that some field, for example Email, is optional."
+  },
+  "emailNotVerifiedDialogTitle": "Verified email not found!",
+  "@emailNotVerifiedDialogTitle": {
+    "description": "Title of dialog when trying to publish document but does not have verified email"
+  },
+  "emailNotVerifiedDialogMessage": "Before you can publish proposals, please make sure your \u2028account has a verified email address.",
+  "@emailNotVerifiedDialogMessage": {
+    "description": "Message of dialog when trying to publish document but does not have verified email"
+  },
+  "emailNotVerifiedDialogAction": "Go to My Account",
+  "@emailNotVerifiedDialogAction": {
+    "description": "Action of dialog when trying to publish document but does not have verified email"
+  },
+  "accountEmailHint": "Please provide an email for proposer and reviewer roles.",
+  "@accountEmailHint": {
+    "description": "When email is not provided this message is shown instead in Account page"
+  },
+  "verificationPending": "Verification pending",
+  "@verificationPending": {
+    "description": "Message of account status chip next to email. Meaning Account is not verified yet."
+  },
+  "verified": "Verified",
+  "@verified": {
+    "description": "Message of account status chip next to email. Meaning Account is verified."
+  },
+  "notVerified": "Not verified",
+  "@notVerified": {
+    "description": "Message of account status chip next to email. Meaning Account is not verified."
+  },
+  "accountEmailVerifyHelper": "Please verify email above in your email. Email Title: Catalyst verification",
+  "@accountEmailVerifyHelper": {
+    "description": "Explanation message blow email field in account page"
+  },
+  "reSend": "Re-send",
+  "@reSend": {
+    "description": "In context of verification email"
+  },
+  "verificationEmailSendTitle": "Verify your email address",
+  "@verificationEmailSendTitle": {
+    "description": "Title of dialog account verification send"
+  },
+  "verificationEmailSendMessage": "We sent you an email with a Catalyst verification link.",
+  "@verificationEmailSendMessage": {
+    "description": "Message of dialog account verification send"
+  },
+  "verificationEmailSendSubMessage": "Please verify your new email address.",
+  "@verificationEmailSendSubMessage": {
+    "description": "Sub message of dialog account verification send"
   }
 }
