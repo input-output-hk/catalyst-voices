@@ -227,7 +227,7 @@ mod test {
 
     #[test]
     fn test_extract_json_schema_for_frontend_config() {
-        let schema = extract_json_schema_for("FrontendConfig");
+        let schema = extract_json_schema_for("InternalServerError");
         println!("{schema}");
         assert!(schema.get("type").is_some());
         assert!(schema.get("properties").is_some());
