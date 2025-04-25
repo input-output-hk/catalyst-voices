@@ -6,7 +6,7 @@ import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 
 abstract interface class UserService implements ActiveAware {
-  factory UserService(
+  const factory UserService(
     UserRepository userRepository,
     UserObserver userObserver,
   ) = UserServiceImpl;
@@ -68,7 +68,7 @@ final class UserServiceImpl implements UserService {
   final UserRepository _userRepository;
   final UserObserver _userObserver;
 
-  UserServiceImpl(
+  const UserServiceImpl(
     this._userRepository,
     this._userObserver,
   );

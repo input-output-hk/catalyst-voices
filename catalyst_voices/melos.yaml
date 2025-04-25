@@ -110,6 +110,7 @@ command:
       flutter_dropzone: 4.0.3
       flutter_dropzone_platform_interface: 2.0.6
       flutter_dropzone_web: 4.0.2
+      flutter_inappwebview: ^6.1.5
       flutter_localized_locales: ^2.0.5
       flutter_markdown: ^0.7.4+3
       flutter_native_splash: ^2.4.6
@@ -147,6 +148,7 @@ command:
       convert: ^3.1.1
       path: ^1.9.1
       pinenacl: ^0.6.0
+      pool: ^1.5.1
       uuid_plus: ^0.1.0
       sentry_flutter: ^8.8.0
       scrollable_positioned_list: ^0.3.8

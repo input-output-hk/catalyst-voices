@@ -5,6 +5,7 @@ import 'package:catalyst_voices_repositories/generated/api/cat_gateway.swagger.d
 import 'package:catalyst_voices_repositories/generated/api/cat_reviews.models.swagger.dart';
 import 'package:catalyst_voices_repositories/src/common/rbac_token_ext.dart';
 import 'package:catalyst_voices_repositories/src/common/response_mapper.dart';
+import 'package:catalyst_voices_repositories/src/dto/user/rbac_registration_chain_dto.dart';
 import 'package:catalyst_voices_repositories/src/dto/user/reviews_catalyst_id_status_ext.dart';
 import 'package:catalyst_voices_repositories/src/dto/user/user_dto.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
@@ -106,11 +107,11 @@ final class UserRepositoryImpl implements UserRepository {
     required CatalystId catalystId,
     required RbacToken rbacToken,
   }) async {
-    // TODO(dtscalac): enable when endpoint works correctly
-    // final rbacRegistration =
-    //     await _recoverRbacRegistration(catalystId, rbacToken);
+    final rbacRegistration = await _recoverRbacRegistration(
+      catalystId,
+      rbacToken,
+    );
     final publicId = await _getReviewsCatalystIDPublic(token: rbacToken);
-
     final username = (publicId?.username as String?) ??
         await _lookupUsernameFromDocuments(
           catalystId: catalystId,
@@ -119,16 +120,8 @@ final class UserRepositoryImpl implements UserRepository {
     return RecoveredAccount(
       username: username,
       email: publicId?.email as String?,
-      // TODO(dtscalac): enable when endpoint works correctly
-      // roles: rbacRegistration.accountRoles,
-      // stakeAddress: rbacRegistration.stakeAddress,
-      roles: const {AccountRole.voter, AccountRole.proposer},
-      stakeAddress: ShelleyAddress.fromBech32(
-        /* cSpell:disable */
-        'addr_test1vzpwq95z3xyum8vqndgdd'
-        '9mdnmafh3djcxnc6jemlgdmswcve6tkw',
-        /* cSpell:enable */
-      ),
+      roles: rbacRegistration.accountRoles,
+      stakeAddress: rbacRegistration.stakeAddress,
       publicStatus: publicId?.status?.toModel() ?? AccountPublicStatus.notSetup,
     );
   }
@@ -167,8 +160,6 @@ final class UserRepositoryImpl implements UserRepository {
     ).then((value) => value?.username);
   }
 
-  // TODO(dtscalac): enable when endpoint works correctly
-  // ignore: unused_element
   Future<RbacRegistrationChain> _recoverRbacRegistration(
     CatalystId catalystId,
     RbacToken token,
