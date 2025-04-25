@@ -1,7 +1,7 @@
 VERSION 0.8
 
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/python:v3.3.3 AS python-ci
-IMPORT github.com/input-output-hk/catalyst-libs/rust:r20250416-00 AS cat-libs-rust
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/python:v3.3.4 AS python-ci
+IMPORT github.com/input-output-hk/catalyst-libs/rust:r20250425-00 AS cat-libs-rust
 
 builder:
     FROM python-ci+python-base
@@ -9,6 +9,7 @@ builder:
     # prepare tests
     COPY --dir ./api .
     COPY --dir ./integration .
+    COPY --dir ./scripts .
     COPY --dir ./utils .
     COPY --dir ./test_data .
     COPY cat-libs-rust+build/mk_signed_doc .

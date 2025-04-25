@@ -6,7 +6,7 @@ import 'package:flutter/widgets.dart';
 import 'package:formz/formz.dart';
 
 final class Email extends FormzInput<String, EmailValidationException> {
-  static const NumRange<int> lengthRange = NumRange(min: 1, max: 100);
+  static const NumRange<int> lengthRange = NumRange(min: 0, max: 100);
 
   const Email.dirty([super.value = '']) : super.dirty();
 
@@ -18,7 +18,7 @@ final class Email extends FormzInput<String, EmailValidationException> {
       return const OutOfRangeEmailException();
     }
 
-    if (!EmailValidator.validate(value)) {
+    if (value.isNotEmpty && !EmailValidator.validate(value)) {
       return const EmailPatternInvalidException();
     }
 

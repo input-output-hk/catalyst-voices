@@ -19,6 +19,12 @@ class VoicesAutocomplete<T extends Object> extends StatelessWidget {
   /// [RawAutocomplete.focusNode]
   final FocusNode? focusNode;
 
+  final AutovalidateMode autovalidateMode;
+
+  final VoicesTextFieldValidator? textValidator;
+
+  final bool showValidationStatusIcon;
+
   const VoicesAutocomplete({
     super.key,
     required this.optionsBuilder,
@@ -26,6 +32,9 @@ class VoicesAutocomplete<T extends Object> extends StatelessWidget {
     this.displayStringForOption = RawAutocomplete.defaultStringForOption,
     this.textEditingController,
     this.focusNode,
+    this.autovalidateMode = AutovalidateMode.onUserInteraction,
+    this.textValidator,
+    this.showValidationStatusIcon = true,
   });
 
   @override
@@ -49,6 +58,9 @@ class VoicesAutocomplete<T extends Object> extends StatelessWidget {
           onFieldSubmitted: (value) {
             onFieldSubmitted();
           },
+          autovalidateMode: autovalidateMode,
+          textValidator: textValidator,
+          showValidationStatusIcon: showValidationStatusIcon,
         );
       },
       optionsViewBuilder: (context, onSelected, options) {
@@ -58,6 +70,35 @@ class VoicesAutocomplete<T extends Object> extends StatelessWidget {
           displayStringForOption: displayStringForOption,
         );
       },
+    );
+  }
+}
+
+class _VoicesAutocompletionOption<T extends Object> extends StatelessWidget {
+  final T option;
+  final AutocompleteOnSelected<T> onSelected;
+  final AutocompleteOptionToString<T> displayStringForOption;
+
+  const _VoicesAutocompletionOption({
+    required this.option,
+    required this.onSelected,
+    required this.displayStringForOption,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final color = theme.colors.textOnPrimaryLevel0;
+
+    return InkWell(
+      onTap: () => onSelected(option),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+        child: Text(
+          displayStringForOption(option),
+          style: theme.textTheme.bodyMedium?.copyWith(color: color),
+        ),
+      ),
     );
   }
 }
@@ -98,35 +139,6 @@ class _VoicesAutocompletionOptions<T extends Object> extends StatelessWidget {
               ).toList(),
             ),
           ),
-        ),
-      ),
-    );
-  }
-}
-
-class _VoicesAutocompletionOption<T extends Object> extends StatelessWidget {
-  final T option;
-  final AutocompleteOnSelected<T> onSelected;
-  final AutocompleteOptionToString<T> displayStringForOption;
-
-  const _VoicesAutocompletionOption({
-    required this.option,
-    required this.onSelected,
-    required this.displayStringForOption,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final color = theme.colors.textOnPrimaryLevel0;
-
-    return InkWell(
-      onTap: () => onSelected(option),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-        child: Text(
-          displayStringForOption(option),
-          style: theme.textTheme.bodyMedium?.copyWith(color: color),
         ),
       ),
     );

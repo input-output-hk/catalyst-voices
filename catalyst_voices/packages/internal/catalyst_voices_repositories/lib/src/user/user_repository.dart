@@ -1,24 +1,25 @@
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_repositories/generated/api/cat_gateway.swagger.dart';
 import 'package:catalyst_voices_repositories/generated/api/cat_reviews.models.swagger.dart';
-import 'package:catalyst_voices_repositories/src/api/api_services.dart';
 import 'package:catalyst_voices_repositories/src/common/rbac_token_ext.dart';
 import 'package:catalyst_voices_repositories/src/common/response_mapper.dart';
-import 'package:catalyst_voices_repositories/src/dto/user/account_status_dto.dart';
 import 'package:catalyst_voices_repositories/src/dto/user/rbac_registration_chain_dto.dart';
+import 'package:catalyst_voices_repositories/src/dto/user/reviews_catalyst_id_status_ext.dart';
 import 'package:catalyst_voices_repositories/src/dto/user/user_dto.dart';
-import 'package:catalyst_voices_repositories/src/user/source/user_storage.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:collection/collection.dart';
 
 abstract interface class UserRepository {
   const factory UserRepository(
     UserStorage storage,
     KeychainProvider keychainProvider,
     ApiServices apiServices,
+    DocumentRepository documentRepository,
   ) = UserRepositoryImpl;
 
-  Future<AccountStatus> getAccountStatus();
+  Future<AccountPublicStatus> getAccountPublicStatus();
 
   Future<TransactionHash> getPreviousRegistrationTransactionId({
     required CatalystId catalystId,
@@ -43,18 +44,20 @@ final class UserRepositoryImpl implements UserRepository {
   final UserStorage _storage;
   final KeychainProvider _keychainProvider;
   final ApiServices _apiServices;
+  final DocumentRepository _documentRepository;
 
   const UserRepositoryImpl(
     this._storage,
     this._keychainProvider,
     this._apiServices,
+    this._documentRepository,
   );
 
   @override
-  Future<AccountStatus> getAccountStatus() async {
-    final body =
-        await _apiServices.reviews.apiCatalystIdsMeGet().successBodyOrThrow();
-    return body.status!.toModel();
+  Future<AccountPublicStatus> getAccountPublicStatus() {
+    return _getReviewsCatalystIDPublic()
+        .then((value) => value?.status?.toModel())
+        .then((value) => value ?? AccountPublicStatus.notSetup);
   }
 
   @override
@@ -108,13 +111,18 @@ final class UserRepositoryImpl implements UserRepository {
       catalystId,
       rbacToken,
     );
-    final publicId = await _recoverCatalystIDPublic(rbacToken);
+    final publicId = await _getReviewsCatalystIDPublic(token: rbacToken);
+    final username = (publicId?.username as String?) ??
+        await _lookupUsernameFromDocuments(
+          catalystId: catalystId,
+        );
 
     return RecoveredAccount(
-      username: publicId?.username as String?,
+      username: username,
       email: publicId?.email as String?,
       roles: rbacRegistration.accountRoles,
       stakeAddress: rbacRegistration.stakeAddress,
+      publicStatus: publicId?.status?.toModel() ?? AccountPublicStatus.notSetup,
     );
   }
 
@@ -125,23 +133,37 @@ final class UserRepositoryImpl implements UserRepository {
     return _storage.writeUser(dto);
   }
 
-  Future<CatalystIDPublic?> _recoverCatalystIDPublic(
-    RbacToken token,
-  ) async {
-    try {
-      return await _apiServices.reviews
-          .apiCatalystIdsMeGet(authorization: token.authHeader())
-          .successBodyOrThrow();
-    } on NotFoundException {
-      // nothing to recover
-      return null;
-    }
+  /// Looks up reviews module and receives status for active
+  /// account if [token] is not specified.
+  Future<CatalystIDPublic?> _getReviewsCatalystIDPublic({
+    RbacToken? token,
+  }) {
+    return _apiServices.reviews
+        .apiCatalystIdsMeGet(authorization: token?.authHeader())
+        .successBodyOrThrow()
+        .then<CatalystIDPublic?>((value) => value)
+        .onError<NotFoundException>((error, stackTrace) => null);
+  }
+
+  Future<String?> _lookupUsernameFromDocuments({
+    required CatalystId catalystId,
+  }) {
+    final significantId = catalystId.toSignificant();
+    return _documentRepository
+        .getLatestDocument(authorId: significantId)
+        .then((value) => value?.metadata.authors ?? <CatalystId>[])
+        .then(
+      (authors) {
+        return authors
+            .firstWhereOrNull((id) => id.toSignificant() == significantId);
+      },
+    ).then((value) => value?.username);
   }
 
   Future<RbacRegistrationChain> _recoverRbacRegistration(
     CatalystId catalystId,
     RbacToken token,
-  ) async {
+  ) {
     return _apiServices.gateway
         .apiV1RbacRegistrationGet(
           lookup: catalystId.toUri().toStringWithoutScheme(),

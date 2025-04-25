@@ -31,16 +31,31 @@ final class ApiServices {
     _fixModelsMapping();
 
     return ApiServices.internal(
-      gateway: createGateway(
-        gatewayUri: Uri.parse(config.gatewayUrl),
-        authTokenProvider: authTokenProvider,
+      gateway: CatGateway.create(
+        authenticator: null,
+        baseUrl: Uri.parse(config.gatewayUrl),
+        converter: CborOrJsonDelegateConverter(
+          cborConverter: CborSerializableConverter(),
+          jsonConverter: $JsonSerializableConverter(),
+        ),
+        interceptors: [
+          RbacAuthInterceptor(authTokenProvider),
+          if (kDebugMode) HttpLoggingInterceptor(onlyErrors: true),
+        ],
       ),
-      vit: createVit(
-        vitUri: Uri.parse(config.vitUrl),
+      vit: Vit.create(
+        baseUrl: Uri.parse(config.vitUrl),
+        interceptors: [
+          if (kDebugMode) HttpLoggingInterceptor(onlyErrors: true),
+        ],
       ),
-      reviews: createReviews(
-        reviewsUrl: Uri.parse(config.reviewsUrl),
-        authTokenProvider: authTokenProvider,
+      reviews: CatReviews.create(
+        authenticator: null,
+        baseUrl: Uri.parse(config.reviewsUrl),
+        interceptors: [
+          RbacAuthInterceptor(authTokenProvider),
+          if (kDebugMode) HttpLoggingInterceptor(onlyErrors: true),
+        ],
       ),
     );
   }
@@ -51,47 +66,4 @@ final class ApiServices {
     required this.vit,
     required this.reviews,
   });
-
-  static CatGateway createGateway({
-    required Uri gatewayUri,
-    required AuthTokenProvider authTokenProvider,
-  }) {
-    return CatGateway.create(
-      authenticator: null,
-      baseUrl: gatewayUri,
-      converter: CborOrJsonDelegateConverter(
-        cborConverter: CborSerializableConverter(),
-        jsonConverter: $JsonSerializableConverter(),
-      ),
-      interceptors: [
-        RbacAuthInterceptor(authTokenProvider),
-        if (kDebugMode) HttpLoggingInterceptor(onlyErrors: true),
-      ],
-    );
-  }
-
-  static CatReviews createReviews({
-    required Uri reviewsUrl,
-    required AuthTokenProvider authTokenProvider,
-  }) {
-    return CatReviews.create(
-      authenticator: null,
-      baseUrl: reviewsUrl,
-      interceptors: [
-        RbacAuthInterceptor(authTokenProvider),
-        if (kDebugMode) HttpLoggingInterceptor(onlyErrors: true),
-      ],
-    );
-  }
-
-  static Vit createVit({
-    required Uri vitUri,
-  }) {
-    return Vit.create(
-      baseUrl: vitUri,
-      interceptors: [
-        if (kDebugMode) HttpLoggingInterceptor(onlyErrors: true),
-      ],
-    );
-  }
 }

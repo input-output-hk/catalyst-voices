@@ -18,90 +18,16 @@ class TreasuryCampaignStagesViewTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SectionStateBuilder(
+    return SectionBaseTile(
       id: data.id,
-      builder: (context, value, child) {
-        return SelectableTile(
-          isSelected: value.isSelected,
-          child: Column(
-            children: [
-              TreasuryCampaignStepHeader(data),
-              const SizedBox(height: 12),
-              const TreasuryCampaignTimezone(),
-              const SizedBox(height: 24),
-              const _DateRange(),
-            ],
-          ),
-        );
-      },
-    );
-  }
-}
-
-class _DateRange extends StatelessWidget {
-  const _DateRange();
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SegmentHeader(
-            name: context.l10n.startAndEndDates,
-            padding: EdgeInsets.zero,
-          ),
+          TreasuryCampaignStepHeader(data),
           const SizedBox(height: 12),
-          const Row(
-            children: [
-              _StartDate(),
-              SizedBox(width: 24),
-              _EndDate(),
-            ],
-          ),
-          const SizedBox(height: 36),
+          const TreasuryCampaignTimezone(),
+          const SizedBox(height: 24),
+          const _DateRange(),
         ],
-      ),
-    );
-  }
-}
-
-class _StartDate extends StatelessWidget {
-  const _StartDate();
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      child:
-          BlocSelector<CampaignBuilderCubit, CampaignBuilderState, DateTime?>(
-        selector: (state) => state.startDate,
-        builder: (context, date) {
-          return _Date(
-            label: context.l10n.campaignStart,
-            dateTime: date,
-          );
-        },
-      ),
-    );
-  }
-}
-
-class _EndDate extends StatelessWidget {
-  const _EndDate();
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      child:
-          BlocSelector<CampaignBuilderCubit, CampaignBuilderState, DateTime?>(
-        selector: (state) => state.endDate,
-        builder: (context, date) {
-          return _Date(
-            label: context.l10n.campaignEnd,
-            dateTime: date,
-          );
-        },
       ),
     );
   }
@@ -146,5 +72,74 @@ class _Date extends StatelessWidget {
     }
 
     return DateFormatter.formatFullDateTime(date, timeOnNewline: true);
+  }
+}
+
+class _DateRange extends StatelessWidget {
+  const _DateRange();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SegmentHeader(
+            name: context.l10n.startAndEndDates,
+            padding: EdgeInsets.zero,
+          ),
+          const SizedBox(height: 12),
+          const Row(
+            children: [
+              _StartDate(),
+              SizedBox(width: 24),
+              _EndDate(),
+            ],
+          ),
+          const SizedBox(height: 36),
+        ],
+      ),
+    );
+  }
+}
+
+class _EndDate extends StatelessWidget {
+  const _EndDate();
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child:
+          BlocSelector<CampaignBuilderCubit, CampaignBuilderState, DateTime?>(
+        selector: (state) => state.endDate,
+        builder: (context, date) {
+          return _Date(
+            label: context.l10n.campaignEnd,
+            dateTime: date,
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _StartDate extends StatelessWidget {
+  const _StartDate();
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child:
+          BlocSelector<CampaignBuilderCubit, CampaignBuilderState, DateTime?>(
+        selector: (state) => state.startDate,
+        builder: (context, date) {
+          return _Date(
+            label: context.l10n.campaignStart,
+            dateTime: date,
+          );
+        },
+      ),
+    );
   }
 }
