@@ -112,7 +112,7 @@ fn build_signed_doc(data: &SignedDocData, sk: &SigningKey) -> (Uuid, CatalystSig
         .with_json_metadata(metadata.clone())
         .expect("Failed to build Metadata from template")
         .with_decoded_content(data.content.to_vec())
-        .add_signature(|m| sk.sign(&m).to_vec(), kid)
+        .add_signature(|m| sk.sign(&m).to_vec(), &kid)
         .expect("Failed to add signature for template")
         .build();
     let doc_id = doc
