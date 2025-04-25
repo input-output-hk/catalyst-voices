@@ -1,24 +1,25 @@
 //! Configuration Endpoints
 
-use jsonschema::BasicOutput;
 use poem::web::RealIp;
 use poem_openapi::{
     param::Query,
     payload::Json,
-    types::{Example, ParseFromJSON, ToJSON},
+    types::{Example, ParseFromJSON},
     ApiResponse, NewType, OpenApi,
 };
 use serde_json::Value;
 use tracing::error;
 
 use crate::{
-    db::event::config::{key::ConfigKey, Config},
+    db::event::{
+        config::{key::ConfigKey, Config},
+        error::NotFoundError,
+    },
     service::common::{
         auth::{api_key::InternalApiKeyAuthorization, none_or_rbac::NoneOrRBAC},
-        objects::config::{frontend_config::FrontendConfig, ConfigUnprocessableContent},
+        objects::config::frontend_config::FrontendConfig,
         responses::WithErrorResponses,
         tags::ApiTags,
-        types::generic::error_msg::ErrorMessage,
     },
 };
 
@@ -31,19 +32,13 @@ enum GetConfigResponses {
     /// Configuration result.
     #[oai(status = 200)]
     Ok(Json<FrontendConfig>),
+
+    /// No frontend config.
+    #[oai(status = 404)]
+    NotFound,
 }
 /// Get configuration all responses.
 type GetConfigAllResponses = WithErrorResponses<GetConfigResponses>;
-
-/// Get configuration schema endpoint responses.
-#[derive(ApiResponse)]
-enum GetConfigSchemaResponses {
-    /// Configuration result.
-    #[oai(status = 200)]
-    Ok(Json<FrontendConfig>),
-}
-/// Get configuration schema all responses.
-type GetConfigSchemaAllResponses = WithErrorResponses<GetConfigSchemaResponses>;
 
 /// Set configuration endpoint responses.
 #[derive(ApiResponse)]
@@ -51,9 +46,6 @@ enum SetConfigResponse {
     /// Configuration Update Successful.
     #[oai(status = 204)]
     Ok,
-    /// Set configuration unprocessable content.
-    #[oai(status = 422)]
-    UnprocessableContent(Json<ConfigUnprocessableContent>),
 }
 /// Set configuration all responses.
 type SetConfigAllResponses = WithErrorResponses<SetConfigResponse>;
@@ -81,7 +73,7 @@ impl ConfigApi {
     ///
     /// Does not require any Catalyst RBAC Token to access.
     #[oai(
-        path = "/draft/config/frontend",
+        path = "/v1/config/frontend",
         method = "get",
         operation_id = "get_config_frontend"
     )]
@@ -93,6 +85,9 @@ impl ConfigApi {
         let ip_config = if let Some(ip) = ip_address.0 {
             match Config::get(ConfigKey::FrontendForIp(ip)).await {
                 Ok(value) => Some(value),
+                Err(err) if err.is::<NotFoundError>() => {
+                    return GetConfigResponses::NotFound.into();
+                },
                 Err(err) => {
                     error!(id="get_frontend_config_ip", error=?err, "Failed to get frontend configuration for IP");
                     return GetConfigAllResponses::handle_error(&err);
@@ -126,28 +121,6 @@ impl ConfigApi {
         }
     }
 
-    /// Get the frontend configuration JSON schema.
-    ///
-    /// Returns the JSON schema which defines the data which can be read or written for
-    /// the frontend configuration.
-    ///
-    /// ### Security
-    ///
-    /// Does not require any Catalyst RBAC Token to access.
-    #[oai(
-        path = "/draft/config/frontend/schema",
-        method = "get",
-        operation_id = "get_config_frontend_schema"
-    )]
-    #[allow(clippy::unused_async)]
-    async fn get_frontend_schema(&self, _auth: NoneOrRBAC) -> GetConfigSchemaAllResponses {
-        // Schema for both IP specific and general are identical
-        let schema_value = ConfigKey::Frontend.schema().clone();
-        let frontend_config =
-            FrontendConfig::parse_from_json(Some(schema_value)).unwrap_or_default();
-        GetConfigSchemaResponses::Ok(Json(frontend_config)).into()
-    }
-
     /// Set the frontend configuration.
     ///
     /// Store the given config as either global front end configuration, or configuration
@@ -157,7 +130,7 @@ impl ConfigApi {
     ///
     /// Requires Admin Authoritative RBAC Token.
     #[oai(
-        path = "/draft/config/frontend",
+        path = "/v1/config/frontend",
         method = "put",
         operation_id = "put_config_frontend",
         hidden = true
@@ -166,25 +139,12 @@ impl ConfigApi {
         &self,
         /// *OPTIONAL* The IP Address to set the configuration for.
         #[oai(name = "IP")]
-        ip_query: Query<Option<IpAddr>>,
-        body: Json<FrontendConfig>, _auth: InternalApiKeyAuthorization,
+        Query(ip_query): Query<Option<IpAddr>>,
+        Json(json_config): Json<Value>, _auth: InternalApiKeyAuthorization,
     ) -> SetConfigAllResponses {
-        let body_value = body.0.to_json();
-
-        match body_value {
-            Some(value) => {
-                match ip_query.0 {
-                    Some(ip) => set(ConfigKey::FrontendForIp(ip.0), value).await,
-                    None => set(ConfigKey::Frontend, value).await,
-                }
-            },
-            None => {
-                SetConfigResponse::UnprocessableContent(Json(ConfigUnprocessableContent::new(
-                    "Invalid JSON data".to_string(),
-                    None,
-                )))
-                .into()
-            },
+        match ip_query {
+            Some(ip) => set(ConfigKey::FrontendForIp(ip.0), json_config).await,
+            None => set(ConfigKey::Frontend, json_config).await,
         }
     }
 }
@@ -211,22 +171,7 @@ fn merge_configs(general: &Value, ip_specific: &Value) -> Value {
 /// Helper function to handle set.
 async fn set(key: ConfigKey, value: Value) -> SetConfigAllResponses {
     match Config::set(key, value).await {
-        Ok(validate) => {
-            match validate {
-                BasicOutput::Valid(_) => SetConfigResponse::Ok.into(),
-                BasicOutput::Invalid(errors) => {
-                    let schema_errors: Vec<ErrorMessage> = errors
-                        .iter()
-                        .map(|error| error.error_description().clone().into_inner().into())
-                        .collect();
-                    SetConfigResponse::UnprocessableContent(Json(ConfigUnprocessableContent::new(
-                        "Invalid JSON data validating against JSON schema".to_string(),
-                        Some(schema_errors.into()),
-                    )))
-                    .into()
-                },
-            }
-        },
+        Ok(()) => SetConfigResponse::Ok.into(),
         Err(err) => {
             error!(id="set_config_frontend", error=?err, "Failed to set frontend configuration");
             SetConfigAllResponses::handle_error(&err)
