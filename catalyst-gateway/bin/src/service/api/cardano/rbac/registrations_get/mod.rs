@@ -59,6 +59,21 @@ pub(crate) async fn endpoint(
         return AllResponses::service_unavailable(&err, RetryAfterOption::Default);
     };
 
+    // TODO: FIXME:
+    // In case of Catalyst ID:
+    //      1. Build the chain.
+    //      2. Get the latest stake address.
+    //      3. Check if it is used.
+    //      4. If not - we have a valid chain.
+    //      5. If yes - check what chain is valid and if the original chain is "overridden".
+    //      ? Build chains for ALL encountered stake addresses?!
+    // In case of stake address:
+    //      1. Find ALL Catalyst IDs for that address.
+    //      2. Build all the chains in proper order and discard invalid ones.
+    //      3. Return the only remaining chain.
+
+    // TODO: FIXME: Add comments about optimization and reference the corresponding issue.
+
     let catalyst_id = match lookup {
         Some(CatIdOrStake::CatId(v)) => v.into(),
         Some(CatIdOrStake::Address(address)) => {
