@@ -72,7 +72,9 @@ abstract interface class DocumentRepository {
     required DocumentRef ref,
   });
 
-  /// Useful when recovering account and we want to lookup latest [CatalystId].
+  /// Useful when recovering account and we want to lookup
+  /// latest [DocumentData] which of [authorId] and check
+  /// username used in [CatalystId] in that document.
   Future<DocumentData?> getLatestDocument({
     CatalystId? authorId,
   });

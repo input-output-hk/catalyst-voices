@@ -134,7 +134,7 @@ final class UserRepositoryImpl implements UserRepository {
   }
 
   /// Looks up reviews module and receives status for active
-  /// account of [token] is not specified.
+  /// account if [token] is not specified.
   Future<CatalystIDPublic?> _getReviewsCatalystIDPublic({
     RbacToken? token,
   }) {
