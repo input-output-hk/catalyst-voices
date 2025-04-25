@@ -5,7 +5,7 @@ import 'package:equatable/equatable.dart';
 final class ProposalViewMetadata extends Equatable {
   final Profile author;
   final String? description;
-  final ProposalStatus status;
+  final ProposalPublish status;
   final DateTime? createdAt;
   final bool warningCreatedAt;
   final String? tag;
