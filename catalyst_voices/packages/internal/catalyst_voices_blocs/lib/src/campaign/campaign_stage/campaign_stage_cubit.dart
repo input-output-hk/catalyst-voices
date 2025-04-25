@@ -11,7 +11,7 @@ final _logger = Logger('CampaignStageCubit');
 
 class CampaignStageCubit extends Cubit<CampaignStageState> {
   final CampaignService _campaignService;
-  late final Timer _timer;
+  late Timer? _timer;
 
   CampaignStageCubit(this._campaignService)
       : super(const LoadingCampaignStage()) {
@@ -20,7 +20,8 @@ class CampaignStageCubit extends Cubit<CampaignStageState> {
 
   @override
   Future<void> close() async {
-    _timer.cancel();
+    _timer?.cancel();
+    _timer = null;
     await super.close();
   }
 
@@ -67,7 +68,7 @@ class CampaignStageCubit extends Cubit<CampaignStageState> {
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       final now = DateTime.now();
       if (now.isAfter(endTime)) {
-        _timer.cancel();
+        _timer?.cancel();
         emit(const AfterProposalSubmissionStage());
       }
     });
