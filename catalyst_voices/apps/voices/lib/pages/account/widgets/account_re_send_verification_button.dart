@@ -12,7 +12,7 @@ class AccountReSendVerificationButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return VoicesFilledButton(
-      onTap: () => unawaited(context.read<AccountCubit>().reSendVerification()),
+      onTap: () => unawaited(context.read<AccountCubit>().resendVerification()),
       child: Text(context.l10n.reSend),
     );
   }

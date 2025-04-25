@@ -44,7 +44,7 @@ abstract interface class UserService implements ActiveAware {
 
   Future<void> removeAccount(Account account);
 
-  Future<void> reSendActiveAccountVerificationEmail();
+  Future<void> resendActiveAccountVerificationEmail();
 
   Future<void> updateAccount({
     required CatalystId id,
@@ -187,7 +187,7 @@ final class UserServiceImpl implements UserService {
   }
 
   @override
-  Future<void> reSendActiveAccountVerificationEmail() async {
+  Future<void> resendActiveAccountVerificationEmail() async {
     final user = await getUser();
     final activeAccount = user.activeAccount;
     final email = activeAccount?.email;

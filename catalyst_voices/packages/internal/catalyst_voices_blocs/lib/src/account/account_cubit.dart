@@ -40,7 +40,7 @@ final class AccountCubit extends Cubit<AccountState>
     }
   }
 
-  Future<void> reSendVerification() async {
+  Future<void> resendVerification() async {
     final activeAccount = _userService.user.activeAccount;
     final email = activeAccount?.email;
     if (email == null) {
@@ -48,7 +48,7 @@ final class AccountCubit extends Cubit<AccountState>
     }
 
     try {
-      await _userService.reSendActiveAccountVerificationEmail();
+      await _userService.resendActiveAccountVerificationEmail();
 
       emitSignal(const AccountVerificationEmailSendSignal());
     } catch (error, stackTrace) {
