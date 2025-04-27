@@ -27,6 +27,26 @@ class WorkspaceHeader extends StatefulWidget {
   State<WorkspaceHeader> createState() => _WorkspaceHeaderState();
 }
 
+class _CreateProposalButtonSelector extends StatelessWidget {
+  const _CreateProposalButtonSelector();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocSelector<WorkspaceBloc, WorkspaceState, bool>(
+      selector: (state) => state.isProposalLimitReached,
+      builder: (context, isProposalLimitReached) {
+        return Offstage(
+          offstage: isProposalLimitReached,
+          child: const Padding(
+            padding: EdgeInsets.only(right: 8),
+            child: _CreateProposalButton(),
+          ),
+        );
+      },
+    );
+  }
+}
+
 class _HasCommentCard extends StatelessWidget {
   const _HasCommentCard();
 
@@ -83,15 +103,33 @@ class _HasCommentCard extends StatelessWidget {
   }
 }
 
+class _ImportProposalButtonSelector extends StatelessWidget {
+  const _ImportProposalButtonSelector();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocSelector<WorkspaceBloc, WorkspaceState, bool>(
+      selector: (state) => state.isProposalLimitReached,
+      builder: (context, isProposalLimitReached) {
+        return Offstage(
+          offstage: isProposalLimitReached,
+          child: const Padding(
+            padding: EdgeInsets.only(left: 8),
+            child: _ImportProposalButton(),
+          ),
+        );
+      },
+    );
+  }
+}
+
 class _ViewComments extends StatelessWidget {
   const _ViewComments();
 
   @override
   Widget build(BuildContext context) {
     return BlocSelector<WorkspaceBloc, WorkspaceState, bool>(
-      selector: (state) {
-        return state.hasComments;
-      },
+      selector: (state) => state.hasComments,
       builder: (context, hasComments) {
         return hasComments
             ? const Padding(
@@ -136,10 +174,8 @@ class _WorkspaceHeaderState extends State<WorkspaceHeader> {
                 ),
               ),
               const Spacer(),
-              const _CreateProposalButton(),
-              const SizedBox(width: 8),
-              const _ImportProposalButton(),
-              const SizedBox(width: 8),
+              const _CreateProposalButtonSelector(),
+              const _ImportProposalButtonSelector(),
               _TimelineToggleButton(
                 onPressed: _toggleTimelineVisibility,
               ),
