@@ -1,7 +1,7 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/api/interceptors/rbac_auth_interceptor.dart';
 import 'package:catalyst_voices_repositories/src/auth/auth_token_provider.dart';
-import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:catalyst_voices_repositories/src/common/rbac_token_ext.dart';
 import 'package:chopper/chopper.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
@@ -9,50 +9,34 @@ import 'package:uuid_plus/uuid_plus.dart';
 
 import '../matcher/request_matchers.dart';
 import 'mock_chain.dart';
-import 'mock_keychain.dart';
 import 'mock_response.dart';
 
 void main() {
   group(RbacAuthInterceptor, () {
-    late final UserObserver userObserver;
     late final AuthTokenProvider authTokenProvider;
     late final RbacAuthInterceptor interceptor;
     late final Chain<String> chain;
 
-    final Keychain keychain = MockKeychain();
-
     setUpAll(() {
-      userObserver = StreamUserObserver();
       authTokenProvider = _MockAuthTokenProvider();
-      interceptor = RbacAuthInterceptor(
-        userObserver,
-        authTokenProvider,
-      );
+      interceptor = RbacAuthInterceptor(authTokenProvider);
 
       chain = MockChain<String>();
 
       registerFallbackValue(Request('X', Uri(), Uri()));
     });
 
-    tearDownAll(() async {
-      await userObserver.dispose();
-    });
-
     setUp(() {
-      when(() => keychain.id).thenAnswer((_) => const Uuid().v4());
       when(
         // ignore: discarded_futures
         () => authTokenProvider.createRbacToken(
           forceRefresh: any(named: 'forceRefresh'),
         ),
-      ).thenAnswer((_) => Future(() => const Uuid().v4()));
-
-      userObserver.user = const User.empty();
+      ).thenAnswer((_) => Future(() => RbacToken(const Uuid().v4())));
     });
 
     tearDown(() {
       reset(chain);
-      reset(keychain);
     });
 
     test(
@@ -63,23 +47,9 @@ void main() {
       final requestResponse = MockResponse<String>();
 
       // When
-      when(() => keychain.isUnlocked).thenAnswer((_) => Future.value(true));
       when(() => chain.request).thenReturn(request);
       when(() => chain.proceed(any())).thenAnswer((_) => requestResponse);
       when(() => requestResponse.statusCode).thenAnswer((_) => 200);
-
-      final user = User(
-        accounts: [
-          Account.dummy(
-            catalystId: DummyCatalystIdFactory.create(),
-            keychain: keychain,
-            isActive: true,
-          ),
-        ],
-        settings: const UserSettings(),
-      );
-
-      userObserver.user = user;
 
       await interceptor.intercept(chain);
 
@@ -98,23 +68,9 @@ void main() {
       final requestResponse = MockResponse<String>();
 
       // When
-      when(() => keychain.isUnlocked).thenAnswer((_) => Future.value(true));
       when(() => chain.request).thenReturn(request);
       when(() => chain.proceed(any())).thenAnswer((_) => requestResponse);
       when(() => requestResponse.statusCode).thenAnswer((_) => 200);
-
-      final user = User(
-        accounts: [
-          Account.dummy(
-            catalystId: DummyCatalystIdFactory.create(),
-            keychain: keychain,
-            isActive: true,
-          ),
-        ],
-        settings: const UserSettings(),
-      );
-
-      userObserver.user = user;
 
       await interceptor.intercept(chain);
 
@@ -135,57 +91,11 @@ void main() {
       final requestResponse = MockResponse<String>();
 
       // When
-      when(() => keychain.isUnlocked).thenAnswer((_) => Future.value(false));
+      when(() => authTokenProvider.createRbacToken())
+          .thenAnswer((_) => Future.value(null));
       when(() => chain.request).thenReturn(request);
       when(() => chain.proceed(any())).thenAnswer((_) => requestResponse);
       when(() => requestResponse.statusCode).thenAnswer((_) => 200);
-
-      final user = User(
-        accounts: [
-          Account.dummy(
-            catalystId: DummyCatalystIdFactory.create(),
-            keychain: keychain,
-            isActive: true,
-          ),
-        ],
-        settings: const UserSettings(),
-      );
-
-      userObserver.user = user;
-
-      await interceptor.intercept(chain);
-
-      // Then
-      final captured = verify(() => chain.proceed(captureAny())).captured;
-
-      expect(
-        (captured.single as Request).headers.containsKey(_authHeaderName),
-        isFalse,
-      );
-    });
-
-    test('when none account is active auth header is not added', () async {
-      // Given
-      final request = Request('GET', Uri(), Uri());
-      final requestResponse = MockResponse<String>();
-
-      // When
-      when(() => chain.request).thenReturn(request);
-      when(() => chain.proceed(any())).thenAnswer((_) => requestResponse);
-      when(() => requestResponse.statusCode).thenAnswer((_) => 200);
-
-      final user = User(
-        accounts: [
-          Account.dummy(
-            catalystId: DummyCatalystIdFactory.create(),
-            keychain: keychain,
-            isActive: false,
-          ),
-        ],
-        settings: const UserSettings(),
-      );
-
-      userObserver.user = user;
 
       await interceptor.intercept(chain);
 
@@ -200,8 +110,8 @@ void main() {
 
     test('401 response code triggers force token update', () async {
       // Given
-      const originalToken = 'expired_token';
-      const refreshedToken = 'refreshed_token';
+      const originalToken = RbacToken('expired_token');
+      const refreshedToken = RbacToken('refreshed_token');
 
       final request = Request('GET', Uri(), Uri());
 
@@ -209,7 +119,6 @@ void main() {
       final retryResponse = MockResponse<String>();
 
       // When
-      when(() => keychain.isUnlocked).thenAnswer((_) => Future.value(true));
       when(() => chain.request).thenReturn(request);
 
       // Original token
@@ -221,7 +130,7 @@ void main() {
       when(() {
         return chain.proceed(
           any(
-            that: containsHeaderValue(_buildAuthHeaderValue(originalToken)),
+            that: containsHeaderValue(originalToken.authHeader()),
           ),
         );
       }).thenAnswer((_) => originalResponse);
@@ -232,7 +141,7 @@ void main() {
       when(() {
         return chain.proceed(
           any(
-            that: containsHeaderValue(_buildAuthHeaderValue(refreshedToken)),
+            that: containsHeaderValue(refreshedToken.authHeader()),
           ),
         );
       }).thenAnswer((_) => retryResponse);
@@ -241,19 +150,6 @@ void main() {
       when(() => originalResponse.statusCode).thenAnswer((_) => 401);
       when(() => retryResponse.statusCode).thenAnswer((_) => 200);
 
-      final user = User(
-        accounts: [
-          Account.dummy(
-            catalystId: DummyCatalystIdFactory.create(),
-            keychain: keychain,
-            isActive: true,
-          ),
-        ],
-        settings: const UserSettings(),
-      );
-
-      userObserver.user = user;
-
       await interceptor.intercept(chain);
 
       // Then
@@ -265,7 +161,7 @@ void main() {
         captured.first,
         allOf(
           isA<Request>(),
-          containsHeaderValue(_buildAuthHeaderValue(originalToken)),
+          containsHeaderValue(originalToken.authHeader()),
           isNot(containsHeaderKey('Retry-Count')),
         ),
       );
@@ -273,7 +169,7 @@ void main() {
         captured[1],
         allOf(
           isA<Request>(),
-          containsHeaderValue(_buildAuthHeaderValue(refreshedToken)),
+          containsHeaderValue(refreshedToken.authHeader()),
           containsHeaderKey('Retry-Count'),
           containsHeaderValue('1'),
         ),
@@ -282,8 +178,8 @@ void main() {
 
     test('403 response code triggers force token update', () async {
       // Given
-      const originalToken = 'expired_token';
-      const refreshedToken = 'refreshed_token';
+      const originalToken = RbacToken('expired_token');
+      const refreshedToken = RbacToken('refreshed_token');
 
       final request = Request('GET', Uri(), Uri());
 
@@ -291,7 +187,6 @@ void main() {
       final retryResponse = MockResponse<String>();
 
       // When
-      when(() => keychain.isUnlocked).thenAnswer((_) => Future.value(true));
       when(() => chain.request).thenReturn(request);
 
       // Original token
@@ -303,7 +198,7 @@ void main() {
       when(() {
         return chain.proceed(
           any(
-            that: containsHeaderValue(_buildAuthHeaderValue(originalToken)),
+            that: containsHeaderValue(originalToken.authHeader()),
           ),
         );
       }).thenAnswer((_) => originalResponse);
@@ -314,7 +209,7 @@ void main() {
       when(() {
         return chain.proceed(
           any(
-            that: containsHeaderValue(_buildAuthHeaderValue(refreshedToken)),
+            that: containsHeaderValue(refreshedToken.authHeader()),
           ),
         );
       }).thenAnswer((_) => retryResponse);
@@ -322,19 +217,6 @@ void main() {
       // Responses
       when(() => originalResponse.statusCode).thenAnswer((_) => 403);
       when(() => retryResponse.statusCode).thenAnswer((_) => 200);
-
-      final user = User(
-        accounts: [
-          Account.dummy(
-            catalystId: DummyCatalystIdFactory.create(),
-            keychain: keychain,
-            isActive: true,
-          ),
-        ],
-        settings: const UserSettings(),
-      );
-
-      userObserver.user = user;
 
       await interceptor.intercept(chain);
 
@@ -347,7 +229,7 @@ void main() {
         captured.first,
         allOf(
           isA<Request>(),
-          containsHeaderValue(_buildAuthHeaderValue(originalToken)),
+          containsHeaderValue(originalToken.authHeader()),
           isNot(containsHeaderKey('Retry-Count')),
         ),
       );
@@ -355,7 +237,7 @@ void main() {
         captured[1],
         allOf(
           isA<Request>(),
-          containsHeaderValue(_buildAuthHeaderValue(refreshedToken)),
+          containsHeaderValue(refreshedToken.authHeader()),
           containsHeaderKey('Retry-Count'),
           containsHeaderValue('1'),
         ),
@@ -364,7 +246,7 @@ void main() {
 
     test('token refresh gives up after 1st try', () async {
       // Given
-      const originalToken = 'expired_token';
+      const originalToken = RbacToken('expired_token');
       final request = Request(
         'GET',
         Uri(),
@@ -374,7 +256,6 @@ void main() {
       final originalResponse = MockResponse<String>();
 
       // When
-      when(() => keychain.isUnlocked).thenAnswer((_) => Future.value(true));
       when(() => chain.request).thenReturn(request);
 
       // Original token
@@ -386,26 +267,13 @@ void main() {
       when(() {
         return chain.proceed(
           any(
-            that: containsHeaderValue(_buildAuthHeaderValue(originalToken)),
+            that: containsHeaderValue(originalToken.authHeader()),
           ),
         );
       }).thenAnswer((_) => originalResponse);
 
       // Responses
       when(() => originalResponse.statusCode).thenAnswer((_) => 403);
-
-      final user = User(
-        accounts: [
-          Account.dummy(
-            catalystId: DummyCatalystIdFactory.create(),
-            keychain: keychain,
-            isActive: true,
-          ),
-        ],
-        settings: const UserSettings(),
-      );
-
-      userObserver.user = user;
 
       await interceptor.intercept(chain);
 
@@ -418,7 +286,7 @@ void main() {
         captured.first,
         allOf(
           isA<Request>(),
-          containsHeaderValue(_buildAuthHeaderValue(originalToken)),
+          containsHeaderValue(originalToken.authHeader()),
           containsHeaderKey('Retry-Count'),
           containsHeaderValue('1'),
         ),
@@ -428,7 +296,5 @@ void main() {
 }
 
 const _authHeaderName = 'Authorization';
-
-String _buildAuthHeaderValue(String value) => 'Bearer $value';
 
 class _MockAuthTokenProvider extends Mock implements AuthTokenProvider {}

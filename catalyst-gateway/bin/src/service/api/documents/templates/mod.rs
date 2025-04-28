@@ -6,7 +6,7 @@ use std::{collections::HashMap, env, sync::LazyLock};
 
 use catalyst_signed_doc::{Builder, CatalystSignedDocument, ContentEncoding, ContentType, IdUri};
 use data::{CATEGORY_DOCUMENTS, COMMENT_TEMPLATES, PROPOSAL_TEMPLATES};
-use ed25519_dalek::SigningKey;
+use ed25519_dalek::{ed25519::signature::Signer, SigningKey};
 use hex::FromHex;
 use uuid::Uuid;
 
@@ -112,7 +112,7 @@ fn build_signed_doc(data: &SignedDocData, sk: &SigningKey) -> (Uuid, CatalystSig
         .with_json_metadata(metadata.clone())
         .expect("Failed to build Metadata from template")
         .with_decoded_content(data.content.to_vec())
-        .add_signature(sk.to_bytes(), kid)
+        .add_signature(|m| sk.sign(&m).to_vec(), &kid)
         .expect("Failed to add signature for template")
         .build();
     let doc_id = doc

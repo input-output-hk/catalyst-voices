@@ -1,6 +1,8 @@
 import 'dart:async';
 
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/auth/auth_token_provider.dart';
+import 'package:catalyst_voices_repositories/src/common/rbac_token_ext.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:chopper/chopper.dart' as utils show applyHeader;
 import 'package:chopper/chopper.dart' hide applyHeader;
@@ -15,32 +17,31 @@ final _logger = Logger('RbacAuthInterceptor');
 /// - 403: The token is valid, we know who they are but either the timestamp is
 /// wrong (out of date) or the signature is wrong.
 final class RbacAuthInterceptor implements Interceptor {
+  static const _authHeaderName = 'Authorization';
   static const _retryCountHeaderName = 'Retry-Count';
   static const _retryStatusCodes = [401, 403];
   static const _maxRetries = 1;
 
-  final UserObserver _userObserver;
   final AuthTokenProvider _authTokenProvider;
 
-  const RbacAuthInterceptor(
-    this._userObserver,
-    this._authTokenProvider,
-  );
+  const RbacAuthInterceptor(this._authTokenProvider);
 
   @override
   FutureOr<Response<BodyType>> intercept<BodyType>(
     Chain<BodyType> chain,
   ) async {
-    final keychain = _userObserver.user.activeAccount?.keychain;
-    final isUnlocked = await keychain?.isUnlocked ?? false;
-
-    if (!isUnlocked) {
+    if (chain.request.headers[_authHeaderName] != null) {
+      // token is already added
       return chain.proceed(chain.request);
     }
 
     final token = await _authTokenProvider.createRbacToken();
-    final updatedRequest = chain.request.applyAuthToken(token);
+    if (token == null) {
+      // keychain locked or not existing
+      return chain.proceed(chain.request);
+    }
 
+    final updatedRequest = chain.request.applyAuthToken(token);
     final response = await chain.proceed(updatedRequest);
 
     if (_retryStatusCodes.contains(response.statusCode)) {
@@ -66,6 +67,13 @@ final class RbacAuthInterceptor implements Interceptor {
         forceRefresh: true,
       );
 
+      if (newToken == null) {
+        throw StateError(
+          'Could not create a new RBAC token, '
+          'did the keychain become locked in the meantime?',
+        );
+      }
+
       return request
           .applyAuthToken(newToken)
           .applyHeader(name: _retryCountHeaderName, value: '${retryCount + 1}');
@@ -77,10 +85,10 @@ final class RbacAuthInterceptor implements Interceptor {
 }
 
 extension on Request {
-  Request applyAuthToken(String value) {
+  Request applyAuthToken(RbacToken token) {
     return applyHeader(
-      name: 'Authorization',
-      value: 'Bearer $value',
+      name: RbacAuthInterceptor._authHeaderName,
+      value: token.authHeader(),
     );
   }
 

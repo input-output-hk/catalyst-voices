@@ -1,5 +1,5 @@
 VERSION 0.8
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/spectral:v3.3.3 AS spectral-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/spectral:v3.3.4 AS spectral-ci
 IMPORT .. AS gateway
 
 docker-compose:
@@ -22,7 +22,8 @@ INSTALL_SCYLLA:
         wget -O /etc/apt/sources.list.d/scylla.list http://downloads.scylladb.com/deb/debian/scylla-$VERSION.list && \
         apt-get update && \
         apt-get install -y --no-install-recommends \
-        scylla
+            scylla \
+            curl
     COPY ./scylla.yaml /etc/scylla/scylla.yaml
     COPY ./scylla_entry.sh .
 

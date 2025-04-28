@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/common/constants/constants.dart';
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/widgets/cards/tip_card.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
@@ -111,13 +112,7 @@ class _LeftSide extends StatelessWidget {
           title: context.l10n.noWalletInstalledTitle,
           description: context.l10n.noWalletInstalledDescription,
         ),
-        VoicesTextButton(
-          onTap: () {
-            // TODO(LynxLynxx): implement url launching
-          },
-          trailing: VoicesAssets.icons.externalLink.buildIcon(),
-          child: Text(context.l10n.visitCatalystWalletDocumentationTextButton),
-        ),
+        const _NoWalletTroubleshootingButton(),
       ],
     );
   }
@@ -218,6 +213,22 @@ class _NoWalletErrorReason extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _NoWalletTroubleshootingButton extends StatelessWidget
+    with LaunchUrlMixin {
+  const _NoWalletTroubleshootingButton();
+
+  @override
+  Widget build(BuildContext context) {
+    return VoicesTextButton(
+      onTap: () async {
+        await launchUri(VoicesConstants.walletTroubleshootingUrl.getUri());
+      },
+      trailing: VoicesAssets.icons.externalLink.buildIcon(),
+      child: Text(context.l10n.visitCatalystWalletDocumentationTextButton),
     );
   }
 }

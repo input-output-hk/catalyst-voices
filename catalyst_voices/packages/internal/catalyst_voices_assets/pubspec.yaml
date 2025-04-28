@@ -4,8 +4,8 @@ version: 0.1.0+1
 publish_to: none
 
 environment:
-  sdk: ">=3.5.0 <4.0.0"
-  flutter: ">=3.29.0"
+  sdk: ">=3.6.0 <4.0.0"
+  flutter: ">=3.29.3"
 
 dependencies:
   flutter:
@@ -30,7 +30,6 @@ flutter:
     - assets/icons/
     - assets/lottie/
     - assets/videos/
-    - assets/document_templates/proposal/F14-Generic/
   fonts:
     - family: SF-Pro
       fonts:

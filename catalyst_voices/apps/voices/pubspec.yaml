@@ -4,8 +4,8 @@ version: 0.1.0+1
 publish_to: none
 
 environment:
-  sdk: ">=3.5.0 <4.0.0"
-  flutter: ">=3.29.0"
+  sdk: ">=3.6.0 <4.0.0"
+  flutter: ">=3.29.3"
 
 dependencies:
   animated_text_kit: ^4.2.2
@@ -46,6 +46,7 @@ dependencies:
   flutter_dropzone: 4.0.3
   flutter_dropzone_platform_interface: 2.0.6
   flutter_dropzone_web: 4.0.2
+  flutter_inappwebview: ^6.1.5
   flutter_localized_locales: ^2.0.5
   flutter_markdown: ^0.7.4+3
   flutter_native_splash: ^2.4.6

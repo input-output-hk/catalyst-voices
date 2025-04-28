@@ -85,12 +85,19 @@ command:
   bootstrap:
     runPubGetInParallel: true
     environment:
-      sdk: ">=3.5.0 <4.0.0"
-      flutter: ">=3.29.0"
+      sdk: ">=3.6.0 <4.0.0"
+      flutter: ">=3.29.3"
     dependencies:
       auto_size_text: ^3.0.0
       async: ^2.11.0
-      asn1lib: ^1.5.3
+      # TODO(dtscalac): revert to official version from pub.dev when dart 3.8.0 is stable
+      # and it's possible to configure the `dart format` with:
+      #   trailing_commas: preserve
+      # Official version enforces dart 3.7.0 which messes the formatting.
+      # https://github.com/dart-lang/sdk/blob/main/CHANGELOG.md#dart-format-1
+      asn1lib:
+        git:
+          url: https://github.com/dtscalac/asn1lib
       bip39: ^1.0.6
       bloc_concurrency: ^0.2.2
       chopper: ^8.0.3
@@ -110,6 +117,7 @@ command:
       flutter_dropzone: 4.0.3
       flutter_dropzone_platform_interface: 2.0.6
       flutter_dropzone_web: 4.0.2
+      flutter_inappwebview: ^6.1.5
       flutter_localized_locales: ^2.0.5
       flutter_markdown: ^0.7.4+3
       flutter_native_splash: ^2.4.6
@@ -147,6 +155,7 @@ command:
       convert: ^3.1.1
       path: ^1.9.1
       pinenacl: ^0.6.0
+      pool: ^1.5.1
       uuid_plus: ^0.1.0
       sentry_flutter: ^8.8.0
       scrollable_positioned_list: ^0.3.8

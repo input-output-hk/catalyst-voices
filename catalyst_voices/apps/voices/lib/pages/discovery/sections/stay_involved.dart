@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:catalyst_voices/common/constants/constants.dart';
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/widgets/buttons/copy_catalyst_id_button.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_filled_button.dart';
@@ -60,8 +61,7 @@ class __ReviewerCardState extends State<_ReviewerCard> {
           const SizedBox(height: 4),
           _StayInvolvedActionButton(
             title: context.l10n.becomeReviewer,
-            // TODO(LynxLynxx): add url;
-            urlString: 'https://google.com',
+            urlString: VoicesConstants.becomeReviewerUrl,
             trailing: VoicesAssets.icons.externalLink.buildIcon(),
           ),
         ],
@@ -211,11 +211,10 @@ class _VoterCard extends StatelessWidget {
     return _StayInvolvedCard(
       icon: VoicesAssets.icons.vote,
       title: context.l10n.votingRegistrationForF14,
-      description: context.l10n.stayInvolvedVoterDescription,
+      description: context.l10n.stayInvolvedContributorDescription,
       actions: _StayInvolvedActionButton(
         title: context.l10n.votingRegistration,
-        // TODO(LynxLynxx): add url;
-        urlString: 'https://google.com',
+        urlString: VoicesConstants.votingRegistrationUrl,
       ),
       additionalInfo: BlocSelector<DiscoveryCubit, DiscoveryState, DateTime?>(
         selector: (state) {

@@ -100,6 +100,8 @@ class VoicesTextField extends VoicesFormField<String> {
   /// [TextField.mouseCursor]
   final MouseCursor? mouseCursor;
 
+  final bool showValidationStatusIcon;
+
   VoicesTextField({
     super.key,
     super.enabled = true,
@@ -132,6 +134,7 @@ class VoicesTextField extends VoicesFormField<String> {
     this.inputFormatters,
     this.maxLengthEnforcement,
     this.mouseCursor,
+    this.showValidationStatusIcon = true,
   }) : super(
           value: controller?.text ?? initialText,
           validator: (value) {
@@ -631,6 +634,10 @@ class VoicesTextFieldState extends VoicesFormFieldState<String> {
   }
 
   Widget? _getStatusSuffixWidget() {
+    if (!widget.showValidationStatusIcon) {
+      return null;
+    }
+
     final showStatusIcon = widget.decoration?.showStatusSuffixIcon ?? true;
     if (!showStatusIcon) {
       return null;

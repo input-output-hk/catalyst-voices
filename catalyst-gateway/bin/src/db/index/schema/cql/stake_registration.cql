@@ -11,8 +11,9 @@ CREATE TABLE IF NOT EXISTS stake_registration (
 
     -- Stake key lifecycle data, shows what happened with the stake key at this slot#.
     script           boolean,  -- Is the address a script address.
-    register         boolean,  -- True if the stake was registered in this transaction.
-    deregister       boolean,  -- True if the stake key was deregistered in this transaction.
+    register         boolean,  -- True if the this transaction contains cardano stake registration cert.
+    deregister       boolean,  -- True if the this transaction contains cardano stake deregistration cert.
+    cip36            boolean,  -- True if the this transaction contains CIP36 registration.
     pool_delegation  blob,     -- Stake was delegated to this Pool address.
                               -- Not present if delegation did not change.
 

@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/routes/routes.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_filled_button.dart';
-import 'package:catalyst_voices/widgets/cards/pending_proposal_card.dart';
+import 'package:catalyst_voices/widgets/cards/proposal/pending_proposal_card.dart';
 import 'package:catalyst_voices/widgets/scrollbar/voices_slider.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
@@ -26,6 +26,49 @@ class MostRecentProposals extends StatefulWidget {
 
   @override
   State<MostRecentProposals> createState() => _LatestProposalsState();
+}
+
+class ViewAllProposals extends StatelessWidget {
+  const ViewAllProposals({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const _Background(
+      key: Key('MostRecentViewAllProposals'),
+      constraints: BoxConstraints(maxHeight: 184),
+      child: Center(
+        child: _ViewAllProposalsButton(),
+      ),
+    );
+  }
+}
+
+class _Background extends StatelessWidget {
+  final Widget child;
+  final BoxConstraints constraints;
+
+  const _Background({
+    super.key,
+    required this.child,
+    this.constraints = const BoxConstraints(maxHeight: 900),
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      key: const Key('MostRecentProposals'),
+      constraints: constraints,
+      decoration: BoxDecoration(
+        image: DecorationImage(
+          image: CatalystImage.asset(
+            VoicesAssets.images.campaignHero.path,
+          ).image,
+          fit: BoxFit.cover,
+        ),
+      ),
+      child: child,
+    );
+  }
 }
 
 class _LatestProposalsState extends State<MostRecentProposals> {
@@ -116,15 +159,7 @@ class _LatestProposalsState extends State<MostRecentProposals> {
             ),
           ),
           const SizedBox(height: 16),
-          VoicesFilledButton(
-            backgroundColor: ThemeBuilder.buildTheme().colorScheme.onPrimary,
-            foregroundColor: ThemeBuilder.buildTheme().colorScheme.primary,
-            child: Text(
-              key: const Key('ViewAllProposalsBtn'),
-              context.l10n.viewAllProposals,
-            ),
-            onTap: () => const ProposalsRoute().go(context),
-          ),
+          const _ViewAllProposalsButton(),
           const SizedBox(height: 72),
         ],
       ),
@@ -168,5 +203,22 @@ class _LatestProposalsState extends State<MostRecentProposals> {
   void _onSliderChanged(double value) {
     final maxScroll = _scrollController.position.maxScrollExtent;
     _scrollController.jumpTo(maxScroll * value);
+  }
+}
+
+class _ViewAllProposalsButton extends StatelessWidget {
+  const _ViewAllProposalsButton();
+
+  @override
+  Widget build(BuildContext context) {
+    return VoicesFilledButton(
+      backgroundColor: ThemeBuilder.buildTheme().colorScheme.onPrimary,
+      foregroundColor: ThemeBuilder.buildTheme().colorScheme.primary,
+      child: Text(
+        key: const Key('ViewAllProposalsBtn'),
+        context.l10n.viewAllProposals,
+      ),
+      onTap: () => const ProposalsRoute().go(context),
+    );
   }
 }

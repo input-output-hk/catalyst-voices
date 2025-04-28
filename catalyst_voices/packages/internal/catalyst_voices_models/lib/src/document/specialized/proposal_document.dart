@@ -28,6 +28,23 @@ final class ProposalDocument extends Equatable {
       DocumentNodeId.fromString('milestones.milestones.milestone_list');
   static final tagNodeId = DocumentNodeId.fromString('theme.theme.grouped_tag');
 
+  /// A list of all [DocumentNodeId] that are expected to appear
+  /// in the proposal template schema.
+  ///
+  /// The app builds custom logic on top of these node ids.
+  static final allNodeIds = [
+    titleNodeId,
+    descriptionNodeId,
+    requestedFundsNodeId,
+    durationNodeId,
+    authorNameNodeId,
+    categoryNodeId,
+    categoryDetailsNodeId,
+    milestonesNodeId,
+    milestoneListNodeId,
+    tagNodeId,
+  ];
+
   static const String exportFileExt = 'json';
 
   final ProposalMetadata metadata;
@@ -38,15 +55,7 @@ final class ProposalDocument extends Equatable {
     required this.document,
   });
 
-  String? get authorName {
-    final property = document.getProperty(authorNameNodeId);
-
-    if (property is! DocumentValueProperty<String>) {
-      return null;
-    }
-
-    return property.value;
-  }
+  String? get authorName => _contentAuthorName ?? _metadataAuthorName;
 
   String? get description {
     final property = document.getProperty(descriptionNodeId);
@@ -119,6 +128,18 @@ final class ProposalDocument extends Equatable {
 
     return property.value;
   }
+
+  String? get _contentAuthorName {
+    final property = document.getProperty(authorNameNodeId);
+
+    if (property is! DocumentValueProperty<String>) {
+      return null;
+    }
+
+    return property.value;
+  }
+
+  String? get _metadataAuthorName => metadata.authors.firstOrNull?.username;
 }
 
 final class ProposalMetadata extends DocumentMetadata {

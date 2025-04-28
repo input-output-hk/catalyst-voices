@@ -1,7 +1,7 @@
 VERSION 0.8
 
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/python:v3.3.3 AS python-ci
-IMPORT github.com/input-output-hk/catalyst-libs/rust:r20250416-00 AS cat-libs-rust
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/python:v3.3.4 AS python-ci
+IMPORT github.com/input-output-hk/catalyst-libs/rust:r20250425-00 AS cat-libs-rust
 
 builder:
     FROM python-ci+python-base
@@ -9,10 +9,10 @@ builder:
     # prepare tests
     COPY --dir ./api .
     COPY --dir ./integration .
+    COPY --dir ./scripts .
     COPY --dir ./utils .
     COPY --dir ./test_data .
     COPY cat-libs-rust+build/mk_signed_doc .
-    COPY ./snapshot_tool-56364174.json .
     DO python-ci+BUILDER
 
 test:
@@ -26,8 +26,7 @@ test:
         --compose docker-compose.yml \
         --load event-db:latest=(./../../event-db+build) \
         --load cat-gateway-with-scylla:latest=(./../+package-cat-gateway-with-scylla) \
-        --service cat-gateway-with-scylla \
-        --allow-privileged
+        --service cat-gateway-with-scylla-is-running
         RUN poetry run pytest -s --junitxml=junit-report.xml --cov=integration --cov-report lcov
     END
     WAIT

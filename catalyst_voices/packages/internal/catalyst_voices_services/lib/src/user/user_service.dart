@@ -1,11 +1,12 @@
 import 'dart:async';
 
+import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 
 abstract interface class UserService implements ActiveAware {
-  factory UserService(
+  const factory UserService(
     UserRepository userRepository,
     UserObserver userObserver,
   ) = UserServiceImpl;
@@ -16,7 +17,24 @@ abstract interface class UserService implements ActiveAware {
 
   Future<void> dispose();
 
+  /// If updating a registration the new registration must be
+  /// linked via the transaction hash to the last one.
+  ///
+  /// The method returns the last known transaction ID.
+  Future<TransactionHash> getPreviousRegistrationTransactionId();
+
   Future<User> getUser();
+
+  Future<bool> isActiveAccountPubliclyVerified();
+
+  /// Fetches info about recovered account.
+  ///
+  /// This does not recover the account,
+  /// it only does the lookup if there's an account to recover.
+  Future<RecoveredAccount> recoverAccount({
+    required CatalystId catalystId,
+    required RbacToken rbacToken,
+  });
 
   /// Registers a new [account] and makes it active.
   ///
@@ -26,12 +44,16 @@ abstract interface class UserService implements ActiveAware {
 
   Future<void> removeAccount(Account account);
 
+  Future<void> resendActiveAccountVerificationEmail();
+
   Future<void> updateAccount({
     required CatalystId id,
     Optional<String>? username,
-    String? email,
+    Optional<String>? email,
     Set<AccountRole>? roles,
   });
+
+  Future<void> updateActiveAccountDetails();
 
   Future<void> updateSettings(UserSettings newValue);
 
@@ -46,7 +68,7 @@ final class UserServiceImpl implements UserService {
   final UserRepository _userRepository;
   final UserObserver _userObserver;
 
-  UserServiceImpl(
+  const UserServiceImpl(
     this._userRepository,
     this._userObserver,
   );
@@ -67,7 +89,54 @@ final class UserServiceImpl implements UserService {
   Future<void> dispose() async {}
 
   @override
+  Future<TransactionHash> getPreviousRegistrationTransactionId() {
+    final activeAccount = user.activeAccount;
+    if (activeAccount == null) {
+      throw ArgumentError.notNull('activeAccount');
+    }
+
+    return _userRepository.getPreviousRegistrationTransactionId(
+      catalystId: activeAccount.catalystId,
+    );
+  }
+
+  @override
   Future<User> getUser() => _userRepository.getUser();
+
+  @override
+  Future<bool> isActiveAccountPubliclyVerified() async {
+    final user = await getUser();
+    final activeAccount = user.activeAccount;
+    if (activeAccount == null) {
+      return false;
+    }
+
+    // If already verified just return true.
+    if (activeAccount.publicStatus.isVerified) {
+      return true;
+    }
+
+    // Ask backend if status changed.
+    final status = await _userRepository.getAccountPublicStatus();
+    if (status != activeAccount.publicStatus) {
+      final updatedAccount = activeAccount.copyWith(publicStatus: status);
+      final updatedUser = user.updateAccount(updatedAccount);
+      await _updateUser(updatedUser);
+    }
+
+    return status.isVerified;
+  }
+
+  @override
+  Future<RecoveredAccount> recoverAccount({
+    required CatalystId catalystId,
+    required RbacToken rbacToken,
+  }) {
+    return _userRepository.recoverAccount(
+      catalystId: catalystId,
+      rbacToken: rbacToken,
+    );
+  }
 
   @override
   Future<void> registerAccount(Account account) async {
@@ -84,9 +153,17 @@ final class UserServiceImpl implements UserService {
 
     await _updateUser(user);
 
-    // updating email must be after updating user so that
-    // the request is sent with correct access token
-    unawaited(_userRepository.updateEmail(account.email));
+    final email = account.email;
+    if (email != null) {
+      // updating user profile must be after updating user so that
+      // the request is sent with correct access token
+      unawaited(
+        _userRepository.publishUserProfile(
+          catalystId: account.catalystId,
+          email: email,
+        ),
+      );
+    }
   }
 
   @override
@@ -110,10 +187,32 @@ final class UserServiceImpl implements UserService {
   }
 
   @override
+  Future<void> resendActiveAccountVerificationEmail() async {
+    final user = await getUser();
+    final activeAccount = user.activeAccount;
+    final email = activeAccount?.email;
+    if (activeAccount == null || email == null || email.isEmpty) {
+      return;
+    }
+
+    await _userRepository.publishUserProfile(
+      catalystId: activeAccount.catalystId,
+      email: email,
+    );
+
+    final updatedAccount = activeAccount.copyWith(
+      publicStatus: AccountPublicStatus.verifying,
+    );
+    final updatedUser = user.updateAccount(updatedAccount);
+
+    await _updateUser(updatedUser);
+  }
+
+  @override
   Future<void> updateAccount({
     required CatalystId id,
     Optional<String>? username,
-    String? email,
+    Optional<String>? email,
     Set<AccountRole>? roles,
   }) async {
     final user = await getUser();
@@ -130,14 +229,43 @@ final class UserServiceImpl implements UserService {
     }
 
     if (email != null) {
-      await _userRepository.updateEmail(email);
-      updatedAccount = updatedAccount.copyWith(email: email);
+      updatedAccount = updatedAccount.copyWith(
+        email: email,
+        publicStatus: email.isEmpty
+            ? AccountPublicStatus.notSetup
+            : AccountPublicStatus.verifying,
+      );
     }
 
     if (roles != null) {
       updatedAccount = updatedAccount.copyWith(roles: roles);
     }
 
+    if (username != null || email != null) {
+      final accountEmail = updatedAccount.email;
+      if (accountEmail != null) {
+        await _userRepository.publishUserProfile(
+          catalystId: updatedAccount.catalystId,
+          email: accountEmail,
+        );
+      }
+    }
+
+    final updatedUser = user.updateAccount(updatedAccount);
+
+    await _updateUser(updatedUser);
+  }
+
+  @override
+  Future<void> updateActiveAccountDetails() async {
+    final user = await getUser();
+    final activeAccount = user.activeAccount;
+    if (activeAccount == null) {
+      return;
+    }
+
+    final publicStatus = await _userRepository.getAccountPublicStatus();
+    final updatedAccount = activeAccount.copyWith(publicStatus: publicStatus);
     final updatedUser = user.updateAccount(updatedAccount);
 
     await _updateUser(updatedUser);

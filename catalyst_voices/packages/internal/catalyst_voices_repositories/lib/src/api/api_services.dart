@@ -7,8 +7,6 @@ import 'package:catalyst_voices_repositories/src/api/converters/cbor_or_json_con
 import 'package:catalyst_voices_repositories/src/api/converters/cbor_serializable_converter.dart';
 import 'package:catalyst_voices_repositories/src/api/interceptors/rbac_auth_interceptor.dart';
 import 'package:catalyst_voices_repositories/src/auth/auth_token_provider.dart';
-import 'package:catalyst_voices_shared/catalyst_voices_shared.dart'
-    show UserObserver;
 import 'package:chopper/chopper.dart';
 import 'package:flutter/foundation.dart';
 
@@ -28,42 +26,37 @@ final class ApiServices {
 
   factory ApiServices({
     required ApiConfig config,
-    required UserObserver userObserver,
     required AuthTokenProvider authTokenProvider,
   }) {
     _fixModelsMapping();
 
-    final cat = CatGateway.create(
-      authenticator: null,
-      baseUrl: Uri.parse(config.gatewayUrl),
-      converter: CborOrJsonDelegateConverter(
-        cborConverter: CborSerializableConverter(),
-        jsonConverter: $JsonSerializableConverter(),
-      ),
-      interceptors: [
-        RbacAuthInterceptor(userObserver, authTokenProvider),
-        if (kDebugMode) HttpLoggingInterceptor(onlyErrors: true),
-      ],
-    );
-    final vit = Vit.create(
-      baseUrl: Uri.parse(config.vitUrl),
-      interceptors: [
-        if (kDebugMode) HttpLoggingInterceptor(onlyErrors: true),
-      ],
-    );
-    final review = CatReviews.create(
-      authenticator: null,
-      baseUrl: Uri.parse(config.reviewsUrl),
-      interceptors: [
-        RbacAuthInterceptor(userObserver, authTokenProvider),
-        if (kDebugMode) HttpLoggingInterceptor(onlyErrors: true),
-      ],
-    );
-
     return ApiServices.internal(
-      gateway: cat,
-      vit: vit,
-      reviews: review,
+      gateway: CatGateway.create(
+        authenticator: null,
+        baseUrl: Uri.parse(config.gatewayUrl),
+        converter: CborOrJsonDelegateConverter(
+          cborConverter: CborSerializableConverter(),
+          jsonConverter: $JsonSerializableConverter(),
+        ),
+        interceptors: [
+          RbacAuthInterceptor(authTokenProvider),
+          if (kDebugMode) HttpLoggingInterceptor(onlyErrors: true),
+        ],
+      ),
+      vit: Vit.create(
+        baseUrl: Uri.parse(config.vitUrl),
+        interceptors: [
+          if (kDebugMode) HttpLoggingInterceptor(onlyErrors: true),
+        ],
+      ),
+      reviews: CatReviews.create(
+        authenticator: null,
+        baseUrl: Uri.parse(config.reviewsUrl),
+        interceptors: [
+          RbacAuthInterceptor(authTokenProvider),
+          if (kDebugMode) HttpLoggingInterceptor(onlyErrors: true),
+        ],
+      ),
     );
   }
 

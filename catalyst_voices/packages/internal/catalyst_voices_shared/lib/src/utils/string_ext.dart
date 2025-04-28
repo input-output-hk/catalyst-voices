@@ -8,8 +8,6 @@ extension StringExt on String {
 
   bool get isNotBlank => !isBlank;
 
-  String withBullet() => withPrefix('• ');
-
   String capitalize() {
     if (isNotEmpty) {
       return '${this[0].toUpperCase()}${substring(1).toLowerCase()}';
@@ -45,6 +43,13 @@ extension StringExt on String {
     };
   }
 
+  String? nullIfEmpty() {
+    if (isEmpty) {
+      return null;
+    }
+    return this;
+  }
+
   String starred({
     bool leading = true,
     bool isEnabled = true,
@@ -56,9 +61,31 @@ extension StringExt on String {
     return leading ? withPrefix('*') : withSuffix('*');
   }
 
+  String withBullet() => withPrefix('• ');
+
   String withPrefix(String value) => '$value$this';
 
-  String withSuffix(String value) => '$this$value';
+  String withSuffix(
+    String value, {
+    bool space = false,
+    bool brackets = false,
+  }) {
+    final buffer = StringBuffer(this);
+
+    if (buffer.isNotEmpty && space) {
+      buffer.write(' ');
+    }
+
+    if (brackets) {
+      buffer.write('(');
+    }
+    buffer.write(value);
+    if (brackets) {
+      buffer.write(')');
+    }
+
+    return buffer.toString();
+  }
 }
 
 extension UrlParser on String {

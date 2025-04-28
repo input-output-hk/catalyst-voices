@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:catalyst_voices/common/ext/account_role_ext.dart';
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/pages/account/edit_roles_dialog.dart';
+import 'package:catalyst_voices/pages/account/verification_required_dialog.dart';
 import 'package:catalyst_voices/pages/registration/registration_dialog.dart';
 import 'package:catalyst_voices/pages/registration/registration_type.dart';
 import 'package:catalyst_voices/widgets/common/affix_decorator.dart';
@@ -52,6 +55,13 @@ class _AccountRolesTileState extends State<_AccountRolesTile> {
   }
 
   Future<void> _addAccountRole() async {
+    final isVerified =
+        context.read<AccountCubit>().state.accountPublicStatus.isVerified;
+    if (!isVerified) {
+      unawaited(VerificationRequiredDialog.show(context));
+      return;
+    }
+
     final confirmed = await EditRolesDialog.show(context);
 
     if (!confirmed || !mounted) {

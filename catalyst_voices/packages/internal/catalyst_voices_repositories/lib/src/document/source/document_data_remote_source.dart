@@ -1,11 +1,16 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_repositories/generated/api/cat_gateway.models.swagger.dart';
+import 'package:catalyst_voices_repositories/src/common/response_mapper.dart';
 import 'package:catalyst_voices_repositories/src/document/document_data_factory.dart';
 import 'package:catalyst_voices_repositories/src/dto/api/document_index_list_dto.dart';
 import 'package:catalyst_voices_repositories/src/dto/api/document_index_query_filters_dto.dart';
+import 'package:flutter/foundation.dart';
 
 final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
+  @visibleForTesting
+  static const indexPageSize = 200;
+
   final ApiServices _api;
   final SignedDocumentManager _signedDocumentManager;
 
@@ -16,54 +21,43 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
 
   @override
   Future<DocumentData> get({required DocumentRef ref}) async {
-    final response = await _api.gateway.apiV1DocumentDocumentIdGet(
-      documentId: ref.id,
-      version: ref.version,
-    );
+    final bytes = await _api.gateway
+        .apiV1DocumentDocumentIdGet(
+          documentId: ref.id,
+          version: ref.version,
+        )
+        .successBodyBytesOrThrow();
 
-    if (!response.isSuccessful) {
-      final statusCode = response.statusCode;
-      final error = response.error;
-
-      throw ApiErrorResponseException(statusCode: statusCode, error: error);
-    }
-
-    final bytes = response.bodyBytes;
     final signedDocument = await _signedDocumentManager.parseDocument(bytes);
     return DocumentDataFactory.create(signedDocument);
   }
 
   @override
   Future<String?> getLatestVersion(String id) async {
-    final response = await _api.gateway.apiV1DocumentIndexPost(
-      body: DocumentIndexQueryFilter(id: EqOrRangedIdDto.eq(id)),
-      limit: 1,
-    );
+    try {
+      final index = await _api.gateway
+          .apiV1DocumentIndexPost(
+            body: DocumentIndexQueryFilter(id: EqOrRangedIdDto.eq(id)),
+            limit: 1,
+          )
+          .successBodyOrThrow();
 
-    if (response.statusCode == ApiErrorResponseException.notFound) {
+      final docs = index.docs;
+      if (docs.isEmpty) {
+        return null;
+      }
+
+      return docs
+          .sublist(0, 1)
+          .cast<Map<String, dynamic>>()
+          .map(DocumentIndexListDto.fromJson)
+          .firstOrNull
+          ?.ver
+          .firstOrNull
+          ?.ver;
+    } on NotFoundException {
       return null;
     }
-
-    if (!response.isSuccessful) {
-      final statusCode = response.statusCode;
-      final error = response.error;
-
-      throw ApiErrorResponseException(statusCode: statusCode, error: error);
-    }
-
-    final docs = response.body?.docs;
-    if (docs == null || docs.isEmpty) {
-      return null;
-    }
-
-    return docs
-        .sublist(0, 1)
-        .cast<Map<String, dynamic>>()
-        .map(DocumentIndexListDto.fromJson)
-        .firstOrNull
-        ?.ver
-        .firstOrNull
-        ?.ver;
   }
 
   @override
@@ -71,7 +65,7 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
     final allRefs = <SignedDocumentRef>{};
 
     var page = 0;
-    const maxPerPage = 100;
+    const maxPerPage = indexPageSize;
     var remaining = 0;
 
     do {
@@ -92,34 +86,20 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
   @override
   Future<void> publish(SignedDocument document) async {
     final bytes = document.toBytes();
-    final response = await _api.gateway.apiV1DocumentPut(body: bytes);
-
-    if (!response.isSuccessful) {
-      final statusCode = response.statusCode;
-      final error = response.error;
-
-      throw ApiErrorResponseException(statusCode: statusCode, error: error);
-    }
+    await _api.gateway.apiV1DocumentPut(body: bytes).successBodyOrThrow();
   }
 
   Future<DocumentIndexList> _getDocumentIndexList({
     required int page,
     required int limit,
   }) async {
-    final response = await _api.gateway.apiV1DocumentIndexPost(
-      body: const DocumentIndexQueryFilter(),
-      limit: limit,
-      page: page,
-    );
-
-    if (!response.isSuccessful) {
-      final statusCode = response.statusCode;
-      final error = response.error;
-
-      throw ApiErrorResponseException(statusCode: statusCode, error: error);
-    }
-
-    return response.bodyOrThrow;
+    return _api.gateway
+        .apiV1DocumentIndexPost(
+          body: const DocumentIndexQueryFilter(),
+          limit: limit,
+          page: page,
+        )
+        .successBodyOrThrow();
   }
 }
 

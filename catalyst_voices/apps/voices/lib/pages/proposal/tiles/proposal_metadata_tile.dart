@@ -2,7 +2,6 @@ import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.da
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/pages/proposal/widget/proposal_delivery_card.dart';
 import 'package:catalyst_voices/pages/proposal/widget/proposal_version.dart';
-import 'package:catalyst_voices/widgets/common/proposal_status_container.dart';
 import 'package:catalyst_voices/widgets/document/document_comments_chip.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
@@ -14,7 +13,7 @@ import 'package:flutter/material.dart';
 class ProposalMetadataTile extends StatelessWidget {
   final Profile author;
   final String? description;
-  final ProposalStatus status;
+  final ProposalPublish status;
   final DateTime? createdAt;
   final bool warningCreatedAt;
   final String? tag;
@@ -52,7 +51,7 @@ class ProposalMetadataTile extends StatelessWidget {
           crossAxisAlignment: WrapCrossAlignment.center,
           runSpacing: 8,
           children: <Widget>[
-            ProposalStatusContainer(type: status),
+            ProposalPublishChip(proposalPublish: status),
             const SizedBox(width: 8),
             const ProposalVersion(readOnly: true),
             if (createdAt != null) ...[
