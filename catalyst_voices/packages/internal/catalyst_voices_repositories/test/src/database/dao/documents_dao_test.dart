@@ -287,7 +287,9 @@ void main() {
           expect(secondEmission, equals([document2.document]));
           expect(secondEmission.length, equals(1));
           expect(
-              secondEmission.first.metadata.selfRef.version, equals(version2));
+            secondEmission.first.metadata.selfRef.version,
+            equals(version2),
+          );
         },
         onPlatform: driftOnPlatforms,
       );
@@ -579,7 +581,9 @@ void main() {
           );
 
           expect(
-              document?.metadata.selfRef, document2.document.metadata.selfRef);
+            document?.metadata.selfRef,
+            document2.document.metadata.selfRef,
+          );
         },
         onPlatform: driftOnPlatforms,
       );
