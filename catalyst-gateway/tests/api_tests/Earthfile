@@ -21,6 +21,7 @@ test:
 
     ENV EVENT_DB_TEST_URL "postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev"
     ENV CAT_GATEWAY_TEST_URL "http://127.0.0.1:3030"
+    ENV CAT_GATEWAY_INTERNAL_API_KEY "123"
 
     WITH DOCKER \
         --compose docker-compose.yml \
