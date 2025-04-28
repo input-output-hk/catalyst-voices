@@ -99,6 +99,7 @@ class _Body extends StatelessWidget {
           proposalPublish: proposal.publish,
           title: proposal.title,
           version: proposal.versions.versionNumber(proposal.selfRef.version!),
+          hasNewerLocalIteration: proposal.hasNewerLocalIteration,
         ),
       ],
     );

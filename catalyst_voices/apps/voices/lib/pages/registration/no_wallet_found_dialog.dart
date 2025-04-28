@@ -259,17 +259,17 @@ class _RightSide extends StatelessWidget {
         SupportedWallet(
           image: VoicesAssets.images.eternlWallet,
           name: context.l10n.eternlWallet,
-          url: 'https://www.example.com', // TODO(LynxLynxx): add url
+          url: 'https://eternl.io/',
         ),
         SupportedWallet(
           image: VoicesAssets.images.laceWallet,
           name: context.l10n.laceWallet,
-          url: 'https://www.example.com', // TODO(LynxLynxx): add url
+          url: 'https://www.lace.io/',
         ),
         SupportedWallet(
           image: VoicesAssets.images.namiWallet,
           name: context.l10n.namiWallet,
-          url: 'https://www.example.com', // TODO(LynxLynxx): add url
+          url: 'https://www.namiwallet.io/',
         ),
         const VoicesDivider.expanded(),
         const Spacer(),
