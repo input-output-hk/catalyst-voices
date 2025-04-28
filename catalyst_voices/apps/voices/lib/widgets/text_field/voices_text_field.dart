@@ -544,6 +544,7 @@ class VoicesTextFieldState extends VoicesFormFieldState<String> {
           ? textTheme.bodySmall
           : textTheme.bodySmall!.copyWith(color: colors.textOnPrimaryLevel1),
       hintText: widget.decoration?.hintText,
+      helperMaxLines: 2,
       hintStyle: _getHintStyle(
         textTheme,
         theme,
