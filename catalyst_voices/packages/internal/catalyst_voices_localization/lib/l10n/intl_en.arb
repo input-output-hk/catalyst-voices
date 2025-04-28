@@ -2648,6 +2648,13 @@
   "notPublishedInfoMarkdown": "**Not published**\n\nThese private proposals are only stored on your local device, and cannot be seen by anybody but you.",
   "@notPublishedInfoMarkdown": {
     "description": "Info message shown in tooltip info in workspace page"
+  },
+  "deleteLocalVersionIfWantToPublishThisVersion": "If you want to publish this iteration as final, please delete the local draft.",
+  "@deleteLocalVersionIfWantToPublishThisVersion": {
+    "description": "Message shown when user tries to publish a draft proposal as final proposal but there is a newer local draft proposal."
+  },
+  "cantEditThisProposal": "Can't edit this proposal",
+  "@cantEditThisProposal": {
+    "description": "Message shown when user tries to edit a proposal that should not be editable."
   }
-
 }
