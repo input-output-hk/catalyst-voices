@@ -1,7 +1,7 @@
 //! Configuration Endpoints
 
 use poem::web::RealIp;
-use poem_openapi::{param::Query, payload::Json, types::Example, ApiResponse, NewType, OpenApi};
+use poem_openapi::{param::Query, payload::Json, ApiResponse, OpenApi};
 use serde_json::{Map, Value};
 use tracing::error;
 
@@ -14,7 +14,7 @@ use crate::{
         auth::{api_key::InternalApiKeyAuthorization, none_or_rbac::NoneOrRBAC},
         responses::WithErrorResponses,
         tags::ApiTags,
-        types::generic::json_object::JsonObject,
+        types::generic::{ip_addr::IpAddr, json_object::JsonObject},
     },
 };
 
@@ -45,19 +45,6 @@ enum SetConfigResponse {
 /// Set configuration all responses.
 type SetConfigAllResponses = WithErrorResponses<SetConfigResponse>;
 
-#[derive(NewType)]
-#[oai(example = true)]
-/// IP Address.
-pub(crate) struct IpAddr(std::net::IpAddr);
-
-impl Example for IpAddr {
-    fn example() -> Self {
-        Self(std::net::IpAddr::V4(std::net::Ipv4Addr::new(
-            192, 168, 10, 15,
-        )))
-    }
-}
-
 #[OpenApi(tag = "ApiTags::Config")]
 impl ConfigApi {
     /// Get the configuration for the frontend.
@@ -73,12 +60,12 @@ impl ConfigApi {
         operation_id = "get_config_frontend"
     )]
     async fn get_frontend(&self, ip_address: RealIp, _auth: NoneOrRBAC) -> GetConfigAllResponses {
-        let general_config: Option<JsonObject> = match Config::get(ConfigKey::Frontend)
+        let general_config: JsonObject = match Config::get(ConfigKey::Frontend)
             .await
             .and_then(TryInto::try_into)
         {
-            Ok(value) => Some(value),
-            Err(err) if err.is::<NotFoundError>() => None,
+            Ok(value) => value,
+            Err(err) if err.is::<NotFoundError>() => return GetConfigResponses::NotFound.into(),
             Err(err) => {
                 error!(id="get_frontend_config_general", error=?err, "Failed to get general frontend configuration");
                 return GetConfigAllResponses::handle_error(&err);
@@ -101,15 +88,11 @@ impl ConfigApi {
         } else {
             None
         };
-
-        match (general_config, ip_config) {
-            (Some(general_config), Some(ip_config)) => {
-                let config = merge_configs(general_config, ip_config);
-                GetConfigResponses::Ok(Json(config)).into()
-            },
-            (Some(general_config), None) => GetConfigResponses::Ok(Json(general_config)).into(),
-            (None, Some(ip_config)) => GetConfigResponses::Ok(Json(ip_config)).into(),
-            (None, None) => GetConfigResponses::NotFound.into(),
+        if let Some(ip_config) = ip_config {
+            let config = merge_configs(general_config, ip_config);
+            GetConfigResponses::Ok(Json(config)).into()
+        } else {
+            GetConfigResponses::Ok(Json(general_config)).into()
         }
     }
 
@@ -135,7 +118,7 @@ impl ConfigApi {
         Json(json_config): Json<JsonObject>, _auth: InternalApiKeyAuthorization,
     ) -> SetConfigAllResponses {
         if let Some(ip) = ip_address {
-            set(ConfigKey::FrontendForIp(ip.0), json_config.into()).await
+            set(ConfigKey::FrontendForIp(ip.into()), json_config.into()).await
         } else {
             set(ConfigKey::Frontend, json_config.into()).await
         }

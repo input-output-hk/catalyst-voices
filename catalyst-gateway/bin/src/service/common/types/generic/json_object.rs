@@ -1,4 +1,4 @@
-//! `JSON` Object Type.
+//! `JsonObject` Type.
 
 use std::ops::{Deref, DerefMut};
 
