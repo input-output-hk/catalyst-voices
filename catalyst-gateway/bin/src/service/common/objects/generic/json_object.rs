@@ -4,7 +4,7 @@ use poem_openapi::{
     registry::{MetaSchema, MetaSchemaRef},
     types::{Example, ParseError, ParseFromJSON, ParseResult, ToJSON, Type},
 };
-
+ 
 // TODO: remove all usages with the `common::types::generic::json_object::JsonObject`
 /// Represents any JSON object used to interfacing as an API object.
 #[derive(Debug, Clone)]
