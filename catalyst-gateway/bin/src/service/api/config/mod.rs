@@ -2,7 +2,7 @@
 
 use poem::web::RealIp;
 use poem_openapi::{param::Query, payload::Json, types::Example, ApiResponse, NewType, OpenApi};
-use serde_json::Value;
+use serde_json::{Map, Value};
 use tracing::error;
 
 use crate::{
@@ -146,11 +146,11 @@ impl ConfigApi {
 fn merge_configs(general: JsonObject, ip_specific: JsonObject) -> JsonObject {
     let mut merged = general;
 
-    for (key, value) in &*ip_specific {
-        if let Some(existing_value) = merged.get_mut(key) {
-            *existing_value = value.clone();
+    for (key, value) in Map::<String, Value>::from(ip_specific) {
+        if let Some(existing_value) = merged.get_mut(&key) {
+            *existing_value = value;
         } else {
-            merged.insert(key.clone(), value.clone());
+            merged.insert(key, value);
         }
     }
 

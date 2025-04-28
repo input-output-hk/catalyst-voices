@@ -98,3 +98,9 @@ impl From<JsonObject> for Value {
         Value::Object(value.0)
     }
 }
+
+impl From<JsonObject> for Map<String, Value> {
+    fn from(value: JsonObject) -> Self {
+        value.0
+    }
+}
