@@ -256,12 +256,10 @@ scripts:
       melos run test:select --no-select
     description: Run `flutter test` for all packages.
 
-  # TODO(kukkok3):
   # catalyst_voices: this package should contain only widget tests
-  # catalyst_voices_assets: enable when https://github.com/input-output-hk/catalyst-voices/issues/1979 is fixed
   test-web:
     run: |
-      melos exec -c 1 --dir-exists="test" --ignore="catalyst_voices,catalyst_voices_assets" -- flutter test --platform chrome
+      melos exec -c 1 --dir-exists="test" --ignore="catalyst_voices" -- flutter test --platform chrome
     description: Run `flutter test --platform chrome` for all packages.
 
   test-report-web:
