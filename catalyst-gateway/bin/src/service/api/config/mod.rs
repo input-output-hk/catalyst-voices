@@ -14,6 +14,7 @@ use crate::{
         auth::{api_key::InternalApiKeyAuthorization, none_or_rbac::NoneOrRBAC},
         responses::WithErrorResponses,
         tags::ApiTags,
+        types::generic::json_object::JsonObject,
     },
 };
 
@@ -25,7 +26,7 @@ pub(crate) struct ConfigApi;
 enum GetConfigResponses {
     /// Configuration result.
     #[oai(status = 200)]
-    Ok(Json<Value>),
+    Ok(Json<JsonObject>),
 
     /// No frontend config.
     #[oai(status = 404)]
@@ -72,7 +73,10 @@ impl ConfigApi {
         operation_id = "get_config_frontend"
     )]
     async fn get_frontend(&self, ip_address: RealIp, _auth: NoneOrRBAC) -> GetConfigAllResponses {
-        let general_config = match Config::get(ConfigKey::Frontend).await {
+        let general_config: Option<JsonObject> = match Config::get(ConfigKey::Frontend)
+            .await
+            .and_then(TryInto::try_into)
+        {
             Ok(value) => Some(value),
             Err(err) if err.is::<NotFoundError>() => None,
             Err(err) => {
@@ -82,8 +86,11 @@ impl ConfigApi {
         };
 
         // Attempt to fetch the IP configuration
-        let ip_config = if let Some(ip) = ip_address.0 {
-            match Config::get(ConfigKey::FrontendForIp(ip)).await {
+        let ip_config: Option<JsonObject> = if let Some(ip) = ip_address.0 {
+            match Config::get(ConfigKey::FrontendForIp(ip))
+                .await
+                .and_then(TryInto::try_into)
+            {
                 Ok(value) => Some(value),
                 Err(err) if err.is::<NotFoundError>() => None,
                 Err(err) => {
@@ -97,7 +104,7 @@ impl ConfigApi {
 
         match (general_config, ip_config) {
             (Some(general_config), Some(ip_config)) => {
-                let config = merge_configs(&general_config, &ip_config);
+                let config = merge_configs(general_config, ip_config);
                 GetConfigResponses::Ok(Json(config)).into()
             },
             (Some(general_config), None) => GetConfigResponses::Ok(Json(general_config)).into(),
@@ -125,29 +132,25 @@ impl ConfigApi {
         /// *OPTIONAL* The IP Address to set the configuration for.
         #[oai(name = "IP")]
         Query(ip_address): Query<Option<IpAddr>>,
-        Json(json_config): Json<Value>, _auth: InternalApiKeyAuthorization,
+        Json(json_config): Json<JsonObject>, _auth: InternalApiKeyAuthorization,
     ) -> SetConfigAllResponses {
         if let Some(ip) = ip_address {
-            set(ConfigKey::FrontendForIp(ip.0), json_config).await
+            set(ConfigKey::FrontendForIp(ip.0), json_config.into()).await
         } else {
-            set(ConfigKey::Frontend, json_config).await
+            set(ConfigKey::Frontend, json_config.into()).await
         }
     }
 }
 
 /// Helper function to merge two JSON values.
-fn merge_configs(general: &Value, ip_specific: &Value) -> Value {
-    let mut merged = general.clone();
+fn merge_configs(general: JsonObject, ip_specific: JsonObject) -> JsonObject {
+    let mut merged = general;
 
-    if let Some(ip_specific_obj) = ip_specific.as_object() {
-        if let Some(merged_obj) = merged.as_object_mut() {
-            for (key, value) in ip_specific_obj {
-                if let Some(existing_value) = merged_obj.get_mut(key) {
-                    *existing_value = value.clone();
-                } else {
-                    merged_obj.insert(key.clone(), value.clone());
-                }
-            }
+    for (key, value) in &*ip_specific {
+        if let Some(existing_value) = merged.get_mut(key) {
+            *existing_value = value.clone();
+        } else {
+            merged.insert(key.clone(), value.clone());
         }
     }
 
