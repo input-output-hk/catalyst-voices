@@ -90,14 +90,14 @@ def generate_rbac_auth_token(
     bip32_ed25519_sk = BIP32ED25519PrivateKey(sk, chain_code)
     bip32_ed25519_pk = BIP32ED25519PublicKey(pk, chain_code)
 
-    cat_id = generate_cat_id(network, subnet, RoleID.ROLE_0, pk_hex, 0)
-
+    # Concat . before the signature
+    cat_id = f"{generate_cat_id(network, subnet, RoleID.ROLE_0, pk_hex, 0)}."
+   
     signature = bip32_ed25519_sk.sign(cat_id.encode())
     bip32_ed25519_pk.verify(signature, cat_id.encode())
     signature_b64 = base64_url(signature)
 
-    return f"{cat_id}.{signature_b64}"
-
+    return f"{cat_id}{signature_b64}"
 
 def base64_url(data: bytes) -> str:
     # URL safety and no padding base 64
