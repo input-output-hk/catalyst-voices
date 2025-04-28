@@ -17,7 +17,6 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart'
     hide PopupMenuItem;
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ProposalMenuActionButton extends StatefulWidget {
   final DocumentRef ref;
