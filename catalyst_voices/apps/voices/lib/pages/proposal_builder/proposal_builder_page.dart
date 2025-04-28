@@ -12,8 +12,8 @@ import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_segments
 import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_setup_panel.dart';
 import 'package:catalyst_voices/pages/spaces/appbar/session_state_header.dart';
 import 'package:catalyst_voices/pages/workspace/submission_closing_warning_dialog.dart';
+import 'package:catalyst_voices/routes/routes.dart';
 import 'package:catalyst_voices/routes/routing/proposal_builder_route.dart';
-import 'package:catalyst_voices/routes/routing/spaces_route.dart';
 import 'package:catalyst_voices/widgets/modals/comment/submit_comment_error_dialog.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/publish_proposal_error_dialog.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/submit_proposal_error_dialog.dart';
@@ -157,6 +157,8 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
         const WorkspaceRoute().go(context);
       case ProposalSubmissionCloseDate():
         unawaited(_showSubmissionClosingWarningDialog(signal.date));
+      case EmailNotVerifiedProposalBuilderSignal():
+        unawaited(_showEmailNotVerifiedDialog());
     }
   }
 
@@ -251,6 +253,16 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
       context: context,
       exception: error,
     );
+  }
+
+  Future<void> _showEmailNotVerifiedDialog() async {
+    final openAccount = await EmailNotVerifiedDialog.show(context);
+
+    if (openAccount && mounted) {
+      Router.neglect(context, () {
+        unawaited(const AccountRoute().push(context));
+      });
+    }
   }
 
   Future<void> _showPublishException(ProposalBuilderPublishException error) {

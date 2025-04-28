@@ -51,6 +51,8 @@ class _DocumentBuilderSectionTileState
     extends State<DocumentBuilderSectionTile> {
   final _formKey = GlobalKey<FormState>();
 
+  late final WidgetStatesController _statesController;
+
   late model.DocumentProperty _editedSection;
   late model.DocumentPropertyBuilder _builder;
 
@@ -73,7 +75,7 @@ class _DocumentBuilderSectionTileState
 
     return EditableTile(
       title: title,
-      isSelected: widget.isSelected,
+      statesController: _statesController,
       isEditMode: _isEditMode,
       isSaveEnabled: true,
       isEditEnabled: widget.isEditable,
@@ -112,11 +114,26 @@ class _DocumentBuilderSectionTileState
     } else if (oldWidget.section != widget.section) {
       _resetBuilder();
     }
+
+    if (widget.isSelected != oldWidget.isSelected) {
+      _statesController.update(WidgetState.selected, widget.isSelected);
+    }
+  }
+
+  @override
+  void dispose() {
+    _statesController.dispose();
+
+    super.dispose();
   }
 
   @override
   void initState() {
     super.initState();
+
+    _statesController = WidgetStatesController({
+      if (widget.isSelected) WidgetState.selected,
+    });
 
     _editedSection = widget.section;
     _builder = _editedSection.toBuilder();

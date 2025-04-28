@@ -9,19 +9,20 @@ part 'user_dto.g.dart';
 @JsonSerializable(createJsonKeys: true)
 final class AccountDto {
   final String catalystId;
-  final String email;
+  final String? email;
   final String keychainId;
   final Set<AccountRole> roles;
   final String? address;
-  final bool isProvisional;
+  @JsonKey(unknownEnumValue: JsonKey.nullForUndefinedEnumValue)
+  final AccountPublicStatus? publicStatus;
 
   AccountDto({
     required this.catalystId,
-    required this.email,
+    this.email,
     required this.keychainId,
     required this.roles,
     required this.address,
-    this.isProvisional = true,
+    this.publicStatus,
   });
 
   factory AccountDto.fromJson(Map<String, dynamic> json) {
@@ -39,8 +40,16 @@ final class AccountDto {
           keychainId: data.keychain.id,
           roles: data.roles,
           address: data.address?.toBech32(),
-          isProvisional: data.isProvisional,
+          publicStatus: data.publicStatus,
         );
+
+  // As part of migration falling back to unknown if email is not set.
+  AccountPublicStatus get _publicStatus {
+    return publicStatus ??
+        (email != null
+            ? AccountPublicStatus.unknown
+            : AccountPublicStatus.notSetup);
+  }
 
   Map<String, dynamic> toJson() => _$AccountDtoToJson(this);
 
@@ -57,22 +66,13 @@ final class AccountDto {
       keychain: keychain,
       roles: roles,
       address: address != null ? ShelleyAddress.fromBech32(address) : null,
+      publicStatus: _publicStatus,
       isActive: keychainId == activeKeychainId,
-      isProvisional: isProvisional,
     );
   }
 
   static void _jsonMigration(Map<String, dynamic> json) {
-    /// email was added later and some existing accounts
-    /// are already stored without it but we still don't want to make
-    /// those fields optional.
-    void baseProfileMigration() {
-      if (!json.containsKey(_$AccountDtoJsonKeys.email)) {
-        json[_$AccountDtoJsonKeys.email] = 'migrated@iohk.com';
-      }
-    }
-
-    baseProfileMigration();
+    // empty at the moment.
   }
 }
 

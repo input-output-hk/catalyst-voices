@@ -17,7 +17,7 @@ void main() {
         expect(error, isNull);
       });
 
-      test('empty returns error', () {
+      test('empty value is accepted as valid', () {
         // Given
         const value = '';
 
@@ -27,7 +27,7 @@ void main() {
         // Then
         final error = email.error;
 
-        expect(error, isA<OutOfRangeEmailException>());
+        expect(error, isNull);
       });
 
       test('without top level domain returns error', () {
