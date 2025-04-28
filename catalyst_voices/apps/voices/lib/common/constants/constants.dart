@@ -47,6 +47,8 @@ abstract class VoicesConstants {
       'https://docs.projectcatalyst.io/catalyst-tools/catalyst-app/my-account';
   static const insertNewImageDocsUrl =
       'https://docs.projectcatalyst.io/catalyst-tools/catalyst-app/create-and-submit-proposals-in-workspace/using-images';
+  static const joinNewsletterUrl =
+      'https://mpc.projectcatalyst.io/newsletter-signup';
 
   static String cardanoScanStakeAddressUrl(ShelleyAddress stakeAddress) {
     switch (stakeAddress.network) {
