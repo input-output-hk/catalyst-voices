@@ -248,6 +248,9 @@ class VoicesTextFieldDecoration {
   /// [InputDecoration.helperText].
   final String? helperText;
 
+  /// [InputDecoration.helperMaxLines]
+  final int? helperMaxLines;
+
   /// [InputDecoration.hintText].
   final String? hintText;
 
@@ -303,6 +306,7 @@ class VoicesTextFieldDecoration {
     this.labelText,
     this.helper,
     this.helperText,
+    this.helperMaxLines = 2,
     this.hintText,
     this.hintStyle,
     this.errorText,
@@ -544,7 +548,7 @@ class VoicesTextFieldState extends VoicesFormFieldState<String> {
           ? textTheme.bodySmall
           : textTheme.bodySmall!.copyWith(color: colors.textOnPrimaryLevel1),
       hintText: widget.decoration?.hintText,
-      helperMaxLines: 2,
+      helperMaxLines: widget.decoration?.helperMaxLines,
       hintStyle: _getHintStyle(
         textTheme,
         theme,
