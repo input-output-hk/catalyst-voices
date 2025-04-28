@@ -27,7 +27,8 @@ class ProposalBuilderStatusAction extends StatelessWidget {
         return (
           offstage: state.isLoading || state.error != null,
           items: ProposalMenuItemAction.proposalBuilderAvailableOptions(
-            state.metadata.publish,
+            proposalPublish: state.metadata.publish,
+            publishOptions: state.publishOptions,
           )
         );
       },
@@ -151,10 +152,10 @@ class _PopupMenuButtonState extends State<_PopupMenuButton> {
   Future<void> _publishIteration() async {
     final bloc = context.read<ProposalBuilderBloc>();
 
-    if (!await bloc.isAccountEmailVerified()) {
-      bloc.emitSignal(const EmailNotVerifiedProposalBuilderSignal());
-      return;
-    }
+    // if (!await bloc.isAccountEmailVerified()) {
+    //   bloc.emitSignal(const EmailNotVerifiedProposalBuilderSignal());
+    //   return;
+    // }
 
     if (!mounted || bloc.isClosed) {
       return;
@@ -199,10 +200,10 @@ class _PopupMenuButtonState extends State<_PopupMenuButton> {
       return;
     }
 
-    if (!await bloc.isAccountEmailVerified()) {
-      bloc.emitSignal(const EmailNotVerifiedProposalBuilderSignal());
-      return;
-    }
+    // if (!await bloc.isAccountEmailVerified()) {
+    //   bloc.emitSignal(const EmailNotVerifiedProposalBuilderSignal());
+    //   return;
+    // }
 
     if (!mounted || bloc.isClosed) {
       return;
