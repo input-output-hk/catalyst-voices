@@ -2,6 +2,7 @@ import pytest
 from api.v1 import config_frontend
 
 
+# TODO: missing test case with putting frontend config to the specific IP address
 def test_config_frontend():
     exp_config = {"some": "thing"}
     resp = config_frontend.put(exp_config)
