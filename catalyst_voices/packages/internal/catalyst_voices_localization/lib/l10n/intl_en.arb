@@ -2636,5 +2636,13 @@
   "invalidSeedPhraseWord": "Invalid",
   "@invalidSeedPhraseWord": {
     "description": "Error shown when user inputs SeedPhrase word but invalid does not match any"
+  },
+  "deleteLocalVersionIfWantToPublishThisVersion": "If you want to publish this iteration as final, please delete the local draft.",
+  "@deleteLocalVersionIfWantToPublishThisVersion": {
+    "description": "Message shown when user tries to publish a draft proposal as final proposal but there is a newer local draft proposal."
+  },
+  "cantEditThisProposal": "Can't edit this proposal",
+  "@cantEditThisProposal": {
+    "description": "Message shown when user tries to edit a proposal that should not be editable."
   }
 }
