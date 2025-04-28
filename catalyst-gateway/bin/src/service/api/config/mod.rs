@@ -28,7 +28,7 @@ enum GetConfigResponses {
     #[oai(status = 200)]
     Ok(Json<JsonObject>),
 
-    /// No frontend config.
+    /// No frontend config defined.
     #[oai(status = 404)]
     NotFound,
 }
