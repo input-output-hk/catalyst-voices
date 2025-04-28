@@ -4,7 +4,6 @@ import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 class AccountReSendVerificationButton extends StatelessWidget {
   const AccountReSendVerificationButton({super.key});
