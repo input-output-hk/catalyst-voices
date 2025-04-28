@@ -45,15 +45,14 @@ services:
       - CASSANDRA_PERSISTENT_URL=localhost:9042
       - CASSANDRA_VOLATILE_URL=localhost:9042
       - CAT_ADDRESS=0.0.0.0:3030
-      - CHAIN_NETWORK="Preprod"
+      - CHAIN_NETWORK=Preprod
       - SIGNED_DOC_SK=0x6455585b5dcc565c8975bc136e215d6d4dd96540620f37783c564da3cb3686dd
       - LOG_LEVEL=error
       - RUST_LOG="error,cat_gateway=debug,cardano_chain_follower=debug,mithril-client=debug"
       - DATA_REFRESH_TICK=5
       - CHECK_CONFIG_TICK=5
-      - CHAIN_FOLLOWER_SYNC_TASKS="16"
-      - MACHINE_ID="UID"
-      - INTERNAL_API_KEY="123"
+      - MACHINE_ID=UID
+      - INTERNAL_API_KEY=123
       - RBAC_OFF=true
     ports:
       - 3030:3030
