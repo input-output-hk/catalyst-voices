@@ -35,9 +35,10 @@ def test_persistent_ada_amount_endpoint(snapshot, rbac_chain_factory):
         ), f"Cannot find assets for stake_address: {stake_address}"
         assets = resp.json()
         if assets["persistent"]["ada_amount"] != expected_amount:
+            stake_pk = entry["stake_public_key"]
             logger.error(
-                f"Not expected ada amount for stake_address: {stake_address}, {entry["stake_public_key"]}"
+                f"Not expected ada amount for stake_address: {stake_address}, {stake_pk}"
             )
         # assert (
         #     assets["persistent"]["ada_amount"] == expected_amount
-        # ), f"Not expected ada amount for stake_address: {stake_address}, {entry["stake_public_key"]}"
+        # ), f"Not expected ada amount for stake_address: {stake_address}, {stake_pk}"
