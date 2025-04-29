@@ -200,7 +200,7 @@ class _RightSide extends StatelessWidget with LaunchUrlMixin {
         _HeadsUpInfo(context.l10n.proposalsLimitReachedPoint2(maxSubmissions)),
         _HeadsUpInfo(context.l10n.proposalsLimitReachedPoint3),
         _HeadsUpInfo(context.l10n.proposalsLimitReachedPoint4),
-        const SizedBox(height: 24),
+        const SizedBox(height: 32),
         // TODO(dtscalac): add the learn more link explaining
         // the proposal submission limit
         VoicesLearnMoreFilledButton(
