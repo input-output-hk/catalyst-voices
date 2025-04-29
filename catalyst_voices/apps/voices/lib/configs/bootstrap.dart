@@ -6,7 +6,6 @@ import 'package:catalyst_voices/app/view/app_splash_screen_manager.dart';
 import 'package:catalyst_voices/configs/app_bloc_observer.dart';
 import 'package:catalyst_voices/configs/sentry_service.dart';
 import 'package:catalyst_voices/dependency/dependencies.dart';
-import 'package:catalyst_voices/routes/guards/milestone_guard.dart';
 import 'package:catalyst_voices/routes/routes.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
@@ -84,9 +83,6 @@ GoRouter buildAppRouter({
 }) {
   return AppRouter.init(
     initialLocation: initialLocation,
-    guards: const [
-      MilestoneGuard(),
-    ],
   );
 }
 
