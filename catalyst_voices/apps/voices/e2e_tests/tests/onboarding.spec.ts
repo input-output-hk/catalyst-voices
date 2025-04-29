@@ -1,6 +1,6 @@
 import { WalletListPanel } from "../pageobject/onboarding/create-flow/step-16-wallet-list";
 import { WalletDetectionPanel } from "../pageobject/onboarding/create-flow/step-18-wallet-detection";
-import { OnboardingBasePage } from "../pageobject/onboarding/onboarding-base-page";
+import { OnboardingCommon } from "../pageobject/onboarding/onboardingCommon";
 import { UnlockPasswordSuccessPanel } from "../pageobject/onboarding/restore-flow/step-8-unlock-password-success-panel";
 import { test } from "../test-fixtures";
 import { walletConfigs } from "../utils/walletConfigs";
@@ -23,6 +23,7 @@ test(
 
     // await new WalletListPage(page).clickEnableWallet(walletConfig.extension.Name);
     await page.goto("http://localhost:55338/m4/discovery");
+    await OnboardingManager.createKeychain(accountModel);
     await new WalletListPanel(page).goto("test1234");
     const [walletPopup] = await Promise.all([
       browser.waitForEvent("page"),

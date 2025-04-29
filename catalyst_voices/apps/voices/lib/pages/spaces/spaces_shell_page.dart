@@ -13,7 +13,6 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 class SpacesShellPage extends StatefulWidget {
   static final Map<Space, ShortcutActivator> _spacesShortcutsActivators = {

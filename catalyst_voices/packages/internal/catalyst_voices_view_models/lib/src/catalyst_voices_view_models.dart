@@ -30,6 +30,8 @@ export 'proposal/proposal_view_header.dart';
 export 'proposal/proposal_view_metadata.dart';
 export 'proposal/proposal_view_model.dart';
 export 'proposal_builder/exception/proposal_builder_exception.dart';
+export 'proposal_builder/proposal_builder_menu_item_data.dart';
+export 'proposal_builder/proposal_menu_item_action_enum.dart';
 export 'proposal_comments/proposal_comments_segment.dart';
 export 'proposal_comments/proposal_comments_sort.dart';
 export 'proposals/proposals_category_filter.dart';

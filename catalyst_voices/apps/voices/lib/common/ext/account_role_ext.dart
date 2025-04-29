@@ -4,12 +4,39 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 
 extension AccountRoleExt on AccountRole {
+  SvgGenImage get icon {
+    return switch (this) {
+      AccountRole.voter => VoicesAssets.images.roleVoter,
+      AccountRole.drep => VoicesAssets.images.roleDrep,
+      AccountRole.proposer => VoicesAssets.images.roleProposer,
+    };
+  }
+
+  SvgGenImage get smallIcon {
+    return switch (this) {
+      AccountRole.voter => VoicesAssets.icons.vote,
+      AccountRole.drep => VoicesAssets.icons.documentText,
+      AccountRole.proposer => VoicesAssets.icons.badgeCheck,
+    };
+  }
+
+  String getDescription(BuildContext context) {
+    switch (this) {
+      case AccountRole.voter:
+        return context.l10n.contributorDescription;
+      case AccountRole.proposer:
+        return context.l10n.proposerDescription;
+      case AccountRole.drep:
+        return context.l10n.drepDescription;
+    }
+  }
+
   String getName(
     BuildContext context, {
     bool addDefaultState = false,
   }) {
     var name = switch (this) {
-      AccountRole.voter => context.l10n.voter,
+      AccountRole.voter => context.l10n.contributor,
       AccountRole.proposer => context.l10n.proposer,
       AccountRole.drep => context.l10n.drep,
     };
@@ -21,36 +48,12 @@ extension AccountRoleExt on AccountRole {
     return name;
   }
 
-  String getVerboseName(BuildContext context) {
-    switch (this) {
-      case AccountRole.voter:
-        return context.l10n.voterVerboseName;
-      case AccountRole.proposer:
-        return context.l10n.proposerVerboseName;
-      case AccountRole.drep:
-        return context.l10n.drepVerboseName;
-    }
-  }
-
-  String getDescription(BuildContext context) {
-    switch (this) {
-      case AccountRole.voter:
-        return context.l10n.voterDescription;
-      case AccountRole.proposer:
-        return context.l10n.proposerDescription;
-      case AccountRole.drep:
-        return context.l10n.drepDescription;
-    }
-  }
-
   List<String> getSummary(BuildContext context) {
     switch (this) {
       case AccountRole.voter:
         return [
-          context.l10n.voterSummarySelectFavorites,
-          context.l10n.voterSummaryComment,
-          context.l10n.voterSummaryCastVotes,
-          context.l10n.voterSummaryVoterRewards,
+          context.l10n.contributorSummarySelectFavorites,
+          context.l10n.contributorSummaryComment,
         ];
       case AccountRole.proposer:
         return [
@@ -69,19 +72,14 @@ extension AccountRoleExt on AccountRole {
     }
   }
 
-  SvgGenImage get icon {
-    return switch (this) {
-      AccountRole.voter => VoicesAssets.images.roleVoter,
-      AccountRole.drep => VoicesAssets.images.roleDrep,
-      AccountRole.proposer => VoicesAssets.images.roleProposer,
-    };
-  }
-
-  SvgGenImage get smallIcon {
-    return switch (this) {
-      AccountRole.voter => VoicesAssets.icons.vote,
-      AccountRole.drep => VoicesAssets.icons.documentText,
-      AccountRole.proposer => VoicesAssets.icons.badgeCheck,
-    };
+  String getVerboseName(BuildContext context) {
+    switch (this) {
+      case AccountRole.voter:
+        return context.l10n.contributorVerboseName;
+      case AccountRole.proposer:
+        return context.l10n.proposerVerboseName;
+      case AccountRole.drep:
+        return context.l10n.drepVerboseName;
+    }
   }
 }

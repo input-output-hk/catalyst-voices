@@ -1,6 +1,6 @@
 import { Locator, Page } from "@playwright/test";
 import intlEn from "../localization-util";
-import { OnboardingBasePage } from "../onboarding-base-page";
+import { OnboardingBasePage } from "../onboardingCommon";
 import { UnlockPasswordInfoPanel } from "./step-6-unlock-password-info-panel";
 
 export class UnlockPasswordInputPanel {

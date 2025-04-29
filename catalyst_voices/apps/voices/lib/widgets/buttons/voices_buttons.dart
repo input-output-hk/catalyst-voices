@@ -255,17 +255,22 @@ class ShareButton extends StatelessWidget {
 
 class VoicesBackButton extends StatelessWidget {
   final VoidCallback? onTap;
+  final String? semanticsIdentifier;
 
   const VoicesBackButton({
     super.key,
     this.onTap,
+    this.semanticsIdentifier,
   });
 
   @override
   Widget build(BuildContext context) {
     return VoicesOutlinedButton(
       onTap: onTap,
-      child: Text(context.l10n.back),
+      child: Semantics(
+        identifier: semanticsIdentifier ?? 'BackButton',
+        child: Text(context.l10n.back),
+      ),
     );
   }
 }
@@ -356,17 +361,18 @@ class VoicesLearnMoreButton extends StatelessWidget {
 
 class VoicesNextButton extends StatelessWidget {
   final VoidCallback? onTap;
+  final String? semanticsIdentifier;
 
-  const VoicesNextButton({
-    super.key,
-    this.onTap,
-  });
+  const VoicesNextButton({super.key, this.onTap, this.semanticsIdentifier});
 
   @override
   Widget build(BuildContext context) {
     return VoicesFilledButton(
       onTap: onTap,
-      child: Text(context.l10n.next),
+      child: Semantics(
+        identifier: semanticsIdentifier ?? 'NextButton',
+        child: Text(context.l10n.next),
+      ),
     );
   }
 }

@@ -7,6 +7,14 @@ final class DeletedProposalBuilderSignal extends ProposalBuilderSignal {
   List<Object?> get props => [];
 }
 
+final class EmailNotVerifiedProposalBuilderSignal
+    extends ProposalBuilderSignal {
+  const EmailNotVerifiedProposalBuilderSignal();
+
+  @override
+  List<Object?> get props => [];
+}
+
 sealed class ProposalBuilderSignal extends Equatable {
   const ProposalBuilderSignal();
 }

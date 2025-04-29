@@ -1,5 +1,5 @@
 import { Page } from "@playwright/test";
-import { OnboardingBasePage } from "../onboarding-base-page";
+import { OnboardingBasePage } from "../onboardingCommon";
 import { WriteDownSeedPhraseInfoPanel } from "./step-9-writedown-seedphrase-info";
 
 export class InputSeedPhrasePanel {

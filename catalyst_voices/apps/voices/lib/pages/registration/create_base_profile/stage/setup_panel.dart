@@ -38,22 +38,25 @@ class _DisplayNameTextField extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
 
-    return VoicesUsernameTextField(
-      key: const Key('DisplayNameTextField'),
-      initialText: displayName.value,
-      onChanged: (value) {
-        RegistrationCubit.of(context)
-            .baseProfile
-            .updateUsername(Username.dirty(value ?? ''));
-      },
-      onFieldSubmitted: null,
-      decoration: VoicesTextFieldDecoration(
-        labelText: l10n.createBaseProfileSetupDisplayNameLabel.starred(),
-        hintText: l10n.createBaseProfileSetupDisplayNameHint,
-        helperText: l10n.createBaseProfileSetupDisplayNameHelper,
-        errorText: displayName.displayError?.message(context),
+    return Semantics(
+      identifier: 'DisplayNameTextField',
+      child: VoicesUsernameTextField(
+        key: const Key('DisplayNameTextField'),
+        initialText: displayName.value,
+        onChanged: (value) {
+          RegistrationCubit.of(context)
+              .baseProfile
+              .updateUsername(Username.dirty(value ?? ''));
+        },
+        onFieldSubmitted: null,
+        decoration: VoicesTextFieldDecoration(
+          labelText: l10n.createBaseProfileSetupDisplayNameLabel.starred(),
+          hintText: l10n.createBaseProfileSetupDisplayNameHint,
+          helperText: l10n.createBaseProfileSetupDisplayNameHelper,
+          errorText: displayName.displayError?.message(context),
+        ),
+        maxLength: Username.lengthRange.max,
       ),
-      maxLength: Username.lengthRange.max,
     );
   }
 }
@@ -81,32 +84,39 @@ class _EmailTextField extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
 
-    return VoicesEmailTextField(
-      key: const Key('EmailTextField'),
-      initialText: email.value,
-      onChanged: (value) {
-        RegistrationCubit.of(context)
-            .baseProfile
-            .updateEmail(Email.dirty(value ?? ''));
-      },
-      onFieldSubmitted: (value) {
-        final email = Email.dirty(value);
-        final cubit = RegistrationCubit.of(context);
+    return Semantics(
+      identifier: 'EmailTextField',
+      child: VoicesEmailTextField(
+        key: const Key('EmailTextField'),
+        initialText: email.value,
+        onChanged: (value) {
+          RegistrationCubit.of(context)
+              .baseProfile
+              .updateEmail(Email.dirty(value ?? ''));
+        },
+        onFieldSubmitted: (value) {
+          final email = Email.dirty(value);
+          final cubit = RegistrationCubit.of(context);
 
-        cubit.baseProfile.updateEmail(email);
+          cubit.baseProfile.updateEmail(email);
 
-        if (cubit.state.baseProfileStateData.isBaseProfileDataValid) {
-          cubit.nextStep();
-        }
-      },
-      textInputAction: TextInputAction.done,
-      decoration: VoicesTextFieldDecoration(
-        labelText: l10n.createBaseProfileSetupEmailLabel.starred(),
-        hintText: l10n.createBaseProfileSetupEmailHint,
-        helperText: l10n.createBaseProfileSetupEmailHelper,
-        errorText: email.displayError?.message(context),
+          if (cubit.state.baseProfileStateData.isBaseProfileDataValid) {
+            cubit.nextStep();
+          }
+        },
+        textInputAction: TextInputAction.done,
+        decoration: VoicesTextFieldDecoration(
+          labelText: l10n.createBaseProfileSetupEmailLabel.withSuffix(
+            l10n.optional,
+            space: true,
+            brackets: true,
+          ),
+          hintText: l10n.createBaseProfileSetupEmailHint,
+          helperText: l10n.createBaseProfileSetupEmailHelper,
+          errorText: email.displayError?.message(context),
+        ),
+        maxLength: Email.lengthRange.max,
       ),
-      maxLength: Email.lengthRange.max,
     );
   }
 }

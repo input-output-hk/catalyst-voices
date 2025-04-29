@@ -1,5 +1,6 @@
 import { Locator, Page } from "@playwright/test";
 import { GetStartedPanel } from "../step-1-get-started";
+import { OnboardingCommon } from "../onboardingCommon";
 
 export class BaseProfileInfoPanel {
   page: Page;
@@ -7,7 +8,9 @@ export class BaseProfileInfoPanel {
 
   constructor(page: Page) {
     this.page = page;
-    this.createYourBaseProfileBtn = page.getByTestId('CreateBaseProfileNextButton');
+    this.createYourBaseProfileBtn = page.getByTestId(
+      "CreateBaseProfileNextButton"
+    );
   }
 
   async goto() {

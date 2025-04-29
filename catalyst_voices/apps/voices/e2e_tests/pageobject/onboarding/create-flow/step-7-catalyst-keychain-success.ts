@@ -1,5 +1,5 @@
 import { Page } from "@playwright/test";
-import { OnboardingBasePage } from "../onboarding-base-page";
+import { OnboardingCommon } from "../onboardingCommon";
 import { CatalystKeychainInfoPanel } from "./step-6-catalyst-keychain-info";
 
 export class CatalystKeychainSuccessPanel {
@@ -17,6 +17,6 @@ export class CatalystKeychainSuccessPanel {
   }
 
   async clickNextButton() {
-    await new OnboardingBasePage(this.page).nextButton.click();
+    await new (this.page).nextButton.click();
   }
 }

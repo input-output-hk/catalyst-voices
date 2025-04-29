@@ -1,7 +1,6 @@
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ProposalLoading extends StatelessWidget {
   const ProposalLoading({super.key});

@@ -14,14 +14,14 @@ sealed class AccountSubmitData {
 final class AccountSubmitFullData extends AccountSubmitData {
   final Keychain keychain;
   final String username;
-  final String email;
+  final String? email;
   final Set<AccountRole> roles;
 
   const AccountSubmitFullData({
     required super.metadata,
     required this.keychain,
     required this.username,
-    required this.email,
+    this.email,
     required this.roles,
   });
 }

@@ -1,5 +1,5 @@
 import { Locator, Page } from "@playwright/test";
-import { OnboardingBasePage } from "../onboarding-base-page";
+import { OnboardingBasePage } from "../onboardingCommon";
 import { CatalystKeychainSuccessPanel } from "./step-7-catalyst-keychain-success";
 
 export class WriteDownSeedPhrasePanel {
