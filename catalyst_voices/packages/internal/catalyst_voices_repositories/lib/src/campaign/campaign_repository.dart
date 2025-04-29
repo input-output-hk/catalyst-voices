@@ -2,8 +2,7 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 
 // ignore: one_member_abstracts
 abstract interface class CampaignRepository {
-  const factory CampaignRepository(
-  ) = CampaignRepositoryImpl;
+  const factory CampaignRepository() = CampaignRepositoryImpl;
 
   Future<CampaignBase> getCampaign({
     required String id,
@@ -19,9 +18,7 @@ abstract interface class CampaignRepository {
 }
 
 final class CampaignRepositoryImpl implements CampaignRepository {
-
-  const CampaignRepositoryImpl(
-  );
+  const CampaignRepositoryImpl();
 
   @override
   Future<CampaignBase> getCampaign({
