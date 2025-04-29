@@ -106,25 +106,14 @@ enum ProposalMenuItemAction {
     );
   }
 
-  static List<ProposalMenuItemAction> proposalBuilderAvailableOptions({
-    required ProposalPublish proposalPublish,
-  }) {
+  static List<ProposalMenuItemAction> proposalBuilderAvailableOptions(
+    ProposalPublish proposalPublish,
+  ) {
     switch (proposalPublish) {
       case ProposalPublish.localDraft:
-        return [
-          view,
-          publish,
-          submit,
-          export,
-          delete,
-        ];
+        return [view, publish, submit, export, delete];
       case ProposalPublish.publishedDraft:
-        return [
-          view,
-          submit,
-          forget,
-          export,
-        ];
+        return [view, submit, forget, export];
       case ProposalPublish.submittedProposal:
         // Submitted can't be open in editor
         return [];
