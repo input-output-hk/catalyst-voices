@@ -67,7 +67,7 @@ def set_config(env: str):
     settings = load_json_file(settings_path)
     print(f"Loaded settings:\n{settings}")
 
-    # extracting settings.json attributes
+    # extract settings.json attributes
     url = extract_attribute(settings, "url")
     api_key = extract_attribute(settings, "api_key")
     headers = {"X-API-Key": api_key}
