@@ -5,14 +5,13 @@ import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/common/ext/space_ext.dart';
 import 'package:catalyst_voices/routes/routing/routing.dart';
 import 'package:catalyst_voices/widgets/campaign_timeline/campaign_timeline_card.dart';
-import 'package:catalyst_voices/widgets/modals/proposals/proposal_limit_reached_dialog.dart';
+import 'package:catalyst_voices/widgets/modals/proposals/create_new_proposal_dialog.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart'
     show ProposalDocument, Space;
-import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
