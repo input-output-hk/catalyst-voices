@@ -103,26 +103,6 @@ class _BlocOnDeviceKeychains extends StatelessWidget {
   }
 }
 
-class _OnDeviceKeychains extends StatelessWidget {
-  final bool foundKeychain;
-  final VoidCallback onUnlockTap;
-
-  const _OnDeviceKeychains({
-    this.foundKeychain = false,
-    required this.onUnlockTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return DefaultTextStyle(
-      style: TextStyle(color: Theme.of(context).colors.textOnPrimaryLevel1),
-      child: foundKeychain
-          ? _KeychainFoundIndicator(onUnlockTap: onUnlockTap)
-          : const _KeychainNotFoundIndicator(),
-    );
-  }
-}
-
 class _KeychainFoundIndicator extends StatelessWidget {
   final VoidCallback onUnlockTap;
 
@@ -166,17 +146,37 @@ class _KeychainNotFoundIndicator extends StatelessWidget {
   }
 }
 
+class _OnDeviceKeychains extends StatelessWidget {
+  final bool foundKeychain;
+  final VoidCallback onUnlockTap;
+
+  const _OnDeviceKeychains({
+    this.foundKeychain = false,
+    required this.onUnlockTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return DefaultTextStyle(
+      style: TextStyle(color: Theme.of(context).colors.textOnPrimaryLevel1),
+      child: foundKeychain
+          ? _KeychainFoundIndicator(onUnlockTap: onUnlockTap)
+          : const _KeychainNotFoundIndicator(),
+    );
+  }
+}
+
 extension _RegistrationRecoverMethodExt on RegistrationRecoverMethod {
   SvgGenImage get _icon => switch (this) {
         RegistrationRecoverMethod.seedPhrase => VoicesAssets.icons.colorSwatch,
       };
 
+  String? _getSubtitle(VoicesLocalizations l10n) => switch (this) {
+        RegistrationRecoverMethod.seedPhrase => null,
+      };
+
   String _getTitle(VoicesLocalizations l10n) => switch (this) {
         RegistrationRecoverMethod.seedPhrase =>
           l10n.recoverWithSeedPhrase12Words,
-      };
-
-  String? _getSubtitle(VoicesLocalizations l10n) => switch (this) {
-        RegistrationRecoverMethod.seedPhrase => null,
       };
 }
