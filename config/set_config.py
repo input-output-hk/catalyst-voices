@@ -21,7 +21,7 @@ import os
 import glob
 import time
 import requests
-import re
+import ipaddress
 
 
 # helpers
@@ -47,13 +47,17 @@ def deep_merge(a: dict, b: dict) -> dict:
 
 def parse_ip_config_file(path: str) -> tuple[str, dict]:
     filename = os.path.basename(path)
-    match = re.match(r"ip_(\d{1,3}(?:\.\d{1,3}){3})\.config\.json", filename)
-    if not match:
+    if not filename.startswith("ip_") or not filename.endswith(".config.json"):
         raise ValueError(f"Invalid IP config filename: {filename}")
 
-    ip = match.group(1)
+    ip_part = filename[len("ip_") : -len(".config.json")]
 
-    return ip, load_json_file(path)
+    try:
+        ipaddress.ip_address(ip_part)
+    except ValueError:
+        raise ValueError(f"Invalid IP address in filename: {ip_part}")
+
+    return ip_part, load_json_file(path)
 
 
 # main action
@@ -71,6 +75,11 @@ def set_config(env: str):
     settings = load_json_file(settings_path)
     print(f"Loaded settings:\n{settings}")
 
+    # extracting settings.json attributes
+    method = settings["method"] if "method" in settings else "put"
+    url = settings["url"]
+    headers = settings["headers"] if "headers" in settings else {}
+
     # load and apply config.json
     config_path = os.path.join(env_dir, "config.json")
     if not os.path.isfile(config_path):
@@ -79,6 +88,7 @@ def set_config(env: str):
     print(f"Applying default config:\n{config}")
 
     # find and apply any ip-specific configs
+    ip_configs = {}
     ip_config_paths = glob.glob(os.path.join(env_dir, "ip_*.config.json"))
     for ip_config_path in ip_config_paths:
         ip, ip_config = parse_ip_config_file(ip_config_path)
@@ -86,9 +96,11 @@ def set_config(env: str):
             f"Applying IP-specific config from {os.path.basename(ip_config_path)}:\n{ip_config}"
         )
 
+        ip_configs[ip] = ip_config
+
         payload = deep_merge(config, ip_config)
 
-        requests.put(f"https://{ip}/api/draft/config/frontend", json=payload)
+    requests[method](f"{url}", json=payload, headers=headers)
 
 
 # args parser
