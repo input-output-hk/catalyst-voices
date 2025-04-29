@@ -179,13 +179,7 @@ final class CoseSign extends Equatable {
       payload: CborBytes(payload),
     );
 
-    return Uint8List.fromList(
-      cbor.encode(
-        CborBytes(
-          cbor.encode(sigStructure),
-        ),
-      ),
-    );
+    return Uint8List.fromList(cbor.encode(sigStructure));
   }
 
   static CborList _createCoseSignSigStructure({

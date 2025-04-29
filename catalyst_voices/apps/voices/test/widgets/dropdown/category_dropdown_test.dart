@@ -10,12 +10,12 @@ void main() {
   final items = [
     const DropdownMenuViewModel(
       name: 'Item 1',
-      value: SignedDocumentRef(id: 'value1'),
+      value: ProposalsRefCategoryFilter(ref: SignedDocumentRef(id: 'value1')),
       isSelected: false,
     ),
     const DropdownMenuViewModel(
       name: 'Item 2',
-      value: SignedDocumentRef(id: 'value2'),
+      value: ProposalsRefCategoryFilter(ref: SignedDocumentRef(id: 'value2')),
       isSelected: true,
     ),
   ];
@@ -34,7 +34,7 @@ void main() {
               popupMenuButtonKey: popupMenuButtonKey,
               highlightColor: Colors.blue,
               onSelected: (value) {
-                selectedValue = value;
+                selectedValue = value.ref;
               },
               child: const Text('Dropdown'),
             ),

@@ -11,7 +11,6 @@ import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:result_type/result_type.dart';
 
 final _logger = Logger('RegistrationCubit');
@@ -387,7 +386,7 @@ final class RegistrationCubit extends Cubit<RegistrationState>
       metadata: metadata,
       keychain: keychain,
       username: username,
-      email: email,
+      email: email.isNotEmpty ? email : null,
       roles: roles,
     );
   }

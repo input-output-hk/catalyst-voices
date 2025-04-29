@@ -2,7 +2,6 @@ import 'package:catalyst_voices/pages/workspace/user_proposals/user_proposals.da
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 typedef UserProposalsSelectorState = ({bool show, List<Proposal> proposals});
 
