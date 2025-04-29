@@ -72,6 +72,8 @@ def set_config(env: str):
     config = load_json_file(config_path)
     print(f"Applying default config:\n{config}")
 
+    requests.put(f"{url}", json=config, headers=headers)
+
     # find and apply any ip-specific configs
     ip_config_paths = glob.glob(os.path.join(env_dir, "ip_*.config.json"))
     for ip_config_path in ip_config_paths:
@@ -81,8 +83,6 @@ def set_config(env: str):
         )
 
         requests.put(f"{url}?IP={ip}", json=ip_config, headers=headers)
-
-    requests.put(f"{url}", json=config, headers=headers)
 
 
 # args parser
