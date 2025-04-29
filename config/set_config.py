@@ -30,21 +30,6 @@ def load_json_file(filepath: str):
         return json.load(f)
 
 
-def deep_merge(a: dict, b: dict) -> dict:
-    result = a.copy()
-    for key, value in b.items():
-        if key in result:
-            if isinstance(result[key], dict) and isinstance(value, dict):
-                result[key] = deep_merge(result[key], value)
-            elif isinstance(result[key], list) and isinstance(value, list):
-                result[key] = result[key] + value
-            else:
-                result[key] = value
-        else:
-            result[key] = value
-    return result
-
-
 def parse_ip_config_file(path: str) -> tuple[str, dict]:
     filename = os.path.basename(path)
     if not filename.startswith("ip_") or not filename.endswith(".config.json"):
@@ -76,9 +61,12 @@ def set_config(env: str):
     print(f"Loaded settings:\n{settings}")
 
     # extracting settings.json attributes
-    method = settings["method"] if "method" in settings else "put"
     url = settings["url"]
-    headers = settings["headers"] if "headers" in settings else {}
+    api_key = settings["api_key"]
+    headers = {
+        "X-API-Key": api_key,
+        "Content-Type": "application/json"
+    }
 
     # load and apply config.json
     config_path = os.path.join(env_dir, "config.json")
@@ -88,7 +76,6 @@ def set_config(env: str):
     print(f"Applying default config:\n{config}")
 
     # find and apply any ip-specific configs
-    ip_configs = {}
     ip_config_paths = glob.glob(os.path.join(env_dir, "ip_*.config.json"))
     for ip_config_path in ip_config_paths:
         ip, ip_config = parse_ip_config_file(ip_config_path)
@@ -96,11 +83,9 @@ def set_config(env: str):
             f"Applying IP-specific config from {os.path.basename(ip_config_path)}:\n{ip_config}"
         )
 
-        ip_configs[ip] = ip_config
+        requests.put(f"{url}?IP={ip}", json=ip_config, headers=headers)
 
-        payload = deep_merge(config, ip_config)
-
-    requests[method](f"{url}", json=payload, headers=headers)
+    requests.put(f"{url}", json=config, headers=headers)
 
 
 # args parser
