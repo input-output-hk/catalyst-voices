@@ -273,7 +273,8 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
   }
 
   Future<void> _showProposalLimitReachedDialog(
-      MaxProposalsLimitReachedSignal signal,) {
+    MaxProposalsLimitReachedSignal signal,
+  ) {
     return ProposalLimitReachedDialog.show(
       context: context,
       currentSubmissions: signal.currentSubmissions,
