@@ -196,7 +196,7 @@ class _PopupMenuButtonState extends State<_PopupMenuButton> {
     final bloc = context.read<ProposalBuilderBloc>();
 
     if (bloc.state.isMaxProposalsLimitReached) {
-      bloc.add(MaxProposalsLimitReachedEvent());
+      bloc.add(const MaxProposalsLimitReachedEvent());
       return;
     }
 
