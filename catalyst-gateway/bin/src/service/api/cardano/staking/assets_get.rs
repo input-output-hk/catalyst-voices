@@ -143,24 +143,24 @@ async fn build_full_stake_info_response(
 /// between lookups.
 async fn calculate_assets_state(
     session: Arc<CassandraSession>, stake_address: Cip19StakeAddress, slot_num: SlotNo,
-    txo_base_state: TxoAssetsState,
+    mut txo_base_state: TxoAssetsState,
 ) -> anyhow::Result<TxoAssetsState> {
     let address: StakeAddress = stake_address.try_into()?;
 
-    let (txos, txo_assets) = futures::try_join!(
+    let (mut txos, txo_assets) = futures::try_join!(
         get_txo(&session, &address, slot_num),
         get_txo_assets(&session, &address, slot_num)
     )?;
 
+    let params = update_spent(&session, &address, &mut txo_base_state.txos, &mut txos).await?;
+
     // Extend the base state with current session data (used to calculate volatile data)
-    let mut txos = txo_base_state.txos.into_iter().chain(txos).collect();
+    let txos = txo_base_state.txos.into_iter().chain(txos).collect();
     let txo_assets: HashMap<_, _> = txo_base_state
         .txo_assets
         .into_iter()
         .chain(txo_assets)
         .collect();
-
-    let params = update_spent(&session, &address, &mut txos).await?;
 
     // Sets TXOs as spent in the database in the background.
     tokio::spawn(async move {
@@ -251,11 +251,17 @@ async fn get_txo_assets(
 }
 
 /// Checks if the given TXOs were spent and mark then as such.
+/// Separating `base_txos` and `txos` because we dont want to make an update inside the db
+/// for the `base_txos` data (it is covering the case when inside the persistent part we
+/// have a txo which is spent inside the volatile, so to not incorrectly mix up records
+/// from these two tables, inserting some rows from persistent to volatile section).
 async fn update_spent(
-    session: &CassandraSession, stake_address: &StakeAddress, txos: &mut TxoMap,
+    session: &CassandraSession, stake_address: &StakeAddress, base_txos: &mut TxoMap,
+    txos: &mut TxoMap,
 ) -> anyhow::Result<Vec<UpdateTxoSpentQueryParams>> {
     let txn_hashes = txos
         .iter()
+        .chain(base_txos.iter())
         .filter(|(_, txo)| txo.spent_slot_no.is_none())
         .map(|((tx_id, _), _)| *tx_id)
         .collect::<HashSet<_>>()
@@ -282,6 +288,9 @@ async fn update_spent(
                     spent_slot: row.slot_no,
                 });
 
+                txo_info.spent_slot_no = Some(row.slot_no.into());
+            }
+            if let Some(txo_info) = base_txos.get_mut(&key) {
                 txo_info.spent_slot_no = Some(row.slot_no.into());
             }
         }
