@@ -2,7 +2,6 @@ import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 class CategoryDetailCubit extends Cubit<CategoryDetailState> {
   final CampaignService _campaignService;
