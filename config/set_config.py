@@ -45,6 +45,13 @@ def parse_ip_config_file(path: str) -> tuple[str, dict]:
     return ip_part, load_json_file(path)
 
 
+def extract_attribute(obj: str, field_name: str):
+    if field_name in obj:
+        return obj[field_name]
+    else:
+        raise KeyError(f"Missing required key: '{field_name}'")
+
+
 # main action
 def set_config(env: str):
     repo_root = os.path.dirname(os.path.abspath(__file__))
@@ -61,8 +68,8 @@ def set_config(env: str):
     print(f"Loaded settings:\n{settings}")
 
     # extracting settings.json attributes
-    url = settings["url"]
-    api_key = settings["api_key"]
+    url = extract_attribute(settings, "url")
+    api_key = extract_attribute(settings, "api_key")
     headers = {"X-API-Key": api_key}
 
     # load and apply config.json
@@ -72,7 +79,8 @@ def set_config(env: str):
     config = load_json_file(config_path)
     print(f"Applying default config:\n{config}")
 
-    requests.put(f"{url}", json=config, headers=headers)
+    resp = requests.put(url, json=config, headers=headers)
+    resp.raise_for_status()
 
     # find and apply any ip-specific configs
     ip_config_paths = glob.glob(os.path.join(env_dir, "ip_*.config.json"))
@@ -82,7 +90,8 @@ def set_config(env: str):
             f"Applying IP-specific config from {os.path.basename(ip_config_path)}:\n{ip_config}"
         )
 
-        requests.put(f"{url}?IP={ip}", json=ip_config, headers=headers)
+        resp = requests.put(f"{url}?IP={ip}", json=ip_config, headers=headers)
+        resp.raise_for_status()
 
 
 # args parser
