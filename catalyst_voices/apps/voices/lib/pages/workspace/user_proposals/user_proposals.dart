@@ -54,24 +54,21 @@ class _UserProposalsState extends State<UserProposals> {
             items: _submitted,
             emptyTextMessage: context.l10n.noFinalUserProposals,
             title: context.l10n.submittedForReview(_submitted.length, 5),
-            // TODO(LynxLynxx): update when we get info from designers
-            info: 'Info',
+            info: context.l10n.submittedForReviewInfoMarkdown,
             learnMoreUrl: VoicesConstants.proposalPublishingDocsUrl,
           ),
           UserProposalSection(
             items: _draft,
             emptyTextMessage: context.l10n.noDraftUserProposals,
             title: context.l10n.sharedForPublicInProgress,
-            // TODO(LynxLynxx): update when we get info from designers
-            info: 'Info',
+            info: context.l10n.sharedForPublicInfoMarkdown,
             learnMoreUrl: VoicesConstants.proposalPublishingDocsUrl,
           ),
           UserProposalSection(
             items: _local,
             emptyTextMessage: context.l10n.noLocalUserProposals,
             title: context.l10n.notPublished,
-            // TODO(LynxLynxx): update when we get info from designers
-            info: 'Info',
+            info: context.l10n.notPublishedInfoMarkdown,
             learnMoreUrl: VoicesConstants.proposalPublishingDocsUrl,
           ),
         ],

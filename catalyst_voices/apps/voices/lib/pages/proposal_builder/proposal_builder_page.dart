@@ -28,7 +28,6 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 class ProposalBuilderPage extends StatefulWidget {
@@ -272,23 +271,22 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
     );
   }
 
-  Future<void> _showSubmissionClosingWarningDialog([
-    DateTime? submissionCloseDate,
-  ]) async {
+  Future<void> _showSubmissionClosingWarningDialog(
+    DateTime submissionCloseDate,
+  ) async {
     final canShow = context
         .read<SessionCubit>()
         .state
         .settings
         .showSubmissionClosingWarning;
 
-    if (submissionCloseDate == null || !canShow || !mounted) {
-      return;
+    if (canShow) {
+      await SubmissionClosingWarningDialog.showNDaysBefore(
+        context: context,
+        submissionCloseAt: submissionCloseDate,
+        dontShowAgain: _dontShowCampaignSubmissionClosingDialog,
+      );
     }
-    await SubmissionClosingWarningDialog.showNDaysBefore(
-      context: context,
-      submissionCloseAt: submissionCloseDate,
-      dontShowAgain: _dontShowCampaignSubmissionClosingDialog,
-    );
   }
 
   Future<void> _showSubmitException(ProposalBuilderSubmitException error) {

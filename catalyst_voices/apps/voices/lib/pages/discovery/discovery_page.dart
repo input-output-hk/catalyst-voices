@@ -9,7 +9,6 @@ import 'package:catalyst_voices/pages/discovery/state_selectors/current_campaign
 import 'package:catalyst_voices/pages/discovery/state_selectors/most_recent_proposals_selector.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 class DiscoveryPage extends StatefulWidget {
   const DiscoveryPage({super.key});

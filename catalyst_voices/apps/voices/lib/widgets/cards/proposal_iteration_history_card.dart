@@ -12,7 +12,6 @@ import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ProposalIterationHistory extends StatefulWidget {
   final Proposal proposal;
@@ -154,14 +153,6 @@ class _IterationVersionList extends StatelessWidget {
 class _ProposalIterationHistoryState extends State<ProposalIterationHistory> {
   bool _isExpanded = false;
 
-  bool get _hasNewerLocalIteration {
-    if (widget.proposal.versions.isEmpty) return false;
-    final latestVersion = widget.proposal.versions.first;
-    return latestVersion.isLatestVersion(
-      widget.proposal.selfRef.version ?? '',
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -186,7 +177,7 @@ class _ProposalIterationHistoryState extends State<ProposalIterationHistory> {
                   else
                     VoicesAssets.icons.chevronRight.buildIcon(size: 18),
                   const SizedBox(width: 4),
-                  if (_hasNewerLocalIteration)
+                  if (widget.proposal.hasNewerLocalIteration)
                     _Title(
                       publish: widget.proposal.versions.first.publish,
                       title: widget.proposal.versions.first.title,
@@ -210,7 +201,7 @@ class _ProposalIterationHistoryState extends State<ProposalIterationHistory> {
                     ),
                   const Spacer(),
                   Offstage(
-                    offstage: !_hasNewerLocalIteration,
+                    offstage: !widget.proposal.hasNewerLocalIteration,
                     child: _Actions(
                       ref: widget.proposal.versions.first.selfRef,
                     ),

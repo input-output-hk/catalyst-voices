@@ -20,7 +20,7 @@ sealed class ProposalBuilderSignal extends Equatable {
 }
 
 final class ProposalSubmissionCloseDate extends ProposalBuilderSignal {
-  final DateTime? date;
+  final DateTime date;
 
   const ProposalSubmissionCloseDate({required this.date});
 

@@ -14,7 +14,6 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart'
     show ProposalDocument, Space;
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 part 'create_proposal_button.dart';
 part 'import_proposal_button.dart';
