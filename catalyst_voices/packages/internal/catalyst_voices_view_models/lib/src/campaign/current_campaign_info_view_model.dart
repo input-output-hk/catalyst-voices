@@ -7,8 +7,8 @@ import 'package:equatable/equatable.dart';
 class CurrentCampaignInfoViewModel extends Equatable {
   final String title;
   final String description;
-  final double allFunds;
-  final double totalAsk;
+  final Coin allFunds;
+  final Coin totalAsk;
   final List<CampaignTimelineViewModel> timeline;
   final ComparableRange<Coin> askRange;
 
@@ -26,8 +26,8 @@ class CurrentCampaignInfoViewModel extends Equatable {
       title: 'Catalyst Fund14',
       // Description is used in dialog detail campaign
       description: '',
-      allFunds: 50000000,
-      totalAsk: 4020000,
+      allFunds: Coin.fromWholeAda(50000000),
+      totalAsk: Coin.fromWholeAda(4020000),
       askRange: ComparableRange(
         min: Coin.fromWholeAda(30000),
         max: Coin.fromWholeAda(150000),
@@ -60,8 +60,8 @@ class NullCurrentCampaignInfoViewModel extends CurrentCampaignInfoViewModel {
   const NullCurrentCampaignInfoViewModel({
     super.title = '',
     super.description = '',
-    super.allFunds = 50000000,
-    super.totalAsk = 4020000,
+    super.allFunds = const Coin.fromWholeAda(50000000),
+    super.totalAsk = const Coin.fromWholeAda(4020000),
     super.askRange = const ComparableRange(
       min: Coin.fromWholeAda(30000),
       max: Coin.fromWholeAda(150000),

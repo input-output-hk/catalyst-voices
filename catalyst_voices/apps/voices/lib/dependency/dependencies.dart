@@ -197,11 +197,7 @@ final class Dependencies extends DependencyProvider {
           get<SignedDocumentManager>(),
         );
       })
-      ..registerLazySingleton<CampaignRepository>(() {
-        return CampaignRepository(
-          get<ProposalRepository>(),
-        );
-      })
+      ..registerLazySingleton<CampaignRepository>(CampaignRepository.new)
       ..registerLazySingleton<ConfigRepository>(ConfigRepository.new)
       ..registerLazySingleton<DocumentRepository>(() {
         return DocumentRepository(
@@ -292,7 +288,7 @@ final class Dependencies extends DependencyProvider {
     registerLazySingleton<CampaignService>(() {
       return CampaignService(
         get<CampaignRepository>(),
-        get<DocumentRepository>(),
+        get<ProposalRepository>(),
       );
     });
     registerLazySingleton<ProposalService>(() {

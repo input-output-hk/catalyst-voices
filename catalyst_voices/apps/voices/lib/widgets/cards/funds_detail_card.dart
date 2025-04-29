@@ -1,16 +1,14 @@
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
-import 'package:catalyst_voices/common/formatters/amount_formatter.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
-import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 class FundsDetailCard extends StatelessWidget {
-  final double allFunds;
-  final double totalAsk;
+  final Coin allFunds;
+  final Coin totalAsk;
   final ComparableRange<Coin> askRange;
   final FundsDetailCardType type;
 
@@ -98,7 +96,7 @@ enum FundsDetailCardType {
 class _CampaignFundsDetail extends StatelessWidget {
   final String title;
   final String description;
-  final double funds;
+  final Coin funds;
   final bool largeFundsText;
 
   const _CampaignFundsDetail({
@@ -109,7 +107,7 @@ class _CampaignFundsDetail extends StatelessWidget {
     this.largeFundsText = true,
   });
 
-  String get _formattedFunds => AmountFormatter.decimalFormat(funds);
+  String get _formattedFunds => CryptocurrencyFormatter.decimalFormat(funds);
 
   @override
   Widget build(BuildContext context) {
@@ -138,7 +136,7 @@ class _CampaignFundsDetail extends StatelessWidget {
         const SizedBox(height: 16),
         Text(
           key: const Key('Funds'),
-          '${const Currency.ada().symbol} $_formattedFunds',
+          _formattedFunds,
           style: _foundsTextStyle(context)?.copyWith(
             color: context.colors.textOnPrimaryLevel1,
           ),

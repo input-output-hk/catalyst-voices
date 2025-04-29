@@ -7,8 +7,8 @@ final class CurrentCampaign extends Equatable {
   final String id;
   final String name;
   final String description;
-  final double allFunds;
-  final double totalAsk;
+  final Coin allFunds;
+  final Coin totalAsk;
   final ComparableRange<Coin> askRange;
   final List<CampaignTimeline> timeline;
 
@@ -37,8 +37,8 @@ final class CurrentCampaign extends Equatable {
     String? id,
     String? name,
     String? description,
-    double? allFunds,
-    double? totalAsk,
+    Coin? allFunds,
+    Coin? totalAsk,
     ComparableRange<Coin>? askRange,
     List<CampaignTimeline>? timeline,
   }) {
@@ -60,8 +60,8 @@ extension CurrentCampaignX on CurrentCampaign {
     name: 'Catalyst Fund14',
     description: '''
 Project Catalyst turns economic power into innovation power by using the Cardano Treasury to incentivize and fund community-approved ideas.''',
-    allFunds: 50000000,
-    totalAsk: 4020000,
+    allFunds: const Coin.fromWholeAda(50000000),
+    totalAsk: const Coin.fromWholeAda(4020000),
     askRange: const ComparableRange(
       min: Coin.fromWholeAda(30000),
       max: Coin.fromWholeAda(150000),
