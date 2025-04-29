@@ -1,9 +1,7 @@
 //! Configuration query
 
-use jsonschema::BasicOutput;
 use key::ConfigKey;
 use serde_json::Value;
-use tracing::error;
 
 use crate::db::event::EventDB;
 
@@ -27,20 +25,10 @@ impl Config {
     /// - Error if the query fails.
     pub(crate) async fn get(id: ConfigKey) -> anyhow::Result<Value> {
         let (id1, id2, id3) = id.to_id();
-        let rows = EventDB::query(GET_CONFIG, &[&id1, &id2, &id3]).await?;
+        let row = EventDB::query_one(GET_CONFIG, &[&id1, &id2, &id3]).await?;
 
-        if let Some(row) = rows.first() {
-            let value: Value = row.get(0);
-            match id.validate(&value) {
-                BasicOutput::Valid(_) => return Ok(value),
-                BasicOutput::Invalid(errors) => {
-                    // This should not happen, expecting the schema to be valid
-                    error!(id=%id, error=?errors, "Get Config, schema validation failed, defaulting.");
-                },
-            }
-        }
-        // Return the default config value as a fallback
-        Ok(id.default())
+        let value = row.get(0);
+        Ok(value)
     }
 
     /// Set the configuration for the given `ConfigKey`.
@@ -49,16 +37,9 @@ impl Config {
     ///
     /// - A `BasicOutput` of the validation result, which can be valid or invalid.
     /// - Error if the query fails.
-    pub(crate) async fn set(id: ConfigKey, value: Value) -> anyhow::Result<BasicOutput<'static>> {
-        let validate = id.validate(&value);
-        // Validate schema failed, return immediately with JSON schema error
-        if !validate.is_valid() {
-            return Ok(validate);
-        }
-
+    pub(crate) async fn set(id: ConfigKey, value: Value) -> anyhow::Result<()> {
         let (id1, id2, id3) = id.to_id();
         EventDB::query(UPSERT_CONFIG, &[&id1, &id2, &id3, &value]).await?;
-
-        Ok(validate)
+        Ok(())
     }
 }
