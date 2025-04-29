@@ -5,7 +5,6 @@ import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 
 class RecoverMethodPanel extends StatelessWidget {
@@ -22,52 +21,42 @@ class RecoverMethodPanel extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         const SizedBox(height: 24),
-        Text(
-          key: const Key('RecoverKeychainMethodsTitle'),
-          context.l10n.recoverKeychainMethodsTitle,
-          style: theme.textTheme.titleMedium?.copyWith(color: colorLvl1),
-        ),
-        const SizedBox(height: 12),
-        _BlocOnDeviceKeychains(onUnlockTap: _unlockKeychain),
-        const SizedBox(height: 12),
-        Text(
-          key: const Key('RecoverKeychainMethodsSubtitle'),
-          context.l10n.recoverKeychainMethodsSubtitle,
-          style: theme.textTheme.bodyMedium?.copyWith(color: colorLvl1),
-        ),
-        const SizedBox(height: 32),
-        Text(
-          key: const Key('RecoverKeychainMethodsListTitle'),
-          context.l10n.recoverKeychainMethodsListTitle,
-          style: theme.textTheme.titleSmall?.copyWith(color: colorLvl0),
-        ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: RegistrationRecoverMethod.values
-                .map<Widget>(
-                  (method) {
-                    return RegistrationTile(
-                      key: ValueKey(method),
-                      icon: method._icon,
-                      title: method._getTitle(context.l10n),
-                      subtitle: method._getSubtitle(context.l10n),
-                      onTap: () {
-                        switch (method) {
-                          case RegistrationRecoverMethod.seedPhrase:
-                            RegistrationCubit.of(context)
-                                .recoverWithSeedPhrase();
-                        }
-                      },
-                    );
-                  },
-                )
-                .separatedBy(const SizedBox(height: 12))
-                .toList(),
+        Expanded(
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(
+                  key: const Key('RecoverKeychainMethodsTitle'),
+                  context.l10n.recoverKeychainMethodsTitle,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    color: colorLvl1,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                _BlocOnDeviceKeychains(onUnlockTap: _unlockKeychain),
+                const SizedBox(height: 12),
+                Text(
+                  key: const Key('RecoverKeychainMethodsSubtitle'),
+                  context.l10n.recoverKeychainMethodsSubtitle,
+                  style: theme.textTheme.bodyMedium?.copyWith(color: colorLvl1),
+                ),
+                const SizedBox(height: 32),
+                Text(
+                  key: const Key('RecoverKeychainMethodsListTitle'),
+                  context.l10n.recoverKeychainMethodsListTitle,
+                  style: theme.textTheme.titleSmall?.copyWith(color: colorLvl0),
+                ),
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+                  child: _RecoverMethodsColumn(),
+                ),
+              ],
+            ),
           ),
         ),
-        const Spacer(),
+        const SizedBox(height: 12),
         VoicesBackButton(
           key: const Key('BackButton'),
           onTap: () => RegistrationCubit.of(context).previousStep(),
@@ -163,6 +152,39 @@ class _OnDeviceKeychains extends StatelessWidget {
           ? _KeychainFoundIndicator(onUnlockTap: onUnlockTap)
           : const _KeychainNotFoundIndicator(),
     );
+  }
+}
+
+class _RecoverMethodsColumn extends StatelessWidget {
+  const _RecoverMethodsColumn();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      spacing: 12,
+      children: RegistrationRecoverMethod.values.map<Widget>(
+        (method) {
+          return RegistrationTile(
+            key: ValueKey(method),
+            icon: method._icon,
+            title: method._getTitle(context.l10n),
+            subtitle: method._getSubtitle(context.l10n),
+            onTap: () => _onMethodTap(context, method: method),
+          );
+        },
+      ).toList(),
+    );
+  }
+
+  void _onMethodTap(
+    BuildContext context, {
+    required RegistrationRecoverMethod method,
+  }) {
+    switch (method) {
+      case RegistrationRecoverMethod.seedPhrase:
+        RegistrationCubit.of(context).recoverWithSeedPhrase();
+    }
   }
 }
 
