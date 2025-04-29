@@ -6,7 +6,7 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 /// just to proposals.
 abstract interface class ProposalDocumentDataLocalSource {
   /// Used to retrieve all proposals. Offers way to filter proposals by passing
-  /// category ref and action.
+  /// category ref and proposal filter type.
   ///
   /// If [categoryRef] is null then all proposals are returned.
   Future<List<ProposalDocumentData>> getProposals({
