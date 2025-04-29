@@ -130,6 +130,24 @@ class ProposalIterationStageChip extends StatelessWidget {
   }
 }
 
+class ProposalPublishChip extends StatelessWidget {
+  final ProposalPublish proposalPublish;
+
+  const ProposalPublishChip({
+    super.key,
+    required this.proposalPublish,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return switch (proposalPublish) {
+      ProposalPublish.localDraft => const PrivateProposalChip(),
+      ProposalPublish.publishedDraft => const DraftProposalChip(),
+      ProposalPublish.submittedProposal => const FinalProposalChip(),
+    };
+  }
+}
+
 class ProposalVersionChip extends StatelessWidget {
   final String version;
   final bool useInternalBackground;

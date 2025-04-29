@@ -11,7 +11,7 @@ import 'package:equatable/equatable.dart';
 ///
 /// [DocumentData] can be created from [SignedDocument] which comes from
 /// backend or locally as work in progress.
-final class DocumentData extends Equatable {
+final class DocumentData extends Equatable implements Comparable<DocumentData> {
   final DocumentDataMetadata metadata;
   final DocumentDataContent content;
 
@@ -28,6 +28,11 @@ final class DocumentData extends Equatable {
 
   /// Syntax sugar. Should use [DocumentDataMetadata.selfRef].
   DocumentRef get ref => metadata.selfRef;
+
+  @override
+  int compareTo(DocumentData other) {
+    return metadata.selfRef.compareTo(other.metadata.selfRef);
+  }
 
   /// Update document data with a new [ref].
   DocumentData copyWithSelfRef({required DocumentRef selfRef}) {

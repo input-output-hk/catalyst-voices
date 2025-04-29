@@ -5,8 +5,12 @@ import 'package:catalyst_voices_repositories/src/common/response_mapper.dart';
 import 'package:catalyst_voices_repositories/src/document/document_data_factory.dart';
 import 'package:catalyst_voices_repositories/src/dto/api/document_index_list_dto.dart';
 import 'package:catalyst_voices_repositories/src/dto/api/document_index_query_filters_dto.dart';
+import 'package:flutter/foundation.dart';
 
 final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
+  @visibleForTesting
+  static const indexPageSize = 200;
+
   final ApiServices _api;
   final SignedDocumentManager _signedDocumentManager;
 
@@ -61,7 +65,7 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
     final allRefs = <SignedDocumentRef>{};
 
     var page = 0;
-    const maxPerPage = 100;
+    const maxPerPage = indexPageSize;
     var remaining = 0;
 
     do {

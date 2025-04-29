@@ -5,12 +5,12 @@ import 'package:catalyst_voices_repositories/src/database/dao/proposals_dao.dart
 import 'package:catalyst_voices_repositories/src/database/table/documents_metadata.dart';
 import 'package:catalyst_voices_repositories/src/dto/proposal/proposal_submission_action_dto.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
-import 'package:drift/drift.dart';
-import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:uuid_plus/uuid_plus.dart';
 
 import '../../utils/test_factories.dart';
+import '../connection/test_connection.dart';
+import '../drift_test_platforms.dart';
 
 void main() {
   late DriftCatalystDatabase database;
@@ -20,9 +20,9 @@ void main() {
     DummyCatalystIdFactory.registerDummyKeyFactory();
   });
 
-  setUp(() {
-    final inMemory = DatabaseConnection(NativeDatabase.memory());
-    database = DriftCatalystDatabase(inMemory);
+  setUp(() async {
+    final connection = await buildTestConnection();
+    database = DriftCatalystDatabase(connection);
   });
 
   tearDown(() async {
@@ -30,858 +30,940 @@ void main() {
   });
 
   group(DriftProposalsDao, () {
-    group('watchCount', () {
-      test(
+    group(
+      'watchCount',
+      () {
+        test(
           'returns correct total number of '
-          'proposals for empty filters', () async {
-        // Given
-        final proposals = [
-          _buildProposal(),
-          _buildProposal(),
-        ];
-        const filters = ProposalsCountFilters();
+          'proposals for empty filters',
+          () async {
+            // Given
+            final proposals = [
+              _buildProposal(),
+              _buildProposal(),
+            ];
+            const filters = ProposalsCountFilters();
 
-        // When
-        await database.documentsDao.saveAll(proposals);
+            // When
+            await database.documentsDao.saveAll(proposals);
 
-        // Then
-        final count = await database.proposalsDao
-            .watchCount(
-              filters: filters,
-            )
-            .first;
+            // Then
+            final count = await database.proposalsDao
+                .watchCount(
+                  filters: filters,
+                )
+                .first;
 
-        expect(count.total, proposals.length);
-      });
+            expect(count.total, proposals.length);
+          },
+          onPlatform: driftOnPlatforms,
+        );
 
-      test(
+        test(
           'when two versions of same proposal '
-          'exists there are counted as one', () async {
-        // Given
-        final ref = SignedDocumentRef.generateFirstRef();
-        final proposals = [
-          _buildProposal(selfRef: ref),
-          _buildProposal(selfRef: ref.nextVersion().toSignedDocumentRef()),
-        ];
-        const filters = ProposalsCountFilters();
+          'exists there are counted as one',
+          () async {
+            // Given
+            final ref = SignedDocumentRef.generateFirstRef();
+            final proposals = [
+              _buildProposal(selfRef: ref),
+              _buildProposal(selfRef: ref.nextVersion().toSignedDocumentRef()),
+            ];
+            const filters = ProposalsCountFilters();
 
-        // When
-        await database.documentsDao.saveAll(proposals);
+            // When
+            await database.documentsDao.saveAll(proposals);
 
-        // Then
-        final count = await database.proposalsDao
-            .watchCount(
-              filters: filters,
-            )
-            .first;
+            // Then
+            final count = await database.proposalsDao
+                .watchCount(
+                  filters: filters,
+                )
+                .first;
 
-        expect(count.total, 1);
-      });
+            expect(count.total, 1);
+          },
+          onPlatform: driftOnPlatforms,
+        );
 
-      test('returns one final proposal if final submission is found', () async {
-        // Given
-        final ref = SignedDocumentRef.generateFirstRef();
-        final proposals = [
-          _buildProposal(selfRef: ref),
-          _buildProposal(),
-        ];
-        final actions = [
-          _buildProposalAction(
-            action: ProposalSubmissionActionDto.aFinal,
-            proposalRef: ref,
-          ),
-        ];
-        const filters = ProposalsCountFilters();
+        test(
+          'returns one final proposal if final submission is found',
+          () async {
+            // Given
+            final ref = SignedDocumentRef.generateFirstRef();
+            final proposals = [
+              _buildProposal(selfRef: ref),
+              _buildProposal(),
+            ];
+            final actions = [
+              _buildProposalAction(
+                action: ProposalSubmissionActionDto.aFinal,
+                proposalRef: ref,
+              ),
+            ];
+            const filters = ProposalsCountFilters();
 
-        // When
-        await database.documentsDao.saveAll([...proposals, ...actions]);
+            // When
+            await database.documentsDao.saveAll([...proposals, ...actions]);
 
-        // Then
-        final count = await database.proposalsDao
-            .watchCount(
-              filters: filters,
-            )
-            .first;
+            // Then
+            final count = await database.proposalsDao
+                .watchCount(
+                  filters: filters,
+                )
+                .first;
 
-        expect(count.finals, 1);
-      });
+            expect(count.finals, 1);
+          },
+          onPlatform: driftOnPlatforms,
+        );
 
-      test(
+        test(
           'returns one final proposal when final submission is '
-          'latest action but old draft action exists', () async {
-        // Given
-        final ref = SignedDocumentRef.generateFirstRef();
-        final proposals = [
-          _buildProposal(selfRef: ref),
-        ];
-        final actions = [
-          _buildProposalAction(
-            selfRef: _buildRefAt(DateTime(2025, 04, 1)),
-            action: ProposalSubmissionActionDto.aFinal,
-            proposalRef: ref,
-          ),
-          _buildProposalAction(
-            selfRef: _buildRefAt(DateTime(2025, 04, 2)),
-            action: ProposalSubmissionActionDto.draft,
-            proposalRef: ref,
-          ),
-          _buildProposalAction(
-            selfRef: _buildRefAt(DateTime(2025, 04, 8)),
-            action: ProposalSubmissionActionDto.aFinal,
-            proposalRef: ref,
-          ),
-        ];
-        const filters = ProposalsCountFilters();
+          'latest action but old draft action exists',
+          () async {
+            // Given
+            final ref = SignedDocumentRef.generateFirstRef();
+            final proposals = [
+              _buildProposal(selfRef: ref),
+            ];
+            final actions = [
+              _buildProposalAction(
+                selfRef: _buildRefAt(DateTime(2025, 04, 1)),
+                action: ProposalSubmissionActionDto.aFinal,
+                proposalRef: ref,
+              ),
+              _buildProposalAction(
+                selfRef: _buildRefAt(DateTime(2025, 04, 2)),
+                action: ProposalSubmissionActionDto.draft,
+                proposalRef: ref,
+              ),
+              _buildProposalAction(
+                selfRef: _buildRefAt(DateTime(2025, 04, 8)),
+                action: ProposalSubmissionActionDto.aFinal,
+                proposalRef: ref,
+              ),
+            ];
+            const filters = ProposalsCountFilters();
 
-        // When
-        await database.documentsDao.saveAll([...proposals, ...actions]);
+            // When
+            await database.documentsDao.saveAll([...proposals, ...actions]);
 
-        // Then
-        final count = await database.proposalsDao
-            .watchCount(
-              filters: filters,
-            )
-            .first;
+            // Then
+            final count = await database.proposalsDao
+                .watchCount(
+                  filters: filters,
+                )
+                .first;
 
-        expect(count.finals, 1);
-      });
+            expect(count.finals, 1);
+          },
+          onPlatform: driftOnPlatforms,
+        );
 
-      test(
+        test(
           'returns zero final proposal if latest '
-          'submission is draft', () async {
-        // Given
-        final ref = SignedDocumentRef.generateFirstRef();
-        final proposals = [
-          _buildProposal(selfRef: ref),
-        ];
-        final actions = [
-          _buildProposalAction(
-            selfRef: _buildRefAt(DateTime(2025, 04, 7)),
-            action: ProposalSubmissionActionDto.aFinal,
-            proposalRef: ref,
-          ),
-          _buildProposalAction(
-            selfRef: _buildRefAt(DateTime(2025, 04, 8)),
-            action: ProposalSubmissionActionDto.draft,
-            proposalRef: ref,
-          ),
-        ];
-        const filters = ProposalsCountFilters();
+          'submission is draft',
+          () async {
+            // Given
+            final ref = SignedDocumentRef.generateFirstRef();
+            final proposals = [
+              _buildProposal(selfRef: ref),
+            ];
+            final actions = [
+              _buildProposalAction(
+                selfRef: _buildRefAt(DateTime(2025, 04, 7)),
+                action: ProposalSubmissionActionDto.aFinal,
+                proposalRef: ref,
+              ),
+              _buildProposalAction(
+                selfRef: _buildRefAt(DateTime(2025, 04, 8)),
+                action: ProposalSubmissionActionDto.draft,
+                proposalRef: ref,
+              ),
+            ];
+            const filters = ProposalsCountFilters();
 
-        // When
-        await database.documentsDao.saveAll([...proposals, ...actions]);
+            // When
+            await database.documentsDao.saveAll([...proposals, ...actions]);
 
-        // Then
-        final count = await database.proposalsDao
-            .watchCount(
-              filters: filters,
-            )
-            .first;
+            // Then
+            final count = await database.proposalsDao
+                .watchCount(
+                  filters: filters,
+                )
+                .first;
 
-        expect(count.finals, 0);
-      });
+            expect(count.finals, 0);
+          },
+          onPlatform: driftOnPlatforms,
+        );
 
-      test(
+        test(
           'returns two final proposal when each have '
-          'complex action history', () async {
-        // Given
-        final proposalOneRef = SignedDocumentRef.generateFirstRef();
-        final proposalTwoRef = SignedDocumentRef.generateFirstRef();
-        final proposals = [
-          _buildProposal(selfRef: proposalOneRef),
-          _buildProposal(selfRef: proposalTwoRef),
-        ];
-        final actions = [
-          _buildProposalAction(
-            selfRef: _buildRefAt(DateTime(2025, 04, 1)),
-            action: ProposalSubmissionActionDto.draft,
-            proposalRef: proposalOneRef,
-          ),
-          _buildProposalAction(
-            selfRef: _buildRefAt(DateTime(2025, 04, 2)),
-            action: ProposalSubmissionActionDto.aFinal,
-            proposalRef: proposalOneRef,
-          ),
-          _buildProposalAction(
-            selfRef: _buildRefAt(DateTime(2025, 04, 7)),
-            action: ProposalSubmissionActionDto.hide,
-            proposalRef: proposalTwoRef,
-          ),
-          _buildProposalAction(
-            selfRef: _buildRefAt(DateTime(2025, 04, 8)),
-            action: ProposalSubmissionActionDto.aFinal,
-            proposalRef: proposalTwoRef,
-          ),
-        ];
-        const filters = ProposalsCountFilters();
+          'complex action history',
+          () async {
+            // Given
+            final proposalOneRef = SignedDocumentRef.generateFirstRef();
+            final proposalTwoRef = SignedDocumentRef.generateFirstRef();
+            final proposals = [
+              _buildProposal(selfRef: proposalOneRef),
+              _buildProposal(selfRef: proposalTwoRef),
+            ];
+            final actions = [
+              _buildProposalAction(
+                selfRef: _buildRefAt(DateTime(2025, 04, 1)),
+                action: ProposalSubmissionActionDto.draft,
+                proposalRef: proposalOneRef,
+              ),
+              _buildProposalAction(
+                selfRef: _buildRefAt(DateTime(2025, 04, 2)),
+                action: ProposalSubmissionActionDto.aFinal,
+                proposalRef: proposalOneRef,
+              ),
+              _buildProposalAction(
+                selfRef: _buildRefAt(DateTime(2025, 04, 7)),
+                action: ProposalSubmissionActionDto.hide,
+                proposalRef: proposalTwoRef,
+              ),
+              _buildProposalAction(
+                selfRef: _buildRefAt(DateTime(2025, 04, 8)),
+                action: ProposalSubmissionActionDto.aFinal,
+                proposalRef: proposalTwoRef,
+              ),
+            ];
+            const filters = ProposalsCountFilters();
 
-        // When
-        await database.documentsDao.saveAll([...proposals, ...actions]);
+            // When
+            await database.documentsDao.saveAll([...proposals, ...actions]);
 
-        // Then
-        final count = await database.proposalsDao
-            .watchCount(
-              filters: filters,
-            )
-            .first;
+            // Then
+            final count = await database.proposalsDao
+                .watchCount(
+                  filters: filters,
+                )
+                .first;
 
-        expect(count.finals, 2);
-      });
-
-      test('returns calculated drafts and finals count', () async {
-        // Given
-        final proposalOneRef = SignedDocumentRef.generateFirstRef();
-        final proposalTwoRef = SignedDocumentRef.generateFirstRef();
-        final proposals = [
-          _buildProposal(selfRef: proposalOneRef),
-          _buildProposal(selfRef: proposalTwoRef),
-        ];
-        final actions = [
-          _buildProposalAction(
-            action: ProposalSubmissionActionDto.aFinal,
-            proposalRef: proposalOneRef,
-          ),
-          _buildProposalAction(
-            action: ProposalSubmissionActionDto.draft,
-            proposalRef: proposalTwoRef,
-          ),
-        ];
-        const filters = ProposalsCountFilters();
-
-        // When
-        await database.documentsDao.saveAll([...proposals, ...actions]);
-
-        // Then
-        final count = await database.proposalsDao
-            .watchCount(
-              filters: filters,
-            )
-            .first;
-
-        expect(count.total, 2);
-        expect(count.drafts, 1);
-        expect(count.finals, 1);
-      });
-
-      test('returns correct favorites count', () async {
-        // Given
-        final proposalOneRef = SignedDocumentRef.generateFirstRef();
-        final proposalTwoRef = SignedDocumentRef.generateFirstRef();
-        final proposals = [
-          _buildProposal(selfRef: proposalOneRef),
-          _buildProposal(selfRef: proposalTwoRef),
-        ];
-        final favorites = [
-          _buildProposalFavorite(proposalRef: proposalOneRef),
-        ];
-
-        const filters = ProposalsCountFilters();
-
-        // When
-        await database.documentsDao.saveAll(proposals);
-        for (final fav in favorites) {
-          await database.favoritesDao.save(fav);
-        }
-
-        // Then
-        final count = await database.proposalsDao
-            .watchCount(
-              filters: filters,
-            )
-            .first;
-
-        expect(count.total, 2);
-        expect(count.favorites, 1);
-      });
-
-      test('returns correct my count base on author', () async {
-        // Given
-        final userId = DummyCatalystIdFactory.create(username: 'damian');
-        final proposalOneRef = SignedDocumentRef.generateFirstRef();
-        final proposalTwoRef = SignedDocumentRef.generateFirstRef();
-        final proposals = [
-          _buildProposal(selfRef: proposalOneRef),
-          _buildProposal(selfRef: proposalTwoRef, author: userId),
-        ];
-
-        final filters = ProposalsCountFilters(author: userId);
-
-        // When
-        await database.documentsDao.saveAll(proposals);
-
-        // Then
-        final count = await database.proposalsDao
-            .watchCount(
-              filters: filters,
-            )
-            .first;
-
-        expect(count.total, 2);
-        expect(count.my, 1);
-      });
-
-      test('returns correct count when only author filter is on', () async {
-        // Given
-        final userId = DummyCatalystIdFactory.create(username: 'damian');
-        final proposalOneRef = SignedDocumentRef.generateFirstRef();
-        final proposalTwoRef = SignedDocumentRef.generateFirstRef();
-        final proposals = [
-          _buildProposal(selfRef: proposalOneRef),
-          _buildProposal(selfRef: proposalTwoRef, author: userId),
-        ];
-        final favorites = [
-          _buildProposalFavorite(proposalRef: proposalOneRef),
-        ];
-        final actions = [
-          _buildProposalAction(
-            action: ProposalSubmissionActionDto.aFinal,
-            proposalRef: proposalTwoRef,
-          ),
-        ];
-
-        final filters = ProposalsCountFilters(
-          author: userId,
-          onlyAuthor: true,
-        );
-        const expectedCount = ProposalsCount(
-          total: 1,
-          drafts: 0,
-          finals: 1,
-          favorites: 0,
-          my: 1,
+            expect(count.finals, 2);
+          },
+          onPlatform: driftOnPlatforms,
         );
 
-        // When
-        await database.documentsDao.saveAll([...proposals, ...actions]);
+        test(
+          'returns calculated drafts and finals count',
+          () async {
+            // Given
+            final proposalOneRef = SignedDocumentRef.generateFirstRef();
+            final proposalTwoRef = SignedDocumentRef.generateFirstRef();
+            final proposals = [
+              _buildProposal(selfRef: proposalOneRef),
+              _buildProposal(selfRef: proposalTwoRef),
+            ];
+            final actions = [
+              _buildProposalAction(
+                action: ProposalSubmissionActionDto.aFinal,
+                proposalRef: proposalOneRef,
+              ),
+              _buildProposalAction(
+                action: ProposalSubmissionActionDto.draft,
+                proposalRef: proposalTwoRef,
+              ),
+            ];
+            const filters = ProposalsCountFilters();
 
-        for (final fav in favorites) {
-          await database.favoritesDao.save(fav);
-        }
+            // When
+            await database.documentsDao.saveAll([...proposals, ...actions]);
 
-        // Then
-        final count = await database.proposalsDao
-            .watchCount(
-              filters: filters,
-            )
-            .first;
+            // Then
+            final count = await database.proposalsDao
+                .watchCount(
+                  filters: filters,
+                )
+                .first;
 
-        expect(count, expectedCount);
-      });
-
-      test('returns correct count when category filter is on', () async {
-        // Given
-        final userId = DummyCatalystIdFactory.create(username: 'damian');
-        final categoryId = categoriesTemplatesRefs.first.category;
-
-        final proposalOneRef = SignedDocumentRef.generateFirstRef();
-        final proposalTwoRef = SignedDocumentRef.generateFirstRef();
-        final proposals = [
-          _buildProposal(
-            selfRef: proposalOneRef,
-            categoryId: categoriesTemplatesRefs[1].category,
-          ),
-          _buildProposal(
-            selfRef: proposalTwoRef,
-            author: userId,
-            categoryId: categoryId,
-          ),
-        ];
-        final favorites = [
-          _buildProposalFavorite(proposalRef: proposalOneRef),
-        ];
-        final actions = [
-          _buildProposalAction(
-            action: ProposalSubmissionActionDto.aFinal,
-            proposalRef: proposalTwoRef,
-          ),
-        ];
-
-        final filters = ProposalsCountFilters(category: categoryId);
-        const expectedCount = ProposalsCount(
-          total: 1,
-          drafts: 0,
-          finals: 1,
-          favorites: 0,
-          my: 0,
+            expect(count.total, 2);
+            expect(count.drafts, 1);
+            expect(count.finals, 1);
+          },
+          onPlatform: driftOnPlatforms,
         );
 
-        // When
-        await database.documentsDao.saveAll([...proposals, ...actions]);
+        test(
+          'returns correct favorites count',
+          () async {
+            // Given
+            final proposalOneRef = SignedDocumentRef.generateFirstRef();
+            final proposalTwoRef = SignedDocumentRef.generateFirstRef();
+            final proposals = [
+              _buildProposal(selfRef: proposalOneRef),
+              _buildProposal(selfRef: proposalTwoRef),
+            ];
+            final favorites = [
+              _buildProposalFavorite(proposalRef: proposalOneRef),
+            ];
 
-        for (final fav in favorites) {
-          await database.favoritesDao.save(fav);
-        }
+            const filters = ProposalsCountFilters();
 
-        // Then
-        final count = await database.proposalsDao
-            .watchCount(
-              filters: filters,
-            )
-            .first;
+            // When
+            await database.documentsDao.saveAll(proposals);
+            for (final fav in favorites) {
+              await database.favoritesDao.save(fav);
+            }
 
-        expect(count, expectedCount);
-      });
+            // Then
+            final count = await database.proposalsDao
+                .watchCount(
+                  filters: filters,
+                )
+                .first;
 
-      test('returns correct count when search query is not empty', () async {
-        // Given
-        final proposals = [
-          _buildProposal(),
-          _buildProposal(title: 'Explore'),
-          _buildProposal(title: 'Not this one'),
-        ];
-
-        /* cSpell:disable */
-        const filters = ProposalsCountFilters(searchQuery: 'Expl');
-        /* cSpell:enable */
-        const expectedCount = ProposalsCount(
-          total: 1,
-          drafts: 1,
-          finals: 0,
-          favorites: 0,
-          my: 0,
+            expect(count.total, 2);
+            expect(count.favorites, 1);
+          },
+          onPlatform: driftOnPlatforms,
         );
 
-        // When
-        await database.documentsDao.saveAll(proposals);
+        test(
+          'returns correct my count base on author',
+          () async {
+            // Given
+            final userId = DummyCatalystIdFactory.create(username: 'damian');
+            final proposalOneRef = SignedDocumentRef.generateFirstRef();
+            final proposalTwoRef = SignedDocumentRef.generateFirstRef();
+            final proposals = [
+              _buildProposal(selfRef: proposalOneRef),
+              _buildProposal(selfRef: proposalTwoRef, author: userId),
+            ];
 
-        // Then
-        final count = await database.proposalsDao
-            .watchCount(
-              filters: filters,
-            )
-            .first;
+            final filters = ProposalsCountFilters(author: userId);
 
-        expect(count, expectedCount);
-      });
+            // When
+            await database.documentsDao.saveAll(proposals);
 
-      test('search is looking up author name in catalystId', () async {
-        // Given
-        const authorName = 'Damian';
-        final search = authorName.substring(0, 2);
-        final userId = DummyCatalystIdFactory.create(username: authorName);
+            // Then
+            final count = await database.proposalsDao
+                .watchCount(
+                  filters: filters,
+                )
+                .first;
 
-        final proposals = [
-          _buildProposal(contentAuthorName: 'Unknown'),
-          _buildProposal(author: userId),
-          _buildProposal(contentAuthorName: 'Other'),
-        ];
-
-        final filters = ProposalsCountFilters(searchQuery: search);
-        const expectedCount = ProposalsCount(
-          total: 1,
-          drafts: 1,
-          finals: 0,
-          favorites: 0,
-          my: 0,
+            expect(count.total, 2);
+            expect(count.my, 1);
+          },
+          onPlatform: driftOnPlatforms,
         );
 
-        // When
-        await database.documentsDao.saveAll(proposals);
+        test(
+          'returns correct count when only author filter is on',
+          () async {
+            // Given
+            final userId = DummyCatalystIdFactory.create(username: 'damian');
+            final proposalOneRef = SignedDocumentRef.generateFirstRef();
+            final proposalTwoRef = SignedDocumentRef.generateFirstRef();
+            final proposals = [
+              _buildProposal(selfRef: proposalOneRef),
+              _buildProposal(selfRef: proposalTwoRef, author: userId),
+            ];
+            final favorites = [
+              _buildProposalFavorite(proposalRef: proposalOneRef),
+            ];
+            final actions = [
+              _buildProposalAction(
+                action: ProposalSubmissionActionDto.aFinal,
+                proposalRef: proposalTwoRef,
+              ),
+            ];
 
-        // Then
-        final count = await database.proposalsDao
-            .watchCount(
-              filters: filters,
-            )
-            .first;
+            final filters = ProposalsCountFilters(
+              author: userId,
+              onlyAuthor: true,
+            );
+            const expectedCount = ProposalsCount(
+              total: 1,
+              drafts: 0,
+              finals: 1,
+              favorites: 0,
+              my: 1,
+            );
 
-        expect(count, expectedCount);
-      });
+            // When
+            await database.documentsDao.saveAll([...proposals, ...actions]);
 
-      test('search is looking up author name in content', () async {
-        // Given
-        const authorName = 'Damian';
-        final search = authorName.substring(0, 2);
+            for (final fav in favorites) {
+              await database.favoritesDao.save(fav);
+            }
 
-        final proposals = [
-          _buildProposal(contentAuthorName: 'Unknown'),
-          _buildProposal(contentAuthorName: authorName),
-          _buildProposal(contentAuthorName: 'Other'),
-        ];
+            // Then
+            final count = await database.proposalsDao
+                .watchCount(
+                  filters: filters,
+                )
+                .first;
 
-        final filters = ProposalsCountFilters(searchQuery: search);
-        const expectedCount = ProposalsCount(
-          total: 1,
-          drafts: 1,
-          finals: 0,
-          favorites: 0,
-          my: 0,
+            expect(count, expectedCount);
+          },
+          onPlatform: driftOnPlatforms,
         );
 
-        // When
-        await database.documentsDao.saveAll(proposals);
+        test(
+          'returns correct count when category filter is on',
+          () async {
+            // Given
+            final userId = DummyCatalystIdFactory.create(username: 'damian');
+            final categoryId = constantDocumentsRefs.first.category;
 
-        // Then
-        final count = await database.proposalsDao
-            .watchCount(
-              filters: filters,
-            )
-            .first;
+            final proposalOneRef = SignedDocumentRef.generateFirstRef();
+            final proposalTwoRef = SignedDocumentRef.generateFirstRef();
+            final proposals = [
+              _buildProposal(
+                selfRef: proposalOneRef,
+                categoryId: constantDocumentsRefs[1].category,
+              ),
+              _buildProposal(
+                selfRef: proposalTwoRef,
+                author: userId,
+                categoryId: categoryId,
+              ),
+            ];
+            final favorites = [
+              _buildProposalFavorite(proposalRef: proposalOneRef),
+            ];
+            final actions = [
+              _buildProposalAction(
+                action: ProposalSubmissionActionDto.aFinal,
+                proposalRef: proposalTwoRef,
+              ),
+            ];
 
-        expect(count, expectedCount);
-      });
-    });
+            final filters = ProposalsCountFilters(category: categoryId);
+            const expectedCount = ProposalsCount(
+              total: 1,
+              drafts: 0,
+              finals: 1,
+              favorites: 0,
+              my: 0,
+            );
+
+            // When
+            await database.documentsDao.saveAll([...proposals, ...actions]);
+
+            for (final fav in favorites) {
+              await database.favoritesDao.save(fav);
+            }
+
+            // Then
+            final count = await database.proposalsDao
+                .watchCount(
+                  filters: filters,
+                )
+                .first;
+
+            expect(count, expectedCount);
+          },
+          onPlatform: driftOnPlatforms,
+        );
+
+        test(
+          'returns correct count when search query is not empty',
+          () async {
+            // Given
+            final proposals = [
+              _buildProposal(),
+              _buildProposal(title: 'Explore'),
+              _buildProposal(title: 'Not this one'),
+            ];
+
+            /* cSpell:disable */
+            const filters = ProposalsCountFilters(searchQuery: 'Expl');
+            /* cSpell:enable */
+            const expectedCount = ProposalsCount(
+              total: 1,
+              drafts: 1,
+              finals: 0,
+              favorites: 0,
+              my: 0,
+            );
+
+            // When
+            await database.documentsDao.saveAll(proposals);
+
+            // Then
+            final count = await database.proposalsDao
+                .watchCount(
+                  filters: filters,
+                )
+                .first;
+
+            expect(count, expectedCount);
+          },
+          onPlatform: driftOnPlatforms,
+        );
+
+        test(
+          'search is looking up author name in catalystId',
+          () async {
+            // Given
+            const authorName = 'Damian';
+            final search = authorName.substring(0, 2);
+            final userId = DummyCatalystIdFactory.create(username: authorName);
+
+            final proposals = [
+              _buildProposal(contentAuthorName: 'Unknown'),
+              _buildProposal(author: userId),
+              _buildProposal(contentAuthorName: 'Other'),
+            ];
+
+            final filters = ProposalsCountFilters(searchQuery: search);
+            const expectedCount = ProposalsCount(
+              total: 1,
+              drafts: 1,
+              finals: 0,
+              favorites: 0,
+              my: 0,
+            );
+
+            // When
+            await database.documentsDao.saveAll(proposals);
+
+            // Then
+            final count = await database.proposalsDao
+                .watchCount(
+                  filters: filters,
+                )
+                .first;
+
+            expect(count, expectedCount);
+          },
+          onPlatform: driftOnPlatforms,
+        );
+
+        test(
+          'search is looking up author name in content',
+          () async {
+            // Given
+            const authorName = 'Damian';
+            final search = authorName.substring(0, 2);
+
+            final proposals = [
+              _buildProposal(contentAuthorName: 'Unknown'),
+              _buildProposal(contentAuthorName: authorName),
+              _buildProposal(contentAuthorName: 'Other'),
+            ];
+
+            final filters = ProposalsCountFilters(searchQuery: search);
+            const expectedCount = ProposalsCount(
+              total: 1,
+              drafts: 1,
+              finals: 0,
+              favorites: 0,
+              my: 0,
+            );
+
+            // When
+            await database.documentsDao.saveAll(proposals);
+
+            // Then
+            final count = await database.proposalsDao
+                .watchCount(
+                  filters: filters,
+                )
+                .first;
+
+            expect(count, expectedCount);
+          },
+          onPlatform: driftOnPlatforms,
+        );
+      },
+    );
 
     group('queryProposalsPage', () {
-      test('only newest version of proposal is returned', () async {
-        // Given
-        final templateRef = SignedDocumentRef.generateFirstRef();
+      test(
+        'only newest version of proposal is returned',
+        () async {
+          // Given
+          final templateRef = SignedDocumentRef.generateFirstRef();
 
-        final ref = _buildRefAt(DateTime(2025, 4, 7));
-        final nextRef = _buildRefAt(DateTime(2025, 4, 8)).copyWith(id: ref.id);
-        final latestRef =
-            _buildRefAt(DateTime(2025, 4, 9)).copyWith(id: ref.id);
+          final ref = _buildRefAt(DateTime(2025, 4, 7));
+          final nextRef =
+              _buildRefAt(DateTime(2025, 4, 8)).copyWith(id: ref.id);
+          final latestRef =
+              _buildRefAt(DateTime(2025, 4, 9)).copyWith(id: ref.id);
 
-        final differentRef = _buildRefAt(DateTime(2025, 4, 12));
+          final differentRef = _buildRefAt(DateTime(2025, 4, 12));
 
-        final templates = [
-          _buildProposalTemplate(selfRef: templateRef),
-        ];
+          final templates = [
+            _buildProposalTemplate(selfRef: templateRef),
+          ];
 
-        final proposals = [
-          _buildProposal(selfRef: ref, template: templateRef),
-          _buildProposal(selfRef: nextRef, template: templateRef),
-          _buildProposal(selfRef: latestRef, template: templateRef),
-          _buildProposal(selfRef: differentRef, template: templateRef),
-        ];
-        const request = PageRequest(page: 0, size: 10);
-        const filters = ProposalsFilters();
+          final proposals = [
+            _buildProposal(selfRef: ref, template: templateRef),
+            _buildProposal(selfRef: nextRef, template: templateRef),
+            _buildProposal(selfRef: latestRef, template: templateRef),
+            _buildProposal(selfRef: differentRef, template: templateRef),
+          ];
+          const request = PageRequest(page: 0, size: 10);
+          const filters = ProposalsFilters();
 
-        final expectedRefs = [
-          latestRef,
-          differentRef,
-        ];
+          final expectedRefs = [
+            latestRef,
+            differentRef,
+          ];
 
-        // When
-        await database.documentsDao.saveAll([...templates, ...proposals]);
+          // When
+          await database.documentsDao.saveAll([...templates, ...proposals]);
 
-        // Then
-        final page = await database.proposalsDao.queryProposalsPage(
-          request: request,
-          filters: filters,
-        );
-
-        expect(page.items.length, 2);
-        expect(page.items.length, page.total);
-
-        final proposalsRefs = page.items
-            .map((e) => e.proposal)
-            .map((entity) => entity.ref)
-            .toList();
-
-        expect(
-          proposalsRefs,
-          expectedRefs,
-        );
-      });
-
-      test('proposals are split into pages correctly', () async {
-        // Given
-        final templateRef = SignedDocumentRef.generateFirstRef();
-
-        final templates = [
-          _buildProposalTemplate(selfRef: templateRef),
-        ];
-
-        final now = DateTime(2024, 4, 9);
-        final proposals = List.generate(45, (index) {
-          return _buildProposal(
-            selfRef: _buildRefAt(now.subtract(Duration(days: index))),
-            template: templateRef,
+          // Then
+          final page = await database.proposalsDao.queryProposalsPage(
+            request: request,
+            filters: filters,
           );
-        });
-        const filters = ProposalsFilters();
 
-        // When
-        await database.documentsDao.saveAll([...templates, ...proposals]);
+          expect(page.items.length, 2);
+          expect(page.items.length, page.total);
 
-        // Then
-        const firstRequest = PageRequest(page: 0, size: 25);
-        final pageZero = await database.proposalsDao.queryProposalsPage(
-          request: firstRequest,
-          filters: filters,
-        );
+          final proposalsRefs = page.items
+              .map((e) => e.proposal)
+              .map((entity) => entity.ref)
+              .toList();
 
-        expect(pageZero.page, 0);
-        expect(pageZero.total, proposals.length);
-        expect(pageZero.items.length, firstRequest.size);
+          expect(
+            proposalsRefs,
+            expectedRefs,
+          );
+        },
+        onPlatform: driftOnPlatforms,
+      );
 
-        const secondRequest = PageRequest(page: 1, size: 25);
+      test(
+        'proposals are split into pages correctly',
+        () async {
+          // Given
+          final templateRef = SignedDocumentRef.generateFirstRef();
 
-        final pageOne = await database.proposalsDao.queryProposalsPage(
-          request: secondRequest,
-          filters: filters,
-        );
+          final templates = [
+            _buildProposalTemplate(selfRef: templateRef),
+          ];
 
-        expect(pageOne.page, 1);
-        expect(pageOne.total, proposals.length);
-        expect(pageOne.items.length, proposals.length - pageZero.items.length);
-      });
+          final now = DateTime(2024, 4, 9);
+          final proposals = List.generate(45, (index) {
+            return _buildProposal(
+              selfRef: _buildRefAt(now.subtract(Duration(days: index))),
+              template: templateRef,
+            );
+          });
+          const filters = ProposalsFilters();
 
-      test('proposals category filter works as expected', () async {
-        // Given
-        final templateRef = SignedDocumentRef.generateFirstRef();
-        final categoryId = categoriesTemplatesRefs.first.category;
+          // When
+          await database.documentsDao.saveAll([...templates, ...proposals]);
 
-        final templates = [
-          _buildProposalTemplate(selfRef: templateRef),
-        ];
+          // Then
+          const firstRequest = PageRequest(page: 0, size: 25);
+          final pageZero = await database.proposalsDao.queryProposalsPage(
+            request: firstRequest,
+            filters: filters,
+          );
 
-        final proposals = [
-          _buildProposal(
-            selfRef: _buildRefAt(DateTime(2025, 4, 1)),
-            template: templateRef,
-            categoryId: categoryId,
-          ),
-          _buildProposal(
-            selfRef: _buildRefAt(DateTime(2025, 4, 2)),
-            template: templateRef,
-            categoryId: categoryId,
-          ),
-          _buildProposal(
-            selfRef: _buildRefAt(DateTime(2025, 4, 3)),
-            template: templateRef,
-            categoryId: categoryId,
-          ),
-          _buildProposal(
-            template: templateRef,
-            categoryId: categoriesTemplatesRefs[1].category,
-          ),
-        ];
+          expect(pageZero.page, 0);
+          expect(pageZero.total, proposals.length);
+          expect(pageZero.items.length, firstRequest.size);
 
-        final expectedRefs = proposals
-            .sublist(0, 3)
-            .map((proposal) => proposal.document.ref)
-            .toList();
+          const secondRequest = PageRequest(page: 1, size: 25);
 
-        final filters = ProposalsFilters(category: categoryId);
+          final pageOne = await database.proposalsDao.queryProposalsPage(
+            request: secondRequest,
+            filters: filters,
+          );
 
-        // When
-        await database.documentsDao.saveAll([...templates, ...proposals]);
+          expect(pageOne.page, 1);
+          expect(pageOne.total, proposals.length);
+          expect(
+            pageOne.items.length,
+            proposals.length - pageZero.items.length,
+          );
+        },
+        onPlatform: driftOnPlatforms,
+      );
 
-        // Then
-        const request = PageRequest(page: 0, size: 25);
-        final page = await database.proposalsDao.queryProposalsPage(
-          request: request,
-          filters: filters,
-        );
+      test(
+        'proposals category filter works as expected',
+        () async {
+          // Given
+          final templateRef = SignedDocumentRef.generateFirstRef();
+          final categoryId = constantDocumentsRefs.first.category;
 
-        expect(page.page, 0);
-        expect(page.total, 3);
-        expect(page.items.map((e) => e.proposal.ref), expectedRefs);
-      });
+          final templates = [
+            _buildProposalTemplate(selfRef: templateRef),
+          ];
 
-      test('final proposals filter works as expected', () async {
-        // Given
-        final templateRef = SignedDocumentRef.generateFirstRef();
+          final proposals = [
+            _buildProposal(
+              selfRef: _buildRefAt(DateTime(2025, 4, 1)),
+              template: templateRef,
+              categoryId: categoryId,
+            ),
+            _buildProposal(
+              selfRef: _buildRefAt(DateTime(2025, 4, 2)),
+              template: templateRef,
+              categoryId: categoryId,
+            ),
+            _buildProposal(
+              selfRef: _buildRefAt(DateTime(2025, 4, 3)),
+              template: templateRef,
+              categoryId: categoryId,
+            ),
+            _buildProposal(
+              template: templateRef,
+              categoryId: constantDocumentsRefs[1].category,
+            ),
+          ];
 
-        final templates = [
-          _buildProposalTemplate(selfRef: templateRef),
-        ];
+          final expectedRefs = proposals
+              .sublist(0, 3)
+              .map((proposal) => proposal.document.ref)
+              .toList();
 
-        final proposalRef1 = _buildRefAt(DateTime(2025, 4, 1));
-        final proposalRef2 = _buildRefAt(DateTime(2025, 4, 2));
-        final proposalRef3 = _buildRefAt(DateTime(2025, 4, 3));
+          final filters = ProposalsFilters(category: categoryId);
 
-        final proposals = [
-          _buildProposal(
-            selfRef: proposalRef1,
-            template: templateRef,
-          ),
-          _buildProposal(
-            selfRef: proposalRef2,
-            template: templateRef,
-          ),
-          _buildProposal(
-            selfRef: proposalRef3,
-            template: templateRef,
-          ),
-          _buildProposal(template: templateRef),
-        ];
+          // When
+          await database.documentsDao.saveAll([...templates, ...proposals]);
 
-        final actions = [
-          _buildProposalAction(
-            action: ProposalSubmissionActionDto.aFinal,
-            proposalRef: proposalRef1,
-          ),
-          _buildProposalAction(
-            action: ProposalSubmissionActionDto.aFinal,
-            proposalRef: proposalRef2,
-          ),
-        ];
+          // Then
+          const request = PageRequest(page: 0, size: 25);
+          final page = await database.proposalsDao.queryProposalsPage(
+            request: request,
+            filters: filters,
+          );
 
-        final expectedRefs = [
-          proposalRef1,
-          proposalRef2,
-        ];
+          expect(page.page, 0);
+          expect(page.total, 3);
+          expect(page.items.map((e) => e.proposal.ref), expectedRefs);
+        },
+        onPlatform: driftOnPlatforms,
+      );
 
-        const filters = ProposalsFilters(type: ProposalsFilterType.finals);
+      test(
+        'final proposals filter works as expected',
+        () async {
+          // Given
+          final templateRef = SignedDocumentRef.generateFirstRef();
 
-        // When
-        await database.documentsDao.saveAll([
-          ...templates,
-          ...proposals,
-          ...actions,
-        ]);
+          final templates = [
+            _buildProposalTemplate(selfRef: templateRef),
+          ];
 
-        // Then
-        const request = PageRequest(page: 0, size: 25);
-        final page = await database.proposalsDao.queryProposalsPage(
-          request: request,
-          filters: filters,
-        );
+          final proposalRef1 = _buildRefAt(DateTime(2025, 4, 1));
+          final proposalRef2 = _buildRefAt(DateTime(2025, 4, 2));
+          final proposalRef3 = _buildRefAt(DateTime(2025, 4, 3));
 
-        expect(page.page, 0);
-        expect(page.total, 2);
-        expect(page.items.map((e) => e.proposal.ref), expectedRefs);
-      });
+          final proposals = [
+            _buildProposal(
+              selfRef: proposalRef1,
+              template: templateRef,
+            ),
+            _buildProposal(
+              selfRef: proposalRef2,
+              template: templateRef,
+            ),
+            _buildProposal(
+              selfRef: proposalRef3,
+              template: templateRef,
+            ),
+            _buildProposal(template: templateRef),
+          ];
 
-      test('final proposals is one with latest action as final', () async {
-        // Given
-        final templateRef = SignedDocumentRef.generateFirstRef();
+          final actions = [
+            _buildProposalAction(
+              action: ProposalSubmissionActionDto.aFinal,
+              proposalRef: proposalRef1,
+            ),
+            _buildProposalAction(
+              action: ProposalSubmissionActionDto.aFinal,
+              proposalRef: proposalRef2,
+            ),
+          ];
 
-        final templates = [
-          _buildProposalTemplate(selfRef: templateRef),
-        ];
+          final expectedRefs = [
+            proposalRef1,
+            proposalRef2,
+          ];
 
-        final proposalRef1 = _buildRefAt(DateTime(2025, 4, 1));
-        final proposalRef2 = _buildRefAt(DateTime(2025, 4, 2));
-        final proposalRef3 = _buildRefAt(DateTime(2025, 4, 3));
+          const filters = ProposalsFilters(type: ProposalsFilterType.finals);
 
-        final proposals = [
-          _buildProposal(
-            selfRef: proposalRef1,
-            template: templateRef,
-          ),
-          _buildProposal(
-            selfRef: proposalRef2,
-            template: templateRef,
-          ),
-          _buildProposal(
-            selfRef: proposalRef3,
-            template: templateRef,
-          ),
-          _buildProposal(template: templateRef),
-        ];
+          // When
+          await database.documentsDao.saveAll([
+            ...templates,
+            ...proposals,
+            ...actions,
+          ]);
 
-        final actions = [
-          _buildProposalAction(
-            selfRef: _buildRefAt(DateTime(2025, 4, 5)),
-            action: ProposalSubmissionActionDto.aFinal,
-            proposalRef: proposalRef1,
-          ),
-          _buildProposalAction(
-            selfRef: _buildRefAt(DateTime(2025, 4, 1)),
-            action: ProposalSubmissionActionDto.draft,
-            proposalRef: proposalRef1,
-          ),
-        ];
+          // Then
+          const request = PageRequest(page: 0, size: 25);
+          final page = await database.proposalsDao.queryProposalsPage(
+            request: request,
+            filters: filters,
+          );
 
-        final expectedRefs = [
-          proposalRef1,
-        ];
+          expect(page.page, 0);
+          expect(page.total, 2);
+          expect(page.items.map((e) => e.proposal.ref), expectedRefs);
+        },
+        onPlatform: driftOnPlatforms,
+      );
 
-        const filters = ProposalsFilters(type: ProposalsFilterType.finals);
+      test(
+        'final proposals is one with latest action as final',
+        () async {
+          // Given
+          final templateRef = SignedDocumentRef.generateFirstRef();
 
-        // When
-        await database.documentsDao.saveAll([
-          ...templates,
-          ...proposals,
-          ...actions,
-        ]);
+          final templates = [
+            _buildProposalTemplate(selfRef: templateRef),
+          ];
 
-        // Then
-        const request = PageRequest(page: 0, size: 25);
-        final page = await database.proposalsDao.queryProposalsPage(
-          request: request,
-          filters: filters,
-        );
+          final proposalRef1 = _buildRefAt(DateTime(2025, 4, 1));
+          final proposalRef2 = _buildRefAt(DateTime(2025, 4, 2));
+          final proposalRef3 = _buildRefAt(DateTime(2025, 4, 3));
 
-        expect(page.page, 0);
-        expect(page.total, 1);
-        expect(page.items.map((e) => e.proposal.ref), expectedRefs);
-      });
+          final proposals = [
+            _buildProposal(
+              selfRef: proposalRef1,
+              template: templateRef,
+            ),
+            _buildProposal(
+              selfRef: proposalRef2,
+              template: templateRef,
+            ),
+            _buildProposal(
+              selfRef: proposalRef3,
+              template: templateRef,
+            ),
+            _buildProposal(template: templateRef),
+          ];
 
-      test('JoinedProposal is build correctly ', () async {
-        // Given
-        final templateRef = SignedDocumentRef.generateFirstRef();
+          final actions = [
+            _buildProposalAction(
+              selfRef: _buildRefAt(DateTime(2025, 4, 5)),
+              action: ProposalSubmissionActionDto.aFinal,
+              proposalRef: proposalRef1,
+            ),
+            _buildProposalAction(
+              selfRef: _buildRefAt(DateTime(2025, 4, 1)),
+              action: ProposalSubmissionActionDto.draft,
+              proposalRef: proposalRef1,
+            ),
+          ];
 
-        final templates = [
-          _buildProposalTemplate(selfRef: templateRef),
-        ];
+          final expectedRefs = [
+            proposalRef1,
+          ];
 
-        final proposalRef1 = _buildRefAt(DateTime(2025, 4, 1));
-        final proposalRef2 =
-            _buildRefAt(DateTime(2025, 4, 2)).copyWith(id: proposalRef1.id);
-        final proposalRef3 =
-            _buildRefAt(DateTime(2025, 4, 3)).copyWith(id: proposalRef1.id);
+          const filters = ProposalsFilters(type: ProposalsFilterType.finals);
 
-        final proposals = [
-          _buildProposal(
-            selfRef: proposalRef1,
-            template: templateRef,
-          ),
-          _buildProposal(
-            selfRef: proposalRef2,
-            template: templateRef,
-          ),
-          _buildProposal(
-            selfRef: proposalRef3,
-            template: templateRef,
-          ),
-        ];
+          // When
+          await database.documentsDao.saveAll([
+            ...templates,
+            ...proposals,
+            ...actions,
+          ]);
 
-        final actions = [
-          _buildProposalAction(
-            selfRef: _buildRefAt(DateTime(2025, 4, 5)),
-            action: ProposalSubmissionActionDto.aFinal,
-            proposalRef: proposalRef2,
-          ),
-          _buildProposalAction(
-            selfRef: _buildRefAt(DateTime(2025, 4, 1)),
-            action: ProposalSubmissionActionDto.draft,
-            proposalRef: proposalRef1,
-          ),
-        ];
+          // Then
+          const request = PageRequest(page: 0, size: 25);
+          final page = await database.proposalsDao.queryProposalsPage(
+            request: request,
+            filters: filters,
+          );
 
-        final comments = [
-          _buildProposalComment(proposalRef: proposalRef1),
-          _buildProposalComment(proposalRef: proposalRef2),
-          _buildProposalComment(proposalRef: proposalRef2),
-          _buildProposalComment(proposalRef: proposalRef3),
-        ];
+          expect(page.page, 0);
+          expect(page.total, 1);
+          expect(page.items.map((e) => e.proposal.ref), expectedRefs);
+        },
+        onPlatform: driftOnPlatforms,
+      );
 
-        const filters = ProposalsFilters();
+      test(
+        'JoinedProposal is build correctly ',
+        () async {
+          // Given
+          final templateRef = SignedDocumentRef.generateFirstRef();
 
-        // When
-        await database.documentsDao.saveAll([
-          ...templates,
-          ...proposals,
-          ...actions,
-          ...comments,
-        ]);
+          final templates = [
+            _buildProposalTemplate(selfRef: templateRef),
+          ];
 
-        // Then
-        const request = PageRequest(page: 0, size: 25);
-        final page = await database.proposalsDao.queryProposalsPage(
-          request: request,
-          filters: filters,
-        );
+          final proposalRef1 = _buildRefAt(DateTime(2025, 4, 1));
+          final proposalRef2 =
+              _buildRefAt(DateTime(2025, 4, 2)).copyWith(id: proposalRef1.id);
+          final proposalRef3 =
+              _buildRefAt(DateTime(2025, 4, 3)).copyWith(id: proposalRef1.id);
 
-        expect(page.page, 0);
-        expect(page.total, 1);
+          final proposals = [
+            _buildProposal(
+              selfRef: proposalRef1,
+              template: templateRef,
+            ),
+            _buildProposal(
+              selfRef: proposalRef2,
+              template: templateRef,
+            ),
+            _buildProposal(
+              selfRef: proposalRef3,
+              template: templateRef,
+            ),
+          ];
 
-        final joinedProposal = page.items.single;
+          final actions = [
+            _buildProposalAction(
+              selfRef: _buildRefAt(DateTime(2025, 4, 5)),
+              action: ProposalSubmissionActionDto.aFinal,
+              proposalRef: proposalRef2,
+            ),
+            _buildProposalAction(
+              selfRef: _buildRefAt(DateTime(2025, 4, 1)),
+              action: ProposalSubmissionActionDto.draft,
+              proposalRef: proposalRef1,
+            ),
+          ];
 
-        expect(joinedProposal.proposal, proposals[1].document);
-        expect(joinedProposal.template, templates[0].document);
-        expect(joinedProposal.action, actions[0].document);
-        expect(joinedProposal.commentsCount, 2);
-        expect(
-          joinedProposal.versions,
-          proposals.map((e) => e.document.ref.version).toList().reversed,
-        );
-      });
+          final comments = [
+            _buildProposalComment(proposalRef: proposalRef1),
+            _buildProposalComment(proposalRef: proposalRef2),
+            _buildProposalComment(proposalRef: proposalRef2),
+            _buildProposalComment(proposalRef: proposalRef3),
+          ];
+
+          const filters = ProposalsFilters();
+
+          // When
+          await database.documentsDao.saveAll([
+            ...templates,
+            ...proposals,
+            ...actions,
+            ...comments,
+          ]);
+
+          // Then
+          const request = PageRequest(page: 0, size: 25);
+          final page = await database.proposalsDao.queryProposalsPage(
+            request: request,
+            filters: filters,
+          );
+
+          expect(page.page, 0);
+          expect(page.total, 1);
+
+          final joinedProposal = page.items.single;
+
+          expect(joinedProposal.proposal, proposals[1].document);
+          expect(joinedProposal.template, templates[0].document);
+          expect(joinedProposal.action, actions[0].document);
+          expect(joinedProposal.commentsCount, 2);
+          expect(
+            joinedProposal.versions,
+            proposals.map((e) => e.document.ref.version).toList().reversed,
+          );
+        },
+        onPlatform: driftOnPlatforms,
+      );
 
       test(
         'search query is looking up catalystId and proposal content ',
@@ -948,6 +1030,7 @@ void main() {
           expect(refs, hasLength(expectedRefs.length));
           expect(refs, containsAll(expectedRefs));
         },
+        onPlatform: driftOnPlatforms,
       );
     });
   });
@@ -968,7 +1051,7 @@ DocumentEntityWithMetadata _buildProposal({
     authors: [
       if (author != null) author,
     ],
-    categoryId: categoryId ?? categoriesTemplatesRefs.first.category,
+    categoryId: categoryId ?? constantDocumentsRefs.first.category,
   );
   final content = DocumentDataContent({
     if (title != null || contentAuthorName != null)

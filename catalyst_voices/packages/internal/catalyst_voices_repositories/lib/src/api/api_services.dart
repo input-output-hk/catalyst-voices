@@ -30,13 +30,25 @@ final class ApiServices {
     _fixModelsMapping();
 
     return ApiServices.internal(
-      gateway: createGateway(
-        gatewayUri: env.gateway,
-        authTokenProvider: authTokenProvider,
+      gateway: CatGateway.create(
+        authenticator: null,
+        baseUrl: env.gateway,
+        converter: CborOrJsonDelegateConverter(
+          cborConverter: CborSerializableConverter(),
+          jsonConverter: $JsonSerializableConverter(),
+        ),
+        interceptors: [
+          RbacAuthInterceptor(authTokenProvider),
+          if (kDebugMode) HttpLoggingInterceptor(onlyErrors: true),
+        ],
       ),
-      reviews: createReviews(
-        reviewsUrl: env.reviews,
-        authTokenProvider: authTokenProvider,
+      reviews: CatReviews.create(
+        authenticator: null,
+        baseUrl: env.reviews,
+        interceptors: [
+          RbacAuthInterceptor(authTokenProvider),
+          if (kDebugMode) HttpLoggingInterceptor(onlyErrors: true),
+        ],
       ),
     );
   }
@@ -46,36 +58,4 @@ final class ApiServices {
     required this.gateway,
     required this.reviews,
   });
-
-  static CatGateway createGateway({
-    required Uri gatewayUri,
-    required AuthTokenProvider authTokenProvider,
-  }) {
-    return CatGateway.create(
-      authenticator: null,
-      baseUrl: gatewayUri,
-      converter: CborOrJsonDelegateConverter(
-        cborConverter: CborSerializableConverter(),
-        jsonConverter: $JsonSerializableConverter(),
-      ),
-      interceptors: [
-        RbacAuthInterceptor(authTokenProvider),
-        if (kDebugMode) HttpLoggingInterceptor(onlyErrors: true),
-      ],
-    );
-  }
-
-  static CatReviews createReviews({
-    required Uri reviewsUrl,
-    required AuthTokenProvider authTokenProvider,
-  }) {
-    return CatReviews.create(
-      authenticator: null,
-      baseUrl: reviewsUrl,
-      interceptors: [
-        RbacAuthInterceptor(authTokenProvider),
-        if (kDebugMode) HttpLoggingInterceptor(onlyErrors: true),
-      ],
-    );
-  }
 }

@@ -15,12 +15,12 @@ repository.workspace = true
 workspace = true
 
 [dependencies]
-cardano-chain-follower = { version = "0.0.8", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "r20250423-00" }
-rbac-registration = { version = "0.0.4", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "r20250423-00" }
-catalyst-types = { version = "0.0.3", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "r20250423-00" }
-cardano-blockchain-types = { version = "0.0.3", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "r20250423-00" }
-catalyst-signed-doc = { version = "0.0.4", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "r20250423-00" }
-c509-certificate = { version = "0.0.3", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "r20250423-00" }
+cardano-chain-follower = { version = "0.0.8", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "r20250428-00" }
+rbac-registration = { version = "0.0.4", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "r20250428-00" }
+catalyst-types = { version = "0.0.3", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "r20250428-00" }
+cardano-blockchain-types = { version = "0.0.3", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "r20250428-00" }
+catalyst-signed-doc = { version = "0.0.4", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "r20250428-00" }
+c509-certificate = { version = "0.0.3", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "r20250428-00" }
 
 pallas = { version = "0.30.1", git = "https://github.com/input-output-hk/catalyst-pallas.git", rev = "9b5183c8b90b90fe2cc319d986e933e9518957b3" }
 pallas-traverse = { version = "0.30.1", git = "https://github.com/input-output-hk/catalyst-pallas.git", rev = "9b5183c8b90b90fe2cc319d986e933e9518957b3" }
@@ -49,7 +49,7 @@ tokio-postgres = { version = "0.7.12", features = [
 ] }
 tokio = { version = "1.41.0", features = ["rt", "macros", "rt-multi-thread"] }
 dotenvy = "0.15.7"
-local-ip-address = "0.6.3"
+local-ip-address = "=0.6.3"
 gethostname = "0.5.0"
 hex = "0.4.3"
 handlebars = "6.2.0"
@@ -87,7 +87,6 @@ rust-embed = "8.5.0"
 num-traits = "0.2.19"
 base64 = "0.22.1"
 dashmap = { version = "6.1.0", features = ["rayon"] }
-jsonschema = "0.26.1"
 bech32 = "0.11.0"
 const_format = "0.2.33"
 regex = "1.11.1"
