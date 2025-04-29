@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:catalyst_voices/common/constants/constants.dart';
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/widgets/cards/tip_card.dart';
 import 'package:catalyst_voices/widgets/countdown/voices_countdown.dart';
@@ -201,10 +202,8 @@ class _RightSide extends StatelessWidget with LaunchUrlMixin {
         _HeadsUpInfo(context.l10n.proposalsLimitReachedPoint3),
         _HeadsUpInfo(context.l10n.proposalsLimitReachedPoint4),
         const SizedBox(height: 32),
-        // TODO(dtscalac): add the learn more link explaining
-        // the proposal submission limit
-        VoicesLearnMoreFilledButton(
-          onTap: () => unawaited(launchUri(''.getUri())),
+        VoicesLearnMoreFilledButton.url(
+          url: VoicesConstants.proposalPublishingDocsUrl,
         ),
         const Spacer(),
         _Countdown(date: date),
