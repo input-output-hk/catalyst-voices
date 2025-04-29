@@ -271,23 +271,22 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
     );
   }
 
-  Future<void> _showSubmissionClosingWarningDialog([
-    DateTime? submissionCloseDate,
-  ]) async {
+  Future<void> _showSubmissionClosingWarningDialog(
+    DateTime submissionCloseDate,
+  ) async {
     final canShow = context
         .read<SessionCubit>()
         .state
         .settings
         .showSubmissionClosingWarning;
 
-    if (submissionCloseDate == null || !canShow || !mounted) {
-      return;
+    if (canShow) {
+      await SubmissionClosingWarningDialog.showNDaysBefore(
+        context: context,
+        submissionCloseAt: submissionCloseDate,
+        dontShowAgain: _dontShowCampaignSubmissionClosingDialog,
+      );
     }
-    await SubmissionClosingWarningDialog.showNDaysBefore(
-      context: context,
-      submissionCloseAt: submissionCloseDate,
-      dontShowAgain: _dontShowCampaignSubmissionClosingDialog,
-    );
   }
 
   Future<void> _showSubmitException(ProposalBuilderSubmitException error) {
