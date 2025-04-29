@@ -26,6 +26,15 @@ final class DatabaseDocumentsDataSource
   }
 
   @override
+  Future<DocumentData?> getLatest({
+    CatalystId? authorId,
+  }) {
+    return _database.documentsDao
+        .queryLatestDocumentData(authorId: authorId)
+        .then((value) => value?.toModel());
+  }
+
+  @override
   Future<Page<ProposalDocumentData>> getProposalsPage({
     required PageRequest request,
     required ProposalsFilters filters,

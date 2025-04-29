@@ -4,7 +4,6 @@ import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 class TreasuryCampaignStagesEditTile extends StatelessWidget {
   final TreasurySection data;
@@ -16,22 +15,17 @@ class TreasuryCampaignStagesEditTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SectionStateBuilder(
+    return SectionBaseTile(
       id: data.id,
-      builder: (context, value, child) {
-        return SelectableTile(
-          isSelected: value.isSelected,
-          child: Column(
-            children: [
-              TreasuryCampaignStepHeader(data),
-              const SizedBox(height: 12),
-              const TreasuryCampaignTimezone(),
-              const SizedBox(height: 24),
-              _DateRange(data: data),
-            ],
-          ),
-        );
-      },
+      child: Column(
+        children: [
+          TreasuryCampaignStepHeader(data),
+          const SizedBox(height: 12),
+          const TreasuryCampaignTimezone(),
+          const SizedBox(height: 24),
+          _DateRange(data: data),
+        ],
+      ),
     );
   }
 }
@@ -48,22 +42,6 @@ class _DateRange extends StatefulWidget {
 class _DateRangeState extends State<_DateRange> {
   late final VoicesDateTimeFieldController _startDateController;
   late final VoicesDateTimeFieldController _endDateController;
-
-  @override
-  void initState() {
-    super.initState();
-
-    final cubit = context.read<CampaignBuilderCubit>();
-    _startDateController = VoicesDateTimeFieldController(cubit.state.startDate);
-    _endDateController = VoicesDateTimeFieldController(cubit.state.endDate);
-  }
-
-  @override
-  void dispose() {
-    _startDateController.dispose();
-    _endDateController.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -111,14 +89,30 @@ class _DateRangeState extends State<_DateRange> {
     );
   }
 
-  // ignore: use_setters_to_change_properties
-  void _onEditStartDate(DateTime? startDate) {
-    _startDateController.value = startDate;
+  @override
+  void dispose() {
+    _startDateController.dispose();
+    _endDateController.dispose();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    final cubit = context.read<CampaignBuilderCubit>();
+    _startDateController = VoicesDateTimeFieldController(cubit.state.startDate);
+    _endDateController = VoicesDateTimeFieldController(cubit.state.endDate);
   }
 
   // ignore: use_setters_to_change_properties
   void _onEditEndDate(DateTime? endDate) {
     _endDateController.value = endDate;
+  }
+
+  // ignore: use_setters_to_change_properties
+  void _onEditStartDate(DateTime? startDate) {
+    _startDateController.value = startDate;
   }
 }
 

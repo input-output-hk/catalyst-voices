@@ -8,11 +8,15 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   const catalystKey = Key('C');
 
-  Widget buildApp() => BlocProvider(
+  Widget buildApp({
+    ThemeMode themeMode = ThemeMode.light,
+  }) =>
+      BlocProvider(
         create: (context) => BrandBloc(),
         child: BlocBuilder<BrandBloc, BrandState>(
           builder: (context, state) {
             return MaterialApp(
+              themeMode: themeMode,
               home: Builder(
                 builder: (context) => Scaffold(
                   body: Row(

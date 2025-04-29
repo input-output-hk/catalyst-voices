@@ -92,8 +92,8 @@ final class AccountRoleData extends Equatable {
 
 enum AccountRoleStatus {
   /// meaning transaction was sent but backend does not know about it yet.
-  sent,
+  volatile,
 
-  /// backend seen transaction with given role.
-  confirmed,
+  /// backend seen transaction with given role in chain.
+  permanent,
 }

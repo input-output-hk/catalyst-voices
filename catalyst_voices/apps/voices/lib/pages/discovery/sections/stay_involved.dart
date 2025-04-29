@@ -14,7 +14,6 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 class StayInvolved extends StatelessWidget {
   const StayInvolved({super.key});
@@ -211,7 +210,7 @@ class _VoterCard extends StatelessWidget {
     return _StayInvolvedCard(
       icon: VoicesAssets.icons.vote,
       title: context.l10n.votingRegistrationForF14,
-      description: context.l10n.stayInvolvedVoterDescription,
+      description: context.l10n.stayInvolvedContributorDescription,
       actions: _StayInvolvedActionButton(
         title: context.l10n.votingRegistration,
         urlString: VoicesConstants.votingRegistrationUrl,

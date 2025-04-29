@@ -1,9 +1,7 @@
 import 'package:catalyst_voices_assets/generated/assets.gen.dart';
-import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
-import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/widgets.dart';
 
 enum ProposalMenuItemAction {
@@ -20,10 +18,15 @@ enum ProposalMenuItemAction {
 
   const ProposalMenuItemAction({this.clickable = true});
 
-  String? description(BuildContext context, ProposalBuilderMetadata metadata) {
+  String? description(
+    BuildContext context, {
+    required int currentIteration,
+  }) {
     return switch (this) {
-      ProposalMenuItemAction.view =>
-        _formatProposalDescription(context, metadata),
+      ProposalMenuItemAction.view => _formatProposalDescription(
+          context,
+          currentIteration: currentIteration,
+        ),
       ProposalMenuItemAction.publish =>
         context.l10n.proposalEditorStatusDropdownPublishDescription,
       ProposalMenuItemAction.submit =>
@@ -95,11 +98,9 @@ enum ProposalMenuItemAction {
   }
 
   String _formatProposalDescription(
-    BuildContext context,
-    ProposalBuilderMetadata metadata,
-  ) {
-    final currentIteration =
-        metadata.latestVersion?.number ?? DocumentVersion.firstNumber;
+    BuildContext context, {
+    required int currentIteration,
+  }) {
     return context.l10n.proposalEditorStatusDropdownViewDescription(
       currentIteration,
     );

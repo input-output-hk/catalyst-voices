@@ -1,6 +1,7 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/database/catalyst_database.dart';
 import 'package:catalyst_voices_repositories/src/database/dao/drafts_dao.drift.dart';
+import 'package:catalyst_voices_repositories/src/database/query/jsonb_expressions.dart';
 import 'package:catalyst_voices_repositories/src/database/table/drafts.dart';
 import 'package:catalyst_voices_repositories/src/database/table/drafts.drift.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
@@ -32,6 +33,10 @@ abstract interface class DraftsDao {
 
   /// Returns all known document drafts refs.
   Future<List<DraftRef>> queryAllRefs();
+
+  Future<DocumentDraftEntity?> queryLatest({
+    CatalystId? authorId,
+  });
 
   Future<List<DocumentDraftEntity>> queryVersionsOfId({required String id});
 
@@ -120,6 +125,21 @@ class DriftDraftsDao extends DatabaseAccessor<DriftCatalystDatabase>
 
       return DraftRef(id: id.uuid, version: version.uuid);
     }).get();
+  }
+
+  @override
+  Future<DocumentDraftEntity?> queryLatest({
+    CatalystId? authorId,
+  }) {
+    final query = select(drafts)
+      ..orderBy([(t) => OrderingTerm.desc(t.verHi)])
+      ..limit(1);
+
+    if (authorId != null) {
+      query.where((tbl) => tbl.metadata.isAuthor(authorId));
+    }
+
+    return query.getSingleOrNull();
   }
 
   @override

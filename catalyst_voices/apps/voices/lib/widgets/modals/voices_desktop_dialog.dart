@@ -13,7 +13,6 @@ class VoicesSinglePaneDialog extends StatelessWidget {
   final Color? backgroundColor;
   final bool showBorder;
   final bool showClose;
-  final Alignment closeAlignment;
   final Widget child;
   final bool fillPosition;
 
@@ -27,7 +26,6 @@ class VoicesSinglePaneDialog extends StatelessWidget {
     this.backgroundColor,
     this.showBorder = false,
     this.showClose = true,
-    this.closeAlignment = Alignment.topRight,
     this.fillPosition = false,
     required this.child,
   });
@@ -39,7 +37,7 @@ class VoicesSinglePaneDialog extends StatelessWidget {
       showBorder: showBorder,
       constraints: constraints,
       child: Stack(
-        alignment: closeAlignment,
+        alignment: Alignment.center,
         children: [
           if (fillPosition)
             Positioned.fill(
@@ -47,9 +45,13 @@ class VoicesSinglePaneDialog extends StatelessWidget {
             )
           else
             child,
-          Offstage(
-            offstage: !showClose,
-            child: const _CloseButton(),
+          Positioned(
+            top: 0,
+            right: 0,
+            child: Offstage(
+              offstage: !showClose,
+              child: const _CloseButton(),
+            ),
           ),
         ],
       ),

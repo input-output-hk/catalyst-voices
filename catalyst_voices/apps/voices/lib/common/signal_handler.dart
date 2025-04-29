@@ -4,7 +4,6 @@ import 'dart:async';
 
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 /// An interface of an abstract signal handler.
 abstract interface class SignalHandler<Signal extends Object> {

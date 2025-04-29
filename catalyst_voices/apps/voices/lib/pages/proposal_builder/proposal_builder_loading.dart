@@ -1,9 +1,8 @@
-import 'package:catalyst_voices/widgets/tiles/selectable_tile.dart';
+import 'package:catalyst_voices/widgets/tiles/base_tile.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ProposalBuilderLoadingSelector extends StatelessWidget {
   const ProposalBuilderLoadingSelector({super.key});
@@ -88,7 +87,7 @@ class _SectionPlaceholder extends StatelessWidget {
     final subtitleColor = Theme.of(context).colors.iconsDisabled.withAlpha(40);
     final bodyColor = Theme.of(context).colors.iconsDisabled.withAlpha(20);
 
-    return SelectableTile(
+    return BaseTile(
       child: Padding(
         padding: const EdgeInsets.all(24),
         child: Column(

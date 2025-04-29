@@ -13,21 +13,18 @@ class TreasuryProposalTemplateTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SectionStateBuilder(
+    return SectionBaseTile(
       id: data.id,
-      builder: (context, value, child) {
-        return WorkspaceTextTileContainer(
-          name: data.resolveTitle(context),
-          isSelected: value.isSelected,
-          headerActions: [
-            VoicesTextButton(
-              onTap: data.isEditable ? () {} : null,
-              child: Text(context.l10n.stepEdit),
-            ),
-          ],
-          content: data.resolveDesc(context) ?? data.resolveTitle(context),
-        );
-      },
+      child: WorkspaceTextTileContainer(
+        name: data.resolveTitle(context),
+        headerActions: [
+          VoicesTextButton(
+            onTap: data.isEditable ? () {} : null,
+            child: Text(context.l10n.stepEdit),
+          ),
+        ],
+        content: data.resolveDesc(context) ?? data.resolveTitle(context),
+      ),
     );
   }
 }

@@ -12,7 +12,9 @@ pub(crate) const SCHEMA_VERSION: &str = "https://json-schema.org/draft/2020-12/s
 /// Get the `OpenAPI` specification
 pub(crate) static OPENAPI_SPEC: LazyLock<Value> = LazyLock::new(api_spec);
 
-/// Extract a JSON schema from `schema_name`
+/// Extracts a JSON schema definition from the `OpenAPI` JSON definition of our service
+/// by the `schema_name`.
+#[allow(dead_code)]
 pub(crate) fn extract_json_schema_for(schema_name: &str) -> Value {
     let schema = OPENAPI_SPEC
         .get("components")
@@ -225,7 +227,7 @@ mod test {
 
     #[test]
     fn test_extract_json_schema_for_frontend_config() {
-        let schema = extract_json_schema_for("FrontendConfig");
+        let schema = extract_json_schema_for("InternalServerError");
         println!("{schema}");
         assert!(schema.get("type").is_some());
         assert!(schema.get("properties").is_some());

@@ -18,7 +18,7 @@ final class Account extends Equatable {
   /* cSpell:enable */
 
   final CatalystId catalystId;
-  final String email;
+  final String? email;
   final Keychain keychain;
   final Set<AccountRole> roles;
 
@@ -27,23 +27,26 @@ final class Account extends Equatable {
   /// null for users created before this field was added here.
   final ShelleyAddress? address;
 
+  /// Status of this account in reviews module. Public status
+  /// can be changed by attaching [email] to account.
+  final AccountPublicStatus publicStatus;
+
   /// Whether this account is being used.
   final bool isActive;
 
-  /// When account registration transaction is posted on chain account is
-  /// "provisional". This means backend does not yet know about it because
-  /// transaction was not yet read.
-  final bool isProvisional;
-
   const Account({
     required this.catalystId,
-    required this.email,
+    this.email,
     required this.keychain,
     required this.roles,
     required this.address,
+    required this.publicStatus,
     this.isActive = false,
-    this.isProvisional = true,
-  });
+  }) : assert(
+          (email == null && publicStatus == AccountPublicStatus.notSetup) ||
+              (email != null && publicStatus != AccountPublicStatus.notSetup),
+          'Account publicStatus have to be notSetup only when email is not set',
+        );
 
   factory Account.dummy({
     required CatalystId catalystId,
@@ -52,7 +55,7 @@ final class Account extends Equatable {
   }) {
     return Account(
       catalystId: catalystId,
-      email: 'dummy@iohk.com',
+      email: null,
       keychain: keychain,
       roles: const {
         AccountRole.voter,
@@ -64,14 +67,21 @@ final class Account extends Equatable {
         '9mdnmafh3djcxnc6jemlgdmswcve6tkw',
       ),
       /* cSpell:enable */
+      publicStatus: AccountPublicStatus.notSetup,
       isActive: isActive,
-      isProvisional: true,
     );
   }
 
+  // Note. Disabled all admin functionalities for F14.
   bool get isAdmin => false;
 
   bool get isDummy => keychain.id == dummyKeychainId;
+
+  // TODO(damian-molinski): Update this getter.
+  /// When account registration transaction is posted on chain account is
+  /// "provisional". This means backend does not yet know about it because
+  /// transaction was not yet read.
+  bool get isProvisional => true;
 
   @override
   List<Object?> get props => [
@@ -80,29 +90,29 @@ final class Account extends Equatable {
         keychain.id,
         roles,
         address,
+        publicStatus,
         isActive,
-        isProvisional,
       ];
 
   String? get username => catalystId.username;
 
   Account copyWith({
     CatalystId? catalystId,
-    String? email,
+    Optional<String>? email,
     Keychain? keychain,
     Set<AccountRole>? roles,
     ShelleyAddress? address,
+    AccountPublicStatus? publicStatus,
     bool? isActive,
-    bool? isProvisional,
   }) {
     return Account(
       catalystId: catalystId ?? this.catalystId,
-      email: email ?? this.email,
+      email: email.dataOr(this.email),
       keychain: keychain ?? this.keychain,
       roles: roles ?? this.roles,
       address: address ?? this.address,
+      publicStatus: publicStatus ?? this.publicStatus,
       isActive: isActive ?? this.isActive,
-      isProvisional: isProvisional ?? this.isProvisional,
     );
   }
 

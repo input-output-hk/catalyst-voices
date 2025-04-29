@@ -3,27 +3,12 @@ import 'dart:async';
 import 'package:catalyst_voices/widgets/buttons/voices_buttons.dart';
 import 'package:catalyst_voices/widgets/scrollbar/voices_scrollbar.dart';
 import 'package:catalyst_voices/widgets/text_field/voices_autocomplete.dart';
+import 'package:catalyst_voices/widgets/text_field/voices_text_field.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
+import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
-final class SeedPhraseFieldController
-    extends ValueNotifier<List<SeedPhraseWord>> {
-  SeedPhraseFieldController([super._value = const <SeedPhraseWord>[]]);
-
-  set words(List<SeedPhraseWord> words) {
-    value = words;
-  }
-
-  List<SeedPhraseWord> get words {
-    return value;
-  }
-
-  void clear() {
-    value = const [];
-  }
-}
 
 class SeedPhraseField extends StatefulWidget {
   final int wordsCount;
@@ -45,6 +30,92 @@ class SeedPhraseField extends StatefulWidget {
   State<SeedPhraseField> createState() => _SeedPhraseFieldState();
 }
 
+final class SeedPhraseFieldController
+    extends ValueNotifier<List<SeedPhraseWord>> {
+  SeedPhraseFieldController([super._value = const <SeedPhraseWord>[]]);
+
+  List<SeedPhraseWord> get words {
+    return value;
+  }
+
+  set words(List<SeedPhraseWord> words) {
+    value = words;
+  }
+
+  void clear() {
+    value = const [];
+  }
+}
+
+class _DeleteLastWordAction extends Action<_DeleteLastWordIntent> {
+  final VoidCallback onInvoke;
+  final TextEditingController textEditingController;
+  final SeedPhraseFieldController seedPhraseFieldController;
+
+  _DeleteLastWordAction({
+    required this.onInvoke,
+    required this.textEditingController,
+    required this.seedPhraseFieldController,
+  });
+
+  @override
+  Object? invoke(_DeleteLastWordIntent intent) {
+    onInvoke();
+    return null;
+  }
+
+  @override
+  bool isEnabled(_DeleteLastWordIntent intent) {
+    if (textEditingController.text.isNotEmpty) {
+      return false;
+    }
+
+    if (seedPhraseFieldController.value.isEmpty) {
+      return false;
+    }
+
+    return true;
+  }
+}
+
+class _DeleteLastWordIntent extends Intent {
+  const _DeleteLastWordIntent();
+}
+
+class _DeleteShortcut extends StatelessWidget {
+  final VoidCallback onDeleteLastWord;
+  final TextEditingController controller;
+  final SeedPhraseFieldController seedPhraseFieldController;
+  final Widget child;
+
+  const _DeleteShortcut({
+    required this.onDeleteLastWord,
+    required this.controller,
+    required this.seedPhraseFieldController,
+    required this.child,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Shortcuts(
+      shortcuts: <LogicalKeySet, Intent>{
+        LogicalKeySet(LogicalKeyboardKey.backspace):
+            const _DeleteLastWordIntent(),
+      },
+      child: Actions(
+        actions: <Type, Action<Intent>>{
+          _DeleteLastWordIntent: _DeleteLastWordAction(
+            onInvoke: onDeleteLastWord,
+            textEditingController: controller,
+            seedPhraseFieldController: seedPhraseFieldController,
+          ),
+        },
+        child: child,
+      ),
+    );
+  }
+}
+
 class _SeedPhraseFieldState extends State<SeedPhraseField> {
   final _textEditingController = TextEditingController();
   final _scrollController = ScrollController();
@@ -53,32 +124,18 @@ class _SeedPhraseFieldState extends State<SeedPhraseField> {
 
   FocusNode? _focusNode;
 
-  FocusNode get _effectiveFocusNode {
-    return widget.focusNode ?? (_focusNode ??= FocusNode());
-  }
-
   SeedPhraseFieldController? _controller;
 
   SeedPhraseFieldController get _effectiveController {
     return widget.controller ?? (_controller ??= SeedPhraseFieldController());
   }
 
-  bool get _isCompleted {
-    return _effectiveController.value.length == widget.wordsCount;
+  FocusNode get _effectiveFocusNode {
+    return widget.focusNode ?? (_focusNode ??= FocusNode());
   }
 
-  @override
-  void dispose() {
-    _textEditingController.dispose();
-    _scrollController.dispose();
-
-    _focusNode?.dispose();
-    _focusNode = null;
-
-    _controller?.dispose();
-    _controller = null;
-
-    super.dispose();
+  bool get _isCompleted {
+    return _effectiveController.value.length == widget.wordsCount;
   }
 
   @override
@@ -143,6 +200,20 @@ class _SeedPhraseFieldState extends State<SeedPhraseField> {
     );
   }
 
+  @override
+  void dispose() {
+    _textEditingController.dispose();
+    _scrollController.dispose();
+
+    _focusNode?.dispose();
+    _focusNode = null;
+
+    _controller?.dispose();
+    _controller = null;
+
+    super.dispose();
+  }
+
   void _appendWord(String data) {
     final nextNr = _effectiveController.value.length + 1;
     final word = SeedPhraseWord(data, nr: nextNr);
@@ -164,10 +235,6 @@ class _SeedPhraseFieldState extends State<SeedPhraseField> {
         .addPostFrameCallback((_) => _ensureWordFieldVisible());
   }
 
-  void _deleteLastWord() {
-    _deleteAt(_effectiveController.value.length - 1);
-  }
-
   void _deleteAt(int index) {
     final words = [..._effectiveController.value]..removeAt(index);
 
@@ -180,45 +247,15 @@ class _SeedPhraseFieldState extends State<SeedPhraseField> {
     widget.onChanged?.call(words);
   }
 
+  void _deleteLastWord() {
+    _deleteAt(_effectiveController.value.length - 1);
+  }
+
   void _ensureWordFieldVisible() {
     final fieldContext = _wordFieldKey.currentContext;
     if (fieldContext != null) {
       unawaited(Scrollable.ensureVisible(fieldContext));
     }
-  }
-}
-
-class _DeleteShortcut extends StatelessWidget {
-  final VoidCallback onDeleteLastWord;
-  final TextEditingController controller;
-  final SeedPhraseFieldController seedPhraseFieldController;
-  final Widget child;
-
-  const _DeleteShortcut({
-    required this.onDeleteLastWord,
-    required this.controller,
-    required this.seedPhraseFieldController,
-    required this.child,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Shortcuts(
-      shortcuts: <LogicalKeySet, Intent>{
-        LogicalKeySet(LogicalKeyboardKey.backspace):
-            const _DeleteLastWordIntent(),
-      },
-      child: Actions(
-        actions: <Type, Action<Intent>>{
-          _DeleteLastWordIntent: _DeleteLastWordAction(
-            onInvoke: onDeleteLastWord,
-            textEditingController: controller,
-            seedPhraseFieldController: seedPhraseFieldController,
-          ),
-        },
-        child: child,
-      ),
-    );
   }
 }
 
@@ -298,42 +335,20 @@ class _WordField extends StatelessWidget {
               .take(10);
         },
         onSelected: onSelected,
+        autovalidateMode: AutovalidateMode.always,
+        textValidator: (value) {
+          return switch (value) {
+            final value when value.isEmpty =>
+              const VoicesTextFieldValidationResult.none(),
+            final value when !words.any((word) => word.startsWith(value)) =>
+              VoicesTextFieldValidationResult.error(
+                context.l10n.invalidSeedPhraseWord,
+              ),
+            _ => const VoicesTextFieldValidationResult.none(),
+          };
+        },
+        showValidationStatusIcon: false,
       ),
     );
-  }
-}
-
-class _DeleteLastWordIntent extends Intent {
-  const _DeleteLastWordIntent();
-}
-
-class _DeleteLastWordAction extends Action<_DeleteLastWordIntent> {
-  final VoidCallback onInvoke;
-  final TextEditingController textEditingController;
-  final SeedPhraseFieldController seedPhraseFieldController;
-
-  _DeleteLastWordAction({
-    required this.onInvoke,
-    required this.textEditingController,
-    required this.seedPhraseFieldController,
-  });
-
-  @override
-  bool isEnabled(_DeleteLastWordIntent intent) {
-    if (textEditingController.text.isNotEmpty) {
-      return false;
-    }
-
-    if (seedPhraseFieldController.value.isEmpty) {
-      return false;
-    }
-
-    return true;
-  }
-
-  @override
-  Object? invoke(_DeleteLastWordIntent intent) {
-    onInvoke();
-    return null;
   }
 }

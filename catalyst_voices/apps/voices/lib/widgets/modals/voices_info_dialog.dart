@@ -14,6 +14,7 @@ class VoicesDesktopInfoDialog extends StatelessWidget {
   final Widget icon;
   final Widget title;
   final Widget message;
+  final Widget? subMessage;
   final Widget action;
   final bool fillPosition;
 
@@ -22,6 +23,7 @@ class VoicesDesktopInfoDialog extends StatelessWidget {
     required this.icon,
     required this.title,
     required this.message,
+    this.subMessage,
     required this.action,
     this.fillPosition = false,
   });
@@ -31,6 +33,8 @@ class VoicesDesktopInfoDialog extends StatelessWidget {
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
     final colors = theme.colors;
+
+    final subMessage = this.subMessage;
 
     final iconThemeData = IconThemeData(
       size: 48,
@@ -43,6 +47,13 @@ class VoicesDesktopInfoDialog extends StatelessWidget {
     );
 
     final messageStyle = (textTheme.bodyMedium ?? const TextStyle()).copyWith(
+      fontWeight: subMessage != null ? FontWeight.w700 : null,
+      color: colors.textOnPrimaryLevel0,
+    );
+
+    final subMessageStyle =
+        (textTheme.bodyMedium ?? const TextStyle()).copyWith(
+      fontWeight: FontWeight.w500,
       color: colors.textOnPrimaryLevel0,
     );
 
@@ -52,6 +63,7 @@ class VoicesDesktopInfoDialog extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 83),
         child: Column(
           mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             const SizedBox(height: 36),
             IconTheme(
@@ -71,6 +83,14 @@ class VoicesDesktopInfoDialog extends StatelessWidget {
               textAlign: TextAlign.center,
               child: message,
             ),
+            if (subMessage != null) ...[
+              const SizedBox(height: 15),
+              DefaultTextStyle(
+                style: subMessageStyle,
+                textAlign: TextAlign.center,
+                child: subMessage,
+              ),
+            ],
             const SizedBox(height: 24),
             action,
             const SizedBox(height: 20),

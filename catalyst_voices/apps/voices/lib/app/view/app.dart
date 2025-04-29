@@ -5,7 +5,6 @@ import 'package:catalyst_voices/dependency/dependencies.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 final class App extends StatefulWidget {
   final RouterConfig<Object> routerConfig;

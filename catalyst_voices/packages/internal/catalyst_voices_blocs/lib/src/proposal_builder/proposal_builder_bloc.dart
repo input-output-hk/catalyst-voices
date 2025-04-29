@@ -33,6 +33,7 @@ final class ProposalBuilderBloc
   ProposalBuilderBlocCache _cache = const ProposalBuilderBlocCache();
   StreamSubscription<CatalystId?>? _activeAccountIdSub;
   StreamSubscription<List<CommentWithReplies>>? _commentsSub;
+  StreamSubscription<AccountPublicStatus>? _activeAccountPublicStatusSub;
 
   ProposalBuilderBloc(
     this._proposalService,
@@ -62,9 +63,13 @@ final class ProposalBuilderBloc
     on<UpdateCommentBuilderEvent>(_updateCommentBuilder);
     on<UpdateCommentRepliesEvent>(_updateCommentReplies);
     on<SubmitCommentEvent>(_submitComment);
+    on<AccountPublicStatusChangedEvent>(_updateAccountPublicStatus);
+
+    final activeAccount = _userService.user.activeAccount;
 
     _cache = _cache.copyWith(
-      activeAccountId: Optional(_userService.user.activeAccount?.catalystId),
+      activeAccountId: Optional(activeAccount?.catalystId),
+      accountPublicStatus: Optional(activeAccount?.publicStatus),
     );
 
     _activeAccountIdSub = _userService.watchUser
@@ -73,6 +78,12 @@ final class ProposalBuilderBloc
         .listen(
           (value) => add(RebuildActiveAccountProposalEvent(catalystId: value)),
         );
+
+    _activeAccountPublicStatusSub = _userService.watchUser
+        .map((event) => event.activeAccount?.publicStatus)
+        .distinct()
+        .map((event) => event ?? AccountPublicStatus.unknown)
+        .listen((event) => add(AccountPublicStatusChangedEvent(status: event)));
   }
 
   @override
@@ -83,7 +94,14 @@ final class ProposalBuilderBloc
     await _commentsSub?.cancel();
     _commentsSub = null;
 
+    await _activeAccountPublicStatusSub?.cancel();
+    _activeAccountPublicStatusSub = null;
+
     return super.close();
+  }
+
+  Future<bool> isAccountEmailVerified() {
+    return _userService.isActiveAccountPubliclyVerified();
   }
 
   bool validate() {
@@ -124,6 +142,7 @@ final class ProposalBuilderBloc
     required List<CommentWithReplies> comments,
     required CommentsState commentsState,
     required bool hasActiveAccount,
+    required bool canPublish,
   }) {
     final documentSegments = _mapDocumentToSegments(
       proposalDocument,
@@ -151,6 +170,7 @@ final class ProposalBuilderBloc
       metadata: proposalMetadata,
       category: categoryVM,
       activeNodeId: firstSection?.id,
+      canPublish: canPublish,
     );
   }
 
@@ -667,6 +687,7 @@ final class ProposalBuilderBloc
     final commentTemplate = _cache.commentTemplate;
     final comments = _cache.comments ?? [];
     final commentsState = state.comments;
+    final emailStatus = _cache.accountPublicStatus;
 
     if (proposalDocument == null ||
         proposalMetadata == null ||
@@ -683,6 +704,7 @@ final class ProposalBuilderBloc
       commentSchema: commentTemplate.schema,
       comments: comments,
       commentsState: commentsState,
+      canPublish: emailStatus?.isVerified ?? false,
     );
   }
 
@@ -831,6 +853,17 @@ final class ProposalBuilderBloc
 
     _updateMetadata(emit, publish: ProposalPublish.submittedProposal);
     emitSignal(const SubmittedProposalBuilderSignal());
+  }
+
+  void _updateAccountPublicStatus(
+    AccountPublicStatusChangedEvent event,
+    Emitter<ProposalBuilderState> emit,
+  ) {
+    _cache = _cache.copyWith(accountPublicStatus: Optional(event.status));
+
+    final isPubliclyVerified = event.status.isVerified;
+
+    emit(state.copyWith(canPublish: isPubliclyVerified));
   }
 
   Future<void> _updateCommentBuilder(

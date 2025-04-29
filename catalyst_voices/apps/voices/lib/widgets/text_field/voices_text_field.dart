@@ -100,6 +100,8 @@ class VoicesTextField extends VoicesFormField<String> {
   /// [TextField.mouseCursor]
   final MouseCursor? mouseCursor;
 
+  final bool showValidationStatusIcon;
+
   VoicesTextField({
     super.key,
     super.enabled = true,
@@ -132,6 +134,7 @@ class VoicesTextField extends VoicesFormField<String> {
     this.inputFormatters,
     this.maxLengthEnforcement,
     this.mouseCursor,
+    this.showValidationStatusIcon = true,
   }) : super(
           value: controller?.text ?? initialText,
           validator: (value) {
@@ -249,6 +252,9 @@ class VoicesTextFieldDecoration {
   /// [InputDecoration.helperText].
   final String? helperText;
 
+  /// [InputDecoration.helperMaxLines]
+  final int? helperMaxLines;
+
   /// [InputDecoration.hintText].
   final String? hintText;
 
@@ -304,6 +310,7 @@ class VoicesTextFieldDecoration {
     this.labelText,
     this.helper,
     this.helperText,
+    this.helperMaxLines = 2,
     this.hintText,
     this.hintStyle,
     this.errorText,
@@ -545,6 +552,7 @@ class VoicesTextFieldState extends VoicesFormFieldState<String> {
           ? textTheme.bodySmall
           : textTheme.bodySmall!.copyWith(color: colors.textOnPrimaryLevel1),
       hintText: widget.decoration?.hintText,
+      helperMaxLines: widget.decoration?.helperMaxLines,
       hintStyle: _getHintStyle(
         textTheme,
         theme,
@@ -635,6 +643,10 @@ class VoicesTextFieldState extends VoicesFormFieldState<String> {
   }
 
   Widget? _getStatusSuffixWidget() {
+    if (!widget.showValidationStatusIcon) {
+      return null;
+    }
+
     final showStatusIcon = widget.decoration?.showStatusSuffixIcon ?? true;
     if (!showStatusIcon) {
       return null;

@@ -65,7 +65,27 @@ extension StringExt on String {
 
   String withPrefix(String value) => '$value$this';
 
-  String withSuffix(String value) => '$this$value';
+  String withSuffix(
+    String value, {
+    bool space = false,
+    bool brackets = false,
+  }) {
+    final buffer = StringBuffer(this);
+
+    if (buffer.isNotEmpty && space) {
+      buffer.write(' ');
+    }
+
+    if (brackets) {
+      buffer.write('(');
+    }
+    buffer.write(value);
+    if (brackets) {
+      buffer.write(')');
+    }
+
+    return buffer.toString();
+  }
 }
 
 extension UrlParser on String {

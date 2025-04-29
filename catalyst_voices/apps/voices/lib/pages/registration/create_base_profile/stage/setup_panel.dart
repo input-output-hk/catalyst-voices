@@ -101,7 +101,11 @@ class _EmailTextField extends StatelessWidget {
       },
       textInputAction: TextInputAction.done,
       decoration: VoicesTextFieldDecoration(
-        labelText: l10n.createBaseProfileSetupEmailLabel.starred(),
+        labelText: l10n.createBaseProfileSetupEmailLabel.withSuffix(
+          l10n.optional,
+          space: true,
+          brackets: true,
+        ),
         hintText: l10n.createBaseProfileSetupEmailHint,
         helperText: l10n.createBaseProfileSetupEmailHelper,
         errorText: email.displayError?.message(context),

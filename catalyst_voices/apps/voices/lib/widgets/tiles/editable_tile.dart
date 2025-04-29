@@ -11,7 +11,7 @@ typedef EditableTileChange = ({
 
 class EditableTile extends StatelessWidget {
   final String title;
-  final bool isSelected;
+  final WidgetStatesController? statesController;
   final bool isEditMode;
   final bool isSaveEnabled;
   final bool isEditEnabled;
@@ -20,12 +20,13 @@ class EditableTile extends StatelessWidget {
   final String? errorText;
   final VoicesEditCancelButtonStyle editCancelButtonStyle;
   final ValueChanged<EditableTileChange>? onChanged;
+  final List<Widget> footerActions;
   final Widget child;
 
   const EditableTile({
     super.key,
     required this.title,
-    this.isSelected = false,
+    this.statesController,
     this.isEditMode = false,
     this.isSaveEnabled = false,
     this.isEditEnabled = true,
@@ -34,17 +35,19 @@ class EditableTile extends StatelessWidget {
     this.errorText,
     this.editCancelButtonStyle = VoicesEditCancelButtonStyle.text,
     this.onChanged,
+    this.footerActions = const [],
     required this.child,
   });
 
   @override
   Widget build(BuildContext context) {
     final showSaveButton = isEditMode;
-    final showFooter = showSaveButton || errorText != null;
+    final showFooter =
+        showSaveButton || errorText != null || footerActions.isNotEmpty;
 
     return PropertyTile(
       title: title,
-      isSelected: isSelected,
+      statesController: statesController,
       action: Offstage(
         offstage: !isEditEnabled,
         child: VoicesEditCancelButton(
@@ -63,6 +66,7 @@ class EditableTile extends StatelessWidget {
               showSaveButton: showSaveButton,
               isSaveEnabled: isSaveEnabled,
               onSave: _save,
+              children: footerActions,
             )
           : null,
       child: child,
@@ -126,6 +130,7 @@ class _Footer extends StatelessWidget {
   final bool showSaveButton;
   final bool isSaveEnabled;
   final VoidCallback onSave;
+  final List<Widget> children;
 
   const _Footer({
     required this.saveButtonLeading,
@@ -134,6 +139,7 @@ class _Footer extends StatelessWidget {
     required this.showSaveButton,
     required this.isSaveEnabled,
     required this.onSave,
+    this.children = const [],
   });
 
   @override
@@ -141,12 +147,12 @@ class _Footer extends StatelessWidget {
     final errorText = this.errorText;
 
     return Row(
+      spacing: 8,
       children: [
-        Expanded(
-          child: errorText != null
-              ? _ErrorText(text: errorText)
-              : const SizedBox.shrink(),
-        ),
+        if (errorText != null)
+          Expanded(child: _ErrorText(text: errorText))
+        else
+          const Spacer(),
         Visibility.maintain(
           visible: showSaveButton,
           child: VoicesFilledButton(
@@ -161,6 +167,7 @@ class _Footer extends StatelessWidget {
             ),
           ),
         ),
+        ...children,
       ],
     );
   }

@@ -53,6 +53,10 @@ abstract interface class DocumentsDao {
   /// Returns all known document refs.
   Future<List<SignedDocumentRef>> queryAllRefs();
 
+  Future<DocumentEntity?> queryLatestDocumentData({
+    CatalystId? authorId,
+  });
+
   /// Returns document with matching refTo and type.
   /// It return only lates version of document matching [refTo]
   Future<DocumentEntity?> queryRefToDocumentData({
@@ -218,6 +222,21 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
 
       return SignedDocumentRef(id: id.uuid, version: version.uuid);
     }).get();
+  }
+
+  @override
+  Future<DocumentEntity?> queryLatestDocumentData({
+    CatalystId? authorId,
+  }) {
+    final query = select(documents)
+      ..orderBy([(t) => OrderingTerm.desc(t.verHi)])
+      ..limit(1);
+
+    if (authorId != null) {
+      query.where((tbl) => tbl.metadata.isAuthor(authorId));
+    }
+
+    return query.getSingleOrNull();
   }
 
   @override
