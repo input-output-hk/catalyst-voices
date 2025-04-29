@@ -2,9 +2,9 @@
 
 use poem_openapi::{types::Example, NewType};
 
+/// IP Address.
 #[derive(NewType)]
 #[oai(example = true)]
-/// IP Address.
 pub(crate) struct IpAddr(std::net::IpAddr);
 
 impl Example for IpAddr {
