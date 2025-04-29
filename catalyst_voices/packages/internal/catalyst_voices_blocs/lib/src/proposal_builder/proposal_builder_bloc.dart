@@ -577,7 +577,9 @@ final class ProposalBuilderBloc
         ?.timeline
         .to;
 
-    emitSignal(ProposalSubmissionCloseDate(date: closeDate));
+    if (closeDate != null) {
+      emitSignal(ProposalSubmissionCloseDate(date: closeDate));
+    }
   }
 
   Future<void> _publishAndSubmitProposalForReview(
