@@ -70,8 +70,8 @@ class _Actions extends StatelessWidget with LaunchUrlMixin {
           const SizedBox(height: 52),
           VoicesFilledButton(
             child: Text(context.l10n.joinNewsletter),
-            onTap: () {
-              // TODO(LynxLynxx): implement url launching
+            onTap: () async {
+              await launchUri(VoicesConstants.joinNewsletterUrl.getUri());
             },
           ),
           const SizedBox(height: 12),

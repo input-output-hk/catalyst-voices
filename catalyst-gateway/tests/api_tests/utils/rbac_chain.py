@@ -42,6 +42,7 @@ class RBACChain:
                 role_id,
                 role_0_pk,
                 role_data["rotation"],
+                True,
             ),
             role_data["sk"],
         )
@@ -63,18 +64,22 @@ def rbac_chain_factory():
 
 
 def generate_cat_id(
-    network: str, subnet: str, role_id: RoleID, pk_hex: str, rotation: int
+    network: str, subnet: str, role_id: RoleID, pk_hex: str, rotation: int, is_uri: bool
 ):
     pk = bytes.fromhex(pk_hex)[:32]
-    prefix = "catid.:"
     nonce = int(datetime.now(timezone.utc).timestamp())
     subnet = f"{subnet}." if subnet else ""
     role0_pk_b64 = base64_url(pk)
 
     if role_id == RoleID.ROLE_0 and rotation == 0:
-        return f"{prefix}{nonce}@{subnet}{network}/{role0_pk_b64}"
+        res = f"{nonce}@{subnet}{network}/{role0_pk_b64}"
+    else:
+        res = f"{nonce}@{subnet}{network}/{role0_pk_b64}/{role_id}/{rotation}"
 
-    return f"{prefix}{nonce}@{subnet}{network}/{role0_pk_b64}/{role_id}/{rotation}"
+    if is_uri:
+        res = f"id.catalyst://{res}"
+
+    return res
 
 
 def generate_rbac_auth_token(
@@ -90,14 +95,16 @@ def generate_rbac_auth_token(
     bip32_ed25519_sk = BIP32ED25519PrivateKey(sk, chain_code)
     bip32_ed25519_pk = BIP32ED25519PublicKey(pk, chain_code)
 
-    # Concat . before the signature
-    cat_id = f"{generate_cat_id(network, subnet, RoleID.ROLE_0, pk_hex, 0)}."
-   
+    token_prefix = "catid.:"
+    # Add . before signing
+    cat_id = f"{token_prefix}{generate_cat_id(network, subnet, RoleID.ROLE_0, pk_hex, 0, False)}."
+
     signature = bip32_ed25519_sk.sign(cat_id.encode())
     bip32_ed25519_pk.verify(signature, cat_id.encode())
     signature_b64 = base64_url(signature)
 
     return f"{cat_id}{signature_b64}"
+
 
 def base64_url(data: bytes) -> str:
     # URL safety and no padding base 64
