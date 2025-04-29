@@ -24,9 +24,9 @@ def test_invalid_rbac_auth_token():
     resp = get(lookup=None, token="invalid")
     assert( resp.status_code == 401 ), f"Expected missing token prefix: {resp.status_code} - {resp.text}"
 
-    # Missing signature -> 401
+    # Missing signature (removing all . so cannot split into token and signature) -> 401
     # cspell:disable-next-line 
-    token = "catid.:1744185821@preprod.cardano/bkL45YmnbrsT7yed94Qe_Ol48Qa-4Zbw48_TR7sxoug"
+    token = "catid.:1744185821@preprodcardano/bkL45YmnbrsT7yed94Qe_Ol48Qa-4Zbw48_TR7sxoug"
     resp = get(lookup=None, token=token)
     assert( resp.status_code == 401 ), f"Expected missing token signature: {resp.status_code} - {resp.text}"
     
@@ -50,7 +50,7 @@ def test_invalid_rbac_auth_token():
 
     # Auth token has username -> 401
     # cspell:disable-next-line
-    token = "catid.alice:1744185821@preprod.cardano/bkL45YmnbrsT7yed94Qe_Ol48Qa-4Zbw48_TR7sxoug.nEWeRBKoksRSY6W8_Gxeq07I7EiWhm9G-IOGxP7BDFSa-x--VHZPiwji5mWKtZd6qvWSGuOu9TvdklYnGMJ2CQ"
+    token = "catid.bob:1744185821@preprod.cardano/bkL45YmnbrsT7yed94Qe_Ol48Qa-4Zbw48_TR7sxoug.nEWeRBKoksRSY6W8_Gxeq07I7EiWhm9G-IOGxP7BDFSa-x--VHZPiwji5mWKtZd6qvWSGuOu9TvdklYnGMJ2CQ"
     resp = get(lookup=None, token=token)
     assert( resp.status_code == 401 ), f"Expected must not contain username: {resp.status_code} - {resp.text}"
     
@@ -74,15 +74,21 @@ def test_invalid_rbac_auth_token():
     
     # Catalyst ID part contain rotation -> 401
     # cspell:disable-next-line
-    token = "catid.:1744185821@preprod.cardano/bkL45YmnbrsT7yed94Qe_Ol48Qa-4Zbw48_TR7sxoug/0/0.nEWeRBKoksRSY6W8_Gxeq07I7EiWhm9G-IOGxP7BDFSa-x--VHZPiwji5mWKtZd6qvWSGuOu9TvdklYnGMJ2CQ"
+    token = "catid.:1744185821@preprod.cardano/bkL45YmnbrsT7yed94Qe_Ol48Qa-4Zbw48_TR7sxoug/0/10.nEWeRBKoksRSY6W8_Gxeq07I7EiWhm9G-IOGxP7BDFSa-x--VHZPiwji5mWKtZd6qvWSGuOu9TvdklYnGMJ2CQ"
     resp = get(lookup=None, token=token)
     assert( resp.status_code == 401 ), f"Expected no rotation: {resp.status_code} - {resp.text}"
     
-    # Unknown network -> 401
+    # Unsupported network -> 401
+    # cspell:disable-next-line
+    token = "catid.:1744185821@testnet.test/bkL45YmnbrsT7yed94Qe_Ol48Qa-4Zbw48_TR7sxoug.nEWeRBKoksRSY6W8_Gxeq07I7EiWhm9G-IOGxP7BDFSa-x--VHZPiwji5mWKtZd6qvWSGuOu9TvdklYnGMJ2CQ"
+    resp = get(lookup=None, token=token)
+    assert( resp.status_code == 401 ), f"Expected unsupported network: {resp.status_code} - {resp.text}"
+
+    # Unsupported subnet -> 401
     # cspell:disable-next-line
     token = "catid.:1744185821@testnet.cardano/bkL45YmnbrsT7yed94Qe_Ol48Qa-4Zbw48_TR7sxoug.nEWeRBKoksRSY6W8_Gxeq07I7EiWhm9G-IOGxP7BDFSa-x--VHZPiwji5mWKtZd6qvWSGuOu9TvdklYnGMJ2CQ"
     resp = get(lookup=None, token=token)
-    assert( resp.status_code == 401 ), f"Expected unknown network: {resp.status_code} - {resp.text}"
+    assert( resp.status_code == 401 ), f"Expected unsupported subnet: {resp.status_code} - {resp.text}"
 
     # Role 0 key is not registered in the given network (not found in the database) - 401
     # cspell:disable-next-line
@@ -96,12 +102,12 @@ def test_invalid_rbac_auth_token():
     resp = get(lookup=None, token=token)
     assert(resp.status_code == 403), f"Expected nonce expired: {resp.status_code} - {resp.text}"
     
-    # Signature verification, not valid signature -> 403. 
+    # Signature verification, not valid signature -> 403.
     nonce = int(datetime.now(timezone.utc).timestamp())
     # cspell:disable-next-line
     token = f"catid.:{nonce}@preprod.cardano/bkL45YmnbrsT7yed94Qe_Ol48Qa-4Zbw48_TR7sxoug.mlMUaAMADHCI59TXwvpe5fnYPLAewKd_71iDr46Qyti7sIYdN-Hyd4dJVfNVDYU4At5XaMniqf5v5wxgmAEOCQ"
     resp = get(lookup=None, token=token)
-    assert(resp.status_code == 402), f"Expected invalid signature: {resp.status_code} - {resp.text}"
+    assert(resp.status_code == 403), f"Expected invalid signature: {resp.status_code} - {resp.text}"
     
 def test_valid_rbac_auth_token(rbac_chain_factory):
     token = rbac_chain_factory(RoleID.ROLE_0).auth_token()
