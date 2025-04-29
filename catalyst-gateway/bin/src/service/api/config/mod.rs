@@ -79,7 +79,7 @@ impl ConfigApi {
                 .and_then(TryInto::try_into)
             {
                 Ok(value) => Some(value),
-                Err(err) if err.is::<NotFoundError>() => None,
+                Err(err) if err.is::<NotFoundError>() => return GetConfigResponses::NotFound.into(),
                 Err(err) => {
                     error!(id = "get_frontend_config_ip", error = ?err, "Failed to get frontend configuration for IP");
                     return GetConfigAllResponses::handle_error(&err);
