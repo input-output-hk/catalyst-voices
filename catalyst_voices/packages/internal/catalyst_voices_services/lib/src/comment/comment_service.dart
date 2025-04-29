@@ -42,7 +42,7 @@ final class CommentServiceImpl implements CommentService {
   Future<CommentTemplate> getCommentTemplateFor({
     required DocumentRef category,
   }) async {
-    final commentTemplateRef = categoriesTemplatesRefs
+    final commentTemplateRef = constantDocumentsRefs
         .firstWhereOrNull((element) => element.category.id == category.id)
         ?.comment;
 
