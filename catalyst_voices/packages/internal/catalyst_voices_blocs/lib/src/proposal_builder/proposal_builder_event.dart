@@ -75,6 +75,13 @@ final class MaxProposalsLimitChangedEvent extends ProposalBuilderEvent {
   List<Object?> get props => [isLimitReached];
 }
 
+final class MaxProposalsLimitReachedEvent extends ProposalBuilderEvent {
+  const MaxProposalsLimitReachedEvent();
+
+  @override
+  List<Object?> get props => [];
+}
+
 sealed class ProposalBuilderEvent extends Equatable {
   const ProposalBuilderEvent();
 }

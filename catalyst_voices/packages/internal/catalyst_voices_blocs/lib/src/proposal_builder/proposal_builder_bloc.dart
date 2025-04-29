@@ -66,6 +66,7 @@ final class ProposalBuilderBloc
     on<SubmitCommentEvent>(_submitComment);
     on<AccountPublicStatusChangedEvent>(_updateAccountPublicStatus);
     on<MaxProposalsLimitChangedEvent>(_updateMaxProposalsLimitReached);
+    on<MaxProposalsLimitReachedEvent>(_onMaxProposalsLimitReached);
 
     final activeAccount = _userService.user.activeAccount;
 
@@ -173,11 +174,6 @@ final class ProposalBuilderBloc
     final guidance = _getGuidanceForSection(firstSegment, firstSection);
     final categoryVM = CampaignCategoryDetailsViewModel.fromModel(category);
 
-    final publishOptions = _createPublishOptions(
-      isEmailVerified: isEmailVerified,
-      isMaxProposalsLimitReached: isMaxProposalsLimitReached,
-    );
-
     return ProposalBuilderState(
       documentSegments: documentSegments,
       commentSegments: commentSegments,
@@ -186,7 +182,8 @@ final class ProposalBuilderBloc
       metadata: proposalMetadata,
       category: categoryVM,
       activeNodeId: firstSection?.id,
-      publishOptions: publishOptions,
+      canPublish: isEmailVerified,
+      isMaxProposalsLimitReached: isMaxProposalsLimitReached,
     );
   }
 
@@ -226,19 +223,6 @@ final class ProposalBuilderBloc
     }
 
     return _rebuildState();
-  }
-
-  ProposalBuilderPublishOptions _createPublishOptions({
-    required bool isEmailVerified,
-    required bool isMaxProposalsLimitReached,
-  }) {
-    if (isMaxProposalsLimitReached) {
-      return ProposalBuilderPublishOptions.disabled;
-    } else if (!isEmailVerified) {
-      return ProposalBuilderPublishOptions.locked;
-    } else {
-      return ProposalBuilderPublishOptions.enabled;
-    }
   }
 
   Future<void> _deleteProposal(
@@ -350,6 +334,16 @@ final class ProposalBuilderBloc
             _findGuidanceItems(segment, section, section.property).toList(),
       );
     }
+  }
+
+  Future<DateTime?> _getProposalSubmissionCloseDate() async {
+    final timeline = await _campaignService.getCampaignTimeline();
+    return timeline
+        .firstWhereOrNull(
+          (e) => e.stage == CampaignTimelineStage.proposalSubmission,
+        )
+        ?.timeline
+        .to;
   }
 
   void _handleActiveNodeChangedEvent(
@@ -598,18 +592,29 @@ final class ProposalBuilderBloc
     }).toList();
   }
 
+  Future<void> _onMaxProposalsLimitReached(
+    MaxProposalsLimitReachedEvent event,
+    Emitter<ProposalBuilderState> emit,
+  ) async {
+    final proposalSubmissionCloseDate = await _getProposalSubmissionCloseDate();
+    final count = await _proposalService.watchUserProposalsCount().first;
+
+    if (proposalSubmissionCloseDate != null) {
+      final signal = MaxProposalsLimitReachedSignal(
+        proposalSubmissionCloseDate: proposalSubmissionCloseDate,
+        currentSubmissions: count.finals,
+        maxSubmissions: ProposalDocument.maxSubmittedProposalsPerUser,
+      );
+
+      emitSignal(signal);
+    }
+  }
+
   Future<void> _proposalSubmissionCloseDate(
     ProposalSubmissionCloseDateEvent event,
     Emitter<ProposalBuilderState> emit,
   ) async {
-    final timeline = await _campaignService.getCampaignTimeline();
-    final closeDate = timeline
-        .firstWhereOrNull(
-          (e) => e.stage == CampaignTimelineStage.proposalSubmission,
-        )
-        ?.timeline
-        .to;
-
+    final closeDate = await _getProposalSubmissionCloseDate();
     if (closeDate != null) {
       emitSignal(ProposalSubmissionCloseDate(date: closeDate));
     }

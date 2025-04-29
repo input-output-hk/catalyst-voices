@@ -128,6 +128,8 @@ abstract interface class ProposalService {
   });
 
   Stream<List<Proposal>> watchUserProposals();
+
+  Stream<ProposalsCount> watchUserProposalsCount();
 }
 
 final class ProposalServiceImpl implements ProposalService {
@@ -440,21 +442,8 @@ final class ProposalServiceImpl implements ProposalService {
 
   @override
   Stream<bool> watchMaxProposalsLimitReached() {
-    return _userService.watchUser.distinct().switchMap((user) {
-      final authorId = user.activeAccount?.catalystId;
-      if (!_isProposer(user) || authorId == null) {
-        // user is not eligible for creating proposals
-        return const Stream.empty();
-      }
-
-      final filters = ProposalsCountFilters(
-        author: authorId,
-        onlyAuthor: true,
-      );
-
-      return watchProposalsCount(filters: filters).map((count) {
-        return count.finals >= ProposalDocument.maxSubmittedProposalsPerUser;
-      });
+    return watchUserProposalsCount().map((count) {
+      return count.finals >= ProposalDocument.maxSubmittedProposalsPerUser;
     });
   }
 
@@ -517,6 +506,24 @@ final class ProposalServiceImpl implements ProposalService {
           },
         ).switchMap(Stream.fromFuture);
       });
+    });
+  }
+
+  @override
+  Stream<ProposalsCount> watchUserProposalsCount() {
+    return _userService.watchUser.distinct().switchMap((user) {
+      final authorId = user.activeAccount?.catalystId;
+      if (!_isProposer(user) || authorId == null) {
+        // user is not eligible for creating proposals
+        return const Stream.empty();
+      }
+
+      final filters = ProposalsCountFilters(
+        author: authorId,
+        onlyAuthor: true,
+      );
+
+      return watchProposalsCount(filters: filters);
     });
   }
 

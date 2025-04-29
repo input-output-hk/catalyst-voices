@@ -2,7 +2,6 @@ import 'package:catalyst_voices_assets/generated/assets.gen.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
-import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/widgets.dart';
 
 enum ProposalMenuItemAction {
@@ -109,21 +108,20 @@ enum ProposalMenuItemAction {
 
   static List<ProposalMenuItemAction> proposalBuilderAvailableOptions({
     required ProposalPublish proposalPublish,
-    required ProposalBuilderPublishOptions publishOptions,
   }) {
     switch (proposalPublish) {
       case ProposalPublish.localDraft:
         return [
           view,
           publish,
-          if (publishOptions != ProposalBuilderPublishOptions.disabled) submit,
+          submit,
           export,
           delete,
         ];
       case ProposalPublish.publishedDraft:
         return [
           view,
-          if (publishOptions != ProposalBuilderPublishOptions.disabled) submit,
+          submit,
           forget,
           export,
         ];

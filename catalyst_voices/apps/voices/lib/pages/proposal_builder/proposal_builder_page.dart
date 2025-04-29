@@ -15,6 +15,7 @@ import 'package:catalyst_voices/pages/workspace/submission_closing_warning_dialo
 import 'package:catalyst_voices/routes/routes.dart';
 import 'package:catalyst_voices/routes/routing/proposal_builder_route.dart';
 import 'package:catalyst_voices/widgets/modals/comment/submit_comment_error_dialog.dart';
+import 'package:catalyst_voices/widgets/modals/proposals/proposal_limit_reached_dialog.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/publish_proposal_error_dialog.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/submit_proposal_error_dialog.dart';
 import 'package:catalyst_voices/widgets/snackbar/voices_snackbar.dart';
@@ -158,6 +159,8 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
         unawaited(_showSubmissionClosingWarningDialog(signal.date));
       case EmailNotVerifiedProposalBuilderSignal():
         unawaited(_showEmailNotVerifiedDialog());
+      case MaxProposalsLimitReachedSignal():
+        unawaited(_showProposalLimitReachedDialog(signal));
     }
   }
 
@@ -267,6 +270,16 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
         unawaited(const AccountRoute().push(context));
       });
     }
+  }
+
+  Future<void> _showProposalLimitReachedDialog(
+      MaxProposalsLimitReachedSignal signal,) {
+    return ProposalLimitReachedDialog.show(
+      context: context,
+      currentSubmissions: signal.currentSubmissions,
+      maxSubmissions: signal.maxSubmissions,
+      submissionCloseAt: signal.proposalSubmissionCloseDate,
+    );
   }
 
   Future<void> _showPublishException(ProposalBuilderPublishException error) {
