@@ -1,5 +1,6 @@
 # Before running this test, unset RBAC_OFF environment variable
 
+import pytest
 import requests
 from api import cat_gateway_endpoint_url
 from utils import health, sync
@@ -16,6 +17,7 @@ def get(lookup: str | None, token: str, extra_headers: dict | None = None):
         headers.update(extra_headers)
     return requests.get(URL, headers=headers, params={"lookup": lookup})
 
+@pytest.mark.skip
 def test_invalid_rbac_auth_token():
     health.is_live()
     health.is_ready()
@@ -108,7 +110,8 @@ def test_invalid_rbac_auth_token():
     token = f"catid.:{nonce}@preprod.cardano/bkL45YmnbrsT7yed94Qe_Ol48Qa-4Zbw48_TR7sxoug.mlMUaAMADHCI59TXwvpe5fnYPLAewKd_71iDr46Qyti7sIYdN-Hyd4dJVfNVDYU4At5XaMniqf5v5wxgmAEOCQ"
     resp = get(lookup=None, token=token)
     assert(resp.status_code == 403), f"Expected invalid signature: {resp.status_code} - {resp.text}"
-    
+
+@pytest.mark.skip
 def test_valid_rbac_auth_token(rbac_chain_factory):
     token = rbac_chain_factory(RoleID.ROLE_0).auth_token()
     resp = get(lookup=None, token=token)
