@@ -199,6 +199,9 @@ final class ProposalBuilderBloc
     final commentTemplate =
         await _commentService.getCommentTemplateFor(category: category.selfRef);
 
+    final isMaxProposalsLimitReached =
+        await _proposalService.isMaxProposalsLimitReached();
+
     _cache = _cache.copyWith(
       proposalBuilder: Optional(proposalDocument.toBuilder()),
       proposalDocument: Optional(proposalDocument),
@@ -206,6 +209,7 @@ final class ProposalBuilderBloc
       category: Optional(category),
       commentTemplate: Optional(commentTemplate),
       comments: const Optional.empty(),
+      isMaxProposalsLimitReached: Optional(isMaxProposalsLimitReached),
     );
 
     await _commentsSub?.cancel();
