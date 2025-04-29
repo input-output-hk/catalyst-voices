@@ -63,10 +63,7 @@ def set_config(env: str):
     # extracting settings.json attributes
     url = settings["url"]
     api_key = settings["api_key"]
-    headers = {
-        "X-API-Key": api_key,
-        "Content-Type": "application/json"
-    }
+    headers = {"X-API-Key": api_key}
 
     # load and apply config.json
     config_path = os.path.join(env_dir, "config.json")
