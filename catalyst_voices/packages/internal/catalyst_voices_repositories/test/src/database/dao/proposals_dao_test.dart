@@ -410,14 +410,14 @@ void main() {
           () async {
             // Given
             final userId = DummyCatalystIdFactory.create(username: 'damian');
-            final categoryId = categoriesTemplatesRefs.first.category;
+            final categoryId = constantDocumentsRefs.first.category;
 
             final proposalOneRef = SignedDocumentRef.generateFirstRef();
             final proposalTwoRef = SignedDocumentRef.generateFirstRef();
             final proposals = [
               _buildProposal(
                 selfRef: proposalOneRef,
-                categoryId: categoriesTemplatesRefs[1].category,
+                categoryId: constantDocumentsRefs[1].category,
               ),
               _buildProposal(
                 selfRef: proposalTwoRef,
@@ -689,7 +689,7 @@ void main() {
         () async {
           // Given
           final templateRef = SignedDocumentRef.generateFirstRef();
-          final categoryId = categoriesTemplatesRefs.first.category;
+          final categoryId = constantDocumentsRefs.first.category;
 
           final templates = [
             _buildProposalTemplate(selfRef: templateRef),
@@ -713,7 +713,7 @@ void main() {
             ),
             _buildProposal(
               template: templateRef,
-              categoryId: categoriesTemplatesRefs[1].category,
+              categoryId: constantDocumentsRefs[1].category,
             ),
           ];
 
@@ -1051,7 +1051,7 @@ DocumentEntityWithMetadata _buildProposal({
     authors: [
       if (author != null) author,
     ],
-    categoryId: categoryId ?? categoriesTemplatesRefs.first.category,
+    categoryId: categoryId ?? constantDocumentsRefs.first.category,
   );
   final content = DocumentDataContent({
     if (title != null || contentAuthorName != null)

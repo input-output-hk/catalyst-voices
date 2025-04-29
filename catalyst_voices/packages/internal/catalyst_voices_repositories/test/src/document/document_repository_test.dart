@@ -308,7 +308,7 @@ void main() {
           );
           final remoteRefs = [...refs, ...refs];
           final expectedRefs = [
-            ...categoriesTemplatesRefs.expand((e) => [e.proposal, e.comment]),
+            ...constantDocumentsRefs.expand((e) => [e.proposal, e.comment]),
             ...refs,
           ];
 
@@ -390,7 +390,7 @@ void main() {
         'remote loose refs to const documents are removed',
         () async {
           // Given
-          final constTemplatesRefs = categoriesTemplatesRefs
+          final constTemplatesRefs = constantDocumentsRefs
               .expand((element) => [element.proposal])
               .toList();
 
@@ -423,7 +423,7 @@ void main() {
         'categories refs are filtered out',
         () async {
           // Given
-          final categoriesRefs = categoriesTemplatesRefs
+          final categoriesRefs = constantDocumentsRefs
               .expand((element) => [element.category])
               .toList();
           final categoriesIds = categoriesRefs.map((e) => e.id).toList();
