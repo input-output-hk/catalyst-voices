@@ -2502,6 +2502,44 @@
       }
     }
   },
+  "proposalsLimitReachedSubtitle": "You already published {count} final {count, plural, =0{proposals} =1{proposal} other{proposals}}!",
+  "@proposalsLimitReachedSubtitle": {
+    "description": "Subtitle in dialog when user tries to publish too many proposals.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "proposalsLimitReachedPoint1": "You can continue editing local/draft proposals.",
+  "@proposalsLimitReachedPoint1": {
+    "description": "Explains that local/draft proposals are not limited."
+  },
+  "proposalsLimitReachedPoint2": "You can't publish more than {count} {count, plural, =0{finals} =1{final} other{finals}}.",
+  "@proposalsLimitReachedPoint2": {
+    "description": "Explains that user can't publish more proposals that the limit allows.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "proposalsLimitReachedPoint3": "You can share for feedback.",
+  "@proposalsLimitReachedPoint3": {
+    "description": "Explains that users can still send proposals for public feedback even if they cannot submit for review."
+  },
+  "proposalsLimitReachedPoint4": "Publish Final is disabled.",
+  "@proposalsLimitReachedPoint4": {
+    "description": "Explains that users cannot anymore submit proposals for review."
+  },
+  "proposalsLimitReachedCaptionTitle": "Want to publish another final?",
+  "@proposalsLimitReachedCaptionTitle": {
+    "description": "A title of a small note in a dialog that explains a user has reached the proposal limit."
+  },
+  "proposalsLimitReachedCaptionText": "You need to put one of your final proposals to draft, before you can publish another final.",
+  "@proposalsLimitReachedCaptionText": {
+    "description": "A message of a small note in a dialog that explains a user has reached the proposal limit."
+  },
   "insertNewImageDialogTitle": "Insert New Image",
   "@insertNewImageDialogTitle": {
     "description": "Title of the dialog for inserting a new image"
