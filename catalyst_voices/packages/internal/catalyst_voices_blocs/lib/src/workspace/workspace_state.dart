@@ -8,14 +8,12 @@ final class WorkspaceState extends Equatable {
   final LocalizedException? error;
   final List<Proposal> userProposals;
   final List<CampaignTimelineViewModel> timelineItems;
-  final bool isProposalLimitReached;
 
   const WorkspaceState({
     this.isLoading = false,
     this.error,
     this.userProposals = const [],
     this.timelineItems = const [],
-    this.isProposalLimitReached = true,
   });
 
   bool get hasComments => userProposals.any((e) => e.commentsCount > 0);
@@ -34,7 +32,6 @@ final class WorkspaceState extends Equatable {
         error,
         userProposals,
         timelineItems,
-        isProposalLimitReached,
       ];
 
   List<Proposal> get published => userProposals
@@ -60,15 +57,12 @@ final class WorkspaceState extends Equatable {
     Optional<LocalizedException>? error,
     List<Proposal>? userProposals,
     List<CampaignTimelineViewModel>? timelineItems,
-    bool? isProposalLimitReached,
   }) {
     return WorkspaceState(
       isLoading: isLoading ?? this.isLoading,
       error: error.dataOr(this.error),
       userProposals: userProposals ?? this.userProposals,
       timelineItems: timelineItems ?? this.timelineItems,
-      isProposalLimitReached:
-          isProposalLimitReached ?? this.isProposalLimitReached,
     );
   }
 }

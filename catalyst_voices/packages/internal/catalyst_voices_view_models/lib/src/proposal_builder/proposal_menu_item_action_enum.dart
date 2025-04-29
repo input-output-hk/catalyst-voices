@@ -115,10 +115,8 @@ enum ProposalMenuItemAction {
       case ProposalPublish.localDraft:
         return [
           view,
-          if (publishOptions != ProposalBuilderPublishOptions.disabled) ...[
-            publish,
-            submit,
-          ],
+          publish,
+          if (publishOptions != ProposalBuilderPublishOptions.disabled) submit,
           export,
           delete,
         ];

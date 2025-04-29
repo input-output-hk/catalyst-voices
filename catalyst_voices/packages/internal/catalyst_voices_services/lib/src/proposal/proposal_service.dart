@@ -160,12 +160,6 @@ final class ProposalServiceImpl implements ProposalService {
     required SignedDocumentRef template,
     required SignedDocumentRef categoryId,
   }) async {
-    if (await isMaxProposalsLimitReached()) {
-      throw const ProposalLimitReachedException(
-        maxLimit: ProposalDocument.maxSubmittedProposalsPerUser,
-      );
-    }
-
     final draftRef = DraftRef.generateFirstRef();
     final catalystId = _getUserCatalystId();
     await _proposalRepository.upsertDraftProposal(
@@ -274,12 +268,6 @@ final class ProposalServiceImpl implements ProposalService {
 
   @override
   Future<DocumentRef> importProposal(Uint8List data) async {
-    if (await isMaxProposalsLimitReached()) {
-      throw const ProposalLimitReachedException(
-        maxLimit: ProposalDocument.maxSubmittedProposalsPerUser,
-      );
-    }
-
     final authorId = _getUserCatalystId();
     return _proposalRepository.importProposal(data, authorId);
   }
@@ -299,12 +287,6 @@ final class ProposalServiceImpl implements ProposalService {
   Future<SignedDocumentRef> publishProposal({
     required DocumentData document,
   }) async {
-    if (await isMaxProposalsLimitReached()) {
-      throw const ProposalLimitReachedException(
-        maxLimit: ProposalDocument.maxSubmittedProposalsPerUser,
-      );
-    }
-
     final originalRef = document.ref;
 
     // There is a system requirement to publish fresh documents,

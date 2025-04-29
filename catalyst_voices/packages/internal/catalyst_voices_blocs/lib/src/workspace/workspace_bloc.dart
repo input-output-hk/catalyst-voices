@@ -25,7 +25,6 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
   final DownloaderService _downloaderService;
 
   StreamSubscription<List<Proposal>>? _proposalsSub;
-  StreamSubscription<bool>? _isMaxProposalsLimitReachedSub;
 
   // ignore: unused_field
   final List<Proposal> _proposals = [];
@@ -37,7 +36,6 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     this._downloaderService,
   ) : super(const WorkspaceState()) {
     on<LoadProposalsEvent>(_loadProposals);
-    on<LoadProposalsLimitEvent>(_loadProposalsLimit);
     on<ImportProposalEvent>(_importProposal);
     on<ErrorLoadProposalsEvent>(_errorLoadProposals);
     on<WatchUserProposalsEvent>(_watchUserProposals);
@@ -74,9 +72,6 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
   Future<void> _cancelProposalSubscriptions() async {
     await _proposalsSub?.cancel();
     _proposalsSub = null;
-
-    await _isMaxProposalsLimitReachedSub?.cancel();
-    _isMaxProposalsLimitReachedSub = null;
   }
 
   Future<void> _deleteProposal(
@@ -208,17 +203,6 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     );
   }
 
-  Future<void> _loadProposalsLimit(
-    LoadProposalsLimitEvent event,
-    Emitter<WorkspaceState> emit,
-  ) async {
-    emit(
-      state.copyWith(
-        isProposalLimitReached: event.isMaxLimitReached,
-      ),
-    );
-  }
-
   List<Proposal> _removeProposal(
     DocumentRef proposalRef,
   ) {
@@ -239,12 +223,6 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
         add(ErrorLoadProposalsEvent(LocalizedException.create(error)));
       },
     );
-
-    _isMaxProposalsLimitReachedSub = _proposalService
-        .watchMaxProposalsLimitReached()
-        .listen((isMaxLimitReached) {
-      add(LoadProposalsLimitEvent(isMaxLimitReached: isMaxLimitReached));
-    });
   }
 
   Future<void> _unlockProposal(

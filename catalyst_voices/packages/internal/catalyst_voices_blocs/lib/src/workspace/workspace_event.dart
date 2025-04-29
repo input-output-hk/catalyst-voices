@@ -63,15 +63,6 @@ final class LoadProposalsEvent extends WorkspaceEvent {
   List<Object?> get props => [proposals];
 }
 
-final class LoadProposalsLimitEvent extends WorkspaceEvent {
-  final bool isMaxLimitReached;
-
-  const LoadProposalsLimitEvent({required this.isMaxLimitReached});
-
-  @override
-  List<Object?> get props => [isMaxLimitReached];
-}
-
 final class UnlockProposalEvent extends WorkspaceEvent {
   final DocumentRef ref;
 

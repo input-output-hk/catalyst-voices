@@ -5,14 +5,13 @@ import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/common/ext/space_ext.dart';
 import 'package:catalyst_voices/routes/routing/routing.dart';
 import 'package:catalyst_voices/widgets/campaign_timeline/campaign_timeline_card.dart';
-import 'package:catalyst_voices/widgets/modals/proposals/proposal_limit_reached_dialog.dart';
+import 'package:catalyst_voices/widgets/modals/proposals/create_new_proposal_dialog.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart'
     show ProposalDocument, Space;
-import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
@@ -25,26 +24,6 @@ class WorkspaceHeader extends StatefulWidget {
 
   @override
   State<WorkspaceHeader> createState() => _WorkspaceHeaderState();
-}
-
-class _CreateProposalButtonSelector extends StatelessWidget {
-  const _CreateProposalButtonSelector();
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocSelector<WorkspaceBloc, WorkspaceState, bool>(
-      selector: (state) => state.isProposalLimitReached,
-      builder: (context, isProposalLimitReached) {
-        return Offstage(
-          offstage: isProposalLimitReached,
-          child: const Padding(
-            padding: EdgeInsets.only(right: 8),
-            child: _CreateProposalButton(),
-          ),
-        );
-      },
-    );
-  }
 }
 
 class _HasCommentCard extends StatelessWidget {
@@ -103,26 +82,6 @@ class _HasCommentCard extends StatelessWidget {
   }
 }
 
-class _ImportProposalButtonSelector extends StatelessWidget {
-  const _ImportProposalButtonSelector();
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocSelector<WorkspaceBloc, WorkspaceState, bool>(
-      selector: (state) => state.isProposalLimitReached,
-      builder: (context, isProposalLimitReached) {
-        return Offstage(
-          offstage: isProposalLimitReached,
-          child: const Padding(
-            padding: EdgeInsets.only(left: 8),
-            child: _ImportProposalButton(),
-          ),
-        );
-      },
-    );
-  }
-}
-
 class _ViewComments extends StatelessWidget {
   const _ViewComments();
 
@@ -174,8 +133,10 @@ class _WorkspaceHeaderState extends State<WorkspaceHeader> {
                 ),
               ),
               const Spacer(),
-              const _CreateProposalButtonSelector(),
-              const _ImportProposalButtonSelector(),
+              const _CreateProposalButton(),
+              const SizedBox(width: 8),
+              const _ImportProposalButton(),
+              const SizedBox(width: 8),
               _TimelineToggleButton(
                 onPressed: _toggleTimelineVisibility,
               ),
