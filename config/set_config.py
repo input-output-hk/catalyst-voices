@@ -3,7 +3,7 @@ A script for inserting frontend config files via the `config/frontend` PUT endpo
 
 # Example
 
-```py
+```sh
 python3 config/set_config.py --retry dev
 ```
 
