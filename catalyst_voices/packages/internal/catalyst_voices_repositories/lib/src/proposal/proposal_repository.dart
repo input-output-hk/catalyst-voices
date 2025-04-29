@@ -30,6 +30,11 @@ abstract interface class ProposalRepository {
     required DocumentRef ref,
   });
 
+  Future<List<ProposalData>> getProposals({
+    SignedDocumentRef? categoryRef,
+    required ProposalsFilterType type,
+  });
+
   /// Fetches all proposals for page matching [request] as well as
   /// [filters].
   Future<Page<ProposalData>> getProposalsPage({
@@ -176,6 +181,16 @@ final class ProposalRepositoryImpl implements ProposalRepository {
 
     final action = _buildProposalActionData(data);
     return _getProposalPublish(ref: ref, action: action);
+  }
+
+  @override
+  Future<List<ProposalData>> getProposals({
+    SignedDocumentRef? categoryRef,
+    required ProposalsFilterType type,
+  }) async {
+    return _proposalsLocalSource
+        .getProposals(type: type, categoryRef: categoryRef)
+        .then((value) => value.map((e) => _buildProposalData(e)!).toList());
   }
 
   @override
