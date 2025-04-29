@@ -14,7 +14,6 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart'
     show DocumentVersion, ProposalMenuItemAction;
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ProposalBuilderStatusAction extends StatelessWidget {
   const ProposalBuilderStatusAction({super.key});

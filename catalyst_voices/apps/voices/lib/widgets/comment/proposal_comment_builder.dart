@@ -7,7 +7,6 @@ import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart'
     hide DocumentPropertyBuilder;
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 typedef OnSubmitProposalComment = Future<void> Function({
   required Document document,

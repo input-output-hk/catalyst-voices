@@ -1,5 +1,4 @@
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 class BlocBaseProfileSelector<T>
     extends BlocSelector<RegistrationCubit, RegistrationState, T> {
