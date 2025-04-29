@@ -98,7 +98,7 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
             rightRail: const ProposalBuilderSetupPanel(),
             body: _ProposalBuilderContent(
               controller: _segmentsScrollController,
-              onRetryTap: _loadData,
+              onRetryTap: _loadProposal,
             ),
             bodyConstraints: const BoxConstraints.expand(),
           ),
@@ -113,7 +113,7 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
 
     if (widget.proposalId != oldWidget.proposalId ||
         widget.categoryId != oldWidget.categoryId) {
-      _loadData();
+      _loadProposal();
     }
   }
 
@@ -176,7 +176,8 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
 
     _listenForProposalRef(bloc);
     _listenForSegments(bloc);
-    _loadData(bloc: bloc);
+    _loadProposal(bloc: bloc);
+    _loadSubmissionCloseDate(bloc: bloc);
   }
 
   void _dontShowCampaignSubmissionClosingDialog(bool value) {
@@ -215,7 +216,7 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
     _updateSegments(bloc.state.allSegments, bloc.state.activeNodeId);
   }
 
-  void _loadData({ProposalBuilderBloc? bloc}) {
+  void _loadProposal({ProposalBuilderBloc? bloc}) {
     bloc ??= context.read<ProposalBuilderBloc>();
 
     final proposalId = widget.proposalId;
@@ -228,6 +229,10 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
     } else {
       bloc.add(const LoadDefaultProposalCategoryEvent());
     }
+  }
+
+  void _loadSubmissionCloseDate({ProposalBuilderBloc? bloc}) {
+    bloc ??= context.read<ProposalBuilderBloc>();
     bloc.add(const ProposalSubmissionCloseDateEvent());
   }
 
