@@ -7,8 +7,8 @@ import 'package:equatable/equatable.dart';
 class CurrentCampaignInfoViewModel extends Equatable {
   final String title;
   final String description;
-  final int allFunds;
-  final int totalAsk;
+  final double allFunds;
+  final double totalAsk;
   final List<CampaignTimelineViewModel> timeline;
   final ComparableRange<Coin> askRange;
 

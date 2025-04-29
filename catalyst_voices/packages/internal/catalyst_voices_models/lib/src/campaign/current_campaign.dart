@@ -7,8 +7,8 @@ final class CurrentCampaign extends Equatable {
   final String id;
   final String name;
   final String description;
-  final int allFunds;
-  final int totalAsk;
+  final double allFunds;
+  final double totalAsk;
   final ComparableRange<Coin> askRange;
   final List<CampaignTimeline> timeline;
 
@@ -37,8 +37,8 @@ final class CurrentCampaign extends Equatable {
     String? id,
     String? name,
     String? description,
-    int? allFunds,
-    int? totalAsk,
+    double? allFunds,
+    double? totalAsk,
     ComparableRange<Coin>? askRange,
     List<CampaignTimeline>? timeline,
   }) {

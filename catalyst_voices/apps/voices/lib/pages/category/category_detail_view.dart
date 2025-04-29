@@ -33,8 +33,8 @@ class CategoryDetailView extends StatelessWidget {
           ),
           const SizedBox(height: 64),
           FundsDetailCard(
-            allFunds: category.availableFunds.value,
-            totalAsk: category.totalAsk.value,
+            allFunds: category.availableFunds.ada,
+            totalAsk: category.totalAsk.ada,
             askRange: category.range,
             type: FundsDetailCardType.category,
           ),

@@ -13,7 +13,7 @@ final staticCampaignCategories = [
     description:
         '''Supports development of open source technology, centered around improving the Cardano developer experience and creating developer-friendly tooling that streamlines an integrated development environment.''',
     proposalsCount: 0,
-    availableFunds: const Coin(0),
+    availableFunds: const Coin.fromWholeAda(100000),
     imageUrl: '',
     totalAsk: const Coin(0),
     range: const ComparableRange(

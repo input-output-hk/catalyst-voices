@@ -9,8 +9,8 @@ import 'package:flutter/material.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 class FundsDetailCard extends StatelessWidget {
-  final int allFunds;
-  final int totalAsk;
+  final double allFunds;
+  final double totalAsk;
   final ComparableRange<Coin> askRange;
   final FundsDetailCardType type;
 
@@ -98,7 +98,7 @@ enum FundsDetailCardType {
 class _CampaignFundsDetail extends StatelessWidget {
   final String title;
   final String description;
-  final int funds;
+  final double funds;
   final bool largeFundsText;
 
   const _CampaignFundsDetail({
