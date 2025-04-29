@@ -4,7 +4,6 @@ export 'campaign/campaign_repository.dart' show CampaignRepository;
 export 'comment/comment_repository.dart' show CommentRepository;
 export 'config/config_repository.dart' show ConfigRepository;
 export 'database/database.dart';
-export 'document/constants.dart';
 export 'document/document_mapper.dart' show DocumentMapperImpl;
 export 'document/document_repository.dart' show DocumentRepository;
 export 'document/exception/document_exception.dart';
