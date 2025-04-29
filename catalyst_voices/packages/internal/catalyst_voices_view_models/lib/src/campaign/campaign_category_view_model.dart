@@ -1,7 +1,7 @@
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_assets/generated/assets.gen.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart'
-    show CampaignCategory, SignedDocumentRef, StaticCategoryDocumentData;
+    show CampaignCategory, SignedDocumentRef;
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:equatable/equatable.dart';
@@ -103,14 +103,16 @@ final class CampaignCategoryViewModel extends Equatable {
   List<Object?> get props => [id, name];
 }
 
-extension CategoryImageUrl on StaticCategoryDocumentData {
+final class CategoryImageUrl {
+  CategoryImageUrl._();
+
   static String imageUrl(String uuid) {
-    return VoicesAssets.images.category.values
-        .firstWhere(
-          (img) => img.path.contains(uuid),
-          orElse: () => VoicesAssets
-              .images.category.category0194d49030bf70438c5cF0e09f8a6d8c,
-        )
-        .path;
+    return VoicesAssets.images.category.values.firstWhere(
+      (img) => img.path.contains(uuid),
+      orElse: () {
+        return VoicesAssets
+            .images.category.category0194d49030bf70438c5cF0e09f8a6d8c;
+      },
+    ).path;
   }
 }
