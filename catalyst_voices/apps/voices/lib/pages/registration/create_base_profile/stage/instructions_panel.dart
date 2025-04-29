@@ -103,7 +103,12 @@ class _NextButton extends StatelessWidget {
     return VoicesFilledButton(
       key: const Key('CreateBaseProfileNext'),
       onTap: () => RegistrationCubit.of(context).nextStep(),
-      child: Text(context.l10n.createBaseProfileInstructionsNext),
+      child: Semantics(
+        identifier: 'CreateBaseProfileNextButton',
+        child: Text(
+          context.l10n.createBaseProfileInstructionsNext,
+        ),
+      ),
     );
   }
 }

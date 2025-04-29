@@ -63,9 +63,13 @@ class _SelectWalletPanelState extends State<SelectWalletPanel> {
         ),
         const SizedBox(height: 40),
         Expanded(
-          child: _BlocWallets(
-            onRefreshTap: _refreshWallets,
-            onSelectWallet: _onSelectWallet,
+          child: Semantics(
+            container: true,
+            label: 'WalletsList',
+            child: _BlocWallets(
+              onRefreshTap: _refreshWallets,
+              onSelectWallet: _onSelectWallet,
+            ),
           ),
         ),
         const SizedBox(height: 24),
@@ -137,46 +141,6 @@ class _Wallets extends StatelessWidget {
   }
 }
 
-class _WalletsEmpty extends StatelessWidget {
-  final VoidCallback onRetry;
-
-  const _WalletsEmpty({required this.onRetry});
-
-  @override
-  Widget build(BuildContext context) {
-    return Align(
-      alignment: Alignment.topCenter,
-      child: SizedBox(
-        width: double.infinity,
-        child: VoicesErrorIndicator(
-          message: context.l10n.noWalletFound,
-          onRetry: onRetry,
-        ),
-      ),
-    );
-  }
-}
-
-class _WalletsError extends StatelessWidget {
-  final VoidCallback onRetry;
-
-  const _WalletsError({required this.onRetry});
-
-  @override
-  Widget build(BuildContext context) {
-    return Align(
-      alignment: Alignment.topCenter,
-      child: SizedBox(
-        width: double.infinity,
-        child: VoicesErrorIndicator(
-          message: context.l10n.somethingWentWrong,
-          onRetry: onRetry,
-        ),
-      ),
-    );
-  }
-}
-
 class _WalletsList extends StatelessWidget {
   final List<WalletMetadata> wallets;
   final _OnSelectWallet onSelectWallet;
@@ -229,11 +193,13 @@ class _WalletTileState extends State<_WalletTile> {
 
   @override
   Widget build(BuildContext context) {
-    return VoicesWalletTile(
-      iconSrc: widget.wallet.icon,
-      name: Text(widget.wallet.name),
-      isLoading: _isLoading,
-      onTap: _onSelectWallet,
+    return Semantics(
+      child: VoicesWalletTile(
+        iconSrc: widget.wallet.icon,
+        name: Text(widget.wallet.name),
+        isLoading: _isLoading,
+        onTap: _onSelectWallet,
+      ),
     );
   }
 
@@ -251,5 +217,45 @@ class _WalletTileState extends State<_WalletTile> {
         });
       }
     }
+  }
+}
+
+class _WalletsEmpty extends StatelessWidget {
+  final VoidCallback onRetry;
+
+  const _WalletsEmpty({required this.onRetry});
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: Alignment.topCenter,
+      child: SizedBox(
+        width: double.infinity,
+        child: VoicesErrorIndicator(
+          message: context.l10n.noWalletFound,
+          onRetry: onRetry,
+        ),
+      ),
+    );
+  }
+}
+
+class _WalletsError extends StatelessWidget {
+  final VoidCallback onRetry;
+
+  const _WalletsError({required this.onRetry});
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: Alignment.topCenter,
+      child: SizedBox(
+        width: double.infinity,
+        child: VoicesErrorIndicator(
+          message: context.l10n.somethingWentWrong,
+          onRetry: onRetry,
+        ),
+      ),
+    );
   }
 }
