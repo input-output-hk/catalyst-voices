@@ -496,10 +496,7 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
       final myRefs = await _maybeGetAuthorProposalsLooseRefs(author: author);
 
       final total = allRefs.length;
-      // filtering by id to ignore different versions of the same document
-      final finals = allRefs
-          .where((ref) => finalsRefs.any((finalRef) => finalRef.id == ref.id))
-          .length;
+      final finals = allRefs.where(finalsRefs.contains).length;
       final drafts = total - finals;
       final favorites = allRefs
           .where((ref) => favoritesRefs.any((fav) => fav.id == ref.id))
