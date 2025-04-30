@@ -33,7 +33,7 @@ def test_invalid_rbac_auth_token(rbac_chain_factory):
     assert(resp.status_code == 401), f"Expected invalid signature: {resp.status_code} - {resp.text}"
     
     # Text after `catid.` is not a Catalyst ID -> 401
-    token = rbac_chain_factory(RoleID.ROLE_0).auth_token(cid="notacatid")
+    token = rbac_chain_factory(RoleID.ROLE_0).auth_token(cid="not_a_catid")
     resp = get(lookup=None, token=token)
     assert(resp.status_code == 401), f"Expected invalid Catalyst ID: {resp.status_code} - {resp.text}"
 
