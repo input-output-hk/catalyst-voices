@@ -54,8 +54,8 @@ def extract_attribute(obj: str, field_name: str):
 
 # main action
 def set_config(env: str):
-    repo_root = os.path.dirname(os.path.abspath(__file__))
-    env_dir = os.path.join(repo_root, env)
+    file_dir = os.path.dirname(os.path.abspath(__file__))
+    env_dir = os.path.join(file_dir, env)
 
     print(f"Setting config for environment: {env}")
     print(f"Looking for configs in: {env_dir}")
@@ -85,13 +85,17 @@ def set_config(env: str):
     # find and apply any ip-specific configs
     ip_config_paths = glob.glob(os.path.join(env_dir, "ip_*.config.json"))
     for ip_config_path in ip_config_paths:
-        ip, ip_config = parse_ip_config_file(ip_config_path)
-        print(
-            f"Applying IP-specific config from {os.path.basename(ip_config_path)}:\n{ip_config}"
-        )
+        try:
+            ip, ip_config = parse_ip_config_file(ip_config_path)
+            print(
+                f"Applying IP-specific config from {os.path.basename(ip_config_path)}:\n{ip_config}"
+            )
 
-        resp = requests.put(f"{url}?IP={ip}", json=ip_config, headers=headers)
-        resp.raise_for_status()
+            resp = requests.put(f"{url}?IP={ip}", json=ip_config, headers=headers)
+            resp.raise_for_status()
+        except Exception as e:
+            print(f"Skipping {os.path.basename(ip_config_path)} due to error: {e}")
+            continue
 
 
 # args parser
@@ -115,13 +119,23 @@ def main():
             set_config(args.env)
             print(f"Configuration for '{args.env}' set successfully.")
             break
+        except requests.exceptions.RequestException as e:
+            print(f"HTTP request failed: {e}")
+        except FileNotFoundError as e:
+            print(f"Missing file: {e}")
+        except KeyError as e:
+            print(f"Config error: {e}")
+        except ValueError as e:
+            print(f"Validation error: {e}")
         except Exception as e:
-            print(f"Error: {e}")
-            if args.retry:
-                print("Retrying in 1 minute...")
-                time.sleep(60)
-            else:
-                break
+            print(f"Unexpected error: {e}")
+
+        if args.retry:
+            print("Retrying in 1 minute...")
+            time.sleep(60)
+        else:
+            print("Failed to set configuration. Exiting.")
+            exit(1)
 
 
 if __name__ == "__main__":
