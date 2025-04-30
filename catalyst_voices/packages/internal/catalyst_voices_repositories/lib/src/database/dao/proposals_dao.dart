@@ -11,6 +11,7 @@ import 'package:catalyst_voices_repositories/src/database/table/documents.drift.
 import 'package:catalyst_voices_repositories/src/database/table/documents_favorite.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_metadata.dart';
 import 'package:catalyst_voices_repositories/src/dto/proposal/proposal_submission_action_dto.dart';
+import 'package:collection/collection.dart';
 import 'package:drift/drift.dart';
 import 'package:drift/extensions/json1.dart';
 import 'package:equatable/equatable.dart';
@@ -491,17 +492,29 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
     CatalystId? author,
   }) async* {
     await for (final allRefs in source) {
-      final finalsRefs = await _getFinalProposalsRefs();
+      final latestActions = await _getProposalsLatestAction();
+      final hiddenRefs = latestActions
+          .where((element) => element.action.isHidden)
+          .map((e) => e.proposalRef);
+      final finalsRefs = latestActions
+          .where((element) => element.action.isFinal)
+          .map((e) => e.proposalRef);
+
       final favoritesRefs = await _getFavoritesRefs();
       final myRefs = await _maybeGetAuthorProposalsLooseRefs(author: author);
 
-      final total = allRefs.length;
-      final finals = allRefs.where(finalsRefs.contains).length;
+      final notHidden = allRefs
+          .where((ref) => hiddenRefs.none((myRef) => myRef.id == ref.id));
+
+      final total = notHidden.length;
+      final finals = notHidden
+          .where((ref) => finalsRefs.any((myRef) => myRef.id == ref.id))
+          .length;
       final drafts = total - finals;
-      final favorites = allRefs
+      final favorites = notHidden
           .where((ref) => favoritesRefs.any((fav) => fav.id == ref.id))
           .length;
-      final my = allRefs
+      final my = notHidden
           .where((ref) => myRefs.any((myRef) => myRef.id == ref.id))
           .length;
 

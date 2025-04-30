@@ -573,6 +573,86 @@ void main() {
           },
           onPlatform: driftOnPlatforms,
         );
+
+        test(
+          'returns correctly counted proposals',
+          () async {
+            // Given
+            final one = SignedDocumentRef.generateFirstRef();
+            final two = one.nextVersion().toSignedDocumentRef();
+            final three = two.nextVersion().toSignedDocumentRef();
+
+            final proposals = [
+              _buildProposal(selfRef: one),
+              _buildProposal(selfRef: two),
+              _buildProposal(selfRef: three),
+            ];
+            final actions = [
+              _buildProposalAction(
+                selfRef: SignedDocumentRef.generateFirstRef(),
+                action: ProposalSubmissionActionDto.aFinal,
+                proposalRef: two,
+              ),
+            ];
+            const filters = ProposalsCountFilters();
+            const expectedCount = ProposalsCount(
+              total: 1,
+              finals: 1,
+            );
+
+            // When
+            await database.documentsDao.saveAll([...proposals, ...actions]);
+
+            // Then
+            final count = await database.proposalsDao
+                .watchCount(
+                  filters: filters,
+                )
+                .first;
+
+            expect(count, expectedCount);
+          },
+          onPlatform: driftOnPlatforms,
+        );
+
+        test(
+          'hidden proposals are excluded from count',
+          () async {
+            // Given
+            final one = SignedDocumentRef.generateFirstRef();
+            final two = SignedDocumentRef.generateFirstRef();
+
+            final proposals = [
+              _buildProposal(selfRef: one),
+              _buildProposal(selfRef: two),
+            ];
+            final actions = [
+              _buildProposalAction(
+                selfRef: SignedDocumentRef.generateFirstRef(),
+                action: ProposalSubmissionActionDto.hide,
+                proposalRef: two,
+              ),
+            ];
+            const filters = ProposalsCountFilters();
+            const expectedCount = ProposalsCount(
+              total: 1,
+              drafts: 1,
+            );
+
+            // When
+            await database.documentsDao.saveAll([...proposals, ...actions]);
+
+            // Then
+            final count = await database.proposalsDao
+                .watchCount(
+                  filters: filters,
+                )
+                .first;
+
+            expect(count, expectedCount);
+          },
+          onPlatform: driftOnPlatforms,
+        );
       },
     );
 
