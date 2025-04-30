@@ -1033,6 +1033,261 @@ void main() {
         onPlatform: driftOnPlatforms,
       );
     });
+    group('queryProposals', () {
+      test(
+        'returns only newest version of each proposal',
+        () async {
+          // Given
+          final templateRef = SignedDocumentRef.generateFirstRef();
+
+          final ref = _buildRefAt(DateTime(2025, 4, 7));
+          final nextRef =
+              _buildRefAt(DateTime(2025, 4, 8)).copyWith(id: ref.id);
+          final latestRef =
+              _buildRefAt(DateTime(2025, 4, 9)).copyWith(id: ref.id);
+
+          final differentRef = _buildRefAt(DateTime(2025, 4, 12));
+
+          final templates = [
+            _buildProposalTemplate(selfRef: templateRef),
+          ];
+
+          final proposals = [
+            _buildProposal(selfRef: ref, template: templateRef),
+            _buildProposal(selfRef: nextRef, template: templateRef),
+            _buildProposal(selfRef: latestRef, template: templateRef),
+            _buildProposal(selfRef: differentRef, template: templateRef),
+          ];
+
+          final expectedRefs = [
+            latestRef,
+            differentRef,
+          ];
+
+          // When
+          await database.documentsDao.saveAll([...templates, ...proposals]);
+
+          // Then
+          final result = await database.proposalsDao.queryProposals(
+            type: ProposalsFilterType.total,
+          );
+
+          expect(result.length, 2);
+          expect(
+            result.map((e) => e.proposal.ref),
+            expectedRefs,
+          );
+        },
+        onPlatform: driftOnPlatforms,
+      );
+
+      test(
+        'filters by category when categoryRef is provided',
+        () async {
+          // Given
+          final templateRef = SignedDocumentRef.generateFirstRef();
+
+          final templates = [
+            _buildProposalTemplate(selfRef: templateRef),
+          ];
+
+          final proposals = [
+            _buildProposal(
+              selfRef: _buildRefAt(DateTime(2025, 4, 1)),
+              template: templateRef,
+            ),
+            _buildProposal(
+              selfRef: _buildRefAt(DateTime(2025, 4, 2)),
+              template: templateRef,
+              categoryId: constantDocumentsRefs[1].category,
+            ),
+            _buildProposal(
+              selfRef: _buildRefAt(DateTime(2025, 4, 3)),
+              template: templateRef,
+              categoryId: constantDocumentsRefs[1].category,
+            ),
+          ];
+
+          final expectedRefs = proposals
+              .where(
+                (p) =>
+                    p.document.metadata.categoryId ==
+                    constantDocumentsRefs[1].category,
+              )
+              .map((proposal) => proposal.document.ref)
+              .toList();
+
+          // When
+          await database.documentsDao.saveAll([...templates, ...proposals]);
+
+          // Then
+          final result = await database.proposalsDao.queryProposals(
+            categoryRef: constantDocumentsRefs[1].category,
+            type: ProposalsFilterType.total,
+          );
+
+          expect(result.length, 2);
+          expect(
+            result.map((e) => e.proposal.ref).toList(),
+            expectedRefs,
+          );
+        },
+        onPlatform: driftOnPlatforms,
+      );
+
+      test(
+        'filters final proposals correctly',
+        () async {
+          // Given
+          final templateRef = SignedDocumentRef.generateFirstRef();
+
+          final templates = [
+            _buildProposalTemplate(selfRef: templateRef),
+          ];
+
+          final proposalRef1 = _buildRefAt(DateTime(2025, 4, 1));
+          final proposalRef2 = _buildRefAt(DateTime(2025, 4, 2));
+          final proposalRef3 = _buildRefAt(DateTime(2025, 4, 3));
+
+          final proposals = [
+            _buildProposal(
+              selfRef: proposalRef1,
+              template: templateRef,
+            ),
+            _buildProposal(
+              selfRef: proposalRef2,
+              template: templateRef,
+            ),
+            _buildProposal(
+              selfRef: proposalRef3,
+              template: templateRef,
+            ),
+          ];
+
+          final actions = [
+            _buildProposalAction(
+              action: ProposalSubmissionActionDto.aFinal,
+              proposalRef: proposalRef1,
+            ),
+            _buildProposalAction(
+              action: ProposalSubmissionActionDto.aFinal,
+              proposalRef: proposalRef2,
+            ),
+          ];
+
+          final expectedRefs = [
+            proposalRef1,
+            proposalRef2,
+          ];
+
+          // When
+          await database.documentsDao.saveAll([
+            ...templates,
+            ...proposals,
+            ...actions,
+          ]);
+
+          // Then
+          final result = await database.proposalsDao.queryProposals(
+            type: ProposalsFilterType.finals,
+          );
+
+          expect(result.length, 2);
+          expect(
+            result.map((e) => e.proposal.ref),
+            expectedRefs,
+          );
+        },
+        onPlatform: driftOnPlatforms,
+      );
+
+      test(
+        'returns correct JoinedProposal structure',
+        () async {
+          // Given
+          final templateRef = SignedDocumentRef.generateFirstRef();
+
+          final templates = [
+            _buildProposalTemplate(selfRef: templateRef),
+          ];
+
+          final baseTime = DateTime(2025, 4, 1);
+          final proposalRef1 = _buildRefAt(baseTime);
+          final proposalRef2 =
+              _buildRefAt(baseTime.add(const Duration(days: 1)))
+                  .copyWith(id: proposalRef1.id);
+          final proposalRef3 =
+              _buildRefAt(baseTime.add(const Duration(days: 2)))
+                  .copyWith(id: proposalRef1.id);
+
+          final proposals = [
+            _buildProposal(
+              selfRef: proposalRef1,
+              template: templateRef,
+            ),
+            _buildProposal(
+              selfRef: proposalRef2,
+              template: templateRef,
+            ),
+            _buildProposal(
+              selfRef: proposalRef3,
+              template: templateRef,
+            ),
+          ];
+
+          final actionTime = baseTime.add(const Duration(days: 3));
+          final actions = [
+            _buildProposalAction(
+              selfRef: _buildRefAt(actionTime),
+              action: ProposalSubmissionActionDto.aFinal,
+              proposalRef: proposalRef2,
+            ),
+          ];
+
+          final comments = [
+            _buildProposalComment(proposalRef: proposalRef1),
+            _buildProposalComment(proposalRef: proposalRef2),
+            _buildProposalComment(proposalRef: proposalRef2),
+            _buildProposalComment(proposalRef: proposalRef3),
+          ];
+
+          // When
+          await database.documentsDao.saveAll([
+            ...templates,
+            ...proposals,
+            ...actions,
+            ...comments,
+          ]);
+
+          // Then
+          final result = await database.proposalsDao.queryProposals(
+            type: ProposalsFilterType.total,
+          );
+
+          expect(result.length, 1);
+
+          final joinedProposal = result.single;
+
+          // Since there's a final action pointing to proposalRef2,
+          // that should be the effective proposal version
+          expect(joinedProposal.proposal, proposals[1].document);
+          expect(joinedProposal.template, templates[0].document);
+          expect(joinedProposal.action, actions[0].document);
+          expect(
+            joinedProposal.commentsCount,
+            2,
+          );
+          expect(
+            joinedProposal.versions,
+            proposals.map((e) => e.document.ref.version).toList().reversed,
+          );
+
+          expect(joinedProposal.proposal.ref, proposalRef2);
+          expect(joinedProposal.action?.metadata.ref, proposalRef2);
+        },
+        onPlatform: driftOnPlatforms,
+      );
+    });
   });
 }
 

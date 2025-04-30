@@ -121,7 +121,7 @@ final class Proposal extends Equatable {
         versions,
       ];
 
-  int get versionCount => versions.length;
+  int get versionCount => versions.isEmpty ? 1 : versions.length;
 
   Proposal copyWith({
     DocumentRef? selfRef,
