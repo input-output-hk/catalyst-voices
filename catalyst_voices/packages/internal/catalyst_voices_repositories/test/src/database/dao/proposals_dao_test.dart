@@ -1086,7 +1086,6 @@ void main() {
         () async {
           // Given
           final templateRef = SignedDocumentRef.generateFirstRef();
-          final categoryId = categoriesTemplatesRefs.first.category;
 
           final templates = [
             _buildProposalTemplate(selfRef: templateRef),
@@ -1096,21 +1095,25 @@ void main() {
             _buildProposal(
               selfRef: _buildRefAt(DateTime(2025, 4, 1)),
               template: templateRef,
-              categoryId: categoryId,
             ),
             _buildProposal(
               selfRef: _buildRefAt(DateTime(2025, 4, 2)),
               template: templateRef,
-              categoryId: categoryId,
+              categoryId: constantDocumentsRefs[1].category,
             ),
             _buildProposal(
+              selfRef: _buildRefAt(DateTime(2025, 4, 3)),
               template: templateRef,
-              categoryId: categoriesTemplatesRefs[1].category,
+              categoryId: constantDocumentsRefs[1].category,
             ),
           ];
 
           final expectedRefs = proposals
-              .sublist(0, 2)
+              .where(
+                (p) =>
+                    p.document.metadata.categoryId ==
+                    constantDocumentsRefs[1].category,
+              )
               .map((proposal) => proposal.document.ref)
               .toList();
 
@@ -1119,13 +1122,13 @@ void main() {
 
           // Then
           final result = await database.proposalsDao.queryProposals(
-            categoryRef: categoryId,
+            categoryRef: constantDocumentsRefs[1].category,
             type: ProposalsFilterType.total,
           );
 
           expect(result.length, 2);
           expect(
-            result.map((e) => e.proposal.ref),
+            result.map((e) => e.proposal.ref).toList(),
             expectedRefs,
           );
         },
