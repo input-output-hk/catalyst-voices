@@ -31,10 +31,13 @@ class _DataProposalSelector extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // TODO(dtscalac): clarify what to show here, currently it shows
+              // published + submitted together, however the limit for proposals
+              // is only for submitted ones
               _Header(
                 title: context.l10n.noPublishedProposalsOnMaxCount(
                   state.data.length,
-                  5,
+                  ProposalDocument.maxSubmittedProposalsPerUser,
                 ),
               ),
               Offstage(

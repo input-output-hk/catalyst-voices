@@ -11,6 +11,7 @@ final class ProposalBuilderBlocCache extends Equatable {
   final CommentTemplate? commentTemplate;
   final List<CommentWithReplies>? comments;
   final AccountPublicStatus? accountPublicStatus;
+  final bool? isMaxProposalsLimitReached;
 
   const ProposalBuilderBlocCache({
     this.activeAccountId,
@@ -21,6 +22,7 @@ final class ProposalBuilderBlocCache extends Equatable {
     this.commentTemplate,
     this.comments,
     this.accountPublicStatus,
+    this.isMaxProposalsLimitReached,
   });
 
   @override
@@ -33,6 +35,7 @@ final class ProposalBuilderBlocCache extends Equatable {
         commentTemplate,
         comments,
         accountPublicStatus,
+        isMaxProposalsLimitReached,
       ];
 
   ProposalBuilderBlocCache copyWith({
@@ -44,6 +47,7 @@ final class ProposalBuilderBlocCache extends Equatable {
     Optional<CommentTemplate>? commentTemplate,
     Optional<List<CommentWithReplies>>? comments,
     Optional<AccountPublicStatus>? accountPublicStatus,
+    Optional<bool>? isMaxProposalsLimitReached,
   }) {
     return ProposalBuilderBlocCache(
       activeAccountId: activeAccountId.dataOr(this.activeAccountId),
@@ -54,6 +58,8 @@ final class ProposalBuilderBlocCache extends Equatable {
       commentTemplate: commentTemplate.dataOr(this.commentTemplate),
       comments: comments.dataOr(this.comments),
       accountPublicStatus: accountPublicStatus.dataOr(this.accountPublicStatus),
+      isMaxProposalsLimitReached:
+          isMaxProposalsLimitReached.dataOr(this.isMaxProposalsLimitReached),
     );
   }
 }

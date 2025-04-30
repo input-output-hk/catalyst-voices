@@ -54,6 +54,7 @@ export 'hi_lo/uuid_hi_lo.dart';
 export 'money/money.dart';
 export 'pagination/page.dart';
 export 'pagination/page_request.dart';
+export 'proposal/exception/proposal_limit_reached_exception.dart';
 export 'proposal/proposal.dart';
 export 'proposal/proposal_data.dart';
 export 'proposal/proposal_enums.dart';
