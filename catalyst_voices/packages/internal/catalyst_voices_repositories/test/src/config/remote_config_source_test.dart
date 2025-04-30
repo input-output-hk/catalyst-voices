@@ -1,61 +1,85 @@
-import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
+import 'package:chopper/chopper.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:mocktail/mocktail.dart';
 
 void main() {
-  final client = _MockClient();
+  final CatGateway gateway = _MockedCatGateway();
+  final CatReviews reviews = _MockedCatReviews();
+
+  late final ApiServices apiServices;
+
+  late final ApiConfigSource source;
 
   setUpAll(() {
-    UrlRemoteConfigSource.mockClient = client;
+    apiServices = ApiServices.internal(
+      gateway: gateway,
+      reviews: reviews,
+    );
 
-    registerFallbackValue(Uri());
+    source = ApiConfigSource(apiServices);
   });
 
   tearDown(() {
-    reset(client);
+    reset(gateway);
+    reset(reviews);
   });
 
-  group(UrlRemoteConfigSource, () {
-    test('relative path to endpoints is correct', () async {
+  group(ApiConfigSource, () {
+    test('empty config is parsed correctly', () async {
       // Given
-      final base = AppEnvironmentType.relative.gateway;
-      final source = UrlRemoteConfigSource(baseUrl: base);
-
-      final expectedUri = Uri.parse('$base/api/draft/config/frontend');
+      const configJson = '{}';
+      final response = Response<Object>(http.Response('', 200), configJson);
 
       // When
-      when(() => client.get(any(), headers: any(named: 'headers')))
-          .thenAnswer((_) => Future.value(http.Response('{}', 200)));
+      when(gateway.apiV1ConfigFrontendGet)
+          .thenAnswer((_) => Future.value(response));
 
       // Then
-      await source.get();
+      final config = await source.get();
 
-      final uri = verify(() => client.get(captureAny())).captured.single as Uri;
-
-      expect(uri, expectedUri);
+      expect(config.blockchain, isNull);
+      expect(config.sentry, isNull);
+      expect(config.cache, isNull);
     });
 
-    test('dev path to endpoints is correct', () async {
+    test('invalid type is falling back to empty', () async {
       // Given
-      final base = AppEnvironmentType.dev.gateway;
-      final source = UrlRemoteConfigSource(baseUrl: base);
-
-      final expectedUri = Uri.parse('$base/api/draft/config/frontend');
+      const configJson = '1';
+      final response = Response<Object>(http.Response('', 200), configJson);
 
       // When
-      when(() => client.get(any(), headers: any(named: 'headers')))
-          .thenAnswer((_) => Future.value(http.Response('{}', 200)));
+      when(gateway.apiV1ConfigFrontendGet)
+          .thenAnswer((_) => Future.value(response));
 
       // Then
-      await source.get();
+      final config = await source.get();
 
-      final uri = verify(() => client.get(captureAny())).captured.single as Uri;
+      expect(config.blockchain, isNull);
+      expect(config.sentry, isNull);
+      expect(config.cache, isNull);
+    });
 
-      expect(uri, expectedUri);
+    test('invalid json is falling back to empty', () async {
+      // Given
+      const configJson = '[]';
+      final response = Response<Object>(http.Response('', 200), configJson);
+
+      // When
+      when(gateway.apiV1ConfigFrontendGet)
+          .thenAnswer((_) => Future.value(response));
+
+      // Then
+      final config = await source.get();
+
+      expect(config.blockchain, isNull);
+      expect(config.sentry, isNull);
+      expect(config.cache, isNull);
     });
   });
 }
 
-class _MockClient extends Mock implements http.Client {}
+class _MockedCatGateway extends Mock implements CatGateway {}
+
+class _MockedCatReviews extends Mock implements CatReviews {}

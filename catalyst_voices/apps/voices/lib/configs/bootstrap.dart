@@ -36,7 +36,7 @@ Future<BootstrapArgs> bootstrap({
   AppEnvironment? environment,
 }) async {
   _loggingService
-    ..level = kDebugMode ? Level.FINER : Level.OFF
+    ..level = kDebugMode ? Level.ALL : Level.OFF
     ..printLogs = kDebugMode;
 
   GoRouter.optionURLReflectsImperativeAPIs = true;
@@ -44,15 +44,13 @@ Future<BootstrapArgs> bootstrap({
 
   environment ??= AppEnvironment.fromEnv();
 
-  // TODO(damian-molinski): replace it with API Service when endpoint
-  // is moved to v1
-  final configSource = UrlRemoteConfigSource(baseUrl: environment.type.gateway);
-  final configService = ConfigService(ConfigRepository(configSource));
-  final config = await configService.getAppConfig(env: environment.type);
-
   await _cleanupOldStorages();
   await registerDependencies(environment: environment, config: null);
   await _initCryptoUtils();
+
+  final configSource = ApiConfigSource(Dependencies.instance.get());
+  final configService = ConfigService(ConfigRepository(configSource));
+  final config = await configService.getAppConfig(env: environment.type);
 
   Dependencies.instance.registerConfig(config);
 
