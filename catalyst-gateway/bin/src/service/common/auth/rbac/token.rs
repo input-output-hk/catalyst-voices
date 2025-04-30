@@ -13,6 +13,7 @@ use cardano_blockchain_types::Network;
 use catalyst_types::id_uri::{key_rotation::KeyRotation, role_index::RoleIndex, IdUri};
 use chrono::{TimeDelta, Utc};
 use ed25519_dalek::{ed25519::signature::Signer, Signature, SigningKey, VerifyingKey};
+use futures::future::try_join;
 use rbac_registration::registration::cardano::RegistrationChain;
 
 use crate::db::index::{
@@ -172,9 +173,19 @@ impl CatalystRBACTokenV1 {
     /// If it is a first call, fetch all data from the database and initialize it.
     pub(crate) async fn reg_chain(&mut self) -> anyhow::Result<Option<RegistrationChain>> {
         if self.reg_chain.is_none() {
-            let session =
+            let persistent_session =
                 CassandraSession::get(true).ok_or(CassandraSessionError::FailedAcquiringSession)?;
-            let reg_queries = indexed_registrations(&session, self.catalyst_id()).await?;
+            let volatile_session = CassandraSession::get(false)
+                .ok_or(CassandraSessionError::FailedAcquiringSession)?;
+            let (persistent_regs, volatile_regs) = try_join(
+                indexed_registrations(&persistent_session, self.catalyst_id()),
+                indexed_registrations(&volatile_session, self.catalyst_id()),
+            )
+            .await?;
+            // Combine persistent and volatile registrations.
+            let reg_queries: Vec<_> = persistent_regs.into_iter().chain(volatile_regs).collect();
+            // let reg_queries =
+            //     indexed_registrations(&persistent_session, self.catalyst_id()).await?;
             self.reg_chain = build_reg_chain(reg_queries.into_iter(), self.network()).await?;
         }
         Ok(self.reg_chain.clone())
