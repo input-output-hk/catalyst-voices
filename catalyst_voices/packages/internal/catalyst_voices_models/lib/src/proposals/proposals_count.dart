@@ -35,4 +35,15 @@ final class ProposalsCount extends Equatable {
       ProposalsFilterType.my => my,
     };
   }
+
+  @override
+  String toString() {
+    return 'ProposalsCount('
+        'total[$total], '
+        'drafts[$drafts], '
+        'finals[$finals], '
+        'favorites[$favorites], '
+        'my[$my]'
+        ')';
+  }
 }
