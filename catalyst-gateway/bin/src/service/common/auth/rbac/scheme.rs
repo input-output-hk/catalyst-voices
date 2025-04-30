@@ -77,12 +77,22 @@ impl ResponseError for ServiceUnavailableError {
     }
 }
 
-/// Error with the Authorization Token
-///
-/// We can not parse it, so its a 401 response.
+/// Authentication token error.
 #[derive(Debug, thiserror::Error)]
-#[error("Invalid Catalyst RBAC Auth Token: {0}")]
-pub struct AuthTokenError(String);
+enum AuthTokenError {
+    /// Error when registration chain cannot be built.
+    #[error("Unable to build registration chain, err: {0}")]
+    BuildRegChain(String),
+    /// Error when RBAC token cannot be parsed.
+    #[error("Fail to parse RBAC token string, err: {0}")]
+    ParseRbacToken(String),
+    /// Error when registration chain cannot be found.
+    #[error("Registration not found for the auth token.")]
+    RegistrationNotFound,
+    /// Error when latest signing key cannot be found.
+    #[error("Unable to get the latest signing key.")]
+    LatestSigningKey,
+}
 
 impl ResponseError for AuthTokenError {
     fn status(&self) -> StatusCode {
@@ -92,7 +102,7 @@ impl ResponseError for AuthTokenError {
     /// Convert this error to a HTTP response.
     fn as_response(&self) -> poem::Response
     where Self: Error + Send + Sync + 'static {
-        ErrorResponses::unauthorized(self.0.clone()).into_response()
+        ErrorResponses::unauthorized(self.to_string()).into_response()
     }
 }
 
@@ -135,7 +145,7 @@ async fn checker_api_catalyst_auth(
     // Deserialize the token: this performs the 1-5 steps of the validation.
     let mut token = CatalystRBACTokenV1::parse(&bearer.token).map_err(|e| {
         error!("Corrupt auth token: {e:?}");
-        AuthTokenError(e.to_string())
+        AuthTokenError::ParseRbacToken(e.to_string())
     })?;
 
     // If env var explicitly set by SRE, switch off full verification
@@ -151,16 +161,14 @@ async fn checker_api_catalyst_auth(
                 "Unable to find registrations for {} Catalyst ID",
                 token.catalyst_id()
             );
-            return Err(
-                AuthTokenError("Registration not found for the auth token".to_string()).into(),
-            );
+            return Err(AuthTokenError::RegistrationNotFound.into());
         },
         Err(err) if err.is::<CassandraSessionError>() => {
             return Err(ServiceUnavailableError(err).into())
         },
         Err(err) => {
             error!("Unable to build a registration chain Catalyst ID: {err:?}");
-            return Err(AuthTokenError("Unable to build registration chain".to_string()).into());
+            return Err(AuthTokenError::BuildRegChain(err.to_string()).into());
         },
     };
 
@@ -192,7 +200,7 @@ async fn checker_api_catalyst_auth(
                 "Unable to get last signing key for {} Catalyst ID",
                 token.catalyst_id()
             );
-            AuthTokenError("Unable to get the latest signing key".to_string())
+            AuthTokenError::LatestSigningKey
         })?;
 
     // Step 9: Verify the signature against the Role 0 pk.
