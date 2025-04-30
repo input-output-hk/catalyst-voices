@@ -35,6 +35,16 @@ final class DatabaseDocumentsDataSource
   }
 
   @override
+  Future<List<ProposalDocumentData>> getProposals({
+    SignedDocumentRef? categoryRef,
+    required ProposalsFilterType type,
+  }) {
+    return _database.proposalsDao
+        .queryProposals(categoryRef: categoryRef, type: type)
+        .then((value) => value.map((e) => e.toModel()).toList());
+  }
+
+  @override
   Future<Page<ProposalDocumentData>> getProposalsPage({
     required PageRequest request,
     required ProposalsFilters filters,

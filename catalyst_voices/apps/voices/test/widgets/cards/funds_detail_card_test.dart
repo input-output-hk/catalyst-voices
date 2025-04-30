@@ -21,8 +21,8 @@ void main() {
           const Scaffold(
             body: Center(
               child: FundsDetailCard(
-                allFunds: 100,
-                totalAsk: 100,
+                allFunds: Coin.fromWholeAda(100),
+                totalAsk: Coin.fromWholeAda(100),
                 askRange: ComparableRange(
                   min: Coin.fromWholeAda(100),
                   max: Coin.fromWholeAda(100),
@@ -44,8 +44,8 @@ void main() {
           const Scaffold(
             body: Center(
               child: FundsDetailCard(
-                allFunds: 1,
-                totalAsk: 2,
+                allFunds: Coin.fromWholeAda(1),
+                totalAsk: Coin.fromWholeAda(2),
                 askRange: ComparableRange(
                   min: Coin.fromWholeAda(3),
                   max: Coin.fromWholeAda(4),
@@ -70,8 +70,8 @@ void main() {
           const Scaffold(
             body: Center(
               child: FundsDetailCard(
-                allFunds: 100,
-                totalAsk: 100,
+                allFunds: Coin.fromWholeAda(100),
+                totalAsk: Coin.fromWholeAda(100),
                 askRange: ComparableRange(
                   min: Coin.fromWholeAda(100),
                   max: Coin.fromWholeAda(100),
@@ -92,8 +92,8 @@ void main() {
           const Scaffold(
             body: Center(
               child: FundsDetailCard(
-                allFunds: 1,
-                totalAsk: 2,
+                allFunds: Coin.fromWholeAda(1),
+                totalAsk: Coin.fromWholeAda(2),
                 askRange: ComparableRange(
                   min: Coin.fromWholeAda(3),
                   max: Coin.fromWholeAda(4),
