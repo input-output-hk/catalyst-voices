@@ -72,7 +72,7 @@ impl Query {
 
 /// Returns a sorted list of all registrations for the given Catalyst ID from the
 /// database.
-async fn indexed_registrations(
+pub(crate) async fn indexed_registrations(
     session: &CassandraSession, catalyst_id: &IdUri,
 ) -> anyhow::Result<Vec<Query>> {
     let mut result: Vec<_> = Query::execute(session, QueryParams {
@@ -86,31 +86,32 @@ async fn indexed_registrations(
 }
 
 /// Build a registration chain from the given indexed data.
+///
+/// # NOTE: provided `reg_queries` must be sorted by `slot_no`, look into `indexed_registrations` function.
 pub(crate) async fn build_reg_chain(
-    session: &CassandraSession, catalyst_id: &IdUri, network: Network,
+    mut reg_queries_iter: impl Iterator<Item = Query>, network: Network,
 ) -> anyhow::Result<Option<RegistrationChain>> {
-    let regs = indexed_registrations(session, catalyst_id).await?;
-    let mut regs_iter = regs.iter();
-    let Some(root) = regs_iter.next() else {
+    let Some(root) = reg_queries_iter.next() else {
         return Ok(None);
     };
 
-    let root = registration(network, root.slot_no.into(), root.txn_index.into())
+    let root = load_registration_from_chain(network, root.slot_no.into(), root.txn_index.into())
         .await
         .context("Failed to get root registration")?;
     let mut chain = RegistrationChain::new(root).context("Invalid root registration")?;
 
-    for reg in regs_iter {
+    for reg in reg_queries_iter {
         // We only store valid registrations in this table, so an error here indicates a bug in
         // our indexing logic.
-        let cip509 = registration(network, reg.slot_no.into(), reg.txn_index.into())
-            .await
-            .with_context(|| {
-                format!(
-                    "Invalid or missing registration at {:?} block {:?} transaction",
-                    reg.slot_no, reg.txn_index,
-                )
-            })?;
+        let cip509 =
+            load_registration_from_chain(network, reg.slot_no.into(), reg.txn_index.into())
+                .await
+                .with_context(|| {
+                    format!(
+                        "Invalid or missing registration at {:?} block {:?} transaction",
+                        reg.slot_no, reg.txn_index,
+                    )
+                })?;
         match chain.update(cip509) {
             Ok(c) => chain = c,
             Err(e) => {
@@ -127,8 +128,9 @@ pub(crate) async fn build_reg_chain(
     Ok(Some(chain))
 }
 
-/// A helper function to return a RBAC registration from the given block and slot.
-pub(crate) async fn registration(
+/// A helper function to load a RBAC registration by the given block and slot from the
+/// `cardano-chain-follower`.
+pub(crate) async fn load_registration_from_chain(
     network: Network, slot: Slot, txn_index: TxnIndex,
 ) -> anyhow::Result<Cip509> {
     let point = Point::fuzzy(slot);
@@ -152,4 +154,20 @@ pub(crate) async fn registration(
         .with_context(|| {
             format!("No RBAC registration, slot = {slot:?}, transaction index = {txn_index:?}")
         })
+}
+
+#[test]
+fn some_test() {
+    fn some_funct<I: Iterator<Item = u32>>(iter: I) {
+        for item in iter {
+            println!("{item}");
+        }
+    }
+    let mut sum = 0;
+
+    some_funct([1, 2, 3, 4].into_iter().inspect(|val| {
+        println!("adding values");
+        sum += *val;
+    }));
+    println!("{sum}");
 }

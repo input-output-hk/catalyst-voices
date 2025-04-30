@@ -16,7 +16,7 @@ use ed25519_dalek::{ed25519::signature::Signer, Signature, SigningKey, Verifying
 use rbac_registration::registration::cardano::RegistrationChain;
 
 use crate::db::index::{
-    queries::rbac::get_rbac_registrations::build_reg_chain,
+    queries::rbac::get_rbac_registrations::{build_reg_chain, indexed_registrations},
     session::{CassandraSession, CassandraSessionError},
 };
 
@@ -174,7 +174,8 @@ impl CatalystRBACTokenV1 {
         if self.reg_chain.is_none() {
             let session =
                 CassandraSession::get(true).ok_or(CassandraSessionError::FailedAcquiringSession)?;
-            self.reg_chain = build_reg_chain(&session, self.catalyst_id(), self.network()).await?;
+            let reg_queries = indexed_registrations(&session, self.catalyst_id()).await?;
+            self.reg_chain = build_reg_chain(reg_queries.into_iter(), self.network()).await?;
         }
         Ok(self.reg_chain.clone())
     }
