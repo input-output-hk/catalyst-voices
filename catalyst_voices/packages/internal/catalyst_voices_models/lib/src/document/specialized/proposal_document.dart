@@ -5,6 +5,11 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:equatable/equatable.dart';
 
 final class ProposalDocument extends Equatable {
+  /// The maximum amount of proposal submitted for review per user.
+  ///
+  /// The limit does not have any effect on drafts or published proposals.
+  static const int maxSubmittedProposalsPerUser = 6;
+
   /// A hardcoded [NodeId] of the title property.
   ///
   /// Since properties are dynamic the application cannot determine

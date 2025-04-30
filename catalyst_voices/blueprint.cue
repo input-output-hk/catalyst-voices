@@ -72,12 +72,6 @@ project: {
 							  try_files $uri $uri/ /index.html;
 							}
 
-							# Ensure that /m4 (and any other SPA path) serves index.html
-							location /m4 {
-							  root /app;
-							  try_files $uri $uri/ /index.html;
-							}
-							
 							error_page   500 502 503 504  /50x.html;
 							location = /50x.html {
 							  root   /usr/share/nginx/html;
