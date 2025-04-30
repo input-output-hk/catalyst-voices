@@ -88,17 +88,20 @@ def set_config(env: str):
     # find and apply any ip-specific configs
     ip_config_paths = glob.glob(os.path.join(env_dir, "ip_*.config.json"))
     for ip_config_path in ip_config_paths:
+        basename = os.path.basename(ip_config_path)
+
         try:
             ip, ip_config = parse_ip_config_file(ip_config_path)
-            print(
-                f"Applying IP-specific config from {os.path.basename(ip_config_path)}:\n{ip_config}"
-            )
+            print(f"Applying IP-specific config from {basename}:\n{ip_config}")
 
             resp = requests.put(f"{url}?IP={ip}", json=ip_config, headers=headers)
             resp.raise_for_status()
+        except requests.exceptions.RequestException as e:
+            print(f"Skipping {basename}, failed to send HTTP request: {e}")
+        except ValueError as e:
+            print(f"Skipping {basename}, invalid IP address format: {e}")
         except Exception as e:
-            print(f"Skipping {os.path.basename(ip_config_path)} due to error: {e}")
-            continue
+            print(f"Skipping {basename} due to error: {e}")
 
 
 # args parser
