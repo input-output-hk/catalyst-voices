@@ -4,6 +4,7 @@
 
 use std::{
     fmt::{Display, Formatter},
+    sync::LazyLock,
     time::Duration,
 };
 
@@ -20,6 +21,11 @@ use crate::db::index::{
     queries::rbac::get_rbac_registrations::build_reg_chain,
     session::{CassandraSession, CassandraSessionError},
 };
+
+/// Captures just the digits after last slash
+/// This Regex should not fail
+#[allow(clippy::unwrap_used)]
+static REGEX: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"/\d+$").unwrap());
 
 /// A Catalyst RBAC Authorization Token.
 ///
@@ -106,11 +112,8 @@ impl CatalystRBACTokenV1 {
         if catalyst_id.nonce().is_none() {
             return Err(anyhow!("Catalyst ID must have nonce"));
         }
-        // Captures just the digits after last slash
-        // This Regex should not fail
-        let re = Regex::new(r"/\d+$").map_err(|_| anyhow!("Invalid Regex"))?;
 
-        if re.is_match(token) {
+        if REGEX.is_match(token) {
             return Err(anyhow!(
                 "Catalyst ID mustn't have role or rotation specified"
             ));
