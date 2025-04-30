@@ -27,7 +27,7 @@ class ProposalSubmissionStartText extends StatelessWidget {
         startDate,
         formatter: (context, dateTime) {
           final date =
-              DateFormatter.formatDateTimeParts(startDate, includeYear: true);
+              DateFormatter.formatDateTimeParts(dateTime, includeYear: true);
 
           return context.l10n
               .proposalSubmissionStageStartAt(date.date, date.time);
