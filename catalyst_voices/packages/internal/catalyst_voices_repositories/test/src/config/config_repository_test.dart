@@ -1,12 +1,14 @@
 //ignore_for_file: avoid_dynamic_calls
 
+import 'dart:convert';
+
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_repositories/src/dto/config/config.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
-import '../utils/fixture_reader.dart';
+import '../../fixture/configs.dart';
 
 void main() {
   final remoteSource = _MockRemoteConfigSource();
@@ -20,7 +22,7 @@ void main() {
     test('full remote config is mapped correctly', () async {
       // Given
       const changedHost = 'midnight';
-      final configJson = await FixtureReader.readJson('config/full');
+      final configJson = jsonDecode(Configs.full) as Map<String, dynamic>;
       configJson['blockchain']['host'] = changedHost;
       final remoteConfig = RemoteConfig.fromJson(configJson);
 
@@ -40,7 +42,7 @@ void main() {
         'partial remote config is using '
         'fallback values when missing', () async {
       // Given
-      final configJson = await FixtureReader.readJson('config/no_chain');
+      final configJson = jsonDecode(Configs.noChain) as Map<String, dynamic>;
       final remoteConfig = RemoteConfig.fromJson(configJson);
 
       const env = AppEnvironmentType.dev;
@@ -57,7 +59,7 @@ void main() {
 
     test('empty config fallbacks to default values', () async {
       // Given
-      final configJson = await FixtureReader.readJson('config/empty');
+      final configJson = jsonDecode(Configs.empty) as Map<String, dynamic>;
       final remoteConfig = RemoteConfig.fromJson(configJson);
 
       const env = AppEnvironmentType.dev;

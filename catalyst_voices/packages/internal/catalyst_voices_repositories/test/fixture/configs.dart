@@ -1,3 +1,7 @@
+abstract class Configs {
+  static String empty = '{}';
+
+  static String full = '''
 {
   "version": "0.1.0",
   "createdAt": "2025-04-02T12:59:50.841808Z",
@@ -36,4 +40,32 @@
       "selectionStrategy": "greedy"
     }
   }
+}
+''';
+
+  static String noChain = '''
+{
+  "version": "0.1.0",
+  "createdAt": "2025-04-02T12:59:50.841808Z",
+  "cache": {
+    "expiryDuration": {
+      "keychainUnlock": 3600
+    }
+  },
+  "sentry": {
+    "dsn": "https://8e333ddbed1e096c70e4ed006892c355@o622089.ingest.us.sentry.io/4507113601433600",
+    "environment": "prod",
+    "release": "catalyst-voices@prod",
+    "tracesSampleRate": 0.1,
+    "profilesSampleRate": 0.1,
+    "enableAutoSessionTracking": true,
+    "attachScreenshot": false,
+    "attachViewHierarchy": false,
+    "debug": false,
+    "diagnosticLevel": "error"
+  }
+}
+''';
+
+  const Configs._();
 }
