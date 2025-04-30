@@ -2,6 +2,15 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:equatable/equatable.dart';
 
+final class AccountPublicStatusChangedEvent extends ProposalBuilderEvent {
+  final AccountPublicStatus status;
+
+  const AccountPublicStatusChangedEvent({required this.status});
+
+  @override
+  List<Object?> get props => [status];
+}
+
 final class ActiveNodeChangedEvent extends ProposalBuilderEvent {
   final NodeId? id;
 
@@ -55,6 +64,22 @@ final class LoadProposalEvent extends ProposalBuilderEvent {
 
   @override
   List<Object?> get props => [proposalId];
+}
+
+final class MaxProposalsLimitChangedEvent extends ProposalBuilderEvent {
+  final bool isLimitReached;
+
+  const MaxProposalsLimitChangedEvent({required this.isLimitReached});
+
+  @override
+  List<Object?> get props => [isLimitReached];
+}
+
+final class MaxProposalsLimitReachedEvent extends ProposalBuilderEvent {
+  const MaxProposalsLimitReachedEvent();
+
+  @override
+  List<Object?> get props => [];
 }
 
 sealed class ProposalBuilderEvent extends Equatable {

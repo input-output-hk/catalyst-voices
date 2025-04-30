@@ -4,7 +4,6 @@ import 'package:catalyst_voices/pages/registration/widgets/unlock_password_form.
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 class UnlockPasswordPanel extends StatefulWidget {
   const UnlockPasswordPanel({super.key});

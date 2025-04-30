@@ -1,13 +1,12 @@
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
-import 'package:catalyst_voices_models/src/document/data/static_document_data.dart';
-import 'package:catalyst_voices_models/src/document/document_ref.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:equatable/equatable.dart';
 
 final staticCampaignCategories = [
   CampaignCategory(
-    selfRef: StaticProposalTemplateData.documents[0].categoryId,
-    proposalTemplateRef: StaticProposalTemplateData.documents[0].ref,
+    selfRef: constantDocumentsRefs[0].category,
+    proposalTemplateRef: constantDocumentsRefs[0].proposal,
     categoryName: 'Cardano Open:',
     categorySubname: 'Developers',
     description:
@@ -25,8 +24,8 @@ final staticCampaignCategories = [
     submissionCloseDate: DateTime.now(),
   ),
   CampaignCategory(
-    selfRef: StaticProposalTemplateData.documents[1].categoryId,
-    proposalTemplateRef: StaticProposalTemplateData.documents[1].ref,
+    selfRef: constantDocumentsRefs[1].category,
+    proposalTemplateRef: constantDocumentsRefs[1].proposal,
     categoryName: 'Cardano Open:',
     categorySubname: 'Ecosystem',
     description:
@@ -44,8 +43,8 @@ final staticCampaignCategories = [
     submissionCloseDate: DateTime.now(),
   ),
   CampaignCategory(
-    selfRef: StaticProposalTemplateData.documents[2].categoryId,
-    proposalTemplateRef: StaticProposalTemplateData.documents[2].ref,
+    selfRef: constantDocumentsRefs[2].category,
+    proposalTemplateRef: constantDocumentsRefs[2].proposal,
     categoryName: 'Cardano Use Cases:',
     categorySubname: 'Concept',
     description: '''
@@ -64,8 +63,8 @@ Accepts early stage ideas to deliver proof of concept, design research and basic
     submissionCloseDate: DateTime.now(),
   ),
   CampaignCategory(
-    selfRef: StaticProposalTemplateData.documents[3].categoryId,
-    proposalTemplateRef: StaticProposalTemplateData.documents[3].ref,
+    selfRef: constantDocumentsRefs[3].category,
+    proposalTemplateRef: constantDocumentsRefs[3].proposal,
     categoryName: 'Cardano Use Cases:',
     categorySubname: 'Product',
     description:
@@ -83,8 +82,8 @@ Accepts early stage ideas to deliver proof of concept, design research and basic
     submissionCloseDate: DateTime.now(),
   ),
   CampaignCategory(
-    selfRef: StaticProposalTemplateData.documents[4].categoryId,
-    proposalTemplateRef: StaticProposalTemplateData.documents[4].ref,
+    selfRef: constantDocumentsRefs[4].category,
+    proposalTemplateRef: constantDocumentsRefs[4].proposal,
     categoryName: 'Cardano Partners:',
     categorySubname: 'Enterprise R&D',
     description: '''
@@ -103,8 +102,8 @@ Fuels the fly-wheels of innovation to ignite premium R&D projects that benefit C
     submissionCloseDate: DateTime.now(),
   ),
   CampaignCategory(
-    selfRef: StaticProposalTemplateData.documents[5].categoryId,
-    proposalTemplateRef: StaticProposalTemplateData.documents[5].ref,
+    selfRef: constantDocumentsRefs[5].category,
+    proposalTemplateRef: constantDocumentsRefs[5].proposal,
     categoryName: 'Cardano Partners:',
     categorySubname: 'Growth & Acceleration',
     description: '''
@@ -123,8 +122,8 @@ Fuels adoption by igniting premium advertising or venture building partnerships 
     submissionCloseDate: DateTime.now(),
   ),
   CampaignCategory(
-    selfRef: StaticProposalTemplateData.documents[6].categoryId,
-    proposalTemplateRef: StaticProposalTemplateData.documents[6].ref,
+    selfRef: constantDocumentsRefs[6].category,
+    proposalTemplateRef: constantDocumentsRefs[6].proposal,
     categoryName: '',
     categorySubname: '',
     description: '',
@@ -141,8 +140,8 @@ Fuels adoption by igniting premium advertising or venture building partnerships 
     submissionCloseDate: DateTime.now(),
   ),
   CampaignCategory(
-    selfRef: StaticProposalTemplateData.documents[7].categoryId,
-    proposalTemplateRef: StaticProposalTemplateData.documents[7].ref,
+    selfRef: constantDocumentsRefs[7].category,
+    proposalTemplateRef: constantDocumentsRefs[7].proposal,
     categoryName: '',
     categorySubname: '',
     description: '',
@@ -159,8 +158,8 @@ Fuels adoption by igniting premium advertising or venture building partnerships 
     submissionCloseDate: DateTime.now(),
   ),
   CampaignCategory(
-    selfRef: StaticProposalTemplateData.documents[8].categoryId,
-    proposalTemplateRef: StaticProposalTemplateData.documents[8].ref,
+    selfRef: constantDocumentsRefs[8].category,
+    proposalTemplateRef: constantDocumentsRefs[8].proposal,
     categoryName: '',
     categorySubname: '',
     description: '',
@@ -177,8 +176,8 @@ Fuels adoption by igniting premium advertising or venture building partnerships 
     submissionCloseDate: DateTime.now(),
   ),
   CampaignCategory(
-    selfRef: StaticProposalTemplateData.documents[9].categoryId,
-    proposalTemplateRef: StaticProposalTemplateData.documents[9].ref,
+    selfRef: constantDocumentsRefs[9].category,
+    proposalTemplateRef: constantDocumentsRefs[9].proposal,
     categoryName: '',
     categorySubname: '',
     description: '',
@@ -195,8 +194,8 @@ Fuels adoption by igniting premium advertising or venture building partnerships 
     submissionCloseDate: DateTime.now(),
   ),
   CampaignCategory(
-    selfRef: StaticProposalTemplateData.documents[10].categoryId,
-    proposalTemplateRef: StaticProposalTemplateData.documents[10].ref,
+    selfRef: constantDocumentsRefs[10].category,
+    proposalTemplateRef: constantDocumentsRefs[10].proposal,
     categoryName: '',
     categorySubname: '',
     description: '',
@@ -213,8 +212,8 @@ Fuels adoption by igniting premium advertising or venture building partnerships 
     submissionCloseDate: DateTime.now(),
   ),
   CampaignCategory(
-    selfRef: StaticProposalTemplateData.documents[11].categoryId,
-    proposalTemplateRef: StaticProposalTemplateData.documents[11].ref,
+    selfRef: constantDocumentsRefs[11].category,
+    proposalTemplateRef: constantDocumentsRefs[11].proposal,
     categoryName: '',
     categorySubname: '',
     description: '',

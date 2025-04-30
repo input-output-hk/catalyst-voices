@@ -1,16 +1,16 @@
 import 'package:catalyst_voices_repositories/src/database/catalyst_database.dart';
-import 'package:drift/drift.dart';
-import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../utils/test_factories.dart';
+import 'connection/test_connection.dart';
+import 'drift_test_platforms.dart';
 
 void main() {
   late DriftCatalystDatabase database;
 
-  setUp(() {
-    final inMemory = DatabaseConnection(NativeDatabase.memory());
-    database = DriftCatalystDatabase(inMemory);
+  setUp(() async {
+    final connection = await buildTestConnection();
+    database = DriftCatalystDatabase(connection);
   });
 
   tearDown(() async {
@@ -47,6 +47,7 @@ void main() {
         expect(draftsCountAfter, isZero);
         expect(documentsCountAfter, isZero);
       },
+      onPlatform: driftOnPlatforms,
     );
   });
 }

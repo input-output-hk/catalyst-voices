@@ -72,6 +72,13 @@ abstract interface class DocumentRepository {
     required DocumentRef ref,
   });
 
+  /// Useful when recovering account and we want to lookup
+  /// latest [DocumentData] which of [authorId] and check
+  /// username used in [CatalystId] in that document.
+  Future<DocumentData?> getLatestDocument({
+    CatalystId? authorId,
+  });
+
   /// Returns count of documents matching [ref] id and [type].
   Future<int> getRefCount({
     required DocumentRef ref,
@@ -228,7 +235,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   @override
   Future<List<SignedDocumentRef>> getAllDocumentsRefs() async {
     final allRefs = await _remoteDocuments.index();
-    final allConstRefs = categoriesTemplatesRefs.all;
+    final allConstRefs = constantDocumentsRefs.all;
 
     final nonConstRefs = allRefs
         .where((ref) => allConstRefs.none((e) => e.id == ref.id))
@@ -249,7 +256,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
 
     final uniqueRefs = {
       // Note. categories are mocked on backend so we can't not fetch them.
-      ...categoriesTemplatesRefs.expand((e) => [e.proposal, e.comment]),
+      ...constantDocumentsRefs.expand((e) => [e.proposal, e.comment]),
       ...allLatestRefs,
     };
 
@@ -281,6 +288,19 @@ final class DocumentRepositoryImpl implements DocumentRepository {
       SignedDocumentRef() => _getSignedDocumentData(ref: ref),
       DraftRef() => _getDraftDocumentData(ref: ref),
     };
+  }
+
+  @override
+  Future<DocumentData?> getLatestDocument({
+    CatalystId? authorId,
+  }) async {
+    final latestDocument = await _localDocuments.getLatest(authorId: authorId);
+    final latestDraft = await _drafts.getLatest(authorId: authorId);
+
+    return [latestDocument, latestDraft]
+        .nonNulls
+        .sorted((a, b) => a.compareTo(b))
+        .firstOrNull;
   }
 
   @override

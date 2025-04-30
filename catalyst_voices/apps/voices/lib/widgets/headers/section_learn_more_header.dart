@@ -1,8 +1,7 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
-import 'package:catalyst_voices/widgets/buttons/learn_more_button.dart';
-import 'package:catalyst_voices/widgets/widgets.dart';
+import 'package:catalyst_voices/widgets/buttons/voices_buttons.dart';
+import 'package:catalyst_voices/widgets/tooltips/voices_markdown_tooltip.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
-import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 
@@ -43,14 +42,15 @@ class SectionLearnMoreHeader extends StatelessWidget with LaunchUrlMixin {
             ),
           ),
           const SizedBox(width: 4),
-          VoicesPlainTooltip(
-            message: context.l10n.learnMore,
+          VoicesMarkdownTooltip(
+            message: info,
+            constraints: const BoxConstraints(maxWidth: 312),
             child: VoicesAssets.icons.informationCircle.buildIcon(
               color: context.colors.textOnPrimaryLevel1,
             ),
           ),
           const Spacer(),
-          LearnMoreButton(learnMoreUrl: learnMoreUrl),
+          VoicesLearnMoreTextButton.url(url: learnMoreUrl),
         ],
       ),
     );

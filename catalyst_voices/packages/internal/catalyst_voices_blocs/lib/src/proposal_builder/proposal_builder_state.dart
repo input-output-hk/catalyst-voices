@@ -80,6 +80,8 @@ final class ProposalBuilderState extends Equatable {
   final CampaignCategoryDetailsViewModel? category;
   final NodeId? activeNodeId;
   final bool showValidationErrors;
+  final bool canPublish;
+  final bool isMaxProposalsLimitReached;
 
   const ProposalBuilderState({
     this.isLoading = false,
@@ -94,6 +96,8 @@ final class ProposalBuilderState extends Equatable {
     this.category,
     this.activeNodeId,
     this.showValidationErrors = false,
+    this.canPublish = false,
+    this.isMaxProposalsLimitReached = true,
   });
 
   List<Segment> get allSegments => [
@@ -122,12 +126,27 @@ final class ProposalBuilderState extends Equatable {
         category,
         activeNodeId,
         showValidationErrors,
+        canPublish,
+        isMaxProposalsLimitReached,
       ];
 
   bool get showError => !isLoading && error != null;
 
   bool get showSegments =>
       !isLoading && allSegments.isNotEmpty && error == null;
+
+  ProposalBuilderMenuItemData buildMenuItem({
+    required ProposalMenuItemAction action,
+  }) {
+    final latestVersion = metadata.latestVersion?.number;
+
+    return ProposalBuilderMenuItemData(
+      action: action,
+      proposalTitle: proposalTitle,
+      currentIteration: latestVersion ?? DocumentVersion.firstNumber,
+      canPublish: canPublish,
+    );
+  }
 
   ProposalBuilderState copyWith({
     bool? isLoading,
@@ -142,6 +161,8 @@ final class ProposalBuilderState extends Equatable {
     Optional<CampaignCategoryDetailsViewModel>? category,
     Optional<NodeId>? activeNodeId,
     bool? showValidationErrors,
+    bool? canPublish,
+    bool? isMaxProposalsLimitReached,
   }) {
     return ProposalBuilderState(
       isLoading: isLoading ?? this.isLoading,
@@ -156,6 +177,9 @@ final class ProposalBuilderState extends Equatable {
       category: category.dataOr(this.category),
       activeNodeId: activeNodeId.dataOr(this.activeNodeId),
       showValidationErrors: showValidationErrors ?? this.showValidationErrors,
+      canPublish: canPublish ?? this.canPublish,
+      isMaxProposalsLimitReached:
+          isMaxProposalsLimitReached ?? this.isMaxProposalsLimitReached,
     );
   }
 }

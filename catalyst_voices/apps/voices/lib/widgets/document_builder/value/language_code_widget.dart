@@ -59,7 +59,8 @@ class _LanguageCodeWidgetState extends State<LanguageCodeWidget> {
               : null;
         })
         .nonNulls
-        .toList();
+        .toList()
+      ..sort((a, b) => a.label.compareTo(b.label));
   }
 
   String? _getLocalizedLanguageName(String languageCode) {

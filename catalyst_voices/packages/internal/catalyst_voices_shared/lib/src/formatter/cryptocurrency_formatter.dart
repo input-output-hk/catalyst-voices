@@ -12,7 +12,7 @@ abstract class CryptocurrencyFormatter {
     if (amount.value == 0) {
       return '${const Currency.ada().symbol} -';
     }
-    final value = NumberFormat.decimalPattern().format(amount.value);
+    final value = NumberFormat.decimalPattern().format(amount.ada);
     return '${const Currency.ada().symbol} $value';
   }
 

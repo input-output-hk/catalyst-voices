@@ -33,6 +33,8 @@ final class ProposalBuilderBloc
   ProposalBuilderBlocCache _cache = const ProposalBuilderBlocCache();
   StreamSubscription<CatalystId?>? _activeAccountIdSub;
   StreamSubscription<List<CommentWithReplies>>? _commentsSub;
+  StreamSubscription<AccountPublicStatus>? _activeAccountPublicStatusSub;
+  StreamSubscription<bool>? _isMaxProposalsLimitReachedSub;
 
   ProposalBuilderBloc(
     this._proposalService,
@@ -62,9 +64,15 @@ final class ProposalBuilderBloc
     on<UpdateCommentBuilderEvent>(_updateCommentBuilder);
     on<UpdateCommentRepliesEvent>(_updateCommentReplies);
     on<SubmitCommentEvent>(_submitComment);
+    on<AccountPublicStatusChangedEvent>(_updateAccountPublicStatus);
+    on<MaxProposalsLimitChangedEvent>(_updateMaxProposalsLimitReached);
+    on<MaxProposalsLimitReachedEvent>(_onMaxProposalsLimitReached);
+
+    final activeAccount = _userService.user.activeAccount;
 
     _cache = _cache.copyWith(
-      activeAccountId: Optional(_userService.user.activeAccount?.catalystId),
+      activeAccountId: Optional(activeAccount?.catalystId),
+      accountPublicStatus: Optional(activeAccount?.publicStatus),
     );
 
     _activeAccountIdSub = _userService.watchUser
@@ -73,6 +81,17 @@ final class ProposalBuilderBloc
         .listen(
           (value) => add(RebuildActiveAccountProposalEvent(catalystId: value)),
         );
+
+    _activeAccountPublicStatusSub = _userService.watchUser
+        .map((event) => event.activeAccount?.publicStatus)
+        .distinct()
+        .map((event) => event ?? AccountPublicStatus.unknown)
+        .listen((event) => add(AccountPublicStatusChangedEvent(status: event)));
+
+    _isMaxProposalsLimitReachedSub =
+        _proposalService.watchMaxProposalsLimitReached().listen((event) {
+      add(MaxProposalsLimitChangedEvent(isLimitReached: event));
+    });
   }
 
   @override
@@ -83,7 +102,17 @@ final class ProposalBuilderBloc
     await _commentsSub?.cancel();
     _commentsSub = null;
 
+    await _activeAccountPublicStatusSub?.cancel();
+    _activeAccountPublicStatusSub = null;
+
+    await _isMaxProposalsLimitReachedSub?.cancel();
+    _isMaxProposalsLimitReachedSub = null;
+
     return super.close();
+  }
+
+  Future<bool> isAccountEmailVerified() {
+    return _userService.isActiveAccountPubliclyVerified();
   }
 
   bool validate() {
@@ -124,6 +153,8 @@ final class ProposalBuilderBloc
     required List<CommentWithReplies> comments,
     required CommentsState commentsState,
     required bool hasActiveAccount,
+    required bool isEmailVerified,
+    required bool isMaxProposalsLimitReached,
   }) {
     final documentSegments = _mapDocumentToSegments(
       proposalDocument,
@@ -151,6 +182,8 @@ final class ProposalBuilderBloc
       metadata: proposalMetadata,
       category: categoryVM,
       activeNodeId: firstSection?.id,
+      canPublish: isEmailVerified,
+      isMaxProposalsLimitReached: isMaxProposalsLimitReached,
     );
   }
 
@@ -163,6 +196,9 @@ final class ProposalBuilderBloc
     final commentTemplate =
         await _commentService.getCommentTemplateFor(category: category.selfRef);
 
+    final isMaxProposalsLimitReached =
+        await _proposalService.isMaxProposalsLimitReached();
+
     _cache = _cache.copyWith(
       proposalBuilder: Optional(proposalDocument.toBuilder()),
       proposalDocument: Optional(proposalDocument),
@@ -170,6 +206,7 @@ final class ProposalBuilderBloc
       category: Optional(category),
       commentTemplate: Optional(commentTemplate),
       comments: const Optional.empty(),
+      isMaxProposalsLimitReached: Optional(isMaxProposalsLimitReached),
     );
 
     await _commentsSub?.cancel();
@@ -297,6 +334,16 @@ final class ProposalBuilderBloc
             _findGuidanceItems(segment, section, section.property).toList(),
       );
     }
+  }
+
+  Future<DateTime?> _getProposalSubmissionCloseDate() async {
+    final timeline = await _campaignService.getCampaignTimeline();
+    return timeline
+        .firstWhereOrNull(
+          (e) => e.stage == CampaignTimelineStage.proposalSubmission,
+        )
+        ?.timeline
+        .to;
   }
 
   void _handleActiveNodeChangedEvent(
@@ -545,19 +592,32 @@ final class ProposalBuilderBloc
     }).toList();
   }
 
+  Future<void> _onMaxProposalsLimitReached(
+    MaxProposalsLimitReachedEvent event,
+    Emitter<ProposalBuilderState> emit,
+  ) async {
+    final proposalSubmissionCloseDate = await _getProposalSubmissionCloseDate();
+    final count = await _proposalService.watchUserProposalsCount().first;
+
+    if (proposalSubmissionCloseDate != null) {
+      final signal = MaxProposalsLimitReachedSignal(
+        proposalSubmissionCloseDate: proposalSubmissionCloseDate,
+        currentSubmissions: count.finals,
+        maxSubmissions: ProposalDocument.maxSubmittedProposalsPerUser,
+      );
+
+      emitSignal(signal);
+    }
+  }
+
   Future<void> _proposalSubmissionCloseDate(
     ProposalSubmissionCloseDateEvent event,
     Emitter<ProposalBuilderState> emit,
   ) async {
-    final timeline = await _campaignService.getCampaignTimeline();
-    final closeDate = timeline
-        .firstWhereOrNull(
-          (e) => e.stage == CampaignTimelineStage.proposalSubmission,
-        )
-        ?.timeline
-        .to;
-
-    emitSignal(ProposalSubmissionCloseDate(date: closeDate));
+    final closeDate = await _getProposalSubmissionCloseDate();
+    if (closeDate != null) {
+      emitSignal(ProposalSubmissionCloseDate(date: closeDate));
+    }
   }
 
   Future<void> _publishAndSubmitProposalForReview(
@@ -667,6 +727,9 @@ final class ProposalBuilderBloc
     final commentTemplate = _cache.commentTemplate;
     final comments = _cache.comments ?? [];
     final commentsState = state.comments;
+    final emailStatus = _cache.accountPublicStatus;
+    final isMaxProposalsLimitReached =
+        _cache.isMaxProposalsLimitReached ?? true;
 
     if (proposalDocument == null ||
         proposalMetadata == null ||
@@ -683,6 +746,8 @@ final class ProposalBuilderBloc
       commentSchema: commentTemplate.schema,
       comments: comments,
       commentsState: commentsState,
+      isEmailVerified: emailStatus?.isVerified ?? false,
+      isMaxProposalsLimitReached: isMaxProposalsLimitReached,
     );
   }
 
@@ -833,6 +898,14 @@ final class ProposalBuilderBloc
     emitSignal(const SubmittedProposalBuilderSignal());
   }
 
+  void _updateAccountPublicStatus(
+    AccountPublicStatusChangedEvent event,
+    Emitter<ProposalBuilderState> emit,
+  ) {
+    _cache = _cache.copyWith(accountPublicStatus: Optional(event.status));
+    emit(_rebuildState());
+  }
+
   Future<void> _updateCommentBuilder(
     UpdateCommentBuilderEvent event,
     Emitter<ProposalBuilderState> emit,
@@ -859,6 +932,16 @@ final class ProposalBuilderBloc
   ) async {
     final updatedComments = state.comments.copyWith(commentsSort: event.sort);
     emit(state.copyWith(comments: updatedComments));
+    emit(_rebuildState());
+  }
+
+  void _updateMaxProposalsLimitReached(
+    MaxProposalsLimitChangedEvent event,
+    Emitter<ProposalBuilderState> emit,
+  ) {
+    _cache = _cache.copyWith(
+      isMaxProposalsLimitReached: Optional(event.isLimitReached),
+    );
     emit(_rebuildState());
   }
 

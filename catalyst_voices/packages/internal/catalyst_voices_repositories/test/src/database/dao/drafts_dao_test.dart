@@ -3,19 +3,20 @@ import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_repositories/src/database/catalyst_database.dart';
 import 'package:catalyst_voices_repositories/src/database/dao/drafts_dao.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
-import 'package:drift/drift.dart' show DatabaseConnection, Uint8List;
-import 'package:drift/native.dart';
+import 'package:drift/drift.dart' show Uint8List;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:uuid_plus/uuid_plus.dart';
 
 import '../../utils/test_factories.dart';
+import '../connection/test_connection.dart';
+import '../drift_test_platforms.dart';
 
 void main() {
   late DriftCatalystDatabase database;
 
-  setUp(() {
-    final inMemory = DatabaseConnection(NativeDatabase.memory());
-    database = DriftCatalystDatabase(inMemory);
+  setUp(() async {
+    final connection = await buildTestConnection();
+    database = DriftCatalystDatabase(connection);
   });
 
   tearDown(() async {
@@ -24,393 +25,444 @@ void main() {
 
   group(DriftDraftsDao, () {
     group('query', () {
-      test('returns specific version matching exact ref', () async {
-        // Given
-        final drafts = List<DocumentDraftEntity>.generate(
-          2,
-          (index) => DraftFactory.build(),
-        );
-        final ref = DraftRef(
-          id: drafts.first.metadata.id,
-          version: drafts.first.metadata.version,
-        );
+      test(
+        'returns specific version matching exact ref',
+        () async {
+          // Given
+          final drafts = List<DocumentDraftEntity>.generate(
+            2,
+            (index) => DraftFactory.build(),
+          );
+          final ref = DraftRef(
+            id: drafts.first.metadata.id,
+            version: drafts.first.metadata.version,
+          );
 
-        // When
-        await database.draftsDao.saveAll(drafts);
+          // When
+          await database.draftsDao.saveAll(drafts);
 
-        // Then
-        final entity = await database.draftsDao.query(ref: ref);
+          // Then
+          final entity = await database.draftsDao.query(ref: ref);
 
-        expect(entity, isNotNull);
+          expect(entity, isNotNull);
 
-        final id = UuidHiLo(high: entity!.idHi, low: entity.idLo);
-        final ver = UuidHiLo(high: entity.verHi, low: entity.verLo);
+          final id = UuidHiLo(high: entity!.idHi, low: entity.idLo);
+          final ver = UuidHiLo(high: entity.verHi, low: entity.verLo);
 
-        expect(id.uuid, ref.id);
-        expect(ver.uuid, ref.version);
-      });
+          expect(id.uuid, ref.id);
+          expect(ver.uuid, ref.version);
+        },
+        onPlatform: driftOnPlatforms,
+      );
 
-      test('returns newest version when ver is not specified', () async {
-        // Given
-        final id = const Uuid().v7();
-        final firstVersionId = const Uuid().v7(
-          config: V7Options(
-            DateTime(2025, 2, 10).millisecondsSinceEpoch,
-            null,
-          ),
-        );
-        final secondVersionId = const Uuid().v7(
-          config: V7Options(
-            DateTime(2025, 2, 11).millisecondsSinceEpoch,
-            null,
-          ),
-        );
+      test(
+        'returns newest version when ver is not specified',
+        () async {
+          // Given
+          final id = const Uuid().v7();
+          final firstVersionId = const Uuid().v7(
+            config: V7Options(
+              DateTime(2025, 2, 10).millisecondsSinceEpoch,
+              null,
+            ),
+          );
+          final secondVersionId = const Uuid().v7(
+            config: V7Options(
+              DateTime(2025, 2, 11).millisecondsSinceEpoch,
+              null,
+            ),
+          );
 
-        final drafts = <DocumentDraftEntity>[
-          DraftFactory.build(
+          final drafts = <DocumentDraftEntity>[
+            DraftFactory.build(
+              metadata: DocumentDataMetadata(
+                type: DocumentType.proposalDocument,
+                selfRef: DraftRef(id: id, version: firstVersionId),
+              ),
+            ),
+            DraftFactory.build(
+              metadata: DocumentDataMetadata(
+                type: DocumentType.proposalDocument,
+                selfRef: DraftRef(id: id, version: secondVersionId),
+              ),
+            ),
+          ];
+          final ref = DraftRef(id: drafts.first.metadata.id);
+
+          // When
+          await database.draftsDao.saveAll(drafts);
+
+          // Then
+          final entity = await database.draftsDao.query(ref: ref);
+
+          expect(entity, isNotNull);
+
+          expect(entity!.metadata.id, id);
+          expect(entity.metadata.version, secondVersionId);
+        },
+        onPlatform: driftOnPlatforms,
+      );
+
+      test(
+        'returns null when id does not match any id',
+        () async {
+          // Given
+          final drafts = List<DocumentDraftEntity>.generate(
+            2,
+            (index) => DraftFactory.build(),
+          );
+          final ref = DraftRef(id: const Uuid().v7());
+
+          // When
+          await database.draftsDao.saveAll(drafts);
+
+          // Then
+          final entity = await database.draftsDao.query(ref: ref);
+
+          expect(entity, isNull);
+        },
+        onPlatform: driftOnPlatforms,
+      );
+
+      test(
+        'all refs return as expected',
+        () async {
+          // Given
+          final refs = List.generate(10, (_) => DraftRef.generateFirstRef());
+          final drafts = refs.map((ref) {
+            return DraftFactory.build(
+              metadata: DocumentDataMetadata(
+                type: DocumentType.proposalDocument,
+                selfRef: ref,
+              ),
+            );
+          });
+
+          // When
+          await database.draftsDao.saveAll(drafts);
+
+          // Then
+          final allRefs = await database.draftsDao.queryAllRefs();
+
+          expect(
+            allRefs,
+            allOf(hasLength(refs.length), containsAll(refs)),
+          );
+        },
+        onPlatform: driftOnPlatforms,
+      );
+
+      test(
+        'authors are correctly extracted',
+        () async {
+          final authorId1 = CatalystId(host: 'test', role0Key: Uint8List(32));
+          final authorId2 = CatalystId(host: 'test1', role0Key: Uint8List(32));
+
+          final ref = DraftRef.generateFirstRef();
+          // Given
+          final draft = DraftFactory.build(
             metadata: DocumentDataMetadata(
               type: DocumentType.proposalDocument,
-              selfRef: DraftRef(id: id, version: firstVersionId),
+              selfRef: ref,
+              authors: [
+                authorId1,
+                authorId2,
+              ],
             ),
-          ),
-          DraftFactory.build(
+          );
+
+          await database.draftsDao.save(draft);
+          final doc = await database.draftsDao.query(ref: ref);
+          expect(
+            doc?.metadata.authors,
+            [
+              authorId1,
+              authorId2,
+            ],
+          );
+        },
+        onPlatform: driftOnPlatforms,
+      );
+
+      test(
+        'when updating proposal author list is not deleted',
+        () async {
+          final authorId1 = CatalystId(host: 'test', role0Key: Uint8List(32));
+          final authorId2 = CatalystId(host: 'test1', role0Key: Uint8List(32));
+
+          final ref = DraftRef.generateFirstRef();
+          // Given
+          final draft = DraftFactory.build(
             metadata: DocumentDataMetadata(
               type: DocumentType.proposalDocument,
-              selfRef: DraftRef(id: id, version: secondVersionId),
+              selfRef: ref,
+              authors: [
+                authorId1,
+                authorId2,
+              ],
             ),
-          ),
-        ];
-        final ref = DraftRef(id: drafts.first.metadata.id);
+            content: const DocumentDataContent({
+              'title': 'Dev',
+            }),
+          );
 
-        // When
-        await database.draftsDao.saveAll(drafts);
+          final updateDraft = draft.copyWith(
+            metadata: draft.metadata.copyWith(
+              authors: null,
+            ),
+            content: const DocumentDataContent({
+              'title': 'Update',
+            }),
+          );
 
-        // Then
-        final entity = await database.draftsDao.query(ref: ref);
+          await database.draftsDao.save(draft);
+          await database.draftsDao.save(updateDraft);
 
-        expect(entity, isNotNull);
+          final updated = await database.draftsDao.query(ref: ref);
 
-        expect(entity!.metadata.id, id);
-        expect(entity.metadata.version, secondVersionId);
-      });
+          expect(
+            updated?.metadata.authors?.length,
+            equals(2),
+          );
+          expect(
+            updated?.metadata.authors,
+            equals([
+              authorId1,
+              authorId2,
+            ]),
+          );
+        },
+        onPlatform: driftOnPlatforms,
+      );
 
-      test('returns null when id does not match any id', () async {
-        // Given
-        final drafts = List<DocumentDraftEntity>.generate(
-          2,
-          (index) => DraftFactory.build(),
-        );
-        final ref = DraftRef(id: const Uuid().v7());
+      test(
+        'all drafts with from same account are returned '
+        'even when username changes',
+        () async {
+          // Given
+          final originalId = DummyCatalystIdFactory.create(username: 'damian');
+          final updatedId =
+              originalId.copyWith(username: const Optional('dev'));
 
-        // When
-        await database.draftsDao.saveAll(drafts);
+          final draft1 = DraftFactory.build(
+            metadata: DocumentDataMetadata(
+              type: DocumentType.proposalDocument,
+              selfRef: SignedDocumentRef.generateFirstRef(),
+              authors: [originalId],
+            ),
+          );
+          final draft2 = DraftFactory.build(
+            metadata: DocumentDataMetadata(
+              type: DocumentType.proposalDocument,
+              selfRef: SignedDocumentRef.generateFirstRef(),
+              authors: [updatedId],
+            ),
+          );
 
-        // Then
-        final entity = await database.draftsDao.query(ref: ref);
+          final drafts = [draft1, draft2];
+          final refs = drafts.map((e) => e.metadata.selfRef).toList();
 
-        expect(entity, isNull);
-      });
+          // When
+          await database.draftsDao.saveAll(drafts);
 
-      test('all refs return as expected', () async {
-        // Given
-        final refs = List.generate(10, (_) => DraftRef.generateFirstRef());
-        final drafts = refs.map((ref) {
-          return DraftFactory.build(
+          // Then
+          final stream = database.draftsDao.watchAll(authorId: updatedId);
+
+          expect(
+            stream,
+            emitsInOrder([
+              allOf(
+                hasLength(drafts.length),
+                everyElement(
+                  predicate<DocumentDraftEntity>((document) {
+                    return refs.contains(document.metadata.selfRef);
+                  }),
+                ),
+              ),
+            ]),
+          );
+        },
+        onPlatform: driftOnPlatforms,
+      );
+    });
+
+    group('count', () {
+      test(
+        'ref without ver includes all versions',
+        () async {
+          // Given
+          final id = const Uuid().v7();
+          final drafts = List<DocumentDraftEntity>.generate(
+            2,
+            (index) {
+              return DraftFactory.build(
+                metadata: DocumentDataMetadata(
+                  type: DocumentType.proposalDocument,
+                  selfRef: DraftRef(id: id, version: const Uuid().v7()),
+                ),
+              );
+            },
+          );
+          final ref = DraftRef(id: id);
+
+          // When
+          await database.draftsDao.saveAll(drafts);
+
+          // Then
+          final count = await database.draftsDao.count(ref: ref);
+
+          expect(count, drafts.length);
+        },
+        onPlatform: driftOnPlatforms,
+      );
+
+      test(
+        'ref with ver includes only that version',
+        () async {
+          // Given
+          final id = const Uuid().v7();
+          final version = const Uuid().v7();
+          final drafts = <DocumentDraftEntity>[
+            DraftFactory.build(
+              metadata: DocumentDataMetadata(
+                type: DocumentType.proposalDocument,
+                selfRef: DraftRef(id: id, version: version),
+              ),
+            ),
+            DraftFactory.build(
+              metadata: DocumentDataMetadata(
+                type: DocumentType.proposalDocument,
+                selfRef: DraftRef.first(id),
+              ),
+            ),
+          ];
+          final ref = DraftRef(id: id, version: version);
+
+          // When
+          await database.draftsDao.saveAll(drafts);
+
+          // Then
+          final count = await database.draftsDao.count(ref: ref);
+
+          expect(count, 1);
+        },
+        onPlatform: driftOnPlatforms,
+      );
+
+      test(
+        'returns 0 whe no matching drafts are found',
+        () async {
+          // Given
+          final drafts = <DocumentDraftEntity>[
+            DraftFactory.build(),
+            DraftFactory.build(),
+          ];
+          final ref = DraftRef(id: const Uuid().v7());
+
+          // When
+          await database.draftsDao.saveAll(drafts);
+
+          // Then
+          final count = await database.draftsDao.count(ref: ref);
+
+          expect(count, 0);
+        },
+        onPlatform: driftOnPlatforms,
+      );
+    });
+
+    group('update', () {
+      test(
+        'replaces content correctly for exact ref',
+        () async {
+          // Given
+          final draft = DraftFactory.build();
+          const updatedContent = DocumentDataContent({
+            'title': 'Dev final 2',
+            'author': 'dev',
+          });
+          final ref = DraftRef(
+            id: draft.metadata.id,
+            version: draft.metadata.version,
+          );
+
+          // When
+          await database.draftsDao.save(draft);
+          await database.draftsDao
+              .updateContent(ref: ref, content: updatedContent);
+
+          // Then
+          final entity = await database.draftsDao.query(ref: ref);
+
+          expect(entity, isNotNull);
+          expect(entity?.content, updatedContent);
+        },
+        onPlatform: driftOnPlatforms,
+      );
+
+      test(
+        'replaces content for all matching '
+        'ids when ver is not specified',
+        () async {
+          // Given
+          final id = const Uuid().v7();
+          final drafts = List.generate(
+            5,
+            (index) => DraftFactory.build(
+              metadata: DocumentDataMetadata(
+                type: DocumentType.proposalDocument,
+                selfRef: DraftRef(id: id, version: const Uuid().v7()),
+              ),
+            ),
+          );
+          const updatedContent = DocumentDataContent({
+            'title': 'Dev final 2',
+            'author': 'dev',
+          });
+          final ref = DraftRef(id: id);
+
+          // When
+          await database.draftsDao.saveAll(drafts);
+          await database.draftsDao
+              .updateContent(ref: ref, content: updatedContent);
+
+          // Then
+          final entities = await database.draftsDao.queryAll();
+
+          expect(entities, hasLength(drafts.length));
+          expect(
+            entities.every((element) => element.content == updatedContent),
+            isTrue,
+          );
+        },
+        onPlatform: driftOnPlatforms,
+      );
+    });
+
+    group('delete', () {
+      test(
+        'inserting and deleting a draft makes the table empty',
+        () async {
+          // Given
+          final ref = DraftRef.generateFirstRef();
+
+          final draft = DraftFactory.build(
             metadata: DocumentDataMetadata(
               type: DocumentType.proposalDocument,
               selfRef: ref,
             ),
           );
-        });
 
-        // When
-        await database.draftsDao.saveAll(drafts);
+          // When
+          await database.draftsDao.save(draft);
+          await database.draftsDao.deleteWhere(ref: ref);
 
-        // Then
-        final allRefs = await database.draftsDao.queryAllRefs();
-
-        expect(
-          allRefs,
-          allOf(hasLength(refs.length), containsAll(refs)),
-        );
-      });
-
-      test('authors are correctly extracted', () async {
-        final authorId1 = CatalystId(host: 'test', role0Key: Uint8List(32));
-        final authorId2 = CatalystId(host: 'test1', role0Key: Uint8List(32));
-
-        final ref = DraftRef.generateFirstRef();
-        // Given
-        final draft = DraftFactory.build(
-          metadata: DocumentDataMetadata(
-            type: DocumentType.proposalDocument,
-            selfRef: ref,
-            authors: [
-              authorId1,
-              authorId2,
-            ],
-          ),
-        );
-
-        await database.draftsDao.save(draft);
-        final doc = await database.draftsDao.query(ref: ref);
-        expect(
-          doc?.metadata.authors,
-          [
-            authorId1,
-            authorId2,
-          ],
-        );
-      });
-
-      test('when updating proposal author list is not deleted', () async {
-        final authorId1 = CatalystId(host: 'test', role0Key: Uint8List(32));
-        final authorId2 = CatalystId(host: 'test1', role0Key: Uint8List(32));
-
-        final ref = DraftRef.generateFirstRef();
-        // Given
-        final draft = DraftFactory.build(
-          metadata: DocumentDataMetadata(
-            type: DocumentType.proposalDocument,
-            selfRef: ref,
-            authors: [
-              authorId1,
-              authorId2,
-            ],
-          ),
-          content: const DocumentDataContent({
-            'title': 'Dev',
-          }),
-        );
-
-        final updateDraft = draft.copyWith(
-          metadata: draft.metadata.copyWith(
-            authors: null,
-          ),
-          content: const DocumentDataContent({
-            'title': 'Update',
-          }),
-        );
-
-        await database.draftsDao.save(draft);
-        await database.draftsDao.save(updateDraft);
-
-        final updated = await database.draftsDao.query(ref: ref);
-
-        expect(
-          updated?.metadata.authors?.length,
-          equals(2),
-        );
-        expect(
-          updated?.metadata.authors,
-          equals([
-            authorId1,
-            authorId2,
-          ]),
-        );
-      });
-
-      test(
-          'all drafts with from same account are returned '
-          'even when username changes', () async {
-        // Given
-        final originalId = DummyCatalystIdFactory.create(username: 'damian');
-        final updatedId = originalId.copyWith(username: const Optional('dev'));
-
-        final draft1 = DraftFactory.build(
-          metadata: DocumentDataMetadata(
-            type: DocumentType.proposalDocument,
-            selfRef: SignedDocumentRef.generateFirstRef(),
-            authors: [originalId],
-          ),
-        );
-        final draft2 = DraftFactory.build(
-          metadata: DocumentDataMetadata(
-            type: DocumentType.proposalDocument,
-            selfRef: SignedDocumentRef.generateFirstRef(),
-            authors: [updatedId],
-          ),
-        );
-
-        final drafts = [draft1, draft2];
-        final refs = drafts.map((e) => e.metadata.selfRef).toList();
-
-        // When
-        await database.draftsDao.saveAll(drafts);
-
-        // Then
-        final stream = database.draftsDao.watchAll(authorId: updatedId);
-
-        expect(
-          stream,
-          emitsInOrder([
-            allOf(
-              hasLength(drafts.length),
-              everyElement(
-                predicate<DocumentDraftEntity>((document) {
-                  return refs.contains(document.metadata.selfRef);
-                }),
-              ),
-            ),
-          ]),
-        );
-      });
-    });
-
-    group('count', () {
-      test('ref without ver includes all versions', () async {
-        // Given
-        final id = const Uuid().v7();
-        final drafts = List<DocumentDraftEntity>.generate(
-          2,
-          (index) {
-            return DraftFactory.build(
-              metadata: DocumentDataMetadata(
-                type: DocumentType.proposalDocument,
-                selfRef: DraftRef(id: id, version: const Uuid().v7()),
-              ),
-            );
-          },
-        );
-        final ref = DraftRef(id: id);
-
-        // When
-        await database.draftsDao.saveAll(drafts);
-
-        // Then
-        final count = await database.draftsDao.count(ref: ref);
-
-        expect(count, drafts.length);
-      });
-
-      test('ref with ver includes only that version', () async {
-        // Given
-        final id = const Uuid().v7();
-        final version = const Uuid().v7();
-        final drafts = <DocumentDraftEntity>[
-          DraftFactory.build(
-            metadata: DocumentDataMetadata(
-              type: DocumentType.proposalDocument,
-              selfRef: DraftRef(id: id, version: version),
-            ),
-          ),
-          DraftFactory.build(
-            metadata: DocumentDataMetadata(
-              type: DocumentType.proposalDocument,
-              selfRef: DraftRef.first(id),
-            ),
-          ),
-        ];
-        final ref = DraftRef(id: id, version: version);
-
-        // When
-        await database.draftsDao.saveAll(drafts);
-
-        // Then
-        final count = await database.draftsDao.count(ref: ref);
-
-        expect(count, 1);
-      });
-
-      test('returns 0 whe no matching drafts are found', () async {
-        // Given
-        final drafts = <DocumentDraftEntity>[
-          DraftFactory.build(),
-          DraftFactory.build(),
-        ];
-        final ref = DraftRef(id: const Uuid().v7());
-
-        // When
-        await database.draftsDao.saveAll(drafts);
-
-        // Then
-        final count = await database.draftsDao.count(ref: ref);
-
-        expect(count, 0);
-      });
-    });
-
-    group('update', () {
-      test('replaces content correctly for exact ref', () async {
-        // Given
-        final draft = DraftFactory.build();
-        const updatedContent = DocumentDataContent({
-          'title': 'Dev final 2',
-          'author': 'dev',
-        });
-        final ref = DraftRef(
-          id: draft.metadata.id,
-          version: draft.metadata.version,
-        );
-
-        // When
-        await database.draftsDao.save(draft);
-        await database.draftsDao
-            .updateContent(ref: ref, content: updatedContent);
-
-        // Then
-        final entity = await database.draftsDao.query(ref: ref);
-
-        expect(entity, isNotNull);
-        expect(entity?.content, updatedContent);
-      });
-
-      test(
-          'replaces content for all matching '
-          'ids when ver is not specified', () async {
-        // Given
-        final id = const Uuid().v7();
-        final drafts = List.generate(
-          5,
-          (index) => DraftFactory.build(
-            metadata: DocumentDataMetadata(
-              type: DocumentType.proposalDocument,
-              selfRef: DraftRef(id: id, version: const Uuid().v7()),
-            ),
-          ),
-        );
-        const updatedContent = DocumentDataContent({
-          'title': 'Dev final 2',
-          'author': 'dev',
-        });
-        final ref = DraftRef(id: id);
-
-        // When
-        await database.draftsDao.saveAll(drafts);
-        await database.draftsDao
-            .updateContent(ref: ref, content: updatedContent);
-
-        // Then
-        final entities = await database.draftsDao.queryAll();
-
-        expect(entities, hasLength(drafts.length));
-        expect(
-          entities.every((element) => element.content == updatedContent),
-          isTrue,
-        );
-      });
-    });
-
-    group('delete', () {
-      test('inserting and deleting a draft makes the table empty', () async {
-        // Given
-        final ref = DraftRef.generateFirstRef();
-
-        final draft = DraftFactory.build(
-          metadata: DocumentDataMetadata(
-            type: DocumentType.proposalDocument,
-            selfRef: ref,
-          ),
-        );
-
-        // When
-        await database.draftsDao.save(draft);
-        await database.draftsDao.deleteWhere(ref: ref);
-
-        // Then
-        final entities = await database.draftsDao.queryAll();
-        expect(entities, isEmpty);
-      });
+          // Then
+          final entities = await database.draftsDao.queryAll();
+          expect(entities, isEmpty);
+        },
+        onPlatform: driftOnPlatforms,
+      );
     });
   });
 }

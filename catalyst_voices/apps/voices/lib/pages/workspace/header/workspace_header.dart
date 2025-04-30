@@ -14,7 +14,6 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart'
     show ProposalDocument, Space;
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 part 'create_proposal_button.dart';
 part 'import_proposal_button.dart';
@@ -89,9 +88,7 @@ class _ViewComments extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocSelector<WorkspaceBloc, WorkspaceState, bool>(
-      selector: (state) {
-        return state.hasComments;
-      },
+      selector: (state) => state.hasComments,
       builder: (context, hasComments) {
         return hasComments
             ? const Padding(

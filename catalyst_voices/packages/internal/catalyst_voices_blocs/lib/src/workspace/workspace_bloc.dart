@@ -24,7 +24,7 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
   final DocumentMapper _documentMapper;
   final DownloaderService _downloaderService;
 
-  StreamSubscription<List<Proposal>>? _proposalsSubscription;
+  StreamSubscription<List<Proposal>>? _proposalsSub;
 
   // ignore: unused_field
   final List<Proposal> _proposals = [];
@@ -48,8 +48,7 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
 
   @override
   Future<void> close() {
-    _proposalsSubscription?.cancel();
-    _proposalsSubscription = null;
+    _cancelProposalSubscriptions();
     return super.close();
   }
 
@@ -68,6 +67,11 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
       template: templateRef,
       categoryId: categoryId,
     );
+  }
+
+  Future<void> _cancelProposalSubscriptions() async {
+    await _proposalsSub?.cancel();
+    _proposalsSub = null;
   }
 
   Future<void> _deleteProposal(
@@ -98,8 +102,8 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
         isLoading: false,
       ),
     );
-    await _proposalsSubscription?.cancel();
-    _proposalsSubscription = null;
+
+    await _cancelProposalSubscriptions();
   }
 
   Future<void> _exportProposal(
@@ -207,11 +211,10 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
   }
 
   void _setupProposalsSubscription() {
-    _proposalsSubscription = _proposalService.watchUserProposals().listen(
+    _proposalsSub = _proposalService.watchUserProposals().listen(
       (proposals) {
         if (isClosed) return;
         _logger.info('Stream received ${proposals.length} proposals');
-
         add(LoadProposalsEvent(proposals));
       },
       onError: (Object error, StackTrace stackTrace) {
@@ -243,19 +246,22 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     Emitter<WorkspaceState> emit,
   ) async {
     // As stream is needed in a few places we don't want to create it every time
-    if (_proposalsSubscription != null && state.error == null) {
+    if (_proposalsSub != null && state.error == null) {
       return;
     }
+
     _logger.info('Setup user proposals subscription');
+
     emit(
       state.copyWith(
         isLoading: true,
         error: const Optional.empty(),
       ),
     );
+
     _logger.info('$state and ${state.showProposals}');
-    await _proposalsSubscription?.cancel();
-    _proposalsSubscription = null;
+
+    await _cancelProposalSubscriptions();
     _setupProposalsSubscription();
   }
 }

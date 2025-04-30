@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:catalyst_voices/common/error_handler.dart';
+import 'package:catalyst_voices/common/signal_handler.dart';
+import 'package:catalyst_voices/pages/account/verification_email_send_dialog.dart';
 import 'package:catalyst_voices/pages/account/widgets/account_action_tile.dart';
 import 'package:catalyst_voices/pages/account/widgets/account_email_tile.dart';
 import 'package:catalyst_voices/pages/account/widgets/account_header_tile.dart';
@@ -15,7 +17,6 @@ import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 final class AccountPage extends StatefulWidget {
   const AccountPage({super.key});
@@ -25,7 +26,9 @@ final class AccountPage extends StatefulWidget {
 }
 
 class _AccountPageState extends State<AccountPage>
-    with ErrorHandlerStateMixin<AccountCubit, AccountPage> {
+    with
+        ErrorHandlerStateMixin<AccountCubit, AccountPage>,
+        SignalHandlerStateMixin<AccountCubit, AccountSignal, AccountPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -92,9 +95,21 @@ class _AccountPageState extends State<AccountPage>
   }
 
   @override
+  void handleSignal(AccountSignal signal) {
+    switch (signal) {
+      case AccountVerificationEmailSendSignal():
+        _showVerificationEmailSendDialog();
+    }
+  }
+
+  @override
   void initState() {
     super.initState();
 
-    unawaited(context.read<AccountCubit>().loadAccountDetails());
+    unawaited(context.read<AccountCubit>().updateAccountDetails());
+  }
+
+  void _showVerificationEmailSendDialog() {
+    unawaited(VerificationEmailSendDialog.show(context));
   }
 }
