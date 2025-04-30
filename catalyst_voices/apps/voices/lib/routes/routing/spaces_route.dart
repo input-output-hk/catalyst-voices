@@ -11,15 +11,12 @@ import 'package:catalyst_voices/routes/guards/proposal_submission_guard.dart';
 import 'package:catalyst_voices/routes/guards/route_guard.dart';
 import 'package:catalyst_voices/routes/guards/session_unlocked_guard.dart';
 import 'package:catalyst_voices/routes/guards/user_access_guard.dart';
-import 'package:catalyst_voices/routes/routing/routes.dart';
 import 'package:catalyst_voices/routes/routing/transitions/transitions.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 part 'spaces_route.g.dart';
-
-const _prefix = Routes.currentMilestone;
 
 final class CategoryDetailRoute extends GoRouteData
     with FadePageTransitionMixin, CompositeRouteGuardMixin {
@@ -116,7 +113,7 @@ final class ProposalsRoute extends GoRouteData
 @TypedShellRoute<SpacesShellRouteData>(
   routes: <TypedRoute<RouteData>>[
     TypedGoRoute<DiscoveryRoute>(
-      path: '/$_prefix/discovery',
+      path: '/discovery',
       routes: [
         TypedGoRoute<ProposalsRoute>(
           path: 'proposals',
@@ -126,10 +123,10 @@ final class ProposalsRoute extends GoRouteData
         ),
       ],
     ),
-    TypedGoRoute<WorkspaceRoute>(path: '/$_prefix/workspace'),
-    TypedGoRoute<VotingRoute>(path: '/$_prefix/voting'),
-    TypedGoRoute<FundedProjectsRoute>(path: '/$_prefix/funded_projects'),
-    TypedGoRoute<TreasuryRoute>(path: '/$_prefix/treasury'),
+    TypedGoRoute<WorkspaceRoute>(path: '/workspace'),
+    TypedGoRoute<VotingRoute>(path: '/voting'),
+    TypedGoRoute<FundedProjectsRoute>(path: '/funded_projects'),
+    TypedGoRoute<TreasuryRoute>(path: '/treasury'),
   ],
 )
 final class SpacesShellRouteData extends ShellRouteData {
@@ -149,9 +146,7 @@ final class SpacesShellRouteData extends ShellRouteData {
     GoRouterState state,
     Widget navigator,
   ) {
-    final spacePath = state.uri.pathSegments
-        .skipWhile((value) => value == Routes.currentMilestone)
-        .first;
+    final spacePath = state.uri.pathSegments.first;
 
     final space = _spacePathMapping[spacePath];
 
