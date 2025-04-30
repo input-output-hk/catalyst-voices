@@ -28,6 +28,85 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
   DriftProposalsDao(super.attachedDatabase);
 
   @override
+  Future<List<JoinedProposalEntity>> queryProposals({
+    SignedDocumentRef? categoryRef,
+    required ProposalsFilterType type,
+  }) async {
+    final latestProposalRef = alias(documents, 'latestProposalRef');
+    final proposal = alias(documents, 'proposal');
+
+    final maxVerHi = latestProposalRef.verHi.max();
+    final latestProposalsQuery = selectOnly(latestProposalRef, distinct: true)
+      ..addColumns([
+        latestProposalRef.idHi,
+        latestProposalRef.idLo,
+        maxVerHi,
+        latestProposalRef.verLo,
+      ])
+      ..where(latestProposalRef.type.equalsValue(DocumentType.proposalDocument))
+      ..groupBy([latestProposalRef.idHi + latestProposalRef.idLo]);
+
+    final verSubquery = Subquery(latestProposalsQuery, 'latestProposalRef');
+
+    final mainQuery = select(proposal).join([
+      innerJoin(
+        verSubquery,
+        Expression.and([
+          verSubquery.ref(maxVerHi).equalsExp(proposal.verHi),
+          verSubquery.ref(latestProposalRef.verLo).equalsExp(proposal.verLo),
+        ]),
+        useColumns: false,
+      ),
+    ])
+      ..where(
+        Expression.and([
+          proposal.type.equalsValue(DocumentType.proposalDocument),
+          proposal.metadata.jsonExtract(r'$.template').isNotNull(),
+          proposal.metadata.jsonExtract(r'$.categoryId').isNotNull(),
+        ]),
+      )
+      ..orderBy([OrderingTerm.asc(proposal.verHi)]);
+
+    if (categoryRef != null) {
+      mainQuery.where(proposal.metadata.isCategory(categoryRef));
+    }
+
+    final ids = await _getFilterTypeIds(type);
+
+    final include = ids.include;
+    if (include != null) {
+      final highs = include.map((e) => e.high);
+      final lows = include.map((e) => e.low);
+      mainQuery.where(
+        Expression.and([
+          proposal.idHi.isIn(highs),
+          proposal.idLo.isIn(lows),
+        ]),
+      );
+    }
+
+    final exclude = ids.exclude;
+    if (exclude != null) {
+      final highs = exclude.map((e) => e.high);
+      final lows = exclude.map((e) => e.low);
+
+      mainQuery.where(
+        Expression.and([
+          proposal.idHi.isNotIn(highs),
+          proposal.idLo.isNotIn(lows),
+        ]),
+      );
+    }
+
+    final proposals = await mainQuery
+        .map((row) => row.readTable(proposal))
+        .get()
+        .then((entities) => entities.map(_buildJoinedProposal).toList().wait);
+
+    return proposals;
+  }
+
+  @override
   Future<Page<JoinedProposalEntity>> queryProposalsPage({
     required PageRequest request,
     required ProposalsFilters filters,
@@ -517,6 +596,11 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
 }
 
 abstract interface class ProposalsDao {
+  Future<List<JoinedProposalEntity>> queryProposals({
+    SignedDocumentRef? categoryRef,
+    required ProposalsFilterType type,
+  });
+
   Future<Page<JoinedProposalEntity>> queryProposalsPage({
     required PageRequest request,
     required ProposalsFilters filters,
