@@ -104,7 +104,7 @@ struct EnvVars {
     /// Server name
     server_name: Option<StringEnvVar>,
 
-    /// The Service ID used to anonymize client connections.
+    /// Id of the Service.
     service_id: StringEnvVar,
 
     /// The client id key used to anonymize client connections.
@@ -191,7 +191,7 @@ static ENV_VARS: LazyLock<EnvVars> = LazyLock::new(|| {
         address,
         server_name: StringEnvVar::new_optional("SERVER_NAME", false),
         service_id: StringEnvVar::new("SERVICE_ID", calculate_service_uuid().into()),
-        client_id_key: StringEnvVar::new("CLIENT_ID_KEY", (CLIENT_ID_KEY_DEFAULT, true).into()),
+        client_id_key: StringEnvVar::new("CLIENT_ID_KEY", CLIENT_ID_KEY_DEFAULT.into()),
         api_host_names: StringEnvVar::new_optional("API_HOST_NAMES", false),
         api_url_prefix: StringEnvVar::new("API_URL_PREFIX", API_URL_PREFIX_DEFAULT.into()),
 
