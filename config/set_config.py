@@ -79,8 +79,11 @@ def set_config(env: str):
     config = load_json_file(config_path)
     print(f"Applying default config:\n{config}")
 
-    resp = requests.put(url, json=config, headers=headers)
-    resp.raise_for_status()
+    try:
+        resp = requests.put(url, json=config, headers=headers)
+        resp.raise_for_status()
+    except Exception as e:
+        print(f"Skipping {os.path.basename(config_path)} due to error: {e}")
 
     # find and apply any ip-specific configs
     ip_config_paths = glob.glob(os.path.join(env_dir, "ip_*.config.json"))
