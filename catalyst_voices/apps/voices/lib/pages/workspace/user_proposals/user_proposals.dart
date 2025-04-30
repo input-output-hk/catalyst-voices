@@ -53,7 +53,10 @@ class _UserProposalsState extends State<UserProposals> {
           UserProposalSection(
             items: _submitted,
             emptyTextMessage: context.l10n.noFinalUserProposals,
-            title: context.l10n.submittedForReview(_submitted.length, 5),
+            title: context.l10n.submittedForReview(
+              _submitted.length,
+              ProposalDocument.maxSubmittedProposalsPerUser,
+            ),
             info: context.l10n.submittedForReviewInfoMarkdown,
             learnMoreUrl: VoicesConstants.proposalPublishingDocsUrl,
           ),

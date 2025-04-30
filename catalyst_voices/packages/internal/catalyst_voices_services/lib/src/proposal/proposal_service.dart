@@ -71,6 +71,10 @@ abstract interface class ProposalService {
   /// a new standalone proposal not related to the previous one.
   Future<DocumentRef> importProposal(Uint8List data);
 
+  /// Returns true if the current user has
+  /// reached the limit of submitted proposals.
+  Future<bool> isMaxProposalsLimitReached();
+
   /// Publishes a public proposal draft.
   /// The local draft referenced by the [document] is removed.
   ///
@@ -116,11 +120,16 @@ abstract interface class ProposalService {
 
   Stream<List<Proposal>> watchLatestProposals({int? limit});
 
+  /// Streams changes to [isMaxProposalsLimitReached].
+  Stream<bool> watchMaxProposalsLimitReached();
+
   Stream<ProposalsCount> watchProposalsCount({
     required ProposalsCountFilters filters,
   });
 
   Stream<List<Proposal>> watchUserProposals();
+
+  Stream<ProposalsCount> watchUserProposalsCount();
 }
 
 final class ProposalServiceImpl implements ProposalService {
@@ -266,6 +275,13 @@ final class ProposalServiceImpl implements ProposalService {
   }
 
   @override
+  Future<bool> isMaxProposalsLimitReached() async {
+    // By default return true to prevent creating proposals
+    // if we couldn't determine the state due to an error.
+    return watchMaxProposalsLimitReached().first.catchError((_) => true);
+  }
+
+  @override
   Future<SignedDocumentRef> publishProposal({
     required DocumentData document,
   }) async {
@@ -307,7 +323,13 @@ final class ProposalServiceImpl implements ProposalService {
   Future<SignedDocumentRef> submitProposalForReview({
     required SignedDocumentRef proposalRef,
     required SignedDocumentRef categoryId,
-  }) {
+  }) async {
+    if (await isMaxProposalsLimitReached()) {
+      throw const ProposalLimitReachedException(
+        maxLimit: ProposalDocument.maxSubmittedProposalsPerUser,
+      );
+    }
+
     return _signerService.useProposerCredentials(
       (catalystId, privateKey) async {
         final actionRef = SignedDocumentRef.generateFirstRef();
@@ -415,6 +437,13 @@ final class ProposalServiceImpl implements ProposalService {
   }
 
   @override
+  Stream<bool> watchMaxProposalsLimitReached() {
+    return watchUserProposalsCount().map((count) {
+      return count.finals >= ProposalDocument.maxSubmittedProposalsPerUser;
+    });
+  }
+
+  @override
   Stream<ProposalsCount> watchProposalsCount({
     required ProposalsCountFilters filters,
   }) {
@@ -473,6 +502,24 @@ final class ProposalServiceImpl implements ProposalService {
           },
         ).switchMap(Stream.fromFuture);
       });
+    });
+  }
+
+  @override
+  Stream<ProposalsCount> watchUserProposalsCount() {
+    return _userService.watchUser.distinct().switchMap((user) {
+      final authorId = user.activeAccount?.catalystId;
+      if (!_isProposer(user) || authorId == null) {
+        // user is not eligible for creating proposals
+        return const Stream.empty();
+      }
+
+      final filters = ProposalsCountFilters(
+        author: authorId,
+        onlyAuthor: true,
+      );
+
+      return watchProposalsCount(filters: filters);
     });
   }
 
