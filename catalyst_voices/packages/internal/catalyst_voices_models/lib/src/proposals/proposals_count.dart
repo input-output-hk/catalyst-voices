@@ -1,7 +1,6 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart'
     show ProposalsFilterType;
 import 'package:equatable/equatable.dart';
-import 'package:flutter/foundation.dart';
 
 final class ProposalsCount extends Equatable {
   final int total;
@@ -39,10 +38,6 @@ final class ProposalsCount extends Equatable {
 
   @override
   String toString() {
-    if (!kDebugMode) {
-      return super.toString();
-    }
-
     return 'ProposalsCount('
         'total[$total], '
         'drafts[$drafts], '
