@@ -155,19 +155,3 @@ pub(crate) async fn load_registration_from_chain(
             format!("No RBAC registration, slot = {slot:?}, transaction index = {txn_index:?}")
         })
 }
-
-#[test]
-fn some_test() {
-    fn some_funct<I: Iterator<Item = u32>>(iter: I) {
-        for item in iter {
-            println!("{item}");
-        }
-    }
-    let mut sum = 0;
-
-    some_funct([1, 2, 3, 4].into_iter().inspect(|val| {
-        println!("adding values");
-        sum += *val;
-    }));
-    println!("{sum}");
-}
