@@ -183,10 +183,8 @@ impl CatalystRBACTokenV1 {
             )
             .await?;
             // Combine persistent and volatile registrations.
-            let reg_queries: Vec<_> = persistent_regs.into_iter().chain(volatile_regs).collect();
-            // let reg_queries =
-            //     indexed_registrations(&persistent_session, self.catalyst_id()).await?;
-            self.reg_chain = build_reg_chain(reg_queries.into_iter(), self.network()).await?;
+            let combined_regs = persistent_regs.into_iter().chain(volatile_regs);
+            self.reg_chain = build_reg_chain(combined_regs, self.network()).await?;
         }
         Ok(self.reg_chain.clone())
     }
