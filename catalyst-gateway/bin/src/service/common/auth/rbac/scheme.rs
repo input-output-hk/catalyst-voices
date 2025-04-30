@@ -80,16 +80,16 @@ impl ResponseError for ServiceUnavailableError {
 /// Authentication token error.
 #[derive(Debug, thiserror::Error)]
 enum AuthTokenError {
-    /// Error when registration chain cannot be built.
+    /// Registration chain cannot be built.
     #[error("Unable to build registration chain, err: {0}")]
     BuildRegChain(String),
-    /// Error when RBAC token cannot be parsed.
+    /// RBAC token cannot be parsed.
     #[error("Fail to parse RBAC token string, err: {0}")]
     ParseRbacToken(String),
-    /// Error when registration chain cannot be found.
+    /// Registration chain cannot be found.
     #[error("Registration not found for the auth token.")]
     RegistrationNotFound,
-    /// Error when latest signing key cannot be found.
+    /// Latest signing key cannot be found.
     #[error("Unable to get the latest signing key.")]
     LatestSigningKey,
 }
