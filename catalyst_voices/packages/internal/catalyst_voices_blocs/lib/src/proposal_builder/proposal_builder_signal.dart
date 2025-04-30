@@ -15,6 +15,25 @@ final class EmailNotVerifiedProposalBuilderSignal
   List<Object?> get props => [];
 }
 
+final class MaxProposalsLimitReachedSignal extends ProposalBuilderSignal {
+  final int currentSubmissions;
+  final int maxSubmissions;
+  final DateTime proposalSubmissionCloseDate;
+
+  const MaxProposalsLimitReachedSignal({
+    required this.proposalSubmissionCloseDate,
+    required this.currentSubmissions,
+    required this.maxSubmissions,
+  });
+
+  @override
+  List<Object?> get props => [
+        proposalSubmissionCloseDate,
+        currentSubmissions,
+        maxSubmissions,
+      ];
+}
+
 sealed class ProposalBuilderSignal extends Equatable {
   const ProposalBuilderSignal();
 }
