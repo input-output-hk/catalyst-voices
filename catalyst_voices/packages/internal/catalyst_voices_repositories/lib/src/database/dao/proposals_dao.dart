@@ -288,15 +288,6 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
     }
   }
 
-  Future<List<SignedDocumentRef>> _getFinalProposalsRefs() {
-    return _getProposalsLatestAction().then(
-      (value) => value
-          .where((element) => element.action.isFinal)
-          .map((e) => e.proposalRef)
-          .toList(),
-    );
-  }
-
   Future<int> _getProposalCommentsCount(DocumentRef ref) {
     final id = ref.id;
     final ver = ref.version;
