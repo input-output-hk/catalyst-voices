@@ -4,7 +4,6 @@ import 'package:catalyst_voices/routes/guards/proposal_submission_guard.dart';
 import 'package:catalyst_voices/routes/guards/route_guard.dart';
 import 'package:catalyst_voices/routes/guards/session_unlocked_guard.dart';
 import 'package:catalyst_voices/routes/guards/user_access_guard.dart';
-import 'package:catalyst_voices/routes/routing/routes.dart';
 import 'package:catalyst_voices/routes/routing/transitions/fade_page_transition_mixin.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/widgets.dart';
@@ -13,7 +12,7 @@ import 'package:go_router/go_router.dart';
 part 'proposal_builder_route.g.dart';
 
 @TypedGoRoute<ProposalBuilderDraftRoute>(
-  path: '/${Routes.currentMilestone}/workspace/proposal_builder/draft',
+  path: '/workspace/proposal_builder/draft',
 )
 final class ProposalBuilderDraftRoute extends GoRouteData
     with FadePageTransitionMixin, CompositeRouteGuardMixin {
@@ -46,7 +45,7 @@ final class ProposalBuilderDraftRoute extends GoRouteData
 }
 
 @TypedGoRoute<ProposalBuilderRoute>(
-  path: '/${Routes.currentMilestone}/workspace/proposal_builder/:proposalId',
+  path: '/workspace/proposal_builder/:proposalId',
 )
 final class ProposalBuilderRoute extends GoRouteData
     with FadePageTransitionMixin, CompositeRouteGuardMixin {

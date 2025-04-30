@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:catalyst_voices/common/constants/constants.dart';
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/widgets/cards/tip_card.dart';
 import 'package:catalyst_voices/widgets/countdown/voices_countdown.dart';
@@ -14,20 +15,18 @@ class ProposalLimitReachedDialog extends StatelessWidget {
   final int currentSubmissions;
   final int maxSubmissions;
   final DateTime submissionCloseAt;
-  final ValueChanged<bool>? dontShowAgain;
 
   const ProposalLimitReachedDialog({
     super.key,
     required this.currentSubmissions,
     required this.maxSubmissions,
     required this.submissionCloseAt,
-    this.dontShowAgain,
   });
 
   @override
   Widget build(BuildContext context) {
     return VoicesTwoPaneDialog(
-      left: _LeftSide(dontShowAgain),
+      left: const _LeftSide(),
       right: _RightSide(
         currentSubmissions: currentSubmissions,
         maxSubmissions: maxSubmissions,
@@ -42,7 +41,6 @@ class ProposalLimitReachedDialog extends StatelessWidget {
     required int currentSubmissions,
     required int maxSubmissions,
     required DateTime submissionCloseAt,
-    ValueChanged<bool>? dontShowAgain,
   }) async {
     await VoicesDialog.show<void>(
       context: context,
@@ -50,7 +48,6 @@ class ProposalLimitReachedDialog extends StatelessWidget {
         currentSubmissions: currentSubmissions,
         maxSubmissions: maxSubmissions,
         submissionCloseAt: submissionCloseAt,
-        dontShowAgain: dontShowAgain,
       ),
       routeSettings: const RouteSettings(name: '/proposal-limit-reached'),
     );
@@ -121,9 +118,7 @@ class _HeadsUpInfo extends StatelessWidget {
 }
 
 class _LeftSide extends StatefulWidget {
-  final ValueChanged<bool>? dontShowAgain;
-
-  const _LeftSide(this.dontShowAgain);
+  const _LeftSide();
 
   @override
   State<_LeftSide> createState() => _LeftSideState();
@@ -134,44 +129,10 @@ class _LeftSideState extends State<_LeftSide> {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      fit: StackFit.expand,
-      children: [
-        CatalystImage.asset(
-          VoicesAssets.images.trafficCone.path,
-          fit: BoxFit.cover,
-        ),
-        Positioned(
-          bottom: 20,
-          left: 20,
-          child: CheckboxTheme(
-            data: Theme.of(context).checkboxTheme.copyWith(
-                  side: BorderSide(
-                    color: context.colorScheme.primary,
-                    width: 2,
-                  ),
-                ),
-            child: VoicesCheckbox(
-              value: isChecked,
-              onChanged: _handleCheckboxChange,
-              label: Text(
-                context.l10n.dontShowAgain,
-                style: context.textTheme.bodyLarge?.copyWith(
-                  color: context.colorScheme.primary,
-                ),
-              ),
-            ),
-          ),
-        ),
-      ],
+    return CatalystImage.asset(
+      VoicesAssets.images.trafficCone.path,
+      fit: BoxFit.cover,
     );
-  }
-
-  void _handleCheckboxChange(bool value) {
-    setState(() {
-      isChecked = value;
-    });
-    widget.dontShowAgain?.call(value);
   }
 }
 
@@ -201,10 +162,8 @@ class _RightSide extends StatelessWidget with LaunchUrlMixin {
         _HeadsUpInfo(context.l10n.proposalsLimitReachedPoint3),
         _HeadsUpInfo(context.l10n.proposalsLimitReachedPoint4),
         const SizedBox(height: 32),
-        // TODO(dtscalac): add the learn more link explaining
-        // the proposal submission limit
-        VoicesLearnMoreFilledButton(
-          onTap: () => unawaited(launchUri(''.getUri())),
+        VoicesLearnMoreFilledButton.url(
+          url: VoicesConstants.proposalPublishingDocsUrl,
         ),
         const Spacer(),
         _Countdown(date: date),
