@@ -14,8 +14,6 @@ import 'package:go_router/go_router.dart';
 /// Semantic anchor for generated routes so only this class
 /// knows how to work with them.
 abstract final class Routes {
-  static const currentMilestone = 'm4';
-
   static final List<RouteBase> routes = [
     ...account.$appRoutes,
     ...coming_soon.$appRoutes,

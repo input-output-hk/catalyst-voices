@@ -194,6 +194,12 @@ class _PopupMenuButtonState extends State<_PopupMenuButton> {
 
   Future<void> _submitForReview() async {
     final bloc = context.read<ProposalBuilderBloc>();
+
+    if (bloc.state.isMaxProposalsLimitReached) {
+      bloc.add(const MaxProposalsLimitReachedEvent());
+      return;
+    }
+
     if (!bloc.validate()) {
       return;
     }
