@@ -55,7 +55,7 @@ impl EnvVars {
     /// Create a config for event db.
     pub(super) fn new() -> Self {
         Self {
-            url: StringEnvVar::new("EVENT_DB_URL", EVENT_DB_URL_DEFAULT.into()),
+            url: StringEnvVar::new("EVENT_DB_URL", (EVENT_DB_URL_DEFAULT, true).into()),
             username: StringEnvVar::new_optional("EVENT_DB_USERNAME", false),
             password: StringEnvVar::new_optional("EVENT_DB_PASSWORD", true),
             max_connections: StringEnvVar::new_as_int(
