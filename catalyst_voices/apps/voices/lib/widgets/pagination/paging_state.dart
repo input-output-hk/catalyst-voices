@@ -89,7 +89,7 @@ class PagingState<ItemType> extends Equatable {
     return PagingStatus.ongoing;
   }
 
-  int get toValue => currentTo + 1;
+  int get toValue => currentTo + 1 < maxResults ? currentTo + 1 : maxResults;
 
   bool get _hasError => error != null;
 
