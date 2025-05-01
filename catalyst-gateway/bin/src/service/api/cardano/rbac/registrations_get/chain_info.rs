@@ -43,18 +43,16 @@ impl ChainInfo {
         let mut last_volatile_txn = None;
         let mut last_persistent_slot = 0.into();
 
-        let reqs_iter = registrations
-            .into_iter()
-            .inspect(|(is_persistent, reg)| {
-                update_values(
-                    *is_persistent,
-                    reg,
-                    &mut last_persistent_txn,
-                    &mut last_volatile_txn,
-                    &mut last_persistent_slot,
-                );
-            })
-            .map(|(_, reg)| reg);
+        let reqs_iter = registrations.into_iter().map(|(is_persistent, reg)| {
+            update_values(
+                is_persistent,
+                &reg,
+                &mut last_persistent_txn,
+                &mut last_volatile_txn,
+                &mut last_persistent_slot,
+            );
+            reg
+        });
 
         let res = build_reg_chain(reqs_iter, network).await?.map(|chain| {
             Self {

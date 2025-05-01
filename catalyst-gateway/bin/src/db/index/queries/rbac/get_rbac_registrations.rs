@@ -95,7 +95,7 @@ pub(crate) async fn build_reg_chain(
         return Ok(None);
     };
 
-    let root = load_registration_from_chain(network, root.slot_no.into(), root.txn_index.into())
+    let root = load_cip509_from_chain(network, root.slot_no.into(), root.txn_index.into())
         .await
         .context("Failed to get root registration")?;
     let mut chain = RegistrationChain::new(root).context("Invalid root registration")?;
@@ -103,15 +103,14 @@ pub(crate) async fn build_reg_chain(
     for reg in reg_queries_iter {
         // We only store valid registrations in this table, so an error here indicates a bug in
         // our indexing logic.
-        let cip509 =
-            load_registration_from_chain(network, reg.slot_no.into(), reg.txn_index.into())
-                .await
-                .with_context(|| {
-                    format!(
-                        "Invalid or missing registration at {:?} block {:?} transaction",
-                        reg.slot_no, reg.txn_index,
-                    )
-                })?;
+        let cip509 = load_cip509_from_chain(network, reg.slot_no.into(), reg.txn_index.into())
+            .await
+            .with_context(|| {
+                format!(
+                    "Invalid or missing registration at {:?} block {:?} transaction",
+                    reg.slot_no, reg.txn_index,
+                )
+            })?;
         match chain.update(cip509) {
             Ok(c) => chain = c,
             Err(e) => {
@@ -128,9 +127,9 @@ pub(crate) async fn build_reg_chain(
     Ok(Some(chain))
 }
 
-/// A helper function to load a RBAC registration by the given block and slot from the
-/// `cardano-chain-follower`.
-pub(crate) async fn load_registration_from_chain(
+/// A helper function to load a RBAC registration `Cip509` by the given block and slot
+/// from the `cardano-chain-follower`.
+pub(crate) async fn load_cip509_from_chain(
     network: Network, slot: Slot, txn_index: TxnIndex,
 ) -> anyhow::Result<Cip509> {
     let point = Point::fuzzy(slot);
