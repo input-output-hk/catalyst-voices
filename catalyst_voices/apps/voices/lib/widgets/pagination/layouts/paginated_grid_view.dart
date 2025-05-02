@@ -83,7 +83,8 @@ class PaginatedGridView<ItemType> extends StatelessWidget {
           children: [
             child,
             Offstage(
-              offstage: pagingState.itemList.isEmpty,
+              offstage: pagingState.itemList.isEmpty ||
+                  (pagingState.isFirstPage && pagingState.isLastPage),
               child: _Controls(
                 fromNumber: pagingState.fromValue,
                 toNumber: pagingState.toValue,
