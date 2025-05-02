@@ -1094,8 +1094,8 @@
   "recoveryExitConfirmDialogSubtitle": "12 word keychain restoration incomplete",
   "recoveryExitConfirmDialogContent": "Please continue your Catalyst Keychain restoration, if you cancel all input will be lost.",
   "recoveryExitConfirmDialogContinue": "Continue recovery process",
-  "recoverAccount": "Recover account",
-  "@recoverAccount": {
+  "forgotPassword": "Forgot password",
+  "@forgotPassword": {
     "description": "Refers to the action label for recovering the user account."
   },
   "uploadConfirmDialogSubtitle": "SWITCH TO FILE UPLOAD",
@@ -2675,15 +2675,15 @@
   "@invalidSeedPhraseWord": {
     "description": "Error shown when user inputs SeedPhrase word but invalid does not match any"
   },
-  "submittedForReviewInfoMarkdown": "**Locked final**\n\nThese proposals are finished/final, and published to the review stage. Final proposals enter the ballot on approval. You are allowed to publish a maximum of 5 proposals.\n\n**Important Note:**\n\nAll Publishing happens in the proposal editor, so you minimize the chances of making mistakes.",
+  "submittedForReviewInfoMarkdown": "**Locked final**\n\nYour proposal is locked and visible to everyone. To make changes, you’ll need to unlock it and start a new draft. It’s eligible for both feedback and funding, so stay tuned for next steps.",
   "@submittedForReviewInfoMarkdown": {
     "description": "Info message shown in tooltip info in workspace page"
   },
-  "sharedForPublicInfoMarkdown": "**In progress**\n\nThese proposals are in progress/draft and published draft iterations make their rounds in the discovery space, and people can provide feedback.\n\nYou can make a new local iteration of a published draft, just be sure to share as draft if you want to receive feedback, or as final if you think your proposal is ready.\n\n**Important Note:**\n\nAll Publishing happens in the proposal editor, so you minimize the chances of making mistakes.",
+  "sharedForPublicInfoMarkdown": "**In progress**\n\nYour latest published version is visible to everyone, but edits you make stay private until you share again. Create a new local iteration to keep working. It’s eligible for feedback but not for funding yet.",
   "@sharedForPublicInfoMarkdown": {
     "description": "Info message shown in tooltip info in workspace page"
   },
-  "notPublishedInfoMarkdown": "**Not published**\n\nThese private proposals are only stored on your local device, and cannot be seen by anybody but you.",
+  "notPublishedInfoMarkdown": "**Not published**\n\nThis draft is saved locally and only you can see it. You can edit it anytime on this device. It’s not eligible for feedback or funding yet. Share for feedback or submit for review to publish it to the network.",
   "@notPublishedInfoMarkdown": {
     "description": "Info message shown in tooltip info in workspace page"
   },
