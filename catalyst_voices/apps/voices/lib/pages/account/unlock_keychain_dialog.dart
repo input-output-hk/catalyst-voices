@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:catalyst_voices/common/constants/constants.dart';
 import 'package:catalyst_voices/common/error_handler.dart';
 import 'package:catalyst_voices/pages/registration/pictures/unlock_keychain_picture.dart';
 import 'package:catalyst_voices/pages/registration/registration_dialog.dart';
@@ -10,6 +11,7 @@ import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
@@ -75,7 +77,9 @@ class _Navigation extends StatelessWidget {
 }
 
 class _UnlockKeychainDialogState extends State<UnlockKeychainDialog>
-    with ErrorHandlerStateMixin<SessionCubit, UnlockKeychainDialog> {
+    with
+        ErrorHandlerStateMixin<SessionCubit, UnlockKeychainDialog>,
+        LaunchUrlMixin {
   final TextEditingController _passwordController = TextEditingController();
   LocalizedException? _error;
 
@@ -85,6 +89,7 @@ class _UnlockKeychainDialogState extends State<UnlockKeychainDialog>
       left: InformationPanel(
         title: context.l10n.unlockDialogHeader,
         picture: const UnlockKeychainPicture(),
+        onTap: () async => launchUri(VoicesConstants.unlockAccountUrl.getUri()),
       ),
       right: _UnlockPasswordPanel(
         controller: _passwordController,
