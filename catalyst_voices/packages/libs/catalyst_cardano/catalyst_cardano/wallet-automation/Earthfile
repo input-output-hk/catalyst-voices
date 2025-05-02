@@ -1,6 +1,6 @@
 VERSION 0.8
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:feat/automatic_set_build_number AS flutter-ci
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/playwright:feat/automatic_set_build_number AS playwright-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:v3.4.2 AS flutter-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/playwright:v3.4.2 AS playwright-ci
 
 deps:
     DO playwright-ci+SETUP --workdir=/wallet-automation
