@@ -6,7 +6,9 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 
-class UploadSeedPhraseDialog {
+abstract final class UploadSeedPhraseDialog {
+  const UploadSeedPhraseDialog._();
+
   static Future<List<SeedPhraseWord>?> show(BuildContext context) async {
     final file = await VoicesUploadFileDialog.show(
       context,
