@@ -38,16 +38,26 @@ class RBACChain:
         role_0_pk = self.keys_map[f"{RoleID.ROLE_0}"]["pk"]
         return (
             generate_cat_id(
-                self.network,
-                self.subnet,
-                role_id,
-                role_0_pk,
-                role_data["rotation"],
-                True,
+                network=self.network,
+                subnet=self.subnet,
+                role_id=role_id,
+                pk_hex=role_0_pk,
+                rotation=role_data["rotation"],
+                is_uri=True,
             ),
             role_data["sk"],
+        )    
+    
+    def short_cat_id(self) -> str:
+        return generate_cat_id(
+            network=self.network,
+            subnet=self.subnet,
+            role_id=RoleID.ROLE_0,
+            pk_hex=self.keys_map[f"{RoleID.ROLE_0}"]["pk"],
+            rotation=0,
+            is_uri=False,
+            is_short=True
         )
-
 
 @pytest.fixture
 def rbac_chain_factory():
@@ -64,7 +74,7 @@ def rbac_chain_factory():
 
 
 def generate_cat_id(
-    network: str, subnet: str, role_id: RoleID, pk_hex: str, rotation: int, is_uri: bool, nonce: str = None
+    network: str, subnet: str, role_id: RoleID, pk_hex: str, rotation: int, is_uri: bool, is_short: bool = False, nonce: str = None
 ):
     pk = bytes.fromhex(pk_hex)[:32]
     if nonce is None:
@@ -72,14 +82,15 @@ def generate_cat_id(
     subnet = f"{subnet}." if subnet else ""
     role0_pk_b64 = base64_url(pk)
 
-    if role_id == RoleID.ROLE_0 and rotation == 0:
-        res = f":{nonce}@{subnet}{network}/{role0_pk_b64}"
+    if is_short:
+        res = f"{subnet}{network}/{role0_pk_b64}"
     else:
-        res = f":{nonce}@{subnet}{network}/{role0_pk_b64}/{role_id}/{rotation}"
-
-    if is_uri:
-        res = f"id.catalyst://{res}"
-
+        res = f":{nonce}@{subnet}{network}/{role0_pk_b64}"
+        if not (role_id == RoleID.ROLE_0 and rotation == 0):
+            res += f"/{role_id}/{rotation}"
+        if is_uri:
+            res = f"id.catalyst://{res}"
+            
     return res
 
 
@@ -92,7 +103,7 @@ def generate_rbac_auth_token(
     sig: str = None,
     username: str = None,
     is_uri: bool = False,
-    nonce: int = None,
+    nonce: str = None,
 ) -> str:
     pk = bytes.fromhex(pk_hex)[:32]
     sk = bytes.fromhex(sk_hex)[:64]
@@ -103,7 +114,14 @@ def generate_rbac_auth_token(
 
     token_prefix = f"catid.{username}" if username else "catid."
     if cid is None:
-        cat_id = f"{token_prefix}{generate_cat_id(network, subnet, RoleID.ROLE_0, pk_hex, 0, is_uri, nonce)}."
+        cat_id = f"{token_prefix}{generate_cat_id(
+            network=network, 
+            subnet=subnet, 
+            role_id=RoleID.ROLE_0,
+            pk_hex=pk_hex, 
+            rotation=0, 
+            is_uri=is_uri,
+            nonce=nonce)}."
     else:
         cat_id = f"{token_prefix}:{cid}."
 
