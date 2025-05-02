@@ -13,16 +13,6 @@ class UploadSeedPhraseConfirmationDialog extends StatelessWidget {
     super.key,
   });
 
-  static Future<bool> show(BuildContext context) async {
-    final result = await VoicesDialog.show<bool>(
-      context: context,
-      routeSettings: const RouteSettings(name: '/upload-seed-phrase'),
-      builder: (context) => const UploadSeedPhraseConfirmationDialog(),
-    );
-
-    return result ?? false;
-  }
-
   @override
   Widget build(BuildContext context) {
     return VoicesAlertDialog(
@@ -52,5 +42,15 @@ class UploadSeedPhraseConfirmationDialog extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  static Future<bool> show(BuildContext context) async {
+    final result = await VoicesDialog.show<bool>(
+      context: context,
+      routeSettings: const RouteSettings(name: '/upload-seed-phrase'),
+      builder: (context) => const UploadSeedPhraseConfirmationDialog(),
+    );
+
+    return result ?? false;
   }
 }
