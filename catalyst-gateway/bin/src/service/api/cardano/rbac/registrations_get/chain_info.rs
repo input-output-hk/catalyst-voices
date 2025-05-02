@@ -43,18 +43,20 @@ impl ChainInfo {
         let mut last_volatile_txn = None;
         let mut last_persistent_slot = 0.into();
 
-        let reqs_iter = registrations.into_iter().map(|(is_persistent, reg)| {
-            update_values(
-                is_persistent,
-                &reg,
-                &mut last_persistent_txn,
-                &mut last_volatile_txn,
-                &mut last_persistent_slot,
-            );
-            reg
-        });
-
-        let res = build_reg_chain(reqs_iter, network).await?.map(|chain| {
+        let res = build_reg_chain(
+            registrations.into_iter(),
+            network,
+            |is_persistent: bool, slot_no: Slot, chain: &RegistrationChain| {
+                if is_persistent {
+                    last_persistent_txn = Some(chain.current_tx_id_hash());
+                    last_persistent_slot = slot_no;
+                } else {
+                    last_volatile_txn = Some(chain.current_tx_id_hash());
+                }
+            },
+        )
+        .await?
+        .map(|chain| {
             Self {
                 chain,
                 last_persistent_txn,
@@ -99,17 +101,4 @@ async fn last_registration_chain(
         .map(<[_]>::to_vec)
         // This should never happen: the index is valid because of the check above.
         .context("Invalid root registration index")
-}
-
-/// Updates the values depending on if the given registration is persistent or not.
-fn update_values(
-    is_persistent: bool, reg: &Query, last_persistent_txn: &mut Option<TransactionId>,
-    last_volatile_txn: &mut Option<TransactionId>, last_persistent_slot: &mut Slot,
-) {
-    if is_persistent {
-        *last_persistent_txn = Some(reg.txn_id.into());
-        *last_persistent_slot = reg.slot_no.into();
-    } else {
-        *last_volatile_txn = Some(reg.txn_id.into());
-    }
 }

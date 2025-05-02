@@ -36,6 +36,7 @@ pub(crate) struct QueryParams {
 #[derive(DeserializeRow, Clone)]
 pub(crate) struct Query {
     /// Registration transaction id.
+    #[allow(dead_code)]
     pub txn_id: DbTransactionId,
     /// A block slot number.
     pub slot_no: DbSlot,
@@ -88,21 +89,25 @@ pub(crate) async fn indexed_registrations(
 /// Build a registration chain from the given indexed data.
 ///
 /// # NOTE: provided `reg_queries` must be sorted by `slot_no`, look into `indexed_registrations` function.
-pub(crate) async fn build_reg_chain(
-    mut reg_queries_iter: impl Iterator<Item = Query>, network: Network,
+pub(crate) async fn build_reg_chain<OnSucessFn: FnMut(bool, Slot, &RegistrationChain)>(
+    mut reg_queries_iter: impl Iterator<Item = (bool, Query)>, network: Network,
+    mut on_sucess: OnSucessFn,
 ) -> anyhow::Result<Option<RegistrationChain>> {
-    let Some(root) = reg_queries_iter.next() else {
+    let Some((is_persistent, root)) = reg_queries_iter.next() else {
         return Ok(None);
     };
 
+    let slot_no = root.slot_no.into();
     let root = load_cip509_from_chain(network, root.slot_no.into(), root.txn_index.into())
         .await
         .context("Failed to get root registration")?;
     let mut chain = RegistrationChain::new(root).context("Invalid root registration")?;
+    on_sucess(is_persistent, slot_no, &chain);
 
-    for reg in reg_queries_iter {
+    for (is_persistent, reg) in reg_queries_iter {
         // We only store valid registrations in this table, so an error here indicates a bug in
         // our indexing logic.
+        let slot_no = reg.slot_no.into();
         let cip509 = load_cip509_from_chain(network, reg.slot_no.into(), reg.txn_index.into())
             .await
             .with_context(|| {
@@ -112,7 +117,10 @@ pub(crate) async fn build_reg_chain(
                 )
             })?;
         match chain.update(cip509) {
-            Ok(c) => chain = c,
+            Ok(c) => {
+                chain = c;
+                on_sucess(is_persistent, slot_no, &chain);
+            },
             Err(e) => {
                 // This isn't a hard error because while the individual registration can be valid it
                 // can be invalid in the context of the whole registration chain.
