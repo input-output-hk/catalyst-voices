@@ -22,29 +22,22 @@ mixin UploadSeedPhraseMixin<T extends StatefulWidget> on State<T> {
     }
 
     final words = await UploadSeedPhraseDialog.show(context);
-
     if (words == null || !mounted) {
       return null;
     }
 
-    if (!validate) {
+    if (!validate || SeedPhrase.isValid(words: words)) {
       return words;
     }
 
-    final isValid = SeedPhrase.isValid(words: words);
-
-    if (!isValid) {
-      final showUpload = await IncorrectSeedPhraseDialog.show(context);
-      if (!showUpload || !mounted) {
-        return null;
-      }
-
-      return importSeedPhraseWords(
-        requireConfirmation: false,
-        validate: validate,
-      );
+    final showUpload = await IncorrectSeedPhraseDialog.show(context);
+    if (!showUpload || !mounted) {
+      return null;
     }
 
-    return words;
+    return importSeedPhraseWords(
+      requireConfirmation: false,
+      validate: validate,
+    );
   }
 }
