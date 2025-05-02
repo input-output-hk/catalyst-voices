@@ -1094,8 +1094,8 @@
   "recoveryExitConfirmDialogSubtitle": "12 word keychain restoration incomplete",
   "recoveryExitConfirmDialogContent": "Please continue your Catalyst Keychain restoration, if you cancel all input will be lost.",
   "recoveryExitConfirmDialogContinue": "Continue recovery process",
-  "recoverAccount": "Recover account",
-  "@recoverAccount": {
+  "forgotPassword": "Forgot password",
+  "@forgotPassword": {
     "description": "Refers to the action label for recovering the user account."
   },
   "uploadConfirmDialogSubtitle": "SWITCH TO FILE UPLOAD",
