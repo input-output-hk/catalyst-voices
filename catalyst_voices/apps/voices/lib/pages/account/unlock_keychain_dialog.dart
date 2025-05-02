@@ -56,7 +56,7 @@ class _Navigation extends StatelessWidget {
               child: VoicesOutlinedButton(
                 key: const Key('UnlockRecoverButton'),
                 onTap: onRecover,
-                child: Text(context.l10n.recoverAccount),
+                child: Text(context.l10n.forgotPassword),
               ),
             ),
             const SizedBox(width: 10),
