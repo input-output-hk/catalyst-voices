@@ -43,14 +43,17 @@ final class CategoryDetailRoute extends GoRouteData
 
 final class DiscoveryRoute extends GoRouteData
     with FadePageTransitionMixin, CompositeRouteGuardMixin {
-  const DiscoveryRoute();
+  final bool? $extra;
+
+  // ignore: avoid_positional_boolean_parameters
+  const DiscoveryRoute({this.$extra});
 
   @override
   List<RouteGuard> get routeGuards => [const ProposalSubmissionGuard()];
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
-    return const DiscoveryPage();
+    return DiscoveryPage(keychainDeleted: $extra ?? false);
   }
 }
 
