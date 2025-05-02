@@ -78,7 +78,7 @@ class _AccountKeychainTileState extends State<AccountKeychainTile> {
     }
 
     if (mounted) {
-      const DiscoveryRoute().goRemoveKeychain(context);
+      const DiscoveryRoute($extra: true).go(context);
     }
   }
 }

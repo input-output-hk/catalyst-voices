@@ -12,10 +12,9 @@ import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:flutter/material.dart';
 
 class DiscoveryPage extends StatefulWidget {
-  final bool _keychainDeleted;
+  final bool keychainDeleted;
 
-  const DiscoveryPage({super.key}) : _keychainDeleted = false;
-  const DiscoveryPage.keychainDeleted({super.key}) : _keychainDeleted = true;
+  const DiscoveryPage({super.key, this.keychainDeleted = false});
 
   @override
   State<DiscoveryPage> createState() => _DiscoveryPageState();
@@ -63,8 +62,8 @@ class _DiscoveryPageState extends State<DiscoveryPage>
     super.initState();
 
     unawaited(context.read<DiscoveryCubit>().getAllData());
-
-    if (widget._keychainDeleted) {
+    print(widget.keychainDeleted);
+    if (widget.keychainDeleted) {
       WidgetsBinding.instance.addPostFrameCallback((_) async {
         await _showKeychainDeletedDialog(context);
       });

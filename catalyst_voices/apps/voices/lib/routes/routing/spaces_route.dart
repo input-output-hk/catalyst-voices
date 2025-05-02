@@ -43,25 +43,17 @@ final class CategoryDetailRoute extends GoRouteData
 
 final class DiscoveryRoute extends GoRouteData
     with FadePageTransitionMixin, CompositeRouteGuardMixin {
-  const DiscoveryRoute();
+  final bool? $extra;
+
+  // ignore: avoid_positional_boolean_parameters
+  const DiscoveryRoute({this.$extra});
 
   @override
   List<RouteGuard> get routeGuards => [const ProposalSubmissionGuard()];
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
-    final isKeychainDeleted = state.extra as bool? ?? false;
-    if (isKeychainDeleted) {
-      return const DiscoveryPage.keychainDeleted();
-    }
-    return const DiscoveryPage();
-  }
-
-  // To not expose value in url we pass it as extra
-  // This can be changed to extension if we will have more routes that need
-  // hidden value in url
-  void goRemoveKeychain(BuildContext context) {
-    context.go(location, extra: true);
+    return DiscoveryPage(keychainDeleted: $extra ?? false);
   }
 }
 
