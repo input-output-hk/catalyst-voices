@@ -89,9 +89,9 @@ pub(crate) async fn indexed_registrations(
 /// Build a registration chain from the given indexed data.
 ///
 /// # NOTE: provided `reg_queries` must be sorted by `slot_no`, look into `indexed_registrations` function.
-pub(crate) async fn build_reg_chain<OnSucessFn: FnMut(bool, Slot, &RegistrationChain)>(
+pub(crate) async fn build_reg_chain<OnSuccessFn: FnMut(bool, Slot, &RegistrationChain)>(
     mut reg_queries_iter: impl Iterator<Item = (bool, Query)>, network: Network,
-    mut on_sucess: OnSucessFn,
+    mut on_success: OnSuccessFn,
 ) -> anyhow::Result<Option<RegistrationChain>> {
     let Some((is_persistent, root)) = reg_queries_iter.next() else {
         return Ok(None);
@@ -102,7 +102,7 @@ pub(crate) async fn build_reg_chain<OnSucessFn: FnMut(bool, Slot, &RegistrationC
         .await
         .context("Failed to get root registration")?;
     let mut chain = RegistrationChain::new(root).context("Invalid root registration")?;
-    on_sucess(is_persistent, slot_no, &chain);
+    on_success(is_persistent, slot_no, &chain);
 
     for (is_persistent, reg) in reg_queries_iter {
         // We only store valid registrations in this table, so an error here indicates a bug in
@@ -119,7 +119,7 @@ pub(crate) async fn build_reg_chain<OnSucessFn: FnMut(bool, Slot, &RegistrationC
         match chain.update(cip509) {
             Ok(c) => {
                 chain = c;
-                on_sucess(is_persistent, slot_no, &chain);
+                on_success(is_persistent, slot_no, &chain);
             },
             Err(e) => {
                 // This isn't a hard error because while the individual registration can be valid it
