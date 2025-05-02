@@ -62,7 +62,6 @@ class _DiscoveryPageState extends State<DiscoveryPage>
     super.initState();
 
     unawaited(context.read<DiscoveryCubit>().getAllData());
-    print(widget.keychainDeleted);
     if (widget.keychainDeleted) {
       WidgetsBinding.instance.addPostFrameCallback((_) async {
         await _showKeychainDeletedDialog(context);
