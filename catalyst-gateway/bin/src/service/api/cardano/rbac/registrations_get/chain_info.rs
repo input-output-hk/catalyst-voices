@@ -34,6 +34,8 @@ impl ChainInfo {
         persistent_session: &CassandraSession, volatile_session: &CassandraSession,
         catalyst_id: &IdUri,
     ) -> anyhow::Result<Option<Self>> {
+        // TODO: FIXME: Recheck why we are doing this. There should be only one chain for every
+        // Catalyst ID.
         let registrations =
             last_registration_chain(persistent_session, volatile_session, catalyst_id).await?;
         if registrations.is_empty() {

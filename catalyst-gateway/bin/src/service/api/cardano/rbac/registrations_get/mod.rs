@@ -1,5 +1,7 @@
 //! Implementation of the GET `/rbac/registrations` endpoint.
 
+use std::collections::HashSet;
+
 pub use response::AllResponses;
 
 mod binary_data;
@@ -20,7 +22,7 @@ mod unprocessable_content;
 use anyhow::{anyhow, Context};
 use cardano_blockchain_types::StakeAddress;
 use catalyst_types::id_uri::IdUri;
-use futures::{TryFutureExt, TryStreamExt};
+use futures::{future::try_join, TryFutureExt, TryStreamExt};
 use poem_openapi::payload::Json;
 use tracing::error;
 
@@ -59,31 +61,36 @@ pub(crate) async fn endpoint(
         return AllResponses::service_unavailable(&err, RetryAfterOption::Default);
     };
 
-    let catalyst_id = match lookup {
-        Some(CatIdOrStake::CatId(v)) => v.into(),
+    let catalyst_ids = match lookup {
+        Some(CatIdOrStake::CatId(v)) => vec![v.into()],
         Some(CatIdOrStake::Address(address)) => {
             let address: StakeAddress = match address.try_into() {
                 Ok(a) => a,
                 Err(e) => return AllResponses::handle_error(&e),
             };
-            // TODO: For now we want to select the latest registration (so query the volatile
-            // database first), but ideally the logic should be more sophisticated. See the issue
-            // for more details: https://github.com/input-output-hk/catalyst-voices/issues/2152
-            match catalyst_id_from_stake(&volatile_session, address.clone()).await {
-                Ok(Some(v)) => v,
+            match try_join(
+                catalyst_ids_from_stake(&persistent_session, address.clone()),
+                catalyst_ids_from_stake(&volatile_session, address),
+            )
+            .await
+            {
                 Err(e) => return AllResponses::handle_error(&e),
-                Ok(None) => {
-                    match catalyst_id_from_stake(&persistent_session, address).await {
-                        Ok(Some(v)) => v,
-                        Err(e) => return AllResponses::handle_error(&e),
-                        Ok(None) => return Responses::NotFound.into(),
+                Ok((mut ids, volatile_ids)) => {
+                    ids.extend(volatile_ids);
+                    if ids.is_empty() {
+                        return Responses::NotFound.into();
                     }
+
+                    // Remove potential duplicates.
+                    let mut seen = HashSet::new();
+                    ids.retain(|id| seen.insert(id));
+                    ids
                 },
             }
         },
         None => {
             match token {
-                Some(token) => token.catalyst_id().clone(),
+                Some(token) => vec![token.catalyst_id().clone()],
                 None => {
                     return Responses::UnprocessableContent(Json(RbacUnprocessableContent::new(
                         "Either lookup parameter or token must be provided",
@@ -107,19 +114,17 @@ pub(crate) async fn endpoint(
 }
 
 /// Returns a Catalyst ID for the given stake address.
-async fn catalyst_id_from_stake(
+async fn catalyst_ids_from_stake(
     session: &CassandraSession, address: StakeAddress,
-) -> anyhow::Result<Option<IdUri>> {
-    let mut result: Vec<_> = Query::execute(session, QueryParams {
+) -> anyhow::Result<Vec<IdUri>> {
+    Query::execute(session, QueryParams {
         stake_address: address.into(),
     })
-    .and_then(|r| r.try_collect().map_err(Into::into))
-    .await
-    .map(|mut res: Vec<_>| {
-        res.sort_by(|a, b| a.slot_no.cmp(&b.slot_no));
-        res
+    .and_then(|r| {
+        r.map_ok(|v| v.catalyst_id.into())
+            .try_collect()
+            .map_err(Into::into)
     })
-    .context("Failed to query Catalyst ID from stake address")?;
-
-    Ok(result.pop().map(|v| v.catalyst_id.into()))
+    .await
+    .context("Failed to query Catalyst ID from stake address")
 }
