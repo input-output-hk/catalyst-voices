@@ -133,6 +133,18 @@ final class UserRepositoryImpl implements UserRepository {
     return _storage.writeUser(dto);
   }
 
+  CatalystIDPublic _decodeCatalystIdPublic(CatalystIDPublic catalystId) {
+    final username = catalystId.username as String?;
+    if (username == null) {
+      return catalystId;
+    }
+
+    return catalystId.copyWith(
+      // decoding from Uri to replace %20 for white space, etc.
+      username: Uri.decodeComponent(username),
+    );
+  }
+
   /// Looks up reviews module and receives status for active
   /// account if [token] is not specified.
   Future<CatalystIDPublic?> _getReviewsCatalystIDPublic({
@@ -144,10 +156,11 @@ final class UserRepositoryImpl implements UserRepository {
         .then<CatalystIDPublic?>((value) => value)
         .onError<NotFoundException>((error, stackTrace) => null);
 
-    return response?.copyWith(
-      // decoding from Uri to replace %20 for white space, etc.
-      username: Uri.decodeComponent(response.username as String),
-    );
+    if (response != null) {
+      return _decodeCatalystIdPublic(response);
+    } else {
+      return null;
+    }
   }
 
   Future<String?> _lookupUsernameFromDocuments({
