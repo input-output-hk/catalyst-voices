@@ -137,12 +137,17 @@ final class UserRepositoryImpl implements UserRepository {
   /// account if [token] is not specified.
   Future<CatalystIDPublic?> _getReviewsCatalystIDPublic({
     RbacToken? token,
-  }) {
-    return _apiServices.reviews
+  }) async {
+    final response = await _apiServices.reviews
         .apiCatalystIdsMeGet(authorization: token?.authHeader())
         .successBodyOrThrow()
         .then<CatalystIDPublic?>((value) => value)
         .onError<NotFoundException>((error, stackTrace) => null);
+
+    return response?.copyWith(
+      // decoding from Uri to replace %20 for white space, etc.
+      username: Uri.decodeComponent(response.username as String),
+    );
   }
 
   Future<String?> _lookupUsernameFromDocuments({
