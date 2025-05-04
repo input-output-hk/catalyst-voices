@@ -154,7 +154,7 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
         _onProposalDeleted();
       case PublishedProposalBuilderSignal():
       case SubmittedProposalBuilderSignal():
-        const WorkspaceRoute().go(context);
+        _leavePage();
       case ProposalSubmissionCloseDate():
         unawaited(_showSubmissionClosingWarningDialog(signal.date));
       case EmailNotVerifiedProposalBuilderSignal():
@@ -187,6 +187,16 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
     context
         .read<SessionCubit>()
         .updateShowSubmissionClosingWarning(value: !value);
+  }
+
+  void _leavePage() {
+    // Unsubscribe from proposal ref since it might be changing while
+    // we're navigating away which can cause the router the neglect the url
+    // which will prevent the navigation to workspace.
+    unawaited(_proposalRefSub?.cancel());
+    _proposalRefSub = null;
+
+    const WorkspaceRoute().go(context);
   }
 
   void _handleSegmentsControllerChange() {
