@@ -31,7 +31,7 @@ final class ProposalBuilderBloc
   final DocumentMapper _documentMapper;
 
   ProposalBuilderBlocCache _cache = const ProposalBuilderBlocCache();
-  StreamSubscription<Account?>? _activeAccountIdSub;
+  StreamSubscription<Account?>? _activeAccountSub;
   StreamSubscription<List<CommentWithReplies>>? _commentsSub;
   StreamSubscription<bool>? _isMaxProposalsLimitReachedSub;
 
@@ -73,7 +73,7 @@ final class ProposalBuilderBloc
       accountPublicStatus: Optional(activeAccount?.publicStatus),
     );
 
-    _activeAccountIdSub = _userService.watchUser
+    _activeAccountSub = _userService.watchUser
         .map((event) => event.activeAccount)
         .distinct()
         .listen(
@@ -88,8 +88,8 @@ final class ProposalBuilderBloc
 
   @override
   Future<void> close() async {
-    await _activeAccountIdSub?.cancel();
-    _activeAccountIdSub = null;
+    await _activeAccountSub?.cancel();
+    _activeAccountSub = null;
 
     await _commentsSub?.cancel();
     _commentsSub = null;
