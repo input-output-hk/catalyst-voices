@@ -1,8 +1,6 @@
 import 'package:catalyst_voices/routes/routing/account_route.dart' as account;
 import 'package:catalyst_voices/routes/routing/campaign_stage_route.dart'
     as campaign_stage;
-import 'package:catalyst_voices/routes/routing/coming_soon_route.dart'
-    as coming_soon;
 import 'package:catalyst_voices/routes/routing/overall_spaces_route.dart'
     as overall_spaces;
 import 'package:catalyst_voices/routes/routing/proposal_builder_route.dart'
@@ -16,7 +14,6 @@ import 'package:go_router/go_router.dart';
 abstract final class Routes {
   static final List<RouteBase> routes = [
     ...account.$appRoutes,
-    ...coming_soon.$appRoutes,
     ...spaces.$appRoutes,
     ...overall_spaces.$appRoutes,
     ...proposal.$appRoutes,
@@ -25,6 +22,6 @@ abstract final class Routes {
   ];
 
   static String get initialLocation {
-    return const coming_soon.ComingSoonRoute().location;
+    return const spaces.DiscoveryRoute().location;
   }
 }
