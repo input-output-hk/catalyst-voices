@@ -118,6 +118,7 @@ build-web:
     FROM +code-generator
     ARG WORKDIR=/frontend/apps/voices
 
+
     DO flutter-ci+BUILD_WEB --WORKDIR=$WORKDIR --TARGET=lib/configs/main_web.dart
     SAVE ARTIFACT web
 
