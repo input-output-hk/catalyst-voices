@@ -42,7 +42,7 @@ def test_rbac_endpoints(rbac_chain_factory):
     assert(resp.status_code == 404), f"Expected not registered cat id: {resp.status_code} - {resp.text}"
         
     # Wrong format Catalyst ID lookup
-    cat_id = "invalidFftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE"
     # cspell:disable-next-line
+    cat_id = "invalidFftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE"
     resp = get(lookup="cat_id", token=auth_token)
     assert(resp.status_code == 412), f"Expected wrong format cat id: {resp.status_code} - {resp.text}"
