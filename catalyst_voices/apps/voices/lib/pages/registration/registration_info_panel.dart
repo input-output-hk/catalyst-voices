@@ -254,7 +254,6 @@ class _RegistrationPicture extends StatelessWidget {
 
     Widget buildRecoverSeedPhrase(RecoverWithSeedPhraseStage stage) {
       return switch (stage) {
-        RecoverWithSeedPhraseStage.seedPhraseInstructions ||
         RecoverWithSeedPhraseStage.seedPhrase ||
         RecoverWithSeedPhraseStage.accountDetails =>
           const KeychainPicture(),

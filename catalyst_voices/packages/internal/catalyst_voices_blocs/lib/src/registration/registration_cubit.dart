@@ -301,7 +301,12 @@ final class RegistrationCubit extends Cubit<RegistrationState>
 
     unawaited(recover.checkLocalKeychains());
 
-    _goToStep(const RecoverMethodStep());
+    // If we have only one recover method just fast forward
+    if (RegistrationRecoverMethod.values.length <= 1) {
+      recoverWithSeedPhrase();
+    } else {
+      _goToStep(const RecoverMethodStep());
+    }
   }
 
   void recoverProgress() {
@@ -573,7 +578,7 @@ final class RegistrationCubit extends Cubit<RegistrationState>
 
       return previousStep != null
           ? RecoverWithSeedPhraseStep(stage: previousStep)
-          : const RecoverMethodStep();
+          : const GetStartedStep();
     }
 
     return switch (step) {

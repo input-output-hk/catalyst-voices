@@ -5,6 +5,7 @@ import 'package:catalyst_voices_repositories/generated/api/cat_gateway.swagger.d
 import 'package:catalyst_voices_repositories/generated/api/cat_reviews.models.swagger.dart';
 import 'package:catalyst_voices_repositories/src/common/rbac_token_ext.dart';
 import 'package:catalyst_voices_repositories/src/common/response_mapper.dart';
+import 'package:catalyst_voices_repositories/src/dto/user/catalyst_id_public_ext.dart';
 import 'package:catalyst_voices_repositories/src/dto/user/rbac_registration_chain_dto.dart';
 import 'package:catalyst_voices_repositories/src/dto/user/reviews_catalyst_id_status_ext.dart';
 import 'package:catalyst_voices_repositories/src/dto/user/user_dto.dart';
@@ -137,12 +138,13 @@ final class UserRepositoryImpl implements UserRepository {
   /// account if [token] is not specified.
   Future<CatalystIDPublic?> _getReviewsCatalystIDPublic({
     RbacToken? token,
-  }) {
+  }) async {
     return _apiServices.reviews
         .apiCatalystIdsMeGet(authorization: token?.authHeader())
         .successBodyOrThrow()
         .then<CatalystIDPublic?>((value) => value)
-        .onError<NotFoundException>((error, stackTrace) => null);
+        .onError<NotFoundException>((error, stackTrace) => null)
+        .then((value) => value?.decode());
   }
 
   Future<String?> _lookupUsernameFromDocuments({

@@ -96,7 +96,9 @@ dev_dependencies:
   catalyst_analysis: ^3.0.0
   flutter_test:
     sdk: flutter
-  go_router_builder: ^2.4.1
+  # TODO(damian-molinski): remove version lock when go_router is upgraded.
+  # Lock at 2.8.2 because 2.9.0 introduced changes required for go_router 15.0.0.
+  go_router_builder: 2.8.2
   integration_test:
     sdk: flutter
   mockito: ^5.4.4
