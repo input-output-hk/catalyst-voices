@@ -80,6 +80,11 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
   StreamSubscription<DocumentRef?>? _proposalRefSub;
   StreamSubscription<dynamic>? _segmentsSub;
 
+  /// A bool which should be set to true when navigating away from the screen.
+  /// If true the page should not attempt to overwrite the url
+  /// (i.e. with document ref change) not to prevent the back navigation.
+  bool _isAboutToExit = false;
+
   @override
   Widget build(BuildContext context) {
     return ProposalBuilderChangingOverlay(
@@ -154,7 +159,7 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
         _onProposalDeleted();
       case PublishedProposalBuilderSignal():
       case SubmittedProposalBuilderSignal():
-        const WorkspaceRoute().go(context);
+        _leavePage();
       case ProposalSubmissionCloseDate():
         unawaited(_showSubmissionClosingWarningDialog(signal.date));
       case EmailNotVerifiedProposalBuilderSignal():
@@ -194,6 +199,11 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
 
     final event = ActiveNodeChangedEvent(activeSectionId);
     context.read<ProposalBuilderBloc>().add(event);
+  }
+
+  void _leavePage() {
+    _isAboutToExit = true;
+    const WorkspaceRoute().go(context);
   }
 
   void _listenForProposalRef(ProposalBuilderBloc bloc) {
@@ -246,7 +256,7 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
   }
 
   void _onProposalRefChanged(DocumentRef? ref) {
-    if (ref != null) {
+    if (ref != null && !_isAboutToExit) {
       Router.neglect(context, () {
         ProposalBuilderRoute.fromRef(ref: ref).replace(context);
       });
