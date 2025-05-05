@@ -36,6 +36,7 @@ pub(crate) struct QueryParams {
 #[derive(DeserializeRow, Clone)]
 pub(crate) struct Query {
     /// Registration transaction id.
+    #[allow(dead_code)]
     pub txn_id: DbTransactionId,
     /// A block slot number.
     pub slot_no: DbSlot,
@@ -72,7 +73,7 @@ impl Query {
 
 /// Returns a sorted list of all registrations for the given Catalyst ID from the
 /// database.
-async fn indexed_registrations(
+pub(crate) async fn indexed_registrations(
     session: &CassandraSession, catalyst_id: &IdUri,
 ) -> anyhow::Result<Vec<Query>> {
     let mut result: Vec<_> = Query::execute(session, QueryParams {
@@ -86,24 +87,28 @@ async fn indexed_registrations(
 }
 
 /// Build a registration chain from the given indexed data.
-pub(crate) async fn build_reg_chain(
-    session: &CassandraSession, catalyst_id: &IdUri, network: Network,
+///
+/// # NOTE: provided `reg_queries` must be sorted by `slot_no`, look into `indexed_registrations` function.
+pub(crate) async fn build_reg_chain<OnSuccessFn: FnMut(bool, Slot, &RegistrationChain)>(
+    mut reg_queries_iter: impl Iterator<Item = (bool, Query)>, network: Network,
+    mut on_success: OnSuccessFn,
 ) -> anyhow::Result<Option<RegistrationChain>> {
-    let regs = indexed_registrations(session, catalyst_id).await?;
-    let mut regs_iter = regs.iter();
-    let Some(root) = regs_iter.next() else {
+    let Some((is_persistent, root)) = reg_queries_iter.next() else {
         return Ok(None);
     };
 
-    let root = registration(network, root.slot_no.into(), root.txn_index.into())
+    let slot_no = root.slot_no.into();
+    let root = load_cip509_from_chain(network, root.slot_no.into(), root.txn_index.into())
         .await
         .context("Failed to get root registration")?;
     let mut chain = RegistrationChain::new(root).context("Invalid root registration")?;
+    on_success(is_persistent, slot_no, &chain);
 
-    for reg in regs_iter {
+    for (is_persistent, reg) in reg_queries_iter {
         // We only store valid registrations in this table, so an error here indicates a bug in
         // our indexing logic.
-        let cip509 = registration(network, reg.slot_no.into(), reg.txn_index.into())
+        let slot_no = reg.slot_no.into();
+        let cip509 = load_cip509_from_chain(network, reg.slot_no.into(), reg.txn_index.into())
             .await
             .with_context(|| {
                 format!(
@@ -112,7 +117,10 @@ pub(crate) async fn build_reg_chain(
                 )
             })?;
         match chain.update(cip509) {
-            Ok(c) => chain = c,
+            Ok(c) => {
+                chain = c;
+                on_success(is_persistent, slot_no, &chain);
+            },
             Err(e) => {
                 // This isn't a hard error because while the individual registration can be valid it
                 // can be invalid in the context of the whole registration chain.
@@ -127,8 +135,9 @@ pub(crate) async fn build_reg_chain(
     Ok(Some(chain))
 }
 
-/// A helper function to return a RBAC registration from the given block and slot.
-pub(crate) async fn registration(
+/// A helper function to load a RBAC registration `Cip509` by the given block and slot
+/// from the `cardano-chain-follower`.
+pub(crate) async fn load_cip509_from_chain(
     network: Network, slot: Slot, txn_index: TxnIndex,
 ) -> anyhow::Result<Cip509> {
     let point = Point::fuzzy(slot);
