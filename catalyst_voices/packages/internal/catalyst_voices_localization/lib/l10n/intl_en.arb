@@ -65,22 +65,6 @@
   "@homeScreenText": {
     "description": "Text shown in the home screen"
   },
-  "comingSoonSubtitle": "Voices",
-  "@comingSoonSubtitle": {
-    "description": "Text shown after logo in coming soon page"
-  },
-  "comingSoonTitle1": "Coming",
-  "@comingSoonTitle1": {
-    "description": "Text shown as main title in coming soon page"
-  },
-  "comingSoonTitle2": "soon",
-  "@comingSoonTitle2": {
-    "description": "Text shown as main title in coming soon page"
-  },
-  "comingSoonDescription": "Project Catalyst is the world's largest decentralized innovation engine for solving real-world challenges.",
-  "@comingSoonDescription": {
-    "description": "Text shown as description in coming soon page"
-  },
   "connectingStatusLabelText": "re-connecting",
   "@connectingStatusLabelText": {
     "description": "Label text shown in the ConnectingStatus widget during re-connection."
@@ -597,22 +581,6 @@
         "type": "String"
       }
     }
-  },
-  "walletLinkTransactionPositiveSmallPrint": "Positive small print",
-  "@walletLinkTransactionPositiveSmallPrint": {
-    "description": "A side note on transaction summary in the wallet link explaining the positives about the registration."
-  },
-  "walletLinkTransactionPositiveSmallPrintItem1": "Your registration is a one time event, cost will not renew periodically.",
-  "@walletLinkTransactionPositiveSmallPrintItem1": {
-    "description": "The first item for the positive small print message."
-  },
-  "walletLinkTransactionPositiveSmallPrintItem2": "Your registrations can be found under your account profile after completion.",
-  "@walletLinkTransactionPositiveSmallPrintItem2": {
-    "description": "The second item for the positive small print message."
-  },
-  "walletLinkTransactionPositiveSmallPrintItem3": "All registration fees go into the Cardano Treasury.",
-  "@walletLinkTransactionPositiveSmallPrintItem3": {
-    "description": "The third item for the positive small print message."
   },
   "walletLinkTransactionSign": "Sign transaction with wallet",
   "@walletLinkTransactionSign": {

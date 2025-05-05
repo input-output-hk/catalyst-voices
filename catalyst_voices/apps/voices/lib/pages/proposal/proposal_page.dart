@@ -9,6 +9,9 @@ import 'package:catalyst_voices/pages/proposal/snack_bar/viewing_older_version_s
 import 'package:catalyst_voices/pages/proposal/widget/proposal_header.dart';
 import 'package:catalyst_voices/pages/proposal/widget/proposal_navigation_panel.dart';
 import 'package:catalyst_voices/pages/proposal/widget/proposal_sidebars.dart';
+import 'package:catalyst_voices/pages/spaces/appbar/session_action_header.dart';
+import 'package:catalyst_voices/pages/spaces/appbar/session_state_header.dart';
+import 'package:catalyst_voices/pages/spaces/drawer/opportunities_drawer.dart';
 import 'package:catalyst_voices/routes/routes.dart';
 import 'package:catalyst_voices/widgets/modals/comment/submit_comment_error_dialog.dart';
 import 'package:catalyst_voices/widgets/snackbar/voices_snackbar.dart';
@@ -46,7 +49,14 @@ class _ProposalPageState extends State<ProposalPage>
     return SegmentsControllerScope(
       controller: _segmentsController,
       child: Scaffold(
-        appBar: const VoicesAppBar(automaticallyImplyLeading: false),
+        appBar: const VoicesAppBar(
+          automaticallyImplyLeading: false,
+          actions: [
+            SessionActionHeader(),
+            SessionStateHeader(),
+          ],
+        ),
+        endDrawer: const OpportunitiesDrawer(),
         body: ProposalHeaderWrapper(
           child: ProposalSidebars(
             navPanel: const ProposalNavigationPanel(),

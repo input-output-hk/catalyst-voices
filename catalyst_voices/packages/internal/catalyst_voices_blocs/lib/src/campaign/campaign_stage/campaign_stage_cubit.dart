@@ -11,14 +11,23 @@ final _logger = Logger('CampaignStageCubit');
 
 class CampaignStageCubit extends Cubit<CampaignStageState> {
   final CampaignService _campaignService;
+  late Timer? _timer;
 
   CampaignStageCubit(this._campaignService)
-      : super(const ProposalSubmissionStage()) {
+      : super(const LoadingCampaignStage()) {
     unawaited(getCampaignStage());
+  }
+
+  @override
+  Future<void> close() async {
+    _timer?.cancel();
+    _timer = null;
+    await super.close();
   }
 
   Future<void> getCampaignStage() async {
     try {
+      emit(const LoadingCampaignStage());
       final campaignTimeline = await _campaignService.getCampaignTimeline();
 
       final now = DateTime.now();
@@ -31,6 +40,7 @@ class CampaignStageCubit extends Cubit<CampaignStageState> {
 
       if (proposalSubmissionStage.timeline.isInRange(now)) {
         emit(const ProposalSubmissionStage());
+        _startCountdownTimer(proposalSubmissionStage.timeline.to);
       } else if (proposalSubmissionStage.timeline.isBeforeRange(now)) {
         emit(
           PreProposalSubmissionStage(
@@ -49,5 +59,19 @@ class CampaignStageCubit extends Cubit<CampaignStageState> {
 
   void proposalSubmissionStarted() {
     emit(const ProposalSubmissionStage());
+  }
+
+  void _startCountdownTimer(DateTime? endTime) {
+    if (endTime == null) {
+      return;
+    }
+    _timer?.cancel();
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      final now = DateTime.now();
+      if (now.isAfter(endTime)) {
+        timer.cancel();
+        emit(const AfterProposalSubmissionStage());
+      }
+    });
   }
 }
