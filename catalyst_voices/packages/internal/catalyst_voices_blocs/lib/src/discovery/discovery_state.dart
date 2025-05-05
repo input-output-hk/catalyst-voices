@@ -1,4 +1,6 @@
-part of 'discovery_cubit.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
+import 'package:equatable/equatable.dart';
 
 final class DiscoveryCampaignCategoriesState extends Equatable {
   final bool isLoading;
@@ -92,35 +94,43 @@ final class DiscoveryMostRecentProposalsState extends Equatable {
       proposals: proposals ?? this.proposals,
     );
   }
+
+  DiscoveryMostRecentProposalsState updateFavorites(List<String> ids) {
+    final updatedProposals = [...proposals]
+        .map((e) => e.copyWith(isFavorite: ids.contains(e.ref.id)))
+        .toList();
+
+    return copyWith(proposals: updatedProposals);
+  }
 }
 
 final class DiscoveryState extends Equatable {
-  final DiscoveryCurrentCampaignState currentCampaign;
-  final DiscoveryCampaignCategoriesState campaignCategories;
-  final DiscoveryMostRecentProposalsState mostRecentProposals;
+  final DiscoveryCurrentCampaignState campaign;
+  final DiscoveryCampaignCategoriesState categories;
+  final DiscoveryMostRecentProposalsState proposals;
 
   const DiscoveryState({
-    this.currentCampaign = const DiscoveryCurrentCampaignState(),
-    this.campaignCategories = const DiscoveryCampaignCategoriesState(),
-    this.mostRecentProposals = const DiscoveryMostRecentProposalsState(),
+    this.campaign = const DiscoveryCurrentCampaignState(),
+    this.categories = const DiscoveryCampaignCategoriesState(),
+    this.proposals = const DiscoveryMostRecentProposalsState(),
   });
 
   @override
   List<Object?> get props => [
-        currentCampaign,
-        campaignCategories,
-        mostRecentProposals,
+        campaign,
+        categories,
+        proposals,
       ];
 
   DiscoveryState copyWith({
-    DiscoveryCurrentCampaignState? currentCampaign,
-    DiscoveryCampaignCategoriesState? campaignCategories,
-    DiscoveryMostRecentProposalsState? mostRecentProposals,
+    DiscoveryCurrentCampaignState? campaign,
+    DiscoveryCampaignCategoriesState? categories,
+    DiscoveryMostRecentProposalsState? proposals,
   }) {
     return DiscoveryState(
-      currentCampaign: currentCampaign ?? this.currentCampaign,
-      campaignCategories: campaignCategories ?? this.campaignCategories,
-      mostRecentProposals: mostRecentProposals ?? this.mostRecentProposals,
+      campaign: campaign ?? this.campaign,
+      categories: categories ?? this.categories,
+      proposals: proposals ?? this.proposals,
     );
   }
 }
