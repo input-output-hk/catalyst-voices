@@ -389,13 +389,11 @@ final class ProposalRepositoryImpl implements ProposalRepository {
 
     final publish = switch (action) {
       ProposalSubmissionAction.aFinal => ProposalPublish.submittedProposal,
-      ProposalSubmissionAction.hide => throw ArgumentError.value(
-          action,
-          'action',
-          'Unsupported ${ProposalSubmissionAction.hide}, Make sure to filter'
-              ' out hidden proposals before this code is reached.',
-        ),
       ProposalSubmissionAction.draft || null => ProposalPublish.publishedDraft,
+      ProposalSubmissionAction.hide => throw ArgumentError(
+          'Unsupported ${ProposalSubmissionAction.hide}, Make sure to filter'
+          ' out hidden proposals before this code is reached.',
+        ),
     };
 
     final document = _buildProposalDocument(
