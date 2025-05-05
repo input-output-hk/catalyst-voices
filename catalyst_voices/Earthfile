@@ -116,15 +116,10 @@ build-static-analysis:
 # Build web version of Catalyst Voices
 build-web:
     FROM +code-generator
-    ARG RUN_ON_PR=true
-
     ARG WORKDIR=/frontend/apps/voices
-    IF [ $RUN_ON_PR = true ]
-        DO flutter-ci+BUILD_WEB --WORKDIR=$WORKDIR --BUILD_MODE='--profile' --TARGET=lib/configs/main_web.dart
-    ELSE
-        DO flutter-ci+BUILD_WEB --WORKDIR=$WORKDIR --TARGET=lib/configs/main_web.dart
-        SAVE ARTIFACT web
-    END
+
+    DO flutter-ci+BUILD_WEB --WORKDIR=$WORKDIR --TARGET=lib/configs/main_web.dart
+    SAVE ARTIFACT web
 
 package:
     FROM nginx:alpine3.20-slim
