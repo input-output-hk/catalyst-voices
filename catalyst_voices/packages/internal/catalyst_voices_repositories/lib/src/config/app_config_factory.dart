@@ -50,7 +50,7 @@ final class AppConfigFactory {
         ),
       ),
       sentry: defaultEnvConfig.sentry.copyWith(
-        dns: remote.sentry?.dns,
+        dsn: remote.sentry?.dsn,
         environment: remote.sentry?.environment,
         release: remote.sentry?.release,
         tracesSampleRate: remote.sentry?.tracesSampleRate,

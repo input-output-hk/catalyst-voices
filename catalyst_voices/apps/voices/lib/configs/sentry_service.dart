@@ -15,7 +15,7 @@ final class SentryService {
     await SentryFlutter.init(
       (options) {
         options
-          ..dsn = config.dns
+          ..dsn = config.dsn
           ..environment = config.environment
           ..tracesSampleRate = config.tracesSampleRate
           ..profilesSampleRate = config.profilesSampleRate

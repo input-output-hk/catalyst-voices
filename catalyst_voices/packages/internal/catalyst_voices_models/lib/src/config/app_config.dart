@@ -38,7 +38,7 @@ final class AppConfig extends Equatable {
           ),
           database: const DatabaseConfig(),
           sentry: const SentryConfig(
-            dns:
+            dsn:
                 'https://8e333ddbed1e096c70e4ed006892c355@o622089.ingest.us.sentry.io/4507113601433600',
             environment: 'dev',
             release: 'catalyst-voices@dev',
@@ -76,7 +76,7 @@ final class AppConfig extends Equatable {
           ),
           database: const DatabaseConfig(),
           sentry: const SentryConfig(
-            dns:
+            dsn:
                 'https://8e333ddbed1e096c70e4ed006892c355@o622089.ingest.us.sentry.io/4507113601433600',
             environment: 'preprod',
             release: 'catalyst-voices@preprod',
@@ -105,7 +105,7 @@ final class AppConfig extends Equatable {
           ),
           database: const DatabaseConfig(),
           sentry: const SentryConfig(
-            dns:
+            dsn:
                 'https://8e333ddbed1e096c70e4ed006892c355@o622089.ingest.us.sentry.io/4507113601433600',
             environment: 'prod',
             release: 'catalyst-voices@prod',
@@ -236,7 +236,7 @@ final class ExpiryDuration extends Equatable {
 }
 
 final class SentryConfig extends Equatable {
-  final String dns;
+  final String dsn;
   final String environment;
   final String release;
   final double tracesSampleRate;
@@ -248,7 +248,7 @@ final class SentryConfig extends Equatable {
   final String diagnosticLevel;
 
   const SentryConfig({
-    required this.dns,
+    required this.dsn,
     required this.environment,
     required this.release,
     required this.tracesSampleRate,
@@ -262,7 +262,7 @@ final class SentryConfig extends Equatable {
 
   @override
   List<Object?> get props => [
-        dns,
+        dsn,
         environment,
         release,
         tracesSampleRate,
@@ -275,7 +275,7 @@ final class SentryConfig extends Equatable {
       ];
 
   SentryConfig copyWith({
-    String? dns,
+    String? dsn,
     String? environment,
     String? release,
     double? tracesSampleRate,
@@ -287,7 +287,7 @@ final class SentryConfig extends Equatable {
     String? diagnosticLevel,
   }) {
     return SentryConfig(
-      dns: dns ?? this.dns,
+      dsn: dsn ?? this.dsn,
       environment: environment ?? this.environment,
       release: release ?? this.release,
       tracesSampleRate: tracesSampleRate ?? this.tracesSampleRate,

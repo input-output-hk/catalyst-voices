@@ -4,7 +4,7 @@ part 'remote_sentry_config.g.dart';
 
 @JsonSerializable(createToJson: false)
 final class RemoteSentryConfig {
-  final String? dns;
+  final String? dsn;
   final String? environment;
   final String? release;
   final double? tracesSampleRate;
@@ -16,7 +16,7 @@ final class RemoteSentryConfig {
   final String? diagnosticLevel;
 
   const RemoteSentryConfig({
-    this.dns,
+    this.dsn,
     this.environment,
     this.release,
     this.tracesSampleRate,
