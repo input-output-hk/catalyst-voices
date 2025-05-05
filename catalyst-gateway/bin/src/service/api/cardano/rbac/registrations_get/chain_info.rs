@@ -5,12 +5,12 @@
 use anyhow::Context;
 use cardano_blockchain_types::{Slot, TransactionId};
 use catalyst_types::id_uri::IdUri;
-use futures::{future::try_join, TryFutureExt, TryStreamExt};
+use futures::future::try_join;
 use rbac_registration::registration::cardano::RegistrationChain;
 
 use crate::{
     db::index::{
-        queries::rbac::get_rbac_registrations::{registration, Query, QueryParams},
+        queries::rbac::get_rbac_registrations::{build_reg_chain, indexed_registrations, Query},
         session::CassandraSession,
     },
     settings::Settings,
@@ -36,9 +36,6 @@ impl ChainInfo {
     ) -> anyhow::Result<Option<Self>> {
         let registrations =
             last_registration_chain(persistent_session, volatile_session, catalyst_id).await?;
-        if registrations.is_empty() {
-            return Ok(None);
-        }
 
         let network = Settings::cardano_network();
 
@@ -46,41 +43,28 @@ impl ChainInfo {
         let mut last_volatile_txn = None;
         let mut last_persistent_slot = 0.into();
 
-        let mut iter = registrations.into_iter();
-        let (is_persistent, reg) = iter.next().context("No root registration found")?;
-        let cip509 = registration(network, reg.slot_no.into(), reg.txn_index.into()).await?;
-        let mut chain = RegistrationChain::new(cip509).context("Invalid root registration")?;
-        update_values(
-            is_persistent,
-            &reg,
-            &mut last_persistent_txn,
-            &mut last_volatile_txn,
-            &mut last_persistent_slot,
-        );
-
-        for (is_persistent, reg) in iter {
-            let cip509 = registration(network, reg.slot_no.into(), reg.txn_index.into()).await?;
-
-            // This isn't a hard error because while the individual registration can be valid it can
-            // be invalid in the context of the whole registration chain.
-            if let Ok(new) = chain.update(cip509) {
-                chain = new;
-                update_values(
-                    is_persistent,
-                    &reg,
-                    &mut last_persistent_txn,
-                    &mut last_volatile_txn,
-                    &mut last_persistent_slot,
-                );
+        let res = build_reg_chain(
+            registrations.into_iter(),
+            network,
+            |is_persistent: bool, slot_no: Slot, chain: &RegistrationChain| {
+                if is_persistent {
+                    last_persistent_txn = Some(chain.current_tx_id_hash());
+                    last_persistent_slot = slot_no;
+                } else {
+                    last_volatile_txn = Some(chain.current_tx_id_hash());
+                }
+            },
+        )
+        .await?
+        .map(|chain| {
+            Self {
+                chain,
+                last_persistent_txn,
+                last_volatile_txn,
+                last_persistent_slot,
             }
-        }
-
-        Ok(Some(Self {
-            chain,
-            last_persistent_txn,
-            last_volatile_txn,
-            last_persistent_slot,
-        }))
+        });
+        Ok(res)
     }
 }
 
@@ -117,31 +101,4 @@ async fn last_registration_chain(
         .map(<[_]>::to_vec)
         // This should never happen: the index is valid because of the check above.
         .context("Invalid root registration index")
-}
-
-/// Returns a sorted list of registrations for the given Catalyst ID from the database.
-async fn indexed_registrations(
-    session: &CassandraSession, catalyst_id: &IdUri,
-) -> anyhow::Result<Vec<Query>> {
-    let mut result: Vec<_> = Query::execute(session, QueryParams {
-        catalyst_id: catalyst_id.clone().into(),
-    })
-    .and_then(|r| r.try_collect().map_err(Into::into))
-    .await?;
-
-    result.sort_by_key(|r| r.slot_no);
-    Ok(result)
-}
-
-/// Updates the values depending on if the given registration is persistent or not.
-fn update_values(
-    is_persistent: bool, reg: &Query, last_persistent_txn: &mut Option<TransactionId>,
-    last_volatile_txn: &mut Option<TransactionId>, last_persistent_slot: &mut Slot,
-) {
-    if is_persistent {
-        *last_persistent_txn = Some(reg.txn_id.into());
-        *last_persistent_slot = reg.slot_no.into();
-    } else {
-        *last_volatile_txn = Some(reg.txn_id.into());
-    }
 }
