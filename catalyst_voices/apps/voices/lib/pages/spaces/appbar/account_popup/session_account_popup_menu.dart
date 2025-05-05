@@ -256,6 +256,15 @@ class _SessionAccountPopupMenuState extends State<SessionAccountPopupMenu>
 
   @override
   Widget build(BuildContext context) {
+    // TODO(damian-molinski): replace `PopupMenuButton` by `showMenu`.
+    // Consider to replace all usages of PopupMenuButton
+    // by creating a custom replacement.
+    //
+    // Reason (when navigating away from a page that opened a PopupMenuButton):
+    // To safely refer to a widget's ancestor in its dispose() method, save
+    // a reference to the ancestor by calling
+    // dependOnInheritedWidgetOfExactType() in the widget's
+    // didChangeDependencies() method.
     return PopupMenuButton<_MenuItemEvent>(
       key: _popupMenuButtonKey,
       initialValue: null,

@@ -45,7 +45,6 @@ final class DiscoveryRoute extends GoRouteData
     with FadePageTransitionMixin, CompositeRouteGuardMixin {
   final bool? $extra;
 
-  // ignore: avoid_positional_boolean_parameters
   const DiscoveryRoute({this.$extra});
 
   @override
