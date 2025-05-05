@@ -2662,5 +2662,9 @@
   "cantEditThisProposal": "Can't edit this proposal",
   "@cantEditThisProposal": {
     "description": "Message shown when user tries to edit a proposal that should not be editable."
+  },
+  "comingSoon": "Coming Soon",
+  "@comingSoon": {
+    "description": "Coming soon message"
   }
 }

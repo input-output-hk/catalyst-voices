@@ -11,7 +11,7 @@ final _logger = Logger('CampaignStageCubit');
 
 class CampaignStageCubit extends Cubit<CampaignStageState> {
   final CampaignService _campaignService;
-  late Timer? _timer;
+  Timer? _timer;
 
   CampaignStageCubit(this._campaignService)
       : super(const LoadingCampaignStage()) {
