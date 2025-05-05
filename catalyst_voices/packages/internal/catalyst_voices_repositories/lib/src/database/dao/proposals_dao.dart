@@ -205,7 +205,7 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
     final proposals = await mainQuery
         .map((row) => row.readTable(proposal))
         .get()
-        .then((entities) => entities.map(_buildJoinedProposal).toList().wait);
+        .then((entities) => entities.map(_buildJoinedProposal).wait);
 
     final total = await watchCount(filters: filters.toCountFilters())
         .first
@@ -275,6 +275,26 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
     );
   }
 
+  Future<_IdsFilter> _excludeHiddenProposalsFilter() {
+    return _getProposalsLatestAction().then((value) {
+      return value
+          .where((e) => e.action.isHidden)
+          .map((e) => e.proposalRef.id)
+          .map(UuidHiLo.from);
+    }).then(_IdsFilter.exclude);
+  }
+
+  Future<_IdsFilter> _excludeNotDraftProposalsFilter() {
+    return _getProposalsLatestAction().then(
+      (value) {
+        return value
+            .where((element) => element.action.isNotDraft)
+            .map((e) => e.proposalRef.id)
+            .map(UuidHiLo.from);
+      },
+    ).then(_IdsFilter.exclude);
+  }
+
   Future<List<SignedDocumentRef>> _getAuthorProposalsLooseRefs({
     required CatalystId author,
   }) {
@@ -332,38 +352,15 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
   Future<_IdsFilter> _getFilterTypeIds(ProposalsFilterType type) {
     switch (type) {
       case ProposalsFilterType.total:
-        return _getProposalsLatestAction().then(
-          (value) {
-            return value
-                .where((element) => element.action.isHidden)
-                .map((e) => e.proposalRef.id)
-                .map(UuidHiLo.from);
-          },
-        ).then(_IdsFilter.exclude);
+        return _excludeHiddenProposalsFilter();
       case ProposalsFilterType.drafts:
-        return _getProposalsLatestAction().then(
-          (value) {
-            return value
-                .where((element) => element.action.isNotDraft)
-                .map((e) => e.proposalRef.id)
-                .map(UuidHiLo.from);
-          },
-        ).then(_IdsFilter.exclude);
+        return _excludeNotDraftProposalsFilter();
       case ProposalsFilterType.finals:
-        return _getProposalsLatestAction().then(
-          (value) {
-            return value
-                .where((element) => element.action.isFinal)
-                .map((e) => e.proposalRef.id)
-                .map(UuidHiLo.from);
-          },
-        ).then(_IdsFilter.include);
+        return _includeFinalProposalsFilter();
       case ProposalsFilterType.favorites:
-        return _getFavoritesRefs()
-            .then((value) => value.map((e) => e.id).map(UuidHiLo.from))
-            .then(_IdsFilter.include);
+        return _includeFavoriteRefsExcludingHiddenProposalsFilter();
       case ProposalsFilterType.my:
-        return Future.value(const _IdsFilter());
+        return _excludeHiddenProposalsFilter();
     }
   }
 
@@ -521,6 +518,32 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
       final low = row.read(documents.verLo)!;
       return UuidHiLo(high: high, low: low).uuid;
     }).get();
+  }
+
+  Future<_IdsFilter> _includeFavoriteRefsExcludingHiddenProposalsFilter() {
+    return _getFavoritesRefs().then((favoriteRefs) {
+      return _getProposalsLatestAction().then((actions) async {
+        final hiddenProposalsIds = actions
+            .where((e) => e.action.isHidden)
+            .map((e) => e.proposalRef.id);
+
+        return favoriteRefs
+            .map((e) => e.id)
+            .whereNot(hiddenProposalsIds.contains)
+            .map(UuidHiLo.from);
+      });
+    }).then(_IdsFilter.include);
+  }
+
+  Future<_IdsFilter> _includeFinalProposalsFilter() {
+    return _getProposalsLatestAction().then(
+      (value) {
+        return value
+            .where((element) => element.action.isFinal)
+            .map((e) => e.proposalRef.id)
+            .map(UuidHiLo.from);
+      },
+    ).then(_IdsFilter.include);
   }
 
   Future<List<SignedDocumentRef>> _maybeGetAuthorProposalsLooseRefs({
