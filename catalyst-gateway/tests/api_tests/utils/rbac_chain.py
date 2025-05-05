@@ -29,7 +29,15 @@ class RBACChain:
     def auth_token(self, cid: str = None, sig: str = None, username: str = None, is_uri: bool = False, nonce: str = None) -> str:
         role_0_keys = self.keys_map[f"{RoleID.ROLE_0}"]
         return generate_rbac_auth_token(
-            self.network, self.subnet, role_0_keys["pk"], role_0_keys["sk"], cid, sig, username, is_uri, nonce
+            self.network,
+            self.subnet,
+            role_0_keys["pk"],
+            role_0_keys["sk"],
+            cid,
+            sig,
+            username,
+            is_uri,
+            nonce
         )
 
     # returns a role's catalyst id, with the provided role secret key
@@ -48,15 +56,12 @@ class RBACChain:
             role_data["sk"],
         )    
     
-    def short_cat_id(self) -> str:
+    def short_cat_id(self) -> str:        
         return generate_cat_id(
             network=self.network,
             subnet=self.subnet,
-            role_id=RoleID.ROLE_0,
             pk_hex=self.keys_map[f"{RoleID.ROLE_0}"]["pk"],
-            rotation=0,
             is_uri=False,
-            is_short=True
         )
 
 @pytest.fixture
@@ -72,27 +77,50 @@ def rbac_chain_factory():
 
     return __rbac_chain_factory
 
-
+# Default is set to URI format
+# Optional field = subnet, role id, rotation, username, nonce
 def generate_cat_id(
-    network: str, subnet: str, role_id: RoleID, pk_hex: str, rotation: int, is_uri: bool, is_short: bool = False, nonce: str = None
-):
+    network: str,
+    pk_hex: str,
+    is_uri: bool = True,
+    subnet: str = None,
+    role_id: str = None,
+    rotation: str = None,
+    username: str = None,
+    nonce: str = None,
+) -> str:
     pk = bytes.fromhex(pk_hex)[:32]
-    if nonce is None:
-        nonce = f"{int(datetime.now(timezone.utc).timestamp())}"
-    subnet = f"{subnet}." if subnet else ""
     role0_pk_b64 = base64_url(pk)
 
-    if is_short:
-        res = f"{subnet}{network}/{role0_pk_b64}"
-    else:
-        res = f":{nonce}@{subnet}{network}/{role0_pk_b64}"
-        if not (role_id == RoleID.ROLE_0 and rotation == 0):
-            res += f"/{role_id}/{rotation}"
-        if is_uri:
-            res = f"id.catalyst://{res}"
-            
-    return res
+    # If nonce is set to none, use current timestamp
+    # If set to empty string, use empty string (no nonce)
+    if nonce is None:
+        nonce = f"{int(datetime.now(timezone.utc).timestamp())}"
 
+    # Authority part
+    authority = ""
+    if username:
+        authority += f"{username}"
+    if nonce:
+        authority += f":{nonce}"
+    authority += "@"
+
+    if subnet:
+        authority += f"{subnet}.{network}"
+    else:
+        authority += network
+
+    # Path
+    path = f"{role0_pk_b64}"
+    if role_id:
+        path += f"/{role_id}"
+        if rotation:
+            path += f"/{rotation}"
+            
+    if is_uri:
+        return f"id.catalyst://{authority}/{path}"
+    else:
+        return f"{authority}/{path}"
 
 def generate_rbac_auth_token(
     network: str,
@@ -117,9 +145,7 @@ def generate_rbac_auth_token(
         cat_id = f"{token_prefix}{generate_cat_id(
             network=network, 
             subnet=subnet, 
-            role_id=RoleID.ROLE_0,
             pk_hex=pk_hex, 
-            rotation=0, 
             is_uri=is_uri,
             nonce=nonce)}."
     else:
