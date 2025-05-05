@@ -191,38 +191,6 @@ class _Navigation extends StatelessWidget {
   }
 }
 
-class _PositiveSmallPrint extends StatelessWidget {
-  const _PositiveSmallPrint();
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Text(
-          context.l10n.walletLinkTransactionPositiveSmallPrint,
-          style: Theme.of(context)
-              .textTheme
-              .titleSmall
-              ?.copyWith(fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: 12),
-        Padding(
-          padding: const EdgeInsets.only(left: 4),
-          child: BulletList(
-            items: [
-              context.l10n.walletLinkTransactionPositiveSmallPrintItem1,
-              context.l10n.walletLinkTransactionPositiveSmallPrintItem2,
-              context.l10n.walletLinkTransactionPositiveSmallPrintItem3,
-            ],
-            spacing: 4,
-          ),
-        ),
-      ],
-    );
-  }
-}
-
 class _RbacTransactionPanelState extends State<RbacTransactionPanel> {
   @override
   Widget build(BuildContext context) {
@@ -345,8 +313,6 @@ class _TransactionDetails extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _BlocSummary(),
-        SizedBox(height: 18),
-        _PositiveSmallPrint(),
         _BlocTxSubmitError(),
       ],
     );
