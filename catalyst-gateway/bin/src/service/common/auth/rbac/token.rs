@@ -4,21 +4,28 @@
 
 use std::{
     fmt::{Display, Formatter},
+    sync::LazyLock,
     time::Duration,
 };
 
 use anyhow::{anyhow, Context, Result};
 use base64::{prelude::BASE64_URL_SAFE_NO_PAD, Engine};
 use cardano_blockchain_types::Network;
-use catalyst_types::id_uri::{key_rotation::KeyRotation, role_index::RoleIndex, IdUri};
+use catalyst_types::id_uri::IdUri;
 use chrono::{TimeDelta, Utc};
 use ed25519_dalek::{ed25519::signature::Signer, Signature, SigningKey, VerifyingKey};
 use rbac_registration::registration::cardano::RegistrationChain;
+use regex::Regex;
 
 use crate::db::index::{
     queries::rbac::get_rbac_registrations::build_reg_chain,
     session::{CassandraSession, CassandraSessionError},
 };
+
+/// Captures just the digits after last slash
+/// This Regex should not fail
+#[allow(clippy::unwrap_used)]
+static REGEX: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"/\d+$").unwrap());
 
 /// A Catalyst RBAC Authorization Token.
 ///
@@ -105,12 +112,11 @@ impl CatalystRBACTokenV1 {
         if catalyst_id.nonce().is_none() {
             return Err(anyhow!("Catalyst ID must have nonce"));
         }
-        let (role, rotation) = catalyst_id.role_and_rotation();
-        if role != RoleIndex::ROLE_0 {
-            return Err(anyhow!("Catalyst ID mustn't have role specified"));
-        }
-        if rotation != KeyRotation::DEFAULT {
-            return Err(anyhow!("Catalyst ID mustn't have rotation specified"));
+
+        if REGEX.is_match(token) {
+            return Err(anyhow!(
+                "Catalyst ID mustn't have role or rotation specified"
+            ));
         }
         let network = convert_network(&catalyst_id.network())?;
 
@@ -212,7 +218,8 @@ fn convert_network((network, subnet): &(String, Option<String>)) -> Result<Netwo
         Some("mainnet") => Ok(Network::Mainnet),
         Some("preprod") => Ok(Network::Preprod),
         Some("preview") => Ok(Network::Preview),
-        _ => Err(anyhow!("Unsupported network: {network}")),
+        Some(other) => Err(anyhow!("Unsupported subnet: {other}")),
+        None => Err(anyhow!("Missing subnet")),
     }
 }
 

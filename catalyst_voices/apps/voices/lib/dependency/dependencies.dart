@@ -297,7 +297,7 @@ final class Dependencies extends DependencyProvider {
     registerLazySingleton<CampaignService>(() {
       return CampaignService(
         get<CampaignRepository>(),
-        get<DocumentRepository>(),
+        get<ProposalRepository>(),
       );
     });
     registerLazySingleton<ProposalService>(() {

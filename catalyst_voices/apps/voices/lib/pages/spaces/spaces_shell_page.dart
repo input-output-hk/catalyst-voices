@@ -70,7 +70,7 @@ class _Shortcuts extends StatelessWidget {
           bindings: <ShortcutActivator, VoidCallback>{
             for (final entry in shortcuts.entries)
               entry.value: () => entry.key.go(context),
-            if (!kReleaseMode)
+            if (kDebugMode)
               CampaignAdminToolsDialog.shortcut: onToggleAdminTools,
           },
           child: child,

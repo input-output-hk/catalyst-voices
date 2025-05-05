@@ -1,10 +1,11 @@
+import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 
 abstract interface class CampaignService {
   const factory CampaignService(
     CampaignRepository campaignRepository,
-    DocumentRepository documentRepository,
+    ProposalRepository documentRepository,
   ) = CampaignServiceImpl;
 
   Future<Campaign?> getActiveCampaign();
@@ -24,13 +25,11 @@ abstract interface class CampaignService {
 
 final class CampaignServiceImpl implements CampaignService {
   final CampaignRepository _campaignRepository;
-
-  // ignore: unused_field
-  final DocumentRepository _documentRepository;
+  final ProposalRepository _proposalRepository;
 
   const CampaignServiceImpl(
     this._campaignRepository,
-    this._documentRepository,
+    this._proposalRepository,
   );
 
   @override
@@ -51,7 +50,23 @@ final class CampaignServiceImpl implements CampaignService {
 
   @override
   Future<List<CampaignCategory>> getCampaignCategories() async {
-    return _campaignRepository.getCampaignCategories();
+    final categories = await _campaignRepository.getCampaignCategories();
+    final updatedCategories = <CampaignCategory>[];
+
+    for (final category in categories) {
+      final categoryProposals = await _proposalRepository.getProposals(
+        type: ProposalsFilterType.finals,
+        categoryRef: category.selfRef,
+      );
+      final totalAsk = _calculateTotalAsk(categoryProposals);
+
+      final updatedCategory = category.copyWith(
+        totalAsk: totalAsk,
+        proposalsCount: categoryProposals.length,
+      );
+      updatedCategories.add(updatedCategory);
+    }
+    return updatedCategories;
   }
 
   @override
@@ -61,14 +76,38 @@ final class CampaignServiceImpl implements CampaignService {
 
   @override
   Future<CampaignCategory> getCategory(SignedDocumentRef ref) async {
-    // TODO(LynxLynxx): call backend for current ask amount
-    // and submitted proposal count
-    return _campaignRepository.getCategory(ref);
+    final category = await _campaignRepository.getCategory(ref);
+    final categoryProposals = await _proposalRepository.getProposals(
+      type: ProposalsFilterType.finals,
+      categoryRef: ref,
+    );
+    final totalAsk = _calculateTotalAsk(categoryProposals);
+
+    return category.copyWith(
+      totalAsk: totalAsk,
+      proposalsCount: categoryProposals.length,
+    );
   }
 
   @override
   Future<CurrentCampaign> getCurrentCampaign() async {
-    // TODO(LynxLynxx): call backend for current ask amount
-    return _campaignRepository.getCurrentCampaign();
+    final currentCampaign = await _campaignRepository.getCurrentCampaign();
+    final campaignProposals = await _proposalRepository.getProposals(
+      type: ProposalsFilterType.finals,
+    );
+    final totalAsk = _calculateTotalAsk(campaignProposals);
+
+    return currentCampaign.copyWith(totalAsk: totalAsk);
+  }
+
+  Coin _calculateTotalAsk(List<ProposalData> proposals) {
+    var totalAskBalance = const Balance.zero();
+    for (final proposal in proposals) {
+      final fundsRequested = proposal.document.fundsRequested;
+      final askBalance = Balance(coin: fundsRequested ?? const Coin(0));
+
+      totalAskBalance += askBalance;
+    }
+    return totalAskBalance.coin;
   }
 }

@@ -1,15 +1,12 @@
 import 'dart:async';
 
-import 'package:catalyst_voices/pages/registration/incorrect_seed_phrase_dialog.dart';
-import 'package:catalyst_voices/pages/registration/upload_seed_phrase_confirmation_dialog.dart';
-import 'package:catalyst_voices/pages/registration/upload_seed_phrase_dialog.dart';
 import 'package:catalyst_voices/pages/registration/widgets/registration_stage_message.dart';
 import 'package:catalyst_voices/pages/registration/widgets/registration_stage_navigation.dart';
 import 'package:catalyst_voices/pages/registration/widgets/seed_phrase_actions.dart';
+import 'package:catalyst_voices/pages/registration/widgets/upload_seed_phrase/upload_seed_phrase_mixin.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
-import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 
 class SeedPhraseInputPanel extends StatefulWidget {
@@ -64,7 +61,8 @@ class _BlocSeedPhraseField extends StatelessWidget {
   }
 }
 
-class _SeedPhraseInputPanelState extends State<SeedPhraseInputPanel> {
+class _SeedPhraseInputPanelState extends State<SeedPhraseInputPanel>
+    with UploadSeedPhraseMixin {
   late final SeedPhraseFieldController _controller;
   final _focusNode = FocusNode();
 
@@ -142,33 +140,13 @@ class _SeedPhraseInputPanelState extends State<SeedPhraseInputPanel> {
     _focusNode.requestFocus();
   }
 
-  Future<void> _showUploadDialog() async {
-    final words = await UploadSeedPhraseDialog.show(context);
-
-    if (words == null) {
-      return;
-    }
-
-    final isValid = SeedPhrase.isValid(
-      words: words,
-    );
-
-    if (!mounted) {
-      return;
-    } else if (isValid) {
-      _controller.words = words;
-    } else {
-      final showUpload = await IncorrectSeedPhraseDialog.show(context);
-      if (showUpload) {
-        await _showUploadDialog();
-      }
-    }
-  }
-
   Future<void> _uploadSeedPhrase() async {
-    final showUpload = await UploadSeedPhraseConfirmationDialog.show(context);
-    if (showUpload) {
-      await _showUploadDialog();
+    final hasWords = _controller.words.isNotEmpty;
+    final words = await importSeedPhraseWords(requireConfirmation: hasWords);
+    if (words == null || !mounted) {
+      return;
     }
+
+    _controller.words = words;
   }
 }
