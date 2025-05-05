@@ -70,6 +70,7 @@ impl ChainInfo {
     }
 }
 
+// TODO: FIXME: Remove?
 /// Returns a last independent chain of both persistent and volatile registrations.
 async fn last_registration_chain(
     persistent_session: &CassandraSession, volatile_session: &CassandraSession, catalyst_id: &IdUri,
