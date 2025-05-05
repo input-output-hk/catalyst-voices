@@ -133,34 +133,17 @@ final class UserRepositoryImpl implements UserRepository {
     return _storage.writeUser(dto);
   }
 
-  CatalystIDPublic _decodeCatalystIdPublic(CatalystIDPublic catalystId) {
-    final username = catalystId.username as String?;
-    if (username == null) {
-      return catalystId;
-    }
-
-    return catalystId.copyWith(
-      // decoding from Uri to replace %20 for white space, etc.
-      username: Uri.decodeComponent(username),
-    );
-  }
-
   /// Looks up reviews module and receives status for active
   /// account if [token] is not specified.
   Future<CatalystIDPublic?> _getReviewsCatalystIDPublic({
     RbacToken? token,
   }) async {
-    final response = await _apiServices.reviews
+    return _apiServices.reviews
         .apiCatalystIdsMeGet(authorization: token?.authHeader())
         .successBodyOrThrow()
         .then<CatalystIDPublic?>((value) => value)
-        .onError<NotFoundException>((error, stackTrace) => null);
-
-    if (response != null) {
-      return _decodeCatalystIdPublic(response);
-    } else {
-      return null;
-    }
+        .onError<NotFoundException>((error, stackTrace) => null)
+        .then((value) => value?.decode());
   }
 
   Future<String?> _lookupUsernameFromDocuments({
@@ -188,5 +171,19 @@ final class UserRepositoryImpl implements UserRepository {
           authorization: token.authHeader(),
         )
         .successBodyOrThrow();
+  }
+}
+
+extension on CatalystIDPublic {
+  CatalystIDPublic decode() {
+    final username = this.username as String?;
+    if (username == null) {
+      return this;
+    }
+
+    return copyWith(
+      // decoding from Uri to replace %20 for white space, etc.
+      username: Uri.decodeComponent(username),
+    );
   }
 }
