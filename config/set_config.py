@@ -41,7 +41,7 @@ def read_config(env_dir: Path) -> tuple[dict[str, str], dict[str, str]]:
     settings = load_json_file(settings_path)
     print(f"Loaded settings:\n{settings}")
 
-    # load and apply config.json
+    # load config.json
     config_path = Path(env_dir) / "config.json"
     if not Path.is_file(config_path):
         errmsg = f"Missing config.json at {config_path}"
