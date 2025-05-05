@@ -58,12 +58,10 @@ def apply(url: str, api_key: str, config: any, timeout: int, *, ip: str | None =
 
     while True:
         try:
-            if ip is None:
-                resp = requests.put(url, json=config, headers=headers, timeout=timeout)
-                resp.raise_for_status()
-            else:
-                resp = requests.put(f"{url}?IP={ip}", json=config, headers=headers, timeout=timeout)
-                resp.raise_for_status()
+            f_url = url if ip is None else f"{url}?IP={ip}"
+            
+            resp = requests.put(f_url, json=config, headers=headers, timeout=timeout)
+            resp.raise_for_status()
             break
         except requests.exceptions.RequestException as e:
             errmsg = f"failed to send HTTP request: {e}"
