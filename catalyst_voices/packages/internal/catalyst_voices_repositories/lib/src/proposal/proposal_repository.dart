@@ -190,7 +190,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   }) async {
     return _proposalsLocalSource
         .getProposals(type: type, categoryRef: categoryRef)
-        .then((value) => value.map((e) => _buildProposalData(e)!).toList());
+        .then((value) => value.map(_buildProposalData).toList());
   }
 
   @override
@@ -200,7 +200,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   }) {
     return _proposalsLocalSource
         .getProposalsPage(request: request, filters: filters)
-        .then((value) => value.map((e) => _buildProposalData(e)!));
+        .then((value) => value.map(_buildProposalData));
   }
 
   @override
@@ -384,18 +384,19 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     return proposalAction;
   }
 
-  ProposalData? _buildProposalData(ProposalDocumentData data) {
+  ProposalData _buildProposalData(ProposalDocumentData data) {
     final action = _buildProposalActionData(data.action);
 
     final publish = switch (action) {
       ProposalSubmissionAction.aFinal => ProposalPublish.submittedProposal,
-      ProposalSubmissionAction.hide => null,
+      ProposalSubmissionAction.hide => throw ArgumentError.value(
+          action,
+          'action',
+          'Unsupported ${ProposalSubmissionAction.hide}, Make sure to filter'
+              ' out hidden proposals before this code is reached.',
+        ),
       ProposalSubmissionAction.draft || null => ProposalPublish.publishedDraft,
     };
-
-    if (publish == null) {
-      return null;
-    }
 
     final document = _buildProposalDocument(
       documentData: data.proposal,
