@@ -582,22 +582,6 @@
       }
     }
   },
-  "walletLinkTransactionPositiveSmallPrint": "Positive small print",
-  "@walletLinkTransactionPositiveSmallPrint": {
-    "description": "A side note on transaction summary in the wallet link explaining the positives about the registration."
-  },
-  "walletLinkTransactionPositiveSmallPrintItem1": "Your registration is a one time event, cost will not renew periodically.",
-  "@walletLinkTransactionPositiveSmallPrintItem1": {
-    "description": "The first item for the positive small print message."
-  },
-  "walletLinkTransactionPositiveSmallPrintItem2": "Your registrations can be found under your account profile after completion.",
-  "@walletLinkTransactionPositiveSmallPrintItem2": {
-    "description": "The second item for the positive small print message."
-  },
-  "walletLinkTransactionPositiveSmallPrintItem3": "All registration fees go into the Cardano Treasury.",
-  "@walletLinkTransactionPositiveSmallPrintItem3": {
-    "description": "The third item for the positive small print message."
-  },
   "walletLinkTransactionSign": "Sign transaction with wallet",
   "@walletLinkTransactionSign": {
     "description": "The primary button label to sign a transaction on transaction summary screen."
