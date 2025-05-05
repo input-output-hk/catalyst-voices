@@ -64,6 +64,7 @@ def apply(url: str, api_key: str, config: any, timeout: int, *, ip: str | None =
             else:
                 resp = requests.put(f"{url}?IP={ip}", json=config, headers=headers, timeout=timeout)
                 resp.raise_for_status()
+            break
         except requests.exceptions.RequestException as e:
             errmsg = f"failed to send HTTP request: {e}"
             print(errmsg)
