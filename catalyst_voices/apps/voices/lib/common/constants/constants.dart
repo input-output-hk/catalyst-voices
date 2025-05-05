@@ -15,16 +15,15 @@ abstract class VoicesConstants {
       'https://docs.projectcatalyst.io/catalyst-tools/catalyst-app/app-timeline#before-submission';
   static const afterSubmissionUrl =
       'https://docs.projectcatalyst.io/catalyst-tools/catalyst-app/app-timeline#after-submission';
-  static const becomeReviewerUrl =
-      'https://docs.projectcatalyst.io/catalyst-tools/catalyst-app/stay-involved#reviewer';
+  static const becomeReviewerUrl = 'https://reviews.projectcatalyst.io/';
   static const votingRegistrationUrl =
-      'https://docs.projectcatalyst.io/catalyst-tools/catalyst-app/stay-involved#voter';
+      'https://docs.projectcatalyst.io/current-fund/voter-registration';
   static const walletTroubleshootingUrl =
       'https://docs.projectcatalyst.io/catalyst-tools/catalyst-app/getting-started#wallet-connect-troubleshooting';
   static const mobileExperienceUrl =
       'https://docs.projectcatalyst.io/catalyst-tools/catalyst-app/mobile-experience';
   static const catalystKnowledgeBaseUrl =
-      'https://docs.projectcatalyst.io/catalyst-tools/catalyst-app/my-account#catalyst-knowledge-base';
+      'https://docs.projectcatalyst.io/catalyst-tools/catalyst-app';
   static const proposalPublishingDocsUrl =
       'https://docs.projectcatalyst.io/catalyst-tools/catalyst-app/create-and-submit-proposals-in-workspace#proposal-publishing';
   static const getStartedUrl =
@@ -49,6 +48,8 @@ abstract class VoicesConstants {
       'https://docs.projectcatalyst.io/catalyst-tools/catalyst-app/create-and-submit-proposals-in-workspace/using-images';
   static const joinNewsletterUrl =
       'https://mpc.projectcatalyst.io/newsletter-signup';
+  static const unlockAccountUrl =
+      'https://docs.projectcatalyst.io/catalyst-tools/catalyst-app/my-account#lock-unlock-account';
 
   static String cardanoScanStakeAddressUrl(ShelleyAddress stakeAddress) {
     switch (stakeAddress.network) {

@@ -95,7 +95,7 @@ class _RegistrationDialogState extends State<RegistrationDialog>
       case UpdateAccount(:final id):
         unawaited(_cubit.startAccountUpdate(id: id));
       case RecoverRegistration():
-        _cubit.goToStep(const RecoverMethodStep());
+        _cubit.goToStep(const RecoverWithSeedPhraseStep());
       case ContinueRegistration():
         _cubit.recoverProgress();
     }
