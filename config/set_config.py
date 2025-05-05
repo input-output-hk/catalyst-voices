@@ -31,15 +31,8 @@ def parse_ip_config_file(path: Path) -> tuple[str, dict]:
     return ip_part, load_json_file(path)
 
 
-# main action
-def set_config(env: str) -> None:
-    """Read config files from the specified `env`, then apply the configs."""
-    file_dir = Path(__file__).resolve().parent
-    env_dir = Path(file_dir) / env
-
-    print(f"Setting config for environment: {env}")
-    print(f"Looking for configs in: {env_dir}")
-
+def read_config(env_dir: Path) -> tuple[dict[str, str], dict[str, str]]:
+    """Extract and prepare configs before applying."""
     # load settings.json
     settings_path = Path(env_dir) / "settings.json"
     if not Path.is_file(settings_path):
@@ -47,15 +40,6 @@ def set_config(env: str) -> None:
         raise FileNotFoundError(errmsg)
     settings = load_json_file(settings_path)
     print(f"Loaded settings:\n{settings}")
-
-    # extract settings.json attributes
-    url = settings["url"]
-    timeout = settings["timeout"]
-    api_key_env = settings["api_key_env"]
-
-    api_key = os.environ[api_key_env]
-
-    headers = {"X-API-Key": api_key}
 
     # load and apply config.json
     config_path = Path(env_dir) / "config.json"
@@ -65,31 +49,62 @@ def set_config(env: str) -> None:
     config = load_json_file(config_path)
     print(f"Applying default config:\n{config}")
 
-    try:
-        resp = requests.put(url, json=config, headers=headers, timeout=timeout)
-        resp.raise_for_status()
-    except requests.exceptions.RequestException as e:
-        errmsg = f"Skipping {config_path.name}, failed to send HTTP request: {e}"
-        print(errmsg)
+    return settings, config
+
+
+def apply(url: str, api_key: str, config: any, timeout: int, *, ip: str | None = None, retry: bool = False) -> None:
+    """Send an HTTP request to apply the config to the specified URL."""
+    headers = {"X-API-Key": api_key}
+
+    while True:
+        try:
+            if ip is None:
+                resp = requests.put(url, json=config, headers=headers, timeout=timeout)
+                resp.raise_for_status()
+            else:
+                resp = requests.put(f"{url}?IP={ip}", json=config, headers=headers, timeout=timeout)
+                resp.raise_for_status()
+        except requests.exceptions.RequestException as e:
+            errmsg = f"failed to send HTTP request: {e}"
+            print(errmsg)
+
+            if retry:
+                print("Retrying in 1 minute...")
+                time.sleep(60)
+            else:
+                break
+
+
+# main action
+def set_config(env: str, *, retry: bool = False) -> None:
+    """Read config files from the specified `env`, then apply the configs."""
+    file_dir = Path(__file__).resolve().parent
+    env_dir = Path(file_dir) / env
+
+    print(f"Setting config for environment: {env}")
+    print(f"Looking for configs in: {env_dir}")
+
+    settings, config = read_config(env_dir)
+
+    url = settings["url"]
+    timeout = settings["timeout"]
+    api_key_env = settings["api_key_env"]
+
+    api_key = os.environ[api_key_env]
+
+    # apply base config
+    apply(url, api_key, config, timeout, retry=retry)
 
     # find and apply any ip-specific configs
     ip_config_paths = list(env_dir.glob("ip_*.config.json"))
     for ip_config_path in ip_config_paths:
-        filename = ip_config_path.name
-
         try:
             ip, ip_config = parse_ip_config_file(ip_config_path)
-            print(f"Applying IP-specific config from {filename}:\n{ip_config}")
+            print(f"Applying IP-specific config from {ip_config_path.name}:\n{ip_config}")
 
-            resp = requests.put(
-                f"{url}?IP={ip}", json=ip_config, headers=headers, timeout=timeout
-            )
-            resp.raise_for_status()
-        except requests.exceptions.RequestException as e:
-            errmsg = f"Skipping {filename}, failed to send HTTP request: {e}"
-            print(errmsg)
+            apply(url, api_key, ip_config, timeout, ip=ip, retry=retry)
         except ValueError as e:
-            errmsg = f"Skipping {filename}, invalid IP address format: {e}"
+            errmsg = f"Skipping {ip_config_path.name}, invalid IP address format: {e}"
             print(errmsg)
 
 
@@ -108,21 +123,5 @@ parser.add_argument(
 
 args = parser.parse_args()
 
-while True:
-    try:
-        set_config(args.env)
-        print(f"Configuration for '{args.env}' set successfully.")
-        break
-    except FileNotFoundError as e:
-        errmsg = f"Missing file: {e}"
-        print(errmsg)
-    except KeyError as e:
-        errmsg = f"Missing config or env variable: {e}"
-        print(errmsg)
-
-    if args.retry:
-        print("Retrying in 1 minute...")
-        time.sleep(60)
-    else:
-        print("Failed to set configuration.")
-        break
+set_config(args.env, retry=args.retry)
+print(f"Configuration for '{args.env}' set successfully.")
