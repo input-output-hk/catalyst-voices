@@ -124,4 +124,4 @@ parser.add_argument(
 args = parser.parse_args()
 
 set_config(args.env, retry=args.retry)
-print(f"Configuration for '{args.env}' set successfully.")
+print(f"Finished applying configuration for '{args.env}'.")
