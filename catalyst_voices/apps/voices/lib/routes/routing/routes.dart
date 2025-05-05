@@ -6,6 +6,7 @@ import 'package:catalyst_voices/routes/routing/overall_spaces_route.dart'
 import 'package:catalyst_voices/routes/routing/proposal_builder_route.dart'
     as proposal_builder;
 import 'package:catalyst_voices/routes/routing/proposal_route.dart' as proposal;
+import 'package:catalyst_voices/routes/routing/root_route.dart' as root;
 import 'package:catalyst_voices/routes/routing/spaces_route.dart' as spaces;
 import 'package:go_router/go_router.dart';
 
@@ -13,6 +14,7 @@ import 'package:go_router/go_router.dart';
 /// knows how to work with them.
 abstract final class Routes {
   static final List<RouteBase> routes = [
+    ...root.$appRoutes,
     ...account.$appRoutes,
     ...spaces.$appRoutes,
     ...overall_spaces.$appRoutes,
@@ -22,6 +24,6 @@ abstract final class Routes {
   ];
 
   static String get initialLocation {
-    return const spaces.DiscoveryRoute().location;
+    return const root.RootRoute().location;
   }
 }
