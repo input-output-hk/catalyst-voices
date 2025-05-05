@@ -45,7 +45,7 @@ def parse_ip_config_file(path: str) -> tuple[str, dict]:
     return ip_part, load_json_file(path)
 
 
-def extract_attribute(obj: str, field_name: str):
+def extract_attribute(obj, field_name: str):
     if field_name in obj:
         return obj[field_name]
     else:
