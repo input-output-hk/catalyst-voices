@@ -5,6 +5,7 @@ import 'package:catalyst_voices_repositories/generated/api/cat_gateway.swagger.d
 import 'package:catalyst_voices_repositories/generated/api/cat_reviews.models.swagger.dart';
 import 'package:catalyst_voices_repositories/src/common/rbac_token_ext.dart';
 import 'package:catalyst_voices_repositories/src/common/response_mapper.dart';
+import 'package:catalyst_voices_repositories/src/dto/user/catalyst_id_public_ext.dart';
 import 'package:catalyst_voices_repositories/src/dto/user/rbac_registration_chain_dto.dart';
 import 'package:catalyst_voices_repositories/src/dto/user/reviews_catalyst_id_status_ext.dart';
 import 'package:catalyst_voices_repositories/src/dto/user/user_dto.dart';
@@ -171,19 +172,5 @@ final class UserRepositoryImpl implements UserRepository {
           authorization: token.authHeader(),
         )
         .successBodyOrThrow();
-  }
-}
-
-extension on CatalystIDPublic {
-  CatalystIDPublic decode() {
-    final username = this.username as String?;
-    if (username == null) {
-      return this;
-    }
-
-    return copyWith(
-      // decoding from Uri to replace %20 for white space, etc.
-      username: Uri.decodeComponent(username),
-    );
   }
 }
