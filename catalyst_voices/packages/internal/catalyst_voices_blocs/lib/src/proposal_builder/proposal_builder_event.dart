@@ -2,15 +2,6 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:equatable/equatable.dart';
 
-final class AccountPublicStatusChangedEvent extends ProposalBuilderEvent {
-  final AccountPublicStatus status;
-
-  const AccountPublicStatusChangedEvent({required this.status});
-
-  @override
-  List<Object?> get props => [status];
-}
-
 final class ActiveNodeChangedEvent extends ProposalBuilderEvent {
   final NodeId? id;
 
@@ -101,12 +92,12 @@ final class PublishProposalEvent extends ProposalBuilderEvent {
 }
 
 final class RebuildActiveAccountProposalEvent extends ProposalBuilderEvent {
-  final CatalystId? catalystId;
+  final Account? account;
 
-  const RebuildActiveAccountProposalEvent({required this.catalystId});
+  const RebuildActiveAccountProposalEvent({required this.account});
 
   @override
-  List<Object?> get props => [catalystId];
+  List<Object?> get props => [account];
 }
 
 final class RebuildCommentsProposalEvent extends ProposalBuilderEvent {

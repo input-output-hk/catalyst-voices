@@ -16,11 +16,13 @@ const TITLE: &str = "RBAC role data map";
 const DESCRIPTION: &str = "A RBAC role data map.";
 
 /// A schema.
-static SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| MetaSchema {
-    title: Some(TITLE.to_owned()),
-    description: Some(DESCRIPTION),
-    example: RoleMap::example().to_json(),
-    ..MetaSchema::ANY
+static SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| {
+    MetaSchema {
+        title: Some(TITLE.to_owned()),
+        description: Some(DESCRIPTION),
+        example: RoleMap::example().to_json(),
+        ..MetaSchema::ANY
+    }
 });
 
 /// A RBAC role data map.

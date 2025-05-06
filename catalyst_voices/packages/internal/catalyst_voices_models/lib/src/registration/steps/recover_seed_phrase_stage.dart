@@ -1,8 +1,5 @@
 /// Describes the seed phrase recovery method flow.
 enum RecoverWithSeedPhraseStage {
-  /// Provides user with brief information's about seed phrase words.
-  seedPhraseInstructions,
-
   /// Where user enters 12 words for seed phrase.
   seedPhrase,
 

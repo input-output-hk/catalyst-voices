@@ -30,6 +30,11 @@ abstract interface class ProposalRepository {
     required DocumentRef ref,
   });
 
+  Future<List<ProposalData>> getProposals({
+    SignedDocumentRef? categoryRef,
+    required ProposalsFilterType type,
+  });
+
   /// Fetches all proposals for page matching [request] as well as
   /// [filters].
   Future<Page<ProposalData>> getProposalsPage({
@@ -179,13 +184,23 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   }
 
   @override
+  Future<List<ProposalData>> getProposals({
+    SignedDocumentRef? categoryRef,
+    required ProposalsFilterType type,
+  }) async {
+    return _proposalsLocalSource
+        .getProposals(type: type, categoryRef: categoryRef)
+        .then((value) => value.map(_buildProposalData).toList());
+  }
+
+  @override
   Future<Page<ProposalData>> getProposalsPage({
     required PageRequest request,
     required ProposalsFilters filters,
   }) {
     return _proposalsLocalSource
         .getProposalsPage(request: request, filters: filters)
-        .then((value) => value.map((e) => _buildProposalData(e)!));
+        .then((value) => value.map(_buildProposalData));
   }
 
   @override
@@ -369,18 +384,17 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     return proposalAction;
   }
 
-  ProposalData? _buildProposalData(ProposalDocumentData data) {
+  ProposalData _buildProposalData(ProposalDocumentData data) {
     final action = _buildProposalActionData(data.action);
 
     final publish = switch (action) {
       ProposalSubmissionAction.aFinal => ProposalPublish.submittedProposal,
-      ProposalSubmissionAction.hide => null,
       ProposalSubmissionAction.draft || null => ProposalPublish.publishedDraft,
+      ProposalSubmissionAction.hide => throw ArgumentError(
+          'Unsupported ${ProposalSubmissionAction.hide}, Make sure to filter'
+          ' out hidden proposals before this code is reached.',
+        ),
     };
-
-    if (publish == null) {
-      return null;
-    }
 
     final document = _buildProposalDocument(
       documentData: data.proposal,

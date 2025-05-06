@@ -120,7 +120,7 @@ impl VerifyingKeyProvider {
 
             let (kid_role_index, kid_rotation) = kid.role_and_rotation();
             let kid_role_index = kid_role_index.to_string().parse::<u8>()?;
-            let kid_role_index = RoleId::try_from(kid_role_index)?;
+            let kid_role_index = RoleId::from(kid_role_index);
 
             let (latest_pk, rotation) = reg_chain
                 .get_latest_signing_pk_for_role(&kid_role_index)
