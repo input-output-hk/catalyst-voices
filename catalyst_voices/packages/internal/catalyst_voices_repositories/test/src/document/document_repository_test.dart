@@ -467,6 +467,38 @@ void main() {
         },
         onPlatform: driftOnPlatforms,
       );
+
+      test(
+        'unknown ref types are removed if same ref found if not unknown type',
+        () async {
+          // Given
+          const categoryType = DocumentType.categoryParametersDocument;
+
+          final ref = SignedDocumentRef.generateFirstRef();
+          final docsRefs = <TypedDocumentRef>[
+            TypedDocumentRef(ref: ref, type: DocumentType.proposalDocument),
+            TypedDocumentRef(ref: ref, type: DocumentType.unknown),
+          ];
+          final expectedRefs = <TypedDocumentRef>[
+            ...constantDocumentsRefs.expand(
+              (refs) => refs.allTyped.where((e) => e.type != categoryType),
+            ),
+            TypedDocumentRef(ref: ref, type: DocumentType.proposalDocument),
+          ];
+
+          // When
+          when(() => remoteDocuments.index())
+              .thenAnswer((_) => Future.value(docsRefs));
+
+          final allRefs = await repository.getAllDocumentsRefs();
+
+          // Then
+          expect(allRefs, containsAll(expectedRefs));
+
+          verifyNever(() => remoteDocuments.getLatestVersion(any()));
+        },
+        onPlatform: driftOnPlatforms,
+      );
     });
 
     test(
