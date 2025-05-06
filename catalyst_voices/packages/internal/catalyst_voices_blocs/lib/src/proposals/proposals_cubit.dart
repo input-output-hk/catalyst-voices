@@ -30,9 +30,7 @@ final class ProposalsCubit extends Cubit<ProposalsState>
     this._campaignService,
     this._proposalService,
   ) : super(const ProposalsState()) {
-    final activeAccount = _userService.user.activeAccount;
-    final filters = ProposalsFilters(author: activeAccount?.catalystId);
-    _cache = _cache.copyWith(filters: filters);
+    _resetCache();
 
     _activeAccountIdSub = _userService.watchUser
         .map((event) => event.activeAccount?.catalystId)
@@ -119,8 +117,7 @@ final class ProposalsCubit extends Cubit<ProposalsState>
     required SignedDocumentRef? category,
     required ProposalsFilterType type,
   }) {
-    _cache = const ProposalsCubitCache();
-
+    _resetCache();
     unawaited(_loadCampaignCategories());
 
     changeFilters(
@@ -242,6 +239,12 @@ final class ProposalsCubit extends Cubit<ProposalsState>
     }).toList();
 
     emit(state.copyWith(categorySelectorItems: categorySelectorItems));
+  }
+
+  void _resetCache() {
+    final activeAccount = _userService.user.activeAccount;
+    final filters = ProposalsFilters(author: activeAccount?.catalystId);
+    _cache = ProposalsCubitCache(filters: filters);
   }
 
   Future<void> _updateFavoriteProposal(

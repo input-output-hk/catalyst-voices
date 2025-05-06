@@ -17,9 +17,6 @@ final class SessionState extends Equatable {
   /// corresponding to the current session state.
   final List<Space> spaces;
 
-  /// Return a list of all available spaces
-  final List<Space> availableSpaces;
-
   /// Returns a list of [spaces] that should be shown in overall spaces menu.
   final List<Space> overallSpaces;
 
@@ -37,7 +34,6 @@ final class SessionState extends Equatable {
     this.account,
     this.isRegistrationInProgress = false,
     required this.spaces,
-    required this.availableSpaces,
     this.overallSpaces = const [],
     this.spacesShortcuts = const {},
     this.canCreateAccount = false,
@@ -51,7 +47,6 @@ final class SessionState extends Equatable {
           status: SessionStatus.guest,
           canCreateAccount: canCreateAccount,
           spaces: const [Space.discovery],
-          availableSpaces: AccessControl.defaultAvailableSpaces,
           settings: settings,
         );
 
@@ -59,7 +54,6 @@ final class SessionState extends Equatable {
       : this(
           status: SessionStatus.visitor,
           spaces: const [Space.discovery],
-          availableSpaces: AccessControl.defaultAvailableSpaces,
         );
 
   const SessionState.visitor({
@@ -71,7 +65,6 @@ final class SessionState extends Equatable {
           canCreateAccount: canCreateAccount,
           isRegistrationInProgress: isRegistrationInProgress,
           spaces: const [Space.discovery],
-          availableSpaces: AccessControl.defaultAvailableSpaces,
           settings: settings,
         );
 

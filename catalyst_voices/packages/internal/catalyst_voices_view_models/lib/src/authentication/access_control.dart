@@ -14,7 +14,6 @@ final class AccessControl {
     Space.discovery,
     Space.workspace,
     Space.voting,
-    Space.fundedProjects,
   ];
 
   static const List<Space> _adminAccess = [
@@ -46,14 +45,6 @@ final class AccessControl {
   ];
 
   const AccessControl();
-
-  List<Space> availableSpaces(Account? account) {
-    if (account == null || !account.isAdmin) {
-      return defaultAvailableSpaces;
-    } else {
-      return Space.values;
-    }
-  }
 
   List<Space> overallSpaces(Account? account) {
     if (account == null) return _votingAccess;
