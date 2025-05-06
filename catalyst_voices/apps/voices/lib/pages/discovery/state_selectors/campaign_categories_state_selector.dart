@@ -47,7 +47,7 @@ class _CampaignCategoriesData extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocSelector<DiscoveryCubit, DiscoveryState, _ListItems>(
       selector: (state) {
-        return state.campaignCategories.categories;
+        return state.categories.categories;
       },
       builder: (context, state) {
         return Offstage(
@@ -67,10 +67,8 @@ class _CampaignCategoriesError extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocSelector<DiscoveryCubit, DiscoveryState, VisibilityState>(
-      selector: (state) => (
-        show: state.campaignCategories.showError,
-        error: state.campaignCategories.error
-      ),
+      selector: (state) =>
+          (show: state.categories.showError, error: state.categories.error),
       builder: (context, state) {
         final errorMessage = state.error?.message(context);
         return Offstage(
@@ -100,7 +98,7 @@ class _CampaignCategoriesLoading extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocSelector<DiscoveryCubit, DiscoveryState, bool>(
       selector: (state) {
-        return state.campaignCategories.isLoading;
+        return state.categories.isLoading;
       },
       builder: (context, isLoading) {
         final dummyCategories = List.filled(
