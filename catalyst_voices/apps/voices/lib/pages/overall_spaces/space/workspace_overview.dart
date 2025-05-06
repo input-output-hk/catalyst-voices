@@ -42,10 +42,10 @@ class _BrowseMyProposals extends StatelessWidget {
     return SpaceOverviewNavTile(
       leading: VoicesAssets.icons.briefcase.buildIcon(),
       title: Text(
-        context.l10n.browseMyProposals,
+        context.l10n.myProposals,
         style: Theme.of(context).textTheme.bodyLarge,
       ),
-      onTap: () => ProposalsRoute.myProposals().go(context),
+      onTap: () => const WorkspaceRoute().go(context),
     );
   }
 }
