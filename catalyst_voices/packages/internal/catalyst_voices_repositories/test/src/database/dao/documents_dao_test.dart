@@ -241,6 +241,9 @@ void main() {
               ),
             );
           });
+          final typedRefs = refs
+              .map((e) => e.toTyped(DocumentType.proposalDocument))
+              .toList();
 
           // When
           await database.documentsDao.saveAll(documentsWithMetadata);
@@ -250,7 +253,7 @@ void main() {
 
           expect(
             allRefs,
-            allOf(hasLength(refs.length), containsAll(refs)),
+            allOf(hasLength(refs.length), containsAll(typedRefs)),
           );
         },
         onPlatform: driftOnPlatforms,

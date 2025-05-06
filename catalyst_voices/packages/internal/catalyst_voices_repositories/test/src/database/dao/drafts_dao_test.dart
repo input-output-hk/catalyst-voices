@@ -128,7 +128,10 @@ void main() {
         'all refs return as expected',
         () async {
           // Given
-          final refs = List.generate(10, (_) => DraftRef.generateFirstRef());
+          final refs = List.generate(
+            10,
+            (_) => DraftRef.generateFirstRef(),
+          );
           final drafts = refs.map((ref) {
             return DraftFactory.build(
               metadata: DocumentDataMetadata(
@@ -137,6 +140,9 @@ void main() {
               ),
             );
           });
+          final typedRefs = refs
+              .map((e) => e.toTyped(DocumentType.proposalDocument))
+              .toList();
 
           // When
           await database.draftsDao.saveAll(drafts);
@@ -146,7 +152,7 @@ void main() {
 
           expect(
             allRefs,
-            allOf(hasLength(refs.length), containsAll(refs)),
+            allOf(hasLength(refs.length), containsAll(typedRefs)),
           );
         },
         onPlatform: driftOnPlatforms,

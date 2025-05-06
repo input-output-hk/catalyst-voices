@@ -302,14 +302,20 @@ void main() {
         'duplicated refs are filtered out',
         () async {
           // Given
+          const categoryType = DocumentType.categoryParametersDocument;
           final refs = List.generate(
             10,
             (_) => SignedDocumentRef.generateFirstRef()
                 .toTyped(DocumentType.proposalDocument),
           );
           final remoteRefs = [...refs, ...refs];
-          final expectedRefs = [
-            ...constantDocumentsRefs.expand((e) => [e.proposal, e.comment]),
+          final expectedRefs = <TypedDocumentRef>[
+            ...constantDocumentsRefs.expand(
+              (e) {
+                return e.allTyped
+                    .where((element) => element.type != categoryType);
+              },
+            ),
             ...refs,
           ];
 
