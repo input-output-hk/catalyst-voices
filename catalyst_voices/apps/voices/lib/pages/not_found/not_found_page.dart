@@ -71,7 +71,7 @@ class _Image extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.sizeOf(context).width;
-    final minImageWidth = min(300, screenWidth * 0.0);
+    final minImageWidth = min(300, screenWidth * 0.9);
     const maxImageWidth = 500;
     final preferredImageWidth = screenWidth * 0.6;
 
