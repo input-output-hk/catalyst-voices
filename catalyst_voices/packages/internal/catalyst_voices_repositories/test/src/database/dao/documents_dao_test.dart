@@ -246,7 +246,7 @@ void main() {
           await database.documentsDao.saveAll(documentsWithMetadata);
 
           // Then
-          final allRefs = await database.documentsDao.queryAllRefs();
+          final allRefs = await database.documentsDao.queryAllTypedRefs();
 
           expect(
             allRefs,

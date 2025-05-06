@@ -304,7 +304,8 @@ void main() {
           // Given
           final refs = List.generate(
             10,
-            (_) => SignedDocumentRef.generateFirstRef(),
+            (_) => SignedDocumentRef.generateFirstRef()
+                .toTyped(DocumentType.proposalDocument),
           );
           final remoteRefs = [...refs, ...refs];
           final expectedRefs = [
@@ -337,7 +338,7 @@ void main() {
             (_) => SignedDocumentRef.exact(
               id: const Uuid().v7(),
               version: const Uuid().v7(),
-            ),
+            ).toTyped(DocumentType.proposalDocument),
           );
 
           // When
@@ -361,11 +362,12 @@ void main() {
             (_) => SignedDocumentRef.exact(
               id: const Uuid().v7(),
               version: const Uuid().v7(),
-            ),
+            ).toTyped(DocumentType.proposalDocument),
           );
           final looseRefs = List.generate(
             10,
-            (_) => SignedDocumentRef.loose(id: const Uuid().v7()),
+            (_) => SignedDocumentRef.loose(id: const Uuid().v7())
+                .toTyped(DocumentType.proposalDocument),
           );
           final refs = [...exactRefs, ...looseRefs];
 
@@ -381,7 +383,7 @@ void main() {
           verify(() => remoteDocuments.getLatestVersion(any()))
               .called(looseRefs.length);
 
-          expect(allRefs.every((element) => element.isExact), isTrue);
+          expect(allRefs.every((element) => element.ref.isExact), isTrue);
         },
         onPlatform: driftOnPlatforms,
       );
@@ -391,14 +393,20 @@ void main() {
         () async {
           // Given
           final constTemplatesRefs = constantDocumentsRefs
-              .expand((element) => [element.proposal])
+              .expand(
+                (element) => [
+                  element.proposal.toTyped(DocumentType.proposalTemplate),
+                ],
+              )
               .toList();
 
           final docsRefs = List.generate(
             10,
-            (_) => SignedDocumentRef.generateFirstRef(),
+            (_) => SignedDocumentRef.generateFirstRef()
+                .toTyped(DocumentType.proposalDocument),
           );
-          final looseTemplatesRefs = constTemplatesRefs.map((e) => e.toLoose());
+          final looseTemplatesRefs =
+              constTemplatesRefs.map((e) => e.copyWith(ref: e.ref.toLoose()));
           final refs = [
             ...docsRefs,
             ...looseTemplatesRefs,
@@ -424,15 +432,22 @@ void main() {
         () async {
           // Given
           final categoriesRefs = constantDocumentsRefs
-              .expand((element) => [element.category])
+              .expand(
+                (element) => [
+                  element.category
+                      .toTyped(DocumentType.categoryParametersDocument),
+                ],
+              )
               .toList();
-          final categoriesIds = categoriesRefs.map((e) => e.id).toList();
+          final categoriesIds = categoriesRefs.map((e) => e.ref.id).toList();
 
           final docsRefs = List.generate(
             10,
-            (_) => SignedDocumentRef.generateFirstRef(),
+            (_) => SignedDocumentRef.generateFirstRef()
+                .toTyped(DocumentType.proposalDocument),
           );
-          final looseCategoriesRefs = categoriesRefs.map((e) => e.toLoose());
+          final looseCategoriesRefs =
+              categoriesRefs.map((e) => e.copyWith(ref: e.ref.toLoose()));
           final refs = [
             ...docsRefs,
             ...looseCategoriesRefs,
@@ -446,7 +461,7 @@ void main() {
 
           // Then
           expect(allRefs, isNot(containsAll(categoriesRefs)));
-          expect(allRefs.none((ref) => categoriesIds.contains(ref.id)), isTrue);
+          expect(allRefs.none((e) => categoriesIds.contains(e.ref.id)), isTrue);
 
           verifyNever(() => remoteDocuments.getLatestVersion(any()));
         },

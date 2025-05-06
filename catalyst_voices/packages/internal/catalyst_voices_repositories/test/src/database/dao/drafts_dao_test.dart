@@ -142,7 +142,7 @@ void main() {
           await database.draftsDao.saveAll(drafts);
 
           // Then
-          final allRefs = await database.draftsDao.queryAllRefs();
+          final allRefs = await database.draftsDao.queryAllTypedRefs();
 
           expect(
             allRefs,

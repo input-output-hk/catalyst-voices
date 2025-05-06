@@ -9,9 +9,9 @@ import 'package:result_type/result_type.dart';
 
 final _logger = Logger('DocumentsService');
 
-typedef _RefFailure = Failure<SignedDocumentRef, Exception>;
+typedef _RefFailure = Failure<TypedDocumentRef, Exception>;
 
-typedef _RefSuccess = Success<SignedDocumentRef, Exception>;
+typedef _RefSuccess = Success<TypedDocumentRef, Exception>;
 
 // ignore: one_member_abstracts
 abstract interface class DocumentsService {
@@ -24,7 +24,7 @@ abstract interface class DocumentsService {
   /// [onProgress] emits from 0.0 to 1.0.
   ///
   /// Returns list of added refs.
-  Future<List<SignedDocumentRef>> sync({
+  Future<List<TypedDocumentRef>> sync({
     ValueChanged<double>? onProgress,
     int maxConcurrent,
   });
@@ -38,7 +38,7 @@ final class DocumentsServiceImpl implements DocumentsService {
   );
 
   @override
-  Future<List<SignedDocumentRef>> sync({
+  Future<List<TypedDocumentRef>> sync({
     ValueChanged<double>? onProgress,
     int maxConcurrent = 100,
   }) async {
@@ -66,7 +66,7 @@ final class DocumentsServiceImpl implements DocumentsService {
     final pool = Pool(maxConcurrent);
 
     final futures = <Future<void>>[];
-    final outcomes = <Result<SignedDocumentRef, Exception>>[];
+    final outcomes = <Result<TypedDocumentRef, Exception>>[];
 
     /// Handling or errors as Outcome because we have to
     /// give a change to all refs to finish and keep all info about what
@@ -78,11 +78,15 @@ final class DocumentsServiceImpl implements DocumentsService {
       /// That's reason for adding pool and limiting max requests.
       final future = pool.withResource<void>(() async {
         try {
-          await _documentRepository.cacheDocument(ref: ref);
+          if (ref.ref is SignedDocumentRef) {
+            await _documentRepository.cacheDocument(
+              ref: ref.ref.toSignedDocumentRef(),
+            );
+          }
           outcomes.add(_RefSuccess(ref));
         } catch (error, stackTrace) {
           final exception = RefSyncException(
-            ref,
+            ref.ref,
             error: error,
             stack: stackTrace,
           );
