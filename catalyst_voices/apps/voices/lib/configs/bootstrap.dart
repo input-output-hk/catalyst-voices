@@ -53,7 +53,7 @@ Future<BootstrapArgs> bootstrap({
   router ??= buildAppRouter();
 
   // Observer is very noisy on Logger. Enable it only if you want to debug
-  // smth
+  // something
   Bloc.observer = AppBlocObserver(enabledOnChange: false);
 
   Dependencies.instance.get<SyncManager>().start().ignore();
