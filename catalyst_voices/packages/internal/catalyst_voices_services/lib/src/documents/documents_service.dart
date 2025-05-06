@@ -85,7 +85,7 @@ final class DocumentsServiceImpl implements DocumentsService {
     /// One such case is Proposal and Template or Action.
     for (final group in prioritizedMissingRefs) {
       _logger.finest(
-        'Synchronising priority[${group.key}] '
+        'Syncing priority[${group.key}] '
         'group with refs[${group.value.length}]',
       );
       final futures = <Future<void>>[];
