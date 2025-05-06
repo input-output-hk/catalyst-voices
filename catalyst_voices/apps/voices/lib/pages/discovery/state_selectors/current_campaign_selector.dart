@@ -76,7 +76,7 @@ class CurrentCampaignLoading extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocSelector<DiscoveryCubit, DiscoveryState, bool>(
       selector: (state) {
-        return state.currentCampaign.isLoading;
+        return state.campaign.isLoading;
       },
       builder: (context, state) {
         return Offstage(
@@ -100,7 +100,7 @@ class CurrentCampaignData extends StatelessWidget {
         CurrentCampaignInfoViewModel>(
       key: const Key('CurrentCampaignData'),
       selector: (state) {
-        return state.currentCampaign.currentCampaign;
+        return state.campaign.currentCampaign;
       },
       builder: (context, state) {
         return Offstage(
@@ -122,8 +122,8 @@ class CurrentCampaignError extends StatelessWidget {
     return BlocSelector<DiscoveryCubit, DiscoveryState, VisibilityState>(
       selector: (state) {
         return (
-          show: state.currentCampaign.showError,
-          error: state.currentCampaign.error,
+          show: state.campaign.showError,
+          error: state.campaign.error,
         );
       },
       builder: (context, state) {

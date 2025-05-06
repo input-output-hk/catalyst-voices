@@ -217,7 +217,7 @@ class _VoterCard extends StatelessWidget {
       ),
       additionalInfo: BlocSelector<DiscoveryCubit, DiscoveryState, DateTime?>(
         selector: (state) {
-          return state.currentCampaign.votingStartsAt;
+          return state.campaign.votingStartsAt;
         },
         builder: (context, date) {
           return date == null
