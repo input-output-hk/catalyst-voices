@@ -101,9 +101,8 @@ final class DocumentsServiceImpl implements DocumentsService {
         final future = pool.withResource<void>(() async {
           try {
             if (ref.ref is SignedDocumentRef) {
-              await _documentRepository.cacheDocument(
-                ref: ref.ref.toSignedDocumentRef(),
-              );
+              final signedRef = ref.ref.toSignedDocumentRef();
+              await _documentRepository.cacheDocument(ref: signedRef);
             }
             outcomes.add(_RefSuccess(ref));
           } catch (error, stackTrace) {
