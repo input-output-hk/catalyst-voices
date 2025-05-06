@@ -76,7 +76,7 @@ impl EnvVars {
         );
 
         Self {
-            url: StringEnvVar::new(&format!("CASSANDRA_{name}_URL"), url.into()),
+            url: StringEnvVar::new(&format!("CASSANDRA_{name}_URL"), (url, true).into()),
             username: StringEnvVar::new_optional(&format!("CASSANDRA_{name}_USERNAME"), false),
             password: StringEnvVar::new_optional(&format!("CASSANDRA_{name}_PASSWORD"), true),
             tls,

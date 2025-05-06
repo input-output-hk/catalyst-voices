@@ -40,11 +40,14 @@ class CategoryProposalsDetailsCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 16),
-          VoicesOutlinedButton(
-            child: Text(context.l10n.viewProposals),
-            onTap: () {
-              ProposalsRoute.fromRef(categoryId: categoryId).go(context);
-            },
+          Offstage(
+            offstage: categoryProposalsCount == 0,
+            child: VoicesOutlinedButton(
+              child: Text(context.l10n.viewProposals),
+              onTap: () {
+                ProposalsRoute.fromRef(categoryId: categoryId).go(context);
+              },
+            ),
           ),
         ],
       ),

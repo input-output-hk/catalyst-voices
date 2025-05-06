@@ -15,6 +15,7 @@ import 'package:catalyst_voices/pages/workspace/submission_closing_warning_dialo
 import 'package:catalyst_voices/routes/routes.dart';
 import 'package:catalyst_voices/routes/routing/proposal_builder_route.dart';
 import 'package:catalyst_voices/widgets/modals/comment/submit_comment_error_dialog.dart';
+import 'package:catalyst_voices/widgets/modals/proposals/proposal_limit_reached_dialog.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/publish_proposal_error_dialog.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/submit_proposal_error_dialog.dart';
 import 'package:catalyst_voices/widgets/snackbar/voices_snackbar.dart';
@@ -79,6 +80,11 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
   StreamSubscription<DocumentRef?>? _proposalRefSub;
   StreamSubscription<dynamic>? _segmentsSub;
 
+  /// A bool which should be set to true when navigating away from the screen.
+  /// If true the page should not attempt to overwrite the url
+  /// (i.e. with document ref change) not to prevent the back navigation.
+  bool _isAboutToExit = false;
+
   @override
   Widget build(BuildContext context) {
     return ProposalBuilderChangingOverlay(
@@ -98,7 +104,7 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
             rightRail: const ProposalBuilderSetupPanel(),
             body: _ProposalBuilderContent(
               controller: _segmentsScrollController,
-              onRetryTap: _loadData,
+              onRetryTap: _loadProposal,
             ),
             bodyConstraints: const BoxConstraints.expand(),
           ),
@@ -113,7 +119,7 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
 
     if (widget.proposalId != oldWidget.proposalId ||
         widget.categoryId != oldWidget.categoryId) {
-      _loadData();
+      _loadProposal();
     }
   }
 
@@ -153,11 +159,13 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
         _onProposalDeleted();
       case PublishedProposalBuilderSignal():
       case SubmittedProposalBuilderSignal():
-        const WorkspaceRoute().go(context);
+        _leavePage();
       case ProposalSubmissionCloseDate():
         unawaited(_showSubmissionClosingWarningDialog(signal.date));
       case EmailNotVerifiedProposalBuilderSignal():
         unawaited(_showEmailNotVerifiedDialog());
+      case MaxProposalsLimitReachedSignal():
+        unawaited(_showProposalLimitReachedDialog(signal));
     }
   }
 
@@ -176,7 +184,8 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
 
     _listenForProposalRef(bloc);
     _listenForSegments(bloc);
-    _loadData(bloc: bloc);
+    _loadProposal(bloc: bloc);
+    _loadSubmissionCloseDate(bloc: bloc);
   }
 
   void _dontShowCampaignSubmissionClosingDialog(bool value) {
@@ -190,6 +199,11 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
 
     final event = ActiveNodeChangedEvent(activeSectionId);
     context.read<ProposalBuilderBloc>().add(event);
+  }
+
+  void _leavePage() {
+    _isAboutToExit = true;
+    const WorkspaceRoute().go(context);
   }
 
   void _listenForProposalRef(ProposalBuilderBloc bloc) {
@@ -215,7 +229,7 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
     _updateSegments(bloc.state.allSegments, bloc.state.activeNodeId);
   }
 
-  void _loadData({ProposalBuilderBloc? bloc}) {
+  void _loadProposal({ProposalBuilderBloc? bloc}) {
     bloc ??= context.read<ProposalBuilderBloc>();
 
     final proposalId = widget.proposalId;
@@ -228,6 +242,10 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
     } else {
       bloc.add(const LoadDefaultProposalCategoryEvent());
     }
+  }
+
+  void _loadSubmissionCloseDate({ProposalBuilderBloc? bloc}) {
+    bloc ??= context.read<ProposalBuilderBloc>();
     bloc.add(const ProposalSubmissionCloseDateEvent());
   }
 
@@ -238,7 +256,7 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
   }
 
   void _onProposalRefChanged(DocumentRef? ref) {
-    if (ref != null) {
+    if (ref != null && !_isAboutToExit) {
       Router.neglect(context, () {
         ProposalBuilderRoute.fromRef(ref: ref).replace(context);
       });
@@ -262,6 +280,17 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
         unawaited(const AccountRoute().push(context));
       });
     }
+  }
+
+  Future<void> _showProposalLimitReachedDialog(
+    MaxProposalsLimitReachedSignal signal,
+  ) {
+    return ProposalLimitReachedDialog.show(
+      context: context,
+      currentSubmissions: signal.currentSubmissions,
+      maxSubmissions: signal.maxSubmissions,
+      submissionCloseAt: signal.proposalSubmissionCloseDate,
+    );
   }
 
   Future<void> _showPublishException(ProposalBuilderPublishException error) {

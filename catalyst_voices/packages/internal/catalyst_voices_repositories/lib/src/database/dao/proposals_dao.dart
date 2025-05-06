@@ -11,6 +11,7 @@ import 'package:catalyst_voices_repositories/src/database/table/documents.drift.
 import 'package:catalyst_voices_repositories/src/database/table/documents_favorite.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_metadata.dart';
 import 'package:catalyst_voices_repositories/src/dto/proposal/proposal_submission_action_dto.dart';
+import 'package:collection/collection.dart';
 import 'package:drift/drift.dart';
 import 'package:drift/extensions/json1.dart';
 import 'package:equatable/equatable.dart';
@@ -26,6 +27,85 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
     with $DriftProposalsDaoMixin
     implements ProposalsDao {
   DriftProposalsDao(super.attachedDatabase);
+
+  @override
+  Future<List<JoinedProposalEntity>> queryProposals({
+    SignedDocumentRef? categoryRef,
+    required ProposalsFilterType type,
+  }) async {
+    final latestProposalRef = alias(documents, 'latestProposalRef');
+    final proposal = alias(documents, 'proposal');
+
+    final maxVerHi = latestProposalRef.verHi.max();
+    final latestProposalsQuery = selectOnly(latestProposalRef, distinct: true)
+      ..addColumns([
+        latestProposalRef.idHi,
+        latestProposalRef.idLo,
+        maxVerHi,
+        latestProposalRef.verLo,
+      ])
+      ..where(latestProposalRef.type.equalsValue(DocumentType.proposalDocument))
+      ..groupBy([latestProposalRef.idHi + latestProposalRef.idLo]);
+
+    final verSubquery = Subquery(latestProposalsQuery, 'latestProposalRef');
+
+    final mainQuery = select(proposal).join([
+      innerJoin(
+        verSubquery,
+        Expression.and([
+          verSubquery.ref(maxVerHi).equalsExp(proposal.verHi),
+          verSubquery.ref(latestProposalRef.verLo).equalsExp(proposal.verLo),
+        ]),
+        useColumns: false,
+      ),
+    ])
+      ..where(
+        Expression.and([
+          proposal.type.equalsValue(DocumentType.proposalDocument),
+          proposal.metadata.jsonExtract(r'$.template').isNotNull(),
+          proposal.metadata.jsonExtract(r'$.categoryId').isNotNull(),
+        ]),
+      )
+      ..orderBy([OrderingTerm.asc(proposal.verHi)]);
+
+    if (categoryRef != null) {
+      mainQuery.where(proposal.metadata.isCategory(categoryRef));
+    }
+
+    final ids = await _getFilterTypeIds(type);
+
+    final include = ids.include;
+    if (include != null) {
+      final highs = include.map((e) => e.high);
+      final lows = include.map((e) => e.low);
+      mainQuery.where(
+        Expression.and([
+          proposal.idHi.isIn(highs),
+          proposal.idLo.isIn(lows),
+        ]),
+      );
+    }
+
+    final exclude = ids.exclude;
+    if (exclude != null) {
+      final highs = exclude.map((e) => e.high);
+      final lows = exclude.map((e) => e.low);
+
+      mainQuery.where(
+        Expression.and([
+          proposal.idHi.isNotIn(highs),
+          proposal.idLo.isNotIn(lows),
+        ]),
+      );
+    }
+
+    final proposals = await mainQuery
+        .map((row) => row.readTable(proposal))
+        .get()
+        .then((entities) => entities.map(_buildJoinedProposal).toList().wait);
+
+    return proposals;
+  }
 
   @override
   Future<Page<JoinedProposalEntity>> queryProposalsPage({
@@ -125,7 +205,7 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
     final proposals = await mainQuery
         .map((row) => row.readTable(proposal))
         .get()
-        .then((entities) => entities.map(_buildJoinedProposal).toList().wait);
+        .then((entities) => entities.map(_buildJoinedProposal).wait);
 
     final total = await watchCount(filters: filters.toCountFilters())
         .first
@@ -195,6 +275,26 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
     );
   }
 
+  Future<_IdsFilter> _excludeHiddenProposalsFilter() {
+    return _getProposalsLatestAction().then((value) {
+      return value
+          .where((e) => e.action.isHidden)
+          .map((e) => e.proposalRef.id)
+          .map(UuidHiLo.from);
+    }).then(_IdsFilter.exclude);
+  }
+
+  Future<_IdsFilter> _excludeNotDraftProposalsFilter() {
+    return _getProposalsLatestAction().then(
+      (value) {
+        return value
+            .where((element) => element.action.isNotDraft)
+            .map((e) => e.proposalRef.id)
+            .map(UuidHiLo.from);
+      },
+    ).then(_IdsFilter.exclude);
+  }
+
   Future<List<SignedDocumentRef>> _getAuthorProposalsLooseRefs({
     required CatalystId author,
   }) {
@@ -252,48 +352,16 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
   Future<_IdsFilter> _getFilterTypeIds(ProposalsFilterType type) {
     switch (type) {
       case ProposalsFilterType.total:
-        return _getProposalsLatestAction().then(
-          (value) {
-            return value
-                .where((element) => element.action.isHidden)
-                .map((e) => e.proposalRef.id)
-                .map(UuidHiLo.from);
-          },
-        ).then(_IdsFilter.exclude);
+        return _excludeHiddenProposalsFilter();
       case ProposalsFilterType.drafts:
-        return _getProposalsLatestAction().then(
-          (value) {
-            return value
-                .where((element) => element.action.isNotDraft)
-                .map((e) => e.proposalRef.id)
-                .map(UuidHiLo.from);
-          },
-        ).then(_IdsFilter.exclude);
+        return _excludeNotDraftProposalsFilter();
       case ProposalsFilterType.finals:
-        return _getProposalsLatestAction().then(
-          (value) {
-            return value
-                .where((element) => element.action.isFinal)
-                .map((e) => e.proposalRef.id)
-                .map(UuidHiLo.from);
-          },
-        ).then(_IdsFilter.include);
+        return _includeFinalProposalsFilter();
       case ProposalsFilterType.favorites:
-        return _getFavoritesRefs()
-            .then((value) => value.map((e) => e.id).map(UuidHiLo.from))
-            .then(_IdsFilter.include);
+        return _includeFavoriteRefsExcludingHiddenProposalsFilter();
       case ProposalsFilterType.my:
-        return Future.value(const _IdsFilter());
+        return _excludeHiddenProposalsFilter();
     }
-  }
-
-  Future<List<SignedDocumentRef>> _getFinalProposalsRefs() {
-    return _getProposalsLatestAction().then(
-      (value) => value
-          .where((element) => element.action.isFinal)
-          .map((e) => e.proposalRef)
-          .toList(),
-    );
   }
 
   Future<int> _getProposalCommentsCount(DocumentRef ref) {
@@ -452,6 +520,32 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
     }).get();
   }
 
+  Future<_IdsFilter> _includeFavoriteRefsExcludingHiddenProposalsFilter() {
+    return _getFavoritesRefs().then((favoriteRefs) {
+      return _getProposalsLatestAction().then((actions) async {
+        final hiddenProposalsIds = actions
+            .where((e) => e.action.isHidden)
+            .map((e) => e.proposalRef.id);
+
+        return favoriteRefs
+            .map((e) => e.id)
+            .whereNot(hiddenProposalsIds.contains)
+            .map(UuidHiLo.from);
+      });
+    }).then(_IdsFilter.include);
+  }
+
+  Future<_IdsFilter> _includeFinalProposalsFilter() {
+    return _getProposalsLatestAction().then(
+      (value) {
+        return value
+            .where((element) => element.action.isFinal)
+            .map((e) => e.proposalRef.id)
+            .map(UuidHiLo.from);
+      },
+    ).then(_IdsFilter.include);
+  }
+
   Future<List<SignedDocumentRef>> _maybeGetAuthorProposalsLooseRefs({
     CatalystId? author,
   }) {
@@ -491,17 +585,29 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
     CatalystId? author,
   }) async* {
     await for (final allRefs in source) {
-      final finalsRefs = await _getFinalProposalsRefs();
+      final latestActions = await _getProposalsLatestAction();
+      final hiddenRefs = latestActions
+          .where((element) => element.action.isHidden)
+          .map((e) => e.proposalRef);
+      final finalsRefs = latestActions
+          .where((element) => element.action.isFinal)
+          .map((e) => e.proposalRef);
+
       final favoritesRefs = await _getFavoritesRefs();
       final myRefs = await _maybeGetAuthorProposalsLooseRefs(author: author);
 
-      final total = allRefs.length;
-      final finals = allRefs.where(finalsRefs.contains).length;
+      final notHidden = allRefs
+          .where((ref) => hiddenRefs.none((myRef) => myRef.id == ref.id));
+
+      final total = notHidden.length;
+      final finals = notHidden
+          .where((ref) => finalsRefs.any((myRef) => myRef.id == ref.id))
+          .length;
       final drafts = total - finals;
-      final favorites = allRefs
+      final favorites = notHidden
           .where((ref) => favoritesRefs.any((fav) => fav.id == ref.id))
           .length;
-      final my = allRefs
+      final my = notHidden
           .where((ref) => myRefs.any((myRef) => myRef.id == ref.id))
           .length;
 
@@ -517,6 +623,11 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
 }
 
 abstract interface class ProposalsDao {
+  Future<List<JoinedProposalEntity>> queryProposals({
+    SignedDocumentRef? categoryRef,
+    required ProposalsFilterType type,
+  });
+
   Future<Page<JoinedProposalEntity>> queryProposalsPage({
     required PageRequest request,
     required ProposalsFilters filters,

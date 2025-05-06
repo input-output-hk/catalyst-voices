@@ -22,7 +22,7 @@ use crate::{
             },
             update_txo_spent::{UpdateTxoSpentQuery, UpdateTxoSpentQueryParams},
         },
-        session::CassandraSession,
+        session::{CassandraSession, CassandraSessionError},
     },
     service::common::{
         objects::cardano::{
@@ -30,11 +30,8 @@ use crate::{
             stake_info::{FullStakeInfo, StakeInfo, StakedTxoAssetInfo},
         },
         responses::WithErrorResponses,
-        types::{
-            cardano::{
-                asset_name::AssetName, cip19_stake_address::Cip19StakeAddress, slot_no::SlotNo,
-            },
-            headers::retry_after::RetryAfterOption,
+        types::cardano::{
+            asset_name::AssetName, cip19_stake_address::Cip19StakeAddress, slot_no::SlotNo,
         },
     },
     settings::Settings,
@@ -62,52 +59,11 @@ pub(crate) type AllResponses = WithErrorResponses<Responses>;
 pub(crate) async fn endpoint(
     stake_address: Cip19StakeAddress, provided_network: Option<Network>, slot_num: Option<SlotNo>,
 ) -> AllResponses {
-    if let Some(provided_network) = provided_network {
-        if cardano_blockchain_types::Network::from(provided_network) != Settings::cardano_network()
-        {
-            return Responses::NotFound.into();
-        }
+    match build_full_stake_info_response(stake_address, provided_network, slot_num).await {
+        Ok(None) => Responses::NotFound.into(),
+        Ok(Some(full_stake_info)) => Responses::Ok(Json(full_stake_info)).into(),
+        Err(err) => AllResponses::handle_error(&err),
     }
-
-    let (persistent_stake_info, txo_state) = {
-        let Some(persistent_session) = CassandraSession::get(true) else {
-            tracing::error!("Failed to acquire persistent db session");
-            return AllResponses::service_unavailable(
-                &anyhow::anyhow!("Failed to acquire db session"),
-                RetryAfterOption::Default,
-            );
-        };
-        let persistent_res =
-            calculate_stake_info(persistent_session, stake_address.clone(), slot_num, None).await;
-        match persistent_res {
-            Ok(Some((stake_info, txo_state))) => (stake_info, txo_state),
-            Ok(None) => return Responses::NotFound.into(),
-            Err(err) => return AllResponses::handle_error(&err),
-        }
-    };
-
-    let volatile_stake_info = {
-        let Some(volatile_session) = CassandraSession::get(false) else {
-            tracing::error!("Failed to acquire volatile db session");
-            return AllResponses::service_unavailable(
-                &anyhow::anyhow!("Failed to acquire volatile db session"),
-                RetryAfterOption::Default,
-            );
-        };
-        let volatile_res =
-            calculate_stake_info(volatile_session, stake_address, slot_num, Some(txo_state)).await;
-        match volatile_res {
-            Ok(Some((stake_info, _))) => stake_info,
-            Ok(None) => return Responses::NotFound.into(),
-            Err(err) => return AllResponses::handle_error(&err),
-        }
-    };
-
-    Responses::Ok(Json(FullStakeInfo {
-        volatile: volatile_stake_info.into(),
-        persistent: persistent_stake_info.into(),
-    }))
-    .into()
 }
 
 /// TXO asset information.
@@ -136,37 +92,75 @@ struct TxoInfo {
     spent_slot_no: Option<Slot>,
 }
 
-/// Calculate the stake info for a given stake address.
+/// Building a full stake info response from the provided arguments.
+async fn build_full_stake_info_response(
+    stake_address: Cip19StakeAddress, provided_network: Option<Network>, slot_num: Option<SlotNo>,
+) -> anyhow::Result<Option<FullStakeInfo>> {
+    if let Some(provided_network) = provided_network {
+        if cardano_blockchain_types::Network::from(provided_network) != Settings::cardano_network()
+        {
+            return Ok(None);
+        }
+    }
+    let persistent_session =
+        CassandraSession::get(true).ok_or(CassandraSessionError::FailedAcquiringSession)?;
+    let volatile_session =
+        CassandraSession::get(false).ok_or(CassandraSessionError::FailedAcquiringSession)?;
+    let adjusted_slot_num = slot_num.unwrap_or(SlotNo::MAXIMUM);
+
+    let persistent_txo_state = calculate_assets_state(
+        persistent_session,
+        stake_address.clone(),
+        adjusted_slot_num,
+        TxoAssetsState::default(),
+    )
+    .await?;
+
+    let volatile_txo_state = calculate_assets_state(
+        volatile_session,
+        stake_address.clone(),
+        adjusted_slot_num,
+        persistent_txo_state.clone(),
+    )
+    .await?;
+
+    if volatile_txo_state.is_empty() && persistent_txo_state.is_empty() {
+        return Ok(None);
+    }
+    let persistent_stake_info = build_stake_info(persistent_txo_state, adjusted_slot_num)?;
+
+    let volatile_stake_info = build_stake_info(volatile_txo_state, adjusted_slot_num)?;
+
+    Ok(Some(FullStakeInfo {
+        volatile: volatile_stake_info.into(),
+        persistent: persistent_stake_info.into(),
+    }))
+}
+
+/// Calculate the assets state info for a given stake address.
 ///
 /// This function also updates the spent column if it detects that a TXO was spent
 /// between lookups.
-async fn calculate_stake_info(
-    session: Arc<CassandraSession>, stake_address: Cip19StakeAddress, slot_num: Option<SlotNo>,
-    txo_base_state: Option<TxoAssetsState>,
-) -> anyhow::Result<Option<(StakeInfo, TxoAssetsState)>> {
+async fn calculate_assets_state(
+    session: Arc<CassandraSession>, stake_address: Cip19StakeAddress, slot_num: SlotNo,
+    mut txo_base_state: TxoAssetsState,
+) -> anyhow::Result<TxoAssetsState> {
     let address: StakeAddress = stake_address.try_into()?;
-    let adjusted_slot_num = slot_num.unwrap_or(SlotNo::MAXIMUM);
 
-    let (txos, txo_assets) = futures::try_join!(
-        get_txo(&session, &address, adjusted_slot_num),
-        get_txo_assets(&session, &address, adjusted_slot_num)
+    let (mut txos, txo_assets) = futures::try_join!(
+        get_txo(&session, &address, slot_num),
+        get_txo_assets(&session, &address, slot_num)
     )?;
 
-    let (mut txos, txo_assets) = if let Some(TxoAssetsState {
-        txos: base_txos,
-        txo_assets: base_assets,
-    }) = txo_base_state
-    {
-        // Extend the base state with current session data (used to calculate volatile data)
-        (
-            base_txos.into_iter().chain(txos).collect(),
-            base_assets.into_iter().chain(txo_assets).collect(),
-        )
-    } else {
-        (txos, txo_assets)
-    };
+    let params = update_spent(&session, &address, &mut txo_base_state.txos, &mut txos).await?;
 
-    let params = update_spent(&session, &address, &mut txos).await?;
+    // Extend the base state with current session data (used to calculate volatile data)
+    let txos = txo_base_state.txos.into_iter().chain(txos).collect();
+    let txo_assets: HashMap<_, _> = txo_base_state
+        .txo_assets
+        .into_iter()
+        .chain(txo_assets)
+        .collect();
 
     // Sets TXOs as spent in the database in the background.
     tokio::spawn(async move {
@@ -175,13 +169,7 @@ async fn calculate_stake_info(
         }
     });
 
-    if txos.is_empty() && txo_assets.is_empty() {
-        return Ok(None);
-    }
-
-    let stake_info = build_stake_info(txos.clone(), txo_assets.clone(), adjusted_slot_num)?;
-
-    Ok(Some((stake_info, TxoAssetsState { txos, txo_assets })))
+    Ok(TxoAssetsState { txos, txo_assets })
 }
 
 /// `TxoInfo` map type alias
@@ -220,11 +208,19 @@ async fn get_txo(
 type TxoAssetsMap = HashMap<(Slot, TxnIndex, i16), TxoAssetInfo>;
 
 /// TXO Assets state
+#[derive(Default, Clone)]
 struct TxoAssetsState {
     /// TXO Info map
     txos: TxoMap,
     /// TXO Assets map
     txo_assets: TxoAssetsMap,
+}
+
+impl TxoAssetsState {
+    /// Returns true if underlying `txos` and `txo_assets` are empty, false otherwise
+    fn is_empty(&self) -> bool {
+        self.txos.is_empty() && self.txo_assets.is_empty()
+    }
 }
 
 /// Returns a map of txo asset infos for the given stake address.
@@ -255,11 +251,17 @@ async fn get_txo_assets(
 }
 
 /// Checks if the given TXOs were spent and mark then as such.
+/// Separating `base_txos` and `txos` because we dont want to make an update inside the db
+/// for the `base_txos` data (it is covering the case when inside the persistent part we
+/// have a txo which is spent inside the volatile, so to not incorrectly mix up records
+/// from these two tables, inserting some rows from persistent to volatile section).
 async fn update_spent(
-    session: &CassandraSession, stake_address: &StakeAddress, txos: &mut TxoMap,
+    session: &CassandraSession, stake_address: &StakeAddress, base_txos: &mut TxoMap,
+    txos: &mut TxoMap,
 ) -> anyhow::Result<Vec<UpdateTxoSpentQueryParams>> {
     let txn_hashes = txos
         .iter()
+        .chain(base_txos.iter())
         .filter(|(_, txo)| txo.spent_slot_no.is_none())
         .map(|((tx_id, _), _)| *tx_id)
         .collect::<HashSet<_>>()
@@ -288,6 +290,9 @@ async fn update_spent(
 
                 txo_info.spent_slot_no = Some(row.slot_no.into());
             }
+            if let Some(txo_info) = base_txos.get_mut(&key) {
+                txo_info.spent_slot_no = Some(row.slot_no.into());
+            }
         }
     }
 
@@ -295,12 +300,10 @@ async fn update_spent(
 }
 
 /// Builds an instance of [`StakeInfo`] based on the TXOs given.
-fn build_stake_info(
-    txos: TxoMap, mut tokens: TxoAssetsMap, slot_num: SlotNo,
-) -> anyhow::Result<StakeInfo> {
+fn build_stake_info(mut txo_state: TxoAssetsState, slot_num: SlotNo) -> anyhow::Result<StakeInfo> {
     let slot_num = slot_num.into();
     let mut stake_info = StakeInfo::default();
-    for txo_info in txos.into_values() {
+    for txo_info in txo_state.txos.into_values() {
         // Filter out spent TXOs.
         if let Some(spent_slot) = txo_info.spent_slot_no {
             if spent_slot <= slot_num {
@@ -321,7 +324,7 @@ fn build_stake_info(
             .into();
 
         let key = (txo_info.slot_no, txo_info.txn_index, txo_info.txo);
-        if let Some(native_token) = tokens.remove(&key) {
+        if let Some(native_token) = txo_state.txo_assets.remove(&key) {
             match native_token.amount.try_into() {
                 Ok(amount) => {
                     stake_info.assets.push(StakedTxoAssetInfo {

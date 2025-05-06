@@ -33,14 +33,16 @@ final class WorkspaceState extends Equatable {
         userProposals,
         timelineItems,
       ];
+
   List<Proposal> get published => userProposals
       .where(
         (e) => (e.publish.isPublished || e.publish.isDraft),
       )
       .toList();
+
   bool get showError => error != null && !isLoading;
-  bool get showLoading => isLoading;
   bool get showProposals => error == null;
+
   DateTime? get submissionCloseDate => timelineItems
       .firstWhereOrNull(
         (e) => e.stage == CampaignTimelineStage.proposalSubmission,
@@ -51,12 +53,7 @@ final class WorkspaceState extends Equatable {
   int get totalPublishedProposals => published.length;
 
   WorkspaceState copyWith({
-    WorkspaceTabType? tab,
     bool? isLoading,
-    int? draftProposalCount,
-    int? finalProposalCount,
-    String? searchQuery,
-    List<WorkspaceProposalListItem>? proposals,
     Optional<LocalizedException>? error,
     List<Proposal>? userProposals,
     List<CampaignTimelineViewModel>? timelineItems,

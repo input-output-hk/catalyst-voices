@@ -227,12 +227,13 @@ class _ShareItem extends StatelessWidget with LaunchUrlMixin {
   }
 
   Future<void> _webShareItem(BuildContext context) async {
-    final url = '${Uri.base.host}:${Uri.base.port}$shareUrl';
+    final link = Uri.base.replace(path: shareUrl).toString();
+
     if (shareType == ShareType.clipboard) {
       _showSnackbar(context);
-      return Clipboard.setData(ClipboardData(text: url));
+      return Clipboard.setData(ClipboardData(text: link));
     } else {
-      await launchUri(shareType.shareUrl(shareMessage, url).getUri());
+      await launchUri(shareType.shareUrl(shareMessage, link).getUri());
     }
   }
 }
