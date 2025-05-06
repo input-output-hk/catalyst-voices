@@ -234,7 +234,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
 
   @override
   Future<List<TypedDocumentRef>> getAllDocumentsRefs() async {
-    final allRefs = await _remoteDocuments.index();
+    final allRefs = await _remoteDocuments.index().then(_uniqueTypedRefs);
     final allConstRefs = constantDocumentsRefs.expand((element) => element.all);
 
     final nonConstRefs = allRefs
@@ -630,6 +630,22 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     }
 
     return [];
+  }
+
+  List<TypedDocumentRef> _uniqueTypedRefs(List<TypedDocumentRef> refs) {
+    final uniqueRefs = <DocumentRef, TypedDocumentRef>{};
+
+    for (final ref in refs) {
+      uniqueRefs.update(
+        ref.ref,
+        // While indexing we don't know what is type of "ref" or "reply".
+        // Here we're trying to eliminate duplicates with unknown type.
+        (value) => value.type != DocumentType.unknown ? value : ref,
+        ifAbsent: () => ref,
+      );
+    }
+
+    return uniqueRefs.values.toList();
   }
 
   Stream<DocumentData?> _watchDocumentData({
