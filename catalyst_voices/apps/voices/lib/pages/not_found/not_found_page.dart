@@ -71,8 +71,8 @@ class _Image extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.sizeOf(context).width;
-    final minImageWidth = max(300, screenWidth * 0.2);
-    final maxImageWidth = min(500, screenWidth * 0.9);
+    final minImageWidth = min(300, screenWidth * 0.0);
+    const maxImageWidth = 500;
     final preferredImageWidth = screenWidth * 0.6;
 
     final imageWidth = preferredImageWidth.clamp(
@@ -81,12 +81,10 @@ class _Image extends StatelessWidget {
     );
 
     return Center(
-      child: SizedBox(
+      child: CatalystImage.asset(
+        VoicesAssets.images.notFound404.path,
         width: imageWidth.toDouble(),
-        child: CatalystImage.asset(
-          VoicesAssets.images.notFound404.path,
-          fit: BoxFit.cover,
-        ),
+        fit: BoxFit.cover,
       ),
     );
   }
