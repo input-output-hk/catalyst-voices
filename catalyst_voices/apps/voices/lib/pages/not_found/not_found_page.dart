@@ -75,9 +75,9 @@ class _Image extends StatelessWidget {
     final maxImageWidth = min(500, screenWidth * 0.9);
     final preferredImageWidth = screenWidth * 0.6;
 
-    final imageWidth = max(
-      min(preferredImageWidth, maxImageWidth),
+    final imageWidth = preferredImageWidth.clamp(
       minImageWidth,
+      maxImageWidth,
     );
 
     return Center(
