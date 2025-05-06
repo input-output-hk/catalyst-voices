@@ -5,6 +5,7 @@ import 'package:catalyst_voices_repositories/src/common/response_mapper.dart';
 import 'package:catalyst_voices_repositories/src/document/document_data_factory.dart';
 import 'package:catalyst_voices_repositories/src/dto/api/document_index_list_dto.dart';
 import 'package:catalyst_voices_repositories/src/dto/api/document_index_query_filters_dto.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 
 final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
@@ -34,6 +35,15 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
 
   @override
   Future<String?> getLatestVersion(String id) async {
+    final constVersion = constantDocumentsRefs
+        .expand((element) => element.all)
+        .firstWhereOrNull((element) => element.id == id)
+        ?.version;
+
+    if (constVersion != null) {
+      return constVersion;
+    }
+
     try {
       final index = await _api.gateway
           .apiV1DocumentIndexPost(
