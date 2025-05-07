@@ -80,14 +80,19 @@ final class CategoryTemplatesRefs extends Equatable {
     required this.comment,
   });
 
+  Iterable<SignedDocumentRef> get all => [category, proposal, comment];
+
+  Iterable<TypedDocumentRef> get allTyped {
+    return [
+      TypedDocumentRef(
+        ref: category,
+        type: DocumentType.categoryParametersDocument,
+      ),
+      TypedDocumentRef(ref: proposal, type: DocumentType.proposalTemplate),
+      TypedDocumentRef(ref: comment, type: DocumentType.commentTemplate),
+    ];
+  }
+
   @override
   List<Object?> get props => [category, proposal, comment];
-}
-
-extension on CategoryTemplatesRefs {
-  Iterable<SignedDocumentRef> get all => [category, proposal, comment];
-}
-
-extension CategoryTemplatesRefsListExt on List<CategoryTemplatesRefs> {
-  Iterable<SignedDocumentRef> get all => expand((element) => element.all);
 }
