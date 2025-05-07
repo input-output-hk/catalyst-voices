@@ -1,9 +1,11 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/pages/proposal/widget/proposal_version.dart';
+import 'package:catalyst_voices/routes/routes.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class ProposalNavigationControls extends StatelessWidget {
   final VoidCallback onToggleTap;
@@ -40,6 +42,14 @@ class _BackButton extends StatelessWidget {
     return NavigationBack(
       label: context.l10n.backToList,
       isCompact: isCompact,
+      onTap: () {
+        final router = GoRouter.of(context);
+        if (router.canPop()) {
+          router.pop();
+        } else {
+          const ProposalsRoute().go(context);
+        }
+      },
     );
   }
 }
