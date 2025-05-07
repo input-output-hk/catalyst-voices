@@ -37,8 +37,8 @@ final class DatabaseDraftsDataSource implements DraftDataSource {
   }
 
   @override
-  Future<List<DraftRef>> index() {
-    return _database.draftsDao.queryAllRefs();
+  Future<List<TypedDocumentRef>> index() {
+    return _database.draftsDao.queryAllTypedRefs();
   }
 
   @override
