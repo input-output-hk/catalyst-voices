@@ -1,6 +1,6 @@
 //! Cardano Staking API Endpoints.
 
-use assets_get::{get_stake_address_from_cat_id, AllResponses, Responses};
+use assets_get::{get_stake_address_from_cat_id, Responses};
 use poem_openapi::{param::Query, OpenApi};
 use tracing::debug;
 
@@ -56,7 +56,10 @@ impl Api {
                 if let NoneOrRBAC::RBAC(token) = auth {
                     match get_stake_address_from_cat_id(token.into()).await {
                         Ok(addr) => addr,
-                        Err(err) => return AllResponses::handle_error(&err),
+                        Err(err) => {
+                            debug!("Cannot obtain stake addr from cat id {err}");
+                            return Responses::NotFound.into();
+                        },
                     }
                 } else {
                     debug!("No Stake address or RBAC token present");
