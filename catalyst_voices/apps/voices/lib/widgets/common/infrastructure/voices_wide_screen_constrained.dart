@@ -35,7 +35,7 @@ class VoicesWideScreenConstrained extends StatelessWidget {
   }
 }
 
-extension ConstrainedSliverListExtension on List<Widget> {
+extension ConstrainedListExtension on List<Widget> {
   List<Widget> constrainedDelegate({
     double maxWidth = 1440,
     List<Type> excludeTypes = const [],
