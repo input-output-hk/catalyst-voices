@@ -68,7 +68,7 @@ impl Api {
     #[oai(
         path = "/v2/cardano/assets/",
         method = "get",
-        operation_id = "stakedAssetsGet",
+        operation_id = "stakedAssetsGetv2",
         transform = "schema_version_validation"
     )]
     async fn staked_ada_get_v2(
