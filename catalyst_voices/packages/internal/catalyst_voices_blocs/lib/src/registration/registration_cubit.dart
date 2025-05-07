@@ -172,9 +172,10 @@ final class RegistrationCubit extends Cubit<RegistrationState>
         ),
       );
 
+      _progressNotifier.clear();
       nextStep();
     } on RegistrationException catch (error, stack) {
-      _logger.severe('Submit registration', error, stack);
+      _logger.severe('Submit registration failed', error, stack);
 
       final exception = LocalizedRegistrationException.from(error);
 
@@ -185,7 +186,7 @@ final class RegistrationCubit extends Cubit<RegistrationState>
         ),
       );
     } catch (error, stack) {
-      _logger.severe('Submit registration', error, stack);
+      _logger.severe('Submit registration failed', error, stack);
 
       const exception = LocalizedRegistrationUnknownException();
 
