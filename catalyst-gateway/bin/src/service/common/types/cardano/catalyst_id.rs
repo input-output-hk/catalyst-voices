@@ -5,7 +5,6 @@
 use std::{borrow::Cow, sync::LazyLock};
 
 use anyhow::Context;
-use catalyst_types::id_uri::IdUri;
 use ed25519_dalek::SigningKey;
 use poem_openapi::{
     registry::{MetaSchema, MetaSchemaRef},
@@ -33,11 +32,11 @@ static SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| {
 
 /// A Catalyst short identifier.
 #[derive(Debug, Clone, PartialEq, Hash)]
-pub(crate) struct CatalystId(IdUri);
+pub(crate) struct CatalystId(catalyst_types::catalyst_id::CatalystId);
 
 impl Type for CatalystId {
-    type RawElementValueType = IdUri;
-    type RawValueType = IdUri;
+    type RawElementValueType = catalyst_types::catalyst_id::CatalystId;
+    type RawValueType = catalyst_types::catalyst_id::CatalystId;
 
     const IS_REQUIRED: bool = true;
 
@@ -61,13 +60,13 @@ impl Type for CatalystId {
     }
 }
 
-impl From<IdUri> for CatalystId {
-    fn from(value: IdUri) -> Self {
+impl From<catalyst_types::catalyst_id::CatalystId> for CatalystId {
+    fn from(value: catalyst_types::catalyst_id::CatalystId) -> Self {
         Self(value.as_short_id())
     }
 }
 
-impl From<CatalystId> for IdUri {
+impl From<CatalystId> for catalyst_types::catalyst_id::CatalystId {
     fn from(value: CatalystId) -> Self {
         value.0
     }
@@ -80,7 +79,7 @@ impl TryFrom<&str> for CatalystId {
         value
             .parse()
             .context("Invalid Catalyst ID")
-            .map(|id: IdUri| Self(id.as_short_id()))
+            .map(|id: catalyst_types::catalyst_id::CatalystId| Self(id.as_short_id()))
     }
 }
 
@@ -114,7 +113,7 @@ impl Example for CatalystId {
             105, 123, 50, 105, 25, 112, 59, 172, 3, 28, 174, 127, 96,
         ];
         let signing_key = &SigningKey::from_bytes(&secret_key_bytes);
-        IdUri::new("cardano", Some("preprod"), signing_key.into())
+        catalyst_types::catalyst_id::CatalystId::new("cardano", Some("preprod"), signing_key.into())
             .as_id()
             .into()
     }

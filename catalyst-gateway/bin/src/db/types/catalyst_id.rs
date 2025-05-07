@@ -1,6 +1,6 @@
 //! A `IdUri` wrapper that can be stored to and load from a database.
 
-use catalyst_types::id_uri::IdUri;
+use catalyst_types::catalyst_id::CatalystId;
 use scylla::_macro_internal::{
     CellWriter, ColumnType, DeserializationError, DeserializeValue, FrameSlice, SerializationError,
     SerializeValue, TypeCheckError, WrittenCellProof,
@@ -9,15 +9,15 @@ use scylla::_macro_internal::{
 /// A `IdUri` wrapper that can be stored to and load from a database.
 #[allow(clippy::module_name_repetitions)]
 #[derive(Debug, Clone, PartialEq, Hash)]
-pub struct DbCatalystId(IdUri);
+pub struct DbCatalystId(CatalystId);
 
-impl From<IdUri> for DbCatalystId {
-    fn from(value: IdUri) -> Self {
+impl From<CatalystId> for DbCatalystId {
+    fn from(value: CatalystId) -> Self {
         Self(value)
     }
 }
 
-impl From<DbCatalystId> for IdUri {
+impl From<DbCatalystId> for CatalystId {
     fn from(value: DbCatalystId) -> Self {
         value.0
     }
@@ -40,7 +40,7 @@ impl<'frame, 'metadata> DeserializeValue<'frame, 'metadata> for DbCatalystId {
         typ: &'metadata ColumnType<'metadata>, v: Option<FrameSlice<'frame>>,
     ) -> Result<Self, DeserializationError> {
         let id = String::deserialize(typ, v)?;
-        let id: IdUri = id.parse().map_err(DeserializationError::new)?;
+        let id: CatalystId = id.parse().map_err(DeserializationError::new)?;
         Ok(Self(id))
     }
 }
