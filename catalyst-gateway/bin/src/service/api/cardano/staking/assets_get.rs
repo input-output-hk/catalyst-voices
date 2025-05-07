@@ -12,19 +12,25 @@ use tracing::debug;
 
 use crate::{
     db::index::{
-        queries::staked_ada::{
-            get_assets_by_stake_address::{
-                GetAssetsByStakeAddressParams, GetAssetsByStakeAddressQuery,
+        queries::{
+            rbac::get_stake_address_from_catalyst_id::{
+                GetStakeAddressByCatIDParams, GetStakeAddressByCatIDQuery,
             },
-            get_txi_by_txn_hash::{GetTxiByTxnHashesQuery, GetTxiByTxnHashesQueryParams},
-            get_txo_by_stake_address::{
-                GetTxoByStakeAddressQuery, GetTxoByStakeAddressQueryParams,
+            staked_ada::{
+                get_assets_by_stake_address::{
+                    GetAssetsByStakeAddressParams, GetAssetsByStakeAddressQuery,
+                },
+                get_txi_by_txn_hash::{GetTxiByTxnHashesQuery, GetTxiByTxnHashesQueryParams},
+                get_txo_by_stake_address::{
+                    GetTxoByStakeAddressQuery, GetTxoByStakeAddressQueryParams,
+                },
+                update_txo_spent::{UpdateTxoSpentQuery, UpdateTxoSpentQueryParams},
             },
-            update_txo_spent::{UpdateTxoSpentQuery, UpdateTxoSpentQueryParams},
         },
         session::{CassandraSession, CassandraSessionError},
     },
     service::common::{
+        auth::rbac::token::CatalystRBACTokenV1,
         objects::cardano::{
             network::Network,
             stake_info::{FullStakeInfo, StakeInfo, StakedTxoAssetInfo},
@@ -346,4 +352,26 @@ fn build_stake_info(mut txo_state: TxoAssetsState, slot_num: SlotNo) -> anyhow::
     }
 
     Ok(stake_info)
+}
+
+/// Retrieves the CIP-19 stake address associated with a given Catalyst RBAC token.
+pub async fn get_stake_address_from_cat_id(
+    token: CatalystRBACTokenV1,
+) -> anyhow::Result<Cip19StakeAddress> {
+    let session =
+        CassandraSession::get(true).ok_or(CassandraSessionError::FailedAcquiringSession)?;
+
+    let mut results = GetStakeAddressByCatIDQuery::execute(
+        &session,
+        GetStakeAddressByCatIDParams::new(token.catalyst_id().clone().into()),
+    )
+    .await?;
+
+    let stake_address = results
+        .try_next()
+        .await?
+        .ok_or_else(|| anyhow::anyhow!("No stake address found"))?
+        .stake_address;
+
+    Cip19StakeAddress::try_from(stake_address.to_string())
 }

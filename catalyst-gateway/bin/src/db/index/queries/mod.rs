@@ -12,6 +12,7 @@ use std::{fmt::Debug, sync::Arc};
 
 use anyhow::bail;
 use crossbeam_skiplist::SkipMap;
+use rbac::get_stake_address_from_catalyst_id;
 use registrations::{
     get_all_invalids::GetAllInvalidRegistrationsQuery,
     get_all_registrations::GetAllRegistrationsQuery, get_from_stake_addr::GetRegistrationQuery,
@@ -99,6 +100,8 @@ pub(crate) enum PreparedSelectQuery {
     CatalystIdByTransactionId,
     /// Get Catalyst ID by stake address.
     CatalystIdByStakeAddress,
+    /// Get stake address by Catalyst ID .
+    StakeAddressByCatalystId,
     /// Get RBAC registrations by Catalyst ID.
     RbacRegistrationsByCatalystId,
     /// Get invalid RBAC registrations by Catalyst ID.
@@ -164,6 +167,8 @@ pub(crate) struct PreparedQueries {
     sync_status_insert: PreparedStatement,
     /// Get Catalyst ID by stake address.
     catalyst_id_by_stake_address_query: PreparedStatement,
+    /// Get stake address by Catalyst ID.
+    stake_address_by_catalyst_id_query: PreparedStatement,
     /// Get Catalyst ID by transaction ID.
     catalyst_id_by_transaction_id_query: PreparedStatement,
     /// Get RBAC registrations by Catalyst ID.
@@ -211,6 +216,11 @@ impl PreparedQueries {
         let sync_status_insert = SyncStatusInsertQuery::prepare(session.clone()).await?;
         let catalyst_id_by_stake_address_query =
             get_catalyst_id_from_stake_address::Query::prepare(session.clone()).await?;
+        let stake_address_by_catalyst_id_query =
+            get_stake_address_from_catalyst_id::GetStakeAddressByCatIDQuery::prepare(
+                session.clone(),
+            )
+            .await?;
         let catalyst_id_by_transaction_id_query =
             get_catalyst_id_from_transaction_id::Query::prepare(session.clone()).await?;
         let rbac_registrations_by_catalyst_id_query =
@@ -267,6 +277,7 @@ impl PreparedQueries {
             catalyst_id_by_transaction_id_query,
             get_all_registrations_query: get_all_registrations_query?,
             get_all_invalid_registrations_query: get_all_invalid_registrations_query?,
+            stake_address_by_catalyst_id_query,
         })
     }
 
@@ -369,6 +380,9 @@ impl PreparedQueries {
             PreparedSelectQuery::GetAllRegistrations => &self.get_all_registrations_query,
             PreparedSelectQuery::GetAllInvalidRegistrations => {
                 &self.get_all_invalid_registrations_query
+            },
+            PreparedSelectQuery::StakeAddressByCatalystId => {
+                &self.stake_address_by_catalyst_id_query
             },
         };
         session_execute_iter(session, prepared_stmt, params).await
