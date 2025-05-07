@@ -193,18 +193,19 @@ async fn get_txo(
 
     let txo_map = txos_stream
         .map_err(Into::<anyhow::Error>::into)
-        .try_fold(HashMap::new(), |mut txo_map, row| {
-            async move {
-                let key = (row.txn_id.into(), row.txo.into());
-                txo_map.insert(key, TxoInfo {
+        .try_fold(HashMap::new(), |mut txo_map, row| async move {
+            let key = (row.txn_id.into(), row.txo.into());
+            txo_map.insert(
+                key,
+                TxoInfo {
                     value: row.value,
                     txn_index: row.txn_index.into(),
                     txo: row.txo.into(),
                     slot_no: row.slot_no.into(),
                     spent_slot_no: row.spent_slot.map(Into::into),
-                });
-                Ok(txo_map)
-            }
+                },
+            );
+            Ok(txo_map)
         })
         .await?;
     Ok(txo_map)
@@ -241,16 +242,17 @@ async fn get_txo_assets(
 
     let tokens_map = assets_txos_stream
         .map_err(Into::<anyhow::Error>::into)
-        .try_fold(HashMap::new(), |mut tokens_map, row| {
-            async move {
-                let key = (row.slot_no.into(), row.txn_index.into(), row.txo.into());
-                tokens_map.insert(key, TxoAssetInfo {
+        .try_fold(HashMap::new(), |mut tokens_map, row| async move {
+            let key = (row.slot_no.into(), row.txn_index.into(), row.txo.into());
+            tokens_map.insert(
+                key,
+                TxoAssetInfo {
                     id: row.policy_id,
                     name: row.asset_name.into(),
                     amount: row.value,
-                });
-                Ok(tokens_map)
-            }
+                },
+            );
+            Ok(tokens_map)
         })
         .await?;
     Ok(tokens_map)
@@ -358,11 +360,11 @@ fn build_stake_info(mut txo_state: TxoAssetsState, slot_num: SlotNo) -> anyhow::
 pub async fn get_stake_address_from_cat_id(
     token: CatalystRBACTokenV1,
 ) -> anyhow::Result<Cip19StakeAddress> {
-    let session =
-        CassandraSession::get(true).ok_or(CassandraSessionError::FailedAcquiringSession)?;
+    let volatile_session =
+        CassandraSession::get(false).ok_or(CassandraSessionError::FailedAcquiringSession)?;
 
     let mut results = GetStakeAddressByCatIDQuery::execute(
-        &session,
+        &volatile_session,
         GetStakeAddressByCatIDParams::new(token.catalyst_id().clone().into()),
     )
     .await?;
