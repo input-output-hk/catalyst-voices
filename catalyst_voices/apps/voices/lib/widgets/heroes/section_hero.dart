@@ -1,20 +1,21 @@
 import 'dart:async';
 
+import 'package:catalyst_voices/app/view/app_precache_image_assets.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
 class HeroSection extends StatefulWidget {
   final AlignmentGeometry alignment;
-  final Widget child;
   final String asset;
   final String? assetPackageName;
+  final Widget child;
 
   const HeroSection({
     super.key,
     this.alignment = Alignment.bottomLeft,
-    required this.child,
     required this.asset,
     this.assetPackageName,
+    required this.child,
   });
 
   @override
@@ -55,10 +56,11 @@ class _HeroSectionState extends State<HeroSection>
 
   VideoPlayerController get _effectiveController {
     return _controller ??
-        (_controller ??= VideoPlayerController.asset(
+        AssetsPrecacheService.instance.getVideoController(widget.asset) ??
+        VideoPlayerController.asset(
           widget.asset,
           package: widget.assetPackageName,
-        ));
+        );
   }
 
   @override
@@ -100,10 +102,13 @@ class _HeroSectionState extends State<HeroSection>
   @override
   void initState() {
     super.initState();
-    _controller = VideoPlayerController.asset(
-      widget.asset,
-      package: widget.assetPackageName,
-    );
+    _controller =
+        AssetsPrecacheService.instance.getVideoController(widget.asset) ??
+            VideoPlayerController.asset(
+              widget.asset,
+              package: widget.assetPackageName,
+            );
+
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (mounted) {
         await _initalizedVideoPlayer();

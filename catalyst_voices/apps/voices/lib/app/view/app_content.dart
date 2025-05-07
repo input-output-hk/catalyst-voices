@@ -72,7 +72,7 @@ final class _AppContent extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       builder: (_, child) {
         return AppActiveStateListener(
-          child: GlobalPrecacheImages(
+          child: GlobalPrecacheAssets(
             child: GlobalSessionListener(
               // IMPORTANT: AppSplashScreenManager must be placed above all
               // widgets that render visible UI elements. Any widget that
