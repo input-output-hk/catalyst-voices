@@ -358,20 +358,40 @@ fn build_stake_info(mut txo_state: TxoAssetsState, slot_num: SlotNo) -> anyhow::
 pub async fn get_stake_address_from_cat_id(
     token: CatalystRBACTokenV1,
 ) -> anyhow::Result<Cip19StakeAddress> {
+    // Attempt to acquire sessions
     let volatile_session =
         CassandraSession::get(false).ok_or(CassandraSessionError::FailedAcquiringSession)?;
+    let persistent_session =
+        CassandraSession::get(true).ok_or(CassandraSessionError::FailedAcquiringSession)?;
 
-    let mut results = GetStakeAddressByCatIDQuery::execute(
-        &volatile_session,
-        GetStakeAddressByCatIDParams::new(token.catalyst_id().clone().into()),
-    )
-    .await?;
-
-    let stake_address = results
-        .try_next()
-        .await?
-        .ok_or_else(|| anyhow::anyhow!("No stake address found"))?
-        .stake_address;
+    // Try getting the stake address from the volatile session
+    let stake_address = match get_stake_address_for_token(token.clone(), volatile_session).await {
+        Ok(address) => address,
+        Err(_) => {
+            match get_stake_address_for_token(token, persistent_session).await {
+                Ok(address) => address,
+                Err(_) => {
+                    return Err(anyhow::anyhow!(
+                        "Cannot get stake addr from volatile or persistent session"
+                    ))
+                },
+            }
+        },
+    };
 
     Cip19StakeAddress::try_from(stake_address.to_string())
+}
+
+/// Fetches the stake address for a given Catalyst token.
+async fn get_stake_address_for_token(
+    token: CatalystRBACTokenV1, session: Arc<CassandraSession>,
+) -> Result<crate::db::types::DbStakeAddress, anyhow::Error> {
+    let params = GetStakeAddressByCatIDParams::new(token.catalyst_id().clone().into());
+    let mut results = GetStakeAddressByCatIDQuery::execute(&session, params).await?;
+
+    results
+        .try_next()
+        .await?
+        .map(|row| row.stake_address)
+        .ok_or_else(|| anyhow::anyhow!("No stake address found"))
 }
