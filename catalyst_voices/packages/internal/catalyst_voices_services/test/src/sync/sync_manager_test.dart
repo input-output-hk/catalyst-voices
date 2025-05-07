@@ -33,9 +33,10 @@ void main() {
       // Given
       final allRefs = List.generate(
         10,
-        (_) => SignedDocumentRef.first(const Uuid().v7()),
+        (_) => SignedDocumentRef.first(const Uuid().v7())
+            .toTyped(DocumentType.proposalDocument),
       );
-      final cachedRefs = <SignedDocumentRef>[];
+      final cachedRefs = <TypedDocumentRef>[];
 
       // When
       when(documentRepository.getAllDocumentsRefs)

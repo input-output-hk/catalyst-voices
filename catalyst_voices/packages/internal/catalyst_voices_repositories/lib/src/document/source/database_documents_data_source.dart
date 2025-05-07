@@ -73,8 +73,8 @@ final class DatabaseDocumentsDataSource
   }
 
   @override
-  Future<List<DocumentRef>> index() {
-    return _database.documentsDao.queryAllRefs();
+  Future<List<TypedDocumentRef>> index() {
+    return _database.documentsDao.queryAllTypedRefs();
   }
 
   @override
