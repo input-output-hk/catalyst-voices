@@ -27,7 +27,7 @@ pub(crate) struct GetStakeAddressByCatIDParams {
 }
 
 impl GetStakeAddressByCatIDParams {
-    /// Creates a new [`GetAssetsByStakeAddressParams`].
+    /// Creates a new [`GetStakeAddressByCatIDParams`].
     pub(crate) fn new(catalyst_id: DbCatalystId) -> Self {
         Self { catalyst_id }
     }
