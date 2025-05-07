@@ -54,7 +54,7 @@ Future<BootstrapArgs> bootstrap({
 
   // Observer is very noisy on Logger. Enable it only if you want to debug
   // something
-  Bloc.observer = AppBlocObserver(enabledOnChange: false);
+  Bloc.observer = AppBlocObserver(logOnChange: false);
 
   Dependencies.instance.get<SyncManager>().start().ignore();
 

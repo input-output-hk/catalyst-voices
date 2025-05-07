@@ -3,10 +3,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 final class AppBlocObserver extends BlocObserver {
   final _logger = Logger('AppBlocObserver');
-  final bool enabledOnChange;
+  final bool logOnChange;
 
   AppBlocObserver({
-    this.enabledOnChange = true,
+    this.logOnChange = true,
   });
 
   @override
@@ -15,7 +15,7 @@ final class AppBlocObserver extends BlocObserver {
     Change<dynamic> change,
   ) {
     super.onChange(bloc, change);
-    if (enabledOnChange) {
+    if (logOnChange) {
       _logger.finest('onChange(${bloc.runtimeType}, $change)');
     }
   }

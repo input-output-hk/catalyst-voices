@@ -80,7 +80,7 @@ final class DocumentsServiceImpl implements DocumentsService {
     );
 
     /// Prioritize documents synchronization because
-    /// some documents depend on other already beaning available.
+    /// some documents depend on other already being available.
     ///
     /// One such case is Proposal and Template or Action.
     for (final group in prioritizedMissingRefs) {
