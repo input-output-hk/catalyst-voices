@@ -2,7 +2,7 @@
 
 use std::collections::HashMap;
 
-use catalyst_types::id_uri::role_index::RoleId;
+use catalyst_types::catalyst_id::role_index::RoleId;
 use poem_openapi::{types::Example, Object};
 
 use crate::service::{

@@ -19,7 +19,7 @@ mod unprocessable_content;
 
 use anyhow::{anyhow, Context};
 use cardano_blockchain_types::StakeAddress;
-use catalyst_types::id_uri::IdUri;
+use catalyst_types::catalyst_id::CatalystId;
 use futures::{TryFutureExt, TryStreamExt};
 use poem_openapi::payload::Json;
 use tracing::error;
@@ -109,7 +109,7 @@ pub(crate) async fn endpoint(
 /// Returns a Catalyst ID for the given stake address.
 async fn catalyst_id_from_stake(
     session: &CassandraSession, address: StakeAddress,
-) -> anyhow::Result<Option<IdUri>> {
+) -> anyhow::Result<Option<CatalystId>> {
     let mut result: Vec<_> = Query::execute(session, QueryParams {
         stake_address: address.into(),
     })

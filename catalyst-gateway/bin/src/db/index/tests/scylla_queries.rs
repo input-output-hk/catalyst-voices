@@ -4,7 +4,7 @@
 // cSpell:ignoreRegExp cardano/Fftx
 
 use cardano_blockchain_types::TransactionId;
-use catalyst_types::id_uri::IdUri;
+use catalyst_types::catalyst_id::CatalystId;
 use futures::StreamExt;
 
 use super::*;
@@ -113,7 +113,7 @@ async fn get_rbac_registrations_by_catalyst_id() {
         panic!("{SESSION_ERR_MSG}");
     };
 
-    let id: IdUri = "cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE"
+    let id: CatalystId = "cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE"
         .parse()
         .unwrap();
     let mut row_stream = Query::execute(&session, QueryParams {
@@ -136,7 +136,7 @@ async fn get_rbac_invalid_registrations_by_catalyst_id() {
         panic!("{SESSION_ERR_MSG}");
     };
 
-    let id: IdUri = "cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE"
+    let id: CatalystId = "cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE"
         .parse()
         .unwrap();
     let mut row_stream = Query::execute(&session, QueryParams {

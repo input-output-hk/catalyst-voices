@@ -2,7 +2,7 @@
 
 use std::{collections::HashMap, sync::LazyLock};
 
-use catalyst_types::id_uri::role_index::RoleId;
+use catalyst_types::catalyst_id::role_index::RoleId;
 use poem_openapi::{
     registry::{MetaSchema, MetaSchemaRef},
     types::{Example, ParseError, ParseFromJSON, ParseResult, ToJSON, Type},

@@ -11,7 +11,7 @@ use anyhow::{bail, Context};
 use cardano_blockchain_types::{
     Cip0134Uri, MultiEraBlock, Slot, StakeAddress, TransactionId, TxnIndex,
 };
-use catalyst_types::id_uri::IdUri;
+use catalyst_types::catalyst_id::CatalystId;
 use pallas::ledger::addresses::Address;
 use rbac_registration::cardano::cip509::{Cip509, Cip509RbacMetadata};
 use scylla::Session;
@@ -214,7 +214,7 @@ impl Rbac509InsertQuery {
 async fn catalyst_id(
     session: &Arc<CassandraSession>, cip509: &Cip509, txn_id: TransactionId, slot: Slot,
     index: TxnIndex, is_immutable: bool,
-) -> anyhow::Result<IdUri> {
+) -> anyhow::Result<CatalystId> {
     use crate::db::index::queries::rbac::get_catalyst_id_from_transaction_id::cache_for_transaction_id;
 
     let id = match cip509.previous_transaction() {
@@ -235,7 +235,7 @@ async fn catalyst_id(
 /// Queries a Catalyst ID from the database by the given transaction ID.
 async fn query_catalyst_id(
     session: &Arc<CassandraSession>, txn_id: TransactionId, is_immutable: bool,
-) -> anyhow::Result<IdUri> {
+) -> anyhow::Result<CatalystId> {
     use crate::db::index::queries::rbac::get_catalyst_id_from_transaction_id::Query;
 
     if let Some(q) = Query::get_latest(session, txn_id.into())

@@ -1,7 +1,7 @@
 //! Catalyst RBAC Security Scheme
 use std::{env, error::Error, sync::LazyLock, time::Duration};
 
-use catalyst_types::id_uri::role_index::RoleId;
+use catalyst_types::catalyst_id::role_index::RoleId;
 use moka::future::Cache;
 use poem::{error::ResponseError, http::StatusCode, IntoResponse, Request};
 use poem_openapi::{auth::Bearer, SecurityScheme};

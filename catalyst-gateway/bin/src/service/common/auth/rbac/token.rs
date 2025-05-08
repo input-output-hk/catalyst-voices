@@ -10,7 +10,7 @@ use std::{
 use anyhow::{anyhow, Context, Result};
 use base64::{prelude::BASE64_URL_SAFE_NO_PAD, Engine};
 use cardano_blockchain_types::Network;
-use catalyst_types::id_uri::{key_rotation::KeyRotation, role_index::RoleId, IdUri};
+use catalyst_types::catalyst_id::{key_rotation::KeyRotation, role_index::RoleId, CatalystId};
 use chrono::{TimeDelta, Utc};
 use ed25519_dalek::{ed25519::signature::Signer, Signature, SigningKey, VerifyingKey};
 use futures::future::try_join;
@@ -29,7 +29,7 @@ use crate::db::index::{
 #[derive(Debug, Clone)]
 pub(crate) struct CatalystRBACTokenV1 {
     /// A Catalyst identifier.
-    catalyst_id: IdUri,
+    catalyst_id: CatalystId,
     /// A network value.
     ///
     /// The network value is contained in the Catalyst ID and can be accessed from it, but
@@ -54,7 +54,9 @@ impl CatalystRBACTokenV1 {
     pub(crate) fn new(
         network: &str, subnet: Option<&str>, role0_pk: VerifyingKey, sk: &SigningKey,
     ) -> Result<Self> {
-        let catalyst_id = IdUri::new(network, subnet, role0_pk).with_nonce().as_id();
+        let catalyst_id = CatalystId::new(network, subnet, role0_pk)
+            .with_nonce()
+            .as_id();
         let network = convert_network(&catalyst_id.network())?;
         let raw = as_raw_bytes(&catalyst_id.to_string());
         let signature = sk.sign(&raw);
@@ -96,7 +98,7 @@ impl CatalystRBACTokenV1 {
             .map_err(|_| anyhow!("Invalid token signature length"))?;
         let raw = as_raw_bytes(token);
 
-        let catalyst_id: IdUri = token.parse().context("Invalid Catalyst ID")?;
+        let catalyst_id: CatalystId = token.parse().context("Invalid Catalyst ID")?;
         if catalyst_id.username().is_some_and(|n| !n.is_empty()) {
             return Err(anyhow!("Catalyst ID must not contain username"));
         }
@@ -160,7 +162,7 @@ impl CatalystRBACTokenV1 {
     }
 
     /// Returns a Catalyst ID from the token.
-    pub(crate) fn catalyst_id(&self) -> &IdUri {
+    pub(crate) fn catalyst_id(&self) -> &CatalystId {
         &self.catalyst_id
     }
 
