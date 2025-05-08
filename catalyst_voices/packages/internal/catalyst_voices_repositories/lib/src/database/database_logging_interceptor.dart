@@ -17,7 +17,7 @@ const _clauseKeywords = [
   'ORDER BY',
   'HAVING',
   'LIMIT',
-  'OFFSET'
+  'OFFSET',
 ];
 const _indent = '  ';
 
