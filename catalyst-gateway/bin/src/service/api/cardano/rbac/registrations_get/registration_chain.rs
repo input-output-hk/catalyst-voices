@@ -2,6 +2,7 @@
 
 use std::collections::HashMap;
 
+use catalyst_types::catalyst_id::role_index::RoleId;
 use poem_openapi::{types::Example, Object};
 
 use crate::service::{
@@ -77,13 +78,12 @@ impl RbacRegistrationChain {
 }
 
 /// Gets and converts a role data from the given chain info.
-fn role_data(info: &ChainInfo) -> anyhow::Result<HashMap<u8, RbacRoleData>> {
+fn role_data(info: &ChainInfo) -> anyhow::Result<HashMap<RoleId, RbacRoleData>> {
     info.chain
         .role_data_history()
         .iter()
-        .map(|(&number, data)| {
-            RbacRoleData::new(data, info.last_persistent_slot, &info.chain)
-                .map(|r| (number.into(), r))
+        .map(|(&role, data)| {
+            RbacRoleData::new(data, info.last_persistent_slot, &info.chain).map(|rbac| (role, rbac))
         })
         .collect()
 }
