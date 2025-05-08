@@ -39,6 +39,13 @@ static TRANSACTIONS: LazyLock<Cache<TransactionId, CatalystId>> = LazyLock::new(
         .build()
 });
 
+/// A cache that allows to find all registration transaction of a chain by Catalyst ID.
+static CHAIN_TRANSACTIONS: LazyLock<Cache<CatalystId, Vec<TransactionId>>> = LazyLock::new(|| {
+    Cache::builder()
+        .eviction_policy(EvictionPolicy::lru())
+        .build()
+});
+
 /// A cache for RBAC registrations.
 pub struct RbacCache {}
 
@@ -70,7 +77,10 @@ impl RbacCache {
     /// In case of failure a problem report from the given registration is updated and
     /// returned.
     #[allow(clippy::result_large_err)]
-    pub fn add(registration: Cip509) -> Result<RbacCacheAddSuccess, RbacCacheAddError> {
+    // TODO: FIXME: Store both persistent and volatile registrations.
+    pub fn add(
+        registration: Cip509, _is_persistent: bool,
+    ) -> Result<RbacCacheAddSuccess, RbacCacheAddError> {
         match registration.previous_transaction() {
             Some(previous_txn) => update_chain(registration, previous_txn),
             None => start_new_chain(registration),
@@ -102,7 +112,7 @@ fn update_chain(
     let catalyst_id = TRANSACTIONS.get(&previous_txn).ok_or_else(|| {
         debug!("Unable to find previous transaction {previous_txn} in the RBAC cache");
         // We are unable to determine a Catalyst ID, so there is no sense to update the
-        // problem report.
+        // problem report because we would be unable to store this registration anyway.
         RbacCacheAddError {
             catalyst_id,
             purpose,
@@ -159,6 +169,16 @@ fn update_chain(
         ACTIVE_ADDRESSES.insert(address.to_owned(), catalyst_id.clone());
     }
     TRANSACTIONS.insert(new_chain.current_tx_id_hash(), catalyst_id.clone());
+    CHAIN_TRANSACTIONS
+        .entry(catalyst_id.clone())
+        .and_upsert_with(|e| {
+            e.map(|e| {
+                let mut val = e.into_value();
+                val.push(new_chain.current_tx_id_hash());
+                val
+            })
+            .unwrap_or_default()
+        });
     CHAINS.insert(catalyst_id.clone(), new_chain);
 
     Ok(RbacCacheAddSuccess {
@@ -208,6 +228,7 @@ fn start_new_chain(registration: Cip509) -> Result<RbacCacheAddSuccess, RbacCach
         }
     }
 
+    // TODO: FIXME: Allow to override/replace/restart multiple chains!
     match other_chains.as_slice() {
         [] => {
             // All addresses are unique - nothing to do.
@@ -239,10 +260,19 @@ fn start_new_chain(registration: Cip509) -> Result<RbacCacheAddSuccess, RbacCach
             }
 
             // Remove the previous chain from caches.
+            if let Some(transactions) = CHAIN_TRANSACTIONS.get(previous_chain.catalyst_id()) {
+                for txn in transactions {
+                    TRANSACTIONS.invalidate(&txn);
+                }
+            } else {
+                error!(
+                    "Unable to find {} chain transactions",
+                    previous_chain.catalyst_id()
+                );
+            }
             CHAINS.invalidate(previous_chain.catalyst_id());
             // There is no need to update `ACTIVE_ADDRESSES` cache because it will
             // be overwritten below anyway.
-            // TODO: FIXME: Cleanup `TRANSACTIONS` cache.
         },
         [..] => {
             // At the moment we don't allow for one registration to override multiple
@@ -265,6 +295,7 @@ fn start_new_chain(registration: Cip509) -> Result<RbacCacheAddSuccess, RbacCach
         ACTIVE_ADDRESSES.insert(address.clone(), catalyst_id.clone());
     }
     TRANSACTIONS.insert(new_chain.current_tx_id_hash(), catalyst_id.clone());
+    CHAIN_TRANSACTIONS.insert(catalyst_id.clone(), vec![new_chain.current_tx_id_hash()]);
     CHAINS.insert(catalyst_id.clone(), new_chain);
 
     Ok(RbacCacheAddSuccess {
