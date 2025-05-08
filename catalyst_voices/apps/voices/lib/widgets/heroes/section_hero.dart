@@ -1,142 +1,104 @@
-import 'dart:async';
-
-import 'package:catalyst_voices/app/view/app_precache_image_assets.dart';
+import 'package:catalyst_voices/app/view/video_cache/app_video_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
-class HeroSection extends StatefulWidget {
+class HeroSection extends StatelessWidget {
   final AlignmentGeometry alignment;
   final String asset;
+  final BoxConstraints constraints;
   final String? assetPackageName;
+
   final Widget child;
 
   const HeroSection({
     super.key,
     this.alignment = Alignment.bottomLeft,
     required this.asset,
+    this.constraints = const BoxConstraints.tightFor(height: 650),
     this.assetPackageName,
     required this.child,
   });
 
   @override
-  State<HeroSection> createState() => _HeroSectionState();
-}
-
-class _Background extends StatelessWidget {
-  final VideoPlayerController controller;
-  const _Background({
-    required this.controller,
-  });
-  @override
   Widget build(BuildContext context) {
-    return controller.value.isInitialized
-        ? ConstrainedBox(
-            constraints: const BoxConstraints(maxHeight: 650),
-            child: FittedBox(
-              fit: BoxFit.cover,
-              clipBehavior: Clip.hardEdge,
-              child: SizedBox(
-                key: const Key('HeroBackgroundVideo'),
-                width: controller.value.size.width,
-                height: controller.value.size.height,
-                child: VideoPlayer(controller),
-              ),
-            ),
-          )
-        : const SizedBox.shrink();
+    return Stack(
+      fit: StackFit.passthrough,
+      alignment: alignment,
+      children: [
+        _Background(
+          asset: asset,
+          assetPackage: assetPackageName,
+          constraints: constraints,
+        ),
+        Align(
+          alignment: alignment,
+          child: child,
+        ),
+      ],
+    );
   }
 }
 
-class _HeroSectionState extends State<HeroSection>
+class _Background extends StatefulWidget {
+  final String? assetPackage;
+  final String asset;
+  final BoxConstraints constraints;
+
+  const _Background({
+    this.assetPackage,
+    required this.asset,
+    required this.constraints,
+  });
+
+  @override
+  State<_Background> createState() => _BackgroundState();
+}
+
+class _BackgroundState extends State<_Background>
     with AutomaticKeepAliveClientMixin {
-  VideoPlayerController? _controller;
+  Future<VideoPlayerController>? _future;
 
   @override
   bool get wantKeepAlive => true;
-
-  VideoPlayerController get _effectiveController {
-    return _controller ??
-        AssetsPrecacheService.instance.getVideoController(widget.asset) ??
-        VideoPlayerController.asset(
-          widget.asset,
-          package: widget.assetPackageName,
-        );
-  }
 
   @override
   Widget build(BuildContext context) {
     super.build(context);
 
-    return Stack(
-      fit: StackFit.passthrough,
-      alignment: widget.alignment,
-      children: [
-        _Background(
-          controller: _effectiveController,
-        ),
-        Align(
-          alignment: widget.alignment,
-          child: widget.child,
-        ),
-      ],
+    return ConstrainedBox(
+      constraints: widget.constraints,
+      child: FutureBuilder<VideoPlayerController>(
+        future: _future,
+        builder: (context, snapshot) {
+          final controller = snapshot.data;
+
+          if (controller == null) {
+            return const SizedBox.expand();
+          }
+
+          return FittedBox(
+            fit: BoxFit.cover,
+            clipBehavior: Clip.hardEdge,
+            child: SizedBox(
+              key: const Key('HeroBackgroundVideo'),
+              width: controller.value.size.width,
+              height: controller.value.size.height,
+              child: VideoPlayer(controller),
+            ),
+          );
+        },
+      ),
     );
   }
 
   @override
-  void didUpdateWidget(HeroSection oldWidget) {
-    super.didUpdateWidget(oldWidget);
+  void didChangeDependencies() {
+    super.didChangeDependencies();
 
-    if (oldWidget.asset != widget.asset ||
-        oldWidget.assetPackageName != widget.assetPackageName) {
-      unawaited(_disposeAndReinitializeVideoPlayer());
-    }
+    _future ??= Future.microtask(() async => _getController());
   }
 
-  @override
-  void dispose() {
-    unawaited(_controller?.dispose());
-    _controller = null;
-    super.dispose();
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _controller =
-        AssetsPrecacheService.instance.getVideoController(widget.asset) ??
-            VideoPlayerController.asset(
-              widget.asset,
-              package: widget.assetPackageName,
-            );
-
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      if (mounted) {
-        await _initalizedVideoPlayer();
-      }
-    });
-  }
-
-  Future<void> _disposeAndReinitializeVideoPlayer() async {
-    if (mounted) {
-      await _controller?.dispose();
-    }
-    if (mounted) {
-      _controller = VideoPlayerController.asset(
-        widget.asset,
-        package: widget.assetPackageName,
-      );
-      await _initalizedVideoPlayer();
-    }
-  }
-
-  Future<void> _initalizedVideoPlayer() async {
-    await _controller?.initialize().then((_) async {
-      await _controller?.setVolume(0);
-      await _controller?.play();
-      await _controller?.setLooping(true);
-    });
-    if (mounted) {
-      setState(() {});
-    }
+  Future<VideoPlayerController> _getController() {
+    return VideoManagerScope.of(context).getOrCreateController(widget.asset);
   }
 }
