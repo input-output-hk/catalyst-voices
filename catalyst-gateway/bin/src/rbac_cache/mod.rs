@@ -85,7 +85,7 @@ impl RbacCache {
     /// Returns a registration chain by the stake address.
     pub fn get_by_address(address: &StakeAddress) -> Option<RegistrationChain> {
         let id = ACTIVE_ADDRESSES.get(address)?;
-        CHAINS.get(&id)
+        Self::get(&id)
     }
 }
 
@@ -142,9 +142,11 @@ fn update_chain(
     }
 
     // Try to add a new registration to the chain.
-    let new_chain = chain.update(registration).map_err(|_| {
-        // TODO: FIXME: Decide if we want update report inside of
-        // `RegistrationChain::update`. If not update the report here.
+    let new_chain = chain.update(registration).map_err(|e| {
+        report.other(
+            &format!("{e:?}"),
+            "Failed to apply update the registration chain",
+        );
         RbacCacheAddError {
             catalyst_id: Some(catalyst_id.clone()),
             purpose,
@@ -174,9 +176,11 @@ fn start_new_chain(registration: Cip509) -> Result<RbacCacheAddSuccess, RbacCach
     let purpose = registration.purpose();
     let report = registration.report().to_owned();
 
-    let new_chain = RegistrationChain::new(registration).map_err(|_| {
-        // TODO: FIXME: Decide if we want update report inside of
-        // `RegistrationChain::new`. If not update the report here.
+    let new_chain = RegistrationChain::new(registration).map_err(|e| {
+        report.other(
+            &format!("{e:?}"),
+            "Failed to apply start a registration chain",
+        );
         RbacCacheAddError {
             catalyst_id,
             purpose,
