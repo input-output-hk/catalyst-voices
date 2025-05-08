@@ -9,18 +9,20 @@ import 'package:go_router/go_router.dart';
 class NavigationBack extends StatelessWidget {
   final String? label;
   final bool isCompact;
+  final VoidCallback? onTap;
 
   const NavigationBack({
     super.key,
     this.label,
     this.isCompact = false,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
     return VoicesTextButton(
       key: const Key('NavigationBackBtn'),
-      onTap: () => _popRoute(context),
+      onTap: onTap ?? () => _popRoute(context),
       leading: isCompact ? null : VoicesAssets.icons.arrowLeft.buildIcon(),
       style: TextButton.styleFrom(
         foregroundColor: context.colors.textOnPrimaryLevel1,

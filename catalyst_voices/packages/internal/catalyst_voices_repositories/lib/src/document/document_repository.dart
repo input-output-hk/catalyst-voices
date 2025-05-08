@@ -47,7 +47,7 @@ abstract interface class DocumentRepository {
   /// Returns list of refs to all published and any refs it may hold.
   ///
   /// Its using documents index api.
-  Future<List<SignedDocumentRef>> getAllDocumentsRefs();
+  Future<List<TypedDocumentRef>> getAllDocumentsRefs();
 
   /// Return list of all cached documents id for given [id].
   /// It looks for documents in the local storage and draft storage.
@@ -56,7 +56,7 @@ abstract interface class DocumentRepository {
   });
 
   /// Returns list of locally saved signed documents refs.
-  Future<List<SignedDocumentRef>> getCachedDocumentsRefs();
+  Future<List<TypedDocumentRef>> getCachedDocumentsRefs();
 
   /// If version is not specified in [ref] method will try to return latest
   /// version of document matching [ref].
@@ -233,20 +233,20 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   }
 
   @override
-  Future<List<SignedDocumentRef>> getAllDocumentsRefs() async {
-    final allRefs = await _remoteDocuments.index();
-    final allConstRefs = constantDocumentsRefs.all;
+  Future<List<TypedDocumentRef>> getAllDocumentsRefs() async {
+    final allRefs = await _remoteDocuments.index().then(_uniqueTypedRefs);
+    final allConstRefs = constantDocumentsRefs.expand((element) => element.all);
 
     final nonConstRefs = allRefs
-        .where((ref) => allConstRefs.none((e) => e.id == ref.id))
+        .where((ref) => allConstRefs.none((e) => e.id == ref.ref.id))
         .toList();
 
-    final exactRefs = nonConstRefs.where((ref) => ref.isExact).toList();
-    final looseRefs = nonConstRefs.where((ref) => !ref.isExact).toList();
+    final exactRefs = nonConstRefs.where((ref) => ref.ref.isExact).toList();
+    final looseRefs = nonConstRefs.where((ref) => !ref.ref.isExact).toList();
 
     final latestLooseRefs = await looseRefs.map((ref) async {
-      final latestVer = await _remoteDocuments.getLatestVersion(ref.id);
-      return ref.copyWith(version: Optional(latestVer));
+      final latestVer = await _remoteDocuments.getLatestVersion(ref.ref.id);
+      return latestVer != null ? ref.copyWithVersion(latestVer) : ref;
     }).wait;
 
     final allLatestRefs = [
@@ -256,7 +256,9 @@ final class DocumentRepositoryImpl implements DocumentRepository {
 
     final uniqueRefs = {
       // Note. categories are mocked on backend so we can't not fetch them.
-      ...constantDocumentsRefs.expand((e) => [e.proposal, e.comment]),
+      ...constantDocumentsRefs.expand(
+        (element) => element.allTyped.where((e) => !e.type.isCategory),
+      ),
       ...allLatestRefs,
     };
 
@@ -274,10 +276,8 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   }
 
   @override
-  Future<List<SignedDocumentRef>> getCachedDocumentsRefs() {
-    return _localDocuments
-        .index()
-        .then((refs) => refs.cast<SignedDocumentRef>());
+  Future<List<TypedDocumentRef>> getCachedDocumentsRefs() {
+    return _localDocuments.index();
   }
 
   @override
@@ -632,6 +632,22 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     return [];
   }
 
+  List<TypedDocumentRef> _uniqueTypedRefs(List<TypedDocumentRef> refs) {
+    final uniqueRefs = <DocumentRef, TypedDocumentRef>{};
+
+    for (final ref in refs) {
+      uniqueRefs.update(
+        ref.ref,
+        // While indexing we don't know what is type of "ref" or "reply".
+        // Here we're trying to eliminate duplicates with unknown type.
+        (value) => value.type != DocumentType.unknown ? value : ref,
+        ifAbsent: () => ref,
+      );
+    }
+
+    return uniqueRefs.values.toList();
+  }
+
   Stream<DocumentData?> _watchDocumentData({
     required DocumentRef ref,
     bool synchronizedUpdate = false,
@@ -667,4 +683,8 @@ final class DocumentRepositoryImpl implements DocumentRepository {
 
     return StreamGroup.merge([updateStream, localStream]);
   }
+}
+
+extension on DocumentType {
+  bool get isCategory => this == DocumentType.categoryParametersDocument;
 }

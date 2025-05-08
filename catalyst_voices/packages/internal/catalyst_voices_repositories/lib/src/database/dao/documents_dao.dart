@@ -51,7 +51,7 @@ abstract interface class DocumentsDao {
   Future<List<DocumentEntity>> queryAll({DocumentType? type});
 
   /// Returns all known document refs.
-  Future<List<SignedDocumentRef>> queryAllRefs();
+  Future<List<TypedDocumentRef>> queryAllTypedRefs();
 
   Future<DocumentEntity?> queryLatestDocumentData({
     CatalystId? authorId,
@@ -201,13 +201,14 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
   }
 
   @override
-  Future<List<SignedDocumentRef>> queryAllRefs() {
+  Future<List<TypedDocumentRef>> queryAllTypedRefs() {
     final select = selectOnly(documents)
       ..addColumns([
         documents.idHi,
         documents.idLo,
         documents.verHi,
         documents.verLo,
+        documents.type,
       ]);
 
     return select.map((row) {
@@ -220,7 +221,10 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
         low: row.read(documents.verLo)!,
       );
 
-      return SignedDocumentRef(id: id.uuid, version: version.uuid);
+      final ref = SignedDocumentRef(id: id.uuid, version: version.uuid);
+      final type = row.readWithConverter(documents.type)!;
+
+      return TypedDocumentRef(ref: ref, type: type);
     }).get();
   }
 
