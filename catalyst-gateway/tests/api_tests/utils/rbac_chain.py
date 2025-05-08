@@ -27,12 +27,12 @@ class RBACChain:
         self.subnet = subnet
 
     def auth_token(self, cid: str = None, sig: str = None, username: str = None, is_uri: bool = False, nonce: str = None) -> str:
-        role_0_keys = self.keys_map[f"{RoleID.ROLE_0}"]
+        role_0_arr = self.keys_map[f"{RoleID.ROLE_0}"]
         return generate_rbac_auth_token(
             self.network,
             self.subnet,
-            role_0_keys["pk"],
-            role_0_keys["sk"],
+            role_0_arr[0]["pk"],
+            role_0_arr[-1]["sk"],
             cid,
             sig,
             username,
@@ -42,25 +42,25 @@ class RBACChain:
 
     # returns a role's catalyst id, with the provided role secret key
     def cat_id_for_role(self, role_id: RoleID) -> (str, str):
-        role_data = self.keys_map[f"{role_id}"]
-        role_0_pk = self.keys_map[f"{RoleID.ROLE_0}"]["pk"]
+        role_data_arr = self.keys_map[f"{role_id}"]
+        role_0_arr= self.keys_map[f"{RoleID.ROLE_0}"]
         return (
             generate_cat_id(
                 network=self.network,
                 subnet=self.subnet,
                 role_id=role_id,
-                pk_hex=role_0_pk,
-                rotation=role_data["rotation"],
+                pk_hex=role_0_arr[0]["pk"],
+                rotation=role_data_arr[-1]["rotation"],
                 is_uri=True,
             ),
-            role_data["sk"],
+            role_data_arr[-1]["sk"],
         )    
     
     def short_cat_id(self) -> str:        
         return generate_cat_id(
             network=self.network,
             subnet=self.subnet,
-            pk_hex=self.keys_map[f"{RoleID.ROLE_0}"]["pk"],
+            pk_hex=self.keys_map[f"{RoleID.ROLE_0}"][0]["pk"],
             is_uri=False,
         )
 
