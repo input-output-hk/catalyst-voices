@@ -157,7 +157,7 @@ class _VoicesDesktopDialog extends StatelessWidget {
             )
           : Theme.of(context).dialogTheme.shape,
       backgroundColor: backgroundColor,
-      alignment: Alignment.topCenter,
+      alignment: Alignment.center,
       insetPadding: const EdgeInsets.symmetric(horizontal: 40, vertical: 90),
       child: ConstrainedBox(
         constraints: constraints,

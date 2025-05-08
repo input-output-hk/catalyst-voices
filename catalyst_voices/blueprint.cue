@@ -61,11 +61,17 @@ project: {
 							add_header Cross-Origin-Opener-Policy "same-origin";
 							add_header Cross-Origin-Embedder-Policy "require-corp";
 
+							# Enforce browser to always check with server whether the app static files are up-to-date.
+							add_header 'Cache-Control' 'must-revalidate';
+							expires 1h;
+							etag on;
+
 							location / {
 							  root   /app;
 							  index  index.html;
 							  try_files $uri $uri/ /index.html;
 							}
+
 							error_page   500 502 503 504  /50x.html;
 							location = /50x.html {
 							  root   /usr/share/nginx/html;

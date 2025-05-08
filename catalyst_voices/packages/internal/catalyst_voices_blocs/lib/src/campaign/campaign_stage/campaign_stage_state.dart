@@ -21,6 +21,10 @@ final class ErrorSubmissionStage extends CampaignStageState {
   List<Object?> get props => [...super.props, error];
 }
 
+final class LoadingCampaignStage extends CampaignStageState {
+  const LoadingCampaignStage();
+}
+
 final class PreProposalSubmissionStage extends CampaignStageState {
   final DateTime? startDate;
 

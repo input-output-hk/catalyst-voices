@@ -169,7 +169,6 @@ final class SessionCubit extends Cubit<SessionState>
           status: SessionStatus.actor,
           account: SessionAccount.mocked(),
           spaces: Space.values,
-          availableSpaces: Space.values,
           overallSpaces: Space.values,
           spacesShortcuts: AccessControl.allSpacesShortcutsActivators,
           canCreateAccount: true,
@@ -217,7 +216,6 @@ final class SessionCubit extends Cubit<SessionState>
 
     final sessionAccount = SessionAccount.fromAccount(account);
     final spaces = _accessControl.spacesAccess(account);
-    final availableSpaces = _accessControl.availableSpaces(account);
     final overallSpaces = _accessControl.overallSpaces(account);
     final spacesShortcuts = _accessControl.spacesShortcutsActivators(account);
 
@@ -225,7 +223,6 @@ final class SessionCubit extends Cubit<SessionState>
       status: SessionStatus.actor,
       account: sessionAccount,
       spaces: spaces,
-      availableSpaces: availableSpaces,
       overallSpaces: overallSpaces,
       spacesShortcuts: spacesShortcuts,
       canCreateAccount: canCreateAccount,

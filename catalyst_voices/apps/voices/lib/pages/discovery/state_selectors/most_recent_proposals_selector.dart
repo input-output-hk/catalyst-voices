@@ -31,7 +31,7 @@ class _MostRecentProposalsData extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocSelector<DiscoveryCubit, DiscoveryState, _ListItems>(
-      selector: (state) => state.mostRecentProposals.proposals,
+      selector: (state) => state.proposals.proposals,
       builder: (context, state) {
         if (state.length < _minProposalsToShowRecent) {
           return const ViewAllProposals();
@@ -50,8 +50,8 @@ class _MostRecentProposalsError extends StatelessWidget {
     return BlocSelector<DiscoveryCubit, DiscoveryState, VisibilityState>(
       selector: (state) {
         return (
-          show: state.mostRecentProposals.showError,
-          error: state.mostRecentProposals.error,
+          show: state.proposals.showError,
+          error: state.proposals.error,
         );
       },
       builder: (context, state) {
@@ -83,7 +83,7 @@ class _MostRecentProposalsLoading extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocSelector<DiscoveryCubit, DiscoveryState, bool>(
       selector: (state) {
-        return state.mostRecentProposals.isLoading;
+        return state.proposals.isLoading;
       },
       builder: (context, state) {
         return const Offstage();

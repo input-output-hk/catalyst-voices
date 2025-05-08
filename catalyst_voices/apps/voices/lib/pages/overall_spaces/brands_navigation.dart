@@ -39,7 +39,6 @@ class BrandsNavigation extends StatelessWidget {
             endIndent: 0,
           ),
           const _SpacesTile(),
-          const _OpportunitiesTile(),
         ],
       ),
     );
@@ -169,18 +168,6 @@ final class _ForegroundColor implements WidgetStateProperty<Color?> {
     }
 
     return colors.textOnPrimaryLevel0;
-  }
-}
-
-class _OpportunitiesTile extends StatelessWidget {
-  const _OpportunitiesTile();
-
-  @override
-  Widget build(BuildContext context) {
-    return _BrandsNavigationTile(
-      leading: VoicesAssets.icons.collection.buildIcon(),
-      content: Text(context.l10n.opportunities),
-    );
   }
 }
 

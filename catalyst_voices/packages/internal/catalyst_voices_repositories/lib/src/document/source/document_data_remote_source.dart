@@ -5,6 +5,7 @@ import 'package:catalyst_voices_repositories/src/common/response_mapper.dart';
 import 'package:catalyst_voices_repositories/src/document/document_data_factory.dart';
 import 'package:catalyst_voices_repositories/src/dto/api/document_index_list_dto.dart';
 import 'package:catalyst_voices_repositories/src/dto/api/document_index_query_filters_dto.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 
 final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
@@ -34,6 +35,15 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
 
   @override
   Future<String?> getLatestVersion(String id) async {
+    final constVersion = constantDocumentsRefs
+        .expand((element) => element.all)
+        .firstWhereOrNull((element) => element.id == id)
+        ?.version;
+
+    if (constVersion != null) {
+      return constVersion;
+    }
+
     try {
       final index = await _api.gateway
           .apiV1DocumentIndexPost(
@@ -61,8 +71,8 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
   }
 
   @override
-  Future<List<SignedDocumentRef>> index() async {
-    final allRefs = <SignedDocumentRef>{};
+  Future<List<TypedDocumentRef>> index() async {
+    final allRefs = <TypedDocumentRef>{};
 
     var page = 0;
     const maxPerPage = indexPageSize;
@@ -108,27 +118,56 @@ abstract interface class DocumentDataRemoteSource
   Future<String?> getLatestVersion(String id);
 
   @override
-  Future<List<SignedDocumentRef>> index();
+  Future<List<TypedDocumentRef>> index();
 
   Future<void> publish(SignedDocument document);
 }
 
 extension on DocumentIndexList {
-  List<SignedDocumentRef> get refs {
+  List<TypedDocumentRef> get refs {
     return docs
         .cast<Map<String, dynamic>>()
         .map(DocumentIndexListDto.fromJson)
         .map((ref) {
-          return <SignedDocumentRef>[
+          return <TypedDocumentRef>[
             ...ref.ver.map((ver) {
-              return <SignedDocumentRef>[
-                SignedDocumentRef(id: ref.id, version: ver.ver),
-                if (ver.ref != null) ver.ref!.toRef(),
-                if (ver.reply != null) ver.reply!.toRef(),
-                if (ver.template != null) ver.template!.toRef(),
-                if (ver.brand != null) ver.brand!.toRef(),
-                if (ver.campaign != null) ver.campaign!.toRef(),
-                if (ver.category != null) ver.category!.toRef(),
+              final documentType = DocumentType.fromJson(ver.type);
+
+              return <TypedDocumentRef>[
+                TypedDocumentRef(
+                  ref: SignedDocumentRef(id: ref.id, version: ver.ver),
+                  type: documentType,
+                ),
+                if (ver.ref != null)
+                  TypedDocumentRef(
+                    ref: ver.ref!.toRef(),
+                    type: DocumentType.unknown,
+                  ),
+                if (ver.reply != null)
+                  TypedDocumentRef(
+                    ref: ver.reply!.toRef(),
+                    type: DocumentType.unknown,
+                  ),
+                if (ver.template != null)
+                  TypedDocumentRef(
+                    ref: ver.template!.toRef(),
+                    type: documentType.template ?? DocumentType.unknown,
+                  ),
+                if (ver.brand != null)
+                  TypedDocumentRef(
+                    ref: ver.brand!.toRef(),
+                    type: DocumentType.brandParametersDocument,
+                  ),
+                if (ver.campaign != null)
+                  TypedDocumentRef(
+                    ref: ver.campaign!.toRef(),
+                    type: DocumentType.campaignParametersDocument,
+                  ),
+                if (ver.category != null)
+                  TypedDocumentRef(
+                    ref: ver.category!.toRef(),
+                    type: DocumentType.categoryParametersDocument,
+                  ),
               ];
             }).expand((element) => element),
           ];
