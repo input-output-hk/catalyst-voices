@@ -4,10 +4,29 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:collection/collection.dart';
 import 'package:drift/drift.dart';
 
+const _clauseKeywords = [
+  'SELECT',
+  'FROM',
+  'INNER JOIN',
+  'LEFT JOIN',
+  'RIGHT JOIN',
+  'JOIN',
+  'ON',
+  'WHERE',
+  'GROUP BY',
+  'ORDER BY',
+  'HAVING',
+  'LIMIT',
+  'OFFSET'
+];
+const _indent = '  ';
+
 final class DatabaseLoggingInterceptor extends QueryInterceptor {
   final bool isEnabled;
   final bool onlyErrors;
   final Logger logger;
+
+  var _operationNr = 0;
 
   DatabaseLoggingInterceptor({
     this.isEnabled = true,
@@ -17,12 +36,12 @@ final class DatabaseLoggingInterceptor extends QueryInterceptor {
 
   @override
   Future<void> commitTransaction(TransactionExecutor inner) {
-    return _run('commit', () => super.commitTransaction(inner));
+    return _run(() => 'commit', () => super.commitTransaction(inner));
   }
 
   @override
   Future<void> rollbackTransaction(TransactionExecutor inner) {
-    return _run('rollback', () => super.rollbackTransaction(inner));
+    return _run(() => 'rollback', () => super.rollbackTransaction(inner));
   }
 
   @override
@@ -31,7 +50,7 @@ final class DatabaseLoggingInterceptor extends QueryInterceptor {
     BatchedStatements statements,
   ) {
     return _run(
-      'batch with ${_formatBatchedStatements(statements)}',
+      () => 'batch with ${_prettyBatch(statements)}',
       () => super.runBatched(executor, statements),
     );
   }
@@ -43,7 +62,7 @@ final class DatabaseLoggingInterceptor extends QueryInterceptor {
     List<Object?> args,
   ) {
     return _run(
-      'custom with ${_formatStatementWithArgs(statement, args)}',
+      () => 'custom with ${_prettyFormat(statement, args)}',
       () => super.runCustom(executor, statement, args),
     );
   }
@@ -55,7 +74,7 @@ final class DatabaseLoggingInterceptor extends QueryInterceptor {
     List<Object?> args,
   ) {
     return _run(
-      'delete with ${_formatStatementWithArgs(statement, args)}',
+      () => 'delete with ${_prettyFormat(statement, args)}',
       () => super.runDelete(executor, statement, args),
     );
   }
@@ -67,7 +86,7 @@ final class DatabaseLoggingInterceptor extends QueryInterceptor {
     List<Object?> args,
   ) {
     return _run(
-      'insert with ${_formatStatementWithArgs(statement, args)}',
+      () => 'insert with ${_prettyFormat(statement, args)}',
       () => super.runInsert(executor, statement, args),
     );
   }
@@ -79,7 +98,7 @@ final class DatabaseLoggingInterceptor extends QueryInterceptor {
     List<Object?> args,
   ) {
     return _run(
-      'select with ${_formatStatementWithArgs(statement, args)}',
+      () => 'select with ${_prettyFormat(statement, args)}',
       () => super.runSelect(executor, statement, args),
     );
   }
@@ -91,43 +110,9 @@ final class DatabaseLoggingInterceptor extends QueryInterceptor {
     List<Object?> args,
   ) {
     return _run(
-      'update with ${_formatStatementWithArgs(statement, args)}',
+      () => 'update with ${_prettyFormat(statement, args)}',
       () => super.runUpdate(executor, statement, args),
     );
-  }
-
-  String _formatBatchedStatements(BatchedStatements statements) {
-    return statements.statements.mapIndexed(
-      (index, statement) {
-        final args = statements.arguments
-            .firstWhereOrNull((args) => args.statementIndex == index)
-            ?.arguments;
-
-        return _formatStatementWithArgs(statement, args ?? []);
-      },
-    ).join(',');
-  }
-
-  String _formatStatementWithArgs(String statement, List<Object?> args) {
-    final buffer = StringBuffer(statement);
-
-    if (args.isNotEmpty) {
-      final readableArgs = args.map(
-        (arg) {
-          if (arg is Uint8List) {
-            return 'Bytes[${arg.length}]';
-          }
-
-          return arg;
-        },
-      ).toString();
-
-      buffer
-        ..write(' ')
-        ..write(readableArgs);
-    }
-
-    return buffer.toString();
   }
 
   void _log(
@@ -152,17 +137,93 @@ final class DatabaseLoggingInterceptor extends QueryInterceptor {
     );
   }
 
+  String _prettyBatch(BatchedStatements statements) {
+    return statements.statements.mapIndexed(
+      (index, statement) {
+        final args = statements.arguments
+            .firstWhereOrNull((args) => args.statementIndex == index)
+            ?.arguments;
+
+        return _prettyFormat(statement, args ?? []);
+      },
+    ).join(', ');
+  }
+
+  String _prettyFormat(String statement, List<Object?> args) {
+    var formatted = statement
+        // Insert args
+        .replaceAllMappedIndexed(
+      '?',
+      (match, index) {
+        final arg = args.elementAtOrNull(index);
+        final formattedArg = arg is Uint8List ? '*bytes*' : arg;
+
+        return formattedArg.toString();
+      },
+    )
+        // Normalize spacing
+        .replaceAll(RegExp(r'\s+'), ' ');
+
+    for (final keyword in _clauseKeywords) {
+      final pattern = RegExp('\\b$keyword\\b', caseSensitive: false);
+      formatted = formatted.replaceAllMapped(
+        pattern,
+        (match) => '\n${match.group(0)}',
+      );
+    }
+
+    // Line breaks for AND/OR within WHERE and ON
+    formatted = formatted.replaceAllMapped(
+      RegExp(r'\b(AND|OR)\b', caseSensitive: false),
+      (match) => '\n  ${match.group(0)}',
+    );
+
+    // New lines after commas outside parentheses (e.g., SELECT, GROUP BY)
+    formatted = formatted.replaceAllMapped(
+      RegExp(r',(?![^()]*\))'),
+      (match) => ',\n  ',
+    );
+
+    // Indentation
+    final lines = formatted.split('\n');
+    final buffer = StringBuffer();
+
+    var indentLevel = 0;
+
+    for (var line in lines) {
+      line = line.trim();
+
+      // Adjust indent level based on parentheses
+      final openParens = '('.allMatches(line).length;
+      final closeParens = ')'.allMatches(line).length;
+
+      if (closeParens > openParens) {
+        indentLevel =
+            (indentLevel - (closeParens - openParens)).clamp(0, indentLevel);
+      }
+
+      buffer.writeln('${_indent * indentLevel}$line');
+
+      if (openParens > closeParens) {
+        indentLevel += (openParens - closeParens);
+      }
+    }
+
+    return buffer.toString().trim();
+  }
+
   Future<T> _run<T>(
-    String description,
+    String Function() description,
     FutureOr<T> Function() operation,
   ) async {
     if (!isEnabled) {
       return operation();
     }
 
+    final nr = _operationNr++;
     final stopwatch = Stopwatch()..start();
 
-    _log(Level.INFO, 'Running $description');
+    _log(Level.INFO, '[$nr] Running ${description()}');
 
     try {
       final result = await operation();
@@ -171,14 +232,14 @@ final class DatabaseLoggingInterceptor extends QueryInterceptor {
 
       _log(
         Level.INFO,
-        ' => succeeded after ${stopwatch.elapsedMilliseconds}ms',
+        '[$nr] => succeeded after ${stopwatch.elapsedMilliseconds}ms',
       );
 
       return result;
     } catch (error, stack) {
       _log(
         Level.WARNING,
-        ' => failed after ${stopwatch.elapsedMilliseconds}ms',
+        '[$nr] => failed after ${stopwatch.elapsedMilliseconds}ms',
         error,
         stack,
       );
