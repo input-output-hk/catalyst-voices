@@ -22,14 +22,13 @@ class VideoManager extends ValueNotifier<VideoManagerState> {
     String asset, {
     String? package,
   }) async {
-    if (value.controllers.containsKey(asset)) {
-      return value.controllers[asset]!;
+    final key = _createKey(asset, package);
+    if (value.controllers.containsKey(key)) {
+      return value.controllers[key]!;
     }
     final controller = await _initializeController(asset, package: package);
 
-    final newControllers =
-        Map<String, VideoPlayerController>.from(value.controllers)
-          ..[asset] = controller;
+    final newControllers = Map.of(value.controllers)..[key] = controller;
 
     value = value.copyWith(controllers: newControllers);
 
@@ -43,15 +42,15 @@ class VideoManager extends ValueNotifier<VideoManagerState> {
   }) async {
     if (_isInitialized) return;
 
-    final newControllers =
-        Map<String, VideoPlayerController>.from(value.controllers);
+    final newControllers = Map.of(value.controllers);
 
     await Future.wait(
       assets.map((asset) async {
-        if (value.controllers.containsKey(asset)) return;
+        final key = _createKey(asset, package);
+        if (value.controllers.containsKey(key)) return;
 
         final controller = await _initializeController(asset, package: package);
-        newControllers[asset] = controller;
+        newControllers[key] = controller;
       }),
     );
 
@@ -65,6 +64,10 @@ class VideoManager extends ValueNotifier<VideoManagerState> {
       await _resetControllers();
       value = value.copyWith(brightness: Optional(theme.brightness));
     }
+  }
+
+  String _createKey(String asset, String? package) {
+    return '$asset${package != null ? "_$package" : "_unknown"}';
   }
 
   Future<VideoPlayerController> _initializeController(
