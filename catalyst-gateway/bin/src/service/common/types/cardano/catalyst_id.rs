@@ -5,6 +5,7 @@
 use std::{borrow::Cow, sync::LazyLock};
 
 use anyhow::Context;
+use catalyst_types::catalyst_id::CatalystId as CatalystIdInner;
 use ed25519_dalek::SigningKey;
 use poem_openapi::{
     registry::{MetaSchema, MetaSchemaRef},
@@ -32,11 +33,11 @@ static SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| {
 
 /// A Catalyst short identifier.
 #[derive(Debug, Clone, PartialEq, Hash)]
-pub(crate) struct CatalystId(catalyst_types::catalyst_id::CatalystId);
+pub(crate) struct CatalystId(CatalystIdInner);
 
 impl Type for CatalystId {
-    type RawElementValueType = catalyst_types::catalyst_id::CatalystId;
-    type RawValueType = catalyst_types::catalyst_id::CatalystId;
+    type RawElementValueType = CatalystIdInner;
+    type RawValueType = CatalystIdInner;
 
     const IS_REQUIRED: bool = true;
 
@@ -60,13 +61,13 @@ impl Type for CatalystId {
     }
 }
 
-impl From<catalyst_types::catalyst_id::CatalystId> for CatalystId {
-    fn from(value: catalyst_types::catalyst_id::CatalystId) -> Self {
+impl From<CatalystIdInner> for CatalystId {
+    fn from(value: CatalystIdInner) -> Self {
         Self(value.as_short_id())
     }
 }
 
-impl From<CatalystId> for catalyst_types::catalyst_id::CatalystId {
+impl From<CatalystId> for CatalystIdInner {
     fn from(value: CatalystId) -> Self {
         value.0
     }
@@ -79,7 +80,7 @@ impl TryFrom<&str> for CatalystId {
         value
             .parse()
             .context("Invalid Catalyst ID")
-            .map(|id: catalyst_types::catalyst_id::CatalystId| Self(id.as_short_id()))
+            .map(|id: CatalystIdInner| Self(id.as_short_id()))
     }
 }
 
@@ -113,7 +114,7 @@ impl Example for CatalystId {
             105, 123, 50, 105, 25, 112, 59, 172, 3, 28, 174, 127, 96,
         ];
         let signing_key = &SigningKey::from_bytes(&secret_key_bytes);
-        catalyst_types::catalyst_id::CatalystId::new("cardano", Some("preprod"), signing_key.into())
+        CatalystIdInner::new("cardano", Some("preprod"), signing_key.into())
             .as_id()
             .into()
     }

@@ -1,4 +1,4 @@
-//! A `IdUri` wrapper that can be stored to and load from a database.
+//! A `CatalystId` wrapper that can be stored to and load from a database.
 
 use catalyst_types::catalyst_id::CatalystId;
 use scylla::_macro_internal::{
@@ -6,7 +6,7 @@ use scylla::_macro_internal::{
     SerializeValue, TypeCheckError, WrittenCellProof,
 };
 
-/// A `IdUri` wrapper that can be stored to and load from a database.
+/// A `CatalystId` wrapper that can be stored to and load from a database.
 #[allow(clippy::module_name_repetitions)]
 #[derive(Debug, Clone, PartialEq, Hash)]
 pub struct DbCatalystId(CatalystId);
