@@ -51,7 +51,7 @@ void main() {
       expect(actual, equals(expected));
     }
 
-    group('calculateSlotNumberAtTargetDate on ${NetworkId.testnet}', () {
+    group('calculateSlotNumber on ${NetworkId.testnet}', () {
       test('https://preprod.cardanoscan.io/block/46', () async {
         await testSlotNumber(
           targetDateTime: DateTime.utc(2022, 6, 21, 0, 0, 0),
@@ -77,7 +77,7 @@ void main() {
       });
     });
 
-    group('calculateSlotNumberAtTargetDate on ${NetworkId.mainnet}', () {
+    group('calculateSlotNumber on ${NetworkId.mainnet}', () {
       test('https://cardanoscan.io/block/4490511', () async {
         await testSlotNumber(
           targetDateTime: DateTime.utc(2020, 7, 29, 21, 44, 51),

@@ -37,7 +37,6 @@ final class BlockchainSlotNumberConfig extends Equatable {
     return BlockchainSlotNumberConfig(
       systemStartTimestamp: DateTime.utc(2022, 6, 21, 0, 0, 0),
       systemStartSlot: const SlotBigNum(86400),
-      // https://book.world.dev.cardano.org/environments/mainnet/shelley-genesis.json
       slotLength: const Duration(seconds: 1),
     );
   }
