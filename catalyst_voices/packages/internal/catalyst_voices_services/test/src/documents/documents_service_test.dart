@@ -28,9 +28,10 @@ void main() {
       // Given
       final allRefs = List.generate(
         10,
-        (_) => SignedDocumentRef.first(const Uuid().v7()),
+        (_) => SignedDocumentRef.first(const Uuid().v7())
+            .toTyped(DocumentType.proposalDocument),
       );
-      final cachedRefs = <SignedDocumentRef>[];
+      final cachedRefs = <TypedDocumentRef>[];
 
       // When
       when(documentRepository.getAllDocumentsRefs)
@@ -51,7 +52,8 @@ void main() {
       // Given
       final allRefs = List.generate(
         10,
-        (_) => SignedDocumentRef.first(const Uuid().v7()),
+        (_) => SignedDocumentRef.first(const Uuid().v7())
+            .toTyped(DocumentType.proposalDocument),
       );
       final cachedRefs = allRefs.sublist(0, (allRefs.length / 2).floor());
       final expectedCalls = allRefs.length - cachedRefs.length;
@@ -75,12 +77,14 @@ void main() {
       // Given
       final allRefs = List.generate(
         10,
-        (_) => SignedDocumentRef.first(const Uuid().v7()),
+        (_) => SignedDocumentRef.first(const Uuid().v7())
+            .toTyped(DocumentType.proposalDocument),
       );
       final cachedRefs = allRefs +
           List.generate(
             5,
-            (_) => SignedDocumentRef.first(const Uuid().v7()),
+            (_) => SignedDocumentRef.first(const Uuid().v7())
+                .toTyped(DocumentType.proposalDocument),
           );
 
       // When
@@ -103,9 +107,10 @@ void main() {
       // Given
       final allRefs = List.generate(
         10,
-        (_) => SignedDocumentRef.first(const Uuid().v7()),
+        (_) => SignedDocumentRef.first(const Uuid().v7())
+            .toTyped(DocumentType.proposalDocument),
       );
-      final cachedRefs = <SignedDocumentRef>[];
+      final cachedRefs = <TypedDocumentRef>[];
       var progress = 0.0;
 
       // When
@@ -130,7 +135,8 @@ void main() {
       // Given
       final allRefs = List.generate(
         10,
-        (_) => SignedDocumentRef.first(const Uuid().v7()),
+        (_) => SignedDocumentRef.first(const Uuid().v7())
+            .toTyped(DocumentType.proposalDocument),
       );
       final cachedRefs = allRefs.sublist(0, (allRefs.length / 2).floor());
       final expectedNewRefs = allRefs.sublist(cachedRefs.length);
