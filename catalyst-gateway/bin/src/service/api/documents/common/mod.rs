@@ -4,7 +4,6 @@
 use std::collections::HashMap;
 
 use catalyst_signed_doc::CatalystSignedDocument;
-use catalyst_types::catalyst_id::role_index::RoleId;
 
 use super::templates::get_doc_static_template;
 use crate::{
@@ -119,9 +118,6 @@ impl VerifyingKeyProvider {
             }
 
             let (kid_role_index, kid_rotation) = kid.role_and_rotation();
-            let kid_role_index = kid_role_index.to_string().parse::<u8>()?;
-            let kid_role_index = RoleId::from(kid_role_index);
-
             let (latest_pk, rotation) = reg_chain
                 .get_latest_signing_pk_for_role(&kid_role_index)
                 .ok_or_else(|| {
