@@ -179,6 +179,7 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
           (e) => PendingProposal.fromProposal(
             e,
             campaignName: 'f14',
+            isFavorite: state.proposals.favoritesIds.contains(e.selfRef.id),
           ),
         )
         .toList();

@@ -2670,5 +2670,17 @@
   "comingSoon": "Coming Soon",
   "@comingSoon": {
     "description": "Coming soon message"
+  },
+  "notFoundTitle": "We can't find that page.",
+  "@notFoundTitle": {
+    "description": "Title on the not found page."
+  },
+  "notFoundMessage": "Looks like we can't find the page you're looking for.\nMaybe a good time for a coffee break?",
+  "@notFoundMessage": {
+    "description": "Message on the not found page."
+  },
+  "notFoundButton": "Go to Catalyst Home",
+  "@notFoundButton": {
+    "description": "Button label on the not found page to go to home page in the app."
   }
 }

@@ -241,16 +241,19 @@ void main() {
               ),
             );
           });
+          final typedRefs = refs
+              .map((e) => e.toTyped(DocumentType.proposalDocument))
+              .toList();
 
           // When
           await database.documentsDao.saveAll(documentsWithMetadata);
 
           // Then
-          final allRefs = await database.documentsDao.queryAllRefs();
+          final allRefs = await database.documentsDao.queryAllTypedRefs();
 
           expect(
             allRefs,
-            allOf(hasLength(refs.length), containsAll(refs)),
+            allOf(hasLength(refs.length), containsAll(typedRefs)),
           );
         },
         onPlatform: driftOnPlatforms,

@@ -95,7 +95,7 @@ void main() {
           SignedDocumentRef(id: proposalId, version: const Uuid().v7()),
           SignedDocumentRef(id: proposalId, version: const Uuid().v7()),
         ];
-        final templateRef = SignedDocumentRef(id: const Uuid().v7());
+        final templateRef = SignedDocumentRef.first(const Uuid().v7());
 
         final page = DocumentIndexList(
           docs: [
@@ -104,8 +104,11 @@ void main() {
               ver: proposalRefs.map((e) {
                 return IndividualDocumentVersion(
                   ver: e.version!,
-                  type: '',
-                  template: DocumentRefForFilteredDocuments(id: templateRef.id),
+                  type: DocumentType.proposalDocument.uuid,
+                  template: DocumentRefForFilteredDocuments(
+                    id: templateRef.id,
+                    ver: templateRef.version,
+                  ),
                 );
               }).toList(),
             ).toJson(),
@@ -114,9 +117,9 @@ void main() {
         );
         final response = Response(http.Response('', 200), page);
 
-        final expectedRefs = [
-          ...proposalRefs,
-          templateRef,
+        final expectedRefs = <TypedDocumentRef>[
+          ...proposalRefs.map((e) => e.toTyped(DocumentType.proposalDocument)),
+          templateRef.toTyped(DocumentType.proposalTemplate),
         ];
 
         // When
