@@ -38,7 +38,7 @@ class _Body extends StatelessWidget {
               const StayInvolved(),
               const MostRecentProposalsSelector(),
             ].constrainedDelegate(
-             excludePredicate: (widget) =>
+              excludePredicate: (widget) =>
                   widget is CampaignHeroSection ||
                   widget is MostRecentProposalsSelector ||
                   widget is HowItWorks,
