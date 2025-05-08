@@ -157,7 +157,7 @@ async fn validate_against_original_doc(doc: &CatalystSignedDocument) -> anyhow::
         .body()
         .authors()
         .iter()
-        .map(|author| catalyst_signed_doc::IdUri::from_str(author))
+        .map(|author| catalyst_signed_doc::CatalystId::from_str(author))
         .collect::<Result<HashSet<_>, _>>()?;
     let authors: HashSet<_> = doc.authors().into_iter().collect();
     Ok(authors == original_authors)
