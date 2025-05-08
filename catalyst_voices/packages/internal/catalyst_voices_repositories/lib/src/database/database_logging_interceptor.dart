@@ -36,12 +36,18 @@ final class DatabaseLoggingInterceptor extends QueryInterceptor {
 
   @override
   Future<void> commitTransaction(TransactionExecutor inner) {
-    return _run(() => 'commit', () => super.commitTransaction(inner));
+    return _run(
+      () => 'commit',
+      () => super.commitTransaction(inner),
+    );
   }
 
   @override
   Future<void> rollbackTransaction(TransactionExecutor inner) {
-    return _run(() => 'rollback', () => super.rollbackTransaction(inner));
+    return _run(
+      () => 'rollback',
+      () => super.rollbackTransaction(inner),
+    );
   }
 
   @override
@@ -62,7 +68,7 @@ final class DatabaseLoggingInterceptor extends QueryInterceptor {
     List<Object?> args,
   ) {
     return _run(
-      () => 'custom with ${_prettyFormat(statement, args)}',
+      () => _prettyFormat(statement, args),
       () => super.runCustom(executor, statement, args),
     );
   }
@@ -74,7 +80,7 @@ final class DatabaseLoggingInterceptor extends QueryInterceptor {
     List<Object?> args,
   ) {
     return _run(
-      () => 'delete with ${_prettyFormat(statement, args)}',
+      () => _prettyFormat(statement, args),
       () => super.runDelete(executor, statement, args),
     );
   }
@@ -86,7 +92,7 @@ final class DatabaseLoggingInterceptor extends QueryInterceptor {
     List<Object?> args,
   ) {
     return _run(
-      () => 'insert with ${_prettyFormat(statement, args)}',
+      () => _prettyFormat(statement, args),
       () => super.runInsert(executor, statement, args),
     );
   }
@@ -98,7 +104,7 @@ final class DatabaseLoggingInterceptor extends QueryInterceptor {
     List<Object?> args,
   ) {
     return _run(
-      () => 'select with ${_prettyFormat(statement, args)}',
+      () => _prettyFormat(statement, args),
       () => super.runSelect(executor, statement, args),
     );
   }
@@ -110,7 +116,7 @@ final class DatabaseLoggingInterceptor extends QueryInterceptor {
     List<Object?> args,
   ) {
     return _run(
-      () => 'update with ${_prettyFormat(statement, args)}',
+      () => _prettyFormat(statement, args),
       () => super.runUpdate(executor, statement, args),
     );
   }
