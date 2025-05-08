@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 
+bool _defaultExcludePredicate(Widget child) => false;
+
+typedef ExcludeWidgetPredicate = bool Function(Widget child);
+
 class VoicesWideScreenConstrained extends StatelessWidget {
   /// Width of the screen. Defaults to 1440. When child has padding
   /// of horizontal 120 so actual content is 1200
@@ -24,9 +28,8 @@ class VoicesWideScreenConstrained extends StatelessWidget {
     );
 
     if (backgroundColor != null) {
-      content = Container(
-        width: double.infinity,
-        color: backgroundColor,
+      content = ColoredBox(
+        color: backgroundColor!,
         child: content,
       );
     }
@@ -38,10 +41,10 @@ class VoicesWideScreenConstrained extends StatelessWidget {
 extension ConstrainedListExtension on List<Widget> {
   List<Widget> constrainedDelegate({
     double maxWidth = 1440,
-    List<Type> excludeTypes = const [],
+    ExcludeWidgetPredicate excludePredicate = _defaultExcludePredicate,
   }) {
     return map((widget) {
-      if (excludeTypes.contains(widget.runtimeType)) {
+      if (excludePredicate(widget)) {
         return widget;
       }
 

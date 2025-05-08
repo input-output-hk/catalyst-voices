@@ -78,8 +78,10 @@ class _LatestProposalsState extends State<MostRecentProposals> {
   Widget build(BuildContext context) {
     return Container(
       key: const Key('MostRecentProposals'),
-      constraints:
-          const BoxConstraints.tightFor(height: 800, width: double.infinity),
+      constraints: const BoxConstraints.tightFor(
+        height: 800,
+        width: double.infinity,
+      ),
       decoration: BoxDecoration(
         image: DecorationImage(
           image: CatalystImage.asset(
