@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:catalyst_voices/pages/not_found/not_found_page.dart';
 import 'package:catalyst_voices/routes/guards/route_guard.dart';
 import 'package:catalyst_voices/routes/routes.dart';
 import 'package:catalyst_voices/routes/routing/routes.dart';
@@ -29,6 +30,7 @@ abstract final class AppRouter {
       // always true. We're deciding whether to print
       // them or not in LoggingService
       debugLogDiagnostics: true,
+      errorBuilder: (_, __) => const NotFoundPage(),
     );
   }
 
