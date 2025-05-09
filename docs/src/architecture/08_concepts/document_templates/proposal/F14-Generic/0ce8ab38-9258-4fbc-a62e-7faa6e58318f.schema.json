@@ -1048,21 +1048,21 @@
                                         "title": "Milestone Outputs",
                                         "description": "What will be delivered in this milestone",
                                         "x-placeholder": "Describe the deliverables or outcomes for this milestone",
-                                        "maxLength": 1000
+                                        "maxLength": 2000
                                     },
                                     "acceptance_criteria": {
                                         "$ref": "#/definitions/multiLineTextEntryMarkdown",
                                         "title": "Acceptance Criteria",
                                         "description": "Specific conditions that must be met",
                                         "x-placeholder": "Define the criteria for success in this milestone",
-                                        "maxLength": 1000
+                                        "maxLength": 2000
                                     },
                                     "evidence": {
                                         "$ref": "#/definitions/multiLineTextEntryMarkdown",
                                         "title": "Evidence of Completion",
                                         "description": "How you will demonstrate achievement",
                                         "x-placeholder": "Specify the evidence that will demonstrate this milestone is complete",
-                                        "maxLength": 1000
+                                        "maxLength": 2000
                                     },
                                     "delivery_month": {
                                         "$ref": "#/definitions/durationInMonths",
