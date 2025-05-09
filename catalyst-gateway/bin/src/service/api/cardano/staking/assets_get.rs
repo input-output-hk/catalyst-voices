@@ -12,19 +12,25 @@ use tracing::debug;
 
 use crate::{
     db::index::{
-        queries::staked_ada::{
-            get_assets_by_stake_address::{
-                GetAssetsByStakeAddressParams, GetAssetsByStakeAddressQuery,
+        queries::{
+            rbac::get_stake_address_from_catalyst_id::{
+                GetStakeAddressByCatIDParams, GetStakeAddressByCatIDQuery,
             },
-            get_txi_by_txn_hash::{GetTxiByTxnHashesQuery, GetTxiByTxnHashesQueryParams},
-            get_txo_by_stake_address::{
-                GetTxoByStakeAddressQuery, GetTxoByStakeAddressQueryParams,
+            staked_ada::{
+                get_assets_by_stake_address::{
+                    GetAssetsByStakeAddressParams, GetAssetsByStakeAddressQuery,
+                },
+                get_txi_by_txn_hash::{GetTxiByTxnHashesQuery, GetTxiByTxnHashesQueryParams},
+                get_txo_by_stake_address::{
+                    GetTxoByStakeAddressQuery, GetTxoByStakeAddressQueryParams,
+                },
+                update_txo_spent::{UpdateTxoSpentQuery, UpdateTxoSpentQueryParams},
             },
-            update_txo_spent::{UpdateTxoSpentQuery, UpdateTxoSpentQueryParams},
         },
         session::{CassandraSession, CassandraSessionError},
     },
     service::common::{
+        auth::rbac::token::CatalystRBACTokenV1,
         objects::cardano::{
             network::Network,
             stake_info::{FullStakeInfo, StakeInfo, StakedTxoAssetInfo},
@@ -346,4 +352,46 @@ fn build_stake_info(mut txo_state: TxoAssetsState, slot_num: SlotNo) -> anyhow::
     }
 
     Ok(stake_info)
+}
+
+/// Retrieves the CIP-19 stake address associated with a given Catalyst RBAC token.
+pub async fn get_stake_address_from_cat_id(
+    token: CatalystRBACTokenV1,
+) -> anyhow::Result<Cip19StakeAddress> {
+    // Attempt to acquire sessions
+    let volatile_session =
+        CassandraSession::get(false).ok_or(CassandraSessionError::FailedAcquiringSession)?;
+    let persistent_session =
+        CassandraSession::get(true).ok_or(CassandraSessionError::FailedAcquiringSession)?;
+
+    // Try getting the stake address from the volatile session
+    let stake_address = match get_stake_address_for_token(token.clone(), volatile_session).await {
+        Ok(address) => address,
+        Err(_) => {
+            match get_stake_address_for_token(token, persistent_session).await {
+                Ok(address) => address,
+                Err(_) => {
+                    return Err(anyhow::anyhow!(
+                        "Cannot get stake addr from volatile or persistent session"
+                    ))
+                },
+            }
+        },
+    };
+
+    Cip19StakeAddress::try_from(stake_address.to_string())
+}
+
+/// Fetches the stake address for a given Catalyst token.
+async fn get_stake_address_for_token(
+    token: CatalystRBACTokenV1, session: Arc<CassandraSession>,
+) -> Result<crate::db::types::DbStakeAddress, anyhow::Error> {
+    let params = GetStakeAddressByCatIDParams::new(token.catalyst_id().clone().into());
+    let mut results = GetStakeAddressByCatIDQuery::execute(&session, params).await?;
+
+    results
+        .try_next()
+        .await?
+        .map(|row| row.stake_address)
+        .ok_or_else(|| anyhow::anyhow!("No stake address found"))
 }
