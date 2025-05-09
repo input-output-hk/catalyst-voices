@@ -425,7 +425,7 @@ final class RegistrationServiceImpl implements RegistrationService {
   ///
   /// If transaction is generated and signed but never expires
   /// then anybody could submit it at any time, even without
-  /// the knowledge of the wallet owner
+  /// the knowledge of the wallet owner.
   ///
   /// It's a common security practice to configure transactions
   /// to expire after a certain duration.
