@@ -5,7 +5,7 @@ use std::sync::Arc;
 use anyhow::Context;
 use cardano_blockchain_types::{Network, Point, Slot, TxnIndex};
 use cardano_chain_follower::ChainFollower;
-use catalyst_signed_doc::IdUri;
+use catalyst_signed_doc::CatalystId;
 use futures::{TryFutureExt, TryStreamExt};
 use rbac_registration::{cardano::cip509::Cip509, registration::cardano::RegistrationChain};
 use scylla::{
@@ -74,7 +74,7 @@ impl Query {
 /// Returns a sorted list of all registrations for the given Catalyst ID from the
 /// database.
 pub(crate) async fn indexed_registrations(
-    session: &CassandraSession, catalyst_id: &IdUri,
+    session: &CassandraSession, catalyst_id: &CatalystId,
 ) -> anyhow::Result<Vec<Query>> {
     let mut result: Vec<_> = Query::execute(session, QueryParams {
         catalyst_id: catalyst_id.clone().into(),
