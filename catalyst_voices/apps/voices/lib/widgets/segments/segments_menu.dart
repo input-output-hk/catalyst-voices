@@ -2,7 +2,6 @@ import 'package:catalyst_voices/widgets/menu/voices_node_menu.dart';
 import 'package:catalyst_voices/widgets/segments/segments_controller.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
@@ -26,39 +25,41 @@ class SegmentsMenu extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       mainAxisSize: MainAxisSize.min,
-      children: segments
-          .map<Widget>(
-            (segment) {
-              return VoicesNodeMenu(
-                key: ValueKey('Segment[${segment.id}]NodeMenu'),
-                name: Text(segment.resolveTitle(context)),
-                icon: segment.icon.buildIcon(),
-                onHeaderTap: () {
-                  onSegmentTap(segment.id);
-                },
-                onItemTap: (id) {
-                  final sections = segment.sections;
-                  final section = sections.firstWhere((e) => e.id.value == id);
-
-                  onSectionSelected(section.id);
-                },
-                selectedItemId: selectedSectionId?.value,
-                isExpanded: openedSegments.contains(segment.id),
-                items: segment.sections.map(
-                  (section) {
-                    return VoicesNodeMenuItem(
-                      id: section.id.value,
-                      label: section.resolveTitle(context),
-                      isEnabled: section.isEnabled,
-                      hasError: section.hasError,
-                    );
-                  },
-                ).toList(),
-              );
+      spacing: 12,
+      children: segments.map<Widget>(
+        (segment) {
+          return VoicesNodeMenu(
+            key: ValueKey('Segment[${segment.id}]NodeMenu'),
+            name: Text(
+              segment.resolveTitle(context),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+            icon: segment.icon.buildIcon(),
+            onHeaderTap: () {
+              onSegmentTap(segment.id);
             },
-          )
-          .separatedBy(const SizedBox(height: 12))
-          .toList(),
+            onItemTap: (id) {
+              final sections = segment.sections;
+              final section = sections.firstWhere((e) => e.id.value == id);
+
+              onSectionSelected(section.id);
+            },
+            selectedItemId: selectedSectionId?.value,
+            isExpanded: openedSegments.contains(segment.id),
+            items: segment.sections.map(
+              (section) {
+                return VoicesNodeMenuItem(
+                  id: section.id.value,
+                  label: section.resolveTitle(context),
+                  isEnabled: section.isEnabled,
+                  hasError: section.hasError,
+                );
+              },
+            ).toList(),
+          );
+        },
+      ).toList(),
     );
   }
 }
