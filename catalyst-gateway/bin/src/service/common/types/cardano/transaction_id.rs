@@ -4,6 +4,7 @@ use std::sync::LazyLock;
 
 use cardano_blockchain_types::TransactionId;
 use catalyst_types::hashes::BLAKE_2B256_SIZE;
+use const_format::concatcp;
 use poem_openapi::{
     registry::{MetaSchema, MetaSchemaRef},
     types::{Example, ParseError, ParseFromJSON, ParseFromParameter, ParseResult, ToJSON, Type},
@@ -23,7 +24,7 @@ const ENCODED_LENGTH: usize = EXAMPLE.len();
 /// Length of the hash itself;
 const HASH_LENGTH: usize = BLAKE_2B256_SIZE;
 /// Validation Regex Pattern
-const PATTERN: &str = "0x[A-Fa-f0-9]{64}";
+const PATTERN: &str = concatcp!("^0x", "[A-Fa-f0-9]{", HASH_LENGTH * 2, "}$");
 
 /// Schema.
 #[allow(clippy::cast_lossless)]
@@ -80,5 +81,28 @@ impl TryFrom<Vec<u8>> for TxnId {
 impl From<TransactionId> for TxnId {
     fn from(value: TransactionId) -> Self {
         Self(value.to_string())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use regex::Regex;
+
+    use super::*;
+
+    #[test]
+    fn test_txn_id() {
+        let regex = Regex::new(PATTERN).unwrap();
+        assert!(regex.is_match(EXAMPLE));
+        assert!(TxnId::parse_from_parameter(EXAMPLE).is_ok());
+
+        let invalid = [
+            "0x27d0350039fb3d068cccfae902bf2e72583fc5",
+            "0x27d0350039fb3d068cccfae902bf2e72583fc553e0aafb960bd9d76d5bff777b0",
+        ];
+        for v in &invalid {
+            assert!(!regex.is_match(v));
+            assert!(TxnId::parse_from_parameter(v).is_err());
+        }
     }
 }

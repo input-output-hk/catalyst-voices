@@ -1,4 +1,4 @@
-//! Cardano address types.
+//! Cardano stake address types.
 //!
 //! More information can be found in [CIP-19](https://cips.cardano.org/cip/CIP-19)
 
@@ -145,16 +145,32 @@ impl Example for Cip19StakeAddress {
 
 #[cfg(test)]
 mod tests {
+    use regex::Regex;
     use super::*;
 
+    // Test Vector: <https://cips.cardano.org/cip/CIP-19>
     // cspell: disable
     const VALID_PROD_STAKE_ADDRESS: &str =
-        "stake1u94ullc9nj9gawc08990nx8hwgw80l9zpmr8re44kydqy9cdjq6rq";
+        "stake1uyehkck0lajq8gr28t9uxnuvgcqrc6070x3k9r8048z8y5gh6ffgw";
     const VALID_TEST_STAKE_ADDRESS: &str =
         "stake_test1uqehkck0lajq8gr28t9uxnuvgcqrc6070x3k9r8048z8y5gssrtvn";
     const INVALID_STAKE_ADDRESS: &str =
         "invalid1u9nlq5nmuzthw3vhgakfpxyq4r0zl2c0p8uqy24gpyjsa6c3df4h6";
     // cspell: enable
+
+    #[test]
+    fn test_cip19_stake_address() {
+        let regex = Regex::new(PATTERN).unwrap();
+
+        let valid = [EXAMPLE, VALID_PROD_STAKE_ADDRESS, VALID_TEST_STAKE_ADDRESS];
+        for v in valid {
+            assert!(regex.is_match(v));
+            assert!(Cip19StakeAddress::parse_from_parameter(v).is_ok());
+        }
+
+        assert!(!regex.is_match(INVALID_STAKE_ADDRESS));
+        assert!(Cip19StakeAddress::parse_from_parameter(INVALID_STAKE_ADDRESS).is_err());
+    }
 
     #[test]
     fn test_valid_stake_address_from_string() {

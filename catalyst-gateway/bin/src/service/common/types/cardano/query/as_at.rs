@@ -171,14 +171,23 @@ impl Display for AsAt {
 
 #[cfg(test)]
 mod tests {
-    use super::parse_parameter;
+    use regex::Regex;
+    use super::*;
 
     #[test]
     fn test_string_to_slot_no() {
-        let slot_no = "SLOT:12396302";
-        assert!(parse_parameter(slot_no).is_ok());
+        let regex = Regex::new(PATTERN).unwrap();
 
-        let unix_timestamp = "TIME:1736164751";
-        assert!(parse_parameter(unix_timestamp).is_ok());
+        let valid = [&EXAMPLE, "SLOT:12396302", "TIME:1736164751"];
+        let invalid = ["TIME:123456789012345678901", "TIME:"];
+
+        for v in &valid {
+            assert!(regex.is_match(v));
+            assert!(AsAt::parse_from_parameter(v).is_ok());
+        }
+        for v in &invalid {
+            assert!(!regex.is_match(v));
+            assert!(AsAt::parse_from_parameter(v).is_err());
+        }
     }
 }
