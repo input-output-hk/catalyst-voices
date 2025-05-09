@@ -2,6 +2,7 @@
 
 use std::{collections::HashMap, sync::LazyLock};
 
+use catalyst_types::catalyst_id::role_index::RoleId;
 use poem_openapi::{
     registry::{MetaSchema, MetaSchemaRef},
     types::{Example, ParseError, ParseFromJSON, ParseResult, ToJSON, Type},
@@ -26,10 +27,10 @@ static SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| {
 
 /// A RBAC role data map.
 #[derive(Debug, Clone)]
-pub(crate) struct RoleMap(HashMap<u8, RbacRoleData>);
+pub(crate) struct RoleMap(HashMap<RoleId, RbacRoleData>);
 
-impl From<HashMap<u8, RbacRoleData>> for RoleMap {
-    fn from(value: HashMap<u8, RbacRoleData>) -> Self {
+impl From<HashMap<RoleId, RbacRoleData>> for RoleMap {
+    fn from(value: HashMap<RoleId, RbacRoleData>) -> Self {
         Self(value)
     }
 }
@@ -86,6 +87,10 @@ impl ParseFromJSON for RoleMap {
 
 impl Example for RoleMap {
     fn example() -> Self {
-        Self([(0, RbacRoleData::example())].into_iter().collect())
+        Self(
+            [(RoleId::Role0, RbacRoleData::example())]
+                .into_iter()
+                .collect(),
+        )
     }
 }

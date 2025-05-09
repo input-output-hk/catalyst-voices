@@ -3,7 +3,7 @@
 use std::{fmt::Debug, sync::Arc};
 
 use cardano_blockchain_types::TransactionId;
-use catalyst_types::id_uri::IdUri;
+use catalyst_types::catalyst_id::CatalystId;
 use scylla::{SerializeRow, Session};
 use tracing::error;
 
@@ -38,7 +38,7 @@ impl Debug for Params {
 
 impl Params {
     /// Creates a new record for this transaction.
-    pub(crate) fn new(catalyst_id: IdUri, txn_id: TransactionId) -> Self {
+    pub(crate) fn new(catalyst_id: CatalystId, txn_id: TransactionId) -> Self {
         Params {
             txn_id: txn_id.into(),
             catalyst_id: catalyst_id.into(),
