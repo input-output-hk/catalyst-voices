@@ -235,17 +235,17 @@ class _DocumentPropertyBuilderViewerState
 class _ListItem extends StatelessWidget {
   final String title;
   final bool isRequired;
-  final Widget value;
   final bool isMultiline;
   final bool isAnswered;
+  final Widget child;
 
   const _ListItem({
     required super.key,
     required this.title,
     required this.isRequired,
-    required this.value,
     this.isMultiline = false,
     this.isAnswered = false,
+    required this.child,
   });
 
   @override
@@ -276,7 +276,7 @@ class _ListItem extends StatelessWidget {
           ),
           maxLines: !isMultiline ? 1 : null,
           overflow: !isMultiline ? TextOverflow.ellipsis : TextOverflow.clip,
-          child: value,
+          child: child,
         ),
       ],
     );
@@ -312,8 +312,9 @@ class _MarkdownListItem extends StatelessWidget {
       key: ValueKey(id),
       title: title,
       isRequired: isRequired,
-      value: child,
       isAnswered: isAnswered,
+      isMultiline: true,
+      child: child,
     );
   }
 }
@@ -353,9 +354,9 @@ class _TextListItem extends StatelessWidget {
       key: ValueKey(id),
       title: title,
       isRequired: isRequired,
-      value: child,
       isMultiline: isMultiline,
       isAnswered: isAnswered,
+      child: child,
     );
   }
 }
