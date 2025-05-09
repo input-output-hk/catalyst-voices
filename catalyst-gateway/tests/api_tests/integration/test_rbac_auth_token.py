@@ -92,7 +92,8 @@ def test_invalid_rbac_auth_token(rbac_chain_factory):
 
 @pytest.mark.preprod_indexing
 def test_valid_rbac_auth_token(rbac_chain_factory):
-    token = rbac_chain_factory(RoleID.ROLE_0).auth_token()
+    token = rbac_chain_factory(RoleID.PROPOSER).auth_token()
+    
     resp = get(lookup=None, token=token)
     assert(resp.status_code == 200), f"Expected valid token that already registered: {resp.status_code} - {resp.text}"
     
