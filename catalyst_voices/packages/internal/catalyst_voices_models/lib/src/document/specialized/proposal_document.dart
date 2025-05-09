@@ -60,7 +60,9 @@ final class ProposalDocument extends Equatable {
     required this.document,
   });
 
-  String? get authorName => _contentAuthorName ?? _metadataAuthorName;
+  CatalystId? get authorId => metadata.authors.firstOrNull;
+
+  String? get authorName => _metadataAuthorName ?? _contentAuthorName;
 
   String? get description {
     final property = document.getProperty(descriptionNodeId);
