@@ -4,7 +4,9 @@ mod data;
 
 use std::{collections::HashMap, env, sync::LazyLock};
 
-use catalyst_signed_doc::{Builder, CatalystSignedDocument, ContentEncoding, ContentType, IdUri};
+use catalyst_signed_doc::{
+    Builder, CatalystId, CatalystSignedDocument, ContentEncoding, ContentType,
+};
 use data::{CATEGORY_DOCUMENTS, COMMENT_TEMPLATES, PROPOSAL_TEMPLATES};
 use ed25519_dalek::{ed25519::signature::Signer, SigningKey};
 use hex::FromHex;
@@ -107,7 +109,7 @@ fn build_signed_doc(data: &SignedDocData, sk: &SigningKey) -> (Uuid, CatalystSig
         "brand_id":  {"id": BRAND_ID, "ver": BRAND_VERSION},
     });
 
-    let kid = IdUri::new(KID_NETWORK, None, sk.verifying_key());
+    let kid = CatalystId::new(KID_NETWORK, None, sk.verifying_key());
     let doc = Builder::new()
         .with_json_metadata(metadata.clone())
         .expect("Failed to build Metadata from template")
