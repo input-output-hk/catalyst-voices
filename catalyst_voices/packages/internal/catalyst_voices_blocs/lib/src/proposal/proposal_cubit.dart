@@ -296,7 +296,9 @@ final class ProposalCubit extends Cubit<ProposalState>
       categoryName: category?.categoryName ?? '',
       proposalTitle: document.title ?? '',
       data: ProposalViewMetadata(
-        author: Profile(catalystId: DummyCatalystIdFactory.create()),
+        author: Profile(
+          catalystId: document.metadataCatalystId!,
+        ),
         description: document.description,
         status: proposal.publish,
         createdAt: version?.id.tryDateTime ?? DateTime.now(),

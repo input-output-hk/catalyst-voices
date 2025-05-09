@@ -60,7 +60,7 @@ final class ProposalDocument extends Equatable {
     required this.document,
   });
 
-  String? get authorName => _contentAuthorName ?? _metadataAuthorName;
+  String? get authorName => _metadataAuthorName ?? _contentAuthorName;
 
   String? get description {
     final property = document.getProperty(descriptionNodeId);
@@ -93,6 +93,8 @@ final class ProposalDocument extends Equatable {
     if (value == null) return null;
     return Coin.fromWholeAda(value);
   }
+
+  CatalystId? get metadataCatalystId => metadata.authors.firstOrNull;
 
   int? get milestoneCount {
     final property = document.getProperty(milestonesNodeId);
