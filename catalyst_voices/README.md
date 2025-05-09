@@ -9,8 +9,9 @@ This repository contains the Catalyst Voices app and packages.
   * [Getting Started](#getting-started)
     * [Bootstrapping](#bootstrapping)
     * [Packages](#packages)
-    * [Flavors](#flavors)
+    * [Environment types](#environment-types)
     * [Environment variables](#environment-variables)
+      * [Environment config](#environment-config)
     * [Code Generation](#code-generation)
       * [Running Code Generation](#running-code-generation)
         * [Basic Generation](#basic-generation)
@@ -63,45 +64,60 @@ just bootstrap
 | [catalyst_voices_shared](./packages/internal/catalyst_voices_shared/)             | Shared code  |[example](./packages/internal/catalyst_voices_shared/)|
 | [catalyst_voices_view_models](./packages/internal/catalyst_voices_view_models/)   | ViewModels  |[example](./packages/internal/catalyst_voices_view_models/)|
 
-### Flavors
+### Environment types
 
-This project contains four flavors:
+This project contains four env types:
 
 * dev
-* qa
 * preprod
 * prod
+* relative
 
-To run the desired flavor, either use the launch configuration in VSCode/Android Studio or use the following commands:
+To run the desired flavor, either use the launch configuration in VSCode/Android Studio or use the
+following commands:
 
 ```sh
 # Development
-flutter run --flavor dev --target apps/voices/lib/configs/main_dev.dart
-
-# QA
-flutter run --flavor qa --target apps/voices/lib/configs/main_qa.dart
+flutter run --target apps/voices/lib/configs/main_dev.dart
 
 # Pre-Production
-flutter run --flavor preprod --target apps/voices/lib/configs/main_preprod.dart
+flutter run --target apps/voices/lib/configs/main_preprod.dart
 
 # Production
-flutter run --flavor prod --target apps/voices/lib/configs/main_prod.dart
+flutter run --target apps/voices/lib/configs/main_prod.dart
+
+# Or
+flutter run --flavor prod --target apps/voices/lib/configs/main.dart
+
+# Or
+flutter run --target apps/voices/lib/configs/main.dart --dart-define=ENV_NAME=prod
 ```
 
->Catalyst Voices works on the Web only.
->We plan to add support for other targets later.
+> Catalyst Voices works on the Web only.
+> We plan to add support for other targets later.
 
 ### Environment variables
 
-We use [dart defines](https://dart.dev/guides/language/language-tour#using-variables)
-to manage environment variables.
+We use [dart defines](https://dart.dev/guides/language/language-tour#using-variables) as flavor run parameter.
 
-For example if you need to pass `SENTRY_DSN` as environment variable,
-you can use the following command:
+All of env variable are optional and you can define only what you want, where you want.
+
+Priority looks as follow:
+
+1. `dart-define` vars
+2. `flavor` var
+
+If none of above is defined app will fallback to **relative** type for web or **dev** in other cases.
+
+Using following command below will resolve in **relative** env type because **ENV_NAME** nor **flavor** is defined.
 
 ```sh
-flutter build web --target apps/voices/lib/configs/main_web.dart --dart-define SENTRY_DSN=REPLACE_WITH_SENTRY_DSN_URL
+flutter build web --target apps/voices/lib/configs/main_web.dart
 ```
+
+#### Environment config
+
+Configuration is downloaded dynamically from **gateway** backend where **gateway** base url depends on used env type.
 
 ### Code Generation
 

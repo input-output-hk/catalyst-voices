@@ -40,7 +40,17 @@ sealed class LocalizedApiException extends LocalizedException {
           statusCode: statusCode,
           error: error,
         ),
+      ApiMalformedBodyException() => const MalformedBodyApiException(),
     };
+  }
+}
+
+final class MalformedBodyApiException extends LocalizedApiException {
+  const MalformedBodyApiException();
+
+  @override
+  String message(BuildContext context) {
+    return context.l10n.apiErrorMalformedBody;
   }
 }
 

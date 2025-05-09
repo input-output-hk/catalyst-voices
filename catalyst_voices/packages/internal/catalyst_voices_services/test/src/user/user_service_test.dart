@@ -28,7 +28,7 @@ void main() {
       keychainProvider = VaultKeychainProvider(
         secureStorage: const FlutterSecureStorage(),
         sharedPreferences: SharedPreferencesAsync(),
-        cacheConfig: const CacheConfig(),
+        cacheConfig: const AppConfig.dev().cache,
       );
       userObserver = StreamUserObserver();
     });

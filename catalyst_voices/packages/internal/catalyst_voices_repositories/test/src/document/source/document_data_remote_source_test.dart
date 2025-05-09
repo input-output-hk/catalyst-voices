@@ -11,7 +11,6 @@ import 'package:uuid_plus/uuid_plus.dart';
 void main() {
   final CatGateway gateway = _MockedCatGateway();
   final CatReviews reviews = _MockedCatReviews();
-  final Vit vit = _MockedVit();
   final SignedDocumentManager signedDocumentManager =
       _MockedSignedDocumentManager();
 
@@ -23,7 +22,6 @@ void main() {
   setUpAll(() {
     apiServices = ApiServices.internal(
       gateway: gateway,
-      vit: vit,
       reviews: reviews,
     );
 
@@ -33,7 +31,6 @@ void main() {
   tearDown(() {
     reset(gateway);
     reset(reviews);
-    reset(vit);
     reset(signedDocumentManager);
   });
 
@@ -173,5 +170,3 @@ class _MockedCatReviews extends Mock implements CatReviews {}
 
 class _MockedSignedDocumentManager extends Mock
     implements SignedDocumentManager {}
-
-class _MockedVit extends Mock implements Vit {}
