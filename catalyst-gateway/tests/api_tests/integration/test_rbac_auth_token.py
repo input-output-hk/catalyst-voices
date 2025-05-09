@@ -42,7 +42,7 @@ def test_invalid_rbac_auth_token(rbac_chain_factory):
     resp = get(lookup=None, token=token)
     assert(resp.status_code == 401), f"Expected must not contain username: {resp.status_code} - {resp.text}"
     
-    # Catalyst ID not in a correct format -> 401
+    # Catalyst ID not in a correct format (Should be in short form with catid. -> 401
     token = rbac_chain_factory(RoleID.ROLE_0).auth_token(is_uri=True)
     resp = get(lookup=None, token=token)
     assert(resp.status_code == 401), f"Expected invalid Catalyst ID format: {resp.status_code} - {resp.text}"
@@ -92,7 +92,8 @@ def test_invalid_rbac_auth_token(rbac_chain_factory):
 
 @pytest.mark.preprod_indexing
 def test_valid_rbac_auth_token(rbac_chain_factory):
-    token = rbac_chain_factory(RoleID.ROLE_0).auth_token()
+    token = rbac_chain_factory(RoleID.PROPOSER).auth_token()
+    
     resp = get(lookup=None, token=token)
     assert(resp.status_code == 200), f"Expected valid token that already registered: {resp.status_code} - {resp.text}"
     
