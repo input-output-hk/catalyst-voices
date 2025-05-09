@@ -23,7 +23,7 @@ const EXAMPLE: &str = "c9993e54-1ee1-41f7-ab99-3fdec865c744";
 pub(crate) const ENCODED_LENGTH: usize = EXAMPLE.len();
 /// Validation Regex Pattern
 pub(crate) const PATTERN: &str =
-    "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89abAB][0-9a-fA0F]{3}-[0-9a-fA-F]{12}$";
+    "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$";
 /// Format
 pub(crate) const FORMAT: &str = "uuid";
 
@@ -92,5 +92,23 @@ impl TryInto<uuid::Uuid> for UUIDv4 {
 impl From<catalyst_signed_doc::UuidV4> for UUIDv4 {
     fn from(value: catalyst_signed_doc::UuidV4) -> Self {
         Self(value.to_string())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use regex::Regex;
+    use super::*;
+
+    #[test]
+    fn test_uuidv4() {
+        let regex = Regex::new(PATTERN).unwrap();
+        let valid = [EXAMPLE, "01943A32-9F35-4A14-B364-36AD693465E6"];
+        for v in &valid {
+            assert!(regex.is_match(v));
+            assert!(UUIDv4::parse_from_parameter(v).is_ok());
+        }
+        // Try UUIDv7
+        assert!(UUIDv4::parse_from_parameter("c9993e54-1ee1-71f7-ab99-3fdec865c744").is_err());
     }
 }
