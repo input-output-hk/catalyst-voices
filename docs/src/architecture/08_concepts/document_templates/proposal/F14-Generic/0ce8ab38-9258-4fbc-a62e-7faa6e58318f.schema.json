@@ -487,13 +487,14 @@
                     "properties": {
                         "isOpenSource": {
                             "$ref": "#/definitions/yesNoChoice",
-                            "title": "Is the project open source?",
+                            "title": "Will your project's output/s be fully open source?",
                             "description": "Select Yes if the project is open source, No if it is not."
                         },
                         "licenseInformation": {
                             "$ref": "#/definitions/multiLineTextEntry",
-                            "title": "License and Additional Information",
+                            "title": "Please provide here more information on the open source status of your project outputs",
                             "description": "Provide the license type and any additional context regarding the open-source status of your project. If partially open source, specify which parts are open source.",
+                            "x-guidance": "If you answered YES to the above question:\n\nIf declaring the project is open source in the application form, the project should be open source-available throughout the entire lifecycle of the project with a declared open-source repository.\nPlease indicate here the type of license you intend to use for open source and provide any further information you feel is relevant to the open source status of your project outputs. If only certain elements of your code will be open source please clarify which elements will be open source here.\n\nIf you answered NO to the above question, please give further details as to why your projects outputs will not be open source.",
                             "x-placeholder": "Describe the open source status of your project and the license type",
                             "maxLength": 500
                         }
