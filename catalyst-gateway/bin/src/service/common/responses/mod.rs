@@ -16,7 +16,7 @@ use poem_openapi::{
     registry::{MetaHeader, MetaResponse, MetaResponses, Registry},
     ApiResponse,
 };
-use tracing::error;
+use tracing::{debug, error};
 
 mod code_401_unauthorized;
 mod code_403_forbidden;
@@ -34,7 +34,7 @@ use super::types::headers::{
     retry_after::{RetryAfterHeader, RetryAfterOption},
 };
 use crate::{
-    db::index::session::CassandraSessionError,
+    db::{event::EventDBConnectionError, index::session::CassandraSessionError},
     service::utilities::health::{set_event_db_liveness, set_index_db_liveness},
 };
 
@@ -149,17 +149,24 @@ impl<T> WithErrorResponses<T> {
     /// Returns a Server Error or a Service Unavailable response.
     pub(crate) fn handle_error(err: &anyhow::Error) -> Self {
         match err {
-            err if err.is::<bb8::RunError<tokio_postgres::Error>>() => {
+            err if err.is::<bb8::RunError<tokio_postgres::Error>>()
+                || err.is::<EventDBConnectionError>() =>
+            {
                 // Event DB failed
+                debug!(error=?err, "Handling Response for Event DB Error");
                 set_event_db_liveness(false);
                 Self::service_unavailable(err, RetryAfterOption::Default)
             },
             err if err.is::<CassandraSessionError>() => {
                 // Index DB failed
+                debug!(error=?err, "Handling Response for Index DB Error");
                 set_index_db_liveness(false);
                 Self::service_unavailable(err, RetryAfterOption::Default)
             },
-            err => Self::internal_error(err),
+            err => {
+                debug!(error=?err, "Handling Response for Internal Error");
+                Self::internal_error(err)
+            },
         }
     }
 

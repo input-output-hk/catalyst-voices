@@ -6,6 +6,7 @@ use panic_message::panic_message;
 use poem::{http::StatusCode, middleware::PanicHandler, IntoResponse};
 use poem_openapi::payload::Json;
 use serde_json::json;
+use tracing::debug;
 
 use crate::{
     service::{
@@ -58,8 +59,14 @@ impl PanicHandler for ServicePanicHandler {
         // Increment the counter used for liveness checks.
         inc_live_counter();
 
+        let current_count = get_live_counter();
+        debug!(
+            live_counter = current_count,
+            "Handling service panic response"
+        );
+
         // If current count is above the threshold, then flag the system as NOT live.
-        if get_live_counter() > Settings::service_live_counter_threshold() {
+        if current_count > Settings::service_live_counter_threshold() {
             set_not_live();
         }
 

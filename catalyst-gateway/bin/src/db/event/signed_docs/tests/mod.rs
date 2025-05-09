@@ -7,7 +7,7 @@ use futures::TryStreamExt;
 use super::*;
 use crate::db::event::{
     common::{eq_or_ranged_uuid::EqOrRangedUuid, query_limits::QueryLimits},
-    establish_connection,
+    establish_connection_pool,
 };
 
 mod filter_by_field;
@@ -15,7 +15,7 @@ mod filter_by_field;
 #[ignore = "An integration test which requires a running EventDB instance, disabled from `testunit` CI run"]
 #[tokio::test]
 async fn queries_test() {
-    establish_connection();
+    establish_connection_pool().await;
 
     let doc_type = uuid::Uuid::new_v4();
     let docs = test_docs(doc_type);
