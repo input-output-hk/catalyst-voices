@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["QUERY"],"fn":["build_reg_chain","indexed_registrations","load_cip509_from_chain"],"struct":["Query","QueryParams"]};

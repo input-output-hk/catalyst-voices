@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["GetConfigResponses","SetConfigResponse"],"fn":["merge_configs","set"],"struct":["ConfigApi"],"type":["GetConfigAllResponses","SetConfigAllResponses"]};
