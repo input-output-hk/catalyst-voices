@@ -1,0 +1,212 @@
+{
+    "schemaInfo": {
+      "version": "1.0.0",
+      "schemaURL": "https://raw.githubusercontent.com/input-output-hk/catalyst-voices/refs/heads/main/docs/src/architecture/08_concepts/document_templates/parameter-document/governanceParametersSchema_v1.0.json"
+    },
+    "brandParameters": [
+      {
+        "parameter": "Direct Voting privacy state",
+        "dataType": "Boolean",
+        "isDecisionParameter": false
+      },
+      {
+        "parameter": "Brand Name",
+        "dataType": "String",
+        "isDecisionParameter": false
+      },
+      {
+        "parameter": "Minimum Budget Request Per Proposal",
+        "dataType": "ADA Amount",
+        "isDecisionParameter": false
+      },
+      {
+        "parameter": "Maximum Budget Request Per Proposal",
+        "dataType": "ADA Amount (Variable per Challenge/Category)",
+        "isDecisionParameter": false
+      },
+      {
+        "parameter": "Maximum proposals per Proposer/co-proposer",
+        "dataType": "Integer",
+        "isDecisionParameter": false
+      },
+      {
+        "parameter": "Community Reviewer registration",
+        "dataType": "String",
+        "isDecisionParameter": false
+      },
+      {
+        "parameter": "Voting power threshold",
+        "dataType": "Lovelace Amount",
+        "isDecisionParameter": false
+      },
+      {
+        "parameter": "Tallying optimization",
+        "dataType": "Ratio / Formula",
+        "isDecisionParameter": false
+      },
+      {
+        "parameter": "Proposal acceptance threshold",
+        "dataType": "Percentage",
+        "isDecisionParameter": false
+      }
+    ],
+    "campaignParameters": [
+      {
+        "parameter": "Fund/Campaign Name",
+        "dataType": "String",
+        "isDecisionParameter": false
+      },
+      {
+        "parameter": "Fund/Campaign Size",
+        "dataType": "ADA Amount",
+        "isDecisionParameter": false
+      },
+      {
+        "parameter": "Campaign (Challenge) Title",
+        "dataType": "String",
+        "isDecisionParameter": false
+      },
+      {
+        "parameter": "Campaign (Challenge) Budget",
+        "dataType": "ADA Amount",
+        "isDecisionParameter": false
+      },
+      {
+        "parameter": "Proposal Submission Fee",
+        "dataType": "Currency Amount / String",
+        "isDecisionParameter": false
+      },
+      {
+        "parameter": "Compensations and funds distribution target date",
+        "dataType": "Date",
+        "isDecisionParameter": false
+      },
+      {
+        "parameter": "Proposals registration on the blockchain",
+        "dataType": "Date",
+        "isDecisionParameter": false
+      },
+      {
+        "parameter": "Drep deadline date",
+        "dataType": "Date",
+        "isDecisionParameter": false
+      },
+      {
+        "parameter": "Registration deadline date",
+        "dataType": "Datetime",
+        "isDecisionParameter": false
+      },
+      {
+        "parameter": "Voting period start time",
+        "dataType": "Datetime",
+        "isDecisionParameter": true
+      },
+      {
+        "parameter": "Voting period end time",
+        "dataType": "Datetime",
+        "isDecisionParameter": false
+      },
+      {
+        "parameter": "Start of tallying",
+        "dataType": "Date",
+        "isDecisionParameter": false
+      },
+      {
+        "parameter": "End of tallying",
+        "dataType": "Date",
+        "isDecisionParameter": false
+      },
+      {
+        "parameter": "Proposal Funding logic (winner selection)",
+        "dataType": "String / Rule",
+        "isDecisionParameter": false
+      },
+      {
+        "parameter": "Voter Compensations (Vrtotal)",
+        "dataType": "Percentage / ADA Amount",
+        "isDecisionParameter": false
+      },
+      {
+        "parameter": "Community Review Compensations",
+        "dataType": "Percentage / ADA Amount",
+        "isDecisionParameter": false
+      },
+      {
+        "parameter": "Community Moderator Compensations (AArtotal)",
+        "dataType": "Percentage / ADA Amount",
+        "isDecisionParameter": false
+      },
+      {
+        "parameter": "Onboarding compensations (Cttotal)",
+        "dataType": "Percentage / ADA Amount",
+        "isDecisionParameter": false
+      },
+      {
+        "parameter": "Project Accountability Management Comp.",
+        "dataType": "Percentage / ADA Amount",
+        "isDecisionParameter": false
+      },
+      {
+        "parameter": "current_insight_sharing_start",
+        "dataType": "Date",
+        "isDecisionParameter": false
+      },
+      {
+        "parameter": "current_proposal_submission_start",
+        "dataType": "Date",
+        "isDecisionParameter": false
+      },
+      {
+        "parameter": "current_refine_proposals_start",
+        "dataType": "Date",
+        "isDecisionParameter": false
+      },
+      {
+        "parameter": "current_finalize_proposals_start",
+        "dataType": "Date",
+        "isDecisionParameter": false
+      },
+      {
+        "parameter": "current_proposal_assessment",
+        "dataType": "Date",
+        "isDecisionParameter": false
+      },
+      {
+        "parameter": "current_assessment_qa_start",
+        "dataType": "Date",
+        "isDecisionParameter": false
+      }
+    ],
+    "categoryParameters": [
+      {
+        "parameter": "Campaign (Challenge) Title",
+        "dataType": "String",
+        "isDecisionParameter": false
+      },
+      {
+        "parameter": "Minimum Budget Request Per Proposal",
+        "dataType": "ADA Amount",
+        "isDecisionParameter": false
+      },
+      {
+        "parameter": "Maximum Budget Request Per Proposal",
+        "dataType": "ADA Amount (Variable per Challenge/Category)",
+        "isDecisionParameter": false
+      },
+      {
+        "parameter": "Proposal Funding logic (winner selection)",
+        "dataType": "String / Rule",
+        "isDecisionParameter": false
+      },
+      {
+        "parameter": "Proposal acceptance threshold",
+        "dataType": "Percentage",
+        "isDecisionParameter": false
+      },
+      {
+        "parameter": "Voting options",
+        "dataType": "List",
+        "isDecisionParameter": true
+      }
+    ]
+  }

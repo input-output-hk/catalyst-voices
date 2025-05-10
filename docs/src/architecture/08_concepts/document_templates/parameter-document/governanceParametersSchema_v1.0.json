@@ -1,0 +1,82 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "https://raw.githubusercontent.com/input-output-hk/catalyst-voices/refs/heads/main/docs/src/architecture/08_concepts/document_templates/parameter-document/governanceParametersSchema_v1.0.json",
+    "title": "Catalyst Governance Parameters",
+    "description": "Schema for defining Catalyst parameters at brand, campaign, and category levels. Version 1.0.",
+    "type": "object",
+    "properties": {
+      "schemaInfo": {
+        "type": "object",
+        "description": "Metadata about the schema and data version.",
+        "properties": {
+          "version": {
+            "type": "string",
+            "pattern": "^\\d+\\.\\d+\\.\\d+$",
+            "description": "Semantic version of this data structure (e.g., 1.0.0)."
+          },
+          "schemaURL": {
+            "type": "string",
+            "format": "uri",
+            "description": "URL to the JSON schema definition for this document version."
+          }
+        },
+        "required": ["version", "schemaURL"]
+      },
+      "brandParameters": {
+        "type": "array",
+        "description": "Parameters applicable at the brand level.",
+        "items": { "$ref": "#/definitions/parameterItem" }
+      },
+      "campaignParameters": {
+        "type": "array",
+        "description": "Parameters applicable at the campaign level.",
+        "items": { "$ref": "#/definitions/parameterItem" }
+      },
+      "categoryParameters": {
+        "type": "array",
+        "description": "Parameters applicable at the category/challenge level.",
+        "items": { "$ref": "#/definitions/parameterItem" }
+      }
+    },
+    "required": [
+      "schemaInfo",
+      "brandParameters",
+      "campaignParameters",
+      "categoryParameters"
+    ],
+    "definitions": {
+      "parameterItem": {
+        "type": "object",
+        "properties": {
+          "parameter": {
+            "type": "string",
+            "description": "The name or description of the parameter."
+          },
+          "dataType": {
+            "type": "string",
+            "description": "The expected data type of the parameter's value.",
+            "enum": [
+              "Boolean",
+              "String",
+              "ADA Amount",
+              "ADA Amount (Variable per Challenge/Category)",
+              "Lovelace Amount",
+              "Integer",
+              "Date",
+              "Datetime",
+              "Ratio / Formula",
+              "Percentage",
+              "Currency Amount / String",
+              "String / Rule",
+              "List"
+            ]
+          },
+          "isDecisionParameter": {
+            "type": "boolean",
+            "description": "Indicates if this parameter is a key decision-making point."
+          }
+        },
+        "required": ["parameter", "dataType", "isDecisionParameter"]
+      }
+    }
+  }
