@@ -1,6 +1,6 @@
 //! A cache for RBAC registrations.
 
-// TODO: Remove the attribute.
+// TODO (stanislav-tkach): Remove the attribute.
 #![allow(dead_code)]
 
 use std::sync::LazyLock;
