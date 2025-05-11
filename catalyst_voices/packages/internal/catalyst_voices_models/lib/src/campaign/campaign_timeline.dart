@@ -50,7 +50,7 @@ extension CampaignTimelineX on CampaignTimeline {
           '''Participants submit initial proposals for ideas to solve challenges. A set amount of ada is allocated to the new funding round.''',
       timeline: DateRange(
         from: DateTime.utc(2025, 4, 30, 13, 20),
-        to: DateTime.utc(2025, 5, 7, 17, 00),
+        to: DateTime.utc(2025, 5, 13, 17, 00),
       ),
       stage: CampaignTimelineStage.proposalSubmission,
     ),
@@ -83,16 +83,6 @@ extension CampaignTimelineX on CampaignTimeline {
         to: DateTime.utc(2025, 5, 15, 17, 00),
       ),
       stage: CampaignTimelineStage.votingResults,
-    ),
-    CampaignTimeline(
-      title: 'Project Onboarding',
-      description:
-          '''Votes are tallied and the results revealed. Voters and community reviewers receive their rewards.''',
-      timeline: DateRange(
-        from: DateTime.utc(2025, 5, 15, 17, 00),
-        to: null,
-      ),
-      stage: CampaignTimelineStage.projectOnboarding,
     ),
   ];
 }

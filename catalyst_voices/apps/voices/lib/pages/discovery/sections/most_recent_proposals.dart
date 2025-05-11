@@ -78,7 +78,10 @@ class _LatestProposalsState extends State<MostRecentProposals> {
   Widget build(BuildContext context) {
     return Container(
       key: const Key('MostRecentProposals'),
-      constraints: const BoxConstraints(maxHeight: 900),
+      constraints: const BoxConstraints.tightFor(
+        height: 800,
+        width: double.infinity,
+      ),
       decoration: BoxDecoration(
         image: DecorationImage(
           image: CatalystImage.asset(
@@ -87,80 +90,83 @@ class _LatestProposalsState extends State<MostRecentProposals> {
           fit: BoxFit.cover,
         ),
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const SizedBox(height: 72),
-          Text(
-            key: const Key('MostRecentProposalsTitle'),
-            context.l10n.mostRecent,
-            style: context.textTheme.headlineLarge?.copyWith(
-              color: ThemeBuilder.buildTheme().colors.textOnPrimaryWhite,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 100),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: 72),
+            Text(
+              key: const Key('MostRecentProposalsTitle'),
+              context.l10n.mostRecent,
+              style: context.textTheme.headlineLarge?.copyWith(
+                color: ThemeBuilder.buildTheme().colors.textOnPrimaryWhite,
+              ),
             ),
-          ),
-          const SizedBox(height: 48),
-          MouseRegion(
-            cursor: SystemMouseCursors.click,
-            child: GestureDetector(
-              onHorizontalDragUpdate: _onHorizontalDrag,
-              child: SizedBox(
-                height: 440,
-                child: Center(
-                  child: ListView.separated(
-                    controller: _scrollController,
-                    shrinkWrap: true,
-                    physics: const ClampingScrollPhysics(),
-                    padding: const EdgeInsets.symmetric(horizontal: 120),
-                    scrollDirection: Axis.horizontal,
-                    itemCount: widget.proposals.length,
-                    itemBuilder: (context, index) {
-                      final proposal = widget.proposals[index];
-                      final ref = proposal.ref;
-                      return Skeletonizer(
-                        enabled: widget.isLoading,
-                        child: PendingProposalCard(
-                          key: Key('PendingProposalCard_$ref'),
-                          proposal: proposal,
-                          onTap: () {
-                            unawaited(
-                              ProposalRoute(
-                                proposalId: ref.id,
-                                version: ref.version,
-                              ).push(context),
-                            );
-                          },
-                          onFavoriteChanged: (value) async {
-                            final bloc = context.read<DiscoveryCubit>();
-                            if (value) {
-                              await bloc.addFavorite(ref);
-                            } else {
-                              await bloc.removeFavorite(ref);
-                            }
-                          },
-                          isFavorite: proposal.isFavorite,
-                        ),
-                      );
-                    },
-                    separatorBuilder: (context, index) =>
-                        const SizedBox(width: 24),
+            const SizedBox(height: 48),
+            MouseRegion(
+              cursor: SystemMouseCursors.click,
+              child: GestureDetector(
+                onHorizontalDragUpdate: _onHorizontalDrag,
+                child: SizedBox(
+                  height: 440,
+                  width: 1200,
+                  child: Center(
+                    child: ListView.separated(
+                      controller: _scrollController,
+                      shrinkWrap: true,
+                      physics: const ClampingScrollPhysics(),
+                      scrollDirection: Axis.horizontal,
+                      itemCount: widget.proposals.length,
+                      itemBuilder: (context, index) {
+                        final proposal = widget.proposals[index];
+                        final ref = proposal.ref;
+                        return Skeletonizer(
+                          enabled: widget.isLoading,
+                          child: PendingProposalCard(
+                            key: Key('PendingProposalCard_$ref'),
+                            proposal: proposal,
+                            onTap: () {
+                              unawaited(
+                                ProposalRoute(
+                                  proposalId: ref.id,
+                                  version: ref.version,
+                                ).push(context),
+                              );
+                            },
+                            onFavoriteChanged: (value) async {
+                              final bloc = context.read<DiscoveryCubit>();
+                              if (value) {
+                                await bloc.addFavorite(ref);
+                              } else {
+                                await bloc.removeFavorite(ref);
+                              }
+                            },
+                            isFavorite: proposal.isFavorite,
+                          ),
+                        );
+                      },
+                      separatorBuilder: (context, index) =>
+                          const SizedBox(width: 24),
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
-          const SizedBox(height: 16),
-          ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 360),
-            child: VoicesSlider(
-              key: const Key('MostRecentProposalsSlider'),
-              value: _scrollPercentage,
-              onChanged: _onSliderChanged,
+            const SizedBox(height: 16),
+            ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 360),
+              child: VoicesSlider(
+                key: const Key('MostRecentProposalsSlider'),
+                value: _scrollPercentage,
+                onChanged: _onSliderChanged,
+              ),
             ),
-          ),
-          const SizedBox(height: 16),
-          const _ViewAllProposalsButton(),
-          const SizedBox(height: 72),
-        ],
+            const SizedBox(height: 16),
+            const _ViewAllProposalsButton(),
+            const SizedBox(height: 72),
+          ],
+        ),
       ),
     );
   }
