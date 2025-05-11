@@ -93,7 +93,7 @@ impl RbacCache {
         })?;
         let chain = self.chains.get(&catalyst_id).ok_or_else(|| {
             // This means the cache is broken. This should never normally happen.
-            error!("Broken Rbac cache: {catalyst_id} is present in TRANSACTIONS cache, but missing in CHAINS");
+            error!("Broken RBAC cache: {catalyst_id} is present in TRANSACTIONS cache, but missing in CHAINS");
             RbacCacheAddError {
                 catalyst_id: Some(catalyst_id.clone()),
                 purpose,
@@ -197,75 +197,57 @@ impl RbacCache {
         }
 
         let new_addresses = new_chain.role_0_stake_addresses();
-        let mut other_chains = Vec::new();
+        let mut previous_chains = Vec::new();
         for address in &new_addresses {
             if let Some(id) = self.active_addresses.get(address) {
-                other_chains.push(id);
-            }
-        }
-
-        // TODO: FIXME: Allow to override/replace/restart multiple chains!
-        match other_chains.as_slice() {
-            [] => {
-                // All addresses are unique - nothing to do.
-            },
-            [previous_chain] => {
-                // Check if it is a proper overriding registration.
-                let previous_chain = self.chains.get(previous_chain).ok_or_else(|| {
+                let previous_chain = self.chains.get(&id).ok_or_else(|| {
                     // This means the cache is broken. This should never normally happen.
-                    error!("Broken Rbac cache: {previous_chain} is present in ACTIVE_ADDRESSES cache, but missing in CHAINS");
+                    error!("Broken RBAC cache: {id} is present in ACTIVE_ADDRESSES cache, but missing in CHAINS");
                     RbacCacheAddError {
                         catalyst_id: Some(catalyst_id.clone()),
                         purpose,
                         report: report.clone(),
                     }
                 })?;
+                previous_chains.push(id);
+
                 if previous_chain.get_latest_signing_pk_for_role(&RoleId::Role0)
                     == new_chain.get_latest_signing_pk_for_role(&RoleId::Role0)
                 {
                     report.functional_validation(
                         &format!("A new registration ({catalyst_id}) uses the same public key as the previous one ({})",
-                                 previous_chain.catalyst_id()),
+                            previous_chain.catalyst_id()),
                         "It is only allowed to override the existing chain by using different public key",
                     );
-                    return Err(RbacCacheAddError {
-                        catalyst_id: Some(catalyst_id),
-                        purpose,
-                        report,
-                    });
                 }
+            }
+        }
 
-                // Remove the previous chain from caches.
-                if let Some(transactions) =
-                    self.chain_transactions.get(previous_chain.catalyst_id())
-                {
-                    for txn in transactions {
-                        self.transactions.invalidate(&txn);
-                    }
-                } else {
-                    error!(
-                        "Unable to find {} chain transactions",
-                        previous_chain.catalyst_id()
-                    );
+        if report.is_problematic() {
+            return Err(RbacCacheAddError {
+                catalyst_id: Some(catalyst_id),
+                purpose,
+                report,
+            });
+        }
+
+        for id in previous_chains {
+            // Remove the previous chain from caches.
+            if let Some(transactions) = self.chain_transactions.get(&id) {
+                for txn in transactions {
+                    self.transactions.invalidate(&txn);
                 }
-                self.chains.invalidate(previous_chain.catalyst_id());
-                // There is no need to update `ACTIVE_ADDRESSES` cache because it will
-                // be overwritten below anyway.
-            },
-            [..] => {
-                // At the moment we don't allow for one registration to override multiple
-                // existing chains. We can reconsider this logic when multiple stake addressed
-                // will be properly supported.
-                report.functional_validation(
-                    &format!("{catalyst_id} Catalyst ID is already used"),
-                    "It isn't allowed to use same stake address in multiple registration chains",
-                );
-                return Err(RbacCacheAddError {
-                    catalyst_id: Some(catalyst_id),
-                    purpose,
-                    report,
-                });
-            },
+            } else {
+                error!("Unable to find {id} chain transactions");
+            }
+            self.chain_transactions.invalidate(&id);
+            if let Some(previous_chain) = self.chains.remove(&id) {
+                for address in previous_chain.role_0_stake_addresses() {
+                    self.active_addresses.invalidate(&address);
+                }
+            } else {
+                error!("Broken RBAC cache: unable to find {id} chain transactions");
+            }
         }
 
         // Everything is fine: update caches.
