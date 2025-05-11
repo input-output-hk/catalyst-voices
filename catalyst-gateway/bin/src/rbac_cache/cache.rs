@@ -1,0 +1,289 @@
+//! A cache for RBAC registrations.
+
+use cardano_blockchain_types::{StakeAddress, TransactionId};
+use catalyst_types::catalyst_id::{role_index::RoleId, CatalystId};
+use moka::{policy::EvictionPolicy, sync::Cache};
+use rbac_registration::{cardano::cip509::Cip509, registration::cardano::RegistrationChain};
+use tracing::{debug, error};
+
+use crate::rbac_cache::add_result::{AddResult, RbacCacheAddError, RbacCacheAddSuccess};
+
+/// A cache for RBAC registrations.
+pub struct RbacCache {
+    /// A cache of valid RBAC registration chains.
+    chains: Cache<CatalystId, RegistrationChain>,
+    /// A cache of active stake addresses.
+    ///
+    /// An address considered active if it is used by any of valid RBAC chains.
+    active_addresses: Cache<StakeAddress, CatalystId>,
+    /// A cache that allows to find a Catalyst ID of the previous registration using its
+    /// transaction identifier (hash).
+    transactions: Cache<TransactionId, CatalystId>,
+    /// A cache that allows to find all registration transaction of a chain by Catalyst
+    /// ID.
+    chain_transactions: Cache<CatalystId, Vec<TransactionId>>,
+}
+
+impl RbacCache {
+    /// Creates a new `RbacCache` instance.
+    pub fn new() -> Self {
+        let chains = Cache::builder()
+            .eviction_policy(EvictionPolicy::lru())
+            .build();
+        let active_addresses = Cache::builder()
+            .eviction_policy(EvictionPolicy::lru())
+            .build();
+        let transactions = Cache::builder()
+            .eviction_policy(EvictionPolicy::lru())
+            .build();
+        let chain_transactions = Cache::builder()
+            .eviction_policy(EvictionPolicy::lru())
+            .build();
+
+        Self {
+            chains,
+            active_addresses,
+            transactions,
+            chain_transactions,
+        }
+    }
+
+    /// Adds the given registration to one of the existing chains or starts a new one.
+    ///
+    /// In case of failure a problem report from the given registration is updated and
+    /// returned.
+    #[allow(clippy::result_large_err)]
+    pub fn add(&self, registration: Cip509) -> AddResult {
+        match registration.previous_transaction() {
+            Some(previous_txn) => self.update_chain(registration, previous_txn),
+            None => self.start_new_chain(registration),
+        }
+    }
+
+    /// Returns a registration chain by the given Catalyst ID.
+    pub fn get(&self, id: &CatalystId) -> Option<RegistrationChain> {
+        self.chains.get(id)
+    }
+
+    /// Returns a registration chain by the stake address.
+    pub fn get_by_address(&self, address: &StakeAddress) -> Option<RegistrationChain> {
+        let id = self.active_addresses.get(address)?;
+        self.get(&id)
+    }
+
+    /// Applies the given registration to one of the existing chains.
+    #[allow(clippy::result_large_err)]
+    fn update_chain(
+        &self, registration: Cip509, previous_txn: TransactionId,
+    ) -> Result<RbacCacheAddSuccess, RbacCacheAddError> {
+        let catalyst_id = registration.catalyst_id().cloned();
+        let purpose = registration.purpose();
+        let report = registration.report().to_owned();
+
+        // Find a chain this registration belongs to.
+        let catalyst_id = self.transactions.get(&previous_txn).ok_or_else(|| {
+            debug!("Unable to find previous transaction {previous_txn} in the RBAC cache");
+            // We are unable to determine a Catalyst ID, so there is no sense to update the
+            // problem report because we would be unable to store this registration anyway.
+            RbacCacheAddError {
+                catalyst_id,
+                purpose,
+                report: report.clone(),
+            }
+        })?;
+        let chain = self.chains.get(&catalyst_id).ok_or_else(|| {
+            // This means the cache is broken. This should never normally happen.
+            error!("Broken Rbac cache: {catalyst_id} is present in TRANSACTIONS cache, but missing in CHAINS");
+            RbacCacheAddError {
+                catalyst_id: Some(catalyst_id.clone()),
+                purpose,
+                report: report.clone(),
+            }
+        })?;
+
+        // Check that addresses from the new registration aren't used in other chains.
+        let previous_addresses = chain.role_0_stake_addresses();
+        let registration_addresses = registration.role_0_stake_addresses();
+        let new_addresses: Vec<_> = registration_addresses
+            .difference(&previous_addresses)
+            .collect();
+        for address in &new_addresses {
+            if self.active_addresses.get(address).is_some() {
+                report.functional_validation(
+                    &format!("{address} stake addresses is already used"),
+                    "It isn't allowed to use same stake address in multiple registration chains",
+                );
+            }
+        }
+        if report.is_problematic() {
+            return Err(RbacCacheAddError {
+                catalyst_id: Some(catalyst_id),
+                purpose,
+                report,
+            });
+        }
+
+        // Try to add a new registration to the chain.
+        let new_chain = chain.update(registration).map_err(|e| {
+            report.other(
+                &format!("{e:?}"),
+                "Failed to apply update the registration chain",
+            );
+            RbacCacheAddError {
+                catalyst_id: Some(catalyst_id.clone()),
+                purpose,
+                report,
+            }
+        })?;
+
+        // Everything is fine: update caches.
+        for address in new_addresses {
+            self.active_addresses
+                .insert(address.to_owned(), catalyst_id.clone());
+        }
+        self.transactions
+            .insert(new_chain.current_tx_id_hash(), catalyst_id.clone());
+        self.chain_transactions
+            .entry(catalyst_id.clone())
+            .and_upsert_with(|e| {
+                e.map(|e| {
+                    let mut val = e.into_value();
+                    val.push(new_chain.current_tx_id_hash());
+                    val
+                })
+                .unwrap_or_default()
+            });
+        self.chains.insert(catalyst_id.clone(), new_chain);
+
+        Ok(RbacCacheAddSuccess {
+            catalyst_id,
+            // A valid registration must have a purpose.
+            #[allow(clippy::expect_used)]
+            purpose: purpose.expect("Missing registration purpose"),
+        })
+    }
+
+    /// Starts a new Rbac registration chain.
+    #[allow(clippy::result_large_err)]
+    fn start_new_chain(
+        &self, registration: Cip509,
+    ) -> Result<RbacCacheAddSuccess, RbacCacheAddError> {
+        let catalyst_id = registration.catalyst_id().cloned();
+        let purpose = registration.purpose();
+        let report = registration.report().to_owned();
+
+        let new_chain = RegistrationChain::new(registration).map_err(|e| {
+            report.other(
+                &format!("{e:?}"),
+                "Failed to apply start a registration chain",
+            );
+            RbacCacheAddError {
+                catalyst_id,
+                purpose,
+                report: report.clone(),
+            }
+        })?;
+        let catalyst_id = new_chain.catalyst_id().to_owned();
+        if self.chains.get(&catalyst_id).is_some() {
+            report.functional_validation(
+                &format!("{catalyst_id} is already used"),
+                "It isn't allowed to use same Catalyst ID (certificate subject public key) in multiple registration chains",
+            );
+            return Err(RbacCacheAddError {
+                catalyst_id: Some(catalyst_id),
+                purpose,
+                report,
+            });
+        }
+
+        let new_addresses = new_chain.role_0_stake_addresses();
+        let mut other_chains = Vec::new();
+        for address in &new_addresses {
+            if let Some(id) = self.active_addresses.get(address) {
+                other_chains.push(id);
+            }
+        }
+
+        // TODO: FIXME: Allow to override/replace/restart multiple chains!
+        match other_chains.as_slice() {
+            [] => {
+                // All addresses are unique - nothing to do.
+            },
+            [previous_chain] => {
+                // Check if it is a proper overriding registration.
+                let previous_chain = self.chains.get(previous_chain).ok_or_else(|| {
+                    // This means the cache is broken. This should never normally happen.
+                    error!("Broken Rbac cache: {previous_chain} is present in ACTIVE_ADDRESSES cache, but missing in CHAINS");
+                    RbacCacheAddError {
+                        catalyst_id: Some(catalyst_id.clone()),
+                        purpose,
+                        report: report.clone(),
+                    }
+                })?;
+                if previous_chain.get_latest_signing_pk_for_role(&RoleId::Role0)
+                    == new_chain.get_latest_signing_pk_for_role(&RoleId::Role0)
+                {
+                    report.functional_validation(
+                        &format!("A new registration ({catalyst_id}) uses the same public key as the previous one ({})",
+                                 previous_chain.catalyst_id()),
+                        "It is only allowed to override the existing chain by using different public key",
+                    );
+                    return Err(RbacCacheAddError {
+                        catalyst_id: Some(catalyst_id),
+                        purpose,
+                        report,
+                    });
+                }
+
+                // Remove the previous chain from caches.
+                if let Some(transactions) =
+                    self.chain_transactions.get(previous_chain.catalyst_id())
+                {
+                    for txn in transactions {
+                        self.transactions.invalidate(&txn);
+                    }
+                } else {
+                    error!(
+                        "Unable to find {} chain transactions",
+                        previous_chain.catalyst_id()
+                    );
+                }
+                self.chains.invalidate(previous_chain.catalyst_id());
+                // There is no need to update `ACTIVE_ADDRESSES` cache because it will
+                // be overwritten below anyway.
+            },
+            [..] => {
+                // At the moment we don't allow for one registration to override multiple
+                // existing chains. We can reconsider this logic when multiple stake addressed
+                // will be properly supported.
+                report.functional_validation(
+                    &format!("{catalyst_id} Catalyst ID is already used"),
+                    "It isn't allowed to use same stake address in multiple registration chains",
+                );
+                return Err(RbacCacheAddError {
+                    catalyst_id: Some(catalyst_id),
+                    purpose,
+                    report,
+                });
+            },
+        }
+
+        // Everything is fine: update caches.
+        for address in new_addresses {
+            self.active_addresses
+                .insert(address.clone(), catalyst_id.clone());
+        }
+        self.transactions
+            .insert(new_chain.current_tx_id_hash(), catalyst_id.clone());
+        self.chain_transactions
+            .insert(catalyst_id.clone(), vec![new_chain.current_tx_id_hash()]);
+        self.chains.insert(catalyst_id.clone(), new_chain);
+
+        Ok(RbacCacheAddSuccess {
+            catalyst_id,
+            // A valid registration must have a purpose.
+            #[allow(clippy::expect_used)]
+            purpose: purpose.expect("Missing registration purpose"),
+        })
+    }
+}
