@@ -19,9 +19,6 @@ pub struct RbacCache {
     /// A cache that allows to find a Catalyst ID of the previous registration using its
     /// transaction identifier (hash).
     transactions: Cache<TransactionId, CatalystId>,
-    /// A cache that allows to find all registration transaction of a chain by Catalyst
-    /// ID.
-    chain_transactions: Cache<CatalystId, Vec<TransactionId>>,
 }
 
 impl RbacCache {
@@ -36,15 +33,11 @@ impl RbacCache {
         let transactions = Cache::builder()
             .eviction_policy(EvictionPolicy::lru())
             .build();
-        let chain_transactions = Cache::builder()
-            .eviction_policy(EvictionPolicy::lru())
-            .build();
 
         Self {
             chains,
             active_addresses,
             transactions,
-            chain_transactions,
         }
     }
 
@@ -161,16 +154,6 @@ impl RbacCache {
         }
         self.transactions
             .insert(new_chain.current_tx_id_hash(), catalyst_id.clone());
-        self.chain_transactions
-            .entry(catalyst_id.clone())
-            .and_upsert_with(|e| {
-                e.map(|e| {
-                    let mut val = e.into_value();
-                    val.push(new_chain.current_tx_id_hash());
-                    val
-                })
-                .unwrap_or_default()
-            });
         self.chains.insert(catalyst_id.clone(), new_chain);
 
         Ok(RbacCacheAddSuccess {
@@ -215,7 +198,6 @@ impl RbacCache {
         }
 
         let new_addresses = new_chain.role_0_stake_addresses();
-        let mut previous_chains = Vec::new();
         for address in &new_addresses {
             if let Some(id) = self.active_addresses.get(address) {
                 let previous_chain = self.chains.get(&id).ok_or_else(|| {
@@ -227,7 +209,6 @@ impl RbacCache {
                         report: report.clone(),
                     }
                 })?;
-                previous_chains.push(id);
 
                 if previous_chain.get_latest_signing_pk_for_role(&RoleId::Role0)
                     == new_chain.get_latest_signing_pk_for_role(&RoleId::Role0)
@@ -249,25 +230,6 @@ impl RbacCache {
             });
         }
 
-        for id in previous_chains {
-            // Remove the previous chain from caches.
-            if let Some(transactions) = self.chain_transactions.get(&id) {
-                for txn in transactions {
-                    self.transactions.invalidate(&txn);
-                }
-            } else {
-                error!("Unable to find {id} chain transactions");
-            }
-            self.chain_transactions.invalidate(&id);
-            if let Some(previous_chain) = self.chains.remove(&id) {
-                for address in previous_chain.role_0_stake_addresses() {
-                    self.active_addresses.invalidate(&address);
-                }
-            } else {
-                error!("Broken RBAC cache: unable to find {id} chain transactions");
-            }
-        }
-
         // Everything is fine: update caches.
         for address in new_addresses {
             self.active_addresses
@@ -275,8 +237,6 @@ impl RbacCache {
         }
         self.transactions
             .insert(new_chain.current_tx_id_hash(), catalyst_id.clone());
-        self.chain_transactions
-            .insert(catalyst_id.clone(), vec![new_chain.current_tx_id_hash()]);
         self.chains.insert(catalyst_id.clone(), new_chain);
 
         Ok(RbacCacheAddSuccess {
