@@ -228,6 +228,7 @@ final class ProposalCubit extends Cubit<ProposalState>
 
   ProposalViewData _buildProposalViewData({
     required bool hasActiveAccount,
+    required bool hasAccountUsername,
     required ProposalData? proposal,
     required CampaignCategory? category,
     required List<CommentWithReplies> comments,
@@ -260,6 +261,7 @@ final class ProposalCubit extends Cubit<ProposalState>
             commentSchema: commentSchema,
             commentsSort: commentsSort,
             hasActiveAccount: hasActiveAccount,
+            hasAccountUsername: hasAccountUsername,
           )
         : const <Segment>[];
 
@@ -288,6 +290,7 @@ final class ProposalCubit extends Cubit<ProposalState>
     required DocumentSchema? commentSchema,
     required ProposalCommentsSort commentsSort,
     required bool hasActiveAccount,
+    required bool hasAccountUsername,
   }) {
     final document = proposal.document;
     final isDraftProposal = document.metadata.selfRef is DraftRef;
@@ -316,8 +319,10 @@ final class ProposalCubit extends Cubit<ProposalState>
       ],
     );
 
-    final canReply = !isDraftProposal && hasActiveAccount;
-    final canComment = canReply && commentSchema != null;
+    final isNotLocalAndHasActiveAccount = !isDraftProposal && hasActiveAccount;
+    final canReply = isNotLocalAndHasActiveAccount && hasAccountUsername;
+    final canComment = isNotLocalAndHasActiveAccount && commentSchema != null;
+
     final commentsSegment = ProposalCommentsSegment(
       id: const NodeId('comments'),
       sort: commentsSort,
@@ -328,10 +333,11 @@ final class ProposalCubit extends Cubit<ProposalState>
           comments: commentsSort.applyTo(comments),
           canReply: canReply,
         ),
-        if (canReply && commentSchema != null)
+        if (canComment)
           ProposalAddCommentSection(
             id: const NodeId('comments.add'),
             schema: commentSchema,
+            showUsernameRequired: !hasAccountUsername,
           ),
       ],
     );
@@ -365,8 +371,11 @@ final class ProposalCubit extends Cubit<ProposalState>
     final isFavorite = _cache.isFavorite ?? false;
     final activeAccountId = _cache.activeAccountId;
 
+    final username = activeAccountId?.username;
+
     return _buildProposalViewData(
       hasActiveAccount: activeAccountId != null,
+      hasAccountUsername: username != null && !username.isBlank,
       proposal: proposal,
       category: category,
       comments: comments,

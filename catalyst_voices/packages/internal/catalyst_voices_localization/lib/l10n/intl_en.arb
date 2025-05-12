@@ -2682,5 +2682,13 @@
   "anonymousUsername": "Anonymous",
   "@anonymousUsername": {
     "description": "When account does not have specified username this text is shown"
+  },
+  "commentPickUsernameLabel": "Pick a username to join the conversation and leave a comment.",
+  "@commentPickUsernameLabel": {
+    "description": "Message shown when user tries to comment on proposal while not having username"
+  },
+  "commentPickUsernameButton": "Set a username",
+  "@commentPickUsernameButton": {
+    "description": "CTA button to set username"
   }
 }

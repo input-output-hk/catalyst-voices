@@ -173,8 +173,13 @@ class _ProposalBuilderSegments extends StatelessWidget {
           comment: comment,
           canReply: canReply,
         ),
-      ProposalAddCommentSection(:final schema) => ProposalAddCommentTile(
+      ProposalAddCommentSection(
+        :final schema,
+        :final showUsernameRequired,
+      ) =>
+        ProposalAddCommentTile(
           schema: schema,
+          showUsernameRequired: showUsernameRequired,
           onSubmit: ({required document, reply}) async {
             final event = SubmitCommentEvent(
               document: document,

@@ -144,6 +144,7 @@ final class ProposalBuilderBloc
     required bool hasActiveAccount,
     required bool isEmailVerified,
     required bool isMaxProposalsLimitReached,
+    required bool hasAccountUsername,
   }) {
     final documentSegments = _mapDocumentToSegments(
       proposalDocument,
@@ -156,6 +157,7 @@ final class ProposalBuilderBloc
       commentSchema: commentSchema,
       commentsState: commentsState,
       hasActiveAccount: hasActiveAccount,
+      hasAccountUsername: hasAccountUsername,
     );
 
     final firstSegment = documentSegments.firstOrNull;
@@ -529,11 +531,14 @@ final class ProposalBuilderBloc
     required DocumentSchema? commentSchema,
     required CommentsState commentsState,
     required bool hasActiveAccount,
+    required bool hasAccountUsername,
   }) {
     final isDraftProposal =
         originalProposalRef == null || originalProposalRef is DraftRef;
-    final canReply = !isDraftProposal && hasActiveAccount;
-    final canComment = canReply && commentSchema != null;
+    final isNotLocalAndHasActiveAccount = !isDraftProposal && hasActiveAccount;
+
+    final canReply = isNotLocalAndHasActiveAccount && hasAccountUsername;
+    final canComment = isNotLocalAndHasActiveAccount && commentSchema != null;
 
     if (canComment || comments.isNotEmpty) {
       return [
@@ -547,10 +552,11 @@ final class ProposalBuilderBloc
               comments: commentsState.commentsSort.applyTo(comments),
               canReply: canReply,
             ),
-            if (canReply && commentSchema != null)
+            if (canComment)
               ProposalAddCommentSection(
                 id: const NodeId('comments.add'),
                 schema: commentSchema,
+                showUsernameRequired: !hasActiveAccount,
               ),
           ],
         ),
@@ -737,8 +743,11 @@ final class ProposalBuilderBloc
       return const ProposalBuilderState(isLoading: true, isChanging: true);
     }
 
+    final username = activeAccountId?.username;
+
     return _buildState(
       hasActiveAccount: activeAccountId != null,
+      hasAccountUsername: username != null && !username.isBlank,
       proposalDocument: proposalDocument,
       proposalMetadata: proposalMetadata,
       category: category,

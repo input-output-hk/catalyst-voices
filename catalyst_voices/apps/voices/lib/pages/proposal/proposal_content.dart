@@ -186,8 +186,13 @@ class _SegmentsListView extends StatelessWidget {
         ),
       ProposalCommentsSection() => switch (item) {
           ProposalViewCommentsSection() => const SizedBox.shrink(),
-          ProposalAddCommentSection(:final schema) => ProposalAddCommentTile(
+          ProposalAddCommentSection(
+            :final schema,
+            :final showUsernameRequired,
+          ) =>
+            ProposalAddCommentTile(
               schema: schema,
+              showUsernameRequired: showUsernameRequired,
               onSubmit: ({required document, reply}) async {
                 return context
                     .read<ProposalCubit>()
