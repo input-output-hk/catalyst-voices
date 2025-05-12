@@ -63,7 +63,7 @@ void main() {
       final remoteConfig = RemoteConfig.fromJson(configJson);
 
       const env = AppEnvironmentType.dev;
-      const expectedConfig = AppConfig.dev();
+      final expectedConfig = AppConfig.dev();
 
       // When
       when(remoteSource.get).thenAnswer((_) => Future.value(remoteConfig));

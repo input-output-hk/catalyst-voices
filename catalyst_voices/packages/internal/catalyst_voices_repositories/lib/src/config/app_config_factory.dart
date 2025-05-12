@@ -41,6 +41,14 @@ final class AppConfigFactory {
           remoteTransactionBuilderConfig?.selectionStrategy?.build(),
     );
 
+    // Slot Number Config
+    final remoteSlotNumberConfig = remoteBlockchainConfig?.slotNumberConfig;
+    final effectiveSlotNumberConfig = blockchain.slotNumberConfig.copyWith(
+      systemStartTimestamp: remoteSlotNumberConfig?.systemStartTimestamp,
+      systemStartSlot: remoteSlotNumberConfig?.systemStartSlot?.asSlotBigNum(),
+      slotLength: remoteSlotNumberConfig?.slotLength?.asDuration(),
+    );
+
     return defaultEnvConfig.copyWith(
       version: remote.version,
       cache: defaultEnvConfig.cache.copyWith(
@@ -65,6 +73,7 @@ final class AppConfigFactory {
         networkId: remoteBlockchainConfig?.networkId?.tryParseNetworkId(),
         host: remoteBlockchainConfig?.host?.tryParseCatalystIdHost(),
         transactionBuilderConfig: effectiveTransactionBuilderConfig,
+        slotNumberConfig: effectiveSlotNumberConfig,
       ),
     );
   }
@@ -82,6 +91,8 @@ extension on int {
   Coin asCoin() => Coin(this);
 
   Duration asDuration() => Duration(seconds: this);
+
+  SlotBigNum asSlotBigNum() => SlotBigNum(this);
 }
 
 extension on RemoteTransactionSelectionStrategyType {

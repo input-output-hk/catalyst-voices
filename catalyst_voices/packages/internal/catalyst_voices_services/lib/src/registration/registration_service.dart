@@ -54,7 +54,6 @@ abstract interface class RegistrationService {
   /// Throws a subclass of [RegistrationException] in case of a failure.
   Future<Transaction> prepareRegistration({
     required CardanoWallet wallet,
-    required NetworkId networkId,
     required CatalystPrivateKey masterKey,
     required Set<RegistrationTransactionRole> roles,
   });
@@ -163,7 +162,6 @@ final class RegistrationServiceImpl implements RegistrationService {
   @override
   Future<Transaction> prepareRegistration({
     required CardanoWallet wallet,
-    required NetworkId networkId,
     required CatalystPrivateKey masterKey,
     required Set<RegistrationTransactionRole> roles,
   }) async {
@@ -171,9 +169,9 @@ final class RegistrationServiceImpl implements RegistrationService {
       final config = _blockchainConfig.transactionBuilderConfig;
       final enabledWallet = await wallet.enable();
       final walletNetworkId = await enabledWallet.getNetworkId();
-      if (walletNetworkId != networkId) {
+      if (walletNetworkId != _blockchainConfig.networkId) {
         throw RegistrationNetworkIdMismatchException(
-          targetNetworkId: networkId,
+          targetNetworkId: _blockchainConfig.networkId,
         );
       }
 
@@ -185,7 +183,7 @@ final class RegistrationServiceImpl implements RegistrationService {
         ),
       );
 
-      final slotNumber = await _getRegistrationSlotNumberTtl(networkId);
+      final slotNumber = await _getRegistrationSlotNumberTtl();
 
       final previousTransactionId = await _fetchPreviousTransactionId(
         isFirstRegistration: roles.isFirstRegistration,
@@ -195,7 +193,7 @@ final class RegistrationServiceImpl implements RegistrationService {
         transactionConfig: config,
         keyDerivationService: _keyDerivationService,
         masterKey: masterKey,
-        networkId: networkId,
+        networkId: _blockchainConfig.networkId,
         slotNumberTtl: slotNumber,
         roles: roles,
         changeAddress: changeAddress,
@@ -429,13 +427,15 @@ final class RegistrationServiceImpl implements RegistrationService {
   ///
   /// It's a common security practice to configure transactions
   /// to expire after a certain duration.
-  Future<SlotBigNum> _getRegistrationSlotNumberTtl(NetworkId networkId) async {
+  Future<SlotBigNum> _getRegistrationSlotNumberTtl() async {
     final registrationTransactionExpiration =
         DateTimeExt.now().add(const Duration(hours: 3));
 
+    final config = _blockchainConfig.slotNumberConfig;
+
     return _blockchainService.calculateSlotNumber(
       targetDateTime: registrationTransactionExpiration,
-      networkId: networkId,
+      config: config,
     );
   }
 }

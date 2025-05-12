@@ -28,7 +28,7 @@ final class AppConfig extends Equatable {
     required this.blockchain,
   });
 
-  const AppConfig.dev()
+  AppConfig.dev()
       : this(
           version: '0.0.1',
           cache: const CacheConfig(
@@ -50,23 +50,24 @@ final class AppConfig extends Equatable {
             debug: true,
             diagnosticLevel: 'debug',
           ),
-          blockchain: const BlockchainConfig(
+          blockchain: BlockchainConfig(
             networkId: NetworkId.testnet,
             host: CatalystIdHost.cardanoPreprod,
             transactionBuilderConfig: _defaultTransactionBuilderConfig,
+            slotNumberConfig: BlockchainSlotNumberConfig.testnet(),
           ),
         );
 
   factory AppConfig.env(AppEnvironmentType env) {
     return switch (env) {
-      AppEnvironmentType.dev => const AppConfig.dev(),
-      AppEnvironmentType.preprod => const AppConfig.preprod(),
-      AppEnvironmentType.prod => const AppConfig.prod(),
-      AppEnvironmentType.relative => const AppConfig.dev(),
+      AppEnvironmentType.dev => AppConfig.dev(),
+      AppEnvironmentType.preprod => AppConfig.preprod(),
+      AppEnvironmentType.prod => AppConfig.prod(),
+      AppEnvironmentType.relative => AppConfig.dev(),
     };
   }
 
-  const AppConfig.preprod()
+  AppConfig.preprod()
       : this(
           version: '0.0.1',
           cache: const CacheConfig(
@@ -88,14 +89,15 @@ final class AppConfig extends Equatable {
             debug: false,
             diagnosticLevel: 'warning',
           ),
-          blockchain: const BlockchainConfig(
+          blockchain: BlockchainConfig(
             networkId: NetworkId.testnet,
             host: CatalystIdHost.cardanoPreprod,
             transactionBuilderConfig: _defaultTransactionBuilderConfig,
+            slotNumberConfig: BlockchainSlotNumberConfig.testnet(),
           ),
         );
 
-  const AppConfig.prod()
+  AppConfig.prod()
       : this(
           version: '0.0.1',
           cache: const CacheConfig(
@@ -117,10 +119,11 @@ final class AppConfig extends Equatable {
             debug: false,
             diagnosticLevel: 'error',
           ),
-          blockchain: const BlockchainConfig(
-            networkId: NetworkId.testnet,
+          blockchain: BlockchainConfig(
+            networkId: NetworkId.mainnet,
             host: CatalystIdHost.cardano,
             transactionBuilderConfig: _defaultTransactionBuilderConfig,
+            slotNumberConfig: BlockchainSlotNumberConfig.mainnet(),
           ),
         );
 
@@ -154,26 +157,35 @@ final class BlockchainConfig extends Equatable {
   final NetworkId networkId;
   final CatalystIdHost host;
   final TransactionBuilderConfig transactionBuilderConfig;
+  final BlockchainSlotNumberConfig slotNumberConfig;
 
   const BlockchainConfig({
     required this.networkId,
     required this.host,
     required this.transactionBuilderConfig,
+    required this.slotNumberConfig,
   });
 
   @override
-  List<Object?> get props => [networkId, host, transactionBuilderConfig];
+  List<Object?> get props => [
+        networkId,
+        host,
+        transactionBuilderConfig,
+        slotNumberConfig,
+      ];
 
   BlockchainConfig copyWith({
     NetworkId? networkId,
     CatalystIdHost? host,
     TransactionBuilderConfig? transactionBuilderConfig,
+    BlockchainSlotNumberConfig? slotNumberConfig,
   }) {
     return BlockchainConfig(
       networkId: networkId ?? this.networkId,
       host: host ?? this.host,
       transactionBuilderConfig:
           transactionBuilderConfig ?? this.transactionBuilderConfig,
+      slotNumberConfig: slotNumberConfig ?? this.slotNumberConfig,
     );
   }
 }
