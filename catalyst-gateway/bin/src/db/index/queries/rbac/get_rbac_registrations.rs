@@ -12,7 +12,7 @@ use scylla::{
     prepared_statement::PreparedStatement, statement::Consistency,
     transport::iterator::TypedRowStream, DeserializeRow, SerializeRow, Session,
 };
-use tracing::{error, warn};
+use tracing::{debug, error};
 
 use crate::db::{
     index::{
