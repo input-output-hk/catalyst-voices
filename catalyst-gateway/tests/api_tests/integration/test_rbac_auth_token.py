@@ -42,7 +42,7 @@ def test_invalid_rbac_auth_token(rbac_chain_factory):
     resp = get(lookup=None, token=token)
     assert(resp.status_code == 401), f"Expected must not contain username: {resp.status_code} - {resp.text}"
     
-    # Catalyst ID not in a correct format -> 401
+    # Catalyst ID not in a correct format (Should be in short form with catid. -> 401
     token = rbac_chain_factory(RoleID.ROLE_0).auth_token(is_uri=True)
     resp = get(lookup=None, token=token)
     assert(resp.status_code == 401), f"Expected invalid Catalyst ID format: {resp.status_code} - {resp.text}"
@@ -92,18 +92,24 @@ def test_invalid_rbac_auth_token(rbac_chain_factory):
 
 @pytest.mark.preprod_indexing
 def test_valid_rbac_auth_token(rbac_chain_factory):
-    token = rbac_chain_factory(RoleID.ROLE_0).auth_token()
-    resp = get(lookup=None, token=token)
-    assert(resp.status_code == 200), f"Expected valid token that already registered: {resp.status_code} - {resp.text}"
+    def test_valid_rbac_auth_token_inner(role: RoleID):
+        token = rbac_chain_factory(role).auth_token()
     
-    # X-API-Key does not match as expected value, but still pass because the nonce is valid
-    token = rbac_chain_factory(RoleID.ROLE_0).auth_token()
-    resp = get(lookup=None, token=token, extra_headers={"X-API-Key": "test"})
-    assert(resp.status_code == 200), f"Expected valid token that already registered when X-API-Key does not match {resp.status_code} - {resp.text}"
-    
-    # X-API-Key does match the expected, nonce validation is skipped
-    nonce = int((datetime.now(timezone.utc) - timedelta(days=30)).timestamp())  
-    token = rbac_chain_factory(RoleID.ROLE_0).auth_token(nonce=nonce)
-    resp = get(lookup=None, token=token, extra_headers={"X-API-Key": "123"})
-    assert(resp.status_code == 200), f"Expected valid token that already registered when X-API-Key does match, nonce validation is skipped: {resp.status_code} - {resp.text}"
+        resp = get(lookup=None, token=token)
+        assert(resp.status_code == 200), f"Expected valid token that already registered: {resp.status_code} - {resp.text}"
+        
+        # X-API-Key does not match as expected value, but still pass because the nonce is valid
+        token = rbac_chain_factory(role).auth_token()
+        resp = get(lookup=None, token=token, extra_headers={"X-API-Key": "test"})
+        assert(resp.status_code == 200), f"Expected valid token that already registered when X-API-Key does not match {resp.status_code} - {resp.text}"
+        
+        # X-API-Key does match the expected, nonce validation is skipped
+        nonce = int((datetime.now(timezone.utc) - timedelta(days=30)).timestamp())  
+        token = rbac_chain_factory(role).auth_token(nonce=nonce)
+        resp = get(lookup=None, token=token, extra_headers={"X-API-Key": "123"})
+        assert(resp.status_code == 200), f"Expected valid token that already registered when X-API-Key does match, nonce validation is skipped: {resp.status_code} - {resp.text}"
+
+        
+    for role in RoleID:
+        test_valid_rbac_auth_token_inner(role)
     
