@@ -73,6 +73,29 @@ void main() {
       // Then
       expect(config, equals(expectedConfig));
     });
+
+    test('blockchain slot number config is decoded correctly', () async {
+      // Given
+      final configJson =
+          jsonDecode(Configs.blockchainSlotNumber) as Map<String, dynamic>;
+      final remoteConfig = RemoteConfig.fromJson(configJson);
+
+      final systemStartTimestamp = DateTime.utc(2020, 7, 29, 21, 44, 51);
+      const systemStartSlot = 4492800;
+      const slotLength = Duration(seconds: 1);
+
+      // When
+      when(remoteSource.get).thenAnswer((_) => Future.value(remoteConfig));
+
+      // Then
+      final config = await repository.getConfig(env: AppEnvironmentType.dev);
+
+      final slotNumberConfig = config.blockchain.slotNumberConfig;
+
+      expect(slotNumberConfig.systemStartTimestamp, systemStartTimestamp);
+      expect(slotNumberConfig.systemStartSlot, systemStartSlot);
+      expect(slotNumberConfig.slotLength, slotLength);
+    });
   });
 }
 

@@ -67,5 +67,21 @@ abstract class Configs {
 }
 ''';
 
+  static String blockchainSlotNumber = '''
+{
+  "version": "0.1.0",
+  "createdAt": "2025-04-02T12:59:50.841808Z",
+  "blockchain": {
+    "networkId": "mainnet",
+    "host": "cardano",
+    "slotNumberConfig": {
+      "systemStartTimestamp":"2020-07-29T21:44:51.000000Z",
+      "systemStartSlot":4492800,
+      "slotLength":1
+    }
+  }
+}
+''';
+
   const Configs._();
 }
