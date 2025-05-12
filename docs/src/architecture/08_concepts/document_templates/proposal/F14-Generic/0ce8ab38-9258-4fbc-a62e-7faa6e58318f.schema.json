@@ -487,7 +487,7 @@
                     "$ref": "#/definitions/section",
                     "title": "Project Open Source",
                     "description": "Will your project's output be fully open source? Open source refers to something people can modify and share because its design is publicly accessible.",
-                    "x-guidance": "Open source software is software with source code that anyone can inspect, modify, and enhance. Conversely, only the original authors of proprietary software can legally copy, inspect, and alter that software.",
+                    "x-guidance": "[Open source](https://docs.projectcatalyst.io/current-fund/proposal-submission/additional-guidance) refers to something people can modify and share because its design is publicly accessible. Open source software is software with source code that anyone can inspect, modify, and enhance. Conversely, only the original authors of proprietary software can legally copy, inspect, and alter that software..",
                     "properties": {
                         "isOpenSource": {
                             "$ref": "#/definitions/yesNoChoice",
@@ -1027,7 +1027,7 @@
                     "$ref": "#/definitions/section",
                     "title": "Project Milestones",
                     "description": "What are the key milestones you need to achieve in order to complete your project successfully?",
-                    "x-guidance": "Please follow these guidelines to build your individual milestones. Each milestone must include:\n\n1. **Milestone Outputs**\n   - What will be delivered\n\n2. **Acceptance Criteria**\n   - What conditions must be met\n\n3. **Evidence of Completion**\n   - How you will prove the milestone is complete.\n\n[https://docs.projectcatalyst.io/current-fund/project-onboarding/funded-proposers-guides/how-to-create-a-statement-of-milestones-guide-for-funded-proposers](https://docs.projectcatalyst.io/current-fund/project-onboarding/funded-proposers-guides/how-to-create-a-statement-of-milestones-guide-for-funded-proposers)",
+                    "x-guidance": "Please follow these [guidelines](https://docs.projectcatalyst.io/current-fund/project-onboarding/funded-proposers-guides/how-to-create-a-statement-of-milestones-guide-for-funded-proposers) to build your individual milestones. Each milestone must include:\n\n1. **Milestone Outputs**\n   - What will be delivered\n\n2. **Acceptance Criteria**\n   - What conditions must be met\n\n3. **Evidence of Completion**\n   - How you will prove the milestone is complete.",
                     "properties": {
                         "milestone_list": {
                             "type": "array",
