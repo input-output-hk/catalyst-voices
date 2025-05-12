@@ -1,8 +1,11 @@
 {
-    "0": {
-        "tx_id": "e4d3c4957cfb8a77bfb7be3e320af57b6d5b2f6f36a8564b6c7921cb9b6ffd39",
-        "sk": "600f662a02d72db06c21201e2e7810042419fa769f30b5be46f92e29e7e59341f03aa7eb2c89083569968ec621f1b0c8cdc392f4d895651cc29b168522066fbe65dcadfa4e257915afe0972ef01a805adabb725daf4b7eaa997f4a7181ebd512",
-        "pk": "d0a195a645d57b9fa1d517c86f4f0c9dcfb13194f3497e555673c3687be1aea465dcadfa4e257915afe0972ef01a805adabb725daf4b7eaa997f4a7181ebd512",
-        "rotation": 0
-    }
-}
+    "0":[
+       {
+          "tx_id":"e4d3c4957cfb8a77bfb7be3e320af57b6d5b2f6f36a8564b6c7921cb9b6ffd39",
+          "sk":"600f662a02d72db06c21201e2e7810042419fa769f30b5be46f92e29e7e59341f03aa7eb2c89083569968ec621f1b0c8cdc392f4d895651cc29b168522066fbe65dcadfa4e257915afe0972ef01a805adabb725daf4b7eaa997f4a7181ebd512",
+          "pk":"d0a195a645d57b9fa1d517c86f4f0c9dcfb13194f3497e555673c3687be1aea465dcadfa4e257915afe0972ef01a805adabb725daf4b7eaa997f4a7181ebd512",
+          "stake_address":"stake_test1upkg8vzueeczrg443wkjkqhj2xk3hcz9hfe02vz48ayeqtsqeyvpf",
+          "rotation":0
+       }
+    ]
+ }
