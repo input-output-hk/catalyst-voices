@@ -90,7 +90,8 @@ fn is_valid(addr: &str) -> bool {
     // Just check the string can be safely converted into the type.
     if let Ok((hrp, addr)) = bech32::decode(addr) {
         let hrp = hrp.as_str();
-        (addr.len() == (DECODED_UNSTAKED_ADDR_LEN + HEADER_LEN) || addr.len() == (DECODED_STAKED_ADDR_LEN + HEADER_LEN))
+        (addr.len() == (DECODED_UNSTAKED_ADDR_LEN + HEADER_LEN)
+            || addr.len() == (DECODED_STAKED_ADDR_LEN + HEADER_LEN))
             && (hrp == PROD || hrp == TEST)
     } else {
         false
@@ -150,6 +151,7 @@ impl Example for Cip19ShelleyAddress {
 #[cfg(test)]
 mod tests {
     use regex::Regex;
+
     use super::*;
 
     #[test]

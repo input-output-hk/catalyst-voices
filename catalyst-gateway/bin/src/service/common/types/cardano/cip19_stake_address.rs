@@ -146,6 +146,7 @@ impl Example for Cip19StakeAddress {
 #[cfg(test)]
 mod tests {
     use regex::Regex;
+
     use super::*;
 
     // Test Vector: <https://cips.cardano.org/cip/CIP-19>

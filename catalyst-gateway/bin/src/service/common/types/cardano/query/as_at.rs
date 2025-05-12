@@ -172,6 +172,7 @@ impl Display for AsAt {
 #[cfg(test)]
 mod tests {
     use regex::Regex;
+
     use super::*;
 
     #[test]

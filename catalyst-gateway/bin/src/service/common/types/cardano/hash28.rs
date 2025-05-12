@@ -96,6 +96,7 @@ impl From<HexEncodedHash28> for Vec<u8> {
 #[cfg(test)]
 mod tests {
     use regex::Regex;
+
     use super::*;
 
     #[test]
@@ -107,6 +108,7 @@ mod tests {
         let invalid = [
             "0x27d0350039fb3d068cccfae902bf2e72583fc5",
             "0x27d0350039fb3d068cccfae902bf2e72583fc553e0aafb960bd9d76d5bff777b0",
+            "0x",
         ];
         for v in invalid {
             assert!(!regex.is_match(v));

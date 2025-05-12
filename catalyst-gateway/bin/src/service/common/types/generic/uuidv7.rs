@@ -98,6 +98,7 @@ impl From<catalyst_signed_doc::UuidV7> for UUIDv7 {
 #[cfg(test)]
 mod tests {
     use regex::Regex;
+
     use super::*;
 
     #[test]

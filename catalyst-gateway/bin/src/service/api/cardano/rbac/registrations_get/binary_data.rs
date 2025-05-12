@@ -37,12 +37,19 @@ static SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| {
     }
 });
 
+/// Validate the `HexEncodedBinaryData`.
+/// This part is done separately from the `PATTERN`
+fn is_valid(hash: &str) -> bool {
+    matches!(hash.strip_prefix("0x"), Some(h) if !h.is_empty())
+}
+
 impl_string_types!(
     /// A hex encoded binary data.
     HexEncodedBinaryData,
     "string",
     FORMAT,
-    Some(SCHEMA.clone())
+    Some(SCHEMA.clone()),
+    is_valid
 );
 
 impl From<Vec<u8>> for HexEncodedBinaryData {
@@ -60,5 +67,25 @@ impl From<Ed25519HexEncodedPublicKey> for HexEncodedBinaryData {
 impl Example for HexEncodedBinaryData {
     fn example() -> Self {
         Self(EXAMPLE.to_owned())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use regex::Regex;
+
+    use super::*;
+
+    #[test]
+    fn test_hex_binary_data() {
+        let regex = Regex::new(PATTERN).unwrap();
+        assert!(regex.is_match(EXAMPLE));
+        assert!(HexEncodedBinaryData::parse_from_parameter(EXAMPLE).is_ok());
+
+        let invalid = ["123", "0x"];
+        for v in invalid {
+            assert!(!regex.is_match(v));
+            assert!(HexEncodedBinaryData::parse_from_parameter(v).is_err());
+        }
     }
 }
