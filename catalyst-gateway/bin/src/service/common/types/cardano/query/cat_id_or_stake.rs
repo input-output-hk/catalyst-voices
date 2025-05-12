@@ -63,14 +63,12 @@ const PATTERN: &str = concatcp!(
 const FORMAT: &str = concatcp!(catalyst_id::FORMAT, "|", cip19_stake_address::FORMAT);
 
 /// Schema.
-static SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| {
-    MetaSchema {
-        title: Some(TITLE.to_owned()),
-        description: Some(DESCRIPTION),
-        example: Some(Value::String(EXAMPLE.to_string())),
-        pattern: Some(PATTERN.to_string()),
-        ..poem_openapi::registry::MetaSchema::ANY
-    }
+static SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| MetaSchema {
+    title: Some(TITLE.to_owned()),
+    description: Some(DESCRIPTION),
+    example: Some(Value::String(EXAMPLE.to_string())),
+    pattern: Some(PATTERN.to_string()),
+    ..poem_openapi::registry::MetaSchema::ANY
 });
 
 impl Type for CatIdOrStake {
@@ -133,11 +131,13 @@ mod tests {
         ];
         // cspell: enable
 
+        // cspell: disable
         let invalid = [
             "invalidFftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE",
             "",
             "stake_2345",
         ];
+        // cspell: enable
 
         for v in valid {
             assert!(CatIdOrStake::parse_from_parameter(v).is_ok());
