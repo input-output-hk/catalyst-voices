@@ -9,6 +9,7 @@ use poem_openapi::{
     registry::{MetaSchema, MetaSchemaRef},
     types::{Example, ParseError, ParseFromJSON, ParseFromParameter, ParseResult, ToJSON, Type},
 };
+use regex::Regex;
 use serde_json::Value;
 
 use crate::service::common::types::string_types::impl_string_types;
@@ -40,17 +41,18 @@ static SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| {
     }
 });
 
-/// Because ALL the constraints are defined above, we do not ever need to define them in
-/// the API. BUT we do need to make a validator.
-/// This helps enforce uniform validation.
+/// Validate `UUIDv7` This part is done separately from the `PATTERN`
 fn is_valid(uuidv7: &str) -> bool {
-    // Just check the string can be safely converted into the type.
-    // All the necessary validation is done in that process.
-    if let Ok(uuid) = uuid::Uuid::parse_str(uuidv7) {
-        uuid.get_version() == Some(uuid::Version::SortRand)
-    } else {
-        false
+    /// Regex to validate `UUIDv7`
+    #[allow(clippy::unwrap_used)] // Safe because the Regex is constant.
+    static RE: LazyLock<Regex> = LazyLock::new(|| Regex::new(PATTERN).unwrap());
+
+    if RE.is_match(uuidv7) {
+        if let Ok(uuid) = uuid::Uuid::parse_str(uuidv7) {
+            return uuid.get_version() == Some(uuid::Version::SortRand);
+        }
     }
+    false
 }
 
 impl_string_types!(UUIDv7, "string", FORMAT, Some(SCHEMA.clone()), is_valid);
@@ -97,21 +99,16 @@ impl From<catalyst_signed_doc::UuidV7> for UUIDv7 {
 
 #[cfg(test)]
 mod tests {
-    use regex::Regex;
-
     use super::*;
 
     #[test]
     fn test_uuidv7() {
-        let regex = Regex::new(PATTERN).unwrap();
         let valid = [EXAMPLE, "01943A32-9F35-7A14-B364-36AD693465E6"];
         for v in &valid {
-            assert!(regex.is_match(v));
             assert!(UUIDv7::parse_from_parameter(v).is_ok());
         }
         // Try UUIDv4
         let invalid = "c9993e54-1ee1-41f7-ab99-3fdec865c744";
         assert!(UUIDv7::parse_from_parameter(invalid).is_err());
-        assert!(regex.is_match(invalid));
     }
 }

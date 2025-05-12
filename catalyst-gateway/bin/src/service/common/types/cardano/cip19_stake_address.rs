@@ -12,6 +12,7 @@ use poem_openapi::{
     registry::{MetaExternalDocument, MetaSchema, MetaSchemaRef},
     types::{Example, ParseError, ParseFromJSON, ParseFromParameter, ParseResult, ToJSON, Type},
 };
+use regex::Regex;
 use serde_json::Value;
 
 use crate::service::common::types::string_types::impl_string_types;
@@ -70,17 +71,19 @@ static STAKE_SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| {
     }
 });
 
-/// Because ALL the constraints are defined above, we do not ever need to define them in
-/// the API. BUT we do need to make a validator.
-/// This helps enforce uniform validation.
+/// Validate `Cip19StakeAddress` This part is done separately from the `PATTERN`
 fn is_valid(stake_addr: &str) -> bool {
-    // Just check the string can be safely converted into the type.
-    if let Ok((hrp, addr)) = bech32::decode(stake_addr) {
-        let hrp = hrp.as_str();
-        addr.len() == DECODED_ADDR_LEN && (hrp == PROD_STAKE || hrp == TEST_STAKE)
-    } else {
-        false
+    /// Regex to validate `Cip19StakeAddress`
+    #[allow(clippy::unwrap_used)] // Safe because the Regex is constant.
+    static RE: LazyLock<Regex> = LazyLock::new(|| Regex::new(PATTERN).unwrap());
+
+    if RE.is_match(stake_addr) {
+        if let Ok((hrp, addr)) = bech32::decode(stake_addr) {
+            let hrp = hrp.as_str();
+            return addr.len() == DECODED_ADDR_LEN && (hrp == PROD_STAKE || hrp == TEST_STAKE);
+        }
     }
+    false
 }
 
 impl_string_types!(
@@ -145,8 +148,6 @@ impl Example for Cip19StakeAddress {
 
 #[cfg(test)]
 mod tests {
-    use regex::Regex;
-
     use super::*;
 
     // Test Vector: <https://cips.cardano.org/cip/CIP-19>
@@ -161,15 +162,11 @@ mod tests {
 
     #[test]
     fn test_cip19_stake_address() {
-        let regex = Regex::new(PATTERN).unwrap();
-
         let valid = [EXAMPLE, VALID_PROD_STAKE_ADDRESS, VALID_TEST_STAKE_ADDRESS];
         for v in valid {
-            assert!(regex.is_match(v));
             assert!(Cip19StakeAddress::parse_from_parameter(v).is_ok());
         }
 
-        assert!(!regex.is_match(INVALID_STAKE_ADDRESS));
         assert!(Cip19StakeAddress::parse_from_parameter(INVALID_STAKE_ADDRESS).is_err());
     }
 

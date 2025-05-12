@@ -43,7 +43,7 @@ static SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| {
     }
 });
 
-// Validate `AssetName` This part is done separately from the `PATTERN`
+/// Validate `AssetName` This part is done separately from the `PATTERN`
 fn is_valid(name: &str) -> bool {
     // Hex string
     if let Some(hash) = name.strip_prefix("0x") {
@@ -114,6 +114,7 @@ mod tests {
             "0x40a8016ca43cfae6b76b11222042664b3b6f2fdcdb08c98ac9d51f41217922b41",
             "This_Is_A_Very_Long_String_but_invalid_parsing",
             "0x",
+            "0xqw",
         ];
 
         for v in valid {

@@ -11,6 +11,7 @@ use poem_openapi::{
     registry::{MetaExternalDocument, MetaSchema, MetaSchemaRef},
     types::{Example, ParseError, ParseFromJSON, ParseFromParameter, ParseResult, ToJSON, Type},
 };
+use regex::Regex;
 use serde_json::Value;
 
 use crate::service::common::types::string_types::impl_string_types;
@@ -83,19 +84,21 @@ static SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| {
     }
 });
 
-/// Because ALL the constraints are defined above, we do not ever need to define them in
-/// the API. BUT we do need to make a validator.
-/// This helps enforce uniform validation.
+/// Validate `Cip19ShelleyAddress` This part is done separately from the `PATTERN`
 fn is_valid(addr: &str) -> bool {
-    // Just check the string can be safely converted into the type.
-    if let Ok((hrp, addr)) = bech32::decode(addr) {
-        let hrp = hrp.as_str();
-        (addr.len() == (DECODED_UNSTAKED_ADDR_LEN + HEADER_LEN)
-            || addr.len() == (DECODED_STAKED_ADDR_LEN + HEADER_LEN))
-            && (hrp == PROD || hrp == TEST)
-    } else {
-        false
+    /// Regex to validate `Cip19ShelleyAddress`
+    #[allow(clippy::unwrap_used)] // Safe because the Regex is constant.
+    static RE: LazyLock<Regex> = LazyLock::new(|| Regex::new(PATTERN).unwrap());
+
+    if RE.is_match(addr) {
+        if let Ok((hrp, addr)) = bech32::decode(addr) {
+            let hrp = hrp.as_str();
+            return (addr.len() == (DECODED_UNSTAKED_ADDR_LEN + HEADER_LEN)
+                || addr.len() == (DECODED_STAKED_ADDR_LEN + HEADER_LEN))
+                && (hrp == PROD || hrp == TEST);
+        }
     }
+    false
 }
 
 impl_string_types!(
@@ -150,14 +153,10 @@ impl Example for Cip19ShelleyAddress {
 
 #[cfg(test)]
 mod tests {
-    use regex::Regex;
-
     use super::*;
 
     #[test]
     fn test_cip19_shelley_address() {
-        let regex = Regex::new(PATTERN).unwrap();
-
         // Test Vector: <https://cips.cardano.org/cip/CIP-19>
         // cspell: disable
         let valid = [
@@ -190,11 +189,9 @@ mod tests {
         // cspell: enable
 
         for v in valid {
-            assert!(regex.is_match(v));
             assert!(Cip19ShelleyAddress::parse_from_parameter(v).is_ok());
         }
         for v in invalid {
-            assert!(!regex.is_match(v));
             assert!(Cip19ShelleyAddress::parse_from_parameter(v).is_err());
         }
     }

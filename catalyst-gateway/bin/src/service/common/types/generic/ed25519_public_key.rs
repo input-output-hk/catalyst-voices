@@ -9,6 +9,7 @@ use poem_openapi::{
     registry::{MetaSchema, MetaSchemaRef},
     types::{Example, ParseError, ParseFromJSON, ParseFromParameter, ParseResult, ToJSON, Type},
 };
+use regex::Regex;
 use serde_json::Value;
 
 use crate::{
@@ -25,7 +26,7 @@ const EXAMPLE: &str = "0x56CDD154355E078A0990F9E633F9553F7D43A68B2FF9BEF78B9F5C7
 /// Length of the hex encoded string
 pub(crate) const ENCODED_LENGTH: usize = ed25519::HEX_ENCODED_LENGTH;
 /// Validation Regex Pattern
-pub(crate) const PATTERN: &str = "0x[A-Fa-f0-9]{64}";
+pub(crate) const PATTERN: &str = "^0x[A-Fa-f0-9]{64}$";
 /// Format
 pub(crate) const FORMAT: &str = "hex:ed25519-public-key";
 
@@ -42,13 +43,16 @@ static SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| {
     }
 });
 
-/// Because ALL the constraints are defined above, we do not ever need to define them in
-/// the API. BUT we do need to make a validator.
-/// This helps enforce uniform validation.
+/// Validate `Ed25519HexEncodedPublicKey` This part is done separately from the `PATTERN`
 fn is_valid(hex_key: &str) -> bool {
-    // Just check the string can be safely converted into the type.
-    // All the necessary validation is done in that process.
-    ed25519::verifying_key_from_hex(hex_key).is_ok()
+    /// Regex to validate `Ed25519HexEncodedPublicKey`
+    #[allow(clippy::unwrap_used)] // Safe because the Regex is constant.
+    static RE: LazyLock<Regex> = LazyLock::new(|| Regex::new(PATTERN).unwrap());
+
+    if RE.is_match(hex_key) {
+        return ed25519::verifying_key_from_hex(hex_key).is_ok();
+    }
+    false
 }
 
 impl_string_types!(
@@ -145,14 +149,26 @@ impl TryInto<Vec<u8>> for Ed25519HexEncodedPublicKey {
 
 #[cfg(test)]
 mod tests {
-    use super::Ed25519HexEncodedPublicKey;
+    use super::*;
 
     #[test]
-    fn hex_to_pub_key() {
+    fn test_ed255519() {
         // https://cexplorer.io/article/understanding-cardano-addresses
-        assert!(Ed25519HexEncodedPublicKey::try_from(
-            "0x76e7ac0e460b6cdecea4be70479dab13c4adbd117421259a9b36caac007394de".to_string(),
-        )
-        .is_ok());
+        let valid = [
+            EXAMPLE,
+            "0x76e7ac0e460b6cdecea4be70479dab13c4adbd117421259a9b36caac007394de",
+        ];
+        for v in valid {
+            assert!(Ed25519HexEncodedPublicKey::parse_from_parameter(v).is_ok());
+        }
+        let invalid = [
+            "123",
+            "0x",
+            "0xqw",
+            "0x76e7ac0e460b6cdecea4be70479dab13c4adbd117421259a9b36caac007394de1",
+        ];
+        for v in invalid {
+            assert!(Ed25519HexEncodedPublicKey::parse_from_parameter(v).is_err());
+        }
     }
 }

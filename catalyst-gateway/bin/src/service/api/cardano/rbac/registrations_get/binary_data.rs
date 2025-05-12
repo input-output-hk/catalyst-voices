@@ -6,6 +6,7 @@ use poem_openapi::{
     registry::{MetaSchema, MetaSchemaRef},
     types::{Example, ParseError, ParseFromJSON, ParseFromParameter, ParseResult, ToJSON, Type},
 };
+use regex::Regex;
 use serde_json::Value;
 
 use crate::service::{
@@ -40,7 +41,16 @@ static SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| {
 /// Validate the `HexEncodedBinaryData`.
 /// This part is done separately from the `PATTERN`
 fn is_valid(hash: &str) -> bool {
-    matches!(hash.strip_prefix("0x"), Some(h) if !h.is_empty())
+    /// Regex to validate `HexEncodedBinaryData`
+    #[allow(clippy::unwrap_used)] // Safe because the Regex is constant
+    static RE: LazyLock<Regex> = LazyLock::new(|| Regex::new(PATTERN).unwrap());
+
+    if RE.is_match(hash) {
+        if let Some(h) = hash.strip_prefix("0x") {
+            return hex::decode(h).is_ok();
+        }
+    }
+    false
 }
 
 impl_string_types!(
@@ -72,19 +82,14 @@ impl Example for HexEncodedBinaryData {
 
 #[cfg(test)]
 mod tests {
-    use regex::Regex;
-
     use super::*;
 
     #[test]
     fn test_hex_binary_data() {
-        let regex = Regex::new(PATTERN).unwrap();
-        assert!(regex.is_match(EXAMPLE));
         assert!(HexEncodedBinaryData::parse_from_parameter(EXAMPLE).is_ok());
 
-        let invalid = ["123", "0x"];
+        let invalid = ["123", "0x", "0xqw"];
         for v in invalid {
-            assert!(!regex.is_match(v));
             assert!(HexEncodedBinaryData::parse_from_parameter(v).is_err());
         }
     }

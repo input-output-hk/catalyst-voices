@@ -11,6 +11,7 @@ use poem_openapi::{
     registry::{MetaSchema, MetaSchemaRef},
     types::{ParseFromParameter, ParseResult, Type},
 };
+use regex::Regex;
 use serde_json::Value;
 
 use crate::service::common::types::cardano::{
@@ -101,31 +102,47 @@ impl Type for CatIdOrStake {
 
 impl ParseFromParameter for CatIdOrStake {
     fn parse_from_parameter(value: &str) -> ParseResult<Self> {
+        /// Regex to validate `CatIdOrStake`
+        #[allow(clippy::unwrap_used)] // Safe because the Regex is constant
+        static RE: LazyLock<Regex> = LazyLock::new(|| Regex::new(PATTERN).unwrap());
+
+        if !RE.is_match(value) {
+            return Err(anyhow::anyhow!(
+                "Invalid \"Catalyst Id or Stake Address\" parameter format."
+            )
+            .into());
+        }
         Ok(value.try_into()?)
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use regex::Regex;
-
     use super::*;
 
     #[test]
     fn test_cat_id_or_stake() {
-        let regex = Regex::new(PATTERN).unwrap();
+        // Test data
+        // <https://cips.cardano.org/cip/CIP-19>
+        // cspell: disable
+        let valid = [
+            EXAMPLE,
+            "stake_test1uqehkck0lajq8gr28t9uxnuvgcqrc6070x3k9r8048z8y5gssrtvn",
+            "stake1uyehkck0lajq8gr28t9uxnuvgcqrc6070x3k9r8048z8y5gh6ffgw",
+            "cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE",
+        ];
+        // cspell: enable
 
-        // https://cexplorer.io/article/understanding-cardano-addresses
-        let valid = [EXAMPLE, "stake1u94ullc9nj9gawc08990nx8hwgw80l9zpmr8re44kydqy9cdjq6rq", "cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE"];
-
-        let invalid = ["invalidFftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE", "", "stake_2345"];
+        let invalid = [
+            "invalidFftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE",
+            "",
+            "stake_2345",
+        ];
 
         for v in valid {
-            assert!(regex.is_match(v));
             assert!(CatIdOrStake::parse_from_parameter(v).is_ok());
         }
         for v in invalid {
-            assert!(!regex.is_match(v));
             assert!(CatIdOrStake::parse_from_parameter(v).is_err());
         }
     }
