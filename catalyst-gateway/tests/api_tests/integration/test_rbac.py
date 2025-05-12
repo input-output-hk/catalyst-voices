@@ -8,7 +8,7 @@ def test_rbac_endpoints(rbac_chain_factory):
     auth_token = rbac_chain_factory(RoleID.ROLE_0).auth_token()
     
     # Registered stake address lookup
-    stake_address = ONLY_ROLE_0_REG_JSON["0"]["stake_address"]
+    stake_address = ONLY_ROLE_0_REG_JSON["0"][0]["stake_address"]
     resp = get(lookup=stake_address, token=auth_token)
     assert(resp.status_code == 200), f"Expected registered stake address: {resp.status_code} - {resp.text}"
 
