@@ -63,12 +63,14 @@ const PATTERN: &str = concatcp!(
 const FORMAT: &str = concatcp!(catalyst_id::FORMAT, "|", cip19_stake_address::FORMAT);
 
 /// Schema.
-static SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| MetaSchema {
-    title: Some(TITLE.to_owned()),
-    description: Some(DESCRIPTION),
-    example: Some(Value::String(EXAMPLE.to_string())),
-    pattern: Some(PATTERN.to_string()),
-    ..poem_openapi::registry::MetaSchema::ANY
+static SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| {
+    MetaSchema {
+        title: Some(TITLE.to_owned()),
+        description: Some(DESCRIPTION),
+        example: Some(Value::String(EXAMPLE.to_string())),
+        pattern: Some(PATTERN.to_string()),
+        ..poem_openapi::registry::MetaSchema::ANY
+    }
 });
 
 impl Type for CatIdOrStake {
