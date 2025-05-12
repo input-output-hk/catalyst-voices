@@ -266,7 +266,7 @@ final class ProposalCubit extends Cubit<ProposalState>
     final header = ProposalViewHeader(
       proposalRef: proposalDocumentRef,
       title: proposalDocument?.title ?? '',
-      authorName: proposalDocument?.authorName ?? '',
+      authorName: proposalDocument?.authorName,
       createdAt: proposalDocumentRef?.version?.tryDateTime,
       commentsCount: comments.length,
       versions: versions,

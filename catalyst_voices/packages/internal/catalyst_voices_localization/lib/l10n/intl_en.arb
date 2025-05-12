@@ -2678,5 +2678,9 @@
   "notFoundButton": "Go to Catalyst Home",
   "@notFoundButton": {
     "description": "Button label on the not found page to go to home page in the app."
+  },
+  "anonymousUsername": "Anonymous",
+  "@anonymousUsername": {
+    "description": "When account does not have specified username this text is shown"
   }
 }
