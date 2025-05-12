@@ -101,7 +101,7 @@ pub(crate) async fn build_reg_chain<OnSuccessFn: FnMut(bool, Slot, &Registration
     let root = load_cip509_from_chain(network, root.slot_no.into(), root.txn_index.into())
         .await
         .context("Failed to get root registration")?;
-    let mut chain = RegistrationChain::new(root).context("Invalid root registration")?;
+    let mut chain = RegistrationChain::new(&root).context("Invalid root registration")?;
     on_success(is_persistent, slot_no, &chain);
 
     for (is_persistent, reg) in reg_queries_iter {
@@ -116,7 +116,7 @@ pub(crate) async fn build_reg_chain<OnSuccessFn: FnMut(bool, Slot, &Registration
                     reg.slot_no, reg.txn_index,
                 )
             })?;
-        match chain.update(cip509) {
+        match chain.update(&cip509) {
             Ok(c) => {
                 chain = c;
                 on_success(is_persistent, slot_no, &chain);
