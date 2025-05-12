@@ -51,9 +51,9 @@ pub(crate) struct Params {
     pub(crate) txn_index: DbTxnIndex,
     /// Transaction Output Offset inside the transaction.
     pub(crate) txo: DbTxnOutputOffset,
-    /// Asset Policy Hash - Binary 28 bytes.
+    /// Asset policy unique identifier (28 bytes).
     policy_id: Vec<u8>,
-    /// Name of the asset, within the Policy.
+    /// Asset name (range of 0 - 32 bytes).
     asset_name: Vec<u8>,
 }
 

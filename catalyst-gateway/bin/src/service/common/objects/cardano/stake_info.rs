@@ -18,7 +18,7 @@ use crate::service::common::types::{
 #[derive(Object, Debug, Clone)]
 #[oai(example)]
 pub(crate) struct StakedTxoAssetInfo {
-    /// Token policy hash.
+    /// Asset policy unique identifier (28 bytes).
     pub(crate) policy_hash: HexEncodedHash28,
     /// Token policies Asset Name.
     pub(crate) asset_name: AssetName,

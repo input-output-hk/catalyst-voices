@@ -14,17 +14,21 @@ use crate::service::common::types::string_types::impl_string_types;
 const TITLE: &str = "Cardano Native Asset Name";
 /// Description.
 const DESCRIPTION: &str = r"The name given to the native asset when it was minted.
-If the name can be converted to UTF8, its string is represented directly.
-Otherwise it will be represented as escaped ascii.
-Any `\` present in the name will be replaced with `\\` in all cases.";
+It is used to distinguish different assets within the same policy.
+If the name starts with 0x, it will be treated as hex encoded,
+this hex encoded should not exceed 64 length long.
+Otherwise, it will be treated as normal string, which will later be converted to UTF-8 where after converted, 
+it should not exceed 32 bytes";
+
 /// Example.
 const EXAMPLE: &str = "My Cool\nAsset";
 /// Minimum length.
 const MIN_LENGTH: usize = 0;
-/// Maximum length. (True length is 32, but escaping can double its size).
-const MAX_LENGTH: usize = 64;
+/// Maximum length.
+const MAX_LENGTH: usize = 1000;
 /// Validation Regex Pattern
-const PATTERN: &str = r"[\S\s]{0,64}";
+/// Can be anything
+const PATTERN: &str = r".*";
 
 /// Schema.
 static SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| {
@@ -39,12 +43,16 @@ static SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| {
     }
 });
 
-/// Because ALL the constraints are defined above, we do not ever need to define them in
-/// the API. BUT we do need to make a validator.
-/// This helps enforce uniform validation.
-fn is_valid(_name: &str) -> bool {
-    // Anything is valid.
-    true
+// Validate `AssetName` This part is done separately from the `PATTERN`
+fn is_valid(name: &str) -> bool {
+    // Hex string
+    if let Some(hash) = name.strip_prefix("0x") {
+        hash.len() <= 64
+    // Any string
+    } else {
+        let hex = hex::encode(name);
+        hex.len() <= 64
+    }
 }
 
 impl_string_types!(
@@ -78,5 +86,44 @@ impl From<Vec<u8>> for AssetName {
 impl From<String> for AssetName {
     fn from(value: String) -> Self {
         Self(value)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use regex::Regex;
+
+    use super::*;
+
+    #[test]
+    fn test_asset_name() {
+        let regex = Regex::new(PATTERN).unwrap();
+
+        // Test Data
+        // <https://preprod.cardanoscan.io/tokens>
+        let valid = [
+            "This_Is_A_Very_Long_String______",
+            "0x7dc6f84acd4016aa7b2f7ab7231981a1014fdcc0a1df70424a3e179b5e1c8e67",
+            "SPLASH",
+            "0x6c71",
+            "",
+        ];
+
+        // Valid Regex, invalid parsing
+        let invalid = [
+            "0x40a8016ca43cfae6b76b11222042664b3b6f2fdcdb08c98ac9d51f41217922b41",
+            "This_Is_A_Very_Long_String_but_invalid_parsing",
+            "0x",
+        ];
+
+        for v in valid {
+            assert!(regex.is_match(v));
+            assert!(AssetName::parse_from_parameter(v).is_ok());
+        }
+
+        for v in invalid {
+            assert!(regex.is_match(v));
+            assert!(AssetName::parse_from_parameter(v).is_err());
+        }
     }
 }
