@@ -2,9 +2,9 @@ import 'package:catalyst_voices/pages/registration/pictures/task_picture.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:flutter/material.dart';
 
-const _wordsPerColumnCount = 6;
-const _firstHighlightIndex = [0];
 const _allHighlightIndex = [0, 1, 2, 3, 4, 5];
+const _firstHighlightIndex = [0];
+const _wordsPerColumnCount = 6;
 
 class SeedPhrasePicture extends StatelessWidget {
   final bool indicateSelection;
@@ -47,14 +47,39 @@ class SeedPhrasePicture extends StatelessWidget {
   }
 }
 
+class _Word extends StatelessWidget {
+  final bool isSelected;
+  final TaskPictureType type;
+
+  const _Word({
+    this.isSelected = false,
+    required this.type,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final color = type.foregroundColor(theme, isHighlight: isSelected);
+
+    return AnimatedContainer(
+      height: 6.72,
+      duration: const Duration(milliseconds: 200),
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(1.12),
+      ),
+    );
+  }
+}
+
 class _Words extends StatelessWidget {
+  final bool indicateSelection;
+
+  final TaskPictureType type;
   const _Words({
     required this.indicateSelection,
     required this.type,
   });
-
-  final bool indicateSelection;
-  final TaskPictureType type;
 
   @override
   Widget build(BuildContext context) {
@@ -72,7 +97,6 @@ class _Words extends StatelessWidget {
               TaskPictureType.error =>
                 _allHighlightIndex,
             },
-            count: _wordsPerColumnCount,
             type: type,
           ),
         ),
@@ -86,7 +110,6 @@ class _Words extends StatelessWidget {
               TaskPictureType.error =>
                 _allHighlightIndex,
             },
-            count: _wordsPerColumnCount,
             type: type,
           ),
         ),
@@ -110,7 +133,6 @@ class _WordsColumn extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
-      mainAxisSize: MainAxisSize.max,
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: List.generate(
         count,
@@ -120,31 +142,6 @@ class _WordsColumn extends StatelessWidget {
             type: type,
           );
         },
-      ),
-    );
-  }
-}
-
-class _Word extends StatelessWidget {
-  final bool isSelected;
-  final TaskPictureType type;
-
-  const _Word({
-    this.isSelected = false,
-    required this.type,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final color = type.foregroundColor(theme, isHighlight: isSelected);
-
-    return AnimatedContainer(
-      height: 6.72,
-      duration: const Duration(milliseconds: 200),
-      decoration: BoxDecoration(
-        color: color,
-        borderRadius: BorderRadius.circular(1.12),
       ),
     );
   }

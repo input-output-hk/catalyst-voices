@@ -77,7 +77,6 @@ class _SegmentMenuTile extends StatelessWidget {
 
         SegmentsControllerScope.of(context).selectSectionStep(section.id);
       },
-      selectedItemId: null,
       isExpanded: isExpanded,
       items: segment.sections.map(
         (section) {

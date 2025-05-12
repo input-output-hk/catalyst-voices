@@ -175,8 +175,6 @@ class _SeedPhraseFieldState extends State<SeedPhraseField> {
                           key: ValueKey('Word${element.nr}CellKey'),
                           nr: element.nr,
                           data: element.data,
-                          // disabled always for now.
-                          onDeleteTap: null,
                         );
                       },
                     ),

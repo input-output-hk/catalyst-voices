@@ -60,7 +60,6 @@ class VoicesDesktopInfoDialog extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 83),
         child: Column(
           mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             const SizedBox(height: 36),
             IconTheme(

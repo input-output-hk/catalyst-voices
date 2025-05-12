@@ -129,7 +129,7 @@ void main() {
             ];
             final actions = [
               _buildProposalAction(
-                selfRef: _buildRefAt(DateTime(2025, 04, 1)),
+                selfRef: _buildRefAt(DateTime(2025, 04)),
                 action: ProposalSubmissionActionDto.aFinal,
                 proposalRef: ref,
               ),
@@ -212,7 +212,7 @@ void main() {
             ];
             final actions = [
               _buildProposalAction(
-                selfRef: _buildRefAt(DateTime(2025, 04, 1)),
+                selfRef: _buildRefAt(DateTime(2025, 04)),
                 action: ProposalSubmissionActionDto.draft,
                 proposalRef: proposalOneRef,
               ),
@@ -380,9 +380,7 @@ void main() {
             );
             const expectedCount = ProposalsCount(
               total: 1,
-              drafts: 0,
               finals: 1,
-              favorites: 0,
               my: 1,
             );
 
@@ -438,10 +436,7 @@ void main() {
             final filters = ProposalsCountFilters(category: categoryId);
             const expectedCount = ProposalsCount(
               total: 1,
-              drafts: 0,
               finals: 1,
-              favorites: 0,
-              my: 0,
             );
 
             // When
@@ -479,9 +474,6 @@ void main() {
             const expectedCount = ProposalsCount(
               total: 1,
               drafts: 1,
-              finals: 0,
-              favorites: 0,
-              my: 0,
             );
 
             // When
@@ -517,9 +509,6 @@ void main() {
             const expectedCount = ProposalsCount(
               total: 1,
               drafts: 1,
-              finals: 0,
-              favorites: 0,
-              my: 0,
             );
 
             // When
@@ -554,9 +543,6 @@ void main() {
             const expectedCount = ProposalsCount(
               total: 1,
               drafts: 1,
-              finals: 0,
-              favorites: 0,
-              my: 0,
             );
 
             // When
@@ -777,7 +763,7 @@ void main() {
 
           final proposals = [
             _buildProposal(
-              selfRef: _buildRefAt(DateTime(2025, 4, 1)),
+              selfRef: _buildRefAt(DateTime(2025, 4)),
               template: templateRef,
               categoryId: categoryId,
             ),
@@ -831,7 +817,7 @@ void main() {
             _buildProposalTemplate(selfRef: templateRef),
           ];
 
-          final proposalRef1 = _buildRefAt(DateTime(2025, 4, 1));
+          final proposalRef1 = _buildRefAt(DateTime(2025, 4));
           final proposalRef2 = _buildRefAt(DateTime(2025, 4, 2));
           final proposalRef3 = _buildRefAt(DateTime(2025, 4, 3));
 
@@ -900,7 +886,7 @@ void main() {
             _buildProposalTemplate(selfRef: templateRef),
           ];
 
-          final proposalRef1 = _buildRefAt(DateTime(2025, 4, 1));
+          final proposalRef1 = _buildRefAt(DateTime(2025, 4));
           final proposalRef2 = _buildRefAt(DateTime(2025, 4, 2));
           final proposalRef3 = _buildRefAt(DateTime(2025, 4, 3));
 
@@ -927,7 +913,7 @@ void main() {
               proposalRef: proposalRef1,
             ),
             _buildProposalAction(
-              selfRef: _buildRefAt(DateTime(2025, 4, 1)),
+              selfRef: _buildRefAt(DateTime(2025, 4)),
               action: ProposalSubmissionActionDto.draft,
               proposalRef: proposalRef1,
             ),
@@ -970,7 +956,7 @@ void main() {
             _buildProposalTemplate(selfRef: templateRef),
           ];
 
-          final proposalRef1 = _buildRefAt(DateTime(2025, 4, 1));
+          final proposalRef1 = _buildRefAt(DateTime(2025, 4));
           final proposalRef2 =
               _buildRefAt(DateTime(2025, 4, 2)).copyWith(id: proposalRef1.id);
           final proposalRef3 =
@@ -998,7 +984,7 @@ void main() {
               proposalRef: proposalRef2,
             ),
             _buildProposalAction(
-              selfRef: _buildRefAt(DateTime(2025, 4, 1)),
+              selfRef: _buildRefAt(DateTime(2025, 4)),
               action: ProposalSubmissionActionDto.draft,
               proposalRef: proposalRef1,
             ),
@@ -1173,7 +1159,7 @@ void main() {
 
           final proposals = [
             _buildProposal(
-              selfRef: _buildRefAt(DateTime(2025, 4, 1)),
+              selfRef: _buildRefAt(DateTime(2025, 4)),
               template: templateRef,
             ),
             _buildProposal(
@@ -1225,7 +1211,7 @@ void main() {
             _buildProposalTemplate(selfRef: templateRef),
           ];
 
-          final proposalRef1 = _buildRefAt(DateTime(2025, 4, 1));
+          final proposalRef1 = _buildRefAt(DateTime(2025, 4));
           final proposalRef2 = _buildRefAt(DateTime(2025, 4, 2));
           final proposalRef3 = _buildRefAt(DateTime(2025, 4, 3));
 
@@ -1291,7 +1277,7 @@ void main() {
             _buildProposalTemplate(selfRef: templateRef),
           ];
 
-          final baseTime = DateTime(2025, 4, 1);
+          final baseTime = DateTime(2025, 4);
           final proposalRef1 = _buildRefAt(baseTime);
           final proposalRef2 =
               _buildRefAt(baseTime.add(const Duration(days: 1)))

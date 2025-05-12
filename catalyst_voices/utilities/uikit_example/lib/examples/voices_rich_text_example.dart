@@ -3,6 +3,17 @@ import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 
+const _textSample = [
+  {'insert': 'Sample Rich Text Editor'},
+  {
+    'attributes': {'header': 1},
+    'insert': '\n',
+  },
+  {'insert': '\n'},
+  {'insert': 'We will be able to create content now!'},
+  {'insert': '\n'},
+];
+
 class VoicesRichTextExample extends StatefulWidget {
   static const String route = '/rich-text-example';
 
@@ -16,11 +27,19 @@ class _VoicesRichTextExampleState extends State<VoicesRichTextExample> {
   late final VoicesRichTextController _controller;
 
   @override
-  void initState() {
-    super.initState();
-    _controller = VoicesRichTextController(
-      document: Document.fromJson(_textSample),
-      selection: const TextSelection.collapsed(offset: 0),
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Theme.of(context).colors.onSurfaceNeutralOpaqueLv0,
+      appBar: AppBar(title: const Text('Voices Rich Text')),
+      body: SingleChildScrollView(
+        child: VoicesRichText(
+          controller: _controller,
+          charsLimit: 800,
+          focusNode: FocusNode(),
+          scrollController: ScrollController(),
+          onChanged: (_) {},
+        ),
+      ),
     );
   }
 
@@ -31,31 +50,11 @@ class _VoicesRichTextExampleState extends State<VoicesRichTextExample> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Theme.of(context).colors.onSurfaceNeutralOpaqueLv0,
-      appBar: AppBar(title: const Text('Voices Rich Text')),
-      body: SingleChildScrollView(
-        child: VoicesRichText(
-          controller: _controller,
-          charsLimit: 800,
-          enabled: true,
-          focusNode: FocusNode(),
-          scrollController: ScrollController(),
-          onChanged: (_) {},
-        ),
-      ),
+  void initState() {
+    super.initState();
+    _controller = VoicesRichTextController(
+      document: Document.fromJson(_textSample),
+      selection: const TextSelection.collapsed(offset: 0),
     );
   }
 }
-
-const _textSample = [
-  {'insert': 'Sample Rich Text Editor'},
-  {
-    'attributes': {'header': 1},
-    'insert': '\n',
-  },
-  {'insert': '\n'},
-  {'insert': 'We will be able to create content now!'},
-  {'insert': '\n'},
-];

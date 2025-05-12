@@ -16,7 +16,6 @@ void main() {
       // Arrange: Provide a loading builder
       await tester.pumpApp(
         ResultBuilder<String, String>(
-          result: null,
           successBuilder: (context, data) => Text('Success: $data'),
           failureBuilder: (context, data) => Text('Failure: $data'),
           loadingBuilder: (context) => const CircularProgressIndicator(),
@@ -74,8 +73,6 @@ void main() {
 
       await tester.pumpApp(
         ResultBuilder<String, String>(
-          result: null,
-          minLoadingDuration: minLoadingDuration,
           successBuilder: (context, data) => Text('Success: $data'),
           failureBuilder: (context, data) => Text('Failure: $data'),
           loadingBuilder: (context) => const CircularProgressIndicator(),
@@ -94,7 +91,6 @@ void main() {
       await tester.pumpApp(
         ResultBuilder<String, String>(
           result: Success('Test Success'),
-          minLoadingDuration: minLoadingDuration,
           successBuilder: (context, data) => Text('Success: $data'),
           failureBuilder: (context, data) => Text('Failure: $data'),
           loadingBuilder: (context) => const CircularProgressIndicator(),
@@ -118,7 +114,6 @@ void main() {
           builder: (context, snapshot) {
             return ResultBuilder<String, String>(
               result: snapshot.data,
-              minLoadingDuration: minLoadingDuration,
               successBuilder: (context, data) => Text('Success: $data'),
               failureBuilder: (context, data) => Text('Failure: $data'),
               loadingBuilder: (context) => const CircularProgressIndicator(),
@@ -145,7 +140,7 @@ void main() {
 
       // Now simulate passing the minLoadingDuration,
       // 100ms remaining at this point
-      await tester.pumpAndSettle(const Duration(milliseconds: 100));
+      await tester.pumpAndSettle();
 
       // Verify that after the full duration, success is displayed
       expect(find.text('Success: Test Success'), findsOneWidget);
@@ -161,7 +156,6 @@ void main() {
         StatefulBuilder(
           builder: (context, setState) {
             return ResultBuilder<String, String>(
-              result: null,
               successBuilder: (context, data) =>
                   Text('Success: $data', key: successWidgetKey),
               failureBuilder: (context, data) =>

@@ -20,7 +20,7 @@ class VoicesNodeMenuPlaceholder extends StatelessWidget {
       root: SimpleTreeViewRootRow(
         leading: [
           VoicesNodeMenuIcon(isOpen: isExpanded),
-          const _Placeholder(width: 16, height: 16),
+          const _Placeholder(width: 16),
         ],
         child: const _Placeholder(),
       ),
