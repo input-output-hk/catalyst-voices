@@ -1,5 +1,4 @@
 import pytest
-from loguru import logger
 from utils import health, signed_doc, uuid_v7
 from api.v1 import document
 import os
@@ -291,8 +290,6 @@ def test_proposal_doc(proposal_doc_factory, rbac_chain_factory):
         resp.status_code == 422
     ), f"Publish document, expected 422 Unprocessable Content: {resp.status_code} - {resp.text}"
 
-    logger.info("Proposal document test successful.")
-
 
 @pytest.mark.preprod_indexing
 def test_comment_doc(comment_doc_factory, rbac_chain_factory):
@@ -355,8 +352,6 @@ def test_comment_doc(comment_doc_factory, rbac_chain_factory):
     assert (
         resp.status_code == 422
     ), f"Publish document, expected 422 Unprocessable Content: {resp.status_code} - {resp.text}"
-
-    logger.info("Comment document test successful.")
 
 
 @pytest.mark.preprod_indexing
@@ -424,8 +419,6 @@ def test_submission_action(submission_action_factory, rbac_chain_factory):
     assert (
         resp.status_code == 422
     ), f"Publish document, expected 422 Unprocessable Content: {resp.status_code} - {resp.text}"
-
-    logger.info("Submission action document test successful.")
 
 
 @pytest.mark.preprod_indexing
@@ -496,5 +489,3 @@ def test_document_index_endpoint(proposal_doc_factory, rbac_chain_factory):
     assert (
         resp.status_code == 412
     ), f"Post document, expected 412 Precondition Failed: {resp.status_code} - {resp.text}"
-
-    logger.info("Document POST /index endpoint test successful.")
