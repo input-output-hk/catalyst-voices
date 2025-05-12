@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:catalyst_voices/widgets/buttons/voices_buttons.dart';
 import 'package:catalyst_voices/widgets/scrollbar/voices_scrollbar.dart';
 import 'package:catalyst_voices/widgets/text_field/voices_autocomplete.dart';
 import 'package:catalyst_voices/widgets/text_field/voices_text_field.dart';
@@ -260,13 +259,11 @@ class _SeedPhraseFieldState extends State<SeedPhraseField> {
 class _WordCell extends StatelessWidget {
   final int nr;
   final String data;
-  final VoidCallback? onDeleteTap;
 
   const _WordCell({
     super.key,
     required this.nr,
     required this.data,
-    this.onDeleteTap,
   });
 
   @override
@@ -289,10 +286,7 @@ class _WordCell extends StatelessWidget {
             Text('${nr.toString().padLeft(2, '0')}.'),
             const SizedBox(width: 6),
             Text(data),
-            if (onDeleteTap != null)
-              XButton(onTap: onDeleteTap)
-            else
-              const SizedBox(width: 16),
+            const SizedBox(width: 16),
           ],
         ),
       ),

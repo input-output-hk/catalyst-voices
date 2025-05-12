@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 
 const _allHighlightIndex = [0, 1, 2, 3, 4, 5];
 const _firstHighlightIndex = [0];
-const _wordsPerColumnCount = 6;
 
 class SeedPhrasePicture extends StatelessWidget {
   final bool indicateSelection;
@@ -119,14 +118,14 @@ class _Words extends StatelessWidget {
 }
 
 class _WordsColumn extends StatelessWidget {
+  static const int _count = 6;
+
   final List<int> highlightIndexes;
-  final int count;
   final TaskPictureType type;
 
   const _WordsColumn({
     super.key,
     this.highlightIndexes = const [],
-    this.count = 6,
     required this.type,
   });
 
@@ -135,7 +134,7 @@ class _WordsColumn extends StatelessWidget {
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: List.generate(
-        count,
+        _count,
         (index) {
           return _Word(
             isSelected: highlightIndexes.contains(index),

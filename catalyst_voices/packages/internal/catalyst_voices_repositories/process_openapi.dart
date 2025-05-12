@@ -89,6 +89,7 @@ class _FilterAllOfVisitor {
 
   _FilterAllOfVisitor({
     required this.source,
+    // ignore: unused_element_parameter
     this.verbose = false,
   });
 
