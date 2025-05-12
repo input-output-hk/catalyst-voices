@@ -36,8 +36,8 @@ final class WorkspaceState extends Equatable {
 
   List<Proposal> get published => userProposals
       .where((e) => (e.publish.isPublished || e.publish.isDraft))
-      .sorted(_compareProposals)
-      .toList();
+      .toList()
+    ..sort();
 
   bool get showError => error != null && !isLoading;
 
@@ -63,15 +63,5 @@ final class WorkspaceState extends Equatable {
       userProposals: userProposals ?? this.userProposals,
       timelineItems: timelineItems ?? this.timelineItems,
     );
-  }
-
-  static int _compareProposals(Proposal a, Proposal b) {
-    if (a.publish != b.publish) {
-      // sort by status first
-      return a.publish.compareTo(b.publish);
-    }
-
-    // most recent first, older later
-    return b.updateDate.compareTo(a.updateDate);
   }
 }
