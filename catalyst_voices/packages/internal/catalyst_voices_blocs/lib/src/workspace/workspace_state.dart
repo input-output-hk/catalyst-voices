@@ -35,9 +35,8 @@ final class WorkspaceState extends Equatable {
       ];
 
   List<Proposal> get published => userProposals
-      .where(
-        (e) => (e.publish.isPublished || e.publish.isDraft),
-      )
+      .where((e) => (e.publish.isPublished || e.publish.isDraft))
+      .sortedBy((e) => e.publish)
       .toList();
 
   bool get showError => error != null && !isLoading;
