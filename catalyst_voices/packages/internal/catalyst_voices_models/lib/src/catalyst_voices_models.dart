@@ -4,6 +4,7 @@ export 'api/exception/api_exception.dart';
 export 'auth/password_strength.dart';
 export 'auth/rbac_token.dart';
 export 'auth/seed_phrase.dart';
+export 'blockchain/blockchain_slot_config.dart';
 export 'campaign/campaign.dart';
 export 'campaign/campaign_base.dart';
 export 'campaign/campaign_category.dart';

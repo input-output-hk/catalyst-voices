@@ -29,7 +29,13 @@ class SegmentHeaderTile extends StatelessWidget {
           ),
           name: name,
           isSelected: isOpened && hasSelectedStep,
-          onTap: () => controller.focusSection(id),
+          onTap: () {
+            controller.toggleSegment(id);
+
+            if (controller.value.openedSegments.contains(id)) {
+              controller.focusSection(id);
+            }
+          },
         );
       },
     );

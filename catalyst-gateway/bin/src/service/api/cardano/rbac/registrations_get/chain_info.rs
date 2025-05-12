@@ -4,7 +4,7 @@
 
 use anyhow::Context;
 use cardano_blockchain_types::{Slot, TransactionId};
-use catalyst_types::id_uri::IdUri;
+use catalyst_types::catalyst_id::CatalystId;
 use futures::future::try_join;
 use rbac_registration::registration::cardano::RegistrationChain;
 
@@ -32,7 +32,7 @@ impl ChainInfo {
     /// Creates a new `ChainInfo` instance.
     pub(crate) async fn new(
         persistent_session: &CassandraSession, volatile_session: &CassandraSession,
-        catalyst_id: &IdUri,
+        catalyst_id: &CatalystId,
     ) -> anyhow::Result<Option<Self>> {
         let registrations =
             last_registration_chain(persistent_session, volatile_session, catalyst_id).await?;
@@ -70,7 +70,8 @@ impl ChainInfo {
 
 /// Returns a last independent chain of both persistent and volatile registrations.
 async fn last_registration_chain(
-    persistent_session: &CassandraSession, volatile_session: &CassandraSession, catalyst_id: &IdUri,
+    persistent_session: &CassandraSession, volatile_session: &CassandraSession,
+    catalyst_id: &CatalystId,
 ) -> anyhow::Result<Vec<(bool, Query)>> {
     let (persistent_registrations, volatile_registrations) = try_join(
         indexed_registrations(persistent_session, catalyst_id),

@@ -1,11 +1,11 @@
-//! A Catalyst short identifier.
+//! A Catalyst identifier.
 
 // cSpell:ignoreRegExp cardano/Fftx
 
 use std::{borrow::Cow, sync::LazyLock};
 
 use anyhow::Context;
-use catalyst_types::id_uri::IdUri;
+use catalyst_types::catalyst_id::CatalystId as CatalystIdInner;
 use ed25519_dalek::SigningKey;
 use poem_openapi::{
     registry::{MetaSchema, MetaSchemaRef},
@@ -16,28 +16,28 @@ use serde_json::Value;
 /// Catalyst Id String Format
 pub(crate) const FORMAT: &str = "catalyst_id";
 
-/// Catalyst Id Pattern
-pub(crate) const PATTERN: &str = r".+\..+\/[A-Za-z0-9_-]{43}";
+/// Minimum format for Catalyst Id. (<`text`/`public_key_base64_url`>)
+pub(crate) const PATTERN: &str = r".+\/[A-Za-z0-9_-]{43}";
 
 /// A schema.
 static SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| {
     let example = Some(CatalystId::example().0.to_string().into());
     MetaSchema {
-        title: Some("Catalyst short ID".into()),
-        description: Some("Catalyst short identifier in string format"),
+        title: Some("Catalyst ID".into()),
+        description: Some("Catalyst identifier in string format"),
         example,
         pattern: Some(PATTERN.into()),
         ..MetaSchema::ANY
     }
 });
 
-/// A Catalyst short identifier.
+/// A Catalyst identifier.
 #[derive(Debug, Clone, PartialEq, Hash)]
-pub(crate) struct CatalystId(IdUri);
+pub(crate) struct CatalystId(CatalystIdInner);
 
 impl Type for CatalystId {
-    type RawElementValueType = IdUri;
-    type RawValueType = IdUri;
+    type RawElementValueType = CatalystIdInner;
+    type RawValueType = CatalystIdInner;
 
     const IS_REQUIRED: bool = true;
 
@@ -61,13 +61,13 @@ impl Type for CatalystId {
     }
 }
 
-impl From<IdUri> for CatalystId {
-    fn from(value: IdUri) -> Self {
+impl From<CatalystIdInner> for CatalystId {
+    fn from(value: CatalystIdInner) -> Self {
         Self(value.as_short_id())
     }
 }
 
-impl From<CatalystId> for IdUri {
+impl From<CatalystId> for CatalystIdInner {
     fn from(value: CatalystId) -> Self {
         value.0
     }
@@ -80,7 +80,7 @@ impl TryFrom<&str> for CatalystId {
         value
             .parse()
             .context("Invalid Catalyst ID")
-            .map(|id: IdUri| Self(id.as_short_id()))
+            .map(|id: CatalystIdInner| Self(id.as_short_id()))
     }
 }
 
@@ -114,7 +114,7 @@ impl Example for CatalystId {
             105, 123, 50, 105, 25, 112, 59, 172, 3, 28, 174, 127, 96,
         ];
         let signing_key = &SigningKey::from_bytes(&secret_key_bytes);
-        IdUri::new("cardano", Some("preprod"), signing_key.into())
+        CatalystIdInner::new("cardano", Some("preprod"), signing_key.into())
             .as_id()
             .into()
     }
