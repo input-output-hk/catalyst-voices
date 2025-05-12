@@ -4,7 +4,6 @@
 use std::collections::HashMap;
 
 use catalyst_signed_doc::CatalystSignedDocument;
-use rbac_registration::cardano::cip509::RoleNumber;
 
 use super::templates::get_doc_static_template;
 use crate::{
@@ -59,12 +58,12 @@ impl catalyst_signed_doc::providers::CatalystSignedDocumentProvider for DocProvi
 /// A struct which implements a
 /// `catalyst_signed_doc::providers::CatalystSignedDocumentProvider` trait
 pub(crate) struct VerifyingKeyProvider(
-    HashMap<catalyst_signed_doc::IdUri, ed25519_dalek::VerifyingKey>,
+    HashMap<catalyst_signed_doc::CatalystId, ed25519_dalek::VerifyingKey>,
 );
 
 impl catalyst_signed_doc::providers::VerifyingKeyProvider for VerifyingKeyProvider {
     async fn try_get_key(
-        &self, kid: &catalyst_signed_doc::IdUri,
+        &self, kid: &catalyst_signed_doc::CatalystId,
     ) -> anyhow::Result<Option<ed25519_dalek::VerifyingKey>> {
         Ok(self.0.get(kid).copied())
     }
@@ -96,7 +95,7 @@ impl VerifyingKeyProvider {
     /// - The latest signing key for a required role cannot be found.
     /// - The KID is not using the latest rotation.
     pub(crate) async fn try_from_kids(
-        token: &mut CatalystRBACTokenV1, kids: &[catalyst_signed_doc::IdUri],
+        token: &mut CatalystRBACTokenV1, kids: &[catalyst_signed_doc::CatalystId],
     ) -> anyhow::Result<Self> {
         if kids.len() > 1 {
             anyhow::bail!("Multi-signature document is currently unsupported");
@@ -119,9 +118,6 @@ impl VerifyingKeyProvider {
             }
 
             let (kid_role_index, kid_rotation) = kid.role_and_rotation();
-            let kid_role_index = RoleNumber::from(kid_role_index.to_string().parse::<u8>()?);
-            let kid_rotation = kid_rotation.to_string().parse::<usize>()?;
-
             let (latest_pk, rotation) = reg_chain
                 .get_latest_signing_pk_for_role(&kid_role_index)
                 .ok_or_else(|| {

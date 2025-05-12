@@ -1,6 +1,5 @@
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
-import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 
 // Note:
@@ -137,12 +136,12 @@ class SimpleTreeViewRootRow extends StatelessWidget {
 
     return DefaultTextStyle(
       style: textStyle,
-      maxLines: 1,
+      maxLines: 2,
       overflow: TextOverflow.ellipsis,
       child: IconTheme(
         data: iconTheme,
         child: ConstrainedBox(
-          constraints: const BoxConstraints.tightFor(height: 32),
+          constraints: const BoxConstraints(minHeight: 32),
           child: Material(
             type: MaterialType.transparency,
             textStyle: textStyle,
@@ -152,10 +151,11 @@ class SimpleTreeViewRootRow extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Row(
+                  spacing: 4,
                   children: [
                     ...leading,
                     Flexible(child: child),
-                  ].separatedBy(const SizedBox(width: 4)).toList(),
+                  ],
                 ),
               ),
             ),

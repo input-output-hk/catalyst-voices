@@ -12,7 +12,7 @@ final class RecoverWithSeedPhraseStep extends AccountRecoverStep {
   final RecoverWithSeedPhraseStage stage;
 
   const RecoverWithSeedPhraseStep({
-    this.stage = RecoverWithSeedPhraseStage.seedPhraseInstructions,
+    this.stage = RecoverWithSeedPhraseStage.seedPhrase,
   });
 
   @override

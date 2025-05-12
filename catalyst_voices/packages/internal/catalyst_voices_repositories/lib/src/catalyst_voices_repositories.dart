@@ -4,7 +4,6 @@ export 'campaign/campaign_repository.dart' show CampaignRepository;
 export 'comment/comment_repository.dart' show CommentRepository;
 export 'config/config_repository.dart' show ConfigRepository;
 export 'database/database.dart';
-export 'document/constants.dart';
 export 'document/document_mapper.dart' show DocumentMapperImpl;
 export 'document/document_repository.dart' show DocumentRepository;
 export 'document/exception/document_exception.dart';
@@ -22,4 +21,4 @@ export 'signed_document/signed_document_manager_impl.dart'
     show SignedDocumentManagerImpl;
 export 'user/source/user_storage.dart';
 export 'user/user_repository.dart' show UserRepository;
-export 'wallet/wallet_repository.dart' show WalletRepository;
+export 'wallet/blockchain_repository.dart' show BlockchainRepository;

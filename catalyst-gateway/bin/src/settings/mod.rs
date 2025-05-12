@@ -104,7 +104,7 @@ struct EnvVars {
     /// Server name
     server_name: Option<StringEnvVar>,
 
-    /// The Service ID used to anonymize client connections.
+    /// Id of the Service.
     service_id: StringEnvVar,
 
     /// The client id key used to anonymize client connections.

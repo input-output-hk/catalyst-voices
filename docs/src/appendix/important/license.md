@@ -9,11 +9,11 @@ icon: material/license
 ??? note "Apache 2 License"
 
     ```text
-    {{ include_file('includes/repo/LICENSE-APACHE', 0, -1, 8) }}
+    {{ include_file('includes/repo/LICENSE-APACHE') }}
     ```
 
 ??? note "MIT License"
 
     ```text
-    {{ include_file('includes/repo/LICENSE-MIT', 0, -1, 8) }}
+    {{ include_file('includes/repo/LICENSE-MIT') }}
     ```

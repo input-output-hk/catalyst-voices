@@ -50,7 +50,11 @@ class VoicesNodeMenu extends StatelessWidget {
             isSelected: item.id == selectedItemId,
             hasError: item.hasError,
             onTap: item.isEnabled ? () => onItemTap(item.id) : null,
-            child: Text(item.label),
+            child: Text(
+              item.label,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
           );
         },
       ).toList(),

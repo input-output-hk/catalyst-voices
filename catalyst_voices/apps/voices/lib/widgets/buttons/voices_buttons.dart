@@ -9,7 +9,13 @@ import 'package:catalyst_voices/widgets/common/animated_expand_chevron.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/create_new_proposal_dialog.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+void _launchUrl(String url) {
+  unawaited(launchUrl(url.getUri()));
+}
 
 class ActionIconButton extends StatelessWidget {
   final VoidCallback? onTap;
@@ -340,13 +346,52 @@ enum VoicesEditCancelButtonStyle {
 }
 
 /// A "Learn More" button that redirects usually to an external content.
-class VoicesLearnMoreButton extends StatelessWidget {
+class VoicesLearnMoreFilledButton extends StatelessWidget {
   final VoidCallback onTap;
 
-  const VoicesLearnMoreButton({
+  const VoicesLearnMoreFilledButton({
     super.key,
     required this.onTap,
   });
+
+  factory VoicesLearnMoreFilledButton.url({
+    Key? key,
+    required String url,
+  }) {
+    return VoicesLearnMoreFilledButton(
+      key: key,
+      onTap: () => _launchUrl(url),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return VoicesFilledButton(
+      key: const Key('LearnMoreButton'),
+      trailing: VoicesAssets.icons.externalLink.buildIcon(),
+      onTap: onTap,
+      child: Text(context.l10n.learnMore),
+    );
+  }
+}
+
+class VoicesLearnMoreTextButton extends StatelessWidget {
+  final VoidCallback onTap;
+
+  const VoicesLearnMoreTextButton({
+    super.key,
+    required this.onTap,
+  });
+
+  factory VoicesLearnMoreTextButton.url({
+    Key? key,
+    required String url,
+  }) {
+    return VoicesLearnMoreTextButton(
+      key: key,
+      onTap: () => _launchUrl(url),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {

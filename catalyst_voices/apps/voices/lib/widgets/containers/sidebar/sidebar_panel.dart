@@ -48,7 +48,10 @@ class _SidebarPanelState extends State<SidebarPanel>
                   alignment: Alignment.centerRight,
                   child: FadeTransition(
                     opacity: _fadeAnimation,
-                    child: widget.body,
+                    child: IgnorePointer(
+                      ignoring: widget.isCollapsed,
+                      child: widget.body,
+                    ),
                   ),
                 ),
               ),

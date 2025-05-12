@@ -52,13 +52,7 @@ class TipCard extends StatelessWidget {
                     color: context.colors.textOnPrimaryLevel1,
                   ),
                 ),
-                for (final tip in tips)
-                  Text(
-                    tip.withBullet(),
-                    style: context.textTheme.bodySmall?.copyWith(
-                      color: context.colors.textOnPrimaryLevel1,
-                    ),
-                  ),
+                for (final tip in tips) _TipText(tip: tip),
               ],
             ),
           ),
@@ -69,6 +63,36 @@ class TipCard extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _TipText extends StatelessWidget {
+  final String tip;
+
+  const _TipText({required this.tip});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(width: 4),
+        Text(
+          ''.withBullet(),
+          style: context.textTheme.bodySmall?.copyWith(
+            color: context.colors.textOnPrimaryLevel1,
+          ),
+        ),
+        Expanded(
+          child: Text(
+            tip,
+            style: context.textTheme.bodySmall?.copyWith(
+              color: context.colors.textOnPrimaryLevel1,
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

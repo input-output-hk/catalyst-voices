@@ -89,7 +89,9 @@ class _GlobalPrecacheImagesState extends State<GlobalPrecacheImages> {
         theme.brandAssets.brand.logo(context),
         theme.brandAssets.brand.logoIcon(context),
       ],
-      assets: [VoicesAssets.images.comingSoonBkg],
+      assets: [
+        VoicesAssets.images.bgBubbles,
+      ],
     );
   }
 }

@@ -1,8 +1,6 @@
-import 'package:catalyst_voices/pages/registration/incorrect_seed_phrase_dialog.dart';
-import 'package:catalyst_voices/pages/registration/upload_seed_phrase_confirmation_dialog.dart';
-import 'package:catalyst_voices/pages/registration/upload_seed_phrase_dialog.dart';
 import 'package:catalyst_voices/pages/registration/widgets/registration_stage_navigation.dart';
 import 'package:catalyst_voices/pages/registration/widgets/seed_phrase_actions.dart';
+import 'package:catalyst_voices/pages/registration/widgets/upload_seed_phrase/upload_seed_phrase_mixin.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -59,6 +57,7 @@ class _BlocSeedPhraseWords extends StatelessWidget {
 
   final VoidCallback? onImportTap;
   final VoidCallback? onResetTap;
+
   const _BlocSeedPhraseWords({
     required this.onUserWordsChanged,
     this.onImportTap,
@@ -92,7 +91,8 @@ class _BlocSeedPhraseWords extends StatelessWidget {
   }
 }
 
-class _SeedPhraseCheckPanelState extends State<SeedPhraseCheckPanel> {
+class _SeedPhraseCheckPanelState extends State<SeedPhraseCheckPanel>
+    with UploadSeedPhraseMixin {
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -119,39 +119,25 @@ class _SeedPhraseCheckPanelState extends State<SeedPhraseCheckPanel> {
   }
 
   Future<void> _importSeedPhrase() async {
-    final showUpload = await UploadSeedPhraseConfirmationDialog.show(context);
-    if (showUpload) {
-      await _showUploadDialog();
+    final hasWords = RegistrationCubit.of(context)
+        .state
+        .keychainStateData
+        .seedPhraseStateData
+        .userWords
+        .isNotEmpty;
+
+    final words = await importSeedPhraseWords(requireConfirmation: hasWords);
+    if (words == null || !mounted) {
+      return;
     }
+
+    _onWordsSequenceChanged(words);
   }
 
   void _onWordsSequenceChanged(List<SeedPhraseWord> words) {
     RegistrationCubit.of(context)
         .keychainCreation
         .setUserSeedPhraseWords(words);
-  }
-
-  Future<void> _showUploadDialog() async {
-    final words = await UploadSeedPhraseDialog.show(context);
-
-    if (!mounted || words == null) return;
-
-    final areWordsMatching =
-        RegistrationCubit.of(context).keychainCreation.areWordsMatching(words);
-
-    final isValid = areWordsMatching &&
-        SeedPhrase.isValid(
-          words: words,
-        );
-
-    if (isValid) {
-      _onWordsSequenceChanged(words);
-    } else {
-      final showUpload = await IncorrectSeedPhraseDialog.show(context);
-      if (showUpload) {
-        await _showUploadDialog();
-      }
-    }
   }
 }
 

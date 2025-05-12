@@ -170,8 +170,8 @@ final class Dependencies extends DependencyProvider {
           get<DocumentRepository>(),
         );
       })
-      ..registerLazySingleton<WalletRepository>(() {
-        return WalletRepository(get<ApiServices>());
+      ..registerLazySingleton<BlockchainRepository>(() {
+        return BlockchainRepository(get<ApiServices>());
       })
       ..registerLazySingleton<SignedDocumentManager>(() {
         return const SignedDocumentManager();
@@ -256,7 +256,7 @@ final class Dependencies extends DependencyProvider {
     registerLazySingleton<RegistrationService>(() {
       return RegistrationService(
         get<UserService>(),
-        get<WalletService>(),
+        get<BlockchainService>(),
         get<KeychainProvider>(),
         get<CatalystCardano>(),
         get<AuthTokenGenerator>(),
@@ -273,9 +273,9 @@ final class Dependencies extends DependencyProvider {
       },
       dispose: (service) => unawaited(service.dispose()),
     );
-    registerLazySingleton<WalletService>(() {
-      return WalletService(
-        get<WalletRepository>(),
+    registerLazySingleton<BlockchainService>(() {
+      return BlockchainService(
+        get<BlockchainRepository>(),
       );
     });
     registerLazySingleton<SignerService>(() {
@@ -288,7 +288,7 @@ final class Dependencies extends DependencyProvider {
     registerLazySingleton<CampaignService>(() {
       return CampaignService(
         get<CampaignRepository>(),
-        get<DocumentRepository>(),
+        get<ProposalRepository>(),
       );
     });
     registerLazySingleton<ProposalService>(() {

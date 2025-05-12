@@ -32,6 +32,9 @@ final class RegistrationTransactionBuilder {
   /// The network ID where the transaction will be submitted.
   final NetworkId networkId;
 
+  /// The ttl slot number after which the transaction is invalid.
+  final SlotBigNum slotNumberTtl;
+
   /// The user selected roles for which the user is registering.
   final Set<RegistrationTransactionRole> roles;
 
@@ -56,6 +59,7 @@ final class RegistrationTransactionBuilder {
     required this.keyDerivationService,
     required this.masterKey,
     required this.networkId,
+    required this.slotNumberTtl,
     required this.roles,
     required this.changeAddress,
     required this.rewardAddresses,
@@ -177,6 +181,7 @@ final class RegistrationTransactionBuilder {
       config: transactionConfig,
       inputs: utxos,
       networkId: networkId,
+      ttl: slotNumberTtl,
       auxiliaryData: auxiliaryData,
       witnessBuilder: const TransactionWitnessSetBuilder(
         vkeys: {},

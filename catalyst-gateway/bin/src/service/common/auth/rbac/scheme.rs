@@ -1,11 +1,11 @@
 //! Catalyst RBAC Security Scheme
 use std::{env, error::Error, sync::LazyLock, time::Duration};
 
+use catalyst_types::catalyst_id::role_index::RoleId;
 use moka::future::Cache;
 use poem::{error::ResponseError, http::StatusCode, IntoResponse, Request};
 use poem_openapi::{auth::Bearer, SecurityScheme};
-use rbac_registration::cardano::cip509::RoleNumber;
-use tracing::error;
+use tracing::debug;
 
 use super::token::CatalystRBACTokenV1;
 use crate::{
@@ -45,7 +45,7 @@ static CACHE: LazyLock<Cache<EncodedAuthToken, CatalystRBACTokenV1>> = LazyLock:
     bearer_format = "catalyst-rbac-token",
     checker = "checker_api_catalyst_auth"
 )]
-#[allow(dead_code, clippy::module_name_repetitions)]
+#[allow(clippy::module_name_repetitions)]
 pub(crate) struct CatalystRBACSecurityScheme(CatalystRBACTokenV1);
 
 impl From<CatalystRBACSecurityScheme> for CatalystRBACTokenV1 {
@@ -77,12 +77,22 @@ impl ResponseError for ServiceUnavailableError {
     }
 }
 
-/// Error with the Authorization Token
-///
-/// We can not parse it, so its a 401 response.
+/// Authentication token error.
 #[derive(Debug, thiserror::Error)]
-#[error("Invalid Catalyst RBAC Auth Token")]
-pub struct AuthTokenError;
+enum AuthTokenError {
+    /// Registration chain cannot be built.
+    #[error("Unable to build registration chain, err: {0}")]
+    BuildRegChain(String),
+    /// RBAC token cannot be parsed.
+    #[error("Fail to parse RBAC token string, err: {0}")]
+    ParseRbacToken(String),
+    /// Registration chain cannot be found.
+    #[error("Registration not found for the auth token.")]
+    RegistrationNotFound,
+    /// Latest signing key cannot be found.
+    #[error("Unable to get the latest signing key.")]
+    LatestSigningKey,
+}
 
 impl ResponseError for AuthTokenError {
     fn status(&self) -> StatusCode {
@@ -92,7 +102,7 @@ impl ResponseError for AuthTokenError {
     /// Convert this error to a HTTP response.
     fn as_response(&self) -> poem::Response
     where Self: Error + Send + Sync + 'static {
-        ErrorResponses::unauthorized().into_response()
+        ErrorResponses::unauthorized(self.to_string()).into_response()
     }
 }
 
@@ -100,7 +110,7 @@ impl ResponseError for AuthTokenError {
 ///
 /// Not enough access rights, so its a 403 response.
 #[derive(Debug, thiserror::Error)]
-#[error("Insufficient Permission for Catalyst RBAC Token")]
+#[error("Insufficient Permission for Catalyst RBAC Token: {0:?}")]
 pub struct AuthTokenAccessViolation(Vec<String>);
 
 impl ResponseError for AuthTokenAccessViolation {
@@ -134,8 +144,8 @@ async fn checker_api_catalyst_auth(
 
     // Deserialize the token: this performs the 1-5 steps of the validation.
     let mut token = CatalystRBACTokenV1::parse(&bearer.token).map_err(|e| {
-        error!("Corrupt auth token: {e:?}");
-        AuthTokenError
+        debug!("Corrupt auth token: {e:?}");
+        AuthTokenError::ParseRbacToken(e.to_string())
     })?;
 
     // If env var explicitly set by SRE, switch off full verification
@@ -147,18 +157,18 @@ async fn checker_api_catalyst_auth(
     let reg_chain = match token.reg_chain().await {
         Ok(Some(reg_chain)) => reg_chain,
         Ok(None) => {
-            error!(
+            debug!(
                 "Unable to find registrations for {} Catalyst ID",
                 token.catalyst_id()
             );
-            return Err(AuthTokenError.into());
+            return Err(AuthTokenError::RegistrationNotFound.into());
         },
         Err(err) if err.is::<CassandraSessionError>() => {
             return Err(ServiceUnavailableError(err).into())
         },
         Err(err) => {
-            error!("Unable to build a registration chain Catalyst ID: {err:?}");
-            return Err(AuthTokenError.into());
+            debug!("Unable to build a registration chain Catalyst ID: {err:?}");
+            return Err(AuthTokenError::BuildRegChain(err.to_string()).into());
         },
     };
 
@@ -166,7 +176,7 @@ async fn checker_api_catalyst_auth(
     // If `InternalApiKeyAuthorization` auth is provided, skip validation.
     if check_api_key(req.headers()).is_err() && !token.is_young(MAX_TOKEN_AGE, MAX_TOKEN_SKEW) {
         // Token is too old or too far in the future.
-        error!("Auth token expired: {token}");
+        debug!("Auth token expired: {token}");
         Err(AuthTokenAccessViolation(vec!["EXPIRED".to_string()]))?;
     }
 
@@ -184,18 +194,18 @@ async fn checker_api_catalyst_auth(
 
     // Step 8: Get the latest stable signing certificate registered for Role 0.
     let (latest_pk, _) = reg_chain
-        .get_latest_signing_pk_for_role(&RoleNumber::ROLE_0)
+        .get_latest_signing_pk_for_role(&RoleId::Role0)
         .ok_or_else(|| {
-            error!(
+            debug!(
                 "Unable to get last signing key for {} Catalyst ID",
                 token.catalyst_id()
             );
-            AuthTokenError
+            AuthTokenError::LatestSigningKey
         })?;
 
     // Step 9: Verify the signature against the Role 0 pk.
     if let Err(error) = token.verify(&latest_pk) {
-        error!(error=%error, "Invalid signature for token: {token}");
+        debug!(error=%error, "Invalid signature for token: {token}");
         Err(AuthTokenAccessViolation(vec![
             "INVALID SIGNATURE".to_string()
         ]))?;
