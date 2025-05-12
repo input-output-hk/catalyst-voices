@@ -5,7 +5,7 @@ use std::sync::Arc;
 use anyhow::Context;
 use cardano_blockchain_types::{Network, Point, Slot, TxnIndex};
 use cardano_chain_follower::ChainFollower;
-use catalyst_signed_doc::IdUri;
+use catalyst_signed_doc::CatalystId;
 use futures::{TryFutureExt, TryStreamExt};
 use rbac_registration::{cardano::cip509::Cip509, registration::cardano::RegistrationChain};
 use scylla::{
@@ -74,7 +74,7 @@ impl Query {
 /// Returns a sorted list of all registrations for the given Catalyst ID from the
 /// database.
 pub(crate) async fn indexed_registrations(
-    session: &CassandraSession, catalyst_id: &IdUri,
+    session: &CassandraSession, catalyst_id: &CatalystId,
 ) -> anyhow::Result<Vec<Query>> {
     let mut result: Vec<_> = Query::execute(session, QueryParams {
         catalyst_id: catalyst_id.clone().into(),
@@ -101,7 +101,7 @@ pub(crate) async fn build_reg_chain<OnSuccessFn: FnMut(bool, Slot, &Registration
     let root = load_cip509_from_chain(network, root.slot_no.into(), root.txn_index.into())
         .await
         .context("Failed to get root registration")?;
-    let mut chain = RegistrationChain::new(root).context("Invalid root registration")?;
+    let mut chain = RegistrationChain::new(&root).context("Invalid root registration")?;
     on_success(is_persistent, slot_no, &chain);
 
     for (is_persistent, reg) in reg_queries_iter {
@@ -116,7 +116,7 @@ pub(crate) async fn build_reg_chain<OnSuccessFn: FnMut(bool, Slot, &Registration
                     reg.slot_no, reg.txn_index,
                 )
             })?;
-        match chain.update(cip509) {
+        match chain.update(&cip509) {
             Ok(c) => {
                 chain = c;
                 on_success(is_persistent, slot_no, &chain);

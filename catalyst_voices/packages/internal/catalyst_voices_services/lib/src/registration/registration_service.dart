@@ -19,7 +19,7 @@ final _testNetAddress = ShelleyAddress.fromBech32(
 abstract interface class RegistrationService {
   factory RegistrationService(
     UserService userService,
-    WalletService walletService,
+    BlockchainService blockchainService,
     KeychainProvider keychainProvider,
     CatalystCardano cardano,
     AuthTokenGenerator authTokenGenerator,
@@ -93,7 +93,7 @@ abstract interface class RegistrationService {
 /// Manages the user registration.
 final class RegistrationServiceImpl implements RegistrationService {
   final UserService _userService;
-  final WalletService _walletService;
+  final BlockchainService _blockchainService;
   final KeychainProvider _keychainProvider;
   final CatalystCardano _cardano;
   final AuthTokenGenerator _authTokenGenerator;
@@ -102,7 +102,7 @@ final class RegistrationServiceImpl implements RegistrationService {
 
   const RegistrationServiceImpl(
     this._userService,
-    this._walletService,
+    this._blockchainService,
     this._keychainProvider,
     this._cardano,
     this._authTokenGenerator,
@@ -153,7 +153,7 @@ final class RegistrationServiceImpl implements RegistrationService {
   }) async {
     final rbacToken = await _deriveRbacToken(seedPhrase);
 
-    return _walletService.getWalletBalance(
+    return _blockchainService.getWalletBalance(
       stakeAddress: address,
       networkId: _blockchainConfig.networkId,
       rbacToken: rbacToken,
@@ -185,6 +185,8 @@ final class RegistrationServiceImpl implements RegistrationService {
         ),
       );
 
+      final slotNumber = await _getRegistrationSlotNumberTtl(networkId);
+
       final previousTransactionId = await _fetchPreviousTransactionId(
         isFirstRegistration: roles.isFirstRegistration,
       );
@@ -194,6 +196,7 @@ final class RegistrationServiceImpl implements RegistrationService {
         keyDerivationService: _keyDerivationService,
         masterKey: masterKey,
         networkId: networkId,
+        slotNumberTtl: slotNumber,
         roles: roles,
         changeAddress: changeAddress,
         rewardAddresses: rewardAddresses,
@@ -416,5 +419,23 @@ final class RegistrationServiceImpl implements RegistrationService {
     }
 
     return _userService.getPreviousRegistrationTransactionId();
+  }
+
+  /// The timestamp when a registration transaction expires.
+  ///
+  /// If transaction is generated and signed but never expires
+  /// then anybody could submit it at any time, even without
+  /// the knowledge of the wallet owner.
+  ///
+  /// It's a common security practice to configure transactions
+  /// to expire after a certain duration.
+  Future<SlotBigNum> _getRegistrationSlotNumberTtl(NetworkId networkId) async {
+    final registrationTransactionExpiration =
+        DateTimeExt.now().add(const Duration(hours: 3));
+
+    return _blockchainService.calculateSlotNumber(
+      targetDateTime: registrationTransactionExpiration,
+      networkId: networkId,
+    );
   }
 }

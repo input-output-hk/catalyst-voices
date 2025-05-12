@@ -4,6 +4,7 @@ import 'package:catalyst_voices_repositories/src/database/dao/documents_dao.dart
 import 'package:catalyst_voices_repositories/src/database/dao/drafts_dao.dart';
 import 'package:catalyst_voices_repositories/src/database/dao/favorites_dao.dart';
 import 'package:catalyst_voices_repositories/src/database/dao/proposals_dao.dart';
+import 'package:catalyst_voices_repositories/src/database/database_logging_interceptor.dart';
 import 'package:catalyst_voices_repositories/src/database/migration/drift_migration_strategy.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents.drift.dart';
@@ -86,6 +87,12 @@ class DriftCatalystDatabase extends $DriftCatalystDatabase
 
             // TODO(damian-molinski): Native not supported yet
             native: null,
+          ).interceptWith(
+            DatabaseLoggingInterceptor(
+              isEnabled: kDebugMode,
+              onlyErrors: true,
+              dbName: config.name,
+            ),
           ),
         );
 

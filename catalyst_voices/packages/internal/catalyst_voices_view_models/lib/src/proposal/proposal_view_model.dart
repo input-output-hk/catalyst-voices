@@ -141,6 +141,7 @@ and PRISM, but its potential is only barely exploited.
   PendingProposal.fromProposal(
     Proposal proposal, {
     required String campaignName,
+    bool isFavorite = false,
   }) : this(
           ref: proposal.selfRef,
           campaignName: campaignName,
@@ -154,6 +155,7 @@ and PRISM, but its potential is only barely exploited.
           version: proposal.versionCount,
           duration: proposal.duration,
           author: proposal.author,
+          isFavorite: isFavorite,
         );
 
   String get fundsRequested {
