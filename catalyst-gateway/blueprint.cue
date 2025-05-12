@@ -27,9 +27,6 @@ project: {
 								"CHAIN_NETWORK": {
 									value: string | *"Preprod"
 								}
-								"RBAC_OFF": {
-									value: string | *"True"
-								}
 								"RUST_LOG": {
 									value: string | *"debug,cat_gateway=debug,cardano_chain_follower=info"
 								}
