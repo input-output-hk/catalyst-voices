@@ -47,7 +47,7 @@ static SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| {
 fn is_valid(name: &str) -> bool {
     // Hex string
     if let Some(hash) = name.strip_prefix("0x") {
-        hash.len() <= 64
+        !hash.is_empty() && hash.len() <= 64 && hex::decode(hash).is_ok()
     // Any string
     } else {
         let hex = hex::encode(name);
