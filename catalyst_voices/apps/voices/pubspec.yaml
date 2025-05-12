@@ -84,10 +84,6 @@ dependencies:
   url_strategy: ^0.3.0
   uuid_plus: ^0.1.0
   video_player: ^2.9.2
-  # TODO(dtscalac): win32 dependency is just a transitive dependency and shouldn't be imported
-  # but here we import it explicitly to make sure the latest version is used which addresses
-  # the problem from here: https://github.com/jonataslaw/get_cli/issues/263
-  win32: ^5.5.4
 
 dev_dependencies:
   analyzer: 7.3.0
