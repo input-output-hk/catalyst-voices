@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
@@ -19,14 +20,14 @@ class VideoManager extends ValueNotifier<VideoManagerState> {
   }
 
   Future<VideoPlayerController> getOrCreateController(
-    String asset, {
-    String? package,
-  }) async {
-    final key = _createKey(asset, package);
+    VideoCacheKey asset,
+  ) async {
+    final key = _createKey(asset.name, asset.package);
     if (value.controllers.containsKey(key)) {
       return value.controllers[key]!;
     }
-    final controller = await _initializeController(asset, package: package);
+    final controller =
+        await _initializeController(asset.name, package: asset.package);
 
     final newControllers = Map.of(value.controllers)..[key] = controller;
 
@@ -37,19 +38,19 @@ class VideoManager extends ValueNotifier<VideoManagerState> {
 
   Future<void> precacheVideos(
     BuildContext context, {
-    required List<String> assets,
-    String? package,
+    required VideoPrecacheAssets videoAssets,
   }) async {
     if (_isInitialized) return;
 
     final newControllers = Map.of(value.controllers);
 
     await Future.wait(
-      assets.map((asset) async {
-        final key = _createKey(asset, package);
+      videoAssets.assets.map((asset) async {
+        final key = _createKey(asset, videoAssets.package);
         if (value.controllers.containsKey(key)) return;
 
-        final controller = await _initializeController(asset, package: package);
+        final controller =
+            await _initializeController(asset, package: videoAssets.package);
         newControllers[key] = controller;
       }),
     );

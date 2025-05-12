@@ -1,12 +1,12 @@
 import 'package:catalyst_voices/app/view/video_cache/app_video_manager.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
 class HeroSection extends StatelessWidget {
   final AlignmentGeometry alignment;
-  final String asset;
+  final VideoCacheKey asset;
   final BoxConstraints constraints;
-  final String? assetPackageName;
 
   final Widget child;
 
@@ -15,7 +15,6 @@ class HeroSection extends StatelessWidget {
     this.alignment = Alignment.bottomLeft,
     required this.asset,
     this.constraints = const BoxConstraints.tightFor(height: 650),
-    this.assetPackageName,
     required this.child,
   });
 
@@ -27,7 +26,6 @@ class HeroSection extends StatelessWidget {
       children: [
         _Background(
           asset: asset,
-          assetPackage: assetPackageName,
           constraints: constraints,
         ),
         Align(
@@ -40,12 +38,10 @@ class HeroSection extends StatelessWidget {
 }
 
 class _Background extends StatefulWidget {
-  final String? assetPackage;
-  final String asset;
+  final VideoCacheKey asset;
   final BoxConstraints constraints;
 
   const _Background({
-    this.assetPackage,
     required this.asset,
     required this.constraints,
   });

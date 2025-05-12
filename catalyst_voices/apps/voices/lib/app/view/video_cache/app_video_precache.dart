@@ -1,5 +1,6 @@
 import 'package:catalyst_voices/app/view/video_cache/app_video_manager.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 class AppVideoPrecache extends StatefulWidget {
@@ -15,8 +16,9 @@ class AppVideoPrecache extends StatefulWidget {
 }
 
 class _AppVideoPrecacheState extends State<AppVideoPrecache> {
-  late final VideoManager _manager;
+  VideoManager? _manager;
   Future<void>? _precacheFuture;
+  Brightness? _previousBrightness;
 
   @override
   Widget build(BuildContext context) {
@@ -24,14 +26,14 @@ class _AppVideoPrecacheState extends State<AppVideoPrecache> {
       future: _precacheFuture,
       builder: (context, snapshot) {
         final offstage = snapshot.connectionState == ConnectionState.waiting &&
-            !_manager.isInitialized;
+            !(_manager?.isInitialized ?? false);
 
         if (offstage) {
           return const Offstage();
         }
 
         return VideoManagerScope(
-          manager: _manager,
+          manager: _manager!,
           child: widget.child,
         );
       },
@@ -42,16 +44,20 @@ class _AppVideoPrecacheState extends State<AppVideoPrecache> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     final theme = Theme.of(context);
+    final currentBrightness = theme.brightness;
 
-    _precacheFuture ??= Future.microtask(() async {
-      await _manager.resetCacheIfNeeded(theme);
-      await _precacheVideos();
-    });
+    if (_previousBrightness != currentBrightness) {
+      _previousBrightness = currentBrightness;
+      _precacheFuture = Future.microtask(() async {
+        await _manager?.resetCacheIfNeeded(theme);
+        await _precacheVideos();
+      });
+    }
   }
 
   @override
   void dispose() {
-    _manager.dispose();
+    _manager = null;
     super.dispose();
   }
 
@@ -59,15 +65,24 @@ class _AppVideoPrecacheState extends State<AppVideoPrecache> {
   void initState() {
     super.initState();
     _manager = VideoManager();
+    // _manager = Dependencies.instance.isRegistered<VideoManager>()
+    //     ? Dependencies.instance.get<VideoManager>()
+    //     : null;
+    // assert(
+    //   _manager != null,
+    //   'VideoManager should be registered in Dependencies',
+    // );
   }
 
   Future<void> _precacheVideos() {
-    return _manager.precacheVideos(
-      context,
-      assets: [
-        VoicesAssets.videos.heroDesktop,
-      ],
-      package: 'catalyst_voices_assets',
-    );
+    return _manager?.precacheVideos(
+          context,
+          videoAssets: VideoPrecacheAssets(
+            assets: [
+              VoicesAssets.videos.heroDesktop,
+            ],
+          ),
+        ) ??
+        Future.value();
   }
 }
