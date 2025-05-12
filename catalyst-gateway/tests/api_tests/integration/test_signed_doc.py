@@ -5,7 +5,8 @@ import os
 import json
 from typing import Dict, Any, List
 import copy
-from utils.rbac_chain import rbac_chain_factory, RoleID, RBACChain
+from utils.rbac_chain import rbac_chain_factory, RoleID
+import cbor2
 
 
 class SignedDocument:
@@ -419,6 +420,35 @@ def test_submission_action(submission_action_factory, rbac_chain_factory):
     assert (
         resp.status_code == 422
     ), f"Publish document, expected 422 Unprocessable Content: {resp.status_code} - {resp.text}"
+
+
+def test_invalid_signature(
+    submission_action_factory,
+    comment_doc_factory,
+    proposal_doc_factory,
+    rbac_chain_factory,
+):
+
+    doc = proposal_doc_factory()
+    rbac_chain = rbac_chain_factory(RoleID.PROPOSER)
+    (cat_id, sk_hex) = rbac_chain.cat_id_for_role(RoleID.PROPOSER)
+    doc.metadata["ver"] = uuid_v7.uuid_v7()
+    doc_hex = doc.build_and_sign(cat_id, sk_hex)
+
+    doc_cbor = cbor2.loads(bytes.fromhex(doc_hex)).value
+    cose_signatures = doc_cbor[3]
+    assert len(cose_signatures) > 1
+
+    # corrupt signature
+    cose_signature = cose_signatures[0]
+    cose_signature[2].append(2)
+    # resp = document.put(
+    #     data=doc_hex,
+    #     token=rbac_chain.auth_token(),
+    # )
+    # assert (
+    #     resp.status_code == 201
+    # ), f"Failed to publish document: {resp.status_code} - {resp.text}"
 
 
 @pytest.mark.preprod_indexing

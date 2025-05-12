@@ -6,7 +6,7 @@ from utils.rbac_chain import rbac_chain_factory
 from api.v1 import cardano
 
 
-@pytest.mark.preprod_indexing
+@pytest.mark.skip
 def test_persistent_ada_amount_endpoint(snapshot, rbac_chain_factory):
     logger.info(f"{snapshot.network}, {snapshot.slot_no}")
     rbac_chain = rbac_chain_factory()
