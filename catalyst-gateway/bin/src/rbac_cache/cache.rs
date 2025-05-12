@@ -53,7 +53,7 @@ impl RbacCache {
     /// In case of failure a problem report from the given registration is updated and
     /// returned.
     #[allow(clippy::result_large_err)]
-    pub fn add(&self, registration: Cip509) -> AddResult {
+    pub fn add(&self, registration: &Cip509) -> AddResult {
         match registration.previous_transaction() {
             Some(previous_txn) => self.update_chain(registration, previous_txn),
             None => self.start_new_chain(registration),
@@ -71,10 +71,28 @@ impl RbacCache {
         self.get(&id)
     }
 
+    /// Returns a list of active stake addresses of the given registration chain.
+    ///
+    /// One or all addresses of the chain can be "taken" by another "restarting"
+    /// registration. See [RBAC examples] for more details.
+    ///
+    /// [RBAC examples]: https://github.com/input-output-hk/catalyst-libs/blob/main/rust/rbac-registration/examples.md
+    pub fn active_stake_addresses(&self, id: &CatalystId) -> Vec<StakeAddress> {
+        let Some(chain) = self.get(id) else {
+            return Vec::new();
+        };
+
+        chain
+            .role_0_stake_addresses()
+            .into_iter()
+            .filter(|address| self.active_addresses.get(address).as_ref() == Some(id))
+            .collect()
+    }
+
     /// Applies the given registration to one of the existing chains.
     #[allow(clippy::result_large_err)]
     fn update_chain(
-        &self, registration: Cip509, previous_txn: TransactionId,
+        &self, registration: &Cip509, previous_txn: TransactionId,
     ) -> Result<RbacCacheAddSuccess, RbacCacheAddError> {
         let catalyst_id = registration.catalyst_id().cloned();
         let purpose = registration.purpose();
@@ -166,7 +184,7 @@ impl RbacCache {
     /// Starts a new Rbac registration chain.
     #[allow(clippy::result_large_err)]
     fn start_new_chain(
-        &self, registration: Cip509,
+        &self, registration: &Cip509,
     ) -> Result<RbacCacheAddSuccess, RbacCacheAddError> {
         let catalyst_id = registration.catalyst_id().cloned();
         let purpose = registration.purpose();

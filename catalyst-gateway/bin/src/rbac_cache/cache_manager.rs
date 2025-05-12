@@ -33,9 +33,9 @@ impl RbacCacheManager {
     /// In case of failure a problem report from the given registration is updated and
     /// returned.
     #[allow(clippy::result_large_err)]
-    pub fn add(&self, registration: Cip509, is_persistent: bool) -> AddResult {
+    pub fn add(&self, registration: &Cip509, is_persistent: bool) -> AddResult {
         if is_persistent {
-            self.persistent.add(registration.clone())?;
+            self.persistent.add(registration)?;
         }
         self.volatile.add(registration)
     }
@@ -57,6 +57,22 @@ impl RbacCacheManager {
             self.persistent.get_by_address(address)
         } else {
             self.volatile.get_by_address(address)
+        }
+    }
+
+    /// Returns a list of active stake addresses of the given registration chain.
+    ///
+    /// One or all addresses of the chain can be "taken" by another "restarting"
+    /// registration. See [RBAC examples] for more details.
+    ///
+    /// [RBAC examples]: https://github.com/input-output-hk/catalyst-libs/blob/main/rust/rbac-registration/examples.md
+    pub fn active_stake_addresses(
+        &self, id: &CatalystId, is_persistent: bool,
+    ) -> Vec<StakeAddress> {
+        if is_persistent {
+            self.persistent.active_stake_addresses(id)
+        } else {
+            self.volatile.active_stake_addresses(id)
         }
     }
 }
