@@ -61,8 +61,6 @@ class SegmentHeader extends StatelessWidget {
               ),
               padding: padding,
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   if (leading != null) leading!,
                   Expanded(child: Text(name)),

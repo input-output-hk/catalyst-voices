@@ -100,7 +100,7 @@ void main() {
 
     testWidgets('hides new iteration details when showLatestLocal is false',
         (tester) async {
-      await pumpCard(tester, showLatestLocal: false);
+      await pumpCard(tester);
       await tester.pumpAndSettle();
 
       expect(

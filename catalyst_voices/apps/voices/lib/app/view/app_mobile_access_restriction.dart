@@ -147,7 +147,6 @@ class _Background extends StatelessWidget {
         ],
         gradient: const RadialGradient(
           center: Alignment(0.2822, -0.3306),
-          radius: 0.5,
           colors: [Color(0x99F9E7FD), Color(0x99F6CEFF)],
           stops: [1.0, 0.0],
         ),
@@ -175,7 +174,6 @@ class _Background extends StatelessWidget {
         ],
         gradient: const RadialGradient(
           center: Alignment(0.2814, -0.3306),
-          radius: 0.5,
           colors: [
             Color.fromRGBO(205, 213, 254, 0.7),
             Color(0x99C6C5FF),
