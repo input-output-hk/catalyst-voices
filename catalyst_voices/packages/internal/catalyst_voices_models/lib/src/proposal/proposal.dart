@@ -3,7 +3,7 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:equatable/equatable.dart';
 
-final class Proposal extends Equatable {
+final class Proposal extends Equatable implements Comparable<Proposal> {
   final DocumentRef selfRef;
   final String title;
   final String description;
@@ -122,6 +122,17 @@ final class Proposal extends Equatable {
       ];
 
   int get versionCount => versions.isEmpty ? 1 : versions.length;
+
+  @override
+  int compareTo(Proposal other) {
+    if (publish != other.publish) {
+      // sort by status first
+      return publish.compareTo(other.publish);
+    }
+
+    // most recent first, older later
+    return other.updateDate.compareTo(updateDate);
+  }
 
   Proposal copyWith({
     DocumentRef? selfRef,

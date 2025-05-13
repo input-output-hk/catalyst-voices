@@ -21,7 +21,6 @@ class CommentCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: Theme.of(context).colorScheme.outline.withValues(alpha: .38),
-          width: 1,
         ),
       ),
       child: Padding(

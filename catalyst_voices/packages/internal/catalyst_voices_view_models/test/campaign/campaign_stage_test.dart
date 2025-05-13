@@ -5,7 +5,7 @@ import 'package:test/test.dart';
 
 void main() {
   group(CampaignStage, () {
-    final date = DateTime(2024, 12, 3, 12, 0);
+    final date = DateTime(2024, 12, 3, 12);
     final campaign = Campaign(
       id: 'id',
       name: 'name',

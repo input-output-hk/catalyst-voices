@@ -267,7 +267,6 @@ class _SessionAccountPopupMenuState extends State<SessionAccountPopupMenu>
     // didChangeDependencies() method.
     return PopupMenuButton<_MenuItemEvent>(
       key: _popupMenuButtonKey,
-      initialValue: null,
       onSelected: _handleEvent,
       itemBuilder: (context) => const [_PopupMenuItem()],
       tooltip: context.l10n.accountMenuPopupTooltip,

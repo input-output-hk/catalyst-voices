@@ -213,7 +213,6 @@ void main() {
         Material(
           child: SearchTextField(
             hintText: 'Search...',
-            showClearButton: false,
             onSearch: ({
               required String searchValue,
               required bool isSubmitted,

@@ -14,6 +14,9 @@ class CampaignDetailsDialog extends StatefulWidget {
     required this.id,
   });
 
+  @override
+  State<CampaignDetailsDialog> createState() => _CampaignDetailsDialogState();
+
   static Future<void> show(
     BuildContext context, {
     required String id,
@@ -22,22 +25,22 @@ class CampaignDetailsDialog extends StatefulWidget {
       context: context,
       routeSettings: RouteSettings(name: '/campaign/$id'),
       builder: (context) => CampaignDetailsDialog._(id: id),
-      barrierDismissible: true,
     );
   }
-
-  @override
-  State<CampaignDetailsDialog> createState() => _CampaignDetailsDialogState();
 }
 
 class _CampaignDetailsDialogState extends State<CampaignDetailsDialog> {
   late final CampaignDetailsBloc _bloc;
 
   @override
-  void initState() {
-    super.initState();
-    _bloc = Dependencies.instance.get();
-    _bloc.add(LoadCampaignEvent(id: widget.id));
+  Widget build(BuildContext context) {
+    return BlocProvider.value(
+      value: _bloc,
+      child: const VoicesDetailsDialog(
+        header: CampaignHeader(),
+        body: CampaignSectionsListView(),
+      ),
+    );
   }
 
   @override
@@ -56,13 +59,9 @@ class _CampaignDetailsDialogState extends State<CampaignDetailsDialog> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return BlocProvider.value(
-      value: _bloc,
-      child: const VoicesDetailsDialog(
-        header: CampaignHeader(),
-        body: CampaignSectionsListView(),
-      ),
-    );
+  void initState() {
+    super.initState();
+    _bloc = Dependencies.instance.get();
+    _bloc.add(LoadCampaignEvent(id: widget.id));
   }
 }

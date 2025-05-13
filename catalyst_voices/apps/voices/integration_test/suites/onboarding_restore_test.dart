@@ -257,8 +257,7 @@ void main() async {
 
         await UnlockPasswordInputPanel($)
             .enterPassword('Test1234', 'WrongPassword');
-        await UnlockPasswordInputPanel($)
-            .verifyPasswordConfirmErrorIcon(isShown: true);
+        await UnlockPasswordInputPanel($).verifyPasswordConfirmErrorIcon();
       });
 
       patrolWidgetTest('restore - can recover different keychain',

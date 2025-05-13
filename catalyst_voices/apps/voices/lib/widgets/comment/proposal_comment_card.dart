@@ -27,7 +27,6 @@ class ProposalCommentCard extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         ProfileAvatar(
-          size: 40,
           username: authorId.username,
         ),
         const SizedBox(width: 16),
@@ -79,7 +78,6 @@ class _Header extends StatelessWidget {
 
     return Row(
       spacing: 8,
-      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Expanded(
           child: Wrap(

@@ -169,7 +169,6 @@ class _RangeAsk extends StatelessWidget {
         border: Border(
           left: BorderSide(
             color: context.colors.outlineBorder,
-            width: 1,
           ),
         ),
       ),
@@ -210,7 +209,6 @@ class _RangeValue extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisAlignment: MainAxisAlignment.start,
       children: [
         Skeleton.keep(
           child: Text(

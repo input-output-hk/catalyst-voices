@@ -2,20 +2,6 @@ import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:flutter/material.dart';
 
-enum VoicesIndicatorType {
-  normal,
-  error,
-  success;
-
-  Color _iconColor(BuildContext context) {
-    return switch (this) {
-      VoicesIndicatorType.normal => Theme.of(context).colors.iconsForeground,
-      VoicesIndicatorType.error => Theme.of(context).colors.iconsError,
-      VoicesIndicatorType.success => Theme.of(context).colors.iconsSuccess,
-    };
-  }
-}
-
 class VoicesIndicator extends StatelessWidget {
   final VoicesIndicatorType type;
   final SvgGenImage icon;
@@ -39,7 +25,6 @@ class VoicesIndicator extends StatelessWidget {
       decoration: BoxDecoration(
         border: Border.all(
           color: theme.colors.outlineBorderVariant,
-          width: 1,
         ),
         borderRadius: BorderRadius.circular(8),
       ),
@@ -69,5 +54,19 @@ class VoicesIndicator extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+enum VoicesIndicatorType {
+  normal,
+  error,
+  success;
+
+  Color _iconColor(BuildContext context) {
+    return switch (this) {
+      VoicesIndicatorType.normal => Theme.of(context).colors.iconsForeground,
+      VoicesIndicatorType.error => Theme.of(context).colors.iconsError,
+      VoicesIndicatorType.success => Theme.of(context).colors.iconsSuccess,
+    };
   }
 }
