@@ -63,6 +63,12 @@ pub(crate) enum CassandraSessionError {
         /// The underlying error that caused the session creation to fail.
         source: anyhow::Error,
     },
+    /// Error when connecting to database.
+    #[error("Database connection failed: {source}")]
+    ConnectionUnavailable {
+        /// The underlying error that caused the connection failure.
+        source: anyhow::Error,
+    },
     /// Error when schema migration fails.
     #[error("Schema migration failed: {source}")]
     SchemaMigrationFailed {
