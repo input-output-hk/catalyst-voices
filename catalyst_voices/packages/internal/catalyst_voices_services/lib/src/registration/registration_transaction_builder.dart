@@ -259,9 +259,7 @@ final class RegistrationTransactionBuilder {
 
     final tbs = X509TBSCertificate(
       serialNumber: _randomSerialNumber(),
-      subjectPublicKey: Bip32Ed25519XPublicKeyFactory.instance.fromBytes(
-        keyPair.publicKey.bytes,
-      ),
+      subjectPublicKey: keyPair.publicKey.toEd25519(),
       issuer: issuer,
       validityNotBefore: DateTime.now().toUtc(),
       validityNotAfter: X509TBSCertificate.foreverValid,

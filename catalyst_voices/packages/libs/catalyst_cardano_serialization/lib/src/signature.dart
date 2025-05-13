@@ -58,6 +58,16 @@ final class Ed25519PublicKey extends Equatable implements CborEncodable {
     }
   }
 
+  /// Creates the [Ed25519PublicKey] from [bytes].
+  /// 
+  /// If [bytes] are longer than [length] then only up to [length]
+  /// bytes starting from the first index will be used.
+  /// 
+  /// Useful when needed to work with extended or simple public keys
+  /// and not being interested in the chain code bytes on 32-63 indexes.
+  Ed25519PublicKey.tryFromBytes(List<int> bytes)
+      : bytes = bytes.take(length).toList();
+
   /// Constructs [Ed25519PublicKey] from a hex [string].
   factory Ed25519PublicKey.fromHex(String string) {
     return Ed25519PublicKey.fromBytes(hex.decode(string));
