@@ -422,11 +422,15 @@ class VoicesTextFieldState extends VoicesFormFieldState<String> {
           fit: BoxFit.scaleDown,
         );
       case VoicesTextFieldStatus.warning:
-        // TODO(dtscalac): this is not the right icon, it should be outlined
-        // & rounded, ask designers to provide it and update it
-        return Icon(Icons.warning_outlined, color: color);
+        return VoicesAssets.icons.exclamation.buildIcon(
+          color: color,
+          fit: BoxFit.scaleDown,
+        );
       case VoicesTextFieldStatus.error:
-        return Icon(Icons.error_outline, color: color);
+        return VoicesAssets.icons.exclamationCircle.buildIcon(
+          color: color,
+          fit: BoxFit.scaleDown,
+        );
     }
   }
 

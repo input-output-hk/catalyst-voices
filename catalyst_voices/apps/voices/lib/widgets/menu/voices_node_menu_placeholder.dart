@@ -20,7 +20,7 @@ class VoicesNodeMenuPlaceholder extends StatelessWidget {
       root: SimpleTreeViewRootRow(
         leading: [
           VoicesNodeMenuIcon(isOpen: isExpanded),
-          const _Placeholder(width: 16, height: 16),
+          const _Placeholder(width: 16),
         ],
         child: const _Placeholder(),
       ),
@@ -43,12 +43,10 @@ class VoicesNodeMenuPlaceholder extends StatelessWidget {
 
 class _Placeholder extends StatelessWidget {
   final double width;
-  final double height;
   final Color? color;
 
   const _Placeholder({
     this.width = 110,
-    this.height = 16,
     this.color,
   });
 
@@ -56,7 +54,7 @@ class _Placeholder extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: width,
-      height: height,
+      height: 16,
       decoration: BoxDecoration(
         color: color ?? Theme.of(context).colorScheme.primary,
         borderRadius: BorderRadius.circular(4),

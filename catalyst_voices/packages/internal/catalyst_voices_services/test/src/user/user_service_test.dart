@@ -102,7 +102,6 @@ void main() {
       final oldAccount = Account.dummy(
         catalystId: catalystId,
         keychain: oldKeychain,
-        isActive: false,
       );
 
       final newKeychain = await keychainProvider.create(newKeychainId);

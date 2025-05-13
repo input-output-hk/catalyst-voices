@@ -29,7 +29,7 @@ void main() {
       serialNumber: 1,
       subjectPublicKey: publicKey,
       issuer: issuer,
-      validityNotBefore: DateTime.utc(2025, 3, 1, 12, 0, 0),
+      validityNotBefore: DateTime.utc(2025, 3, 1, 12),
       validityNotAfter: X509TBSCertificate.foreverValid,
       subject: issuer,
       extensions: const X509CertificateExtensions(

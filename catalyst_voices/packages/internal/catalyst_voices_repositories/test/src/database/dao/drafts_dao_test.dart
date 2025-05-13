@@ -213,9 +213,7 @@ void main() {
           );
 
           final updateDraft = draft.copyWith(
-            metadata: draft.metadata.copyWith(
-              authors: null,
-            ),
+            metadata: draft.metadata.copyWith(),
             content: const DocumentDataContent({
               'title': 'Update',
             }),

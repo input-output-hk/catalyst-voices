@@ -113,7 +113,6 @@ class _VoicesNumFieldState<T extends num> extends State<VoicesNumField<T>> {
       controller: _textEditingController,
       statesController: widget.statesController,
       focusNode: widget.focusNode,
-      maxLines: 1,
       maxLength: widget.maxLength,
       decoration: widget.decoration,
       keyboardType: widget.keyboardType,

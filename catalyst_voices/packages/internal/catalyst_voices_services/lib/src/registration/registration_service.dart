@@ -338,7 +338,6 @@ final class RegistrationServiceImpl implements RegistrationService {
 
       return Account(
         catalystId: catalystId,
-        email: null,
         keychain: keychain,
         roles: roles,
         address: _testNetAddress,

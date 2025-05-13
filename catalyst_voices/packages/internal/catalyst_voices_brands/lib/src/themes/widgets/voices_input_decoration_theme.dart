@@ -32,7 +32,6 @@ class VoicesInputDecorationTheme extends InputDecorationTheme {
       return OutlineInputBorder(
         borderSide: BorderSide(
           color: colors.outlineBorder,
-          width: 1,
         ),
         borderRadius: BorderRadius.circular(4),
       );
@@ -61,7 +60,6 @@ class VoicesInputDecorationTheme extends InputDecorationTheme {
     return OutlineInputBorder(
       borderSide: BorderSide(
         color: colors.outlineBorderVariant,
-        width: 1,
       ),
       borderRadius: BorderRadius.circular(4),
     );

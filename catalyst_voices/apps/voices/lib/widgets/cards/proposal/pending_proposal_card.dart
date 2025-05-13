@@ -157,7 +157,6 @@ class _PendingProposalCardState extends State<PendingProposalCard> {
         child: InkWell(
           statesController: _statesController,
           onTap: widget.onTap,
-          canRequestFocus: true,
           highlightColor: Colors.transparent,
           borderRadius: BorderRadius.circular(12),
           child: ProposalBorder(
@@ -235,7 +234,6 @@ class _PropertyValue extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisAlignment: MainAxisAlignment.start,
       children: [
         Text(
           key: const Key('Title'),

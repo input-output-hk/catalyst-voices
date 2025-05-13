@@ -33,6 +33,7 @@ class ProfileAvatar extends StatelessWidget {
       radius: size / 2,
       backgroundColor: backgroundColor,
       foregroundColor: foregroundColor,
+      padding: const EdgeInsets.all(6),
       icon: Text(
         username?.first?.capitalize() ?? '',
         style: effectiveTextStyle,

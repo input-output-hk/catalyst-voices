@@ -123,7 +123,6 @@ class _WorkspaceHeaderState extends State<WorkspaceHeader> {
           ),
           const SizedBox(height: 8),
           Row(
-            mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(

@@ -64,7 +64,6 @@ class _SimpleTextEntryWidgetState extends State<SimpleTextEntryWidget> {
           ),
           enabled: widget.isEditMode,
           resizableVertically: false,
-          resizableHorizontally: false,
           maxLengthEnforcement: MaxLengthEnforcement.none,
           maxLines: _resizable ? null : 1,
           maxLength: _maxLength,

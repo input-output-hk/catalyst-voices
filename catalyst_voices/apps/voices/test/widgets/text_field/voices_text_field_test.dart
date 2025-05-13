@@ -248,7 +248,10 @@ void main() {
       expect(find.text(warningMessage), findsOneWidget);
 
       // Verify that the warning icon is displayed
-      expect(find.byIcon(Icons.warning_outlined), findsOneWidget);
+      expect(
+        find.byType(CatalystSvgIcon),
+        findsOneWidget,
+      );
     });
   });
 }
@@ -261,7 +264,7 @@ class _MaterialApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      theme: ThemeBuilder.buildTheme(brand: Brand.catalyst),
+      theme: ThemeBuilder.buildTheme(),
       home: Scaffold(body: child),
     );
   }

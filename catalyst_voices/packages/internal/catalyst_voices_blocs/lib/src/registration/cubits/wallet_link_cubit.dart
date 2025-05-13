@@ -88,7 +88,6 @@ final class WalletLinkCubit extends Cubit<WalletLinkStateData>
       final walletConnection = WalletConnectionData(
         name: walletInfo.metadata.name,
         icon: walletInfo.metadata.icon,
-        isConnected: true,
       );
       final walletSummary = WalletSummaryData(
         walletName: walletInfo.metadata.name,

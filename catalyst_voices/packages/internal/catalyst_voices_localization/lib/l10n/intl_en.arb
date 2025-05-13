@@ -1875,17 +1875,9 @@
       }
     }
   },
-  "noPublishedProposalsOnMaxCount": "Published Proposals ({current}/{max})",
-  "@noPublishedProposalsOnMaxCount": {
-    "description": "Title for section to show number of published proposals out of max proposals",
-    "placeholders": {
-      "current": {
-        "type": "int"
-      },
-      "max": {
-        "type": "int"
-      }
-    }
+  "publishedProposals": "Published Proposals",
+  "@publishedProposals": {
+    "description": "A label for proposals that have been published (public)."
   },
   "nrOfIteration": "Iteration {nr}",
   "@nrOfIteration": {

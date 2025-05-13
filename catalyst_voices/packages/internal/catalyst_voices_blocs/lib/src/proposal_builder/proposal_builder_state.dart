@@ -27,11 +27,9 @@ final class ProposalBuilderMetadata extends Equatable {
   }) {
     final firstRef = DraftRef.generateFirstRef();
     return ProposalBuilderMetadata(
-      publish: ProposalPublish.localDraft,
       documentRef: firstRef,
       templateRef: templateRef,
       categoryId: categoryId,
-      versions: const [],
     );
   }
 

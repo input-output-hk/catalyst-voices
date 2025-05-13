@@ -111,7 +111,6 @@ class _CampaignDateInformation extends StatelessWidget {
       children: [
         const SizedBox(height: 30),
         Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             VoicesAssets.icons.calendar.buildIcon(),
             const SizedBox(width: 8),

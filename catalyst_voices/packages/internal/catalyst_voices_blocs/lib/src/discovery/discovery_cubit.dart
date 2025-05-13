@@ -91,7 +91,6 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
           campaign: DiscoveryCurrentCampaignState(
             currentCampaign: currentCampaign,
             campaignTimeline: campaignTimeline,
-            error: null,
             isLoading: false,
           ),
         ),
@@ -188,7 +187,6 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
       state.copyWith(
         proposals: state.proposals.copyWith(
           isLoading: false,
-          error: null,
           proposals: proposalList,
         ),
       ),

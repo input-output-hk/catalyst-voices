@@ -64,7 +64,6 @@ void main() {
         );
         final proposal = DocumentDataFactory.build(
           selfRef: SignedDocumentRef.first(const Uuid().v7()),
-          type: DocumentType.proposalDocument,
           template: templateRef,
           content: DocumentDataContent(proposalData),
         );
@@ -99,9 +98,7 @@ void main() {
         );
         final proposal = DocumentDataFactory.build(
           selfRef: SignedDocumentRef.first(const Uuid().v7()),
-          type: DocumentType.proposalDocument,
           template: templateRef,
-          content: const DocumentDataContent({}),
         );
 
         when(() => remoteDocuments.get(ref: templateRef)).thenAnswer(
@@ -512,7 +509,6 @@ void main() {
       'should emit changes',
       () async {
         // Given
-        const initialContent = DocumentDataContent({});
         const updatedContent = DocumentDataContent({'title': 'My proposal'});
 
         final templateRef = SignedDocumentRef.generateFirstRef();
@@ -523,14 +519,11 @@ void main() {
 
         final draftRef = DraftRef.generateFirstRef();
         final draftData = DocumentDataFactory.build(
-          type: DocumentType.proposalDocument,
           selfRef: draftRef,
           template: templateRef,
-          content: initialContent,
         );
 
         final updatedData = DocumentDataFactory.build(
-          type: DocumentType.proposalDocument,
           selfRef: draftRef,
           template: templateRef,
           content: updatedContent,
@@ -575,7 +568,6 @@ void main() {
             DocumentDataContent({'title': 'My proposal'});
         final publicDraftRef = DraftRef.generateFirstRef();
         final publicDraftData = DocumentDataFactory.build(
-          type: DocumentType.proposalDocument,
           selfRef: publicDraftRef,
           template: templateRef,
           content: publicDraftContent,

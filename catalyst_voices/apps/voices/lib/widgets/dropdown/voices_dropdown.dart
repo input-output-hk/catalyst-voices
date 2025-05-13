@@ -34,7 +34,6 @@ class FilterByDropdown<T> extends StatelessWidget {
       initialSelection: value,
       enableSearch: false,
       requestFocusOnTap: false,
-      enableFilter: false,
       inputDecorationTheme: const InputDecorationTheme(
         isDense: true,
         contentPadding: EdgeInsets.zero,

@@ -96,7 +96,6 @@ class BubblePainter extends CustomPainter {
       ..shader = RadialGradient(
         colors: bubble.gradientColors,
         stops: bubble.gradientStops,
-        center: Alignment.center,
         radius: 0.8,
       ).createShader(rect)
       ..blendMode = BlendMode.softLight;

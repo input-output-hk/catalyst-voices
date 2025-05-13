@@ -296,8 +296,7 @@ void main() async {
         await PasswordInputPanel($).enterPassword('Test1234', 'Test123');
         await PasswordInputPanel($)
             .verifyValidationIndicator(PasswordValidationStatus.normal);
-        await PasswordInputPanel($)
-            .verifyPasswordConfirmErrorIcon(isShown: true);
+        await PasswordInputPanel($).verifyPasswordConfirmErrorIcon();
         await PasswordInputPanel($).verifyNextButtonIsDisabled();
       });
 

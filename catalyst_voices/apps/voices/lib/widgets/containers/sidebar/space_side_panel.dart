@@ -139,7 +139,6 @@ class _SpaceSidePanelState extends State<SpaceSidePanel>
               child: DefaultTabController(
                 length: widget.tabs.length,
                 child: Column(
-                  mainAxisSize: MainAxisSize.max,
                   children: [
                     _Header(
                       onCollapseTap: () {

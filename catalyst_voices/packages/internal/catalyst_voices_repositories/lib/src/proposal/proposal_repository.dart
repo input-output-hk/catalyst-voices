@@ -406,8 +406,10 @@ final class ProposalRepositoryImpl implements ProposalRepository {
       publish: publish,
       commentsCount: data.commentsCount,
       // TODO(damian-molinski): remove it or use different model.
+      // ignore: avoid_redundant_argument_values
       categoryName: '',
       // TODO(damian-molinski): only Strings or use different model.
+      // ignore: avoid_redundant_argument_values
       versions: const [],
     );
   }

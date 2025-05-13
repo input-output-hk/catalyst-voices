@@ -55,7 +55,6 @@ class VoicesDateTimeTextField extends StatelessWidget {
         suffixIcon: ExcludeFocus(child: suffixIcon),
         showStatusSuffixIcon: false,
         fillColor: theme.colors.elevationsOnSurfaceNeutralLv1Grey,
-        filled: true,
         enabledBorder: OutlineInputBorder(
           borderSide: borderSide,
           borderRadius: borderRadius,

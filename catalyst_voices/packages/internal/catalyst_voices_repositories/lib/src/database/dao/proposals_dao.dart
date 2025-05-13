@@ -558,7 +558,7 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
 
   Future<DocumentEntity?> _maybeGetDocument(DocumentRef? ref) {
     if (ref == null) {
-      return Future.value(null);
+      return Future.value();
     }
 
     final id = UuidHiLo.from(ref.id);

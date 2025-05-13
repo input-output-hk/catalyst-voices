@@ -13,7 +13,7 @@ void main() {
           fontSize: 24,
           color: Colors.red,
         );
-        const colors = VoicesColorScheme.optional(textPrimary: Colors.black);
+        const colors = VoicesColorScheme.optional();
         final widget = Directionality(
           textDirection: TextDirection.ltr,
           child: Theme(
@@ -57,7 +57,7 @@ void main() {
           fontSize: 12,
           color: Colors.red,
         );
-        const colors = VoicesColorScheme.optional(textPrimary: Colors.black);
+        const colors = VoicesColorScheme.optional();
         final widget = Directionality(
           textDirection: TextDirection.ltr,
           child: Theme(

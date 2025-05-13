@@ -11,15 +11,15 @@ void main() {
     });
 
     test('plusDays', () {
-      final dstEnd = DateTime(2022, 10, 30, 0, 0);
-      final nextDay = DateTime(2022, 10, 31, 0, 0);
+      final dstEnd = DateTime(2022, 10, 30);
+      final nextDay = DateTime(2022, 10, 31);
 
       expect(dstEnd.plusDays(1), equals(nextDay));
     });
 
     test('minusDays', () {
-      final dstEnd = DateTime(2022, 10, 31, 0, 0);
-      final previousDay = DateTime(2022, 10, 30, 0, 0);
+      final dstEnd = DateTime(2022, 10, 31);
+      final previousDay = DateTime(2022, 10, 30);
 
       expect(dstEnd.minusDays(1), equals(previousDay));
     });

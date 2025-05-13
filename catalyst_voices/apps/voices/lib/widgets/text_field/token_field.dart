@@ -52,7 +52,6 @@ class TokenField extends StatelessWidget {
         errorText: errorText,
         prefixText: currency.symbol,
         hintText: range != null ? '${range.min}' : null,
-        filled: true,
         helper: range != null && showHelper
             ? _Helper(
                 currency: currency,

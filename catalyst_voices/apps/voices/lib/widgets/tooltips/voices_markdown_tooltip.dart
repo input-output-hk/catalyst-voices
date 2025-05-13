@@ -86,7 +86,6 @@ class VoicesMarkdownTooltip extends StatelessWidget {
           BoxShadow(
             offset: Offset(0, 1),
             blurRadius: 2,
-            spreadRadius: 0,
             color: Color(0x4D000000),
           ),
         ],

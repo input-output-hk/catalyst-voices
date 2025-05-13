@@ -40,7 +40,6 @@ void main() {
               ),
               theme: ThemeBuilder.buildTheme(
                 brand: state.brand,
-                brightness: Brightness.light,
               ),
               darkTheme: ThemeBuilder.buildTheme(
                 brand: state.brand,

@@ -1,4 +1,4 @@
-enum ProposalPublish {
+enum ProposalPublish implements Comparable<ProposalPublish> {
   /// A proposal has not yet been published,
   /// it's stored only in the local storage.
   localDraft,
@@ -17,6 +17,12 @@ enum ProposalPublish {
   bool get isLocal => this == localDraft;
 
   bool get isPublished => this == submittedProposal;
+
+  /// Sorts in reverse order to how the [ProposalStatus] enums are declared.
+  @override
+  int compareTo(ProposalPublish other) {
+    return other.index.compareTo(index);
+  }
 }
 
 // Note. This enum may be deleted later. Its here for backwards compatibility.

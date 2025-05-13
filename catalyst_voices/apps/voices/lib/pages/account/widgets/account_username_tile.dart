@@ -32,7 +32,6 @@ class _AccountUsernameTileState extends State<AccountUsernameTile> {
       onChanged: _onEditModeChange,
       isEditMode: _isEditMode,
       isSaveEnabled: _username.isValid,
-      isEditEnabled: true,
       child: VoicesUsernameTextField(
         key: const Key('AccountDisplayNameTextField'),
         controller: _controller,

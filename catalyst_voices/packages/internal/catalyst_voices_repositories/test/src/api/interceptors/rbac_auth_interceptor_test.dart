@@ -92,7 +92,7 @@ void main() {
 
       // When
       when(() => authTokenProvider.createRbacToken())
-          .thenAnswer((_) => Future.value(null));
+          .thenAnswer((_) => Future.value());
       when(() => chain.request).thenReturn(request);
       when(() => chain.proceed(any())).thenAnswer((_) => requestResponse);
       when(() => requestResponse.statusCode).thenAnswer((_) => 200);

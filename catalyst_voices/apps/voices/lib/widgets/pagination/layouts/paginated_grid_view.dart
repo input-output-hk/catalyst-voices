@@ -56,9 +56,6 @@ class PaginatedGridView<ItemType> extends StatelessWidget {
                 key: const Key('PaginatedGridView'),
                 spacing: 16,
                 runSpacing: 16,
-                alignment: WrapAlignment.start,
-                crossAxisAlignment: WrapCrossAlignment.start,
-                runAlignment: WrapAlignment.start,
                 children: pagingState.itemList
                     .map((item) => _itemBuilder(context, item))
                     .toList(),

@@ -36,7 +36,6 @@ class _BaseTileState extends State<BaseTile> {
     final borderRadius = WidgetStateProperty.fromMap(
       <WidgetStatesConstraint, BorderRadius>{
         selectedOrError: const BorderRadius.horizontal(
-          left: Radius.zero,
           right: _borderRadius,
         ),
         WidgetState.any: const BorderRadius.all(_borderRadius),

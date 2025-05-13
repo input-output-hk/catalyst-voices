@@ -21,7 +21,6 @@ class BrandsNavigation extends StatelessWidget {
       ),
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Column(
-        mainAxisSize: MainAxisSize.max,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           ...Brand.values.map(

@@ -41,64 +41,6 @@ final class LocalCryptoService implements CryptoService {
   /// 3-byte marker attached at the end of encrypted data.
   Uint8List get _checksum => utf8.encode('CHK');
 
-  // Note. Argon2id has no native browser implementation and dart one is
-  // slow > 1s. That's why Pbkdf2 is used.
-  @override
-  Future<Uint8List> deriveKey(
-    Uint8List seed, {
-    Uint8List? salt,
-  }) {
-    Future<Uint8List> run() async {
-      final algorithm = Pbkdf2(
-        macAlgorithm: Hmac.sha256(),
-        iterations: 10000, // 20k iterations
-        bits: 256, // 256 bits = 32 bytes output
-      );
-
-      final keySalt = salt ?? _generateRandomList(length: _saltLength);
-
-      final secretKey = await algorithm.deriveKey(
-        secretKey: SecretKey(seed),
-        nonce: keySalt,
-      );
-
-      final keyBytes = await secretKey.extractBytes().then(Uint8List.fromList);
-
-      secretKey.destroy();
-
-      // Combine salt and hashed password for storage
-      return Uint8List.fromList([...keySalt, ...keyBytes]);
-    }
-
-    if (kDebugMode) {
-      return _benchmark(run(), debugLabel: 'DeriveKey');
-    } else {
-      return run();
-    }
-  }
-
-  @override
-  Future<bool> verifyKey(
-    Uint8List seed, {
-    required Uint8List key,
-  }) {
-    Future<bool> run() async {
-      final salt = key.sublist(0, _saltLength);
-      if (salt.length < _saltLength) {
-        return false;
-      }
-
-      final derivedKey = await deriveKey(seed, salt: salt);
-      return listEquals(derivedKey, key);
-    }
-
-    if (kDebugMode) {
-      return _benchmark(run(), debugLabel: 'VerifyKey');
-    } else {
-      return run();
-    }
-  }
-
   @override
   Future<Uint8List> decrypt(
     Uint8List data, {
@@ -121,7 +63,7 @@ final class LocalCryptoService implements CryptoService {
         throw CryptoAlgorithmUnsupported('Algorithm $version');
       }
 
-      final algorithm = AesGcm.with256bits(nonceLength: _viLength);
+      final algorithm = AesGcm.with256bits();
       final secretKey = SecretKey(key.sublist(_saltLength));
 
       final encryptedData = data.sublist(2);
@@ -162,13 +104,49 @@ final class LocalCryptoService implements CryptoService {
     }
   }
 
+  // Note. Argon2id has no native browser implementation and dart one is
+  // slow > 1s. That's why Pbkdf2 is used.
+  @override
+  Future<Uint8List> deriveKey(
+    Uint8List seed, {
+    Uint8List? salt,
+  }) {
+    Future<Uint8List> run() async {
+      final algorithm = Pbkdf2(
+        macAlgorithm: Hmac.sha256(),
+        iterations: 10000, // 20k iterations
+        bits: 256, // 256 bits = 32 bytes output
+      );
+
+      final keySalt = salt ?? _generateRandomList(length: _saltLength);
+
+      final secretKey = await algorithm.deriveKey(
+        secretKey: SecretKey(seed),
+        nonce: keySalt,
+      );
+
+      final keyBytes = await secretKey.extractBytes().then(Uint8List.fromList);
+
+      secretKey.destroy();
+
+      // Combine salt and hashed password for storage
+      return Uint8List.fromList([...keySalt, ...keyBytes]);
+    }
+
+    if (kDebugMode) {
+      return _benchmark(run(), debugLabel: 'DeriveKey');
+    } else {
+      return run();
+    }
+  }
+
   @override
   Future<Uint8List> encrypt(
     Uint8List data, {
     required Uint8List key,
   }) {
     Future<Uint8List> run() async {
-      final algorithm = AesGcm.with256bits(nonceLength: _viLength);
+      final algorithm = AesGcm.with256bits();
       final secretKey = SecretKey(key.sublist(_saltLength));
 
       final checksum = _checksum;
@@ -177,9 +155,7 @@ final class LocalCryptoService implements CryptoService {
       final secretBox = await algorithm.encrypt(
         combinedData,
         secretKey: secretKey,
-        nonce: null,
         aad: [],
-        possibleBuffer: null,
       );
 
       final concatenation = secretBox.concatenation();
@@ -202,17 +178,26 @@ final class LocalCryptoService implements CryptoService {
     }
   }
 
-  /// Builds list with [length] and random bytes in it.
-  Uint8List _generateRandomList({
-    required int length,
+  @override
+  Future<bool> verifyKey(
+    Uint8List seed, {
+    required Uint8List key,
   }) {
-    final list = Uint8List(length);
+    Future<bool> run() async {
+      final salt = key.sublist(0, _saltLength);
+      if (salt.length < _saltLength) {
+        return false;
+      }
 
-    for (var i = 0; i < length; i++) {
-      list[i] = _random.nextInt(255);
+      final derivedKey = await deriveKey(seed, salt: salt);
+      return listEquals(derivedKey, key);
     }
 
-    return list;
+    if (kDebugMode) {
+      return _benchmark(run(), debugLabel: 'VerifyKey');
+    } else {
+      return run();
+    }
   }
 
   Future<T> _benchmark<T>(
@@ -227,5 +212,18 @@ final class LocalCryptoService implements CryptoService {
         _logger.finest('Took[$debugLabel] ${stopwatch.elapsed}');
       },
     );
+  }
+
+  /// Builds list with [length] and random bytes in it.
+  Uint8List _generateRandomList({
+    required int length,
+  }) {
+    final list = Uint8List(length);
+
+    for (var i = 0; i < length; i++) {
+      list[i] = _random.nextInt(255);
+    }
+
+    return list;
   }
 }

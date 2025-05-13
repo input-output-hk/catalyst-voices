@@ -227,8 +227,6 @@ void main() {
       adminToolsCubit.emit(
         const AdminToolsState(
           enabled: true,
-          campaignStage: CampaignStage.scheduled,
-          sessionStatus: SessionStatus.actor,
         ),
       );
 

@@ -50,7 +50,7 @@ extension CampaignTimelineX on CampaignTimeline {
           '''Participants submit initial proposals for ideas to solve challenges. A set amount of ada is allocated to the new funding round.''',
       timeline: DateRange(
         from: DateTime.utc(2025, 4, 30, 13, 20),
-        to: DateTime.utc(2025, 5, 13, 17, 00),
+        to: DateTime.utc(2025, 5, 13, 17),
       ),
       stage: CampaignTimelineStage.proposalSubmission,
     ),
@@ -59,8 +59,8 @@ extension CampaignTimelineX on CampaignTimeline {
       description:
           '''Community members share ideas and insights to refine the proposals. This stage consists of two distinct parts: reviews by LV0 & LV1s reviewers, as well as moderation by LV2s moderators.''',
       timeline: DateRange(
-        from: DateTime.utc(2025, 5, 7, 17, 00),
-        to: DateTime.utc(2025, 5, 13, 17, 00),
+        from: DateTime.utc(2025, 5, 7, 17),
+        to: DateTime.utc(2025, 5, 13, 17),
       ),
       stage: CampaignTimelineStage.communityReview,
     ),
@@ -69,8 +69,8 @@ extension CampaignTimelineX on CampaignTimeline {
       description:
           '''Community members vote using the Project Catalyst voting app. Votes are weighted based on voter's token holding.''',
       timeline: DateRange(
-        from: DateTime.utc(2025, 5, 13, 17, 00),
-        to: DateTime.utc(2025, 5, 14, 17, 00),
+        from: DateTime.utc(2025, 5, 13, 17),
+        to: DateTime.utc(2025, 5, 14, 17),
       ),
       stage: CampaignTimelineStage.communityVoting,
     ),
@@ -79,8 +79,8 @@ extension CampaignTimelineX on CampaignTimeline {
       description:
           '''Votes are tallied and the results revealed. Voters and community reviewers receive their rewards.''',
       timeline: DateRange(
-        from: DateTime.utc(2025, 5, 14, 17, 00),
-        to: DateTime.utc(2025, 5, 15, 17, 00),
+        from: DateTime.utc(2025, 5, 14, 17),
+        to: DateTime.utc(2025, 5, 15, 17),
       ),
       stage: CampaignTimelineStage.votingResults,
     ),

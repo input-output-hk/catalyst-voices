@@ -186,28 +186,30 @@ class ExamplesListPage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('UI examples'),
       ),
-      body: ListView.separated(
-        padding: const EdgeInsets.symmetric(vertical: 32),
-        itemCount: examples.length + 1,
-        itemBuilder: (context, index) {
-          // leading dummy item for divider
-          if (index == 0) {
-            return const SizedBox.shrink();
-          }
+      body: SelectionArea(
+        child: ListView.separated(
+          padding: const EdgeInsets.symmetric(vertical: 32),
+          itemCount: examples.length + 1,
+          itemBuilder: (context, index) {
+            // leading dummy item for divider
+            if (index == 0) {
+              return const SizedBox.shrink();
+            }
 
-          return examples[index - 1];
-        },
-        separatorBuilder: (context, index) {
-          if (index == 0) {
-            return const VoicesTextDivider(child: Text('Screens'));
-          }
+            return examples[index - 1];
+          },
+          separatorBuilder: (context, index) {
+            if (index == 0) {
+              return const VoicesTextDivider(child: Text('Screens'));
+            }
 
-          if (index == screens.length) {
-            return const VoicesTextDivider(child: Text('UI Kit'));
-          }
+            if (index == screens.length) {
+              return const VoicesTextDivider(child: Text('UI Kit'));
+            }
 
-          return const VoicesDivider();
-        },
+            return const VoicesDivider();
+          },
+        ),
       ),
     );
   }
