@@ -62,12 +62,8 @@ final class _AppContent extends StatelessWidget {
       localeListResolutionCallback: basicLocaleListResolution,
       routerConfig: routerConfig,
       themeMode: themeMode,
-      theme: ThemeBuilder.buildTheme(
-        brand: Brand.catalyst,
-        brightness: Brightness.light,
-      ),
+      theme: ThemeBuilder.buildTheme(),
       darkTheme: ThemeBuilder.buildTheme(
-        brand: Brand.catalyst,
         brightness: Brightness.dark,
       ),
       debugShowCheckedModeBanner: false,

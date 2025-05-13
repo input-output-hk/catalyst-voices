@@ -77,7 +77,7 @@ class OpenApiProcessor {
     Map<String, dynamic> data, {
     required String source,
   }) {
-    final visitor = _FilterAllOfVisitor(source: source, verbose: false);
+    final visitor = _FilterAllOfVisitor(source: source);
     final result = visitor.visit(data);
     return result as Map<String, dynamic>;
   }
@@ -89,6 +89,7 @@ class _FilterAllOfVisitor {
 
   _FilterAllOfVisitor({
     required this.source,
+    // ignore: unused_element_parameter
     this.verbose = false,
   });
 

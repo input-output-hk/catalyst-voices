@@ -18,11 +18,8 @@ void main() {
       });
 
       test('empty returns error', () {
-        // Given
-        const value = '';
-
         // When
-        const username = Username.pure(value);
+        const username = Username.pure();
 
         // Then
         final error = username.error;

@@ -60,7 +60,6 @@ class VoicesNavTile extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.only(left: 16),
                 child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     if (leading != null) leading!,
                     Expanded(

@@ -82,12 +82,10 @@ class _VoicesHttpsTextFieldState extends State<VoicesHttpsTextField>
             ),
           ),
           fillColor: Theme.of(context).colors.onSurfaceNeutralOpaqueLv1,
-          filled: true,
         ),
         style: _getTextStyle(context),
         enabled: widget.enabled,
         readOnly: !widget.enabled,
-        autovalidateMode: AutovalidateMode.onUserInteraction,
         mouseCursor: widget.enabled ? null : SystemMouseCursors.click,
       ),
     );
