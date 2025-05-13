@@ -467,72 +467,82 @@ def test_invalid_signature(
 
 
 @pytest.mark.preprod_indexing
-def test_document_index_endpoint(proposal_doc_factory, rbac_chain_factory):
-    (first_proposal, role_id) = proposal_doc_factory()
+def test_document_index_endpoint(
+    submission_action_factory,
+    comment_doc_factory,
+    proposal_doc_factory,
+    rbac_chain_factory,
+):
+    for doc_factory in [
+        submission_action_factory,
+        comment_doc_factory,
+        proposal_doc_factory,
+    ]:
+        (doc, role_id) = doc_factory()
 
-    rbac_chain = rbac_chain_factory(role_id)
-    (cat_id, sk_hex) = rbac_chain.cat_id_for_role(role_id)
-    # submiting 10 proposal documents
-    total_amount = 10
+        rbac_chain = rbac_chain_factory(role_id)
+        (cat_id, sk_hex) = rbac_chain.cat_id_for_role(role_id)
+        # submiting 10 documents
+        total_amount = 10
 
-    for _ in range(total_amount - 1):
-        doc = first_proposal.copy()
-        # keep the same id, but different version
-        doc.metadata["ver"] = uuid_v7.uuid_v7()
-        resp = document.put(
-            data=doc.build_and_sign(cat_id, sk_hex),
-            token=rbac_chain.auth_token(),
+        for _ in range(total_amount - 1):
+            doc = doc.copy()
+            # keep the same id, but different version
+            doc.metadata["ver"] = uuid_v7.uuid_v7()
+            resp = document.put(
+                data=doc.build_and_sign(cat_id, sk_hex),
+                token=rbac_chain.auth_token(),
+            )
+            assert (
+                resp.status_code == 201
+            ), f"Failed to publish document: {resp.status_code} - {resp.text}"
+
+        limit = 1
+        page = 0
+        filter = {"id": {"eq": doc.metadata["id"]}}
+        resp = document.post(
+            f"/index?limit={limit}&page={page}",
+            filter=filter,
         )
         assert (
-            resp.status_code == 201
-        ), f"Failed to publish document: {resp.status_code} - {resp.text}"
+            resp.status_code == 200
+        ), f"Failed to post document: {resp.status_code} - {resp.text}"
 
-    limit = 1
-    page = 0
-    filter = {"id": {"eq": first_proposal.metadata["id"]}}
-    resp = document.post(
-        f"/index?limit={limit}&page={page}",
-        filter=filter,
-    )
-    assert (
-        resp.status_code == 200
-    ), f"Failed to post document: {resp.status_code} - {resp.text}"
+        data = resp.json()
+        assert data["page"]["limit"] == limit
+        assert data["page"]["page"] == page
+        assert data["page"]["remaining"] == total_amount - 1 - page
 
-    data = resp.json()
-    assert data["page"]["limit"] == limit
-    assert data["page"]["page"] == page
-    assert data["page"]["remaining"] == total_amount - 1 - page
+        page += 1
+        resp = document.post(
+            f"/index?limit={limit}&page={page}",
+            filter=filter,
+        )
+        assert (
+            resp.status_code == 200
+        ), f"Failed to post document: {resp.status_code} - {resp.text}"
+        data = resp.json()
+        assert data["page"]["limit"] == limit
+        assert data["page"]["page"] == page
+        assert data["page"]["remaining"] == total_amount - 1 - page
 
-    page += 1
-    resp = document.post(
-        f"/index?limit={limit}&page={page}",
-        filter=filter,
-    )
-    assert (
-        resp.status_code == 200
-    ), f"Failed to post document: {resp.status_code} - {resp.text}"
-    data = resp.json()
-    assert data["page"]["limit"] == limit
-    assert data["page"]["page"] == page
-    assert data["page"]["remaining"] == total_amount - 1 - page
+        resp = document.post(
+            f"/index?limit={total_amount}",
+            filter=filter,
+        )
+        assert (
+            resp.status_code == 200
+        ), f"Failed to post document: {resp.status_code} - {resp.text}"
+        data = resp.json()
+        assert data["page"]["limit"] == total_amount
+        assert data["page"]["page"] == 0  # default value
+        assert data["page"]["remaining"] == 0
 
-    resp = document.post(
-        f"/index?limit={total_amount}",
-        filter=filter,
-    )
-    assert (
-        resp.status_code == 200
-    ), f"Failed to post document: {resp.status_code} - {resp.text}"
-    data = resp.json()
-    assert data["page"]["limit"] == total_amount
-    assert data["page"]["page"] == 0  # default value
-    assert data["page"]["remaining"] == 0
-
-    # Pagination out of range
-    resp = document.post(
-        "/index?page=92233720368547759",
-        filter={},
-    )
-    assert (
-        resp.status_code == 412
-    ), f"Post document, expected 412 Precondition Failed: {resp.status_code} - {resp.text}"
+        # Pagination out of range
+        resp = document.post(
+            "/index?page=92233720368547759",
+            filter={},
+        )
+        assert (
+            resp.status_code == 412
+        ), f"Post document, expected 412 Precondition Failed: {resp.status_code} - {resp.text}"
