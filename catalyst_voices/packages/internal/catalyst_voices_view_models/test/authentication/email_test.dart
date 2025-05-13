@@ -18,11 +18,8 @@ void main() {
       });
 
       test('empty value is accepted as valid', () {
-        // Given
-        const value = '';
-
         // When
-        const email = Email.pure(value);
+        const email = Email.pure();
 
         // Then
         final error = email.error;
