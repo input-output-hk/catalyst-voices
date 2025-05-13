@@ -15,11 +15,13 @@ final class ProposalRoute extends GoRouteData
   final String proposalId;
   final String? version;
   final bool local;
+  final bool? readOnly; // To set read only view
 
   const ProposalRoute({
     required this.proposalId,
     this.version,
     this.local = false,
+    this.readOnly,
   });
 
   ProposalRoute.fromRef({required DocumentRef ref})
@@ -30,7 +32,7 @@ final class ProposalRoute extends GoRouteData
         );
 
   @override
-  List<RouteGuard> get routeGuards => const [ProposalSubmissionGuard()];
+  List<RouteGuard> get routeGuards => const [ReadOnlyProposalViewGuard()];
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
@@ -39,7 +41,6 @@ final class ProposalRoute extends GoRouteData
       version: version,
       isDraft: local,
     );
-
-    return ProposalPage(ref: ref);
+    return ProposalPage(ref: ref, readOnly: readOnly ?? false);
   }
 }

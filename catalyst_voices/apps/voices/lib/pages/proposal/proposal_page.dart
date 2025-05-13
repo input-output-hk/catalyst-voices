@@ -25,10 +25,12 @@ import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 class ProposalPage extends StatefulWidget {
   final DocumentRef ref;
+  final bool readOnly;
 
   const ProposalPage({
     super.key,
     required this.ref,
+    this.readOnly = false,
   });
 
   @override
@@ -49,11 +51,14 @@ class _ProposalPageState extends State<ProposalPage>
     return SegmentsControllerScope(
       controller: _segmentsController,
       child: Scaffold(
-        appBar: const VoicesAppBar(
+        appBar: VoicesAppBar(
           automaticallyImplyLeading: false,
           actions: [
-            SessionActionHeader(),
-            SessionStateHeader(),
+            Offstage(
+              offstage: widget.readOnly,
+              child: const SessionActionHeader(),
+            ),
+            const SessionStateHeader(),
           ],
         ),
         endDrawer: const OpportunitiesDrawer(),

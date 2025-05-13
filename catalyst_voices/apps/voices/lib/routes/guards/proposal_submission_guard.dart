@@ -23,3 +23,27 @@ final class ProposalSubmissionGuard implements RouteGuard {
     }
   }
 }
+
+final class ReadOnlyProposalViewGuard implements RouteGuard {
+  const ReadOnlyProposalViewGuard();
+  @override
+  FutureOr<String?> redirect(BuildContext context, GoRouterState state) {
+    final campaignState = context.read<CampaignStageCubit>().state;
+
+    if (state.matchedLocation.startsWith('/proposal/')) {
+      if (campaignState is AfterProposalSubmissionStage) {
+        final proposalId = state.pathParameters['proposalId'];
+        return ProposalRoute(
+          proposalId: proposalId!,
+          version: state.uri.queryParameters['version'],
+          local: state.uri.queryParameters['local'] == 'true',
+          readOnly: true,
+        ).location;
+      } else if (campaignState is PreProposalSubmissionStage) {
+        return const CampaignStageRoute().location;
+      }
+    }
+
+    return null;
+  }
+}
