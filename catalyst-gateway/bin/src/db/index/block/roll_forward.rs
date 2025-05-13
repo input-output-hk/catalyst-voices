@@ -33,6 +33,7 @@ pub(crate) async fn purge_live_index(purge_condition: PurgeCondition) -> anyhow:
         anyhow::bail!("Failed to acquire db session");
     };
 
+    purge_txi_by_hash(&session, purge_condition).await?;
     purge_cip36_registration(&session, purge_condition).await?;
     purge_cip36_registration_for_vote_key(&session, purge_condition).await?;
     purge_cip36_registration_invalid(&session, purge_condition).await?;
@@ -44,6 +45,27 @@ pub(crate) async fn purge_live_index(purge_condition: PurgeCondition) -> anyhow:
     purge_unstaked_txo_ada(&session, purge_condition).await?;
     purge_unstaked_txo_assets(&session, purge_condition).await?;
 
+    Ok(())
+}
+
+/// Purge data from `txi_by_hash`.
+async fn purge_txi_by_hash(
+    session: &Arc<CassandraSession>, purge_condition: PurgeCondition,
+) -> anyhow::Result<()> {
+    use purge::txi_by_hash::{DeleteQuery, Params, PrimaryKeyQuery};
+
+    // Get all keys
+    let mut primary_keys_stream = PrimaryKeyQuery::execute(session).await?;
+    // Filter
+    let mut delete_params: Vec<Params> = Vec::new();
+    while let Some(Ok(primary_key)) = primary_keys_stream.next().await {
+        if purge_condition.filter(primary_key.2.into()) {
+            let params: Params = primary_key.into();
+            delete_params.push(params);
+        }
+    }
+    // Delete filtered keys
+    DeleteQuery::execute(session, delete_params).await?;
     Ok(())
 }
 
