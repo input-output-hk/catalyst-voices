@@ -152,7 +152,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_ed255519() {
+    fn test_ed25519() {
         // https://cexplorer.io/article/understanding-cardano-addresses
         let valid = [
             EXAMPLE,
