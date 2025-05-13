@@ -187,6 +187,11 @@ class _ProposalBuilderSegments extends StatelessWidget {
             );
             context.read<ProposalBuilderBloc>().add(event);
           },
+          onUsernamePicked: (value) {
+            final event = UpdateUsernameEvent(value);
+
+            context.read<ProposalBuilderBloc>().add(event);
+          },
         ),
       _ => throw ArgumentError('Not supported type ${item.runtimeType}'),
     };

@@ -65,6 +65,7 @@ final class ProposalBuilderBloc
     on<SubmitCommentEvent>(_submitComment);
     on<MaxProposalsLimitChangedEvent>(_updateMaxProposalsLimitReached);
     on<MaxProposalsLimitReachedEvent>(_onMaxProposalsLimitReached);
+    on<UpdateUsernameEvent>(_onUpdateUsername);
 
     final activeAccount = _userService.user.activeAccount;
 
@@ -610,6 +611,28 @@ final class ProposalBuilderBloc
       );
 
       emitSignal(signal);
+    }
+  }
+
+  Future<void> _onUpdateUsername(
+    UpdateUsernameEvent event,
+    Emitter<ProposalBuilderState> emit,
+  ) async {
+    final catId = _userService.user.activeAccount?.catalystId;
+    if (catId == null) {
+      _logger.warning('Tried to update username but no action account found');
+      return;
+    }
+
+    try {
+      final value = event.value;
+      await _userService.updateAccount(
+        id: catId,
+        username: value.isNotEmpty ? Optional(value) : const Optional.empty(),
+      );
+    } catch (error, stackTrace) {
+      _logger.severe('Update username failed', error, stackTrace);
+      emitError(LocalizedException.create(error));
     }
   }
 

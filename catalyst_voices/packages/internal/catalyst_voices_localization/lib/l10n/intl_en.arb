@@ -2683,12 +2683,20 @@
   "@anonymousUsername": {
     "description": "When account does not have specified username this text is shown"
   },
-  "commentPickUsernameLabel": "Pick a username to join the conversation and leave a comment.",
+  "commentPickUsernameLabel": "Pick a display name to join the conversation and leave a comment.",
   "@commentPickUsernameLabel": {
     "description": "Message shown when user tries to comment on proposal while not having username"
   },
-  "commentPickUsernameButton": "Set a username",
-  "@commentPickUsernameButton": {
-    "description": "CTA button to set username"
+  "commentPickUsername": "Set Display Name",
+  "@commentPickUsername": {
+    "description": "Shown as CTA button or title of dialog"
+  },
+  "commentPickUsernameHint": "Enter Name",
+  "@commentPickUsernameHint": {
+    "description": "Hint of username text field"
+  },
+  "confirm": "Confirm",
+  "@confirm": {
+    "description": "Generic text for confirming actions such as pick username"
   }
 }

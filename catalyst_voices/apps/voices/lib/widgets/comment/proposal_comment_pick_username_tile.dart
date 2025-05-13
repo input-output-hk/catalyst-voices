@@ -1,10 +1,18 @@
+import 'dart:async';
+
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
+import 'package:catalyst_voices/widgets/comment/pick_username_dialog.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
 
 class ProposalCommentPickUsernameTile extends StatelessWidget {
-  const ProposalCommentPickUsernameTile({super.key});
+  final ValueChanged<String> onUsernamePicked;
+
+  const ProposalCommentPickUsernameTile({
+    super.key,
+    required this.onUsernamePicked,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -14,16 +22,20 @@ class ProposalCommentPickUsernameTile extends StatelessWidget {
       children: [
         const _LabelText(),
         const SizedBox(height: 12),
-        _PickUsernameButton(onTap: () => _showUsernameDialog(context)),
+        _PickUsernameButton(
+          onTap: () => unawaited(_showUsernameDialog(context)),
+        ),
       ],
     );
   }
 
-  void _showUsernameDialog(BuildContext context) {
-    // TODO(damian-molinski): Finish implementation when
-    //  we know how it should look.
+  Future<void> _showUsernameDialog(BuildContext context) async {
+    final username = await PickUsernameDialog.show(context);
+    if (username == null || !context.mounted) {
+      return;
+    }
 
-    throw UnimplementedError();
+    onUsernamePicked(username);
   }
 }
 
@@ -52,7 +64,7 @@ class _PickUsernameButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return VoicesFilledButton(
       onTap: onTap,
-      child: Text(context.l10n.commentPickUsernameButton),
+      child: Text(context.l10n.commentPickUsername),
     );
   }
 }

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:catalyst_voices/pages/proposal/tiles/proposal_comment_tile.dart';
@@ -197,6 +198,9 @@ class _SegmentsListView extends StatelessWidget {
                 return context
                     .read<ProposalCubit>()
                     .submitComment(document: document, reply: reply);
+              },
+              onUsernamePicked: (value) {
+                unawaited(context.read<ProposalCubit>().updateUsername(value));
               },
             ),
         },

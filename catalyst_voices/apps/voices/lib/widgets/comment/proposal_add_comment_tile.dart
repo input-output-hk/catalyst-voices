@@ -7,18 +7,22 @@ class ProposalAddCommentTile extends StatelessWidget {
   final DocumentSchema schema;
   final bool showUsernameRequired;
   final OnSubmitProposalComment onSubmit;
+  final ValueChanged<String> onUsernamePicked;
 
   const ProposalAddCommentTile({
     super.key,
     required this.schema,
     required this.showUsernameRequired,
     required this.onSubmit,
+    required this.onUsernamePicked,
   });
 
   @override
   Widget build(BuildContext context) {
     if (showUsernameRequired) {
-      return const ProposalCommentPickUsernameTile();
+      return ProposalCommentPickUsernameTile(
+        onUsernamePicked: onUsernamePicked,
+      );
     }
     return ProposalCommentBuilder(
       schema: schema,

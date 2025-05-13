@@ -226,6 +226,24 @@ final class ProposalCubit extends Cubit<ProposalState>
     }
   }
 
+  Future<void> updateUsername(String value) async {
+    final catId = _cache.activeAccountId;
+    if (catId == null) {
+      _logger.warning('Tried to update username but no action account found');
+      return;
+    }
+
+    try {
+      await _userService.updateAccount(
+        id: catId,
+        username: value.isNotEmpty ? Optional(value) : const Optional.empty(),
+      );
+    } catch (error, stackTrace) {
+      _logger.severe('Update username failed', error, stackTrace);
+      emitError(LocalizedException.create(error));
+    }
+  }
+
   ProposalViewData _buildProposalViewData({
     required bool hasActiveAccount,
     required bool hasAccountUsername,
