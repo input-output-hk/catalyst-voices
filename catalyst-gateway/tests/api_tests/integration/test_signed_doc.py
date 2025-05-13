@@ -460,9 +460,9 @@ def test_invalid_signature(
             data=cbor2.dumps(doc_cbor).hex(),
             token=rbac_chain.auth_token(),
         )
-        # TODO change to 422
+        # Should be fixed with this issue https://github.com/input-output-hk/catalyst-libs/issues/316
         assert (
-            resp.status_code == 201
+            resp.status_code == 422
         ), f"Publish document, expected 422 Unprocessable Content: {resp.status_code} - {resp.text}"
 
 
