@@ -4,12 +4,13 @@ import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 
 // TODO(dtscalac): move most blockchain/wallet related code to here
 abstract interface class BlockchainService {
-  const factory BlockchainService(BlockchainRepository blockchainRepository) =
-      BlockchainServiceImpl;
+  const factory BlockchainService(
+    BlockchainRepository blockchainRepository,
+  ) = BlockchainServiceImpl;
 
   Future<SlotBigNum> calculateSlotNumber({
     required DateTime targetDateTime,
-    required NetworkId networkId,
+    required BlockchainSlotNumberConfig config,
   });
 
   Future<Coin> getWalletBalance({
@@ -22,18 +23,15 @@ abstract interface class BlockchainService {
 final class BlockchainServiceImpl implements BlockchainService {
   final BlockchainRepository _blockchainRepository;
 
-  const BlockchainServiceImpl(this._blockchainRepository);
+  const BlockchainServiceImpl(
+    this._blockchainRepository,
+  );
 
   @override
   Future<SlotBigNum> calculateSlotNumber({
     required DateTime targetDateTime,
-    required NetworkId networkId,
+    required BlockchainSlotNumberConfig config,
   }) async {
-    final config = switch (networkId) {
-      NetworkId.mainnet => BlockchainSlotNumberConfig.mainnet(),
-      NetworkId.testnet => BlockchainSlotNumberConfig.testnet(),
-    };
-
     final diff = targetDateTime.millisecondsSinceEpoch -
         config.systemStartTimestamp.millisecondsSinceEpoch;
 

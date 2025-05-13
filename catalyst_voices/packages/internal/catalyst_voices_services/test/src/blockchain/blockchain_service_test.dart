@@ -12,7 +12,9 @@ void main() {
 
     setUp(() {
       walletRepository = _FakeWalletRepository();
-      service = BlockchainService(walletRepository);
+      service = BlockchainService(
+        walletRepository,
+      );
     });
 
     test('getWalletBalance', () async {
@@ -40,12 +42,12 @@ void main() {
 
     Future<void> testSlotNumber({
       required DateTime targetDateTime,
-      required NetworkId networkId,
+      required BlockchainSlotNumberConfig config,
       required SlotBigNum expected,
     }) async {
       final actual = await service.calculateSlotNumber(
         targetDateTime: targetDateTime,
-        networkId: networkId,
+        config: config,
       );
 
       expect(actual, equals(expected));
@@ -54,8 +56,8 @@ void main() {
     group('calculateSlotNumber on ${NetworkId.testnet}', () {
       test('https://preprod.cardanoscan.io/block/46', () async {
         await testSlotNumber(
-          targetDateTime: DateTime.utc(2022, 6, 21),
-          networkId: NetworkId.testnet,
+          targetDateTime: DateTime.utc(2022, 6, 21, 0, 0, 0),
+          config: BlockchainSlotNumberConfig.testnet(),
           expected: const SlotBigNum(86400),
         );
       });
@@ -63,7 +65,7 @@ void main() {
       test('https://preprod.cardanoscan.io/block/2000000', () async {
         await testSlotNumber(
           targetDateTime: DateTime.utc(2024, 3, 4, 7, 17, 24),
-          networkId: NetworkId.testnet,
+          config: BlockchainSlotNumberConfig.testnet(),
           expected: const SlotBigNum(53853444),
         );
       });
@@ -71,7 +73,7 @@ void main() {
       test('https://preprod.cardanoscan.io/block/3456000', () async {
         await testSlotNumber(
           targetDateTime: DateTime.utc(2025, 5, 8, 4, 54, 40),
-          networkId: NetworkId.testnet,
+          config: BlockchainSlotNumberConfig.testnet(),
           expected: const SlotBigNum(90996880),
         );
       });
@@ -81,7 +83,7 @@ void main() {
       test('https://cardanoscan.io/block/4490511', () async {
         await testSlotNumber(
           targetDateTime: DateTime.utc(2020, 7, 29, 21, 44, 51),
-          networkId: NetworkId.mainnet,
+          config: BlockchainSlotNumberConfig.mainnet(),
           expected: const SlotBigNum(4492800),
         );
       });
@@ -89,7 +91,7 @@ void main() {
       test('https://cardanoscan.io/block/8547193', () async {
         await testSlotNumber(
           targetDateTime: DateTime.utc(2023, 3, 21, 21, 44, 34),
-          networkId: NetworkId.mainnet,
+          config: BlockchainSlotNumberConfig.mainnet(),
           expected: const SlotBigNum(87868783),
         );
       });
@@ -97,7 +99,7 @@ void main() {
       test('https://cardanoscan.io/block/10547193', () async {
         await testSlotNumber(
           targetDateTime: DateTime.utc(2024, 7, 8, 16, 57, 22),
-          networkId: NetworkId.mainnet,
+          config: BlockchainSlotNumberConfig.mainnet(),
           expected: const SlotBigNum(128891551),
         );
       });
@@ -105,7 +107,7 @@ void main() {
       test('https://cardanoscan.io/block/11837000', () async {
         await testSlotNumber(
           targetDateTime: DateTime.utc(2025, 5, 8, 9, 34, 28),
-          networkId: NetworkId.mainnet,
+          config: BlockchainSlotNumberConfig.mainnet(),
           expected: const SlotBigNum(155130577),
         );
       });

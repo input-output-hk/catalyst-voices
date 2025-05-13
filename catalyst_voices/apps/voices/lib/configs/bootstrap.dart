@@ -45,14 +45,14 @@ Future<BootstrapArgs> bootstrap({
   environment ??= AppEnvironment.fromEnv();
 
   await _cleanupOldStorages();
-  await registerDependencies(environment: environment, config: null);
+  await registerDependencies(environment: environment);
   await _initCryptoUtils();
 
   final configSource = ApiConfigSource(Dependencies.instance.get());
   final configService = ConfigService(ConfigRepository(configSource));
   final config = await configService.getAppConfig(env: environment.type);
 
-  Dependencies.instance.registerConfig(config);
+  registerConfig(config);
 
   router ??= buildAppRouter();
 
@@ -97,18 +97,18 @@ GoRouter buildAppRouter({
 }
 
 @visibleForTesting
+void registerConfig(AppConfig config) {
+  Dependencies.instance.registerConfig(config);
+}
+
+@visibleForTesting
 Future<void> registerDependencies({
   AppEnvironment environment = const AppEnvironment.dev(),
-  AppConfig? config = const AppConfig.dev(),
 }) async {
   if (!Dependencies.instance.isInitialized) {
     await Dependencies.instance.init(
       environment: environment,
     );
-  }
-
-  if (config != null) {
-    Dependencies.instance.registerConfig(config);
   }
 }
 
