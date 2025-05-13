@@ -70,11 +70,12 @@ def comment_templates() -> List[str]:
     ]
 
 
-# return a Proposal document which is already published to the cat-gateway
+# return a Proposal document which is already published to the cat-gateway and the corresponding RoleID
 @pytest.fixture
 def proposal_doc_factory(proposal_templates, rbac_chain_factory):
-    def __proposal_doc_factory() -> SignedDocument:
-        rbac_chain = rbac_chain_factory(RoleID.PROPOSER)
+    def __proposal_doc_factory() -> tuple[SignedDocument, RoleID]:
+        role_id = RoleID.PROPOSER
+        rbac_chain = rbac_chain_factory(role_id)
         proposal_doc_id = uuid_v7.uuid_v7()
         category_id = "0194d490-30bf-7473-81c8-a0eaef369619"
         proposal_metadata_json = {
@@ -99,7 +100,7 @@ def proposal_doc_factory(proposal_templates, rbac_chain_factory):
             proposal_json = json.load(proposal_json_file)
 
         doc = SignedDocument(proposal_metadata_json, proposal_json)
-        (cat_id, sk_hex) = rbac_chain.cat_id_for_role(RoleID.PROPOSER)
+        (cat_id, sk_hex) = rbac_chain.cat_id_for_role(role_id)
         resp = document.put(
             data=doc.build_and_sign(cat_id, sk_hex),
             token=rbac_chain.auth_token(),
@@ -108,19 +109,18 @@ def proposal_doc_factory(proposal_templates, rbac_chain_factory):
             resp.status_code == 201
         ), f"Failed to publish document: {resp.status_code} - {resp.text}"
 
-        return doc
+        return doc, role_id
 
     return __proposal_doc_factory
 
 
-# return a Comment document which is already published to the cat-gateway
+# return a Comment document which is already published to the cat-gateway, with the relevant RoleID
 @pytest.fixture
-def comment_doc_factory(
-    proposal_doc_factory, comment_templates, rbac_chain_factory
-) -> SignedDocument:
-    def __comment_doc_factory() -> SignedDocument:
-        rbac_chain = rbac_chain_factory(RoleID.ROLE_0)
-        proposal_doc = proposal_doc_factory()
+def comment_doc_factory(proposal_doc_factory, comment_templates, rbac_chain_factory):
+    def __comment_doc_factory() -> tuple[SignedDocument, RoleID]:
+        role_id = RoleID.ROLE_0
+        rbac_chain = rbac_chain_factory(role_id)
+        proposal_doc = proposal_doc_factory()[0]
         comment_doc_id = uuid_v7.uuid_v7()
         comment_metadata_json = {
             "id": comment_doc_id,
@@ -142,7 +142,7 @@ def comment_doc_factory(
             comment_json = json.load(comment_json_file)
 
         doc = SignedDocument(comment_metadata_json, comment_json)
-        (cat_id, sk_hex) = rbac_chain.cat_id_for_role(RoleID.ROLE_0)
+        (cat_id, sk_hex) = rbac_chain.cat_id_for_role(role_id)
         resp = document.put(
             data=doc.build_and_sign(cat_id, sk_hex),
             token=rbac_chain.auth_token(),
@@ -151,19 +151,18 @@ def comment_doc_factory(
             resp.status_code == 201
         ), f"Failed to publish document: {resp.status_code} - {resp.text}"
 
-        return doc
+        return doc, role_id
 
     return __comment_doc_factory
 
 
-# return a submission action document.
+# return a submission action document which is already published to the cat-gateway, with the relevant RoleID
 @pytest.fixture
-def submission_action_factory(
-    proposal_doc_factory, comment_templates, rbac_chain_factory
-) -> SignedDocument:
-    def __submission_action_factory() -> SignedDocument:
-        rbac_chain = rbac_chain_factory(RoleID.PROPOSER)
-        proposal_doc = proposal_doc_factory()
+def submission_action_factory(proposal_doc_factory, rbac_chain_factory):
+    def __submission_action_factory() -> tuple[SignedDocument, RoleID]:
+        role_id = RoleID.PROPOSER
+        rbac_chain = rbac_chain_factory(role_id)
+        proposal_doc = proposal_doc_factory()[0]
         submission_action_id = uuid_v7.uuid_v7()
         sub_action_metadata_json = {
             "id": submission_action_id,
@@ -183,7 +182,7 @@ def submission_action_factory(
             comment_json = json.load(comment_json_file)
 
         doc = SignedDocument(sub_action_metadata_json, comment_json)
-        (cat_id, sk_hex) = rbac_chain.cat_id_for_role(RoleID.PROPOSER)
+        (cat_id, sk_hex) = rbac_chain.cat_id_for_role(role_id)
         resp = document.put(
             data=doc.build_and_sign(cat_id, sk_hex),
             token=rbac_chain.auth_token(),
@@ -192,7 +191,7 @@ def submission_action_factory(
             resp.status_code == 201
         ), f"Failed to publish sub_action: {resp.status_code} - {resp.text}"
 
-        return doc
+        return doc, role_id
 
     return __submission_action_factory
 
@@ -208,8 +207,9 @@ def test_templates(proposal_templates, comment_templates):
 
 @pytest.mark.preprod_indexing
 def test_proposal_doc(proposal_doc_factory, rbac_chain_factory):
-    rbac_chain = rbac_chain_factory(RoleID.PROPOSER)
-    (cat_id, sk_hex) = rbac_chain.cat_id_for_role(RoleID.PROPOSER)
+    (proposal_doc, role_id) = proposal_doc_factory()
+    rbac_chain = rbac_chain_factory(role_id)
+    (cat_id, sk_hex) = rbac_chain.cat_id_for_role(role_id)
     proposal_doc = proposal_doc_factory()
     proposal_doc_id = proposal_doc.metadata["id"]
 
@@ -294,8 +294,9 @@ def test_proposal_doc(proposal_doc_factory, rbac_chain_factory):
 
 @pytest.mark.preprod_indexing
 def test_comment_doc(comment_doc_factory, rbac_chain_factory):
-    rbac_chain = rbac_chain_factory(RoleID.ROLE_0)
-    (cat_id, sk_hex) = rbac_chain.cat_id_for_role(RoleID.ROLE_0)
+    (comment_doc, role_id) = comment_doc_factory()
+    rbac_chain = rbac_chain_factory(role_id)
+    (cat_id, sk_hex) = rbac_chain.cat_id_for_role(role_id)
     comment_doc = comment_doc_factory()
     comment_doc_id = comment_doc.metadata["id"]
 
@@ -357,8 +358,9 @@ def test_comment_doc(comment_doc_factory, rbac_chain_factory):
 
 @pytest.mark.preprod_indexing
 def test_submission_action(submission_action_factory, rbac_chain_factory):
-    rbac_chain = rbac_chain_factory(RoleID.PROPOSER)
-    (cat_id, sk_hex) = rbac_chain.cat_id_for_role(RoleID.PROPOSER)
+    (submission_action, role_id) = submission_action_factory()
+    rbac_chain = rbac_chain_factory(role_id)
+    (cat_id, sk_hex) = rbac_chain.cat_id_for_role(role_id)
     submission_action = submission_action_factory()
     submission_action_id = submission_action.metadata["id"]
 
@@ -428,36 +430,52 @@ def test_invalid_signature(
     proposal_doc_factory,
     rbac_chain_factory,
 ):
+    for doc, role_id in [
+        submission_action_factory(),
+        comment_doc_factory(),
+        proposal_doc_factory(),
+    ]:
+        rbac_chain = rbac_chain_factory(role_id)
+        (cat_id, sk_hex) = rbac_chain.cat_id_for_role(role_id)
+        doc.metadata["ver"] = uuid_v7.uuid_v7()
+        valid_doc_hex = doc.build_and_sign(cat_id, sk_hex)
 
-    doc = proposal_doc_factory()
-    rbac_chain = rbac_chain_factory(RoleID.PROPOSER)
-    (cat_id, sk_hex) = rbac_chain.cat_id_for_role(RoleID.PROPOSER)
-    doc.metadata["ver"] = uuid_v7.uuid_v7()
-    doc_hex = doc.build_and_sign(cat_id, sk_hex)
+        # corrupt signature
+        doc_cbor = cbor2.loads(bytes.fromhex(valid_doc_hex)).value
+        doc_cbor[3][0][2] = doc_cbor[3][0][2] + b"extra bytes"
 
-    doc_cbor = cbor2.loads(bytes.fromhex(doc_hex)).value
-    cose_signatures = doc_cbor[3]
-    assert len(cose_signatures) > 1
+        resp = document.put(
+            data=cbor2.dumps(doc_cbor).hex(),
+            token=rbac_chain.auth_token(),
+        )
+        assert (
+            resp.status_code == 422
+        ), f"Publish document, expected 422 Unprocessable Content: {resp.status_code} - {resp.text}"
 
-    # corrupt signature
-    cose_signature = cose_signatures[0]
-    cose_signature[2].append(2)
-    # resp = document.put(
-    #     data=doc_hex,
-    #     token=rbac_chain.auth_token(),
-    # )
-    # assert (
-    #     resp.status_code == 201
-    # ), f"Failed to publish document: {resp.status_code} - {resp.text}"
+        # modify document without changing signature
+        doc_cbor = cbor2.loads(bytes.fromhex(valid_doc_hex)).value
+        protected_headers = cbor2.loads(doc_cbor[0])
+        protected_headers["extra header field"] = "extra header field value"
+        doc_cbor[0] = cbor2.dumps(protected_headers)
+
+        resp = document.put(
+            data=cbor2.dumps(doc_cbor).hex(),
+            token=rbac_chain.auth_token(),
+        )
+        assert (
+            resp.status_code == 422
+        ), f"Publish document, expected 422 Unprocessable Content: {resp.status_code} - {resp.text}"
 
 
 @pytest.mark.preprod_indexing
 def test_document_index_endpoint(proposal_doc_factory, rbac_chain_factory):
-    rbac_chain = rbac_chain_factory(RoleID.PROPOSER)
-    (cat_id, sk_hex) = rbac_chain.cat_id_for_role(RoleID.PROPOSER)
+    (first_proposal, role_id) = proposal_doc_factory()
+
+    rbac_chain = rbac_chain_factory(role_id)
+    (cat_id, sk_hex) = rbac_chain.cat_id_for_role(role_id)
     # submiting 10 proposal documents
     total_amount = 10
-    first_proposal = proposal_doc_factory()
+
     for _ in range(total_amount - 1):
         doc = first_proposal.copy()
         # keep the same id, but different version
