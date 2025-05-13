@@ -243,12 +243,16 @@ final class DatabaseLoggingInterceptor extends QueryInterceptor {
 
       return result;
     } catch (error, stack) {
-      _log(
-        Level.WARNING,
-        '[$nr] => failed after ${stopwatch.elapsedMilliseconds}ms',
-        error,
-        stack,
-      );
+      if (error.toString() == 'Operation was cancelled') {
+        _log(Level.FINEST, '[$nr] => was cancelled');
+      } else {
+        _log(
+          Level.WARNING,
+          '[$nr] => failed after ${stopwatch.elapsedMilliseconds}ms',
+          error,
+          stack,
+        );
+      }
 
       rethrow;
     }
