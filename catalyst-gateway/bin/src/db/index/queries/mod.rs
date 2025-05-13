@@ -38,7 +38,10 @@ use super::block::{
     txi::TxiInsertQuery, txo::TxoInsertQuery,
 };
 use crate::{
-    db::index::queries::rbac::{get_rbac_invalid_registrations, get_rbac_registrations},
+    db::index::{
+        queries::rbac::{get_rbac_invalid_registrations, get_rbac_registrations},
+        session::CassandraSessionError,
+    },
     service::utilities::health::set_index_db_liveness,
     settings::cassandra_db,
 };
