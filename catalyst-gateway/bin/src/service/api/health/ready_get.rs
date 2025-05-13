@@ -75,11 +75,12 @@
 //! providing ongoing connectivity checks and recovery attempts for the service's
 //! databases.
 use poem_openapi::ApiResponse;
+use tracing::debug;
 
 use crate::{
     cardano::INDEXING_DB_READY_WAIT_INTERVAL,
     db::{
-        event::{establish_connection, EventDB},
+        event::{establish_connection_pool, EventDB},
         index::session::CassandraSession,
     },
     service::{
@@ -125,9 +126,11 @@ pub(crate) async fn endpoint() -> AllResponses {
 
     // When check fails, attempt to re-connect
     if !event_db_live {
-        establish_connection();
+        establish_connection_pool().await;
         // Re-check, and update Event DB service liveness flag
-        set_event_db_liveness(EventDB::connection_is_ok());
+        let event_db_is_live = EventDB::connection_is_ok().await;
+        debug!("Event DB Reconnected?: {event_db_is_live}");
+        set_event_db_liveness(event_db_is_live);
     };
 
     // Check Index DB connection
