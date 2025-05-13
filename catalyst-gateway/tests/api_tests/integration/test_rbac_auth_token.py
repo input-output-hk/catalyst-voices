@@ -92,7 +92,7 @@ def test_invalid_rbac_auth_token(rbac_chain_factory):
 
 @pytest.mark.preprod_indexing
 def test_valid_rbac_auth_token(rbac_chain_factory):
-    def test_valid_rbac_auth_token_inner(role: RoleID):
+    def test_valid_rbac_auth_token_inner(role: list[RoleID]):
         token = rbac_chain_factory(role).auth_token()
     
         resp = get(lookup=None, token=token)
@@ -110,6 +110,6 @@ def test_valid_rbac_auth_token(rbac_chain_factory):
         assert(resp.status_code == 200), f"Expected valid token that already registered when X-API-Key does match, nonce validation is skipped: {resp.status_code} - {resp.text}"
 
         
-    for role in RoleID:
+    for role in [[RoleID.ROLE_0], [RoleID.ROLE_0, RoleID.PROPOSER]]:
         test_valid_rbac_auth_token_inner(role)
     
