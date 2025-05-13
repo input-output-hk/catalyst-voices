@@ -166,7 +166,6 @@ class _TagChipGroup extends StatelessWidget {
           key: ObjectKey(tag),
           name: tag,
           isSelected: isSelected,
-          isEnabled: true,
           onTap: () => isSelected ? onChanged(null) : onChanged(tag),
         );
       }).toList(),

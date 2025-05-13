@@ -44,7 +44,6 @@ final class CoseSign1 extends Equatable {
     return CoseSign1(
       protectedHeaders: CoseHeaders.fromCbor(
         protectedHeaders,
-        encodeAsBytes: true,
       ),
       unprotectedHeaders: CoseHeaders.fromCbor(
         unprotectedHeaders,
@@ -53,6 +52,56 @@ final class CoseSign1 extends Equatable {
       payload: Uint8List.fromList((payload as CborBytes).bytes),
       signature: Uint8List.fromList((signature as CborBytes).bytes),
     );
+  }
+
+  @override
+  List<Object?> get props => [
+        protectedHeaders,
+        unprotectedHeaders,
+        payload,
+        signature,
+      ];
+
+  /// Serializes the type as cbor.
+  CborValue toCbor({bool tagged = true}) {
+    return CborList(
+      [
+        protectedHeaders.toCbor(),
+        unprotectedHeaders.toCbor(),
+        CborBytes(payload),
+        CborBytes(signature),
+      ],
+      tags: [
+        if (tagged) CoseTags.coseSign1,
+      ],
+    );
+  }
+
+  /// Verifies whether the COSE_SIGN1 [signature] is valid.
+  ///
+  /// The [verifier] is responsible for providing the verification algorithm.
+  Future<bool> verify({
+    required CatalystCoseVerifier verifier,
+  }) async {
+    final sigStructure = _createCoseSign1SigStructure(
+      protectedHeader: protectedHeaders.toCbor(),
+      payload: CborBytes(payload),
+    );
+
+    final toBeSigned = cbor.encode(
+      CborBytes(
+        cbor.encode(sigStructure),
+      ),
+    );
+
+    try {
+      return await verifier.verify(
+        Uint8List.fromList(toBeSigned),
+        Uint8List.fromList(signature),
+      );
+    } catch (e) {
+      return false;
+    }
   }
 
   /// Creates a signed COSE_SIGN1 structure.
@@ -92,56 +141,6 @@ final class CoseSign1 extends Equatable {
       signature: await signer.sign(toBeSigned),
     );
   }
-
-  /// Verifies whether the COSE_SIGN1 [signature] is valid.
-  ///
-  /// The [verifier] is responsible for providing the verification algorithm.
-  Future<bool> verify({
-    required CatalystCoseVerifier verifier,
-  }) async {
-    final sigStructure = _createCoseSign1SigStructure(
-      protectedHeader: protectedHeaders.toCbor(),
-      payload: CborBytes(payload),
-    );
-
-    final toBeSigned = cbor.encode(
-      CborBytes(
-        cbor.encode(sigStructure),
-      ),
-    );
-
-    try {
-      return await verifier.verify(
-        Uint8List.fromList(toBeSigned),
-        Uint8List.fromList(signature),
-      );
-    } catch (e) {
-      return false;
-    }
-  }
-
-  /// Serializes the type as cbor.
-  CborValue toCbor({bool tagged = true}) {
-    return CborList(
-      [
-        protectedHeaders.toCbor(),
-        unprotectedHeaders.toCbor(),
-        CborBytes(payload),
-        CborBytes(signature),
-      ],
-      tags: [
-        if (tagged) CoseTags.coseSign1,
-      ],
-    );
-  }
-
-  @override
-  List<Object?> get props => [
-        protectedHeaders,
-        unprotectedHeaders,
-        payload,
-        signature,
-      ];
 
   static CborValue _createCoseSign1SigStructure({
     required CborValue protectedHeader,

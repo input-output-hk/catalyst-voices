@@ -54,7 +54,7 @@ void main() {
     group('calculateSlotNumber on ${NetworkId.testnet}', () {
       test('https://preprod.cardanoscan.io/block/46', () async {
         await testSlotNumber(
-          targetDateTime: DateTime.utc(2022, 6, 21, 0, 0, 0),
+          targetDateTime: DateTime.utc(2022, 6, 21),
           networkId: NetworkId.testnet,
           expected: const SlotBigNum(86400),
         );

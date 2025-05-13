@@ -572,8 +572,6 @@ final class ProposalBuilderBloc
               id: section.schema.nodeId,
               property: section,
               schema: section.schema,
-              isEnabled: true,
-              isEditable: true,
               hasError:
                   showValidationErrors && !section.isValidExcludingSubsections,
             ),

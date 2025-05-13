@@ -14,7 +14,6 @@ void main() {
           document: Document(),
           selection: const TextSelection.collapsed(offset: 0),
         ),
-        enabled: true,
         focusNode: FocusNode(),
         scrollController: ScrollController(),
         onChanged: (_) {},

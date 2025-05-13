@@ -201,8 +201,7 @@ void main() {
 
     test('should format date without year when includeYear is false', () {
       final date = DateTime(2023, 10, 25, 14, 30); // 25th October 2023, 14:30
-      final result =
-          DateFormatter.formatDateTimeParts(date, includeYear: false);
+      final result = DateFormatter.formatDateTimeParts(date);
 
       expect(result.date, '25 October');
       expect(result.time, '14:30');

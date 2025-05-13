@@ -39,7 +39,6 @@ class _DeleteKeychainDialogState extends State<DeleteKeychainDialog> {
       child: SizedBox(
         width: double.infinity,
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
           children: [
             const SizedBox(height: 36),
@@ -84,7 +83,6 @@ class _DeleteKeychainDialogState extends State<DeleteKeychainDialog> {
                     decoration: VoicesTextFieldDecoration(
                       errorText: _errorText,
                       errorMaxLines: 2,
-                      filled: true,
                       fillColor: Theme.of(context)
                           .colors
                           .elevationsOnSurfaceNeutralLv1White,
