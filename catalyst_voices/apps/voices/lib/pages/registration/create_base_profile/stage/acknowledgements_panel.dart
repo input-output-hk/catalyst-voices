@@ -109,14 +109,17 @@ class _PrivacyPolicyCheckBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return VoicesCheckbox(
-      value: isChecked,
-      label: const PrivacyPolicyRichText(),
-      onChanged: (value) {
-        RegistrationCubit.of(context)
-            .baseProfile
-            .updatePrivacyPolicy(isAccepted: value);
-      },
+    return Semantics(
+      identifier: 'PrivacyPolicyCheckbox',
+      child: VoicesCheckbox(
+        value: isChecked,
+        label: const PrivacyPolicyRichText(),
+        onChanged: (value) {
+          RegistrationCubit.of(context)
+              .baseProfile
+              .updatePrivacyPolicy(isAccepted: value);
+        },
+      ),
     );
   }
 }
@@ -142,14 +145,17 @@ class _DataUsageCheckBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return VoicesCheckbox(
-      value: isChecked,
-      label: Text(context.l10n.createBaseProfileAcknowledgementsDataUsage),
-      onChanged: (value) {
-        RegistrationCubit.of(context)
-            .baseProfile
-            .updateDataUsage(isAccepted: value);
-      },
+    return Semantics(
+      identifier: 'DataUsageCheckbox',
+      child: VoicesCheckbox(
+        value: isChecked,
+        label: Text(context.l10n.createBaseProfileAcknowledgementsDataUsage),
+        onChanged: (value) {
+          RegistrationCubit.of(context)
+              .baseProfile
+              .updateDataUsage(isAccepted: value);
+        },
+      ),
     );
   }
 }
