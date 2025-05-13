@@ -14,7 +14,7 @@ abstract class VoicesConstants {
   static const beforeSubmissionUrl =
       'https://docs.projectcatalyst.io/catalyst-tools/catalyst-app/app-timeline#before-submission';
   static const afterSubmissionUrl =
-      'https://docs.projectcatalyst.io/catalyst-tools/catalyst-app/app-timeline#after-submission';
+      'https://docs.projectcatalyst.io/catalyst-tools/catalyst-app/stay-involved';
   static const becomeReviewerUrl = 'https://reviews.projectcatalyst.io/';
   static const votingRegistrationUrl =
       'https://docs.projectcatalyst.io/current-fund/voter-registration';

@@ -243,11 +243,6 @@ class _VoicesDateTimeFieldState extends State<VoicesDateTimeField> {
                 },
                 behavior: HitTestBehavior.translucent,
                 excludeFromSemantics: true,
-                onPanUpdate: null,
-                onPanDown: null,
-                onPanCancel: null,
-                onPanEnd: null,
-                onPanStart: null,
                 child: Container(
                   color: Colors.transparent,
                 ),

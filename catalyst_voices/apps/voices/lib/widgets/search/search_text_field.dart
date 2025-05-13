@@ -53,7 +53,6 @@ class _SearchTextFieldState extends State<SearchTextField> {
           prefixIcon: VoicesAssets.icons.search.buildIcon(
             color: Theme.of(context).colors.iconsForeground,
           ),
-          filled: true,
           fillColor: Theme.of(context).colorScheme.surface,
           suffixIcon: ValueListenableBuilder<TextEditingValue>(
             valueListenable: _controller,

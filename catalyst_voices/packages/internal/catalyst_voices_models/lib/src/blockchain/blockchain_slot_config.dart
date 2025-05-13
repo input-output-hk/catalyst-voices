@@ -35,7 +35,7 @@ final class BlockchainSlotNumberConfig extends Equatable {
   /// The [NetworkId.testnet] configuration.
   factory BlockchainSlotNumberConfig.testnet() {
     return BlockchainSlotNumberConfig(
-      systemStartTimestamp: DateTime.utc(2022, 6, 21, 0, 0, 0),
+      systemStartTimestamp: DateTime.utc(2022, 6, 21),
       systemStartSlot: const SlotBigNum(86400),
       slotLength: const Duration(seconds: 1),
     );

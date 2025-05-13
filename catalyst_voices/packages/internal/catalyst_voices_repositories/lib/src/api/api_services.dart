@@ -32,7 +32,6 @@ final class ApiServices {
 
     return ApiServices.internal(
       gateway: CatGateway.create(
-        authenticator: null,
         baseUrl: Uri.parse(config.gatewayUrl),
         converter: CborOrJsonDelegateConverter(
           cborConverter: CborSerializableConverter(),
@@ -50,7 +49,6 @@ final class ApiServices {
         ],
       ),
       reviews: CatReviews.create(
-        authenticator: null,
         baseUrl: Uri.parse(config.reviewsUrl),
         interceptors: [
           RbacAuthInterceptor(authTokenProvider),
