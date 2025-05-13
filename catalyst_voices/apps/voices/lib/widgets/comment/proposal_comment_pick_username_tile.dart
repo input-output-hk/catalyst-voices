@@ -18,7 +18,6 @@ class ProposalCommentPickUsernameTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         const _LabelText(),
         const SizedBox(height: 12),
