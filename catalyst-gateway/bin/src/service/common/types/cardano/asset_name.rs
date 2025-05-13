@@ -2,10 +2,12 @@
 
 use std::sync::LazyLock;
 
+use const_format::concatcp;
 use poem_openapi::{
     registry::{MetaSchema, MetaSchemaRef},
     types::{Example, ParseError, ParseFromJSON, ParseFromParameter, ParseResult, ToJSON, Type},
 };
+use regex::Regex;
 use serde_json::Value;
 
 use crate::service::common::types::string_types::impl_string_types;
@@ -14,21 +16,22 @@ use crate::service::common::types::string_types::impl_string_types;
 const TITLE: &str = "Cardano Native Asset Name";
 /// Description.
 const DESCRIPTION: &str = r"The name given to the native asset when it was minted.
-It is used to distinguish different assets within the same policy.
-If the name starts with 0x, it will be treated as hex encoded,
-this hex encoded should not exceed 64 length long.
-Otherwise, it will be treated as normal string, which will later be converted to UTF-8 where after converted, 
-it should not exceed 32 bytes";
+If the name can be converted to UTF8, its string is represented directly.
+Otherwise it will be represented as escaped ascii.
+Any `\` present in the name will be replaced with `\\` in all cases.";
 
 /// Example.
 const EXAMPLE: &str = "My Cool\nAsset";
+/// Maximum asset name in bytes.
+const ASSET_NAME_MAX_BYTES: usize = 32;
 /// Minimum length.
 const MIN_LENGTH: usize = 0;
-/// Maximum length.
-const MAX_LENGTH: usize = 1000;
+/// Maximum length calculated from maximum length of escaped string * max number of bytes of asset name.
+/// <https://www.gnu.org/software/gawk/manual/html_node/Escape-Sequences.html>
+const MAX_LENGTH: usize = ASSET_NAME_MAX_BYTES * 4;
 /// Validation Regex Pattern
 /// Can be anything
-const PATTERN: &str = r".*";
+const PATTERN: &str = concatcp!("^.{", "0,", MAX_LENGTH ,"}$");
 
 /// Schema.
 static SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| {
@@ -45,14 +48,10 @@ static SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| {
 
 /// Validate `AssetName` This part is done separately from the `PATTERN`
 fn is_valid(name: &str) -> bool {
-    // Hex string
-    if let Some(hash) = name.strip_prefix("0x") {
-        !hash.is_empty() && hash.len() <= 64 && hex::decode(hash).is_ok()
-    // Any string
-    } else {
-        let hex = hex::encode(name);
-        hex.len() <= 64
-    }
+    /// Regex to validate `AssetName`
+    #[allow(clippy::unwrap_used)] // Safe because the Regex is constant.
+    static RE: LazyLock<Regex> = LazyLock::new(|| Regex::new(PATTERN).unwrap());
+    RE.is_match(name)
 }
 
 impl_string_types!(
@@ -91,39 +90,26 @@ impl From<String> for AssetName {
 
 #[cfg(test)]
 mod tests {
-    use regex::Regex;
-
     use super::*;
 
     #[test]
     fn test_asset_name() {
-        let regex = Regex::new(PATTERN).unwrap();
-
+        let escape_octal = r"\nnn".repeat(32);
         // Test Data
         // <https://preprod.cardanoscan.io/tokens>
         let valid = [
             "This_Is_A_Very_Long_String______",
-            "0x7dc6f84acd4016aa7b2f7ab7231981a1014fdcc0a1df70424a3e179b5e1c8e67",
+            &escape_octal,
             "SPLASH",
-            "0x6c71",
-            "",
         ];
-
-        // Valid Regex, invalid parsing
-        let invalid = [
-            "0x40a8016ca43cfae6b76b11222042664b3b6f2fdcdb08c98ac9d51f41217922b41",
-            "This_Is_A_Very_Long_String_but_invalid_parsing",
-            "0x",
-            "0xqw",
-        ];
-
         for v in valid {
-            assert!(regex.is_match(v));
             assert!(AssetName::parse_from_parameter(v).is_ok());
         }
-
+        let invalid = [
+            // Add additional char
+            &format!("{escape_octal}a")
+        ];
         for v in invalid {
-            assert!(regex.is_match(v));
             assert!(AssetName::parse_from_parameter(v).is_err());
         }
     }

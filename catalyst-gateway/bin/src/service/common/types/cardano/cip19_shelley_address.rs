@@ -36,7 +36,7 @@ const ENCODED_STAKED_ADDR_LEN: usize = 98;
 const ENCODED_UNSTAKED_ADDR_LEN: usize = 53;
 /// Regex Pattern
 const PATTERN: &str = concatcp!(
-    "(",
+    "^(",
     PROD,
     "|",
     TEST,

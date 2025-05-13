@@ -31,11 +31,11 @@ const PROD_STAKE: &str = "stake";
 const TEST_STAKE: &str = "stake_test";
 /// Regex Pattern
 pub(crate) const PATTERN: &str = concatcp!(
-    "(",
+    "^(",
     PROD_STAKE,
     "|",
     TEST_STAKE,
-    ")1[a,c-h,j-n,p-z,0,2-9]{53}"
+    ")1[a,c-h,j-n,p-z,0,2-9]{53}$"
 );
 /// Length of the encoded address.
 const ENCODED_ADDR_LEN: usize = 53;
