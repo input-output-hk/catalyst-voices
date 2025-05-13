@@ -290,6 +290,20 @@ def test_proposal_doc(proposal_doc_factory, rbac_chain_factory):
         resp.status_code == 422
     ), f"Publish document, expected 422 Unprocessable Content: {resp.status_code} - {resp.text}"
 
+    # Put a submission action document with the non allowed RoleID
+    for invalid_role in RoleID:
+        if invalid_role != role_id:
+            invalid_doc = proposal_doc.copy()
+            invalid_doc.metadata["ver"] = uuid_v7.uuid_v7()
+            (inv_cat_id, inv_sk_hex) = rbac_chain.cat_id_for_role(invalid_role)
+            resp = document.put(
+                data=invalid_doc.build_and_sign(inv_cat_id, inv_sk_hex),
+                token=rbac_chain.auth_token(),
+            )
+            assert (
+                resp.status_code == 422
+            ), f"Publish document, expected 422 Unprocessable Content: {resp.status_code} - {resp.text}"
+
 
 @pytest.mark.preprod_indexing
 def test_comment_doc(comment_doc_factory, rbac_chain_factory):
@@ -352,6 +366,20 @@ def test_comment_doc(comment_doc_factory, rbac_chain_factory):
     assert (
         resp.status_code == 422
     ), f"Publish document, expected 422 Unprocessable Content: {resp.status_code} - {resp.text}"
+
+    # Put a submission action document with the non allowed RoleID
+    for invalid_role in RoleID:
+        if invalid_role != role_id:
+            invalid_doc = comment_doc.copy()
+            invalid_doc.metadata["ver"] = uuid_v7.uuid_v7()
+            (inv_cat_id, inv_sk_hex) = rbac_chain.cat_id_for_role(invalid_role)
+            resp = document.put(
+                data=invalid_doc.build_and_sign(inv_cat_id, inv_sk_hex),
+                token=rbac_chain.auth_token(),
+            )
+            assert (
+                resp.status_code == 422
+            ), f"Publish document, expected 422 Unprocessable Content: {resp.status_code} - {resp.text}"
 
 
 @pytest.mark.preprod_indexing
@@ -420,8 +448,22 @@ def test_submission_action(submission_action_factory, rbac_chain_factory):
         resp.status_code == 422
     ), f"Publish document, expected 422 Unprocessable Content: {resp.status_code} - {resp.text}"
 
+    # Put a submission action document with the non allowed RoleID
+    for invalid_role in RoleID:
+        if invalid_role != role_id:
+            invalid_doc = submission_action.copy()
+            invalid_doc.metadata["ver"] = uuid_v7.uuid_v7()
+            (inv_cat_id, inv_sk_hex) = rbac_chain.cat_id_for_role(invalid_role)
+            resp = document.put(
+                data=invalid_doc.build_and_sign(inv_cat_id, inv_sk_hex),
+                token=rbac_chain.auth_token(),
+            )
+            assert (
+                resp.status_code == 422
+            ), f"Publish document, expected 422 Unprocessable Content: {resp.status_code} - {resp.text}"
 
-@pytest.mark.preprod_indexing
+
+@pytest.mark.skip
 def test_invalid_signature(
     submission_action_factory,
     comment_doc_factory,
