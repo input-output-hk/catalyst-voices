@@ -10,6 +10,7 @@ EnvVars getDartEnvVars() {
       : null;
 
   return const EnvVars(
+    // ignore: avoid_redundant_argument_values
     envName: envName ?? appFlavor,
   );
 }

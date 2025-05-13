@@ -105,7 +105,7 @@ void main() {
           as Map<String, dynamic>;
       final remoteConfig = RemoteConfig.fromJson(configJson);
 
-      final systemStartTimestamp = DateTime.utc(2022, 6, 21, 0, 0, 0);
+      final systemStartTimestamp = DateTime.utc(2022, 6, 21);
       const systemStartSlot = 86400;
       const slotLength = Duration(seconds: 1);
 
