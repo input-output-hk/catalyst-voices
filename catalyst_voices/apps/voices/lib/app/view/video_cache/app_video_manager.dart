@@ -15,7 +15,7 @@ class VideoManager extends ValueNotifier<VideoManagerState> {
 
   @override
   void dispose() {
-    unawaited(_resetControllers());
+    unawaited(_disposeControllers());
     super.dispose();
   }
 
@@ -62,13 +62,20 @@ class VideoManager extends ValueNotifier<VideoManagerState> {
   Future<void> resetCacheIfNeeded(ThemeData theme) async {
     if (value.brightness != theme.brightness) {
       _isInitialized = false;
-      await _resetControllers();
+      await _disposeControllers();
       value = value.copyWith(brightness: Optional(theme.brightness));
     }
   }
 
   String _createKey(String asset, String? package) {
     return '$asset${package != null ? "_$package" : "_unknown"}';
+  }
+
+  Future<void> _disposeControllers() async {
+    for (final controller in value.controllers.values) {
+      await controller.dispose();
+    }
+    value = value.copyWith(controllers: {});
   }
 
   Future<VideoPlayerController> _initializeController(
@@ -81,18 +88,13 @@ class VideoManager extends ValueNotifier<VideoManagerState> {
     );
 
     await controller.initialize();
+    // TOOD(LynxLynxx): extract this to public method so intreseted widget can
+    // control video playback
     await controller.setLooping(true);
     await controller.setVolume(0);
     await controller.play();
 
     return controller;
-  }
-
-  Future<void> _resetControllers() async {
-    for (final controller in value.controllers.values) {
-      await controller.dispose();
-    }
-    value = value.copyWith(controllers: {});
   }
 }
 

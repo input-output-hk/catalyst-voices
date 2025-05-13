@@ -1,4 +1,5 @@
 import 'package:catalyst_voices/app/view/video_cache/app_video_manager.dart';
+import 'package:catalyst_voices/dependency/dependencies.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
@@ -64,14 +65,7 @@ class _AppVideoPrecacheState extends State<AppVideoPrecache> {
   @override
   void initState() {
     super.initState();
-    _manager = VideoManager();
-    // _manager = Dependencies.instance.isRegistered<VideoManager>()
-    //     ? Dependencies.instance.get<VideoManager>()
-    //     : null;
-    // assert(
-    //   _manager != null,
-    //   'VideoManager should be registered in Dependencies',
-    // );
+    _manager = Dependencies.instance.get<VideoManager>();
   }
 
   Future<void> _precacheVideos() {

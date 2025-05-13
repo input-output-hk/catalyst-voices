@@ -1,7 +1,6 @@
-import 'package:catalyst_voices/app/view/video_cache/app_video_manager.dart';
+import 'package:catalyst_voices/widgets/video/video_player.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
-import 'package:video_player/video_player.dart';
 
 class HeroSection extends StatelessWidget {
   final AlignmentGeometry alignment;
@@ -37,7 +36,7 @@ class HeroSection extends StatelessWidget {
   }
 }
 
-class _Background extends StatefulWidget {
+class _Background extends StatelessWidget {
   final VideoCacheKey asset;
   final BoxConstraints constraints;
 
@@ -47,54 +46,13 @@ class _Background extends StatefulWidget {
   });
 
   @override
-  State<_Background> createState() => _BackgroundState();
-}
-
-class _BackgroundState extends State<_Background>
-    with AutomaticKeepAliveClientMixin {
-  Future<VideoPlayerController>? _future;
-
-  @override
-  bool get wantKeepAlive => true;
-
-  @override
   Widget build(BuildContext context) {
-    super.build(context);
-
     return ConstrainedBox(
-      constraints: widget.constraints,
-      child: FutureBuilder<VideoPlayerController>(
-        future: _future,
-        builder: (context, snapshot) {
-          final controller = snapshot.data;
-
-          if (controller == null) {
-            return const SizedBox.expand();
-          }
-
-          return FittedBox(
-            fit: BoxFit.cover,
-            clipBehavior: Clip.hardEdge,
-            child: SizedBox(
-              key: const Key('HeroBackgroundVideo'),
-              width: controller.value.size.width,
-              height: controller.value.size.height,
-              child: VideoPlayer(controller),
-            ),
-          );
-        },
+      constraints: constraints,
+      child: VoicesVideoPlayer(
+        key: const Key('HeroBackgroundVideo'),
+        asset: asset,
       ),
     );
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-
-    _future ??= Future.microtask(() async => _getController());
-  }
-
-  Future<VideoPlayerController> _getController() {
-    return VideoManagerScope.of(context).getOrCreateController(widget.asset);
   }
 }
