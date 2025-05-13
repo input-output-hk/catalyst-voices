@@ -6,6 +6,7 @@ pub(crate) mod chain_follower;
 pub(crate) mod chain_indexer;
 pub(crate) mod endpoint;
 pub(crate) mod memory;
+pub(crate) mod rbac_cache;
 
 /// Initialize Prometheus metrics.
 ///
