@@ -238,6 +238,8 @@ final class ProposalCubit extends Cubit<ProposalState>
         id: catId,
         username: value.isNotEmpty ? Optional(value) : const Optional.empty(),
       );
+
+      emitSignal(const UsernameUpdatedSignal());
     } catch (error, stackTrace) {
       _logger.severe('Update username failed', error, stackTrace);
       emitError(LocalizedException.create(error));

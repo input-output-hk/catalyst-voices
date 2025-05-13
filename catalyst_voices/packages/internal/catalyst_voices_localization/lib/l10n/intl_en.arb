@@ -2690,5 +2690,13 @@
   "confirm": "Confirm",
   "@confirm": {
     "description": "Generic text for confirming actions such as pick username"
+  },
+  "usernameSavedTitle": "Display Name Saved",
+  "@usernameSavedTitle": {
+    "description": "Used as username change confirmation snack bar title"
+  },
+  "usernameSavedMessage": "All set! You can now join the conversation.",
+  "@usernameSavedMessage": {
+    "description": "Used as username change confirmation snack bar message"
   }
 }
