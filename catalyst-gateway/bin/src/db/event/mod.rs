@@ -7,7 +7,7 @@ use std::{
     },
 };
 
-use bb8::Pool;
+use bb8::{Pool, PooledConnection};
 use bb8_postgres::PostgresConnectionManager;
 use error::NotFoundError;
 use futures::{Stream, StreamExt, TryStreamExt};
@@ -40,13 +40,29 @@ pub(crate) struct EventDB {}
 
 /// `EventDB` Errors
 #[derive(thiserror::Error, Debug, PartialEq, Eq)]
-pub(crate) enum Error {
+pub(crate) enum EventDBConnectionError {
     /// Failed to get a DB Pool
     #[error("DB Pool uninitialized")]
     DbPoolUninitialized,
+    /// Failed to get a DB Pool Connection
+    #[error("DB Pool connection is unavailable")]
+    PoolConnectionUnavailable,
 }
 
 impl EventDB {
+    /// Get a connection from the pool.
+    async fn get_pool_connection<'a>(
+    ) -> Result<PooledConnection<'a, PostgresConnectionManager<NoTls>>, EventDBConnectionError>
+    {
+        let pool = EVENT_DB_POOL
+            .get()
+            .ok_or(EventDBConnectionError::DbPoolUninitialized)?;
+        pool.get().await.map_err(|_| {
+            set_event_db_liveness(false);
+            EventDBConnectionError::PoolConnectionUnavailable
+        })
+    }
+
     /// Determine if deep query inspection is enabled.
     pub(crate) fn is_deep_query_enabled() -> bool {
         DEEP_QUERY_INSPECT.load(Ordering::SeqCst)
@@ -81,8 +97,7 @@ impl EventDB {
         if Self::is_deep_query_enabled() {
             Self::explain_analyze_rollback(stmt, params).await?;
         }
-        let pool = EVENT_DB_POOL.get().ok_or(Error::DbPoolUninitialized)?;
-        let conn = pool.get().await?;
+        let conn = Self::get_pool_connection().await?;
         let rows = conn.query(stmt, params).await?;
         Ok(rows)
     }
@@ -107,8 +122,7 @@ impl EventDB {
         if Self::is_deep_query_enabled() {
             Self::explain_analyze_rollback(stmt, params).await?;
         }
-        let pool = EVENT_DB_POOL.get().ok_or(Error::DbPoolUninitialized)?;
-        let conn = pool.get().await?;
+        let conn = Self::get_pool_connection().await?;
         let rows = conn.query_raw(stmt, params.iter().copied()).await?;
         Ok(rows.map_err(Into::into).boxed())
     }
@@ -130,8 +144,7 @@ impl EventDB {
         if Self::is_deep_query_enabled() {
             Self::explain_analyze_rollback(stmt, params).await?;
         }
-        let pool = EVENT_DB_POOL.get().ok_or(Error::DbPoolUninitialized)?;
-        let conn = pool.get().await?;
+        let conn = Self::get_pool_connection().await?;
         let row = conn.query_opt(stmt, params).await?.ok_or(NotFoundError)?;
         Ok(row)
     }
@@ -153,16 +166,15 @@ impl EventDB {
         if Self::is_deep_query_enabled() {
             Self::explain_analyze_commit(stmt, params).await?;
         } else {
-            let pool = EVENT_DB_POOL.get().ok_or(Error::DbPoolUninitialized)?;
-            let conn = pool.get().await?;
+            let conn = Self::get_pool_connection().await?;
             conn.query(stmt, params).await?;
         }
         Ok(())
     }
 
     /// Checks that connection to `EventDB` is available.
-    pub(crate) fn connection_is_ok() -> bool {
-        EVENT_DB_POOL.get().is_some()
+    pub(crate) async fn connection_is_ok() -> bool {
+        Self::get_pool_connection().await.is_ok()
     }
 
     /// Prepend `EXPLAIN ANALYZE` to the query, and rollback the transaction.
@@ -199,8 +211,7 @@ impl EventDB {
         );
 
         async move {
-            let pool = EVENT_DB_POOL.get().ok_or(Error::DbPoolUninitialized)?;
-            let mut conn = pool.get().await?;
+            let mut conn = Self::get_pool_connection().await?;
             let transaction = conn.transaction().await?;
             let explain_stmt = transaction
                 .prepare(format!("EXPLAIN ANALYZE {stmt}").as_str())
@@ -246,9 +257,10 @@ impl EventDB {
 /// `.env` file.
 ///
 /// If connection to the pool is `OK`, the `LIVE_EVENT_DB` atomic flag is set to `true`.
-pub fn establish_connection() {
+pub async fn establish_connection_pool() {
     let (url, user, pass, max_connections, max_lifetime, min_idle, connection_timeout) =
         Settings::event_db_settings();
+    debug!("Establishing connection with Event DB pool");
 
     // This was pre-validated and can't fail, but provide default in the impossible case it
     // does.
@@ -265,16 +277,22 @@ pub fn establish_connection() {
 
     let pg_mgr = PostgresConnectionManager::new(config, tokio_postgres::NoTls);
 
-    let pool = Pool::builder()
+    match Pool::builder()
         .max_size(max_connections)
         .max_lifetime(Some(core::time::Duration::from_secs(max_lifetime.into())))
         .min_idle(min_idle)
         .connection_timeout(core::time::Duration::from_secs(connection_timeout.into()))
-        .build_unchecked(pg_mgr);
-
-    if EVENT_DB_POOL.set(Arc::new(pool)).is_err() {
-        error!("Failed to set event db pool. Called Twice?");
-    } else {
-        set_event_db_liveness(true);
+        .build(pg_mgr)
+        .await
+    {
+        Ok(pool) => {
+            debug!("Event DB pool configured.");
+            if EVENT_DB_POOL.set(Arc::new(pool)).is_err() {
+                error!("Failed to set EVENT_DB_POOL. Already set?");
+            }
+        },
+        Err(err) => {
+            error!(error = %err, "Failed to establish connection with EventDB pool");
+        },
     }
 }
