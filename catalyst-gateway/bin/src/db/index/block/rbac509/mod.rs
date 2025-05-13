@@ -15,7 +15,7 @@ use catalyst_types::catalyst_id::CatalystId;
 use pallas::ledger::addresses::Address;
 use rbac_registration::cardano::cip509::{Cip509, Cip509RbacMetadata};
 use scylla::Session;
-use tracing::error;
+use tracing::{debug, error};
 
 use crate::{
     db::index::{
@@ -77,7 +77,7 @@ impl Rbac509InsertQuery {
                 // This registration is either completely corrupted or someone else is using "our"
                 // label (`MetadatumLabel::CIP509_RBAC`). We don't want to index it even as
                 // incorrect.
-                error!(
+                debug!(
                     slot = ?slot,
                     index = ?index,
                     "Invalid RBAC Registration Metadata in transaction: {e:?}"
@@ -112,7 +112,7 @@ impl Rbac509InsertQuery {
         {
             Ok(v) => v,
             Err(e) => {
-                error!("Unable to determine Catalyst id for registration: slot = {slot:?}, index = {index:?}, txn_hash = {txn_hash:?}: {e:?}");
+                debug!("Unable to determine Catalyst id for registration: slot = {slot:?}, index = {index:?}, txn_hash = {txn_hash:?}: {e:?}");
                 return;
             },
         };
