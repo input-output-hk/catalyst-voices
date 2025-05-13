@@ -4,6 +4,7 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:collection/collection.dart';
 import 'package:drift/drift.dart';
 
+const _cancellationMessage = 'Operation was cancelled';
 const _clauseKeywords = [
   'SELECT',
   'FROM',
@@ -243,7 +244,7 @@ final class DatabaseLoggingInterceptor extends QueryInterceptor {
 
       return result;
     } catch (error, stack) {
-      if (error.toString() == 'Operation was cancelled') {
+      if (error.toString() == _cancellationMessage) {
         _log(Level.FINEST, '[$nr] => was cancelled');
       } else {
         _log(
