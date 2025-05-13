@@ -50,7 +50,6 @@ class SupportedWallet extends StatelessWidget with LaunchUrlMixin {
         vertical: 12,
       ),
       child: Row(
-        mainAxisSize: MainAxisSize.max,
         children: [
           CatalystImage.asset(image.path),
           const SizedBox(width: 16),

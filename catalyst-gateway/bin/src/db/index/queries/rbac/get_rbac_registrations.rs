@@ -12,7 +12,7 @@ use scylla::{
     prepared_statement::PreparedStatement, statement::Consistency,
     transport::iterator::TypedRowStream, DeserializeRow, SerializeRow, Session,
 };
-use tracing::{error, warn};
+use tracing::{debug, error};
 
 use crate::db::{
     index::{
@@ -124,7 +124,7 @@ pub(crate) async fn build_reg_chain<OnSuccessFn: FnMut(bool, Slot, &Registration
             Err(e) => {
                 // This isn't a hard error because while the individual registration can be valid it
                 // can be invalid in the context of the whole registration chain.
-                warn!(
+                debug!(
                     "Unable to apply registration from {:?} block {:?} txn index: {e:?}",
                     reg.slot_no, reg.txn_index
                 );

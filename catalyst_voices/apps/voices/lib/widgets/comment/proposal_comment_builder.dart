@@ -173,7 +173,6 @@ class _SessionAccountAvatar extends StatelessWidget {
     );
     return ProfileAvatar(
       username: username,
-      size: 40,
     );
   }
 }

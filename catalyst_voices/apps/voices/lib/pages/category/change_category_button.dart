@@ -38,13 +38,10 @@ class _ChangeCategoryButtonState extends State<ChangeCategoryButton> {
       builder: (context, state) {
         return CategoryDropdown(
           popupMenuButtonKey: _popupMenuButtonKey,
-          clipBehavior: Clip.hardEdge,
           onSelected: _changeCategory,
           onCanceled: () => _handleClose,
           onOpened: () => _handleOpen,
-          offset: const Offset(0, 40),
           items: state,
-          constraints: const BoxConstraints(maxWidth: 320),
           highlightColor: context.colors.onSurfacePrimary08,
           child: VoicesOutlinedButton(
             onTap: () {

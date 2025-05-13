@@ -92,9 +92,7 @@ void main() {
       );
 
       when(
-        () => mockProposalRepository.watchLatestProposals(
-          limit: null,
-        ),
+        () => mockProposalRepository.watchLatestProposals(),
       ).thenAnswer((_) => Stream.value([proposalData1, proposalData2]));
 
       when(
@@ -131,9 +129,7 @@ void main() {
       expect(proposals.length, equals(2));
 
       verify(
-        () => mockProposalRepository.watchLatestProposals(
-          limit: null,
-        ),
+        () => mockProposalRepository.watchLatestProposals(),
       ).called(1);
 
       verify(
@@ -220,9 +216,7 @@ void main() {
             Stream.value([proposalData1, proposalData2]).asBroadcastStream();
 
         when(
-          () => mockProposalRepository.watchLatestProposals(
-            limit: null,
-          ),
+          () => mockProposalRepository.watchLatestProposals(),
         ).thenAnswer((_) => proposalsStream);
 
         when(

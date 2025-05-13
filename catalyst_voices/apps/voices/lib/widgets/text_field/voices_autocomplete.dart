@@ -54,7 +54,6 @@ class VoicesAutocomplete<T extends Object> extends StatelessWidget {
         return VoicesTextField(
           controller: textEditingController,
           focusNode: focusNode,
-          maxLines: 1,
           onFieldSubmitted: (value) {
             onFieldSubmitted();
           },
