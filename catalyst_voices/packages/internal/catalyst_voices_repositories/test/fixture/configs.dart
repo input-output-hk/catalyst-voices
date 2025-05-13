@@ -67,5 +67,36 @@ abstract class Configs {
 }
 ''';
 
+  static String mainnetBlockchainSlotNumber = '''
+{
+  "version": "0.1.0",
+  "createdAt": "2025-04-02T12:59:50.841808Z",
+  "blockchain": {
+    "networkId": "mainnet",
+    "host": "cardano",
+    "slotNumberConfig": {
+      "systemStartTimestamp":"2020-07-29T21:44:51.000000Z",
+      "systemStartSlot":4492800,
+      "slotLength":1
+    }
+  }
+}
+''';
+  static String testnetBlockchainSlotNumber = '''
+{
+  "version": "0.1.0",
+  "createdAt": "2025-04-02T12:59:50.841808Z",
+  "blockchain": {
+    "networkId": "testnet",
+    "host": "cardano",
+    "slotNumberConfig": {
+      "systemStartTimestamp":"2022-06-21T00:00:00.000000Z",
+      "systemStartSlot":86400,
+      "slotLength":1
+    }
+  }
+}
+''';
+
   const Configs._();
 }

@@ -7,15 +7,34 @@ final class RemoteBlockchainConfig {
   final String? networkId;
   final String? host;
   final RemoteTransactionBuilderConfig? transactionBuilderConfig;
+  final RemoteSlotNumberConfig? slotNumberConfig;
 
   RemoteBlockchainConfig({
     this.networkId,
     this.host,
     this.transactionBuilderConfig,
+    this.slotNumberConfig,
   });
 
   factory RemoteBlockchainConfig.fromJson(Map<String, dynamic> json) {
     return _$RemoteBlockchainConfigFromJson(json);
+  }
+}
+
+@JsonSerializable(createToJson: false)
+final class RemoteSlotNumberConfig {
+  final DateTime? systemStartTimestamp;
+  final int? systemStartSlot;
+  final int? slotLength;
+
+  RemoteSlotNumberConfig({
+    this.systemStartTimestamp,
+    this.systemStartSlot,
+    this.slotLength,
+  });
+
+  factory RemoteSlotNumberConfig.fromJson(Map<String, dynamic> json) {
+    return _$RemoteSlotNumberConfigFromJson(json);
   }
 }
 
