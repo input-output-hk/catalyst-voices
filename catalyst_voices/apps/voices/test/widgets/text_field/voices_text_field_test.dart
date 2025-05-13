@@ -248,7 +248,10 @@ void main() {
       expect(find.text(warningMessage), findsOneWidget);
 
       // Verify that the warning icon is displayed
-      expect(find.byIcon(Icons.warning_outlined), findsOneWidget);
+      expect(
+        find.byType(CatalystSvgIcon),
+        findsOneWidget,
+      );
     });
   });
 }
