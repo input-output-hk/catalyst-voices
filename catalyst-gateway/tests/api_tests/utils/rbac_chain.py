@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 import base64
 import pytest
-from enum import IntEnum
+from enum import IntEnum, Enum
 import json
 from pycardano.crypto.bip32 import BIP32ED25519PrivateKey, BIP32ED25519PublicKey
 
@@ -9,6 +9,12 @@ with open("./test_data/rbac_regs/only_role_0.jsonc", "r") as f:
     ONLY_ROLE_0_REG_JSON = json.load(f)
 with open("./test_data/rbac_regs/role_3.jsonc", "r") as f:
     ROLE_3_REG_JSON = json.load(f)
+
+
+class Chain(Enum):
+    All = 0
+    Role0 = 1
+    Role0_With_Proposer = 2
 
 
 class RoleID(IntEnum):
@@ -74,28 +80,21 @@ class RBACChain:
 
 @pytest.fixture
 def rbac_chain_factory():
-    # if `registered_roles` default value is all rbac chain with all available roles
     def __rbac_chain_factory(
-        roles: list[RoleID] = [RoleID.ROLE_0, RoleID.PROPOSER],
+        chain: Chain = Chain.All,
         network: str = "cardano",
         subnet: str = "preprod",
     ) -> RBACChain:
-        if isinstance(roles, RoleID):
-            roles = [roles]
-        else:
-            roles = sorted(set(roles))
-            
-        match roles:
+        match chain:
             # RBAC registration chain that contains only Role 0 (voter)
-            case [RoleID.ROLE_0]:
+            case Chain.Role0:
                 return RBACChain(ONLY_ROLE_0_REG_JSON, network, subnet)
             # RBAC registration chain that contains both Role 0 -> Role 3 (proposer)
-            case [RoleID.ROLE_0, RoleID.PROPOSER]:
+            case Chain.Role0_With_Proposer:
                 return RBACChain(ROLE_3_REG_JSON, network, subnet)
-            case _:
-                assert (
-                    False
-                ), f"Does not have a registration with the following roles {roles}"
+            # RBAC registration chain that contains all known roles
+            case Chain.All:
+                return RBACChain(ROLE_3_REG_JSON, network, subnet)
 
     return __rbac_chain_factory
 
