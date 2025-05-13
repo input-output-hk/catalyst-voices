@@ -156,12 +156,7 @@ impl RbacCache {
             .insert(new_chain.current_tx_id_hash(), catalyst_id.clone());
         self.chains.insert(catalyst_id.clone(), new_chain);
 
-        Ok(RbacCacheAddSuccess {
-            catalyst_id,
-            // A valid registration must have a purpose.
-            #[allow(clippy::expect_used)]
-            purpose: purpose.expect("Missing registration purpose"),
-        })
+        Ok(RbacCacheAddSuccess { catalyst_id })
     }
 
     /// Starts a new Rbac registration chain.
@@ -239,11 +234,6 @@ impl RbacCache {
             .insert(new_chain.current_tx_id_hash(), catalyst_id.clone());
         self.chains.insert(catalyst_id.clone(), new_chain);
 
-        Ok(RbacCacheAddSuccess {
-            catalyst_id,
-            // A valid registration must have a purpose.
-            #[allow(clippy::expect_used)]
-            purpose: purpose.expect("Missing registration purpose"),
-        })
+        Ok(RbacCacheAddSuccess { catalyst_id })
     }
 }

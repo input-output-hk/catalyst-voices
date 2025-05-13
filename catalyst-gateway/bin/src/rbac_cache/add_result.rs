@@ -11,8 +11,6 @@ pub type AddResult = Result<RbacCacheAddSuccess, RbacCacheAddError>;
 pub struct RbacCacheAddSuccess {
     /// A Catalyst ID.
     pub catalyst_id: CatalystId,
-    /// A registration purpose.
-    pub purpose: UuidV4,
 }
 
 /// An error returned from the `RbacCache::add` method.
