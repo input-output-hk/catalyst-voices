@@ -23,7 +23,7 @@ const DESCRIPTION: &str = "A hex encoded binary data.";
 /// An example.
 const EXAMPLE: &str = "0x56CDD154355E078A0990F9E633F9553F7D43A68B2FF9BEF78B9F5C71C808A7C8";
 /// A validation regex pattern.
-const PATTERN: &str = "0x[A-Fa-f0-9]+";
+const PATTERN: &str = "0x[A-Fa-f0-9]+$";
 /// A format.
 const FORMAT: &str = "hex";
 
@@ -88,7 +88,7 @@ mod tests {
     fn test_hex_binary_data() {
         assert!(HexEncodedBinaryData::parse_from_parameter(EXAMPLE).is_ok());
 
-        let invalid = ["123", "0x", "0xqw"];
+        let invalid = ["123", "0x", "0xqw", "abcdefghijk"];
         for v in invalid {
             assert!(HexEncodedBinaryData::parse_from_parameter(v).is_err());
         }
