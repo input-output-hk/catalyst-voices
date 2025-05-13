@@ -55,7 +55,6 @@ final class Account extends Equatable {
   }) {
     return Account(
       catalystId: catalystId,
-      email: null,
       keychain: keychain,
       roles: const {
         AccountRole.voter,

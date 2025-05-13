@@ -76,17 +76,17 @@ void main() {
       expect(range1!.min, equals(10));
       expect(range1.max, equals(20));
 
-      final range2 = NumRange.optionalRangeOf<num>(min: null, max: 20);
+      final range2 = NumRange.optionalRangeOf<num>(max: 20);
       expect(range2, isNotNull);
       expect(range2!.min, isNull);
       expect(range2.max, equals(20));
 
-      final range3 = NumRange.optionalRangeOf<num>(min: 10, max: null);
+      final range3 = NumRange.optionalRangeOf<num>(min: 10);
       expect(range3, isNotNull);
       expect(range3!.min, equals(10));
       expect(range3.max, isNull);
 
-      final range4 = NumRange.optionalRangeOf<num>(min: null, max: null);
+      final range4 = NumRange.optionalRangeOf<num>();
       expect(range4, isNull);
     });
   });

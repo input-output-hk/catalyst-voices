@@ -34,7 +34,7 @@ class _ProposalBuilderLoading extends StatelessWidget {
         SizedBox(height: 12),
         _SectionHeaderPlaceholder(isOpen: true),
         SizedBox(height: 12),
-        _SectionPlaceholder(blocks: 1),
+        _SectionPlaceholder(),
         SizedBox(height: 12),
         _SectionPlaceholder(blocks: 3),
         SizedBox(height: 24),

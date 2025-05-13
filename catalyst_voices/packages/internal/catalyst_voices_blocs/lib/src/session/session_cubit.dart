@@ -172,16 +172,13 @@ final class SessionCubit extends Cubit<SessionState>
           overallSpaces: Space.values,
           spacesShortcuts: AccessControl.allSpacesShortcutsActivators,
           canCreateAccount: true,
-          settings: const SessionSettings.fallback(),
         );
       case SessionStatus.guest:
         return const SessionState.guest(
           canCreateAccount: true,
-          settings: SessionSettings.fallback(),
         );
       case SessionStatus.visitor:
         return const SessionState.visitor(
-          settings: SessionSettings.fallback(),
           isRegistrationInProgress: false,
           canCreateAccount: true,
         );
