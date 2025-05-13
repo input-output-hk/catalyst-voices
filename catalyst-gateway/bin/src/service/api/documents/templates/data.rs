@@ -32,7 +32,7 @@ impl From<CategoryDocData> for SignedDocData {
         Self {
             id: value.0,
             ver: value.0,
-            doc_type: catalyst_signed_doc::doc_types::CATEGORY_DOCUMENT_UUID_TYPE,
+            doc_type: catalyst_signed_doc::doc_types::PARAMETERS_DOCUMENT_UUID_TYPE,
             content: EMPTY_JSON_OBJECT_BYTES,
             category_id: None,
         }
