@@ -175,6 +175,15 @@ final class UpdateCommentsSortEvent extends ProposalBuilderEvent {
   List<Object?> get props => [sort];
 }
 
+final class UpdateUsernameEvent extends ProposalBuilderEvent {
+  final String value;
+
+  const UpdateUsernameEvent(this.value);
+
+  @override
+  List<Object?> get props => [value];
+}
+
 final class ValidateProposalEvent extends ProposalBuilderEvent {
   const ValidateProposalEvent();
 
