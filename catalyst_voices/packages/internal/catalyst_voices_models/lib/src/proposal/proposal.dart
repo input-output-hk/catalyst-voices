@@ -14,7 +14,7 @@ final class Proposal extends Equatable implements Comparable<Proposal> {
   final ProposalPublish publish;
   final List<ProposalVersion> versions;
   final int duration;
-  final String author;
+  final String? author;
   final int commentsCount;
   final String category;
   final SignedDocumentRef categoryId;
@@ -30,7 +30,7 @@ final class Proposal extends Equatable implements Comparable<Proposal> {
     required ProposalPublish publish,
     List<ProposalVersion> versions = const [],
     required int duration,
-    required String author,
+    required String? author,
     required int commentsCount,
     required String category,
     required SignedDocumentRef categoryId,
@@ -71,7 +71,7 @@ final class Proposal extends Equatable implements Comparable<Proposal> {
       status: ProposalStatus.inProgress,
       publish: data.publish,
       duration: document.duration ?? 0,
-      author: document.authorName ?? '',
+      author: document.authorName,
       commentsCount: data.commentsCount,
       categoryId: data.categoryId,
       category: data.categoryName,
@@ -144,7 +144,7 @@ final class Proposal extends Equatable implements Comparable<Proposal> {
     ProposalPublish? publish,
     int? commentsCount,
     int? duration,
-    String? author,
+    Optional<String>? author,
     List<ProposalVersion>? versions,
     String? category,
     SignedDocumentRef? categoryId,
@@ -159,7 +159,7 @@ final class Proposal extends Equatable implements Comparable<Proposal> {
         publish: publish ?? this.publish,
         commentsCount: commentsCount ?? this.commentsCount,
         duration: duration ?? this.duration,
-        author: author ?? this.author,
+        author: author.dataOr(this.author),
         versions: versions ?? this.versions,
         category: category ?? this.category,
         categoryId: categoryId ?? this.categoryId,
