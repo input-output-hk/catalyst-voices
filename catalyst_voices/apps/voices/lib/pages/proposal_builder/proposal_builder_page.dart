@@ -18,6 +18,7 @@ import 'package:catalyst_voices/widgets/modals/comment/submit_comment_error_dial
 import 'package:catalyst_voices/widgets/modals/proposals/proposal_limit_reached_dialog.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/publish_proposal_error_dialog.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/submit_proposal_error_dialog.dart';
+import 'package:catalyst_voices/widgets/modals/proposals/unlock_edit_proposal.dart';
 import 'package:catalyst_voices/widgets/snackbar/voices_snackbar.dart';
 import 'package:catalyst_voices/widgets/snackbar/voices_snackbar_action.dart';
 import 'package:catalyst_voices/widgets/snackbar/voices_snackbar_type.dart';
@@ -166,6 +167,8 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
         unawaited(_showEmailNotVerifiedDialog());
       case MaxProposalsLimitReachedSignal():
         unawaited(_showProposalLimitReachedDialog(signal));
+      case UnlockProposalSignal():
+        unawaited(_showUnlockProposalDialog(signal));
     }
   }
 
@@ -323,6 +326,28 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
       context: context,
       exception: error,
     );
+  }
+
+  Future<void> _showUnlockProposalDialog(
+    UnlockProposalSignal signal, {
+    ProposalBuilderBloc? bloc,
+  }) async {
+    bloc ??= context.read<ProposalBuilderBloc>();
+    final action = await UnlockEditProposalDialog.show(
+          context: context,
+          title: signal.title,
+          version: signal.version,
+        ) ??
+        false;
+
+    if (action && mounted) {
+      return bloc.add(const UnlockProposalBuilderEvent());
+    }
+    if (mounted) {
+      Router.neglect(context, () {
+        const WorkspaceRoute().replace(context);
+      });
+    }
   }
 
   void _showValidationErrorSnackbar(ProposalBuilderValidationException error) {
