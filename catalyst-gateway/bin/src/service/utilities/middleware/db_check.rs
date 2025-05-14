@@ -3,10 +3,7 @@
 use poem::{http::StatusCode, Endpoint, Middleware, Request, Result};
 use tracing::error;
 
-use crate::{
-    db::{event::EventDB, index::session::CassandraSession},
-    service::utilities::health::{set_event_db_liveness, set_index_db_liveness},
-};
+use crate::service::utilities::health::{event_db_is_live, index_db_is_live};
 
 /// Middleware type that returns a response with 503 status code
 /// if any DB stops responding before returning the wrapped endpoint.
@@ -30,16 +27,18 @@ impl<E: Endpoint> Endpoint for DatabaseConnectionImpl<E> {
     type Output = E::Output;
 
     async fn call(&self, req: Request) -> Result<Self::Output> {
+        let req_path = req.uri().path();
+
         // TODO: find a better way to filter URI paths
-        if !req.uri().path().starts_with("/health") {
-            if !EventDB::connection_is_ok() {
-                set_event_db_liveness(false);
-                error!("EventDB connection failed");
+        let is_health_endpoint = req_path.starts_with("/api/v1/health/");
+
+        if !is_health_endpoint {
+            if !event_db_is_live() {
+                error!(endpoint_path = %req_path, "Event DB is not live");
                 return Err(StatusCode::SERVICE_UNAVAILABLE.into());
             }
-            if !CassandraSession::is_ready() {
-                set_index_db_liveness(false);
-                error!("Index DB connection failed");
+            if !index_db_is_live() {
+                error!(endpoint_path = %req_path, "Index DB is not live");
                 return Err(StatusCode::SERVICE_UNAVAILABLE.into());
             }
         }

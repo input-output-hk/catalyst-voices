@@ -2,15 +2,16 @@
 use std::{io::Write, path::PathBuf, time::Duration};
 
 use clap::Parser;
-use tracing::{error, info};
+use tracing::{debug, error, info};
 
 use crate::{
     cardano::start_followers,
-    db::{self, index::session::CassandraSession},
+    db::{self, event::EventDB, index::session::CassandraSession},
     service::{
         self,
         utilities::health::{
-            condition_for_started, is_live, live_counter_reset, service_has_started, set_to_started,
+            condition_for_started, is_live, live_counter_reset, service_has_started,
+            set_event_db_liveness, set_to_started,
         },
     },
     settings::{ServiceSettings, Settings},
@@ -54,7 +55,15 @@ impl Cli {
                 // Start the DB's.
                 CassandraSession::init();
 
-                db::event::establish_connection();
+                // Initialize Event DB connection pool
+                db::event::establish_connection_pool().await;
+                // Test that connection is available
+                if EventDB::connection_is_ok().await {
+                    set_event_db_liveness(true);
+                    debug!("Event DB is connected. Liveness set to true");
+                } else {
+                    error!("Event DB connection failed");
+                }
 
                 // Start the chain indexing follower.
                 start_followers().await?;
