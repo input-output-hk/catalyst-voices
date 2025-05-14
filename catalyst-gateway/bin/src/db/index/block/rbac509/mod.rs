@@ -86,7 +86,7 @@ impl Rbac509InsertQuery {
         }
 
         let previous_transaction = cip509.previous_transaction();
-        match RBAC_CACHE.add(&cip509, block.is_immutable()) {
+        match RBAC_CACHE.add(cip509, block.is_immutable()) {
             Ok(RbacCacheAddSuccess { catalyst_id }) => {
                 self.registrations.push(insert_rbac509::Params::new(
                     catalyst_id.clone(),
