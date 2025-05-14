@@ -50,6 +50,8 @@ abstract class VoicesConstants {
       'https://mpc.projectcatalyst.io/newsletter-signup';
   static const unlockAccountUrl =
       'https://docs.projectcatalyst.io/catalyst-tools/catalyst-app/my-account#lock-unlock-account';
+  static const confirmSeedPhraseUrl =
+      'https://docs.projectcatalyst.io/catalyst-tools/catalyst-app/getting-started#confirm-seed-phrase';
 
   static String cardanoScanStakeAddressUrl(ShelleyAddress stakeAddress) {
     switch (stakeAddress.network) {
