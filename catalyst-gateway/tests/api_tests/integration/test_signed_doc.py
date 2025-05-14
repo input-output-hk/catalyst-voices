@@ -7,6 +7,7 @@ from typing import Dict, Any, List
 import copy
 from utils.rbac_chain import rbac_chain_factory, RoleID
 import cbor2
+import uuid
 
 
 class SignedDocument:
@@ -463,7 +464,7 @@ def test_submission_action(submission_action_factory, rbac_chain_factory):
             ), f"Publish document, expected 422 Unprocessable Content: {resp.status_code} - {resp.text}"
 
 
-@pytest.mark.skip
+@pytest.mark.preprod_indexing
 def test_invalid_signature(
     submission_action_factory,
     comment_doc_factory,
@@ -495,14 +496,13 @@ def test_invalid_signature(
         # modify document without changing signature
         doc_cbor = cbor2.loads(bytes.fromhex(valid_doc_hex)).value
         protected_headers = cbor2.loads(doc_cbor[0])
-        protected_headers["extra header field"] = "extra header field value"
+        protected_headers["ver"] = uuid.UUID(uuid_v7.uuid_v7())
         doc_cbor[0] = cbor2.dumps(protected_headers)
 
         resp = document.put(
             data=cbor2.dumps(doc_cbor).hex(),
             token=rbac_chain.auth_token(),
         )
-        # Should be fixed with this issue https://github.com/input-output-hk/catalyst-libs/issues/316
         assert (
             resp.status_code == 422
         ), f"Publish document, expected 422 Unprocessable Content: {resp.status_code} - {resp.text}"
