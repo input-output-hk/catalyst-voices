@@ -1,11 +1,11 @@
 import pytest
-from utils.rbac_chain import ONLY_ROLE_0_REG_JSON, rbac_chain_factory, RoleID
+from utils.rbac_chain import ONLY_ROLE_0_REG_JSON, rbac_chain_factory, RoleID, Chain
 from api.v1.rbac import get
 
 @pytest.mark.preprod_indexing
 def test_rbac_endpoints(rbac_chain_factory):
     
-    auth_token = rbac_chain_factory(RoleID.ROLE_0).auth_token()
+    auth_token = rbac_chain_factory(Chain.Role0).auth_token()
     
     # Registered stake address lookup
     stake_address = ONLY_ROLE_0_REG_JSON["0"][0]["stake_address"]
@@ -26,11 +26,11 @@ def test_rbac_endpoints(rbac_chain_factory):
     assert(resp.status_code == 412), f"Expected wrong format stake address: {resp.status_code} - {resp.text}"
     
     # Registered Catalyst ID lookup
-    cat_id = rbac_chain_factory(RoleID.ROLE_0).cat_id_for_role(RoleID.ROLE_0)[0]
+    cat_id = rbac_chain_factory(Chain.Role0).cat_id_for_role(RoleID.ROLE_0)[0]
     resp = get(lookup=cat_id, token=auth_token)
     assert(resp.status_code == 200), f"Expected registered cat id: {resp.status_code} - {resp.text}"
 
-    cat_id = rbac_chain_factory(RoleID.ROLE_0).short_cat_id()
+    cat_id = rbac_chain_factory(Chain.Role0).short_cat_id()
     resp = get(lookup=cat_id, token=auth_token)
     assert(resp.status_code == 200), f"Expected registered short cat id: {resp.status_code} - {resp.text}"
     
