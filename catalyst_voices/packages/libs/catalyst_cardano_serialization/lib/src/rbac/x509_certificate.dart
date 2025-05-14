@@ -558,7 +558,7 @@ class X509TBSCertificate with EquatableMixin {
     final sequence = object.asSequence;
     final string = sequence.elements[1] as ASN1BitString;
     final stringBytes = string.contentBytes();
-    return Ed25519PublicKey.tryFromBytes(stringBytes);
+    return Ed25519PublicKey.fromSimpleOrExtendedBytes(stringBytes);
   }
 
   static int _readVersion(ASN1Object object) {

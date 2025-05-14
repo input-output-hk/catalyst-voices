@@ -11,7 +11,7 @@ void main() {
       );
     });
 
-    test('tryFromBytes skips chain code', () {
+    test('fromSimpleOrExtendedBytes skips chain code', () {
       const extendedKeyHex = 'bcbf9d3b5b8ef3d6f65fa59ef4bb64e6e56bb3de354bc'
           '484fa74f2e19734fa2ef5e94d3e0b9968b8f464ad8b3f'
           'b24ab1fbda4cb0cdaa2960f8f3d07cc4ee3c7f';
@@ -22,7 +22,8 @@ void main() {
       final extendedKeyBytes = hex.decode(extendedKeyHex);
       final simpleKeyBytes = hex.decode(simpleKeyHex);
 
-      final publicKey = Ed25519PublicKey.tryFromBytes(extendedKeyBytes);
+      final publicKey =
+          Ed25519PublicKey.fromSimpleOrExtendedBytes(extendedKeyBytes);
       expect(publicKey.bytes, isNot(equals(extendedKeyBytes)));
       expect(publicKey.bytes, equals(simpleKeyBytes));
     });
