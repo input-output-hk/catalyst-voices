@@ -10,7 +10,6 @@ abstract interface class AuthTokenCache {
 final class LocalAuthTokenCache extends LocalTllCache
     implements AuthTokenCache {
   static const _maxTokenAge = Duration(hours: 1);
-  static const _expiryTolerance = Duration(minutes: 1);
 
   LocalAuthTokenCache({
     required super.sharedPreferences,
@@ -20,7 +19,7 @@ final class LocalAuthTokenCache extends LocalTllCache
 
   @override
   Future<String?> getRbac({required CatalystId id}) async {
-    if (await isAboutToExpire(key: id.asKey, tolerance: _expiryTolerance)) {
+    if (await isAboutToExpire(key: id.asKey)) {
       return null;
     }
     return get(key: id.asKey);
