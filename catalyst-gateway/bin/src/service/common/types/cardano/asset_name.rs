@@ -31,7 +31,7 @@ const MIN_LENGTH: usize = 0;
 const MAX_LENGTH: usize = ASSET_NAME_MAX_BYTES * 4;
 /// Validation Regex Pattern
 /// Can be anything
-const PATTERN: &str = concatcp!("^.{", "0,", MAX_LENGTH, "}$");
+const PATTERN: &str = concatcp!(r"^[\S\s]{", "0,", MAX_LENGTH, "}$");
 
 /// Schema.
 static SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| {
@@ -97,7 +97,12 @@ mod tests {
         let escape_octal = r"\nnn".repeat(32);
         // Test Data
         // <https://preprod.cardanoscan.io/tokens>
-        let valid = ["This_Is_A_Very_Long_String______", &escape_octal, "SPLASH"];
+        let valid = [
+            EXAMPLE,
+            "This_Is_A_Very_Long_String______",
+            &escape_octal,
+            "SPLASH",
+        ];
         for v in valid {
             assert!(AssetName::parse_from_parameter(v).is_ok());
         }
