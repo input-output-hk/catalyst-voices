@@ -10,7 +10,10 @@
 use poem::{http::StatusCode, Endpoint, EndpointExt, Middleware, Request, Result};
 use tracing::error;
 
-use crate::db::event::EventDB;
+use crate::{
+    db::event::{EventDB, EventDBConnectionError},
+    service::utilities::health::set_event_db_liveness,
+};
 
 /// A middleware that raises an error  with `ServiceUnavailable` and 503 status code
 /// if a DB schema version mismatch is found the existing `State`.
@@ -37,7 +40,12 @@ impl<E: Endpoint> Endpoint for SchemaVersionValidationImpl<E> {
         // Check if the inner schema version status is set to `Mismatch`,
         // if so, return the `StatusCode::SERVICE_UNAVAILABLE` code.
         if let Err(e) = EventDB::schema_version_check().await {
-            error!("Schema version check error: {e:?}");
+            if e.is::<EventDBConnectionError>() {
+                set_event_db_liveness(false);
+                error!("Event DB is disconnected. Liveness set to false");
+            } else {
+                error!("Schema version check error: {e:?}");
+            }
             return Err(StatusCode::SERVICE_UNAVAILABLE.into());
         }
         // Calls the endpoint with the request, and returns the response.
