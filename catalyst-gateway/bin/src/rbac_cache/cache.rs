@@ -46,7 +46,7 @@ impl RbacCache {
     /// In case of failure a problem report from the given registration is updated and
     /// returned.
     #[allow(clippy::result_large_err)]
-    pub fn add(&self, registration: &Cip509) -> AddResult {
+    pub fn add(&self, registration: Cip509) -> AddResult {
         match registration.previous_transaction() {
             Some(previous_txn) => self.update_chain(registration, previous_txn),
             None => self.start_new_chain(registration),
@@ -85,7 +85,7 @@ impl RbacCache {
     /// Applies the given registration to one of the existing chains.
     #[allow(clippy::result_large_err)]
     fn update_chain(
-        &self, registration: &Cip509, previous_txn: TransactionId,
+        &self, registration: Cip509, previous_txn: TransactionId,
     ) -> Result<RbacCacheAddSuccess, RbacCacheAddError> {
         let catalyst_id = registration.catalyst_id().cloned();
         let purpose = registration.purpose();
@@ -162,7 +162,7 @@ impl RbacCache {
     /// Starts a new Rbac registration chain.
     #[allow(clippy::result_large_err)]
     fn start_new_chain(
-        &self, registration: &Cip509,
+        &self, registration: Cip509,
     ) -> Result<RbacCacheAddSuccess, RbacCacheAddError> {
         let catalyst_id = registration.catalyst_id().cloned();
         let purpose = registration.purpose();
