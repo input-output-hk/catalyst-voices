@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 import base64
 import pytest
-from enum import IntEnum
+from enum import IntEnum, Enum
 import json
 from pycardano.crypto.bip32 import BIP32ED25519PrivateKey, BIP32ED25519PublicKey
 
@@ -9,6 +9,12 @@ with open("./test_data/rbac_regs/only_role_0.jsonc", "r") as f:
     ONLY_ROLE_0_REG_JSON = json.load(f)
 with open("./test_data/rbac_regs/role_3.jsonc", "r") as f:
     ROLE_3_REG_JSON = json.load(f)
+
+
+class Chain(Enum):
+    All = 0
+    Role0 = 1
+    Role0_With_Proposer = 2
 
 
 class RoleID(IntEnum):
@@ -26,7 +32,14 @@ class RBACChain:
         self.network = network
         self.subnet = subnet
 
-    def auth_token(self, cid: str = None, sig: str = None, username: str = None, is_uri: bool = False, nonce: str = None) -> str:
+    def auth_token(
+        self,
+        cid: str = None,
+        sig: str = None,
+        username: str = None,
+        is_uri: bool = False,
+        nonce: str = None,
+    ) -> str:
         role_0_arr = self.keys_map[f"{RoleID.ROLE_0}"]
         return generate_rbac_auth_token(
             self.network,
@@ -37,13 +50,13 @@ class RBACChain:
             sig,
             username,
             is_uri,
-            nonce
+            nonce,
         )
 
     # returns a role's catalyst id, with the provided role secret key
-    def cat_id_for_role(self, role_id: RoleID) -> (str, str):
+    def cat_id_for_role(self, role_id: RoleID) -> tuple[str, str]:
         role_data_arr = self.keys_map[f"{role_id}"]
-        role_0_arr= self.keys_map[f"{RoleID.ROLE_0}"]
+        role_0_arr = self.keys_map[f"{RoleID.ROLE_0}"]
         return (
             generate_cat_id(
                 network=self.network,
@@ -54,9 +67,9 @@ class RBACChain:
                 is_uri=True,
             ),
             role_data_arr[-1]["sk"],
-        )    
-    
-    def short_cat_id(self) -> str:        
+        )
+
+    def short_cat_id(self) -> str:
         return generate_cat_id(
             network=self.network,
             subnet=self.subnet,
@@ -64,18 +77,27 @@ class RBACChain:
             is_uri=False,
         )
 
+
 @pytest.fixture
 def rbac_chain_factory():
-    def __rbac_chain_factory(role_id: RoleID, network: str = "cardano", subnet: str = "preprod") -> RBACChain:
-        match role_id:
+    def __rbac_chain_factory(
+        chain: Chain = Chain.All,
+        network: str = "cardano",
+        subnet: str = "preprod",
+    ) -> RBACChain:
+        match chain:
             # RBAC registration chain that contains only Role 0 (voter)
-            case RoleID.ROLE_0:
+            case Chain.Role0:
                 return RBACChain(ONLY_ROLE_0_REG_JSON, network, subnet)
             # RBAC registration chain that contains both Role 0 -> Role 3 (proposer)
-            case RoleID.PROPOSER:
+            case Chain.Role0_With_Proposer:
+                return RBACChain(ROLE_3_REG_JSON, network, subnet)
+            # RBAC registration chain that contains all known roles
+            case Chain.All:
                 return RBACChain(ROLE_3_REG_JSON, network, subnet)
 
     return __rbac_chain_factory
+
 
 # Default is set to URI format
 # Optional field = subnet, role id, rotation, username, nonce
@@ -116,11 +138,12 @@ def generate_cat_id(
         path += f"/{role_id}"
         if rotation:
             path += f"/{rotation}"
-            
+
     if is_uri:
         return f"id.catalyst://{authority}/{path}"
     else:
         return f"{authority}/{path}"
+
 
 def generate_rbac_auth_token(
     network: str,
@@ -156,7 +179,7 @@ def generate_rbac_auth_token(
         bip32_ed25519_pk.verify(signature, cat_id.encode())
     else:
         signature = sig.encode()
-    
+
     signature_b64 = base64_url(signature)
 
     return f"{cat_id}{signature_b64}"
