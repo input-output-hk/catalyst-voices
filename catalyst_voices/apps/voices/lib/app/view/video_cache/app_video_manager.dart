@@ -88,7 +88,7 @@ class VideoManager extends ValueNotifier<VideoManagerState> {
     );
 
     await controller.initialize();
-    // TOOD(LynxLynxx): extract this to public method so intreseted widget can
+    // TODO(LynxLynxx): extract this to public method so interested widget can
     // control video playback
     await controller.setLooping(true);
     await controller.setVolume(0);
