@@ -24,9 +24,10 @@ class ProfileAvatar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final username = this.username;
+    final hasUsername = username != null && username.isNotEmpty;
 
     final child = switch (true) {
-      _ when username != null && username.isNotEmpty => _Username(
+      _ when hasUsername => _Username(
           username,
           style: textStyle,
           size: size,
@@ -39,7 +40,7 @@ class ProfileAvatar extends StatelessWidget {
       radius: size / 2,
       backgroundColor: backgroundColor,
       foregroundColor: foregroundColor,
-      padding: username != null ? const EdgeInsets.all(6) : EdgeInsets.zero,
+      padding: hasUsername ? const EdgeInsets.all(6) : EdgeInsets.zero,
       icon: child,
     );
   }
