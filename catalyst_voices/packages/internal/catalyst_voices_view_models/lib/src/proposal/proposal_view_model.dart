@@ -97,7 +97,7 @@ final class PendingProposal extends ProposalViewModel {
   final ProposalPublish publishStage;
   final int version;
   final int duration;
-  final String author;
+  final String? author;
 
   const PendingProposal({
     required super.ref,
@@ -195,7 +195,7 @@ and PRISM, but its potential is only barely exploited.
     ProposalPublish? publishStage,
     int? version,
     int? duration,
-    String? author,
+    Optional<String>? author,
   }) {
     return PendingProposal(
       ref: ref ?? this.ref,
@@ -210,7 +210,7 @@ and PRISM, but its potential is only barely exploited.
       publishStage: publishStage ?? this.publishStage,
       version: version ?? this.version,
       duration: duration ?? this.duration,
-      author: author ?? this.author,
+      author: author.dataOr(this.author),
     );
   }
 }

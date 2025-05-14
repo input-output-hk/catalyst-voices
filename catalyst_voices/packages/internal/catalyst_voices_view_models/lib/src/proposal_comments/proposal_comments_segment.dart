@@ -8,14 +8,21 @@ import 'package:flutter/material.dart';
 
 final class ProposalAddCommentSection extends ProposalCommentsSection {
   final DocumentSchema schema;
+  final bool showUsernameRequired;
 
   const ProposalAddCommentSection({
     required super.id,
     required this.schema,
+    required this.showUsernameRequired,
   });
 
   @override
-  List<Object?> get props => super.props + [schema];
+  List<Object?> get props =>
+      super.props +
+      [
+        schema,
+        showUsernameRequired,
+      ];
 
   @override
   String resolveTitle(BuildContext context) {
