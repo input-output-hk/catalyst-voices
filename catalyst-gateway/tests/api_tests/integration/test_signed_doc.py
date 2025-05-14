@@ -1,12 +1,13 @@
 import pytest
-from loguru import logger
 from utils import health, signed_doc, uuid_v7
 from api.v1 import document
 import os
 import json
 from typing import Dict, Any, List
 import copy
-from utils.rbac_chain import rbac_chain_factory, RoleID, RBACChain
+from utils.rbac_chain import rbac_chain_factory, RoleID
+import cbor2
+import uuid
 
 
 class SignedDocument:
@@ -70,11 +71,12 @@ def comment_templates() -> List[str]:
     ]
 
 
-# return a Proposal document which is already published to the cat-gateway
+# return a Proposal document which is already published to the cat-gateway and the corresponding RoleID
 @pytest.fixture
 def proposal_doc_factory(proposal_templates, rbac_chain_factory):
-    def __proposal_doc_factory() -> SignedDocument:
-        rbac_chain = rbac_chain_factory(RoleID.PROPOSER)
+    def __proposal_doc_factory() -> tuple[SignedDocument, RoleID]:
+        role_id = RoleID.PROPOSER
+        rbac_chain = rbac_chain_factory()
         proposal_doc_id = uuid_v7.uuid_v7()
         category_id = "0194d490-30bf-7473-81c8-a0eaef369619"
         proposal_metadata_json = {
@@ -99,7 +101,7 @@ def proposal_doc_factory(proposal_templates, rbac_chain_factory):
             proposal_json = json.load(proposal_json_file)
 
         doc = SignedDocument(proposal_metadata_json, proposal_json)
-        (cat_id, sk_hex) = rbac_chain.cat_id_for_role(RoleID.PROPOSER)
+        (cat_id, sk_hex) = rbac_chain.cat_id_for_role(role_id)
         resp = document.put(
             data=doc.build_and_sign(cat_id, sk_hex),
             token=rbac_chain.auth_token(),
@@ -108,19 +110,18 @@ def proposal_doc_factory(proposal_templates, rbac_chain_factory):
             resp.status_code == 201
         ), f"Failed to publish document: {resp.status_code} - {resp.text}"
 
-        return doc
+        return doc, role_id
 
     return __proposal_doc_factory
 
 
-# return a Comment document which is already published to the cat-gateway
+# return a Comment document which is already published to the cat-gateway, with the relevant RoleID
 @pytest.fixture
-def comment_doc_factory(
-    proposal_doc_factory, comment_templates, rbac_chain_factory
-) -> SignedDocument:
-    def __comment_doc_factory() -> SignedDocument:
-        rbac_chain = rbac_chain_factory(RoleID.ROLE_0)
-        proposal_doc = proposal_doc_factory()
+def comment_doc_factory(proposal_doc_factory, comment_templates, rbac_chain_factory):
+    def __comment_doc_factory() -> tuple[SignedDocument, RoleID]:
+        role_id = RoleID.ROLE_0
+        rbac_chain = rbac_chain_factory()
+        proposal_doc = proposal_doc_factory()[0]
         comment_doc_id = uuid_v7.uuid_v7()
         comment_metadata_json = {
             "id": comment_doc_id,
@@ -142,7 +143,7 @@ def comment_doc_factory(
             comment_json = json.load(comment_json_file)
 
         doc = SignedDocument(comment_metadata_json, comment_json)
-        (cat_id, sk_hex) = rbac_chain.cat_id_for_role(RoleID.ROLE_0)
+        (cat_id, sk_hex) = rbac_chain.cat_id_for_role(role_id)
         resp = document.put(
             data=doc.build_and_sign(cat_id, sk_hex),
             token=rbac_chain.auth_token(),
@@ -151,19 +152,18 @@ def comment_doc_factory(
             resp.status_code == 201
         ), f"Failed to publish document: {resp.status_code} - {resp.text}"
 
-        return doc
+        return doc, role_id
 
     return __comment_doc_factory
 
 
-# return a submission action document.
+# return a submission action document which is already published to the cat-gateway, with the relevant RoleID
 @pytest.fixture
-def submission_action_factory(
-    proposal_doc_factory, comment_templates, rbac_chain_factory
-) -> SignedDocument:
-    def __submission_action_factory() -> SignedDocument:
-        rbac_chain = rbac_chain_factory(RoleID.PROPOSER)
-        proposal_doc = proposal_doc_factory()
+def submission_action_factory(proposal_doc_factory, rbac_chain_factory):
+    def __submission_action_factory() -> tuple[SignedDocument, RoleID]:
+        role_id = RoleID.PROPOSER
+        rbac_chain = rbac_chain_factory()
+        proposal_doc = proposal_doc_factory()[0]
         submission_action_id = uuid_v7.uuid_v7()
         sub_action_metadata_json = {
             "id": submission_action_id,
@@ -183,7 +183,7 @@ def submission_action_factory(
             comment_json = json.load(comment_json_file)
 
         doc = SignedDocument(sub_action_metadata_json, comment_json)
-        (cat_id, sk_hex) = rbac_chain.cat_id_for_role(RoleID.PROPOSER)
+        (cat_id, sk_hex) = rbac_chain.cat_id_for_role(role_id)
         resp = document.put(
             data=doc.build_and_sign(cat_id, sk_hex),
             token=rbac_chain.auth_token(),
@@ -192,7 +192,7 @@ def submission_action_factory(
             resp.status_code == 201
         ), f"Failed to publish sub_action: {resp.status_code} - {resp.text}"
 
-        return doc
+        return doc, role_id
 
     return __submission_action_factory
 
@@ -208,9 +208,9 @@ def test_templates(proposal_templates, comment_templates):
 
 @pytest.mark.preprod_indexing
 def test_proposal_doc(proposal_doc_factory, rbac_chain_factory):
-    rbac_chain = rbac_chain_factory(RoleID.PROPOSER)
-    (cat_id, sk_hex) = rbac_chain.cat_id_for_role(RoleID.PROPOSER)
-    proposal_doc = proposal_doc_factory()
+    (proposal_doc, role_id) = proposal_doc_factory()
+    rbac_chain = rbac_chain_factory()
+    (cat_id, sk_hex) = rbac_chain.cat_id_for_role(role_id)
     proposal_doc_id = proposal_doc.metadata["id"]
 
     # Get the proposal document
@@ -291,14 +291,26 @@ def test_proposal_doc(proposal_doc_factory, rbac_chain_factory):
         resp.status_code == 422
     ), f"Publish document, expected 422 Unprocessable Content: {resp.status_code} - {resp.text}"
 
-    logger.info("Proposal document test successful.")
+    # Put a submission action document with the non allowed RoleID
+    for invalid_role in RoleID:
+        if invalid_role != role_id:
+            invalid_doc = proposal_doc.copy()
+            invalid_doc.metadata["ver"] = uuid_v7.uuid_v7()
+            (inv_cat_id, inv_sk_hex) = rbac_chain.cat_id_for_role(invalid_role)
+            resp = document.put(
+                data=invalid_doc.build_and_sign(inv_cat_id, inv_sk_hex),
+                token=rbac_chain.auth_token(),
+            )
+            assert (
+                resp.status_code == 422
+            ), f"Publish document, expected 422 Unprocessable Content: {resp.status_code} - {resp.text}"
 
 
 @pytest.mark.preprod_indexing
 def test_comment_doc(comment_doc_factory, rbac_chain_factory):
-    rbac_chain = rbac_chain_factory(RoleID.ROLE_0)
-    (cat_id, sk_hex) = rbac_chain.cat_id_for_role(RoleID.ROLE_0)
-    comment_doc = comment_doc_factory()
+    (comment_doc, role_id) = comment_doc_factory()
+    rbac_chain = rbac_chain_factory()
+    (cat_id, sk_hex) = rbac_chain.cat_id_for_role(role_id)
     comment_doc_id = comment_doc.metadata["id"]
 
     # Get the comment document
@@ -356,14 +368,26 @@ def test_comment_doc(comment_doc_factory, rbac_chain_factory):
         resp.status_code == 422
     ), f"Publish document, expected 422 Unprocessable Content: {resp.status_code} - {resp.text}"
 
-    logger.info("Comment document test successful.")
+    # Put a submission action document with the non allowed RoleID
+    for invalid_role in RoleID:
+        if invalid_role != role_id:
+            invalid_doc = comment_doc.copy()
+            invalid_doc.metadata["ver"] = uuid_v7.uuid_v7()
+            (inv_cat_id, inv_sk_hex) = rbac_chain.cat_id_for_role(invalid_role)
+            resp = document.put(
+                data=invalid_doc.build_and_sign(inv_cat_id, inv_sk_hex),
+                token=rbac_chain.auth_token(),
+            )
+            assert (
+                resp.status_code == 422
+            ), f"Publish document, expected 422 Unprocessable Content: {resp.status_code} - {resp.text}"
 
 
 @pytest.mark.preprod_indexing
 def test_submission_action(submission_action_factory, rbac_chain_factory):
-    rbac_chain = rbac_chain_factory(RoleID.PROPOSER)
-    (cat_id, sk_hex) = rbac_chain.cat_id_for_role(RoleID.PROPOSER)
-    submission_action = submission_action_factory()
+    (submission_action, role_id) = submission_action_factory()
+    rbac_chain = rbac_chain_factory()
+    (cat_id, sk_hex) = rbac_chain.cat_id_for_role(role_id)
     submission_action_id = submission_action.metadata["id"]
 
     # Get the submission action doc
@@ -425,76 +449,142 @@ def test_submission_action(submission_action_factory, rbac_chain_factory):
         resp.status_code == 422
     ), f"Publish document, expected 422 Unprocessable Content: {resp.status_code} - {resp.text}"
 
-    logger.info("Submission action document test successful.")
+    # Put a submission action document with the non allowed RoleID
+    for invalid_role in RoleID:
+        if invalid_role != role_id:
+            invalid_doc = submission_action.copy()
+            invalid_doc.metadata["ver"] = uuid_v7.uuid_v7()
+            (inv_cat_id, inv_sk_hex) = rbac_chain.cat_id_for_role(invalid_role)
+            resp = document.put(
+                data=invalid_doc.build_and_sign(inv_cat_id, inv_sk_hex),
+                token=rbac_chain.auth_token(),
+            )
+            assert (
+                resp.status_code == 422
+            ), f"Publish document, expected 422 Unprocessable Content: {resp.status_code} - {resp.text}"
 
 
 @pytest.mark.preprod_indexing
-def test_document_index_endpoint(proposal_doc_factory, rbac_chain_factory):
-    rbac_chain = rbac_chain_factory(RoleID.PROPOSER)
-    (cat_id, sk_hex) = rbac_chain.cat_id_for_role(RoleID.PROPOSER)
-    # submiting 10 proposal documents
-    total_amount = 10
-    first_proposal = proposal_doc_factory()
-    for _ in range(total_amount - 1):
-        doc = first_proposal.copy()
-        # keep the same id, but different version
+def test_invalid_signature(
+    submission_action_factory,
+    comment_doc_factory,
+    proposal_doc_factory,
+    rbac_chain_factory,
+):
+    for doc, role_id in [
+        submission_action_factory(),
+        comment_doc_factory(),
+        proposal_doc_factory(),
+    ]:
+        rbac_chain = rbac_chain_factory()
+        (cat_id, sk_hex) = rbac_chain.cat_id_for_role(role_id)
         doc.metadata["ver"] = uuid_v7.uuid_v7()
+        valid_doc_hex = doc.build_and_sign(cat_id, sk_hex)
+
+        # corrupt signature
+        doc_cbor = cbor2.loads(bytes.fromhex(valid_doc_hex)).value
+        doc_cbor[3][0][2] = doc_cbor[3][0][2] + b"extra bytes"
+
         resp = document.put(
-            data=doc.build_and_sign(cat_id, sk_hex),
+            data=cbor2.dumps(doc_cbor).hex(),
             token=rbac_chain.auth_token(),
         )
         assert (
-            resp.status_code == 201
-        ), f"Failed to publish document: {resp.status_code} - {resp.text}"
+            resp.status_code == 422
+        ), f"Publish document, expected 422 Unprocessable Content: {resp.status_code} - {resp.text}"
 
-    limit = 1
-    page = 0
-    filter = {"id": {"eq": first_proposal.metadata["id"]}}
-    resp = document.post(
-        f"/index?limit={limit}&page={page}",
-        filter=filter,
-    )
-    assert (
-        resp.status_code == 200
-    ), f"Failed to post document: {resp.status_code} - {resp.text}"
+        # modify document without changing signature
+        doc_cbor = cbor2.loads(bytes.fromhex(valid_doc_hex)).value
+        protected_headers = cbor2.loads(doc_cbor[0])
+        protected_headers["ver"] = uuid.UUID(uuid_v7.uuid_v7())
+        doc_cbor[0] = cbor2.dumps(protected_headers)
 
-    data = resp.json()
-    assert data["page"]["limit"] == limit
-    assert data["page"]["page"] == page
-    assert data["page"]["remaining"] == total_amount - 1 - page
+        resp = document.put(
+            data=cbor2.dumps(doc_cbor).hex(),
+            token=rbac_chain.auth_token(),
+        )
+        assert (
+            resp.status_code == 422
+        ), f"Publish document, expected 422 Unprocessable Content: {resp.status_code} - {resp.text}"
 
-    page += 1
-    resp = document.post(
-        f"/index?limit={limit}&page={page}",
-        filter=filter,
-    )
-    assert (
-        resp.status_code == 200
-    ), f"Failed to post document: {resp.status_code} - {resp.text}"
-    data = resp.json()
-    assert data["page"]["limit"] == limit
-    assert data["page"]["page"] == page
-    assert data["page"]["remaining"] == total_amount - 1 - page
 
-    resp = document.post(
-        f"/index?limit={total_amount}",
-        filter=filter,
-    )
-    assert (
-        resp.status_code == 200
-    ), f"Failed to post document: {resp.status_code} - {resp.text}"
-    data = resp.json()
-    assert data["page"]["limit"] == total_amount
-    assert data["page"]["page"] == 0  # default value
-    assert data["page"]["remaining"] == 0
+@pytest.mark.preprod_indexing
+def test_document_index_endpoint(
+    submission_action_factory,
+    comment_doc_factory,
+    proposal_doc_factory,
+    rbac_chain_factory,
+):
+    for doc_factory in [
+        submission_action_factory,
+        comment_doc_factory,
+        proposal_doc_factory,
+    ]:
+        (doc, role_id) = doc_factory()
 
-    # Pagination out of range
-    resp = document.post(
-        "/index?page=92233720368547759",
-        filter={},
-    )
-    assert (
-        resp.status_code == 412
-    ), f"Post document, expected 412 Precondition Failed: {resp.status_code} - {resp.text}"
+        rbac_chain = rbac_chain_factory()
+        (cat_id, sk_hex) = rbac_chain.cat_id_for_role(role_id)
+        # submiting 10 documents
+        total_amount = 10
 
-    logger.info("Document POST /index endpoint test successful.")
+        for _ in range(total_amount - 1):
+            doc = doc.copy()
+            # keep the same id, but different version
+            doc.metadata["ver"] = uuid_v7.uuid_v7()
+            resp = document.put(
+                data=doc.build_and_sign(cat_id, sk_hex),
+                token=rbac_chain.auth_token(),
+            )
+            assert (
+                resp.status_code == 201
+            ), f"Failed to publish document: {resp.status_code} - {resp.text}"
+
+        limit = 1
+        page = 0
+        filter = {"id": {"eq": doc.metadata["id"]}}
+        resp = document.post(
+            f"/index?limit={limit}&page={page}",
+            filter=filter,
+        )
+        assert (
+            resp.status_code == 200
+        ), f"Failed to post document: {resp.status_code} - {resp.text}"
+
+        data = resp.json()
+        assert data["page"]["limit"] == limit
+        assert data["page"]["page"] == page
+        assert data["page"]["remaining"] == total_amount - 1 - page
+
+        page += 1
+        resp = document.post(
+            f"/index?limit={limit}&page={page}",
+            filter=filter,
+        )
+        assert (
+            resp.status_code == 200
+        ), f"Failed to post document: {resp.status_code} - {resp.text}"
+        data = resp.json()
+        assert data["page"]["limit"] == limit
+        assert data["page"]["page"] == page
+        assert data["page"]["remaining"] == total_amount - 1 - page
+
+        resp = document.post(
+            f"/index?limit={total_amount}",
+            filter=filter,
+        )
+        assert (
+            resp.status_code == 200
+        ), f"Failed to post document: {resp.status_code} - {resp.text}"
+        data = resp.json()
+        assert data["page"]["limit"] == total_amount
+        assert data["page"]["page"] == 0  # default value
+        assert data["page"]["remaining"] == 0
+
+        # Pagination out of range
+        resp = document.post(
+            "/index?page=92233720368547759",
+            filter={},
+        )
+        assert (
+            resp.status_code == 412
+        ), f"Post document, expected 412 Precondition Failed: {resp.status_code} - {resp.text}"
