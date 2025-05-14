@@ -3,7 +3,8 @@ import 'dart:typed_data';
 
 import 'package:asn1lib/asn1lib.dart';
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
-import 'package:catalyst_key_derivation/catalyst_key_derivation.dart' hide Ed25519PublicKey;
+import 'package:catalyst_key_derivation/catalyst_key_derivation.dart'
+    hide Ed25519PublicKey;
 import 'package:equatable/equatable.dart';
 
 bool _registeredASN1Names = false;
