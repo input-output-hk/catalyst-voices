@@ -487,7 +487,7 @@
                     "$ref": "#/definitions/section",
                     "title": "Project Open Source",
                     "description": "Will your project's output be fully open source? Open source refers to something people can modify and share because its design is publicly accessible.",
-                    "x-guidance": "[Open source](https://docs.projectcatalyst.io/current-fund/proposal-submission/additional-guidance) refers to something people can modify and share because its design is publicly accessible. Open source software is software with source code that anyone can inspect, modify, and enhance. Conversely, only the original authors of proprietary software can legally copy, inspect, and alter that software..",
+                    "x-guidance": "[Open source](https://docs.projectcatalyst.io/current-fund/proposal-submission/additional-guidance) refers to something people can modify and share because its design is publicly accessible. Open source software is software with source code that anyone can inspect, modify, and enhance. Conversely, only the original authors of proprietary software can legally copy, inspect, and alter that software.",
                     "properties": {
                         "isOpenSource": {
                             "$ref": "#/definitions/yesNoChoice",
