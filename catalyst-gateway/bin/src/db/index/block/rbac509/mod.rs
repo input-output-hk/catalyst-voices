@@ -172,7 +172,7 @@ mod tests {
             .parse()
             .unwrap();
         query.index(txn_hash, 0.into(), &block);
-        assert!(query.invalid.is_empty());
         assert!(query.registrations.is_empty());
+        assert_eq!(1, query.invalid.len());
     }
 }
