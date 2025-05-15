@@ -81,8 +81,7 @@ final class DocumentSchemaDto {
           final schemaObject = properties[r'$schema'];
 
           // 4.
-          if (schemaObject is Map<String, dynamic> &&
-              schemaObject.containsKey('const')) {
+          if (schemaObject is Map<String, dynamic> && schemaObject.containsKey('const')) {
             adapted['propertiesSchema'] = schemaObject['const'];
           }
         }

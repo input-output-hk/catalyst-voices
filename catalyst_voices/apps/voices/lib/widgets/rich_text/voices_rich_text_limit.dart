@@ -33,17 +33,13 @@ class VoicesRichTextLimit extends StatelessWidget {
             child: Text(
               error,
               style: theme.textTheme.bodySmall!.copyWith(
-                color: enabled
-                    ? theme.colorScheme.error
-                    : theme.colors.textDisabled,
+                color: enabled ? theme.colorScheme.error : theme.colors.textDisabled,
               ),
             ),
           ),
           StreamBuilder(
             initialData: controller.markdownData.data.length,
-            stream: controller.changes
-                .map((e) => controller.markdownData.data.length)
-                .distinct(),
+            stream: controller.changes.map((e) => controller.markdownData.data.length).distinct(),
             builder: (context, snapshot) {
               final data = snapshot.data;
               return Text(

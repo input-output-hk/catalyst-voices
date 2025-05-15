@@ -31,10 +31,7 @@ final class SignedDocumentManagerImpl implements SignedDocumentManager {
       coseSign: coseSign,
       payload: payload,
       metadata: metadata,
-      signers: coseSign.signatures
-          .map((e) => e.decodeCatalystId())
-          .nonNulls
-          .toList(),
+      signers: coseSign.signatures.map((e) => e.decodeCatalystId()).nonNulls.toList(),
     );
   }
 
@@ -241,31 +238,19 @@ extension _SignedDocumentMetadataExt on SignedDocumentMetadata {
       contentType: _SignedDocumentContentTypeExt.fromCose(
         protectedHeaders.contentType,
       ),
-      documentType:
-          type == null ? DocumentType.unknown : DocumentType.fromJson(type),
+      documentType: type == null ? DocumentType.unknown : DocumentType.fromJson(type),
       id: protectedHeaders.id?.value,
       ver: protectedHeaders.ver?.value,
       ref: ref == null ? null : _SignedDocumentMetadataRefExt.fromCose(ref),
-      refHash: refHash == null
-          ? null
-          : _SignedDocumentMetadataRefHashExt.fromCose(refHash),
-      template: template == null
-          ? null
-          : _SignedDocumentMetadataRefExt.fromCose(template),
-      reply:
-          reply == null ? null : _SignedDocumentMetadataRefExt.fromCose(reply),
+      refHash: refHash == null ? null : _SignedDocumentMetadataRefHashExt.fromCose(refHash),
+      template: template == null ? null : _SignedDocumentMetadataRefExt.fromCose(template),
+      reply: reply == null ? null : _SignedDocumentMetadataRefExt.fromCose(reply),
       section: protectedHeaders.section,
       collabs: protectedHeaders.collabs,
-      brandId: brandId == null
-          ? null
-          : _SignedDocumentMetadataRefExt.fromCose(brandId),
-      campaignId: campaignId == null
-          ? null
-          : _SignedDocumentMetadataRefExt.fromCose(campaignId),
+      brandId: brandId == null ? null : _SignedDocumentMetadataRefExt.fromCose(brandId),
+      campaignId: campaignId == null ? null : _SignedDocumentMetadataRefExt.fromCose(campaignId),
       electionId: protectedHeaders.electionId,
-      categoryId: categoryId == null
-          ? null
-          : _SignedDocumentMetadataRefExt.fromCose(categoryId),
+      categoryId: categoryId == null ? null : _SignedDocumentMetadataRefExt.fromCose(categoryId),
     );
   }
 }

@@ -143,8 +143,7 @@ final class DocumentLanguageCodeSchema extends DocumentStringSchema {
   }
 }
 
-final class DocumentMultiLineTextEntryMarkdownSchema
-    extends DocumentStringSchema {
+final class DocumentMultiLineTextEntryMarkdownSchema extends DocumentStringSchema {
   const DocumentMultiLineTextEntryMarkdownSchema({
     required super.nodeId,
     required super.format,
@@ -394,8 +393,7 @@ sealed class DocumentStringSchema extends DocumentValueSchema<String> {
 
   @override
   @mustCallSuper
-  List<Object?> get props =>
-      super.props + [contentMediaType, strLengthRange, pattern];
+  List<Object?> get props => super.props + [contentMediaType, strLengthRange, pattern];
 
   @override
   DocumentStringSchema copyWith({DocumentNodeId? nodeId, String? title});

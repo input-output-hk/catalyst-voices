@@ -99,8 +99,7 @@ class _Message extends StatelessWidget {
     return Text(
       context.l10n.notFoundMessage,
       textAlign: TextAlign.center,
-      style: theme.textTheme.bodyLarge
-          ?.copyWith(color: theme.colors.textOnPrimaryLevel1),
+      style: theme.textTheme.bodyLarge?.copyWith(color: theme.colors.textOnPrimaryLevel1),
     );
   }
 }
@@ -114,8 +113,7 @@ class _Title extends StatelessWidget {
     return Text(
       context.l10n.notFoundTitle,
       textAlign: TextAlign.center,
-      style: theme.textTheme.headlineLarge
-          ?.copyWith(color: theme.colorScheme.primary),
+      style: theme.textTheme.headlineLarge?.copyWith(color: theme.colorScheme.primary),
     );
   }
 }

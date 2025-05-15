@@ -12,8 +12,7 @@ void main() {
     final publicKey = Ed25519PublicKey.seeded(0);
 
     setUpAll(() {
-      Bip32Ed25519XPublicKeyFactory.instance =
-          _FakeBip32Ed25519XPublicKeyFactory();
+      Bip32Ed25519XPublicKeyFactory.instance = _FakeBip32Ed25519XPublicKeyFactory();
     });
 
     /* cSpell:disable */
@@ -70,8 +69,7 @@ void main() {
   });
 }
 
-class _FakeBip32Ed25519XPrivateKey extends Fake
-    implements Bip32Ed25519XPrivateKey {
+class _FakeBip32Ed25519XPrivateKey extends Fake implements Bip32Ed25519XPrivateKey {
   final Bip32Ed25519XSignature signature;
 
   _FakeBip32Ed25519XPrivateKey({required this.signature});
@@ -82,8 +80,7 @@ class _FakeBip32Ed25519XPrivateKey extends Fake
   }
 }
 
-class _FakeBip32Ed25519XPublicKey extends Fake
-    implements Bip32Ed25519XPublicKey {
+class _FakeBip32Ed25519XPublicKey extends Fake implements Bip32Ed25519XPublicKey {
   @override
   List<int> get bytes => [1, 2, 3];
 
@@ -97,16 +94,14 @@ class _FakeBip32Ed25519XPublicKey extends Fake
   }
 }
 
-class _FakeBip32Ed25519XPublicKeyFactory extends Fake
-    implements Bip32Ed25519XPublicKeyFactory {
+class _FakeBip32Ed25519XPublicKeyFactory extends Fake implements Bip32Ed25519XPublicKeyFactory {
   @override
   Bip32Ed25519XPublicKey fromBytes(List<int> bytes) {
     return _FakeBip32Ed25519XPublicKey();
   }
 }
 
-class _FakeBip32Ed25519XSignature extends Fake
-    implements Bip32Ed25519XSignature {
+class _FakeBip32Ed25519XSignature extends Fake implements Bip32Ed25519XSignature {
   @override
   List<int> get bytes => [4, 5, 6];
 }

@@ -58,9 +58,7 @@ class RegistrationInfoPanel extends StatelessWidget with LaunchUrlMixin {
   }) {
     _HeaderStrings buildKeychainStageHeader(CreateKeychainStage stage) {
       return switch (stage) {
-        CreateKeychainStage.splash ||
-        CreateKeychainStage.instructions =>
-          _HeaderStrings(
+        CreateKeychainStage.splash || CreateKeychainStage.instructions => _HeaderStrings(
             title: context.l10n.catalystKeychain,
           ),
         CreateKeychainStage.seedPhrase => _HeaderStrings(
@@ -98,9 +96,7 @@ class RegistrationInfoPanel extends StatelessWidget with LaunchUrlMixin {
             title: context.l10n.walletLinkHeader,
             subtitle: context.l10n.walletLinkWalletSubheader,
           ),
-        WalletLinkStage.rolesChooser ||
-        WalletLinkStage.rolesSummary =>
-          _HeaderStrings(
+        WalletLinkStage.rolesChooser || WalletLinkStage.rolesSummary => _HeaderStrings(
             title: context.l10n.walletLinkHeader,
             subtitle: context.l10n.walletLinkRolesSubheader,
           ),
@@ -139,18 +135,14 @@ class RegistrationInfoPanel extends StatelessWidget with LaunchUrlMixin {
       CreateBaseProfileStep() => VoicesConstants.setupBaseProfileUrl,
       CreateKeychainStep() => VoicesConstants.createCatalystKeychainUrl,
       WalletLinkStep(:final stage) => switch (stage) {
-          WalletLinkStage.selectWallet =>
-            VoicesConstants.officiallySupportedWalletsUrl,
+          WalletLinkStage.selectWallet => VoicesConstants.officiallySupportedWalletsUrl,
           WalletLinkStage.rolesChooser ||
           WalletLinkStage.rolesSummary =>
             VoicesConstants.selectRolesUrl,
-          WalletLinkStage.rbacTransaction =>
-            VoicesConstants.submitRegistrationTransactionUrl,
+          WalletLinkStage.rbacTransaction => VoicesConstants.submitRegistrationTransactionUrl,
           _ => VoicesConstants.linkCardanoWalletUrl,
         },
-      RecoverWithSeedPhraseStep() ||
-      RecoverMethodStep() =>
-        VoicesConstants.restoreKeychainUrl,
+      RecoverWithSeedPhraseStep() || RecoverMethodStep() => VoicesConstants.restoreKeychainUrl,
       _ => VoicesConstants.getStartedUrl,
     };
     if (url.isNotEmpty) {
@@ -225,15 +217,12 @@ class _RegistrationPicture extends StatelessWidget {
   Widget build(BuildContext context) {
     Widget buildKeychainStagePicture(CreateKeychainStage stage) {
       return switch (stage) {
-        CreateKeychainStage.splash ||
-        CreateKeychainStage.instructions =>
-          const KeychainPicture(),
+        CreateKeychainStage.splash || CreateKeychainStage.instructions => const KeychainPicture(),
         CreateKeychainStage.seedPhrase => const SeedPhrasePicture(),
         CreateKeychainStage.checkSeedPhraseInstructions ||
         CreateKeychainStage.checkSeedPhrase =>
           const SeedPhrasePicture(indicateSelection: true),
-        CreateKeychainStage.checkSeedPhraseResult =>
-          const _BlocSeedPhraseResultPicture(),
+        CreateKeychainStage.checkSeedPhraseResult => const _BlocSeedPhraseResultPicture(),
         CreateKeychainStage.unlockPasswordInstructions ||
         CreateKeychainStage.unlockPasswordCreate =>
           const _BlocCreationPasswordPicture(),
@@ -260,8 +249,7 @@ class _RegistrationPicture extends StatelessWidget {
         RecoverWithSeedPhraseStage.unlockPasswordInstructions ||
         RecoverWithSeedPhraseStage.unlockPassword =>
           const _BlocRecoveryPasswordPicture(),
-        RecoverWithSeedPhraseStage.success =>
-          const KeychainWithPasswordPicture(),
+        RecoverWithSeedPhraseStage.success => const KeychainWithPasswordPicture(),
       };
     }
 
@@ -284,8 +272,7 @@ class _RegistrationPicture extends StatelessWidget {
       RecoverWithSeedPhraseStep(:final stage) => buildRecoverSeedPhrase(stage),
       CreateBaseProfileStep() => const BaseProfilePicture(),
       CreateKeychainStep(:final stage) => buildKeychainStagePicture(stage),
-      AccountCreateProgressStep(:final completedSteps) =>
-        buildRegistrationProgress(completedSteps),
+      AccountCreateProgressStep(:final completedSteps) => buildRegistrationProgress(completedSteps),
       WalletLinkStep(:final stage) => buildWalletLinkStagePicture(stage),
       AccountCompletedStep() => const AccountCompletedPicture(),
     };

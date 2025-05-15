@@ -25,16 +25,11 @@ final class AccessControl {
   ];
 
   static final Map<Space, LogicalKeySet> allSpacesShortcutsActivators = {
-    Space.discovery:
-        LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.digit1),
-    Space.workspace:
-        LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.digit2),
-    Space.voting:
-        LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.digit3),
-    Space.fundedProjects:
-        LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.digit4),
-    Space.treasury:
-        LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.keyT),
+    Space.discovery: LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.digit1),
+    Space.workspace: LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.digit2),
+    Space.voting: LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.digit3),
+    Space.fundedProjects: LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.digit4),
+    Space.treasury: LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.keyT),
   };
 
   static const List<Space> defaultAvailableSpaces = [
@@ -85,8 +80,7 @@ final class AccessControl {
   }
 
   static bool _hasProposerOrDrepRole(Account account) {
-    return account.roles
-        .any((role) => [AccountRole.proposer, AccountRole.drep].contains(role));
+    return account.roles.any((role) => [AccountRole.proposer, AccountRole.drep].contains(role));
   }
 }
 
