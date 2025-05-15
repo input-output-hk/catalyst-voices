@@ -8,6 +8,7 @@ from api.v1 import cardano
 
 @pytest.mark.preprod_indexing
 def test_persistent_ada_amount_endpoint():
+    # could the file from https://github.com/input-output-hk/catalyst-storage/blob/main/cardano-asset-preprod.json
     ASSETS_DATA_PATH = os.environ["ASSETS_DATA_PATH"]
 
     test_data: dict[str, any] = {}
