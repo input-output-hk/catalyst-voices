@@ -35,7 +35,7 @@ def test_persistent_ada_amount_endpoint():
         assets = resp.json()
 
         # check ada amount
-        received_ada = assets["volatile"]["ada_amount"]
+        received_ada = assets["persistent"]["ada_amount"]
         expected_ada = entry["ada_amount"]
 
         assert received_ada == expected_ada, logger.error(
@@ -44,7 +44,8 @@ def test_persistent_ada_amount_endpoint():
 
         # check assets
         received_assets = {
-            item["policy_hash"]: item["amount"] for item in assets["volatile"]["assets"]
+            item["policy_hash"]: item["amount"]
+            for item in assets["persistent"]["assets"]
         }
         expected_assets = entry["native_tokens"]
 
