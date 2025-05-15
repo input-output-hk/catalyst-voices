@@ -55,7 +55,7 @@ pub(crate) async fn index_block(block: &MultiEraBlock) -> anyhow::Result<()> {
         txo_index.index(block.network(), &txn, slot_no, txn_id, index);
 
         // Index RBAC 509 inside the transaction.
-        rbac509_index.index(&session, txn_id, index, block).await;
+        rbac509_index.index(txn_id, index, block);
     }
 
     // We then execute each batch of data from the block.

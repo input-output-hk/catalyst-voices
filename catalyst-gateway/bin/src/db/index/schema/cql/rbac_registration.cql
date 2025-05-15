@@ -8,7 +8,6 @@ CREATE TABLE IF NOT EXISTS rbac_registration (
     slot_no             varint,         -- slot number of the txn_id. (u64)
     txn_index           smallint,       -- Index of the TX which holds the registration data. (i16)
     prv_txn_id          blob,           -- 32 Bytes from Previous Transaction Hash.
-    purpose             uuid,           -- 16 Bytes of UUIDv4 Purpose.
 
     PRIMARY KEY (catalyst_id, txn_id)
 )

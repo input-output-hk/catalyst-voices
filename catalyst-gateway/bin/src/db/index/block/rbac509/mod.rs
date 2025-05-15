@@ -1,19 +1,12 @@
 //! Index Role-Based Access Control (RBAC) Registration.
 
-pub(crate) mod insert_catalyst_id_for_stake_address;
-pub(crate) mod insert_catalyst_id_for_txn_id;
 pub(crate) mod insert_rbac509;
 pub(crate) mod insert_rbac509_invalid;
 
 use std::sync::Arc;
 
-use anyhow::{bail, Context};
-use cardano_blockchain_types::{
-    Cip0134Uri, MultiEraBlock, Slot, StakeAddress, TransactionId, TxnIndex,
-};
-use catalyst_types::catalyst_id::CatalystId;
-use pallas::ledger::addresses::Address;
-use rbac_registration::cardano::cip509::{Cip509, Cip509RbacMetadata};
+use cardano_blockchain_types::{MultiEraBlock, TransactionId, TxnIndex};
+use rbac_registration::cardano::cip509::Cip509;
 use scylla::Session;
 use tracing::{debug, error};
 
@@ -22,6 +15,7 @@ use crate::{
         queries::{FallibleQueryTasks, PreparedQuery, SizedBatch},
         session::CassandraSession,
     },
+    rbac_cache::{RbacCacheAddError, RbacCacheAddSuccess, RBAC_CACHE},
     settings::cassandra_db::EnvVars,
 };
 
@@ -32,10 +26,6 @@ pub(crate) struct Rbac509InsertQuery {
     pub(crate) registrations: Vec<insert_rbac509::Params>,
     /// An invalid RBAC registration data.
     pub(crate) invalid: Vec<insert_rbac509_invalid::Params>,
-    /// A Catalyst ID for transaction ID Data captured during indexing.
-    pub(crate) catalyst_id_for_txn_id: Vec<insert_catalyst_id_for_txn_id::Params>,
-    /// A Catalyst ID for stake address data captured during indexing.
-    pub(crate) catalyst_id_for_stake_address: Vec<insert_catalyst_id_for_stake_address::Params>,
 }
 
 impl Rbac509InsertQuery {
@@ -44,27 +34,22 @@ impl Rbac509InsertQuery {
         Rbac509InsertQuery {
             registrations: Vec::new(),
             invalid: Vec::new(),
-            catalyst_id_for_txn_id: Vec::new(),
-            catalyst_id_for_stake_address: Vec::new(),
         }
     }
 
     /// Prepare Batch of Insert RBAC 509 Registration Data Queries
     pub(crate) async fn prepare_batch(
         session: &Arc<Session>, cfg: &EnvVars,
-    ) -> anyhow::Result<(SizedBatch, SizedBatch, SizedBatch, SizedBatch)> {
+    ) -> anyhow::Result<(SizedBatch, SizedBatch)> {
         Ok((
             insert_rbac509::Params::prepare_batch(session, cfg).await?,
             insert_rbac509_invalid::Params::prepare_batch(session, cfg).await?,
-            insert_catalyst_id_for_txn_id::Params::prepare_batch(session, cfg).await?,
-            insert_catalyst_id_for_stake_address::Params::prepare_batch(session, cfg).await?,
         ))
     }
 
     /// Index the RBAC 509 registrations in a transaction.
-    pub(crate) async fn index(
-        &mut self, session: &Arc<CassandraSession>, txn_hash: TransactionId, index: TxnIndex,
-        block: &MultiEraBlock,
+    pub(crate) fn index(
+        &mut self, txn_hash: TransactionId, index: TxnIndex, block: &MultiEraBlock,
     ) {
         let slot = block.slot();
         let cip509 = match Cip509::new(block, index, &[]) {
@@ -100,51 +85,22 @@ impl Rbac509InsertQuery {
             );
         }
 
-        let catalyst_id = match catalyst_id(
-            session,
-            &cip509,
-            txn_hash,
-            slot,
-            index,
-            block.is_immutable(),
-        )
-        .await
-        {
-            Ok(v) => v,
-            Err(e) => {
-                debug!("Unable to determine Catalyst id for registration: slot = {slot:?}, index = {index:?}, txn_hash = {txn_hash:?}: {e:?}");
-                return;
-            },
-        };
-
         let previous_transaction = cip509.previous_transaction();
-        let purpose = cip509.purpose();
-        match cip509.consume() {
-            Ok((purpose, metadata, _)) => {
+        match RBAC_CACHE.add(cip509, block.is_immutable()) {
+            Ok(RbacCacheAddSuccess { catalyst_id }) => {
                 self.registrations.push(insert_rbac509::Params::new(
                     catalyst_id.clone(),
                     txn_hash,
                     slot,
                     index,
-                    purpose,
                     previous_transaction,
                 ));
-                self.catalyst_id_for_txn_id
-                    .push(insert_catalyst_id_for_txn_id::Params::new(
-                        catalyst_id.clone(),
-                        txn_hash,
-                    ));
-                for address in stake_addresses(&metadata) {
-                    self.catalyst_id_for_stake_address.push(
-                        insert_catalyst_id_for_stake_address::Params::new(
-                            address,
-                            slot,
-                            catalyst_id.clone(),
-                        ),
-                    );
-                }
             },
-            Err(report) => {
+            Err(RbacCacheAddError::InvalidRegistration {
+                catalyst_id,
+                purpose,
+                report,
+            }) => {
                 self.invalid.push(insert_rbac509_invalid::Params::new(
                     catalyst_id,
                     txn_hash,
@@ -154,6 +110,9 @@ impl Rbac509InsertQuery {
                     previous_transaction,
                     &report,
                 ));
+            },
+            Err(RbacCacheAddError::UnknownCatalystId) => {
+                debug!("Unable to determine Catalyst id for registration: slot = {slot:?}, index = {index:?}, txn_hash = {txn_hash:?}");
             },
         }
     }
@@ -182,106 +141,36 @@ impl Rbac509InsertQuery {
             }));
         }
 
-        if !self.catalyst_id_for_txn_id.is_empty() {
-            let inner_session = session.clone();
-            query_handles.push(tokio::spawn(async move {
-                inner_session
-                    .execute_batch(
-                        PreparedQuery::CatalystIdForTxnIdInsertQuery,
-                        self.catalyst_id_for_txn_id,
-                    )
-                    .await
-            }));
-        }
-
-        if !self.catalyst_id_for_stake_address.is_empty() {
-            let inner_session = session.clone();
-            query_handles.push(tokio::spawn(async move {
-                inner_session
-                    .execute_batch(
-                        PreparedQuery::CatalystIdForStakeAddressInsertQuery,
-                        self.catalyst_id_for_stake_address,
-                    )
-                    .await
-            }));
-        }
-
         query_handles
     }
 }
 
-/// Returns a Catalyst ID of the given registration.
-async fn catalyst_id(
-    session: &Arc<CassandraSession>, cip509: &Cip509, txn_id: TransactionId, slot: Slot,
-    index: TxnIndex, is_immutable: bool,
-) -> anyhow::Result<CatalystId> {
-    use crate::db::index::queries::rbac::get_catalyst_id_from_transaction_id::cache_for_transaction_id;
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::db::index::tests::test_utils;
 
-    let id = match cip509.previous_transaction() {
-        Some(previous) => query_catalyst_id(session, previous, is_immutable).await?,
-        None => {
-            cip509
-                .catalyst_id()
-                .context("Empty Catalyst ID in root RBAC registration")?
-                .as_short_id()
-        },
-    };
-
-    cache_for_transaction_id(txn_id, id.clone(), slot, index);
-
-    Ok(id)
-}
-
-/// Queries a Catalyst ID from the database by the given transaction ID.
-async fn query_catalyst_id(
-    session: &Arc<CassandraSession>, txn_id: TransactionId, is_immutable: bool,
-) -> anyhow::Result<CatalystId> {
-    use crate::db::index::queries::rbac::get_catalyst_id_from_transaction_id::Query;
-
-    if let Some(q) = Query::get_latest(session, txn_id.into())
-        .await
-        .context("Failed to query Catalyst ID from transaction ID")?
-    {
-        Ok(q.catalyst_id.into())
-    } else {
-        if is_immutable {
-            bail!("Unable to find Catalyst ID in the persistent DB");
-        }
-
-        // If this block is a volatile/mutable one then try to look up a Catalyst ID in the
-        // persistent database.
-        let persistent_session =
-            CassandraSession::get(true).context("Failed to get persistent DB session")?;
-        Query::get_latest(&persistent_session, txn_id.into())
-            .await
-            .transpose()
-            .context("Unable to find Catalyst ID in the persistent DB")?
-            .map(|q| q.catalyst_id.into())
-    }
-}
-
-/// Returns stake addresses of the role 0.
-fn stake_addresses(metadata: &Cip509RbacMetadata) -> Vec<StakeAddress> {
-    let mut result = Vec::new();
-
-    if let Some(uris) = metadata.certificate_uris.x_uris().get(&0) {
-        result.extend(convert_stake_addresses(uris));
-    }
-    if let Some(uris) = metadata.certificate_uris.c_uris().get(&0) {
-        result.extend(convert_stake_addresses(uris));
+    #[tokio::test]
+    async fn index() {
+        let block = test_utils::block_3();
+        let mut query = Rbac509InsertQuery::new();
+        let txn_hash = "1bf8eb4da8fe5910cc890025deb9740ba5fa4fd2ac418ccbebfd6a09ed10e88b"
+            .parse()
+            .unwrap();
+        query.index(txn_hash, 0.into(), &block);
+        assert!(query.invalid.is_empty());
+        assert_eq!(1, query.registrations.len());
     }
 
-    result
-}
-
-/// Converts a list of `Cip0134Uri` to a list of stake addresses.
-fn convert_stake_addresses(uris: &[Cip0134Uri]) -> Vec<StakeAddress> {
-    uris.iter()
-        .filter_map(|uri| {
-            match uri.address() {
-                Address::Stake(a) => Some(a.clone().into()),
-                _ => None,
-            }
-        })
-        .collect()
+    #[tokio::test]
+    async fn index_invalid() {
+        let block = test_utils::block_4();
+        let mut query = Rbac509InsertQuery::new();
+        let txn_hash = "337d35026efaa48b5ee092d38419e102add1b535364799eb8adec8ac6d573b79"
+            .parse()
+            .unwrap();
+        query.index(txn_hash, 0.into(), &block);
+        assert!(query.registrations.is_empty());
+        assert_eq!(1, query.invalid.len());
+    }
 }
