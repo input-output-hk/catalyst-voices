@@ -31,6 +31,8 @@ START_POSITION = 0
 
 def get_reguest(s: requests.Session, url: str):
     resp = s.get(url=url, headers={"project_id": BLOCKFROST_TOKEN})
+    if resp.status_code == 404:
+        return None
     assert resp.status_code == 200, f"req: {url}, resp: {resp.text}"
     return resp.json()
 
@@ -68,6 +70,8 @@ for i, record in enumerate(processing_records):
         s,
         f"{BLOCKFROST_URL}/accounts/{stake_addr}/addresses",
     )
+    if addresses == None:
+        continue
 
     ada_amount = 0
     native_tokens = {}
