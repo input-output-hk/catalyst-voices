@@ -17,14 +17,11 @@ mod role_data;
 mod role_map;
 mod unprocessable_content;
 
-use anyhow::anyhow;
 use cardano_blockchain_types::StakeAddress;
-use catalyst_types::catalyst_id::CatalystId;
 use poem_openapi::payload::Json;
-use tracing::error;
 
 use crate::{
-    db::index::session::CassandraSession,
+    rbac_cache::RBAC_CACHE,
     service::{
         api::cardano::rbac::registrations_get::{
             chain_info::ChainInfo, registration_chain::RbacRegistrationChain, response::Responses,
@@ -32,10 +29,7 @@ use crate::{
         },
         common::{
             auth::rbac::token::CatalystRBACTokenV1,
-            types::{
-                cardano::query::cat_id_or_stake::CatIdOrStake,
-                headers::retry_after::RetryAfterOption,
-            },
+            types::cardano::query::cat_id_or_stake::CatIdOrStake,
         },
     },
 };
@@ -44,42 +38,29 @@ use crate::{
 pub(crate) async fn endpoint(
     lookup: Option<CatIdOrStake>, token: Option<CatalystRBACTokenV1>,
 ) -> AllResponses {
-    let Some(persistent_session) = CassandraSession::get(true) else {
-        let err = anyhow!("Failed to acquire persistent db session");
-        error!("{err:?}");
-        return AllResponses::service_unavailable(&err, RetryAfterOption::Default);
-    };
-    let Some(volatile_session) = CassandraSession::get(false) else {
-        let err = anyhow!("Failed to acquire volatile db session");
-        error!("{err:?}");
-        return AllResponses::service_unavailable(&err, RetryAfterOption::Default);
-    };
-
-    let catalyst_id = match lookup {
-        Some(CatIdOrStake::CatId(v)) => v.into(),
+    let (persistent_chain, volatile_chain) = match lookup {
+        Some(CatIdOrStake::CatId(id)) => {
+            let id = id.into();
+            (RBAC_CACHE.get(&id, true), RBAC_CACHE.get(&id, false))
+        },
         Some(CatIdOrStake::Address(address)) => {
             let address: StakeAddress = match address.try_into() {
                 Ok(a) => a,
                 Err(e) => return AllResponses::handle_error(&e),
             };
-            // TODO: For now we want to select the latest registration (so query the volatile
-            // database first), but ideally the logic should be more sophisticated. See the issue
-            // for more details: https://github.com/input-output-hk/catalyst-voices/issues/2152
-            match catalyst_id_from_stake(&volatile_session, address.clone()).await {
-                Ok(Some(v)) => v,
-                Err(e) => return AllResponses::handle_error(&e),
-                Ok(None) => {
-                    match catalyst_id_from_stake(&persistent_session, address).await {
-                        Ok(Some(v)) => v,
-                        Err(e) => return AllResponses::handle_error(&e),
-                        Ok(None) => return Responses::NotFound.into(),
-                    }
-                },
-            }
+            (
+                RBAC_CACHE.get_by_address(&address, true),
+                RBAC_CACHE.get_by_address(&address, false),
+            )
         },
         None => {
             match token {
-                Some(token) => token.catalyst_id().clone(),
+                Some(token) => {
+                    (
+                        RBAC_CACHE.get(token.catalyst_id(), true),
+                        RBAC_CACHE.get(token.catalyst_id(), false),
+                    )
+                },
                 None => {
                     return Responses::UnprocessableContent(Json(RbacUnprocessableContent::new(
                         "Either lookup parameter or token must be provided",
@@ -90,23 +71,13 @@ pub(crate) async fn endpoint(
         },
     };
 
-    match ChainInfo::new(&persistent_session, &volatile_session, &catalyst_id).await {
-        Ok(Some(info)) => {
+    match ChainInfo::new(persistent_chain, volatile_chain) {
+        Some(info) => {
             match RbacRegistrationChain::new(&info) {
                 Ok(c) => Responses::Ok(Json(Box::new(c))).into(),
                 Err(e) => AllResponses::handle_error(&e),
             }
         },
-        Ok(None) => Responses::NotFound.into(),
-        Err(e) => AllResponses::handle_error(&e),
+        None => Responses::NotFound.into(),
     }
-}
-
-/// Returns a Catalyst ID for the given stake address.
-#[allow(clippy::unused_async)]
-async fn catalyst_id_from_stake(
-    _session: &CassandraSession, _address: StakeAddress,
-) -> anyhow::Result<Option<CatalystId>> {
-    // TODO: This function should be entirely removed as a part of https://github.com/input-output-hk/catalyst-voices/issues/2532
-    Ok(None)
 }
