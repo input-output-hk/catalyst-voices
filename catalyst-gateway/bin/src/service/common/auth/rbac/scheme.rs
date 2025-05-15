@@ -9,7 +9,7 @@ use tracing::debug;
 
 use super::token::CatalystRBACTokenV1;
 use crate::{
-    db::index::session::CassandraSessionError,
+    rbac_cache::RBAC_CACHE,
     service::common::{
         auth::api_key::check_api_key,
         responses::{ErrorResponses, WithErrorResponses},
@@ -80,9 +80,6 @@ impl ResponseError for ServiceUnavailableError {
 /// Authentication token error.
 #[derive(Debug, thiserror::Error)]
 enum AuthTokenError {
-    /// Registration chain cannot be built.
-    #[error("Unable to build registration chain, err: {0}")]
-    BuildRegChain(String),
     /// RBAC token cannot be parsed.
     #[error("Fail to parse RBAC token string, err: {0}")]
     ParseRbacToken(String),
@@ -136,6 +133,7 @@ const MAX_TOKEN_SKEW: Duration = Duration::from_secs(5 * 60); // 5 minutes
 /// is valid. The performed validation is described [here].
 ///
 /// [here]: https://github.com/input-output-hk/catalyst-voices/blob/main/docs/src/catalyst-standards/permissionless-auth/auth-header.md#backend-processing-of-the-token
+#[allow(clippy::unused_async)]
 async fn checker_api_catalyst_auth(
     req: &Request, bearer: Bearer,
 ) -> poem::Result<CatalystRBACTokenV1> {
@@ -143,7 +141,7 @@ async fn checker_api_catalyst_auth(
     const RBAC_OFF: &str = "RBAC_OFF";
 
     // Deserialize the token: this performs the 1-5 steps of the validation.
-    let mut token = CatalystRBACTokenV1::parse(&bearer.token).map_err(|e| {
+    let token = CatalystRBACTokenV1::parse(&bearer.token).map_err(|e| {
         debug!("Corrupt auth token: {e:?}");
         AuthTokenError::ParseRbacToken(e.to_string())
     })?;
@@ -153,23 +151,18 @@ async fn checker_api_catalyst_auth(
         return Ok(token);
     };
 
-    // Step 6: get and build latest registration chain from the db.
-    let reg_chain = match token.reg_chain().await {
-        Ok(Some(reg_chain)) => reg_chain,
-        Ok(None) => {
-            debug!(
-                "Unable to find registrations for {} Catalyst ID",
-                token.catalyst_id()
-            );
-            return Err(AuthTokenError::RegistrationNotFound.into());
-        },
-        Err(err) if err.is::<CassandraSessionError>() => {
-            return Err(ServiceUnavailableError(err).into())
-        },
-        Err(err) => {
-            debug!("Unable to build a registration chain Catalyst ID: {err:?}");
-            return Err(AuthTokenError::BuildRegChain(err.to_string()).into());
-        },
+    // Step 6: get the registration chain
+    // Get the registration from the persistent first, if not found, try volatile.
+    let reg_chain = RBAC_CACHE
+        .get(token.catalyst_id(), true)
+        .or_else(|| RBAC_CACHE.get(token.catalyst_id(), false));
+
+    let Some(reg_chain) = reg_chain else {
+        debug!(
+            "Unable to find registrations for {} Catalyst ID",
+            token.catalyst_id()
+        );
+        return Err(AuthTokenError::RegistrationNotFound.into());
     };
 
     // Step 7: Verify that the nonce is in the acceptable range.
@@ -179,18 +172,6 @@ async fn checker_api_catalyst_auth(
         debug!("Auth token expired: {token}");
         Err(AuthTokenAccessViolation(vec!["EXPIRED".to_string()]))?;
     }
-
-    // TODO: Caching is currently disabled because we want to measure the performance without
-    // it.
-    // // Its valid and young enough, check if its in the auth cache.
-    // // This get() will extend the entry life for another 5 minutes.
-    // // Even though we keep calling get(), the entry will expire
-    // // after 30 minutes (TTL) from the origin insert().
-    // // This is an optimization which saves us constantly looking up registrations we have
-    // // already validated.
-    // if let Some(token) = CACHE.get(&bearer.token).await {
-    //     return Ok(token);
-    // }
 
     // Step 8: Get the latest stable signing certificate registered for Role 0.
     let (latest_pk, _) = reg_chain
@@ -215,11 +196,6 @@ async fn checker_api_catalyst_auth(
     //   - Get the latest unstable signing certificate registered for Role 0.
     //   - Verify the signature against the Role 0 Public Key and Algorithm identified by the
     //     certificate. If this fails, return 403.
-
-    // TODO: Caching is currently disabled because we want to measure the performance without
-    // it.
-    // // This entry will expire after 5 minutes (TTI) if there is no more ().
-    // CACHE.insert(bearer.token, token.clone()).await;
 
     // Step 11: Token is valid
     Ok(token)
