@@ -12,12 +12,9 @@ class RestoreKeychainChoicePanel extends OnboardingPageBase {
   final recoverKeychainMethodsTitle = const Key('RecoverKeychainMethodsTitle');
   final onDeviceKeychainsWidget = const Key('BlocOnDeviceKeychains');
   final keychainNotFoundIndicator = const Key('KeychainNotFoundIndicator');
-  final recoverKeychainMethodsSubtitleKey =
-      const Key('RecoverKeychainMethodsSubtitle');
-  final recoverKeychainMethodsListTitleKey =
-      const Key('RecoverKeychainMethodsListTitle');
-  final registrationTileKey =
-      const ValueKey(RegistrationRecoverMethod.seedPhrase);
+  final recoverKeychainMethodsSubtitleKey = const Key('RecoverKeychainMethodsSubtitle');
+  final recoverKeychainMethodsListTitleKey = const Key('RecoverKeychainMethodsListTitle');
+  final registrationTileKey = const ValueKey(RegistrationRecoverMethod.seedPhrase);
 
   @override
   Future<void> goto() async {

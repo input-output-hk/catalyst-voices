@@ -56,8 +56,7 @@ final class CampaignInfoCubit extends Cubit<CampaignInfoState> {
   }
 
   CampaignInfo _mockCampaign(Campaign campaign) {
-    final campaignStage =
-        CampaignStage.fromCampaign(campaign, DateTimeExt.now());
+    final campaignStage = CampaignStage.fromCampaign(campaign, DateTimeExt.now());
     if (_adminToolsState.campaignStage == campaignStage) {
       // campaign has already target stage, no need to mock it
       return CampaignInfo.fromCampaign(campaign, DateTimeExt.now());

@@ -5,8 +5,7 @@ import 'package:catalyst_voices/widgets/menu/voices_wallet_tile.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:flutter/material.dart';
 
-const _base64Icon =
-    'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFAAAABQCAYAAACOEfKtAAAACX'
+const _base64Icon = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFAAAABQCAYAAACOEfKtAAAACX'
     'BIWXMAABYlAAAWJQFJUiTwAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAxlSURBVH'
     'gB7Z0JdFTVGcf/M1kJkMWEAAGyCEpQ3A+R2lJltRVpWTxVRCC0BQWkkB5pWVoNHtmqshShKi'
     'qrWtqyCFLaQ1kUjxpoS0UqiSIMCUGCIYRAyDJJpvf/kjedebx57817b8L6O+fxJjN35s37z3'

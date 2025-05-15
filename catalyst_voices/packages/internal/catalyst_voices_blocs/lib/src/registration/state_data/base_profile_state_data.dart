@@ -44,8 +44,7 @@ final class BaseProfileStateData extends Equatable {
       email: email ?? this.email,
       username: username ?? this.username,
       isToSAccepted: isToSAccepted ?? this.isToSAccepted,
-      isPrivacyPolicyAccepted:
-          isPrivacyPolicyAccepted ?? this.isPrivacyPolicyAccepted,
+      isPrivacyPolicyAccepted: isPrivacyPolicyAccepted ?? this.isPrivacyPolicyAccepted,
       isDataUsageAccepted: isDataUsageAccepted ?? this.isDataUsageAccepted,
     );
   }

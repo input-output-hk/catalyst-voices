@@ -21,8 +21,7 @@ class DocumentPropertyReadBuilder extends StatefulWidget {
   }
 }
 
-class _DocumentPropertyReadBuilderState
-    extends State<DocumentPropertyReadBuilder> {
+class _DocumentPropertyReadBuilderState extends State<DocumentPropertyReadBuilder> {
   final List<DocumentPropertyValueListItem<Object>> _items = [];
 
   @override
@@ -64,8 +63,8 @@ class _DocumentPropertyReadBuilderState
   ) sync* {
     switch (property) {
       case DocumentListProperty():
-        for (final property in property.properties
-            .whereNot((element) => element.schema.isSectionOrSubsection)) {
+        for (final property
+            in property.properties.whereNot((element) => element.schema.isSectionOrSubsection)) {
           yield* _calculateItemsFrom(property);
         }
       case DocumentObjectProperty():
@@ -261,8 +260,7 @@ class _ListItemBuilder extends StatelessWidget {
           value: MarkdownText(value ?? const MarkdownData('-')),
           isMultiline: true,
         ),
-      DocumentTextListItem(:final title, :final value, :final isMultiline) =>
-        _ListItem(
+      DocumentTextListItem(:final title, :final value, :final isMultiline) => _ListItem(
           title: title,
           value: Text(value ?? '-'),
           isMultiline: isMultiline,

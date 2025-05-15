@@ -75,9 +75,7 @@ void main() {
     await tester.pumpAndSettle();
 
     // Then
-    final actionButtons = find
-        .byWidgetPredicate((widget) => widget is VoicesTextButton)
-        .evaluate();
+    final actionButtons = find.byWidgetPredicate((widget) => widget is VoicesTextButton).evaluate();
 
     expect(actionButtons.length, actions.length);
 

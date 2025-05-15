@@ -66,8 +66,7 @@ class _Indicator extends StatelessWidget {
       child: LayoutBuilder(
         key: const Key('PasswordStrengthIndicator'),
         builder: (context, constraints) {
-          final totalWidthOfAllGaps =
-              (PasswordStrength.values.length - 1) * _tracksGap;
+          final totalWidthOfAllGaps = (PasswordStrength.values.length - 1) * _tracksGap;
           final availableWidth = constraints.maxWidth - totalWidthOfAllGaps;
           final trackWidth = availableWidth / PasswordStrength.values.length;
 

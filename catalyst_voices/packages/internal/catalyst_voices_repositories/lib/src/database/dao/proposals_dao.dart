@@ -179,8 +179,7 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
       );
     }
 
-    if ((filters.onlyAuthor ?? false) ||
-        filters.type == ProposalsFilterType.my) {
+    if ((filters.onlyAuthor ?? false) || filters.type == ProposalsFilterType.my) {
       if (author != null) {
         mainQuery.where(proposal.metadata.isAuthor(author));
       } else {
@@ -240,9 +239,8 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
 
     var proposalRef = proposal.metadata.selfRef;
 
-    final latestAction =
-        await _getProposalsLatestAction(proposalId: proposalRef.id)
-            .then((value) => value.singleOrNull);
+    final latestAction = await _getProposalsLatestAction(proposalId: proposalRef.id)
+        .then((value) => value.singleOrNull);
 
     var effectiveProposal = proposal;
 
@@ -259,12 +257,8 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
     final commentsCountFuture = _getProposalCommentsCount(proposalRef);
     final versionsFuture = _getProposalVersions(proposalRef.id);
 
-    final (template, action, commentsCount, versions) = await (
-      templateFuture,
-      actionFuture,
-      commentsCountFuture,
-      versionsFuture
-    ).wait;
+    final (template, action, commentsCount, versions) =
+        await (templateFuture, actionFuture, commentsCountFuture, versionsFuture).wait;
 
     return JoinedProposalEntity(
       proposal: effectiveProposal,
@@ -277,10 +271,7 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
 
   Future<_IdsFilter> _excludeHiddenProposalsFilter() {
     return _getProposalsLatestAction().then((value) {
-      return value
-          .where((e) => e.action.isHidden)
-          .map((e) => e.proposalRef.id)
-          .map(UuidHiLo.from);
+      return value.where((e) => e.action.isHidden).map((e) => e.proposalRef.id).map(UuidHiLo.from);
     }).then(_IdsFilter.exclude);
   }
 
@@ -378,10 +369,7 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
         Expression.and([
           documents.type.equalsValue(DocumentType.commentDocument),
           documents.metadata.jsonExtract<String>(r'$.ref.id').equals(id),
-          if (ver != null)
-            documents.metadata
-                .jsonExtract<String>(r'$.ref.version')
-                .equals(ver),
+          if (ver != null) documents.metadata.jsonExtract<String>(r'$.ref.version').equals(ver),
         ]),
       )
       ..orderBy([OrderingTerm.desc(documents.verHi)]);
@@ -426,9 +414,8 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
 
           final content = row.readWithConverter(documents.content);
           final rawAction = content?.data['action'];
-          final actionDto = rawAction is String
-              ? ProposalSubmissionActionDto.fromJson(rawAction)
-              : null;
+          final actionDto =
+              rawAction is String ? ProposalSubmissionActionDto.fromJson(rawAction) : null;
           final action = actionDto?.toModel();
 
           if (action == null) {
@@ -523,9 +510,8 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
   Future<_IdsFilter> _includeFavoriteRefsExcludingHiddenProposalsFilter() {
     return _getFavoritesRefs().then((favoriteRefs) {
       return _getProposalsLatestAction().then((actions) async {
-        final hiddenProposalsIds = actions
-            .where((e) => e.action.isHidden)
-            .map((e) => e.proposalRef.id);
+        final hiddenProposalsIds =
+            actions.where((e) => e.action.isHidden).map((e) => e.proposalRef.id);
 
         return favoriteRefs
             .map((e) => e.id)
@@ -586,30 +572,22 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
   }) async* {
     await for (final allRefs in source) {
       final latestActions = await _getProposalsLatestAction();
-      final hiddenRefs = latestActions
-          .where((element) => element.action.isHidden)
-          .map((e) => e.proposalRef);
-      final finalsRefs = latestActions
-          .where((element) => element.action.isFinal)
-          .map((e) => e.proposalRef);
+      final hiddenRefs =
+          latestActions.where((element) => element.action.isHidden).map((e) => e.proposalRef);
+      final finalsRefs =
+          latestActions.where((element) => element.action.isFinal).map((e) => e.proposalRef);
 
       final favoritesRefs = await _getFavoritesRefs();
       final myRefs = await _maybeGetAuthorProposalsLooseRefs(author: author);
 
-      final notHidden = allRefs
-          .where((ref) => hiddenRefs.none((myRef) => myRef.id == ref.id));
+      final notHidden = allRefs.where((ref) => hiddenRefs.none((myRef) => myRef.id == ref.id));
 
       final total = notHidden.length;
-      final finals = notHidden
-          .where((ref) => finalsRefs.any((myRef) => myRef.id == ref.id))
-          .length;
+      final finals = notHidden.where((ref) => finalsRefs.any((myRef) => myRef.id == ref.id)).length;
       final drafts = total - finals;
-      final favorites = notHidden
-          .where((ref) => favoritesRefs.any((fav) => fav.id == ref.id))
-          .length;
-      final my = notHidden
-          .where((ref) => myRefs.any((myRef) => myRef.id == ref.id))
-          .length;
+      final favorites =
+          notHidden.where((ref) => favoritesRefs.any((fav) => fav.id == ref.id)).length;
+      final my = notHidden.where((ref) => myRefs.any((myRef) => myRef.id == ref.id)).length;
 
       yield ProposalsCount(
         total: total,

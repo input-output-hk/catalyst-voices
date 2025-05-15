@@ -141,9 +141,8 @@ final class SegmentsControllerScope extends InheritedWidget {
   }
 
   static SegmentsController of(BuildContext context) {
-    final controller = context
-        .dependOnInheritedWidgetOfExactType<SegmentsControllerScope>()
-        ?.controller;
+    final controller =
+        context.dependOnInheritedWidgetOfExactType<SegmentsControllerScope>()?.controller;
 
     assert(
       controller != null,

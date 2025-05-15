@@ -9,8 +9,7 @@ void main() {
   final changeAddress = SelectionUtils.randomAddress();
 
   group('$TransactionBuilder Coin Selection Tests', () {
-    test('selectInputs should throw an exception if funds are insufficient',
-        () {
+    test('selectInputs should throw an exception if funds are insufficient', () {
       const builder = TransactionBuilder(config: config, inputs: {});
 
       expect(
