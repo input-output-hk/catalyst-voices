@@ -68,8 +68,7 @@ final class ProposalCubit extends Cubit<ProposalState>
       final commentTemplate = await _commentService.getCommentTemplateFor(
         category: proposal.categoryId,
       );
-      final isFavorite =
-          await _proposalService.watchIsFavoritesProposal(ref: ref).first;
+      final isFavorite = await _proposalService.watchIsFavoritesProposal(ref: ref).first;
 
       _cache = _cache.copyWith(
         proposal: Optional(proposal),
@@ -181,8 +180,7 @@ final class ProposalCubit extends Cubit<ProposalState>
     required SignedDocumentRef ref,
     required bool show,
   }) {
-    final updatedComments =
-        state.comments.updateCommentBuilder(ref: ref, show: show);
+    final updatedComments = state.comments.updateCommentBuilder(ref: ref, show: show);
 
     emit(state.copyWith(comments: updatedComments));
   }
@@ -191,8 +189,7 @@ final class ProposalCubit extends Cubit<ProposalState>
     required SignedDocumentRef ref,
     required bool show,
   }) {
-    final updatedComments =
-        state.comments.updateCommentReplies(ref: ref, show: show);
+    final updatedComments = state.comments.updateCommentReplies(ref: ref, show: show);
 
     emit(state.copyWith(comments: updatedComments));
   }
@@ -226,8 +223,29 @@ final class ProposalCubit extends Cubit<ProposalState>
     }
   }
 
+  Future<void> updateUsername(String value) async {
+    final catId = _cache.activeAccountId;
+    if (catId == null) {
+      _logger.warning('Tried to update username but no action account found');
+      return;
+    }
+
+    try {
+      await _userService.updateAccount(
+        id: catId,
+        username: value.isNotEmpty ? Optional(value) : const Optional.empty(),
+      );
+
+      emitSignal(const UsernameUpdatedSignal());
+    } catch (error, stackTrace) {
+      _logger.severe('Update username failed', error, stackTrace);
+      emitError(LocalizedException.create(error));
+    }
+  }
+
   ProposalViewData _buildProposalViewData({
     required bool hasActiveAccount,
+    required bool hasAccountUsername,
     required ProposalData? proposal,
     required CampaignCategory? category,
     required List<CommentWithReplies> comments,
@@ -260,13 +278,14 @@ final class ProposalCubit extends Cubit<ProposalState>
             commentSchema: commentSchema,
             commentsSort: commentsSort,
             hasActiveAccount: hasActiveAccount,
+            hasAccountUsername: hasAccountUsername,
           )
         : const <Segment>[];
 
     final header = ProposalViewHeader(
       proposalRef: proposalDocumentRef,
       title: proposalDocument?.title ?? '',
-      authorName: proposalDocument?.authorName ?? '',
+      authorName: proposalDocument?.authorName,
       createdAt: proposalDocumentRef?.version?.tryDateTime,
       commentsCount: comments.length,
       versions: versions,
@@ -288,6 +307,7 @@ final class ProposalCubit extends Cubit<ProposalState>
     required DocumentSchema? commentSchema,
     required ProposalCommentsSort commentsSort,
     required bool hasActiveAccount,
+    required bool hasAccountUsername,
   }) {
     final document = proposal.document;
     final isDraftProposal = document.metadata.selfRef is DraftRef;
@@ -316,8 +336,10 @@ final class ProposalCubit extends Cubit<ProposalState>
       ],
     );
 
-    final canReply = !isDraftProposal && hasActiveAccount;
-    final canComment = canReply && commentSchema != null;
+    final isNotLocalAndHasActiveAccount = !isDraftProposal && hasActiveAccount;
+    final canReply = isNotLocalAndHasActiveAccount && hasAccountUsername;
+    final canComment = isNotLocalAndHasActiveAccount && commentSchema != null;
+
     final commentsSegment = ProposalCommentsSegment(
       id: const NodeId('comments'),
       sort: commentsSort,
@@ -328,10 +350,11 @@ final class ProposalCubit extends Cubit<ProposalState>
           comments: commentsSort.applyTo(comments),
           canReply: canReply,
         ),
-        if (canReply && commentSchema != null)
+        if (canComment)
           ProposalAddCommentSection(
             id: const NodeId('comments.add'),
             schema: commentSchema,
+            showUsernameRequired: !hasAccountUsername,
           ),
       ],
     );
@@ -365,8 +388,11 @@ final class ProposalCubit extends Cubit<ProposalState>
     final isFavorite = _cache.isFavorite ?? false;
     final activeAccountId = _cache.activeAccountId;
 
+    final username = activeAccountId?.username;
+
     return _buildProposalViewData(
       hasActiveAccount: activeAccountId != null,
+      hasAccountUsername: username != null && !username.isBlank,
       proposal: proposal,
       category: category,
       comments: comments,

@@ -14,8 +14,7 @@ class PrivacyPolicyRichText extends StatefulWidget {
   State<PrivacyPolicyRichText> createState() => _PrivacyPolicyRichTextState();
 }
 
-class _PrivacyPolicyRichTextState extends State<PrivacyPolicyRichText>
-    with LaunchUrlMixin {
+class _PrivacyPolicyRichTextState extends State<PrivacyPolicyRichText> with LaunchUrlMixin {
   late final TapGestureRecognizer _recognizer;
 
   @override

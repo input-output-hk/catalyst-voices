@@ -15,15 +15,13 @@ class StandardLinksPageFooter extends StatelessWidget {
         LinkText(
           'About us',
           onTap: () {
-            ScaffoldMessenger.of(context)
-                .showSnackBar(const SnackBar(content: Text('About us')));
+            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('About us')));
           },
         ),
         LinkText(
           'Funds',
           onTap: () {
-            ScaffoldMessenger.of(context)
-                .showSnackBar(const SnackBar(content: Text('Funds')));
+            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Funds')));
           },
         ),
         LinkText(
@@ -36,8 +34,7 @@ class StandardLinksPageFooter extends StatelessWidget {
         LinkText(
           'Contact us',
           onTap: () {
-            ScaffoldMessenger.of(context)
-                .showSnackBar(const SnackBar(content: Text('Contact us')));
+            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Contact us')));
           },
         ),
       ],
@@ -45,22 +42,19 @@ class StandardLinksPageFooter extends StatelessWidget {
         VoicesIconButton(
           child: VoicesAssets.images.facebookMono.buildIcon(),
           onTap: () {
-            ScaffoldMessenger.of(context)
-                .showSnackBar(const SnackBar(content: Text('Facebook')));
+            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Facebook')));
           },
         ),
         VoicesIconButton(
           child: VoicesAssets.images.linkedinMono.buildIcon(),
           onTap: () {
-            ScaffoldMessenger.of(context)
-                .showSnackBar(const SnackBar(content: Text('LinkedIn')));
+            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('LinkedIn')));
           },
         ),
         VoicesIconButton(
           child: VoicesAssets.images.xMono.buildIcon(),
           onTap: () {
-            ScaffoldMessenger.of(context)
-                .showSnackBar(const SnackBar(content: Text('X')));
+            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('X')));
           },
         ),
       ],

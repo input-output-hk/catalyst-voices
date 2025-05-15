@@ -27,8 +27,7 @@ abstract base class BaseHash extends Equatable implements CborEncodable {
   }
 
   /// Deserializes the type from cbor.
-  BaseHash.fromCbor(CborValue value)
-      : this.fromBytes(bytes: (value as CborBytes).bytes);
+  BaseHash.fromCbor(CborValue value) : this.fromBytes(bytes: (value as CborBytes).bytes);
 
   /// Serializes the type as cbor.
   @override

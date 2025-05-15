@@ -32,11 +32,10 @@ final class BlockchainServiceImpl implements BlockchainService {
     required DateTime targetDateTime,
     required BlockchainSlotNumberConfig config,
   }) async {
-    final diff = targetDateTime.millisecondsSinceEpoch -
-        config.systemStartTimestamp.millisecondsSinceEpoch;
+    final diff =
+        targetDateTime.millisecondsSinceEpoch - config.systemStartTimestamp.millisecondsSinceEpoch;
 
-    final slotNum =
-        diff / config.slotLength.inMilliseconds + config.systemStartSlot.value;
+    final slotNum = diff / config.slotLength.inMilliseconds + config.systemStartSlot.value;
 
     return SlotBigNum(slotNum.floor());
   }

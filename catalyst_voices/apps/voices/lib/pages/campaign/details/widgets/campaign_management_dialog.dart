@@ -66,9 +66,7 @@ class _CampaignManagementDialogState extends State<CampaignManagementDialog> {
                 child: Text(context.l10n.saveButtonText),
                 onTap: () {
                   Navigator.of(context).pop(_campaignPublish);
-                  context
-                      .read<CampaignBuilderCubit>()
-                      .updateCampaignPublish(_campaignPublish);
+                  context.read<CampaignBuilderCubit>().updateCampaignPublish(_campaignPublish);
                 },
               ),
             ),

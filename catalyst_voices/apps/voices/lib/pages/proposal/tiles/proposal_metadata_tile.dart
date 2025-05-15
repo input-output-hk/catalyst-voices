@@ -5,8 +5,7 @@ import 'package:catalyst_voices/pages/proposal/widget/proposal_version.dart';
 import 'package:catalyst_voices/widgets/document/document_comments_chip.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
-import 'package:catalyst_voices_models/catalyst_voices_models.dart'
-    hide ProposalVersion;
+import 'package:catalyst_voices_models/catalyst_voices_models.dart' hide ProposalVersion;
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 
@@ -72,8 +71,7 @@ class ProposalMetadataTile extends StatelessWidget {
         if (description != null)
           Text(
             description,
-            style: context.textTheme.bodyLarge
-                ?.copyWith(color: context.colors.textOnPrimaryLevel0),
+            style: context.textTheme.bodyLarge?.copyWith(color: context.colors.textOnPrimaryLevel0),
           ),
         ProposalDeliveryCard(
           fundsRequested: fundsRequested,
@@ -98,11 +96,8 @@ class _CreatedAtText extends StatelessWidget {
   Widget build(BuildContext context) {
     return TimezoneDateTimeTextTheme(
       data: TimezoneDateTimeTextThemeData(
-        backgroundColor: isWarning
-            ? WidgetStatePropertyAll(context.colors.warningContainer)
-            : null,
-        foregroundColor:
-            isWarning ? WidgetStatePropertyAll(context.colors.warning) : null,
+        backgroundColor: isWarning ? WidgetStatePropertyAll(context.colors.warningContainer) : null,
+        foregroundColor: isWarning ? WidgetStatePropertyAll(context.colors.warning) : null,
       ),
       child: TimestampText(dateTime),
     );

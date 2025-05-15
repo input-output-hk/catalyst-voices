@@ -38,8 +38,7 @@ final class ContainsTitle extends CustomExpression<bool> {
         );
 }
 
-extension ContentColumnExt
-    on GeneratedColumnWithTypeConverter<DocumentDataContent, Uint8List> {
+extension ContentColumnExt on GeneratedColumnWithTypeConverter<DocumentDataContent, Uint8List> {
   Expression<bool> hasTitle(String query) => ContainsTitle(query: query);
 }
 
@@ -54,8 +53,7 @@ extension DocumentTableExt on $DocumentsTable {
   }
 }
 
-extension MetadataColumnExt
-    on GeneratedColumnWithTypeConverter<DocumentDataMetadata, Uint8List> {
+extension MetadataColumnExt on GeneratedColumnWithTypeConverter<DocumentDataMetadata, Uint8List> {
   List<Expression<bool>> hasAuthorName(String name) {
     return [
       ContainsMetadataAuthorName(query: name),

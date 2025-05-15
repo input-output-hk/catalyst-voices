@@ -119,14 +119,13 @@ final class TieredFee extends Equatable {
     int refScriptCostPerByte,
     int resScriptSize,
   ) {
-    int calcRefScriptFee(double acc, double curTierPrice, int n) =>
-        n <= sizeIncrement
-            ? (acc + n * curTierPrice).floor()
-            : calcRefScriptFee(
-                acc + curTierPrice * sizeIncrement,
-                curTierPrice * multiplier,
-                n - sizeIncrement,
-              );
+    int calcRefScriptFee(double acc, double curTierPrice, int n) => n <= sizeIncrement
+        ? (acc + n * curTierPrice).floor()
+        : calcRefScriptFee(
+            acc + curTierPrice * sizeIncrement,
+            curTierPrice * multiplier,
+            n - sizeIncrement,
+          );
     return calcRefScriptFee(
       0,
       refScriptCostPerByte.toDouble(),

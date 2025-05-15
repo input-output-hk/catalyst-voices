@@ -197,8 +197,7 @@ base class SecureStorageVault with StorageAsStringMixin implements Vault {
     await _initializationCompleter.future;
 
     final all = await _secureStorage.readAll();
-    final vaultKeys =
-        List.of(all.keys).where((key) => key.startsWith(_instanceKey));
+    final vaultKeys = List.of(all.keys).where((key) => key.startsWith(_instanceKey));
 
     for (final key in vaultKeys) {
       await _secureStorage.delete(key: key);

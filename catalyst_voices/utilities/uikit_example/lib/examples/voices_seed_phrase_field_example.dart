@@ -13,8 +13,7 @@ class VoicesSeedPhraseFieldExample extends StatefulWidget {
   }
 }
 
-class _VoicesSeedPhraseFieldExampleState
-    extends State<VoicesSeedPhraseFieldExample> {
+class _VoicesSeedPhraseFieldExampleState extends State<VoicesSeedPhraseFieldExample> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(

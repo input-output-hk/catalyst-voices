@@ -146,8 +146,7 @@ class _NoWalletActionState extends State<_NoWalletAction> {
 
   Future<void> _checkAvailableWallets(BuildContext context) async {
     _changeIsLoading();
-    final hasWallets =
-        await context.read<SessionCubit>().checkAvailableWallets();
+    final hasWallets = await context.read<SessionCubit>().checkAvailableWallets();
     if (hasWallets && context.mounted) {
       Navigator.of(context).pop(true);
     } else {
@@ -215,8 +214,7 @@ class _NoWalletErrorReason extends StatelessWidget {
   }
 }
 
-class _NoWalletTroubleshootingButton extends StatelessWidget
-    with LaunchUrlMixin {
+class _NoWalletTroubleshootingButton extends StatelessWidget with LaunchUrlMixin {
   const _NoWalletTroubleshootingButton();
 
   @override

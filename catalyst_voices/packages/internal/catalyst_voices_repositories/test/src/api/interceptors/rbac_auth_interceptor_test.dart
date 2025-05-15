@@ -91,8 +91,7 @@ void main() {
       final requestResponse = MockResponse<String>();
 
       // When
-      when(() => authTokenProvider.createRbacToken())
-          .thenAnswer((_) => Future.value());
+      when(() => authTokenProvider.createRbacToken()).thenAnswer((_) => Future.value());
       when(() => chain.request).thenReturn(request);
       when(() => chain.proceed(any())).thenAnswer((_) => requestResponse);
       when(() => requestResponse.statusCode).thenAnswer((_) => 200);
