@@ -1,6 +1,5 @@
 import 'package:catalyst_key_derivation/src/bip32_ed25519/bip32_ed25519_private_key.dart';
-import 'package:catalyst_key_derivation/src/rust/api/key_derivation.dart'
-    as rust;
+import 'package:catalyst_key_derivation/src/rust/api/key_derivation.dart' as rust;
 import 'package:cbor/cbor.dart';
 import 'package:convert/convert.dart';
 
@@ -11,8 +10,7 @@ import 'package:convert/convert.dart';
 /// in tests to provide mocked private keys which don't need
 /// to communicate with Rust.
 abstract class Bip32Ed25519XPrivateKeyFactory {
-  static Bip32Ed25519XPrivateKeyFactory _instance =
-      const DefaultBip32Ed25519XPrivateKeyFactory();
+  static Bip32Ed25519XPrivateKeyFactory _instance = const DefaultBip32Ed25519XPrivateKeyFactory();
 
   const Bip32Ed25519XPrivateKeyFactory();
 
@@ -48,8 +46,7 @@ abstract class Bip32Ed25519XPrivateKeyFactory {
 
 /// The default implementation of [Bip32Ed25519XPrivateKeyFactory]
 /// that provides real instances of [Bip32Ed25519XPrivateKey].
-final class DefaultBip32Ed25519XPrivateKeyFactory
-    extends Bip32Ed25519XPrivateKeyFactory {
+final class DefaultBip32Ed25519XPrivateKeyFactory extends Bip32Ed25519XPrivateKeyFactory {
   const DefaultBip32Ed25519XPrivateKeyFactory();
 
   @override

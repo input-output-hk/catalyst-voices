@@ -81,9 +81,7 @@ final class CommentServiceImpl implements CommentService {
   }) {
     assert(ref.isExact, 'Comments are linked to exact version of document');
 
-    return _commentRepository
-        .watchCommentsWith(ref: ref)
-        .map(_buildCommentTree);
+    return _commentRepository.watchCommentsWith(ref: ref).map(_buildCommentTree);
   }
 
   List<CommentWithReplies> _buildCommentTree(List<CommentDocument> comments) {

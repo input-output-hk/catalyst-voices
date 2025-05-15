@@ -140,8 +140,7 @@ final class TransactionBuilder extends Equatable {
 
     final fee = minFee();
 
-    final inputTotal =
-        inputs.map((e) => e.output.amount).reduce((a, b) => a + b);
+    final inputTotal = inputs.map((e) => e.output.amount).reduce((a, b) => a + b);
     final outputTotal = outputs.isNotEmpty
         ? outputs.map((e) => e.amount).reduce((a, b) => a + b)
         : const Balance.zero();
@@ -335,9 +334,7 @@ final class TransactionBuilder extends Equatable {
     return Transaction(
       body: txBody,
       // TODO(ilap): The buildFake should be refactored instead.
-      witnessSet: useWitnesses
-          ? generateFakeWitnessSet(inputs)
-          : witnessBuilder.buildFake(),
+      witnessSet: useWitnesses ? generateFakeWitnessSet(inputs) : witnessBuilder.buildFake(),
       isValid: true,
       auxiliaryData: auxiliaryData,
     );
@@ -349,8 +346,7 @@ final class TransactionBuilder extends Equatable {
   static TransactionWitnessSet generateFakeWitnessSet(
     Set<TransactionUnspentOutput> inputs,
   ) {
-    final uniqueAddresses =
-        inputs.map((input) => input.output.address.publicKeyHash).toSet();
+    final uniqueAddresses = inputs.map((input) => input.output.address.publicKeyHash).toSet();
 
     return TransactionWitnessSet(
       vkeyWitnesses: {
@@ -418,8 +414,7 @@ final class TransactionBuilder extends Equatable {
       );
 
       for (final nftChange in nftChanges) {
-        final changeOutput =
-            TransactionOutputBuilder.withAssetAndMinRequiredCoin(
+        final changeOutput = TransactionOutputBuilder.withAssetAndMinRequiredCoin(
           address: address,
           multiAsset: nftChange,
           coinsPerUtxoByte: config.coinsPerUtxoByte,
@@ -449,8 +444,7 @@ final class TransactionBuilder extends Equatable {
     if (!changeLeft.isZero) {
       final outputs = List.of(builder.outputs);
       final lastOutput = outputs.removeLast();
-      final newOutput =
-          lastOutput.copyWith(amount: lastOutput.amount + changeLeft);
+      final newOutput = lastOutput.copyWith(amount: lastOutput.amount + changeLeft);
       outputs.add(newOutput);
       builder = builder.copyWith(outputs: outputs);
     }
@@ -640,14 +634,11 @@ final class TransactionBuilder extends Equatable {
       outputs: List.of(outputs),
       fee: fee,
       ttl: ttl,
-      auxiliaryDataHash: auxiliaryData != null
-          ? AuxiliaryDataHash.fromAuxiliaryData(auxiliaryData!)
-          : null,
+      auxiliaryDataHash:
+          auxiliaryData != null ? AuxiliaryDataHash.fromAuxiliaryData(auxiliaryData!) : null,
       validityStart: validityStart,
       mint: mint,
-      scriptDataHash: scriptData != null
-          ? ScriptDataHash.fromScriptData(scriptData!)
-          : null,
+      scriptDataHash: scriptData != null ? ScriptDataHash.fromScriptData(scriptData!) : null,
       collateralInputs: collateralInputs,
       requiredSigners: requiredSigners,
       networkId: networkId,
@@ -724,8 +715,7 @@ final class TransactionBuilderConfig extends Equatable {
   });
 
   @override
-  List<Object?> get props =>
-      [feeAlgo, maxTxSize, maxValueSize, coinsPerUtxoByte];
+  List<Object?> get props => [feeAlgo, maxTxSize, maxValueSize, coinsPerUtxoByte];
 }
 
 /// Builder and utils around [TransactionOutput].
@@ -810,8 +800,7 @@ final class TransactionOutputBuilder {
     // the min ada, it may increase the cbor size in bytes
     while (true) {
       final sizeDiff = latestCoinSize - oldCoinSize;
-      final tentativeMinAda =
-          Coin(outputSize + constantOverhead + sizeDiff) * coinsPerUtxoByte;
+      final tentativeMinAda = Coin(outputSize + constantOverhead + sizeDiff) * coinsPerUtxoByte;
 
       final newCoinSize = 1 + CborSize.ofInt(tentativeMinAda.value).bytes;
       final isDone = latestCoinSize == newCoinSize;
@@ -825,8 +814,7 @@ final class TransactionOutputBuilder {
     // how many bytes the size changed from including the minimum ada value
     final sizeChange = latestCoinSize - oldCoinSize;
 
-    final adjustedMinAda =
-        Coin(outputSize + constantOverhead + sizeChange) * coinsPerUtxoByte;
+    final adjustedMinAda = Coin(outputSize + constantOverhead + sizeChange) * coinsPerUtxoByte;
 
     return adjustedMinAda;
   }

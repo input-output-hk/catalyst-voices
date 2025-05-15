@@ -30,10 +30,8 @@ void main() async {
   group(
     'Account page -',
     () {
-      patrolWidgetTest(
-          tags: 'issues_1715',
-          skip: true,
-          'user - locking account', (PatrolTester $) async {
+      patrolWidgetTest(tags: 'issues_1715', skip: true, 'user - locking account',
+          (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await UnlockPasswordSuccessPanel($).goto();
         await UnlockPasswordSuccessPanel($).clickGoToDashboard();
@@ -41,60 +39,51 @@ void main() async {
         await AppBarPage($).unlockBtnIsVisible();
       });
 
-      patrolWidgetTest('user - locking and unlocking account',
-          (PatrolTester $) async {
+      patrolWidgetTest('user - locking and unlocking account', (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await UnlockPasswordSuccessPanel($).goto();
         await UnlockPasswordSuccessPanel($).clickGoToDashboard();
         await AppBarPage($).lockBtnClick();
         await AppBarPage($).unlockBtnClick();
-        await $(UnlockModalPage($).unlockPasswordTextField)
-            .enterText('Test1234');
+        await $(UnlockModalPage($).unlockPasswordTextField).enterText('Test1234');
         await $(UnlockModalPage($).unlockConfirmPasswordButton).tap();
         await AppBarPage($).unlockBtnIsVisible();
       });
 
-      patrolWidgetTest('user - unlocking - wrong password error appears',
-          (PatrolTester $) async {
+      patrolWidgetTest('user - unlocking - wrong password error appears', (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await UnlockPasswordSuccessPanel($).goto();
         await UnlockPasswordSuccessPanel($).clickGoToDashboard();
         await AppBarPage($).lockBtnClick();
         await AppBarPage($).unlockBtnClick();
-        await $(UnlockModalPage($).unlockPasswordTextField)
-            .enterText('Test12345');
+        await $(UnlockModalPage($).unlockPasswordTextField).enterText('Test12345');
         await $(UnlockModalPage($).unlockConfirmPasswordButton).tap();
         await UnlockModalPage($).incorrectPasswordErrorShowsUp();
       });
 
-      patrolWidgetTest(
-          tags: 'issues_1597',
-          skip: true,
-          'user changing email works', (PatrolTester $) async {
+      patrolWidgetTest(tags: 'issues_1597', skip: true, 'user changing email works',
+          (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await UnlockPasswordSuccessPanel($).goto();
         await UnlockPasswordSuccessPanel($).clickGoToDashboard();
         await AppBarPage($).accountPopupBtnClick();
         await AccountDropdownPage($).clickProfileAndKeychain();
         await ProfilePage($).clickEmailAddressEdit();
-        await $(ProfilePage($).accountEmailTextField)
-            .enterText('bera@gmail.com');
+        await $(ProfilePage($).accountEmailTextField).enterText('bera@gmail.com');
         await $(ProfilePage($).emailTileSaveBtn).tap();
         // await ProfilePage($).emailIsAsExpected('bera@gmail.com');
         // TODO(emiride): uncomment above when backend is ready
         // https://github.com/input-output-hk/catalyst-voices/issues/1597
       });
 
-      patrolWidgetTest('removing keychain logs out the user',
-          (PatrolTester $) async {
+      patrolWidgetTest('removing keychain logs out the user', (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await UnlockPasswordSuccessPanel($).goto();
         await UnlockPasswordSuccessPanel($).clickGoToDashboard();
         await AppBarPage($).accountPopupBtnClick();
         await AccountDropdownPage($).clickProfileAndKeychain();
         await ProfilePage($).removeKeychainClick();
-        await $(ProfilePage($).deleteKeychainTextField)
-            .enterText('Remove Keychain');
+        await $(ProfilePage($).deleteKeychainTextField).enterText('Remove Keychain');
         await $(ProfilePage($).deleteKeychainContinueButton).tap();
         await $(ProfilePage($).keychainDeletedDialogCloseButton).tap();
         await AppBarPage($).visitorBtnIsVisible();

@@ -49,8 +49,7 @@ class VoicesDesktopInfoDialog extends StatelessWidget {
       color: colors.textOnPrimaryLevel0,
     );
 
-    final subMessageStyle =
-        (textTheme.bodyMedium ?? const TextStyle()).copyWith(
+    final subMessageStyle = (textTheme.bodyMedium ?? const TextStyle()).copyWith(
       fontWeight: FontWeight.w500,
       color: colors.textOnPrimaryLevel0,
     );

@@ -8,8 +8,7 @@ void main() {
         child: MaterialApp(
           home: Scaffold(
             body: ResponsiveChild(
-              xs: (context) =>
-                  const Text('Simple text for extra small screens.'),
+              xs: (context) => const Text('Simple text for extra small screens.'),
               sm: (context) => const Padding(
                 padding: EdgeInsets.all(50),
                 child: Text('Text with padding for small screens.'),
@@ -29,8 +28,7 @@ void main() {
       );
 
   group('Test screen sizes', () {
-    testWidgets('ResponsiveChild outputs a text for extra-small screens',
-        (tester) async {
+    testWidgets('ResponsiveChild outputs a text for extra-small screens', (tester) async {
       await tester.pumpWidget(
         buildApp(const Size.fromWidth(280)),
       );
@@ -41,8 +39,7 @@ void main() {
         findsOneWidget,
       );
     });
-    testWidgets('ResponsiveChild outputs a text with padding for small screens',
-        (tester) async {
+    testWidgets('ResponsiveChild outputs a text with padding for small screens', (tester) async {
       await tester.pumpWidget(
         buildApp(const Size.fromWidth(620)),
       );
@@ -60,8 +57,7 @@ void main() {
       );
       expect(paddingWidget.padding, const EdgeInsets.all(50));
     });
-    testWidgets('ResponsiveChild outputs four texts for medium screens',
-        (tester) async {
+    testWidgets('ResponsiveChild outputs four texts for medium screens', (tester) async {
       await tester.pumpWidget(
         buildApp(const Size.fromWidth(1280)),
       );
@@ -72,8 +68,7 @@ void main() {
       expect(find.text('of Texts'), findsOneWidget);
       expect(find.text('for medium screens.'), findsOneWidget);
     });
-    testWidgets('ResponsiveChild fallback to other for large screens',
-        (tester) async {
+    testWidgets('ResponsiveChild fallback to other for large screens', (tester) async {
       await tester.pumpWidget(
         buildApp(const Size.fromWidth(1600)),
       );

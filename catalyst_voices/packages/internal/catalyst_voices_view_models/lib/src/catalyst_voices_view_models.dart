@@ -20,6 +20,7 @@ export 'exception/localized_exception.dart';
 export 'exception/localized_not_found_exception.dart';
 export 'exception/localized_proposal_deletion_exception.dart';
 export 'exception/localized_unknown_exception.dart';
+export 'managers/video_manager_assets.dart';
 export 'menu/menu_item.dart';
 export 'menu/popup_menu_item.dart';
 export 'proposal/exception/localized_unknown_publish_comment_exception.dart';

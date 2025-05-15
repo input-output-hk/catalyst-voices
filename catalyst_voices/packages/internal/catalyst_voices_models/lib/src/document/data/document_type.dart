@@ -83,14 +83,10 @@ enum DocumentType {
         DocumentType.proposalTemplate,
 
       // comment
-      DocumentType.commentDocument ||
-      DocumentType.commentTemplate =>
-        DocumentType.commentTemplate,
+      DocumentType.commentDocument || DocumentType.commentTemplate => DocumentType.commentTemplate,
 
       // review
-      DocumentType.reviewDocument ||
-      DocumentType.reviewTemplate =>
-        DocumentType.reviewTemplate,
+      DocumentType.reviewDocument || DocumentType.reviewTemplate => DocumentType.reviewTemplate,
 
       // category
       DocumentType.categoryParametersDocument ||

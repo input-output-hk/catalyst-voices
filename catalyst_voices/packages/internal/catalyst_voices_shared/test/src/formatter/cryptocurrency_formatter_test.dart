@@ -61,16 +61,13 @@ void main() {
         expect(result, '1000000.123456₳');
       });
 
-      test('should format ADA amount with less than 6 decimal places correctly',
-          () {
+      test('should format ADA amount with less than 6 decimal places correctly', () {
         final coin = Coin.fromAda(0.123);
         final result = CryptocurrencyFormatter.formatExactAmount(coin);
         expect(result, '0.123₳');
       });
 
-      test(
-          'should format ADA amount with trailing zeros up to 6 decimal places',
-          () {
+      test('should format ADA amount with trailing zeros up to 6 decimal places', () {
         final coin = Coin.fromAda(0.123000);
         final result = CryptocurrencyFormatter.formatExactAmount(coin);
         expect(result, '0.123₳'); // Trailing zeros should not appear.

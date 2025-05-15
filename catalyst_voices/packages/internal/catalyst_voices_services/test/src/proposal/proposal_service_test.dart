@@ -212,8 +212,7 @@ void main() {
         final comments2 = ReplaySubject<int>();
 
         // Create a broadcast stream for the proposals
-        final proposalsStream =
-            Stream.value([proposalData1, proposalData2]).asBroadcastStream();
+        final proposalsStream = Stream.value([proposalData1, proposalData2]).asBroadcastStream();
 
         when(
           () => mockProposalRepository.watchLatestProposals(),
@@ -297,8 +296,7 @@ void main() {
         finals: ProposalDocument.maxSubmittedProposalsPerUser + 1,
       );
 
-      when(() => mockUserService.watchUser)
-          .thenAnswer((_) => Stream.value(user));
+      when(() => mockUserService.watchUser).thenAnswer((_) => Stream.value(user));
 
       when(
         () => mockProposalRepository.watchProposalsCount(
