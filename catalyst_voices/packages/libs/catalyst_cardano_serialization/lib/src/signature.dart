@@ -75,8 +75,7 @@ final class Ed25519PublicKey extends Equatable implements CborEncodable {
   ///
   /// Useful when needed to work with extended or simple public keys
   /// and not being interested in the chain code bytes on 32-63 indexes.
-  Ed25519PublicKey.fromSimpleOrExtendedBytes(List<int> bytes)
-      : bytes = bytes.take(length).toList();
+  Ed25519PublicKey.fromSimpleOrExtendedBytes(List<int> bytes) : bytes = bytes.take(length).toList();
 
   /// Returns the [Ed25519PublicKey] filled with [byte] that can be
   /// used to reserve size to calculate the final transaction bytes size.
