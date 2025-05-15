@@ -14,13 +14,19 @@ pub struct RbacCacheAddSuccess {
 }
 
 /// An error returned from the `RbacCache::add` method.
-///
-/// It is used to insert a registration data to the `rbac_invalid_registration` table.
-pub struct RbacCacheAddError {
-    /// A Catalyst ID.
-    pub catalyst_id: Option<CatalystId>,
-    /// A registration purpose.
-    pub purpose: Option<UuidV4>,
-    /// A problem report.
-    pub report: ProblemReport,
+#[allow(clippy::large_enum_variant)]
+pub enum RbacCacheAddError {
+    /// A registration is invalid (`report.is_problematic()` returns `true`).
+    ///
+    /// This variant is inserted to the `rbac_invalid_registration` table.
+    InvalidRegistration {
+        /// A Catalyst ID.
+        catalyst_id: CatalystId,
+        /// A registration purpose.
+        purpose: Option<UuidV4>,
+        /// A problem report.
+        report: ProblemReport,
+    },
+    /// Unable to determine a Catalyst ID of the registration.
+    UnknownCatalystId,
 }

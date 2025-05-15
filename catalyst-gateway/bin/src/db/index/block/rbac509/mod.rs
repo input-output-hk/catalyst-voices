@@ -96,8 +96,8 @@ impl Rbac509InsertQuery {
                     previous_transaction,
                 ));
             },
-            Err(RbacCacheAddError {
-                catalyst_id: Some(catalyst_id),
+            Err(RbacCacheAddError::InvalidRegistration {
+                catalyst_id,
                 purpose,
                 report,
             }) => {
@@ -111,9 +111,7 @@ impl Rbac509InsertQuery {
                     &report,
                 ));
             },
-            Err(RbacCacheAddError {
-                catalyst_id: None, ..
-            }) => {
+            Err(RbacCacheAddError::UnknownCatalystId) => {
                 debug!("Unable to determine Catalyst id for registration: slot = {slot:?}, index = {index:?}, txn_hash = {txn_hash:?}");
             },
         }
