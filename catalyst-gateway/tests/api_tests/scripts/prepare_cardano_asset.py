@@ -28,7 +28,8 @@ BLOCKFROST_TOKEN = os.environ["BLOCKFROST_TOKEN"]
 
 BLOCKFROST_URL = "https://cardano-preprod.blockfrost.io/api/v0"
 
-RECORDS_LIMIT = 1000
+RECORDS_LIMIT = 1
+START_POSITION = 0
 
 
 def get_reguest(s: requests.Session, url: str):
@@ -43,19 +44,28 @@ def get_reguest(s: requests.Session, url: str):
 with open(IN_FILE, "r", encoding="utf-8") as f:
     snapshot_data = json.load(f)
 
+try:
+    # open output file if already exists to write into it
+    with open(OUT_FILE, "r", encoding="utf-8") as f:
+        formatted_records = json.load(f)
+except:
+    formatted_records = {}
+
 # process each record
 s = requests.Session()
 formatted_records = {}
-processing_records = snapshot_data[:]
+processing_records = snapshot_data[START_POSITION:RECORDS_LIMIT]
+logger.info(
+    f"Start processing start: {START_POSITION}, end: {START_POSITION + min(len(processing_records), RECORDS_LIMIT)}"
+)
 for i, record in enumerate(processing_records):
-    if i >= RECORDS_LIMIT:
-        break
-
     stake_addr = address.stake_public_key_to_address(
         key=record["stake_public_key"][2:], is_stake=True, network_type="preprod"
     )
 
-    logger.info(f"Checking: '{stake_addr}'... ({i + 1}/{RECORDS_LIMIT})")
+    logger.info(
+        f"Checking: '{stake_addr}'... ({i + 1}/{min(len(processing_records), RECORDS_LIMIT)})"
+    )
 
     addresses = get_reguest(
         s,
@@ -95,4 +105,6 @@ for i, record in enumerate(processing_records):
 with open(OUT_FILE, "w") as f:
     json.dump(formatted_records, f, indent=2)
 
-print("Completed preparing data")
+logger.info(
+    f"Completed preparing data, start: {START_POSITION}, end: {START_POSITION + min(len(processing_records), RECORDS_LIMIT)}"
+)
