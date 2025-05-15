@@ -20,7 +20,8 @@ class SpaceHeader extends StatelessWidget {
 
     return Container(
       key: Key('SpaceHeader.${data.name}'),
-      padding: const EdgeInsets.symmetric(vertical: 14).add(const EdgeInsets.only(left: 16)),
+      padding: const EdgeInsets.symmetric(vertical: 14)
+          .add(const EdgeInsets.only(left: 16)),
       child: Row(
         children: [
           SpaceAvatar(
@@ -33,7 +34,8 @@ class SpaceHeader extends StatelessWidget {
               data.localizedName(context.l10n),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: theme.textTheme.titleMedium?.copyWith(color: theme.colors.textPrimary),
+              style: theme.textTheme.titleMedium
+                  ?.copyWith(color: theme.colors.textPrimary),
             ),
           ),
         ],

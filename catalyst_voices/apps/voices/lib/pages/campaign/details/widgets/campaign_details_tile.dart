@@ -138,7 +138,10 @@ class _CampaignData extends StatelessWidget {
             subtitle: l10n.totalSubmitted,
             value: proposalsCount,
           ),
-        ].map<Widget>((e) => Expanded(child: e)).separatedBy(const SizedBox(width: 16)).toList(),
+        ]
+            .map<Widget>((e) => Expanded(child: e))
+            .separatedBy(const SizedBox(width: 16))
+            .toList(),
       ),
     );
   }
@@ -187,8 +190,9 @@ class _CampaignDataTile extends StatelessWidget {
         const SizedBox(height: 16),
         Row(
           textBaseline: TextBaseline.alphabetic,
-          crossAxisAlignment:
-              valueSuffix != null ? CrossAxisAlignment.baseline : CrossAxisAlignment.end,
+          crossAxisAlignment: valueSuffix != null
+              ? CrossAxisAlignment.baseline
+              : CrossAxisAlignment.end,
           children: [
             Text(
               key: const Key('Value'),

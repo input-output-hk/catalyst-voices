@@ -58,7 +58,9 @@ final class _Color extends WidgetStateProperty<Color> {
   Color resolve(Set<WidgetState> states) {
     if (const [WidgetState.hovered, WidgetState.focused].any(states.contains)) {
       return switch (publishStage) {
-        ProposalPublish.localDraft || ProposalPublish.publishedDraft => colorScheme.secondary,
+        ProposalPublish.localDraft ||
+        ProposalPublish.publishedDraft =>
+          colorScheme.secondary,
         ProposalPublish.submittedProposal => colorScheme.primary,
       };
     }

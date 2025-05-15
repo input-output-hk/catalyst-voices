@@ -74,7 +74,8 @@ void main() {
 
     await secureStorage.clear();
 
-    final futures = keyValues.keys.map((e) => secureStorage.readString(key: e)).toList();
+    final futures =
+        keyValues.keys.map((e) => secureStorage.readString(key: e)).toList();
 
     final values = await Future.wait(futures);
 

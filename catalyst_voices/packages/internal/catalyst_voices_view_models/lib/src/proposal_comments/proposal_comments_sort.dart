@@ -46,7 +46,9 @@ extension SegmentsExt on Iterable<Segment> {
   Iterable<Segment> sortWith({required ProposalCommentsSort sort}) {
     return List.of(this).map(
       (segment) {
-        return segment is ProposalCommentsSegment ? segment.copySorted(sort: sort) : segment;
+        return segment is ProposalCommentsSegment
+            ? segment.copySorted(sort: sort)
+            : segment;
       },
     );
   }

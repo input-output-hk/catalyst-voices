@@ -201,7 +201,11 @@ class _Foreground extends StatelessWidget {
         children: [
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 30),
-            child: Theme.of(context).brandAssets.brand.logo(context).buildPicture(),
+            child: Theme.of(context)
+                .brandAssets
+                .brand
+                .logo(context)
+                .buildPicture(),
           ),
           Center(
             child: Padding(

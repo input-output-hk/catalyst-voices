@@ -59,7 +59,8 @@ final class Proposal extends Equatable implements Comparable<Proposal> {
     final document = data.document;
     final updateDate = document.metadata.selfRef.version!.dateTime;
 
-    final versions = data.versions.map(ProposalVersion.fromData).toList()..sort();
+    final versions = data.versions.map(ProposalVersion.fromData).toList()
+      ..sort();
 
     return Proposal._(
       selfRef: document.metadata.selfRef,

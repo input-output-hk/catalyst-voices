@@ -40,7 +40,8 @@ class FinalProposalChip extends StatelessWidget {
           color: Theme.of(context).colorScheme.onPrimary,
         ),
       ),
-      backgroundColor: onColorBackground ? Theme.of(context).colorScheme.primary : null,
+      backgroundColor:
+          onColorBackground ? Theme.of(context).colorScheme.primary : null,
     );
   }
 }
@@ -58,7 +59,8 @@ class PrivateProposalChip extends StatelessWidget {
           color: Theme.of(context).colors.textOnPrimaryLevel1,
         ),
       ),
-      backgroundColor: Theme.of(context).colors.elevationsOnSurfaceNeutralLv1Grey,
+      backgroundColor:
+          Theme.of(context).colors.elevationsOnSurfaceNeutralLv1Grey,
     );
   }
 }
@@ -76,8 +78,9 @@ class ProposalCommentsChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return VoicesChip.rectangular(
-      backgroundColor:
-          useInternalBackground ? context.colors.elevationsOnSurfaceNeutralLv1Grey : null,
+      backgroundColor: useInternalBackground
+          ? context.colors.elevationsOnSurfaceNeutralLv1Grey
+          : null,
       leading: VoicesAssets.icons.chatAlt2.buildIcon(
         color: useInternalBackground ? null : context.colors.iconsBackground,
       ),
@@ -163,7 +166,8 @@ class ProposalVersionChip extends StatelessWidget {
         children: [
           VoicesAssets.icons.documentText.buildIcon(
             size: 18,
-            color: useInternalBackground ? null : context.colors.iconsBackground,
+            color:
+                useInternalBackground ? null : context.colors.iconsBackground,
           ),
           Text(
             version,

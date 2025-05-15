@@ -7,5 +7,6 @@ final class LocalizedUnlockPasswordException extends LocalizedException {
   const LocalizedUnlockPasswordException();
 
   @override
-  String message(BuildContext context) => context.l10n.unlockDialogIncorrectPassword;
+  String message(BuildContext context) =>
+      context.l10n.unlockDialogIncorrectPassword;
 }

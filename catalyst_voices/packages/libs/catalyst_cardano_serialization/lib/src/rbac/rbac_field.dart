@@ -37,7 +37,8 @@ final class DefinedRbacField<T extends CborEncodable> extends RbacField<T> {
 /// - [UndefinedRbacField] - when the field should not be modified.
 /// - [DefinedRbacField] - when the field should be updated with the
 /// given value.
-sealed class RbacField<T extends CborEncodable> extends Equatable implements CborEncodable {
+sealed class RbacField<T extends CborEncodable> extends Equatable
+    implements CborEncodable {
   /// The default constructor for the [RbacField].
   const RbacField();
 

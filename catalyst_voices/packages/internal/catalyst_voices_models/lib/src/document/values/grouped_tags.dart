@@ -64,8 +64,10 @@ final class GroupedTags extends Equatable {
         return false;
       }
 
-      final group = conditions.firstWhereOrNull((e) => e.schema is DocumentTagGroupSchema);
-      final selection = conditions.firstWhereOrNull((e) => e.schema is DocumentTagSelectionSchema);
+      final group = conditions
+          .firstWhereOrNull((e) => e.schema is DocumentTagGroupSchema);
+      final selection = conditions
+          .firstWhereOrNull((e) => e.schema is DocumentTagSelectionSchema);
 
       if (group == null) {
         logger?.warning('Group[$group] definition is not group');

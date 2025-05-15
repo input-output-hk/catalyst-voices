@@ -71,7 +71,8 @@ void main() {
       expect(selectedValue, 'Item 2');
     });
 
-    testWidgets('displays error message when in error state', (WidgetTester tester) async {
+    testWidgets('displays error message when in error state',
+        (WidgetTester tester) async {
       await tester.pumpApp(
         Scaffold(
           body: Center(
@@ -79,7 +80,8 @@ void main() {
               items: items,
               value: null,
               onChanged: (_) {},
-              validator: (value) => value == null ? 'Selection is required' : null,
+              validator: (value) =>
+                  value == null ? 'Selection is required' : null,
               autovalidateMode: AutovalidateMode.always,
             ),
           ),

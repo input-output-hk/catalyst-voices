@@ -85,11 +85,15 @@ class CampaignStageCard extends StatelessWidget {
     switch (campaign.stage) {
       case CampaignStage.draft:
       case CampaignStage.scheduled:
-        final formattedDate = DateFormatter.formatDateTimeParts(campaign.startDate);
-        return context.l10n.campaignBeginsOn(formattedDate.date, formattedDate.time);
+        final formattedDate =
+            DateFormatter.formatDateTimeParts(campaign.startDate);
+        return context.l10n
+            .campaignBeginsOn(formattedDate.date, formattedDate.time);
       case CampaignStage.live:
-        final formattedDate = DateFormatter.formatDateTimeParts(campaign.endDate);
-        return context.l10n.campaignEndsOn(formattedDate.date, formattedDate.time);
+        final formattedDate =
+            DateFormatter.formatDateTimeParts(campaign.endDate);
+        return context.l10n
+            .campaignEndsOn(formattedDate.date, formattedDate.time);
       case CampaignStage.completed:
         return '';
     }

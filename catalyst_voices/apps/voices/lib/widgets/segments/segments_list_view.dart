@@ -56,11 +56,13 @@ class BasicSegmentsListView extends StatelessWidget {
   }
 }
 
-class SegmentsListView<T1 extends Segment, T2 extends Section> extends BasicSegmentsListView {
+class SegmentsListView<T1 extends Segment, T2 extends Section>
+    extends BasicSegmentsListView {
   SegmentsListView({
     super.key,
     required super.items,
-    SegmentHeaderWidgetBuilder<T1> segmentBuilder = _defaultSegmentHeaderBuilder,
+    SegmentHeaderWidgetBuilder<T1> segmentBuilder =
+        _defaultSegmentHeaderBuilder,
     required SectionWidgetBuilder<T2> sectionBuilder,
     super.padding,
     super.itemScrollController,

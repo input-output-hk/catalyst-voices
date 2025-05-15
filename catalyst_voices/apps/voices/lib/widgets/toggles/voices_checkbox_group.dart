@@ -67,7 +67,8 @@ class VoicesCheckboxGroup<T extends Object> extends StatelessWidget {
 
   bool get _isGroupEnabled => onChanged != null;
 
-  bool get _isGroupSelected => elements.every((element) => selected.contains(element.value));
+  bool get _isGroupSelected =>
+      elements.every((element) => selected.contains(element.value));
 
   const VoicesCheckboxGroup({
     super.key,
@@ -101,8 +102,9 @@ class VoicesCheckboxGroup<T extends Object> extends StatelessWidget {
                       value: selected.contains(element.value),
                       label: element.label,
                       note: element.note,
-                      onChanged:
-                          _isGroupEnabled ? (value) => _updateElement(element.value, value) : null,
+                      onChanged: _isGroupEnabled
+                          ? (value) => _updateElement(element.value, value)
+                          : null,
                       isError: element.isError,
                     );
                   },
@@ -126,7 +128,8 @@ class VoicesCheckboxGroup<T extends Object> extends StatelessWidget {
       'Toggled group status but change callback is null',
     );
 
-    final updatedSelection = isChecked ? elements.map((e) => e.value).toSet() : <T>{};
+    final updatedSelection =
+        isChecked ? elements.map((e) => e.value).toSet() : <T>{};
 
     onChanged!(updatedSelection);
   }

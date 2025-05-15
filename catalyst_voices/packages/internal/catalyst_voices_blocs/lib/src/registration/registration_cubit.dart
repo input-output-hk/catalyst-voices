@@ -16,7 +16,8 @@ import 'package:result_type/result_type.dart';
 final _logger = Logger('RegistrationCubit');
 
 /// Manages the registration state.
-final class RegistrationCubit extends Cubit<RegistrationState> with BlocErrorEmitterMixin {
+final class RegistrationCubit extends Cubit<RegistrationState>
+    with BlocErrorEmitterMixin {
   final BaseProfileCubit _baseProfileCubit;
   final KeychainCreationCubit _keychainCreationCubit;
   final WalletLinkCubit _walletLinkCubit;
@@ -452,7 +453,9 @@ final class RegistrationCubit extends Cubit<RegistrationState> with BlocErrorEmi
 
       // if there is no next step from wallet link go to account completed.
       final nextStage = step.stage.next;
-      return nextStage != null ? WalletLinkStep(stage: nextStage) : const AccountCompletedStep();
+      return nextStage != null
+          ? WalletLinkStep(stage: nextStage)
+          : const AccountCompletedStep();
     }
 
     RegistrationStep? nextRecoverWithSeedPhraseStep() {
@@ -465,7 +468,9 @@ final class RegistrationCubit extends Cubit<RegistrationState> with BlocErrorEmi
       }
 
       final nextStage = step.stage.next;
-      return nextStage != null ? RecoverWithSeedPhraseStep(stage: nextStage) : null;
+      return nextStage != null
+          ? RecoverWithSeedPhraseStep(stage: nextStage)
+          : null;
     }
 
     RegistrationStep? nextRegistrationStep(
@@ -492,7 +497,8 @@ final class RegistrationCubit extends Cubit<RegistrationState> with BlocErrorEmi
       RecoverWithSeedPhraseStep() => nextRecoverWithSeedPhraseStep(),
       CreateBaseProfileStep() => nextBaseProfile(),
       CreateKeychainStep() => nextKeychainStep(),
-      AccountCreateProgressStep(:final completedSteps) => nextRegistrationStep(completedSteps),
+      AccountCreateProgressStep(:final completedSteps) =>
+        nextRegistrationStep(completedSteps),
       WalletLinkStep() => nextWalletLinkStep(),
       AccountCompletedStep() => null,
     };
@@ -525,7 +531,8 @@ final class RegistrationCubit extends Cubit<RegistrationState> with BlocErrorEmi
     RegistrationStep previousBaseProfileStep() {
       final step = state.step;
 
-      final previousStep = step is CreateBaseProfileStep ? step.stage.previous : null;
+      final previousStep =
+          step is CreateBaseProfileStep ? step.stage.previous : null;
 
       return previousStep != null
           ? CreateBaseProfileStep(stage: previousStep)
@@ -536,7 +543,8 @@ final class RegistrationCubit extends Cubit<RegistrationState> with BlocErrorEmi
     RegistrationStep previousKeychainStep() {
       final step = state.step;
 
-      final previousStep = step is CreateKeychainStep ? step.stage.previous : null;
+      final previousStep =
+          step is CreateKeychainStep ? step.stage.previous : null;
 
       return previousStep != null
           ? CreateKeychainStep(stage: previousStep)
@@ -566,7 +574,8 @@ final class RegistrationCubit extends Cubit<RegistrationState> with BlocErrorEmi
     RegistrationStep previousRecoverWithSeedPhraseStep() {
       final step = state.step;
 
-      final previousStep = step is RecoverWithSeedPhraseStep ? step.stage.previous : null;
+      final previousStep =
+          step is RecoverWithSeedPhraseStep ? step.stage.previous : null;
 
       return previousStep != null
           ? RecoverWithSeedPhraseStep(stage: previousStep)

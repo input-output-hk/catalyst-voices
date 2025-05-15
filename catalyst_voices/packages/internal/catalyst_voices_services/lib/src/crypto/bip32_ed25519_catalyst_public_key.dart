@@ -4,7 +4,8 @@ import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:equatable/equatable.dart';
 
-final class Bip32Ed25519XCatalystPublicKey extends Equatable implements CatalystPublicKey {
+final class Bip32Ed25519XCatalystPublicKey extends Equatable
+    implements CatalystPublicKey {
   final Bip32Ed25519XPublicKey _publicKey;
 
   const Bip32Ed25519XCatalystPublicKey(this._publicKey);
@@ -16,7 +17,8 @@ final class Bip32Ed25519XCatalystPublicKey extends Equatable implements Catalyst
   List<Object?> get props => [_publicKey];
 
   @override
-  Uint8List get publicKeyBytes => Uint8List.fromList(_publicKey.toPublicKey().bytes);
+  Uint8List get publicKeyBytes =>
+      Uint8List.fromList(_publicKey.toPublicKey().bytes);
 
   @override
   Future<bool> verify(Uint8List data, {required CatalystSignature signature}) {
@@ -28,7 +30,8 @@ final class Bip32Ed25519XCatalystPublicKey extends Equatable implements Catalyst
   }
 }
 
-final class Bip32Ed25519XCatalystPublicKeyFactory implements CatalystPublicKeyFactory {
+final class Bip32Ed25519XCatalystPublicKeyFactory
+    implements CatalystPublicKeyFactory {
   const Bip32Ed25519XCatalystPublicKeyFactory();
 
   @override

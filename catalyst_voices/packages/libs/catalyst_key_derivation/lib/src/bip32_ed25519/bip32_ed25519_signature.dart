@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
-import 'package:catalyst_key_derivation/src/rust/api/key_derivation.dart' as rust;
+import 'package:catalyst_key_derivation/src/rust/api/key_derivation.dart'
+    as rust;
 import 'package:cbor/cbor.dart';
 import 'package:convert/convert.dart';
 import 'package:equatable/equatable.dart';

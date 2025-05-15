@@ -24,7 +24,8 @@ class SpaceOverviewNavTile extends StatelessWidget {
       color: theme.colors.iconsForeground,
     );
 
-    final textStyle = (theme.textTheme.labelLarge ?? const TextStyle()).copyWith(
+    final textStyle =
+        (theme.textTheme.labelLarge ?? const TextStyle()).copyWith(
       color: theme.colors.textOnPrimaryLevel0,
     );
 

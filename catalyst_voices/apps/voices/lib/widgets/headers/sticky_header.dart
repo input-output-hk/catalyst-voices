@@ -55,7 +55,8 @@ class _StickyHeaderState extends State<StickyHeader> {
   }
 
   void _handleScrollNotification(ScrollNotification notification) {
-    if (notification is ScrollUpdateNotification && widget.notificationPredicate(notification)) {
+    if (notification is ScrollUpdateNotification &&
+        widget.notificationPredicate(notification)) {
       final oldScrolledUnder = _scrolledUnder;
       final metrics = notification.metrics;
       switch (metrics.axisDirection) {

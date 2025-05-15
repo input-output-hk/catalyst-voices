@@ -147,7 +147,8 @@ class _BrandTile extends StatelessWidget {
         prefix: brand.logoIcon(context).buildIcon(allowColorFilter: false),
         child: Text(
           brand.localizedName(context.l10n),
-          style: context.textTheme.titleMedium?.copyWith(color: context.colorScheme.primary),
+          style: context.textTheme.titleMedium
+              ?.copyWith(color: context.colorScheme.primary),
         ),
       ),
     );

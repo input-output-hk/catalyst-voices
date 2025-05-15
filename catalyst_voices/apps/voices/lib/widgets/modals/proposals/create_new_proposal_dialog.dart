@@ -24,7 +24,8 @@ class CreateNewProposalDialog extends StatefulWidget {
   const CreateNewProposalDialog({super.key});
 
   @override
-  State<CreateNewProposalDialog> createState() => _CreateNewProposalDialogState();
+  State<CreateNewProposalDialog> createState() =>
+      _CreateNewProposalDialogState();
 
   static Future<void> show(BuildContext context) async {
     final result = showDialog<void>(
@@ -90,7 +91,8 @@ class _CategorySelection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<NewProposalCubit, NewProposalState, _SelectedCategoryData>(
+    return BlocSelector<NewProposalCubit, NewProposalState,
+        _SelectedCategoryData>(
       selector: (state) {
         return (
           categories: state.categories,
@@ -127,8 +129,10 @@ class _Content extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocSelector<NewProposalCubit, NewProposalState,
         ({bool isLoading, bool isMissingProposerRole})>(
-      selector: (state) =>
-          (isLoading: state.isLoading, isMissingProposerRole: state.isMissingProposerRole),
+      selector: (state) => (
+        isLoading: state.isLoading,
+        isMissingProposerRole: state.isMissingProposerRole
+      ),
       builder: (context, state) {
         if (state.isLoading) {
           return const _LoadingContent();
@@ -146,7 +150,8 @@ class _CreateNewProposalContent extends StatefulWidget {
   const _CreateNewProposalContent();
 
   @override
-  State<_CreateNewProposalContent> createState() => _CreateNewProposalContentState();
+  State<_CreateNewProposalContent> createState() =>
+      _CreateNewProposalContentState();
 }
 
 class _CreateNewProposalContentState extends State<_CreateNewProposalContent> {
@@ -284,8 +289,9 @@ class _TitleTextField extends StatelessWidget {
         return VoicesTextField(
           initialText: title.value,
           onFieldSubmitted: onFieldSubmitted,
-          onChanged: (value) =>
-              context.read<NewProposalCubit>().updateTitle(ProposalTitle.dirty(value ?? '')),
+          onChanged: (value) => context
+              .read<NewProposalCubit>()
+              .updateTitle(ProposalTitle.dirty(value ?? '')),
           decoration: VoicesTextFieldDecoration(
             borderRadius: BorderRadius.circular(8),
             filled: false,

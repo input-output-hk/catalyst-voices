@@ -8,9 +8,13 @@ extension NullableCatalystIDStatusExt on CatalystIDStatus? {
   // banned = 3
   AccountPublicStatus toModel() {
     return switch (this) {
-      null || CatalystIDStatus.swaggerGeneratedUnknown => AccountPublicStatus.unknown,
+      null ||
+      CatalystIDStatus.swaggerGeneratedUnknown =>
+        AccountPublicStatus.unknown,
       CatalystIDStatus.value_0 => AccountPublicStatus.verifying,
-      CatalystIDStatus.value_1 || CatalystIDStatus.value_2 => AccountPublicStatus.verified,
+      CatalystIDStatus.value_1 ||
+      CatalystIDStatus.value_2 =>
+        AccountPublicStatus.verified,
       CatalystIDStatus.value_3 => AccountPublicStatus.banned,
     };
   }

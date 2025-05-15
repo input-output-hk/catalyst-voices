@@ -64,13 +64,17 @@ final class User extends Equatable {
   User removeAccount({
     required CatalystId id,
   }) {
-    final accounts = [...this.accounts].where((account) => !id.isReferringTo(account)).toList();
+    final accounts = [...this.accounts]
+        .where((account) => !id.isReferringTo(account))
+        .toList();
 
     return copyWith(accounts: accounts);
   }
 
   User updateAccount(Account account) {
-    final accounts = List.of(this.accounts).map((e) => e.isSameRef(account) ? account : e).toList();
+    final accounts = List.of(this.accounts)
+        .map((e) => e.isSameRef(account) ? account : e)
+        .toList();
 
     return copyWith(accounts: accounts);
   }

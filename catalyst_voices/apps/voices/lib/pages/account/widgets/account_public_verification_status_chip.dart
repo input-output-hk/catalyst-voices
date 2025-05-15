@@ -29,7 +29,8 @@ class _Chip extends StatelessWidget {
     return VoicesChip.round(
       content: Text(
         status.localizedName(context),
-        style: context.textTheme.labelSmall?.copyWith(color: status.foregroundColor(context)),
+        style: context.textTheme.labelSmall
+            ?.copyWith(color: status.foregroundColor(context)),
       ),
       padding: const EdgeInsets.symmetric(vertical: 1, horizontal: 6),
       backgroundColor: status.backgroundColor(context),

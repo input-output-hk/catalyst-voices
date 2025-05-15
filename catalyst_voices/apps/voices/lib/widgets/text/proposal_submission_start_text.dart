@@ -20,14 +20,17 @@ class ProposalSubmissionStartText extends StatelessWidget {
         timestampTextStyle: WidgetStatePropertyAll<TextStyle>(
           context.textTheme.titleLarge ?? const TextStyle(),
         ),
-        foregroundColor: WidgetStatePropertyAll(context.colors.textOnPrimaryLevel0),
+        foregroundColor:
+            WidgetStatePropertyAll(context.colors.textOnPrimaryLevel0),
       ),
       child: TimezoneDateTimeText(
         startDate,
         formatter: (context, dateTime) {
-          final date = DateFormatter.formatDateTimeParts(dateTime, includeYear: true);
+          final date =
+              DateFormatter.formatDateTimeParts(dateTime, includeYear: true);
 
-          return context.l10n.proposalSubmissionStageStartAt(date.date, date.time);
+          return context.l10n
+              .proposalSubmissionStageStartAt(date.date, date.time);
         },
       ),
     );

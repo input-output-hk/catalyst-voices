@@ -30,9 +30,11 @@ class OnboardingPageBase {
   final registrationDialogTitle = const Key('RegistrationDialogTitle');
   final voicesAlertDialogTitleRow = const Key('VoicesAlertDialogTitleRow');
   final warningIcon = const Key('WarningIcon');
-  final voicesAlertDialogCloseButton = const Key('VoicesAlertDialogCloseButton');
+  final voicesAlertDialogCloseButton =
+      const Key('VoicesAlertDialogCloseButton');
   final voicesAlertDialogSubtitle = const Key('VoicesAlertDialogSubtitle');
-  final registrationExitDialogContent = const Key('RegistrationExitDialogContent');
+  final registrationExitDialogContent =
+      const Key('RegistrationExitDialogContent');
   final recoveryExitDialogContent = const Key('RecoveryExitDialogContent');
 
   Future<String?> infoPartHeaderTitleText() async {
@@ -52,7 +54,9 @@ class OnboardingPageBase {
   }
 
   Future<PatrolFinder> closeButton() async {
-    return $(registrationDialog).$(CommonPage($).dialogCloseButton).waitUntilVisible();
+    return $(registrationDialog)
+        .$(CommonPage($).dialogCloseButton)
+        .waitUntilVisible();
   }
 
   Future<void> verifyNextButtonIsEnabled() async {
@@ -64,7 +68,9 @@ class OnboardingPageBase {
   }
 
   PatrolFinder infoPartTaskPicture() {
-    return $(registrationInfoPanel).$(registrationInfoPictureContainer).$(IconTheme);
+    return $(registrationInfoPanel)
+        .$(registrationInfoPictureContainer)
+        .$(IconTheme);
   }
 
   Future<void> clickBack() async {

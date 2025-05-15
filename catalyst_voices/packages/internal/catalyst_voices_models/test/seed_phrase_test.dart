@@ -56,7 +56,8 @@ void main() {
       );
     });
 
-    test('should contain consistent mnemonic and seed in generated SeedPhrase', () {
+    test('should contain consistent mnemonic and seed in generated SeedPhrase',
+        () {
       final seedPhrase = SeedPhrase();
       final mnemonic = seedPhrase.mnemonic;
       final seed = seedPhrase.hexSeed;

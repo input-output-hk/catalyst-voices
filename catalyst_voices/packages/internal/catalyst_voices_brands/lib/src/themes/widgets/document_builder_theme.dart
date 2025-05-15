@@ -21,7 +21,9 @@ class DocumentBuilderTheme extends InheritedTheme {
   }
 
   static DocumentBuilderThemeData? maybeOf(BuildContext context) {
-    return context.dependOnInheritedWidgetOfExactType<DocumentBuilderTheme>()?.data;
+    return context
+        .dependOnInheritedWidgetOfExactType<DocumentBuilderTheme>()
+        ?.data;
   }
 
   static DocumentBuilderThemeData of(BuildContext context) {

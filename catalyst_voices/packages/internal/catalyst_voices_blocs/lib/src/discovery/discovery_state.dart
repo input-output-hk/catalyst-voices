@@ -20,7 +20,8 @@ final class DiscoveryCampaignCategoriesState extends Equatable {
         categories,
       ];
 
-  bool get showCategories => !isLoading && categories.isNotEmpty && error == null;
+  bool get showCategories =>
+      !isLoading && categories.isNotEmpty && error == null;
 
   bool get showError => !isLoading && error != null;
 }
@@ -36,7 +37,8 @@ final class DiscoveryCurrentCampaignState extends Equatable {
     this.error,
     CurrentCampaignInfoViewModel? currentCampaign,
     this.campaignTimeline = const [],
-  }) : currentCampaign = currentCampaign ?? const NullCurrentCampaignInfoViewModel();
+  }) : currentCampaign =
+            currentCampaign ?? const NullCurrentCampaignInfoViewModel();
 
   @override
   List<Object?> get props => [
@@ -99,8 +101,9 @@ final class DiscoveryMostRecentProposalsState extends Equatable {
   }
 
   DiscoveryMostRecentProposalsState updateFavorites(List<String> ids) {
-    final updatedProposals =
-        [...proposals].map((e) => e.copyWith(isFavorite: ids.contains(e.ref.id))).toList();
+    final updatedProposals = [...proposals]
+        .map((e) => e.copyWith(isFavorite: ids.contains(e.ref.id)))
+        .toList();
     return copyWith(proposals: updatedProposals, favoritesIds: ids);
   }
 }

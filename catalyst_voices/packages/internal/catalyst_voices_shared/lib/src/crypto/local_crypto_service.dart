@@ -160,7 +160,8 @@ final class LocalCryptoService implements CryptoService {
 
       final concatenation = secretBox.concatenation();
 
-      final metadata = Uint8List.fromList([_currentVersion, _currentAlgorithmId]);
+      final metadata =
+          Uint8List.fromList([_currentVersion, _currentAlgorithmId]);
 
       final result = Uint8List.fromList([
         ...metadata,

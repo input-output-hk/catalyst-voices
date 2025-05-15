@@ -28,12 +28,17 @@ final class RegistrationTransactionRole extends Equatable {
   @override
   List<Object?> get props => [type, action];
 
-  bool get setDrep => type == AccountRole.drep && action == RegistrationTransactionRoleAction.set;
+  bool get setDrep =>
+      type == AccountRole.drep &&
+      action == RegistrationTransactionRoleAction.set;
 
   bool get setProposer =>
-      type == AccountRole.proposer && action == RegistrationTransactionRoleAction.set;
+      type == AccountRole.proposer &&
+      action == RegistrationTransactionRoleAction.set;
 
-  bool get setVoter => type == AccountRole.voter && action == RegistrationTransactionRoleAction.set;
+  bool get setVoter =>
+      type == AccountRole.voter &&
+      action == RegistrationTransactionRoleAction.set;
 }
 
 enum RegistrationTransactionRoleAction {
@@ -42,7 +47,8 @@ enum RegistrationTransactionRoleAction {
   unset,
 }
 
-extension IterableRegistrationTransactionRoleExt on Iterable<RegistrationTransactionRole> {
+extension IterableRegistrationTransactionRoleExt
+    on Iterable<RegistrationTransactionRole> {
   /// Whether the configured roles indicate this is a first
   /// registration (true) or registration update - role change (false).
   bool get isFirstRegistration => any((e) => e.setVoter);

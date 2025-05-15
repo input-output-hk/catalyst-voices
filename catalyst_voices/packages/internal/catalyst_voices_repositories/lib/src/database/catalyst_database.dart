@@ -68,7 +68,8 @@ abstract interface class CatalystDatabase {
   views: [],
   include: {},
 )
-class DriftCatalystDatabase extends $DriftCatalystDatabase implements CatalystDatabase {
+class DriftCatalystDatabase extends $DriftCatalystDatabase
+    implements CatalystDatabase {
   final _clearLock = Lock();
 
   @visibleForTesting

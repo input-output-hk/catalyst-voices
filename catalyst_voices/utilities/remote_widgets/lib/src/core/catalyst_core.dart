@@ -5,7 +5,8 @@ import 'package:rfw/rfw.dart';
 ///
 /// The map contains a collection of [LocalWidgetBuilder] functions
 /// that define the core widgets used in Catalyst.
-Map<String, LocalWidgetBuilder> get _catalystCoreWidgetsDefinitions => <String, LocalWidgetBuilder>{
+Map<String, LocalWidgetBuilder> get _catalystCoreWidgetsDefinitions =>
+    <String, LocalWidgetBuilder>{
       'TextField': (BuildContext context, DataSource source) {
         return TextField(
           style: ArgumentDecoders.textStyle(source, ['style']),

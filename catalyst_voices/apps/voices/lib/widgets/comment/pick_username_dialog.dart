@@ -33,14 +33,14 @@ class _PickUsernameDialogState extends State<PickUsernameDialog> {
             const SizedBox(height: 44),
             Text(
               context.l10n.commentPickUsername,
-              style:
-                  context.textTheme.titleLarge?.copyWith(color: context.colors.textOnPrimaryLevel0),
+              style: context.textTheme.titleLarge
+                  ?.copyWith(color: context.colors.textOnPrimaryLevel0),
             ),
             const SizedBox(height: 24),
             Text(
               context.l10n.commentPickUsernameLabel,
-              style:
-                  context.textTheme.bodyMedium?.copyWith(color: context.colors.textOnPrimaryLevel0),
+              style: context.textTheme.bodyMedium
+                  ?.copyWith(color: context.colors.textOnPrimaryLevel0),
             ),
             const SizedBox(height: 24),
             VoicesUsernameTextField(

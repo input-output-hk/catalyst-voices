@@ -42,7 +42,8 @@ class CurrentCampaignInfoViewModel extends Equatable {
       allFunds: model.allFunds,
       totalAsk: model.totalAsk,
       askRange: model.askRange,
-      timeline: model.timeline.map(CampaignTimelineViewModel.fromModel).toList(),
+      timeline:
+          model.timeline.map(CampaignTimelineViewModel.fromModel).toList(),
     );
   }
 

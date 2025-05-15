@@ -28,9 +28,12 @@ class _Header extends StatelessWidget {
 }
 
 class _UserProposalsState extends State<UserProposals> {
-  List<Proposal> get _draft => widget.items.where((e) => e.publish.isDraft).toList();
-  List<Proposal> get _local => widget.items.where((e) => e.publish.isLocal).toList();
-  List<Proposal> get _submitted => widget.items.where((e) => e.publish.isPublished).toList();
+  List<Proposal> get _draft =>
+      widget.items.where((e) => e.publish.isDraft).toList();
+  List<Proposal> get _local =>
+      widget.items.where((e) => e.publish.isLocal).toList();
+  List<Proposal> get _submitted =>
+      widget.items.where((e) => e.publish.isPublished).toList();
 
   @override
   Widget build(BuildContext context) {

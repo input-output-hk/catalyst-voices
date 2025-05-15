@@ -70,7 +70,8 @@ void main() {
         order: const [],
       );
 
-      test('validate empty selection returns $MissingRequiredDocumentValue', () {
+      test('validate empty selection returns $MissingRequiredDocumentValue',
+          () {
         final result = tagGroupSchema.validate([
           DocumentValueProperty<String>(
             schema: groupSchema,

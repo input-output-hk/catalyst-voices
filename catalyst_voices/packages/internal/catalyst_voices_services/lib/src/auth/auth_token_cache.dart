@@ -7,7 +7,8 @@ abstract interface class AuthTokenCache {
   Future<void> setRbac(String value, {required CatalystId id});
 }
 
-final class LocalAuthTokenCache extends LocalTllCache implements AuthTokenCache {
+final class LocalAuthTokenCache extends LocalTllCache
+    implements AuthTokenCache {
   static const _maxTokenAge = Duration(hours: 1);
 
   LocalAuthTokenCache({

@@ -42,7 +42,8 @@ class _AccountEmailTileState extends State<AccountEmailTile> {
       isSaveEnabled: hasEmail,
       statesController: _statesController,
       footerActions: [
-        if (!_isEditMode && !isVerified && hasEmail) const AccountReSendVerificationButton(),
+        if (!_isEditMode && !isVerified && hasEmail)
+          const AccountReSendVerificationButton(),
       ],
       child: VoicesEmailTextField(
         key: const Key('AccountEmailTextField'),
@@ -55,7 +56,9 @@ class _AccountEmailTileState extends State<AccountEmailTile> {
             offstage: _isEditMode || _email.value.isEmpty,
             child: const AccountPublicVerificationStatusChip(),
           ),
-          helperText: !_isEditMode && !isVerified ? context.l10n.accountEmailVerifyHelper : null,
+          helperText: !_isEditMode && !isVerified
+              ? context.l10n.accountEmailVerifyHelper
+              : null,
         ),
         onFieldSubmitted: null,
         readOnly: !_isEditMode,
@@ -97,7 +100,10 @@ class _AccountEmailTileState extends State<AccountEmailTile> {
       if (_isEditMode) WidgetState.selected,
     });
 
-    _emailSub = bloc.stream.map((event) => event.email).distinct().listen(_handleEmailChange);
+    _emailSub = bloc.stream
+        .map((event) => event.email)
+        .distinct()
+        .listen(_handleEmailChange);
 
     _publicStatusSub = bloc.stream
         .map((event) => event.accountPublicStatus)

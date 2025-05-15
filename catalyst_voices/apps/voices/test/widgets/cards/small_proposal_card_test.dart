@@ -98,7 +98,8 @@ void main() {
       );
     });
 
-    testWidgets('hides new iteration details when showLatestLocal is false', (tester) async {
+    testWidgets('hides new iteration details when showLatestLocal is false',
+        (tester) async {
       await pumpCard(tester);
       await tester.pumpAndSettle();
 
@@ -108,15 +109,18 @@ void main() {
       );
     });
 
-    testWidgets('shows correct chip based on proposal publish status', (tester) async {
+    testWidgets('shows correct chip based on proposal publish status',
+        (tester) async {
       // Test for published draft
-      mockProposal = mockProposal.copyWith(publish: ProposalPublish.publishedDraft);
+      mockProposal =
+          mockProposal.copyWith(publish: ProposalPublish.publishedDraft);
       await pumpCard(tester);
       await tester.pumpAndSettle();
       expect(find.byType(DraftProposalChip), findsOneWidget);
 
       // Test for submitted proposal
-      mockProposal = mockProposal.copyWith(publish: ProposalPublish.submittedProposal);
+      mockProposal =
+          mockProposal.copyWith(publish: ProposalPublish.submittedProposal);
       await pumpCard(tester);
       await tester.pumpAndSettle();
       expect(find.byType(FinalProposalChip), findsOneWidget);

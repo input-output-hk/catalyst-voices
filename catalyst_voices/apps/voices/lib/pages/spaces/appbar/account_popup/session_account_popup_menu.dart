@@ -250,7 +250,8 @@ class _Session extends StatelessWidget {
   }
 }
 
-class _SessionAccountPopupMenuState extends State<SessionAccountPopupMenu> with LaunchUrlMixin {
+class _SessionAccountPopupMenuState extends State<SessionAccountPopupMenu>
+    with LaunchUrlMixin {
   final _popupMenuButtonKey = GlobalKey<PopupMenuButtonState<_MenuItemEvent>>();
 
   @override

@@ -27,8 +27,10 @@ enum ProposalMenuItemAction {
           context,
           currentIteration: currentIteration,
         ),
-      ProposalMenuItemAction.publish => context.l10n.proposalEditorStatusDropdownPublishDescription,
-      ProposalMenuItemAction.submit => context.l10n.proposalEditorStatusDropdownSubmitDescription,
+      ProposalMenuItemAction.publish =>
+        context.l10n.proposalEditorStatusDropdownPublishDescription,
+      ProposalMenuItemAction.submit =>
+        context.l10n.proposalEditorStatusDropdownSubmitDescription,
       _ => null,
     };
   }
@@ -36,13 +38,17 @@ enum ProposalMenuItemAction {
   SvgGenImage icon({bool workspace = false}) {
     switch (this) {
       case ProposalMenuItemAction.view:
-        return workspace ? VoicesAssets.icons.eye : VoicesAssets.icons.documentText;
+        return workspace
+            ? VoicesAssets.icons.eye
+            : VoicesAssets.icons.documentText;
       case ProposalMenuItemAction.publish:
         return VoicesAssets.icons.chatAlt2;
       case ProposalMenuItemAction.submit:
         return VoicesAssets.icons.badgeCheck;
       case ProposalMenuItemAction.export:
-        return workspace ? VoicesAssets.icons.duplicate : VoicesAssets.icons.folderOpen;
+        return workspace
+            ? VoicesAssets.icons.duplicate
+            : VoicesAssets.icons.folderOpen;
       case ProposalMenuItemAction.delete:
         return VoicesAssets.icons.trash;
       case ProposalMenuItemAction.edit:
@@ -60,16 +66,19 @@ enum ProposalMenuItemAction {
     int currentIteration,
   ) {
     return switch (this) {
-      ProposalMenuItemAction.view => (proposalTitle != null && proposalTitle.isNotBlank)
-          ? proposalTitle
-          : context.l10n.proposalEditorStatusDropdownViewTitle,
+      ProposalMenuItemAction.view =>
+        (proposalTitle != null && proposalTitle.isNotBlank)
+            ? proposalTitle
+            : context.l10n.proposalEditorStatusDropdownViewTitle,
       ProposalMenuItemAction.publish =>
         context.l10n.proposalEditorStatusDropdownPublishTitle(currentIteration),
       ProposalMenuItemAction.submit =>
         context.l10n.proposalEditorStatusDropdownSubmitTitle(currentIteration),
       ProposalMenuItemAction.forget => context.l10n.forgetProposal,
-      ProposalMenuItemAction.export => context.l10n.proposalEditorStatusDropdownExportTitle,
-      ProposalMenuItemAction.delete => context.l10n.proposalEditorStatusDropdownDeleteTitle,
+      ProposalMenuItemAction.export =>
+        context.l10n.proposalEditorStatusDropdownExportTitle,
+      ProposalMenuItemAction.delete =>
+        context.l10n.proposalEditorStatusDropdownDeleteTitle,
       _ => '',
     };
   }

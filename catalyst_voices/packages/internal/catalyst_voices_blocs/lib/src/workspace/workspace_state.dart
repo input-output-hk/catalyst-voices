@@ -34,8 +34,10 @@ final class WorkspaceState extends Equatable {
         timelineItems,
       ];
 
-  List<Proposal> get published =>
-      userProposals.where((e) => (e.publish.isPublished || e.publish.isDraft)).toList()..sort();
+  List<Proposal> get published => userProposals
+      .where((e) => (e.publish.isPublished || e.publish.isDraft))
+      .toList()
+    ..sort();
 
   bool get showError => error != null && !isLoading;
   bool get showProposals => error == null;

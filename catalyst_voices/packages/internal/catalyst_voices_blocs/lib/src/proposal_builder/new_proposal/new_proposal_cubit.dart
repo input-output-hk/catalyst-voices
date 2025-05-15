@@ -45,13 +45,14 @@ class NewProposalCubit extends Cubit<NewProposalState>
         ref: templateRef,
       );
 
-      final documentBuilder = DocumentBuilder.fromSchema(schema: template.schema)
-        ..addChange(
-          DocumentValueChange(
-            nodeId: ProposalDocument.titleNodeId,
-            value: title,
-          ),
-        );
+      final documentBuilder =
+          DocumentBuilder.fromSchema(schema: template.schema)
+            ..addChange(
+              DocumentValueChange(
+                nodeId: ProposalDocument.titleNodeId,
+                value: title,
+              ),
+            );
 
       final document = documentBuilder.build();
       final documentContent = _documentMapper.toContent(document);

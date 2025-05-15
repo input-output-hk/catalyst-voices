@@ -47,14 +47,17 @@ class AcknowledgmentsPanel extends OnboardingPageBase {
       $(acknowledgmentsTile).text,
       (await t()).createBaseProfileAcknowledgementsTitle,
     );
-    final tosText = (await t()).createBaseProfileAcknowledgementsToS.split('{tos}')[0];
+    final tosText =
+        (await t()).createBaseProfileAcknowledgementsToS.split('{tos}')[0];
     final tosTextCurrent = $(tosCheckbox).$(Row).$(RichText);
     expect(tosTextCurrent.text?.contains(tosText), true);
-    final policyText =
-        (await t()).createBaseProfileAcknowledgementsPrivacyPolicy.split('{privacy_policy}')[0];
+    final policyText = (await t())
+        .createBaseProfileAcknowledgementsPrivacyPolicy
+        .split('{privacy_policy}')[0];
     final policyTextCurrent = $(privacyPolicyCheckbox).$(Row).$(RichText);
     expect(policyTextCurrent.text?.contains(policyText), true);
-    final dataUsageText = (await t()).createBaseProfileAcknowledgementsDataUsage;
+    final dataUsageText =
+        (await t()).createBaseProfileAcknowledgementsDataUsage;
     final dataUsageTextCurrent = $(dataUsageCheckbox).$(Row).$(Text).text;
     expect(dataUsageTextCurrent?.contains(dataUsageText), true);
     await verifyOpeningLinks();

@@ -35,7 +35,8 @@ void main() {
         expect(find.text(status), findsOneWidget);
         expect(find.text(title), findsOneWidget);
         expect(find.text(body), findsOneWidget);
-        final container = tester.firstWidget(find.byType(Container)) as Container;
+        final container =
+            tester.firstWidget(find.byType(Container)) as Container;
         expect(
           (container.decoration! as BoxDecoration).color,
           equals(colors.success),
@@ -80,7 +81,8 @@ void main() {
         expect(find.text(status), findsOneWidget);
         expect(find.text(title), findsOneWidget);
         expect(find.text(body), findsOneWidget);
-        final container = tester.firstWidget(find.byType(Container)) as Container;
+        final container =
+            tester.firstWidget(find.byType(Container)) as Container;
         expect(
           (container.decoration! as BoxDecoration).color,
           equals(colorScheme.error),

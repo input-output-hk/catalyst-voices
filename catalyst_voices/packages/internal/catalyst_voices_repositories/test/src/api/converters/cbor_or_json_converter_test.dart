@@ -32,7 +32,8 @@ void main() {
         Uri.parse('https://example.com/'),
       );
 
-      when(() => cborConverter.convertRequest(any())).thenAnswer((_) => Future.value(request));
+      when(() => cborConverter.convertRequest(any()))
+          .thenAnswer((_) => Future.value(request));
 
       final convertedRequest = await delegateConverter.convertRequest(request);
       expect(convertedRequest, equals(request));
@@ -47,7 +48,8 @@ void main() {
         Uri.parse('https://example.com/'),
       );
 
-      when(() => jsonConverter.convertRequest(any())).thenAnswer((_) => Future.value(request));
+      when(() => jsonConverter.convertRequest(any()))
+          .thenAnswer((_) => Future.value(request));
 
       final convertedRequest = await delegateConverter.convertRequest(request);
       expect(convertedRequest, equals(request));
@@ -66,11 +68,14 @@ void main() {
       final response = MockResponse<void>();
       when(() => response.base).thenReturn(baseResponse);
       when(() => baseResponse.request).thenReturn(request);
-      when(() => cborConverter.convertResponse<void, void>(response)).thenReturn(response);
+      when(() => cborConverter.convertResponse<void, void>(response))
+          .thenReturn(response);
 
-      final convertedResponse = delegateConverter.convertResponse<void, void>(response);
+      final convertedResponse =
+          delegateConverter.convertResponse<void, void>(response);
       expect(convertedResponse, equals(response));
-      verify(() => cborConverter.convertResponse<void, void>(response)).called(1);
+      verify(() => cborConverter.convertResponse<void, void>(response))
+          .called(1);
       verifyNever(() => jsonConverter.convertResponse<void, void>(response));
     });
 
@@ -85,12 +90,15 @@ void main() {
       final response = MockResponse<void>();
       when(() => response.base).thenReturn(baseResponse);
       when(() => baseResponse.request).thenReturn(request);
-      when(() => jsonConverter.convertResponse<void, void>(response)).thenReturn(response);
+      when(() => jsonConverter.convertResponse<void, void>(response))
+          .thenReturn(response);
 
-      final convertedResponse = delegateConverter.convertResponse<void, void>(response);
+      final convertedResponse =
+          delegateConverter.convertResponse<void, void>(response);
       expect(convertedResponse, equals(response));
       verifyNever(() => cborConverter.convertResponse<void, void>(response));
-      verify(() => jsonConverter.convertResponse<void, void>(response)).called(1);
+      verify(() => jsonConverter.convertResponse<void, void>(response))
+          .called(1);
     });
   });
 }

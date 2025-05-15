@@ -45,7 +45,8 @@ class _SpacesDrawerState extends State<SpacesDrawer> {
                 unawaited(const OverallSpacesRoute().push<void>(context));
               },
               builder: (context, value, child) {
-                final shortcutActivator = widget.spacesShortcutsActivators[value];
+                final shortcutActivator =
+                    widget.spacesShortcutsActivators[value];
 
                 return VoicesPlainTooltip(
                   message: value.localizedName(context.l10n),

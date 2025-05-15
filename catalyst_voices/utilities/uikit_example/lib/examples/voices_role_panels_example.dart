@@ -17,7 +17,8 @@ class VoicesRoleContainersExample extends StatefulWidget {
   }
 }
 
-class _VoicesRoleContainersExampleState extends State<VoicesRoleContainersExample> {
+class _VoicesRoleContainersExampleState
+    extends State<VoicesRoleContainersExample> {
   bool _roleChooserCardState1 = true;
   Set<AccountRole> _rolesChooserPanelState1 = {
     AccountRole.voter,

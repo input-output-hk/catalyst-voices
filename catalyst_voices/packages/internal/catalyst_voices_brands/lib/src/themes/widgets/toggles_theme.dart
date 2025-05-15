@@ -61,7 +61,9 @@ extension TogglesTheme on ThemeData {
             }
 
             if (states.contains(WidgetState.selected)) {
-              return states.contains(WidgetState.error) ? colorScheme.error : colorScheme.primary;
+              return states.contains(WidgetState.error)
+                  ? colorScheme.error
+                  : colorScheme.primary;
             }
 
             return null;
@@ -107,7 +109,8 @@ extension TogglesTheme on ThemeData {
       switchTheme: SwitchThemeData(
         trackColor: WidgetStateProperty.resolveWith(
           (states) {
-            if (states.contains(WidgetState.selected) && !states.contains(WidgetState.disabled)) {
+            if (states.contains(WidgetState.selected) &&
+                !states.contains(WidgetState.disabled)) {
               return colorScheme.primary;
             }
 
@@ -116,7 +119,8 @@ extension TogglesTheme on ThemeData {
         ),
         trackOutlineColor: WidgetStateProperty.resolveWith(
           (states) {
-            if (states.contains(WidgetState.selected) && !states.contains(WidgetState.disabled)) {
+            if (states.contains(WidgetState.selected) &&
+                !states.contains(WidgetState.disabled)) {
               return colorScheme.primary;
             }
 
@@ -139,7 +143,8 @@ extension TogglesTheme on ThemeData {
               if (states.contains(WidgetState.disabled)) {
                 return colorScheme.surface;
               }
-              if (states.contains(WidgetState.pressed) || states.contains(WidgetState.hovered)) {
+              if (states.contains(WidgetState.pressed) ||
+                  states.contains(WidgetState.hovered)) {
                 return colorScheme.primaryContainer;
               }
 
@@ -148,7 +153,8 @@ extension TogglesTheme on ThemeData {
 
             // Not disabled and pressed or hovered
             if (!states.contains(WidgetState.disabled) &&
-                (states.contains(WidgetState.pressed) || states.contains(WidgetState.hovered))) {
+                (states.contains(WidgetState.pressed) ||
+                    states.contains(WidgetState.hovered))) {
               return colors.iconsForeground;
             }
 

@@ -8,12 +8,6 @@ analyzer:
     - test/.test_coverage.dart
     - lib/generated_plugin_registrant.dart
 
-  errors:
-    lines_longer_than_80_chars: ignore
-
-formatter:
-  page_width: 100
-
 # The full list of lints: https://dart.dev/tools/linter-rules
 linter:
   rules:

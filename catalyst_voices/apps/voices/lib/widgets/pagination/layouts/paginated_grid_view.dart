@@ -56,7 +56,9 @@ class PaginatedGridView<ItemType> extends StatelessWidget {
                 key: const Key('PaginatedGridView'),
                 spacing: 16,
                 runSpacing: 16,
-                children: pagingState.itemList.map((item) => _itemBuilder(context, item)).toList(),
+                children: pagingState.itemList
+                    .map((item) => _itemBuilder(context, item))
+                    .toList(),
               ),
             );
             break;
@@ -84,8 +86,12 @@ class PaginatedGridView<ItemType> extends StatelessWidget {
                 fromNumber: pagingState.fromValue,
                 toNumber: pagingState.toValue,
                 maxResults: pagingState.maxResults,
-                onNextPageTap: pagingState.isLastPage ? null : () => _onNextPageTap(pagingState),
-                onPrevPageTap: pagingState.isFirstPage ? null : () => _onPrevPageTap(pagingState),
+                onNextPageTap: pagingState.isLastPage
+                    ? null
+                    : () => _onNextPageTap(pagingState),
+                onPrevPageTap: pagingState.isFirstPage
+                    ? null
+                    : () => _onPrevPageTap(pagingState),
               ),
             ),
           ],
@@ -99,14 +105,16 @@ class PaginatedGridView<ItemType> extends StatelessWidget {
     if (pagingState.currentPage < pagingState.currentLastPage) {
       _pagingController.nextPage();
     } else {
-      _pagingController.notifyPageRequestListeners(_pagingController.nextPageValue);
+      _pagingController
+          .notifyPageRequestListeners(_pagingController.nextPageValue);
     }
   }
 
   void _onPrevPageTap(PagingState<ItemType> pagingState) {
     if (pagingState.isLoading) return;
 
-    _pagingController.notifyPageRequestListeners(_pagingController.currentPage - 1);
+    _pagingController
+        .notifyPageRequestListeners(_pagingController.currentPage - 1);
   }
 }
 

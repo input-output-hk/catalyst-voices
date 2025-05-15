@@ -21,7 +21,8 @@ class _DataProposalSelector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      child: BlocSelector<WorkspaceBloc, WorkspaceState, DataVisibilityState<List<Proposal>>>(
+      child: BlocSelector<WorkspaceBloc, WorkspaceState,
+          DataVisibilityState<List<Proposal>>>(
         selector: (state) {
           return (data: state.published, show: state.showProposals);
         },

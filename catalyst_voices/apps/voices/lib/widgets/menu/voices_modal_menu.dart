@@ -101,8 +101,9 @@ class _VoicesModalMenuItemTileState extends State<_VoicesModalMenuItemTile> {
           widget.label,
           overflow: TextOverflow.ellipsis,
           maxLines: 1,
-          style:
-              _labelTextStyle.resolve(_states).copyWith(color: _foregroundColor.resolve(_states)),
+          style: _labelTextStyle
+              .resolve(_states)
+              .copyWith(color: _foregroundColor.resolve(_states)),
         ),
       ),
     );

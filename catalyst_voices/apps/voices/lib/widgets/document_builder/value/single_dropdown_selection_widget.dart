@@ -19,10 +19,12 @@ class SingleDropdownSelectionWidget extends StatefulWidget {
   });
 
   @override
-  State<SingleDropdownSelectionWidget> createState() => _SingleDropdownSelectionWidgetState();
+  State<SingleDropdownSelectionWidget> createState() =>
+      _SingleDropdownSelectionWidgetState();
 }
 
-class _SingleDropdownSelectionWidgetState extends State<SingleDropdownSelectionWidget> {
+class _SingleDropdownSelectionWidgetState
+    extends State<SingleDropdownSelectionWidget> {
   bool get _isRequired => widget.schema.isRequired;
   String get _title => widget.schema.title;
 

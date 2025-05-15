@@ -81,7 +81,8 @@ const nativeScriptsJSON = [
             {'type': 'before', 'slot': 3000},
             {
               'type': 'sig',
-              'keyHash': '966e394a544f242081e41d1965137b1bb412ac230d40ed5407821c37',
+              'keyHash':
+                  '966e394a544f242081e41d1965137b1bb412ac230d40ed5407821c37',
             }
           ],
         }

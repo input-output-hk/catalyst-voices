@@ -104,7 +104,8 @@ class _AllProposals extends StatelessWidget {
                 image: _proposalImages[proposal.ref]!,
                 proposal: proposal,
                 isFavorite: favoriteProposals.contains(proposal),
-                onFavoriteChanged: (isFavorite) => _onFavoriteChanged(proposal, isFavorite),
+                onFavoriteChanged: (isFavorite) =>
+                    _onFavoriteChanged(proposal, isFavorite),
               ),
           ],
         );
@@ -130,7 +131,8 @@ class _FavoriteProposals extends StatelessWidget {
                 image: _proposalImages[proposal.ref]!,
                 proposal: proposal,
                 isFavorite: true,
-                onFavoriteChanged: (isFavorite) => _onFavoriteChanged(proposal, isFavorite),
+                onFavoriteChanged: (isFavorite) =>
+                    _onFavoriteChanged(proposal, isFavorite),
               ),
           ],
         );

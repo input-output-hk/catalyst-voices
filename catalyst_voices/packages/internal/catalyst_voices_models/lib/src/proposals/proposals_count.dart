@@ -1,4 +1,5 @@
-import 'package:catalyst_voices_models/catalyst_voices_models.dart' show ProposalsFilterType;
+import 'package:catalyst_voices_models/catalyst_voices_models.dart'
+    show ProposalsFilterType;
 import 'package:equatable/equatable.dart';
 
 final class ProposalsCount extends Equatable {

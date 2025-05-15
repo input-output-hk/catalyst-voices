@@ -18,7 +18,8 @@ abstract interface class SecureStorageVaultCache {
   Future<void> clear();
 }
 
-final class SecureStorageVaultTtlCache extends LocalTllCache implements SecureStorageVaultCache {
+final class SecureStorageVaultTtlCache extends LocalTllCache
+    implements SecureStorageVaultCache {
   SecureStorageVaultTtlCache({
     super.key,
     required super.sharedPreferences,

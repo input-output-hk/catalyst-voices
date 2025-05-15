@@ -49,7 +49,8 @@ class NewProposalState extends Equatable {
     return NewProposalState(
       isLoading: isLoading ?? this.isLoading,
       isCreatingProposal: isCreatingProposal ?? this.isCreatingProposal,
-      isMissingProposerRole: isMissingProposerRole ?? this.isMissingProposerRole,
+      isMissingProposerRole:
+          isMissingProposerRole ?? this.isMissingProposerRole,
       title: title ?? this.title,
       categoryId: categoryId.dataOr(this.categoryId),
       categories: categories ?? this.categories,

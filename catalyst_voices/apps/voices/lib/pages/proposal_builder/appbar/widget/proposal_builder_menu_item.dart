@@ -16,7 +16,8 @@ class ProposalBuilderMenuItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<ProposalBuilderBloc, ProposalBuilderState, ProposalBuilderMenuItemData>(
+    return BlocSelector<ProposalBuilderBloc, ProposalBuilderState,
+        ProposalBuilderMenuItemData>(
       selector: (state) => state.buildMenuItem(action: item),
       builder: (context, state) {
         return _ProposalBuilderMenuItem(
@@ -42,7 +43,8 @@ class _ProposalBuilderMenuItem extends StatelessWidget {
     final description = data.description(context);
     final colors = data.colors(context);
 
-    final foregroundColor = colors?.foreground ?? Theme.of(context).colors.textOnPrimaryLevel1;
+    final foregroundColor =
+        colors?.foreground ?? Theme.of(context).colors.textOnPrimaryLevel1;
 
     return ListTile(
       title: MarkdownText(
@@ -54,7 +56,10 @@ class _ProposalBuilderMenuItem extends StatelessWidget {
           ? null
           : Text(
               description,
-              style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: foregroundColor),
+              style: Theme.of(context)
+                  .textTheme
+                  .bodyMedium!
+                  .copyWith(color: foregroundColor),
             ),
       leading: data.action.icon().buildIcon(color: foregroundColor),
       mouseCursor: data.action.clickable ? SystemMouseCursors.click : null,

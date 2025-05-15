@@ -28,7 +28,8 @@ class AutoAlwaysExitBlockRule extends quill_int.InsertRule {
     final itr = DeltaIterator(document.toDelta());
     final prev = itr.skip(index);
     final cur = itr.next();
-    final blockStyle = quill.Style.fromJson(cur.attributes).getBlockExceptHeader();
+    final blockStyle =
+        quill.Style.fromJson(cur.attributes).getBlockExceptHeader();
     // We are not in a block, ignore.
     if (cur.isPlain || blockStyle == null) {
       return null;
@@ -41,7 +42,8 @@ class AutoAlwaysExitBlockRule extends quill_int.InsertRule {
     // Here we now know that the line after `cur` is not in the same block
     // therefore we can exit this block.
     final attributes = cur.attributes ?? <String, dynamic>{};
-    final k = attributes.keys.firstWhere(quill.Attribute.blockKeysExceptHeader.contains);
+    final k = attributes.keys
+        .firstWhere(quill.Attribute.blockKeysExceptHeader.contains);
     attributes[k] = null;
     // retain(1) should be '\n', set it with no attribute
     return Delta()

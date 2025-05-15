@@ -74,8 +74,9 @@ class _DocumentSection extends StatelessWidget {
           section: property,
           isSelected: isSelected,
           isEditable: _isEditable,
-          autovalidateMode:
-              showValidationErrors ? AutovalidateMode.always : AutovalidateMode.disabled,
+          autovalidateMode: showValidationErrors
+              ? AutovalidateMode.always
+              : AutovalidateMode.disabled,
           onChanged: (value) {
             final event = SectionChangedEvent(changes: value);
             context.read<ProposalBuilderBloc>().add(event);
@@ -108,7 +109,8 @@ class _ProposalBuilderSegments extends StatelessWidget {
           padding: const EdgeInsets.only(top: 16, bottom: 64),
           itemBuilder: (context, index) {
             final item = items[index];
-            final previousItem = index == 0 ? null : items.elementAtOrNull(index - 1);
+            final previousItem =
+                index == 0 ? null : items.elementAtOrNull(index - 1);
             final nextItem = items.elementAtOrNull(index + 1);
 
             return _buildItem(
@@ -135,7 +137,8 @@ class _ProposalBuilderSegments extends StatelessWidget {
               return const ProposalSeparatorBox(height: 24);
             }
 
-            if (item is ProposalViewCommentsSection && nextItem is ProposalAddCommentSection) {
+            if (item is ProposalViewCommentsSection &&
+                nextItem is ProposalAddCommentSection) {
               return const ProposalDivider(height: 48);
             }
 
@@ -159,10 +162,13 @@ class _ProposalBuilderSegments extends StatelessWidget {
           sort: sort,
           showSort: item.comments.isNotEmpty,
           onChanged: (value) {
-            context.read<ProposalBuilderBloc>().add(UpdateCommentsSortEvent(sort: value));
+            context
+                .read<ProposalBuilderBloc>()
+                .add(UpdateCommentsSortEvent(sort: value));
           },
         ),
-      ProposalCommentListItem(:final comment, :final canReply) => ProposalBuilderCommentTile(
+      ProposalCommentListItem(:final comment, :final canReply) =>
+        ProposalBuilderCommentTile(
           key: ValueKey(comment.comment.metadata.selfRef),
           comment: comment,
           canReply: canReply,

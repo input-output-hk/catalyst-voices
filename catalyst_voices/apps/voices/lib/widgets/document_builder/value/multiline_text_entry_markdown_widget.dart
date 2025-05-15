@@ -22,7 +22,8 @@ class MultilineTextEntryMarkdownWidget extends StatefulWidget {
   });
 
   @override
-  State<MultilineTextEntryMarkdownWidget> createState() => _MultilineTextEntryMarkdownWidgetState();
+  State<MultilineTextEntryMarkdownWidget> createState() =>
+      _MultilineTextEntryMarkdownWidgetState();
 }
 
 /// This focus helps to interact with [VoicesRichText] widget
@@ -46,7 +47,8 @@ class VoicesRichTextFocusNode extends FocusNode {
   }
 }
 
-class _MultilineTextEntryMarkdownWidgetState extends State<MultilineTextEntryMarkdownWidget> {
+class _MultilineTextEntryMarkdownWidgetState
+    extends State<MultilineTextEntryMarkdownWidget> {
   late final VoicesRichTextController _controller;
   late final VoicesRichTextFocusNode _focus;
   late final ScrollController _scrollController;

@@ -58,8 +58,9 @@ class SeedPhrasesCompleter extends StatelessWidget {
         crossAxisSpacing: crossAxisSpacing,
         children: slots.mapIndexed((index, element) {
           final isCurrent = index == currentIndex;
-          final isPrevious =
-              currentIndex != null ? currentIndex == index + 1 : index == slotsCount - 1;
+          final isPrevious = currentIndex != null
+              ? currentIndex == index + 1
+              : index == slotsCount - 1;
 
           final canDelete = element != null && isPrevious;
 
@@ -69,7 +70,9 @@ class SeedPhrasesCompleter extends StatelessWidget {
             slotNr: index + 1,
             isActive: isCurrent,
             showDelete: canDelete,
-            onTap: !canDelete || onWordTap == null ? null : () => onWordTap(element),
+            onTap: !canDelete || onWordTap == null
+                ? null
+                : () => onWordTap(element),
           );
         }).toList(),
       ),

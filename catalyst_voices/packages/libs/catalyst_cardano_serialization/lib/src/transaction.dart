@@ -152,8 +152,10 @@ final class TransactionBody extends Equatable implements CborEncodable {
         validityStart: _extractValue(map, 8, SlotBigNum.fromCbor),
         mint: _extractValue(map, 9, MultiAsset.fromCbor),
         scriptDataHash: _extractValue(map, 11, ScriptDataHash.fromCbor),
-        collateralInputs: _extractList(map, 13, TransactionInput.fromCbor)?.toSet(),
-        requiredSigners: _extractList(map, 14, Ed25519PublicKeyHash.fromCbor)?.toSet(),
+        collateralInputs:
+            _extractList(map, 13, TransactionInput.fromCbor)?.toSet(),
+        requiredSigners:
+            _extractList(map, 14, Ed25519PublicKeyHash.fromCbor)?.toSet(),
         networkId: _extractValue(
           map,
           15,
@@ -161,7 +163,8 @@ final class TransactionBody extends Equatable implements CborEncodable {
         ),
         collateralReturn: _extractValue(map, 16, TransactionOutput.fromCbor),
         totalCollateral: _extractValue(map, 17, Coin.fromCbor),
-        referenceInputs: _extractList(map, 18, TransactionInput.fromCbor)?.toSet(),
+        referenceInputs:
+            _extractList(map, 18, TransactionInput.fromCbor)?.toSet(),
       );
     } catch (e) {
       throw ArgumentError('Invalid CBOR input: $e');
@@ -195,17 +198,23 @@ final class TransactionBody extends Equatable implements CborEncodable {
         const CborSmallInt(1): _toCborList(outputs),
         const CborSmallInt(2): fee.toCbor(),
         if (ttl != null) const CborSmallInt(3): ttl!.toCbor(),
-        if (auxiliaryDataHash != null) const CborSmallInt(7): auxiliaryDataHash!.toCbor(),
-        if (validityStart != null) const CborSmallInt(8): validityStart!.toCbor(),
+        if (auxiliaryDataHash != null)
+          const CborSmallInt(7): auxiliaryDataHash!.toCbor(),
+        if (validityStart != null)
+          const CborSmallInt(8): validityStart!.toCbor(),
         if (mint != null) const CborSmallInt(9): mint!.toCbor(),
-        if (scriptDataHash != null) const CborSmallInt(11): scriptDataHash!.toCbor(),
+        if (scriptDataHash != null)
+          const CborSmallInt(11): scriptDataHash!.toCbor(),
         if (collateralInputs != null && collateralInputs!.isNotEmpty)
           const CborSmallInt(13): _toCborList(collateralInputs!),
         if (requiredSigners != null && requiredSigners!.isNotEmpty)
           const CborSmallInt(14): _toCborList(requiredSigners!),
-        if (networkId != null) const CborSmallInt(15): CborSmallInt(networkId!.id),
-        if (collateralReturn != null) const CborSmallInt(16): collateralReturn!.toCbor(),
-        if (totalCollateral != null) const CborSmallInt(17): totalCollateral!.toCbor(),
+        if (networkId != null)
+          const CborSmallInt(15): CborSmallInt(networkId!.id),
+        if (collateralReturn != null)
+          const CborSmallInt(16): collateralReturn!.toCbor(),
+        if (totalCollateral != null)
+          const CborSmallInt(17): totalCollateral!.toCbor(),
         if (referenceInputs != null && referenceInputs!.isNotEmpty)
           const CborSmallInt(18): _toCborList(referenceInputs!),
       },
@@ -282,7 +291,8 @@ final class TransactionInput extends Equatable implements CborEncodable {
 }
 
 /// The UTXO that can be used as an input in a new transaction.
-final class TransactionUnspentOutput extends Equatable implements CborEncodable {
+final class TransactionUnspentOutput extends Equatable
+    implements CborEncodable {
   /// The transaction output of a previous transaction,
   /// acts as input for the next transaction.
   final TransactionInput input;

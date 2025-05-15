@@ -42,7 +42,8 @@ class ProposalsPage {
   final subtitle = const Key('Subtitle');
   final value = const Key('Value');
   final suffix = const Key('Suffix');
-  final campaignCategoriesTitleLabel = const Key('CampaignCategoriesTitleLabel');
+  final campaignCategoriesTitleLabel =
+      const Key('CampaignCategoriesTitleLabel');
   final campaignCategoriesMenu = const Key('CampaignCategoriesMenu');
   final cardanoUseCasesLabel = const Key('CardanoUseCasesLabel');
   final cardanoUseCasesSectionLabel = const Key('CardanoUseCasesSectionLabel');
@@ -86,23 +87,38 @@ class ProposalsPage {
 
   Future<void> proposalsTabsLookAsExpected() async {
     expect(
-      $(allProposalsTab).$(Text).text?.startsWith((await t()).noOfAll(0).split('(')[0]),
+      $(allProposalsTab)
+          .$(Text)
+          .text
+          ?.startsWith((await t()).noOfAll(0).split('(')[0]),
       true,
     );
     expect(
-      $(draftProposalsTab).$(Text).text?.startsWith((await t()).noOfDraft(0).split('(')[0]),
+      $(draftProposalsTab)
+          .$(Text)
+          .text
+          ?.startsWith((await t()).noOfDraft(0).split('(')[0]),
       true,
     );
     expect(
-      $(finalProposalsTab).$(Text).text?.startsWith((await t()).noOfFinal(0).split('(')[0]),
+      $(finalProposalsTab)
+          .$(Text)
+          .text
+          ?.startsWith((await t()).noOfFinal(0).split('(')[0]),
       true,
     );
     expect(
-      $(favoriteProposalsTab).$(Text).text?.startsWith((await t()).noOfFavorites(0).split('(')[0]),
+      $(favoriteProposalsTab)
+          .$(Text)
+          .text
+          ?.startsWith((await t()).noOfFavorites(0).split('(')[0]),
       true,
     );
     expect(
-      $(myProposalsTab).$(Text).text?.startsWith((await t()).noOfMyProposals(0).split('(')[0]),
+      $(myProposalsTab)
+          .$(Text)
+          .text
+          ?.startsWith((await t()).noOfMyProposals(0).split('(')[0]),
       true,
     );
   }
@@ -113,7 +129,8 @@ class ProposalsPage {
   }
 
   Future<void> searchFieldLooksAsExpected() async {
-    final searchHintText = $.tester.widget<SearchTextField>($(searchProposalsField)).hintText;
+    final searchHintText =
+        $.tester.widget<SearchTextField>($(searchProposalsField)).hintText;
     expect(searchHintText, (await t()).searchProposals);
   }
 
@@ -124,8 +141,12 @@ class ProposalsPage {
         )
         .length;
     for (var cardIndex = 0; cardIndex < proposalsCount; cardIndex++) {
-      await $(proposalsContainer).$(MostRecentSection($).proposalCard).at(cardIndex).scrollTo();
-      await MostRecentSection($).proposalCardLooksAsExpected(proposalsContainer, cardIndex);
+      await $(proposalsContainer)
+          .$(MostRecentSection($).proposalCard)
+          .at(cardIndex)
+          .scrollTo();
+      await MostRecentSection($)
+          .proposalCardLooksAsExpected(proposalsContainer, cardIndex);
     }
   }
 
@@ -251,30 +272,40 @@ class ProposalsPage {
     final proposalsTotal = int.parse(paginationText.split(' ')[2]);
     expect(proposalsFrom, 1);
     expect(
-      $.tester.widget<IconButton>($(CommonPage($).prevPageBtn).$(IconButton)).onPressed,
+      $.tester
+          .widget<IconButton>($(CommonPage($).prevPageBtn).$(IconButton))
+          .onPressed,
       null,
     );
     if (proposalsTotal > proposalsTo) {
       await $(CommonPage($).nextPageBtn).tap();
       await $(CommonPage($).paginationText).scrollTo(step: 500);
       final paginationTextAfter = $(CommonPage($).paginationText).text!;
-      final proposalsFromAfter = int.parse(paginationTextAfter.split(' ')[0].split('-')[0]);
-      final proposalsToAfter = int.parse(paginationTextAfter.split(' ')[0].split('-')[1]);
+      final proposalsFromAfter =
+          int.parse(paginationTextAfter.split(' ')[0].split('-')[0]);
+      final proposalsToAfter =
+          int.parse(paginationTextAfter.split(' ')[0].split('-')[1]);
       expect(proposalsFromAfter, proposalsTo + 1);
       expect(
-        $.tester.widget<IconButton>($(CommonPage($).prevPageBtn).$(IconButton)).onPressed,
+        $.tester
+            .widget<IconButton>($(CommonPage($).prevPageBtn).$(IconButton))
+            .onPressed,
         isNotNull,
       );
       if (proposalsTotal > proposalsToAfter) {
         expect(proposalsToAfter, proposalsTo * 2);
         expect(
-          $.tester.widget<IconButton>($(CommonPage($).nextPageBtn).$(IconButton)).onPressed,
+          $.tester
+              .widget<IconButton>($(CommonPage($).nextPageBtn).$(IconButton))
+              .onPressed,
           isNotNull,
         );
       } else {
         expect(proposalsToAfter, proposalsTotal);
         expect(
-          $.tester.widget<IconButton>($(CommonPage($).nextPageBtn).$(IconButton)).onPressed,
+          $.tester
+              .widget<IconButton>($(CommonPage($).nextPageBtn).$(IconButton))
+              .onPressed,
           null,
         );
       }
@@ -342,9 +373,14 @@ class ProposalsPage {
   }
 
   Future<void> checkOpeningLinkByMocking(int proposalNumber) async {
-    final linkTitleText = $(shareProposalDialog).$(shareItem).at(proposalNumber).$(itemTitle).text;
+    final linkTitleText = $(shareProposalDialog)
+        .$(shareItem)
+        .at(proposalNumber)
+        .$(itemTitle)
+        .text;
     if (linkTitleText!.contains((await t()).copyLink) == false) {
-      final linkPartialTextToMatch = 'https://${linkTitleText.split(' ').last.toLowerCase()}.com';
+      final linkPartialTextToMatch =
+          'https://${linkTitleText.split(' ').last.toLowerCase()}.com';
       await SelectorUtils.checkOpeningLinkByMocking(
         $,
         linkTitleText,

@@ -30,7 +30,8 @@ abstract base class BaseSection extends Equatable implements Section {
       ];
 }
 
-abstract base class BaseSegment<T extends Section> extends Equatable implements Segment {
+abstract base class BaseSegment<T extends Section> extends Equatable
+    implements Segment {
   @override
   final NodeId id;
   @override

@@ -83,7 +83,9 @@ class _DeleteKeychainDialogState extends State<DeleteKeychainDialog> {
                     decoration: VoicesTextFieldDecoration(
                       errorText: _errorText,
                       errorMaxLines: 2,
-                      fillColor: Theme.of(context).colors.elevationsOnSurfaceNeutralLv1White,
+                      fillColor: Theme.of(context)
+                          .colors
+                          .elevationsOnSurfaceNeutralLv1White,
                       hintText: context.l10n.enterPhrase,
                     ),
                   ),

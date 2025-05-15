@@ -25,8 +25,10 @@ final class WalletLinkCubit extends Cubit<WalletLinkStateData>
     required this.blockchainConfig,
   }) : super(WalletLinkStateData.initial());
 
-  Set<AccountRole> get roles =>
-      state.roles.where((element) => element.isSelected).map((e) => e.type).toSet();
+  Set<AccountRole> get roles => state.roles
+      .where((element) => element.isSelected)
+      .map((e) => e.type)
+      .toSet();
 
   CardanoWallet? get selectedWallet => _selectedWallet;
 
@@ -36,13 +38,15 @@ final class WalletLinkCubit extends Cubit<WalletLinkStateData>
       _wallets.clear();
       emit(state.copyWith(wallets: const Optional.empty()));
 
-      final wallets = await registrationService.getCardanoWallets().withMinimumDelay();
+      final wallets =
+          await registrationService.getCardanoWallets().withMinimumDelay();
 
       _wallets
         ..clear()
         ..addAll(wallets);
 
-      final walletsMetaList = wallets.map(WalletMetadata.fromCardanoWallet).toList();
+      final walletsMetaList =
+          wallets.map(WalletMetadata.fromCardanoWallet).toList();
 
       emit(state.copyWith(wallets: Optional(Success(walletsMetaList))));
     } on Exception catch (error, stackTrace) {
@@ -70,7 +74,8 @@ final class WalletLinkCubit extends Cubit<WalletLinkStateData>
   @override
   Future<bool> selectWallet(WalletMetadata meta) async {
     try {
-      final wallet = _wallets.firstWhereOrNull((wallet) => wallet.name == meta.name);
+      final wallet =
+          _wallets.firstWhereOrNull((wallet) => wallet.name == meta.name);
 
       if (wallet == null) {
         throw const LocalizedRegistrationWalletNotFoundException();
@@ -89,14 +94,18 @@ final class WalletLinkCubit extends Cubit<WalletLinkStateData>
         balance: CryptocurrencyFormatter.formatAmount(walletInfo.balance),
         address: WalletAddressFormatter.formatShort(walletInfo.address),
         clipboardAddress: walletInfo.address.toBech32(),
-        showLowBalance: walletInfo.balance < CardanoWalletDetails.minAdaForRegistration,
+        showLowBalance:
+            walletInfo.balance < CardanoWalletDetails.minAdaForRegistration,
         showExpectedNetworkId:
-            blockchainConfig.networkId != walletInfo.networkId ? blockchainConfig.networkId : null,
+            blockchainConfig.networkId != walletInfo.networkId
+                ? blockchainConfig.networkId
+                : null,
       );
 
       final newState = state.copyWith(
         selectedWallet: Optional(walletInfo),
-        hasEnoughBalance: walletInfo.balance >= CardanoWalletDetails.minAdaForRegistration,
+        hasEnoughBalance:
+            walletInfo.balance >= CardanoWalletDetails.minAdaForRegistration,
         isNetworkIdMatching: walletInfo.networkId == blockchainConfig.networkId,
         walletConnection: Optional(walletConnection),
         walletSummary: Optional(walletSummary),

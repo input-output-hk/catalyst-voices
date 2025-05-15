@@ -17,7 +17,8 @@ class _InsertNewImageDialogState extends State<InsertNewImageDialog> {
 
   bool get _inputFieldIsEmpty => _url.isEmpty;
 
-  bool get _isValidImageUrl => _inputFieldIsEmpty || ImageUrlValidator.isValid(_url);
+  bool get _isValidImageUrl =>
+      _inputFieldIsEmpty || ImageUrlValidator.isValid(_url);
 
   String get _url => _textController.text.trim();
 

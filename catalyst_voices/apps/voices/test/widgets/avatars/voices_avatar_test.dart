@@ -25,7 +25,8 @@ void main() {
       expect(find.byIcon(Icons.person), findsOneWidget);
     });
 
-    testWidgets('VoicesAvatar applies custom radius and padding', (tester) async {
+    testWidgets('VoicesAvatar applies custom radius and padding',
+        (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
@@ -52,7 +53,8 @@ void main() {
       expect(paddingWidget.padding, const EdgeInsets.all(16));
     });
 
-    testWidgets('VoicesAvatar uses custom foreground and background colors', (tester) async {
+    testWidgets('VoicesAvatar uses custom foreground and background colors',
+        (tester) async {
       const foregroundColor = Colors.red;
       const backgroundColor = Colors.green;
 

@@ -28,7 +28,9 @@ final class FilePickerService {
     );
 
     if (result != null) {
-      return result.files.map((file) => file.bytes ?? List<int>.empty()).toList();
+      return result.files
+          .map((file) => file.bytes ?? List<int>.empty())
+          .toList();
     }
     return [];
   }

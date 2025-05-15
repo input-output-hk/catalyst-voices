@@ -33,7 +33,8 @@ final class CampaignCategoryDetailsViewModel extends CampaignCategoryViewModel {
     required this.submissionCloseDate,
   });
 
-  factory CampaignCategoryDetailsViewModel.dummy({String? id}) => CampaignCategoryDetailsViewModel(
+  factory CampaignCategoryDetailsViewModel.dummy({String? id}) =>
+      CampaignCategoryDetailsViewModel(
         id: SignedDocumentRef(id: id ?? '1)'),
         name: 'Cardano Open:',
         subname: 'Developers',
@@ -61,7 +62,9 @@ final class CampaignCategoryDetailsViewModel extends CampaignCategoryViewModel {
       imageUrl: CategoryImageUrl.imageUrl(model.selfRef.id),
       totalAsk: model.totalAsk,
       range: model.range,
-      descriptions: model.descriptions.map(CategoryDescriptionViewModel.fromModel).toList(),
+      descriptions: model.descriptions
+          .map(CategoryDescriptionViewModel.fromModel)
+          .toList(),
       requirements: model.requirements,
       submissionCloseDate: model.submissionCloseDate,
       name: model.categoryName,
@@ -107,7 +110,8 @@ final class CategoryImageUrl {
     return VoicesAssets.images.category.values.firstWhere(
       (img) => img.path.contains(uuid),
       orElse: () {
-        return VoicesAssets.images.category.category0194d49030bf70438c5cF0e09f8a6d8c;
+        return VoicesAssets
+            .images.category.category0194d49030bf70438c5cF0e09f8a6d8c;
       },
     ).path;
   }

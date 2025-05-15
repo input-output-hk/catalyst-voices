@@ -67,7 +67,8 @@ class _CampaignCategoriesError extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocSelector<DiscoveryCubit, DiscoveryState, VisibilityState>(
-      selector: (state) => (show: state.categories.showError, error: state.categories.error),
+      selector: (state) =>
+          (show: state.categories.showError, error: state.categories.error),
       builder: (context, state) {
         final errorMessage = state.error?.message(context);
         return Offstage(

@@ -26,7 +26,8 @@ class VoicesDetailsDialog extends StatelessWidget {
       showClose: false,
       showBorder: true,
       constraints: constraints,
-      backgroundColor: backgroundColor ?? Theme.of(context).colors.elevationsOnSurfaceNeutralLv0,
+      backgroundColor: backgroundColor ??
+          Theme.of(context).colors.elevationsOnSurfaceNeutralLv0,
       child: Column(
         children: [
           header,

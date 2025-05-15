@@ -153,7 +153,8 @@ void main() {
       const refScriptsBytes = 5000;
 
       final linearFee = tieredFee.linearFee(txBytes);
-      final scriptFee = tieredFee.refScriptFee(1.5, 25600, byteCost, refScriptsBytes);
+      final scriptFee =
+          tieredFee.refScriptFee(1.5, 25600, byteCost, refScriptsBytes);
       final expectedFee = Coin(linearFee + scriptFee);
       final actualFee = tieredFee.tieredFee(txBytes, refScriptsBytes);
 
@@ -171,7 +172,8 @@ void main() {
     final inputs = txInputs.map((utxo) => utxo.input).toSet();
 
     final tx = fullSignedTestTransaction(inputs: inputs);
-    final sum = refInputScriptsSizes.reduce((value, element) => value + element);
+    final sum =
+        refInputScriptsSizes.reduce((value, element) => value + element);
 
     final refScriptsFee = tieredFee.refScriptFee(
       tieredFee.multiplier,
@@ -200,10 +202,12 @@ void main() {
       refScriptByteCost: 15,
     );
 
-    final inputs = {...txInputs, ...refInputs}.map((utxo) => utxo.input).toSet();
+    final inputs =
+        {...txInputs, ...refInputs}.map((utxo) => utxo.input).toSet();
 
     final tx = fullSignedTestTransaction(inputs: inputs);
-    final sum = refInputScriptsSizes.reduce((value, element) => value + element);
+    final sum =
+        refInputScriptsSizes.reduce((value, element) => value + element);
 
     final refScriptsFee = tieredFee.refScriptFee(
       tieredFee.multiplier,

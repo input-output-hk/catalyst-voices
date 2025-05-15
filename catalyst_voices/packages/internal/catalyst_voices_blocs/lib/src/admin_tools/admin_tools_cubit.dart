@@ -13,7 +13,8 @@ abstract interface class AdminTools {
 /// Manages the admin tools.
 ///
 /// The admin tools can be used to override application state (UI).
-final class AdminToolsCubit extends Cubit<AdminToolsState> implements AdminTools {
+final class AdminToolsCubit extends Cubit<AdminToolsState>
+    implements AdminTools {
   AdminToolsCubit() : super(const AdminToolsState());
 
   void enable() {

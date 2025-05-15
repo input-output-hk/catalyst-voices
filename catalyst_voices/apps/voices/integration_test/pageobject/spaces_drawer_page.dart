@@ -143,7 +143,8 @@ class SpacesDrawerPage {
       findsOneWidget,
     );
     expect(
-      $(userMenuContainer(Space.workspace)).$(userSectionHeader(Space.workspace)),
+      $(userMenuContainer(Space.workspace))
+          .$(userSectionHeader(Space.workspace)),
       findsOneWidget,
     );
   }

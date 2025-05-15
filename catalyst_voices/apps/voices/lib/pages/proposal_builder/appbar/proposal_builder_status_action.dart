@@ -122,11 +122,14 @@ class _PopupMenuButtonState extends State<_PopupMenuButton> {
 
   void _exportProposal() {
     final prefix = context.l10n.proposal.toLowerCase();
-    context.read<ProposalBuilderBloc>().add(ExportProposalEvent(filePrefix: prefix));
+    context
+        .read<ProposalBuilderBloc>()
+        .add(ExportProposalEvent(filePrefix: prefix));
   }
 
   bool _isLocal(ProposalPublish publish, int iteration) {
-    return publish == ProposalPublish.localDraft && iteration == DocumentVersion.firstNumber;
+    return publish == ProposalPublish.localDraft &&
+        iteration == DocumentVersion.firstNumber;
   }
 
   void _onSelected(ProposalMenuItemAction item) {
@@ -161,13 +164,16 @@ class _PopupMenuButtonState extends State<_PopupMenuButton> {
     }
 
     final state = bloc.state;
-    final proposalTitle = state.proposalTitle ?? context.l10n.proposalEditorStatusDropdownViewTitle;
-    final nextIteration = state.metadata.latestVersion?.number ?? DocumentVersion.firstNumber;
+    final proposalTitle = state.proposalTitle ??
+        context.l10n.proposalEditorStatusDropdownViewTitle;
+    final nextIteration =
+        state.metadata.latestVersion?.number ?? DocumentVersion.firstNumber;
 
     // if it's local draft and the first version then
     // it should be shown as local which corresponds to null
-    final currentIteration =
-        _isLocal(state.metadata.publish, nextIteration) ? null : nextIteration - 1;
+    final currentIteration = _isLocal(state.metadata.publish, nextIteration)
+        ? null
+        : nextIteration - 1;
 
     final shouldPublish = await PublishProposalIterationDialog.show(
           context: context,
@@ -208,7 +214,8 @@ class _PopupMenuButtonState extends State<_PopupMenuButton> {
     }
 
     final state = bloc.state;
-    final proposalTitle = state.proposalTitle ?? context.l10n.proposalEditorStatusDropdownViewTitle;
+    final proposalTitle = state.proposalTitle ??
+        context.l10n.proposalEditorStatusDropdownViewTitle;
     final latestVersion = state.metadata.latestVersion!;
 
     final nextIteration = latestVersion.number;

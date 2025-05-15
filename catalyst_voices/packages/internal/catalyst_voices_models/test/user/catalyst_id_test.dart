@@ -9,7 +9,8 @@ void main() {
     late Uint8List role0Key;
 
     setUpAll(() {
-      role0Key = base64UrlNoPadDecode('FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE');
+      role0Key =
+          base64UrlNoPadDecode('FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE');
     });
 
     test('should create CatalystId instance correctly', () {
@@ -47,7 +48,8 @@ void main() {
       expect(catalystId.encrypt, isFalse);
     });
 
-    test('should create minimal $CatalystId instance with username correctly', () {
+    test('should create minimal $CatalystId instance with username correctly',
+        () {
       final catalystId = CatalystId(
         host: CatalystIdHost.cardano.host,
         username: 'john',
@@ -78,7 +80,8 @@ void main() {
       expect(catalystId.encrypt, isFalse);
     });
 
-    test('should parse minimal $CatalystId with username from Uri correctly', () {
+    test('should parse minimal $CatalystId with username from Uri correctly',
+        () {
       final uri = Uri.parse(
         'id.catalyst://john@preprod.cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE=',
       );

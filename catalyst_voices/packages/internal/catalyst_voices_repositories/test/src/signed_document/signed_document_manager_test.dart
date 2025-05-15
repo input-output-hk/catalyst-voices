@@ -106,7 +106,8 @@ class _FakeCatalystPublicKey extends Fake implements CatalystPublicKey {
   }
 }
 
-class _FakeCatalystPublicKeyFactory extends Fake implements CatalystPublicKeyFactory {
+class _FakeCatalystPublicKeyFactory extends Fake
+    implements CatalystPublicKeyFactory {
   @override
   CatalystPublicKey create(Uint8List bytes) {
     return _FakeCatalystPublicKey(bytes: bytes);
@@ -120,7 +121,8 @@ class _FakeCatalystSignature extends Fake implements CatalystSignature {
   _FakeCatalystSignature({required this.bytes});
 }
 
-class _FakeCatalystSignatureFactory extends Fake implements CatalystSignatureFactory {
+class _FakeCatalystSignatureFactory extends Fake
+    implements CatalystSignatureFactory {
   @override
   CatalystSignature create(Uint8List bytes) {
     return _FakeCatalystSignature(bytes: bytes);

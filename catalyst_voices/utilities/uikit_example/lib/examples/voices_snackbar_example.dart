@@ -27,7 +27,8 @@ class VoicesSnackbarExample extends StatelessWidget {
                       VoicesSnackBar(
                         type: type,
                         behavior: behavior,
-                        onClosePressed: () => VoicesSnackBar.hideCurrent(context),
+                        onClosePressed: () =>
+                            VoicesSnackBar.hideCurrent(context),
                         actions: actions,
                       ).show(context);
                     },

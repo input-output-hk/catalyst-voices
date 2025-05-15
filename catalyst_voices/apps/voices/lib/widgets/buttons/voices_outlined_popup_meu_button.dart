@@ -45,7 +45,9 @@ class VoicesOutlinedPopupMeuButton<T> extends StatelessWidget {
       child: AbsorbPointer(
         child: VoicesOutlinedButton(
           leading: leading,
-          trailing: onSelected != null ? VoicesAssets.icons.chevronDown.buildIcon() : null,
+          trailing: onSelected != null
+              ? VoicesAssets.icons.chevronDown.buildIcon()
+              : null,
           onTap: () {},
           style: OutlinedButton.styleFrom(
             shape: RoundedRectangleBorder(

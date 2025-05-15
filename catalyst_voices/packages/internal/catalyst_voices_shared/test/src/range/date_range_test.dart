@@ -5,7 +5,8 @@ void main() {
   group(DateRange, () {
     test('is not in range', () {
       // Given
-      final range = DateRange(from: DateTime(2025, 1, 20), to: DateTime(2025, 1, 22));
+      final range =
+          DateRange(from: DateTime(2025, 1, 20), to: DateTime(2025, 1, 22));
 
       // When
       final isInRageBeforFromDate = range.isInRange(DateTime(2025, 1, 19));
@@ -18,7 +19,8 @@ void main() {
 
     test('isInRage if value is in between from to and they are not null', () {
       // Given
-      final range = DateRange(from: DateTime(2025, 1, 20), to: DateTime(2025, 1, 22));
+      final range =
+          DateRange(from: DateTime(2025, 1, 20), to: DateTime(2025, 1, 22));
 
       // When
       final isInRange = range.isInRange(DateTime(2025, 1, 21));
@@ -33,7 +35,8 @@ void main() {
 
     test('isInRange if value is the same day as from', () {
       // Given
-      final range = DateRange(from: DateTime(2025, 1, 20), to: DateTime(2025, 1, 22));
+      final range =
+          DateRange(from: DateTime(2025, 1, 20), to: DateTime(2025, 1, 22));
 
       // When
       final isInRange = range.isInRange(DateTime(2025, 1, 20));
@@ -88,7 +91,8 @@ void main() {
 
     test('is out of range', () {
       //Given
-      final range = DateRange(from: DateTime(2025, 1, 20), to: DateTime(2025, 1, 22));
+      final range =
+          DateRange(from: DateTime(2025, 1, 20), to: DateTime(2025, 1, 22));
 
       // When
       final isOutOfRange = range.isInRange(DateTime(2025, 1, 19));
@@ -112,7 +116,8 @@ void main() {
 
     test('is in range when from and to are the same', () {
       // Given
-      final range = DateRange(from: DateTime(2025, 1, 20), to: DateTime(2025, 1, 20));
+      final range =
+          DateRange(from: DateTime(2025, 1, 20), to: DateTime(2025, 1, 20));
 
       // When
       final isInRange = range.isInRange(DateTime(2025, 1, 20));

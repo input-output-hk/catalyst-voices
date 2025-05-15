@@ -26,7 +26,8 @@ final class MaxTxSizeExceededException extends Equatable implements Exception {
 }
 
 /// Exception thrown when the maximum number of inputs is exceeded.
-final class MaximumInputExceededException extends Equatable implements Exception {
+final class MaximumInputExceededException extends Equatable
+    implements Exception {
   /// The maximum nr of allowed inputs.
   final int maxInputs;
 
@@ -43,7 +44,8 @@ final class MaximumInputExceededException extends Equatable implements Exception
 }
 
 /// Exception thrown when the transaction outputs exceed the inputs.
-final class InsufficientUtxoBalanceException extends Equatable implements Exception {
+final class InsufficientUtxoBalanceException extends Equatable
+    implements Exception {
   /// The amount of [Balance] that user has.
   final Balance actualAmount;
 
@@ -80,7 +82,8 @@ final class TxFeeNotSpecifiedException extends Equatable implements Exception {
 
 /// Exception thrown when the transaction output amount
 /// is less than required by the network.
-final class TxValueBelowMinUtxoValueException extends Equatable implements Exception {
+final class TxValueBelowMinUtxoValueException extends Equatable
+    implements Exception {
   /// The amount of [Coin] in the transaction output.
   final Coin actualAmount;
 
@@ -105,7 +108,8 @@ final class TxValueBelowMinUtxoValueException extends Equatable implements Excep
 
 /// Exception thrown when the transaction output
 /// takes more bytes than allowed by [maxValueSize].
-final class TxValueSizeExceededException extends Equatable implements Exception {
+final class TxValueSizeExceededException extends Equatable
+    implements Exception {
   /// The size in bytes that the value has.
   final int actualValueSize;
 
@@ -167,7 +171,8 @@ final class InvalidAddressException extends Equatable implements Exception {
 ///
 /// Thus less or more witnesses than were included when calculating
 /// the fee are not allowed.
-final class InvalidTransactionWitnessesException extends Equatable implements Exception {
+final class InvalidTransactionWitnessesException extends Equatable
+    implements Exception {
   /// The default constructor for [InvalidTransactionWitnessesException].
   const InvalidTransactionWitnessesException();
 
@@ -192,7 +197,8 @@ final class AssetDoesNotExistException extends Equatable implements Exception {
 }
 
 /// Exception thrown when there's not enough [Coin] to transfer native assets.
-final class InsufficientAdaForAssetsException extends Equatable implements Exception {
+final class InsufficientAdaForAssetsException extends Equatable
+    implements Exception {
   /// The default constructor for [InsufficientAdaForAssetsException].
   const InsufficientAdaForAssetsException();
 
@@ -204,7 +210,8 @@ final class InsufficientAdaForAssetsException extends Equatable implements Excep
 }
 
 /// Exception thrown when the total size of reference scripts exceeds the limit.
-final class ReferenceScriptSizeLimitExceededException extends Equatable implements Exception {
+final class ReferenceScriptSizeLimitExceededException extends Equatable
+    implements Exception {
   /// The maximum size of reference scripts allowed per transaction.
   final int maxRefScriptSize;
 
@@ -212,7 +219,8 @@ final class ReferenceScriptSizeLimitExceededException extends Equatable implemen
   const ReferenceScriptSizeLimitExceededException(this.maxRefScriptSize);
 
   @override
-  String toString() => 'Total size of reference scripts exceeds the limit of $maxRefScriptSize '
+  String toString() =>
+      'Total size of reference scripts exceeds the limit of $maxRefScriptSize '
       'bytes';
 
   @override

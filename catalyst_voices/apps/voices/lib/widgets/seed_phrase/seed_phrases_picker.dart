@@ -99,7 +99,8 @@ class _WordCell extends StatelessWidget {
       child: Material(
         color: backgroundColor.resolve(states),
         borderRadius: BorderRadius.circular(8),
-        textStyle: theme.textTheme.labelLarge?.copyWith(color: foregroundColor.resolve(states)),
+        textStyle: theme.textTheme.labelLarge
+            ?.copyWith(color: foregroundColor.resolve(states)),
         child: InkWell(
           onTap: onTap,
           borderRadius: BorderRadius.circular(8),

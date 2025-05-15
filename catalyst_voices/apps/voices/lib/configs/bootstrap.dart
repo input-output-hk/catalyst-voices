@@ -42,8 +42,9 @@ Future<BootstrapArgs> bootstrap({
   setPathUrlStrategy();
 
   final configService = ConfigService(ConfigRepository());
-  final config =
-      await configService.getAppConfig().onError((error, stackTrace) => const AppConfig());
+  final config = await configService
+      .getAppConfig()
+      .onError((error, stackTrace) => const AppConfig());
 
   await _cleanupOldStorages();
   await registerDependencies(config: config);

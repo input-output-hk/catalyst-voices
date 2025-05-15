@@ -30,7 +30,9 @@ class _ToggleStateTextState extends State<ToggleStateText> {
       if (sessionBloc.state.isActive) {
         await sessionBloc.lock();
       } else if (sessionBloc.state.isVisitor) {
-        await sessionBloc.switchToDummyAccount().then((_) => sessionBloc.lock());
+        await sessionBloc
+            .switchToDummyAccount()
+            .then((_) => sessionBloc.lock());
       }
     };
     _tapActiveUser.onTap = () async {

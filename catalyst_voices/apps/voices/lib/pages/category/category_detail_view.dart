@@ -140,7 +140,8 @@ class _Header extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       value,
-      style: context.textTheme.titleLarge?.copyWith(color: context.colors.textOnPrimaryLevel1),
+      style: context.textTheme.titleLarge
+          ?.copyWith(color: context.colors.textOnPrimaryLevel1),
     );
   }
 }

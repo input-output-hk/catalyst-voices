@@ -46,7 +46,8 @@ class ProposalData extends BaseProposalData {
 
   SignedDocumentRef get categoryId => document.metadata.categoryId;
 
-  List<ProposalVersion> get proposalVersions => versions.map((v) => v.toProposalVersion()).toList();
+  List<ProposalVersion> get proposalVersions =>
+      versions.map((v) => v.toProposalVersion()).toList();
 
   @override
   List<Object?> get props => [

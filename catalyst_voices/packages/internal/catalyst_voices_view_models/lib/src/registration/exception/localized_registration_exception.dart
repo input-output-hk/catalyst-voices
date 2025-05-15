@@ -16,8 +16,10 @@ sealed class LocalizedRegistrationException extends LocalizedException {
     return switch (exception) {
       RegistrationInsufficientBalanceException() =>
         const LocalizedRegistrationInsufficientBalanceException(),
-      RegistrationTransactionException() => const LocalizedRegistrationTransactionException(),
-      RegistrationUnknownException() => const LocalizedRegistrationUnknownException(),
+      RegistrationTransactionException() =>
+        const LocalizedRegistrationTransactionException(),
+      RegistrationUnknownException() =>
+        const LocalizedRegistrationUnknownException(),
       RegistrationNetworkIdMismatchException(:final targetNetworkId) =>
         LocalizedRegistrationNetworkIdMismatchException(
           targetNetworkId: targetNetworkId,
@@ -32,17 +34,21 @@ final class LocalizedRegistrationInsufficientBalanceException
   const LocalizedRegistrationInsufficientBalanceException();
 
   @override
-  String message(BuildContext context) => context.l10n.registrationInsufficientBalance;
+  String message(BuildContext context) =>
+      context.l10n.registrationInsufficientBalance;
 }
 
-final class LocalizedRegistrationKeychainNotFoundException extends LocalizedRegistrationException {
+final class LocalizedRegistrationKeychainNotFoundException
+    extends LocalizedRegistrationException {
   const LocalizedRegistrationKeychainNotFoundException();
 
   @override
-  String message(BuildContext context) => context.l10n.registrationKeychainNotFound;
+  String message(BuildContext context) =>
+      context.l10n.registrationKeychainNotFound;
 }
 
-final class LocalizedRegistrationNetworkIdMismatchException extends LocalizedRegistrationException {
+final class LocalizedRegistrationNetworkIdMismatchException
+    extends LocalizedRegistrationException {
   /// The [NetworkId] that the user should be using.
   final NetworkId targetNetworkId;
 
@@ -51,7 +57,8 @@ final class LocalizedRegistrationNetworkIdMismatchException extends LocalizedReg
   });
 
   @override
-  String message(BuildContext context) => context.l10n.registrationNetworkIdMismatch(
+  String message(BuildContext context) =>
+      context.l10n.registrationNetworkIdMismatch(
         targetNetworkId.localizedName(context),
       );
 }
@@ -63,19 +70,23 @@ final class LocalizedRegistrationSeedPhraseNotFoundException
   const LocalizedRegistrationSeedPhraseNotFoundException();
 
   @override
-  String message(BuildContext context) => context.l10n.registrationSeedPhraseNotFound;
+  String message(BuildContext context) =>
+      context.l10n.registrationSeedPhraseNotFound;
 }
 
 /// An exception thrown when submitting a registration transaction fails.
-final class LocalizedRegistrationTransactionException extends LocalizedRegistrationException {
+final class LocalizedRegistrationTransactionException
+    extends LocalizedRegistrationException {
   const LocalizedRegistrationTransactionException();
 
   @override
-  String message(BuildContext context) => context.l10n.registrationTransactionFailed;
+  String message(BuildContext context) =>
+      context.l10n.registrationTransactionFailed;
 }
 
 /// A generic error for describing a failure during user registration.
-final class LocalizedRegistrationUnknownException extends LocalizedRegistrationException {
+final class LocalizedRegistrationUnknownException
+    extends LocalizedRegistrationException {
   const LocalizedRegistrationUnknownException();
 
   @override
@@ -89,17 +100,21 @@ final class LocalizedRegistrationUnlockPasswordNotFoundException
   const LocalizedRegistrationUnlockPasswordNotFoundException();
 
   @override
-  String message(BuildContext context) => context.l10n.registrationUnlockPasswordNotFound;
+  String message(BuildContext context) =>
+      context.l10n.registrationUnlockPasswordNotFound;
 }
 
-final class LocalizedRegistrationWalletNotFoundException extends LocalizedRegistrationException {
+final class LocalizedRegistrationWalletNotFoundException
+    extends LocalizedRegistrationException {
   const LocalizedRegistrationWalletNotFoundException();
 
   @override
-  String message(BuildContext context) => context.l10n.registrationWalletNotFound;
+  String message(BuildContext context) =>
+      context.l10n.registrationWalletNotFound;
 }
 
-final class LocalizedWalletLinkException extends LocalizedRegistrationException {
+final class LocalizedWalletLinkException
+    extends LocalizedRegistrationException {
   final WalletApiErrorCode code;
 
   LocalizedWalletLinkException({
@@ -109,10 +124,13 @@ final class LocalizedWalletLinkException extends LocalizedRegistrationException 
   @override
   String message(BuildContext context) {
     return switch (code) {
-      WalletApiErrorCode.invalidRequest => context.l10n.errorWalletLinkInvalidRequest,
-      WalletApiErrorCode.internalError => context.l10n.errorWalletLinkInternalError,
+      WalletApiErrorCode.invalidRequest =>
+        context.l10n.errorWalletLinkInvalidRequest,
+      WalletApiErrorCode.internalError =>
+        context.l10n.errorWalletLinkInternalError,
       WalletApiErrorCode.refused => context.l10n.errorWalletLinkRefused,
-      WalletApiErrorCode.accountChange => context.l10n.errorWalletLinkAccountChange,
+      WalletApiErrorCode.accountChange =>
+        context.l10n.errorWalletLinkAccountChange,
     };
   }
 }

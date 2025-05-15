@@ -29,7 +29,8 @@ required to submit open source, high quality documentation
 for their technology that can be used as a 
 learning resource by the rest of the community.''';
 
-final class CampaignDetailsBloc extends Bloc<CampaignDetailsEvent, CampaignDetailsState> {
+final class CampaignDetailsBloc
+    extends Bloc<CampaignDetailsEvent, CampaignDetailsState> {
   final CampaignService _campaignService;
 
   CampaignDetailsBloc(

@@ -28,59 +28,70 @@ void main() {
       // Given
       final allRefs = List.generate(
         10,
-        (_) => SignedDocumentRef.first(const Uuid().v7()).toTyped(DocumentType.proposalDocument),
+        (_) => SignedDocumentRef.first(const Uuid().v7())
+            .toTyped(DocumentType.proposalDocument),
       );
       final cachedRefs = <TypedDocumentRef>[];
 
       // When
-      when(documentRepository.getAllDocumentsRefs).thenAnswer((_) => Future.value(allRefs));
-      when(documentRepository.getCachedDocumentsRefs).thenAnswer((_) => Future.value(cachedRefs));
+      when(documentRepository.getAllDocumentsRefs)
+          .thenAnswer((_) => Future.value(allRefs));
+      when(documentRepository.getCachedDocumentsRefs)
+          .thenAnswer((_) => Future.value(cachedRefs));
       when(() => documentRepository.cacheDocument(ref: any(named: 'ref')))
           .thenAnswer((_) => Future(() {}));
 
       await service.sync();
 
       // Then
-      verify(() => documentRepository.cacheDocument(ref: any(named: 'ref'))).called(allRefs.length);
+      verify(() => documentRepository.cacheDocument(ref: any(named: 'ref')))
+          .called(allRefs.length);
     });
 
     test('calls cache documents only for missing refs', () async {
       // Given
       final allRefs = List.generate(
         10,
-        (_) => SignedDocumentRef.first(const Uuid().v7()).toTyped(DocumentType.proposalDocument),
+        (_) => SignedDocumentRef.first(const Uuid().v7())
+            .toTyped(DocumentType.proposalDocument),
       );
       final cachedRefs = allRefs.sublist(0, (allRefs.length / 2).floor());
       final expectedCalls = allRefs.length - cachedRefs.length;
 
       // When
-      when(documentRepository.getAllDocumentsRefs).thenAnswer((_) => Future.value(allRefs));
-      when(documentRepository.getCachedDocumentsRefs).thenAnswer((_) => Future.value(cachedRefs));
+      when(documentRepository.getAllDocumentsRefs)
+          .thenAnswer((_) => Future.value(allRefs));
+      when(documentRepository.getCachedDocumentsRefs)
+          .thenAnswer((_) => Future.value(cachedRefs));
       when(() => documentRepository.cacheDocument(ref: any(named: 'ref')))
           .thenAnswer((_) => Future(() {}));
 
       await service.sync();
 
       // Then
-      verify(() => documentRepository.cacheDocument(ref: any(named: 'ref'))).called(expectedCalls);
+      verify(() => documentRepository.cacheDocument(ref: any(named: 'ref')))
+          .called(expectedCalls);
     });
 
     test('when have more cached refs it returns normally', () async {
       // Given
       final allRefs = List.generate(
         10,
-        (_) => SignedDocumentRef.first(const Uuid().v7()).toTyped(DocumentType.proposalDocument),
+        (_) => SignedDocumentRef.first(const Uuid().v7())
+            .toTyped(DocumentType.proposalDocument),
       );
       final cachedRefs = allRefs +
           List.generate(
             5,
-            (_) =>
-                SignedDocumentRef.first(const Uuid().v7()).toTyped(DocumentType.proposalDocument),
+            (_) => SignedDocumentRef.first(const Uuid().v7())
+                .toTyped(DocumentType.proposalDocument),
           );
 
       // When
-      when(documentRepository.getAllDocumentsRefs).thenAnswer((_) => Future.value(allRefs));
-      when(documentRepository.getCachedDocumentsRefs).thenAnswer((_) => Future.value(cachedRefs));
+      when(documentRepository.getAllDocumentsRefs)
+          .thenAnswer((_) => Future.value(allRefs));
+      when(documentRepository.getCachedDocumentsRefs)
+          .thenAnswer((_) => Future.value(cachedRefs));
       when(() => documentRepository.cacheDocument(ref: any(named: 'ref')))
           .thenAnswer((_) => Future(() {}));
 
@@ -96,14 +107,17 @@ void main() {
       // Given
       final allRefs = List.generate(
         10,
-        (_) => SignedDocumentRef.first(const Uuid().v7()).toTyped(DocumentType.proposalDocument),
+        (_) => SignedDocumentRef.first(const Uuid().v7())
+            .toTyped(DocumentType.proposalDocument),
       );
       final cachedRefs = <TypedDocumentRef>[];
       var progress = 0.0;
 
       // When
-      when(documentRepository.getAllDocumentsRefs).thenAnswer((_) => Future.value(allRefs));
-      when(documentRepository.getCachedDocumentsRefs).thenAnswer((_) => Future.value(cachedRefs));
+      when(documentRepository.getAllDocumentsRefs)
+          .thenAnswer((_) => Future.value(allRefs));
+      when(documentRepository.getCachedDocumentsRefs)
+          .thenAnswer((_) => Future.value(cachedRefs));
       when(() => documentRepository.cacheDocument(ref: any(named: 'ref')))
           .thenAnswer((_) => Future(() {}));
 
@@ -121,14 +135,17 @@ void main() {
       // Given
       final allRefs = List.generate(
         10,
-        (_) => SignedDocumentRef.first(const Uuid().v7()).toTyped(DocumentType.proposalDocument),
+        (_) => SignedDocumentRef.first(const Uuid().v7())
+            .toTyped(DocumentType.proposalDocument),
       );
       final cachedRefs = allRefs.sublist(0, (allRefs.length / 2).floor());
       final expectedNewRefs = allRefs.sublist(cachedRefs.length);
 
       // When
-      when(documentRepository.getAllDocumentsRefs).thenAnswer((_) => Future.value(allRefs));
-      when(documentRepository.getCachedDocumentsRefs).thenAnswer((_) => Future.value(cachedRefs));
+      when(documentRepository.getAllDocumentsRefs)
+          .thenAnswer((_) => Future.value(allRefs));
+      when(documentRepository.getCachedDocumentsRefs)
+          .thenAnswer((_) => Future.value(cachedRefs));
       when(() => documentRepository.cacheDocument(ref: any(named: 'ref')))
           .thenAnswer((_) => Future(() {}));
 

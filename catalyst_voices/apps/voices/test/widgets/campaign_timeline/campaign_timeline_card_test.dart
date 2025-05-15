@@ -113,7 +113,8 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        final voicesChips = tester.widgetList<VoicesChip>(find.byType(VoicesChip));
+        final voicesChips =
+            tester.widgetList<VoicesChip>(find.byType(VoicesChip));
         expect(voicesChips, hasLength(1));
 
         final ongoingTextWidget = find.text('Ongoing');

@@ -12,7 +12,9 @@ final _logger = Logger('ProposalsCubit');
 
 /// Manages the proposals.
 final class ProposalsCubit extends Cubit<ProposalsState>
-    with BlocErrorEmitterMixin, BlocSignalEmitterMixin<ProposalsSignal, ProposalsState> {
+    with
+        BlocErrorEmitterMixin,
+        BlocSignalEmitterMixin<ProposalsSignal, ProposalsState> {
   final UserService _userService;
   final CampaignService _campaignService;
   final ProposalService _proposalService;
@@ -144,7 +146,9 @@ final class ProposalsCubit extends Cubit<ProposalsState>
     if (!isFavorite && _cache.filters.type == ProposalsFilterType.favorites) {
       final page = _cache.page;
       if (page != null) {
-        final proposals = List.of(page.items).where((element) => element.selfRef != ref).toList();
+        final proposals = List.of(page.items)
+            .where((element) => element.selfRef != ref)
+            .toList();
 
         final updatedPage = page.copyWithItems(proposals);
 
@@ -158,7 +162,8 @@ final class ProposalsCubit extends Cubit<ProposalsState>
   }
 
   void updateSearchQuery(String query) {
-    final asOptional = query.isEmpty ? const Optional<String>.empty() : Optional(query);
+    final asOptional =
+        query.isEmpty ? const Optional<String>.empty() : Optional(query);
 
     if (asOptional.data == _cache.filters.searchQuery) {
       return;

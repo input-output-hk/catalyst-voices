@@ -46,7 +46,9 @@ final class AccountDto {
   // As part of migration falling back to unknown if email is not set.
   AccountPublicStatus get _publicStatus {
     return publicStatus ??
-        (email != null ? AccountPublicStatus.unknown : AccountPublicStatus.notSetup);
+        (email != null
+            ? AccountPublicStatus.unknown
+            : AccountPublicStatus.notSetup);
   }
 
   Map<String, dynamic> toJson() => _$AccountDtoToJson(this);

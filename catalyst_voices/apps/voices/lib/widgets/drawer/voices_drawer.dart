@@ -145,7 +145,8 @@ class VoicesDrawerChooser<T> extends StatelessWidget {
             ),
           IconButton(
             key: const ValueKey('DrawerChooserNextButton'),
-            onPressed: _selectedIndex < (items.length - 1) ? _onSelectNext : null,
+            onPressed:
+                _selectedIndex < (items.length - 1) ? _onSelectNext : null,
             icon: VoicesAssets.icons.chevronRight.buildIcon(size: 20),
           ),
         ],

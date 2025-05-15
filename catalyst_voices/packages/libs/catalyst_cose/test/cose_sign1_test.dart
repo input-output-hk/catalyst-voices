@@ -65,7 +65,8 @@ void main() {
   });
 }
 
-final class _SignerVerifier implements CatalystCoseSigner, CatalystCoseVerifier {
+final class _SignerVerifier
+    implements CatalystCoseSigner, CatalystCoseVerifier {
   final SignatureAlgorithm _algorithm;
   final SimpleKeyPair _keyPair;
 

@@ -172,7 +172,8 @@ class PagingController<ItemType> extends ValueNotifier<PagingState<ItemType>> {
       return;
     }
 
-    final localListeners = List<PagingStateListener<ItemType>>.from(_statusListeners!);
+    final localListeners =
+        List<PagingStateListener<ItemType>>.from(_statusListeners!);
     for (final listener in localListeners) {
       if (_statusListeners!.contains(listener)) {
         listener(state);

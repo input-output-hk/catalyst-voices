@@ -14,7 +14,8 @@ void main() {
       fakeAsync((async) {
         var called = false;
 
-        Debouncer(delay: const Duration(milliseconds: 100)).run(() => called = true);
+        Debouncer(delay: const Duration(milliseconds: 100))
+            .run(() => called = true);
 
         expect(called, isFalse);
 

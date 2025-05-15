@@ -58,7 +58,8 @@ class SecureCertificateRepository {
     final encryptedCertificate = await _storageService.getBytes(certificateKey);
     if (encryptedCertificate != null) {
       try {
-        final decryptedBytes = _cryptoService.decrypt(encryptedCertificate, password);
+        final decryptedBytes =
+            _cryptoService.decrypt(encryptedCertificate, password);
         final decodedCertificate = utf8.decode(decryptedBytes);
         return decodedCertificate;
       } catch (e) {
@@ -89,7 +90,8 @@ class SecureCertificateRepository {
       if (_isCertificate(file)) {
         final certificateBytes = await _readFileAsBytes(file);
 
-        final encryptedBytes = _cryptoService.encrypt(certificateBytes, password);
+        final encryptedBytes =
+            _cryptoService.encrypt(certificateBytes, password);
         final certificateKey = _generateCertificateKey(file.name);
 
         await _storageService.saveBytes(certificateKey, encryptedBytes);

@@ -21,10 +21,12 @@ class AgreementConfirmationWidget extends StatefulWidget {
   });
 
   @override
-  State<AgreementConfirmationWidget> createState() => _AgreementConfirmationWidgetState();
+  State<AgreementConfirmationWidget> createState() =>
+      _AgreementConfirmationWidgetState();
 }
 
-class _AgreementConfirmationWidgetState extends State<AgreementConfirmationWidget> {
+class _AgreementConfirmationWidgetState
+    extends State<AgreementConfirmationWidget> {
   bool? get _value => widget.property.value ?? widget.schema.defaultValue;
 
   @override
@@ -88,7 +90,9 @@ class _AgreementConfirmationFormField extends VoicesFormField<bool> {
                   label: Text(
                     context.l10n.agree,
                     style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          color: !enabled && !value ? Theme.of(context).colors.textDisabled : null,
+                          color: !enabled && !value
+                              ? Theme.of(context).colors.textDisabled
+                              : null,
                         ),
                   ),
                 ),

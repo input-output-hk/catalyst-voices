@@ -8,8 +8,10 @@ import 'step_2_restore_keychain_choice_panel.dart';
 class SeedPhraseInstructionsPanel extends OnboardingPageBase {
   SeedPhraseInstructionsPanel(super.$);
 
-  final seedPhraseInstructionsTitleKey = const Key('SeedPhraseInstructionsTitle');
-  final seedPhraseInstructionsSubtitleKey = const Key('SeedPhraseInstructionsSubtitleKey');
+  final seedPhraseInstructionsTitleKey =
+      const Key('SeedPhraseInstructionsTitle');
+  final seedPhraseInstructionsSubtitleKey =
+      const Key('SeedPhraseInstructionsSubtitleKey');
 
   @override
   Future<void> goto() async {

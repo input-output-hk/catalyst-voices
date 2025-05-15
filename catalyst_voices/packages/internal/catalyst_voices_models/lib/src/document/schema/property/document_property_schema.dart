@@ -62,7 +62,8 @@ sealed class DocumentPropertySchema extends Equatable implements DocumentNode {
 
   /// Returns true if this should be treated as a standalone section
   /// rather than a child in a parent section.
-  bool get isSectionOrSubsection => this is DocumentSectionSchema || isSubsection;
+  bool get isSectionOrSubsection =>
+      this is DocumentSectionSchema || isSubsection;
 
   /// Creates a new property from this schema with a default value.
   ///
@@ -98,7 +99,8 @@ sealed class DocumentPropertySchema extends Equatable implements DocumentNode {
 }
 
 /// A schema property that can have a value.
-sealed class DocumentValueSchema<T extends Object> extends DocumentPropertySchema {
+sealed class DocumentValueSchema<T extends Object>
+    extends DocumentPropertySchema {
   /// The default value this property should have
   /// if not assigned any custom value.
   final T? defaultValue;
@@ -176,5 +178,6 @@ sealed class DocumentValueSchema<T extends Object> extends DocumentPropertySchem
 
   @override
   @mustCallSuper
-  List<Object?> get props => super.props + [defaultValue, constValue, enumValues];
+  List<Object?> get props =>
+      super.props + [defaultValue, constValue, enumValues];
 }

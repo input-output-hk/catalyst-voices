@@ -96,7 +96,8 @@ void main() {
     });
 
     test('on-chain complex transaction serialized from and to cbor', () {
-      const hex1 = '84ab0082825820f72db06cf05d94b184209b0a0a868fc249a4f9e6347e4e95a1b9b0'
+      const hex1 =
+          '84ab0082825820f72db06cf05d94b184209b0a0a868fc249a4f9e6347e4e95a1b9b0'
           'fb207cdd1d0b825820f72db06cf05d94b184209b0a0a868fc249a4f9e6347e4e95a1'
           'b9b0fb207cdd1d181d0184a300581d705d2470cbd75a4e78c7f72a6f1f19a3ae6d1e'
           'd673a8343ffa084119a801821a0cfe6a80a0028201d818582bd8799f581cd5c9e461'

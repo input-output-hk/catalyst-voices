@@ -9,10 +9,8 @@ class VoicesNumFieldController<T extends num> extends ValueNotifier<T?> {
   VoicesNumFieldController([super.value]);
 }
 
-typedef VoicesNumFieldValidator<T extends num> = VoicesTextFieldValidationResult Function(
-  T? value,
-  String text,
-);
+typedef VoicesNumFieldValidator<T extends num> = VoicesTextFieldValidationResult
+    Function(T? value, String text);
 
 class VoicesNumField<T extends num> extends StatefulWidget {
   final Codec<T, String> codec;
@@ -121,10 +119,13 @@ class _VoicesNumFieldState<T extends num> extends State<VoicesNumField<T>> {
       inputFormatters: [
         ...?widget.inputFormatters,
       ],
-      onChanged: onChanged != null ? (value) => onChanged(_toNum(value ?? '')) : null,
-      textValidator: validator != null ? (value) => validator(_toNum(value), value) : null,
-      onFieldSubmitted:
-          onFieldSubmitted != null ? (value) => onFieldSubmitted(_toNum(value)) : null,
+      onChanged:
+          onChanged != null ? (value) => onChanged(_toNum(value ?? '')) : null,
+      textValidator:
+          validator != null ? (value) => validator(_toNum(value), value) : null,
+      onFieldSubmitted: onFieldSubmitted != null
+          ? (value) => onFieldSubmitted(_toNum(value))
+          : null,
       enabled: widget.enabled,
       readOnly: widget.readOnly,
       ignorePointers: widget.ignorePointers,

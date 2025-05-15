@@ -101,7 +101,8 @@ void main() {
       expect(find.text(errorText), findsOneWidget);
     });
 
-    testWidgets('displays correct suffix icon based on validation result', (tester) async {
+    testWidgets('displays correct suffix icon based on validation result',
+        (tester) async {
       await tester.pumpWidget(
         _MaterialApp(
           child: VoicesTextField(
@@ -213,7 +214,8 @@ void main() {
       );
     });
 
-    testWidgets('displays warning when validation returns warning', (tester) async {
+    testWidgets('displays warning when validation returns warning',
+        (tester) async {
       const warningMessage = 'This is a warning';
 
       // Define a validator that returns a warning for specific input

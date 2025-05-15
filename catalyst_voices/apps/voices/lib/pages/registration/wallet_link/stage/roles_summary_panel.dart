@@ -85,7 +85,8 @@ class _Subtitle extends StatelessWidget {
             text: context.l10n.walletLinkRoleSummaryContent1,
           ),
           TextSpan(
-            text: context.l10n.walletLinkRoleSummaryContent2(selectedRoles.length),
+            text: context.l10n
+                .walletLinkRoleSummaryContent2(selectedRoles.length),
             style: const TextStyle(fontWeight: FontWeight.bold),
           ),
           TextSpan(

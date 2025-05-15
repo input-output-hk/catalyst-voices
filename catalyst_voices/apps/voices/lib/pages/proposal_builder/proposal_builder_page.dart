@@ -72,7 +72,8 @@ class _ProposalBuilderContent extends StatelessWidget {
 class _ProposalBuilderPageState extends State<ProposalBuilderPage>
     with
         ErrorHandlerStateMixin<ProposalBuilderBloc, ProposalBuilderPage>,
-        SignalHandlerStateMixin<ProposalBuilderBloc, ProposalBuilderSignal, ProposalBuilderPage> {
+        SignalHandlerStateMixin<ProposalBuilderBloc, ProposalBuilderSignal,
+            ProposalBuilderPage> {
   late final SegmentsController _segmentsController;
   late final ItemScrollController _segmentsScrollController;
 
@@ -116,7 +117,8 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
   void didUpdateWidget(ProposalBuilderPage oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    if (widget.proposalId != oldWidget.proposalId || widget.categoryId != oldWidget.categoryId) {
+    if (widget.proposalId != oldWidget.proposalId ||
+        widget.categoryId != oldWidget.categoryId) {
       _loadProposal();
     }
   }
@@ -187,7 +189,9 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
   }
 
   void _dontShowCampaignSubmissionClosingDialog(bool value) {
-    context.read<SessionCubit>().updateShowSubmissionClosingWarning(value: !value);
+    context
+        .read<SessionCubit>()
+        .updateShowSubmissionClosingWarning(value: !value);
   }
 
   void _handleSegmentsControllerChange() {
@@ -299,7 +303,11 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
   Future<void> _showSubmissionClosingWarningDialog(
     DateTime submissionCloseDate,
   ) async {
-    final canShow = context.read<SessionCubit>().state.settings.showSubmissionClosingWarning;
+    final canShow = context
+        .read<SessionCubit>()
+        .state
+        .settings
+        .showSubmissionClosingWarning;
 
     if (canShow) {
       await SubmissionClosingWarningDialog.showNDaysBefore(
@@ -320,7 +328,8 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
   void _showValidationErrorSnackbar(ProposalBuilderValidationException error) {
     VoicesSnackBar.hideCurrent(context);
 
-    final formattedFields = error.fields.whereNot((e) => e.isEmpty).map((e) => '• $e').join('\n');
+    final formattedFields =
+        error.fields.whereNot((e) => e.isEmpty).map((e) => '• $e').join('\n');
 
     VoicesSnackBar(
       behavior: SnackBarBehavior.floating,

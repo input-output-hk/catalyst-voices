@@ -51,7 +51,9 @@ mixin StorageAsStringMixin implements Storage {
   @override
   FutureOr<Uint8List?> readBytes({required String key}) async {
     final base64String = await readString(key: key);
-    final bytes = base64String != null ? Uint8List.fromList(base64Decode(base64String)) : null;
+    final bytes = base64String != null
+        ? Uint8List.fromList(base64Decode(base64String))
+        : null;
 
     return bytes;
   }

@@ -67,7 +67,8 @@ class _ProtectedScreenState extends State<ProtectedScreen> {
                                 children: [
                                   IconButton(
                                     icon: const Icon(Icons.info),
-                                    onPressed: () async => _showCertificateDetails(
+                                    onPressed: () async =>
+                                        _showCertificateDetails(
                                       _certificates[index],
                                     ),
                                   ),
@@ -136,7 +137,8 @@ class _ProtectedScreenState extends State<ProtectedScreen> {
     if (password != null && password.isNotEmpty) {
       try {
         if (await certificateRepo.verifyPassword(password)) {
-          final storedCertificates = await certificateRepo.pickAndStoreCertificates(password);
+          final storedCertificates =
+              await certificateRepo.pickAndStoreCertificates(password);
           if (storedCertificates.isNotEmpty) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
@@ -195,7 +197,8 @@ class _ProtectedScreenState extends State<ProtectedScreen> {
             ),
             TextButton(
               child: const Text('OK'),
-              onPressed: () => Navigator.of(context).pop(_passwordController.text),
+              onPressed: () =>
+                  Navigator.of(context).pop(_passwordController.text),
             ),
           ],
         );
@@ -236,7 +239,8 @@ class _ProtectedScreenState extends State<ProtectedScreen> {
               builder: (BuildContext context) {
                 return AlertDialog(
                   title: Text('Certificate Details: $certificateName'),
-                  content: SingleChildScrollView(child: Text(certificateContent)),
+                  content:
+                      SingleChildScrollView(child: Text(certificateContent)),
                   actions: [
                     TextButton(
                       child: const Text('Close'),

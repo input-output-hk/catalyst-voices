@@ -20,7 +20,8 @@ class SeedPhraseCheckInstructionsPanel extends StatelessWidget {
           child: SingleChildScrollView(
             child: RegistrationStageMessage(
               title: Text(l10n.createKeychainSeedPhraseCheckInstructionsTitle),
-              subtitle: Text(l10n.createKeychainSeedPhraseCheckInstructionsSubtitle),
+              subtitle:
+                  Text(l10n.createKeychainSeedPhraseCheckInstructionsSubtitle),
             ),
           ),
         ),

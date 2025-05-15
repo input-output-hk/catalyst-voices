@@ -30,7 +30,8 @@ final class ProposalAddCommentSection extends ProposalCommentsSection {
   }
 }
 
-final class ProposalCommentListItem extends Equatable implements SegmentsListViewItem {
+final class ProposalCommentListItem extends Equatable
+    implements SegmentsListViewItem {
   @override
   final NodeId id;
   final CommentWithReplies comment;
@@ -56,7 +57,8 @@ sealed class ProposalCommentsSection extends BaseSection {
   });
 }
 
-final class ProposalCommentsSegment extends BaseSegment<ProposalCommentsSection> {
+final class ProposalCommentsSegment
+    extends BaseSegment<ProposalCommentsSection> {
   final ProposalCommentsSort sort;
 
   const ProposalCommentsSegment({

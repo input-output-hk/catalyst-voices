@@ -33,7 +33,8 @@ final class ProposalBuilderMetadata extends Equatable {
     );
   }
 
-  DocumentVersion? get latestVersion => versions.firstWhereOrNull((e) => e.isLatest);
+  DocumentVersion? get latestVersion =>
+      versions.firstWhereOrNull((e) => e.isLatest);
 
   @override
   List<Object?> get props => [
@@ -103,8 +104,8 @@ final class ProposalBuilderState extends Equatable {
       ];
 
   String? get proposalTitle {
-    final property =
-        document?.getProperty(ProposalDocument.titleNodeId) as DocumentValueProperty<String>?;
+    final property = document?.getProperty(ProposalDocument.titleNodeId)
+        as DocumentValueProperty<String>?;
 
     return property?.value;
   }
@@ -129,7 +130,8 @@ final class ProposalBuilderState extends Equatable {
 
   bool get showError => !isLoading && error != null;
 
-  bool get showSegments => !isLoading && allSegments.isNotEmpty && error == null;
+  bool get showSegments =>
+      !isLoading && allSegments.isNotEmpty && error == null;
 
   ProposalBuilderMenuItemData buildMenuItem({
     required ProposalMenuItemAction action,
@@ -174,7 +176,8 @@ final class ProposalBuilderState extends Equatable {
       activeNodeId: activeNodeId.dataOr(this.activeNodeId),
       showValidationErrors: showValidationErrors ?? this.showValidationErrors,
       canPublish: canPublish ?? this.canPublish,
-      isMaxProposalsLimitReached: isMaxProposalsLimitReached ?? this.isMaxProposalsLimitReached,
+      isMaxProposalsLimitReached:
+          isMaxProposalsLimitReached ?? this.isMaxProposalsLimitReached,
     );
   }
 }

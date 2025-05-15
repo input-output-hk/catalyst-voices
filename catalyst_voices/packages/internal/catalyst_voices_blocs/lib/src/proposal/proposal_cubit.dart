@@ -68,7 +68,8 @@ final class ProposalCubit extends Cubit<ProposalState>
       final commentTemplate = await _commentService.getCommentTemplateFor(
         category: proposal.categoryId,
       );
-      final isFavorite = await _proposalService.watchIsFavoritesProposal(ref: ref).first;
+      final isFavorite =
+          await _proposalService.watchIsFavoritesProposal(ref: ref).first;
 
       _cache = _cache.copyWith(
         proposal: Optional(proposal),
@@ -180,7 +181,8 @@ final class ProposalCubit extends Cubit<ProposalState>
     required SignedDocumentRef ref,
     required bool show,
   }) {
-    final updatedComments = state.comments.updateCommentBuilder(ref: ref, show: show);
+    final updatedComments =
+        state.comments.updateCommentBuilder(ref: ref, show: show);
 
     emit(state.copyWith(comments: updatedComments));
   }
@@ -189,7 +191,8 @@ final class ProposalCubit extends Cubit<ProposalState>
     required SignedDocumentRef ref,
     required bool show,
   }) {
-    final updatedComments = state.comments.updateCommentReplies(ref: ref, show: show);
+    final updatedComments =
+        state.comments.updateCommentReplies(ref: ref, show: show);
 
     emit(state.copyWith(comments: updatedComments));
   }

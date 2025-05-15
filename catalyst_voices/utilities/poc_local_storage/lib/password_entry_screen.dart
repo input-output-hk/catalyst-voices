@@ -58,7 +58,9 @@ class _PasswordEntryScreenState extends State<PasswordEntryScreen> {
                           prefixIcon: const Icon(Icons.vpn_key),
                           suffixIcon: IconButton(
                             icon: Icon(
-                              _isPasswordVisible ? Icons.visibility_off : Icons.visibility,
+                              _isPasswordVisible
+                                  ? Icons.visibility_off
+                                  : Icons.visibility,
                             ),
                             onPressed: () {
                               setState(() {

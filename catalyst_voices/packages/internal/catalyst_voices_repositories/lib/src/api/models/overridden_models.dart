@@ -34,7 +34,8 @@ class SimpleProposal$Proposer extends Proposal$Proposer {
 
 // CommunityChoiceProposal
 
-class CommunityChoiceProposal$ProposalCategory extends Proposal$ProposalCategory {
+class CommunityChoiceProposal$ProposalCategory
+    extends Proposal$ProposalCategory {
   CommunityChoiceProposal$ProposalCategory({
     super.categoryId,
     super.categoryName,

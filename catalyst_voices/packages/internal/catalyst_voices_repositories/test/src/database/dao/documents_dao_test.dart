@@ -33,11 +33,13 @@ void main() {
         'documents can be queried back correctly',
         () async {
           // Given
-          final documentsWithMetadata = List<DocumentEntityWithMetadata>.generate(
+          final documentsWithMetadata =
+              List<DocumentEntityWithMetadata>.generate(
             10,
             (index) => DocumentWithMetadataFactory.build(),
           );
-          final expectedDocuments = documentsWithMetadata.map((e) => e.document);
+          final expectedDocuments =
+              documentsWithMetadata.map((e) => e.document);
 
           // When
           await database.documentsDao.saveAll(documentsWithMetadata);
@@ -54,12 +56,14 @@ void main() {
         'conflicting documents are ignored',
         () async {
           // Given
-          final documentsWithMetadata = List<DocumentEntityWithMetadata>.generate(
+          final documentsWithMetadata =
+              List<DocumentEntityWithMetadata>.generate(
             20,
             (index) => DocumentWithMetadataFactory.build(),
           );
 
-          final expectedDocuments = documentsWithMetadata.map((e) => e.document);
+          final expectedDocuments =
+              documentsWithMetadata.map((e) => e.document);
 
           // When
           final firstBatch = documentsWithMetadata.sublist(0, 10);
@@ -82,12 +86,14 @@ void main() {
         'stream emits data when new entities are saved',
         () async {
           // Given
-          final documentsWithMetadata = List<DocumentEntityWithMetadata>.generate(
+          final documentsWithMetadata =
+              List<DocumentEntityWithMetadata>.generate(
             1,
             (index) => DocumentWithMetadataFactory.build(),
           );
 
-          final expectedDocuments = documentsWithMetadata.map((e) => e.document).toList();
+          final expectedDocuments =
+              documentsWithMetadata.map((e) => e.document).toList();
 
           // When
           final documentsStream = database.documentsDao.watchAll();
@@ -110,7 +116,8 @@ void main() {
         'returns specific version matching exact ref',
         () async {
           // Given
-          final documentsWithMetadata = List<DocumentEntityWithMetadata>.generate(
+          final documentsWithMetadata =
+              List<DocumentEntityWithMetadata>.generate(
             2,
             (index) => DocumentWithMetadataFactory.build(),
           );
@@ -200,7 +207,8 @@ void main() {
         'returns null when id does not match any id',
         () async {
           // Given
-          final documentsWithMetadata = List<DocumentEntityWithMetadata>.generate(
+          final documentsWithMetadata =
+              List<DocumentEntityWithMetadata>.generate(
             2,
             (index) => DocumentWithMetadataFactory.build(),
           );
@@ -233,7 +241,9 @@ void main() {
               ),
             );
           });
-          final typedRefs = refs.map((e) => e.toTyped(DocumentType.proposalDocument)).toList();
+          final typedRefs = refs
+              .map((e) => e.toTyped(DocumentType.proposalDocument))
+              .toList();
 
           // When
           await database.documentsDao.saveAll(documentsWithMetadata);
@@ -268,7 +278,8 @@ void main() {
               selfRef: SignedDocumentRef(id: id, version: version2),
             ),
           );
-          final documentsStream = database.documentsDao.watchAll(unique: true).asBroadcastStream();
+          final documentsStream =
+              database.documentsDao.watchAll(unique: true).asBroadcastStream();
 
           await database.documentsDao.saveAll([document]);
           final firstEmission = await documentsStream.first;
@@ -290,7 +301,8 @@ void main() {
         'Returns latest document limited by quantity if provided',
         () async {
           // Given
-          final documentsWithMetadata = List<DocumentEntityWithMetadata>.generate(
+          final documentsWithMetadata =
+              List<DocumentEntityWithMetadata>.generate(
             20,
             (index) => DocumentWithMetadataFactory.build(),
           );
@@ -318,7 +330,8 @@ void main() {
           final limitedExpectedDocuments = expectedDocuments.take(7).toList();
 
           // When
-          final documentsStream = database.documentsDao.watchAll(limit: 7, unique: true);
+          final documentsStream =
+              database.documentsDao.watchAll(limit: 7, unique: true);
 
           await database.documentsDao.saveAll(documentsWithMetadata.reversed);
 
@@ -336,7 +349,9 @@ void main() {
             reason: 'should have 7 documents',
           );
 
-          final uniqueIds = limitedExpectedDocuments.map((d) => '${d.idHi}-${d.idLo}').toSet();
+          final uniqueIds = limitedExpectedDocuments
+              .map((d) => '${d.idHi}-${d.idLo}')
+              .toSet();
           expect(
             uniqueIds.length,
             equals(limitedExpectedDocuments.length),
@@ -366,7 +381,8 @@ void main() {
           }).toList();
 
           // When
-          final documentsStream = database.documentsDao.watchAll(limit: 7, unique: true);
+          final documentsStream =
+              database.documentsDao.watchAll(limit: 7, unique: true);
 
           await database.documentsDao.saveAll(documentsWithMetadata);
           // Then
@@ -420,8 +436,9 @@ void main() {
           );
 
           // When
-          final documentsStream =
-              database.documentsDao.watchAll(limit: 7, unique: true).asBroadcastStream();
+          final documentsStream = database.documentsDao
+              .watchAll(limit: 7, unique: true)
+              .asBroadcastStream();
 
           // Save first version and wait for emission
           await database.documentsDao.saveAll([documentsWithMetadata]);
@@ -472,8 +489,9 @@ void main() {
           );
 
           // When
-          final documentsStream =
-              database.documentsDao.watchAll(limit: 1, unique: true).asBroadcastStream();
+          final documentsStream = database.documentsDao
+              .watchAll(limit: 1, unique: true)
+              .asBroadcastStream();
 
           await database.documentsDao.saveAll([document1]);
           final firstEmission = await documentsStream.first;
@@ -497,7 +515,8 @@ void main() {
         () async {
           // Given
           final originalId = DummyCatalystIdFactory.create(username: 'damian');
-          final updatedId = originalId.copyWith(username: const Optional('dev'));
+          final updatedId =
+              originalId.copyWith(username: const Optional('dev'));
 
           final document1 = DocumentWithMetadataFactory.build(
             metadata: DocumentDataMetadata(
@@ -611,7 +630,8 @@ void main() {
               )
               .asBroadcastStream();
 
-          await database.documentsDao.saveAll([baseDocument, referencingDocument]);
+          await database.documentsDao
+              .saveAll([baseDocument, referencingDocument]);
           final firstEmission = await documentsStream.first;
 
           await database.documentsDao.saveAll([newerVersion]);
@@ -642,7 +662,8 @@ void main() {
           // Given
           final dateTime = DateTimeExt.now();
 
-          final documentsWithMetadata = List<DocumentEntityWithMetadata>.generate(
+          final documentsWithMetadata =
+              List<DocumentEntityWithMetadata>.generate(
             20,
             (index) => DocumentWithMetadataFactory.build(
               metadata: DocumentDataMetadata(
@@ -668,7 +689,8 @@ void main() {
         () async {
           // Given
           final id = const Uuid().v7();
-          final documentsWithMetadata = List<DocumentEntityWithMetadata>.generate(
+          final documentsWithMetadata =
+              List<DocumentEntityWithMetadata>.generate(
             2,
             (index) {
               final metadata = DocumentDataMetadata(
@@ -695,7 +717,8 @@ void main() {
         () async {
           // Given
           final id = const Uuid().v7();
-          final documentsWithMetadata = List<DocumentEntityWithMetadata>.generate(
+          final documentsWithMetadata =
+              List<DocumentEntityWithMetadata>.generate(
             2,
             (index) {
               final metadata = DocumentDataMetadata(
@@ -725,7 +748,8 @@ void main() {
         () async {
           // Given
           final id = const Uuid().v7();
-          final documentsWithMetadata = List<DocumentEntityWithMetadata>.generate(
+          final documentsWithMetadata =
+              List<DocumentEntityWithMetadata>.generate(
             2,
             (index) {
               final metadata = DocumentDataMetadata(
@@ -754,7 +778,8 @@ void main() {
         'many different documents are found',
         () async {
           // Given
-          final documentsWithMetadata = List<DocumentEntityWithMetadata>.generate(
+          final documentsWithMetadata =
+              List<DocumentEntityWithMetadata>.generate(
             10,
             (index) {
               final metadata = DocumentDataMetadata(
@@ -944,7 +969,8 @@ void main() {
         'removes all documents',
         () async {
           // Given
-          final documentsWithMetadata = List<DocumentEntityWithMetadata>.generate(
+          final documentsWithMetadata =
+              List<DocumentEntityWithMetadata>.generate(
             5,
             (index) => DocumentWithMetadataFactory.build(),
           );
@@ -968,7 +994,8 @@ void main() {
         'cascades metadata',
         () async {
           // Given
-          final documentsWithMetadata = List<DocumentEntityWithMetadata>.generate(
+          final documentsWithMetadata =
+              List<DocumentEntityWithMetadata>.generate(
             5,
             (index) => DocumentWithMetadataFactory.build(),
           );

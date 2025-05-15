@@ -132,7 +132,10 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
         count,
       ]);
 
-    return select.map((row) => row.read(count)).get().then((count) => count.firstOrNull ?? 0);
+    return select
+        .map((row) => row.read(count))
+        .get()
+        .then((count) => count.firstOrNull ?? 0);
   }
 
   @override
@@ -146,7 +149,10 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
         count,
       ]);
 
-    return select.map((row) => row.read(count)).get().then((count) => count.firstOrNull ?? 0);
+    return select
+        .map((row) => row.read(count))
+        .get()
+        .then((count) => count.firstOrNull ?? 0);
   }
 
   @override
@@ -160,7 +166,9 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
           row.metadata.jsonExtract<String>(r'$.type').equals(type.uuid),
           row.metadata.jsonExtract<String>(r'$.ref.id').equals(ref.id),
           if (ref.version != null)
-            row.metadata.jsonExtract<String>(r'$.ref.version').equals(ref.version!),
+            row.metadata
+                .jsonExtract<String>(r'$.ref.version')
+                .equals(ref.version!),
         ]),
       );
 
@@ -246,7 +254,9 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
           if (type != null) row.type.equals(type.uuid),
           row.metadata.jsonExtract<String>(r'$.ref.id').equals(refTo.id),
           if (refTo.version != null)
-            row.metadata.jsonExtract<String>(r'$.ref.version').equals(refTo.version!),
+            row.metadata
+                .jsonExtract<String>(r'$.ref.version')
+                .equals(refTo.version!),
         ]),
       )
       ..orderBy([
@@ -298,7 +308,10 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
 
   @override
   Stream<DocumentEntity?> watch({required DocumentRef ref}) {
-    return _selectRef(ref).watch().map((event) => event.firstOrNull).distinct(_entitiesEquals);
+    return _selectRef(ref)
+        .watch()
+        .map((event) => event.firstOrNull)
+        .distinct(_entitiesEquals);
   }
 
   /// When [unique] is true, only latest versions of each document are returned.
@@ -323,7 +336,9 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
         (row) => Expression.and([
           row.metadata.jsonExtract<String>(r'$.ref.id').equals(refTo.id),
           if (refTo.version != null)
-            row.metadata.jsonExtract<String>(r'$.ref.version').equals(refTo.version!),
+            row.metadata
+                .jsonExtract<String>(r'$.ref.version')
+                .equals(refTo.version!),
         ]),
       );
     }
@@ -366,10 +381,14 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
       ..where(
         (row) {
           return Expression.and([
-            if (type != null) row.metadata.jsonExtract<String>(r'$.type').equals(type.uuid),
-            if (refTo != null) row.metadata.jsonExtract<String>(r'$.ref.id').equals(refTo.id),
+            if (type != null)
+              row.metadata.jsonExtract<String>(r'$.type').equals(type.uuid),
+            if (refTo != null)
+              row.metadata.jsonExtract<String>(r'$.ref.id').equals(refTo.id),
             if (refTo?.version != null)
-              row.metadata.jsonExtract<String>(r'$.ref.version').equals(refTo!.version!),
+              row.metadata
+                  .jsonExtract<String>(r'$.ref.version')
+                  .equals(refTo!.version!),
           ]);
         },
       );
@@ -388,7 +407,9 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
           row.metadata.jsonExtract<String>(r'$.type').equals(type.uuid),
           row.metadata.jsonExtract<String>(r'$.ref.id').equals(refTo.id),
           if (refTo.version != null)
-            row.metadata.jsonExtract<String>(r'$.ref.version').equals(refTo.version!),
+            row.metadata
+                .jsonExtract<String>(r'$.ref.version')
+                .equals(refTo.version!),
         ]),
       )
       ..orderBy([
@@ -398,7 +419,10 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
             ),
       ]);
 
-    return query.watch().map((event) => event.firstOrNull).distinct(_entitiesEquals);
+    return query
+        .watch()
+        .map((event) => event.firstOrNull)
+        .distinct(_entitiesEquals);
   }
 
   bool _entitiesEquals(DocumentEntity? previous, DocumentEntity? next) {

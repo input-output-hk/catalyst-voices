@@ -99,7 +99,8 @@ final class ProposalsRoute extends GoRouteData
   @override
   Widget build(BuildContext context, GoRouterState state) {
     final categoryId = this.categoryId;
-    final categoryRef = categoryId != null ? SignedDocumentRef(id: categoryId) : null;
+    final categoryRef =
+        categoryId != null ? SignedDocumentRef(id: categoryId) : null;
 
     final type = ProposalsFilterType.values.asNameMap()[this.type];
 
@@ -181,7 +182,8 @@ final class TreasuryRoute extends GoRouteData
   }
 }
 
-final class VotingRoute extends GoRouteData with FadePageTransitionMixin, CompositeRouteGuardMixin {
+final class VotingRoute extends GoRouteData
+    with FadePageTransitionMixin, CompositeRouteGuardMixin {
   const VotingRoute();
 
   @override

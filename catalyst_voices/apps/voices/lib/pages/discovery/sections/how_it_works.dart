@@ -29,7 +29,8 @@ class HowItWorks extends StatelessWidget {
             Wrap(
               runSpacing: 20,
               alignment: WrapAlignment.center,
-              children: HowItWorksItem.values.map((e) => _Item(item: e)).toList(),
+              children:
+                  HowItWorksItem.values.map((e) => _Item(item: e)).toList(),
             ),
           ],
         ),

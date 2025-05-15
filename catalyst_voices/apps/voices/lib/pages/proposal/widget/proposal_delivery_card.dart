@@ -91,7 +91,8 @@ class _ValueCell extends StatelessWidget {
       children: [
         Text(
           title,
-          style: textTheme.labelMedium?.copyWith(color: colors.textOnPrimaryLevel1),
+          style: textTheme.labelMedium
+              ?.copyWith(color: colors.textOnPrimaryLevel1),
           maxLines: 1,
           overflow: TextOverflow.clip,
         ),
@@ -106,11 +107,13 @@ class _ValueCell extends StatelessWidget {
               valueSuffix,
               maxLines: 1,
               overflow: TextOverflow.clip,
-              style: textTheme.headlineSmall?.copyWith(color: colors.textOnPrimaryLevel1),
+              style: textTheme.headlineSmall
+                  ?.copyWith(color: colors.textOnPrimaryLevel1),
             ),
             Text(
               value,
-              style: textTheme.headlineSmall?.copyWith(color: colors.textOnPrimaryLevel1),
+              style: textTheme.headlineSmall
+                  ?.copyWith(color: colors.textOnPrimaryLevel1),
               maxLines: 1,
               overflow: TextOverflow.clip,
             ),

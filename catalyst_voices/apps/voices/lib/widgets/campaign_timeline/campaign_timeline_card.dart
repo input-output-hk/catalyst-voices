@@ -24,8 +24,9 @@ class CampaignTimelineCard extends StatefulWidget {
 class CampaignTimelineCardState extends State<CampaignTimelineCard> {
   bool _isExpanded = false;
 
-  SvgGenImage get _expandedIcon =>
-      _isExpanded ? VoicesAssets.icons.chevronDown : VoicesAssets.icons.chevronRight;
+  SvgGenImage get _expandedIcon => _isExpanded
+      ? VoicesAssets.icons.chevronDown
+      : VoicesAssets.icons.chevronRight;
   bool get _isOngoing => widget.timelineItem.timeline.isTodayInRange();
 
   @override
@@ -40,7 +41,8 @@ class CampaignTimelineCardState extends State<CampaignTimelineCard> {
         width: 288,
         child: Card(
           key: const Key('TimelineCard'),
-          color: widget.placement.backgroundColor(context, isOngoing: _isOngoing),
+          color:
+              widget.placement.backgroundColor(context, isOngoing: _isOngoing),
           shape: OutlineInputBorder(
             borderSide: widget.placement.borderSide(
               context,

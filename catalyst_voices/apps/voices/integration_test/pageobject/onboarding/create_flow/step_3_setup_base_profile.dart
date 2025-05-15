@@ -15,7 +15,8 @@ class SetupBaseProfilePanel extends OnboardingPageBase {
   final emailTextField = const Key('EmailTextField');
   final ideascaleInfoCard = const Key('IdeascaleInfoCard');
 
-  PatrolFinder get infoCardTitleLocator => $(ideascaleInfoCard).$(#InfoCardTitle);
+  PatrolFinder get infoCardTitleLocator =>
+      $(ideascaleInfoCard).$(#InfoCardTitle);
   PatrolFinder get infoCardDescriptionLocator =>
       $(ideascaleInfoCard).$(#InfoCardDesc).$(Flexible).$(Text);
 

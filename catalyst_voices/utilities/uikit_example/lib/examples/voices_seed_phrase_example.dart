@@ -25,7 +25,8 @@ class VoicesSeedPhraseExample extends StatefulWidget {
   });
 
   @override
-  State<VoicesSeedPhraseExample> createState() => _VoicesSeedPhraseExampleState();
+  State<VoicesSeedPhraseExample> createState() =>
+      _VoicesSeedPhraseExampleState();
 }
 
 class _VoicesSeedPhraseExampleState extends State<VoicesSeedPhraseExample> {

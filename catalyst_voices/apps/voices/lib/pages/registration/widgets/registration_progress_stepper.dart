@@ -74,9 +74,12 @@ final class _AccountCompleted extends _RegistrationProgressStep {
 extension _AccountCreateStepType on AccountCreateStepType {
   String _localizedName(BuildContext context) {
     return switch (this) {
-      AccountCreateStepType.baseProfile => context.l10n.registrationCreateBaseProfileStepGroup,
-      AccountCreateStepType.keychain => context.l10n.registrationCreateKeychainStepGroup,
-      AccountCreateStepType.walletLink => context.l10n.registrationLinkWalletStepGroup,
+      AccountCreateStepType.baseProfile =>
+        context.l10n.registrationCreateBaseProfileStepGroup,
+      AccountCreateStepType.keychain =>
+        context.l10n.registrationCreateKeychainStepGroup,
+      AccountCreateStepType.walletLink =>
+        context.l10n.registrationLinkWalletStepGroup,
     };
   }
 }

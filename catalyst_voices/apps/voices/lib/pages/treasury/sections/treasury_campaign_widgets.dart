@@ -28,9 +28,13 @@ class TreasuryCampaignStepHeader extends StatelessWidget {
               final isEditing = sectionsState.isEditing(data.id);
 
               return VoicesTextButton(
-                onTap: data.isEditable ? () => _onToggleEditing(context, !isEditing) : null,
+                onTap: data.isEditable
+                    ? () => _onToggleEditing(context, !isEditing)
+                    : null,
                 child: Text(
-                  isEditing ? context.l10n.cancelButtonText : context.l10n.stepEdit,
+                  isEditing
+                      ? context.l10n.cancelButtonText
+                      : context.l10n.stepEdit,
                 ),
               );
             },

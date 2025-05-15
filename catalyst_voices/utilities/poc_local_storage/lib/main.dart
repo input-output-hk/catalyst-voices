@@ -9,4 +9,5 @@ void main() {
   runApp(const App());
 }
 
-final SecureCertificateRepository certificateRepo = SecureCertificateRepository();
+final SecureCertificateRepository certificateRepo =
+    SecureCertificateRepository();

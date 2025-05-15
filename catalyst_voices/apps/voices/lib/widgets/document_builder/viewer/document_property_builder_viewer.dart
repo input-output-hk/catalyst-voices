@@ -25,7 +25,8 @@ class DocumentPropertyBuilderViewer extends StatefulWidget {
   }
 }
 
-class _DocumentPropertyBuilderViewerState extends State<DocumentPropertyBuilderViewer> {
+class _DocumentPropertyBuilderViewerState
+    extends State<DocumentPropertyBuilderViewer> {
   final List<Widget> _items = [];
 
   @override
@@ -64,11 +65,12 @@ class _DocumentPropertyBuilderViewerState extends State<DocumentPropertyBuilderV
       id: property.nodeId,
       title: schema.title,
       isRequired: schema.isRequired,
-      value: schema.itemsSchema.title.formatAsPlural(property.properties.length),
+      value:
+          schema.itemsSchema.title.formatAsPlural(property.properties.length),
     );
 
-    for (final property
-        in property.properties.whereNot((element) => element.schema.isSectionOrSubsection)) {
+    for (final property in property.properties
+        .whereNot((element) => element.schema.isSectionOrSubsection)) {
       yield* _buildProperty(property);
     }
   }
@@ -92,8 +94,8 @@ class _DocumentPropertyBuilderViewerState extends State<DocumentPropertyBuilderV
       case DocumentNestedQuestionsSchema():
       case DocumentBorderGroupSchema():
       case DocumentGenericObjectSchema():
-        for (final property
-            in property.properties.whereNot((element) => element.schema.isSectionOrSubsection)) {
+        for (final property in property.properties
+            .whereNot((element) => element.schema.isSectionOrSubsection)) {
           yield* _buildProperty(property);
         }
     }
@@ -260,13 +262,17 @@ class _ListItem extends StatelessWidget {
           DocumentPropertyBuilderTitle(
             title: title,
             isRequired: isRequired,
-            color: isAnswered ? colors.textOnPrimaryLevel1 : colors.textOnPrimaryLevel0,
+            color: isAnswered
+                ? colors.textOnPrimaryLevel1
+                : colors.textOnPrimaryLevel0,
           ),
           const SizedBox(height: 8),
         ],
         DefaultTextStyle(
           style: (textTheme.bodyMedium ?? const TextStyle()).copyWith(
-            color: isAnswered ? colors.textOnPrimaryLevel0 : colors.textOnPrimaryLevel1,
+            color: isAnswered
+                ? colors.textOnPrimaryLevel0
+                : colors.textOnPrimaryLevel1,
           ),
           maxLines: !isMultiline ? 1 : null,
           overflow: !isMultiline ? TextOverflow.ellipsis : TextOverflow.clip,

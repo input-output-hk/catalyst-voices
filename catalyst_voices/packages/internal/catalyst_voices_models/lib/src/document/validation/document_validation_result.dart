@@ -43,7 +43,8 @@ final class DocumentItemsNotUnique extends DocumentValidationResult {
 }
 
 /// The [List]'s length is not within [expectedRange].
-final class DocumentItemsOutOfRange<T extends num> extends DocumentValidationResult {
+final class DocumentItemsOutOfRange<T extends num>
+    extends DocumentValidationResult {
   final DocumentNodeId invalidNodeId;
   final NumRange<int> expectedRange;
   final int actualItems;
@@ -89,7 +90,8 @@ final class DocumentPatternMismatch extends DocumentValidationResult {
 }
 
 /// The [String]'s [actualLength] is not within [expectedRange].
-final class DocumentStringOutOfRange<T extends num> extends DocumentValidationResult {
+final class DocumentStringOutOfRange<T extends num>
+    extends DocumentValidationResult {
   final DocumentNodeId invalidNodeId;
   final NumRange<int> expectedRange;
   final int actualLength;

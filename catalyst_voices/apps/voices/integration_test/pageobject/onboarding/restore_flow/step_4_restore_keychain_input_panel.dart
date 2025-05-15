@@ -9,8 +9,10 @@ import 'step_3_seedphrase_instructions_panel.dart';
 class RestoreKeychainInputPanel extends OnboardingPageBase {
   RestoreKeychainInputPanel(super.$);
 
-  final recoverySeedPhraseInputTitle = const Key('RecoverySeedPhraseInputTitle');
-  final recoverySeedPhraseInputSubtitle = const Key('RecoverySeedPhraseInputSubtitle');
+  final recoverySeedPhraseInputTitle =
+      const Key('RecoverySeedPhraseInputTitle');
+  final recoverySeedPhraseInputSubtitle =
+      const Key('RecoverySeedPhraseInputSubtitle');
   final resetButton = const Key('ResetButton');
   final importCatalystKey = const Key('UploadKeyButton');
   final uploadKeyButton = const Key('UploadKeyButton');

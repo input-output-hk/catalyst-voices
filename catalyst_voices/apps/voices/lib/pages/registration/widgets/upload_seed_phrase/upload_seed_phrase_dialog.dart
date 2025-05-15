@@ -25,8 +25,10 @@ abstract final class UploadSeedPhraseDialog {
 
     final bytes = file.bytes;
     final decodedText = utf8.decode(bytes);
-    final words =
-        decodedText.split(' ').mapIndexed((i, e) => SeedPhraseWord(e, nr: i + 1)).toList();
+    final words = decodedText
+        .split(' ')
+        .mapIndexed((i, e) => SeedPhraseWord(e, nr: i + 1))
+        .toList();
 
     return words;
   }

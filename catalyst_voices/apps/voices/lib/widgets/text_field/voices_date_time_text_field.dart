@@ -48,7 +48,8 @@ class VoicesDateTimeTextField extends StatelessWidget {
 
     return VoicesTextField(
       controller: controller,
-      onChanged: onChanged != null ? (text) => onChanged?.call(text ?? '') : null,
+      onChanged:
+          onChanged != null ? (text) => onChanged?.call(text ?? '') : null,
       textValidator: validator,
       decoration: VoicesTextFieldDecoration(
         suffixIcon: ExcludeFocus(child: suffixIcon),

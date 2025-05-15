@@ -97,7 +97,8 @@ class _Header extends StatelessWidget {
   }
 }
 
-class _SpaceSidePanelState extends State<SpaceSidePanel> with SingleTickerProviderStateMixin {
+class _SpaceSidePanelState extends State<SpaceSidePanel>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<Offset> _offsetAnimation;
 

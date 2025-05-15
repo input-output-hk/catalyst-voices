@@ -43,7 +43,8 @@ class PasswordInputPanel extends OnboardingPageBase {
     bool isShown = true,
   }) async {
     final passwordConfirmField = $(passwordConfirmInputField);
-    final widget = $.tester.widget<VoicesPasswordTextField>(passwordConfirmField);
+    final widget =
+        $.tester.widget<VoicesPasswordTextField>(passwordConfirmField);
     final decoration = widget.decoration!;
     if (!isShown) {
       expect(decoration.errorText, null);
@@ -90,7 +91,8 @@ class PasswordInputPanel extends OnboardingPageBase {
       find.byWidgetPredicate(
         (widget) =>
             widget is CatalystSvgPicture &&
-            (widget.bytesLoader as dynamic).assetName == 'assets/icons/lock-closed.svg',
+            (widget.bytesLoader as dynamic).assetName ==
+                'assets/icons/lock-closed.svg',
       ),
       findsOneWidget,
     );

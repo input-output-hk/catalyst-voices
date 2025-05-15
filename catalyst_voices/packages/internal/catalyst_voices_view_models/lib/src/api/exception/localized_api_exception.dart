@@ -19,9 +19,12 @@ final class ErrorResponseException extends LocalizedApiException {
   String message(BuildContext context) {
     return switch (statusCode) {
       ApiErrorResponseException.notFound => context.l10n.apiErrorNotFound,
-      ApiErrorResponseException.tooManyRequests => context.l10n.apiErrorTooManyRequests,
-      ApiErrorResponseException.internalServerError => context.l10n.apiErrorInternalServerError,
-      ApiErrorResponseException.serviceUnavailable => context.l10n.apiErrorServiceUnavailable,
+      ApiErrorResponseException.tooManyRequests =>
+        context.l10n.apiErrorTooManyRequests,
+      ApiErrorResponseException.internalServerError =>
+        context.l10n.apiErrorInternalServerError,
+      ApiErrorResponseException.serviceUnavailable =>
+        context.l10n.apiErrorServiceUnavailable,
       _ => context.l10n.apiErrorUnknown,
     };
   }
@@ -32,7 +35,8 @@ sealed class LocalizedApiException extends LocalizedException {
 
   factory LocalizedApiException.from(ApiException source) {
     return switch (source) {
-      ApiErrorResponseException(:final statusCode, :final error) => ErrorResponseException(
+      ApiErrorResponseException(:final statusCode, :final error) =>
+        ErrorResponseException(
           statusCode: statusCode,
           error: error,
         ),

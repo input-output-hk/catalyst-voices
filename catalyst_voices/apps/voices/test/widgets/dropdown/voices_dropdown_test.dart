@@ -40,7 +40,8 @@ void main() {
       // Find the input field showing the selected value
       expect(
         find.byWidgetPredicate(
-          (widget) => widget is EditableText && widget.controller.text == 'Item 1',
+          (widget) =>
+              widget is EditableText && widget.controller.text == 'Item 1',
         ),
         findsOneWidget,
       );
@@ -129,7 +130,8 @@ void main() {
       await tester.pumpAndSettle();
       expect(
         find.byWidgetPredicate(
-          (widget) => widget is EditableText && widget.controller.text == 'Item 1',
+          (widget) =>
+              widget is EditableText && widget.controller.text == 'Item 1',
         ),
         findsOneWidget,
       );
@@ -179,7 +181,8 @@ void main() {
       );
     });
 
-    testWidgets('SingleSelectDropdown should display hint and allow item selection',
+    testWidgets(
+        'SingleSelectDropdown should display hint and allow item selection',
         (WidgetTester tester) async {
       // Sample data
       final items = [
@@ -215,7 +218,8 @@ void main() {
       expect(selectedValue, equals('item1'));
     });
 
-    testWidgets('SingleSelectDropdown should handle validation error', (WidgetTester tester) async {
+    testWidgets('SingleSelectDropdown should handle validation error',
+        (WidgetTester tester) async {
       final items = [
         const DropdownMenuEntry<String>(value: 'item1', label: 'Item 1'),
         const DropdownMenuEntry<String>(value: 'item2', label: 'Item 2'),
@@ -227,7 +231,8 @@ void main() {
               items: items,
               value: null,
               hintText: 'Select an item',
-              validator: (value) => value == 'item2' ? 'Value is invalid' : null,
+              validator: (value) =>
+                  value == 'item2' ? 'Value is invalid' : null,
               onChanged: (_) {},
             ),
           ),

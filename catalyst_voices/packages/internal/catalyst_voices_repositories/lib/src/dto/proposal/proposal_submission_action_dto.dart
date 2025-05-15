@@ -15,7 +15,8 @@ final class ProposalSubmissionActionDocumentDto {
     return _$ProposalSubmissionActionDocumentDtoFromJson(json);
   }
 
-  Map<String, dynamic> toJson() => _$ProposalSubmissionActionDocumentDtoToJson(this);
+  Map<String, dynamic> toJson() =>
+      _$ProposalSubmissionActionDocumentDtoToJson(this);
 }
 
 /// See [ProposalSubmissionAction].

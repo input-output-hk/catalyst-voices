@@ -7,7 +7,9 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 
 final class AccountCubit extends Cubit<AccountState>
-    with BlocErrorEmitterMixin, BlocSignalEmitterMixin<AccountSignal, AccountState> {
+    with
+        BlocErrorEmitterMixin,
+        BlocSignalEmitterMixin<AccountSignal, AccountState> {
   final _logger = Logger('AccountCubit');
   final UserService _userService;
 
@@ -74,7 +76,9 @@ final class AccountCubit extends Cubit<AccountState>
       if (activeAccount != null) {
         await _userService.updateAccount(
           id: activeAccount.catalystId,
-          email: email.value.isNotEmpty ? Optional(email.value) : const Optional.empty(),
+          email: email.value.isNotEmpty
+              ? Optional(email.value)
+              : const Optional.empty(),
         );
       }
 

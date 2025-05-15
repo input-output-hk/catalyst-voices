@@ -29,7 +29,8 @@ class SeedPhraseField extends StatefulWidget {
   State<SeedPhraseField> createState() => _SeedPhraseFieldState();
 }
 
-final class SeedPhraseFieldController extends ValueNotifier<List<SeedPhraseWord>> {
+final class SeedPhraseFieldController
+    extends ValueNotifier<List<SeedPhraseWord>> {
   SeedPhraseFieldController([super._value = const <SeedPhraseWord>[]]);
 
   List<SeedPhraseWord> get words {
@@ -97,7 +98,8 @@ class _DeleteShortcut extends StatelessWidget {
   Widget build(BuildContext context) {
     return Shortcuts(
       shortcuts: <LogicalKeySet, Intent>{
-        LogicalKeySet(LogicalKeyboardKey.backspace): const _DeleteLastWordIntent(),
+        LogicalKeySet(LogicalKeyboardKey.backspace):
+            const _DeleteLastWordIntent(),
       },
       child: Actions(
         actions: <Type, Action<Intent>>{
@@ -226,7 +228,8 @@ class _SeedPhraseFieldState extends State<SeedPhraseField> {
     _effectiveController.value = words;
     widget.onChanged?.call(words);
 
-    WidgetsBinding.instance.addPostFrameCallback((_) => _ensureWordFieldVisible());
+    WidgetsBinding.instance
+        .addPostFrameCallback((_) => _ensureWordFieldVisible());
   }
 
   void _deleteAt(int index) {
@@ -319,13 +322,16 @@ class _WordField extends StatelessWidget {
             return const [];
           }
 
-          return words.where((element) => element.startsWith(textEditingValue.text)).take(10);
+          return words
+              .where((element) => element.startsWith(textEditingValue.text))
+              .take(10);
         },
         onSelected: onSelected,
         autovalidateMode: AutovalidateMode.always,
         textValidator: (value) {
           return switch (value) {
-            final value when value.isEmpty => const VoicesTextFieldValidationResult.none(),
+            final value when value.isEmpty =>
+              const VoicesTextFieldValidationResult.none(),
             final value when !words.any((word) => word.startsWith(value)) =>
               VoicesTextFieldValidationResult.error(
                 context.l10n.invalidSeedPhraseWord,

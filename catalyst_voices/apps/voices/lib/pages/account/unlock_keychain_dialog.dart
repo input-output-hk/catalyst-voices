@@ -77,7 +77,9 @@ class _Navigation extends StatelessWidget {
 }
 
 class _UnlockKeychainDialogState extends State<UnlockKeychainDialog>
-    with ErrorHandlerStateMixin<SessionCubit, UnlockKeychainDialog>, LaunchUrlMixin {
+    with
+        ErrorHandlerStateMixin<SessionCubit, UnlockKeychainDialog>,
+        LaunchUrlMixin {
   final TextEditingController _passwordController = TextEditingController();
   LocalizedException? _error;
 
@@ -107,7 +109,9 @@ class _UnlockKeychainDialogState extends State<UnlockKeychainDialog>
   @override
   void handleError(Object error) {
     setState(() {
-      _error = error is LocalizedException ? error : const LocalizedUnlockPasswordException();
+      _error = error is LocalizedException
+          ? error
+          : const LocalizedUnlockPasswordException();
     });
   }
 

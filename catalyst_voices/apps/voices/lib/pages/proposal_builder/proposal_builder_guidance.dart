@@ -12,7 +12,8 @@ class ProposalBuilderGuidanceSelector extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocSelector<ProposalBuilderBloc, ProposalBuilderState,
         ({bool isLoading, ProposalGuidance guidance})>(
-      selector: (state) => (isLoading: state.isLoading, guidance: state.guidance),
+      selector: (state) =>
+          (isLoading: state.isLoading, guidance: state.guidance),
       builder: (context, state) {
         if (state.isLoading) {
           return const _GuidanceListPlaceholder();
@@ -60,7 +61,8 @@ class _GuidanceCard extends StatelessWidget {
           const SizedBox(height: 12),
           Text(
             item.sectionTitle,
-            style: theme.textTheme.titleSmall?.copyWith(color: theme.colors.textOnPrimaryLevel1),
+            style: theme.textTheme.titleSmall
+                ?.copyWith(color: theme.colors.textOnPrimaryLevel1),
           ),
           const SizedBox(height: 10),
           MarkdownText(item.description),

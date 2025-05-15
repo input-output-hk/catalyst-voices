@@ -5,9 +5,11 @@ import 'package:http/http.dart' as http;
 import 'package:remote_widgets/core.dart' as core;
 import 'package:rfw/rfw.dart';
 
-const _remoteWidgetOneUrl = 'https://github.com/minikin/utils/raw/main/remote_widget.rfw';
+const _remoteWidgetOneUrl =
+    'https://github.com/minikin/utils/raw/main/remote_widget.rfw';
 
-const _remoteWidgetTwoUrl = 'https://github.com/minikin/utils/raw/main/new_remote_widget.rfw';
+const _remoteWidgetTwoUrl =
+    'https://github.com/minikin/utils/raw/main/new_remote_widget.rfw';
 
 class RemoteForm extends StatefulWidget {
   const RemoteForm({super.key});

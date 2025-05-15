@@ -31,7 +31,9 @@ final class DatabaseDraftsDataSource implements DraftDataSource {
 
   @override
   Future<DocumentData?> getLatest({CatalystId? authorId}) {
-    return _database.draftsDao.queryLatest(authorId: authorId).then((value) => value?.toModel());
+    return _database.draftsDao
+        .queryLatest(authorId: authorId)
+        .then((value) => value?.toModel());
   }
 
   @override
@@ -41,7 +43,8 @@ final class DatabaseDraftsDataSource implements DraftDataSource {
 
   @override
   Future<List<DocumentData>> queryVersionsOfId({required String id}) async {
-    final documentEntities = await _database.draftsDao.queryVersionsOfId(id: id);
+    final documentEntities =
+        await _database.draftsDao.queryVersionsOfId(id: id);
     return documentEntities.map((e) => e.toModel()).toList();
   }
 
@@ -74,7 +77,9 @@ final class DatabaseDraftsDataSource implements DraftDataSource {
 
   @override
   Stream<DocumentData?> watch({required DocumentRef ref}) {
-    return _database.draftsDao.watch(ref: ref).map((entity) => entity?.toModel());
+    return _database.draftsDao
+        .watch(ref: ref)
+        .map((entity) => entity?.toModel());
   }
 
   @override

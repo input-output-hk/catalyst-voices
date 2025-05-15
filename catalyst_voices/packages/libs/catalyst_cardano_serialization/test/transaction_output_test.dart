@@ -63,7 +63,8 @@ void main() {
       expect(decoded.toCbor(), equals(cbor));
     });
 
-    test('Babbage era transaction output with datum option data and script ref', () {
+    test('Babbage era transaction output with datum option data and script ref',
+        () {
       final output = TransactionOutput(
         address: testnetAddr,
         amount: value,
@@ -76,7 +77,8 @@ void main() {
       expect(decoded.toCbor(), equals(cbor));
     });
 
-    test('Babbage era transaction output with datum option hash and script ref', () {
+    test('Babbage era transaction output with datum option hash and script ref',
+        () {
       final output = TransactionOutput(
         address: testnetAddr,
         amount: value,
@@ -125,8 +127,10 @@ void main() {
     });
 
     test('Equality and hashCode', () {
-      final output1 = PreBabbageTransactionOutput(address: testnetAddr, amount: value);
-      final output2 = PreBabbageTransactionOutput(address: testnetAddr, amount: value);
+      final output1 =
+          PreBabbageTransactionOutput(address: testnetAddr, amount: value);
+      final output2 =
+          PreBabbageTransactionOutput(address: testnetAddr, amount: value);
 
       expect(output1, equals(output2));
       expect(output1.hashCode, equals(output2.hashCode));

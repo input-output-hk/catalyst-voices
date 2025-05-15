@@ -143,8 +143,9 @@ class _DisplayingValueAsChips extends StatelessWidget {
             horizontal: 12,
             vertical: 4,
           ),
-          backgroundColor:
-              value ? Theme.of(context).colors.success : Theme.of(context).colors.iconsError,
+          backgroundColor: value
+              ? Theme.of(context).colors.success
+              : Theme.of(context).colors.iconsError,
         ),
         if (isDefault)
           VoicesChip.round(
@@ -215,9 +216,12 @@ class _DisplayingValueAsSegmentedButton extends StatelessWidget {
           selectedForegroundColor: value
               ? Theme.of(context).colors.successContainer
               : Theme.of(context).colors.errorContainer,
-          selectedBackgroundColor:
-              value ? Theme.of(context).colors.success : Theme.of(context).colors.iconsError,
-          iconColor: value ? Theme.of(context).colors.successContainer : Colors.transparent,
+          selectedBackgroundColor: value
+              ? Theme.of(context).colors.success
+              : Theme.of(context).colors.iconsError,
+          iconColor: value
+              ? Theme.of(context).colors.successContainer
+              : Colors.transparent,
         ),
         showSelectedIcon: false,
         selected: {value},

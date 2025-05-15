@@ -113,7 +113,9 @@ class _PrivacyPolicyCheckBox extends StatelessWidget {
       value: isChecked,
       label: const PrivacyPolicyRichText(),
       onChanged: (value) {
-        RegistrationCubit.of(context).baseProfile.updatePrivacyPolicy(isAccepted: value);
+        RegistrationCubit.of(context)
+            .baseProfile
+            .updatePrivacyPolicy(isAccepted: value);
       },
     );
   }
@@ -144,7 +146,9 @@ class _DataUsageCheckBox extends StatelessWidget {
       value: isChecked,
       label: Text(context.l10n.createBaseProfileAcknowledgementsDataUsage),
       onChanged: (value) {
-        RegistrationCubit.of(context).baseProfile.updateDataUsage(isAccepted: value);
+        RegistrationCubit.of(context)
+            .baseProfile
+            .updateDataUsage(isAccepted: value);
       },
     );
   }

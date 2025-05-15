@@ -67,7 +67,9 @@ final class DocumentsCommentRepository implements CommentRepository {
       template: SignedDocumentMetadataRef.fromDocumentRef(
         document.metadata.template!,
       ),
-      reply: reply != null ? SignedDocumentMetadataRef.fromDocumentRef(reply) : null,
+      reply: reply != null
+          ? SignedDocumentMetadataRef.fromDocumentRef(reply)
+          : null,
     );
 
     final signedDocument = await _signedDocumentManager.signDocument(

@@ -11,7 +11,8 @@ void main() {
   group(ResultBuilder, () {
     const minLoadingDuration = Duration(milliseconds: 300);
 
-    testWidgets('shows loading state when result is null', (WidgetTester tester) async {
+    testWidgets('shows loading state when result is null',
+        (WidgetTester tester) async {
       // Arrange: Provide a loading builder
       await tester.pumpApp(
         ResultBuilder<String, String>(
@@ -28,7 +29,8 @@ void main() {
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
     });
 
-    testWidgets('shows success state when result is Success', (WidgetTester tester) async {
+    testWidgets('shows success state when result is Success',
+        (WidgetTester tester) async {
       // Arrange: Provide a success result
       await tester.pumpApp(
         ResultBuilder<String, String>(
@@ -46,7 +48,8 @@ void main() {
       expect(find.text('Success: Test Success'), findsOneWidget);
     });
 
-    testWidgets('shows failure state when result is Failure', (WidgetTester tester) async {
+    testWidgets('shows failure state when result is Failure',
+        (WidgetTester tester) async {
       // Arrange: Provide a failure result
       await tester.pumpApp(
         ResultBuilder<String, String>(
@@ -64,7 +67,8 @@ void main() {
       expect(find.text('Failure: Test Failure'), findsOneWidget);
     });
 
-    testWidgets('shows loading state for the minimum duration', (WidgetTester tester) async {
+    testWidgets('shows loading state for the minimum duration',
+        (WidgetTester tester) async {
       // Arrange: Provide a delayed success result
 
       await tester.pumpApp(
@@ -99,7 +103,8 @@ void main() {
       expect(find.text('Success: Test Success'), findsOneWidget);
     });
 
-    testWidgets('does not update result before minLoadingDuration', (WidgetTester tester) async {
+    testWidgets('does not update result before minLoadingDuration',
+        (WidgetTester tester) async {
       // Arrange: Start with loading and transition to success
       final completer = Completer<Result<String, String>>();
 
@@ -141,7 +146,8 @@ void main() {
       expect(find.text('Success: Test Success'), findsOneWidget);
     });
 
-    testWidgets('handles result updates and switches between states', (WidgetTester tester) async {
+    testWidgets('handles result updates and switches between states',
+        (WidgetTester tester) async {
       // Arrange: Start with a null result (loading state)
       const successWidgetKey = Key('success');
       const failureWidgetKey = Key('failure');
@@ -150,8 +156,10 @@ void main() {
         StatefulBuilder(
           builder: (context, setState) {
             return ResultBuilder<String, String>(
-              successBuilder: (context, data) => Text('Success: $data', key: successWidgetKey),
-              failureBuilder: (context, data) => Text('Failure: $data', key: failureWidgetKey),
+              successBuilder: (context, data) =>
+                  Text('Success: $data', key: successWidgetKey),
+              failureBuilder: (context, data) =>
+                  Text('Failure: $data', key: failureWidgetKey),
               loadingBuilder: (context) => const CircularProgressIndicator(),
             );
           },
@@ -168,8 +176,10 @@ void main() {
       await tester.pumpApp(
         ResultBuilder<String, String>(
           result: Success('Test Success'),
-          successBuilder: (context, data) => Text('Success: $data', key: successWidgetKey),
-          failureBuilder: (context, data) => Text('Failure: $data', key: failureWidgetKey),
+          successBuilder: (context, data) =>
+              Text('Success: $data', key: successWidgetKey),
+          failureBuilder: (context, data) =>
+              Text('Failure: $data', key: failureWidgetKey),
           loadingBuilder: (context) => const CircularProgressIndicator(),
         ),
       );
@@ -183,8 +193,10 @@ void main() {
       await tester.pumpApp(
         ResultBuilder<String, String>(
           result: Failure('Test Failure'),
-          successBuilder: (context, data) => Text('Success: $data', key: successWidgetKey),
-          failureBuilder: (context, data) => Text('Failure: $data', key: failureWidgetKey),
+          successBuilder: (context, data) =>
+              Text('Success: $data', key: successWidgetKey),
+          failureBuilder: (context, data) =>
+              Text('Failure: $data', key: failureWidgetKey),
           loadingBuilder: (context) => const CircularProgressIndicator(),
         ),
       );

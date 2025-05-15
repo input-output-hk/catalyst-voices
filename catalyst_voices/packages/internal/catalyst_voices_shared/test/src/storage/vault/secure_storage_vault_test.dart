@@ -218,7 +218,8 @@ void main() {
 
     test('uuid keychain id is valid', () {
       // Given
-      const key = 'SecureStorageVault.274f6ab9-39f7-4120-b705-274fea95598e.metadata';
+      const key =
+          'SecureStorageVault.274f6ab9-39f7-4120-b705-274fea95598e.metadata';
 
       // When
       final isValid = SecureStorageVault.isStorageKey(key);

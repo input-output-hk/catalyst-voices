@@ -11,10 +11,12 @@ final class DocumentStringSchemaMapper {
     required bool isRequired,
   }) {
     final format = DocumentPropertyFormat.fromString(schema.format ?? '');
-    final contentMediaType = DocumentContentMediaType.fromString(schema.contentMediaType ?? '');
+    final contentMediaType =
+        DocumentContentMediaType.fromString(schema.contentMediaType ?? '');
     final title = schema.title ?? '';
     final description = schema.description;
-    final descriptionMarkdown = description != null ? MarkdownData(description) : null;
+    final descriptionMarkdown =
+        description != null ? MarkdownData(description) : null;
     final placeholder = schema.placeholder;
     final guidance = schema.guidance;
     final guidanceMarkdown = guidance != null ? MarkdownData(guidance) : null;
@@ -22,7 +24,8 @@ final class DocumentStringSchemaMapper {
     final defaultValue = schema.defaultValue as String?;
     final constValue = schema.constValue as String?;
     final enumValues = schema.enumValues?.cast<String>();
-    final strLengthRange = NumRange.optionalRangeOf(min: schema.minLength, max: schema.maxLength);
+    final strLengthRange =
+        NumRange.optionalRangeOf(min: schema.minLength, max: schema.maxLength);
     final pattern = schema.pattern;
     final patternRegExp = pattern != null ? RegExp(pattern) : null;
     final definition = _DocumentStringDefinition.fromDef(schema.definition());

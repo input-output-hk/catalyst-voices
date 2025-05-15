@@ -1,4 +1,5 @@
-import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart' hide PopupMenuItem;
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart'
+    hide PopupMenuItem;
 import 'package:flutter/material.dart';
 
 class CategoryDropdown extends StatelessWidget {
@@ -64,7 +65,8 @@ class CategoryDropdown extends StatelessWidget {
   }
 }
 
-class CustomPopupMenuItemState<T> extends PopupMenuItemState<T, _PopupMenuItemHighlightColor<T>> {
+class CustomPopupMenuItemState<T>
+    extends PopupMenuItemState<T, _PopupMenuItemHighlightColor<T>> {
   @override
   Widget build(BuildContext context) {
     return Container(

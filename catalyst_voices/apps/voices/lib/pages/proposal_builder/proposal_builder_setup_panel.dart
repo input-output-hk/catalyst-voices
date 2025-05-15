@@ -10,7 +10,8 @@ class ProposalBuilderSetupPanel extends StatefulWidget {
   const ProposalBuilderSetupPanel({super.key});
 
   @override
-  State<ProposalBuilderSetupPanel> createState() => _ProposalBuilderSetupPanelState();
+  State<ProposalBuilderSetupPanel> createState() =>
+      _ProposalBuilderSetupPanelState();
 }
 
 class _ProposalBuilderSetupPanelState extends State<ProposalBuilderSetupPanel> {

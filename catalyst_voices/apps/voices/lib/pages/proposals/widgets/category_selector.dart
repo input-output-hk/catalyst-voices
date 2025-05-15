@@ -12,7 +12,8 @@ class CategorySelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<ProposalsCubit, ProposalsState, List<ProposalsCategorySelectorItem>>(
+    return BlocSelector<ProposalsCubit, ProposalsState,
+        List<ProposalsCategorySelectorItem>>(
       selector: (state) => state.categorySelectorItems,
       builder: (context, state) {
         return _CategorySelector(

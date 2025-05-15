@@ -170,7 +170,8 @@ class VoicesTextField extends VoicesFormField<String> {
                     labelText,
                     style: enabled
                         ? textTheme.titleSmall
-                        : textTheme.titleSmall!.copyWith(color: theme.colors.textDisabled),
+                        : textTheme.titleSmall!
+                            .copyWith(color: theme.colors.textDisabled),
                   ),
                   const SizedBox(height: 4),
                 ],
@@ -326,7 +327,8 @@ class VoicesTextFieldDecoration {
 class VoicesTextFieldState extends VoicesFormFieldState<String> {
   TextEditingController? _customController;
 
-  VoicesTextFieldValidationResult _validation = const VoicesTextFieldValidationResult.none();
+  VoicesTextFieldValidationResult _validation =
+      const VoicesTextFieldValidationResult.none();
 
   @override
   VoicesTextField get widget => super.widget as VoicesTextField;
@@ -344,7 +346,8 @@ class VoicesTextFieldState extends VoicesFormFieldState<String> {
 
     // expands property is not supported if any of these are specified,
     // both must be null
-    final hasNoLineConstraints = widget.maxLines == null && widget.minLines == null;
+    final hasNoLineConstraints =
+        widget.maxLines == null && widget.minLines == null;
 
     return resizable && hasNoLineConstraints;
   }
@@ -539,7 +542,8 @@ class VoicesTextFieldState extends VoicesFormFieldState<String> {
           ? DefaultTextStyle(
               style: widget.enabled
                   ? textTheme.bodySmall!
-                  : textTheme.bodySmall!.copyWith(color: colors.textOnPrimaryLevel1),
+                  : textTheme.bodySmall!
+                      .copyWith(color: colors.textOnPrimaryLevel1),
               child: widget.decoration!.helper!,
             )
           : null,
@@ -567,7 +571,8 @@ class VoicesTextFieldState extends VoicesFormFieldState<String> {
       prefixStyle: WidgetStateTextStyle.resolveWith((states) {
         var textStyle = textTheme.bodyLarge ?? const TextStyle();
 
-        if (!states.contains(WidgetState.focused) && _obtainController().text.isEmpty) {
+        if (!states.contains(WidgetState.focused) &&
+            _obtainController().text.isEmpty) {
           textStyle = textStyle.copyWith(color: colors.textDisabled);
         }
 
@@ -611,7 +616,8 @@ class VoicesTextFieldState extends VoicesFormFieldState<String> {
 
     return widget.enabled
         ? textTheme.bodySmall!.copyWith(color: theme.colorScheme.error)
-        : textTheme.bodySmall!.copyWith(color: theme.colors.textOnPrimaryLevel1);
+        : textTheme.bodySmall!
+            .copyWith(color: theme.colors.textOnPrimaryLevel1);
   }
 
   TextStyle? _getHintStyle(
@@ -630,7 +636,9 @@ class VoicesTextFieldState extends VoicesFormFieldState<String> {
       case VoicesTextFieldStatus.warning:
         return Theme.of(context).colors.warning;
       case VoicesTextFieldStatus.error:
-        return widget.enabled ? Theme.of(context).colorScheme.error : Colors.transparent;
+        return widget.enabled
+            ? Theme.of(context).colorScheme.error
+            : Colors.transparent;
     }
   }
 
@@ -664,7 +672,8 @@ class VoicesTextFieldState extends VoicesFormFieldState<String> {
 
     var customController = _customController;
     if (customController == null) {
-      final textValue = TextEditingValueExt.collapsedAtEndOf(widget.initialText ?? '');
+      final textValue =
+          TextEditingValueExt.collapsedAtEndOf(widget.initialText ?? '');
 
       customController = TextEditingController.fromValue(textValue);
       _customController = customController;
@@ -777,7 +786,8 @@ class VoicesTextFieldValidationResult with EquatableMixin {
     required this.status,
     this.errorMessage,
   }) : assert(
-          (status == VoicesTextFieldStatus.warning || status == VoicesTextFieldStatus.error) ||
+          (status == VoicesTextFieldStatus.warning ||
+                  status == VoicesTextFieldStatus.error) ||
               errorMessage == null,
           'errorMessage can be only used for warning or error status',
         );

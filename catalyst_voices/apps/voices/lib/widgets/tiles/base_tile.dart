@@ -23,7 +23,8 @@ class _BaseTileState extends State<BaseTile> {
   WidgetStatesController? _statesController;
 
   WidgetStatesController get _effectiveStatesController {
-    return widget.statesController ?? (_statesController ??= WidgetStatesController());
+    return widget.statesController ??
+        (_statesController ??= WidgetStatesController());
   }
 
   @override

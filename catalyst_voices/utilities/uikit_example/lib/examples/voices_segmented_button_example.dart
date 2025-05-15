@@ -14,7 +14,8 @@ class VoicesSegmentedButtonExample extends StatefulWidget {
   }
 }
 
-class _VoicesSegmentedButtonExampleState extends State<VoicesSegmentedButtonExample> {
+class _VoicesSegmentedButtonExampleState
+    extends State<VoicesSegmentedButtonExample> {
   Set<_Size> _labelsSelection = const {_Size.m};
   Set<_Size> _emptySelection = const {};
   Set<_Size> _iconsMultiSelection = const {_Size.m};

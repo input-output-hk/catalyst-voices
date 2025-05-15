@@ -40,7 +40,8 @@ class SectionHeader extends StatelessWidget {
         overflow: TextOverflow.ellipsis,
         child: Container(
           constraints: const BoxConstraints.tightFor(height: 56),
-          padding: const EdgeInsets.symmetric(horizontal: 6).add(const EdgeInsets.only(left: 6)),
+          padding: const EdgeInsets.symmetric(horizontal: 6)
+              .add(const EdgeInsets.only(left: 6)),
           child: Row(
             children: [
               if (leading != null) leading!,

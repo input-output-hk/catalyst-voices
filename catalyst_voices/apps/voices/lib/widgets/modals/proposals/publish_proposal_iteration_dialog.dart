@@ -212,7 +212,8 @@ class _VersionUpdateSection extends StatelessWidget {
           const SizedBox(height: 2),
           Text(
             proposalTitle,
-            style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
+            style: theme.textTheme.titleSmall
+                ?.copyWith(fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 16),
           _VersionUpdate(

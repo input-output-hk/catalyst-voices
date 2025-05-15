@@ -2,14 +2,18 @@ import 'package:catalyst_voices/widgets/document_builder/document_list_property_
 import 'package:catalyst_voices/widgets/document_builder/document_object_property_builder.dart';
 import 'package:catalyst_voices/widgets/document_builder/document_value_property_builder.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart'
-    hide DocumentListPropertyBuilder, DocumentObjectPropertyBuilder, DocumentValuePropertyBuilder;
+    hide
+        DocumentListPropertyBuilder,
+        DocumentObjectPropertyBuilder,
+        DocumentValuePropertyBuilder;
 import 'package:flutter/material.dart';
 
 /// A map defining overrides for the [DocumentPropertyBuilder].
 ///
 /// Instead of building a predefined widget it is
 /// possible to override it for given [DocumentNodeId].
-typedef DocumentPropertyBuilderOverrides = Map<DocumentNodeId, DocumentPropertyWidgetBuilder>;
+typedef DocumentPropertyBuilderOverrides
+    = Map<DocumentNodeId, DocumentPropertyWidgetBuilder>;
 
 /// A callback that builds a widget for given document [property].
 typedef DocumentPropertyWidgetBuilder = Widget Function(

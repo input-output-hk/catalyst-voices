@@ -224,7 +224,8 @@ final class DocumentPropertySchemaDto {
     required bool isRequired,
   }) {
     final definitionSchema = definitions.getDefinition(definition());
-    final schema = definitionSchema != null ? mergeWith(definitionSchema) : this;
+    final schema =
+        definitionSchema != null ? mergeWith(definitionSchema) : this;
     final types = schema.types ?? [];
     final isRequiredAndNonNullable =
         isRequired && !types.contains(DocumentPropertyTypeDto.nullable);

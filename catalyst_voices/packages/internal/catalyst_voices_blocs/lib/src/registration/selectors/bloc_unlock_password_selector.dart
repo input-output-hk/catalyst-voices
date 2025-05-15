@@ -1,9 +1,11 @@
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 
-class BlocUnlockPasswordSelector<T> extends BlocSelector<RegistrationCubit, RegistrationState, T> {
+class BlocUnlockPasswordSelector<T>
+    extends BlocSelector<RegistrationCubit, RegistrationState, T> {
   BlocUnlockPasswordSelector({
     super.key,
-    required BlocWidgetSelector<RegistrationState, UnlockPasswordState> stateSelector,
+    required BlocWidgetSelector<RegistrationState, UnlockPasswordState>
+        stateSelector,
     required BlocWidgetSelector<UnlockPasswordState, T> selector,
     required super.builder,
     super.bloc,

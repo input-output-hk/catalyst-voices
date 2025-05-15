@@ -79,7 +79,8 @@ final class DatabaseDocumentsDataSource
 
   @override
   Future<List<DocumentData>> queryVersionsOfId({required String id}) async {
-    final documentEntities = await _database.documentsDao.queryVersionsOfId(id: id);
+    final documentEntities =
+        await _database.documentsDao.queryVersionsOfId(id: id);
     return documentEntities.map((e) => e.toModel()).toList();
   }
 
@@ -111,7 +112,9 @@ final class DatabaseDocumentsDataSource
 
   @override
   Stream<DocumentData?> watch({required DocumentRef ref}) {
-    return _database.documentsDao.watch(ref: ref).map((entity) => entity?.toModel());
+    return _database.documentsDao
+        .watch(ref: ref)
+        .map((entity) => entity?.toModel());
   }
 
   @override

@@ -21,10 +21,12 @@ class ShelleyAddress extends Equatable implements CborEncodable {
   /// The hrp suffix of an address on testnet network.
   static const String testnetHrpSuffix = '_test';
 
-  static const Bech32Encoder _mainNetEncoder = Bech32Encoder(hrp: defaultAddrHrp);
+  static const Bech32Encoder _mainNetEncoder =
+      Bech32Encoder(hrp: defaultAddrHrp);
   static const Bech32Encoder _testNetEncoder =
       Bech32Encoder(hrp: defaultAddrHrp + testnetHrpSuffix);
-  static const Bech32Encoder _mainNetRewardEncoder = Bech32Encoder(hrp: defaultRewardHrp);
+  static const Bech32Encoder _mainNetRewardEncoder =
+      Bech32Encoder(hrp: defaultRewardHrp);
   static const Bech32Encoder _testNetRewardEncoder =
       Bech32Encoder(hrp: defaultRewardHrp + testnetHrpSuffix);
 
@@ -163,7 +165,9 @@ class ShelleyAddress extends Equatable implements CborEncodable {
   }
 
   static NetworkId _extractNetworkId(List<int> bytes) {
-    return NetworkId.testnet.id == (bytes[0] & 0x0f) ? NetworkId.testnet : NetworkId.mainnet;
+    return NetworkId.testnet.id == (bytes[0] & 0x0f)
+        ? NetworkId.testnet
+        : NetworkId.mainnet;
   }
 
   /// Extracts the payload from [bytes].

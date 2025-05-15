@@ -175,8 +175,8 @@ final class Balance extends Equatable implements CborEncodable {
     if (multiAsset == null && other.multiAsset == null) {
       newMultiAsset = null;
     } else {
-      newMultiAsset =
-          (multiAsset ?? const MultiAsset.empty()) + (other.multiAsset ?? const MultiAsset.empty());
+      newMultiAsset = (multiAsset ?? const MultiAsset.empty()) +
+          (other.multiAsset ?? const MultiAsset.empty());
     }
 
     final newCoin = coin + other.coin;
@@ -284,7 +284,8 @@ final class MultiAsset extends Equatable implements CborEncodable {
       {
         for (final policy in bundle.entries)
           policy.key.toCbor(): CborMap({
-            for (final asset in policy.value.entries) asset.key.toCbor(): asset.value.toCbor(),
+            for (final asset in policy.value.entries)
+              asset.key.toCbor(): asset.value.toCbor(),
           }),
       },
       tags: tags,

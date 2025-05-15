@@ -1,6 +1,7 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
-import 'package:catalyst_voices_services/catalyst_voices_services.dart' show AuthTokenCache;
+import 'package:catalyst_voices_services/catalyst_voices_services.dart'
+    show AuthTokenCache;
 import 'package:catalyst_voices_services/src/auth/auth_token_generator.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:synchronized/synchronized.dart';

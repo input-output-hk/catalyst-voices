@@ -21,7 +21,8 @@ void main() {
   ];
 
   group(CategoryDropdown, () {
-    testWidgets('$CategoryDropdown renders correctly', (WidgetTester tester) async {
+    testWidgets('$CategoryDropdown renders correctly',
+        (WidgetTester tester) async {
       final popupMenuButtonKey = GlobalKey<PopupMenuButtonState<dynamic>>();
       SignedDocumentRef? selectedValue;
 
@@ -56,7 +57,8 @@ void main() {
       expect(selectedValue, equals(const SignedDocumentRef(id: 'value1')));
     });
 
-    testWidgets('$CategoryDropdown handles callbacks', (WidgetTester tester) async {
+    testWidgets('$CategoryDropdown handles callbacks',
+        (WidgetTester tester) async {
       final popupMenuButtonKey = GlobalKey<PopupMenuButtonState<dynamic>>();
       var wasOpened = false;
       var wasCanceled = false;
@@ -89,7 +91,8 @@ void main() {
       expect(wasCanceled, isTrue);
     });
 
-    testWidgets('$CategoryDropdown applies highlight color', (WidgetTester tester) async {
+    testWidgets('$CategoryDropdown applies highlight color',
+        (WidgetTester tester) async {
       final popupMenuButtonKey = GlobalKey<PopupMenuButtonState<dynamic>>();
 
       await tester.pumpApp(

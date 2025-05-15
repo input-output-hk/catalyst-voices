@@ -15,7 +15,8 @@ class ProposalCommentTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final showReplies = context.select<ProposalCubit, Map<DocumentRef, bool>>((value) {
+    final showReplies =
+        context.select<ProposalCubit, Map<DocumentRef, bool>>((value) {
       return value.state.comments.showReplies;
     });
 

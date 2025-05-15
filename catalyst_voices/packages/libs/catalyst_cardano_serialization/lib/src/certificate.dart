@@ -14,7 +14,8 @@ abstract base class BaseCertificate implements CborEncodable {
   const BaseCertificate.fromBytes({required this.bytes});
 
   /// Deserializes the type from cbor.
-  BaseCertificate.fromCbor(CborValue value) : this.fromBytes(bytes: (value as CborBytes).bytes);
+  BaseCertificate.fromCbor(CborValue value)
+      : this.fromBytes(bytes: (value as CborBytes).bytes);
 
   /// Serializes the type as cbor.
   @override
@@ -22,7 +23,8 @@ abstract base class BaseCertificate implements CborEncodable {
 
   /// Constructs the [BaseCertificate] from a hex string representation
   /// of [bytes].
-  BaseCertificate.fromHex(String string) : this.fromBytes(bytes: hex.decode(string));
+  BaseCertificate.fromHex(String string)
+      : this.fromBytes(bytes: hex.decode(string));
 
   /// Returns the hex string representation of [bytes].
   String toHex() => hex.encode(bytes);

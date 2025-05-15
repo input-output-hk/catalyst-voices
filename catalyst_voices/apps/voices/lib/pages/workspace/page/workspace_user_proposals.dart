@@ -10,7 +10,8 @@ class WorkspaceUserProposalsSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<WorkspaceBloc, WorkspaceState, UserProposalsSelectorState>(
+    return BlocSelector<WorkspaceBloc, WorkspaceState,
+        UserProposalsSelectorState>(
       selector: (state) => (
         proposals: state.userProposals,
         show: state.showProposals,

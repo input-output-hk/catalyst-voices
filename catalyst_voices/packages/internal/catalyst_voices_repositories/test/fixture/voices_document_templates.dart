@@ -4,15 +4,18 @@ import 'dart:io';
 import 'package:collection/collection.dart';
 
 class VoicesDocumentsTemplates {
-  static final Future<Map<String, dynamic>> proposalF14Schema = _getJsonAssetFromDocs(
+  static final Future<Map<String, dynamic>> proposalF14Schema =
+      _getJsonAssetFromDocs(
     '/src/architecture/08_concepts/document_templates/proposal/F14-Generic/0ce8ab38-9258-4fbc-a62e-7faa6e58318f.schema.json',
   );
 
-  static final Future<Map<String, dynamic>> proposalF14Document = _getJsonAssetFromDocs(
+  static final Future<Map<String, dynamic>> proposalF14Document =
+      _getJsonAssetFromDocs(
     '/src/architecture/08_concepts/document_templates/proposal/F14-Generic/example.proposal.json',
   );
 
-  static final Future<Map<String, dynamic>> commentF14Schema = _getJsonAssetFromDocs(
+  static final Future<Map<String, dynamic>> commentF14Schema =
+      _getJsonAssetFromDocs(
     '/src/architecture/08_concepts/document_templates/F14-Comments/0b8424d4-ebfd-46e3-9577-1775a69d290c.schema.json',
   );
 

@@ -49,7 +49,8 @@ class SeedphraseSuccessPanel extends OnboardingPageBase {
       find.byWidgetPredicate(
         (widget) =>
             widget is CatalystSvgPicture &&
-            (widget.bytesLoader as dynamic).assetName == 'assets/icons/check.svg',
+            (widget.bytesLoader as dynamic).assetName ==
+                'assets/icons/check.svg',
       ),
       findsOneWidget,
     );

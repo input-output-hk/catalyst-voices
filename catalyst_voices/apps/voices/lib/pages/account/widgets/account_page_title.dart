@@ -28,7 +28,8 @@ class AccountPageTitle extends StatelessWidget {
             Text(
               key: const Key('ProfileAndKeychainText'),
               context.l10n.profileAndKeychain,
-              style: context.textTheme.displaySmall?.copyWith(color: context.colorScheme.primary),
+              style: context.textTheme.displaySmall
+                  ?.copyWith(color: context.colorScheme.primary),
             ),
             VoicesLearnMoreTextButton.url(url: VoicesConstants.myAccountUrl),
           ],

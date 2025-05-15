@@ -1,7 +1,8 @@
 import 'package:catalyst_voices/widgets/campaign_timeline/campaign_timeline.dart';
 import 'package:catalyst_voices/widgets/campaign_timeline/campaign_timeline_card.dart';
 import 'package:catalyst_voices_brands/src/themes/catalyst.dart';
-import 'package:catalyst_voices_models/catalyst_voices_models.dart' hide CampaignTimeline;
+import 'package:catalyst_voices_models/catalyst_voices_models.dart'
+    hide CampaignTimeline;
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
@@ -132,14 +133,16 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        final initialHeight = tester.getSize(find.byType(CampaignTimelineCard).first).height;
+        final initialHeight =
+            tester.getSize(find.byType(CampaignTimelineCard).first).height;
         expect(initialHeight, cardHeight);
         expect(find.text('Test Description 1'), findsNothing);
 
         await tester.tap(find.byType(CampaignTimelineCard).first);
         await tester.pumpAndSettle();
 
-        await tester.binding.setSurfaceSize(const Size(1200, expandedCardHeight));
+        await tester.binding
+            .setSurfaceSize(const Size(1200, expandedCardHeight));
         await tester.pumpAndSettle();
 
         expect(find.text('Test Description 1'), findsOneWidget);

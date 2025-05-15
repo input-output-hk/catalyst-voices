@@ -198,6 +198,7 @@ extension _RegistrationRecoverMethodExt on RegistrationRecoverMethod {
       };
 
   String _getTitle(VoicesLocalizations l10n) => switch (this) {
-        RegistrationRecoverMethod.seedPhrase => l10n.recoverWithSeedPhrase12Words,
+        RegistrationRecoverMethod.seedPhrase =>
+          l10n.recoverWithSeedPhrase12Words,
       };
 }

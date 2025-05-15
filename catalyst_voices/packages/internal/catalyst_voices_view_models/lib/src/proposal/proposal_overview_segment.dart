@@ -27,7 +27,8 @@ sealed class ProposalOverviewSection extends BaseSection {
   });
 }
 
-final class ProposalOverviewSegment extends BaseSegment<ProposalOverviewSection> {
+final class ProposalOverviewSegment
+    extends BaseSegment<ProposalOverviewSection> {
   final String categoryName;
   final String proposalTitle;
 

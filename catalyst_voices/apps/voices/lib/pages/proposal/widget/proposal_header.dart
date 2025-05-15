@@ -24,7 +24,8 @@ class ProposalHeader extends StatelessWidget {
         final element = notification.context as Element?;
 
         // Only react to content scroll not menu.
-        return element?.findAncestorWidgetOfExactType<ProposalContent>() != null;
+        return element?.findAncestorWidgetOfExactType<ProposalContent>() !=
+            null;
       },
       child: const _ProposalHeader(),
     );
@@ -113,10 +114,10 @@ class _ProposalMetadata extends StatelessWidget {
     final textTheme = context.textTheme;
     final colors = context.colors;
 
-    final titleTextStyle =
-        (textTheme.titleMedium ?? const TextStyle()).copyWith(color: colors.textOnPrimaryLevel0);
-    final subtitleTextStyle =
-        (textTheme.bodyMedium ?? const TextStyle()).copyWith(color: colors.textOnPrimaryLevel1);
+    final titleTextStyle = (textTheme.titleMedium ?? const TextStyle())
+        .copyWith(color: colors.textOnPrimaryLevel0);
+    final subtitleTextStyle = (textTheme.bodyMedium ?? const TextStyle())
+        .copyWith(color: colors.textOnPrimaryLevel1);
 
     return Column(
       mainAxisSize: MainAxisSize.min,

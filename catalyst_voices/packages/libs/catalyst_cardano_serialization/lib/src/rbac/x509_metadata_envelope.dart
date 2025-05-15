@@ -146,10 +146,12 @@ final class X509MetadataEnvelope<T> extends Equatable {
     return X509MetadataEnvelope(
       purpose: UuidV4.fromCbor(purpose),
       txInputsHash: TransactionInputsHash.fromCbor(txInputsHash),
-      previousTransactionId:
-          previousTransactionId != null ? TransactionHash.fromCbor(previousTransactionId) : null,
+      previousTransactionId: previousTransactionId != null
+          ? TransactionHash.fromCbor(previousTransactionId)
+          : null,
       chunkedData: chunkedData != null ? deserializer(chunkedData) : null,
-      validationSignature: Bip32Ed25519XSignatureFactory.instance.fromCbor(validationSignature),
+      validationSignature:
+          Bip32Ed25519XSignatureFactory.instance.fromCbor(validationSignature),
     );
   }
 
@@ -160,14 +162,16 @@ final class X509MetadataEnvelope<T> extends Equatable {
     required ChunkedDataSerializer<T> serializer,
   }) async {
     final chunkedData = this.chunkedData;
-    final metadata =
-        chunkedData != null ? await _serializeChunkedData(serializer(chunkedData)) : null;
+    final metadata = chunkedData != null
+        ? await _serializeChunkedData(serializer(chunkedData))
+        : null;
 
     return CborMap({
       const CborSmallInt(509): CborMap({
         const CborSmallInt(0): purpose.toCbor(),
         const CborSmallInt(1): txInputsHash.toCbor(),
-        if (previousTransactionId != null) const CborSmallInt(2): previousTransactionId!.toCbor(),
+        if (previousTransactionId != null)
+          const CborSmallInt(2): previousTransactionId!.toCbor(),
         if (metadata != null) metadata.key: metadata.value,
         const CborSmallInt(99): validationSignature.toCbor(),
       }),
@@ -228,14 +232,16 @@ final class X509MetadataEnvelope<T> extends Equatable {
     final brotliCbor = map[const CborSmallInt(11)] as CborList?;
     if (brotliCbor != null) {
       final bytes = _unchunkCborBytes(brotliCbor);
-      final uncompressedBytes = await CatalystCompression.instance.brotli.decompress(bytes);
+      final uncompressedBytes =
+          await CatalystCompression.instance.brotli.decompress(bytes);
       return cbor.decode(uncompressedBytes);
     }
 
     final zstdCbor = map[const CborSmallInt(12)] as CborList?;
     if (zstdCbor != null) {
       final bytes = _unchunkCborBytes(zstdCbor);
-      final uncompressedBytes = await CatalystCompression.instance.zstd.decompress(bytes);
+      final uncompressedBytes =
+          await CatalystCompression.instance.zstd.decompress(bytes);
       return cbor.decode(uncompressedBytes);
     }
 
@@ -289,7 +295,9 @@ final class X509MetadataEnvelope<T> extends Equatable {
       chunks.add(
         bytes.sublist(
           i,
-          i + metadataChunkSize > bytes.length ? bytes.length : i + metadataChunkSize,
+          i + metadataChunkSize > bytes.length
+              ? bytes.length
+              : i + metadataChunkSize,
         ),
       );
     }

@@ -86,23 +86,25 @@ class TimezoneDateTimeText extends StatelessWidget {
     };
     final string = formatter(context, effectiveData);
 
-    final timestampTextStyle =
-        timezoneTheme?.timestampTextStyle ?? WidgetStatePropertyAll(textTheme.bodyMedium);
-    final timezoneTextStyle =
-        timezoneTheme?.timezoneTextStyle ?? WidgetStatePropertyAll(textTheme.labelSmall);
+    final timestampTextStyle = timezoneTheme?.timestampTextStyle ??
+        WidgetStatePropertyAll(textTheme.bodyMedium);
+    final timezoneTextStyle = timezoneTheme?.timezoneTextStyle ??
+        WidgetStatePropertyAll(textTheme.labelSmall);
 
-    final backgroundColor =
-        timezoneTheme?.backgroundColor ?? WidgetStatePropertyAll(theme.colors.primary98);
-    final foregroundColor =
-        timezoneTheme?.foregroundColor ?? WidgetStatePropertyAll(theme.colors.textOnPrimaryLevel1);
+    final backgroundColor = timezoneTheme?.backgroundColor ??
+        WidgetStatePropertyAll(theme.colors.primary98);
+    final foregroundColor = timezoneTheme?.foregroundColor ??
+        WidgetStatePropertyAll(theme.colors.textOnPrimaryLevel1);
 
     final effectiveBackgroundColor = backgroundColor.resolve(states);
     final effectiveForegroundColor = foregroundColor.resolve(states);
 
-    final timestampStyle = (timestampTextStyle.resolve(states) ?? const TextStyle())
-        .copyWith(color: effectiveForegroundColor);
-    final timezoneStyle = (timezoneTextStyle.resolve(states) ?? const TextStyle())
-        .copyWith(color: effectiveForegroundColor);
+    final timestampStyle =
+        (timestampTextStyle.resolve(states) ?? const TextStyle())
+            .copyWith(color: effectiveForegroundColor);
+    final timezoneStyle =
+        (timezoneTextStyle.resolve(states) ?? const TextStyle())
+            .copyWith(color: effectiveForegroundColor);
 
     return AffixDecorator(
       gap: showTimezone ? 6 : 0,

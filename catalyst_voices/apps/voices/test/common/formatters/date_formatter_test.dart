@@ -72,7 +72,9 @@ void main() {
       expect(result, expectedFormat);
     });
 
-    test('Dates are in the same week for Local when Sunday is first day of week', () {
+    test(
+        'Dates are in the same week for Local when Sunday is first day of week',
+        () {
       // Set Sunday as first day of week
       mockLocalizations.firstDayOfWeekIndex = 0;
       final dateRangeWhenSundayFirst = DateRange(
@@ -99,7 +101,9 @@ void main() {
       expect(resultMonday, 'Jan 20 - Jan 26');
     });
 
-    test('Dates are in the same week for Local when Monday is first day of week', () {
+    test(
+        'Dates are in the same week for Local when Monday is first day of week',
+        () {
       // Set Monday as first day of week
       mockLocalizations.firstDayOfWeekIndex = 1;
       final dateRangeWhenSundayFirst = DateRange(

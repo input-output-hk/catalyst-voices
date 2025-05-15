@@ -41,7 +41,8 @@ final class VoicesPasswordTextField extends StatelessWidget {
       autofocus: autofocus,
       obscureText: true,
       textInputAction: textInputAction,
-      onChanged: onChanged != null ? (text) => onChanged?.call(text ?? '') : null,
+      onChanged:
+          onChanged != null ? (text) => onChanged?.call(text ?? '') : null,
       onFieldSubmitted: onSubmitted,
       decoration: decoration,
       inputFormatters: [

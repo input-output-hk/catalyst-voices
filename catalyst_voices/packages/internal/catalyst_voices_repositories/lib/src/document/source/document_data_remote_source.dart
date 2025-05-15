@@ -113,7 +113,8 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
   }
 }
 
-abstract interface class DocumentDataRemoteSource implements DocumentDataSource {
+abstract interface class DocumentDataRemoteSource
+    implements DocumentDataSource {
   Future<String?> getLatestVersion(String id);
 
   @override

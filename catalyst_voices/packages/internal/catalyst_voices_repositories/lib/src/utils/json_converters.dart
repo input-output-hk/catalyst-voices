@@ -21,7 +21,8 @@ final class CoinConverter implements JsonConverter<Coin, int> {
   int toJson(Coin object) => object.value;
 }
 
-final class ShelleyAddressConverter implements JsonConverter<ShelleyAddress, String> {
+final class ShelleyAddressConverter
+    implements JsonConverter<ShelleyAddress, String> {
   const ShelleyAddressConverter();
 
   @override

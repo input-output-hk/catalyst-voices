@@ -15,8 +15,10 @@ void main() {
     final budgetNodeId = objectNodeId.child('budget');
     final listNodeId = DocumentNodeId.root.child('list');
 
-    final titleSchema = DocumentGenericStringSchema.optional(nodeId: titleNodeId);
-    final budgetSchema = DocumentGenericIntegerSchema.optional(nodeId: budgetNodeId);
+    final titleSchema =
+        DocumentGenericStringSchema.optional(nodeId: titleNodeId);
+    final budgetSchema =
+        DocumentGenericIntegerSchema.optional(nodeId: budgetNodeId);
 
     final objectSchema = DocumentGenericObjectSchema.optional(
       nodeId: objectNodeId,
@@ -99,7 +101,8 @@ void main() {
       final builder = DocumentBuilder.fromDocument(document);
 
       final builtDocument = builder.build();
-      final sortedProperties = List.of(document.properties)..sortByOrder(document.schema.order);
+      final sortedProperties = List.of(document.properties)
+        ..sortByOrder(document.schema.order);
 
       expect(builtDocument.schema, document.schema);
       expect(builtDocument.properties, sortedProperties);
@@ -115,7 +118,8 @@ void main() {
 
       builder.addChange(change);
       final document = builder.build();
-      final property = document.getProperty(titleNodeId)! as DocumentValueProperty;
+      final property =
+          document.getProperty(titleNodeId)! as DocumentValueProperty;
 
       expect(property.value, equals('new-value'));
     });
@@ -136,7 +140,8 @@ void main() {
 
       builder.addChanges(changes);
       final document = builder.build();
-      final property = document.getProperty(titleNodeId)! as DocumentValueProperty;
+      final property =
+          document.getProperty(titleNodeId)! as DocumentValueProperty;
 
       expect(property.value, equals('value2'));
     });
@@ -144,14 +149,16 @@ void main() {
     test('should add and remove list items', () {
       final builder = DocumentBuilder.fromSchema(schema: schema);
 
-      final addItemChange = DocumentAddListItemChange(nodeId: listSchema.nodeId);
+      final addItemChange =
+          DocumentAddListItemChange(nodeId: listSchema.nodeId);
 
       // add the first item
       builder.addChange(addItemChange);
 
       // assert first item was added
       final document1 = builder.build();
-      final listProperty1 = document1.getProperty(listSchema.nodeId)! as DocumentListProperty;
+      final listProperty1 =
+          document1.getProperty(listSchema.nodeId)! as DocumentListProperty;
       expect(listProperty1.properties, hasLength(1));
 
       // add the second item
@@ -159,7 +166,8 @@ void main() {
 
       // assert second item was added
       final document2 = builder.build();
-      final listProperty2 = document2.getProperty(listSchema.nodeId)! as DocumentListProperty;
+      final listProperty2 =
+          document2.getProperty(listSchema.nodeId)! as DocumentListProperty;
       expect(listProperty2.properties, hasLength(2));
 
       final removeItemChange = DocumentRemoveListItemChange(
@@ -171,7 +179,8 @@ void main() {
 
       // assert there is only one item remaining
       final document3 = builder.build();
-      final listProperty3 = document3.getProperty(listSchema.nodeId)! as DocumentListProperty;
+      final listProperty3 =
+          document3.getProperty(listSchema.nodeId)! as DocumentListProperty;
       expect(listProperty3.properties, hasLength(1));
     });
   });

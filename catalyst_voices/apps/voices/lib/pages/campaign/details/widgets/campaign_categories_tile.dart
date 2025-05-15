@@ -42,8 +42,8 @@ class _CampaignCategoriesTileState extends State<CampaignCategoriesTile> {
 
   @override
   Widget build(BuildContext context) {
-    final selectedSection =
-        widget.sections.singleWhereOrNull((element) => element.id == _selectedSectionId);
+    final selectedSection = widget.sections
+        .singleWhereOrNull((element) => element.id == _selectedSectionId);
 
     return VoicesExpansionTile(
       initiallyExpanded: true,
@@ -63,8 +63,9 @@ class _CampaignCategoriesTileState extends State<CampaignCategoriesTile> {
             ),
             const SizedBox(width: 32),
             Expanded(
-              child:
-                  selectedSection != null ? _Details(section: selectedSection) : const SizedBox(),
+              child: selectedSection != null
+                  ? _Details(section: selectedSection)
+                  : const SizedBox(),
             ),
           ],
         ),

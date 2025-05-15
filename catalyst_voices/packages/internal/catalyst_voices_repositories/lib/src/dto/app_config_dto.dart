@@ -104,7 +104,8 @@ final class ExpiryDurationDto {
     this.keychainUnlock = const Duration(hours: 1),
   });
 
-  ExpiryDurationDto.fromModel(ExpiryDuration data) : this(keychainUnlock: data.keychainUnlock);
+  ExpiryDurationDto.fromModel(ExpiryDuration data)
+      : this(keychainUnlock: data.keychainUnlock);
 
   factory ExpiryDurationDto.fromJson(Map<String, dynamic> json) {
     return _$ExpiryDurationDtoFromJson(json);

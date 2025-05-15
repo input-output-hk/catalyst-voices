@@ -77,7 +77,9 @@ final class VaultKeychainProvider implements KeychainProvider {
         .then((value) => value.keys)
         .then((keys) => keys.where(VaultKeychain.isKeychainKey))
         .then(
-          (keys) => keys.where((key) => VaultKeychain.getStorageId(key) == id).toList(),
+          (keys) => keys
+              .where((key) => VaultKeychain.getStorageId(key) == id)
+              .toList(),
         );
 
     for (final key in keys) {

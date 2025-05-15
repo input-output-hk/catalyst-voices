@@ -41,7 +41,9 @@ class VoicesMenu extends StatelessWidget {
   _MenuButton _mapItemToButton(MenuItem item) {
     return _MenuButton(
       menuItem: item,
-      menuChildren: (item is SubMenuItem) ? item.children.map(_mapItemToButton).toList() : null,
+      menuChildren: (item is SubMenuItem)
+          ? item.children.map(_mapItemToButton).toList()
+          : null,
       onSelected: (item is SubMenuItem) ? null : onTap,
     );
   }
@@ -65,7 +67,8 @@ class _MenuButton extends StatelessWidget {
     final icon = menuItem.icon;
 
     final textStyle = textTheme.bodyMedium?.copyWith(
-      color: menuItem.enabled ? textTheme.bodySmall?.color : theme.disabledColor,
+      color:
+          menuItem.enabled ? textTheme.bodySmall?.color : theme.disabledColor,
     );
 
     final children = menuChildren;
@@ -82,7 +85,9 @@ class _MenuButton extends StatelessWidget {
                     child: IconTheme(
                       data: IconThemeData(
                         size: 24,
-                        color: menuItem.enabled ? textTheme.bodySmall?.color : theme.disabledColor,
+                        color: menuItem.enabled
+                            ? textTheme.bodySmall?.color
+                            : theme.disabledColor,
                       ),
                       child: icon,
                     ),

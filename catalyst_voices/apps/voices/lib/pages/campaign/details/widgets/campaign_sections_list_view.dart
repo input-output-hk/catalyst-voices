@@ -9,7 +9,8 @@ class CampaignSectionsListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<CampaignDetailsBloc, CampaignDetailsState, List<CampaignListItem>>(
+    return BlocSelector<CampaignDetailsBloc, CampaignDetailsState,
+        List<CampaignListItem>>(
       selector: (state) => state.listItems,
       builder: (context, state) {
         return ListView.builder(

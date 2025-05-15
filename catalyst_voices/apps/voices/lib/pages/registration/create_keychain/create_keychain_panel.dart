@@ -23,10 +23,13 @@ class CreateKeychainPanel extends StatelessWidget {
       CreateKeychainStage.splash => const SplashPanel(),
       CreateKeychainStage.instructions => const InstructionsPanel(),
       CreateKeychainStage.seedPhrase => const SeedPhrasePanel(),
-      CreateKeychainStage.checkSeedPhraseInstructions => const SeedPhraseCheckInstructionsPanel(),
+      CreateKeychainStage.checkSeedPhraseInstructions =>
+        const SeedPhraseCheckInstructionsPanel(),
       CreateKeychainStage.checkSeedPhrase => const SeedPhraseCheckPanel(),
-      CreateKeychainStage.checkSeedPhraseResult => const SeedPhraseCheckResultPanel(),
-      CreateKeychainStage.unlockPasswordInstructions => const UnlockPasswordInstructionsPanel(),
+      CreateKeychainStage.checkSeedPhraseResult =>
+        const SeedPhraseCheckResultPanel(),
+      CreateKeychainStage.unlockPasswordInstructions =>
+        const UnlockPasswordInstructionsPanel(),
       CreateKeychainStage.unlockPasswordCreate => const UnlockPasswordPanel(),
     };
   }

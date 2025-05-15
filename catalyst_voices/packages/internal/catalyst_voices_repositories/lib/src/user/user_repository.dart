@@ -67,10 +67,12 @@ final class UserRepositoryImpl implements UserRepository {
   }) async {
     final lookup = catalystId.toSignificant().toUri().toStringWithoutScheme();
 
-    final rbacChain =
-        await _apiServices.gateway.apiV1RbacRegistrationGet(lookup: lookup).successBodyOrThrow();
+    final rbacChain = await _apiServices.gateway
+        .apiV1RbacRegistrationGet(lookup: lookup)
+        .successBodyOrThrow();
 
-    final transactionId = rbacChain.lastVolatileTxn ?? rbacChain.lastPersistentTxn;
+    final transactionId =
+        rbacChain.lastVolatileTxn ?? rbacChain.lastPersistentTxn;
 
     if (transactionId == null) {
       throw ArgumentError.notNull('transactionId');
@@ -154,7 +156,8 @@ final class UserRepositoryImpl implements UserRepository {
         .then((value) => value?.metadata.authors ?? <CatalystId>[])
         .then(
       (authors) {
-        return authors.firstWhereOrNull((id) => id.toSignificant() == significantId);
+        return authors
+            .firstWhereOrNull((id) => id.toSignificant() == significantId);
       },
     ).then((value) => value?.username);
   }

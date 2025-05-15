@@ -58,7 +58,8 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
     );
 
     final categories = await _campaignService.getCampaignCategories();
-    final categoriesModel = categories.map(CampaignCategoryDetailsViewModel.fromModel).toList();
+    final categoriesModel =
+        categories.map(CampaignCategoryDetailsViewModel.fromModel).toList();
 
     // TODO(damian-molinski): create VoicesBloc / VoicesCubit where this
     // always will be checked.
@@ -130,7 +131,10 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
   StreamSubscription<List<String>> _buildFavoritesProposalsIdsSub() {
     _logger.info('Building favorites proposals ids subscription');
 
-    return _proposalService.watchFavoritesProposalsIds().distinct(listEquals).listen(
+    return _proposalService
+        .watchFavoritesProposalsIds()
+        .distinct(listEquals)
+        .listen(
           _emitFavoritesIds,
           onError: _emitMostRecentError,
         );

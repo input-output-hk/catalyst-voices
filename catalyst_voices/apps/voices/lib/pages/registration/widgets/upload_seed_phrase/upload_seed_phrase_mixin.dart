@@ -1,7 +1,8 @@
 import 'package:catalyst_voices/pages/registration/incorrect_seed_phrase_dialog.dart';
 import 'package:catalyst_voices/pages/registration/widgets/upload_seed_phrase/upload_seed_phrase_confirmation_dialog.dart';
 import 'package:catalyst_voices/pages/registration/widgets/upload_seed_phrase/upload_seed_phrase_dialog.dart';
-import 'package:catalyst_voices_models/catalyst_voices_models.dart' show SeedPhrase, SeedPhraseWord;
+import 'package:catalyst_voices_models/catalyst_voices_models.dart'
+    show SeedPhrase, SeedPhraseWord;
 import 'package:flutter/widgets.dart';
 
 mixin UploadSeedPhraseMixin<T extends StatefulWidget> on State<T> {

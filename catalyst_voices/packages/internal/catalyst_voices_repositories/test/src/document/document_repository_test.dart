@@ -137,7 +137,8 @@ void main() {
 
           final ref = documentData.ref;
 
-          when(() => remoteDocuments.get(ref: ref)).thenAnswer((_) => Future.value(documentData));
+          when(() => remoteDocuments.get(ref: ref))
+              .thenAnswer((_) => Future.value(documentData));
 
           // When
           await repository.getDocumentData(ref: ref);
@@ -163,7 +164,8 @@ void main() {
           final ref = SignedDocumentRef(id: id);
           final exactRef = ref.copyWith(version: Optional(version));
 
-          when(() => remoteDocuments.getLatestVersion(id)).thenAnswer((_) => Future.value(version));
+          when(() => remoteDocuments.getLatestVersion(id))
+              .thenAnswer((_) => Future.value(version));
 
           when(() => remoteDocuments.get(ref: exactRef))
               .thenAnswer((_) => Future.value(documentData));
@@ -212,7 +214,9 @@ void main() {
               isNull,
               // should have all data ready.
               predicate<DocumentsDataWithRefData?>(
-                (data) => data?.data.ref == proposal.ref && data?.refData.ref == template.ref,
+                (data) =>
+                    data?.data.ref == proposal.ref &&
+                    data?.refData.ref == template.ref,
                 'data or dataRef ref do not match',
               ),
             ]),
@@ -254,7 +258,8 @@ void main() {
               )
               .firstWhere((element) => element != null);
 
-          final proposals = await Future.wait([proposal1Future, proposal2Future]);
+          final proposals =
+              await Future.wait([proposal1Future, proposal2Future]);
 
           // Then
           expect(proposals[0]!.data.ref, proposal1.ref);
@@ -297,19 +302,22 @@ void main() {
           const categoryType = DocumentType.categoryParametersDocument;
           final refs = List.generate(
             10,
-            (_) => SignedDocumentRef.generateFirstRef().toTyped(DocumentType.proposalDocument),
+            (_) => SignedDocumentRef.generateFirstRef()
+                .toTyped(DocumentType.proposalDocument),
           );
           final remoteRefs = [...refs, ...refs];
           final expectedRefs = <TypedDocumentRef>[
             ...constantDocumentsRefs.expand(
               (e) {
-                return e.allTyped.where((element) => element.type != categoryType);
+                return e.allTyped
+                    .where((element) => element.type != categoryType);
               },
             ),
             ...refs,
           ];
 
-          when(() => remoteDocuments.index()).thenAnswer((_) => Future.value(remoteRefs));
+          when(() => remoteDocuments.index())
+              .thenAnswer((_) => Future.value(remoteRefs));
 
           // When
           final allRefs = await repository.getAllDocumentsRefs();
@@ -337,7 +345,8 @@ void main() {
           );
 
           // When
-          when(() => remoteDocuments.index()).thenAnswer((_) => Future.value(refs));
+          when(() => remoteDocuments.index())
+              .thenAnswer((_) => Future.value(refs));
 
           await repository.getAllDocumentsRefs();
 
@@ -366,14 +375,16 @@ void main() {
           final refs = [...exactRefs, ...looseRefs];
 
           // When
-          when(() => remoteDocuments.index()).thenAnswer((_) => Future.value(refs));
+          when(() => remoteDocuments.index())
+              .thenAnswer((_) => Future.value(refs));
           when(() => remoteDocuments.getLatestVersion(any()))
               .thenAnswer((_) => Future(() => const Uuid().v7()));
 
           final allRefs = await repository.getAllDocumentsRefs();
 
           // Then
-          verify(() => remoteDocuments.getLatestVersion(any())).called(looseRefs.length);
+          verify(() => remoteDocuments.getLatestVersion(any()))
+              .called(looseRefs.length);
 
           expect(allRefs.every((element) => element.ref.isExact), isTrue);
         },
@@ -394,7 +405,8 @@ void main() {
 
           final docsRefs = List.generate(
             10,
-            (_) => SignedDocumentRef.generateFirstRef().toTyped(DocumentType.proposalDocument),
+            (_) => SignedDocumentRef.generateFirstRef()
+                .toTyped(DocumentType.proposalDocument),
           );
           final looseTemplatesRefs =
               constTemplatesRefs.map((e) => e.copyWith(ref: e.ref.toLoose()));
@@ -404,7 +416,8 @@ void main() {
           ];
 
           // When
-          when(() => remoteDocuments.index()).thenAnswer((_) => Future.value(refs));
+          when(() => remoteDocuments.index())
+              .thenAnswer((_) => Future.value(refs));
 
           final allRefs = await repository.getAllDocumentsRefs();
 
@@ -424,7 +437,8 @@ void main() {
           final categoriesRefs = constantDocumentsRefs
               .expand(
                 (element) => [
-                  element.category.toTyped(DocumentType.categoryParametersDocument),
+                  element.category
+                      .toTyped(DocumentType.categoryParametersDocument),
                 ],
               )
               .toList();
@@ -432,16 +446,19 @@ void main() {
 
           final docsRefs = List.generate(
             10,
-            (_) => SignedDocumentRef.generateFirstRef().toTyped(DocumentType.proposalDocument),
+            (_) => SignedDocumentRef.generateFirstRef()
+                .toTyped(DocumentType.proposalDocument),
           );
-          final looseCategoriesRefs = categoriesRefs.map((e) => e.copyWith(ref: e.ref.toLoose()));
+          final looseCategoriesRefs =
+              categoriesRefs.map((e) => e.copyWith(ref: e.ref.toLoose()));
           final refs = [
             ...docsRefs,
             ...looseCategoriesRefs,
           ];
 
           // When
-          when(() => remoteDocuments.index()).thenAnswer((_) => Future.value(refs));
+          when(() => remoteDocuments.index())
+              .thenAnswer((_) => Future.value(refs));
 
           final allRefs = await repository.getAllDocumentsRefs();
 
@@ -473,7 +490,8 @@ void main() {
           ];
 
           // When
-          when(() => remoteDocuments.index()).thenAnswer((_) => Future.value(docsRefs));
+          when(() => remoteDocuments.index())
+              .thenAnswer((_) => Future.value(docsRefs));
 
           final allRefs = await repository.getAllDocumentsRefs();
 
@@ -546,7 +564,8 @@ void main() {
           selfRef: templateRef,
           type: DocumentType.proposalTemplate,
         );
-        const publicDraftContent = DocumentDataContent({'title': 'My proposal'});
+        const publicDraftContent =
+            DocumentDataContent({'title': 'My proposal'});
         final publicDraftRef = DraftRef.generateFirstRef();
         final publicDraftData = DocumentDataFactory.build(
           selfRef: publicDraftRef,
@@ -579,4 +598,5 @@ void main() {
   });
 }
 
-class _MockDocumentDataRemoteSource extends Mock implements DocumentDataRemoteSource {}
+class _MockDocumentDataRemoteSource extends Mock
+    implements DocumentDataRemoteSource {}

@@ -13,7 +13,8 @@ class ProposalBuilderErrorSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<ProposalBuilderBloc, ProposalBuilderState, LocalizedException?>(
+    return BlocSelector<ProposalBuilderBloc, ProposalBuilderState,
+        LocalizedException?>(
       selector: (state) => state.showError ? state.error : null,
       builder: (context, state) {
         final errorMessage = state?.message(context);

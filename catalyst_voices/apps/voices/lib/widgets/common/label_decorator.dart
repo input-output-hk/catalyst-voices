@@ -53,7 +53,8 @@ class LabelDecorator extends StatelessWidget {
       ].expandIndexed(
         (index, element) {
           return [
-            if (index != 0) SizedBox(width: spacings.elementAtOrNull(index - 1)),
+            if (index != 0)
+              SizedBox(width: spacings.elementAtOrNull(index - 1)),
             element,
           ];
         },

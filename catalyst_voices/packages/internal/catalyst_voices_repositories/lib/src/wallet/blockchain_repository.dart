@@ -8,7 +8,8 @@ import 'package:catalyst_voices_repositories/src/dto/blockchain/network_id_dto.d
 // TODO(dtscalac): move wallet related repository code here
 // ignore: one_member_abstracts
 abstract interface class BlockchainRepository {
-  const factory BlockchainRepository(ApiServices apiServices) = BlockchainRepositoryImpl;
+  const factory BlockchainRepository(ApiServices apiServices) =
+      BlockchainRepositoryImpl;
 
   Future<Coin> getWalletBalance({
     required ShelleyAddress stakeAddress,

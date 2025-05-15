@@ -15,7 +15,8 @@ class CampaignTimelineViewModel extends Equatable {
     required this.stage,
   });
 
-  factory CampaignTimelineViewModel.fromModel(CampaignTimeline model) => CampaignTimelineViewModel(
+  factory CampaignTimelineViewModel.fromModel(CampaignTimeline model) =>
+      CampaignTimelineViewModel(
         title: model.title,
         description: model.description,
         timeline: DateRange(

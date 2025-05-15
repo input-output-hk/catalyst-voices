@@ -14,7 +14,8 @@ import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart' hide PopupMenuItem;
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart'
+    hide PopupMenuItem;
 import 'package:flutter/material.dart';
 
 class ProposalMenuActionButton extends StatefulWidget {
@@ -34,7 +35,8 @@ class ProposalMenuActionButton extends StatefulWidget {
   });
 
   @override
-  State<ProposalMenuActionButton> createState() => _ProposalMenuActionButtonState();
+  State<ProposalMenuActionButton> createState() =>
+      _ProposalMenuActionButtonState();
 }
 
 class _MenuItem extends StatelessWidget {
@@ -63,7 +65,8 @@ class _ProposalMenuActionButtonState extends State<ProposalMenuActionButton> {
 
   bool get _isSubmitted => widget.proposalPublish.isPublished;
 
-  List<ProposalMenuItemAction> get _items => ProposalMenuItemAction.workspaceAvailableOptions(
+  List<ProposalMenuItemAction> get _items =>
+      ProposalMenuItemAction.workspaceAvailableOptions(
         widget.proposalPublish,
       );
 
@@ -93,7 +96,8 @@ class _ProposalMenuActionButtonState extends State<ProposalMenuActionButton> {
       child: VoicesIconButton(
         onTap: _showMenu,
         style: IconButton.styleFrom(
-          foregroundColor: _isSubmitted ? context.colors.textOnPrimaryWhite : null,
+          foregroundColor:
+              _isSubmitted ? context.colors.textOnPrimaryWhite : null,
         ),
         child: VoicesAssets.icons.dotsVertical.buildIcon(),
       ),
@@ -115,7 +119,9 @@ class _ProposalMenuActionButtonState extends State<ProposalMenuActionButton> {
       );
 
       if (confirmed && mounted) {
-        context.read<WorkspaceBloc>().add(DeleteDraftProposalEvent(ref: widget.ref as DraftRef));
+        context
+            .read<WorkspaceBloc>()
+            .add(DeleteDraftProposalEvent(ref: widget.ref as DraftRef));
       }
     }
   }
