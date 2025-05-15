@@ -35,8 +35,7 @@ class SmallProposalCard extends StatelessWidget {
             color: context.colors.outlineBorder,
           ),
           borderRadius: BorderRadius.circular(8),
-          color:
-              proposal.publish.isPublished ? context.colors.iconsPrimary : null,
+          color: proposal.publish.isPublished ? context.colors.iconsPrimary : null,
         ),
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -55,14 +54,11 @@ class SmallProposalCard extends StatelessWidget {
             Text(
               proposal.title,
               style: context.textTheme.titleSmall?.copyWith(
-                color: proposal.publish.isPublished
-                    ? context.colors.textOnPrimaryWhite
-                    : null,
+                color: proposal.publish.isPublished ? context.colors.textOnPrimaryWhite : null,
               ),
             ),
             Offstage(
-              offstage: !proposal.versions
-                      .hasLatestLocalDraft(proposal.selfRef.version) ||
+              offstage: !proposal.versions.hasLatestLocalDraft(proposal.selfRef.version) ||
                   !showLatestLocal,
               child: _NewIterationDetails(
                 title: proposal.title,
@@ -95,8 +91,7 @@ class _Details extends StatelessWidget {
       children: [
         switch (proposal.publish) {
           ProposalPublish.publishedDraft => const DraftProposalChip(),
-          ProposalPublish.submittedProposal =>
-            const FinalProposalChip(onColorBackground: false),
+          ProposalPublish.submittedProposal => const FinalProposalChip(onColorBackground: false),
           ProposalPublish.localDraft => const PrivateProposalChip(),
         },
         ProposalVersionChip(
@@ -191,8 +186,8 @@ class _WarningNewIteration extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AffixDecorator(
-      prefix: VoicesAssets.icons.exclamation
-          .buildIcon(size: 12, color: context.colors.iconsWarning),
+      prefix:
+          VoicesAssets.icons.exclamation.buildIcon(size: 12, color: context.colors.iconsWarning),
       child: Text(
         'Consider publishing this newer iteration!',
         style: context.textTheme.labelMedium?.copyWith(

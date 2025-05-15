@@ -10,8 +10,7 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   group(RbacRegistrationChain, () {
     setUpAll(() {
-      Bip32Ed25519XPublicKeyFactory.instance =
-          _FakeBip32Ed25519XPublicKeyFactory();
+      Bip32Ed25519XPublicKeyFactory.instance = _FakeBip32Ed25519XPublicKeyFactory();
     });
 
     RbacRegistrationChain getRegistrationChain(String jsonString) {
@@ -232,16 +231,14 @@ const _voterJson = '''
 ''';
 /* cSpell:enable */
 
-class _FakeBip32Ed25519XPublicKey extends Fake
-    implements Bip32Ed25519XPublicKey {
+class _FakeBip32Ed25519XPublicKey extends Fake implements Bip32Ed25519XPublicKey {
   @override
   final List<int> bytes;
 
   _FakeBip32Ed25519XPublicKey(this.bytes);
 }
 
-class _FakeBip32Ed25519XPublicKeyFactory extends Fake
-    implements Bip32Ed25519XPublicKeyFactory {
+class _FakeBip32Ed25519XPublicKeyFactory extends Fake implements Bip32Ed25519XPublicKeyFactory {
   @override
   Bip32Ed25519XPublicKey fromBytes(List<int> bytes) {
     return _FakeBip32Ed25519XPublicKey(bytes);

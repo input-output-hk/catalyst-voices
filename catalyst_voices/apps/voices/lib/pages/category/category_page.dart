@@ -127,9 +127,7 @@ class _CategoryDetailErrorSelector extends StatelessWidget {
                     ? null
                     : () {
                         unawaited(
-                          context
-                              .read<CategoryDetailCubit>()
-                              .getCategoryDetail(categoryId),
+                          context.read<CategoryDetailCubit>().getCategoryDetail(categoryId),
                         );
                       },
               ),
@@ -191,9 +189,7 @@ class _CategoryPageState extends State<CategoryPage> {
 
     if (widget.categoryId != oldWidget.categoryId) {
       unawaited(
-        context
-            .read<CategoryDetailCubit>()
-            .getCategoryDetail(widget.categoryId),
+        context.read<CategoryDetailCubit>().getCategoryDetail(widget.categoryId),
       );
     }
   }

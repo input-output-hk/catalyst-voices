@@ -16,9 +16,7 @@ final class ViewingOlderVersionSnackBar extends VoicesSnackBar {
           if (context.mounted) {
             VoicesSnackBar.hideCurrent(context);
 
-            context
-                .read<ProposalCubit>()
-                .emitSignal(const ChangeVersionSignal());
+            context.read<ProposalCubit>().emitSignal(const ChangeVersionSignal());
           }
         },
         child: Text(context.l10n.viewLatestDocumentVersion),

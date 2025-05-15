@@ -107,15 +107,13 @@ class _AccountSummaryDetails extends StatelessWidget {
           _SummaryDetails(
             label: Text(context.l10n.nickname),
             value: Text(
-              username?.nullIfEmpty() ??
-                  context.l10n.notAvailableAbbr.toLowerCase(),
+              username?.nullIfEmpty() ?? context.l10n.notAvailableAbbr.toLowerCase(),
             ),
           ),
           _SummaryDetails(
             label: Text(context.l10n.email),
             value: Text(
-              email?.nullIfEmpty() ??
-                  context.l10n.notAvailableAbbr.toLowerCase(),
+              email?.nullIfEmpty() ?? context.l10n.notAvailableAbbr.toLowerCase(),
             ),
           ),
           _SummaryDetails(
@@ -212,9 +210,7 @@ class _Navigation extends StatelessWidget {
       children: [
         VoicesFilledButton(
           key: const Key('SetUnlockPasswordButton'),
-          onTap: isNextEnabled
-              ? () => RegistrationCubit.of(context).nextStep()
-              : null,
+          onTap: isNextEnabled ? () => RegistrationCubit.of(context).nextStep() : null,
           child: Text(context.l10n.recoveryAccountDetailsAction),
         ),
         const SizedBox(height: 10),

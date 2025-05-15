@@ -40,8 +40,7 @@ class DateRange extends Equatable {
   }
 
   bool isAfterRange(DateTime value) {
-    final max =
-        to?.millisecondsSinceEpoch ?? DateTime(2099).millisecondsSinceEpoch;
+    final max = to?.millisecondsSinceEpoch ?? DateTime(2099).millisecondsSinceEpoch;
     final valueMillis = value.millisecondsSinceEpoch;
 
     return max < valueMillis;
@@ -56,8 +55,7 @@ class DateRange extends Equatable {
 
   bool isInRange(DateTime value) {
     final min = from?.millisecondsSinceEpoch ?? 0;
-    final max =
-        to?.millisecondsSinceEpoch ?? DateTime(2099).millisecondsSinceEpoch;
+    final max = to?.millisecondsSinceEpoch ?? DateTime(2099).millisecondsSinceEpoch;
     final valueMillis = value.millisecondsSinceEpoch;
 
     return min <= valueMillis && valueMillis <= max;

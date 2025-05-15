@@ -10,10 +10,8 @@ class UnlockPasswordSuccessPanel extends OnboardingPageBase {
 
   final recoverySuccessTitle = const Key('RecoverySuccessTitle');
   final recoverySuccessSubtitle = const Key('RecoverySuccessSubtitle');
-  final recoverySuccessGoToDashboardButton =
-      const Key('RecoverySuccessGoToDashboardButton');
-  final recoverySuccessGoAccountButton =
-      const Key('RecoverySuccessGoAccountButton');
+  final recoverySuccessGoToDashboardButton = const Key('RecoverySuccessGoToDashboardButton');
+  final recoverySuccessGoAccountButton = const Key('RecoverySuccessGoAccountButton');
 
   @override
   Future<void> goto() async {

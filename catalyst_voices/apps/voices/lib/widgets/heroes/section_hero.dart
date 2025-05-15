@@ -46,8 +46,7 @@ class _Background extends StatelessWidget {
   }
 }
 
-class _HeroSectionState extends State<HeroSection>
-    with AutomaticKeepAliveClientMixin {
+class _HeroSectionState extends State<HeroSection> with AutomaticKeepAliveClientMixin {
   VideoPlayerController? _controller;
 
   @override
@@ -84,8 +83,7 @@ class _HeroSectionState extends State<HeroSection>
   void didUpdateWidget(HeroSection oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    if (oldWidget.asset != widget.asset ||
-        oldWidget.assetPackageName != widget.assetPackageName) {
+    if (oldWidget.asset != widget.asset || oldWidget.assetPackageName != widget.assetPackageName) {
       unawaited(_disposeAndReinitializeVideoPlayer());
     }
   }

@@ -22,8 +22,7 @@ class ProposalStatusContainer extends StatelessWidget {
       color: config.iconColor,
     );
 
-    final textStyle =
-        (theme.textTheme.labelLarge ?? const TextStyle()).copyWith(
+    final textStyle = (theme.textTheme.labelLarge ?? const TextStyle()).copyWith(
       color: config.textColor,
     );
 

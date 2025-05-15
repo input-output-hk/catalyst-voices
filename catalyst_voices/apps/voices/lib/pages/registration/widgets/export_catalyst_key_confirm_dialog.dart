@@ -22,8 +22,8 @@ class ExportCatalystKeyConfirmDialog extends StatefulWidget {
   }
 }
 
-class _ExportCatalystKeyConfirmDialogState
-    extends State<ExportCatalystKeyConfirmDialog> with LaunchUrlMixin {
+class _ExportCatalystKeyConfirmDialogState extends State<ExportCatalystKeyConfirmDialog>
+    with LaunchUrlMixin {
   late final TapGestureRecognizer _recognizer;
 
   @override

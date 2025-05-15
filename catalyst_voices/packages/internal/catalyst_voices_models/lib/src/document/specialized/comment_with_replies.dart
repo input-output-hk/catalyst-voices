@@ -17,9 +17,8 @@ final class CommentWithReplies extends Equatable {
     required List<CommentDocument> comments,
     int depth = 1,
   }) {
-    final replies = comments
-        .where((element) => element.metadata.reply == comment.metadata.selfRef)
-        .map((e) {
+    final replies =
+        comments.where((element) => element.metadata.reply == comment.metadata.selfRef).map((e) {
       return CommentWithReplies.build(
         e,
         comments: comments,
@@ -55,9 +54,7 @@ final class CommentWithReplies extends Equatable {
       return _addReply(reply);
     }
 
-    final replies = List.of(this.replies)
-        .map((comment) => comment.addReply(reply))
-        .toList();
+    final replies = List.of(this.replies).map((comment) => comment.addReply(reply)).toList();
 
     return copyWith(replies: replies);
   }
@@ -83,9 +80,7 @@ final class CommentWithReplies extends Equatable {
   CommentWithReplies removeReply({
     required SignedDocumentRef ref,
   }) {
-    final replies = List.of(this.replies)
-        .map((e) => e.removeReply(ref: ref))
-        .toList()
+    final replies = List.of(this.replies).map((e) => e.removeReply(ref: ref)).toList()
       ..removeWhere((element) => element.ref == ref);
 
     return copyWith(replies: replies);
@@ -131,9 +126,6 @@ extension CommentWithRepliesListExt on List<CommentWithReplies> {
   List<CommentWithReplies> removeComment({
     required SignedDocumentRef ref,
   }) {
-    return List.of(this)
-        .where((e) => e.ref != ref)
-        .map((e) => e.removeReply(ref: ref))
-        .toList();
+    return List.of(this).where((e) => e.ref != ref).map((e) => e.removeReply(ref: ref)).toList();
   }
 }

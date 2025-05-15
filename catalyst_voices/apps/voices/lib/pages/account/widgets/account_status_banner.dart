@@ -11,8 +11,7 @@ class AccountStatusBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<AccountCubit, AccountState,
-        MyAccountStatusNotification>(
+    return BlocSelector<AccountCubit, AccountState, MyAccountStatusNotification>(
       selector: (state) => state.status,
       builder: (context, state) => _AccountStatusBanner(status: state),
     );

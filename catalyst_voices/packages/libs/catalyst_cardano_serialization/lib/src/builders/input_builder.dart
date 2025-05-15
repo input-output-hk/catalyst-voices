@@ -65,8 +65,8 @@ final class InputBuilder implements CoinSelector {
       final assetUtxos = entry.value;
 
       // Determine if change should be calculated for the current asset group.
-      final shouldCalculateChange = assetId == CoinSelector.adaAssetId ||
-          assetGroups[groupCount - 2].key == assetId;
+      final shouldCalculateChange =
+          assetId == CoinSelector.adaAssetId || assetGroups[groupCount - 2].key == assetId;
 
       while (assetUtxos.isNotEmpty) {
         // Check if there are no more available inputs or if the maximum number
@@ -89,8 +89,7 @@ final class InputBuilder implements CoinSelector {
         selectedTotal += utxo.output.amount;
 
         // Check if the requirements have met.
-        if (_getAssetAmount(assetId, selectedTotal) <
-            _getAssetAmount(assetId, targetTotal)) {
+        if (_getAssetAmount(assetId, selectedTotal) < _getAssetAmount(assetId, targetTotal)) {
           if (assetUtxos.isEmpty) {
             throw InsufficientUtxoBalanceException(
               actualAmount: selectedTotal,
@@ -139,8 +138,7 @@ final class InputBuilder implements CoinSelector {
 
     for (final input in inputs) {
       final inputBalance = input.output.amount;
-      final inputPolicies =
-          inputBalance.multiAsset?.bundle.keys ?? <PolicyId>[];
+      final inputPolicies = inputBalance.multiAsset?.bundle.keys ?? <PolicyId>[];
 
       for (final policy in [CoinSelector.adaPolicy, ...inputPolicies]) {
         if (requiredAssets.containsKey(policy)) {
@@ -151,9 +149,7 @@ final class InputBuilder implements CoinSelector {
             if (requiredAssets[policy]!.containsKey(asset.key)) {
               assetMap.putIfAbsent(assetId, () => []).add(input);
             } else {
-              assetMap
-                  .putIfAbsent(CoinSelector.adaAssetId, () => [])
-                  .add(input);
+              assetMap.putIfAbsent(CoinSelector.adaAssetId, () => []).add(input);
             }
           }
         } else {
@@ -162,8 +158,7 @@ final class InputBuilder implements CoinSelector {
       }
     }
 
-    return assetMap.entries.toList()
-      ..sort((a, b) => b.key.$1.hash.compareTo(a.key.$1.hash));
+    return assetMap.entries.toList()..sort((a, b) => b.key.$1.hash.compareTo(a.key.$1.hash));
   }
 
   /// Retrieves the change outputs and the total transaction fee, if applicable.
@@ -199,8 +194,7 @@ final class InputBuilder implements CoinSelector {
     Balance selectedTotal,
     Balance targetTotal,
   ) {
-    final minFee =
-        builder.copyWith(inputs: selectedInputs).minFee(useWitnesses: true);
+    final minFee = builder.copyWith(inputs: selectedInputs).minFee(useWitnesses: true);
     final minimumRequired = targetTotal + Balance(coin: minFee);
 
     if (selectedTotal.lessThan(minimumRequired)) return null;
@@ -257,9 +251,8 @@ final class InputBuilder implements CoinSelector {
     }
 
     // Remove empty multiasset from the balance
-    final normalizedBalance = remainingBalance.hasMultiAssets()
-        ? remainingBalance
-        : Balance(coin: remainingBalance.coin);
+    final normalizedBalance =
+        remainingBalance.hasMultiAssets() ? remainingBalance : Balance(coin: remainingBalance.coin);
 
     final output = PreBabbageTransactionOutput(
       address: builder.changeAddress!,

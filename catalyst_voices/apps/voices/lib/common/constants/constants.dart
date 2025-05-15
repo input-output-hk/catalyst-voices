@@ -8,8 +8,7 @@ abstract class VoicesConstants {
       'https://docs.projectcatalyst.io/current-fund/fund-basics/project-catalyst-terms-and-conditions';
   static const privacyPolicyUrl =
       'https://docs.projectcatalyst.io/current-fund/fund-basics/project-catalyst-terms-and-conditions/catalyst-fc-privacy-policy';
-  static const supportUrl =
-      'https://catalystiog.zendesk.com/hc/en-us/requests/new';
+  static const supportUrl = 'https://catalystiog.zendesk.com/hc/en-us/requests/new';
   static const docsUrl = 'https://docs.projectcatalyst.io/';
   static const beforeSubmissionUrl =
       'https://docs.projectcatalyst.io/catalyst-tools/catalyst-app/app-timeline#before-submission';
@@ -46,8 +45,7 @@ abstract class VoicesConstants {
       'https://docs.projectcatalyst.io/catalyst-tools/catalyst-app/my-account';
   static const insertNewImageDocsUrl =
       'https://docs.projectcatalyst.io/catalyst-tools/catalyst-app/create-and-submit-proposals-in-workspace/using-images';
-  static const joinNewsletterUrl =
-      'https://mpc.projectcatalyst.io/newsletter-signup';
+  static const joinNewsletterUrl = 'https://mpc.projectcatalyst.io/newsletter-signup';
   static const unlockAccountUrl =
       'https://docs.projectcatalyst.io/catalyst-tools/catalyst-app/my-account#lock-unlock-account';
 

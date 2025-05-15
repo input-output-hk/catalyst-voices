@@ -18,8 +18,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 final _logger = Logger('ProposalBuilderBloc');
 
-final class ProposalBuilderBloc
-    extends Bloc<ProposalBuilderEvent, ProposalBuilderState>
+final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuilderState>
     with
         BlocErrorEmitterMixin,
         BlocSignalEmitterMixin<ProposalBuilderSignal, ProposalBuilderState> {
@@ -73,12 +72,10 @@ final class ProposalBuilderBloc
       accountPublicStatus: Optional(activeAccount?.publicStatus),
     );
 
-    _activeAccountSub = _userService.watchUser
-        .map((event) => event.activeAccount)
-        .distinct()
-        .listen(
-          (value) => add(RebuildActiveAccountProposalEvent(account: value)),
-        );
+    _activeAccountSub =
+        _userService.watchUser.map((event) => event.activeAccount).distinct().listen(
+              (value) => add(RebuildActiveAccountProposalEvent(account: value)),
+            );
 
     _isMaxProposalsLimitReachedSub =
         _proposalService.watchMaxProposalsLimitReached().listen((event) {
@@ -182,8 +179,7 @@ final class ProposalBuilderBloc
     required ProposalBuilderMetadata proposalMetadata,
     required CampaignCategory category,
   }) async {
-    final commentTemplate =
-        await _commentService.getCommentTemplateFor(category: category.selfRef);
+    final commentTemplate = await _commentService.getCommentTemplateFor(category: category.selfRef);
 
     _cache = _cache.copyWith(
       proposalBuilder: Optional(proposalDocument.toBuilder()),
@@ -212,8 +208,7 @@ final class ProposalBuilderBloc
 
   Future<void> _clearCache() async {
     final activeAccount = _userService.user.activeAccount;
-    final isMaxProposalsLimitReached =
-        await _proposalService.isMaxProposalsLimitReached();
+    final isMaxProposalsLimitReached = await _proposalService.isMaxProposalsLimitReached();
 
     _cache = ProposalBuilderBlocCache(
       activeAccountId: activeAccount?.catalystId,
@@ -311,8 +306,7 @@ final class ProposalBuilderBloc
     if (nodeId == null) {
       return const ProposalGuidance(isNoneSelected: true);
     } else {
-      final segment = state.documentSegments
-          .firstWhereOrNull((e) => nodeId.isChildOf(e.id));
+      final segment = state.documentSegments.firstWhereOrNull((e) => nodeId.isChildOf(e.id));
       final section = segment?.sections.firstWhereOrNull((e) => e.id == nodeId);
 
       return _getGuidanceForSection(segment, section);
@@ -327,8 +321,7 @@ final class ProposalBuilderBloc
       return const ProposalGuidance();
     } else {
       return ProposalGuidance(
-        guidanceList:
-            _findGuidanceItems(segment, section, section.property).toList(),
+        guidanceList: _findGuidanceItems(segment, section, section.property).toList(),
       );
     }
   }
@@ -400,8 +393,7 @@ final class ProposalBuilderBloc
         ref: templateRef,
       );
 
-      final documentBuilder =
-          DocumentBuilder.fromSchema(schema: proposalTemplate.schema);
+      final documentBuilder = DocumentBuilder.fromSchema(schema: proposalTemplate.schema);
 
       return _cacheAndCreateState(
         proposalDocument: documentBuilder.build(),
@@ -477,8 +469,7 @@ final class ProposalBuilderBloc
         ref: templateRef,
       );
 
-      final documentBuilder =
-          DocumentBuilder.fromSchema(schema: proposalTemplate.schema);
+      final documentBuilder = DocumentBuilder.fromSchema(schema: proposalTemplate.schema);
 
       return _cacheAndCreateState(
         proposalDocument: documentBuilder.build(),
@@ -530,8 +521,7 @@ final class ProposalBuilderBloc
     required CommentsState commentsState,
     required bool hasActiveAccount,
   }) {
-    final isDraftProposal =
-        originalProposalRef == null || originalProposalRef is DraftRef;
+    final isDraftProposal = originalProposalRef == null || originalProposalRef is DraftRef;
     final canReply = !isDraftProposal && hasActiveAccount;
     final canComment = canReply && commentSchema != null;
 
@@ -572,8 +562,7 @@ final class ProposalBuilderBloc
               id: section.schema.nodeId,
               property: section,
               schema: section.schema,
-              hasError:
-                  showValidationErrors && !section.isValidExcludingSubsections,
+              hasError: showValidationErrors && !section.isValidExcludingSubsections,
             ),
           )
           .toList();
@@ -725,8 +714,7 @@ final class ProposalBuilderBloc
     final comments = _cache.comments ?? [];
     final commentsState = state.comments;
     final emailStatus = _cache.accountPublicStatus;
-    final isMaxProposalsLimitReached =
-        _cache.isMaxProposalsLimitReached ?? true;
+    final isMaxProposalsLimitReached = _cache.isMaxProposalsLimitReached ?? true;
 
     if (proposalDocument == null ||
         proposalMetadata == null ||
@@ -752,8 +740,7 @@ final class ProposalBuilderBloc
     DocumentRef? newRef,
     DocumentRef? removedRef,
   }) {
-    final current =
-        state.metadata.versions.whereNot((e) => e.id == removedRef?.version);
+    final current = state.metadata.versions.whereNot((e) => e.id == removedRef?.version);
     final currentId = newRef?.version ?? current.last.id;
 
     return [
@@ -899,8 +886,7 @@ final class ProposalBuilderBloc
     UpdateCommentBuilderEvent event,
     Emitter<ProposalBuilderState> emit,
   ) async {
-    final updatedComments =
-        state.comments.updateCommentBuilder(ref: event.ref, show: event.show);
+    final updatedComments = state.comments.updateCommentBuilder(ref: event.ref, show: event.show);
 
     emit(state.copyWith(comments: updatedComments));
   }
@@ -909,8 +895,7 @@ final class ProposalBuilderBloc
     UpdateCommentRepliesEvent event,
     Emitter<ProposalBuilderState> emit,
   ) async {
-    final updatedComments =
-        state.comments.updateCommentReplies(ref: event.ref, show: event.show);
+    final updatedComments = state.comments.updateCommentReplies(ref: event.ref, show: event.show);
 
     emit(state.copyWith(comments: updatedComments));
   }
@@ -943,8 +928,7 @@ final class ProposalBuilderBloc
   }) {
     final updatedMetadata = state.metadata.copyWith(
       documentRef: documentRef != null ? Optional(documentRef) : null,
-      originalDocumentRef:
-          originalDocumentRef != null ? Optional(originalDocumentRef) : null,
+      originalDocumentRef: originalDocumentRef != null ? Optional(originalDocumentRef) : null,
       publish: publish,
       versions: versions,
     );
@@ -997,8 +981,7 @@ final class ProposalBuilderBloc
     if (showErrors) {
       emitError(
         ProposalBuilderValidationException(
-          fields:
-              document.invalidProperties.map((e) => e.schema.title).toList(),
+          fields: document.invalidProperties.map((e) => e.schema.title).toList(),
         ),
       );
     }

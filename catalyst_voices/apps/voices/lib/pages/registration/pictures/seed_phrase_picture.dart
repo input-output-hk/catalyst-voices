@@ -32,10 +32,8 @@ class SeedPhrasePicture extends StatelessWidget {
                     indicateSelection: indicateSelection,
                     type: type,
                   ),
-                  if (type == TaskPictureType.success)
-                    VoicesAssets.icons.check.buildIcon(size: 48),
-                  if (type == TaskPictureType.error)
-                    VoicesAssets.icons.x.buildIcon(size: 48),
+                  if (type == TaskPictureType.success) VoicesAssets.icons.check.buildIcon(size: 48),
+                  if (type == TaskPictureType.error) VoicesAssets.icons.x.buildIcon(size: 48),
                 ],
               ),
             );
@@ -89,12 +87,9 @@ class _Words extends StatelessWidget {
           child: _WordsColumn(
             key: const ValueKey('LeftColumnKey'),
             highlightIndexes: switch (type) {
-              TaskPictureType.normal when indicateSelection =>
-                _firstHighlightIndex,
+              TaskPictureType.normal when indicateSelection => _firstHighlightIndex,
               TaskPictureType.normal => const [],
-              TaskPictureType.success ||
-              TaskPictureType.error =>
-                _allHighlightIndex,
+              TaskPictureType.success || TaskPictureType.error => _allHighlightIndex,
             },
             type: type,
           ),
@@ -105,9 +100,7 @@ class _Words extends StatelessWidget {
             key: const ValueKey('RightColumnKey'),
             highlightIndexes: switch (type) {
               TaskPictureType.normal => const [],
-              TaskPictureType.success ||
-              TaskPictureType.error =>
-                _allHighlightIndex,
+              TaskPictureType.success || TaskPictureType.error => _allHighlightIndex,
             },
             type: type,
           ),

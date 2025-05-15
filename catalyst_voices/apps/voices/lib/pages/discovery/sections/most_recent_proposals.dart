@@ -146,8 +146,7 @@ class _LatestProposalsState extends State<MostRecentProposals> {
                           ),
                         );
                       },
-                      separatorBuilder: (context, index) =>
-                          const SizedBox(width: 24),
+                      separatorBuilder: (context, index) => const SizedBox(width: 24),
                     ),
                   ),
                 ),
