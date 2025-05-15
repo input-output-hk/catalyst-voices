@@ -8,14 +8,21 @@ import 'package:flutter/material.dart';
 
 final class ProposalAddCommentSection extends ProposalCommentsSection {
   final DocumentSchema schema;
+  final bool showUsernameRequired;
 
   const ProposalAddCommentSection({
     required super.id,
     required this.schema,
+    required this.showUsernameRequired,
   });
 
   @override
-  List<Object?> get props => super.props + [schema];
+  List<Object?> get props =>
+      super.props +
+      [
+        schema,
+        showUsernameRequired,
+      ];
 
   @override
   String resolveTitle(BuildContext context) {
@@ -23,8 +30,7 @@ final class ProposalAddCommentSection extends ProposalCommentsSection {
   }
 }
 
-final class ProposalCommentListItem extends Equatable
-    implements SegmentsListViewItem {
+final class ProposalCommentListItem extends Equatable implements SegmentsListViewItem {
   @override
   final NodeId id;
   final CommentWithReplies comment;
@@ -50,8 +56,7 @@ sealed class ProposalCommentsSection extends BaseSection {
   });
 }
 
-final class ProposalCommentsSegment
-    extends BaseSegment<ProposalCommentsSection> {
+final class ProposalCommentsSegment extends BaseSegment<ProposalCommentsSection> {
   final ProposalCommentsSort sort;
 
   const ProposalCommentsSegment({

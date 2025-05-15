@@ -16,19 +16,14 @@ final class ProposalDocument extends Equatable {
   /// which property is the title in any other way than
   /// by hardcoding it's node ID.
   static final titleNodeId = DocumentNodeId.fromString('setup.title.title');
-  static final descriptionNodeId =
-      DocumentNodeId.fromString('summary.solution.summary');
-  static final requestedFundsNodeId =
-      DocumentNodeId.fromString('summary.budget.requestedFunds');
-  static final durationNodeId =
-      DocumentNodeId.fromString('summary.time.duration');
-  static final authorNameNodeId =
-      DocumentNodeId.fromString('setup.proposer.applicant');
+  static final descriptionNodeId = DocumentNodeId.fromString('summary.solution.summary');
+  static final requestedFundsNodeId = DocumentNodeId.fromString('summary.budget.requestedFunds');
+  static final durationNodeId = DocumentNodeId.fromString('summary.time.duration');
+  static final authorNameNodeId = DocumentNodeId.fromString('setup.proposer.applicant');
   static final categoryNodeId = DocumentNodeId.fromString('campaign_category');
   static final categoryDetailsNodeId =
       DocumentNodeId.fromString('campaign_category.category_details.details');
-  static final milestonesNodeId =
-      DocumentNodeId.fromString('milestones.milestones');
+  static final milestonesNodeId = DocumentNodeId.fromString('milestones.milestones');
   static final milestoneListNodeId =
       DocumentNodeId.fromString('milestones.milestones.milestone_list');
   static final tagNodeId = DocumentNodeId.fromString('theme.theme.grouped_tag');
@@ -118,8 +113,7 @@ final class ProposalDocument extends Equatable {
     final property = document.getProperty(tagNodeId);
     final scheme = property?.schema;
 
-    if (property is! DocumentObjectProperty ||
-        scheme is! DocumentSingleGroupedTagSelectorSchema) {
+    if (property is! DocumentObjectProperty || scheme is! DocumentSingleGroupedTagSelectorSchema) {
       return null;
     }
 

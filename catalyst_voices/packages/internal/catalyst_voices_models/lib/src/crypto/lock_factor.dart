@@ -31,9 +31,7 @@ final class PasswordLockFactor implements LockFactor {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is PasswordLockFactor &&
-          runtimeType == other.runtimeType &&
-          _data == other._data;
+      other is PasswordLockFactor && runtimeType == other.runtimeType && _data == other._data;
 
   @override
   int get hashCode => _data.hashCode;

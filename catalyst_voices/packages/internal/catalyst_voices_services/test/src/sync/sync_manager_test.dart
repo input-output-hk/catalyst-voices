@@ -33,16 +33,13 @@ void main() {
       // Given
       final allRefs = List.generate(
         10,
-        (_) => SignedDocumentRef.first(const Uuid().v7())
-            .toTyped(DocumentType.proposalDocument),
+        (_) => SignedDocumentRef.first(const Uuid().v7()).toTyped(DocumentType.proposalDocument),
       );
       final cachedRefs = <TypedDocumentRef>[];
 
       // When
-      when(documentRepository.getAllDocumentsRefs)
-          .thenAnswer((_) => Future.value(allRefs));
-      when(documentRepository.getCachedDocumentsRefs)
-          .thenAnswer((_) => Future.value(cachedRefs));
+      when(documentRepository.getAllDocumentsRefs).thenAnswer((_) => Future.value(allRefs));
+      when(documentRepository.getCachedDocumentsRefs).thenAnswer((_) => Future.value(cachedRefs));
       when(() => documentRepository.cacheDocument(ref: any(named: 'ref')))
           .thenAnswer((_) => Future.error(const HttpException('Unknown ref')));
 

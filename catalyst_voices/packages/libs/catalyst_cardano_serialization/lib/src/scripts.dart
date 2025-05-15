@@ -121,8 +121,7 @@ sealed class NativeScript extends Script {
   factory NativeScript.fromCbor(CborValue value) {
     if (value is CborList) {
       try {
-        final type =
-            NativeScriptType.values[(value[0] as CborSmallInt).toInt()];
+        final type = NativeScriptType.values[(value[0] as CborSmallInt).toInt()];
         return switch (type) {
           NativeScriptType.pubkey => ScriptPubkey.fromCbor(value),
           NativeScriptType.all => ScriptAll.fromCbor(value),
@@ -177,23 +176,16 @@ sealed class NativeScript extends Script {
   /// is thrown.
   static NativeScript fromJSON(Map<String, dynamic> json) {
     return switch (json['type']) {
-      'sig' =>
-        ScriptPubkey(Ed25519PublicKeyHash.fromHex(json['keyHash'] as String)),
+      'sig' => ScriptPubkey(Ed25519PublicKeyHash.fromHex(json['keyHash'] as String)),
       'all' => ScriptAll(
-          (json['scripts'] as List<Map<String, dynamic>>)
-              .map<NativeScript>(fromJSON)
-              .toList(),
+          (json['scripts'] as List<Map<String, dynamic>>).map<NativeScript>(fromJSON).toList(),
         ),
       'any' => ScriptAny(
-          (json['scripts'] as List<Map<String, dynamic>>)
-              .map<NativeScript>(fromJSON)
-              .toList(),
+          (json['scripts'] as List<Map<String, dynamic>>).map<NativeScript>(fromJSON).toList(),
         ),
       'atLeast' => ScriptNOfK(
           json['required'] as int,
-          (json['scripts'] as List<Map<String, dynamic>>)
-              .map<NativeScript>(fromJSON)
-              .toList(),
+          (json['scripts'] as List<Map<String, dynamic>>).map<NativeScript>(fromJSON).toList(),
         ),
       'before' => InvalidAfter(json['slot'] as int),
       'after' => InvalidBefore(json['slot'] as int),
@@ -271,9 +263,8 @@ class ScriptAll extends NativeScript {
   /// Factory constructor to create a [ScriptAll] from a CBOR list.
   factory ScriptAll.fromCbor(CborList value) {
     NativeScript._checkListNativeScriptValidity(value);
-    final scripts = (value[1] as CborList)
-        .map((e) => NativeScript.fromCbor(e as CborList))
-        .toList();
+    final scripts =
+        (value[1] as CborList).map((e) => NativeScript.fromCbor(e as CborList)).toList();
     return ScriptAll(scripts);
   }
 
@@ -344,9 +335,8 @@ class ScriptNOfK extends NativeScript {
       throw ArgumentError.value(value, 'value', 'Invalid ScriptNOfK');
     }
     final n = (value[1] as CborSmallInt).value;
-    final scripts = (value[2] as CborList)
-        .map((e) => NativeScript.fromCbor(e as CborList))
-        .toList();
+    final scripts =
+        (value[2] as CborList).map((e) => NativeScript.fromCbor(e as CborList)).toList();
     return ScriptNOfK(n, scripts);
   }
 

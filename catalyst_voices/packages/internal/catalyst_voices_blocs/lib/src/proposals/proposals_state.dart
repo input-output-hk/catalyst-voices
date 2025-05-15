@@ -25,9 +25,8 @@ class ProposalsState extends Equatable {
         categorySelectorItems,
       ];
 
-  SignedDocumentRef? get selectedCategoryId => categorySelectorItems
-      .firstWhereOrNull((element) => element.isSelected)
-      ?.ref;
+  SignedDocumentRef? get selectedCategoryId =>
+      categorySelectorItems.firstWhereOrNull((element) => element.isSelected)?.ref;
 
   ProposalsState copyWith({
     bool? hasSearchQuery,
@@ -39,8 +38,7 @@ class ProposalsState extends Equatable {
       hasSearchQuery: hasSearchQuery ?? this.hasSearchQuery,
       favoritesIds: favoritesIds ?? this.favoritesIds,
       count: count ?? this.count,
-      categorySelectorItems:
-          categorySelectorItems ?? this.categorySelectorItems,
+      categorySelectorItems: categorySelectorItems ?? this.categorySelectorItems,
     );
   }
 

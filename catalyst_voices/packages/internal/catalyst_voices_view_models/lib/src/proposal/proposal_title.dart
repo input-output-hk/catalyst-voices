@@ -3,8 +3,7 @@ import 'package:catalyst_voices_view_models/src/exception/localized_exception.da
 import 'package:flutter/material.dart';
 import 'package:formz/formz.dart';
 
-final class ProposalTitle
-    extends FormzInput<String, ProposalTitleValidationException> {
+final class ProposalTitle extends FormzInput<String, ProposalTitleValidationException> {
   const ProposalTitle.dirty([super.value = '']) : super.dirty();
 
   const ProposalTitle.pure([super.value = '']) : super.pure();
@@ -19,8 +18,7 @@ final class ProposalTitle
   }
 }
 
-final class ProposalTitleEmptyValidationException
-    extends ProposalTitleValidationException {
+final class ProposalTitleEmptyValidationException extends ProposalTitleValidationException {
   const ProposalTitleEmptyValidationException();
 
   @override

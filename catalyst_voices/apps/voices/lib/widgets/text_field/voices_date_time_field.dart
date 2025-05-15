@@ -40,8 +40,7 @@ class _VoicesDateTimeFieldState extends State<VoicesDateTimeField> {
   VoicesDateTimeFieldController? _controller;
 
   VoicesDateTimeFieldController get _effectiveController {
-    return widget.controller ??
-        (_controller ??= VoicesDateTimeFieldController());
+    return widget.controller ?? (_controller ??= VoicesDateTimeFieldController());
   }
 
   OverlayEntry? _overlayEntry;
@@ -71,8 +70,7 @@ class _VoicesDateTimeFieldState extends State<VoicesDateTimeField> {
     super.didUpdateWidget(oldWidget);
 
     if (widget.controller != oldWidget.controller) {
-      (oldWidget.controller ?? _controller)
-          ?.removeListener(_handleDateTimeChanged);
+      (oldWidget.controller ?? _controller)?.removeListener(_handleDateTimeChanged);
       (widget.controller ?? _controller)?.addListener(_handleDateTimeChanged);
     }
   }
@@ -308,8 +306,7 @@ class _VoicesDateTimeFieldState extends State<VoicesDateTimeField> {
   }
 
   bool _isBoxTapped(RenderBox? box, Offset tapPosition) {
-    return box != null &&
-        (box.localToGlobal(Offset.zero) & box.size).contains(tapPosition);
+    return box != null && (box.localToGlobal(Offset.zero) & box.size).contains(tapPosition);
   }
 
   Future<void> _handleTap(PickerType pickerType) async {

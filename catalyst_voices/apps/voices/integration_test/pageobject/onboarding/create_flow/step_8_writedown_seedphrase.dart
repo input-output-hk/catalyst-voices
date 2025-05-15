@@ -30,14 +30,12 @@ class WriteDownSeedphrasePanel extends OnboardingPageBase {
   }
 
   Future<String> writedownSeedPhraseWord(int index) async {
-    final rawWord =
-        $(Key('SeedPhrase${index}CellKey')).$(const Key('SeedPhraseWord')).text;
+    final rawWord = $(Key('SeedPhrase${index}CellKey')).$(const Key('SeedPhraseWord')).text;
     return rawWord!;
   }
 
   Future<int> writedownSeedPhraseNumber(int index) async {
-    final rawNumber =
-        $(Key('SeedPhrase${index}CellKey')).$(seedPhraseNumber).text;
+    final rawNumber = $(Key('SeedPhrase${index}CellKey')).$(seedPhraseNumber).text;
     return int.parse(rawNumber!.split('.').first);
   }
 

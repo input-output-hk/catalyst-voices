@@ -34,11 +34,7 @@ class CampaignCategoriesSection {
       try {
         $(categoriesRoot).$(campaignCategories).at(i).$(description).visible;
       } catch (e) {
-        await $(categoriesRoot)
-            .$(campaignCategories)
-            .at(i)
-            .$(description)
-            .scrollTo();
+        await $(categoriesRoot).$(campaignCategories).at(i).$(description).scrollTo();
       }
       expect(
         $(categoriesRoot).$(campaignCategories).at(i).$(title).$(Text).text,
@@ -49,66 +45,31 @@ class CampaignCategoriesSection {
         isNotEmpty,
       );
       expect(
-        $(categoriesRoot)
-            .$(campaignCategories)
-            .at(i)
-            .$(availableFunds)
-            .$(dataTitle)
-            .text,
+        $(categoriesRoot).$(campaignCategories).at(i).$(availableFunds).$(dataTitle).text,
         (await t()).fundsAvailable,
       );
       expect(
-        $(categoriesRoot)
-            .$(campaignCategories)
-            .at(i)
-            .$(availableFunds)
-            .$(dataValue)
-            .text,
+        $(categoriesRoot).$(campaignCategories).at(i).$(availableFunds).$(dataValue).text,
         isNotEmpty,
       );
       expect(
-        $(categoriesRoot)
-            .$(campaignCategories)
-            .at(i)
-            .$(proposalsCount)
-            .$(dataTitle)
-            .text,
+        $(categoriesRoot).$(campaignCategories).at(i).$(proposalsCount).$(dataTitle).text,
         (await t()).proposals,
       );
       expect(
-        $(categoriesRoot)
-            .$(campaignCategories)
-            .at(i)
-            .$(proposalsCount)
-            .$(dataValue)
-            .text,
+        $(categoriesRoot).$(campaignCategories).at(i).$(proposalsCount).$(dataValue).text,
         isNotEmpty,
       );
       expect(
-        $(categoriesRoot)
-            .$(campaignCategories)
-            .at(i)
-            .$(description)
-            .$(Text)
-            .text,
+        $(categoriesRoot).$(campaignCategories).at(i).$(description).$(Text).text,
         isNotEmpty,
       );
       expect(
-        $(categoriesRoot)
-            .$(campaignCategories)
-            .at(i)
-            .$(categoryDetailsButton)
-            .$(Text)
-            .text,
+        $(categoriesRoot).$(campaignCategories).at(i).$(categoryDetailsButton).$(Text).text,
         (await t()).categoryDetails,
       );
       expect(
-        $(categoriesRoot)
-            .$(campaignCategories)
-            .at(i)
-            .$(viewProposalsButton)
-            .$(Text)
-            .text,
+        $(categoriesRoot).$(campaignCategories).at(i).$(viewProposalsButton).$(Text).text,
         (await t()).viewProposals,
       );
     }
