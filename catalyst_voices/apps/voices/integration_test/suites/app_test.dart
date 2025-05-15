@@ -46,8 +46,7 @@ void main() async {
         'guest - chooser - clicking on icons works correctly',
         (PatrolTester $) async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
-          await $(OverallSpacesPage.guestShortcutBtn)
-              .tap(settleTimeout: Time.long.duration);
+          await $(OverallSpacesPage.guestShortcutBtn).tap(settleTimeout: Time.long.duration);
           await AppBarPage($).spacesDrawerButtonClick();
           SpacesDrawerPage.commonElementsLookAsExpected($);
 
@@ -66,8 +65,7 @@ void main() async {
         'guest - chooser - next,previous buttons work correctly',
         (PatrolTester $) async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
-          await $(OverallSpacesPage.guestShortcutBtn)
-              .tap(settleTimeout: Time.long.duration);
+          await $(OverallSpacesPage.guestShortcutBtn).tap(settleTimeout: Time.long.duration);
           await AppBarPage($).spacesDrawerButtonClick();
 
           // iterate thru spaces by clicking next
@@ -94,8 +92,7 @@ void main() async {
         'user - chooser - clicking on icons works correctly',
         (PatrolTester $) async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
-          await $(OverallSpacesPage.userShortcutBtn)
-              .tap(settleTimeout: Time.long.duration);
+          await $(OverallSpacesPage.userShortcutBtn).tap(settleTimeout: Time.long.duration);
           await AppBarPage($).spacesDrawerButtonClick();
           SpacesDrawerPage.commonElementsLookAsExpected($);
           for (final space in Space.values) {
@@ -111,8 +108,7 @@ void main() async {
         'guest - chooser - all spaces button works',
         (PatrolTester $) async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
-          await $(OverallSpacesPage.guestShortcutBtn)
-              .tap(settleTimeout: Time.long.duration);
+          await $(OverallSpacesPage.guestShortcutBtn).tap(settleTimeout: Time.long.duration);
           await AppBarPage($).spacesDrawerButtonClick();
           await $(SpacesDrawerPage.allSpacesBtn).tap();
           expect($(OverallSpacesPage.spacesListView), findsOneWidget);
@@ -125,8 +121,7 @@ void main() async {
         'user - chooser - all spaces button works',
         (PatrolTester $) async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
-          await $(OverallSpacesPage.userShortcutBtn)
-              .tap(settleTimeout: Time.long.duration);
+          await $(OverallSpacesPage.userShortcutBtn).tap(settleTimeout: Time.long.duration);
           await AppBarPage($).spacesDrawerButtonClick();
           await $(SpacesDrawerPage.allSpacesBtn).tap();
           expect($(OverallSpacesPage.spacesListView), findsOneWidget);
@@ -146,8 +141,7 @@ void main() async {
             Space.treasury: 'Treasury space',
           };
           await $.pumpWidgetAndSettle(App(routerConfig: router));
-          await $(OverallSpacesPage.userShortcutBtn)
-              .tap(settleTimeout: Time.long.duration);
+          await $(OverallSpacesPage.userShortcutBtn).tap(settleTimeout: Time.long.duration);
           await AppBarPage($).spacesDrawerButtonClick();
           for (final space in Space.values) {
             await $(SpacesDrawerPage.chooserItem(space)).tap();

@@ -29,8 +29,7 @@ class RegistrationDetailsPanel extends StatelessWidget {
               stage: stage,
             ),
           CreateKeychainStep(:final stage) => CreateKeychainPanel(stage: stage),
-          AccountCreateProgressStep(:final completedSteps) =>
-            AccountCreateProgressPanel(
+          AccountCreateProgressStep(:final completedSteps) => AccountCreateProgressPanel(
               completedSteps: completedSteps,
             ),
           WalletLinkStep(:final stage) => WalletLinkPanel(stage: stage),

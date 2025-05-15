@@ -19,8 +19,7 @@ class RadioButtonSelectWidget extends StatefulWidget {
   });
 
   @override
-  State<RadioButtonSelectWidget> createState() =>
-      _RadioButtonSelectionWidgetState();
+  State<RadioButtonSelectWidget> createState() => _RadioButtonSelectionWidgetState();
 }
 
 class _RadioButtonSelectionWidgetState extends State<RadioButtonSelectWidget> {

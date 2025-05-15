@@ -7,8 +7,7 @@ import '../../../helpers/helpers.dart';
 
 void main() {
   group(VoicesFutureBuilder, () {
-    testWidgets('Displays data when future completes successfully',
-        (tester) async {
+    testWidgets('Displays data when future completes successfully', (tester) async {
       await tester.pumpApp(
         VoicesFutureBuilder<String>(
           future: () async => 'Test Data',
@@ -29,8 +28,7 @@ void main() {
       expect(find.text('Success'), findsOneWidget);
     });
 
-    testWidgets('Displays error when future completes with an error',
-        (tester) async {
+    testWidgets('Displays error when future completes with an error', (tester) async {
       // Act
       await tester.pumpApp(
         VoicesFutureBuilder<String>(

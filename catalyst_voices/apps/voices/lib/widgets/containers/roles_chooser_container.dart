@@ -57,8 +57,6 @@ class RolesChooserContainer extends StatelessWidget {
   Set<AccountRole> _createNewValue(AccountRole role, bool newValue) {
     final selected = roles.where((role) => role.isSelected).map((e) => e.type);
 
-    return newValue
-        ? ({...selected}..add(role))
-        : ({...selected}..remove(role));
+    return newValue ? ({...selected}..add(role)) : ({...selected}..remove(role));
   }
 }

@@ -65,8 +65,7 @@ class GetStartedPanel extends StatelessWidget {
   }
 
   Future<void> _handleCreateNewAccount(BuildContext context) async {
-    final hasWallets =
-        await context.read<SessionCubit>().checkAvailableWallets();
+    final hasWallets = await context.read<SessionCubit>().checkAvailableWallets();
 
     if (hasWallets && context.mounted) {
       RegistrationCubit.of(context).createNewAccount();

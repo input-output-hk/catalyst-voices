@@ -185,8 +185,7 @@ class DriftDraftsDao extends DatabaseAccessor<DriftCatalystDatabase>
   }) async {
     final insertable = DraftsCompanion(
       content: Value(content),
-      title:
-          content.title != null ? Value(content.title!) : const Value.absent(),
+      title: content.title != null ? Value(content.title!) : const Value.absent(),
     );
     final query = update(drafts)..where((tbl) => _filterRef(tbl, ref));
 

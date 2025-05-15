@@ -15,12 +15,10 @@ class CampaignAdminToolsEventsTab extends StatefulWidget {
   const CampaignAdminToolsEventsTab({super.key});
 
   @override
-  State<CampaignAdminToolsEventsTab> createState() =>
-      _CampaignAdminToolsEventsTabState();
+  State<CampaignAdminToolsEventsTab> createState() => _CampaignAdminToolsEventsTabState();
 }
 
-class _CampaignAdminToolsEventsTabState
-    extends State<CampaignAdminToolsEventsTab> {
+class _CampaignAdminToolsEventsTabState extends State<CampaignAdminToolsEventsTab> {
   static const _defaultStageTransitionDelay = Duration(seconds: 5);
 
   Timer? _stageTimer;
@@ -49,11 +47,9 @@ class _CampaignAdminToolsEventsTabState
             _EventTimelapseControls(
               nextStageTransitionAt: _stageTransitionAt,
               stageTransitionDelay: _stageTransitionDelay,
-              onPreviousStage: _canSelectPreviousStage(stage)
-                  ? () => _onPreviousStage(stage)
-                  : null,
-              onNextStage:
-                  _canSelectNextStage(stage) ? () => _onNextStage(stage) : null,
+              onPreviousStage:
+                  _canSelectPreviousStage(stage) ? () => _onPreviousStage(stage) : null,
+              onNextStage: _canSelectNextStage(stage) ? () => _onNextStage(stage) : null,
               onTransitionDelayChanged: _onTransitionDelayChanged,
             ),
           ],
@@ -155,9 +151,8 @@ class _EventItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = isActive
-        ? Theme.of(context).colorScheme.primary
-        : Theme.of(context).colors.textOnPrimary;
+    final color =
+        isActive ? Theme.of(context).colorScheme.primary : Theme.of(context).colors.textOnPrimary;
 
     return InkWell(
       onTap: onTap,
@@ -224,8 +219,7 @@ class _EventTimelapseControls extends StatefulWidget {
   });
 
   @override
-  State<_EventTimelapseControls> createState() =>
-      _EventTimelapseControlsState();
+  State<_EventTimelapseControls> createState() => _EventTimelapseControlsState();
 }
 
 class _EventTimelapseControlsState extends State<_EventTimelapseControls> {
@@ -321,8 +315,7 @@ class _EventTimelapseControlsState extends State<_EventTimelapseControls> {
     // only update if the duration is different,
     // otherwise we might be overwriting local user edits
     if (_stageTransitionDelay != duration) {
-      final seconds =
-          (duration.inMilliseconds / Duration.millisecondsPerSecond).ceil();
+      final seconds = (duration.inMilliseconds / Duration.millisecondsPerSecond).ceil();
       final text = '${seconds}s';
       _timerController.value = TextEditingValue(
         text: text,
@@ -345,8 +338,7 @@ class _EventTimelapseControlsState extends State<_EventTimelapseControls> {
   }
 
   Duration? get _stageTransitionDelay {
-    final cleanedString =
-        _timerController.text.replaceAll('s', '').replaceAll(' ', '');
+    final cleanedString = _timerController.text.replaceAll('s', '').replaceAll(' ', '');
     final seconds = int.tryParse(cleanedString);
     return seconds != null ? Duration(seconds: seconds) : null;
   }

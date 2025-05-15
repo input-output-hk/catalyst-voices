@@ -39,8 +39,7 @@ class VoicesCalendarDatePicker extends StatefulWidget {
   });
 
   @override
-  State<VoicesCalendarDatePicker> createState() =>
-      _VoicesCalendarDatePickerState();
+  State<VoicesCalendarDatePicker> createState() => _VoicesCalendarDatePickerState();
 }
 
 class _VoicesCalendarDatePickerState extends State<VoicesCalendarDatePicker> {

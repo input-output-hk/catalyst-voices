@@ -66,11 +66,11 @@ class VoicesAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   // Has to be nullable, that's why this is a function.
   Widget? _buildLeading(BuildContext context) {
-    final canImplyDrawerToggleButton = automaticallyImplyLeading &&
-        (Scaffold.maybeOf(context)?.hasDrawer ?? false);
+    final canImplyDrawerToggleButton =
+        automaticallyImplyLeading && (Scaffold.maybeOf(context)?.hasDrawer ?? false);
 
-    final canImplyPopButton = automaticallyImplyLeading &&
-        (Navigator.maybeOf(context)?.canPop() ?? false);
+    final canImplyPopButton =
+        automaticallyImplyLeading && (Navigator.maybeOf(context)?.canPop() ?? false);
 
     final child = leading ??
         (canImplyDrawerToggleButton ? const DrawerToggleButton() : null) ??
@@ -132,11 +132,7 @@ class _Title extends StatelessWidget {
         ),
         xs: (
           widgets: [
-            Theme.of(context)
-                .brandAssets
-                .brand
-                .logoIcon(context)
-                .buildPicture(),
+            Theme.of(context).brandAssets.brand.logoIcon(context).buildPicture(),
           ],
           itemGap: 8
         ),
