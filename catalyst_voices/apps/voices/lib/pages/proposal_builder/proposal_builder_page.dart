@@ -333,14 +333,14 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
     ProposalBuilderBloc? bloc,
   }) async {
     bloc ??= context.read<ProposalBuilderBloc>();
-    final action = await UnlockEditProposalDialog.show(
+    final unlock = await UnlockEditProposalDialog.show(
           context: context,
           title: signal.title,
           version: signal.version,
         ) ??
         false;
 
-    if (action && mounted) {
+    if (unlock && mounted) {
       return bloc.add(const UnlockProposalBuilderEvent());
     }
     if (mounted) {
