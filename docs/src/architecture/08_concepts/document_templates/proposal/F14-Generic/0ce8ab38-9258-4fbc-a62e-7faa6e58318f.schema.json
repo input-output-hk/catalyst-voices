@@ -5,6 +5,9 @@
     "description": "Schema for the F14 Catalyst Proposal Submission Form",
     "maintainers": [{ "name": "Catalyst Team", "url": "https://projectcatalyst.io/" }],
     "x-changelog": {
+        "2025-05-15": [
+            "Setting maxLength for Dependency description"
+        ],
         "2025-04-22": [
             "Updated schema to make optional text fields mandatory.",
             "Assigned title to theme property.",
