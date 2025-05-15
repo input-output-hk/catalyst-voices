@@ -76,8 +76,7 @@ class _ActionButtons extends StatelessWidget {
           VoicesTextButton(
             onTap: agreement
                 ? () {
-                    Navigator.of(context)
-                        .pop(const ForgetProposalForgetAction());
+                    Navigator.of(context).pop(const ForgetProposalForgetAction());
                   }
                 : null,
             child: Text(

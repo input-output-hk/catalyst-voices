@@ -292,9 +292,8 @@ final class RegistrationServiceImpl implements RegistrationService {
             keychain: keychain,
             roles: data.roles,
             address: walletInfo.address,
-            publicStatus: data.email != null
-                ? AccountPublicStatus.verifying
-                : AccountPublicStatus.notSetup,
+            publicStatus:
+                data.email != null ? AccountPublicStatus.verifying : AccountPublicStatus.notSetup,
           );
         });
       });
@@ -429,8 +428,7 @@ final class RegistrationServiceImpl implements RegistrationService {
   /// It's a common security practice to configure transactions
   /// to expire after a certain duration.
   Future<SlotBigNum> _getRegistrationSlotNumberTtl(NetworkId networkId) async {
-    final registrationTransactionExpiration =
-        DateTimeExt.now().add(const Duration(hours: 3));
+    final registrationTransactionExpiration = DateTimeExt.now().add(const Duration(hours: 3));
 
     return _blockchainService.calculateSlotNumber(
       targetDateTime: registrationTransactionExpiration,

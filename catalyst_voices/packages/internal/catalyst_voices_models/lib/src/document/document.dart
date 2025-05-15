@@ -243,8 +243,7 @@ final class DocumentObjectProperty extends DocumentProperty {
     return null;
   }
 
-  DocumentProperty?
-      getPropertyWithSchemaType<T extends DocumentPropertySchema>() {
+  DocumentProperty? getPropertyWithSchemaType<T extends DocumentPropertySchema>() {
     return properties.firstWhereOrNull((e) => e.schema is T);
   }
 

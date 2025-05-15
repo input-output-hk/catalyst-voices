@@ -9,8 +9,7 @@ enum Brand {
     final brightness = Theme.of(context).brightness;
 
     return switch (this) {
-      Brand.catalyst when brightness == Brightness.dark =>
-        VoicesAssets.images.catalystLogoWhite,
+      Brand.catalyst when brightness == Brightness.dark => VoicesAssets.images.catalystLogoWhite,
       Brand.catalyst => VoicesAssets.images.catalystLogo,
     };
   }

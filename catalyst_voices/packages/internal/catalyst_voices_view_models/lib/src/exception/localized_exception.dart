@@ -5,9 +5,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 
 /// An [Exception] that can provide localized, human readable info.
-abstract base class LocalizedException
-    with EquatableMixin
-    implements Exception {
+abstract base class LocalizedException with EquatableMixin implements Exception {
   const LocalizedException();
 
   factory LocalizedException.create(

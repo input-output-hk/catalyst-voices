@@ -73,8 +73,7 @@ class VoicesFutureBuilder<T extends Object> extends StatefulWidget {
   State<VoicesFutureBuilder> createState() => _VoicesFutureBuilderState<T>();
 }
 
-class _VoicesFutureBuilderState<T extends Object>
-    extends State<VoicesFutureBuilder<T>> {
+class _VoicesFutureBuilderState<T extends Object> extends State<VoicesFutureBuilder<T>> {
   Future<T>? _future;
 
   @override

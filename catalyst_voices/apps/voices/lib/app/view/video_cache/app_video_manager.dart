@@ -26,8 +26,7 @@ class VideoManager extends ValueNotifier<VideoManagerState> {
     if (value.controllers.containsKey(key)) {
       return value.controllers[key]!;
     }
-    final controller =
-        await _initializeController(asset.name, package: asset.package);
+    final controller = await _initializeController(asset.name, package: asset.package);
 
     final newControllers = Map.of(value.controllers)..[key] = controller;
 
@@ -49,8 +48,7 @@ class VideoManager extends ValueNotifier<VideoManagerState> {
         final key = _createKey(asset, videoAssets.package);
         if (value.controllers.containsKey(key)) return;
 
-        final controller =
-            await _initializeController(asset, package: videoAssets.package);
+        final controller = await _initializeController(asset, package: videoAssets.package);
         newControllers[key] = controller;
       }),
     );
@@ -113,9 +111,7 @@ class VideoManagerScope extends InheritedWidget {
   }
 
   static VideoManager of(BuildContext context) {
-    return context
-        .dependOnInheritedWidgetOfExactType<VideoManagerScope>()!
-        .manager;
+    return context.dependOnInheritedWidgetOfExactType<VideoManagerScope>()!.manager;
   }
 }
 

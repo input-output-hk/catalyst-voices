@@ -19,8 +19,7 @@ class VoicesVideoPlayer extends StatefulWidget {
   State<VoicesVideoPlayer> createState() => _VoicesVideoPlayerState();
 }
 
-class _VoicesVideoPlayerState extends State<VoicesVideoPlayer>
-    with AutomaticKeepAliveClientMixin {
+class _VoicesVideoPlayerState extends State<VoicesVideoPlayer> with AutomaticKeepAliveClientMixin {
   Future<VideoPlayerController>? _future;
 
   @override

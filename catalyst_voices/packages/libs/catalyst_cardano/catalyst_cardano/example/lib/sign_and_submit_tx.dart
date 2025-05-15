@@ -34,10 +34,8 @@ Transaction _buildUnsignedTx({
     networkId: NetworkId.testnet,
   );
 
-  final txBody = txBuilder
-      .withOutput(txOutput)
-      .withChangeAddressIfNeeded(changeAddress)
-      .buildBody();
+  final txBody =
+      txBuilder.withOutput(txOutput).withChangeAddressIfNeeded(changeAddress).buildBody();
 
   return Transaction(
     body: txBody,

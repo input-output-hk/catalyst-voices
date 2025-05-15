@@ -55,9 +55,7 @@ class _SectionHeaderPlaceholder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final icon = isOpen
-        ? VoicesAssets.icons.chevronDown
-        : VoicesAssets.icons.chevronRight;
+    final icon = isOpen ? VoicesAssets.icons.chevronDown : VoicesAssets.icons.chevronRight;
 
     return Container(
       color: Theme.of(context).colorScheme.primary,

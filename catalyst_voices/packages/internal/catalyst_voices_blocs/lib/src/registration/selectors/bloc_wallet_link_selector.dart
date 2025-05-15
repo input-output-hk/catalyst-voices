@@ -1,7 +1,6 @@
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 
-class BlocWalletLinkSelector<T>
-    extends BlocSelector<RegistrationCubit, RegistrationState, T> {
+class BlocWalletLinkSelector<T> extends BlocSelector<RegistrationCubit, RegistrationState, T> {
   BlocWalletLinkSelector({
     super.key,
     required BlocWidgetSelector<WalletLinkStateData, T> selector,

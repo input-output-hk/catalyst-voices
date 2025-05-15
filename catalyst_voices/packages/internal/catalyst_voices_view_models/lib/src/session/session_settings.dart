@@ -27,8 +27,8 @@ final class SessionSettings extends Equatable {
       : this(
           timezone: settings.timezone ?? _defaultTimezone,
           theme: settings.theme ?? _defaultTheme,
-          showSubmissionClosingWarning: settings.showSubmissionClosingWarning ??
-              _defaultShowSubmissionClosingWarning,
+          showSubmissionClosingWarning:
+              settings.showSubmissionClosingWarning ?? _defaultShowSubmissionClosingWarning,
         );
 
   @override

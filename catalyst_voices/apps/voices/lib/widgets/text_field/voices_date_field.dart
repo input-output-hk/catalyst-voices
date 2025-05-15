@@ -98,14 +98,11 @@ class _VoicesDateFieldState extends State<VoicesDateField> {
 
     return VoicesDateTimeTextField(
       controller: _textEditingController,
-      onChanged: onChanged != null
-          ? (value) => onChanged(_convertTextToDate(value))
-          : null,
+      onChanged: onChanged != null ? (value) => onChanged(_convertTextToDate(value)) : null,
       validator: _validator,
       hintText: _pattern.toUpperCase(),
-      onFieldSubmitted: onFieldSubmitted != null
-          ? (value) => onFieldSubmitted(_convertTextToDate(value))
-          : null,
+      onFieldSubmitted:
+          onFieldSubmitted != null ? (value) => onFieldSubmitted(_convertTextToDate(value)) : null,
       suffixIcon: ExcludeFocus(
         child: VoicesIconButton(
           onTap: widget.onCalendarTap,
@@ -213,8 +210,7 @@ class _VoicesDateFieldState extends State<VoicesDateField> {
         l10n.datePickerDaysInMonthError,
       );
     }
-    if (formatDt.isBefore(today.subtract(const Duration(days: 1))) ||
-        formatDt.isAfter(maxDate)) {
+    if (formatDt.isBefore(today.subtract(const Duration(days: 1))) || formatDt.isAfter(maxDate)) {
       return VoicesTextFieldValidationResult.error(
         l10n.datePickerDateRangeError,
       );
