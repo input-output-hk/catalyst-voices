@@ -29,16 +29,13 @@ final class AppConfigFactory {
     );
 
     // Transaction Builder Config
-    final remoteTransactionBuilderConfig =
-        remoteBlockchainConfig?.transactionBuilderConfig;
+    final remoteTransactionBuilderConfig = remoteBlockchainConfig?.transactionBuilderConfig;
     final effectiveTransactionBuilderConfig = transactionBuilderConfig.copyWith(
       feeAlgo: effectiveFeeAlgo,
       maxTxSize: remoteTransactionBuilderConfig?.maxTxSize,
       maxValueSize: remoteTransactionBuilderConfig?.maxValueSize,
-      coinsPerUtxoByte:
-          remoteTransactionBuilderConfig?.coinsPerUtxoByte?.asCoin(),
-      selectionStrategy:
-          remoteTransactionBuilderConfig?.selectionStrategy?.build(),
+      coinsPerUtxoByte: remoteTransactionBuilderConfig?.coinsPerUtxoByte?.asCoin(),
+      selectionStrategy: remoteTransactionBuilderConfig?.selectionStrategy?.build(),
     );
 
     // Slot Number Config
@@ -53,8 +50,7 @@ final class AppConfigFactory {
       version: remote.version,
       cache: defaultEnvConfig.cache.copyWith(
         expiryDuration: defaultEnvConfig.cache.expiryDuration.copyWith(
-          keychainUnlock:
-              remote.cache?.expiryDuration?.keychainUnlock?.asDuration(),
+          keychainUnlock: remote.cache?.expiryDuration?.keychainUnlock?.asDuration(),
         ),
       ),
       sentry: defaultEnvConfig.sentry.copyWith(
@@ -98,10 +94,8 @@ extension on int {
 extension on RemoteTransactionSelectionStrategyType {
   CoinSelectionStrategy build() {
     return switch (this) {
-      RemoteTransactionSelectionStrategyType.greedy =>
-        const GreedySelectionStrategy(),
-      RemoteTransactionSelectionStrategyType.random =>
-        RandomSelectionStrategy(),
+      RemoteTransactionSelectionStrategyType.greedy => const GreedySelectionStrategy(),
+      RemoteTransactionSelectionStrategyType.random => RandomSelectionStrategy(),
     };
   }
 }

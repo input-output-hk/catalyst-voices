@@ -2,8 +2,7 @@ import 'package:catalyst_voices_models/src/config/env_vars/dart_define_env_vars.
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 
-const _fallbackEnvType =
-    kIsWeb ? AppEnvironmentType.relative : AppEnvironmentType.dev;
+const _fallbackEnvType = kIsWeb ? AppEnvironmentType.relative : AppEnvironmentType.dev;
 
 final class AppEnvironment extends Equatable {
   final AppEnvironmentType type;

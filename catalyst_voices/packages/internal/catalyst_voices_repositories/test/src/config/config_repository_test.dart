@@ -74,11 +74,9 @@ void main() {
       expect(config, equals(expectedConfig));
     });
 
-    test('mainnet blockchain slot number config is decoded correctly',
-        () async {
+    test('mainnet blockchain slot number config is decoded correctly', () async {
       // Given
-      final configJson = jsonDecode(Configs.mainnetBlockchainSlotNumber)
-          as Map<String, dynamic>;
+      final configJson = jsonDecode(Configs.mainnetBlockchainSlotNumber) as Map<String, dynamic>;
       final remoteConfig = RemoteConfig.fromJson(configJson);
 
       final systemStartTimestamp = DateTime.utc(2020, 7, 29, 21, 44, 51);
@@ -98,11 +96,9 @@ void main() {
       expect(slotNumberConfig.slotLength, slotLength);
     });
 
-    test('testnet blockchain slot number config is decoded correctly',
-        () async {
+    test('testnet blockchain slot number config is decoded correctly', () async {
       // Given
-      final configJson = jsonDecode(Configs.testnetBlockchainSlotNumber)
-          as Map<String, dynamic>;
+      final configJson = jsonDecode(Configs.testnetBlockchainSlotNumber) as Map<String, dynamic>;
       final remoteConfig = RemoteConfig.fromJson(configJson);
 
       final systemStartTimestamp = DateTime.utc(2022, 6, 21);

@@ -5,9 +5,7 @@ import 'package:flutter/services.dart';
 const _envNameKey = 'ENV_NAME';
 
 EnvVars getDartEnvVars() {
-  const envName = bool.hasEnvironment(_envNameKey)
-      ? String.fromEnvironment(_envNameKey)
-      : null;
+  const envName = bool.hasEnvironment(_envNameKey) ? String.fromEnvironment(_envNameKey) : null;
 
   return const EnvVars(
     // ignore: avoid_redundant_argument_values

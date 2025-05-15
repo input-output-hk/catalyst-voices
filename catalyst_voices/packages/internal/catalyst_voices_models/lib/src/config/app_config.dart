@@ -183,8 +183,7 @@ final class BlockchainConfig extends Equatable {
     return BlockchainConfig(
       networkId: networkId ?? this.networkId,
       host: host ?? this.host,
-      transactionBuilderConfig:
-          transactionBuilderConfig ?? this.transactionBuilderConfig,
+      transactionBuilderConfig: transactionBuilderConfig ?? this.transactionBuilderConfig,
       slotNumberConfig: slotNumberConfig ?? this.slotNumberConfig,
     );
   }
@@ -304,8 +303,7 @@ final class SentryConfig extends Equatable {
       release: release ?? this.release,
       tracesSampleRate: tracesSampleRate ?? this.tracesSampleRate,
       profilesSampleRate: profilesSampleRate ?? this.profilesSampleRate,
-      enableAutoSessionTracking:
-          enableAutoSessionTracking ?? this.enableAutoSessionTracking,
+      enableAutoSessionTracking: enableAutoSessionTracking ?? this.enableAutoSessionTracking,
       attachScreenshot: attachScreenshot ?? this.attachScreenshot,
       attachViewHierarchy: attachViewHierarchy ?? this.attachViewHierarchy,
       debug: debug ?? this.debug,

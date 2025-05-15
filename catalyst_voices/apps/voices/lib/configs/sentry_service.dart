@@ -1,7 +1,6 @@
 import 'dart:async';
 
-import 'package:catalyst_voices_models/catalyst_voices_models.dart'
-    show SentryConfig;
+import 'package:catalyst_voices_models/catalyst_voices_models.dart' show SentryConfig;
 import 'package:flutter/widgets.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 

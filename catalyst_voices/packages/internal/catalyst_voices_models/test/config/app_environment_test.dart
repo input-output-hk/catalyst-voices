@@ -57,8 +57,7 @@ void main() {
       test('url is correct for dev', () {
         // Given
         const type = AppEnvironmentType.dev;
-        const expectedBaseUrl =
-            'https://app.dev.projectcatalyst.io/api/gateway';
+        const expectedBaseUrl = 'https://app.dev.projectcatalyst.io/api/gateway';
 
         // When
         final baseUrl = type.gateway;
@@ -96,8 +95,7 @@ void main() {
       test('url is correct for dev', () {
         // Given
         const type = AppEnvironmentType.dev;
-        const expectedBaseUrl =
-            'https://app.dev.projectcatalyst.io/api/reviews';
+        const expectedBaseUrl = 'https://app.dev.projectcatalyst.io/api/reviews';
 
         // When
         final baseUrl = type.reviews;
