@@ -943,10 +943,9 @@ final class ProposalBuilderBloc
     UnlockProposalBuilderEvent event,
     Emitter<ProposalBuilderState> emit,
   ) async {
-    final proposalRef = state.metadata.documentRef! as SignedDocumentRef;
-    final categoryId = state.metadata.categoryId!;
-
     try {
+      final proposalRef = state.metadata.documentRef! as SignedDocumentRef;
+      final categoryId = state.metadata.categoryId!;
       emit(state.copyWith(isChanging: true));
       await _proposalService.unlockProposal(
         proposalRef: proposalRef,
