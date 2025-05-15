@@ -64,6 +64,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     on<SubmitCommentEvent>(_submitComment);
     on<MaxProposalsLimitChangedEvent>(_updateMaxProposalsLimitReached);
     on<MaxProposalsLimitReachedEvent>(_onMaxProposalsLimitReached);
+    on<UpdateUsernameEvent>(_onUpdateUsername);
 
     final activeAccount = _userService.user.activeAccount;
 
@@ -141,6 +142,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     required bool hasActiveAccount,
     required bool isEmailVerified,
     required bool isMaxProposalsLimitReached,
+    required bool hasAccountUsername,
   }) {
     final documentSegments = _mapDocumentToSegments(
       proposalDocument,
@@ -153,6 +155,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
       commentSchema: commentSchema,
       commentsState: commentsState,
       hasActiveAccount: hasActiveAccount,
+      hasAccountUsername: hasAccountUsername,
     );
 
     final firstSegment = documentSegments.firstOrNull;
@@ -520,10 +523,13 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     required DocumentSchema? commentSchema,
     required CommentsState commentsState,
     required bool hasActiveAccount,
+    required bool hasAccountUsername,
   }) {
     final isDraftProposal = originalProposalRef == null || originalProposalRef is DraftRef;
-    final canReply = !isDraftProposal && hasActiveAccount;
-    final canComment = canReply && commentSchema != null;
+    final isNotLocalAndHasActiveAccount = !isDraftProposal && hasActiveAccount;
+
+    final canReply = isNotLocalAndHasActiveAccount && hasAccountUsername;
+    final canComment = isNotLocalAndHasActiveAccount && commentSchema != null;
 
     if (canComment || comments.isNotEmpty) {
       return [
@@ -537,10 +543,11 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
               comments: commentsState.commentsSort.applyTo(comments),
               canReply: canReply,
             ),
-            if (canReply && commentSchema != null)
+            if (canComment)
               ProposalAddCommentSection(
                 id: const NodeId('comments.add'),
                 schema: commentSchema,
+                showUsernameRequired: !hasActiveAccount,
               ),
           ],
         ),
@@ -591,6 +598,28 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
       );
 
       emitSignal(signal);
+    }
+  }
+
+  Future<void> _onUpdateUsername(
+    UpdateUsernameEvent event,
+    Emitter<ProposalBuilderState> emit,
+  ) async {
+    final catId = _userService.user.activeAccount?.catalystId;
+    if (catId == null) {
+      _logger.warning('Tried to update username but no action account found');
+      return;
+    }
+
+    try {
+      final value = event.value;
+      await _userService.updateAccount(
+        id: catId,
+        username: value.isNotEmpty ? Optional(value) : const Optional.empty(),
+      );
+    } catch (error, stackTrace) {
+      _logger.severe('Update username failed', error, stackTrace);
+      emitError(LocalizedException.create(error));
     }
   }
 
@@ -723,8 +752,11 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
       return const ProposalBuilderState(isLoading: true, isChanging: true);
     }
 
+    final username = activeAccountId?.username;
+
     return _buildState(
       hasActiveAccount: activeAccountId != null,
+      hasAccountUsername: username != null && !username.isBlank,
       proposalDocument: proposalDocument,
       proposalMetadata: proposalMetadata,
       category: category,

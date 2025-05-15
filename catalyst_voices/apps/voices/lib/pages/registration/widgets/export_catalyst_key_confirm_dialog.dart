@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:catalyst_voices/common/constants/constants.dart';
 import 'package:catalyst_voices/pages/registration/widgets/registration_confirm_dialog.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
@@ -66,7 +69,7 @@ class _ExportCatalystKeyConfirmDialogState extends State<ExportCatalystKeyConfir
 
     _recognizer = TapGestureRecognizer();
     _recognizer.onTap = () {
-      // TODO(damian-molinski): open url when available
+      unawaited(launchUri(VoicesConstants.confirmSeedPhraseUrl.getUri()));
     };
   }
 }

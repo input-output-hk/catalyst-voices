@@ -85,7 +85,7 @@ class PaginatedGridView<ItemType> extends StatelessWidget {
                 toNumber: pagingState.toValue,
                 maxResults: pagingState.maxResults,
                 onNextPageTap: pagingState.isLastPage ? null : () => _onNextPageTap(pagingState),
-                onPrevPageTap: pagingState.isFirstPage ? null : _onPrevPageTap,
+                onPrevPageTap: pagingState.isFirstPage ? null : () => _onPrevPageTap(pagingState),
               ),
             ),
           ],
@@ -103,8 +103,10 @@ class PaginatedGridView<ItemType> extends StatelessWidget {
     }
   }
 
-  void _onPrevPageTap() {
-    _pagingController.prevPage();
+  void _onPrevPageTap(PagingState<ItemType> pagingState) {
+    if (pagingState.isLoading) return;
+
+    _pagingController.notifyPageRequestListeners(_pagingController.currentPage - 1);
   }
 }
 

@@ -73,7 +73,6 @@ class _Header extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final username = this.username;
     final catalystId = this.catalystId;
     final createAt = this.createAt;
 
@@ -85,7 +84,7 @@ class _Header extends StatelessWidget {
             spacing: 8,
             runSpacing: 4,
             children: [
-              if (username != null) _UsernameText(username),
+              _UsernameText(username),
               if (catalystId != null)
                 CatalystIdText(
                   catalystId,
@@ -104,13 +103,13 @@ class _Header extends StatelessWidget {
 }
 
 class _UsernameText extends StatelessWidget {
-  final String data;
+  final String? data;
 
   const _UsernameText(this.data);
 
   @override
   Widget build(BuildContext context) {
-    return Text(
+    return UsernameText(
       data,
       style: context.textTheme.titleSmall?.copyWith(color: context.colors.textOnPrimaryLevel0),
     );
