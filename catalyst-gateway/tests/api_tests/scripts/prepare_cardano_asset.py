@@ -1,12 +1,7 @@
 # cspell: words cloudscraper
 
 """
-This script is a simple web scraper tool to prepare testing data for the `cardano/asset` endpoint.
-
-Prerequisites before running this script:
-- Make sure that you have `BeautifulSoup`, `cloudscraper`, and `certifi` installed.
-- Make sure that you have a snapshot file available for this script, can get one from the `catalyst-storage` repo.
-- Fill your own client params to `CF_CLEARANCE` and `USER_AGENT`. Other variables can be configured to fit the need.
+This script is a simple tool to prepare testing data for the `cardano/asset` endpoint.
 """
 
 import json
@@ -26,9 +21,12 @@ IN_FILE = os.environ["CARDANO_ASSETS_INPUT_FILE"]
 # blockfrost.io token value
 BLOCKFROST_TOKEN = os.environ["BLOCKFROST_TOKEN"]
 
-BLOCKFROST_URL = "https://cardano-preprod.blockfrost.io/api/v0"
+# cardano network type
+CARDANO_NETWORK = os.environ["CARDANO_NETWORK"]
 
-RECORDS_LIMIT = 1
+BLOCKFROST_URL = f"https://cardano-{CARDANO_NETWORK}.blockfrost.io/api/v0"
+
+RECORDS_LIMIT = 1000
 START_POSITION = 0
 
 
