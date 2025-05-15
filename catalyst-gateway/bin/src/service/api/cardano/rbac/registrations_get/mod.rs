@@ -17,18 +17,14 @@ mod role_data;
 mod role_map;
 mod unprocessable_content;
 
-use anyhow::{anyhow, Context};
+use anyhow::anyhow;
 use cardano_blockchain_types::StakeAddress;
 use catalyst_types::catalyst_id::CatalystId;
-use futures::{TryFutureExt, TryStreamExt};
 use poem_openapi::payload::Json;
 use tracing::error;
 
 use crate::{
-    db::index::{
-        queries::rbac::get_catalyst_id_from_stake_address::{Query, QueryParams},
-        session::CassandraSession,
-    },
+    db::index::session::CassandraSession,
     service::{
         api::cardano::rbac::registrations_get::{
             chain_info::ChainInfo, registration_chain::RbacRegistrationChain, response::Responses,
@@ -107,19 +103,10 @@ pub(crate) async fn endpoint(
 }
 
 /// Returns a Catalyst ID for the given stake address.
+#[allow(clippy::unused_async)]
 async fn catalyst_id_from_stake(
-    session: &CassandraSession, address: StakeAddress,
+    _session: &CassandraSession, _address: StakeAddress,
 ) -> anyhow::Result<Option<CatalystId>> {
-    let mut result: Vec<_> = Query::execute(session, QueryParams {
-        stake_address: address.into(),
-    })
-    .and_then(|r| r.try_collect().map_err(Into::into))
-    .await
-    .map(|mut res: Vec<_>| {
-        res.sort_by(|a, b| a.slot_no.cmp(&b.slot_no));
-        res
-    })
-    .context("Failed to query Catalyst ID from stake address")?;
-
-    Ok(result.pop().map(|v| v.catalyst_id.into()))
+    // TODO: This function should be entirely removed as a part of https://github.com/input-output-hk/catalyst-voices/issues/2532
+    Ok(None)
 }

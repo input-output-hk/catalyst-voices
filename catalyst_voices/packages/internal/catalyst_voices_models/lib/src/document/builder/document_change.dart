@@ -16,8 +16,7 @@ sealed class DocumentChange extends Equatable {
   /// `false` otherwise.
   bool targetsDocumentNode(DocumentNode node) {
     final targetedNodeId = nodeId;
-    return targetedNodeId == node.nodeId ||
-        targetedNodeId.isChildOf(node.nodeId);
+    return targetedNodeId == node.nodeId || targetedNodeId.isChildOf(node.nodeId);
   }
 }
 

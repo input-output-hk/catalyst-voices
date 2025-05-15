@@ -91,8 +91,7 @@ class _BlocSeedPhraseWords extends StatelessWidget {
   }
 }
 
-class _SeedPhraseCheckPanelState extends State<SeedPhraseCheckPanel>
-    with UploadSeedPhraseMixin {
+class _SeedPhraseCheckPanelState extends State<SeedPhraseCheckPanel> with UploadSeedPhraseMixin {
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -135,9 +134,7 @@ class _SeedPhraseCheckPanelState extends State<SeedPhraseCheckPanel>
   }
 
   void _onWordsSequenceChanged(List<SeedPhraseWord> words) {
-    RegistrationCubit.of(context)
-        .keychainCreation
-        .setUserSeedPhraseWords(words);
+    RegistrationCubit.of(context).keychainCreation.setUserSeedPhraseWords(words);
   }
 }
 

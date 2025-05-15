@@ -62,16 +62,13 @@ class _Shortcuts extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<SessionCubit, SessionState,
-        Map<Space, ShortcutActivator>>(
+    return BlocSelector<SessionCubit, SessionState, Map<Space, ShortcutActivator>>(
       selector: (state) => state.spacesShortcuts,
       builder: (context, shortcuts) {
         return CallbackShortcuts(
           bindings: <ShortcutActivator, VoidCallback>{
-            for (final entry in shortcuts.entries)
-              entry.value: () => entry.key.go(context),
-            if (kDebugMode)
-              CampaignAdminToolsDialog.shortcut: onToggleAdminTools,
+            for (final entry in shortcuts.entries) entry.value: () => entry.key.go(context),
+            if (kDebugMode) CampaignAdminToolsDialog.shortcut: onToggleAdminTools,
           },
           child: child,
         );
@@ -115,8 +112,7 @@ class _SpacesShellPageState extends State<SpacesShellPage> {
               drawer: isActive
                   ? SpacesDrawer(
                       space: widget.space,
-                      spacesShortcutsActivators:
-                          SpacesShellPage._spacesShortcutsActivators,
+                      spacesShortcutsActivators: SpacesShellPage._spacesShortcutsActivators,
                       isUnlocked: isActive,
                     )
                   : null,

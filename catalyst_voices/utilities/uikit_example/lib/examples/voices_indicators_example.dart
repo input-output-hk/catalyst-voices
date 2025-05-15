@@ -171,9 +171,7 @@ class _StepsState extends State<_Steps> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             VoicesFilledButton(
-              onTap: completedSteps.isEmpty
-                  ? null
-                  : () => setState(_goToPreviousStep),
+              onTap: completedSteps.isEmpty ? null : () => setState(_goToPreviousStep),
               child: const Text('Previous'),
             ),
             const SizedBox(width: 16),

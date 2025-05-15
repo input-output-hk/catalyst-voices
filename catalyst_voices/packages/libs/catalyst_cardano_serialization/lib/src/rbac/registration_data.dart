@@ -48,8 +48,7 @@ final class RegistrationData extends Equatable implements CborEncodable {
     return RegistrationData(
       derCerts: _parseRbacFieldCborList(derCerts, X509DerCertificate.fromCbor),
       cborCerts: _parseRbacFieldCborList(cborCerts, C509Certificate.fromCbor),
-      publicKeys:
-          _parseRbacFieldCborList(publicKeys, Ed25519PublicKey.fromCbor),
+      publicKeys: _parseRbacFieldCborList(publicKeys, Ed25519PublicKey.fromCbor),
       revocationSet: revocationSet?.map(CertificateHash.fromCbor).toList(),
       roleDataSet: roleDataSet?.map(RoleData.fromCbor).toSet(),
     );
@@ -91,8 +90,7 @@ final class RegistrationData extends Equatable implements CborEncodable {
   }
 
   @override
-  List<Object?> get props =>
-      [derCerts, cborCerts, publicKeys, revocationSet, roleDataSet];
+  List<Object?> get props => [derCerts, cborCerts, publicKeys, revocationSet, roleDataSet];
 
   static List<RbacField<T>>? _parseRbacFieldCborList<T extends CborEncodable>(
     CborList? list,
@@ -220,16 +218,12 @@ class RoleData extends Equatable implements CborEncodable {
 
     return RoleData(
       roleNumber: roleNumber.value,
-      roleSigningKey: roleSigningKey != null
-          ? LocalKeyReference.fromCbor(roleSigningKey)
-          : null,
-      roleEncryptionKey: roleEncryptionKey != null
-          ? LocalKeyReference.fromCbor(roleEncryptionKey)
-          : null,
+      roleSigningKey: roleSigningKey != null ? LocalKeyReference.fromCbor(roleSigningKey) : null,
+      roleEncryptionKey:
+          roleEncryptionKey != null ? LocalKeyReference.fromCbor(roleEncryptionKey) : null,
       paymentKey: paymentKey?.value,
       roleSpecificData: roleSpecificData.isNotEmpty
-          ? roleSpecificData
-              .map((key, value) => MapEntry((key as CborSmallInt).value, value))
+          ? roleSpecificData.map((key, value) => MapEntry((key as CborSmallInt).value, value))
           : null,
     );
   }
@@ -240,15 +234,11 @@ class RoleData extends Equatable implements CborEncodable {
     return CborMap(
       {
         const CborSmallInt(0): CborSmallInt(roleNumber),
-        if (roleSigningKey != null)
-          const CborSmallInt(1): roleSigningKey!.toCbor(),
-        if (roleEncryptionKey != null)
-          const CborSmallInt(2): roleEncryptionKey!.toCbor(),
-        if (paymentKey != null)
-          const CborSmallInt(3): CborSmallInt(paymentKey!),
+        if (roleSigningKey != null) const CborSmallInt(1): roleSigningKey!.toCbor(),
+        if (roleEncryptionKey != null) const CborSmallInt(2): roleEncryptionKey!.toCbor(),
+        if (paymentKey != null) const CborSmallInt(3): CborSmallInt(paymentKey!),
         if (roleSpecificData != null)
-          for (final entry in roleSpecificData!.entries)
-            CborSmallInt(entry.key): entry.value,
+          for (final entry in roleSpecificData!.entries) CborSmallInt(entry.key): entry.value,
       },
       tags: tags,
     );

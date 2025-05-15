@@ -17,8 +17,7 @@ import 'package:pinenacl/api.dart';
 ///
 /// > Note: It does not support pure Shelley era outputs i.e. output with only
 /// pure coin (int) type as amount.
-sealed class ShelleyMultiAssetTransactionOutput extends Equatable
-    implements CborEncodable {
+sealed class ShelleyMultiAssetTransactionOutput extends Equatable implements CborEncodable {
   /// The destination address for the output.
   final ShelleyAddress address;
 
@@ -51,8 +50,7 @@ sealed class ShelleyMultiAssetTransactionOutput extends Equatable
 ///
 /// This class is primarily used for basic transaction outputs that do not
 /// include advanced features like script references or inline data.
-final class PreBabbageTransactionOutput
-    extends ShelleyMultiAssetTransactionOutput {
+final class PreBabbageTransactionOutput extends ShelleyMultiAssetTransactionOutput {
   /// Optional datum hash associated with the transaction output.
   /// The datum hash is a cryptographic hash that refers to off-chain data.
   final DatumHash? datumHash;
@@ -72,9 +70,8 @@ final class PreBabbageTransactionOutput
   factory PreBabbageTransactionOutput._fromCborList(CborList list) {
     final address = ShelleyAddress.fromCbor(list[0]);
     final amount = Balance.fromCbor(list[1]);
-    final datumHash = list.length > 2
-        ? DatumHash(Uint8List.fromList((list[2] as CborBytes).bytes))
-        : null;
+    final datumHash =
+        list.length > 2 ? DatumHash(Uint8List.fromList((list[2] as CborBytes).bytes)) : null;
 
     return PreBabbageTransactionOutput(
       address: address,
@@ -179,9 +176,8 @@ final class TransactionOutput extends ShelleyMultiAssetTransactionOutput {
     final datumOption = map[const CborSmallInt(2)] != null
         ? DatumOption.fromCbor(map[const CborSmallInt(2)]!)
         : null;
-    final scriptRef = map[const CborSmallInt(3)] != null
-        ? ScriptRef.fromCbor(map[const CborSmallInt(3)]!)
-        : null;
+    final scriptRef =
+        map[const CborSmallInt(3)] != null ? ScriptRef.fromCbor(map[const CborSmallInt(3)]!) : null;
 
     return TransactionOutput(
       address: address,

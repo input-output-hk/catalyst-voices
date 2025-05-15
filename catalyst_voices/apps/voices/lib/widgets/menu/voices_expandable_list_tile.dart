@@ -31,8 +31,7 @@ class VoicesExpandableListTile extends StatefulWidget {
   });
 
   @override
-  State<VoicesExpandableListTile> createState() =>
-      _VoicesExpandableListTileState();
+  State<VoicesExpandableListTile> createState() => _VoicesExpandableListTileState();
 }
 
 class _VoicesExpandableListTileState extends State<VoicesExpandableListTile> {
@@ -45,15 +44,12 @@ class _VoicesExpandableListTileState extends State<VoicesExpandableListTile> {
         Container(
           clipBehavior: Clip.antiAlias,
           decoration: BoxDecoration(
-            color: _isExpanded
-                ? Theme.of(context).colors.onSurfaceSecondary08
-                : null,
+            color: _isExpanded ? Theme.of(context).colors.onSurfaceSecondary08 : null,
             borderRadius: BorderRadius.only(
               topLeft: const Radius.circular(25),
               topRight: const Radius.circular(25),
               bottomLeft: const Radius.circular(25),
-              bottomRight:
-                  _isExpanded ? Radius.zero : const Radius.circular(25),
+              bottomRight: _isExpanded ? Radius.zero : const Radius.circular(25),
             ),
           ),
           child: VoicesListTile(

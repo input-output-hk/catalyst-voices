@@ -29,9 +29,7 @@ class BulletList extends StatelessWidget {
         for (final item in items)
           _BulletItem(
             text: item,
-            style: style ??
-                Theme.of(context).textTheme.bodySmall ??
-                const TextStyle(),
+            style: style ?? Theme.of(context).textTheme.bodySmall ?? const TextStyle(),
           ),
       ].separatedBy(SizedBox(height: spacing)).toList(),
     );

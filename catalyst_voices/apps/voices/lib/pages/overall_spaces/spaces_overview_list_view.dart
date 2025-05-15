@@ -39,10 +39,8 @@ class _SpacesListViewState extends State<SpacesListView> {
               final space = state[index];
 
               return switch (space) {
-                Space.discovery =>
-                  DiscoveryOverview(key: Key('SpaceOverview.${space.name}')),
-                Space.workspace =>
-                  WorkspaceOverview(key: Key('SpaceOverview.${space.name}')),
+                Space.discovery => DiscoveryOverview(key: Key('SpaceOverview.${space.name}')),
+                Space.workspace => WorkspaceOverview(key: Key('SpaceOverview.${space.name}')),
                 Space.voting => GreyOutContainer(
                     child: VotingOverview(
                       key: Key('SpaceOverview.${space.name}'),

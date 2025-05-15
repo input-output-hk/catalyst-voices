@@ -94,8 +94,7 @@ class _FakeCatalystPrivateKey extends Fake implements CatalystPrivateKey {
   _FakeCatalystPrivateKey({required this.bytes});
 }
 
-class _FakeCatalystPrivateKeyFactory extends Fake
-    implements CatalystPrivateKeyFactory {
+class _FakeCatalystPrivateKeyFactory extends Fake implements CatalystPrivateKeyFactory {
   @override
   CatalystPrivateKey create(Uint8List bytes) {
     return _FakeCatalystPrivateKey(bytes: bytes);

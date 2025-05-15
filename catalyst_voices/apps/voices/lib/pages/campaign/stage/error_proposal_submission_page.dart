@@ -12,8 +12,7 @@ class ErrorProposalSubmissionPage extends StatelessWidget {
     return CampaignBackground(
       child: VoicesErrorIndicator(
         message: const LocalizedUnknownException().message(context),
-        onRetry: () async =>
-            context.read<CampaignStageCubit>().getCampaignStage(),
+        onRetry: () async => context.read<CampaignStageCubit>().getCampaignStage(),
       ),
     );
   }

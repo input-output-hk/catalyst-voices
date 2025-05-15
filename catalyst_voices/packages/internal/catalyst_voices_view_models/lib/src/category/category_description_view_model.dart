@@ -1,5 +1,4 @@
-import 'package:catalyst_voices_models/catalyst_voices_models.dart'
-    show CategoryDescription;
+import 'package:catalyst_voices_models/catalyst_voices_models.dart' show CategoryDescription;
 import 'package:equatable/equatable.dart';
 
 class CategoryDescriptionViewModel extends Equatable {
@@ -11,8 +10,7 @@ class CategoryDescriptionViewModel extends Equatable {
     required this.description,
   });
 
-  factory CategoryDescriptionViewModel.dummy() =>
-      const CategoryDescriptionViewModel(
+  factory CategoryDescriptionViewModel.dummy() => const CategoryDescriptionViewModel(
         title: 'Brief',
         description: '''
 Use cases deliver adoption and real world utility of Cardano to a global base of users and customers. Use cases can be in the nature of applications, products, and new services that lay the foundations for innovative business ideas to flourish on Cardano.

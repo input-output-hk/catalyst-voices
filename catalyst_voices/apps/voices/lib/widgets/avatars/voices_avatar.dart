@@ -57,8 +57,7 @@ class VoicesAvatar extends StatelessWidget {
       width: radius * 2,
       height: radius * 2,
       decoration: BoxDecoration(
-        color:
-            backgroundColor ?? Theme.of(context).colorScheme.primaryContainer,
+        color: backgroundColor ?? Theme.of(context).colorScheme.primaryContainer,
         borderRadius: BorderRadius.circular(radius),
         border: border,
       ),

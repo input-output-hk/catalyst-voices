@@ -88,9 +88,7 @@ class _WorkspacePageState extends State<WorkspacePage>
   }
 
   void _dontShowCampaignSubmissionClosingDialog(bool value) {
-    context
-        .read<SessionCubit>()
-        .updateShowSubmissionClosingWarning(value: !value);
+    context.read<SessionCubit>().updateShowSubmissionClosingWarning(value: !value);
   }
 
   void _showDeleteErrorSnackBar() {
@@ -129,11 +127,7 @@ class _WorkspacePageState extends State<WorkspacePage>
   Future<void> _showSubmissionClosingWarningDialog([
     DateTime? submissionCloseDate,
   ]) async {
-    final canShow = context
-        .read<SessionCubit>()
-        .state
-        .settings
-        .showSubmissionClosingWarning;
+    final canShow = context.read<SessionCubit>().state.settings.showSubmissionClosingWarning;
 
     if (submissionCloseDate == null || !canShow || !mounted) {
       return;

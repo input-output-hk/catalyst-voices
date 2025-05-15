@@ -111,8 +111,7 @@ class _UsernameText extends StatelessWidget {
   Widget build(BuildContext context) {
     return UsernameText(
       data,
-      style: context.textTheme.titleSmall
-          ?.copyWith(color: context.colors.textOnPrimaryLevel0),
+      style: context.textTheme.titleSmall?.copyWith(color: context.colors.textOnPrimaryLevel0),
     );
   }
 }

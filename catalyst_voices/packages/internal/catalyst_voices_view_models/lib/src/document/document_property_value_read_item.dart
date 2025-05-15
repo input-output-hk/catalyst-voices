@@ -9,8 +9,7 @@ final class DocumentLinkReadItem extends DocumentPropertyValueListItem<String> {
   });
 }
 
-final class DocumentMarkdownListItem
-    extends DocumentPropertyValueListItem<MarkdownData> {
+final class DocumentMarkdownListItem extends DocumentPropertyValueListItem<MarkdownData> {
   const DocumentMarkdownListItem({
     required super.id,
     required super.title,

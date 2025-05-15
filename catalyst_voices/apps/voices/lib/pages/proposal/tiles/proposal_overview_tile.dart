@@ -32,16 +32,14 @@ class ProposalOverviewTile extends StatelessWidget {
                     categoryName,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: textTheme.titleSmall
-                        ?.copyWith(color: colors.textOnPrimaryLevel1),
+                    style: textTheme.titleSmall?.copyWith(color: colors.textOnPrimaryLevel1),
                   ),
                   const SizedBox(height: 8),
                   Text(
                     proposalTitle,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: textTheme.headlineLarge
-                        ?.copyWith(color: colors.textOnPrimaryLevel0),
+                    style: textTheme.headlineLarge?.copyWith(color: colors.textOnPrimaryLevel0),
                   ),
                 ],
               ),

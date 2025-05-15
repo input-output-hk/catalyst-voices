@@ -57,10 +57,8 @@ class SimpleTreeViewChildRow extends StatelessWidget {
       if (isSelected) WidgetState.selected,
     };
 
-    final backgroundColor =
-        _BackgroundColor(theme.colors, theme.colorScheme).resolve(widgetStates);
-    final foregroundColor =
-        _ForegroundColor(theme.colors).resolve(widgetStates);
+    final backgroundColor = _BackgroundColor(theme.colors, theme.colorScheme).resolve(widgetStates);
+    final foregroundColor = _ForegroundColor(theme.colors).resolve(widgetStates);
 
     final textStyle = (textTheme.labelLarge ?? const TextStyle()).copyWith(
       color: foregroundColor,
@@ -79,9 +77,7 @@ class SimpleTreeViewChildRow extends StatelessWidget {
         child: ConstrainedBox(
           constraints: const BoxConstraints.tightFor(height: 40),
           child: Material(
-            type: backgroundColor != null
-                ? MaterialType.canvas
-                : MaterialType.transparency,
+            type: backgroundColor != null ? MaterialType.canvas : MaterialType.transparency,
             color: backgroundColor,
             textStyle: textStyle,
             child: InkWell(
@@ -239,8 +235,7 @@ class _SimpleTreeViewIndent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(left: 24)
-          .add(const EdgeInsets.symmetric(horizontal: 4)),
+      padding: const EdgeInsets.only(left: 24).add(const EdgeInsets.symmetric(horizontal: 4)),
       child: SizedBox(
         width: 24,
         child: _SimpleTreeViewIndentJoint(showBottom: showBottomJoint),

@@ -14,9 +14,7 @@ abstract interface class SignalHandler<Signal extends Object> {
 /// obtained from the [signalEmitter] and calls the [handleSignal].
 ///
 /// After the widget is disposed the signal stream is disposed too.
-mixin SignalHandlerStateMixin<
-    Emitter extends SignalEmitter<Signal>,
-    Signal extends Object,
+mixin SignalHandlerStateMixin<Emitter extends SignalEmitter<Signal>, Signal extends Object,
     T extends StatefulWidget> on State<T> implements SignalHandler<Signal> {
   StreamSubscription<Signal>? _signalSub;
 

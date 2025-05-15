@@ -274,10 +274,7 @@ class _ProposalInfo extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        if (proposalStage.isDraft)
-          const DraftProposalChip()
-        else
-          const FinalProposalChip(),
+        if (proposalStage.isDraft) const DraftProposalChip() else const FinalProposalChip(),
         const SizedBox(width: 4),
         ProposalVersionChip(version: version.toString()),
         if (showLastUpdate && lastUpdate != null) ...[
@@ -309,8 +306,7 @@ class _ProposalInfo extends StatelessWidget {
       TimezonePreferences.utc => lastUpdate!.toUtc(),
       TimezonePreferences.local => lastUpdate!.toLocal(),
     };
-    final dt =
-        DateFormatter.formatDateTimeParts(effectiveData, includeYear: true);
+    final dt = DateFormatter.formatDateTimeParts(effectiveData, includeYear: true);
 
     return context.l10n.publishedOn(dt.date, dt.time);
   }

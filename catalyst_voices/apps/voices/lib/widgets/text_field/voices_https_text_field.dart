@@ -27,8 +27,7 @@ class VoicesHttpsTextField extends StatefulWidget {
   State<VoicesHttpsTextField> createState() => _VoicesHttpsTextFieldState();
 }
 
-class _VoicesHttpsTextFieldState extends State<VoicesHttpsTextField>
-    with LaunchUrlMixin {
+class _VoicesHttpsTextFieldState extends State<VoicesHttpsTextField> with LaunchUrlMixin {
   final _textFieldKey = GlobalKey<VoicesTextFieldState>();
 
   TextEditingController? _controller;
@@ -56,8 +55,7 @@ class _VoicesHttpsTextFieldState extends State<VoicesHttpsTextField>
         onFieldSubmitted: widget.onFieldSubmitted,
         textValidator: widget.validator,
         decoration: VoicesTextFieldDecoration(
-          hintText:
-              widget.enabled ? context.l10n.noUrlAdded : context.l10n.addUrl,
+          hintText: widget.enabled ? context.l10n.noUrlAdded : context.l10n.addUrl,
           prefixIcon: VoicesAssets.icons.link.buildIcon(),
           showStatusSuffixIcon: widget.enabled,
           suffixIcon: ValueListenableBuilder(

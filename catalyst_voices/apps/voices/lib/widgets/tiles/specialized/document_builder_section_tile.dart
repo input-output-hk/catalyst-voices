@@ -47,8 +47,7 @@ class DocumentBuilderSectionTile extends StatefulWidget {
   }
 }
 
-class _DocumentBuilderSectionTileState
-    extends State<DocumentBuilderSectionTile> {
+class _DocumentBuilderSectionTileState extends State<DocumentBuilderSectionTile> {
   final _formKey = GlobalKey<FormState>();
 
   late final WidgetStatesController _statesController;

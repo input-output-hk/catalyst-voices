@@ -70,10 +70,7 @@ class _AccountUsernameTileState extends State<AccountUsernameTile> {
 
     _focusNode = FocusNode();
 
-    _sub = bloc.stream
-        .map((event) => event.username)
-        .distinct()
-        .listen(_handleUsernameChange);
+    _sub = bloc.stream.map((event) => event.username).distinct().listen(_handleUsernameChange);
   }
 
   void _handleControllerChange() {

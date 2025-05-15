@@ -40,8 +40,7 @@ class WorkspaceProposalCard extends StatelessWidget {
             children: [
               _Body(proposal),
               Offstage(
-                offstage:
-                    isSubmitted || isLocalDraft || proposal.versions.length < 2,
+                offstage: isSubmitted || isLocalDraft || proposal.versions.length < 2,
                 child: ProposalIterationHistory(
                   proposal: proposal,
                 ),
@@ -84,14 +83,11 @@ class _Body extends StatelessWidget {
           subValue: context.l10n.fundNoCategory(14),
         ),
         _CampaignData(
-          leadValue:
-              CryptocurrencyFormatter.decimalFormat(proposal.fundsRequested),
+          leadValue: CryptocurrencyFormatter.decimalFormat(proposal.fundsRequested),
           subValue: context.l10n.proposalViewFundingRequested,
         ),
         _CampaignData(
-          leadValue: commentsCount == 0
-              ? context.l10n.notAvailableAbbr
-              : commentsCount.toString(),
+          leadValue: commentsCount == 0 ? context.l10n.notAvailableAbbr : commentsCount.toString(),
           subValue: context.l10n.comments(commentsCount),
         ),
         ProposalMenuActionButton(
@@ -118,8 +114,7 @@ class _BodyHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final headerColor = _ProposalSubmitState.of(context)?.headerColor(context);
-    final labelColor =
-        _ProposalSubmitState.of(context)?.headerLabelColor(context);
+    final labelColor = _ProposalSubmitState.of(context)?.headerLabelColor(context);
     return ConstrainedBox(
       constraints: const BoxConstraints(maxWidth: 439),
       child: Column(
@@ -157,8 +152,7 @@ class _CampaignData extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final labelColor =
-        _ProposalSubmitState.of(context)?.dataLabelColor(context);
+    final labelColor = _ProposalSubmitState.of(context)?.dataLabelColor(context);
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -193,17 +187,14 @@ class _ProposalSubmitState extends InheritedWidget {
       ? context.colors.onSurfacePrimary08
       : context.colors.elevationsOnSurfaceNeutralLv1White;
 
-  Color dataLabelColor(BuildContext context) => isSubmitted
-      ? context.colors.primaryContainer
-      : context.colors.textOnPrimaryLevel1;
+  Color dataLabelColor(BuildContext context) =>
+      isSubmitted ? context.colors.primaryContainer : context.colors.textOnPrimaryLevel1;
 
-  Color headerColor(BuildContext context) => isSubmitted
-      ? context.colors.textOnPrimaryWhite
-      : context.colors.textOnPrimaryLevel0;
+  Color headerColor(BuildContext context) =>
+      isSubmitted ? context.colors.textOnPrimaryWhite : context.colors.textOnPrimaryLevel0;
 
-  Color headerLabelColor(BuildContext context) => isSubmitted
-      ? context.colors.textOnPrimaryWhite
-      : context.colors.textOnPrimaryLevel1;
+  Color headerLabelColor(BuildContext context) =>
+      isSubmitted ? context.colors.textOnPrimaryWhite : context.colors.textOnPrimaryLevel1;
 
   @override
   bool updateShouldNotify(covariant _ProposalSubmitState oldWidget) {

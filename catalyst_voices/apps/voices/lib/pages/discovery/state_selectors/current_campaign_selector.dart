@@ -96,8 +96,7 @@ class CurrentCampaignData extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<DiscoveryCubit, DiscoveryState,
-        CurrentCampaignInfoViewModel>(
+    return BlocSelector<DiscoveryCubit, DiscoveryState, CurrentCampaignInfoViewModel>(
       key: const Key('CurrentCampaignData'),
       selector: (state) {
         return state.campaign.currentCampaign;

@@ -15,12 +15,10 @@ extension SpaceExt on Space {
       };
 
   Color backgroundColor(BuildContext context) => switch (this) {
-        Space.discovery =>
-          Theme.of(context).colors.iconsSecondary.withAlpha(41),
+        Space.discovery => Theme.of(context).colors.iconsSecondary.withAlpha(41),
         Space.workspace => Theme.of(context).colorScheme.primaryContainer,
         Space.voting => Theme.of(context).colors.warningContainer,
-        Space.fundedProjects =>
-          Theme.of(context).colors.iconsSecondary.withAlpha(41),
+        Space.fundedProjects => Theme.of(context).colors.iconsSecondary.withAlpha(41),
         Space.treasury => Theme.of(context).colors.successContainer,
       };
 

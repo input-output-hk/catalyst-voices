@@ -2,8 +2,7 @@ import 'dart:async';
 import 'dart:js_interop';
 
 import 'package:catalyst_cardano_platform_interface/catalyst_cardano_platform_interface.dart';
-import 'package:catalyst_cardano_web/src/interop/catalyst_cardano_interop.dart'
-    as interop;
+import 'package:catalyst_cardano_web/src/interop/catalyst_cardano_interop.dart' as interop;
 import 'package:flutter_web_plugins/flutter_web_plugins.dart' show Registrar;
 
 /// The web implementation of [CatalystCardanoPlatform].

@@ -20,8 +20,7 @@ class SubmitProposalForReviewDialog extends StatefulWidget {
   });
 
   @override
-  State<SubmitProposalForReviewDialog> createState() =>
-      _SubmitProposalForReviewDialogState();
+  State<SubmitProposalForReviewDialog> createState() => _SubmitProposalForReviewDialogState();
 
   /// Shows a dialog and returns a [Future] that resolves to `true`
   /// if the user wants to submit the proposal for review
@@ -155,8 +154,7 @@ class _ListItems extends StatelessWidget {
   }
 }
 
-class _SubmitProposalForReviewDialogState
-    extends State<SubmitProposalForReviewDialog> {
+class _SubmitProposalForReviewDialogState extends State<SubmitProposalForReviewDialog> {
   bool _agreementConfirmed = false;
 
   @override
@@ -270,8 +268,7 @@ class _VersionUpdateSection extends StatelessWidget {
           const SizedBox(height: 2),
           Text(
             proposalTitle,
-            style: theme.textTheme.titleSmall
-                ?.copyWith(fontWeight: FontWeight.bold),
+            style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 16),
           _VersionUpdate(

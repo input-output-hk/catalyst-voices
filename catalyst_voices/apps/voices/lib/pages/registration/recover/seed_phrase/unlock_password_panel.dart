@@ -126,24 +126,20 @@ class _UnlockPasswordPanelState extends State<UnlockPasswordPanel> {
   void initState() {
     super.initState();
 
-    final unlockPasswordState = RegistrationCubit.of(context)
-        .state
-        .recoverStateData
-        .unlockPasswordState;
+    final unlockPasswordState =
+        RegistrationCubit.of(context).state.recoverStateData.unlockPasswordState;
 
     final password = unlockPasswordState.password.value;
     final confirmPassword = unlockPasswordState.confirmPassword.value;
 
     final passwordValue = TextEditingValueExt.collapsedAtEndOf(password);
-    final confirmPasswordValue =
-        TextEditingValueExt.collapsedAtEndOf(confirmPassword);
+    final confirmPasswordValue = TextEditingValueExt.collapsedAtEndOf(confirmPassword);
 
     _passwordController = TextEditingController.fromValue(passwordValue)
       ..addListener(_onPasswordChanged);
 
-    _confirmPasswordController =
-        TextEditingController.fromValue(confirmPasswordValue)
-          ..addListener(_onConfirmPasswordChanged);
+    _confirmPasswordController = TextEditingController.fromValue(confirmPasswordValue)
+      ..addListener(_onConfirmPasswordChanged);
   }
 
   void _clearPasswordAndGoBack() {

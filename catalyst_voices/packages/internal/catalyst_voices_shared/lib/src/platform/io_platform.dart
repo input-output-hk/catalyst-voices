@@ -5,8 +5,7 @@ import 'package:catalyst_voices_shared/src/platform/platform_key.dart';
 final class CatalystPlatform {
   static bool get isAndroid => Platform.isAndroid;
 
-  static bool get isDesktop =>
-      Platform.isLinux || Platform.isMacOS || Platform.isWindows;
+  static bool get isDesktop => Platform.isLinux || Platform.isMacOS || Platform.isWindows;
 
   static bool get isFuchsia => Platform.isFuchsia;
 

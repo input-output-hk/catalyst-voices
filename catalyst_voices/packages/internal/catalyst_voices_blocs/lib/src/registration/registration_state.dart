@@ -74,8 +74,7 @@ final class RegistrationState extends Equatable {
       baseProfileStateData: baseProfileStateData ?? this.baseProfileStateData,
       keychainStateData: keychainStateData ?? this.keychainStateData,
       walletLinkStateData: walletLinkStateData ?? this.walletLinkStateData,
-      registrationStateData:
-          registrationStateData ?? this.registrationStateData,
+      registrationStateData: registrationStateData ?? this.registrationStateData,
       recoverStateData: recoverStateData ?? this.recoverStateData,
     );
   }

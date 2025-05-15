@@ -48,8 +48,7 @@ void main() {
 
       setUp(() {
         when(() => keychain.id).thenReturn('keychain_id');
-        when(keychain.getMasterKey)
-            .thenAnswer((_) async => _FakeCatalystPrivateKey(Uint8List(32)));
+        when(keychain.getMasterKey).thenAnswer((_) async => _FakeCatalystPrivateKey(Uint8List(32)));
       });
 
       tearDown(() {

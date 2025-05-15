@@ -5,13 +5,10 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 String _buildExpireKey(String key) => '$key.expireDate';
 
 Set<String> _extendAllowList(Set<String> allowList) {
-  return allowList
-      .expand((element) => [element, _buildExpireKey(element)])
-      .toSet();
+  return allowList.expand((element) => [element, _buildExpireKey(element)]).toSet();
 }
 
-base class LocalTllCache extends LocalStorage
-    implements TtlCache<String, String> {
+base class LocalTllCache extends LocalStorage implements TtlCache<String, String> {
   final Duration _defaultTtl;
 
   LocalTllCache({

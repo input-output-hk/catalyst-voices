@@ -3,7 +3,6 @@
 
 // cSpell:ignoreRegExp cardano/Fftx
 
-use cardano_blockchain_types::TransactionId;
 use catalyst_types::catalyst_id::CatalystId;
 use futures::StreamExt;
 
@@ -40,45 +39,6 @@ async fn test_get_assets_by_stake_addr() {
     )
     .await
     .unwrap();
-
-    while let Some(row_res) = row_stream.next().await {
-        drop(row_res.unwrap());
-    }
-}
-
-#[ignore = "An integration test which requires a running Scylla node instance, disabled from `testunit` CI run"]
-#[tokio::test]
-async fn get_catalyst_id_by_stake_address() {
-    use rbac::get_catalyst_id_from_stake_address::{Query, QueryParams};
-
-    let Ok((session, _)) = get_shared_session().await else {
-        panic!("{SESSION_ERR_MSG}");
-    };
-
-    let mut row_stream = Query::execute(&session, QueryParams {
-        stake_address: stake_address_1().into(),
-    })
-    .await
-    .unwrap();
-
-    while let Some(row_res) = row_stream.next().await {
-        drop(row_res.unwrap());
-    }
-}
-
-#[ignore = "An integration test which requires a running Scylla node instance, disabled from `testunit` CI run"]
-#[tokio::test]
-async fn get_catalyst_id_by_transaction_id() {
-    use rbac::get_catalyst_id_from_transaction_id::{Query, QueryParams};
-
-    let Ok((session, _)) = get_shared_session().await else {
-        panic!("{SESSION_ERR_MSG}");
-    };
-
-    let txn_id = TransactionId::new(&[1, 2, 3]).into();
-    let mut row_stream = Query::execute(&session, QueryParams { txn_id })
-        .await
-        .unwrap();
 
     while let Some(row_res) = row_stream.next().await {
         drop(row_res.unwrap());

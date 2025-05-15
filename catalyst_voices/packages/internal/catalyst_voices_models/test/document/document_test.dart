@@ -242,8 +242,7 @@ void main() {
       });
 
       test('property nested in list is found', () {
-        final nodeId =
-            DocumentNodeId.root.child('setup').child('items').child('0');
+        final nodeId = DocumentNodeId.root.child('setup').child('items').child('0');
         expect(
           document.getProperty(nodeId),
           isA<DocumentValueProperty>(),
@@ -268,8 +267,7 @@ void main() {
       });
 
       test('not existing list property is not found', () {
-        final nodeId =
-            DocumentNodeId.root.child('setup').child('items').child('1');
+        final nodeId = DocumentNodeId.root.child('setup').child('items').child('1');
         expect(
           document.getProperty(nodeId),
           isNull,
@@ -281,8 +279,7 @@ void main() {
       test('getting value from a nested property works', () {
         final titleProperty = DocumentValueProperty(
           schema: DocumentGenericStringSchema.optional(
-            nodeId:
-                DocumentNodeId.root.child('setup').child('items').child('0'),
+            nodeId: DocumentNodeId.root.child('setup').child('items').child('0'),
           ),
           value: 'Test title',
           validationResult: const SuccessfulDocumentValidation(),

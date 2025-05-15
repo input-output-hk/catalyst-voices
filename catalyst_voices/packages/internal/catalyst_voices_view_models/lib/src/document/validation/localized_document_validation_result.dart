@@ -4,8 +4,7 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 
-final class LocalizedDocumentConstValueMismatch
-    extends LocalizedDocumentValidationResult {
+final class LocalizedDocumentConstValueMismatch extends LocalizedDocumentValidationResult {
   final Object constValue;
 
   const LocalizedDocumentConstValueMismatch({required this.constValue});
@@ -19,14 +18,12 @@ final class LocalizedDocumentConstValueMismatch
     if (constValue is bool && constValue) {
       return context.l10n.errorValidationConstsValueBoolMismatch;
     } else {
-      return context.l10n
-          .errorValidationConstValueMismatch(constValue.toString());
+      return context.l10n.errorValidationConstValueMismatch(constValue.toString());
     }
   }
 }
 
-final class LocalizedDocumentEnumValuesMismatch
-    extends LocalizedDocumentValidationResult {
+final class LocalizedDocumentEnumValuesMismatch extends LocalizedDocumentValidationResult {
   final List<Object> enumValues;
 
   const LocalizedDocumentEnumValuesMismatch({required this.enumValues});
@@ -42,8 +39,7 @@ final class LocalizedDocumentEnumValuesMismatch
   }
 }
 
-final class LocalizedDocumentListItemsNotUnique
-    extends LocalizedDocumentValidationResult {
+final class LocalizedDocumentListItemsNotUnique extends LocalizedDocumentValidationResult {
   const LocalizedDocumentListItemsNotUnique();
 
   @override
@@ -55,8 +51,7 @@ final class LocalizedDocumentListItemsNotUnique
   }
 }
 
-final class LocalizedDocumentListItemsOutOfRange
-    extends LocalizedDocumentValidationResult {
+final class LocalizedDocumentListItemsOutOfRange extends LocalizedDocumentValidationResult {
   final NumRange<int> range;
 
   const LocalizedDocumentListItemsOutOfRange({required this.range});
@@ -82,8 +77,7 @@ final class LocalizedDocumentListItemsOutOfRange
   }
 }
 
-final class LocalizedDocumentNumOutOfRange
-    extends LocalizedDocumentValidationResult {
+final class LocalizedDocumentNumOutOfRange extends LocalizedDocumentValidationResult {
   final NumRange<num> range;
 
   const LocalizedDocumentNumOutOfRange({required this.range});
@@ -109,8 +103,7 @@ final class LocalizedDocumentNumOutOfRange
   }
 }
 
-final class LocalizedDocumentPatternMismatch
-    extends LocalizedDocumentValidationResult {
+final class LocalizedDocumentPatternMismatch extends LocalizedDocumentValidationResult {
   const LocalizedDocumentPatternMismatch();
 
   @override
@@ -122,8 +115,7 @@ final class LocalizedDocumentPatternMismatch
   }
 }
 
-final class LocalizedDocumentStringOutOfRange
-    extends LocalizedDocumentValidationResult {
+final class LocalizedDocumentStringOutOfRange extends LocalizedDocumentValidationResult {
   final NumRange<int> range;
 
   const LocalizedDocumentStringOutOfRange({required this.range});
@@ -159,14 +151,10 @@ sealed class LocalizedDocumentValidationResult extends Equatable {
     DocumentValidationResult result,
   ) {
     return switch (result) {
-      SuccessfulDocumentValidation() =>
-        const LocalizedSuccessfulDocumentValidation(),
-      MissingRequiredDocumentValue() =>
-        const LocalizedMissingRequiredDocumentValue(),
-      DocumentNumOutOfRange() =>
-        LocalizedDocumentNumOutOfRange(range: result.expectedRange),
-      DocumentStringOutOfRange() =>
-        LocalizedDocumentStringOutOfRange(range: result.expectedRange),
+      SuccessfulDocumentValidation() => const LocalizedSuccessfulDocumentValidation(),
+      MissingRequiredDocumentValue() => const LocalizedMissingRequiredDocumentValue(),
+      DocumentNumOutOfRange() => LocalizedDocumentNumOutOfRange(range: result.expectedRange),
+      DocumentStringOutOfRange() => LocalizedDocumentStringOutOfRange(range: result.expectedRange),
       DocumentItemsOutOfRange() =>
         LocalizedDocumentListItemsOutOfRange(range: result.expectedRange),
       DocumentItemsNotUnique() => const LocalizedDocumentListItemsNotUnique(),
@@ -186,8 +174,7 @@ sealed class LocalizedDocumentValidationResult extends Equatable {
   String? message(BuildContext context);
 }
 
-final class LocalizedMissingRequiredDocumentValue
-    extends LocalizedDocumentValidationResult {
+final class LocalizedMissingRequiredDocumentValue extends LocalizedDocumentValidationResult {
   const LocalizedMissingRequiredDocumentValue();
 
   @override
@@ -199,8 +186,7 @@ final class LocalizedMissingRequiredDocumentValue
   }
 }
 
-final class LocalizedSuccessfulDocumentValidation
-    extends LocalizedDocumentValidationResult {
+final class LocalizedSuccessfulDocumentValidation extends LocalizedDocumentValidationResult {
   const LocalizedSuccessfulDocumentValidation();
 
   @override

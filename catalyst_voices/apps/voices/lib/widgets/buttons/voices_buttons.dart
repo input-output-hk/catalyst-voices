@@ -138,9 +138,7 @@ class FavoriteButton extends StatelessWidget {
       onTap: onChanged != null ? () => onChanged.call(!isFavorite) : null,
       circle: circle,
       child: CatalystSvgIcon.asset(
-        isFavorite
-            ? VoicesAssets.icons.starFilled.path
-            : VoicesAssets.icons.starOutlined.path,
+        isFavorite ? VoicesAssets.icons.starFilled.path : VoicesAssets.icons.starOutlined.path,
         color: context.colorScheme.primary,
       ),
     );
@@ -293,8 +291,7 @@ class VoicesEditCancelButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final text =
-        isEditing ? context.l10n.cancelButtonText : context.l10n.editButtonText;
+    final text = isEditing ? context.l10n.cancelButtonText : context.l10n.editButtonText;
     final textStyle = theme.textTheme.labelSmall!;
 
     if (hasError) {

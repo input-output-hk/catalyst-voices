@@ -15,8 +15,7 @@ void main() {
     });
 
     test('nested child nodes add paths correctly', () {
-      final childNode =
-          DocumentNodeId.root.child('section1').child('paragraph1');
+      final childNode = DocumentNodeId.root.child('section1').child('paragraph1');
       expect(childNode.paths, ['section1', 'paragraph1']);
       expect(childNode.value, 'section1.paragraph1');
     });
@@ -51,10 +50,7 @@ void main() {
     });
 
     test('multiple parent calls reduce paths step by step', () {
-      final node = DocumentNodeId.root
-          .child('section1')
-          .child('paragraph1')
-          .child('sentence1');
+      final node = DocumentNodeId.root.child('section1').child('paragraph1').child('sentence1');
       final parentNode1 = node.parent();
       final parentNode2 = parentNode1.parent();
       expect(parentNode1.value, 'section1.paragraph1');

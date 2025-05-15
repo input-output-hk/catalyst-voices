@@ -411,9 +411,7 @@ final class ProposalServiceImpl implements ProposalService {
 
   @override
   Stream<List<Proposal>> watchLatestProposals({int? limit}) {
-    return _proposalRepository
-        .watchLatestProposals(limit: limit)
-        .switchMap((documents) async* {
+    return _proposalRepository.watchLatestProposals(limit: limit).switchMap((documents) async* {
       if (documents.isEmpty) {
         yield [];
         return;
@@ -425,8 +423,7 @@ final class ProposalServiceImpl implements ProposalService {
       yield* Rx.combineLatest(
         proposalsDataStreams,
         (List<ProposalData?> proposalsData) async {
-          final validProposalsData =
-              proposalsData.whereType<ProposalData>().toList();
+          final validProposalsData = proposalsData.whereType<ProposalData>().toList();
           final proposalsWithVersions = await Future.wait(
             validProposalsData.map(_addVersionsToProposal),
           );
@@ -473,8 +470,7 @@ final class ProposalServiceImpl implements ProposalService {
         yield* Rx.combineLatest(
           proposalsDataStreams,
           (List<ProposalData?> proposalsData) async {
-            final validProposalsData =
-                proposalsData.whereType<ProposalData>().toList();
+            final validProposalsData = proposalsData.whereType<ProposalData>().toList();
 
             final groupedProposals = groupBy(
               validProposalsData,
@@ -557,8 +553,7 @@ final class ProposalServiceImpl implements ProposalService {
     ProposalDocument doc,
   ) async {
     final selfRef = doc.metadata.selfRef;
-    final campaign =
-        await _campaignRepository.getCategory(doc.metadata.categoryId);
+    final campaign = await _campaignRepository.getCategory(doc.metadata.categoryId);
 
     final commentsCountStream = _proposalRepository.watchCommentsCount(
       refTo: selfRef,

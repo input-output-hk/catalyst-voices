@@ -2,8 +2,7 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:equatable/equatable.dart';
 
-final class ProposalVersion extends Equatable
-    implements Comparable<ProposalVersion> {
+final class ProposalVersion extends Equatable implements Comparable<ProposalVersion> {
   final DocumentRef selfRef;
   final String title;
   final DateTime createdAt;

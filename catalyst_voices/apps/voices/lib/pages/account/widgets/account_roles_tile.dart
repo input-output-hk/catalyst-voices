@@ -54,8 +54,7 @@ class _AccountRolesTileState extends State<_AccountRolesTile> {
   }
 
   Future<void> _addAccountRole() async {
-    final isVerified =
-        context.read<AccountCubit>().state.accountPublicStatus.isVerified;
+    final isVerified = context.read<AccountCubit>().state.accountPublicStatus.isVerified;
     if (!isVerified) {
       unawaited(VerificationRequiredDialog.show(context));
       return;

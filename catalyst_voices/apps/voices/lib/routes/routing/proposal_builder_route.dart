@@ -38,8 +38,7 @@ final class ProposalBuilderDraftRoute extends GoRouteData
   @override
   Widget build(BuildContext context, GoRouterState state) {
     final categoryId = this.categoryId;
-    final categoryRef =
-        categoryId != null ? SignedDocumentRef(id: categoryId) : null;
+    final categoryRef = categoryId != null ? SignedDocumentRef(id: categoryId) : null;
     return ProposalBuilderPage(categoryId: categoryRef);
   }
 }

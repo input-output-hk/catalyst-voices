@@ -20,8 +20,7 @@ class ProposalSubmissionClosesText extends StatelessWidget {
         timestampTextStyle: WidgetStatePropertyAll<TextStyle>(
           context.textTheme.titleLarge ?? const TextStyle(),
         ),
-        foregroundColor:
-            WidgetStatePropertyAll(context.colors.textOnPrimaryLevel1),
+        foregroundColor: WidgetStatePropertyAll(context.colors.textOnPrimaryLevel1),
       ),
       child: TimezoneDateTimeText(
         dateTime,

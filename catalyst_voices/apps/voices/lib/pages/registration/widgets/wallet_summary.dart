@@ -169,9 +169,7 @@ class _WalletSummaryBalance extends StatelessWidget {
           Text(
             key: const Key('WalletBalanceValue'),
             balance,
-            style: showLowBalance
-                ? TextStyle(color: Theme.of(context).colors.iconsError)
-                : null,
+            style: showLowBalance ? TextStyle(color: Theme.of(context).colors.iconsError) : null,
           ),
           if (showLowBalance) ...[
             const SizedBox(width: 4),
@@ -231,8 +229,7 @@ class _WalletSummaryName extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _WalletSummaryItem(
-      label:
-          Text(context.l10n.nameOfWallet, key: const Key('NameOfWalletLabel')),
+      label: Text(context.l10n.nameOfWallet, key: const Key('NameOfWalletLabel')),
       value: Text(
         walletName,
         key: const Key('NameOfWalletValue'),

@@ -268,8 +268,7 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
       textOnPrimaryLevel0: textOnPrimaryLevel0 ?? this.textOnPrimaryLevel0,
       textOnPrimaryLevel1: textOnPrimaryLevel1 ?? this.textOnPrimaryLevel1,
       textOnPrimaryWhite: textOnPrimaryWhite ?? this.textOnPrimaryWhite,
-      textOnPrimaryContainer:
-          textOnPrimaryContainer ?? this.textOnPrimaryContainer,
+      textOnPrimaryContainer: textOnPrimaryContainer ?? this.textOnPrimaryContainer,
       textDisabled: textDisabled ?? this.textDisabled,
       success: success ?? this.success,
       onSuccess: onSuccess ?? this.onSuccess,
@@ -282,29 +281,22 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
       onSurfaceNeutral08: onSurfaceNeutral08 ?? this.onSurfaceError08,
       onSurfaceNeutral012: onSurfaceNeutral012 ?? this.onSurfaceError012,
       onSurfaceNeutral016: onSurfaceNeutral016 ?? this.onSurfaceError016,
-      onSurfaceNeutralOpaqueLv0:
-          onSurfaceNeutralOpaqueLv0 ?? this.onSurfaceNeutralOpaqueLv0,
-      onSurfaceNeutralOpaqueLv1:
-          onSurfaceNeutralOpaqueLv0 ?? this.onSurfaceNeutralOpaqueLv1,
-      onSurfaceNeutralOpaqueLv2:
-          onSurfaceNeutralOpaqueLv0 ?? this.onSurfaceNeutralOpaqueLv2,
-      onSurfacePrimaryContainer:
-          onSurfacePrimaryContainer ?? this.onSurfacePrimaryContainer,
+      onSurfaceNeutralOpaqueLv0: onSurfaceNeutralOpaqueLv0 ?? this.onSurfaceNeutralOpaqueLv0,
+      onSurfaceNeutralOpaqueLv1: onSurfaceNeutralOpaqueLv0 ?? this.onSurfaceNeutralOpaqueLv1,
+      onSurfaceNeutralOpaqueLv2: onSurfaceNeutralOpaqueLv0 ?? this.onSurfaceNeutralOpaqueLv2,
+      onSurfacePrimaryContainer: onSurfacePrimaryContainer ?? this.onSurfacePrimaryContainer,
       onSurfacePrimary08: onSurfacePrimary08 ?? this.onSurfacePrimary08,
       onSurfacePrimary012: onSurfacePrimary012 ?? this.onSurfacePrimary012,
       onSurfacePrimary016: onSurfacePrimary016 ?? this.onSurfacePrimary016,
       onSurfaceSecondary08: onSurfaceSecondary08 ?? this.onSurfaceSecondary08,
-      onSurfaceSecondary012:
-          onSurfaceSecondary012 ?? this.onSurfaceSecondary012,
-      onSurfaceSecondary016:
-          onSurfaceSecondary016 ?? this.onSurfaceSecondary016,
+      onSurfaceSecondary012: onSurfaceSecondary012 ?? this.onSurfaceSecondary012,
+      onSurfaceSecondary016: onSurfaceSecondary016 ?? this.onSurfaceSecondary016,
       onSurfaceError08: onSurfaceError08 ?? this.onSurfaceError08,
       onSurfaceError012: onSurfaceError012 ?? this.onSurfaceError012,
       onSurfaceError016: onSurfaceError016 ?? this.onSurfaceError016,
       iconsForeground: iconsForeground ?? this.iconsForeground,
       iconsBackground: iconsBackground ?? this.iconsBackground,
-      iconsBackgroundVariant:
-          iconsBackgroundVariant ?? this.iconsBackgroundVariant,
+      iconsBackgroundVariant: iconsBackgroundVariant ?? this.iconsBackgroundVariant,
       iconsOnImage: iconsOnImage ?? this.iconsOnImage,
       iconsDisabled: iconsDisabled ?? this.iconsDisabled,
       iconsPrimary: iconsPrimary ?? this.iconsPrimary,
@@ -319,10 +311,10 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
       avatarsError: avatarsError ?? this.avatarsError,
       elevationsOnSurfaceNeutralLv0:
           elevationsOnSurfaceNeutralLv0 ?? this.elevationsOnSurfaceNeutralLv0,
-      elevationsOnSurfaceNeutralLv1Grey: elevationsOnSurfaceNeutralLv1Grey ??
-          this.elevationsOnSurfaceNeutralLv1Grey,
-      elevationsOnSurfaceNeutralLv1White: elevationsOnSurfaceNeutralLv1White ??
-          this.elevationsOnSurfaceNeutralLv1White,
+      elevationsOnSurfaceNeutralLv1Grey:
+          elevationsOnSurfaceNeutralLv1Grey ?? this.elevationsOnSurfaceNeutralLv1Grey,
+      elevationsOnSurfaceNeutralLv1White:
+          elevationsOnSurfaceNeutralLv1White ?? this.elevationsOnSurfaceNeutralLv1White,
       elevationsOnSurfaceNeutralLv2:
           elevationsOnSurfaceNeutralLv2 ?? this.elevationsOnSurfaceNeutralLv2,
       outlineBorder: outlineBorder ?? this.outlineBorder,
@@ -385,16 +377,11 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
       )!,
       warning: Color.lerp(warning, other.warning, t)!,
       onWarning: Color.lerp(onWarning, other.onWarning, t)!,
-      warningContainer:
-          Color.lerp(warningContainer, other.warningContainer, t)!,
-      onWarningContainer:
-          Color.lerp(onWarningContainer, other.onWarningContainer, t)!,
-      onSurfaceNeutral08:
-          Color.lerp(onSurfaceNeutral08, other.onSurfaceNeutral08, t)!,
-      onSurfaceNeutral012:
-          Color.lerp(onSurfaceNeutral012, other.onSurfaceNeutral012, t)!,
-      onSurfaceNeutral016:
-          Color.lerp(onSurfaceNeutral016, other.onSurfaceNeutral016, t)!,
+      warningContainer: Color.lerp(warningContainer, other.warningContainer, t)!,
+      onWarningContainer: Color.lerp(onWarningContainer, other.onWarningContainer, t)!,
+      onSurfaceNeutral08: Color.lerp(onSurfaceNeutral08, other.onSurfaceNeutral08, t)!,
+      onSurfaceNeutral012: Color.lerp(onSurfaceNeutral012, other.onSurfaceNeutral012, t)!,
+      onSurfaceNeutral016: Color.lerp(onSurfaceNeutral016, other.onSurfaceNeutral016, t)!,
       onSurfaceNeutralOpaqueLv0: Color.lerp(
         onSurfaceNeutralOpaqueLv0,
         other.onSurfaceNeutralOpaqueLv0,
@@ -415,28 +402,18 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
         other.onSurfacePrimaryContainer,
         t,
       )!,
-      onSurfacePrimary08:
-          Color.lerp(onSurfacePrimary08, other.onSurfacePrimary08, t)!,
-      onSurfacePrimary012:
-          Color.lerp(onSurfacePrimary012, other.onSurfacePrimary012, t)!,
-      onSurfacePrimary016:
-          Color.lerp(onSurfacePrimary016, other.onSurfacePrimary016, t)!,
-      onSurfaceSecondary08:
-          Color.lerp(onSurfaceSecondary08, other.onSurfaceSecondary08, t)!,
-      onSurfaceSecondary012:
-          Color.lerp(onSurfaceSecondary012, other.onSurfaceSecondary012, t)!,
-      onSurfaceSecondary016:
-          Color.lerp(onSurfaceSecondary016, other.onSurfaceSecondary016, t)!,
-      onSurfaceError08:
-          Color.lerp(onSurfaceError08, other.onSurfaceError08, t)!,
-      onSurfaceError012:
-          Color.lerp(onSurfaceError012, other.onSurfaceError012, t)!,
-      onSurfaceError016:
-          Color.lerp(onSurfaceError016, other.onSurfaceError016, t)!,
+      onSurfacePrimary08: Color.lerp(onSurfacePrimary08, other.onSurfacePrimary08, t)!,
+      onSurfacePrimary012: Color.lerp(onSurfacePrimary012, other.onSurfacePrimary012, t)!,
+      onSurfacePrimary016: Color.lerp(onSurfacePrimary016, other.onSurfacePrimary016, t)!,
+      onSurfaceSecondary08: Color.lerp(onSurfaceSecondary08, other.onSurfaceSecondary08, t)!,
+      onSurfaceSecondary012: Color.lerp(onSurfaceSecondary012, other.onSurfaceSecondary012, t)!,
+      onSurfaceSecondary016: Color.lerp(onSurfaceSecondary016, other.onSurfaceSecondary016, t)!,
+      onSurfaceError08: Color.lerp(onSurfaceError08, other.onSurfaceError08, t)!,
+      onSurfaceError012: Color.lerp(onSurfaceError012, other.onSurfaceError012, t)!,
+      onSurfaceError016: Color.lerp(onSurfaceError016, other.onSurfaceError016, t)!,
       iconsForeground: Color.lerp(iconsForeground, other.iconsForeground, t)!,
       iconsBackground: Color.lerp(iconsBackground, other.iconsBackground, t)!,
-      iconsBackgroundVariant:
-          Color.lerp(iconsBackgroundVariant, other.iconsBackgroundVariant, t)!,
+      iconsBackgroundVariant: Color.lerp(iconsBackgroundVariant, other.iconsBackgroundVariant, t)!,
       iconsOnImage: Color.lerp(iconsOnImage, other.iconsOnImage, t)!,
       iconsDisabled: Color.lerp(iconsDisabled, other.iconsDisabled, t)!,
       iconsPrimary: Color.lerp(iconsPrimary, other.iconsPrimary, t)!,
@@ -445,8 +422,7 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
       iconsWarning: Color.lerp(iconsWarning, other.iconsWarning, t)!,
       iconsError: Color.lerp(iconsError, other.iconsError, t)!,
       avatarsPrimary: Color.lerp(avatarsPrimary, other.avatarsPrimary, t)!,
-      avatarsSecondary:
-          Color.lerp(avatarsSecondary, other.avatarsSecondary, t)!,
+      avatarsSecondary: Color.lerp(avatarsSecondary, other.avatarsSecondary, t)!,
       avatarsSuccess: Color.lerp(avatarsSuccess, other.avatarsSuccess, t)!,
       avatarsWarning: Color.lerp(avatarsWarning, other.avatarsWarning, t)!,
       avatarsError: Color.lerp(avatarsError, other.avatarsError, t)!,
@@ -471,21 +447,16 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
         t,
       )!,
       outlineBorder: Color.lerp(outlineBorder, other.outlineBorder, t)!,
-      outlineBorderVariant:
-          Color.lerp(outlineBorderVariant, other.outlineBorderVariant, t)!,
+      outlineBorderVariant: Color.lerp(outlineBorderVariant, other.outlineBorderVariant, t)!,
       primary98: Color.lerp(primary98, other.primary98, t)!,
-      primaryContainer:
-          Color.lerp(primaryContainer, other.primaryContainer, t)!,
-      onPrimaryContainer:
-          Color.lerp(onPrimaryContainer, other.onPrimaryContainer, t)!,
+      primaryContainer: Color.lerp(primaryContainer, other.primaryContainer, t)!,
+      onPrimaryContainer: Color.lerp(onPrimaryContainer, other.onPrimaryContainer, t)!,
       onErrorVariant: Color.lerp(onErrorVariant, other.onErrorVariant, t)!,
       errorContainer: Color.lerp(errorContainer, other.errorContainer, t)!,
-      onErrorContainer:
-          Color.lerp(onErrorContainer, other.onErrorContainer, t)!,
+      onErrorContainer: Color.lerp(onErrorContainer, other.onErrorContainer, t)!,
       overlay: Color.lerp(overlay, other.overlay, t)!,
       dropShadow: Color.lerp(dropShadow, other.dropShadow, t)!,
-      sysColorsNeutralN60:
-          Color.lerp(sysColorsNeutralN60, other.sysColorsNeutralN60, t)!,
+      sysColorsNeutralN60: Color.lerp(sysColorsNeutralN60, other.sysColorsNeutralN60, t)!,
     );
   }
 }

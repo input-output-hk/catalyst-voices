@@ -13,24 +13,18 @@ enum MyAccountStatusNotificationType {
   Color backgroundColor(BuildContext context) {
     return switch (this) {
       MyAccountStatusNotificationType.offstage => Colors.transparent,
-      MyAccountStatusNotificationType.warning =>
-        Theme.of(context).colors.warningContainer,
-      MyAccountStatusNotificationType.error =>
-        Theme.of(context).colors.errorContainer,
-      MyAccountStatusNotificationType.success =>
-        Theme.of(context).colors.successContainer,
+      MyAccountStatusNotificationType.warning => Theme.of(context).colors.warningContainer,
+      MyAccountStatusNotificationType.error => Theme.of(context).colors.errorContainer,
+      MyAccountStatusNotificationType.success => Theme.of(context).colors.successContainer,
     };
   }
 
   Color foregroundColor(BuildContext context) {
     return switch (this) {
       MyAccountStatusNotificationType.offstage => Colors.transparent,
-      MyAccountStatusNotificationType.warning =>
-        Theme.of(context).colors.onWarningContainer,
-      MyAccountStatusNotificationType.error =>
-        Theme.of(context).colors.onErrorContainer,
-      MyAccountStatusNotificationType.success =>
-        Theme.of(context).colors.onSuccessContainer,
+      MyAccountStatusNotificationType.warning => Theme.of(context).colors.onWarningContainer,
+      MyAccountStatusNotificationType.error => Theme.of(context).colors.onErrorContainer,
+      MyAccountStatusNotificationType.success => Theme.of(context).colors.onSuccessContainer,
     };
   }
 }

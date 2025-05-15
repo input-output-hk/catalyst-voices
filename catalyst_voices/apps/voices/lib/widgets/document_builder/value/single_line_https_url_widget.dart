@@ -21,8 +21,7 @@ class SingleLineHttpsUrlWidget extends StatefulWidget {
   });
 
   @override
-  State<SingleLineHttpsUrlWidget> createState() =>
-      _SingleLineHttpsUrlWidgetState();
+  State<SingleLineHttpsUrlWidget> createState() => _SingleLineHttpsUrlWidgetState();
 }
 
 class _SingleLineHttpsUrlWidgetState extends State<SingleLineHttpsUrlWidget> {
@@ -31,8 +30,7 @@ class _SingleLineHttpsUrlWidgetState extends State<SingleLineHttpsUrlWidget> {
 
   bool get _isRequired => widget.schema.isRequired;
   String get _title => widget.schema.title;
-  String get _value =>
-      widget.property.value ?? widget.schema.defaultValue ?? '';
+  String get _value => widget.property.value ?? widget.schema.defaultValue ?? '';
 
   @override
   Widget build(BuildContext context) {
@@ -62,8 +60,7 @@ class _SingleLineHttpsUrlWidgetState extends State<SingleLineHttpsUrlWidget> {
   void didUpdateWidget(SingleLineHttpsUrlWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    if (oldWidget.isEditMode != widget.isEditMode &&
-        widget.isEditMode == false) {
+    if (oldWidget.isEditMode != widget.isEditMode && widget.isEditMode == false) {
       _textEditingController.textWithSelection = _value;
     }
 

@@ -87,7 +87,6 @@ impl RbacCache {
     fn update_chain(
         &self, registration: Cip509, previous_txn: TransactionId,
     ) -> Result<RbacCacheAddSuccess, RbacCacheAddError> {
-        let catalyst_id = registration.catalyst_id().cloned();
         let purpose = registration.purpose();
         let report = registration.report().to_owned();
 
@@ -96,17 +95,13 @@ impl RbacCache {
             debug!("Unable to find previous transaction {previous_txn} in the RBAC cache");
             // We are unable to determine a Catalyst ID, so there is no sense to update the
             // problem report because we would be unable to store this registration anyway.
-            RbacCacheAddError {
-                catalyst_id,
-                purpose,
-                report: report.clone(),
-            }
+            RbacCacheAddError::UnknownCatalystId
         })?;
         let chain = self.chains.get(&catalyst_id).ok_or_else(|| {
             // This means the cache is broken. This should never normally happen.
             error!("Broken RBAC cache: {catalyst_id} is present in TRANSACTIONS cache, but missing in CHAINS");
-            RbacCacheAddError {
-                catalyst_id: Some(catalyst_id.clone()),
+            RbacCacheAddError::InvalidRegistration {
+                catalyst_id: catalyst_id.clone(),
                 purpose,
                 report: report.clone(),
             }
@@ -127,8 +122,8 @@ impl RbacCache {
             }
         }
         if report.is_problematic() {
-            return Err(RbacCacheAddError {
-                catalyst_id: Some(catalyst_id),
+            return Err(RbacCacheAddError::InvalidRegistration {
+                catalyst_id,
                 purpose,
                 report,
             });
@@ -140,8 +135,8 @@ impl RbacCache {
                 &format!("{e:?}"),
                 "Failed to apply update the registration chain",
             );
-            RbacCacheAddError {
-                catalyst_id: Some(catalyst_id.clone()),
+            RbacCacheAddError::InvalidRegistration {
+                catalyst_id: catalyst_id.clone(),
                 purpose,
                 report,
             }
@@ -156,12 +151,7 @@ impl RbacCache {
             .insert(new_chain.current_tx_id_hash(), catalyst_id.clone());
         self.chains.insert(catalyst_id.clone(), new_chain);
 
-        Ok(RbacCacheAddSuccess {
-            catalyst_id,
-            // A valid registration must have a purpose.
-            #[allow(clippy::expect_used)]
-            purpose: purpose.expect("Missing registration purpose"),
-        })
+        Ok(RbacCacheAddSuccess { catalyst_id })
     }
 
     /// Starts a new Rbac registration chain.
@@ -178,10 +168,14 @@ impl RbacCache {
                 &format!("{e:?}"),
                 "Failed to apply start a registration chain",
             );
-            RbacCacheAddError {
-                catalyst_id,
-                purpose,
-                report: report.clone(),
+            if let Some(catalyst_id) = catalyst_id {
+                RbacCacheAddError::InvalidRegistration {
+                    catalyst_id,
+                    purpose,
+                    report: report.clone(),
+                }
+            } else {
+                RbacCacheAddError::UnknownCatalystId
             }
         })?;
         let catalyst_id = new_chain.catalyst_id().to_owned();
@@ -190,8 +184,8 @@ impl RbacCache {
                 &format!("{catalyst_id} is already used"),
                 "It isn't allowed to use same Catalyst ID (certificate subject public key) in multiple registration chains",
             );
-            return Err(RbacCacheAddError {
-                catalyst_id: Some(catalyst_id),
+            return Err(RbacCacheAddError::InvalidRegistration {
+                catalyst_id,
                 purpose,
                 report,
             });
@@ -203,8 +197,8 @@ impl RbacCache {
                 let previous_chain = self.chains.get(&id).ok_or_else(|| {
                     // This means the cache is broken. This should never normally happen.
                     error!("Broken RBAC cache: {id} is present in ACTIVE_ADDRESSES cache, but missing in CHAINS");
-                    RbacCacheAddError {
-                        catalyst_id: Some(catalyst_id.clone()),
+                    RbacCacheAddError::InvalidRegistration {
+                        catalyst_id: catalyst_id.clone(),
                         purpose,
                         report: report.clone(),
                     }
@@ -223,8 +217,8 @@ impl RbacCache {
         }
 
         if report.is_problematic() {
-            return Err(RbacCacheAddError {
-                catalyst_id: Some(catalyst_id),
+            return Err(RbacCacheAddError::InvalidRegistration {
+                catalyst_id,
                 purpose,
                 report,
             });
@@ -239,11 +233,6 @@ impl RbacCache {
             .insert(new_chain.current_tx_id_hash(), catalyst_id.clone());
         self.chains.insert(catalyst_id.clone(), new_chain);
 
-        Ok(RbacCacheAddSuccess {
-            catalyst_id,
-            // A valid registration must have a purpose.
-            #[allow(clippy::expect_used)]
-            purpose: purpose.expect("Missing registration purpose"),
-        })
+        Ok(RbacCacheAddSuccess { catalyst_id })
     }
 }

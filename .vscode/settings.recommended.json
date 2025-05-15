@@ -9,14 +9,19 @@
   },
   "files.autoSave": "afterDelay",
   "editor.formatOnType": true,
-  "editor.rulers": [100],
+  "editor.rulers": [
+    100
+  ],
   "editor.tabSize": 4,
   "debug.openDebug": "openOnDebugBreak",
   "debug.internalConsoleOptions": "openOnSessionStart",
+  "dart.lineLength": 100,
   "[dart]": {
     "editor.formatOnSave": true,
     "editor.formatOnType": true,
-    "editor.rulers": [80],
+    "editor.rulers": [
+      100
+    ],
     "editor.codeActionsOnSave": {
       "source.fixAll": "explicit",
       "source.organizeImports": "explicit",
@@ -54,8 +59,14 @@
     ".pages": "yaml",
     ".earthlyignore": "ignore"
   },
-  "rust-analyzer.linkedProjects": ["./catalyst-gateway/Cargo.toml"],
-  "rust-analyzer.check.overrideCommand": ["bash", "-c", "cargo lint-vscode"],
+  "rust-analyzer.linkedProjects": [
+    "./catalyst-gateway/Cargo.toml"
+  ],
+  "rust-analyzer.check.overrideCommand": [
+    "bash",
+    "-c",
+    "cargo lint-vscode"
+  ],
   "yaml.schemas": {
     "https://squidfunk.github.io/mkdocs-material/schema.json": "mkdocs.yml"
   },
@@ -83,7 +94,9 @@
     "files.trimTrailingWhitespace": true,
     "editor.defaultFormatter": "DavidAnson.vscode-markdownlint"
   },
-  "rust-analyzer.rustfmt.extraArgs": ["+nightly"],
+  "rust-analyzer.rustfmt.extraArgs": [
+    "+nightly"
+  ],
   "rust-analyzer.lens.enable": true,
   "vs-kubernetes": {
     "vs-kubernetes.kubeconfig": "utilities/local-cluster/shared/k3s.yaml"

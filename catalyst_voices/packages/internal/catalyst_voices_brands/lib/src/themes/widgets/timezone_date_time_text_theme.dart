@@ -21,9 +21,7 @@ class TimezoneDateTimeTextTheme extends InheritedTheme {
   }
 
   static TimezoneDateTimeTextThemeData? maybeOf(BuildContext context) {
-    return context
-        .dependOnInheritedWidgetOfExactType<TimezoneDateTimeTextTheme>()
-        ?.data;
+    return context.dependOnInheritedWidgetOfExactType<TimezoneDateTimeTextTheme>()?.data;
   }
 }
 

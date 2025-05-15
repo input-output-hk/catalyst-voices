@@ -56,9 +56,7 @@ class _Date extends StatelessWidget {
         Text(
           _formatDate(context, dateTime),
           style: theme.textTheme.bodyLarge!.copyWith(
-            color: dateTime == null
-                ? theme.colors.textDisabled
-                : theme.colors.onPrimaryContainer,
+            color: dateTime == null ? theme.colors.textDisabled : theme.colors.onPrimaryContainer,
           ),
         ),
       ],
@@ -109,8 +107,7 @@ class _EndDate extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Expanded(
-      child:
-          BlocSelector<CampaignBuilderCubit, CampaignBuilderState, DateTime?>(
+      child: BlocSelector<CampaignBuilderCubit, CampaignBuilderState, DateTime?>(
         selector: (state) => state.endDate,
         builder: (context, date) {
           return _Date(
@@ -129,8 +126,7 @@ class _StartDate extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Expanded(
-      child:
-          BlocSelector<CampaignBuilderCubit, CampaignBuilderState, DateTime?>(
+      child: BlocSelector<CampaignBuilderCubit, CampaignBuilderState, DateTime?>(
         selector: (state) => state.startDate,
         builder: (context, date) {
           return _Date(

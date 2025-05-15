@@ -48,14 +48,12 @@ class EmptyState extends StatelessWidget {
               children: [
                 Text(
                   _buildTitle(context),
-                  style: textTheme.titleMedium
-                      ?.copyWith(color: theme.colors.textOnPrimaryLevel1),
+                  style: textTheme.titleMedium?.copyWith(color: theme.colors.textOnPrimaryLevel1),
                 ),
                 const SizedBox(height: 8),
                 Text(
                   _buildDescription(context),
-                  style: textTheme.bodyMedium
-                      ?.copyWith(color: theme.colors.textOnPrimaryLevel1),
+                  style: textTheme.bodyMedium?.copyWith(color: theme.colors.textOnPrimaryLevel1),
                   textAlign: TextAlign.center,
                 ),
               ],

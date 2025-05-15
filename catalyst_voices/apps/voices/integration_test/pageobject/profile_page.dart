@@ -26,11 +26,9 @@ class ProfilePage {
   final profileAndKeychainText = const Key('ProfileAndKeychainText');
   final accountEmailTextField = const Key('AccountEmailTextField');
   final emailTileSaveBtn = const Key('EmailTileSaveButton');
-  final deleteKeychainContinueButton =
-      const Key('DeleteKeychainContinueButton');
+  final deleteKeychainContinueButton = const Key('DeleteKeychainContinueButton');
   final deleteKeychainTextField = const Key('DeleteKeychainTextField');
-  final keychainDeletedDialogCloseButton =
-      const Key('KeychainDeletedDialogCloseButton');
+  final keychainDeletedDialogCloseButton = const Key('KeychainDeletedDialogCloseButton');
   Future<void> clickDisplayNameEdit() async {
     await $(displayNameTile).$(editBtn).tap();
   }
@@ -105,11 +103,8 @@ class ProfilePage {
   }
 
   Future<void> emailIsAsExpected(String expectedEmail) async {
-    final textField = $(accountEmailTile)
-        .$(CommonPage($).voicesTextField)
-        .evaluate()
-        .first
-        .widget as TextField;
+    final textField =
+        $(accountEmailTile).$(CommonPage($).voicesTextField).evaluate().first.widget as TextField;
 
     expect(textField.controller!.text, expectedEmail);
   }

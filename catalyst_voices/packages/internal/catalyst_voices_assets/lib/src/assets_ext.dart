@@ -1,8 +1,7 @@
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart'
-    show SvgTheme, svg, SvgAssetLoader, ColorMapper;
+import 'package:flutter_svg/flutter_svg.dart' show SvgTheme, svg, SvgAssetLoader, ColorMapper;
 import 'package:lottie/lottie.dart' as lottie;
 
 extension AssetGenImageExt on AssetGenImage {
@@ -49,8 +48,7 @@ extension LottieGenImageExt on LottieGenImage {
     lottie.LottieImageProviderFactory? imageProviderFactory,
     Key? key,
     AssetBundle? bundle,
-    Widget Function(BuildContext, Widget, lottie.LottieComposition?)?
-        frameBuilder,
+    Widget Function(BuildContext, Widget, lottie.LottieComposition?)? frameBuilder,
     ImageErrorWidgetBuilder? errorBuilder,
     double? width,
     double? height,

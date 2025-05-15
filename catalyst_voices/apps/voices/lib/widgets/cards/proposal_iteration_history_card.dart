@@ -22,8 +22,7 @@ class ProposalIterationHistory extends StatefulWidget {
   });
 
   @override
-  State<ProposalIterationHistory> createState() =>
-      _ProposalIterationHistoryState();
+  State<ProposalIterationHistory> createState() => _ProposalIterationHistoryState();
 }
 
 class _Actions extends StatelessWidget {
@@ -63,9 +62,7 @@ class _Actions extends StatelessWidget {
       );
 
       if (confirmed && context.mounted) {
-        context
-            .read<WorkspaceBloc>()
-            .add(DeleteDraftProposalEvent(ref: ref as DraftRef));
+        context.read<WorkspaceBloc>().add(DeleteDraftProposalEvent(ref: ref as DraftRef));
       }
     }
   }

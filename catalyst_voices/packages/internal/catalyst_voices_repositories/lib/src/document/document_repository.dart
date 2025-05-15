@@ -237,9 +237,8 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     final allRefs = await _remoteDocuments.index().then(_uniqueTypedRefs);
     final allConstRefs = constantDocumentsRefs.expand((element) => element.all);
 
-    final nonConstRefs = allRefs
-        .where((ref) => allConstRefs.none((e) => e.id == ref.ref.id))
-        .toList();
+    final nonConstRefs =
+        allRefs.where((ref) => allConstRefs.none((e) => e.id == ref.ref.id)).toList();
 
     final exactRefs = nonConstRefs.where((ref) => ref.ref.isExact).toList();
     final looseRefs = nonConstRefs.where((ref) => !ref.ref.isExact).toList();
@@ -297,10 +296,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     final latestDocument = await _localDocuments.getLatest(authorId: authorId);
     final latestDraft = await _drafts.getLatest(authorId: authorId);
 
-    return [latestDocument, latestDraft]
-        .nonNulls
-        .sorted((a, b) => a.compareTo(b))
-        .firstOrNull;
+    return [latestDocument, latestDraft].nonNulls.sorted((a, b) => a.compareTo(b)).firstOrNull;
   }
 
   @override
@@ -453,8 +449,8 @@ final class DocumentRepositoryImpl implements DocumentRepository {
         );
 
     // Combine streams
-    return Rx.combineLatest2<List<DocumentsDataWithRefData>,
-        List<DocumentsDataWithRefData>, List<DocumentsDataWithRefData>>(
+    return Rx.combineLatest2<List<DocumentsDataWithRefData>, List<DocumentsDataWithRefData>,
+        List<DocumentsDataWithRefData>>(
       localDocs,
       localDrafts,
       (docs, drafts) {
@@ -529,9 +525,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     required DocumentRef ref,
     required ValueResolver<DocumentData, DocumentRef> refGetter,
   }) {
-    return _watchDocumentData(ref: ref)
-        .distinct()
-        .switchMap<DocumentsDataWithRefData?>((document) {
+    return _watchDocumentData(ref: ref).distinct().switchMap<DocumentsDataWithRefData?>((document) {
       if (document == null) {
         return Stream.value(null);
       }
@@ -571,9 +565,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     required DocumentType type,
     ValueResolver<DocumentData, DocumentRef> refGetter = _templateResolver,
   }) {
-    return _localDocuments
-        .watchRefToDocumentData(refTo: refTo, type: type)
-        .distinct();
+    return _localDocuments.watchRefToDocumentData(refTo: refTo, type: type).distinct();
   }
 
   Future<DocumentData> _getDraftDocumentData({
@@ -611,9 +603,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   }) async {
     try {
       final results = await Future.wait(
-        documents
-            .where((doc) => doc.metadata.template != null)
-            .map((documentData) async {
+        documents.where((doc) => doc.metadata.template != null).map((documentData) async {
           final templateRef = documentData.metadata.template!;
           final templateData = await _documentDataLock.synchronized(
             () => getDocumentData(ref: templateRef),

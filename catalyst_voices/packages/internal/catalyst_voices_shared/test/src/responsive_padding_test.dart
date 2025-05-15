@@ -26,8 +26,7 @@ void main() {
     };
 
     for (final entry in sizesToTest.entries) {
-      testWidgets('ResponsivePadding adapts to screen of width $entry.key',
-          (tester) async {
+      testWidgets('ResponsivePadding adapts to screen of width $entry.key', (tester) async {
         await tester.pumpWidget(
           buildApp(Size.fromWidth(entry.key)),
         );

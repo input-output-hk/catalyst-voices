@@ -69,9 +69,7 @@ class _FeedbackTile extends StatelessWidget {
               context.l10n.feedbackOnProposals,
               style: Theme.of(context).textTheme.bodyLarge,
             ),
-            onTap: state
-                ? () => GoRouter.of(context).go(const ProposalsRoute().location)
-                : null,
+            onTap: state ? () => GoRouter.of(context).go(const ProposalsRoute().location) : null,
           ),
         );
       },

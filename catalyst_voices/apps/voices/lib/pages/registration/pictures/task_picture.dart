@@ -49,8 +49,7 @@ class TaskPicture extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final size = constraints
-            .constrainSizeAndAttemptToPreserveAspectRatio(preferredSize);
+        final size = constraints.constrainSizeAndAttemptToPreserveAspectRatio(preferredSize);
         final childSize = Size.square(size.width * _childSizeFactor);
 
         return SizedBox.fromSize(

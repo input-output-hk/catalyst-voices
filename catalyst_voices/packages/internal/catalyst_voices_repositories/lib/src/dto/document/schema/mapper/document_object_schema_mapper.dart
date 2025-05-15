@@ -37,8 +37,7 @@ final class DocumentObjectSchemaMapper {
     final title = schema.title ?? '';
     final icon = schema.icon;
     final description = schema.description;
-    final descriptionMarkdown =
-        description != null ? MarkdownData(description) : null;
+    final descriptionMarkdown = description != null ? MarkdownData(description) : null;
     final placeholder = schema.placeholder;
     final guidance = schema.guidance;
     final guidanceMarkdown = guidance != null ? MarkdownData(guidance) : null;

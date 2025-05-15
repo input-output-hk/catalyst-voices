@@ -45,13 +45,11 @@ class FilterByDropdown<T> extends StatelessWidget {
         padding: WidgetStateProperty.all(EdgeInsets.zero),
         visualDensity: VisualDensity.compact,
       ),
-      trailingIcon: VoicesAssets.icons.chevronDown
-          .buildIcon(color: theme.colorScheme.primary),
-      selectedTrailingIcon: VoicesAssets.icons.chevronUp
-          .buildIcon(color: theme.colorScheme.primary),
+      trailingIcon: VoicesAssets.icons.chevronDown.buildIcon(color: theme.colorScheme.primary),
+      selectedTrailingIcon:
+          VoicesAssets.icons.chevronUp.buildIcon(color: theme.colorScheme.primary),
       textAlign: TextAlign.end,
-      textStyle: theme.textTheme.labelLarge
-          ?.copyWith(color: theme.colorScheme.primary),
+      textStyle: theme.textTheme.labelLarge?.copyWith(color: theme.colorScheme.primary),
     );
   }
 }
@@ -106,9 +104,7 @@ class SingleSelectDropdown<T> extends VoicesFormField<T> {
                   disabledBorder: _border(field.context, borderRadius),
                   focusedBorder: _border(field.context, borderRadius),
                   errorStyle: theme.textTheme.bodySmall?.copyWith(
-                    color: enabled
-                        ? theme.colorScheme.error
-                        : theme.colors.textDisabled,
+                    color: enabled ? theme.colorScheme.error : theme.colors.textDisabled,
                   ),
                   focusColor: Colors.tealAccent,
                 ),
@@ -125,8 +121,7 @@ class SingleSelectDropdown<T> extends VoicesFormField<T> {
                   backgroundColor: WidgetStatePropertyAll(
                     theme.colors.elevationsOnSurfaceNeutralLv1Grey,
                   ),
-                  maximumSize:
-                      const WidgetStatePropertyAll(Size.fromHeight(350)),
+                  maximumSize: const WidgetStatePropertyAll(Size.fromHeight(350)),
                 ),
               ),
             );

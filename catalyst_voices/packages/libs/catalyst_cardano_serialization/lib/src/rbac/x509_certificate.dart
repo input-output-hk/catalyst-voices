@@ -84,8 +84,7 @@ class X509Certificate with EquatableMixin {
   String toPem([String label = 'CERTIFICATE']) {
     final derBytes = toASN1().encodedBytes;
     final base64 = base64Encode(derBytes);
-    final chunks =
-        RegExp('.{1,64}').allMatches(base64).map((m) => m.group(0)).join('\n');
+    final chunks = RegExp('.{1,64}').allMatches(base64).map((m) => m.group(0)).join('\n');
 
     return '-----BEGIN $label-----\n'
         '$chunks\n'
@@ -128,16 +127,13 @@ class X509CertificateExtensions with EquatableMixin {
     final sequence = object.asSequence;
     final extensionsSequence = sequence.elements.first.asSequence;
     final subjectAltNameSequence = extensionsSequence.elements.first.asSequence;
-    final subjectAltNameIdentifier =
-        subjectAltNameSequence.elements[0] as ASN1ObjectIdentifier;
+    final subjectAltNameIdentifier = subjectAltNameSequence.elements[0] as ASN1ObjectIdentifier;
 
-    if (subjectAltNameIdentifier !=
-        ASN1ObjectIdentifier.fromName('subjectAltName')) {
+    if (subjectAltNameIdentifier != ASN1ObjectIdentifier.fromName('subjectAltName')) {
       return const X509CertificateExtensions();
     }
 
-    final subjectAltNameOctetString =
-        subjectAltNameSequence.elements[1].asOctetString;
+    final subjectAltNameOctetString = subjectAltNameSequence.elements[1].asOctetString;
 
     final subjectAltNameElementsSequence =
         ASN1Sequence.fromBytes(subjectAltNameOctetString.valueBytes());
@@ -472,9 +468,8 @@ class X509TBSCertificate with EquatableMixin {
       validityNotAfter: validityNotAfterASN1.asDateTime,
       subject: X509DistinguishedName.fromASN1(subjectASN1),
       subjectPublicKey: _readSubjectPublicKeyInfo(subjectPublicKeyASN1),
-      extensions: extensionsASN1 != null
-          ? X509CertificateExtensions.fromASN1(extensionsASN1)
-          : null,
+      extensions:
+          extensionsASN1 != null ? X509CertificateExtensions.fromASN1(extensionsASN1) : null,
     );
   }
 

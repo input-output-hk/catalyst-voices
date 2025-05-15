@@ -80,8 +80,7 @@ class _CatalystIdTextState extends State<CatalystIdText> {
   void didUpdateWidget(CatalystIdText oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    if (widget.data != oldWidget.data ||
-        widget.isCompact != oldWidget.isCompact) {
+    if (widget.data != oldWidget.data || widget.isCompact != oldWidget.isCompact) {
       final id = widget.data;
       _fullDataAsString = id.toSignificant().toUri().toStringWithoutScheme();
       _effectiveData = _buildTextData();
@@ -182,14 +181,12 @@ class _Chip extends StatelessWidget {
     final textTheme = theme.textTheme;
     final colors = theme.colors;
 
-    final backgroundColor =
-        this.backgroundColor ?? colors.elevationsOnSurfaceNeutralLv1Grey;
+    final backgroundColor = this.backgroundColor ?? colors.elevationsOnSurfaceNeutralLv1Grey;
     final foregroundColor = colors.textOnPrimaryLevel1;
     final overlayColor = colors.onSurfaceNeutralOpaqueLv2;
 
-    final textStyle = (textTheme.bodyMedium ?? const TextStyle())
-        .merge(style)
-        .copyWith(color: foregroundColor);
+    final textStyle =
+        (textTheme.bodyMedium ?? const TextStyle()).merge(style).copyWith(color: foregroundColor);
 
     return Material(
       color: backgroundColor,
@@ -225,9 +222,7 @@ class _Copy extends StatelessWidget {
     final theme = Theme.of(context);
 
     final color = showCheck ? theme.colors.success : theme.colorScheme.primary;
-    final asset = showCheck
-        ? VoicesAssets.icons.clipboardCheck
-        : VoicesAssets.icons.clipboardCopy;
+    final asset = showCheck ? VoicesAssets.icons.clipboardCheck : VoicesAssets.icons.clipboardCopy;
 
     return CatalystSvgIcon.asset(
       asset.path,

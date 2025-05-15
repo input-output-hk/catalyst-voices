@@ -19,8 +19,7 @@ class SidebarPanel extends StatefulWidget {
   State<SidebarPanel> createState() => _SidebarPanelState();
 }
 
-class _SidebarPanelState extends State<SidebarPanel>
-    with SingleTickerProviderStateMixin {
+class _SidebarPanelState extends State<SidebarPanel> with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
   late final Animation<double> _sizeAnimation;
   late final Animation<double> _fadeAnimation;

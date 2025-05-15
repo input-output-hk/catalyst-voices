@@ -1,7 +1,6 @@
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 
-class BlocSeedPhraseSelector<T>
-    extends BlocSelector<RegistrationCubit, RegistrationState, T> {
+class BlocSeedPhraseSelector<T> extends BlocSelector<RegistrationCubit, RegistrationState, T> {
   BlocSeedPhraseSelector({
     super.key,
     required BlocWidgetSelector<SeedPhraseStateData, T> selector,

@@ -51,8 +51,7 @@ class RegistrationTile extends StatelessWidget {
                         title,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
-                        style: theme.textTheme.titleSmall
-                            ?.copyWith(color: foregroundColor),
+                        style: theme.textTheme.titleSmall?.copyWith(color: foregroundColor),
                       ),
                       if (subtitle != null)
                         Text(
@@ -60,8 +59,7 @@ class RegistrationTile extends StatelessWidget {
                           subtitle,
                           maxLines: 1,
                           overflow: TextOverflow.clip,
-                          style: theme.textTheme.bodySmall
-                              ?.copyWith(color: foregroundColor),
+                          style: theme.textTheme.bodySmall?.copyWith(color: foregroundColor),
                         ),
                     ],
                   ),

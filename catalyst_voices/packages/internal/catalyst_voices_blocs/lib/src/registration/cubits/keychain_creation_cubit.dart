@@ -135,8 +135,7 @@ final class KeychainCreationCubit extends Cubit<KeychainStateData>
   }
 }
 
-abstract interface class KeychainCreationManager
-    implements UnlockPasswordManager {
+abstract interface class KeychainCreationManager implements UnlockPasswordManager {
   bool areWordsMatching(List<SeedPhraseWord> words);
 
   void buildSeedPhrase({

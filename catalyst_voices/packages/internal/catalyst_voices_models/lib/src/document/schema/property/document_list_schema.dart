@@ -24,8 +24,7 @@ final class DocumentGenericListSchema extends DocumentListSchema {
     super.guidance,
     super.isSubsection = false,
     super.isRequired = false,
-    super.itemsSchema =
-        const DocumentGenericStringSchema.optional(nodeId: DocumentNodeId.root),
+    super.itemsSchema = const DocumentGenericStringSchema.optional(nodeId: DocumentNodeId.root),
     super.itemsRange,
     super.uniqueItems = false,
   });
@@ -77,8 +76,7 @@ sealed class DocumentListSchema extends DocumentPropertySchema {
 
   @override
   @mustCallSuper
-  List<Object?> get props =>
-      super.props + [itemsSchema, itemsRange, uniqueItems];
+  List<Object?> get props => super.props + [itemsSchema, itemsRange, uniqueItems];
 
   /// A method that builds typed properties.
   ///
@@ -132,8 +130,7 @@ sealed class DocumentListSchema extends DocumentPropertySchema {
   }
 }
 
-final class DocumentMultiLineTextEntryListMarkdownSchema
-    extends DocumentListSchema {
+final class DocumentMultiLineTextEntryListMarkdownSchema extends DocumentListSchema {
   const DocumentMultiLineTextEntryListMarkdownSchema({
     required super.nodeId,
     required super.format,
@@ -250,8 +247,7 @@ final class DocumentNestedQuestionsListSchema extends DocumentListSchema {
   }
 }
 
-final class DocumentSingleLineHttpsUrlEntryListSchema
-    extends DocumentListSchema {
+final class DocumentSingleLineHttpsUrlEntryListSchema extends DocumentListSchema {
   const DocumentSingleLineHttpsUrlEntryListSchema({
     required super.nodeId,
     required super.format,

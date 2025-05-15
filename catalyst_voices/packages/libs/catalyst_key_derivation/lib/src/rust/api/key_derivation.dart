@@ -27,10 +27,9 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 /// # Errors
 ///
 /// Returns an error if the mnemonic is invalid.
-Future<Bip32Ed25519XPrivateKey> mnemonicToXprv(
-        {required String mnemonic, String? passphrase}) =>
-    RustLib.instance.api.crateApiKeyDerivationMnemonicToXprv(
-        mnemonic: mnemonic, passphrase: passphrase);
+Future<Bip32Ed25519XPrivateKey> mnemonicToXprv({required String mnemonic, String? passphrase}) =>
+    RustLib.instance.api
+        .crateApiKeyDerivationMnemonicToXprv(mnemonic: mnemonic, passphrase: passphrase);
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Bip32Ed25519Signature>>
 abstract class Bip32Ed25519Signature implements RustOpaqueInterface {
@@ -39,8 +38,7 @@ abstract class Bip32Ed25519Signature implements RustOpaqueInterface {
 
   /// Create a new `Bip32Ed25519Signature` from the given bytes.
   factory Bip32Ed25519Signature({required U8Array64 sigBytes}) =>
-      RustLib.instance.api
-          .crateApiKeyDerivationBip32Ed25519SignatureNew(sigBytes: sigBytes);
+      RustLib.instance.api.crateApiKeyDerivationBip32Ed25519SignatureNew(sigBytes: sigBytes);
 
   /// Convert to a hex string.
   String toHex();
@@ -89,9 +87,8 @@ abstract class Bip32Ed25519XPrivateKey implements RustOpaqueInterface {
   U8Array96 get inner;
 
   /// Create a new `Bip32Ed25519XPrivateKey` from the given bytes.
-  factory Bip32Ed25519XPrivateKey({required U8Array96 xprvBytes}) => RustLib
-      .instance.api
-      .crateApiKeyDerivationBip32Ed25519XPrivateKeyNew(xprvBytes: xprvBytes);
+  factory Bip32Ed25519XPrivateKey({required U8Array96 xprvBytes}) =>
+      RustLib.instance.api.crateApiKeyDerivationBip32Ed25519XPrivateKeyNew(xprvBytes: xprvBytes);
 
   /// Sign the given data with the given extended private key.
   ///
@@ -124,8 +121,7 @@ abstract class Bip32Ed25519XPrivateKey implements RustOpaqueInterface {
   /// # Errors
   ///
   /// Returns an error if the extended private key or signature is invalid.
-  Future<bool> verifySignature(
-      {required List<int> data, required Bip32Ed25519Signature signature});
+  Future<bool> verifySignature({required List<int> data, required Bip32Ed25519Signature signature});
 
   /// Get extended public key from the given extended private key.
   ///
@@ -163,8 +159,7 @@ abstract class Bip32Ed25519XPublicKey implements RustOpaqueInterface {
 
   /// Create a new `Bip32Ed25519XPublicKey` from the given bytes.
   factory Bip32Ed25519XPublicKey({required U8Array64 xpubBytes}) =>
-      RustLib.instance.api
-          .crateApiKeyDerivationBip32Ed25519XPublicKeyNew(xpubBytes: xpubBytes);
+      RustLib.instance.api.crateApiKeyDerivationBip32Ed25519XPublicKeyNew(xpubBytes: xpubBytes);
 
   /// Convert to a hex string.
   String toHex();
@@ -183,8 +178,7 @@ abstract class Bip32Ed25519XPublicKey implements RustOpaqueInterface {
   /// # Errors
   ///
   /// Returns an error if the extended public key or signature is invalid.
-  Future<bool> verifySignature(
-      {required List<int> data, required Bip32Ed25519Signature signature});
+  Future<bool> verifySignature({required List<int> data, required Bip32Ed25519Signature signature});
 }
 
 class U8Array32 extends NonGrowableListView<int> {

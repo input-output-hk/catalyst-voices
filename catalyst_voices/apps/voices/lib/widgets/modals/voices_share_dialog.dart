@@ -28,8 +28,7 @@ enum ShareType {
         ShareType.reddit => VoicesAssets.icons.reddit,
       };
 
-  String description(VoicesLocalizations l10n, String itemType) =>
-      switch (this) {
+  String description(VoicesLocalizations l10n, String itemType) => switch (this) {
         ShareType.clipboard => l10n.shareDirectLinkToItem(itemType),
         ShareType.xTwitter => l10n.shareLinkOnSocialMedia(itemType, name),
         ShareType.linkedin => l10n.shareLinkOnSocialMedia(itemType, name),
@@ -166,9 +165,7 @@ class _ShareItem extends StatelessWidget with LaunchUrlMixin {
       borderRadius: BorderRadius.circular(8),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
-        onTap: CatalystPlatform.isWeb
-            ? () async => _webShareItem(context)
-            : _shareItem,
+        onTap: CatalystPlatform.isWeb ? () async => _webShareItem(context) : _shareItem,
         child: Container(
           decoration: BoxDecoration(
             border: Border.all(
@@ -184,8 +181,7 @@ class _ShareItem extends StatelessWidget with LaunchUrlMixin {
               VoicesAvatar(
                 key: const Key('ItemIcon'),
                 icon: shareType.icon.buildIcon(),
-                backgroundColor:
-                    context.colors.elevationsOnSurfaceNeutralLv1Grey,
+                backgroundColor: context.colors.elevationsOnSurfaceNeutralLv1Grey,
                 foregroundColor: context.colors.iconsForeground,
               ),
               Expanded(

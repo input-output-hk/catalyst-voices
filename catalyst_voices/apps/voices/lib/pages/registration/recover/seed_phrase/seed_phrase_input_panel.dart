@@ -61,8 +61,7 @@ class _BlocSeedPhraseField extends StatelessWidget {
   }
 }
 
-class _SeedPhraseInputPanelState extends State<SeedPhraseInputPanel>
-    with UploadSeedPhraseMixin {
+class _SeedPhraseInputPanelState extends State<SeedPhraseInputPanel> with UploadSeedPhraseMixin {
   late final SeedPhraseFieldController _controller;
   final _focusNode = FocusNode();
 
@@ -116,8 +115,7 @@ class _SeedPhraseInputPanelState extends State<SeedPhraseInputPanel>
     final recoverState = RegistrationCubit.of(context).state.recoverStateData;
     final words = recoverState.userSeedPhraseWords;
 
-    _controller = SeedPhraseFieldController(words)
-      ..addListener(_onWordsChanged);
+    _controller = SeedPhraseFieldController(words)..addListener(_onWordsChanged);
   }
 
   void _onWordsChanged() {

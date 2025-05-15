@@ -6,15 +6,13 @@ import 'package:catalyst_voices_services/src/crypto/bip32_ed25519_catalyst_publi
 import 'package:catalyst_voices_services/src/crypto/bip32_ed25519_catalyst_signature.dart';
 import 'package:equatable/equatable.dart';
 
-final class Bip32Ed25519XCatalystPrivateKey extends Equatable
-    implements CatalystPrivateKey {
+final class Bip32Ed25519XCatalystPrivateKey extends Equatable implements CatalystPrivateKey {
   final Bip32Ed25519XPrivateKey _privateKey;
 
   const Bip32Ed25519XCatalystPrivateKey(this._privateKey);
 
   @override
-  CatalystSignatureAlgorithm get algorithm =>
-      CatalystSignatureAlgorithm.ed25519;
+  CatalystSignatureAlgorithm get algorithm => CatalystSignatureAlgorithm.ed25519;
 
   @override
   Uint8List get bytes => Uint8List.fromList(_privateKey.bytes);
@@ -46,8 +44,7 @@ final class Bip32Ed25519XCatalystPrivateKey extends Equatable
   }
 }
 
-final class Bip32Ed25519XCatalystPrivateKeyFactory
-    implements CatalystPrivateKeyFactory {
+final class Bip32Ed25519XCatalystPrivateKeyFactory implements CatalystPrivateKeyFactory {
   const Bip32Ed25519XCatalystPrivateKeyFactory();
 
   @override

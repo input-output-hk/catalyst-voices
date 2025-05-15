@@ -55,9 +55,7 @@ class _ErrorProposalSelector extends StatelessWidget {
             child: VoicesErrorIndicator(
               message: state.error?.message(context) ??
                   const LocalizedUnknownException().message(context),
-              onRetry: () => context
-                  .read<WorkspaceBloc>()
-                  .add(const WatchUserProposalsEvent()),
+              onRetry: () => context.read<WorkspaceBloc>().add(const WatchUserProposalsEvent()),
             ),
           ),
         );

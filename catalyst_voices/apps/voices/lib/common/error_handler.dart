@@ -17,8 +17,8 @@ abstract interface class ErrorHandler {
 /// obtained from the [errorEmitter] and calls the [handleError].
 ///
 /// After the widget is disposed the error stream is disposed too.
-mixin ErrorHandlerStateMixin<E extends ErrorEmitter, T extends StatefulWidget>
-    on State<T> implements ErrorHandler {
+mixin ErrorHandlerStateMixin<E extends ErrorEmitter, T extends StatefulWidget> on State<T>
+    implements ErrorHandler {
   StreamSubscription<Object>? _errorSub;
 
   @override

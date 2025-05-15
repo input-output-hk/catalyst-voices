@@ -14,8 +14,7 @@ import 'package:equatable/equatable.dart';
 ///
 /// This is useful because seed phrase may have duplicate words. With this
 /// structure we can distinguish which word is which.
-final class SeedPhraseWord extends Equatable
-    implements Comparable<SeedPhraseWord> {
+final class SeedPhraseWord extends Equatable implements Comparable<SeedPhraseWord> {
   /// Word value.
   final String data;
 

@@ -2,8 +2,7 @@ import 'package:catalyst_voices/widgets/document_builder/common/document_error_t
 import 'package:catalyst_voices/widgets/document_builder/common/document_property_builder_title.dart';
 import 'package:catalyst_voices/widgets/document_builder/value/document_builder_value_widget.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
-import 'package:catalyst_voices_models/catalyst_voices_models.dart'
-    hide DocumentPropertyBuilder;
+import 'package:catalyst_voices_models/catalyst_voices_models.dart' hide DocumentPropertyBuilder;
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:collection/collection.dart';
@@ -67,8 +66,8 @@ class _FormField extends VoicesFormField<DocumentObjectProperty> {
             final property = field.value!;
             final schema = property.schema;
             final title = schema.title;
-            final properties = property.properties
-                .whereNot((child) => child.schema.isSectionOrSubsection);
+            final properties =
+                property.properties.whereNot((child) => child.schema.isSectionOrSubsection);
 
             final showBorder = schema is DocumentBorderGroupSchema;
             final error = field.errorText;
@@ -164,7 +163,6 @@ class _GenericDocumentObjectPropertyBuilderState
       return null;
     }
 
-    return LocalizedDocumentValidationResult.from(property.validationResult)
-        .message(context);
+    return LocalizedDocumentValidationResult.from(property.validationResult).message(context);
   }
 }

@@ -18,8 +18,7 @@ class DocumentErrorText extends StatelessWidget {
     return Text(
       text ?? context.l10n.snackbarErrorLabelText,
       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-            color:
-                enabled ? theme.colorScheme.error : theme.colors.textDisabled,
+            color: enabled ? theme.colorScheme.error : theme.colors.textDisabled,
           ),
     );
   }

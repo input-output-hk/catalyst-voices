@@ -119,8 +119,7 @@ class _FakeVoicesLocalizations extends Fake implements VoicesLocalizations {
   @override
   String get campaignTreasury => 'Campaign Treasury';
   @override
-  String get campaignTreasuryDescription =>
-      'Total budget, including ecosystem incentives';
+  String get campaignTreasuryDescription => 'Total budget, including ecosystem incentives';
   @override
   String get categoryBudget => 'Category Budget';
   @override

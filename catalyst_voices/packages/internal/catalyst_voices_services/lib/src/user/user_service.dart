@@ -231,9 +231,7 @@ final class UserServiceImpl implements UserService {
     if (email != null) {
       updatedAccount = updatedAccount.copyWith(
         email: email,
-        publicStatus: email.isEmpty
-            ? AccountPublicStatus.notSetup
-            : AccountPublicStatus.verifying,
+        publicStatus: email.isEmpty ? AccountPublicStatus.notSetup : AccountPublicStatus.verifying,
       );
     }
 

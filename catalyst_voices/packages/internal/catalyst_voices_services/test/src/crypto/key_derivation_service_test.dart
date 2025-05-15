@@ -24,8 +24,7 @@ void main() {
     });
 
     test('should generate master key from a seed phrase', () async {
-      final privateKey =
-          await keyDerivation.deriveMasterKey(seedPhrase: seedPhrase);
+      final privateKey = await keyDerivation.deriveMasterKey(seedPhrase: seedPhrase);
       expect(privateKey.bytes, isNotEmpty);
     });
 
@@ -51,8 +50,7 @@ void main() {
   });
 }
 
-class _FakeBip32Ed25519XPrivateKey extends Fake
-    implements Bip32Ed25519XPrivateKey {
+class _FakeBip32Ed25519XPrivateKey extends Fake implements Bip32Ed25519XPrivateKey {
   @override
   final List<int> bytes;
 
@@ -71,8 +69,7 @@ class _FakeBip32Ed25519XPrivateKey extends Fake
   }
 }
 
-class _FakeBip32Ed25519XPublicKey extends Fake
-    implements Bip32Ed25519XPublicKey {
+class _FakeBip32Ed25519XPublicKey extends Fake implements Bip32Ed25519XPublicKey {
   @override
   final List<int> bytes;
 

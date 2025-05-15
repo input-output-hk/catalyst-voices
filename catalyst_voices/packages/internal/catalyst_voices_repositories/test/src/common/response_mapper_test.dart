@@ -53,8 +53,7 @@ void main() {
       );
     });
 
-    test('successBodyBytesOrThrow throws $ApiErrorResponseException otherwise',
-        () {
+    test('successBodyBytesOrThrow throws $ApiErrorResponseException otherwise', () {
       final response = mockBinaryResponse(
         statusCode: HttpStatus.internalServerError,
         error: 'Internal Error',

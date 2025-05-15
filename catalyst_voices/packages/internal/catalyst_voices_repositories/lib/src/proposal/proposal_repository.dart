@@ -136,8 +136,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
       throw const NotFoundException(message: 'Proposal is hidden');
     }
     final templateRef = documentData.metadata.template!;
-    final documentTemplate =
-        await _documentRepository.getDocumentData(ref: templateRef);
+    final documentTemplate = await _documentRepository.getDocumentData(ref: templateRef);
     final proposalDocument = _buildProposalDocument(
       documentData: documentData,
       templateData: documentTemplate,
@@ -149,8 +148,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     final proposalVersions = (await Future.wait(
       documentVersions.map(
         (e) async {
-          final proposalPublish =
-              await getProposalPublishForRef(ref: e.metadata.selfRef);
+          final proposalPublish = await getProposalPublishForRef(ref: e.metadata.selfRef);
 
           if (proposalPublish == null) {
             return null;
@@ -207,8 +205,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   Future<ProposalTemplate> getProposalTemplate({
     required DocumentRef ref,
   }) async {
-    final proposalDocument =
-        await _documentRepository.getDocumentData(ref: ref);
+    final proposalDocument = await _documentRepository.getDocumentData(ref: ref);
 
     return _buildProposalTemplate(documentData: proposalDocument);
   }
@@ -476,12 +473,8 @@ final class ProposalRepositoryImpl implements ProposalRepository {
       documentType: DocumentType.proposalDocument,
       id: metadata.id,
       ver: metadata.version,
-      template: template == null
-          ? null
-          : SignedDocumentMetadataRef.fromDocumentRef(template),
-      categoryId: categoryId == null
-          ? null
-          : SignedDocumentMetadataRef.fromDocumentRef(categoryId),
+      template: template == null ? null : SignedDocumentMetadataRef.fromDocumentRef(template),
+      categoryId: categoryId == null ? null : SignedDocumentMetadataRef.fromDocumentRef(categoryId),
     );
   }
 
@@ -495,9 +488,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
       return switch (action) {
         ProposalSubmissionAction.aFinal => ProposalPublish.submittedProposal,
         ProposalSubmissionAction.hide => null,
-        ProposalSubmissionAction.draft ||
-        null =>
-          ProposalPublish.publishedDraft,
+        ProposalSubmissionAction.draft || null => ProposalPublish.publishedDraft,
       };
     }
   }

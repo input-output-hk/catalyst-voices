@@ -29,8 +29,7 @@ final class DocumentBuilder {
   }) {
     return DocumentBuilder(
       schema: schema,
-      properties:
-          schema.properties.map(DocumentPropertyBuilder.fromSchema).toList(),
+      properties: schema.properties.map(DocumentPropertyBuilder.fromSchema).toList(),
     );
   }
 
@@ -38,9 +37,7 @@ final class DocumentBuilder {
   factory DocumentBuilder.fromDocument(Document document) {
     return DocumentBuilder(
       schema: document.schema,
-      properties: document.properties
-          .map(DocumentPropertyBuilder.fromProperty)
-          .toList(),
+      properties: document.properties.map(DocumentPropertyBuilder.fromProperty).toList(),
     );
   }
 
@@ -59,8 +56,7 @@ final class DocumentBuilder {
 
   /// Builds an immutable [Document].
   Document build() {
-    final mappedProperties = _properties.map((e) => e.build()).toList()
-      ..sortByOrder(_schema.order);
+    final mappedProperties = _properties.map((e) => e.build()).toList()..sortByOrder(_schema.order);
 
     return Document(
       schema: _schema,
@@ -144,9 +140,7 @@ final class DocumentListPropertyBuilder extends DocumentPropertyBuilder {
   ) {
     return DocumentListPropertyBuilder(
       schema: property.schema,
-      properties: property.properties
-          .map(DocumentPropertyBuilder.fromProperty)
-          .toList(),
+      properties: property.properties.map(DocumentPropertyBuilder.fromProperty).toList(),
     );
   }
 
@@ -277,9 +271,7 @@ final class DocumentObjectPropertyBuilder extends DocumentPropertyBuilder {
   ) {
     return DocumentObjectPropertyBuilder(
       schema: property.schema,
-      properties: property.properties
-          .map(DocumentPropertyBuilder.fromProperty)
-          .toList(),
+      properties: property.properties.map(DocumentPropertyBuilder.fromProperty).toList(),
     );
   }
 
@@ -302,8 +294,7 @@ final class DocumentObjectPropertyBuilder extends DocumentPropertyBuilder {
   /// Builds an immutable [DocumentObjectProperty].
   @override
   DocumentObjectProperty build() {
-    final mappedProperties = _properties.map((e) => e.build()).toList()
-      ..sortByOrder(_schema.order);
+    final mappedProperties = _properties.map((e) => e.build()).toList()..sortByOrder(_schema.order);
 
     return _schema.buildProperty(
       properties: List.unmodifiable(mappedProperties),
@@ -312,8 +303,7 @@ final class DocumentObjectPropertyBuilder extends DocumentPropertyBuilder {
 }
 
 /// A [DocumentProperty] builder suited to work with [DocumentValueProperty].
-final class DocumentValuePropertyBuilder<T extends Object>
-    extends DocumentPropertyBuilder {
+final class DocumentValuePropertyBuilder<T extends Object> extends DocumentPropertyBuilder {
   /// The schema of the document property.
   DocumentValueSchema<T> _schema;
 

@@ -1,7 +1,6 @@
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 
-class BlocRegistrationSelector<T>
-    extends BlocSelector<RegistrationCubit, RegistrationState, T> {
+class BlocRegistrationSelector<T> extends BlocSelector<RegistrationCubit, RegistrationState, T> {
   BlocRegistrationSelector({
     super.key,
     required BlocWidgetSelector<RegistrationStateData, T> selector,

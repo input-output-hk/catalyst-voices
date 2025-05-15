@@ -15,9 +15,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 final _logger = Logger('WorkspaceBloc');
 
 final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
-    with
-        BlocSignalEmitterMixin<WorkspaceSignal, WorkspaceState>,
-        BlocErrorEmitterMixin {
+    with BlocSignalEmitterMixin<WorkspaceSignal, WorkspaceState>, BlocErrorEmitterMixin {
   // ignore: unused_field
   final CampaignService _campaignService;
   final ProposalService _proposalService;
@@ -140,8 +138,7 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     ForgetProposalEvent event,
     Emitter<WorkspaceState> emit,
   ) async {
-    final proposal =
-        state.userProposals.firstWhereOrNull((e) => e.selfRef == event.ref);
+    final proposal = state.userProposals.firstWhereOrNull((e) => e.selfRef == event.ref);
     if (proposal == null || proposal.selfRef is! SignedDocumentRef) {
       return emitError(const LocalizedUnknownException());
     }
@@ -166,8 +163,7 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     Emitter<WorkspaceState> emit,
   ) async {
     final timelineItems = await _campaignService.getCampaignTimeline();
-    final timeline =
-        timelineItems.map(CampaignTimelineViewModel.fromModel).toList();
+    final timeline = timelineItems.map(CampaignTimelineViewModel.fromModel).toList();
 
     emit(state.copyWith(timelineItems: timeline));
     emitSignal(SubmissionCloseDate(date: state.submissionCloseDate));
@@ -206,8 +202,7 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
   List<Proposal> _removeProposal(
     DocumentRef proposalRef,
   ) {
-    return [...state.userProposals]
-      ..removeWhere((e) => e.selfRef.id == proposalRef.id);
+    return [...state.userProposals]..removeWhere((e) => e.selfRef.id == proposalRef.id);
   }
 
   void _setupProposalsSubscription() {
@@ -229,8 +224,7 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     UnlockProposalEvent event,
     Emitter<WorkspaceState> emit,
   ) async {
-    final proposal =
-        state.userProposals.firstWhereOrNull((e) => e.selfRef == event.ref);
+    final proposal = state.userProposals.firstWhereOrNull((e) => e.selfRef == event.ref);
     if (proposal == null || proposal.selfRef is! SignedDocumentRef) {
       return emitError(const LocalizedUnknownException());
     }

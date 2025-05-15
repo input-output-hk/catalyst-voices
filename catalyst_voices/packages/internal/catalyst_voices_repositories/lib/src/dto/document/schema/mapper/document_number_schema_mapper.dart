@@ -13,8 +13,7 @@ final class DocumentNumberSchemaMapper {
     final format = DocumentPropertyFormat.fromString(schema.format ?? '');
     final title = schema.title ?? '';
     final description = schema.description;
-    final descriptionMarkdown =
-        description != null ? MarkdownData(description) : null;
+    final descriptionMarkdown = description != null ? MarkdownData(description) : null;
     final placeholder = schema.placeholder;
     final guidance = schema.guidance;
     final guidanceMarkdown = guidance != null ? MarkdownData(guidance) : null;

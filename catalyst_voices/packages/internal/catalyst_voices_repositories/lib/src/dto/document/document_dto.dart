@@ -49,9 +49,7 @@ final class DocumentDto {
     // building a document via builder to sort properties
     return DocumentBuilder(
       schema: schema,
-      properties: properties
-          .map((e) => DocumentPropertyBuilder.fromProperty(e.toModel()))
-          .toList(),
+      properties: properties.map((e) => DocumentPropertyBuilder.fromProperty(e.toModel())).toList(),
     ).build();
   }
 }
@@ -218,8 +216,7 @@ final class DocumentPropertyObjectDto extends DocumentPropertyDto {
   }
 }
 
-final class DocumentPropertyValueDto<T extends Object>
-    extends DocumentPropertyDto {
+final class DocumentPropertyValueDto<T extends Object> extends DocumentPropertyDto {
   @override
   final DocumentValueSchema<T> schema;
   final T? value;

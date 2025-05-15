@@ -2,8 +2,7 @@ import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
-import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart'
-    hide PopupMenuItem;
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart' hide PopupMenuItem;
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 

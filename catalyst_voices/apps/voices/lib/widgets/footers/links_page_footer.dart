@@ -33,15 +33,13 @@ class LinksPageFooter extends StatelessWidget {
               Wrap(
                 alignment: WrapAlignment.center,
                 runSpacing: 8,
-                children:
-                    upperChildren.separatedBy(const _ResponsiveGap()).toList(),
+                children: upperChildren.separatedBy(const _ResponsiveGap()).toList(),
               ),
               const SizedBox(height: 24),
               Wrap(
                 alignment: WrapAlignment.center,
                 runSpacing: 8,
-                children:
-                    lowerChildren.separatedBy(const _ResponsiveGap()).toList(),
+                children: lowerChildren.separatedBy(const _ResponsiveGap()).toList(),
               ),
             ],
           ),

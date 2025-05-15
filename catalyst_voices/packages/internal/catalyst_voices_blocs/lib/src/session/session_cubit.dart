@@ -18,8 +18,7 @@ set alwaysAllowRegistration(bool newValue) {
 }
 
 /// Manages the user session.
-final class SessionCubit extends Cubit<SessionState>
-    with BlocErrorEmitterMixin {
+final class SessionCubit extends Cubit<SessionState> with BlocErrorEmitterMixin {
   final UserService _userService;
   final RegistrationService _registrationService;
   final RegistrationProgressNotifier _registrationProgressNotifier;
@@ -46,10 +45,8 @@ final class SessionCubit extends Cubit<SessionState>
     this._adminTools,
   )   : _adminToolsState = _adminTools.state,
         super(const SessionState.initial()) {
-    _userSettingsSub = _userService.watchUser
-        .map((user) => user.settings)
-        .distinct()
-        .listen(_handleUserSettings);
+    _userSettingsSub =
+        _userService.watchUser.map((user) => user.settings).distinct().listen(_handleUserSettings);
 
     _keychainUnlockedSub = _userService.watchUser
         .map((user) => user.activeAccount)
@@ -61,9 +58,8 @@ final class SessionCubit extends Cubit<SessionState>
 
     _registrationProgressNotifier.addListener(_onRegistrationProgressChanged);
 
-    _accountSub = _userService.watchUser
-        .map((user) => user.activeAccount)
-        .listen(_onActiveAccountChanged);
+    _accountSub =
+        _userService.watchUser.map((user) => user.activeAccount).listen(_onActiveAccountChanged);
 
     _adminToolsSub = _adminTools.stream.listen(_onAdminToolsChanged);
 
@@ -73,9 +69,7 @@ final class SessionCubit extends Cubit<SessionState>
   }
 
   Future<bool> checkAvailableWallets() async {
-    final wallets = await _registrationService
-        .getCardanoWallets()
-        .onError((_, __) => const []);
+    final wallets = await _registrationService.getCardanoWallets().onError((_, __) => const []);
 
     _hasWallets = wallets.isNotEmpty;
 
@@ -94,8 +88,7 @@ final class SessionCubit extends Cubit<SessionState>
     await _keychainUnlockedSub?.cancel();
     _keychainUnlockedSub = null;
 
-    _registrationProgressNotifier
-        .removeListener(_onRegistrationProgressChanged);
+    _registrationProgressNotifier.removeListener(_onRegistrationProgressChanged);
 
     await _accountSub?.cancel();
     _accountSub = null;
@@ -140,8 +133,7 @@ final class SessionCubit extends Cubit<SessionState>
   void updateShowSubmissionClosingWarning({required bool value}) {
     final settings = _userService.user.settings;
 
-    final updatedSettings =
-        settings.copyWith(showSubmissionClosingWarning: Optional.of(value));
+    final updatedSettings = settings.copyWith(showSubmissionClosingWarning: Optional.of(value));
 
     unawaited(_userService.updateSettings(updatedSettings));
   }
@@ -228,8 +220,7 @@ final class SessionCubit extends Cubit<SessionState>
   }
 
   Future<Account> _getDummyAccount() async {
-    final dummyAccount =
-        _userService.user.accounts.firstWhereOrNull((e) => e.isDummy);
+    final dummyAccount = _userService.user.accounts.firstWhereOrNull((e) => e.isDummy);
 
     return dummyAccount ??
         await _registrationService.registerTestAccount(

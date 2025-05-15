@@ -89,10 +89,8 @@ class CurrentCampaignSection {
           $(currentCampaignRoot).$(ideaDescription).$(MarkdownBody),
         )
         .data;
-    final textToMatch = (await t())
-        .ideaJourneyDescription
-        .split('#### ')[1]
-        .split('[fund timeline]')[0];
+    final textToMatch =
+        (await t()).ideaJourneyDescription.split('#### ')[1].split('[fund timeline]')[0];
     expect(descriptionText.indexOf(textToMatch), greaterThanOrEqualTo(1));
     expect($(currentCampaignRoot).$(timelineCard), findsExactly(5));
   }
@@ -108,27 +106,16 @@ class CurrentCampaignSection {
   Future<void> timelineCardsDataIsRendered() async {
     await descriptionIsRenderedCorrectly();
     await DiscoveryPage($).loadRetryOnError(currentCampaignLoadingError);
-    await $(currentCampaignRoot)
-        .$(timelineCard)
-        .at(0)
-        .$(timelineCardDate)
-        .scrollTo(step: 150);
+    await $(currentCampaignRoot).$(timelineCard).at(0).$(timelineCardDate).scrollTo(step: 150);
     for (var i = 0; i < 5; i++) {
-      final cardTitle = $(campaignTimelineComponent)
-          .$(timelineCard)
-          .at(i)
-          .$(timelineCardTitle);
+      final cardTitle = $(campaignTimelineComponent).$(timelineCard).at(i).$(timelineCardTitle);
       await $.tester.dragUntilVisible(
         cardTitle,
         $(campaignTimelineComponent).$(SingleChildScrollView),
         const Offset(10, 0),
       );
       expect(
-        $(currentCampaignRoot)
-            .$(timelineCard)
-            .at(i)
-            .$(AnimatedSwitcher)
-            .$(Text),
+        $(currentCampaignRoot).$(timelineCard).at(i).$(AnimatedSwitcher).$(Text),
         findsNothing,
       );
       await $(currentCampaignRoot).$(timelineCard).at(i).tap();
@@ -141,12 +128,7 @@ class CurrentCampaignSection {
         isNotEmpty,
       );
       expect(
-        $(currentCampaignRoot)
-            .$(timelineCard)
-            .at(i)
-            .$(AnimatedSwitcher)
-            .$(Text)
-            .text,
+        $(currentCampaignRoot).$(timelineCard).at(i).$(AnimatedSwitcher).$(Text).text,
         isNotEmpty,
       );
     }

@@ -37,8 +37,7 @@ class JSCardanoWalletProxy implements CardanoWallet {
 
   @override
   List<CipExtension> get supportedExtensions =>
-      _delegate.supportedExtensions?.toDart.map((e) => e.toDart).toList() ??
-      _fallbackExtensions;
+      _delegate.supportedExtensions?.toDart.map((e) => e.toDart).toList() ?? _fallbackExtensions;
 
   @override
   Future<bool> isEnabled() async {
@@ -52,8 +51,7 @@ class JSCardanoWalletProxy implements CardanoWallet {
   @override
   Future<CardanoWalletApi> enable({List<CipExtension>? extensions}) async {
     try {
-      final jsExtensions =
-          extensions != null ? JSCipExtensions.fromDart(extensions) : null;
+      final jsExtensions = extensions != null ? JSCipExtensions.fromDart(extensions) : null;
 
       return await _delegate.enable(jsExtensions).toDart.then((e) => e.toDart);
     } catch (ex) {
@@ -106,8 +104,7 @@ class JSCardanoWalletApiProxy implements CardanoWalletApi {
   @override
   Future<NetworkId> getNetworkId() async {
     try {
-      final result =
-          await _delegate.getNetworkId().toDart.then((e) => e.toDartInt);
+      final result = await _delegate.getNetworkId().toDart.then((e) => e.toDartInt);
       return NetworkId.fromId(result);
     } catch (ex) {
       throw _mapApiException(ex) ?? _fallbackApiException(ex);
@@ -130,9 +127,7 @@ class JSCardanoWalletApiProxy implements CardanoWalletApi {
   Future<List<ShelleyAddress>> getRewardAddresses() async {
     try {
       return await _delegate.getRewardAddresses().toDart.then(
-            (array) => array.toDart
-                .map((item) => ShelleyAddress(hex.decode(item.toDart)))
-                .toList(),
+            (array) => array.toDart.map((item) => ShelleyAddress(hex.decode(item.toDart))).toList(),
           );
     } catch (ex) {
       throw _mapApiException(ex) ?? _fallbackApiException(ex);
@@ -143,9 +138,7 @@ class JSCardanoWalletApiProxy implements CardanoWalletApi {
   Future<List<ShelleyAddress>> getUnusedAddresses() async {
     try {
       return await _delegate.getUnusedAddresses().toDart.then(
-            (array) => array.toDart
-                .map((item) => ShelleyAddress(hex.decode(item.toDart)))
-                .toList(),
+            (array) => array.toDart.map((item) => ShelleyAddress(hex.decode(item.toDart))).toList(),
           );
     } catch (ex) {
       throw _mapApiException(ex) ?? _fallbackApiException(ex);
@@ -155,18 +148,13 @@ class JSCardanoWalletApiProxy implements CardanoWalletApi {
   @override
   Future<List<ShelleyAddress>> getUsedAddresses({Paginate? paginate}) async {
     try {
-      final jsPaginate =
-          paginate != null ? JSPaginate.fromDart(paginate) : makeUndefined();
+      final jsPaginate = paginate != null ? JSPaginate.fromDart(paginate) : makeUndefined();
 
       return await _delegate.getUsedAddresses(jsPaginate).toDart.then(
-            (array) => array.toDart
-                .map((item) => ShelleyAddress(hex.decode(item.toDart)))
-                .toList(),
+            (array) => array.toDart.map((item) => ShelleyAddress(hex.decode(item.toDart))).toList(),
           );
     } catch (ex) {
-      throw _mapApiException(ex) ??
-          _mapPaginateException(ex) ??
-          _fallbackApiException(ex);
+      throw _mapApiException(ex) ?? _mapPaginateException(ex) ?? _fallbackApiException(ex);
     }
   }
 
@@ -177,9 +165,7 @@ class JSCardanoWalletApiProxy implements CardanoWalletApi {
   }) async {
     try {
       final utxos = _delegate.getUtxos(
-        amount != null
-            ? hex.encode(cbor.encode(amount.toCbor())).toJS
-            : makeUndefined(),
+        amount != null ? hex.encode(cbor.encode(amount.toCbor())).toJS : makeUndefined(),
         paginate != null ? JSPaginate.fromDart(paginate) : makeUndefined(),
       );
 
@@ -195,9 +181,7 @@ class JSCardanoWalletApiProxy implements CardanoWalletApi {
             .toSet(),
       );
     } catch (ex) {
-      throw _mapApiException(ex) ??
-          _mapPaginateException(ex) ??
-          _fallbackApiException(ex);
+      throw _mapApiException(ex) ?? _mapPaginateException(ex) ?? _fallbackApiException(ex);
     }
   }
 
@@ -215,9 +199,7 @@ class JSCardanoWalletApiProxy implements CardanoWalletApi {
           .toDart
           .then((e) => e.toDart);
     } catch (ex) {
-      throw _mapApiException(ex) ??
-          _mapDataSignException(ex) ??
-          _fallbackApiException(ex);
+      throw _mapApiException(ex) ?? _mapDataSignException(ex) ?? _fallbackApiException(ex);
     }
   }
 
@@ -230,18 +212,13 @@ class JSCardanoWalletApiProxy implements CardanoWalletApi {
       final bytes = cbor.encode(transaction.toCbor());
       final hexString = hex.encode(bytes);
 
-      return await _delegate
-          .signTx(hexString.toJS, partialSign.toJS)
-          .toDart
-          .then(
+      return await _delegate.signTx(hexString.toJS, partialSign.toJS).toDart.then(
             (e) => TransactionWitnessSet.fromCbor(
               cbor.decode(hex.decode(e.toDart)),
             ),
           );
     } catch (ex) {
-      throw _mapApiException(ex) ??
-          _mapTxSignException(ex) ??
-          _fallbackApiException(ex);
+      throw _mapApiException(ex) ?? _mapTxSignException(ex) ?? _fallbackApiException(ex);
     }
   }
 
@@ -253,9 +230,7 @@ class JSCardanoWalletApiProxy implements CardanoWalletApi {
       final result = await _delegate.submitTx(hexString.toJS).toDart;
       return TransactionHash.fromHex(result.toDart);
     } catch (ex) {
-      throw _mapApiException(ex) ??
-          _mapTxSendException(ex) ??
-          _fallbackApiException(ex);
+      throw _mapApiException(ex) ?? _mapTxSendException(ex) ?? _fallbackApiException(ex);
     }
   }
 }
@@ -270,8 +245,7 @@ class JSCardanoWalletCip95ApiProxy implements CardanoWalletCip95Api {
   @override
   Future<PubDRepKey> getPubDRepKey() async {
     try {
-      final result =
-          await _delegate.getPubDRepKey().toDart.then((e) => e.toDart);
+      final result = await _delegate.getPubDRepKey().toDart.then((e) => e.toDart);
       return PubDRepKey(result);
     } catch (ex) {
       throw _mapApiException(ex) ?? _fallbackApiException(ex);
@@ -282,8 +256,7 @@ class JSCardanoWalletCip95ApiProxy implements CardanoWalletCip95Api {
   Future<List<PubStakeKey>> getRegisteredPubStakeKeys() async {
     try {
       return await _delegate.getRegisteredPubStakeKeys().toDart.then(
-            (jsArray) =>
-                jsArray.toDart.map((key) => PubStakeKey(key.toDart)).toList(),
+            (jsArray) => jsArray.toDart.map((key) => PubStakeKey(key.toDart)).toList(),
           );
     } catch (ex) {
       throw _mapApiException(ex) ?? _fallbackApiException(ex);
@@ -294,8 +267,7 @@ class JSCardanoWalletCip95ApiProxy implements CardanoWalletCip95Api {
   Future<List<PubStakeKey>> getUnregisteredPubStakeKeys() async {
     try {
       return await _delegate.getUnregisteredPubStakeKeys().toDart.then(
-            (jsArray) =>
-                jsArray.toDart.map((key) => PubStakeKey(key.toDart)).toList(),
+            (jsArray) => jsArray.toDart.map((key) => PubStakeKey(key.toDart)).toList(),
           );
     } catch (ex) {
       throw _mapApiException(ex) ?? _fallbackApiException(ex);
@@ -330,9 +302,7 @@ class JSCardanoWalletCip95ApiProxy implements CardanoWalletCip95Api {
           .toDart
           .then((e) => VkeyWitness.fromCbor(cbor.decode(hex.decode(e.toDart))));
     } catch (ex) {
-      throw _mapApiException(ex) ??
-          _mapDataSignException(ex) ??
-          _fallbackApiException(ex);
+      throw _mapApiException(ex) ?? _mapDataSignException(ex) ?? _fallbackApiException(ex);
     }
   }
 }

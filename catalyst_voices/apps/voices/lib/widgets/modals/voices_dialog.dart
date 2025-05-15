@@ -16,8 +16,7 @@ abstract final class VoicesDialog {
     // a barrierLabel we reimplemented the same behavior.
     return Navigator.of(context, rootNavigator: useRootNavigator).push<T>(
       RawDialogRoute<T>(
-        pageBuilder: (context, animation, secondaryAnimation) =>
-            builder(context),
+        pageBuilder: (context, animation, secondaryAnimation) => builder(context),
         barrierDismissible: barrierDismissible,
         barrierColor: barrierColor,
         settings: routeSettings,

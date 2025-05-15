@@ -107,9 +107,8 @@ class CatalystSvgIcon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final effectiveSize = allowSize ? size ?? IconTheme.of(context).size : null;
-    final effectiveColorFilter = allowColorFilter
-        ? _colorFilter ?? IconTheme.of(context).asColorFilter()
-        : null;
+    final effectiveColorFilter =
+        allowColorFilter ? _colorFilter ?? IconTheme.of(context).asColorFilter() : null;
 
     return CatalystSvgPicture(
       bytesLoader,

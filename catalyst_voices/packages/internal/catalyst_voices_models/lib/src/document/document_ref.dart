@@ -125,8 +125,7 @@ final class DraftRef extends DocumentRef {
       );
 
   @override
-  String toString() =>
-      isExact ? 'ExactDraftRef($id.v$version)' : 'LooseDraftRef($id)';
+  String toString() => isExact ? 'ExactDraftRef($id.v$version)' : 'LooseDraftRef($id)';
 }
 
 final class SecuredDocumentRef extends Equatable {
@@ -192,9 +191,8 @@ final class SignedDocumentRef extends DocumentRef {
   SignedDocumentRef toSignedDocumentRef() => this;
 
   @override
-  String toString() => isExact
-      ? 'ExactSignedDocumentRef($id.v$version)'
-      : 'LooseSignedDocumentRef($id)';
+  String toString() =>
+      isExact ? 'ExactSignedDocumentRef($id.v$version)' : 'LooseSignedDocumentRef($id)';
 }
 
 final class TypedDocumentRef extends Equatable {

@@ -37,11 +37,7 @@ class MostRecentSection {
   }
 
   Future<void> recentProposalsAreRenderedCorrectly() async {
-    await $(mostRecentProposals)
-        .$(proposalCard)
-        .at(0)
-        .$(commentsCount)
-        .scrollTo(step: 90);
+    await $(mostRecentProposals).$(proposalCard).at(0).$(commentsCount).scrollTo(step: 90);
 
     // TODO(oldgreg): there are only 3 cards indexed(rendered) always,need to
     // find a way to check cards past 3rd after horizontal scroll
@@ -84,12 +80,7 @@ class MostRecentSection {
       findsOneWidget,
     );
     expect(
-      $(parentContainer)
-          .$(proposalCard)
-          .at(cardIndex)
-          .$(authorAvatar)
-          .$(Text)
-          .text,
+      $(parentContainer).$(proposalCard).at(cardIndex).$(authorAvatar).$(Text).text,
       isNotEmpty,
     );
     expect(
@@ -97,39 +88,19 @@ class MostRecentSection {
       isNotEmpty,
     );
     expect(
-      $(parentContainer)
-          .$(proposalCard)
-          .at(cardIndex)
-          .$(fundsRequested)
-          .$(title)
-          .text,
+      $(parentContainer).$(proposalCard).at(cardIndex).$(fundsRequested).$(title).text,
       (await t()).fundsRequested,
     );
     expect(
-      $(parentContainer)
-          .$(proposalCard)
-          .at(cardIndex)
-          .$(fundsRequested)
-          .$(value)
-          .text,
+      $(parentContainer).$(proposalCard).at(cardIndex).$(fundsRequested).$(value).text,
       isNotEmpty,
     );
     expect(
-      $(parentContainer)
-          .$(proposalCard)
-          .at(cardIndex)
-          .$(duration)
-          .$(title)
-          .text,
+      $(parentContainer).$(proposalCard).at(cardIndex).$(duration).$(title).text,
       (await t()).duration,
     );
     expect(
-      $(parentContainer)
-          .$(proposalCard)
-          .at(cardIndex)
-          .$(duration)
-          .$(value)
-          .text,
+      $(parentContainer).$(proposalCard).at(cardIndex).$(duration).$(value).text,
       isNotEmpty,
     );
     expect(
@@ -145,11 +116,7 @@ class MostRecentSection {
       isNotEmpty,
     );
     expect(
-      $(parentContainer)
-          .$(proposalCard)
-          .at(cardIndex)
-          .$(timezoneDateTimeText)
-          .text,
+      $(parentContainer).$(proposalCard).at(cardIndex).$(timezoneDateTimeText).text,
       isNotEmpty,
     );
     expect(
@@ -160,9 +127,7 @@ class MostRecentSection {
 
   Future<void> tryToScrollToRetryError() async {
     try {
-      await $(mostRecentLoadingError)
-          .$(#ErrorRetryBtn)
-          .scrollTo(step: 300, maxScrolls: 5);
+      await $(mostRecentLoadingError).$(#ErrorRetryBtn).scrollTo(step: 300, maxScrolls: 5);
     } catch (e) {
       return;
     }

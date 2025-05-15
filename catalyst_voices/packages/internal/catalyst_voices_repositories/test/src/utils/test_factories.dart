@@ -1,5 +1,4 @@
-import 'package:catalyst_voices_models/catalyst_voices_models.dart'
-    hide Document;
+import 'package:catalyst_voices_models/catalyst_voices_models.dart' hide Document;
 import 'package:catalyst_voices_repositories/src/database/database.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_metadata.dart';
 import 'package:uuid_plus/uuid_plus.dart';

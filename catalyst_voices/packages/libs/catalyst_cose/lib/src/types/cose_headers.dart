@@ -120,27 +120,21 @@ final class CoseHeaders extends Equatable {
     return CoseHeaders(
       alg: CborUtils.deserializeStringOrInt(map[CoseHeaderKeys.alg]),
       kid: CborUtils.deserializeBytes(map[CoseHeaderKeys.kid]),
-      contentType:
-          CborUtils.deserializeStringOrInt(map[CoseHeaderKeys.contentType]),
-      contentEncoding:
-          CborUtils.deserializeStringOrInt(map[CoseHeaderKeys.contentEncoding]),
+      contentType: CborUtils.deserializeStringOrInt(map[CoseHeaderKeys.contentType]),
+      contentEncoding: CborUtils.deserializeStringOrInt(map[CoseHeaderKeys.contentEncoding]),
       type: CborUtils.deserializeUuid(map[CoseHeaderKeys.type]),
       id: CborUtils.deserializeUuid(map[CoseHeaderKeys.id]),
       ver: CborUtils.deserializeUuid(map[CoseHeaderKeys.ver]),
       ref: CborUtils.deserializeReferenceUuid(map[CoseHeaderKeys.ref]),
-      refHash:
-          CborUtils.deserializeReferenceUuidHash(map[CoseHeaderKeys.refHash]),
-      template:
-          CborUtils.deserializeReferenceUuid(map[CoseHeaderKeys.template]),
+      refHash: CborUtils.deserializeReferenceUuidHash(map[CoseHeaderKeys.refHash]),
+      template: CborUtils.deserializeReferenceUuid(map[CoseHeaderKeys.template]),
       reply: CborUtils.deserializeReferenceUuid(map[CoseHeaderKeys.reply]),
       section: CborUtils.deserializeString(map[CoseHeaderKeys.section]),
       collabs: CborUtils.deserializeStringList(map[CoseHeaderKeys.collabs]),
       brandId: CborUtils.deserializeReferenceUuid(map[CoseHeaderKeys.brandId]),
-      campaignId:
-          CborUtils.deserializeReferenceUuid(map[CoseHeaderKeys.campaignId]),
+      campaignId: CborUtils.deserializeReferenceUuid(map[CoseHeaderKeys.campaignId]),
       electionId: CborUtils.deserializeString(map[CoseHeaderKeys.electionId]),
-      categoryId:
-          CborUtils.deserializeReferenceUuid(map[CoseHeaderKeys.categoryId]),
+      categoryId: CborUtils.deserializeReferenceUuid(map[CoseHeaderKeys.categoryId]),
       encodeAsBytes: encodeAsBytes,
     );
   }
@@ -234,8 +228,7 @@ final class CoseHeaders extends Equatable {
       alg: alg != null ? alg() : this.alg,
       kid: kid != null ? kid() : this.kid,
       contentType: contentType != null ? contentType() : this.contentType,
-      contentEncoding:
-          contentEncoding != null ? contentEncoding() : this.contentEncoding,
+      contentEncoding: contentEncoding != null ? contentEncoding() : this.contentEncoding,
       type: type != null ? type() : this.type,
       id: id != null ? id() : this.id,
       ver: ver != null ? ver() : this.ver,
@@ -258,10 +251,8 @@ final class CoseHeaders extends Equatable {
     final map = CborMap({
       if (alg != null) CoseHeaderKeys.alg: alg!.toCbor(),
       if (kid != null) CoseHeaderKeys.kid: CborBytes(kid!),
-      if (contentType != null)
-        CoseHeaderKeys.contentType: contentType!.toCbor(),
-      if (contentEncoding != null)
-        CoseHeaderKeys.contentEncoding: contentEncoding!.toCbor(),
+      if (contentType != null) CoseHeaderKeys.contentType: contentType!.toCbor(),
+      if (contentEncoding != null) CoseHeaderKeys.contentEncoding: contentEncoding!.toCbor(),
       if (type != null) CoseHeaderKeys.type: type!.toCbor(),
       if (id != null) CoseHeaderKeys.id: id!.toCbor(),
       if (ver != null) CoseHeaderKeys.ver: ver!.toCbor(),
@@ -272,11 +263,9 @@ final class CoseHeaders extends Equatable {
       if (section != null) CoseHeaderKeys.section: CborString(section!),
       if (brandId != null) CoseHeaderKeys.brandId: brandId!.toCbor(),
       if (campaignId != null) CoseHeaderKeys.campaignId: campaignId!.toCbor(),
-      if (electionId != null)
-        CoseHeaderKeys.electionId: CborString(electionId!),
+      if (electionId != null) CoseHeaderKeys.electionId: CborString(electionId!),
       if (categoryId != null) CoseHeaderKeys.categoryId: categoryId!.toCbor(),
-      if (collabs != null)
-        CoseHeaderKeys.collabs: CborUtils.serializeStringList(collabs),
+      if (collabs != null) CoseHeaderKeys.collabs: CborUtils.serializeStringList(collabs),
     });
 
     if (encodeAsBytes) {

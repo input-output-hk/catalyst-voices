@@ -107,8 +107,7 @@ class _AllProposals extends StatelessWidget {
               PendingProposalCard(
                 proposal: proposal,
                 isFavorite: favoriteProposals.contains(proposal),
-                onFavoriteChanged: (isFavorite) =>
-                    _onFavoriteChanged(proposal, isFavorite),
+                onFavoriteChanged: (isFavorite) => _onFavoriteChanged(proposal, isFavorite),
               ),
           ],
         );
@@ -133,8 +132,7 @@ class _FavoriteProposals extends StatelessWidget {
               PendingProposalCard(
                 proposal: proposal,
                 isFavorite: true,
-                onFavoriteChanged: (isFavorite) =>
-                    _onFavoriteChanged(proposal, isFavorite),
+                onFavoriteChanged: (isFavorite) => _onFavoriteChanged(proposal, isFavorite),
               ),
           ],
         );
@@ -221,8 +219,7 @@ class _UnlockedHeaderActions extends StatelessWidget {
             decoration: VoicesTextFieldDecoration(
               labelText: 'Show',
               hintText: 'Fund 14',
-              suffixIcon:
-                  VoicesAssets.icons.arrowTriangleDown.buildIcon(size: 16),
+              suffixIcon: VoicesAssets.icons.arrowTriangleDown.buildIcon(size: 16),
             ),
             onFieldSubmitted: (value) {},
           ),

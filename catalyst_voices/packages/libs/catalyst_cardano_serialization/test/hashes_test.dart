@@ -10,8 +10,7 @@ import 'test_utils/test_data.dart';
 
 void main() {
   group(TransactionHash, () {
-    const hexString =
-        '4d3f576f26db29139981a69443c2325daa812cc353a31b5a4db794a5bcbb06c2';
+    const hexString = '4d3f576f26db29139981a69443c2325daa812cc353a31b5a4db794a5bcbb06c2';
     final bytes = hex.decode(hexString);
 
     test('from and to hex', () {
@@ -85,8 +84,7 @@ void main() {
   });
 
   group(AuxiliaryDataHash, () {
-    const hexString =
-        '4d3f576f26db29139981a69443c2325daa812cc353a31b5a4db794a5bcbb06c2';
+    const hexString = '4d3f576f26db29139981a69443c2325daa812cc353a31b5a4db794a5bcbb06c2';
     final bytes = hex.decode(hexString);
 
     test('from and to hex', () {

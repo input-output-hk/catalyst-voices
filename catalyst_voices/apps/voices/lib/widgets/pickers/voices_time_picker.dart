@@ -117,9 +117,7 @@ class _TimeText extends StatelessWidget {
       child: InkWell(
         onTap: () => onTap(value),
         child: ColoredBox(
-          color: !isSelected
-              ? Colors.transparent
-              : Theme.of(context).colors.onSurfaceNeutral08,
+          color: !isSelected ? Colors.transparent : Theme.of(context).colors.onSurfaceNeutral08,
           child: Padding(
             key: key,
             padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),

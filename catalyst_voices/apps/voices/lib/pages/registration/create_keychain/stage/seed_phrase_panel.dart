@@ -139,9 +139,7 @@ class _StoredCheckbox extends StatelessWidget {
       value: isConfirmed,
       label: Text(context.l10n.createKeychainSeedPhraseStoreConfirmation),
       onChanged: (value) {
-        RegistrationCubit.of(context)
-            .keychainCreation
-            .setSeedPhraseStored(value);
+        RegistrationCubit.of(context).keychainCreation.setSeedPhraseStored(value);
       },
     );
   }

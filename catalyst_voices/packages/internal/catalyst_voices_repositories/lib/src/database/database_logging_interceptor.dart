@@ -205,8 +205,7 @@ final class DatabaseLoggingInterceptor extends QueryInterceptor {
       final closeParens = ')'.allMatches(line).length;
 
       if (closeParens > openParens) {
-        indentLevel =
-            (indentLevel - (closeParens - openParens)).clamp(0, indentLevel);
+        indentLevel = (indentLevel - (closeParens - openParens)).clamp(0, indentLevel);
       }
 
       buffer.writeln('${_indent * indentLevel}$line');

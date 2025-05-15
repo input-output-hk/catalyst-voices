@@ -37,8 +37,7 @@ abstract interface class DraftDataSource implements DocumentDataLocalSource {
 }
 
 /// See [DatabaseDocumentsDataSource].
-abstract interface class SignedDocumentDataSource
-    implements DocumentDataLocalSource {
+abstract interface class SignedDocumentDataSource implements DocumentDataLocalSource {
   Future<int> getRefCount({
     required DocumentRef ref,
     required DocumentType type,

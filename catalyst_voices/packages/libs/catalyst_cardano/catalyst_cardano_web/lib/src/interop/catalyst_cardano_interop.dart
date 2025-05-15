@@ -134,8 +134,7 @@ extension type JSCipExtensions._(JSObject _) implements JSObject {
   }
 
   /// Converts JS representation to pure dart representation.
-  List<CipExtension> get toDart =>
-      extensions.toDart.map((e) => e.toDart).toList();
+  List<CipExtension> get toDart => extensions.toDart.map((e) => e.toDart).toList();
 }
 
 /// The JS representation of the [CipExtension].

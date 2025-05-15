@@ -147,8 +147,7 @@ void main() {
   });
 }
 
-class _FakeCatalystPrivateKeyFactory extends Fake
-    implements CatalystPrivateKeyFactory {
+class _FakeCatalystPrivateKeyFactory extends Fake implements CatalystPrivateKeyFactory {
   @override
   CatalystPrivateKey create(Uint8List bytes) {
     return _FakeCatalystPrivateKey(bytes: bytes);

@@ -2,8 +2,7 @@ import 'dart:typed_data';
 
 import 'package:catalyst_key_derivation/src/bip32_ed25519/bip32_ed25519_public_key.dart';
 import 'package:catalyst_key_derivation/src/bip32_ed25519/bip32_ed25519_signature.dart';
-import 'package:catalyst_key_derivation/src/rust/api/key_derivation.dart'
-    as rust;
+import 'package:catalyst_key_derivation/src/rust/api/key_derivation.dart' as rust;
 import 'package:cbor/cbor.dart';
 import 'package:convert/convert.dart';
 import 'package:equatable/equatable.dart';

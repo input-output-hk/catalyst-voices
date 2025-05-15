@@ -8,6 +8,5 @@ mod cache;
 mod cache_manager;
 mod instance;
 
-// TODO: Remove when the cache is used.
-#[allow(unused_imports)]
+pub use add_result::{RbacCacheAddError, RbacCacheAddSuccess};
 pub use instance::RBAC_CACHE;

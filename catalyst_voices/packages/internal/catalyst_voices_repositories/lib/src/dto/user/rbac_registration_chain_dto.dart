@@ -9,8 +9,7 @@ import 'package:convert/convert.dart';
 extension RbacRegistrationChainExt on RbacRegistrationChain {
   Set<AccountRole> get accountRoles {
     final roleNumbers = _roleData.keys.map(int.tryParse);
-    final accountRoles =
-        roleNumbers.map(AccountRole.maybeFromNumber).nonNulls.toSet();
+    final accountRoles = roleNumbers.map(AccountRole.maybeFromNumber).nonNulls.toSet();
 
     return accountRoles;
   }
@@ -66,9 +65,8 @@ extension RbacRegistrationChainExt on RbacRegistrationChain {
       throw ArgumentError.notNull('subjectAltName');
     }
 
-    final stakeAddressUri = subjectAltName
-        .map((e) => e.value)
-        .firstWhereOrNull(CardanoAddressUri.isCardanoAddressUri);
+    final stakeAddressUri =
+        subjectAltName.map((e) => e.value).firstWhereOrNull(CardanoAddressUri.isCardanoAddressUri);
 
     if (stakeAddressUri == null) {
       throw ArgumentError.notNull('stakeAddressUri');
@@ -79,8 +77,7 @@ extension RbacRegistrationChainExt on RbacRegistrationChain {
 
   X509Certificate _decodeX509Certificate(String hexString) {
     final certificateBytes = hex.decode(hexString.replaceFirst('0x', ''));
-    final derCertificate =
-        X509DerCertificate.fromBytes(bytes: certificateBytes);
+    final derCertificate = X509DerCertificate.fromBytes(bytes: certificateBytes);
     return X509Certificate.fromDer(derCertificate);
   }
 }
