@@ -7,7 +7,6 @@ This script is a simple tool to prepare testing data for the `cardano/asset` end
 import json
 import os
 import requests
-from functools import reduce
 from loguru import logger
 
 from utils import address
@@ -26,7 +25,7 @@ CARDANO_NETWORK = os.environ["CARDANO_NETWORK"]
 
 BLOCKFROST_URL = f"https://cardano-{CARDANO_NETWORK}.blockfrost.io/api/v0"
 
-RECORDS_LIMIT = 1000
+RECORDS_LIMIT = 100
 START_POSITION = 0
 
 
@@ -52,7 +51,7 @@ except:
 # process each record
 s = requests.Session()
 formatted_records = {}
-processing_records = snapshot_data[START_POSITION:RECORDS_LIMIT]
+processing_records = snapshot_data[START_POSITION : START_POSITION + RECORDS_LIMIT]
 logger.info(
     f"Start processing start: {START_POSITION}, end: {START_POSITION + min(len(processing_records), RECORDS_LIMIT)}"
 )
@@ -82,9 +81,9 @@ for i, record in enumerate(processing_records):
             if amount["unit"] == "lovelace":
                 ada_amount += int(amount["quantity"])
                 continue
-            native_tokens[amount["unit"]] = native_tokens.get(amount["unit"], 0) + int(
-                amount["quantity"]
-            )
+            native_tokens[f"0x{amount["unit"]}"] = native_tokens.get(
+                amount["unit"], 0
+            ) + int(amount["quantity"])
 
     # get slot number
     latest_block = get_reguest(
