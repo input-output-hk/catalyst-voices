@@ -155,9 +155,7 @@ class _ToggleRepliesChip extends StatelessWidget {
           child: AffixDecorator(
             suffix: AnimatedExpandChevron(isExpanded: hide, size: 18),
             child: Text(
-              hide
-                  ? context.l10n.commentHideReplies
-                  : context.l10n.commentXReplies(repliesCount),
+              hide ? context.l10n.commentHideReplies : context.l10n.commentXReplies(repliesCount),
             ),
           ),
         ),

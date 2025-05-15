@@ -66,8 +66,7 @@ sealed class DocumentObjectSchema extends DocumentPropertySchema {
     return const SuccessfulDocumentValidation();
   }
 
-  DocumentPropertySchema?
-      getPropertySchemaOfType<T extends DocumentPropertySchema>() {
+  DocumentPropertySchema? getPropertySchemaOfType<T extends DocumentPropertySchema>() {
     return properties.firstWhereOrNull((e) => e is T);
   }
 
@@ -115,9 +114,7 @@ final class DocumentSegmentSchema extends DocumentObjectSchema {
       guidance: guidance,
       isSubsection: isSubsection,
       isRequired: isRequired,
-      properties: properties
-          .map((e) => e.copyWith(nodeId: newNodeId.child(e.id)))
-          .toList(),
+      properties: properties.map((e) => e.copyWith(nodeId: newNodeId.child(e.id))).toList(),
       oneOf: oneOf,
       order: order,
       icon: icon,
@@ -162,9 +159,7 @@ final class DocumentSectionSchema extends DocumentObjectSchema {
       guidance: guidance,
       isRequired: isRequired,
       isSubsection: isSubsection,
-      properties: properties
-          .map((e) => e.copyWith(nodeId: newNodeId.child(e.id)))
-          .toList(),
+      properties: properties.map((e) => e.copyWith(nodeId: newNodeId.child(e.id))).toList(),
       oneOf: oneOf,
       order: order,
     );
@@ -203,17 +198,14 @@ final class DocumentNestedQuestionsSchema extends DocumentObjectSchema {
       guidance: guidance,
       isRequired: isRequired,
       isSubsection: isSubsection,
-      properties: properties
-          .map((e) => e.copyWith(nodeId: newNodeId.child(e.id)))
-          .toList(),
+      properties: properties.map((e) => e.copyWith(nodeId: newNodeId.child(e.id))).toList(),
       oneOf: oneOf,
       order: order,
     );
   }
 }
 
-final class DocumentSingleGroupedTagSelectorSchema
-    extends DocumentObjectSchema {
+final class DocumentSingleGroupedTagSelectorSchema extends DocumentObjectSchema {
   const DocumentSingleGroupedTagSelectorSchema({
     required super.nodeId,
     required super.format,
@@ -245,9 +237,7 @@ final class DocumentSingleGroupedTagSelectorSchema
       guidance: guidance,
       isRequired: isRequired,
       isSubsection: isSubsection,
-      properties: properties
-          .map((e) => e.copyWith(nodeId: newNodeId.child(e.id)))
-          .toList(),
+      properties: properties.map((e) => e.copyWith(nodeId: newNodeId.child(e.id))).toList(),
       oneOf: oneOf,
       order: order,
     );
@@ -255,12 +245,10 @@ final class DocumentSingleGroupedTagSelectorSchema
 
   @override
   DocumentValidationResult validate(List<DocumentProperty> properties) {
-    final groupProperty =
-        properties.firstWhereOrNull((e) => e.schema is DocumentTagGroupSchema)
-            as DocumentValueProperty<String>?;
+    final groupProperty = properties.firstWhereOrNull((e) => e.schema is DocumentTagGroupSchema)
+        as DocumentValueProperty<String>?;
 
-    final tagProperty = properties
-            .firstWhereOrNull((e) => e.schema is DocumentTagSelectionSchema)
+    final tagProperty = properties.firstWhereOrNull((e) => e.schema is DocumentTagSelectionSchema)
         as DocumentValueProperty<String>?;
 
     return validateGroupedTagsSelection(
@@ -309,13 +297,11 @@ final class DocumentSingleGroupedTagSelectorSchema
       'the schema to which the property belongs',
     );
 
-    final groupProperty =
-        property.getPropertyWithSchemaType<DocumentTagGroupSchema>()
-            as DocumentValueProperty<String>?;
+    final groupProperty = property.getPropertyWithSchemaType<DocumentTagGroupSchema>()
+        as DocumentValueProperty<String>?;
 
-    final tagProperty =
-        property.getPropertyWithSchemaType<DocumentTagSelectionSchema>()
-            as DocumentValueProperty<String>?;
+    final tagProperty = property.getPropertyWithSchemaType<DocumentTagSelectionSchema>()
+        as DocumentValueProperty<String>?;
 
     final group = groupProperty?.value;
     final tag = tagProperty?.value;
@@ -385,9 +371,7 @@ final class DocumentBorderGroupSchema extends DocumentObjectSchema {
       guidance: guidance,
       isRequired: isRequired,
       isSubsection: isSubsection,
-      properties: properties
-          .map((e) => e.copyWith(nodeId: newNodeId.child(e.id)))
-          .toList(),
+      properties: properties.map((e) => e.copyWith(nodeId: newNodeId.child(e.id))).toList(),
       oneOf: oneOf,
       order: order,
     );
@@ -440,9 +424,7 @@ final class DocumentGenericObjectSchema extends DocumentObjectSchema {
       guidance: guidance,
       isRequired: isRequired,
       isSubsection: isSubsection,
-      properties: properties
-          .map((e) => e.copyWith(nodeId: newNodeId.child(e.id)))
-          .toList(),
+      properties: properties.map((e) => e.copyWith(nodeId: newNodeId.child(e.id))).toList(),
       oneOf: oneOf,
       order: order,
     );

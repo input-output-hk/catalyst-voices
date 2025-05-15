@@ -30,9 +30,8 @@ class NavigationBack extends StatelessWidget {
         iconSize: isCompact ? 24 : 18,
         shape: isCompact ? const CircleBorder() : null,
       ),
-      child: isCompact
-          ? VoicesAssets.icons.arrowLeft.buildIcon()
-          : Text(label ?? context.l10n.back),
+      child:
+          isCompact ? VoicesAssets.icons.arrowLeft.buildIcon() : Text(label ?? context.l10n.back),
     );
   }
 

@@ -55,9 +55,7 @@ class NavigationLocation extends StatelessWidget {
                 (index, part) {
                   return TextSpan(
                     text: part,
-                    style: index == 0
-                        ? const TextStyle(fontWeight: FontWeight.bold)
-                        : null,
+                    style: index == 0 ? const TextStyle(fontWeight: FontWeight.bold) : null,
                   );
                 },
               )
