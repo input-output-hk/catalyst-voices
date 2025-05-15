@@ -1,10 +1,10 @@
-import 'package:catalyst_voices/widgets/avatars/voices_avatar.dart';
+import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:flutter/material.dart';
 
 class CommentCard extends StatelessWidget {
   final String text;
-  final String username;
+  final String? username;
   final DateTime date;
 
   const CommentCard({
@@ -39,7 +39,7 @@ class CommentCard extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(username),
+                    UsernameText(username),
                     Text(date.toString()),
                   ],
                 ),

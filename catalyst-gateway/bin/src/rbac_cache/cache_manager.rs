@@ -33,9 +33,9 @@ impl RbacCacheManager {
     /// In case of failure a problem report from the given registration is updated and
     /// returned.
     #[allow(clippy::result_large_err)]
-    pub fn add(&self, registration: &Cip509, is_persistent: bool) -> AddResult {
+    pub fn add(&self, registration: Cip509, is_persistent: bool) -> AddResult {
         if is_persistent {
-            self.persistent.add(registration)?;
+            self.persistent.add(registration.clone())?;
         }
         self.volatile.add(registration)
     }

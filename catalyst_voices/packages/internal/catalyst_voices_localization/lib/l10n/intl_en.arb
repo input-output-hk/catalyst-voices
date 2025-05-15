@@ -2670,5 +2670,33 @@
   "notFoundButton": "Go to Catalyst Home",
   "@notFoundButton": {
     "description": "Button label on the not found page to go to home page in the app."
+  },
+  "anonymousUsername": "Anonymous",
+  "@anonymousUsername": {
+    "description": "When account does not have specified username this text is shown"
+  },
+  "commentPickUsernameLabel": "Pick a display name to join the conversation and leave a comment.",
+  "@commentPickUsernameLabel": {
+    "description": "Message shown when user tries to comment on proposal while not having username"
+  },
+  "commentPickUsername": "Set Display Name",
+  "@commentPickUsername": {
+    "description": "Shown as CTA button or title of dialog"
+  },
+  "commentPickUsernameHint": "Enter Name",
+  "@commentPickUsernameHint": {
+    "description": "Hint of username text field"
+  },
+  "confirm": "Confirm",
+  "@confirm": {
+    "description": "Generic text for confirming actions such as pick username"
+  },
+  "usernameSavedTitle": "Display Name Saved",
+  "@usernameSavedTitle": {
+    "description": "Used as username change confirmation snack bar title"
+  },
+  "usernameSavedMessage": "All set! You can now join the conversation.",
+  "@usernameSavedMessage": {
+    "description": "Used as username change confirmation snack bar message"
   }
 }

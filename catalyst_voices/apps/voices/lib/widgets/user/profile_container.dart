@@ -23,13 +23,12 @@ class ProfileContainer extends StatelessWidget {
           size: 32,
           username: username,
         ),
-        if (username != null)
-          Text(
-            username,
-            style: context.textTheme.titleSmall?.copyWith(
-              color: context.colors.textOnPrimaryLevel1,
-            ),
+        UsernameText(
+          username,
+          style: context.textTheme.titleSmall?.copyWith(
+            color: context.colors.textOnPrimaryLevel1,
           ),
+        ),
         CatalystIdText(
           profile.catalystId,
           isCompact: true,

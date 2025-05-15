@@ -5,7 +5,7 @@ import 'package:equatable/equatable.dart';
 final class ProposalViewHeader extends Equatable {
   final DocumentRef? proposalRef;
   final String title;
-  final String authorName;
+  final String? authorName;
   final DateTime? createdAt;
   final int commentsCount;
   final List<DocumentVersion> versions;
@@ -14,7 +14,7 @@ final class ProposalViewHeader extends Equatable {
   const ProposalViewHeader({
     this.proposalRef,
     this.title = '',
-    this.authorName = '',
+    this.authorName,
     this.createdAt,
     this.commentsCount = 0,
     this.versions = const <DocumentVersion>[],

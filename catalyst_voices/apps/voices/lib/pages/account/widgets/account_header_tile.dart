@@ -40,7 +40,7 @@ class _AccountHeaderTile extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
+              UsernameText(
                 data?.username ?? '',
                 style: context.textTheme.titleLarge?.copyWith(
                   color: context.colors.textOnPrimaryLevel0,

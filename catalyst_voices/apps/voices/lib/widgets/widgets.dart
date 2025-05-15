@@ -115,3 +115,4 @@ export 'tooltips/voices_rich_tooltip.dart';
 export 'user/catalyst_id_text.dart';
 export 'user/profile_avatar.dart';
 export 'user/profile_container.dart';
+export 'user/username_text.dart';

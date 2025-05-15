@@ -36,7 +36,7 @@ class PendingProposalCard extends StatefulWidget {
 }
 
 class _Author extends StatelessWidget {
-  final String author;
+  final String? author;
 
   const _Author({
     required this.author,
@@ -49,7 +49,7 @@ class _Author extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(
+          UsernameText(
             key: const Key('Author'),
             author,
             style: context.textTheme.titleSmall?.copyWith(

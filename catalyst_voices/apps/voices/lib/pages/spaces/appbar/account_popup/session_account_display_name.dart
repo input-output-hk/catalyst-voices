@@ -1,4 +1,5 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
+import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:flutter/material.dart';
 
@@ -7,15 +8,15 @@ class SessionAccountDisplayName extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<SessionCubit, SessionState, String>(
-      selector: (state) => state.account?.username ?? '',
+    return BlocSelector<SessionCubit, SessionState, String?>(
+      selector: (state) => state.account?.username,
       builder: (context, state) => _Text(state),
     );
   }
 }
 
 class _Text extends StatelessWidget {
-  final String data;
+  final String? data;
 
   const _Text(this.data);
 
@@ -25,7 +26,7 @@ class _Text extends StatelessWidget {
       color: context.colors.textOnPrimaryLevel0,
     );
 
-    return Text(
+    return UsernameText(
       data,
       style: textStyle,
       maxLines: 1,

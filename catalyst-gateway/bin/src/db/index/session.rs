@@ -61,30 +61,35 @@ pub(crate) enum CassandraSessionError {
     #[error("Creating session failed: {source}")]
     CreatingSessionFailed {
         /// The underlying error that caused the session creation to fail.
+        #[source]
         source: anyhow::Error,
     },
     /// Error when connecting to database.
     #[error("Database connection failed: {source}")]
     ConnectionUnavailable {
         /// The underlying error that caused the connection failure.
+        #[source]
         source: anyhow::Error,
     },
     /// Error when schema migration fails.
     #[error("Schema migration failed: {source}")]
     SchemaMigrationFailed {
         /// The underlying error that caused the schema migration to fail.
+        #[source]
         source: anyhow::Error,
     },
     /// Error when preparing queries fails.
     #[error("Preparing queries failed: {source}")]
     PreparingQueriesFailed {
         /// The underlying error that caused query preparation to fail.
+        #[source]
         source: anyhow::Error,
     },
     /// Error when preparing purge queries fails.
     #[error("Preparing purge queries failed: {source}")]
     PreparingPurgeQueriesFailed {
         /// The underlying error that caused purge query preparation to fail.
+        #[source]
         source: anyhow::Error,
     },
     /// Error indicating that the session has already been set.
