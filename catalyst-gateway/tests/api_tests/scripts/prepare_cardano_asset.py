@@ -1,4 +1,4 @@
-# cspell: words cloudscraper
+# cspell: words BLOCKFROST
 
 """
 This script is a simple tool to prepare testing data for the `cardano/asset` endpoint.
@@ -29,7 +29,7 @@ RECORDS_LIMIT = 100
 START_POSITION = 0
 
 
-def get_reguest(s: requests.Session, url: str):
+def get_request(s: requests.Session, url: str):
     resp = s.get(url=url, headers={"project_id": BLOCKFROST_TOKEN})
     if resp.status_code == 404:
         return None
@@ -66,7 +66,7 @@ for i, record in enumerate(processing_records):
         f"Checking: '{stake_addr}'... ({i + 1}/{min(len(processing_records), RECORDS_LIMIT)})"
     )
 
-    addresses = get_reguest(
+    addresses = get_request(
         s,
         f"{BLOCKFROST_URL}/accounts/{stake_addr}/addresses",
     )
@@ -77,7 +77,7 @@ for i, record in enumerate(processing_records):
     native_tokens = {}
     for addr in addresses:
         addr = addr["address"]
-        addr_info = get_reguest(
+        addr_info = get_request(
             s,
             f"{BLOCKFROST_URL}/addresses/{addr}",
         )
@@ -90,7 +90,7 @@ for i, record in enumerate(processing_records):
             ) + int(amount["quantity"])
 
     # get slot number
-    latest_block = get_reguest(
+    latest_block = get_request(
         s,
         f"{BLOCKFROST_URL}/blocks/latest",
     )
