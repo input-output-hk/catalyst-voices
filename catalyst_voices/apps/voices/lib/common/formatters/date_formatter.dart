@@ -17,7 +17,6 @@ abstract class DateFormatter {
         return '${l10n.weekOf} ${DateFormat.MMMd().format(from)}';
       }
 
-      // ignore: lines_longer_than_80_chars
       return '${DateFormat.MMMd().format(from)} - ${DateFormat.MMMd().format(to)}';
     } else if (to == null && from != null) {
       return '${l10n.from} ${DateFormat.MMMd().format(from)}';
@@ -60,8 +59,7 @@ abstract class DateFormatter {
     DateTime date, {
     bool includeYear = false,
   }) {
-    final formatter =
-        includeYear ? DateFormat('d MMMM yyyy') : DateFormat('d MMMM');
+    final formatter = includeYear ? DateFormat('d MMMM yyyy') : DateFormat('d MMMM');
     final dayMonthFormatter = formatter.format(date);
     final timeFormatter = DateFormat('HH:mm').format(date);
 
@@ -88,8 +86,7 @@ abstract class DateFormatter {
     DateTime dateTime, {
     bool timeOnNewline = false,
   }) {
-    final format =
-        timeOnNewline ? 'EEE, d MMMM yyyy\nh:mm a' : 'EEE, d MMMM yyyy h:mm a';
+    final format = timeOnNewline ? 'EEE, d MMMM yyyy\nh:mm a' : 'EEE, d MMMM yyyy h:mm a';
     return DateFormat(format).format(dateTime);
   }
 

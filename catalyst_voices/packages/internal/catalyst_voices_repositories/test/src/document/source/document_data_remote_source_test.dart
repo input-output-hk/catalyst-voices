@@ -12,8 +12,7 @@ void main() {
   final CatGateway gateway = _MockedCatGateway();
   final CatReviews reviews = _MockedCatReviews();
   final Vit vit = _MockedVit();
-  final SignedDocumentManager signedDocumentManager =
-      _MockedSignedDocumentManager();
+  final SignedDocumentManager signedDocumentManager = _MockedSignedDocumentManager();
 
   late final ApiServices apiServices;
   late final CatGatewayDocumentDataSource source;
@@ -171,7 +170,6 @@ class _MockedCatGateway extends Mock implements CatGateway {}
 
 class _MockedCatReviews extends Mock implements CatReviews {}
 
-class _MockedSignedDocumentManager extends Mock
-    implements SignedDocumentManager {}
+class _MockedSignedDocumentManager extends Mock implements SignedDocumentManager {}
 
 class _MockedVit extends Mock implements Vit {}

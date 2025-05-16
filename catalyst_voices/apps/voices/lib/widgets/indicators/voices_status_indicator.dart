@@ -96,8 +96,7 @@ class _StatusContainer extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
       alignment: Alignment.center,
       child: DefaultTextStyle(
-        style: (theme.textTheme.titleLarge ?? const TextStyle())
-            .copyWith(color: foregroundColor),
+        style: (theme.textTheme.titleLarge ?? const TextStyle()).copyWith(color: foregroundColor),
         child: IconTheme(
           data: IconThemeData(
             size: 24,

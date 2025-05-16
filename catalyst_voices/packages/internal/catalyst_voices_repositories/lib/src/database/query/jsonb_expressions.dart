@@ -8,7 +8,6 @@ final class ContainsAuthorId extends CustomExpression<bool> {
   ContainsAuthorId({
     required CatalystId id,
   }) : super(
-          //ignore: lines_longer_than_80_chars
           "json_extract(metadata, '\$.authors') LIKE '%${id.toSignificant().toUri().toStringWithoutScheme()}%'",
         );
 }
@@ -16,10 +15,7 @@ final class ContainsAuthorId extends CustomExpression<bool> {
 final class ContainsContentAuthorName extends CustomExpression<bool> {
   ContainsContentAuthorName({
     required String query,
-  }) : super(
-          //ignore: lines_longer_than_80_chars
-          "json_extract(content, '\$.setup.proposer.applicant') LIKE '%$query%'",
-        );
+  }) : super("json_extract(content, '\$.setup.proposer.applicant') LIKE '%$query%'");
 }
 
 final class ContainsMetadataAuthorName extends CustomExpression<bool> {
@@ -38,8 +34,7 @@ final class ContainsTitle extends CustomExpression<bool> {
         );
 }
 
-extension ContentColumnExt
-    on GeneratedColumnWithTypeConverter<DocumentDataContent, Uint8List> {
+extension ContentColumnExt on GeneratedColumnWithTypeConverter<DocumentDataContent, Uint8List> {
   Expression<bool> hasTitle(String query) => ContainsTitle(query: query);
 }
 
@@ -54,8 +49,7 @@ extension DocumentTableExt on $DocumentsTable {
   }
 }
 
-extension MetadataColumnExt
-    on GeneratedColumnWithTypeConverter<DocumentDataMetadata, Uint8List> {
+extension MetadataColumnExt on GeneratedColumnWithTypeConverter<DocumentDataMetadata, Uint8List> {
   List<Expression<bool>> hasAuthorName(String name) {
     return [
       ContainsMetadataAuthorName(query: name),

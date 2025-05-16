@@ -33,8 +33,7 @@ class CatalystKeychainSuccessPanel extends OnboardingPageBase {
       find.byWidgetPredicate(
         (widget) =>
             widget is CatalystSvgPicture &&
-            (widget.bytesLoader as dynamic).assetName ==
-                'assets/images/keychain.svg',
+            (widget.bytesLoader as dynamic).assetName == 'assets/images/keychain.svg',
       ),
       findsOneWidget,
     );

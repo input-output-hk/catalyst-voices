@@ -1,8 +1,7 @@
 import 'package:catalyst_voices/widgets/document_builder/common/document_error_text.dart';
 import 'package:catalyst_voices/widgets/document_builder/value/document_builder_value_widget.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
-import 'package:catalyst_voices_models/catalyst_voices_models.dart'
-    hide DocumentPropertyBuilder;
+import 'package:catalyst_voices_models/catalyst_voices_models.dart' hide DocumentPropertyBuilder;
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:collection/collection.dart';
@@ -23,12 +22,10 @@ class DocumentListPropertyBuilder extends StatefulWidget {
   });
 
   @override
-  State<DocumentListPropertyBuilder> createState() =>
-      _DocumentListPropertyBuilderState();
+  State<DocumentListPropertyBuilder> createState() => _DocumentListPropertyBuilderState();
 }
 
-class _DocumentListPropertyBuilderState
-    extends State<DocumentListPropertyBuilder> {
+class _DocumentListPropertyBuilderState extends State<DocumentListPropertyBuilder> {
   AutovalidateMode _autovalidateMode = AutovalidateMode.onUserInteraction;
 
   @override
@@ -55,8 +52,7 @@ class _DocumentListPropertyBuilderState
       return null;
     }
 
-    return LocalizedDocumentValidationResult.from(property.validationResult)
-        .message(context);
+    return LocalizedDocumentValidationResult.from(property.validationResult).message(context);
   }
 }
 
@@ -72,8 +68,8 @@ class _FormField extends VoicesFormField<DocumentListProperty> {
           enabled: isEditMode,
           builder: (field) {
             final property = field.value!;
-            final properties = property.properties
-                .whereNot((child) => child.schema.isSectionOrSubsection);
+            final properties =
+                property.properties.whereNot((child) => child.schema.isSectionOrSubsection);
 
             final error = field.errorText;
 

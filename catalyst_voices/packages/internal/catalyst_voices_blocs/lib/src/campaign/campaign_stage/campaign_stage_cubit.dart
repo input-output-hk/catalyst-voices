@@ -13,8 +13,7 @@ class CampaignStageCubit extends Cubit<CampaignStageState> {
   final CampaignService _campaignService;
   Timer? _timer;
 
-  CampaignStageCubit(this._campaignService)
-      : super(const LoadingCampaignStage()) {
+  CampaignStageCubit(this._campaignService) : super(const LoadingCampaignStage()) {
     unawaited(getCampaignStage());
   }
 

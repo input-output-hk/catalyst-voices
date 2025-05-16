@@ -20,8 +20,7 @@ class RestoreKeychainSuccessPanel extends OnboardingPageBase {
   final walletAddressLabel = const Key('WalletAddressLabel');
   final walletAddressValue = const Key('WalletAddressValue');
   final setUnlockPasswordButton = const Key('SetUnlockPasswordButton');
-  final recoverDifferentKeychainButton =
-      const Key('RecoverDifferentKeychainButton');
+  final recoverDifferentKeychainButton = const Key('RecoverDifferentKeychainButton');
   final recoveryAccountError = const Key('RecoveryAccountError');
 
   @override
@@ -93,12 +92,10 @@ class RestoreKeychainSuccessPanel extends OnboardingPageBase {
 
   Future<void> _ensureWalletIsRecovered() async {
     try {
-      await $(recoveryAccountSuccessTitle)
-          .waitUntilVisible(timeout: const Duration(seconds: 5));
+      await $(recoveryAccountSuccessTitle).waitUntilVisible(timeout: const Duration(seconds: 5));
     } catch (e) {
       await $(recoveryAccountError).$(CommonPage($).errorRetryBtn).tap();
     }
-    await $(recoveryAccountSuccessTitle)
-        .waitUntilVisible(timeout: const Duration(seconds: 5));
+    await $(recoveryAccountSuccessTitle).waitUntilVisible(timeout: const Duration(seconds: 5));
   }
 }

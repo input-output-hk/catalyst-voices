@@ -11,8 +11,7 @@ sealed class RegistrationException with EquatableMixin implements Exception {
 
 /// An exception thrown when attempting to register
 /// but the user doesn't have enough Ada to cover the transaction fee.
-final class RegistrationInsufficientBalanceException
-    extends RegistrationException {
+final class RegistrationInsufficientBalanceException extends RegistrationException {
   const RegistrationInsufficientBalanceException();
 
   @override
@@ -22,8 +21,7 @@ final class RegistrationInsufficientBalanceException
 /// An exception thrown when wallet ID doesn't match the configured network ID.
 ///
 /// I.e. trying to create transaction on preprod with production wallet.
-final class RegistrationNetworkIdMismatchException
-    extends RegistrationException {
+final class RegistrationNetworkIdMismatchException extends RegistrationException {
   /// The [NetworkId] that the user should be using.
   final NetworkId targetNetworkId;
 
@@ -33,8 +31,7 @@ final class RegistrationNetworkIdMismatchException
   List<Object?> get props => [targetNetworkId];
 
   @override
-  String toString() =>
-      'RegistrationNetworkIdMismatchException(target: $targetNetworkId)';
+  String toString() => 'RegistrationNetworkIdMismatchException(target: $targetNetworkId)';
 }
 
 /// An exception thrown when attempting to register and the transaction fails.

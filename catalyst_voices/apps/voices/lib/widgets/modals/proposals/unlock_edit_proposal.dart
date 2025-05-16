@@ -18,8 +18,7 @@ class UnlockEditProposalDialog extends StatefulWidget {
   });
 
   @override
-  State<UnlockEditProposalDialog> createState() =>
-      _UnlockEditProposalDialogState();
+  State<UnlockEditProposalDialog> createState() => _UnlockEditProposalDialogState();
 
   static Future<bool?> show({
     required BuildContext context,
