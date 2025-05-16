@@ -1,8 +1,7 @@
 //! Catalyst RBAC Security Scheme
-use std::{env, error::Error, sync::LazyLock, time::Duration};
+use std::{env, error::Error, time::Duration};
 
 use catalyst_types::catalyst_id::role_index::RoleId;
-use moka::future::Cache;
 use poem::{error::ResponseError, http::StatusCode, IntoResponse, Request};
 use poem_openapi::{auth::Bearer, SecurityScheme};
 use tracing::debug;
@@ -17,25 +16,8 @@ use crate::{
     },
 };
 
-/// Auth token in the form of catv1.
-pub type EncodedAuthToken = String;
-
 /// The header name that holds the authorization RBAC token
 pub(crate) const AUTHORIZATION_HEADER: &str = "Authorization";
-
-/// Cached auth tokens
-// TODO: Caching is currently disabled because we want to measure the performance without it. See
-// https://github.com/input-output-hk/catalyst-voices/issues/1940 for more details.
-#[allow(dead_code)]
-static CACHE: LazyLock<Cache<EncodedAuthToken, CatalystRBACTokenV1>> = LazyLock::new(|| {
-    Cache::builder()
-        // Time to live (TTL): 30 minutes
-        .time_to_live(Duration::from_secs(30 * 60))
-        // Time to idle (TTI):  5 minutes
-        .time_to_idle(Duration::from_secs(5 * 60))
-        // Create the cache.
-        .build()
-});
 
 /// Catalyst RBAC Access Token
 #[derive(SecurityScheme)]
