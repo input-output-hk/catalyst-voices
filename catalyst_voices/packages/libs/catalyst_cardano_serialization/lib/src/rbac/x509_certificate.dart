@@ -3,7 +3,7 @@ import 'dart:typed_data';
 
 import 'package:asn1lib/asn1lib.dart';
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
-import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
+import 'package:catalyst_key_derivation/catalyst_key_derivation.dart' hide Ed25519PublicKey;
 import 'package:equatable/equatable.dart';
 
 bool _registeredASN1Names = false;
@@ -425,7 +425,7 @@ class X509TBSCertificate with EquatableMixin {
   final X509DistinguishedName subject;
 
   /// The public key of the [subject].
-  final Bip32Ed25519XPublicKey subjectPublicKey;
+  final Ed25519PublicKey subjectPublicKey;
 
   /// Extra extensions of the certificate.
   final X509CertificateExtensions? extensions;
@@ -548,11 +548,11 @@ class X509TBSCertificate with EquatableMixin {
     return integer.intValue;
   }
 
-  static Bip32Ed25519XPublicKey _readSubjectPublicKeyInfo(ASN1Object object) {
+  static Ed25519PublicKey _readSubjectPublicKeyInfo(ASN1Object object) {
     final sequence = object.asSequence;
     final string = sequence.elements[1] as ASN1BitString;
     final stringBytes = string.contentBytes();
-    return Bip32Ed25519XPublicKeyFactory.instance.fromBytes(stringBytes);
+    return Ed25519PublicKey.fromSimpleOrExtendedBytes(stringBytes);
   }
 
   static int _readVersion(ASN1Object object) {
