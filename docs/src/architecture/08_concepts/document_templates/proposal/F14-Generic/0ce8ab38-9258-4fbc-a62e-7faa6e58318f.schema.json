@@ -5,9 +5,12 @@
     "description": "Schema for the F14 Catalyst Proposal Submission Form",
     "maintainers": [{ "name": "Catalyst Team", "url": "https://projectcatalyst.io/" }],
     "x-changelog": {
-        "2025-05-09": [
+        "2025-05-16": [
             "Updated titles, descriptions and guidance copy text.",
             "Increased maxLength for outputs, acceptance criteria and completion."
+        ],
+        "2025-05-15": [
+            "Setting maxLength for Dependency description"
         ],
         "2025-04-22": [
             "Updated schema to make optional text fields mandatory.",
@@ -479,7 +482,8 @@
                             "title": "Dependency description",
                             "description": "Here you should list any dependencies and prerequisites for your project's success. These are usually external factors (such as third-party suppliers, external resources, third-party software, etc.) that may cause a delay, since a project has less control over them. In case of third party software, indicate whether you have the necessary licenses and permission to use such software.",
                             "x-guidance": "If YES, please describe what the dependency is and why you believe it is essential for your project's delivery. If NO, please write \"No dependencies\"",
-                            "x-placeholder": "Describe any dependencies or write 'No dependencies'."
+                            "x-placeholder": "Describe any dependencies or write 'No dependencies'.",
+                            "maxLength": 10240
                         }
                     }
                 },
