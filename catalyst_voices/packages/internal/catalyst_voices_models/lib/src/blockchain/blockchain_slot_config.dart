@@ -47,4 +47,16 @@ final class BlockchainSlotNumberConfig extends Equatable {
         systemStartSlot,
         slotLength,
       ];
+
+  BlockchainSlotNumberConfig copyWith({
+    DateTime? systemStartTimestamp,
+    SlotBigNum? systemStartSlot,
+    Duration? slotLength,
+  }) {
+    return BlockchainSlotNumberConfig(
+      systemStartTimestamp: systemStartTimestamp ?? this.systemStartTimestamp,
+      systemStartSlot: systemStartSlot ?? this.systemStartSlot,
+      slotLength: slotLength ?? this.slotLength,
+    );
+  }
 }

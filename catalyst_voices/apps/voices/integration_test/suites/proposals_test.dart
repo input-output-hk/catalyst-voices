@@ -17,7 +17,8 @@ void main() async {
   });
 
   setUp(() async {
-    await registerDependencies(config: const AppConfig());
+    await registerDependencies();
+    registerConfig(AppConfig.dev());
     router.go(const ProposalsRoute().location);
   });
 

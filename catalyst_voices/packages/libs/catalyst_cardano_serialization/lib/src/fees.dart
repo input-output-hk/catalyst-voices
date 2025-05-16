@@ -159,6 +159,25 @@ final class TieredFee extends Equatable {
     return totalSize;
   }
 
+  /// Creates copy of this config with updated parameters.
+  TieredFee copyWith({
+    int? constant,
+    int? coefficient,
+    double? multiplier,
+    int? sizeIncrement,
+    int? refScriptByteCost,
+    int? maxRefScriptSize,
+  }) {
+    return TieredFee(
+      constant: constant ?? this.constant,
+      coefficient: coefficient ?? this.coefficient,
+      multiplier: multiplier ?? this.multiplier,
+      sizeIncrement: sizeIncrement ?? this.sizeIncrement,
+      refScriptByteCost: refScriptByteCost ?? this.refScriptByteCost,
+      maxRefScriptSize: maxRefScriptSize ?? this.maxRefScriptSize,
+    );
+  }
+
   @override
   List<Object?> get props => [
         constant,
