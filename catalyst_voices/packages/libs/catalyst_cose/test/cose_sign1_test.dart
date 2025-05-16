@@ -22,7 +22,7 @@ void main() {
         protectedHeaders: const CoseHeaders.protected(
           contentType: IntValue(CoseValues.jsonContentType),
           contentEncoding: StringValue(CoseValues.brotliContentEncoding),
-          type: Uuid(uuidV7),
+          type: DocumentType([Uuid(uuidV7)]),
           id: Uuid(uuidV7),
           ver: Uuid(uuidV7),
           ref: ReferenceUuid(id: Uuid(uuidV7)),

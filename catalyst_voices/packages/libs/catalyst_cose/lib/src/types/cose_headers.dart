@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:catalyst_cose/src/cose_constants.dart';
+import 'package:catalyst_cose/src/types/document_type.dart';
 import 'package:catalyst_cose/src/types/string_or_int.dart';
 import 'package:catalyst_cose/src/types/uuid.dart';
 import 'package:catalyst_cose/src/utils/cbor_utils.dart';
@@ -36,7 +37,7 @@ final class CoseHeaders extends Equatable {
   final StringOrInt? contentEncoding;
 
   /// See [CoseHeaderKeys.type].
-  final Uuid? type;
+  final DocumentType? type;
 
   /// See [CoseHeaderKeys.id].
   final Uuid? id;
@@ -122,7 +123,7 @@ final class CoseHeaders extends Equatable {
       kid: CborUtils.deserializeBytes(map[CoseHeaderKeys.kid]),
       contentType: CborUtils.deserializeStringOrInt(map[CoseHeaderKeys.contentType]),
       contentEncoding: CborUtils.deserializeStringOrInt(map[CoseHeaderKeys.contentEncoding]),
-      type: CborUtils.deserializeUuid(map[CoseHeaderKeys.type]),
+      type: CborUtils.deserializeDocumentType(map[CoseHeaderKeys.type]),
       id: CborUtils.deserializeUuid(map[CoseHeaderKeys.id]),
       ver: CborUtils.deserializeUuid(map[CoseHeaderKeys.ver]),
       ref: CborUtils.deserializeReferenceUuid(map[CoseHeaderKeys.ref]),
@@ -209,7 +210,7 @@ final class CoseHeaders extends Equatable {
     OptionalValueGetter<Uint8List?>? kid,
     OptionalValueGetter<StringOrInt?>? contentType,
     OptionalValueGetter<StringOrInt?>? contentEncoding,
-    OptionalValueGetter<Uuid?>? type,
+    OptionalValueGetter<DocumentType?>? type,
     OptionalValueGetter<Uuid?>? id,
     OptionalValueGetter<Uuid?>? ver,
     OptionalValueGetter<ReferenceUuid?>? ref,
