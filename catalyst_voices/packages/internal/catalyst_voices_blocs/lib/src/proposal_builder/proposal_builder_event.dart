@@ -140,6 +140,13 @@ final class SubmitProposalEvent extends ProposalBuilderEvent {
   List<Object?> get props => [];
 }
 
+final class UnlockProposalBuilderEvent extends ProposalBuilderEvent {
+  const UnlockProposalBuilderEvent();
+
+  @override
+  List<Object?> get props => [];
+}
+
 final class UpdateCommentBuilderEvent extends ProposalBuilderEvent {
   final SignedDocumentRef ref;
   final bool show;

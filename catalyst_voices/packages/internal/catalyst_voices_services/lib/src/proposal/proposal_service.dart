@@ -49,6 +49,8 @@ abstract interface class ProposalService {
   /// Similar to [watchFavoritesProposalsIds] stops after first emit.
   Future<List<String>> getFavoritesProposalsIds();
 
+  Future<DocumentRef> getLatestProposalVersion({required DocumentRef ref});
+
   Future<ProposalData> getProposal({
     required DocumentRef ref,
   });
@@ -222,6 +224,20 @@ final class ProposalServiceImpl implements ProposalService {
     return _documentRepository
         .watchAllDocumentsFavoriteIds(type: DocumentType.proposalDocument)
         .first;
+  }
+
+  @override
+  Future<DocumentRef> getLatestProposalVersion({
+    required DocumentRef ref,
+  }) async {
+    final proposalVersions = await _documentRepository.getAllVersionsOfId(
+      id: ref.id,
+    );
+    final refList = List<DocumentRef>.from(
+      proposalVersions.map((e) => e.metadata.selfRef).toList(),
+    )..sort();
+
+    return refList.last;
   }
 
   @override
