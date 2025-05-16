@@ -25,8 +25,7 @@ class _CampaignManagementState extends State<CampaignManagement> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<CampaignBuilderCubit, CampaignBuilderState,
-        CampaignPublish?>(
+    return BlocSelector<CampaignBuilderCubit, CampaignBuilderState, CampaignPublish?>(
       selector: (state) => state.publish,
       builder: (context, publish) {
         return Row(
@@ -127,9 +126,7 @@ class _Text extends StatelessWidget {
     return Text(
       text,
       style: Theme.of(context).textTheme.labelLarge?.copyWith(
-            color: isSelected
-                ? theme.colors.successContainer
-                : theme.colors.onSurfaceNeutral012,
+            color: isSelected ? theme.colors.successContainer : theme.colors.onSurfaceNeutral012,
           ),
     );
   }

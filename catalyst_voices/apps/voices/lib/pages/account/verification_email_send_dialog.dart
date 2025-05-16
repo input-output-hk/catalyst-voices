@@ -10,8 +10,7 @@ class VerificationEmailSendDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return VoicesDesktopInfoDialog(
-      icon: VoicesAssets.icons.informationCircle
-          .buildIcon(color: context.colors.iconsPrimary),
+      icon: VoicesAssets.icons.informationCircle.buildIcon(color: context.colors.iconsPrimary),
       title: Text(context.l10n.verificationEmailSendTitle),
       message: Text(context.l10n.verificationEmailSendMessage),
       subMessage: Text(context.l10n.verificationEmailSendSubMessage),

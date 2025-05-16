@@ -5,6 +5,7 @@ import 'package:catalyst_voices/common/signal_handler.dart';
 import 'package:catalyst_voices/pages/proposal/proposal_content.dart';
 import 'package:catalyst_voices/pages/proposal/proposal_error.dart';
 import 'package:catalyst_voices/pages/proposal/proposal_loading.dart';
+import 'package:catalyst_voices/pages/proposal/snack_bar/username_updated_snack_bar.dart';
 import 'package:catalyst_voices/pages/proposal/snack_bar/viewing_older_version_snack_bar.dart';
 import 'package:catalyst_voices/pages/proposal/widget/proposal_header.dart';
 import 'package:catalyst_voices/pages/proposal/widget/proposal_navigation_panel.dart';
@@ -116,6 +117,9 @@ class _ProposalPageState extends State<ProposalPage>
         ViewingOlderVersionSnackBar(context).show(context);
       case ChangeVersionSignal():
         _changeVersion(signal.to);
+      case UsernameUpdatedSignal():
+        VoicesSnackBar.hideCurrent(context);
+        UsernameUpdatedSnackBar(context).show(context);
     }
   }
 

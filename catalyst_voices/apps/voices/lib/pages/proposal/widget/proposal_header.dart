@@ -24,8 +24,7 @@ class ProposalHeader extends StatelessWidget {
         final element = notification.context as Element?;
 
         // Only react to content scroll not menu.
-        return element?.findAncestorWidgetOfExactType<ProposalContent>() !=
-            null;
+        return element?.findAncestorWidgetOfExactType<ProposalContent>() != null;
       },
       child: const _ProposalHeader(),
     );
@@ -98,7 +97,7 @@ class _ProposalHeader extends StatelessWidget {
 
 class _ProposalMetadata extends StatelessWidget {
   final String title;
-  final String author;
+  final String? author;
   final DateTime? createdAt;
   final int commentsCount;
 
@@ -114,10 +113,10 @@ class _ProposalMetadata extends StatelessWidget {
     final textTheme = context.textTheme;
     final colors = context.colors;
 
-    final titleTextStyle = (textTheme.titleMedium ?? const TextStyle())
-        .copyWith(color: colors.textOnPrimaryLevel0);
-    final subtitleTextStyle = (textTheme.bodyMedium ?? const TextStyle())
-        .copyWith(color: colors.textOnPrimaryLevel1);
+    final titleTextStyle =
+        (textTheme.titleMedium ?? const TextStyle()).copyWith(color: colors.textOnPrimaryLevel0);
+    final subtitleTextStyle =
+        (textTheme.bodyMedium ?? const TextStyle()).copyWith(color: colors.textOnPrimaryLevel1);
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -133,7 +132,7 @@ class _ProposalMetadata extends StatelessWidget {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              if (author.isNotEmpty) Text(author),
+              UsernameText(author),
               if (createdAt != null) TimestampText(createdAt!),
               Text(context.l10n.noOfComments(commentsCount)),
             ].separatedBy(const DotSeparator()).toList(),

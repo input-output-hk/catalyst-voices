@@ -87,8 +87,7 @@ class _UIKitExampleAppState extends State<UIKitExampleApp> {
       settings: settings,
       builder: (_) {
         return _ThemeModeSwitcherWrapper(
-          brightness:
-              _themeMode == ThemeMode.dark ? Brightness.dark : Brightness.light,
+          brightness: _themeMode == ThemeMode.dark ? Brightness.dark : Brightness.light,
           onChanged: _onThemeModeChanged,
           child: page,
         );

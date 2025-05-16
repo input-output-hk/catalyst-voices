@@ -10,8 +10,7 @@ void main() {
     });
 
     test('registrationOffset is not duplicated', () {
-      final offsets =
-          AccountRole.values.map((e) => e.registrationOffset).toList();
+      final offsets = AccountRole.values.map((e) => e.registrationOffset).toList();
       final uniqueOffsets = offsets.toSet().toList();
 
       expect(offsets, hasLength(uniqueOffsets.length));

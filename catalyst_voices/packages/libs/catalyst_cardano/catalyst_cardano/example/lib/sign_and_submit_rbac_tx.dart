@@ -2,8 +2,7 @@
 
 part of 'main.dart';
 
-const _catalystUserRoleRegistrationPurpose =
-    'ca7a1457-ef9f-4c7f-9c74-7f8c4a4cfa6c';
+const _catalystUserRoleRegistrationPurpose = 'ca7a1457-ef9f-4c7f-9c74-7f8c4a4cfa6c';
 
 final _transactionHash = TransactionHash.fromHex(
   '4d3f576f26db29139981a69443c2325daa812cc353a31b5a4db794a5bcbb06c2',

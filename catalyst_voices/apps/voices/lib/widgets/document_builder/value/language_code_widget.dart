@@ -54,9 +54,7 @@ class _LanguageCodeWidgetState extends State<LanguageCodeWidget> {
     return (widget.schema.enumValues ?? [])
         .map((e) {
           final label = _getLocalizedLanguageName(e);
-          return label != null
-              ? DropdownMenuEntry(value: e, label: label)
-              : null;
+          return label != null ? DropdownMenuEntry(value: e, label: label) : null;
         })
         .nonNulls
         .toList()

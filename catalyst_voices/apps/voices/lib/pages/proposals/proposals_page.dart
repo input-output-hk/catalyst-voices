@@ -34,8 +34,7 @@ class _ProposalsPageState extends State<ProposalsPage>
     with
         SingleTickerProviderStateMixin,
         ErrorHandlerStateMixin<ProposalsCubit, ProposalsPage>,
-        SignalHandlerStateMixin<ProposalsCubit, ProposalsSignal,
-            ProposalsPage> {
+        SignalHandlerStateMixin<ProposalsCubit, ProposalsSignal, ProposalsPage> {
   late final TabController _tabController;
   late final PagingController<ProposalViewModel> _pagingController;
 
@@ -44,8 +43,8 @@ class _ProposalsPageState extends State<ProposalsPage>
     return CustomScrollView(
       slivers: [
         SliverPadding(
-          padding: const EdgeInsets.symmetric(horizontal: 32)
-              .add(const EdgeInsets.only(bottom: 32)),
+          padding:
+              const EdgeInsets.symmetric(horizontal: 32).add(const EdgeInsets.only(bottom: 32)),
           sliver: SliverList(
             delegate: SliverChildListDelegate(
               [
@@ -132,10 +131,8 @@ class _ProposalsPageState extends State<ProposalsPage>
   void initState() {
     super.initState();
 
-    final proposalsFilterType = widget.type ??
-        (widget.myProposals
-            ? ProposalsFilterType.my
-            : ProposalsFilterType.total);
+    final proposalsFilterType =
+        widget.type ?? (widget.myProposals ? ProposalsFilterType.my : ProposalsFilterType.total);
 
     _tabController = TabController(
       initialIndex: proposalsFilterType.index,

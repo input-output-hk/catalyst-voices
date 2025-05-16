@@ -4,11 +4,7 @@ import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.da
 import 'package:catalyst_voices/common/constants/constants.dart';
 import 'package:catalyst_voices/common/ext/account_role_ext.dart';
 import 'package:catalyst_voices/widgets/buttons/clipboard_button.dart';
-import 'package:catalyst_voices/widgets/buttons/voices_filled_button.dart';
-import 'package:catalyst_voices/widgets/buttons/voices_text_button.dart';
-import 'package:catalyst_voices/widgets/chips/voices_chip.dart';
-import 'package:catalyst_voices/widgets/indicators/voices_circular_progress_indicator.dart';
-import 'package:catalyst_voices/widgets/indicators/voices_error_indicator.dart';
+import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
@@ -106,16 +102,12 @@ class _AccountSummaryDetails extends StatelessWidget {
         children: [
           _SummaryDetails(
             label: Text(context.l10n.nickname),
-            value: Text(
-              username?.nullIfEmpty() ??
-                  context.l10n.notAvailableAbbr.toLowerCase(),
-            ),
+            value: UsernameText(username),
           ),
           _SummaryDetails(
             label: Text(context.l10n.email),
             value: Text(
-              email?.nullIfEmpty() ??
-                  context.l10n.notAvailableAbbr.toLowerCase(),
+              email?.nullIfEmpty() ?? context.l10n.notAvailableAbbr.toLowerCase(),
             ),
           ),
           _SummaryDetails(
@@ -212,9 +204,7 @@ class _Navigation extends StatelessWidget {
       children: [
         VoicesFilledButton(
           key: const Key('SetUnlockPasswordButton'),
-          onTap: isNextEnabled
-              ? () => RegistrationCubit.of(context).nextStep()
-              : null,
+          onTap: isNextEnabled ? () => RegistrationCubit.of(context).nextStep() : null,
           child: Text(context.l10n.recoveryAccountDetailsAction),
         ),
         const SizedBox(height: 10),

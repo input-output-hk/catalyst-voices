@@ -4,10 +4,12 @@ use std::sync::LazyLock;
 
 use cardano_blockchain_types::TransactionId;
 use catalyst_types::hashes::BLAKE_2B256_SIZE;
+use const_format::concatcp;
 use poem_openapi::{
     registry::{MetaSchema, MetaSchemaRef},
     types::{Example, ParseError, ParseFromJSON, ParseFromParameter, ParseResult, ToJSON, Type},
 };
+use regex::Regex;
 use serde_json::Value;
 
 use crate::service::{common::types::string_types::impl_string_types, utilities::as_hex_string};
@@ -23,7 +25,7 @@ const ENCODED_LENGTH: usize = EXAMPLE.len();
 /// Length of the hash itself;
 const HASH_LENGTH: usize = BLAKE_2B256_SIZE;
 /// Validation Regex Pattern
-const PATTERN: &str = "0x[A-Fa-f0-9]{64}";
+const PATTERN: &str = concatcp!("^0x", "[A-Fa-f0-9]{", HASH_LENGTH * 2, "}$");
 
 /// Schema.
 #[allow(clippy::cast_lossless)]
@@ -39,17 +41,18 @@ static SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| {
     }
 });
 
-/// Because ALL the constraints are defined above, we do not ever need to define them in
-/// the API. BUT we do need to make a validator.
-/// This helps enforce uniform validation.
+/// Validate `TxnId` This part is done separately from the `PATTERN`
 fn is_valid(hash: &str) -> bool {
-    if hash.len() == ENCODED_LENGTH && hash.starts_with("0x") {
-        #[allow(clippy::string_slice)] // 100% safe due to the above checks.
-        let hash = &hash[2..];
-        hex::decode(hash).is_ok()
-    } else {
-        false
+    /// Regex to validate `TxnId`
+    #[allow(clippy::unwrap_used)] // Safe because the Regex is constant.
+    static RE: LazyLock<Regex> = LazyLock::new(|| Regex::new(PATTERN).unwrap());
+
+    if RE.is_match(hash) {
+        if let Some(h) = hash.strip_prefix("0x") {
+            return hex::decode(h).is_ok();
+        }
     }
+    false
 }
 
 impl_string_types!(
@@ -80,5 +83,25 @@ impl TryFrom<Vec<u8>> for TxnId {
 impl From<TransactionId> for TxnId {
     fn from(value: TransactionId) -> Self {
         Self(value.to_string())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_txn_id() {
+        assert!(TxnId::parse_from_parameter(EXAMPLE).is_ok());
+
+        let invalid = [
+            "0x27d0350039fb3d068cccfae902bf2e72583fc5",
+            "0x27d0350039fb3d068cccfae902bf2e72583fc553e0aafb960bd9d76d5bff777b0",
+            "0x",
+            "0xqw",
+        ];
+        for v in &invalid {
+            assert!(TxnId::parse_from_parameter(v).is_err());
+        }
     }
 }

@@ -48,9 +48,9 @@ pub(crate) struct GetAssetsByStakeAddressQuery {
     pub txo: DbTxnOutputOffset,
     /// TXO transaction slot number.
     pub slot_no: DbSlot,
-    /// Asset hash.
+    /// Asset policy hash (28 bytes).
     pub policy_id: Vec<u8>,
-    /// Asset name.
+    /// Asset name (range of 0 - 32 bytes)
     pub asset_name: Vec<u8>,
     /// Asset value.
     pub value: num_bigint::BigInt,

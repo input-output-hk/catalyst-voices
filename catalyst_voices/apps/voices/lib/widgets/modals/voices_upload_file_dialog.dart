@@ -237,12 +237,9 @@ class _UploadContainerState extends State<_UploadContainer> {
               InkWell(
                 onTap: () async {
                   final result = await FilePicker.platform.pickFiles(
-                    type: (widget.allowedExtensions != null)
-                        ? FileType.custom
-                        : FileType.any,
-                    allowedExtensions: (widget.allowedExtensions != null)
-                        ? widget.allowedExtensions!
-                        : null,
+                    type: (widget.allowedExtensions != null) ? FileType.custom : FileType.any,
+                    allowedExtensions:
+                        (widget.allowedExtensions != null) ? widget.allowedExtensions! : null,
                   );
                   final file = result?.files.first;
                   final name = file?.name;
@@ -282,8 +279,7 @@ class _UploadContainerState extends State<_UploadContainer> {
                       ),
                       RichText(
                         text: TextSpan(
-                          text: context.l10n
-                              .uploadDropInfo(widget.itemNameToUpload),
+                          text: context.l10n.uploadDropInfo(widget.itemNameToUpload),
                           style: Theme.of(context).textTheme.titleSmall,
                           children: <TextSpan>[
                             TextSpan(

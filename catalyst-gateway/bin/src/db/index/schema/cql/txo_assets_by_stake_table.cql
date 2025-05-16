@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS txo_assets_by_stake (
     txn_index       smallint, -- Which Transaction in the Slot is the TXO.
     txo             smallint, -- offset in the txo list of the transaction the txo is in.
     policy_id       blob,     -- asset policy hash (id) (28 byte binary hash)
-    asset_name      blob,     -- name of the asset policy (UTF8) (32 bytes)
+    asset_name      blob,     -- name of the asset policy (UTF8) (0 - 32 bytes)
 
 
     -- None Key Data of the asset.
