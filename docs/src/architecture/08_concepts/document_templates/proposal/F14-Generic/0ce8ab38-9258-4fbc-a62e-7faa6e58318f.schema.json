@@ -5,6 +5,10 @@
     "description": "Schema for the F14 Catalyst Proposal Submission Form",
     "maintainers": [{ "name": "Catalyst Team", "url": "https://projectcatalyst.io/" }],
     "x-changelog": {
+        "2025-05-16": [
+            "Updated titles, descriptions and guidance copy text.",
+            "Increased maxLength for outputs, acceptance criteria and completion."
+        ],
         "2025-05-15": [
             "Setting maxLength for Dependency description"
         ],
@@ -487,17 +491,18 @@
                     "$ref": "#/definitions/section",
                     "title": "Project Open Source",
                     "description": "Will your project's output be fully open source? Open source refers to something people can modify and share because its design is publicly accessible.",
-                    "x-guidance": "Open source software is software with source code that anyone can inspect, modify, and enhance. Conversely, only the original authors of proprietary software can legally copy, inspect, and alter that software",
+                    "x-guidance": "[Open source](https://docs.projectcatalyst.io/current-fund/proposal-submission/additional-guidance) refers to something people can modify and share because its design is publicly accessible. Open source software is software with source code that anyone can inspect, modify, and enhance. Conversely, only the original authors of proprietary software can legally copy, inspect, and alter that software.",
                     "properties": {
                         "isOpenSource": {
                             "$ref": "#/definitions/yesNoChoice",
-                            "title": "Is the project open source?",
+                            "title": "Will your project's output/s be fully open source?",
                             "description": "Select Yes if the project is open source, No if it is not."
                         },
                         "licenseInformation": {
                             "$ref": "#/definitions/multiLineTextEntry",
-                            "title": "License and Additional Information",
+                            "title": "Please provide here more information on the open source status of your project outputs",
                             "description": "Provide the license type and any additional context regarding the open-source status of your project. If partially open source, specify which parts are open source.",
+                            "x-guidance": "If you answered YES to the above question:\n\nIf declaring the project is open source in the application form, the project should be open source-available throughout the entire lifecycle of the project with a declared open-source repository.\nPlease indicate here the type of license you intend to use for open source and provide any further information you feel is relevant to the open source status of your project outputs. If only certain elements of your code will be open source please clarify which elements will be open source here.\n\nIf you answered NO to the above question, please give further details as to why your projects outputs will not be open source.",
                             "x-placeholder": "Describe the open source status of your project and the license type",
                             "maxLength": 500
                         }
@@ -974,6 +979,7 @@
                     "properties": {
                         "solution": {
                             "$ref": "#/definitions/multiLineTextEntryMarkdown",
+                            "title": "Please describe your proposed solution and how it addresses the problem",
                             "minLength": 1,
                             "maxLength": 10240,
                             "description": "Please describe your proposed solution",
@@ -989,7 +995,7 @@
                     "properties": {
                         "impact": {
                             "$ref": "#/definitions/multiLineTextEntryMarkdown",
-                            "description": "Please define the positive impact your project will have on the wider Cardano community",
+                            "title": "Please define the positive impact your project will have on the wider Cardano community",
                             "x-placeholder": "Define the positive impact your project will have on the Cardano community",
                             "minLength": 1,
                             "maxLength": 10240
@@ -1004,7 +1010,7 @@
                     "properties": {
                         "feasibility": {
                             "$ref": "#/definitions/multiLineTextEntryMarkdown",
-                            "description": "What is your capability to deliver your project with high levels of trust and accountability? How do you intend to validate if your approach is feasible?",
+                            "title": "What is your capability to deliver your project with high levels of trust and accountability? How do you intend to validate if your approach is feasible?",
                             "x-placeholder": "Describe your capability to deliver the project with trust and accountability",
                             "minLength": 1,
                             "maxLength": 10240
@@ -1025,12 +1031,12 @@
                     "$ref": "#/definitions/section",
                     "title": "Project Milestones",
                     "description": "What are the key milestones you need to achieve in order to complete your project successfully?",
-                    "x-guidance": "Please follow these guidelines to build your individual milestones. Each milestone must include:\n\n1. **Milestone Outputs**\n   - What will be delivered\n\n2. **Acceptance Criteria**\n   - What conditions must be met\n\n3. **Evidence of Completion**\n   - How you will prove the milestone is complete.",
+                    "x-guidance": "Please follow these [guidelines](https://docs.projectcatalyst.io/current-fund/project-onboarding/funded-proposers-guides/how-to-create-a-statement-of-milestones-guide-for-funded-proposers) to build your individual milestones. Each milestone must include:\n\n1. **Milestone Outputs**\n   - What will be delivered\n\n2. **Acceptance Criteria**\n   - What conditions must be met\n\n3. **Evidence of Completion**\n   - How you will prove the milestone is complete.",
                     "properties": {
                         "milestone_list": {
                             "type": "array",
                             "title": "What are the key milestones you need to achieve in order to complete your project successfully?",
-                            "description": "Your requested budget requires a minimum of 3 milestones. However you can add additional milestones, please confirm how many milestones you would like to submit.",
+                            "description": "The number of milestones is dependent on the amount of requested funding. Refer to the Guidance card on the right for details on the required number of milestones.",
                             "x-guidance": "**Milestone Requirements:**\n\n- For Grant Amounts of up to 75k ada: at least 2 milestones, plus the final one including Project Close-out Report and Video, must be included (**3 milestones in total**)\n- For Grant Amounts over 75k ada up to 150k ada: at least 3 milestones, plus the final one including Project Close-out Report and Video, must be included (**4 milestones in total**)\n- For Grant Amounts over 150k ada up to 300k ada: at least 4 milestones, plus the final one including Project Close-out Report and Video, must be included (**5 milestones in total**)\n- For Grant Amounts exceeding 300k ada: at least 5 milestones, plus the final one including Project Close-out Report and Video, must be included (**6 milestones in total**)",
                             "minItems": 3,
                             "maxItems": 6,
@@ -1052,21 +1058,21 @@
                                         "title": "Milestone Outputs",
                                         "description": "What will be delivered in this milestone",
                                         "x-placeholder": "Describe the deliverables or outcomes for this milestone",
-                                        "maxLength": 1000
+                                        "maxLength": 2000
                                     },
                                     "acceptance_criteria": {
                                         "$ref": "#/definitions/multiLineTextEntryMarkdown",
                                         "title": "Acceptance Criteria",
                                         "description": "Specific conditions that must be met",
                                         "x-placeholder": "Define the criteria for success in this milestone",
-                                        "maxLength": 1000
+                                        "maxLength": 2000
                                     },
                                     "evidence": {
                                         "$ref": "#/definitions/multiLineTextEntryMarkdown",
                                         "title": "Evidence of Completion",
                                         "description": "How you will demonstrate achievement",
                                         "x-placeholder": "Specify the evidence that will demonstrate this milestone is complete",
-                                        "maxLength": 1000
+                                        "maxLength": 2000
                                     },
                                     "delivery_month": {
                                         "$ref": "#/definitions/durationInMonths",
