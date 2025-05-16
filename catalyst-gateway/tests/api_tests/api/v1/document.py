@@ -2,6 +2,7 @@ import requests
 from api import cat_gateway_endpoint_url
 
 URL = cat_gateway_endpoint_url("api/v1/document")
+INDEX_URL = cat_gateway_endpoint_url("api/v1/document/index")
 
 
 # Signed document GET
@@ -21,3 +22,8 @@ def put(data: str, token: str):
 def post(document_url: str, filter: dict):
     headers = {"Content-Type": "application/json"}
     return requests.post(f"{URL}{document_url}", headers=headers, json=filter)
+
+# Signed document Index POST
+def index_post(filter: dict):
+    headers = {"Content-Type": "application/json"}
+    return requests.post(f"{INDEX_URL}", headers=headers, json=filter)

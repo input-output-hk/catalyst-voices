@@ -12,7 +12,12 @@ def is_ready():
     logger.info("cat-gateway service is READY.")
 
 
+def is_not_live():
+    resp = health.live()
+    assert resp.status_code == 503, f"Service is not expected to be live: {resp.status_code} - {resp.text}"
+    logger.info("cat-gateway service is NOT LIVE.")
+
 def is_not_ready():
     resp = health.ready()
-    assert resp.status_code == 503, f"Service is expected to be unready: {resp.status_code} - {resp.text}"
+    assert resp.status_code == 503, f"Service is not expected to be ready: {resp.status_code} - {resp.text}"
     logger.info("cat-gateway service is NOT READY.")
