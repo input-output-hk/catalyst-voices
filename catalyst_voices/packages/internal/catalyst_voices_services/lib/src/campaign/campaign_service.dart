@@ -16,7 +16,7 @@ abstract interface class CampaignService {
 
   Future<List<CampaignCategory>> getCampaignCategories();
 
-  Future<CampaignTimeline> getCampaignStageByStage(CampaignTimelineStage stage);
+  Future<CampaignTimeline> getCampaignTimelineByStage(CampaignTimelineStage stage);
 
   Future<List<CampaignTimeline>> getCampaignTimeline();
 
@@ -72,7 +72,7 @@ final class CampaignServiceImpl implements CampaignService {
   }
 
   @override
-  Future<CampaignTimeline> getCampaignStageByStage(CampaignTimelineStage stage) async {
+  Future<CampaignTimeline> getCampaignTimelineByStage(CampaignTimelineStage stage) async {
     final timeline = await getCampaignTimeline();
     final timelineStage = timeline.firstWhere((element) => element.stage == stage);
     return timelineStage;
