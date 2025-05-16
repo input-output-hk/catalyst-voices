@@ -47,7 +47,7 @@ class _ProposalPageState extends State<ProposalPage>
 
   @override
   Widget build(BuildContext context) {
-    //Because appBar need PreferedSizedWidget and BlocSelector don't work with it
+    //Because appBar need PreferredSizedWidget and BlocSelector don't work with it
     final readOnlyMode = context.watch<ProposalCubit>().state.readOnlyMode;
 
     return SegmentsControllerScope(
