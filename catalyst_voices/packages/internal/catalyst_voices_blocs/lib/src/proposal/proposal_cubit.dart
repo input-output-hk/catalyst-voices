@@ -35,9 +35,8 @@ final class ProposalCubit extends Cubit<ProposalState>
     this._campaignService,
     this._documentMapper,
   ) : super(const ProposalState()) {
-    _cache = _cache.copyWith(
-      activeAccountId: Optional(_userService.user.activeAccount?.catalystId),
-    );
+    _cache =
+        _cache.copyWith(activeAccountId: Optional(_userService.user.activeAccount?.catalystId));
     _activeAccountIdSub = _userService.watchUser
         .map((event) => event.activeAccount?.catalystId)
         .distinct()
@@ -57,11 +56,10 @@ final class ProposalCubit extends Cubit<ProposalState>
 
   Future<void> load({required DocumentRef ref}) async {
     try {
+      final isReadOnlyMode = await _isReadOnlyMode();
       _logger.info('Loading $ref');
 
       _cache = _cache.copyWith(ref: Optional.of(ref));
-
-      emit(state.copyWith(isLoading: true));
 
       final proposal = await _proposalService.getProposal(ref: ref);
       final category = await _campaignService.getCategory(proposal.categoryId);
@@ -88,7 +86,7 @@ final class ProposalCubit extends Cubit<ProposalState>
       if (!isClosed) {
         final proposalState = _rebuildProposalState();
 
-        emit(ProposalState(data: proposalState));
+        emit(ProposalState(data: proposalState, readOnlyMode: isReadOnlyMode));
 
         if (proposalState.isCurrentVersionLatest == false) {
           emitSignal(const ViewingOlderVersionSignal());
@@ -384,6 +382,7 @@ final class ProposalCubit extends Cubit<ProposalState>
       CampaignTimelineStage.proposalSubmission,
     );
     final dateRangeStatus = campaignTimeline.timeline.rangeStatusNow();
+
     return switch (dateRangeStatus) {
       DateRangeStatus.after => true,
       _ => false,

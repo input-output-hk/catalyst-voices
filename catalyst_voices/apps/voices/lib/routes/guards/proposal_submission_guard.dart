@@ -12,38 +12,17 @@ final class ProposalSubmissionGuard implements RouteGuard {
 
   @override
   FutureOr<String?> redirect(BuildContext context, GoRouterState state) {
-    final campaignState = context.read<CampaignStageCubit>().state;
-    if (campaignState is ProposalSubmissionStage) {
-      if (state.path == const CampaignStageRoute().location) {
-        return const DiscoveryRoute().location;
-      }
-      return null;
-    } else {
-      return const CampaignStageRoute().location;
-    }
-  }
-}
-
-final class ReadOnlyProposalViewGuard implements RouteGuard {
-  const ReadOnlyProposalViewGuard();
-  @override
-  FutureOr<String?> redirect(BuildContext context, GoRouterState state) {
+    final path = state.path;
     final campaignState = context.read<CampaignStageCubit>().state;
 
-    if (state.matchedLocation.startsWith('/proposal/')) {
-      if (campaignState is AfterProposalSubmissionStage) {
-        final proposalId = state.pathParameters['proposalId'];
-        return ProposalRoute(
-          proposalId: proposalId!,
-          version: state.uri.queryParameters['version'],
-          local: state.uri.queryParameters['local'] == 'true',
-          readOnly: true,
-        ).location;
-      } else if (campaignState is PreProposalSubmissionStage) {
-        return const CampaignStageRoute().location;
-      }
-    }
-
-    return null;
+    return switch (campaignState) {
+      AfterProposalSubmissionStage() when path != null && ProposalRoute.isPath(path) => null,
+      AfterProposalSubmissionStage() => const CampaignStageRoute().location,
+      PreProposalSubmissionStage() when path != null && ProposalRoute.isPath(path) =>
+        const CampaignStageRoute().location,
+      ProposalSubmissionStage() when state.matchedLocation == const CampaignStageRoute().location =>
+        const DiscoveryRoute().location,
+      _ => null,
+    };
   }
 }

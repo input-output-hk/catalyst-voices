@@ -26,12 +26,10 @@ import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 class ProposalPage extends StatefulWidget {
   final DocumentRef ref;
-  final bool readOnly;
 
   const ProposalPage({
     super.key,
     required this.ref,
-    this.readOnly = false,
   });
 
   @override
@@ -49,6 +47,9 @@ class _ProposalPageState extends State<ProposalPage>
 
   @override
   Widget build(BuildContext context) {
+    //Because appBar need PreferedSizedWidget and BlocSelector don't work with it
+    final readOnlyMode = context.watch<ProposalCubit>().state.readOnlyMode;
+
     return SegmentsControllerScope(
       controller: _segmentsController,
       child: Scaffold(
@@ -56,10 +57,13 @@ class _ProposalPageState extends State<ProposalPage>
           automaticallyImplyLeading: false,
           actions: [
             Offstage(
-              offstage: widget.readOnly,
+              offstage: readOnlyMode,
               child: const SessionActionHeader(),
             ),
-            const SessionStateHeader(),
+            Offstage(
+              offstage: readOnlyMode,
+              child: const SessionStateHeader(),
+            ),
           ],
         ),
         endDrawer: const OpportunitiesDrawer(),
