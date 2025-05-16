@@ -216,10 +216,7 @@ class DriftDraftsDao extends DatabaseAccessor<DriftCatalystDatabase>
       final searchId = authorId.toSignificant().toUri().toStringWithoutScheme();
 
       query.where(
-        (doc) => CustomExpression<bool>(
-          // ignore: lines_longer_than_80_chars
-          "json_extract(metadata, '\$.authors') LIKE '%$searchId%'",
-        ),
+        (doc) => CustomExpression<bool>("json_extract(metadata, '\$.authors') LIKE '%$searchId%'"),
       );
     }
 
