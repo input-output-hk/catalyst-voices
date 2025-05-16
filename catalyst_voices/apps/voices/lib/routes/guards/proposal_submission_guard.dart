@@ -12,14 +12,17 @@ final class ProposalSubmissionGuard implements RouteGuard {
 
   @override
   FutureOr<String?> redirect(BuildContext context, GoRouterState state) {
+    final path = state.path;
     final campaignState = context.read<CampaignStageCubit>().state;
-    if (campaignState is ProposalSubmissionStage) {
-      if (state.path == const CampaignStageRoute().location) {
-        return const DiscoveryRoute().location;
-      }
-      return null;
-    } else {
-      return const CampaignStageRoute().location;
-    }
+
+    return switch (campaignState) {
+      AfterProposalSubmissionStage() when path != null && ProposalRoute.isPath(path) => null,
+      AfterProposalSubmissionStage() => const CampaignStageRoute().location,
+      PreProposalSubmissionStage() when path != null && ProposalRoute.isPath(path) =>
+        const CampaignStageRoute().location,
+      ProposalSubmissionStage() when state.matchedLocation == const CampaignStageRoute().location =>
+        const DiscoveryRoute().location,
+      _ => null,
+    };
   }
 }

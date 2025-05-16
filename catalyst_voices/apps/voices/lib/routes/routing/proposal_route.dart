@@ -39,7 +39,10 @@ final class ProposalRoute extends GoRouteData
       version: version,
       isDraft: local,
     );
-
     return ProposalPage(ref: ref);
+  }
+
+  static bool isPath(String path) {
+    return ($proposalRoute as GoRoute).path == path;
   }
 }

@@ -8,12 +8,14 @@ final class ProposalState extends Equatable {
   final ProposalViewData data;
   final CommentsState comments;
   final LocalizedException? error;
+  final bool readOnlyMode;
 
   const ProposalState({
     this.isLoading = false,
     this.data = const ProposalViewData(),
     this.comments = const CommentsState(),
     this.error,
+    this.readOnlyMode = false,
   });
 
   @override
@@ -22,6 +24,7 @@ final class ProposalState extends Equatable {
         data,
         comments,
         error,
+        readOnlyMode,
       ];
 
   bool get showData => !showError;
@@ -33,12 +36,14 @@ final class ProposalState extends Equatable {
     ProposalViewData? data,
     CommentsState? comments,
     Optional<LocalizedException>? error,
+    bool? readOnlyMode,
   }) {
     return ProposalState(
       isLoading: isLoading ?? this.isLoading,
       data: data ?? this.data,
       comments: comments ?? this.comments,
       error: error.dataOr(this.error),
+      readOnlyMode: readOnlyMode ?? this.readOnlyMode,
     );
   }
 
