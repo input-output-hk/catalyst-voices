@@ -48,9 +48,7 @@ class __ReviewerCardState extends State<_ReviewerCard> {
   Widget build(BuildContext context) {
     return _StayInvolvedCard(
       icon: VoicesAssets.icons.clipboardCheck,
-      title:
-          // ignore: lines_longer_than_80_chars
-          '${context.l10n.turnOpinionsIntoActions} ${context.l10n.becomeReviewer}!',
+      title: '${context.l10n.turnOpinionsIntoActions} ${context.l10n.becomeReviewer}!',
       description: context.l10n.stayInvolvedReviewerDescription,
       actions: Row(
         children: [
