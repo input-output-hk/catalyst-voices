@@ -5,10 +5,13 @@
 use std::sync::LazyLock;
 
 use anyhow::bail;
+use catalyst_types::hashes::BLAKE_2B224_SIZE;
+use const_format::concatcp;
 use poem_openapi::{
     registry::{MetaSchema, MetaSchemaRef},
     types::{Example, ParseError, ParseFromJSON, ParseFromParameter, ParseResult, ToJSON, Type},
 };
+use regex::Regex;
 use serde_json::Value;
 
 use crate::service::{
@@ -25,9 +28,9 @@ const EXAMPLE: &str = "0x8eee77e5894c22268d5d12e6484ba713e7ddd595abba308d88d3694
 /// Length of the hex encoded string;
 const ENCODED_LENGTH: usize = EXAMPLE.len();
 /// Length of the hash itself;
-const HASH_LENGTH: usize = 28;
+const HASH_LENGTH: usize = BLAKE_2B224_SIZE;
 /// Validation Regex Pattern
-const PATTERN: &str = "0x[A-Fa-f0-9]{56}";
+const PATTERN: &str = concatcp!("^0x", "[A-Fa-f0-9]{", HASH_LENGTH * 2, "}$");
 
 /// Schema.
 static SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| {
@@ -42,17 +45,18 @@ static SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| {
     }
 });
 
-/// Because ALL the constraints are defined above, we do not ever need to define them in
-/// the API. BUT we do need to make a validator.
-/// This helps enforce uniform validation.
+/// Validate `HexEncodedHash28` This part is done separately from the `PATTERN`
 fn is_valid(hash: &str) -> bool {
-    if hash.len() == ENCODED_LENGTH && hash.starts_with("0x") {
-        #[allow(clippy::string_slice)] // 100% safe due to the above checks.
-        let hash = &hash[2..];
-        hex::decode(hash).is_ok()
-    } else {
-        false
+    /// Regex to validate `HexEncodedHash28`
+    #[allow(clippy::unwrap_used)] // Safe because the Regex is constant.
+    static RE: LazyLock<Regex> = LazyLock::new(|| Regex::new(PATTERN).unwrap());
+
+    if RE.is_match(hash) {
+        if let Some(h) = hash.strip_prefix("0x") {
+            return hex::decode(h).is_ok();
+        }
     }
+    false
 }
 
 impl_string_types!(
@@ -88,5 +92,26 @@ impl From<HexEncodedHash28> for Vec<u8> {
     fn from(val: HexEncodedHash28) -> Self {
         #[allow(clippy::expect_used)]
         from_hex_string(&val.0).expect("This can only fail if the type was invalidly constructed.")
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_hash_28() {
+        assert!(HexEncodedHash28::parse_from_parameter(EXAMPLE).is_ok());
+
+        let invalid = [
+            "0x27d0350039fb3d068cccfae902bf2e72583fc5",
+            "0x27d0350039fb3d068cccfae902bf2e72583fc553e0aafb960bd9d76d5bff777b0",
+            "0x",
+            "0xqw",
+            "",
+        ];
+        for v in invalid {
+            assert!(HexEncodedHash28::parse_from_parameter(v).is_err());
+        }
     }
 }
