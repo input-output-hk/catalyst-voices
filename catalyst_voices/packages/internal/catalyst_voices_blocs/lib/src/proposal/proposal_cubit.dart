@@ -61,6 +61,8 @@ final class ProposalCubit extends Cubit<ProposalState>
 
       _cache = _cache.copyWith(ref: Optional.of(ref));
 
+      emit(state.copyWith(isLoading: true));
+
       final proposal = await _proposalService.getProposal(ref: ref);
       final category = await _campaignService.getCategory(proposal.categoryId);
       final commentTemplate = await _commentService.getCommentTemplateFor(

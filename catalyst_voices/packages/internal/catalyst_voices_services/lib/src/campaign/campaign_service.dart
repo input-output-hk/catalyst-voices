@@ -16,9 +16,9 @@ abstract interface class CampaignService {
 
   Future<List<CampaignCategory>> getCampaignCategories();
 
-  Future<CampaignTimeline> getCampaignTimelineByStage(CampaignTimelineStage stage);
-
   Future<List<CampaignTimeline>> getCampaignTimeline();
+
+  Future<CampaignTimeline> getCampaignTimelineByStage(CampaignTimelineStage stage);
 
   Future<CampaignCategory> getCategory(SignedDocumentRef ref);
 
@@ -72,15 +72,18 @@ final class CampaignServiceImpl implements CampaignService {
   }
 
   @override
-  Future<CampaignTimeline> getCampaignTimelineByStage(CampaignTimelineStage stage) async {
-    final timeline = await getCampaignTimeline();
-    final timelineStage = timeline.firstWhere((element) => element.stage == stage);
-    return timelineStage;
+  Future<List<CampaignTimeline>> getCampaignTimeline() {
+    return _campaignRepository.getCampaignTimeline();
   }
 
   @override
-  Future<List<CampaignTimeline>> getCampaignTimeline() {
-    return _campaignRepository.getCampaignTimeline();
+  Future<CampaignTimeline> getCampaignTimelineByStage(CampaignTimelineStage stage) async {
+    final timeline = await getCampaignTimeline();
+    final timelineStage = timeline.firstWhere(
+      (element) => element.stage == stage,
+      orElse: () => throw (StateError('Stage $stage not found')),
+    );
+    return timelineStage;
   }
 
   @override

@@ -547,7 +547,7 @@ final class ProposalServiceImpl implements ProposalService {
         .toList();
 
     return proposal.copyWith(versions: proposalDataVersion);
-  }
+}
 
   Future<Stream<ProposalData?>> _createProposalDataStream(
     ProposalDocument doc,
