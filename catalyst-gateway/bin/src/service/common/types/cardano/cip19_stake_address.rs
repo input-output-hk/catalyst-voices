@@ -1,4 +1,4 @@
-//! Cardano address types.
+//! Cardano stake address types.
 //!
 //! More information can be found in [CIP-19](https://cips.cardano.org/cip/CIP-19)
 
@@ -12,6 +12,7 @@ use poem_openapi::{
     registry::{MetaExternalDocument, MetaSchema, MetaSchemaRef},
     types::{Example, ParseError, ParseFromJSON, ParseFromParameter, ParseResult, ToJSON, Type},
 };
+use regex::Regex;
 use serde_json::Value;
 
 use crate::service::common::types::string_types::impl_string_types;
@@ -30,11 +31,11 @@ const PROD_STAKE: &str = "stake";
 const TEST_STAKE: &str = "stake_test";
 /// Regex Pattern
 pub(crate) const PATTERN: &str = concatcp!(
-    "(",
+    "^(",
     PROD_STAKE,
     "|",
     TEST_STAKE,
-    ")1[a,c-h,j-n,p-z,0,2-9]{53}"
+    ")1[a,c-h,j-n,p-z,0,2-9]{53}$"
 );
 /// Length of the encoded address.
 const ENCODED_ADDR_LEN: usize = 53;
@@ -70,17 +71,19 @@ static STAKE_SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| {
     }
 });
 
-/// Because ALL the constraints are defined above, we do not ever need to define them in
-/// the API. BUT we do need to make a validator.
-/// This helps enforce uniform validation.
+/// Validate `Cip19StakeAddress` This part is done separately from the `PATTERN`
 fn is_valid(stake_addr: &str) -> bool {
-    // Just check the string can be safely converted into the type.
-    if let Ok((hrp, addr)) = bech32::decode(stake_addr) {
-        let hrp = hrp.as_str();
-        addr.len() == DECODED_ADDR_LEN && (hrp == PROD_STAKE || hrp == TEST_STAKE)
-    } else {
-        false
+    /// Regex to validate `Cip19StakeAddress`
+    #[allow(clippy::unwrap_used)] // Safe because the Regex is constant.
+    static RE: LazyLock<Regex> = LazyLock::new(|| Regex::new(PATTERN).unwrap());
+
+    if RE.is_match(stake_addr) {
+        if let Ok((hrp, addr)) = bech32::decode(stake_addr) {
+            let hrp = hrp.as_str();
+            return addr.len() == DECODED_ADDR_LEN && (hrp == PROD_STAKE || hrp == TEST_STAKE);
+        }
     }
+    false
 }
 
 impl_string_types!(
@@ -147,14 +150,25 @@ impl Example for Cip19StakeAddress {
 mod tests {
     use super::*;
 
+    // Test Vector: <https://cips.cardano.org/cip/CIP-19>
     // cspell: disable
     const VALID_PROD_STAKE_ADDRESS: &str =
-        "stake1u94ullc9nj9gawc08990nx8hwgw80l9zpmr8re44kydqy9cdjq6rq";
+        "stake1uyehkck0lajq8gr28t9uxnuvgcqrc6070x3k9r8048z8y5gh6ffgw";
     const VALID_TEST_STAKE_ADDRESS: &str =
         "stake_test1uqehkck0lajq8gr28t9uxnuvgcqrc6070x3k9r8048z8y5gssrtvn";
     const INVALID_STAKE_ADDRESS: &str =
         "invalid1u9nlq5nmuzthw3vhgakfpxyq4r0zl2c0p8uqy24gpyjsa6c3df4h6";
     // cspell: enable
+
+    #[test]
+    fn test_cip19_stake_address() {
+        let valid = [EXAMPLE, VALID_PROD_STAKE_ADDRESS, VALID_TEST_STAKE_ADDRESS];
+        for v in valid {
+            assert!(Cip19StakeAddress::parse_from_parameter(v).is_ok());
+        }
+
+        assert!(Cip19StakeAddress::parse_from_parameter(INVALID_STAKE_ADDRESS).is_err());
+    }
 
     #[test]
     fn test_valid_stake_address_from_string() {
