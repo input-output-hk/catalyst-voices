@@ -36,6 +36,32 @@ class ProposalPage extends StatefulWidget {
   State<ProposalPage> createState() => _ProposalPageState();
 }
 
+class _AppBar extends StatelessWidget implements PreferredSizeWidget {
+  const _AppBar();
+
+  @override
+  Size get preferredSize => const VoicesAppBar().preferredSize;
+
+  @override
+  Widget build(BuildContext context) {
+    final readOnlyMode = context.select<ProposalCubit, bool>((cubit) => cubit.state.readOnlyMode);
+
+    return VoicesAppBar(
+      automaticallyImplyLeading: false,
+      actions: [
+        Offstage(
+          offstage: readOnlyMode,
+          child: const SessionActionHeader(),
+        ),
+        Offstage(
+          offstage: readOnlyMode,
+          child: const SessionStateHeader(),
+        ),
+      ],
+    );
+  }
+}
+
 class _ProposalPageState extends State<ProposalPage>
     with
         ErrorHandlerStateMixin<ProposalCubit, ProposalPage>,
@@ -47,25 +73,10 @@ class _ProposalPageState extends State<ProposalPage>
 
   @override
   Widget build(BuildContext context) {
-    //Because appBar need PreferredSizedWidget and BlocSelector don't work with it
-    final readOnlyMode = context.watch<ProposalCubit>().state.readOnlyMode;
-
     return SegmentsControllerScope(
       controller: _segmentsController,
       child: Scaffold(
-        appBar: VoicesAppBar(
-          automaticallyImplyLeading: false,
-          actions: [
-            Offstage(
-              offstage: readOnlyMode,
-              child: const SessionActionHeader(),
-            ),
-            Offstage(
-              offstage: readOnlyMode,
-              child: const SessionStateHeader(),
-            ),
-          ],
-        ),
+        appBar: const _AppBar(),
         endDrawer: const OpportunitiesDrawer(),
         body: ProposalHeaderWrapper(
           child: ProposalSidebars(
