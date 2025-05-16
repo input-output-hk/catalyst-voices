@@ -1,4 +1,5 @@
 import 'package:catalyst_voices/app/view/app_active_state_listener.dart';
+import 'package:catalyst_voices/app/view/app_global_shortcuts.dart';
 import 'package:catalyst_voices/app/view/app_mobile_access_restriction.dart';
 import 'package:catalyst_voices/app/view/app_precache_image_assets.dart';
 import 'package:catalyst_voices/app/view/app_session_listener.dart';
@@ -68,18 +69,20 @@ final class _AppContent extends StatelessWidget {
       ),
       debugShowCheckedModeBanner: false,
       builder: (_, child) {
-        return AppActiveStateListener(
-          child: AppVideoPrecache(
-            child: GlobalPrecacheImages(
-              child: GlobalSessionListener(
-                // IMPORTANT: AppSplashScreenManager must be placed above all
-                // widgets that render visible UI elements. Any widget that
-                // displays content should be a descendant of
-                // AppSplashScreenManager to ensure proper splash
-                // screen behavior.
-                child: AppSplashScreenManager(
-                  child: AppMobileAccessRestriction(
-                    child: child ?? const SizedBox.shrink(),
+        return AppGlobalShortcuts(
+          child: AppActiveStateListener(
+            child: AppVideoPrecache(
+              child: GlobalPrecacheImages(
+                child: GlobalSessionListener(
+                  // IMPORTANT: AppSplashScreenManager must be placed above all
+                  // widgets that render visible UI elements. Any widget that
+                  // displays content should be a descendant of
+                  // AppSplashScreenManager to ensure proper splash
+                  // screen behavior.
+                  child: AppSplashScreenManager(
+                    child: AppMobileAccessRestriction(
+                      child: child ?? const SizedBox.shrink(),
+                    ),
                   ),
                 ),
               ),

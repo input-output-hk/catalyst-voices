@@ -77,6 +77,9 @@ class _AppState extends State<App> {
         lazy: false,
         create: (_) => Dependencies.instance.get<CampaignStageCubit>(),
       ),
+      BlocProvider<DevToolsBloc>(
+        create: (_) => Dependencies.instance.get<DevToolsBloc>(),
+      ),
     ];
   }
 }

@@ -22,6 +22,7 @@ export 'crypto/catalyst_public_key.dart';
 export 'crypto/catalyst_signature.dart';
 export 'crypto/catalyst_signature_algorithm.dart';
 export 'crypto/lock_factor.dart';
+export 'dev_tools/dev_tools_config.dart';
 export 'document/builder/document_builder.dart';
 export 'document/builder/document_change.dart';
 export 'document/constant_documents_refs.dart';

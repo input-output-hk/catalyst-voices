@@ -2698,5 +2698,34 @@
   "usernameSavedMessage": "All set! You can now join the conversation.",
   "@usernameSavedMessage": {
     "description": "Used as username change confirmation snack bar message"
+  },
+  "devToolsAlreadyDeveloper": "Already developer!",
+  "@devToolsAlreadyDeveloper": {
+    "description": "SnackBar message when trying to enable dev tools while already enabled"
+  },
+  "devToolsAlreadyDeveloperMessage": "Open DevTools with cmd+shift+D shortcut",
+  "@devToolsAlreadyDeveloperMessage": {
+    "description": "Explanation text"
+  },
+  "devToolsBecameDeveloper": "You became developer!",
+  "@devToolsBecameDeveloper": {
+    "description": "SnackBar message when enable dev tools"
+  },
+  "devToolsBecameDeveloperMessage": "Open DevTools with cmd+shift+D shortcut",
+  "@devToolsBecameDeveloperMessage": {
+    "description": "Explanation text"
+  },
+  "devToolsTapsLeftToEnable": "{count} taps left",
+  "@devToolsTapsLeftToEnable": {
+    "description": "SnackBar message while enabling dev tools",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "devToolsTapsLeftToEnableMessage": "Keep on tapping",
+  "@devToolsTapsLeftToEnableMessage": {
+    "description": "Explanation text"
   }
 }
