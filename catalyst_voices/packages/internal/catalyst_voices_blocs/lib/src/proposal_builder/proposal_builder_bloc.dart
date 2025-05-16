@@ -415,8 +415,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     LoadProposalEvent event,
     Emitter<ProposalBuilderState> emit,
   ) async {
-    final proposalRef =
-        await _proposalService.getLatestProposalVersion(ref: event.proposalId);
+    final proposalRef = await _proposalService.getLatestProposalVersion(ref: event.proposalId);
 
     if (state.metadata.documentRef == proposalRef) {
       _logger.info('Loading proposal: $proposalRef ignored, already loaded');
@@ -938,8 +937,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
         proposalRef: proposalRef,
         categoryId: categoryId,
       );
-      final stateMetadata =
-          state.metadata.copyWith(publish: ProposalPublish.publishedDraft);
+      final stateMetadata = state.metadata.copyWith(publish: ProposalPublish.publishedDraft);
       _cache = _cache.copyWith(proposalMetadata: Optional(stateMetadata));
       emit(state.copyWith(metadata: stateMetadata, isChanging: false));
     } catch (e, stackTrace) {
