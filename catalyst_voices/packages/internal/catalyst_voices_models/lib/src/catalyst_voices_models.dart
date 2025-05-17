@@ -44,6 +44,7 @@ export 'document/specialized/comment_template.dart';
 export 'document/specialized/comment_with_replies.dart';
 export 'document/specialized/proposal_document.dart';
 export 'document/specialized/proposal_template.dart';
+export 'document/typed_document_ref.dart';
 export 'document/validation/document_validation_result.dart';
 export 'document/validation/document_validator.dart';
 export 'document/values/grouped_tags.dart';
