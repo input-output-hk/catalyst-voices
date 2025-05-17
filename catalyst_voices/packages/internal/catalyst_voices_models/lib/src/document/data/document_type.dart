@@ -1,16 +1,25 @@
 import 'dart:math' as math;
 
-// TODO(damian-molinski): update this list base on specs.
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:collection/collection.dart';
+import 'package:equatable/equatable.dart';
+import 'package:flutter/foundation.dart';
+
 /// https://github.com/input-output-hk/catalyst-libs/blob/main/docs/src/architecture/08_concepts/signed_doc/types.md#document-base-types
 enum DocumentBaseType {
-  action(priority: 900),
-  brand,
-  proposal,
-  campaign,
-  category,
-  comment,
-  template(priority: 1000),
-  unknown;
+  action(uuid: _Constants.action, priority: 900),
+  brand(uuid: _Constants.brand),
+  campaign(uuid: _Constants.campaign),
+  category(uuid: _Constants.category),
+  comment(uuid: _Constants.comment),
+  decision(uuid: _Constants.decision),
+  moderationAction(uuid: _Constants.moderationAction),
+  proposal(uuid: _Constants.proposal),
+  submissionAction(uuid: _Constants.submissionAction),
+  template(uuid: _Constants.template, priority: 1000);
+
+  /// Constant uuid value to this base type.
+  final String uuid;
 
   /// Can be used to order documents synchronisation.
   ///
@@ -18,102 +27,159 @@ enum DocumentBaseType {
   final int priority;
 
   const DocumentBaseType({
+    required this.uuid,
     this.priority = 0,
   });
 }
 
-/// List of types and metadata fields is here
-/// https://input-output-hk.github.io/catalyst-libs/branch/feat_signed_object/architecture/08_concepts/signed_doc/types/
-enum DocumentType {
-  proposalDocument(uuid: '7808d2ba-d511-40af-84e8-c0d1625fdfdc'),
-  proposalTemplate(
-    uuid: '0ce8ab38-9258-4fbc-a62e-7faa6e58318f',
-    baseTypes: [DocumentBaseType.template],
-  ),
-  commentDocument(uuid: 'b679ded3-0e7c-41ba-89f8-da62a17898ea'),
-  commentTemplate(
-    uuid: '0b8424d4-ebfd-46e3-9577-1775a69d290c',
-    baseTypes: [DocumentBaseType.template],
-  ),
-  reviewDocument(uuid: 'e4caf5f0-098b-45fd-94f3-0702a4573db5'),
-  reviewTemplate(
-    uuid: 'ebe5d0bf-5d86-4577-af4d-008fddbe2edc',
-    baseTypes: [DocumentBaseType.template],
-  ),
-  categoryParametersDocument(uuid: '48c20109-362a-4d32-9bba-e0a9cf8b45be'),
+enum DocumentTypeDef {
+  proposalDocument(_Constants.proposalDocument),
+  proposalTemplate(_Constants.proposalTemplate, overrideBaseTypes: [DocumentBaseType.template]),
+  commentDocument(_Constants.commentDocument),
+  commentTemplate(_Constants.commentTemplate, overrideBaseTypes: [DocumentBaseType.template]),
+  reviewDocument(_Constants.reviewDocument),
+  reviewTemplate(_Constants.reviewTemplate, overrideBaseTypes: [DocumentBaseType.template]),
+  categoryParametersDocument(_Constants.categoryParametersDocument),
   categoryParametersTemplate(
-    uuid: '65b1e8b0-51f1-46a5-9970-72cdf26884be',
-    baseTypes: [DocumentBaseType.template],
+    _Constants.categoryParametersTemplate,
+    overrideBaseTypes: [DocumentBaseType.template],
   ),
-  campaignParametersDocument(uuid: '0110ea96-a555-47ce-8408-36efe6ed6f7c'),
+  campaignParametersDocument(_Constants.campaignParametersDocument),
   campaignParametersTemplate(
-    uuid: '7e8f5fa2-44ce-49c8-bfd5-02af42c179a3',
-    baseTypes: [DocumentBaseType.template],
+    _Constants.campaignParametersTemplate,
+    overrideBaseTypes: [DocumentBaseType.template],
   ),
-  brandParametersDocument(uuid: '3e4808cc-c86e-467b-9702-d60baa9d1fca'),
+  brandParametersDocument(_Constants.brandParametersDocument),
   brandParametersTemplate(
-    uuid: 'fd3c1735-80b1-4eea-8d63-5f436d97ea31',
-    baseTypes: [DocumentBaseType.template],
+    _Constants.brandParametersTemplate,
+    overrideBaseTypes: [DocumentBaseType.template],
   ),
   proposalActionDocument(
-    uuid: '5e60e623-ad02-4a1b-a1ac-406db978ee48',
-    baseTypes: [DocumentBaseType.action],
-  ),
-  unknown(uuid: '');
+    _Constants.proposalActionDocument,
+    overrideBaseTypes: [DocumentBaseType.action],
+  );
 
-  final String uuid;
-  final List<DocumentBaseType> baseTypes;
+  final List<String> value;
 
-  const DocumentType({
-    required this.uuid,
-    this.baseTypes = const [],
-  });
+  // TODO(damian-molinski): remove it after values migration to BaseTypes
+  final List<DocumentBaseType>? _overrideBaseTypes;
 
-  /// Finds biggest [baseTypes] priority or 0.
-  int get priority => baseTypes.fold(
-        0,
-        (previousValue, element) => math.max(previousValue, element.priority),
-      );
+  const DocumentTypeDef(
+    this.value, {
+    List<DocumentBaseType>? overrideBaseTypes,
+  }) : _overrideBaseTypes = overrideBaseTypes;
 
-  DocumentType? get template {
+  DocumentTypeDef? get template {
     return switch (this) {
-      // proposal
-      DocumentType.proposalDocument ||
-      DocumentType.proposalTemplate =>
-        DocumentType.proposalTemplate,
-
-      // comment
-      DocumentType.commentDocument || DocumentType.commentTemplate => DocumentType.commentTemplate,
-
-      // review
-      DocumentType.reviewDocument || DocumentType.reviewTemplate => DocumentType.reviewTemplate,
-
-      // category
-      DocumentType.categoryParametersDocument ||
-      DocumentType.categoryParametersTemplate =>
-        DocumentType.categoryParametersTemplate,
-
-      // campaign
-      DocumentType.campaignParametersDocument ||
-      DocumentType.campaignParametersTemplate =>
-        DocumentType.campaignParametersTemplate,
-
-      // brand
-      DocumentType.brandParametersDocument ||
-      DocumentType.brandParametersTemplate =>
-        DocumentType.brandParametersTemplate,
-
-      // other
-      DocumentType.proposalActionDocument || DocumentType.unknown => null,
+      DocumentTypeDef.proposalDocument ||
+      DocumentTypeDef.proposalTemplate =>
+        DocumentTypeDef.proposalTemplate,
+      DocumentTypeDef.commentDocument ||
+      DocumentTypeDef.commentTemplate =>
+        DocumentTypeDef.commentTemplate,
+      DocumentTypeDef.reviewDocument ||
+      DocumentTypeDef.reviewTemplate =>
+        DocumentTypeDef.reviewTemplate,
+      DocumentTypeDef.categoryParametersDocument ||
+      DocumentTypeDef.categoryParametersTemplate =>
+        DocumentTypeDef.categoryParametersTemplate,
+      DocumentTypeDef.campaignParametersDocument ||
+      DocumentTypeDef.campaignParametersTemplate =>
+        DocumentTypeDef.campaignParametersTemplate,
+      DocumentTypeDef.brandParametersDocument ||
+      DocumentTypeDef.brandParametersTemplate =>
+        DocumentTypeDef.brandParametersTemplate,
+      DocumentTypeDef.proposalActionDocument => null,
     };
   }
+}
 
-  static DocumentType fromJson(String data) {
-    return DocumentType.values.firstWhere(
-      (element) => element.uuid == data,
-      orElse: () => DocumentType.unknown,
+/// :)
+final class DocumentType extends Equatable {
+  /// UUIDs
+  final List<String> value;
+
+  const DocumentType(List<String> value) : this._(value);
+
+  factory DocumentType.fromDef(DocumentTypeDef def) => DocumentType(def.value);
+
+  factory DocumentType.fromJson(String json) => DocumentType(json.split(','));
+
+  /// 1.25
+  const DocumentType._(this.value);
+
+  /// Returns found [DocumentBaseType] in [value].
+  List<DocumentBaseType> get baseTypes {
+    final overrideBaseTypes = def?._overrideBaseTypes;
+    if (overrideBaseTypes != null) {
+      return overrideBaseTypes;
+    }
+    return DocumentBaseType.values.where((baseType) => value.contains(baseType.uuid)).toList();
+  }
+
+  DocumentTypeDef? get def {
+    return DocumentTypeDef.values.firstWhereOrNull((def) => listEquals(def.value, value));
+  }
+
+  /// Calculates priority based on found [DocumentBaseType] in [value].
+  int get priority {
+    return baseTypes.fold(
+      0,
+      (previousValue, element) => math.max(previousValue, element.priority),
     );
   }
 
-  static String toJson(DocumentType type) => type.uuid;
+  @override
+  List<Object?> get props => [value];
+
+  DocumentType? get template {
+    final templateDef = def?.template;
+    if (templateDef == null) {
+      return null;
+    }
+
+    return DocumentType.fromDef(templateDef);
+  }
+
+  String toJson() => value.join(',');
+
+  @override
+  String toString() {
+    return '${def?.name.capitalize() ?? 'Unknown'}(${toJson()})';
+  }
+}
+
+// TODO(damian-molinski): At the moment we have const uuids for concrete DocumentType's as single
+// value but later we'll use only base types and resolve DocumentType against those
+abstract final class _Constants {
+  // Document Base Types
+  // https://github.com/input-output-hk/catalyst-libs/blob/main/docs/src/architecture/08_concepts/signed_doc/types.md#document-base-types
+  static const action = '5e60e623-ad02-4a1b-a1ac-406db978ee48';
+  static const brand = 'ebcabeeb-5bc5-4f95-91e8-cab8ca724172';
+  static const campaign = '5ef32d5d-f240-462c-a7a4-ba4af221fa23';
+  static const category = '818938c3-3139-4daa-afe6-974c78488e95';
+  static const comment = 'b679ded3-0e7c-41ba-89f8-da62a17898ea';
+  static const decision = '788ff4c6-d65a-451f-bb33-575fe056b411';
+  static const moderationAction = 'a5d232b8-5e03-4117-9afd-be32b878fcdd';
+  static const proposal = '7808d2ba-d511-40af-84e8-c0d1625fdfdc';
+  static const submissionAction = '78927329-cfd9-4ea1-9c71-0e019b126a65';
+  static const template = '0ce8ab38-9258-4fbc-a62e-7faa6e58318f';
+
+  // Document Types
+  // https://github.com/input-output-hk/catalyst-libs/blob/main/docs/src/architecture/08_concepts/signed_doc/types.md#document-types
+  static const proposalDocument = ['7808d2ba-d511-40af-84e8-c0d1625fdfdc'];
+  static const proposalTemplate = ['0ce8ab38-9258-4fbc-a62e-7faa6e58318f'];
+  static const commentDocument = ['b679ded3-0e7c-41ba-89f8-da62a17898ea'];
+  static const commentTemplate = ['0b8424d4-ebfd-46e3-9577-1775a69d290c'];
+  static const reviewDocument = ['e4caf5f0-098b-45fd-94f3-0702a4573db5'];
+  static const reviewTemplate = ['ebe5d0bf-5d86-4577-af4d-008fddbe2edc'];
+  static const categoryParametersDocument = ['48c20109-362a-4d32-9bba-e0a9cf8b45be'];
+  static const categoryParametersTemplate = ['65b1e8b0-51f1-46a5-9970-72cdf26884be'];
+  static const campaignParametersDocument = ['0110ea96-a555-47ce-8408-36efe6ed6f7c'];
+  static const campaignParametersTemplate = ['7e8f5fa2-44ce-49c8-bfd5-02af42c179a3'];
+  static const brandParametersDocument = ['3e4808cc-c86e-467b-9702-d60baa9d1fca'];
+  static const brandParametersTemplate = ['fd3c1735-80b1-4eea-8d63-5f436d97ea31'];
+  static const proposalActionDocument = ['5e60e623-ad02-4a1b-a1ac-406db978ee48'];
+
+  const _Constants._();
 }
