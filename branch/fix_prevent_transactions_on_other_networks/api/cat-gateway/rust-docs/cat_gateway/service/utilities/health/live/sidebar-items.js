@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["get_live_counter","inc_live_counter","is_live","live_counter_reset","set_not_live"],"static":["IS_LIVE","LIVE_PANIC_COUNTER"]};
