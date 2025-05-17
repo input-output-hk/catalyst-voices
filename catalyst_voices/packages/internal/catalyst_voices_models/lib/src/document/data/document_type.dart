@@ -32,76 +32,23 @@ enum DocumentBaseType {
   });
 }
 
-enum DocumentTypeDef {
-  proposalDocument(_Constants.proposalDocument),
-  proposalTemplate(_Constants.proposalTemplate, overrideBaseTypes: [DocumentBaseType.template]),
-  commentDocument(_Constants.commentDocument),
-  commentTemplate(_Constants.commentTemplate, overrideBaseTypes: [DocumentBaseType.template]),
-  reviewDocument(_Constants.reviewDocument),
-  reviewTemplate(_Constants.reviewTemplate, overrideBaseTypes: [DocumentBaseType.template]),
-  categoryParametersDocument(_Constants.categoryParametersDocument),
-  categoryParametersTemplate(
-    _Constants.categoryParametersTemplate,
-    overrideBaseTypes: [DocumentBaseType.template],
-  ),
-  campaignParametersDocument(_Constants.campaignParametersDocument),
-  campaignParametersTemplate(
-    _Constants.campaignParametersTemplate,
-    overrideBaseTypes: [DocumentBaseType.template],
-  ),
-  brandParametersDocument(_Constants.brandParametersDocument),
-  brandParametersTemplate(
-    _Constants.brandParametersTemplate,
-    overrideBaseTypes: [DocumentBaseType.template],
-  ),
-  proposalActionDocument(
-    _Constants.proposalActionDocument,
-    overrideBaseTypes: [DocumentBaseType.action],
-  );
-
-  final List<String> value;
-
-  // TODO(damian-molinski): remove it after values migration to BaseTypes
-  final List<DocumentBaseType>? _overrideBaseTypes;
-
-  const DocumentTypeDef(
-    this.value, {
-    List<DocumentBaseType>? overrideBaseTypes,
-  }) : _overrideBaseTypes = overrideBaseTypes;
-
-  DocumentTypeDef? get template {
-    return switch (this) {
-      DocumentTypeDef.proposalDocument ||
-      DocumentTypeDef.proposalTemplate =>
-        DocumentTypeDef.proposalTemplate,
-      DocumentTypeDef.commentDocument ||
-      DocumentTypeDef.commentTemplate =>
-        DocumentTypeDef.commentTemplate,
-      DocumentTypeDef.reviewDocument ||
-      DocumentTypeDef.reviewTemplate =>
-        DocumentTypeDef.reviewTemplate,
-      DocumentTypeDef.categoryParametersDocument ||
-      DocumentTypeDef.categoryParametersTemplate =>
-        DocumentTypeDef.categoryParametersTemplate,
-      DocumentTypeDef.campaignParametersDocument ||
-      DocumentTypeDef.campaignParametersTemplate =>
-        DocumentTypeDef.campaignParametersTemplate,
-      DocumentTypeDef.brandParametersDocument ||
-      DocumentTypeDef.brandParametersTemplate =>
-        DocumentTypeDef.brandParametersTemplate,
-      DocumentTypeDef.proposalActionDocument => null,
-    };
-  }
-}
-
 /// :)
 final class DocumentType extends Equatable {
+  // Helper function. Eventually may be removed.
+  static const proposalDocument = DocumentType(_Constants.proposalDocument);
+  static const proposalTemplate = DocumentType(_Constants.proposalTemplate);
+  static const commentDocument = DocumentType(_Constants.commentDocument);
+  static const commentTemplate = DocumentType(_Constants.commentTemplate);
+  static const categoryParametersDocument = DocumentType(_Constants.categoryParametersDocument);
+  static const campaignParametersDocument = DocumentType(_Constants.campaignParametersDocument);
+  static const brandParametersDocument = DocumentType(_Constants.brandParametersDocument);
+  static const proposalActionDocument = DocumentType(_Constants.proposalActionDocument);
+
   /// UUIDs
   final List<String> value;
 
+  ///
   const DocumentType(List<String> value) : this._(value);
-
-  factory DocumentType.fromDef(DocumentTypeDef def) => DocumentType(def.value);
 
   factory DocumentType.fromJson(String json) => DocumentType(json.split(','));
 
@@ -110,16 +57,14 @@ final class DocumentType extends Equatable {
 
   /// Returns found [DocumentBaseType] in [value].
   List<DocumentBaseType> get baseTypes {
-    final overrideBaseTypes = def?._overrideBaseTypes;
+    final overrideBaseTypes = _def?._overrideBaseTypes;
     if (overrideBaseTypes != null) {
       return overrideBaseTypes;
     }
     return DocumentBaseType.values.where((baseType) => value.contains(baseType.uuid)).toList();
   }
 
-  DocumentTypeDef? get def {
-    return DocumentTypeDef.values.firstWhereOrNull((def) => listEquals(def.value, value));
-  }
+  bool get isCategory => _def == _DocumentTypeDef.categoryParametersDocument;
 
   /// Calculates priority based on found [DocumentBaseType] in [value].
   int get priority {
@@ -133,19 +78,23 @@ final class DocumentType extends Equatable {
   List<Object?> get props => [value];
 
   DocumentType? get template {
-    final templateDef = def?.template;
+    final templateDef = _def?.template;
     if (templateDef == null) {
       return null;
     }
 
-    return DocumentType.fromDef(templateDef);
+    return DocumentType(templateDef.value);
+  }
+
+  _DocumentTypeDef? get _def {
+    return _DocumentTypeDef.values.firstWhereOrNull((def) => listEquals(def.value, value));
   }
 
   String toJson() => value.join(',');
 
   @override
   String toString() {
-    return '${def?.name.capitalize() ?? 'Unknown'}(${toJson()})';
+    return '${_def?.name.capitalize() ?? 'Unknown'}(${toJson()})';
   }
 }
 
@@ -182,4 +131,66 @@ abstract final class _Constants {
   static const proposalActionDocument = ['5e60e623-ad02-4a1b-a1ac-406db978ee48'];
 
   const _Constants._();
+}
+
+enum _DocumentTypeDef {
+  proposalDocument(_Constants.proposalDocument),
+  proposalTemplate(_Constants.proposalTemplate, overrideBaseTypes: [DocumentBaseType.template]),
+  commentDocument(_Constants.commentDocument),
+  commentTemplate(_Constants.commentTemplate, overrideBaseTypes: [DocumentBaseType.template]),
+  reviewDocument(_Constants.reviewDocument),
+  reviewTemplate(_Constants.reviewTemplate, overrideBaseTypes: [DocumentBaseType.template]),
+  categoryParametersDocument(_Constants.categoryParametersDocument),
+  categoryParametersTemplate(
+    _Constants.categoryParametersTemplate,
+    overrideBaseTypes: [DocumentBaseType.template],
+  ),
+  campaignParametersDocument(_Constants.campaignParametersDocument),
+  campaignParametersTemplate(
+    _Constants.campaignParametersTemplate,
+    overrideBaseTypes: [DocumentBaseType.template],
+  ),
+  brandParametersDocument(_Constants.brandParametersDocument),
+  brandParametersTemplate(
+    _Constants.brandParametersTemplate,
+    overrideBaseTypes: [DocumentBaseType.template],
+  ),
+  proposalActionDocument(
+    _Constants.proposalActionDocument,
+    overrideBaseTypes: [DocumentBaseType.action],
+  );
+
+  final List<String> value;
+
+  // TODO(damian-molinski): remove it after values migration to BaseTypes
+  final List<DocumentBaseType>? _overrideBaseTypes;
+
+  const _DocumentTypeDef(
+    this.value, {
+    List<DocumentBaseType>? overrideBaseTypes,
+  }) : _overrideBaseTypes = overrideBaseTypes;
+
+  _DocumentTypeDef? get template {
+    return switch (this) {
+      _DocumentTypeDef.proposalDocument ||
+      _DocumentTypeDef.proposalTemplate =>
+        _DocumentTypeDef.proposalTemplate,
+      _DocumentTypeDef.commentDocument ||
+      _DocumentTypeDef.commentTemplate =>
+        _DocumentTypeDef.commentTemplate,
+      _DocumentTypeDef.reviewDocument ||
+      _DocumentTypeDef.reviewTemplate =>
+        _DocumentTypeDef.reviewTemplate,
+      _DocumentTypeDef.categoryParametersDocument ||
+      _DocumentTypeDef.categoryParametersTemplate =>
+        _DocumentTypeDef.categoryParametersTemplate,
+      _DocumentTypeDef.campaignParametersDocument ||
+      _DocumentTypeDef.campaignParametersTemplate =>
+        _DocumentTypeDef.campaignParametersTemplate,
+      _DocumentTypeDef.brandParametersDocument ||
+      _DocumentTypeDef.brandParametersTemplate =>
+        _DocumentTypeDef.brandParametersTemplate,
+      _DocumentTypeDef.proposalActionDocument => null,
+    };
+  }
 }
