@@ -1,5 +1,39 @@
 //! Metrics related to RBAC Registration Chain Caching analytics.
 
+use std::{
+    sync::atomic::{AtomicBool, Ordering},
+    thread,
+    time::Duration,
+};
+
+use crate::{rbac_cache::RBAC_CACHE, settings::Settings};
+
+/// This is to prevent the init function from accidentally being called multiple times.
+static IS_INITIALIZED: AtomicBool = AtomicBool::new(false);
+
+/// Starts a background thread to periodically update Chain Follower metrics.
+///
+/// This function spawns a thread that updates the Chain Follower metrics
+/// at regular intervals defined by `METRICS_FOLLOWER_INTERVAL`.
+pub(crate) fn init_metrics_reporter() {
+    if IS_INITIALIZED.swap(true, Ordering::SeqCst) {
+        return;
+    }
+
+    let api_host_names = Settings::api_host_names().join(",");
+    let service_id = Settings::service_id();
+    let network = Settings::cardano_network().to_string();
+
+    thread::spawn(move || loop {
+        let rbac_entries = RBAC_CACHE.rbac_entries();
+        reporter::CACHING_RBAC_ENTRIES
+            .with_label_values(&[&api_host_names, service_id, &network])
+            .set(i64::try_from(rbac_entries).unwrap_or(-1));
+
+        thread::sleep(Duration::from_secs(1));
+    });
+}
+
 /// All the related RBAC Registration Chain Caching reporting metrics to the Prometheus
 /// service are inside this module.
 pub(crate) mod reporter {

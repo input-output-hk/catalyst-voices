@@ -235,4 +235,19 @@ impl RbacCache {
 
         Ok(RbacCacheAddSuccess { catalyst_id })
     }
+
+    /// Returns the number of cached chain entries.
+    pub fn chain_entries(&self) -> usize {
+        self.chains.iter().count()
+    }
+
+    /// Returns the number of cached active address entries.
+    pub fn active_address_entries(&self) -> usize {
+        self.active_addresses.iter().count()
+    }
+
+    /// Returns the number of cached transaction entries.
+    pub fn transaction_entries(&self) -> usize {
+        self.transactions.iter().count()
+    }
 }

@@ -17,6 +17,7 @@ pub(crate) mod rbac_cache;
 pub(crate) fn init_prometheus() -> Registry {
     chain_follower::init_metrics_reporter();
     memory::init_metrics_reporter();
+    rbac_cache::init_metrics_reporter();
 
     default_registry().clone()
 }

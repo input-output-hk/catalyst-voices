@@ -6,7 +6,7 @@ use cardano_blockchain_types::StakeAddress;
 use catalyst_types::catalyst_id::CatalystId;
 use rbac_registration::{cardano::cip509::Cip509, registration::cardano::RegistrationChain};
 
-use crate::rbac_cache::{add_result::AddResult, cache::RbacCache};
+use crate::{rbac_cache::{add_result::AddResult, cache::RbacCache}};
 
 /// A wrapper that allows managing both persistent and volatile caches at the same time.
 pub struct RbacCacheManager {
@@ -35,18 +35,21 @@ impl RbacCacheManager {
     #[allow(clippy::result_large_err)]
     pub fn add(&self, registration: Cip509, is_persistent: bool) -> AddResult {
         if is_persistent {
-            self.persistent.add(registration.clone())?;
+            self.persistent.add(registration.clone())
+        } else {
+            self.volatile.add(registration)
         }
-        self.volatile.add(registration)
     }
 
     /// Returns a registration chain by the given Catalyst ID.
     pub fn get(&self, id: &CatalystId, is_persistent: bool) -> Option<RegistrationChain> {
-        if is_persistent {
+        let result = if is_persistent {
             self.persistent.get(id)
         } else {
             self.volatile.get(id)
-        }
+        };
+
+        result
     }
 
     /// Returns a registration chain by the stake address.
@@ -74,5 +77,10 @@ impl RbacCacheManager {
         } else {
             self.volatile.active_stake_addresses(id)
         }
+    }
+
+    /// Returns the number of cached chain entries from both persisent and volatile.
+    pub fn rbac_entries(&self) -> usize {
+        self.persistent.chain_entries() + self.volatile.chain_entries()
     }
 }
