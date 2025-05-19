@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:catalyst_voices/widgets/gesture/voices_gesture_detector.dart';
 import 'package:catalyst_voices/widgets/snackbar/voices_snackbar.dart';
 import 'package:catalyst_voices/widgets/snackbar/voices_snackbar_type.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
@@ -25,12 +26,9 @@ class _DevToolsEnablerState extends State<DevToolsEnabler> {
 
   @override
   Widget build(BuildContext context) {
-    return MouseRegion(
-      cursor: widget.isEnabled ? SystemMouseCursors.click : MouseCursor.defer,
-      child: GestureDetector(
-        onTap: widget.isEnabled ? _handleTap : null,
-        child: widget.child,
-      ),
+    return VoicesGestureDetector(
+      onTap: widget.isEnabled ? _handleTap : null,
+      child: widget.child,
     );
   }
 
