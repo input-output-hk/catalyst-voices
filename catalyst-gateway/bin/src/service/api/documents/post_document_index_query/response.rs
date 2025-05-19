@@ -159,7 +159,7 @@ pub(crate) struct IndexedDocumentVersion {
     #[oai(skip_serializing_if_is_none)]
     pub template: Option<FilteredDocumentReference>,
     /// Document Parameter Reference that matches the filter
-    #[oai(skip_serializing_if_is_none)]
+    #[oai(rename = "doc_parameters", skip_serializing_if_is_none)]
     pub parameters: Option<FilteredDocumentReference>,
 }
 
