@@ -73,6 +73,11 @@ sealed class DocumentRef extends Equatable implements Comparable<DocumentRef> {
   /// Creates ref without version.
   DocumentRef toLoose();
 
+  /// Converts to [MaybeTypedDocumentRef] with given optional [type].
+  MaybeTypedDocumentRef toMaybeTyped([DocumentType? type]) {
+    return MaybeTypedDocumentRef(ref: this, type: type);
+  }
+
   /// Converts the [DocumentRef] to [SignedDocumentRef].
   ///
   /// Useful when a draft becomes a signed document after publishing.

@@ -119,9 +119,9 @@ void main() {
         );
         final response = Response(http.Response('', 200), page);
 
-        final expectedRefs = <TypedDocumentRef>[
+        final expectedRefs = <MaybeTypedDocumentRef>[
           ...proposalRefs.map((e) => e.toTyped(DocumentType.proposalDocument)),
-          templateRef.toTyped(DocumentType.proposalTemplate),
+          templateRef.toMaybeTyped(DocumentType.proposalTemplate),
         ];
 
         // When
