@@ -12,18 +12,17 @@ final class DocumentType extends Equatable {
 
   /// Deserializes the type from cbor.
   factory DocumentType.fromCbor(CborValue value) {
-    // TODO(damian-molinski): remove it
     // backwards compatibility but we're not going to maintain it as its pre 1.0
     if (value is CborBytes) {
       return DocumentType([Uuid.fromCbor(value)]);
     }
 
     if (value is CborList) {
-      final types = value.cast<CborBytes>().map(Uuid.fromCbor).toList();
+      final types = value.map(Uuid.fromCbor).toList();
       return DocumentType(types);
     }
 
-    throw FormatException('The $value is not a valid DocumentType!');
+    throw ArgumentError.value(value, 'value', 'Not a supported value for DocumentType!');
   }
 
   @override

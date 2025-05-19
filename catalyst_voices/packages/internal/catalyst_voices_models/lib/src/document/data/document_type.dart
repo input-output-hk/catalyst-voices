@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
@@ -32,9 +33,17 @@ enum DocumentBaseType {
   });
 }
 
-/// :)
+/// Defines kind of [Document]. It supports list of values, which are UUIDv4.
+///
+/// At the moment we have well-known definition's of documents as static fields [proposalDocument],
+/// [proposalTemplate] and so on.
+///
+/// Its a class and not enum because it more flexible and can accept *some* unknown value but other
+/// may still be know and it will be helpful while debugging or defining custom types.
+///
+/// In future we'll check [value] for what kind of [DocumentBaseType] it contains.
 final class DocumentType extends Equatable {
-  // Helper function. Eventually may be removed.
+  // Helper function. Eventually may be removed in favour of named constructors.
   static const proposalDocument = DocumentType(_Constants.proposalDocument);
   static const proposalTemplate = DocumentType(_Constants.proposalTemplate);
   static const commentDocument = DocumentType(_Constants.commentDocument);
@@ -44,27 +53,35 @@ final class DocumentType extends Equatable {
   static const brandParametersDocument = DocumentType(_Constants.brandParametersDocument);
   static const proposalActionDocument = DocumentType(_Constants.proposalActionDocument);
 
-  /// UUIDs
+  /// UUIDs v4.
+  ///
+  /// Later it should contain only values from [DocumentBaseType].
   final List<String> value;
 
-  ///
+  /// Default constructor.
   const DocumentType(List<String> value) : this._(value);
 
+  /// Shouldn't be used as it does not make sense. Only in case of fallback decoding.
   const DocumentType.empty() : this(const []);
 
+  /// As backwards compatibility it accepts [json] as simple [String] or [List] or [String]s.
+  ///
+  /// Otherwise throws [ArgumentError].
   factory DocumentType.fromJson(dynamic json) {
     if (json is String) {
       return DocumentType(json.split(','));
     }
 
     if (json is List<dynamic>) {
-      return DocumentType(json.whereType<String>().toList());
+      return DocumentType(json.cast<String>().toList());
     }
 
     throw ArgumentError.value(json, 'json', 'not supported type for DocumentType');
   }
 
-  /// 1.25
+  // TODO(damian-molinski): Remove after transition to DocumentBaseType is completed.
+  /// Private constructor. Its not very useful right now but we may want to
+  /// privately override [DocumentBaseType] for some definition in transition.
   const DocumentType._(this.value);
 
   /// Returns found [DocumentBaseType] in [value].
@@ -90,14 +107,11 @@ final class DocumentType extends Equatable {
   List<Object?> get props => [value];
 
   DocumentType? get template {
-    final def = _def;
-    final templateDef = def?.template;
+    final templateDef = _def?.template;
     if (templateDef == null) {
-      print('$def not not template');
       return null;
     }
 
-    print('$def -> template $templateDef');
     return DocumentType(templateDef.value);
   }
 
