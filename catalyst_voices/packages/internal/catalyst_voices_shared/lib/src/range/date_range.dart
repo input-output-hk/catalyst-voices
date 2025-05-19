@@ -64,4 +64,21 @@ class DateRange extends Equatable {
   bool isTodayInRange() {
     return isInRange(DateTime.now());
   }
+
+  DateRangeStatus rangeStatusNow() {
+    final now = DateTime.now();
+    if (isInRange(now)) {
+      return DateRangeStatus.inRange;
+    } else if (isBeforeRange(now)) {
+      return DateRangeStatus.before;
+    } else {
+      return DateRangeStatus.after;
+    }
+  }
+}
+
+enum DateRangeStatus {
+  before,
+  inRange,
+  after,
 }
