@@ -32,12 +32,13 @@ class CampaignStageCubit extends Cubit<CampaignStageState> {
       );
       final dateRangeStatus = campaignTimeline.timeline.rangeStatusNow();
       final startDate = campaignTimeline.timeline.from;
+      final endDate = campaignTimeline.timeline.to;
 
       return switch (dateRangeStatus) {
         DateRangeStatus.after => emit(const AfterProposalSubmissionStage()),
         DateRangeStatus.before => emit(PreProposalSubmissionStage(startDate: startDate)),
         DateRangeStatus.inRange => {
-            _startCountdownTimer(startDate),
+            _startCountdownTimer(endDate),
             emit(const ProposalSubmissionStage()),
           }
       };
