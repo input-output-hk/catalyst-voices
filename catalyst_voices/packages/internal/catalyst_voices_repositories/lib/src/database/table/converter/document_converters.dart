@@ -36,6 +36,6 @@ final class _DocumentTypeConverter extends TypeConverter<DocumentType, String> {
 
   @override
   String toSql(DocumentType value) {
-    return DocumentType.toJson(value);
+    return value.toJson();
   }
 }

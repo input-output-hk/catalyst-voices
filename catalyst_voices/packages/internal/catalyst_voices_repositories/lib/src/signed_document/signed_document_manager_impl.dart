@@ -2,20 +2,20 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:catalyst_compression/catalyst_compression.dart';
-import 'package:catalyst_cose/catalyst_cose.dart';
+import 'package:catalyst_cose/catalyst_cose.dart' as cose;
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/signed_document/signed_document_manager.dart';
 import 'package:cbor/cbor.dart';
 import 'package:equatable/equatable.dart';
 
-const _brotliEncoding = StringValue(CoseValues.brotliContentEncoding);
+const _brotliEncoding = cose.StringValue(cose.CoseValues.brotliContentEncoding);
 
 final class SignedDocumentManagerImpl implements SignedDocumentManager {
   const SignedDocumentManagerImpl();
 
   @override
   Future<SignedDocument> parseDocument(Uint8List bytes) async {
-    final coseSign = CoseSign.fromCbor(cbor.decode(bytes));
+    final coseSign = cose.CoseSign.fromCbor(cbor.decode(bytes));
     final metadata = _SignedDocumentMetadataExt.fromCose(
       protectedHeaders: coseSign.protectedHeaders,
       unprotectedHeaders: coseSign.unprotectedHeaders,
@@ -44,7 +44,7 @@ final class SignedDocumentManagerImpl implements SignedDocumentManager {
   }) async {
     final compressedPayload = await _brotliCompressPayload(document.toBytes());
 
-    final coseSign = await CoseSign.sign(
+    final coseSign = await cose.CoseSign.sign(
       protectedHeaders: metadata.asCoseProtectedHeaders,
       unprotectedHeaders: metadata.asCoseUnprotectedHeaders,
       payload: compressedPayload,
@@ -65,7 +65,7 @@ final class SignedDocumentManagerImpl implements SignedDocumentManager {
     return Uint8List.fromList(compressed);
   }
 
-  Future<Uint8List> _brotliDecompressPayload(CoseSign coseSign) async {
+  Future<Uint8List> _brotliDecompressPayload(cose.CoseSign coseSign) async {
     if (coseSign.protectedHeaders.contentEncoding == _brotliEncoding) {
       final compressor = CatalystCompression.instance.brotli;
       final decompressed = await compressor.decompress(coseSign.payload);
@@ -76,7 +76,7 @@ final class SignedDocumentManagerImpl implements SignedDocumentManager {
   }
 }
 
-final class _CatalystSigner implements CatalystCoseSigner {
+final class _CatalystSigner implements cose.CatalystCoseSigner {
   final CatalystId _catalystId;
   final CatalystPrivateKey _privateKey;
 
@@ -86,7 +86,7 @@ final class _CatalystSigner implements CatalystCoseSigner {
   );
 
   @override
-  StringOrInt? get alg => null;
+  cose.StringOrInt? get alg => null;
 
   @override
   Future<Uint8List?> get kid async {
@@ -101,7 +101,7 @@ final class _CatalystSigner implements CatalystCoseSigner {
   }
 }
 
-final class _CatalystVerifier implements CatalystCoseVerifier {
+final class _CatalystVerifier implements cose.CatalystCoseVerifier {
   final CatalystId _catalystId;
 
   const _CatalystVerifier(this._catalystId);
@@ -125,7 +125,7 @@ final class _CatalystVerifier implements CatalystCoseVerifier {
 }
 
 final class _CoseSignedDocument with EquatableMixin implements SignedDocument {
-  final CoseSign _coseSign;
+  final cose.CoseSign _coseSign;
 
   @override
   final SignedDocumentPayload payload;
@@ -137,7 +137,7 @@ final class _CoseSignedDocument with EquatableMixin implements SignedDocument {
   final List<CatalystId> signers;
 
   const _CoseSignedDocument({
-    required CoseSign coseSign,
+    required cose.CoseSign coseSign,
     required this.payload,
     required this.metadata,
     required this.signers,
@@ -158,7 +158,19 @@ final class _CoseSignedDocument with EquatableMixin implements SignedDocument {
   }
 }
 
-extension _CoseSignatureExt on CoseSignature {
+extension on cose.DocumentType {
+  DocumentType toModel() {
+    return DocumentType(value.map((e) => e.value).toList());
+  }
+}
+
+extension on DocumentType {
+  cose.DocumentType toCose() {
+    return cose.DocumentType(value.map((e) => e.asUuid).toList());
+  }
+}
+
+extension _CoseSignatureExt on cose.CoseSignature {
   CatalystId? decodeCatalystId() {
     final kid = protectedHeaders.kid;
     if (kid == null) return null;
@@ -173,23 +185,23 @@ extension _CoseSignatureExt on CoseSignature {
 
 extension _SignedDocumentContentTypeExt on SignedDocumentContentType {
   /// Maps the [SignedDocumentContentType] into COSE representation.
-  StringOrInt? get asCose {
+  cose.StringOrInt? get asCose {
     switch (this) {
       case SignedDocumentContentType.json:
-        return const IntValue(CoseValues.jsonContentType);
+        return const cose.IntValue(cose.CoseValues.jsonContentType);
       case SignedDocumentContentType.unknown:
         return null;
     }
   }
 
-  static SignedDocumentContentType fromCose(StringOrInt? contentType) {
+  static SignedDocumentContentType fromCose(cose.StringOrInt? contentType) {
     switch (contentType) {
-      case IntValue():
+      case cose.IntValue():
         return switch (contentType.value) {
-          CoseValues.jsonContentType => SignedDocumentContentType.json,
+          cose.CoseValues.jsonContentType => SignedDocumentContentType.json,
           _ => SignedDocumentContentType.unknown
         };
-      case StringValue():
+      case cose.StringValue():
       case null:
         return SignedDocumentContentType.unknown;
     }
@@ -197,11 +209,11 @@ extension _SignedDocumentContentTypeExt on SignedDocumentContentType {
 }
 
 extension _SignedDocumentMetadataExt on SignedDocumentMetadata {
-  CoseHeaders get asCoseProtectedHeaders {
-    return CoseHeaders.protected(
+  cose.CoseHeaders get asCoseProtectedHeaders {
+    return cose.CoseHeaders.protected(
       contentType: contentType.asCose,
       contentEncoding: _brotliEncoding,
-      type: documentType.uuid.asUuid,
+      type: documentType.toCose(),
       id: id?.asUuid,
       ver: ver?.asUuid,
       ref: ref?.asCose,
@@ -217,15 +229,15 @@ extension _SignedDocumentMetadataExt on SignedDocumentMetadata {
     );
   }
 
-  CoseHeaders get asCoseUnprotectedHeaders {
-    return const CoseHeaders.unprotected();
+  cose.CoseHeaders get asCoseUnprotectedHeaders {
+    return const cose.CoseHeaders.unprotected();
   }
 
   static SignedDocumentMetadata fromCose({
-    required CoseHeaders protectedHeaders,
-    required CoseHeaders unprotectedHeaders,
+    required cose.CoseHeaders protectedHeaders,
+    required cose.CoseHeaders unprotectedHeaders,
   }) {
-    final type = protectedHeaders.type?.value;
+    final type = protectedHeaders.type;
     final ref = protectedHeaders.ref;
     final refHash = protectedHeaders.refHash;
     final template = protectedHeaders.template;
@@ -235,10 +247,8 @@ extension _SignedDocumentMetadataExt on SignedDocumentMetadata {
     final categoryId = protectedHeaders.categoryId;
 
     return SignedDocumentMetadata(
-      contentType: _SignedDocumentContentTypeExt.fromCose(
-        protectedHeaders.contentType,
-      ),
-      documentType: type == null ? DocumentType.unknown : DocumentType.fromJson(type),
+      contentType: _SignedDocumentContentTypeExt.fromCose(protectedHeaders.contentType),
+      documentType: type?.toModel() ?? const DocumentType.empty(),
       id: protectedHeaders.id?.value,
       ver: protectedHeaders.ver?.value,
       ref: ref == null ? null : _SignedDocumentMetadataRefExt.fromCose(ref),
@@ -256,12 +266,12 @@ extension _SignedDocumentMetadataExt on SignedDocumentMetadata {
 }
 
 extension _SignedDocumentMetadataRefExt on SignedDocumentMetadataRef {
-  ReferenceUuid get asCose => ReferenceUuid(
+  cose.ReferenceUuid get asCose => cose.ReferenceUuid(
         id: id.asUuid,
         ver: ver?.asUuid,
       );
 
-  static SignedDocumentMetadataRef fromCose(ReferenceUuid ref) {
+  static SignedDocumentMetadataRef fromCose(cose.ReferenceUuid ref) {
     return SignedDocumentMetadataRef(
       id: ref.id.value,
       ver: ref.ver?.value,
@@ -270,12 +280,12 @@ extension _SignedDocumentMetadataRefExt on SignedDocumentMetadataRef {
 }
 
 extension _SignedDocumentMetadataRefHashExt on SignedDocumentMetadataRefHash {
-  ReferenceUuidHash get asCose => ReferenceUuidHash(
+  cose.ReferenceUuidHash get asCose => cose.ReferenceUuidHash(
         ref: ref.asCose,
         hash: hash,
       );
 
-  static SignedDocumentMetadataRefHash fromCose(ReferenceUuidHash ref) {
+  static SignedDocumentMetadataRefHash fromCose(cose.ReferenceUuidHash ref) {
     return SignedDocumentMetadataRefHash(
       ref: _SignedDocumentMetadataRefExt.fromCose(ref.ref),
       hash: ref.hash,
@@ -284,5 +294,5 @@ extension _SignedDocumentMetadataRefHashExt on SignedDocumentMetadataRefHash {
 }
 
 extension _UuidExt on String {
-  Uuid get asUuid => Uuid(this);
+  cose.Uuid get asUuid => cose.Uuid(this);
 }

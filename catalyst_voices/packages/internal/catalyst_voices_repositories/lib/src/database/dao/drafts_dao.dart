@@ -32,7 +32,7 @@ abstract interface class DraftsDao {
   Future<List<DocumentDraftEntity>> queryAll();
 
   /// Returns all known document drafts refs.
-  Future<List<TypedDocumentRef>> queryAllTypedRefs();
+  Future<List<MaybeTypedDocumentRef>> queryAllTypedRefs();
 
   Future<DocumentDraftEntity?> queryLatest({
     CatalystId? authorId,
@@ -104,7 +104,7 @@ class DriftDraftsDao extends DatabaseAccessor<DriftCatalystDatabase>
   }
 
   @override
-  Future<List<TypedDocumentRef>> queryAllTypedRefs() {
+  Future<List<MaybeTypedDocumentRef>> queryAllTypedRefs() {
     final select = selectOnly(drafts)
       ..addColumns([
         drafts.idHi,
@@ -126,7 +126,7 @@ class DriftDraftsDao extends DatabaseAccessor<DriftCatalystDatabase>
       final ref = DraftRef(id: id.uuid, version: version.uuid);
       final type = row.readWithConverter(drafts.type)!;
 
-      return TypedDocumentRef(ref: ref, type: type);
+      return MaybeTypedDocumentRef(ref: ref, type: type);
     }).get();
   }
 
@@ -210,7 +210,7 @@ class DriftDraftsDao extends DatabaseAccessor<DriftCatalystDatabase>
     final query = select(drafts);
 
     if (type != null) {
-      query.where((doc) => doc.type.equals(type.uuid));
+      query.where((doc) => doc.type.equalsValue(type));
     }
     if (authorId != null) {
       final searchId = authorId.toSignificant().toUri().toStringWithoutScheme();

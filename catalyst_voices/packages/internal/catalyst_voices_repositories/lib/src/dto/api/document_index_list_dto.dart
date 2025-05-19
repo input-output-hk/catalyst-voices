@@ -46,7 +46,7 @@ final class DocumentRefForFilteredDocuments {
 @JsonSerializable()
 final class IndividualDocumentVersion {
   final String ver;
-  final String type;
+  final dynamic type;
   final DocumentRefForFilteredDocuments? ref;
   final DocumentRefForFilteredDocuments? reply;
   final DocumentRefForFilteredDocuments? template;

@@ -76,10 +76,6 @@ final class DocumentDataDto {
 
 @JsonSerializable()
 final class DocumentDataMetadataDto {
-  @JsonKey(
-    toJson: DocumentType.toJson,
-    fromJson: DocumentType.fromJson,
-  )
   final DocumentType type;
   final DocumentRefDto selfRef;
   final DocumentRefDto? ref;

@@ -50,7 +50,19 @@ final class DocumentType extends Equatable {
   ///
   const DocumentType(List<String> value) : this._(value);
 
-  factory DocumentType.fromJson(String json) => DocumentType(json.split(','));
+  const DocumentType.empty() : this(const []);
+
+  factory DocumentType.fromJson(dynamic json) {
+    if (json is String) {
+      return DocumentType(json.split(','));
+    }
+
+    if (json is List<dynamic>) {
+      return DocumentType(json.whereType<String>().toList());
+    }
+
+    throw ArgumentError.value(json, 'json', 'not supported type for DocumentType');
+  }
 
   /// 1.25
   const DocumentType._(this.value);
@@ -78,11 +90,14 @@ final class DocumentType extends Equatable {
   List<Object?> get props => [value];
 
   DocumentType? get template {
-    final templateDef = _def?.template;
+    final def = _def;
+    final templateDef = def?.template;
     if (templateDef == null) {
+      print('$def not not template');
       return null;
     }
 
+    print('$def -> template $templateDef');
     return DocumentType(templateDef.value);
   }
 

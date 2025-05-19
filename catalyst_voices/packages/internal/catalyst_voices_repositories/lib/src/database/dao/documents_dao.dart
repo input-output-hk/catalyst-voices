@@ -2,6 +2,7 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/database/catalyst_database.dart';
 import 'package:catalyst_voices_repositories/src/database/dao/documents_dao.drift.dart';
 import 'package:catalyst_voices_repositories/src/database/query/jsonb_expressions.dart';
+import 'package:catalyst_voices_repositories/src/database/table/converter/document_converters.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents.drift.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_metadata.dart';
@@ -51,7 +52,7 @@ abstract interface class DocumentsDao {
   Future<List<DocumentEntity>> queryAll({DocumentType? type});
 
   /// Returns all known document refs.
-  Future<List<TypedDocumentRef>> queryAllTypedRefs();
+  Future<List<MaybeTypedDocumentRef>> queryAllTypedRefs();
 
   Future<DocumentEntity?> queryLatestDocumentData({
     CatalystId? authorId,
@@ -157,7 +158,7 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
     final query = select(documents)
       ..where(
         (row) => Expression.and([
-          row.metadata.jsonExtract<String>(r'$.type').equals(type.uuid),
+          row.metadata.jsonExtract<String>(r'$.type').equals(type.toSql()),
           row.metadata.jsonExtract<String>(r'$.ref.id').equals(ref.id),
           if (ref.version != null)
             row.metadata.jsonExtract<String>(r'$.ref.version').equals(ref.version!),
@@ -186,14 +187,14 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
   Future<List<DocumentEntity>> queryAll({DocumentType? type}) {
     final query = select(documents);
     if (type != null) {
-      query.where((doc) => doc.type.equals(type.uuid));
+      query.where((doc) => doc.type.equalsValue(type));
     }
 
     return query.get();
   }
 
   @override
-  Future<List<TypedDocumentRef>> queryAllTypedRefs() {
+  Future<List<MaybeTypedDocumentRef>> queryAllTypedRefs() {
     final select = selectOnly(documents)
       ..addColumns([
         documents.idHi,
@@ -216,7 +217,7 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
       final ref = SignedDocumentRef(id: id.uuid, version: version.uuid);
       final type = row.readWithConverter(documents.type)!;
 
-      return TypedDocumentRef(ref: ref, type: type);
+      return MaybeTypedDocumentRef(ref: ref, type: type);
     }).get();
   }
 
@@ -243,7 +244,7 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
     final query = select(documents)
       ..where(
         (row) => Expression.and([
-          if (type != null) row.type.equals(type.uuid),
+          if (type != null) row.type.equalsValue(type),
           row.metadata.jsonExtract<String>(r'$.ref.id').equals(refTo.id),
           if (refTo.version != null)
             row.metadata.jsonExtract<String>(r'$.ref.version').equals(refTo.version!),
@@ -313,7 +314,7 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
     final query = select(documents);
 
     if (type != null) {
-      query.where((doc) => doc.type.equals(type.uuid));
+      query.where((doc) => doc.type.equalsValue(type));
     }
     if (authorId != null) {
       query.where((tbl) => tbl.metadata.isAuthor(authorId));
@@ -366,7 +367,7 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
       ..where(
         (row) {
           return Expression.and([
-            if (type != null) row.metadata.jsonExtract<String>(r'$.type').equals(type.uuid),
+            if (type != null) row.metadata.jsonExtract<String>(r'$.type').equals(type.toSql()),
             if (refTo != null) row.metadata.jsonExtract<String>(r'$.ref.id').equals(refTo.id),
             if (refTo?.version != null)
               row.metadata.jsonExtract<String>(r'$.ref.version').equals(refTo!.version!),
@@ -385,7 +386,7 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
     final query = select(documents)
       ..where(
         (row) => Expression.and([
-          row.metadata.jsonExtract<String>(r'$.type').equals(type.uuid),
+          row.metadata.jsonExtract<String>(r'$.type').equals(type.toSql()),
           row.metadata.jsonExtract<String>(r'$.ref.id').equals(refTo.id),
           if (refTo.version != null)
             row.metadata.jsonExtract<String>(r'$.ref.version').equals(refTo.version!),
@@ -439,4 +440,8 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
       ])
       ..limit(1);
   }
+}
+
+extension on DocumentType {
+  String toSql() => DocumentConverters.type.toSql(this);
 }

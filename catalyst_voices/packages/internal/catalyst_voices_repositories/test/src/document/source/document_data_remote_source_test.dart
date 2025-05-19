@@ -106,7 +106,7 @@ void main() {
               ver: proposalRefs.map((e) {
                 return IndividualDocumentVersion(
                   ver: e.version!,
-                  type: DocumentType.proposalDocument.uuid,
+                  type: DocumentType.proposalDocument.toJson(),
                   template: DocumentRefForFilteredDocuments(
                     id: templateRef.id,
                     ver: templateRef.version,
