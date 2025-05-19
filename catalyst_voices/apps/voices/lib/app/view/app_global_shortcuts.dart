@@ -18,6 +18,7 @@ class AppGlobalShortcuts extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDeveloper = context.select<DevToolsBloc, bool>((value) => value.state.isDeveloper);
 
+    // TODO(damian-molinski): migrate AdminTools shortcut here from SpacesShellPage.
     return CallbackShortcuts(
       bindings: {
         if (isDeveloper)
