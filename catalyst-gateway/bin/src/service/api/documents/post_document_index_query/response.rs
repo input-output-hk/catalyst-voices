@@ -158,15 +158,9 @@ pub(crate) struct IndexedDocumentVersion {
     /// Document Template Reference that matches the filter
     #[oai(skip_serializing_if_is_none)]
     pub template: Option<FilteredDocumentReference>,
-    /// Document Brand Reference that matches the filter
-    #[oai(skip_serializing_if_is_none)]
-    pub brand: Option<FilteredDocumentReference>,
-    /// Document Campaign Reference that matches the filter
-    #[oai(skip_serializing_if_is_none)]
-    pub campaign: Option<FilteredDocumentReference>,
-    /// Document Category Reference that matches the filter
-    #[oai(skip_serializing_if_is_none)]
-    pub category: Option<FilteredDocumentReference>,
+    /// Document Parameter Reference that matches the filter
+    #[oai(rename = "doc_parameters", skip_serializing_if_is_none)]
+    pub parameters: Option<FilteredDocumentReference>,
 }
 
 impl Example for IndexedDocumentVersion {
@@ -177,9 +171,7 @@ impl Example for IndexedDocumentVersion {
             doc_ref: Some(DocumentReference::example().into()),
             reply: None,
             template: None,
-            brand: None,
-            campaign: None,
-            category: None,
+            parameters: None,
         }
     }
 }
@@ -256,17 +248,13 @@ impl TryFrom<SignedDocBody> for IndexedDocumentVersionDocumented {
         let mut doc_ref = None;
         let mut reply = None;
         let mut template = None;
-        let mut brand = None;
-        let mut campaign = None;
-        let mut category = None;
+        let mut parameters = None;
         if let Some(json_meta) = doc.metadata() {
             let meta: catalyst_signed_doc::ExtraFields = serde_json::from_value(json_meta.clone())?;
             doc_ref = meta.doc_ref().map(Into::into);
             reply = meta.reply().map(Into::into);
             template = meta.template().map(Into::into);
-            brand = meta.brand_id().map(Into::into);
-            campaign = meta.campaign_id().map(Into::into);
-            category = meta.campaign_id().map(Into::into);
+            parameters = meta.parameters().map(Into::into);
         }
 
         Ok(IndexedDocumentVersionDocumented(IndexedDocumentVersion {
@@ -275,9 +263,7 @@ impl TryFrom<SignedDocBody> for IndexedDocumentVersionDocumented {
             doc_ref,
             reply,
             template,
-            brand,
-            campaign,
-            category,
+            parameters,
         }))
     }
 }
