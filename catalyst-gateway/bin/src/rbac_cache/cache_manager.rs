@@ -5,8 +5,11 @@
 use cardano_blockchain_types::StakeAddress;
 use catalyst_types::catalyst_id::CatalystId;
 use rbac_registration::{cardano::cip509::Cip509, registration::cardano::RegistrationChain};
+use tokio::sync::broadcast;
 
 use crate::{rbac_cache::{add_result::AddResult, cache::RbacCache}};
+
+use super::event;
 
 /// A wrapper that allows managing both persistent and volatile caches at the same time.
 pub struct RbacCacheManager {
@@ -14,6 +17,11 @@ pub struct RbacCacheManager {
     persistent: RbacCache,
     /// A cache for volatile RBAC data.
     volatile: RbacCache,
+    /// Event sender during the lifetime of the cache manager.
+    event_channel: (
+        broadcast::Sender<event::RbacCacheManagerEvent>,
+        broadcast::Receiver<event::RbacCacheManagerEvent>,
+    ),
 }
 
 impl RbacCacheManager {
@@ -25,6 +33,7 @@ impl RbacCacheManager {
         Self {
             persistent,
             volatile,
+            event_channel: broadcast::channel(10),
         }
     }
 
