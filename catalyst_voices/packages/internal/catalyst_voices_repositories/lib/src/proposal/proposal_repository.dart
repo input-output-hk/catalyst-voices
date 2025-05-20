@@ -92,6 +92,11 @@ abstract interface class ProposalRepository {
     required ProposalsCountFilters filters,
   });
 
+  Stream<Page<ProposalData>> watchProposalsPage({
+    required PageRequest request,
+    required ProposalsFilters filters,
+  });
+
   Stream<List<ProposalDocument>> watchUserProposals({
     required CatalystId authorId,
   });
@@ -339,6 +344,16 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     required ProposalsCountFilters filters,
   }) {
     return _proposalsLocalSource.watchProposalsCount(filters: filters);
+  }
+
+  @override
+  Stream<Page<ProposalData>> watchProposalsPage({
+    required PageRequest request,
+    required ProposalsFilters filters,
+  }) {
+    return _proposalsLocalSource
+        .watchProposalsPage(request: request, filters: filters)
+        .map((value) => value.map(_buildProposalData));
   }
 
   @override

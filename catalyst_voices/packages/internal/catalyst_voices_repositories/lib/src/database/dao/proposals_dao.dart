@@ -15,6 +15,7 @@ import 'package:collection/collection.dart';
 import 'package:drift/drift.dart';
 import 'package:drift/extensions/json1.dart';
 import 'package:equatable/equatable.dart';
+import 'package:rxdart/rxdart.dart';
 
 @DriftAccessor(
   tables: [
@@ -225,6 +226,21 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
     final stream = _getProposalsRefsStream(filters: filters);
 
     return _transformRefsStreamToCount(stream, author: filters.author);
+  }
+
+  @override
+  Stream<Page<JoinedProposalEntity>> watchProposalsPage({
+    required PageRequest request,
+    required ProposalsFilters filters,
+  }) async* {
+    yield await queryProposalsPage(request: request, filters: filters);
+
+    yield* connection.streamQueries
+        .updatesForSync(TableUpdateQuery.onAllTables([documents, documentsFavorites]))
+        .debounceTime(const Duration(milliseconds: 100))
+        .asyncMap((event) {
+      return queryProposalsPage(request: request, filters: filters);
+    });
   }
 
   // TODO(damian-molinski): Make this more specialized per case.
@@ -613,6 +629,11 @@ abstract interface class ProposalsDao {
 
   Stream<ProposalsCount> watchCount({
     required ProposalsCountFilters filters,
+  });
+
+  Stream<Page<JoinedProposalEntity>> watchProposalsPage({
+    required PageRequest request,
+    required ProposalsFilters filters,
   });
 }
 
