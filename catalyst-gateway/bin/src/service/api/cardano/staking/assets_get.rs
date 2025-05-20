@@ -205,7 +205,7 @@ async fn get_txo(
 }
 
 /// TXO Assets map type alias
-type TxoAssetsMap = HashMap<(Slot, TxnIndex, i16), TxoAssetInfo>;
+type TxoAssetsMap = HashMap<(Slot, TxnIndex, i16), Vec<TxoAssetInfo>>;
 
 /// TXO Assets state
 #[derive(Default, Clone)]
@@ -235,14 +235,25 @@ async fn get_txo_assets(
 
     let tokens_map = assets_txos_stream
         .map_err(Into::<anyhow::Error>::into)
-        .try_fold(HashMap::new(), |mut tokens_map, row| {
+        .try_fold(HashMap::new(), |mut tokens_map: TxoAssetsMap, row| {
             async move {
                 let key = (row.slot_no.into(), row.txn_index.into(), row.txo.into());
-                tokens_map.insert(key, TxoAssetInfo {
-                    id: row.policy_id,
-                    name: row.asset_name.into(),
-                    amount: row.value,
-                });
+                match tokens_map.entry(key) {
+                    std::collections::hash_map::Entry::Occupied(mut o) => {
+                        o.get_mut().push(TxoAssetInfo {
+                            id: row.policy_id,
+                            name: row.asset_name.into(),
+                            amount: row.value,
+                        });
+                    },
+                    std::collections::hash_map::Entry::Vacant(v) => {
+                        v.insert(vec![TxoAssetInfo {
+                            id: row.policy_id,
+                            name: row.asset_name.into(),
+                            amount: row.value,
+                        }]);
+                    },
+                }
                 Ok(tokens_map)
             }
         })
@@ -324,18 +335,20 @@ fn build_stake_info(mut txo_state: TxoAssetsState, slot_num: SlotNo) -> anyhow::
             .into();
 
         let key = (txo_info.slot_no, txo_info.txn_index, txo_info.txo);
-        if let Some(native_token) = txo_state.txo_assets.remove(&key) {
-            match native_token.amount.try_into() {
-                Ok(amount) => {
-                    stake_info.assets.push(StakedTxoAssetInfo {
-                        policy_hash: native_token.id.try_into()?,
-                        asset_name: native_token.name,
-                        amount,
-                    });
-                },
-                Err(e) => {
-                    debug!("Invalid TXO Asset for {key:?}: {e}");
-                },
+        if let Some(native_assets) = txo_state.txo_assets.remove(&key) {
+            for native_asset in native_assets {
+                match native_asset.amount.try_into() {
+                    Ok(amount) => {
+                        stake_info.assets.push(StakedTxoAssetInfo {
+                            policy_hash: native_asset.id.try_into()?,
+                            asset_name: native_asset.name,
+                            amount,
+                        });
+                    },
+                    Err(e) => {
+                        debug!("Invalid TXO Asset for {key:?}: {e}");
+                    },
+                }
             }
         }
 
