@@ -434,14 +434,10 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
               rawAction is String ? ProposalSubmissionActionDto.fromJson(rawAction) : null;
           final action = actionDto?.toModel();
 
-          if (action == null) {
-            return null;
-          }
-
           return _ProposalActions(
             selfRef: selfRef,
             proposalRef: proposalRef,
-            action: action,
+            action: action ?? ProposalSubmissionAction.draft,
           );
         })
         .get()

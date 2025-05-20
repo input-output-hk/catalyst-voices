@@ -400,8 +400,9 @@ final class ProposalRepositoryImpl implements ProposalRepository {
       ProposalSubmissionAction.aFinal => ProposalPublish.submittedProposal,
       ProposalSubmissionAction.draft || null => ProposalPublish.publishedDraft,
       ProposalSubmissionAction.hide => throw ArgumentError(
-          'Unsupported ${ProposalSubmissionAction.hide}, Make sure to filter'
-          ' out hidden proposals before this code is reached.',
+          'Proposal(${data.proposal.metadata.selfRef}) is '
+          'unsupported ${ProposalSubmissionAction.hide}. Make sure to filter '
+          'out hidden proposals before this code is reached.',
         ),
     };
 
