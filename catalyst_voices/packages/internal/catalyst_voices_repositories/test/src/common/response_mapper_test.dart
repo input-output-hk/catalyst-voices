@@ -1,9 +1,11 @@
 // test/response_mapper_test.dart
+import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/common/response_mapper.dart';
+import 'package:catalyst_voices_repositories/src/dto/error/error_response.dart';
 import 'package:chopper/chopper.dart' as chopper;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
@@ -53,6 +55,18 @@ void main() {
       );
     });
 
+    test('successBodyBytesOrThrow throws $ResourceConflictException for 409', () {
+      final response = mockBinaryResponse(
+        statusCode: HttpStatus.conflict,
+        error: jsonEncode(const ErrorResponse(detail: 'Error message').toJson()),
+      );
+
+      expect(
+        response.successBodyBytesOrThrow,
+        throwsA(const ResourceConflictException(message: 'Error message')),
+      );
+    });
+
     test('successBodyBytesOrThrow throws $ApiErrorResponseException otherwise', () {
       final response = mockBinaryResponse(
         statusCode: HttpStatus.internalServerError,
@@ -79,6 +93,18 @@ void main() {
       expect(
         response.successBodyOrThrow,
         throwsA(isA<NotFoundException>()),
+      );
+    });
+
+    test('successBodyOrThrow throws $ResourceConflictException for 409', () {
+      final response = mockResponse(
+        statusCode: HttpStatus.conflict,
+        error: jsonEncode(const ErrorResponse(detail: 'Error message').toJson()),
+      );
+
+      expect(
+        response.successBodyOrThrow,
+        throwsA(const ResourceConflictException(message: 'Error message')),
       );
     });
 
