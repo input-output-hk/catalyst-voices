@@ -65,6 +65,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     on<MaxProposalsLimitChangedEvent>(_updateMaxProposalsLimitReached);
     on<MaxProposalsLimitReachedEvent>(_onMaxProposalsLimitReached);
     on<UpdateUsernameEvent>(_onUpdateUsername);
+    on<UnlockProposalBuilderEvent>(_unlockProposal);
 
     final activeAccount = _userService.user.activeAccount;
 
@@ -414,7 +415,8 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     LoadProposalEvent event,
     Emitter<ProposalBuilderState> emit,
   ) async {
-    final proposalRef = event.proposalId;
+    final proposalRef = await _proposalService.getLatestProposalVersion(ref: event.proposalId);
+
     if (state.metadata.documentRef == proposalRef) {
       _logger.info('Loading proposal: $proposalRef ignored, already loaded');
       return;
@@ -428,6 +430,15 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
       );
 
       final proposal = Proposal.fromData(proposalData);
+
+      if (proposalData.publish.isPublished) {
+        emitSignal(
+          UnlockProposalSignal(
+            title: proposal.title,
+            version: proposal.versionCount,
+          ),
+        );
+      }
 
       final versions = proposalData.versions.mapIndexed((index, version) {
         final versionRef = version.document.metadata.selfRef;
@@ -912,6 +923,27 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
 
     _updateMetadata(emit, publish: ProposalPublish.submittedProposal);
     emitSignal(const SubmittedProposalBuilderSignal());
+  }
+
+  Future<void> _unlockProposal(
+    UnlockProposalBuilderEvent event,
+    Emitter<ProposalBuilderState> emit,
+  ) async {
+    try {
+      final proposalRef = state.metadata.documentRef! as SignedDocumentRef;
+      final categoryId = state.metadata.categoryId!;
+      emit(state.copyWith(isChanging: true));
+      await _proposalService.unlockProposal(
+        proposalRef: proposalRef,
+        categoryId: categoryId,
+      );
+      final stateMetadata = state.metadata.copyWith(publish: ProposalPublish.publishedDraft);
+      _cache = _cache.copyWith(proposalMetadata: Optional(stateMetadata));
+      emit(state.copyWith(metadata: stateMetadata, isChanging: false));
+    } catch (e, stackTrace) {
+      _logger.severe('Unlock proposal failed', e, stackTrace);
+      emitError(LocalizedException.create(e));
+    }
   }
 
   Future<void> _updateCommentBuilder(

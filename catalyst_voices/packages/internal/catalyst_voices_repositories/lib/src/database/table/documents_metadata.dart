@@ -18,20 +18,19 @@ enum DocumentMetadataFieldKey {
 )
 @DataClassName('DocumentMetadataEntity')
 class DocumentsMetadata extends Table with VerHiLoTableMixin {
-  /// e.g. 'category', 'title', 'description'
-  TextColumn get fieldKey => textEnum<DocumentMetadataFieldKey>()();
-
-  /// The actual value (for category, title, description, etc.)
-  TextColumn get fieldValue => text()();
-
   @override
   List<String> get customConstraints => [
         /// Referring with two columns throws a
         /// "SqliteException(1): foreign key mismatch"
         /// But when doing it explicitly it no longer complains
-        // ignore: lines_longer_than_80_chars
         'FOREIGN KEY("ver_hi", "ver_lo") REFERENCES "${$DocumentsTable.$name}"("ver_hi", "ver_lo") ON DELETE CASCADE ON UPDATE CASCADE',
       ];
+
+  /// e.g. 'category', 'title', 'description'
+  TextColumn get fieldKey => textEnum<DocumentMetadataFieldKey>()();
+
+  /// The actual value (for category, title, description, etc.)
+  TextColumn get fieldValue => text()();
 
   @override
   Set<Column> get primaryKey => {
