@@ -137,7 +137,8 @@ final class VoicesRichTextController extends quill.QuillController {
       clear();
     } else {
       final delta = markdown.encoder.convert(newMarkdownData);
-      document = quill.Document.fromDelta(delta);
+      final newDocument = quill.Document.fromDelta(delta);
+      document = newDocument;
     }
   }
 
