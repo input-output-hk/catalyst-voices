@@ -33,7 +33,7 @@ pub(crate) fn init_metrics_reporter() {
     let service_id = Settings::service_id();
     let network = Settings::cardano_network().to_string();
 
-    // for sendig metrics periodically
+    // for sending metrics periodically
     thread::spawn(move || {
         reporter::MAX_CACHE_SIZE
             .with_label_values(&[&api_host_names, service_id, &network])

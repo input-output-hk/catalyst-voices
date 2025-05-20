@@ -103,7 +103,7 @@ impl RbacCacheManager {
         }
     }
 
-    /// Returns the number of cached chain entries from both persisent and volatile.
+    /// Returns the number of cached chain entries from both persistent and volatile.
     pub fn rbac_entries(&self) -> usize {
         self.persistent.chain_entries() + self.volatile.chain_entries()
     }
