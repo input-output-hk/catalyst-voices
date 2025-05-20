@@ -1,6 +1,13 @@
 //! Adds an information about the running cat-gateway instance for each response headers.
 
-use poem::{Endpoint, Middleware, Request, Result};
+use std::fmt::Write;
+
+use poem::{Endpoint, IntoResponse, Middleware, Request, Response, Result};
+
+use crate::{
+    build_info::build_info,
+    settings::{self, Settings},
+};
 
 /// Middleware type that returns a response with 503 status code
 /// if any DB stops responding before returning the wrapped endpoint.
@@ -21,10 +28,45 @@ pub(crate) struct CatGatewayInfoImpl<E> {
 }
 
 impl<E: Endpoint> Endpoint for CatGatewayInfoImpl<E> {
-    type Output = E::Output;
+    type Output = Response;
 
     async fn call(&self, req: Request) -> Result<Self::Output> {
-        let resp = self.ep.call(req).await?;
-        Ok(resp)
+        let resp = self.ep.call(req).await?.into_response();
+
+        Ok(resp
+            .with_header("Server", server_info())
+            .with_header("Cardano-Network", Settings::cardano_network().to_string())
+            .into_response())
+    }
+}
+
+/// Returns a cat-gateway server info in the following format
+/// ```
+/// cat-gateway/<service-id> commit:<git_commit>,branch:<git_branch>,tags:<git_tag1>,<git_tag2>
+/// ```
+fn server_info() -> String {
+    let cat_gateway_info = build_info();
+    let mut server_info = format!("catalyst-gateway/{}", settings::Settings::service_id());
+    if let Some(vc) = &cat_gateway_info.version_control {
+        if let Some(git) = vc.git() {
+            let _ = write!(&mut server_info, " commit:{}", git.commit_short_id);
+            if let Some(branch) = &git.branch {
+                let _ = write!(&mut server_info, ",branch:{branch}");
+            }
+            if !git.tags.is_empty() {
+                let _ = write!(&mut server_info, ",tags:{}", git.tags.join(","));
+            }
+        }
+    }
+    server_info
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn server_info_test() {
+        println!("{}", server_info());
     }
 }
