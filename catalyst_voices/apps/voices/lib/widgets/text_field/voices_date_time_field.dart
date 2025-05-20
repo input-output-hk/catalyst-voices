@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/widgets/gesture/voices_gesture_detector.dart';
 import 'package:catalyst_voices/widgets/pickers/voices_calendar_picker.dart';
 import 'package:catalyst_voices/widgets/pickers/voices_time_picker.dart';
 import 'package:catalyst_voices/widgets/text_field/voices_date_field.dart';
@@ -7,10 +8,6 @@ import 'package:flutter/material.dart';
 typedef DateTimeParts = ({DateTime date, TimeOfDay time});
 
 enum PickerType { date, time }
-
-final class VoicesDateTimeFieldController extends ValueNotifier<DateTime?> {
-  VoicesDateTimeFieldController([super._value]);
-}
 
 class VoicesDateTimeField extends StatefulWidget {
   final VoicesDateTimeFieldController? controller;
@@ -30,6 +27,10 @@ class VoicesDateTimeField extends StatefulWidget {
   State<VoicesDateTimeField> createState() => _VoicesDateTimeFieldState();
 }
 
+final class VoicesDateTimeFieldController extends ValueNotifier<DateTime?> {
+  VoicesDateTimeFieldController([super._value]);
+}
+
 class _VoicesDateTimeFieldState extends State<VoicesDateTimeField> {
   late final VoicesDateFieldController _dateController;
   late final VoicesTimeFieldController _timeController;
@@ -39,48 +40,14 @@ class _VoicesDateTimeFieldState extends State<VoicesDateTimeField> {
 
   VoicesDateTimeFieldController? _controller;
 
-  VoicesDateTimeFieldController get _effectiveController {
-    return widget.controller ?? (_controller ??= VoicesDateTimeFieldController());
-  }
-
   OverlayEntry? _overlayEntry;
   PickerType? _pickerType;
   VoidCallback? _scrollListener;
   bool _isDateOverlayOpen = false;
   bool _isTimeOverlayOpen = false;
 
-  @override
-  void initState() {
-    super.initState();
-
-    final dateTime = _effectiveController.value;
-    final parts = dateTime != null ? _convertDateTimeToParts(dateTime) : null;
-
-    _effectiveController.addListener(_handleDateTimeChanged);
-
-    _dateController = VoicesDateFieldController(parts?.date);
-    _dateController.addListener(_handleDateChanged);
-
-    _timeController = VoicesTimeFieldController(parts?.time);
-    _timeController.addListener(_handleTimeChanged);
-  }
-
-  @override
-  void didUpdateWidget(VoicesDateTimeField oldWidget) {
-    super.didUpdateWidget(oldWidget);
-
-    if (widget.controller != oldWidget.controller) {
-      (oldWidget.controller ?? _controller)?.removeListener(_handleDateTimeChanged);
-      (widget.controller ?? _controller)?.addListener(_handleDateTimeChanged);
-    }
-  }
-
-  @override
-  void dispose() {
-    _controller?.dispose();
-    _controller = null;
-
-    super.dispose();
+  VoicesDateTimeFieldController get _effectiveController {
+    return widget.controller ?? (_controller ??= VoicesDateTimeFieldController());
   }
 
   @override
@@ -121,6 +88,113 @@ class _VoicesDateTimeFieldState extends State<VoicesDateTimeField> {
     );
   }
 
+  @override
+  void didUpdateWidget(VoicesDateTimeField oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (widget.controller != oldWidget.controller) {
+      (oldWidget.controller ?? _controller)?.removeListener(_handleDateTimeChanged);
+      (widget.controller ?? _controller)?.addListener(_handleDateTimeChanged);
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller?.dispose();
+    _controller = null;
+
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    final dateTime = _effectiveController.value;
+    final parts = dateTime != null ? _convertDateTimeToParts(dateTime) : null;
+
+    _effectiveController.addListener(_handleDateTimeChanged);
+
+    _dateController = VoicesDateFieldController(parts?.date);
+    _dateController.addListener(_handleDateChanged);
+
+    _timeController = VoicesTimeFieldController(parts?.time);
+    _timeController.addListener(_handleTimeChanged);
+  }
+
+  DateTimeParts? _convertDateTimeToParts(DateTime value) {
+    final date = DateTime(value.year, value.month, value.day);
+    final time = TimeOfDay(hour: value.hour, minute: value.minute);
+
+    return (date: date, time: time);
+  }
+
+  RenderBox? _getRenderBox(GlobalKey key) {
+    return key.currentContext?.findRenderObject() as RenderBox?;
+  }
+
+  Offset _getRenderBoxOffset(GlobalKey key) {
+    final renderObject = key.currentContext?.findRenderObject();
+    if (renderObject is! RenderBox) {
+      return Offset.zero;
+    }
+
+    return renderObject.localToGlobal(Offset.zero);
+  }
+
+  void _handleDateChanged() => _syncControllers();
+
+  void _handleDateTimeChanged() {
+    final dateTime = _effectiveController.value;
+
+    final parts = dateTime != null ? _convertDateTimeToParts(dateTime) : null;
+
+    if (_dateController.value != parts?.date) {
+      _dateController.value = parts?.date;
+    }
+
+    if (_timeController.value != parts?.time) {
+      _timeController.value = parts?.time;
+    }
+  }
+
+  Future<void> _handleTap(PickerType pickerType) async {
+    _removeOverlay();
+    if (pickerType == PickerType.date) {
+      await _showDatePicker();
+    } else {
+      await _showTimePicker();
+    }
+  }
+
+  void _handleTimeChanged() => _syncControllers();
+
+  bool _isBoxTapped(RenderBox? box, Offset tapPosition) {
+    return box != null && (box.localToGlobal(Offset.zero) & box.size).contains(tapPosition);
+  }
+
+  void _removeOverlay() {
+    if (_overlayEntry != null) {
+      setState(() {
+        if (_pickerType == PickerType.date) {
+          _isDateOverlayOpen = false;
+        } else {
+          _isTimeOverlayOpen = false;
+        }
+      });
+
+      final scrollPosition = Scrollable.maybeOf(context)?.position;
+      if (scrollPosition != null && _scrollListener != null) {
+        scrollPosition.removeListener(_scrollListener!);
+      }
+
+      _overlayEntry?.remove();
+      _overlayEntry = null;
+      _scrollListener = null;
+      _pickerType = null;
+    }
+  }
+
   Future<void> _showDatePicker() async {
     final picker = VoicesCalendarDatePicker(
       initialDate: _dateController.value,
@@ -138,63 +212,6 @@ class _VoicesDateTimeFieldState extends State<VoicesDateTimeField> {
       initialPosition: initialPosition,
       child: picker,
     );
-  }
-
-  Future<void> _showTimePicker() async {
-    final picker = VoicesTimePicker(
-      onTap: (value) {
-        _removeOverlay();
-        _timeController.value = value;
-      },
-      selectedTime: _timeController.value,
-      timeZone: widget.timeZone,
-    );
-
-    final initialPosition = _getRenderBoxOffset(_timeFieldKey);
-    _pickerType = PickerType.time;
-
-    _showOverlay(
-      initialPosition: initialPosition,
-      child: picker,
-    );
-  }
-
-  void _handleDateTimeChanged() {
-    final dateTime = _effectiveController.value;
-
-    final parts = dateTime != null ? _convertDateTimeToParts(dateTime) : null;
-
-    if (_dateController.value != parts?.date) {
-      _dateController.value = parts?.date;
-    }
-
-    if (_timeController.value != parts?.time) {
-      _timeController.value = parts?.time;
-    }
-  }
-
-  void _handleDateChanged() => _syncControllers();
-
-  void _handleTimeChanged() => _syncControllers();
-
-  void _syncControllers() {
-    final date = _dateController.value;
-    final time = _timeController.value;
-
-    final dateTime = date != null && time != null
-        ? DateTime(date.year, date.month, date.day, time.hour, time.minute)
-        : null;
-
-    if (_effectiveController.value != dateTime) {
-      _effectiveController.value = dateTime;
-    }
-  }
-
-  DateTimeParts? _convertDateTimeToParts(DateTime value) {
-    final date = DateTime(value.year, value.month, value.day);
-    final time = TimeOfDay(hour: value.hour, minute: value.minute);
-
-    return (date: date, time: time);
   }
 
   void _showOverlay({
@@ -222,28 +239,25 @@ class _VoicesDateTimeFieldState extends State<VoicesDateTimeField> {
       builder: (context) => Stack(
         children: [
           Positioned.fill(
-            child: MouseRegion(
-              opaque: false,
-              hitTestBehavior: HitTestBehavior.translucent,
-              child: GestureDetector(
-                onTapDown: (details) async {
-                  final tapPosition = details.globalPosition;
-                  final dateBox = _getRenderBox(_dateFiledKey);
-                  final timeBox = _getRenderBox(_timeFieldKey);
+            child: VoicesGestureDetector(
+              onTapDown: (details) async {
+                final tapPosition = details.globalPosition;
+                final dateBox = _getRenderBox(_dateFiledKey);
+                final timeBox = _getRenderBox(_timeFieldKey);
 
-                  if (_isBoxTapped(dateBox, tapPosition)) {
-                    return _handleTap(PickerType.date);
-                  } else if (_isBoxTapped(timeBox, tapPosition)) {
-                    return _handleTap(PickerType.time);
-                  } else {
-                    _removeOverlay();
-                  }
-                },
-                behavior: HitTestBehavior.translucent,
-                excludeFromSemantics: true,
-                child: Container(
-                  color: Colors.transparent,
-                ),
+                if (_isBoxTapped(dateBox, tapPosition)) {
+                  return _handleTap(PickerType.date);
+                } else if (_isBoxTapped(timeBox, tapPosition)) {
+                  return _handleTap(PickerType.time);
+                } else {
+                  _removeOverlay();
+                }
+              },
+              behavior: HitTestBehavior.translucent,
+              excludeFromSemantics: true,
+              mouseRegionOpaque: false,
+              child: Container(
+                color: Colors.transparent,
               ),
             ),
           ),
@@ -270,51 +284,35 @@ class _VoicesDateTimeFieldState extends State<VoicesDateTimeField> {
     overlay.insert(_overlayEntry!);
   }
 
-  void _removeOverlay() {
-    if (_overlayEntry != null) {
-      setState(() {
-        if (_pickerType == PickerType.date) {
-          _isDateOverlayOpen = false;
-        } else {
-          _isTimeOverlayOpen = false;
-        }
-      });
+  Future<void> _showTimePicker() async {
+    final picker = VoicesTimePicker(
+      onTap: (value) {
+        _removeOverlay();
+        _timeController.value = value;
+      },
+      selectedTime: _timeController.value,
+      timeZone: widget.timeZone,
+    );
 
-      final scrollPosition = Scrollable.maybeOf(context)?.position;
-      if (scrollPosition != null && _scrollListener != null) {
-        scrollPosition.removeListener(_scrollListener!);
-      }
+    final initialPosition = _getRenderBoxOffset(_timeFieldKey);
+    _pickerType = PickerType.time;
 
-      _overlayEntry?.remove();
-      _overlayEntry = null;
-      _scrollListener = null;
-      _pickerType = null;
-    }
+    _showOverlay(
+      initialPosition: initialPosition,
+      child: picker,
+    );
   }
 
-  Offset _getRenderBoxOffset(GlobalKey key) {
-    final renderObject = key.currentContext?.findRenderObject();
-    if (renderObject is! RenderBox) {
-      return Offset.zero;
-    }
+  void _syncControllers() {
+    final date = _dateController.value;
+    final time = _timeController.value;
 
-    return renderObject.localToGlobal(Offset.zero);
-  }
+    final dateTime = date != null && time != null
+        ? DateTime(date.year, date.month, date.day, time.hour, time.minute)
+        : null;
 
-  RenderBox? _getRenderBox(GlobalKey key) {
-    return key.currentContext?.findRenderObject() as RenderBox?;
-  }
-
-  bool _isBoxTapped(RenderBox? box, Offset tapPosition) {
-    return box != null && (box.localToGlobal(Offset.zero) & box.size).contains(tapPosition);
-  }
-
-  Future<void> _handleTap(PickerType pickerType) async {
-    _removeOverlay();
-    if (pickerType == PickerType.date) {
-      await _showDatePicker();
-    } else {
-      await _showTimePicker();
+    if (_effectiveController.value != dateTime) {
+      _effectiveController.value = dateTime;
     }
   }
 }
