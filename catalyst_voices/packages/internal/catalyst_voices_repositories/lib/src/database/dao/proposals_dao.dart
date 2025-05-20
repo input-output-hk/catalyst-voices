@@ -237,7 +237,7 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
 
     yield* connection.streamQueries
         .updatesForSync(TableUpdateQuery.onAllTables([documents, documentsFavorites]))
-        .debounceTime(const Duration(milliseconds: 100))
+        .debounceTime(const Duration(milliseconds: 10))
         .asyncMap((event) {
       return queryProposalsPage(request: request, filters: filters);
     });
