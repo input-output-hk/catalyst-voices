@@ -80,13 +80,11 @@ impl RbacCacheManager {
     pub fn get_by_address(
         &self, address: &StakeAddress, is_persistent: bool,
     ) -> Option<RegistrationChain> {
-        let result = if is_persistent {
+        if is_persistent {
             self.persistent.get_by_address(address)
         } else {
             self.volatile.get_by_address(address)
-        };
-
-        result
+        }
     }
 
     /// Returns a list of active stake addresses of the given registration chain.

@@ -5,15 +5,23 @@ use std::time::Duration;
 /// Represents various events that can occur in the RBAC cache manager.
 #[derive(Debug, Clone)]
 pub(crate) enum RbacCacheManagerEvent {
+    /// Emitted when the cache manager is initialized.
     Initialized {
+        /// Time taken to complete startup.
         start_up_time: Duration,
     },
+    /// Emitted when a new RBAC registration chain is added.
     RbacRegistrationChainAdded {
+        /// Whether the chain is stored persistently.
         is_persistent: bool,
     },
+    /// Emitted when the cache is accessed.
     CacheAccessed {
+        /// Time taken to access the cache.
         latency: Duration,
+        /// Whether the access involved persistent storage.
         is_persistent: bool,
+        /// Whether the cache entry was found; marked as cache hit.
         is_found: bool,
     },
 }
