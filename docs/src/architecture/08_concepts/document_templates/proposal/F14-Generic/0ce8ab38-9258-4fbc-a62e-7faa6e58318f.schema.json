@@ -5,6 +5,11 @@
     "description": "Schema for the F14 Catalyst Proposal Submission Form",
     "maintainers": [{ "name": "Catalyst Team", "url": "https://projectcatalyst.io/" }],
     "x-changelog": {
+        "2025-05-20": [
+            "Adding formatting to guidance text",
+            "Updating titles and descriptions",
+            "Updating required fields"
+        ],
         "2025-05-16": [
             "Updated titles, descriptions and guidance copy text.",
             "Increased maxLength for outputs, acceptance criteria and completion."
@@ -268,7 +273,7 @@
                     "properties": {
                         "title": {
                             "$ref": "#/definitions/singleLineTextEntry",
-                            "title": "Proposal Title",
+                            "title": "Please provide your proposal title",
                             "description": "**Proposal title**\n\nPlease note we suggest you use no more than 60 characters for your proposal title so that it can be easily viewed in the voting app.",
                             "minLength": 1,
                             "maxLength": 60,
@@ -296,8 +301,8 @@
                         },
                         "type": {
                             "$ref": "#/definitions/radioButtonSelect",
-                            "title": "Are you delivering this project as an individual or as an entity (whether formally incorporated or not)",
-                            "description": "Are you delivering this project as an individual or as an entity (whether formally incorporated or not)",
+                            "title": "Are you delivering this project as an individual or as an entity (whether formally incorporated or not)?",
+                            "description": "Are you delivering this project as an individual or as an entity (whether formally incorporated or not)?",
                             "x-guidance": "Please select from one of the following:\n\n1. Individual\n2. Entity (Incorporated)\n3. Entity (Not Incorporated)",
                             "x-placeholder": "Select whether you're applying as an individual or entity",
                             "enum": [
@@ -311,7 +316,7 @@
                             "$ref": "#/definitions/tagInput",
                             "title": "Co-proposers and additional applicants",
                             "description": "Co-proposers and additional applicants",
-                            "x-guidance": "List any persons who are submitting the proposal jointly with the main applicant. Make sure you have confirmed approval/awareness with these individuals/accounts before adding them. If there is more than one proposer, identify the lead person who is authorized to act on behalf of other co-proposers. **IMPORTANT** A maximum of 6 (six) proposals can be led or co-proposed by the same applicant or enterprise. Please, reference Fund 14 rules for added detail.",
+                            "x-guidance": "List any persons who are submitting the proposal jointly with the main applicant. Make sure you have confirmed approval/awareness with these individuals/accounts before adding them. If there is more than one proposer, identify the lead person who is authorized to act on behalf of other co-proposers. **IMPORTANT A maximum of 6 (six) proposals can be led or co-proposed by the same applicant or enterprise. Please, reference Fund14 rules for added detail.**",
                             "x-placeholder": "Enter the names of co-proposers or additional applicants",
                             "x-subsection": true,
                             "maxItems": 5,
@@ -356,9 +361,9 @@
                     "properties": {
                         "requestedFunds": {
                             "$ref": "#/definitions/tokenValueCardanoADA",
-                            "title": "Requested funds in ADA",
+                            "title": "Enter the amount of funding you are requesting in ADA",
                             "description": "The amount of funding requested for your proposal",
-                            "x-guidance": "There is a minimum and a maximum amount of funding that can be requested in a single Catalyst proposal. These are outlined below per each category:\n\nMinimum Funding Amount per proposal:\n\nCardano Open: A15,000\nCardano Uses Cases: A15,000\nCardano Partners: A500,000\n\nMaximum Funding Amount per proposal:\n\nCardano Open:\n- Developers (technical): A200,000\n- Ecosystem (non-technical): A100,000\n\nCardano Uses Cases:\n- Concept A150,000\n- Product: A500,000\n\nCardano Partners:\n- Enterprise R&D A2,000,000\n- Growth & Acceleration: A2,000,000",
+                            "x-guidance": "There is a minimum and a maximum amount of funding that can be requested in a single Catalyst proposal. These are outlined below per each category:\n\nMinimum Funding Amount per proposal:\n\n- Cardano Use Cases: Partners & Products: **₳100k**\n- Cardano Uses Cases: Concepts: **₳15k**\n- Cardano Open: Developers: **₳15k**\n- Cardano Open: Ecosystem: **₳15k**\n\nMaximum Funding Amount per proposal:\n\n- Cardano Use Cases: Partners & Products: **₳1M**\n- Cardano Uses Cases: Concepts: **₳100k**\n- Cardano Open: Developers: **₳100k**\n- Cardano Open: Ecosystem: **₳60k**",
                             "x-placeholder": "Enter the amount of funding you are requesting in ADA",
                             "minimum": 15000,
                             "maximum": 2000000
@@ -375,10 +380,10 @@
                     "properties": {
                         "duration": {
                             "$ref": "#/definitions/durationInMonths",
-                            "title": "Project Duration in Months",
+                            "title": "Please specify how many months you expect your project to last",
                             "description": "Specify the expected duration of your project. Projects must be completable within 2-12 months.",
-                            "x-guidance": "Minimum 2 months-Maximum 12 months. The scope of your funding request and this project is expected to produce the deliverables you specify in the proposal within 2-12 months. If you believe your project will take longer than 12 months, consider reducing the project's scope so that it becomes achievable within 12 months. If your project completes earlier than scheduled so long as you have submitted your PoAs and Project Close-out report and video then your project can be closed out.",
-                            "x-placeholder": "Enter the expected duration of your project (2-12 months)",
+                            "x-guidance": "Minimum 2 months-Maximum 12 months.\n\nThe scope of your funding request and this project is expected to produce the deliverables you specify in the proposal within 2-12 months.\n\nIf you believe your project will take longer than 12 months, consider reducing the project's scope so that it becomes achievable within 12 months. If your project completes earlier than scheduled so long as you have submitted your PoAs and Project Close-out report and video then your project can be closed out.",
+                            "x-placeholder": "Select the expected duration of your project (2-12 months)",
                             "minimum": 2,
                             "maximum": 12
                         }
@@ -394,9 +399,9 @@
                     "properties": {
                         "isTranslated": {
                             "$ref": "#/definitions/yesNoChoice",
-                            "title": "Auto-translated Status",
+                            "title": "Please indicate if your proposal has been auto-translated",
                             "description": "Indicate if your proposal has been auto-translated into English from another language",
-                            "x-guidance": "Tick YES if your proposal has been auto-translated into English from another language so readers are reminded that your proposal has been translated, and that they should be tolerant of any language imperfections. Tick NO if your proposal has not been auto-translated into English from another language",
+                            "x-guidance": "Yes/No\n\nTick YES if your proposal has been auto-translated into English from another language so readers are reminded that your proposal has been translated, and that they should be tolerant of any language imperfections.\n\nYou can either link a document with your proposal in its original language OR provide your response in your native language after the English language in each question if you wish.\n\nTick NO if your proposal has not been auto-translated into English from another language",
                             "x-placeholder": "Select if your proposal has been auto-translated into English"
                         },
                         "originalLanguage": {
@@ -409,7 +414,10 @@
                             "title": "Original Document Link",
                             "description": "Provide a link to the original proposal document in its original language"
                         }
-                    }
+                    },
+                    "required": [
+                        "isTranslated"
+                    ]
                 },
                 "problem": {
                     "$ref": "#/definitions/section",
@@ -418,11 +426,11 @@
                     "properties": {
                         "statement": {
                             "$ref": "#/definitions/multiLineTextEntry",
-                            "title": "Problem Description",
+                            "title": "What is the problem you want to solve?",
                             "description": "Clearly define the problem you aim to solve. This will be visible in the Catalyst voting app.",
                             "minLength": 10,
                             "maxLength": 200,
-                            "x-guidance": "Ensure you present a well-defined problem. What is the core issue that you hope to fix? Remember: the reader might not recognize the problem unless you state it clearly. This answer will be displayed on the Catalyst voting app, so voters will see it even if they don't open your proposal to read it in detail.",
+                            "x-guidance": "Ensure you present a well-defined problem. What is the core issue that you hope to fix? Remember: the reader might not recognize the problem unless you state it clearly.\n\nThis answer will be displayed on the Catalyst voting app, so voters will see it even if they don't open your proposal to read it in detail.",
                             "x-placeholder": "Describe the problem you aim to solve"
                         }
                     },
@@ -437,11 +445,11 @@
                     "properties": {
                         "summary": {
                             "$ref": "#/definitions/multiLineTextEntry",
-                            "title": "Solution Summary",
+                            "title": "Summarize your solution to the problem",
                             "description": "Briefly describe your solution. Focus on what you will do or create to solve the problem.",
                             "minLength": 10,
                             "maxLength": 200,
-                            "x-guidance": "Focus on what you are going to do, or make, or change, to solve the problem. So not 'There should be a way to....' but 'We will make a...' Clearly state how the solution addresses the specific problem you have identified - connect the 'why' and the 'how'. This answer will be displayed on the Catalyst voting app, so voters will see it even if they do not open your proposal and read it in detail.",
+                            "x-guidance": "Focus on what you are going to do, or make, or change, to solve the problem. So not 'There should be a way to....' but 'We will make a...'\n\nClearly state how the solution addresses the specific problem you have identified - connect the 'why' and the 'how'.\n\nThis answer will be displayed on the Catalyst voting app, so voters will see it even if they do not open your proposal and read it in detail.",
                             "x-placeholder": "Describe how you'll solve the problem"
                         }
                     },
@@ -453,12 +461,12 @@
                     "$ref": "#/definitions/section",
                     "title": "Supporting Documentation",
                     "description": "Additional resources and documentation for your proposal",
-                    "x-guidance": "Here, provide links to yours or your partner organization's website, repository, or marketing. Alternatively, provide links to any whitepaper or other publication relevant to your proposal. Note however that this is extra information that voters and Community Reviewers might choose not to read. You should not fail to include any of the questions in this form because you feel the answers can be found elsewhere. If any links are specified make sure these are added in good order (first link must be present before specifying second). Also ensure all links include https. Without these steps, the form will not be submittable and show errors",
+                    "x-guidance": "Here, provide links to yours or your partner organization's website, repository, or marketing. Alternatively, provide links to any whitepaper or other publication relevant to your proposal.\n\nNote however that this is extra information that voters and Community Reviewers might choose not to read. You should not fail to include any of the questions in this form because you feel the answers can be found elsewhere.\n\nIf any links are specified make sure these are added in good order (first link must be present before specifying second). Also ensure all links include https. Without these steps, the form will not be submittable and show errors",
                     "x-placeholder": "Enter relevant links (website, GitHub, whitepaper, etc.)",
                     "properties": {
                         "links": {
                             "$ref": "#/definitions/singleLineHttpsURLEntryList",
-                            "title": "Resource Links",
+                            "title": "Supporting links",
                             "description": "Links to any relevant documentation, code repositories, or marketing materials. All links must use HTTPS.",
                             "minItems": 0,
                             "maxItems": 5
@@ -472,26 +480,29 @@
                     "properties": {
                         "hasDependency": {
                             "$ref": "#/definitions/yesNoChoice",
-                            "title": "Does the project have any dependency",
+                            "title": "Does your project have any dependencies on other organizations, technical or otherwise?",
                             "description": "Does your project have any dependencies on other organizations, technical or otherwise?",
-                            "x-guidance": "If your project has any dependencies and prerequisites for your project's success, list them here. These are usually external factors (such as third-party suppliers, external resources, third-party software, etc.) that may cause a delay, since a project has less control over them. In case of third party software, indicate whether you have the necessary licenses and permission to use such software.",
+                            "x-guidance": "Here you should list any dependencies and prerequisites for your project’s success. These are usually external factors (such as third-party suppliers, external resources, third-party software, etc.) that may cause a delay, since a project has less control over them.\n\nIn case of third party software, indicate whether you have the necessary licenses and permission to use such software.",
                             "x-placeholder": "Select if your project has any dependencies"
                         },
                         "dependencyDetail": {
                             "$ref": "#/definitions/singleLineTextEntry",
-                            "title": "Dependency description",
+                            "title": "Describe any dependencies or write 'No dependencies'",
                             "description": "Here you should list any dependencies and prerequisites for your project's success. These are usually external factors (such as third-party suppliers, external resources, third-party software, etc.) that may cause a delay, since a project has less control over them. In case of third party software, indicate whether you have the necessary licenses and permission to use such software.",
                             "x-guidance": "If YES, please describe what the dependency is and why you believe it is essential for your project's delivery. If NO, please write \"No dependencies\"",
-                            "x-placeholder": "Describe any dependencies or write 'No dependencies'.",
                             "maxLength": 10240
                         }
-                    }
+                    },
+                    "required": [
+                        "hasDependency",
+                        "dependencyDetail"
+                    ]
                 },
                 "open_source": {
                     "$ref": "#/definitions/section",
                     "title": "Project Open Source",
                     "description": "Will your project's output be fully open source? Open source refers to something people can modify and share because its design is publicly accessible.",
-                    "x-guidance": "[Open source](https://docs.projectcatalyst.io/current-fund/proposal-submission/additional-guidance) refers to something people can modify and share because its design is publicly accessible. Open source software is software with source code that anyone can inspect, modify, and enhance. Conversely, only the original authors of proprietary software can legally copy, inspect, and alter that software.",
+                    "x-guidance": "Open source software is software whose source code is publicly accessible and licensed in a way that allows anyone to use, modify, and share it freely, typically under licenses approved by the Open Source Initiative.\n\nProprietary software source code is not publicly available and the rights to use, modify, or redistribute proprietary software are restricted and typically reserved by the software's owner.\n\nhttps://opensource.org/licenses",
                     "properties": {
                         "isOpenSource": {
                             "$ref": "#/definitions/yesNoChoice",
@@ -502,8 +513,7 @@
                             "$ref": "#/definitions/multiLineTextEntry",
                             "title": "Please provide here more information on the open source status of your project outputs",
                             "description": "Provide the license type and any additional context regarding the open-source status of your project. If partially open source, specify which parts are open source.",
-                            "x-guidance": "If you answered YES to the above question:\n\nIf declaring the project is open source in the application form, the project should be open source-available throughout the entire lifecycle of the project with a declared open-source repository.\nPlease indicate here the type of license you intend to use for open source and provide any further information you feel is relevant to the open source status of your project outputs. If only certain elements of your code will be open source please clarify which elements will be open source here.\n\nIf you answered NO to the above question, please give further details as to why your projects outputs will not be open source.",
-                            "x-placeholder": "Describe the open source status of your project and the license type",
+                            "x-guidance": "If you answered YES to the above question:\n\nIf declaring the project is open source in the application form, the project should be open source-available throughout the entire lifecycle of the project with a declared open-source repository.\n\nPlease indicate here the type of license you intend to use for open source and provide any further information you feel is relevant to the open source status of your project outputs. If only certain elements of your code will be open source please clarify which elements will be open source here.\n\nIf you answered NO to the question above:\n\nPlease explain why the outputs of your project will not be made open source.",
                             "maxLength": 500
                         }
                     },
@@ -962,10 +972,9 @@
                             ]
                         }
                     },
-                    "x-order": ["theme"]
+                    "required": ["grouped_tag"]
                 }
-            },
-            "x-order": ["theme"]
+            }
         },
         "details": {
             "$ref": "#/definitions/segment",
@@ -1084,7 +1093,7 @@
                                     },
                                     "cost": {
                                         "$ref": "#/definitions/tokenValueCardanoADA",
-                                        "title": "Cost in ADA",
+                                        "title": "Enter the cost associated with this milestone",
                                         "description": "The cost of this milestone in ADA",
                                         "x-placeholder": "Enter the cost associated with this milestone"
                                     },
@@ -1093,8 +1102,7 @@
                                         "title": "Progress Status",
                                         "description": "Current status of the milestone",
                                         "x-placeholder": "Enter the percentage of overall project  completion progress for this milestone (0-100%)",
-                                        "enum": ["Not Started", "In Progress", "Completed", "Delayed"],
-                                        "default": "Not Started"
+                                        "enum": ["0%", "10%", "20%", "30%", "40%", "50%", "60%", "70%", "80%", "90%", "100%"]                                        
                                     }
                                 }
                             }
