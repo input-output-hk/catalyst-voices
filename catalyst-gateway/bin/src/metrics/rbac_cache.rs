@@ -77,14 +77,14 @@ pub(crate) fn init_metrics_reporter() {
             reporter::CACHE_ACCESS
                 .with_label_values(&[&api_host_names, service_id, &network])
                 .inc();
-            reporter::LATENCY
-                .with_label_values(&[&api_host_names, service_id, &network])
-                .observe(latency.as_secs_f64());
 
             if *is_found {
                 reporter::CACHE_HIT
                     .with_label_values(&[&api_host_names, service_id, &network])
                     .inc();
+                reporter::LATENCY
+                    .with_label_values(&[&api_host_names, service_id, &network])
+                    .observe(latency.as_secs_f64());
             } else {
                 reporter::CACHE_MISS
                     .with_label_values(&[&api_host_names, service_id, &network])
