@@ -8,9 +8,6 @@ analyzer:
     - test/.test_coverage.dart
     - lib/generated_plugin_registrant.dart
 
-  errors:
-    lines_longer_than_80_chars: ignore
-
 formatter:
   page_width: 100
 
@@ -88,7 +85,6 @@ linter:
     - library_names
     - library_prefixes
     - library_private_types_in_public_api
-    - lines_longer_than_80_chars
     - literal_only_boolean_expressions
     - missing_whitespace_between_adjacent_strings
     - no_adjacent_strings_in_list
