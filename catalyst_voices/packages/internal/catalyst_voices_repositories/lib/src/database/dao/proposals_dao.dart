@@ -295,7 +295,7 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
     return _getProposalsLatestAction().then(
       (value) {
         return value
-            .where((element) => element.action.isNotDraft)
+            .where((element) => !element.action.isDraft)
             .map((e) => e.proposalRef.id)
             .map(UuidHiLo.from);
       },
@@ -668,11 +668,11 @@ final class _ProposalActions extends Equatable {
 }
 
 extension on ProposalSubmissionAction {
+  bool get isDraft => this == ProposalSubmissionAction.draft;
+
   bool get isFinal => this == ProposalSubmissionAction.aFinal;
 
   bool get isHidden => this == ProposalSubmissionAction.hide;
-
-  bool get isNotDraft => isFinal || isHidden;
 }
 
 extension on TypedResult {
