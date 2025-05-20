@@ -44,4 +44,4 @@ markers = [
     "preprod_indexing: marks test which requires indexing of the cardano preprod network",
     "health_endpoint: marks tests with requires a proxy for testing"
 ]
-addopts = "-m 'not preprod_indexing' -m 'not health_endpoint'"
+addopts = "-m 'not preprod_indexing and not health_endpoint'"

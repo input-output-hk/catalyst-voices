@@ -1,13 +1,12 @@
-from api.v1 import document
-from typing import Any, Generator
-from wrappers import TestProxy
-from wrappers.cat_gateway import CatGateway
-from utils import health
 import pytest
 import time
 
+from api.v1 import document, rbac
+from typing import Any, Generator
+from utils import health
 from utils.rbac_chain import rbac_chain_factory, Chain
-from api.v1 import rbac
+from wrappers import TestProxy
+from wrappers.cat_gateway import CatGateway
 
 @pytest.fixture
 def event_db_proxy() -> Generator[Any, Any, Any]:
@@ -71,3 +70,10 @@ def test_ready_endpoint_with_event_db_outage(event_db_proxy, index_db_proxy, cat
     index_db_proxy.suspend()
     resp = rbac.get(lookup=stake_address, token=auth_token)
     assert(resp.status_code == 503), f"Expected RBAC lookup to fail: {resp.status_code} - {resp.text}"
+
+    # call ready endpoint, expect 503
+    health.is_not_ready() #assertion
+
+    #Call `ready` endpoint to attempt re-connection that should succeed
+    index_db_proxy.resume()
+    health.is_ready() #assertion

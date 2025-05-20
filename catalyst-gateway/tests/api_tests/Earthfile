@@ -10,8 +10,9 @@ builder:
     COPY --dir ./api .
     COPY --dir ./integration .
     COPY --dir ./scripts .
-    COPY --dir ./utils .
     COPY --dir ./test_data .
+    COPY --dir ./utils .
+    COPY --dir ./wrappers .
     COPY cat-libs-rust+build/mk_signed_doc .
     DO python-ci+BUILDER
 
