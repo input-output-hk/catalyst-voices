@@ -53,6 +53,8 @@ class MarkdownEncoder extends Converter<Delta, MarkdownData> {
     }
 
     final data = _deltaToMd.convert(input);
-    return MarkdownData(data);
+    final trimmed = data.trim();
+
+    return MarkdownData(trimmed);
   }
 }

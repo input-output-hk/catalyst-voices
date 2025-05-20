@@ -136,9 +136,16 @@ final class VoicesRichTextController extends quill.QuillController {
     } else if (newMarkdownData.data.isEmpty) {
       clear();
     } else {
+      // current selection
+      final currentSelection = selection;
+
+      // update document (resets selection)
       final delta = markdown.encoder.convert(newMarkdownData);
       final newDocument = quill.Document.fromDelta(delta);
       document = newDocument;
+
+      // revert selection
+      updateSelection(currentSelection, quill.ChangeSource.local);
     }
   }
 
