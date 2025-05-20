@@ -92,7 +92,7 @@ def proposal_doc_factory(proposal_templates, rbac_chain_factory):
                 "ver": proposal_templates[0],
             },
             # referenced to the defined category id, comes from the 'templates/data.rs' file
-            "category_id": {
+            "parameters": {
                 "id": category_id,
                 "ver": category_id,
             },
