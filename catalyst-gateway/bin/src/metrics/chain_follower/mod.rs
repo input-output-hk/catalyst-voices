@@ -28,7 +28,7 @@ pub(crate) fn init_metrics_reporter() {
     let service_id = Settings::service_id();
     let network = Settings::cardano_network();
     let network_idx = network as usize;
-    
+
     thread::spawn(move || {
         loop {
             {

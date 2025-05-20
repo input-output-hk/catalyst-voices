@@ -2,14 +2,15 @@
 
 // TODO(stanislav-tkach): Handle the rollback of volatile registrations.
 
+use std::time::Instant;
+
 use cardano_blockchain_types::StakeAddress;
 use catalyst_types::catalyst_id::CatalystId;
 use rbac_registration::{cardano::cip509::Cip509, registration::cardano::RegistrationChain};
 use tokio::sync::broadcast;
 
-use crate::{rbac_cache::{add_result::AddResult, cache::RbacCache}};
-
-use super::event;
+use super::{event, event::EventTarget};
+use crate::rbac_cache::{add_result::AddResult, cache::RbacCache};
 
 /// A wrapper that allows managing both persistent and volatile caches at the same time.
 pub struct RbacCacheManager {
@@ -43,20 +44,34 @@ impl RbacCacheManager {
     /// returned.
     #[allow(clippy::result_large_err)]
     pub fn add(&self, registration: Cip509, is_persistent: bool) -> AddResult {
-        if is_persistent {
+        let result = if is_persistent {
             self.persistent.add(registration.clone())
         } else {
             self.volatile.add(registration)
-        }
+        };
+
+        self.dispatch_event(event::RbacCacheManagerEvent::RbacRegistrationChainAdded {
+            is_persistent,
+        });
+
+        result
     }
 
     /// Returns a registration chain by the given Catalyst ID.
     pub fn get(&self, id: &CatalystId, is_persistent: bool) -> Option<RegistrationChain> {
+        let start = Instant::now();
+
         let result = if is_persistent {
             self.persistent.get(id)
         } else {
             self.volatile.get(id)
         };
+
+        self.dispatch_event(event::RbacCacheManagerEvent::CacheAccessed {
+            latency: start.elapsed(),
+            is_persistent,
+            is_found: result.is_some(),
+        });
 
         result
     }
@@ -65,11 +80,13 @@ impl RbacCacheManager {
     pub fn get_by_address(
         &self, address: &StakeAddress, is_persistent: bool,
     ) -> Option<RegistrationChain> {
-        if is_persistent {
+        let result = if is_persistent {
             self.persistent.get_by_address(address)
         } else {
             self.volatile.get_by_address(address)
-        }
+        };
+
+        result
     }
 
     /// Returns a list of active stake addresses of the given registration chain.
@@ -91,5 +108,20 @@ impl RbacCacheManager {
     /// Returns the number of cached chain entries from both persisent and volatile.
     pub fn rbac_entries(&self) -> usize {
         self.persistent.chain_entries() + self.volatile.chain_entries()
+    }
+}
+
+impl event::EventTarget<event::RbacCacheManagerEvent> for RbacCacheManager {
+    fn add_event_listener(&self, listener: event::EventListenerFn<event::RbacCacheManagerEvent>) {
+        let mut rx = self.event_channel.0.subscribe();
+        tokio::spawn(async move {
+            while let Ok(event) = rx.recv().await {
+                (listener)(&event);
+            }
+        });
+    }
+
+    fn dispatch_event(&self, message: event::RbacCacheManagerEvent) {
+        let _ = self.event_channel.0.send(message);
     }
 }

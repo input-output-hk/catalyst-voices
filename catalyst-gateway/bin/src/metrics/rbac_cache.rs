@@ -6,7 +6,13 @@ use std::{
     time::Duration,
 };
 
-use crate::{rbac_cache::RBAC_CACHE, settings::Settings};
+use crate::{
+    rbac_cache::{
+        event::{EventTarget, RbacCacheManagerEvent as Event},
+        RBAC_CACHE,
+    },
+    settings::Settings,
+};
 
 /// This is to prevent the init function from accidentally being called multiple times.
 static IS_INITIALIZED: AtomicBool = AtomicBool::new(false);
@@ -24,14 +30,52 @@ pub(crate) fn init_metrics_reporter() {
     let service_id = Settings::service_id();
     let network = Settings::cardano_network().to_string();
 
-    thread::spawn(move || loop {
-        let rbac_entries = RBAC_CACHE.rbac_entries();
-        reporter::CACHING_RBAC_ENTRIES
-            .with_label_values(&[&api_host_names, service_id, &network])
-            .set(i64::try_from(rbac_entries).unwrap_or(-1));
+    // for sendig metrics periodically
+    thread::spawn(move || {
+        loop {
+            let rbac_entries = RBAC_CACHE.rbac_entries();
+            reporter::CACHING_RBAC_ENTRIES
+                .with_label_values(&[&api_host_names, service_id, &network])
+                .set(i64::try_from(rbac_entries).unwrap_or(-1));
 
-        thread::sleep(Duration::from_secs(1));
+            thread::sleep(Duration::from_secs(1));
+        }
     });
+
+    let api_host_names = Settings::api_host_names().join(",");
+    let service_id = Settings::service_id();
+    let network = Settings::cardano_network().to_string();
+
+    // for sending metrics on events
+    RBAC_CACHE.add_event_listener(Box::new(move |event: &Event| {
+        if let Event::Initialized { start_up_time } = event {
+            reporter::START_UP_TIME
+                .with_label_values(&[&api_host_names, service_id, &network])
+                .set(i64::try_from(start_up_time.as_millis()).unwrap_or(-1));
+        }
+        if let Event::RbacRegistrationChainAdded { .. } = event {}
+        if let Event::CacheAccessed {
+            is_found, latency, ..
+        } = event
+        {
+            reporter::CACHE_ACCESS
+                .with_label_values(&[&api_host_names, service_id, &network])
+                .inc();
+            reporter::LATENCY
+                .with_label_values(&[&api_host_names, service_id, &network])
+                .observe(latency.as_secs_f64());
+
+            if *is_found {
+                reporter::CACHE_HIT
+                    .with_label_values(&[&api_host_names, service_id, &network])
+                    .inc();
+            } else {
+                reporter::CACHE_MISS
+                    .with_label_values(&[&api_host_names, service_id, &network])
+                    .inc();
+            }
+        }
+    }));
 }
 
 /// All the related RBAC Registration Chain Caching reporting metrics to the Prometheus

@@ -6,7 +6,7 @@
 mod add_result;
 mod cache;
 mod cache_manager;
-mod event;
+pub mod event;
 mod instance;
 
 pub use add_result::{RbacCacheAddError, RbacCacheAddSuccess};
