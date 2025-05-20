@@ -54,6 +54,7 @@ class _MultilineTextEntryMarkdownWidgetState extends State<MultilineTextEntryMar
 
   bool get _isRequired => widget.schema.isRequired;
   int? get _maxLength => widget.schema.strLengthRange?.max;
+  String? get _placeholder => widget.schema.placeholder;
   String get _title => widget.schema.title;
 
   @override
@@ -77,6 +78,7 @@ class _MultilineTextEntryMarkdownWidgetState extends State<MultilineTextEntryMar
           charsLimit: _maxLength,
           onChanged: _onChanged,
           validator: _validator,
+          placeholder: _placeholder,
         ),
       ],
     );
