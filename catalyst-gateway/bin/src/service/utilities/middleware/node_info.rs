@@ -34,13 +34,16 @@ impl<E: Endpoint> Endpoint for CatGatewayInfoImpl<E> {
         let resp = self.ep.call(req).await?.into_response();
 
         Ok(resp
+            // using a `Server` header
+            // <https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Server>
             .with_header("Server", server_info())
             .with_header("Cardano-Network", Settings::cardano_network().to_string())
             .into_response())
     }
 }
 
-/// Returns a cat-gateway server info in the following format
+/// Returns a cat-gateway server info in the following format,
+/// based on the `User-Agent` <https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/User-Agent>
 /// ```
 /// cat-gateway/<service-id> commit:<git_commit>,branch:<git_branch>,tags:<git_tag1>,<git_tag2>
 /// ```
