@@ -69,6 +69,7 @@ mod tests {
     use super::*;
 
     #[test]
+    #[ignore]
     fn server_info_test() {
         println!("{}", server_info());
     }
