@@ -119,8 +119,6 @@ abstract interface class ProposalService {
     required DocumentRef ref,
   });
 
-  Stream<List<Proposal>> watchLatestProposals({int? limit});
-
   /// Streams changes to [isMaxProposalsLimitReached].
   Stream<bool> watchMaxProposalsLimitReached();
 
@@ -411,30 +409,6 @@ final class ProposalServiceImpl implements ProposalService {
   @override
   Stream<bool> watchIsFavoritesProposal({required DocumentRef ref}) {
     return _documentRepository.watchIsDocumentFavorite(ref: ref.toLoose());
-  }
-
-  @override
-  Stream<List<Proposal>> watchLatestProposals({int? limit}) {
-    return _proposalRepository.watchLatestProposals(limit: limit).switchMap((documents) async* {
-      if (documents.isEmpty) {
-        yield [];
-        return;
-      }
-      final proposalsDataStreams = await Future.wait(
-        documents.map(_createProposalDataStream).toList(),
-      );
-
-      yield* Rx.combineLatest(
-        proposalsDataStreams,
-        (List<ProposalData?> proposalsData) async {
-          final validProposalsData = proposalsData.whereType<ProposalData>().toList();
-          final proposalsWithVersions = await Future.wait(
-            validProposalsData.map(_addVersionsToProposal),
-          );
-          return proposalsWithVersions.map(Proposal.fromData).toList();
-        },
-      ).switchMap(Stream.fromFuture);
-    });
   }
 
   @override
