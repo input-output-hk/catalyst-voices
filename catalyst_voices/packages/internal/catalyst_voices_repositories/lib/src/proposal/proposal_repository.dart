@@ -389,11 +389,8 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     if (action == null) {
       return null;
     }
-    final proposalAction = ProposalSubmissionActionDocumentDto.fromJson(
-      action.content.data,
-    ).action.toModel();
-
-    return proposalAction;
+    final dto = ProposalSubmissionActionDocumentDto.fromJson(action.content.data);
+    return dto.action.toModel();
   }
 
   ProposalData _buildProposalData(ProposalDocumentData data) {
