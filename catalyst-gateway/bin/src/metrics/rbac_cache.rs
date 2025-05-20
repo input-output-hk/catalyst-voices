@@ -3,7 +3,6 @@
 use std::{
     sync::atomic::{AtomicBool, Ordering},
     thread,
-    time::Duration,
 };
 
 use catalyst_types::catalyst_id::CatalystId;
@@ -37,7 +36,7 @@ pub(crate) fn init_metrics_reporter() {
     thread::spawn(move || {
         reporter::MAX_CACHE_SIZE
             .with_label_values(&[&api_host_names, service_id, &network])
-            .set(i64::try_from(0).unwrap_or(-1));
+            .set(i64::try_from(Settings::rbac_cache_max_mem_size()).unwrap_or(-1));
 
         loop {
             let rbac_entries = RBAC_CACHE.rbac_entries();
@@ -54,7 +53,7 @@ pub(crate) fn init_metrics_reporter() {
                 .with_label_values(&[&api_host_names, service_id, &network])
                 .set(i64::try_from(approx_mem_used).unwrap_or(-1));
 
-            thread::sleep(Duration::from_secs(1));
+            thread::sleep(Settings::metrics_rbac_cache_interval());
         }
     });
 
