@@ -12,7 +12,6 @@ builder:
     COPY --dir ./scripts .
     COPY --dir ./test_data .
     COPY --dir ./utils .
-    COPY --dir ./wrappers .
     COPY cat-libs-rust+build/mk_signed_doc .
     DO python-ci+BUILDER
 
