@@ -134,10 +134,10 @@ async fn checker_api_catalyst_auth(
     };
 
     // Step 6: get the registration chain
-    // Get the registration from the persistent first, if not found, try volatile.
+    // Get the registration from the volatile first, if not found, try persistent.
     let reg_chain = RBAC_CACHE
-        .get(token.catalyst_id(), true)
-        .or_else(|| RBAC_CACHE.get(token.catalyst_id(), false));
+        .get(token.catalyst_id(), false)
+        .or_else(|| RBAC_CACHE.get(token.catalyst_id(), true));
 
     let Some(reg_chain) = reg_chain else {
         debug!(
