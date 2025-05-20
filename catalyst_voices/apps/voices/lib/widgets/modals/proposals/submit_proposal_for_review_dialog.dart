@@ -57,26 +57,23 @@ class _AgreementConfirmation extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
-      child: MouseRegion(
-        cursor: SystemMouseCursors.click,
-        child: GestureDetector(
-          behavior: HitTestBehavior.opaque,
-          onTap: () => onChanged(!value),
-          child: Row(
-            spacing: 24,
-            children: [
-              VoicesCheckbox(
-                value: value,
-                onChanged: onChanged,
+      child: VoicesGestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () => onChanged(!value),
+        child: Row(
+          spacing: 24,
+          children: [
+            VoicesCheckbox(
+              value: value,
+              onChanged: onChanged,
+            ),
+            Expanded(
+              child: Text(
+                context.l10n.publishProposalForReviewDialogAgreement,
+                style: Theme.of(context).textTheme.bodyMedium,
               ),
-              Expanded(
-                child: Text(
-                  context.l10n.publishProposalForReviewDialogAgreement,
-                  style: Theme.of(context).textTheme.bodyMedium,
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
