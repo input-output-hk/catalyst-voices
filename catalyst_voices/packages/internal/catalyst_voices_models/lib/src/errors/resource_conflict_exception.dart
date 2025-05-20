@@ -6,7 +6,7 @@ final class ResourceConflictException extends Equatable implements Exception {
   const ResourceConflictException({this.message});
 
   @override
-  List<Object?> get props => [];
+  List<Object?> get props => [message];
 
   @override
   String toString() {
