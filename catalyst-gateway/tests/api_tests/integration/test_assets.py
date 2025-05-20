@@ -1,5 +1,6 @@
 import json
 import os
+import codecs
 
 import pytest
 from loguru import logger
@@ -43,8 +44,14 @@ def test_persistent_ada_amount_endpoint():
         )
 
         # check assets
+        print(assets["persistent"]["assets"])
         received_assets = {
-            item["policy_hash"]: item["amount"]
+            (
+                item["policy_hash"]
+                + codecs.decode(item["asset_name"], "unicode_escape")
+                .encode("latin1")
+                .hex()
+            ): item["amount"]
             for item in assets["persistent"]["assets"]
         }
         expected_assets = entry["native_tokens"]
