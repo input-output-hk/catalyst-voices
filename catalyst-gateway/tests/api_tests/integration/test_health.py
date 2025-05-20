@@ -41,7 +41,7 @@ def test_ready_endpoint_with_event_db_outage(event_db_proxy, index_db_proxy, cat
     # suspend event db comms
     event_db_proxy.suspend()
     # fetch endpoint that uses event db
-    resp = document.index_post({})
+    resp = document.post(filter={})
     assert(resp.status_code == 503), f"Expected document index to fail: {resp.status_code} - {resp.text}"
     # call ready endpoint, expect 503
     health.is_not_ready() #assertion
@@ -52,7 +52,7 @@ def test_ready_endpoint_with_event_db_outage(event_db_proxy, index_db_proxy, cat
     health.is_ready()
 
     # fetch endpoint that uses event db
-    resp = document.index_post({})
+    resp = document.post(filter={})
     assert(resp.status_code == 200), f"Expected document index to succeed: {resp.status_code} - {resp.text}"
 
     # Index DB testing

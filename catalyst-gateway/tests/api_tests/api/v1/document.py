@@ -19,11 +19,15 @@ def put(data: str, token: str):
 
 
 # Signed document POST
-def post(document_url: str, filter: dict):
+def post(filter: dict, limit=None, page=None):
     headers = {"Content-Type": "application/json"}
-    return requests.post(f"{URL}{document_url}", headers=headers, json=filter)
+    url = f"{URL}/index"
+    query_params = []
+    if limit is not None:
+        query_params.append(f"limit={limit}")
+    if page is not None:
+        query_params.append(f"page={page}")
 
-# Signed document Index POST
-def index_post(filter: dict):
-    headers = {"Content-Type": "application/json"}
-    return requests.post(f"{INDEX_URL}", headers=headers, json=filter)
+    if query_params:
+        url += "?" + "&".join(query_params)
+    return requests.post(url, headers=headers, json=filter)
