@@ -31,7 +31,8 @@ use crate::{
         },
         responses::WithErrorResponses,
         types::cardano::{
-            asset_name::AssetName, cip19_stake_address::Cip19StakeAddress, slot_no::SlotNo,
+            ada_value::AdaValue, asset_name::AssetName, asset_value::AssetValue,
+            cip19_stake_address::Cip19StakeAddress, hash28::HexEncodedHash28, slot_no::SlotNo,
         },
     },
     settings::Settings,
@@ -313,7 +314,10 @@ async fn update_spent(
 /// Builds an instance of [`StakeInfo`] based on the TXOs given.
 fn build_stake_info(mut txo_state: TxoAssetsState, slot_num: SlotNo) -> anyhow::Result<StakeInfo> {
     let slot_num = slot_num.into();
-    let mut stake_info = StakeInfo::default();
+    let mut total_ada_amount = AdaValue::default();
+    let mut last_slot_num = SlotNo::default();
+    let mut assets = HashMap::<(HexEncodedHash28, AssetName), AssetValue>::new();
+
     for txo_info in txo_state.txos.into_values() {
         // Filter out spent TXOs.
         if let Some(spent_slot) = txo_info.spent_slot_no {
@@ -322,28 +326,29 @@ fn build_stake_info(mut txo_state: TxoAssetsState, slot_num: SlotNo) -> anyhow::
             }
         }
 
-        let value = u64::try_from(txo_info.value)?;
-        stake_info.ada_amount = stake_info
-            .ada_amount
-            .checked_add(value)
-            .ok_or_else(|| {
-                anyhow::anyhow!(
-                    "Total stake amount overflow: {} + {value}",
-                    stake_info.ada_amount
-                )
-            })?
-            .into();
+        let value = AdaValue::try_from(txo_info.value)?;
+        total_ada_amount = total_ada_amount.checked_add(value).ok_or_else(|| {
+            anyhow::anyhow!("Total stake amount overflow: {total_ada_amount} + {value}",)
+        })?;
 
         let key = (txo_info.slot_no, txo_info.txn_index, txo_info.txo);
         if let Some(native_assets) = txo_state.txo_assets.remove(&key) {
             for native_asset in native_assets {
                 match native_asset.amount.try_into() {
                     Ok(amount) => {
-                        stake_info.assets.push(StakedTxoAssetInfo {
-                            policy_hash: native_asset.id.try_into()?,
-                            asset_name: native_asset.name,
-                            amount,
-                        });
+                        match assets.entry((native_asset.id.try_into()?, native_asset.name)) {
+                            std::collections::hash_map::Entry::Occupied(mut o) => {
+                                *o.get_mut() = o.get().checked_add(&amount).ok_or_else(|| {
+                                    anyhow::anyhow!(
+                                        "Total asset amount overflow: {} + {amount}",
+                                        o.get()
+                                    )
+                                })?;
+                            },
+                            std::collections::hash_map::Entry::Vacant(v) => {
+                                v.insert(amount);
+                            },
+                        }
                     },
                     Err(e) => {
                         debug!("Invalid TXO Asset for {key:?}: {e}");
@@ -353,10 +358,24 @@ fn build_stake_info(mut txo_state: TxoAssetsState, slot_num: SlotNo) -> anyhow::
         }
 
         let slot_no = txo_info.slot_no.into();
-        if stake_info.slot_number < slot_no {
-            stake_info.slot_number = slot_no;
+        if last_slot_num < slot_no {
+            last_slot_num = slot_no;
         }
     }
 
-    Ok(stake_info)
+    Ok(StakeInfo {
+        ada_amount: total_ada_amount,
+        slot_number: last_slot_num,
+        assets: assets
+            .into_iter()
+            .map(|((policy_hash, asset_name), amount)| {
+                StakedTxoAssetInfo {
+                    policy_hash,
+                    asset_name,
+                    amount,
+                }
+            })
+            .collect::<Vec<_>>()
+            .into(),
+    })
 }

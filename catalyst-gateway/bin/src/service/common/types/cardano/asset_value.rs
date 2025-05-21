@@ -1,6 +1,6 @@
 //! Value of a Cardano Native Asset.
 
-use std::sync::LazyLock;
+use std::{fmt::Display, sync::LazyLock};
 
 use anyhow::bail;
 use poem_openapi::{
@@ -40,6 +40,19 @@ static SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| {
 /// Value of a Cardano Native Asset (may not be zero)
 #[derive(Debug, Clone, Eq, PartialEq, Hash)]
 pub(crate) struct AssetValue(i128);
+
+impl Display for AssetValue {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.0)
+    }
+}
+
+impl AssetValue {
+    /// Performs safe addition that returns None instead of wrapping around on overflow.
+    pub(crate) fn checked_add(&self, v: &Self) -> Option<Self> {
+        self.0.checked_add(v.0).map(Self)
+    }
+}
 
 /// Is the `AssetValue` valid?
 fn is_valid(value: i128) -> bool {

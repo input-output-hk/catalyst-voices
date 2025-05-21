@@ -1,6 +1,6 @@
 //! ADA coins value on the blockchain.
 
-use std::{fmt::Display, ops::Deref, sync::LazyLock};
+use std::{fmt::Display, sync::LazyLock};
 
 use anyhow::bail;
 use num_bigint::BigInt;
@@ -39,17 +39,16 @@ static SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| {
 
 pub(crate) struct AdaValue(u64);
 
-impl Deref for AdaValue {
-    type Target = u64;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
-}
-
 impl Display for AdaValue {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.0)
+    }
+}
+
+impl AdaValue {
+    /// Performs safe addition that returns None instead of wrapping around on overflow.
+    pub(crate) fn checked_add(self, v: Self) -> Option<Self> {
+        self.0.checked_add(v.0).map(Self)
     }
 }
 
@@ -118,6 +117,18 @@ impl From<AdaValue> for BigInt {
 impl ToJSON for AdaValue {
     fn to_json(&self) -> Option<Value> {
         Some(self.0.into())
+    }
+}
+
+impl TryFrom<num_bigint::BigInt> for AdaValue {
+    type Error = anyhow::Error;
+
+    fn try_from(value: num_bigint::BigInt) -> Result<Self, Self::Error> {
+        let value: u64 = value.try_into()?;
+        if !is_valid(value) {
+            bail!("Invalid Ada Value");
+        }
+        Ok(Self(value))
     }
 }
 
