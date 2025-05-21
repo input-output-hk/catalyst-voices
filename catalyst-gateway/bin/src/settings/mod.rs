@@ -54,9 +54,6 @@ const METRICS_MEMORY_INTERVAL_DEFAULT: Duration = Duration::from_secs(1);
 /// Default `METRICS_FOLLOWER_INTERVAL`, 1 second.
 const METRICS_FOLLOWER_INTERVAL_DEFAULT: Duration = Duration::from_secs(1);
 
-/// Default `METRICS_RBAC_CACHE_INTERVAL`, 1 second.
-const METRICS_RBAC_CACHE_INTERVAL_DEFAULT: Duration = Duration::from_secs(1);
-
 /// Default `RBAC_CACHE_MAX_MEM_SIZE`, 10 MB.
 const RBAC_CACHE_MAX_MEM_SIZE_DEFAULT: u64 = 10 * 1024 * 1024;
 
@@ -156,9 +153,6 @@ struct EnvVars {
     /// Interval for updating and sending Chain Follower metrics.
     metrics_follower_interval: Duration,
 
-    /// Interval for updating and sending RBAC cache metrics.
-    metrics_rbac_cache_interval: Duration,
-
     /// Maximum in-memory cache size for RBAC data, in bytes.
     rbac_cache_max_mem_size: u64,
 
@@ -238,10 +232,6 @@ static ENV_VARS: LazyLock<EnvVars> = LazyLock::new(|| {
         metrics_follower_interval: StringEnvVar::new_as_duration(
             "METRICS_FOLLOWER_INTERVAL",
             METRICS_FOLLOWER_INTERVAL_DEFAULT,
-        ),
-        metrics_rbac_cache_interval: StringEnvVar::new_as_duration(
-            "METRICS_RBAC_CACHE_INTERVAL",
-            METRICS_RBAC_CACHE_INTERVAL_DEFAULT,
         ),
         service_live_timeout_interval: StringEnvVar::new_as_duration(
             "SERVICE_LIVE_TIMEOUT_INTERVAL",
@@ -396,11 +386,6 @@ impl Settings {
     /// The Chain Follower metrics interval
     pub(crate) fn metrics_follower_interval() -> Duration {
         ENV_VARS.metrics_follower_interval
-    }
-
-    /// The RBAC cache metrics interval
-    pub(crate) fn metrics_rbac_cache_interval() -> Duration {
-        ENV_VARS.metrics_rbac_cache_interval
     }
 
     /// Maximum in-memory cache size for RBAC data, in bytes.

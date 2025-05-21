@@ -4,14 +4,17 @@ use poem::{
 };
 use prometheus::{Encoder, Registry, TextEncoder};
 
+type UpdateFn = fn();
+
 pub struct MetricsUpdaterMiddleware {
-    registry: Registry
+    registry: Registry,
+    updater: UpdateFn,
 }
 
 impl MetricsUpdaterMiddleware {
     /// Create a `PrometheusExporter` endpoint.
-    pub fn new(registry: Registry) -> Self {
-        Self { registry }
+    pub fn new(registry: Registry, updater: UpdateFn) -> Self {
+        Self { registry, updater }
     }
 }
 
@@ -21,6 +24,7 @@ impl IntoEndpoint for MetricsUpdaterMiddleware {
     fn into_endpoint(self) -> Self::Endpoint {
         MetricsUpdaterEndpoint {
             registry: self.registry.clone(),
+            updater: self.updater,
         }
     }
 }
@@ -28,6 +32,7 @@ impl IntoEndpoint for MetricsUpdaterMiddleware {
 #[doc(hidden)]
 pub struct MetricsUpdaterEndpoint {
     registry: Registry,
+    updater: UpdateFn,
 }
 
 impl Endpoint for MetricsUpdaterEndpoint {
@@ -37,6 +42,8 @@ impl Endpoint for MetricsUpdaterEndpoint {
         if req.method() != Method::GET {
             return Ok(StatusCode::METHOD_NOT_ALLOWED.into());
         }
+
+        (self.updater)();
 
         let encoder = TextEncoder::new();
         let metric_families = self.registry.gather();

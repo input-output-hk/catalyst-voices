@@ -1,9 +1,6 @@
 //! Metrics related to RBAC Registration Chain Caching analytics.
 
-use std::{
-    sync::atomic::{AtomicBool, Ordering},
-    thread,
-};
+use std::sync::atomic::{AtomicBool, Ordering};
 
 use catalyst_types::catalyst_id::CatalystId;
 use rbac_registration::registration::cardano::RegistrationChain;
@@ -19,10 +16,7 @@ use crate::{
 /// This is to prevent the init function from accidentally being called multiple times.
 static IS_INITIALIZED: AtomicBool = AtomicBool::new(false);
 
-/// Starts a background thread to periodically update Chain Follower metrics.
-///
-/// This function spawns a thread that updates the Chain Follower metrics
-/// at regular intervals defined by `METRICS_FOLLOWER_INTERVAL`.
+/// Starts an event listener to `RBAC_CACHE` and listens for changes as metrics.
 pub(crate) fn init_metrics_reporter() {
     if IS_INITIALIZED.swap(true, Ordering::SeqCst) {
         return;
@@ -32,36 +26,6 @@ pub(crate) fn init_metrics_reporter() {
     let service_id = Settings::service_id();
     let network = Settings::cardano_network().to_string();
 
-    // for sending metrics periodically
-    thread::spawn(move || {
-        reporter::MAX_CACHE_SIZE
-            .with_label_values(&[&api_host_names, service_id, &network])
-            .set(i64::try_from(Settings::rbac_cache_max_mem_size()).unwrap_or(-1));
-
-        loop {
-            let rbac_entries = RBAC_CACHE.rbac_entries();
-
-            let chain_size = size_of::<RegistrationChain>();
-            let key_size = size_of::<CatalystId>();
-
-            let approx_mem_used = (chain_size + key_size) * rbac_entries;
-
-            reporter::CACHING_RBAC_ENTRIES
-                .with_label_values(&[&api_host_names, service_id, &network])
-                .set(i64::try_from(rbac_entries).unwrap_or(-1));
-            reporter::CACHE_SIZE
-                .with_label_values(&[&api_host_names, service_id, &network])
-                .set(i64::try_from(approx_mem_used).unwrap_or(-1));
-
-            thread::sleep(Settings::metrics_rbac_cache_interval());
-        }
-    });
-
-    let api_host_names = Settings::api_host_names().join(",");
-    let service_id = Settings::service_id();
-    let network = Settings::cardano_network().to_string();
-
-    // for sending metrics on events
     RBAC_CACHE.add_event_listener(Box::new(move |event: &Event| {
         if let Event::Initialized { start_up_time } = event {
             reporter::START_UP_TIME
@@ -91,6 +55,32 @@ pub(crate) fn init_metrics_reporter() {
             }
         }
     }));
+}
+
+pub(crate) fn update() {
+    let api_host_names = Settings::api_host_names().join(",");
+    let service_id = Settings::service_id();
+    let network = Settings::cardano_network().to_string();
+
+    reporter::MAX_CACHE_SIZE
+        .with_label_values(&[&api_host_names, service_id, &network])
+        .set(i64::try_from(Settings::rbac_cache_max_mem_size()).unwrap_or(-1));
+
+    loop {
+        let rbac_entries = RBAC_CACHE.rbac_entries();
+
+        let chain_size = size_of::<RegistrationChain>();
+        let key_size = size_of::<CatalystId>();
+
+        let approx_mem_used = (chain_size + key_size) * rbac_entries;
+
+        reporter::CACHING_RBAC_ENTRIES
+            .with_label_values(&[&api_host_names, service_id, &network])
+            .set(i64::try_from(rbac_entries).unwrap_or(-1));
+        reporter::CACHE_SIZE
+            .with_label_values(&[&api_host_names, service_id, &network])
+            .set(i64::try_from(approx_mem_used).unwrap_or(-1));
+    }
 }
 
 /// All the related RBAC Registration Chain Caching reporting metrics to the Prometheus
