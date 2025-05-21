@@ -83,7 +83,7 @@ class _DocumentPropertyBuilderViewerState extends State<DocumentPropertyBuilderV
 
         yield _TextListItem(
           id: property.nodeId,
-          title: '',
+          title: context.l10n.singleGroupedTagSelectorTitle,
           isRequired: schema.isRequired,
           value: value?.toString(),
         );

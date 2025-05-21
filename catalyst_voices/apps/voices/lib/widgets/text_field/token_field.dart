@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/widgets/text_field/voices_num_field.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
@@ -58,6 +59,9 @@ class TokenField extends StatelessWidget {
                 range: range,
               )
             : null,
+        labelStyle: context.textTheme.bodySmall?.copyWith(
+          color: context.colors.textOnPrimaryLevel1,
+        ),
       ),
       validator: (int? value, text) => _validate(context, value, text),
       onChanged: onChanged,

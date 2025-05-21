@@ -18,7 +18,7 @@ class DocumentPropertyBuilderTitle extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       title.starred(isEnabled: isRequired),
-      maxLines: 1,
+      maxLines: 2,
       overflow: TextOverflow.ellipsis,
       style: Theme.of(context).textTheme.bodySmall?.copyWith(
             color: color ?? Theme.of(context).colors.textOnPrimaryLevel1,
