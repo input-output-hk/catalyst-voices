@@ -11,7 +11,8 @@ from api.v1 import cardano
 def test_persistent_ada_amount_endpoint():
     # could the file from https://github.com/input-output-hk/catalyst-storage/blob/main/cardano-asset-preprod.json
     ASSETS_DATA_PATH = os.environ["ASSETS_DATA_PATH"]
-    ALLOWED_FAILURE_RATE = 0.75
+    # 5% failure rate
+    ALLOWED_FAILURE_RATE = 0.05
 
     test_data: dict[str, any] = {}
     with open(ASSETS_DATA_PATH) as f:
@@ -68,6 +69,6 @@ def test_persistent_ada_amount_endpoint():
             )
             failures += 1
 
-    assert failures / checks >= ALLOWED_FAILURE_RATE, logger.error(
+    assert failures / checks <= ALLOWED_FAILURE_RATE, logger.error(
         f"Final failure rate is more than expected. Current: {failures / checks}, Allowed: {ALLOWED_FAILURE_RATE} "
     )
