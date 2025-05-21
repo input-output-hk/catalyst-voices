@@ -1,6 +1,6 @@
 use poem::{
     http::{Method, StatusCode},
-    Endpoint, IntoEndpoint, Request, Response, Result,
+    Endpoint, Request, Response, Result,
 };
 use prometheus::{Encoder, Registry, TextEncoder};
 
@@ -18,24 +18,7 @@ impl MetricsUpdaterMiddleware {
     }
 }
 
-impl IntoEndpoint for MetricsUpdaterMiddleware {
-    type Endpoint = MetricsUpdaterEndpoint;
-
-    fn into_endpoint(self) -> Self::Endpoint {
-        MetricsUpdaterEndpoint {
-            registry: self.registry.clone(),
-            updater: self.updater,
-        }
-    }
-}
-
-#[doc(hidden)]
-pub struct MetricsUpdaterEndpoint {
-    registry: Registry,
-    updater: UpdateFn,
-}
-
-impl Endpoint for MetricsUpdaterEndpoint {
+impl Endpoint for MetricsUpdaterMiddleware {
     type Output = Response;
 
     async fn call(&self, req: Request) -> Result<Self::Output> {

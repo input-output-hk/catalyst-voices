@@ -62,25 +62,22 @@ pub(crate) fn update() {
     let service_id = Settings::service_id();
     let network = Settings::cardano_network().to_string();
 
+    let rbac_entries = RBAC_CACHE.rbac_entries();
+
+    let chain_size = size_of::<RegistrationChain>();
+    let key_size = size_of::<CatalystId>();
+
+    let approx_mem_used = (chain_size + key_size) * rbac_entries;
+
     reporter::MAX_CACHE_SIZE
         .with_label_values(&[&api_host_names, service_id, &network])
         .set(i64::try_from(Settings::rbac_cache_max_mem_size()).unwrap_or(-1));
-
-    loop {
-        let rbac_entries = RBAC_CACHE.rbac_entries();
-
-        let chain_size = size_of::<RegistrationChain>();
-        let key_size = size_of::<CatalystId>();
-
-        let approx_mem_used = (chain_size + key_size) * rbac_entries;
-
-        reporter::CACHING_RBAC_ENTRIES
-            .with_label_values(&[&api_host_names, service_id, &network])
-            .set(i64::try_from(rbac_entries).unwrap_or(-1));
-        reporter::CACHE_SIZE
-            .with_label_values(&[&api_host_names, service_id, &network])
-            .set(i64::try_from(approx_mem_used).unwrap_or(-1));
-    }
+    reporter::CACHING_RBAC_ENTRIES
+        .with_label_values(&[&api_host_names, service_id, &network])
+        .set(i64::try_from(rbac_entries).unwrap_or(-1));
+    reporter::CACHE_SIZE
+        .with_label_values(&[&api_host_names, service_id, &network])
+        .set(i64::try_from(approx_mem_used).unwrap_or(-1));
 }
 
 /// All the related RBAC Registration Chain Caching reporting metrics to the Prometheus
