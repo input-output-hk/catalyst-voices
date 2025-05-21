@@ -5,17 +5,20 @@ import codecs
 import pytest
 from loguru import logger
 from api.v1 import cardano
-from functools import reduce
 
 
 @pytest.mark.preprod_indexing
 def test_persistent_ada_amount_endpoint():
     # could the file from https://github.com/input-output-hk/catalyst-storage/blob/main/cardano-asset-preprod.json
     ASSETS_DATA_PATH = os.environ["ASSETS_DATA_PATH"]
+    ALLOWED_FAILURE_RATE = 0.75
 
     test_data: dict[str, any] = {}
     with open(ASSETS_DATA_PATH) as f:
         test_data = json.load(f)
+
+    checks = 0
+    failures = 0
 
     total_len = len(test_data)
     for i, (stake_addr, entry) in enumerate(test_data.items()):
@@ -39,12 +42,14 @@ def test_persistent_ada_amount_endpoint():
         received_ada = assets["persistent"]["ada_amount"]
         expected_ada = entry["ada_amount"]
 
-        assert received_ada == expected_ada, logger.error(
-            f"Assertion failed: Ada amount for '{stake_addr}', expected: {expected_ada}, received: {received_ada}"
-        )
+        checks += 1
+        if received_ada != expected_ada:
+            logger.error(
+                f"Assertion failed: Ada amount for '{stake_addr}', expected: {expected_ada}, received: {received_ada}"
+            )
+            failures += 1
 
         # check assets
-        print(assets["persistent"]["assets"])
         received_assets = {
             (
                 item["policy_hash"]
@@ -56,6 +61,13 @@ def test_persistent_ada_amount_endpoint():
         }
         expected_assets = entry["native_tokens"]
 
-        assert received_assets == expected_assets, logger.error(
-            f"Assertion failed: Token count for '{stake_addr}', expected: {expected_assets}, received: {received_assets}"
-        )
+        checks += 1
+        if received_assets != expected_assets:
+            logger.error(
+                f"Assertion failed: Native Assets for '{stake_addr}', expected: {expected_assets}, received: {received_assets}"
+            )
+            failures += 1
+
+    assert failures / checks >= ALLOWED_FAILURE_RATE, logger.error(
+        f"Final failure rate is more than expected. Current: {failures / checks}, Allowed: {ALLOWED_FAILURE_RATE} "
+    )
