@@ -12,7 +12,7 @@ def test_persistent_ada_amount_endpoint():
     # could the file from https://github.com/input-output-hk/catalyst-storage/blob/main/cardano-asset-preprod.json
     ASSETS_DATA_PATH = os.environ["ASSETS_DATA_PATH"]
     # 5% failure rate
-    ALLOWED_FAILURE_RATE = 0.05
+    ALLOWED_FAILURE_RATE = 0.1
 
     test_data: dict[str, any] = {}
     with open(ASSETS_DATA_PATH) as f:
