@@ -132,30 +132,6 @@ impl TryFrom<num_bigint::BigInt> for AdaValue {
     }
 }
 
-impl TryFrom<i64> for AdaValue {
-    type Error = anyhow::Error;
-
-    fn try_from(value: i64) -> Result<Self, Self::Error> {
-        let value: u64 = value.try_into()?;
-        if !is_valid(value) {
-            bail!("Invalid ADA Value");
-        }
-        Ok(Self(value))
-    }
-}
-
-impl From<u64> for AdaValue {
-    fn from(value: u64) -> Self {
-        Self(value)
-    }
-}
-
-impl From<AdaValue> for u64 {
-    fn from(value: AdaValue) -> Self {
-        value.0
-    }
-}
-
 impl Example for AdaValue {
     fn example() -> Self {
         Self(EXAMPLE)
