@@ -14,11 +14,11 @@ import 'package:markdown_quill/markdown_quill.dart';
 // models/shared package
 const markdown = MarkdownCodec();
 
-final _mdDocument = md.Document();
-final _mdToDelta = MarkdownToDelta(markdownDocument: _mdDocument);
 final _deltaToMd = DeltaToMarkdown(
   customContentHandler: DeltaToMarkdown.escapeSpecialCharactersRelaxed,
 );
+final _mdDocument = md.Document();
+final _mdToDelta = MarkdownToDelta(markdownDocument: _mdDocument);
 
 final class MarkdownCodec extends Codec<MarkdownData, Delta> {
   const MarkdownCodec();

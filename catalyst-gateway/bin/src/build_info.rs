@@ -19,7 +19,7 @@ build time: {}
     $.timestamp
 );
 
-build_info_crate::build_info!(fn build_info);
+build_info_crate::build_info!(pub(crate) fn build_info);
 
 /// Log Build Info to our logs.
 pub(crate) fn log_build_info() {
