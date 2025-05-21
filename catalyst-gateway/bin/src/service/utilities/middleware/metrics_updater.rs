@@ -1,25 +1,53 @@
 use poem::{
-    endpoint::PrometheusExporter, http::{Method, StatusCode}, Endpoint, IntoEndpoint, Request, Response, Result
+    http::{Method, StatusCode},
+    Endpoint, IntoEndpoint, Request, Response, Result,
 };
-use prometheus::Registry;
+use prometheus::{Encoder, Registry, TextEncoder};
 
 pub struct MetricsUpdaterMiddleware {
-    exporter: PrometheusExporter,
+    registry: Registry
 }
 
 impl MetricsUpdaterMiddleware {
     /// Create a `PrometheusExporter` endpoint.
     pub fn new(registry: Registry) -> Self {
-        Self {
-            exporter: PrometheusExporter::new(registry),
+        Self { registry }
+    }
+}
+
+impl IntoEndpoint for MetricsUpdaterMiddleware {
+    type Endpoint = MetricsUpdaterEndpoint;
+
+    fn into_endpoint(self) -> Self::Endpoint {
+        MetricsUpdaterEndpoint {
+            registry: self.registry.clone(),
         }
     }
 }
 
-impl Endpoint for MetricsUpdaterMiddleware {
+#[doc(hidden)]
+pub struct MetricsUpdaterEndpoint {
+    registry: Registry,
+}
+
+impl Endpoint for MetricsUpdaterEndpoint {
     type Output = Response;
 
     async fn call(&self, req: Request) -> Result<Self::Output> {
-        self.exporter.into_endpoint().call(req).await
+        if req.method() != Method::GET {
+            return Ok(StatusCode::METHOD_NOT_ALLOWED.into());
+        }
+
+        let encoder = TextEncoder::new();
+        let metric_families = self.registry.gather();
+        let mut result = Vec::new();
+        match encoder.encode(&metric_families, &mut result) {
+            Ok(()) => {
+                Ok(Response::builder()
+                    .content_type(encoder.format_type())
+                    .body(result))
+            },
+            Err(_) => Err(StatusCode::INTERNAL_SERVER_ERROR.into()),
+        }
     }
 }
