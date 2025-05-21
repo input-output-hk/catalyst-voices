@@ -832,7 +832,8 @@
                                                 "Risk Management",
                                                 "Yield",
                                                 "Staking",
-                                                "Lending"
+                                                "Lending",
+                                                "DEX"
                                             ]
                                         }
                                     }
@@ -857,7 +858,7 @@
                                                 "Real Estate",
                                                 "Healthcare",
                                                 "Tourism",
-                                                "Entertainments",
+                                                "Entertainment",
                                                 "RWA",
                                                 "Music",
                                                 "Tokenization"
@@ -896,7 +897,7 @@
                                                 "Interoperability",
                                                 "Off-chain",
                                                 "Legal",
-                                                "Policy Advocacy",
+                                                "Advocacy",
                                                 "Standards"
                                             ]
                                         }
@@ -927,7 +928,6 @@
                                         "tag": {
                                             "$ref": "#/definitions/tagSelection",
                                             "enum": [
-                                                "Smart Contract",
                                                 "Smart Contracts",
                                                 "Audit",
                                                 "Oracles"
@@ -1052,7 +1052,7 @@
                             "items": {
                                 "type": "object",
                                 "title": "Milestone",
-                                "required": ["title", "outputs", "acceptance_criteria", "evidence", "delivery_month", "cost", "progress"],
+                                "required": ["title", "outputs", "acceptance_criteria", "evidence", "delivery_month", "cost"],
                                 "x-subsection": true,
                                 "properties": {
                                     "title": {
@@ -1102,7 +1102,8 @@
                                         "title": "Progress Status",
                                         "description": "Current status of the milestone",
                                         "x-placeholder": "Enter the percentage of overall project  completion progress for this milestone (0-100%)",
-                                        "enum": ["0%", "10%", "20%", "30%", "40%", "50%", "60%", "70%", "80%", "90%", "100%"]                                        
+                                        "enum": ["0%", "10%", "20%", "30%", "40%", "50%", "60%", "70%", "80%", "90%", "100%"]
+                                        
                                     }
                                 }
                             }
