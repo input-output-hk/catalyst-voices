@@ -126,7 +126,7 @@ impl TryFrom<num_bigint::BigInt> for AdaValue {
     fn try_from(value: num_bigint::BigInt) -> Result<Self, Self::Error> {
         let value: u64 = value.try_into()?;
         if !is_valid(value) {
-            bail!("Invalid Ada Value");
+            bail!("Invalid ADA Value");
         }
         Ok(Self(value))
     }
