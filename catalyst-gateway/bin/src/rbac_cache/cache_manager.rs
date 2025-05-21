@@ -12,6 +12,9 @@ use tokio::sync::broadcast;
 use super::{event, event::EventTarget};
 use crate::rbac_cache::{add_result::AddResult, cache::RbacCache};
 
+/// The capacity of the broadcast channel buffer.
+const BROADCAST_CHANNEL_CAPACITY: usize = 128;
+
 /// A wrapper that allows managing both persistent and volatile caches at the same time.
 pub struct RbacCacheManager {
     /// A cache for persistent RBAC data.
@@ -34,7 +37,7 @@ impl RbacCacheManager {
         Self {
             persistent,
             volatile,
-            event_channel: broadcast::channel(10),
+            event_channel: broadcast::channel(BROADCAST_CHANNEL_CAPACITY),
         }
     }
 
