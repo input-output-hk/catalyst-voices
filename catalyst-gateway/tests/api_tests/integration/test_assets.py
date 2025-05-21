@@ -69,6 +69,7 @@ def test_persistent_ada_amount_endpoint():
             )
             failures += 1
 
-    assert failures / checks <= ALLOWED_FAILURE_RATE, logger.error(
-        f"Final failure rate is more than expected. Current: {failures / checks}, Allowed: {ALLOWED_FAILURE_RATE} "
+    assert failures / checks <= ALLOWED_FAILURE_RATE
+    logger.info(
+        f"Final failure rate is {failures / checks}, Allowed: {ALLOWED_FAILURE_RATE} "
     )
