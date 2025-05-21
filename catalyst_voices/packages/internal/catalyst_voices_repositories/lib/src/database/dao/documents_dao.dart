@@ -336,19 +336,36 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
     ]);
 
     if (unique) {
-      return query.watch().map((list) {
-        final latestVersions = <String, DocumentEntity>{};
-        for (final entity in list) {
-          final id = '${entity.idHi}_${entity.idLo}';
-          if (!latestVersions.containsKey(id)) {
-            latestVersions[id] = entity;
-          }
-        }
-        if (limit != null) {
-          return latestVersions.values.toList().take(limit).toList();
-        }
-        return latestVersions.values.toList();
-      });
+      final latestDocumentRef = alias(documents, 'latestDocumentRef');
+      final maxVerHi = latestDocumentRef.verHi.max();
+      final latestDocumentQuery = selectOnly(latestDocumentRef, distinct: true)
+        ..addColumns([
+          latestDocumentRef.idHi,
+          latestDocumentRef.idLo,
+          maxVerHi,
+          latestDocumentRef.verLo,
+        ])
+        ..where(latestDocumentRef.type.equalsValue(DocumentType.proposalDocument))
+        ..groupBy([latestDocumentRef.idHi + latestDocumentRef.idLo]);
+
+      final verSubquery = Subquery(latestDocumentQuery, 'latestDocumentRef');
+
+      final uniqueQuery = query.join([
+        innerJoin(
+          verSubquery,
+          Expression.and([
+            verSubquery.ref(maxVerHi).equalsExp(documents.verHi),
+            verSubquery.ref(latestDocumentRef.verLo).equalsExp(documents.verLo),
+          ]),
+          useColumns: false,
+        ),
+      ]);
+
+      if (limit != null) {
+        uniqueQuery.limit(limit);
+      }
+
+      return uniqueQuery.map((row) => row.readTable(documents)).watch();
     }
 
     if (limit != null) {
