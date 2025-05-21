@@ -26,7 +26,11 @@ def test_persistent_ada_amount_endpoint():
         logger.info(f"Checking: '{stake_addr}'... ({i + 1}/{total_len})")
 
         resp = cardano.assets(stake_addr, entry["slot_number"])
-        if entry["ada_amount"] == 0 and resp.status_code == 404:
+        if (
+            entry["ada_amount"] == 0
+            and len(entry["native_tokens"]) == 0
+            and resp.status_code == 404
+        ):
             # it is possible that snapshot tool collected data for the stake key which does not have any unspent utxo
             # at this case cat-gateway return 404, that is why we are checking this case additionally
             logger.info("Skipped checking: empty ada")
