@@ -8,9 +8,9 @@ final class ApiConfig extends Equatable {
   final String reviewsUrl;
 
   const ApiConfig({
-    this.gatewayUrl = 'https://gateway.dev.projectcatalyst.io/',
-    this.vitUrl = 'https://core.dev.projectcatalyst.io/',
-    this.reviewsUrl = 'https://reviews.dev.projectcatalyst.io/',
+    this.gatewayUrl = 'https://gateway.preprod.projectcatalyst.io/',
+    this.vitUrl = 'https://core.preprod.projectcatalyst.io/',
+    this.reviewsUrl = 'https://reviews.preprod.projectcatalyst.io/',
   });
 
   @override
