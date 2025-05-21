@@ -327,9 +327,7 @@ fn build_stake_info(mut txo_state: TxoAssetsState, slot_num: SlotNo) -> anyhow::
         }
 
         let value = AdaValue::try_from(txo_info.value)?;
-        total_ada_amount = total_ada_amount.checked_add(value).ok_or_else(|| {
-            anyhow::anyhow!("Total stake amount overflow: {total_ada_amount} + {value}",)
-        })?;
+        total_ada_amount = total_ada_amount.saturating_add(value);
 
         let key = (txo_info.slot_no, txo_info.txn_index, txo_info.txo);
         if let Some(native_assets) = txo_state.txo_assets.remove(&key) {
@@ -338,12 +336,7 @@ fn build_stake_info(mut txo_state: TxoAssetsState, slot_num: SlotNo) -> anyhow::
                     Ok(amount) => {
                         match assets.entry((native_asset.id.try_into()?, native_asset.name)) {
                             std::collections::hash_map::Entry::Occupied(mut o) => {
-                                *o.get_mut() = o.get().checked_add(&amount).ok_or_else(|| {
-                                    anyhow::anyhow!(
-                                        "Total asset amount overflow: {} + {amount}",
-                                        o.get()
-                                    )
-                                })?;
+                                *o.get_mut() = o.get().saturating_add(&amount);
                             },
                             std::collections::hash_map::Entry::Vacant(v) => {
                                 v.insert(amount);

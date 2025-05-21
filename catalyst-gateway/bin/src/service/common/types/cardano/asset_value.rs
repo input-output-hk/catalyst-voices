@@ -48,9 +48,12 @@ impl Display for AssetValue {
 }
 
 impl AssetValue {
-    /// Performs safe addition that returns None instead of wrapping around on overflow.
-    pub(crate) fn checked_add(&self, v: &Self) -> Option<Self> {
-        self.0.checked_add(v.0).map(Self)
+    /// Performs saturating addition.
+    pub(crate) fn saturating_add(&self, v: &Self) -> Self {
+        self.0
+            .checked_add(v.0)
+            .inspect(|_| tracing::error!("Asset value overflow: {self} + {v}",))
+            .map_or(Self(i128::MAX), Self)
     }
 }
 
