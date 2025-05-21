@@ -9,6 +9,9 @@ use crate::{
     settings::{self, Settings},
 };
 
+/// A prefix for any custom header field <https://datatracker.ietf.org/doc/html/rfc6648#appendix-B>
+const CUSTOM_HEADER_PREFIX: &str = "VND.projectcatalyst.io";
+
 /// Middleware type that returns a response with 503 status code
 /// if any DB stops responding before returning the wrapped endpoint.
 pub(crate) struct CatGatewayInfo;
@@ -37,7 +40,10 @@ impl<E: Endpoint> Endpoint for CatGatewayInfoImpl<E> {
             // using a `Server` header
             // <https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Server>
             .with_header("Server", server_info())
-            .with_header("Cardano-Network", Settings::cardano_network().to_string())
+            .with_header(
+                format!("{CUSTOM_HEADER_PREFIX}.Cardano-Network"),
+                Settings::cardano_network().to_string(),
+            )
             .into_response())
     }
 }
