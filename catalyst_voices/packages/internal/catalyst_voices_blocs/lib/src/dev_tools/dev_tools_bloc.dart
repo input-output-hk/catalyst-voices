@@ -1,9 +1,12 @@
 import 'dart:async';
 
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 
 const _requiredTapCount = 6;
+final _logger = Logger('DevToolsBloc');
 
 final class DevToolsBloc extends Bloc<DevToolsEvent, DevToolsState>
     with BlocSignalEmitterMixin<DevToolsSignal, DevToolsState> {
@@ -17,6 +20,7 @@ final class DevToolsBloc extends Bloc<DevToolsEvent, DevToolsState>
     on<DevToolsEnablerTappedEvent>(_handleEnablerTap);
     on<DevToolsEnablerTapResetEvent>(_handleTapCountReset);
     on<RecoverConfigEvent>(_handleRecoverConfig);
+    on<UpdateSystemInfoEvent>(_handleUpdateSystemInfo);
 
     add(const RecoverConfigEvent());
   }
@@ -82,5 +86,23 @@ final class DevToolsBloc extends Bloc<DevToolsEvent, DevToolsState>
     _resetCountTimer = null;
 
     emit(state.copyWith(enableTapCount: 0));
+  }
+
+  Future<void> _handleUpdateSystemInfo(
+    UpdateSystemInfoEvent event,
+    Emitter<DevToolsState> emit,
+  ) async {
+    SystemInfo? systemInfo;
+
+    try {
+      systemInfo = await _devToolsService.getSystemInfo();
+    } catch (error, stack) {
+      _logger.warning('Updating system info failed', error, stack);
+      systemInfo = null;
+    } finally {
+      if (!isClosed) {
+        emit(state.copyWith(systemInfo: Optional(systemInfo)));
+      }
+    }
   }
 }

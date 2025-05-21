@@ -334,6 +334,7 @@ final class Dependencies extends DependencyProvider {
     registerLazySingleton<DevToolsService>(() {
       return DevToolsService(
         get<DevToolsRepository>(),
+        get<AppConfig>(),
       );
     });
   }
