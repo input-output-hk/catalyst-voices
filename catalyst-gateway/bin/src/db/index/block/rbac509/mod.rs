@@ -162,6 +162,8 @@ mod tests {
         assert_eq!(1, query.registrations.len());
     }
 
+    // The invalid vec is empty in this test because `RBAC_CACHE.add()` returns
+    // `UnknownCatalystId` for that registration.
     #[tokio::test]
     async fn index_invalid() {
         let block = test_utils::block_4();
@@ -171,6 +173,6 @@ mod tests {
             .unwrap();
         query.index(txn_hash, 0.into(), &block);
         assert!(query.registrations.is_empty());
-        assert_eq!(1, query.invalid.len());
+        assert!(query.invalid.is_empty());
     }
 }
