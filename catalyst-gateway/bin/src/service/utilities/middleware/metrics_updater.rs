@@ -1,3 +1,8 @@
+//! A middleware wrapping around `prometheus::Registry`.
+//! It acts as an endpoint to export metrics data to the Prometheus service.
+//! For every request to this endpoint, it will call the `updater` function to update
+//! metrics to the latest before sending to the service.
+
 use poem::{
     http::{Method, StatusCode},
     Endpoint, Request, Response, Result,
