@@ -44,8 +44,10 @@ abstract interface class UserService implements ActiveAware {
 
   Future<void> removeAccount(Account account);
 
+  /// Throws [EmailAlreadyUsedException] if email already taken.
   Future<void> resendActiveAccountVerificationEmail();
 
+  /// Throws [EmailAlreadyUsedException] if [email] already taken.
   Future<void> updateAccount({
     required CatalystId id,
     Optional<String>? username,
