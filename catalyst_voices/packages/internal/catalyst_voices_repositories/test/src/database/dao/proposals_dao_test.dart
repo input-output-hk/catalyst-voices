@@ -1089,6 +1089,73 @@ void main() {
         },
         onPlatform: driftOnPlatforms,
       );
+
+      test(
+        'hidden proposals are filtered out when pointing to older version',
+        () async {
+          // Given
+          final templateRef = SignedDocumentRef.generateFirstRef();
+          final proposalRef = SignedDocumentRef.generateFirstRef();
+          final nextProposalRef = proposalRef.nextVersion().toSignedDocumentRef();
+
+          final templates = [
+            _buildProposalTemplate(selfRef: templateRef),
+          ];
+
+          final proposals = [
+            _buildProposal(
+              selfRef: proposalRef,
+              template: templateRef,
+            ),
+            _buildProposal(
+              selfRef: nextProposalRef,
+              template: templateRef,
+            ),
+          ];
+
+          const expectedRefs = <SignedDocumentRef>[];
+
+          final actions = <DocumentEntityWithMetadata>[
+            _buildProposalAction(
+              selfRef: _buildRefAt(DateTime(2025, 5, 2)),
+              action: ProposalSubmissionActionDto.aFinal,
+              proposalRef: proposalRef,
+            ),
+            _buildProposalAction(
+              selfRef: _buildRefAt(DateTime(2025, 5, 20)),
+              action: ProposalSubmissionActionDto.hide,
+              proposalRef: proposalRef,
+            ),
+          ];
+          final comments = <DocumentEntityWithMetadata>[];
+
+          const filters = ProposalsFilters();
+
+          // When
+          await database.documentsDao.saveAll([
+            ...templates,
+            ...proposals,
+            ...actions,
+            ...comments,
+          ]);
+
+          // Then
+          const request = PageRequest(page: 0, size: 25);
+          final page = await database.proposalsDao.queryProposalsPage(
+            request: request,
+            filters: filters,
+          );
+
+          expect(page.page, 0);
+          expect(page.total, expectedRefs.length);
+
+          final refs = page.items.map((e) => e.proposal.metadata.selfRef).toList();
+
+          expect(refs, hasLength(expectedRefs.length));
+          expect(refs, containsAll(expectedRefs));
+        },
+        onPlatform: driftOnPlatforms,
+      );
     });
     group('queryProposals', () {
       test(

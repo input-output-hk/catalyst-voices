@@ -206,6 +206,7 @@ minicbor
 minijinja
 mithril
 mitigations
+mitmdump
 mocktail
 moderations
 moka
@@ -258,6 +259,7 @@ pubkey
 PUBLICKEY
 pubspec
 pycardano
+pyright
 pytest
 qrcode
 rapidoc

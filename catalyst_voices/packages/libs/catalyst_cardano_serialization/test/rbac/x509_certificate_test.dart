@@ -1,5 +1,5 @@
-import 'package:catalyst_cardano_serialization/src/rbac/x509_certificate.dart';
-import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
+import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
+import 'package:catalyst_key_derivation/catalyst_key_derivation.dart' hide Ed25519PublicKey;
 import 'package:collection/collection.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
@@ -8,7 +8,7 @@ void main() {
   group(X509Certificate, () {
     final signature = _FakeBip32Ed25519XSignature();
     final privateKey = _FakeBip32Ed25519XPrivateKey(signature: signature);
-    final publicKey = _FakeBip32Ed25519XPublicKey();
+    final publicKey = Ed25519PublicKey.seeded(0);
 
     setUpAll(() {
       Bip32Ed25519XPublicKeyFactory.instance = _FakeBip32Ed25519XPublicKeyFactory();

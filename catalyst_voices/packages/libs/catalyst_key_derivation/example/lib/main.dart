@@ -3,6 +3,18 @@
 import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
 import 'package:flutter/material.dart';
 
+/// Run only via `flutter run`:
+///
+/// ```shell
+/// flutter run \
+/// --web-header Cross-Origin-Opener-Policy=same-origin \
+/// --web-header Cross-Origin-Embedder-Policy=require-corp \
+/// --target lib/main.dart \
+/// -d chrome
+/// ```
+///
+/// Explanation:
+/// - flutter_rust_bridge: https://cjycode.com/flutter_rust_bridge/manual/miscellaneous/web-cross-origin#when-flutter-run
 Future<void> main() async {
   await CatalystKeyDerivation.init();
   runApp(const MyApp());

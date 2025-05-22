@@ -4,12 +4,14 @@
 
 use std::sync::LazyLock;
 
+use catalyst_types::hashes::BLAKE_2B224_SIZE;
 use const_format::concatcp;
 use pallas::ledger::addresses::{Address, ShelleyAddress};
 use poem_openapi::{
     registry::{MetaExternalDocument, MetaSchema, MetaSchemaRef},
     types::{Example, ParseError, ParseFromJSON, ParseFromParameter, ParseResult, ToJSON, Type},
 };
+use regex::Regex;
 use serde_json::Value;
 
 use crate::service::common::types::string_types::impl_string_types;
@@ -34,7 +36,7 @@ const ENCODED_STAKED_ADDR_LEN: usize = 98;
 const ENCODED_UNSTAKED_ADDR_LEN: usize = 53;
 /// Regex Pattern
 const PATTERN: &str = concatcp!(
-    "(",
+    "^(",
     PROD,
     "|",
     TEST,
@@ -46,10 +48,13 @@ const PATTERN: &str = concatcp!(
     BECH32,
     "{",
     ENCODED_STAKED_ADDR_LEN,
-    "})"
+    "})$"
 );
+
+/// Header length
+const HEADER_LEN: usize = 1;
 /// Length of the decoded address.
-const DECODED_UNSTAKED_ADDR_LEN: usize = 28;
+const DECODED_UNSTAKED_ADDR_LEN: usize = BLAKE_2B224_SIZE;
 /// Length of the decoded address.
 const DECODED_STAKED_ADDR_LEN: usize = DECODED_UNSTAKED_ADDR_LEN * 2;
 /// Minimum length
@@ -79,18 +84,21 @@ static SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| {
     }
 });
 
-/// Because ALL the constraints are defined above, we do not ever need to define them in
-/// the API. BUT we do need to make a validator.
-/// This helps enforce uniform validation.
+/// Validate `Cip19ShelleyAddress` This part is done separately from the `PATTERN`
 fn is_valid(addr: &str) -> bool {
-    // Just check the string can be safely converted into the type.
-    if let Ok((hrp, addr)) = bech32::decode(addr) {
-        let hrp = hrp.as_str();
-        (addr.len() == DECODED_UNSTAKED_ADDR_LEN || addr.len() == DECODED_STAKED_ADDR_LEN)
-            && (hrp == PROD || hrp == TEST)
-    } else {
-        false
+    /// Regex to validate `Cip19ShelleyAddress`
+    #[allow(clippy::unwrap_used)] // Safe because the Regex is constant.
+    static RE: LazyLock<Regex> = LazyLock::new(|| Regex::new(PATTERN).unwrap());
+
+    if RE.is_match(addr) {
+        if let Ok((hrp, addr)) = bech32::decode(addr) {
+            let hrp = hrp.as_str();
+            return (addr.len() == (DECODED_UNSTAKED_ADDR_LEN + HEADER_LEN)
+                || addr.len() == (DECODED_STAKED_ADDR_LEN + HEADER_LEN))
+                && (hrp == PROD || hrp == TEST);
+        }
     }
+    false
 }
 
 impl_string_types!(
@@ -119,7 +127,7 @@ impl TryFrom<ShelleyAddress> for Cip19ShelleyAddress {
     fn try_from(addr: ShelleyAddress) -> Result<Self, Self::Error> {
         let addr_str = addr
             .to_bech32()
-            .map_err(|e| anyhow::anyhow!(format!("Invalid payment address {e}")))?;
+            .map_err(|e| anyhow::anyhow!(format!("Invalid Shelley address {e}")))?;
         Ok(Self(addr_str))
     }
 }
@@ -132,7 +140,7 @@ impl TryInto<ShelleyAddress> for Cip19ShelleyAddress {
         let address = Address::from_bech32(address_str)?;
         match address {
             Address::Shelley(address) => Ok(address),
-            _ => Err(anyhow::anyhow!("Invalid payment address")),
+            _ => Err(anyhow::anyhow!("Invalid Shelley address")),
         }
     }
 }
@@ -140,5 +148,51 @@ impl TryInto<ShelleyAddress> for Cip19ShelleyAddress {
 impl Example for Cip19ShelleyAddress {
     fn example() -> Self {
         Self(EXAMPLE.to_owned())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_cip19_shelley_address() {
+        // Test Vector: <https://cips.cardano.org/cip/CIP-19>
+        // cspell: disable
+        let valid = [
+            EXAMPLE,
+            "addr1qx2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3n0d3vllmyqwsx5wktcd8cc3sq835lu7drv2xwl2wywfgse35a3x", 
+            "addr1z8phkx6acpnf78fuvxn0mkew3l0fd058hzquvz7w36x4gten0d3vllmyqwsx5wktcd8cc3sq835lu7drv2xwl2wywfgs9yc0hh", 
+            "addr1yx2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzerkr0vd4msrxnuwnccdxlhdjar77j6lg0wypcc9uar5d2shs2z78ve",
+            "addr1x8phkx6acpnf78fuvxn0mkew3l0fd058hzquvz7w36x4gt7r0vd4msrxnuwnccdxlhdjar77j6lg0wypcc9uar5d2shskhj42g",
+            "addr1vx2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzers66hrl8",
+            "addr1w8phkx6acpnf78fuvxn0mkew3l0fd058hzquvz7w36x4gtcyjy7wx",
+            "addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3n0d3vllmyqwsx5wktcd8cc3sq835lu7drv2xwl2wywfgs68faae",
+            "addr_test1zrphkx6acpnf78fuvxn0mkew3l0fd058hzquvz7w36x4gten0d3vllmyqwsx5wktcd8cc3sq835lu7drv2xwl2wywfgsxj90mg",
+            "addr_test1yz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzerkr0vd4msrxnuwnccdxlhdjar77j6lg0wypcc9uar5d2shsf5r8qx",
+            "addr_test1xrphkx6acpnf78fuvxn0mkew3l0fd058hzquvz7w36x4gt7r0vd4msrxnuwnccdxlhdjar77j6lg0wypcc9uar5d2shs4p04xh",
+            "addr_test1vz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzerspjrlsz",
+            "addr_test1wrphkx6acpnf78fuvxn0mkew3l0fd058hzquvz7w36x4gtcl6szpr",
+        ];
+
+        let invalid = [
+            "addr1gx2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer5pnz75xxcrzqf96k",
+            "addr128phkx6acpnf78fuvxn0mkew3l0fd058hzquvz7w36x4gtupnz75xxcrtw79hu",
+            "stake1uyehkck0lajq8gr28t9uxnuvgcqrc6070x3k9r8048z8y5gh6ffgw",
+            "stake178phkx6acpnf78fuvxn0mkew3l0fd058hzquvz7w36x4gtcccycj5",
+            "addr_test1gz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer5pnz75xxcrdw5vky",
+            "addr_test12rphkx6acpnf78fuvxn0mkew3l0fd058hzquvz7w36x4gtupnz75xxcryqrvmw",
+            "stake_test1uqehkck0lajq8gr28t9uxnuvgcqrc6070x3k9r8048z8y5gssrtvn",
+            "stake_test17rphkx6acpnf78fuvxn0mkew3l0fd058hzquvz7w36x4gtcljw6kf",
+            "",
+        ];
+        // cspell: enable
+
+        for v in valid {
+            assert!(Cip19ShelleyAddress::parse_from_parameter(v).is_ok());
+        }
+        for v in invalid {
+            assert!(Cip19ShelleyAddress::parse_from_parameter(v).is_err());
+        }
     }
 }

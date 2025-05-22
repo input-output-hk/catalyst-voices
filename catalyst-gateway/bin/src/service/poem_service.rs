@@ -13,6 +13,7 @@ use super::{
     common::auth::{api_key::API_KEY_HEADER, rbac::scheme::AUTHORIZATION_HEADER},
     utilities::middleware::{
         db_check::DatabaseConnectionCheck, metrics_updater::MetricsUpdaterMiddleware,
+        node_info::CatGatewayInfo
     },
 };
 use crate::{
@@ -54,6 +55,7 @@ fn mk_app(base_route: Option<Route>) -> impl Endpoint {
         .with(CatchPanic::new().with_handler(ServicePanicHandler))
         .with(Tracing)
         .with(DatabaseConnectionCheck)
+        .with(CatGatewayInfo)
         .with(
             SensitiveHeader::new()
                 .header(API_KEY_HEADER)
