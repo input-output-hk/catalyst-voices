@@ -27,29 +27,21 @@ class CampaignStageCubit extends Cubit<CampaignStageState> {
   Future<void> getCampaignStage() async {
     try {
       emit(const LoadingCampaignStage());
-      final campaignTimeline = await _campaignService.getCampaignTimeline();
-
-      final now = DateTime.now();
-      final proposalSubmissionStage = campaignTimeline.firstWhere(
-        (e) => e.stage == CampaignTimelineStage.proposalSubmission,
-        orElse: () => throw const NotFoundException(
-          message: 'Proposal submission stage not found',
-        ),
+      final campaignTimeline = await _campaignService.getCampaignTimelineByStage(
+        CampaignTimelineStage.proposalSubmission,
       );
+      final dateRangeStatus = campaignTimeline.timeline.rangeStatusNow();
+      final startDate = campaignTimeline.timeline.from;
+      final endDate = campaignTimeline.timeline.to;
 
-      if (proposalSubmissionStage.timeline.isInRange(now)) {
-        emit(const ProposalSubmissionStage());
-        _startCountdownTimer(proposalSubmissionStage.timeline.to);
-      } else if (proposalSubmissionStage.timeline.isBeforeRange(now)) {
-        emit(
-          PreProposalSubmissionStage(
-            startDate: proposalSubmissionStage.timeline.from,
-          ),
-        );
-      } else {
-        emit(const AfterProposalSubmissionStage());
-      }
-      _logger.info(state.toString());
+      return switch (dateRangeStatus) {
+        DateRangeStatus.after => emit(const AfterProposalSubmissionStage()),
+        DateRangeStatus.before => emit(PreProposalSubmissionStage(startDate: startDate)),
+        DateRangeStatus.inRange => {
+            _startCountdownTimer(endDate),
+            emit(const ProposalSubmissionStage()),
+          }
+      };
     } catch (error, stackTrace) {
       _logger.severe('getCampaignStage error', error, stackTrace);
       emit(const ErrorSubmissionStage(LocalizedUnknownException()));

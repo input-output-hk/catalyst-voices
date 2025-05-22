@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 
@@ -56,24 +57,21 @@ class LinkText extends StatelessWidget with LaunchUrlMixin {
 
     return DefaultSelectionStyle(
       mouseCursor: enabled ? SystemMouseCursors.click : null,
-      child: MouseRegion(
-        cursor: enabled ? SystemMouseCursors.click : SystemMouseCursors.none,
-        child: GestureDetector(
-          onTap: enabled
-              ? onTap ??
-                  () {
-                    final uri = this.uri ?? Uri.tryParse(data);
-                    if (uri != null) {
-                      unawaited(launchUri(uri));
-                    }
+      child: VoicesGestureDetector(
+        onTap: enabled
+            ? onTap ??
+                () {
+                  final uri = this.uri ?? Uri.tryParse(data);
+                  if (uri != null) {
+                    unawaited(launchUri(uri));
                   }
-              : null,
-          child: DefaultTextStyle.merge(
-            style: style,
-            child: Text(
-              data,
-              style: effectiveStyle,
-            ),
+                }
+            : null,
+        child: DefaultTextStyle.merge(
+          style: style,
+          child: Text(
+            data,
+            style: effectiveStyle,
           ),
         ),
       ),

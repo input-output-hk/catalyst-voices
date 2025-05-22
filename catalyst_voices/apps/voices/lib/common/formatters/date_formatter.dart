@@ -17,7 +17,6 @@ abstract class DateFormatter {
         return '${l10n.weekOf} ${DateFormat.MMMd().format(from)}';
       }
 
-      // ignore: lines_longer_than_80_chars
       return '${DateFormat.MMMd().format(from)} - ${DateFormat.MMMd().format(to)}';
     } else if (to == null && from != null) {
       return '${l10n.from} ${DateFormat.MMMd().format(from)}';

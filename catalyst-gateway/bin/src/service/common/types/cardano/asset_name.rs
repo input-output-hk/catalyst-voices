@@ -2,10 +2,12 @@
 
 use std::sync::LazyLock;
 
+use const_format::concatcp;
 use poem_openapi::{
     registry::{MetaSchema, MetaSchemaRef},
     types::{Example, ParseError, ParseFromJSON, ParseFromParameter, ParseResult, ToJSON, Type},
 };
+use regex::Regex;
 use serde_json::Value;
 
 use crate::service::common::types::string_types::impl_string_types;
@@ -17,14 +19,19 @@ const DESCRIPTION: &str = r"The name given to the native asset when it was minte
 If the name can be converted to UTF8, its string is represented directly.
 Otherwise it will be represented as escaped ascii.
 Any `\` present in the name will be replaced with `\\` in all cases.";
+
 /// Example.
 const EXAMPLE: &str = "My Cool\nAsset";
+/// Maximum asset name in bytes.
+const ASSET_NAME_MAX_BYTES: usize = 32;
 /// Minimum length.
 const MIN_LENGTH: usize = 0;
-/// Maximum length. (True length is 32, but escaping can double its size).
-const MAX_LENGTH: usize = 64;
+/// Maximum length calculated from maximum length of escaped string * max number of bytes
+/// of asset name. <https://www.gnu.org/software/gawk/manual/html_node/Escape-Sequences.html>
+const MAX_LENGTH: usize = ASSET_NAME_MAX_BYTES * 4;
 /// Validation Regex Pattern
-const PATTERN: &str = r"[\S\s]{0,64}";
+/// Can be anything
+const PATTERN: &str = concatcp!(r"^[\S\s]{", "0,", MAX_LENGTH, "}$");
 
 /// Schema.
 static SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| {
@@ -39,12 +46,12 @@ static SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| {
     }
 });
 
-/// Because ALL the constraints are defined above, we do not ever need to define them in
-/// the API. BUT we do need to make a validator.
-/// This helps enforce uniform validation.
-fn is_valid(_name: &str) -> bool {
-    // Anything is valid.
-    true
+/// Validate `AssetName` This part is done separately from the `PATTERN`
+fn is_valid(name: &str) -> bool {
+    /// Regex to validate `AssetName`
+    #[allow(clippy::unwrap_used)] // Safe because the Regex is constant.
+    static RE: LazyLock<Regex> = LazyLock::new(|| Regex::new(PATTERN).unwrap());
+    RE.is_match(name)
 }
 
 impl_string_types!(
@@ -78,5 +85,33 @@ impl From<Vec<u8>> for AssetName {
 impl From<String> for AssetName {
     fn from(value: String) -> Self {
         Self(value)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_asset_name() {
+        let escape_octal = r"\nnn".repeat(32);
+        // Test Data
+        // <https://preprod.cardanoscan.io/tokens>
+        let valid = [
+            EXAMPLE,
+            "This_Is_A_Very_Long_String______",
+            &escape_octal,
+            "SPLASH",
+        ];
+        for v in valid {
+            assert!(AssetName::parse_from_parameter(v).is_ok());
+        }
+        let invalid = [
+            // Add additional char
+            &format!("{escape_octal}a"),
+        ];
+        for v in invalid {
+            assert!(AssetName::parse_from_parameter(v).is_err());
+        }
     }
 }
