@@ -441,6 +441,10 @@ final class TransactionBuilder extends Equatable {
     builder = builder.withFee(newFee);
 
     if (!changeLeft.isZero) {
+      // No new transaction output needed at this stage,
+      // since the method is only called when multi assets exist
+      // then at least one transaction output for them is created
+      // which we can reuse here for the remaining change.
       builder = builder._addChangeToLastOutput(change: changeLeft);
     }
 
