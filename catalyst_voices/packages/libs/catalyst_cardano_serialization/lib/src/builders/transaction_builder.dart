@@ -423,10 +423,9 @@ final class TransactionBuilder extends Equatable {
         final feeForChange = TransactionOutputBuilder.feeForOutput(
           config,
           changeOutput,
-          numOutputs: outputs.length,
         );
 
-        newFee = newFee + feeForChange;
+        newFee += feeForChange;
 
         final changeAdaPlusFee = changeOutput.amount.coin + newFee;
         if (changeLeft.coin < changeAdaPlusFee) {
@@ -476,7 +475,6 @@ final class TransactionBuilder extends Equatable {
             address: address,
             amount: changeEstimator,
           ),
-          numOutputs: outputs.length,
         );
 
         final newFee = fee + feeForChange;
@@ -768,9 +766,8 @@ final class TransactionOutputBuilder {
   /// sufficient.
   static Coin feeForOutput(
     TransactionBuilderConfig config,
-    ShelleyMultiAssetTransactionOutput output, {
-    required int numOutputs,
-  }) =>
+    ShelleyMultiAssetTransactionOutput output,
+  ) =>
       Coin(
         cbor.encode(output.toCbor()).length * config.feeAlgo.coefficient,
       );

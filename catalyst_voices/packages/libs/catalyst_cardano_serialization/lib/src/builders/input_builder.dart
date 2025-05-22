@@ -261,7 +261,6 @@ final class InputBuilder implements CoinSelector {
     final changeFee = TransactionOutputBuilder.feeForOutput(
       builder.config,
       output,
-      numOutputs: builder.outputs.length,
     );
     final minAda = TransactionOutputBuilder.minimumAdaForOutput(
       output,

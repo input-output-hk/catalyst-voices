@@ -421,7 +421,7 @@ final class SelectionUtils {
       config.coinsPerUtxoByte,
     );
 
-    final outputFee = TransactionOutputBuilder.feeForOutput(config, output, numOutputs: 1);
+    final outputFee = TransactionOutputBuilder.feeForOutput(config, output);
     final totalFee = minAda + outputFee;
 
     return coin < totalFee
