@@ -441,11 +441,7 @@ final class TransactionBuilder extends Equatable {
     builder = builder.withFee(newFee);
 
     if (!changeLeft.isZero) {
-      final outputs = List.of(builder.outputs);
-      final lastOutput = outputs.removeLast();
-      final newOutput = lastOutput.copyWith(amount: lastOutput.amount + changeLeft);
-      outputs.add(newOutput);
-      builder = builder.copyWith(outputs: outputs);
+      builder = _addChangeToLastOutput(change: changeLeft);
     }
 
     return builder;
@@ -456,11 +452,13 @@ final class TransactionBuilder extends Equatable {
     required Coin fee,
     required Balance changeEstimator,
   }) {
+    final changeOutput = PreBabbageTransactionOutput(
+      address: address,
+      amount: changeEstimator,
+    );
+
     final minAda = TransactionOutputBuilder.minimumAdaForOutput(
-      PreBabbageTransactionOutput(
-        address: address,
-        amount: changeEstimator,
-      ),
+      changeOutput,
       config.coinsPerUtxoByte,
     );
 
@@ -469,14 +467,7 @@ final class TransactionBuilder extends Equatable {
         // burn remaining change as fee
         return withFee(changeEstimator.coin);
       case true:
-        final feeForChange = TransactionOutputBuilder.feeForOutput(
-          config,
-          PreBabbageTransactionOutput(
-            address: address,
-            amount: changeEstimator,
-          ),
-        );
-
+        final feeForChange = TransactionOutputBuilder.feeForOutput(config, changeOutput);
         final newFee = fee + feeForChange;
 
         switch (changeEstimator.coin >= minAda) {
@@ -492,6 +483,40 @@ final class TransactionBuilder extends Equatable {
             );
         }
     }
+  }
+
+  /// Removes the last transaction output and inserts a new one with extra [change].
+  /// Updates the [fee] to accommodate a possibly larger new transaction output.
+  TransactionBuilder _addChangeToLastOutput({
+    required Balance change,
+  }) {
+    final newOutputs = List.of(outputs);
+    var changeLeft = change;
+    var newFee = fee!;
+
+    // remove old output
+    final lastOutput = newOutputs.removeLast();
+    final lastOutputFee = TransactionOutputBuilder.feeForOutput(config, lastOutput);
+    newFee -= lastOutputFee;
+    changeLeft += Balance(coin: lastOutputFee);
+
+    // create new output with remaining change
+    final newOutput = lastOutput.copyWith(amount: lastOutput.amount + changeLeft);
+    final newOutputFee = TransactionOutputBuilder.feeForOutput(config, newOutput);
+
+    // subtract the fee for the new output from it
+    final newOutputMinusFee = newOutput.copyWith(
+      amount: newOutput.amount - Balance(coin: newOutputFee),
+    );
+    newFee += newOutputFee;
+    changeLeft -= Balance(coin: newFee);
+
+    // add new output
+    newOutputs.add(newOutputMinusFee);
+    return copyWith(
+      outputs: newOutputs,
+      fee: newFee,
+    );
   }
 
   /// Returns true if adding additional [assetToAdd] to [currentAssets]
