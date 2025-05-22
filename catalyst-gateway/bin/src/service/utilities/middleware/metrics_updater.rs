@@ -9,6 +9,7 @@ use poem::{
 };
 use prometheus::{Encoder, Registry, TextEncoder};
 
+/// The function type to call when a request sent to the endpoint.
 type UpdateFn = fn();
 
 /// A Middleware wrapping the Prometheus registry to report as metrics.

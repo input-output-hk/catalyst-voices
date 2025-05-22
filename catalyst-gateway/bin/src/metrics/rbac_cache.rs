@@ -90,7 +90,10 @@ pub(crate) fn update() {
     let chain_size = size_of::<RegistrationChain>();
     let key_size = size_of::<CatalystId>();
 
-    let approx_mem_used = (chain_size + key_size) * rbac_entries;
+    let approx_mem_used = chain_size
+        .checked_add(key_size)
+        .and_then(|sum| sum.checked_mul(rbac_entries))
+        .unwrap_or_default();
 
     reporter::MAX_CACHE_SIZE
         .with_label_values(&[&api_host_names, service_id, &network])

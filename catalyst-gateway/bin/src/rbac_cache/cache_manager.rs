@@ -47,13 +47,11 @@ impl RbacCacheManager {
     /// returned.
     #[allow(clippy::result_large_err)]
     pub fn add(&self, registration: Cip509, is_persistent: bool) -> AddResult {
-        let result = if is_persistent {
+        if is_persistent {
             self.persistent.add(registration.clone())
         } else {
             self.volatile.add(registration)
-        };
-
-        result
+        }
     }
 
     /// Returns a registration chain by the given Catalyst ID.
@@ -104,7 +102,10 @@ impl RbacCacheManager {
 
     /// Returns the number of cached chain entries from both persistent and volatile.
     pub fn rbac_entries(&self) -> usize {
-        self.persistent.chain_entries() + self.volatile.chain_entries()
+        self.persistent
+            .chain_entries()
+            .checked_add(self.volatile.chain_entries())
+            .unwrap_or_default()
     }
 }
 
