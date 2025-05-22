@@ -42,7 +42,7 @@ abstract interface class UserService implements ActiveAware {
   /// contrary to [useAccount] which doesn't have such logic.
   ///
   /// Throws [EmailAlreadyUsedException] if [Account.email] already taken.
-  /// 
+  ///
   /// Due to impossibility to validate the email before registering
   /// the account will be still registered and afterwards
   /// the [EmailAlreadyUsedException] thrown in case of non-unique email.
