@@ -1,4 +1,5 @@
 import 'package:catalyst_voices/widgets/common/label_decorator.dart';
+import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 
 /// A Voices Radio widget that combines a Radio button with optional
@@ -39,20 +40,17 @@ class VoicesRadio<T extends Object> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MouseRegion(
-      cursor: SystemMouseCursors.click,
-      child: GestureDetector(
-        onTap: onChanged != null ? _changeGroupValue : null,
-        behavior: HitTestBehavior.opaque,
-        child: LabelDecorator(
-          label: label,
-          note: note,
-          child: Radio(
-            value: value,
-            groupValue: groupValue,
-            onChanged: onChanged,
-            toggleable: toggleable,
-          ),
+    return VoicesGestureDetector(
+      onTap: onChanged != null ? _changeGroupValue : null,
+      behavior: HitTestBehavior.opaque,
+      child: LabelDecorator(
+        label: label,
+        note: note,
+        child: Radio(
+          value: value,
+          groupValue: groupValue,
+          onChanged: onChanged,
+          toggleable: toggleable,
         ),
       ),
     );

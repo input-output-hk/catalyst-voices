@@ -244,15 +244,12 @@ class _TapDetector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MouseRegion(
-      cursor: SystemMouseCursors.click,
-      onExit: (event) => onHoverExit(),
-      child: GestureDetector(
-        onTap: onTap,
-        // there is a gap between text and copy
-        behavior: HitTestBehavior.translucent,
-        child: child,
-      ),
+    return VoicesGestureDetector(
+      onTap: onTap,
+      // there is a gap between text and copy
+      behavior: HitTestBehavior.translucent,
+      mouseRegionOnExit: (event) => onHoverExit(),
+      child: child,
     );
   }
 }

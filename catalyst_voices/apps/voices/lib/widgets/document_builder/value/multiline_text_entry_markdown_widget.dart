@@ -70,9 +70,9 @@ class _MultilineTextEntryMarkdownWidgetState extends State<MultilineTextEntryMar
           ),
         VoicesRichText(
           controller: _controller,
-          enabled: widget.isEditMode,
           focusNode: _focus,
           scrollController: _scrollController,
+          enabled: widget.isEditMode,
           minHeight: 160,
           charsLimit: _maxLength,
           onChanged: _onChanged,
@@ -144,8 +144,10 @@ class _MultilineTextEntryMarkdownWidgetState extends State<MultilineTextEntryMar
     widget.onChanged([change]);
   }
 
-  void _onChanged(MarkdownData? markdownData) {
-    _onChangedDebouncer.run(() => _dispatchChange(markdownData));
+  void _onChanged(MarkdownData? _) {
+    // Get markdown data from the controller, the method argument might
+    // already not be what latest controller holds due to debouncer delay.
+    _onChangedDebouncer.run(() => _dispatchChange(_controller.markdownData));
   }
 
   void _toggleEditMode() {
