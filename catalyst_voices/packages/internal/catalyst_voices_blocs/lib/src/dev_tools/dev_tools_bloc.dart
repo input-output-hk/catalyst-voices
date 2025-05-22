@@ -11,18 +11,22 @@ final _logger = Logger('DevToolsBloc');
 final class DevToolsBloc extends Bloc<DevToolsEvent, DevToolsState>
     with BlocSignalEmitterMixin<DevToolsSignal, DevToolsState> {
   final DevToolsService _devToolsService;
+  final SyncManager _syncManager;
 
   Timer? _resetCountTimer;
 
   DevToolsBloc(
     this._devToolsService,
+    this._syncManager,
   ) : super(const DevToolsState()) {
     on<DevToolsEnablerTappedEvent>(_handleEnablerTap);
     on<DevToolsEnablerTapResetEvent>(_handleTapCountReset);
-    on<RecoverConfigEvent>(_handleRecoverConfig);
+    on<RecoverDataEvent>(_handleRecoverData);
     on<UpdateSystemInfoEvent>(_handleUpdateSystemInfo);
+    on<SyncDocumentsEvent>(_handleSyncDocuments);
+    on<UpdateAllEvent>(_handleUpdateAll);
 
-    add(const RecoverConfigEvent());
+    add(const RecoverDataEvent());
   }
 
   @override
@@ -67,14 +71,32 @@ final class DevToolsBloc extends Bloc<DevToolsEvent, DevToolsState>
     );
   }
 
-  Future<void> _handleRecoverConfig(
-    RecoverConfigEvent event,
+  Future<void> _handleRecoverData(
+    RecoverDataEvent event,
     Emitter<DevToolsState> emit,
   ) async {
     final isDeveloper = await _devToolsService.isDeveloper();
+    final syncStats = await _devToolsService.getStats();
 
     if (!isClosed) {
-      emit(state.copyWith(isDeveloper: isDeveloper));
+      emit(state.copyWith(isDeveloper: isDeveloper, syncStats: Optional(syncStats)));
+    }
+  }
+
+  Future<void> _handleSyncDocuments(
+    SyncDocumentsEvent event,
+    Emitter<DevToolsState> emit,
+  ) async {
+    try {
+      await _syncManager.start();
+
+      final syncStats = await _devToolsService.getStats();
+
+      if (!isClosed) {
+        emit(state.copyWith(syncStats: Optional(syncStats)));
+      }
+    } catch (error, stack) {
+      _logger.warning('Sync failed', error, stack);
     }
   }
 
@@ -86,6 +108,22 @@ final class DevToolsBloc extends Bloc<DevToolsEvent, DevToolsState>
     _resetCountTimer = null;
 
     emit(state.copyWith(enableTapCount: 0));
+  }
+
+  Future<void> _handleUpdateAll(
+    UpdateAllEvent event,
+    Emitter<DevToolsState> emit,
+  ) async {
+    try {
+      final systemInfo = await _devToolsService.getSystemInfo();
+      final syncStats = await _devToolsService.getStats();
+
+      if (!isClosed) {
+        emit(state.copyWith(systemInfo: Optional(systemInfo), syncStats: Optional(syncStats)));
+      }
+    } catch (error, stack) {
+      _logger.warning('Updating all failed', error, stack);
+    }
   }
 
   Future<void> _handleUpdateSystemInfo(

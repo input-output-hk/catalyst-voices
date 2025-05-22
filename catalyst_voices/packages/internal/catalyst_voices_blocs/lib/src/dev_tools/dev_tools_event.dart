@@ -15,8 +15,16 @@ sealed class DevToolsEvent extends Equatable {
   List<Object?> get props => [];
 }
 
-final class RecoverConfigEvent extends DevToolsEvent {
-  const RecoverConfigEvent();
+final class RecoverDataEvent extends DevToolsEvent {
+  const RecoverDataEvent();
+}
+
+final class SyncDocumentsEvent extends DevToolsEvent {
+  const SyncDocumentsEvent();
+}
+
+final class UpdateAllEvent extends DevToolsEvent {
+  const UpdateAllEvent();
 }
 
 final class UpdateSystemInfoEvent extends DevToolsEvent {

@@ -4,8 +4,11 @@ import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 abstract interface class DevToolsService {
   const factory DevToolsService(
     DevToolsRepository devToolsRepository,
+    SyncStatsStorage syncStatsStorage,
     AppConfig config,
   ) = DevToolsServiceImpl;
+
+  Future<SyncStats> getStats();
 
   Future<SystemInfo> getSystemInfo();
 
@@ -16,12 +19,17 @@ abstract interface class DevToolsService {
 
 final class DevToolsServiceImpl implements DevToolsService {
   final DevToolsRepository _devToolsRepository;
+  final SyncStatsStorage _syncStatsStorage;
   final AppConfig _config;
 
   const DevToolsServiceImpl(
     this._devToolsRepository,
+    this._syncStatsStorage,
     this._config,
   );
+
+  @override
+  Future<SyncStats> getStats() => _syncStatsStorage.read();
 
   @override
   Future<SystemInfo> getSystemInfo() async {
