@@ -23,21 +23,18 @@ impl ChainInfo {
         let mut chain = None;
         let mut last_persistent_txn = None;
         let mut last_volatile_txn = None;
-        // TODO: FIXME:
         let mut last_persistent_slot = 0.into();
 
         if let Some(c) = persistent_chain {
             last_persistent_txn = Some(c.current_tx_id_hash());
+            last_persistent_slot = c.current_point().slot_or_default();
             chain = Some(c);
         };
         if let Some(c) = volatile_chain {
             last_volatile_txn = Some(c.current_tx_id_hash());
             chain = Some(c);
         };
-
-        let Some(chain) = chain else {
-            return None;
-        };
+        let chain = chain?;
 
         Some(Self {
             chain,

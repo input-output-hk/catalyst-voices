@@ -35,7 +35,7 @@ use crate::{
 };
 
 /// Get RBAC registration endpoint.
-pub(crate) async fn endpoint(
+pub(crate) fn endpoint(
     lookup: Option<CatIdOrStake>, token: Option<CatalystRBACTokenV1>,
 ) -> AllResponses {
     let (persistent_chain, volatile_chain) = match lookup {
