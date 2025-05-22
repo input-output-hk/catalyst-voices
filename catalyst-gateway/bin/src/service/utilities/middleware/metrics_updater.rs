@@ -6,8 +6,13 @@ use prometheus::{Encoder, Registry, TextEncoder};
 
 type UpdateFn = fn();
 
+/// A Middleware wrapping the Prometheus registry to report as metrics.
+///
+/// The middleware is originally from `poem::endpoint::PrometheusExporter`.
 pub struct MetricsUpdaterMiddleware {
+    /// The Prometheus registry.
     registry: Registry,
+    /// The updater function, called for every request for this endpoint.
     updater: UpdateFn,
 }
 

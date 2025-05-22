@@ -32,31 +32,54 @@ pub(crate) fn init_metrics_reporter() {
                 .with_label_values(&[&api_host_names, service_id, &network])
                 .set(i64::try_from(start_up_time.as_millis()).unwrap_or(-1));
         }
-        if let Event::RbacRegistrationChainAdded { .. } = event {}
         if let Event::CacheAccessed {
-            is_found, latency, ..
+            is_found,
+            is_persistent,
+            latency,
+            ..
         } = event
         {
-            reporter::CACHE_ACCESS
-                .with_label_values(&[&api_host_names, service_id, &network])
-                .inc();
-
-            if *is_found {
-                reporter::CACHE_HIT
+            if *is_persistent {
+                reporter::PERSISTENT_CACHE_ACCESS
                     .with_label_values(&[&api_host_names, service_id, &network])
                     .inc();
+
+                if *is_found {
+                    reporter::PERSISTENT_CACHE_HIT
+                        .with_label_values(&[&api_host_names, service_id, &network])
+                        .inc();
+                } else {
+                    reporter::PERSISTENT_CACHE_MISS
+                        .with_label_values(&[&api_host_names, service_id, &network])
+                        .inc();
+                }
+            } else {
+                reporter::VOLATILE_CACHE_ACCESS
+                    .with_label_values(&[&api_host_names, service_id, &network])
+                    .inc();
+
+                if *is_found {
+                    reporter::VOLATILE_CACHE_HIT
+                        .with_label_values(&[&api_host_names, service_id, &network])
+                        .inc();
+                } else {
+                    reporter::VOLATILE_CACHE_MISS
+                        .with_label_values(&[&api_host_names, service_id, &network])
+                        .inc();
+                }
+            }
+
+            if *is_found {
                 reporter::LATENCY
                     .with_label_values(&[&api_host_names, service_id, &network])
                     .observe(latency.as_secs_f64());
-            } else {
-                reporter::CACHE_MISS
-                    .with_label_values(&[&api_host_names, service_id, &network])
-                    .inc();
             }
         }
     }));
 }
 
+/// Updates `MAX_CACHE_SIZE`, `CACHING_RBAC_ENTRIES`, and `CACHE_SIZE` metrics to current
+/// values.
 pub(crate) fn update() {
     let api_host_names = Settings::api_host_names().join(",");
     let service_id = Settings::service_id();
@@ -93,21 +116,61 @@ pub(crate) mod reporter {
     /// Labels for the metrics.
     const METRIC_LABELS: [&str; 3] = ["api_host_names", "service_id", "network"];
 
-    /// Total count of cache hits.
-    pub(crate) static CACHE_HIT: LazyLock<CounterVec> = LazyLock::new(|| {
-        register_counter_vec!("cache_hit", "Total count of cache hits", &METRIC_LABELS).unwrap()
-    });
-
-    /// Total count of cache misses.
-    pub(crate) static CACHE_MISS: LazyLock<CounterVec> = LazyLock::new(|| {
-        register_counter_vec!("cache_miss", "Total count of cache misses", &METRIC_LABELS).unwrap()
-    });
-
-    /// Total count of cache access attempts.
-    pub(crate) static CACHE_ACCESS: LazyLock<CounterVec> = LazyLock::new(|| {
+    /// Total count of cache hits for persistent.
+    pub(crate) static PERSISTENT_CACHE_HIT: LazyLock<CounterVec> = LazyLock::new(|| {
         register_counter_vec!(
-            "cache_access",
-            "Total count of cache access attempts",
+            "persistent_cache_hit",
+            "Total count of cache hits for persistent",
+            &METRIC_LABELS
+        )
+        .unwrap()
+    });
+
+    /// Total count of cache misses for persistent.
+    pub(crate) static PERSISTENT_CACHE_MISS: LazyLock<CounterVec> = LazyLock::new(|| {
+        register_counter_vec!(
+            "persistent_cache_miss",
+            "Total count of cache misses for persistent",
+            &METRIC_LABELS
+        )
+        .unwrap()
+    });
+
+    /// Total count of cache access attempts for persistent.
+    pub(crate) static PERSISTENT_CACHE_ACCESS: LazyLock<CounterVec> = LazyLock::new(|| {
+        register_counter_vec!(
+            "persistent_cache_access",
+            "Total count of cache access attempts for persistent",
+            &METRIC_LABELS
+        )
+        .unwrap()
+    });
+
+    /// Total count of cache hits for volatile.
+    pub(crate) static VOLATILE_CACHE_HIT: LazyLock<CounterVec> = LazyLock::new(|| {
+        register_counter_vec!(
+            "volatile_cache_hit",
+            "Total count of cache hits for volatile",
+            &METRIC_LABELS
+        )
+        .unwrap()
+    });
+
+    /// Total count of cache misses for volatile.
+    pub(crate) static VOLATILE_CACHE_MISS: LazyLock<CounterVec> = LazyLock::new(|| {
+        register_counter_vec!(
+            "volatile_cache_miss",
+            "Total count of cache misses for volatile",
+            &METRIC_LABELS
+        )
+        .unwrap()
+    });
+
+    /// Total count of cache access attempts for volatile.
+    pub(crate) static VOLATILE_CACHE_ACCESS: LazyLock<CounterVec> = LazyLock::new(|| {
+        register_counter_vec!(
+            "volatile_cache_access",
+            "Total count of cache access attempts for volatile",
             &METRIC_LABELS
         )
         .unwrap()

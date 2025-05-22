@@ -10,11 +10,6 @@ pub(crate) enum RbacCacheManagerEvent {
         /// Time taken to complete startup.
         start_up_time: Duration,
     },
-    /// Emitted when a new RBAC registration chain is added.
-    RbacRegistrationChainAdded {
-        /// Whether the chain is stored persistently.
-        is_persistent: bool,
-    },
     /// Emitted when the cache is accessed.
     CacheAccessed {
         /// Time taken to access the cache.

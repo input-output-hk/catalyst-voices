@@ -13,7 +13,7 @@ use super::{event, event::EventTarget};
 use crate::rbac_cache::{add_result::AddResult, cache::RbacCache};
 
 /// The capacity of the broadcast channel buffer.
-const BROADCAST_CHANNEL_CAPACITY: usize = 128;
+const BROADCAST_CHANNEL_CAPACITY: usize = 1000;
 
 /// A wrapper that allows managing both persistent and volatile caches at the same time.
 pub struct RbacCacheManager {
@@ -52,10 +52,6 @@ impl RbacCacheManager {
         } else {
             self.volatile.add(registration)
         };
-
-        self.dispatch_event(event::RbacCacheManagerEvent::RbacRegistrationChainAdded {
-            is_persistent,
-        });
 
         result
     }
