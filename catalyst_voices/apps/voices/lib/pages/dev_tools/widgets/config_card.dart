@@ -21,6 +21,7 @@ class ConfigCard extends StatelessWidget {
           reviewsUrl: state?.api.reviewsUrl,
           networkId: state?.blockchain.networkId,
           host: state?.blockchain.host,
+          // TODO(damian-molinski): use DTO after #2124 is merged.
           transactionBuilderConfig: state?.blockchain.transactionBuilderConfig.asMap(),
         );
       },

@@ -28,7 +28,7 @@ class _BuildNumberTextState extends State<BuildNumberText> {
   }
 
   @override
-  void didUpdateWidget(covariant BuildNumberText oldWidget) {
+  void didUpdateWidget(BuildNumberText oldWidget) {
     super.didUpdateWidget(oldWidget);
 
     if (widget.data != oldWidget.data) {
