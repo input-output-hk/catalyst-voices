@@ -3,14 +3,15 @@ import 'package:kiri_check/kiri_check.dart';
 import 'package:test/test.dart';
 
 import '../test_utils/selection_utils.dart';
+import '../test_utils/test_data.dart';
 
 void main() {
-  const config = SelectionUtils.defaultConfig;
+  final config = transactionBuilderConfig();
   final changeAddress = SelectionUtils.randomAddress();
 
   group('$TransactionBuilder Coin Selection Tests', () {
     test('selectInputs should throw an exception if funds are insufficient', () {
-      const builder = TransactionBuilder(config: config, inputs: {});
+      final builder = TransactionBuilder(config: config, inputs: const {});
 
       expect(
         builder.selectInputs,

@@ -2,7 +2,6 @@ import 'dart:math';
 import 'package:bip32_ed25519/bip32_ed25519.dart';
 import 'package:catalyst_cardano_serialization/src/address.dart';
 import 'package:catalyst_cardano_serialization/src/builders/transaction_builder.dart';
-import 'package:catalyst_cardano_serialization/src/fees.dart';
 import 'package:catalyst_cardano_serialization/src/hashes.dart';
 import 'package:catalyst_cardano_serialization/src/signature.dart';
 import 'package:catalyst_cardano_serialization/src/transaction.dart';
@@ -25,21 +24,6 @@ final class SelectionUtils {
         count,
         (int index) => Ed25519PrivateKey.seeded(count),
       );
-
-  /// The default configuration for transaction building.
-  ///
-  /// This configuration includes fee algorithm parameters, maximum transaction
-  /// size, maximum value size, and coins per UTxO byte.
-  static const defaultConfig = TransactionBuilderConfig(
-    feeAlgo: TieredFee(
-      constant: 155381,
-      coefficient: 44,
-      refScriptByteCost: 15,
-    ),
-    maxTxSize: 16384,
-    maxValueSize: 5000,
-    coinsPerUtxoByte: Coin(4310),
-  );
 
   /// Generates a random ASCII string of the specified length.
   ///

@@ -441,7 +441,7 @@ final class TransactionBuilder extends Equatable {
     builder = builder.withFee(newFee);
 
     if (!changeLeft.isZero) {
-      builder = _addChangeToLastOutput(change: changeLeft);
+      builder = builder._addChangeToLastOutput(change: changeLeft);
     }
 
     return builder;
