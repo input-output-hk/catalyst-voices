@@ -494,12 +494,11 @@ final class TransactionBuilder extends Equatable {
   TransactionBuilder _addChangeToLastOutput({
     required Balance change,
   }) {
-    final newOutputs = List.of(outputs);
     var changeLeft = change;
     var newFee = fee!;
 
     // remove old output
-    final lastOutput = newOutputs.removeLast();
+    final lastOutput = outputs.last;
     final lastOutputFee = TransactionOutputBuilder.feeForOutput(config, lastOutput);
     newFee -= lastOutputFee;
     changeLeft += Balance(coin: lastOutputFee);
@@ -515,12 +514,8 @@ final class TransactionBuilder extends Equatable {
     newFee += newOutputFee;
     changeLeft -= Balance(coin: newFee);
 
-    // add new output
-    newOutputs.add(newOutputMinusFee);
-    return copyWith(
-      outputs: newOutputs,
-      fee: newFee,
-    );
+    // add new output and modify the fee
+    return withOutput(newOutputMinusFee).withFee(newFee);
   }
 
   /// Returns true if adding additional [assetToAdd] to [currentAssets]
