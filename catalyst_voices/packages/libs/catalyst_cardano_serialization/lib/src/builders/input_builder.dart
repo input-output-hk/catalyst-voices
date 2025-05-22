@@ -1,5 +1,6 @@
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_cardano_serialization/src/builders/types.dart';
+import 'package:cbor/cbor.dart';
 
 /// A builder that constructs the minimal required transaction inputs from a set
 /// of inputs using a coin selection algorithm.
@@ -30,6 +31,9 @@ final class InputBuilder implements CoinSelector {
     int minInputs = CoinSelector.minInputs,
     int maxInputs = CoinSelector.maxInputs,
   }) {
+    // Cap max inputs limit to prevent transaction size explosion
+    // Each input adds 40 to 50 bytes + witness overhead, so 50 inputs is a large transaction
+    maxInputs = maxInputs.clamp(1, 50);
     final availableInputs = builder.inputs.toSet();
     final selectedInputs = <TransactionUnspentOutput>{};
 
@@ -187,6 +191,8 @@ final class InputBuilder implements CoinSelector {
   ///   - This method ensures the transaction remains valid by confirming that
   ///     the accumulated balance exceeds or equals the required amount plus
   ///     fees.
+  /// Calculates change outputs and the exact total fee using iterative approach.
+  /// Returns `(changeOutputs, totalFee)` or `null` if funds are insufficient.
   (List<ShelleyMultiAssetTransactionOutput>, Coin)? _getChangeAndFee(
     AssetId assetId,
     TransactionBuilder builder,
@@ -194,27 +200,84 @@ final class InputBuilder implements CoinSelector {
     Balance selectedTotal,
     Balance targetTotal,
   ) {
-    final minFee = builder.copyWith(inputs: selectedInputs).minFee(useWitnesses: true);
-    final minimumRequired = targetTotal + Balance(coin: minFee);
-
-    if (selectedTotal.lessThan(minimumRequired)) return null;
-
-    // Calculate the change to be returned, as the selected total is guaranteed
-    // to be larger.
-    final changeTotal = selectedTotal - minimumRequired;
-
-    final (changeOutputs, changeFee) = _buildChangeOutputs(
-      builder,
-      changeTotal,
-      minFee,
-    );
-
-    final requiredFee = minFee + changeFee;
-    if (selectedTotal.lessThan(targetTotal + Balance(coin: requiredFee))) {
-      return null;
+    if (builder.changeAddress == null) {
+      throw ArgumentError('Change address is required for fee calculation');
     }
 
-    return (changeOutputs, requiredFee);
+    var currentBuilder = builder.copyWith(inputs: selectedInputs);
+    var estimatedFee = currentBuilder.minFee(useWitnesses: true);
+    
+    // Add a dynamic buffer based on input complexity
+    // More inputs = higher buffer
+    // Testing showed more inputs required higher buffer
+    final inputCount = selectedInputs.length;
+    final bufferFactor = inputCount <= 5 
+        ? 1.03  // 3% 
+        : inputCount <= 20 
+            ? 1.05  // 5%
+            : 1.08; // 8%
+            
+    estimatedFee = Coin((estimatedFee.value * bufferFactor).ceil());
+        final minimumRequired = targetTotal + Balance(coin: estimatedFee);
+    if (selectedTotal.lessThan(minimumRequired)) {
+      return null;
+    }
+    
+    var remainingBalance = selectedTotal - minimumRequired;
+    
+     final maxIterations = inputCount <= 10 ? 3 : 5;
+     for (var iteration = 0; iteration < maxIterations; iteration++) {
+      final (changeOutputs, _) = _buildChangeOutputs(
+        currentBuilder,
+        remainingBalance,
+        estimatedFee,
+      );
+      final completeBuilder = currentBuilder.copyWith(
+        outputs: [...currentBuilder.outputs, ...changeOutputs],
+      );
+      
+      final actualFee = completeBuilder.minFee(useWitnesses: true);
+      
+       if ((actualFee.value - estimatedFee.value).abs() < 500) {
+         final bufferedFinalFee = Coin((actualFee.value * bufferFactor).ceil());
+         
+         final finalTotal = targetTotal + Balance(coin: bufferedFinalFee);
+         if (selectedTotal.lessThan(finalTotal)) {
+           return null;
+         }
+         
+         final finalChange = selectedTotal - finalTotal;
+         final (finalOutputs, _) = _buildChangeOutputs(
+           currentBuilder,
+           finalChange,
+           bufferedFinalFee,
+         );
+         
+         return (finalOutputs, bufferedFinalFee);
+       }
+      
+      estimatedFee = actualFee;
+      final newMinimum = targetTotal + Balance(coin: estimatedFee);
+      if (selectedTotal.lessThan(newMinimum)) {
+        return null;
+      }
+      remainingBalance = selectedTotal - newMinimum;
+    }
+    
+     final bufferedFallbackFee = Coin((estimatedFee.value * bufferFactor).ceil());
+     final finalTotal = targetTotal + Balance(coin: bufferedFallbackFee);
+     if (selectedTotal.lessThan(finalTotal)) {
+       return null;
+     }
+     
+     final finalChange = selectedTotal - finalTotal;
+     final (finalOutputs, _) = _buildChangeOutputs(
+       currentBuilder,
+       finalChange,
+       bufferedFallbackFee,
+     );
+     
+     return (finalOutputs, bufferedFallbackFee);
   }
 
   /// Constructs the change outputs and calculates their associated fees.
@@ -243,14 +306,17 @@ final class InputBuilder implements CoinSelector {
   (List<ShelleyMultiAssetTransactionOutput>, Coin) _buildChangeOutputs(
     TransactionBuilder builder,
     Balance remainingBalance,
-    Coin minFee,
+    Coin fee,
   ) {
-    if (remainingBalance.isZero) return ([], const Coin(0));
+    // If no change, return empty outputs and the fee
+    if (remainingBalance.isZero || remainingBalance.coin.value <= 0) {
+      return ([], fee);
+    }
+    
+    // Make sure we have a change address
     if (builder.changeAddress == null) {
       throw ArgumentError('Change address required for non-zero balance.');
     }
-
-    // Remove empty multiasset from the balance
     final normalizedBalance =
         remainingBalance.hasMultiAssets() ? remainingBalance : Balance(coin: remainingBalance.coin);
 
@@ -258,24 +324,16 @@ final class InputBuilder implements CoinSelector {
       address: builder.changeAddress!,
       amount: normalizedBalance,
     );
-    final changeFee = TransactionOutputBuilder.feeForOutput(
-      builder.config,
-      output,
-      numOutputs: builder.outputs.length,
-    );
     final minAda = TransactionOutputBuilder.minimumAdaForOutput(
       output,
       builder.config.coinsPerUtxoByte,
     );
 
-    final changeOutputs = <ShelleyMultiAssetTransactionOutput>[];
-    if (normalizedBalance.coin >= minAda + changeFee) {
-      changeOutputs.add(
-        output.copyWith(amount: normalizedBalance - Balance(coin: changeFee)),
-      );
-      return (changeOutputs, changeFee);
+    // minimum ADA requirements
+    if (normalizedBalance.coin >= minAda) {
+      return ([output], fee);
     } else {
-      return ([], minAda + changeFee);
+      return ([], fee);
     }
   }
 

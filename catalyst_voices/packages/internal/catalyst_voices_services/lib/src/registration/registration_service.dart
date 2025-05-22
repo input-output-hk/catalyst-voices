@@ -360,16 +360,7 @@ final class RegistrationServiceImpl implements RegistrationService {
       );
     }
 
-    final witnessSet = await enabledWallet.signTx(transaction: unsignedTx);
-
-    final signedTx = Transaction(
-      body: unsignedTx.body,
-      isValid: true,
-      witnessSet: witnessSet,
-      auxiliaryData: unsignedTx.auxiliaryData,
-    );
-
-    final txHash = await enabledWallet.submitTx(transaction: signedTx);
+    final txHash = await enabledWallet.submitTx(transaction: unsignedTx);
 
     _logger.info('Registration transaction submitted [$txHash]');
 

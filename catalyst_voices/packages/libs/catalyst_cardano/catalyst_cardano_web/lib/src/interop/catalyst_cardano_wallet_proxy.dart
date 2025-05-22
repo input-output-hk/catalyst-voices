@@ -1,4 +1,5 @@
 import 'dart:js_interop';
+import 'dart:typed_data';
 
 import 'package:catalyst_cardano_platform_interface/catalyst_cardano_platform_interface.dart';
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
@@ -204,6 +205,7 @@ class JSCardanoWalletApiProxy implements CardanoWalletApi {
   }
 
   @override
+  // Dead code should be removed
   Future<TransactionWitnessSet> signTx({
     required Transaction transaction,
     bool partialSign = false,
@@ -223,14 +225,52 @@ class JSCardanoWalletApiProxy implements CardanoWalletApi {
   }
 
   @override
-  Future<TransactionHash> submitTx({required Transaction transaction}) async {
+  Future<TransactionHash> submitTx({
+    required Transaction transaction,
+  }) async {
+    const int _arr4 = 0x84, _t = 0xF5, _f = 0xF4, _n = 0xF6, _emap = 0xA0;
+
+    Uint8List _makeArray(Uint8List s0, Uint8List s1, bool valid, Uint8List? s3) {
+      final b = BytesBuilder()
+        ..addByte(_arr4)
+        ..add(s0)
+        ..add(s1)
+        ..addByte(valid ? _t : _f)
+        ..add(s3 ?? Uint8List.fromList([_n]));
+      return b.toBytes();
+    }
+
     try {
-      final bytes = cbor.encode(transaction.toCbor());
-      final hexString = hex.encode(bytes);
-      final result = await _delegate.submitTx(hexString.toJS).toDart;
-      return TransactionHash.fromHex(result.toDart);
-    } catch (ex) {
-      throw _mapApiException(ex) ?? _mapTxSendException(ex) ?? _fallbackApiException(ex);
+      final Uint8List bodyBytes = Uint8List.fromList(cbor.encode(transaction.body.toCbor()));
+      final Uint8List? auxBytes = transaction.auxiliaryData != null
+          ? Uint8List.fromList(cbor.encode(transaction.auxiliaryData!.toCbor()))
+          : null;
+
+      // unsigned tx
+      final Uint8List unsignedBlob = _makeArray(
+        bodyBytes,
+        Uint8List.fromList([_emap]),
+        transaction.isValid,
+        auxBytes,
+      );
+      final String hexUnsigned = hex.encode(unsignedBlob);
+      // sign
+      final String hexWit = await _delegate.signTx(hexUnsigned.toJS, false.toJS).toDart as String;
+      final Uint8List witBytes = Uint8List.fromList(hex.decode(hexWit));
+      // final signed tx
+      final Uint8List signedBlob = _makeArray(
+        bodyBytes,
+        witBytes,
+        transaction.isValid,
+        auxBytes,
+      );
+      final String hexSigned = hex.encode(signedBlob);
+
+      // submit
+      final String txHashHex = await _delegate.submitTx(hexSigned.toJS).toDart as String;
+      return TransactionHash.fromHex(txHashHex);
+    } catch (err, st) {
+      throw _mapApiException(err) ?? _mapTxSendException(err) ?? _fallbackApiException(err);
     }
   }
 }
