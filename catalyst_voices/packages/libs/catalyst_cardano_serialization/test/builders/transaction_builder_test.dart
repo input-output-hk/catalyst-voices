@@ -7,7 +7,7 @@ import '../test_utils/test_data.dart';
 
 void main() {
   group(TransactionBuilder, () {
-    test('transaction with native assets has correctly calculate fee', () {
+    test('transaction with native assets has correctly calculated fee', () {
       final changeAddress = ShelleyAddress.fromBech32(
         /* cSpell:disable */
         'addr_test1qq2fckuzdvxu074ngumdkwn68tuuse67yg5'
