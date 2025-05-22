@@ -1,8 +1,6 @@
-import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_repositories/src/dto/error/error_response.dart';
 import 'package:chopper/chopper.dart' as chopper;
 
 /// Handles [Future] API responses.
@@ -52,22 +50,6 @@ extension ResponseMapper<T> on chopper.Response<T> {
   }
 
   String? _extractErrorMessage(Object? error) {
-    if (error == null) return null;
-
-    if (error is String) {
-      return _extractErrorMessageFromJson(error) ?? error;
-    }
-
-    return error.toString();
-  }
-
-  String? _extractErrorMessageFromJson(String string) {
-    try {
-      final data = jsonDecode(string) as Map<String, dynamic>;
-      final response = ErrorResponse.fromJson(data);
-      return response.detail;
-    } catch (error) {
-      return null;
-    }
+    return error?.toString();
   }
 }
