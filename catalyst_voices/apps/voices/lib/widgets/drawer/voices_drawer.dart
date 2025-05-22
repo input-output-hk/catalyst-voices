@@ -1,4 +1,4 @@
-import 'package:catalyst_voices/widgets/menu/voices_list_tile.dart';
+import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:flutter/material.dart';
@@ -129,18 +129,14 @@ class VoicesDrawerChooser<T> extends StatelessWidget {
             icon: VoicesAssets.icons.chevronLeft.buildIcon(size: 20),
           ),
           for (final item in items)
-            MouseRegion(
+            VoicesGestureDetector(
               key: ValueKey('DrawerChooser$item'),
-              cursor: SystemMouseCursors.click,
-              child: GestureDetector(
-                key: const ValueKey('DrawerChooserItem'),
-                behavior: HitTestBehavior.opaque,
-                onTap: () => onSelected(item),
-                child: itemBuilder(
-                  context: context,
-                  item: item,
-                  isSelected: selectedItem == item,
-                ),
+              behavior: HitTestBehavior.opaque,
+              onTap: () => onSelected(item),
+              child: itemBuilder(
+                context: context,
+                item: item,
+                isSelected: selectedItem == item,
               ),
             ),
           IconButton(

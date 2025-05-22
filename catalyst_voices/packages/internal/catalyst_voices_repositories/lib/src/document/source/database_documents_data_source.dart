@@ -154,6 +154,16 @@ final class DatabaseDocumentsDataSource
   }
 
   @override
+  Stream<Page<ProposalDocumentData>> watchProposalsPage({
+    required PageRequest request,
+    required ProposalsFilters filters,
+  }) {
+    return _database.proposalsDao
+        .watchProposalsPage(request: request, filters: filters)
+        .map((page) => page.map((e) => e.toModel()));
+  }
+
+  @override
   Stream<DocumentData?> watchRefToDocumentData({
     required DocumentRef refTo,
     required DocumentType type,

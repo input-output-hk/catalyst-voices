@@ -42,6 +42,7 @@ export 'drawer/voices_drawer_space_chooser.dart';
 export 'footers/links_page_footer.dart';
 export 'footers/standard_links_page_footer.dart';
 export 'form/voices_form_field.dart';
+export 'gesture/voices_gesture_detector.dart';
 export 'headers/brand_header.dart';
 export 'headers/section_header.dart';
 export 'headers/section_learn_more_header.dart';

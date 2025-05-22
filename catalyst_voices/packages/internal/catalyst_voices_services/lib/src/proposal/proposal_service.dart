@@ -1,9 +1,8 @@
-import 'dart:typed_data';
-
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:collection/collection.dart';
+import 'package:flutter/foundation.dart';
 import 'package:rxdart/rxdart.dart';
 
 abstract interface class ProposalService {
@@ -48,6 +47,8 @@ abstract interface class ProposalService {
 
   /// Similar to [watchFavoritesProposalsIds] stops after first emit.
   Future<List<String>> getFavoritesProposalsIds();
+
+  Future<DocumentRef> getLatestProposalVersion({required DocumentRef ref});
 
   Future<ProposalData> getProposal({
     required DocumentRef ref,
@@ -118,13 +119,16 @@ abstract interface class ProposalService {
     required DocumentRef ref,
   });
 
-  Stream<List<Proposal>> watchLatestProposals({int? limit});
-
   /// Streams changes to [isMaxProposalsLimitReached].
   Stream<bool> watchMaxProposalsLimitReached();
 
   Stream<ProposalsCount> watchProposalsCount({
     required ProposalsCountFilters filters,
+  });
+
+  Stream<Page<Proposal>> watchProposalsPage({
+    required PageRequest request,
+    required ProposalsFilters filters,
   });
 
   Stream<List<Proposal>> watchUserProposals();
@@ -225,6 +229,20 @@ final class ProposalServiceImpl implements ProposalService {
   }
 
   @override
+  Future<DocumentRef> getLatestProposalVersion({
+    required DocumentRef ref,
+  }) async {
+    final proposalVersions = await _documentRepository.getAllVersionsOfId(
+      id: ref.id,
+    );
+    final refList = List<DocumentRef>.from(
+      proposalVersions.map((e) => e.metadata.selfRef).toList(),
+    )..sort();
+
+    return refList.last;
+  }
+
+  @override
   Future<ProposalData> getProposal({
     required DocumentRef ref,
   }) async {
@@ -235,26 +253,10 @@ final class ProposalServiceImpl implements ProposalService {
   Future<Page<Proposal>> getProposalsPage({
     required PageRequest request,
     required ProposalsFilters filters,
-  }) async {
-    final page = await _proposalRepository.getProposalsPage(
-      request: request,
-      filters: filters,
-    );
-
-    // TODO(damian-molinski): this most likely should happen in ProposalsCubit.
-    final proposals = await page.items.map(
-      (item) async {
-        final categoryId = item.categoryId;
-        final category = await _campaignRepository.getCategory(categoryId);
-
-        final withCategory = item.copyWith(categoryName: category.categoryText);
-
-        // TODO(damian-molinski): It should be different model.
-        return Proposal.fromData(withCategory);
-      },
-    ).wait;
-
-    return page.copyWithItems(proposals);
+  }) {
+    return _proposalRepository
+        .getProposalsPage(request: request, filters: filters)
+        .then(_mapProposalDataPage);
   }
 
   @override
@@ -410,30 +412,6 @@ final class ProposalServiceImpl implements ProposalService {
   }
 
   @override
-  Stream<List<Proposal>> watchLatestProposals({int? limit}) {
-    return _proposalRepository.watchLatestProposals(limit: limit).switchMap((documents) async* {
-      if (documents.isEmpty) {
-        yield [];
-        return;
-      }
-      final proposalsDataStreams = await Future.wait(
-        documents.map(_createProposalDataStream).toList(),
-      );
-
-      yield* Rx.combineLatest(
-        proposalsDataStreams,
-        (List<ProposalData?> proposalsData) async {
-          final validProposalsData = proposalsData.whereType<ProposalData>().toList();
-          final proposalsWithVersions = await Future.wait(
-            validProposalsData.map(_addVersionsToProposal),
-          );
-          return proposalsWithVersions.map(Proposal.fromData).toList();
-        },
-      ).switchMap(Stream.fromFuture);
-    });
-  }
-
-  @override
   Stream<bool> watchMaxProposalsLimitReached() {
     return watchUserProposalsCount().map((count) {
       return count.finals >= ProposalDocument.maxSubmittedProposalsPerUser;
@@ -445,6 +423,16 @@ final class ProposalServiceImpl implements ProposalService {
     required ProposalsCountFilters filters,
   }) {
     return _proposalRepository.watchProposalsCount(filters: filters);
+  }
+
+  @override
+  Stream<Page<Proposal>> watchProposalsPage({
+    required PageRequest request,
+    required ProposalsFilters filters,
+  }) {
+    return _proposalRepository
+        .watchProposalsPage(request: request, filters: filters)
+        .asyncMap(_mapProposalDataPage);
   }
 
   @override
@@ -470,6 +458,7 @@ final class ProposalServiceImpl implements ProposalService {
         yield* Rx.combineLatest(
           proposalsDataStreams,
           (List<ProposalData?> proposalsData) async {
+            // Note. one is null and two versions of same id.
             final validProposalsData = proposalsData.whereType<ProposalData>().toList();
 
             final groupedProposals = groupBy(
@@ -588,5 +577,22 @@ final class ProposalServiceImpl implements ProposalService {
 
   bool _isProposer(User user) {
     return user.activeAccount?.roles.contains(AccountRole.proposer) ?? false;
+  }
+
+  Future<Page<Proposal>> _mapProposalDataPage(Page<ProposalData> page) async {
+    // TODO(damian-molinski): this most likely should happen in ProposalsCubit.
+    final proposals = await page.items.map(
+      (item) async {
+        final categoryId = item.categoryId;
+        final category = await _campaignRepository.getCategory(categoryId);
+
+        final withCategory = item.copyWith(categoryName: category.categoryText);
+
+        // TODO(damian-molinski): It should be different model.
+        return Proposal.fromData(withCategory);
+      },
+    ).wait;
+
+    return page.copyWithItems(proposals);
   }
 }
