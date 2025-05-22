@@ -786,6 +786,10 @@
   "@somethingWentWrong": {
     "description": "Error description when something goes wrong."
   },
+  "resourceConflictError": "Provided data is not unique.",
+  "@resourceConflictError": {
+    "description": "Error description when there's duplicate data (i.e. email or username already taken)."
+  },
   "noWalletFound": "No wallet found.",
   "@noWalletFound": {
     "description": "A description when no wallet extension was found."

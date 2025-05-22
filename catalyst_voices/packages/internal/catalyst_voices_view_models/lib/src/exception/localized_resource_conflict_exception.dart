@@ -11,5 +11,5 @@ final class LocalizedResourceConflictException extends LocalizedException {
   List<Object?> get props => [customMessage];
 
   @override
-  String message(BuildContext context) => customMessage ?? context.l10n.somethingWentWrong;
+  String message(BuildContext context) => customMessage ?? context.l10n.resourceConflictError;
 }
