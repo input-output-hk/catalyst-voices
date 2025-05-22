@@ -1,4 +1,9 @@
+import 'package:catalyst_voices/pages/dev_tools/widgets/app_info_card.dart';
+import 'package:catalyst_voices/pages/dev_tools/widgets/config_card.dart';
+import 'package:catalyst_voices/pages/dev_tools/widgets/gateway_info_card.dart';
+import 'package:catalyst_voices/pages/dev_tools/widgets/x_close_button.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
+import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:flutter/material.dart';
 
 class DevToolsPage extends StatefulWidget {
@@ -26,9 +31,25 @@ class DevToolsPage extends StatefulWidget {
 class _DevToolsPageState extends State<DevToolsPage> {
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      appBar: VoicesAppBar(),
-      body: SizedBox.expand(child: Placeholder(child: Center(child: Text('DevTools')))),
+    return Scaffold(
+      appBar: const VoicesAppBar(leading: XCloseButton()),
+      body: ListView(
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+        children: const [
+          AppInfoCard(),
+          SizedBox(height: 12),
+          GatewayInfoCard(),
+          SizedBox(height: 12),
+          ConfigCard(),
+        ],
+      ),
     );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    context.read<DevToolsBloc>().add(const UpdateSystemInfoEvent());
   }
 }
