@@ -1466,6 +1466,14 @@
   },
   "errorEmailValidationPattern": "Incorrect email pattern",
   "errorEmailValidationOutOfRange": "Invalid length",
+  "errorEmailAlreadyInUseUpdateLater": "This email address is already in use. You can update your email later from your account settings.",
+  "@errorEmailAlreadyInUseUpdateLater": {
+    "description": "Error when trying to register with email that is taken already (in registration)."
+  },
+  "errorEmailAlreadyInUse": "This email address is already in use.",
+  "@errorEmailAlreadyInUse": {
+    "description": "Error when trying to update email that is taken already."
+  },
   "categoryDetails": "Category Details",
   "fundsAvailable": "Funds Available",
   "minBudgetRequest": "Min budget request",
