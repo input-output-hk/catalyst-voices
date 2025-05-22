@@ -36,12 +36,10 @@ class CampaignCategoryCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          // TODO(LynxxLynx): implement image when info from where it comes
-          CatalystImage.asset(
-            key: const Key('CategoryImage'),
-            category.imageUrl,
-            fit: BoxFit.fill,
+          category.image.buildPicture(
             height: 220,
+            fit: BoxFit.fill,
+            color: context.colors.iconsPrimary,
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),

@@ -1,9 +1,11 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
-import 'package:catalyst_voices/pages/category/change_category_button.dart';
+import 'package:catalyst_voices/pages/category/category_brief.dart';
+import 'package:catalyst_voices/pages/category/category_description_expadable_list.dart';
 import 'package:catalyst_voices/widgets/cards/funds_detail_card.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
+import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
-import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
@@ -30,6 +32,9 @@ class CategoryDetailView extends StatelessWidget {
           _CategoryBrief(
             categoryName: category.formattedName,
             categoryDescription: category.description,
+            categoryRef: category.id,
+            image: category.image,
+            proposalCount: category.proposalsCount,
           ),
           const SizedBox(height: 64),
           FundsDetailCard(
@@ -39,7 +44,7 @@ class CategoryDetailView extends StatelessWidget {
             type: FundsDetailCardType.category,
           ),
           const SizedBox(height: 48),
-          _ExpandableDescriptionList(
+          CategoryDescriptionExpandableList(
             descriptions: category.descriptions,
           ),
         ],
@@ -48,99 +53,67 @@ class CategoryDetailView extends StatelessWidget {
   }
 }
 
-class _BodyText extends StatelessWidget {
-  final String value;
-
-  const _BodyText(this.value);
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      value,
-      style: context.textTheme.bodyMedium,
-    );
-  }
-}
-
 class _CategoryBrief extends StatelessWidget {
   final String categoryName;
   final String categoryDescription;
+  final SignedDocumentRef categoryRef;
+  final SvgGenImage image;
+  final int proposalCount;
 
   const _CategoryBrief({
     required this.categoryName,
     required this.categoryDescription,
+    required this.categoryRef,
+    required this.image,
+    required this.proposalCount,
   });
 
   @override
   Widget build(BuildContext context) {
-    return ConstrainedBox(
-      constraints: const BoxConstraints(maxWidth: 580),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
+    final lightColors = [
+      const Color(0xFFF6FAFE),
+      const Color(0xFFB4DAFD),
+      const Color(0xFFF8C1EA),
+    ];
+    final darkColors = [
+      const Color(0xFF1736A3),
+      const Color(0xFF4E74B2),
+      const Color(0xFF9338C3),
+    ];
+    final isLight = Theme.of(context).brightness == Brightness.light;
+
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: context.colors.avatarsPrimary,
+        borderRadius: BorderRadius.circular(12),
+        gradient: LinearGradient(
+          begin: const Alignment(-0.15, 1.8),
+          end: const Alignment(0.18, -1.2),
+          colors: isLight ? lightColors : darkColors,
+          stops: const [0.26, 0.56, 1],
+        ),
+      ),
+      child: Stack(
         children: [
-          Text(
-            context.l10n.category,
-            style: context.textTheme.titleSmall?.copyWith(
-              color: context.colors.textOnPrimaryLevel1,
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+            child: CategoryBrief(
+              categoryName: categoryName,
+              categoryDescription: categoryDescription,
+              categoryRef: categoryRef,
+              showViewAllButton: proposalCount > 0,
             ),
           ),
-          Text(
-            categoryName,
-            style: context.textTheme.displaySmall,
+          Positioned(
+            right: 0,
+            bottom: 0,
+            child: image.buildPicture(
+              // size: 380,
+              color: context.colors.iconsBackground.withValues(alpha: .4),
+            ),
           ),
-          const SizedBox(height: 16),
-          Text(
-            categoryDescription,
-            style: context.textTheme.bodyMedium,
-          ),
-          const SizedBox(height: 35),
-          const ChangeCategoryButton(),
         ],
       ),
-    );
-  }
-}
-
-class _ExpandableDescriptionList extends StatelessWidget {
-  final List<CategoryDescriptionViewModel> descriptions;
-
-  const _ExpandableDescriptionList({
-    required this.descriptions,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: descriptions
-          .map<Widget>(
-            (e) => VoicesExpansionTile(
-              title: _Header(e.title),
-              initiallyExpanded: true,
-              backgroundColor: Colors.transparent,
-              children: [
-                _BodyText(e.description),
-              ],
-            ),
-          )
-          .separatedBy(const SizedBox(height: 32))
-          .toList(),
-    );
-  }
-}
-
-class _Header extends StatelessWidget {
-  final String value;
-
-  const _Header(this.value);
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      value,
-      style: context.textTheme.titleLarge?.copyWith(color: context.colors.textOnPrimaryLevel1),
     );
   }
 }
