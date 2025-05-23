@@ -15,12 +15,13 @@ class ConfigCard extends StatelessWidget {
       selector: (state) => state.systemInfo?.config,
       builder: (context, state) {
         return _ConfigCard(
-          // TODO(damian-molinski): change it after #2124 is merged.
+          // TODO(damian-molinski): change it after #2135 is merged.
           env: 'dev',
           gatewayUrl: state?.api.gatewayUrl,
           reviewsUrl: state?.api.reviewsUrl,
           networkId: state?.blockchain.networkId,
           host: state?.blockchain.host,
+          // TODO(damian-molinski): use DTO after #2135 is merged.
           transactionBuilderConfig: state?.blockchain.transactionBuilderConfig.asMap(),
         );
       },
@@ -29,7 +30,7 @@ class ConfigCard extends StatelessWidget {
 }
 
 class _ConfigCard extends StatelessWidget {
-  // TODO(damian-molinski): change it after #2124 is merged.
+  // TODO(damian-molinski): change it after #2135 is merged.
   final String? env;
   final String? gatewayUrl;
   final String? reviewsUrl;
