@@ -23,6 +23,7 @@ impl Api {
     ///
     /// This endpoint returns RBAC registrations by provided auth Catalyst Id credentials
     /// or by the `lookup` argument if provided.
+    #[allow(clippy::unused_async)]
     async fn rbac_registrations_get(
         &self,
         /// Stake address or Catalyst ID to get the RBAC registration for.
@@ -31,6 +32,6 @@ impl Api {
         auth: NoneOrRBAC,
     ) -> registrations_get::AllResponses {
         let token = auth.into();
-        registrations_get::endpoint(lookup, token).await
+        registrations_get::endpoint(lookup, token)
     }
 }
