@@ -71,8 +71,8 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
   }
 
   @override
-  Future<List<TypedDocumentRef>> index() async {
-    final allRefs = <TypedDocumentRef>{};
+  Future<List<MaybeTypedDocumentRef>> index() async {
+    final allRefs = <MaybeTypedDocumentRef>{};
 
     var page = 0;
     const maxPerPage = indexPageSize;
@@ -117,40 +117,32 @@ abstract interface class DocumentDataRemoteSource implements DocumentDataSource 
   Future<String?> getLatestVersion(String id);
 
   @override
-  Future<List<TypedDocumentRef>> index();
+  Future<List<MaybeTypedDocumentRef>> index();
 
   Future<void> publish(SignedDocument document);
 }
 
 extension on DocumentIndexList {
-  List<TypedDocumentRef> get refs {
+  List<MaybeTypedDocumentRef> get refs {
     return docs
         .cast<Map<String, dynamic>>()
         .map(DocumentIndexListDto.fromJson)
         .map((ref) {
-          return <TypedDocumentRef>[
+          return <MaybeTypedDocumentRef>[
             ...ref.ver.map((ver) {
               final documentType = DocumentType.fromJson(ver.type);
 
-              return <TypedDocumentRef>[
+              return <MaybeTypedDocumentRef>[
                 TypedDocumentRef(
                   ref: SignedDocumentRef(id: ref.id, version: ver.ver),
                   type: documentType,
                 ),
-                if (ver.ref != null)
-                  TypedDocumentRef(
-                    ref: ver.ref!.toRef(),
-                    type: DocumentType.unknown,
-                  ),
-                if (ver.reply != null)
-                  TypedDocumentRef(
-                    ref: ver.reply!.toRef(),
-                    type: DocumentType.unknown,
-                  ),
+                if (ver.ref != null) MaybeTypedDocumentRef(ref: ver.ref!.toRef()),
+                if (ver.reply != null) MaybeTypedDocumentRef(ref: ver.reply!.toRef()),
                 if (ver.template != null)
-                  TypedDocumentRef(
+                  MaybeTypedDocumentRef(
                     ref: ver.template!.toRef(),
-                    type: documentType.template ?? DocumentType.unknown,
+                    type: documentType.template,
                   ),
                 if (ver.brand != null)
                   TypedDocumentRef(

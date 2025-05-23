@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:catalyst_cose/src/types/document_type.dart';
 import 'package:catalyst_cose/src/types/string_or_int.dart';
 import 'package:catalyst_cose/src/types/uuid.dart';
 import 'package:cbor/cbor.dart';
@@ -23,6 +24,15 @@ final class CborUtils {
     }
 
     return Uint8List.fromList((value as CborBytes).bytes);
+  }
+
+  /// Deserializes optional [DocumentType] type.
+  static DocumentType? deserializeDocumentType(CborValue? value) {
+    if (value == null) {
+      return null;
+    }
+
+    return DocumentType.fromCbor(value);
   }
 
   /// Deserialized optional [ReferenceUuid] type.
