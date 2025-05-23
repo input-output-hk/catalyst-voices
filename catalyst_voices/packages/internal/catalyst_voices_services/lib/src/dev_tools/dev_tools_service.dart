@@ -4,6 +4,7 @@ import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 abstract interface class DevToolsService {
   const factory DevToolsService(
     DevToolsRepository devToolsRepository,
+    AppEnvironment environment,
     AppConfig config,
   ) = DevToolsServiceImpl;
 
@@ -16,10 +17,12 @@ abstract interface class DevToolsService {
 
 final class DevToolsServiceImpl implements DevToolsService {
   final DevToolsRepository _devToolsRepository;
+  final AppEnvironment _environment;
   final AppConfig _config;
 
   const DevToolsServiceImpl(
     this._devToolsRepository,
+    this._environment,
     this._config,
   );
 
@@ -27,13 +30,14 @@ final class DevToolsServiceImpl implements DevToolsService {
   Future<SystemInfo> getSystemInfo() async {
     final appInfo = await _devToolsRepository.readAppInfo();
     final gatewayInfo = await _devToolsRepository.readGatewayInfo();
-    // TODO(damian-molinski): migrate at some point to use AppConfigObserver or Service.
+    final environment = _environment;
     final config = _config;
 
     return SystemInfo(
       app: appInfo,
       gateway: gatewayInfo,
       config: config,
+      environment: environment,
     );
   }
 
