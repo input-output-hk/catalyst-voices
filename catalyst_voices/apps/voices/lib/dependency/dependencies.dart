@@ -158,7 +158,14 @@ final class Dependencies extends DependencyProvider {
         );
       })
       ..registerFactory<CampaignStageCubit>(() {
-        return CampaignStageCubit(get<CampaignService>());
+        return CampaignStageCubit(
+          get<CampaignService>(),
+        );
+      })
+      ..registerFactory<DevToolsBloc>(() {
+        return DevToolsBloc(
+          get<DevToolsService>(),
+        );
       });
   }
 
@@ -230,6 +237,13 @@ final class Dependencies extends DependencyProvider {
           get<SignedDocumentManager>(),
           get<DocumentRepository>(),
         ),
+      )
+      ..registerLazySingleton<DevToolsRepository>(
+        () {
+          return DevToolsRepository(
+            get<DevToolsStorage>(),
+          );
+        },
       );
   }
 
@@ -326,6 +340,12 @@ final class Dependencies extends DependencyProvider {
         get<DocumentRepository>(),
       );
     });
+    registerLazySingleton<DevToolsService>(() {
+      return DevToolsService(
+        get<DevToolsRepository>(),
+        get<AppConfig>(),
+      );
+    });
   }
 
   void _registerStorages() {
@@ -350,6 +370,11 @@ final class Dependencies extends DependencyProvider {
     );
     registerLazySingleton<AuthTokenCache>(() {
       return LocalAuthTokenCache(
+        sharedPreferences: get<SharedPreferencesAsync>(),
+      );
+    });
+    registerLazySingleton<DevToolsStorage>(() {
+      return DevToolsStorageLocal(
         sharedPreferences: get<SharedPreferencesAsync>(),
       );
     });

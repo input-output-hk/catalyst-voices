@@ -786,6 +786,10 @@
   "@somethingWentWrong": {
     "description": "Error description when something goes wrong."
   },
+  "resourceConflictError": "Provided data is not unique.",
+  "@resourceConflictError": {
+    "description": "Error description when there's duplicate data (i.e. email or username already taken)."
+  },
   "noWalletFound": "No wallet found.",
   "@noWalletFound": {
     "description": "A description when no wallet extension was found."
@@ -1462,6 +1466,14 @@
   },
   "errorEmailValidationPattern": "Incorrect email pattern",
   "errorEmailValidationOutOfRange": "Invalid length",
+  "errorEmailAlreadyInUseUpdateLater": "This email address is already in use. You can update your email later from your account settings.",
+  "@errorEmailAlreadyInUseUpdateLater": {
+    "description": "Error when trying to register with email that is taken already (in registration)."
+  },
+  "errorEmailAlreadyInUse": "This email address is already in use.",
+  "@errorEmailAlreadyInUse": {
+    "description": "Error when trying to update email that is taken already."
+  },
   "categoryDetails": "Category Details",
   "fundsAvailable": "Funds Available",
   "minBudgetRequest": "Min budget request",
@@ -2702,5 +2714,34 @@
   "usernameSavedMessage": "All set! You can now join the conversation.",
   "@usernameSavedMessage": {
     "description": "Used as username change confirmation snack bar message"
+  },
+  "devToolsAlreadyDeveloper": "Already developer!",
+  "@devToolsAlreadyDeveloper": {
+    "description": "SnackBar message when trying to enable dev tools while already enabled"
+  },
+  "devToolsAlreadyDeveloperMessage": "Open DevTools with cmd+shift+D shortcut",
+  "@devToolsAlreadyDeveloperMessage": {
+    "description": "Explanation text"
+  },
+  "devToolsBecameDeveloper": "You became developer!",
+  "@devToolsBecameDeveloper": {
+    "description": "SnackBar message when enable dev tools"
+  },
+  "devToolsBecameDeveloperMessage": "Open DevTools with cmd+shift+D shortcut",
+  "@devToolsBecameDeveloperMessage": {
+    "description": "Explanation text"
+  },
+  "devToolsTapsLeftToEnable": "{count} taps left",
+  "@devToolsTapsLeftToEnable": {
+    "description": "SnackBar message while enabling dev tools",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "devToolsTapsLeftToEnableMessage": "Keep on tapping",
+  "@devToolsTapsLeftToEnableMessage": {
+    "description": "Explanation text"
   }
 }

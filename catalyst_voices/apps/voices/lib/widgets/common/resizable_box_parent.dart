@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:flutter/widgets.dart';
 
@@ -72,6 +73,44 @@ class _ResizableBoxState extends State<_ResizableBox> {
   late double _height;
 
   @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        SizedBox(
+          width: _width,
+          height: _height,
+          child: widget.child,
+        ),
+        Positioned(
+          bottom: widget.iconBottomSpacing,
+          right: 0,
+          child: VoicesGestureDetector(
+            cursor: SystemMouseCursors.resizeDownRight,
+            onPanUpdate: (details) {
+              setState(() {
+                if (widget.resizableHorizontally) {
+                  _width = (_width + details.delta.dx).clamp(
+                    widget.minWidth,
+                    widget.constraints.maxWidth,
+                  );
+                }
+
+                if (widget.resizableVertically) {
+                  _height = (_height + details.delta.dy).clamp(
+                    widget.minHeight,
+                    widget.constraints.maxHeight,
+                  );
+                }
+              });
+            },
+            child: VoicesAssets.images.dragger.buildIcon(size: 15),
+          ),
+        ),
+      ],
+    );
+  }
+
+  @override
   void initState() {
     super.initState();
 
@@ -84,45 +123,5 @@ class _ResizableBoxState extends State<_ResizableBox> {
     }
 
     _height = max(widget.constraints.minHeight, widget.minHeight);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        SizedBox(
-          width: _width,
-          height: _height,
-          child: widget.child,
-        ),
-        Positioned(
-          bottom: widget.iconBottomSpacing,
-          right: 0,
-          child: MouseRegion(
-            cursor: SystemMouseCursors.resizeDownRight,
-            child: GestureDetector(
-              onPanUpdate: (details) {
-                setState(() {
-                  if (widget.resizableHorizontally) {
-                    _width = (_width + details.delta.dx).clamp(
-                      widget.minWidth,
-                      widget.constraints.maxWidth,
-                    );
-                  }
-
-                  if (widget.resizableVertically) {
-                    _height = (_height + details.delta.dy).clamp(
-                      widget.minHeight,
-                      widget.constraints.maxHeight,
-                    );
-                  }
-                });
-              },
-              child: VoicesAssets.images.dragger.buildIcon(size: 15),
-            ),
-          ),
-        ),
-      ],
-    );
   }
 }

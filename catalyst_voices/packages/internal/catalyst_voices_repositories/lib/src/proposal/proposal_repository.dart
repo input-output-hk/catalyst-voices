@@ -92,6 +92,11 @@ abstract interface class ProposalRepository {
     required ProposalsCountFilters filters,
   });
 
+  Stream<Page<ProposalData>> watchProposalsPage({
+    required PageRequest request,
+    required ProposalsFilters filters,
+  });
+
   Stream<List<ProposalDocument>> watchUserProposals({
     required CatalystId authorId,
   });
@@ -342,6 +347,16 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   }
 
   @override
+  Stream<Page<ProposalData>> watchProposalsPage({
+    required PageRequest request,
+    required ProposalsFilters filters,
+  }) {
+    return _proposalsLocalSource
+        .watchProposalsPage(request: request, filters: filters)
+        .map((value) => value.map(_buildProposalData));
+  }
+
+  @override
   Stream<List<ProposalDocument>> watchUserProposals({
     required CatalystId authorId,
   }) {
@@ -374,11 +389,8 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     if (action == null) {
       return null;
     }
-    final proposalAction = ProposalSubmissionActionDocumentDto.fromJson(
-      action.content.data,
-    ).action.toModel();
-
-    return proposalAction;
+    final dto = ProposalSubmissionActionDocumentDto.fromJson(action.content.data);
+    return dto.action.toModel();
   }
 
   ProposalData _buildProposalData(ProposalDocumentData data) {
@@ -388,8 +400,9 @@ final class ProposalRepositoryImpl implements ProposalRepository {
       ProposalSubmissionAction.aFinal => ProposalPublish.submittedProposal,
       ProposalSubmissionAction.draft || null => ProposalPublish.publishedDraft,
       ProposalSubmissionAction.hide => throw ArgumentError(
-          'Unsupported ${ProposalSubmissionAction.hide}, Make sure to filter'
-          ' out hidden proposals before this code is reached.',
+          'Proposal(${data.proposal.metadata.selfRef}) is '
+          'unsupported ${ProposalSubmissionAction.hide}. Make sure to filter '
+          'out hidden proposals before this code is reached.',
         ),
     };
 

@@ -25,7 +25,7 @@ CARDANO_NETWORK = os.environ["CARDANO_NETWORK"]
 
 BLOCKFROST_URL = f"https://cardano-{CARDANO_NETWORK}.blockfrost.io/api/v0"
 
-RECORDS_LIMIT = 100
+RECORDS_LIMIT = 10000
 START_POSITION = 0
 
 
@@ -52,7 +52,6 @@ except:
 
 # process each record
 s = requests.Session()
-formatted_records = {}
 processing_records = snapshot_data[START_POSITION : START_POSITION + RECORDS_LIMIT]
 logger.info(
     f"Start processing start: {START_POSITION}, end: {START_POSITION + min(len(processing_records), RECORDS_LIMIT)}"

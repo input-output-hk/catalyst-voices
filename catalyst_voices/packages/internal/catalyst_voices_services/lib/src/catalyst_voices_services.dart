@@ -9,6 +9,7 @@ export 'crypto/bip32_ed25519_catalyst_private_key.dart' show Bip32Ed25519XCataly
 export 'crypto/bip32_ed25519_catalyst_public_key.dart' show Bip32Ed25519XCatalystPublicKeyFactory;
 export 'crypto/bip32_ed25519_catalyst_signature.dart' show Bip32Ed25519XCatalystSignatureFactory;
 export 'crypto/key_derivation_service.dart' show KeyDerivationService;
+export 'dev_tools/dev_tools_service.dart' show DevToolsService;
 export 'documents/documents_service.dart' show DocumentsService;
 export 'downloader/downloader_service.dart' show DownloaderService;
 export 'proposal/proposal_service.dart' show ProposalService;
