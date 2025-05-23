@@ -153,6 +153,8 @@ class VoicesTextField extends VoicesFormField<String> {
             final textTheme = theme.textTheme;
 
             final labelText = decoration?.labelText ?? '';
+            final labelStyle = decoration?.labelStyle;
+
             final resizableVertically = state._isResizableVertically;
             final resizableHorizontally = state._isResizableHorizontally;
 
@@ -169,8 +171,9 @@ class VoicesTextField extends VoicesFormField<String> {
                     key: const Key('EnterPasswordText'),
                     labelText,
                     style: enabled
-                        ? textTheme.titleSmall
-                        : textTheme.titleSmall!.copyWith(color: theme.colors.textDisabled),
+                        ? (labelStyle ?? textTheme.titleSmall)
+                        : (labelStyle ?? textTheme.titleSmall)
+                            ?.copyWith(color: theme.colors.textDisabled),
                   ),
                   const SizedBox(height: 4),
                 ],
@@ -294,6 +297,8 @@ class VoicesTextFieldDecoration {
   /// If not specified, no radius will be applied.
   final BorderRadius? borderRadius;
 
+  final TextStyle? labelStyle;
+
   /// Creates a new text field decoration.
   const VoicesTextFieldDecoration({
     this.border,
@@ -320,6 +325,7 @@ class VoicesTextFieldDecoration {
     this.filled = true,
     this.fillColor,
     this.borderRadius,
+    this.labelStyle,
   });
 }
 

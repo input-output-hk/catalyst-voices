@@ -41,6 +41,7 @@ class _SingleDropdownSelectionWidgetState extends State<SingleDropdownSelectionW
         SingleSelectDropdown(
           items: _buildMenuEntries(),
           value: widget.property.value ?? widget.schema.defaultValue,
+          hintText: widget.schema.placeholder,
           onChanged: _onChanged,
           validator: _validator,
           enabled: widget.isEditMode,
