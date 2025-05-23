@@ -37,6 +37,9 @@ class AffixDecorator extends StatelessWidget {
   /// The widget to be decorated with prefix and/or suffix.
   final Widget child;
 
+  /// See [Row.crossAxisAlignment].
+  final CrossAxisAlignment crossAxisAlignment;
+
   /// Creates a new instance of PrefixSuffixDecorator.
   ///
   /// At least one of `prefix` or `suffix` should be non-null for the decoration
@@ -48,6 +51,7 @@ class AffixDecorator extends StatelessWidget {
     this.prefix,
     this.suffix,
     this.mainAxisSize = MainAxisSize.min,
+    this.crossAxisAlignment = CrossAxisAlignment.center,
     required this.child,
   });
 
@@ -69,6 +73,7 @@ class AffixDecorator extends StatelessWidget {
 
     return Row(
       mainAxisSize: mainAxisSize,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (prefix != null) ...[
           IconTheme(

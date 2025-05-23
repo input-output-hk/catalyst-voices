@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/routes/routing/proposal_builder_route.dart';
 import 'package:catalyst_voices/widgets/cards/voices_leading_icon_card.dart';
-import 'package:catalyst_voices/widgets/common/affix_decorator.dart';
+import 'package:catalyst_voices/widgets/list/category_requirements_list.dart';
 import 'package:catalyst_voices/widgets/text/day_at_time_text.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
@@ -14,14 +14,16 @@ import 'package:flutter/material.dart';
 class CreateProposalCard extends StatelessWidget {
   final SignedDocumentRef categoryId;
   final String categoryName;
-  final List<String> categoryRequirements;
+  final List<String> categoryDos;
+  final List<String> categoryDonts;
   final DateTime submissionCloseDate;
 
   const CreateProposalCard({
     super.key,
     required this.categoryId,
     required this.categoryName,
-    required this.categoryRequirements,
+    required this.categoryDos,
+    required this.categoryDonts,
     required this.submissionCloseDate,
   });
 
@@ -45,7 +47,10 @@ class CreateProposalCard extends StatelessWidget {
               color: context.colors.textOnPrimaryLevel1,
             ),
           ),
-          _Requirements(requirements: categoryRequirements),
+          CategoryRequirementsList(
+            dos: categoryDos,
+            donts: categoryDonts,
+          ),
           const SizedBox(height: 24),
           _SubmissionCloseAt(submissionCloseDate),
           const SizedBox(height: 24),
@@ -53,55 +58,11 @@ class CreateProposalCard extends StatelessWidget {
             child: Text(
               context.l10n.startProposal,
             ),
-            onTap: () {
-              unawaited(
-                ProposalBuilderDraftRoute.fromRef(categoryId: categoryId).push(context),
-              );
-            },
+            onTap: () => unawaited(
+              ProposalBuilderDraftRoute.fromRef(categoryId: categoryId).push(context),
+            ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _Requirements extends StatelessWidget {
-  final List<String> requirements;
-
-  const _Requirements({required this.requirements});
-
-  @override
-  Widget build(BuildContext context) {
-    return Offstage(
-      offstage: requirements.isEmpty,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const SizedBox(height: 16),
-          Text(
-            context.l10n.categoryRequirements,
-            style: context.textTheme.bodyMedium,
-          ),
-          ...requirements.map(_RequirementsText.new),
-        ],
-      ),
-    );
-  }
-}
-
-class _RequirementsText extends StatelessWidget {
-  final String text;
-
-  const _RequirementsText(this.text);
-
-  @override
-  Widget build(BuildContext context) {
-    return AffixDecorator(
-      prefix: VoicesAssets.icons.check.buildIcon(),
-      child: Text(
-        text,
-        style: context.textTheme.bodyMedium,
       ),
     );
   }

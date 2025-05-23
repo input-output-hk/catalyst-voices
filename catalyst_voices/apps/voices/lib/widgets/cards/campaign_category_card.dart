@@ -36,13 +36,7 @@ class CampaignCategoryCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          // TODO(LynxxLynx): implement image when info from where it comes
-          CatalystImage.asset(
-            key: const Key('CategoryImage'),
-            category.imageUrl,
-            fit: BoxFit.fill,
-            height: 220,
-          ),
+          _Background(image: category.image),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
             child: Column(
@@ -69,6 +63,41 @@ class CampaignCategoryCard extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _Background extends StatelessWidget {
+  final SvgGenImage image;
+
+  const _Background({required this.image});
+
+  @override
+  Widget build(BuildContext context) {
+    final lightColors = [
+      const Color(0xFFF7FAFE),
+      const Color(0xFFC0D5FB),
+      const Color(0xFFF9A5E0),
+    ];
+    final darkColors = [
+      const Color(0xFF91B9EA),
+      const Color(0xFF5A7AE5),
+      const Color(0xFFA55DCE),
+    ];
+    final isLight = Theme.of(context).brightness == Brightness.light;
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(vertical: 40),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: isLight ? lightColors : darkColors,
+        ),
+      ),
+      child: image.buildPicture(
+        height: 160,
+        fit: BoxFit.fitHeight,
+        color: context.colors.iconsPrimary,
       ),
     );
   }
