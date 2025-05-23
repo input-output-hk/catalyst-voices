@@ -19,14 +19,6 @@ targets:
           use_path_for_request_names: true
           additional_headers:
             - "Authorization"
-          overriden_models:
-            - file_name: "vit"
-              import_url: "../../src/api/models/overridden_models.dart"
-              overriden_models:
-                - SimpleProposal$ProposalCategory
-                - SimpleProposal$Proposer
-                - CommunityChoiceProposal$ProposalCategory
-                - CommunityChoiceProposal$Proposer
           response_override_value_map:
             - url: /api/v1/document/index
               method: post

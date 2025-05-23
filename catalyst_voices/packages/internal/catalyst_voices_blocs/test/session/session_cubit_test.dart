@@ -38,7 +38,7 @@ void main() {
     keychainProvider = VaultKeychainProvider(
       secureStorage: const FlutterSecureStorage(),
       sharedPreferences: SharedPreferencesAsync(),
-      cacheConfig: const CacheConfig(),
+      cacheConfig: AppConfig.dev().cache,
     );
     userRepository = _FakeUserRepository();
     userObserver = StreamUserObserver();
