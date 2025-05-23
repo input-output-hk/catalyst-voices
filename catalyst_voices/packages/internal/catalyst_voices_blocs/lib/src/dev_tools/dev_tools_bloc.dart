@@ -14,6 +14,7 @@ final class DevToolsBloc extends Bloc<DevToolsEvent, DevToolsState>
   final SyncManager _syncManager;
 
   Timer? _resetCountTimer;
+  StreamSubscription<SyncStats>? _syncStartsSub;
 
   DevToolsBloc(
     this._devToolsService,
@@ -25,6 +26,9 @@ final class DevToolsBloc extends Bloc<DevToolsEvent, DevToolsState>
     on<UpdateSystemInfoEvent>(_handleUpdateSystemInfo);
     on<SyncDocumentsEvent>(_handleSyncDocuments);
     on<UpdateAllEvent>(_handleUpdateAll);
+    on<WatchSystemInfoEvent>(_handleWatchSystemInfoEvent);
+    on<StopWatchingSystemInfoEvent>(_handleStopWatchingSystemInfoEvent);
+    on<SyncStatsChangedEvent>(_handleSyncStatsChanged);
 
     add(const RecoverDataEvent());
   }
@@ -33,6 +37,9 @@ final class DevToolsBloc extends Bloc<DevToolsEvent, DevToolsState>
   Future<void> close() {
     _resetCountTimer?.cancel();
     _resetCountTimer = null;
+
+    _syncStartsSub?.cancel();
+    _syncStartsSub = null;
 
     return super.close();
   }
@@ -83,21 +90,30 @@ final class DevToolsBloc extends Bloc<DevToolsEvent, DevToolsState>
     }
   }
 
+  Future<void> _handleStopWatchingSystemInfoEvent(
+    StopWatchingSystemInfoEvent event,
+    Emitter<DevToolsState> emit,
+  ) async {
+    await _syncStartsSub?.cancel();
+    _syncStartsSub = null;
+  }
+
   Future<void> _handleSyncDocuments(
     SyncDocumentsEvent event,
     Emitter<DevToolsState> emit,
   ) async {
     try {
       await _syncManager.start();
-
-      final syncStats = await _devToolsService.getStats();
-
-      if (!isClosed) {
-        emit(state.copyWith(syncStats: Optional(syncStats)));
-      }
     } catch (error, stack) {
       _logger.warning('Sync failed', error, stack);
     }
+  }
+
+  void _handleSyncStatsChanged(
+    SyncStatsChangedEvent event,
+    Emitter<DevToolsState> emit,
+  ) {
+    emit(state.copyWith(syncStats: Optional(event.stats)));
   }
 
   void _handleTapCountReset(
@@ -142,5 +158,13 @@ final class DevToolsBloc extends Bloc<DevToolsEvent, DevToolsState>
         emit(state.copyWith(systemInfo: Optional(systemInfo)));
       }
     }
+  }
+
+  Future<void> _handleWatchSystemInfoEvent(
+    WatchSystemInfoEvent event,
+    Emitter<DevToolsState> emit,
+  ) async {
+    _syncStartsSub =
+        _devToolsService.watchStats().listen((event) => add(SyncStatsChangedEvent(event)));
   }
 }

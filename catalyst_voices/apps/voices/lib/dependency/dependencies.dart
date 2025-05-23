@@ -371,11 +371,14 @@ final class Dependencies extends DependencyProvider {
         sharedPreferences: get<SharedPreferencesAsync>(),
       );
     });
-    registerLazySingleton<SyncStatsStorage>(() {
-      return SyncStatsLocalStorage(
-        sharedPreferences: get<SharedPreferencesAsync>(),
-      );
-    });
+    registerLazySingleton<SyncStatsStorage>(
+      () {
+        return SyncStatsLocalStorage(
+          sharedPreferences: get<SharedPreferencesAsync>(),
+        );
+      },
+      dispose: (storage) async => storage.dispose(),
+    );
   }
 
   void _registerUtils() {

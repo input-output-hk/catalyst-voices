@@ -91,7 +91,7 @@ final class SyncManagerImpl implements SyncManager {
     required int newRefsCount,
     required Duration duration,
   }) async {
-    final stats = await _statsStorage.read();
+    final stats = (await _statsStorage.read()) ?? const SyncStats();
 
     final updated = stats.copyWith(
       lastSuccessfulSyncAt: Optional(DateTimeExt.now()),

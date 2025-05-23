@@ -30,6 +30,8 @@ class DevToolsPage extends StatefulWidget {
 }
 
 class _DevToolsPageState extends State<DevToolsPage> {
+  DevToolsBloc? _bloc;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -50,9 +52,25 @@ class _DevToolsPageState extends State<DevToolsPage> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    _bloc = context.read<DevToolsBloc>();
+  }
+
+  @override
+  void dispose() {
+    _bloc?.add(const StopWatchingSystemInfoEvent());
+    _bloc = null;
+    super.dispose();
+  }
+
+  @override
   void initState() {
     super.initState();
 
-    context.read<DevToolsBloc>().add(const UpdateAllEvent());
+    _bloc = context.read<DevToolsBloc>()
+      ..add(const UpdateAllEvent())
+      ..add(const WatchSystemInfoEvent());
   }
 }

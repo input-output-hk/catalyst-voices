@@ -15,6 +15,8 @@ abstract interface class DevToolsService {
   Future<bool> isDeveloper();
 
   Future<void> updateDevTools({required bool isEnabled});
+
+  Stream<SyncStats> watchStats();
 }
 
 final class DevToolsServiceImpl implements DevToolsService {
@@ -29,7 +31,9 @@ final class DevToolsServiceImpl implements DevToolsService {
   );
 
   @override
-  Future<SyncStats> getStats() => _syncStatsStorage.read();
+  Future<SyncStats> getStats() {
+    return _syncStatsStorage.read().then((value) => value ?? const SyncStats());
+  }
 
   @override
   Future<SystemInfo> getSystemInfo() async {
@@ -55,5 +59,10 @@ final class DevToolsServiceImpl implements DevToolsService {
     final config = await _devToolsRepository.readConfig();
     final updatedConfig = config.copyWith(isDeveloper: isEnabled);
     await _devToolsRepository.writeConfig(updatedConfig);
+  }
+
+  @override
+  Stream<SyncStats> watchStats() {
+    return _syncStatsStorage.watch().map((event) => event ?? const SyncStats());
   }
 }
