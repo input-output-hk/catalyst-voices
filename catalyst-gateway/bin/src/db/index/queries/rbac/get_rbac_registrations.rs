@@ -19,7 +19,7 @@ use crate::db::{
         queries::{PreparedQueries, PreparedSelectQuery},
         session::CassandraSession,
     },
-    types::{DbCatalystId, DbSlot, DbTransactionId, DbTxnIndex, DbUuidV4},
+    types::{DbCatalystId, DbSlot, DbTransactionId, DbTxnIndex},
 };
 
 /// Get registrations by Catalyst ID query.
@@ -44,9 +44,6 @@ pub(crate) struct Query {
     pub txn_index: DbTxnIndex,
     /// A previous  transaction id.
     pub prv_txn_id: Option<DbTransactionId>,
-    /// A registration purpose.
-    #[allow(dead_code)]
-    pub purpose: DbUuidV4,
 }
 
 impl Query {
