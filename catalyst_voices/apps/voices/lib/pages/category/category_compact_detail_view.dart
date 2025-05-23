@@ -1,8 +1,8 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/pages/category/category_brief.dart';
-import 'package:catalyst_voices/pages/category/category_description_expadable_list.dart';
+import 'package:catalyst_voices/pages/category/category_description_expandable_list.dart';
 import 'package:catalyst_voices/widgets/cards/funds_detail_card.dart';
-import 'package:catalyst_voices/widgets/list/category_requirments_list.dart';
+import 'package:catalyst_voices/widgets/list/category_requirements_list.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
