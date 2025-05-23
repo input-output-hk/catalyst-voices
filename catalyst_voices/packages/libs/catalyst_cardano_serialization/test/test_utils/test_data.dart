@@ -1,4 +1,6 @@
 import 'package:catalyst_cardano_serialization/src/address.dart';
+import 'package:catalyst_cardano_serialization/src/builders/transaction_builder.dart';
+import 'package:catalyst_cardano_serialization/src/fees.dart';
 import 'package:catalyst_cardano_serialization/src/hashes.dart';
 import 'package:catalyst_cardano_serialization/src/scripts.dart';
 import 'package:catalyst_cardano_serialization/src/signature.dart';
@@ -46,6 +48,23 @@ TransactionUnspentOutput testUtxo({int? index, ScriptRef? scriptRef}) {
       amount: const Balance(coin: Coin(100000000)),
       scriptRef: scriptRef,
     ),
+  );
+}
+
+/// The default configuration for transaction building.
+///
+/// This configuration includes fee algorithm parameters, maximum transaction
+/// size, maximum value size, and coins per UTxO byte.
+TransactionBuilderConfig transactionBuilderConfig() {
+  return const TransactionBuilderConfig(
+    feeAlgo: TieredFee(
+      constant: 155381,
+      coefficient: 44,
+      refScriptByteCost: 15,
+    ),
+    maxTxSize: 16384,
+    maxValueSize: 5000,
+    coinsPerUtxoByte: Coin(4310),
   );
 }
 
