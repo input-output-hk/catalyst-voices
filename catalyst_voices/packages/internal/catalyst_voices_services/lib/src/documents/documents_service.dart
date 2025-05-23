@@ -16,7 +16,7 @@ typedef _RefSuccess = Success<TypedDocumentRef, Exception>;
 
 // ignore: one_member_abstracts
 abstract interface class DocumentsService {
-  factory DocumentsService(
+  const factory DocumentsService(
     DocumentRepository documentRepository,
   ) = DocumentsServiceImpl;
 
@@ -34,7 +34,7 @@ abstract interface class DocumentsService {
 final class DocumentsServiceImpl implements DocumentsService {
   final DocumentRepository _documentRepository;
 
-  DocumentsServiceImpl(
+  const DocumentsServiceImpl(
     this._documentRepository,
   );
 

@@ -18,6 +18,17 @@ base class LocalStorage with StorageAsStringMixin implements Storage {
   }) : _sharedPreferences = sharedPreferences;
 
   @override
+  Future<void> clear() async {
+    final keysToRemove = allowList?.map(_effectiveKey).toSet() ??
+        await () async {
+          final keys = await _sharedPreferences.getKeys();
+          return keys.where((element) => element.startsWith(key)).toSet();
+        }();
+
+    await _sharedPreferences.clear(allowList: keysToRemove);
+  }
+
+  @override
   Future<bool> contains({required String key}) {
     final effectiveKey = _effectiveKey(key);
 
@@ -43,17 +54,6 @@ base class LocalStorage with StorageAsStringMixin implements Storage {
     } else {
       await _sharedPreferences.remove(effectiveKey);
     }
-  }
-
-  @override
-  Future<void> clear() async {
-    final keysToRemove = allowList?.map(_effectiveKey).toSet() ??
-        await () async {
-          final keys = await _sharedPreferences.getKeys();
-          return keys.where((element) => element.startsWith(key)).toSet();
-        }();
-
-    await _sharedPreferences.clear(allowList: keysToRemove);
   }
 
   String _effectiveKey(String value) {
