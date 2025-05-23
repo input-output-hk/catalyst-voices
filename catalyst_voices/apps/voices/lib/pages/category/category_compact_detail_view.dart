@@ -1,8 +1,9 @@
+import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/pages/category/category_brief.dart';
 import 'package:catalyst_voices/pages/category/category_description_expadable_list.dart';
 import 'package:catalyst_voices/widgets/cards/funds_detail_card.dart';
-import 'package:catalyst_voices/widgets/containers/linear_gradient_header.dart';
 import 'package:catalyst_voices/widgets/list/category_requirments_list.dart';
+import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
@@ -16,11 +17,12 @@ class CategoryCompactDetailView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Material(
       borderRadius: BorderRadius.circular(12),
-      color: Colors.transparent,
+      color: context.colors.onSurfaceNeutralOpaqueLv1,
       clipBehavior: Clip.hardEdge,
       child: Stack(
         children: [
-          const LinearGradientHeader(),
+          const _Background(),
+          _Image(image: category.image),
           Padding(
             padding: const EdgeInsets.all(32),
             child: Column(
@@ -56,6 +58,39 @@ class CategoryCompactDetailView extends StatelessWidget {
   }
 }
 
+class _Background extends StatelessWidget {
+  const _Background();
+
+  @override
+  Widget build(BuildContext context) {
+    final lightColors = [
+      context.colors.onSurfaceNeutralOpaqueLv1,
+      const Color(0xFFB4DAFD),
+      const Color(0xFFF8C1EA),
+    ];
+    final darkColors = [
+      context.colors.onSurfaceNeutralOpaqueLv1,
+      const Color(0xFF4E74B2),
+      const Color(0xFF9338C3),
+    ];
+    final isLight = Theme.of(context).brightness == Brightness.light;
+
+    return Container(
+      width: double.infinity,
+      height: 300,
+      decoration: BoxDecoration(
+        color: context.colors.avatarsPrimary,
+        gradient: LinearGradient(
+          begin: const Alignment(0, 1.4),
+          end: const Alignment(0.18, -1.2),
+          colors: isLight ? lightColors : darkColors,
+          stops: const [0.46, 0.66, 1],
+        ),
+      ),
+    );
+  }
+}
+
 class _CategoryBrief extends StatelessWidget {
   final String categoryName;
   final String categoryDescription;
@@ -75,6 +110,24 @@ class _CategoryBrief extends StatelessWidget {
       categoryRef: categoryRef,
       showViewAllButton: false,
       type: CategoryBriefType.compact,
+    );
+  }
+}
+
+class _Image extends StatelessWidget {
+  final SvgGenImage image;
+
+  const _Image({required this.image});
+
+  @override
+  Widget build(BuildContext context) {
+    return Positioned(
+      right: -50,
+      top: -50,
+      child: image.buildPicture(
+        height: 250,
+        color: context.colors.iconsBackground.withValues(alpha: .4),
+      ),
     );
   }
 }

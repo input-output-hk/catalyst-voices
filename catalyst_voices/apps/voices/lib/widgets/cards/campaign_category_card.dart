@@ -36,11 +36,7 @@ class CampaignCategoryCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          category.image.buildPicture(
-            height: 220,
-            fit: BoxFit.fill,
-            color: context.colors.iconsPrimary,
-          ),
+          _Background(image: category.image),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
             child: Column(
@@ -67,6 +63,41 @@ class CampaignCategoryCard extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _Background extends StatelessWidget {
+  final SvgGenImage image;
+
+  const _Background({required this.image});
+
+  @override
+  Widget build(BuildContext context) {
+    final lightColors = [
+      const Color(0xFFF7FAFE),
+      const Color(0xFFC0D5FB),
+      const Color(0xFFF9A5E0),
+    ];
+    final darkColors = [
+      const Color(0xFF91B9EA),
+      const Color(0xFF5A7AE5),
+      const Color(0xFFA55DCE),
+    ];
+    final isLight = Theme.of(context).brightness == Brightness.light;
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(vertical: 40),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: isLight ? lightColors : darkColors,
+        ),
+      ),
+      child: image.buildPicture(
+        height: 160,
+        fit: BoxFit.fitHeight,
+        color: context.colors.iconsPrimary,
       ),
     );
   }

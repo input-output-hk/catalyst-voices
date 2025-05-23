@@ -105,10 +105,10 @@ class _CategoryBrief extends StatelessWidget {
             ),
           ),
           Positioned(
-            right: 0,
-            bottom: 0,
+            right: -100,
+            top: -80,
             child: image.buildPicture(
-              // size: 380,
+              height: 380,
               color: context.colors.iconsBackground.withValues(alpha: .4),
             ),
           ),
