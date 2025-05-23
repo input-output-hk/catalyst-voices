@@ -27,9 +27,7 @@ use crate::{
     settings::{chain_follower, Settings},
 };
 
-// pub(crate) mod cip36_registration_obsolete;
 pub(crate) mod event;
-pub(crate) mod util;
 
 /// How long we wait between checks for connection to the indexing DB to be ready.
 pub(crate) const INDEXING_DB_READY_WAIT_INTERVAL: Duration = Duration::from_secs(1);
