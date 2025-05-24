@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["role_data"],"struct":["RbacRegistrationChain"]};

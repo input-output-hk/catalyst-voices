@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["GET_INVALID_REGISTRATIONS_FROM_STAKE_PK_QUERY"],"struct":["GetInvalidRegistrationParams","GetInvalidRegistrationQuery"]};
