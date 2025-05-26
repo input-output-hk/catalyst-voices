@@ -23,6 +23,8 @@ extension ResponseMapper<T> on chopper.Response<T> {
       return bodyBytes;
     } else if (statusCode == ApiErrorResponseException.notFound) {
       throw NotFoundException(message: error.toString());
+    } else if (statusCode == ApiErrorResponseException.conflict) {
+      throw ResourceConflictException(message: _extractErrorMessage(error));
     } else {
       throw toApiException();
     }
@@ -32,7 +34,9 @@ extension ResponseMapper<T> on chopper.Response<T> {
     if (isSuccessful) {
       return bodyOrThrow;
     } else if (statusCode == ApiErrorResponseException.notFound) {
-      throw NotFoundException(message: error.toString());
+      throw NotFoundException(message: _extractErrorMessage(error));
+    } else if (statusCode == ApiErrorResponseException.conflict) {
+      throw ResourceConflictException(message: _extractErrorMessage(error));
     } else {
       throw toApiException();
     }
@@ -43,5 +47,9 @@ extension ResponseMapper<T> on chopper.Response<T> {
       statusCode: statusCode,
       error: error,
     );
+  }
+
+  String? _extractErrorMessage(Object? error) {
+    return error?.toString();
   }
 }

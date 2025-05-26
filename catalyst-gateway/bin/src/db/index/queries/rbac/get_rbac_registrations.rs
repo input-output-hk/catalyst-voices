@@ -43,6 +43,7 @@ pub(crate) struct Query {
     /// A transaction index.
     pub txn_index: DbTxnIndex,
     /// A previous  transaction id.
+    #[allow(dead_code)]
     pub prv_txn_id: Option<DbTransactionId>,
 }
 
