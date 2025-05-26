@@ -69,6 +69,9 @@ class _ClearedSnackbar extends StatelessWidget {
 
         context.read<ProposalBuilderBloc>().add(event);
       },
+      onClose: () {
+        context.read<ProposalBuilderBloc>().add(const ClearValidationProposalEvent());
+      },
     );
   }
 }
@@ -206,6 +209,7 @@ class _Snackbar extends StatelessWidget {
   final String message;
   final String buttonText;
   final VoidCallback buttonAction;
+  final VoidCallback? onClose;
 
   const _Snackbar({
     required this.type,
@@ -213,6 +217,7 @@ class _Snackbar extends StatelessWidget {
     required this.message,
     required this.buttonText,
     required this.buttonAction,
+    this.onClose,
   });
 
   @override
@@ -221,7 +226,7 @@ class _Snackbar extends StatelessWidget {
       type: type,
       title: title,
       message: message,
-      onClosePressed: () => unawaited(_onClose(context)),
+      onClosePressed: onClose ?? () => unawaited(_onClose(context)),
       actions: [
         VoicesSnackBarPrimaryAction(
           type: type,
