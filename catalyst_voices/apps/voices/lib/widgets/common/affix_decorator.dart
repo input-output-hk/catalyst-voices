@@ -73,7 +73,7 @@ class AffixDecorator extends StatelessWidget {
 
     return Row(
       mainAxisSize: mainAxisSize,
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: crossAxisAlignment,
       children: [
         if (prefix != null) ...[
           IconTheme(

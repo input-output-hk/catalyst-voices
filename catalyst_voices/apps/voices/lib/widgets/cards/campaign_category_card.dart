@@ -75,6 +75,23 @@ class _Background extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(vertical: 40),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: _getGradientColors(context),
+        ),
+      ),
+      child: image.buildPicture(
+        height: 160,
+        fit: BoxFit.fitHeight,
+        color: _getImageColor(context),
+      ),
+    );
+  }
+
+  List<Color> _getGradientColors(BuildContext context) {
     final lightColors = [
       const Color(0xFFF7FAFE),
       const Color(0xFFC0D5FB),
@@ -86,20 +103,13 @@ class _Background extends StatelessWidget {
       const Color(0xFFA55DCE),
     ];
     final isLight = Theme.of(context).brightness == Brightness.light;
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: 40),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: isLight ? lightColors : darkColors,
-        ),
-      ),
-      child: image.buildPicture(
-        height: 160,
-        fit: BoxFit.fitHeight,
-        color: context.colors.iconsPrimary,
-      ),
-    );
+
+    return isLight ? lightColors : darkColors;
+  }
+
+  Color _getImageColor(BuildContext context) {
+    final isLight = Theme.of(context).brightness == Brightness.light;
+    return isLight ? context.colors.iconsPrimary : Colors.white;
   }
 }
 
