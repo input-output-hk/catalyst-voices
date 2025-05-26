@@ -1,21 +1,19 @@
 import 'dart:async';
 
-import 'package:catalyst_voices/widgets/buttons/voices_filled_button.dart';
-import 'package:catalyst_voices/widgets/buttons/voices_text_button.dart';
-import 'package:catalyst_voices/widgets/modals/voices_alert_dialog.dart';
-import 'package:catalyst_voices/widgets/modals/voices_dialog.dart';
+import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/widgets/snackbar/voices_snackbar.dart';
 import 'package:catalyst_voices/widgets/snackbar/voices_snackbar_action.dart';
 import 'package:catalyst_voices/widgets/snackbar/voices_snackbar_type.dart';
+import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
 
-class ProposalBuilderValidationErrorsSnackbar extends StatelessWidget {
+class ProposalBuilderValidationSnackbarOverlay extends StatelessWidget {
   final Widget child;
 
-  const ProposalBuilderValidationErrorsSnackbar({
+  const ProposalBuilderValidationSnackbarOverlay({
     super.key,
     required this.child,
   });
@@ -31,6 +29,8 @@ class ProposalBuilderValidationErrorsSnackbar extends StatelessWidget {
             child,
             if (state != null)
               Positioned(
+                left: MediaQuery.sizeOf(context).width * 0.30,
+                right: MediaQuery.sizeOf(context).width * 0.30,
                 bottom: 32,
                 child: _SnackbarStatusSelector(validationErrors: state),
               ),
@@ -81,26 +81,26 @@ class _ExitFormIssueModeDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return VoicesAlertDialog(
-      icon: CatalystImage.asset(
-        VoicesAssets.images.keyIncorrect.path,
-        width: 80,
-        height: 80,
+    return VoicesDesktopInfoDialog(
+      icon: VoicesAssets.icons.exclamation.buildIcon(
+        color: context.colors.iconsWarning,
       ),
-      subtitle: Text(context.l10n.proposalEditorValidationExitDialogTitle),
-      content: Text(
-        context.l10n.proposalEditorValidationExitDialogMessage,
+      title: Text(context.l10n.proposalEditorValidationExitDialogTitle),
+      message: Text(context.l10n.proposalEditorValidationExitDialogMessage),
+      action: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        spacing: 12,
+        children: [
+          VoicesTextButton(
+            child: Text(context.l10n.exitButtonText),
+            onTap: () => Navigator.of(context).pop(true),
+          ),
+          VoicesFilledButton(
+            child: Text(context.l10n.resumeButtonText),
+            onTap: () => Navigator.of(context).pop(false),
+          ),
+        ],
       ),
-      buttons: [
-        VoicesTextButton(
-          child: Text(context.l10n.exitButtonText),
-          onTap: () => Navigator.of(context).pop(true),
-        ),
-        VoicesFilledButton(
-          child: Text(context.l10n.resumeButtonText),
-          onTap: () => Navigator.of(context).pop(false),
-        ),
-      ],
     );
   }
 
