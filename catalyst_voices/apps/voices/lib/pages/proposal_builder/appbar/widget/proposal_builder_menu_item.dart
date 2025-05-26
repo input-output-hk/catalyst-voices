@@ -40,29 +40,48 @@ class _ProposalBuilderMenuItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final title = data.title(context);
     final description = data.description(context);
-    final colors = data.colors(context);
+    final foregroundColor = Theme.of(context).colors.textOnPrimaryLevel1;
 
-    final foregroundColor = colors?.foreground ?? Theme.of(context).colors.textOnPrimaryLevel1;
+    return Stack(
+      children: [
+        ListTile(
+          title: MarkdownText(
+            MarkdownData(title),
+            selectable: false,
+            pColor: foregroundColor,
+          ),
+          subtitle: description == null
+              ? null
+              : Text(
+                  description,
+                  style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: foregroundColor),
+                ),
+          leading: data.action.icon().buildIcon(color: foregroundColor),
+          mouseCursor: data.action.clickable ? SystemMouseCursors.click : null,
+          // Shape is here so ListTile does not add rounded corners.
+          shape: const RoundedRectangleBorder(),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+        ),
+        if (data.hasError)
+          const Positioned(
+            left: 0,
+            top: 0,
+            bottom: 0,
+            child: _ProposalBuilderMenuItemErrorIndicator(),
+          ),
+      ],
+    );
+  }
+}
 
-    return ListTile(
-      title: MarkdownText(
-        MarkdownData(title),
-        selectable: false,
-        pColor: foregroundColor,
-      ),
-      subtitle: description == null
-          ? null
-          : Text(
-              description,
-              style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: foregroundColor),
-            ),
-      leading: data.action.icon().buildIcon(color: foregroundColor),
-      mouseCursor: data.action.clickable ? SystemMouseCursors.click : null,
-      // Shape is here so ListTile does not add rounded corners.
-      shape: const RoundedRectangleBorder(),
-      tileColor: colors?.background,
-      splashColor: colors?.foreground,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+class _ProposalBuilderMenuItemErrorIndicator extends StatelessWidget {
+  const _ProposalBuilderMenuItemErrorIndicator({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 5,
+      color: Theme.of(context).colorScheme.error,
     );
   }
 }
