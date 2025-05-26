@@ -1034,7 +1034,17 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
   ) {
     final validationErrors = state.validationErrors?.copyWith(status: event.status);
 
-    emit(state.copyWith(validationErrors: Optional(validationErrors)));
+    final documentSegments = _mapDocumentToSegments(
+      _cache.proposalDocument!,
+      showValidationErrors: validationErrors?.showErrorsInMenu ?? false,
+    );
+
+    emit(
+      state.copyWith(
+        documentSegments: documentSegments,
+        validationErrors: Optional(validationErrors),
+      ),
+    );
   }
 
   Future<DraftRef> _upsertDraftProposal(DocumentDataContent document) async {
