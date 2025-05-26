@@ -1,5 +1,4 @@
-import 'package:catalyst_voices_models/catalyst_voices_models.dart'
-    show ApiConfig;
+import 'package:catalyst_voices_models/catalyst_voices_models.dart' show ApiConfig;
 import 'package:catalyst_voices_repositories/generated/api/cat_gateway.swagger.dart';
 import 'package:catalyst_voices_repositories/generated/api/client_index.dart';
 import 'package:catalyst_voices_repositories/generated/api/client_mapping.dart';
@@ -32,7 +31,6 @@ final class ApiServices {
 
     return ApiServices.internal(
       gateway: CatGateway.create(
-        authenticator: null,
         baseUrl: Uri.parse(config.gatewayUrl),
         converter: CborOrJsonDelegateConverter(
           cborConverter: CborSerializableConverter(),
@@ -50,7 +48,6 @@ final class ApiServices {
         ],
       ),
       reviews: CatReviews.create(
-        authenticator: null,
         baseUrl: Uri.parse(config.reviewsUrl),
         interceptors: [
           RbacAuthInterceptor(authTokenProvider),

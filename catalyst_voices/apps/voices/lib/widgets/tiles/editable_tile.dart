@@ -42,8 +42,7 @@ class EditableTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final showSaveButton = isEditMode;
-    final showFooter =
-        showSaveButton || errorText != null || footerActions.isNotEmpty;
+    final showFooter = showSaveButton || errorText != null || footerActions.isNotEmpty;
 
     return PropertyTile(
       title: title,
@@ -149,10 +148,7 @@ class _Footer extends StatelessWidget {
     return Row(
       spacing: 8,
       children: [
-        if (errorText != null)
-          Expanded(child: _ErrorText(text: errorText))
-        else
-          const Spacer(),
+        if (errorText != null) Expanded(child: _ErrorText(text: errorText)) else const Spacer(),
         Visibility.maintain(
           visible: showSaveButton,
           child: VoicesFilledButton(

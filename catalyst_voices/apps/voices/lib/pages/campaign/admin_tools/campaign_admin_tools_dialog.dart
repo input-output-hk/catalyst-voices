@@ -11,114 +11,6 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-/// A draggable [CampaignAdminToolsDialog],
-/// should be used as a child of a [Stack].
-///
-/// Initially shown at bottom-left corner with [initialOffset] offset.
-class DraggableCampaignAdminToolsDialog extends StatefulWidget {
-  /// The key for the [CampaignAdminToolsDialog] to make sure it's state
-  /// is kept when a user keeps dragging it.
-  ///
-  /// The state might include currently open tab from [TabBar],
-  /// scroll position, etc.
-  final GlobalKey dialogKey;
-
-  /// See [CampaignAdminToolsDialog.selectedSpace].
-  final Space selectedSpace;
-
-  /// See [CampaignAdminToolsDialog.onSpaceSelected].
-  final ValueChanged<Space> onSpaceSelected;
-
-  /// The initial offset from bottom-left for the dialog.
-  final Offset initialOffset;
-
-  const DraggableCampaignAdminToolsDialog({
-    super.key,
-    required this.dialogKey,
-    required this.selectedSpace,
-    required this.onSpaceSelected,
-    this.initialOffset = const Offset(32, 32),
-  });
-
-  @override
-  State<DraggableCampaignAdminToolsDialog> createState() =>
-      _DraggableCampaignAdminToolsDialogState();
-}
-
-class _DraggableCampaignAdminToolsDialogState
-    extends State<DraggableCampaignAdminToolsDialog> {
-  Offset _position = Offset.infinite;
-  late Size _screenSize;
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-
-    _screenSize = MediaQuery.sizeOf(context);
-
-    if (_position.isInfinite) {
-      // initialize it for the first time
-      _position = Offset(
-        widget.initialOffset.dx,
-        _screenSize.height -
-            CampaignAdminToolsDialog._height -
-            widget.initialOffset.dy,
-      );
-    } else {
-      // clamp it so that it fits into the screen
-      // in case user shrinks the app window
-
-      _position = _clampIntoScreenBounds(_position);
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final Widget child = CampaignAdminToolsDialog(
-      key: widget.dialogKey,
-      selectedSpace: widget.selectedSpace,
-      onSpaceSelected: widget.onSpaceSelected,
-    );
-
-    return Positioned(
-      left: _position.dx,
-      top: _position.dy,
-      child: Draggable(
-        onDragUpdate: _onDragUpdate,
-        childWhenDragging: const Offstage(),
-        feedback: child,
-        child: child,
-      ),
-    );
-  }
-
-  void _onDragUpdate(DragUpdateDetails details) {
-    final newPosition = _position + details.delta;
-    final clampedPosition = _clampIntoScreenBounds(newPosition);
-
-    if (_position != clampedPosition) {
-      setState(() {
-        _position = clampedPosition;
-      });
-    }
-  }
-
-  /// Makes sure the dialog would fit into a screen window
-  /// even if the window gets shrunk, etc.
-  Offset _clampIntoScreenBounds(Offset offset) {
-    return Offset(
-      offset.dx.clamp(
-        0,
-        _screenSize.width - CampaignAdminToolsDialog._width,
-      ),
-      offset.dy.clamp(
-        0,
-        _screenSize.height - CampaignAdminToolsDialog._height,
-      ),
-    );
-  }
-}
-
 /// The campaign admin tools dialog which supports
 /// mocking different campaign and user states.
 ///
@@ -163,7 +55,6 @@ class CampaignAdminToolsDialog extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: Theme.of(context).colors.onSurfaceNeutral012,
-          width: 1,
         ),
       ),
       child: Material(
@@ -183,74 +74,38 @@ class CampaignAdminToolsDialog extends StatelessWidget {
   }
 }
 
-class _Header extends StatelessWidget {
-  const _Header();
+/// A draggable [CampaignAdminToolsDialog],
+/// should be used as a child of a [Stack].
+///
+/// Initially shown at bottom-left corner with [initialOffset] offset.
+class DraggableCampaignAdminToolsDialog extends StatefulWidget {
+  /// The key for the [CampaignAdminToolsDialog] to make sure it's state
+  /// is kept when a user keeps dragging it.
+  ///
+  /// The state might include currently open tab from [TabBar],
+  /// scroll position, etc.
+  final GlobalKey dialogKey;
+
+  /// See [CampaignAdminToolsDialog.selectedSpace].
+  final Space selectedSpace;
+
+  /// See [CampaignAdminToolsDialog.onSpaceSelected].
+  final ValueChanged<Space> onSpaceSelected;
+
+  /// The initial offset from bottom-left for the dialog.
+  final Offset initialOffset;
+
+  const DraggableCampaignAdminToolsDialog({
+    super.key,
+    required this.dialogKey,
+    required this.selectedSpace,
+    required this.onSpaceSelected,
+    this.initialOffset = const Offset(32, 32),
+  });
 
   @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 12, 12, 12),
-      child: Row(
-        children: [
-          Expanded(
-            child: Text(
-              context.l10n.campaignPreviewTitle,
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-          ),
-          XButton(
-            onTap: () => context.read<AdminToolsCubit>().disable(),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _Tabs extends StatelessWidget {
-  const _Tabs();
-
-  @override
-  Widget build(BuildContext context) {
-    return const DefaultTabController(
-      length: 2,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _TabBar(),
-          Expanded(
-            child: TabBarStackView(
-              children: [
-                CampaignAdminToolsEventsTab(),
-                CampaignAdminToolsViewsTab(),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _TabBar extends StatelessWidget {
-  const _TabBar();
-
-  @override
-  Widget build(BuildContext context) {
-    return TabBar(
-      tabAlignment: TabAlignment.fill,
-      indicatorSize: TabBarIndicatorSize.tab,
-      tabs: [
-        Tab(
-          text: context.l10n.campaignPreviewEvents,
-        ),
-        Tab(
-          text: context.l10n.campaignPreviewViews,
-        ),
-      ],
-    );
-  }
+  State<DraggableCampaignAdminToolsDialog> createState() =>
+      _DraggableCampaignAdminToolsDialogState();
 }
 
 class _BlocFooter extends StatelessWidget {
@@ -278,6 +133,77 @@ class _BlocFooter extends StatelessWidget {
         );
       },
     );
+  }
+}
+
+class _DraggableCampaignAdminToolsDialogState extends State<DraggableCampaignAdminToolsDialog> {
+  Offset _position = Offset.infinite;
+  late Size _screenSize;
+
+  @override
+  Widget build(BuildContext context) {
+    final Widget child = CampaignAdminToolsDialog(
+      key: widget.dialogKey,
+      selectedSpace: widget.selectedSpace,
+      onSpaceSelected: widget.onSpaceSelected,
+    );
+
+    return Positioned(
+      left: _position.dx,
+      top: _position.dy,
+      child: Draggable(
+        onDragUpdate: _onDragUpdate,
+        childWhenDragging: const Offstage(),
+        feedback: child,
+        child: child,
+      ),
+    );
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    _screenSize = MediaQuery.sizeOf(context);
+
+    if (_position.isInfinite) {
+      // initialize it for the first time
+      _position = Offset(
+        widget.initialOffset.dx,
+        _screenSize.height - CampaignAdminToolsDialog._height - widget.initialOffset.dy,
+      );
+    } else {
+      // clamp it so that it fits into the screen
+      // in case user shrinks the app window
+
+      _position = _clampIntoScreenBounds(_position);
+    }
+  }
+
+  /// Makes sure the dialog would fit into a screen window
+  /// even if the window gets shrunk, etc.
+  Offset _clampIntoScreenBounds(Offset offset) {
+    return Offset(
+      offset.dx.clamp(
+        0,
+        _screenSize.width - CampaignAdminToolsDialog._width,
+      ),
+      offset.dy.clamp(
+        0,
+        _screenSize.height - CampaignAdminToolsDialog._height,
+      ),
+    );
+  }
+
+  void _onDragUpdate(DragUpdateDetails details) {
+    final newPosition = _position + details.delta;
+    final clampedPosition = _clampIntoScreenBounds(newPosition);
+
+    if (_position != clampedPosition) {
+      setState(() {
+        _position = clampedPosition;
+      });
+    }
   }
 }
 
@@ -319,6 +245,30 @@ class _Footer extends StatelessWidget {
   }
 }
 
+class _Header extends StatelessWidget {
+  const _Header();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(24, 12, 12, 12),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              context.l10n.campaignPreviewTitle,
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+          ),
+          XButton(
+            onTap: () => context.read<AdminToolsCubit>().disable(),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _SpaceItem extends StatelessWidget {
   final Space space;
   final bool isActive;
@@ -334,14 +284,56 @@ class _SpaceItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return VoicesAvatar(
       icon: space.icon.buildIcon(),
-      backgroundColor:
-          isActive ? space.backgroundColor(context) : Colors.transparent,
-      foregroundColor: isActive
-          ? space.foregroundColor(context)
-          : Theme.of(context).colors.iconsForeground,
-      padding: const EdgeInsets.all(8),
-      radius: 20,
+      backgroundColor: isActive ? space.backgroundColor(context) : Colors.transparent,
+      foregroundColor:
+          isActive ? space.foregroundColor(context) : Theme.of(context).colors.iconsForeground,
       onTap: onTap,
+    );
+  }
+}
+
+class _TabBar extends StatelessWidget {
+  const _TabBar();
+
+  @override
+  Widget build(BuildContext context) {
+    return TabBar(
+      tabAlignment: TabAlignment.fill,
+      indicatorSize: TabBarIndicatorSize.tab,
+      tabs: [
+        Tab(
+          text: context.l10n.campaignPreviewEvents,
+        ),
+        Tab(
+          text: context.l10n.campaignPreviewViews,
+        ),
+      ],
+    );
+  }
+}
+
+class _Tabs extends StatelessWidget {
+  const _Tabs();
+
+  @override
+  Widget build(BuildContext context) {
+    return const DefaultTabController(
+      length: 2,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _TabBar(),
+          Expanded(
+            child: TabBarStackView(
+              children: [
+                CampaignAdminToolsEventsTab(),
+                CampaignAdminToolsViewsTab(),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

@@ -1,13 +1,12 @@
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
+import 'package:catalyst_voices_view_models/src/exception/localized_resource_conflict_exception.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 
 /// An [Exception] that can provide localized, human readable info.
-abstract base class LocalizedException
-    with EquatableMixin
-    implements Exception {
+abstract base class LocalizedException with EquatableMixin implements Exception {
   const LocalizedException();
 
   factory LocalizedException.create(
@@ -17,6 +16,9 @@ abstract base class LocalizedException
     if (error is LocalizedException) return error;
     if (error is ApiException) return LocalizedApiException.from(error);
     if (error is NotFoundException) return const LocalizedNotFoundException();
+    if (error is ResourceConflictException) {
+      return LocalizedResourceConflictException(error.message);
+    }
 
     return fallback();
   }

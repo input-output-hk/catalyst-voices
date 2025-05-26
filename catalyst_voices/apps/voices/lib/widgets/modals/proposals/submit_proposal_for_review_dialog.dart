@@ -20,8 +20,7 @@ class SubmitProposalForReviewDialog extends StatefulWidget {
   });
 
   @override
-  State<SubmitProposalForReviewDialog> createState() =>
-      _SubmitProposalForReviewDialogState();
+  State<SubmitProposalForReviewDialog> createState() => _SubmitProposalForReviewDialogState();
 
   /// Shows a dialog and returns a [Future] that resolves to `true`
   /// if the user wants to submit the proposal for review
@@ -58,26 +57,23 @@ class _AgreementConfirmation extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
-      child: MouseRegion(
-        cursor: SystemMouseCursors.click,
-        child: GestureDetector(
-          behavior: HitTestBehavior.opaque,
-          onTap: () => onChanged(!value),
-          child: Row(
-            spacing: 24,
-            children: [
-              VoicesCheckbox(
-                value: value,
-                onChanged: onChanged,
+      child: VoicesGestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () => onChanged(!value),
+        child: Row(
+          spacing: 24,
+          children: [
+            VoicesCheckbox(
+              value: value,
+              onChanged: onChanged,
+            ),
+            Expanded(
+              child: Text(
+                context.l10n.publishProposalForReviewDialogAgreement,
+                style: Theme.of(context).textTheme.bodyMedium,
               ),
-              Expanded(
-                child: Text(
-                  context.l10n.publishProposalForReviewDialogAgreement,
-                  style: Theme.of(context).textTheme.bodyMedium,
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -155,8 +151,7 @@ class _ListItems extends StatelessWidget {
   }
 }
 
-class _SubmitProposalForReviewDialogState
-    extends State<SubmitProposalForReviewDialog> {
+class _SubmitProposalForReviewDialogState extends State<SubmitProposalForReviewDialog> {
   bool _agreementConfirmed = false;
 
   @override
@@ -270,8 +265,7 @@ class _VersionUpdateSection extends StatelessWidget {
           const SizedBox(height: 2),
           Text(
             proposalTitle,
-            style: theme.textTheme.titleSmall
-                ?.copyWith(fontWeight: FontWeight.bold),
+            style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 16),
           _VersionUpdate(

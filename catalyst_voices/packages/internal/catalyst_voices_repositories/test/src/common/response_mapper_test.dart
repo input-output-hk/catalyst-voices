@@ -53,8 +53,18 @@ void main() {
       );
     });
 
-    test('successBodyBytesOrThrow throws $ApiErrorResponseException otherwise',
-        () {
+    test('successBodyBytesOrThrow throws $ResourceConflictException for 409', () {
+      final response = mockBinaryResponse(
+        statusCode: HttpStatus.conflict,
+      );
+
+      expect(
+        response.successBodyBytesOrThrow,
+        throwsA(const ResourceConflictException()),
+      );
+    });
+
+    test('successBodyBytesOrThrow throws $ApiErrorResponseException otherwise', () {
       final response = mockBinaryResponse(
         statusCode: HttpStatus.internalServerError,
         error: 'Internal Error',
@@ -80,6 +90,17 @@ void main() {
       expect(
         response.successBodyOrThrow,
         throwsA(isA<NotFoundException>()),
+      );
+    });
+
+    test('successBodyOrThrow throws $ResourceConflictException for 409', () {
+      final response = mockResponse(
+        statusCode: HttpStatus.conflict,
+      );
+
+      expect(
+        response.successBodyOrThrow,
+        throwsA(const ResourceConflictException()),
       );
     });
 

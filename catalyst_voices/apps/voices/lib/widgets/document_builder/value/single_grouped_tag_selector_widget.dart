@@ -49,8 +49,7 @@ class _GroupedTagChip extends StatelessWidget {
   }
 }
 
-class _SingleGroupedTagSelectorWidgetState
-    extends State<SingleGroupedTagSelectorWidget> {
+class _SingleGroupedTagSelectorWidgetState extends State<SingleGroupedTagSelectorWidget> {
   @override
   Widget build(BuildContext context) {
     return _TagWidget(
@@ -166,7 +165,6 @@ class _TagChipGroup extends StatelessWidget {
           key: ObjectKey(tag),
           name: tag,
           isSelected: isSelected,
-          isEnabled: true,
           onTap: () => isSelected ? onChanged(null) : onChanged(tag),
         );
       }).toList(),
@@ -190,9 +188,7 @@ class _TagGroupsDropdown extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SingleSelectDropdown<GroupedTags>(
-      items: groupedTags
-          .map((e) => DropdownMenuEntry(value: e, label: e.group))
-          .toList(),
+      items: groupedTags.map((e) => DropdownMenuEntry(value: e, label: e.group)).toList(),
       value: value,
       onChanged: onChanged,
     );

@@ -278,10 +278,8 @@ class _Summary extends StatelessWidget {
             children: [
               Text(
                 context.l10n.total,
-                style: Theme.of(context)
-                    .textTheme
-                    .titleSmall
-                    ?.copyWith(fontWeight: FontWeight.bold),
+                style:
+                    Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
               ),
               Text(
                 transactionFee,

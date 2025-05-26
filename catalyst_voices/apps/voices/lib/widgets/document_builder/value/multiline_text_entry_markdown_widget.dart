@@ -22,8 +22,7 @@ class MultilineTextEntryMarkdownWidget extends StatefulWidget {
   });
 
   @override
-  State<MultilineTextEntryMarkdownWidget> createState() =>
-      _MultilineTextEntryMarkdownWidgetState();
+  State<MultilineTextEntryMarkdownWidget> createState() => _MultilineTextEntryMarkdownWidgetState();
 }
 
 /// This focus helps to interact with [VoicesRichText] widget
@@ -47,8 +46,7 @@ class VoicesRichTextFocusNode extends FocusNode {
   }
 }
 
-class _MultilineTextEntryMarkdownWidgetState
-    extends State<MultilineTextEntryMarkdownWidget> {
+class _MultilineTextEntryMarkdownWidgetState extends State<MultilineTextEntryMarkdownWidget> {
   late final VoicesRichTextController _controller;
   late final VoicesRichTextFocusNode _focus;
   late final ScrollController _scrollController;
@@ -72,9 +70,9 @@ class _MultilineTextEntryMarkdownWidgetState
           ),
         VoicesRichText(
           controller: _controller,
-          enabled: widget.isEditMode,
           focusNode: _focus,
           scrollController: _scrollController,
+          enabled: widget.isEditMode,
           minHeight: 160,
           charsLimit: _maxLength,
           onChanged: _onChanged,
@@ -146,8 +144,10 @@ class _MultilineTextEntryMarkdownWidgetState
     widget.onChanged([change]);
   }
 
-  void _onChanged(MarkdownData? markdownData) {
-    _onChangedDebouncer.run(() => _dispatchChange(markdownData));
+  void _onChanged(MarkdownData? _) {
+    // Get markdown data from the controller, the method argument might
+    // already not be what latest controller holds due to debouncer delay.
+    _onChangedDebouncer.run(() => _dispatchChange(_controller.markdownData));
   }
 
   void _toggleEditMode() {

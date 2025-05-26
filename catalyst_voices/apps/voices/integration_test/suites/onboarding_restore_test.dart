@@ -56,8 +56,7 @@ void main() async {
         },
       );
 
-      patrolWidgetTest('restore - keychain choice screen looks OK',
-          (PatrolTester $) async {
+      patrolWidgetTest('restore - keychain choice screen looks OK', (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await RestoreKeychainChoicePanel($).goto();
         await RestoreKeychainChoicePanel($).verifyPageElements();
@@ -119,8 +118,7 @@ void main() async {
         await SeedPhraseInstructionsPanel($).verifyDetailsPanel();
       });
 
-      patrolWidgetTest('restore - seed phrase input screen looks OK',
-          (PatrolTester $) async {
+      patrolWidgetTest('restore - seed phrase input screen looks OK', (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await RestoreKeychainInputPanel($).goto();
         await RestoreKeychainInputPanel($).verifyPageElements();
@@ -167,15 +165,13 @@ void main() async {
         await RestoreKeychainInputPanel($).verifyDetailsPanel();
       });
 
-      patrolWidgetTest('restore - valid seed phrase input works',
-          (PatrolTester $) async {
+      patrolWidgetTest('restore - valid seed phrase input works', (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await RestoreKeychainSuccessPanel($).goto();
         await RestoreKeychainSuccessPanel($).verifyPageElements();
       });
 
-      patrolWidgetTest('restore - unlock password info screen looks OK',
-          (PatrolTester $) async {
+      patrolWidgetTest('restore - unlock password info screen looks OK', (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await UnlockPasswordInfoPanel($).goto();
         await UnlockPasswordInfoPanel($).verifyPageElements();
@@ -222,22 +218,18 @@ void main() async {
         await UnlockPasswordInfoPanel($).verifyDetailsPanel();
       });
 
-      patrolWidgetTest('restore - password input validation works',
-          (PatrolTester $) async {
+      patrolWidgetTest('restore - password input validation works', (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await UnlockPasswordInputPanel($).goto();
         await UnlockPasswordInputPanel($).verifyPageElements();
 
         // Test invalid password
         await UnlockPasswordInputPanel($).enterPassword('short', 'short');
-        await UnlockPasswordInputPanel($)
-            .verifyValidationIndicator(PasswordValidationStatus.weak);
+        await UnlockPasswordInputPanel($).verifyValidationIndicator(PasswordValidationStatus.weak);
 
         // Test valid password
-        await UnlockPasswordInputPanel($)
-            .enterPassword('ValidPass123', 'ValidPass123');
-        await UnlockPasswordInputPanel($)
-            .verifyValidationIndicator(PasswordValidationStatus.good);
+        await UnlockPasswordInputPanel($).enterPassword('ValidPass123', 'ValidPass123');
+        await UnlockPasswordInputPanel($).verifyValidationIndicator(PasswordValidationStatus.good);
       });
 
       patrolWidgetTest('restore - complete flow works', (PatrolTester $) async {
@@ -250,19 +242,15 @@ void main() async {
         await AppBarPage($).sessionAccountPopupMenuAvatarIsVisible();
       });
 
-      patrolWidgetTest('restore - password mismatch shows error',
-          (PatrolTester $) async {
+      patrolWidgetTest('restore - password mismatch shows error', (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await UnlockPasswordInputPanel($).goto();
 
-        await UnlockPasswordInputPanel($)
-            .enterPassword('Test1234', 'WrongPassword');
-        await UnlockPasswordInputPanel($)
-            .verifyPasswordConfirmErrorIcon(isShown: true);
+        await UnlockPasswordInputPanel($).enterPassword('Test1234', 'WrongPassword');
+        await UnlockPasswordInputPanel($).verifyPasswordConfirmErrorIcon();
       });
 
-      patrolWidgetTest('restore - can recover different keychain',
-          (PatrolTester $) async {
+      patrolWidgetTest('restore - can recover different keychain', (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await RestoreKeychainSuccessPanel($).goto();
         await RestoreKeychainSuccessPanel($).clickRecoverDifferentKeychain();

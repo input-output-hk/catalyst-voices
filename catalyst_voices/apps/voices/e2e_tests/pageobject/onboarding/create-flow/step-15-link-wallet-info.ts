@@ -1,24 +1,22 @@
 import { Locator, Page } from "@playwright/test";
 import { KeychainFinalPanel } from "./step-14-keychain-final";
-import intlEn from "../localization-util";
+import { TestModel } from "../../../models/testModel";
 
-export  class LinkWalletInfoPanel {
-    page: Page
-    chooseWalletBtn: Locator
+export class LinkWalletInfoPanel {
+  page: Page;
+  chooseWalletBtn: Locator;
 
-    constructor(page: Page) {
-        this.page = page;
-        this.chooseWalletBtn = this.page.getByRole("button", {
-            name: intlEn.chooseCardanoWallet,
-        });
-    }
+  constructor(page: Page) {
+    this.page = page;
+    this.chooseWalletBtn = this.page.getByTestId("ChooseWalletBtn");
+  }
 
-    async goto(password: string) {
-        await new KeychainFinalPanel(this.page).goto(password);
-        await new KeychainFinalPanel(this.page).clickLinkWalletAndRolesBtn();
-    }
+  async goto(testModel: TestModel) {
+    await new KeychainFinalPanel(this.page).goto(testModel);
+    await new KeychainFinalPanel(this.page).clickLinkWalletAndRolesBtn();
+  }
 
-    async clickChooseWalletBtn() {
-        await this.chooseWalletBtn.click();
-    }
+  async clickChooseWalletBtn() {
+    await this.chooseWalletBtn.click();
+  }
 }

@@ -10,8 +10,7 @@ import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
-import 'package:catalyst_voices_models/catalyst_voices_models.dart'
-    show ProposalDocument, Space;
+import 'package:catalyst_voices_models/catalyst_voices_models.dart' show ProposalDocument, Space;
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
@@ -31,51 +30,48 @@ class _HasCommentCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MouseRegion(
-      cursor: SystemMouseCursors.click,
-      child: GestureDetector(
-        onTap: () async => ProposalsRoute.myProposals().push(context),
-        child: Container(
-          decoration: BoxDecoration(
-            color: context.colors.elevationsOnSurfaceNeutralLv0,
-            borderRadius: BorderRadius.circular(16),
-          ),
-          padding: const EdgeInsets.all(16),
-          constraints: const BoxConstraints(
-            maxWidth: 300,
-            maxHeight: 190,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Row(
-                children: [
-                  VoicesAssets.icons.chat.buildIcon(
-                    color: context.colors.iconsPrimary,
-                  ),
-                  const Spacer(),
-                  VoicesAssets.icons.arrowRight.buildIcon(
-                    color: context.colors.primaryContainer,
-                  ),
-                ],
-              ),
-              const Spacer(),
-              Text(
-                context.l10n.viewProposalComments,
-                style: context.textTheme.titleSmall?.copyWith(
-                  color: context.colors.textOnPrimaryLevel1,
+    return VoicesGestureDetector(
+      onTap: () async => ProposalsRoute.myProposals().push(context),
+      child: Container(
+        decoration: BoxDecoration(
+          color: context.colors.elevationsOnSurfaceNeutralLv0,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        padding: const EdgeInsets.all(16),
+        constraints: const BoxConstraints(
+          maxWidth: 300,
+          maxHeight: 190,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
+              children: [
+                VoicesAssets.icons.chat.buildIcon(
+                  color: context.colors.iconsPrimary,
                 ),
-              ),
-              Text(
-                context.l10n.viewProposalCommentsDescription,
-                style: context.textTheme.bodyMedium?.copyWith(
-                  color: context.colors.sysColorsNeutralN60,
+                const Spacer(),
+                VoicesAssets.icons.arrowRight.buildIcon(
+                  color: context.colors.primaryContainer,
                 ),
+              ],
+            ),
+            const Spacer(),
+            Text(
+              context.l10n.viewProposalComments,
+              style: context.textTheme.titleSmall?.copyWith(
+                color: context.colors.textOnPrimaryLevel1,
               ),
-              const Spacer(),
-            ],
-          ),
+            ),
+            Text(
+              context.l10n.viewProposalCommentsDescription,
+              style: context.textTheme.bodyMedium?.copyWith(
+                color: context.colors.sysColorsNeutralN60,
+              ),
+            ),
+            const Spacer(),
+          ],
         ),
       ),
     );
@@ -123,7 +119,6 @@ class _WorkspaceHeaderState extends State<WorkspaceHeader> {
           ),
           const SizedBox(height: 8),
           Row(
-            mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(

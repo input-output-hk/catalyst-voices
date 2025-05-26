@@ -1,6 +1,6 @@
 import { Locator, Page } from "@playwright/test";
-import intlEn from "../localization-util";
 import { AcknowledgementsPanel } from "./step-4-acknowledgements";
+import { TestModel } from "../../../models/testModel";
 
 export class BaseProfileFinalPanel {
   page: Page;
@@ -8,13 +8,11 @@ export class BaseProfileFinalPanel {
 
   constructor(page: Page) {
     this.page = page;
-    this.createYourCatalystKeychainBtn = page.getByRole("button", {
-      name: intlEn.accountCreationSplashTitle,
-    });
+    this.createYourCatalystKeychainBtn = page.getByTestId("");
   }
 
-  async goto() {
-    await new AcknowledgementsPanel(this.page).goto();
+  async goto(testModel: TestModel) {
+    await new AcknowledgementsPanel(this.page).goto(testModel);
     await new AcknowledgementsPanel(this.page).clickNextButton();
   }
 

@@ -36,7 +36,7 @@ class PendingProposalCard extends StatefulWidget {
 }
 
 class _Author extends StatelessWidget {
-  final String author;
+  final String? author;
 
   const _Author({
     required this.author,
@@ -49,7 +49,7 @@ class _Author extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(
+          UsernameText(
             key: const Key('Author'),
             author,
             style: context.textTheme.titleSmall?.copyWith(
@@ -157,7 +157,6 @@ class _PendingProposalCardState extends State<PendingProposalCard> {
         child: InkWell(
           statesController: _statesController,
           onTap: widget.onTap,
-          canRequestFocus: true,
           highlightColor: Colors.transparent,
           borderRadius: BorderRadius.circular(12),
           child: ProposalBorder(
@@ -235,7 +234,6 @@ class _PropertyValue extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisAlignment: MainAxisAlignment.start,
       children: [
         Text(
           key: const Key('Title'),
@@ -276,10 +274,7 @@ class _ProposalInfo extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        if (proposalStage.isDraft)
-          const DraftProposalChip()
-        else
-          const FinalProposalChip(),
+        if (proposalStage.isDraft) const DraftProposalChip() else const FinalProposalChip(),
         const SizedBox(width: 4),
         ProposalVersionChip(version: version.toString()),
         if (showLastUpdate && lastUpdate != null) ...[
@@ -311,8 +306,7 @@ class _ProposalInfo extends StatelessWidget {
       TimezonePreferences.utc => lastUpdate!.toUtc(),
       TimezonePreferences.local => lastUpdate!.toLocal(),
     };
-    final dt =
-        DateFormatter.formatDateTimeParts(effectiveData, includeYear: true);
+    final dt = DateFormatter.formatDateTimeParts(effectiveData, includeYear: true);
 
     return context.l10n.publishedOn(dt.date, dt.time);
   }

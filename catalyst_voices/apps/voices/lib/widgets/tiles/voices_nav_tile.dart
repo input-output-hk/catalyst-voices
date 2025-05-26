@@ -49,9 +49,7 @@ class VoicesNavTile extends StatelessWidget {
         child: ConstrainedBox(
           constraints: const BoxConstraints(minHeight: 56),
           child: Material(
-            type: backgroundColor != null
-                ? MaterialType.canvas
-                : MaterialType.transparency,
+            type: backgroundColor != null ? MaterialType.canvas : MaterialType.transparency,
             shape: const StadiumBorder(),
             color: backgroundColor,
             child: InkWell(
@@ -60,7 +58,6 @@ class VoicesNavTile extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.only(left: 16),
                 child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     if (leading != null) leading!,
                     Expanded(

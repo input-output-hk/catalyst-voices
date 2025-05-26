@@ -27,7 +27,6 @@ class ProposalCommentCard extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         ProfileAvatar(
-          size: 40,
           username: authorId.username,
         ),
         const SizedBox(width: 16),
@@ -74,20 +73,18 @@ class _Header extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final username = this.username;
     final catalystId = this.catalystId;
     final createAt = this.createAt;
 
     return Row(
       spacing: 8,
-      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Expanded(
           child: Wrap(
             spacing: 8,
             runSpacing: 4,
             children: [
-              if (username != null) _UsernameText(username),
+              _UsernameText(username),
               if (catalystId != null)
                 CatalystIdText(
                   catalystId,
@@ -106,16 +103,15 @@ class _Header extends StatelessWidget {
 }
 
 class _UsernameText extends StatelessWidget {
-  final String data;
+  final String? data;
 
   const _UsernameText(this.data);
 
   @override
   Widget build(BuildContext context) {
-    return Text(
+    return UsernameText(
       data,
-      style: context.textTheme.titleSmall
-          ?.copyWith(color: context.colors.textOnPrimaryLevel0),
+      style: context.textTheme.titleSmall?.copyWith(color: context.colors.textOnPrimaryLevel0),
     );
   }
 }

@@ -62,8 +62,7 @@ class BubblePainter extends CustomPainter {
 
   @override
   bool shouldRepaint(BubblePainter oldDelegate) =>
-      !listEquals(bubbles, oldDelegate.bubbles) ||
-      !listEquals(shapes, oldDelegate.shapes);
+      !listEquals(bubbles, oldDelegate.bubbles) || !listEquals(shapes, oldDelegate.shapes);
 
   void _drawBackground(Canvas canvas, Size size) {
     if (backgroundColor == null) return;
@@ -80,9 +79,7 @@ class BubblePainter extends CustomPainter {
       radius: bubble.radius,
     );
 
-    if (bubble.shadowBlur != null &&
-        bubble.shadowOffset != null &&
-        bubble.shadowColor != null) {
+    if (bubble.shadowBlur != null && bubble.shadowOffset != null && bubble.shadowColor != null) {
       final shadowPath = Path()..addOval(rect.inflate(bubble.shadowBlur!));
 
       canvas
@@ -96,7 +93,6 @@ class BubblePainter extends CustomPainter {
       ..shader = RadialGradient(
         colors: bubble.gradientColors,
         stops: bubble.gradientStops,
-        center: Alignment.center,
         radius: 0.8,
       ).createShader(rect)
       ..blendMode = BlendMode.softLight;

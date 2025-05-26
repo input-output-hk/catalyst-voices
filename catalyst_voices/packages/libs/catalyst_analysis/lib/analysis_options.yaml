@@ -8,6 +8,9 @@ analyzer:
     - test/.test_coverage.dart
     - lib/generated_plugin_registrant.dart
 
+formatter:
+  page_width: 100
+
 # The full list of lints: https://dart.dev/tools/linter-rules
 linter:
   rules:
@@ -32,9 +35,7 @@ linter:
     - avoid_positional_boolean_parameters
     - avoid_print
     - avoid_private_typedef_functions
-    # TODO(dtscalac) below lint rule crashes in dart 3.5.0+,
-    # disabled until https://github.com/dart-lang/sdk/issues/56561 is addressed
-    - avoid_redundant_argument_values: false
+    - avoid_redundant_argument_values
     - avoid_relative_lib_imports
     - avoid_renaming_method_parameters
     - avoid_return_types_on_setters
@@ -84,7 +85,6 @@ linter:
     - library_names
     - library_prefixes
     - library_private_types_in_public_api
-    - lines_longer_than_80_chars
     - literal_only_boolean_expressions
     - missing_whitespace_between_adjacent_strings
     - no_adjacent_strings_in_list
@@ -103,7 +103,6 @@ linter:
     - one_member_abstracts
     - only_throw_errors
     - overridden_fields
-    - package_api_docs
     - package_names
     - package_prefixed_library_names
     - parameter_assignments

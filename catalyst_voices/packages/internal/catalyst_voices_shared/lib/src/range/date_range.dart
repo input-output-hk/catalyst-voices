@@ -40,8 +40,7 @@ class DateRange extends Equatable {
   }
 
   bool isAfterRange(DateTime value) {
-    final max =
-        to?.millisecondsSinceEpoch ?? DateTime(2099).millisecondsSinceEpoch;
+    final max = to?.millisecondsSinceEpoch ?? DateTime(2099).millisecondsSinceEpoch;
     final valueMillis = value.millisecondsSinceEpoch;
 
     return max < valueMillis;
@@ -56,8 +55,7 @@ class DateRange extends Equatable {
 
   bool isInRange(DateTime value) {
     final min = from?.millisecondsSinceEpoch ?? 0;
-    final max =
-        to?.millisecondsSinceEpoch ?? DateTime(2099).millisecondsSinceEpoch;
+    final max = to?.millisecondsSinceEpoch ?? DateTime(2099).millisecondsSinceEpoch;
     final valueMillis = value.millisecondsSinceEpoch;
 
     return min <= valueMillis && valueMillis <= max;
@@ -66,4 +64,21 @@ class DateRange extends Equatable {
   bool isTodayInRange() {
     return isInRange(DateTime.now());
   }
+
+  DateRangeStatus rangeStatusNow() {
+    final now = DateTime.now();
+    if (isInRange(now)) {
+      return DateRangeStatus.inRange;
+    } else if (isBeforeRange(now)) {
+      return DateRangeStatus.before;
+    } else {
+      return DateRangeStatus.after;
+    }
+  }
+}
+
+enum DateRangeStatus {
+  before,
+  inRange,
+  after,
 }

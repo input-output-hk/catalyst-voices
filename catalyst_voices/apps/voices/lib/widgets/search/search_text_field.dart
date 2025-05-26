@@ -37,14 +37,12 @@ class SearchTextField extends StatefulWidget {
 class _SearchTextFieldState extends State<SearchTextField> {
   late final TextEditingController _controller;
   Debouncer? _debouncer;
-  Debouncer get _effectiveDebouncer =>
-      widget.debouncer ?? (_debouncer ??= Debouncer());
+  Debouncer get _effectiveDebouncer => widget.debouncer ?? (_debouncer ??= Debouncer());
 
   @override
   Widget build(BuildContext context) {
     return ConstrainedBox(
-      constraints:
-          BoxConstraints(maxWidth: widget.width, maxHeight: widget.height),
+      constraints: BoxConstraints(maxWidth: widget.width, maxHeight: widget.height),
       child: VoicesTextField(
         controller: _controller,
         decoration: VoicesTextFieldDecoration(
@@ -53,7 +51,6 @@ class _SearchTextFieldState extends State<SearchTextField> {
           prefixIcon: VoicesAssets.icons.search.buildIcon(
             color: Theme.of(context).colors.iconsForeground,
           ),
-          filled: true,
           fillColor: Theme.of(context).colorScheme.surface,
           suffixIcon: ValueListenableBuilder<TextEditingValue>(
             valueListenable: _controller,

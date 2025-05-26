@@ -129,7 +129,7 @@ void main() {
             ];
             final actions = [
               _buildProposalAction(
-                selfRef: _buildRefAt(DateTime(2025, 04, 1)),
+                selfRef: _buildRefAt(DateTime(2025, 04)),
                 action: ProposalSubmissionActionDto.aFinal,
                 proposalRef: ref,
               ),
@@ -212,7 +212,7 @@ void main() {
             ];
             final actions = [
               _buildProposalAction(
-                selfRef: _buildRefAt(DateTime(2025, 04, 1)),
+                selfRef: _buildRefAt(DateTime(2025, 04)),
                 action: ProposalSubmissionActionDto.draft,
                 proposalRef: proposalOneRef,
               ),
@@ -380,9 +380,7 @@ void main() {
             );
             const expectedCount = ProposalsCount(
               total: 1,
-              drafts: 0,
               finals: 1,
-              favorites: 0,
               my: 1,
             );
 
@@ -438,10 +436,7 @@ void main() {
             final filters = ProposalsCountFilters(category: categoryId);
             const expectedCount = ProposalsCount(
               total: 1,
-              drafts: 0,
               finals: 1,
-              favorites: 0,
-              my: 0,
             );
 
             // When
@@ -479,9 +474,6 @@ void main() {
             const expectedCount = ProposalsCount(
               total: 1,
               drafts: 1,
-              finals: 0,
-              favorites: 0,
-              my: 0,
             );
 
             // When
@@ -517,9 +509,6 @@ void main() {
             const expectedCount = ProposalsCount(
               total: 1,
               drafts: 1,
-              finals: 0,
-              favorites: 0,
-              my: 0,
             );
 
             // When
@@ -554,9 +543,6 @@ void main() {
             const expectedCount = ProposalsCount(
               total: 1,
               drafts: 1,
-              finals: 0,
-              favorites: 0,
-              my: 0,
             );
 
             // When
@@ -664,10 +650,8 @@ void main() {
           final templateRef = SignedDocumentRef.generateFirstRef();
 
           final ref = _buildRefAt(DateTime(2025, 4, 7));
-          final nextRef =
-              _buildRefAt(DateTime(2025, 4, 8)).copyWith(id: ref.id);
-          final latestRef =
-              _buildRefAt(DateTime(2025, 4, 9)).copyWith(id: ref.id);
+          final nextRef = _buildRefAt(DateTime(2025, 4, 8)).copyWith(id: ref.id);
+          final latestRef = _buildRefAt(DateTime(2025, 4, 9)).copyWith(id: ref.id);
 
           final differentRef = _buildRefAt(DateTime(2025, 4, 12));
 
@@ -701,10 +685,8 @@ void main() {
           expect(page.items.length, 2);
           expect(page.items.length, page.total);
 
-          final proposalsRefs = page.items
-              .map((e) => e.proposal)
-              .map((entity) => entity.ref)
-              .toList();
+          final proposalsRefs =
+              page.items.map((e) => e.proposal).map((entity) => entity.ref).toList();
 
           expect(
             proposalsRefs,
@@ -777,7 +759,7 @@ void main() {
 
           final proposals = [
             _buildProposal(
-              selfRef: _buildRefAt(DateTime(2025, 4, 1)),
+              selfRef: _buildRefAt(DateTime(2025, 4)),
               template: templateRef,
               categoryId: categoryId,
             ),
@@ -797,10 +779,8 @@ void main() {
             ),
           ];
 
-          final expectedRefs = proposals
-              .sublist(0, 3)
-              .map((proposal) => proposal.document.ref)
-              .toList();
+          final expectedRefs =
+              proposals.sublist(0, 3).map((proposal) => proposal.document.ref).toList();
 
           final filters = ProposalsFilters(category: categoryId);
 
@@ -831,7 +811,7 @@ void main() {
             _buildProposalTemplate(selfRef: templateRef),
           ];
 
-          final proposalRef1 = _buildRefAt(DateTime(2025, 4, 1));
+          final proposalRef1 = _buildRefAt(DateTime(2025, 4));
           final proposalRef2 = _buildRefAt(DateTime(2025, 4, 2));
           final proposalRef3 = _buildRefAt(DateTime(2025, 4, 3));
 
@@ -900,7 +880,7 @@ void main() {
             _buildProposalTemplate(selfRef: templateRef),
           ];
 
-          final proposalRef1 = _buildRefAt(DateTime(2025, 4, 1));
+          final proposalRef1 = _buildRefAt(DateTime(2025, 4));
           final proposalRef2 = _buildRefAt(DateTime(2025, 4, 2));
           final proposalRef3 = _buildRefAt(DateTime(2025, 4, 3));
 
@@ -927,7 +907,7 @@ void main() {
               proposalRef: proposalRef1,
             ),
             _buildProposalAction(
-              selfRef: _buildRefAt(DateTime(2025, 4, 1)),
+              selfRef: _buildRefAt(DateTime(2025, 4)),
               action: ProposalSubmissionActionDto.draft,
               proposalRef: proposalRef1,
             ),
@@ -970,11 +950,9 @@ void main() {
             _buildProposalTemplate(selfRef: templateRef),
           ];
 
-          final proposalRef1 = _buildRefAt(DateTime(2025, 4, 1));
-          final proposalRef2 =
-              _buildRefAt(DateTime(2025, 4, 2)).copyWith(id: proposalRef1.id);
-          final proposalRef3 =
-              _buildRefAt(DateTime(2025, 4, 3)).copyWith(id: proposalRef1.id);
+          final proposalRef1 = _buildRefAt(DateTime(2025, 4));
+          final proposalRef2 = _buildRefAt(DateTime(2025, 4, 2)).copyWith(id: proposalRef1.id);
+          final proposalRef3 = _buildRefAt(DateTime(2025, 4, 3)).copyWith(id: proposalRef1.id);
 
           final proposals = [
             _buildProposal(
@@ -998,7 +976,7 @@ void main() {
               proposalRef: proposalRef2,
             ),
             _buildProposalAction(
-              selfRef: _buildRefAt(DateTime(2025, 4, 1)),
+              selfRef: _buildRefAt(DateTime(2025, 4)),
               action: ProposalSubmissionActionDto.draft,
               proposalRef: proposalRef1,
             ),
@@ -1104,8 +1082,74 @@ void main() {
           expect(page.page, 0);
           expect(page.total, 2);
 
-          final refs =
-              page.items.map((e) => e.proposal.metadata.selfRef).toList();
+          final refs = page.items.map((e) => e.proposal.metadata.selfRef).toList();
+
+          expect(refs, hasLength(expectedRefs.length));
+          expect(refs, containsAll(expectedRefs));
+        },
+        onPlatform: driftOnPlatforms,
+      );
+
+      test(
+        'hidden proposals are filtered out when pointing to older version',
+        () async {
+          // Given
+          final templateRef = SignedDocumentRef.generateFirstRef();
+          final proposalRef = SignedDocumentRef.generateFirstRef();
+          final nextProposalRef = proposalRef.nextVersion().toSignedDocumentRef();
+
+          final templates = [
+            _buildProposalTemplate(selfRef: templateRef),
+          ];
+
+          final proposals = [
+            _buildProposal(
+              selfRef: proposalRef,
+              template: templateRef,
+            ),
+            _buildProposal(
+              selfRef: nextProposalRef,
+              template: templateRef,
+            ),
+          ];
+
+          const expectedRefs = <SignedDocumentRef>[];
+
+          final actions = <DocumentEntityWithMetadata>[
+            _buildProposalAction(
+              selfRef: _buildRefAt(DateTime(2025, 5, 2)),
+              action: ProposalSubmissionActionDto.aFinal,
+              proposalRef: proposalRef,
+            ),
+            _buildProposalAction(
+              selfRef: _buildRefAt(DateTime(2025, 5, 20)),
+              action: ProposalSubmissionActionDto.hide,
+              proposalRef: proposalRef,
+            ),
+          ];
+          final comments = <DocumentEntityWithMetadata>[];
+
+          const filters = ProposalsFilters();
+
+          // When
+          await database.documentsDao.saveAll([
+            ...templates,
+            ...proposals,
+            ...actions,
+            ...comments,
+          ]);
+
+          // Then
+          const request = PageRequest(page: 0, size: 25);
+          final page = await database.proposalsDao.queryProposalsPage(
+            request: request,
+            filters: filters,
+          );
+
+          expect(page.page, 0);
+          expect(page.total, expectedRefs.length);
+
+          final refs = page.items.map((e) => e.proposal.metadata.selfRef).toList();
 
           expect(refs, hasLength(expectedRefs.length));
           expect(refs, containsAll(expectedRefs));
@@ -1121,10 +1165,8 @@ void main() {
           final templateRef = SignedDocumentRef.generateFirstRef();
 
           final ref = _buildRefAt(DateTime(2025, 4, 7));
-          final nextRef =
-              _buildRefAt(DateTime(2025, 4, 8)).copyWith(id: ref.id);
-          final latestRef =
-              _buildRefAt(DateTime(2025, 4, 9)).copyWith(id: ref.id);
+          final nextRef = _buildRefAt(DateTime(2025, 4, 8)).copyWith(id: ref.id);
+          final latestRef = _buildRefAt(DateTime(2025, 4, 9)).copyWith(id: ref.id);
 
           final differentRef = _buildRefAt(DateTime(2025, 4, 12));
 
@@ -1173,7 +1215,7 @@ void main() {
 
           final proposals = [
             _buildProposal(
-              selfRef: _buildRefAt(DateTime(2025, 4, 1)),
+              selfRef: _buildRefAt(DateTime(2025, 4)),
               template: templateRef,
             ),
             _buildProposal(
@@ -1190,9 +1232,7 @@ void main() {
 
           final expectedRefs = proposals
               .where(
-                (p) =>
-                    p.document.metadata.categoryId ==
-                    constantDocumentsRefs[1].category,
+                (p) => p.document.metadata.categoryId == constantDocumentsRefs[1].category,
               )
               .map((proposal) => proposal.document.ref)
               .toList();
@@ -1225,7 +1265,7 @@ void main() {
             _buildProposalTemplate(selfRef: templateRef),
           ];
 
-          final proposalRef1 = _buildRefAt(DateTime(2025, 4, 1));
+          final proposalRef1 = _buildRefAt(DateTime(2025, 4));
           final proposalRef2 = _buildRefAt(DateTime(2025, 4, 2));
           final proposalRef3 = _buildRefAt(DateTime(2025, 4, 3));
 
@@ -1291,14 +1331,12 @@ void main() {
             _buildProposalTemplate(selfRef: templateRef),
           ];
 
-          final baseTime = DateTime(2025, 4, 1);
+          final baseTime = DateTime(2025, 4);
           final proposalRef1 = _buildRefAt(baseTime);
           final proposalRef2 =
-              _buildRefAt(baseTime.add(const Duration(days: 1)))
-                  .copyWith(id: proposalRef1.id);
+              _buildRefAt(baseTime.add(const Duration(days: 1))).copyWith(id: proposalRef1.id);
           final proposalRef3 =
-              _buildRefAt(baseTime.add(const Duration(days: 2)))
-                  .copyWith(id: proposalRef1.id);
+              _buildRefAt(baseTime.add(const Duration(days: 2))).copyWith(id: proposalRef1.id);
 
           final proposals = [
             _buildProposal(

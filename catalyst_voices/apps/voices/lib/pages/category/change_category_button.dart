@@ -4,8 +4,7 @@ import 'package:catalyst_voices/widgets/dropdown/category_dropdown.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
-import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart'
-    hide PopupMenuItem;
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart' hide PopupMenuItem;
 import 'package:flutter/material.dart';
 
 class ChangeCategoryButton extends StatefulWidget {
@@ -38,13 +37,10 @@ class _ChangeCategoryButtonState extends State<ChangeCategoryButton> {
       builder: (context, state) {
         return CategoryDropdown(
           popupMenuButtonKey: _popupMenuButtonKey,
-          clipBehavior: Clip.hardEdge,
           onSelected: _changeCategory,
           onCanceled: () => _handleClose,
           onOpened: () => _handleOpen,
-          offset: const Offset(0, 40),
           items: state,
-          constraints: const BoxConstraints(maxWidth: 320),
           highlightColor: context.colors.onSurfacePrimary08,
           child: VoicesOutlinedButton(
             onTap: () {
@@ -52,8 +48,7 @@ class _ChangeCategoryButtonState extends State<ChangeCategoryButton> {
             },
             trailing: VoicesAssets.icons.chevronDown.buildIcon(),
             style: OutlinedButton.styleFrom(
-              backgroundColor:
-                  isOpen ? context.colors.onSurfacePrimary08 : null,
+              backgroundColor: isOpen ? context.colors.onSurfacePrimary08 : null,
             ),
             child: Text(
               context.l10n.exploreCategories,

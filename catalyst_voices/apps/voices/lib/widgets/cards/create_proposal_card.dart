@@ -55,8 +55,7 @@ class CreateProposalCard extends StatelessWidget {
             ),
             onTap: () {
               unawaited(
-                ProposalBuilderDraftRoute.fromRef(categoryId: categoryId)
-                    .push(context),
+                ProposalBuilderDraftRoute.fromRef(categoryId: categoryId).push(context),
               );
             },
           ),

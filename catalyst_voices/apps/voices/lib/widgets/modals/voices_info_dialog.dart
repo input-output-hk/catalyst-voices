@@ -49,8 +49,7 @@ class VoicesDesktopInfoDialog extends StatelessWidget {
       color: colors.textOnPrimaryLevel0,
     );
 
-    final subMessageStyle =
-        (textTheme.bodyMedium ?? const TextStyle()).copyWith(
+    final subMessageStyle = (textTheme.bodyMedium ?? const TextStyle()).copyWith(
       fontWeight: FontWeight.w500,
       color: colors.textOnPrimaryLevel0,
     );
@@ -60,7 +59,6 @@ class VoicesDesktopInfoDialog extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 83),
         child: Column(
           mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             const SizedBox(height: 36),
             IconTheme(

@@ -17,8 +17,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_quill/flutter_quill.dart' as quill;
 import 'package:flutter_quill/internal.dart' as quill_int;
-import 'package:flutter_quill_extensions/flutter_quill_extensions.dart'
-    as quill_ext;
+import 'package:flutter_quill_extensions/flutter_quill_extensions.dart' as quill_ext;
 import 'package:flutter_quill_extensions/flutter_quill_extensions.dart';
 
 class VoicesRichText extends VoicesFormField<MarkdownData> {
@@ -137,8 +136,16 @@ final class VoicesRichTextController extends quill.QuillController {
     } else if (newMarkdownData.data.isEmpty) {
       clear();
     } else {
+      // current selection
+      final currentSelection = selection;
+
+      // update document (resets selection)
       final delta = markdown.encoder.convert(newMarkdownData);
-      document = quill.Document.fromDelta(delta);
+      final newDocument = quill.Document.fromDelta(delta);
+      document = newDocument;
+
+      // revert selection
+      updateSelection(currentSelection, quill.ChangeSource.local);
     }
   }
 
@@ -266,8 +273,7 @@ class _EditorState extends State<_Editor> {
           /* cSpell:enable */
           customStyles: quill.DefaultStyles(
             placeHolder: quill.DefaultTextBlockStyle(
-              textTheme.bodyLarge
-                      ?.copyWith(color: theme.colors.textOnPrimaryLevel1) ??
+              textTheme.bodyLarge?.copyWith(color: theme.colors.textOnPrimaryLevel1) ??
                   DefaultTextStyle.of(context).style,
               quill.HorizontalSpacing.zero,
               quill.VerticalSpacing.zero,
@@ -474,8 +480,7 @@ class _ToolbarImageOptionButton extends StatelessWidget {
           );
         },
         imageButtonConfig: quill_ext.QuillToolbarImageConfig(
-          insertImageUrlDialogBuilder: (context) =>
-              const InsertNewImageDialog(),
+          insertImageUrlDialogBuilder: (context) => const InsertNewImageDialog(),
         ),
       ),
     );

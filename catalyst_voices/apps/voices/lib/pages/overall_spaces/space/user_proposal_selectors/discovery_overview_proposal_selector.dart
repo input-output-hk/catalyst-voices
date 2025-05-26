@@ -21,8 +21,7 @@ class _DataProposalSelector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      child: BlocSelector<WorkspaceBloc, WorkspaceState,
-          DataVisibilityState<List<Proposal>>>(
+      child: BlocSelector<WorkspaceBloc, WorkspaceState, DataVisibilityState<List<Proposal>>>(
         selector: (state) {
           return (data: state.published, show: state.showProposals);
         },
@@ -31,14 +30,8 @@ class _DataProposalSelector extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // TODO(dtscalac): clarify what to show here, currently it shows
-              // published + submitted together, however the limit for proposals
-              // is only for submitted ones
               _Header(
-                title: context.l10n.noPublishedProposalsOnMaxCount(
-                  state.data.length,
-                  ProposalDocument.maxSubmittedProposalsPerUser,
-                ),
+                title: context.l10n.publishedProposals,
               ),
               Offstage(
                 offstage: !state.show,

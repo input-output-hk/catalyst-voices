@@ -1,6 +1,7 @@
 import { Locator, Page } from "@playwright/test";
-import { OnboardingBasePage } from "../onboardingCommon";
+import { OnboardingCommon } from "../onboardingCommon";
 import { CatalystKeychainSuccessPanel } from "./step-7-catalyst-keychain-success";
+import { TestModel } from "../../../models/testModel";
 
 export class WriteDownSeedPhrasePanel {
   page: Page;
@@ -11,8 +12,9 @@ export class WriteDownSeedPhrasePanel {
     this.checkbox = page.getByRole("checkbox");
   }
 
-  async goto() {
-    await new CatalystKeychainSuccessPanel(this.page).goto();
+  async goto(testModel: TestModel) {
+    await new CatalystKeychainSuccessPanel(this.page).goto(testModel);
+    // TODO(emiride): store seed phrase in test model
     await new CatalystKeychainSuccessPanel(this.page).clickNextButton();
   }
 
@@ -23,6 +25,6 @@ export class WriteDownSeedPhrasePanel {
   }
 
   async clickNextButton() {
-    await new OnboardingBasePage(this.page).nextButton.click();
+    await new OnboardingCommon(this.page).nextButton.click();
   }
 }

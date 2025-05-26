@@ -1,6 +1,7 @@
 import { Page } from "@playwright/test";
-import { OnboardingBasePage } from "../onboardingCommon";
+import { OnboardingCommon } from "../onboardingCommon";
 import { InputSeedPhrasePanel } from "./step-10-Input-seedphrase";
+import { TestModel } from "../../../models/testModel";
 
 export class SeedphraseSuccessPanel {
   page: Page;
@@ -9,12 +10,12 @@ export class SeedphraseSuccessPanel {
     this.page = page;
   }
 
-  async goto() {
-    await new InputSeedPhrasePanel(this.page).goto();
+  async goto(testModel: TestModel) {
+    await new InputSeedPhrasePanel(this.page).goto(testModel);
     await new InputSeedPhrasePanel(this.page).clickNextButton();
   }
 
   async clickNextButton() {
-    new OnboardingBasePage(this.page).nextButton.click();
+    new OnboardingCommon(this.page).nextButton.click();
   }
 }

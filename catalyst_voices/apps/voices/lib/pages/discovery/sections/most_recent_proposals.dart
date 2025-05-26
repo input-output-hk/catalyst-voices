@@ -2,9 +2,9 @@ import 'dart:async';
 
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/routes/routes.dart';
-import 'package:catalyst_voices/widgets/buttons/voices_filled_button.dart';
 import 'package:catalyst_voices/widgets/cards/proposal/pending_proposal_card.dart';
 import 'package:catalyst_voices/widgets/scrollbar/voices_slider.dart';
+import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
@@ -104,51 +104,47 @@ class _LatestProposalsState extends State<MostRecentProposals> {
               ),
             ),
             const SizedBox(height: 48),
-            MouseRegion(
-              cursor: SystemMouseCursors.click,
-              child: GestureDetector(
-                onHorizontalDragUpdate: _onHorizontalDrag,
-                child: SizedBox(
-                  height: 440,
-                  width: 1200,
-                  child: Center(
-                    child: ListView.separated(
-                      controller: _scrollController,
-                      shrinkWrap: true,
-                      physics: const ClampingScrollPhysics(),
-                      scrollDirection: Axis.horizontal,
-                      itemCount: widget.proposals.length,
-                      itemBuilder: (context, index) {
-                        final proposal = widget.proposals[index];
-                        final ref = proposal.ref;
-                        return Skeletonizer(
-                          enabled: widget.isLoading,
-                          child: PendingProposalCard(
-                            key: Key('PendingProposalCard_$ref'),
-                            proposal: proposal,
-                            onTap: () {
-                              unawaited(
-                                ProposalRoute(
-                                  proposalId: ref.id,
-                                  version: ref.version,
-                                ).push(context),
-                              );
-                            },
-                            onFavoriteChanged: (value) async {
-                              final bloc = context.read<DiscoveryCubit>();
-                              if (value) {
-                                await bloc.addFavorite(ref);
-                              } else {
-                                await bloc.removeFavorite(ref);
-                              }
-                            },
-                            isFavorite: proposal.isFavorite,
-                          ),
-                        );
-                      },
-                      separatorBuilder: (context, index) =>
-                          const SizedBox(width: 24),
-                    ),
+            VoicesGestureDetector(
+              onHorizontalDragUpdate: _onHorizontalDrag,
+              child: SizedBox(
+                height: 440,
+                width: 1200,
+                child: Center(
+                  child: ListView.separated(
+                    controller: _scrollController,
+                    shrinkWrap: true,
+                    physics: const ClampingScrollPhysics(),
+                    scrollDirection: Axis.horizontal,
+                    itemCount: widget.proposals.length,
+                    itemBuilder: (context, index) {
+                      final proposal = widget.proposals[index];
+                      final ref = proposal.ref;
+                      return Skeletonizer(
+                        enabled: widget.isLoading,
+                        child: PendingProposalCard(
+                          key: Key('PendingProposalCard_$ref'),
+                          proposal: proposal,
+                          onTap: () {
+                            unawaited(
+                              ProposalRoute(
+                                proposalId: ref.id,
+                                version: ref.version,
+                              ).push(context),
+                            );
+                          },
+                          onFavoriteChanged: (value) async {
+                            final bloc = context.read<DiscoveryCubit>();
+                            if (value) {
+                              await bloc.addFavorite(ref);
+                            } else {
+                              await bloc.removeFavorite(ref);
+                            }
+                          },
+                          isFavorite: proposal.isFavorite,
+                        ),
+                      );
+                    },
+                    separatorBuilder: (context, index) => const SizedBox(width: 24),
                   ),
                 ),
               ),

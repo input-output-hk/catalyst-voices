@@ -32,7 +32,6 @@ class _AccountUsernameTileState extends State<AccountUsernameTile> {
       onChanged: _onEditModeChange,
       isEditMode: _isEditMode,
       isSaveEnabled: _username.isValid,
-      isEditEnabled: true,
       child: VoicesUsernameTextField(
         key: const Key('AccountDisplayNameTextField'),
         controller: _controller,
@@ -71,10 +70,7 @@ class _AccountUsernameTileState extends State<AccountUsernameTile> {
 
     _focusNode = FocusNode();
 
-    _sub = bloc.stream
-        .map((event) => event.username)
-        .distinct()
-        .listen(_handleUsernameChange);
+    _sub = bloc.stream.map((event) => event.username).distinct().listen(_handleUsernameChange);
   }
 
   void _handleControllerChange() {

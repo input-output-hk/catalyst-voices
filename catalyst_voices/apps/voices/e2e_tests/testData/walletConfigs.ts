@@ -1,5 +1,5 @@
-import { BrowserExtensionName, getBrowserExtension } from "./extensions";
-import { WalletConfig } from "./wallets/walletUtils";
+import { BrowserExtensionName, getBrowserExtension } from "../utils/extensions";
+import { WalletConfig } from "../utils/wallets/walletUtils";
 
 export const walletConfigs: WalletConfig[] = [
   {

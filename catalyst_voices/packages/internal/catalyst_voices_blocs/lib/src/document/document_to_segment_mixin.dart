@@ -10,9 +10,8 @@ mixin DocumentToSegmentMixin {
   }) {
     final result = <DocumentSegment>[];
 
-    final effectiveSegments = document.segments
-        .where((element) => !filterOut.contains(element.nodeId))
-        .toList();
+    final effectiveSegments =
+        document.segments.where((element) => !filterOut.contains(element.nodeId)).toList();
 
     for (final segment in effectiveSegments) {
       final sections = segment.sections
@@ -23,10 +22,7 @@ mixin DocumentToSegmentMixin {
           id: section.schema.nodeId,
           property: section,
           schema: section.schema,
-          isEnabled: true,
-          isEditable: true,
-          hasError:
-              showValidationErrors && !section.isValidExcludingSubsections,
+          hasError: showValidationErrors && !section.isValidExcludingSubsections,
         );
       }).toList();
 

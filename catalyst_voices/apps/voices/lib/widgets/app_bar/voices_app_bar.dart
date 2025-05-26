@@ -1,5 +1,6 @@
 import 'package:catalyst_voices/widgets/app_bar/actions/search_button.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_buttons.dart';
+import 'package:catalyst_voices/widgets/dev_tools/dev_tools_enabler.dart';
 import 'package:catalyst_voices/widgets/separators/voices_divider.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
@@ -34,6 +35,9 @@ class VoicesAppBar extends StatelessWidget implements PreferredSizeWidget {
   });
 
   @override
+  Size get preferredSize => const Size.fromHeight(64);
+
+  @override
   Widget build(BuildContext context) {
     return _Theme(
       child: ResponsiveBuilder<double>(
@@ -66,11 +70,11 @@ class VoicesAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   // Has to be nullable, that's why this is a function.
   Widget? _buildLeading(BuildContext context) {
-    final canImplyDrawerToggleButton = automaticallyImplyLeading &&
-        (Scaffold.maybeOf(context)?.hasDrawer ?? false);
+    final canImplyDrawerToggleButton =
+        automaticallyImplyLeading && (Scaffold.maybeOf(context)?.hasDrawer ?? false);
 
-    final canImplyPopButton = automaticallyImplyLeading &&
-        (Navigator.maybeOf(context)?.canPop() ?? false);
+    final canImplyPopButton =
+        automaticallyImplyLeading && (Navigator.maybeOf(context)?.canPop() ?? false);
 
     final child = leading ??
         (canImplyDrawerToggleButton ? const DrawerToggleButton() : null) ??
@@ -85,9 +89,57 @@ class VoicesAppBar extends StatelessWidget implements PreferredSizeWidget {
       child: child,
     );
   }
+}
+
+class _Actions extends StatelessWidget {
+  final List<Widget> children;
+
+  const _Actions({
+    required this.children,
+  });
 
   @override
-  Size get preferredSize => const Size.fromHeight(64);
+  Widget build(BuildContext context) {
+    return ResponsiveBuilder<({EdgeInsets wrapperPadding, double itemGap})>(
+      xs: const (
+        wrapperPadding: EdgeInsets.only(right: 8),
+        itemGap: 6,
+      ),
+      sm: const (
+        wrapperPadding: EdgeInsets.only(right: 16),
+        itemGap: 6,
+      ),
+      other: const (
+        wrapperPadding: EdgeInsets.only(right: 24),
+        itemGap: 12,
+      ),
+      builder: (context, data) => Container(
+        alignment: Alignment.centerRight,
+        padding: data.wrapperPadding,
+        child: ListView.separated(
+          shrinkWrap: true,
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          itemBuilder: (context, index) => children[index],
+          separatorBuilder: (context, index) => SizedBox(
+            width: data.itemGap,
+          ),
+          itemCount: children.length,
+          scrollDirection: Axis.horizontal,
+        ),
+      ),
+    );
+  }
+}
+
+class _BrandPicture extends StatelessWidget {
+  const _BrandPicture();
+
+  @override
+  Widget build(BuildContext context) {
+    return DevToolsEnabler(
+      child: Theme.of(context).brandAssets.brand.logo(context).buildPicture(),
+    );
+  }
 }
 
 class _Theme extends StatelessWidget {
@@ -132,17 +184,13 @@ class _Title extends StatelessWidget {
         ),
         xs: (
           widgets: [
-            Theme.of(context)
-                .brandAssets
-                .brand
-                .logoIcon(context)
-                .buildPicture(),
+            const _BrandPicture(),
           ],
           itemGap: 8
         ),
         sm: (
           widgets: [
-            Theme.of(context).brandAssets.brand.logo(context).buildPicture(),
+            const _BrandPicture(),
             if (showSearch)
               SearchButton(
                 onPressed: () {},
@@ -152,53 +200,13 @@ class _Title extends StatelessWidget {
         ),
         other: (
           widgets: [
-            Theme.of(context).brandAssets.brand.logo(context).buildPicture(),
+            const _BrandPicture(),
             if (showSearch)
               SearchButton(
                 onPressed: () {},
               ),
           ],
           itemGap: 24
-        ),
-      ),
-    );
-  }
-}
-
-class _Actions extends StatelessWidget {
-  final List<Widget> children;
-
-  const _Actions({
-    required this.children,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return ResponsiveBuilder<({EdgeInsets wrapperPadding, double itemGap})>(
-      xs: const (
-        wrapperPadding: EdgeInsets.only(right: 8),
-        itemGap: 6,
-      ),
-      sm: const (
-        wrapperPadding: EdgeInsets.only(right: 16),
-        itemGap: 6,
-      ),
-      other: const (
-        wrapperPadding: EdgeInsets.only(right: 24),
-        itemGap: 12,
-      ),
-      builder: (context, data) => Container(
-        alignment: Alignment.centerRight,
-        padding: data.wrapperPadding,
-        child: ListView.separated(
-          shrinkWrap: true,
-          padding: const EdgeInsets.symmetric(vertical: 12),
-          itemBuilder: (context, index) => children[index],
-          separatorBuilder: (context, index) => SizedBox(
-            width: data.itemGap,
-          ),
-          itemCount: children.length,
-          scrollDirection: Axis.horizontal,
         ),
       ),
     );

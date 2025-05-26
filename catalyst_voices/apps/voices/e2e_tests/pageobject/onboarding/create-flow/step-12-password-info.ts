@@ -1,6 +1,7 @@
 import { Page } from "@playwright/test";
-import { OnboardingBasePage } from "../onboardingCommon";
+import { OnboardingCommon } from "../onboardingCommon";
 import { SeedphraseSuccessPanel } from "./step-11-seedphrase-success";
+import { TestModel } from "../../../models/testModel";
 
 export class PasswordInfoPanel {
   page: Page;
@@ -9,12 +10,12 @@ export class PasswordInfoPanel {
     this.page = page;
   }
 
-  async goto() {
-    await new SeedphraseSuccessPanel(this.page).goto();
+  async goto(testModel: TestModel) {
+    await new SeedphraseSuccessPanel(this.page).goto(testModel);
     await new SeedphraseSuccessPanel(this.page).clickNextButton();
   }
 
   async clickNextButton() {
-    new OnboardingBasePage(this.page).nextButton.click();
+    new OnboardingCommon(this.page).nextButton.click();
   }
 }

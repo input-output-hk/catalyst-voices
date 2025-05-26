@@ -1,6 +1,7 @@
 import { Page } from "@playwright/test";
-import { OnboardingBasePage } from "../onboardingCommon";
+import { OnboardingCommon } from "../onboardingCommon";
 import { WriteDownSeedPhrasePanel } from "./step-8-writedown-seedphrase";
+import { TestModel } from "../../../models/testModel";
 
 export class WriteDownSeedPhraseInfoPanel {
   page: Page;
@@ -9,13 +10,13 @@ export class WriteDownSeedPhraseInfoPanel {
     this.page = page;
   }
 
-  async goto() {
-    await new WriteDownSeedPhrasePanel(this.page).goto();
+  async goto(testModel: TestModel) {
+    await new WriteDownSeedPhrasePanel(this.page).goto(testModel);
     await new WriteDownSeedPhrasePanel(this.page).markCheckboxAs(true);
     await new WriteDownSeedPhrasePanel(this.page).clickNextButton();
   }
 
   async clickNextButton() {
-    await new OnboardingBasePage(this.page).nextButton.click();
+    await new OnboardingCommon(this.page).nextButton.click();
   }
 }

@@ -250,8 +250,7 @@ class _Session extends StatelessWidget {
   }
 }
 
-class _SessionAccountPopupMenuState extends State<SessionAccountPopupMenu>
-    with LaunchUrlMixin {
+class _SessionAccountPopupMenuState extends State<SessionAccountPopupMenu> with LaunchUrlMixin {
   final _popupMenuButtonKey = GlobalKey<PopupMenuButtonState<_MenuItemEvent>>();
 
   @override
@@ -267,7 +266,6 @@ class _SessionAccountPopupMenuState extends State<SessionAccountPopupMenu>
     // didChangeDependencies() method.
     return PopupMenuButton<_MenuItemEvent>(
       key: _popupMenuButtonKey,
-      initialValue: null,
       onSelected: _handleEvent,
       itemBuilder: (context) => const [_PopupMenuItem()],
       tooltip: context.l10n.accountMenuPopupTooltip,

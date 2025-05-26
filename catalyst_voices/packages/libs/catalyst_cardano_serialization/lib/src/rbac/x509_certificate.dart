@@ -3,7 +3,7 @@ import 'dart:typed_data';
 
 import 'package:asn1lib/asn1lib.dart';
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
-import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
+import 'package:catalyst_key_derivation/catalyst_key_derivation.dart' hide Ed25519PublicKey;
 import 'package:equatable/equatable.dart';
 
 bool _registeredASN1Names = false;
@@ -84,8 +84,7 @@ class X509Certificate with EquatableMixin {
   String toPem([String label = 'CERTIFICATE']) {
     final derBytes = toASN1().encodedBytes;
     final base64 = base64Encode(derBytes);
-    final chunks =
-        RegExp('.{1,64}').allMatches(base64).map((m) => m.group(0)).join('\n');
+    final chunks = RegExp('.{1,64}').allMatches(base64).map((m) => m.group(0)).join('\n');
 
     return '-----BEGIN $label-----\n'
         '$chunks\n'
@@ -128,16 +127,13 @@ class X509CertificateExtensions with EquatableMixin {
     final sequence = object.asSequence;
     final extensionsSequence = sequence.elements.first.asSequence;
     final subjectAltNameSequence = extensionsSequence.elements.first.asSequence;
-    final subjectAltNameIdentifier =
-        subjectAltNameSequence.elements[0] as ASN1ObjectIdentifier;
+    final subjectAltNameIdentifier = subjectAltNameSequence.elements[0] as ASN1ObjectIdentifier;
 
-    if (subjectAltNameIdentifier !=
-        ASN1ObjectIdentifier.fromName('subjectAltName')) {
+    if (subjectAltNameIdentifier != ASN1ObjectIdentifier.fromName('subjectAltName')) {
       return const X509CertificateExtensions();
     }
 
-    final subjectAltNameOctetString =
-        subjectAltNameSequence.elements[1].asOctetString;
+    final subjectAltNameOctetString = subjectAltNameSequence.elements[1].asOctetString;
 
     final subjectAltNameElementsSequence =
         ASN1Sequence.fromBytes(subjectAltNameOctetString.valueBytes());
@@ -429,7 +425,7 @@ class X509TBSCertificate with EquatableMixin {
   final X509DistinguishedName subject;
 
   /// The public key of the [subject].
-  final Bip32Ed25519XPublicKey subjectPublicKey;
+  final Ed25519PublicKey subjectPublicKey;
 
   /// Extra extensions of the certificate.
   final X509CertificateExtensions? extensions;
@@ -472,9 +468,8 @@ class X509TBSCertificate with EquatableMixin {
       validityNotAfter: validityNotAfterASN1.asDateTime,
       subject: X509DistinguishedName.fromASN1(subjectASN1),
       subjectPublicKey: _readSubjectPublicKeyInfo(subjectPublicKeyASN1),
-      extensions: extensionsASN1 != null
-          ? X509CertificateExtensions.fromASN1(extensionsASN1)
-          : null,
+      extensions:
+          extensionsASN1 != null ? X509CertificateExtensions.fromASN1(extensionsASN1) : null,
     );
   }
 
@@ -553,11 +548,11 @@ class X509TBSCertificate with EquatableMixin {
     return integer.intValue;
   }
 
-  static Bip32Ed25519XPublicKey _readSubjectPublicKeyInfo(ASN1Object object) {
+  static Ed25519PublicKey _readSubjectPublicKeyInfo(ASN1Object object) {
     final sequence = object.asSequence;
     final string = sequence.elements[1] as ASN1BitString;
     final stringBytes = string.contentBytes();
-    return Bip32Ed25519XPublicKeyFactory.instance.fromBytes(stringBytes);
+    return Ed25519PublicKey.fromSimpleOrExtendedBytes(stringBytes);
   }
 
   static int _readVersion(ASN1Object object) {

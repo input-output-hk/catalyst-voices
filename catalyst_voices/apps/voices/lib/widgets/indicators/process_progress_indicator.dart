@@ -64,9 +64,7 @@ class ProcessProgressIndicator<T extends Object> extends StatelessWidget {
           final isCompleted = completed.contains(step.value);
           final isCurrent = current == step.value;
 
-          final type = isLast
-              ? _StepIndicatorType.completes
-              : _StepIndicatorType.standard;
+          final type = isLast ? _StepIndicatorType.completes : _StepIndicatorType.standard;
           final status = isCompleted
               ? _StepIndicatorStatus.completed
               : isCurrent
@@ -226,8 +224,7 @@ class _StepStatusIndicatorContainer extends StatelessWidget {
       alignment: Alignment.center,
       child: Column(
         children: [
-          if (neighborhood.previous)
-            const Expanded(child: VoicesVerticalDivider()),
+          if (neighborhood.previous) const Expanded(child: VoicesVerticalDivider()),
           ConstrainedBox(
             constraints: const BoxConstraints(minWidth: 50, maxWidth: 60),
             child: child,
@@ -254,22 +251,16 @@ class _StepStatusIndicator extends StatelessWidget {
       constraints: BoxConstraints.tight(_buildSize()),
       duration: const Duration(milliseconds: 300),
       decoration: BoxDecoration(
-        color: status.isCompleted
-            ? Theme.of(context).colors.successContainer
-            : null,
+        color: status.isCompleted ? Theme.of(context).colors.successContainer : null,
         border: _buildBorder(context),
         shape: BoxShape.circle,
       ),
       alignment: Alignment.center,
       child: switch (type) {
-        _StepIndicatorType.standard when status.isCurrent =>
-          const _CurrentStepDot(),
-        _StepIndicatorType.standard when status.isCompleted =>
-          const _StepIcon(),
-        _StepIndicatorType.completes when status.isCompleted =>
-          const _StepIcon(showFlag: true),
-        _StepIndicatorType.completes =>
-          const _StepIcon(showFlag: true, isCompleted: false),
+        _StepIndicatorType.standard when status.isCurrent => const _CurrentStepDot(),
+        _StepIndicatorType.standard when status.isCompleted => const _StepIcon(),
+        _StepIndicatorType.completes when status.isCompleted => const _StepIcon(showFlag: true),
+        _StepIndicatorType.completes => const _StepIcon(showFlag: true, isCompleted: false),
         _StepIndicatorType.standard => null,
       },
     );
@@ -277,9 +268,8 @@ class _StepStatusIndicator extends StatelessWidget {
 
   Size _buildSize() {
     return switch (type) {
-      _StepIndicatorType.standard => status == _StepIndicatorStatus.current
-          ? const Size.square(24)
-          : const Size.square(30),
+      _StepIndicatorType.standard =>
+        status == _StepIndicatorStatus.current ? const Size.square(24) : const Size.square(30),
       _StepIndicatorType.completes => const Size.square(40),
     };
   }

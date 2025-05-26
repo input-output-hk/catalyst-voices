@@ -1,7 +1,7 @@
 import { Locator, Page } from "@playwright/test";
-import { OnboardingBasePage } from "../onboardingCommon";
+import { OnboardingCommon } from "../onboardingCommon";
 import { PasswordInputPanel } from "./step-13-password-input";
-import intlEn from "../localization-util";
+import { TestModel } from "../../../models/testModel";
 
 export class KeychainFinalPanel {
   page: Page;
@@ -9,18 +9,16 @@ export class KeychainFinalPanel {
 
   constructor(page: Page) {
     this.page = page;
-    this.linkWalletAndRolesBtn = this.page.getByRole("button", {
-      name: intlEn.createKeychainLinkWalletAndRoles,
-    });
+    this.linkWalletAndRolesBtn = this.page.getByTestId("");
   }
 
-  async goto(password: string) {
-    await new PasswordInputPanel(this.page).goto();
-    await new PasswordInputPanel(this.page).fillPassword(password);
-    await new PasswordInputPanel(this.page).fillConfirmPassword(password);
+  async goto(testModel: TestModel) {
+    await new PasswordInputPanel(this.page).goto(testModel);
+    await new PasswordInputPanel(this.page).fillPassword(testModel.accountModel.password);
+    await new PasswordInputPanel(this.page).fillConfirmPassword(testModel.accountModel.password);
     await this.page.waitForTimeout(1000);
 
-    await new OnboardingBasePage(this.page).nextButton.click();
+    await new OnboardingCommon(this.page).nextButton.click();
   }
 
   async clickLinkWalletAndRolesBtn() {

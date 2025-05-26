@@ -7,9 +7,7 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 
 final class AccountCubit extends Cubit<AccountState>
-    with
-        BlocErrorEmitterMixin,
-        BlocSignalEmitterMixin<AccountSignal, AccountState> {
+    with BlocErrorEmitterMixin, BlocSignalEmitterMixin<AccountSignal, AccountState> {
   final _logger = Logger('AccountCubit');
   final UserService _userService;
 
@@ -50,6 +48,9 @@ final class AccountCubit extends Cubit<AccountState>
       await _userService.resendActiveAccountVerificationEmail();
 
       emitSignal(const AccountVerificationEmailSendSignal());
+    } on EmailAlreadyUsedException catch (error, stackTrace) {
+      _logger.severe('Re-send verification email - already used', error, stackTrace);
+      emitError(const LocalizedEmailAlreadyUsedException());
     } catch (error, stackTrace) {
       _logger.severe('Re-send verification email', error, stackTrace);
       emitError(LocalizedException.create(error));
@@ -76,9 +77,7 @@ final class AccountCubit extends Cubit<AccountState>
       if (activeAccount != null) {
         await _userService.updateAccount(
           id: activeAccount.catalystId,
-          email: email.value.isNotEmpty
-              ? Optional(email.value)
-              : const Optional.empty(),
+          email: email.value.isNotEmpty ? Optional(email.value) : const Optional.empty(),
         );
       }
 
@@ -86,6 +85,10 @@ final class AccountCubit extends Cubit<AccountState>
       emitSignal(const AccountVerificationEmailSendSignal());
 
       return true;
+    } on EmailAlreadyUsedException {
+      _logger.info('Email already used');
+      emitError(const LocalizedEmailAlreadyUsedException());
+      return false;
     } catch (error, stackTrace) {
       _logger.severe('Update email', error, stackTrace);
       emitError(LocalizedException.create(error));
@@ -138,8 +141,6 @@ final class AccountCubit extends Cubit<AccountState>
         .toList();
 
     return AccountState(
-      // Note. account status is not supported for f14.
-      status: const None(),
       catalystId: catalystId,
       username: Username.pure(catalystId?.username ?? ''),
       email: Email.pure(from?.email ?? ''),

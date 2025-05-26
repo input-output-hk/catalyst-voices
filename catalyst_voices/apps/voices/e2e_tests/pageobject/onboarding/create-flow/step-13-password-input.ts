@@ -1,5 +1,6 @@
 import { Locator, Page } from "@playwright/test";
 import { PasswordInfoPanel } from "./step-12-password-info";
+import { TestModel } from "../../../models/testModel";
 
 export class PasswordInputPanel {
   page: Page;
@@ -16,8 +17,8 @@ export class PasswordInputPanel {
     );
   }
 
-  async goto() {
-    await new PasswordInfoPanel(this.page).goto();
+  async goto(testModel: TestModel) {
+    await new PasswordInfoPanel(this.page).goto(testModel);
     await new PasswordInfoPanel(this.page).clickNextButton();
   }
 

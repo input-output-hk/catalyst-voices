@@ -8,6 +8,7 @@ export class WalletDetectionPanel {
         this.page = page;
         this.selectRolesBtn = page.getByRole("button", { name: "selectRolesBtn" });
     }
+    
 
     async clickSelectRolesBtn() {
 

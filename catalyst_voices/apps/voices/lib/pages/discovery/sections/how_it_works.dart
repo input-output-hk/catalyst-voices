@@ -4,30 +4,6 @@ import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
 
-enum HowItWorksItem {
-  collaborate,
-  vote,
-  follow;
-
-  SvgGenImage get icon => switch (this) {
-        HowItWorksItem.collaborate => VoicesAssets.icons.userGroup,
-        HowItWorksItem.vote => VoicesAssets.icons.vote,
-        HowItWorksItem.follow => VoicesAssets.icons.speakerphone,
-      };
-
-  String title(VoicesLocalizations l10n) => switch (this) {
-        HowItWorksItem.collaborate => l10n.howItWorksCollaborate,
-        HowItWorksItem.vote => l10n.howItWorksVote,
-        HowItWorksItem.follow => l10n.howItWorksFollow,
-      };
-
-  String description(VoicesLocalizations l10n) => switch (this) {
-        HowItWorksItem.collaborate => l10n.howItWorksCollaborateDescription,
-        HowItWorksItem.vote => l10n.howItWorksVoteDescription,
-        HowItWorksItem.follow => l10n.howItWorksFollowDescription,
-      };
-}
-
 class HowItWorks extends StatelessWidget {
   const HowItWorks({super.key});
 
@@ -51,17 +27,39 @@ class HowItWorks extends StatelessWidget {
             ),
             const SizedBox(height: 32),
             Wrap(
-              direction: Axis.horizontal,
               runSpacing: 20,
               alignment: WrapAlignment.center,
-              children:
-                  HowItWorksItem.values.map((e) => _Item(item: e)).toList(),
+              children: HowItWorksItem.values.map((e) => _Item(item: e)).toList(),
             ),
           ],
         ),
       ),
     );
   }
+}
+
+enum HowItWorksItem {
+  collaborate,
+  vote,
+  follow;
+
+  SvgGenImage get icon => switch (this) {
+        HowItWorksItem.collaborate => VoicesAssets.icons.userGroup,
+        HowItWorksItem.vote => VoicesAssets.icons.vote,
+        HowItWorksItem.follow => VoicesAssets.icons.speakerphone,
+      };
+
+  String description(VoicesLocalizations l10n) => switch (this) {
+        HowItWorksItem.collaborate => l10n.howItWorksCollaborateDescription,
+        HowItWorksItem.vote => l10n.howItWorksVoteDescription,
+        HowItWorksItem.follow => l10n.howItWorksFollowDescription,
+      };
+
+  String title(VoicesLocalizations l10n) => switch (this) {
+        HowItWorksItem.collaborate => l10n.howItWorksCollaborate,
+        HowItWorksItem.vote => l10n.howItWorksVote,
+        HowItWorksItem.follow => l10n.howItWorksFollow,
+      };
 }
 
 class _Item extends StatelessWidget {

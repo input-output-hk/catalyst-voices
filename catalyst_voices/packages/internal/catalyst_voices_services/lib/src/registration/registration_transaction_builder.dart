@@ -1,7 +1,7 @@
 import 'dart:math';
 
-import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart'
-    as cs show Ed25519PublicKey;
+import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart' as cs
+    show Ed25519PublicKey;
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart'
     hide Ed25519PublicKey;
 import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
@@ -17,8 +17,7 @@ typedef RegistrationMetadata = X509MetadataEnvelope<RegistrationData>;
 /// using RBAC specification.
 final class RegistrationTransactionBuilder {
   /// The RBAC registration purpose for the Catalyst Project.
-  static const _catalystUserRoleRegistrationPurpose =
-      'ca7a1457-ef9f-4c7f-9c74-7f8c4a4cfa6c';
+  static const _catalystUserRoleRegistrationPurpose = 'ca7a1457-ef9f-4c7f-9c74-7f8c4a4cfa6c';
 
   /// The transaction config with current network parameters.
   final TransactionBuilderConfig transactionConfig;
@@ -106,16 +105,14 @@ final class RegistrationTransactionBuilder {
     );
 
     return rootKeyPair.use((rootKeyPair) async {
-      final derCert = roles.isFirstRegistration
-          ? await _generateX509Certificate(keyPair: rootKeyPair)
-          : null;
+      final derCert =
+          roles.isFirstRegistration ? await _generateX509Certificate(keyPair: rootKeyPair) : null;
       final publicKeys = await _generatePublicKeysForAllRoles(rootKeyPair);
 
       final x509Envelope = X509MetadataEnvelope.unsigned(
         purpose: UuidV4.fromString(_catalystUserRoleRegistrationPurpose),
         txInputsHash: TransactionInputsHash.fromTransactionInputs(utxos),
-        previousTransactionId:
-            roles.isFirstRegistration ? null : previousTransactionId!,
+        previousTransactionId: roles.isFirstRegistration ? null : previousTransactionId!,
         chunkedData: RegistrationData(
           derCerts: [
             if (derCert != null) RbacField.set(derCert),
@@ -189,8 +186,7 @@ final class RegistrationTransactionBuilder {
       ),
     );
 
-    final txBody =
-        txBuilder.withChangeAddressIfNeeded(changeAddress).buildBody();
+    final txBody = txBuilder.withChangeAddressIfNeeded(changeAddress).buildBody();
 
     return Transaction(
       body: txBody,
@@ -247,8 +243,7 @@ final class RegistrationTransactionBuilder {
   ) async {
     final maxOffset = AccountRole.values.map((e) => e.registrationOffset).max;
     return [
-      for (int i = 0; i <= maxOffset; i++)
-        await _generatePublicKeyForOffset(i, rootKeyPair),
+      for (int i = 0; i <= maxOffset; i++) await _generatePublicKeyForOffset(i, rootKeyPair),
     ];
   }
 
@@ -259,9 +254,7 @@ final class RegistrationTransactionBuilder {
 
     final tbs = X509TBSCertificate(
       serialNumber: _randomSerialNumber(),
-      subjectPublicKey: Bip32Ed25519XPublicKeyFactory.instance.fromBytes(
-        keyPair.publicKey.bytes,
-      ),
+      subjectPublicKey: keyPair.publicKey.toEd25519(),
       issuer: issuer,
       validityNotBefore: DateTime.now().toUtc(),
       validityNotAfter: X509TBSCertificate.foreverValid,
@@ -313,10 +306,7 @@ final class RegistrationTransactionBuilder {
 
 extension on CatalystPublicKey {
   cs.Ed25519PublicKey toEd25519() {
-    final publicKey = Bip32Ed25519XPublicKeyFactory.instance
-        .fromBytes(bytes)
-        .toPublicKey()
-        .bytes;
+    final publicKey = Bip32Ed25519XPublicKeyFactory.instance.fromBytes(bytes).toPublicKey().bytes;
 
     return cs.Ed25519PublicKey.fromBytes(publicKey);
   }

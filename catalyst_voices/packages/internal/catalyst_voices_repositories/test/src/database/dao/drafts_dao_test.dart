@@ -140,9 +140,7 @@ void main() {
               ),
             );
           });
-          final typedRefs = refs
-              .map((e) => e.toTyped(DocumentType.proposalDocument))
-              .toList();
+          final typedRefs = refs.map((e) => e.toTyped(DocumentType.proposalDocument)).toList();
 
           // When
           await database.draftsDao.saveAll(drafts);
@@ -213,9 +211,7 @@ void main() {
           );
 
           final updateDraft = draft.copyWith(
-            metadata: draft.metadata.copyWith(
-              authors: null,
-            ),
+            metadata: draft.metadata.copyWith(),
             content: const DocumentDataContent({
               'title': 'Update',
             }),
@@ -247,8 +243,7 @@ void main() {
         () async {
           // Given
           final originalId = DummyCatalystIdFactory.create(username: 'damian');
-          final updatedId =
-              originalId.copyWith(username: const Optional('dev'));
+          final updatedId = originalId.copyWith(username: const Optional('dev'));
 
           final draft1 = DraftFactory.build(
             metadata: DocumentDataMetadata(
@@ -394,8 +389,7 @@ void main() {
 
           // When
           await database.draftsDao.save(draft);
-          await database.draftsDao
-              .updateContent(ref: ref, content: updatedContent);
+          await database.draftsDao.updateContent(ref: ref, content: updatedContent);
 
           // Then
           final entity = await database.draftsDao.query(ref: ref);
@@ -429,8 +423,7 @@ void main() {
 
           // When
           await database.draftsDao.saveAll(drafts);
-          await database.draftsDao
-              .updateContent(ref: ref, content: updatedContent);
+          await database.draftsDao.updateContent(ref: ref, content: updatedContent);
 
           // Then
           final entities = await database.draftsDao.queryAll();

@@ -50,8 +50,7 @@ void main() async {
   group(
     'Onboarding steps - ',
     () {
-      patrolWidgetTest('visitor - get started screen looks OK',
-          (PatrolTester $) async {
+      patrolWidgetTest('visitor - get started screen looks OK', (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await GetStartedPanel($).goto();
         await GetStartedPanel($).verifyPageElements();
@@ -71,8 +70,7 @@ void main() async {
         await SetupBaseProfilePanel($).verifyPageElements();
       });
 
-      patrolWidgetTest(
-          'visitor - create - keychain acknowledgement screen looks OK',
+      patrolWidgetTest('visitor - create - keychain acknowledgement screen looks OK',
           (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await AcknowledgmentsPanel($).goto();
@@ -86,16 +84,14 @@ void main() async {
         await SetupBaseProfilePanel($).verifyPageElements();
       });
 
-      patrolWidgetTest(
-          'visitor - create - keychain create Catalyst Keychain looks OK',
+      patrolWidgetTest('visitor - create - keychain create Catalyst Keychain looks OK',
           (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await BaseProfileFinalPanel($).goto();
         await BaseProfileFinalPanel($).verifyPageElements();
       });
 
-      patrolWidgetTest('visitor - create - keychain info screen looks OK',
-          (PatrolTester $) async {
+      patrolWidgetTest('visitor - create - keychain info screen looks OK', (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await CatalystKeychainInfoPanel($).goto();
         await CatalystKeychainInfoPanel($).verifyPageElements();
@@ -108,8 +104,7 @@ void main() async {
         await CatalystKeychainSuccessPanel($).verifyPageElements();
       });
 
-      patrolWidgetTest(
-          'visitor - create - keychain created screen back button works',
+      patrolWidgetTest('visitor - create - keychain created screen back button works',
           (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await CatalystKeychainSuccessPanel($).goto();
@@ -124,8 +119,7 @@ void main() async {
         await WriteDownSeedphrasePanel($).verifyPageElements();
       });
 
-      patrolWidgetTest(
-          'visitor - create - mnemonic writedown screen back button works',
+      patrolWidgetTest('visitor - create - mnemonic writedown screen back button works',
           (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await WriteDownSeedphrasePanel($).goto();
@@ -149,8 +143,7 @@ void main() async {
         await WritedownSeedphraseInfoPanel($).verifyPageElements();
       });
 
-      patrolWidgetTest(
-          'visitor - create - mnemonic input info screen back button works',
+      patrolWidgetTest('visitor - create - mnemonic input info screen back button works',
           (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await WritedownSeedphraseInfoPanel($).goto();
@@ -158,15 +151,13 @@ void main() async {
         await WriteDownSeedphrasePanel($).verifyPageElements();
       });
 
-      patrolWidgetTest('visitor - create - mnemonic input screen looks OK',
-          (PatrolTester $) async {
+      patrolWidgetTest('visitor - create - mnemonic input screen looks OK', (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await InputSeedphrasePanel($).goto();
         await InputSeedphrasePanel($).verifyPageElements();
       });
 
-      patrolWidgetTest(
-          'visitor - create - mnemonic input screen back button works',
+      patrolWidgetTest('visitor - create - mnemonic input screen back button works',
           (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await InputSeedphrasePanel($).goto();
@@ -183,16 +174,14 @@ void main() async {
         await InputSeedphrasePanel($).verifyNextButtonIsEnabled();
       });
 
-      patrolWidgetTest(
-          'visitor - create - mnemonic input verified screen looks OK',
+      patrolWidgetTest('visitor - create - mnemonic input verified screen looks OK',
           (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await SeedphraseSuccessPanel($).goto();
         await SeedphraseSuccessPanel($).verifyPageElements();
       });
 
-      patrolWidgetTest(
-          'visitor - create - mnemonic input verified screen back button works',
+      patrolWidgetTest('visitor - create - mnemonic input verified screen back button works',
           (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await SeedphraseSuccessPanel($).goto();
@@ -200,15 +189,13 @@ void main() async {
         await InputSeedphrasePanel($).verifyInfoPanel();
       });
 
-      patrolWidgetTest('visitor - create - password info screen looks OK',
-          (PatrolTester $) async {
+      patrolWidgetTest('visitor - create - password info screen looks OK', (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await PasswordInfoPanel($).goto();
         await PasswordInfoPanel($).verifyPageElements();
       });
 
-      patrolWidgetTest(
-          'visitor - create - password info screen back button works',
+      patrolWidgetTest('visitor - create - password info screen back button works',
           (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await PasswordInfoPanel($).goto();
@@ -216,15 +203,13 @@ void main() async {
         await PasswordInfoPanel($).verifyInfoPanel();
       });
 
-      patrolWidgetTest('visitor - create - password input screen looks OK',
-          (PatrolTester $) async {
+      patrolWidgetTest('visitor - create - password input screen looks OK', (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await PasswordInputPanel($).goto();
         await PasswordInputPanel($).verifyPageElements();
       });
 
-      patrolWidgetTest(
-          'visitor - create - password input screen back button works',
+      patrolWidgetTest('visitor - create - password input screen back button works',
           (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await PasswordInputPanel($).goto();
@@ -232,22 +217,19 @@ void main() async {
         await PasswordInfoPanel($).verifyPageElements();
       });
 
-      patrolWidgetTest(
-          'visitor - create - password input - valid minimum length password',
+      patrolWidgetTest('visitor - create - password input - valid minimum length password',
           (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await PasswordInputPanel($).goto();
         await PasswordInputPanel($).enterPassword('Test1234', 'Test1234');
-        await PasswordInputPanel($)
-            .verifyPasswordConfirmErrorIcon(isShown: false);
+        await PasswordInputPanel($).verifyPasswordConfirmErrorIcon(isShown: false);
         await PasswordInputPanel($).verifyValidationIndicator(
           PasswordValidationStatus.normal,
         );
         await PasswordInputPanel($).verifyNextButtonIsEnabled();
       });
 
-      patrolWidgetTest(
-          'visitor - create - password input - valid long password',
+      patrolWidgetTest('visitor - create - password input - valid long password',
           (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await PasswordInputPanel($).goto();
@@ -255,8 +237,7 @@ void main() async {
           'Test1234Test1234',
           'Test1234Test1234',
         );
-        await PasswordInputPanel($)
-            .verifyPasswordConfirmErrorIcon(isShown: false);
+        await PasswordInputPanel($).verifyPasswordConfirmErrorIcon(isShown: false);
         await PasswordInputPanel($).verifyValidationIndicator(
           PasswordValidationStatus.good,
         );
@@ -268,41 +249,32 @@ void main() async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await PasswordInputPanel($).goto();
         await PasswordInputPanel($).enterPassword('Test123', '');
-        await PasswordInputPanel($)
-            .verifyValidationIndicator(PasswordValidationStatus.weak);
-        await PasswordInputPanel($)
-            .verifyPasswordConfirmErrorIcon(isShown: false);
+        await PasswordInputPanel($).verifyValidationIndicator(PasswordValidationStatus.weak);
+        await PasswordInputPanel($).verifyPasswordConfirmErrorIcon(isShown: false);
         await PasswordInputPanel($).verifyNextButtonIsDisabled();
       });
 
-      patrolWidgetTest(
-          'visitor - create - password input - valid password, no confirmation',
+      patrolWidgetTest('visitor - create - password input - valid password, no confirmation',
           (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await PasswordInputPanel($).goto();
         await PasswordInputPanel($).enterPassword('Test1234', '');
-        await PasswordInputPanel($)
-            .verifyValidationIndicator(PasswordValidationStatus.normal);
-        await PasswordInputPanel($)
-            .verifyPasswordConfirmErrorIcon(isShown: false);
+        await PasswordInputPanel($).verifyValidationIndicator(PasswordValidationStatus.normal);
+        await PasswordInputPanel($).verifyPasswordConfirmErrorIcon(isShown: false);
         await PasswordInputPanel($).verifyNextButtonIsDisabled();
       });
 
-      patrolWidgetTest(
-          'visitor - create - password input - not matching confirmation',
+      patrolWidgetTest('visitor - create - password input - not matching confirmation',
           (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await PasswordInputPanel($).goto();
         await PasswordInputPanel($).enterPassword('Test1234', 'Test123');
-        await PasswordInputPanel($)
-            .verifyValidationIndicator(PasswordValidationStatus.normal);
-        await PasswordInputPanel($)
-            .verifyPasswordConfirmErrorIcon(isShown: true);
+        await PasswordInputPanel($).verifyValidationIndicator(PasswordValidationStatus.normal);
+        await PasswordInputPanel($).verifyPasswordConfirmErrorIcon();
         await PasswordInputPanel($).verifyNextButtonIsDisabled();
       });
 
-      patrolWidgetTest(
-          'visitor - create - keychain created success screen looks OK',
+      patrolWidgetTest('visitor - create - keychain created success screen looks OK',
           (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await KeychainFinalPanel($).goto();
@@ -323,8 +295,7 @@ void main() async {
         await WalletListPanel($).verifyPageElements();
       });
 
-      patrolWidgetTest(
-          'visitor - create - link wallet select screen back button works',
+      patrolWidgetTest('visitor - create - link wallet select screen back button works',
           (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await WalletListPanel($).goto();
@@ -338,8 +309,7 @@ void main() async {
   group(
     'Onboarding -',
     () {
-      patrolWidgetTest('visitor - get started button works',
-          (PatrolTester $) async {
+      patrolWidgetTest('visitor - get started button works', (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await AppBarPage($).getStartedBtnClick();
         expect($(OnboardingPageBase($).registrationInfoPanel), findsOneWidget);
@@ -351,8 +321,7 @@ void main() async {
         );
       });
 
-      patrolWidgetTest('visitor - get started screen close button works',
-          (PatrolTester $) async {
+      patrolWidgetTest('visitor - get started screen close button works', (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await GetStartedPanel($).goto();
         await OnboardingPageBase($).closeButton().tap();

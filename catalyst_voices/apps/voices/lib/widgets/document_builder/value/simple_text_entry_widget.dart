@@ -64,7 +64,6 @@ class _SimpleTextEntryWidgetState extends State<SimpleTextEntryWidget> {
           ),
           enabled: widget.isEditMode,
           resizableVertically: false,
-          resizableHorizontally: false,
           maxLengthEnforcement: MaxLengthEnforcement.none,
           maxLines: _resizable ? null : 1,
           maxLength: _maxLength,
@@ -110,8 +109,7 @@ class _SimpleTextEntryWidgetState extends State<SimpleTextEntryWidget> {
   void initState() {
     super.initState();
 
-    final textValue =
-        TextEditingValueExt.collapsedAtEndOf(widget.property.value ?? '');
+    final textValue = TextEditingValueExt.collapsedAtEndOf(widget.property.value ?? '');
 
     _controller = TextEditingController.fromValue(textValue);
     _focusNode = FocusNode(canRequestFocus: widget.isEditMode);

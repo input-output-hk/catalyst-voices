@@ -28,6 +28,7 @@ abstract interface class UserRepository {
 
   Future<User> getUser();
 
+  /// Throws [EmailAlreadyUsedException] if [email] already taken.
   Future<void> publishUserProfile({
     required CatalystId catalystId,
     required String email,
@@ -67,12 +68,10 @@ final class UserRepositoryImpl implements UserRepository {
   }) async {
     final lookup = catalystId.toSignificant().toUri().toStringWithoutScheme();
 
-    final rbacChain = await _apiServices.gateway
-        .apiV1RbacRegistrationGet(lookup: lookup)
-        .successBodyOrThrow();
+    final rbacChain =
+        await _apiServices.gateway.apiV1RbacRegistrationGet(lookup: lookup).successBodyOrThrow();
 
-    final transactionId =
-        rbacChain.lastVolatileTxn ?? rbacChain.lastPersistentTxn;
+    final transactionId = rbacChain.lastVolatileTxn ?? rbacChain.lastPersistentTxn;
 
     if (transactionId == null) {
       throw ArgumentError.notNull('transactionId');
@@ -93,14 +92,18 @@ final class UserRepositoryImpl implements UserRepository {
     required CatalystId catalystId,
     required String email,
   }) async {
-    await _apiServices.reviews
-        .apiCatalystIdsMePost(
-          body: CatalystIDCreate(
-            catalystIdUri: catalystId.toUri().toStringWithoutScheme(),
-            email: email,
-          ),
-        )
-        .successBodyOrThrow();
+    try {
+      await _apiServices.reviews
+          .apiCatalystIdsMePost(
+            body: CatalystIDCreate(
+              catalystIdUri: catalystId.toUri().toStringWithoutScheme(),
+              email: email,
+            ),
+          )
+          .successBodyOrThrow();
+    } on ResourceConflictException {
+      throw const EmailAlreadyUsedException();
+    }
   }
 
   @override
@@ -156,8 +159,7 @@ final class UserRepositoryImpl implements UserRepository {
         .then((value) => value?.metadata.authors ?? <CatalystId>[])
         .then(
       (authors) {
-        return authors
-            .firstWhereOrNull((id) => id.toSignificant() == significantId);
+        return authors.firstWhereOrNull((id) => id.toSignificant() == significantId);
       },
     ).then((value) => value?.username);
   }

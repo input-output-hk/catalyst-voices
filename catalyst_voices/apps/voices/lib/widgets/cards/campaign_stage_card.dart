@@ -85,15 +85,11 @@ class CampaignStageCard extends StatelessWidget {
     switch (campaign.stage) {
       case CampaignStage.draft:
       case CampaignStage.scheduled:
-        final formattedDate =
-            DateFormatter.formatDateTimeParts(campaign.startDate);
-        return context.l10n
-            .campaignBeginsOn(formattedDate.date, formattedDate.time);
+        final formattedDate = DateFormatter.formatDateTimeParts(campaign.startDate);
+        return context.l10n.campaignBeginsOn(formattedDate.date, formattedDate.time);
       case CampaignStage.live:
-        final formattedDate =
-            DateFormatter.formatDateTimeParts(campaign.endDate);
-        return context.l10n
-            .campaignEndsOn(formattedDate.date, formattedDate.time);
+        final formattedDate = DateFormatter.formatDateTimeParts(campaign.endDate);
+        return context.l10n.campaignEndsOn(formattedDate.date, formattedDate.time);
       case CampaignStage.completed:
         return '';
     }
@@ -111,7 +107,6 @@ class _CampaignDateInformation extends StatelessWidget {
       children: [
         const SizedBox(height: 30),
         Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             VoicesAssets.icons.calendar.buildIcon(),
             const SizedBox(width: 8),

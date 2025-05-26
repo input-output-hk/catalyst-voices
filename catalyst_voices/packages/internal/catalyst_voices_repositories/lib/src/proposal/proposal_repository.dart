@@ -92,6 +92,11 @@ abstract interface class ProposalRepository {
     required ProposalsCountFilters filters,
   });
 
+  Stream<Page<ProposalData>> watchProposalsPage({
+    required PageRequest request,
+    required ProposalsFilters filters,
+  });
+
   Stream<List<ProposalDocument>> watchUserProposals({
     required CatalystId authorId,
   });
@@ -136,8 +141,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
       throw const NotFoundException(message: 'Proposal is hidden');
     }
     final templateRef = documentData.metadata.template!;
-    final documentTemplate =
-        await _documentRepository.getDocumentData(ref: templateRef);
+    final documentTemplate = await _documentRepository.getDocumentData(ref: templateRef);
     final proposalDocument = _buildProposalDocument(
       documentData: documentData,
       templateData: documentTemplate,
@@ -149,8 +153,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     final proposalVersions = (await Future.wait(
       documentVersions.map(
         (e) async {
-          final proposalPublish =
-              await getProposalPublishForRef(ref: e.metadata.selfRef);
+          final proposalPublish = await getProposalPublishForRef(ref: e.metadata.selfRef);
 
           if (proposalPublish == null) {
             return null;
@@ -207,8 +210,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   Future<ProposalTemplate> getProposalTemplate({
     required DocumentRef ref,
   }) async {
-    final proposalDocument =
-        await _documentRepository.getDocumentData(ref: ref);
+    final proposalDocument = await _documentRepository.getDocumentData(ref: ref);
 
     return _buildProposalTemplate(documentData: proposalDocument);
   }
@@ -345,6 +347,16 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   }
 
   @override
+  Stream<Page<ProposalData>> watchProposalsPage({
+    required PageRequest request,
+    required ProposalsFilters filters,
+  }) {
+    return _proposalsLocalSource
+        .watchProposalsPage(request: request, filters: filters)
+        .map((value) => value.map(_buildProposalData));
+  }
+
+  @override
   Stream<List<ProposalDocument>> watchUserProposals({
     required CatalystId authorId,
   }) {
@@ -377,11 +389,8 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     if (action == null) {
       return null;
     }
-    final proposalAction = ProposalSubmissionActionDocumentDto.fromJson(
-      action.content.data,
-    ).action.toModel();
-
-    return proposalAction;
+    final dto = ProposalSubmissionActionDocumentDto.fromJson(action.content.data);
+    return dto.action.toModel();
   }
 
   ProposalData _buildProposalData(ProposalDocumentData data) {
@@ -391,8 +400,9 @@ final class ProposalRepositoryImpl implements ProposalRepository {
       ProposalSubmissionAction.aFinal => ProposalPublish.submittedProposal,
       ProposalSubmissionAction.draft || null => ProposalPublish.publishedDraft,
       ProposalSubmissionAction.hide => throw ArgumentError(
-          'Unsupported ${ProposalSubmissionAction.hide}, Make sure to filter'
-          ' out hidden proposals before this code is reached.',
+          'Proposal(${data.proposal.metadata.selfRef}) is '
+          'unsupported ${ProposalSubmissionAction.hide}. Make sure to filter '
+          'out hidden proposals before this code is reached.',
         ),
     };
 
@@ -406,8 +416,10 @@ final class ProposalRepositoryImpl implements ProposalRepository {
       publish: publish,
       commentsCount: data.commentsCount,
       // TODO(damian-molinski): remove it or use different model.
+      // ignore: avoid_redundant_argument_values
       categoryName: '',
       // TODO(damian-molinski): only Strings or use different model.
+      // ignore: avoid_redundant_argument_values
       versions: const [],
     );
   }
@@ -474,12 +486,8 @@ final class ProposalRepositoryImpl implements ProposalRepository {
       documentType: DocumentType.proposalDocument,
       id: metadata.id,
       ver: metadata.version,
-      template: template == null
-          ? null
-          : SignedDocumentMetadataRef.fromDocumentRef(template),
-      categoryId: categoryId == null
-          ? null
-          : SignedDocumentMetadataRef.fromDocumentRef(categoryId),
+      template: template == null ? null : SignedDocumentMetadataRef.fromDocumentRef(template),
+      categoryId: categoryId == null ? null : SignedDocumentMetadataRef.fromDocumentRef(categoryId),
     );
   }
 
@@ -493,9 +501,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
       return switch (action) {
         ProposalSubmissionAction.aFinal => ProposalPublish.submittedProposal,
         ProposalSubmissionAction.hide => null,
-        ProposalSubmissionAction.draft ||
-        null =>
-          ProposalPublish.publishedDraft,
+        ProposalSubmissionAction.draft || null => ProposalPublish.publishedDraft,
       };
     }
   }

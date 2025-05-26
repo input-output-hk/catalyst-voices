@@ -43,9 +43,8 @@ class AccountCreateProgressPanel extends StatelessWidget {
                 ],
                 RegistrationProgressStepper(
                   completed: completedSteps.toSet(),
-                  current: AccountCreateStepType.values
-                      .whereNot(completedSteps.contains)
-                      .firstOrNull,
+                  current:
+                      AccountCreateStepType.values.whereNot(completedSteps.contains).firstOrNull,
                 ),
               ],
             ),
@@ -99,11 +98,12 @@ class _CreateKeychainButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Semantics(
-      child: VoicesFilledButton(
-        key: const Key('CreateKeychainButton'),
-        onTap: onTap,
-        leading: VoicesAssets.icons.key.buildIcon(size: 18),
+    return VoicesFilledButton(
+      key: const Key('CreateKeychainButton'),
+      onTap: onTap,
+      leading: VoicesAssets.icons.key.buildIcon(size: 18),
+      child: Semantics(
+        label: 'CreateKeychainButton',
         child: Text(context.l10n.accountCreationSplashTitle),
       ),
     );
@@ -134,8 +134,7 @@ class _LinkWalletAndRolesButton extends StatelessWidget {
 extension _AccountCreateStepType on AccountCreateStepType {
   String? _title(BuildContext context) {
     return switch (this) {
-      AccountCreateStepType.baseProfile =>
-        context.l10n.createBaseProfileCreatedTitle,
+      AccountCreateStepType.baseProfile => context.l10n.createBaseProfileCreatedTitle,
       AccountCreateStepType.keychain => context.l10n.createKeychainCreatedTitle,
       AccountCreateStepType.walletLink => null,
     };
@@ -143,10 +142,8 @@ extension _AccountCreateStepType on AccountCreateStepType {
 
   String? _nextStepText(BuildContext context) {
     return switch (this) {
-      AccountCreateStepType.baseProfile =>
-        context.l10n.createBaseProfileNextStep,
-      AccountCreateStepType.keychain =>
-        context.l10n.createKeychainCreatedNextStep,
+      AccountCreateStepType.baseProfile => context.l10n.createBaseProfileNextStep,
+      AccountCreateStepType.keychain => context.l10n.createKeychainCreatedNextStep,
       AccountCreateStepType.walletLink => null,
     };
   }

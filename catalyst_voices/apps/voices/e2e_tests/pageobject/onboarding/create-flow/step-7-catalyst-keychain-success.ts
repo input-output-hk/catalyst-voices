@@ -1,6 +1,7 @@
 import { Page } from "@playwright/test";
 import { OnboardingCommon } from "../onboardingCommon";
 import { CatalystKeychainInfoPanel } from "./step-6-catalyst-keychain-info";
+import { TestModel } from "../../../models/testModel";
 
 export class CatalystKeychainSuccessPanel {
   page: Page;
@@ -9,14 +10,14 @@ export class CatalystKeychainSuccessPanel {
     this.page = page;
   }
 
-  async goto() {
-    await new CatalystKeychainInfoPanel(this.page).goto();
+  async goto(testModel: TestModel) {
+    await new CatalystKeychainInfoPanel(this.page).goto(testModel);
     await new CatalystKeychainInfoPanel(
       this.page
     ).clickCreateCatalystKeychainNowBtn();
   }
 
   async clickNextButton() {
-    await new (this.page).nextButton.click();
+    await new OnboardingCommon(this.page).nextButton.click();
   }
 }

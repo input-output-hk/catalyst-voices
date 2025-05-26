@@ -3,7 +3,7 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:equatable/equatable.dart';
 
-final class Proposal extends Equatable {
+final class Proposal extends Equatable implements Comparable<Proposal> {
   final DocumentRef selfRef;
   final String title;
   final String description;
@@ -14,7 +14,7 @@ final class Proposal extends Equatable {
   final ProposalPublish publish;
   final List<ProposalVersion> versions;
   final int duration;
-  final String author;
+  final String? author;
   final int commentsCount;
   final String category;
   final SignedDocumentRef categoryId;
@@ -30,7 +30,7 @@ final class Proposal extends Equatable {
     required ProposalPublish publish,
     List<ProposalVersion> versions = const [],
     required int duration,
-    required String author,
+    required String? author,
     required int commentsCount,
     required String category,
     required SignedDocumentRef categoryId,
@@ -59,8 +59,7 @@ final class Proposal extends Equatable {
     final document = data.document;
     final updateDate = document.metadata.selfRef.version!.dateTime;
 
-    final versions = data.versions.map(ProposalVersion.fromData).toList()
-      ..sort();
+    final versions = data.versions.map(ProposalVersion.fromData).toList()..sort();
 
     return Proposal._(
       selfRef: document.metadata.selfRef,
@@ -71,7 +70,7 @@ final class Proposal extends Equatable {
       status: ProposalStatus.inProgress,
       publish: data.publish,
       duration: document.duration ?? 0,
-      author: document.authorName ?? '',
+      author: document.authorName,
       commentsCount: data.commentsCount,
       categoryId: data.categoryId,
       category: data.categoryName,
@@ -123,6 +122,17 @@ final class Proposal extends Equatable {
 
   int get versionCount => versions.isEmpty ? 1 : versions.length;
 
+  @override
+  int compareTo(Proposal other) {
+    if (publish != other.publish) {
+      // sort by status first
+      return publish.compareTo(other.publish);
+    }
+
+    // most recent first, older later
+    return other.updateDate.compareTo(updateDate);
+  }
+
   Proposal copyWith({
     DocumentRef? selfRef,
     String? title,
@@ -133,7 +143,7 @@ final class Proposal extends Equatable {
     ProposalPublish? publish,
     int? commentsCount,
     int? duration,
-    String? author,
+    Optional<String>? author,
     List<ProposalVersion>? versions,
     String? category,
     SignedDocumentRef? categoryId,
@@ -148,7 +158,7 @@ final class Proposal extends Equatable {
         publish: publish ?? this.publish,
         commentsCount: commentsCount ?? this.commentsCount,
         duration: duration ?? this.duration,
-        author: author ?? this.author,
+        author: author.dataOr(this.author),
         versions: versions ?? this.versions,
         category: category ?? this.category,
         categoryId: categoryId ?? this.categoryId,

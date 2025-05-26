@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:catalyst_voices/widgets/buttons/voices_buttons.dart';
 import 'package:catalyst_voices/widgets/scrollbar/voices_scrollbar.dart';
 import 'package:catalyst_voices/widgets/text_field/voices_autocomplete.dart';
 import 'package:catalyst_voices/widgets/text_field/voices_text_field.dart';
@@ -30,8 +29,7 @@ class SeedPhraseField extends StatefulWidget {
   State<SeedPhraseField> createState() => _SeedPhraseFieldState();
 }
 
-final class SeedPhraseFieldController
-    extends ValueNotifier<List<SeedPhraseWord>> {
+final class SeedPhraseFieldController extends ValueNotifier<List<SeedPhraseWord>> {
   SeedPhraseFieldController([super._value = const <SeedPhraseWord>[]]);
 
   List<SeedPhraseWord> get words {
@@ -99,8 +97,7 @@ class _DeleteShortcut extends StatelessWidget {
   Widget build(BuildContext context) {
     return Shortcuts(
       shortcuts: <LogicalKeySet, Intent>{
-        LogicalKeySet(LogicalKeyboardKey.backspace):
-            const _DeleteLastWordIntent(),
+        LogicalKeySet(LogicalKeyboardKey.backspace): const _DeleteLastWordIntent(),
       },
       child: Actions(
         actions: <Type, Action<Intent>>{
@@ -175,8 +172,6 @@ class _SeedPhraseFieldState extends State<SeedPhraseField> {
                           key: ValueKey('Word${element.nr}CellKey'),
                           nr: element.nr,
                           data: element.data,
-                          // disabled always for now.
-                          onDeleteTap: null,
                         );
                       },
                     ),
@@ -231,8 +226,7 @@ class _SeedPhraseFieldState extends State<SeedPhraseField> {
     _effectiveController.value = words;
     widget.onChanged?.call(words);
 
-    WidgetsBinding.instance
-        .addPostFrameCallback((_) => _ensureWordFieldVisible());
+    WidgetsBinding.instance.addPostFrameCallback((_) => _ensureWordFieldVisible());
   }
 
   void _deleteAt(int index) {
@@ -262,13 +256,11 @@ class _SeedPhraseFieldState extends State<SeedPhraseField> {
 class _WordCell extends StatelessWidget {
   final int nr;
   final String data;
-  final VoidCallback? onDeleteTap;
 
   const _WordCell({
     super.key,
     required this.nr,
     required this.data,
-    this.onDeleteTap,
   });
 
   @override
@@ -291,10 +283,7 @@ class _WordCell extends StatelessWidget {
             Text('${nr.toString().padLeft(2, '0')}.'),
             const SizedBox(width: 6),
             Text(data),
-            if (onDeleteTap != null)
-              XButton(onTap: onDeleteTap)
-            else
-              const SizedBox(width: 16),
+            const SizedBox(width: 16),
           ],
         ),
       ),
@@ -330,16 +319,13 @@ class _WordField extends StatelessWidget {
             return const [];
           }
 
-          return words
-              .where((element) => element.startsWith(textEditingValue.text))
-              .take(10);
+          return words.where((element) => element.startsWith(textEditingValue.text)).take(10);
         },
         onSelected: onSelected,
         autovalidateMode: AutovalidateMode.always,
         textValidator: (value) {
           return switch (value) {
-            final value when value.isEmpty =>
-              const VoicesTextFieldValidationResult.none(),
+            final value when value.isEmpty => const VoicesTextFieldValidationResult.none(),
             final value when !words.any((word) => word.startsWith(value)) =>
               VoicesTextFieldValidationResult.error(
                 context.l10n.invalidSeedPhraseWord,

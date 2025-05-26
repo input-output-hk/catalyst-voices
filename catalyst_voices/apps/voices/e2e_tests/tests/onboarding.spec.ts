@@ -1,19 +1,15 @@
+import { AccountModel } from "../models/accountModel";
+import { TestModel } from "../models/testModel";
+import { accountModels } from "../testData/accountConfigs";
 import { WalletListPanel } from "../pageobject/onboarding/create-flow/step-16-wallet-list";
 import { WalletDetectionPanel } from "../pageobject/onboarding/create-flow/step-18-wallet-detection";
 import { OnboardingCommon } from "../pageobject/onboarding/onboardingCommon";
-import { UnlockPasswordSuccessPanel } from "../pageobject/onboarding/restore-flow/step-8-unlock-password-success-panel";
 import { test } from "../test-fixtures";
-import { walletConfigs } from "../utils/walletConfigs";
+import { walletConfigs } from "../testData/walletConfigs";
 import { WalletConfig } from "../utils/wallets/walletUtils";
 
 const walletConfig: WalletConfig = walletConfigs[3];
-
-// do some non-happy flows (wrong seed phrase, cancel connection, no wallet, etc)
-
-// test("Refactored restore flow demo", async ({ page }) => {
-//   await page.goto("http://localhost:51709/m4/discovery");
-//   await new UnlockPasswordSuccessPanel(page).goto("test1234");
-// });
+const accountModel: AccountModel = accountModels[0];
 
 test(
   "Create keychain and link wallet for " + walletConfig.extension.Name,
@@ -21,18 +17,21 @@ test(
     const browser = await restoreWallet(walletConfig);
     const page = browser.pages()[0];
 
-    // await new WalletListPage(page).clickEnableWallet(walletConfig.extension.Name);
-    await page.goto("http://localhost:55338/m4/discovery");
-    await OnboardingManager.createKeychain(accountModel);
-    await new WalletListPanel(page).goto("test1234");
+    const testModel = new TestModel(accountModel, walletConfig);
+
+    await page.goto("http://localhost:49367/discovery");
+    await new WalletListPanel(page).goto(testModel);
     const [walletPopup] = await Promise.all([
       browser.waitForEvent("page"),
-      new WalletListPanel(page).clickYoroiWallet(),
+      new WalletListPanel(page).clickWallet(
+        walletConfig.extension.Name.toLowerCase()
+      ),
     ]);
+
     await walletPopup.locator("div.ConnectedWallet_wrapper").click();
     await page.waitForTimeout(2000);
     await new WalletDetectionPanel(page).clickSelectRolesBtn();
-    await new OnboardingBasePage(page).nextButton.click();
+    await new OnboardingCommon(page).nextButton.click();
     await page.locator('role=button[name="reviewRegTransaction"]').click();
     const [signPopup] = await Promise.all([
       browser.waitForEvent("page"),

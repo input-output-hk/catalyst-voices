@@ -72,9 +72,7 @@ void main() {
       expect(result, expectedFormat);
     });
 
-    test(
-        'Dates are in the same week for Local when Sunday is first day of week',
-        () {
+    test('Dates are in the same week for Local when Sunday is first day of week', () {
       // Set Sunday as first day of week
       mockLocalizations.firstDayOfWeekIndex = 0;
       final dateRangeWhenSundayFirst = DateRange(
@@ -101,9 +99,7 @@ void main() {
       expect(resultMonday, 'Jan 20 - Jan 26');
     });
 
-    test(
-        'Dates are in the same week for Local when Monday is first day of week',
-        () {
+    test('Dates are in the same week for Local when Monday is first day of week', () {
       // Set Monday as first day of week
       mockLocalizations.firstDayOfWeekIndex = 1;
       final dateRangeWhenSundayFirst = DateRange(
@@ -201,8 +197,7 @@ void main() {
 
     test('should format date without year when includeYear is false', () {
       final date = DateTime(2023, 10, 25, 14, 30); // 25th October 2023, 14:30
-      final result =
-          DateFormatter.formatDateTimeParts(date, includeYear: false);
+      final result = DateFormatter.formatDateTimeParts(date);
 
       expect(result.date, '25 October');
       expect(result.time, '14:30');

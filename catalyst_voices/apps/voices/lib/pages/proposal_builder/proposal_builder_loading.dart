@@ -34,7 +34,7 @@ class _ProposalBuilderLoading extends StatelessWidget {
         SizedBox(height: 12),
         _SectionHeaderPlaceholder(isOpen: true),
         SizedBox(height: 12),
-        _SectionPlaceholder(blocks: 1),
+        _SectionPlaceholder(),
         SizedBox(height: 12),
         _SectionPlaceholder(blocks: 3),
         SizedBox(height: 24),
@@ -55,9 +55,7 @@ class _SectionHeaderPlaceholder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final icon = isOpen
-        ? VoicesAssets.icons.chevronDown
-        : VoicesAssets.icons.chevronRight;
+    final icon = isOpen ? VoicesAssets.icons.chevronDown : VoicesAssets.icons.chevronRight;
 
     return Container(
       color: Theme.of(context).colorScheme.primary,

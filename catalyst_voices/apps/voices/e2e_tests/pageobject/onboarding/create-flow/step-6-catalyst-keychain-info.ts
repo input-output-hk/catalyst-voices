@@ -1,25 +1,24 @@
 import { Locator, Page } from "@playwright/test";
 import { BaseProfileFinalPanel } from "./step-5-base-profile-final";
+import { TestModel } from "../../../models/testModel";
 
 export class CatalystKeychainInfoPanel {
   page: Page;
-  createCatalystKeychainNowBtn: Locator;
+  createKeychainButton: Locator;
 
   constructor(page: Page) {
     this.page = page;
-    this.createCatalystKeychainNowBtn = page.getByRole("button", {
-      name: intlEn.accountCreationSplashNextButton,
-    });
+    this.createKeychainButton = page.getByTestId("CreateKeychainButton");
   }
 
-  async goto() {
-    await new BaseProfileFinalPanel(this.page).goto();
+  async goto(testModel: TestModel) {
+    await new BaseProfileFinalPanel(this.page).goto(testModel);
     await new BaseProfileFinalPanel(
       this.page
     ).clickCreateYourCatalystKeychainBtn();
   }
 
   async clickCreateCatalystKeychainNowBtn() {
-    await this.createCatalystKeychainNowBtn.click();
+    await this.createKeychainButton.click();
   }
 }

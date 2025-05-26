@@ -185,8 +185,7 @@ class DriftDraftsDao extends DatabaseAccessor<DriftCatalystDatabase>
   }) async {
     final insertable = DraftsCompanion(
       content: Value(content),
-      title:
-          content.title != null ? Value(content.title!) : const Value.absent(),
+      title: content.title != null ? Value(content.title!) : const Value.absent(),
     );
     final query = update(drafts)..where((tbl) => _filterRef(tbl, ref));
 
@@ -217,10 +216,7 @@ class DriftDraftsDao extends DatabaseAccessor<DriftCatalystDatabase>
       final searchId = authorId.toSignificant().toUri().toStringWithoutScheme();
 
       query.where(
-        (doc) => CustomExpression<bool>(
-          // ignore: lines_longer_than_80_chars
-          "json_extract(metadata, '\$.authors') LIKE '%$searchId%'",
-        ),
+        (doc) => CustomExpression<bool>("json_extract(metadata, '\$.authors') LIKE '%$searchId%'"),
       );
     }
 

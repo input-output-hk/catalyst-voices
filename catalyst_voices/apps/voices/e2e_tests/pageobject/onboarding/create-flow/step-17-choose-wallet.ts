@@ -1,5 +1,6 @@
 import { Page } from "@playwright/test";
 import { WalletListPanel } from "./step-16-wallet-list";
+import { TestModel } from "../../../models/testModel";
 
 export class WalletPopupSelection {
   page: Page;
@@ -8,8 +9,10 @@ export class WalletPopupSelection {
     this.page = page;
   }
 
-  async goto(password: string) {
-    await new WalletListPanel(this.page).goto(password);
-    await new WalletListPanel(this.page).clickYoroiWallet();
+  async goto(testModel: TestModel) {
+    await new WalletListPanel(this.page).goto(testModel);
+    await new WalletListPanel(this.page).clickWallet(
+      testModel.walletConfig.extension.Name.toLowerCase()
+    );
   }
 }

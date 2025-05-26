@@ -101,8 +101,7 @@ void main() {
       expect(find.text(errorText), findsOneWidget);
     });
 
-    testWidgets('displays correct suffix icon based on validation result',
-        (tester) async {
+    testWidgets('displays correct suffix icon based on validation result', (tester) async {
       await tester.pumpWidget(
         _MaterialApp(
           child: VoicesTextField(
@@ -214,8 +213,7 @@ void main() {
       );
     });
 
-    testWidgets('displays warning when validation returns warning',
-        (tester) async {
+    testWidgets('displays warning when validation returns warning', (tester) async {
       const warningMessage = 'This is a warning';
 
       // Define a validator that returns a warning for specific input
@@ -248,7 +246,10 @@ void main() {
       expect(find.text(warningMessage), findsOneWidget);
 
       // Verify that the warning icon is displayed
-      expect(find.byIcon(Icons.warning_outlined), findsOneWidget);
+      expect(
+        find.byType(CatalystSvgIcon),
+        findsOneWidget,
+      );
     });
   });
 }
@@ -261,7 +262,7 @@ class _MaterialApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      theme: ThemeBuilder.buildTheme(brand: Brand.catalyst),
+      theme: ThemeBuilder.buildTheme(),
       home: Scaffold(body: child),
     );
   }

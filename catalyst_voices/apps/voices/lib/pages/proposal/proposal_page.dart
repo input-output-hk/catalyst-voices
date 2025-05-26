@@ -5,6 +5,7 @@ import 'package:catalyst_voices/common/signal_handler.dart';
 import 'package:catalyst_voices/pages/proposal/proposal_content.dart';
 import 'package:catalyst_voices/pages/proposal/proposal_error.dart';
 import 'package:catalyst_voices/pages/proposal/proposal_loading.dart';
+import 'package:catalyst_voices/pages/proposal/snack_bar/username_updated_snack_bar.dart';
 import 'package:catalyst_voices/pages/proposal/snack_bar/viewing_older_version_snack_bar.dart';
 import 'package:catalyst_voices/pages/proposal/widget/proposal_header.dart';
 import 'package:catalyst_voices/pages/proposal/widget/proposal_navigation_panel.dart';
@@ -35,6 +36,32 @@ class ProposalPage extends StatefulWidget {
   State<ProposalPage> createState() => _ProposalPageState();
 }
 
+class _AppBar extends StatelessWidget implements PreferredSizeWidget {
+  const _AppBar();
+
+  @override
+  Size get preferredSize => const VoicesAppBar().preferredSize;
+
+  @override
+  Widget build(BuildContext context) {
+    final readOnlyMode = context.select<ProposalCubit, bool>((cubit) => cubit.state.readOnlyMode);
+
+    return VoicesAppBar(
+      automaticallyImplyLeading: false,
+      actions: [
+        Offstage(
+          offstage: readOnlyMode,
+          child: const SessionActionHeader(),
+        ),
+        Offstage(
+          offstage: readOnlyMode,
+          child: const SessionStateHeader(),
+        ),
+      ],
+    );
+  }
+}
+
 class _ProposalPageState extends State<ProposalPage>
     with
         ErrorHandlerStateMixin<ProposalCubit, ProposalPage>,
@@ -49,13 +76,7 @@ class _ProposalPageState extends State<ProposalPage>
     return SegmentsControllerScope(
       controller: _segmentsController,
       child: Scaffold(
-        appBar: const VoicesAppBar(
-          automaticallyImplyLeading: false,
-          actions: [
-            SessionActionHeader(),
-            SessionStateHeader(),
-          ],
-        ),
+        appBar: const _AppBar(),
         endDrawer: const OpportunitiesDrawer(),
         body: ProposalHeaderWrapper(
           child: ProposalSidebars(
@@ -111,6 +132,9 @@ class _ProposalPageState extends State<ProposalPage>
         ViewingOlderVersionSnackBar(context).show(context);
       case ChangeVersionSignal():
         _changeVersion(signal.to);
+      case UsernameUpdatedSignal():
+        VoicesSnackBar.hideCurrent(context);
+        UsernameUpdatedSnackBar(context).show(context);
     }
   }
 

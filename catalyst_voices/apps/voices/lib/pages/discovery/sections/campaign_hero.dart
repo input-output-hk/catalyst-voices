@@ -7,6 +7,7 @@ import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 class CampaignHeroSection extends StatelessWidget {
@@ -18,8 +19,7 @@ class CampaignHeroSection extends StatelessWidget {
       key: const Key('CampaignHeroSection'),
       constraints: const BoxConstraints(minHeight: 450),
       child: HeroSection(
-        asset: VoicesAssets.videos.heroDesktop,
-        assetPackageName: 'catalyst_voices_assets',
+        asset: VideoCacheKey(name: VoicesAssets.videos.heroDesktop),
         child: ResponsivePadding(
           xs: const EdgeInsets.only(left: 40, bottom: 16, top: 8, right: 40),
           sm: const EdgeInsets.only(left: 80, bottom: 32, top: 18),

@@ -35,8 +35,7 @@ final class AuthTokenGenerator {
 
   CatalystId _createCatalystIdForToken(CatalystId catalystId) {
     final dateTime = DateTimeExt.now();
-    final secondsSinceEpoch =
-        dateTime.millisecondsSinceEpoch ~/ Duration.millisecondsPerSecond;
+    final secondsSinceEpoch = dateTime.millisecondsSinceEpoch ~/ Duration.millisecondsPerSecond;
 
     return catalystId.copyWith(
       username: const Optional.empty(),

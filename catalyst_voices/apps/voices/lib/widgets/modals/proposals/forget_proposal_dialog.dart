@@ -67,7 +67,7 @@ class _ActionButtons extends StatelessWidget {
           const Spacer(),
           VoicesTextButton(
             onTap: () {
-              Navigator.of(context).pop(null);
+              Navigator.of(context).pop();
             },
             child: Text(
               context.l10n.cancelButtonText,
@@ -76,8 +76,7 @@ class _ActionButtons extends StatelessWidget {
           VoicesTextButton(
             onTap: agreement
                 ? () {
-                    Navigator.of(context)
-                        .pop(const ForgetProposalForgetAction());
+                    Navigator.of(context).pop(const ForgetProposalForgetAction());
                   }
                 : null,
             child: Text(

@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:catalyst_cardano/catalyst_cardano.dart';
 import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
+import 'package:catalyst_voices/app/view/video_cache/app_video_manager.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
@@ -147,7 +148,14 @@ final class Dependencies extends DependencyProvider {
         );
       })
       ..registerFactory<CampaignStageCubit>(() {
-        return CampaignStageCubit(get<CampaignService>());
+        return CampaignStageCubit(
+          get<CampaignService>(),
+        );
+      })
+      ..registerFactory<DevToolsBloc>(() {
+        return DevToolsBloc(
+          get<DevToolsService>(),
+        );
       });
   }
 
@@ -220,6 +228,13 @@ final class Dependencies extends DependencyProvider {
           get<SignedDocumentManager>(),
           get<DocumentRepository>(),
         ),
+      )
+      ..registerLazySingleton<DevToolsRepository>(
+        () {
+          return DevToolsRepository(
+            get<DevToolsStorage>(),
+          );
+        },
       );
   }
 
@@ -316,6 +331,12 @@ final class Dependencies extends DependencyProvider {
         get<DocumentRepository>(),
       );
     });
+    registerLazySingleton<DevToolsService>(() {
+      return DevToolsService(
+        get<DevToolsRepository>(),
+        get<AppConfig>(),
+      );
+    });
   }
 
   void _registerStorages() {
@@ -343,6 +364,11 @@ final class Dependencies extends DependencyProvider {
         sharedPreferences: get<SharedPreferencesAsync>(),
       );
     });
+    registerLazySingleton<DevToolsStorage>(() {
+      return DevToolsStorageLocal(
+        sharedPreferences: get<SharedPreferencesAsync>(),
+      );
+    });
   }
 
   void _registerUtils() {
@@ -357,6 +383,12 @@ final class Dependencies extends DependencyProvider {
     registerLazySingleton<UserObserver>(
       StreamUserObserver.new,
       dispose: (observer) async => observer.dispose(),
+    );
+    registerLazySingleton<VideoManager>(
+      () {
+        return VideoManager();
+      },
+      dispose: (manager) => manager.dispose(),
     );
   }
 }

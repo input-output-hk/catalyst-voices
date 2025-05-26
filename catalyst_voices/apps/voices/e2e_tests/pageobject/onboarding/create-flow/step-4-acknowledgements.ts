@@ -1,6 +1,7 @@
 import { Page } from "@playwright/test";
-import { OnboardingBasePage } from "../onboardingCommon";
+import { OnboardingCommon } from "../onboardingCommon";
 import { SetupBaseProfilePanel } from "./step-3-setup-base-profile";
+import { TestModel } from "../../../models/testModel";
 
 export class AcknowledgementsPanel {
   page: Page;
@@ -9,12 +10,18 @@ export class AcknowledgementsPanel {
     this.page = page;
   }
 
-  async goto() {
+  async goto(testModel: TestModel) {
     await new SetupBaseProfilePanel(this.page).goto();
+    await new SetupBaseProfilePanel(this.page).fillUsername(
+      testModel.accountModel.name
+    );
+    await new SetupBaseProfilePanel(this.page).fillEmail(
+      testModel.accountModel.email
+    );
     await new SetupBaseProfilePanel(this.page).clickNextButton();
   }
 
   async clickNextButton() {
-    await new OnboardingBasePage(this.page).nextButton.click();
+    await new OnboardingCommon(this.page).nextButton.click();
   }
 }

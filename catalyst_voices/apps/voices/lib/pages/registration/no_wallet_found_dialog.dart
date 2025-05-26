@@ -50,7 +50,6 @@ class SupportedWallet extends StatelessWidget with LaunchUrlMixin {
         vertical: 12,
       ),
       child: Row(
-        mainAxisSize: MainAxisSize.max,
         children: [
           CatalystImage.asset(image.path),
           const SizedBox(width: 16),
@@ -147,8 +146,7 @@ class _NoWalletActionState extends State<_NoWalletAction> {
 
   Future<void> _checkAvailableWallets(BuildContext context) async {
     _changeIsLoading();
-    final hasWallets =
-        await context.read<SessionCubit>().checkAvailableWallets();
+    final hasWallets = await context.read<SessionCubit>().checkAvailableWallets();
     if (hasWallets && context.mounted) {
       Navigator.of(context).pop(true);
     } else {
@@ -216,8 +214,7 @@ class _NoWalletErrorReason extends StatelessWidget {
   }
 }
 
-class _NoWalletTroubleshootingButton extends StatelessWidget
-    with LaunchUrlMixin {
+class _NoWalletTroubleshootingButton extends StatelessWidget with LaunchUrlMixin {
   const _NoWalletTroubleshootingButton();
 
   @override

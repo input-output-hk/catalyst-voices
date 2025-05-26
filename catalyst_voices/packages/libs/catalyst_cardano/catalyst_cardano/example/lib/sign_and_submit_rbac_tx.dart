@@ -2,76 +2,54 @@
 
 part of 'main.dart';
 
-const _catalystUserRoleRegistrationPurpose =
-    'ca7a1457-ef9f-4c7f-9c74-7f8c4a4cfa6c';
+const _catalystUserRoleRegistrationPurpose = 'ca7a1457-ef9f-4c7f-9c74-7f8c4a4cfa6c';
 
 final _transactionHash = TransactionHash.fromHex(
   '4d3f576f26db29139981a69443c2325daa812cc353a31b5a4db794a5bcbb06c2',
 );
 
-Future<void> _signAndSubmitRbacTx({
-  required BuildContext context,
-  required CardanoWalletApi api,
+Future<X509Certificate> generateX509Certificate({
+  required Bip32Ed25519XKeyPair keyPair,
+  required ShelleyAddress stakeAddress,
 }) async {
-  var result = '';
-  try {
-    final changeAddress = await api.getChangeAddress();
-    final rewardAddresses = await api.getRewardAddresses();
+  const maxInt = 4294967296;
 
-    final utxos = await api.getUtxos(
-      amount: const Balance(
-        coin: Coin(1000000),
-      ),
-    );
+  /* cSpell:disable */
+  const issuer = X509DistinguishedName(
+    countryName: '',
+    stateOrProvinceName: '',
+    localityName: '',
+    organizationName: '',
+    organizationalUnitName: '',
+    commonName: '',
+  );
 
-    if (utxos.isEmpty) {
-      throw Exception('Insufficient balance, please top up your wallet');
-    }
+  final tbs = X509TBSCertificate(
+    serialNumber: Random().nextInt(maxInt),
+    subjectPublicKey: keyPair.publicKey.toSerializableEd25519(),
+    issuer: issuer,
+    validityNotBefore: DateTime.now().toUtc(),
+    validityNotAfter: X509TBSCertificate.foreverValid,
+    subject: issuer,
+    extensions: X509CertificateExtensions(
+      subjectAltName: [
+        const X509String('mydomain.com', tag: X509String.domainNameTag),
+        const X509String('www.mydomain.com', tag: X509String.domainNameTag),
+        const X509String('example.com', tag: X509String.domainNameTag),
+        const X509String('www.example.com', tag: X509String.domainNameTag),
+        X509String(
+          'web+cardano://addr/${stakeAddress.toBech32()}',
+          tag: X509String.uriTag,
+        ),
+      ],
+    ),
+  );
+  /* cSpell:enable */
 
-    final x509Envelope = await _buildMetadataEnvelope(
-      utxos: utxos,
-      rewardAddress: rewardAddresses.first,
-    );
-
-    final auxiliaryData = AuxiliaryData.fromCbor(
-      await x509Envelope.toCbor(serializer: (e) => e.toCbor()),
-    );
-
-    final unsignedTx = _buildUnsignedRbacTx(
-      inputs: utxos,
-      changeAddress: changeAddress,
-      rewardAddress: rewardAddresses.first,
-      auxiliaryData: auxiliaryData,
-    );
-
-    print('unsigned tx: ${hex.encode(cbor.encode(unsignedTx.toCbor()))}');
-
-    final witnessSet = await api.signTx(transaction: unsignedTx);
-
-    print('Witness set: $witnessSet');
-
-    final signedTx = Transaction(
-      body: unsignedTx.body,
-      isValid: true,
-      witnessSet: witnessSet,
-      auxiliaryData: unsignedTx.auxiliaryData,
-    );
-
-    print('signed tx: ${hex.encode(cbor.encode(signedTx.toCbor()))}');
-
-    final txHash = await api.submitTx(transaction: signedTx);
-    result = 'Tx hash: ${txHash.toHex()}';
-  } catch (error) {
-    result = error.toString();
-  }
-
-  if (context.mounted) {
-    await _showDialog(
-      context: context,
-      title: 'Sign & submit RBAC tx',
-      message: result,
-    );
-  }
+  return X509Certificate.generateSelfSigned(
+    tbsCertificate: tbs,
+    privateKey: keyPair.privateKey,
+  );
 }
 
 Future<X509MetadataEnvelope<RegistrationData>> _buildMetadataEnvelope({
@@ -187,48 +165,69 @@ Transaction _buildUnsignedRbacTx({
   );
 }
 
-Future<X509Certificate> generateX509Certificate({
-  required Bip32Ed25519XKeyPair keyPair,
-  required ShelleyAddress stakeAddress,
+Future<void> _signAndSubmitRbacTx({
+  required BuildContext context,
+  required CardanoWalletApi api,
 }) async {
-  const maxInt = 4294967296;
+  var result = '';
+  try {
+    final changeAddress = await api.getChangeAddress();
+    final rewardAddresses = await api.getRewardAddresses();
 
-  /* cSpell:disable */
-  const issuer = X509DistinguishedName(
-    countryName: '',
-    stateOrProvinceName: '',
-    localityName: '',
-    organizationName: '',
-    organizationalUnitName: '',
-    commonName: '',
-  );
+    final utxos = await api.getUtxos(
+      amount: const Balance(
+        coin: Coin(1000000),
+      ),
+    );
 
-  final tbs = X509TBSCertificate(
-    serialNumber: Random().nextInt(maxInt),
-    subjectPublicKey: keyPair.publicKey,
-    issuer: issuer,
-    validityNotBefore: DateTime.now().toUtc(),
-    validityNotAfter: X509TBSCertificate.foreverValid,
-    subject: issuer,
-    extensions: X509CertificateExtensions(
-      subjectAltName: [
-        const X509String('mydomain.com', tag: X509String.domainNameTag),
-        const X509String('www.mydomain.com', tag: X509String.domainNameTag),
-        const X509String('example.com', tag: X509String.domainNameTag),
-        const X509String('www.example.com', tag: X509String.domainNameTag),
-        X509String(
-          'web+cardano://addr/${stakeAddress.toBech32()}',
-          tag: X509String.uriTag,
-        ),
-      ],
-    ),
-  );
-  /* cSpell:enable */
+    if (utxos.isEmpty) {
+      throw Exception('Insufficient balance, please top up your wallet');
+    }
 
-  return X509Certificate.generateSelfSigned(
-    tbsCertificate: tbs,
-    privateKey: keyPair.privateKey,
-  );
+    final x509Envelope = await _buildMetadataEnvelope(
+      utxos: utxos,
+      rewardAddress: rewardAddresses.first,
+    );
+
+    final auxiliaryData = AuxiliaryData.fromCbor(
+      await x509Envelope.toCbor(serializer: (e) => e.toCbor()),
+    );
+
+    final unsignedTx = _buildUnsignedRbacTx(
+      inputs: utxos,
+      changeAddress: changeAddress,
+      rewardAddress: rewardAddresses.first,
+      auxiliaryData: auxiliaryData,
+    );
+
+    print('unsigned tx: ${hex.encode(cbor.encode(unsignedTx.toCbor()))}');
+
+    final witnessSet = await api.signTx(transaction: unsignedTx);
+
+    print('Witness set: $witnessSet');
+
+    final signedTx = Transaction(
+      body: unsignedTx.body,
+      isValid: true,
+      witnessSet: witnessSet,
+      auxiliaryData: unsignedTx.auxiliaryData,
+    );
+
+    print('signed tx: ${hex.encode(cbor.encode(signedTx.toCbor()))}');
+
+    final txHash = await api.submitTx(transaction: signedTx);
+    result = 'Tx hash: ${txHash.toHex()}';
+  } catch (error) {
+    result = error.toString();
+  }
+
+  if (context.mounted) {
+    await _showDialog(
+      context: context,
+      title: 'Sign & submit RBAC tx',
+      message: result,
+    );
+  }
 }
 
 extension on Bip32Ed25519XPublicKey {

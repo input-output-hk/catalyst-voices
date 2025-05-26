@@ -1,5 +1,5 @@
-import 'package:catalyst_cardano_serialization/src/rbac/x509_certificate.dart';
-import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
+import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
+import 'package:catalyst_key_derivation/catalyst_key_derivation.dart' hide Ed25519PublicKey;
 import 'package:collection/collection.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
@@ -8,11 +8,10 @@ void main() {
   group(X509Certificate, () {
     final signature = _FakeBip32Ed25519XSignature();
     final privateKey = _FakeBip32Ed25519XPrivateKey(signature: signature);
-    final publicKey = _FakeBip32Ed25519XPublicKey();
+    final publicKey = Ed25519PublicKey.seeded(0);
 
     setUpAll(() {
-      Bip32Ed25519XPublicKeyFactory.instance =
-          _FakeBip32Ed25519XPublicKeyFactory();
+      Bip32Ed25519XPublicKeyFactory.instance = _FakeBip32Ed25519XPublicKeyFactory();
     });
 
     /* cSpell:disable */
@@ -29,7 +28,7 @@ void main() {
       serialNumber: 1,
       subjectPublicKey: publicKey,
       issuer: issuer,
-      validityNotBefore: DateTime.utc(2025, 3, 1, 12, 0, 0),
+      validityNotBefore: DateTime.utc(2025, 3, 1, 12),
       validityNotAfter: X509TBSCertificate.foreverValid,
       subject: issuer,
       extensions: const X509CertificateExtensions(
@@ -69,8 +68,7 @@ void main() {
   });
 }
 
-class _FakeBip32Ed25519XPrivateKey extends Fake
-    implements Bip32Ed25519XPrivateKey {
+class _FakeBip32Ed25519XPrivateKey extends Fake implements Bip32Ed25519XPrivateKey {
   final Bip32Ed25519XSignature signature;
 
   _FakeBip32Ed25519XPrivateKey({required this.signature});
@@ -81,8 +79,7 @@ class _FakeBip32Ed25519XPrivateKey extends Fake
   }
 }
 
-class _FakeBip32Ed25519XPublicKey extends Fake
-    implements Bip32Ed25519XPublicKey {
+class _FakeBip32Ed25519XPublicKey extends Fake implements Bip32Ed25519XPublicKey {
   @override
   List<int> get bytes => [1, 2, 3];
 
@@ -96,16 +93,14 @@ class _FakeBip32Ed25519XPublicKey extends Fake
   }
 }
 
-class _FakeBip32Ed25519XPublicKeyFactory extends Fake
-    implements Bip32Ed25519XPublicKeyFactory {
+class _FakeBip32Ed25519XPublicKeyFactory extends Fake implements Bip32Ed25519XPublicKeyFactory {
   @override
   Bip32Ed25519XPublicKey fromBytes(List<int> bytes) {
     return _FakeBip32Ed25519XPublicKey();
   }
 }
 
-class _FakeBip32Ed25519XSignature extends Fake
-    implements Bip32Ed25519XSignature {
+class _FakeBip32Ed25519XSignature extends Fake implements Bip32Ed25519XSignature {
   @override
   List<int> get bytes => [4, 5, 6];
 }

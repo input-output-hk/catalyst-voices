@@ -13,7 +13,7 @@ packages = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = "^3.12"
 loguru = "^0.7.2"
 asyncio = "^3.4.3"
 asyncpg = "^0.30.0"
@@ -25,6 +25,13 @@ pycardano = "^0.13.1"
 beautifulsoup4 = "^4.13.4"
 cloudscraper = "^1.2.71"
 certifi = "^2025.1.31"
+cbor2 = "^5.6.5"
+uuid = "^1.30"
+
+[tool.poetry.group.dev.dependencies]
+mitmproxy = "^12.0.1"
+pyright = "^1.1.400"
+ruff = "^0.11.8"
 
 [build-system]
 requires = ["poetry-core"]
@@ -35,5 +42,6 @@ markers = [
     "ci: marks tests to be run in ci",
     "nightly: marks tests to be run nightly",
     "preprod_indexing: marks test which requires indexing of the cardano preprod network",
+    "health_endpoint: marks tests with requires a proxy for testing"
 ]
-addopts = "-m 'not preprod_indexing'"
+addopts = "-m 'not preprod_indexing and not health_endpoint'"

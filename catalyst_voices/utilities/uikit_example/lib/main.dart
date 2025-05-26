@@ -16,56 +16,6 @@ class UIKitExampleApp extends StatefulWidget {
   State<UIKitExampleApp> createState() => _UIKitExampleAppState();
 }
 
-class _UIKitExampleAppState extends State<UIKitExampleApp> {
-  ThemeMode _themeMode = ThemeMode.system;
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'UI kit examples',
-      supportedLocales: VoicesLocalizations.supportedLocales,
-      localizationsDelegates: const [
-        ...VoicesLocalizations.localizationsDelegates,
-        LocaleNamesLocalizationsDelegate(),
-      ],
-      localeListResolutionCallback: basicLocaleListResolution,
-      theme: ThemeBuilder.buildTheme(brand: Brand.catalyst),
-      darkTheme: ThemeBuilder.buildTheme(
-        brand: Brand.catalyst,
-        brightness: Brightness.dark,
-      ),
-      themeMode: _themeMode,
-      onGenerateRoute: _onGenerateRoute,
-    );
-  }
-
-  Route<dynamic> _onGenerateRoute(RouteSettings settings) {
-    final page = ExamplesListPage.examples
-            .where((e) => e.route == settings.name)
-            .map((e) => e.page)
-            .firstOrNull ??
-        const ExamplesListPage();
-
-    return MaterialPageRoute(
-      settings: settings,
-      builder: (_) {
-        return _ThemeModeSwitcherWrapper(
-          brightness:
-              _themeMode == ThemeMode.dark ? Brightness.dark : Brightness.light,
-          onChanged: _onThemeModeChanged,
-          child: page,
-        );
-      },
-    );
-  }
-
-  void _onThemeModeChanged(ThemeMode themeMode) {
-    setState(() {
-      _themeMode = themeMode;
-    });
-  }
-}
-
 class _ThemeModeSwitcherWrapper extends StatelessWidget {
   final Brightness brightness;
   final ValueChanged<ThemeMode> onChanged;
@@ -101,5 +51,53 @@ class _ThemeModeSwitcherWrapper extends StatelessWidget {
         ),
       ],
     );
+  }
+}
+
+class _UIKitExampleAppState extends State<UIKitExampleApp> {
+  ThemeMode _themeMode = ThemeMode.system;
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'UI kit examples',
+      supportedLocales: VoicesLocalizations.supportedLocales,
+      localizationsDelegates: const [
+        ...VoicesLocalizations.localizationsDelegates,
+        LocaleNamesLocalizationsDelegate(),
+      ],
+      localeListResolutionCallback: basicLocaleListResolution,
+      theme: ThemeBuilder.buildTheme(),
+      darkTheme: ThemeBuilder.buildTheme(
+        brightness: Brightness.dark,
+      ),
+      themeMode: _themeMode,
+      onGenerateRoute: _onGenerateRoute,
+    );
+  }
+
+  Route<dynamic> _onGenerateRoute(RouteSettings settings) {
+    final page = ExamplesListPage.examples
+            .where((e) => e.route == settings.name)
+            .map((e) => e.page)
+            .firstOrNull ??
+        const ExamplesListPage();
+
+    return MaterialPageRoute(
+      settings: settings,
+      builder: (_) {
+        return _ThemeModeSwitcherWrapper(
+          brightness: _themeMode == ThemeMode.dark ? Brightness.dark : Brightness.light,
+          onChanged: _onThemeModeChanged,
+          child: page,
+        );
+      },
+    );
+  }
+
+  void _onThemeModeChanged(ThemeMode themeMode) {
+    setState(() {
+      _themeMode = themeMode;
+    });
   }
 }

@@ -1,6 +1,7 @@
 import { Page } from "@playwright/test";
-import { OnboardingBasePage } from "../onboardingCommon";
+import { OnboardingCommon } from "../onboardingCommon";
 import { WriteDownSeedPhraseInfoPanel } from "./step-9-writedown-seedphrase-info";
+import { TestModel } from "../../../models/testModel";
 
 export class InputSeedPhrasePanel {
   page: Page;
@@ -9,12 +10,12 @@ export class InputSeedPhrasePanel {
     this.page = page;
   }
 
-  async goto() {
-    await new WriteDownSeedPhraseInfoPanel(this.page).goto();
+  async goto(testModel: TestModel) {
+    await new WriteDownSeedPhraseInfoPanel(this.page).goto(testModel);
     await new WriteDownSeedPhraseInfoPanel(this.page).clickNextButton();
   }
 
   async clickNextButton() {
-    new OnboardingBasePage(this.page).nextButton.click();
+    new OnboardingCommon(this.page).nextButton.click();
   }
 }

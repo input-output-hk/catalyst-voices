@@ -18,7 +18,7 @@ use crate::service::common::types::{
 #[derive(Object, Debug, Clone)]
 #[oai(example)]
 pub(crate) struct StakedTxoAssetInfo {
-    /// Token policy hash.
+    /// Asset policy hash (28 bytes).
     pub(crate) policy_hash: HexEncodedHash28,
     /// Token policies Asset Name.
     pub(crate) asset_name: AssetName,
@@ -55,7 +55,7 @@ impl Example for StakedAssetInfoList {
 }
 
 /// User's cardano stake info.
-#[derive(Object, Default)]
+#[derive(Object)]
 #[oai(example = true)]
 pub(crate) struct StakeInfo {
     /// Total stake amount.
@@ -79,7 +79,7 @@ impl Example for StakeInfo {
 }
 
 /// Volatile stake information.
-#[derive(NewType, Default, From, Into)]
+#[derive(NewType, From, Into)]
 #[oai(
     from_multipart = false,
     from_parameter = false,
@@ -95,7 +95,7 @@ impl Example for VolatileStakeInfo {
 }
 
 /// Persistent stake information.
-#[derive(NewType, Default, From, Into)]
+#[derive(NewType, From, Into)]
 #[oai(
     from_multipart = false,
     from_parameter = false,
@@ -111,7 +111,7 @@ impl Example for PersistentStakeInfo {
 }
 
 /// Full user's cardano stake info.
-#[derive(Object, Default)]
+#[derive(Object)]
 #[oai(example = true)]
 pub(crate) struct FullStakeInfo {
     /// Volatile stake information.

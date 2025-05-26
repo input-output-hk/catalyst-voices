@@ -786,6 +786,10 @@
   "@somethingWentWrong": {
     "description": "Error description when something goes wrong."
   },
+  "resourceConflictError": "Provided data is not unique.",
+  "@resourceConflictError": {
+    "description": "Error description when there's duplicate data (i.e. email or username already taken)."
+  },
   "noWalletFound": "No wallet found.",
   "@noWalletFound": {
     "description": "A description when no wallet extension was found."
@@ -1462,6 +1466,14 @@
   },
   "errorEmailValidationPattern": "Incorrect email pattern",
   "errorEmailValidationOutOfRange": "Invalid length",
+  "errorEmailAlreadyInUseUpdateLater": "This email address is already in use. You can update your email later from your account settings.",
+  "@errorEmailAlreadyInUseUpdateLater": {
+    "description": "Error when trying to register with email that is taken already (in registration)."
+  },
+  "errorEmailAlreadyInUse": "This email address is already in use.",
+  "@errorEmailAlreadyInUse": {
+    "description": "Error when trying to update email that is taken already."
+  },
   "categoryDetails": "Category Details",
   "fundsAvailable": "Funds Available",
   "minBudgetRequest": "Min budget request",
@@ -1875,17 +1887,9 @@
       }
     }
   },
-  "noPublishedProposalsOnMaxCount": "Published Proposals ({current}/{max})",
-  "@noPublishedProposalsOnMaxCount": {
-    "description": "Title for section to show number of published proposals out of max proposals",
-    "placeholders": {
-      "current": {
-        "type": "int"
-      },
-      "max": {
-        "type": "int"
-      }
-    }
+  "publishedProposals": "Published Proposals",
+  "@publishedProposals": {
+    "description": "A label for proposals that have been published (public)."
   },
   "nrOfIteration": "Iteration {nr}",
   "@nrOfIteration": {
@@ -2678,5 +2682,62 @@
   "notFoundButton": "Go to Catalyst Home",
   "@notFoundButton": {
     "description": "Button label on the not found page to go to home page in the app."
+  },
+  "anonymousUsername": "Anonymous",
+  "@anonymousUsername": {
+    "description": "When account does not have specified username this text is shown"
+  },
+  "commentPickUsernameLabel": "Pick a display name to join the conversation and leave a comment.",
+  "@commentPickUsernameLabel": {
+    "description": "Message shown when user tries to comment on proposal while not having username"
+  },
+  "commentPickUsername": "Set Display Name",
+  "@commentPickUsername": {
+    "description": "Shown as CTA button or title of dialog"
+  },
+  "commentPickUsernameHint": "Enter Name",
+  "@commentPickUsernameHint": {
+    "description": "Hint of username text field"
+  },
+  "confirm": "Confirm",
+  "@confirm": {
+    "description": "Generic text for confirming actions such as pick username"
+  },
+  "usernameSavedTitle": "Display Name Saved",
+  "@usernameSavedTitle": {
+    "description": "Used as username change confirmation snack bar title"
+  },
+  "usernameSavedMessage": "All set! You can now join the conversation.",
+  "@usernameSavedMessage": {
+    "description": "Used as username change confirmation snack bar message"
+  },
+  "devToolsAlreadyDeveloper": "Already developer!",
+  "@devToolsAlreadyDeveloper": {
+    "description": "SnackBar message when trying to enable dev tools while already enabled"
+  },
+  "devToolsAlreadyDeveloperMessage": "Open DevTools with cmd+shift+D shortcut",
+  "@devToolsAlreadyDeveloperMessage": {
+    "description": "Explanation text"
+  },
+  "devToolsBecameDeveloper": "You became developer!",
+  "@devToolsBecameDeveloper": {
+    "description": "SnackBar message when enable dev tools"
+  },
+  "devToolsBecameDeveloperMessage": "Open DevTools with cmd+shift+D shortcut",
+  "@devToolsBecameDeveloperMessage": {
+    "description": "Explanation text"
+  },
+  "devToolsTapsLeftToEnable": "{count} taps left",
+  "@devToolsTapsLeftToEnable": {
+    "description": "SnackBar message while enabling dev tools",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "devToolsTapsLeftToEnableMessage": "Keep on tapping",
+  "@devToolsTapsLeftToEnableMessage": {
+    "description": "Explanation text"
   }
 }

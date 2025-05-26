@@ -6,7 +6,7 @@ export class AppBarPage {
 
   constructor(page: Page) {
     this.page = page;
-    this.getStartedBtn = this.page.getByTestId("GetStartedBtn");
+    this.getStartedBtn = this.page.getByTestId("GetStartedButton");
   }
   async GetStartedBtnClick() {
     await this.getStartedBtn.click();

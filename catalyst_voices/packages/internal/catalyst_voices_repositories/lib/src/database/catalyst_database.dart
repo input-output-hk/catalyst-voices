@@ -68,8 +68,7 @@ abstract interface class CatalystDatabase {
   views: [],
   include: {},
 )
-class DriftCatalystDatabase extends $DriftCatalystDatabase
-    implements CatalystDatabase {
+class DriftCatalystDatabase extends $DriftCatalystDatabase implements CatalystDatabase {
   final _clearLock = Lock();
 
   @visibleForTesting
@@ -86,11 +85,12 @@ class DriftCatalystDatabase extends $DriftCatalystDatabase
             ),
 
             // TODO(damian-molinski): Native not supported yet
+            // ignore: avoid_redundant_argument_values
             native: null,
           ).interceptWith(
             DatabaseLoggingInterceptor(
+              // ignore: avoid_redundant_argument_values
               isEnabled: kDebugMode,
-              onlyErrors: true,
               dbName: config.name,
             ),
           ),

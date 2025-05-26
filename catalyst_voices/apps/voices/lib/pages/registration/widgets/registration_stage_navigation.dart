@@ -33,9 +33,8 @@ class RegistrationBackNextNavigation extends StatelessWidget {
         Semantics(
           child: VoicesNextButton(
             semanticsIdentifier: 'NextButton',
-            onTap: isNextEnabled
-                ? onNextTap ?? () => RegistrationCubit.of(context).nextStep()
-                : null,
+            onTap:
+                isNextEnabled ? onNextTap ?? () => RegistrationCubit.of(context).nextStep() : null,
           ),
         ),
       ],

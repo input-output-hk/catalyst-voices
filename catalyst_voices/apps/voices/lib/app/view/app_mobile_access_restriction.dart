@@ -147,7 +147,6 @@ class _Background extends StatelessWidget {
         ],
         gradient: const RadialGradient(
           center: Alignment(0.2822, -0.3306),
-          radius: 0.5,
           colors: [Color(0x99F9E7FD), Color(0x99F6CEFF)],
           stops: [1.0, 0.0],
         ),
@@ -175,7 +174,6 @@ class _Background extends StatelessWidget {
         ],
         gradient: const RadialGradient(
           center: Alignment(0.2814, -0.3306),
-          radius: 0.5,
           colors: [
             Color.fromRGBO(205, 213, 254, 0.7),
             Color(0x99C6C5FF),
@@ -203,11 +201,7 @@ class _Foreground extends StatelessWidget {
         children: [
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 30),
-            child: Theme.of(context)
-                .brandAssets
-                .brand
-                .logo(context)
-                .buildPicture(),
+            child: Theme.of(context).brandAssets.brand.logo(context).buildPicture(),
           ),
           Center(
             child: Padding(

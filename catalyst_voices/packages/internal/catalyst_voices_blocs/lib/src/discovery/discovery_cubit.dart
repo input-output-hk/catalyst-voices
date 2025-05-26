@@ -58,8 +58,7 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
     );
 
     final categories = await _campaignService.getCampaignCategories();
-    final categoriesModel =
-        categories.map(CampaignCategoryDetailsViewModel.fromModel).toList();
+    final categoriesModel = categories.map(CampaignCategoryDetailsViewModel.fromModel).toList();
 
     // TODO(damian-molinski): create VoicesBloc / VoicesCubit where this
     // always will be checked.
@@ -91,7 +90,6 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
           campaign: DiscoveryCurrentCampaignState(
             currentCampaign: currentCampaign,
             campaignTimeline: campaignTimeline,
-            error: null,
             isLoading: false,
           ),
         ),
@@ -132,10 +130,7 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
   StreamSubscription<List<String>> _buildFavoritesProposalsIdsSub() {
     _logger.info('Building favorites proposals ids subscription');
 
-    return _proposalService
-        .watchFavoritesProposalsIds()
-        .distinct(listEquals)
-        .listen(
+    return _proposalService.watchFavoritesProposalsIds().distinct(listEquals).listen(
           _emitFavoritesIds,
           onError: _emitMostRecentError,
         );
@@ -145,7 +140,11 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
     _logger.fine('Building proposals subscription');
 
     return _proposalService
-        .watchLatestProposals(limit: _maxRecentProposalsCount)
+        .watchProposalsPage(
+          request: const PageRequest(page: 0, size: _maxRecentProposalsCount),
+          filters: const ProposalsFilters(),
+        )
+        .map((event) => event.items)
         .distinct(listEquals)
         .listen(
           _handleProposals,
@@ -188,7 +187,6 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
       state.copyWith(
         proposals: state.proposals.copyWith(
           isLoading: false,
-          error: null,
           proposals: proposalList,
         ),
       ),

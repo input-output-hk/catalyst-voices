@@ -18,6 +18,7 @@ import 'package:catalyst_voices/widgets/modals/comment/submit_comment_error_dial
 import 'package:catalyst_voices/widgets/modals/proposals/proposal_limit_reached_dialog.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/publish_proposal_error_dialog.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/submit_proposal_error_dialog.dart';
+import 'package:catalyst_voices/widgets/modals/proposals/unlock_edit_proposal.dart';
 import 'package:catalyst_voices/widgets/snackbar/voices_snackbar.dart';
 import 'package:catalyst_voices/widgets/snackbar/voices_snackbar_action.dart';
 import 'package:catalyst_voices/widgets/snackbar/voices_snackbar_type.dart';
@@ -72,8 +73,7 @@ class _ProposalBuilderContent extends StatelessWidget {
 class _ProposalBuilderPageState extends State<ProposalBuilderPage>
     with
         ErrorHandlerStateMixin<ProposalBuilderBloc, ProposalBuilderPage>,
-        SignalHandlerStateMixin<ProposalBuilderBloc, ProposalBuilderSignal,
-            ProposalBuilderPage> {
+        SignalHandlerStateMixin<ProposalBuilderBloc, ProposalBuilderSignal, ProposalBuilderPage> {
   late final SegmentsController _segmentsController;
   late final ItemScrollController _segmentsScrollController;
 
@@ -117,8 +117,7 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
   void didUpdateWidget(ProposalBuilderPage oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    if (widget.proposalId != oldWidget.proposalId ||
-        widget.categoryId != oldWidget.categoryId) {
+    if (widget.proposalId != oldWidget.proposalId || widget.categoryId != oldWidget.categoryId) {
       _loadProposal();
     }
   }
@@ -166,6 +165,8 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
         unawaited(_showEmailNotVerifiedDialog());
       case MaxProposalsLimitReachedSignal():
         unawaited(_showProposalLimitReachedDialog(signal));
+      case UnlockProposalSignal():
+        unawaited(_showUnlockProposalDialog(signal));
     }
   }
 
@@ -189,9 +190,7 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
   }
 
   void _dontShowCampaignSubmissionClosingDialog(bool value) {
-    context
-        .read<SessionCubit>()
-        .updateShowSubmissionClosingWarning(value: !value);
+    context.read<SessionCubit>().updateShowSubmissionClosingWarning(value: !value);
   }
 
   void _handleSegmentsControllerChange() {
@@ -303,11 +302,7 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
   Future<void> _showSubmissionClosingWarningDialog(
     DateTime submissionCloseDate,
   ) async {
-    final canShow = context
-        .read<SessionCubit>()
-        .state
-        .settings
-        .showSubmissionClosingWarning;
+    final canShow = context.read<SessionCubit>().state.settings.showSubmissionClosingWarning;
 
     if (canShow) {
       await SubmissionClosingWarningDialog.showNDaysBefore(
@@ -325,11 +320,32 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
     );
   }
 
+  Future<void> _showUnlockProposalDialog(
+    UnlockProposalSignal signal, {
+    ProposalBuilderBloc? bloc,
+  }) async {
+    bloc ??= context.read<ProposalBuilderBloc>();
+    final unlock = await UnlockEditProposalDialog.show(
+          context: context,
+          title: signal.title,
+          version: signal.version,
+        ) ??
+        false;
+
+    if (unlock && mounted) {
+      return bloc.add(const UnlockProposalBuilderEvent());
+    }
+    if (mounted) {
+      Router.neglect(context, () {
+        const WorkspaceRoute().replace(context);
+      });
+    }
+  }
+
   void _showValidationErrorSnackbar(ProposalBuilderValidationException error) {
     VoicesSnackBar.hideCurrent(context);
 
-    final formattedFields =
-        error.fields.whereNot((e) => e.isEmpty).map((e) => '• $e').join('\n');
+    final formattedFields = error.fields.whereNot((e) => e.isEmpty).map((e) => '• $e').join('\n');
 
     VoicesSnackBar(
       behavior: SnackBarBehavior.floating,

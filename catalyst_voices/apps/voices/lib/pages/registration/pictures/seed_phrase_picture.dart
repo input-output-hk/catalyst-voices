@@ -2,9 +2,8 @@ import 'package:catalyst_voices/pages/registration/pictures/task_picture.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:flutter/material.dart';
 
-const _wordsPerColumnCount = 6;
-const _firstHighlightIndex = [0];
 const _allHighlightIndex = [0, 1, 2, 3, 4, 5];
+const _firstHighlightIndex = [0];
 
 class SeedPhrasePicture extends StatelessWidget {
   final bool indicateSelection;
@@ -33,93 +32,13 @@ class SeedPhrasePicture extends StatelessWidget {
                     indicateSelection: indicateSelection,
                     type: type,
                   ),
-                  if (type == TaskPictureType.success)
-                    VoicesAssets.icons.check.buildIcon(size: 48),
-                  if (type == TaskPictureType.error)
-                    VoicesAssets.icons.x.buildIcon(size: 48),
+                  if (type == TaskPictureType.success) VoicesAssets.icons.check.buildIcon(size: 48),
+                  if (type == TaskPictureType.error) VoicesAssets.icons.x.buildIcon(size: 48),
                 ],
               ),
             );
           },
         ),
-      ),
-    );
-  }
-}
-
-class _Words extends StatelessWidget {
-  const _Words({
-    required this.indicateSelection,
-    required this.type,
-  });
-
-  final bool indicateSelection;
-  final TaskPictureType type;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Expanded(
-          child: _WordsColumn(
-            key: const ValueKey('LeftColumnKey'),
-            highlightIndexes: switch (type) {
-              TaskPictureType.normal when indicateSelection =>
-                _firstHighlightIndex,
-              TaskPictureType.normal => const [],
-              TaskPictureType.success ||
-              TaskPictureType.error =>
-                _allHighlightIndex,
-            },
-            count: _wordsPerColumnCount,
-            type: type,
-          ),
-        ),
-        const SizedBox(width: 6),
-        Expanded(
-          child: _WordsColumn(
-            key: const ValueKey('RightColumnKey'),
-            highlightIndexes: switch (type) {
-              TaskPictureType.normal => const [],
-              TaskPictureType.success ||
-              TaskPictureType.error =>
-                _allHighlightIndex,
-            },
-            count: _wordsPerColumnCount,
-            type: type,
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _WordsColumn extends StatelessWidget {
-  final List<int> highlightIndexes;
-  final int count;
-  final TaskPictureType type;
-
-  const _WordsColumn({
-    super.key,
-    this.highlightIndexes = const [],
-    this.count = 6,
-    required this.type,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.max,
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: List.generate(
-        count,
-        (index) {
-          return _Word(
-            isSelected: highlightIndexes.contains(index),
-            type: type,
-          );
-        },
       ),
     );
   }
@@ -145,6 +64,76 @@ class _Word extends StatelessWidget {
       decoration: BoxDecoration(
         color: color,
         borderRadius: BorderRadius.circular(1.12),
+      ),
+    );
+  }
+}
+
+class _Words extends StatelessWidget {
+  final bool indicateSelection;
+
+  final TaskPictureType type;
+  const _Words({
+    required this.indicateSelection,
+    required this.type,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Expanded(
+          child: _WordsColumn(
+            key: const ValueKey('LeftColumnKey'),
+            highlightIndexes: switch (type) {
+              TaskPictureType.normal when indicateSelection => _firstHighlightIndex,
+              TaskPictureType.normal => const [],
+              TaskPictureType.success || TaskPictureType.error => _allHighlightIndex,
+            },
+            type: type,
+          ),
+        ),
+        const SizedBox(width: 6),
+        Expanded(
+          child: _WordsColumn(
+            key: const ValueKey('RightColumnKey'),
+            highlightIndexes: switch (type) {
+              TaskPictureType.normal => const [],
+              TaskPictureType.success || TaskPictureType.error => _allHighlightIndex,
+            },
+            type: type,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _WordsColumn extends StatelessWidget {
+  static const int _count = 6;
+
+  final List<int> highlightIndexes;
+  final TaskPictureType type;
+
+  const _WordsColumn({
+    super.key,
+    this.highlightIndexes = const [],
+    required this.type,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: List.generate(
+        _count,
+        (index) {
+          return _Word(
+            isSelected: highlightIndexes.contains(index),
+            type: type,
+          );
+        },
       ),
     );
   }
