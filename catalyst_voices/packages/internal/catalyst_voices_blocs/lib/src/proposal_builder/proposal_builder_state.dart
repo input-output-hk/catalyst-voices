@@ -191,6 +191,17 @@ final class ProposalBuilderValidationErrors extends Equatable {
   @override
   List<Object?> get props => [status, errors];
 
+  bool get showErrorsInMenu {
+    switch (status) {
+      case ProposalBuilderValidationStatus.notStarted:
+      case ProposalBuilderValidationStatus.cleared:
+        return false;
+      case ProposalBuilderValidationStatus.pendingShowAll:
+      case ProposalBuilderValidationStatus.pendingHideAll:
+        return true;
+    }
+  }
+
   ProposalBuilderValidationErrors copyWith({
     ProposalBuilderValidationStatus? status,
     List<String>? errors,

@@ -147,7 +147,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
   }) {
     final documentSegments = _mapDocumentToSegments(
       proposalDocument,
-      showValidationErrors: state.validationErrors != null,
+      showValidationErrors: state.validationErrors?.showErrorsInMenu ?? false,
     );
 
     final commentSegments = _mapCommentToSegments(
@@ -368,7 +368,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
 
     final documentSegments = _mapDocumentToSegments(
       document,
-      showValidationErrors: state.validationErrors != null,
+      showValidationErrors: state.validationErrors?.showErrorsInMenu ?? false,
     );
 
     final validationErrors = state.validationErrors?.withErrorList(document.collectErrors());
@@ -1044,7 +1044,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
 
     final documentSegments = _mapDocumentToSegments(
       document,
-      showValidationErrors: showErrors,
+      showValidationErrors: false,
     );
 
     if (showErrors) {
