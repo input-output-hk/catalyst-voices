@@ -63,18 +63,6 @@ class _Background extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final lightColors = [
-      context.colors.onSurfaceNeutralOpaqueLv1,
-      const Color(0xFFB4DAFD),
-      const Color(0xFFF8C1EA),
-    ];
-    final darkColors = [
-      context.colors.onSurfaceNeutralOpaqueLv1,
-      const Color(0xFF4E74B2),
-      const Color(0xFF9338C3),
-    ];
-    final isLight = Theme.of(context).brightness == Brightness.light;
-
     return Container(
       width: double.infinity,
       height: 300,
@@ -83,7 +71,7 @@ class _Background extends StatelessWidget {
         gradient: LinearGradient(
           begin: const Alignment(0, 1.4),
           end: const Alignment(0.18, -1.2),
-          colors: isLight ? lightColors : darkColors,
+          colors: context.colors.headerGradientSecondary,
           stops: const [0.46, 0.66, 1],
         ),
       ),

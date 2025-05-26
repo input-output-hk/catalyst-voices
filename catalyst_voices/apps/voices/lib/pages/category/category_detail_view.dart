@@ -77,7 +77,7 @@ class _CategoryBrief extends StatelessWidget {
         gradient: LinearGradient(
           begin: const Alignment(-0.15, 1.8),
           end: const Alignment(0.18, -1.2),
-          colors: _getGradientColors(context),
+          colors: context.colors.headerGradient,
           stops: const [0.26, 0.56, 1],
         ),
       ),
@@ -103,20 +103,5 @@ class _CategoryBrief extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  List<Color> _getGradientColors(BuildContext context) {
-    final lightColors = [
-      const Color(0xFFF6FAFE),
-      const Color(0xFFB4DAFD),
-      const Color(0xFFF8C1EA),
-    ];
-    final darkColors = [
-      const Color(0xFF1736A3),
-      const Color(0xFF4E74B2),
-      const Color(0xFF9338C3),
-    ];
-    final isLight = Theme.of(context).brightness == Brightness.light;
-    return isLight ? lightColors : darkColors;
   }
 }

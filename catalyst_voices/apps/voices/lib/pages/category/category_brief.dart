@@ -58,7 +58,7 @@ class CategoryBrief extends StatelessWidget {
           child: Row(
             children: [
               if (showViewAllButton) ...[
-                ViewAllCategoryProposalButton(categoryId: categoryRef),
+                ViewAllCategoryProposalButton(categoryRef: categoryRef),
                 const SizedBox(width: 8),
               ],
               const ChangeCategoryButton(),
