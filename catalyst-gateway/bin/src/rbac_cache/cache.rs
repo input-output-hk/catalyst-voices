@@ -1,7 +1,10 @@
 //! A cache for RBAC registrations.
 
 use cardano_blockchain_types::{StakeAddress, TransactionId};
-use catalyst_types::catalyst_id::{role_index::RoleId, CatalystId};
+use catalyst_types::{
+    catalyst_id::{role_index::RoleId, CatalystId},
+    problem_report::ProblemReport,
+};
 use ed25519_dalek::VerifyingKey;
 use moka::{policy::EvictionPolicy, sync::Cache};
 use rbac_registration::{cardano::cip509::Cip509, registration::cardano::RegistrationChain};
@@ -132,13 +135,6 @@ impl RbacCache {
                 );
             }
         }
-        if report.is_problematic() {
-            return Err(RbacCacheAddError::InvalidRegistration {
-                catalyst_id,
-                purpose,
-                report,
-            });
-        }
 
         // Try to add a new registration to the chain.
         let new_chain = chain.update(registration).map_err(|e| {
@@ -153,21 +149,14 @@ impl RbacCache {
             }
         })?;
 
-        // Check if a new registration contains a signing key that was used by any other chain.
-        if let Some((key, _)) = new_chain.get_latest_signing_pk_for_role(&RoleId::Role0) {
-            if let Some(previous) = self.public_keys.get(&key) {
-                if &previous != new_chain.catalyst_id() {
-                    report.functional_validation(
-                        &format!("An update to {catalyst_id} registration chain uses the same public key ({key:?}) as {previous} chain"),
-                        "It isn't allowed to use role 0 signing (certificate subject public) key in different chains",
-                    );
-                    return Err(RbacCacheAddError::InvalidRegistration {
-                        catalyst_id: catalyst_id.clone(),
-                        purpose,
-                        report,
-                    });
-                }
-            }
+        self.verify_public_keys(&new_chain, &report);
+
+        if report.is_problematic() {
+            return Err(RbacCacheAddError::InvalidRegistration {
+                catalyst_id,
+                purpose,
+                report,
+            });
         }
 
         // Everything is fine: update caches.
@@ -247,6 +236,8 @@ impl RbacCache {
             }
         }
 
+        self.verify_public_keys(&new_chain, &report);
+
         if report.is_problematic() {
             return Err(RbacCacheAddError::InvalidRegistration {
                 catalyst_id,
@@ -271,5 +262,21 @@ impl RbacCache {
         self.chains.insert(catalyst_id.clone(), new_chain);
 
         Ok(RbacCacheAddSuccess { catalyst_id })
+    }
+
+    /// Checks that a new registration doesn't contain a signing key that was used by any
+    /// other chain.
+    fn verify_public_keys(&self, new_chain: &RegistrationChain, report: &ProblemReport) {
+        if let Some((key, _)) = new_chain.get_latest_signing_pk_for_role(&RoleId::Role0) {
+            if let Some(previous) = self.public_keys.get(&key) {
+                if &previous != new_chain.catalyst_id() {
+                    report.functional_validation(
+                        &format!("An update to {} registration chain uses the same public key ({key:?}) as {previous} chain",
+                            new_chain.catalyst_id()),
+                        "It isn't allowed to use role 0 signing (certificate subject public) key in different chains",
+                    );
+                }
+            }
+        }
     }
 }
