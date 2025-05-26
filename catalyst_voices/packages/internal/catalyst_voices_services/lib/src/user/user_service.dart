@@ -40,12 +40,20 @@ abstract interface class UserService implements ActiveAware {
   ///
   /// It can invoke some one-time registration logic,
   /// contrary to [useAccount] which doesn't have such logic.
+  ///
+  /// Throws [EmailAlreadyUsedException] if [Account.email] already taken.
+  ///
+  /// Due to impossibility to validate the email before registering
+  /// the account will be still registered and afterwards
+  /// the [EmailAlreadyUsedException] thrown in case of non-unique email.
   Future<void> registerAccount(Account account);
 
   Future<void> removeAccount(Account account);
 
+  /// Throws [EmailAlreadyUsedException] if email already taken.
   Future<void> resendActiveAccountVerificationEmail();
 
+  /// Throws [EmailAlreadyUsedException] if [email] already taken.
   Future<void> updateAccount({
     required CatalystId id,
     Optional<String>? username,
@@ -157,11 +165,9 @@ final class UserServiceImpl implements UserService {
     if (email != null) {
       // updating user profile must be after updating user so that
       // the request is sent with correct access token
-      unawaited(
-        _userRepository.publishUserProfile(
-          catalystId: account.catalystId,
-          email: email,
-        ),
+      await _userRepository.publishUserProfile(
+        catalystId: account.catalystId,
+        email: email,
       );
     }
   }
