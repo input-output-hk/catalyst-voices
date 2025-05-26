@@ -18,3 +18,7 @@ sealed class DevToolsEvent extends Equatable {
 final class RecoverConfigEvent extends DevToolsEvent {
   const RecoverConfigEvent();
 }
+
+final class UpdateSystemInfoEvent extends DevToolsEvent {
+  const UpdateSystemInfoEvent();
+}
