@@ -19,15 +19,10 @@ import 'package:catalyst_voices/widgets/modals/proposals/proposal_limit_reached_
 import 'package:catalyst_voices/widgets/modals/proposals/publish_proposal_error_dialog.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/submit_proposal_error_dialog.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/unlock_edit_proposal.dart';
-import 'package:catalyst_voices/widgets/snackbar/voices_snackbar.dart';
-import 'package:catalyst_voices/widgets/snackbar/voices_snackbar_action.dart';
-import 'package:catalyst_voices/widgets/snackbar/voices_snackbar_type.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
-import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
-import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
@@ -138,8 +133,6 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
   @override
   void handleError(Object error) {
     switch (error) {
-      case ProposalBuilderValidationException():
-        _showValidationErrorSnackbar(error);
       case ProposalBuilderPublishException():
         unawaited(_showPublishException(error));
       case ProposalBuilderSubmitException():
@@ -340,27 +333,6 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
         const WorkspaceRoute().replace(context);
       });
     }
-  }
-
-  void _showValidationErrorSnackbar(ProposalBuilderValidationException error) {
-    VoicesSnackBar.hideCurrent(context);
-
-    final formattedFields = error.fields.whereNot((e) => e.isEmpty).map((e) => '• $e').join('\n');
-
-    VoicesSnackBar(
-      behavior: SnackBarBehavior.floating,
-      type: VoicesSnackBarType.error,
-      duration: const Duration(seconds: 15),
-      title: error.message(context),
-      message: formattedFields,
-      actions: [
-        VoicesSnackBarPrimaryAction(
-          type: VoicesSnackBarType.error,
-          onPressed: () => VoicesSnackBar.hideCurrent(context),
-          child: Text(context.l10n.cancelButtonText),
-        ),
-      ],
-    ).show(context);
   }
 
   void _updateSegments(List<Segment> data, NodeId? activeSectionId) {

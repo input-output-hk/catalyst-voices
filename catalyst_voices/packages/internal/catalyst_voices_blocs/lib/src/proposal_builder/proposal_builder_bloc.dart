@@ -147,7 +147,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
   }) {
     final documentSegments = _mapDocumentToSegments(
       proposalDocument,
-      showValidationErrors: state.showValidationErrors,
+      showValidationErrors: state.validationErrors != null,
     );
 
     final commentSegments = _mapCommentToSegments(
@@ -172,7 +172,8 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
       metadata: proposalMetadata,
       category: categoryVM,
       activeNodeId: firstSection?.id,
-      canPublish: isEmailVerified,
+      validationErrors: state.validationErrors?.withErrorList(proposalDocument.collectErrors()),
+      canPublish: isEmailVerified && proposalDocument.isValid,
       isMaxProposalsLimitReached: isMaxProposalsLimitReached,
     );
   }
@@ -367,12 +368,16 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
 
     final documentSegments = _mapDocumentToSegments(
       document,
-      showValidationErrors: state.showValidationErrors,
+      showValidationErrors: state.validationErrors != null,
     );
+
+    final validationErrors = state.validationErrors?.withErrorList(document.collectErrors());
 
     final newState = state.copyWith(
       document: Optional(document),
       documentSegments: documentSegments,
+      validationErrors: Optional(validationErrors),
+      canPublish: _cache.isEmailVerified && document.isValid,
     );
 
     // early emit new state to make the UI responsive
@@ -753,7 +758,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     final commentTemplate = _cache.commentTemplate;
     final comments = _cache.comments ?? [];
     final commentsState = state.comments;
-    final emailStatus = _cache.accountPublicStatus;
+    final isEmailVerified = _cache.isEmailVerified;
     final isMaxProposalsLimitReached = _cache.isMaxProposalsLimitReached ?? true;
 
     if (proposalDocument == null ||
@@ -774,7 +779,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
       commentSchema: commentTemplate.schema,
       comments: comments,
       commentsState: commentsState,
-      isEmailVerified: emailStatus?.isVerified ?? false,
+      isEmailVerified: isEmailVerified,
       isMaxProposalsLimitReached: isMaxProposalsLimitReached,
     );
   }
@@ -1043,18 +1048,28 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     );
 
     if (showErrors) {
-      emitError(
-        ProposalBuilderValidationException(
-          fields: document.invalidProperties.map((e) => e.schema.title).toList(),
+      final newState = state.copyWith(
+        documentSegments: documentSegments,
+        validationErrors: Optional(
+          ProposalBuilderValidationErrors(
+            status: ProposalBuilderValidationStatus.notStarted,
+            errors: document.collectErrors(),
+          ),
         ),
       );
+      emit(newState);
+    } else {
+      final newState = state.copyWith(
+        documentSegments: documentSegments,
+        validationErrors: const Optional.empty(),
+      );
+      emit(newState);
     }
+  }
+}
 
-    final newState = state.copyWith(
-      documentSegments: documentSegments,
-      showValidationErrors: showErrors,
-    );
-
-    emit(newState);
+extension on Document {
+  List<String> collectErrors() {
+    return invalidProperties.map((e) => e.schema.title).whereNot((e) => e.isBlank).toList();
   }
 }

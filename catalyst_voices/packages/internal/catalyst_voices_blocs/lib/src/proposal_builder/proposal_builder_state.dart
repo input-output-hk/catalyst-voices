@@ -76,7 +76,7 @@ final class ProposalBuilderState extends Equatable {
   final ProposalGuidance guidance;
   final CampaignCategoryDetailsViewModel? category;
   final NodeId? activeNodeId;
-  final bool showValidationErrors;
+  final ProposalBuilderValidationErrors? validationErrors;
   final bool canPublish;
   final bool isMaxProposalsLimitReached;
 
@@ -92,7 +92,7 @@ final class ProposalBuilderState extends Equatable {
     this.guidance = const ProposalGuidance(),
     this.category,
     this.activeNodeId,
-    this.showValidationErrors = false,
+    this.validationErrors,
     this.canPublish = false,
     this.isMaxProposalsLimitReached = true,
   });
@@ -122,7 +122,7 @@ final class ProposalBuilderState extends Equatable {
         guidance,
         category,
         activeNodeId,
-        showValidationErrors,
+        validationErrors,
         canPublish,
         isMaxProposalsLimitReached,
       ];
@@ -156,7 +156,7 @@ final class ProposalBuilderState extends Equatable {
     ProposalGuidance? guidance,
     Optional<CampaignCategoryDetailsViewModel>? category,
     Optional<NodeId>? activeNodeId,
-    bool? showValidationErrors,
+    Optional<ProposalBuilderValidationErrors>? validationErrors,
     bool? canPublish,
     bool? isMaxProposalsLimitReached,
   }) {
@@ -172,11 +172,73 @@ final class ProposalBuilderState extends Equatable {
       guidance: guidance ?? this.guidance,
       category: category.dataOr(this.category),
       activeNodeId: activeNodeId.dataOr(this.activeNodeId),
-      showValidationErrors: showValidationErrors ?? this.showValidationErrors,
+      validationErrors: validationErrors.dataOr(this.validationErrors),
       canPublish: canPublish ?? this.canPublish,
       isMaxProposalsLimitReached: isMaxProposalsLimitReached ?? this.isMaxProposalsLimitReached,
     );
   }
+}
+
+final class ProposalBuilderValidationErrors extends Equatable {
+  final ProposalBuilderValidationStatus status;
+  final List<String> errors;
+
+  const ProposalBuilderValidationErrors({
+    required this.status,
+    required this.errors,
+  });
+
+  @override
+  List<Object?> get props => [status, errors];
+
+  ProposalBuilderValidationErrors copyWith({
+    ProposalBuilderValidationStatus? status,
+    List<String>? errors,
+  }) {
+    return ProposalBuilderValidationErrors(
+      status: status ?? this.status,
+      errors: errors ?? this.errors,
+    );
+  }
+
+  ProposalBuilderValidationErrors withErrorList(
+    List<String> errors,
+  ) {
+    return copyWith(
+      status: _ensureStatusMatchesErrorList(status, errors),
+      errors: errors,
+    );
+  }
+
+  ProposalBuilderValidationStatus _ensureStatusMatchesErrorList(
+    ProposalBuilderValidationStatus status,
+    List<String> errors,
+  ) {
+    switch (status) {
+      case ProposalBuilderValidationStatus.notStarted:
+      case ProposalBuilderValidationStatus.pendingShowAll:
+      case ProposalBuilderValidationStatus.pendingHideAll:
+        if (errors.isEmpty) {
+          return ProposalBuilderValidationStatus.cleared;
+        } else {
+          return status;
+        }
+
+      case ProposalBuilderValidationStatus.cleared:
+        if (errors.isEmpty) {
+          return status;
+        } else {
+          return ProposalBuilderValidationStatus.pendingShowAll;
+        }
+    }
+  }
+}
+
+enum ProposalBuilderValidationStatus {
+  notStarted,
+  pendingShowAll,
+  pendingHideAll,
+  cleared,
 }
 
 final class ProposalGuidance extends Equatable {

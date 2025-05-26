@@ -1640,10 +1640,6 @@
   "@proposalOptions": {
     "description": "Actions related to a proposal like publishing, sharing, exporting, etc."
   },
-  "proposalEditorValidationSnackbar": "Fix the following input errors",
-  "@proposalEditorValidationSnackbar": {
-    "description": "Snackbar title shown when user tries to save a proposal with errors."
-  },
   "proposalEditorDeleteDialogTitle": "Delete Proposal?",
   "@proposalEditorDeleteDialogTitle": {
     "description": "A title for the dialog to confirm proposal deletion."
