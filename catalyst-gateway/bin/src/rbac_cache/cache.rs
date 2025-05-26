@@ -256,7 +256,8 @@ impl RbacCache {
         if let Some((key, _)) = new_chain.get_latest_signing_pk_for_role(&RoleId::Role0) {
             self.public_keys.insert(key, catalyst_id.clone());
         } else {
-            // The registration must already be validated, so this should never happen.
+            // A root registration should always contain role 0 with a signing key. The registration
+            // must already be validated, so this should never happen.
             error!("{catalyst_id} root registration doesn't have a signing key");
         }
         self.chains.insert(catalyst_id.clone(), new_chain);
