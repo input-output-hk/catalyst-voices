@@ -11,19 +11,18 @@ abstract interface class LoggingService {
     return _LoggingServiceImpl(root: Logger.root);
   }
 
-  // ignore: avoid_setters_without_getters
-  set level(Level newValue);
-
-  // ignore: avoid_setters_without_getters
-  set printLogs(bool newValue);
-
   Future<void> dispose();
+
+  void level(Level newValue);
+
+  void printLogs({required bool enabled});
 }
 
 final class _LoggingServiceImpl implements LoggingService {
   final Logger root;
 
   StreamSubscription<LogRecord>? _recordsSub;
+  bool _printLogs;
 
   _LoggingServiceImpl({
     required this.root,
@@ -35,30 +34,25 @@ final class _LoggingServiceImpl implements LoggingService {
   }
 
   @override
-  // ignore: avoid_setters_without_getters
-  set level(Level newValue) {
+  Future<void> dispose() async {
+    await _recordsSub?.cancel();
+    _recordsSub = null;
+  }
+
+  @override
+  void level(Level newValue) {
     if (root.level == newValue) {
       return;
     }
     root.level = newValue;
   }
 
-  bool get printLogs => _printLogs;
-
-  bool _printLogs;
-
   @override
-  set printLogs(bool newValue) {
-    if (_printLogs == newValue) {
+  void printLogs({required bool enabled}) {
+    if (_printLogs == enabled) {
       return;
     }
-    _printLogs = newValue;
-  }
-
-  @override
-  Future<void> dispose() async {
-    await _recordsSub?.cancel();
-    _recordsSub = null;
+    _printLogs = enabled;
   }
 
   void _onLogRecord(LogRecord log) {
