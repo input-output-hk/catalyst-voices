@@ -67,7 +67,7 @@ class _DocumentSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocSelector<ProposalBuilderBloc, ProposalBuilderState, bool>(
-      selector: (state) => state.validationErrors?.showErrorsInMenu ?? false,
+      selector: (state) => state.validationErrors?.showErrors ?? false,
       builder: (context, showValidationErrors) {
         return DocumentBuilderSectionTile(
           key: key,

@@ -193,7 +193,7 @@ final class ProposalBuilderValidationErrors extends Equatable {
   @override
   List<Object?> get props => [status, origin, errors];
 
-  bool get showErrorsInMenu {
+  bool get showErrors {
     switch (status) {
       case ProposalBuilderValidationStatus.notStarted:
       case ProposalBuilderValidationStatus.cleared:
@@ -249,16 +249,16 @@ final class ProposalBuilderValidationErrors extends Equatable {
   }
 }
 
+enum ProposalBuilderValidationOrigin {
+  shareDraft,
+  submitForReview,
+}
+
 enum ProposalBuilderValidationStatus {
   notStarted,
   pendingShowAll,
   pendingHideAll,
   cleared,
-}
-
-enum ProposalBuilderValidationOrigin {
-  shareDraft,
-  submitForReview,
 }
 
 final class ProposalGuidance extends Equatable {
