@@ -73,7 +73,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
 
     _cache = _cache.copyWith(
       activeAccountId: Optional(activeAccount?.catalystId),
-      accountPublicStatus: const Optional(AccountPublicStatus.verified),
+      accountPublicStatus: Optional(activeAccount?.publicStatus),
     );
 
     _activeAccountSub =
@@ -219,7 +219,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
 
     _cache = ProposalBuilderBlocCache(
       activeAccountId: activeAccount?.catalystId,
-      accountPublicStatus: AccountPublicStatus.verified,
+      accountPublicStatus: activeAccount?.publicStatus,
       isMaxProposalsLimitReached: isMaxProposalsLimitReached,
     );
   }
