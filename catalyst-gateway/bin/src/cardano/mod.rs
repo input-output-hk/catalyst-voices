@@ -1,6 +1,6 @@
 //! Logic for orchestrating followers
 
-use std::{fmt::Display, ops::Sub, sync::Arc, time::Duration};
+use std::{fmt::Display, sync::Arc, time::Duration};
 
 use cardano_blockchain_types::{MultiEraBlock, Network, Point, Slot};
 use cardano_chain_follower::{ChainFollower, ChainSyncConfig};
