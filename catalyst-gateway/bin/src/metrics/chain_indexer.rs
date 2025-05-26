@@ -89,4 +89,14 @@ pub(crate) mod reporter {
         )
         .unwrap()
     });
+
+    /// A slot difference between immutable tip slot and the volatile tip slot number.
+    pub(crate) static SLOT_TIP_DIFF: LazyLock<IntGaugeVec> = LazyLock::new(|| {
+        register_int_gauge_vec!(
+            format!("indexer_slot_tip_diff"),
+            "A slot difference between immutable tip slot and the volatile tip slot number",
+            &METRIC_LABELS
+        )
+        .unwrap()
+    });
 }
