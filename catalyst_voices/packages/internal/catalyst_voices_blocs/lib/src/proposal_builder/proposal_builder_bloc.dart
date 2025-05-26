@@ -704,7 +704,12 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
   ) async {
     try {
       _logger.info('Publishing proposal');
-      emit(state.copyWith(isChanging: true));
+      emit(
+        state.copyWith(
+          isChanging: true,
+          validationErrors: const Optional.empty(),
+        ),
+      );
 
       final currentRef = state.metadata.documentRef!;
       final updatedRef = await _proposalService.publishProposal(
@@ -908,7 +913,12 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
   ) async {
     try {
       _logger.info('Submitting proposal for review');
-      emit(state.copyWith(isChanging: true));
+      emit(
+        state.copyWith(
+          isChanging: true,
+          validationErrors: const Optional.empty(),
+        ),
+      );
 
       switch (state.metadata.publish) {
         case ProposalPublish.localDraft:
