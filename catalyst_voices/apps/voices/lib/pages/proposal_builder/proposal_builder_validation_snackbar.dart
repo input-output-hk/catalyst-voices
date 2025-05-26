@@ -29,10 +29,20 @@ class ProposalBuilderValidationSnackbarOverlay extends StatelessWidget {
             child,
             if (state != null)
               Positioned(
-                left: MediaQuery.sizeOf(context).width * 0.30,
-                right: MediaQuery.sizeOf(context).width * 0.30,
+                left: 0,
+                right: 0,
                 bottom: 32,
-                child: _SnackbarStatusSelector(validationErrors: state),
+                child: Center(
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      maxWidth: VoicesSnackBar.calculateSnackBarWidth(
+                        behavior: SnackBarBehavior.floating,
+                        screenWidth: MediaQuery.sizeOf(context).width,
+                      ),
+                    ),
+                    child: _SnackbarStatusSelector(validationErrors: state),
+                  ),
+                ),
               ),
           ],
         );
@@ -193,13 +203,11 @@ class _PendingSnackbar extends StatelessWidget {
   }
 
   String _buildMessage(BuildContext context) {
-    final buffer = StringBuffer(context.l10n.proposalEditorValidationErrorInProgressMessage);
     if (showAll) {
-      buffer
-        ..write('\n\n')
-        ..writeAll(errors.map((e) => '• $e'), '\n');
+      return errors.map((e) => '   • $e').join('\n');
+    } else {
+      return context.l10n.proposalEditorValidationErrorInProgressMessage;
     }
-    return buffer.toString();
   }
 }
 
