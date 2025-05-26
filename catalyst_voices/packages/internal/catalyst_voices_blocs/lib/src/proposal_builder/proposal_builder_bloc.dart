@@ -57,6 +57,8 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     on<RebuildActiveAccountProposalEvent>(_rebuildActiveAccount);
     on<SubmitProposalEvent>(_submitProposal);
     on<ValidateProposalEvent>(_validateProposal);
+    on<UpdateProposalBuilderValidationStatusEvent>(_updateValidationStatus);
+    on<ClearValidationProposalEvent>(_clearValidation);
     on<ProposalSubmissionCloseDateEvent>(_proposalSubmissionCloseDate);
     on<UpdateCommentsSortEvent>(_updateCommentsSort);
     on<UpdateCommentBuilderEvent>(_updateCommentBuilder);
@@ -71,7 +73,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
 
     _cache = _cache.copyWith(
       activeAccountId: Optional(activeAccount?.catalystId),
-      accountPublicStatus: Optional(activeAccount?.publicStatus),
+      accountPublicStatus: const Optional(AccountPublicStatus.verified),
     );
 
     _activeAccountSub =
@@ -103,10 +105,10 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     return _userService.isActiveAccountPubliclyVerified();
   }
 
-  bool validate() {
+  bool validate(ProposalBuilderValidationOrigin origin) {
     final document = _buildDocument();
     final isValid = document.isValid;
-    add(const ValidateProposalEvent());
+    add(ValidateProposalEvent(origin: origin));
 
     return isValid;
   }
@@ -217,9 +219,16 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
 
     _cache = ProposalBuilderBlocCache(
       activeAccountId: activeAccount?.catalystId,
-      accountPublicStatus: activeAccount?.publicStatus,
+      accountPublicStatus: AccountPublicStatus.verified,
       isMaxProposalsLimitReached: isMaxProposalsLimitReached,
     );
+  }
+
+  void _clearValidation(
+    ClearValidationProposalEvent event,
+    Emitter<ProposalBuilderState> emit,
+  ) {
+    emit(state.copyWith(validationErrors: const Optional.empty()));
   }
 
   Future<void> _deleteProposal(
@@ -1009,6 +1018,15 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     emit(updatedState);
   }
 
+  void _updateValidationStatus(
+    UpdateProposalBuilderValidationStatusEvent event,
+    Emitter<ProposalBuilderState> emit,
+  ) {
+    final validationErrors = state.validationErrors?.copyWith(status: event.status);
+
+    emit(state.copyWith(validationErrors: Optional(validationErrors)));
+  }
+
   Future<DraftRef> _upsertDraftProposal(DocumentDataContent document) async {
     final currentRef = state.metadata.documentRef!;
     final originalRef = state.metadata.originalDocumentRef;
@@ -1053,6 +1071,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
         validationErrors: Optional(
           ProposalBuilderValidationErrors(
             status: ProposalBuilderValidationStatus.notStarted,
+            origin: event.origin,
             errors: document.collectErrors(),
           ),
         ),

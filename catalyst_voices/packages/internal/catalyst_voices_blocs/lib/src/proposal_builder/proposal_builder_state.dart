@@ -181,15 +181,17 @@ final class ProposalBuilderState extends Equatable {
 
 final class ProposalBuilderValidationErrors extends Equatable {
   final ProposalBuilderValidationStatus status;
+  final ProposalBuilderValidationOrigin origin;
   final List<String> errors;
 
   const ProposalBuilderValidationErrors({
     required this.status,
+    required this.origin,
     required this.errors,
   });
 
   @override
-  List<Object?> get props => [status, errors];
+  List<Object?> get props => [status, origin, errors];
 
   bool get showErrorsInMenu {
     switch (status) {
@@ -204,10 +206,12 @@ final class ProposalBuilderValidationErrors extends Equatable {
 
   ProposalBuilderValidationErrors copyWith({
     ProposalBuilderValidationStatus? status,
+    ProposalBuilderValidationOrigin? origin,
     List<String>? errors,
   }) {
     return ProposalBuilderValidationErrors(
       status: status ?? this.status,
+      origin: origin ?? this.origin,
       errors: errors ?? this.errors,
     );
   }
@@ -250,6 +254,11 @@ enum ProposalBuilderValidationStatus {
   pendingShowAll,
   pendingHideAll,
   cleared,
+}
+
+enum ProposalBuilderValidationOrigin {
+  shareDraft,
+  submitForReview,
 }
 
 final class ProposalGuidance extends Equatable {
