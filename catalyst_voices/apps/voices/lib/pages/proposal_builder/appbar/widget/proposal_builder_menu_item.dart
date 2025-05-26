@@ -75,7 +75,7 @@ class _ProposalBuilderMenuItem extends StatelessWidget {
 }
 
 class _ProposalBuilderMenuItemErrorIndicator extends StatelessWidget {
-  const _ProposalBuilderMenuItemErrorIndicator({super.key});
+  const _ProposalBuilderMenuItemErrorIndicator();
 
   @override
   Widget build(BuildContext context) {
