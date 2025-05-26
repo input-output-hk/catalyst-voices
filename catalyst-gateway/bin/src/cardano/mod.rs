@@ -744,8 +744,12 @@ pub(crate) async fn start_followers() -> anyhow::Result<()> {
                 reporter::SLOT_TIP_DIFF
                     .with_label_values(&[&api_host_names, service_id, &network])
                     .set(
-                        i64::try_from(u64::from(*immutable_slot).sub(u64::from(*live_slot)))
-                            .unwrap_or(-1),
+                        i64::try_from(
+                            u64::from(*immutable_slot)
+                                .checked_sub(u64::from(*live_slot))
+                                .unwrap_or_default(),
+                        )
+                        .unwrap_or(-1),
                     );
             }
             if let Event::ImmutableTipSlotChanged {
@@ -760,8 +764,12 @@ pub(crate) async fn start_followers() -> anyhow::Result<()> {
                 reporter::SLOT_TIP_DIFF
                     .with_label_values(&[&api_host_names, service_id, &network])
                     .set(
-                        i64::try_from(u64::from(*immutable_slot).sub(u64::from(*live_slot)))
-                            .unwrap_or(-1),
+                        i64::try_from(
+                            u64::from(*immutable_slot)
+                                .checked_sub(u64::from(*live_slot))
+                                .unwrap_or_default(),
+                        )
+                        .unwrap_or(-1),
                     );
             }
             if let Event::IndexedSlotProgressed { slot } = event {
