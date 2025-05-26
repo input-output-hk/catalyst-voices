@@ -169,7 +169,7 @@ class _PendingSnackbar extends StatelessWidget {
         ProposalBuilderValidationOrigin.submitForReview =>
           context.l10n.proposalEditorValidationErrorSubmitReviewTitle(errors.length),
       },
-      message: context.l10n.proposalEditorValidationErrorInProgressMessage,
+      message: _buildMessage(context),
       buttonText: switch (showAll) {
         true => context.l10n.hideAllIssues,
         false => context.l10n.showAllIssues,
@@ -187,6 +187,16 @@ class _PendingSnackbar extends StatelessWidget {
         context.read<ProposalBuilderBloc>().add(event);
       },
     );
+  }
+
+  String _buildMessage(BuildContext context) {
+    final buffer = StringBuffer(context.l10n.proposalEditorValidationErrorInProgressMessage);
+    if (showAll) {
+      buffer
+        ..write('\n\n')
+        ..writeAll(errors.map((e) => '• $e'), '\n');
+    }
+    return buffer.toString();
   }
 }
 
