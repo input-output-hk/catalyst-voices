@@ -228,7 +228,17 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     ClearValidationProposalEvent event,
     Emitter<ProposalBuilderState> emit,
   ) {
-    emit(state.copyWith(validationErrors: const Optional.empty()));
+    final documentSegments = _mapDocumentToSegments(
+      _cache.proposalDocument!,
+      showValidationErrors: false,
+    );
+
+    emit(
+      state.copyWith(
+        documentSegments: documentSegments,
+        validationErrors: const Optional.empty(),
+      ),
+    );
   }
 
   Future<void> _deleteProposal(
