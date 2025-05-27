@@ -92,7 +92,7 @@ pub(crate) fn update() {
 
     let approx_mem_used = chain_size
         .checked_add(key_size)
-        .and_then(|sum| sum.checked_mul(rbac_entries))
+        .and_then(|sum| sum.checked_mul(rbac_entries as usize))
         .unwrap_or_default();
 
     reporter::MAX_CACHE_SIZE
