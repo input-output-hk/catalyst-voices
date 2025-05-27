@@ -1,5 +1,6 @@
 import 'package:catalyst_voices/pages/dev_tools/widgets/app_info_card.dart';
 import 'package:catalyst_voices/pages/dev_tools/widgets/config_card.dart';
+import 'package:catalyst_voices/pages/dev_tools/widgets/documents_card.dart';
 import 'package:catalyst_voices/pages/dev_tools/widgets/gateway_info_card.dart';
 import 'package:catalyst_voices/pages/dev_tools/widgets/logs_card.dart';
 import 'package:catalyst_voices/pages/dev_tools/widgets/x_close_button.dart';
@@ -30,6 +31,8 @@ class DevToolsPage extends StatefulWidget {
 }
 
 class _DevToolsPageState extends State<DevToolsPage> {
+  DevToolsBloc? _bloc;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -43,6 +46,8 @@ class _DevToolsPageState extends State<DevToolsPage> {
           SizedBox(height: 12),
           ConfigCard(),
           SizedBox(height: 12),
+          DocumentsCard(),
+          SizedBox(height: 12),
           LogsCard(),
         ],
       ),
@@ -50,9 +55,25 @@ class _DevToolsPageState extends State<DevToolsPage> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    _bloc = context.read<DevToolsBloc>();
+  }
+
+  @override
+  void dispose() {
+    _bloc?.add(const StopWatchingSystemInfoEvent());
+    _bloc = null;
+    super.dispose();
+  }
+
+  @override
   void initState() {
     super.initState();
 
-    context.read<DevToolsBloc>().add(const UpdateSystemInfoEvent());
+    _bloc = context.read<DevToolsBloc>()
+      ..add(const UpdateAllEvent())
+      ..add(const WatchSystemInfoEvent());
   }
 }

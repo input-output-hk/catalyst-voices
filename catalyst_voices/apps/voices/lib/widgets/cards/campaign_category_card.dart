@@ -4,6 +4,7 @@ import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/routes/routing/spaces_route.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
+import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
@@ -36,13 +37,7 @@ class CampaignCategoryCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          // TODO(LynxxLynx): implement image when info from where it comes
-          CatalystImage.asset(
-            key: const Key('CategoryImage'),
-            category.imageUrl,
-            fit: BoxFit.fill,
-            height: 220,
-          ),
+          _Background(image: category.image),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
             child: Column(
@@ -63,7 +58,7 @@ class CampaignCategoryCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 32),
                 _Buttons(
-                  categoryId: category.id,
+                  categoryRef: category.id,
                 ),
               ],
             ),
@@ -74,11 +69,40 @@ class CampaignCategoryCard extends StatelessWidget {
   }
 }
 
+class _Background extends StatelessWidget {
+  final SvgGenImage image;
+
+  const _Background({required this.image});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(vertical: 40),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: context.colors.cardBackgroundGradient,
+        ),
+      ),
+      child: image.buildPicture(
+        height: 160,
+        fit: BoxFit.fitHeight,
+        color: _getImageColor(context),
+      ),
+    );
+  }
+
+  Color _getImageColor(BuildContext context) {
+    final isLight = context.theme.isLight;
+    return isLight ? context.colors.iconsPrimary : Colors.white;
+  }
+}
+
 class _Buttons extends StatelessWidget {
-  final SignedDocumentRef categoryId;
+  final SignedDocumentRef categoryRef;
 
   const _Buttons({
-    required this.categoryId,
+    required this.categoryRef,
   });
 
   @override
@@ -90,7 +114,7 @@ class _Buttons extends StatelessWidget {
         VoicesFilledButton(
           key: const Key('CategoryDetailsBtn'),
           onTap: () {
-            CategoryDetailRoute.fromRef(categoryId: categoryId).go(context);
+            CategoryDetailRoute.fromRef(categoryRef: categoryRef).go(context);
           },
           child: Text(context.l10n.categoryDetails),
         ),
@@ -98,7 +122,7 @@ class _Buttons extends StatelessWidget {
         VoicesFilledButton(
           key: const Key('ViewProposalsBtn'),
           onTap: () {
-            final route = ProposalsRoute.fromRef(categoryId: categoryId);
+            final route = ProposalsRoute.fromRef(categoryRef: categoryRef);
             unawaited(route.push(context));
           },
           backgroundColor: context.colors.elevationsOnSurfaceNeutralLv2,

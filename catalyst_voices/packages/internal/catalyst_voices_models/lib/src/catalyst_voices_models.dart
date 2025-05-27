@@ -73,6 +73,7 @@ export 'registration/account_submit_data.dart';
 export 'registration/registration.dart';
 export 'signed_document/signed_document.dart';
 export 'signed_document/signed_document_payload.dart';
+export 'sync/sync_stats.dart';
 export 'user/account.dart';
 export 'user/account_public_status.dart';
 export 'user/account_role.dart';

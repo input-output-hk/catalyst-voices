@@ -12,31 +12,42 @@ final _logger = Logger('DevToolsBloc');
 final class DevToolsBloc extends Bloc<DevToolsEvent, DevToolsState>
     with BlocSignalEmitterMixin<DevToolsSignal, DevToolsState> {
   final DevToolsService _devToolsService;
+  final SyncManager _syncManager;
   final LoggingService? _loggingService;
   final DownloaderService _downloaderService;
 
   Timer? _resetCountTimer;
+  StreamSubscription<SyncStats>? _syncStartsSub;
 
   DevToolsBloc(
     this._devToolsService,
+    this._syncManager,
     this._loggingService,
     this._downloaderService,
   ) : super(const DevToolsState()) {
     on<DevToolsEnablerTappedEvent>(_handleEnablerTap);
     on<DevToolsEnablerTapResetEvent>(_handleTapCountReset);
-    on<RecoverConfigEvent>(_handleRecoverConfig);
+    on<RecoverDataEvent>(_handleRecoverData);
     on<UpdateSystemInfoEvent>(_handleUpdateSystemInfo);
+    on<SyncDocumentsEvent>(_handleSyncDocuments);
+    on<UpdateAllEvent>(_handleUpdateAll);
+    on<WatchSystemInfoEvent>(_handleWatchSystemInfoEvent);
+    on<StopWatchingSystemInfoEvent>(_handleStopWatchingSystemInfoEvent);
+    on<SyncStatsChangedEvent>(_handleSyncStatsChanged);
     on<ChangeLogLevelEvent>(_handleChangeLogLevel);
     on<ChangeCollectLogsEvent>(_handleChangeCollectLogs);
     on<PrepareAndExportLogsEvent>(_handleExportLogs);
 
-    add(const RecoverConfigEvent());
+    add(const RecoverDataEvent());
   }
 
   @override
   Future<void> close() {
     _resetCountTimer?.cancel();
     _resetCountTimer = null;
+
+    _syncStartsSub?.cancel();
+    _syncStartsSub = null;
 
     return super.close();
   }
@@ -119,24 +130,50 @@ final class DevToolsBloc extends Bloc<DevToolsEvent, DevToolsState>
     }
   }
 
-  Future<void> _handleRecoverConfig(
-    RecoverConfigEvent event,
+  Future<void> _handleRecoverData(
+    RecoverDataEvent event,
     Emitter<DevToolsState> emit,
   ) async {
     final isDeveloper = await _devToolsService.isDeveloper();
+    final syncStats = await _devToolsService.getStats();
     final areLogsOptionsAvailable = _loggingService != null;
     final loggingSettings = await _loggingService?.getSettings();
 
     if (!isClosed) {
-      emit(
-        state.copyWith(
-          isDeveloper: isDeveloper,
-          areLogsOptionsAvailable: areLogsOptionsAvailable,
-          logsLevel: Optional(loggingSettings?.effectiveLevel),
-          collectLogs: loggingSettings?.effectiveCollectLogs ?? false,
-        ),
-      );
+      emit(state.copyWith(
+        isDeveloper: isDeveloper,
+        syncStats: Optional(syncStats),
+        areLogsOptionsAvailable: areLogsOptionsAvailable,
+        logsLevel: Optional(loggingSettings?.effectiveLevel),
+        collectLogs: loggingSettings?.effectiveCollectLogs ?? false,
+      ));
     }
+  }
+
+  Future<void> _handleStopWatchingSystemInfoEvent(
+    StopWatchingSystemInfoEvent event,
+    Emitter<DevToolsState> emit,
+  ) async {
+    await _syncStartsSub?.cancel();
+    _syncStartsSub = null;
+  }
+
+  Future<void> _handleSyncDocuments(
+    SyncDocumentsEvent event,
+    Emitter<DevToolsState> emit,
+  ) async {
+    try {
+      await _syncManager.start();
+    } catch (error, stack) {
+      _logger.warning('Sync failed', error, stack);
+    }
+  }
+
+  void _handleSyncStatsChanged(
+    SyncStatsChangedEvent event,
+    Emitter<DevToolsState> emit,
+  ) {
+    emit(state.copyWith(syncStats: Optional(event.stats)));
   }
 
   void _handleTapCountReset(
@@ -147,6 +184,22 @@ final class DevToolsBloc extends Bloc<DevToolsEvent, DevToolsState>
     _resetCountTimer = null;
 
     emit(state.copyWith(enableTapCount: 0));
+  }
+
+  Future<void> _handleUpdateAll(
+    UpdateAllEvent event,
+    Emitter<DevToolsState> emit,
+  ) async {
+    try {
+      final systemInfo = await _devToolsService.getSystemInfo();
+      final syncStats = await _devToolsService.getStats();
+
+      if (!isClosed) {
+        emit(state.copyWith(systemInfo: Optional(systemInfo), syncStats: Optional(syncStats)));
+      }
+    } catch (error, stack) {
+      _logger.warning('Updating all failed', error, stack);
+    }
   }
 
   Future<void> _handleUpdateSystemInfo(
@@ -165,5 +218,13 @@ final class DevToolsBloc extends Bloc<DevToolsEvent, DevToolsState>
         emit(state.copyWith(systemInfo: Optional(systemInfo)));
       }
     }
+  }
+
+  Future<void> _handleWatchSystemInfoEvent(
+    WatchSystemInfoEvent event,
+    Emitter<DevToolsState> emit,
+  ) async {
+    _syncStartsSub =
+        _devToolsService.watchStats().listen((event) => add(SyncStatsChangedEvent(event)));
   }
 }

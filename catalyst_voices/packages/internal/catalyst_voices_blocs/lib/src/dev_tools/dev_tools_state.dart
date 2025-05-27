@@ -6,6 +6,8 @@ final class DevToolsState extends Equatable {
   final int enableTapCount;
   final bool isDeveloper;
   final SystemInfo? systemInfo;
+  final SyncStats? syncStats;
+  final int? documentsCount;
   final bool areLogsOptionsAvailable;
   final Level? logsLevel;
   final bool collectLogs;
@@ -14,6 +16,8 @@ final class DevToolsState extends Equatable {
     this.enableTapCount = 0,
     this.isDeveloper = false,
     this.systemInfo,
+    this.syncStats,
+    this.documentsCount,
     this.areLogsOptionsAvailable = false,
     this.logsLevel,
     this.collectLogs = false,
@@ -24,6 +28,8 @@ final class DevToolsState extends Equatable {
         enableTapCount,
         isDeveloper,
         systemInfo,
+        syncStats,
+        documentsCount,
         areLogsOptionsAvailable,
         logsLevel,
         collectLogs,
@@ -33,6 +39,8 @@ final class DevToolsState extends Equatable {
     int? enableTapCount,
     bool? isDeveloper,
     Optional<SystemInfo>? systemInfo,
+    Optional<SyncStats>? syncStats,
+    Optional<int>? documentsCount,
     bool? areLogsOptionsAvailable,
     Optional<Level>? logsLevel,
     bool? collectLogs,
@@ -41,6 +49,8 @@ final class DevToolsState extends Equatable {
       enableTapCount: enableTapCount ?? this.enableTapCount,
       isDeveloper: isDeveloper ?? this.isDeveloper,
       systemInfo: systemInfo.dataOr(this.systemInfo),
+      syncStats: syncStats.dataOr(this.syncStats),
+      documentsCount: documentsCount.dataOr(this.documentsCount),
       areLogsOptionsAvailable: areLogsOptionsAvailable ?? this.areLogsOptionsAvailable,
       logsLevel: logsLevel.dataOr(this.logsLevel),
       collectLogs: collectLogs ?? this.collectLogs,
