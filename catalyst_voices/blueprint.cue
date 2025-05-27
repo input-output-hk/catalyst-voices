@@ -10,7 +10,7 @@ project: {
 		bundle: {
 			modules: main: {
 				name:    "app"
-				version: "0.6.0"
+				version: "0.10.0"
 				values: {
 					deployment: containers: main: {
 						image: {
@@ -30,8 +30,14 @@ project: {
 						}
 						port: 8080
 						probes: {
-							liveness: path:  "/"
-							readiness: path: "/"
+							liveness: {
+								path: "/"
+								port: 8080
+							}
+							readiness: {
+								path: "/"
+								port: 8080
+							}
 						}
 					}
 
@@ -80,14 +86,28 @@ project: {
 						}
 						"""
 
-					dns: subdomain: "voices"
-					route: rules: [{
-						matchPrefix: "/"
-					}]
+					dns: subdomain: "app"
+					route: {
+						rules: [
+							{
+								matches: [
+									{
+										path: {
+											type:  "PathPrefix"
+											value: "/"
+										}
+									},
+								]
+								target: port: 8080
+							},
+						]
+					}
 
 					service: {
-						port:       80
-						targetPort: 8080
+						ports: {
+							port:       80
+							targetPort: 8080
+						}
 					}
 				}
 			}
