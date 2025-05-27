@@ -26,7 +26,7 @@ impl HealthApi {
     /// *This endpoint is for internal use of the service deployment infrastructure.
     /// It may not be exposed publicly.*
     #[oai(
-        path = "/v1/health/started",
+        path = "/v2/health/started",
         method = "get",
         operation_id = "healthStarted"
     )]
