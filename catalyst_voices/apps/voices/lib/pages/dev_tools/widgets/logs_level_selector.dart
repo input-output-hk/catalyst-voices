@@ -3,7 +3,7 @@ import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 
-const _allLevels = [
+const _levels = [
   Level.ALL,
   Level.OFF,
   Level.FINEST,
@@ -37,10 +37,13 @@ class _LogsLevelSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FilterByDropdown<Level>(
-      items: _allLevels.map((level) => DropdownMenuEntry(value: level, label: level.name)).toList(),
-      onChanged: (value) => context.read<DevToolsBloc>().add(ChangeLogLevelEvent(value)),
-      value: current,
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: 200),
+      child: SingleSelectDropdown<Level>(
+        items: _levels.map((level) => DropdownMenuEntry(value: level, label: level.name)).toList(),
+        onChanged: (value) => context.read<DevToolsBloc>().add(ChangeLogLevelEvent(value)),
+        value: current,
+      ),
     );
   }
 }

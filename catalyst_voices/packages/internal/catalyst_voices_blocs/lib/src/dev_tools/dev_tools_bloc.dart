@@ -124,9 +124,18 @@ final class DevToolsBloc extends Bloc<DevToolsEvent, DevToolsState>
     Emitter<DevToolsState> emit,
   ) async {
     final isDeveloper = await _devToolsService.isDeveloper();
+    final areLogsOptionsAvailable = _loggingService != null;
+    final loggingSettings = await _loggingService?.getSettings();
 
     if (!isClosed) {
-      emit(state.copyWith(isDeveloper: isDeveloper));
+      emit(
+        state.copyWith(
+          isDeveloper: isDeveloper,
+          areLogsOptionsAvailable: areLogsOptionsAvailable,
+          logsLevel: Optional(loggingSettings?.effectiveLevel),
+          collectLogs: loggingSettings?.effectiveCollectLogs ?? false,
+        ),
+      );
     }
   }
 

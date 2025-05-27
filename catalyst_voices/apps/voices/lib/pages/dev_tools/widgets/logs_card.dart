@@ -12,27 +12,30 @@ class LogsCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocSelector<DevToolsBloc, DevToolsState, bool>(
       selector: (state) => state.areLogsOptionsAvailable,
-      builder: (context, state) {
-        return Offstage(
-          offstage: !state,
-          child: const _LogsCard(),
-        );
-      },
+      builder: (context, state) => _LogsCard(isAvailable: state),
     );
   }
 }
 
 class _LogsCard extends StatelessWidget {
-  const _LogsCard();
+  final bool isAvailable;
+
+  const _LogsCard({
+    required this.isAvailable,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return const InfoCard(
-      title: Text('Logs'),
+    return InfoCard(
+      title: const Text('Logs'),
       children: [
-        LogsLevelSelector(),
-        LogsCollectToggle(),
-        LogsExportButton(),
+        if (isAvailable) ...[
+          const LogsLevelSelector(),
+          const LogsCollectToggle(),
+          const LogsExportButton(),
+        ] else ...[
+          const Text('Not Available'),
+        ],
       ],
     );
   }

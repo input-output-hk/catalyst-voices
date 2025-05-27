@@ -1,6 +1,7 @@
 import 'package:catalyst_voices/pages/dev_tools/widgets/app_info_card.dart';
 import 'package:catalyst_voices/pages/dev_tools/widgets/config_card.dart';
 import 'package:catalyst_voices/pages/dev_tools/widgets/gateway_info_card.dart';
+import 'package:catalyst_voices/pages/dev_tools/widgets/logs_card.dart';
 import 'package:catalyst_voices/pages/dev_tools/widgets/x_close_button.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
@@ -41,6 +42,8 @@ class _DevToolsPageState extends State<DevToolsPage> {
           GatewayInfoCard(),
           SizedBox(height: 12),
           ConfigCard(),
+          SizedBox(height: 12),
+          LogsCard(),
         ],
       ),
     );
