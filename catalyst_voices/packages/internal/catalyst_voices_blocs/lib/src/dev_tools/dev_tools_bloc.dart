@@ -15,15 +15,18 @@ final class DevToolsBloc extends Bloc<DevToolsEvent, DevToolsState>
   final SyncManager _syncManager;
   final LoggingService? _loggingService;
   final DownloaderService _downloaderService;
+  final DocumentsService _documentsService;
 
   Timer? _resetCountTimer;
   StreamSubscription<SyncStats>? _syncStartsSub;
+  StreamSubscription<int>? _documentsCountSub;
 
   DevToolsBloc(
     this._devToolsService,
     this._syncManager,
     this._loggingService,
     this._downloaderService,
+    this._documentsService,
   ) : super(const DevToolsState()) {
     on<DevToolsEnablerTappedEvent>(_handleEnablerTap);
     on<DevToolsEnablerTapResetEvent>(_handleTapCountReset);
@@ -33,6 +36,9 @@ final class DevToolsBloc extends Bloc<DevToolsEvent, DevToolsState>
     on<UpdateAllEvent>(_handleUpdateAll);
     on<WatchSystemInfoEvent>(_handleWatchSystemInfoEvent);
     on<StopWatchingSystemInfoEvent>(_handleStopWatchingSystemInfoEvent);
+    on<WatchDocumentsEvent>(_handleWatchDocumentsEvent);
+    on<StopWatchingDocumentsEvent>(_handleStopWatchingDocumentsEvent);
+    on<DocumentsCountChangedEvent>(_updateDocumentsCount);
     on<SyncStatsChangedEvent>(_handleSyncStatsChanged);
     on<ChangeLogLevelEvent>(_handleChangeLogLevel);
     on<ChangeCollectLogsEvent>(_handleChangeCollectLogs);
@@ -48,6 +54,9 @@ final class DevToolsBloc extends Bloc<DevToolsEvent, DevToolsState>
 
     _syncStartsSub?.cancel();
     _syncStartsSub = null;
+
+    _documentsCountSub?.cancel();
+    _documentsCountSub = null;
 
     return super.close();
   }
@@ -150,6 +159,14 @@ final class DevToolsBloc extends Bloc<DevToolsEvent, DevToolsState>
     }
   }
 
+  Future<void> _handleStopWatchingDocumentsEvent(
+    StopWatchingDocumentsEvent event,
+    Emitter<DevToolsState> emit,
+  ) async {
+    await _documentsCountSub?.cancel();
+    _documentsCountSub = null;
+  }
+
   Future<void> _handleStopWatchingSystemInfoEvent(
     StopWatchingSystemInfoEvent event,
     Emitter<DevToolsState> emit,
@@ -220,11 +237,26 @@ final class DevToolsBloc extends Bloc<DevToolsEvent, DevToolsState>
     }
   }
 
+  Future<void> _handleWatchDocumentsEvent(
+    WatchDocumentsEvent event,
+    Emitter<DevToolsState> emit,
+  ) async {
+    _documentsCountSub =
+        _documentsService.watchCount().listen((event) => add(DocumentsCountChangedEvent(event)));
+  }
+
   Future<void> _handleWatchSystemInfoEvent(
     WatchSystemInfoEvent event,
     Emitter<DevToolsState> emit,
   ) async {
     _syncStartsSub =
         _devToolsService.watchStats().listen((event) => add(SyncStatsChangedEvent(event)));
+  }
+
+  void _updateDocumentsCount(
+    DocumentsCountChangedEvent event,
+    Emitter<DevToolsState> emit,
+  ) {
+    emit(state.copyWith(documentsCount: Optional(event.count)));
   }
 }

@@ -162,6 +162,7 @@ final class Dependencies extends DependencyProvider {
           get<SyncManager>(),
           isRegistered<LoggingService>() ? get<LoggingService>() : null,
           get<DownloaderService>(),
+          get<DocumentsService>(),
         );
       });
   }

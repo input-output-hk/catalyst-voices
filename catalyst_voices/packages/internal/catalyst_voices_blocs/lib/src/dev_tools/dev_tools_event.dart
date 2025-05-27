@@ -35,6 +35,15 @@ sealed class DevToolsEvent extends Equatable {
   List<Object?> get props => [];
 }
 
+final class DocumentsCountChangedEvent extends DevToolsEvent {
+  final int count;
+
+  const DocumentsCountChangedEvent(this.count);
+
+  @override
+  List<Object?> get props => [count];
+}
+
 final class PrepareAndExportLogsEvent extends DevToolsEvent {
   const PrepareAndExportLogsEvent();
 }
@@ -45,6 +54,10 @@ final class RecoverConfigEvent extends DevToolsEvent {
 
 final class RecoverDataEvent extends DevToolsEvent {
   const RecoverDataEvent();
+}
+
+final class StopWatchingDocumentsEvent extends DevToolsEvent {
+  const StopWatchingDocumentsEvent();
 }
 
 final class StopWatchingSystemInfoEvent extends DevToolsEvent {
@@ -70,6 +83,10 @@ final class UpdateAllEvent extends DevToolsEvent {
 
 final class UpdateSystemInfoEvent extends DevToolsEvent {
   const UpdateSystemInfoEvent();
+}
+
+final class WatchDocumentsEvent extends DevToolsEvent {
+  const WatchDocumentsEvent();
 }
 
 final class WatchSystemInfoEvent extends DevToolsEvent {

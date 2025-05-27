@@ -64,6 +64,7 @@ class _DevToolsPageState extends State<DevToolsPage> {
   @override
   void dispose() {
     _bloc?.add(const StopWatchingSystemInfoEvent());
+    _bloc?.add(const StopWatchingDocumentsEvent());
     _bloc = null;
     super.dispose();
   }
@@ -74,6 +75,7 @@ class _DevToolsPageState extends State<DevToolsPage> {
 
     _bloc = context.read<DevToolsBloc>()
       ..add(const UpdateAllEvent())
-      ..add(const WatchSystemInfoEvent());
+      ..add(const WatchSystemInfoEvent())
+      ..add(const WatchDocumentsEvent());
   }
 }
