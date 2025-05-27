@@ -12,8 +12,6 @@ final class CreateProposalWithoutPreselectedCategoryStep extends ProposalCreatio
     this.stage = CreateProposalStage.setTitle,
   });
 
-  
-
   @override
   List<Object?> get props => [stage];
 }

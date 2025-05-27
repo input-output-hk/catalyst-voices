@@ -12,7 +12,7 @@ final staticCampaignCategories = [
     description:
         '''Supports development of open source technology, centered around improving the Cardano developer experience and creating developer-friendly tooling that streamlines an integrated development environment.''',
     shortDescription:
-        '''Cardano Use Cases: Concepts funds novel, early-stage Cardano-based concepts developing proof of concept prototypes through deploying minimum viable products (MVP) to validate innovative products, services, or business models driving Cardano adoption.''',
+        '''For Tier-1 partnerships and real-world pilots that scale Cardano adoption through high-impact use. cases.''',
     proposalsCount: 0,
     availableFunds: const Coin.fromWholeAda(100000),
     imageUrl: '',

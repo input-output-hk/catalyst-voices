@@ -24,41 +24,94 @@ class CreateNewProposalCategorySelection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: ListView(
-            children: categories
-                .map(
-                  (e) => Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: context.colors.outlineBorder,
-                      ),
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 20,
-                    ),
-                    child: Column(
-                      children: [
-                        Text(e.name),
-                      ],
-                    ),
-                  ),
-                )
-                .toList(),
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxHeight: 430),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            child: ListView.separated(
+              itemBuilder: (context, index) => _CategoryCard(
+                name: categories[index].formattedName,
+                description: categories[index].shortDescription,
+                ref: categories[index].id,
+                isSelected: categories[index].id == selectedCategory,
+                onCategorySelected: onCategorySelected,
+              ),
+              separatorBuilder: (context, index) => const SizedBox(height: 16),
+              itemCount: categories.length,
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            flex: 2,
+            child: _selectedCategory != null
+                ? SingleChildScrollView(
+                    child: CategoryCompactDetailView(category: _selectedCategory!),
+                  )
+                : const _NoneCategorySelected(),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _CategoryCard extends StatelessWidget {
+  final SignedDocumentRef ref;
+  final String name;
+  final String description;
+  final bool isSelected;
+  final ValueChanged<SignedDocumentRef?> onCategorySelected;
+
+  const _CategoryCard({
+    required this.ref,
+    required this.name,
+    required this.description,
+    required this.isSelected,
+    required this.onCategorySelected,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      clipBehavior: Clip.antiAlias,
+      borderRadius: BorderRadius.circular(16),
+      child: InkWell(
+        onTap: () => onCategorySelected(ref),
+        child: Container(
+          clipBehavior: Clip.antiAlias,
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: isSelected ? context.colorScheme.primary : context.colors.outlineBorder,
+            ),
+            borderRadius: BorderRadius.circular(16),
+          ),
+          padding: const EdgeInsets.symmetric(
+            horizontal: 28,
+            vertical: 20,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                name,
+                style: context.textTheme.titleSmall?.copyWith(
+                  color:
+                      isSelected ? context.colorScheme.primary : context.colors.textOnPrimaryLevel0,
+                ),
+              ),
+              Text(
+                description,
+                style: context.textTheme.bodyMedium?.copyWith(
+                  color: context.colors.textOnPrimaryLevel1,
+                ),
+              ),
+            ],
           ),
         ),
-        const SizedBox(width: 16),
-        Expanded(
-          flex: 2,
-          child: _selectedCategory != null
-              ? CategoryCompactDetailView(category: _selectedCategory!)
-              : const _NoneCategorySelected(),
-        ),
-      ],
+      ),
     );
   }
 }
