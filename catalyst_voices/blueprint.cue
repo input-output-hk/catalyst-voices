@@ -98,7 +98,7 @@ project: {
 										}
 									},
 								]
-								targetPort: 8080
+								target: port: 8080
 							},
 						]
 					}
