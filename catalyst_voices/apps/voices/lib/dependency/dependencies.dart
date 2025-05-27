@@ -30,10 +30,14 @@ final class Dependencies extends DependencyProvider {
 
   Future<void> init({
     required AppConfig config,
+    LoggingService? loggingService,
   }) async {
     DependencyProvider.instance = this;
 
     registerSingleton<AppConfig>(config);
+    if (loggingService != null) {
+      registerSingleton<LoggingService>(loggingService);
+    }
 
     _registerStorages();
     _registerUtils();
@@ -155,6 +159,7 @@ final class Dependencies extends DependencyProvider {
       ..registerFactory<DevToolsBloc>(() {
         return DevToolsBloc(
           get<DevToolsService>(),
+          isRegistered<LoggingService>() ? get<LoggingService>() : null,
         );
       });
   }

@@ -40,11 +40,10 @@ Future<BootstrapArgs> bootstrap({
   setPathUrlStrategy();
 
   final configService = ConfigService(ConfigRepository());
-  final config =
-      await configService.getAppConfig().onError((error, stackTrace) => const AppConfig());
+  final config = await configService.getAppConfig().onError((_, __) => const AppConfig());
 
   await _cleanupOldStorages();
-  await registerDependencies(config: config);
+  await registerDependencies(config: config, loggingService: _loggingService);
   await _initCryptoUtils();
 
   router ??= buildAppRouter();
@@ -86,9 +85,15 @@ GoRouter buildAppRouter({
 }
 
 @visibleForTesting
-Future<void> registerDependencies({required AppConfig config}) async {
+Future<void> registerDependencies({
+  required AppConfig config,
+  LoggingService? loggingService,
+}) async {
   if (!Dependencies.instance.isInitialized) {
-    await Dependencies.instance.init(config: config);
+    await Dependencies.instance.init(
+      config: config,
+      loggingService: loggingService,
+    );
   }
 }
 

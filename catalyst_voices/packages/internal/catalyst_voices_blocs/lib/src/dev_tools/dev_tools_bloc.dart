@@ -11,11 +11,13 @@ final _logger = Logger('DevToolsBloc');
 final class DevToolsBloc extends Bloc<DevToolsEvent, DevToolsState>
     with BlocSignalEmitterMixin<DevToolsSignal, DevToolsState> {
   final DevToolsService _devToolsService;
+  final LoggingService? _loggingService;
 
   Timer? _resetCountTimer;
 
   DevToolsBloc(
     this._devToolsService,
+    this._loggingService,
   ) : super(const DevToolsState()) {
     on<DevToolsEnablerTappedEvent>(_handleEnablerTap);
     on<DevToolsEnablerTapResetEvent>(_handleTapCountReset);
