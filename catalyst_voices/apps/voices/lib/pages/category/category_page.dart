@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:catalyst_voices/pages/category/category_detail_view.dart';
 import 'package:catalyst_voices/widgets/cards/category_proposals_details_card.dart';
 import 'package:catalyst_voices/widgets/cards/create_proposal_card.dart';
+import 'package:catalyst_voices/widgets/common/infrastructure/voices_wide_screen_constrained.dart';
 import 'package:catalyst_voices/widgets/indicators/voices_error_indicator.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -88,7 +89,8 @@ class _CardInformation extends StatelessWidget {
                 child: CreateProposalCard(
                   categoryId: category.id,
                   categoryName: category.formattedName,
-                  categoryRequirements: category.requirements,
+                  categoryDos: category.dos,
+                  categoryDonts: category.donts,
                   submissionCloseDate: category.submissionCloseDate,
                 ),
               );
@@ -177,7 +179,7 @@ class _CategoryPageState extends State<CategoryPage> {
             _CategoryDetailErrorSelector(
               categoryId: widget.categoryId,
             ),
-          ],
+          ].constrainedDelegate(maxWidth: 1200),
         ),
       ),
     );

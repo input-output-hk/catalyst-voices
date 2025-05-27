@@ -25,9 +25,9 @@ final class CategoryDetailRoute extends GoRouteData
   const CategoryDetailRoute({required this.categoryId});
 
   factory CategoryDetailRoute.fromRef({
-    required SignedDocumentRef categoryId,
+    required SignedDocumentRef categoryRef,
   }) {
-    return CategoryDetailRoute(categoryId: categoryId.id);
+    return CategoryDetailRoute(categoryId: categoryRef.id);
   }
 
   @override
@@ -85,8 +85,8 @@ final class ProposalsRoute extends GoRouteData
     this.myProposals = false,
   });
 
-  factory ProposalsRoute.fromRef({SignedDocumentRef? categoryId}) {
-    return ProposalsRoute(categoryId: categoryId?.id);
+  factory ProposalsRoute.fromRef({SignedDocumentRef? categoryRef}) {
+    return ProposalsRoute(categoryId: categoryRef?.id);
   }
 
   factory ProposalsRoute.myProposals() {
