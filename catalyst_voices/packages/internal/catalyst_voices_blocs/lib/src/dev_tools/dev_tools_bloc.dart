@@ -23,6 +23,7 @@ final class DevToolsBloc extends Bloc<DevToolsEvent, DevToolsState>
     on<DevToolsEnablerTapResetEvent>(_handleTapCountReset);
     on<RecoverConfigEvent>(_handleRecoverConfig);
     on<UpdateSystemInfoEvent>(_handleUpdateSystemInfo);
+    on<ChangeLogLevelEvent>(_handleChangeLogLevel);
 
     add(const RecoverConfigEvent());
   }
@@ -33,6 +34,19 @@ final class DevToolsBloc extends Bloc<DevToolsEvent, DevToolsState>
     _resetCountTimer = null;
 
     return super.close();
+  }
+
+  Future<void> _handleChangeLogLevel(
+    ChangeLogLevelEvent event,
+    Emitter<DevToolsState> emit,
+  ) async {
+    assert(_loggingService != null, 'Changing log level while LoggingService not available');
+
+    final level = event.level;
+
+    final settings = await _loggingService!.updateSettings(level: Optional(level));
+
+    if (!isClosed) emit(state.copyWith(logsLevel: Optional(settings.effectiveLevel)));
   }
 
   Future<void> _handleEnablerTap(

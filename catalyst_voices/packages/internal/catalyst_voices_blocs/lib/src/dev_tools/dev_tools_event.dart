@@ -1,4 +1,14 @@
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart' show Level;
 import 'package:equatable/equatable.dart';
+
+final class ChangeLogLevelEvent extends DevToolsEvent {
+  final Level? level;
+
+  const ChangeLogLevelEvent(this.level);
+
+  @override
+  List<Object?> get props => [level];
+}
 
 final class DevToolsEnablerTappedEvent extends DevToolsEvent {
   const DevToolsEnablerTappedEvent();

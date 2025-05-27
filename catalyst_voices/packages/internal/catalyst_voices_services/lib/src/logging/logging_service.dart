@@ -35,7 +35,7 @@ abstract interface class LoggingService {
 
   Future<String> prepareForExportCollectedLogs();
 
-  Future<void> updateSettings({
+  Future<LoggingSettings> updateSettings({
     Optional<Level>? level,
     Optional<bool>? printToConsole,
     Optional<bool>? collectLogs,
@@ -89,7 +89,7 @@ final class _LoggingServiceImpl implements LoggingService {
   }
 
   @override
-  Future<void> updateSettings({
+  Future<LoggingSettings> updateSettings({
     Optional<Level>? level,
     Optional<bool>? printToConsole,
     Optional<bool>? collectLogs,
@@ -102,7 +102,7 @@ final class _LoggingServiceImpl implements LoggingService {
     );
 
     if (updatedSettings == settings) {
-      return;
+      return settings;
     }
 
     if (level != null) {
@@ -118,6 +118,8 @@ final class _LoggingServiceImpl implements LoggingService {
     }
 
     await settingsStorage.write(updatedSettings);
+
+    return updatedSettings;
   }
 
   void _chooseCollectStrategy({bool? collect}) {
