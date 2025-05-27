@@ -154,6 +154,7 @@ final class Dependencies extends DependencyProvider {
       ..registerFactory<DevToolsBloc>(() {
         return DevToolsBloc(
           get<DevToolsService>(),
+          get<SyncManager>(),
         );
       });
   }
@@ -333,6 +334,7 @@ final class Dependencies extends DependencyProvider {
     registerLazySingleton<DevToolsService>(() {
       return DevToolsService(
         get<DevToolsRepository>(),
+        get<SyncStatsStorage>(),
         get<AppConfig>(),
       );
     });
@@ -368,12 +370,21 @@ final class Dependencies extends DependencyProvider {
         sharedPreferences: get<SharedPreferencesAsync>(),
       );
     });
+    registerLazySingleton<SyncStatsStorage>(
+      () {
+        return SyncStatsLocalStorage(
+          sharedPreferences: get<SharedPreferencesAsync>(),
+        );
+      },
+      dispose: (storage) async => storage.dispose(),
+    );
   }
 
   void _registerUtils() {
     registerLazySingleton<SyncManager>(
       () {
         return SyncManager(
+          get<SyncStatsStorage>(),
           get<DocumentsService>(),
         );
       },
