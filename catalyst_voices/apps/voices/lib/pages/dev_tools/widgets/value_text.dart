@@ -17,6 +17,7 @@ class ValueText extends StatelessWidget {
       style: context.textTheme.bodyMedium ?? const TextStyle(),
       child: Row(
         mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           name,
           const Text(': '),
