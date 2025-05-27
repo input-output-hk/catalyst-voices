@@ -94,6 +94,21 @@ const VoicesColorScheme darkVoicesColorScheme = VoicesColorScheme(
   overlay: Color(0xA610141C),
   dropShadow: Color(0xA610141C),
   sysColorsNeutralN60: Color(0xFF7F90B3),
+  headerGradient: [
+    Color(0xFF1736A3),
+    Color(0xFF4E74B2),
+    Color(0xFF9338C3),
+  ],
+  headerGradientSecondary: [
+    VoicesColors.darkOnSurfaceNeutralOpaqueLv1,
+    Color(0xFF4E74B2),
+    Color(0xFF9338C3),
+  ],
+  cardBackgroundGradient: [
+    Color(0xFF91B9EA),
+    Color(0xFF5A7AE5),
+    Color(0xFFA55DCE),
+  ],
 );
 
 const BrandAssets lightBrandAssets = BrandAssets(
@@ -179,6 +194,21 @@ const VoicesColorScheme lightVoicesColorScheme = VoicesColorScheme(
   overlay: Color(0x9904080F),
   dropShadow: Color(0x9904080F),
   sysColorsNeutralN60: Color(0xFF7F90B3),
+  headerGradient: [
+    Color(0xFFF6FAFE),
+    Color(0xFFB4DAFD),
+    Color(0xFFF8C1EA),
+  ],
+  headerGradientSecondary: [
+    VoicesColors.lightOnSurfaceNeutralOpaqueLv1,
+    Color(0xFFB4DAFD),
+    Color(0xFFF8C1EA),
+  ],
+  cardBackgroundGradient: [
+    Color(0xFFF7FAFE),
+    Color(0xFFC0D5FB),
+    Color(0xFFF9A5E0),
+  ],
 );
 
 /// [ThemeData] for the `catalyst` brand.
