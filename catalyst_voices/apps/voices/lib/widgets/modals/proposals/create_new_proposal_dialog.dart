@@ -47,15 +47,11 @@ class _Content extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<NewProposalCubit, NewProposalState,
-        ({bool isLoading, bool isMissingProposerRole})>(
-      selector: (state) =>
-          (isLoading: state.isLoading, isMissingProposerRole: state.isMissingProposerRole),
-      builder: (context, state) {
-        if (state.isLoading) {
+    return BlocSelector<NewProposalCubit, NewProposalState, bool>(
+      selector: (state) => state.isLoading,
+      builder: (context, isLoading) {
+        if (isLoading) {
           return const _LoadingContent();
-        } else if (state.isMissingProposerRole) {
-          return const _MissingProposerRoleContent();
         } else {
           return BlocSelector<NewProposalCubit, NewProposalState, ProposalCreationStep>(
             selector: (state) => state.step,
@@ -148,16 +144,6 @@ class _LoadingContent extends StatelessWidget {
     return const Center(
       child: VoicesCircularProgressIndicator(),
     );
-  }
-}
-
-class _MissingProposerRoleContent extends StatelessWidget {
-  const _MissingProposerRoleContent();
-
-  @override
-  Widget build(BuildContext context) {
-    // TODO(dtscalac): implement it when design is available
-    return const Placeholder();
   }
 }
 

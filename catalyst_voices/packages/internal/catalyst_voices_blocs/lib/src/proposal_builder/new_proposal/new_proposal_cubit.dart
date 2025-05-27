@@ -14,13 +14,11 @@ class NewProposalCubit extends Cubit<NewProposalState>
     with BlocErrorEmitterMixin<NewProposalState> {
   final CampaignService _campaignService;
   final ProposalService _proposalService;
-  final UserObserver _userObserver;
   final DocumentMapper _documentMapper;
 
   NewProposalCubit(
     this._campaignService,
     this._proposalService,
-    this._userObserver,
     this._documentMapper,
   ) : super(
           const NewProposalState(
@@ -79,15 +77,10 @@ class NewProposalCubit extends Cubit<NewProposalState>
 
       emit(state.copyWith(step: step, categoryRef: Optional(categoryRef)));
 
-      final account = _userObserver.user.activeAccount;
-      if (account == null) {
-        throw StateError('Account is missing');
-      }
       final categories = await _getCategories();
 
       final newState = state.copyWith(
         isLoading: false,
-        isMissingProposerRole: !account.hasRole(AccountRole.proposer),
         categories: categories,
       );
 

@@ -6,7 +6,6 @@ import 'package:equatable/equatable.dart';
 class NewProposalState extends Equatable {
   final bool isLoading;
   final bool isCreatingProposal;
-  final bool isMissingProposerRole;
   final bool isAgreeToCategoryCriteria;
   final bool isAgreeToNoFurtherCategoryChange;
   final ProposalCreationStep step;
@@ -17,7 +16,6 @@ class NewProposalState extends Equatable {
   const NewProposalState({
     this.isLoading = false,
     this.isCreatingProposal = false,
-    this.isMissingProposerRole = false,
     this.isAgreeToCategoryCriteria = false,
     this.isAgreeToNoFurtherCategoryChange = false,
     this.step = const CreateProposalWithoutPreselectedCategoryStep(),
@@ -39,7 +37,6 @@ class NewProposalState extends Equatable {
   List<Object?> get props => [
         isLoading,
         isCreatingProposal,
-        isMissingProposerRole,
         isAgreeToCategoryCriteria,
         isAgreeToNoFurtherCategoryChange,
         step,
@@ -66,7 +63,6 @@ class NewProposalState extends Equatable {
     return NewProposalState(
       isLoading: isLoading ?? this.isLoading,
       isCreatingProposal: isCreatingProposal ?? this.isCreatingProposal,
-      isMissingProposerRole: isMissingProposerRole ?? this.isMissingProposerRole,
       isAgreeToCategoryCriteria: isAgreeToCategoryCriteria ?? this.isAgreeToCategoryCriteria,
       isAgreeToNoFurtherCategoryChange:
           isAgreeToNoFurtherCategoryChange ?? this.isAgreeToNoFurtherCategoryChange,
