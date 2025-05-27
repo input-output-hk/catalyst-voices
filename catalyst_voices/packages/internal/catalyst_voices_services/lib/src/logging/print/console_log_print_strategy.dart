@@ -1,7 +1,5 @@
-import 'dart:developer' as developer;
-
 import 'package:catalyst_voices_services/src/logging/print/log_print_strategy.dart';
-import 'package:flutter/foundation.dart' show FlutterErrorDetails, ErrorDescription, FlutterError;
+import 'package:flutter/foundation.dart';
 import 'package:logging/logging.dart' show Level, LogRecord;
 
 final class ConsoleLogPrintStrategy implements LogPrintStrategy {
@@ -21,15 +19,21 @@ final class ConsoleLogPrintStrategy implements LogPrintStrategy {
       return;
     }
 
-    developer.log(
-      log.message,
-      time: log.time,
-      sequenceNumber: log.sequenceNumber,
-      level: log.level.value,
-      name: log.loggerName,
-      zone: log.zone,
-      error: log.error,
-      stackTrace: log.stackTrace,
-    );
+    debugPrint('[${log.loggerName}] ${log.message}');
+
+    final object = log.object;
+    if (object != null) {
+      debugPrint(object.toString());
+    }
+
+    final error = log.error;
+    if (error != null) {
+      debugPrint(error.toString());
+    }
+
+    final stackTrace = log.stackTrace;
+    if (stackTrace != null) {
+      debugPrintStack(stackTrace: stackTrace);
+    }
   }
 }
