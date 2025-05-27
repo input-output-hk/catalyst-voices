@@ -235,4 +235,22 @@ impl RbacCache {
 
         Ok(RbacCacheAddSuccess { catalyst_id })
     }
+
+    /// Returns the number of cached chain entries.
+    pub fn chain_entries(&self) -> u64 {
+        self.chains.run_pending_tasks();
+        self.chains.entry_count()
+    }
+
+    /// Returns the number of cached active address entries.
+    pub fn active_address_entries(&self) -> u64 {
+        self.active_addresses.run_pending_tasks();
+        self.active_addresses.entry_count()
+    }
+
+    /// Returns the number of cached transaction entries.
+    pub fn transaction_entries(&self) -> u64 {
+        self.transactions.run_pending_tasks();
+        self.transactions.entry_count()
+    }
 }
