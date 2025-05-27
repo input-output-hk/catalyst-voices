@@ -24,6 +24,7 @@ final class DevToolsBloc extends Bloc<DevToolsEvent, DevToolsState>
     on<RecoverConfigEvent>(_handleRecoverConfig);
     on<UpdateSystemInfoEvent>(_handleUpdateSystemInfo);
     on<ChangeLogLevelEvent>(_handleChangeLogLevel);
+    on<ChangeCollectLogsEvent>(_handleChangeCollectLogs);
 
     add(const RecoverConfigEvent());
   }
@@ -34,6 +35,19 @@ final class DevToolsBloc extends Bloc<DevToolsEvent, DevToolsState>
     _resetCountTimer = null;
 
     return super.close();
+  }
+
+  Future<void> _handleChangeCollectLogs(
+    ChangeCollectLogsEvent event,
+    Emitter<DevToolsState> emit,
+  ) async {
+    assert(_loggingService != null, 'Changing collect logs while LoggingService not available');
+
+    final collectLogs = event.isEnabled;
+
+    final settings = await _loggingService!.updateSettings(collectLogs: Optional(collectLogs));
+
+    if (!isClosed) emit(state.copyWith(collectLogs: settings.effectiveCollectLogs));
   }
 
   Future<void> _handleChangeLogLevel(
