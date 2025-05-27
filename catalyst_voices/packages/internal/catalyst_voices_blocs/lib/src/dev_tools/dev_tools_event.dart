@@ -34,6 +34,10 @@ sealed class DevToolsEvent extends Equatable {
   List<Object?> get props => [];
 }
 
+final class PrepareAndExportLogsEvent extends DevToolsEvent {
+  const PrepareAndExportLogsEvent();
+}
+
 final class RecoverConfigEvent extends DevToolsEvent {
   const RecoverConfigEvent();
 }

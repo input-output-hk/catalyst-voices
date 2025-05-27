@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -12,12 +13,14 @@ final class DevToolsBloc extends Bloc<DevToolsEvent, DevToolsState>
     with BlocSignalEmitterMixin<DevToolsSignal, DevToolsState> {
   final DevToolsService _devToolsService;
   final LoggingService? _loggingService;
+  final DownloaderService _downloaderService;
 
   Timer? _resetCountTimer;
 
   DevToolsBloc(
     this._devToolsService,
     this._loggingService,
+    this._downloaderService,
   ) : super(const DevToolsState()) {
     on<DevToolsEnablerTappedEvent>(_handleEnablerTap);
     on<DevToolsEnablerTapResetEvent>(_handleTapCountReset);
@@ -25,6 +28,7 @@ final class DevToolsBloc extends Bloc<DevToolsEvent, DevToolsState>
     on<UpdateSystemInfoEvent>(_handleUpdateSystemInfo);
     on<ChangeLogLevelEvent>(_handleChangeLogLevel);
     on<ChangeCollectLogsEvent>(_handleChangeCollectLogs);
+    on<PrepareAndExportLogsEvent>(_handleExportLogs);
 
     add(const RecoverConfigEvent());
   }
@@ -95,6 +99,24 @@ final class DevToolsBloc extends Bloc<DevToolsEvent, DevToolsState>
       const Duration(seconds: 1),
       () => add(const DevToolsEnablerTapResetEvent()),
     );
+  }
+
+  Future<void> _handleExportLogs(
+    PrepareAndExportLogsEvent event,
+    Emitter<DevToolsState> emit,
+  ) async {
+    assert(_loggingService != null, 'Exporting logs while LoggingService not available');
+
+    try {
+      final content = await _loggingService!.prepareForExportCollectedLogs();
+      final encodedContent = utf8.encode(content);
+
+      final filename = 'catalyst_app_${DateTimeExt.now().toIso8601String()}_logs.txt';
+
+      await _downloaderService.download(data: encodedContent, filename: filename);
+    } catch (error, stack) {
+      _logger.severe('Exporting logs failed', error, stack);
+    }
   }
 
   Future<void> _handleRecoverConfig(

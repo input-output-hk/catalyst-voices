@@ -160,6 +160,7 @@ final class Dependencies extends DependencyProvider {
         return DevToolsBloc(
           get<DevToolsService>(),
           isRegistered<LoggingService>() ? get<LoggingService>() : null,
+          get<DownloaderService>(),
         );
       });
   }
