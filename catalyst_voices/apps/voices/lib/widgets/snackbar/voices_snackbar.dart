@@ -178,7 +178,7 @@ class _IconAndTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
+    final textStyle = Theme.of(context).textTheme.titleMedium;
 
     return AffixDecorator(
       prefix: IconTheme(
@@ -190,11 +190,8 @@ class _IconAndTitle extends StatelessWidget {
       ),
       child: Text(
         title,
-        style: TextStyle(
+        style: textStyle?.copyWith(
           color: type.titleColor(context),
-          fontSize: textTheme.titleMedium?.fontSize,
-          fontWeight: textTheme.titleMedium?.fontWeight,
-          fontFamily: textTheme.titleMedium?.fontFamily,
         ),
       ),
     );
