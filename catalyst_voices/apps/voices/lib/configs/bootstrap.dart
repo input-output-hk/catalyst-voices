@@ -34,9 +34,7 @@ final _uncaughtZoneLogger = Logger('UncaughtZone');
 Future<BootstrapArgs> bootstrap({
   GoRouter? router,
 }) async {
-  _loggingService
-    ..level(kDebugMode ? Level.FINER : Level.OFF)
-    ..printLogs(enabled: kDebugMode);
+  await _loggingService.init();
 
   GoRouter.optionURLReflectsImperativeAPIs = true;
   setPathUrlStrategy();

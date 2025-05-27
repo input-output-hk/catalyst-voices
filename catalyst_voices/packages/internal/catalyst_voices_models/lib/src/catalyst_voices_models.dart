@@ -56,6 +56,7 @@ export 'hi_lo/uuid_hi_lo.dart';
 export 'info/app_info.dart';
 export 'info/gateway_info.dart';
 export 'info/system_info.dart';
+export 'logging/logging_settings.dart';
 export 'money/money.dart';
 export 'pagination/page.dart';
 export 'pagination/page_request.dart';
