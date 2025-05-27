@@ -1,9 +1,9 @@
 import 'dart:async';
 
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
-import 'package:catalyst_voices/routes/routing/proposal_builder_route.dart';
 import 'package:catalyst_voices/widgets/cards/voices_leading_icon_card.dart';
 import 'package:catalyst_voices/widgets/list/category_requirements_list.dart';
+import 'package:catalyst_voices/widgets/modals/proposals/create_new_proposal_dialog.dart';
 import 'package:catalyst_voices/widgets/text/day_at_time_text.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
@@ -59,7 +59,7 @@ class CreateProposalCard extends StatelessWidget {
               context.l10n.startProposal,
             ),
             onTap: () => unawaited(
-              ProposalBuilderDraftRoute.fromRef(categoryId: categoryId).push(context),
+              CreateNewProposalDialog.show(context, categoryRef: categoryId),
             ),
           ),
         ],
