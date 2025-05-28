@@ -2228,6 +2228,10 @@
   "@apiErrorServiceUnavailable": {
     "description": "Message of an error when api returns matching status code."
   },
+  "apiErrorMalformedBody": "Can not process response body",
+  "@apiErrorMalformedBody": {
+    "description": "Generic message when any endpoint response is different from expected and can not be processed"
+  },
   "degradeFinalToDraftProposal": "You remove this proposal from review/voting stage.",
   "@degradeFinalToDraftProposal": {
     "description": "Information for user that his proposal is going back to draft. "
