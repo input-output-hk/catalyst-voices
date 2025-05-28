@@ -4,6 +4,7 @@ import 'package:catalyst_voices_repositories/generated/api/client_index.dart';
 import 'package:catalyst_voices_repositories/generated/api/client_mapping.dart';
 import 'package:catalyst_voices_repositories/src/api/converters/cbor_or_json_converter.dart';
 import 'package:catalyst_voices_repositories/src/api/converters/cbor_serializable_converter.dart';
+import 'package:catalyst_voices_repositories/src/api/interceptors/path_trim_interceptor.dart';
 import 'package:catalyst_voices_repositories/src/api/interceptors/rbac_auth_interceptor.dart';
 import 'package:catalyst_voices_repositories/src/auth/auth_token_provider.dart';
 import 'package:chopper/chopper.dart';
@@ -36,6 +37,7 @@ final class ApiServices {
           jsonConverter: $JsonSerializableConverter(),
         ),
         interceptors: [
+          PathTrimInterceptor(),
           RbacAuthInterceptor(authTokenProvider),
           if (kDebugMode) HttpLoggingInterceptor(onlyErrors: true),
         ],
@@ -43,6 +45,7 @@ final class ApiServices {
       reviews: CatReviews.create(
         baseUrl: env.reviews,
         interceptors: [
+          PathTrimInterceptor(),
           RbacAuthInterceptor(authTokenProvider),
           if (kDebugMode) HttpLoggingInterceptor(onlyErrors: true),
         ],
