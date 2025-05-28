@@ -13,9 +13,21 @@
   "@emailErrorText": {
     "description": "Text shown in email field when input is invalid"
   },
+  "resumeButtonText": "Resume",
+  "@resumeButtonText": {
+    "description": "Text shown in resume button"
+  },
+  "startButtonText": "Start",
+  "@startButtonText": {
+    "description": "Text shown in start button"
+  },
   "cancelButtonText": "Cancel",
   "@cancelButtonText": {
     "description": "Text shown in cancel button"
+  },
+  "exitButtonText": "Exit",
+  "@exitButtonText": {
+    "description": "Text shown in exit button"
   },
   "editButtonText": "Edit",
   "@editButtonText": {
@@ -786,6 +798,10 @@
   "@somethingWentWrong": {
     "description": "Error description when something goes wrong."
   },
+  "resourceConflictError": "Provided data is not unique.",
+  "@resourceConflictError": {
+    "description": "Error description when there's duplicate data (i.e. email or username already taken)."
+  },
   "noWalletFound": "No wallet found.",
   "@noWalletFound": {
     "description": "A description when no wallet extension was found."
@@ -1460,8 +1476,32 @@
   "@headsUp": {
     "description": "In context for important information below"
   },
+  "shareNewDraft": "Share new draft",
+  "@shareNewDraft": {
+    "description": "In context of sharing proposal for public feedback."
+  },
+  "submitForReview": "Submit for review",
+  "@submitForReview": {
+    "description": "In context of submitting proposal for review."
+  },
+  "showAllIssues": "Show all issues",
+  "@showAllIssues": {
+    "description": "Action to display a full list of issues."
+  },
+  "hideAllIssues": "Hide all issues",
+  "@hideAllIssues": {
+    "description": "Action to hide the full list of issues."
+  },
   "errorEmailValidationPattern": "Incorrect email pattern",
   "errorEmailValidationOutOfRange": "Invalid length",
+  "errorEmailAlreadyInUseUpdateLater": "This email address is already in use. You can update your email later from your account settings.",
+  "@errorEmailAlreadyInUseUpdateLater": {
+    "description": "Error when trying to register with email that is taken already (in registration)."
+  },
+  "errorEmailAlreadyInUse": "This email address is already in use.",
+  "@errorEmailAlreadyInUse": {
+    "description": "Error when trying to update email that is taken already."
+  },
   "categoryDetails": "Category Details",
   "fundsAvailable": "Funds Available",
   "minBudgetRequest": "Min budget request",
@@ -1628,9 +1668,55 @@
   "@proposalOptions": {
     "description": "Actions related to a proposal like publishing, sharing, exporting, etc."
   },
-  "proposalEditorValidationSnackbar": "Fix the following input errors",
-  "@proposalEditorValidationSnackbar": {
-    "description": "Snackbar title shown when user tries to save a proposal with errors."
+  "proposalEditorValidationErrorShareDraftTitle": "To share new draft, resolve {count} form {count, plural, =0{issues} =1{issue} other{issues}}.",
+  "@proposalEditorValidationErrorShareDraftTitle": {
+    "description": "Snackbar title shown when user tries to share proposal draft with errors.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "proposalEditorValidationErrorSubmitReviewTitle": "To submit For Review, resolve {count} {count, plural, =0{issues} =1{issue} other{issues}}.",
+  "@proposalEditorValidationErrorSubmitReviewTitle": {
+    "description": "Snackbar title shown when user tries to submit for review a proposal with errors.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "proposalEditorValidationErrorClearedTitle": "Issues cleared",
+  "@proposalEditorValidationErrorClearedTitle": {
+    "description": "Snackbar title shown when user resolves all validation issues."
+  },
+  "proposalEditorValidationErrorShareDraftNotStartedMessage": "In the next step, you'll see the issues that need to be resolved before publishing your draft.",
+  "@proposalEditorValidationErrorShareDraftNotStartedMessage": {
+    "description": "Snackbar message shown when user tries to share proposal draft with errors."
+  },
+  "proposalEditorValidationErrorSubmitReviewNotStartedMessage": "In the next step, you'll see the issues that need to be resolved before publishing your final.",
+  "@proposalEditorValidationErrorSubmitReviewNotStartedMessage": {
+    "description": "Snackbar message shown when user tries to submit for review a proposal with errors."
+  },
+  "proposalEditorValidationErrorInProgressMessage": "Please review the sections highlighted in red and correct them to continue.",
+  "@proposalEditorValidationErrorInProgressMessage": {
+    "description": "Snackbar message shown when user tries to share proposal draft / submit for review with errors."
+  },
+  "proposalEditorValidationErrorShareDraftClearedMessage": "Please proceed sharing your draft for feedback.",
+  "@proposalEditorValidationErrorShareDraftClearedMessage": {
+    "description": "Snackbar message shown when user resolves all validation issues (after trying to share draft)."
+  },
+  "proposalEditorValidationErrorSubmitReviewClearedMessage": "Please proceed sharing your final for review.",
+  "@proposalEditorValidationErrorSubmitReviewClearedMessage": {
+    "description": "Snackbar message shown when user resolves all validation issues (after trying to share draft)."
+  },
+  "proposalEditorValidationExitDialogTitle": "Exit form issue mode?",
+  "@proposalEditorValidationExitDialogTitle": {
+    "description": "Title in a dialog asking if the user wants to leave the form issue mode."
+  },
+  "proposalEditorValidationExitDialogMessage": "When you exit, any unsaved changes will be lost.",
+  "@proposalEditorValidationExitDialogMessage": {
+    "description": "Message in a dialog asking if the user wants to leave the form issue mode."
   },
   "proposalEditorDeleteDialogTitle": "Delete Proposal?",
   "@proposalEditorDeleteDialogTitle": {

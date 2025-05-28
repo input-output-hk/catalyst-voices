@@ -136,7 +136,8 @@ class VoicesSnackBar extends StatelessWidget {
         content: this,
         behavior: behavior,
         duration: duration,
-        width: _calculateSnackBarWidth(
+        width: calculateSnackBarWidth(
+          behavior: behavior,
           screenWidth: MediaQuery.sizeOf(context).width,
         ),
         padding: padding,
@@ -146,12 +147,15 @@ class VoicesSnackBar extends StatelessWidget {
     );
   }
 
-  double? _calculateSnackBarWidth({required double screenWidth}) {
+  static double calculateSnackBarWidth({
+    required SnackBarBehavior? behavior,
+    required double screenWidth,
+  }) {
     switch (behavior) {
       case null:
       case SnackBarBehavior.fixed:
         // custom width not supported
-        return null;
+        return double.infinity;
       case SnackBarBehavior.floating:
         return max(screenWidth * 0.4, 300).clamp(0.0, screenWidth).toDouble();
     }
@@ -174,7 +178,7 @@ class _IconAndTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
+    final textStyle = Theme.of(context).textTheme.titleMedium;
 
     return AffixDecorator(
       prefix: IconTheme(
@@ -186,11 +190,8 @@ class _IconAndTitle extends StatelessWidget {
       ),
       child: Text(
         title,
-        style: TextStyle(
+        style: textStyle?.copyWith(
           color: type.titleColor(context),
-          fontSize: textTheme.titleMedium?.fontSize,
-          fontWeight: textTheme.titleMedium?.fontWeight,
-          fontFamily: textTheme.titleMedium?.fontFamily,
         ),
       ),
     );

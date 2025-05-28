@@ -27,17 +27,3 @@ final class ProposalBuilderSubmitException extends LocalizedException {
     return context.l10n.proposalEditorSubmitErrorDialogTitle;
   }
 }
-
-final class ProposalBuilderValidationException extends LocalizedException {
-  final List<String> fields;
-
-  const ProposalBuilderValidationException({required this.fields});
-
-  @override
-  List<Object?> get props => fields;
-
-  @override
-  String message(BuildContext context) {
-    return context.l10n.proposalEditorValidationSnackbar;
-  }
-}

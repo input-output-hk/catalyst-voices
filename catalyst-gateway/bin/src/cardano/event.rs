@@ -17,13 +17,17 @@ pub(crate) enum ChainIndexerEvent {
     },
     /// Event triggered when the live tip slot changes.
     LiveTipSlotChanged {
+        /// The immutable tip slot.
+        immutable_slot: Slot,
         /// The new live tip slot.
-        slot: Slot,
+        live_slot: Slot,
     },
     /// Event triggered when the immutable tip slot changes.
     ImmutableTipSlotChanged {
         /// The new immutable tip slot.
-        slot: Slot,
+        immutable_slot: Slot,
+        /// The live tip slot.
+        live_slot: Slot,
     },
     /// Event triggered when the indexed slot progresses.
     IndexedSlotProgressed {
