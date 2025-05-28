@@ -149,13 +149,15 @@ final class DevToolsBloc extends Bloc<DevToolsEvent, DevToolsState>
     final loggingSettings = await _loggingService?.getSettings();
 
     if (!isClosed) {
-      emit(state.copyWith(
-        isDeveloper: isDeveloper,
-        syncStats: Optional(syncStats),
-        areLogsOptionsAvailable: areLogsOptionsAvailable,
-        logsLevel: Optional(loggingSettings?.effectiveLevel),
-        collectLogs: loggingSettings?.effectiveCollectLogs ?? false,
-      ));
+      emit(
+        state.copyWith(
+          isDeveloper: isDeveloper,
+          syncStats: Optional(syncStats),
+          areLogsOptionsAvailable: areLogsOptionsAvailable,
+          logsLevel: Optional(loggingSettings?.effectiveLevel),
+          collectLogs: loggingSettings?.effectiveCollectLogs ?? false,
+        ),
+      );
     }
   }
 
