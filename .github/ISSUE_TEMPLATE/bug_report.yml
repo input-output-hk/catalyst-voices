@@ -49,13 +49,13 @@ body:
   - type: markdown
     attributes:
       value: |
-        👉 **If in the previous dropdown you selected Frontend please include the relevant componenet in your issue title.**
-        - account.registration
-        - proposal.builder
-        - proposal.view
-        - workspace
-        - proposals
-        - discovery
+        👉 **If you selected Frontend as Project please include the relevant component in the issue title.**
+            - account.registration
+            - proposal.builder
+            - proposal.view
+            - workspace
+            - proposals
+            - discovery
         Example: `[Bug][discovery] Crash on login`
 
   - type: dropdown
