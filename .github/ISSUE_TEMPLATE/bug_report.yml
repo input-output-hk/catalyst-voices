@@ -1,7 +1,7 @@
 name: Bug Report
 description: File a bug report
 title: "[Bug]: "
-type: ["Bug"]
+type: "bug"
 body:
   - type: markdown
     attributes:
@@ -49,7 +49,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        👉 **If you selected frontend please include the relevant componenet in your issue title.**
+        👉 **If in the previous dropdown you selected Frontend please include the relevant componenet in your issue title.**
         - account.registration
         - proposal.builder
         - proposal.view
