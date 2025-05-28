@@ -17,7 +17,7 @@ permissions:
 
 jobs:
   ci:
-    uses: input-output-hk/catalyst-forge/.github/workflows/ci.yml@manual-earthly-download
+    uses: input-output-hk/catalyst-forge/.github/workflows/ci.yml@manual-earthly-download # TODO: remove
     with:
       forge_version: 0.16.0
 
