@@ -12,7 +12,7 @@ final staticCampaignCategories = [
     description:
         '''Cardano Use Cases: Partners & Products empowers exceptional applications and enterprise partnerships to enhance products and services with capabilities that drive high-volume transactions and accelerates mainstream adoption.''',
     shortDescription:
-        'For Tier-1 partnerships and real-world pilots that scale Cardano adoption through high-impact use. cases.',
+        'For Tier-1 partnerships and real-world pilots that scale Cardano adoption through high-impact use cases.',
     proposalsCount: 0,
     availableFunds: const Coin.fromWholeAda(8500000),
     imageUrl: '',
