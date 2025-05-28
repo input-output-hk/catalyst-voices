@@ -2300,10 +2300,6 @@
   "@votingRegistration": {
     "description": "Title for registration for voting"
   },
-  "copyMyCatalystId": "Copy my Catalyst ID",
-  "@copyMyCatalystId": {
-    "description": "Action to copy my catalyst id"
-  },
   "stayInvolved": "Stay Involved",
   "@stayInvolved": {
     "description": "Title for the stay involved section"
@@ -2813,5 +2809,17 @@
   "devToolsTapsLeftToEnableMessage": "Keep on tapping",
   "@devToolsTapsLeftToEnableMessage": {
     "description": "Explanation text"
+  },
+  "catalystId": "Catalyst ID",
+  "@catalystId": {
+    "description": "Label of chip with account catalyst ID clearly describing content"
+  },
+  "tip": "Tip",
+  "@tip": {
+    "description": "Generic affix which can be used in different scenarios."
+  },
+  "tipCopyCatalystIdForReviewTool": "Copy your Catalyst ID before you go to the Review tool.",
+  "@tipCopyCatalystIdForReviewTool": {
+    "description": "Gives context where Catalyst ID can be used"
   }
 }
