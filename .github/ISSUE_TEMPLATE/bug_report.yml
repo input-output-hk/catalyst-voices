@@ -50,12 +50,13 @@ body:
     attributes:
       value: |
         👉 **If you selected Frontend as Project please include the relevant component in the issue title.**
-            - account.registration
-            - proposal.builder
-            - proposal.view
-            - workspace
-            - proposals
-            - discovery
+            `[account.registration]`
+            `[proposal.builder]`
+            `[proposal.view]`
+            `[workspace]`
+            `[proposals]`
+            `[discovery]`
+
         Example: `[Bug][discovery] Crash on login`
 
   - type: dropdown
