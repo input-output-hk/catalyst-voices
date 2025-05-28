@@ -1,6 +1,7 @@
 import 'package:catalyst_voices/pages/dev_tools/widgets/app_info_card.dart';
 import 'package:catalyst_voices/pages/dev_tools/widgets/config_card.dart';
 import 'package:catalyst_voices/pages/dev_tools/widgets/documents_card.dart';
+import 'package:catalyst_voices/pages/dev_tools/widgets/environment_card.dart';
 import 'package:catalyst_voices/pages/dev_tools/widgets/gateway_info_card.dart';
 import 'package:catalyst_voices/pages/dev_tools/widgets/x_close_button.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
@@ -39,6 +40,8 @@ class _DevToolsPageState extends State<DevToolsPage> {
       body: ListView(
         padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
         children: const [
+          EnvironmentCard(),
+          SizedBox(height: 12),
           AppInfoCard(),
           SizedBox(height: 12),
           GatewayInfoCard(),
