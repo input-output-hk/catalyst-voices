@@ -284,7 +284,7 @@ impl<E: Endpoint> Endpoint for TracingEndpoint<E> {
 
                     // Log 404 as warning, if env set
                     if status == StatusCode::NOT_FOUND {
-                        if env::var("LOG_404").is_ok() {
+                        if env::var("LOG_NOT_FOUND").is_ok() {
                             warn!(
                             %status);
                         }
