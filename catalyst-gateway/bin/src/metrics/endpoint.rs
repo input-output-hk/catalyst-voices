@@ -65,5 +65,5 @@ pub(crate) static CLIENT_REQUEST_COUNT: LazyLock<IntCounterVec> = LazyLock::new(
 /// Metric counter to track the number of HTTP 404 Not Found responses.
 /// It is use for monitoring crawler activity or requests to invalid URLs.
 pub(crate) static NOT_FOUND_COUNT: LazyLock<IntCounter> = LazyLock::new(|| {
-    register_int_counter!("not_found_count", "Number of 404 not found response",).unwrap()
+    register_int_counter!("response_404", "Number of 404 not found response",).unwrap()
 });
