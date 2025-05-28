@@ -4,12 +4,12 @@ use std::time::Instant;
 
 use cpu_time::ProcessTime; // ThreadTime doesn't work.
 use poem::{
-    http::{header, HeaderMap},
+    http::{header, HeaderMap, StatusCode},
     web::RealIp,
     Endpoint, Error, FromRequest, IntoResponse, Middleware, PathPattern, Request, Response, Result,
 };
 use poem_openapi::OperationId;
-use tracing::{error, field, Instrument, Level, Span};
+use tracing::{error, field, info, Instrument, Level, Span};
 use ulid::Ulid;
 use uuid::Uuid;
 
@@ -276,14 +276,16 @@ impl<E: Endpoint> Endpoint for TracingEndpoint<E> {
                     //};
                     let panic: Option<Uuid> = None;
 
-                    // Get the error message, and also for now, log the error to ensure we are
-                    // preserving all data.
-                    error!(err = ?err, "HTTP Response Error:");
-                    // Only way I can see to get the message, may not be perfect.
-                    let error_message = err.to_string();
-
                     // Convert the error into a response, so we can deal with the error
+                    let error_message = err.to_string();
                     let resp = err.into_response();
+                    let status = resp.status();
+
+                    if status == StatusCode::NOT_FOUND {
+                        info!(message=%error_message, %status, "Not Found");
+                    } else {
+                        error!(%error_message, %status, "HTTP Response Error");
+                    }
 
                     let response_data =
                         ResponseData::new(duration, duration_proc, &resp, panic, &inner_span);
