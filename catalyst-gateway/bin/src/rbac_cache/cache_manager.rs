@@ -48,10 +48,9 @@ impl RbacCacheManager {
     #[allow(clippy::result_large_err)]
     pub fn add(&self, registration: Cip509, is_persistent: bool) -> AddResult {
         if is_persistent {
-            self.persistent.add(registration.clone())
-        } else {
-            self.volatile.add(registration)
+            self.persistent.add(registration.clone())?;
         }
+        self.volatile.add(registration)
     }
 
     /// Returns a registration chain by the given Catalyst ID.
