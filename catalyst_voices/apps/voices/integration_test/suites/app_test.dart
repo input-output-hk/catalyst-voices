@@ -10,6 +10,7 @@ import 'package:patrol_finders/patrol_finders.dart';
 import '../pageobject/app_bar_page.dart';
 import '../pageobject/overall_spaces_page.dart';
 import '../pageobject/spaces_drawer_page.dart';
+import '../utils/bootstrap_utils.dart';
 import '../utils/constants.dart';
 import '../utils/selector_utils.dart';
 
@@ -21,13 +22,12 @@ void main() async {
   });
 
   setUp(() async {
-    await registerDependencies();
-    registerConfig(AppConfig.dev());
+    await registerForTests();
     router.go(const DiscoveryRoute().location);
   });
 
   tearDown(() async {
-    await restartDependencies();
+    await restartForTests();
   });
 
   group(
