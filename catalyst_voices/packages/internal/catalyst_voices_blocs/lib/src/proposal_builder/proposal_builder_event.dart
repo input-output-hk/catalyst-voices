@@ -1,3 +1,4 @@
+import 'package:catalyst_voices_blocs/src/proposal_builder/proposal_builder_state.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:equatable/equatable.dart';
@@ -9,6 +10,13 @@ final class ActiveNodeChangedEvent extends ProposalBuilderEvent {
 
   @override
   List<Object?> get props => [id];
+}
+
+final class ClearValidationProposalEvent extends ProposalBuilderEvent {
+  const ClearValidationProposalEvent();
+
+  @override
+  List<Object?> get props => [];
 }
 
 final class DeleteProposalEvent extends ProposalBuilderEvent {
@@ -182,6 +190,15 @@ final class UpdateCommentsSortEvent extends ProposalBuilderEvent {
   List<Object?> get props => [sort];
 }
 
+final class UpdateProposalBuilderValidationStatusEvent extends ProposalBuilderEvent {
+  final ProposalBuilderValidationStatus status;
+
+  const UpdateProposalBuilderValidationStatusEvent({required this.status});
+
+  @override
+  List<Object?> get props => [status];
+}
+
 final class UpdateUsernameEvent extends ProposalBuilderEvent {
   final String value;
 
@@ -192,8 +209,10 @@ final class UpdateUsernameEvent extends ProposalBuilderEvent {
 }
 
 final class ValidateProposalEvent extends ProposalBuilderEvent {
-  const ValidateProposalEvent();
+  final ProposalBuilderValidationOrigin origin;
+
+  const ValidateProposalEvent({required this.origin});
 
   @override
-  List<Object?> get props => [];
+  List<Object?> get props => [origin];
 }
