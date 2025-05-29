@@ -52,7 +52,8 @@
                 "milestones": { "type": "object" },
                 "team": { "type": "object" },
                 "value": { "type": "object" },
-                "mandatory": { "type": "object" }
+                "ongoing_projects": { "type": "object" },
+                "consent_confirmation": { "type": "object" }
             },
             "x-note": "Major sections of the proposal. Each segment contains sections of information grouped together."
         },
