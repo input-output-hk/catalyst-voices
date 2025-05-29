@@ -2,9 +2,6 @@
 
 use std::sync::atomic::{AtomicBool, Ordering};
 
-use catalyst_types::catalyst_id::CatalystId;
-use rbac_registration::registration::cardano::RegistrationChain;
-
 use crate::{
     rbac_cache::{
         event::{EventTarget, RbacCacheManagerEvent as Event},
@@ -87,23 +84,16 @@ pub(crate) fn update() {
 
     let rbac_entries = RBAC_CACHE.rbac_entries();
 
-    let chain_size = size_of::<RegistrationChain>();
-    let key_size = size_of::<CatalystId>();
-
-    let approx_mem_used = chain_size
-        .checked_add(key_size)
-        .and_then(|sum| sum.checked_mul(rbac_entries as usize))
-        .unwrap_or_default();
-
     reporter::MAX_CACHE_SIZE
         .with_label_values(&[&api_host_names, service_id, &network])
         .set(i64::try_from(Settings::rbac_cache_max_mem_size()).unwrap_or(-1));
     reporter::CACHING_RBAC_ENTRIES
         .with_label_values(&[&api_host_names, service_id, &network])
         .set(i64::try_from(rbac_entries).unwrap_or(-1));
+    // TODO: add size approximation on storage caching when it's available
     reporter::CACHE_SIZE
         .with_label_values(&[&api_host_names, service_id, &network])
-        .set(i64::try_from(approx_mem_used).unwrap_or(-1));
+        .set(i64::try_from(0).unwrap_or(-1));
 }
 
 /// All the related RBAC Registration Chain Caching reporting metrics to the Prometheus
