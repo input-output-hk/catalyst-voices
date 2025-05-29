@@ -8,6 +8,7 @@ use poem::{
     Endpoint, Request, Response, Result,
 };
 use prometheus::{Encoder, Registry, TextEncoder};
+use tracing::error;
 
 /// The function type to call when a request sent to the endpoint.
 type UpdateFn = fn();
@@ -37,7 +38,13 @@ impl Endpoint for MetricsUpdaterMiddleware {
             return Ok(StatusCode::METHOD_NOT_ALLOWED.into());
         }
 
-        (self.updater)();
+        // perform updating as another task
+        let updater = self.updater.clone();
+        let handle = tokio::task::spawn(async move { (updater)() });
+
+        if let Err(err) = handle.await {
+            error!(?err, ?req, "Failed to perform metrics updating");
+        }
 
         let encoder = TextEncoder::new();
         let metric_families = self.registry.gather();
