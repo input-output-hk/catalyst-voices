@@ -67,7 +67,7 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
           proposal.metadata.jsonExtract(r'$.categoryId').isNotNull(),
         ]),
       )
-      ..orderBy([OrderingTerm.desc(proposal.verHi)]);
+      ..orderBy([OrderingTerm.asc(proposal.verHi)]);
 
     if (categoryRef != null) {
       mainQuery.where(proposal.metadata.isCategory(categoryRef));

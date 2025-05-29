@@ -667,7 +667,7 @@ void main() {
           ];
           const request = PageRequest(page: 0, size: 10);
           const filters = ProposalsFilters();
-          const order = Alphabetical();
+          const order = UpdateDate(isAscending: true);
 
           final expectedRefs = [
             latestRef,
@@ -716,7 +716,7 @@ void main() {
             );
           });
           const filters = ProposalsFilters();
-          const order = Alphabetical();
+          const order = UpdateDate(isAscending: true);
 
           // When
           await database.documentsDao.saveAll([...templates, ...proposals]);
@@ -788,7 +788,7 @@ void main() {
               proposals.sublist(0, 3).map((proposal) => proposal.document.ref).toList();
 
           final filters = ProposalsFilters(category: categoryId);
-          const order = Alphabetical();
+          const order = UpdateDate(isAscending: true);
 
           // When
           await database.documentsDao.saveAll([...templates, ...proposals]);
@@ -855,7 +855,7 @@ void main() {
           ];
 
           const filters = ProposalsFilters(type: ProposalsFilterType.finals);
-          const order = Alphabetical();
+          const order = UpdateDate(isAscending: true);
 
           // When
           await database.documentsDao.saveAll([
@@ -927,7 +927,7 @@ void main() {
           ];
 
           const filters = ProposalsFilters(type: ProposalsFilterType.finals);
-          const order = Alphabetical();
+          const order = UpdateDate(isAscending: true);
 
           // When
           await database.documentsDao.saveAll([
@@ -1001,7 +1001,7 @@ void main() {
           ];
 
           const filters = ProposalsFilters();
-          const order = Alphabetical();
+          const order = UpdateDate(isAscending: true);
 
           // When
           await database.documentsDao.saveAll([
@@ -1076,7 +1076,7 @@ void main() {
           final comments = <DocumentEntityWithMetadata>[];
 
           final filters = ProposalsFilters(searchQuery: searchQuery);
-          const order = Alphabetical();
+          const order = UpdateDate(isAscending: true);
 
           // When
           await database.documentsDao.saveAll([
@@ -1145,7 +1145,7 @@ void main() {
           final comments = <DocumentEntityWithMetadata>[];
 
           const filters = ProposalsFilters();
-          const order = Alphabetical();
+          const order = UpdateDate(isAscending: true);
 
           // When
           await database.documentsDao.saveAll([
