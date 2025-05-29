@@ -128,7 +128,6 @@ class _VoicesNumFieldState<T extends num> extends State<VoicesNumField<T>> {
       enabled: widget.enabled,
       readOnly: widget.readOnly,
       ignorePointers: widget.ignorePointers,
-      
     );
   }
 
