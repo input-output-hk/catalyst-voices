@@ -1,6 +1,6 @@
 //! Full Tracing and metrics middleware.
 
-use std::{env, time::Instant};
+use std::time::Instant;
 
 use cpu_time::ProcessTime; // ThreadTime doesn't work.
 use poem::{
@@ -284,7 +284,7 @@ impl<E: Endpoint> Endpoint for TracingEndpoint<E> {
 
                     // Log 404 as warning, if env set
                     if status == StatusCode::NOT_FOUND {
-                        if env::var("LOG_NOT_FOUND").is_ok() {
+                        if Settings::log_not_found() {
                             warn!(
                             %status);
                         }
