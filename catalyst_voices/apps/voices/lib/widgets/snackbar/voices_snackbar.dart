@@ -147,7 +147,7 @@ class VoicesSnackBar extends StatelessWidget {
     );
   }
 
-  static double calculateSnackBarWidth({
+  static double? calculateSnackBarWidth({
     required SnackBarBehavior? behavior,
     required double screenWidth,
   }) {
@@ -155,7 +155,12 @@ class VoicesSnackBar extends StatelessWidget {
       case null:
       case SnackBarBehavior.fixed:
         // custom width not supported
-        return double.infinity;
+        // snack_bar.dart
+        //      if (snackBarBehavior != SnackBarBehavior.floating) {
+        //         ...
+        //         assert(width == null, message('Width'));
+        //       }
+        return null;
       case SnackBarBehavior.floating:
         return max(screenWidth * 0.4, 300).clamp(0.0, screenWidth).toDouble();
     }

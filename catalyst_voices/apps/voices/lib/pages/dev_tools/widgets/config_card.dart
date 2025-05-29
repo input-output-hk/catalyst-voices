@@ -15,10 +15,6 @@ class ConfigCard extends StatelessWidget {
       selector: (state) => state.systemInfo?.config,
       builder: (context, state) {
         return _ConfigCard(
-          // TODO(damian-molinski): change it after #2135 is merged.
-          env: 'dev',
-          gatewayUrl: state?.api.gatewayUrl,
-          reviewsUrl: state?.api.reviewsUrl,
           networkId: state?.blockchain.networkId,
           host: state?.blockchain.host,
           // TODO(damian-molinski): use DTO after #2135 is merged.
@@ -30,18 +26,11 @@ class ConfigCard extends StatelessWidget {
 }
 
 class _ConfigCard extends StatelessWidget {
-  // TODO(damian-molinski): change it after #2135 is merged.
-  final String? env;
-  final String? gatewayUrl;
-  final String? reviewsUrl;
   final NetworkId? networkId;
   final CatalystIdHost? host;
   final Map<String, dynamic>? transactionBuilderConfig;
 
   const _ConfigCard({
-    this.env,
-    this.gatewayUrl,
-    this.reviewsUrl,
     this.networkId,
     this.host,
     this.transactionBuilderConfig,
@@ -52,9 +41,6 @@ class _ConfigCard extends StatelessWidget {
     return InfoCard(
       title: const Text('Config'),
       children: [
-        ValueText(name: const Text('Env'), value: Text(env ?? '-')),
-        ValueText(name: const Text('Gateway'), value: Text(gatewayUrl ?? '-')),
-        ValueText(name: const Text('Reviews'), value: Text(reviewsUrl ?? '-')),
         ValueText(name: const Text('NetworkId'), value: Text(networkId?.name ?? '-')),
         ValueText(name: const Text('Host'), value: Text(host?.name ?? '-')),
         ValueText(
