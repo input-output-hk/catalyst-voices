@@ -1,3 +1,4 @@
+import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart' show Coin;
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_repositories/src/database/catalyst_database.dart';
@@ -5,6 +6,7 @@ import 'package:catalyst_voices_repositories/src/database/dao/proposals_dao.dart
 import 'package:catalyst_voices_repositories/src/database/table/documents_metadata.dart';
 import 'package:catalyst_voices_repositories/src/dto/proposal/proposal_submission_action_dto.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:uuid_plus/uuid_plus.dart';
 
@@ -1174,15 +1176,274 @@ void main() {
         onPlatform: driftOnPlatforms,
       );
 
-      test('order alphabetical works against title', () {}, skip: true);
+      test(
+        'order alphabetical works against title',
+        () async {
+          final templateRef = SignedDocumentRef.generateFirstRef();
+          const titles = [
+            'Abc',
+            'Bcd',
+            'cde',
+          ];
 
-      test('order budget asc works against content path', () {}, skip: true);
+          final templates = [
+            _buildProposalTemplate(selfRef: templateRef),
+          ];
 
-      test('order budget desc works against content path', () {}, skip: true);
+          final proposals = titles.map((title) {
+            return _buildProposal(
+              selfRef: SignedDocumentRef.generateFirstRef(),
+              template: templateRef,
+              title: title,
+            );
+          }).shuffled();
 
-      test('order updateDate asc works against content path', () {}, skip: true);
+          final actions = <DocumentEntityWithMetadata>[];
+          final comments = <DocumentEntityWithMetadata>[];
 
-      test('order updateDate desc works against content path', () {}, skip: true);
+          const filters = ProposalsFilters();
+          const order = Alphabetical();
+
+          // When
+          await database.documentsDao.saveAll([
+            ...templates,
+            ...proposals,
+            ...actions,
+            ...comments,
+          ]);
+
+          // Then
+          const request = PageRequest(page: 0, size: 25);
+          final page = await database.proposalsDao.queryProposalsPage(
+            request: request,
+            filters: filters,
+            order: order,
+          );
+
+          expect(page.page, 0);
+
+          final proposalsTitles = page.items.map((e) => e.proposal.content.title).toList();
+
+          expect(proposalsTitles, containsAllInOrder(titles));
+        },
+        onPlatform: driftOnPlatforms,
+      );
+
+      test(
+        'order budget asc works against content path',
+        () async {
+          final templateRef = SignedDocumentRef.generateFirstRef();
+          const budgets = [
+            Coin.fromWholeAda(100000),
+            Coin.fromWholeAda(199999),
+            Coin.fromWholeAda(200000),
+          ];
+
+          final templates = [
+            _buildProposalTemplate(selfRef: templateRef),
+          ];
+
+          final proposals = budgets.map((requestedFund) {
+            return _buildProposal(
+              selfRef: SignedDocumentRef.generateFirstRef(),
+              template: templateRef,
+              requestedFunds: requestedFund,
+            );
+          }).shuffled();
+
+          final actions = <DocumentEntityWithMetadata>[];
+          final comments = <DocumentEntityWithMetadata>[];
+
+          const filters = ProposalsFilters();
+          const order = Budget(isAscending: true);
+
+          // When
+          await database.documentsDao.saveAll([
+            ...templates,
+            ...proposals,
+            ...actions,
+            ...comments,
+          ]);
+
+          // Then
+          const request = PageRequest(page: 0, size: 25);
+          final page = await database.proposalsDao.queryProposalsPage(
+            request: request,
+            filters: filters,
+            order: order,
+          );
+
+          expect(page.page, 0);
+
+          final proposalsBudgets =
+              page.items.map((e) => e.proposal.content.requestedFunds).toList();
+
+          expect(proposalsBudgets, containsAllInOrder(budgets));
+        },
+        onPlatform: driftOnPlatforms,
+      );
+
+      test(
+        'order budget desc works against content path',
+        () async {
+          final templateRef = SignedDocumentRef.generateFirstRef();
+          const budgets = [
+            Coin.fromWholeAda(200000),
+            Coin.fromWholeAda(199999),
+            Coin.fromWholeAda(100000),
+          ];
+
+          final templates = [
+            _buildProposalTemplate(selfRef: templateRef),
+          ];
+
+          final proposals = budgets.map((requestedFund) {
+            return _buildProposal(
+              selfRef: SignedDocumentRef.generateFirstRef(),
+              template: templateRef,
+              requestedFunds: requestedFund,
+            );
+          }).shuffled();
+
+          final actions = <DocumentEntityWithMetadata>[];
+          final comments = <DocumentEntityWithMetadata>[];
+
+          const filters = ProposalsFilters();
+          const order = Budget(isAscending: false);
+
+          // When
+          await database.documentsDao.saveAll([
+            ...templates,
+            ...proposals,
+            ...actions,
+            ...comments,
+          ]);
+
+          // Then
+          const request = PageRequest(page: 0, size: 25);
+          final page = await database.proposalsDao.queryProposalsPage(
+            request: request,
+            filters: filters,
+            order: order,
+          );
+
+          expect(page.page, 0);
+
+          final proposalsBudgets =
+              page.items.map((e) => e.proposal.content.requestedFunds).toList();
+
+          expect(proposalsBudgets, containsAllInOrder(budgets));
+        },
+        onPlatform: driftOnPlatforms,
+      );
+
+      test(
+        'order updateDate asc works against content path',
+        () async {
+          final templateRef = SignedDocumentRef.generateFirstRef();
+          final dates = [
+            DateTime.utc(2025, 5, 10),
+            DateTime.utc(2025, 5, 20),
+            DateTime.utc(2025, 5, 29),
+          ];
+
+          final templates = [
+            _buildProposalTemplate(selfRef: templateRef),
+          ];
+
+          final proposals = dates.map((date) {
+            return _buildProposal(
+              selfRef: _buildRefAt(date),
+              template: templateRef,
+            );
+          }).shuffled();
+
+          final actions = <DocumentEntityWithMetadata>[];
+          final comments = <DocumentEntityWithMetadata>[];
+
+          const filters = ProposalsFilters();
+          const order = UpdateDate(isAscending: true);
+
+          // When
+          await database.documentsDao.saveAll([
+            ...templates,
+            ...proposals,
+            ...actions,
+            ...comments,
+          ]);
+
+          // Then
+          const request = PageRequest(page: 0, size: 25);
+          final page = await database.proposalsDao.queryProposalsPage(
+            request: request,
+            filters: filters,
+            order: order,
+          );
+
+          expect(page.page, 0);
+
+          final proposalsDates = page.items
+              .map((e) => UuidHiLo(high: e.proposal.verHi, low: e.proposal.verLo).dateTime)
+              .toList();
+
+          expect(proposalsDates, containsAllInOrder(dates));
+        },
+        onPlatform: driftOnPlatforms,
+      );
+
+      test(
+        'order updateDate desc works against content path',
+        () async {
+          final templateRef = SignedDocumentRef.generateFirstRef();
+          final dates = [
+            DateTime.utc(2025, 5, 29),
+            DateTime.utc(2025, 5, 20),
+            DateTime.utc(2025, 5, 10),
+          ];
+
+          final templates = [
+            _buildProposalTemplate(selfRef: templateRef),
+          ];
+
+          final proposals = dates.map((date) {
+            return _buildProposal(
+              selfRef: _buildRefAt(date),
+              template: templateRef,
+            );
+          }).shuffled();
+
+          final actions = <DocumentEntityWithMetadata>[];
+          final comments = <DocumentEntityWithMetadata>[];
+
+          const filters = ProposalsFilters();
+          const order = UpdateDate(isAscending: false);
+
+          // When
+          await database.documentsDao.saveAll([
+            ...templates,
+            ...proposals,
+            ...actions,
+            ...comments,
+          ]);
+
+          // Then
+          const request = PageRequest(page: 0, size: 25);
+          final page = await database.proposalsDao.queryProposalsPage(
+            request: request,
+            filters: filters,
+            order: order,
+          );
+
+          expect(page.page, 0);
+
+          final proposalsDates = page.items
+              .map((e) => UuidHiLo(high: e.proposal.verHi, low: e.proposal.verLo).dateTime)
+              .toList();
+
+          expect(proposalsDates, containsAllInOrder(dates));
+        },
+        onPlatform: driftOnPlatforms,
+      );
     });
     group('queryProposals', () {
       test(
@@ -1443,6 +1704,7 @@ DocumentEntityWithMetadata _buildProposal({
   CatalystId? author,
   String? contentAuthorName,
   SignedDocumentRef? categoryId,
+  Coin? requestedFunds,
 }) {
   final metadata = DocumentDataMetadata(
     type: DocumentType.proposalDocument,
@@ -1464,6 +1726,12 @@ DocumentEntityWithMetadata _buildProposal({
           'title': {
             'title': title,
           },
+      },
+    if (requestedFunds != null)
+      'summary': {
+        'budget': {
+          'requestedFunds': requestedFunds.ada.toInt(),
+        },
       },
   });
 
