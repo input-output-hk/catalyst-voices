@@ -2,7 +2,6 @@ import 'package:catalyst_voices/app/view/app.dart';
 import 'package:catalyst_voices/configs/bootstrap.dart';
 import 'package:catalyst_voices/routes/routes.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart' as blocs;
-import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:patrol_finders/patrol_finders.dart';
@@ -26,6 +25,7 @@ import '../pageobject/onboarding/create_flow/step_9_writedown_seedphrase_info.da
 import '../pageobject/onboarding/onboarding_base_page.dart';
 import '../pageobject/onboarding/step_1_get_started.dart';
 import '../types/password_validation_states.dart';
+import '../utils/bootstrap_utils.dart';
 import '../utils/test_context.dart';
 
 void main() async {
@@ -38,12 +38,12 @@ void main() async {
   });
 
   setUp(() async {
-    await registerDependencies(config: const AppConfig());
+    await registerForTests();
     router.go(const DiscoveryRoute().location);
   });
 
   tearDown(() async {
-    await restartDependencies();
+    await restartForTests();
     TestContext.clearContext();
   });
 
