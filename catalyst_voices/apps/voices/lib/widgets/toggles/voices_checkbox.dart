@@ -1,4 +1,5 @@
 import 'package:catalyst_voices/widgets/common/label_decorator.dart';
+import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:flutter/material.dart';
 
@@ -46,28 +47,25 @@ class VoicesCheckbox extends StatelessWidget {
 
     return AbsorbPointer(
       absorbing: !isEnabled,
-      child: MouseRegion(
-        cursor: SystemMouseCursors.click,
-        child: GestureDetector(
-          onTap: onChanged != null ? () => onChanged(!value) : null,
-          behavior: HitTestBehavior.opaque,
-          child: LabelDecorator(
-            label: label,
-            note: note,
-            spacings: const [12, 8],
-            child: Checkbox(
-              key: const Key('Checkbox'),
-              value: value,
-              // forcing null unwrapping because we're not allowing null value
-              onChanged: onChanged != null ? (value) => onChanged(value!) : null,
-              isError: isError,
-              side: isEnabled
-                  ? null
-                  : BorderSide(
-                      width: 2,
-                      color: Theme.of(context).colors.onSurfaceNeutral012,
-                    ),
-            ),
+      child: VoicesGestureDetector(
+        onTap: onChanged != null ? () => onChanged(!value) : null,
+        behavior: HitTestBehavior.opaque,
+        child: LabelDecorator(
+          label: label,
+          note: note,
+          spacings: const [12, 8],
+          child: Checkbox(
+            key: const Key('Checkbox'),
+            value: value,
+            // forcing null unwrapping because we're not allowing null value
+            onChanged: onChanged != null ? (value) => onChanged(value!) : null,
+            isError: isError,
+            side: isEnabled
+                ? null
+                : BorderSide(
+                    width: 2,
+                    color: Theme.of(context).colors.onSurfaceNeutral012,
+                  ),
           ),
         ),
       ),

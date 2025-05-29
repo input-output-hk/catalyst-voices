@@ -48,6 +48,9 @@ final class AccountCubit extends Cubit<AccountState>
       await _userService.resendActiveAccountVerificationEmail();
 
       emitSignal(const AccountVerificationEmailSendSignal());
+    } on EmailAlreadyUsedException catch (error, stackTrace) {
+      _logger.severe('Re-send verification email - already used', error, stackTrace);
+      emitError(const LocalizedEmailAlreadyUsedException());
     } catch (error, stackTrace) {
       _logger.severe('Re-send verification email', error, stackTrace);
       emitError(LocalizedException.create(error));
@@ -82,6 +85,10 @@ final class AccountCubit extends Cubit<AccountState>
       emitSignal(const AccountVerificationEmailSendSignal());
 
       return true;
+    } on EmailAlreadyUsedException {
+      _logger.info('Email already used');
+      emitError(const LocalizedEmailAlreadyUsedException());
+      return false;
     } catch (error, stackTrace) {
       _logger.severe('Update email', error, stackTrace);
       emitError(LocalizedException.create(error));

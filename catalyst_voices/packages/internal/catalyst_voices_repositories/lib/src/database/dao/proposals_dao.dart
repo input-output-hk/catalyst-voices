@@ -15,6 +15,7 @@ import 'package:collection/collection.dart';
 import 'package:drift/drift.dart';
 import 'package:drift/extensions/json1.dart';
 import 'package:equatable/equatable.dart';
+import 'package:rxdart/rxdart.dart';
 
 @DriftAccessor(
   tables: [
@@ -227,6 +228,21 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
     return _transformRefsStreamToCount(stream, author: filters.author);
   }
 
+  @override
+  Stream<Page<JoinedProposalEntity>> watchProposalsPage({
+    required PageRequest request,
+    required ProposalsFilters filters,
+  }) async* {
+    yield await queryProposalsPage(request: request, filters: filters);
+
+    yield* connection.streamQueries
+        .updatesForSync(TableUpdateQuery.onAllTables([documents, documentsFavorites]))
+        .debounceTime(const Duration(milliseconds: 10))
+        .asyncMap((event) {
+      return queryProposalsPage(request: request, filters: filters);
+    });
+  }
+
   // TODO(damian-molinski): Make this more specialized per case.
   // for example proposals list does not need all versions, just count.
   Future<JoinedProposalEntity> _buildJoinedProposal(
@@ -279,7 +295,7 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
     return _getProposalsLatestAction().then(
       (value) {
         return value
-            .where((element) => element.action.isNotDraft)
+            .where((element) => !element.action.isDraft)
             .map((e) => e.proposalRef.id)
             .map(UuidHiLo.from);
       },
@@ -418,14 +434,10 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
               rawAction is String ? ProposalSubmissionActionDto.fromJson(rawAction) : null;
           final action = actionDto?.toModel();
 
-          if (action == null) {
-            return null;
-          }
-
           return _ProposalActions(
             selfRef: selfRef,
             proposalRef: proposalRef,
-            action: action,
+            action: action ?? ProposalSubmissionAction.draft,
           );
         })
         .get()
@@ -614,6 +626,11 @@ abstract interface class ProposalsDao {
   Stream<ProposalsCount> watchCount({
     required ProposalsCountFilters filters,
   });
+
+  Stream<Page<JoinedProposalEntity>> watchProposalsPage({
+    required PageRequest request,
+    required ProposalsFilters filters,
+  });
 }
 
 final class _IdsFilter extends Equatable {
@@ -647,11 +664,11 @@ final class _ProposalActions extends Equatable {
 }
 
 extension on ProposalSubmissionAction {
+  bool get isDraft => this == ProposalSubmissionAction.draft;
+
   bool get isFinal => this == ProposalSubmissionAction.aFinal;
 
   bool get isHidden => this == ProposalSubmissionAction.hide;
-
-  bool get isNotDraft => isFinal || isHidden;
 }
 
 extension on TypedResult {

@@ -92,7 +92,7 @@ def proposal_doc_factory(proposal_templates, rbac_chain_factory):
                 "ver": proposal_templates[0],
             },
             # referenced to the defined category id, comes from the 'templates/data.rs' file
-            "category_id": {
+            "parameters": {
                 "id": category_id,
                 "ver": category_id,
             },
@@ -220,7 +220,7 @@ def test_proposal_doc(proposal_doc_factory, rbac_chain_factory):
     ), f"Failed to get document: {resp.status_code} - {resp.text}"
 
     # Post a signed document with filter ID
-    resp = document.post("/index", filter={"id": {"eq": proposal_doc_id}})
+    resp = document.post(filter={"id": {"eq": proposal_doc_id}})
     assert (
         resp.status_code == 200
     ), f"Failed to post document: {resp.status_code} - {resp.text}"
@@ -320,7 +320,7 @@ def test_comment_doc(comment_doc_factory, rbac_chain_factory):
     ), f"Failed to get document: {resp.status_code} - {resp.text}"
 
     # Post a signed document with filter ID
-    resp = document.post("/index", filter={"id": {"eq": comment_doc_id}})
+    resp = document.post(filter={"id": {"eq": comment_doc_id}})
     assert (
         resp.status_code == 200
     ), f"Failed to post document: {resp.status_code} - {resp.text}"
@@ -400,7 +400,6 @@ def test_submission_action(submission_action_factory, rbac_chain_factory):
 
     # Post a signed document with filter ID
     resp = document.post(
-        "/index",
         filter={"id": {"eq": submission_action_id}},
     )
     assert (
@@ -543,7 +542,8 @@ def test_document_index_endpoint(
         page = 0
         filter = {"id": {"eq": doc.metadata["id"]}}
         resp = document.post(
-            f"/index?limit={limit}&page={page}",
+            limit=limit,
+            page=page,
             filter=filter,
         )
         assert (
@@ -557,7 +557,8 @@ def test_document_index_endpoint(
 
         page += 1
         resp = document.post(
-            f"/index?limit={limit}&page={page}",
+            limit=limit,
+            page=page,
             filter=filter,
         )
         assert (
@@ -569,7 +570,7 @@ def test_document_index_endpoint(
         assert data["page"]["remaining"] == total_amount - 1 - page
 
         resp = document.post(
-            f"/index?limit={total_amount}",
+            limit=total_amount,
             filter=filter,
         )
         assert (
@@ -582,7 +583,7 @@ def test_document_index_endpoint(
 
         # Pagination out of range
         resp = document.post(
-            "/index?page=92233720368547759",
+            page=92233720368547759,
             filter={},
         )
         assert (

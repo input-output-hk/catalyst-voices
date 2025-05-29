@@ -7,8 +7,6 @@ const _publishActions = [
   ProposalMenuItemAction.submit,
 ];
 
-typedef ProposalBuilderMenuColors = ({Color background, Color foreground});
-
 final class ProposalBuilderMenuItemData extends Equatable {
   final ProposalMenuItemAction action;
   final String? proposalTitle;
@@ -22,6 +20,10 @@ final class ProposalBuilderMenuItemData extends Equatable {
     required this.canPublish,
   });
 
+  bool get hasError {
+    return !canPublish && _publishActions.contains(action);
+  }
+
   @override
   List<Object?> get props => [
         action,
@@ -29,17 +31,6 @@ final class ProposalBuilderMenuItemData extends Equatable {
         currentIteration,
         canPublish,
       ];
-
-  ProposalBuilderMenuColors? colors(BuildContext context) {
-    if (!canPublish && _publishActions.contains(action)) {
-      return (
-        background: Theme.of(context).colorScheme.errorContainer,
-        foreground: Theme.of(context).colorScheme.onErrorContainer,
-      );
-    }
-
-    return null;
-  }
 
   String? description(BuildContext context) {
     return action.description(context, currentIteration: currentIteration);

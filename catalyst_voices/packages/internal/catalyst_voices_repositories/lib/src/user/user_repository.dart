@@ -28,6 +28,7 @@ abstract interface class UserRepository {
 
   Future<User> getUser();
 
+  /// Throws [EmailAlreadyUsedException] if [email] already taken.
   Future<void> publishUserProfile({
     required CatalystId catalystId,
     required String email,
@@ -91,14 +92,18 @@ final class UserRepositoryImpl implements UserRepository {
     required CatalystId catalystId,
     required String email,
   }) async {
-    await _apiServices.reviews
-        .apiCatalystIdsMePost(
-          body: CatalystIDCreate(
-            catalystIdUri: catalystId.toUri().toStringWithoutScheme(),
-            email: email,
-          ),
-        )
-        .successBodyOrThrow();
+    try {
+      await _apiServices.reviews
+          .apiCatalystIdsMePost(
+            body: CatalystIDCreate(
+              catalystIdUri: catalystId.toUri().toStringWithoutScheme(),
+              email: email,
+            ),
+          )
+          .successBodyOrThrow();
+    } on ResourceConflictException {
+      throw const EmailAlreadyUsedException();
+    }
   }
 
   @override

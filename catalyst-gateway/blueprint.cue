@@ -15,7 +15,7 @@ project: {
 		bundle: {
 			modules: main: {
 				name:    "app"
-				version: "0.6.0"
+				version: "0.10.0"
 				values: {
 					deployment: {
 						containers: gateway: {
@@ -123,8 +123,14 @@ project: {
 							}
 							port: 3030
 							probes: {
-								liveness: path:  "/api/v1/health/live"
-								readiness: path: "/api/v1/health/ready"
+								liveness: {
+									path: "/api/v1/health/live"
+									port: 3030
+								}
+								readiness: {
+									path: "/api/v1/health/ready"
+									port: 3030
+								}
 							}
 							mounts: data: {
 								ref: volume: name: "data"
@@ -214,10 +220,33 @@ project: {
 						}
 					}
 
-					dns: subdomain: "gateway"
-					route: rules: [{
-						matchPrefix: "/"
-					}]
+					dns: {
+						createEndpoint: false
+						subdomain:      "app"
+					}
+					route: {
+						hostnames: ["reviews"]
+						rules: [{
+							matches: [{
+								path: {
+									type:  "PathPrefix"
+									value: "/api/gateway"
+								}
+							}]
+							filters: [{
+								type: "URLRewrite"
+								urlRewrite: {
+									path: {
+										type:               "ReplacePrefixMatch"
+										replacePrefixMatch: "/api"
+									}
+								}
+							}]
+							target: {
+								port: 3030
+							}
+						}]
+					}
 
 					secrets: {
 						db: {
@@ -236,8 +265,10 @@ project: {
 					}
 
 					service: {
-						port: 80
-						scrape: {}
+						ports: {
+							port: 80
+						}
+						scrape: false
 					}
 
 					volumes: data: {
