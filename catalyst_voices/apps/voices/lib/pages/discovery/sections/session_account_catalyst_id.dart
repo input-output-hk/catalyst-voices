@@ -3,8 +3,8 @@ import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 
-class SessionAccountPopupCatalystId extends StatelessWidget {
-  const SessionAccountPopupCatalystId({super.key});
+class SessionAccountCatalystId extends StatelessWidget {
+  const SessionAccountCatalystId({super.key});
 
   @override
   Widget build(BuildContext context) {

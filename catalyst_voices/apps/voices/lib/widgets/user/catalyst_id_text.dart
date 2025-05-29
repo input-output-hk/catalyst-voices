@@ -1,8 +1,11 @@
 import 'dart:async';
 
+import 'package:catalyst_voices/common/ext/build_context_ext.dart';
+import 'package:catalyst_voices/widgets/common/affix_decorator.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
+import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
@@ -14,7 +17,10 @@ class CatalystIdText extends StatefulWidget {
   final CatalystId data;
   final bool isCompact;
   final bool showCopy;
+  final bool showLabel;
   final TextStyle? style;
+  final TextStyle? labelStyle;
+  final double labelGap;
   final Color? backgroundColor;
 
   const CatalystIdText(
@@ -22,7 +28,10 @@ class CatalystIdText extends StatefulWidget {
     super.key,
     required this.isCompact,
     this.showCopy = true,
+    this.showLabel = false,
     this.style,
+    this.labelStyle,
+    this.labelGap = 6,
     this.backgroundColor,
   });
 
@@ -40,36 +49,40 @@ class _CatalystIdTextState extends State<CatalystIdText> {
 
   @override
   Widget build(BuildContext context) {
-    return Offstage(
-      offstage: _effectiveData.isEmpty,
-      child: _TapDetector(
-        onTap: _copyDataToClipboard,
-        onHoverExit: _handleHoverExit,
-        child: TooltipVisibility(
-          visible: _tooltipVisible,
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Flexible(
-                child: VoicesPlainTooltip(
-                  message: _fullDataAsString,
-                  // Do not constraint width.
-                  constraints: const BoxConstraints(),
-                  child: _Chip(
-                    _effectiveData,
-                    onTap: _copyDataToClipboard,
-                    style: widget.style,
-                    backgroundColor: widget.backgroundColor,
+    return AffixDecorator(
+      prefix: widget.showLabel ? _LabelText(style: widget.labelStyle) : null,
+      gap: widget.labelGap,
+      child: Offstage(
+        offstage: _effectiveData.isEmpty,
+        child: _TapDetector(
+          onTap: _copyDataToClipboard,
+          onHoverExit: _handleHoverExit,
+          child: TooltipVisibility(
+            visible: _tooltipVisible,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Flexible(
+                  child: VoicesPlainTooltip(
+                    message: _fullDataAsString,
+                    // Do not constraint width.
+                    constraints: const BoxConstraints(),
+                    child: _Chip(
+                      _effectiveData,
+                      onTap: _copyDataToClipboard,
+                      style: widget.style,
+                      backgroundColor: widget.backgroundColor,
+                    ),
                   ),
                 ),
-              ),
-              if (widget.showCopy) ...[
-                const SizedBox(width: 6),
-                _Copy(
-                  showCheck: _highlightCopied,
-                ),
+                if (widget.showCopy) ...[
+                  const SizedBox(width: 6),
+                  _Copy(
+                    showCheck: _highlightCopied,
+                  ),
+                ],
               ],
-            ],
+            ),
           ),
         ),
       ),
@@ -227,6 +240,26 @@ class _Copy extends StatelessWidget {
     return CatalystSvgIcon.asset(
       asset.path,
       color: color,
+    );
+  }
+}
+
+class _LabelText extends StatelessWidget {
+  final TextStyle? style;
+
+  const _LabelText({
+    this.style,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final effectiveStyle = (context.textTheme.bodyMedium ?? const TextStyle())
+        .merge(style)
+        .copyWith(color: context.colors.textOnPrimaryLevel0);
+
+    return Text(
+      '${context.l10n.catalystId}:',
+      style: effectiveStyle,
     );
   }
 }

@@ -1,10 +1,10 @@
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
-class SessionAccountPopupCatalystId extends StatelessWidget {
-  const SessionAccountPopupCatalystId({super.key});
+class SessionAccountDrawerCatalystId extends StatelessWidget {
+  const SessionAccountDrawerCatalystId({super.key});
 
   @override
   Widget build(BuildContext context) {
