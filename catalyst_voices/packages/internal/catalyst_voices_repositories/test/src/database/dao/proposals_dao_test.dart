@@ -667,6 +667,7 @@ void main() {
           ];
           const request = PageRequest(page: 0, size: 10);
           const filters = ProposalsFilters();
+          const order = Alphabetical();
 
           final expectedRefs = [
             latestRef,
@@ -680,6 +681,7 @@ void main() {
           final page = await database.proposalsDao.queryProposalsPage(
             request: request,
             filters: filters,
+            order: order,
           );
 
           expect(page.items.length, 2);
@@ -714,6 +716,7 @@ void main() {
             );
           });
           const filters = ProposalsFilters();
+          const order = Alphabetical();
 
           // When
           await database.documentsDao.saveAll([...templates, ...proposals]);
@@ -723,6 +726,7 @@ void main() {
           final pageZero = await database.proposalsDao.queryProposalsPage(
             request: firstRequest,
             filters: filters,
+            order: order,
           );
 
           expect(pageZero.page, 0);
@@ -734,6 +738,7 @@ void main() {
           final pageOne = await database.proposalsDao.queryProposalsPage(
             request: secondRequest,
             filters: filters,
+            order: order,
           );
 
           expect(pageOne.page, 1);
@@ -783,6 +788,7 @@ void main() {
               proposals.sublist(0, 3).map((proposal) => proposal.document.ref).toList();
 
           final filters = ProposalsFilters(category: categoryId);
+          const order = Alphabetical();
 
           // When
           await database.documentsDao.saveAll([...templates, ...proposals]);
@@ -792,6 +798,7 @@ void main() {
           final page = await database.proposalsDao.queryProposalsPage(
             request: request,
             filters: filters,
+            order: order,
           );
 
           expect(page.page, 0);
@@ -848,6 +855,7 @@ void main() {
           ];
 
           const filters = ProposalsFilters(type: ProposalsFilterType.finals);
+          const order = Alphabetical();
 
           // When
           await database.documentsDao.saveAll([
@@ -861,6 +869,7 @@ void main() {
           final page = await database.proposalsDao.queryProposalsPage(
             request: request,
             filters: filters,
+            order: order,
           );
 
           expect(page.page, 0);
@@ -918,6 +927,7 @@ void main() {
           ];
 
           const filters = ProposalsFilters(type: ProposalsFilterType.finals);
+          const order = Alphabetical();
 
           // When
           await database.documentsDao.saveAll([
@@ -931,6 +941,7 @@ void main() {
           final page = await database.proposalsDao.queryProposalsPage(
             request: request,
             filters: filters,
+            order: order,
           );
 
           expect(page.page, 0);
@@ -990,6 +1001,7 @@ void main() {
           ];
 
           const filters = ProposalsFilters();
+          const order = Alphabetical();
 
           // When
           await database.documentsDao.saveAll([
@@ -1004,6 +1016,7 @@ void main() {
           final page = await database.proposalsDao.queryProposalsPage(
             request: request,
             filters: filters,
+            order: order,
           );
 
           expect(page.page, 0);
@@ -1063,6 +1076,7 @@ void main() {
           final comments = <DocumentEntityWithMetadata>[];
 
           final filters = ProposalsFilters(searchQuery: searchQuery);
+          const order = Alphabetical();
 
           // When
           await database.documentsDao.saveAll([
@@ -1077,6 +1091,7 @@ void main() {
           final page = await database.proposalsDao.queryProposalsPage(
             request: request,
             filters: filters,
+            order: order,
           );
 
           expect(page.page, 0);
@@ -1130,6 +1145,7 @@ void main() {
           final comments = <DocumentEntityWithMetadata>[];
 
           const filters = ProposalsFilters();
+          const order = Alphabetical();
 
           // When
           await database.documentsDao.saveAll([
@@ -1144,6 +1160,7 @@ void main() {
           final page = await database.proposalsDao.queryProposalsPage(
             request: request,
             filters: filters,
+            order: order,
           );
 
           expect(page.page, 0);
@@ -1156,6 +1173,16 @@ void main() {
         },
         onPlatform: driftOnPlatforms,
       );
+
+      test('order alphabetical works against title', () {}, skip: true);
+
+      test('order budget asc works against content path', () {}, skip: true);
+
+      test('order budget desc works against content path', () {}, skip: true);
+
+      test('order updateDate asc works against content path', () {}, skip: true);
+
+      test('order updateDate desc works against content path', () {}, skip: true);
     });
     group('queryProposals', () {
       test(

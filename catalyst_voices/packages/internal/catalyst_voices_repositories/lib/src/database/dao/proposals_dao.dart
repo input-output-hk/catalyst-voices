@@ -67,7 +67,7 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
           proposal.metadata.jsonExtract(r'$.categoryId').isNotNull(),
         ]),
       )
-      ..orderBy([OrderingTerm.asc(proposal.verHi)]);
+      ..orderBy([OrderingTerm.desc(proposal.verHi)]);
 
     if (categoryRef != null) {
       mainQuery.where(proposal.metadata.isCategory(categoryRef));
@@ -112,6 +112,7 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
   Future<Page<JoinedProposalEntity>> queryProposalsPage({
     required PageRequest request,
     required ProposalsFilters filters,
+    required ProposalsOrder order,
   }) async {
     final author = filters.author;
     final searchQuery = filters.searchQuery;
@@ -150,7 +151,7 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
           proposal.metadata.jsonExtract(r'$.categoryId').isNotNull(),
         ]),
       )
-      ..orderBy([OrderingTerm.asc(proposal.verHi)])
+      ..orderBy(order.terms(proposal))
       ..limit(request.size, offset: request.page * request.size);
 
     final ids = await _getFilterTypeIds(filters.type);
@@ -232,14 +233,15 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
   Stream<Page<JoinedProposalEntity>> watchProposalsPage({
     required PageRequest request,
     required ProposalsFilters filters,
+    required ProposalsOrder order,
   }) async* {
-    yield await queryProposalsPage(request: request, filters: filters);
+    yield await queryProposalsPage(request: request, filters: filters, order: order);
 
     yield* connection.streamQueries
         .updatesForSync(TableUpdateQuery.onAllTables([documents, documentsFavorites]))
         .debounceTime(const Duration(milliseconds: 10))
         .asyncMap((event) {
-      return queryProposalsPage(request: request, filters: filters);
+      return queryProposalsPage(request: request, filters: filters, order: order);
     });
   }
 
@@ -621,6 +623,7 @@ abstract interface class ProposalsDao {
   Future<Page<JoinedProposalEntity>> queryProposalsPage({
     required PageRequest request,
     required ProposalsFilters filters,
+    required ProposalsOrder order,
   });
 
   Stream<ProposalsCount> watchCount({
@@ -630,6 +633,7 @@ abstract interface class ProposalsDao {
   Stream<Page<JoinedProposalEntity>> watchProposalsPage({
     required PageRequest request,
     required ProposalsFilters filters,
+    required ProposalsOrder order,
   });
 }
 
@@ -680,5 +684,30 @@ extension on TypedResult {
     final ver = UuidHiLo(high: verHiLo.$1, low: verHiLo.$2).uuid;
 
     return SignedDocumentRef(id: id, version: ver);
+  }
+}
+
+extension on ProposalsOrder {
+  List<OrderingTerm> terms($DocumentsTable table) {
+    return switch (this) {
+      Alphabetical() => [
+          OrderingTerm.desc(table.content.title, nulls: NullsOrder.last),
+          OrderingTerm.desc(table.verHi),
+        ],
+      Budget(:final isAscending) => [
+          OrderingTerm(
+            expression: table.content.requestedFunds,
+            mode: isAscending ? OrderingMode.asc : OrderingMode.desc,
+            nulls: NullsOrder.last,
+          ),
+          OrderingTerm.desc(table.verHi),
+        ],
+      UpdateDate(:final isAscending) => [
+          OrderingTerm(
+            expression: table.verHi,
+            mode: isAscending ? OrderingMode.asc : OrderingMode.desc,
+          ),
+        ],
+    };
   }
 }

@@ -100,6 +100,7 @@ final class ProposalsCubit extends Cubit<ProposalsState>
       final page = await _proposalService.getProposalsPage(
         request: request,
         filters: _cache.filters,
+        order: const UpdateDate(isAscending: false),
       );
 
       _cache = _cache.copyWith(page: Optional(page));

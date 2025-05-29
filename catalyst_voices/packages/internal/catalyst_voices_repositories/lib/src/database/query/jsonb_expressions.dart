@@ -35,6 +35,10 @@ final class ContainsTitle extends CustomExpression<bool> {
 }
 
 extension ContentColumnExt on GeneratedColumnWithTypeConverter<DocumentDataContent, Uint8List> {
+  Expression<int> get requestedFunds => jsonExtract(r'$.summary.budget.requestedFunds');
+
+  Expression<String> get title => jsonExtract(r'$.setup.title.title');
+
   Expression<bool> hasTitle(String query) => ContainsTitle(query: query);
 }
 
