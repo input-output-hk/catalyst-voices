@@ -58,11 +58,13 @@ class _GuidanceCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 12),
-          Text(
-            item.sectionTitle,
-            style: theme.textTheme.titleSmall?.copyWith(color: theme.colors.textOnPrimaryLevel1),
-          ),
-          const SizedBox(height: 10),
+          if (item.sectionTitle.isNotEmpty) ...[
+            Text(
+              item.sectionTitle,
+              style: theme.textTheme.titleSmall?.copyWith(color: theme.colors.textOnPrimaryLevel1),
+            ),
+            const SizedBox(height: 10),
+          ],
           MarkdownText(item.description),
         ],
       ),
