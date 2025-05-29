@@ -36,9 +36,10 @@ class ProposalBuilderValidationSnackbarOverlay extends StatelessWidget {
                   child: ConstrainedBox(
                     constraints: BoxConstraints(
                       maxWidth: VoicesSnackBar.calculateSnackBarWidth(
-                        behavior: SnackBarBehavior.floating,
-                        screenWidth: MediaQuery.sizeOf(context).width,
-                      ),
+                            behavior: SnackBarBehavior.floating,
+                            screenWidth: MediaQuery.sizeOf(context).width,
+                          ) ??
+                          double.infinity,
                     ),
                     child: _SnackbarStatusSelector(validationErrors: state),
                   ),
