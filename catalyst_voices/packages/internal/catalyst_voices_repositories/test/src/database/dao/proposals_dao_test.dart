@@ -1179,6 +1179,7 @@ void main() {
       test(
         'order alphabetical works against title',
         () async {
+          // Given
           final templateRef = SignedDocumentRef.generateFirstRef();
           const titles = [
             'Abc',
@@ -1232,6 +1233,7 @@ void main() {
       test(
         'order budget asc works against content path',
         () async {
+          // Given
           final templateRef = SignedDocumentRef.generateFirstRef();
           const budgets = [
             Coin.fromWholeAda(100000),
@@ -1286,6 +1288,7 @@ void main() {
       test(
         'order budget desc works against content path',
         () async {
+          // Given
           final templateRef = SignedDocumentRef.generateFirstRef();
           const budgets = [
             Coin.fromWholeAda(200000),
@@ -1340,6 +1343,7 @@ void main() {
       test(
         'order updateDate asc works against content path',
         () async {
+          // Given
           final templateRef = SignedDocumentRef.generateFirstRef();
           final dates = [
             DateTime.utc(2025, 5, 10),
@@ -1394,6 +1398,7 @@ void main() {
       test(
         'order updateDate desc works against content path',
         () async {
+          // Given
           final templateRef = SignedDocumentRef.generateFirstRef();
           final dates = [
             DateTime.utc(2025, 5, 29),
@@ -1441,6 +1446,72 @@ void main() {
               .toList();
 
           expect(proposalsDates, containsAllInOrder(dates));
+        },
+        onPlatform: driftOnPlatforms,
+      );
+
+      test(
+        'latest version value is one ordered against',
+        () async {
+          // Given
+          final templateRef = SignedDocumentRef.generateFirstRef();
+          final proposalRef = SignedDocumentRef.first(_buildUuidAt(DateTime.utc(2025, 5, 10)));
+          final latestProposalRef = proposalRef.copyWith(
+            version: Optional(_buildUuidAt(DateTime.utc(2025, 5, 29))),
+          );
+
+          const expectedBudgets = [
+            Coin.fromWholeAda(30000),
+            Coin.fromWholeAda(2000),
+          ];
+          final refsBudgets = <SignedDocumentRef, Coin>{
+            proposalRef: const Coin.fromWholeAda(10000),
+            latestProposalRef: expectedBudgets[0],
+            SignedDocumentRef.generateFirstRef(): expectedBudgets[1],
+          };
+
+          final templates = [
+            _buildProposalTemplate(selfRef: templateRef),
+          ];
+
+          final proposals = refsBudgets.entries.map(
+            (entity) {
+              return _buildProposal(
+                selfRef: entity.key,
+                template: templateRef,
+                requestedFunds: entity.value,
+              );
+            },
+          ).shuffled();
+
+          final actions = <DocumentEntityWithMetadata>[];
+          final comments = <DocumentEntityWithMetadata>[];
+
+          const filters = ProposalsFilters();
+          const order = Budget(isAscending: false);
+
+          // When
+          await database.documentsDao.saveAll([
+            ...templates,
+            ...proposals,
+            ...actions,
+            ...comments,
+          ]);
+
+          // Then
+          const request = PageRequest(page: 0, size: 25);
+          final page = await database.proposalsDao.queryProposalsPage(
+            request: request,
+            filters: filters,
+            order: order,
+          );
+
+          expect(page.page, 0);
+
+          final proposalsBudgets =
+              page.items.map((e) => e.proposal.content.requestedFunds).toList();
+
+          expect(proposalsBudgets, containsAllInOrder(expectedBudgets));
         },
         onPlatform: driftOnPlatforms,
       );
@@ -1828,9 +1899,12 @@ DocumentEntityWithMetadata _buildProposalTemplate({
 }
 
 SignedDocumentRef _buildRefAt(DateTime dateTime) {
+  return SignedDocumentRef.first(_buildUuidAt(dateTime));
+}
+
+String _buildUuidAt(DateTime dateTime) {
   final config = V7Options(dateTime.millisecondsSinceEpoch, null);
-  final val = const Uuid().v7(config: config);
-  return SignedDocumentRef.first(val);
+  return const Uuid().v7(config: config);
 }
 
 extension on DocumentEntity {
