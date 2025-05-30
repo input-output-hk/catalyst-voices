@@ -33,7 +33,7 @@ class _ProposalsLatestUpdated extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return VoicesGestureDetector(
       onTap: () {
         context
             .read<ProposalsCubit>()

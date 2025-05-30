@@ -27,6 +27,8 @@ class FilterByDropdown<T> extends StatelessWidget {
     this.value,
   });
 
+  bool get isEnabled => onChanged != null;
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -39,40 +41,45 @@ class FilterByDropdown<T> extends StatelessWidget {
           )
         : InputBorder.none;
 
-    return DropdownMenu<T?>(
-      dropdownMenuEntries: [
-        if (insertByAll)
-          VoicesDropdownMenuEntry<T?>(
-            value: null,
-            label: context.l10n.all,
-            context: context,
-          ),
-        ...items,
-      ],
-      onSelected: onChanged,
-      initialSelection: value,
-      enableSearch: false,
-      requestFocusOnTap: false,
-      inputDecorationTheme: InputDecorationTheme(
-        isDense: true,
-        contentPadding: EdgeInsets.zero,
-        border: border,
-        enabledBorder: border,
-        focusedBorder: border,
-        iconColor: foregroundColor,
-        prefixIconColor: foregroundColor,
-        prefixIconConstraints: BoxConstraints.tight(const Size.square(18)),
-        suffixIconColor: foregroundColor,
+    return Opacity(
+      opacity: isEnabled ? 1.0 : 0.3,
+      child: DropdownMenu<T?>(
+        dropdownMenuEntries: [
+          if (insertByAll)
+            VoicesDropdownMenuEntry<T?>(
+              value: null,
+              label: context.l10n.all,
+              context: context,
+            ),
+          ...items,
+        ],
+        onSelected: onChanged,
+        initialSelection: value,
+        enableSearch: false,
+        requestFocusOnTap: false,
+        enabled: isEnabled,
+        inputDecorationTheme: InputDecorationTheme(
+          isDense: true,
+          contentPadding: EdgeInsets.zero,
+          border: border,
+          enabledBorder: border,
+          focusedBorder: border,
+          iconColor: foregroundColor,
+          prefixIconColor: foregroundColor,
+          prefixIconConstraints: BoxConstraints.tight(const Size.square(18)),
+          suffixIconColor: foregroundColor,
+        ),
+        menuStyle: MenuStyle(
+          padding: WidgetStateProperty.all(EdgeInsets.zero),
+          visualDensity: VisualDensity.compact,
+        ),
+        leadingIcon: leadingIcon,
+        trailingIcon: VoicesAssets.icons.chevronDown.buildIcon(),
+        selectedTrailingIcon: VoicesAssets.icons.chevronUp.buildIcon(),
+        textAlign: TextAlign.end,
+        textStyle:
+            (theme.textTheme.labelLarge ?? const TextStyle()).copyWith(color: foregroundColor),
       ),
-      menuStyle: MenuStyle(
-        padding: WidgetStateProperty.all(EdgeInsets.zero),
-        visualDensity: VisualDensity.compact,
-      ),
-      leadingIcon: leadingIcon,
-      trailingIcon: VoicesAssets.icons.chevronDown.buildIcon(),
-      selectedTrailingIcon: VoicesAssets.icons.chevronUp.buildIcon(),
-      textAlign: TextAlign.end,
-      textStyle: (theme.textTheme.labelLarge ?? const TextStyle()).copyWith(color: foregroundColor),
     );
   }
 }
