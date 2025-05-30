@@ -9,6 +9,7 @@ import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -29,11 +30,11 @@ final class Dependencies extends DependencyProvider {
   }
 
   Future<void> init({
-    required AppConfig config,
+    required AppEnvironment environment,
   }) async {
     DependencyProvider.instance = this;
 
-    registerSingleton<AppConfig>(config);
+    registerSingleton<AppEnvironment>(environment);
 
     _registerStorages();
     _registerUtils();
@@ -43,6 +44,15 @@ final class Dependencies extends DependencyProvider {
     _registerBlocsWithDependencies();
 
     _isInitialized = true;
+  }
+
+  void registerConfig(AppConfig config) {
+    if (isRegistered<AppConfig>()) {
+      if (kDebugMode) {
+        print('AppConfig already registered!');
+      }
+    }
+    registerSingleton<AppConfig>(config);
   }
 
   void _registerBlocsWithDependencies() {
@@ -155,6 +165,7 @@ final class Dependencies extends DependencyProvider {
       ..registerFactory<DevToolsBloc>(() {
         return DevToolsBloc(
           get<DevToolsService>(),
+          get<SyncManager>(),
         );
       });
   }
@@ -162,7 +173,7 @@ final class Dependencies extends DependencyProvider {
   void _registerNetwork() {
     registerLazySingleton<ApiServices>(() {
       return ApiServices(
-        config: get<AppConfig>().api,
+        env: get<AppEnvironment>().type,
         authTokenProvider: get<AuthTokenProvider>(),
       );
     });
@@ -206,7 +217,6 @@ final class Dependencies extends DependencyProvider {
         );
       })
       ..registerLazySingleton<CampaignRepository>(CampaignRepository.new)
-      ..registerLazySingleton<ConfigRepository>(ConfigRepository.new)
       ..registerLazySingleton<DocumentRepository>(() {
         return DocumentRepository(
           get<DatabaseDraftsDataSource>(),
@@ -334,6 +344,8 @@ final class Dependencies extends DependencyProvider {
     registerLazySingleton<DevToolsService>(() {
       return DevToolsService(
         get<DevToolsRepository>(),
+        get<SyncStatsStorage>(),
+        get<AppEnvironment>(),
         get<AppConfig>(),
       );
     });
@@ -369,12 +381,21 @@ final class Dependencies extends DependencyProvider {
         sharedPreferences: get<SharedPreferencesAsync>(),
       );
     });
+    registerLazySingleton<SyncStatsStorage>(
+      () {
+        return SyncStatsLocalStorage(
+          sharedPreferences: get<SharedPreferencesAsync>(),
+        );
+      },
+      dispose: (storage) async => storage.dispose(),
+    );
   }
 
   void _registerUtils() {
     registerLazySingleton<SyncManager>(
       () {
         return SyncManager(
+          get<SyncStatsStorage>(),
           get<DocumentsService>(),
         );
       },
