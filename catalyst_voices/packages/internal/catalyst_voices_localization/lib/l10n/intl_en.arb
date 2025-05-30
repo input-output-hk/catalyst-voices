@@ -13,9 +13,21 @@
   "@emailErrorText": {
     "description": "Text shown in email field when input is invalid"
   },
+  "resumeButtonText": "Resume",
+  "@resumeButtonText": {
+    "description": "Text shown in resume button"
+  },
+  "startButtonText": "Start",
+  "@startButtonText": {
+    "description": "Text shown in start button"
+  },
   "cancelButtonText": "Cancel",
   "@cancelButtonText": {
     "description": "Text shown in cancel button"
+  },
+  "exitButtonText": "Exit",
+  "@exitButtonText": {
+    "description": "Text shown in exit button"
   },
   "editButtonText": "Edit",
   "@editButtonText": {
@@ -1464,6 +1476,22 @@
   "@headsUp": {
     "description": "In context for important information below"
   },
+  "shareNewDraft": "Share new draft",
+  "@shareNewDraft": {
+    "description": "In context of sharing proposal for public feedback."
+  },
+  "submitForReview": "Submit for review",
+  "@submitForReview": {
+    "description": "In context of submitting proposal for review."
+  },
+  "showAllIssues": "Show all issues",
+  "@showAllIssues": {
+    "description": "Action to display a full list of issues."
+  },
+  "hideAllIssues": "Hide all issues",
+  "@hideAllIssues": {
+    "description": "Action to hide the full list of issues."
+  },
   "errorEmailValidationPattern": "Incorrect email pattern",
   "errorEmailValidationOutOfRange": "Invalid length",
   "errorEmailAlreadyInUseUpdateLater": "This email address is already in use. You can update your email later from your account settings.",
@@ -1640,9 +1668,55 @@
   "@proposalOptions": {
     "description": "Actions related to a proposal like publishing, sharing, exporting, etc."
   },
-  "proposalEditorValidationSnackbar": "Fix the following input errors",
-  "@proposalEditorValidationSnackbar": {
-    "description": "Snackbar title shown when user tries to save a proposal with errors."
+  "proposalEditorValidationErrorShareDraftTitle": "To share new draft, resolve {count} form {count, plural, =0{issues} =1{issue} other{issues}}.",
+  "@proposalEditorValidationErrorShareDraftTitle": {
+    "description": "Snackbar title shown when user tries to share proposal draft with errors.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "proposalEditorValidationErrorSubmitReviewTitle": "To submit For Review, resolve {count} {count, plural, =0{issues} =1{issue} other{issues}}.",
+  "@proposalEditorValidationErrorSubmitReviewTitle": {
+    "description": "Snackbar title shown when user tries to submit for review a proposal with errors.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "proposalEditorValidationErrorClearedTitle": "Issues cleared",
+  "@proposalEditorValidationErrorClearedTitle": {
+    "description": "Snackbar title shown when user resolves all validation issues."
+  },
+  "proposalEditorValidationErrorShareDraftNotStartedMessage": "In the next step, you'll see the issues that need to be resolved before publishing your draft.",
+  "@proposalEditorValidationErrorShareDraftNotStartedMessage": {
+    "description": "Snackbar message shown when user tries to share proposal draft with errors."
+  },
+  "proposalEditorValidationErrorSubmitReviewNotStartedMessage": "In the next step, you'll see the issues that need to be resolved before publishing your final.",
+  "@proposalEditorValidationErrorSubmitReviewNotStartedMessage": {
+    "description": "Snackbar message shown when user tries to submit for review a proposal with errors."
+  },
+  "proposalEditorValidationErrorInProgressMessage": "Please review the sections highlighted in red and correct them to continue.",
+  "@proposalEditorValidationErrorInProgressMessage": {
+    "description": "Snackbar message shown when user tries to share proposal draft / submit for review with errors."
+  },
+  "proposalEditorValidationErrorShareDraftClearedMessage": "Please proceed sharing your draft for feedback.",
+  "@proposalEditorValidationErrorShareDraftClearedMessage": {
+    "description": "Snackbar message shown when user resolves all validation issues (after trying to share draft)."
+  },
+  "proposalEditorValidationErrorSubmitReviewClearedMessage": "Please proceed sharing your final for review.",
+  "@proposalEditorValidationErrorSubmitReviewClearedMessage": {
+    "description": "Snackbar message shown when user resolves all validation issues (after trying to share draft)."
+  },
+  "proposalEditorValidationExitDialogTitle": "Exit form issue mode?",
+  "@proposalEditorValidationExitDialogTitle": {
+    "description": "Title in a dialog asking if the user wants to leave the form issue mode."
+  },
+  "proposalEditorValidationExitDialogMessage": "When you exit, any unsaved changes will be lost.",
+  "@proposalEditorValidationExitDialogMessage": {
+    "description": "Message in a dialog asking if the user wants to leave the form issue mode."
   },
   "proposalEditorDeleteDialogTitle": "Delete Proposal?",
   "@proposalEditorDeleteDialogTitle": {
@@ -2153,6 +2227,10 @@
   "apiErrorServiceUnavailable": "Service Unavailable",
   "@apiErrorServiceUnavailable": {
     "description": "Message of an error when api returns matching status code."
+  },
+  "apiErrorMalformedBody": "Can not process response body",
+  "@apiErrorMalformedBody": {
+    "description": "Generic message when any endpoint response is different from expected and can not be processed"
   },
   "degradeFinalToDraftProposal": "You remove this proposal from review/voting stage.",
   "@degradeFinalToDraftProposal": {
@@ -2739,5 +2817,47 @@
   "devToolsTapsLeftToEnableMessage": "Keep on tapping",
   "@devToolsTapsLeftToEnableMessage": {
     "description": "Explanation text"
+  },
+  "createProposalInCategory": "Create Proposal in {category}",
+  "@createProposalInCategory": {
+    "description": "Title of the dialog for creating a proposal in a specific category",
+    "placeholders": {
+      "category": {
+        "type": "String"
+      }
+    }
+  },
+  "enterTitle": "Enter title",
+  "@enterTitle": {
+    "description": "CTA text for the title input field"
+  },
+
+  "proposalTitleShortDescription": "A strong proposal title can really set the tone and capture attention. ",
+  "@proposalTitleShortDescription": {
+    "description": "Short description for the title input field"
+  },
+  "agreementCantChangeCategory": "I understand that I can’t change my category selection in Fund14.",
+  "@agreementCantChangeCategory": {
+    "description": "Text for the agreement checkbox that explains that user can't change category selection in Fund14"
+  },
+  "agreementFitToCategoryCriteria": "I understand the category brief and will make sure my proposal fits the criteria.",
+  "@agreementFitToCategoryCriteria": {
+    "description": "Text for the agreement checkbox that explains that user understands the category brief and will make sure their proposal fits the criteria"
+  },
+  "categorySelectionDescription": "Choose Wisely! Review the category and its rules carefully as this can’t be changed after you make a selection. To switch, you’ll need to start a new proposal.",
+  "@categorySelectionDescription": {
+    "description": "Text for the category selection description in new proposal dialog"
+  },
+  "selectCategory": "Select Category",
+  "@selectCategory": {
+    "description": "Text for the select category button in new proposal dialog"
+  },
+  "selectCategoryToSeeDetailsTitle": "Select a category to check if this category is for you.",
+  "@selectCategoryToSeeDetailsTitle": {
+    "description": "Text for the select category to see details title in new proposal dialog"
+  },
+  "selectCategoryToSeeDetailsDescription": "Do keep in mind that you can’t change category\nafter starting your proposal.",
+  "@selectCategoryToSeeDetailsDescription": {
+    "description": "Text for the select category to see details description in new proposal dialog"
   }
 }
