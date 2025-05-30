@@ -2,7 +2,10 @@
 
 use std::sync::LazyLock;
 
-use prometheus::{register_histogram_vec, register_int_counter_vec, HistogramVec, IntCounterVec};
+use prometheus::{
+    register_histogram_vec, register_int_counter, register_int_counter_vec, HistogramVec,
+    IntCounter, IntCounterVec,
+};
 
 /// Labels for the metrics
 const METRIC_LABELS: [&str; 3] = ["endpoint", "method", "status_code"];
@@ -57,4 +60,10 @@ pub(crate) static CLIENT_REQUEST_COUNT: LazyLock<IntCounterVec> = LazyLock::new(
         &CLIENT_METRIC_LABELS
     )
     .unwrap()
+});
+
+/// Metric counter to track the number of HTTP 404 Not Found responses.
+/// It is use for monitoring crawler activity or requests to invalid URLs.
+pub(crate) static NOT_FOUND_COUNT: LazyLock<IntCounter> = LazyLock::new(|| {
+    register_int_counter!("response_404", "Number of 404 not found response",).unwrap()
 });
