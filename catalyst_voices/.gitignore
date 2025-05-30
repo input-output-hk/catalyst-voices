@@ -126,6 +126,9 @@ coverage/
 !.vscode/extensions.json
 !.vscode/*.code-snippets
 
+### DevContainers ###
+!.devcontainer/
+
 # Local History for Visual Studio Code
 .history/
 

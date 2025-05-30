@@ -81,6 +81,10 @@ $RECYCLE.BIN/
 !/.vscode/settings.recommended.json
 !/.vscode/tasks.recommended.json
 
+
+### DevContainers ###
+.devcontainer/
+
 # Flutter/Dart/Pub
 .dart_tool/
 .packages
@@ -128,3 +132,6 @@ browser_extensions/
 #Test report and coverage
 *.junit-report.xml
 *.coverage.info
+
+# FVM Version Cache
+.fvm/

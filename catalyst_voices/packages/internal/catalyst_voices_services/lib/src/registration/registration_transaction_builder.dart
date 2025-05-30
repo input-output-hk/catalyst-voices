@@ -184,9 +184,12 @@ final class RegistrationTransactionBuilder {
         vkeys: {},
         vkeysCount: 2,
       ),
+      changeAddress: changeAddress,
     );
 
-    final txBody = txBuilder.withChangeAddressIfNeeded(changeAddress).buildBody();
+    // coin selection to minimize UTXOs
+    final optimizedBuilder = txBuilder.applySelection();
+    final txBody = optimizedBuilder.buildBody();
 
     return Transaction(
       body: txBody,
