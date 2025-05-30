@@ -38,7 +38,7 @@ class _ProposalsOrderDropdown extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // TODO(damian-molinski): FilterByDropdown should have more customization
-    // options. Should be refactor to smth custom.
+    // options. Refactor to something custom.
     return Container(
       decoration: BoxDecoration(
         border: Border.all(color: context.colors.outlineBorderVariant),
