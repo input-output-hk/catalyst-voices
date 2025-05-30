@@ -27,23 +27,23 @@ class CreateNewProposalActionButtons extends StatelessWidget {
             _StartProposalButton(),
           ],
         ),
-      CreateProposalWithoutPreselectedCategoryStep(:final stage) => switch (stage) {
-          CreateProposalStage.selectCategory => const Row(
-              children: [
-                _AgreementCheckboxes(),
-                Spacer(),
-                _BackButton(),
-                SizedBox(width: 8),
-                _StartProposalButton(),
-              ],
-            ),
-          CreateProposalStage.setTitle => const Row(
-              children: [
-                Spacer(),
-                _SelectCategoryButton(),
-              ],
-            ),
-        },
+      CreateProposalWithoutPreselectedCategoryStep(:final stage)
+          when stage == CreateProposalStage.selectCategory =>
+        const Row(
+          children: [
+            _AgreementCheckboxes(),
+            Spacer(),
+            _BackButton(),
+            SizedBox(width: 8),
+            _StartProposalButton(),
+          ],
+        ),
+      CreateProposalWithoutPreselectedCategoryStep() => const Row(
+          children: [
+            Spacer(),
+            _SelectCategoryButton(),
+          ],
+        ),
     };
   }
 }
