@@ -2818,6 +2818,47 @@
   "@devToolsTapsLeftToEnableMessage": {
     "description": "Explanation text"
   },
+  "createProposalInCategory": "Create Proposal in {category}",
+  "@createProposalInCategory": {
+    "description": "Title of the dialog for creating a proposal in a specific category",
+    "placeholders": {
+      "category": {
+        "type": "String"
+      }
+    }
+  },
+  "enterTitle": "Enter title",
+  "@enterTitle": {
+    "description": "CTA text for the title input field"
+  },
+  "proposalTitleShortDescription": "A strong proposal title can really set the tone and capture attention. ",
+  "@proposalTitleShortDescription": {
+    "description": "Short description for the title input field"
+  },
+  "agreementCantChangeCategory": "I understand that I can’t change my category selection in Fund14.",
+  "@agreementCantChangeCategory": {
+    "description": "Text for the agreement checkbox that explains that user can't change category selection in Fund14"
+  },
+  "agreementFitToCategoryCriteria": "I understand the category brief and will make sure my proposal fits the criteria.",
+  "@agreementFitToCategoryCriteria": {
+    "description": "Text for the agreement checkbox that explains that user understands the category brief and will make sure their proposal fits the criteria"
+  },
+  "categorySelectionDescription": "Choose Wisely! Review the category and its rules carefully as this can’t be changed after you make a selection. To switch, you’ll need to start a new proposal.",
+  "@categorySelectionDescription": {
+    "description": "Text for the category selection description in new proposal dialog"
+  },
+  "selectCategory": "Select Category",
+  "@selectCategory": {
+    "description": "Text for the select category button in new proposal dialog"
+  },
+  "selectCategoryToSeeDetailsTitle": "Select a category to check if this category is for you.",
+  "@selectCategoryToSeeDetailsTitle": {
+    "description": "Text for the select category to see details title in new proposal dialog"
+  },
+  "selectCategoryToSeeDetailsDescription": "Do keep in mind that you can’t change category\nafter starting your proposal.",
+  "@selectCategoryToSeeDetailsDescription": {
+    "description": "Text for the select category to see details description in new proposal dialog"
+  },
   "proposalsLatestUpdatesHours": "Latest updates ({count}{count, plural, =1{hr} other{hrs}})",
   "@proposalsLatestUpdatesHours": {
     "description": "One of filter options for proposals. Meaning show only latest proposals.",
