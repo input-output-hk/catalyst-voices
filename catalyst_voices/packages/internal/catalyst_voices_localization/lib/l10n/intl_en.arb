@@ -2831,11 +2831,11 @@
   "@orderProposalsAlphabetical": {
     "description": "Order proposals by title option"
   },
-  "orderProposalsBudgetAsc": "Budget: highest first",
+  "orderProposalsBudgetAsc": "Budget: lowest first",
   "@orderProposalsBudgetAsc": {
     "description": "Order proposals by budget option"
   },
-  "orderProposalsBudgetDesc": "Budget: lowest first",
+  "orderProposalsBudgetDesc": "Budget: highest first",
   "@orderProposalsBudgetDesc": {
     "description": "Order proposals by budget option"
   },
