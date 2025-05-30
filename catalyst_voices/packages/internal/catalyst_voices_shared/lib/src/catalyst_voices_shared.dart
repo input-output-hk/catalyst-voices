@@ -14,7 +14,7 @@ export 'keychain/keychain.dart';
 export 'keychain/keychain_provider.dart';
 export 'keychain/vault_keychain.dart';
 export 'keychain/vault_keychain_provider.dart';
-export 'logging/logging_service.dart';
+export 'logging/logger.dart';
 export 'platform/catalyst_platform.dart';
 export 'platform_aware_builder/platform_aware_builder.dart';
 export 'range/date_range.dart';

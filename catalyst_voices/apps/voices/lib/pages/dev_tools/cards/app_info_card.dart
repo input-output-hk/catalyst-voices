@@ -1,6 +1,6 @@
+import 'package:catalyst_voices/pages/dev_tools/cards/info_card.dart';
 import 'package:catalyst_voices/pages/dev_tools/widgets/build_mode_text.dart';
 import 'package:catalyst_voices/pages/dev_tools/widgets/build_number_text.dart';
-import 'package:catalyst_voices/pages/dev_tools/widgets/info_card.dart';
 import 'package:catalyst_voices/pages/dev_tools/widgets/value_text.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';

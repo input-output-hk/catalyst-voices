@@ -29,6 +29,8 @@ abstract interface class DocumentsService {
     ValueChanged<double>? onProgress,
     int maxConcurrent,
   });
+
+  Stream<int> watchCount();
 }
 
 final class DocumentsServiceImpl implements DocumentsService {
@@ -137,5 +139,10 @@ final class DocumentsServiceImpl implements DocumentsService {
     onProgress?.call(1);
 
     return outcomes.whereType<_RefSuccess>().map((e) => e.success).toList();
+  }
+
+  @override
+  Stream<int> watchCount() {
+    return _documentRepository.watchCount();
   }
 }

@@ -1,5 +1,5 @@
+import 'package:catalyst_voices/pages/dev_tools/cards/info_card.dart';
 import 'package:catalyst_voices/pages/dev_tools/widgets/documents_count_text.dart';
-import 'package:catalyst_voices/pages/dev_tools/widgets/info_card.dart';
 import 'package:catalyst_voices/pages/dev_tools/widgets/sync_stats_text.dart';
 import 'package:catalyst_voices/pages/dev_tools/widgets/value_text.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';

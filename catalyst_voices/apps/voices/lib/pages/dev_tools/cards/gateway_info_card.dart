@@ -1,4 +1,4 @@
-import 'package:catalyst_voices/pages/dev_tools/widgets/info_card.dart';
+import 'package:catalyst_voices/pages/dev_tools/cards/info_card.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
