@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/widgets/rich_text/markdown_text.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
@@ -65,7 +66,10 @@ class _GuidanceCard extends StatelessWidget {
             ),
             const SizedBox(height: 10),
           ],
-          MarkdownText(item.description),
+          MarkdownText(
+            item.description,
+            pStyle: context.textTheme.bodyMedium,
+          ),
         ],
       ),
     );
