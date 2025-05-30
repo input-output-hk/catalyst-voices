@@ -14,12 +14,16 @@ class CreateBaseProfilePanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return switch (stage) {
-      CreateBaseProfileStage.instructions => const InstructionsPanel(),
-      CreateBaseProfileStage.setup => const SetupPanel(
-          key: Key('BaseProfileDetailsPanel'),
-        ),
-      CreateBaseProfileStage.acknowledgements => const AcknowledgementsPanel(),
-    };
+    return Semantics(
+      identifier: 'CreateBaseProfilePanel',
+      child: switch (stage) {
+        CreateBaseProfileStage.instructions => const InstructionsPanel(),
+        CreateBaseProfileStage.setup => const SetupPanel(
+            key: Key('BaseProfileDetailsPanel'),
+          ),
+        CreateBaseProfileStage.acknowledgements =>
+          const AcknowledgementsPanel(),
+      },
+    );
   }
 }

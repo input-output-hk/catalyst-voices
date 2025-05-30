@@ -52,10 +52,16 @@ class VoicesIconButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return IconButton(
-      onPressed: onTap,
-      style: (style ?? const ButtonStyle()).merge(_buildVariantStyle(context)),
-      icon: child,
+    return Semantics(
+      container: true,
+      button: true,
+      label: 'closeBtn-test',
+      child: IconButton(
+        onPressed: onTap,
+        style:
+            (style ?? const ButtonStyle()).merge(_buildVariantStyle(context)),
+        icon: child,
+      ),
     );
   }
 

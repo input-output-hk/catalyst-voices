@@ -202,10 +202,14 @@ class _Navigation extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        VoicesFilledButton(
-          key: const Key('SetUnlockPasswordButton'),
-          onTap: isNextEnabled ? () => RegistrationCubit.of(context).nextStep() : null,
-          child: Text(context.l10n.recoveryAccountDetailsAction),
+        Semantics(
+          container: true,
+          label: 'Set unlock password for this device',
+          child: VoicesFilledButton(
+            key: const Key('SetUnlockPasswordButton'),
+            onTap: isNextEnabled ? () => RegistrationCubit.of(context).nextStep() : null,
+            child: Text(context.l10n.recoveryAccountDetailsAction),
+          ),
         ),
         const SizedBox(height: 10),
         VoicesTextButton(
