@@ -7,12 +7,14 @@ class MarkdownText extends StatelessWidget with LaunchUrlMixin {
   final MarkdownData markdownData;
   final bool selectable;
   final Color? pColor;
+  final TextStyle? pStyle;
 
   const MarkdownText(
     this.markdownData, {
     super.key,
     this.selectable = true,
     this.pColor,
+    this.pStyle,
   });
 
   @override
@@ -23,7 +25,7 @@ class MarkdownText extends StatelessWidget with LaunchUrlMixin {
       data: markdownData.data,
       selectable: selectable,
       styleSheet: MarkdownStyleSheet(
-        p: pColor != null ? TextStyle(color: pColor) : null,
+        p: pStyle?.copyWith(color: pColor) ?? (pColor != null ? TextStyle(color: pColor) : null),
       ),
       onTapLink: (text, href, title) async {
         if (href != null) {
