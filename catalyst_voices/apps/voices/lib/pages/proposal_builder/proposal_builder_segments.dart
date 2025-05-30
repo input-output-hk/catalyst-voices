@@ -22,7 +22,7 @@ part 'proposal_builder_action_widgets.dart';
 part 'proposal_builder_document_widgets.dart';
 
 final DocumentPropertyActionOverrides _widgetActionOverrides = {
-  ProposalDocument.categoryDetailsNodeId: _CategoryDetailsAction(),
+  ProposalDocument.categoryDetailsNodeId: const _CategoryDetailsAction(),
 };
 
 final DocumentPropertyBuilderOverrides _widgetOverrides = {
