@@ -11,6 +11,7 @@ import 'package:catalyst_voices_repositories/src/database/table/documents.drift.
 import 'package:catalyst_voices_repositories/src/database/table/documents_favorite.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_metadata.dart';
 import 'package:catalyst_voices_repositories/src/dto/proposal/proposal_submission_action_dto.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:collection/collection.dart';
 import 'package:drift/drift.dart';
 import 'package:drift/extensions/json1.dart';
@@ -201,6 +202,15 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
     if (searchQuery != null) {
       // TODO(damian-molinski): Check if documentsMetadata can be used.
       mainQuery.where(proposal.search(searchQuery));
+    }
+
+    final maxAge = filters.maxAge;
+    if (maxAge != null) {
+      final now = DateTimeExt.now(utc: true);
+      final oldestDateTime = now.subtract(maxAge);
+      final uuid = UuidUtils.buildV7At(oldestDateTime);
+      final hiLo = UuidHiLo.from(uuid);
+      mainQuery.where(proposal.verHi.isBiggerThanValue(hiLo.high));
     }
 
     final proposals = await mainQuery
@@ -493,6 +503,15 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
     if (searchQuery != null) {
       // TODO(damian-molinski): Check if documentsMetadata can be used.
       query.where(documents.search(searchQuery));
+    }
+
+    final maxAge = filters?.maxAge;
+    if (maxAge != null) {
+      final now = DateTimeExt.now(utc: true);
+      final oldestDateTime = now.subtract(maxAge);
+      final uuid = UuidUtils.buildV7At(oldestDateTime);
+      final hiLo = UuidHiLo.from(uuid);
+      query.where(documents.verHi.isBiggerThanValue(hiLo.high));
     }
 
     return query.map((row) => row.readSelfRef(documents)).watch();
