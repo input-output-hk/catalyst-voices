@@ -393,7 +393,7 @@
                             "$ref": "#/definitions/yesNoChoice",
                             "title": "Please indicate if your proposal has been auto-translated",
                             "description": "Indicate if your proposal has been auto-translated into English from another language",
-                            "x-guidance": "Tick “YES” to remind readers that your proposal has been automatically translated and that there may be translation inaccuracies.\n\nIf you wish, you can link a document with the proposal in your native language OR provide a response in your native language after the English language in each question. \n\nTick “NO” if your proposal has not been automatically translated into English from another language.",
+                            "x-guidance": "Tick “YES” to remind readers that your proposal has been automatically translated and that there may be translation inaccuracies.\n\nIf you wish, you can link a document with the proposal in your native language. \n\nTick “NO” if your proposal has not been automatically translated into English from another language.",
                             "x-placeholder": "Select if your proposal has been auto-translated into English"
                         },
                         "originalLanguage": {
@@ -480,7 +480,6 @@
                             "title": "Describe any dependencies or write 'No dependencies'",
                             "description": "Here you should list any dependencies and prerequisites for your project's success. These are usually external factors (such as third-party suppliers, external resources, third-party software, etc.) that may cause a delay, since a project has less control over them. In case of third party software, indicate whether you have the necessary licenses and permission to use such software.",
                             "x-guidance": "If “YES”, please describe the dependencies and why you believe them essential to the project's delivery. If “NO”, please write \"No dependencies\"",
-                            "x-placeholder": "Describe any dependencies or write ‘No dependencies’.",
                             "minLength": 15,
                             "maxLength": 10240
                         }
@@ -1194,7 +1193,8 @@
                                         "title": "Project ID",
                                         "description": "Seven digit project ID from Catalyst website",
                                         "pattern": "^[0-9]{7}$",
-                                        "maxLength": 7
+                                        "maxLength": 7,
+                                        "minLength": 7
                                     }
                                 }
                             }
