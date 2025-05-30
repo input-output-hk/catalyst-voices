@@ -5,7 +5,7 @@ import 'package:formz/formz.dart';
 
 final class ProposalTitle extends FormzInput<String, ProposalTitleValidationException> {
   static const titleMinLength = 3;
-  
+
   const ProposalTitle.dirty([super.value = '']) : super.dirty();
 
   const ProposalTitle.pure([super.value = '']) : super.pure();
