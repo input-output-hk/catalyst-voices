@@ -5,6 +5,7 @@ import 'package:catalyst_voices/common/signal_handler.dart';
 import 'package:catalyst_voices/pages/proposals/widgets/proposals_controls.dart';
 import 'package:catalyst_voices/pages/proposals/widgets/proposals_header.dart';
 import 'package:catalyst_voices/pages/proposals/widgets/proposals_pagination.dart';
+import 'package:catalyst_voices/pages/proposals/widgets/proposals_sub_header.dart';
 import 'package:catalyst_voices/pages/proposals/widgets/proposals_tabs.dart';
 import 'package:catalyst_voices/pages/proposals/widgets/proposals_tabs_divider.dart';
 import 'package:catalyst_voices/routes/routes.dart';
@@ -68,7 +69,9 @@ class _ProposalsPageState extends State<ProposalsPage>
                       ),
                     ),
                     const ProposalsTabsDivider(),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 16),
+                    const ProposalsSubHeader(),
+                    const SizedBox(height: 16),
                     ProposalsPagination(controller: _pagingController),
                     const SizedBox(height: 12),
                   ],
@@ -93,6 +96,8 @@ class _ProposalsPageState extends State<ProposalsPage>
             category: Optional(widget.categoryId),
             type: widget.type ?? ProposalsFilterType.total,
           );
+
+      _doResetPagination();
     }
 
     if (widget.type != oldWidget.type) {
@@ -115,7 +120,7 @@ class _ProposalsPageState extends State<ProposalsPage>
       case ChangeFilterTypeSignal(:final type):
         _updateRoute(filterType: type);
       case ResetProposalsPaginationSignal():
-        _pagingController.notifyPageRequestListeners(0);
+        _doResetPagination();
       case ProposalsPageReadySignal(:final page):
         _pagingController.value = _pagingController.value.copyWith(
           currentPage: page.page,
@@ -148,11 +153,16 @@ class _ProposalsPageState extends State<ProposalsPage>
           onlyMyProposals: widget.myProposals,
           category: widget.categoryId,
           type: proposalsFilterType,
+          order: const Alphabetical(),
         );
 
     _pagingController
       ..addPageRequestListener(_handleProposalsPageRequest)
       ..notifyPageRequestListeners(0);
+  }
+
+  void _doResetPagination() {
+    _pagingController.notifyPageRequestListeners(0);
   }
 
   Future<void> _handleProposalsPageRequest(

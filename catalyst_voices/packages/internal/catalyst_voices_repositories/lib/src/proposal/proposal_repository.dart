@@ -40,6 +40,7 @@ abstract interface class ProposalRepository {
   Future<Page<ProposalData>> getProposalsPage({
     required PageRequest request,
     required ProposalsFilters filters,
+    required ProposalsOrder order,
   });
 
   /// Returns [ProposalTemplate] for matching [ref].
@@ -95,6 +96,7 @@ abstract interface class ProposalRepository {
   Stream<Page<ProposalData>> watchProposalsPage({
     required PageRequest request,
     required ProposalsFilters filters,
+    required ProposalsOrder order,
   });
 
   Stream<List<ProposalDocument>> watchUserProposals({
@@ -200,9 +202,10 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   Future<Page<ProposalData>> getProposalsPage({
     required PageRequest request,
     required ProposalsFilters filters,
+    required ProposalsOrder order,
   }) {
     return _proposalsLocalSource
-        .getProposalsPage(request: request, filters: filters)
+        .getProposalsPage(request: request, filters: filters, order: order)
         .then((value) => value.map(_buildProposalData));
   }
 
@@ -350,9 +353,10 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   Stream<Page<ProposalData>> watchProposalsPage({
     required PageRequest request,
     required ProposalsFilters filters,
+    required ProposalsOrder order,
   }) {
     return _proposalsLocalSource
-        .watchProposalsPage(request: request, filters: filters)
+        .watchProposalsPage(request: request, filters: filters, order: order)
         .map((value) => value.map(_buildProposalData));
   }
 

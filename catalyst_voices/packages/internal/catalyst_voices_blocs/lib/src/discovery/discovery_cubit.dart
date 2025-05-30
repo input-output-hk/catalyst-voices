@@ -143,6 +143,7 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
         .watchProposalsPage(
           request: const PageRequest(page: 0, size: _maxRecentProposalsCount),
           filters: const ProposalsFilters(),
+          order: const UpdateDate(isAscending: false),
         )
         .map((event) => event.items)
         .distinct(listEquals)

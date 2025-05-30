@@ -8,6 +8,7 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/foundation.dart';
 
+const _recentProposalsMaxAge = Duration(hours: 72);
 final _logger = Logger('ProposalsCubit');
 
 /// Manages the proposals.
@@ -27,7 +28,7 @@ final class ProposalsCubit extends Cubit<ProposalsState>
     this._userService,
     this._campaignService,
     this._proposalService,
-  ) : super(const ProposalsState()) {
+  ) : super(const ProposalsState(recentProposalsMaxAge: _recentProposalsMaxAge)) {
     _resetCache();
 
     _activeAccountIdSub = _userService.watchUser
@@ -47,7 +48,8 @@ final class ProposalsCubit extends Cubit<ProposalsState>
     Optional<SignedDocumentRef>? category,
     ProposalsFilterType? type,
     Optional<String>? searchQuery,
-    bool sendResetSignal = true,
+    bool? isRecentEnabled,
+    bool resetProposals = false,
   }) {
     final filters = _cache.filters.copyWith(
       type: type,
@@ -55,6 +57,9 @@ final class ProposalsCubit extends Cubit<ProposalsState>
       onlyAuthor: onlyMy,
       category: category,
       searchQuery: searchQuery,
+      maxAge: isRecentEnabled != null
+          ? Optional(isRecentEnabled ? _recentProposalsMaxAge : null)
+          : null,
     );
 
     if (_cache.filters == filters) {
@@ -63,11 +68,36 @@ final class ProposalsCubit extends Cubit<ProposalsState>
 
     _cache = _cache.copyWith(filters: filters);
 
+    emit(
+      state.copyWith(
+        isOrderEnabled: _cache.filters.type == ProposalsFilterType.total,
+        isRecentProposalsEnabled: _cache.filters.maxAge != null,
+      ),
+    );
+
     if (category != null) _rebuildCategories();
+    if (type != null) _rebuildOrder();
 
     _watchProposalsCount(filters: filters.toCountFilters());
 
-    if (sendResetSignal) {
+    if (resetProposals) {
+      emitSignal(const ResetProposalsPaginationSignal());
+    }
+  }
+
+  void changeOrder(
+    ProposalsOrder? order, {
+    bool resetProposals = false,
+  }) {
+    if (_cache.selectedOrder == order) {
+      return;
+    }
+
+    _cache = _cache.copyWith(selectedOrder: Optional(order));
+
+    _rebuildOrder();
+
+    if (resetProposals) {
       emitSignal(const ResetProposalsPaginationSignal());
     }
   }
@@ -97,9 +127,15 @@ final class ProposalsCubit extends Cubit<ProposalsState>
         _cache = _cache.copyWith(campaign: Optional(campaign));
       }
 
+      final filters = _cache.filters;
+      final order = _resolveEffectiveOrder();
+
+      _logger.finer('Proposals request[$request], filters[$filters], order[$order]');
+
       final page = await _proposalService.getProposalsPage(
         request: request,
-        filters: _cache.filters,
+        filters: filters,
+        order: order,
       );
 
       _cache = _cache.copyWith(page: Optional(page));
@@ -114,16 +150,14 @@ final class ProposalsCubit extends Cubit<ProposalsState>
     required bool onlyMyProposals,
     required SignedDocumentRef? category,
     required ProposalsFilterType type,
+    required ProposalsOrder order,
   }) {
     _resetCache();
+    _rebuildOrder();
     unawaited(_loadCampaignCategories());
 
-    changeFilters(
-      onlyMy: Optional(onlyMyProposals),
-      category: Optional(category),
-      type: type,
-      sendResetSignal: false,
-    );
+    changeFilters(onlyMy: Optional(onlyMyProposals), category: Optional(category), type: type);
+    changeOrder(order);
   }
 
   /// Changes the favorite status of the proposal with [ref].
@@ -236,10 +270,43 @@ final class ProposalsCubit extends Cubit<ProposalsState>
     emit(state.copyWith(categorySelectorItems: categorySelectorItems));
   }
 
+  void _rebuildOrder() {
+    final filterType = _cache.filters.type;
+    final selectedOrder = _resolveEffectiveOrder();
+
+    final options = filterType == ProposalsFilterType.total
+        ? const [
+            Alphabetical(),
+            Budget(isAscending: false),
+            Budget(isAscending: true),
+          ]
+        : const [
+            UpdateDate(isAscending: false),
+          ];
+
+    final orderItem = options
+        .map((order) => ProposalsDropdownOrderItem(order, isSelected: order == selectedOrder))
+        .toList();
+
+    emit(state.copyWith(orderItems: orderItem));
+  }
+
   void _resetCache() {
     final activeAccount = _userService.user.activeAccount;
     final filters = ProposalsFilters(author: activeAccount?.catalystId);
     _cache = ProposalsCubitCache(filters: filters);
+  }
+
+  ProposalsOrder _resolveEffectiveOrder() {
+    final filterType = _cache.filters.type;
+    final selectedOrder = _cache.selectedOrder;
+
+    // skip order for non total
+    if (filterType != ProposalsFilterType.total) {
+      return const UpdateDate(isAscending: false);
+    }
+
+    return selectedOrder ?? const Alphabetical();
   }
 
   Future<void> _updateFavoriteProposal(

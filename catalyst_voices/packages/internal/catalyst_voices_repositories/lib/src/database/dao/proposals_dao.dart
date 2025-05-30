@@ -11,6 +11,7 @@ import 'package:catalyst_voices_repositories/src/database/table/documents.drift.
 import 'package:catalyst_voices_repositories/src/database/table/documents_favorite.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_metadata.dart';
 import 'package:catalyst_voices_repositories/src/dto/proposal/proposal_submission_action_dto.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:collection/collection.dart';
 import 'package:drift/drift.dart';
 import 'package:drift/extensions/json1.dart';
@@ -112,6 +113,7 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
   Future<Page<JoinedProposalEntity>> queryProposalsPage({
     required PageRequest request,
     required ProposalsFilters filters,
+    required ProposalsOrder order,
   }) async {
     final author = filters.author;
     final searchQuery = filters.searchQuery;
@@ -150,7 +152,7 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
           proposal.metadata.jsonExtract(r'$.categoryId').isNotNull(),
         ]),
       )
-      ..orderBy([OrderingTerm.asc(proposal.verHi)])
+      ..orderBy(order.terms(proposal))
       ..limit(request.size, offset: request.page * request.size);
 
     final ids = await _getFilterTypeIds(filters.type);
@@ -202,6 +204,15 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
       mainQuery.where(proposal.search(searchQuery));
     }
 
+    final maxAge = filters.maxAge;
+    if (maxAge != null) {
+      final now = DateTimeExt.now(utc: true);
+      final oldestDateTime = now.subtract(maxAge);
+      final uuid = UuidUtils.buildV7At(oldestDateTime);
+      final hiLo = UuidHiLo.from(uuid);
+      mainQuery.where(proposal.verHi.isBiggerThanValue(hiLo.high));
+    }
+
     final proposals = await mainQuery
         .map((row) => row.readTable(proposal))
         .get()
@@ -232,14 +243,15 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
   Stream<Page<JoinedProposalEntity>> watchProposalsPage({
     required PageRequest request,
     required ProposalsFilters filters,
+    required ProposalsOrder order,
   }) async* {
-    yield await queryProposalsPage(request: request, filters: filters);
+    yield await queryProposalsPage(request: request, filters: filters, order: order);
 
     yield* connection.streamQueries
         .updatesForSync(TableUpdateQuery.onAllTables([documents, documentsFavorites]))
         .debounceTime(const Duration(milliseconds: 10))
         .asyncMap((event) {
-      return queryProposalsPage(request: request, filters: filters);
+      return queryProposalsPage(request: request, filters: filters, order: order);
     });
   }
 
@@ -493,6 +505,15 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
       query.where(documents.search(searchQuery));
     }
 
+    final maxAge = filters?.maxAge;
+    if (maxAge != null) {
+      final now = DateTimeExt.now(utc: true);
+      final oldestDateTime = now.subtract(maxAge);
+      final uuid = UuidUtils.buildV7At(oldestDateTime);
+      final hiLo = UuidHiLo.from(uuid);
+      query.where(documents.verHi.isBiggerThanValue(hiLo.high));
+    }
+
     return query.map((row) => row.readSelfRef(documents)).watch();
   }
 
@@ -621,6 +642,7 @@ abstract interface class ProposalsDao {
   Future<Page<JoinedProposalEntity>> queryProposalsPage({
     required PageRequest request,
     required ProposalsFilters filters,
+    required ProposalsOrder order,
   });
 
   Stream<ProposalsCount> watchCount({
@@ -630,6 +652,7 @@ abstract interface class ProposalsDao {
   Stream<Page<JoinedProposalEntity>> watchProposalsPage({
     required PageRequest request,
     required ProposalsFilters filters,
+    required ProposalsOrder order,
   });
 }
 
@@ -680,5 +703,30 @@ extension on TypedResult {
     final ver = UuidHiLo(high: verHiLo.$1, low: verHiLo.$2).uuid;
 
     return SignedDocumentRef(id: id, version: ver);
+  }
+}
+
+extension on ProposalsOrder {
+  List<OrderingTerm> terms($DocumentsTable table) {
+    return switch (this) {
+      Alphabetical() => [
+          OrderingTerm.asc(table.content.title, nulls: NullsOrder.last),
+          OrderingTerm.desc(table.verHi),
+        ],
+      Budget(:final isAscending) => [
+          OrderingTerm(
+            expression: table.content.requestedFunds,
+            mode: isAscending ? OrderingMode.asc : OrderingMode.desc,
+            nulls: NullsOrder.last,
+          ),
+          OrderingTerm.desc(table.verHi),
+        ],
+      UpdateDate(:final isAscending) => [
+          OrderingTerm(
+            expression: table.verHi,
+            mode: isAscending ? OrderingMode.asc : OrderingMode.desc,
+          ),
+        ],
+    };
   }
 }
