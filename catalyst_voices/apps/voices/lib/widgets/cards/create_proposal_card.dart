@@ -1,11 +1,8 @@
-import 'dart:async';
-
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
-import 'package:catalyst_voices/routes/routing/proposal_builder_route.dart';
+import 'package:catalyst_voices/widgets/buttons/create_proposal_button.dart';
 import 'package:catalyst_voices/widgets/cards/voices_leading_icon_card.dart';
 import 'package:catalyst_voices/widgets/list/category_requirements_list.dart';
 import 'package:catalyst_voices/widgets/text/day_at_time_text.dart';
-import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -54,14 +51,7 @@ class CreateProposalCard extends StatelessWidget {
           const SizedBox(height: 24),
           _SubmissionCloseAt(submissionCloseDate),
           const SizedBox(height: 24),
-          VoicesFilledButton(
-            child: Text(
-              context.l10n.startProposal,
-            ),
-            onTap: () => unawaited(
-              ProposalBuilderDraftRoute.fromRef(categoryId: categoryId).push(context),
-            ),
-          ),
+          CreateProposalButton(categoryRef: categoryId),
         ],
       ),
     );
