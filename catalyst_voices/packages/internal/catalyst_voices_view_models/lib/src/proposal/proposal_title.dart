@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:formz/formz.dart';
 
 final class ProposalTitle extends FormzInput<String, ProposalTitleValidationException> {
+  static const titleMinLength = 3;
   const ProposalTitle.dirty([super.value = '']) : super.dirty();
 
   const ProposalTitle.pure([super.value = '']) : super.pure();
@@ -12,6 +13,8 @@ final class ProposalTitle extends FormzInput<String, ProposalTitleValidationExce
   ProposalTitleValidationException? validator(String value) {
     if (value.isEmpty) {
       return const ProposalTitleEmptyValidationException();
+    } else if (value.length < titleMinLength) {
+      return const ProposalTitleMinLengthValidationException(minLength: titleMinLength);
     }
 
     return null;
@@ -24,6 +27,17 @@ final class ProposalTitleEmptyValidationException extends ProposalTitleValidatio
   @override
   String message(BuildContext context) {
     return context.l10n.errorValidationStringEmpty;
+  }
+}
+
+final class ProposalTitleMinLengthValidationException extends ProposalTitleValidationException {
+  final int minLength;
+
+  const ProposalTitleMinLengthValidationException({required this.minLength});
+
+  @override
+  String message(BuildContext context) {
+    return context.l10n.errorValidationStringLengthBelowMin(minLength);
   }
 }
 
