@@ -132,7 +132,6 @@ final class ProposalsCubit extends Cubit<ProposalsState>
 
       _logger.finer('Proposals request[$request], filters[$filters], order[$order]');
 
-      // TODO(damian-molinski): implement maxAge
       final page = await _proposalService.getProposalsPage(
         request: request,
         filters: filters,
