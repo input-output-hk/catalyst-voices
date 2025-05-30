@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/common/ext/text_editing_controller_ext.dart';
 import 'package:catalyst_voices/widgets/form/voices_form_field.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
@@ -9,47 +10,69 @@ import 'package:flutter/material.dart';
 class FilterByDropdown<T> extends StatelessWidget {
   final List<DropdownMenuEntry<T?>> items;
   final ValueChanged<T?>? onChanged;
+  final Color? foregroundColor;
+  final Widget? leadingIcon;
+  final bool isOutlined;
+  final bool insertByAll;
   final T? value;
 
   const FilterByDropdown({
     super.key,
     required this.items,
     this.onChanged,
+    this.foregroundColor,
+    this.leadingIcon,
+    this.isOutlined = false,
+    this.insertByAll = true,
     this.value,
   });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+
+    final foregroundColor = this.foregroundColor ?? theme.colorScheme.primary;
+    final border = isOutlined
+        ? OutlineInputBorder(
+            borderSide: BorderSide(color: context.colors.outlineBorderVariant),
+            borderRadius: BorderRadius.circular(8),
+          )
+        : InputBorder.none;
+
     return DropdownMenu<T?>(
       dropdownMenuEntries: [
-        VoicesDropdownMenuEntry<T?>(
-          value: null,
-          label: context.l10n.all,
-          context: context,
-        ),
+        if (insertByAll)
+          VoicesDropdownMenuEntry<T?>(
+            value: null,
+            label: context.l10n.all,
+            context: context,
+          ),
         ...items,
       ],
       onSelected: onChanged,
       initialSelection: value,
       enableSearch: false,
       requestFocusOnTap: false,
-      inputDecorationTheme: const InputDecorationTheme(
+      inputDecorationTheme: InputDecorationTheme(
         isDense: true,
         contentPadding: EdgeInsets.zero,
-        border: InputBorder.none,
-        enabledBorder: InputBorder.none,
-        focusedBorder: InputBorder.none,
+        border: border,
+        enabledBorder: border,
+        focusedBorder: border,
+        iconColor: foregroundColor,
+        prefixIconColor: foregroundColor,
+        prefixIconConstraints: BoxConstraints.tight(const Size.square(18)),
+        suffixIconColor: foregroundColor,
       ),
       menuStyle: MenuStyle(
         padding: WidgetStateProperty.all(EdgeInsets.zero),
         visualDensity: VisualDensity.compact,
       ),
-      trailingIcon: VoicesAssets.icons.chevronDown.buildIcon(color: theme.colorScheme.primary),
-      selectedTrailingIcon:
-          VoicesAssets.icons.chevronUp.buildIcon(color: theme.colorScheme.primary),
+      leadingIcon: leadingIcon,
+      trailingIcon: VoicesAssets.icons.chevronDown.buildIcon(),
+      selectedTrailingIcon: VoicesAssets.icons.chevronUp.buildIcon(),
       textAlign: TextAlign.end,
-      textStyle: theme.textTheme.labelLarge?.copyWith(color: theme.colorScheme.primary),
+      textStyle: (theme.textTheme.labelLarge ?? const TextStyle()).copyWith(color: foregroundColor),
     );
   }
 }
