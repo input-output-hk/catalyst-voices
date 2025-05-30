@@ -2826,5 +2826,25 @@
         "type": "int"
       }
     }
+  },
+  "orderProposalsAlphabetical": "Alphabetical",
+  "@orderProposalsAlphabetical": {
+    "description": "Order proposals by title option"
+  },
+  "orderProposalsBudgetAsc": "Budget: highest first",
+  "@orderProposalsBudgetAsc": {
+    "description": "Order proposals by budget option"
+  },
+  "orderProposalsBudgetDesc": "Budget: lowest first",
+  "@orderProposalsBudgetDesc": {
+    "description": "Order proposals by budget option"
+  },
+  "orderProposalsUpdateDateAsc": "Oldest to newest",
+  "@orderProposalsUpdateDateAsc": {
+    "description": "Order proposals by update date option"
+  },
+  "orderProposalsUpdateDateDesc": "Newest to oldest",
+  "@orderProposalsUpdateDateDesc": {
+    "description": "Order proposals by update date option"
   }
 }

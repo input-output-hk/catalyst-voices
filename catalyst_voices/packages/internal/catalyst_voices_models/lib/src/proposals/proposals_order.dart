@@ -4,6 +4,9 @@ import 'package:equatable/equatable.dart';
 /// Orders base on [Proposal.title].
 final class Alphabetical extends ProposalsOrder {
   const Alphabetical();
+
+  @override
+  String toString() => 'Alphabetical';
 }
 
 /// Order base on [Proposal.fundsRequested].
@@ -20,6 +23,9 @@ final class Budget extends ProposalsOrder {
 
   @override
   List<Object?> get props => [isAscending];
+
+  @override
+  String toString() => 'Budget(${isAscending ? 'asc' : 'desc'})';
 }
 
 /// A base sealed class representing different ways to order [Proposal].
@@ -47,4 +53,7 @@ final class UpdateDate extends ProposalsOrder {
 
   @override
   List<Object?> get props => [isAscending];
+
+  @override
+  String toString() => 'UpdateDate(${isAscending ? 'asc' : 'desc'})';
 }

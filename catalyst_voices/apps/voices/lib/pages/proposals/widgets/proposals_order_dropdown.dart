@@ -52,6 +52,7 @@ class _ProposalsOrderDropdown extends StatelessWidget {
               value: item.value,
               label: item.localizedName(context),
               context: context,
+              style: const ButtonStyle(visualDensity: VisualDensity.compact),
             );
           },
         ).toList(),

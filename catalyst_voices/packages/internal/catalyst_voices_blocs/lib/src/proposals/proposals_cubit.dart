@@ -8,11 +8,6 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/foundation.dart';
 
-const _orderOptions = [
-  Alphabetical(),
-  Budget(isAscending: false),
-  Budget(isAscending: true),
-];
 const _recentProposalsMaxAge = Duration(hours: 72);
 final _logger = Logger('ProposalsCubit');
 
@@ -81,6 +76,7 @@ final class ProposalsCubit extends Cubit<ProposalsState>
     );
 
     if (category != null) _rebuildCategories();
+    if (type != null) _rebuildOrder();
 
     _watchProposalsCount(filters: filters.toCountFilters());
 
@@ -93,11 +89,11 @@ final class ProposalsCubit extends Cubit<ProposalsState>
     ProposalsOrder? order, {
     bool resetProposals = false,
   }) {
-    if (_cache.order == order) {
+    if (_cache.selectedOrder == order) {
       return;
     }
 
-    _cache = _cache.copyWith(order: Optional(order));
+    _cache = _cache.copyWith(selectedOrder: Optional(order));
 
     _rebuildOrder();
 
@@ -276,9 +272,20 @@ final class ProposalsCubit extends Cubit<ProposalsState>
   }
 
   void _rebuildOrder() {
-    final selectedOrder = _cache.order ?? const Alphabetical();
+    final filterType = _cache.filters.type;
+    final selectedOrder = _resolveEffectiveOrder();
 
-    final orderItem = _orderOptions
+    final options = filterType == ProposalsFilterType.total
+        ? const [
+            Alphabetical(),
+            Budget(isAscending: false),
+            Budget(isAscending: true),
+          ]
+        : const [
+            UpdateDate(isAscending: false),
+          ];
+
+    final orderItem = options
         .map((order) => ProposalsDropdownOrderItem(order, isSelected: order == selectedOrder))
         .toList();
 
@@ -293,7 +300,7 @@ final class ProposalsCubit extends Cubit<ProposalsState>
 
   ProposalsOrder _resolveEffectiveOrder() {
     final filterType = _cache.filters.type;
-    final selectedOrder = _cache.order;
+    final selectedOrder = _cache.selectedOrder;
 
     // skip order for non total
     if (filterType != ProposalsFilterType.total) {

@@ -5,7 +5,7 @@ final class ProposalsCubitCache extends Equatable {
   final Campaign? campaign;
   final Page<Proposal>? page;
   final ProposalsFilters filters;
-  final ProposalsOrder? order;
+  final ProposalsOrder? selectedOrder;
   final List<CampaignCategory>? categories;
   final ProposalsCount count;
 
@@ -13,7 +13,7 @@ final class ProposalsCubitCache extends Equatable {
     this.campaign,
     this.page,
     this.filters = const ProposalsFilters(),
-    this.order,
+    this.selectedOrder,
     this.categories,
     this.count = const ProposalsCount(),
   });
@@ -23,7 +23,7 @@ final class ProposalsCubitCache extends Equatable {
         campaign,
         page,
         filters,
-        order,
+        selectedOrder,
         categories,
         count,
       ];
@@ -32,7 +32,7 @@ final class ProposalsCubitCache extends Equatable {
     Optional<Campaign>? campaign,
     Optional<Page<Proposal>>? page,
     ProposalsFilters? filters,
-    Optional<ProposalsOrder>? order,
+    Optional<ProposalsOrder>? selectedOrder,
     Optional<List<CampaignCategory>>? categories,
     ProposalsCount? count,
   }) {
@@ -40,7 +40,7 @@ final class ProposalsCubitCache extends Equatable {
       campaign: campaign.dataOr(this.campaign),
       page: page.dataOr(this.page),
       filters: filters ?? this.filters,
-      order: order.dataOr(this.order),
+      selectedOrder: selectedOrder.dataOr(this.selectedOrder),
       categories: categories.dataOr(this.categories),
       count: count ?? this.count,
     );

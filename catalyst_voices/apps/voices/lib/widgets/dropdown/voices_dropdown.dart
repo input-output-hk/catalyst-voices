@@ -76,7 +76,7 @@ class FilterByDropdown<T> extends StatelessWidget {
         leadingIcon: leadingIcon,
         trailingIcon: VoicesAssets.icons.chevronDown.buildIcon(),
         selectedTrailingIcon: VoicesAssets.icons.chevronUp.buildIcon(),
-        textAlign: TextAlign.end,
+        textAlign: TextAlign.center,
         textStyle:
             (theme.textTheme.labelLarge ?? const TextStyle()).copyWith(color: foregroundColor),
       ),
@@ -180,6 +180,8 @@ class VoicesDropdownMenuEntry<T> extends DropdownMenuEntry<T> {
     required super.value,
     required super.label,
     required this.context,
+    super.leadingIcon,
+    super.trailingIcon,
     ButtonStyle? style,
   }) : super(
           style: style ?? _createButtonStyle(context),
