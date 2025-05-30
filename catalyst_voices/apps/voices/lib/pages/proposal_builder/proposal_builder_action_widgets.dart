@@ -1,6 +1,8 @@
 part of 'proposal_builder_segments.dart';
 
 class _CategoryDetailsAction extends StatelessWidget {
+  const _CategoryDetailsAction();
+
   @override
   Widget build(BuildContext context) {
     return BlocSelector<ProposalBuilderBloc, ProposalBuilderState,
