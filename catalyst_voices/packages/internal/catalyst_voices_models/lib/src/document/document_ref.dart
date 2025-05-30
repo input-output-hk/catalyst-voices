@@ -73,6 +73,11 @@ sealed class DocumentRef extends Equatable implements Comparable<DocumentRef> {
   /// Creates ref without version.
   DocumentRef toLoose();
 
+  /// Converts to [MaybeTypedDocumentRef] with given optional [type].
+  MaybeTypedDocumentRef toMaybeTyped([DocumentType? type]) {
+    return MaybeTypedDocumentRef(ref: this, type: type);
+  }
+
   /// Converts the [DocumentRef] to [SignedDocumentRef].
   ///
   /// Useful when a draft becomes a signed document after publishing.
@@ -193,31 +198,4 @@ final class SignedDocumentRef extends DocumentRef {
   @override
   String toString() =>
       isExact ? 'ExactSignedDocumentRef($id.v$version)' : 'LooseSignedDocumentRef($id)';
-}
-
-final class TypedDocumentRef extends Equatable {
-  final DocumentRef ref;
-  final DocumentType type;
-
-  const TypedDocumentRef({
-    required this.ref,
-    required this.type,
-  });
-
-  @override
-  List<Object?> get props => [ref, type];
-
-  TypedDocumentRef copyWith({
-    DocumentRef? ref,
-    DocumentType? type,
-  }) {
-    return TypedDocumentRef(
-      ref: ref ?? this.ref,
-      type: type ?? this.type,
-    );
-  }
-
-  TypedDocumentRef copyWithVersion(String version) {
-    return copyWith(ref: ref.copyWith(version: Optional(version)));
-  }
 }
