@@ -6,7 +6,7 @@
     "maintainers": [{ "name": "Catalyst Team", "url": "https://projectcatalyst.io/" }],
     "x-changelog": {
         "2025-05-28": [
-            "Setting titles/description/placeholders/requirements according to DevOps team for generic proposal template"
+            "Setting titles/description/placeholders/requirements according to generic proposal template requirements for F14"
         ],
         "2025-05-15": [
             "Setting maxLength for Dependency description"
@@ -489,7 +489,6 @@
                         "hasDependency", 
                         "dependencyDetail"
                     ]
-
                 },
                 "open_source": {
                     "$ref": "#/definitions/section",
@@ -991,7 +990,6 @@
                 "impact": {
                     "$ref": "#/definitions/section",
                     "title": "Impact",
-                   
                     "properties": {
                         "impact": {
                             "$ref": "#/definitions/multiLineTextEntryMarkdown",
@@ -1182,7 +1180,7 @@
                         "projects": {
                             "$ref": "#/definitions/tagInput",
                             "title": "Project ID's",
-                            "description": "If you answered “yes” to the previous question, please list all IDs for any projects you or your co-applicants are currently involved in that have not been completed yet",
+                            "description": "If you answered “yes” to the previous question, please select first how many there are in total and then list all IDs for any projects you or your co-applicants are currently involved in that have not been completed yet.",
                             "x-guidance": "You can find a seven digit project ID on each original proposal page listed on Catalyst website. [Search for yours here.](https://projectcatalyst.io/search)",
                             "x-subsection": false,
                             "maxItems": 15,
@@ -1195,7 +1193,7 @@
                                         "type": "string",
                                         "title": "Project ID",
                                         "description": "Seven digit project ID from Catalyst website",
-                                        "minLength": 7,
+                                        "pattern": "^[0-9]{7}$",
                                         "maxLength": 7
                                     }
                                 }
