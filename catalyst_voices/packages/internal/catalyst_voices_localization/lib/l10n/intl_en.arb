@@ -2859,5 +2859,9 @@
   "selectCategoryToSeeDetailsDescription": "Do keep in mind that you can’t change category\nafter starting your proposal.",
   "@selectCategoryToSeeDetailsDescription": {
     "description": "Text for the select category to see details description in new proposal dialog"
+  },
+  "readCategoryBriefButtonLabel": "Read category brief",
+  "@readCategoryBriefButtonLabel": {
+    "description": "Label for the read category brief button"
   }
 }
