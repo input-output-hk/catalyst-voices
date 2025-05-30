@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/widgets/text_field/voices_num_field.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
@@ -12,6 +13,7 @@ class TokenField extends StatelessWidget {
   final VoicesNumFieldValidator<int>? validator;
   final String? labelText;
   final String? errorText;
+  final String? placeholder;
   final FocusNode? focusNode;
   final NumRange<int>? range;
   final Currency currency;
@@ -28,6 +30,7 @@ class TokenField extends StatelessWidget {
     this.validator,
     this.labelText,
     this.errorText,
+    this.placeholder,
     this.focusNode,
     this.range,
     this.currency = const Currency.ada(),
@@ -52,12 +55,16 @@ class TokenField extends StatelessWidget {
         errorText: errorText,
         prefixText: currency.symbol,
         hintText: range != null ? '${range.min}' : null,
-        helper: range != null && showHelper
+        helper: showHelper
             ? _Helper(
                 currency: currency,
                 range: range,
+                placeholder: placeholder,
               )
             : null,
+        labelStyle: context.textTheme.labelLarge?.copyWith(
+          color: context.colors.textOnPrimaryLevel1,
+        ),
       ),
       validator: (int? value, text) => _validate(context, value, text),
       onChanged: onChanged,
@@ -90,17 +97,19 @@ class TokenField extends StatelessWidget {
 
 class _Helper extends StatelessWidget {
   final Currency currency;
-  final NumRange<int> range;
+  final NumRange<int>? range;
+  final String? placeholder;
 
   const _Helper({
     required this.currency,
     required this.range,
+    this.placeholder,
   });
 
   @override
   Widget build(BuildContext context) {
-    final min = range.min;
-    final max = range.max;
+    final min = range?.min;
+    final max = range?.max;
 
     const boldStyle = TextStyle(fontWeight: FontWeight.bold);
 
@@ -114,6 +123,7 @@ class _Helper extends StatelessWidget {
             _ => throw ArgumentError('Unknown placeholder[$placeholder]'),
           };
         },
+        style: context.textTheme.bodySmall,
       );
     }
 
@@ -139,6 +149,10 @@ class _Helper extends StatelessWidget {
           };
         },
       );
+    }
+
+    if (placeholder != null) {
+      return Text(placeholder!);
     }
 
     return const Text('');
