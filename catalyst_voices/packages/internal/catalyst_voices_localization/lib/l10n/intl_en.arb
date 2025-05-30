@@ -2817,5 +2817,14 @@
   "devToolsTapsLeftToEnableMessage": "Keep on tapping",
   "@devToolsTapsLeftToEnableMessage": {
     "description": "Explanation text"
+  },
+  "proposalsLatestUpdatesHours": "Latest updates ({count}{count, plural, =1{hr} other{hrs}})",
+  "@proposalsLatestUpdatesHours": {
+    "description": "One of filter options for proposals. Meaning show only latest proposals.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   }
 }
