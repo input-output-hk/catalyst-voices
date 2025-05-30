@@ -149,6 +149,8 @@ class _IterationVersionList extends StatelessWidget {
 
 class _ProposalIterationHistoryState extends State<ProposalIterationHistory> {
   bool _isExpanded = false;
+  late bool _hasNewerLocalIteration;
+  ProposalVersion? _firstVersion;
 
   @override
   Widget build(BuildContext context) {
@@ -174,14 +176,14 @@ class _ProposalIterationHistoryState extends State<ProposalIterationHistory> {
                   else
                     VoicesAssets.icons.chevronRight.buildIcon(size: 18),
                   const SizedBox(width: 4),
-                  if (widget.proposal.hasNewerLocalIteration)
+                  if (_hasNewerLocalIteration && _firstVersion != null)
                     _Title(
-                      publish: widget.proposal.versions.first.publish,
-                      title: widget.proposal.versions.first.title,
+                      publish: _firstVersion!.publish,
+                      title: _firstVersion!.title,
                       iteration: widget.proposal.versions.versionNumber(
-                        widget.proposal.versions.first.selfRef.version ?? '',
+                        _firstVersion!.selfRef.version ?? '',
                       ),
-                      updateDate: widget.proposal.versions.first.createdAt,
+                      updateDate: _firstVersion!.createdAt,
                       boldTitle: true,
                     )
                   else
@@ -197,12 +199,10 @@ class _ProposalIterationHistoryState extends State<ProposalIterationHistory> {
                       ),
                     ),
                   const Spacer(),
-                  Offstage(
-                    offstage: !widget.proposal.hasNewerLocalIteration,
-                    child: _Actions(
-                      ref: widget.proposal.versions.first.selfRef,
+                  if (_hasNewerLocalIteration && _firstVersion != null)
+                    _Actions(
+                      ref: _firstVersion!.selfRef,
                     ),
-                  ),
                 ],
               ),
             ),
@@ -218,10 +218,29 @@ class _ProposalIterationHistoryState extends State<ProposalIterationHistory> {
     );
   }
 
+  @override
+  void didUpdateWidget(ProposalIterationHistory oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.proposal != oldWidget.proposal) {
+      _updateState();
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _updateState();
+  }
+
   void _changeExpanded() {
     setState(() {
       _isExpanded = !_isExpanded;
     });
+  }
+
+  void _updateState() {
+    _hasNewerLocalIteration = widget.proposal.hasNewerLocalIteration;
+    _firstVersion = widget.proposal.versions.isNotEmpty ? widget.proposal.versions.first : null;
   }
 }
 
