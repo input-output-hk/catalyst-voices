@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["Responses"],"fn":["endpoint","get_document"],"struct":["DocProvider"],"type":["AllResponses"]};

@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"mod":["boolean","date_time","ed25519_public_key","error_list","error_msg","error_uuid","query","url","uuidv4","uuidv7"]};
