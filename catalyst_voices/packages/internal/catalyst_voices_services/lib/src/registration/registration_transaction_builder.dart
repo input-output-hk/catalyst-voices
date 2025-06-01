@@ -184,9 +184,10 @@ final class RegistrationTransactionBuilder {
         vkeys: {},
         vkeysCount: 2,
       ),
+      changeAddress: changeAddress,
     );
 
-    final txBody = txBuilder.withChangeAddressIfNeeded(changeAddress).buildBody();
+    final txBody = txBuilder.applySelection().buildBody();
 
     return Transaction(
       body: txBody,

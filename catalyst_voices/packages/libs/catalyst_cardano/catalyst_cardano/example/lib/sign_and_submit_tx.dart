@@ -10,6 +10,7 @@ TransactionBuilderConfig _buildTransactionBuilderConfig() {
     maxTxSize: 16384,
     maxValueSize: 5000,
     coinsPerUtxoByte: Coin(4310),
+    selectionStrategy: ExactBiggestAssetSelectionStrategy(),
   );
 }
 
@@ -32,10 +33,10 @@ Transaction _buildUnsignedTx({
     config: _buildTransactionBuilderConfig(),
     inputs: utxos,
     networkId: NetworkId.testnet,
+    changeAddress: changeAddress,
   );
 
-  final txBody =
-      txBuilder.withOutput(txOutput).withChangeAddressIfNeeded(changeAddress).buildBody();
+  final txBody = txBuilder.withOutput(txOutput).applySelection().buildBody();
 
   return Transaction(
     body: txBody,
@@ -51,12 +52,7 @@ Future<void> _signAndSubmitTx({
   var result = '';
   try {
     final changeAddress = await api.getChangeAddress();
-
-    final utxos = await api.getUtxos(
-      amount: const Balance(
-        coin: Coin(1000000),
-      ),
-    );
+    final utxos = await api.getUtxos();
 
     if (utxos.isEmpty) {
       throw Exception('Insufficient balance, please top up your wallet');

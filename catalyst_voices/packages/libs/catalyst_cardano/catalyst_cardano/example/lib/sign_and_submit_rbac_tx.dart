@@ -153,9 +153,10 @@ Transaction _buildUnsignedRbacTx({
       // in a better way, count = reward addresses vkeys + payment address vkey
       vkeysCount: 2,
     ),
+    changeAddress: changeAddress,
   );
 
-  final txBody = txBuilder.withChangeAddressIfNeeded(changeAddress).buildBody();
+  final txBody = txBuilder.applySelection().buildBody();
 
   return Transaction(
     body: txBody,
@@ -174,11 +175,7 @@ Future<void> _signAndSubmitRbacTx({
     final changeAddress = await api.getChangeAddress();
     final rewardAddresses = await api.getRewardAddresses();
 
-    final utxos = await api.getUtxos(
-      amount: const Balance(
-        coin: Coin(1000000),
-      ),
-    );
+    final utxos = await api.getUtxos();
 
     if (utxos.isEmpty) {
       throw Exception('Insufficient balance, please top up your wallet');
