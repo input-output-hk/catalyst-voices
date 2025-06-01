@@ -906,9 +906,7 @@ final class TransactionOutputBuilder {
 
     // how many bytes the size changed from including the minimum ada value
     final sizeChange = latestCoinSize - oldCoinSize;
-
     final adjustedMinAda = Coin(outputSize + constantOverhead + sizeChange) * coinsPerUtxoByte;
-
     return adjustedMinAda;
   }
 
