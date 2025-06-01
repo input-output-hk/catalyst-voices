@@ -14,7 +14,7 @@ import 'package:convert/convert.dart';
 ///
 /// This class is used only in testing and resides under the `./test` folder.
 final class SelectionUtils {
-  static final _kRandom = Random();
+  static final _kRandom = Random(1748425502827);
 
   static const String _chars = 'abcdefghijklmnopqrstuvwxyz'
       'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
@@ -330,6 +330,7 @@ final class SelectionUtils {
         minPercentage: minCoinPct,
         maxPercentage: maxCoinPct,
       );
+
       return TransactionOutput(
         address: randomAddress(),
         amount: Balance(coin: coin, multiAsset: balance.multiAsset),

@@ -95,6 +95,8 @@ extension on RemoteTransactionSelectionStrategyType {
   CoinSelectionStrategy build() {
     return switch (this) {
       RemoteTransactionSelectionStrategyType.greedy => const GreedySelectionStrategy(),
+      RemoteTransactionSelectionStrategyType.exactBiggest =>
+        const ExactBiggestAssetSelectionStrategy(),
       RemoteTransactionSelectionStrategyType.random => RandomSelectionStrategy(),
     };
   }

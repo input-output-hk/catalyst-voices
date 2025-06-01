@@ -60,7 +60,7 @@ final class RemoteTransactionBuilderConfig {
   }
 }
 
-enum RemoteTransactionSelectionStrategyType { greedy, random }
+enum RemoteTransactionSelectionStrategyType { greedy, exactBiggest, random }
 
 @JsonSerializable(createToJson: false)
 final class RemoteTransactionTieredFee {
