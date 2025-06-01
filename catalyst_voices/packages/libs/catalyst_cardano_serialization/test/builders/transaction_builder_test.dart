@@ -1,10 +1,61 @@
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:test/test.dart';
 
+import '../test_utils/selection_utils.dart';
 import '../test_utils/test_data.dart';
 
 void main() {
   group(TransactionBuilder, () {
+    test(
+        'transaction with outputs with too little '
+        ' ada throws $TxValueBelowMinUtxoValueException', () {
+      final txOutput = PreBabbageTransactionOutput(
+        address: testnetAddr,
+        amount: const Balance(coin: Coin(1)),
+      );
+
+      final txBuilder = TransactionBuilder(
+        config: transactionBuilderConfig(),
+        inputs: const {},
+        outputs: [txOutput],
+        fee: Coin.fromAda(0.2),
+      );
+
+      expect(
+        txBuilder.buildBody,
+        throwsA(isA<TxValueBelowMinUtxoValueException>()),
+      );
+    });
+
+    test('transaction with too big outputs throws $TxValueSizeExceededException', () {
+      final txOutput = PreBabbageTransactionOutput(
+        address: testnetAddr,
+        amount: Balance(
+          coin: const Coin.fromWholeAda(10),
+          multiAsset: MultiAsset(
+            bundle: {
+              for (int i = 0; i < 150; i++)
+                PolicyId(SelectionUtils.randomHexString(PolicyId.hashLength)): {
+                  AssetName('RND'): Coin(i),
+                },
+            },
+          ),
+        ),
+      );
+
+      final txBuilder = TransactionBuilder(
+        config: transactionBuilderConfig(),
+        inputs: const {},
+        outputs: [txOutput],
+        fee: Coin.fromAda(0.2),
+      );
+
+      expect(
+        txBuilder.buildBody,
+        throwsA(isA<TxValueSizeExceededException>()),
+      );
+    });
+
     test('transaction without fee throws $TxFeeNotSpecifiedException', () {
       final txBuilder = TransactionBuilder(
         config: transactionBuilderConfig(),
@@ -18,89 +69,82 @@ void main() {
     });
 
     test(
-      'transaction with mismatch between inputs and outputs'
-      ' throws $TxBalanceMismatchException',
-      () {
-        final utxo = TransactionUnspentOutput(
-          input: TransactionInput(
-            transactionId: TransactionHash.fromHex(
-              'd766cd9c60f3307d779892745047036d3fe578588f63ada8a454a1e51141bbf7',
-            ),
-            index: 1,
+        'transaction with mismatch between inputs and outputs'
+        ' throws $TxBalanceMismatchException', () {
+      final utxo = TransactionUnspentOutput(
+        input: TransactionInput(
+          transactionId: TransactionHash.fromHex(
+            'd766cd9c60f3307d779892745047036d3fe578588f63ada8a454a1e51141bbf7',
           ),
-          output: PreBabbageTransactionOutput(
-            address: ShelleyAddress.fromBech32(
-              /* cSpell:disable */
-              'addr_test1qq2fckuzdvxu074ngumdkwn68tuuse67yg55r8exmkwdnn2lc30fwlx8jy6e54em6dcql0ma3gz75rc4ywuzuny7p7csr9kx9g',
-              /* cSpell:enable */
-            ),
-            amount: const Balance(
-              coin: Coin.fromWholeAda(1),
-            ),
+          index: 1,
+        ),
+        output: PreBabbageTransactionOutput(
+          address: ShelleyAddress.fromBech32(
+            /* cSpell:disable */
+            'addr_test1qq2fckuzdvxu074ngumdkwn68tuuse67yg55r8exmkwdnn2lc30fwlx8jy6e54em6dcql0ma3gz75rc4ywuzuny7p7csr9kx9g',
+            /* cSpell:enable */
           ),
-        );
-
-        final txOutput = PreBabbageTransactionOutput(
-          address: testnetAddr,
-          amount: const Balance(coin: Coin.fromWholeAda(2)),
-        );
-
-        final txBuilder = TransactionBuilder(
-          config: transactionBuilderConfig(),
-          inputs: {utxo},
-          outputs: [txOutput],
-          fee: Coin.fromAda(0.2),
-          networkId: NetworkId.testnet,
-        );
-
-        expect(
-          txBuilder.buildBody,
-          throwsA(isA<TxBalanceMismatchException>()),
-        );
-      },
-    );
-
-    test(
-      'transaction with too small fee throws $TxFeeTooSmallException',
-      () {
-        final utxo = TransactionUnspentOutput(
-          input: TransactionInput(
-            transactionId: TransactionHash.fromHex(
-              'd766cd9c60f3307d779892745047036d3fe578588f63ada8a454a1e51141bbf7',
-            ),
-            index: 1,
+          amount: const Balance(
+            coin: Coin.fromWholeAda(1),
           ),
-          output: PreBabbageTransactionOutput(
-            address: ShelleyAddress.fromBech32(
-              /* cSpell:disable */
-              'addr_test1qq2fckuzdvxu074ngumdkwn68tuuse67yg55r8exmkwdnn2lc30fwlx8jy6e54em6dcql0ma3gz75rc4ywuzuny7p7csr9kx9g',
-              /* cSpell:enable */
-            ),
-            amount: const Balance(
-              coin: Coin.fromWholeAda(1),
-            ),
+        ),
+      );
+
+      final txOutput = PreBabbageTransactionOutput(
+        address: testnetAddr,
+        amount: const Balance(coin: Coin.fromWholeAda(2)),
+      );
+
+      final txBuilder = TransactionBuilder(
+        config: transactionBuilderConfig(),
+        inputs: {utxo},
+        outputs: [txOutput],
+        fee: Coin.fromAda(0.2),
+      );
+
+      expect(
+        txBuilder.buildBody,
+        throwsA(isA<TxBalanceMismatchException>()),
+      );
+    });
+
+    test('transaction with too small fee throws $TxFeeTooSmallException', () {
+      final utxo = TransactionUnspentOutput(
+        input: TransactionInput(
+          transactionId: TransactionHash.fromHex(
+            'd766cd9c60f3307d779892745047036d3fe578588f63ada8a454a1e51141bbf7',
           ),
-        );
+          index: 1,
+        ),
+        output: PreBabbageTransactionOutput(
+          address: ShelleyAddress.fromBech32(
+            /* cSpell:disable */
+            'addr_test1qq2fckuzdvxu074ngumdkwn68tuuse67yg55r8exmkwdnn2lc30fwlx8jy6e54em6dcql0ma3gz75rc4ywuzuny7p7csr9kx9g',
+            /* cSpell:enable */
+          ),
+          amount: const Balance(
+            coin: Coin.fromWholeAda(1),
+          ),
+        ),
+      );
 
-        final txOutput = PreBabbageTransactionOutput(
-          address: testnetAddr,
-          amount: const Balance(coin: Coin(900000)),
-        );
+      final txOutput = PreBabbageTransactionOutput(
+        address: testnetAddr,
+        amount: const Balance(coin: Coin(900000)),
+      );
 
-        final txBuilder = TransactionBuilder(
-          config: transactionBuilderConfig(),
-          inputs: {utxo},
-          outputs: [txOutput],
-          fee: const Coin(100000),
-          networkId: NetworkId.testnet,
-        );
+      final txBuilder = TransactionBuilder(
+        config: transactionBuilderConfig(),
+        inputs: {utxo},
+        outputs: [txOutput],
+        fee: const Coin(100000),
+      );
 
-        expect(
-          txBuilder.buildBody,
-          throwsA(isA<TxFeeTooSmallException>()),
-        );
-      },
-    );
+      expect(
+        txBuilder.buildBody,
+        throwsA(isA<TxFeeTooSmallException>()),
+      );
+    });
 
     test('transaction too large throws $MaxTxSizeExceededException', () {
       final utxo = TransactionUnspentOutput(
