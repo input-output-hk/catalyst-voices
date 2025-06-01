@@ -172,7 +172,12 @@ final class TransactionBuilder extends Equatable {
   TransactionBody buildBody() {
     final (body, fullTxSize) = _buildAndSize();
 
-    _validateTxSize(fullTxSize);
+    _validateMaxTxSize(fullTxSize);
+    _validateMinTxFee(
+      body: body,
+      inputs: inputs,
+      referenceInputs: referenceInputs,
+    );
     _validateInputsMatchOutputsAndFee(
       inputs: inputs,
       outputs: outputs,
@@ -563,7 +568,7 @@ final class TransactionBuilder extends Equatable {
         outputs.map((e) => e.amount).fold(const Balance(coin: Coin(0)), (a, b) => a + b);
 
     if (inputsTotal != outputsTotal + Balance(coin: fee)) {
-      throw TransactionBalanceMismatchException(
+      throw TxBalanceMismatchException(
         inputs: inputsTotal,
         outputs: outputsTotal,
         fee: fee,
@@ -571,11 +576,30 @@ final class TransactionBuilder extends Equatable {
     }
   }
 
-  void _validateTxSize(int fullTxSize) {
+  void _validateMaxTxSize(int fullTxSize) {
     if (fullTxSize > config.maxTxSize) {
       throw MaxTxSizeExceededException(
         maxTxSize: config.maxTxSize,
         actualTxSize: fullTxSize,
+      );
+    }
+  }
+
+  void _validateMinTxFee({
+    required TransactionBody body,
+    required Set<TransactionUnspentOutput> inputs,
+    required Set<TransactionUnspentOutput>? referenceInputs,
+  }) {
+    final transaction = buildFakeTransaction(body);
+    final minFee = config.feeAlgo.minFee(transaction, {
+      ...inputs,
+      ...?referenceInputs,
+    });
+
+    if (body.fee < minFee) {
+      throw TxFeeTooSmallException(
+        actualFee: body.fee,
+        minFee: minFee,
       );
     }
   }

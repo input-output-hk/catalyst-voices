@@ -158,7 +158,7 @@ final class ReferenceScriptSizeLimitExceededException extends Equatable implemen
 }
 
 /// Exception thrown when transaction inputs are not equal to outputs + fee.
-final class TransactionBalanceMismatchException extends Equatable implements Exception {
+final class TxBalanceMismatchException extends Equatable implements Exception {
   /// The total balance of inputs.
   final Balance inputs;
 
@@ -168,8 +168,8 @@ final class TransactionBalanceMismatchException extends Equatable implements Exc
   /// The fee for the transaction.
   final Coin fee;
 
-  /// The default constructor for [TransactionBalanceMismatchException].
-  const TransactionBalanceMismatchException({
+  /// The default constructor for [TxBalanceMismatchException].
+  const TxBalanceMismatchException({
     required this.inputs,
     required this.outputs,
     required this.fee,
@@ -179,7 +179,7 @@ final class TransactionBalanceMismatchException extends Equatable implements Exc
   List<Object?> get props => [inputs, outputs, fee];
 
   @override
-  String toString() => 'TransactionBalanceMismatchException('
+  String toString() => 'TxBalanceMismatchException('
       'inputs:$inputs'
       ', outputs:$outputs'
       ', fee:$fee'
@@ -196,6 +196,30 @@ final class TxFeeNotSpecifiedException extends Equatable implements Exception {
 
   @override
   String toString() => 'TxFeeNotSpecifiedException';
+}
+
+/// Exception thrown when building a transaction that doesn't specify the fee.
+final class TxFeeTooSmallException extends Equatable implements Exception {
+  /// The actual fee provided in the transaction.
+  final Coin actualFee;
+
+  /// The minimum fee for transaction.
+  final Coin minFee;
+
+  /// The default constructor for [TxFeeTooSmallException].
+  const TxFeeTooSmallException({
+    required this.actualFee,
+    required this.minFee,
+  });
+
+  @override
+  List<Object?> get props => [actualFee, minFee];
+
+  @override
+  String toString() => 'TxFeeTooSmallException('
+      'actualFee=$actualFee'
+      ', minFee=$minFee'
+      ')';
 }
 
 /// Exception thrown when the transaction output amount
