@@ -146,8 +146,7 @@ final class TransactionBuilder extends Equatable {
     final outputTotalPlusFee = outputTotal + Balance(coin: fee);
 
     if (outputTotalPlusFee.coin == inputTotal.coin) {
-      // ignore: avoid_returning_this
-      return this;
+      return withFee(fee);
     } else if (outputTotalPlusFee.coin > inputTotal.coin) {
       throw InsufficientUtxoBalanceException(
         actualAmount: inputTotal,
