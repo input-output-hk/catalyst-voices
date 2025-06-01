@@ -5,6 +5,61 @@ import '../test_utils/test_data.dart';
 
 void main() {
   group(TransactionBuilder, () {
+    test('transaction without fee throws $TxFeeNotSpecifiedException', () {
+      final txBuilder = TransactionBuilder(
+        config: transactionBuilderConfig(),
+        inputs: const {},
+      );
+
+      expect(
+        txBuilder.buildBody,
+        throwsA(isA<TxFeeNotSpecifiedException>()),
+      );
+    });
+
+    test(
+      'transaction with mismatch between inputs and outputs'
+      ' throws $TransactionBalanceMismatchException',
+      () {
+        final utxo = TransactionUnspentOutput(
+          input: TransactionInput(
+            transactionId: TransactionHash.fromHex(
+              'd766cd9c60f3307d779892745047036d3fe578588f63ada8a454a1e51141bbf7',
+            ),
+            index: 1,
+          ),
+          output: PreBabbageTransactionOutput(
+            address: ShelleyAddress.fromBech32(
+              /* cSpell:disable */
+              'addr_test1qq2fckuzdvxu074ngumdkwn68tuuse67yg55r8exmkwdnn2lc30fwlx8jy6e54em6dcql0ma3gz75rc4ywuzuny7p7csr9kx9g',
+              /* cSpell:enable */
+            ),
+            amount: const Balance(
+              coin: Coin.fromWholeAda(1),
+            ),
+          ),
+        );
+
+        final txOutput = PreBabbageTransactionOutput(
+          address: testnetAddr,
+          amount: const Balance(coin: Coin.fromWholeAda(2)),
+        );
+
+        final txBuilder = TransactionBuilder(
+          config: transactionBuilderConfig(),
+          inputs: {utxo},
+          outputs: [txOutput],
+          fee: Coin.fromAda(0.2),
+          networkId: NetworkId.testnet,
+        );
+
+        expect(
+          txBuilder.buildBody,
+          throwsA(isA<TransactionBalanceMismatchException>()),
+        );
+      },
+    );
+
     test('transaction with native assets has correctly calculated fee', () {
       final changeAddress = ShelleyAddress.fromBech32(
         /* cSpell:disable */
