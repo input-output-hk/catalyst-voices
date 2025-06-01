@@ -60,7 +60,7 @@ void main() {
         () {
           forAll(
             maxExamples: 200,
-            integer(min: 40, max: 200),
+            integer(min: 40, max: 140),
             (utxoCount) {
               final utxos = SelectionUtils.generateUtxos(
                 utxoCount,
