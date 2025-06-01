@@ -165,35 +165,19 @@ final class TransactionBuilder extends Equatable {
     );
   }
 
-  /// Builds a [TransactionBody] and measures the final transaction size
-  /// that will be submitted to the blockchain.
-  ///
-  /// Knowing the final transaction size is very important as it influences
-  /// the [fee] the wallet must pay for the transaction.
-  ///
-  /// Since the transaction body is signed before all
-  (TransactionBody, int) buildAndSize() {
-    final built = _buildBody();
-
-    // we must build a tx with fake data (of correct size)
-    // to check the final transaction size
-    final fullTx = buildFakeTransaction(built);
-    final fullTxSize = cbor.encode(fullTx.toCbor()).length;
-    return (fullTx.body, fullTxSize);
-  }
-
   /// Returns the body of the new transaction.
   ///
   /// Throws [MaxTxSizeExceededException] if maximum transaction
   /// size is reached.
   TransactionBody buildBody() {
-    final (body, fullTxSize) = buildAndSize();
-    if (fullTxSize > config.maxTxSize) {
-      throw MaxTxSizeExceededException(
-        maxTxSize: config.maxTxSize,
-        actualTxSize: fullTxSize,
-      );
-    }
+    final (body, fullTxSize) = _buildAndSize();
+
+    _validateTxSize(fullTxSize);
+    _validateInputsMatchOutputsAndFee(
+      inputs: inputs,
+      outputs: outputs,
+      fee: body.fee,
+    );
 
     return body;
   }
@@ -260,7 +244,7 @@ final class TransactionBuilder extends Equatable {
 
   /// Returns the size of the full transaction in bytes.
   int fullSize() {
-    return buildAndSize().$2;
+    return _buildAndSize().$2;
   }
 
   /// Calculates the minimum fee for the transaction.
@@ -275,7 +259,7 @@ final class TransactionBuilder extends Equatable {
   /// Returns:
   /// - A [Coin] representing the minimum fee required for the transaction.
   Coin minFee({bool useWitnesses = false}) {
-    final txBody = copyWith(fee: Coin(config.feeAlgo.constant)).buildBody();
+    final txBody = copyWith(fee: Coin(config.feeAlgo.constant))._buildBody();
     final fullTx = buildFakeTransaction(txBody, useWitnesses: useWitnesses);
 
     return config.feeAlgo.minFee(fullTx, {...inputs, ...?referenceInputs});
@@ -442,20 +426,31 @@ final class TransactionBuilder extends Equatable {
     return copyWith(outputs: newOutputs).withOutput(newOutputMinusFee).withFee(newFee);
   }
 
+  /// Builds a [TransactionBody] and measures the final transaction size
+  /// that will be submitted to the blockchain.
+  ///
+  /// Knowing the final transaction size is very important as it influences
+  /// the [fee] the wallet must pay for the transaction.
+  ///
+  /// Since the transaction body is signed before all
+  (TransactionBody, int) _buildAndSize() {
+    final built = _buildBody();
+
+    // we must build a tx with fake data (of correct size)
+    // to check the final transaction size
+    final fullTx = buildFakeTransaction(built);
+    final fullTxSize = cbor.encode(fullTx.toCbor()).length;
+    return (fullTx.body, fullTxSize);
+  }
+
   TransactionBody _buildBody() {
     final fee = this.fee;
     if (fee == null) {
       throw const TxFeeNotSpecifiedException();
     }
 
-    _validateInputsMatchOutputsAndFee(
-      inputs: inputs,
-      outputs: outputs,
-      fee: fee,
-    );
-
     return TransactionBody(
-      inputs: Set.of(inputs.map((e) => e.input)),
+      inputs: inputs.map((e) => e.input).toSet(),
       outputs: outputs,
       fee: fee,
       ttl: ttl,
@@ -572,6 +567,15 @@ final class TransactionBuilder extends Equatable {
         inputs: inputsTotal,
         outputs: outputsTotal,
         fee: fee,
+      );
+    }
+  }
+
+  void _validateTxSize(int fullTxSize) {
+    if (fullTxSize > config.maxTxSize) {
+      throw MaxTxSizeExceededException(
+        maxTxSize: config.maxTxSize,
+        actualTxSize: fullTxSize,
       );
     }
   }
