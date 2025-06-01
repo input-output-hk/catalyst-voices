@@ -172,17 +172,18 @@ final class TransactionBuilder extends Equatable {
   TransactionBody buildBody() {
     final (body, fullTxSize) = _buildAndSize();
 
-    _validateMaxTxSize(fullTxSize);
-    _validateMinTxFee(
-      body: body,
-      inputs: inputs,
-      referenceInputs: referenceInputs,
-    );
+    _validateOutputsValueAndSize(outputs);
     _validateInputsMatchOutputsAndFee(
       inputs: inputs,
       outputs: outputs,
       fee: body.fee,
     );
+    _validateMinTxFee(
+      body: body,
+      inputs: inputs,
+      referenceInputs: referenceInputs,
+    );
+    _validateMaxTxSize(fullTxSize);
 
     return body;
   }
@@ -363,35 +364,7 @@ final class TransactionBuilder extends Equatable {
   }
 
   /// Returns a copy of this [TransactionBuilder] with extra [output].
-  ///
-  /// The [output] must reach a minimum [Coin] value as calculated
-  /// by [TransactionOutputBuilder.minimumAdaForOutput],
-  /// otherwise [TxValueBelowMinUtxoValueException] is thrown.
   TransactionBuilder withOutput(ShelleyMultiAssetTransactionOutput output) {
-    final valueSize = cbor.encode(output.amount.toCbor()).length;
-
-    if (!TransactionOutputBuilder.isOutputSizeValid(
-      output,
-      config.maxValueSize,
-    )) {
-      throw TxValueSizeExceededException(
-        actualValueSize: valueSize,
-        maxValueSize: config.maxValueSize,
-      );
-    }
-
-    final minAdaPerUtxoEntry = TransactionOutputBuilder.minimumAdaForOutput(
-      output,
-      config.coinsPerUtxoByte,
-    );
-
-    if (output.amount.coin < minAdaPerUtxoEntry) {
-      throw TxValueBelowMinUtxoValueException(
-        actualAmount: output.amount.coin,
-        requiredAmount: minAdaPerUtxoEntry,
-      );
-    }
-
     return copyWith(outputs: [...outputs, output]);
   }
 
@@ -601,6 +574,34 @@ final class TransactionBuilder extends Equatable {
         actualFee: body.fee,
         minFee: minFee,
       );
+    }
+  }
+
+  void _validateOutputsValueAndSize(List<ShelleyMultiAssetTransactionOutput> outputs) {
+    for (final output in outputs) {
+      if (!TransactionOutputBuilder.isOutputSizeValid(
+        output,
+        config.maxValueSize,
+      )) {
+        final valueSize = cbor.encode(output.amount.toCbor()).length;
+
+        throw TxValueSizeExceededException(
+          actualValueSize: valueSize,
+          maxValueSize: config.maxValueSize,
+        );
+      }
+
+      final minAdaPerUtxoEntry = TransactionOutputBuilder.minimumAdaForOutput(
+        output,
+        config.coinsPerUtxoByte,
+      );
+
+      if (output.amount.coin < minAdaPerUtxoEntry) {
+        throw TxValueBelowMinUtxoValueException(
+          actualAmount: output.amount.coin,
+          requiredAmount: minAdaPerUtxoEntry,
+        );
+      }
     }
   }
 

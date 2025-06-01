@@ -17,43 +17,48 @@ void main() {
       );
     });
 
-    test('transaction too large throws $MaxTxSizeExceededException', () {
-      final utxo = TransactionUnspentOutput(
-        input: TransactionInput(
-          transactionId: TransactionHash.fromHex(
-            'd766cd9c60f3307d779892745047036d3fe578588f63ada8a454a1e51141bbf7',
+    test(
+      'transaction with mismatch between inputs and outputs'
+      ' throws $TxBalanceMismatchException',
+      () {
+        final utxo = TransactionUnspentOutput(
+          input: TransactionInput(
+            transactionId: TransactionHash.fromHex(
+              'd766cd9c60f3307d779892745047036d3fe578588f63ada8a454a1e51141bbf7',
+            ),
+            index: 1,
           ),
-          index: 1,
-        ),
-        output: PreBabbageTransactionOutput(
-          address: ShelleyAddress.fromBech32(
-            /* cSpell:disable */
-            'addr_test1qq2fckuzdvxu074ngumdkwn68tuuse67yg55r8exmkwdnn2lc30fwlx8jy6e54em6dcql0ma3gz75rc4ywuzuny7p7csr9kx9g',
-            /* cSpell:enable */
+          output: PreBabbageTransactionOutput(
+            address: ShelleyAddress.fromBech32(
+              /* cSpell:disable */
+              'addr_test1qq2fckuzdvxu074ngumdkwn68tuuse67yg55r8exmkwdnn2lc30fwlx8jy6e54em6dcql0ma3gz75rc4ywuzuny7p7csr9kx9g',
+              /* cSpell:enable */
+            ),
+            amount: const Balance(
+              coin: Coin.fromWholeAda(1),
+            ),
           ),
-          amount: const Balance(
-            coin: Coin.fromWholeAda(1),
-          ),
-        ),
-      );
+        );
 
-      final txOutput = PreBabbageTransactionOutput(
-        address: testnetAddr,
-        amount: const Balance(coin: Coin(1)),
-      );
+        final txOutput = PreBabbageTransactionOutput(
+          address: testnetAddr,
+          amount: const Balance(coin: Coin.fromWholeAda(2)),
+        );
 
-      final txBuilder = TransactionBuilder(
-        config: transactionBuilderConfig(),
-        inputs: {utxo},
-        outputs: List.filled(1000, txOutput),
-        fee: const Coin.fromWholeAda(1),
-      );
+        final txBuilder = TransactionBuilder(
+          config: transactionBuilderConfig(),
+          inputs: {utxo},
+          outputs: [txOutput],
+          fee: Coin.fromAda(0.2),
+          networkId: NetworkId.testnet,
+        );
 
-      expect(
-        txBuilder.buildBody,
-        throwsA(isA<MaxTxSizeExceededException>()),
-      );
-    });
+        expect(
+          txBuilder.buildBody,
+          throwsA(isA<TxBalanceMismatchException>()),
+        );
+      },
+    );
 
     test(
       'transaction with too small fee throws $TxFeeTooSmallException',
@@ -97,48 +102,43 @@ void main() {
       },
     );
 
-    test(
-      'transaction with mismatch between inputs and outputs'
-      ' throws $TxBalanceMismatchException',
-      () {
-        final utxo = TransactionUnspentOutput(
-          input: TransactionInput(
-            transactionId: TransactionHash.fromHex(
-              'd766cd9c60f3307d779892745047036d3fe578588f63ada8a454a1e51141bbf7',
-            ),
-            index: 1,
+    test('transaction too large throws $MaxTxSizeExceededException', () {
+      final utxo = TransactionUnspentOutput(
+        input: TransactionInput(
+          transactionId: TransactionHash.fromHex(
+            'd766cd9c60f3307d779892745047036d3fe578588f63ada8a454a1e51141bbf7',
           ),
-          output: PreBabbageTransactionOutput(
-            address: ShelleyAddress.fromBech32(
-              /* cSpell:disable */
-              'addr_test1qq2fckuzdvxu074ngumdkwn68tuuse67yg55r8exmkwdnn2lc30fwlx8jy6e54em6dcql0ma3gz75rc4ywuzuny7p7csr9kx9g',
-              /* cSpell:enable */
-            ),
-            amount: const Balance(
-              coin: Coin.fromWholeAda(1),
-            ),
+          index: 1,
+        ),
+        output: PreBabbageTransactionOutput(
+          address: ShelleyAddress.fromBech32(
+            /* cSpell:disable */
+            'addr_test1qq2fckuzdvxu074ngumdkwn68tuuse67yg55r8exmkwdnn2lc30fwlx8jy6e54em6dcql0ma3gz75rc4ywuzuny7p7csr9kx9g',
+            /* cSpell:enable */
           ),
-        );
+          amount: const Balance(
+            coin: Coin.fromWholeAda(1002),
+          ),
+        ),
+      );
 
-        final txOutput = PreBabbageTransactionOutput(
-          address: testnetAddr,
-          amount: const Balance(coin: Coin.fromWholeAda(2)),
-        );
+      final txOutput = PreBabbageTransactionOutput(
+        address: testnetAddr,
+        amount: const Balance(coin: Coin.fromWholeAda(1)),
+      );
 
-        final txBuilder = TransactionBuilder(
-          config: transactionBuilderConfig(),
-          inputs: {utxo},
-          outputs: [txOutput],
-          fee: Coin.fromAda(0.2),
-          networkId: NetworkId.testnet,
-        );
+      final txBuilder = TransactionBuilder(
+        config: transactionBuilderConfig(),
+        inputs: {utxo},
+        outputs: List.filled(1000, txOutput),
+        fee: const Coin.fromWholeAda(2),
+      );
 
-        expect(
-          txBuilder.buildBody,
-          throwsA(isA<TxBalanceMismatchException>()),
-        );
-      },
-    );
+      expect(
+        txBuilder.buildBody,
+        throwsA(isA<MaxTxSizeExceededException>()),
+      );
+    });
 
     test('transaction with native assets has correctly calculated fee', () {
       final changeAddress = ShelleyAddress.fromBech32(
