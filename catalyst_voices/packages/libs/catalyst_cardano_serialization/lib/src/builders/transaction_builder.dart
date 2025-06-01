@@ -114,6 +114,204 @@ final class TransactionBuilder extends Equatable {
     this.changeAddress,
   });
 
+  @override
+  List<Object?> get props => [
+        config,
+        inputs,
+        outputs,
+        fee,
+        ttl,
+        auxiliaryData,
+        validityStart,
+        mint,
+        scriptData,
+        collateralInputs,
+        requiredSigners,
+        networkId,
+        collateralReturn,
+        totalCollateral,
+        referenceInputs,
+        witnessBuilder,
+      ];
+
+  /// Applies coin selection to the transaction and updates its state.
+  ///
+  /// This method selects inputs and calculates change outputs and fees using
+  /// the provided [CoinSelectionStrategy]. It returns a new
+  /// [TransactionBuilder] instance with the updated inputs, outputs, and fee.
+  ///
+  /// Parameters:
+  /// - [strategy]: The coin selection strategy to use.
+  /// - [minInputs]: The minimum number of inputs to include.
+  /// - [maxInputs]: The maximum number of inputs to include.
+  ///
+  /// Returns:
+  /// - A new [TransactionBuilder] instance with the updated state.
+  TransactionBuilder applySelection({
+    CoinSelectionStrategy strategy = const GreedySelectionStrategy(),
+    int minInputs = CoinSelector.minInputs,
+    int maxInputs = CoinSelector.maxInputs,
+  }) {
+    final (selectedInputs, changes, totalFee) = selectInputs(
+      strategy: strategy,
+      minInputs: minInputs,
+      maxInputs: maxInputs,
+    );
+
+    return copyWith(
+      inputs: selectedInputs,
+      outputs: [...outputs, ...changes],
+      fee: totalFee,
+    );
+  }
+
+  /// Builds a [TransactionBody] and measures the final transaction size
+  /// that will be submitted to the blockchain.
+  ///
+  /// Knowing the final transaction size is very important as it influences
+  /// the [fee] the wallet must pay for the transaction.
+  ///
+  /// Since the transaction body is signed before all
+  (TransactionBody, int) buildAndSize() {
+    final built = _buildBody();
+
+    // we must build a tx with fake data (of correct size)
+    // to check the final transaction size
+    final fullTx = buildFakeTransaction(built);
+    final fullTxSize = cbor.encode(fullTx.toCbor()).length;
+    return (fullTx.body, fullTxSize);
+  }
+
+  /// Returns the body of the new transaction.
+  ///
+  /// Throws [MaxTxSizeExceededException] if maximum transaction
+  /// size is reached.
+  TransactionBody buildBody() {
+    final (body, fullTxSize) = buildAndSize();
+    if (fullTxSize > config.maxTxSize) {
+      throw MaxTxSizeExceededException(
+        maxTxSize: config.maxTxSize,
+        actualTxSize: fullTxSize,
+      );
+    }
+
+    return body;
+  }
+
+  /// Constructs a placeholder [Transaction] using fake witness data.
+  ///
+  /// This method generates a [Transaction] for estimating the final size by
+  /// creating fake witness data of the appropriate length. If [useWitnesses]
+  /// is set to `true`, it generates a witness set based on the unique input
+  /// addresses. Otherwise, it uses the existing `buildFake` method for
+  /// backward compatibility.
+  ///
+  /// Parameters:
+  /// - [txBody]: The body of the transaction being constructed.
+  /// - [useWitnesses]: If `true`, generates a witness set based on the inputs.
+  ///   Defaults to `false` for backward compatibility.
+  ///
+  /// Returns:
+  /// - A proper [Transaction] with a body, placeholder witness set, and
+  ///   auxiliary data.
+  Transaction buildFakeTransaction(
+    TransactionBody txBody, {
+    bool useWitnesses = false,
+  }) {
+    return Transaction(
+      body: txBody,
+      // TODO(ilap): The buildFake should be refactored instead.
+      witnessSet: useWitnesses ? generateFakeWitnessSet(inputs) : witnessBuilder.buildFake(),
+      isValid: true,
+      auxiliaryData: auxiliaryData,
+    );
+  }
+
+  /// Creates a copy of this transaction builder with modified fields.
+  ///
+  /// Only the specified parameters will be updated; all other fields
+  /// remain unchanged.
+  TransactionBuilder copyWith({
+    Set<TransactionUnspentOutput>? inputs,
+    List<ShelleyMultiAssetTransactionOutput>? outputs,
+    Coin? fee,
+    TransactionWitnessSetBuilder? witnessBuilder,
+  }) {
+    return TransactionBuilder(
+      config: config,
+      inputs: inputs ?? this.inputs,
+      outputs: outputs ?? this.outputs,
+      fee: fee ?? this.fee,
+      ttl: ttl,
+      auxiliaryData: auxiliaryData,
+      validityStart: validityStart,
+      mint: mint,
+      scriptData: scriptData,
+      collateralInputs: collateralInputs,
+      requiredSigners: requiredSigners,
+      networkId: networkId,
+      collateralReturn: collateralReturn,
+      totalCollateral: totalCollateral,
+      referenceInputs: referenceInputs,
+      witnessBuilder: witnessBuilder ?? this.witnessBuilder,
+      changeAddress: changeAddress,
+    );
+  }
+
+  /// Returns the size of the full transaction in bytes.
+  int fullSize() {
+    return buildAndSize().$2;
+  }
+
+  /// Calculates the minimum fee for the transaction.
+  ///
+  /// This method calculates the minimum fee required for the transaction,
+  /// optionally considering the witnesses based on the inputs' addresses.
+  ///
+  /// - [useWitnesses]: If `true`, the fee calculation will include witnesses
+  ///   based on the inputs' addresses, making the fee more accurate by using
+  ///   the proper number of witnesses.
+  ///
+  /// Returns:
+  /// - A [Coin] representing the minimum fee required for the transaction.
+  Coin minFee({bool useWitnesses = false}) {
+    final txBody = copyWith(fee: Coin(config.feeAlgo.constant)).buildBody();
+    final fullTx = buildFakeTransaction(txBody, useWitnesses: useWitnesses);
+
+    return config.feeAlgo.minFee(fullTx, {...inputs, ...?referenceInputs});
+  }
+
+  /// Selects UTXO inputs for the transaction based on the given strategy.
+  ///
+  /// This method uses the provided [CoinSelectionStrategy] to select the
+  /// optimal set of inputs for the transaction. It also allows specifying the
+  /// minimum and maximum number of inputs to be considered during selection.
+  ///
+  /// Parameters:
+  /// - [strategy]: The coin selection strategy to use.
+  /// - [minInputs]: The minimum number of inputs to include.
+  /// - [maxInputs]: The maximum number of inputs to include.
+  ///
+  /// Returns:
+  /// - A [SelectionResult] containing the selected inputs, change outputs, and
+  ///   the total (witnesses included) transaction fee.
+  ///
+  SelectionResult selectInputs({
+    CoinSelectionStrategy strategy = const GreedySelectionStrategy(),
+    int minInputs = CoinSelector.minInputs,
+    int maxInputs = CoinSelector.maxInputs,
+  }) {
+    final selector = InputBuilder(
+      selectionStrategy: strategy,
+    );
+
+    return selector.selectInputs(
+      builder: this,
+      minInputs: minInputs,
+      maxInputs: maxInputs,
+    );
+  }
+
   /// Returns a copy of this [TransactionBuilder] with extra [address] used
   /// to spend any remaining change from the transaction, if it is needed.
   ///
@@ -214,187 +412,212 @@ final class TransactionBuilder extends Equatable {
     return copyWith(witnessBuilder: builder);
   }
 
-  /// Builds a [TransactionBody] and measures the final transaction size
-  /// that will be submitted to the blockchain.
-  ///
-  /// Knowing the final transaction size is very important as it influences
-  /// the [fee] the wallet must pay for the transaction.
-  ///
-  /// Since the transaction body is signed before all
-  (TransactionBody, int) buildAndSize() {
-    final built = _buildBody();
+  /// Removes the last transaction output and inserts a new one with extra [change].
+  /// Updates the [fee] to accommodate a possibly larger new transaction output.
+  TransactionBuilder _addChangeToLastOutput({
+    required Balance change,
+  }) {
+    final newOutputs = List.of(outputs);
+    var changeLeft = change;
+    var newFee = fee!;
 
-    // we must build a tx with fake data (of correct size)
-    // to check the final transaction size
-    final fullTx = buildFakeTransaction(built);
-    final fullTxSize = cbor.encode(fullTx.toCbor()).length;
-    return (fullTx.body, fullTxSize);
+    // remove old output
+    final lastOutput = newOutputs.removeLast();
+    final lastOutputFee = TransactionOutputBuilder.feeForOutput(config, lastOutput);
+    newFee -= lastOutputFee;
+    changeLeft += Balance(coin: lastOutputFee);
+
+    // create new output with remaining change
+    final newOutput = lastOutput.copyWith(amount: lastOutput.amount + changeLeft);
+    final newOutputFee = TransactionOutputBuilder.feeForOutput(config, newOutput);
+
+    // subtract the fee for the new output from it
+    final newOutputMinusFee = newOutput.copyWith(
+      amount: newOutput.amount - Balance(coin: newOutputFee),
+    );
+    newFee += newOutputFee;
+    changeLeft -= Balance(coin: newFee);
+
+    // add new output and modify the fee
+    return copyWith(outputs: newOutputs).withOutput(newOutputMinusFee).withFee(newFee);
   }
 
-  /// Returns the body of the new transaction.
-  ///
-  /// Throws [MaxTxSizeExceededException] if maximum transaction
-  /// size is reached.
-  TransactionBody buildBody() {
-    final (body, fullTxSize) = buildAndSize();
-    if (fullTxSize > config.maxTxSize) {
-      throw MaxTxSizeExceededException(
-        maxTxSize: config.maxTxSize,
-        actualTxSize: fullTxSize,
-      );
+  TransactionBody _buildBody() {
+    final fee = this.fee;
+    if (fee == null) {
+      throw const TxFeeNotSpecifiedException();
     }
 
-    return body;
+    _validateInputsMatchOutputsAndFee(
+      inputs: inputs,
+      outputs: outputs,
+      fee: fee,
+    );
+
+    return TransactionBody(
+      inputs: Set.of(inputs.map((e) => e.input)),
+      outputs: outputs,
+      fee: fee,
+      ttl: ttl,
+      auxiliaryDataHash:
+          auxiliaryData != null ? AuxiliaryDataHash.fromAuxiliaryData(auxiliaryData!) : null,
+      validityStart: validityStart,
+      mint: mint,
+      scriptDataHash: scriptData != null ? ScriptDataHash.fromScriptData(scriptData!) : null,
+      collateralInputs: collateralInputs,
+      requiredSigners: requiredSigners,
+      networkId: networkId,
+      collateralReturn: collateralReturn,
+      totalCollateral: totalCollateral,
+      referenceInputs: referenceInputs?.map((utxo) => utxo.input).toSet(),
+    );
   }
 
-  /// Selects UTXO inputs for the transaction based on the given strategy.
-  ///
-  /// This method uses the provided [CoinSelectionStrategy] to select the
-  /// optimal set of inputs for the transaction. It also allows specifying the
-  /// minimum and maximum number of inputs to be considered during selection.
-  ///
-  /// Parameters:
-  /// - [strategy]: The coin selection strategy to use.
-  /// - [minInputs]: The minimum number of inputs to include.
-  /// - [maxInputs]: The maximum number of inputs to include.
-  ///
-  /// Returns:
-  /// - A [SelectionResult] containing the selected inputs, change outputs, and
-  ///   the total (witnesses included) transaction fee.
-  ///
-  SelectionResult selectInputs({
-    CoinSelectionStrategy strategy = const GreedySelectionStrategy(),
-    int minInputs = CoinSelector.minInputs,
-    int maxInputs = CoinSelector.maxInputs,
+  /// Splits the native assets into multiple [MultiAsset]
+  /// if they don't fit into one transaction output.
+  List<MultiAsset> _packNftsForChange({
+    required ShelleyAddress changeAddress,
+    required Balance changeEstimator,
   }) {
-    final selector = InputBuilder(
-      selectionStrategy: strategy,
-    );
+    final baseMultiAsset = changeEstimator.multiAsset;
+    if (baseMultiAsset == null) return [];
 
-    return selector.selectInputs(
-      builder: this,
-      minInputs: minInputs,
-      maxInputs: maxInputs,
-    );
+    final changeAssets = <MultiAsset>[];
+    var baseCoin = Balance(coin: changeEstimator.coin);
+    var output = TransactionOutput(address: changeAddress, amount: baseCoin);
+
+    for (final policy in baseMultiAsset.bundle.entries) {
+      var oldAmount = output.amount;
+      var val = const Balance.zero();
+      var nextNft = const MultiAsset(bundle: {});
+      var rebuiltAssets = <AssetName, Coin>{};
+
+      for (final asset in policy.value.entries) {
+        if (_willAddingAssetMakeOutputOverflow(
+          output: output,
+          currentAssets: rebuiltAssets,
+          assetToAdd: (policy.key, asset.key, asset.value),
+        )) {
+          // if we got here, this means we will run into a overflow error,
+          // so we want to split into multiple outputs, for that we...
+
+          // 1. insert the current assets as they are, as this won't overflow
+          nextNft = MultiAsset(
+            bundle: {
+              ...nextNft.bundle,
+              policy.key: rebuiltAssets,
+            },
+          );
+
+          val = val.copyWith(multiAsset: nextNft);
+          output = output.copyWith(amount: output.amount + val);
+          changeAssets.add(output.amount.multiAsset!);
+
+          // 2. create a new output with the base coin value as zero
+          baseCoin = const Balance.zero();
+          output = TransactionOutput(
+            address: changeAddress,
+            amount: baseCoin,
+          );
+
+          // 3. continue building the new output from the asset we stopped
+          oldAmount = output.amount;
+          val = const Balance.zero();
+          nextNft = const MultiAsset(bundle: {});
+          rebuiltAssets = {};
+        }
+
+        rebuiltAssets[asset.key] = asset.value;
+      }
+
+      nextNft = MultiAsset(
+        bundle: {
+          ...nextNft.bundle,
+          policy.key: rebuiltAssets,
+        },
+      );
+      val = val.copyWith(multiAsset: nextNft);
+      output = output.copyWith(amount: output.amount + val);
+
+      final outputCopy = output.copyWith(amount: val);
+      final minAda = TransactionOutputBuilder.minimumAdaForOutput(
+        outputCopy,
+        config.coinsPerUtxoByte,
+      );
+
+      final amountCopy = output.amount.copyWith(coin: minAda);
+      final bytes = cbor.encode(amountCopy.toCbor());
+      if (bytes.length > config.maxValueSize) {
+        output = output.copyWith(amount: oldAmount);
+        break;
+      }
+    }
+
+    changeAssets.add(output.amount.multiAsset!);
+    return changeAssets;
   }
 
-  /// Applies coin selection to the transaction and updates its state.
-  ///
-  /// This method selects inputs and calculates change outputs and fees using
-  /// the provided [CoinSelectionStrategy]. It returns a new
-  /// [TransactionBuilder] instance with the updated inputs, outputs, and fee.
-  ///
-  /// Parameters:
-  /// - [strategy]: The coin selection strategy to use.
-  /// - [minInputs]: The minimum number of inputs to include.
-  /// - [maxInputs]: The maximum number of inputs to include.
-  ///
-  /// Returns:
-  /// - A new [TransactionBuilder] instance with the updated state.
-  TransactionBuilder applySelection({
-    CoinSelectionStrategy strategy = const GreedySelectionStrategy(),
-    int minInputs = CoinSelector.minInputs,
-    int maxInputs = CoinSelector.maxInputs,
+  void _validateInputsMatchOutputsAndFee({
+    required Set<TransactionUnspentOutput> inputs,
+    required List<ShelleyMultiAssetTransactionOutput> outputs,
+    required Coin fee,
   }) {
-    final (selectedInputs, changes, totalFee) = selectInputs(
-      strategy: strategy,
-      minInputs: minInputs,
-      maxInputs: maxInputs,
-    );
+    final inputsTotal =
+        inputs.map((e) => e.output.amount).fold(const Balance(coin: Coin(0)), (a, b) => a + b);
+    final outputsTotal =
+        outputs.map((e) => e.amount).fold(const Balance(coin: Coin(0)), (a, b) => a + b);
 
-    return copyWith(
-      inputs: selectedInputs,
-      outputs: [...outputs, ...changes],
-      fee: totalFee,
-    );
+    if (inputsTotal != outputsTotal + Balance(coin: fee)) {
+      throw TransactionBalanceMismatchException(
+        inputs: inputsTotal,
+        outputs: outputsTotal,
+        fee: fee,
+      );
+    }
   }
 
-  /// Constructs a placeholder [Transaction] using fake witness data.
+  /// Returns true if adding additional [assetToAdd] to [currentAssets]
+  /// will trigger size overflow in [output].
   ///
-  /// This method generates a [Transaction] for estimating the final size by
-  /// creating fake witness data of the appropriate length. If [useWitnesses]
-  /// is set to `true`, it generates a witness set based on the unique input
-  /// addresses. Otherwise, it uses the existing `buildFake` method for
-  /// backward compatibility.
-  ///
-  /// Parameters:
-  /// - [txBody]: The body of the transaction being constructed.
-  /// - [useWitnesses]: If `true`, generates a witness set based on the inputs.
-  ///   Defaults to `false` for backward compatibility.
-  ///
-  /// Returns:
-  /// - A proper [Transaction] with a body, placeholder witness set, and
-  ///   auxiliary data.
-  Transaction buildFakeTransaction(
-    TransactionBody txBody, {
-    bool useWitnesses = false,
+  /// The function is used to split native assets into
+  /// multiple outputs if they don't fit in one output.
+  bool _willAddingAssetMakeOutputOverflow({
+    required ShelleyMultiAssetTransactionOutput output,
+    required Map<AssetName, Coin> currentAssets,
+    required (PolicyId, AssetName, Coin) assetToAdd,
   }) {
-    return Transaction(
-      body: txBody,
-      // TODO(ilap): The buildFake should be refactored instead.
-      witnessSet: useWitnesses ? generateFakeWitnessSet(inputs) : witnessBuilder.buildFake(),
-      isValid: true,
-      auxiliaryData: auxiliaryData,
+    final (policy, assetName, value) = assetToAdd;
+
+    final valueWithExtraMultiAssets = Balance(
+      coin: const Coin(0),
+      multiAsset: MultiAsset(
+        bundle: {
+          policy: {
+            ...currentAssets,
+            assetName: value,
+          },
+        },
+      ),
     );
-  }
 
-  /// Generates a fake `TransactionWitnessSet` for accurate transaction fee
-  /// calculation, ensuring the correct number of VKey witnesses based on
-  /// the builder's unique input addresses.
-  static TransactionWitnessSet generateFakeWitnessSet(
-    Set<TransactionUnspentOutput> inputs,
-  ) {
-    final uniqueAddresses = inputs.map((input) => input.output.address.publicKeyHash).toSet();
-
-    return TransactionWitnessSet(
-      vkeyWitnesses: {
-        for (var i = 0; i < uniqueAddresses.length; i++) VkeyWitness.seeded(i),
-      },
+    final outputWithExtraMultiAssets = TransactionOutput(
+      address: output.address,
+      amount: output.amount + valueWithExtraMultiAssets,
     );
+
+    final minAdaForExtraOutput = TransactionOutputBuilder.minimumAdaForOutput(
+      outputWithExtraMultiAssets,
+      config.coinsPerUtxoByte,
+    );
+
+    final valueWithExtraAmountAndMultiAssets = Balance(
+      coin: minAdaForExtraOutput,
+      multiAsset: outputWithExtraMultiAssets.amount.multiAsset,
+    );
+
+    final bytes = cbor.encode(valueWithExtraAmountAndMultiAssets.toCbor());
+    return bytes.length > config.maxValueSize;
   }
-
-  /// Returns the size of the full transaction in bytes.
-  int fullSize() {
-    return buildAndSize().$2;
-  }
-
-  /// Calculates the minimum fee for the transaction.
-  ///
-  /// This method calculates the minimum fee required for the transaction,
-  /// optionally considering the witnesses based on the inputs' addresses.
-  ///
-  /// - [useWitnesses]: If `true`, the fee calculation will include witnesses
-  ///   based on the inputs' addresses, making the fee more accurate by using
-  ///   the proper number of witnesses.
-  ///
-  /// Returns:
-  /// - A [Coin] representing the minimum fee required for the transaction.
-  Coin minFee({bool useWitnesses = false}) {
-    final txBody = copyWith(fee: Coin(config.feeAlgo.constant)).buildBody();
-    final fullTx = buildFakeTransaction(txBody, useWitnesses: useWitnesses);
-
-    return config.feeAlgo.minFee(fullTx, {...inputs, ...?referenceInputs});
-  }
-
-  @override
-  List<Object?> get props => [
-        config,
-        inputs,
-        outputs,
-        fee,
-        ttl,
-        auxiliaryData,
-        validityStart,
-        mint,
-        scriptData,
-        collateralInputs,
-        requiredSigners,
-        networkId,
-        collateralReturn,
-        totalCollateral,
-        referenceInputs,
-        witnessBuilder,
-      ];
 
   TransactionBuilder _withChangeAddressIfNeededWithMultiAssets({
     required ShelleyAddress address,
@@ -487,216 +710,18 @@ final class TransactionBuilder extends Equatable {
     }
   }
 
-  /// Removes the last transaction output and inserts a new one with extra [change].
-  /// Updates the [fee] to accommodate a possibly larger new transaction output.
-  TransactionBuilder _addChangeToLastOutput({
-    required Balance change,
-  }) {
-    final newOutputs = List.of(outputs);
-    var changeLeft = change;
-    var newFee = fee!;
+  /// Generates a fake `TransactionWitnessSet` for accurate transaction fee
+  /// calculation, ensuring the correct number of VKey witnesses based on
+  /// the builder's unique input addresses.
+  static TransactionWitnessSet generateFakeWitnessSet(
+    Set<TransactionUnspentOutput> inputs,
+  ) {
+    final uniqueAddresses = inputs.map((input) => input.output.address.publicKeyHash).toSet();
 
-    // remove old output
-    final lastOutput = newOutputs.removeLast();
-    final lastOutputFee = TransactionOutputBuilder.feeForOutput(config, lastOutput);
-    newFee -= lastOutputFee;
-    changeLeft += Balance(coin: lastOutputFee);
-
-    // create new output with remaining change
-    final newOutput = lastOutput.copyWith(amount: lastOutput.amount + changeLeft);
-    final newOutputFee = TransactionOutputBuilder.feeForOutput(config, newOutput);
-
-    // subtract the fee for the new output from it
-    final newOutputMinusFee = newOutput.copyWith(
-      amount: newOutput.amount - Balance(coin: newOutputFee),
-    );
-    newFee += newOutputFee;
-    changeLeft -= Balance(coin: newFee);
-
-    // add new output and modify the fee
-    return copyWith(outputs: newOutputs).withOutput(newOutputMinusFee).withFee(newFee);
-  }
-
-  /// Returns true if adding additional [assetToAdd] to [currentAssets]
-  /// will trigger size overflow in [output].
-  ///
-  /// The function is used to split native assets into
-  /// multiple outputs if they don't fit in one output.
-  bool _willAddingAssetMakeOutputOverflow({
-    required ShelleyMultiAssetTransactionOutput output,
-    required Map<AssetName, Coin> currentAssets,
-    required (PolicyId, AssetName, Coin) assetToAdd,
-  }) {
-    final (policy, assetName, value) = assetToAdd;
-
-    final valueWithExtraMultiAssets = Balance(
-      coin: const Coin(0),
-      multiAsset: MultiAsset(
-        bundle: {
-          policy: {
-            ...currentAssets,
-            assetName: value,
-          },
-        },
-      ),
-    );
-
-    final outputWithExtraMultiAssets = TransactionOutput(
-      address: output.address,
-      amount: output.amount + valueWithExtraMultiAssets,
-    );
-
-    final minAdaForExtraOutput = TransactionOutputBuilder.minimumAdaForOutput(
-      outputWithExtraMultiAssets,
-      config.coinsPerUtxoByte,
-    );
-
-    final valueWithExtraAmountAndMultiAssets = Balance(
-      coin: minAdaForExtraOutput,
-      multiAsset: outputWithExtraMultiAssets.amount.multiAsset,
-    );
-
-    final bytes = cbor.encode(valueWithExtraAmountAndMultiAssets.toCbor());
-    return bytes.length > config.maxValueSize;
-  }
-
-  /// Splits the native assets into multiple [MultiAsset]
-  /// if they don't fit into one transaction output.
-  List<MultiAsset> _packNftsForChange({
-    required ShelleyAddress changeAddress,
-    required Balance changeEstimator,
-  }) {
-    final baseMultiAsset = changeEstimator.multiAsset;
-    if (baseMultiAsset == null) return [];
-
-    final changeAssets = <MultiAsset>[];
-    var baseCoin = Balance(coin: changeEstimator.coin);
-    var output = TransactionOutput(address: changeAddress, amount: baseCoin);
-
-    for (final policy in baseMultiAsset.bundle.entries) {
-      var oldAmount = output.amount;
-      var val = const Balance.zero();
-      var nextNft = const MultiAsset(bundle: {});
-      var rebuiltAssets = <AssetName, Coin>{};
-
-      for (final asset in policy.value.entries) {
-        if (_willAddingAssetMakeOutputOverflow(
-          output: output,
-          currentAssets: rebuiltAssets,
-          assetToAdd: (policy.key, asset.key, asset.value),
-        )) {
-          // if we got here, this means we will run into a overflow error,
-          // so we want to split into multiple outputs, for that we...
-
-          // 1. insert the current assets as they are, as this won't overflow
-          nextNft = MultiAsset(
-            bundle: {
-              ...nextNft.bundle,
-              policy.key: rebuiltAssets,
-            },
-          );
-
-          val = val.copyWith(multiAsset: nextNft);
-          output = output.copyWith(amount: output.amount + val);
-          changeAssets.add(output.amount.multiAsset!);
-
-          // 2. create a new output with the base coin value as zero
-          baseCoin = const Balance.zero();
-          output = TransactionOutput(
-            address: changeAddress,
-            amount: baseCoin,
-          );
-
-          // 3. continue building the new output from the asset we stopped
-          oldAmount = output.amount;
-          val = const Balance.zero();
-          nextNft = const MultiAsset(bundle: {});
-          rebuiltAssets = {};
-        }
-
-        rebuiltAssets[asset.key] = asset.value;
-      }
-
-      nextNft = MultiAsset(
-        bundle: {
-          ...nextNft.bundle,
-          policy.key: rebuiltAssets,
-        },
-      );
-      val = val.copyWith(multiAsset: nextNft);
-      output = output.copyWith(amount: output.amount + val);
-
-      final outputCopy = output.copyWith(amount: val);
-      final minAda = TransactionOutputBuilder.minimumAdaForOutput(
-        outputCopy,
-        config.coinsPerUtxoByte,
-      );
-
-      final amountCopy = output.amount.copyWith(coin: minAda);
-      final bytes = cbor.encode(amountCopy.toCbor());
-      if (bytes.length > config.maxValueSize) {
-        output = output.copyWith(amount: oldAmount);
-        break;
-      }
-    }
-
-    changeAssets.add(output.amount.multiAsset!);
-    return changeAssets;
-  }
-
-  TransactionBody _buildBody() {
-    final fee = this.fee;
-    if (fee == null) {
-      throw const TxFeeNotSpecifiedException();
-    }
-
-    return TransactionBody(
-      inputs: Set.of(inputs.map((e) => e.input)),
-      outputs: List.of(outputs),
-      fee: fee,
-      ttl: ttl,
-      auxiliaryDataHash:
-          auxiliaryData != null ? AuxiliaryDataHash.fromAuxiliaryData(auxiliaryData!) : null,
-      validityStart: validityStart,
-      mint: mint,
-      scriptDataHash: scriptData != null ? ScriptDataHash.fromScriptData(scriptData!) : null,
-      collateralInputs: collateralInputs,
-      requiredSigners: requiredSigners,
-      networkId: networkId,
-      collateralReturn: collateralReturn,
-      totalCollateral: totalCollateral,
-      referenceInputs: referenceInputs?.map((utxo) => utxo.input).toSet(),
-    );
-  }
-
-  /// Creates a copy of this transaction builder with modified fields.
-  ///
-  /// Only the specified parameters will be updated; all other fields
-  /// remain unchanged.
-  TransactionBuilder copyWith({
-    Set<TransactionUnspentOutput>? inputs,
-    List<ShelleyMultiAssetTransactionOutput>? outputs,
-    Coin? fee,
-    TransactionWitnessSetBuilder? witnessBuilder,
-  }) {
-    return TransactionBuilder(
-      config: config,
-      inputs: inputs ?? this.inputs,
-      outputs: outputs ?? this.outputs,
-      fee: fee ?? this.fee,
-      ttl: ttl,
-      auxiliaryData: auxiliaryData,
-      validityStart: validityStart,
-      mint: mint,
-      scriptData: scriptData,
-      collateralInputs: collateralInputs,
-      requiredSigners: requiredSigners,
-      networkId: networkId,
-      collateralReturn: collateralReturn,
-      totalCollateral: totalCollateral,
-      referenceInputs: referenceInputs,
-      witnessBuilder: witnessBuilder ?? this.witnessBuilder,
-      changeAddress: changeAddress,
+    return TransactionWitnessSet(
+      vkeyWitnesses: {
+        for (var i = 0; i < uniqueAddresses.length; i++) VkeyWitness.seeded(i),
+      },
     );
   }
 }
@@ -770,37 +795,6 @@ final class TransactionOutputBuilder {
   /// Prevents creating instances of [TransactionOutputBuilder].
   const TransactionOutputBuilder._();
 
-  /// Creates a new [TransactionOutput] that transfers
-  /// the [multiAsset] to the address.
-  ///
-  /// Adds a minimum amount of [Coin] to the transaction to pass
-  /// the [minimumAdaForOutput] validation.
-  static ShelleyMultiAssetTransactionOutput withAssetAndMinRequiredCoin({
-    required ShelleyAddress address,
-    required MultiAsset multiAsset,
-    required Coin coinsPerUtxoByte,
-  }) {
-    final minOutput = PreBabbageTransactionOutput(
-      address: address,
-      amount: const Balance.zero(),
-    );
-
-    final minPossibleCoin = minimumAdaForOutput(minOutput, coinsPerUtxoByte);
-
-    final checkOutput = minOutput.copyWith(
-      amount: Balance(
-        coin: minPossibleCoin,
-        multiAsset: multiAsset,
-      ),
-    );
-
-    final requiredCoin = minimumAdaForOutput(checkOutput, coinsPerUtxoByte);
-    return PreBabbageTransactionOutput(
-      address: address,
-      amount: Balance(coin: requiredCoin, multiAsset: multiAsset),
-    );
-  }
-
   /// Calculates the transaction fee for the given [output].
   ///
   /// The output fee is computed by multiplying the encoded output size
@@ -816,6 +810,59 @@ final class TransactionOutputBuilder {
       Coin(
         cbor.encode(output.toCbor()).length * config.feeAlgo.coefficient,
       );
+
+  /// Validates the size of a transaction output against protocol parameters.
+  ///
+  /// A transaction output is valid if:
+  /// - The total value size (including lovelace and multi-assets) does not
+  ///   exceed `maxValueSize`.
+  ///
+  /// These constraints ensure consistent and predictable transaction
+  /// processing.
+  static bool isOutputSizeValid(
+    ShelleyMultiAssetTransactionOutput output,
+    int maxValueSize,
+  ) =>
+      cbor.encode(output.amount.toCbor()).length <= maxValueSize;
+
+  /// Validates the value of a transaction output.
+  ///
+  /// A transaction output value is valid if:
+  /// - **Coin (Lovelace)**:
+  ///   - The value is an unsigned integer within the range [0, 2^64 - 1].
+  ///   - Although Dart's maximum safe integer for web applications is 2^53 - 1,
+  ///     this range is sufficient for Cardano's lovelace maximum value
+  ///     `(4.5 × 10^15)`, which fits well within this range above.
+  /// - **Multi-asset amount**:
+  ///   - The value is a positive uint64 (1 to 2^64 - 1).
+  ///   - Since this range exceeds Dart's `int` limits on the web, `BigInt`
+  ///     should be used.
+  // TODO(ilap): Consider using BigInt for multiasset's values.
+  static bool isOutputValueValid(TransactionOutput output) {
+    final balance = output.amount;
+    final coin = balance.coin;
+    final (lowerBound, upperBound) = CoinSelector.coinValueRange;
+
+    final coinValid = coin >= lowerBound && coin <= upperBound;
+
+    /// It's evaluated using short-circuit logic, so no separation is needed.
+    if (!coinValid || !output.amount.hasMultiAssets()) return coinValid;
+
+    final (assetLowerBound, assetUpperBound) = CoinSelector.assetValueRange;
+
+    for (final entry in balance.multiAsset!.bundle.entries) {
+      final assets = entry.value;
+
+      for (final assetEntry in assets.entries) {
+        final coin = assetEntry.value;
+        final valueValid = coin >= assetLowerBound && coin <= assetUpperBound;
+        if (!valueValid) return false;
+      }
+    }
+
+    /// No failures till now, so the output has valid values.
+    return true;
+  }
 
   /// Calculates the minimum amount of extra [Coin] for UTXO input.
   ///
@@ -861,56 +908,34 @@ final class TransactionOutputBuilder {
     return adjustedMinAda;
   }
 
-  /// Validates the value of a transaction output.
+  /// Creates a new [TransactionOutput] that transfers
+  /// the [multiAsset] to the address.
   ///
-  /// A transaction output value is valid if:
-  /// - **Coin (Lovelace)**:
-  ///   - The value is an unsigned integer within the range [0, 2^64 - 1].
-  ///   - Although Dart's maximum safe integer for web applications is 2^53 - 1,
-  ///     this range is sufficient for Cardano's lovelace maximum value
-  ///     `(4.5 × 10^15)`, which fits well within this range above.
-  /// - **Multi-asset amount**:
-  ///   - The value is a positive uint64 (1 to 2^64 - 1).
-  ///   - Since this range exceeds Dart's `int` limits on the web, `BigInt`
-  ///     should be used.
-  // TODO(ilap): Consider using BigInt for multiasset's values.
-  static bool isOutputValueValid(TransactionOutput output) {
-    final balance = output.amount;
-    final coin = balance.coin;
-    final (lowerBound, upperBound) = CoinSelector.coinValueRange;
+  /// Adds a minimum amount of [Coin] to the transaction to pass
+  /// the [minimumAdaForOutput] validation.
+  static ShelleyMultiAssetTransactionOutput withAssetAndMinRequiredCoin({
+    required ShelleyAddress address,
+    required MultiAsset multiAsset,
+    required Coin coinsPerUtxoByte,
+  }) {
+    final minOutput = PreBabbageTransactionOutput(
+      address: address,
+      amount: const Balance.zero(),
+    );
 
-    final coinValid = coin >= lowerBound && coin <= upperBound;
+    final minPossibleCoin = minimumAdaForOutput(minOutput, coinsPerUtxoByte);
 
-    /// It's evaluated using short-circuit logic, so no separation is needed.
-    if (!coinValid || !output.amount.hasMultiAssets()) return coinValid;
+    final checkOutput = minOutput.copyWith(
+      amount: Balance(
+        coin: minPossibleCoin,
+        multiAsset: multiAsset,
+      ),
+    );
 
-    final (assetLowerBound, assetUpperBound) = CoinSelector.assetValueRange;
-
-    for (final entry in balance.multiAsset!.bundle.entries) {
-      final assets = entry.value;
-
-      for (final assetEntry in assets.entries) {
-        final coin = assetEntry.value;
-        final valueValid = coin >= assetLowerBound && coin <= assetUpperBound;
-        if (!valueValid) return false;
-      }
-    }
-
-    /// No failures till now, so the output has valid values.
-    return true;
+    final requiredCoin = minimumAdaForOutput(checkOutput, coinsPerUtxoByte);
+    return PreBabbageTransactionOutput(
+      address: address,
+      amount: Balance(coin: requiredCoin, multiAsset: multiAsset),
+    );
   }
-
-  /// Validates the size of a transaction output against protocol parameters.
-  ///
-  /// A transaction output is valid if:
-  /// - The total value size (including lovelace and multi-assets) does not
-  ///   exceed `maxValueSize`.
-  ///
-  /// These constraints ensure consistent and predictable transaction
-  /// processing.
-  static bool isOutputSizeValid(
-    ShelleyMultiAssetTransactionOutput output,
-    int maxValueSize,
-  ) =>
-      cbor.encode(output.amount.toCbor()).length <= maxValueSize;
 }
