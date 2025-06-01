@@ -107,10 +107,7 @@ final class TransactionBuilder extends Equatable {
     this.collateralReturn,
     this.totalCollateral,
     this.referenceInputs,
-    this.witnessBuilder = const TransactionWitnessSetBuilder(
-      vkeys: {},
-      vkeysCount: 1,
-    ),
+    this.witnessBuilder = const TransactionWitnessSetBuilder(vkeys: {}),
     this.changeAddress,
   });
 
@@ -191,27 +188,19 @@ final class TransactionBuilder extends Equatable {
   /// Constructs a placeholder [Transaction] using fake witness data.
   ///
   /// This method generates a [Transaction] for estimating the final size by
-  /// creating fake witness data of the appropriate length. If [useWitnesses]
-  /// is set to `true`, it generates a witness set based on the unique input
-  /// addresses. Otherwise, it uses the existing `buildFake` method for
-  /// backward compatibility.
+  /// creating fake witness data of the appropriate length.
+  /// It generates a witness set based on the unique input addresses and required signers.
   ///
   /// Parameters:
   /// - [txBody]: The body of the transaction being constructed.
-  /// - [useWitnesses]: If `true`, generates a witness set based on the inputs.
-  ///   Defaults to `false` for backward compatibility.
   ///
   /// Returns:
   /// - A proper [Transaction] with a body, placeholder witness set, and
   ///   auxiliary data.
-  Transaction buildFakeTransaction(
-    TransactionBody txBody, {
-    bool useWitnesses = false,
-  }) {
+  Transaction buildFakeTransaction(TransactionBody txBody) {
     return Transaction(
       body: txBody,
-      // TODO(ilap): The buildFake should be refactored instead.
-      witnessSet: useWitnesses ? generateFakeWitnessSet(inputs) : witnessBuilder.buildFake(),
+      witnessSet: generateFakeWitnessSet(inputs, requiredSigners),
       isValid: true,
       auxiliaryData: auxiliaryData,
     );
@@ -258,15 +247,11 @@ final class TransactionBuilder extends Equatable {
   /// This method calculates the minimum fee required for the transaction,
   /// optionally considering the witnesses based on the inputs' addresses.
   ///
-  /// - [useWitnesses]: If `true`, the fee calculation will include witnesses
-  ///   based on the inputs' addresses, making the fee more accurate by using
-  ///   the proper number of witnesses.
-  ///
   /// Returns:
   /// - A [Coin] representing the minimum fee required for the transaction.
-  Coin minFee({bool useWitnesses = false}) {
+  Coin minFee() {
     final txBody = copyWith(fee: Coin(config.feeAlgo.constant))._buildBody();
-    final fullTx = buildFakeTransaction(txBody, useWitnesses: useWitnesses);
+    final fullTx = buildFakeTransaction(txBody);
 
     return config.feeAlgo.minFee(fullTx, {...inputs, ...?referenceInputs});
   }
@@ -741,11 +726,13 @@ final class TransactionBuilder extends Equatable {
 
   /// Generates a fake `TransactionWitnessSet` for accurate transaction fee
   /// calculation, ensuring the correct number of VKey witnesses based on
-  /// the builder's unique input addresses.
+  /// the builder's unique input addresses and required signers.
   static TransactionWitnessSet generateFakeWitnessSet(
     Set<TransactionUnspentOutput> inputs,
+    Set<Ed25519PublicKeyHash>? requiredSigners,
   ) {
-    final uniqueAddresses = inputs.map((input) => input.output.address.publicKeyHash).toSet();
+    final uniqueAddresses = inputs.map((input) => input.output.address.publicKeyHash).toSet()
+      ..addAll(requiredSigners ?? {});
 
     return TransactionWitnessSet(
       vkeyWitnesses: {

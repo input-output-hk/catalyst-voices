@@ -194,7 +194,7 @@ final class InputBuilder implements CoinSelector {
     Balance selectedTotal,
     Balance targetTotal,
   ) {
-    final minFee = builder.copyWith(inputs: selectedInputs).minFee(useWitnesses: true);
+    final minFee = builder.copyWith(inputs: selectedInputs).minFee();
     final minimumRequired = targetTotal + Balance(coin: minFee);
 
     if (selectedTotal.lessThan(minimumRequired)) return null;
@@ -245,6 +245,7 @@ final class InputBuilder implements CoinSelector {
     Balance remainingBalance,
     Coin minFee,
   ) {
+    // TODO(dtscalac): build here multiple outputs if native assets cannot fit into one
     if (remainingBalance.isZero) return ([], const Coin(0));
     if (builder.changeAddress == null) {
       throw ArgumentError('Change address required for non-zero balance.');

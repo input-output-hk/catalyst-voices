@@ -147,12 +147,6 @@ Transaction _buildUnsignedRbacTx({
     inputs: inputs,
     networkId: NetworkId.testnet,
     auxiliaryData: auxiliaryData,
-    witnessBuilder: const TransactionWitnessSetBuilder(
-      vkeys: {},
-      // TODO(dtscalac): investigate if vkeyCount can be found out
-      // in a better way, count = reward addresses vkeys + payment address vkey
-      vkeysCount: 2,
-    ),
     changeAddress: changeAddress,
   );
 

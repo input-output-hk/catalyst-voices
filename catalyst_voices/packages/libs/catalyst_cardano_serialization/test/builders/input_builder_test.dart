@@ -88,6 +88,7 @@ void main() {
                 isValid: true,
                 witnessSet: TransactionBuilder.generateFakeWitnessSet(
                   appliedBuilder.inputs,
+                  appliedBuilder.requiredSigners,
                 ),
               );
 

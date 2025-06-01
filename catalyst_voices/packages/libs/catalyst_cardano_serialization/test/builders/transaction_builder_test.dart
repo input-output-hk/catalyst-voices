@@ -79,11 +79,7 @@ void main() {
           index: 1,
         ),
         output: PreBabbageTransactionOutput(
-          address: ShelleyAddress.fromBech32(
-            /* cSpell:disable */
-            'addr_test1qq2fckuzdvxu074ngumdkwn68tuuse67yg55r8exmkwdnn2lc30fwlx8jy6e54em6dcql0ma3gz75rc4ywuzuny7p7csr9kx9g',
-            /* cSpell:enable */
-          ),
+          address: SelectionUtils.randomAddress(),
           amount: const Balance(
             coin: Coin.fromWholeAda(1),
           ),
@@ -117,11 +113,7 @@ void main() {
           index: 1,
         ),
         output: PreBabbageTransactionOutput(
-          address: ShelleyAddress.fromBech32(
-            /* cSpell:disable */
-            'addr_test1qq2fckuzdvxu074ngumdkwn68tuuse67yg55r8exmkwdnn2lc30fwlx8jy6e54em6dcql0ma3gz75rc4ywuzuny7p7csr9kx9g',
-            /* cSpell:enable */
-          ),
+          address: SelectionUtils.randomAddress(),
           amount: const Balance(
             coin: Coin.fromWholeAda(1),
           ),
@@ -155,11 +147,7 @@ void main() {
           index: 1,
         ),
         output: PreBabbageTransactionOutput(
-          address: ShelleyAddress.fromBech32(
-            /* cSpell:disable */
-            'addr_test1qq2fckuzdvxu074ngumdkwn68tuuse67yg55r8exmkwdnn2lc30fwlx8jy6e54em6dcql0ma3gz75rc4ywuzuny7p7csr9kx9g',
-            /* cSpell:enable */
-          ),
+          address: SelectionUtils.randomAddress(),
           amount: const Balance(
             coin: Coin.fromWholeAda(1002),
           ),
@@ -185,13 +173,7 @@ void main() {
     });
 
     test('transaction with native assets has correctly calculated fee', () {
-      final changeAddress = ShelleyAddress.fromBech32(
-        /* cSpell:disable */
-        'addr_test1qq2fckuzdvxu074ngumdkwn68tuuse67yg5'
-        '5r8exmkwdnn2lc30fwlx8jy6e54em6dcql0ma3gz75rc4'
-        'ywuzuny7p7csr9kx9g',
-        /* cSpell:enable */
-      );
+      final changeAddress = SelectionUtils.randomAddress();
 
       final utxoWithNativeAssets = TransactionUnspentOutput(
         input: TransactionInput(
@@ -201,11 +183,7 @@ void main() {
           index: 1,
         ),
         output: PreBabbageTransactionOutput(
-          address: ShelleyAddress.fromBech32(
-            /* cSpell:disable */
-            'addr_test1qq2fckuzdvxu074ngumdkwn68tuuse67yg55r8exmkwdnn2lc30fwlx8jy6e54em6dcql0ma3gz75rc4ywuzuny7p7csr9kx9g',
-            /* cSpell:enable */
-          ),
+          address: SelectionUtils.randomAddress(),
           amount: Balance(
             coin: const Coin(9298446742),
             multiAsset: MultiAsset(
