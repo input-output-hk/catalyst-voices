@@ -12,7 +12,7 @@ import 'package:http/http.dart' as http;
 /// mapping out these requests to a proper converter type.
 class CborOrJsonDelegateConverter implements Converter {
   static const cborRequests = [
-    (method: 'PUT', path: '/api/v1/document'),
+    (method: 'PUT', path: '/v1/document'),
   ];
 
   final Converter cborConverter;
@@ -49,7 +49,7 @@ class CborOrJsonDelegateConverter implements Converter {
   bool _isCborRequest(http.BaseRequest request) {
     for (final cborRequest in cborRequests) {
       if (cborRequest.method.equalsIgnoreCase(request.method) &&
-          cborRequest.path.equalsIgnoreCase(request.url.path)) {
+          request.url.path.endsWith(cborRequest.path)) {
         return true;
       }
     }
