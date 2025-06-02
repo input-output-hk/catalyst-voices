@@ -537,7 +537,7 @@
                             "$ref": "#/definitions/multiLineTextEntryMarkdown",
                             "title": "Mention your open-source License and describe your open-source license rationale.",
                             "x-placeholder": "Please provide your rationale.",
-                            "description": "Please provide your open-soruce license rationale.",
+                            "description": "Please provide your open-source license rationale.",
                             "x-guidance": "- For instance, any recognized open-source license (MIT, Apache 2.0, GPL or other).\n- Explain why this license fits your project goals (e.g. broad use, contribution rules, commercial compatibility).\n- Avoid vague terms like “custom license” without justification.",
                             "minLength": 200,
                             "maxLength": 600
