@@ -155,7 +155,7 @@ project: {
 						}
 						replicas:       1
 						serviceAccount: "catalyst-gateway"
-						strategy:       "Recreate"
+						strategy:       "RollingUpdate"
 						tolerations: [
 							{
 								key:      "app"
