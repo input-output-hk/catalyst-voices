@@ -18,8 +18,8 @@ void main() {
       'when using coin selection algorithm',
       () {
         forAll(
-          maxExamples: 200,
-          integer(min: 40, max: 150),
+          maxExamples: 300,
+          integer(min: 1, max: 140),
           (utxoCount) {
             final utxos = SelectionUtils.generateUtxos(
               utxoCount,
@@ -72,8 +72,8 @@ void main() {
       'when consuming all inputs',
       () {
         forAll(
-          maxExamples: 150,
-          integer(min: 40, max: 150),
+          maxExamples: 300,
+          integer(min: 1, max: 140),
           (utxoCount) {
             final utxos = SelectionUtils.generateUtxos(
               utxoCount,
