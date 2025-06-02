@@ -7,6 +7,7 @@ final class ProposalsFilters extends Equatable {
   final bool? onlyAuthor;
   final SignedDocumentRef? category;
   final String? searchQuery;
+  final Duration? maxAge;
 
   const ProposalsFilters({
     this.type = ProposalsFilterType.total,
@@ -14,6 +15,7 @@ final class ProposalsFilters extends Equatable {
     this.onlyAuthor,
     this.category,
     this.searchQuery,
+    this.maxAge,
   });
 
   @override
@@ -23,6 +25,7 @@ final class ProposalsFilters extends Equatable {
         onlyAuthor,
         category,
         searchQuery,
+        maxAge,
       ];
 
   ProposalsFilters copyWith({
@@ -31,6 +34,7 @@ final class ProposalsFilters extends Equatable {
     Optional<bool>? onlyAuthor,
     Optional<SignedDocumentRef>? category,
     Optional<String>? searchQuery,
+    Optional<Duration>? maxAge,
   }) {
     return ProposalsFilters(
       type: type ?? this.type,
@@ -38,6 +42,7 @@ final class ProposalsFilters extends Equatable {
       onlyAuthor: onlyAuthor.dataOr(this.onlyAuthor),
       category: category.dataOr(this.category),
       searchQuery: searchQuery.dataOr(this.searchQuery),
+      maxAge: maxAge.dataOr(this.maxAge),
     );
   }
 
@@ -47,6 +52,7 @@ final class ProposalsFilters extends Equatable {
       onlyAuthor: onlyAuthor,
       category: category,
       searchQuery: searchQuery,
+      maxAge: maxAge,
     );
   }
 
@@ -56,7 +62,8 @@ final class ProposalsFilters extends Equatable {
       'author[$author], '
       'onlyAuthor[$onlyAuthor], '
       'category[$category], '
-      'searchQuery[$searchQuery]'
+      'searchQuery[$searchQuery], '
+      'maxAge[$maxAge]'
       ')';
 }
 
