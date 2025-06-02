@@ -6,15 +6,15 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Catalyst Voices [macOS]",
+      "name": "Catalyst Voices [macOS][DEV]",
       "cwd": "catalyst_voices/apps/voices",
       "request": "launch",
       "type": "dart",
       "flutterMode": "debug",
-      "program": "lib/configs/main_web.dart"
+      "program": "lib/configs/main_dev.dart"
     },
     {
-      "name": "Catalyst Voices [Web]",
+      "name": "Catalyst Voices [Web][DEV]",
       "cwd": "catalyst_voices/apps/voices",
       "request": "launch",
       "type": "dart",
@@ -23,6 +23,8 @@
       "args": [
         "--dart-define",
         "SENTRY_DSN=REPLACE_WITH_SENTRY_DSN_URL",
+        "--dart-define",
+        "ENV_NAME=dev",
         // flutter_rust_bridge: https://cjycode.com/flutter_rust_bridge/manual/miscellaneous/web-cross-origin#when-flutter-run
         // drift: https://drift.simonbinder.eu/platforms/web/#additional-headers
         "--web-header",
