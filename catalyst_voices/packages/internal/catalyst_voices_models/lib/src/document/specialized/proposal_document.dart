@@ -15,6 +15,8 @@ final class ProposalDocument extends Equatable {
   /// Since properties are dynamic the application cannot determine
   /// which property is the title in any other way than
   /// by hardcoding it's node ID.
+  ///
+  /// Some of nodes are used as paths for db jsonb queries.
   static final titleNodeId = DocumentNodeId.fromString('setup.title.title');
   static final descriptionNodeId = DocumentNodeId.fromString('summary.solution.summary');
   static final requestedFundsNodeId = DocumentNodeId.fromString('summary.budget.requestedFunds');
@@ -146,6 +148,9 @@ final class ProposalDocument extends Equatable {
 }
 
 final class ProposalMetadata extends DocumentMetadata {
+  static const categoryIdNode = NodeId('categoryId.id');
+  static const authorsNode = NodeId('authors');
+
   final SignedDocumentRef templateRef;
   final SignedDocumentRef categoryId;
   final List<CatalystId> authors;

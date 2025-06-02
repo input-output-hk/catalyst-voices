@@ -2831,7 +2831,6 @@
   "@enterTitle": {
     "description": "CTA text for the title input field"
   },
-
   "proposalTitleShortDescription": "A strong proposal title can really set the tone and capture attention. ",
   "@proposalTitleShortDescription": {
     "description": "Short description for the title input field"
@@ -2863,5 +2862,34 @@
   "readCategoryBriefButtonLabel": "Read category brief",
   "@readCategoryBriefButtonLabel": {
     "description": "Label for the read category brief button"
+  },
+  "proposalsLatestUpdatesHours": "Latest updates ({count}{count, plural, =1{hr} other{hrs}})",
+  "@proposalsLatestUpdatesHours": {
+    "description": "One of filter options for proposals. Meaning show only latest proposals.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "orderProposalsAlphabetical": "Alphabetical",
+  "@orderProposalsAlphabetical": {
+    "description": "Order proposals by title option"
+  },
+  "orderProposalsBudgetAsc": "Budget: lowest first",
+  "@orderProposalsBudgetAsc": {
+    "description": "Order proposals by budget option"
+  },
+  "orderProposalsBudgetDesc": "Budget: highest first",
+  "@orderProposalsBudgetDesc": {
+    "description": "Order proposals by budget option"
+  },
+  "orderProposalsUpdateDateAsc": "Oldest to newest",
+  "@orderProposalsUpdateDateAsc": {
+    "description": "Order proposals by update date option"
+  },
+  "orderProposalsUpdateDateDesc": "Newest to oldest",
+  "@orderProposalsUpdateDateDesc": {
+    "description": "Order proposals by update date option"
   }
 }
