@@ -15,7 +15,15 @@ class SeedPhraseCheckResultPanel extends StatelessWidget {
   Widget build(BuildContext context) {
     return const RegistrationDetailsPanelScaffold(
       body: SingleChildScrollView(child: _BlocRegistrationStageMessage()),
-      footer: _BlocNavigation(),
+      footer: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          _BlocNextStep(),
+          SizedBox(height: 10),
+          _BlocNavigation(),
+        ],
+      ),
     );
   }
 }
