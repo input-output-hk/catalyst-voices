@@ -95,7 +95,7 @@ add the following configuration to your `.vscode/launch.json` file:
   "program": "lib/configs/main_qa.dart",
   "args": [
     "--dart-define",
-    "SENTRY_DSN=REPLACE_WITH_SENTRY_DSN_URL",
+    "ENV_NAME=dev",
     "--web-header",
     "Cross-Origin-Opener-Policy=same-origin",
     "--web-header",

@@ -1,5 +1,6 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
-import 'package:catalyst_voices/widgets/tiles/voices_expansion_tile.dart';
+import 'package:catalyst_voices/widgets/widgets.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
@@ -38,9 +39,9 @@ class _BodyText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(
-      value,
-      style: context.textTheme.bodyMedium,
+    return MarkdownText(
+      MarkdownData(value),
+      pStyle: context.textTheme.bodyLarge,
     );
   }
 }

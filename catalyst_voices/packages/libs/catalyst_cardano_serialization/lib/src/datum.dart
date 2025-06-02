@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+
 import 'package:catalyst_cardano_serialization/src/types.dart';
 import 'package:cbor/cbor.dart';
 import 'package:equatable/equatable.dart';
