@@ -2859,6 +2859,10 @@
   "@selectCategoryToSeeDetailsDescription": {
     "description": "Text for the select category to see details description in new proposal dialog"
   },
+  "readCategoryBriefButtonLabel": "Read category brief",
+  "@readCategoryBriefButtonLabel": {
+    "description": "Label for the read category brief button"
+  },
   "proposalsLatestUpdatesHours": "Latest updates ({count}{count, plural, =1{hr} other{hrs}})",
   "@proposalsLatestUpdatesHours": {
     "description": "One of filter options for proposals. Meaning show only latest proposals.",
