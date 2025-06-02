@@ -29,7 +29,7 @@ final class ProposalDocument extends Equatable {
   static final milestoneListNodeId =
       DocumentNodeId.fromString('milestones.milestones.milestone_list');
   static final milestoneListChildNodeId =
-      DocumentNodeId.fromString('milestones.milestones.milestone_list.milestone.');
+      DocumentNodeId.fromString('milestones.milestones.milestone_list.');
   static final tagNodeId = DocumentNodeId.fromString('theme.theme.grouped_tag');
 
   /// A list of all [DocumentNodeId] that are expected to appear
