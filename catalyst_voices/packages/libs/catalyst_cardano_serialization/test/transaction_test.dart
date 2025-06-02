@@ -137,14 +137,6 @@ void main() {
   });
 }
 
-void _testTransactionSerializationRoundTrip(Transaction transaction) {
-  final hex1 = hex.encode(cbor.encode(transaction.toCbor()));
-  final tx1 = Transaction.fromCbor(cbor.decode(hex.decode(hex1)));
-  final hex2 = hex.encode(cbor.encode(tx1.toCbor()));
-
-  expect(hex1, equals(hex2));
-}
-
 void _testTransactionSerialization(
   Transaction transaction,
   String expectedHex,
@@ -153,4 +145,12 @@ void _testTransactionSerialization(
   final hexString = hex.encode(bytes);
 
   expect(hexString, equals(expectedHex));
+}
+
+void _testTransactionSerializationRoundTrip(Transaction transaction) {
+  final hex1 = hex.encode(cbor.encode(transaction.toCbor()));
+  final tx1 = Transaction.fromCbor(cbor.decode(hex.decode(hex1)));
+  final hex2 = hex.encode(cbor.encode(tx1.toCbor()));
+
+  expect(hex1, equals(hex2));
 }
