@@ -35,11 +35,23 @@ class _DocumentTokenValueWidgetState extends State<DocumentTokenValueWidget> {
   int? get _value => widget.property.value ?? widget.schema.defaultValue;
 
   @override
-  void initState() {
-    super.initState();
+  Widget build(BuildContext context) {
+    final schema = widget.schema;
 
-    _controller = VoicesIntFieldController(_value);
-    _focusNode = FocusNode(canRequestFocus: widget.isEditMode);
+    return TokenField(
+      controller: _controller,
+      focusNode: _focusNode,
+      onChanged: _onChanged,
+      onFieldSubmitted: _onChanged,
+      validator: _validator,
+      labelText: schema.title.isEmpty ? null : schema.formattedTitle,
+      placeholder: schema.placeholder,
+      range: schema.numRange,
+      currency: widget.currency,
+      showHelper: widget.isEditMode,
+      enabled: widget.isEditMode,
+      ignorePointers: !widget.isEditMode,
+    );
   }
 
   @override
@@ -66,22 +78,20 @@ class _DocumentTokenValueWidgetState extends State<DocumentTokenValueWidget> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    final schema = widget.schema;
+  void initState() {
+    super.initState();
 
-    return TokenField(
-      controller: _controller,
-      focusNode: _focusNode,
-      onChanged: _onChanged,
-      onFieldSubmitted: _onChanged,
-      validator: _validator,
-      labelText: schema.title.isEmpty ? null : schema.formattedTitle,
-      range: schema.numRange,
-      currency: widget.currency,
-      showHelper: widget.isEditMode,
-      enabled: widget.isEditMode,
-      ignorePointers: !widget.isEditMode,
+    _controller = VoicesIntFieldController(_value);
+    _focusNode = FocusNode(canRequestFocus: widget.isEditMode);
+  }
+
+  void _onChanged(int? value) {
+    final change = DocumentValueChange(
+      nodeId: widget.schema.nodeId,
+      value: value,
     );
+
+    widget.onChanged([change]);
   }
 
   void _onEditModeChanged() {
@@ -92,15 +102,6 @@ class _DocumentTokenValueWidgetState extends State<DocumentTokenValueWidget> {
     } else {
       _focusNode.unfocus();
     }
-  }
-
-  void _onChanged(int? value) {
-    final change = DocumentValueChange(
-      nodeId: widget.schema.nodeId,
-      value: value,
-    );
-
-    widget.onChanged([change]);
   }
 
   VoicesTextFieldValidationResult _validator(int? value, String text) {
