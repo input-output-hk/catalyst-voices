@@ -1,7 +1,5 @@
 /// Holds cbor tags not specified by the official cbor package.
 final class CborCustomTags {
-  const CborCustomTags._();
-
   /// The value is absent (a gap in the array).
   static const int absent = 31;
 
@@ -13,6 +11,8 @@ final class CborCustomTags {
 
   /// A cbor tag describing a ED25519-BIP32 Public Key.
   static const int ed25519Bip32PublicKey = 32773;
+
+  const CborCustomTags._();
 }
 
 /// How many bytes are used in cbor encoding for a major type/length.
@@ -32,13 +32,13 @@ enum CborSize {
   /// Length/data is in 8 bytes following the type information.
   eight(bytes: 8);
 
+  /// The max int value that can be inlined in cbor without extra bytes.
+  static const int maxInlineEncoding = 23;
+
   /// The amount of bytes it takes to encode the type in cbor.
   final int bytes;
 
   const CborSize({required this.bytes});
-
-  /// The max int value that can be inlined in cbor without extra bytes.
-  static const int maxInlineEncoding = 23;
 
   /// Calculates the [CborSize] for arbitrary [value].
   static CborSize ofInt(int value) {

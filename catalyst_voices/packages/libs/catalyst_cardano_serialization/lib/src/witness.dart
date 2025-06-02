@@ -2,40 +2,6 @@ import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.da
 import 'package:cbor/cbor.dart';
 import 'package:equatable/equatable.dart';
 
-/// Witnesses that allow for various types of transactions on the Cardano
-/// blockchain.
-enum WitnessType {
-  /// A witness that contains a verification key.
-  vkeyWitness(0),
-
-  /// A native script witness.
-  nativeScript(1),
-
-  /// A bootstrap witness.
-  bootstrapWitness(2),
-
-  /// A Plutus v1 script witness.
-  plutusV1Script(3),
-
-  /// A Plutus data witness.
-  plutusData(4),
-
-  /// A redeemer witness.
-  redeemers(5),
-
-  /// A Plutus v2 script witness.
-  plutusV2Script(6),
-
-  /// A Plutus v3 script witness.
-  plutusV3Script(7);
-
-  /// The integer value associated with the witness type.
-  final int value;
-
-  /// Constructs a new `WitnessType` with the given integer value.
-  const WitnessType(this.value);
-}
-
 /// A set of witnesses that sign the transaction.
 final class TransactionWitnessSet extends Equatable implements CborEncodable {
   /// The witnesses that sign the transaction.
@@ -104,14 +70,15 @@ final class TransactionWitnessSet extends Equatable implements CborEncodable {
     );
   }
 
-  static Set<T> _getWitnesses<T>(
-    CborMap map,
-    WitnessType type,
-    T Function(CborValue) fromCbor,
-  ) {
-    final value = map[CborSmallInt(type.value)] as CborList?;
-    return value?.map(fromCbor).toSet() ?? {};
-  }
+  @override
+  List<Object?> get props => [
+        vkeyWitnesses,
+        nativeScripts,
+        plutusV1Scripts,
+        redeemers,
+        plutusV2Scripts,
+        plutusV3Scripts,
+      ];
 
   /// Serializes the type as cbor.
   @override
@@ -147,15 +114,14 @@ final class TransactionWitnessSet extends Equatable implements CborEncodable {
     return {};
   }
 
-  @override
-  List<Object?> get props => [
-        vkeyWitnesses,
-        nativeScripts,
-        plutusV1Scripts,
-        redeemers,
-        plutusV2Scripts,
-        plutusV3Scripts,
-      ];
+  static Set<T> _getWitnesses<T>(
+    CborMap map,
+    WitnessType type,
+    T Function(CborValue) fromCbor,
+  ) {
+    final value = map[CborSmallInt(type.value)] as CborList?;
+    return value?.map(fromCbor).toSet() ?? {};
+  }
 }
 
 /// The transaction witness with a [signature] of the transaction.
@@ -172,15 +138,6 @@ final class VkeyWitness extends Equatable implements CborEncodable {
     required this.signature,
   });
 
-  /// Builds a fake [VkeyWitness] that helps to measure target transaction
-  /// size when the transaction hasn't been signed yet.
-  factory VkeyWitness.seeded(int byte) {
-    return VkeyWitness(
-      vkey: Ed25519PublicKey.seeded(byte),
-      signature: Ed25519Signature.seeded(byte),
-    );
-  }
-
   /// Deserializes the type from cbor.
   factory VkeyWitness.fromCbor(CborValue value) {
     final list = value as CborList;
@@ -193,6 +150,18 @@ final class VkeyWitness extends Equatable implements CborEncodable {
     );
   }
 
+  /// Builds a fake [VkeyWitness] that helps to measure target transaction
+  /// size when the transaction hasn't been signed yet.
+  factory VkeyWitness.seeded(int byte) {
+    return VkeyWitness(
+      vkey: Ed25519PublicKey.seeded(byte),
+      signature: Ed25519Signature.seeded(byte),
+    );
+  }
+
+  @override
+  List<Object?> get props => [vkey, signature];
+
   /// Serializes the type as cbor.
   @override
   CborValue toCbor({List<int> tags = const []}) {
@@ -204,7 +173,38 @@ final class VkeyWitness extends Equatable implements CborEncodable {
       tags: tags,
     );
   }
+}
 
-  @override
-  List<Object?> get props => [vkey, signature];
+/// Witnesses that allow for various types of transactions on the Cardano
+/// blockchain.
+enum WitnessType {
+  /// A witness that contains a verification key.
+  vkeyWitness(0),
+
+  /// A native script witness.
+  nativeScript(1),
+
+  /// A bootstrap witness.
+  bootstrapWitness(2),
+
+  /// A Plutus v1 script witness.
+  plutusV1Script(3),
+
+  /// A Plutus data witness.
+  plutusData(4),
+
+  /// A redeemer witness.
+  redeemers(5),
+
+  /// A Plutus v2 script witness.
+  plutusV2Script(6),
+
+  /// A Plutus v3 script witness.
+  plutusV3Script(7);
+
+  /// The integer value associated with the witness type.
+  final int value;
+
+  /// Constructs a new `WitnessType` with the given integer value.
+  const WitnessType(this.value);
 }

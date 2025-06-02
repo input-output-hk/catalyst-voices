@@ -35,9 +35,7 @@ Future<BootstrapArgs> bootstrap({
   GoRouter? router,
   AppEnvironment? environment,
 }) async {
-  _loggingService
-    ..level = kDebugMode ? Level.FINER : Level.OFF
-    ..printLogs = kDebugMode;
+  await _loggingService.init();
 
   GoRouter.optionURLReflectsImperativeAPIs = true;
   setPathUrlStrategy();
@@ -45,7 +43,7 @@ Future<BootstrapArgs> bootstrap({
   environment ??= AppEnvironment.fromEnv();
 
   await _cleanupOldStorages();
-  await registerDependencies(environment: environment);
+  await registerDependencies(environment: environment, loggingService: _loggingService);
   await _initCryptoUtils();
 
   final configSource = ApiConfigSource(Dependencies.instance.get());
@@ -104,10 +102,12 @@ void registerConfig(AppConfig config) {
 @visibleForTesting
 Future<void> registerDependencies({
   AppEnvironment environment = const AppEnvironment.dev(),
+  LoggingService? loggingService,
 }) async {
   if (!Dependencies.instance.isInitialized) {
     await Dependencies.instance.init(
       environment: environment,
+      loggingService: loggingService,
     );
   }
 }

@@ -21,6 +21,7 @@ class EditableTile extends StatelessWidget {
   final VoicesEditCancelButtonStyle editCancelButtonStyle;
   final ValueChanged<EditableTileChange>? onChanged;
   final List<Widget> footerActions;
+  final Widget? overrideAction;
   final Widget child;
 
   const EditableTile({
@@ -36,6 +37,7 @@ class EditableTile extends StatelessWidget {
     this.editCancelButtonStyle = VoicesEditCancelButtonStyle.text,
     this.onChanged,
     this.footerActions = const [],
+    this.overrideAction,
     required this.child,
   });
 
@@ -47,16 +49,17 @@ class EditableTile extends StatelessWidget {
     return PropertyTile(
       title: title,
       statesController: statesController,
-      action: Offstage(
-        offstage: !isEditEnabled,
-        child: VoicesEditCancelButton(
-          key: const Key('EditableTileEditCancelButton'),
-          style: editCancelButtonStyle,
-          onTap: _toggleEditMode,
-          isEditing: isEditMode,
-          hasError: errorText != null,
-        ),
-      ),
+      action: overrideAction ??
+          Offstage(
+            offstage: !isEditEnabled,
+            child: VoicesEditCancelButton(
+              key: const Key('EditableTileEditCancelButton'),
+              style: editCancelButtonStyle,
+              onTap: _toggleEditMode,
+              isEditing: isEditMode,
+              hasError: errorText != null,
+            ),
+          ),
       footer: showFooter
           ? _Footer(
               saveButtonLeading: saveButtonLeading,
