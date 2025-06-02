@@ -31,7 +31,7 @@ class CategoryCompactDetailView extends StatelessWidget {
               children: [
                 _CategoryBrief(
                   categoryName: category.formattedName,
-                  categoryDescription: category.shortDescription,
+                  categoryDescription: category.description,
                   categoryRef: category.id,
                 ),
                 FundsDetailCard(

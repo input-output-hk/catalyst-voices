@@ -19,6 +19,40 @@ final class InputBuilder implements CoinSelector {
   /// Creates an [InputBuilder] with the given [selectionStrategy].
   const InputBuilder({required this.selectionStrategy});
 
+  /// Groups UTxOs by token, mapping each token to its corresponding UTxOs.
+  @override
+  AssetsGroup buildAssetGroups(
+    Balance requiredBalance,
+    Set<TransactionUnspentOutput> inputs,
+  ) {
+    final assetMap = <AssetId, List<TransactionUnspentOutput>>{};
+    final requiredAssets = requiredBalance.multiAsset?.bundle ?? {};
+
+    for (final input in inputs) {
+      final inputBalance = input.output.amount;
+      final inputPolicies = inputBalance.multiAsset?.bundle.keys ?? <PolicyId>[];
+
+      for (final policy in [CoinSelector.adaPolicy, ...inputPolicies]) {
+        if (requiredAssets.containsKey(policy)) {
+          final inputAssets = inputBalance.multiAsset!.bundle[policy]!.entries;
+
+          for (final asset in inputAssets) {
+            final assetId = (policy, asset.key);
+            if (requiredAssets[policy]!.containsKey(asset.key)) {
+              assetMap.putIfAbsent(assetId, () => []).add(input);
+            } else {
+              assetMap.putIfAbsent(CoinSelector.adaAssetId, () => []).add(input);
+            }
+          }
+        } else {
+          assetMap.putIfAbsent(CoinSelector.adaAssetId, () => []).add(input);
+        }
+      }
+    }
+
+    return assetMap.entries.toList()..sort((a, b) => b.key.$1.hash.compareTo(a.key.$1.hash));
+  }
+
   /// Selects inputs to satisfy transaction outputs and fees.
   ///
   /// Throws:
@@ -127,96 +161,6 @@ final class InputBuilder implements CoinSelector {
     );
   }
 
-  /// Groups UTxOs by token, mapping each token to its corresponding UTxOs.
-  @override
-  AssetsGroup buildAssetGroups(
-    Balance requiredBalance,
-    Set<TransactionUnspentOutput> inputs,
-  ) {
-    final assetMap = <AssetId, List<TransactionUnspentOutput>>{};
-    final requiredAssets = requiredBalance.multiAsset?.bundle ?? {};
-
-    for (final input in inputs) {
-      final inputBalance = input.output.amount;
-      final inputPolicies = inputBalance.multiAsset?.bundle.keys ?? <PolicyId>[];
-
-      for (final policy in [CoinSelector.adaPolicy, ...inputPolicies]) {
-        if (requiredAssets.containsKey(policy)) {
-          final inputAssets = inputBalance.multiAsset!.bundle[policy]!.entries;
-
-          for (final asset in inputAssets) {
-            final assetId = (policy, asset.key);
-            if (requiredAssets[policy]!.containsKey(asset.key)) {
-              assetMap.putIfAbsent(assetId, () => []).add(input);
-            } else {
-              assetMap.putIfAbsent(CoinSelector.adaAssetId, () => []).add(input);
-            }
-          }
-        } else {
-          assetMap.putIfAbsent(CoinSelector.adaAssetId, () => []).add(input);
-        }
-      }
-    }
-
-    return assetMap.entries.toList()..sort((a, b) => b.key.$1.hash.compareTo(a.key.$1.hash));
-  }
-
-  /// Retrieves the change outputs and the total transaction fee, if applicable.
-  ///
-  /// This method calculates whether there is sufficient balance to cover the
-  /// required amount and associated fees, then retrieves the pre-constructed
-  /// change outputs and the total transaction fee.
-  ///
-  /// - Parameters:
-  ///   - [assetId]: The identifier for which the change is being calculated.
-  ///   - [builder]: The transaction builder used to create the transaction.
-  ///   - [selectedInputs]: The set of selected UTxOs to fund the transaction.
-  ///   - [selectedTotal]: The total balance accumulated from selected inputs.
-  ///   - [targetTotal]: The balance required to satisfy the transaction's
-  ///     outputs and minimum ADA requirements.
-  ///
-  /// - Returns:
-  ///   A tuple containing:
-  ///   - [List<TransactionOutput>]: The list of change outputs.
-  ///   - [Coin]: The total transaction fee, including the fee for the change
-  ///     outputs.
-  ///   Returns `null` if the accumulated balance is insufficient to cover the
-  ///   required amount and fees.
-  ///
-  /// - Notes:
-  ///   - This method ensures the transaction remains valid by confirming that
-  ///     the accumulated balance exceeds or equals the required amount plus
-  ///     fees.
-  (List<ShelleyMultiAssetTransactionOutput>, Coin)? _getChangeAndFee(
-    AssetId assetId,
-    TransactionBuilder builder,
-    Set<TransactionUnspentOutput> selectedInputs,
-    Balance selectedTotal,
-    Balance targetTotal,
-  ) {
-    final minFee = builder.copyWith(inputs: selectedInputs).minFee(useWitnesses: true);
-    final minimumRequired = targetTotal + Balance(coin: minFee);
-
-    if (selectedTotal.lessThan(minimumRequired)) return null;
-
-    // Calculate the change to be returned, as the selected total is guaranteed
-    // to be larger.
-    final changeTotal = selectedTotal - minimumRequired;
-
-    final (changeOutputs, changeFee) = _buildChangeOutputs(
-      builder,
-      changeTotal,
-      minFee,
-    );
-
-    final requiredFee = minFee + changeFee;
-    if (selectedTotal.lessThan(targetTotal + Balance(coin: requiredFee))) {
-      return null;
-    }
-
-    return (changeOutputs, requiredFee);
-  }
-
   /// Constructs the change outputs and calculates their associated fees.
   ///
   /// This method generates the necessary change outputs based on the remaining
@@ -285,5 +229,61 @@ final class InputBuilder implements CoinSelector {
     return assetId == CoinSelector.adaAssetId
         ? balance.coin
         : balance.multiAsset?.bundle[policy]?[assetName] ?? const Coin(0);
+  }
+
+  /// Retrieves the change outputs and the total transaction fee, if applicable.
+  ///
+  /// This method calculates whether there is sufficient balance to cover the
+  /// required amount and associated fees, then retrieves the pre-constructed
+  /// change outputs and the total transaction fee.
+  ///
+  /// - Parameters:
+  ///   - [assetId]: The identifier for which the change is being calculated.
+  ///   - [builder]: The transaction builder used to create the transaction.
+  ///   - [selectedInputs]: The set of selected UTxOs to fund the transaction.
+  ///   - [selectedTotal]: The total balance accumulated from selected inputs.
+  ///   - [targetTotal]: The balance required to satisfy the transaction's
+  ///     outputs and minimum ADA requirements.
+  ///
+  /// - Returns:
+  ///   A tuple containing:
+  ///   - [List<TransactionOutput>]: The list of change outputs.
+  ///   - [Coin]: The total transaction fee, including the fee for the change
+  ///     outputs.
+  ///   Returns `null` if the accumulated balance is insufficient to cover the
+  ///   required amount and fees.
+  ///
+  /// - Notes:
+  ///   - This method ensures the transaction remains valid by confirming that
+  ///     the accumulated balance exceeds or equals the required amount plus
+  ///     fees.
+  (List<ShelleyMultiAssetTransactionOutput>, Coin)? _getChangeAndFee(
+    AssetId assetId,
+    TransactionBuilder builder,
+    Set<TransactionUnspentOutput> selectedInputs,
+    Balance selectedTotal,
+    Balance targetTotal,
+  ) {
+    final minFee = builder.copyWith(inputs: selectedInputs).minFee(useWitnesses: true);
+    final minimumRequired = targetTotal + Balance(coin: minFee);
+
+    if (selectedTotal.lessThan(minimumRequired)) return null;
+
+    // Calculate the change to be returned, as the selected total is guaranteed
+    // to be larger.
+    final changeTotal = selectedTotal - minimumRequired;
+
+    final (changeOutputs, changeFee) = _buildChangeOutputs(
+      builder,
+      changeTotal,
+      minFee,
+    );
+
+    final requiredFee = minFee + changeFee;
+    if (selectedTotal.lessThan(targetTotal + Balance(coin: requiredFee))) {
+      return null;
+    }
+
+    return (changeOutputs, requiredFee);
   }
 }

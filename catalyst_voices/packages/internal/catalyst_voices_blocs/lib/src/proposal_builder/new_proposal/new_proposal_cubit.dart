@@ -14,13 +14,11 @@ class NewProposalCubit extends Cubit<NewProposalState>
     with BlocErrorEmitterMixin<NewProposalState> {
   final CampaignService _campaignService;
   final ProposalService _proposalService;
-  final UserObserver _userObserver;
   final DocumentMapper _documentMapper;
 
   NewProposalCubit(
     this._campaignService,
     this._proposalService,
-    this._userObserver,
     this._documentMapper,
   ) : super(
           const NewProposalState(
@@ -33,7 +31,7 @@ class NewProposalCubit extends Cubit<NewProposalState>
       emit(state.copyWith(isCreatingProposal: true));
 
       final title = state.title.value;
-      final categoryId = state.categoryId;
+      final categoryId = state.categoryRef;
 
       if (categoryId == null) {
         throw StateError('Cannot create draft, category not selected');
@@ -70,21 +68,20 @@ class NewProposalCubit extends Cubit<NewProposalState>
     }
   }
 
-  Future<void> load() async {
+  Future<void> load({SignedDocumentRef? categoryRef}) async {
     try {
       emit(NewProposalState.loading());
+      final step = categoryRef == null
+          ? const CreateProposalWithoutPreselectedCategoryStep()
+          : const CreateProposalWithPreselectedCategoryStep();
 
-      final account = _userObserver.user.activeAccount;
-      if (account == null) {
-        throw StateError('Account is missing');
-      }
+      emit(state.copyWith(step: step, categoryRef: Optional(categoryRef)));
+
       final categories = await _getCategories();
 
       final newState = state.copyWith(
         isLoading: false,
-        isMissingProposerRole: !account.hasRole(AccountRole.proposer),
         categories: categories,
-        categoryId: Optional(categories.first.id),
       );
 
       emit(newState);
@@ -97,12 +94,38 @@ class NewProposalCubit extends Cubit<NewProposalState>
     }
   }
 
-  void updateSelectedCategory(SignedDocumentRef? categoryId) {
-    emit(state.copyWith(categoryId: Optional(categoryId)));
+  void selectCategoryStage() {
+    const stage = CreateProposalWithoutPreselectedCategoryStep(
+      stage: CreateProposalStage.selectCategory,
+    );
+    emit(state.copyWith(step: stage));
+  }
+
+  void updateAgreeToCategoryCriteria({required bool value}) {
+    emit(state.copyWith(isAgreeToCategoryCriteria: value));
+  }
+
+  void updateAgreeToNoFurtherCategoryChange({required bool value}) {
+    emit(state.copyWith(isAgreeToNoFurtherCategoryChange: value));
+  }
+
+  void updateSelectedCategory(SignedDocumentRef? categoryRef) {
+    emit(
+      state.copyWith(
+        categoryRef: Optional(categoryRef),
+        isAgreeToCategoryCriteria: false,
+        isAgreeToNoFurtherCategoryChange: false,
+      ),
+    );
   }
 
   void updateTitle(ProposalTitle title) {
     emit(state.copyWith(title: title));
+  }
+
+  void updateTitleStage() {
+    const stage = CreateProposalWithoutPreselectedCategoryStep();
+    emit(state.copyWith(step: stage));
   }
 
   Future<List<CampaignCategoryDetailsViewModel>> _getCategories() async {

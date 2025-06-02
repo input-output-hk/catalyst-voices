@@ -226,63 +226,26 @@ project: {
 					}
 					route: {
 						hostnames: ["reviews"]
-						rules: [
-							{
-								matches: [
-									{
-										path: {
-											type:  "PathPrefix"
-											value: "/api/gateway/api"
-										}
-									},
-								]
-								filters: [
-									{
-										type: "URLRewrite"
-										urlRewrite: {
-											path: {
-												type:               "ReplacePrefixMatch"
-												replacePrefixMatch: "/api"
-											}
-										}
-									},
-								]
-								target: port: 3030
-							},
-							{
-								matches: [
-									{
-										path: {
-											type:  "PathPrefix"
-											value: "/api/gateway"
-										}
-									},
-								]
-								filters: [
-									{
-										type: "URLRewrite"
-										urlRewrite: {
-											path: {
-												type:               "ReplacePrefixMatch"
-												replacePrefixMatch: "/api"
-											}
-										}
-									},
-								]
-								target: port: 3030
-							},
-							{
-								matches: [
-									{
-										path: {
-											type:  "PathPrefix"
-											value: "/api"
-										}
-									},
-								]
-								target: port: 3030
-							},
-						]
+						rules: [{
+							matches: [{
+								path: {
+									type:  "PathPrefix"
+									value: "/api/gateway"
+								}
+							}]
+							filters: [{
+								type: "URLRewrite"
+								urlRewrite: {
+									path: {
+										type:               "ReplacePrefixMatch"
+										replacePrefixMatch: "/api"
+									}
+								}
+							}]
+							target: {
+								port: 3030
+							}
+						}]
 					}
 
 					secrets: {

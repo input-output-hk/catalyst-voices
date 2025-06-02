@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/common/ext/text_editing_controller_ext.dart';
 import 'package:catalyst_voices/widgets/form/voices_form_field.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
@@ -9,47 +10,76 @@ import 'package:flutter/material.dart';
 class FilterByDropdown<T> extends StatelessWidget {
   final List<DropdownMenuEntry<T?>> items;
   final ValueChanged<T?>? onChanged;
+  final Color? foregroundColor;
+  final Widget? leadingIcon;
+  final bool isOutlined;
+  final bool insertByAll;
   final T? value;
 
   const FilterByDropdown({
     super.key,
     required this.items,
     this.onChanged,
+    this.foregroundColor,
+    this.leadingIcon,
+    this.isOutlined = false,
+    this.insertByAll = true,
     this.value,
   });
+
+  bool get isEnabled => onChanged != null;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return DropdownMenu<T?>(
-      dropdownMenuEntries: [
-        VoicesDropdownMenuEntry<T?>(
-          value: null,
-          label: context.l10n.all,
-          context: context,
+
+    final foregroundColor = this.foregroundColor ?? theme.colorScheme.primary;
+    final border = isOutlined
+        ? OutlineInputBorder(
+            borderSide: BorderSide(color: context.colors.outlineBorderVariant),
+            borderRadius: BorderRadius.circular(8),
+          )
+        : InputBorder.none;
+
+    return Opacity(
+      opacity: isEnabled ? 1.0 : 0.3,
+      child: DropdownMenu<T?>(
+        dropdownMenuEntries: [
+          if (insertByAll)
+            VoicesDropdownMenuEntry<T?>(
+              value: null,
+              label: context.l10n.all,
+              context: context,
+            ),
+          ...items,
+        ],
+        onSelected: onChanged,
+        initialSelection: value,
+        enableSearch: false,
+        requestFocusOnTap: false,
+        enabled: isEnabled,
+        inputDecorationTheme: InputDecorationTheme(
+          isDense: true,
+          contentPadding: EdgeInsets.zero,
+          border: border,
+          enabledBorder: border,
+          focusedBorder: border,
+          iconColor: foregroundColor,
+          prefixIconColor: foregroundColor,
+          prefixIconConstraints: BoxConstraints.tight(const Size.square(18)),
+          suffixIconColor: foregroundColor,
         ),
-        ...items,
-      ],
-      onSelected: onChanged,
-      initialSelection: value,
-      enableSearch: false,
-      requestFocusOnTap: false,
-      inputDecorationTheme: const InputDecorationTheme(
-        isDense: true,
-        contentPadding: EdgeInsets.zero,
-        border: InputBorder.none,
-        enabledBorder: InputBorder.none,
-        focusedBorder: InputBorder.none,
+        menuStyle: MenuStyle(
+          padding: WidgetStateProperty.all(EdgeInsets.zero),
+          visualDensity: VisualDensity.compact,
+        ),
+        leadingIcon: leadingIcon,
+        trailingIcon: VoicesAssets.icons.chevronDown.buildIcon(),
+        selectedTrailingIcon: VoicesAssets.icons.chevronUp.buildIcon(),
+        textAlign: TextAlign.center,
+        textStyle:
+            (theme.textTheme.labelLarge ?? const TextStyle()).copyWith(color: foregroundColor),
       ),
-      menuStyle: MenuStyle(
-        padding: WidgetStateProperty.all(EdgeInsets.zero),
-        visualDensity: VisualDensity.compact,
-      ),
-      trailingIcon: VoicesAssets.icons.chevronDown.buildIcon(color: theme.colorScheme.primary),
-      selectedTrailingIcon:
-          VoicesAssets.icons.chevronUp.buildIcon(color: theme.colorScheme.primary),
-      textAlign: TextAlign.end,
-      textStyle: theme.textTheme.labelLarge?.copyWith(color: theme.colorScheme.primary),
     );
   }
 }
@@ -150,6 +180,8 @@ class VoicesDropdownMenuEntry<T> extends DropdownMenuEntry<T> {
     required super.value,
     required super.label,
     required this.context,
+    super.leadingIcon,
+    super.trailingIcon,
     ButtonStyle? style,
   }) : super(
           style: style ?? _createButtonStyle(context),
