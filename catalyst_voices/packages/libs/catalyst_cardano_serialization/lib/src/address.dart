@@ -83,17 +83,32 @@ class ShelleyAddress extends Equatable implements CborEncodable {
     return ShelleyAddress((value as CborBytes).bytes);
   }
 
-  /// Serializes the type as cbor.
   @override
-  CborValue toCbor({List<int> tags = const []}) => CborBytes(bytes, tags: tags);
+  int get hashCode => Object.hashAll([...bytes, hrp]);
 
   /// Returns the [NetworkId] related to this address.
   NetworkId get network => _extractNetworkId(bytes);
+
+  @override
+  List<Object?> get props => [toBech32()];
 
   /// Returns the [Ed25519PublicKeyHash] contained in this address.
   ///
   /// Practically it's the address without the header byte.
   Ed25519PublicKeyHash get publicKeyHash => _extractPublicKeyHash(bytes);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! ShelleyAddress) return false;
+    if (bytes.length != other.bytes.length) return false;
+    if (hrp != other.hrp) return false;
+
+    for (var i = 0; i < bytes.length; i++) {
+      if (bytes[i] != other.bytes[i]) return false;
+    }
+    return true;
+  }
 
   /// Encodes the address in bech32 format.
   String toBech32() {
@@ -112,27 +127,12 @@ class ShelleyAddress extends Equatable implements CborEncodable {
     }
   }
 
+  /// Serializes the type as cbor.
   @override
-  int get hashCode => Object.hashAll([...bytes, hrp]);
-
-  @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-    if (other is! ShelleyAddress) return false;
-    if (bytes.length != other.bytes.length) return false;
-    if (hrp != other.hrp) return false;
-
-    for (var i = 0; i < bytes.length; i++) {
-      if (bytes[i] != other.bytes[i]) return false;
-    }
-    return true;
-  }
+  CborValue toCbor({List<int> tags = const []}) => CborBytes(bytes, tags: tags);
 
   @override
   String toString() => toBech32();
-
-  @override
-  List<Object?> get props => [toBech32()];
 
   /// If were using the testnet, make sure the hrp ends with '_test'
   static String _computeHrp(NetworkId id, String prefix) {
@@ -143,12 +143,6 @@ class ShelleyAddress extends Equatable implements CborEncodable {
     } else {
       return prefix + testnetHrpSuffix;
     }
-  }
-
-  static String _hrpPrefix(String addr) {
-    final s = addr.trim();
-    final i = s.indexOf('1');
-    return s.substring(0, i > 0 ? i : 0);
   }
 
   static String _extractHrp(List<int> bytes) {
@@ -173,4 +167,10 @@ class ShelleyAddress extends Equatable implements CborEncodable {
       Ed25519PublicKeyHash.fromBytes(
         bytes: bytes.sublist(1, Ed25519PublicKeyHash.hashLength + 1),
       );
+
+  static String _hrpPrefix(String addr) {
+    final s = addr.trim();
+    final i = s.indexOf('1');
+    return s.substring(0, i > 0 ? i : 0);
+  }
 }

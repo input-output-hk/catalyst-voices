@@ -4,15 +4,15 @@ import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
 import 'package:cbor/cbor.dart';
 import 'package:equatable/equatable.dart';
 
-/// Serializes the type [T] into cbor.
-///
-/// In most cases the [T] type is going to be [RegistrationData].
-typedef ChunkedDataSerializer<T> = CborValue Function(T value);
-
 /// Deserializes the type [T] from cbor.
 ///
 /// In most cases the [T] type is going to be [RegistrationData].
 typedef ChunkedDataDeserializer<T> = T Function(CborValue value);
+
+/// Serializes the type [T] into cbor.
+///
+/// In most cases the [T] type is going to be [RegistrationData].
+typedef ChunkedDataSerializer<T> = CborValue Function(T value);
 
 /// X509 Certificate metadata and related metadata within
 /// a x509 Registration/Update transaction must be protected
@@ -127,30 +127,27 @@ final class X509MetadataEnvelope<T> extends Equatable {
     this.chunkedData,
   }) : validationSignature = Bip32Ed25519XSignatureFactory.instance.seeded(0);
 
-  /// Deserializes the type from cbor.
-  ///
-  /// The [deserializer] in most cases is going
-  /// to be [RegistrationData.fromCbor].
-  static Future<X509MetadataEnvelope<T>> fromCbor<T>(
-    CborValue value, {
-    required ChunkedDataDeserializer<T> deserializer,
-  }) async {
-    final metadata = value as CborMap;
-    final envelope = metadata[const CborSmallInt(509)]! as CborMap;
-    final purpose = envelope[const CborSmallInt(0)]! as CborBytes;
-    final txInputsHash = envelope[const CborSmallInt(1)]!;
-    final previousTransactionId = envelope[const CborSmallInt(2)];
-    final chunkedData = await _deserializeChunkedData(envelope);
-    final validationSignature = envelope[const CborSmallInt(99)]!;
+  @override
+  List<Object?> get props => [
+        purpose,
+        txInputsHash,
+        previousTransactionId,
+        chunkedData,
+        validationSignature,
+      ];
 
-    return X509MetadataEnvelope(
-      purpose: UuidV4.fromCbor(purpose),
-      txInputsHash: TransactionInputsHash.fromCbor(txInputsHash),
-      previousTransactionId:
-          previousTransactionId != null ? TransactionHash.fromCbor(previousTransactionId) : null,
-      chunkedData: chunkedData != null ? deserializer(chunkedData) : null,
-      validationSignature: Bip32Ed25519XSignatureFactory.instance.fromCbor(validationSignature),
-    );
+  /// Serializes the envelope into bytes, signs it with the [privateKey]
+  /// and returns a copy of the [X509MetadataEnvelope]
+  /// with the resulting [validationSignature].
+  ///
+  /// The [serializer] in most cases is going to be [RegistrationData.toCbor].
+  Future<X509MetadataEnvelope<T>> sign({
+    required Bip32Ed25519XPrivateKey privateKey,
+    required ChunkedDataSerializer<T> serializer,
+  }) async {
+    final bytes = cbor.encode(await toCbor(serializer: serializer));
+    final signature = await privateKey.sign(bytes);
+    return withValidationSignature(signature);
   }
 
   /// Serializes the type as cbor.
@@ -172,20 +169,6 @@ final class X509MetadataEnvelope<T> extends Equatable {
         const CborSmallInt(99): validationSignature.toCbor(),
       }),
     });
-  }
-
-  /// Serializes the envelope into bytes, signs it with the [privateKey]
-  /// and returns a copy of the [X509MetadataEnvelope]
-  /// with the resulting [validationSignature].
-  ///
-  /// The [serializer] in most cases is going to be [RegistrationData.toCbor].
-  Future<X509MetadataEnvelope<T>> sign({
-    required Bip32Ed25519XPrivateKey privateKey,
-    required ChunkedDataSerializer<T> serializer,
-  }) async {
-    final bytes = cbor.encode(await toCbor(serializer: serializer));
-    final signature = await privateKey.sign(bytes);
-    return withValidationSignature(signature);
   }
 
   /// Returns true if given [signature] belongs to a given [publicKey]
@@ -216,6 +199,61 @@ final class X509MetadataEnvelope<T> extends Equatable {
       chunkedData: chunkedData,
       validationSignature: validationSignature,
     );
+  }
+
+  /// Deserializes the type from cbor.
+  ///
+  /// The [deserializer] in most cases is going
+  /// to be [RegistrationData.fromCbor].
+  static Future<X509MetadataEnvelope<T>> fromCbor<T>(
+    CborValue value, {
+    required ChunkedDataDeserializer<T> deserializer,
+  }) async {
+    final metadata = value as CborMap;
+    final envelope = metadata[const CborSmallInt(509)]! as CborMap;
+    final purpose = envelope[const CborSmallInt(0)]! as CborBytes;
+    final txInputsHash = envelope[const CborSmallInt(1)]!;
+    final previousTransactionId = envelope[const CborSmallInt(2)];
+    final chunkedData = await _deserializeChunkedData(envelope);
+    final validationSignature = envelope[const CborSmallInt(99)]!;
+
+    return X509MetadataEnvelope(
+      purpose: UuidV4.fromCbor(purpose),
+      txInputsHash: TransactionInputsHash.fromCbor(txInputsHash),
+      previousTransactionId:
+          previousTransactionId != null ? TransactionHash.fromCbor(previousTransactionId) : null,
+      chunkedData: chunkedData != null ? deserializer(chunkedData) : null,
+      validationSignature: Bip32Ed25519XSignatureFactory.instance.fromCbor(validationSignature),
+    );
+  }
+
+  static List<List<int>> _chunkCborBytes(List<int> bytes) {
+    final chunks = <List<int>>[];
+    for (var i = 0; i < bytes.length; i += metadataChunkSize) {
+      chunks.add(
+        bytes.sublist(
+          i,
+          i + metadataChunkSize > bytes.length ? bytes.length : i + metadataChunkSize,
+        ),
+      );
+    }
+    return chunks;
+  }
+
+  static Future<List<int>?> _compressBrotli(List<int> bytes) async {
+    try {
+      return await CatalystCompression.instance.brotli.compress(bytes);
+    } on CompressionNotSupportedException {
+      return null;
+    }
+  }
+
+  static Future<List<int>?> _compressZstd(List<int> bytes) async {
+    try {
+      return await CatalystCompression.instance.zstd.compress(bytes);
+    } on CompressionNotSupportedException {
+      return null;
+    }
   }
 
   static Future<CborValue?> _deserializeChunkedData(CborMap map) async {
@@ -267,35 +305,6 @@ final class X509MetadataEnvelope<T> extends Equatable {
     );
   }
 
-  static Future<List<int>?> _compressBrotli(List<int> bytes) async {
-    try {
-      return await CatalystCompression.instance.brotli.compress(bytes);
-    } on CompressionNotSupportedException {
-      return null;
-    }
-  }
-
-  static Future<List<int>?> _compressZstd(List<int> bytes) async {
-    try {
-      return await CatalystCompression.instance.zstd.compress(bytes);
-    } on CompressionNotSupportedException {
-      return null;
-    }
-  }
-
-  static List<List<int>> _chunkCborBytes(List<int> bytes) {
-    final chunks = <List<int>>[];
-    for (var i = 0; i < bytes.length; i += metadataChunkSize) {
-      chunks.add(
-        bytes.sublist(
-          i,
-          i + metadataChunkSize > bytes.length ? bytes.length : i + metadataChunkSize,
-        ),
-      );
-    }
-    return chunks;
-  }
-
   static List<int> _unchunkCborBytes(CborList chunkedBytes) {
     final result = <int>[];
     for (final chunk in chunkedBytes) {
@@ -303,13 +312,4 @@ final class X509MetadataEnvelope<T> extends Equatable {
     }
     return result;
   }
-
-  @override
-  List<Object?> get props => [
-        purpose,
-        txInputsHash,
-        previousTransactionId,
-        chunkedData,
-        validationSignature,
-      ];
 }

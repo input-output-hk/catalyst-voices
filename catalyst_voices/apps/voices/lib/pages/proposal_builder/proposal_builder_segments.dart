@@ -1,9 +1,15 @@
+import 'dart:async';
+
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
+import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/pages/proposal_builder/tiles/proposal_builder_comment_tile.dart';
 import 'package:catalyst_voices/widgets/comment/proposal_add_comment_tile.dart';
 import 'package:catalyst_voices/widgets/comment/proposal_comments_header_tile.dart';
+import 'package:catalyst_voices/widgets/list/category_requirements_list.dart';
+import 'package:catalyst_voices/widgets/modals/proposals/category_brief_dialog.dart';
 import 'package:catalyst_voices/widgets/tiles/specialized/proposal_tile_decoration.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
+import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -12,7 +18,12 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
+part 'proposal_builder_action_widgets.dart';
 part 'proposal_builder_document_widgets.dart';
+
+final DocumentPropertyActionOverrides _widgetActionOverrides = {
+  ProposalDocument.categoryDetailsNodeId: const _CategoryDetailsAction(),
+};
 
 final DocumentPropertyBuilderOverrides _widgetOverrides = {
   ProposalDocument.categoryDetailsNodeId: (context, property) =>
@@ -67,7 +78,7 @@ class _DocumentSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocSelector<ProposalBuilderBloc, ProposalBuilderState, bool>(
-      selector: (state) => state.showValidationErrors,
+      selector: (state) => state.validationErrors?.showErrors ?? false,
       builder: (context, showValidationErrors) {
         return DocumentBuilderSectionTile(
           key: key,
@@ -80,6 +91,7 @@ class _DocumentSection extends StatelessWidget {
             final event = SectionChangedEvent(changes: value);
             context.read<ProposalBuilderBloc>().add(event);
           },
+          actionOverrides: _widgetActionOverrides,
           overrides: _widgetOverrides,
         );
       },

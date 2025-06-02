@@ -65,6 +65,43 @@ final class TieredFee extends Equatable {
     this.maxRefScriptSize = 204800,
   });
 
+  @override
+  List<Object?> get props => [
+        constant,
+        coefficient,
+        multiplier,
+        sizeIncrement,
+        refScriptByteCost,
+        maxRefScriptSize,
+      ];
+
+  /// Creates copy of this config with updated parameters.
+  TieredFee copyWith({
+    int? constant,
+    int? coefficient,
+    double? multiplier,
+    int? sizeIncrement,
+    int? refScriptByteCost,
+    int? maxRefScriptSize,
+  }) {
+    return TieredFee(
+      constant: constant ?? this.constant,
+      coefficient: coefficient ?? this.coefficient,
+      multiplier: multiplier ?? this.multiplier,
+      sizeIncrement: sizeIncrement ?? this.sizeIncrement,
+      refScriptByteCost: refScriptByteCost ?? this.refScriptByteCost,
+      maxRefScriptSize: maxRefScriptSize ?? this.maxRefScriptSize,
+    );
+  }
+
+  /// Calculates the linear fee for a transaction based on its size in bytes.
+  ///
+  /// The linear fee formula is:
+  /// - `fee = constant + (tx.bytes.len * coefficient)`
+  ///
+  /// > This formula does not account for smart contract scripts.
+  int linearFee(int bytesCount) => bytesCount * coefficient + constant;
+
   /// Calculates the minimum fee for the transaction, adding any reference
   /// script-related costs if applicable.
   Coin minFee(Transaction tx, Set<TransactionUnspentOutput> inputs) {
@@ -80,30 +117,6 @@ final class TieredFee extends Equatable {
     );
 
     return Coin(minTxFee);
-  }
-
-  /// Calculates the linear fee for a transaction based on its size in bytes.
-  ///
-  /// The linear fee formula is:
-  /// - `fee = constant + (tx.bytes.len * coefficient)`
-  ///
-  /// > This formula does not account for smart contract scripts.
-  int linearFee(int bytesCount) => bytesCount * coefficient + constant;
-
-  /// Calculates the fee for a transaction using the tiered pricing model.
-  /// This includes both the linear fee and, if applicable, a reference script
-  /// fee.
-  int tieredFee(int txBytes, int refScriptsBytes) {
-    final txFee = linearFee(txBytes);
-    final scriptFee = refScriptByteCost > 0 && refScriptsBytes > 0
-        ? refScriptFee(
-            multiplier,
-            sizeIncrement,
-            refScriptByteCost,
-            refScriptsBytes,
-          )
-        : 0;
-    return txFee + scriptFee;
   }
 
   /// Calculates the fee for the reference scripts.
@@ -133,6 +146,22 @@ final class TieredFee extends Equatable {
     );
   }
 
+  /// Calculates the fee for a transaction using the tiered pricing model.
+  /// This includes both the linear fee and, if applicable, a reference script
+  /// fee.
+  int tieredFee(int txBytes, int refScriptsBytes) {
+    final txFee = linearFee(txBytes);
+    final scriptFee = refScriptByteCost > 0 && refScriptsBytes > 0
+        ? refScriptFee(
+            multiplier,
+            sizeIncrement,
+            refScriptByteCost,
+            refScriptsBytes,
+          )
+        : 0;
+    return txFee + scriptFee;
+  }
+
   /// Calculates the total size of reference scripts used in a transaction.
   ///
   /// This includes the sizes of reference scripts from both inputs and
@@ -158,14 +187,4 @@ final class TieredFee extends Equatable {
 
     return totalSize;
   }
-
-  @override
-  List<Object?> get props => [
-        constant,
-        coefficient,
-        multiplier,
-        sizeIncrement,
-        refScriptByteCost,
-        maxRefScriptSize,
-      ];
 }

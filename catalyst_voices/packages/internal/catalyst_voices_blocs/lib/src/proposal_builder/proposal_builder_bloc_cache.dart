@@ -38,6 +38,8 @@ final class ProposalBuilderBlocCache extends Equatable {
         isMaxProposalsLimitReached,
       ];
 
+  bool get isEmailVerified => accountPublicStatus?.isVerified ?? false;
+
   ProposalBuilderBlocCache copyWith({
     Optional<CatalystId>? activeAccountId,
     Optional<DocumentBuilder>? proposalBuilder,
