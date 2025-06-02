@@ -39,7 +39,7 @@ class _SelectWalletPanelState extends State<SelectWalletPanel> {
             onSelectWallet: _onSelectWallet,
           ),
         ),
-        const SizedBox(height: 24),
+        const SizedBox(height: 12),
         VoicesBackButton(
           key: const Key('BackButton'),
           onTap: () {
