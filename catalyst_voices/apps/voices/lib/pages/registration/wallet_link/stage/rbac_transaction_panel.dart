@@ -7,6 +7,7 @@ import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 import 'package:result_type/result_type.dart';
@@ -235,8 +236,6 @@ class _Summary extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final name = walletInfo.metadata.name;
-
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -255,7 +254,7 @@ class _Summary extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           Text(
-            context.l10n.walletLinkTransactionLinkItem(name),
+            context.l10n.walletLinkTransactionLinkItem(walletInfo.metadata.name.capitalize()),
             style: Theme.of(context).textTheme.bodySmall,
           ),
           for (final role in roles) ...[

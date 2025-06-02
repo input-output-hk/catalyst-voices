@@ -231,7 +231,7 @@ class _WalletTileState extends State<_WalletTile> {
   Widget build(BuildContext context) {
     return VoicesWalletTile(
       iconSrc: widget.wallet.icon,
-      name: Text(widget.wallet.name),
+      name: Text(widget.wallet.name.capitalize()),
       isLoading: _isLoading,
       onTap: _onSelectWallet,
     );

@@ -4,6 +4,7 @@ import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
@@ -80,7 +81,7 @@ class _BlocWalletDetailsText extends StatelessWidget {
       selector: (state) => state.selectedWallet?.metadata.name,
       builder: (context, state) {
         return Text(
-          context.l10n.walletLinkWalletDetailsContent(state ?? ''),
+          context.l10n.walletLinkWalletDetailsContent((state ?? '').capitalize()),
           style: Theme.of(context).textTheme.titleMedium,
         );
       },
