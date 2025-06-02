@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:catalyst_voices/common/ext/account_role_ext.dart';
+import 'package:catalyst_voices/pages/registration/widgets/registration_details_panel_scaffold.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
@@ -195,20 +196,13 @@ class _Navigation extends StatelessWidget {
 class _RbacTransactionPanelState extends State<RbacTransactionPanel> {
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        const SizedBox(height: 24),
-        Text(
-          context.l10n.walletLinkTransactionTitle,
-          style: Theme.of(context).textTheme.titleMedium,
-        ),
-        const SizedBox(height: 12),
-        Expanded(
-          child: _BlocTransactionDetails(onRefreshTap: _onRefresh),
-        ),
-        const _Navigation(),
-      ],
+    return RegistrationDetailsPanelScaffold(
+      title: Text(
+        context.l10n.walletLinkTransactionTitle,
+        style: Theme.of(context).textTheme.titleMedium,
+      ),
+      body: _BlocTransactionDetails(onRefreshTap: _onRefresh),
+      footer: const _Navigation(),
     );
   }
 

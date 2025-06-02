@@ -1,4 +1,5 @@
 import 'package:catalyst_voices/pages/registration/widgets/next_step.dart';
+import 'package:catalyst_voices/pages/registration/widgets/registration_details_panel_scaffold.dart';
 import 'package:catalyst_voices/pages/registration/widgets/registration_stage_message.dart';
 import 'package:catalyst_voices/pages/registration/widgets/registration_stage_navigation.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
@@ -12,43 +13,23 @@ class SeedPhraseCheckResultPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        SizedBox(height: 24),
-        Expanded(
-          child: SingleChildScrollView(
-            child: _BlocRegistrationStageMessage(),
-          ),
-        ),
-        _BlocNextStep(),
-        SizedBox(height: 10),
-        _BlocNavigation(),
-      ],
+    return const RegistrationDetailsPanelScaffold(
+      body: SingleChildScrollView(child: _BlocRegistrationStageMessage()),
+      footer: _BlocNavigation(),
     );
   }
 }
 
-class _BlocRegistrationStageMessage extends StatelessWidget {
-  const _BlocRegistrationStageMessage();
+class _BlocNavigation extends StatelessWidget {
+  const _BlocNavigation();
 
   @override
   Widget build(BuildContext context) {
     return BlocSeedPhraseSelector<bool>(
       selector: (state) => state.areUserWordsCorrect,
       builder: (context, state) {
-        // TODO(damian-molinski): use correct strings when available.
-        return RegistrationStageMessage(
-          title: Text(
-            state
-                ? context.l10n.createKeychainSeedPhraseCheckSuccessTitle
-                : 'Seed phrase words does not match!',
-          ),
-          subtitle: Text(
-            state
-                ? context.l10n.createKeychainSeedPhraseCheckSuccessSubtitle
-                : 'Go back ana make sure order is correct',
-          ),
+        return RegistrationBackNextNavigation(
+          isNextEnabled: state,
         );
       },
     );
@@ -74,16 +55,26 @@ class _BlocNextStep extends StatelessWidget {
   }
 }
 
-class _BlocNavigation extends StatelessWidget {
-  const _BlocNavigation();
+class _BlocRegistrationStageMessage extends StatelessWidget {
+  const _BlocRegistrationStageMessage();
 
   @override
   Widget build(BuildContext context) {
     return BlocSeedPhraseSelector<bool>(
       selector: (state) => state.areUserWordsCorrect,
       builder: (context, state) {
-        return RegistrationBackNextNavigation(
-          isNextEnabled: state,
+        // TODO(damian-molinski): use correct strings when available.
+        return RegistrationStageMessage(
+          title: Text(
+            state
+                ? context.l10n.createKeychainSeedPhraseCheckSuccessTitle
+                : 'Seed phrase words does not match!',
+          ),
+          subtitle: Text(
+            state
+                ? context.l10n.createKeychainSeedPhraseCheckSuccessSubtitle
+                : 'Go back ana make sure order is correct',
+          ),
         );
       },
     );

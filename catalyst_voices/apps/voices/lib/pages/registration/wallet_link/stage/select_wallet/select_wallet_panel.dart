@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:catalyst_voices/common/constants/constants.dart';
 import 'package:catalyst_voices/pages/registration/wallet_link/stage/select_wallet/widget/wallets_list_view.dart';
+import 'package:catalyst_voices/pages/registration/widgets/registration_details_panel_scaffold.dart';
 import 'package:catalyst_voices/pages/registration/widgets/registration_stage_message.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
@@ -24,36 +25,34 @@ class SelectWalletPanel extends StatefulWidget {
 class _SelectWalletPanelState extends State<SelectWalletPanel> {
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        const SizedBox(height: 24),
-        RegistrationStageMessage(
-          title: Text(context.l10n.walletLinkSelectWalletTitle),
-          subtitle: Text(context.l10n.walletLinkSelectWalletContent),
-        ),
-        const SizedBox(height: 40),
-        Expanded(
-          child: WalletsListView(
-            onRefreshTap: _refreshWallets,
-            onSelectWallet: _onSelectWallet,
+    return RegistrationDetailsPanelScaffold(
+      title: RegistrationStageMessage(
+        title: Text(context.l10n.walletLinkSelectWalletTitle),
+        subtitle: Text(context.l10n.walletLinkSelectWalletContent),
+      ),
+      body: WalletsListView(
+        onRefreshTap: _refreshWallets,
+        onSelectWallet: _onSelectWallet,
+      ),
+      footer: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          VoicesBackButton(
+            key: const Key('BackButton'),
+            onTap: () {
+              RegistrationCubit.of(context).previousStep();
+            },
           ),
-        ),
-        const SizedBox(height: 12),
-        VoicesBackButton(
-          key: const Key('BackButton'),
-          onTap: () {
-            RegistrationCubit.of(context).previousStep();
-          },
-        ),
-        const SizedBox(height: 10),
-        VoicesTextButton(
-          key: const Key('SeeAllSupportedWalletsButton'),
-          trailing: VoicesAssets.icons.externalLink.buildIcon(),
-          onTap: () async => _launchSupportedWalletsLink(),
-          child: Text(context.l10n.seeAllSupportedWallets),
-        ),
-      ],
+          const SizedBox(height: 10),
+          VoicesTextButton(
+            key: const Key('SeeAllSupportedWalletsButton'),
+            trailing: VoicesAssets.icons.externalLink.buildIcon(),
+            onTap: () async => _launchSupportedWalletsLink(),
+            child: Text(context.l10n.seeAllSupportedWallets),
+          ),
+        ],
+      ),
     );
   }
 
