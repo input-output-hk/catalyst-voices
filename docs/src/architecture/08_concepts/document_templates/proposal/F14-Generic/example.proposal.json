@@ -137,7 +137,7 @@
                     "cost": 60000,
                     "progress": "Not Started"
                 },
-                {
+            {
                     "title": "Final Release and Documentation",
                     "outputs": "Project completion, documentation, and Project Close-out Report and Video",
                     "acceptance_criteria": "- All features implemented and tested\n- Documentation complete\n- Close-out report and video delivered",
@@ -161,10 +161,12 @@
         }
     },
     "agreements": {
-        "mandatory": {
-            "fund_rules": true,
-            "terms_and_conditions": true,
-            "privacy_policy": true
+        "ongoing_projects": {
+            "has_ongoing_projects": false,
+            "projects": []
+        },
+        "consent_confirmation": {
+            "terms_and_conditions": true
         }
     }
 }
