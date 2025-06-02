@@ -57,6 +57,7 @@ abstract interface class ProposalService {
   Future<Page<Proposal>> getProposalsPage({
     required PageRequest request,
     required ProposalsFilters filters,
+    required ProposalsOrder order,
   });
 
   Future<ProposalTemplate> getProposalTemplate({
@@ -129,6 +130,7 @@ abstract interface class ProposalService {
   Stream<Page<Proposal>> watchProposalsPage({
     required PageRequest request,
     required ProposalsFilters filters,
+    required ProposalsOrder order,
   });
 
   Stream<List<Proposal>> watchUserProposals();
@@ -253,9 +255,10 @@ final class ProposalServiceImpl implements ProposalService {
   Future<Page<Proposal>> getProposalsPage({
     required PageRequest request,
     required ProposalsFilters filters,
+    required ProposalsOrder order,
   }) {
     return _proposalRepository
-        .getProposalsPage(request: request, filters: filters)
+        .getProposalsPage(request: request, filters: filters, order: order)
         .then(_mapProposalDataPage);
   }
 
@@ -429,9 +432,10 @@ final class ProposalServiceImpl implements ProposalService {
   Stream<Page<Proposal>> watchProposalsPage({
     required PageRequest request,
     required ProposalsFilters filters,
+    required ProposalsOrder order,
   }) {
     return _proposalRepository
-        .watchProposalsPage(request: request, filters: filters)
+        .watchProposalsPage(request: request, filters: filters, order: order)
         .asyncMap(_mapProposalDataPage);
   }
 
