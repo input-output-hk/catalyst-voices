@@ -17,12 +17,12 @@ final class Redeemer extends Equatable implements CborEncodable {
   /// The CBOR value is expected to be a list or a map.
   factory Redeemer.fromCbor(CborValue value) => Redeemer(redeemer: value);
 
+  @override
+  List<Object?> get props => [redeemer];
+
   /// Converts the [Redeemer] to a CBOR-encoded value.
   @override
   CborValue toCbor({List<int> tags = const []}) => redeemer;
-
-  @override
-  List<Object?> get props => [redeemer];
 }
 
 // TODO(ilap): implement proper plutus data class, this is just a placeholder.
@@ -38,10 +38,10 @@ class ScriptData extends Equatable implements CborEncodable {
   /// The CBOR value is expected to be a list or a map.
   factory ScriptData.fromCbor(CborValue data) => ScriptData(data: data);
 
+  @override
+  List<Object?> get props => [data];
+
   /// Converts the [ScriptData] to a CBOR-encoded value.
   @override
   CborValue toCbor({List<int> tags = const []}) => data;
-
-  @override
-  List<Object?> get props => [data];
 }

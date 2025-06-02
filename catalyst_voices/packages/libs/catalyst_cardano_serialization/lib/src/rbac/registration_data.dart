@@ -7,6 +7,77 @@ import 'package:catalyst_cardano_serialization/src/utils/cbor.dart';
 import 'package:cbor/cbor.dart';
 import 'package:equatable/equatable.dart';
 
+/// Offset reference to a key defined in this registration.
+///
+/// More efficient than a key hash.
+class LocalKeyReference extends Equatable implements CborEncodable {
+  /// A type of referenced key.
+  final LocalKeyReferenceType keyType;
+
+  /// Offset of the key in the specified set. 0 = first entry.
+  final int offset;
+
+  /// The default constructor for [LocalKeyReference].
+  const LocalKeyReference({
+    required this.keyType,
+    required this.offset,
+  });
+
+  /// Deserializes the type from cbor.
+  factory LocalKeyReference.fromCbor(CborValue value) {
+    final list = value as CborList;
+    final keyType = list[0] as CborSmallInt;
+    final offset = list[1] as CborSmallInt;
+
+    return LocalKeyReference(
+      keyType: LocalKeyReferenceType.fromTag(keyType.value),
+      offset: offset.value,
+    );
+  }
+
+  @override
+  List<Object?> get props => [keyType, offset];
+
+  /// Serializes the type as cbor.
+  @override
+  CborValue toCbor({List<int> tags = const []}) {
+    return CborList(
+      [
+        CborSmallInt(keyType.tag),
+        CborSmallInt(offset),
+      ],
+      tags: tags,
+    );
+  }
+}
+
+/// Defines the type of the referenced local key.
+enum LocalKeyReferenceType {
+  /// The DER encoded X509 certificate.
+  x509Certs(tag: 10),
+
+  /// The C509 encoded certificate.
+  c509Certs(tag: 20),
+
+  /// The public key.
+  pubKeys(tag: 30);
+
+  /// The magic number defining the certificate type.
+  final int tag;
+
+  /// The default constructor for [LocalKeyReferenceType].
+  const LocalKeyReferenceType({required this.tag});
+
+  /// Returns a [LocalKeyReferenceType] by a [tag].
+  factory LocalKeyReferenceType.fromTag(int tag) {
+    for (final value in values) {
+      if (value.tag == tag) return value;
+    }
+
+    throw ArgumentError('Undefined LocalKeyReferenceType with tag: $tag');
+  }
+}
+
 /// Defines the X509 Role Based Access Control transaction metadata.
 final class RegistrationData extends Equatable implements CborEncodable {
   /// Un-ordered List of DER encoded x509 certificates.
@@ -54,6 +125,9 @@ final class RegistrationData extends Equatable implements CborEncodable {
     );
   }
 
+  @override
+  List<Object?> get props => [derCerts, cborCerts, publicKeys, revocationSet, roleDataSet];
+
   /// Serializes the type as cbor.
   @override
   CborValue toCbor({List<int> tags = const []}) => CborMap(
@@ -88,9 +162,6 @@ final class RegistrationData extends Equatable implements CborEncodable {
       items.map((e) => mapper != null ? mapper(e) : e.toCbor()).toList(),
     );
   }
-
-  @override
-  List<Object?> get props => [derCerts, cborCerts, publicKeys, revocationSet, roleDataSet];
 
   static List<RbacField<T>>? _parseRbacFieldCborList<T extends CborEncodable>(
     CborList? list,
@@ -228,6 +299,15 @@ class RoleData extends Equatable implements CborEncodable {
     );
   }
 
+  @override
+  List<Object?> get props => [
+        roleNumber,
+        roleSigningKey,
+        roleEncryptionKey,
+        paymentKey,
+        roleSpecificData,
+      ];
+
   /// Serializes the type as cbor.
   @override
   CborValue toCbor({List<int> tags = const []}) {
@@ -242,85 +322,5 @@ class RoleData extends Equatable implements CborEncodable {
       },
       tags: tags,
     );
-  }
-
-  @override
-  List<Object?> get props => [
-        roleNumber,
-        roleSigningKey,
-        roleEncryptionKey,
-        paymentKey,
-        roleSpecificData,
-      ];
-}
-
-/// Offset reference to a key defined in this registration.
-///
-/// More efficient than a key hash.
-class LocalKeyReference extends Equatable implements CborEncodable {
-  /// A type of referenced key.
-  final LocalKeyReferenceType keyType;
-
-  /// Offset of the key in the specified set. 0 = first entry.
-  final int offset;
-
-  /// The default constructor for [LocalKeyReference].
-  const LocalKeyReference({
-    required this.keyType,
-    required this.offset,
-  });
-
-  /// Deserializes the type from cbor.
-  factory LocalKeyReference.fromCbor(CborValue value) {
-    final list = value as CborList;
-    final keyType = list[0] as CborSmallInt;
-    final offset = list[1] as CborSmallInt;
-
-    return LocalKeyReference(
-      keyType: LocalKeyReferenceType.fromTag(keyType.value),
-      offset: offset.value,
-    );
-  }
-
-  /// Serializes the type as cbor.
-  @override
-  CborValue toCbor({List<int> tags = const []}) {
-    return CborList(
-      [
-        CborSmallInt(keyType.tag),
-        CborSmallInt(offset),
-      ],
-      tags: tags,
-    );
-  }
-
-  @override
-  List<Object?> get props => [keyType, offset];
-}
-
-/// Defines the type of the referenced local key.
-enum LocalKeyReferenceType {
-  /// The DER encoded X509 certificate.
-  x509Certs(tag: 10),
-
-  /// The C509 encoded certificate.
-  c509Certs(tag: 20),
-
-  /// The public key.
-  pubKeys(tag: 30);
-
-  /// The magic number defining the certificate type.
-  final int tag;
-
-  /// The default constructor for [LocalKeyReferenceType].
-  const LocalKeyReferenceType({required this.tag});
-
-  /// Returns a [LocalKeyReferenceType] by a [tag].
-  factory LocalKeyReferenceType.fromTag(int tag) {
-    for (final value in values) {
-      if (value.tag == tag) return value;
-    }
-
-    throw ArgumentError('Undefined LocalKeyReferenceType with tag: $tag');
   }
 }

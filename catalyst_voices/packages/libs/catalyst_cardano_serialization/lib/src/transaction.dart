@@ -6,6 +6,38 @@ import 'package:catalyst_cardano_serialization/src/witness.dart';
 import 'package:cbor/cbor.dart';
 import 'package:equatable/equatable.dart';
 
+/// The transaction metadata as a list of key-value pairs (a map).
+final class AuxiliaryData extends Equatable implements CborEncodable {
+  /// The transaction metadata map.
+  final Map<CborValue, CborValue> map;
+
+  /// The default constructor for [AuxiliaryData].
+  const AuxiliaryData({this.map = const {}});
+
+  /// Deserializes the type from cbor.
+  factory AuxiliaryData.fromCbor(CborValue value) {
+    final map = value as CborMap;
+    return AuxiliaryData(map: Map.fromEntries(map.entries));
+  }
+
+  @override
+  List<Object?> get props => [map];
+
+  /// Serializes the type as cbor.
+  @override
+  CborValue toCbor({List<int> tags = const []}) {
+    return CborMap(
+      map,
+      tags: map.isNotEmpty
+          ? tags
+          : [
+              CborCustomTags.map,
+              ...tags,
+            ],
+    );
+  }
+}
+
 /// Represents the signed transaction with a list of witnesses
 /// which are used to verify the validity of a transaction.
 final class Transaction extends Equatable implements CborEncodable {
@@ -47,6 +79,9 @@ final class Transaction extends Equatable implements CborEncodable {
     );
   }
 
+  @override
+  List<Object?> get props => [body, isValid, witnessSet, auxiliaryData];
+
   /// Serializes the type as cbor.
   @override
   CborValue toCbor({List<int> tags = const []}) {
@@ -60,9 +95,6 @@ final class Transaction extends Equatable implements CborEncodable {
       tags: tags,
     );
   }
-
-  @override
-  List<Object?> get props => [body, isValid, witnessSet, auxiliaryData];
 }
 
 /// Represents the details of a transaction including inputs, outputs, fee, etc.
@@ -168,23 +200,23 @@ final class TransactionBody extends Equatable implements CborEncodable {
     }
   }
 
-  static List<T>? _extractList<T>(
-    CborMap map,
-    int key,
-    T Function(CborValue) fromCbor,
-  ) {
-    final list = map[CborSmallInt(key)] as CborList?;
-    return list?.map(fromCbor).toList();
-  }
-
-  static T? _extractValue<T>(
-    CborMap map,
-    int key,
-    T Function(CborValue) fromCbor,
-  ) {
-    final value = map[CborSmallInt(key)];
-    return value != null ? fromCbor(value) : null;
-  }
+  @override
+  List<Object?> get props => [
+        inputs,
+        outputs,
+        fee,
+        ttl,
+        auxiliaryDataHash,
+        validityStart,
+        mint,
+        scriptDataHash,
+        collateralInputs,
+        requiredSigners,
+        networkId,
+        collateralReturn,
+        totalCollateral,
+        referenceInputs,
+      ];
 
   /// Serializes the type as cbor.
   @override
@@ -219,23 +251,23 @@ final class TransactionBody extends Equatable implements CborEncodable {
     ]);
   }
 
-  @override
-  List<Object?> get props => [
-        inputs,
-        outputs,
-        fee,
-        ttl,
-        auxiliaryDataHash,
-        validityStart,
-        mint,
-        scriptDataHash,
-        collateralInputs,
-        requiredSigners,
-        networkId,
-        collateralReturn,
-        totalCollateral,
-        referenceInputs,
-      ];
+  static List<T>? _extractList<T>(
+    CborMap map,
+    int key,
+    T Function(CborValue) fromCbor,
+  ) {
+    final list = map[CborSmallInt(key)] as CborList?;
+    return list?.map(fromCbor).toList();
+  }
+
+  static T? _extractValue<T>(
+    CborMap map,
+    int key,
+    T Function(CborValue) fromCbor,
+  ) {
+    final value = map[CborSmallInt(key)];
+    return value != null ? fromCbor(value) : null;
+  }
 }
 
 /// The transaction output of a previous transaction,
@@ -265,6 +297,9 @@ final class TransactionInput extends Equatable implements CborEncodable {
     );
   }
 
+  @override
+  List<Object?> get props => [transactionId, index];
+
   /// Serializes the type as cbor.
   @override
   CborValue toCbor({List<int> tags = const []}) {
@@ -276,9 +311,6 @@ final class TransactionInput extends Equatable implements CborEncodable {
       tags: tags,
     );
   }
-
-  @override
-  List<Object?> get props => [transactionId, index];
 }
 
 /// The UTXO that can be used as an input in a new transaction.
@@ -309,6 +341,9 @@ final class TransactionUnspentOutput extends Equatable implements CborEncodable 
     );
   }
 
+  @override
+  List<Object?> get props => [input, output];
+
   /// Serializes the type as cbor.
   @override
   CborValue toCbor({List<int> tags = const []}) {
@@ -320,39 +355,4 @@ final class TransactionUnspentOutput extends Equatable implements CborEncodable 
       tags: tags,
     );
   }
-
-  @override
-  List<Object?> get props => [input, output];
-}
-
-/// The transaction metadata as a list of key-value pairs (a map).
-final class AuxiliaryData extends Equatable implements CborEncodable {
-  /// The transaction metadata map.
-  final Map<CborValue, CborValue> map;
-
-  /// The default constructor for [AuxiliaryData].
-  const AuxiliaryData({this.map = const {}});
-
-  /// Deserializes the type from cbor.
-  factory AuxiliaryData.fromCbor(CborValue value) {
-    final map = value as CborMap;
-    return AuxiliaryData(map: Map.fromEntries(map.entries));
-  }
-
-  /// Serializes the type as cbor.
-  @override
-  CborValue toCbor({List<int> tags = const []}) {
-    return CborMap(
-      map,
-      tags: map.isNotEmpty
-          ? tags
-          : [
-              CborCustomTags.map,
-              ...tags,
-            ],
-    );
-  }
-
-  @override
-  List<Object?> get props => [map];
 }
