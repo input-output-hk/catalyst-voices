@@ -216,6 +216,7 @@ class _ShareItem extends StatelessWidget with LaunchUrlMixin {
   void _showSnackbar(BuildContext context) {
     VoicesSnackBar(
       type: VoicesSnackBarType.success,
+      behavior: SnackBarBehavior.floating,
       title: context.l10n.copied,
       message: context.l10n.linkCopiedToClipboard,
       duration: const Duration(seconds: 2),
