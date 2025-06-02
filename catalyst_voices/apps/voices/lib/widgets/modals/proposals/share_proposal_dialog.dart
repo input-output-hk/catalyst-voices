@@ -13,11 +13,20 @@ class ShareProposalDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return VoicesShareDialog(
-      key: const Key('ShareProposalDialog'),
-      shareItemType: context.l10n.proposal,
-      shareUrl: shareUrl,
-      shareMessage: context.l10n.proposalShareMessage,
+    return ScaffoldMessenger(
+      child: Builder(
+        builder: (context) {
+          return Scaffold(
+            backgroundColor: Colors.transparent,
+            body: VoicesShareDialog(
+              key: const Key('ShareProposalDialog'),
+              shareItemType: context.l10n.proposal,
+              shareUrl: shareUrl,
+              shareMessage: context.l10n.proposalShareMessage,
+            ),
+          );
+        },
+      ),
     );
   }
 
