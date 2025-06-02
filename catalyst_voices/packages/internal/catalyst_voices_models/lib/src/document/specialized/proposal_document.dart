@@ -44,7 +44,6 @@ final class ProposalDocument extends Equatable {
     categoryDetailsNodeId,
     milestonesNodeId,
     milestoneListNodeId,
-    milestoneListChildNodeId,
     tagNodeId,
   ];
 
