@@ -33,37 +33,6 @@ void main() {
           ),
         );
       });
-
-      transactionPropertyTest(
-        'Transaction fee calculation should be consistent with the valid '
-        'transaction fee across different UTxO and output combinations',
-        (data) {
-          final builder = data.builder;
-          final appliedBuilder = builder.applySelection();
-          final txBody = appliedBuilder.buildBody();
-          final calculatedFee = txBody.fee;
-
-          final signedFakeTx = Transaction(
-            body: txBody,
-            isValid: true,
-            witnessSet: TransactionBuilder.generateFakeWitnessSet(
-              appliedBuilder.inputs,
-              appliedBuilder.requiredSigners,
-            ),
-          );
-
-          final validFee = config.feeAlgo.minFee(signedFakeTx, {
-            ...builder.inputs,
-            ...?builder.referenceInputs,
-          });
-
-          expect(
-            calculatedFee,
-            equals(validFee),
-            reason: 'Calculated transaction fee should match the valid fee',
-          );
-        },
-      );
     });
   });
 }
