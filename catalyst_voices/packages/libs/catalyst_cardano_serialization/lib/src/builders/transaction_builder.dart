@@ -525,10 +525,8 @@ final class TransactionBuilder extends Equatable {
     required List<ShelleyMultiAssetTransactionOutput> outputs,
     required Coin fee,
   }) {
-    final inputsTotal =
-        inputs.map((e) => e.output.amount).fold(const Balance(coin: Coin(0)), (a, b) => a + b);
-    final outputsTotal =
-        outputs.map((e) => e.amount).fold(const Balance(coin: Coin(0)), (a, b) => a + b);
+    final inputsTotal = CoinSelector.sumAmounts(inputs, (input) => input.output.amount);
+    final outputsTotal = CoinSelector.sumAmounts(outputs, (output) => output.amount);
 
     if (inputsTotal != outputsTotal + Balance(coin: fee)) {
       throw TxBalanceMismatchException(
@@ -696,36 +694,40 @@ final class TransactionBuilder extends Equatable {
     required Coin fee,
     required Balance changeEstimator,
   }) {
-    final changeOutput = PreBabbageTransactionOutput(
+    final draftOutput = PreBabbageTransactionOutput(
       address: address,
       amount: changeEstimator,
     );
 
-    final minAda = TransactionOutputBuilder.minimumAdaForOutput(
-      changeOutput,
+    final minAdaForDraft = TransactionOutputBuilder.minimumAdaForOutput(
+      draftOutput,
       config.coinsPerUtxoByte,
     );
 
-    switch (changeEstimator.coin >= minAda) {
+    switch (changeEstimator.coin > minAdaForDraft) {
+      case true:
+        final feeForChange = TransactionOutputBuilder.feeForOutput(config, draftOutput);
+        final newFee = fee + feeForChange;
+
+        final changeOutput = PreBabbageTransactionOutput(
+          address: address,
+          amount: changeEstimator - Balance(coin: newFee),
+        );
+
+        final minAdaForChange = TransactionOutputBuilder.minimumAdaForOutput(
+          changeOutput,
+          config.coinsPerUtxoByte,
+        );
+
+        if (changeOutput.amount.coin >= minAdaForChange) {
+          return withFee(newFee).withOutput(changeOutput);
+        } else {
+          return withFee(changeEstimator.coin);
+        }
+
       case false:
         // burn remaining change as fee
         return withFee(changeEstimator.coin);
-      case true:
-        final feeForChange = TransactionOutputBuilder.feeForOutput(config, changeOutput);
-        final newFee = fee + feeForChange;
-
-        switch (changeEstimator.coin >= minAda) {
-          case false:
-            // burn remaining change as fee
-            return withFee(changeEstimator.coin);
-          case true:
-            return withFee(newFee).withOutput(
-              PreBabbageTransactionOutput(
-                address: address,
-                amount: changeEstimator - Balance(coin: newFee),
-              ),
-            );
-        }
     }
   }
 
