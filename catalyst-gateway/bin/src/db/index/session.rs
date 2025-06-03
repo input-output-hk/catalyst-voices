@@ -1,6 +1,7 @@
 //! Session creation and storage
 
 use std::{
+    any::TypeId,
     fmt::Debug,
     path::PathBuf,
     sync::{Arc, OnceLock},
@@ -8,6 +9,7 @@ use std::{
 };
 
 use cardano_blockchain_types::Network;
+use dashmap::DashMap;
 use openssl::ssl::{SslContextBuilder, SslFiletype, SslMethod, SslVerifyMode};
 use scylla::{
     frame::Compression, serialize::row::SerializeRow, transport::iterator::QueryPager,
@@ -21,7 +23,7 @@ use super::{
     queries::{
         purge::{self, PreparedDeleteQuery},
         FallibleQueryResults, PreparedQueries, PreparedQuery, PreparedSelectQuery,
-        PreparedUpsertQuery,
+        PreparedUpsertQuery, QueryKind,
     },
     schema::create_schema,
 };
@@ -115,6 +117,9 @@ pub(crate) struct CassandraSession {
     queries: Arc<PreparedQueries>,
     /// All prepared purge queries we can use on this session.
     purge_queries: Arc<purge::PreparedQueries>,
+    /// All prepared queries we can use on this session.
+    #[allow(dead_code)]
+    prepared_queries: DashMap<TypeId, QueryKind>,
 }
 
 /// Session error while initialization.
@@ -433,6 +438,7 @@ async fn retry_init(cfg: cassandra_db::EnvVars, network: Network, persistent: bo
             session,
             queries,
             purge_queries,
+            prepared_queries: DashMap::default(),
         };
 
         // Save the session so we can execute queries on the DB
