@@ -10,11 +10,16 @@ class SessionAccountPopupCatalystId extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocSelector<SessionCubit, SessionState, CatalystId?>(
       selector: (state) => state.account?.catalystId,
-      builder: (context, state) {
-        if (state == null) {
-          return const Offstage();
+      builder: (context, catalystId) {
+        if (catalystId == null) {
+          return const SizedBox.shrink();
         }
-        return CatalystIdText(state, isCompact: true);
+
+        return CatalystIdText(
+          catalystId,
+          isCompact: true,
+          showLabel: true,
+        );
       },
     );
   }
