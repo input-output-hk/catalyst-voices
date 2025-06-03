@@ -345,7 +345,7 @@
                             "x-guidance": "Each funding category has a minimum and maximum amount of funding a single proposal can request.\n\nMinimum Funding Amount per proposal:\n\n- Cardano Use Cases: Concepts: **₳250k**\n- Cardano Uses Cases: Concepts: **₳15K**\n- Cardano Open: Developers: **₳15K**\n- Cardano Open: Ecosystem: **₳15K**\n\nMaximum Funding Amount per proposal:\n\n- Cardano Use Cases: Concepts: **₳1M**\n- Cardano Uses Cases: Concepts: **₳100K**\n- Cardano Open: Developers: **₳100K**\n- Cardano Open: Ecosystem: **₳60K**",
                             "x-placeholder": "Enter the amount of funding you are requesting in ADA",
                             "minimum": 15000,
-                            "maximum": 1000000
+                            "maximum": 100000
                         }
                     },
                     "required": [
@@ -940,7 +940,7 @@
                                         "title": "Evidence of Completion",
                                         "description": "How you will demonstrate achievement",
                                         "x-placeholder": "Specify the evidence that will demonstrate this milestone is complete",
-                                        "minLength": 200,
+                                        "minLength": 100,
                                         "maxLength": 2000
                                     },
                                     "delivery_month": {
