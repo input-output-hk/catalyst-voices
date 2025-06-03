@@ -1,6 +1,6 @@
 -- Initialize the Project Catalyst Event Database.
 
--- cspell: words psql noqa
+-- cspell: words psql noqa datname
 
 -- This script requires a number of variables to be set.
 -- They will default if not set externally.
