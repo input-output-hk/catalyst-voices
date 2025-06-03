@@ -2304,10 +2304,6 @@
   "@votingRegistration": {
     "description": "Title for registration for voting"
   },
-  "copyMyCatalystId": "Copy my Catalyst ID",
-  "@copyMyCatalystId": {
-    "description": "Action to copy my catalyst id"
-  },
   "stayInvolved": "Stay Involved",
   "@stayInvolved": {
     "description": "Title for the stay involved section"
@@ -2793,17 +2789,29 @@
   "@devToolsAlreadyDeveloper": {
     "description": "SnackBar message when trying to enable dev tools while already enabled"
   },
-  "devToolsAlreadyDeveloperMessage": "Open DevTools with cmd+shift+D shortcut",
+  "devToolsAlreadyDeveloperMessage": "Open DevTools with {shortcut} shortcut",
   "@devToolsAlreadyDeveloperMessage": {
-    "description": "Explanation text"
+    "description": "Explanation text",
+    "placeholders": {
+      "shortcut": {
+        "type": "String",
+        "example": "cmd+shift+D"
+      }
+    }
   },
   "devToolsBecameDeveloper": "You became developer!",
   "@devToolsBecameDeveloper": {
     "description": "SnackBar message when enable dev tools"
   },
-  "devToolsBecameDeveloperMessage": "Open DevTools with cmd+shift+D shortcut",
+  "devToolsBecameDeveloperMessage": "Open DevTools with {shortcut} shortcut",
   "@devToolsBecameDeveloperMessage": {
-    "description": "Explanation text"
+    "description": "Explanation text",
+    "placeholders": {
+      "shortcut": {
+        "type": "String",
+        "example": "cmd+shift+D"
+      }
+    }
   },
   "devToolsTapsLeftToEnable": "{count} taps left",
   "@devToolsTapsLeftToEnable": {
@@ -2891,5 +2899,17 @@
   "orderProposalsUpdateDateDesc": "Newest to oldest",
   "@orderProposalsUpdateDateDesc": {
     "description": "Order proposals by update date option"
+  },
+  "catalystId": "Catalyst ID",
+  "@catalystId": {
+    "description": "Label of chip with account catalyst ID clearly describing content"
+  },
+  "tip": "Tip",
+  "@tip": {
+    "description": "Generic affix which can be used in different scenarios."
+  },
+  "tipCopyCatalystIdForReviewTool": "Copy your Catalyst ID before you go to the Review tool.",
+  "@tipCopyCatalystIdForReviewTool": {
+    "description": "Gives context where Catalyst ID can be used"
   }
 }
