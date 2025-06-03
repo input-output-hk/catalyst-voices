@@ -1,18 +1,11 @@
-import 'dart:async';
-
 import 'package:catalyst_voices/common/constants/constants.dart';
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
-import 'package:catalyst_voices/widgets/buttons/copy_catalyst_id_button.dart';
-import 'package:catalyst_voices/widgets/snackbar/voices_snackbar.dart';
-import 'package:catalyst_voices/widgets/snackbar/voices_snackbar_type.dart';
+import 'package:catalyst_voices/pages/spaces/drawer/session_account_drawer_catalyst_id.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
-import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
-import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 class OpportunitiesDrawer extends StatelessWidget {
   const OpportunitiesDrawer({super.key});
@@ -57,58 +50,46 @@ class _BecomeReviewerCard extends StatelessWidget with LaunchUrlMixin {
   Widget build(BuildContext context) {
     return _OpportunityCard(
       background: VoicesAssets.images.opportunities.reviewer.path,
-      child: Padding(
-        padding: const EdgeInsets.only(
-          top: 28,
-          left: 24,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(
-              width: 198,
-              child: Text(
-                context.l10n.turnOpinionsIntoActions,
-                style: context.textTheme.headlineMedium?.copyWith(
-                  color: context.colorScheme.primary,
-                ),
-              ),
+      widthFactor: 0.6,
+      alignment: Alignment.centerLeft,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(
+            context.l10n.turnOpinionsIntoActions,
+            style: context.textTheme.headlineMedium?.copyWith(
+              color: context.colorScheme.primary,
+              height: 1,
             ),
-            const SizedBox(height: 15),
-            CopyCatalystIdButton(onTap: () => _handleCopyCatalystId(context)),
-            const SizedBox(height: 4),
-            _OpportunityActionButton(
-              onTap: () async {
-                await launchUri(VoicesConstants.becomeReviewerUrl.getUri());
-              },
-              title: context.l10n.becomeReviewer,
-              trailing: VoicesAssets.icons.externalLink.buildIcon(),
-            ),
-          ],
-        ),
+          ),
+          const SizedBox(height: 16),
+          const _CopyCatalystIdTipText(),
+          const SizedBox(height: 16),
+          const SessionAccountDrawerCatalystId(),
+          const SizedBox(height: 20),
+          _OpportunityActionButton(
+            onTap: () async {
+              await launchUri(VoicesConstants.becomeReviewerUrl().getUri());
+            },
+            title: context.l10n.becomeReviewer,
+            trailing: VoicesAssets.icons.externalLink.buildIcon(),
+          ),
+        ],
       ),
     );
   }
+}
 
-  void _copyToClipboard(CatalystId? text) {
-    unawaited(Clipboard.setData(ClipboardData(text: text.toString())));
-  }
+class _CopyCatalystIdTipText extends StatelessWidget {
+  const _CopyCatalystIdTipText();
 
-  void _handleCopyCatalystId(BuildContext context) {
-    final catalystId = context.read<SessionCubit>().state.account?.catalystId;
-    _copyToClipboard(catalystId);
-    _showSuccessSnackbar(context);
-  }
-
-  void _showSuccessSnackbar(BuildContext context) {
-    VoicesSnackBar.hideCurrent(context);
-
-    VoicesSnackBar(
-      type: VoicesSnackBarType.success,
-      behavior: SnackBarBehavior.floating,
-      message: context.l10n.copied,
-    ).show(context);
+  @override
+  Widget build(BuildContext context) {
+    return TipText(
+      context.l10n.tipCopyCatalystIdForReviewTool,
+      style: context.textTheme.bodyMedium?.copyWith(color: context.colors.textOnPrimaryLevel1),
+    );
   }
 }
 
@@ -167,17 +148,20 @@ class _OpportunityActionButton extends StatelessWidget {
 
 class _OpportunityCard extends StatelessWidget {
   final String background;
+  final double widthFactor;
+  final Alignment alignment;
   final Widget child;
 
   const _OpportunityCard({
     required this.background,
+    required this.widthFactor,
+    required this.alignment,
     required this.child,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      constraints: BoxConstraints.tight(const Size(426, 260)),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
         image: DecorationImage(
@@ -185,7 +169,12 @@ class _OpportunityCard extends StatelessWidget {
           fit: BoxFit.cover,
         ),
       ),
-      child: child,
+      padding: const EdgeInsets.symmetric(vertical: 28, horizontal: 24),
+      alignment: alignment,
+      child: FractionallySizedBox(
+        widthFactor: widthFactor,
+        child: child,
+      ),
     );
   }
 }
@@ -197,39 +186,32 @@ class _RegisterAsVoter extends StatelessWidget with LaunchUrlMixin {
   Widget build(BuildContext context) {
     return _OpportunityCard(
       background: VoicesAssets.images.opportunities.voter.path,
-      child: Align(
-        alignment: Alignment.topRight,
-        child: Padding(
-          padding: const EdgeInsets.only(
-            top: 44,
-            right: 24,
+      widthFactor: 0.55,
+      alignment: Alignment.centerRight,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          const SizedBox(height: 16),
+          Text(
+            context.l10n.f14Voting,
+            style: context.textTheme.headlineMedium?.copyWith(
+              color: context.colorScheme.primary,
+              height: 1,
+            ),
           ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(
-                width: 198,
-                child: Text(
-                  context.l10n.f14Voting,
-                  style: context.textTheme.headlineMedium?.copyWith(
-                    color: context.colorScheme.primary,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 20),
-              _OpportunityActionButton(
-                onTap: () async {
-                  await launchUri(
-                    VoicesConstants.votingRegistrationUrl.getUri(),
-                  );
-                },
-                title: context.l10n.votingRegistration,
-                trailing: VoicesAssets.icons.externalLink.buildIcon(),
-              ),
-            ],
+          const SizedBox(height: 28),
+          _OpportunityActionButton(
+            onTap: () async {
+              await launchUri(
+                VoicesConstants.votingRegistrationUrl.getUri(),
+              );
+            },
+            title: context.l10n.votingRegistration,
+            trailing: VoicesAssets.icons.externalLink.buildIcon(),
           ),
-        ),
+          const SizedBox(height: 16),
+        ],
       ),
     );
   }

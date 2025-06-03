@@ -2,18 +2,14 @@ import 'dart:async';
 
 import 'package:catalyst_voices/common/constants/constants.dart';
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
-import 'package:catalyst_voices/widgets/buttons/copy_catalyst_id_button.dart';
-import 'package:catalyst_voices/widgets/buttons/voices_filled_button.dart';
-import 'package:catalyst_voices/widgets/snackbar/voices_snackbar.dart';
-import 'package:catalyst_voices/widgets/snackbar/voices_snackbar_type.dart';
+import 'package:catalyst_voices/pages/discovery/sections/session_account_catalyst_id.dart';
 import 'package:catalyst_voices/widgets/text/voting_start_at_time_text.dart';
+import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
-import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 class StayInvolved extends StatelessWidget {
   const StayInvolved({super.key});
@@ -43,47 +39,15 @@ class StayInvolved extends StatelessWidget {
   }
 }
 
-class __ReviewerCardState extends State<_ReviewerCard> {
+class _CopyCatalystIdTipText extends StatelessWidget {
+  const _CopyCatalystIdTipText();
+
   @override
   Widget build(BuildContext context) {
-    return _StayInvolvedCard(
-      icon: VoicesAssets.icons.clipboardCheck,
-      title: '${context.l10n.turnOpinionsIntoActions} ${context.l10n.becomeReviewer}!',
-      description: context.l10n.stayInvolvedReviewerDescription,
-      actions: Row(
-        children: [
-          CopyCatalystIdButton(
-            onTap: () => _handleCopyCatalystId(context),
-          ),
-          const SizedBox(height: 4),
-          _StayInvolvedActionButton(
-            title: context.l10n.becomeReviewer,
-            urlString: VoicesConstants.becomeReviewerUrl,
-            trailing: VoicesAssets.icons.externalLink.buildIcon(),
-          ),
-        ],
-      ),
+    return TipText(
+      context.l10n.tipCopyCatalystIdForReviewTool,
+      style: context.textTheme.bodyMedium?.copyWith(color: context.colors.textOnPrimaryLevel1),
     );
-  }
-
-  void _copyToClipboard(CatalystId? text) {
-    unawaited(Clipboard.setData(ClipboardData(text: text.toString())));
-  }
-
-  void _handleCopyCatalystId(BuildContext context) {
-    final catalystId = context.read<SessionCubit>().state.account?.catalystId;
-    _copyToClipboard(catalystId);
-    _showSuccessSnackbar(context);
-  }
-
-  void _showSuccessSnackbar(BuildContext context) {
-    VoicesSnackBar.hideCurrent(context);
-
-    VoicesSnackBar(
-      type: VoicesSnackBarType.success,
-      behavior: SnackBarBehavior.floating,
-      message: context.l10n.copied,
-    ).show(context);
   }
 }
 
@@ -99,11 +63,29 @@ class _Header extends StatelessWidget {
   }
 }
 
-class _ReviewerCard extends StatefulWidget {
+class _ReviewerCard extends StatelessWidget {
   const _ReviewerCard();
 
   @override
-  State<_ReviewerCard> createState() => __ReviewerCardState();
+  Widget build(BuildContext context) {
+    return _StayInvolvedCard(
+      icon: VoicesAssets.icons.clipboardCheck,
+      title: '${context.l10n.turnOpinionsIntoActions} ${context.l10n.becomeReviewer}!',
+      description: context.l10n.stayInvolvedReviewerDescription,
+      additionalInfo: const _CopyCatalystIdTipText(),
+      actions: Row(
+        children: [
+          _StayInvolvedActionButton(
+            title: context.l10n.becomeReviewer,
+            urlString: VoicesConstants.becomeReviewerUrl(),
+            trailing: VoicesAssets.icons.externalLink.buildIcon(),
+          ),
+          const SizedBox(width: 24),
+          const SessionAccountCatalystId(),
+        ],
+      ),
+    );
+  }
 }
 
 class _StayInvolvedActionButton extends StatelessWidget with LaunchUrlMixin {

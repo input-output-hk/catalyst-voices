@@ -14,5 +14,7 @@ enum AccountPublicStatus {
   notSetup,
   unknown;
 
+  bool get isNotSetup => this == AccountPublicStatus.notSetup;
+
   bool get isVerified => this == AccountPublicStatus.verified;
 }
