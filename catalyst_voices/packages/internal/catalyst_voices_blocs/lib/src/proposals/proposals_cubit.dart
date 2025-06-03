@@ -198,7 +198,7 @@ final class ProposalsCubit extends Cubit<ProposalsState>
       return;
     }
 
-    changeFilters(searchQuery: asOptional);
+    changeFilters(searchQuery: asOptional, resetProposals: true);
 
     emit(state.copyWith(hasSearchQuery: !asOptional.isEmpty));
   }
@@ -232,7 +232,7 @@ final class ProposalsCubit extends Cubit<ProposalsState>
   }
 
   void _handleActiveAccountIdChange(CatalystId? id) {
-    changeFilters(author: Optional(id));
+    changeFilters(author: Optional(id), resetProposals: true);
   }
 
   void _handleFavoriteProposalsIds(List<String> ids) {
