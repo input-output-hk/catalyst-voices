@@ -31,7 +31,7 @@ final class ApiServices {
 
     return ApiServices.internal(
       gateway: CatGateway.create(
-        baseUrl: env.gateway,
+        baseUrl: env.appGatewayApi,
         converter: CborOrJsonDelegateConverter(
           cborConverter: CborSerializableConverter(),
           jsonConverter: $JsonSerializableConverter(),
@@ -43,7 +43,7 @@ final class ApiServices {
         ],
       ),
       reviews: CatReviews.create(
-        baseUrl: env.reviews,
+        baseUrl: env.appReviewsApi,
         interceptors: [
           PathTrimInterceptor(),
           RbacAuthInterceptor(authTokenProvider),
