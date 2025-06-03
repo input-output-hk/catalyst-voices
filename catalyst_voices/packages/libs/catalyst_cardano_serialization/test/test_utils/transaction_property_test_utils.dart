@@ -40,6 +40,7 @@ void transactionPropertyTest(
 }) {
   property(description, () {
     forAll(
+      seed: 88675123,
       maxExamples: maxExamples,
       combine6(
         combine2(
