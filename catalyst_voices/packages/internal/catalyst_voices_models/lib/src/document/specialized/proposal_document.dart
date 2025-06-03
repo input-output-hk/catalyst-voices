@@ -31,7 +31,7 @@ final class ProposalDocument extends Equatable {
   // This dot at the end is intentional.
   // More info: https://github.com/input-output-hk/catalyst-voices/pull/2640#discussion_r2115627064
   // It is used to indicate that the node id is a child of the milestone_list.
-  // TODO(LynxLynxx): Add some sort of imlementation of wildcards to the DocumentNodeId.
+  // TODO(LynxLynxx): Add some sort of implementation of wildcards to the DocumentNodeId.
   // https://github.com/input-output-hk/catalyst-voices/issues/2661
   static final milestoneListChildNodeId =
       DocumentNodeId.fromString('milestones.milestones.milestone_list.');
