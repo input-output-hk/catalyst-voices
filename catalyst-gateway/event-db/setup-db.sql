@@ -18,6 +18,22 @@
 \echo -> dbUserPw ............... = xxxx
 \echo -> dbSuperUser ............ = :dbSuperUser
 
+SET localApp.dbUser = :'dbUser';
+SET localApp.dbName = :'dbName';
+DO $$ 
+DECLARE
+    db_name TEXT := current_setting('localApp.dbName');
+BEGIN
+    IF EXISTS (SELECT 1 FROM pg_database WHERE datname = db_name) THEN
+        -- Prevent new connections
+        EXECUTE format('ALTER DATABASE %I WITH ALLOW_CONNECTIONS false;', db_name);
+
+        -- Terminate active connections
+        EXECUTE format('SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = %L AND pid <> pg_backend_pid();', db_name);
+
+    END IF;
+END $$;
+
 -- Cleanup if we already ran this before.
 DROP DATABASE IF EXISTS :"dbName"; -- noqa: PRS
 DO $$
