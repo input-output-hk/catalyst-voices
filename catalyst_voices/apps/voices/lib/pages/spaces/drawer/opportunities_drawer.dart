@@ -70,7 +70,7 @@ class _BecomeReviewerCard extends StatelessWidget with LaunchUrlMixin {
           const SizedBox(height: 20),
           _OpportunityActionButton(
             onTap: () async {
-              await launchUri(VoicesConstants.becomeReviewerUrl.getUri());
+              await launchUri(VoicesConstants.becomeReviewerUrl().getUri());
             },
             title: context.l10n.becomeReviewer,
             trailing: VoicesAssets.icons.externalLink.buildIcon(),

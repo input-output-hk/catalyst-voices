@@ -88,7 +88,7 @@ class _ReviewerCard extends StatelessWidget {
           ),
           _StayInvolvedActionButton(
             title: context.l10n.becomeReviewer,
-            urlString: VoicesConstants.becomeReviewerUrl,
+            urlString: VoicesConstants.becomeReviewerUrl(),
             trailing: VoicesAssets.icons.externalLink.buildIcon(),
           ),
         ],

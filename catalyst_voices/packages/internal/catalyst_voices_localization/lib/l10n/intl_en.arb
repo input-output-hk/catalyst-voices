@@ -2795,17 +2795,29 @@
   "@devToolsAlreadyDeveloper": {
     "description": "SnackBar message when trying to enable dev tools while already enabled"
   },
-  "devToolsAlreadyDeveloperMessage": "Open DevTools with cmd+shift+D shortcut",
+  "devToolsAlreadyDeveloperMessage": "Open DevTools with {shortcut} shortcut",
   "@devToolsAlreadyDeveloperMessage": {
-    "description": "Explanation text"
+    "description": "Explanation text",
+    "placeholders": {
+      "shortcut": {
+        "type": "String",
+        "example": "cmd+shift+D"
+      }
+    }
   },
   "devToolsBecameDeveloper": "You became developer!",
   "@devToolsBecameDeveloper": {
     "description": "SnackBar message when enable dev tools"
   },
-  "devToolsBecameDeveloperMessage": "Open DevTools with cmd+shift+D shortcut",
+  "devToolsBecameDeveloperMessage": "Open DevTools with {shortcut} shortcut",
   "@devToolsBecameDeveloperMessage": {
-    "description": "Explanation text"
+    "description": "Explanation text",
+    "placeholders": {
+      "shortcut": {
+        "type": "String",
+        "example": "cmd+shift+D"
+      }
+    }
   },
   "devToolsTapsLeftToEnable": "{count} taps left",
   "@devToolsTapsLeftToEnable": {
