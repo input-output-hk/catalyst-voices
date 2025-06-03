@@ -182,8 +182,10 @@ class _StayInvolvedCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 588,
-      height: 550,
+      constraints: const BoxConstraints(
+        minHeight: 550,
+        maxWidth: 588,
+      ),
       padding: const EdgeInsets.symmetric(horizontal: 32),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
@@ -226,6 +228,7 @@ class _StayInvolvedCard extends StatelessWidget {
             additionalInfo!,
           ],
           actions,
+          const SizedBox(height: 20),
         ],
       ),
     );
