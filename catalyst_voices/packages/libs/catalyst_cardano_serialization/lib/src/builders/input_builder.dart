@@ -8,10 +8,10 @@ import 'package:catalyst_cardano_serialization/src/builders/types.dart';
 /// a coin selection algorithm to determine the minimal required inputs needed
 /// to satisfy the transaction outputs and fees. It produces a new selection
 /// result containing:
+///
 /// - The selected inputs.
 /// - Change outputs, if applicable.
 /// - The calculated transaction fee.
-///
 final class InputBuilder implements CoinSelector {
   /// Strategy used to prioritize the available UTxOs.
   final CoinSelectionStrategy selectionStrategy;
@@ -65,7 +65,6 @@ final class InputBuilder implements CoinSelector {
     int maxInputs = CoinSelector.maxInputs,
   }) {
     final availableInputs = builder.inputs.toSet();
-    final selectedInputs = <TransactionUnspentOutput>{};
 
     final inputTotal = CoinSelector.sumAmounts(
       builder.inputs,
@@ -90,67 +89,53 @@ final class InputBuilder implements CoinSelector {
     // Apply the coin selection strategy to prioritize UTXOs within each group.
     selectionStrategy.apply(assetGroups);
 
-    final groupCount = assetGroups.length;
-    var selectedTotal = const Balance.zero();
+    final selector = _SelectInputs(
+      builder: builder,
+      minInputs: minInputs,
+      maxInputs: maxInputs,
+      availableInputs: availableInputs,
+      targetTotal: targetTotal,
+      assetGroups: assetGroups,
+    );
 
-    // Iterate through each asset group (native tokens + ADA as the last group).
-    for (final entry in assetGroups) {
-      final assetId = entry.key;
-      final assetUtxos = entry.value;
+    return selector.selectInputs();
+  }
+}
 
-      // Determine if change should be calculated for the current asset group.
-      final shouldCalculateChange =
-          assetId == CoinSelector.adaAssetId || assetGroups[groupCount - 2].key == assetId;
+class _SelectInputs {
+  final TransactionBuilder builder;
+  final int minInputs;
+  final int maxInputs;
+  final Set<TransactionUnspentOutput> availableInputs;
+  final Balance targetTotal;
+  final AssetsGroup assetGroups;
 
-      while (assetUtxos.isNotEmpty) {
-        // Check if there are no more available inputs or if the maximum number
-        // of inputs has been exceeded.
-        if (availableInputs.isEmpty || selectedInputs.length > maxInputs) {
-          throw InsufficientUtxoBalanceException(
-            actualAmount: selectedTotal,
-            requiredAmount: targetTotal,
-          );
-        }
+  final selectedInputs = <TransactionUnspentOutput>{};
+  Balance selectedTotal = const Balance.zero();
 
-        // Select the first available UTXO from the list of asset UTXOs.
-        final utxo = assetUtxos.removeAt(0);
+  _SelectInputs({
+    required this.builder,
+    required this.minInputs,
+    required this.maxInputs,
+    required this.availableInputs,
+    required this.targetTotal,
+    required this.assetGroups,
+  });
 
-        // Check if the UTXO is still available for selection.
-        if (!availableInputs.remove(utxo)) continue;
+  SelectionResult selectInputs() {
+    final postPredefinedOutputsResult = _selectInputsToSatisfyOutputs();
+    if (postPredefinedOutputsResult != null) {
+      return postPredefinedOutputsResult;
+    }
 
-        // Add the UTXO to the selected inputs and update the selected total.
-        selectedInputs.add(utxo);
-        selectedTotal += utxo.output.amount;
+    final postChangeOutputsResult = _selectInputsToSatisfyChangeOutputsAndFee();
+    if (postChangeOutputsResult != null) {
+      return postChangeOutputsResult;
+    }
 
-        // Check if the requirements have met.
-        if (_getAssetAmount(assetId, selectedTotal) < _getAssetAmount(assetId, targetTotal)) {
-          if (assetUtxos.isEmpty) {
-            throw InsufficientUtxoBalanceException(
-              actualAmount: selectedTotal,
-              requiredAmount: targetTotal,
-            );
-          } else {
-            continue;
-          }
-        }
-
-        if (shouldCalculateChange && selectedInputs.length >= minInputs) {
-          final changeAndFee = _getChangeAndFee(
-            assetId,
-            builder,
-            selectedInputs,
-            selectedTotal,
-            targetTotal,
-          );
-
-          // Return the selection result if change and fees are successfully
-          // calculated.
-          if (changeAndFee != null) {
-            final (changeOutputs, totalFee) = changeAndFee;
-            return (selectedInputs, changeOutputs, totalFee);
-          }
-        }
-      }
+    final result = _getSelectionResultSatisfyingOutputsAndFee();
+    if (result != null) {
+      return result;
     }
 
     // Throw an exception if the selection process fails to meet the
@@ -171,8 +156,6 @@ final class InputBuilder implements CoinSelector {
   ///   - [builder]: The transaction builder used to create the transaction.
   ///   - [remainingBalance]: The balance remaining after deducting the required
   ///     amount and initial fees.
-  ///   - [minFee]: The minimum fee for the transaction before considering
-  ///     change outputs.
   ///
   /// - Returns:
   ///   A tuple containing:
@@ -184,42 +167,22 @@ final class InputBuilder implements CoinSelector {
   ///     the fee remains unchanged.
   ///   - This method handles multi-asset balances and ensures they are included
   ///     in the change outputs, if applicable.
-  (List<ShelleyMultiAssetTransactionOutput>, Coin) _buildChangeOutputs(
+  (List<ShelleyMultiAssetTransactionOutput>, Coin)? _buildChangeOutputs(
     TransactionBuilder builder,
     Balance remainingBalance,
-    Coin minFee,
   ) {
-    // TODO(dtscalac): build here multiple outputs if native assets cannot fit into one
-    if (remainingBalance.isZero) return ([], const Coin(0));
-    if (builder.changeAddress == null) {
-      throw ArgumentError('Change address required for non-zero balance.');
-    }
+    try {
+      if (remainingBalance.isZero) return ([], const Coin(0));
 
-    // Remove empty multiasset from the balance
-    final normalizedBalance =
-        remainingBalance.hasMultiAssets() ? remainingBalance : Balance(coin: remainingBalance.coin);
+      final builderWithChangeOutputs = builder.withChangeIfNeeded();
+      final deltaOutputs = List.of(builderWithChangeOutputs.outputs)..removeAll(builder.outputs);
+      final deltaFee = builderWithChangeOutputs.fee! - builder.minFee();
 
-    final output = PreBabbageTransactionOutput(
-      address: builder.changeAddress!,
-      amount: normalizedBalance,
-    );
-    final changeFee = TransactionOutputBuilder.feeForOutput(
-      builder.config,
-      output,
-    );
-    final minAda = TransactionOutputBuilder.minimumAdaForOutput(
-      output,
-      builder.config.coinsPerUtxoByte,
-    );
-
-    final changeOutputs = <ShelleyMultiAssetTransactionOutput>[];
-    if (normalizedBalance.coin >= minAda + changeFee) {
-      changeOutputs.add(
-        output.copyWith(amount: normalizedBalance - Balance(coin: changeFee)),
-      );
-      return (changeOutputs, changeFee);
-    } else {
-      return ([], minAda + changeFee);
+      return (deltaOutputs, deltaFee);
+    } on InsufficientUtxoBalanceException {
+      return null;
+    } on InsufficientAdaForAssetsException {
+      return null;
     }
   }
 
@@ -238,7 +201,6 @@ final class InputBuilder implements CoinSelector {
   /// change outputs and the total transaction fee.
   ///
   /// - Parameters:
-  ///   - [assetId]: The identifier for which the change is being calculated.
   ///   - [builder]: The transaction builder used to create the transaction.
   ///   - [selectedInputs]: The set of selected UTxOs to fund the transaction.
   ///   - [selectedTotal]: The total balance accumulated from selected inputs.
@@ -258,13 +220,13 @@ final class InputBuilder implements CoinSelector {
   ///     the accumulated balance exceeds or equals the required amount plus
   ///     fees.
   (List<ShelleyMultiAssetTransactionOutput>, Coin)? _getChangeAndFee(
-    AssetId assetId,
     TransactionBuilder builder,
     Set<TransactionUnspentOutput> selectedInputs,
     Balance selectedTotal,
     Balance targetTotal,
   ) {
-    final minFee = builder.copyWith(inputs: selectedInputs).minFee();
+    final builderWithInputs = builder.copyWith(inputs: selectedInputs);
+    final minFee = builderWithInputs.minFee();
     final minimumRequired = targetTotal + Balance(coin: minFee);
 
     if (selectedTotal.lessThan(minimumRequired)) return null;
@@ -273,17 +235,139 @@ final class InputBuilder implements CoinSelector {
     // to be larger.
     final changeTotal = selectedTotal - minimumRequired;
 
-    final (changeOutputs, changeFee) = _buildChangeOutputs(
-      builder,
-      changeTotal,
-      minFee,
-    );
+    final record = _buildChangeOutputs(builderWithInputs, changeTotal);
+    if (record == null) {
+      return null;
+    }
 
+    final (changeOutputs, changeFee) = record;
     final requiredFee = minFee + changeFee;
     if (selectedTotal.lessThan(targetTotal + Balance(coin: requiredFee))) {
       return null;
     }
 
     return (changeOutputs, requiredFee);
+  }
+
+  SelectionResult? _getSelectionResultSatisfyingOutputsAndFee() {
+    if (selectedInputs.length < minInputs || selectedInputs.length > maxInputs) {
+      return null;
+    }
+
+    final changeAndFee = _getChangeAndFee(builder, selectedInputs, selectedTotal, targetTotal);
+
+    // Return the selection result if change and fees are successfully calculated.
+    if (changeAndFee != null) {
+      final (changeOutputs, totalFee) = changeAndFee;
+      return (selectedInputs, changeOutputs, totalFee);
+    }
+
+    return null;
+  }
+
+  /// Attempts to select just enough Ada inputs (UTXOs) to satisfy both the required
+  /// change outputs and the transaction fee.
+  ///
+  /// This method iterates through available Ada UTXOs and selectively includes them
+  /// into the input set until:
+  ///
+  /// - The selected inputs can fully satisfy the outputs, including generating any
+  ///   required change outputs.
+  /// - The transaction fee requirements are met.
+  SelectionResult? _selectInputsToSatisfyChangeOutputsAndFee() {
+    final adaAssetGroup =
+        assetGroups.where((e) => e.key == CoinSelector.adaAssetId).firstOrNull?.value ?? [];
+
+    while (availableInputs.isNotEmpty && adaAssetGroup.isNotEmpty) {
+      // Select the first available UTXO from the list of asset UTXOs.
+      final utxo = adaAssetGroup.removeAt(0);
+      final utxoAvailable = _selectUtxoIfStillAvailable(utxo);
+      if (!utxoAvailable) continue;
+
+      final result = _getSelectionResultSatisfyingOutputsAndFee();
+      if (result != null) {
+        return result;
+      }
+    }
+
+    return _getSelectionResultSatisfyingOutputsAndFee();
+  }
+
+  /// Selects the minimum number of UTxOs required to satisfy the [targetTotal] amounts
+  /// for each asset group, including Ada and native tokens.
+  ///
+  /// This method:
+  /// - Iterates over each asset group needed in the transaction (e.g., Ada, native tokens).
+  /// - Selects UTxOs for each asset until the selected input total meets or exceeds
+  ///   the required output amount for that asset.
+  SelectionResult? _selectInputsToSatisfyOutputs() {
+    // Iterate through each asset group (native tokens + ADA as the last group).
+    for (final entry in assetGroups) {
+      final assetId = entry.key;
+      final assetUtxos = entry.value;
+
+      if (_getAssetAmount(assetId, selectedTotal) >= _getAssetAmount(assetId, targetTotal)) {
+        // Already selected enough utxos for given asset.
+        continue;
+      }
+
+      while (assetUtxos.isNotEmpty) {
+        // Check if there are no more available inputs or if the maximum number
+        // of inputs has been exceeded.
+        if (availableInputs.isEmpty) {
+          throw InsufficientUtxoBalanceException(
+            actualAmount: selectedTotal,
+            requiredAmount: targetTotal,
+          );
+        }
+
+        // Select the first available UTXO from the list of asset UTXOs.
+        final utxo = assetUtxos.removeAt(0);
+        final utxoAvailable = _selectUtxoIfStillAvailable(utxo);
+        if (!utxoAvailable) continue;
+
+        // Check if the requirements have met.
+        if (_getAssetAmount(assetId, selectedTotal) < _getAssetAmount(assetId, targetTotal)) {
+          if (assetUtxos.isEmpty) {
+            throw InsufficientUtxoBalanceException(
+              actualAmount: selectedTotal,
+              requiredAmount: targetTotal,
+            );
+          } else {
+            continue;
+          }
+        }
+
+        final result = _getSelectionResultSatisfyingOutputsAndFee();
+        if (result != null) {
+          return result;
+        }
+      }
+    }
+
+    return _getSelectionResultSatisfyingOutputsAndFee();
+  }
+
+  bool _selectUtxoIfStillAvailable(TransactionUnspentOutput utxo) {
+    if (selectedInputs.length >= maxInputs) {
+      throw InsufficientUtxoBalanceException(
+        actualAmount: selectedTotal,
+        requiredAmount: targetTotal,
+      );
+    } else if (!availableInputs.remove(utxo)) {
+      return false;
+    } else {
+      selectedInputs.add(utxo);
+      selectedTotal += utxo.output.amount;
+      return true;
+    }
+  }
+}
+
+extension<T> on List<T> {
+  void removeAll(List<T> elements) {
+    for (final element in elements) {
+      remove(element);
+    }
   }
 }
