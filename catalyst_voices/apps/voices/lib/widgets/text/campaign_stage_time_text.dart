@@ -52,12 +52,15 @@ class _DateText extends StatelessWidget {
           label,
           style: context.textTheme.bodyMedium?.copyWith(color: context.colors.sysColorsNeutralN60),
         ),
-        TimezoneDateTimeText(
-          date,
-          formatter: (context, dateTime) {
-            final date = DateFormatter.formatFullDate24Format(dateTime);
-            return date;
-          },
+        Flexible(
+          child: TimezoneDateTimeText(
+            date,
+            formatter: (context, dateTime) {
+              final date = DateFormatter.formatFullDate24Format(dateTime);
+              return date;
+            },
+            style: const TextStyle(overflow: TextOverflow.ellipsis),
+          ),
         ),
       ],
     );

@@ -2,19 +2,16 @@ import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/widgets/text/campaign_stage_time_text.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
-import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 class CampaignTimelineCard extends StatefulWidget {
   final CampaignTimelineViewModel timelineItem;
-  final CampaignTimelinePlacement placement;
 
   const CampaignTimelineCard({
     super.key,
     required this.timelineItem,
-    required this.placement,
   });
 
   @override
@@ -42,10 +39,7 @@ class CampaignTimelineCardState extends State<CampaignTimelineCard> {
           key: const Key('TimelineCard'),
           color: context.colors.elevationsOnSurfaceNeutralLv1White,
           shape: OutlineInputBorder(
-            borderSide: widget.placement.borderSide(
-              context,
-              isOngoing: _isOngoing,
-            ),
+            borderSide: _getBorder(context),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Padding(
@@ -114,46 +108,19 @@ class CampaignTimelineCardState extends State<CampaignTimelineCard> {
     );
   }
 
+  BorderSide _getBorder(BuildContext context) {
+    return switch (_isOngoing) {
+      true => BorderSide(
+          color: context.colorScheme.primary,
+          width: 2,
+        ),
+      false => BorderSide.none,
+    };
+  }
+
   void _toggleExpanded() {
     setState(() {
       _isExpanded = !_isExpanded;
     });
-  }
-}
-
-enum CampaignTimelinePlacement {
-  discovery,
-  workspace;
-
-  Color backgroundColor(
-    BuildContext context, {
-    required bool isOngoing,
-  }) {
-    final colors = Theme.of(context).colors;
-
-    return switch ((this, isOngoing)) {
-      (discovery, _) => colors.elevationsOnSurfaceNeutralLv0,
-      (workspace, true) => colors.elevationsOnSurfaceNeutralLv0,
-      (workspace, false) => colors.elevationsOnSurfaceNeutralLv0,
-    };
-  }
-
-  BorderSide borderSide(
-    BuildContext context, {
-    required bool isOngoing,
-  }) {
-    final colorScheme = context.colorScheme;
-
-    return switch ((this, isOngoing)) {
-      (discovery, true) => BorderSide(
-          color: colorScheme.primary,
-          width: 2,
-        ),
-      (workspace, true) => BorderSide(
-          color: colorScheme.primary,
-          width: 2,
-        ),
-      (_, _) => BorderSide.none,
-    };
   }
 }

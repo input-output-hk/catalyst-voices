@@ -1,5 +1,4 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
-import 'package:catalyst_voices/widgets/campaign_timeline/campaign_timeline_card.dart';
 import 'package:catalyst_voices/widgets/cards/funds_detail_card.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
@@ -49,7 +48,6 @@ class CurrentCampaign extends StatelessWidget {
           child: CampaignTimeline(
             key: const Key('CampaignTimeline'),
             timelineItems: currentCampaignInfo.timeline,
-            placement: CampaignTimelinePlacement.discovery,
             horizontalPadding: const SizedBox(width: 120),
           ),
         ),

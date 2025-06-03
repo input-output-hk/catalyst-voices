@@ -44,16 +44,54 @@ class _CopyCatalystIdTipText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Offstage(
-      offstage: !context.select<SessionCubit, bool>((cubit) => cubit.state.isActive),
-      child: Padding(
-        padding: const EdgeInsets.only(top: 20),
-        child: TipText(
-          context.l10n.tipCopyCatalystIdForReviewTool(VoicesConstants.becomeReviewerUrl()),
-          style: context.textTheme.bodyMedium?.copyWith(color: context.colors.textOnPrimaryLevel1),
-        ),
-      ),
+    return BlocSelector<SessionCubit, SessionState, bool>(
+      selector: (state) {
+        return state.isActive;
+      },
+      builder: (context, isActive) {
+        return Offstage(
+          offstage: !isActive,
+          child: Padding(
+            padding: const EdgeInsets.only(top: 20),
+            child: TipText(
+              context.l10n.tipCopyCatalystIdForReviewTool(VoicesConstants.becomeReviewerUrl()),
+              style:
+                  context.textTheme.bodyMedium?.copyWith(color: context.colors.textOnPrimaryLevel1),
+            ),
+          ),
+        );
+      },
     );
+  }
+}
+
+class _DatetimeRangeTimeline extends StatelessWidget {
+  final DateRange? dateRange;
+  final String title;
+
+  const _DatetimeRangeTimeline({
+    this.dateRange,
+    required this.title,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return dateRange == null
+        ? const SizedBox.shrink()
+        : Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                context.l10n.votingTimelineHeader,
+                style: context.textTheme.bodyMedium
+                    ?.copyWith(color: context.colors.textOnPrimaryLevel1),
+              ),
+              CampaignStageTimeText(
+                dateRange: dateRange!,
+              ),
+            ],
+          );
   }
 }
 
@@ -214,21 +252,10 @@ class _VoterCard extends StatelessWidget {
               return state.campaign.votingRegistrationStartsAt;
             },
             builder: (context, date) {
-              return date == null
-                  ? const SizedBox.shrink()
-                  : Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          context.l10n.votingRegistrationTimelineHeader,
-                          style: context.textTheme.bodyMedium
-                              ?.copyWith(color: context.colors.textOnPrimaryLevel1),
-                        ),
-                        CampaignStageTimeText(
-                          dateRange: date,
-                        ),
-                      ],
-                    );
+              return _DatetimeRangeTimeline(
+                dateRange: date,
+                title: context.l10n.votingRegistrationTimelineHeader,
+              );
             },
           ),
           const SizedBox(height: 16),
@@ -237,21 +264,10 @@ class _VoterCard extends StatelessWidget {
               return state.campaign.votingStartsAt;
             },
             builder: (context, date) {
-              return date == null
-                  ? const SizedBox.shrink()
-                  : Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          context.l10n.votingTimelineHeader,
-                          style: context.textTheme.bodyMedium
-                              ?.copyWith(color: context.colors.textOnPrimaryLevel1),
-                        ),
-                        CampaignStageTimeText(
-                          dateRange: date,
-                        ),
-                      ],
-                    );
+              return _DatetimeRangeTimeline(
+                dateRange: date,
+                title: context.l10n.votingTimelineHeader,
+              );
             },
           ),
         ],
