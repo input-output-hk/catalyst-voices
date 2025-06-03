@@ -106,7 +106,7 @@ void transactionPropertyTest(
           inputs: builderData.inputs,
           outputs: builderData.outputs,
           ttl: builderData.ttl,
-          // auxiliaryData: builderData.auxiliaryData,
+          auxiliaryData: builderData.auxiliaryData,
           networkId: builderData.networkId,
           requiredSigners: builderData.requiredSigners,
           changeAddress: builderData.changeAddress,
