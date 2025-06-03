@@ -3,6 +3,8 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 
 const _fallbackEnvType = kIsWeb ? AppEnvironmentType.relative : AppEnvironmentType.dev;
+const _projectCatalyst = 'projectcatalyst.io';
+final _envRegExp = RegExp(r'app\.([a-z]+)\.projectcatalyst\.io', caseSensitive: false);
 
 final class AppEnvironment extends Equatable {
   final AppEnvironmentType type;
@@ -48,6 +50,7 @@ final class AppEnvironment extends Equatable {
   List<Object?> get props => [type];
 }
 
+/// See https://github.com/input-output-hk/catalyst-internal-docs/issues/178
 enum AppEnvironmentType {
   /// This type tells app to always talk to full, hardcoded dev backend
   /// url.
@@ -71,13 +74,10 @@ enum AppEnvironmentType {
   /// It useful when building app one time and it can be deployed anywhere.
   relative;
 
-  /// See https://github.com/input-output-hk/catalyst-internal-docs/issues/178
-  Uri get baseUrl {
+  Uri get app {
     return switch (this) {
-      AppEnvironmentType.dev ||
-      AppEnvironmentType.preprod =>
-        Uri.https('app.$name.projectcatalyst.io'),
-      AppEnvironmentType.prod => Uri.https('app.projectcatalyst.io'),
+      AppEnvironmentType.dev || AppEnvironmentType.preprod => _getBaseUrl('app', envName: name),
+      AppEnvironmentType.prod => _getBaseUrl('app'),
 
       /// [AppEnvironmentType.relative] type does not now where its backends
       /// are hosted.
@@ -85,9 +85,46 @@ enum AppEnvironmentType {
     };
   }
 
-  /// See https://github.com/input-output-hk/catalyst-internal-docs/issues/178
-  Uri get gateway => baseUrl.replace(path: '/api/gateway');
+  Uri get appGatewayApi => app.replace(path: '/api/gateway');
 
-  /// See https://github.com/input-output-hk/catalyst-internal-docs/issues/178
-  Uri get reviews => baseUrl.replace(path: '/api/reviews');
+  Uri get appReviewsApi => app.replace(path: '/api/reviews');
+
+  Uri get reviews {
+    return switch (this) {
+      AppEnvironmentType.dev || AppEnvironmentType.preprod => _getBaseUrl('reviews', envName: name),
+      AppEnvironmentType.prod => _getBaseUrl('reviews'),
+      AppEnvironmentType.relative => _getBaseUrl(
+          'reviews',
+          envName: tryUriBaseEnvName(from: Uri.base.toString()),
+        ),
+    };
+  }
+
+  Uri _getBaseUrl(
+    String name, {
+    String? envName,
+  }) {
+    final parts = [
+      name,
+      if (envName != null) envName,
+      _projectCatalyst,
+    ];
+
+    final authority = parts.join('.');
+
+    return Uri.https(authority);
+  }
+
+  @visibleForTesting
+  static String? tryUriBaseEnvName({required String from}) {
+    final match = _envRegExp.firstMatch(from);
+    if (match != null && match.groupCount >= 1) {
+      final value = match.group(1)!;
+      if (AppEnvironmentType.values.any((element) => element.name == value)) {
+        return value;
+      }
+    }
+
+    return null;
+  }
 }
