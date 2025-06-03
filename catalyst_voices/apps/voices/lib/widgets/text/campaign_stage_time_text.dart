@@ -20,11 +20,13 @@ class CampaignStageTimeText extends StatelessWidget {
             date: dateRange.from!,
             label: context.l10n.starts,
           ),
-        if (dateRange.to != null)
+        if (dateRange.to != null) ...[
+          const SizedBox(height: 4),
           _DateText(
             date: dateRange.to!,
             label: context.l10n.finishes,
           ),
+        ],
       ],
     );
   }

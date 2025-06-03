@@ -2298,7 +2298,7 @@
   "@turnOpinionsIntoActions": {
     "description": "Title for becoming a reviewer"
   },
-  "becomeReviewer": "Become a Reviewer",
+  "becomeReviewer": "Become a Reviewer!",
   "@becomeReviewer": {
     "description": "Title for becoming a reviewer"
   },
@@ -2314,11 +2314,11 @@
   "@stayInvolved": {
     "description": "Title for the stay involved section"
   },
-  "stayInvolvedReviewerDescription": "Your voice has power. Use it to guide others and help improve the Cardano community.\n\nAs a reviewer, you'll make a real impact by sharing thoughtful feedback and influencing decisions.",
+  "stayInvolvedReviewerDescription": "Your voice has power. Use it to guide others and help improve the Cardano community.\n\nAs a reviewer, you’ll make a real impact by sharing thoughtful feedback and influencing decisions.",
   "@stayInvolvedReviewerDescription": {
     "description": "Description for the reviewer cards in stay involved section"
   },
-  "stayInvolvedContributorDescription": "Get Ready! This is your chance to have a say in where the funds go. To make sure you're ready to participate.\n\nRemember, by casting your vote, you're not only influencing the development of Cardano but also helping to build a community that reflects the values you care about.",
+  "stayInvolvedContributorDescription": "Get Ready! This is your chance to have a say in where the funds go. To make sure you're ready to participate.\n\nRemember, by voting, you're not only influencing the development of Cardano but also helping to build a community that reflects the values you care about.",
   "@stayInvolvedContributorDescription": {
     "description": "Description for the contributor cards in stay involved section"
   },
@@ -2902,9 +2902,14 @@
   "@tip": {
     "description": "Generic affix which can be used in different scenarios."
   },
-  "tipCopyCatalystIdForReviewTool": "Copy your Catalyst ID before you go to the Review tool.",
+  "tipCopyCatalystIdForReviewTool": "Copy your Catalyst ID before you go to the [Community Review module.]({url})",
   "@tipCopyCatalystIdForReviewTool": {
-    "description": "Gives context where Catalyst ID can be used"
+    "description": "Gives context where Catalyst ID can be used",
+    "placeholders": {
+      "url": {
+        "type": "String"
+      }
+    }
   },
   "starts": "Starts:",
   "@starts": {
@@ -2913,5 +2918,21 @@
   "finishes": "Finishes:",
   "@finishes": {
     "description": "Label for the campaign stage finish date"
+  },
+  "registerToVoteFund14": "Register to Vote in Fund14",
+  "@registerToVoteFund14": {
+    "description": "Title of the register to vote section"
+  },
+  "becomeVoter": "Become a Voter",
+  "@becomeVoter": {
+    "description": "Title for becoming a voter"
+  },
+  "votingRegistrationTimelineHeader": "Voting registration:",
+  "@votingRegistrationTimelineHeader": {
+    "description": "Header for the voting registration timeline"
+  },
+  "votingTimelineHeader": "Voting:",
+  "@votingTimelineHeader": {
+    "description": "Header for the voting timeline"
   }
 }

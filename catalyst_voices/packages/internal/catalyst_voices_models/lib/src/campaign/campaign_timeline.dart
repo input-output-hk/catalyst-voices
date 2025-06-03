@@ -17,13 +17,19 @@ final class CampaignTimeline extends Equatable {
   });
 
   @override
-  List<Object?> get props => [title, description, timeline, stage];
+  List<Object?> get props => [
+        title,
+        description,
+        timeline,
+        stage,
+      ];
 
   CampaignTimeline copyWith({
     String? title,
     String? description,
     DateRange? timeline,
     CampaignTimelineStage? stage,
+    bool? offstage,
   }) {
     return CampaignTimeline(
       title: title ?? this.title,
@@ -40,6 +46,7 @@ enum CampaignTimelineStage {
   communityVoting,
   votingResults,
   projectOnboarding,
+  votingRegistration,
 }
 
 extension CampaignTimelineX on CampaignTimeline {
@@ -63,6 +70,15 @@ extension CampaignTimelineX on CampaignTimeline {
         to: DateTime.utc(2025, 08, 6, 6),
       ),
       stage: CampaignTimelineStage.communityReview,
+    ),
+    CampaignTimeline(
+      title: 'Voting Registration',
+      description: '',
+      timeline: DateRange(
+        from: DateTime.utc(2025, 06, 18),
+        to: DateTime.utc(2025, 08, 2, 21, 45),
+      ),
+      stage: CampaignTimelineStage.votingRegistration,
     ),
     CampaignTimeline(
       title: 'Community Voting',

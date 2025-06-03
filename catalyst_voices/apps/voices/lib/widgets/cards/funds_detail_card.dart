@@ -53,7 +53,7 @@ class FundsDetailCard extends StatelessWidget {
                   funds: allFunds,
                 ),
                 Offstage(
-                  offstage: type.isCategoryCompact || type.isFound,
+                  offstage: type.isCategoryCompact,
                   child: _CampaignFundsDetail(
                     key: const Key('FundsDetailRequested'),
                     title: type.localizedTotalAsk(context.l10n),
@@ -62,7 +62,10 @@ class FundsDetailCard extends StatelessWidget {
                     largeFundsText: false,
                   ),
                 ),
-                _RangeAsk(range: askRange),
+                Offstage(
+                  offstage: type.isFound,
+                  child: _RangeAsk(range: askRange),
+                ),
               ],
             ),
           ),

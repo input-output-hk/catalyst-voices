@@ -3,22 +3,36 @@ import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 
+typedef _AccountSessionData = ({CatalystId? catalystId, bool isUnlock});
+
 class SessionAccountCatalystId extends StatelessWidget {
-  const SessionAccountCatalystId({super.key});
+  final EdgeInsets padding;
+
+  const SessionAccountCatalystId({
+    super.key,
+    this.padding = EdgeInsets.zero,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<SessionCubit, SessionState, CatalystId?>(
-      selector: (state) => state.account?.catalystId,
-      builder: (context, catalystId) {
-        if (catalystId == null) {
+    return BlocSelector<SessionCubit, SessionState, _AccountSessionData>(
+      selector: (state) => (catalystId: state.account?.catalystId, isUnlock: state.isActive),
+      builder: (context, data) {
+        if (data.catalystId == null) {
           return const SizedBox.shrink();
         }
 
-        return CatalystIdText(
-          catalystId,
-          isCompact: true,
-          showLabel: true,
+        return Offstage(
+          offstage: !data.isUnlock,
+          child: Padding(
+            padding: padding,
+            child: CatalystIdText(
+              data.catalystId!,
+              isCompact: true,
+              showLabel: true,
+              labelGap: 0,
+            ),
+          ),
         );
       },
     );

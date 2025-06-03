@@ -9,6 +9,7 @@ import 'package:catalyst_voices/widgets/campaign_timeline/campaign_timeline_card
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
+import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart' show ProposalDocument, Space;
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
@@ -145,11 +146,8 @@ class _WorkspaceHeaderState extends State<WorkspaceHeader> {
                   child: Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: theme.colorScheme.surface,
+                      color: theme.colors.onSurfaceNeutralOpaqueLv0.withValues(alpha: 0.6),
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: Colors.grey.withAlpha(51),
-                      ),
                     ),
                     child: BlocSelector<WorkspaceBloc, WorkspaceState,
                         List<CampaignTimelineViewModel>>(

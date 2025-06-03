@@ -40,7 +40,7 @@ class CampaignTimelineCardState extends State<CampaignTimelineCard> {
         width: 288,
         child: Card(
           key: const Key('TimelineCard'),
-          color: context.colors.onSurfaceNeutralOpaqueLv0,
+          color: context.colors.elevationsOnSurfaceNeutralLv1White,
           shape: OutlineInputBorder(
             borderSide: widget.placement.borderSide(
               context,
@@ -67,7 +67,7 @@ class CampaignTimelineCardState extends State<CampaignTimelineCard> {
                         content: Text(
                           context.l10n.ongoing,
                           style: context.textTheme.labelSmall?.copyWith(
-                            color: Colors.white,
+                            color: colors.onPrimary,
                           ),
                         ),
                         padding: const EdgeInsets.symmetric(
@@ -78,7 +78,7 @@ class CampaignTimelineCardState extends State<CampaignTimelineCard> {
                     ),
                     const Spacer(),
                     _expandedIcon.buildIcon(
-                      color: colors.primaryContainer,
+                      color: colors.primary,
                     ),
                   ],
                 ),
@@ -92,19 +92,20 @@ class CampaignTimelineCardState extends State<CampaignTimelineCard> {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
+                const SizedBox(height: 12),
                 CampaignStageTimeText(dateRange: widget.timelineItem.timeline),
-                const SizedBox(height: 16),
-                AnimatedSwitcher(
-                  duration: Durations.medium4,
-                  child: _isExpanded
-                      ? Text(
-                          widget.timelineItem.description,
-                          style: context.textTheme.bodyMedium?.copyWith(
-                            color: context.colors.sysColorsNeutralN60,
-                          ),
-                        )
-                      : const SizedBox.shrink(),
-                ),
+                if (_isExpanded)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 12),
+                    child: Text(
+                      widget.timelineItem.description,
+                      style: context.textTheme.bodyMedium?.copyWith(
+                        color: context.colors.textOnPrimaryLevel1,
+                      ),
+                    ),
+                  )
+                else
+                  const SizedBox.shrink(),
               ],
             ),
           ),
@@ -131,9 +132,9 @@ enum CampaignTimelinePlacement {
     final colors = Theme.of(context).colors;
 
     return switch ((this, isOngoing)) {
-      (discovery, _) => colors.onSurfaceNeutralOpaqueLv0,
-      (workspace, true) => colors.onSurfaceNeutralOpaqueLv0,
-      (workspace, false) => colors.onSurfaceNeutralOpaqueLv1,
+      (discovery, _) => colors.elevationsOnSurfaceNeutralLv0,
+      (workspace, true) => colors.elevationsOnSurfaceNeutralLv0,
+      (workspace, false) => colors.elevationsOnSurfaceNeutralLv0,
     };
   }
 
@@ -145,6 +146,10 @@ enum CampaignTimelinePlacement {
 
     return switch ((this, isOngoing)) {
       (discovery, true) => BorderSide(
+          color: colorScheme.primary,
+          width: 2,
+        ),
+      (workspace, true) => BorderSide(
           color: colorScheme.primary,
           width: 2,
         ),
