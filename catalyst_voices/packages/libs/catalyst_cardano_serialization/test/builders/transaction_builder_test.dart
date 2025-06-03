@@ -211,10 +211,10 @@ void main() {
         config: transactionBuilderConfig(),
         inputs: {utxoWithNativeAssets},
         networkId: NetworkId.testnet,
+        changeAddress: changeAddress,
       );
 
-      final txBody =
-          txBuilder.withOutput(txOutput).withChangeAddressIfNeeded(changeAddress).buildBody();
+      final txBody = txBuilder.withOutput(txOutput).withChangeIfNeeded().buildBody();
 
       expect(txBody.fee, equals(const Coin(170605)));
     });

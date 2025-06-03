@@ -113,6 +113,7 @@ Future<void> main() async {
     ttl: const SlotBigNum(410021),
     auxiliaryData: txMetadata,
     networkId: NetworkId.testnet,
+    changeAddress: changeAddress,
   );
 
   final changeAddress = ShelleyAddress.fromBech32(
@@ -122,7 +123,7 @@ Future<void> main() async {
 
   final txBody = txBuilder
       .withOutput(txOutput)
-      .withChangeAddressIfNeeded(changeAddress)
+      .withChangeIfNeeded()
       // fee can be set manually or left empty to be auto calculated
       // .withFee(const Coin(10000000))
       .buildBody();

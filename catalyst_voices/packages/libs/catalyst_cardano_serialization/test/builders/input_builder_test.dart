@@ -1,13 +1,11 @@
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
-import 'package:kiri_check/kiri_check.dart';
 import 'package:test/test.dart';
 
-import '../test_utils/selection_utils.dart';
 import '../test_utils/test_data.dart';
+import '../test_utils/transaction_property_test_utils.dart';
 
 void main() {
   final config = transactionBuilderConfig();
-  final changeAddress = SelectionUtils.randomAddress();
 
   group('$TransactionBuilder Coin Selection Tests', () {
     test('selectInputs should throw an exception if funds are insufficient', () {
@@ -20,89 +18,49 @@ void main() {
     });
 
     group('Property-based tests for coin selection', () {
-      property(
+      transactionPropertyTest(
           'Coin selection should maintain accounting properties for '
-          'various UTxO and output combinations', () {
-        forAll(
-          maxExamples: 200,
-          integer(min: 20, max: 500),
-          (utxoCount) {
-            final utxos = SelectionUtils.generateUtxos(
-              utxoCount,
-              minimumCoin: const Coin(15000000),
-            );
+          'various UTxO and output combinations', (data) {
+        final builder = data.builder;
 
-            final outputs = SelectionUtils.outputsFromUTxos(
-              inputs: utxos,
-              maxOutputs: 10,
-            );
-
-            final builder = TransactionBuilder(
-              config: config,
-              inputs: utxos,
-              outputs: outputs,
-              changeAddress: changeAddress,
-            );
-            expect(
-              builder.selectInputs,
-              anyOf([
-                returnsNormally,
-                throwsA(isA<MaxTxSizeExceededException>()),
-              ]),
-            );
-          },
+        expect(
+          builder.selectInputs,
+          anyOf(
+            [
+              returnsNormally,
+              throwsA(isA<MaxTxSizeExceededException>()),
+            ],
+          ),
         );
       });
 
-      property(
+      transactionPropertyTest(
         'Transaction fee calculation should be consistent with the valid '
         'transaction fee across different UTxO and output combinations',
-        () {
-          forAll(
-            maxExamples: 200,
-            integer(min: 40, max: 140),
-            (utxoCount) {
-              final utxos = SelectionUtils.generateUtxos(
-                utxoCount,
-                minimumCoin: const Coin(15000000),
-              );
+        (data) {
+          final builder = data.builder;
+          final appliedBuilder = builder.applySelection();
+          final txBody = appliedBuilder.buildBody();
+          final calculatedFee = txBody.fee;
 
-              final outputs = SelectionUtils.outputsFromUTxos(
-                inputs: utxos,
-                maxOutputs: 20,
-              );
+          final signedFakeTx = Transaction(
+            body: txBody,
+            isValid: true,
+            witnessSet: TransactionBuilder.generateFakeWitnessSet(
+              appliedBuilder.inputs,
+              appliedBuilder.requiredSigners,
+            ),
+          );
 
-              final builder = TransactionBuilder(
-                config: config,
-                inputs: utxos,
-                outputs: outputs,
-                changeAddress: changeAddress,
-              );
+          final validFee = config.feeAlgo.minFee(signedFakeTx, {
+            ...builder.inputs,
+            ...?builder.referenceInputs,
+          });
 
-              final appliedBuilder = builder.applySelection();
-              final txBody = appliedBuilder.buildBody();
-              final calculatedFee = txBody.fee;
-
-              final signedFakeTx = Transaction(
-                body: txBody,
-                isValid: true,
-                witnessSet: TransactionBuilder.generateFakeWitnessSet(
-                  appliedBuilder.inputs,
-                  appliedBuilder.requiredSigners,
-                ),
-              );
-
-              final validFee = config.feeAlgo.minFee(signedFakeTx, {
-                ...builder.inputs,
-                ...?builder.referenceInputs,
-              });
-
-              expect(
-                calculatedFee,
-                equals(validFee),
-                reason: 'Calculated transaction fee should match the valid fee',
-              );
-            },
+          expect(
+            calculatedFee,
+            equals(validFee),
+            reason: 'Calculated transaction fee should match the valid fee',
           );
         },
       );

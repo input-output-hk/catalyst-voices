@@ -134,11 +134,12 @@ Transaction _buildUnsignedTx({
     config: txBuilderConfig,
     inputs: utxos,
     networkId: NetworkId.testnet,
+    changeAddress: changeAddress,
   );
 
   final txBody = txBuilder
       .withOutput(txOutput)
-      .withChangeAddressIfNeeded(changeAddress)
+      .withChangeIfNeeded()
       .buildBody();
 
   return Transaction(

@@ -287,15 +287,15 @@ final class TransactionBuilder extends Equatable {
     );
   }
 
-  /// Returns a copy of this [TransactionBuilder] with extra [address] used
+  /// Returns a copy of this [TransactionBuilder] with extra [changeAddress] used
   /// to spend any remaining change from the transaction, if it is needed.
   ///
   /// Since in a Cardano transaction the input amount must match the output
   /// amount plus fee, the method must ensure that there are no unspent utxos.
   ///
   /// The algorithm first tries to create a [ShelleyMultiAssetTransactionOutput]
-  /// which will transfer any remaining [Coin] back to the [address].
-  /// The [address] should be the change address of the wallet initiating the
+  /// which will transfer any remaining [Coin] back to the [changeAddress].
+  /// The [changeAddress] should be the change address of the wallet initiating the
   /// transaction.
   ///
   /// If creating an extra [ShelleyMultiAssetTransactionOutput] is not possible
@@ -304,10 +304,15 @@ final class TransactionBuilder extends Equatable {
   ///  burn any remaining change.
   ///
   /// Follows code style of Cardano Multiplatform Lib to make patching easy.
-  TransactionBuilder withChangeAddressIfNeeded(ShelleyAddress address) {
+  TransactionBuilder withChangeIfNeeded() {
     if (this.fee != null) {
       // generating the change output involves changing the fee
       return this;
+    }
+
+    final changeAddress = this.changeAddress;
+    if (changeAddress == null) {
+      throw StateError('Make sure to set change address before calling withChangeIfNeeded');
     }
 
     final fee = minFee();
@@ -329,13 +334,13 @@ final class TransactionBuilder extends Equatable {
       final changeEstimator = inputTotal - outputTotal;
       if (changeEstimator.hasMultiAssets()) {
         return _withChangeAddressIfNeededWithMultiAssets(
-          address: address,
+          address: changeAddress,
           fee: fee,
           changeEstimator: changeEstimator,
         );
       } else {
         return _withChangeAddressIfNeededWithoutMultiAssets(
-          address: address,
+          address: changeAddress,
           fee: fee,
           changeEstimator: changeEstimator,
         );
