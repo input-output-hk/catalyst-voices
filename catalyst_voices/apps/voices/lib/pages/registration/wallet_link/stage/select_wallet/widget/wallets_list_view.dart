@@ -49,7 +49,7 @@ class _WalletsListView extends StatelessWidget {
     return ListView.builder(
       itemCount: wallets.length,
       itemBuilder: (context, index) {
-        final wallet = wallets[0];
+        final wallet = wallets[index];
 
         return WalletListTile(
           key: ValueKey('Wallet${wallet.name}ListTile'),
