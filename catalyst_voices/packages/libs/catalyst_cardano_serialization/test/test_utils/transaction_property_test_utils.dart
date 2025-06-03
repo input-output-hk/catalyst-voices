@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
+import 'package:cbor/cbor.dart';
 import 'package:equatable/equatable.dart';
 import 'package:kiri_check/kiri_check.dart';
 import 'package:meta/meta.dart';
@@ -28,32 +29,33 @@ void transactionPropertyTest(
   String description,
   FutureOr<void> Function(TransactionPropertyTestData data) body, {
   TransactionBuilderConfig? config,
-  int maxExamples = 1000,
+  int maxExamples = 200000,
   int maxUtxos = 140,
   int maxOutputs = 20,
+  int maxAuxiliaryDataBytes = 100,
 }) {
   property(description, () {
     forAll(
       maxExamples: maxExamples,
-      shrinkingPolicy: ShrinkingPolicy.off,
-      combine4(
+      combine6(
         combine2(
           integer(min: 1, max: maxUtxos),
           boolean(),
         ),
         integer(min: 0, max: maxOutputs),
-        combine2(
-          integer(min: 1, max: 1000000000),
-          boolean(),
-        ),
+        integer(min: 0, max: 1000000000),
+        binary(minLength: 0, maxLength: maxAuxiliaryDataBytes),
         constantFrom([...NetworkId.values, null]),
+        integer(min: 0, max: 3),
       ),
       (data) async {
         final (
           (utxoCount, withTokens),
           outputsCount,
-          (ttl, withTtl),
+          ttl,
+          auxiliaryData,
           networkId,
+          requiredSigners,
         ) = data;
 
         final resolvedConfig = config ?? transactionBuilderConfig();
@@ -74,8 +76,21 @@ void transactionPropertyTest(
         final builderData = TransactionPropertyBuilderTestData(
           inputs: utxos,
           outputs: outputs,
-          ttl: withTtl ? SlotBigNum(ttl) : null,
+          ttl: ttl > 0 ? SlotBigNum(ttl) : null,
+          auxiliaryData: auxiliaryData.isEmpty
+              ? null
+              : AuxiliaryData(
+                  map: {
+                    const CborSmallInt(0): CborBytes(auxiliaryData),
+                  },
+                ),
           networkId: networkId,
+          requiredSigners: requiredSigners > 0
+              ? List.generate(
+                  requiredSigners,
+                  (i) => Ed25519PublicKeyHash.fromPublicKey(Ed25519PublicKey.seeded(i)),
+                )
+              : null,
           changeAddress: SelectionUtils.randomAddress(networkId: networkId ?? NetworkId.testnet),
         );
 
@@ -84,6 +99,7 @@ void transactionPropertyTest(
           inputs: builderData.inputs,
           outputs: builderData.outputs,
           ttl: builderData.ttl,
+          auxiliaryData: builderData.auxiliaryData,
           networkId: builderData.networkId,
           changeAddress: builderData.changeAddress,
         );
@@ -103,14 +119,18 @@ final class TransactionPropertyBuilderTestData extends Equatable {
   final Set<TransactionUnspentOutput> inputs;
   final List<TransactionOutput> outputs;
   final SlotBigNum? ttl;
+  final AuxiliaryData? auxiliaryData;
   final NetworkId? networkId;
+  final List<Ed25519PublicKeyHash>? requiredSigners;
   final ShelleyAddress changeAddress;
 
   const TransactionPropertyBuilderTestData({
     required this.inputs,
     required this.outputs,
     required this.ttl,
+    required this.auxiliaryData,
     required this.networkId,
+    required this.requiredSigners,
     required this.changeAddress,
   });
 
@@ -119,7 +139,9 @@ final class TransactionPropertyBuilderTestData extends Equatable {
         inputs,
         outputs,
         ttl,
+        auxiliaryData,
         networkId,
+        requiredSigners,
         changeAddress,
       ];
 }
