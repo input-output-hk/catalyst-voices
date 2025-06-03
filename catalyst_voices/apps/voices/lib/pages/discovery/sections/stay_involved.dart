@@ -49,7 +49,7 @@ class _CopyCatalystIdTipText extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.only(top: 20),
         child: TipText(
-          context.l10n.tipCopyCatalystIdForReviewTool(VoicesConstants.becomeReviewerUrl),
+          context.l10n.tipCopyCatalystIdForReviewTool(VoicesConstants.becomeReviewerUrl()),
           style: context.textTheme.bodyMedium?.copyWith(color: context.colors.textOnPrimaryLevel1),
         ),
       ),

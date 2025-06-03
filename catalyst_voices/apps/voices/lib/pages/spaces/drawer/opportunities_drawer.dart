@@ -75,7 +75,7 @@ class _BecomeReviewerCard extends StatelessWidget with LaunchUrlMixin {
             title: context.l10n.becomeReviewer,
             trailing: VoicesAssets.icons.externalLink.buildIcon(),
           ),
-      ],
+        ],
       ),
     );
   }
@@ -87,7 +87,7 @@ class _CopyCatalystIdTipText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TipText(
-      context.l10n.tipCopyCatalystIdForReviewTool(VoicesConstants.becomeReviewerUrl),
+      context.l10n.tipCopyCatalystIdForReviewTool(VoicesConstants.becomeReviewerUrl()),
       style: context.textTheme.bodyMedium?.copyWith(color: context.colors.textOnPrimaryLevel1),
     );
   }
