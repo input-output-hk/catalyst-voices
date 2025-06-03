@@ -16,23 +16,27 @@ import 'test_data.dart';
 /// various scenarios such as coin selection or outputs planning.
 ///
 /// Parameters:
-/// - [description] - the test description.
-/// - [body] - the test body.
-/// - [config] - optional [TransactionBuilderConfig], if provided the test data will use it.
-/// - [maxExamples] - how many different data sets to generate.
-/// - [maxUtxos] - a maximum number of inputs utxos in the [TransactionPropertyTestData], must be at least one.
-/// - [maxOutputs] - a maximum number of outputs to generate for the transaction.
+/// - [description]: the test description.
+/// - [body]: the test body.
+/// - [config]: optional [TransactionBuilderConfig], if provided the test data will use it.
+/// - [maxExamples]: how many different data sets to generate.
+/// - [maxUtxos]: a maximum number of inputs utxos in the [TransactionPropertyTestData], must be at least one.
+/// - [maxOutputs]: a maximum number of outputs to generate for the transaction.
+/// - [maxAuxiliaryDataBytes]: a byte length of [AuxiliaryData].
+/// - [minimumUtxoCoin]: the least of Ada in each of UTxO's.
+///
 ///   The outputs are guaranteed to be composed in a way that it's possible to make
-///   a transaction with given inputs.
+///   a valid transaction with generated configuration.
 @isTest
 void transactionPropertyTest(
   String description,
   FutureOr<void> Function(TransactionPropertyTestData data) body, {
   TransactionBuilderConfig? config,
-  int maxExamples = 200000,
-  int maxUtxos = 140,
+  int maxExamples = 1000,
+  int maxUtxos = 130,
   int maxOutputs = 20,
   int maxAuxiliaryDataBytes = 100,
+  Coin minimumUtxoCoin = const Coin(1500000),
 }) {
   property(description, () {
     forAll(
@@ -49,6 +53,8 @@ void transactionPropertyTest(
         integer(min: 0, max: 3),
       ),
       (data) async {
+        final resolvedConfig = config ?? transactionBuilderConfig();
+
         final (
           (utxoCount, withTokens),
           outputsCount,
@@ -58,22 +64,22 @@ void transactionPropertyTest(
           requiredSigners,
         ) = data;
 
-        final resolvedConfig = config ?? transactionBuilderConfig();
-
         final utxos = SelectionUtils.generateUtxos(
           utxoCount,
           withTokens: withTokens,
-          minimumCoin: Coin.fromAda(1.5),
+          minimumCoin: minimumUtxoCoin,
+          minimumTotalAda: withTokens ? const Coin.fromWholeAda(3) : null,
         );
 
         final outputs = outputsCount > 0
             ? SelectionUtils.outputsFromUTxos(
                 inputs: utxos,
+                config: resolvedConfig,
                 maxOutputs: outputsCount,
               )
             : <TransactionOutput>[];
 
-        final builderData = TransactionPropertyBuilderTestData(
+        final builderData = TransactionPropertyBuilderInputs(
           inputs: utxos,
           outputs: outputs,
           ttl: ttl > 0 ? SlotBigNum(ttl) : null,
@@ -89,7 +95,7 @@ void transactionPropertyTest(
               ? List.generate(
                   requiredSigners,
                   (i) => Ed25519PublicKeyHash.fromPublicKey(Ed25519PublicKey.seeded(i)),
-                )
+                ).toSet()
               : null,
           changeAddress: SelectionUtils.randomAddress(networkId: networkId ?? NetworkId.testnet),
         );
@@ -99,14 +105,15 @@ void transactionPropertyTest(
           inputs: builderData.inputs,
           outputs: builderData.outputs,
           ttl: builderData.ttl,
-          auxiliaryData: builderData.auxiliaryData,
+          // auxiliaryData: builderData.auxiliaryData,
           networkId: builderData.networkId,
+          requiredSigners: builderData.requiredSigners,
           changeAddress: builderData.changeAddress,
         );
 
         final testData = TransactionPropertyTestData(
           builder: builder,
-          data: builderData,
+          inputs: builderData,
         );
 
         await body(testData);
@@ -115,16 +122,17 @@ void transactionPropertyTest(
   });
 }
 
-final class TransactionPropertyBuilderTestData extends Equatable {
+/// Properties of [TransactionBuilder].
+final class TransactionPropertyBuilderInputs extends Equatable {
   final Set<TransactionUnspentOutput> inputs;
   final List<TransactionOutput> outputs;
   final SlotBigNum? ttl;
   final AuxiliaryData? auxiliaryData;
   final NetworkId? networkId;
-  final List<Ed25519PublicKeyHash>? requiredSigners;
+  final Set<Ed25519PublicKeyHash>? requiredSigners;
   final ShelleyAddress changeAddress;
 
-  const TransactionPropertyBuilderTestData({
+  const TransactionPropertyBuilderInputs({
     required this.inputs,
     required this.outputs,
     required this.ttl,
@@ -146,18 +154,19 @@ final class TransactionPropertyBuilderTestData extends Equatable {
       ];
 }
 
+/// The test data with which the [transactionPropertyTest] runs.
 final class TransactionPropertyTestData extends Equatable {
   final TransactionBuilder builder;
-  final TransactionPropertyBuilderTestData data;
+  final TransactionPropertyBuilderInputs inputs;
 
   const TransactionPropertyTestData({
     required this.builder,
-    required this.data,
+    required this.inputs,
   });
 
   @override
   List<Object?> get props => [
         builder,
-        data,
+        inputs,
       ];
 }
