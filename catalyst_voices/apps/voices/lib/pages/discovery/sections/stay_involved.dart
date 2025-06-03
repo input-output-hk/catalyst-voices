@@ -39,6 +39,18 @@ class StayInvolved extends StatelessWidget {
   }
 }
 
+class _CopyCatalystIdTipText extends StatelessWidget {
+  const _CopyCatalystIdTipText();
+
+  @override
+  Widget build(BuildContext context) {
+    return TipText(
+      context.l10n.tipCopyCatalystIdForReviewTool,
+      style: context.textTheme.bodyMedium?.copyWith(color: context.colors.textOnPrimaryLevel1),
+    );
+  }
+}
+
 class _Header extends StatelessWidget {
   const _Header();
 
@@ -65,25 +77,13 @@ class _ReviewerCard extends StatelessWidget {
         children: [
           _StayInvolvedActionButton(
             title: context.l10n.becomeReviewer,
-            urlString: VoicesConstants.becomeReviewerUrl,
+            urlString: VoicesConstants.becomeReviewerUrl(),
             trailing: VoicesAssets.icons.externalLink.buildIcon(),
           ),
           const SizedBox(width: 24),
           const SessionAccountCatalystId(),
         ],
       ),
-    );
-  }
-}
-
-class _CopyCatalystIdTipText extends StatelessWidget {
-  const _CopyCatalystIdTipText();
-
-  @override
-  Widget build(BuildContext context) {
-    return TipText(
-      context.l10n.tipCopyCatalystIdForReviewTool,
-      style: context.textTheme.bodyMedium?.copyWith(color: context.colors.textOnPrimaryLevel1),
     );
   }
 }
