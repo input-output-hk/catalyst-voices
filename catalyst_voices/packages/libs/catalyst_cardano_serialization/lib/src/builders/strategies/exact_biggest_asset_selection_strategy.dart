@@ -12,8 +12,13 @@ final class ExactBiggestAssetSelectionStrategy implements CoinSelectionStrategy 
   @override
   void apply(AssetsGroup assetsGroup) {
     for (final asset in assetsGroup) {
-      asset.value.sort((a, b) => tokenCompare(asset.key, a, b));
+      asset.value.sort((a, b) => _tokenCompare(asset.key, a, b));
     }
+  }
+
+  bool _hasOtherAssets(Balance balance, AssetId assetId) {
+    final assets = balance.listNonZeroAssetIds()..remove(assetId);
+    return assets.isNotEmpty;
   }
 
   /// Compares this [TransactionUnspentOutput] with another
@@ -31,7 +36,7 @@ final class ExactBiggestAssetSelectionStrategy implements CoinSelectionStrategy 
   /// Returns:
   /// A negative integer, zero, or a positive integer as this UTxO is less than,
   /// equal to, or greater than the specified UTxO.
-  int tokenCompare(
+  int _tokenCompare(
     AssetId asset,
     TransactionUnspentOutput thisUtxo,
     TransactionUnspentOutput otherUtxo,
@@ -50,12 +55,7 @@ final class ExactBiggestAssetSelectionStrategy implements CoinSelectionStrategy 
     } else if (thisHasOtherAssets && otherHasOtherAssets) {
       return 1;
     } else {
-      return thisAssetBalance.compareTo(otherAssetBalance);
+      return otherAssetBalance.compareTo(thisAssetBalance);
     }
-  }
-
-  bool _hasOtherAssets(Balance balance, AssetId assetId) {
-    final assets = balance.listNonZeroAssetIds()..remove(assetId);
-    return assets.isNotEmpty;
   }
 }

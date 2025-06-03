@@ -89,7 +89,7 @@ final class InputBuilder implements CoinSelector {
     // Apply the coin selection strategy to prioritize UTXOs within each group.
     selectionStrategy.apply(assetGroups);
 
-    final selector = _SelectInputs(
+    final selector = _InputSelector(
       builder: builder,
       minInputs: minInputs,
       maxInputs: maxInputs,
@@ -102,7 +102,7 @@ final class InputBuilder implements CoinSelector {
   }
 }
 
-class _SelectInputs {
+class _InputSelector {
   final TransactionBuilder builder;
   final int minInputs;
   final int maxInputs;
@@ -113,7 +113,7 @@ class _SelectInputs {
   final selectedInputs = <TransactionUnspentOutput>{};
   Balance selectedTotal = const Balance.zero();
 
-  _SelectInputs({
+  _InputSelector({
     required this.builder,
     required this.minInputs,
     required this.maxInputs,
@@ -123,9 +123,9 @@ class _SelectInputs {
   });
 
   SelectionResult selectInputs() {
-    final postPredefinedOutputsResult = _selectInputsToSatisfyOutputs();
-    if (postPredefinedOutputsResult != null) {
-      return postPredefinedOutputsResult;
+    final postOutputsResult = _selectInputsToSatisfyOutputs();
+    if (postOutputsResult != null) {
+      return postOutputsResult;
     }
 
     final postChangeOutputsResult = _selectInputsToSatisfyChangeOutputsAndFee();
@@ -249,14 +249,17 @@ class _SelectInputs {
     return (changeOutputs, requiredFee);
   }
 
+  /// Tries to build a valid [SelectionResult] from the current input selection,
+  /// ensuring output and fee requirements are met.
+  ///
+  /// Returns null if the requirements are not met.
   SelectionResult? _getSelectionResultSatisfyingOutputsAndFee() {
     if (selectedInputs.length < minInputs || selectedInputs.length > maxInputs) {
       return null;
     }
 
-    final changeAndFee = _getChangeAndFee(builder, selectedInputs, selectedTotal, targetTotal);
-
     // Return the selection result if change and fees are successfully calculated.
+    final changeAndFee = _getChangeAndFee(builder, selectedInputs, selectedTotal, targetTotal);
     if (changeAndFee != null) {
       final (changeOutputs, totalFee) = changeAndFee;
       return (selectedInputs, changeOutputs, totalFee);
