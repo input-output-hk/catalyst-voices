@@ -5,11 +5,10 @@ import 'package:catalyst_voices_repositories/src/dto/document/document_data_dto.
 import 'package:catalyst_voices_repositories/src/dto/document/document_dto.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/schema/document_schema_dto.dart';
 import 'package:catalyst_voices_repositories/src/dto/proposal/proposal_submission_action_dto.dart';
-import 'package:flutter/services.dart';
 import 'package:rxdart/rxdart.dart';
 
 abstract interface class ProposalRepository {
-  factory ProposalRepository(
+  const factory ProposalRepository(
     SignedDocumentManager signedDocumentManager,
     DocumentRepository documentRepository,
     ProposalDocumentDataLocalSource proposalsLocalSource,
