@@ -75,7 +75,7 @@ class _BecomeReviewerCard extends StatelessWidget with LaunchUrlMixin {
             title: context.l10n.becomeReviewer,
             trailing: VoicesAssets.icons.externalLink.buildIcon(),
           ),
-        ],
+      ],
       ),
     );
   }
