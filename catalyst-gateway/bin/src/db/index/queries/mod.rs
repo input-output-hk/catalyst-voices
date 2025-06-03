@@ -11,7 +11,7 @@ pub(crate) mod sync_status;
 use std::{fmt::Debug, sync::Arc};
 
 use anyhow::bail;
-use crossbeam_skiplist::SkipMap;
+use dashmap::DashMap;
 use registrations::{
     get_all_invalids::GetAllInvalidRegistrationsQuery,
     get_all_registrations::GetAllRegistrationsQuery, get_from_stake_addr::GetRegistrationQuery,
@@ -50,7 +50,26 @@ use crate::{
 };
 
 /// Batches of different sizes, prepared and ready for use.
-pub(crate) type SizedBatch = SkipMap<u16, Arc<Batch>>;
+pub(crate) type SizedBatch = DashMap<u16, Arc<Batch>>;
+
+/// Kind of result
+#[derive(Clone)]
+#[allow(dead_code)]
+pub(crate) enum QueryKind {
+    /// Sized-batch
+    Batch(SizedBatch),
+    /// Prepared statement
+    Statement(PreparedStatement),
+}
+
+/// A trait to prepare Index DB queries.
+#[allow(dead_code)]
+pub(crate) trait Query {
+    /// Prepare the query
+    async fn prepare_query(
+        session: &Arc<Session>, cfg: &cassandra_db::EnvVars,
+    ) -> anyhow::Result<QueryKind>;
+}
 
 /// All Prepared insert Queries that we know about.
 #[derive(strum_macros::Display)]
@@ -296,7 +315,7 @@ impl PreparedQueries {
         session: Arc<Session>, query: &str, cfg: &cassandra_db::EnvVars,
         consistency: scylla::statement::Consistency, idempotent: bool, logged: bool,
     ) -> anyhow::Result<SizedBatch> {
-        let sized_batches: SizedBatch = SkipMap::new();
+        let sized_batches: SizedBatch = DashMap::new();
 
         // First prepare the query. Only needs to be done once, all queries on a batch are the
         // same.
