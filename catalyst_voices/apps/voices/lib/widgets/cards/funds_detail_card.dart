@@ -53,7 +53,7 @@ class FundsDetailCard extends StatelessWidget {
                   funds: allFunds,
                 ),
                 Offstage(
-                  offstage: type.isCategoryCompact,
+                  offstage: type.isCategoryCompact || type.isFound,
                   child: _CampaignFundsDetail(
                     key: const Key('FundsDetailRequested'),
                     title: type.localizedTotalAsk(context.l10n),
@@ -78,6 +78,7 @@ enum FundsDetailCardType {
   category;
 
   bool get isCategoryCompact => this == FundsDetailCardType.categoryCompact;
+  bool get isFound => this == FundsDetailCardType.found;
 
   String localizedTotalAsk(VoicesLocalizations l10n) {
     return switch (this) {

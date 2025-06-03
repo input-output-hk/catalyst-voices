@@ -1,5 +1,5 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
-import 'package:catalyst_voices/common/formatters/date_formatter.dart';
+import 'package:catalyst_voices/widgets/text/campaign_stage_time_text.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
@@ -36,11 +36,11 @@ class CampaignTimelineCardState extends State<CampaignTimelineCard> {
       onTap: _toggleExpanded,
       behavior: HitTestBehavior.opaque,
       child: Container(
-        constraints: const BoxConstraints(minHeight: 150),
+        constraints: const BoxConstraints(minHeight: 153),
         width: 288,
         child: Card(
           key: const Key('TimelineCard'),
-          color: widget.placement.backgroundColor(context, isOngoing: _isOngoing),
+          color: context.colors.onSurfaceNeutralOpaqueLv0,
           shape: OutlineInputBorder(
             borderSide: widget.placement.borderSide(
               context,
@@ -55,11 +55,28 @@ class CampaignTimelineCardState extends State<CampaignTimelineCard> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     VoicesAssets.icons.calendar.buildIcon(
                       color: colors.primary,
                     ),
+                    const SizedBox(width: 12),
+                    Offstage(
+                      offstage: !_isOngoing,
+                      child: VoicesChip.round(
+                        backgroundColor: colors.primary,
+                        content: Text(
+                          context.l10n.ongoing,
+                          style: context.textTheme.labelSmall?.copyWith(
+                            color: Colors.white,
+                          ),
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 1,
+                        ),
+                      ),
+                    ),
+                    const Spacer(),
                     _expandedIcon.buildIcon(
                       color: colors.primaryContainer,
                     ),
@@ -75,41 +92,7 @@ class CampaignTimelineCardState extends State<CampaignTimelineCard> {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: Text(
-                        key: const Key('TimelineCardDate'),
-                        DateFormatter.formatDateRange(
-                          MaterialLocalizations.of(context),
-                          context.l10n,
-                          widget.timelineItem.timeline,
-                        ),
-                        style: context.textTheme.bodyMedium?.copyWith(
-                          color: context.colors.sysColorsNeutralN60,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    if (_isOngoing) ...[
-                      const SizedBox(width: 8),
-                      Offstage(
-                        offstage: !_isOngoing,
-                        child: VoicesChip.round(
-                          backgroundColor: colors.primary,
-                          content: Text(
-                            context.l10n.ongoing,
-                            style: context.textTheme.labelSmall?.copyWith(
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
+                CampaignStageTimeText(dateRange: widget.timelineItem.timeline),
                 const SizedBox(height: 16),
                 AnimatedSwitcher(
                   duration: Durations.medium4,

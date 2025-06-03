@@ -47,42 +47,51 @@ extension CampaignTimelineX on CampaignTimeline {
     CampaignTimeline(
       title: 'Proposal Submission',
       description:
-          '''Participants submit initial proposals for ideas to solve challenges. A set amount of ada is allocated to the new funding round.''',
+          '''Proposers submit initial ideas to solve challenges. Each proposal includes the problem, solution, requested ADA budget, and a clear implementation plan.''',
       timeline: DateRange(
         from: DateTime.utc(2025, 4, 30, 13, 20),
-        to: DateTime.utc(2025, 12, 13, 17),
+        to: DateTime.utc(2025, 07, 07, 06),
       ),
       stage: CampaignTimelineStage.proposalSubmission,
     ),
     CampaignTimeline(
       title: 'Community Review',
       description:
-          '''Community members share ideas and insights to refine the proposals. This stage consists of two distinct parts: reviews by LV0 & LV1s reviewers, as well as moderation by LV2s moderators.''',
+          '''Community members help improve proposals through two key steps: LV0 and LV1 reviewers assess the proposals, then LV2 moderators oversee the process to ensure quality and fairness.''',
       timeline: DateRange(
-        from: DateTime.utc(2025, 12, 14, 17),
-        to: DateTime.utc(2025, 12, 15, 17),
+        from: DateTime.utc(2025, 07, 19, 12),
+        to: DateTime.utc(2025, 08, 6, 6),
       ),
       stage: CampaignTimelineStage.communityReview,
     ),
     CampaignTimeline(
       title: 'Community Voting',
-      description:
-          '''Community members vote using the Project Catalyst voting app. Votes are weighted based on voter's token holding.''',
+      description: '''Community members cast their votes using the Catalyst Voting app.''',
       timeline: DateRange(
-        from: DateTime.utc(2025, 12, 16, 17),
-        to: DateTime.utc(2025, 12, 17, 17),
+        from: DateTime.utc(2025, 08, 11, 12),
+        to: DateTime.utc(2025, 08, 25, 11),
       ),
       stage: CampaignTimelineStage.communityVoting,
     ),
     CampaignTimeline(
       title: 'Voting Results',
       description:
-          '''Votes are tallied and the results revealed. Voters and community reviewers receive their rewards.''',
+          '''Votes are tallied and the results are announced. Rewards are distributed to both voters and community reviewers.''',
       timeline: DateRange(
-        from: DateTime.utc(2025, 12, 18, 17),
-        to: DateTime.utc(2025, 12, 19, 17),
+        from: DateTime.utc(2025, 08, 25),
+        to: DateTime.utc(2025, 08, 31),
       ),
       stage: CampaignTimelineStage.votingResults,
+    ),
+    CampaignTimeline(
+      title: 'Project Onboarding',
+      description:
+          '''This phase involves finalizing the key milestones submitted in the Catalyst App during the proposal submission stage within the Catalyst Milestone Module. It also includes conducting formal due diligence, and fulfilling all required onboarding steps to become eligible for funding.''',
+      timeline: DateRange(
+        from: DateTime.utc(2025, 08, 28),
+        to: DateTime.utc(2025, 10, 9),
+      ),
+      stage: CampaignTimelineStage.projectOnboarding,
     ),
   ];
 }

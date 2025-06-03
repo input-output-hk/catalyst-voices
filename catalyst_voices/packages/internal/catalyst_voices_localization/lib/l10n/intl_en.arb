@@ -1450,7 +1450,10 @@
   },
   "howItWorksFollowDescription": "Receive regular updates on all the funded ideas, so you can follow along and see how things are progressing.",
   "heroSectionTitle": "Create, fund and deliver the future of Cardano.",
-  "projectCatalystDescription": "Project Catalyst is an experiment in community innovation, providing a framework to turn ideas into impactful real world projects.\n\nWe're putting the community at the heart of Cardano's future development. Are you ready for the Challenge?",
+  "projectCatalystDescription": "Project Catalyst is the world’s largest decentralized innovation engine for solving real-world challenges.\n\nWe're putting the community at the heart of Cardano's future development.\n\nAre you ready for the Challenge?",
+  "@projectCatalystDescription": {
+    "description": "description text for discovery page in hero section"
+  },
   "viewCurrentCampaign": "View Current Campaign",
   "catalystF14": "Catalyst Fund14",
   "@catalystF14": {
@@ -1465,7 +1468,10 @@
   "maximumAsk": "Maximum Ask",
   "minimumAsk": "Minimum Ask",
   "ideaJourney": "Idea Journey",
-  "ideaJourneyDescription": "#### Ideas comes to life in Catalyst through its key stages below. For the full timeline, deadlines and latest updates, visit the [fund timeline](https://docs.projectcatalyst.io/current-fund/fund-basics/fund-timeline) Gitbook page.",
+  "ideaJourneyDescription": "#### Ideas come to life in Catalyst through the key stages below. For the full timeline, deadlines and latest updates, visit the [fund timeline](https://docs.projectcatalyst.io/current-fund/fund-basics/fund-timeline) Gitbook page.",
+  "@ideaJourneyDescription": {
+    "description": "Description for the idea journey section"
+  },
   "ongoing": "Ongoing",
   "from": "From",
   "to": "To",
@@ -2899,5 +2905,13 @@
   "tipCopyCatalystIdForReviewTool": "Copy your Catalyst ID before you go to the Review tool.",
   "@tipCopyCatalystIdForReviewTool": {
     "description": "Gives context where Catalyst ID can be used"
+  },
+  "starts": "Starts:",
+  "@starts": {
+    "description": "Label for the campaign stage start date"
+  },
+  "finishes": "Finishes:",
+  "@finishes": {
+    "description": "Label for the campaign stage finish date"
   }
 }

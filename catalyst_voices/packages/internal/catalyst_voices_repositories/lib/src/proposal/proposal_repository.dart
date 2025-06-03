@@ -1,4 +1,4 @@
-import 'dart:typed_data';
+import 'dart:convert';
 
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
@@ -7,10 +7,12 @@ import 'package:catalyst_voices_repositories/src/dto/document/document_data_dto.
 import 'package:catalyst_voices_repositories/src/dto/document/document_dto.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/schema/document_schema_dto.dart';
 import 'package:catalyst_voices_repositories/src/dto/proposal/proposal_submission_action_dto.dart';
+import 'package:flutter/services.dart';
+import 'package:http/http.dart' as http;
 import 'package:rxdart/rxdart.dart';
 
 abstract interface class ProposalRepository {
-  const factory ProposalRepository(
+  factory ProposalRepository(
     SignedDocumentManager signedDocumentManager,
     DocumentRepository documentRepository,
     ProposalDocumentDataLocalSource proposalsLocalSource,
@@ -109,7 +111,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   final DocumentRepository _documentRepository;
   final ProposalDocumentDataLocalSource _proposalsLocalSource;
 
-  const ProposalRepositoryImpl(
+  ProposalRepositoryImpl(
     this._signedDocumentManager,
     this._documentRepository,
     this._proposalsLocalSource,
@@ -144,6 +146,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     }
     final templateRef = documentData.metadata.template!;
     final documentTemplate = await _documentRepository.getDocumentData(ref: templateRef);
+    // final documentTemplate = await _getTemplate(templateRef);
     final proposalDocument = _buildProposalDocument(
       documentData: documentData,
       templateData: documentTemplate,
@@ -508,5 +511,19 @@ final class ProposalRepositoryImpl implements ProposalRepository {
         ProposalSubmissionAction.draft || null => ProposalPublish.publishedDraft,
       };
     }
+  }
+
+  Future<DocumentData> _getTemplate(DocumentRef selfRef) async {
+    final webJson = await http.get(Uri.parse('/test.json'));
+    final decodedBody = utf8.decode(webJson.bodyBytes);
+    final content = jsonDecode(decodedBody) as Map<String, dynamic>;
+
+    return DocumentData(
+      metadata: DocumentDataMetadata(
+        type: DocumentType.proposalTemplate,
+        selfRef: selfRef,
+      ),
+      content: DocumentDataContent(content),
+    );
   }
 }
