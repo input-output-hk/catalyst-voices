@@ -24,19 +24,13 @@ final class TransactionWitnessSetBuilder extends Equatable {
     required this.vkeysCount,
   });
 
+  @override
+  List<Object?> get props => [vkeys, vkeysCount];
+
   /// Adds a [witness] to the set.
   TransactionWitnessSetBuilder addVkey(VkeyWitness witness) {
     final map = Map.of(vkeys);
     map[witness.vkey] = witness;
-    return TransactionWitnessSetBuilder(
-      vkeys: map,
-      vkeysCount: vkeysCount,
-    );
-  }
-
-  /// Removes the witness with [vkey] from the set.
-  TransactionWitnessSetBuilder removeVkey(Ed25519PublicKey vkey) {
-    final map = Map.of(vkeys)..remove(vkey);
     return TransactionWitnessSetBuilder(
       vkeys: map,
       vkeysCount: vkeysCount,
@@ -66,6 +60,12 @@ final class TransactionWitnessSetBuilder extends Equatable {
     );
   }
 
-  @override
-  List<Object?> get props => [vkeys, vkeysCount];
+  /// Removes the witness with [vkey] from the set.
+  TransactionWitnessSetBuilder removeVkey(Ed25519PublicKey vkey) {
+    final map = Map.of(vkeys)..remove(vkey);
+    return TransactionWitnessSetBuilder(
+      vkeys: map,
+      vkeysCount: vkeysCount,
+    );
+  }
 }

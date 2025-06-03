@@ -3,114 +3,6 @@ import 'package:cbor/cbor.dart';
 import 'package:convert/convert.dart';
 import 'package:equatable/equatable.dart';
 
-/// An interface for classes that support CBOR serialization.
-///
-// ignore: one_member_abstracts
-abstract interface class CborEncodable {
-  /// Creates a new instance of [CborEncodable].
-  const CborEncodable();
-
-  /// Converts this instance to its CBOR representation.
-  CborValue toCbor({List<int> tags = const []});
-}
-
-/// Specifies on which network the code will run.
-enum NetworkId {
-  /// The production network
-  mainnet(id: 1),
-
-  /// The test network.
-  testnet(id: 0);
-
-  /// The magic protocol number acting as the identifier of the network.
-  final int id;
-
-  const NetworkId({required this.id});
-
-  factory NetworkId.fromId(int id) {
-    for (final value in values) {
-      if (value.id == id) {
-        return value;
-      }
-    }
-
-    throw ArgumentError('Unsupported NetworkId: $id');
-  }
-}
-
-/// Specifies an amount of ADA in terms of lovelace.
-final class Coin extends Equatable implements Comparable<Coin> {
-  /// The amount of lovelaces in one ADA.
-  static const int adaInLovelaces = 1000000;
-
-  /// The amount of lovelaces.
-  final int value;
-
-  /// The default constructor for the [Coin].
-  const Coin(this.value);
-
-  /// Creates a [Coin] from [amount] specified in ADAs.
-  factory Coin.fromAda(double amount) {
-    return Coin((amount * adaInLovelaces).toInt());
-  }
-
-  /// Creates a [Coin] from [amount] specified in ADAs (without lovelaces).
-  const Coin.fromWholeAda(int amount) : this(amount * adaInLovelaces);
-
-  /// Deserializes the type from cbor.
-  factory Coin.fromCbor(CborValue value) {
-    return Coin((value as CborSmallInt).value);
-  }
-
-  /// Serializes the type as cbor.
-  CborValue toCbor() => CborSmallInt(value);
-
-  /// Converts lovelaces to ADAs
-  double get ada => value / adaInLovelaces;
-
-  /// Adds [other] value to this value and returns a new [Coin].
-  Coin operator +(Coin other) => Coin(value + other.value);
-
-  /// Subtracts [other] values from this value and returns a new [Coin].
-  Coin operator -(Coin other) => Coin(value - other.value);
-
-  /// Multiplies this value by [other] values and returns a new [Coin].
-  Coin operator *(Coin other) => Coin(value * other.value);
-
-  /// Divides this value by [other] value without remainder
-  /// and returns a new [Coin].
-  Coin operator ~/(Coin other) => Coin(value ~/ other.value);
-
-  /// Returns true if [value] is greater than [other] value.
-  bool operator >(Coin other) => value > other.value;
-
-  /// Returns true if [value] is greater than or equal [other] value.
-  bool operator >=(Coin other) => value > other.value || value == other.value;
-
-  /// Returns true if [value] is smaller than [other] value.
-  bool operator <(Coin other) => value < other.value;
-
-  /// Returns true if [value] is smaller than or equal [other] value.
-  bool operator <=(Coin other) => value < other.value || value == other.value;
-
-  @override
-  int compareTo(Coin other) => value.compareTo(other.value);
-
-  @override
-  List<Object?> get props => [value];
-}
-
-/// A blockchain slot number.
-extension type const SlotBigNum(int value) {
-  /// Deserializes the type from cbor.
-  factory SlotBigNum.fromCbor(CborValue value) {
-    return SlotBigNum((value as CborSmallInt).value);
-  }
-
-  /// Serializes the type as cbor.
-  CborValue toCbor() => CborSmallInt(value);
-}
-
 /// Represents the balance of the wallet in terms of [Coin].
 final class Balance extends Equatable implements CborEncodable {
   /// The amount of [Coin] that the wallet holds.
@@ -124,11 +16,6 @@ final class Balance extends Equatable implements CborEncodable {
     required this.coin,
     this.multiAsset,
   });
-
-  /// Returns a zero [Balance] with no [coin] or [multiAsset].
-  const Balance.zero()
-      : coin = const Coin(0),
-        multiAsset = null;
 
   /// Deserializes the type from cbor.
   factory Balance.fromCbor(CborValue value) {
@@ -152,22 +39,16 @@ final class Balance extends Equatable implements CborEncodable {
     );
   }
 
-  /// Serializes the type as cbor.
-  @override
-  CborValue toCbor({List<int> tags = const []}) {
-    final multiAsset = this.multiAsset;
-    if (multiAsset == null) {
-      return coin.toCbor();
-    }
+  /// Returns a zero [Balance] with no [coin] or [multiAsset].
+  const Balance.zero()
+      : coin = const Coin(0),
+        multiAsset = null;
 
-    return CborList(
-      [
-        coin.toCbor(),
-        multiAsset.toCbor(),
-      ],
-      tags: tags,
-    );
-  }
+  /// Returns true if
+  bool get isZero => coin == const Coin(0) && !hasMultiAssets();
+
+  @override
+  List<Object?> get props => [coin, multiAsset];
 
   /// Adds [other] value to this value and returns a new [Balance].
   Balance operator +(Balance other) {
@@ -206,8 +87,16 @@ final class Balance extends Equatable implements CborEncodable {
     );
   }
 
-  /// Returns true if
-  bool get isZero => coin == const Coin(0) && !hasMultiAssets();
+  /// Return a copy of this value with [coin] and [multiAsset] if present.
+  Balance copyWith({
+    Coin? coin,
+    MultiAsset? multiAsset,
+  }) {
+    return Balance(
+      coin: coin ?? this.coin,
+      multiAsset: multiAsset ?? this.multiAsset,
+    );
+  }
 
   /// Returns true if at least one native asset with non-zero amount exists.
   bool hasMultiAssets() {
@@ -223,19 +112,95 @@ final class Balance extends Equatable implements CborEncodable {
     return false;
   }
 
-  /// Return a copy of this value with [coin] and [multiAsset] if present.
-  Balance copyWith({
-    Coin? coin,
-    MultiAsset? multiAsset,
-  }) {
-    return Balance(
-      coin: coin ?? this.coin,
-      multiAsset: multiAsset ?? this.multiAsset,
+  /// Serializes the type as cbor.
+  @override
+  CborValue toCbor({List<int> tags = const []}) {
+    final multiAsset = this.multiAsset;
+    if (multiAsset == null) {
+      return coin.toCbor();
+    }
+
+    return CborList(
+      [
+        coin.toCbor(),
+        multiAsset.toCbor(),
+      ],
+      tags: tags,
     );
   }
+}
+
+/// An interface for classes that support CBOR serialization.
+///
+// ignore: one_member_abstracts
+abstract interface class CborEncodable {
+  /// Creates a new instance of [CborEncodable].
+  const CborEncodable();
+
+  /// Converts this instance to its CBOR representation.
+  CborValue toCbor({List<int> tags = const []});
+}
+
+/// Specifies an amount of ADA in terms of lovelace.
+final class Coin extends Equatable implements Comparable<Coin> {
+  /// The amount of lovelaces in one ADA.
+  static const int adaInLovelaces = 1000000;
+
+  /// The amount of lovelaces.
+  final int value;
+
+  /// The default constructor for the [Coin].
+  const Coin(this.value);
+
+  /// Creates a [Coin] from [amount] specified in ADAs.
+  factory Coin.fromAda(double amount) {
+    return Coin((amount * adaInLovelaces).toInt());
+  }
+
+  /// Deserializes the type from cbor.
+  factory Coin.fromCbor(CborValue value) {
+    return Coin((value as CborSmallInt).value);
+  }
+
+  /// Creates a [Coin] from [amount] specified in ADAs (without lovelaces).
+  const Coin.fromWholeAda(int amount) : this(amount * adaInLovelaces);
+
+  /// Converts lovelaces to ADAs
+  double get ada => value / adaInLovelaces;
 
   @override
-  List<Object?> get props => [coin, multiAsset];
+  List<Object?> get props => [value];
+
+  /// Multiplies this value by [other] values and returns a new [Coin].
+  Coin operator *(Coin other) => Coin(value * other.value);
+
+  /// Adds [other] value to this value and returns a new [Coin].
+  Coin operator +(Coin other) => Coin(value + other.value);
+
+  /// Subtracts [other] values from this value and returns a new [Coin].
+  Coin operator -(Coin other) => Coin(value - other.value);
+
+  /// Returns true if [value] is smaller than [other] value.
+  bool operator <(Coin other) => value < other.value;
+
+  /// Returns true if [value] is smaller than or equal [other] value.
+  bool operator <=(Coin other) => value < other.value || value == other.value;
+
+  /// Returns true if [value] is greater than [other] value.
+  bool operator >(Coin other) => value > other.value;
+
+  /// Returns true if [value] is greater than or equal [other] value.
+  bool operator >=(Coin other) => value > other.value || value == other.value;
+
+  @override
+  int compareTo(Coin other) => value.compareTo(other.value);
+
+  /// Serializes the type as cbor.
+  CborValue toCbor() => CborSmallInt(value);
+
+  /// Divides this value by [other] value without remainder
+  /// and returns a new [Coin].
+  Coin operator ~/(Coin other) => Coin(value ~/ other.value);
 }
 
 /// Holds native assets minted with [PolicyId].
@@ -277,19 +242,8 @@ final class MultiAsset extends Equatable implements CborEncodable {
     return MultiAsset(bundle: bundle);
   }
 
-  /// Serializes the type as cbor.
   @override
-  CborValue toCbor({List<int> tags = const []}) {
-    return CborMap(
-      {
-        for (final policy in bundle.entries)
-          policy.key.toCbor(): CborMap({
-            for (final asset in policy.value.entries) asset.key.toCbor(): asset.value.toCbor(),
-          }),
-      },
-      tags: tags,
-    );
-  }
+  List<Object?> get props => [bundle];
 
   /// Adds [other] value to this value and returns a new [MultiAsset].
   MultiAsset operator +(MultiAsset other) {
@@ -331,8 +285,56 @@ final class MultiAsset extends Equatable implements CborEncodable {
     return MultiAsset(bundle: bundleCopy);
   }
 
+  /// Serializes the type as cbor.
   @override
-  List<Object?> get props => [bundle];
+  CborValue toCbor({List<int> tags = const []}) {
+    return CborMap(
+      {
+        for (final policy in bundle.entries)
+          policy.key.toCbor(): CborMap({
+            for (final asset in policy.value.entries) asset.key.toCbor(): asset.value.toCbor(),
+          }),
+      },
+      tags: tags,
+    );
+  }
+}
+
+/// Specifies on which network the code will run.
+enum NetworkId {
+  /// The production network
+  mainnet(id: 1),
+
+  /// The test network.
+  testnet(id: 0);
+
+  /// The magic protocol number acting as the identifier of the network.
+  final int id;
+
+  const NetworkId({required this.id});
+
+  factory NetworkId.fromId(int id) {
+    for (final value in values) {
+      if (value.id == id) {
+        return value;
+      }
+    }
+
+    throw ArgumentError('Unsupported NetworkId: $id');
+  }
+}
+
+/// The name of a native asset.
+extension type AssetName(String name) {
+  /// Deserializes the type from cbor.
+  factory AssetName.fromCbor(CborValue value) {
+    final bytes = (value as CborBytes).bytes;
+    // FIXME(ilap): Handle non ASCII/UTF-8 characters.
+    return AssetName(CborString.fromUtf8(bytes).toString(allowMalformed: true));
+  }
+
+  /// Serializes the type as cbor.
+  CborValue toCbor() => CborBytes(CborString(name).utf8Bytes);
 }
 
 /// The hash of policy ID that minted native assets.
@@ -349,15 +351,13 @@ extension type PolicyId(String hash) {
   CborValue toCbor() => CborBytes(hex.decode(hash));
 }
 
-/// The name of a native asset.
-extension type AssetName(String name) {
+/// A blockchain slot number.
+extension type const SlotBigNum(int value) {
   /// Deserializes the type from cbor.
-  factory AssetName.fromCbor(CborValue value) {
-    final bytes = (value as CborBytes).bytes;
-    // FIXME(ilap): Handle non ASCII/UTF-8 characters.
-    return AssetName(CborString.fromUtf8(bytes).toString(allowMalformed: true));
+  factory SlotBigNum.fromCbor(CborValue value) {
+    return SlotBigNum((value as CborSmallInt).value);
   }
 
   /// Serializes the type as cbor.
-  CborValue toCbor() => CborBytes(CborString(name).utf8Bytes);
+  CborValue toCbor() => CborSmallInt(value);
 }
