@@ -73,9 +73,7 @@ void main() {
         ' throws $TxBalanceMismatchException', () {
       final utxo = TransactionUnspentOutput(
         input: TransactionInput(
-          transactionId: TransactionHash.fromHex(
-            'd766cd9c60f3307d779892745047036d3fe578588f63ada8a454a1e51141bbf7',
-          ),
+          transactionId: testTransactionHash,
           index: 1,
         ),
         output: PreBabbageTransactionOutput(
@@ -107,9 +105,7 @@ void main() {
     test('transaction with too small fee throws $TxFeeTooSmallException', () {
       final utxo = TransactionUnspentOutput(
         input: TransactionInput(
-          transactionId: TransactionHash.fromHex(
-            'd766cd9c60f3307d779892745047036d3fe578588f63ada8a454a1e51141bbf7',
-          ),
+          transactionId: testTransactionHash,
           index: 1,
         ),
         output: PreBabbageTransactionOutput(
@@ -141,9 +137,7 @@ void main() {
     test('transaction too large throws $MaxTxSizeExceededException', () {
       final utxo = TransactionUnspentOutput(
         input: TransactionInput(
-          transactionId: TransactionHash.fromHex(
-            'd766cd9c60f3307d779892745047036d3fe578588f63ada8a454a1e51141bbf7',
-          ),
+          transactionId: testTransactionHash,
           index: 1,
         ),
         output: PreBabbageTransactionOutput(
@@ -177,9 +171,7 @@ void main() {
 
       final utxoWithNativeAssets = TransactionUnspentOutput(
         input: TransactionInput(
-          transactionId: TransactionHash.fromHex(
-            'd766cd9c60f3307d779892745047036d3fe578588f63ada8a454a1e51141bbf7',
-          ),
+          transactionId: testTransactionHash,
           index: 1,
         ),
         output: PreBabbageTransactionOutput(

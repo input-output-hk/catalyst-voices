@@ -604,7 +604,6 @@ AuxiliaryData testAuxiliaryData() {
     },
   );
 }
-
 /* cSpell:enable */
 
 TransactionUnspentOutput testUtxo({int? index, ScriptRef? scriptRef}) {

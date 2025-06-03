@@ -25,12 +25,7 @@ void main() {
 
         expect(
           builder.selectInputs,
-          anyOf(
-            [
-              returnsNormally,
-              throwsA(isA<MaxTxSizeExceededException>()),
-            ],
-          ),
+          returnsNormally,
         );
       });
     });

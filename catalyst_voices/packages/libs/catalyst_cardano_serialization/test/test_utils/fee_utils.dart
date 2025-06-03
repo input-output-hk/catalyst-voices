@@ -33,7 +33,7 @@ void verifyTransactionFee(Transaction transaction, TransactionBuilder builder) {
   } else if (calculatedFee == validFee) {
     // Calculated fee is the minimum fee, correct!
   } else if (builder.hasChangeOutputs) {
-    fail('Any leftover ada should be included in the changed output, not burned as a fee.'
+    fail('Any leftover ada should be included in the change output, not burned as a fee.'
         ' Expected fee: $validFee, got: $calculatedFee');
   } else {
     final leftoverAda = calculatedFee - validFee;
