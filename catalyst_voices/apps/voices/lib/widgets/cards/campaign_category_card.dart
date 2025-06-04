@@ -31,7 +31,7 @@ class CampaignCategoryCard extends StatelessWidget {
       ),
       clipBehavior: Clip.antiAlias,
       constraints: const BoxConstraints.tightFor(
-        width: 390,
+        width: 590,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -77,17 +77,37 @@ class _Background extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: 40),
+      width: 590,
+      height: 220,
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: context.colors.cardBackgroundGradient,
         ),
       ),
-      child: image.buildPicture(
-        height: 160,
-        fit: BoxFit.fitHeight,
-        color: _getImageColor(context),
+      child: Stack(
+        children: [
+          Positioned(
+            top: -150,
+            right: -80,
+            child: Transform.rotate(
+              angle: -0.1,
+              child: image.buildPicture(
+                width: 450,
+                fit: BoxFit.fitWidth,
+                color: _getImageColor(context).withValues(alpha: 0.1),
+              ),
+            ),
+          ),
+          Positioned(
+            left: 20,
+            top: 20,
+            child: image.buildPicture(
+              width: 280,
+              fit: BoxFit.fitWidth,
+              color: _getImageColor(context),
+            ),
+          ),
+        ],
       ),
     );
   }
