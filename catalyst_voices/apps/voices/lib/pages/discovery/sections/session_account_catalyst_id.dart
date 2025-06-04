@@ -4,7 +4,12 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 
 class SessionAccountCatalystId extends StatelessWidget {
-  const SessionAccountCatalystId({super.key});
+  final EdgeInsets padding;
+
+  const SessionAccountCatalystId({
+    super.key,
+    this.padding = EdgeInsets.zero,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -15,10 +20,14 @@ class SessionAccountCatalystId extends StatelessWidget {
           return const SizedBox.shrink();
         }
 
-        return CatalystIdText(
-          catalystId,
-          isCompact: true,
-          showLabel: true,
+        return Padding(
+          padding: padding,
+          child: CatalystIdText(
+            catalystId,
+            isCompact: true,
+            showLabel: true,
+            labelGap: 0,
+          ),
         );
       },
     );

@@ -1,5 +1,6 @@
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 
 class TipText extends StatelessWidget {
@@ -19,9 +20,12 @@ class TipText extends StatelessWidget {
       style: (style ?? const TextStyle()).copyWith(fontWeight: FontWeight.bold),
       placeholderSpanBuilder: (context, placeholder) {
         return switch (placeholder) {
-          'content' => TextSpan(
-              text: data,
-              style: const TextStyle(fontWeight: FontWeight.normal),
+          'content' => WidgetSpan(
+              alignment: PlaceholderAlignment.middle,
+              child: MarkdownText(
+                MarkdownData(data),
+                pStyle: style,
+              ),
             ),
           _ => throw ArgumentError('Unknown placeholder[$placeholder]'),
         };

@@ -62,7 +62,10 @@ class FundsDetailCard extends StatelessWidget {
                     largeFundsText: false,
                   ),
                 ),
-                _RangeAsk(range: askRange),
+                Offstage(
+                  offstage: type.isFound,
+                  child: _RangeAsk(range: askRange),
+                ),
               ],
             ),
           ),
@@ -78,6 +81,7 @@ enum FundsDetailCardType {
   category;
 
   bool get isCategoryCompact => this == FundsDetailCardType.categoryCompact;
+  bool get isFound => this == FundsDetailCardType.found;
 
   String localizedTotalAsk(VoicesLocalizations l10n) {
     return switch (this) {
