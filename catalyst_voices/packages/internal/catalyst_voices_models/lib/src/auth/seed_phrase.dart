@@ -111,6 +111,7 @@ final class SeedPhrase extends Equatable {
     return bip39.validateMnemonic(mnemonic);
   }
 
+  /// The seed derived from the mnemonic as a Uint8List.
   Uint8List get uint8ListSeed => bip39.mnemonicToSeed(mnemonic);
 
   /// The seed derived from the mnemonic as a hex-encoded string.
