@@ -22,12 +22,8 @@ class RegistrationDetailsPanel extends StatelessWidget {
         return switch (state) {
           GetStartedStep() => const GetStartedPanel(),
           RecoverMethodStep() => const RecoverMethodPanel(),
-          RecoverWithSeedPhraseStep(:final stage) => RecoverSeedPhrasePanel(
-              stage: stage,
-            ),
-          CreateBaseProfileStep(:final stage) => CreateBaseProfilePanel(
-              stage: stage,
-            ),
+          RecoverWithSeedPhraseStep(:final stage) => RecoverSeedPhrasePanel(stage: stage),
+          CreateBaseProfileStep(:final stage) => CreateBaseProfilePanel(stage: stage),
           CreateKeychainStep(:final stage) => CreateKeychainPanel(stage: stage),
           AccountCreateProgressStep(:final completedSteps) => AccountCreateProgressPanel(
               completedSteps: completedSteps,
