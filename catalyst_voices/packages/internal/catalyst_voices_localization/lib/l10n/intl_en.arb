@@ -1119,6 +1119,10 @@
   "errorWalletLinkInternalError": "Wallet authorisation internal error",
   "errorWalletLinkRefused": "Wallet authorisation failed",
   "errorWalletLinkAccountChange": "Wallet account change",
+  "errorSeedPhraseWordsDoNotMatch": "Words do not match",
+  "@errorSeedPhraseWordsDoNotMatch": {
+    "description": "Error message when user inserts incorrect seed phrase words"
+  },
   "all": "All",
   "@all": {
     "description": "Primary used to select all object. To display object without any filter"
