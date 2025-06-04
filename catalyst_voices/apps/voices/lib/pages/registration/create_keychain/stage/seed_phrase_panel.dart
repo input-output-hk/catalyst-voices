@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:catalyst_voices/pages/registration/widgets/export_catalyst_key_confirm_dialog.dart';
+import 'package:catalyst_voices/pages/registration/widgets/registration_details_panel_scaffold.dart';
 import 'package:catalyst_voices/pages/registration/widgets/registration_stage_navigation.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
@@ -15,31 +16,6 @@ class SeedPhrasePanel extends StatefulWidget {
 
   @override
   State<SeedPhrasePanel> createState() => _SeedPhrasePanelState();
-}
-
-class _SeedPhrasePanelState extends State<SeedPhrasePanel> {
-  @override
-  void initState() {
-    super.initState();
-    RegistrationCubit.of(context).keychainCreation.buildSeedPhrase();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Expanded(
-          child: _BlocLoadable(
-            builder: (context) => const _BlocSeedPhraseWords(),
-          ),
-        ),
-        const SizedBox(height: 10),
-        const _BlocStoredCheckbox(),
-        const SizedBox(height: 10),
-        const _BlocNavigation(),
-      ],
-    );
-  }
 }
 
 class _BlocLoadable extends StatelessWidget {
@@ -63,6 +39,22 @@ class _BlocLoadable extends StatelessWidget {
   }
 }
 
+class _BlocNavigation extends StatelessWidget {
+  const _BlocNavigation();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocSeedPhraseSelector<bool>(
+      selector: (state) => state.isStoredConfirmed,
+      builder: (context, state) {
+        return RegistrationBackNextNavigation(
+          isNextEnabled: state,
+        );
+      },
+    );
+  }
+}
+
 class _BlocSeedPhraseWords extends StatelessWidget {
   const _BlocSeedPhraseWords();
 
@@ -72,6 +64,46 @@ class _BlocSeedPhraseWords extends StatelessWidget {
       selector: (state) => state.seedPhraseWords,
       builder: (context, state) => _SeedPhraseWords(state),
     );
+  }
+}
+
+class _BlocStoredCheckbox extends StatelessWidget {
+  const _BlocStoredCheckbox();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocSeedPhraseSelector<bool>(
+      selector: (state) => state.isStoredConfirmed,
+      builder: (context, state) {
+        return _StoredCheckbox(
+          isConfirmed: state,
+        );
+      },
+    );
+  }
+}
+
+class _SeedPhrasePanelState extends State<SeedPhrasePanel> {
+  @override
+  Widget build(BuildContext context) {
+    return RegistrationDetailsPanelScaffold(
+      body: _BlocLoadable(builder: (context) => const _BlocSeedPhraseWords()),
+      footer: const Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          _BlocStoredCheckbox(),
+          SizedBox(height: 10),
+          _BlocNavigation(),
+        ],
+      ),
+    );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    RegistrationCubit.of(context).keychainCreation.buildSeedPhrase();
   }
 }
 
@@ -109,22 +141,6 @@ class _SeedPhraseWords extends StatelessWidget {
   }
 }
 
-class _BlocStoredCheckbox extends StatelessWidget {
-  const _BlocStoredCheckbox();
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocSeedPhraseSelector<bool>(
-      selector: (state) => state.isStoredConfirmed,
-      builder: (context, state) {
-        return _StoredCheckbox(
-          isConfirmed: state,
-        );
-      },
-    );
-  }
-}
-
 class _StoredCheckbox extends StatelessWidget {
   final bool isConfirmed;
 
@@ -140,22 +156,6 @@ class _StoredCheckbox extends StatelessWidget {
       label: Text(context.l10n.createKeychainSeedPhraseStoreConfirmation),
       onChanged: (value) {
         RegistrationCubit.of(context).keychainCreation.setSeedPhraseStored(value);
-      },
-    );
-  }
-}
-
-class _BlocNavigation extends StatelessWidget {
-  const _BlocNavigation();
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocSeedPhraseSelector<bool>(
-      selector: (state) => state.isStoredConfirmed,
-      builder: (context, state) {
-        return RegistrationBackNextNavigation(
-          isNextEnabled: state,
-        );
       },
     );
   }

@@ -279,7 +279,7 @@ final class RegistrationCubit extends Cubit<RegistrationState> with BlocErrorEmi
       _transaction = transaction;
 
       final fee = transaction.body.fee;
-      final formattedFree = CryptocurrencyFormatter.formatExactAmount(fee);
+      final formattedFree = CryptocurrencyFormatter.formatAmount(fee);
 
       _onRegistrationStateDataChanged(
         _registrationState.copyWith(
