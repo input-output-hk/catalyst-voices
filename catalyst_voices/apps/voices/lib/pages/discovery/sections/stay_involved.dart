@@ -246,7 +246,7 @@ class _VoterCard extends StatelessWidget {
       description: context.l10n.stayInvolvedContributorDescription,
       actions: _StayInvolvedActionButton(
         title: context.l10n.becomeVoter,
-        urlString: VoicesConstants.votingRegistrationUrl,
+        urlString: VoicesConstants.afterSubmissionUrl,
       ),
       additionalInfo: Column(
         children: [

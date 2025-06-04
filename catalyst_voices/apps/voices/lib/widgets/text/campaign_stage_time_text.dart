@@ -14,19 +14,18 @@ class CampaignStageTimeText extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: 4,
       children: [
         if (dateRange.from != null)
           _DateText(
             date: dateRange.from!,
             label: context.l10n.starts,
           ),
-        if (dateRange.to != null) ...[
-          const SizedBox(height: 4),
+        if (dateRange.to != null)
           _DateText(
             date: dateRange.to!,
             label: context.l10n.finishes,
           ),
-        ],
       ],
     );
   }

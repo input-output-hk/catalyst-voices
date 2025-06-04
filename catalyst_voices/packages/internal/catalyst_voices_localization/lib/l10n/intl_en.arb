@@ -1468,9 +1468,14 @@
   "maximumAsk": "Maximum Ask",
   "minimumAsk": "Minimum Ask",
   "ideaJourney": "Idea Journey",
-  "ideaJourneyDescription": "#### Ideas come to life in Catalyst through the key stages below. For the full timeline, deadlines and latest updates, visit the [fund timeline](https://docs.projectcatalyst.io/current-fund/fund-basics/fund-timeline) Gitbook page.",
+  "ideaJourneyDescription": "#### Ideas come to life in Catalyst through the key stages below. For the full timeline, deadlines and latest updates, visit the [fund timeline]({link}) Gitbook page.", 
   "@ideaJourneyDescription": {
-    "description": "Description for the idea journey section"
+    "description": "Description for the idea journey section",
+    "placeholders": {
+      "link": {
+        "type": "String"
+      }
+    }
   },
   "ongoing": "Ongoing",
   "from": "From",

@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/common/constants/constants.dart';
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/widgets/cards/funds_detail_card.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
@@ -75,7 +76,7 @@ class _SubTitle extends StatelessWidget {
           const SizedBox(height: 12),
           MarkdownText(
             key: const Key('IdeaDescription'),
-            MarkdownData(context.l10n.ideaJourneyDescription),
+            MarkdownData(context.l10n.ideaJourneyDescription(VoicesConstants.campaignTimeline)),
           ),
         ],
       ),

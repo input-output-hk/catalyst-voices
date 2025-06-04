@@ -97,9 +97,7 @@ class CampaignTimelineCardState extends State<CampaignTimelineCard> {
                         color: context.colors.textOnPrimaryLevel1,
                       ),
                     ),
-                  )
-                else
-                  const SizedBox.shrink(),
+                  ),
               ],
             ),
           ),

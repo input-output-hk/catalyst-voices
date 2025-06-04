@@ -38,6 +38,7 @@ abstract class VoicesConstants {
   static const joinNewsletterUrl = 'https://mpc.projectcatalyst.io/newsletter-signup';
   static const unlockAccountUrl = '$_catalystApp/my-account#lock-unlock-account';
   static const confirmSeedPhraseUrl = '$_catalystApp/getting-started#confirm-seed-phrase';
+  static const campaignTimeline = '$_docs/current-fund/fund-basics/fund-timeline';
 
   static String becomeReviewerUrl() {
     return '${Dependencies.instance.get<AppEnvironment>().type.reviews}/register';
