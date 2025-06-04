@@ -54,6 +54,8 @@ final class CampaignServiceImpl implements CampaignService {
   Future<List<CampaignCategory>> getCampaignCategories() async {
     final categories = await _campaignRepository.getCampaignCategories();
     final updatedCategories = <CampaignCategory>[];
+    final proposalSubmissionStage =
+        await getCampaignTimelineByStage(CampaignTimelineStage.proposalSubmission);
 
     for (final category in categories) {
       final categoryProposals = await _proposalRepository.getProposals(
@@ -65,6 +67,7 @@ final class CampaignServiceImpl implements CampaignService {
       final updatedCategory = category.copyWith(
         totalAsk: totalAsk,
         proposalsCount: categoryProposals.length,
+        submissionCloseDate: proposalSubmissionStage.timeline.to,
       );
       updatedCategories.add(updatedCategory);
     }
@@ -93,11 +96,14 @@ final class CampaignServiceImpl implements CampaignService {
       type: ProposalsFilterType.finals,
       categoryRef: ref,
     );
+    final proposalSubmissionStage =
+        await getCampaignTimelineByStage(CampaignTimelineStage.proposalSubmission);
     final totalAsk = _calculateTotalAsk(categoryProposals);
 
     return category.copyWith(
       totalAsk: totalAsk,
       proposalsCount: categoryProposals.length,
+      submissionCloseDate: proposalSubmissionStage.timeline.to,
     );
   }
 
