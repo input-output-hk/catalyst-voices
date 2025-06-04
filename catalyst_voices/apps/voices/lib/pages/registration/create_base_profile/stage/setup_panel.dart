@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/pages/registration/widgets/registration_details_panel_scaffold.dart';
 import 'package:catalyst_voices/pages/registration/widgets/registration_stage_navigation.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
@@ -167,34 +168,33 @@ class _SetupPanelState extends State<SetupPanel> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const SizedBox(height: 24),
-        const _Title(),
-        Expanded(
-          child: FocusScope(
-            child: VoicesScrollbar(
-              controller: _scrollController,
-              alwaysVisible: true,
-              padding: const EdgeInsets.only(left: 10),
-              child: ListView(
-                controller: _scrollController,
-                padding: const EdgeInsets.symmetric(vertical: 24),
-                children: const [
-                  _DisplayNameSelector(),
-                  SizedBox(height: 24),
-                  _EmailSelector(),
-                ],
-              ),
-            ),
+    return RegistrationDetailsPanelScaffold(
+      title: const _Title(),
+      body: FocusScope(
+        child: VoicesScrollbar(
+          controller: _scrollController,
+          alwaysVisible: true,
+          padding: const EdgeInsets.only(left: 10),
+          child: ListView(
+            controller: _scrollController,
+            padding: EdgeInsets.zero,
+            children: const [
+              _DisplayNameSelector(),
+              SizedBox(height: 24),
+              _EmailSelector(),
+            ],
           ),
         ),
-        const SizedBox(height: 24),
-        const _IdeascaleInfoCard(),
-        const SizedBox(height: 24),
-        const _NavigationSelector(),
-      ],
+      ),
+      footer: const Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          _IdeascaleInfoCard(),
+          SizedBox(height: 24),
+          _NavigationSelector(),
+        ],
+      ),
     );
   }
 

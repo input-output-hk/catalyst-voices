@@ -121,7 +121,9 @@ project: {
 									}
 								}
 							}
-							port: 3030
+							ports: {
+								metrics: port: 3030
+							}
 							probes: {
 								liveness: {
 									path: "/api/v1/health/live"
@@ -275,9 +277,9 @@ project: {
 
 					service: {
 						ports: {
-							port: 80
+							metrics: 3030
 						}
-						scrape: false
+						scrape: true
 					}
 				}
 			}
