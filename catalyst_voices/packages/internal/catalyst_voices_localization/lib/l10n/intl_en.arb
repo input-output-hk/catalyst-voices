@@ -644,6 +644,10 @@
   "@registrationWalletNotFound": {
     "description": "Error message shown when connect wallet but matching was not found"
   },
+  "registrationAccountNotFound": "Account not found. Make sure seed phrase is correct.",
+  "@registrationAccountNotFound": {
+    "description": "Error message shown when recovering account with invalid seed phrase."
+  },
   "walletLinkRoleChooserTitle": "How do you want to participate in Catalyst?",
   "@walletLinkRoleChooserTitle": {
     "description": "A title on the role chooser screen in registration."
