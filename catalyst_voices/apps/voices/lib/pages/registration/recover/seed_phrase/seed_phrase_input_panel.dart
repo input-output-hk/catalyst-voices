@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:catalyst_voices/pages/registration/widgets/registration_details_panel_scaffold.dart';
 import 'package:catalyst_voices/pages/registration/widgets/registration_stage_message.dart';
 import 'package:catalyst_voices/pages/registration/widgets/registration_stage_navigation.dart';
 import 'package:catalyst_voices/pages/registration/widgets/seed_phrase_actions.dart';
@@ -67,38 +68,36 @@ class _SeedPhraseInputPanelState extends State<SeedPhraseInputPanel> with Upload
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        const SizedBox(height: 24),
-        RegistrationStageMessage(
-          title: Text(
-            context.l10n.recoverySeedPhraseInputTitle,
-            key: const Key('RecoverySeedPhraseInputTitle'),
+    return RegistrationDetailsPanelScaffold(
+      title: RegistrationStageMessage(
+        title: Text(
+          context.l10n.recoverySeedPhraseInputTitle,
+          key: const Key('RecoverySeedPhraseInputTitle'),
+        ),
+        subtitle: Text(
+          context.l10n.recoverySeedPhraseInputSubtitle,
+          key: const Key('RecoverySeedPhraseInputSubtitle'),
+        ),
+        spacing: 12,
+      ),
+      body: _BlocSeedPhraseField(
+        controller: _controller,
+        focusNode: _focusNode,
+      ),
+      footer: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          SeedPhraseActions(
+            onImportKeyTap: _uploadSeedPhrase,
+            onResetTap: _resetControllerWords,
           ),
-          subtitle: Text(
-            context.l10n.recoverySeedPhraseInputSubtitle,
-            key: const Key('RecoverySeedPhraseInputSubtitle'),
+          const SizedBox(height: 12),
+          _BlocNavigation(
+            onNextTap: _recoverAccountAndGoNextStage,
           ),
-          spacing: 12,
-        ),
-        const SizedBox(height: 12),
-        Expanded(
-          child: _BlocSeedPhraseField(
-            controller: _controller,
-            focusNode: _focusNode,
-          ),
-        ),
-        const SizedBox(height: 12),
-        SeedPhraseActions(
-          onImportKeyTap: _uploadSeedPhrase,
-          onResetTap: _resetControllerWords,
-        ),
-        const SizedBox(height: 12),
-        _BlocNavigation(
-          onNextTap: _recoverAccountAndGoNextStage,
-        ),
-      ],
+        ],
+      ),
     );
   }
 
