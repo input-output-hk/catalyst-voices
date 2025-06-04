@@ -70,7 +70,7 @@ final class WalletLinkCubit extends Cubit<WalletLinkStateData>
   @override
   Future<bool> selectWallet(WalletMetadata meta) async {
     try {
-      final wallet = _wallets.firstWhereOrNull((wallet) => wallet.name == meta.name);
+      final wallet = _wallets.firstWhereOrNull((wallet) => wallet.name.equalsIgnoreCase(meta.name));
 
       if (wallet == null) {
         throw const LocalizedRegistrationWalletNotFoundException();

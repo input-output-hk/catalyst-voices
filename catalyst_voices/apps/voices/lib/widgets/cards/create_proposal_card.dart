@@ -81,7 +81,7 @@ class _SubmissionCloseAt extends StatelessWidget {
             ),
             DayAtTimeText(
               dateTime: dateTime,
-              showTimezone: false,
+              showTimezone: true,
             ),
           ],
         ),

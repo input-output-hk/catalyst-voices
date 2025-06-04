@@ -93,11 +93,13 @@ class _ContentView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      child: Stack(
         children: [
           child,
-          CreateNewProposalActionButtons(step: step),
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: CreateNewProposalActionButtons(step: step),
+          ),
         ],
       ),
     );
@@ -109,7 +111,7 @@ class _CreateNewProposalDialogState extends State<CreateNewProposalDialog>
   @override
   Widget build(BuildContext context) {
     return VoicesDetailsDialog(
-      constraints: const BoxConstraints(maxHeight: 800, maxWidth: 1200),
+      constraints: const BoxConstraints.tightFor(height: 800, width: 1200),
       header: VoicesAlignTitleHeader(
         title: _getTitle(),
         padding: const EdgeInsets.all(24),

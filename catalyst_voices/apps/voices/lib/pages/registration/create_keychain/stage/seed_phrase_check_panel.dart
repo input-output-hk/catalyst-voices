@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/pages/registration/widgets/registration_details_panel_scaffold.dart';
 import 'package:catalyst_voices/pages/registration/widgets/registration_stage_navigation.dart';
 import 'package:catalyst_voices/pages/registration/widgets/seed_phrase_actions.dart';
 import 'package:catalyst_voices/pages/registration/widgets/upload_seed_phrase/upload_seed_phrase_mixin.dart';
@@ -94,22 +95,17 @@ class _BlocSeedPhraseWords extends StatelessWidget {
 class _SeedPhraseCheckPanelState extends State<SeedPhraseCheckPanel> with UploadSeedPhraseMixin {
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Expanded(
-          child: _BlocLoadable(
-            builder: (context) {
-              return _BlocSeedPhraseWords(
-                onUserWordsChanged: _onWordsSequenceChanged,
-                onImportTap: _importSeedPhrase,
-                onResetTap: _clearUserWords,
-              );
-            },
-          ),
-        ),
-        const SizedBox(height: 10),
-        const _BlocNavigation(),
-      ],
+    return RegistrationDetailsPanelScaffold(
+      body: _BlocLoadable(
+        builder: (context) {
+          return _BlocSeedPhraseWords(
+            onUserWordsChanged: _onWordsSequenceChanged,
+            onImportTap: _importSeedPhrase,
+            onResetTap: _clearUserWords,
+          );
+        },
+      ),
+      footer: const _BlocNavigation(),
     );
   }
 
@@ -160,7 +156,6 @@ class _SeedPhraseWords extends StatelessWidget {
     return SingleChildScrollView(
       child: Column(
         children: [
-          const SizedBox(height: 20),
           SeedPhrasesSequencer(
             words: words,
             selectedWords: userWords,
