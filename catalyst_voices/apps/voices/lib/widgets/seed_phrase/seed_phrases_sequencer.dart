@@ -1,5 +1,4 @@
-import 'package:catalyst_voices/widgets/seed_phrase/seed_phrases_completer.dart';
-import 'package:catalyst_voices/widgets/seed_phrase/seed_phrases_picker.dart';
+import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 
@@ -38,13 +37,17 @@ class SeedPhrasesSequencer extends StatelessWidget {
           slotsCount: words.length,
           words: selectedWords,
           onWordTap: _removeWord,
+          mainAxisSpacing: 4,
+          crossAxisSpacing: 10,
         ),
-        const SizedBox(height: 10),
+        const VoicesDivider(height: 24),
         SeedPhrasesPicker(
           key: const Key('SeedPhrasesPicker'),
           words: words,
           selectedWords: selectedWords,
           onWordTap: _selectWord,
+          mainAxisSpacing: 4,
+          crossAxisSpacing: 10,
         ),
       ],
     );
