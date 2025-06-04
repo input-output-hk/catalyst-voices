@@ -40,7 +40,7 @@ abstract class VoicesConstants {
   static const confirmSeedPhraseUrl = '$_catalystApp/getting-started#confirm-seed-phrase';
 
   static String becomeReviewerUrl() {
-    return Dependencies.instance.get<AppEnvironment>().type.reviews.toString();
+    return '${Dependencies.instance.get<AppEnvironment>().type.reviews}/register';
   }
 
   static String cardanoScanStakeAddressUrl(ShelleyAddress stakeAddress) {
