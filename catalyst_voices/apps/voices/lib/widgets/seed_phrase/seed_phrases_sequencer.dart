@@ -37,8 +37,6 @@ class SeedPhrasesSequencer extends StatelessWidget {
           slotsCount: words.length,
           words: selectedWords,
           onWordTap: _removeWord,
-          mainAxisSpacing: 4,
-          crossAxisSpacing: 10,
         ),
         const VoicesDivider(height: 24),
         SeedPhrasesPicker(
@@ -46,8 +44,6 @@ class SeedPhrasesSequencer extends StatelessWidget {
           words: words,
           selectedWords: selectedWords,
           onWordTap: _selectWord,
-          mainAxisSpacing: 4,
-          crossAxisSpacing: 10,
         ),
       ],
     );
