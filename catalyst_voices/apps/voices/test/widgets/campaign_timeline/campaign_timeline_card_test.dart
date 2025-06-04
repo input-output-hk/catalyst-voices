@@ -28,7 +28,6 @@ void main() {
       (tester) async {
         final widget = CampaignTimelineCard(
           timelineItem: timelineItem,
-          placement: CampaignTimelinePlacement.discovery,
         );
 
         await tester.pumpApp(
@@ -47,7 +46,6 @@ void main() {
       (tester) async {
         final widget = CampaignTimelineCard(
           timelineItem: timelineItem,
-          placement: CampaignTimelinePlacement.workspace,
         );
 
         await tester.pumpApp(
@@ -66,7 +64,6 @@ void main() {
       (tester) async {
         final widget = CampaignTimelineCard(
           timelineItem: timelineItem,
-          placement: CampaignTimelinePlacement.discovery,
         );
 
         await tester.pumpApp(
@@ -104,7 +101,6 @@ void main() {
 
         final widget = CampaignTimelineCard(
           timelineItem: currentTimelineItem,
-          placement: CampaignTimelinePlacement.discovery,
         );
 
         await tester.pumpApp(
@@ -141,7 +137,6 @@ void main() {
       (tester) async {
         final widget = CampaignTimelineCard(
           timelineItem: timelineItem,
-          placement: CampaignTimelinePlacement.discovery,
         );
 
         await tester.pumpApp(
