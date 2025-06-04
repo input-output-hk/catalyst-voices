@@ -5,7 +5,6 @@ import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/common/ext/space_ext.dart';
 import 'package:catalyst_voices/routes/routing/routing.dart';
 import 'package:catalyst_voices/widgets/buttons/create_proposal_button.dart';
-import 'package:catalyst_voices/widgets/campaign_timeline/campaign_timeline_card.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
@@ -145,11 +144,8 @@ class _WorkspaceHeaderState extends State<WorkspaceHeader> {
                   child: Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: theme.colorScheme.surface,
+                      color: context.colors.onSurfaceNeutralOpaqueLv0.withValues(alpha: 0.6),
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: Colors.grey.withAlpha(51),
-                      ),
                     ),
                     child: BlocSelector<WorkspaceBloc, WorkspaceState,
                         List<CampaignTimelineViewModel>>(
@@ -159,7 +155,6 @@ class _WorkspaceHeaderState extends State<WorkspaceHeader> {
                       builder: (context, timelineItems) {
                         return CampaignTimeline(
                           timelineItems: timelineItems,
-                          placement: CampaignTimelinePlacement.workspace,
                         );
                       },
                     ),
