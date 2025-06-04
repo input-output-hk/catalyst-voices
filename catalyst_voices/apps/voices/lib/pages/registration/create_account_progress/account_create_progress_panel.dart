@@ -102,7 +102,10 @@ class _CreateKeychainButton extends StatelessWidget {
       key: const Key('CreateKeychainButton'),
       onTap: onTap,
       leading: VoicesAssets.icons.key.buildIcon(size: 18),
-      child: Text(context.l10n.accountCreationSplashTitle),
+      child: Semantics(
+        label: 'CreateKeychainButton',
+        child: Text(context.l10n.accountCreationSplashTitle),
+      ),
     );
   }
 }
@@ -116,11 +119,14 @@ class _LinkWalletAndRolesButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return VoicesFilledButton(
-      key: const Key('LinkWalletAndRolesButton'),
-      onTap: onTap,
-      leading: VoicesAssets.icons.wallet.buildIcon(size: 18),
-      child: Text(context.l10n.createKeychainLinkWalletAndRoles),
+    return Semantics(
+      label: 'LinkWalletAndRoles-test',
+      child: VoicesFilledButton(
+        key: const Key('LinkWalletAndRolesButton'),
+        onTap: onTap,
+        leading: VoicesAssets.icons.wallet.buildIcon(size: 18),
+        child: Text(context.l10n.createKeychainLinkWalletAndRoles),
+      ),
     );
   }
 }

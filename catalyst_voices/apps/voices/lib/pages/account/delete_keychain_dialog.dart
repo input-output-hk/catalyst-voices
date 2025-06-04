@@ -76,15 +76,21 @@ class _DeleteKeychainDialogState extends State<DeleteKeychainDialog> {
                 const SizedBox(height: 2),
                 SizedBox(
                   width: 300,
-                  child: VoicesTextField(
-                    key: const Key('DeleteKeychainTextField'),
-                    controller: _textEditingController,
-                    onFieldSubmitted: _removeKeychain,
-                    decoration: VoicesTextFieldDecoration(
-                      errorText: _errorText,
-                      errorMaxLines: 2,
-                      fillColor: Theme.of(context).colors.elevationsOnSurfaceNeutralLv1White,
-                      hintText: context.l10n.enterPhrase,
+                  child: Semantics(
+                    container: true,
+                    textField: true,
+                    label: 'DeleteKeychainTextField',
+                    child: VoicesTextField(
+                      key: const Key('DeleteKeychainTextField'),
+                      controller: _textEditingController,
+                      onFieldSubmitted: _removeKeychain,
+                      decoration: VoicesTextFieldDecoration(
+                        errorText: _errorText,
+                        errorMaxLines: 2,
+                        filled: true,
+                        fillColor: Theme.of(context).colors.elevationsOnSurfaceNeutralLv1White,
+                        hintText: context.l10n.enterPhrase,
+                      ),
                     ),
                   ),
                 ),
@@ -93,11 +99,16 @@ class _DeleteKeychainDialogState extends State<DeleteKeychainDialog> {
             const SizedBox(height: 24),
             Wrap(
               children: [
-                VoicesFilledButton(
-                  key: const Key('DeleteKeychainContinueButton'),
-                  backgroundColor: Theme.of(context).colors.iconsError,
-                  onTap: _removeKeychain,
-                  child: Text(context.l10n.continueText),
+                Semantics(
+                  container: true,
+                  button: true,
+                  label: 'DeleteKeychainContinueButton',
+                  child: VoicesFilledButton(
+                    key: const Key('DeleteKeychainContinueButton'),
+                    backgroundColor: Theme.of(context).colors.iconsError,
+                    onTap: _removeKeychain,
+                    child: Text(context.l10n.continueText),
+                  ),
                 ),
                 const SizedBox(width: 8),
                 VoicesTextButton.danger(
