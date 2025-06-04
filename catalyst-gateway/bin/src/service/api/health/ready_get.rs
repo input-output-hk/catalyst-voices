@@ -85,7 +85,9 @@ use crate::{
     },
     service::{
         common::{responses::WithErrorResponses, types::headers::retry_after::RetryAfterOption},
-        utilities::health::{event_db_is_live, index_db_is_live, set_event_db_liveness},
+        utilities::health::{
+            condition_for_started, event_db_is_live, index_db_is_live, set_event_db_liveness,
+        },
     },
 };
 
@@ -143,16 +145,9 @@ pub(crate) async fn endpoint() -> AllResponses {
         drop(CassandraSession::wait_until_ready(INDEXING_DB_READY_WAIT_INTERVAL, true).await);
     }
 
-    let success_response = Responses::NoContent.into();
-
-    // Return 204 response if check passed initially.
-    if index_db_live && event_db_live {
-        return success_response;
-    }
-
     // Otherwise, re-check, and return 204 response if all is good.
-    if index_db_is_live() && event_db_is_live() {
-        return success_response;
+    if condition_for_started() {
+        return Responses::NoContent.into();
     }
 
     // Otherwise, return 503 response.
