@@ -24,34 +24,36 @@ class CreateNewProposalCategorySelection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ConstrainedBox(
-      constraints: const BoxConstraints(maxHeight: 430),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            child: ListView.separated(
-              itemBuilder: (context, index) => _CategoryCard(
-                name: categories[index].formattedName,
-                description: categories[index].shortDescription,
-                ref: categories[index].id,
-                isSelected: categories[index].id == selectedCategory,
-                onCategorySelected: onCategorySelected,
+    return Expanded(
+      child: Padding(
+        padding: const EdgeInsets.only(bottom: 50),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: ListView.separated(
+                itemBuilder: (context, index) => _CategoryCard(
+                  name: categories[index].formattedName,
+                  description: categories[index].shortDescription,
+                  ref: categories[index].id,
+                  isSelected: categories[index].id == selectedCategory,
+                  onCategorySelected: onCategorySelected,
+                ),
+                separatorBuilder: (context, index) => const SizedBox(height: 16),
+                itemCount: categories.length,
               ),
-              separatorBuilder: (context, index) => const SizedBox(height: 16),
-              itemCount: categories.length,
             ),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            flex: 2,
-            child: _selectedCategory != null
-                ? SingleChildScrollView(
-                    child: CategoryCompactDetailView(category: _selectedCategory!),
-                  )
-                : const _NoneCategorySelected(),
-          ),
-        ],
+            const SizedBox(width: 16),
+            Expanded(
+              flex: 2,
+              child: _selectedCategory != null
+                  ? SingleChildScrollView(
+                      child: CategoryCompactDetailView(category: _selectedCategory!),
+                    )
+                  : const _NoneCategorySelected(),
+            ),
+          ],
+        ),
       ),
     );
   }
