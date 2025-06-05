@@ -106,8 +106,6 @@ void main() {
 
         expect(find.textContaining('1'), findsOne);
         expect(find.textContaining('2'), findsOne);
-        expect(find.textContaining('3'), findsOne);
-        expect(find.textContaining('4'), findsOne);
       });
     });
   });

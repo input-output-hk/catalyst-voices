@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/pages/registration/widgets/registration_details_panel_scaffold.dart';
 import 'package:catalyst_voices/routes/routes.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_filled_button.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_text_button.dart';
@@ -15,39 +16,43 @@ class RestoredPanel extends StatelessWidget {
     final textTheme = theme.textTheme;
     final colors = theme.colors;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        const SizedBox(height: 24),
-        Text(
-          key: const Key('RecoverySuccessTitle'),
-          context.l10n.recoverySuccessTitle,
-          style: textTheme.titleLarge?.copyWith(
-            color: colors.textOnPrimaryLevel1,
+    return RegistrationDetailsPanelScaffold(
+      title: Text(
+        key: const Key('RecoverySuccessTitle'),
+        context.l10n.recoverySuccessTitle,
+        style: textTheme.titleLarge?.copyWith(
+          color: colors.textOnPrimaryLevel1,
+        ),
+      ),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(
+            key: const Key('RecoverySuccessSubtitle'),
+            context.l10n.recoverySuccessSubtitle,
+            style: textTheme.bodyMedium?.copyWith(
+              color: colors.textOnPrimaryLevel0,
+            ),
           ),
-        ),
-        const SizedBox(height: 24),
-        Text(
-          key: const Key('RecoverySuccessSubtitle'),
-          context.l10n.recoverySuccessSubtitle,
-          style: textTheme.bodyMedium?.copyWith(
-            color: colors.textOnPrimaryLevel0,
+        ],
+      ),
+      footer: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          VoicesFilledButton(
+            key: const Key('RecoverySuccessGoToDashboardButton'),
+            onTap: () => _redirectToDashboard(context),
+            child: Text(context.l10n.recoverySuccessGoToDashboard),
           ),
-        ),
-        const Spacer(),
-        const SizedBox(height: 10),
-        VoicesFilledButton(
-          key: const Key('RecoverySuccessGoToDashboardButton'),
-          onTap: () => _redirectToDashboard(context),
-          child: Text(context.l10n.recoverySuccessGoToDashboard),
-        ),
-        const SizedBox(height: 10),
-        VoicesTextButton(
-          key: const Key('RecoverySuccessGoAccountButton'),
-          onTap: () => _redirectToMyAccount(context),
-          child: Text(context.l10n.recoverySuccessGoAccount),
-        ),
-      ],
+          const SizedBox(height: 10),
+          VoicesTextButton(
+            key: const Key('RecoverySuccessGoAccountButton'),
+            onTap: () => _redirectToMyAccount(context),
+            child: Text(context.l10n.recoverySuccessGoAccount),
+          ),
+        ],
+      ),
     );
   }
 
