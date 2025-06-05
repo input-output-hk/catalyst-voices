@@ -12,6 +12,7 @@ import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_segments
 import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_setup_panel.dart';
 import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_validation_snackbar.dart';
 import 'package:catalyst_voices/pages/spaces/appbar/session_state_header.dart';
+import 'package:catalyst_voices/pages/spaces/drawer/opportunities_drawer.dart';
 import 'package:catalyst_voices/pages/workspace/submission_closing_warning_dialog.dart';
 import 'package:catalyst_voices/routes/routes.dart';
 import 'package:catalyst_voices/routes/routing/proposal_builder_route.dart';
@@ -94,6 +95,7 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
               SessionStateHeader(),
             ],
           ),
+          endDrawer: const OpportunitiesDrawer(),
           body: SegmentsControllerScope(
             controller: _segmentsController,
             child: SidebarScaffold(

@@ -5,6 +5,8 @@ use std::sync::atomic::{
     Ordering::{Acquire, Release},
 };
 
+use tracing::debug;
+
 /// Flag to determine if the service has started
 static STARTED: AtomicBool = AtomicBool::new(false);
 
@@ -30,7 +32,11 @@ pub(crate) fn set_to_started() {
 
 /// Returns whether the service has started or not.
 pub(crate) fn condition_for_started() -> bool {
-    event_db_is_live() && index_db_is_live() && follower_has_first_reached_tip()
+    let event_db = event_db_is_live();
+    let index_db = index_db_is_live();
+    let follower = follower_has_first_reached_tip();
+    debug!("Checking if service has started. Event DB: {event_db}, Index DB: {index_db}, Follower: {follower}");
+    event_db && index_db && follower
 }
 
 /// Returns whether the Event DB is live or not.

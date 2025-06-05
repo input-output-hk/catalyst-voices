@@ -1,5 +1,6 @@
 import 'package:catalyst_voices/common/ext/account_role_ext.dart';
 import 'package:catalyst_voices/pages/registration/widgets/next_step.dart';
+import 'package:catalyst_voices/pages/registration/widgets/registration_details_panel_scaffold.dart';
 import 'package:catalyst_voices/routes/routing/account_route.dart';
 import 'package:catalyst_voices/routes/routing/spaces_route.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
@@ -16,44 +17,46 @@ class AccountCompletedPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Expanded(
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                const _TitleText(),
-                const SizedBox(height: 10),
-                Column(
-                  children: const <Widget>[
-                    _CatalystKeychainCreatedCard(),
-                    _WalletConnectedCardSelector(),
-                    _RolesSelectedCardSelector(),
-                  ].separatedBy(const SizedBox(height: 10)).toList(),
-                ),
+    return RegistrationDetailsPanelScaffold(
+      body: const SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            _TitleText(),
+            SizedBox(height: 10),
+            Column(
+              spacing: 10,
+              children: <Widget>[
+                _CatalystKeychainCreatedCard(),
+                _WalletConnectedCardSelector(),
+                _RolesSelectedCardSelector(),
               ],
             ),
+          ],
+        ),
+      ),
+      footer: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          const _NextStep(),
+          const SizedBox(height: 10),
+          _OpenDiscoveryButton(
+            onTap: () {
+              Navigator.pop(context);
+              const DiscoveryRoute().go(context);
+            },
           ),
-        ),
-        const _NextStep(),
-        const SizedBox(height: 10),
-        _OpenDiscoveryButton(
-          onTap: () {
-            Navigator.pop(context);
-            const DiscoveryRoute().go(context);
-          },
-        ),
-        const SizedBox(height: 10),
-        _ReviewMyAccountButton(
-          onTap: () {
-            Navigator.pop(context);
-            const AccountRoute().go(context);
-          },
-        ),
-      ],
+          const SizedBox(height: 10),
+          _ReviewMyAccountButton(
+            onTap: () {
+              Navigator.pop(context);
+              const AccountRoute().go(context);
+            },
+          ),
+        ],
+      ),
     );
   }
 }

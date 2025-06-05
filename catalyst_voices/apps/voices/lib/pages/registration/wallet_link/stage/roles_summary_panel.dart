@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/pages/registration/widgets/registration_details_panel_scaffold.dart';
 import 'package:catalyst_voices/pages/registration/widgets/registration_stage_message.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
@@ -14,33 +15,39 @@ class RolesSummaryPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        const SizedBox(height: 24),
-        RegistrationStageMessage(
-          title: Text(context.l10n.walletLinkRoleSummaryTitle),
-          subtitle: const _BlocSubtitle(),
-          spacing: 12,
-        ),
-        const SizedBox(height: 12),
-        const _BlocRolesSummaryContainer(),
-        const Spacer(),
-        VoicesFilledButton(
-          leading: VoicesAssets.icons.wallet.buildIcon(),
-          onTap: () {
-            RegistrationCubit.of(context).nextStep();
-          },
-          child: Text(context.l10n.reviewRegistrationTransaction),
-        ),
-        const SizedBox(height: 10),
-        VoicesTextButton(
-          onTap: () {
-            RegistrationCubit.of(context).changeRoleSetup();
-          },
-          child: Text(context.l10n.walletLinkTransactionChangeRoles),
-        ),
-      ],
+    return RegistrationDetailsPanelScaffold(
+      body: ListView(
+        padding: EdgeInsets.zero,
+        children: [
+          RegistrationStageMessage(
+            title: Text(context.l10n.walletLinkRoleSummaryTitle),
+            subtitle: const _BlocSubtitle(),
+            spacing: 12,
+          ),
+          const SizedBox(height: 12),
+          const _BlocRolesSummaryContainer(),
+        ],
+      ),
+      footer: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          VoicesFilledButton(
+            leading: VoicesAssets.icons.wallet.buildIcon(),
+            onTap: () {
+              RegistrationCubit.of(context).nextStep();
+            },
+            child: Text(context.l10n.reviewRegistrationTransaction),
+          ),
+          const SizedBox(height: 10),
+          VoicesTextButton(
+            onTap: () {
+              RegistrationCubit.of(context).changeRoleSetup();
+            },
+            child: Text(context.l10n.walletLinkTransactionChangeRoles),
+          ),
+        ],
+      ),
     );
   }
 }
