@@ -1,5 +1,6 @@
 import 'package:catalyst_voices/widgets/common/columns_row.dart';
 import 'package:catalyst_voices/widgets/seed_phrase/seed_phrases_completer.dart';
+import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 
@@ -76,10 +77,6 @@ class _WordCell extends StatelessWidget {
   /// A callback function triggered when the cell is tapped (if not selected).
   final VoidCallback? onTap;
 
-  Set<WidgetState> get states => {
-        if (isSelected) WidgetState.selected,
-      };
-
   const _WordCell(
     this.data, {
     super.key,
@@ -87,12 +84,22 @@ class _WordCell extends StatelessWidget {
     this.onTap,
   });
 
+  Set<WidgetState> get states => {
+        if (isSelected) WidgetState.selected,
+      };
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    final backgroundColor = _CellBackgroundColor(theme);
-    final foregroundColor = _CellForegroundColor(theme);
+    final backgroundColor = WidgetStateProperty<Color?>.fromMap({
+      WidgetState.selected: theme.colors.outlineBorderVariant,
+      WidgetState.any: theme.colorScheme.primary,
+    });
+    final foregroundColor = WidgetStateProperty<Color?>.fromMap({
+      WidgetState.selected: theme.colors.textDisabled,
+      WidgetState.any: theme.colors.textOnPrimaryWhite,
+    });
 
     return ConstrainedBox(
       constraints: const BoxConstraints.tightFor(height: 32),
@@ -107,35 +114,5 @@ class _WordCell extends StatelessWidget {
         ),
       ),
     );
-  }
-}
-
-final class _CellBackgroundColor extends WidgetStateProperty<Color> {
-  final ThemeData theme;
-
-  _CellBackgroundColor(this.theme);
-
-  @override
-  Color resolve(Set<WidgetState> states) {
-    if (states.contains(WidgetState.selected)) {
-      return theme.colorScheme.primary.withValues(alpha: 0.12);
-    }
-
-    return theme.colorScheme.primary;
-  }
-}
-
-final class _CellForegroundColor extends WidgetStateProperty<Color> {
-  final ThemeData theme;
-
-  _CellForegroundColor(this.theme);
-
-  @override
-  Color resolve(Set<WidgetState> states) {
-    if (states.contains(WidgetState.selected)) {
-      return theme.colorScheme.primary;
-    }
-
-    return theme.colorScheme.onPrimary;
   }
 }

@@ -4,6 +4,7 @@ import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.da
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:collection/collection.dart';
 
 abstract interface class UserService implements ActiveAware {
   const factory UserService(
@@ -268,11 +269,13 @@ final class UserServiceImpl implements UserService {
       return;
     }
 
-    final publicStatus = await _userRepository.getAccountPublicStatus();
-    final updatedAccount = activeAccount.copyWith(publicStatus: publicStatus);
-    final updatedUser = user.updateAccount(updatedAccount);
+    if (!activeAccount.publicStatus.isNotSetup) {
+      final publicStatus = await _userRepository.getAccountPublicStatus();
+      final updatedAccount = activeAccount.copyWith(publicStatus: publicStatus);
+      final updatedUser = user.updateAccount(updatedAccount);
 
-    await _updateUser(updatedUser);
+      await _updateUser(updatedUser);
+    }
   }
 
   @override

@@ -53,6 +53,9 @@ class _AccountHeaderTile extends StatelessWidget {
                 CatalystIdText(
                   data,
                   isCompact: false,
+                  showLabel: true,
+                  labelGap: 4,
+                  labelStyle: context.textTheme.titleSmall,
                   backgroundColor: context.colors.onSurfaceNeutralOpaqueLv2,
                 ),
               ],

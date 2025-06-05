@@ -8,23 +8,25 @@ const EMPTY_JSON_OBJECT_BYTES: &[u8] = b"{}";
 pub(crate) struct CategoryDocData(
     /// ID and Version
     &'static str,
+    /// Content bytes
+    &'static [u8],
 );
 /// List of category documents, 12 categories for Fund 14.
 // TODO: Fix Content once it is added
 #[rustfmt::skip]
 pub(crate) const CATEGORY_DOCUMENTS: [CategoryDocData; 12] = [
-    CategoryDocData("0194d490-30bf-7473-81c8-a0eaef369619"),
-    CategoryDocData("0194d490-30bf-7043-8c5c-f0e09f8a6d8c"),
-    CategoryDocData("0194d490-30bf-7e75-95c1-a6cf0e8086d9"),
-    CategoryDocData("0194d490-30bf-7703-a1c0-83a916b001e7"),
-    CategoryDocData("0194d490-30bf-79d1-9a0f-84943123ef38"),
-    CategoryDocData("0194d490-30bf-706d-91c6-0d4707f74cdf"),
-    CategoryDocData("0194d490-30bf-759e-b729-304306fbaa5e"),
-    CategoryDocData("0194d490-30bf-7e27-b5fd-de3133b54bf6"),
-    CategoryDocData("0194d490-30bf-7f9e-8a5d-91fb67c078f2"),
-    CategoryDocData("0194d490-30bf-7676-9658-36c0b67e656e"),
-    CategoryDocData("0194d490-30bf-7978-b031-7aa2ccc5e3fd"),
-    CategoryDocData("0194d490-30bf-7d34-bba9-8498094bd627"),
+    CategoryDocData("0194d490-30bf-7473-81c8-a0eaef369619", include_bytes!("./docs/category/f14_partner_product.schema.json")),
+    CategoryDocData("0194d490-30bf-7043-8c5c-f0e09f8a6d8c", include_bytes!("./docs/category/f14_concepts.schema.json")),
+    CategoryDocData("0194d490-30bf-7e75-95c1-a6cf0e8086d9", include_bytes!("./docs/category/f14_developers.schema.json")),
+    CategoryDocData("0194d490-30bf-7703-a1c0-83a916b001e7", include_bytes!("./docs/category/f14_ecosystem.schema.json")),
+    CategoryDocData("0194d490-30bf-79d1-9a0f-84943123ef38", EMPTY_JSON_OBJECT_BYTES),
+    CategoryDocData("0194d490-30bf-706d-91c6-0d4707f74cdf", EMPTY_JSON_OBJECT_BYTES),
+    CategoryDocData("0194d490-30bf-759e-b729-304306fbaa5e", EMPTY_JSON_OBJECT_BYTES),
+    CategoryDocData("0194d490-30bf-7e27-b5fd-de3133b54bf6", EMPTY_JSON_OBJECT_BYTES),
+    CategoryDocData("0194d490-30bf-7f9e-8a5d-91fb67c078f2", EMPTY_JSON_OBJECT_BYTES),
+    CategoryDocData("0194d490-30bf-7676-9658-36c0b67e656e", EMPTY_JSON_OBJECT_BYTES),
+    CategoryDocData("0194d490-30bf-7978-b031-7aa2ccc5e3fd", EMPTY_JSON_OBJECT_BYTES),
+    CategoryDocData("0194d490-30bf-7d34-bba9-8498094bd627", EMPTY_JSON_OBJECT_BYTES),
 ];
 
 impl From<CategoryDocData> for SignedDocData {
@@ -33,7 +35,7 @@ impl From<CategoryDocData> for SignedDocData {
             id: value.0,
             ver: value.0,
             doc_type: catalyst_signed_doc::doc_types::CATEGORY_DOCUMENT_UUID_TYPE,
-            content: EMPTY_JSON_OBJECT_BYTES,
+            content: value.1,
             category_id: None,
         }
     }

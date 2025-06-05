@@ -20,13 +20,13 @@ extension type UuidV4._(List<int> bytes) {
     }
   }
 
-  /// Builds a [UuidV4] from a [string].
-  UuidV4.fromString(String string) : this.fromBytes(_uuidToBinary(string));
-
   /// Deserializes the type from cbor.
   factory UuidV4.fromCbor(CborValue value) {
     return UuidV4.fromBytes((value as CborBytes).bytes);
   }
+
+  /// Builds a [UuidV4] from a [string].
+  UuidV4.fromString(String string) : this.fromBytes(_uuidToBinary(string));
 
   /// Serializes the type as cbor.
   CborValue toCbor() => CborBytes(bytes);

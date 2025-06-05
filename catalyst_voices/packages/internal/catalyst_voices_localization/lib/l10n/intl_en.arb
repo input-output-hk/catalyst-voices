@@ -644,6 +644,10 @@
   "@registrationWalletNotFound": {
     "description": "Error message shown when connect wallet but matching was not found"
   },
+  "registrationAccountNotFound": "Account not found. Make sure seed phrase is correct.",
+  "@registrationAccountNotFound": {
+    "description": "Error message shown when recovering account with invalid seed phrase."
+  },
   "walletLinkRoleChooserTitle": "How do you want to participate in Catalyst?",
   "@walletLinkRoleChooserTitle": {
     "description": "A title on the role chooser screen in registration."
@@ -1115,6 +1119,10 @@
   "errorWalletLinkInternalError": "Wallet authorisation internal error",
   "errorWalletLinkRefused": "Wallet authorisation failed",
   "errorWalletLinkAccountChange": "Wallet account change",
+  "errorSeedPhraseWordsDoNotMatch": "Words do not match",
+  "@errorSeedPhraseWordsDoNotMatch": {
+    "description": "Error message when user inserts incorrect seed phrase words"
+  },
   "all": "All",
   "@all": {
     "description": "Primary used to select all object. To display object without any filter"
@@ -1450,7 +1458,10 @@
   },
   "howItWorksFollowDescription": "Receive regular updates on all the funded ideas, so you can follow along and see how things are progressing.",
   "heroSectionTitle": "Create, fund and deliver the future of Cardano.",
-  "projectCatalystDescription": "Project Catalyst is an experiment in community innovation, providing a framework to turn ideas into impactful real world projects.\n\nWe're putting the community at the heart of Cardano's future development. Are you ready for the Challenge?",
+  "projectCatalystDescription": "Project Catalyst is the world’s largest decentralized innovation engine for solving real-world challenges.\n\nWe're putting the community at the heart of Cardano's future development.\n\nAre you ready for the Challenge?",
+  "@projectCatalystDescription": {
+    "description": "description text for discovery page in hero section"
+  },
   "viewCurrentCampaign": "View Current Campaign",
   "catalystF14": "Catalyst Fund14",
   "@catalystF14": {
@@ -1465,7 +1476,15 @@
   "maximumAsk": "Maximum Ask",
   "minimumAsk": "Minimum Ask",
   "ideaJourney": "Idea Journey",
-  "ideaJourneyDescription": "#### Ideas comes to life in Catalyst through its key stages below. For the full timeline, deadlines and latest updates, visit the [fund timeline](https://docs.projectcatalyst.io/current-fund/fund-basics/fund-timeline) Gitbook page.",
+  "ideaJourneyDescription": "#### Ideas come to life in Catalyst through the key stages below. For the full timeline, deadlines and latest updates, visit the [fund timeline]({link}) Gitbook page.", 
+  "@ideaJourneyDescription": {
+    "description": "Description for the idea journey section",
+    "placeholders": {
+      "link": {
+        "type": "String"
+      }
+    }
+  },
   "ongoing": "Ongoing",
   "from": "From",
   "to": "To",
@@ -2292,7 +2311,7 @@
   "@turnOpinionsIntoActions": {
     "description": "Title for becoming a reviewer"
   },
-  "becomeReviewer": "Become a Reviewer",
+  "becomeReviewer": "Become a Reviewer!",
   "@becomeReviewer": {
     "description": "Title for becoming a reviewer"
   },
@@ -2304,19 +2323,15 @@
   "@votingRegistration": {
     "description": "Title for registration for voting"
   },
-  "copyMyCatalystId": "Copy my Catalyst ID",
-  "@copyMyCatalystId": {
-    "description": "Action to copy my catalyst id"
-  },
   "stayInvolved": "Stay Involved",
   "@stayInvolved": {
     "description": "Title for the stay involved section"
   },
-  "stayInvolvedReviewerDescription": "Your voice has power. Use it to guide others and help improve the Cardano community.\n\nAs a reviewer, you'll make a real impact by sharing thoughtful feedback and influencing decisions.",
+  "stayInvolvedReviewerDescription": "Your voice has power. Use it to guide others and help improve the Cardano community.\n\nAs a reviewer, you’ll make a real impact by sharing thoughtful feedback and influencing decisions.",
   "@stayInvolvedReviewerDescription": {
     "description": "Description for the reviewer cards in stay involved section"
   },
-  "stayInvolvedContributorDescription": "Get Ready! This is your chance to have a say in where the funds go. To make sure you're ready to participate.\n\nRemember, by casting your vote, you're not only influencing the development of Cardano but also helping to build a community that reflects the values you care about.",
+  "stayInvolvedContributorDescription": "Get Ready! This is your chance to have a say in where the funds go. To make sure you're ready to participate.\n\nRemember, by voting, you're not only influencing the development of Cardano but also helping to build a community that reflects the values you care about.",
   "@stayInvolvedContributorDescription": {
     "description": "Description for the contributor cards in stay involved section"
   },
@@ -2793,17 +2808,29 @@
   "@devToolsAlreadyDeveloper": {
     "description": "SnackBar message when trying to enable dev tools while already enabled"
   },
-  "devToolsAlreadyDeveloperMessage": "Open DevTools with cmd+shift+D shortcut",
+  "devToolsAlreadyDeveloperMessage": "Open DevTools with {shortcut} shortcut",
   "@devToolsAlreadyDeveloperMessage": {
-    "description": "Explanation text"
+    "description": "Explanation text",
+    "placeholders": {
+      "shortcut": {
+        "type": "String",
+        "example": "cmd+shift+D"
+      }
+    }
   },
   "devToolsBecameDeveloper": "You became developer!",
   "@devToolsBecameDeveloper": {
     "description": "SnackBar message when enable dev tools"
   },
-  "devToolsBecameDeveloperMessage": "Open DevTools with cmd+shift+D shortcut",
+  "devToolsBecameDeveloperMessage": "Open DevTools with {shortcut} shortcut",
   "@devToolsBecameDeveloperMessage": {
-    "description": "Explanation text"
+    "description": "Explanation text",
+    "placeholders": {
+      "shortcut": {
+        "type": "String",
+        "example": "cmd+shift+D"
+      }
+    }
   },
   "devToolsTapsLeftToEnable": "{count} taps left",
   "@devToolsTapsLeftToEnable": {
@@ -2817,5 +2844,120 @@
   "devToolsTapsLeftToEnableMessage": "Keep on tapping",
   "@devToolsTapsLeftToEnableMessage": {
     "description": "Explanation text"
+  },
+  "createProposalInCategory": "Create Proposal in {category}",
+  "@createProposalInCategory": {
+    "description": "Title of the dialog for creating a proposal in a specific category",
+    "placeholders": {
+      "category": {
+        "type": "String"
+      }
+    }
+  },
+  "enterTitle": "Enter title",
+  "@enterTitle": {
+    "description": "CTA text for the title input field"
+  },
+  "proposalTitleShortDescription": "A strong proposal title can really set the tone and capture attention. ",
+  "@proposalTitleShortDescription": {
+    "description": "Short description for the title input field"
+  },
+  "agreementCantChangeCategory": "I understand that I can’t change my category selection in Fund14.",
+  "@agreementCantChangeCategory": {
+    "description": "Text for the agreement checkbox that explains that user can't change category selection in Fund14"
+  },
+  "agreementFitToCategoryCriteria": "I understand the category brief and will make sure my proposal fits the criteria.",
+  "@agreementFitToCategoryCriteria": {
+    "description": "Text for the agreement checkbox that explains that user understands the category brief and will make sure their proposal fits the criteria"
+  },
+  "categorySelectionDescription": "Choose Wisely! Review the category and its rules carefully as this can’t be changed after you make a selection. To switch, you’ll need to start a new proposal.",
+  "@categorySelectionDescription": {
+    "description": "Text for the category selection description in new proposal dialog"
+  },
+  "selectCategory": "Select Category",
+  "@selectCategory": {
+    "description": "Text for the select category button in new proposal dialog"
+  },
+  "selectCategoryToSeeDetailsTitle": "Select a category to check if this category is for you.",
+  "@selectCategoryToSeeDetailsTitle": {
+    "description": "Text for the select category to see details title in new proposal dialog"
+  },
+  "selectCategoryToSeeDetailsDescription": "Do keep in mind that you can’t change category\nafter starting your proposal.",
+  "@selectCategoryToSeeDetailsDescription": {
+    "description": "Text for the select category to see details description in new proposal dialog"
+  },
+  "readCategoryBriefButtonLabel": "Read category brief",
+  "@readCategoryBriefButtonLabel": {
+    "description": "Label for the read category brief button"
+  },
+  "proposalsLatestUpdatesHours": "Latest updates ({count}{count, plural, =1{hr} other{hrs}})",
+  "@proposalsLatestUpdatesHours": {
+    "description": "One of filter options for proposals. Meaning show only latest proposals.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "orderProposalsAlphabetical": "Alphabetical",
+  "@orderProposalsAlphabetical": {
+    "description": "Order proposals by title option"
+  },
+  "orderProposalsBudgetAsc": "Budget: lowest first",
+  "@orderProposalsBudgetAsc": {
+    "description": "Order proposals by budget option"
+  },
+  "orderProposalsBudgetDesc": "Budget: highest first",
+  "@orderProposalsBudgetDesc": {
+    "description": "Order proposals by budget option"
+  },
+  "orderProposalsUpdateDateAsc": "Oldest to newest",
+  "@orderProposalsUpdateDateAsc": {
+    "description": "Order proposals by update date option"
+  },
+  "orderProposalsUpdateDateDesc": "Newest to oldest",
+  "@orderProposalsUpdateDateDesc": {
+    "description": "Order proposals by update date option"
+  },
+  "catalystId": "Catalyst ID",
+  "@catalystId": {
+    "description": "Label of chip with account catalyst ID clearly describing content"
+  },
+  "tip": "Tip",
+  "@tip": {
+    "description": "Generic affix which can be used in different scenarios."
+  },
+  "tipCopyCatalystIdForReviewTool": "Copy your Catalyst ID before you go to the [Community Review module.]({url})",
+  "@tipCopyCatalystIdForReviewTool": {
+    "description": "Gives context where Catalyst ID can be used",
+    "placeholders": {
+      "url": {
+        "type": "String"
+      }
+    }
+  },
+  "starts": "Starts:",
+  "@starts": {
+    "description": "Label for the campaign stage start date"
+  },
+  "finishes": "Finishes:",
+  "@finishes": {
+    "description": "Label for the campaign stage finish date"
+  },
+  "registerToVoteFund14": "Register to Vote in Fund14",
+  "@registerToVoteFund14": {
+    "description": "Title of the register to vote section"
+  },
+  "becomeVoter": "Become a Voter",
+  "@becomeVoter": {
+    "description": "Title for becoming a voter"
+  },
+  "votingRegistrationTimelineHeader": "Voting registration:",
+  "@votingRegistrationTimelineHeader": {
+    "description": "Header for the voting registration timeline"
+  },
+  "votingTimelineHeader": "Voting:",
+  "@votingTimelineHeader": {
+    "description": "Header for the voting timeline"
   }
 }

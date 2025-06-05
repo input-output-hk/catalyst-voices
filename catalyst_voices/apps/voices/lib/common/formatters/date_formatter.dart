@@ -77,6 +77,10 @@ abstract class DateFormatter {
     return DateFormat('d MMM HH:mm').format(dateTime);
   }
 
+  static String formatFullDate24Format(DateTime dateTime) {
+    return DateFormat('d MMM, yyyy - HH:mm').format(dateTime);
+  }
+
   /// Formats full date and time.
   /// If [timeOnNewline] is true then the time will be placed on a new line.
   ///

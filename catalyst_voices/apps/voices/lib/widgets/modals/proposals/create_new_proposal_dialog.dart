@@ -2,12 +2,10 @@ import 'dart:async';
 
 import 'package:catalyst_voices/common/error_handler.dart';
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
-import 'package:catalyst_voices/routes/routes.dart';
-import 'package:catalyst_voices/routes/routing/proposal_builder_route.dart';
-import 'package:catalyst_voices/widgets/dropdown/voices_dropdown.dart';
 import 'package:catalyst_voices/widgets/modals/details/voices_align_title_header.dart';
+import 'package:catalyst_voices/widgets/modals/proposals/create_new_proposal_action_buttons.dart';
+import 'package:catalyst_voices/widgets/modals/proposals/create_new_proposal_category_selection.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
-import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -21,102 +19,26 @@ typedef _SelectedCategoryData = ({
 });
 
 class CreateNewProposalDialog extends StatefulWidget {
-  const CreateNewProposalDialog({super.key});
+  final SignedDocumentRef? categoryRef;
+
+  const CreateNewProposalDialog({super.key, this.categoryRef});
 
   @override
   State<CreateNewProposalDialog> createState() => _CreateNewProposalDialogState();
 
-  static Future<void> show(BuildContext context) async {
+  static Future<void> show(
+    BuildContext context, {
+    SignedDocumentRef? categoryRef,
+  }) async {
     final result = showDialog<void>(
       context: context,
       routeSettings: const RouteSettings(name: '/create-new-proposal'),
-      builder: (context) => const CreateNewProposalDialog(),
+      builder: (context) => CreateNewProposalDialog(
+        categoryRef: categoryRef,
+      ),
     );
 
     return result;
-  }
-}
-
-class _ActionButtons extends StatelessWidget {
-  final VoidCallback onSave;
-  final VoidCallback onOpenInEditor;
-
-  const _ActionButtons({
-    required this.onSave,
-    required this.onOpenInEditor,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        VoicesFilledButton(
-          onTap: () {
-            Navigator.of(context).pop();
-            const DiscoveryRoute().go(context);
-          },
-          leading: VoicesAssets.icons.informationCircle.buildIcon(),
-          child: Text(context.l10n.jumpToCampaignCategory),
-        ),
-        const Spacer(),
-        BlocSelector<NewProposalCubit, NewProposalState, bool>(
-          selector: (state) => state.isValid && !state.isCreatingProposal,
-          builder: (context, canTap) {
-            return VoicesTextButton(
-              onTap: canTap ? onSave : null,
-              child: Text(context.l10n.saveDraft),
-            );
-          },
-        ),
-        const SizedBox(width: 8),
-        BlocSelector<NewProposalCubit, NewProposalState, bool>(
-          selector: (state) => state.isValid && !state.isCreatingProposal,
-          builder: (context, canTap) {
-            return VoicesFilledButton(
-              onTap: canTap ? onOpenInEditor : null,
-              child: Text(context.l10n.openInEditor),
-            );
-          },
-        ),
-      ],
-    );
-  }
-}
-
-class _CategorySelection extends StatelessWidget {
-  final FocusNode focusNode;
-
-  const _CategorySelection({required this.focusNode});
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocSelector<NewProposalCubit, NewProposalState, _SelectedCategoryData>(
-      selector: (state) {
-        return (
-          categories: state.categories,
-          value: state.categoryId,
-        );
-      },
-      builder: (context, state) {
-        return SingleSelectDropdown<SignedDocumentRef>(
-          focusNode: focusNode,
-          filled: false,
-          borderRadius: 8,
-          items: state.categories
-              .map(
-                (e) => DropdownMenuEntry(
-                  value: e.id,
-                  label: e.formattedName,
-                ),
-              )
-              .toList(),
-          value: state.value,
-          onChanged: (value) {
-            context.read<NewProposalCubit>().updateSelectedCategory(value);
-          },
-        );
-      },
-    );
   }
 }
 
@@ -125,91 +47,62 @@ class _Content extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<NewProposalCubit, NewProposalState,
-        ({bool isLoading, bool isMissingProposerRole})>(
-      selector: (state) =>
-          (isLoading: state.isLoading, isMissingProposerRole: state.isMissingProposerRole),
-      builder: (context, state) {
-        if (state.isLoading) {
+    return BlocSelector<NewProposalCubit, NewProposalState, bool>(
+      selector: (state) => state.isLoading,
+      builder: (context, isLoading) {
+        if (isLoading) {
           return const _LoadingContent();
-        } else if (state.isMissingProposerRole) {
-          return const _MissingProposerRoleContent();
         } else {
-          return const _CreateNewProposalContent();
+          return BlocSelector<NewProposalCubit, NewProposalState, ProposalCreationStep>(
+            selector: (state) => state.step,
+            builder: (context, step) {
+              return switch (step) {
+                CreateProposalWithPreselectedCategoryStep() => _ContentView(
+                    step: step,
+                    child: const _ProposalTitle(),
+                  ),
+                CreateProposalWithoutPreselectedCategoryStep(:final stage) => switch (stage) {
+                    CreateProposalStage.setTitle => _ContentView(
+                        step: step,
+                        child: const _ProposalTitle(),
+                      ),
+                    CreateProposalStage.selectCategory => _ContentView(
+                        step: step,
+                        child: const _ProposalCategory(),
+                      ),
+                  },
+              };
+            },
+          );
         }
       },
     );
   }
 }
 
-class _CreateNewProposalContent extends StatefulWidget {
-  const _CreateNewProposalContent();
+class _ContentView extends StatelessWidget {
+  final ProposalCreationStep step;
+  final Widget child;
 
-  @override
-  State<_CreateNewProposalContent> createState() => _CreateNewProposalContentState();
-}
-
-class _CreateNewProposalContentState extends State<_CreateNewProposalContent> {
-  final FocusNode _categoryFocusNode = FocusNode();
+  const _ContentView({
+    required this.step,
+    required this.child,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
+      child: Stack(
         children: [
-          _SectionTitle(
-            text: context.l10n.title.starred(),
-          ),
-          _TitleTextField(
-            onFieldSubmitted: _onTitleSubmitted,
-          ),
-          const SizedBox(height: 16),
-          _SectionTitle(
-            text: context.l10n.selectedCategory.starred(),
-          ),
-          _CategorySelection(focusNode: _categoryFocusNode),
-          const SizedBox(height: 40),
-          _ActionButtons(
-            onSave: _onSave,
-            onOpenInEditor: _onOpenInEditor,
+          child,
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: CreateNewProposalActionButtons(step: step),
           ),
         ],
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    _categoryFocusNode.dispose();
-    super.dispose();
-  }
-
-  void onTitleSubmitted(String title) {
-    _categoryFocusNode.requestFocus();
-  }
-
-  Future<void> _onOpenInEditor() async {
-    final cubit = context.read<NewProposalCubit>();
-    final draftRef = await cubit.createDraft();
-    if (draftRef != null && mounted) {
-      ProposalBuilderRoute.fromRef(ref: draftRef).go(context);
-    }
-  }
-
-  Future<void> _onSave() async {
-    final cubit = context.read<NewProposalCubit>();
-    final draftRef = await cubit.createDraft();
-
-    if (draftRef != null && mounted) {
-      Navigator.of(context).pop();
-    }
-  }
-
-  void _onTitleSubmitted(String title) {
-    _categoryFocusNode.requestFocus();
   }
 }
 
@@ -218,9 +111,9 @@ class _CreateNewProposalDialogState extends State<CreateNewProposalDialog>
   @override
   Widget build(BuildContext context) {
     return VoicesDetailsDialog(
-      constraints: const BoxConstraints(maxHeight: 390, maxWidth: 750),
+      constraints: const BoxConstraints.tightFor(height: 800, width: 1200),
       header: VoicesAlignTitleHeader(
-        title: context.l10n.createProposal,
+        title: _getTitle(),
         padding: const EdgeInsets.all(24),
       ),
       body: const _Content(),
@@ -230,7 +123,18 @@ class _CreateNewProposalDialogState extends State<CreateNewProposalDialog>
   @override
   void initState() {
     super.initState();
-    unawaited(context.read<NewProposalCubit>().load());
+    unawaited(context.read<NewProposalCubit>().load(categoryRef: widget.categoryRef));
+  }
+
+  String _getTitle() {
+    final categoryName =
+        context.select<NewProposalCubit, String?>((cubit) => cubit.state.selectedCategoryName);
+
+    if (categoryName == null) {
+      return context.l10n.createProposal;
+    } else {
+      return context.l10n.createProposalInCategory(categoryName);
+    }
   }
 }
 
@@ -245,36 +149,91 @@ class _LoadingContent extends StatelessWidget {
   }
 }
 
-class _MissingProposerRoleContent extends StatelessWidget {
-  const _MissingProposerRoleContent();
+class _ProposalCategory extends StatelessWidget {
+  const _ProposalCategory();
 
   @override
   Widget build(BuildContext context) {
-    // TODO(dtscalac): implement it when design is available
-    return const Placeholder();
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: 28,
+      children: [
+        _SectionTitle(
+          text: context.l10n.selectCategory,
+          description: context.l10n.categorySelectionDescription,
+        ),
+        BlocSelector<NewProposalCubit, NewProposalState, _SelectedCategoryData>(
+          selector: (state) {
+            return (
+              categories: state.categories,
+              value: state.categoryRef,
+            );
+          },
+          builder: (context, state) {
+            return CreateNewProposalCategorySelection(
+              categories: state.categories,
+              selectedCategory: state.value,
+              onCategorySelected: (value) =>
+                  context.read<NewProposalCubit>().updateSelectedCategory(value),
+            );
+          },
+        ),
+      ],
+    );
+  }
+}
+
+class _ProposalTitle extends StatelessWidget {
+  const _ProposalTitle();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      spacing: 28,
+      children: [
+        _SectionTitle(
+          text: context.l10n.title,
+          description: context.l10n.proposalTitleShortDescription,
+        ),
+        const _TitleTextField(),
+      ],
+    );
   }
 }
 
 class _SectionTitle extends StatelessWidget {
   final String text;
+  final String description;
 
   const _SectionTitle({
     required this.text,
+    required this.description,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Text(
-      text,
-      style: context.textTheme.titleSmall,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      spacing: 8,
+      children: [
+        Text(
+          text,
+          style: context.textTheme.titleSmall,
+        ),
+        Text(
+          description,
+          style: context.textTheme.bodyMedium?.copyWith(color: context.colors.textOnPrimaryLevel1),
+        ),
+      ],
     );
   }
 }
 
 class _TitleTextField extends StatelessWidget {
-  final ValueChanged<String> onFieldSubmitted;
-
-  const _TitleTextField({required this.onFieldSubmitted});
+  const _TitleTextField();
 
   @override
   Widget build(BuildContext context) {
@@ -283,7 +242,7 @@ class _TitleTextField extends StatelessWidget {
       builder: (context, title) {
         return VoicesTextField(
           initialText: title.value,
-          onFieldSubmitted: onFieldSubmitted,
+          onFieldSubmitted: (_) {},
           onChanged: (value) =>
               context.read<NewProposalCubit>().updateTitle(ProposalTitle.dirty(value ?? '')),
           decoration: VoicesTextFieldDecoration(
@@ -293,6 +252,7 @@ class _TitleTextField extends StatelessWidget {
               borderRadius: BorderRadius.circular(8),
               borderSide: BorderSide(color: context.colors.outlineBorder),
             ),
+            labelText: context.l10n.enterTitle.starred(),
             errorText: title.displayError?.message(context),
             helperText: context.l10n.required.starred().toLowerCase(),
           ),

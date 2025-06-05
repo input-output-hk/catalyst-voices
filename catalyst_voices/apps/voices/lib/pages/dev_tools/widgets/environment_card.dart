@@ -1,4 +1,4 @@
-import 'package:catalyst_voices/pages/dev_tools/widgets/info_card.dart';
+import 'package:catalyst_voices/pages/dev_tools/cards/info_card.dart';
 import 'package:catalyst_voices/pages/dev_tools/widgets/value_text.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -32,8 +32,14 @@ class _EnvironmentCard extends StatelessWidget {
       title: const Text('Environment'),
       children: [
         ValueText(name: const Text('Env'), value: Text(env?.type.name.capitalize() ?? '-')),
-        ValueText(name: const Text('GatewayUrl'), value: Text(env?.type.gateway.toString() ?? '-')),
-        ValueText(name: const Text('ReviewsUrl'), value: Text(env?.type.reviews.toString() ?? '-')),
+        ValueText(
+          name: const Text('GatewayUrl'),
+          value: Text(env?.type.appGatewayApi.toString() ?? '-'),
+        ),
+        ValueText(
+          name: const Text('ReviewsUrl'),
+          value: Text(env?.type.appReviewsApi.toString() ?? '-'),
+        ),
       ],
     );
   }

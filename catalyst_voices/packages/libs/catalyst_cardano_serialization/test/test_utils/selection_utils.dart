@@ -1,4 +1,5 @@
 import 'dart:math';
+
 import 'package:bip32_ed25519/bip32_ed25519.dart';
 import 'package:catalyst_cardano_serialization/src/address.dart';
 import 'package:catalyst_cardano_serialization/src/builders/transaction_builder.dart';
@@ -21,11 +22,6 @@ final class SelectionUtils {
       'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
       '0123456789';
 
-  List<Ed25519PrivateKey> generateMockPrivateKeys(int count) => List<Ed25519PrivateKey>.generate(
-        count,
-        (int index) => Ed25519PrivateKey.seeded(count),
-      );
-
   /// The default configuration for transaction building.
   ///
   /// This configuration includes fee algorithm parameters, maximum transaction
@@ -41,162 +37,27 @@ final class SelectionUtils {
     coinsPerUtxoByte: Coin(4310),
   );
 
-  /// Generates a random ASCII string of the specified length.
-  ///
-  /// - [length]: The length of the random ASCII string to generate.
-  ///
-  /// Returns:
-  /// - A random ASCII string of the specified length.
-  static String randomAscii(int length) =>
-      List.generate(length, (index) => _chars[_kRandom.nextInt(_chars.length)]).join();
-
-  /// Generates a random Shelley address.
-  ///
-  /// - [isBase]: If `true`, generates a base address. Otherwise, generates an
-  ///   enterprise address.
-  /// - [networkId]: Specifies the network for address generation.
-  ///
-  /// Returns:
-  /// - A random [ShelleyAddress].
-  static ShelleyAddress randomAddress({
-    bool isBase = true,
-    NetworkId networkId = NetworkId.testnet,
-  }) =>
-      ShelleyAddress(
-        [
-          _getMockAddressHrp(isBase: isBase, networkId: networkId),
-          ...randomBytes(
-            isBase ? ShelleyAddress.baseAddrLength - 1 : ShelleyAddress.entAddrLength - 1,
-          ),
-        ],
-      );
-
-  static int _getMockAddressHrp({
-    bool isBase = true,
-    NetworkId networkId = NetworkId.testnet,
-  }) =>
-      0 | (isBase ? 0x00 : 0x20) | networkId.id;
-
-  /// Generates a list of random Shelley addresses.
-  ///
-  /// - [count]: The number of addresses to generate.
-  /// - [isBase]: If `true`, generates base addresses. Otherwise, generates
-  ///   enterprise addresses.
-  /// - [networkId]: Specifies the network for address generation.
-  ///
-  /// Returns:
-  /// - A list of random [ShelleyAddress] objects.
-  static List<ShelleyAddress> randomAddresses({
-    required int count,
-    bool isBase = true,
-    NetworkId networkId = NetworkId.testnet,
-  }) =>
-      List<ShelleyAddress>.generate(
+  List<Ed25519PrivateKey> generateMockPrivateKeys(int count) => List<Ed25519PrivateKey>.generate(
         count,
-        (_) => randomAddress(isBase: isBase, networkId: networkId),
+        (int index) => Ed25519PrivateKey.seeded(count),
       );
 
-  static List<ShelleyAddress> mockAddresses({
-    required int count,
-    bool isBase = true,
-    NetworkId networkId = NetworkId.testnet,
+  /// Generates a random amount of a balance between minPercentage and
+  /// maxPercentage.
+  static Coin calculateRandomAmount(
+    Coin balance, {
+    int minPercentage = 0,
+    int maxPercentage = 80,
   }) {
-    return List<ShelleyAddress>.generate(
-      count,
-      (int index) {
-        final prv = Bip32SigningKey.normalizeBytes(
-          Uint8List.fromList(List.filled(96, count)),
-        );
+    final randomPercentage =
+        minPercentage + _kRandom.nextDouble() * (maxPercentage - minPercentage);
 
-        final pub = prv.publicKey;
-        final hrp = _getMockAddressHrp(isBase: isBase, networkId: networkId);
+    final randomAmount = (balance.value * (randomPercentage / 100)).toInt();
 
-        final addrBytes =
-            isBase ? <int>[...pub.prefix, ...List<int>.filled(28, count)] : pub.prefix.toList();
-        final addr = ShelleyAddress([hrp, ...addrBytes]);
+    final adjustedAmount = randomAmount == 0 ? 1 : randomAmount;
 
-        return addr;
-      },
-    );
+    return Coin(adjustedAmount);
   }
-
-  /// Generates a random balance.
-  ///
-  /// - [withTokens]: If `true`, includes random tokens in the balance.
-  ///
-  /// Returns:
-  /// - A random [Balance].
-  static Balance randomBalance({bool withTokens = false}) =>
-      randomBalances(count: 1, withTokens: withTokens).first;
-
-  /// Generates a list of random balances.
-  ///
-  /// - [count]: The number of balances to generate.
-  /// - [withTokens]: If `true`, includes random tokens in the balances.
-  ///
-  /// Returns:
-  /// - A list of random [Balance] objects.
-  static List<Balance> randomBalances({
-    required int count,
-    Coin minimumCoin = const Coin(0),
-    bool withTokens = false,
-  }) {
-    final pids = List.generate(10, (int index) {
-      return PolicyId(randomHexString(PolicyId.hashLength));
-    });
-
-    final assetNames = List.generate(10, (int index) {
-      final assetNameLength = _kRandom.nextInt(32).clamp(4, 16);
-      return AssetName(randomAscii(assetNameLength));
-    });
-
-    final balances = <Balance>[];
-    final distr = generateWeibullDistribution(count, 1.5, 2);
-
-    for (var i = 0; i < count; i++) {
-      final nextInt = _kRandom.nextInt(10);
-      final assetNr = _kRandom.nextInt(6) + 1;
-      final assetDistr = generateWeibullDistribution(assetNr, 1.5, 2);
-
-      final assets = List<Map<AssetName, Coin>>.generate(assetNr, (int index) {
-        return {
-          assetNames[nextInt]: Coin(assetDistr[_kRandom.nextInt(assetNr)].toInt()),
-        };
-      });
-      final multiAsset = withTokens
-          ? MultiAsset(
-              bundle: {
-                pids[nextInt]: Map<AssetName, Coin>.fromEntries(
-                  assets.expand((map) => map.entries),
-                ),
-              },
-            )
-          : null;
-
-      final coin = Coin(distr[i].toInt());
-      final lovelace = coin < minimumCoin ? minimumCoin + coin : coin;
-      final balance = Balance(coin: lovelace, multiAsset: multiAsset);
-      balances.add(balance);
-    }
-    return balances;
-  }
-
-  /// Generates a list of random bytes.
-  ///
-  /// - [length]: The length of the byte list to generate.
-  ///
-  /// Returns:
-  /// - A list of random bytes.
-  static List<int> randomBytes(int length) => List.generate(length, (_) => _kRandom.nextInt(256));
-
-  /// Generates a random hexadecimal string of the given byte length.
-  ///
-  /// - [bytesLength]: The number of bytes to generate before encoding as hex.
-  ///
-  /// Returns:
-  /// A random hexadecimal string representation of the generated bytes.
-
-  static String randomHexString(int bytesLength) => hex.encoder.convert(randomBytes(bytesLength));
 
   /// Generates a set of random UTxOs (Unspent Transaction Outputs).
   ///
@@ -281,21 +142,62 @@ final class SelectionUtils {
     return weibullNumbers;
   }
 
-  /// Generates a random amount of a balance between minPercentage and
-  /// maxPercentage.
-  static Coin calculateRandomAmount(
-    Coin balance, {
-    int minPercentage = 0,
-    int maxPercentage = 80,
+  static List<ShelleyAddress> mockAddresses({
+    required int count,
+    bool isBase = true,
+    NetworkId networkId = NetworkId.testnet,
   }) {
-    final randomPercentage =
-        minPercentage + _kRandom.nextDouble() * (maxPercentage - minPercentage);
+    return List<ShelleyAddress>.generate(
+      count,
+      (int index) {
+        final prv = Bip32SigningKey.normalizeBytes(
+          Uint8List.fromList(List.filled(96, count)),
+        );
 
-    final randomAmount = (balance.value * (randomPercentage / 100)).toInt();
+        final pub = prv.publicKey;
+        final hrp = _getMockAddressHrp(isBase: isBase, networkId: networkId);
 
-    final adjustedAmount = randomAmount == 0 ? 1 : randomAmount;
+        final addrBytes =
+            isBase ? <int>[...pub.prefix, ...List<int>.filled(28, count)] : pub.prefix.toList();
+        final addr = ShelleyAddress([hrp, ...addrBytes]);
 
-    return Coin(adjustedAmount);
+        return addr;
+      },
+    );
+  }
+
+  /// Normalizes a transaction input to meet the minimum ADA requirement.
+  ///
+  /// - [input]: The [TransactionUnspentOutput] to normalize.
+  /// - [config]: The [TransactionBuilderConfig] to use for the normalization.
+  ///
+  /// Returns:
+  /// - A normalized [TransactionOutput].
+  static TransactionOutput normalizeInputForMinAda({
+    required TransactionUnspentOutput input,
+    required TransactionBuilderConfig config,
+  }) {
+    final output = input.output;
+
+    final coin = output.amount.coin;
+
+    final minAda = TransactionOutputBuilder.minimumAdaForOutput(
+      output,
+      config.coinsPerUtxoByte,
+    );
+
+    final outputFee = TransactionOutputBuilder.feeForOutput(config, output, numOutputs: 1);
+    final totalFee = minAda + outputFee;
+
+    return coin < totalFee
+        ? TransactionOutput(
+            address: output.address,
+            amount: Balance(coin: totalFee),
+          )
+        : TransactionOutput(
+            address: output.address,
+            amount: output.amount,
+          );
   }
 
   /// Generates a list of transaction outputs from a set of UTxOs.
@@ -353,6 +255,133 @@ final class SelectionUtils {
     });
   }
 
+  /// Generates a random Shelley address.
+  ///
+  /// - [isBase]: If `true`, generates a base address. Otherwise, generates an
+  ///   enterprise address.
+  /// - [networkId]: Specifies the network for address generation.
+  ///
+  /// Returns:
+  /// - A random [ShelleyAddress].
+  static ShelleyAddress randomAddress({
+    bool isBase = true,
+    NetworkId networkId = NetworkId.testnet,
+  }) =>
+      ShelleyAddress(
+        [
+          _getMockAddressHrp(isBase: isBase, networkId: networkId),
+          ...randomBytes(
+            isBase ? ShelleyAddress.baseAddrLength - 1 : ShelleyAddress.entAddrLength - 1,
+          ),
+        ],
+      );
+
+  /// Generates a list of random Shelley addresses.
+  ///
+  /// - [count]: The number of addresses to generate.
+  /// - [isBase]: If `true`, generates base addresses. Otherwise, generates
+  ///   enterprise addresses.
+  /// - [networkId]: Specifies the network for address generation.
+  ///
+  /// Returns:
+  /// - A list of random [ShelleyAddress] objects.
+  static List<ShelleyAddress> randomAddresses({
+    required int count,
+    bool isBase = true,
+    NetworkId networkId = NetworkId.testnet,
+  }) =>
+      List<ShelleyAddress>.generate(
+        count,
+        (_) => randomAddress(isBase: isBase, networkId: networkId),
+      );
+
+  /// Generates a random ASCII string of the specified length.
+  ///
+  /// - [length]: The length of the random ASCII string to generate.
+  ///
+  /// Returns:
+  /// - A random ASCII string of the specified length.
+  static String randomAscii(int length) =>
+      List.generate(length, (index) => _chars[_kRandom.nextInt(_chars.length)]).join();
+
+  /// Generates a random balance.
+  ///
+  /// - [withTokens]: If `true`, includes random tokens in the balance.
+  ///
+  /// Returns:
+  /// - A random [Balance].
+  static Balance randomBalance({bool withTokens = false}) =>
+      randomBalances(count: 1, withTokens: withTokens).first;
+
+  /// Generates a list of random balances.
+  ///
+  /// - [count]: The number of balances to generate.
+  /// - [withTokens]: If `true`, includes random tokens in the balances.
+  ///
+  /// Returns:
+  /// - A list of random [Balance] objects.
+  static List<Balance> randomBalances({
+    required int count,
+    Coin minimumCoin = const Coin(0),
+    bool withTokens = false,
+  }) {
+    final pids = List.generate(10, (int index) {
+      return PolicyId(randomHexString(PolicyId.hashLength));
+    });
+
+    final assetNames = List.generate(10, (int index) {
+      final assetNameLength = _kRandom.nextInt(32).clamp(4, 16);
+      return AssetName(randomAscii(assetNameLength));
+    });
+
+    final balances = <Balance>[];
+    final distr = generateWeibullDistribution(count, 1.5, 2);
+
+    for (var i = 0; i < count; i++) {
+      final nextInt = _kRandom.nextInt(10);
+      final assetNr = _kRandom.nextInt(6) + 1;
+      final assetDistr = generateWeibullDistribution(assetNr, 1.5, 2);
+
+      final assets = List<Map<AssetName, Coin>>.generate(assetNr, (int index) {
+        return {
+          assetNames[nextInt]: Coin(assetDistr[_kRandom.nextInt(assetNr)].toInt()),
+        };
+      });
+      final multiAsset = withTokens
+          ? MultiAsset(
+              bundle: {
+                pids[nextInt]: Map<AssetName, Coin>.fromEntries(
+                  assets.expand((map) => map.entries),
+                ),
+              },
+            )
+          : null;
+
+      final coin = Coin(distr[i].toInt());
+      final lovelace = coin < minimumCoin ? minimumCoin + coin : coin;
+      final balance = Balance(coin: lovelace, multiAsset: multiAsset);
+      balances.add(balance);
+    }
+    return balances;
+  }
+
+  /// Generates a list of random bytes.
+  ///
+  /// - [length]: The length of the byte list to generate.
+  ///
+  /// Returns:
+  /// - A list of random bytes.
+  static List<int> randomBytes(int length) => List.generate(length, (_) => _kRandom.nextInt(256));
+
+  /// Generates a random hexadecimal string of the given byte length.
+  ///
+  /// - [bytesLength]: The number of bytes to generate before encoding as hex.
+  ///
+  /// Returns:
+  /// A random hexadecimal string representation of the generated bytes.
+
+  static String randomHexString(int bytesLength) => hex.encoder.convert(randomBytes(bytesLength));
+
   /// Selects a specified number of tokens from a balance.
   ///
   /// - [balance]: The [Balance] from which to select tokens.
@@ -401,37 +430,9 @@ final class SelectionUtils {
     return result;
   }
 
-  /// Normalizes a transaction input to meet the minimum ADA requirement.
-  ///
-  /// - [input]: The [TransactionUnspentOutput] to normalize.
-  /// - [config]: The [TransactionBuilderConfig] to use for the normalization.
-  ///
-  /// Returns:
-  /// - A normalized [TransactionOutput].
-  static TransactionOutput normalizeInputForMinAda({
-    required TransactionUnspentOutput input,
-    required TransactionBuilderConfig config,
-  }) {
-    final output = input.output;
-
-    final coin = output.amount.coin;
-
-    final minAda = TransactionOutputBuilder.minimumAdaForOutput(
-      output,
-      config.coinsPerUtxoByte,
-    );
-
-    final outputFee = TransactionOutputBuilder.feeForOutput(config, output, numOutputs: 1);
-    final totalFee = minAda + outputFee;
-
-    return coin < totalFee
-        ? TransactionOutput(
-            address: output.address,
-            amount: Balance(coin: totalFee),
-          )
-        : TransactionOutput(
-            address: output.address,
-            amount: output.amount,
-          );
-  }
+  static int _getMockAddressHrp({
+    bool isBase = true,
+    NetworkId networkId = NetworkId.testnet,
+  }) =>
+      0 | (isBase ? 0x00 : 0x20) | networkId.id;
 }

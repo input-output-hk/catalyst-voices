@@ -1,9 +1,15 @@
+import 'dart:async';
+
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
+import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/pages/proposal_builder/tiles/proposal_builder_comment_tile.dart';
 import 'package:catalyst_voices/widgets/comment/proposal_add_comment_tile.dart';
 import 'package:catalyst_voices/widgets/comment/proposal_comments_header_tile.dart';
+import 'package:catalyst_voices/widgets/list/category_requirements_list.dart';
+import 'package:catalyst_voices/widgets/modals/proposals/category_brief_dialog.dart';
 import 'package:catalyst_voices/widgets/tiles/specialized/proposal_tile_decoration.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
+import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -12,7 +18,12 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
+part 'proposal_builder_action_widgets.dart';
 part 'proposal_builder_document_widgets.dart';
+
+final DocumentPropertyActionOverrides _widgetActionOverrides = {
+  ProposalDocument.categoryDetailsNodeId: const _CategoryDetailsAction(),
+};
 
 final DocumentPropertyBuilderOverrides _widgetOverrides = {
   ProposalDocument.categoryDetailsNodeId: (context, property) =>
@@ -69,21 +80,29 @@ class _DocumentSection extends StatelessWidget {
     return BlocSelector<ProposalBuilderBloc, ProposalBuilderState, bool>(
       selector: (state) => state.validationErrors?.showErrors ?? false,
       builder: (context, showValidationErrors) {
-        return DocumentBuilderSectionTile(
-          key: key,
-          section: property,
-          isSelected: isSelected,
-          isEditable: _isEditable,
-          autovalidateMode:
-              showValidationErrors ? AutovalidateMode.always : AutovalidateMode.disabled,
-          onChanged: (value) {
-            final event = SectionChangedEvent(changes: value);
-            context.read<ProposalBuilderBloc>().add(event);
-          },
-          overrides: _widgetOverrides,
+        return GestureDetector(
+          onTap: () => _handleOnTap(context),
+          child: DocumentBuilderSectionTile(
+            key: ValueKey('DocumentProperty[${property.nodeId.value}]Tile'),
+            section: property,
+            isSelected: isSelected,
+            isEditable: _isEditable,
+            autovalidateMode:
+                showValidationErrors ? AutovalidateMode.always : AutovalidateMode.disabled,
+            onChanged: (value) {
+              final event = SectionChangedEvent(changes: value);
+              context.read<ProposalBuilderBloc>().add(event);
+            },
+            actionOverrides: _widgetActionOverrides,
+            overrides: _widgetOverrides,
+          ),
         );
       },
     );
+  }
+
+  void _handleOnTap(BuildContext context) {
+    SegmentsControllerScope.of(context).selectSectionStep(property.nodeId, shouldScroll: false);
   }
 }
 
@@ -106,17 +125,24 @@ class _ProposalBuilderSegments extends StatelessWidget {
           items: items,
           itemScrollController: itemScrollController,
           padding: const EdgeInsets.only(top: 16, bottom: 64),
+          // TODO(damian-molinski): Remove this workaround in #2697.
+          // ListView should be able to dispose its children when out of view port.
+          // Read more in issue description.
+          minCacheExtent: double.infinity,
           itemBuilder: (context, index) {
             final item = items[index];
             final previousItem = index == 0 ? null : items.elementAtOrNull(index - 1);
             final nextItem = items.elementAtOrNull(index + 1);
 
-            return _buildItem(
-              context: context,
-              item: item,
-              previousItem: previousItem,
-              nextItem: nextItem,
-              selectedNodeId: selectedNodeId,
+            return KeyedSubtree(
+              key: ValueKey(item.id),
+              child: _buildItem(
+                context: context,
+                item: item,
+                previousItem: previousItem,
+                nextItem: nextItem,
+                selectedNodeId: selectedNodeId,
+              ),
             );
           },
           separatorBuilder: (context, index) {
