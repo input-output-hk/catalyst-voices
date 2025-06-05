@@ -66,6 +66,7 @@ impl RbacCacheManager {
     /// registration. See [RBAC examples] for more details.
     ///
     /// [RBAC examples]: https://github.com/input-output-hk/catalyst-libs/blob/main/rust/rbac-registration/examples.md
+    #[allow(dead_code)]
     pub fn active_stake_addresses(
         &self, id: &CatalystId, is_persistent: bool,
     ) -> Vec<StakeAddress> {
