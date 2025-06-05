@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/common/constants/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -7,9 +8,8 @@ import '../../utils/translations_utils.dart';
 import '../discovery_page.dart';
 
 class CurrentCampaignSection {
-  CurrentCampaignSection(this.$);
-
   late PatrolTester $;
+
   final currentCampaignRoot = const Key('CurrentCampaignRoot');
   final title = const Key('CurrentCampaignTitle');
   final subtitle = const Key('Subtitle');
@@ -26,20 +26,7 @@ class CurrentCampaignSection {
   final timelineCardTitle = const Key('TimelineCardTitle');
   final timelineCardDate = const Key('TimelineCardDate');
   final currentCampaignLoadingError = const Key('CurrentCampaignError');
-
-  Future<void> titleIsRenderedCorrectly() async {
-    await $(title).scrollTo();
-    expect($(title).text, (await t()).currentCampaign);
-  }
-
-  Future<void> subtitleIsRenderedCorrectly() async {
-    expect($(subtitle).text?.startsWith('Catalyst Fund '), true);
-  }
-
-  Future<void> descriptionIsRenderedCorrectly() async {
-    await $(description).scrollTo(step: 90);
-    expect($(description).text, (await t()).currentCampaignDescription);
-  }
+  CurrentCampaignSection(this.$);
 
   Future<void> campaignDetailsAreRenderedCorrectly() async {
     await $(fundsDetailCard).$(fundsDetailAskRangeMax).$(#Title).scrollTo();
@@ -89,10 +76,17 @@ class CurrentCampaignSection {
           $(currentCampaignRoot).$(ideaDescription).$(MarkdownBody),
         )
         .data;
-    final textToMatch =
-        (await t()).ideaJourneyDescription.split('#### ')[1].split('[fund timeline]')[0];
+    final textToMatch = (await t())
+        .ideaJourneyDescription(VoicesConstants.campaignTimeline)
+        .split('#### ')[1]
+        .split('[fund timeline]')[0];
     expect(descriptionText.indexOf(textToMatch), greaterThanOrEqualTo(1));
     expect($(currentCampaignRoot).$(timelineCard), findsExactly(5));
+  }
+
+  Future<void> descriptionIsRenderedCorrectly() async {
+    await $(description).scrollTo(step: 90);
+    expect($(description).text, (await t()).currentCampaignDescription);
   }
 
   Future<void> looksAsExpectedForVisitor() async {
@@ -101,6 +95,10 @@ class CurrentCampaignSection {
     await descriptionIsRenderedCorrectly();
     await DiscoveryPage($).loadRetryOnError(currentCampaignLoadingError);
     await campaignDetailsAreRenderedCorrectly();
+  }
+
+  Future<void> subtitleIsRenderedCorrectly() async {
+    expect($(subtitle).text?.startsWith('Catalyst Fund '), true);
   }
 
   Future<void> timelineCardsDataIsRendered() async {
@@ -132,5 +130,10 @@ class CurrentCampaignSection {
         isNotEmpty,
       );
     }
+  }
+
+  Future<void> titleIsRenderedCorrectly() async {
+    await $(title).scrollTo();
+    expect($(title).text, (await t()).currentCampaign);
   }
 }

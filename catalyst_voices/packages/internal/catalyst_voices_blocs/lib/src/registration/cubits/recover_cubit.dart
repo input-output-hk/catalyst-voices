@@ -77,9 +77,9 @@ final class RecoverCubit extends Cubit<RecoverStateData>
         return false;
       }
 
-      final account = await _registrationService.recoverAccount(
-        seedPhrase: seedPhrase,
-      );
+      final account = await _registrationService
+          .recoverAccount(seedPhrase: seedPhrase)
+          .onError<NotFoundException>((_, __) => throw const LocalizedRecoverAccountNotFound());
 
       final address = account.address!;
       final balance = await _registrationService.getWalletBalance(

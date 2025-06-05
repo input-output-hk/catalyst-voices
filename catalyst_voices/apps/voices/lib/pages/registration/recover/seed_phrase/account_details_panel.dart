@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices/common/constants/constants.dart';
 import 'package:catalyst_voices/common/ext/account_role_ext.dart';
+import 'package:catalyst_voices/pages/registration/widgets/registration_details_panel_scaffold.dart';
 import 'package:catalyst_voices/widgets/buttons/clipboard_button.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
@@ -25,24 +26,14 @@ class AccountDetailsPanel extends StatelessWidget {
     final theme = Theme.of(context);
     final textColor = theme.colors.textOnPrimaryLevel1;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        const SizedBox(height: 24),
-        Text(
-          key: const Key('RecoveryAccountTitle'),
-          context.l10n.recoveryAccountTitle,
-          style: theme.textTheme.titleMedium?.copyWith(color: textColor),
-        ),
-        const SizedBox(height: 24),
-        const Expanded(
-          child: SingleChildScrollView(
-            child: _BlocAccountSummery(),
-          ),
-        ),
-        const SizedBox(height: 24),
-        const _BlocNavigation(),
-      ],
+    return RegistrationDetailsPanelScaffold(
+      title: Text(
+        key: const Key('RecoveryAccountTitle'),
+        context.l10n.recoveryAccountTitle,
+        style: theme.textTheme.titleMedium?.copyWith(color: textColor),
+      ),
+      body: const SingleChildScrollView(child: _BlocAccountSummery()),
+      footer: const _BlocNavigation(),
     );
   }
 }
