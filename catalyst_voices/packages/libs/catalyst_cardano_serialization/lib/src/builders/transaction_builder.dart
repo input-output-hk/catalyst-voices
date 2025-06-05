@@ -591,6 +591,14 @@ final class TransactionBuilder extends Equatable {
           requiredAmount: minAdaPerUtxoEntry,
         );
       }
+
+      final assetsPerOutput = output.amount.listNonZeroAssetIds().length;
+      if (assetsPerOutput > config.maxAssetsPerOutput) {
+        throw TxMaxAssetsPerOutputExceededException(
+          actualCount: assetsPerOutput,
+          maxCount: config.maxAssetsPerOutput,
+        );
+      }
     }
   }
 

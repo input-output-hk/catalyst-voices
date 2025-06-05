@@ -629,6 +629,7 @@ TransactionUnspentOutput testUtxo({int? index, ScriptRef? scriptRef}) {
 /// size, maximum value size, and coins per UTxO byte.
 TransactionBuilderConfig transactionBuilderConfig({
   CoinSelectionStrategy selectionStrategy = const GreedySelectionStrategy(),
+  int maxAssetsPerOutput = 100,
 }) {
   return TransactionBuilderConfig(
     feeAlgo: const TieredFee(
@@ -638,7 +639,7 @@ TransactionBuilderConfig transactionBuilderConfig({
     ),
     maxTxSize: 16384,
     maxValueSize: 5000,
-    maxAssetsPerOutput: 100,
+    maxAssetsPerOutput: maxAssetsPerOutput,
     coinsPerUtxoByte: const Coin(4310),
     selectionStrategy: selectionStrategy,
   );

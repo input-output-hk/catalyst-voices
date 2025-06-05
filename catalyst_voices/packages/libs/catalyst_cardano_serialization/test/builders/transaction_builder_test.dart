@@ -166,6 +166,64 @@ void main() {
       );
     });
 
+    test(
+        'transaction output with too many assets '
+        'throws $TxMaxAssetsPerOutputExceededException', () {
+      final changeAddress = SelectionUtils.randomAddress();
+      final policyId = PolicyId(SelectionUtils.randomHexString(PolicyId.hashLength));
+
+      final utxoWithNativeAssets = TransactionUnspentOutput(
+        input: TransactionInput(
+          transactionId: testTransactionHash,
+          index: 1,
+        ),
+        output: PreBabbageTransactionOutput(
+          address: SelectionUtils.randomAddress(),
+          amount: Balance(
+            coin: const Coin(9298446742),
+            multiAsset: MultiAsset(
+              bundle: {
+                policyId: {
+                  AssetName('ASSET_1'): const Coin(100),
+                  AssetName('ASSET_2'): const Coin(100),
+                },
+              },
+            ),
+          ),
+        ),
+      );
+
+      final txBuilder = TransactionBuilder(
+        config: transactionBuilderConfig(maxAssetsPerOutput: 1),
+        inputs: {utxoWithNativeAssets},
+        outputs: [
+          PreBabbageTransactionOutput(
+            address: testnetAddr,
+            amount: Balance(
+              coin: const Coin(2000000),
+              multiAsset: MultiAsset(
+                bundle: {
+                  policyId: {
+                    AssetName('ASSET_1'): const Coin(100),
+                    AssetName('ASSET_2'): const Coin(100),
+                  },
+                },
+              ),
+            ),
+          ),
+        ],
+        networkId: NetworkId.testnet,
+        changeAddress: changeAddress,
+      );
+
+      final updatedTxBuilder = txBuilder.withChangeIfNeeded();
+
+      expect(
+        updatedTxBuilder.buildBody,
+        throwsA(isA<TxMaxAssetsPerOutputExceededException>()),
+      );
+    });
+
     test('transaction with native assets has correctly calculated fee', () {
       final changeAddress = SelectionUtils.randomAddress();
 

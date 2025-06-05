@@ -271,3 +271,28 @@ final class TxValueSizeExceededException extends Equatable implements Exception 
       ', maxValueSize:$maxValueSize'
       ')';
 }
+
+/// Exception thrown when the transaction output
+/// has more native tokens than allowed.
+final class TxMaxAssetsPerOutputExceededException extends Equatable implements Exception {
+  /// The current native tokens count.
+  final int actualCount;
+
+  /// The maximum allowed count.
+  final int maxCount;
+
+  /// The default constructor for [TxMaxAssetsPerOutputExceededException].
+  const TxMaxAssetsPerOutputExceededException({
+    required this.actualCount,
+    required this.maxCount,
+  });
+
+  @override
+  List<Object?> get props => [actualCount, maxCount];
+
+  @override
+  String toString() => 'TxMaxAssetsPerOutputExceededException('
+      'actualCount:$actualCount'
+      ', maxCount:$maxCount'
+      ')';
+}
