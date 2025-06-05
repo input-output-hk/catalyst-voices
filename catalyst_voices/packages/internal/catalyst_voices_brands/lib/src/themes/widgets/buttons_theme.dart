@@ -1,6 +1,23 @@
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:flutter/material.dart';
 
+/// Most of buttons share same configuration and differ in just a
+/// few properties that's why we're extracting what's shared.
+///
+/// ButtonStyle returned by this function is not final and is meant to
+/// be served as further adjustment via .copyWith or `.merge`.
+ButtonStyle _buildBaseButtonStyle(TextTheme textTheme) {
+  return ButtonStyle(
+    textStyle: WidgetStatePropertyAll(textTheme.labelLarge),
+    minimumSize: const WidgetStatePropertyAll(Size(85, 40)),
+    iconSize: const WidgetStatePropertyAll(16),
+    shape: const WidgetStatePropertyAll(StadiumBorder()),
+    padding: const WidgetStatePropertyAll(
+      EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+    ),
+  );
+}
+
 extension ButtonsThemeExt on ThemeData {
   /// Applies Buttons themes configuration.
   ///
@@ -14,7 +31,12 @@ extension ButtonsThemeExt on ThemeData {
           backgroundColor: colorScheme.primary,
           disabledForegroundColor: colors.textDisabled,
           disabledBackgroundColor: colors.onSurfaceNeutral012,
-        ).merge(_buildBaseButtonStyle(textTheme)),
+        ).merge(_buildBaseButtonStyle(textTheme)).copyWith(
+              overlayColor: WidgetStateProperty.fromMap({
+                WidgetState.pressed | WidgetState.focused: colors.primaryOverlay,
+                WidgetState.hovered: colors.primaryOverlay.withValues(alpha: 0.4),
+              }),
+            ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
@@ -61,21 +83,4 @@ extension ButtonsThemeExt on ThemeData {
       ),
     );
   }
-}
-
-/// Most of buttons share same configuration and differ in just a
-/// few properties that's why we're extracting what's shared.
-///
-/// ButtonStyle returned by this function is not final and is meant to
-/// be served as further adjustment via .copyWith or `.merge`.
-ButtonStyle _buildBaseButtonStyle(TextTheme textTheme) {
-  return ButtonStyle(
-    textStyle: WidgetStatePropertyAll(textTheme.labelLarge),
-    minimumSize: const WidgetStatePropertyAll(Size(85, 40)),
-    iconSize: const WidgetStatePropertyAll(16),
-    shape: const WidgetStatePropertyAll(StadiumBorder()),
-    padding: const WidgetStatePropertyAll(
-      EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-    ),
-  );
 }
