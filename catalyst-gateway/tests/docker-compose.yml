@@ -37,8 +37,8 @@ services:
     container_name: cat-gateway-with-scylla
     healthcheck:
       test: "curl -s -i localhost:3030/api/v1/health/ready | head -n 1 | grep 204"
-      interval: 10s
-      timeout: 5s
+      interval: 60s
+      timeout: 300s
       retries: 10
     environment:
       - EVENT_DB_URL=postgres://catalyst-event-dev:CHANGE_ME@event-db/CatalystEventDev

@@ -60,6 +60,7 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
   final Color outlineBorder;
   final Color outlineBorderVariant;
   final Color primary98;
+  final Color primaryOverlay;
   final Color primaryContainer;
   final Color onPrimaryContainer;
   final Color onErrorVariant;
@@ -126,6 +127,7 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
     required this.outlineBorder,
     required this.outlineBorderVariant,
     required this.primary98,
+    required this.primaryOverlay,
     required this.primaryContainer,
     required this.onPrimaryContainer,
     required this.onErrorVariant,
@@ -194,6 +196,7 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
     this.outlineBorder = Colors.black,
     this.outlineBorderVariant = Colors.black,
     this.primary98 = Colors.black,
+    this.primaryOverlay = Colors.black,
     this.primaryContainer = Colors.black,
     this.onPrimaryContainer = Colors.black,
     this.onErrorVariant = Colors.black,
@@ -262,6 +265,7 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
     Color? outlineBorder,
     Color? outlineBorderVariant,
     Color? primary98,
+    Color? primaryOverlay,
     Color? primaryContainer,
     Color? onPrimaryContainer,
     Color? onErrorVariant,
@@ -332,6 +336,7 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
       outlineBorder: outlineBorder ?? this.outlineBorder,
       outlineBorderVariant: outlineBorderVariant ?? this.outlineBorderVariant,
       primary98: primary98 ?? this.primary98,
+      primaryOverlay: primaryOverlay ?? this.primaryOverlay,
       primaryContainer: primaryContainer ?? this.primaryContainer,
       onPrimaryContainer: onPrimaryContainer ?? this.onPrimaryContainer,
       onErrorVariant: onErrorVariant ?? this.onErrorVariant,
@@ -464,6 +469,7 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
       outlineBorder: Color.lerp(outlineBorder, other.outlineBorder, t)!,
       outlineBorderVariant: Color.lerp(outlineBorderVariant, other.outlineBorderVariant, t)!,
       primary98: Color.lerp(primary98, other.primary98, t)!,
+      primaryOverlay: Color.lerp(primaryOverlay, other.primaryOverlay, t)!,
       primaryContainer: Color.lerp(primaryContainer, other.primaryContainer, t)!,
       onPrimaryContainer: Color.lerp(onPrimaryContainer, other.onPrimaryContainer, t)!,
       onErrorVariant: Color.lerp(onErrorVariant, other.onErrorVariant, t)!,
