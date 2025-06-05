@@ -83,7 +83,7 @@ class _DocumentSection extends StatelessWidget {
         return GestureDetector(
           onTap: () => _handleOnTap(context),
           child: DocumentBuilderSectionTile(
-            key: key,
+            key: ValueKey('DocumentProperty[${property.nodeId.value}]Tile'),
             section: property,
             isSelected: isSelected,
             isEditable: _isEditable,
@@ -126,16 +126,20 @@ class _ProposalBuilderSegments extends StatelessWidget {
           itemScrollController: itemScrollController,
           padding: const EdgeInsets.only(top: 16, bottom: 64),
           itemBuilder: (context, index) {
+            print('Building index [$index]');
             final item = items[index];
             final previousItem = index == 0 ? null : items.elementAtOrNull(index - 1);
             final nextItem = items.elementAtOrNull(index + 1);
 
-            return _buildItem(
-              context: context,
-              item: item,
-              previousItem: previousItem,
-              nextItem: nextItem,
-              selectedNodeId: selectedNodeId,
+            return KeyedSubtree(
+              key: ValueKey(item.id),
+              child: _buildItem(
+                context: context,
+                item: item,
+                previousItem: previousItem,
+                nextItem: nextItem,
+                selectedNodeId: selectedNodeId,
+              ),
             );
           },
           separatorBuilder: (context, index) {

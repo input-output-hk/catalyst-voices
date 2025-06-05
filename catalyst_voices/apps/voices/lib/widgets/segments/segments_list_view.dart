@@ -51,6 +51,7 @@ class BasicSegmentsListView extends StatelessWidget {
         itemBuilder: itemBuilder,
         separatorBuilder: separatorBuilder,
         itemCount: items.length,
+        minCacheExtent: double.infinity,
       ),
     );
   }

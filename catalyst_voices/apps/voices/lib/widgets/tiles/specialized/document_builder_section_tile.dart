@@ -131,6 +131,8 @@ class _DocumentBuilderSectionTileState extends State<DocumentBuilderSectionTile>
 
   @override
   void dispose() {
+    print('Dispose [${widget.key}]');
+
     _statesController.dispose();
 
     super.dispose();
@@ -139,6 +141,8 @@ class _DocumentBuilderSectionTileState extends State<DocumentBuilderSectionTile>
   @override
   void initState() {
     super.initState();
+
+    print('InitState [${widget.key}]');
 
     _statesController = WidgetStatesController({
       if (widget.isSelected) WidgetState.selected,
