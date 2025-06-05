@@ -50,7 +50,8 @@ class DocumentBuilderSectionTile extends StatefulWidget {
   }
 }
 
-class _DocumentBuilderSectionTileState extends State<DocumentBuilderSectionTile> {
+class _DocumentBuilderSectionTileState extends State<DocumentBuilderSectionTile>
+    with AutomaticKeepAliveClientMixin {
   final _formKey = GlobalKey<FormState>();
 
   late final WidgetStatesController _statesController;
@@ -61,6 +62,9 @@ class _DocumentBuilderSectionTileState extends State<DocumentBuilderSectionTile>
   final _pendingChanges = <model.DocumentChange>[];
 
   bool _isEditMode = false;
+
+  @override
+  bool get wantKeepAlive => true;
 
   String? get _errorText {
     if (widget.autovalidateMode == AutovalidateMode.always &&
@@ -79,6 +83,7 @@ class _DocumentBuilderSectionTileState extends State<DocumentBuilderSectionTile>
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     final title = _editedSection.schema.title;
 
     return EditableTile(
@@ -132,6 +137,7 @@ class _DocumentBuilderSectionTileState extends State<DocumentBuilderSectionTile>
   @override
   void dispose() {
     _statesController.dispose();
+    print('dispose ${widget.key}');
 
     super.dispose();
   }
