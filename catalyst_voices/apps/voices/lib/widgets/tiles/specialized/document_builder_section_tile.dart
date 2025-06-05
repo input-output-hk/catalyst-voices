@@ -188,6 +188,8 @@ class _DocumentBuilderSectionTileState extends State<DocumentBuilderSectionTile>
           setState(() {
             _isEditMode = value.isEditMode;
           });
+          SegmentsControllerScope.of(context)
+              .selectSectionStep(widget.section.nodeId, shouldScroll: false);
         }
 
       case EditableTileChangeSource.save:
