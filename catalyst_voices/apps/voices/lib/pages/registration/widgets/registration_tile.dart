@@ -21,6 +21,7 @@ class RegistrationTile extends StatelessWidget {
 
     final backgroundColor = theme.colorScheme.primary;
     final foregroundColor = theme.colorScheme.onPrimary;
+    final overlayColor = theme.filledButtonTheme.style?.overlayColor;
 
     final subtitle = this.subtitle;
 
@@ -32,6 +33,7 @@ class RegistrationTile extends StatelessWidget {
         child: InkWell(
           onTap: onTap,
           borderRadius: BorderRadius.circular(12),
+          overlayColor: overlayColor,
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Row(

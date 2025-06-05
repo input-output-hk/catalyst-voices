@@ -44,9 +44,10 @@ class _UserProposalsState extends State<UserProposals> {
           VoicesDivider(
             indent: 0,
             endIndent: 0,
-            height: 56,
-            color: context.colors.primaryContainer,
+            height: 24,
+            color: context.colorScheme.primary,
           ),
+          const SizedBox(height: 20),
           UserProposalSection(
             items: _submitted,
             emptyTextMessage: context.l10n.noFinalUserProposals,

@@ -11,10 +11,12 @@ import 'package:catalyst_voices_repositories/src/database/table/documents.drift.
 import 'package:catalyst_voices_repositories/src/database/table/documents_favorite.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_metadata.dart';
 import 'package:catalyst_voices_repositories/src/dto/proposal/proposal_submission_action_dto.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:collection/collection.dart';
 import 'package:drift/drift.dart';
 import 'package:drift/extensions/json1.dart';
 import 'package:equatable/equatable.dart';
+import 'package:rxdart/rxdart.dart';
 
 @DriftAccessor(
   tables: [
@@ -111,6 +113,7 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
   Future<Page<JoinedProposalEntity>> queryProposalsPage({
     required PageRequest request,
     required ProposalsFilters filters,
+    required ProposalsOrder order,
   }) async {
     final author = filters.author;
     final searchQuery = filters.searchQuery;
@@ -149,7 +152,7 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
           proposal.metadata.jsonExtract(r'$.categoryId').isNotNull(),
         ]),
       )
-      ..orderBy([OrderingTerm.asc(proposal.verHi)])
+      ..orderBy(order.terms(proposal))
       ..limit(request.size, offset: request.page * request.size);
 
     final ids = await _getFilterTypeIds(filters.type);
@@ -201,6 +204,15 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
       mainQuery.where(proposal.search(searchQuery));
     }
 
+    final maxAge = filters.maxAge;
+    if (maxAge != null) {
+      final now = DateTimeExt.now(utc: true);
+      final oldestDateTime = now.subtract(maxAge);
+      final uuid = UuidUtils.buildV7At(oldestDateTime);
+      final hiLo = UuidHiLo.from(uuid);
+      mainQuery.where(proposal.verHi.isBiggerThanValue(hiLo.high));
+    }
+
     final proposals = await mainQuery
         .map((row) => row.readTable(proposal))
         .get()
@@ -225,6 +237,22 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
     final stream = _getProposalsRefsStream(filters: filters);
 
     return _transformRefsStreamToCount(stream, author: filters.author);
+  }
+
+  @override
+  Stream<Page<JoinedProposalEntity>> watchProposalsPage({
+    required PageRequest request,
+    required ProposalsFilters filters,
+    required ProposalsOrder order,
+  }) async* {
+    yield await queryProposalsPage(request: request, filters: filters, order: order);
+
+    yield* connection.streamQueries
+        .updatesForSync(TableUpdateQuery.onAllTables([documents, documentsFavorites]))
+        .debounceTime(const Duration(milliseconds: 10))
+        .asyncMap((event) {
+      return queryProposalsPage(request: request, filters: filters, order: order);
+    });
   }
 
   // TODO(damian-molinski): Make this more specialized per case.
@@ -279,7 +307,7 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
     return _getProposalsLatestAction().then(
       (value) {
         return value
-            .where((element) => element.action.isNotDraft)
+            .where((element) => !element.action.isDraft)
             .map((e) => e.proposalRef.id)
             .map(UuidHiLo.from);
       },
@@ -418,14 +446,10 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
               rawAction is String ? ProposalSubmissionActionDto.fromJson(rawAction) : null;
           final action = actionDto?.toModel();
 
-          if (action == null) {
-            return null;
-          }
-
           return _ProposalActions(
             selfRef: selfRef,
             proposalRef: proposalRef,
-            action: action,
+            action: action ?? ProposalSubmissionAction.draft,
           );
         })
         .get()
@@ -479,6 +503,15 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
     if (searchQuery != null) {
       // TODO(damian-molinski): Check if documentsMetadata can be used.
       query.where(documents.search(searchQuery));
+    }
+
+    final maxAge = filters?.maxAge;
+    if (maxAge != null) {
+      final now = DateTimeExt.now(utc: true);
+      final oldestDateTime = now.subtract(maxAge);
+      final uuid = UuidUtils.buildV7At(oldestDateTime);
+      final hiLo = UuidHiLo.from(uuid);
+      query.where(documents.verHi.isBiggerThanValue(hiLo.high));
     }
 
     return query.map((row) => row.readSelfRef(documents)).watch();
@@ -609,10 +642,17 @@ abstract interface class ProposalsDao {
   Future<Page<JoinedProposalEntity>> queryProposalsPage({
     required PageRequest request,
     required ProposalsFilters filters,
+    required ProposalsOrder order,
   });
 
   Stream<ProposalsCount> watchCount({
     required ProposalsCountFilters filters,
+  });
+
+  Stream<Page<JoinedProposalEntity>> watchProposalsPage({
+    required PageRequest request,
+    required ProposalsFilters filters,
+    required ProposalsOrder order,
   });
 }
 
@@ -647,11 +687,11 @@ final class _ProposalActions extends Equatable {
 }
 
 extension on ProposalSubmissionAction {
+  bool get isDraft => this == ProposalSubmissionAction.draft;
+
   bool get isFinal => this == ProposalSubmissionAction.aFinal;
 
   bool get isHidden => this == ProposalSubmissionAction.hide;
-
-  bool get isNotDraft => isFinal || isHidden;
 }
 
 extension on TypedResult {
@@ -663,5 +703,30 @@ extension on TypedResult {
     final ver = UuidHiLo(high: verHiLo.$1, low: verHiLo.$2).uuid;
 
     return SignedDocumentRef(id: id, version: ver);
+  }
+}
+
+extension on ProposalsOrder {
+  List<OrderingTerm> terms($DocumentsTable table) {
+    return switch (this) {
+      Alphabetical() => [
+          OrderingTerm.asc(table.content.title, nulls: NullsOrder.last),
+          OrderingTerm.desc(table.verHi),
+        ],
+      Budget(:final isAscending) => [
+          OrderingTerm(
+            expression: table.content.requestedFunds,
+            mode: isAscending ? OrderingMode.asc : OrderingMode.desc,
+            nulls: NullsOrder.last,
+          ),
+          OrderingTerm.desc(table.verHi),
+        ],
+      UpdateDate(:final isAscending) => [
+          OrderingTerm(
+            expression: table.verHi,
+            mode: isAscending ? OrderingMode.asc : OrderingMode.desc,
+          ),
+        ],
+    };
   }
 }

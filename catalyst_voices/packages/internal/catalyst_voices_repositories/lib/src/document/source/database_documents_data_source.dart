@@ -48,9 +48,10 @@ final class DatabaseDocumentsDataSource
   Future<Page<ProposalDocumentData>> getProposalsPage({
     required PageRequest request,
     required ProposalsFilters filters,
+    required ProposalsOrder order,
   }) {
     return _database.proposalsDao
-        .queryProposalsPage(request: request, filters: filters)
+        .queryProposalsPage(request: request, filters: filters, order: order)
         .then((page) => page.map((e) => e.toModel()));
   }
 
@@ -151,6 +152,17 @@ final class DatabaseDocumentsDataSource
     required ProposalsCountFilters filters,
   }) {
     return _database.proposalsDao.watchCount(filters: filters);
+  }
+
+  @override
+  Stream<Page<ProposalDocumentData>> watchProposalsPage({
+    required PageRequest request,
+    required ProposalsFilters filters,
+    required ProposalsOrder order,
+  }) {
+    return _database.proposalsDao
+        .watchProposalsPage(request: request, filters: filters, order: order)
+        .map((page) => page.map((e) => e.toModel()));
   }
 
   @override

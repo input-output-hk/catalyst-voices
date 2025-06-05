@@ -8,21 +8,26 @@ final class ContainsAuthorId extends CustomExpression<bool> {
   ContainsAuthorId({
     required CatalystId id,
   }) : super(
-          "json_extract(metadata, '\$.authors') LIKE '%${id.toSignificant().toUri().toStringWithoutScheme()}%'",
+          "json_extract(metadata, '${ProposalMetadata.authorsNode.asPath}') "
+          "LIKE '%${id.toSignificant().toUri().toStringWithoutScheme()}%'",
         );
 }
 
 final class ContainsContentAuthorName extends CustomExpression<bool> {
   ContainsContentAuthorName({
     required String query,
-  }) : super("json_extract(content, '\$.setup.proposer.applicant') LIKE '%$query%'");
+  }) : super(
+          "json_extract(content, '${ProposalDocument.authorNameNodeId.asPath}') "
+          "LIKE '%$query%'",
+        );
 }
 
 final class ContainsMetadataAuthorName extends CustomExpression<bool> {
   ContainsMetadataAuthorName({
     required String query,
   }) : super(
-          "json_extract(metadata, '\$.authors') LIKE '%$query%'",
+          "json_extract(metadata, '${ProposalMetadata.authorsNode.asPath}') "
+          "LIKE '%$query%'",
         );
 }
 
@@ -30,11 +35,26 @@ final class ContainsTitle extends CustomExpression<bool> {
   ContainsTitle({
     required String query,
   }) : super(
-          "json_extract(content, '\$.setup.title.title') LIKE '%$query%'",
+          "json_extract(content, '${ProposalDocument.titleNodeId.asPath}') "
+          "LIKE '%$query%'",
         );
 }
 
+extension on NodeId {
+  /// Converts [NodeId] into jsonb well-formatted path argument.
+  ///
+  /// This relies on fact that [NodeId] (especially [DocumentNodeId]) is already following
+  /// convention of separating paths with '.' (dots).
+  ///
+  /// Read more: https://sqlite.org/json1.html#path_arguments.
+  String get asPath => '\$.$value';
+}
+
 extension ContentColumnExt on GeneratedColumnWithTypeConverter<DocumentDataContent, Uint8List> {
+  Expression<int> get requestedFunds => jsonExtract(ProposalDocument.requestedFundsNodeId.asPath);
+
+  Expression<String> get title => jsonExtract(ProposalDocument.titleNodeId.asPath);
+
   Expression<bool> hasTitle(String query) => ContainsTitle(query: query);
 }
 
@@ -60,6 +80,6 @@ extension MetadataColumnExt on GeneratedColumnWithTypeConverter<DocumentDataMeta
   Expression<bool> isAuthor(CatalystId id) => ContainsAuthorId(id: id);
 
   Expression<bool> isCategory(SignedDocumentRef ref) {
-    return jsonExtract<String>(r'$.categoryId.id').equals(ref.id);
+    return jsonExtract<String>(ProposalMetadata.categoryIdNode.asPath).equals(ref.id);
   }
 }

@@ -26,6 +26,7 @@ class VoicesRichText extends VoicesFormField<MarkdownData> {
   final ScrollController scrollController;
   final int? charsLimit;
   final double? minHeight;
+  final String? placeholder;
 
   VoicesRichText({
     super.key,
@@ -38,6 +39,7 @@ class VoicesRichText extends VoicesFormField<MarkdownData> {
     required this.scrollController,
     this.charsLimit,
     this.minHeight,
+    this.placeholder,
   }) : super(
           value: controller.markdownData,
           builder: (field) {
@@ -73,6 +75,7 @@ class VoicesRichText extends VoicesFormField<MarkdownData> {
                         scrollController: scrollController,
                         minHeight: minHeight,
                         onChanged: onChangedHandler,
+                        placeholder: placeholder,
                       ),
                     ],
                   ),
@@ -136,8 +139,16 @@ final class VoicesRichTextController extends quill.QuillController {
     } else if (newMarkdownData.data.isEmpty) {
       clear();
     } else {
+      // current selection
+      final currentSelection = selection;
+
+      // update document (resets selection)
       final delta = markdown.encoder.convert(newMarkdownData);
-      document = quill.Document.fromDelta(delta);
+      final newDocument = quill.Document.fromDelta(delta);
+      document = newDocument;
+
+      // revert selection
+      updateSelection(currentSelection, quill.ChangeSource.local);
     }
   }
 
@@ -177,6 +188,7 @@ class _Editor extends StatefulWidget {
   final ScrollController scrollController;
   final double? minHeight;
   final ValueChanged<MarkdownData?>? onChanged;
+  final String? placeholder;
 
   const _Editor({
     required this.controller,
@@ -184,6 +196,7 @@ class _Editor extends StatefulWidget {
     required this.scrollController,
     required this.minHeight,
     required this.onChanged,
+    this.placeholder,
   });
 
   @override
@@ -258,7 +271,7 @@ class _EditorState extends State<_Editor> {
         config: quill.QuillEditorConfig(
           minHeight: widget.minHeight,
           padding: const EdgeInsets.all(16),
-          placeholder: context.l10n.placeholderRichText,
+          placeholder: widget.placeholder ?? context.l10n.placeholderRichText,
           characterShortcutEvents: quill.standardCharactersShortcutEvents,
           /* cSpell:disable */
           spaceShortcutEvents: quill.standardSpaceShorcutEvents,

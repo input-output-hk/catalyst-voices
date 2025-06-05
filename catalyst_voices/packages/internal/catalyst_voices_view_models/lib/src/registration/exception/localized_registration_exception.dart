@@ -5,6 +5,13 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/widgets.dart';
 
+final class LocalizedRecoverAccountNotFound extends LocalizedRegistrationException {
+  const LocalizedRecoverAccountNotFound();
+
+  @override
+  String message(BuildContext context) => context.l10n.registrationAccountNotFound;
+}
+
 /// A [LocalizedException] describing an error during a user registration.
 sealed class LocalizedRegistrationException extends LocalizedException {
   const LocalizedRegistrationException();
@@ -97,6 +104,15 @@ final class LocalizedRegistrationWalletNotFoundException extends LocalizedRegist
 
   @override
   String message(BuildContext context) => context.l10n.registrationWalletNotFound;
+}
+
+final class LocalizedSeedPhraseWordsDoNotMatchException extends LocalizedRegistrationException {
+  const LocalizedSeedPhraseWordsDoNotMatchException();
+
+  @override
+  String message(BuildContext context) {
+    return context.l10n.errorSeedPhraseWordsDoNotMatch;
+  }
 }
 
 final class LocalizedWalletLinkException extends LocalizedRegistrationException {

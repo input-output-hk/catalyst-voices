@@ -1,13 +1,18 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/dev_tools/dev_tools_storage.dart';
 import 'package:catalyst_voices_repositories/src/dto/dev_tools/dev_tools_config_dto.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 abstract interface class DevToolsRepository {
   const factory DevToolsRepository(
     DevToolsStorage storage,
   ) = DevToolsRepositoryImpl;
 
+  Future<AppInfo> readAppInfo();
+
   Future<DevToolsConfig> readConfig();
+
+  Future<GatewayInfo> readGatewayInfo();
 
   Future<void> writeConfig(DevToolsConfig value);
 }
@@ -20,9 +25,25 @@ final class DevToolsRepositoryImpl implements DevToolsRepository {
   );
 
   @override
+  Future<AppInfo> readAppInfo() async {
+    final packageInfo = await PackageInfo.fromPlatform();
+
+    return AppInfo(
+      version: packageInfo.version,
+      buildNumber: packageInfo.buildNumber,
+    );
+  }
+
+  @override
   Future<DevToolsConfig> readConfig() async {
     final dto = await _storage.read();
     return dto?.toModel() ?? const DevToolsConfig();
+  }
+
+  @override
+  Future<GatewayInfo> readGatewayInfo() async {
+    // TODO(damian-molinski): ask any endpoint and read response headers
+    return const GatewayInfo();
   }
 
   @override

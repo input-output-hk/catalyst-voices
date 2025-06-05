@@ -18,6 +18,9 @@ import 'package:flutter/material.dart';
 ///     )
 /// ```
 class AffixDecorator extends StatelessWidget {
+  /// Allows to place affixes horizontally or vertically.
+  final Axis axis;
+
   /// The spacing between the child widget and the prefix/suffix icons.
   final double gap;
 
@@ -37,17 +40,22 @@ class AffixDecorator extends StatelessWidget {
   /// The widget to be decorated with prefix and/or suffix.
   final Widget child;
 
+  /// See [Row.crossAxisAlignment].
+  final CrossAxisAlignment crossAxisAlignment;
+
   /// Creates a new instance of PrefixSuffixDecorator.
   ///
   /// At least one of `prefix` or `suffix` should be non-null for the decoration
   /// to be visible.
   const AffixDecorator({
     super.key,
+    this.axis = Axis.horizontal,
     this.gap = 8,
     this.iconTheme,
     this.prefix,
     this.suffix,
     this.mainAxisSize = MainAxisSize.min,
+    this.crossAxisAlignment = CrossAxisAlignment.center,
     required this.child,
   });
 
@@ -67,26 +75,25 @@ class AffixDecorator extends StatelessWidget {
         ),
     };
 
-    return Row(
+    return Flex(
+      direction: axis,
       mainAxisSize: mainAxisSize,
+      crossAxisAlignment: crossAxisAlignment,
+      spacing: gap,
       children: [
-        if (prefix != null) ...[
+        if (prefix != null)
           IconTheme(
             key: const Key('DecoratorIconBefore'),
             data: iconTheme ?? IconTheme.of(context),
             child: prefix,
           ),
-          SizedBox(width: gap),
-        ],
         child,
-        if (suffix != null) ...[
-          SizedBox(width: gap),
+        if (suffix != null)
           IconTheme(
             key: const Key('DecoratorIconAfter'),
             data: iconTheme ?? IconTheme.of(context),
             child: suffix,
           ),
-        ],
       ],
     );
   }

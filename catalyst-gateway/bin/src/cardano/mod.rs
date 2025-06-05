@@ -27,9 +27,7 @@ use crate::{
     settings::{chain_follower, Settings},
 };
 
-// pub(crate) mod cip36_registration_obsolete;
 pub(crate) mod event;
-pub(crate) mod util;
 
 /// How long we wait between checks for connection to the indexing DB to be ready.
 pub(crate) const INDEXING_DB_READY_WAIT_INTERVAL: Duration = Duration::from_secs(1);
@@ -297,6 +295,7 @@ fn sync_subchain(
 
                     // Update flag if this is the first time reaching TIP.
                     if chain_update.tip && !follower_has_first_reached_tip() {
+                        info!("Follower has reached TIP for the first time");
                         set_follower_first_reached_tip();
                     }
 
@@ -456,10 +455,12 @@ impl SyncTask {
         info!(chain=%self.cfg.chain, immutable_tip=?self.immutable_tip_slot, live_tip=?self.live_tip_slot, "Blockchain ready to sync from.");
 
         self.dispatch_event(event::ChainIndexerEvent::ImmutableTipSlotChanged {
-            slot: self.immutable_tip_slot,
+            immutable_slot: self.immutable_tip_slot,
+            live_slot: self.live_tip_slot,
         });
         self.dispatch_event(event::ChainIndexerEvent::LiveTipSlotChanged {
-            slot: self.live_tip_slot,
+            immutable_slot: self.immutable_tip_slot,
+            live_slot: self.live_tip_slot,
         });
 
         // Wait for indexing DB to be ready before continuing.
@@ -511,7 +512,8 @@ impl SyncTask {
 
                             self.dispatch_event(
                                 event::ChainIndexerEvent::ImmutableTipSlotChanged {
-                                    slot: self.immutable_tip_slot,
+                                    immutable_slot: self.immutable_tip_slot,
+                                    live_slot: self.live_tip_slot,
                                 },
                             );
 
@@ -731,15 +733,45 @@ pub(crate) async fn start_followers() -> anyhow::Result<()> {
                     .with_label_values(&[&api_host_names, service_id, &network])
                     .set(From::from(*current_sync_tasks));
             }
-            if let Event::LiveTipSlotChanged { slot } = event {
+            if let Event::LiveTipSlotChanged {
+                live_slot,
+                immutable_slot,
+            } = event
+            {
                 reporter::CURRENT_LIVE_TIP_SLOT
                     .with_label_values(&[&api_host_names, service_id, &network])
-                    .set(i64::try_from(u64::from(*slot)).unwrap_or(-1));
+                    .set(i64::try_from(u64::from(*live_slot)).unwrap_or(-1));
+
+                reporter::SLOT_TIP_DIFF
+                    .with_label_values(&[&api_host_names, service_id, &network])
+                    .set(
+                        i64::try_from(
+                            u64::from(*immutable_slot)
+                                .checked_sub(u64::from(*live_slot))
+                                .unwrap_or_default(),
+                        )
+                        .unwrap_or(-1),
+                    );
             }
-            if let Event::ImmutableTipSlotChanged { slot } = event {
+            if let Event::ImmutableTipSlotChanged {
+                live_slot,
+                immutable_slot,
+            } = event
+            {
                 reporter::CURRENT_IMMUTABLE_TIP_SLOT
                     .with_label_values(&[&api_host_names, service_id, &network])
-                    .set(i64::try_from(u64::from(*slot)).unwrap_or(-1));
+                    .set(i64::try_from(u64::from(*immutable_slot)).unwrap_or(-1));
+
+                reporter::SLOT_TIP_DIFF
+                    .with_label_values(&[&api_host_names, service_id, &network])
+                    .set(
+                        i64::try_from(
+                            u64::from(*immutable_slot)
+                                .checked_sub(u64::from(*live_slot))
+                                .unwrap_or_default(),
+                        )
+                        .unwrap_or(-1),
+                    );
             }
             if let Event::IndexedSlotProgressed { slot } = event {
                 reporter::HIGHEST_COMPLETE_INDEXED_SLOT

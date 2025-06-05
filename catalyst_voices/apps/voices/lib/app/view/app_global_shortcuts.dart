@@ -7,6 +7,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 class AppGlobalShortcuts extends StatelessWidget {
+  static final devToolsShortcut = LogicalKeySet(
+    LogicalKeyboardKey.meta,
+    LogicalKeyboardKey.shift,
+    LogicalKeyboardKey.keyD,
+  );
+
   final Widget child;
 
   const AppGlobalShortcuts({
@@ -22,11 +28,7 @@ class AppGlobalShortcuts extends StatelessWidget {
     return CallbackShortcuts(
       bindings: {
         if (isDeveloper)
-          LogicalKeySet(
-            LogicalKeyboardKey.meta,
-            LogicalKeyboardKey.shift,
-            LogicalKeyboardKey.keyD,
-          ): () {
+          devToolsShortcut: () {
             final routerContext = AppRouter.rootNavigatorKey.currentContext;
             if (routerContext != null) {
               unawaited(DevToolsPage.show(routerContext));

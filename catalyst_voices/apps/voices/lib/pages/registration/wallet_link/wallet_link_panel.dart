@@ -2,7 +2,7 @@ import 'package:catalyst_voices/pages/registration/wallet_link/stage/intro_panel
 import 'package:catalyst_voices/pages/registration/wallet_link/stage/rbac_transaction_panel.dart';
 import 'package:catalyst_voices/pages/registration/wallet_link/stage/roles_chooser_panel.dart';
 import 'package:catalyst_voices/pages/registration/wallet_link/stage/roles_summary_panel.dart';
-import 'package:catalyst_voices/pages/registration/wallet_link/stage/select_wallet_panel.dart';
+import 'package:catalyst_voices/pages/registration/wallet_link/stage/select_wallet/select_wallet_panel.dart';
 import 'package:catalyst_voices/pages/registration/wallet_link/stage/wallet_details_panel.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
