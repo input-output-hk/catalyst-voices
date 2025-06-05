@@ -53,10 +53,12 @@ final class SegmentsController extends ValueNotifier<SegmentsControllerState> {
     unawaited(_scrollTo(id));
   }
 
-  void selectSectionStep(NodeId id) {
+  void selectSectionStep(NodeId id, {bool shouldScroll = true}) {
     value = value.copyWith(activeSectionId: Optional(id));
 
-    unawaited(_scrollTo(id));
+    if (shouldScroll) {
+      unawaited(_scrollTo(id));
+    }
   }
 
   void toggleSegment(NodeId id) {

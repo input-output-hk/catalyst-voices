@@ -87,7 +87,7 @@ class _CopyCatalystIdTipText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TipText(
-      context.l10n.tipCopyCatalystIdForReviewTool,
+      context.l10n.tipCopyCatalystIdForReviewTool(VoicesConstants.becomeReviewerUrl()),
       style: context.textTheme.bodyMedium?.copyWith(color: context.colors.textOnPrimaryLevel1),
     );
   }

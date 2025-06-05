@@ -161,7 +161,7 @@ class _SeedPhraseWords extends StatelessWidget {
             selectedWords: userWords,
             onChanged: onUserWordsChanged,
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 2),
           SeedPhraseActions(
             onImportKeyTap: onImportTap,
             onResetTap: isResetEnabled ? onResetTap : null,

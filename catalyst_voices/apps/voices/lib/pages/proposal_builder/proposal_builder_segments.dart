@@ -80,22 +80,29 @@ class _DocumentSection extends StatelessWidget {
     return BlocSelector<ProposalBuilderBloc, ProposalBuilderState, bool>(
       selector: (state) => state.validationErrors?.showErrors ?? false,
       builder: (context, showValidationErrors) {
-        return DocumentBuilderSectionTile(
-          key: key,
-          section: property,
-          isSelected: isSelected,
-          isEditable: _isEditable,
-          autovalidateMode:
-              showValidationErrors ? AutovalidateMode.always : AutovalidateMode.disabled,
-          onChanged: (value) {
-            final event = SectionChangedEvent(changes: value);
-            context.read<ProposalBuilderBloc>().add(event);
-          },
-          actionOverrides: _widgetActionOverrides,
-          overrides: _widgetOverrides,
+        return GestureDetector(
+          onTap: () => _handleOnTap(context),
+          child: DocumentBuilderSectionTile(
+            key: key,
+            section: property,
+            isSelected: isSelected,
+            isEditable: _isEditable,
+            autovalidateMode:
+                showValidationErrors ? AutovalidateMode.always : AutovalidateMode.disabled,
+            onChanged: (value) {
+              final event = SectionChangedEvent(changes: value);
+              context.read<ProposalBuilderBloc>().add(event);
+            },
+            actionOverrides: _widgetActionOverrides,
+            overrides: _widgetOverrides,
+          ),
         );
       },
     );
+  }
+
+  void _handleOnTap(BuildContext context) {
+    SegmentsControllerScope.of(context).selectSectionStep(property.nodeId, shouldScroll: false);
   }
 }
 

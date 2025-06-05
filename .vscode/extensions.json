@@ -15,7 +15,6 @@
         "rust-lang.rust-analyzer",
         "JScearcy.rust-doc-viewer",
         "anweiss.cddl-languageserver",
-        "tintinweb.graphviz-interactive-preview",
         "terrastruct.d2",
         "bbenoist.vagrant",
         "ms-kubernetes-tools.vscode-kubernetes-tools",
@@ -23,6 +22,8 @@
         "lawrencegrant.cql",
         "ldez.ignore-files",
         "davidlday.languagetool-linter",
-        "nefrob.vscode-just-syntax"
+        "nefrob.vscode-just-syntax",
+        "EFanZh.graphviz-preview",
+        "Stephanvs.dot"
     ]
 }
