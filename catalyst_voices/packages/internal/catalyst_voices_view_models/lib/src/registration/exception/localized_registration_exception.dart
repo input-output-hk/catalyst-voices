@@ -106,6 +106,15 @@ final class LocalizedRegistrationWalletNotFoundException extends LocalizedRegist
   String message(BuildContext context) => context.l10n.registrationWalletNotFound;
 }
 
+final class LocalizedSeedPhraseWordsDoNotMatchException extends LocalizedRegistrationException {
+  const LocalizedSeedPhraseWordsDoNotMatchException();
+
+  @override
+  String message(BuildContext context) {
+    return context.l10n.errorSeedPhraseWordsDoNotMatch;
+  }
+}
+
 final class LocalizedWalletLinkException extends LocalizedRegistrationException {
   final WalletApiErrorCode code;
 
