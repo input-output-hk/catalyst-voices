@@ -638,6 +638,7 @@ TransactionBuilderConfig transactionBuilderConfig({
     ),
     maxTxSize: 16384,
     maxValueSize: 5000,
+    maxAssetsPerOutput: 100,
     coinsPerUtxoByte: const Coin(4310),
     selectionStrategy: selectionStrategy,
   );

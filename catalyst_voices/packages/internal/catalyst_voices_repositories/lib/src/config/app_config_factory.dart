@@ -34,6 +34,7 @@ final class AppConfigFactory {
       feeAlgo: effectiveFeeAlgo,
       maxTxSize: remoteTransactionBuilderConfig?.maxTxSize,
       maxValueSize: remoteTransactionBuilderConfig?.maxValueSize,
+      maxAssetsPerOutput: remoteTransactionBuilderConfig?.maxAssetsPerOutput,
       coinsPerUtxoByte: remoteTransactionBuilderConfig?.coinsPerUtxoByte?.asCoin(),
       selectionStrategy: remoteTransactionBuilderConfig?.selectionStrategy?.build(),
     );

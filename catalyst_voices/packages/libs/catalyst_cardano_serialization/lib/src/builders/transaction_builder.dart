@@ -460,6 +460,7 @@ final class TransactionBuilder extends Equatable {
           output: output,
           currentAssets: rebuiltAssets,
           assetToAdd: (policy.key, asset.key, asset.value),
+          maxAssetsPerOutput: config.maxAssetsPerOutput,
         )) {
           // if we got here, this means we will run into a overflow error,
           // so we want to split into multiple outputs, for that we...
@@ -594,7 +595,8 @@ final class TransactionBuilder extends Equatable {
   }
 
   /// Returns true if adding additional [assetToAdd] to [currentAssets]
-  /// will trigger size overflow in [output].
+  /// will trigger size overflow in [output] or the asset count
+  /// is more than [TransactionBuilderConfig.maxAssetsPerOutput].
   ///
   /// The function is used to split native assets into
   /// multiple outputs if they don't fit in one output.
@@ -602,7 +604,12 @@ final class TransactionBuilder extends Equatable {
     required ShelleyMultiAssetTransactionOutput output,
     required Map<AssetName, Coin> currentAssets,
     required (PolicyId, AssetName, Coin) assetToAdd,
+    required int maxAssetsPerOutput,
   }) {
+    if (output.amount.listNonZeroAssetIds().length >= maxAssetsPerOutput) {
+      return true;
+    }
+
     final (policy, assetName, value) = assetToAdd;
 
     final valueWithExtraMultiAssets = Balance(
@@ -762,6 +769,9 @@ final class TransactionBuilderConfig extends Equatable {
   /// size in bytes.
   final int maxValueSize;
 
+  /// A number of native assets allowed per output.
+  final int maxAssetsPerOutput;
+
   /// The protocol parameter that establishes the minimum amount of [Coin]
   /// required per UTXO entry.
   ///
@@ -779,6 +789,7 @@ final class TransactionBuilderConfig extends Equatable {
     required this.feeAlgo,
     required this.maxTxSize,
     required this.maxValueSize,
+    this.maxAssetsPerOutput = 1000,
     required this.coinsPerUtxoByte,
     this.selectionStrategy = const GreedySelectionStrategy(),
   });
@@ -788,7 +799,9 @@ final class TransactionBuilderConfig extends Equatable {
         feeAlgo,
         maxTxSize,
         maxValueSize,
+        maxAssetsPerOutput,
         coinsPerUtxoByte,
+        selectionStrategy,
       ];
 
   /// Creates copy of this config with updated parameters.
@@ -796,6 +809,7 @@ final class TransactionBuilderConfig extends Equatable {
     TieredFee? feeAlgo,
     int? maxTxSize,
     int? maxValueSize,
+    int? maxAssetsPerOutput,
     Coin? coinsPerUtxoByte,
     CoinSelectionStrategy? selectionStrategy,
   }) {
@@ -803,6 +817,7 @@ final class TransactionBuilderConfig extends Equatable {
       feeAlgo: feeAlgo ?? this.feeAlgo,
       maxTxSize: maxTxSize ?? this.maxTxSize,
       maxValueSize: maxValueSize ?? this.maxValueSize,
+      maxAssetsPerOutput: maxAssetsPerOutput ?? this.maxAssetsPerOutput,
       coinsPerUtxoByte: coinsPerUtxoByte ?? this.coinsPerUtxoByte,
       selectionStrategy: selectionStrategy ?? this.selectionStrategy,
     );

@@ -14,6 +14,7 @@ Future<void> main() async {
     ),
     maxTxSize: 16384,
     maxValueSize: 5000,
+    maxAssetsPerOutput: 100,
     coinsPerUtxoByte: Coin(4310),
   );
 
