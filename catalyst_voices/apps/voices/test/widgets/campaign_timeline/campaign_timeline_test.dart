@@ -11,7 +11,7 @@ import '../../helpers/helpers.dart';
 
 void main() {
   group(CampaignTimeline, () {
-    const cardHeight = 152.0;
+    const cardHeight = 160.0;
     const expandedCardHeight = 300.0;
 
     final timeline = DateRange(
@@ -40,14 +40,13 @@ void main() {
     testWidgets(
       'renders correctly with multiple timeline items in discovery placement',
       (tester) async {
-        await tester.binding.setSurfaceSize(const Size(1200, 152));
+        await tester.binding.setSurfaceSize(const Size(1200, 160));
 
         final widget = Center(
           child: SizedBox(
             width: 1100,
             child: CampaignTimeline(
               timelineItems: timelineItems,
-              placement: CampaignTimelinePlacement.discovery,
             ),
           ),
         );
@@ -87,7 +86,6 @@ void main() {
             width: 1100,
             child: CampaignTimeline(
               timelineItems: timelineItems,
-              placement: CampaignTimelinePlacement.workspace,
             ),
           ),
         );
@@ -121,7 +119,6 @@ void main() {
             width: 1100,
             child: CampaignTimeline(
               timelineItems: timelineItems,
-              placement: CampaignTimelinePlacement.discovery,
             ),
           ),
         );
@@ -164,7 +161,6 @@ void main() {
                   stage: CampaignTimelineStage.proposalSubmission,
                 ),
               ),
-              placement: CampaignTimelinePlacement.discovery,
             ),
           ),
         );
@@ -195,7 +191,6 @@ void main() {
             width: 1100,
             child: CampaignTimeline(
               timelineItems: timelineItems,
-              placement: CampaignTimelinePlacement.discovery,
             ),
           ),
         );
