@@ -31,6 +31,7 @@
       },
       "maxTxSize": 16384,
       "maxValueSize": 5000,
+      "maxAssetsPerOutput": 100,
       "coinsPerUtxoByte": 4310,
       "selectionStrategy": "exactBiggest"
     },
