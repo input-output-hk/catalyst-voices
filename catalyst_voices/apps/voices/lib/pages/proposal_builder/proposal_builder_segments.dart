@@ -125,6 +125,10 @@ class _ProposalBuilderSegments extends StatelessWidget {
           items: items,
           itemScrollController: itemScrollController,
           padding: const EdgeInsets.only(top: 16, bottom: 64),
+          // TODO(damian-molinski): Remove this workaround in #2697.
+          // ListView should be able to dispose its children when out of view port.
+          // Read more in issue description.
+          minCacheExtent: double.infinity,
           itemBuilder: (context, index) {
             final item = items[index];
             final previousItem = index == 0 ? null : items.elementAtOrNull(index - 1);
