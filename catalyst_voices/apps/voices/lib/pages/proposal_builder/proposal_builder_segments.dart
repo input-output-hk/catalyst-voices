@@ -126,7 +126,6 @@ class _ProposalBuilderSegments extends StatelessWidget {
           itemScrollController: itemScrollController,
           padding: const EdgeInsets.only(top: 16, bottom: 64),
           itemBuilder: (context, index) {
-            print('Building index [$index]');
             final item = items[index];
             final previousItem = index == 0 ? null : items.elementAtOrNull(index - 1);
             final nextItem = items.elementAtOrNull(index + 1);
