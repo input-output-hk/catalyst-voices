@@ -24,6 +24,7 @@ final class CampaignTimeline extends Equatable {
         description,
         timeline,
         stage,
+        offstage,
       ];
 
   CampaignTimeline copyWith({
