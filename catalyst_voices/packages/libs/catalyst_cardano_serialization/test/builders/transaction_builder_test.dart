@@ -316,7 +316,7 @@ void main() {
       );
 
       verifyTransactionFee(transaction, updatedBuilder);
-      expect(txBody.outputs.length, equals(1));
+      expect(txBody.outputs, hasLength(1));
     });
 
     test(
