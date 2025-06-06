@@ -1,107 +1,129 @@
 //! Signed Document Type
 //!
-//! `UUIDv4` Encoded Document Type.
+//! List of `UUIDv4`.
 
 use std::sync::LazyLock;
 
-use anyhow::bail;
 use poem_openapi::{
     registry::{MetaExternalDocument, MetaSchema, MetaSchemaRef},
-    types::{Example, ParseError, ParseFromJSON, ParseFromParameter, ParseResult, ToJSON, Type},
+    types::{Example, ParseError, ParseFromJSON, ParseResult, ToJSON, Type},
 };
-use serde_json::Value;
+use uuid::Uuid;
 
 use self::generic::uuidv4;
-use crate::service::common::types::{generic, string_types::impl_string_types};
+use crate::service::common::types::generic::{self, uuidv4::UUIDv4};
+
+/// Document type - list of `UUIDv4`
+#[derive(Debug, Clone)]
+pub(crate) struct DocumentType(Vec<uuidv4::UUIDv4>);
 
 /// Title.
 const TITLE: &str = "Signed Document Type";
 /// Description.
-const DESCRIPTION: &str = "Document Type.  UUIDv4 Formatted 128bit value.";
-/// Example.
-pub(crate) const EXAMPLE: &str = "7808d2ba-d511-40af-84e8-c0d1625fdfdc";
+const DESCRIPTION: &str = "Document Type. List UUIDv4 Formatted 128bit value.";
 /// External Documentation URI
 const URI: &str =
-    "https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/spec/#type";
+    "https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/types/";
 /// Description of the URI
 const URI_DESCRIPTION: &str = "Specification";
-/// Length of the hex encoded string
-pub(crate) const ENCODED_LENGTH: usize = uuidv4::ENCODED_LENGTH;
-/// Validation Regex Pattern
-pub(crate) const PATTERN: &str = uuidv4::PATTERN;
-/// Format
-pub(crate) const FORMAT: &str = uuidv4::FORMAT;
-
+/// Maximum length
+const MAX_LENGTH: usize = usize::MAX;
+/// Minimum length
+const MIN_LENGTH: usize = 1;
 /// Schema
 static SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| {
     MetaSchema {
-        title: Some(TITLE.to_owned()),
+        title: Some(TITLE.into()),
         description: Some(DESCRIPTION),
-        example: Some(Value::String(EXAMPLE.to_string())),
-        max_length: Some(ENCODED_LENGTH),
-        min_length: Some(ENCODED_LENGTH),
-        pattern: Some(PATTERN.to_string()),
+        max_length: Some(MAX_LENGTH),
+        min_length: Some(MIN_LENGTH),
         external_docs: Some(MetaExternalDocument {
             url: URI.to_owned(),
             description: Some(URI_DESCRIPTION.to_owned()),
         }),
-
-        ..poem_openapi::registry::MetaSchema::ANY
+        ..MetaSchema::ANY
     }
 });
 
-/// Because ALL the constraints are defined above, we do not ever need to define them in
-/// the API. BUT we do need to make a validator.
-/// This helps enforce uniform validation.
-fn is_valid(uuid: &str) -> bool {
-    uuidv4::UUIDv4::try_from(uuid).is_ok()
+impl DocumentType {
+    /// Convert to sql format used for filter '{"uuid", "uuid"}'
+    pub(crate) fn to_sql_array(&self) -> String {
+        format!(
+            "{{{}}}",
+            self.0
+                .iter()
+                .map(|uuid| uuid.to_string())
+                .collect::<Vec<String>>()
+                .join(",")
+        )
+    }
 }
 
-impl_string_types!(
-    DocumentType,
-    "string",
-    FORMAT,
-    Some(SCHEMA.clone()),
-    is_valid
-);
+impl Type for DocumentType {
+    type RawElementValueType = Self;
+    type RawValueType = Self;
 
-impl DocumentType {
-    /// Creates a new `DocumentType` instance without validation.
-    /// **NOTE** could produce an invalid instance, be sure that passing `String` is a
-    /// valid `DocumentType`
-    pub(crate) fn new_unchecked(uuid: String) -> Self {
-        Self(uuid)
+    const IS_REQUIRED: bool = true;
+
+    fn name() -> std::borrow::Cow<'static, str> {
+        "DocumentType".into()
+    }
+
+    fn schema_ref() -> MetaSchemaRef {
+        let schema_ref =
+            MetaSchemaRef::Inline(Box::new(MetaSchema::new_with_format("array", "string")));
+        schema_ref.merge(SCHEMA.clone())
+    }
+
+    fn as_raw_value(&self) -> Option<&Self::RawValueType> {
+        Some(self)
+    }
+
+    fn raw_element_iter<'a>(
+        &'a self,
+    ) -> Box<dyn Iterator<Item = &'a Self::RawElementValueType> + 'a> {
+        Box::new(self.as_raw_value().into_iter())
+    }
+}
+
+impl ParseFromJSON for DocumentType {
+    fn parse_from_json(value: Option<serde_json::Value>) -> ParseResult<Self> {
+        Vec::parse_from_json(value)
+            .map_err(ParseError::propagate)
+            .map(Self)
     }
 }
 
 impl Example for DocumentType {
-    /// An example.
     fn example() -> Self {
-        Self(EXAMPLE.to_owned())
+        Self(vec![uuidv4::UUIDv4::example(), uuidv4::UUIDv4::example()])
     }
 }
 
-impl TryFrom<&str> for DocumentType {
-    type Error = anyhow::Error;
-
-    fn try_from(value: &str) -> Result<Self, Self::Error> {
-        value.to_string().try_into()
+impl ToJSON for DocumentType {
+    fn to_json(&self) -> Option<serde_json::Value> {
+        Some(serde_json::Value::Array(
+            self.0
+                .iter()
+                .filter_map(poem_openapi::types::ToJSON::to_json)
+                .collect(),
+        ))
     }
 }
 
-impl TryFrom<String> for DocumentType {
-    type Error = anyhow::Error;
-
-    fn try_from(value: String) -> Result<Self, Self::Error> {
-        if !is_valid(&value) {
-            bail!("Invalid DocumentType '{value}', must be a valid UUIDv4")
-        }
-        Ok(Self(value))
+impl From<Vec<Uuid>> for DocumentType {
+    fn from(value: Vec<uuid::Uuid>) -> Self {
+        Self(value.into_iter().map(uuidv4::UUIDv4::from).collect())
     }
 }
 
-impl From<uuidv4::UUIDv4> for DocumentType {
-    fn from(value: uuidv4::UUIDv4) -> Self {
-        Self(value.to_string())
+impl From<Vec<String>> for DocumentType {
+    fn from(value: Vec<String>) -> Self {
+        Self(
+            value
+                .into_iter()
+                .filter_map(|s| Uuid::parse_str(&s).ok().map(UUIDv4::from))
+                .collect(),
+        )
     }
 }

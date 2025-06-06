@@ -259,7 +259,7 @@ impl TryFrom<SignedDocBody> for IndexedDocumentVersionDocumented {
 
         Ok(IndexedDocumentVersionDocumented(IndexedDocumentVersion {
             ver: DocumentVer::new_unchecked(doc.ver().to_string()),
-            doc_type: DocumentType::new_unchecked(doc.doc_type().to_string()),
+            doc_type: doc.doc_type().clone().into(),
             doc_ref,
             reply,
             template,
