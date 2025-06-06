@@ -29,7 +29,8 @@ class _DevToolsEnablerState extends State<DevToolsEnabler> {
   @override
   Widget build(BuildContext context) {
     return VoicesGestureDetector(
-      onTap: widget.isEnabled ? _handleTap : null,
+      behavior: HitTestBehavior.opaque,
+      onLongPress: widget.isEnabled ? _handleTap : null,
       child: widget.child,
     );
   }
