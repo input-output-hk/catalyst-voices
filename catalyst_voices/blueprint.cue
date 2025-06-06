@@ -1,4 +1,3 @@
-version: "1.0.0"
 project: {
 	name: "voices"
 	deployment: {
@@ -10,34 +9,55 @@ project: {
 		bundle: {
 			modules: main: {
 				name:    "app"
-				version: "0.10.0"
+				version: "0.11.0"
 				values: {
-					deployment: containers: main: {
-						image: {
-							name: _ @forge(name="CONTAINER_IMAGE")
-							tag:  _ @forge(name="GIT_HASH_OR_TAG")
-						}
-						mounts: {
-							config: {
-								ref: {
-									config: {
-										name: "nginx"
+					deployment: containers:
+					{
+						main: {
+							image: {
+								name: _ @forge(name="CONTAINER_IMAGE")
+								tag:  _ @forge(name="GIT_HASH_OR_TAG")
+							}
+							mounts: {
+								config: {
+									ref: {
+										config: {
+											name: "nginx"
+										}
 									}
+									path:    "/etc/nginx/nginx.conf"
+									subPath: "nginx.conf"
 								}
-								path:    "/etc/nginx/nginx.conf"
-								subPath: "nginx.conf"
+							}
+							ports: {
+								http: port: 8080
+							}
+							probes: {
+								liveness: {
+									path: "/healthz"
+									port: 8080
+								}
+								readiness: {
+									path: "/healthz"
+									port: 8080
+								}
 							}
 						}
-						port: 8080
-						probes: {
-							liveness: {
-								path: "/"
-								port: 8080
+						metrics: {
+							image: {
+								name: "nginx/nginx-prometheus-exporter"
+								tag:  "1.4"
 							}
-							readiness: {
-								path: "/"
-								port: 8080
+
+							ports: {
+								metrics: port: 9113
 							}
+
+							env: {
+								SCRAPE_URI: value: "http://localhost:8080/stub_status"
+							}
+
+							mounts: {}
 						}
 					}
 
@@ -104,10 +124,7 @@ project: {
 					}
 
 					service: {
-						ports: {
-							port:       80
-							targetPort: 8080
-						}
+						scrape: true
 					}
 				}
 			}
