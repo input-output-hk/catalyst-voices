@@ -1,6 +1,7 @@
 export 'app_bar/voices_app_bar.dart';
 export 'avatars/space_avatar.dart';
 export 'avatars/voices_avatar.dart';
+export 'buttons/navigation_back.dart';
 export 'buttons/voices_buttons.dart';
 export 'buttons/voices_filled_button.dart';
 export 'buttons/voices_icon_button.dart';
@@ -21,7 +22,6 @@ export 'cards/role_chooser_card.dart';
 export 'chips/voices_chip.dart';
 export 'common/delayed_widget.dart';
 export 'common/infrastructure/voices_loadable.dart';
-export 'common/navigation_back.dart';
 export 'common/navigation_location.dart';
 export 'common/page_overflow.dart';
 export 'common/shortcut_activator_view.dart';
