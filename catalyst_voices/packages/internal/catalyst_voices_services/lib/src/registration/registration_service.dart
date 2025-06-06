@@ -177,11 +177,7 @@ final class RegistrationServiceImpl implements RegistrationService {
 
       final changeAddress = await enabledWallet.getChangeAddress();
       final rewardAddresses = await enabledWallet.getRewardAddresses();
-      final utxos = await enabledWallet.getUtxos(
-        amount: const Balance(
-          coin: CardanoWalletDetails.minAdaForRegistration,
-        ),
-      );
+      final utxos = await enabledWallet.getUtxos();
 
       final slotNumber = await _getRegistrationSlotNumberTtl();
 
