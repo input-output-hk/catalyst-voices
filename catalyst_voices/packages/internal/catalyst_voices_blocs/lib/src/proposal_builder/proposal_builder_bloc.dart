@@ -229,7 +229,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     Emitter<ProposalBuilderState> emit,
   ) {
     final documentSegments = _mapDocumentToSegments(
-      state.document!,
+      _cache.proposalDocument!,
       showValidationErrors: false,
     );
 
@@ -388,6 +388,8 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
 
     proposalBuilder!.addChanges(event.changes);
     final document = proposalBuilder.build();
+
+    _cache = _cache.copyWith(proposalDocument: Optional(document));
 
     final documentSegments = _mapDocumentToSegments(
       document,
@@ -1049,7 +1051,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     final validationErrors = state.validationErrors?.copyWith(status: event.status);
 
     final documentSegments = _mapDocumentToSegments(
-      state.document!,
+      _cache.proposalDocument!,
       showValidationErrors: validationErrors?.showErrors ?? false,
     );
 
