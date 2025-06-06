@@ -1,6 +1,7 @@
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:test/test.dart';
 
+import '../test_utils/fee_utils.dart';
 import '../test_utils/selection_utils.dart';
 import '../test_utils/test_data.dart';
 
@@ -267,6 +268,118 @@ void main() {
       final txBody = txBuilder.withOutput(txOutput).withChangeIfNeeded().buildBody();
 
       expect(txBody.fee, equals(const Coin(170605)));
+    });
+
+    test(
+        'transaction with maximum allowed native tokens in '
+        'a single output should create a single output', () {
+      const maxNativeAssetsFittingInSingleOutput = 1011;
+      final changeAddress = SelectionUtils.randomAddress();
+
+      final utxoWithNativeAssets = TransactionUnspentOutput(
+        input: TransactionInput(
+          transactionId: testTransactionHash,
+          index: 1,
+        ),
+        output: PreBabbageTransactionOutput(
+          address: SelectionUtils.randomAddress(),
+          amount: Balance(
+            coin: const Coin(81111040),
+            multiAsset: MultiAsset(
+              bundle: {
+                PolicyId('00000000000000000000000000000000000000000000000000000000'): {
+                  for (int i = 0; i < maxNativeAssetsFittingInSingleOutput; i++)
+                    AssetName('$i'): const Coin(1),
+                },
+              },
+            ),
+          ),
+        ),
+      );
+
+      final txBuilder = TransactionBuilder(
+        config: transactionBuilderConfig(maxAssetsPerOutput: 2000),
+        inputs: {utxoWithNativeAssets},
+        changeAddress: changeAddress,
+      );
+
+      final updatedBuilder = txBuilder.applySelection();
+      final txBody = updatedBuilder.buildBody();
+      final transaction = Transaction(
+        body: txBody,
+        isValid: true,
+        witnessSet: TransactionBuilder.generateFakeWitnessSet(
+          updatedBuilder.inputs,
+          updatedBuilder.requiredSigners,
+        ),
+        auxiliaryData: updatedBuilder.auxiliaryData,
+      );
+
+      verifyTransactionFee(transaction, updatedBuilder);
+      expect(txBody.outputs.length, equals(1));
+    });
+
+    test(
+        'transaction with one over the maximum allowed native tokens '
+        'in a single output should create two outputs', () {
+      const maxNativeAssetsFittingInSingleOutput = 1011;
+      final changeAddress = SelectionUtils.randomAddress();
+
+      final utxoWithNativeAssets = TransactionUnspentOutput(
+        input: TransactionInput(
+          transactionId: testTransactionHash,
+          index: 1,
+        ),
+        output: PreBabbageTransactionOutput(
+          address: SelectionUtils.randomAddress(),
+          amount: Balance(
+            coin: const Coin(81111040),
+            multiAsset: MultiAsset(
+              bundle: {
+                PolicyId('00000000000000000000000000000000000000000000000000000000'): {
+                  for (int i = 0; i <= maxNativeAssetsFittingInSingleOutput; i++)
+                    AssetName('$i'): const Coin(1),
+                },
+              },
+            ),
+          ),
+        ),
+      );
+
+      final txBuilder = TransactionBuilder(
+        config: transactionBuilderConfig(maxAssetsPerOutput: 2000),
+        inputs: {utxoWithNativeAssets},
+        changeAddress: changeAddress,
+      );
+
+      final updatedBuilder = txBuilder.applySelection();
+      final txBody = updatedBuilder.buildBody();
+      final transaction = Transaction(
+        body: txBody,
+        isValid: true,
+        witnessSet: TransactionBuilder.generateFakeWitnessSet(
+          updatedBuilder.inputs,
+          updatedBuilder.requiredSigners,
+        ),
+        auxiliaryData: updatedBuilder.auxiliaryData,
+      );
+
+      verifyTransactionFee(transaction, updatedBuilder);
+      expect(txBody.outputs.length, equals(2));
+
+      final firstOutput = txBody.outputs[0];
+      expect(
+        firstOutput.amount.listNonZeroAssetIds(),
+        // length: ada asset + native assets
+        hasLength(maxNativeAssetsFittingInSingleOutput + 1),
+      );
+
+      final secondOutput = txBody.outputs[1];
+      expect(
+        secondOutput.amount.listNonZeroAssetIds(),
+        // length: ada asset + single native asset
+        hasLength(2),
+      );
     });
   });
 }
