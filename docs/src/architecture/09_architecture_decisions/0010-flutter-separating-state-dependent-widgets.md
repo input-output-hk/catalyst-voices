@@ -1,5 +1,5 @@
 ---
-    title: Flutter widgets selectors
+    title: Separation of Concerns for Bloc State-Dependent Widgets
       adr:
         author: Damian Moliński
         created: 06-Jun-2025
@@ -15,11 +15,9 @@
 
 ## Context
 
-We're using [flutter_bloc](https://pub.dev/packages/flutter_bloc) as state management solution of
-choice. Commonly we're using **Selectors** for querying given subpart of **Bloc** state in order rebuild
-only widgets which are interested in that data.
-This maximizes efficiency in render phase but adds complexity in widget tree and makes it harder to
-read/maintain.
+We use [flutter_bloc](https://pub.dev/packages/flutter_bloc) as our state management solution. Commonly, we use **BlocSelector** to retrieve specific parts of **Bloc** state, allowing us to rebuild only widgets that depend on that data.
+
+However, embedding **BlocSelector** directly within large widgets clutters the widget tree with state-selection logic. While this maximizes rendering efficiency, it increases visual complexity and reduces maintainability.
 
 ## Assumptions
 
@@ -28,7 +26,9 @@ read/maintain.
 
 ## Decision
 
-We will build widgets which depend on state data (**Selectors**) in separate file under relative directory `/widgets` to where it's supposed to be used. We will also not include keyword **Selector** or **Bloc** in name of those widgets, instead we'll have public widget with appropriate name, which only selects relevant state data and second, private, widget which will know how to render that data.
+We will extract widgets that depend on **Bloc** state (via **BlocSelector**) into dedicated files, placed in the corresponding `/widgets` subdirectory.
+
+The public widget will act as the interface, encapsulating the state selection logic. It will delegate rendering to a private, internal widget that is unaware of the Bloc and simply receives the selected data as parameters.
 
 ### Example
 
@@ -52,7 +52,7 @@ Simple example but it quickly becomes more complex
           drawer: state.isActive
               ? SpacesDrawer(
                   space: widget.space,
-                  spacesShortcutsActivators: SpacesShellPage._spacesShortcutsActivators,
+                  spacesShortcutsActivators: _spacesShortcutsActivators,
                   isUnlocked: state.isActive,
                 )
               : null,
@@ -144,7 +144,8 @@ return SpacesScaffold(
 
 ## Risks
 
-* More boilerplate code and longer development time
+* While this introduces more files and a slight increase in initial development effort due to the two-widget pattern, we believe the long-term gains in maintainability and readability outweigh this overhead
+* Risk of over-abstraction if used for trivial selections
 
 ## Consequences
 
