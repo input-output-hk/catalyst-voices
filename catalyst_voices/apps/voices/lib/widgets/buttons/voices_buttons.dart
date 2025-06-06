@@ -157,7 +157,7 @@ class LeftArrowButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return VoicesIconButton(
       onTap: onTap,
-      child: VoicesAssets.icons.arrowNarrowLeft.buildIcon(),
+      child: VoicesAssets.icons.arrowLeft.buildIcon(),
     );
   }
 }
@@ -175,17 +175,6 @@ class MoreOptionsButton extends StatelessWidget {
     return VoicesIconButton(
       onTap: onTap,
       child: VoicesAssets.icons.dotsVertical.buildIcon(),
-    );
-  }
-}
-
-class NavigationPopButton extends StatelessWidget {
-  const NavigationPopButton({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return LeftArrowButton(
-      onTap: () => unawaited(Navigator.maybeOf(context)?.maybePop()),
     );
   }
 }
