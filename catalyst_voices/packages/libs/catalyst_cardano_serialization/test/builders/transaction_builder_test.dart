@@ -365,7 +365,7 @@ void main() {
       );
 
       verifyTransactionFee(transaction, updatedBuilder);
-      expect(txBody.outputs.length, equals(2));
+      expect(txBody.outputs, hasLength(2));
 
       final firstOutput = txBody.outputs[0];
       expect(
