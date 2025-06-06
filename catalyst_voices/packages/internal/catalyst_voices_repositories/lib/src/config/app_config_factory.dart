@@ -34,6 +34,7 @@ final class AppConfigFactory {
       feeAlgo: effectiveFeeAlgo,
       maxTxSize: remoteTransactionBuilderConfig?.maxTxSize,
       maxValueSize: remoteTransactionBuilderConfig?.maxValueSize,
+      maxAssetsPerOutput: remoteTransactionBuilderConfig?.maxAssetsPerOutput,
       coinsPerUtxoByte: remoteTransactionBuilderConfig?.coinsPerUtxoByte?.asCoin(),
       selectionStrategy: remoteTransactionBuilderConfig?.selectionStrategy?.build(),
     );
@@ -95,6 +96,8 @@ extension on RemoteTransactionSelectionStrategyType {
   CoinSelectionStrategy build() {
     return switch (this) {
       RemoteTransactionSelectionStrategyType.greedy => const GreedySelectionStrategy(),
+      RemoteTransactionSelectionStrategyType.exactBiggest =>
+        const ExactBiggestAssetSelectionStrategy(),
       RemoteTransactionSelectionStrategyType.random => RandomSelectionStrategy(),
     };
   }

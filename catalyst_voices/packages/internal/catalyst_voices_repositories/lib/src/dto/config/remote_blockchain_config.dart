@@ -43,6 +43,7 @@ final class RemoteTransactionBuilderConfig {
   final RemoteTransactionTieredFee? feeAlgo;
   final int? maxTxSize;
   final int? maxValueSize;
+  final int? maxAssetsPerOutput;
   final int? coinsPerUtxoByte;
   @JsonKey(unknownEnumValue: JsonKey.nullForUndefinedEnumValue)
   final RemoteTransactionSelectionStrategyType? selectionStrategy;
@@ -51,6 +52,7 @@ final class RemoteTransactionBuilderConfig {
     this.feeAlgo,
     this.maxTxSize,
     this.maxValueSize,
+    this.maxAssetsPerOutput,
     this.coinsPerUtxoByte,
     this.selectionStrategy,
   });
@@ -60,7 +62,7 @@ final class RemoteTransactionBuilderConfig {
   }
 }
 
-enum RemoteTransactionSelectionStrategyType { greedy, random }
+enum RemoteTransactionSelectionStrategyType { greedy, exactBiggest, random }
 
 @JsonSerializable(createToJson: false)
 final class RemoteTransactionTieredFee {

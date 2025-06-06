@@ -1,11 +1,13 @@
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_cardano_serialization/src/builders/types.dart';
-import 'package:cbor/cbor.dart';
 
-/// A greedy selection strategy that selects UTxOs by length and value.
-final class GreedySelectionStrategy implements CoinSelectionStrategy {
-  /// Default const constructor for [GreedySelectionStrategy]
-  const GreedySelectionStrategy();
+/// A coin selection strategy that prioritizes UTxOs without other assets.
+///
+/// If both UTxO have extra assets or both of them don't have any other assets
+/// then the larger asset balance is prioritized.
+final class ExactBiggestAssetSelectionStrategy implements CoinSelectionStrategy {
+  /// Default const constructor for [ExactBiggestAssetSelectionStrategy]
+  const ExactBiggestAssetSelectionStrategy();
 
   @override
   void apply(AssetsGroup assetsGroup) {
@@ -14,12 +16,17 @@ final class GreedySelectionStrategy implements CoinSelectionStrategy {
     }
   }
 
+  bool _hasOtherAssets(Balance balance, AssetId assetId) {
+    final assets = balance.listNonZeroAssetIds()..remove(assetId);
+    return assets.isNotEmpty;
+  }
+
   /// Compares this [TransactionUnspentOutput] with another
   /// [TransactionUnspentOutput].
   ///
-  /// This method compares the UTxOs based on:
-  /// 1. The length of the UTxO's balance.
-  /// 2. The value of the UTxO.
+  /// This method prioritizes UTxO which don't have other assets than [asset].
+  /// If both UTxO have extra assets or both of them don't have any other assets
+  /// then the larger [asset] balance is prioritized.
   ///
   /// Parameters:
   /// - [asset]: The asset key to compare against.
@@ -37,16 +44,18 @@ final class GreedySelectionStrategy implements CoinSelectionStrategy {
     final thisBalance = thisUtxo.output.amount;
     final otherBalance = otherUtxo.output.amount;
 
-    final thisBalanceLength = cbor.encode(thisBalance.toCbor()).length;
-    final otherBalanceLength = cbor.encode(otherBalance.toCbor()).length;
-
-    if (thisBalanceLength != otherBalanceLength) {
-      return otherBalanceLength.compareTo(thisBalanceLength);
-    }
-
     final thisAssetBalance = thisBalance[asset] ?? const Coin(0);
     final otherAssetBalance = otherBalance[asset] ?? const Coin(0);
 
-    return otherAssetBalance.compareTo(thisAssetBalance);
+    final thisHasOtherAssets = _hasOtherAssets(thisBalance, asset);
+    final otherHasOtherAssets = _hasOtherAssets(otherBalance, asset);
+
+    if (!thisHasOtherAssets && otherHasOtherAssets) {
+      return -1;
+    } else if (thisHasOtherAssets && otherHasOtherAssets) {
+      return 1;
+    } else {
+      return otherAssetBalance.compareTo(thisAssetBalance);
+    }
   }
 }
