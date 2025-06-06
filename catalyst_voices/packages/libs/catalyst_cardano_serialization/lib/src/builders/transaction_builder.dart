@@ -107,10 +107,7 @@ final class TransactionBuilder extends Equatable {
     this.collateralReturn,
     this.totalCollateral,
     this.referenceInputs,
-    this.witnessBuilder = const TransactionWitnessSetBuilder(
-      vkeys: {},
-      vkeysCount: 1,
-    ),
+    this.witnessBuilder = const TransactionWitnessSetBuilder(vkeys: {}),
     this.changeAddress,
   });
 
@@ -165,35 +162,25 @@ final class TransactionBuilder extends Equatable {
     );
   }
 
-  /// Builds a [TransactionBody] and measures the final transaction size
-  /// that will be submitted to the blockchain.
-  ///
-  /// Knowing the final transaction size is very important as it influences
-  /// the [fee] the wallet must pay for the transaction.
-  ///
-  /// Since the transaction body is signed before all
-  (TransactionBody, int) buildAndSize() {
-    final built = _buildBody();
-
-    // we must build a tx with fake data (of correct size)
-    // to check the final transaction size
-    final fullTx = buildFakeTransaction(built);
-    final fullTxSize = cbor.encode(fullTx.toCbor()).length;
-    return (fullTx.body, fullTxSize);
-  }
-
   /// Returns the body of the new transaction.
   ///
   /// Throws [MaxTxSizeExceededException] if maximum transaction
   /// size is reached.
   TransactionBody buildBody() {
-    final (body, fullTxSize) = buildAndSize();
-    if (fullTxSize > config.maxTxSize) {
-      throw MaxTxSizeExceededException(
-        maxTxSize: config.maxTxSize,
-        actualTxSize: fullTxSize,
-      );
-    }
+    final (body, fullTxSize) = _buildAndSize();
+
+    _validateOutputsValueAndSize(outputs);
+    _validateInputsMatchOutputsAndFee(
+      inputs: inputs,
+      outputs: outputs,
+      fee: body.fee,
+    );
+    _validateMinTxFee(
+      body: body,
+      inputs: inputs,
+      referenceInputs: referenceInputs,
+    );
+    _validateMaxTxSize(fullTxSize);
 
     return body;
   }
@@ -201,27 +188,19 @@ final class TransactionBuilder extends Equatable {
   /// Constructs a placeholder [Transaction] using fake witness data.
   ///
   /// This method generates a [Transaction] for estimating the final size by
-  /// creating fake witness data of the appropriate length. If [useWitnesses]
-  /// is set to `true`, it generates a witness set based on the unique input
-  /// addresses. Otherwise, it uses the existing `buildFake` method for
-  /// backward compatibility.
+  /// creating fake witness data of the appropriate length.
+  /// It generates a witness set based on the unique input addresses and required signers.
   ///
   /// Parameters:
   /// - [txBody]: The body of the transaction being constructed.
-  /// - [useWitnesses]: If `true`, generates a witness set based on the inputs.
-  ///   Defaults to `false` for backward compatibility.
   ///
   /// Returns:
   /// - A proper [Transaction] with a body, placeholder witness set, and
   ///   auxiliary data.
-  Transaction buildFakeTransaction(
-    TransactionBody txBody, {
-    bool useWitnesses = false,
-  }) {
+  Transaction buildFakeTransaction(TransactionBody txBody) {
     return Transaction(
       body: txBody,
-      // TODO(ilap): The buildFake should be refactored instead.
-      witnessSet: useWitnesses ? generateFakeWitnessSet(inputs) : witnessBuilder.buildFake(),
+      witnessSet: generateFakeWitnessSet(inputs, requiredSigners),
       isValid: true,
       auxiliaryData: auxiliaryData,
     );
@@ -260,7 +239,7 @@ final class TransactionBuilder extends Equatable {
 
   /// Returns the size of the full transaction in bytes.
   int fullSize() {
-    return buildAndSize().$2;
+    return _buildAndSize().$2;
   }
 
   /// Calculates the minimum fee for the transaction.
@@ -268,15 +247,11 @@ final class TransactionBuilder extends Equatable {
   /// This method calculates the minimum fee required for the transaction,
   /// optionally considering the witnesses based on the inputs' addresses.
   ///
-  /// - [useWitnesses]: If `true`, the fee calculation will include witnesses
-  ///   based on the inputs' addresses, making the fee more accurate by using
-  ///   the proper number of witnesses.
-  ///
   /// Returns:
   /// - A [Coin] representing the minimum fee required for the transaction.
-  Coin minFee({bool useWitnesses = false}) {
-    final txBody = copyWith(fee: Coin(config.feeAlgo.constant)).buildBody();
-    final fullTx = buildFakeTransaction(txBody, useWitnesses: useWitnesses);
+  Coin minFee() {
+    final txBody = copyWith(fee: Coin(config.feeAlgo.constant))._buildBody();
+    final fullTx = buildFakeTransaction(txBody);
 
     return config.feeAlgo.minFee(fullTx, {...inputs, ...?referenceInputs});
   }
@@ -312,15 +287,15 @@ final class TransactionBuilder extends Equatable {
     );
   }
 
-  /// Returns a copy of this [TransactionBuilder] with extra [address] used
+  /// Returns a copy of this [TransactionBuilder] with extra [changeAddress] used
   /// to spend any remaining change from the transaction, if it is needed.
   ///
   /// Since in a Cardano transaction the input amount must match the output
   /// amount plus fee, the method must ensure that there are no unspent utxos.
   ///
   /// The algorithm first tries to create a [ShelleyMultiAssetTransactionOutput]
-  /// which will transfer any remaining [Coin] back to the [address].
-  /// The [address] should be the change address of the wallet initiating the
+  /// which will transfer any remaining [Coin] back to the [changeAddress].
+  /// The [changeAddress] should be the change address of the wallet initiating the
   /// transaction.
   ///
   /// If creating an extra [ShelleyMultiAssetTransactionOutput] is not possible
@@ -329,10 +304,15 @@ final class TransactionBuilder extends Equatable {
   ///  burn any remaining change.
   ///
   /// Follows code style of Cardano Multiplatform Lib to make patching easy.
-  TransactionBuilder withChangeAddressIfNeeded(ShelleyAddress address) {
+  TransactionBuilder withChangeIfNeeded() {
     if (this.fee != null) {
       // generating the change output involves changing the fee
       return this;
+    }
+
+    final changeAddress = this.changeAddress;
+    if (changeAddress == null) {
+      throw StateError('Make sure to set change address before calling withChangeIfNeeded');
     }
 
     final fee = minFee();
@@ -344,8 +324,7 @@ final class TransactionBuilder extends Equatable {
     final outputTotalPlusFee = outputTotal + Balance(coin: fee);
 
     if (outputTotalPlusFee.coin == inputTotal.coin) {
-      // ignore: avoid_returning_this
-      return this;
+      return withFee(fee);
     } else if (outputTotalPlusFee.coin > inputTotal.coin) {
       throw InsufficientUtxoBalanceException(
         actualAmount: inputTotal,
@@ -355,13 +334,13 @@ final class TransactionBuilder extends Equatable {
       final changeEstimator = inputTotal - outputTotal;
       if (changeEstimator.hasMultiAssets()) {
         return _withChangeAddressIfNeededWithMultiAssets(
-          address: address,
+          address: changeAddress,
           fee: fee,
           changeEstimator: changeEstimator,
         );
       } else {
         return _withChangeAddressIfNeededWithoutMultiAssets(
-          address: address,
+          address: changeAddress,
           fee: fee,
           changeEstimator: changeEstimator,
         );
@@ -375,35 +354,7 @@ final class TransactionBuilder extends Equatable {
   }
 
   /// Returns a copy of this [TransactionBuilder] with extra [output].
-  ///
-  /// The [output] must reach a minimum [Coin] value as calculated
-  /// by [TransactionOutputBuilder.minimumAdaForOutput],
-  /// otherwise [TxValueBelowMinUtxoValueException] is thrown.
   TransactionBuilder withOutput(ShelleyMultiAssetTransactionOutput output) {
-    final valueSize = cbor.encode(output.amount.toCbor()).length;
-
-    if (!TransactionOutputBuilder.isOutputSizeValid(
-      output,
-      config.maxValueSize,
-    )) {
-      throw TxValueSizeExceededException(
-        actualValueSize: valueSize,
-        maxValueSize: config.maxValueSize,
-      );
-    }
-
-    final minAdaPerUtxoEntry = TransactionOutputBuilder.minimumAdaForOutput(
-      output,
-      config.coinsPerUtxoByte,
-    );
-
-    if (output.amount.coin < minAdaPerUtxoEntry) {
-      throw TxValueBelowMinUtxoValueException(
-        actualAmount: output.amount.coin,
-        requiredAmount: minAdaPerUtxoEntry,
-      );
-    }
-
     return copyWith(outputs: [...outputs, output]);
   }
 
@@ -413,6 +364,53 @@ final class TransactionBuilder extends Equatable {
     return copyWith(witnessBuilder: builder);
   }
 
+  /// Removes the last transaction output and inserts a new one with extra [change].
+  /// Updates the [fee] to accommodate a possibly larger new transaction output.
+  TransactionBuilder _addChangeToLastOutput({
+    required Balance change,
+  }) {
+    final newOutputs = List.of(outputs);
+    var changeLeft = change;
+    var newFee = fee!;
+
+    // remove old output
+    final lastOutput = newOutputs.removeLast();
+    final lastOutputFee = TransactionOutputBuilder.feeForOutput(config, lastOutput);
+    newFee -= lastOutputFee;
+    changeLeft += Balance(coin: lastOutputFee);
+
+    // create new output with remaining change
+    final newOutput = lastOutput.copyWith(amount: lastOutput.amount + changeLeft);
+    final newOutputFee = TransactionOutputBuilder.feeForOutput(config, newOutput);
+
+    // subtract the fee for the new output from it
+    final newOutputMinusFee = newOutput.copyWith(
+      amount: newOutput.amount - Balance(coin: newOutputFee),
+    );
+    newFee += newOutputFee;
+    changeLeft -= Balance(coin: newFee);
+
+    // add new output and modify the fee
+    return copyWith(outputs: newOutputs).withOutput(newOutputMinusFee).withFee(newFee);
+  }
+
+  /// Builds a [TransactionBody] and measures the final transaction size
+  /// that will be submitted to the blockchain.
+  ///
+  /// Knowing the final transaction size is very important as it influences
+  /// the [fee] the wallet must pay for the transaction.
+  ///
+  /// Since the transaction body is signed before all
+  (TransactionBody, int) _buildAndSize() {
+    final built = _buildBody();
+
+    // we must build a tx with fake data (of correct size)
+    // to check the final transaction size
+    final fullTx = buildFakeTransaction(built);
+    final fullTxSize = cbor.encode(fullTx.toCbor()).length;
+    return (fullTx.body, fullTxSize);
+  }
+
   TransactionBody _buildBody() {
     final fee = this.fee;
     if (fee == null) {
@@ -420,8 +418,8 @@ final class TransactionBuilder extends Equatable {
     }
 
     return TransactionBody(
-      inputs: Set.of(inputs.map((e) => e.input)),
-      outputs: List.of(outputs),
+      inputs: inputs.map((e) => e.input).toSet(),
+      outputs: outputs,
       fee: fee,
       ttl: ttl,
       auxiliaryDataHash:
@@ -462,6 +460,7 @@ final class TransactionBuilder extends Equatable {
           output: output,
           currentAssets: rebuiltAssets,
           assetToAdd: (policy.key, asset.key, asset.value),
+          maxAssetsPerOutput: config.maxAssetsPerOutput,
         )) {
           // if we got here, this means we will run into a overflow error,
           // so we want to split into multiple outputs, for that we...
@@ -522,8 +521,90 @@ final class TransactionBuilder extends Equatable {
     return changeAssets;
   }
 
+  void _validateInputsMatchOutputsAndFee({
+    required Set<TransactionUnspentOutput> inputs,
+    required List<ShelleyMultiAssetTransactionOutput> outputs,
+    required Coin fee,
+  }) {
+    final inputsTotal = CoinSelector.sumAmounts(inputs, (input) => input.output.amount);
+    final outputsTotal = CoinSelector.sumAmounts(outputs, (output) => output.amount);
+
+    if (inputsTotal != outputsTotal + Balance(coin: fee)) {
+      throw TxBalanceMismatchException(
+        inputs: inputsTotal,
+        outputs: outputsTotal,
+        fee: fee,
+      );
+    }
+  }
+
+  void _validateMaxTxSize(int fullTxSize) {
+    if (fullTxSize > config.maxTxSize) {
+      throw MaxTxSizeExceededException(
+        maxTxSize: config.maxTxSize,
+        actualTxSize: fullTxSize,
+      );
+    }
+  }
+
+  void _validateMinTxFee({
+    required TransactionBody body,
+    required Set<TransactionUnspentOutput> inputs,
+    required Set<TransactionUnspentOutput>? referenceInputs,
+  }) {
+    final transaction = buildFakeTransaction(body);
+    final minFee = config.feeAlgo.minFee(transaction, {
+      ...inputs,
+      ...?referenceInputs,
+    });
+
+    if (body.fee < minFee) {
+      throw TxFeeTooSmallException(
+        actualFee: body.fee,
+        minFee: minFee,
+      );
+    }
+  }
+
+  void _validateOutputsValueAndSize(List<ShelleyMultiAssetTransactionOutput> outputs) {
+    for (final output in outputs) {
+      if (!TransactionOutputBuilder.isOutputSizeValid(
+        output,
+        config.maxValueSize,
+      )) {
+        final valueSize = cbor.encode(output.amount.toCbor()).length;
+
+        throw TxValueSizeExceededException(
+          actualValueSize: valueSize,
+          maxValueSize: config.maxValueSize,
+        );
+      }
+
+      final minAdaPerUtxoEntry = TransactionOutputBuilder.minimumAdaForOutput(
+        output,
+        config.coinsPerUtxoByte,
+      );
+
+      if (output.amount.coin < minAdaPerUtxoEntry) {
+        throw TxValueBelowMinUtxoValueException(
+          actualAmount: output.amount.coin,
+          requiredAmount: minAdaPerUtxoEntry,
+        );
+      }
+
+      final assetsPerOutput = output.amount.listNonZeroAssetIds().length;
+      if (assetsPerOutput > config.maxAssetsPerOutput) {
+        throw TxMaxAssetsPerOutputExceededException(
+          actualCount: assetsPerOutput,
+          maxCount: config.maxAssetsPerOutput,
+        );
+      }
+    }
+  }
+
   /// Returns true if adding additional [assetToAdd] to [currentAssets]
-  /// will trigger size overflow in [output].
+  /// will trigger size overflow in [output] or the asset count
+  /// is more than [TransactionBuilderConfig.maxAssetsPerOutput].
   ///
   /// The function is used to split native assets into
   /// multiple outputs if they don't fit in one output.
@@ -531,7 +612,12 @@ final class TransactionBuilder extends Equatable {
     required ShelleyMultiAssetTransactionOutput output,
     required Map<AssetName, Coin> currentAssets,
     required (PolicyId, AssetName, Coin) assetToAdd,
+    required int maxAssetsPerOutput,
   }) {
+    if (output.amount.listNonZeroAssetIds().length >= maxAssetsPerOutput) {
+      return true;
+    }
+
     final (policy, assetName, value) = assetToAdd;
 
     final valueWithExtraMultiAssets = Balance(
@@ -590,10 +676,9 @@ final class TransactionBuilder extends Equatable {
         final feeForChange = TransactionOutputBuilder.feeForOutput(
           config,
           changeOutput,
-          numOutputs: outputs.length,
         );
 
-        newFee = newFee + feeForChange;
+        newFee += feeForChange;
 
         final changeAdaPlusFee = changeOutput.amount.coin + newFee;
         if (changeLeft.coin < changeAdaPlusFee) {
@@ -609,11 +694,11 @@ final class TransactionBuilder extends Equatable {
     builder = builder.withFee(newFee);
 
     if (!changeLeft.isZero) {
-      final outputs = List.of(builder.outputs);
-      final lastOutput = outputs.removeLast();
-      final newOutput = lastOutput.copyWith(amount: lastOutput.amount + changeLeft);
-      outputs.add(newOutput);
-      builder = builder.copyWith(outputs: outputs);
+      // No new transaction output needed at this stage,
+      // since the method is only called when multi assets exist
+      // then at least one transaction output for them is created
+      // which we can reuse here for the remaining change.
+      builder = builder._addChangeToLastOutput(change: changeLeft);
     }
 
     return builder;
@@ -624,52 +709,52 @@ final class TransactionBuilder extends Equatable {
     required Coin fee,
     required Balance changeEstimator,
   }) {
-    final minAda = TransactionOutputBuilder.minimumAdaForOutput(
-      PreBabbageTransactionOutput(
-        address: address,
-        amount: changeEstimator,
-      ),
+    final draftOutput = PreBabbageTransactionOutput(
+      address: address,
+      amount: changeEstimator,
+    );
+
+    final minAdaForDraft = TransactionOutputBuilder.minimumAdaForOutput(
+      draftOutput,
       config.coinsPerUtxoByte,
     );
 
-    switch (changeEstimator.coin >= minAda) {
+    switch (changeEstimator.coin > minAdaForDraft) {
+      case true:
+        final feeForChange = TransactionOutputBuilder.feeForOutput(config, draftOutput);
+        final newFee = fee + feeForChange;
+
+        final changeOutput = PreBabbageTransactionOutput(
+          address: address,
+          amount: changeEstimator - Balance(coin: newFee),
+        );
+
+        final minAdaForChange = TransactionOutputBuilder.minimumAdaForOutput(
+          changeOutput,
+          config.coinsPerUtxoByte,
+        );
+
+        if (changeOutput.amount.coin >= minAdaForChange) {
+          return withFee(newFee).withOutput(changeOutput);
+        } else {
+          return withFee(changeEstimator.coin);
+        }
+
       case false:
         // burn remaining change as fee
         return withFee(changeEstimator.coin);
-      case true:
-        final feeForChange = TransactionOutputBuilder.feeForOutput(
-          config,
-          PreBabbageTransactionOutput(
-            address: address,
-            amount: changeEstimator,
-          ),
-          numOutputs: outputs.length,
-        );
-
-        final newFee = fee + feeForChange;
-
-        switch (changeEstimator.coin >= minAda) {
-          case false:
-            // burn remaining change as fee
-            return withFee(changeEstimator.coin);
-          case true:
-            return withFee(newFee).withOutput(
-              PreBabbageTransactionOutput(
-                address: address,
-                amount: changeEstimator - Balance(coin: newFee),
-              ),
-            );
-        }
     }
   }
 
   /// Generates a fake `TransactionWitnessSet` for accurate transaction fee
   /// calculation, ensuring the correct number of VKey witnesses based on
-  /// the builder's unique input addresses.
+  /// the builder's unique input addresses and required signers.
   static TransactionWitnessSet generateFakeWitnessSet(
     Set<TransactionUnspentOutput> inputs,
+    Set<Ed25519PublicKeyHash>? requiredSigners,
   ) {
-    final uniqueAddresses = inputs.map((input) => input.output.address.publicKeyHash).toSet();
+    final uniqueAddresses = inputs.map((input) => input.output.address.publicKeyHash).toSet()
+      ..addAll(requiredSigners ?? {});
 
     return TransactionWitnessSet(
       vkeyWitnesses: {
@@ -692,6 +777,9 @@ final class TransactionBuilderConfig extends Equatable {
   /// size in bytes.
   final int maxValueSize;
 
+  /// A number of native assets allowed per output.
+  final int maxAssetsPerOutput;
+
   /// The protocol parameter that establishes the minimum amount of [Coin]
   /// required per UTXO entry.
   ///
@@ -709,6 +797,7 @@ final class TransactionBuilderConfig extends Equatable {
     required this.feeAlgo,
     required this.maxTxSize,
     required this.maxValueSize,
+    this.maxAssetsPerOutput = 1000,
     required this.coinsPerUtxoByte,
     this.selectionStrategy = const GreedySelectionStrategy(),
   });
@@ -718,7 +807,9 @@ final class TransactionBuilderConfig extends Equatable {
         feeAlgo,
         maxTxSize,
         maxValueSize,
+        maxAssetsPerOutput,
         coinsPerUtxoByte,
+        selectionStrategy,
       ];
 
   /// Creates copy of this config with updated parameters.
@@ -726,6 +817,7 @@ final class TransactionBuilderConfig extends Equatable {
     TieredFee? feeAlgo,
     int? maxTxSize,
     int? maxValueSize,
+    int? maxAssetsPerOutput,
     Coin? coinsPerUtxoByte,
     CoinSelectionStrategy? selectionStrategy,
   }) {
@@ -733,6 +825,7 @@ final class TransactionBuilderConfig extends Equatable {
       feeAlgo: feeAlgo ?? this.feeAlgo,
       maxTxSize: maxTxSize ?? this.maxTxSize,
       maxValueSize: maxValueSize ?? this.maxValueSize,
+      maxAssetsPerOutput: maxAssetsPerOutput ?? this.maxAssetsPerOutput,
       coinsPerUtxoByte: coinsPerUtxoByte ?? this.coinsPerUtxoByte,
       selectionStrategy: selectionStrategy ?? this.selectionStrategy,
     );
@@ -758,9 +851,8 @@ final class TransactionOutputBuilder {
   /// sufficient.
   static Coin feeForOutput(
     TransactionBuilderConfig config,
-    ShelleyMultiAssetTransactionOutput output, {
-    required int numOutputs,
-  }) =>
+    ShelleyMultiAssetTransactionOutput output,
+  ) =>
       Coin(
         cbor.encode(output.toCbor()).length * config.feeAlgo.coefficient,
       );
@@ -856,9 +948,7 @@ final class TransactionOutputBuilder {
 
     // how many bytes the size changed from including the minimum ada value
     final sizeChange = latestCoinSize - oldCoinSize;
-
     final adjustedMinAda = Coin(outputSize + constantOverhead + sizeChange) * coinsPerUtxoByte;
-
     return adjustedMinAda;
   }
 
