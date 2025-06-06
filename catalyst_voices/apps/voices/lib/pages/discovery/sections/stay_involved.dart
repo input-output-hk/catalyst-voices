@@ -83,7 +83,7 @@ class _DatetimeRangeTimeline extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                context.l10n.votingTimelineHeader,
+                title,
                 style: context.textTheme.bodyMedium
                     ?.copyWith(color: context.colors.textOnPrimaryLevel1),
               ),
@@ -116,11 +116,35 @@ class _ReviewerCard extends StatelessWidget {
       icon: VoicesAssets.icons.clipboardCheck,
       title: context.l10n.becomeReviewer,
       description: context.l10n.stayInvolvedReviewerDescription,
-      additionalInfo: const _CopyCatalystIdTipText(),
       actions: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          const SizedBox(height: 16),
+          BlocSelector<DiscoveryCubit, DiscoveryState, DateRange?>(
+            selector: (state) {
+              return state.campaign.votingStartsAt;
+            },
+            builder: (context, date) {
+              return _DatetimeRangeTimeline(
+                dateRange: date,
+                title: context.l10n.reviewRegistration,
+              );
+            },
+          ),
+          const SizedBox(height: 8),
+          BlocSelector<DiscoveryCubit, DiscoveryState, DateRange?>(
+            selector: (state) {
+              return state.campaign.votingStartsAt;
+            },
+            builder: (context, date) {
+              return _DatetimeRangeTimeline(
+                dateRange: date,
+                title: context.l10n.reviewTimelineHeader,
+              );
+            },
+          ),
+          const _CopyCatalystIdTipText(),
           const SessionAccountCatalystId(
             padding: EdgeInsets.only(top: 20),
           ),
@@ -183,7 +207,7 @@ class _StayInvolvedCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       constraints: const BoxConstraints(
-        minHeight: 550,
+        minHeight: 565,
         maxWidth: 588,
       ),
       padding: const EdgeInsets.symmetric(horizontal: 32),
@@ -192,22 +216,14 @@ class _StayInvolvedCard extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: Theme.of(context).brightness == Brightness.light
-              ? [
-                  const Color(0xFFD1EAFF),
-                  const Color(0xFFCAD6FE),
-                ]
-              : [
-                  const Color(0xFF2D3953),
-                  const Color(0xFF242C42),
-                ],
+          colors: _getGradientColors(context),
         ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          const SizedBox(height: 40),
+          const SizedBox(height: 20),
           icon.buildIcon(size: 53),
           const SizedBox(height: 22),
           Text(
@@ -232,6 +248,18 @@ class _StayInvolvedCard extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  List<Color> _getGradientColors(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.light
+        ? [
+            const Color(0xFFD1EAFF),
+            const Color(0xFFCAD6FE),
+          ]
+        : [
+            const Color(0xFF2D3953),
+            const Color(0xFF242C42),
+          ];
   }
 }
 

@@ -47,6 +47,18 @@ final class DiscoveryCurrentCampaignState extends Equatable {
         campaignTimeline,
       ];
 
+  DateRange? get reviewRegistrationStartsAt {
+    return campaignTimeline
+        .firstWhere((e) => e.stage == CampaignTimelineStage.reviewRegistration)
+        .timeline;
+  }
+
+  DateRange? get reviewStartsAt {
+    return campaignTimeline
+        .firstWhere((e) => e.stage == CampaignTimelineStage.communityReview)
+        .timeline;
+  }
+
   bool get showCurrentCampaign =>
       !isLoading && currentCampaign is! NullCurrentCampaignInfoViewModel;
 

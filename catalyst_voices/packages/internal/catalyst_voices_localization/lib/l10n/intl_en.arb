@@ -2959,5 +2959,13 @@
   "votingTimelineHeader": "Voting:",
   "@votingTimelineHeader": {
     "description": "Header for the voting timeline"
+  },
+  "reviewRegistration": "Reviewers and Moderators registration:",
+  "@reviewRegistration": {
+    "description": "Title for the review registration timeline"
+  },
+  "reviewTimelineHeader": "Community review:",
+  "@reviewTimelineHeader": {
+    "description": "Header for the review timeline"
   }
 }
