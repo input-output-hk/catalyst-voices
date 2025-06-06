@@ -99,6 +99,17 @@ project: {
 							  try_files $uri $uri/ /index.html;
 							}
 
+							location /healthz {
+							  access_log off;
+							  return 200 "{\\"status\\": \\"ok\\"}";
+							}
+
+							location /stub_status {
+							  stub_status;
+							  allow 127.0.0.1;
+							  deny all;
+							}
+
 							error_page   500 502 503 504  /50x.html;
 							location = /50x.html {
 							  root   /usr/share/nginx/html;
