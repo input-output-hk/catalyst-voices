@@ -2235,7 +2235,7 @@
   "@apiErrorNotFound": {
     "description": "Message of an error when api returns not found status code, depends on context."
   },
-  "apiErrorTooManyRequests": "Too many requests",
+  "apiErrorTooManyRequests": "Too many requests, please try again in 10 minutes.",
   "@apiErrorTooManyRequests": {
     "description": "Message of an error when api returns matching status code."
   },
