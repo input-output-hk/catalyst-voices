@@ -91,6 +91,12 @@ impl TryInto<uuid::Uuid> for UUIDv4 {
     }
 }
 
+impl From<uuid::Uuid> for UUIDv4 {
+    fn from(value: uuid::Uuid) -> Self {
+        UUIDv4(value.to_string())
+    }
+}
+
 impl From<catalyst_signed_doc::UuidV4> for UUIDv4 {
     fn from(value: catalyst_signed_doc::UuidV4) -> Self {
         Self(value.to_string())

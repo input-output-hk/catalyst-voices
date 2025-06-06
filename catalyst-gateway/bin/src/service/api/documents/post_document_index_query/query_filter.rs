@@ -164,7 +164,7 @@ impl TryFrom<DocumentIndexQueryFilter> for DocsQueryFilter {
     fn try_from(value: DocumentIndexQueryFilter) -> Result<Self, Self::Error> {
         let mut db_filter = DocsQueryFilter::all();
         if let Some(doc_type) = value.doc_type {
-            db_filter = db_filter.with_type(doc_type.parse()?);
+            db_filter = db_filter.with_type(doc_type);
         }
         if let Some(id) = value.id {
             db_filter = db_filter.with_id(id.try_into()?);

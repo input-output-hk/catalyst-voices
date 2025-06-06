@@ -82,7 +82,7 @@ impl FullSignedDoc {
     /// # Arguments:
     ///  - `id` is a UUID v7
     ///  - `ver` is a UUID v7
-    ///  - `doc_type` is a UUID v4
+    ///  - `doc_type` is a list of UUID v4
     pub(crate) async fn store(&self) -> anyhow::Result<bool> {
         // Perform insert before checking if the document already exists.
         // This should prevent race condition.
