@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:bip32_ed25519/bip32_ed25519.dart';
 import 'package:catalyst_cardano_serialization/src/address.dart';
 import 'package:catalyst_cardano_serialization/src/builders/transaction_builder.dart';
-import 'package:catalyst_cardano_serialization/src/fees.dart';
+import 'package:catalyst_cardano_serialization/src/builders/types.dart';
 import 'package:catalyst_cardano_serialization/src/hashes.dart';
 import 'package:catalyst_cardano_serialization/src/signature.dart';
 import 'package:catalyst_cardano_serialization/src/transaction.dart';
@@ -16,26 +16,11 @@ import 'package:convert/convert.dart';
 ///
 /// This class is used only in testing and resides under the `./test` folder.
 final class SelectionUtils {
-  static final _kRandom = Random();
+  static final _kRandom = Random(1748425502827);
 
   static const String _chars = 'abcdefghijklmnopqrstuvwxyz'
       'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
       '0123456789';
-
-  /// The default configuration for transaction building.
-  ///
-  /// This configuration includes fee algorithm parameters, maximum transaction
-  /// size, maximum value size, and coins per UTxO byte.
-  static const defaultConfig = TransactionBuilderConfig(
-    feeAlgo: TieredFee(
-      constant: 155381,
-      coefficient: 44,
-      refScriptByteCost: 15,
-    ),
-    maxTxSize: 16384,
-    maxValueSize: 5000,
-    coinsPerUtxoByte: Coin(4310),
-  );
 
   List<Ed25519PrivateKey> generateMockPrivateKeys(int count) => List<Ed25519PrivateKey>.generate(
         count,
@@ -53,8 +38,7 @@ final class SelectionUtils {
         minPercentage + _kRandom.nextDouble() * (maxPercentage - minPercentage);
 
     final randomAmount = (balance.value * (randomPercentage / 100)).toInt();
-
-    final adjustedAmount = randomAmount == 0 ? 1 : randomAmount;
+    final adjustedAmount = max(randomAmount, 1);
 
     return Coin(adjustedAmount);
   }
@@ -68,19 +52,25 @@ final class SelectionUtils {
   static Set<TransactionUnspentOutput> generateUtxos(
     int count, {
     Coin minimumCoin = const Coin(0),
+    Coin? minimumTotalAda,
     bool withTokens = true,
     bool isSeeded = false,
   }) {
+    if (count <= 0) {
+      return {};
+    }
+
     final balances = randomBalances(
       count: count,
       minimumCoin: minimumCoin,
       withTokens: withTokens,
     );
+
     final addressCount = count >= 2 ? (count / 2).floor() : 1;
     final addresses =
         isSeeded ? mockAddresses(count: addressCount) : randomAddresses(count: addressCount);
 
-    return List.generate(
+    final utxos = List.generate(
       count,
       (i) => TransactionUnspentOutput(
         input: TransactionInput(
@@ -95,6 +85,22 @@ final class SelectionUtils {
         ),
       ),
     ).toSet();
+
+    final utxosTotal = CoinSelector.sumAmounts(utxos, (utxo) => utxo.output.amount);
+    if (minimumTotalAda != null && utxosTotal.coin < minimumTotalAda) {
+      final lastUtxo = utxos.last;
+      utxos.remove(lastUtxo);
+
+      final updatedUtxo = TransactionUnspentOutput(
+        input: lastUtxo.input,
+        output: lastUtxo.output.copyWith(
+          amount: lastUtxo.output.amount + Balance(coin: minimumTotalAda - utxosTotal.coin),
+        ),
+      );
+      utxos.add(updatedUtxo);
+    }
+
+    return utxos;
   }
 
   /// Generates a list of numbers following a Weibull distribution.
@@ -186,7 +192,7 @@ final class SelectionUtils {
       config.coinsPerUtxoByte,
     );
 
-    final outputFee = TransactionOutputBuilder.feeForOutput(config, output, numOutputs: 1);
+    final outputFee = TransactionOutputBuilder.feeForOutput(config, output);
     final totalFee = minAda + outputFee;
 
     return coin < totalFee
@@ -202,8 +208,8 @@ final class SelectionUtils {
 
   /// Generates a list of transaction outputs from a set of UTxOs.
   ///
-  /// - [inputs]: The set of [TransactionUnspentOutput] objects to use as
-  ///   inputs.
+  /// - [inputs]: The set of [TransactionUnspentOutput] objects to use as inputs.
+  /// - [config]: The transaction builder config.
   /// - [maxOutputs]: The number of outputs to generate.
   /// - [maxTokens]: The maximum number of tokens to include in each output.
   ///
@@ -211,12 +217,14 @@ final class SelectionUtils {
   /// - A list of [TransactionOutput] objects.
   static List<TransactionOutput> outputsFromUTxos({
     required Set<TransactionUnspentOutput> inputs,
+    required TransactionBuilderConfig config,
     int maxOutputs = 1,
     int maxTokens = 3,
     int minCoinPct = 20,
     int maxCoinPct = 40,
     int maxTokenPct = 80,
   }) {
+    final inputList = inputs.toList();
     final inputCount = inputs.length;
     final maxUtxos = inputCount > 10 ? (inputCount * 0.1).floor() : 1;
 
@@ -231,7 +239,7 @@ final class SelectionUtils {
       var balance = const Balance.zero();
 
       for (var i = 0; i < nrUtxos; i++) {
-        final quantity = inputs.toList()[lastUsedIndex++].output.amount;
+        final quantity = inputList[lastUsedIndex++].output.amount;
 
         final newBalance = selectTokens(
           balance: quantity,
@@ -248,10 +256,34 @@ final class SelectionUtils {
         minPercentage: minCoinPct,
         maxPercentage: maxCoinPct,
       );
-      return TransactionOutput(
+
+      var output = TransactionOutput(
         address: randomAddress(),
-        amount: Balance(coin: coin, multiAsset: balance.multiAsset),
+        amount: Balance(
+          coin: coin,
+          multiAsset: balance.multiAsset,
+        ),
       );
+
+      final minAdaForOutput = TransactionOutputBuilder.minimumAdaForOutput(
+        output,
+        config.coinsPerUtxoByte,
+      );
+
+      if (output.amount.coin < minAdaForOutput) {
+        if (minAdaForOutput <= balance.coin) {
+          output = output.copyWith(
+            amount: output.amount.copyWith(coin: minAdaForOutput),
+          );
+        } else {
+          throw Exception(
+            "The output value is below min ada but there's "
+            'not enough ada to raise the value',
+          );
+        }
+      }
+
+      return output;
     });
   }
 
@@ -415,11 +447,11 @@ final class SelectionUtils {
     }
 
     tokens.shuffle(_kRandom);
-    final result = tokens.take(maxTokens).fold(const Balance.zero(), (prev, token) {
+    final result = tokens.take(maxTokens).fold(Balance(coin: balance.coin), (prev, token) {
       final (policyId, tokenName, quantity) = token;
       return prev +
           Balance(
-            coin: balance.coin,
+            coin: const Coin(0),
             multiAsset: MultiAsset(
               bundle: {
                 policyId: {tokenName: quantity},
