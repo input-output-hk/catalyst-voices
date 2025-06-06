@@ -2327,7 +2327,7 @@
   "@stayInvolved": {
     "description": "Title for the stay involved section"
   },
-  "stayInvolvedReviewerDescription": "Your voice has power. Use it to guide others and help improve the Cardano community.\n\nAs a reviewer, you’ll make a real impact by sharing thoughtful feedback and influencing decisions.",
+  "stayInvolvedReviewerDescription": "Your voice has power. Use it to guide others and help improve the Cardano community.\n\nAs a reviewer, you’ll make a real impact by sharing thoughtful feedback and influencing decisions.\n",
   "@stayInvolvedReviewerDescription": {
     "description": "Description for the reviewer cards in stay involved section"
   },
@@ -2960,7 +2960,7 @@
   "@votingTimelineHeader": {
     "description": "Header for the voting timeline"
   },
-  "reviewRegistration": "Reviewers and Moderators registration:",
+  "reviewRegistration": "Reviewers registration:",
   "@reviewRegistration": {
     "description": "Title for the review registration timeline"
   },

@@ -7,6 +7,7 @@ import 'package:catalyst_voices/widgets/text/campaign_stage_time_text.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
+import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
@@ -84,8 +85,7 @@ class _DatetimeRangeTimeline extends StatelessWidget {
             children: [
               Text(
                 title,
-                style: context.textTheme.bodyMedium
-                    ?.copyWith(color: context.colors.textOnPrimaryLevel1),
+                style: context.textTheme.titleSmall,
               ),
               CampaignStageTimeText(
                 dateRange: dateRange!,
@@ -107,6 +107,30 @@ class _Header extends StatelessWidget {
   }
 }
 
+class _RangeTimelineCard extends StatelessWidget {
+  final List<Widget> children;
+
+  const _RangeTimelineCard({required this.children});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colors.elevationsOnSurfaceNeutralLv0,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Wrap(
+        alignment: WrapAlignment.spaceBetween,
+        spacing: 8,
+        runSpacing: 8,
+        children: children,
+      ),
+    );
+  }
+}
+
 class _ReviewerCard extends StatelessWidget {
   const _ReviewerCard();
 
@@ -121,28 +145,31 @@ class _ReviewerCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 16),
-          BlocSelector<DiscoveryCubit, DiscoveryState, DateRange?>(
-            selector: (state) {
-              return state.campaign.votingStartsAt;
-            },
-            builder: (context, date) {
-              return _DatetimeRangeTimeline(
-                dateRange: date,
-                title: context.l10n.reviewRegistration,
-              );
-            },
-          ),
-          const SizedBox(height: 8),
-          BlocSelector<DiscoveryCubit, DiscoveryState, DateRange?>(
-            selector: (state) {
-              return state.campaign.votingStartsAt;
-            },
-            builder: (context, date) {
-              return _DatetimeRangeTimeline(
-                dateRange: date,
-                title: context.l10n.reviewTimelineHeader,
-              );
-            },
+          _RangeTimelineCard(
+            children: [
+              BlocSelector<DiscoveryCubit, DiscoveryState, DateRange?>(
+                selector: (state) {
+                  return state.campaign.reviewRegistrationStartsAt;
+                },
+                builder: (context, date) {
+                  return _DatetimeRangeTimeline(
+                    dateRange: date,
+                    title: context.l10n.reviewRegistration,
+                  );
+                },
+              ),
+              BlocSelector<DiscoveryCubit, DiscoveryState, DateRange?>(
+                selector: (state) {
+                  return state.campaign.votingStartsAt;
+                },
+                builder: (context, date) {
+                  return _DatetimeRangeTimeline(
+                    dateRange: date,
+                    title: context.l10n.reviewTimelineHeader,
+                  );
+                },
+              ),
+            ],
           ),
           const _CopyCatalystIdTipText(),
           const SessionAccountCatalystId(
@@ -193,14 +220,12 @@ class _StayInvolvedCard extends StatelessWidget {
   final String title;
   final String description;
   final Widget actions;
-  final Widget? additionalInfo;
 
   const _StayInvolvedCard({
     required this.icon,
     required this.title,
     required this.description,
     required this.actions,
-    this.additionalInfo,
   });
 
   @override
@@ -239,10 +264,6 @@ class _StayInvolvedCard extends StatelessWidget {
               color: context.colors.textOnPrimaryLevel1,
             ),
           ),
-          if (additionalInfo != null) ...[
-            const SizedBox(height: 10),
-            additionalInfo!,
-          ],
           actions,
           const SizedBox(height: 20),
         ],
@@ -272,34 +293,41 @@ class _VoterCard extends StatelessWidget {
       icon: VoicesAssets.icons.vote,
       title: context.l10n.registerToVoteFund14,
       description: context.l10n.stayInvolvedContributorDescription,
-      actions: _StayInvolvedActionButton(
-        title: context.l10n.becomeVoter,
-        urlString: VoicesConstants.afterSubmissionUrl,
-      ),
-      additionalInfo: Column(
+      actions: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: [
-          BlocSelector<DiscoveryCubit, DiscoveryState, DateRange?>(
-            selector: (state) {
-              return state.campaign.votingRegistrationStartsAt;
-            },
-            builder: (context, date) {
-              return _DatetimeRangeTimeline(
-                dateRange: date,
-                title: context.l10n.votingRegistrationTimelineHeader,
-              );
-            },
-          ),
           const SizedBox(height: 16),
-          BlocSelector<DiscoveryCubit, DiscoveryState, DateRange?>(
-            selector: (state) {
-              return state.campaign.votingStartsAt;
-            },
-            builder: (context, date) {
-              return _DatetimeRangeTimeline(
-                dateRange: date,
-                title: context.l10n.votingTimelineHeader,
-              );
-            },
+          _RangeTimelineCard(
+            children: [
+              BlocSelector<DiscoveryCubit, DiscoveryState, DateRange?>(
+                selector: (state) {
+                  return state.campaign.votingRegistrationStartsAt;
+                },
+                builder: (context, date) {
+                  return _DatetimeRangeTimeline(
+                    dateRange: date,
+                    title: context.l10n.votingRegistrationTimelineHeader,
+                  );
+                },
+              ),
+              const SizedBox(height: 16),
+              BlocSelector<DiscoveryCubit, DiscoveryState, DateRange?>(
+                selector: (state) {
+                  return state.campaign.votingStartsAt;
+                },
+                builder: (context, date) {
+                  return _DatetimeRangeTimeline(
+                    dateRange: date,
+                    title: context.l10n.votingTimelineHeader,
+                  );
+                },
+              ),
+            ],
+          ),
+          _StayInvolvedActionButton(
+            title: context.l10n.becomeVoter,
+            urlString: VoicesConstants.afterSubmissionUrl,
           ),
         ],
       ),
