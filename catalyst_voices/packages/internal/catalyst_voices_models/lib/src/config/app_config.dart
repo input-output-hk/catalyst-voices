@@ -10,7 +10,9 @@ const _defaultTransactionBuilderConfig = TransactionBuilderConfig(
   ),
   maxTxSize: 16384,
   maxValueSize: 5000,
+  maxAssetsPerOutput: 100,
   coinsPerUtxoByte: Coin(4310),
+  selectionStrategy: ExactBiggestAssetSelectionStrategy(),
 );
 
 final class AppConfig extends Equatable {
