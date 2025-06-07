@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["DEFAULT_FUTURE_THRESHOLD","DEFAULT_PAST_THRESHOLD"],"struct":["EnvVars"]};

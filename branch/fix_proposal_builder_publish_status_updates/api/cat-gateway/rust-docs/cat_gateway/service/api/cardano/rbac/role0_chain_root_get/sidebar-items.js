@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["Responses"],"fn":["endpoint"],"struct":["RbacRole0ChainRootResponse"],"type":["AllResponses"]};
