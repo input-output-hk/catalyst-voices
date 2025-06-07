@@ -3,14 +3,14 @@
 use std::{fmt::Debug, sync::Arc};
 
 use cardano_blockchain_types::{Slot, TransactionId, TxnIndex};
-use catalyst_types::{catalyst_id::CatalystId, uuid::UuidV4};
+use catalyst_types::catalyst_id::CatalystId;
 use scylla::{frame::value::MaybeUnset, SerializeRow, Session};
 use tracing::error;
 
 use crate::{
     db::{
         index::queries::{PreparedQueries, SizedBatch},
-        types::{DbCatalystId, DbSlot, DbTransactionId, DbTxnIndex, DbUuidV4},
+        types::{DbCatalystId, DbSlot, DbTransactionId, DbTxnIndex},
     },
     settings::cassandra_db::EnvVars,
 };
@@ -31,8 +31,6 @@ pub(crate) struct Params {
     txn_index: DbTxnIndex,
     /// Hash of Previous Transaction. Is `None` for the first registration. 32 Bytes.
     prv_txn_id: MaybeUnset<DbTransactionId>,
-    /// Purpose.`UUIDv4`. 16 bytes.
-    purpose: DbUuidV4,
 }
 
 impl Debug for Params {
@@ -47,7 +45,6 @@ impl Debug for Params {
             .field("slot_no", &self.slot_no)
             .field("txn_index", &self.txn_index)
             .field("prv_txn_id", &prv_txn_id)
-            .field("purpose", &self.purpose)
             .finish()
     }
 }
@@ -56,14 +53,13 @@ impl Params {
     /// Create a new record for this transaction.
     pub(crate) fn new(
         catalyst_id: CatalystId, txn_id: TransactionId, slot_no: Slot, txn_index: TxnIndex,
-        purpose: UuidV4, prv_txn_id: Option<TransactionId>,
+        prv_txn_id: Option<TransactionId>,
     ) -> Self {
         let prv_txn_id = prv_txn_id.map_or(MaybeUnset::Unset, |v| MaybeUnset::Set(v.into()));
 
         Self {
             catalyst_id: catalyst_id.into(),
             txn_id: txn_id.into(),
-            purpose: purpose.into(),
             slot_no: slot_no.into(),
             txn_index: txn_index.into(),
             prv_txn_id,
