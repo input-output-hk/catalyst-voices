@@ -210,7 +210,7 @@ class DriftDraftsDao extends DatabaseAccessor<DriftCatalystDatabase>
     final query = select(drafts);
 
     if (type != null) {
-      query.where((doc) => doc.type.equals(type.uuid));
+      query.where((doc) => doc.type.equalsValue(type));
     }
     if (authorId != null) {
       final searchId = authorId.toSignificant().toUri().toStringWithoutScheme();

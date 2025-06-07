@@ -46,7 +46,9 @@ final class DocumentRefForFilteredDocuments {
 @JsonSerializable()
 final class IndividualDocumentVersion {
   final String ver;
-  final String type;
+
+  // TODO(damian-molinski): Change it to List<String> when backend is ready and uses this format.
+  final dynamic type;
   final DocumentRefForFilteredDocuments? ref;
   final DocumentRefForFilteredDocuments? reply;
   final DocumentRefForFilteredDocuments? template;

@@ -103,7 +103,7 @@ void main() {
               ver: proposalRefs.map((e) {
                 return IndividualDocumentVersion(
                   ver: e.version!,
-                  type: DocumentType.proposalDocument.uuid,
+                  type: DocumentType.proposalDocument.toJson(),
                   template: DocumentRefForFilteredDocuments(
                     id: templateRef.id,
                     ver: templateRef.version,
@@ -116,9 +116,9 @@ void main() {
         );
         final response = Response(http.Response('', 200), page);
 
-        final expectedRefs = <TypedDocumentRef>[
+        final expectedRefs = <MaybeTypedDocumentRef>[
           ...proposalRefs.map((e) => e.toTyped(DocumentType.proposalDocument)),
-          templateRef.toTyped(DocumentType.proposalTemplate),
+          templateRef.toMaybeTyped(DocumentType.proposalTemplate),
         ];
 
         // When

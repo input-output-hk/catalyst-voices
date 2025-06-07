@@ -47,7 +47,7 @@ abstract interface class DocumentRepository {
   /// Returns list of refs to all published and any refs it may hold.
   ///
   /// Its using documents index api.
-  Future<List<TypedDocumentRef>> getAllDocumentsRefs();
+  Future<List<MaybeTypedDocumentRef>> getAllDocumentsRefs();
 
   /// Return list of all cached documents id for given [id].
   /// It looks for documents in the local storage and draft storage.
@@ -233,7 +233,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   }
 
   @override
-  Future<List<TypedDocumentRef>> getAllDocumentsRefs() async {
+  Future<List<MaybeTypedDocumentRef>> getAllDocumentsRefs() async {
     final allRefs = await _remoteDocuments.index().then(_uniqueTypedRefs);
     final allConstRefs = constantDocumentsRefs.expand((element) => element.all);
 
@@ -622,15 +622,15 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     return [];
   }
 
-  List<TypedDocumentRef> _uniqueTypedRefs(List<TypedDocumentRef> refs) {
-    final uniqueRefs = <DocumentRef, TypedDocumentRef>{};
+  List<MaybeTypedDocumentRef> _uniqueTypedRefs(List<MaybeTypedDocumentRef> refs) {
+    final uniqueRefs = <DocumentRef, MaybeTypedDocumentRef>{};
 
     for (final ref in refs) {
       uniqueRefs.update(
         ref.ref,
         // While indexing we don't know what is type of "ref" or "reply".
         // Here we're trying to eliminate duplicates with unknown type.
-        (value) => value.type != DocumentType.unknown ? value : ref,
+        (value) => value.type != null ? value : ref,
         ifAbsent: () => ref,
       );
     }
@@ -673,8 +673,4 @@ final class DocumentRepositoryImpl implements DocumentRepository {
 
     return StreamGroup.merge([updateStream, localStream]);
   }
-}
-
-extension on DocumentType {
-  bool get isCategory => this == DocumentType.categoryParametersDocument;
 }
