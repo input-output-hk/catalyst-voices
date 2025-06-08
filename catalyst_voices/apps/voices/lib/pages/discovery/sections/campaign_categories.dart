@@ -16,27 +16,24 @@ class CampaignCategories extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 120),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Center(
-            child: Wrap(
-              spacing: 12,
-              runSpacing: 12,
-              children: categories
-                  .map(
-                    (e) => Skeletonizer(
-                      enabled: isLoading,
-                      child: CampaignCategoryCard(category: e),
-                    ),
-                  )
-                  .toList(),
-            ),
-          ),
-          const SizedBox(height: 24),
-        ],
+      padding: const EdgeInsets.only(
+        left: 120,
+        right: 120,
+        bottom: 24,
+      ),
+      child: Wrap(
+        spacing: 12,
+        runSpacing: 12,
+        children: categories
+            .map(
+              (e) => IntrinsicHeight(
+                child: Skeletonizer(
+                  enabled: isLoading,
+                  child: CampaignCategoryCard(category: e),
+                ),
+              ),
+            )
+            .toList(),
       ),
     );
   }
