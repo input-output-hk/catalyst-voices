@@ -322,21 +322,24 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
     UnlockProposalSignal signal, {
     ProposalBuilderBloc? bloc,
   }) async {
-    bloc ??= context.read<ProposalBuilderBloc>();
-    final unlock = await UnlockEditProposalDialog.show(
-          context: context,
-          title: signal.title,
-          version: signal.version,
-        ) ??
-        false;
+    if (!_isAboutToExit) {
+      bloc ??= context.read<ProposalBuilderBloc>();
+      final unlock = await UnlockEditProposalDialog.show(
+            context: context,
+            title: signal.title,
+            version: signal.version,
+          ) ??
+          false;
 
-    if (unlock && mounted) {
-      return bloc.add(const UnlockProposalBuilderEvent());
-    }
-    if (mounted) {
-      Router.neglect(context, () {
-        const WorkspaceRoute().replace(context);
-      });
+      if (!mounted) {
+        return;
+      } else if (unlock) {
+        return bloc.add(const UnlockProposalBuilderEvent());
+      } else {
+        return Router.neglect(context, () {
+          const WorkspaceRoute().replace(context);
+        });
+      }
     }
   }
 
