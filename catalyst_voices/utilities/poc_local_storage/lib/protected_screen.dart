@@ -183,10 +183,14 @@ class _ProtectedScreenState extends State<ProtectedScreen> {
       builder: (context) {
         return AlertDialog(
           title: Text(message),
-          content: TextField(
-            controller: _passwordController,
-            obscureText: true,
-            decoration: const InputDecoration(hintText: 'Enter password'),
+          // TODO(dtscalac): revert when https://github.com/flutter/flutter/pull/167275
+          // is released and we're using this flutter version
+          content: SelectionArea(
+            child: TextField(
+              controller: _passwordController,
+              obscureText: true,
+              decoration: const InputDecoration(hintText: 'Enter password'),
+            ),
           ),
           actions: [
             TextButton(

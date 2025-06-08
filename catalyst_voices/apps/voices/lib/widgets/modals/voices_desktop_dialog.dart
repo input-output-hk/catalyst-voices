@@ -159,9 +159,13 @@ class _VoicesDesktopDialog extends StatelessWidget {
       backgroundColor: backgroundColor,
       alignment: Alignment.center,
       insetPadding: const EdgeInsets.symmetric(horizontal: 40, vertical: 90),
-      child: ConstrainedBox(
-        constraints: constraints,
-        child: child,
+      child: SelectionArea(
+        // TODO(dtscalac): revert when https://github.com/flutter/flutter/pull/167275
+        // is released and we're using this flutter version
+        child: ConstrainedBox(
+          constraints: constraints,
+          child: child,
+        ),
       ),
     );
   }
