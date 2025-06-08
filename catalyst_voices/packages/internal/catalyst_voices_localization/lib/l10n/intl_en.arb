@@ -2521,9 +2521,14 @@
   "@submitProposalBeforeClosing": {
     "description": "Information for user to submit proposal before the submission window closes"
   },
-  "checkMaxProposal": "Check your finals (max 6) in My proposals.",
+  "checkMaxProposal": "Check your finals (max {count}) in My proposals.",
   "@checkMaxProposal": {
-    "description": "Information for user to check their final proposals before submission window closes"
+    "description": "Information for user to check their final proposals before submission window closes",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "catalystAppNotAvailableAfterSubmissionCloses": "The Catalyst App won’t be available after submission close.",
   "@catalystAppNotAvailableAfterSubmissionCloses": {
