@@ -1,13 +1,12 @@
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
-import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 class ProposalBuilderMenuItem extends StatelessWidget {
-  final ProposalMenuItemAction item;
+  final ProposalBuilderMenuItemData item;
 
   const ProposalBuilderMenuItem({
     super.key,
@@ -16,14 +15,9 @@ class ProposalBuilderMenuItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<ProposalBuilderBloc, ProposalBuilderState, ProposalBuilderMenuItemData>(
-      selector: (state) => state.buildMenuItem(action: item),
-      builder: (context, state) {
-        return _ProposalBuilderMenuItem(
-          key: ValueKey('Action${state.action}MenuTile'),
-          data: state,
-        );
-      },
+    return _ProposalBuilderMenuItem(
+      key: ValueKey('Action${item.action}MenuTile'),
+      data: item,
     );
   }
 }

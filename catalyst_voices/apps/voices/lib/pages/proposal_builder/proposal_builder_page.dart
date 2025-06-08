@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:catalyst_voices/common/error_handler.dart';
 import 'package:catalyst_voices/common/signal_handler.dart';
+import 'package:catalyst_voices/dependency/dependencies.dart';
 import 'package:catalyst_voices/pages/proposal_builder/appbar/proposal_builder_back_action.dart';
 import 'package:catalyst_voices/pages/proposal_builder/appbar/proposal_builder_status_action.dart';
 import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_changing.dart';
@@ -29,7 +30,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
-class ProposalBuilderPage extends StatefulWidget {
+class ProposalBuilderPage extends StatelessWidget {
   final DocumentRef? proposalId;
   final SignedDocumentRef? categoryId;
 
@@ -40,37 +41,34 @@ class ProposalBuilderPage extends StatefulWidget {
   });
 
   @override
-  State<ProposalBuilderPage> createState() => _ProposalBuilderPageState();
-}
-
-class _ProposalBuilderContent extends StatelessWidget {
-  final ItemScrollController controller;
-  final VoidCallback onRetryTap;
-
-  const _ProposalBuilderContent({
-    required this.controller,
-    required this.onRetryTap,
-  });
-
-  @override
   Widget build(BuildContext context) {
-    return FocusTraversalGroup(
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          ProposalBuilderErrorSelector(onRetryTap: onRetryTap),
-          ProposalBuilderSegmentsSelector(itemScrollController: controller),
-          const ProposalBuilderLoadingSelector(),
-        ],
+    return BlocProvider<ProposalBuilderBloc>(
+      create: (context) => Dependencies.instance.get<ProposalBuilderBloc>(),
+      child: _ProposalBuilderBody(
+        proposalId: proposalId,
+        categoryId: categoryId,
       ),
     );
   }
 }
 
-class _ProposalBuilderPageState extends State<ProposalBuilderPage>
+class _ProposalBuilderBody extends StatefulWidget {
+  final DocumentRef? proposalId;
+  final SignedDocumentRef? categoryId;
+
+  const _ProposalBuilderBody({
+    this.proposalId,
+    this.categoryId,
+  });
+
+  @override
+  State<_ProposalBuilderBody> createState() => _ProposalBuilderBodyState();
+}
+
+class _ProposalBuilderBodyState extends State<_ProposalBuilderBody>
     with
-        ErrorHandlerStateMixin<ProposalBuilderBloc, ProposalBuilderPage>,
-        SignalHandlerStateMixin<ProposalBuilderBloc, ProposalBuilderSignal, ProposalBuilderPage> {
+        ErrorHandlerStateMixin<ProposalBuilderBloc, _ProposalBuilderBody>,
+        SignalHandlerStateMixin<ProposalBuilderBloc, ProposalBuilderSignal, _ProposalBuilderBody> {
   late final SegmentsController _segmentsController;
   late final ItemScrollController _segmentsScrollController;
 
@@ -114,7 +112,7 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
   }
 
   @override
-  void didUpdateWidget(ProposalBuilderPage oldWidget) {
+  void didUpdateWidget(_ProposalBuilderBody oldWidget) {
     super.didUpdateWidget(oldWidget);
 
     if (widget.proposalId != oldWidget.proposalId || widget.categoryId != oldWidget.categoryId) {
@@ -318,12 +316,9 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
     );
   }
 
-  Future<void> _showUnlockProposalDialog(
-    UnlockProposalSignal signal, {
-    ProposalBuilderBloc? bloc,
-  }) async {
+  Future<void> _showUnlockProposalDialog(UnlockProposalSignal signal) async {
     if (!_isAboutToExit) {
-      bloc ??= context.read<ProposalBuilderBloc>();
+      final bloc = context.read<ProposalBuilderBloc>();
       final unlock = await UnlockEditProposalDialog.show(
             context: context,
             title: signal.title,
@@ -357,5 +352,29 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
           );
 
     _segmentsController.value = newState;
+  }
+}
+
+class _ProposalBuilderContent extends StatelessWidget {
+  final ItemScrollController controller;
+  final VoidCallback onRetryTap;
+
+  const _ProposalBuilderContent({
+    required this.controller,
+    required this.onRetryTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return FocusTraversalGroup(
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          ProposalBuilderErrorSelector(onRetryTap: onRetryTap),
+          ProposalBuilderSegmentsSelector(itemScrollController: controller),
+          const ProposalBuilderLoadingSelector(),
+        ],
+      ),
+    );
   }
 }
