@@ -60,11 +60,11 @@ class VoicesAlertDialog extends StatelessWidget {
       xs: double.infinity,
       other: _width,
       builder: (context, width) {
-        return Dialog(
-          alignment: Alignment.center,
-          // TODO(dtscalac): revert when https://github.com/flutter/flutter/pull/167275
-          // is released and we're using this flutter version
-          child: SelectionArea(
+        // TODO(dtscalac): remove SelectionArea when https://github.com/flutter/flutter/pull/167275
+        // is released and we're using this flutter version
+        return SelectionArea(
+          child: Dialog(
+            alignment: Alignment.center,
             child: SizedBox(
               width: width,
               child: Padding(

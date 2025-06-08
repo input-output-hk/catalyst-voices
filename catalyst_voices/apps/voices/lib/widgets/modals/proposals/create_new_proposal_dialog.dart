@@ -47,39 +47,35 @@ class _Content extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // TODO(dtscalac): revert when https://github.com/flutter/flutter/pull/167275
-    // is released and we're using this flutter version
-    return SelectionArea(
-      child: BlocSelector<NewProposalCubit, NewProposalState, bool>(
-        selector: (state) => state.isLoading,
-        builder: (context, isLoading) {
-          if (isLoading) {
-            return const _LoadingContent();
-          } else {
-            return BlocSelector<NewProposalCubit, NewProposalState, ProposalCreationStep>(
-              selector: (state) => state.step,
-              builder: (context, step) {
-                return switch (step) {
-                  CreateProposalWithPreselectedCategoryStep() => _ContentView(
-                      step: step,
-                      child: const _ProposalTitle(),
-                    ),
-                  CreateProposalWithoutPreselectedCategoryStep(:final stage) => switch (stage) {
-                      CreateProposalStage.setTitle => _ContentView(
-                          step: step,
-                          child: const _ProposalTitle(),
-                        ),
-                      CreateProposalStage.selectCategory => _ContentView(
-                          step: step,
-                          child: const _ProposalCategory(),
-                        ),
-                    },
-                };
-              },
-            );
-          }
-        },
-      ),
+    return BlocSelector<NewProposalCubit, NewProposalState, bool>(
+      selector: (state) => state.isLoading,
+      builder: (context, isLoading) {
+        if (isLoading) {
+          return const _LoadingContent();
+        } else {
+          return BlocSelector<NewProposalCubit, NewProposalState, ProposalCreationStep>(
+            selector: (state) => state.step,
+            builder: (context, step) {
+              return switch (step) {
+                CreateProposalWithPreselectedCategoryStep() => _ContentView(
+                    step: step,
+                    child: const _ProposalTitle(),
+                  ),
+                CreateProposalWithoutPreselectedCategoryStep(:final stage) => switch (stage) {
+                    CreateProposalStage.setTitle => _ContentView(
+                        step: step,
+                        child: const _ProposalTitle(),
+                      ),
+                    CreateProposalStage.selectCategory => _ContentView(
+                        step: step,
+                        child: const _ProposalCategory(),
+                      ),
+                  },
+              };
+            },
+          );
+        }
+      },
     );
   }
 }
