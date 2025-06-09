@@ -1,4 +1,5 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:equatable/equatable.dart';
 
@@ -46,16 +47,33 @@ final class DiscoveryCurrentCampaignState extends Equatable {
         campaignTimeline,
       ];
 
+  DateRange? get reviewRegistrationStartsAt {
+    return campaignTimeline
+        .firstWhere((e) => e.stage == CampaignTimelineStage.reviewRegistration)
+        .timeline;
+  }
+
+  DateRange? get reviewStartsAt {
+    return campaignTimeline
+        .firstWhere((e) => e.stage == CampaignTimelineStage.communityReview)
+        .timeline;
+  }
+
   bool get showCurrentCampaign =>
       !isLoading && currentCampaign is! NullCurrentCampaignInfoViewModel;
 
   bool get showError => !isLoading && error != null;
 
-  DateTime? get votingStartsAt {
+  DateRange? get votingRegistrationStartsAt {
+    return campaignTimeline
+        .firstWhere((e) => e.stage == CampaignTimelineStage.votingRegistration)
+        .timeline;
+  }
+
+  DateRange? get votingStartsAt {
     return campaignTimeline
         .firstWhere((e) => e.stage == CampaignTimelineStage.communityVoting)
-        .timeline
-        .from;
+        .timeline;
   }
 }
 

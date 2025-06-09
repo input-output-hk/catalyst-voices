@@ -31,10 +31,14 @@ final class Dependencies extends DependencyProvider {
 
   Future<void> init({
     required AppEnvironment environment,
+    LoggingService? loggingService,
   }) async {
     DependencyProvider.instance = this;
 
     registerSingleton<AppEnvironment>(environment);
+    if (loggingService != null) {
+      registerSingleton<LoggingService>(loggingService);
+    }
 
     _registerStorages();
     _registerUtils();
@@ -153,7 +157,6 @@ final class Dependencies extends DependencyProvider {
         return NewProposalCubit(
           get<CampaignService>(),
           get<ProposalService>(),
-          get<UserObserver>(),
           get<DocumentMapper>(),
         );
       })
@@ -166,6 +169,9 @@ final class Dependencies extends DependencyProvider {
         return DevToolsBloc(
           get<DevToolsService>(),
           get<SyncManager>(),
+          isRegistered<LoggingService>() ? get<LoggingService>() : null,
+          get<DownloaderService>(),
+          get<DocumentsService>(),
         );
       });
   }

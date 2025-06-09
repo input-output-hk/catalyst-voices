@@ -295,6 +295,7 @@ fn sync_subchain(
 
                     // Update flag if this is the first time reaching TIP.
                     if chain_update.tip && !follower_has_first_reached_tip() {
+                        info!("Follower has reached TIP for the first time");
                         set_follower_first_reached_tip();
                     }
 

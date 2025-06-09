@@ -1,8 +1,9 @@
 import 'dart:math';
+
 import 'package:bip32_ed25519/bip32_ed25519.dart';
 import 'package:catalyst_cardano_serialization/src/address.dart';
 import 'package:catalyst_cardano_serialization/src/builders/transaction_builder.dart';
-import 'package:catalyst_cardano_serialization/src/fees.dart';
+import 'package:catalyst_cardano_serialization/src/builders/types.dart';
 import 'package:catalyst_cardano_serialization/src/hashes.dart';
 import 'package:catalyst_cardano_serialization/src/signature.dart';
 import 'package:catalyst_cardano_serialization/src/transaction.dart';
@@ -15,7 +16,7 @@ import 'package:convert/convert.dart';
 ///
 /// This class is used only in testing and resides under the `./test` folder.
 final class SelectionUtils {
-  static final _kRandom = Random();
+  static final _kRandom = Random(1748425502827);
 
   static const String _chars = 'abcdefghijklmnopqrstuvwxyz'
       'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
@@ -26,75 +27,126 @@ final class SelectionUtils {
         (int index) => Ed25519PrivateKey.seeded(count),
       );
 
-  /// The default configuration for transaction building.
-  ///
-  /// This configuration includes fee algorithm parameters, maximum transaction
-  /// size, maximum value size, and coins per UTxO byte.
-  static const defaultConfig = TransactionBuilderConfig(
-    feeAlgo: TieredFee(
-      constant: 155381,
-      coefficient: 44,
-      refScriptByteCost: 15,
-    ),
-    maxTxSize: 16384,
-    maxValueSize: 5000,
-    coinsPerUtxoByte: Coin(4310),
-  );
+  /// Generates a random amount of a balance between minPercentage and
+  /// maxPercentage.
+  static Coin calculateRandomAmount(
+    Coin balance, {
+    int minPercentage = 0,
+    int maxPercentage = 80,
+  }) {
+    final randomPercentage =
+        minPercentage + _kRandom.nextDouble() * (maxPercentage - minPercentage);
 
-  /// Generates a random ASCII string of the specified length.
+    final randomAmount = (balance.value * (randomPercentage / 100)).toInt();
+    final adjustedAmount = max(randomAmount, 1);
+
+    return Coin(adjustedAmount);
+  }
+
+  /// Generates a set of random UTxOs (Unspent Transaction Outputs).
   ///
-  /// - [length]: The length of the random ASCII string to generate.
+  /// - [count]: The number of UTxOs to generate.
   ///
   /// Returns:
-  /// - A random ASCII string of the specified length.
-  static String randomAscii(int length) =>
-      List.generate(length, (index) => _chars[_kRandom.nextInt(_chars.length)]).join();
+  /// - A set of random [TransactionUnspentOutput] objects.
+  static Set<TransactionUnspentOutput> generateUtxos(
+    int count, {
+    Coin minimumCoin = const Coin(0),
+    Coin? minimumTotalAda,
+    bool withTokens = true,
+    bool isSeeded = false,
+  }) {
+    if (count <= 0) {
+      return {};
+    }
 
-  /// Generates a random Shelley address.
-  ///
-  /// - [isBase]: If `true`, generates a base address. Otherwise, generates an
-  ///   enterprise address.
-  /// - [networkId]: Specifies the network for address generation.
-  ///
-  /// Returns:
-  /// - A random [ShelleyAddress].
-  static ShelleyAddress randomAddress({
-    bool isBase = true,
-    NetworkId networkId = NetworkId.testnet,
-  }) =>
-      ShelleyAddress(
-        [
-          _getMockAddressHrp(isBase: isBase, networkId: networkId),
-          ...randomBytes(
-            isBase ? ShelleyAddress.baseAddrLength - 1 : ShelleyAddress.entAddrLength - 1,
+    final balances = randomBalances(
+      count: count,
+      minimumCoin: minimumCoin,
+      withTokens: withTokens,
+    );
+
+    final addressCount = count >= 2 ? (count / 2).floor() : 1;
+    final addresses =
+        isSeeded ? mockAddresses(count: addressCount) : randomAddresses(count: addressCount);
+
+    final utxos = List.generate(
+      count,
+      (i) => TransactionUnspentOutput(
+        input: TransactionInput(
+          transactionId: TransactionHash.fromHex(
+            randomHexString(TransactionHash.hashLength),
           ),
-        ],
+          index: i,
+        ),
+        output: TransactionOutput(
+          address: addresses[_kRandom.nextInt(addresses.length)],
+          amount: balances[i],
+        ),
+      ),
+    ).toSet();
+
+    final utxosTotal = CoinSelector.sumAmounts(utxos, (utxo) => utxo.output.amount);
+    if (minimumTotalAda != null && utxosTotal.coin < minimumTotalAda) {
+      final lastUtxo = utxos.last;
+      utxos.remove(lastUtxo);
+
+      final updatedUtxo = TransactionUnspentOutput(
+        input: lastUtxo.input,
+        output: lastUtxo.output.copyWith(
+          amount: lastUtxo.output.amount + Balance(coin: minimumTotalAda - utxosTotal.coin),
+        ),
       );
+      utxos.add(updatedUtxo);
+    }
 
-  static int _getMockAddressHrp({
-    bool isBase = true,
-    NetworkId networkId = NetworkId.testnet,
-  }) =>
-      0 | (isBase ? 0x00 : 0x20) | networkId.id;
+    return utxos;
+  }
 
-  /// Generates a list of random Shelley addresses.
+  /// Generates a list of numbers following a Weibull distribution.
   ///
-  /// - [count]: The number of addresses to generate.
-  /// - [isBase]: If `true`, generates base addresses. Otherwise, generates
-  ///   enterprise addresses.
-  /// - [networkId]: Specifies the network for address generation.
+  /// - [size]: The number of values to generate.
+  /// - [shape]: The shape parameter of the Weibull distribution.
+  /// - [scale]: The scale parameter of the Weibull distribution.
   ///
   /// Returns:
-  /// - A list of random [ShelleyAddress] objects.
-  static List<ShelleyAddress> randomAddresses({
-    required int count,
-    bool isBase = true,
-    NetworkId networkId = NetworkId.testnet,
-  }) =>
-      List<ShelleyAddress>.generate(
-        count,
-        (_) => randomAddress(isBase: isBase, networkId: networkId),
+  /// - A list of [BigInt] values following the Weibull distribution.
+  static List<BigInt> generateWeibullDistribution(
+    int size,
+    double shape,
+    double scale,
+  ) {
+    final random = Random();
+    final weibullNumbers = <BigInt>[];
+
+    for (var i = 0; i < size; i++) {
+      // Uniform random variable between 0 and 1
+      final u = random.nextDouble();
+
+      // Weibull distribution formula
+      final weibullValue = scale * pow(-log(u), 1 / shape);
+
+      // Scale the value to the range [10^6, 10^15]
+      final exponent = weibullValue.clamp(0.0, 8.0).toInt() + 6;
+
+      // Calculate 10^exponent
+      final lowerBound = BigInt.from(10).pow(exponent);
+      // Calculate 10^(exponent + 1)
+      final upperBound = BigInt.from(10).pow(exponent + 1);
+
+      // Generate a random BigInt in the range [lowerBound, upperBound)
+      final range = upperBound - lowerBound;
+      // Scale by range and convert to BigInt
+      final randomOffset = BigInt.from(
+        (random.nextDouble() * range.toDouble()).toInt(),
       );
+      final value = lowerBound + randomOffset;
+
+      weibullNumbers.add(value);
+    }
+
+    return weibullNumbers;
+  }
 
   static List<ShelleyAddress> mockAddresses({
     required int count,
@@ -119,6 +171,170 @@ final class SelectionUtils {
       },
     );
   }
+
+  /// Normalizes a transaction input to meet the minimum ADA requirement.
+  ///
+  /// - [input]: The [TransactionUnspentOutput] to normalize.
+  /// - [config]: The [TransactionBuilderConfig] to use for the normalization.
+  ///
+  /// Returns:
+  /// - A normalized [TransactionOutput].
+  static TransactionOutput normalizeInputForMinAda({
+    required TransactionUnspentOutput input,
+    required TransactionBuilderConfig config,
+  }) {
+    final output = input.output;
+
+    final coin = output.amount.coin;
+
+    final minAda = TransactionOutputBuilder.minimumAdaForOutput(
+      output,
+      config.coinsPerUtxoByte,
+    );
+
+    final outputFee = TransactionOutputBuilder.feeForOutput(config, output);
+    final totalFee = minAda + outputFee;
+
+    return coin < totalFee
+        ? TransactionOutput(
+            address: output.address,
+            amount: Balance(coin: totalFee),
+          )
+        : TransactionOutput(
+            address: output.address,
+            amount: output.amount,
+          );
+  }
+
+  /// Generates a list of transaction outputs from a set of UTxOs.
+  ///
+  /// - [inputs]: The set of [TransactionUnspentOutput] objects to use as inputs.
+  /// - [config]: The transaction builder config.
+  /// - [maxOutputs]: The number of outputs to generate.
+  /// - [maxTokens]: The maximum number of tokens to include in each output.
+  ///
+  /// Returns:
+  /// - A list of [TransactionOutput] objects.
+  static List<TransactionOutput> outputsFromUTxos({
+    required Set<TransactionUnspentOutput> inputs,
+    required TransactionBuilderConfig config,
+    int maxOutputs = 1,
+    int maxTokens = 3,
+    int minCoinPct = 20,
+    int maxCoinPct = 40,
+    int maxTokenPct = 80,
+  }) {
+    final inputList = inputs.toList();
+    final inputCount = inputs.length;
+    final maxUtxos = inputCount > 10 ? (inputCount * 0.1).floor() : 1;
+
+    final normalizedOutputs = (inputCount / maxUtxos).floor();
+    final outputsCount = normalizedOutputs.clamp(1, min(maxOutputs, maxUtxos)).toInt();
+
+    var lastUsedIndex = 0;
+
+    return List<TransactionOutput>.generate(_kRandom.nextInt(outputsCount) + 1, (int index) {
+      final nrUtxos = _kRandom.nextInt(maxUtxos) + 1;
+      final nrTokens = _kRandom.nextInt(maxTokens) + 1;
+      var balance = const Balance.zero();
+
+      for (var i = 0; i < nrUtxos; i++) {
+        final quantity = inputList[lastUsedIndex++].output.amount;
+
+        final newBalance = selectTokens(
+          balance: quantity,
+          outputsCount: outputsCount,
+          maxTokens: nrTokens,
+          maxTokenPct: maxTokenPct,
+        );
+
+        balance += newBalance;
+      }
+
+      final coin = calculateRandomAmount(
+        balance.coin,
+        minPercentage: minCoinPct,
+        maxPercentage: maxCoinPct,
+      );
+
+      var output = TransactionOutput(
+        address: randomAddress(),
+        amount: Balance(
+          coin: coin,
+          multiAsset: balance.multiAsset,
+        ),
+      );
+
+      final minAdaForOutput = TransactionOutputBuilder.minimumAdaForOutput(
+        output,
+        config.coinsPerUtxoByte,
+      );
+
+      if (output.amount.coin < minAdaForOutput) {
+        if (minAdaForOutput <= balance.coin) {
+          output = output.copyWith(
+            amount: output.amount.copyWith(coin: minAdaForOutput),
+          );
+        } else {
+          throw Exception(
+            "The output value is below min ada but there's "
+            'not enough ada to raise the value',
+          );
+        }
+      }
+
+      return output;
+    });
+  }
+
+  /// Generates a random Shelley address.
+  ///
+  /// - [isBase]: If `true`, generates a base address. Otherwise, generates an
+  ///   enterprise address.
+  /// - [networkId]: Specifies the network for address generation.
+  ///
+  /// Returns:
+  /// - A random [ShelleyAddress].
+  static ShelleyAddress randomAddress({
+    bool isBase = true,
+    NetworkId networkId = NetworkId.testnet,
+  }) =>
+      ShelleyAddress(
+        [
+          _getMockAddressHrp(isBase: isBase, networkId: networkId),
+          ...randomBytes(
+            isBase ? ShelleyAddress.baseAddrLength - 1 : ShelleyAddress.entAddrLength - 1,
+          ),
+        ],
+      );
+
+  /// Generates a list of random Shelley addresses.
+  ///
+  /// - [count]: The number of addresses to generate.
+  /// - [isBase]: If `true`, generates base addresses. Otherwise, generates
+  ///   enterprise addresses.
+  /// - [networkId]: Specifies the network for address generation.
+  ///
+  /// Returns:
+  /// - A list of random [ShelleyAddress] objects.
+  static List<ShelleyAddress> randomAddresses({
+    required int count,
+    bool isBase = true,
+    NetworkId networkId = NetworkId.testnet,
+  }) =>
+      List<ShelleyAddress>.generate(
+        count,
+        (_) => randomAddress(isBase: isBase, networkId: networkId),
+      );
+
+  /// Generates a random ASCII string of the specified length.
+  ///
+  /// - [length]: The length of the random ASCII string to generate.
+  ///
+  /// Returns:
+  /// - A random ASCII string of the specified length.
+  static String randomAscii(int length) =>
+      List.generate(length, (index) => _chars[_kRandom.nextInt(_chars.length)]).join();
 
   /// Generates a random balance.
   ///
@@ -198,161 +414,6 @@ final class SelectionUtils {
 
   static String randomHexString(int bytesLength) => hex.encoder.convert(randomBytes(bytesLength));
 
-  /// Generates a set of random UTxOs (Unspent Transaction Outputs).
-  ///
-  /// - [count]: The number of UTxOs to generate.
-  ///
-  /// Returns:
-  /// - A set of random [TransactionUnspentOutput] objects.
-  static Set<TransactionUnspentOutput> generateUtxos(
-    int count, {
-    Coin minimumCoin = const Coin(0),
-    bool withTokens = true,
-    bool isSeeded = false,
-  }) {
-    final balances = randomBalances(
-      count: count,
-      minimumCoin: minimumCoin,
-      withTokens: withTokens,
-    );
-    final addressCount = count >= 2 ? (count / 2).floor() : 1;
-    final addresses =
-        isSeeded ? mockAddresses(count: addressCount) : randomAddresses(count: addressCount);
-
-    return List.generate(
-      count,
-      (i) => TransactionUnspentOutput(
-        input: TransactionInput(
-          transactionId: TransactionHash.fromHex(
-            randomHexString(TransactionHash.hashLength),
-          ),
-          index: i,
-        ),
-        output: TransactionOutput(
-          address: addresses[_kRandom.nextInt(addresses.length)],
-          amount: balances[i],
-        ),
-      ),
-    ).toSet();
-  }
-
-  /// Generates a list of numbers following a Weibull distribution.
-  ///
-  /// - [size]: The number of values to generate.
-  /// - [shape]: The shape parameter of the Weibull distribution.
-  /// - [scale]: The scale parameter of the Weibull distribution.
-  ///
-  /// Returns:
-  /// - A list of [BigInt] values following the Weibull distribution.
-  static List<BigInt> generateWeibullDistribution(
-    int size,
-    double shape,
-    double scale,
-  ) {
-    final random = Random();
-    final weibullNumbers = <BigInt>[];
-
-    for (var i = 0; i < size; i++) {
-      // Uniform random variable between 0 and 1
-      final u = random.nextDouble();
-
-      // Weibull distribution formula
-      final weibullValue = scale * pow(-log(u), 1 / shape);
-
-      // Scale the value to the range [10^6, 10^15]
-      final exponent = weibullValue.clamp(0.0, 8.0).toInt() + 6;
-
-      // Calculate 10^exponent
-      final lowerBound = BigInt.from(10).pow(exponent);
-      // Calculate 10^(exponent + 1)
-      final upperBound = BigInt.from(10).pow(exponent + 1);
-
-      // Generate a random BigInt in the range [lowerBound, upperBound)
-      final range = upperBound - lowerBound;
-      // Scale by range and convert to BigInt
-      final randomOffset = BigInt.from(
-        (random.nextDouble() * range.toDouble()).toInt(),
-      );
-      final value = lowerBound + randomOffset;
-
-      weibullNumbers.add(value);
-    }
-
-    return weibullNumbers;
-  }
-
-  /// Generates a random amount of a balance between minPercentage and
-  /// maxPercentage.
-  static Coin calculateRandomAmount(
-    Coin balance, {
-    int minPercentage = 0,
-    int maxPercentage = 80,
-  }) {
-    final randomPercentage =
-        minPercentage + _kRandom.nextDouble() * (maxPercentage - minPercentage);
-
-    final randomAmount = (balance.value * (randomPercentage / 100)).toInt();
-
-    final adjustedAmount = randomAmount == 0 ? 1 : randomAmount;
-
-    return Coin(adjustedAmount);
-  }
-
-  /// Generates a list of transaction outputs from a set of UTxOs.
-  ///
-  /// - [inputs]: The set of [TransactionUnspentOutput] objects to use as
-  ///   inputs.
-  /// - [maxOutputs]: The number of outputs to generate.
-  /// - [maxTokens]: The maximum number of tokens to include in each output.
-  ///
-  /// Returns:
-  /// - A list of [TransactionOutput] objects.
-  static List<TransactionOutput> outputsFromUTxos({
-    required Set<TransactionUnspentOutput> inputs,
-    int maxOutputs = 1,
-    int maxTokens = 3,
-    int minCoinPct = 20,
-    int maxCoinPct = 40,
-    int maxTokenPct = 80,
-  }) {
-    final inputCount = inputs.length;
-    final maxUtxos = inputCount > 10 ? (inputCount * 0.1).floor() : 1;
-
-    final normalizedOutputs = (inputCount / maxUtxos).floor();
-    final outputsCount = normalizedOutputs.clamp(1, min(maxOutputs, maxUtxos)).toInt();
-
-    var lastUsedIndex = 0;
-
-    return List<TransactionOutput>.generate(_kRandom.nextInt(outputsCount) + 1, (int index) {
-      final nrUtxos = _kRandom.nextInt(maxUtxos) + 1;
-      final nrTokens = _kRandom.nextInt(maxTokens) + 1;
-      var balance = const Balance.zero();
-
-      for (var i = 0; i < nrUtxos; i++) {
-        final quantity = inputs.toList()[lastUsedIndex++].output.amount;
-
-        final newBalance = selectTokens(
-          balance: quantity,
-          outputsCount: outputsCount,
-          maxTokens: nrTokens,
-          maxTokenPct: maxTokenPct,
-        );
-
-        balance += newBalance;
-      }
-
-      final coin = calculateRandomAmount(
-        balance.coin,
-        minPercentage: minCoinPct,
-        maxPercentage: maxCoinPct,
-      );
-      return TransactionOutput(
-        address: randomAddress(),
-        amount: Balance(coin: coin, multiAsset: balance.multiAsset),
-      );
-    });
-  }
-
   /// Selects a specified number of tokens from a balance.
   ///
   /// - [balance]: The [Balance] from which to select tokens.
@@ -386,11 +447,11 @@ final class SelectionUtils {
     }
 
     tokens.shuffle(_kRandom);
-    final result = tokens.take(maxTokens).fold(const Balance.zero(), (prev, token) {
+    final result = tokens.take(maxTokens).fold(Balance(coin: balance.coin), (prev, token) {
       final (policyId, tokenName, quantity) = token;
       return prev +
           Balance(
-            coin: balance.coin,
+            coin: const Coin(0),
             multiAsset: MultiAsset(
               bundle: {
                 policyId: {tokenName: quantity},
@@ -401,37 +462,9 @@ final class SelectionUtils {
     return result;
   }
 
-  /// Normalizes a transaction input to meet the minimum ADA requirement.
-  ///
-  /// - [input]: The [TransactionUnspentOutput] to normalize.
-  /// - [config]: The [TransactionBuilderConfig] to use for the normalization.
-  ///
-  /// Returns:
-  /// - A normalized [TransactionOutput].
-  static TransactionOutput normalizeInputForMinAda({
-    required TransactionUnspentOutput input,
-    required TransactionBuilderConfig config,
-  }) {
-    final output = input.output;
-
-    final coin = output.amount.coin;
-
-    final minAda = TransactionOutputBuilder.minimumAdaForOutput(
-      output,
-      config.coinsPerUtxoByte,
-    );
-
-    final outputFee = TransactionOutputBuilder.feeForOutput(config, output, numOutputs: 1);
-    final totalFee = minAda + outputFee;
-
-    return coin < totalFee
-        ? TransactionOutput(
-            address: output.address,
-            amount: Balance(coin: totalFee),
-          )
-        : TransactionOutput(
-            address: output.address,
-            amount: output.amount,
-          );
-  }
+  static int _getMockAddressHrp({
+    bool isBase = true,
+    NetworkId networkId = NetworkId.testnet,
+  }) =>
+      0 | (isBase ? 0x00 : 0x20) | networkId.id;
 }

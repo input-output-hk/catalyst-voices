@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -12,13 +13,20 @@ final class DevToolsBloc extends Bloc<DevToolsEvent, DevToolsState>
     with BlocSignalEmitterMixin<DevToolsSignal, DevToolsState> {
   final DevToolsService _devToolsService;
   final SyncManager _syncManager;
+  final LoggingService? _loggingService;
+  final DownloaderService _downloaderService;
+  final DocumentsService _documentsService;
 
   Timer? _resetCountTimer;
   StreamSubscription<SyncStats>? _syncStartsSub;
+  StreamSubscription<int>? _documentsCountSub;
 
   DevToolsBloc(
     this._devToolsService,
     this._syncManager,
+    this._loggingService,
+    this._downloaderService,
+    this._documentsService,
   ) : super(const DevToolsState()) {
     on<DevToolsEnablerTappedEvent>(_handleEnablerTap);
     on<DevToolsEnablerTapResetEvent>(_handleTapCountReset);
@@ -28,7 +36,13 @@ final class DevToolsBloc extends Bloc<DevToolsEvent, DevToolsState>
     on<UpdateAllEvent>(_handleUpdateAll);
     on<WatchSystemInfoEvent>(_handleWatchSystemInfoEvent);
     on<StopWatchingSystemInfoEvent>(_handleStopWatchingSystemInfoEvent);
+    on<WatchDocumentsEvent>(_handleWatchDocumentsEvent);
+    on<StopWatchingDocumentsEvent>(_handleStopWatchingDocumentsEvent);
+    on<DocumentsCountChangedEvent>(_updateDocumentsCount);
     on<SyncStatsChangedEvent>(_handleSyncStatsChanged);
+    on<ChangeLogLevelEvent>(_handleChangeLogLevel);
+    on<ChangeCollectLogsEvent>(_handleChangeCollectLogs);
+    on<PrepareAndExportLogsEvent>(_handleExportLogs);
 
     add(const RecoverDataEvent());
   }
@@ -41,7 +55,36 @@ final class DevToolsBloc extends Bloc<DevToolsEvent, DevToolsState>
     _syncStartsSub?.cancel();
     _syncStartsSub = null;
 
+    _documentsCountSub?.cancel();
+    _documentsCountSub = null;
+
     return super.close();
+  }
+
+  Future<void> _handleChangeCollectLogs(
+    ChangeCollectLogsEvent event,
+    Emitter<DevToolsState> emit,
+  ) async {
+    assert(_loggingService != null, 'Changing collect logs while LoggingService not available');
+
+    final collectLogs = event.isEnabled;
+
+    final settings = await _loggingService!.updateSettings(collectLogs: Optional(collectLogs));
+
+    if (!isClosed) emit(state.copyWith(collectLogs: settings.effectiveCollectLogs));
+  }
+
+  Future<void> _handleChangeLogLevel(
+    ChangeLogLevelEvent event,
+    Emitter<DevToolsState> emit,
+  ) async {
+    assert(_loggingService != null, 'Changing log level while LoggingService not available');
+
+    final level = event.level;
+
+    final settings = await _loggingService!.updateSettings(level: Optional(level));
+
+    if (!isClosed) emit(state.copyWith(logsLevel: Optional(settings.effectiveLevel)));
   }
 
   Future<void> _handleEnablerTap(
@@ -73,9 +116,27 @@ final class DevToolsBloc extends Bloc<DevToolsEvent, DevToolsState>
     emit(state.copyWith(enableTapCount: count));
 
     _resetCountTimer = Timer(
-      const Duration(seconds: 1),
+      const Duration(seconds: 2),
       () => add(const DevToolsEnablerTapResetEvent()),
     );
+  }
+
+  Future<void> _handleExportLogs(
+    PrepareAndExportLogsEvent event,
+    Emitter<DevToolsState> emit,
+  ) async {
+    assert(_loggingService != null, 'Exporting logs while LoggingService not available');
+
+    try {
+      final content = await _loggingService!.prepareForExportCollectedLogs();
+      final encodedContent = utf8.encode(content);
+
+      final filename = 'catalyst_app_${DateTimeExt.now().toIso8601String()}_logs.txt';
+
+      await _downloaderService.download(data: encodedContent, filename: filename);
+    } catch (error, stack) {
+      _logger.severe('Exporting logs failed', error, stack);
+    }
   }
 
   Future<void> _handleRecoverData(
@@ -84,10 +145,28 @@ final class DevToolsBloc extends Bloc<DevToolsEvent, DevToolsState>
   ) async {
     final isDeveloper = await _devToolsService.isDeveloper();
     final syncStats = await _devToolsService.getStats();
+    final areLogsOptionsAvailable = _loggingService != null;
+    final loggingSettings = await _loggingService?.getSettings();
 
     if (!isClosed) {
-      emit(state.copyWith(isDeveloper: isDeveloper, syncStats: Optional(syncStats)));
+      emit(
+        state.copyWith(
+          isDeveloper: isDeveloper,
+          syncStats: Optional(syncStats),
+          areLogsOptionsAvailable: areLogsOptionsAvailable,
+          logsLevel: Optional(loggingSettings?.effectiveLevel),
+          collectLogs: loggingSettings?.effectiveCollectLogs ?? false,
+        ),
+      );
     }
+  }
+
+  Future<void> _handleStopWatchingDocumentsEvent(
+    StopWatchingDocumentsEvent event,
+    Emitter<DevToolsState> emit,
+  ) async {
+    await _documentsCountSub?.cancel();
+    _documentsCountSub = null;
   }
 
   Future<void> _handleStopWatchingSystemInfoEvent(
@@ -160,11 +239,26 @@ final class DevToolsBloc extends Bloc<DevToolsEvent, DevToolsState>
     }
   }
 
+  Future<void> _handleWatchDocumentsEvent(
+    WatchDocumentsEvent event,
+    Emitter<DevToolsState> emit,
+  ) async {
+    _documentsCountSub =
+        _documentsService.watchCount().listen((event) => add(DocumentsCountChangedEvent(event)));
+  }
+
   Future<void> _handleWatchSystemInfoEvent(
     WatchSystemInfoEvent event,
     Emitter<DevToolsState> emit,
   ) async {
     _syncStartsSub =
         _devToolsService.watchStats().listen((event) => add(SyncStatsChangedEvent(event)));
+  }
+
+  void _updateDocumentsCount(
+    DocumentsCountChangedEvent event,
+    Emitter<DevToolsState> emit,
+  ) {
+    emit(state.copyWith(documentsCount: Optional(event.count)));
   }
 }

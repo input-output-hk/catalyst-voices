@@ -1,11 +1,12 @@
+import 'package:catalyst_voices/routes/routes.dart';
 import 'package:catalyst_voices/widgets/app_bar/actions/search_button.dart';
-import 'package:catalyst_voices/widgets/buttons/voices_buttons.dart';
 import 'package:catalyst_voices/widgets/dev_tools/dev_tools_enabler.dart';
-import 'package:catalyst_voices/widgets/separators/voices_divider.dart';
+import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 /// A custom [AppBar] widget that adapts to different screen sizes using the
 /// [ResponsiveBuilder] class.
@@ -78,7 +79,7 @@ class VoicesAppBar extends StatelessWidget implements PreferredSizeWidget {
 
     final child = leading ??
         (canImplyDrawerToggleButton ? const DrawerToggleButton() : null) ??
-        (canImplyPopButton ? const NavigationPopButton() : null);
+        (canImplyPopButton ? const NavigationBack(isCompact: true) : null);
 
     if (child == null) {
       return null;
@@ -137,7 +138,11 @@ class _BrandPicture extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DevToolsEnabler(
-      child: Theme.of(context).brandAssets.brand.logo(context).buildPicture(),
+      child: VoicesGestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () => GoRouter.of(context).go(Routes.initialLocation),
+        child: Theme.of(context).brandAssets.brand.logo(context).buildPicture(),
+      ),
     );
   }
 }

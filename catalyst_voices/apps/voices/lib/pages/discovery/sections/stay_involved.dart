@@ -2,18 +2,15 @@ import 'dart:async';
 
 import 'package:catalyst_voices/common/constants/constants.dart';
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
-import 'package:catalyst_voices/widgets/buttons/copy_catalyst_id_button.dart';
-import 'package:catalyst_voices/widgets/buttons/voices_filled_button.dart';
-import 'package:catalyst_voices/widgets/snackbar/voices_snackbar.dart';
-import 'package:catalyst_voices/widgets/snackbar/voices_snackbar_type.dart';
-import 'package:catalyst_voices/widgets/text/voting_start_at_time_text.dart';
+import 'package:catalyst_voices/pages/discovery/sections/session_account_catalyst_id.dart';
+import 'package:catalyst_voices/widgets/text/campaign_stage_time_text.dart';
+import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
+import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
-import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 class StayInvolved extends StatelessWidget {
   const StayInvolved({super.key});
@@ -33,8 +30,8 @@ class StayInvolved extends StatelessWidget {
             spacing: 16,
             runSpacing: 16,
             children: [
-              _ReviewerCard(),
               _VoterCard(),
+              _ReviewerCard(),
             ],
           ),
         ],
@@ -43,47 +40,58 @@ class StayInvolved extends StatelessWidget {
   }
 }
 
-class __ReviewerCardState extends State<_ReviewerCard> {
+class _CopyCatalystIdTipText extends StatelessWidget {
+  const _CopyCatalystIdTipText();
+
   @override
   Widget build(BuildContext context) {
-    return _StayInvolvedCard(
-      icon: VoicesAssets.icons.clipboardCheck,
-      title: '${context.l10n.turnOpinionsIntoActions} ${context.l10n.becomeReviewer}!',
-      description: context.l10n.stayInvolvedReviewerDescription,
-      actions: Row(
-        children: [
-          CopyCatalystIdButton(
-            onTap: () => _handleCopyCatalystId(context),
+    return BlocSelector<SessionCubit, SessionState, bool>(
+      selector: (state) {
+        return state.isActive;
+      },
+      builder: (context, isActive) {
+        return Offstage(
+          offstage: !isActive,
+          child: Padding(
+            padding: const EdgeInsets.only(top: 20),
+            child: TipText(
+              context.l10n.tipCopyCatalystIdForReviewTool(VoicesConstants.becomeReviewerUrl()),
+              style:
+                  context.textTheme.bodyMedium?.copyWith(color: context.colors.textOnPrimaryLevel1),
+            ),
           ),
-          const SizedBox(height: 4),
-          _StayInvolvedActionButton(
-            title: context.l10n.becomeReviewer,
-            urlString: VoicesConstants.becomeReviewerUrl,
-            trailing: VoicesAssets.icons.externalLink.buildIcon(),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
+}
 
-  void _copyToClipboard(CatalystId? text) {
-    unawaited(Clipboard.setData(ClipboardData(text: text.toString())));
-  }
+class _DatetimeRangeTimeline extends StatelessWidget {
+  final DateRange? dateRange;
+  final String title;
 
-  void _handleCopyCatalystId(BuildContext context) {
-    final catalystId = context.read<SessionCubit>().state.account?.catalystId;
-    _copyToClipboard(catalystId);
-    _showSuccessSnackbar(context);
-  }
+  const _DatetimeRangeTimeline({
+    this.dateRange,
+    required this.title,
+  });
 
-  void _showSuccessSnackbar(BuildContext context) {
-    VoicesSnackBar.hideCurrent(context);
-
-    VoicesSnackBar(
-      type: VoicesSnackBarType.success,
-      behavior: SnackBarBehavior.floating,
-      message: context.l10n.copied,
-    ).show(context);
+  @override
+  Widget build(BuildContext context) {
+    return dateRange == null
+        ? const SizedBox.shrink()
+        : Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                title,
+                style: context.textTheme.titleSmall,
+              ),
+              CampaignStageTimeText(
+                dateRange: dateRange!,
+              ),
+            ],
+          );
   }
 }
 
@@ -99,11 +107,83 @@ class _Header extends StatelessWidget {
   }
 }
 
-class _ReviewerCard extends StatefulWidget {
+class _RangeTimelineCard extends StatelessWidget {
+  final List<Widget> children;
+
+  const _RangeTimelineCard({required this.children});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colors.elevationsOnSurfaceNeutralLv0,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Wrap(
+        alignment: WrapAlignment.spaceBetween,
+        spacing: 8,
+        runSpacing: 8,
+        children: children,
+      ),
+    );
+  }
+}
+
+class _ReviewerCard extends StatelessWidget {
   const _ReviewerCard();
 
   @override
-  State<_ReviewerCard> createState() => __ReviewerCardState();
+  Widget build(BuildContext context) {
+    return _StayInvolvedCard(
+      icon: VoicesAssets.icons.clipboardCheck,
+      title: context.l10n.becomeReviewer,
+      description: context.l10n.stayInvolvedReviewerDescription,
+      actions: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: 16),
+          _RangeTimelineCard(
+            children: [
+              BlocSelector<DiscoveryCubit, DiscoveryState, DateRange?>(
+                selector: (state) {
+                  return state.campaign.reviewRegistrationStartsAt;
+                },
+                builder: (context, date) {
+                  return _DatetimeRangeTimeline(
+                    dateRange: date,
+                    title: context.l10n.reviewRegistration,
+                  );
+                },
+              ),
+              BlocSelector<DiscoveryCubit, DiscoveryState, DateRange?>(
+                selector: (state) {
+                  return state.campaign.votingStartsAt;
+                },
+                builder: (context, date) {
+                  return _DatetimeRangeTimeline(
+                    dateRange: date,
+                    title: context.l10n.reviewTimelineHeader,
+                  );
+                },
+              ),
+            ],
+          ),
+          const _CopyCatalystIdTipText(),
+          const SessionAccountCatalystId(
+            padding: EdgeInsets.only(top: 20),
+          ),
+          _StayInvolvedActionButton(
+            title: context.l10n.becomeReviewer,
+            urlString: VoicesConstants.becomeReviewerUrl(),
+            trailing: VoicesAssets.icons.externalLink.buildIcon(),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 class _StayInvolvedActionButton extends StatelessWidget with LaunchUrlMixin {
@@ -119,10 +199,13 @@ class _StayInvolvedActionButton extends StatelessWidget with LaunchUrlMixin {
 
   @override
   Widget build(BuildContext context) {
-    return VoicesFilledButton(
-      onTap: _handleUrlTap,
-      trailing: trailing,
-      child: Text(title),
+    return Padding(
+      padding: const EdgeInsets.only(top: 20),
+      child: VoicesFilledButton(
+        onTap: _handleUrlTap,
+        trailing: trailing,
+        child: Text(title),
+      ),
     );
   }
 
@@ -137,42 +220,35 @@ class _StayInvolvedCard extends StatelessWidget {
   final String title;
   final String description;
   final Widget actions;
-  final Widget? additionalInfo;
 
   const _StayInvolvedCard({
     required this.icon,
     required this.title,
     required this.description,
     required this.actions,
-    this.additionalInfo,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 588,
-      height: 550,
+      constraints: const BoxConstraints(
+        minHeight: 565,
+        maxWidth: 588,
+      ),
       padding: const EdgeInsets.symmetric(horizontal: 32),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(20),
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: Theme.of(context).brightness == Brightness.light
-              ? [
-                  const Color(0xFFD1EAFF),
-                  const Color(0xFFCAD6FE),
-                ]
-              : [
-                  const Color(0xFF2D3953),
-                  const Color(0xFF242C42),
-                ],
+          colors: _getGradientColors(context),
         ),
       ),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: [
+          const SizedBox(height: 20),
           icon.buildIcon(size: 53),
           const SizedBox(height: 22),
           Text(
@@ -188,15 +264,23 @@ class _StayInvolvedCard extends StatelessWidget {
               color: context.colors.textOnPrimaryLevel1,
             ),
           ),
-          if (additionalInfo != null) ...[
-            const SizedBox(height: 12),
-            additionalInfo!,
-          ],
-          const SizedBox(height: 20),
           actions,
+          const SizedBox(height: 20),
         ],
       ),
     );
+  }
+
+  List<Color> _getGradientColors(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.light
+        ? [
+            const Color(0xFFD1EAFF),
+            const Color(0xFFCAD6FE),
+          ]
+        : [
+            const Color(0xFF2D3953),
+            const Color(0xFF242C42),
+          ];
   }
 }
 
@@ -207,23 +291,45 @@ class _VoterCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return _StayInvolvedCard(
       icon: VoicesAssets.icons.vote,
-      title: context.l10n.votingRegistrationForF14,
+      title: context.l10n.registerToVoteFund14,
       description: context.l10n.stayInvolvedContributorDescription,
-      actions: _StayInvolvedActionButton(
-        title: context.l10n.votingRegistration,
-        urlString: VoicesConstants.votingRegistrationUrl,
-      ),
-      additionalInfo: BlocSelector<DiscoveryCubit, DiscoveryState, DateTime?>(
-        selector: (state) {
-          return state.campaign.votingStartsAt;
-        },
-        builder: (context, date) {
-          return date == null
-              ? const SizedBox.shrink()
-              : VotingStartAtTimeText(
-                  data: date,
-                );
-        },
+      actions: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const SizedBox(height: 16),
+          _RangeTimelineCard(
+            children: [
+              BlocSelector<DiscoveryCubit, DiscoveryState, DateRange?>(
+                selector: (state) {
+                  return state.campaign.votingRegistrationStartsAt;
+                },
+                builder: (context, date) {
+                  return _DatetimeRangeTimeline(
+                    dateRange: date,
+                    title: context.l10n.votingRegistrationTimelineHeader,
+                  );
+                },
+              ),
+              const SizedBox(height: 16),
+              BlocSelector<DiscoveryCubit, DiscoveryState, DateRange?>(
+                selector: (state) {
+                  return state.campaign.votingStartsAt;
+                },
+                builder: (context, date) {
+                  return _DatetimeRangeTimeline(
+                    dateRange: date,
+                    title: context.l10n.votingTimelineHeader,
+                  );
+                },
+              ),
+            ],
+          ),
+          _StayInvolvedActionButton(
+            title: context.l10n.becomeVoter,
+            urlString: VoicesConstants.afterSubmissionUrl,
+          ),
+        ],
       ),
     );
   }

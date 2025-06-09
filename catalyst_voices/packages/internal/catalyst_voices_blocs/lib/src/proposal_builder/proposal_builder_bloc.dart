@@ -304,10 +304,14 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     }
 
     final guidance = property.schema.guidance;
+
+    final sectionTitle = property.schema.nodeId.isChildOf(ProposalDocument.milestoneListChildNodeId)
+        ? ''
+        : property.schema.title;
     if (guidance != null) {
       yield ProposalGuidanceItem(
         segmentTitle: segment.schema.title,
-        sectionTitle: property.schema.title,
+        sectionTitle: sectionTitle,
         description: guidance,
       );
     }
@@ -384,6 +388,8 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
 
     proposalBuilder!.addChanges(event.changes);
     final document = proposalBuilder.build();
+
+    _cache = _cache.copyWith(proposalDocument: Optional(document));
 
     final documentSegments = _mapDocumentToSegments(
       document,

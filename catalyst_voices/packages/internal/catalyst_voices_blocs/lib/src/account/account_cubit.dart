@@ -74,15 +74,18 @@ final class AccountCubit extends Cubit<AccountState>
       }
 
       final activeAccount = _userService.user.activeAccount;
+      var didUpdateAccount = false;
       if (activeAccount != null) {
-        await _userService.updateAccount(
+        didUpdateAccount = await _userService.updateAccount(
           id: activeAccount.catalystId,
           email: email.value.isNotEmpty ? Optional(email.value) : const Optional.empty(),
         );
       }
 
-      emit(state.copyWith(email: email));
-      emitSignal(const AccountVerificationEmailSendSignal());
+      if (didUpdateAccount) {
+        emit(state.copyWith(email: email));
+        emitSignal(const AccountVerificationEmailSendSignal());
+      }
 
       return true;
     } on EmailAlreadyUsedException {

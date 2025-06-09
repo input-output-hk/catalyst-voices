@@ -15,6 +15,8 @@ final class ProposalDocument extends Equatable {
   /// Since properties are dynamic the application cannot determine
   /// which property is the title in any other way than
   /// by hardcoding it's node ID.
+  ///
+  /// Some of nodes are used as paths for db jsonb queries.
   static final titleNodeId = DocumentNodeId.fromString('setup.title.title');
   static final descriptionNodeId = DocumentNodeId.fromString('summary.solution.summary');
   static final requestedFundsNodeId = DocumentNodeId.fromString('summary.budget.requestedFunds');
@@ -22,10 +24,17 @@ final class ProposalDocument extends Equatable {
   static final authorNameNodeId = DocumentNodeId.fromString('setup.proposer.applicant');
   static final categoryNodeId = DocumentNodeId.fromString('campaign_category');
   static final categoryDetailsNodeId =
-      DocumentNodeId.fromString('campaign_category.category_details.details');
+      DocumentNodeId.fromString('campaign_category.category_details');
   static final milestonesNodeId = DocumentNodeId.fromString('milestones.milestones');
   static final milestoneListNodeId =
       DocumentNodeId.fromString('milestones.milestones.milestone_list');
+  // This dot at the end is intentional.
+  // More info: https://github.com/input-output-hk/catalyst-voices/pull/2640#discussion_r2115627064
+  // It is used to indicate that the node id is a child of the milestone_list.
+  // TODO(LynxLynxx): Add some sort of implementation of wildcards to the DocumentNodeId.
+  // https://github.com/input-output-hk/catalyst-voices/issues/2661
+  static final milestoneListChildNodeId =
+      DocumentNodeId.fromString('milestones.milestones.milestone_list.');
   static final tagNodeId = DocumentNodeId.fromString('theme.theme.grouped_tag');
 
   /// A list of all [DocumentNodeId] that are expected to appear
@@ -144,6 +153,9 @@ final class ProposalDocument extends Equatable {
 }
 
 final class ProposalMetadata extends DocumentMetadata {
+  static const categoryIdNode = NodeId('categoryId.id');
+  static const authorsNode = NodeId('authors');
+
   final SignedDocumentRef templateRef;
   final SignedDocumentRef categoryId;
   final List<CatalystId> authors;

@@ -47,7 +47,10 @@ class _AppBar extends StatelessWidget implements PreferredSizeWidget {
     final readOnlyMode = context.select<ProposalCubit, bool>((cubit) => cubit.state.readOnlyMode);
 
     return VoicesAppBar(
-      automaticallyImplyLeading: false,
+      leading: NavigationBack(
+        isCompact: true,
+        onCanNotPop: (context, _) => const ProposalsRoute().go(context),
+      ),
       actions: [
         Offstage(
           offstage: readOnlyMode,

@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/widgets/document_builder/common/document_property_builder_title.dart';
 import 'package:catalyst_voices/widgets/dropdown/voices_dropdown.dart';
 import 'package:catalyst_voices/widgets/rich_text/markdown_text.dart';
@@ -38,7 +39,10 @@ class ListLengthPickerWidget extends StatelessWidget {
           const SizedBox(height: 8),
         ],
         if (description.data.isNotEmpty && description.data != title) ...[
-          MarkdownText(description),
+          MarkdownText(
+            description,
+            pStyle: context.textTheme.bodyMedium,
+          ),
           const SizedBox(height: 22),
         ],
         SingleSelectDropdown(

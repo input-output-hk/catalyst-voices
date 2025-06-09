@@ -14,6 +14,7 @@ import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class SessionAccountPopupMenu extends StatefulWidget {
   const SessionAccountPopupMenu({
@@ -287,7 +288,12 @@ class _SessionAccountPopupMenuState extends State<SessionAccountPopupMenu> with 
   void _handleEvent(_MenuItemEvent event) {
     switch (event) {
       case _OpenAccountDetails():
-        unawaited(const AccountRoute().push(context));
+        final router = GoRouter.of(context);
+        final matchedLocation = router.routerDelegate.state.matchedLocation;
+        final isAccount = matchedLocation == const AccountRoute().location;
+        if (!isAccount) {
+          unawaited(const AccountRoute().push(context));
+        }
       case _SetupRoles():
         // TODO(damian-molinski): don't know what it should do
         break;

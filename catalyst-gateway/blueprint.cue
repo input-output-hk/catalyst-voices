@@ -15,9 +15,9 @@ project: {
 		bundle: {
 			modules: main: {
 				name:    "app"
-				version: "0.10.0"
+				version: "0.11.0"
 				values: {
-					deployment: {
+					stateful: {
 						containers: gateway: {
 							image: {
 								name: _ @forge(name="CONTAINER_IMAGE")
@@ -121,7 +121,9 @@ project: {
 									}
 								}
 							}
-							port: 3030
+							ports: {
+								metrics: port: 3030
+							}
 							probes: {
 								liveness: {
 									path: "/api/v1/health/live"
@@ -132,10 +134,12 @@ project: {
 									port: 3030
 								}
 							}
-							mounts: data: {
-								ref: volume: name: "data"
-								path:     "/root/.local/share/cat-gateway"
-								readOnly: false
+							mounts: {
+								data: {
+									ref: stateful: {}
+									path:     "/root/.local/share/cat-gateway"
+									readOnly: false
+								}
 							}
 							resources: {
 								requests: {
@@ -151,8 +155,9 @@ project: {
 						nodeSelector: {
 							"node-group": "catalyst-gateway"
 						}
+						replicas:       1
 						serviceAccount: "catalyst-gateway"
-						strategy:       "Recreate"
+						strategy:       "RollingUpdate"
 						tolerations: [
 							{
 								key:      "app"
@@ -161,6 +166,12 @@ project: {
 								effect:   "NoSchedule"
 							},
 						]
+						volumes: {
+							data: {
+								class: "ebs-io1"
+								size:  "250Gi"
+							}
+						}
 					}
 
 					jobs: migration: containers: main: {
@@ -266,14 +277,9 @@ project: {
 
 					service: {
 						ports: {
-							port: 80
+							metrics: 3030
 						}
-						scrape: false
-					}
-
-					volumes: data: {
-						class: "ebs-io1"
-						size:  "250Gi"
+						scrape: true
 					}
 				}
 			}

@@ -4,13 +4,11 @@ import 'package:flutter/material.dart';
 
 class CampaignTimeline extends StatefulWidget {
   final List<CampaignTimelineViewModel> timelineItems;
-  final CampaignTimelinePlacement placement;
   final SizedBox horizontalPadding;
 
   const CampaignTimeline({
     super.key,
     required this.timelineItems,
-    required this.placement,
     this.horizontalPadding = const SizedBox.shrink(),
   });
 
@@ -37,10 +35,9 @@ class CampaignTimelineState extends State<CampaignTimeline> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               widget.horizontalPadding,
-              ...widget.timelineItems.asMap().entries.map(
+              ...widget.timelineItems.where((e) => !e.offstage).toList().asMap().entries.map(
                     (entry) => CampaignTimelineCard(
                       timelineItem: entry.value,
-                      placement: widget.placement,
                     ),
                   ),
               widget.horizontalPadding,
