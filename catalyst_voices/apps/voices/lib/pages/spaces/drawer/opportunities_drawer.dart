@@ -1,6 +1,7 @@
 import 'package:catalyst_voices/common/constants/constants.dart';
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/pages/spaces/drawer/session_account_drawer_catalyst_id.dart';
+import 'package:catalyst_voices/share/share_manager.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
@@ -70,7 +71,7 @@ class _BecomeReviewerCard extends StatelessWidget with LaunchUrlMixin {
           const SizedBox(height: 20),
           _OpportunityActionButton(
             onTap: () async {
-              await launchUri(VoicesConstants.becomeReviewerUrl().getUri());
+              await launchUri(ShareManager.of(context).becomeReviewer());
             },
             title: context.l10n.becomeReviewer,
             trailing: VoicesAssets.icons.externalLink.buildIcon(),
@@ -86,8 +87,10 @@ class _CopyCatalystIdTipText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final url = Uri.decodeFull(ShareManager.of(context).becomeReviewer().toString());
+
     return TipText(
-      context.l10n.tipCopyCatalystIdForReviewTool(VoicesConstants.becomeReviewerUrl()),
+      context.l10n.tipCopyCatalystIdForReviewTool(url),
       style: context.textTheme.bodyMedium?.copyWith(color: context.colors.textOnPrimaryLevel1),
     );
   }

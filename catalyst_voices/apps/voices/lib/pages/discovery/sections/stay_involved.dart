@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:catalyst_voices/common/constants/constants.dart';
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/pages/discovery/sections/session_account_catalyst_id.dart';
+import 'package:catalyst_voices/share/share_manager.dart';
 import 'package:catalyst_voices/widgets/text/campaign_stage_time_text.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
@@ -55,7 +56,9 @@ class _CopyCatalystIdTipText extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.only(top: 20),
             child: TipText(
-              context.l10n.tipCopyCatalystIdForReviewTool(VoicesConstants.becomeReviewerUrl()),
+              context.l10n.tipCopyCatalystIdForReviewTool(
+                Uri.decodeFull(ShareManager.of(context).becomeReviewer().toString()),
+              ),
               style:
                   context.textTheme.bodyMedium?.copyWith(color: context.colors.textOnPrimaryLevel1),
             ),
@@ -177,7 +180,7 @@ class _ReviewerCard extends StatelessWidget {
           ),
           _StayInvolvedActionButton(
             title: context.l10n.becomeReviewer,
-            urlString: VoicesConstants.becomeReviewerUrl(),
+            urlString: Uri.decodeFull(ShareManager.of(context).becomeReviewer().toString()),
             trailing: VoicesAssets.icons.externalLink.buildIcon(),
           ),
         ],
