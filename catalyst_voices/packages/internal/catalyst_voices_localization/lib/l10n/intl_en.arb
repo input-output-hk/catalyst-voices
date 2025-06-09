@@ -2235,7 +2235,7 @@
   "@apiErrorNotFound": {
     "description": "Message of an error when api returns not found status code, depends on context."
   },
-  "apiErrorTooManyRequests": "Too many requests",
+  "apiErrorTooManyRequests": "Too many requests, please try again in 10 minutes.",
   "@apiErrorTooManyRequests": {
     "description": "Message of an error when api returns matching status code."
   },
@@ -2327,7 +2327,7 @@
   "@stayInvolved": {
     "description": "Title for the stay involved section"
   },
-  "stayInvolvedReviewerDescription": "Your voice has power. Use it to guide others and help improve the Cardano community.\n\nAs a reviewer, you’ll make a real impact by sharing thoughtful feedback and influencing decisions.",
+  "stayInvolvedReviewerDescription": "Your voice has power. Use it to guide others and help improve the Cardano community.\n\nAs a reviewer, you’ll make a real impact by sharing thoughtful feedback and influencing decisions.\n",
   "@stayInvolvedReviewerDescription": {
     "description": "Description for the reviewer cards in stay involved section"
   },
@@ -2521,9 +2521,14 @@
   "@submitProposalBeforeClosing": {
     "description": "Information for user to submit proposal before the submission window closes"
   },
-  "checkMaxProposal": "Check your finals (max 5) in My proposals.",
+  "checkMaxProposal": "Check your finals (max {count}) in My proposals.",
   "@checkMaxProposal": {
-    "description": "Information for user to check their final proposals before submission window closes"
+    "description": "Information for user to check their final proposals before submission window closes",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "catalystAppNotAvailableAfterSubmissionCloses": "The Catalyst App won’t be available after submission close.",
   "@catalystAppNotAvailableAfterSubmissionCloses": {
@@ -2959,5 +2964,13 @@
   "votingTimelineHeader": "Voting:",
   "@votingTimelineHeader": {
     "description": "Header for the voting timeline"
+  },
+  "reviewRegistration": "Reviewers registration:",
+  "@reviewRegistration": {
+    "description": "Title for the review registration timeline"
+  },
+  "reviewTimelineHeader": "Community review:",
+  "@reviewTimelineHeader": {
+    "description": "Header for the review timeline"
   }
 }

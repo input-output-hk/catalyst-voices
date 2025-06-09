@@ -14,16 +14,17 @@ Future<void> main() async {
     ),
     maxTxSize: 16384,
     maxValueSize: 5000,
+    maxAssetsPerOutput: 100,
     coinsPerUtxoByte: Coin(4310),
   );
 
   final txMetadata = AuxiliaryData(
     map: {
       const CborSmallInt(1): CborString('Test'),
-      const CborSmallInt(2): CborBytes(hex.decode('aabbccddeeff')),
+      const CborSmallInt(2): CborBytes(hexDecode('aabbccddeeff')),
       const CborSmallInt(3): const CborSmallInt(997),
       const CborSmallInt(4): cbor.decode(
-        hex.decode(
+        hexDecode(
           '82a50081825820afcf8497561065afe1ca623823508753cc580eb575ac8f1d6cfa'
           'a18c3ceeac010001818258390080f9e2c88e6c817008f3a812ed889b4a4da8e0bd'
           '103f86e7335422aa122a946b9ad3d2ddf029d3a828f0468aece76895f15c9efbd6'
@@ -57,6 +58,11 @@ Future<void> main() async {
     amount: const Balance(coin: Coin(1000000)),
   );
 
+  final changeAddress = ShelleyAddress.fromBech32(
+    'addr_test1qrqr2ved9h96x46yazq89yvcgk0r93gwk0shnv06yfrnfryqhpr26'
+    'st0zgxmjnq6gqve99gtzxumclt9mwe5ynq03hjqgkjmhd',
+  );
+
   final txBuilder = TransactionBuilder(
     config: txBuilderConfig,
     inputs: {utxo},
@@ -65,16 +71,12 @@ Future<void> main() async {
     ttl: const SlotBigNum(410021),
     auxiliaryData: txMetadata,
     networkId: NetworkId.testnet,
-  );
-
-  final changeAddress = ShelleyAddress.fromBech32(
-    'addr_test1qrqr2ved9h96x46yazq89yvcgk0r93gwk0shnv06yfrnfryqhpr26'
-    'st0zgxmjnq6gqve99gtzxumclt9mwe5ynq03hjqgkjmhd',
+    changeAddress: changeAddress,
   );
 
   final txBody = txBuilder
       .withOutput(txOutput)
-      .withChangeAddressIfNeeded(changeAddress)
+      .withChangeIfNeeded()
       // fee can be set manually or left empty to be auto calculated
       // .withFee(const Coin(10000000))
       .buildBody();
@@ -106,13 +108,13 @@ TransactionWitnessSet _signTransaction(Transaction transaction) {
     vkeyWitnesses: {
       VkeyWitness(
         vkey: Ed25519PublicKey.fromBytes(
-          hex.decode(
+          hexDecode(
             '3311ca404fcf22c91d607ace285d70e2'
             '263a1b81745c39673080329bd1a3f56e',
           ),
         ),
         signature: Ed25519Signature.fromBytes(
-          hex.decode(
+          hexDecode(
             'f5eb006f048fdfa9b81b0fe3abee1ce1f1a75789d'
             'c21088b23ebf95c76b050ad157a497999e083e1957'
             'c2a3d730a07a5b2aef4a755783c9ce778c02c4a08970f',

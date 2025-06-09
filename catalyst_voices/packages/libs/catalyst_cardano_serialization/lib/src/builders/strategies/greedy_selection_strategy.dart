@@ -10,7 +10,7 @@ final class GreedySelectionStrategy implements CoinSelectionStrategy {
   @override
   void apply(AssetsGroup assetsGroup) {
     for (final asset in assetsGroup) {
-      asset.value.sort((a, b) => tokenCompare(asset.key, a, b));
+      asset.value.sort((a, b) => _tokenCompare(asset.key, a, b));
     }
   }
 
@@ -29,7 +29,7 @@ final class GreedySelectionStrategy implements CoinSelectionStrategy {
   /// Returns:
   /// A negative integer, zero, or a positive integer as this UTxO is less than,
   /// equal to, or greater than the specified UTxO.
-  int tokenCompare(
+  int _tokenCompare(
     AssetId asset,
     TransactionUnspentOutput thisUtxo,
     TransactionUnspentOutput otherUtxo,
@@ -41,18 +41,12 @@ final class GreedySelectionStrategy implements CoinSelectionStrategy {
     final otherBalanceLength = cbor.encode(otherBalance.toCbor()).length;
 
     if (thisBalanceLength != otherBalanceLength) {
-      return thisBalanceLength.compareTo(otherBalanceLength);
+      return otherBalanceLength.compareTo(thisBalanceLength);
     }
 
-    final (pid, assetName) = asset;
+    final thisAssetBalance = thisBalance[asset] ?? const Coin(0);
+    final otherAssetBalance = otherBalance[asset] ?? const Coin(0);
 
-    final thisAssetBalance = (asset == CoinSelector.adaAssetId)
-        ? thisBalance.coin
-        : thisBalance.multiAsset?.bundle[pid]?[assetName] ?? const Coin(0);
-    final otherAssetBalance = (asset == CoinSelector.adaAssetId)
-        ? otherBalance.coin
-        : otherBalance.multiAsset?.bundle[pid]?[assetName] ?? const Coin(0);
-
-    return thisAssetBalance.compareTo(otherAssetBalance);
+    return otherAssetBalance.compareTo(thisAssetBalance);
   }
 }

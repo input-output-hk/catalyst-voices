@@ -6,6 +6,7 @@ final class CampaignTimeline extends Equatable {
   final String description;
   final DateRange timeline;
   final CampaignTimelineStage stage;
+  final bool offstage;
   // NOTE. later we can add enum for stage that campaign is in when today is
   // in timeline range
 
@@ -14,6 +15,7 @@ final class CampaignTimeline extends Equatable {
     required this.description,
     required this.timeline,
     required this.stage,
+    this.offstage = false,
   });
 
   @override
@@ -22,6 +24,7 @@ final class CampaignTimeline extends Equatable {
         description,
         timeline,
         stage,
+        offstage,
       ];
 
   CampaignTimeline copyWith({
@@ -36,6 +39,7 @@ final class CampaignTimeline extends Equatable {
       description: description ?? this.description,
       timeline: timeline ?? this.timeline,
       stage: stage ?? this.stage,
+      offstage: offstage ?? this.offstage,
     );
   }
 }
@@ -47,6 +51,7 @@ enum CampaignTimelineStage {
   votingResults,
   projectOnboarding,
   votingRegistration,
+  reviewRegistration,
 }
 
 extension CampaignTimelineX on CampaignTimeline {
@@ -63,7 +68,8 @@ extension CampaignTimelineX on CampaignTimeline {
     ),
     CampaignTimeline(
       title: 'Voting Registration',
-      description: '',
+      description:
+          'During Voter registration, ADA holders register via supported wallet to participate in the Voting.',
       timeline: DateRange(
         from: DateTime.utc(2025, 06, 05, 18),
         to: DateTime.utc(2025, 06, 12, 10),
@@ -79,6 +85,16 @@ extension CampaignTimelineX on CampaignTimeline {
         to: DateTime.utc(2025, 06, 13, 13),
       ),
       stage: CampaignTimelineStage.communityReview,
+    ),
+    CampaignTimeline(
+      title: 'Reviewers and Moderators registration',
+      description: '',
+      timeline: DateRange(
+        from: DateTime.utc(2025, 06, 19, 12),
+        to: DateTime.utc(2025, 07, 7, 6),
+      ),
+      stage: CampaignTimelineStage.reviewRegistration,
+      offstage: true,
     ),
     CampaignTimeline(
       title: 'Community Voting',
