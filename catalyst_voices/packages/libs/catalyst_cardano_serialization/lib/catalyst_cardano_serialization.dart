@@ -19,5 +19,6 @@ export 'src/signature.dart';
 export 'src/transaction.dart';
 export 'src/transaction_output.dart';
 export 'src/types.dart';
+export 'src/utils/hex.dart';
 export 'src/utils/uuid.dart';
 export 'src/witness.dart';

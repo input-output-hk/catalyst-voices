@@ -68,7 +68,8 @@ extension CampaignTimelineX on CampaignTimeline {
     ),
     CampaignTimeline(
       title: 'Voting Registration',
-      description: '',
+      description:
+          'During Voter registration, ADA holders register via supported wallet to participate in the Voting.',
       timeline: DateRange(
         from: DateTime.utc(2025, 06, 05, 18),
         to: DateTime.utc(2025, 06, 12, 10),
