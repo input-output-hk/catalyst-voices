@@ -78,11 +78,6 @@ impl FullSignedDoc {
     /// * IF the record does exist, but all values are the same as stored, return Success.
     /// * Otherwise return an error. (Can not over-write an existing record with new
     ///   data).
-    ///
-    /// # Arguments:
-    ///  - `id` is a UUID v7
-    ///  - `ver` is a UUID v7
-    ///  - `doc_type` is a list of UUID v4
     pub(crate) async fn store(&self) -> anyhow::Result<bool> {
         // Perform insert before checking if the document already exists.
         // This should prevent race condition.

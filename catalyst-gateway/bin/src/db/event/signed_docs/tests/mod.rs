@@ -17,10 +17,7 @@ mod filter_by_field;
 async fn queries_test() {
     establish_connection_pool().await;
 
-    let doc_type = vec![
-        uuid::Uuid::new_v4().to_string(),
-        uuid::Uuid::new_v4().to_string(),
-    ];
+    let doc_type: Vec<uuid::Uuid> = vec![uuid::Uuid::new_v4(), uuid::Uuid::new_v4()];
     let docs = test_docs(&doc_type);
 
     for doc in &docs {
@@ -43,7 +40,7 @@ async fn queries_test() {
     filter_count(docs.len().try_into().unwrap()).await;
 }
 
-fn test_docs(doc_type: &[String]) -> Vec<FullSignedDoc> {
+fn test_docs(doc_type: &[uuid::Uuid]) -> Vec<FullSignedDoc> {
     vec![
         FullSignedDoc::new(
             SignedDocBody::new(
@@ -99,7 +96,7 @@ fn test_docs(doc_type: &[String]) -> Vec<FullSignedDoc> {
     ]
 }
 
-async fn store_full_signed_doc(doc: &FullSignedDoc, doc_type: Vec<String>) {
+async fn store_full_signed_doc(doc: &FullSignedDoc, doc_type: Vec<uuid::Uuid>) {
     assert!(doc.store().await.unwrap());
     // try to insert the same data again
     assert!(!doc.store().await.unwrap());
@@ -181,7 +178,7 @@ async fn filter_by_id_and_ver(doc: &FullSignedDoc) {
     assert!(res_docs.try_next().await.unwrap().is_none());
 }
 
-async fn filter_by_type(docs: &[FullSignedDoc], doc_type: Vec<String>) {
+async fn filter_by_type(docs: &[FullSignedDoc], doc_type: Vec<uuid::Uuid>) {
     let filter = DocsQueryFilter::all().with_type(doc_type.into());
     let mut res_docs = SignedDocBody::retrieve(&filter, &QueryLimits::ALL)
         .await
