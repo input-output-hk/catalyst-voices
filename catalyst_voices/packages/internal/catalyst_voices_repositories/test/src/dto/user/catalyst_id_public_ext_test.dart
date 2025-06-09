@@ -19,8 +19,8 @@ void main() {
 
     test('diacritical characters are handled correctly', () {
       // Given
-      const sourceUsername = 'Peverell Heureuxó';
-      const expectedUsername = 'Peverell Heureuxó';
+      const sourceUsername = 'First Ląst';
+      const expectedUsername = 'First Ląst';
       const id = CatalystIDPublic(username: sourceUsername);
 
       // When
@@ -32,8 +32,8 @@ void main() {
 
     test('diacritical characters with while spaces are handled correctly', () {
       // Given
-      const sourceUsername = 'Peverell%20Heureuxó';
-      const expectedUsername = 'Peverell Heureuxó';
+      const sourceUsername = 'First%20Ląst';
+      const expectedUsername = 'First Ląst';
       const id = CatalystIDPublic(username: sourceUsername);
 
       // When
