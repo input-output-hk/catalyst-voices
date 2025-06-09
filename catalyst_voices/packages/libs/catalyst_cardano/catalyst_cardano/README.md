@@ -116,6 +116,7 @@ Transaction _buildUnsignedTx({
     ),
     maxTxSize: 16384,
     maxValueSize: 5000,
+    maxAssetsPerOutput: 100,
     coinsPerUtxoByte: Coin(4310),
   );
 
@@ -134,11 +135,12 @@ Transaction _buildUnsignedTx({
     config: txBuilderConfig,
     inputs: utxos,
     networkId: NetworkId.testnet,
+    changeAddress: changeAddress,
   );
 
   final txBody = txBuilder
       .withOutput(txOutput)
-      .withChangeAddressIfNeeded(changeAddress)
+      .withChangeIfNeeded()
       .buildBody();
 
   return Transaction(

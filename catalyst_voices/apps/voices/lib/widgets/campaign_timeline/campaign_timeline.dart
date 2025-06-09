@@ -35,7 +35,7 @@ class CampaignTimelineState extends State<CampaignTimeline> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               widget.horizontalPadding,
-              ...widget.timelineItems.asMap().entries.map(
+              ...widget.timelineItems.where((e) => !e.offstage).toList().asMap().entries.map(
                     (entry) => CampaignTimelineCard(
                       timelineItem: entry.value,
                     ),

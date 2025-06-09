@@ -1,5 +1,5 @@
 import 'package:catalyst_cardano_serialization/src/signature.dart';
-import 'package:convert/convert.dart';
+import 'package:catalyst_cardano_serialization/src/utils/hex.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -18,8 +18,8 @@ void main() {
 
       const simpleKeyHex = 'bcbf9d3b5b8ef3d6f65fa59ef4bb64e6e56bb3de354bc484fa74f2e19734fa2e';
 
-      final extendedKeyBytes = hex.decode(extendedKeyHex);
-      final simpleKeyBytes = hex.decode(simpleKeyHex);
+      final extendedKeyBytes = hexDecode(extendedKeyHex);
+      final simpleKeyBytes = hexDecode(simpleKeyHex);
 
       final publicKey = Ed25519PublicKey.fromSimpleOrExtendedBytes(extendedKeyBytes);
       expect(publicKey.bytes, isNot(equals(extendedKeyBytes)));
