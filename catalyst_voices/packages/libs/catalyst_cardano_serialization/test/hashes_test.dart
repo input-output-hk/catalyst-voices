@@ -2,8 +2,8 @@ import 'package:catalyst_cardano_serialization/src/certificate.dart';
 import 'package:catalyst_cardano_serialization/src/hashes.dart';
 import 'package:catalyst_cardano_serialization/src/transaction.dart';
 import 'package:catalyst_cardano_serialization/src/types.dart';
+import 'package:catalyst_cardano_serialization/src/utils/hex.dart';
 import 'package:cbor/cbor.dart';
-import 'package:convert/convert.dart';
 import 'package:test/test.dart';
 
 import 'test_utils/test_data.dart';
@@ -11,7 +11,7 @@ import 'test_utils/test_data.dart';
 void main() {
   group(TransactionHash, () {
     const hexString = '4d3f576f26db29139981a69443c2325daa812cc353a31b5a4db794a5bcbb06c2';
-    final bytes = hex.decode(hexString);
+    final bytes = hexDecode(hexString);
 
     test('from and to hex', () {
       final hash = TransactionHash.fromHex(hexString);
@@ -52,7 +52,7 @@ void main() {
 
   group(TransactionInputsHash, () {
     const hexString = '4d3f576f26db29139981a69443c2325d';
-    final bytes = hex.decode(hexString);
+    final bytes = hexDecode(hexString);
 
     test('from and to hex', () {
       final hash = TransactionInputsHash.fromHex(hexString);
@@ -85,7 +85,7 @@ void main() {
 
   group(AuxiliaryDataHash, () {
     const hexString = '4d3f576f26db29139981a69443c2325daa812cc353a31b5a4db794a5bcbb06c2';
-    final bytes = hex.decode(hexString);
+    final bytes = hexDecode(hexString);
 
     test('from and to hex', () {
       final hash = AuxiliaryDataHash.fromHex(hexString);
@@ -126,7 +126,7 @@ void main() {
 
   group(CertificateHash, () {
     const hexString = '4d3f576f26db29139981a69443c2325d';
-    final bytes = hex.decode(hexString);
+    final bytes = hexDecode(hexString);
 
     test('from and to hex', () {
       final hash = CertificateHash.fromHex(hexString);
