@@ -102,7 +102,7 @@ class _PopupMenuButtonState extends State<_PopupMenuButton> {
                 bloc: bloc,
                 selector: (state) => state.buildMenuItem(action: item),
                 builder: (context, itemData) {
-                  return ProposalBuilderMenuItem(item: itemData);
+                  return ProposalBuilderMenuItem(data: itemData);
                 },
               ),
             ),
