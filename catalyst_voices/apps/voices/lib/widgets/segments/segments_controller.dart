@@ -9,10 +9,12 @@ import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 final class SegmentsController extends ValueNotifier<SegmentsControllerState> {
   ItemScrollController? _itemsScrollController;
+  final double scrollAlignment;
 
-  SegmentsController([
-    super.value = const SegmentsControllerState(),
-  ]) : super();
+  SegmentsController({
+    SegmentsControllerState value = const SegmentsControllerState(),
+    this.scrollAlignment = 0,
+  }) : super(value);
 
   // ignore: use_setters_to_change_properties
   void attachItemsScrollController(ItemScrollController value) {
@@ -124,6 +126,7 @@ final class SegmentsController extends ValueNotifier<SegmentsControllerState> {
     await controller.scrollTo(
       index: index,
       duration: const Duration(milliseconds: 300),
+      alignment: scrollAlignment,
     );
   }
 }
