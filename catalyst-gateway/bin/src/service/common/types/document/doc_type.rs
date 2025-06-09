@@ -8,7 +8,6 @@ use poem_openapi::{
     registry::{MetaExternalDocument, MetaSchema, MetaSchemaRef},
     types::{Example, ParseError, ParseFromJSON, ParseResult, ToJSON, Type},
 };
-use uuid::Uuid;
 
 use self::generic::uuidv4;
 use crate::service::common::types::generic::{self, uuidv4::UUIDv4};
@@ -111,19 +110,8 @@ impl ToJSON for DocumentType {
     }
 }
 
-impl From<Vec<Uuid>> for DocumentType {
+impl From<Vec<uuid::Uuid>> for DocumentType {
     fn from(value: Vec<uuid::Uuid>) -> Self {
-        Self(value.into_iter().map(uuidv4::UUIDv4::from).collect())
-    }
-}
-
-impl From<Vec<String>> for DocumentType {
-    fn from(value: Vec<String>) -> Self {
-        Self(
-            value
-                .into_iter()
-                .filter_map(|s| Uuid::parse_str(&s).ok().map(UUIDv4::from))
-                .collect(),
-        )
+        Self(value.into_iter().map(UUIDv4::from).collect())
     }
 }
