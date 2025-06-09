@@ -6,26 +6,9 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 class ProposalBuilderMenuItem extends StatelessWidget {
-  final ProposalBuilderMenuItemData item;
-
-  const ProposalBuilderMenuItem({
-    super.key,
-    required this.item,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return _ProposalBuilderMenuItem(
-      key: ValueKey('Action${item.action}MenuTile'),
-      data: item,
-    );
-  }
-}
-
-class _ProposalBuilderMenuItem extends StatelessWidget {
   final ProposalBuilderMenuItemData data;
 
-  const _ProposalBuilderMenuItem({
+  const ProposalBuilderMenuItem({
     super.key,
     required this.data,
   });
@@ -37,6 +20,7 @@ class _ProposalBuilderMenuItem extends StatelessWidget {
     final foregroundColor = Theme.of(context).colors.textOnPrimaryLevel1;
 
     return Stack(
+      key: ValueKey('Action${data.action}MenuTile'),
       children: [
         ListTile(
           title: MarkdownText(
