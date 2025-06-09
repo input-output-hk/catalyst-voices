@@ -2,6 +2,7 @@ import 'package:catalyst_voices_repositories/generated/api/cat_reviews.models.sw
 import 'package:catalyst_voices_repositories/src/dto/user/catalyst_id_public_ext.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+/* cSpell:disable */
 void main() {
   group('decode', () {
     test('spaces are handled correctly', () {
@@ -43,4 +44,4 @@ void main() {
       expect(decodedId.username, expectedUsername);
     });
   });
-}
+} /* cSpell:enable */
