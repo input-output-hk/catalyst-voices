@@ -28,7 +28,7 @@ void main() {
       keychainProvider = VaultKeychainProvider(
         secureStorage: const FlutterSecureStorage(),
         sharedPreferences: SharedPreferencesAsync(),
-        cacheConfig: const CacheConfig(),
+        cacheConfig: AppConfig.dev().cache,
       );
       userObserver = StreamUserObserver();
     });
@@ -347,6 +347,105 @@ void main() {
         );
       });
     });
+
+    group('updateActiveAccountDetails', () {
+      setUp(() {
+        userRepository = _MockUserRepository();
+        service = UserService(userRepository, userObserver);
+
+        registerFallbackValue(const User.empty());
+      });
+
+      tearDown(() {
+        reset(userRepository);
+      });
+
+      test('user repository is not called when public status is not setup', () async {
+        // Given
+        final keychainId = const Uuid().v4();
+        const publicStatus = AccountPublicStatus.notSetup;
+
+        final keychain = await keychainProvider.create(keychainId);
+        final account = Account.dummy(
+          catalystId: DummyCatalystIdFactory.create(),
+          keychain: keychain,
+          isActive: true,
+        ).copyWith(publicStatus: publicStatus);
+        final user = User.optional(accounts: [account]);
+
+        // When
+        when(() => userRepository.getUser()).thenAnswer((_) => Future.value(user));
+        when(() => userRepository.saveUser(any())).thenAnswer((_) => Future(() {}));
+
+        await service.useLastAccount();
+        await service.updateActiveAccountDetails();
+
+        // Then
+        verifyNever(() => userRepository.getAccountPublicStatus());
+
+        final serviceUser = await service.getUser();
+        expect(serviceUser, user);
+      });
+
+      test('user repository is called when public status is setup', () async {
+        // Given
+        final keychainId = const Uuid().v4();
+        const publicStatus = AccountPublicStatus.verifying;
+
+        final keychain = await keychainProvider.create(keychainId);
+        final account = Account.dummy(
+          catalystId: DummyCatalystIdFactory.create(),
+          keychain: keychain,
+          isActive: true,
+        ).copyWith(
+          email: const Optional('dev@iohk.com'),
+          publicStatus: publicStatus,
+        );
+        final user = User.optional(accounts: [account]);
+
+        // When
+        when(() => userRepository.getUser()).thenAnswer((_) => Future.value(user));
+        when(() => userRepository.saveUser(any())).thenAnswer((_) => Future(() {}));
+        when(() => userRepository.getAccountPublicStatus())
+            .thenAnswer((_) => Future.value(AccountPublicStatus.verified));
+
+        await service.useLastAccount();
+        await service.updateActiveAccountDetails();
+
+        // Then
+        verify(() => userRepository.getAccountPublicStatus()).called(1);
+      });
+
+      test('user account is updated when status changes', () async {
+        // Given
+        final keychainId = const Uuid().v4();
+        const publicStatus = AccountPublicStatus.verifying;
+        const updatedPublicStatus = AccountPublicStatus.verified;
+
+        final keychain = await keychainProvider.create(keychainId);
+        final account = Account.dummy(
+          catalystId: DummyCatalystIdFactory.create(),
+          keychain: keychain,
+          isActive: true,
+        ).copyWith(
+          email: const Optional('dev@iohk.com'),
+          publicStatus: publicStatus,
+        );
+        final user = User.optional(accounts: [account]);
+
+        // When
+        when(() => userRepository.getUser()).thenAnswer((_) => Future.value(user));
+        when(() => userRepository.saveUser(any())).thenAnswer((_) => Future(() {}));
+        when(() => userRepository.getAccountPublicStatus())
+            .thenAnswer((_) => Future.value(updatedPublicStatus));
+
+        await service.useLastAccount();
+        await service.updateActiveAccountDetails();
+
+        // Then
+        expect(service.user.activeAccount?.publicStatus, updatedPublicStatus);
+      });
+    });
   });
 }
 
@@ -378,3 +477,5 @@ class _FakeUserRepository extends Fake implements UserRepository {
     _user = user;
   }
 }
+
+class _MockUserRepository extends Mock implements UserRepository {}

@@ -1,20 +1,17 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
-import 'package:catalyst_voices/common/formatters/date_formatter.dart';
+import 'package:catalyst_voices/widgets/text/campaign_stage_time_text.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
-import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 class CampaignTimelineCard extends StatefulWidget {
   final CampaignTimelineViewModel timelineItem;
-  final CampaignTimelinePlacement placement;
 
   const CampaignTimelineCard({
     super.key,
     required this.timelineItem,
-    required this.placement,
   });
 
   @override
@@ -36,16 +33,13 @@ class CampaignTimelineCardState extends State<CampaignTimelineCard> {
       onTap: _toggleExpanded,
       behavior: HitTestBehavior.opaque,
       child: Container(
-        constraints: const BoxConstraints(minHeight: 150),
+        constraints: const BoxConstraints(minHeight: 153),
         width: 288,
         child: Card(
           key: const Key('TimelineCard'),
-          color: widget.placement.backgroundColor(context, isOngoing: _isOngoing),
+          color: context.colors.elevationsOnSurfaceNeutralLv1White,
           shape: OutlineInputBorder(
-            borderSide: widget.placement.borderSide(
-              context,
-              isOngoing: _isOngoing,
-            ),
+            borderSide: _getBorder(context),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Padding(
@@ -55,13 +49,30 @@ class CampaignTimelineCardState extends State<CampaignTimelineCard> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     VoicesAssets.icons.calendar.buildIcon(
                       color: colors.primary,
                     ),
+                    const SizedBox(width: 12),
+                    Offstage(
+                      offstage: !_isOngoing,
+                      child: VoicesChip.round(
+                        backgroundColor: colors.primary,
+                        content: Text(
+                          context.l10n.ongoing,
+                          style: context.textTheme.labelSmall?.copyWith(
+                            color: colors.onPrimary,
+                          ),
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 1,
+                        ),
+                      ),
+                    ),
+                    const Spacer(),
                     _expandedIcon.buildIcon(
-                      color: colors.primaryContainer,
+                      color: colors.primary,
                     ),
                   ],
                 ),
@@ -75,53 +86,18 @@ class CampaignTimelineCardState extends State<CampaignTimelineCard> {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: Text(
-                        key: const Key('TimelineCardDate'),
-                        DateFormatter.formatDateRange(
-                          MaterialLocalizations.of(context),
-                          context.l10n,
-                          widget.timelineItem.timeline,
-                        ),
-                        style: context.textTheme.bodyMedium?.copyWith(
-                          color: context.colors.sysColorsNeutralN60,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                const SizedBox(height: 12),
+                CampaignStageTimeText(dateRange: widget.timelineItem.timeline),
+                if (_isExpanded)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 12),
+                    child: Text(
+                      widget.timelineItem.description,
+                      style: context.textTheme.bodyMedium?.copyWith(
+                        color: context.colors.textOnPrimaryLevel1,
                       ),
                     ),
-                    if (_isOngoing) ...[
-                      const SizedBox(width: 8),
-                      Offstage(
-                        offstage: !_isOngoing,
-                        child: VoicesChip.round(
-                          backgroundColor: colors.primary,
-                          content: Text(
-                            context.l10n.ongoing,
-                            style: context.textTheme.labelSmall?.copyWith(
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
-                const SizedBox(height: 16),
-                AnimatedSwitcher(
-                  duration: Durations.medium4,
-                  child: _isExpanded
-                      ? Text(
-                          widget.timelineItem.description,
-                          style: context.textTheme.bodyMedium?.copyWith(
-                            color: context.colors.sysColorsNeutralN60,
-                          ),
-                        )
-                      : const SizedBox.shrink(),
-                ),
+                  ),
               ],
             ),
           ),
@@ -130,42 +106,19 @@ class CampaignTimelineCardState extends State<CampaignTimelineCard> {
     );
   }
 
+  BorderSide _getBorder(BuildContext context) {
+    return switch (_isOngoing) {
+      true => BorderSide(
+          color: context.colorScheme.primary,
+          width: 2,
+        ),
+      false => BorderSide.none,
+    };
+  }
+
   void _toggleExpanded() {
     setState(() {
       _isExpanded = !_isExpanded;
     });
-  }
-}
-
-enum CampaignTimelinePlacement {
-  discovery,
-  workspace;
-
-  Color backgroundColor(
-    BuildContext context, {
-    required bool isOngoing,
-  }) {
-    final colors = Theme.of(context).colors;
-
-    return switch ((this, isOngoing)) {
-      (discovery, _) => colors.onSurfaceNeutralOpaqueLv0,
-      (workspace, true) => colors.onSurfaceNeutralOpaqueLv0,
-      (workspace, false) => colors.onSurfaceNeutralOpaqueLv1,
-    };
-  }
-
-  BorderSide borderSide(
-    BuildContext context, {
-    required bool isOngoing,
-  }) {
-    final colorScheme = context.colorScheme;
-
-    return switch ((this, isOngoing)) {
-      (discovery, true) => BorderSide(
-          color: colorScheme.primary,
-          width: 2,
-        ),
-      (_, _) => BorderSide.none,
-    };
   }
 }

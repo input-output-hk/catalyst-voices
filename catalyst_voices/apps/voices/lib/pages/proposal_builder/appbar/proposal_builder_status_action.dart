@@ -156,7 +156,7 @@ class _PopupMenuButtonState extends State<_PopupMenuButton> {
       return;
     }
 
-    if (!bloc.validate()) {
+    if (!bloc.validate(ProposalBuilderValidationOrigin.shareDraft)) {
       return;
     }
 
@@ -194,7 +194,7 @@ class _PopupMenuButtonState extends State<_PopupMenuButton> {
       return;
     }
 
-    if (!bloc.validate()) {
+    if (!bloc.validate(ProposalBuilderValidationOrigin.submitForReview)) {
       return;
     }
 

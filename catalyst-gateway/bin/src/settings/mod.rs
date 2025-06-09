@@ -24,6 +24,7 @@ use crate::{
 pub(crate) mod cassandra_db;
 pub(crate) mod chain_follower;
 pub(crate) mod event_db;
+pub(crate) mod rbac;
 pub(crate) mod signed_doc;
 mod str_env_var;
 
@@ -137,6 +138,9 @@ struct EnvVars {
     /// The Catalyst Signed Documents configuration
     signed_doc: signed_doc::EnvVars,
 
+    /// RBAC configuration.
+    rbac: rbac::EnvVars,
+
     /// Internal API Access API Key
     internal_api_key: Option<StringEnvVar>,
 
@@ -219,6 +223,7 @@ static ENV_VARS: LazyLock<EnvVars> = LazyLock::new(|| {
         chain_follower: chain_follower::EnvVars::new(),
         event_db: event_db::EnvVars::new(),
         signed_doc: signed_doc::EnvVars::new(),
+        rbac: rbac::EnvVars::new(),
         internal_api_key: StringEnvVar::new_optional("INTERNAL_API_KEY", true),
         check_config_tick: StringEnvVar::new_as_duration(
             "CHECK_CONFIG_TICK",
@@ -355,6 +360,13 @@ impl Settings {
     /// Get the configuration of the Catalyst Signed Documents.
     pub(crate) fn signed_doc_cfg() -> signed_doc::EnvVars {
         ENV_VARS.signed_doc.clone()
+    }
+
+    /// Returns the RBAC configuration.
+    // TODO: Remove when used.
+    #[allow(unused)]
+    pub fn rbac_cfg() -> &'static rbac::EnvVars {
+        &ENV_VARS.rbac
     }
 
     /// Chain Follower network (The Blockchain network we are configured to use).

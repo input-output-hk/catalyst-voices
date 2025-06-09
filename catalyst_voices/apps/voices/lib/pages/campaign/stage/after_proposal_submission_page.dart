@@ -21,7 +21,10 @@ class AfterProposalSubmissionPage extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             mainAxisSize: MainAxisSize.min,
             children: [
-              CatalystImage.asset(VoicesAssets.images.thanks.path),
+              CatalystImage.asset(
+                VoicesAssets.images.thanks.path,
+                height: 340,
+              ),
               const SizedBox(height: 17),
               const _Header(),
               const SizedBox(height: 35),

@@ -60,6 +60,7 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
   final Color outlineBorder;
   final Color outlineBorderVariant;
   final Color primary98;
+  final Color primaryOverlay;
   final Color primaryContainer;
   final Color onPrimaryContainer;
   final Color onErrorVariant;
@@ -68,6 +69,9 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
   final Color overlay;
   final Color dropShadow;
   final Color sysColorsNeutralN60;
+  final List<Color> headerGradient;
+  final List<Color> headerGradientSecondary;
+  final List<Color> cardBackgroundGradient;
 
   const VoicesColorScheme({
     required this.textPrimary,
@@ -123,6 +127,7 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
     required this.outlineBorder,
     required this.outlineBorderVariant,
     required this.primary98,
+    required this.primaryOverlay,
     required this.primaryContainer,
     required this.onPrimaryContainer,
     required this.onErrorVariant,
@@ -131,6 +136,9 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
     required this.overlay,
     required this.dropShadow,
     required this.sysColorsNeutralN60,
+    required this.headerGradient,
+    required this.headerGradientSecondary,
+    required this.cardBackgroundGradient,
   });
 
   @visibleForTesting
@@ -188,6 +196,7 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
     this.outlineBorder = Colors.black,
     this.outlineBorderVariant = Colors.black,
     this.primary98 = Colors.black,
+    this.primaryOverlay = Colors.black,
     this.primaryContainer = Colors.black,
     this.onPrimaryContainer = Colors.black,
     this.onErrorVariant = Colors.black,
@@ -196,6 +205,9 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
     this.overlay = Colors.black,
     this.dropShadow = Colors.black,
     this.sysColorsNeutralN60 = Colors.black,
+    this.headerGradient = const [],
+    this.headerGradientSecondary = const [],
+    this.cardBackgroundGradient = const [],
   });
 
   @override
@@ -253,6 +265,7 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
     Color? outlineBorder,
     Color? outlineBorderVariant,
     Color? primary98,
+    Color? primaryOverlay,
     Color? primaryContainer,
     Color? onPrimaryContainer,
     Color? onErrorVariant,
@@ -261,6 +274,9 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
     Color? overlay,
     Color? dropShadow,
     Color? sysColorsNeutralN60,
+    List<Color>? headerGradient,
+    List<Color>? headerGradientSecondary,
+    List<Color>? cardBackgroundGradient,
   }) {
     return VoicesColorScheme(
       textPrimary: textPrimary ?? this.textPrimary,
@@ -320,6 +336,7 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
       outlineBorder: outlineBorder ?? this.outlineBorder,
       outlineBorderVariant: outlineBorderVariant ?? this.outlineBorderVariant,
       primary98: primary98 ?? this.primary98,
+      primaryOverlay: primaryOverlay ?? this.primaryOverlay,
       primaryContainer: primaryContainer ?? this.primaryContainer,
       onPrimaryContainer: onPrimaryContainer ?? this.onPrimaryContainer,
       onErrorVariant: onErrorVariant ?? this.onErrorVariant,
@@ -328,6 +345,9 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
       overlay: overlay ?? this.overlay,
       dropShadow: dropShadow ?? this.dropShadow,
       sysColorsNeutralN60: sysColorsNeutralN60 ?? this.sysColorsNeutralN60,
+      headerGradient: headerGradient ?? this.headerGradient,
+      headerGradientSecondary: headerGradientSecondary ?? this.headerGradientSecondary,
+      cardBackgroundGradient: cardBackgroundGradient ?? this.cardBackgroundGradient,
     );
   }
 
@@ -449,6 +469,7 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
       outlineBorder: Color.lerp(outlineBorder, other.outlineBorder, t)!,
       outlineBorderVariant: Color.lerp(outlineBorderVariant, other.outlineBorderVariant, t)!,
       primary98: Color.lerp(primary98, other.primary98, t)!,
+      primaryOverlay: Color.lerp(primaryOverlay, other.primaryOverlay, t)!,
       primaryContainer: Color.lerp(primaryContainer, other.primaryContainer, t)!,
       onPrimaryContainer: Color.lerp(onPrimaryContainer, other.onPrimaryContainer, t)!,
       onErrorVariant: Color.lerp(onErrorVariant, other.onErrorVariant, t)!,
@@ -457,12 +478,26 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
       overlay: Color.lerp(overlay, other.overlay, t)!,
       dropShadow: Color.lerp(dropShadow, other.dropShadow, t)!,
       sysColorsNeutralN60: Color.lerp(sysColorsNeutralN60, other.sysColorsNeutralN60, t)!,
+      headerGradient: List.generate(
+        headerGradient.length,
+        (i) => Color.lerp(headerGradient[i], other.headerGradient[i], t)!,
+      ),
+      headerGradientSecondary: List.generate(
+        headerGradientSecondary.length,
+        (i) => Color.lerp(headerGradientSecondary[i], other.headerGradientSecondary[i], t)!,
+      ),
+      cardBackgroundGradient: List.generate(
+        cardBackgroundGradient.length,
+        (i) => Color.lerp(cardBackgroundGradient[i], other.cardBackgroundGradient[i], t)!,
+      ),
     );
   }
 }
 
 extension VoicesColorSchemeExtension on ThemeData {
   VoicesColorScheme get colors => extension<VoicesColorScheme>()!;
+
+  bool get isLight => brightness == Brightness.light;
 
   Color get linksPrimary => primaryColor;
 }

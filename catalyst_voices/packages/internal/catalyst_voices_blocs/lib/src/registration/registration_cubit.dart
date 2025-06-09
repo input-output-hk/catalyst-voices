@@ -25,7 +25,6 @@ final class RegistrationCubit extends Cubit<RegistrationState> with BlocErrorEmi
   final UserService _userService;
   final RegistrationService _registrationService;
   final RegistrationProgressNotifier _progressNotifier;
-  final BlockchainConfig _blockchainConfig;
 
   CatalystId? _accountId;
   Keychain? _keychain;
@@ -41,7 +40,6 @@ final class RegistrationCubit extends Cubit<RegistrationState> with BlocErrorEmi
   })  : _userService = userService,
         _registrationService = registrationService,
         _progressNotifier = progressNotifier,
-        _blockchainConfig = blockchainConfig,
         _baseProfileCubit = BaseProfileCubit(),
         _keychainCreationCubit = KeychainCreationCubit(
           downloaderService: downloaderService,
@@ -274,7 +272,6 @@ final class RegistrationCubit extends Cubit<RegistrationState> with BlocErrorEmi
 
       final transaction = await _registrationService.prepareRegistration(
         wallet: wallet,
-        networkId: _blockchainConfig.networkId,
         masterKey: masterKey,
         roles: transactionRoles,
       );
@@ -282,7 +279,7 @@ final class RegistrationCubit extends Cubit<RegistrationState> with BlocErrorEmi
       _transaction = transaction;
 
       final fee = transaction.body.fee;
-      final formattedFree = CryptocurrencyFormatter.formatExactAmount(fee);
+      final formattedFree = CryptocurrencyFormatter.formatAmount(fee);
 
       _onRegistrationStateDataChanged(
         _registrationState.copyWith(

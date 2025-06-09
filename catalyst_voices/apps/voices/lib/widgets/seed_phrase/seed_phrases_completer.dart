@@ -95,12 +95,6 @@ class _WordSlotCell extends StatelessWidget {
   /// A callback function triggered when the slot is tapped (if allowed).
   final VoidCallback? onTap;
 
-  Set<WidgetState> get states => {
-        if (data != null) WidgetState.selected,
-        if (isActive) WidgetState.focused,
-        if (data == null && !isActive) WidgetState.disabled,
-      };
-
   const _WordSlotCell(
     this.data, {
     super.key,
@@ -110,13 +104,29 @@ class _WordSlotCell extends StatelessWidget {
     this.onTap,
   });
 
+  Set<WidgetState> get states => {
+        if (data != null) WidgetState.selected,
+        if (isActive) WidgetState.focused,
+        if (data == null && !isActive) WidgetState.disabled,
+        if (showDelete) WidgetState.hovered,
+      };
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    final backgroundColor = _CellBackgroundColor(theme);
-    final foregroundColor = _CellForegroundColor(theme);
-    final border = _CellBorder(theme);
+    final backgroundColor = WidgetStateProperty<Color?>.fromMap({
+      WidgetState.hovered: theme.colorScheme.primary,
+      WidgetState.selected: theme.colors.onSurfacePrimary016,
+    });
+    final foregroundColor = WidgetStateProperty<Color?>.fromMap({
+      WidgetState.hovered: theme.colors.textOnPrimaryWhite,
+      WidgetState.disabled: theme.colors.textDisabled,
+      WidgetState.any: theme.colors.textOnPrimaryLevel0,
+    });
+    final border = WidgetStateProperty<BoxBorder?>.fromMap({
+      ~WidgetState.selected: Border.all(color: theme.colors.outlineBorder),
+    });
 
     return AnimatedContainer(
       duration: kThemeChangeDuration,
@@ -150,60 +160,5 @@ class _WordSlotCell extends StatelessWidget {
         ),
       ),
     );
-  }
-}
-
-final class _CellBackgroundColor extends WidgetStateProperty<Color?> {
-  final ThemeData theme;
-
-  _CellBackgroundColor(this.theme);
-
-  @override
-  Color? resolve(Set<WidgetState> states) {
-    if (states.contains(WidgetState.disabled)) {
-      return theme.colorScheme.onSurface.withValues(alpha: 0.08);
-    }
-
-    if (states.contains(WidgetState.focused)) {
-      return theme.colors.onSurfaceNeutralOpaqueLv0;
-    }
-
-    return theme.colorScheme.primary;
-  }
-}
-
-final class _CellForegroundColor extends WidgetStateProperty<Color?> {
-  final ThemeData theme;
-
-  _CellForegroundColor(this.theme);
-
-  @override
-  Color? resolve(Set<WidgetState> states) {
-    if (states.contains(WidgetState.disabled)) {
-      return theme.colors.textDisabled;
-    }
-
-    if (states.contains(WidgetState.focused)) {
-      return theme.colorScheme.primary;
-    }
-
-    return theme.colorScheme.onPrimary;
-  }
-}
-
-final class _CellBorder extends WidgetStateProperty<BoxBorder?> {
-  final ThemeData theme;
-
-  _CellBorder(this.theme);
-
-  @override
-  BoxBorder? resolve(Set<WidgetState> states) {
-    if (states.contains(WidgetState.focused)) {
-      return Border.all(
-        color: theme.colorScheme.primary,
-      );
-    }
-
-    return null;
   }
 }

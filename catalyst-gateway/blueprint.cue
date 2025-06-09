@@ -15,9 +15,9 @@ project: {
 		bundle: {
 			modules: main: {
 				name:    "app"
-				version: "0.6.0"
+				version: "0.11.0"
 				values: {
-					deployment: {
+					stateful: {
 						containers: gateway: {
 							image: {
 								name: _ @forge(name="CONTAINER_IMAGE")
@@ -121,15 +121,25 @@ project: {
 									}
 								}
 							}
-							port: 3030
-							probes: {
-								liveness: path:  "/api/v1/health/live"
-								readiness: path: "/api/v1/health/ready"
+							ports: {
+								metrics: port: 3030
 							}
-							mounts: data: {
-								ref: volume: name: "data"
-								path:     "/root/.local/share/cat-gateway"
-								readOnly: false
+							probes: {
+								liveness: {
+									path: "/api/v1/health/live"
+									port: 3030
+								}
+								readiness: {
+									path: "/api/v1/health/ready"
+									port: 3030
+								}
+							}
+							mounts: {
+								data: {
+									ref: stateful: {}
+									path:     "/root/.local/share/cat-gateway"
+									readOnly: false
+								}
 							}
 							resources: {
 								requests: {
@@ -145,8 +155,9 @@ project: {
 						nodeSelector: {
 							"node-group": "catalyst-gateway"
 						}
+						replicas:       1
 						serviceAccount: "catalyst-gateway"
-						strategy:       "Recreate"
+						strategy:       "RollingUpdate"
 						tolerations: [
 							{
 								key:      "app"
@@ -155,6 +166,12 @@ project: {
 								effect:   "NoSchedule"
 							},
 						]
+						volumes: {
+							data: {
+								class: "ebs-io1"
+								size:  "250Gi"
+							}
+						}
 					}
 
 					jobs: migration: containers: main: {
@@ -214,10 +231,33 @@ project: {
 						}
 					}
 
-					dns: subdomain: "gateway"
-					route: rules: [{
-						matchPrefix: "/"
-					}]
+					dns: {
+						createEndpoint: false
+						subdomain:      "app"
+					}
+					route: {
+						hostnames: ["reviews"]
+						rules: [{
+							matches: [{
+								path: {
+									type:  "PathPrefix"
+									value: "/api/gateway"
+								}
+							}]
+							filters: [{
+								type: "URLRewrite"
+								urlRewrite: {
+									path: {
+										type:               "ReplacePrefixMatch"
+										replacePrefixMatch: "/api"
+									}
+								}
+							}]
+							target: {
+								port: 3030
+							}
+						}]
+					}
 
 					secrets: {
 						db: {
@@ -236,13 +276,10 @@ project: {
 					}
 
 					service: {
-						port: 80
-						scrape: {}
-					}
-
-					volumes: data: {
-						class: "ebs-io1"
-						size:  "250Gi"
+						ports: {
+							metrics: 3030
+						}
+						scrape: true
 					}
 				}
 			}
