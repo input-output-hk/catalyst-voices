@@ -31,8 +31,9 @@
       },
       "maxTxSize": 16384,
       "maxValueSize": 5000,
+      "maxAssetsPerOutput": 100,
       "coinsPerUtxoByte": 4310,
-      "selectionStrategy": "greedy"
+      "selectionStrategy": "exactBiggest"
     },
     "slotNumberConfig": {
       "systemStartTimestamp": "2022-06-21T00:00:00.000000Z",

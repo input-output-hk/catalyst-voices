@@ -2,8 +2,8 @@ import 'dart:typed_data';
 
 import 'package:catalyst_cardano_serialization/src/hashes.dart';
 import 'package:catalyst_cardano_serialization/src/types.dart';
+import 'package:catalyst_cardano_serialization/src/utils/hex.dart';
 import 'package:cbor/cbor.dart';
-import 'package:convert/convert.dart';
 import 'package:equatable/equatable.dart';
 import 'package:pinenacl/digests.dart';
 
@@ -250,7 +250,7 @@ class PlutusV1Script extends PlutusScript {
 
   /// Factory constructor to create an [PlutusV2Script] from a CBOR hex string.
   factory PlutusV1Script.fromHex(String cborHex) {
-    final cborValue = cbor.decode(hex.decode(cborHex));
+    final cborValue = cbor.decode(hexDecode(cborHex));
     return PlutusV1Script.fromCbor(cborValue);
   }
 
@@ -268,7 +268,7 @@ class PlutusV2Script extends PlutusScript {
 
   /// Factory constructor to create an [PlutusV2Script] from a CBOR hex string.
   factory PlutusV2Script.fromHex(String cborHex) {
-    final cborValue = cbor.decode(hex.decode(cborHex));
+    final cborValue = cbor.decode(hexDecode(cborHex));
     return PlutusV2Script.fromCbor(cborValue);
   }
 
@@ -286,7 +286,7 @@ class PlutusV3Script extends PlutusScript {
 
   /// Factory constructor to create an [PlutusV2Script] from a CBOR hex string.
   factory PlutusV3Script.fromHex(String cborHex) {
-    final cborValue = cbor.decode(hex.decode(cborHex));
+    final cborValue = cbor.decode(hexDecode(cborHex));
     return PlutusV3Script.fromCbor(cborValue);
   }
 

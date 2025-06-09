@@ -47,7 +47,10 @@ class _AppBar extends StatelessWidget implements PreferredSizeWidget {
     final readOnlyMode = context.select<ProposalCubit, bool>((cubit) => cubit.state.readOnlyMode);
 
     return VoicesAppBar(
-      automaticallyImplyLeading: false,
+      leading: NavigationBack(
+        isCompact: true,
+        onCanNotPop: (context, _) => const ProposalsRoute().go(context),
+      ),
       actions: [
         Offstage(
           offstage: readOnlyMode,
@@ -144,7 +147,7 @@ class _ProposalPageState extends State<ProposalPage>
 
     final bloc = context.read<ProposalCubit>();
 
-    _segmentsController = SegmentsController();
+    _segmentsController = SegmentsController(scrollAlignment: 0.1);
     _segmentsScrollController = ItemScrollController();
 
     _segmentsController

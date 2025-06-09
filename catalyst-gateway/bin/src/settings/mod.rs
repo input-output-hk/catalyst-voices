@@ -156,6 +156,9 @@ struct EnvVars {
 
     /// Threshold for determining if the service is live.
     service_live_counter_threshold: u64,
+
+    /// Set to Log 404 not found.
+    log_not_found: Option<StringEnvVar>,
 }
 
 // Lazy initialization of all env vars which are not command line parameters.
@@ -235,6 +238,7 @@ static ENV_VARS: LazyLock<EnvVars> = LazyLock::new(|| {
             0,
             u64::MAX,
         ),
+        log_not_found: StringEnvVar::new_optional("LOG_NOT_FOUND", false),
     }
 });
 
@@ -463,6 +467,11 @@ impl Settings {
     /// Value after which the service is considered NOT live.
     pub(crate) fn service_live_counter_threshold() -> u64 {
         ENV_VARS.service_live_counter_threshold
+    }
+
+    /// If set log the 404 not found, else do not log.
+    pub(crate) fn log_not_found() -> bool {
+        ENV_VARS.log_not_found.is_some()
     }
 }
 

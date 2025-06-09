@@ -1,3 +1,4 @@
+import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:cbor/cbor.dart';
 import 'package:convert/convert.dart';
 
@@ -17,7 +18,7 @@ extension type Ed25519Signature._(List<int> bytes) {
 
   /// Constructs [Ed25519Signature] from a hex [string].
   factory Ed25519Signature.fromHex(String string) {
-    return Ed25519Signature.fromBytes(hex.decode(string));
+    return Ed25519Signature.fromBytes(hexDecode(string));
   }
 
   /// Returns the [Ed25519Signature] filled with [byte]
