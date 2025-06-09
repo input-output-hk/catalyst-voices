@@ -1,5 +1,6 @@
 import 'package:catalyst_cardano_serialization/src/builders/types.dart';
 import 'package:catalyst_cardano_serialization/src/exceptions.dart';
+import 'package:catalyst_cardano_serialization/src/utils/hex.dart';
 import 'package:cbor/cbor.dart';
 import 'package:convert/convert.dart';
 import 'package:equatable/equatable.dart';
@@ -384,7 +385,7 @@ extension type PolicyId(String hash) {
   }
 
   /// Serializes the type as cbor.
-  CborValue toCbor() => CborBytes(hex.decode(hash));
+  CborValue toCbor() => CborBytes(hexDecode(hash));
 }
 
 /// A blockchain slot number.
