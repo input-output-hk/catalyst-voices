@@ -324,6 +324,10 @@ final class RegistrationCubit extends Cubit<RegistrationState> with BlocErrorEmi
   }
 
   Future<void> recoverProgress() async {
+    _accountId = null;
+    _keychain = null;
+    _transaction = null;
+
     final progress = _progressNotifier.value;
     final baseProfileProgress = progress.baseProfileProgress;
     final keychainProgress = progress.keychainProgress;
@@ -358,7 +362,7 @@ final class RegistrationCubit extends Cubit<RegistrationState> with BlocErrorEmi
     final step = AccountCreateProgressStep(
       completedSteps: [
         if (baseProfileProgress != null) AccountCreateStepType.baseProfile,
-        if (keychainProgress != null) AccountCreateStepType.keychain,
+        if (_keychain != null) AccountCreateStepType.keychain,
       ],
     );
     _goToStep(step);
