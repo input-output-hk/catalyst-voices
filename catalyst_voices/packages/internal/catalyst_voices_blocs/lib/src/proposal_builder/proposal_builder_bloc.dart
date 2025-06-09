@@ -389,6 +389,8 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     proposalBuilder!.addChanges(event.changes);
     final document = proposalBuilder.build();
 
+    _cache = _cache.copyWith(proposalDocument: Optional(document));
+
     final documentSegments = _mapDocumentToSegments(
       document,
       showValidationErrors: state.validationErrors?.showErrors ?? false,

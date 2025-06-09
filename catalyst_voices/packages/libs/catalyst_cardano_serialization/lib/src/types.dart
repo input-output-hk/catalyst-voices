@@ -1,3 +1,4 @@
+import 'package:catalyst_cardano_serialization/src/builders/types.dart';
 import 'package:catalyst_cardano_serialization/src/exceptions.dart';
 import 'package:cbor/cbor.dart';
 import 'package:convert/convert.dart';
@@ -87,6 +88,15 @@ final class Balance extends Equatable implements CborEncodable {
     );
   }
 
+  /// Queries the [assetId] from this [Balance].
+  Coin? operator [](AssetId assetId) {
+    if (assetId == CoinSelector.adaAssetId) {
+      return coin;
+    } else {
+      return multiAsset?[assetId];
+    }
+  }
+
   /// Return a copy of this value with [coin] and [multiAsset] if present.
   Balance copyWith({
     Coin? coin,
@@ -110,6 +120,26 @@ final class Balance extends Equatable implements CborEncodable {
     }
 
     return false;
+  }
+
+  /// Returns a list of assets which are not zero.
+  List<AssetId> listNonZeroAssetIds() {
+    final result = <AssetId>[];
+    if (coin != const Coin(0)) {
+      result.add(CoinSelector.adaAssetId);
+    }
+
+    final multiAsset = this.multiAsset;
+    if (multiAsset != null) {
+      for (final policy in multiAsset.bundle.entries) {
+        for (final asset in policy.value.entries) {
+          final assetId = (policy.key, asset.key);
+          result.add(assetId);
+        }
+      }
+    }
+
+    return result;
   }
 
   /// Serializes the type as cbor.
@@ -283,6 +313,12 @@ final class MultiAsset extends Equatable implements CborEncodable {
     }
 
     return MultiAsset(bundle: bundleCopy);
+  }
+
+  /// Queries the [assetId] from this [MultiAsset].
+  Coin? operator [](AssetId assetId) {
+    final (pid, assetName) = assetId;
+    return bundle[pid]?[assetName];
   }
 
   /// Serializes the type as cbor.
