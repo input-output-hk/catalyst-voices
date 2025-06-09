@@ -1,9 +1,9 @@
 ---
-    title: Separation of Concerns for Bloc State-Dependent Widgets
+    title: Separation of concerns for bloc state-dependent widgets
       adr:
         author: Damian Moliński
         created: 06-Jun-2025
-        status: draft
+        status: proposed
         extends:
           - 0001-flutter
           - 0005-flutter-app
@@ -15,7 +15,7 @@
 
 ## Context
 
-We use [flutter_bloc](https://pub.dev/packages/flutter_bloc) as our state management solution. Commonly, we use **BlocSelector** to retrieve specific parts of **Bloc** state, allowing us to rebuild only widgets that depend on that data.
+We use [flutter_bloc](https://pub.dev/packages/flutter_bloc) as our state management solution. Commonly, we use **BlocSelector** to retrieve specific parts of **Bloc** state. This allows us to rebuild only widgets when data, which they depend on, changes.
 
 However, embedding **BlocSelector** directly within large widgets clutters the widget tree with state-selection logic. While this maximizes rendering efficiency, it increases visual complexity and reduces maintainability.
 
