@@ -147,7 +147,7 @@ class _ProposalPageState extends State<ProposalPage>
 
     final bloc = context.read<ProposalCubit>();
 
-    _segmentsController = SegmentsController();
+    _segmentsController = SegmentsController(scrollAlignment: 0.1);
     _segmentsScrollController = ItemScrollController();
 
     _segmentsController

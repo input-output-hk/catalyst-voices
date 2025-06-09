@@ -4,18 +4,19 @@ use std::time::Instant;
 
 use cpu_time::ProcessTime; // ThreadTime doesn't work.
 use poem::{
-    http::{header, HeaderMap},
+    http::{header, HeaderMap, StatusCode},
     web::RealIp,
     Endpoint, Error, FromRequest, IntoResponse, Middleware, PathPattern, Request, Response, Result,
 };
 use poem_openapi::OperationId;
-use tracing::{error, field, Instrument, Level, Span};
+use tracing::{error, field, warn, Instrument, Level, Span};
 use ulid::Ulid;
 use uuid::Uuid;
 
 use crate::{
     metrics::endpoint::{
         CLIENT_REQUEST_COUNT, HTTP_REQUEST_COUNT, HTTP_REQ_CPU_TIME_MS, HTTP_REQ_DURATION_MS,
+        NOT_FOUND_COUNT,
     },
     settings::Settings,
     utils::blake2b_hash::generate_uuid_string_from_data,
@@ -276,14 +277,21 @@ impl<E: Endpoint> Endpoint for TracingEndpoint<E> {
                     //};
                     let panic: Option<Uuid> = None;
 
-                    // Get the error message, and also for now, log the error to ensure we are
-                    // preserving all data.
-                    error!(err = ?err, "HTTP Response Error:");
-                    // Only way I can see to get the message, may not be perfect.
-                    let error_message = err.to_string();
-
                     // Convert the error into a response, so we can deal with the error
+                    let error_message = err.to_string();
                     let resp = err.into_response();
+                    let status = resp.status();
+
+                    // Log 404 as warning, if env set
+                    if status == StatusCode::NOT_FOUND {
+                        if Settings::log_not_found() {
+                            warn!(
+                            %status);
+                        }
+                    // Other response error code
+                    } else {
+                        error!(%error_message, %status, "HTTP Response Error");
+                    }
 
                     let response_data =
                         ResponseData::new(duration, duration_proc, &resp, panic, &inner_span);
@@ -302,32 +310,37 @@ impl<E: Endpoint> Endpoint for TracingEndpoint<E> {
         .await;
 
         span.in_scope(|| {
-            // We really want to use the path_pattern from the response, but if not set use the path
-            // from the request.
-            let path = if resp_data.endpoint.is_empty() {
-                uri_path
+            // Only count 404, no other metrics to avoid spam from crawlers
+            if resp_data.status_code == StatusCode::NOT_FOUND {
+                NOT_FOUND_COUNT.inc();
             } else {
-                resp_data.endpoint
-            };
+                // We really want to use the path_pattern from the response, but if not set use the path
+                // from the request.
+                let path = if resp_data.endpoint.is_empty() {
+                    uri_path
+                } else {
+                    resp_data.endpoint
+                };
 
-            HTTP_REQ_DURATION_MS
-                .with_label_values(&[&path, &method, &resp_data.status_code.to_string()])
-                .observe(resp_data.duration);
-            HTTP_REQ_CPU_TIME_MS
-                .with_label_values(&[&path, &method, &resp_data.status_code.to_string()])
-                .observe(resp_data.cpu_time);
-            // HTTP_REQUEST_RATE
-            //.with_label_values(&[&uri_path, &method, &response.status_code.to_string()])
-            //.inc();
-            HTTP_REQUEST_COUNT
-                .with_label_values(&[&path, &method, &resp_data.status_code.to_string()])
-                .inc();
-            CLIENT_REQUEST_COUNT
-                .with_label_values(&[&client_id, &resp_data.status_code.to_string()])
-                .inc();
-            // HTTP_REQUEST_SIZE_BYTES
-            //.with_label_values(&[&uri_path, &method, &response.status_code.to_string()])
-            //.observe(response.body().len() as f64);
+                HTTP_REQ_DURATION_MS
+                    .with_label_values(&[&path, &method, &resp_data.status_code.to_string()])
+                    .observe(resp_data.duration);
+                HTTP_REQ_CPU_TIME_MS
+                    .with_label_values(&[&path, &method, &resp_data.status_code.to_string()])
+                    .observe(resp_data.cpu_time);
+                // HTTP_REQUEST_RATE
+                //.with_label_values(&[&uri_path, &method, &response.status_code.to_string()])
+                //.inc();
+                HTTP_REQUEST_COUNT
+                    .with_label_values(&[&path, &method, &resp_data.status_code.to_string()])
+                    .inc();
+                CLIENT_REQUEST_COUNT
+                    .with_label_values(&[&client_id, &resp_data.status_code.to_string()])
+                    .inc();
+                // HTTP_REQUEST_SIZE_BYTES
+                //.with_label_values(&[&uri_path, &method, &response.status_code.to_string()])
+                //.observe(response.body().len() as f64);
+            }
         });
 
         response
