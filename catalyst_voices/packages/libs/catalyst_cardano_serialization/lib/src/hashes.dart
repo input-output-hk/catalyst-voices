@@ -8,6 +8,7 @@ import 'package:catalyst_cardano_serialization/src/redeemer.dart';
 import 'package:catalyst_cardano_serialization/src/signature.dart';
 import 'package:catalyst_cardano_serialization/src/transaction.dart';
 import 'package:catalyst_cardano_serialization/src/types.dart';
+import 'package:catalyst_cardano_serialization/src/utils/hex.dart';
 import 'package:cbor/cbor.dart';
 import 'package:convert/convert.dart';
 import 'package:equatable/equatable.dart';
@@ -60,7 +61,7 @@ abstract base class BaseHash extends Equatable implements CborEncodable {
 
   /// Constructs the [BaseHash] from a hex string representation
   /// of [bytes].
-  BaseHash.fromHex(String string) : this.fromBytes(bytes: hex.decode(string));
+  BaseHash.fromHex(String string) : this.fromBytes(bytes: hexDecode(string));
 
   /// The expected length of the transaction hash bytes.
   int get length;

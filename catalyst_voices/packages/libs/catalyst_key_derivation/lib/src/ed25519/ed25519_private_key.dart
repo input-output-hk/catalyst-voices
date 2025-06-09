@@ -1,3 +1,4 @@
+import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart' show hexDecode;
 import 'package:catalyst_key_derivation/src/ed25519/ed25519_public_key.dart';
 import 'package:catalyst_key_derivation/src/ed25519/ed25519_signature.dart';
 import 'package:cbor/cbor.dart';
@@ -22,7 +23,7 @@ extension type Ed25519PrivateKey._(List<int> bytes) {
 
   /// Constructs [Ed25519PrivateKey] from a hex [string].
   factory Ed25519PrivateKey.fromHex(String string) {
-    return Ed25519PrivateKey.fromBytes(hex.decode(string));
+    return Ed25519PrivateKey.fromBytes(hexDecode(string));
   }
 
   /// Returns the [Ed25519PrivateKey] filled with [byte] that can be
