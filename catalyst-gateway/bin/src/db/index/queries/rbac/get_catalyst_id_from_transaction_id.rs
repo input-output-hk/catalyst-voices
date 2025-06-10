@@ -23,9 +23,9 @@ const QUERY: &str = include_str!("../cql/get_catalyst_id_for_transaction_id.cql"
 
 /// Get Catalyst ID by transaction ID query parameters.
 #[derive(SerializeRow)]
-pub(crate) struct QueryParams {
+struct QueryParams {
     /// A transaction hash.
-    pub(crate) txn_id: DbTransactionId,
+    txn_id: DbTransactionId,
 }
 
 /// Get Catalyst ID by transaction ID query.

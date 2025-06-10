@@ -24,9 +24,9 @@ const QUERY: &str = include_str!("../cql/get_catalyst_id_for_public_key.cql");
 
 /// Get Catalyst ID by public key query parameters.
 #[derive(SerializeRow)]
-pub(crate) struct QueryParams {
+struct QueryParams {
     /// A public key.
-    pub(crate) public_key: DbPublicKey,
+    public_key: DbPublicKey,
 }
 
 /// Get Catalyst ID by public key query.
