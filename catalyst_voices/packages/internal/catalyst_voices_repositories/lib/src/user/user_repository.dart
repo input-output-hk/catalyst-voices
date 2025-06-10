@@ -67,8 +67,9 @@ final class UserRepositoryImpl implements UserRepository {
   }) async {
     final lookup = catalystId.toSignificant().toUri().toStringWithoutScheme();
 
-    final rbacChain =
-        await _apiServices.gateway.apiV1RbacRegistrationGet(lookup: lookup).successBodyOrThrow();
+    final rbacChain = await _apiServices.gateway
+        .apiGatewayV1RbacRegistrationGet(lookup: lookup)
+        .successBodyOrThrow();
 
     final transactionId = rbacChain.lastVolatileTxn ?? rbacChain.lastPersistentTxn;
 
@@ -111,7 +112,7 @@ final class UserRepositoryImpl implements UserRepository {
     required RbacToken rbacToken,
   }) async {
     final rbacRegistration = await _apiServices.gateway
-        .apiV1RbacRegistrationGet(lookup: catalystId.toUri().toStringWithoutScheme())
+        .apiGatewayV1RbacRegistrationGet(lookup: catalystId.toUri().toStringWithoutScheme())
         .successBodyOrThrow();
 
     final publicId = await _getReviewsCatalystIDPublic(token: rbacToken);
