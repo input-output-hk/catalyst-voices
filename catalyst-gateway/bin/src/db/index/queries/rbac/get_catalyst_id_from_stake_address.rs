@@ -30,6 +30,7 @@ pub(crate) struct QueryParams {
 }
 
 /// Get Catalyst ID by stake address query.
+#[allow(dead_code)]
 #[derive(Debug, Clone, DeserializeRow)]
 pub(crate) struct Query {
     /// Catalyst ID for the queries stake address.

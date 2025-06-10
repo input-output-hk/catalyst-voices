@@ -64,6 +64,8 @@ async fn get_catalyst_id_by_stake_address() {
     while let Some(row_res) = row_stream.next().await {
         drop(row_res.unwrap());
     }
+
+    Query::latest(&session, stake_address_1()).await.unwrap();
 }
 
 #[ignore = "An integration test which requires a running Scylla node instance, disabled from `testunit` CI run"]

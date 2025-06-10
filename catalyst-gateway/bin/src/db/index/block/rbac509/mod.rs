@@ -23,6 +23,7 @@ use crate::{
 };
 
 /// Index RBAC 509 Registration Query Parameters
+#[allow(dead_code)]
 #[derive(Debug)]
 pub(crate) struct Rbac509InsertQuery {
     /// RBAC Registration Data captured during indexing.
@@ -30,9 +31,9 @@ pub(crate) struct Rbac509InsertQuery {
     /// An invalid RBAC registration data.
     pub(crate) invalid: Vec<insert_rbac509_invalid::Params>,
     /// A Catalyst ID for transaction ID Data captured during indexing.
-    pub(crate) catalyst_id_for_txn_id: Vec<insert_catalyst_id_for_txn_id::Params>,
+    catalyst_id_for_txn_id: Vec<insert_catalyst_id_for_txn_id::Params>,
     /// A Catalyst ID for stake address data captured during indexing.
-    pub(crate) catalyst_id_for_stake_address: Vec<insert_catalyst_id_for_stake_address::Params>,
+    catalyst_id_for_stake_address: Vec<insert_catalyst_id_for_stake_address::Params>,
     /// A Catalyst ID for public key data captured during indexing.
     catalyst_id_for_public_key: Vec<insert_catalyst_id_for_public_key::Params>,
 }
