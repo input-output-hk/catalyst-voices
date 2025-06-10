@@ -73,9 +73,9 @@ impl From<ProposalTemplateDocData> for SignedDocData {
         Self {
             id: value.0,
             ver: value.0,
-            doc_type: catalyst_signed_doc::doc_types::PROPOSAL_TEMPLATE
-                .clone()
-                .into(),
+            doc_type: vec![
+                catalyst_signed_doc::doc_types::deprecated::PROPOSAL_TEMPLATE_UUID_TYPE.to_string(),
+            ],
             content: value.2,
             category_id: Some(value.1),
         }
@@ -111,9 +111,9 @@ impl From<CommentTemplateDocData> for SignedDocData {
         Self {
             id: value.0,
             ver: value.0,
-            doc_type: catalyst_signed_doc::doc_types::PROPOSAL_COMMENT_TEMPLATE
-                .clone()
-                .into(),
+            doc_type: vec![
+                catalyst_signed_doc::doc_types::deprecated::COMMENT_TEMPLATE_UUID_TYPE.to_string(),
+            ],
             content: include_bytes!("./docs/f14_comment_template.schema.json"),
             category_id: Some(value.1),
         }
