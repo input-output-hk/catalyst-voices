@@ -1,8 +1,8 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
-    "$id": "https://raw.githubusercontent.com/input-output-hk/catalyst-voices/refs/heads/main/docs/src/architecture/08_concepts/document_templates/proposal/F14-Generic/0194d490-30bf-7043-8c5c-f0e09f8a6d8c.schema.json",
-    "title": "F14 Cardano Use Cases: Concepts Form",
-    "description": "Schema for the F14 Cardano Use Cases: Concepts Form",
+    "$id": "https://raw.githubusercontent.com/input-output-hk/catalyst-voices/refs/heads/main/docs/src/architecture/08_concepts/document_templates/proposal/F14-Generic/0194d492-1daa-75b5-b4a4-5cf331cd8d1a.schema.json",
+    "title": "F14 Cardano Use Cases: Partners & Products Form",
+    "description": "Schema for the F14 Cardano Use Cases: Partners & Products Form",
     "maintainers": [{ "name": "Catalyst Team", "url": "https://projectcatalyst.io/" }],
     "x-changelog": {
         "2025-06-02": [
@@ -342,10 +342,10 @@
                             "$ref": "#/definitions/tokenValueCardanoADA",
                             "title": "Enter the amount of funding you are requesting in ADA",
                             "description": "The amount of funding requested for your proposal",
-                            "x-guidance": "Each funding category has a minimum and maximum amount of funding a single proposal can request.\n\nMinimum Funding Amount per proposal:\n\n- Cardano Use Cases: Concepts: **₳250k**\n- Cardano Uses Cases: Concepts: **₳15K**\n- Cardano Open: Developers: **₳15K**\n- Cardano Open: Ecosystem: **₳15K**\n\nMaximum Funding Amount per proposal:\n\n- Cardano Use Cases: Concepts: **₳1M**\n- Cardano Uses Cases: Concepts: **₳100K**\n- Cardano Open: Developers: **₳100K**\n- Cardano Open: Ecosystem: **₳60K**",
+                            "x-guidance": "Each funding category has a minimum and maximum amount of funding a single proposal can request.\n\nMinimum Funding Amount per proposal:\n\n- Cardano Use Cases: Partners & Products: **₳250k**\n- Cardano Uses Cases: Concepts: **₳15K**\n- Cardano Open: Developers: **₳15K**\n- Cardano Open: Ecosystem: **₳15K**\n\nMaximum Funding Amount per proposal:\n\n- Cardano Use Cases: Partners & Products: **₳1M**\n- Cardano Uses Cases: Concepts: **₳100K**\n- Cardano Open: Developers: **₳100K**\n- Cardano Open: Ecosystem: **₳60K**",
                             "x-placeholder": "Enter the amount of funding you are requesting in ADA",
-                            "minimum": 15000,
-                            "maximum": 100000
+                            "minimum": 250000,
+                            "maximum": 1000000
                         }
                     },
                     "required": [
@@ -533,37 +533,37 @@
                     "description": "Answer the following questions to determine the eligibility of your proposal.",
                     "x-guidance": "General Guidance\n\nIn consideration of the Reviewers assessing your proposal, be concise and use bulleted lists where possible.",
                     "properties": {
-                        "innovative_idea": {
+                        "established_partnership": {
                             "$ref": "#/definitions/multiLineTextEntryMarkdown",
-                            "title": "Describe what makes your idea innovative compared to what has been previously funded.",
+                            "title": "Describe your established partnerships.",
                             "x-placeholder": "Please provide your rationale.",
-                            "description": "Please provide your rationale for your innovative idea.",
-                            "x-guidance": "- Clearly state how your idea is new to Cardano or the blockchain space.\n- Highlight what innovation or unique approach your idea brings.\n- Avoid rehashing funded work without clear improvements.",
+                            "description": "Please provide your rationale for your established partnerships.",
+                            "x-guidance": "- For instance, agreements, letters of intent, or public endorsements.\n- If confidential, contact the Catalyst team.\n- Clearly state the partners and describe their role in your project.",
                             "minLength": 200,
                             "maxLength": 600
                         },
-                        "prototype_information": {
+                        "funding_commitments": {
                             "$ref": "#/definitions/multiLineTextEntryMarkdown",
-                            "title": "Describe what your prototype or MVP will demonstrate, and where it can be accessed.",
+                            "title": "Describe matching funding commitments and/or partners.",
                             "x-placeholder": "Please provide your rationale.",
-                            "description": "Please provide your rationale for your prototype or MVP.",
-                            "x-guidance": "- Make sure your prototype or MVP is deployed or testable on-chain by the end of project phase.\n- Consider how the community could help test your prototype or MVP.",
+                            "description": "Please provide your rationale for your funding commitments and/or matching partners.",
+                            "x-guidance": "- For instance, financial or in-kind contributions (time, resources, services).\n- Clearly state contributors, the kind of contribution, the amount,  and how it will be managed.\n- Avoid general claims without named partners.",
                             "minLength": 200,
                             "maxLength": 600
                         },
                          "performance_metrics": {
                             "$ref": "#/definitions/multiLineTextEntryMarkdown",
-                            "title": "Describe realistic measures of success, ideally with on-chain metrics.",
+                            "title": "Describe your key performance metrics.",
                             "x-placeholder": "Please provide your rationale.",
-                            "description": "Please provide your rationale for realistic measures of success.",
-                            "x-guidance": "- Estimate how many users, transactions, or smart contract calls your project expects.\n- Tie projections to Cardano network metrics or similar use cases.\n- Avoid inflated claims—keep it data-based and credible.",
+                            "description": "Please provide your rationale for your key performance metrics.",
+                            "x-guidance": "- For instance, data (user numbers, transactions, traffic, adoption rates), screenshots of dashboards or live analytics.\n- Contextualize why your KPIs matter for your project goals.",
                             "minLength": 200,
                             "maxLength": 600
                         }
                         
                     },
-                    "required": ["innovative_idea", "prototype_information", "performance_metrics"],
-                    "x-order": ["innovative_idea", "prototype_information", "performance_metrics"]
+                    "required": ["established_partnership", "funding_commitments", "performance_metrics"],
+                    "x-order": ["established_partnership", "funding_commitments", "performance_metrics"]
                 }
             },
             "x-order": ["category_details", "category_questions"]
