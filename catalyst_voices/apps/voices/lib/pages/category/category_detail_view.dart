@@ -83,6 +83,14 @@ class _CategoryBrief extends StatelessWidget {
       ),
       child: Stack(
         children: [
+          Positioned(
+            right: -100,
+            top: -80,
+            child: image.buildPicture(
+              height: 380,
+              color: context.colors.iconsBackground.withValues(alpha: .4),
+            ),
+          ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
             child: CategoryBrief(
@@ -90,14 +98,6 @@ class _CategoryBrief extends StatelessWidget {
               categoryDescription: categoryDescription,
               categoryRef: categoryRef,
               showViewAllButton: proposalCount > 0,
-            ),
-          ),
-          Positioned(
-            right: -100,
-            top: -80,
-            child: image.buildPicture(
-              height: 380,
-              color: context.colors.iconsBackground.withValues(alpha: .4),
             ),
           ),
         ],

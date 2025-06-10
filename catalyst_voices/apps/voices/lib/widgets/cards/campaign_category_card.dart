@@ -32,35 +32,39 @@ class CampaignCategoryCard extends StatelessWidget {
       clipBehavior: Clip.antiAlias,
       constraints: const BoxConstraints.tightFor(
         width: 590,
+        height: 631,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
           _Background(image: category.image),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                _Title(category.name, const Key('CategoryTitle')),
-                _Title(category.subname, const Key('CategorySubname')),
-                const SizedBox(height: 16),
-                _CampaignStats(
-                  availableFunds: category.availableFundsText,
-                  proposalsCount: category.proposalsCount,
-                ),
-                const SizedBox(height: 16),
-                _Description(
-                  category.description,
-                  key: const Key('Description'),
-                ),
-                const SizedBox(height: 32),
-                _Buttons(
-                  categoryRef: category.id,
-                ),
-              ],
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _Title(category.name, const Key('CategoryTitle')),
+                  _Title(category.subname, const Key('CategorySubname')),
+                  const SizedBox(height: 16),
+                  _CampaignStats(
+                    availableFunds: category.availableFundsText,
+                    proposalsCount: category.proposalsCount,
+                  ),
+                  const SizedBox(height: 16),
+                  Flexible(
+                    fit: FlexFit.tight,
+                    child: _Description(
+                      category.description,
+                      key: const Key('Description'),
+                    ),
+                  ),
+                  _Buttons(
+                    categoryRef: category.id,
+                  ),
+                ],
+              ),
             ),
           ),
         ],
