@@ -43,6 +43,11 @@ abstract interface class RegistrationService {
   /// Returns the available cardano wallet extensions.
   Future<List<CardanoWallet>> getCardanoWallets();
 
+  /// Tries to find keychain with matching [id] and return it.
+  ///
+  /// Throws error if not found.
+  Future<Keychain> getKeychain(String id);
+
   /// Loads the wallet balance for given [address].
   Future<Coin> getWalletBalance({
     required SeedPhrase seedPhrase,
@@ -143,6 +148,17 @@ final class RegistrationServiceImpl implements RegistrationService {
   @override
   Future<List<CardanoWallet>> getCardanoWallets() {
     return _cardano.getWallets();
+  }
+
+  @override
+  Future<Keychain> getKeychain(String id) async {
+    final exists = await _keychainProvider.exists(id);
+
+    if (!exists) {
+      throw const RegistrationRecoverKeychainNotFoundException();
+    }
+
+    return _keychainProvider.get(id);
   }
 
   @override
