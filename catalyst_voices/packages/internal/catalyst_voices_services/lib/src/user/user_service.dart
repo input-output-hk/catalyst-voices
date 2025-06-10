@@ -128,14 +128,18 @@ final class UserServiceImpl implements UserService {
     }
 
     // Ask backend if status changed.
-    final status = await _userRepository.getAccountPublicStatus();
-    if (status != activeAccount.publicStatus) {
-      final updatedAccount = activeAccount.copyWith(publicStatus: status);
+    final publicProfile = await _userRepository.getAccountPublicProfile();
+    if (publicProfile == null) {
+      return false;
+    }
+
+    if (publicProfile.status != activeAccount.publicStatus) {
+      final updatedAccount = activeAccount.copyWith(publicStatus: publicProfile.status);
       final updatedUser = user.updateAccount(updatedAccount);
       await _updateUser(updatedUser);
     }
 
-    return status.isVerified;
+    return publicProfile.status.isVerified;
   }
 
   @override
@@ -280,8 +284,9 @@ final class UserServiceImpl implements UserService {
     }
 
     if (!activeAccount.publicStatus.isNotSetup) {
-      final publicStatus = await _userRepository.getAccountPublicStatus();
-      final updatedAccount = activeAccount.copyWith(publicStatus: publicStatus);
+      final publicProfile = await _userRepository.getAccountPublicProfile();
+      final publicProfileStatus = publicProfile?.status ?? AccountPublicStatus.unknown;
+      final updatedAccount = activeAccount.copyWith(publicStatus: publicProfileStatus);
       final updatedUser = user.updateAccount(updatedAccount);
 
       await _updateUser(updatedUser);

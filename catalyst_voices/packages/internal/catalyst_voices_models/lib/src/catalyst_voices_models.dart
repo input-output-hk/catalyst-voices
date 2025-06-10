@@ -78,6 +78,8 @@ export 'signed_document/signed_document.dart';
 export 'signed_document/signed_document_payload.dart';
 export 'sync/sync_stats.dart';
 export 'user/account.dart';
+export 'user/account_public_profile.dart';
+export 'user/account_public_rbac_status.dart';
 export 'user/account_public_status.dart';
 export 'user/account_role.dart';
 export 'user/catalyst_id.dart';

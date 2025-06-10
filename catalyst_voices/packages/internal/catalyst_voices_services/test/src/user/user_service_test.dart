@@ -381,7 +381,7 @@ void main() {
         await service.updateActiveAccountDetails();
 
         // Then
-        verifyNever(() => userRepository.getAccountPublicStatus());
+        verifyNever(() => userRepository.getAccountPublicProfile());
 
         final serviceUser = await service.getUser();
         expect(serviceUser, user);
@@ -406,14 +406,20 @@ void main() {
         // When
         when(() => userRepository.getUser()).thenAnswer((_) => Future.value(user));
         when(() => userRepository.saveUser(any())).thenAnswer((_) => Future(() {}));
-        when(() => userRepository.getAccountPublicStatus())
-            .thenAnswer((_) => Future.value(AccountPublicStatus.verified));
+        when(() => userRepository.getAccountPublicProfile()).thenAnswer(
+          (_) => Future.value(
+            const AccountPublicProfile(
+              email: '',
+              status: AccountPublicStatus.verified,
+            ),
+          ),
+        );
 
         await service.useLastAccount();
         await service.updateActiveAccountDetails();
 
         // Then
-        verify(() => userRepository.getAccountPublicStatus()).called(1);
+        verify(() => userRepository.getAccountPublicProfile()).called(1);
       });
 
       test('user account is updated when status changes', () async {
@@ -421,6 +427,7 @@ void main() {
         final keychainId = const Uuid().v4();
         const publicStatus = AccountPublicStatus.verifying;
         const updatedPublicStatus = AccountPublicStatus.verified;
+        const publicProfile = AccountPublicProfile(email: '', status: updatedPublicStatus);
 
         final keychain = await keychainProvider.create(keychainId);
         final account = Account.dummy(
@@ -436,8 +443,8 @@ void main() {
         // When
         when(() => userRepository.getUser()).thenAnswer((_) => Future.value(user));
         when(() => userRepository.saveUser(any())).thenAnswer((_) => Future(() {}));
-        when(() => userRepository.getAccountPublicStatus())
-            .thenAnswer((_) => Future.value(updatedPublicStatus));
+        when(() => userRepository.getAccountPublicProfile())
+            .thenAnswer((_) => Future.value(publicProfile));
 
         await service.useLastAccount();
         await service.updateActiveAccountDetails();
@@ -568,6 +575,7 @@ void main() {
           publicStatus: AccountPublicStatus.verified,
         );
         final user = User.optional(accounts: [account]);
+        const publicProfile = AccountPublicProfile(email: '', status: AccountPublicStatus.verified);
 
         // When
         when(() => userRepository.getUser()).thenAnswer((_) => Future.value(user));
@@ -577,7 +585,7 @@ void main() {
             catalystId: catalystId,
             email: updateEmail,
           ),
-        ).thenAnswer((_) => Future(() {}));
+        ).thenAnswer((_) => Future.value(publicProfile));
 
         userObserver.user = user;
 
@@ -611,10 +619,12 @@ class _FakeUserRepository extends Fake implements UserRepository {
   Future<User> getUser() async => _user ?? const User.empty();
 
   @override
-  Future<void> publishUserProfile({
+  Future<AccountPublicProfile> publishUserProfile({
     required CatalystId catalystId,
     required String email,
-  }) async {}
+  }) async {
+    return AccountPublicProfile(email: email, status: AccountPublicStatus.notSetup);
+  }
 
   @override
   Future<void> saveUser(User user) async {
