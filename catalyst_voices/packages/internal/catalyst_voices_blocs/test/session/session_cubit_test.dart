@@ -11,6 +11,7 @@ import 'package:mocktail/mocktail.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shared_preferences_platform_interface/in_memory_shared_preferences_async.dart';
 import 'package:shared_preferences_platform_interface/shared_preferences_async_platform_interface.dart';
+import 'package:uuid_plus/uuid_plus.dart';
 
 void main() {
   late final KeychainProvider keychainProvider;
@@ -144,6 +145,7 @@ void main() {
         'session is in Visitor state with correct flag', () async {
       // Given
       final keychainProgress = KeychainProgress(
+        keychainId: const Uuid().v4(),
         seedPhrase: SeedPhrase(),
         password: 'Test1234',
       );

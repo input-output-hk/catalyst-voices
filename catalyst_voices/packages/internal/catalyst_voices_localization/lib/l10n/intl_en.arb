@@ -636,6 +636,26 @@
   "@registrationKeychainNotFound": {
     "description": "Error message shown when attempting to prepare registration transaction but keychain was not found or locked. Should not happen."
   },
+  "registrationRecoverKeychainNotFound": "Keychain was not found while recovering.",
+  "@registrationRecoverKeychainNotFound": {
+    "description": "Error message shown when recovering account but keychain was not found locally"
+  },
+  "registrationSaveProgressException": "Could not save progress",
+  "@registrationSaveProgressException": {
+    "description": "Error message shown when data is malformed or missing. Should not happen."
+  },
+  "registrationSaveProgressKeychainNotFoundException": "Keychain not found",
+  "@registrationSaveProgressKeychainNotFoundException": {
+    "description": "Error message shown when could not save keychain progress"
+  },
+  "registrationSaveProgressSeedPhraseNotFoundException": "Keychain not found",
+  "@registrationSaveProgressSeedPhraseNotFoundException": {
+    "description": "Error message shown when could not save seed phrase progress"
+  },
+  "registrationSaveProgressUnlockPasswordNotFoundException": "Keychain not found",
+  "@registrationSaveProgressUnlockPasswordNotFoundException": {
+    "description": "Error message shown when could not save unlock password progress"
+  },
   "registrationUnlockPasswordNotFound": "Password was not found. Make sure valid password was created.",
   "@registrationUnlockPasswordNotFound": {
     "description": "Error message shown when attempting to register or recover account but password was not found"
@@ -1476,7 +1496,7 @@
   "maximumAsk": "Maximum Ask",
   "minimumAsk": "Minimum Ask",
   "ideaJourney": "Idea Journey",
-  "ideaJourneyDescription": "#### Ideas come to life in Catalyst through the key stages below. For the full timeline, deadlines and latest updates, visit the [fund timeline]({link}) Gitbook page.", 
+  "ideaJourneyDescription": "#### Ideas come to life in Catalyst through the key stages below. For the full timeline, deadlines and latest updates, visit the [fund timeline]({link}) Gitbook page.",
   "@ideaJourneyDescription": {
     "description": "Description for the idea journey section",
     "placeholders": {
