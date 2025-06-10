@@ -39,6 +39,9 @@ pub(crate) async fn purge_live_index(purge_condition: PurgeCondition) -> anyhow:
     purge_cip36_registration_invalid(&session, purge_condition).await?;
     purge_rbac509_registration(&session, purge_condition).await?;
     purge_invalid_rbac509_registration(&session, purge_condition).await?;
+    purge_catalyst_id_for_stake_address(&session, purge_condition).await?;
+    purge_catalyst_id_for_txn_id(&session, purge_condition).await?;
+    purge_catalyst_id_for_public_key(&session, purge_condition).await?;
     purge_stake_registration(&session, purge_condition).await?;
     purge_txo_ada(&session, purge_condition).await?;
     purge_txo_assets(&session, purge_condition).await?;
@@ -162,6 +165,63 @@ async fn purge_invalid_rbac509_registration(
     let mut delete_params: Vec<Params> = Vec::new();
     while let Some(Ok(primary_key)) = primary_keys_stream.next().await {
         if purge_condition.filter(primary_key.2.into()) {
+            delete_params.push(primary_key.into());
+        }
+    }
+
+    DeleteQuery::execute(session, delete_params).await?;
+    Ok(())
+}
+
+/// Purges the data from the `catalyst_id_for_stake_address` table.
+async fn purge_catalyst_id_for_stake_address(
+    session: &Arc<CassandraSession>, purge_condition: PurgeCondition,
+) -> anyhow::Result<()> {
+    use purge::catalyst_id_for_stake_address::{DeleteQuery, Params, PrimaryKeyQuery};
+
+    let mut primary_keys_stream = PrimaryKeyQuery::execute(session).await?;
+
+    let mut delete_params: Vec<Params> = Vec::new();
+    while let Some(Ok(primary_key)) = primary_keys_stream.next().await {
+        if purge_condition.filter(primary_key.1.into()) {
+            delete_params.push(primary_key.into());
+        }
+    }
+
+    DeleteQuery::execute(session, delete_params).await?;
+    Ok(())
+}
+
+/// Purges the data from the `catalyst_id_for_txn_id` table.
+async fn purge_catalyst_id_for_txn_id(
+    session: &Arc<CassandraSession>, purge_condition: PurgeCondition,
+) -> anyhow::Result<()> {
+    use purge::catalyst_id_for_txn_id::{DeleteQuery, Params, PrimaryKeyQuery};
+
+    let mut primary_keys_stream = PrimaryKeyQuery::execute(session).await?;
+
+    let mut delete_params: Vec<Params> = Vec::new();
+    while let Some(Ok(primary_key)) = primary_keys_stream.next().await {
+        if purge_condition.filter(primary_key.1.into()) {
+            delete_params.push(primary_key.into());
+        }
+    }
+
+    DeleteQuery::execute(session, delete_params).await?;
+    Ok(())
+}
+
+/// Purges the data from the `catalyst_id_for_public_key` table.
+async fn purge_catalyst_id_for_public_key(
+    session: &Arc<CassandraSession>, purge_condition: PurgeCondition,
+) -> anyhow::Result<()> {
+    use purge::catalyst_id_for_public_key::{DeleteQuery, Params, PrimaryKeyQuery};
+
+    let mut primary_keys_stream = PrimaryKeyQuery::execute(session).await?;
+
+    let mut delete_params: Vec<Params> = Vec::new();
+    while let Some(Ok(primary_key)) = primary_keys_stream.next().await {
+        if purge_condition.filter(primary_key.1.into()) {
             delete_params.push(primary_key.into());
         }
     }

@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS catalyst_id_for_txn_id (
 
     -- Non-Key Data
     catalyst_id         text,       -- Short catalyst ID
+    slot_no             varint,     -- slot number of the txn_id. (u64)
 
     PRIMARY KEY (txn_id)
 );
