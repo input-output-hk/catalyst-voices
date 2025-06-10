@@ -447,6 +447,30 @@ impl SyncTask {
         }
     }
 
+    /// Add a new `SyncTask` to the queue.
+    fn add_sync_task(
+        &mut self, params: SyncParams, event_sender: broadcast::Sender<event::ChainIndexerEvent>,
+    ) {
+        self.sync_tasks.push(sync_subchain(params, event_sender));
+        self.current_sync_tasks = self.current_sync_tasks.saturating_add(1);
+        debug!(current_sync_tasks=%self.current_sync_tasks, "Added new Sync Task");
+        self.dispatch_event(event::ChainIndexerEvent::SyncTasksChanged {
+            current_sync_tasks: self.current_sync_tasks,
+        });
+    }
+
+    /// Update `SyncTask` count.
+    fn sync_task_finished(&mut self) {
+        self.current_sync_tasks = self.current_sync_tasks.checked_sub(1).unwrap_or_else(|| {
+            error!("current_sync_tasks -= 1 overflow");
+            0
+        });
+        debug!(current_sync_tasks=%self.current_sync_tasks, "Finished Sync Task");
+        self.dispatch_event(event::ChainIndexerEvent::SyncTasksChanged {
+            current_sync_tasks: self.current_sync_tasks,
+        });
+    }
+
     /// Primary Chain Follower task.
     ///
     /// This continuously runs in the background, and never terminates.
@@ -486,14 +510,14 @@ impl SyncTask {
 
         // Start the Live Chain sync task - This can never end because it is syncing to TIP.
         // So, if it fails, it will automatically be restarted.
-        self.sync_tasks.push(sync_subchain(
+        self.add_sync_task(
             SyncParams::new(
                 self.cfg.chain,
                 Point::fuzzy(self.immutable_tip_slot),
                 Point::TIP,
             ),
             self.event_channel.0.clone(),
-        ));
+        );
 
         self.start_immutable_followers();
 
@@ -505,6 +529,9 @@ impl SyncTask {
         // They will return from this iterator in the order they complete.
         // This iterator actually never ends, because the live sync task is always restarted.
         while let Some(completed) = self.sync_tasks.next().await {
+            // update sync task count
+            self.sync_task_finished();
+
             match completed {
                 Ok(finished) => {
                     let tips = ChainFollower::get_tips(self.cfg.chain).await;
@@ -523,8 +550,6 @@ impl SyncTask {
                             // Advance the known immutable tip, and try and start followers to reach
                             // it.
                             self.immutable_tip_slot = roll_forward_point.slot_or_default();
-                            info!(chain=%self.cfg.chain, report=%finished, immutable_tip_slot=?self.immutable_tip_slot,
-                            "Chain Indexer reached TIP");
 
                             self.dispatch_event(
                                 event::ChainIndexerEvent::ImmutableTipSlotChanged {
@@ -542,18 +567,10 @@ impl SyncTask {
                         }
 
                         // Start the Live Chain sync task again from where it left off.
-                        self.sync_tasks.push(sync_subchain(
-                            finished.retry(),
-                            self.event_channel.0.clone(),
-                        ));
+                        self.add_sync_task(finished.retry(), self.event_channel.0.clone());
                     } else if let Some(result) = finished.result.as_ref() {
                         match result {
                             Ok(()) => {
-                                self.current_sync_tasks =
-                                    self.current_sync_tasks.checked_sub(1).unwrap_or_else(|| {
-                                        error!("current_sync_tasks -= 1 overflow");
-                                        0
-                                    });
                                 info!(chain=%self.cfg.chain, report=%finished,
                                     "The Immutable follower completed successfully.");
 
@@ -563,9 +580,6 @@ impl SyncTask {
                                             slot: block.slot_or_default(),
                                         },
                                     );
-                                });
-                                self.dispatch_event(event::ChainIndexerEvent::SyncTasksChanged {
-                                    current_sync_tasks: self.current_sync_tasks,
                                 });
 
                                 // If we need more immutable chain followers to sync the block
@@ -577,10 +591,7 @@ impl SyncTask {
                                         "An Immutable follower failed, restarting it.");
                                 // Restart the Immutable Chain sync task again from where it left
                                 // off.
-                                self.sync_tasks.push(sync_subchain(
-                                    finished.retry(),
-                                    self.event_channel.0.clone(),
-                                ));
+                                self.add_sync_task(finished.retry(), self.event_channel.0.clone());
                             },
                         }
                     } else {
@@ -593,6 +604,8 @@ impl SyncTask {
                 },
             }
 
+            let sync_task_count = self.sync_tasks.len();
+
             // IF there is only 1 chain follower left in sync_tasks, then all
             // immutable followers have finished.
             // When this happens we need to purge the live index of any records that exist
@@ -601,7 +614,7 @@ impl SyncTask {
             // want to put a gap in this, so that there are X slots of overlap
             // between the live chain and immutable chain.  This gap should be
             // a parameter.
-            if self.sync_tasks.len() == 1 {
+            if sync_task_count == 1 {
                 self.dispatch_event(event::ChainIndexerEvent::SyncCompleted);
 
                 // Purge data up to this slot
@@ -640,15 +653,10 @@ impl SyncTask {
                 if let Some((first_point, last_point)) =
                     self.get_syncable_range(self.start_slot, end_slot)
                 {
-                    self.sync_tasks.push(sync_subchain(
+                    self.add_sync_task(
                         SyncParams::new(self.cfg.chain, first_point, last_point.clone()),
                         self.event_channel.0.clone(),
-                    ));
-                    self.current_sync_tasks = self.current_sync_tasks.saturating_add(1);
-
-                    self.dispatch_event(event::ChainIndexerEvent::SyncTasksChanged {
-                        current_sync_tasks: self.current_sync_tasks,
-                    });
+                    );
                 }
 
                 // The one slot overlap is deliberate, it doesn't hurt anything and prevents all off
