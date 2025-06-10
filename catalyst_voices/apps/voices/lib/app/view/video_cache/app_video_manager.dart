@@ -24,7 +24,14 @@ class VideoManager extends ValueNotifier<VideoManagerState> {
   ) async {
     final key = _createKey(asset.name, asset.package);
     if (value.controllers.containsKey(key)) {
-      return value.controllers[key]!;
+      final controller = value.controllers[key]!;
+
+      // Re-initialize is needed to properly connect the cached controller
+      // to a new VideoPlayer widget instance, even though controller state remains unchanged
+      // it has to do with internal logic of VideoPlayer widget that is not exposed to us
+      await controller.initialize();
+      await controller.play();
+      return controller;
     }
     final controller = await _initializeController(asset.name, package: asset.package);
 
