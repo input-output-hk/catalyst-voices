@@ -1,5 +1,6 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/pages/category/category_compact_detail_view.dart';
+import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
@@ -26,7 +27,7 @@ class CreateNewProposalCategorySelection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Expanded(
       child: Padding(
-        padding: const EdgeInsets.only(bottom: 50),
+        padding: const EdgeInsets.only(bottom: 68),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -47,8 +48,11 @@ class CreateNewProposalCategorySelection extends StatelessWidget {
             Expanded(
               flex: 2,
               child: _selectedCategory != null
-                  ? SingleChildScrollView(
-                      child: CategoryCompactDetailView(category: _selectedCategory!),
+                  ? VoicesScrollbar(
+                      alwaysVisible: true,
+                      child: SingleChildScrollView(
+                        child: CategoryCompactDetailView(category: _selectedCategory!),
+                      ),
                     )
                   : const _NoneCategorySelected(),
             ),
