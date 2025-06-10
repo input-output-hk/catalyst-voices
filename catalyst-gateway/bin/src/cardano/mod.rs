@@ -39,10 +39,10 @@ async fn start_sync_for(cfg: &chain_follower::EnvVars) -> anyhow::Result<()> {
 
     let mut cfg = ChainSyncConfig::default_for(chain);
     cfg.mithril_cfg = cfg.mithril_cfg.with_dl_config(dl_config);
-    info!(chain = %chain, "Starting Blockchain Sync");
+    info!(chain = %chain, "Starting Chain Sync Task");
 
     if let Err(error) = cfg.run().await {
-        error!(chain=%chain, error=%error, "Failed to start chain sync task");
+        error!(chain=%chain, error=%error, "Failed to start Chain Sync Task");
         Err(error)?;
     }
 
@@ -237,14 +237,12 @@ fn sync_subchain(
     params: SyncParams, event_sender: broadcast::Sender<event::ChainIndexerEvent>,
 ) -> tokio::task::JoinHandle<SyncParams> {
     tokio::spawn(async move {
-        info!(chain = %params.chain, params=%params, "Indexing Blockchain");
-
         // Backoff hitting the database if we need to.
         params.backoff().await;
 
         // Wait for indexing DB to be ready before continuing.
         drop(CassandraSession::wait_until_ready(INDEXING_DB_READY_WAIT_INTERVAL, true).await);
-        info!(chain=%params.chain, params=%params,"Indexing DB is ready");
+        info!(chain=%params.chain, params=%params,"Starting Chain Indexing");
 
         let mut first_indexed_block = params.first_indexed_block.clone();
         let mut first_immutable = params.first_is_immutable;
@@ -255,6 +253,18 @@ fn sync_subchain(
         let mut follower =
             ChainFollower::new(params.chain, params.actual_start(), params.end.clone()).await;
         while let Some(chain_update) = follower.next().await {
+            let tips = ChainFollower::get_tips(params.chain).await;
+            let immutable_slot = tips.0.slot_or_default();
+            let live_slot = tips.1.slot_or_default();
+            let event = event::ChainIndexerEvent::LiveTipSlotChanged {
+                immutable_slot,
+                live_slot,
+            };
+            if let Err(err) = event_sender.send(event) {
+                error!(error=%err, "Unable to send event.");
+            } else {
+                debug!(live_tip_slot=?live_slot, "Chain Indexer update");
+            }
             match chain_update.kind {
                 cardano_chain_follower::Kind::ImmutableBlockRollForward => {
                     // We only process these on the follower tracking the TIP.
@@ -452,7 +462,7 @@ impl SyncTask {
         let tips = ChainFollower::get_tips(self.cfg.chain).await;
         self.immutable_tip_slot = tips.0.slot_or_default();
         self.live_tip_slot = tips.1.slot_or_default();
-        info!(chain=%self.cfg.chain, immutable_tip=?self.immutable_tip_slot, live_tip=?self.live_tip_slot, "Blockchain ready to sync from.");
+        info!(chain=%self.cfg.chain, immutable_tip=?self.immutable_tip_slot, live_tip=?self.live_tip_slot, "Running the primary blockchain follower task.");
 
         self.dispatch_event(event::ChainIndexerEvent::ImmutableTipSlotChanged {
             immutable_slot: self.immutable_tip_slot,
@@ -470,7 +480,7 @@ impl SyncTask {
         // After waiting, we set the liveness flag to true if it is not already set.
         drop(CassandraSession::wait_until_ready(INDEXING_DB_READY_WAIT_INTERVAL, true).await);
 
-        info!(chain=%self.cfg.chain, "Indexing DB is ready - Getting recovery state");
+        info!(chain=%self.cfg.chain, "Indexing DB is ready - Getting recovery state for indexing");
         self.sync_status = get_sync_status().await;
         debug!(chain=%self.cfg.chain, "Sync Status: {:?}", self.sync_status);
 
@@ -497,6 +507,10 @@ impl SyncTask {
         while let Some(completed) = self.sync_tasks.next().await {
             match completed {
                 Ok(finished) => {
+                    let tips = ChainFollower::get_tips(self.cfg.chain).await;
+                    let immutable_tip_slot = tips.0.slot_or_default();
+                    let live_tip_slot = tips.1.slot_or_default();
+                    info!(immutable_tip_slot=?immutable_tip_slot, live_tip_slot=?live_tip_slot, "Chain Indexer task finished");
                     // Sync task finished.  Check if it completed OK or had an error.
                     // If it failed, we need to reschedule it.
 
@@ -509,6 +523,8 @@ impl SyncTask {
                             // Advance the known immutable tip, and try and start followers to reach
                             // it.
                             self.immutable_tip_slot = roll_forward_point.slot_or_default();
+                            info!(chain=%self.cfg.chain, report=%finished, immutable_tip_slot=?self.immutable_tip_slot,
+                            "Chain Indexer reached TIP");
 
                             self.dispatch_event(
                                 event::ChainIndexerEvent::ImmutableTipSlotChanged {
@@ -516,11 +532,13 @@ impl SyncTask {
                                     live_slot: self.live_tip_slot,
                                 },
                             );
+                            info!(chain=%self.cfg.chain, report=%finished,
+                            "Chain Indexer finished reaching TIP.");
 
                             self.start_immutable_followers();
                         } else {
                             error!(chain=%self.cfg.chain, report=%finished,
-                            "The TIP follower failed, restarting it.");
+                            "Chain Indexer finished without to reach TIP.");
                         }
 
                         // Start the Live Chain sync task again from where it left off.
@@ -691,6 +709,7 @@ impl event::EventTarget<event::ChainIndexerEvent> for SyncTask {
     }
 
     fn dispatch_event(&self, message: event::ChainIndexerEvent) {
+        debug!(event = ?message, "Chain Indexer Event");
         let _ = self.event_channel.0.send(message);
     }
 }
@@ -704,7 +723,6 @@ pub(crate) async fn start_followers() -> anyhow::Result<()> {
 
     // Start Syncing the blockchain, so we can consume its data as required.
     start_sync_for(&cfg).await?;
-    info!(chain=%cfg.chain,"Chain Sync is started.");
 
     tokio::spawn(async move {
         use self::event::ChainIndexerEvent as Event;
