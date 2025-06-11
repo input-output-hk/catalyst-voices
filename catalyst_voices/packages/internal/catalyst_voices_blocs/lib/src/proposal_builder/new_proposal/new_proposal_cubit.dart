@@ -76,8 +76,10 @@ class NewProposalCubit extends Cubit<NewProposalState>
           : const CreateProposalWithPreselectedCategoryStep();
       final categoriesModels = await _campaignService.getCampaignCategories();
       final templateRef = await _proposalService.getProposalTemplate(
-        // TODO(LynxLynxx): when we have separate proposal template for generic questions use it as
-        // here
+        // TODO(LynxLynxx): when we have separate proposal template for generic questions use it here
+        // right now user can start creating proposal without selecting category.
+        // Right now every category have the same requirements for title so we can do a fallback for
+        // first category from the list.
         ref: categoryRef ?? categoriesModels.first.proposalTemplateRef,
       );
 
