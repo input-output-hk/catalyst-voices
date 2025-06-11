@@ -129,7 +129,9 @@ final class LocalizedDocumentStringOutOfRange extends LocalizedDocumentValidatio
     final max = range.max;
 
     if (min != null && max != null) {
-      return context.l10n.errorValidationStringLengthOutOfRange(min, max);
+      return min == max
+          ? context.l10n.errorValidationStringLengthOutOfExactRange(min)
+          : context.l10n.errorValidationStringLengthOutOfRange(min, max);
     } else if (min != null) {
       return context.l10n.errorValidationStringLengthBelowMin(min);
     } else if (max != null) {
