@@ -342,7 +342,7 @@
                             "$ref": "#/definitions/tokenValueCardanoADA",
                             "title": "Enter the amount of funding you are requesting in ADA",
                             "description": "The amount of funding requested for your proposal",
-                            "x-guidance": "Each funding category has a minimum and maximum amount of funding a single proposal can request.\n\nMinimum Funding Amount per proposal:\n\n- Cardano Use Cases: Partners & Products: **₳250k**\n- Cardano Uses Cases: Concepts: **₳15K**\n- Cardano Open: Developers: **₳15K**\n- Cardano Open: Ecosystem: **₳15K**\n\nMaximum Funding Amount per proposal:\n\n- Cardano Use Cases: Partners & Products: **₳1M**\n- Cardano Uses Cases: Concepts: **₳100K**\n- Cardano Open: Developers: **₳100K**\n- Cardano Open: Ecosystem: **₳60K**",
+                            "x-guidance": "Each funding category has a minimum and maximum amount of funding a single proposal can request.\n\n**Cardano Use Cases: Partners & Products**\nMinimum Funding Amount per proposal: **₳250K**\nMaximum Funding Amount per proposal: **₳1M**",
                             "x-placeholder": "Enter the amount of funding you are requesting in ADA",
                             "minimum": 250000,
                             "maximum": 1000000

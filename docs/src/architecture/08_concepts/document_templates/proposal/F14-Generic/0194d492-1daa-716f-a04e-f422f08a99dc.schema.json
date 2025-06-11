@@ -342,7 +342,7 @@
                             "$ref": "#/definitions/tokenValueCardanoADA",
                             "title": "Enter the amount of funding you are requesting in ADA",
                             "description": "The amount of funding requested for your proposal",
-                            "x-guidance": "Each funding category has a minimum and maximum amount of funding a single proposal can request.\n\nMinimum Funding Amount per proposal:\n\n- Cardano Open: Ecosystem: **₳250k**\n- Cardano Uses Cases: Concepts: **₳15K**\n- Cardano Open: Developers: **₳15K**\n- Cardano Open: Ecosystem: **₳15K**\n\nMaximum Funding Amount per proposal:\n\n- Cardano Open: Ecosystem: **₳1M**\n- Cardano Uses Cases: Concepts: **₳100K**\n- Cardano Open: Developers: **₳100K**\n- Cardano Open: Ecosystem: **₳60K**",
+                             "x-guidance": "Each funding category has a minimum and maximum amount of funding a single proposal can request.\n\n**Cardano Open: Ecosystem**\nMinimum Funding Amount per proposal: **₳15K**\nMaximum Funding Amount per proposal: **₳60K**",
                             "x-placeholder": "Enter the amount of funding you are requesting in ADA",
                             "minimum": 15000,
                             "maximum": 60000
@@ -531,7 +531,7 @@
                     "$ref": "#/definitions/section",
                     "title": "Category Questions",
                     "description": "Answer the following questions to determine the eligibility of your proposal.",
-                    "x-guidance": "General Guidance\n\nIn consideration of the Reviewers assessing your proposal, be concise and use bulleted lists where possible.",
+                    "x-guidance": "General Guidance\n\nIn consideration of the Reviewers assessing your proposal, be concise and use bulleted lists where possible. Avoid any software or hardware development, even if it seems minor.",
                     "properties": {
                         "target_market": {
                             "$ref": "#/definitions/multiLineTextEntryMarkdown",
