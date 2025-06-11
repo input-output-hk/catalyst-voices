@@ -487,7 +487,7 @@ void main() {
         // When
         when(() => userRepository.getUser()).thenAnswer((_) => Future.value(user));
 
-        await service.updateAccount(id: catalystId, email: const Optional(updateEmail));
+        await service.updateAccount(id: catalystId, email: updateEmail);
 
         // Then
         verifyNever(() => userRepository.saveUser(any()));
@@ -515,7 +515,7 @@ void main() {
         when(() => userRepository.getUser()).thenAnswer((_) => Future.value(user));
         userObserver.user = user;
 
-        await service.updateAccount(id: catalystId, email: const Optional(updateEmail));
+        await service.updateAccount(id: catalystId, email: updateEmail);
 
         // Then
         verifyNever(
@@ -545,17 +545,16 @@ void main() {
         );
         final user = User.optional(accounts: [account]);
 
+        const expectedResult = AccountUpdateResult();
+
         // When
         when(() => userRepository.getUser()).thenAnswer((_) => Future.value(user));
         userObserver.user = user;
 
-        final didUpdateAccount = await service.updateAccount(
-          id: catalystId,
-          email: const Optional(updateEmail),
-        );
+        final result = await service.updateAccount(id: catalystId, email: updateEmail);
 
         // Then
-        expect(didUpdateAccount, isFalse);
+        expect(result, expectedResult);
       });
 
       test('returns true when email did changed', () async {
@@ -577,6 +576,8 @@ void main() {
         final user = User.optional(accounts: [account]);
         const publicProfile = AccountPublicProfile(email: '', status: AccountPublicStatus.verified);
 
+        const expectedResult = AccountUpdateResult(didChanged: true);
+
         // When
         when(() => userRepository.getUser()).thenAnswer((_) => Future.value(user));
         when(() => userRepository.saveUser(any())).thenAnswer((_) => Future(() {}));
@@ -589,13 +590,10 @@ void main() {
 
         userObserver.user = user;
 
-        final didUpdateAccount = await service.updateAccount(
-          id: catalystId,
-          email: const Optional(updateEmail),
-        );
+        final didUpdateAccount = await service.updateAccount(id: catalystId, email: updateEmail);
 
         // Then
-        expect(didUpdateAccount, isTrue);
+        expect(didUpdateAccount, expectedResult);
       });
     });
   });

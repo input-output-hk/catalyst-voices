@@ -57,10 +57,10 @@ abstract interface class UserService implements ActiveAware {
   /// Throws [EmailAlreadyUsedException] if [email] already taken.
   ///
   /// Returns true if updated, false otherwise.
-  Future<bool> updateAccount({
+  Future<AccountUpdateResult> updateAccount({
     required CatalystId id,
     Optional<String>? username,
-    Optional<String>? email,
+    String? email,
     Set<AccountRole>? roles,
   });
 
@@ -222,19 +222,22 @@ final class UserServiceImpl implements UserService {
   }
 
   @override
-  Future<bool> updateAccount({
+  Future<AccountUpdateResult> updateAccount({
     required CatalystId id,
     Optional<String>? username,
-    Optional<String>? email,
+    String? email,
     Set<AccountRole>? roles,
   }) async {
     final user = await getUser();
     if (!user.hasAccount(id: id)) {
-      return false;
+      return const AccountUpdateResult();
     }
     final account = user.getAccount(id);
-    final didEmailChange = email != null && account.email != email.data;
+    final didEmailChange = email != null && account.email != email;
     final didUsernameChange = username != null && account.username != username.data;
+
+    var didChanged = false;
+    var hasPendingEmailChange = false;
 
     var updatedAccount = account.copyWith();
 
@@ -243,36 +246,49 @@ final class UserServiceImpl implements UserService {
       updatedAccount = updatedAccount.copyWith(catalystId: catalystId);
     }
 
-    if (didEmailChange) {
-      updatedAccount = updatedAccount.copyWith(
-        email: email,
-        publicStatus: email.isEmpty ? AccountPublicStatus.notSetup : AccountPublicStatus.verifying,
-      );
-    }
-
     if (roles != null) {
       updatedAccount = updatedAccount.copyWith(roles: roles);
     }
 
+    // username is part of catalystId
     if (didUsernameChange || didEmailChange) {
-      final accountEmail = updatedAccount.email;
-      if (accountEmail != null) {
-        await _userRepository.publishUserProfile(
+      final currentEmail = email ?? updatedAccount.email;
+      final wasVerified = account.publicStatus.isVerified;
+
+      if (currentEmail != null) {
+        final publicProfile = await _userRepository.publishUserProfile(
           catalystId: updatedAccount.catalystId,
-          email: accountEmail,
+          email: currentEmail,
         );
+
+        final isVerified = publicProfile.status.isVerified;
+        final didEffectiveChangeEmail = account.email != publicProfile.email;
+
+        // when account was verified and changing email, the change won't be applied until
+        // new email is verified. We can't downgrade verification.
+        if (didEmailChange && (!didEffectiveChangeEmail || (wasVerified && !isVerified))) {
+          hasPendingEmailChange = true;
+        } else {
+          updatedAccount = updatedAccount.copyWith(
+            email: Optional(publicProfile.email),
+            publicStatus: publicProfile.status,
+          );
+        }
       }
     }
 
-    if (updatedAccount == account) {
-      return false;
+    if (updatedAccount != account) {
+      didChanged = true;
+
+      final updatedUser = user.updateAccount(updatedAccount);
+
+      await _updateUser(updatedUser);
     }
 
-    final updatedUser = user.updateAccount(updatedAccount);
-
-    await _updateUser(updatedUser);
-
-    return true;
+    return AccountUpdateResult(
+      didChanged: didChanged,
+      hasPendingEmailChange: hasPendingEmailChange,
+    );
   }
 
   @override
@@ -286,7 +302,10 @@ final class UserServiceImpl implements UserService {
     if (!activeAccount.publicStatus.isNotSetup) {
       final publicProfile = await _userRepository.getAccountPublicProfile();
       final publicProfileStatus = publicProfile?.status ?? AccountPublicStatus.unknown;
-      final updatedAccount = activeAccount.copyWith(publicStatus: publicProfileStatus);
+      final updatedAccount = activeAccount.copyWith(
+        email: Optional(publicProfile?.email),
+        publicStatus: publicProfileStatus,
+      );
       final updatedUser = user.updateAccount(updatedAccount);
 
       await _updateUser(updatedUser);
