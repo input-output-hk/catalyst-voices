@@ -306,7 +306,7 @@
                                 "properties": {
                                     "name": {
                                         "type": "string",
-                                        "title": "Enter the names of co-proposers or additional applicants",
+                                        "title": "Name and Surname",
                                         "description": "Full name of the co-proposer",
                                         "minLength": 2,
                                         "maxLength": 100
@@ -342,7 +342,7 @@
                             "$ref": "#/definitions/tokenValueCardanoADA",
                             "title": "Enter the amount of funding you are requesting in ADA",
                             "description": "The amount of funding requested for your proposal",
-                             "x-guidance": "Each funding category has a minimum and maximum amount of funding a single proposal can request.\n\n**Cardano Open: Ecosystem**\nMinimum Funding Amount per proposal: **₳15K**\nMaximum Funding Amount per proposal: **₳60K**",
+                            "x-guidance": "Each funding category has a minimum and maximum amount of funding a single proposal can request.\n\n**Cardano Open: Ecosystem**\nMinimum Funding Amount per proposal: **₳15K**\nMaximum Funding Amount per proposal: **₳60K**",
                             "x-placeholder": "Enter the amount of funding you are requesting in ADA",
                             "minimum": 15000,
                             "maximum": 60000

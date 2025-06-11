@@ -306,7 +306,7 @@
                                 "properties": {
                                     "name": {
                                         "type": "string",
-                                        "title": "Enter the names of co-proposers or additional applicants",
+                                        "title": "Name and Surname",
                                         "description": "Full name of the co-proposer",
                                         "minLength": 2,
                                         "maxLength": 100
