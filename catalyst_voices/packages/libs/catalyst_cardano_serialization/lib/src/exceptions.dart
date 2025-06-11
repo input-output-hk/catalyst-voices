@@ -42,6 +42,30 @@ final class InsufficientAdaForAssetsException extends Equatable implements Excep
 }
 
 /// Exception thrown when the transaction outputs exceed the inputs.
+final class InsufficientAdaForChangeOutputException extends Equatable implements Exception {
+  /// The amount of [Coin] that user has.
+  final Coin actualAmount;
+
+  /// The amount of [Coin] that is needed for the change output.
+  final Coin requiredAmount;
+
+  /// The default constructor for [InsufficientAdaForChangeOutputException].
+  const InsufficientAdaForChangeOutputException({
+    required this.actualAmount,
+    required this.requiredAmount,
+  });
+
+  @override
+  List<Object?> get props => [actualAmount, requiredAmount];
+
+  @override
+  String toString() => 'InsufficientAdaForChangeOutputException('
+      'actualAmount:$actualAmount'
+      ', requiredAmount:$requiredAmount'
+      ')';
+}
+
+/// Exception thrown when the transaction outputs exceed the inputs.
 final class InsufficientUtxoBalanceException extends Equatable implements Exception {
   /// The amount of [Balance] that user has.
   final Balance actualAmount;
@@ -222,6 +246,31 @@ final class TxFeeTooSmallException extends Equatable implements Exception {
       ')';
 }
 
+/// Exception thrown when the transaction output
+/// has more native tokens than allowed.
+final class TxMaxAssetsPerOutputExceededException extends Equatable implements Exception {
+  /// The current native tokens count.
+  final int actualCount;
+
+  /// The maximum allowed count.
+  final int maxCount;
+
+  /// The default constructor for [TxMaxAssetsPerOutputExceededException].
+  const TxMaxAssetsPerOutputExceededException({
+    required this.actualCount,
+    required this.maxCount,
+  });
+
+  @override
+  List<Object?> get props => [actualCount, maxCount];
+
+  @override
+  String toString() => 'TxMaxAssetsPerOutputExceededException('
+      'actualCount:$actualCount'
+      ', maxCount:$maxCount'
+      ')';
+}
+
 /// Exception thrown when the transaction output amount
 /// is less than required by the network.
 final class TxValueBelowMinUtxoValueException extends Equatable implements Exception {
@@ -269,30 +318,5 @@ final class TxValueSizeExceededException extends Equatable implements Exception 
   String toString() => 'TxValueSizeExceededException('
       'actualValueSize:$actualValueSize'
       ', maxValueSize:$maxValueSize'
-      ')';
-}
-
-/// Exception thrown when the transaction output
-/// has more native tokens than allowed.
-final class TxMaxAssetsPerOutputExceededException extends Equatable implements Exception {
-  /// The current native tokens count.
-  final int actualCount;
-
-  /// The maximum allowed count.
-  final int maxCount;
-
-  /// The default constructor for [TxMaxAssetsPerOutputExceededException].
-  const TxMaxAssetsPerOutputExceededException({
-    required this.actualCount,
-    required this.maxCount,
-  });
-
-  @override
-  List<Object?> get props => [actualCount, maxCount];
-
-  @override
-  String toString() => 'TxMaxAssetsPerOutputExceededException('
-      'actualCount:$actualCount'
-      ', maxCount:$maxCount'
       ')';
 }

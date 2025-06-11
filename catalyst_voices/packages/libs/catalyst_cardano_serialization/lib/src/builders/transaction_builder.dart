@@ -141,6 +141,8 @@ final class TransactionBuilder extends Equatable {
   /// - [strategy]: The coin selection strategy to use.
   /// - [minInputs]: The minimum number of inputs to include.
   /// - [maxInputs]: The maximum number of inputs to include.
+  /// - [changeOutputStrategy]: Defines a strategy applied to
+  ///   the remaining Ada when planning change outputs.
   ///
   /// Returns:
   /// - A new [TransactionBuilder] instance with the updated state.
@@ -148,11 +150,13 @@ final class TransactionBuilder extends Equatable {
     CoinSelectionStrategy strategy = const GreedySelectionStrategy(),
     int minInputs = CoinSelector.minInputs,
     int maxInputs = CoinSelector.maxInputs,
+    ChangeOutputAdaStrategy changeOutputStrategy = ChangeOutputAdaStrategy.burn,
   }) {
     final (selectedInputs, changes, totalFee) = selectInputs(
       strategy: strategy,
       minInputs: minInputs,
       maxInputs: maxInputs,
+      changeOutputStrategy: changeOutputStrategy,
     );
 
     return copyWith(
@@ -266,6 +270,8 @@ final class TransactionBuilder extends Equatable {
   /// - [strategy]: The coin selection strategy to use.
   /// - [minInputs]: The minimum number of inputs to include.
   /// - [maxInputs]: The maximum number of inputs to include.
+  /// - [changeOutputStrategy]: Defines a strategy applied to
+  ///   the remaining Ada when planning change outputs.
   ///
   /// Returns:
   /// - A [SelectionResult] containing the selected inputs, change outputs, and
@@ -275,9 +281,11 @@ final class TransactionBuilder extends Equatable {
     CoinSelectionStrategy strategy = const GreedySelectionStrategy(),
     int minInputs = CoinSelector.minInputs,
     int maxInputs = CoinSelector.maxInputs,
+    ChangeOutputAdaStrategy changeOutputStrategy = ChangeOutputAdaStrategy.burn,
   }) {
     final selector = InputBuilder(
       selectionStrategy: strategy,
+      changeOutputStrategy: changeOutputStrategy,
     );
 
     return selector.selectInputs(
@@ -301,10 +309,13 @@ final class TransactionBuilder extends Equatable {
   /// If creating an extra [ShelleyMultiAssetTransactionOutput] is not possible
   /// because i.e. the remaining change is too small to cover for extra fee that
   /// such extra output would generate then the transaction fee is increased to
-  ///  burn any remaining change.
+  /// burn any remaining change if [burnAsFee] is `true`.
+  ///
+  /// In case of `false` an [InsufficientAdaForChangeOutputException] is thrown
+  /// because no valid transaction could be created.
   ///
   /// Follows code style of Cardano Multiplatform Lib to make patching easy.
-  TransactionBuilder withChangeIfNeeded() {
+  TransactionBuilder withChangeIfNeeded({bool burnAsFee = true}) {
     if (this.fee != null) {
       // generating the change output involves changing the fee
       return this;
@@ -343,6 +354,7 @@ final class TransactionBuilder extends Equatable {
           address: changeAddress,
           fee: fee,
           changeEstimator: changeEstimator,
+          burnAsFee: burnAsFee,
         );
       }
     }
@@ -708,6 +720,7 @@ final class TransactionBuilder extends Equatable {
     required ShelleyAddress address,
     required Coin fee,
     required Balance changeEstimator,
+    required bool burnAsFee,
   }) {
     final draftOutput = PreBabbageTransactionOutput(
       address: address,
@@ -736,13 +749,26 @@ final class TransactionBuilder extends Equatable {
 
         if (changeOutput.amount.coin >= minAdaForChange) {
           return withFee(newFee).withOutput(changeOutput);
-        } else {
+        } else if (burnAsFee) {
+          // Burn as fee, it's not enough to make a change output.
           return withFee(changeEstimator.coin);
+        } else {
+          throw InsufficientAdaForChangeOutputException(
+            actualAmount: changeEstimator.coin,
+            requiredAmount: minAdaForChange,
+          );
         }
 
       case false:
-        // burn remaining change as fee
-        return withFee(changeEstimator.coin);
+        if (burnAsFee) {
+          // Burn as fee, it's not enough to make a change output.
+          return withFee(changeEstimator.coin);
+        } else {
+          throw InsufficientAdaForChangeOutputException(
+            actualAmount: changeEstimator.coin,
+            requiredAmount: minAdaForDraft,
+          );
+        }
     }
   }
 

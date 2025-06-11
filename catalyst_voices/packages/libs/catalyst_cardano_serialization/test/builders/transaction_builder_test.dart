@@ -1,4 +1,5 @@
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
+import 'package:catalyst_cardano_serialization/src/builders/types.dart';
 import 'package:test/test.dart';
 
 import '../test_utils/fee_utils.dart';
@@ -222,6 +223,111 @@ void main() {
       expect(
         updatedTxBuilder.buildBody,
         throwsA(isA<TxMaxAssetsPerOutputExceededException>()),
+      );
+    });
+
+    test(
+        'transaction with utxos each below min ada required '
+        'for change output will prefer selecting two utxos '
+        'over burning remaining Ada as fee', () {
+      final changeAddress = SelectionUtils.randomAddress();
+      const ada = Coin(969750);
+
+      final utxos = List.generate(5, (index) {
+        return TransactionUnspentOutput(
+          input: TransactionInput(
+            transactionId: TransactionHash.fromHex(
+              SelectionUtils.randomHexString(TransactionHash.hashLength),
+            ),
+            index: index,
+          ),
+          output: PreBabbageTransactionOutput(
+            address: changeAddress,
+            amount: const Balance(coin: ada),
+          ),
+        );
+      });
+
+      final txBuilder = TransactionBuilder(
+        config: transactionBuilderConfig(),
+        inputs: utxos.toSet(),
+        networkId: NetworkId.testnet,
+        changeAddress: changeAddress,
+      );
+
+      final txBody = txBuilder.applySelection().buildBody();
+      expect(txBody.inputs, hasLength(2));
+      expect(txBody.fee, lessThan(ada));
+    });
+
+    test(
+        'transaction with one utxo below min ada required '
+        'for change output will burn remaining ada as fee '
+        'when change output strategy allows to burn ada', () {
+      final changeAddress = SelectionUtils.randomAddress();
+      const ada = Coin(969750);
+
+      final utxo = TransactionUnspentOutput(
+        input: TransactionInput(
+          transactionId: testTransactionHash,
+          index: 1,
+        ),
+        output: PreBabbageTransactionOutput(
+          address: changeAddress,
+          amount: const Balance(coin: ada),
+        ),
+      );
+
+      final txBuilder = TransactionBuilder(
+        config: transactionBuilderConfig(),
+        inputs: {utxo},
+        networkId: NetworkId.testnet,
+        changeAddress: changeAddress,
+      );
+
+      final txBody = txBuilder
+          .applySelection(
+            // ignore: avoid_redundant_argument_values
+            changeOutputStrategy: ChangeOutputAdaStrategy.burn,
+          )
+          .buildBody();
+
+      expect(txBody.inputs, hasLength(1));
+      expect(txBody.fee, equals(ada));
+    });
+
+    test(
+        'transaction with one utxo below min ada required '
+        'for change output will throw exception '
+        'when change output strategy does not allow to burn ada', () {
+      final changeAddress = SelectionUtils.randomAddress();
+      const ada = Coin(969750);
+
+      final utxo = TransactionUnspentOutput(
+        input: TransactionInput(
+          transactionId: testTransactionHash,
+          index: 1,
+        ),
+        output: PreBabbageTransactionOutput(
+          address: changeAddress,
+          amount: const Balance(coin: ada),
+        ),
+      );
+
+      final txBuilder = TransactionBuilder(
+        config: transactionBuilderConfig(),
+        inputs: {utxo},
+        networkId: NetworkId.testnet,
+        changeAddress: changeAddress,
+      );
+
+      expect(
+        () => txBuilder
+            .applySelection(
+              changeOutputStrategy: ChangeOutputAdaStrategy.noBurn,
+            )
+            .buildBody(),
+        throwsA(isA<InsufficientUtxoBalanceException>()),
       );
     });
 
