@@ -113,20 +113,15 @@ class _Header extends StatelessWidget {
 
 class _HeadsUpInfo extends StatelessWidget {
   final String text;
-  final bool isBold;
 
-  const _HeadsUpInfo(
-    this.text, {
-    this.isBold = false,
-  });
+  const _HeadsUpInfo(this.text);
 
   @override
   Widget build(BuildContext context) {
     return Text(
-      text.withBullet(),
+      text.withBullet().withIndent(),
       style: context.textTheme.bodyLarge?.copyWith(
         color: context.colors.textOnPrimaryLevel1,
-        fontWeight: isBold ? FontWeight.w700 : null,
       ),
     );
   }
@@ -202,12 +197,11 @@ class _RightSide extends StatelessWidget {
         const SizedBox(height: 12),
         ProposalSubmissionClosesText(dateTime: date),
         const SizedBox(height: 12),
-        _HeadsUpInfo(context.l10n.submitProposalBeforeClosing),
+        _Text(context.l10n.stepsToDoBeforeAppCloses),
         _HeadsUpInfo(context.l10n.checkMaxProposal(ProposalDocument.maxSubmittedProposalsPerUser)),
-        _HeadsUpInfo(
-          context.l10n.catalystAppNotAvailableAfterSubmissionCloses,
-          isBold: true,
-        ),
+        _HeadsUpInfo(context.l10n.moveFinalProposalsToReviewStage),
+        const SizedBox(height: 20),
+        _Text(context.l10n.importCatalystAppUnavailableAfterDeadline),
         const Spacer(),
         _Countdown(date: date),
         const SizedBox(height: 10),
@@ -220,6 +214,22 @@ class _RightSide extends StatelessWidget {
           ],
         ),
       ],
+    );
+  }
+}
+
+class _Text extends StatelessWidget {
+  final String stepsToDoBeforeAppCloses;
+
+  const _Text(this.stepsToDoBeforeAppCloses);
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      stepsToDoBeforeAppCloses,
+      style: context.textTheme.bodyLarge?.copyWith(
+        color: context.colors.textOnPrimaryLevel1,
+      ),
     );
   }
 }
