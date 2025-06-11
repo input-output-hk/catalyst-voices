@@ -12,6 +12,7 @@ import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class StayInvolved extends StatelessWidget {
   const StayInvolved({super.key});
@@ -57,7 +58,7 @@ class _CopyCatalystIdTipText extends StatelessWidget {
             padding: const EdgeInsets.only(top: 20),
             child: TipText(
               context.l10n.tipCopyCatalystIdForReviewTool(
-                Uri.decodeFull(ShareManager.of(context).becomeReviewer().toString()),
+                ShareManager.of(context).becomeReviewer().decoded(),
               ),
               style:
                   context.textTheme.bodyMedium?.copyWith(color: context.colors.textOnPrimaryLevel1),
@@ -180,7 +181,11 @@ class _ReviewerCard extends StatelessWidget {
           ),
           _StayInvolvedActionButton(
             title: context.l10n.becomeReviewer,
-            urlString: Uri.decodeFull(ShareManager.of(context).becomeReviewer().toString()),
+            onTap: () {
+              final shareManager = ShareManager.of(context);
+              final uri = shareManager.becomeReviewer();
+              unawaited(launchUrl(uri));
+            },
             trailing: VoicesAssets.icons.externalLink.buildIcon(),
           ),
         ],
@@ -191,13 +196,13 @@ class _ReviewerCard extends StatelessWidget {
 
 class _StayInvolvedActionButton extends StatelessWidget with LaunchUrlMixin {
   final String title;
-  final String urlString;
   final Widget? trailing;
+  final VoidCallback? onTap;
 
   const _StayInvolvedActionButton({
     required this.title,
-    required this.urlString,
     this.trailing,
+    this.onTap,
   });
 
   @override
@@ -205,16 +210,11 @@ class _StayInvolvedActionButton extends StatelessWidget with LaunchUrlMixin {
     return Padding(
       padding: const EdgeInsets.only(top: 20),
       child: VoicesFilledButton(
-        onTap: _handleUrlTap,
+        onTap: onTap,
         trailing: trailing,
         child: Text(title),
       ),
     );
-  }
-
-  Future<void> _handleUrlTap() async {
-    final url = urlString.getUri();
-    await launchUri(url);
   }
 }
 
@@ -330,7 +330,10 @@ class _VoterCard extends StatelessWidget {
           ),
           _StayInvolvedActionButton(
             title: context.l10n.becomeVoter,
-            urlString: VoicesConstants.afterSubmissionUrl,
+            onTap: () {
+              final uri = Uri.parse(VoicesConstants.afterSubmissionUrl);
+              unawaited(launchUrl(uri));
+            },
           ),
         ],
       ),

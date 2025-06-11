@@ -87,7 +87,7 @@ class _CopyCatalystIdTipText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final url = Uri.decodeFull(ShareManager.of(context).becomeReviewer().toString());
+    final url = ShareManager.of(context).becomeReviewer().decoded();
 
     return TipText(
       context.l10n.tipCopyCatalystIdForReviewTool(url),
