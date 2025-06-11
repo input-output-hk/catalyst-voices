@@ -8,7 +8,7 @@ pub(crate) mod registrations;
 pub(crate) mod staked_ada;
 pub(crate) mod sync_status;
 
-use std::{fmt::Debug, sync::Arc};
+use std::{any::TypeId, fmt::Debug, sync::Arc};
 
 use anyhow::bail;
 use dashmap::DashMap;
@@ -46,6 +46,7 @@ use super::block::{
 };
 use crate::{
     db::index::{
+        block::certs::StakeRegistrationInsertQuery,
         queries::rbac::{
             get_catalyst_id_from_stake_address, get_catalyst_id_from_transaction_id,
             get_rbac_invalid_registrations, get_rbac_registrations,
@@ -213,6 +214,36 @@ pub(crate) struct PreparedQueries {
 pub(crate) type FallibleQueryResults = anyhow::Result<Vec<QueryResult>>;
 /// A set of query responses from tasks that can fail.
 pub(crate) type FallibleQueryTasks = Vec<tokio::task::JoinHandle<FallibleQueryResults>>;
+
+/// Prepare Queries
+#[allow(dead_code)]
+async fn prepare_queries(
+    session: &Arc<Session>, cfg: &cassandra_db::EnvVars,
+) -> anyhow::Result<DashMap<TypeId, QueryKind>> {
+    // Prepare a query dashmap
+    macro_rules! prepare_q {
+        ( $( $i:ty),* ) => {
+            {
+                let queries = vec![
+                    $(
+                        (TypeId::of::<$i>(), <$i>::prepare_query(session, cfg).await?),
+                    )*
+                ];
+                DashMap::from_iter(queries)
+            }
+        }
+    }
+    // WIP: Adding queries as they implement trait
+    let queries = prepare_q!(
+        TxiInsertQuery,
+        TxoInsertQuery,
+        TxoAssetInsert,
+        TxoUnstaked,
+        TxoUnstakedAsset,
+        StakeRegistrationInsertQuery
+    );
+    Ok(queries)
+}
 
 impl PreparedQueries {
     /// Create new prepared queries for a given session.
