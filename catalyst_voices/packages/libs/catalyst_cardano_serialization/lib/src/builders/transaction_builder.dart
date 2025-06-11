@@ -138,7 +138,6 @@ final class TransactionBuilder extends Equatable {
   /// [TransactionBuilder] instance with the updated inputs, outputs, and fee.
   ///
   /// Parameters:
-  /// - [strategy]: The coin selection strategy to use.
   /// - [minInputs]: The minimum number of inputs to include.
   /// - [maxInputs]: The maximum number of inputs to include.
   /// - [changeOutputStrategy]: Defines a strategy applied to
@@ -147,13 +146,12 @@ final class TransactionBuilder extends Equatable {
   /// Returns:
   /// - A new [TransactionBuilder] instance with the updated state.
   TransactionBuilder applySelection({
-    CoinSelectionStrategy strategy = const GreedySelectionStrategy(),
     int minInputs = CoinSelector.minInputs,
     int maxInputs = CoinSelector.maxInputs,
     ChangeOutputAdaStrategy changeOutputStrategy = ChangeOutputAdaStrategy.burn,
   }) {
     final (selectedInputs, changes, totalFee) = selectInputs(
-      strategy: strategy,
+      strategy: config.selectionStrategy,
       minInputs: minInputs,
       maxInputs: maxInputs,
       changeOutputStrategy: changeOutputStrategy,

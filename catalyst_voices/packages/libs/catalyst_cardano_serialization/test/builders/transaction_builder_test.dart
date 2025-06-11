@@ -1,5 +1,4 @@
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
-import 'package:catalyst_cardano_serialization/src/builders/types.dart';
 import 'package:test/test.dart';
 
 import '../test_utils/fee_utils.dart';
