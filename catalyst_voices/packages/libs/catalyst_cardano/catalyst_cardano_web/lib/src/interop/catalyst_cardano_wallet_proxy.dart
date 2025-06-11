@@ -6,6 +6,10 @@ import 'package:catalyst_cardano_web/src/interop/catalyst_cardano_interop.dart';
 import 'package:cbor/cbor.dart';
 import 'package:convert/convert.dart';
 
+/// The minimal set of wallet extensions that
+/// must be supported by every wallet extension.
+const _fallbackExtensions = [CipExtension(cip: 30)];
+
 /// Error message in exception thrown when trying
 /// to execute a method which doesn't exist in JS layer.
 ///
@@ -15,49 +19,70 @@ import 'package:convert/convert.dart';
 /// Checking for this error messages allows to detect unimplemented method.
 const _noSuchMethodError = 'NoSuchMethodError';
 
-/// The minimal set of wallet extensions that
-/// must be supported by every wallet extension.
-const _fallbackExtensions = [CipExtension(cip: 30)];
+WalletApiException _fallbackApiException(Object ex) {
+  throw WalletApiException(
+    code: WalletApiErrorCode.invalidRequest,
+    info: ex.toString(),
+  );
+}
 
-/// A wrapper around [JSCardanoWallet] that translates between JS/dart layers.
-class JSCardanoWalletProxy implements CardanoWallet {
-  final JSCardanoWallet _delegate;
+WalletApiException? _mapApiException(Object ex) {
+  final message = ex.toString();
 
-  /// The default constructor for [JSCardanoWalletProxy].
-  JSCardanoWalletProxy(this._delegate);
-
-  @override
-  String get name => _delegate.name.toDart;
-
-  @override
-  String get icon => _delegate.icon.toDart;
-
-  @override
-  String? get apiVersion => _delegate.apiVersion?.toDart;
-
-  @override
-  List<CipExtension> get supportedExtensions =>
-      _delegate.supportedExtensions?.toDart.map((e) => e.toDart).toList() ?? _fallbackExtensions;
-
-  @override
-  Future<bool> isEnabled() async {
-    try {
-      return await _delegate.isEnabled().toDart.then((e) => e.toDart);
-    } catch (ex) {
-      throw _mapApiException(ex) ?? _fallbackApiException(ex);
-    }
+  if (message.contains('canceled')) {
+    throw WalletApiException(
+      code: WalletApiErrorCode.refused,
+      info: message,
+    );
   }
 
-  @override
-  Future<CardanoWalletApi> enable({List<CipExtension>? extensions}) async {
-    try {
-      final jsExtensions = extensions != null ? JSCipExtensions.fromDart(extensions) : null;
-
-      return await _delegate.enable(jsExtensions).toDart.then((e) => e.toDart);
-    } catch (ex) {
-      throw _mapApiException(ex) ?? _fallbackApiException(ex);
-    }
+  if (message.contains('unsupported')) {
+    throw WalletApiException(
+      code: WalletApiErrorCode.invalidRequest,
+      info: message,
+    );
   }
+
+  if (message.contains('account changed')) {
+    throw WalletApiException(
+      code: WalletApiErrorCode.accountChange,
+      info: message,
+    );
+  }
+
+  if (message.contains('unknown')) {
+    throw WalletApiException(
+      code: WalletApiErrorCode.internalError,
+      info: message,
+    );
+  }
+
+  return null;
+}
+
+WalletDataSignException? _mapDataSignException(Object ex) {
+  // TODO(dtscalac): extract exception
+  return null;
+}
+
+WalletPaginateException? _mapPaginateException(Object ex) {
+  final message = ex.toString();
+
+  // TODO(dtscalac): extract maxSize from underlying JS exception
+  if (message.contains('page out of range')) {
+    return const WalletPaginateException(maxSize: -1);
+  }
+  return null;
+}
+
+TxSendException? _mapTxSendException(Object ex) {
+  // TODO(dtscalac): extract exception
+  return null;
+}
+
+TxSignException? _mapTxSignException(Object ex) {
+  // TODO(dtscalac): extract exception
+  return null;
 }
 
 /// A wrapper around [JSCardanoWalletApi] that translates between JS/dart layers.
@@ -80,7 +105,19 @@ class JSCardanoWalletApiProxy implements CardanoWalletApi {
   Future<Balance> getBalance() async {
     try {
       final result = await _delegate.getBalance().toDart.then((e) => e.toDart);
-      return Balance.fromCbor(cbor.decode(hex.decode(result)));
+      return Balance.fromCbor(cbor.decode(hexDecode(result)));
+    } catch (ex) {
+      throw _mapApiException(ex) ?? _fallbackApiException(ex);
+    }
+  }
+
+  @override
+  Future<ShelleyAddress> getChangeAddress() async {
+    try {
+      return await _delegate
+          .getChangeAddress()
+          .toDart
+          .then((e) => ShelleyAddress(hexDecode(e.toDart)));
     } catch (ex) {
       throw _mapApiException(ex) ?? _fallbackApiException(ex);
     }
@@ -112,22 +149,10 @@ class JSCardanoWalletApiProxy implements CardanoWalletApi {
   }
 
   @override
-  Future<ShelleyAddress> getChangeAddress() async {
-    try {
-      return await _delegate
-          .getChangeAddress()
-          .toDart
-          .then((e) => ShelleyAddress(hex.decode(e.toDart)));
-    } catch (ex) {
-      throw _mapApiException(ex) ?? _fallbackApiException(ex);
-    }
-  }
-
-  @override
   Future<List<ShelleyAddress>> getRewardAddresses() async {
     try {
       return await _delegate.getRewardAddresses().toDart.then(
-            (array) => array.toDart.map((item) => ShelleyAddress(hex.decode(item.toDart))).toList(),
+            (array) => array.toDart.map((item) => ShelleyAddress(hexDecode(item.toDart))).toList(),
           );
     } catch (ex) {
       throw _mapApiException(ex) ?? _fallbackApiException(ex);
@@ -138,7 +163,7 @@ class JSCardanoWalletApiProxy implements CardanoWalletApi {
   Future<List<ShelleyAddress>> getUnusedAddresses() async {
     try {
       return await _delegate.getUnusedAddresses().toDart.then(
-            (array) => array.toDart.map((item) => ShelleyAddress(hex.decode(item.toDart))).toList(),
+            (array) => array.toDart.map((item) => ShelleyAddress(hexDecode(item.toDart))).toList(),
           );
     } catch (ex) {
       throw _mapApiException(ex) ?? _fallbackApiException(ex);
@@ -151,7 +176,7 @@ class JSCardanoWalletApiProxy implements CardanoWalletApi {
       final jsPaginate = paginate != null ? JSPaginate.fromDart(paginate) : makeUndefined();
 
       return await _delegate.getUsedAddresses(jsPaginate).toDart.then(
-            (array) => array.toDart.map((item) => ShelleyAddress(hex.decode(item.toDart))).toList(),
+            (array) => array.toDart.map((item) => ShelleyAddress(hexDecode(item.toDart))).toList(),
           );
     } catch (ex) {
       throw _mapApiException(ex) ?? _mapPaginateException(ex) ?? _fallbackApiException(ex);
@@ -175,7 +200,7 @@ class JSCardanoWalletApiProxy implements CardanoWalletApi {
         (array) => array.toDart
             .map(
               (item) => TransactionUnspentOutput.fromCbor(
-                cbor.decode(hex.decode(item.toDart)),
+                cbor.decode(hexDecode(item.toDart)),
               ),
             )
             .toSet(),
@@ -214,7 +239,7 @@ class JSCardanoWalletApiProxy implements CardanoWalletApi {
 
       return await _delegate.signTx(hexString.toJS, partialSign.toJS).toDart.then(
             (e) => TransactionWitnessSet.fromCbor(
-              cbor.decode(hex.decode(e.toDart)),
+              cbor.decode(hexDecode(e.toDart)),
             ),
           );
     } catch (ex) {
@@ -300,75 +325,50 @@ class JSCardanoWalletCip95ApiProxy implements CardanoWalletCip95Api {
             hex.encode(payload).toJS,
           )
           .toDart
-          .then((e) => VkeyWitness.fromCbor(cbor.decode(hex.decode(e.toDart))));
+          .then((e) => VkeyWitness.fromCbor(cbor.decode(hexDecode(e.toDart))));
     } catch (ex) {
       throw _mapApiException(ex) ?? _mapDataSignException(ex) ?? _fallbackApiException(ex);
     }
   }
 }
 
-WalletApiException? _mapApiException(Object ex) {
-  final message = ex.toString();
+/// A wrapper around [JSCardanoWallet] that translates between JS/dart layers.
+class JSCardanoWalletProxy implements CardanoWallet {
+  final JSCardanoWallet _delegate;
 
-  if (message.contains('canceled')) {
-    throw WalletApiException(
-      code: WalletApiErrorCode.refused,
-      info: message,
-    );
+  /// The default constructor for [JSCardanoWalletProxy].
+  JSCardanoWalletProxy(this._delegate);
+
+  @override
+  String? get apiVersion => _delegate.apiVersion?.toDart;
+
+  @override
+  String get icon => _delegate.icon.toDart;
+
+  @override
+  String get name => _delegate.name.toDart;
+
+  @override
+  List<CipExtension> get supportedExtensions =>
+      _delegate.supportedExtensions?.toDart.map((e) => e.toDart).toList() ?? _fallbackExtensions;
+
+  @override
+  Future<CardanoWalletApi> enable({List<CipExtension>? extensions}) async {
+    try {
+      final jsExtensions = extensions != null ? JSCipExtensions.fromDart(extensions) : null;
+
+      return await _delegate.enable(jsExtensions).toDart.then((e) => e.toDart);
+    } catch (ex) {
+      throw _mapApiException(ex) ?? _fallbackApiException(ex);
+    }
   }
 
-  if (message.contains('unsupported')) {
-    throw WalletApiException(
-      code: WalletApiErrorCode.invalidRequest,
-      info: message,
-    );
+  @override
+  Future<bool> isEnabled() async {
+    try {
+      return await _delegate.isEnabled().toDart.then((e) => e.toDart);
+    } catch (ex) {
+      throw _mapApiException(ex) ?? _fallbackApiException(ex);
+    }
   }
-
-  if (message.contains('account changed')) {
-    throw WalletApiException(
-      code: WalletApiErrorCode.accountChange,
-      info: message,
-    );
-  }
-
-  if (message.contains('unknown')) {
-    throw WalletApiException(
-      code: WalletApiErrorCode.internalError,
-      info: message,
-    );
-  }
-
-  return null;
-}
-
-WalletPaginateException? _mapPaginateException(Object ex) {
-  final message = ex.toString();
-
-  // TODO(dtscalac): extract maxSize from underlying JS exception
-  if (message.contains('page out of range')) {
-    return const WalletPaginateException(maxSize: -1);
-  }
-  return null;
-}
-
-WalletDataSignException? _mapDataSignException(Object ex) {
-  // TODO(dtscalac): extract exception
-  return null;
-}
-
-TxSignException? _mapTxSignException(Object ex) {
-  // TODO(dtscalac): extract exception
-  return null;
-}
-
-TxSendException? _mapTxSendException(Object ex) {
-  // TODO(dtscalac): extract exception
-  return null;
-}
-
-WalletApiException _fallbackApiException(Object ex) {
-  throw WalletApiException(
-    code: WalletApiErrorCode.invalidRequest,
-    info: ex.toString(),
-  );
 }

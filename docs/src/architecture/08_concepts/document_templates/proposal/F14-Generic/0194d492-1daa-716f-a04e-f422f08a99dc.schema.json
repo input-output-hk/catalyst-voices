@@ -1,8 +1,8 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
-    "$id": "https://raw.githubusercontent.com/input-output-hk/catalyst-voices/refs/heads/main/docs/src/architecture/08_concepts/document_templates/proposal/F14-Generic/0194d490-30bf-7e75-95c1-a6cf0e8086d9.schema.json",
-    "title": "F14 Cardano Open: Developers",
-    "description": "Schema for the F14 Cardano Open: Developers",
+    "$id": "https://raw.githubusercontent.com/input-output-hk/catalyst-voices/refs/heads/main/docs/src/architecture/08_concepts/document_templates/proposal/F14-Generic/0194d492-1daa-716f-a04e-f422f08a99dc.schema.json",
+    "title": "F14 Cardano Open: Ecosystem Form",
+    "description": "Schema for the F14 Cardano Open: Ecosystem Form",
     "maintainers": [{ "name": "Catalyst Team", "url": "https://projectcatalyst.io/" }],
     "x-changelog": {
         "2025-06-02": [
@@ -342,10 +342,10 @@
                             "$ref": "#/definitions/tokenValueCardanoADA",
                             "title": "Enter the amount of funding you are requesting in ADA",
                             "description": "The amount of funding requested for your proposal",
-                            "x-guidance": "Each funding category has a minimum and maximum amount of funding a single proposal can request.\n\nMinimum Funding Amount per proposal:\n\n- Cardano Use Cases: Concepts: **₳250k**\n- Cardano Uses Cases: Concepts: **₳15K**\n- Cardano Open: Developers: **₳15K**\n- Cardano Open: Ecosystem: **₳15K**\n\nMaximum Funding Amount per proposal:\n\n- Cardano Use Cases: Concepts: **₳1M**\n- Cardano Uses Cases: Concepts: **₳100K**\n- Cardano Open: Developers: **₳100K**\n- Cardano Open: Ecosystem: **₳60K**",
+                            "x-guidance": "Each funding category has a minimum and maximum amount of funding a single proposal can request.\n\nMinimum Funding Amount per proposal:\n\n- Cardano Open: Ecosystem: **₳250k**\n- Cardano Uses Cases: Concepts: **₳15K**\n- Cardano Open: Developers: **₳15K**\n- Cardano Open: Ecosystem: **₳15K**\n\nMaximum Funding Amount per proposal:\n\n- Cardano Open: Ecosystem: **₳1M**\n- Cardano Uses Cases: Concepts: **₳100K**\n- Cardano Open: Developers: **₳100K**\n- Cardano Open: Ecosystem: **₳60K**",
                             "x-placeholder": "Enter the amount of funding you are requesting in ADA",
                             "minimum": 15000,
-                            "maximum": 100000
+                            "maximum": 60000
                         }
                     },
                     "required": [
@@ -533,37 +533,37 @@
                     "description": "Answer the following questions to determine the eligibility of your proposal.",
                     "x-guidance": "General Guidance\n\nIn consideration of the Reviewers assessing your proposal, be concise and use bulleted lists where possible.",
                     "properties": {
-                        "license_information": {
+                        "target_market": {
                             "$ref": "#/definitions/multiLineTextEntryMarkdown",
-                            "title": "Mention your open-source License and describe your open-source license rationale.",
+                            "title": "Who you’re targeting, how you’ll reach them, and why this matters for Cardano.",
                             "x-placeholder": "Please provide your rationale.",
-                            "description": "Please provide your open-source license rationale.",
-                            "x-guidance": "- For instance, any recognized open-source license (MIT, Apache 2.0, GPL or other).\n- Explain why this license fits your project goals (e.g. broad use, contribution rules, commercial compatibility).\n- Avoid vague terms like “custom license” without justification.",
+                            "description": "Please provide your rationale for your target market.",
+                            "x-guidance": "- Number of new wallets created or ADA transactions initiated.\n- Growth in local/regional community participation.\n- Partnerships formed with local organizations, schools, or groups.",
                             "minLength": 200,
                             "maxLength": 600
                         },
-                        "source_code_accessibility": {
+                        "key_activities": {
                             "$ref": "#/definitions/multiLineTextEntryMarkdown",
-                            "title": "How do you make sure your source code is accessible to the public from project start, and people are informed?",
+                            "title": "Provide a list of key activities of your project?",
                             "x-placeholder": "Please provide your rationale.",
-                            "description": "Please provide your rationale for how you make sure your source code is accessible to the public from project start, and people are informed.",
-                            "x-guidance": "- Share a public repository link (e.g. GitHub, GitLab) early.\n- Use version control and quality commits regularly.\n- Set clear expectations on progression and communication.",
+                            "description": "Please provide your rationale for your key activities.",
+                            "x-guidance": "- Number of educational sessions, workshops, or webinars held.\n- Total number of participants reached or trained, and retention rates.\n- Increase in Cardano-related knowledge (measured via pre/post surveys or quizzes).",
                             "minLength": 200,
                             "maxLength": 600
                         },
-                         "documentation_quality": {
+                         "performance_metrics": {
                             "$ref": "#/definitions/multiLineTextEntryMarkdown",
-                            "title": "How will you provide high quality documentation?",
+                            "title": "What are your success metrics?",
                             "x-placeholder": "Please provide your rationale.",
-                            "description": "Please provide your quality documentation.",
-                            "x-guidance": "- User and developer documentation (README, setup guide, API docs).\n- Use clear structure, visuals, and examples.\n- Mention tools or standards (e.g. Docusaurus, Markdown, OpenAPI).",
+                            "description": "Please provide your rationale for your success metrics.",
+                            "x-guidance": "- Number of new community groups or meetups formed.\n- Number of events or meetups organized.\n- Event attendance and retention rates (in-person or online).\n- Participant feedback scores or testimonials.\n- Social media growth (followers, engagement rates).\n- Mailing list or community channel sign-ups.",
                             "minLength": 200,
                             "maxLength": 600
                         }
                         
                     },
-                    "required": ["license_information", "source_code_accessibility", "documentation_quality"],
-                    "x-order": ["license_information", "source_code_accessibility", "documentation_quality"]
+                    "required": ["target_market", "key_activities", "performance_metrics"],
+                    "x-order": ["target_market", "key_activities", "performance_metrics"]
                 }
             },
             "x-order": ["category_details", "category_questions"]

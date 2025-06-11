@@ -1,7 +1,7 @@
+import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_key_derivation/src/bip32_ed25519/bip32_ed25519_public_key.dart';
 import 'package:catalyst_key_derivation/src/rust/api/key_derivation.dart' as rust;
 import 'package:cbor/cbor.dart';
-import 'package:convert/convert.dart';
 
 /// A factory that builds instances of [Bip32Ed25519XPublicKey].
 ///
@@ -26,7 +26,7 @@ abstract class Bip32Ed25519XPublicKeyFactory {
 
   /// Constructs a [Bip32Ed25519XPublicKey] from a hex-encoded list of bytes.
   Bip32Ed25519XPublicKey fromHex(String string) {
-    return fromBytes(hex.decode(string));
+    return fromBytes(hexDecode(string));
   }
 
   /// Creates a [Bip32Ed25519XPublicKey] initialized
