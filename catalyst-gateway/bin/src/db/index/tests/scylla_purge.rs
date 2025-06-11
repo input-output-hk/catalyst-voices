@@ -674,7 +674,7 @@ async fn test_txo_ada() {
 
     // data
     let data = vec![
-        txo::insert_txo::Params::new(
+        txo::insert_txo::TxoInsertQuery::new(
             stake_address_1(),
             0.into(),
             0.into(),
@@ -683,7 +683,7 @@ async fn test_txo_ada() {
             0,
             TransactionId::new(&[0]),
         ),
-        txo::insert_txo::Params::new(
+        txo::insert_txo::TxoInsertQuery::new(
             stake_address_2(),
             1.into(),
             1.into(),

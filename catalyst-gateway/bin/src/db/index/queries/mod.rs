@@ -34,8 +34,15 @@ use sync_status::update::SyncStatusInsertQuery;
 use tracing::error;
 
 use super::block::{
-    certs::CertInsertQuery, cip36::Cip36InsertQuery, rbac509::Rbac509InsertQuery,
-    txi::TxiInsertQuery, txo::TxoInsertQuery,
+    certs::CertInsertQuery,
+    cip36::Cip36InsertQuery,
+    rbac509::Rbac509InsertQuery,
+    txi::TxiInsertQuery,
+    txo::{
+        insert_txo::TxoInsertQuery, insert_txo_asset::Params as TxoAssetInsert,
+        insert_unstaked_txo::Params as TxoUnstaked,
+        insert_unstaked_txo_asset::Params as TxoUnstakedAsset, TxoInsertQuery as TxoInsertQueries,
+    },
 };
 use crate::{
     db::index::{
@@ -215,15 +222,29 @@ impl PreparedQueries {
     ) -> anyhow::Result<Self> {
         // We initialize like this, so that all errors preparing querys get shown before aborting.
         let txi_insert_queries = TxiInsertQuery::prepare_batch(&session, cfg).await?;
-        let all_txo_queries = TxoInsertQuery::prepare_batch(&session, cfg).await;
+        let (
+            txo_insert_queries,
+            unstaked_txo_insert_queries,
+            txo_asset_insert_queries,
+            unstaked_txo_asset_insert_queries,
+        ) = TxoInsertQueries::prepare_batch(&session, cfg).await?;
         let stake_registration_insert_queries =
             CertInsertQuery::prepare_batch(&session, cfg).await?;
-        let all_cip36_queries = Cip36InsertQuery::prepare_batch(&session, cfg).await;
+        let (
+            cip36_registration_insert_queries,
+            cip36_registration_error_insert_queries,
+            cip36_registration_for_vote_key_insert_queries,
+        ) = Cip36InsertQuery::prepare_batch(&session, cfg).await?;
         let txo_spent_update_queries =
             UpdateTxoSpentQuery::prepare_batch(session.clone(), cfg).await?;
         let txo_by_stake_address_query = GetTxoByStakeAddressQuery::prepare(session.clone()).await;
         let txi_by_txn_hash_query = GetTxiByTxnHashesQuery::prepare(session.clone()).await;
-        let all_rbac_queries = Rbac509InsertQuery::prepare_batch(&session, cfg).await;
+        let (
+            rbac509_registration_insert_queries,
+            rbac509_invalid_registration_insert_queries,
+            catalyst_id_for_txn_id_insert_queries,
+            catalyst_id_for_stake_address_insert_queries,
+        ) = Rbac509InsertQuery::prepare_batch(&session, cfg).await?;
         let native_assets_by_stake_address_query =
             GetAssetsByStakeAddressQuery::prepare(session.clone()).await;
         let registration_from_stake_addr_query =
@@ -243,26 +264,6 @@ impl PreparedQueries {
             get_rbac_registrations::Query::prepare(session.clone()).await?;
         let rbac_invalid_registrations_by_catalyst_id_query =
             get_rbac_invalid_registrations::Query::prepare(session.clone()).await?;
-
-        let (
-            txo_insert_queries,
-            unstaked_txo_insert_queries,
-            txo_asset_insert_queries,
-            unstaked_txo_asset_insert_queries,
-        ) = all_txo_queries?;
-
-        let (
-            cip36_registration_insert_queries,
-            cip36_registration_error_insert_queries,
-            cip36_registration_for_vote_key_insert_queries,
-        ) = all_cip36_queries?;
-
-        let (
-            rbac509_registration_insert_queries,
-            rbac509_invalid_registration_insert_queries,
-            catalyst_id_for_txn_id_insert_queries,
-            catalyst_id_for_stake_address_insert_queries,
-        ) = all_rbac_queries?;
 
         Ok(Self {
             txo_insert_queries,
