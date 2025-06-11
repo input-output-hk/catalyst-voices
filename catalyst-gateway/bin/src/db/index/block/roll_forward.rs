@@ -146,7 +146,7 @@ async fn purge_rbac509_registration(
     // Filter
     let mut delete_params: Vec<Params> = Vec::new();
     while let Some(Ok(primary_key)) = primary_keys_stream.next().await {
-        if purge_condition.filter(primary_key.2.into()) {
+        if purge_condition.filter(primary_key.1.into()) {
             delete_params.push(primary_key.into());
         }
     }
