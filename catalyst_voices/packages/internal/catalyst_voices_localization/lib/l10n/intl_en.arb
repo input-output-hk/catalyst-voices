@@ -628,7 +628,7 @@
       }
     }
   },
-  "registrationInsufficientBalance": "Insufficient balance, please top up your wallet.",
+  "registrationInsufficientBalance": "Please ensure your Cardano wallet has at least 5 ADA before continuing.",
   "@registrationInsufficientBalance": {
     "description": "Indicates an error when preparing a transaction has failed due to low wallet balance."
   },
@@ -2521,7 +2521,7 @@
   "@goodToKnow": {
     "description": "Text to show when some tip will be presented to user"
   },
-  "registrationTransactionFeeDescription": "The creation of a Catalyst account costs, a transaction fee of (0,21 ADA), be sure your wallet has a minimum of 1 ADA.",
+  "registrationTransactionFeeDescription": "The creation of a Catalyst account costs, a transaction fee of (0,21 ADA), be sure your wallet has a minimum of 5 ADA.",
   "@registrationTransactionFeeDescription": {
     "description": "Description for the registration transaction fee"
   },
