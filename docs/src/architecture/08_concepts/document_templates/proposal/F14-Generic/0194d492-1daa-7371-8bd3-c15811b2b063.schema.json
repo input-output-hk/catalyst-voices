@@ -257,7 +257,7 @@
                             "$ref": "#/definitions/singleLineTextEntry",
                             "title": "Please provide your proposal title",
                             "description": "**Proposal title**\n\nPlease note we suggest you use no more than 60 characters for your proposal title so that it can be easily viewed in the voting app.",
-                            "minLength": 1,
+                            "minLength": 3,
                             "maxLength": 60,
                             "x-guidance": "This is the first detail about your proposal that voters see so it should clearly express what the proposal is about. A clear, unambiguous, and concise title is very important.",
                             "x-placeholder": "Summarize your proposal in 60 characters or less"
