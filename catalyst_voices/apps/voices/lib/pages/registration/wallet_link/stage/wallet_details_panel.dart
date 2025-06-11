@@ -31,7 +31,7 @@ class WalletDetailsPanel extends StatelessWidget {
           _BlocWalletSummary(),
         ],
       ),
-      footer: const _BlocNavigation(),
+      footer: const _Footer(),
     );
   }
 }
@@ -123,6 +123,51 @@ class _ChooseOtherWalletNavigation extends StatelessWidget {
       leading: VoicesAssets.icons.wallet.buildIcon(),
       onTap: () => RegistrationCubit.of(context).previousStep(),
       child: Text(context.l10n.chooseOtherWallet),
+    );
+  }
+}
+
+class _Footer extends StatelessWidget {
+  const _Footer();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          context.l10n.headsUp,
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
+        const SizedBox(height: 8),
+        const _HeadsUp(),
+        const SizedBox(height: 24),
+        const _BlocNavigation(),
+      ],
+    );
+  }
+}
+
+class _HeadsUp extends StatelessWidget {
+  const _HeadsUp();
+
+  @override
+  Widget build(BuildContext context) {
+    return ActionCard(
+      key: const Key('WalletBalanceHeadsUp'),
+      icon: VoicesAssets.icons.mailOpen.buildIcon(),
+      title: Text(
+        context.l10n.walletBalance,
+        key: const Key('WalletBalanceHeadsUpTitle'),
+      ),
+      desc: BulletList(
+        key: const Key('WalletBalanceHeadsUpList'),
+        items: [
+          context.l10n.walletLinkWalletDetailsHeadsUpText,
+        ],
+        spacing: 0,
+      ),
+      statusIcon: VoicesAssets.icons.informationCircle.buildIcon(),
     );
   }
 }
