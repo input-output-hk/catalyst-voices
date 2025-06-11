@@ -1,4 +1,5 @@
-//! RBAC 509 Registration Queries used in purging data.
+//! Catalyst ID For Stake Address (RBAC 509 registrations) queries used in purging data.
+
 use std::{fmt::Debug, sync::Arc};
 
 use scylla::{
@@ -16,38 +17,37 @@ use crate::{
             },
             session::CassandraSession,
         },
-        types::{DbCatalystId, DbSlot, DbTxnIndex},
+        types::{DbSlot, DbStakeAddress, DbTxnIndex},
     },
     settings::cassandra_db,
 };
 
 pub(crate) mod result {
-    //! Return values for RBAC 509 registration purge queries.
-
-    use crate::db::types::{DbCatalystId, DbSlot, DbTxnIndex};
+    //! Return values for Catalyst ID For Stake Address registration purge queries.
+    use crate::db::types::{DbSlot, DbStakeAddress, DbTxnIndex};
 
     /// Primary Key Row
-    pub(crate) type PrimaryKey = (DbCatalystId, DbSlot, DbTxnIndex);
+    pub(crate) type PrimaryKey = (DbStakeAddress, DbSlot, DbTxnIndex);
 }
 
-/// Select primary keys for RBAC 509 registration.
-const SELECT_QUERY: &str = include_str!("cql/get_rbac_registration.cql");
+/// Select primary keys for Catalyst ID For Stake Address registration.
+const SELECT_QUERY: &str = include_str!("cql/get_catalyst_id_for_stake_address.cql");
 
 /// Primary Key Value.
 #[derive(SerializeRow)]
 pub(crate) struct Params {
-    /// A short Catalyst ID.
-    pub catalyst_id: DbCatalystId,
-    /// A slot number.
-    pub slot_no: DbSlot,
+    /// A stake address.
+    pub(crate) stake_address: DbStakeAddress,
+    /// A lost number.
+    pub(crate) slot_no: DbSlot,
     /// A transaction index.
-    pub txn_index: DbTxnIndex,
+    pub(crate) txn_index: DbTxnIndex,
 }
 
 impl Debug for Params {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("Params")
-            .field("catalyst_id", &self.catalyst_id)
+            .field("stake_address", &self.stake_address.to_string())
             .field("slot_no", &self.slot_no)
             .field("txn_index", &self.txn_index)
             .finish()
@@ -57,17 +57,18 @@ impl Debug for Params {
 impl From<result::PrimaryKey> for Params {
     fn from(value: result::PrimaryKey) -> Self {
         Self {
-            catalyst_id: value.0,
+            stake_address: value.0,
             slot_no: value.1,
             txn_index: value.2,
         }
     }
 }
-/// Get primary key for RBAC 509 registration query.
+/// Get primary key for Catalyst ID For Stake Address registration query.
 pub(crate) struct PrimaryKeyQuery;
 
 impl PrimaryKeyQuery {
-    /// Prepares a query to get all RBAC 509 registration primary keys.
+    /// Prepares a query to get all Catalyst ID For Stake Address registration primary
+    /// keys.
     pub(crate) async fn prepare(session: &Arc<Session>) -> anyhow::Result<PreparedStatement> {
         PreparedQueries::prepare(
             session.clone(),
@@ -75,19 +76,20 @@ impl PrimaryKeyQuery {
             scylla::statement::Consistency::All,
             true,
         )
-        .await
-        .inspect_err(
-            |error| error!(error=%error, "Failed to prepare get RBAC 509 registration primary key query."),
-        )
-        .map_err(|error| anyhow::anyhow!("{error}\n--\n{SELECT_QUERY}"))
+            .await
+            .inspect_err(
+                |error| error!(error=%error, "Failed to prepare get Catalyst ID For Stake Address registration primary key query."),
+            )
+            .map_err(|error| anyhow::anyhow!("{error}\n--\n{SELECT_QUERY}"))
     }
 
-    /// Executes a query to get all RBAC 509 registration primary keys.
+    /// Executes a query to get all Catalyst ID For Stake Address registration primary
+    /// keys.
     pub(crate) async fn execute(
         session: &CassandraSession,
     ) -> anyhow::Result<TypedRowStream<result::PrimaryKey>> {
         let iter = session
-            .purge_execute_iter(PreparedSelectQuery::Rbac509)
+            .purge_execute_iter(PreparedSelectQuery::CatalystIdForStakeAddress)
             .await?
             .rows_stream::<result::PrimaryKey>()?;
 
@@ -95,10 +97,10 @@ impl PrimaryKeyQuery {
     }
 }
 
-/// Delete RBAC 509 registration
-const DELETE_QUERY: &str = include_str!("cql/delete_rbac_registration.cql");
+/// Delete Catalyst ID For Stake Address registration
+const DELETE_QUERY: &str = include_str!("cql/delete_catalyst_id_for_stake_address.cql");
 
-/// Delete RBAC 509 registration Query
+/// Delete Catalyst ID For Stake Address registration Query
 pub(crate) struct DeleteQuery;
 
 impl DeleteQuery {
@@ -114,11 +116,11 @@ impl DeleteQuery {
             true,
             false,
         )
-        .await
-        .inspect_err(
-            |error| error!(error=%error, "Failed to prepare delete RBAC 509 registration primary key query."),
-        )
-        .map_err(|error| anyhow::anyhow!("{error}\n--\n{DELETE_QUERY}"))
+            .await
+            .inspect_err(
+                |error| error!(error=%error, "Failed to prepare delete Catalyst ID For Stake Address registration primary key query."),
+            )
+            .map_err(|error| anyhow::anyhow!("{error}\n--\n{DELETE_QUERY}"))
     }
 
     /// Executes a DELETE Query
@@ -126,7 +128,7 @@ impl DeleteQuery {
         session: &CassandraSession, params: Vec<Params>,
     ) -> FallibleQueryResults {
         let results = session
-            .purge_execute_batch(PreparedDeleteQuery::Rbac509, params)
+            .purge_execute_batch(PreparedDeleteQuery::CatalystIdForStakeAddress, params)
             .await?;
 
         Ok(results)

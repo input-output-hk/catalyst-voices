@@ -1,5 +1,8 @@
 //! Queries for purging volatile data.
 
+pub(crate) mod catalyst_id_for_public_key;
+pub(crate) mod catalyst_id_for_stake_address;
+pub(crate) mod catalyst_id_for_txn_id;
 pub(crate) mod cip36_registration;
 pub(crate) mod cip36_registration_for_vote_key;
 pub(crate) mod cip36_registration_invalid;
@@ -50,6 +53,12 @@ pub(crate) enum PreparedDeleteQuery {
     Rbac509,
     /// Invalid RBAC 509 Registration Delete query.
     Rbac509Invalid,
+    /// Catalyst ID for transaction ID delete query.
+    CatalystIdForTxnId,
+    /// Catalyst ID for stake address delete query.
+    CatalystIdForStakeAddress,
+    /// Catalyst ID for public key delete query.
+    CatalystIdForPublicKey,
 }
 
 /// All prepared SELECT query statements (primary keys from table).
@@ -77,6 +86,12 @@ pub(crate) enum PreparedSelectQuery {
     Rbac509,
     /// Invalid RBAC 509 Registration Select query.
     Rbac509Invalid,
+    /// Catalyst ID for transaction ID select query.
+    CatalystIdForTxnId,
+    /// Catalyst ID for stake address select query.
+    CatalystIdForStakeAddress,
+    /// Catalyst ID for public key select query.
+    CatalystIdForPublicKey,
 }
 
 /// All prepared purge queries for a session.
@@ -125,6 +140,18 @@ pub(crate) struct PreparedQueries {
     select_rbac509_invalid_registration: PreparedStatement,
     /// RBAC 509 invalid registrations Delete Query.
     delete_rbac509_invalid_registration: SizedBatch,
+    /// A Catalyst ID for transaction ID primary key query.
+    select_catalyst_id_for_txn_id: PreparedStatement,
+    /// A Catalyst ID for transaction ID delete query.
+    delete_catalyst_id_for_txn_id: SizedBatch,
+    /// A Catalyst ID for stake address primary key query.
+    select_catalyst_id_for_stake_address: PreparedStatement,
+    /// A Catalyst ID for stake address delete query.
+    delete_catalyst_id_for_stake_address: SizedBatch,
+    /// A Catalyst ID for public key primary key query.
+    select_catalyst_id_for_public_key: PreparedStatement,
+    /// A Catalyst ID for public key delete query.
+    delete_catalyst_id_for_public_key: SizedBatch,
 }
 
 impl PreparedQueries {
@@ -179,6 +206,22 @@ impl PreparedQueries {
                 rbac509_invalid_registration::PrimaryKeyQuery::prepare(&session).await?,
             delete_rbac509_invalid_registration:
                 rbac509_invalid_registration::DeleteQuery::prepare_batch(&session, cfg).await?,
+            select_catalyst_id_for_txn_id: catalyst_id_for_txn_id::PrimaryKeyQuery::prepare(
+                &session,
+            )
+            .await?,
+            delete_catalyst_id_for_txn_id: catalyst_id_for_txn_id::DeleteQuery::prepare_batch(
+                &session, cfg,
+            )
+            .await?,
+            select_catalyst_id_for_stake_address:
+                catalyst_id_for_stake_address::PrimaryKeyQuery::prepare(&session).await?,
+            delete_catalyst_id_for_stake_address:
+                catalyst_id_for_stake_address::DeleteQuery::prepare_batch(&session, cfg).await?,
+            select_catalyst_id_for_public_key:
+                catalyst_id_for_public_key::PrimaryKeyQuery::prepare(&session).await?,
+            delete_catalyst_id_for_public_key:
+                catalyst_id_for_public_key::DeleteQuery::prepare_batch(&session, cfg).await?,
         })
     }
 
@@ -224,6 +267,11 @@ impl PreparedQueries {
             },
             PreparedSelectQuery::Rbac509 => &self.select_rbac509_registration,
             PreparedSelectQuery::Rbac509Invalid => &self.select_rbac509_invalid_registration,
+            PreparedSelectQuery::CatalystIdForTxnId => &self.select_catalyst_id_for_txn_id,
+            PreparedSelectQuery::CatalystIdForStakeAddress => {
+                &self.select_catalyst_id_for_stake_address
+            },
+            PreparedSelectQuery::CatalystIdForPublicKey => &self.select_catalyst_id_for_public_key,
         };
 
         super::session_execute_iter(session, prepared_stmt, NO_PARAMS).await
@@ -250,6 +298,11 @@ impl PreparedQueries {
             },
             PreparedDeleteQuery::Rbac509 => &self.delete_rbac509_registration,
             PreparedDeleteQuery::Rbac509Invalid => &self.delete_rbac509_invalid_registration,
+            PreparedDeleteQuery::CatalystIdForTxnId => &self.delete_catalyst_id_for_txn_id,
+            PreparedDeleteQuery::CatalystIdForStakeAddress => {
+                &self.delete_catalyst_id_for_stake_address
+            },
+            PreparedDeleteQuery::CatalystIdForPublicKey => &self.delete_catalyst_id_for_public_key,
         };
 
         super::session_execute_batch(session, query_map, cfg, query, values).await

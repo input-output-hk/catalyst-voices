@@ -39,7 +39,11 @@ use super::block::{
 };
 use crate::{
     db::index::{
-        queries::rbac::{get_rbac_invalid_registrations, get_rbac_registrations},
+        queries::rbac::{
+            get_catalyst_id_from_public_key, get_catalyst_id_from_stake_address,
+            get_catalyst_id_from_transaction_id, get_rbac_invalid_registrations,
+            get_rbac_registrations,
+        },
         session::CassandraSessionError,
     },
     service::utilities::health::set_index_db_liveness,
@@ -50,6 +54,7 @@ use crate::{
 pub(crate) type SizedBatch = SkipMap<u16, Arc<Batch>>;
 
 /// All Prepared insert Queries that we know about.
+#[allow(dead_code)]
 #[derive(strum_macros::Display)]
 #[allow(clippy::enum_variant_names)]
 pub(crate) enum PreparedQuery {
@@ -77,9 +82,16 @@ pub(crate) enum PreparedQuery {
     Rbac509InsertQuery,
     /// An invalid RBAC 509 registration Insert query.
     Rbac509InvalidInsertQuery,
+    /// A Catalyst ID for transaction ID insert query.
+    CatalystIdForTxnIdInsertQuery,
+    /// A Catalyst ID for stake address insert query.
+    CatalystIdForStakeAddressInsertQuery,
+    /// A Catalyst ID for public key insert query.
+    CatalystIdForPublicKeyInsertQuery,
 }
 
 /// All prepared SELECT query statements (return data).
+#[allow(dead_code)]
 pub(crate) enum PreparedSelectQuery {
     /// Get TXO by stake address query.
     TxoByStakeAddress,
@@ -99,6 +111,12 @@ pub(crate) enum PreparedSelectQuery {
     RbacRegistrationsByCatalystId,
     /// Get invalid RBAC registrations by Catalyst ID.
     RbacInvalidRegistrationsByCatalystId,
+    /// Get Catalyst ID by transaction ID.
+    CatalystIdByTransactionId,
+    /// Get Catalyst ID by stake address.
+    CatalystIdByStakeAddress,
+    /// Get Catalyst ID by public key.
+    CatalystIdByPublicKey,
     /// Get all registrations for snapshot
     GetAllRegistrations,
     /// Get all invalid registrations for snapshot
@@ -142,6 +160,12 @@ pub(crate) struct PreparedQueries {
     rbac509_registration_insert_queries: SizedBatch,
     /// Invalid RBAC 509 registrations.
     rbac509_invalid_registration_insert_queries: SizedBatch,
+    /// Catalyst ID for transaction ID insert query.
+    catalyst_id_for_txn_id_insert_queries: SizedBatch,
+    /// Catalyst ID for stake address insert query.
+    catalyst_id_for_stake_address_insert_queries: SizedBatch,
+    /// Catalyst ID for public key insert query.
+    catalyst_id_for_public_key_insert_queries: SizedBatch,
     /// Get native assets by stake address query.
     native_assets_by_stake_address_query: PreparedStatement,
     /// Get registrations
@@ -158,6 +182,12 @@ pub(crate) struct PreparedQueries {
     rbac_registrations_by_catalyst_id_query: PreparedStatement,
     /// Get invalid RBAC registrations by Catalyst ID.
     rbac_invalid_registrations_by_catalyst_id_query: PreparedStatement,
+    /// Get Catalyst ID by stake address.
+    catalyst_id_by_stake_address_query: PreparedStatement,
+    /// Get Catalyst ID by transaction ID.
+    catalyst_id_by_transaction_id_query: PreparedStatement,
+    /// Get Catalyst ID by public key.
+    catalyst_id_by_public_key_query: PreparedStatement,
     /// Get all registrations for snapshot
     get_all_registrations_query: PreparedStatement,
     /// Get all invalid registrations for snapshot
@@ -201,6 +231,12 @@ impl PreparedQueries {
             get_rbac_registrations::Query::prepare(session.clone()).await?;
         let rbac_invalid_registrations_by_catalyst_id_query =
             get_rbac_invalid_registrations::Query::prepare(session.clone()).await?;
+        let catalyst_id_by_stake_address_query =
+            get_catalyst_id_from_stake_address::Query::prepare(session.clone()).await?;
+        let catalyst_id_by_transaction_id_query =
+            get_catalyst_id_from_transaction_id::Query::prepare(session.clone()).await?;
+        let catalyst_id_by_public_key_query =
+            get_catalyst_id_from_public_key::Query::prepare(session.clone()).await?;
 
         let (
             txo_insert_queries,
@@ -215,8 +251,13 @@ impl PreparedQueries {
             cip36_registration_for_vote_key_insert_queries,
         ) = all_cip36_queries?;
 
-        let (rbac509_registration_insert_queries, rbac509_invalid_registration_insert_queries) =
-            all_rbac_queries?;
+        let (
+            rbac509_registration_insert_queries,
+            rbac509_invalid_registration_insert_queries,
+            catalyst_id_for_txn_id_insert_queries,
+            catalyst_id_for_stake_address_insert_queries,
+            catalyst_id_for_public_key_insert_queries,
+        ) = all_rbac_queries?;
 
         Ok(Self {
             txo_insert_queries,
@@ -233,6 +274,9 @@ impl PreparedQueries {
             txi_by_txn_hash_query: txi_by_txn_hash_query?,
             rbac509_registration_insert_queries,
             rbac509_invalid_registration_insert_queries,
+            catalyst_id_for_txn_id_insert_queries,
+            catalyst_id_for_stake_address_insert_queries,
+            catalyst_id_for_public_key_insert_queries,
             native_assets_by_stake_address_query: native_assets_by_stake_address_query?,
             registration_from_stake_addr_query: registration_from_stake_addr_query?,
             stake_addr_from_stake_address_query: stake_addr_from_stake_address?,
@@ -241,6 +285,9 @@ impl PreparedQueries {
             sync_status_insert,
             rbac_registrations_by_catalyst_id_query,
             rbac_invalid_registrations_by_catalyst_id_query,
+            catalyst_id_by_stake_address_query,
+            catalyst_id_by_transaction_id_query,
+            catalyst_id_by_public_key_query,
             get_all_registrations_query: get_all_registrations_query?,
             get_all_invalid_registrations_query: get_all_invalid_registrations_query?,
         })
@@ -345,6 +392,13 @@ impl PreparedQueries {
             PreparedSelectQuery::RbacInvalidRegistrationsByCatalystId => {
                 &self.rbac_invalid_registrations_by_catalyst_id_query
             },
+            PreparedSelectQuery::CatalystIdByTransactionId => {
+                &self.catalyst_id_by_transaction_id_query
+            },
+            PreparedSelectQuery::CatalystIdByStakeAddress => {
+                &self.catalyst_id_by_stake_address_query
+            },
+            PreparedSelectQuery::CatalystIdByPublicKey => &self.catalyst_id_by_public_key_query,
             PreparedSelectQuery::GetAllRegistrations => &self.get_all_registrations_query,
             PreparedSelectQuery::GetAllInvalidRegistrations => {
                 &self.get_all_invalid_registrations_query
@@ -382,6 +436,15 @@ impl PreparedQueries {
             PreparedQuery::Rbac509InsertQuery => &self.rbac509_registration_insert_queries,
             PreparedQuery::Rbac509InvalidInsertQuery => {
                 &self.rbac509_invalid_registration_insert_queries
+            },
+            PreparedQuery::CatalystIdForTxnIdInsertQuery => {
+                &self.catalyst_id_for_txn_id_insert_queries
+            },
+            PreparedQuery::CatalystIdForStakeAddressInsertQuery => {
+                &self.catalyst_id_for_stake_address_insert_queries
+            },
+            PreparedQuery::CatalystIdForPublicKeyInsertQuery => {
+                &self.catalyst_id_for_public_key_insert_queries
             },
         };
         session_execute_batch(session, query_map, cfg, query, values).await

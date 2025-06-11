@@ -1,5 +1,8 @@
 //! Index Role-Based Access Control (RBAC) Registration.
 
+pub(crate) mod insert_catalyst_id_for_public_key;
+pub(crate) mod insert_catalyst_id_for_stake_address;
+pub(crate) mod insert_catalyst_id_for_txn_id;
 pub(crate) mod insert_rbac509;
 pub(crate) mod insert_rbac509_invalid;
 
@@ -20,12 +23,19 @@ use crate::{
 };
 
 /// Index RBAC 509 Registration Query Parameters
+#[allow(dead_code)]
 #[derive(Debug)]
 pub(crate) struct Rbac509InsertQuery {
     /// RBAC Registration Data captured during indexing.
     pub(crate) registrations: Vec<insert_rbac509::Params>,
     /// An invalid RBAC registration data.
     pub(crate) invalid: Vec<insert_rbac509_invalid::Params>,
+    /// A Catalyst ID for transaction ID Data captured during indexing.
+    catalyst_id_for_txn_id: Vec<insert_catalyst_id_for_txn_id::Params>,
+    /// A Catalyst ID for stake address data captured during indexing.
+    catalyst_id_for_stake_address: Vec<insert_catalyst_id_for_stake_address::Params>,
+    /// A Catalyst ID for public key data captured during indexing.
+    catalyst_id_for_public_key: Vec<insert_catalyst_id_for_public_key::Params>,
 }
 
 impl Rbac509InsertQuery {
@@ -34,16 +44,22 @@ impl Rbac509InsertQuery {
         Rbac509InsertQuery {
             registrations: Vec::new(),
             invalid: Vec::new(),
+            catalyst_id_for_txn_id: Vec::new(),
+            catalyst_id_for_stake_address: Vec::new(),
+            catalyst_id_for_public_key: Vec::new(),
         }
     }
 
     /// Prepare Batch of Insert RBAC 509 Registration Data Queries
     pub(crate) async fn prepare_batch(
         session: &Arc<Session>, cfg: &EnvVars,
-    ) -> anyhow::Result<(SizedBatch, SizedBatch)> {
+    ) -> anyhow::Result<(SizedBatch, SizedBatch, SizedBatch, SizedBatch, SizedBatch)> {
         Ok((
             insert_rbac509::Params::prepare_batch(session, cfg).await?,
             insert_rbac509_invalid::Params::prepare_batch(session, cfg).await?,
+            insert_catalyst_id_for_txn_id::Params::prepare_batch(session, cfg).await?,
+            insert_catalyst_id_for_stake_address::Params::prepare_batch(session, cfg).await?,
+            insert_catalyst_id_for_public_key::Params::prepare_batch(session, cfg).await?,
         ))
     }
 
@@ -94,6 +110,8 @@ impl Rbac509InsertQuery {
                     slot,
                     index,
                     previous_transaction,
+                    // TODO: FIXME: This should be fixed along with updating indexing logic.
+                    std::collections::HashSet::new(),
                 ));
             },
             Err(RbacCacheAddError::InvalidRegistration {
