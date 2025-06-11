@@ -47,6 +47,7 @@ async fn test_get_assets_by_stake_addr() {
     }
 }
 
+#[ignore = "An integration test which requires a running Scylla node instance, disabled from `testunit` CI run"]
 #[tokio::test]
 async fn get_catalyst_id_by_stake_address() {
     use rbac::get_catalyst_id_from_stake_address::{Query, QueryParams};
