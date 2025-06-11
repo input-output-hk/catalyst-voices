@@ -203,12 +203,12 @@ class _PopupMenuButtonState extends State<_PopupMenuButton> {
       return;
     }
 
-    if (!bloc.validate(ProposalBuilderValidationOrigin.submitForReview)) {
+    if (!await bloc.isAccountEmailVerified()) {
+      bloc.emitSignal(const EmailNotVerifiedProposalBuilderSignal());
       return;
     }
 
-    if (!await bloc.isAccountEmailVerified()) {
-      bloc.emitSignal(const EmailNotVerifiedProposalBuilderSignal());
+    if (!bloc.validate(ProposalBuilderValidationOrigin.submitForReview)) {
       return;
     }
 
