@@ -25,6 +25,10 @@ use crate::{
     settings::Settings,
 };
 
+/// A query string.
+const QUERY: &str = include_str!("../cql/get_catalyst_id_for_public_key.cql");
+
+/// A persistent cache instance.
 static PERSISTENT_CACHE: LazyLock<Cache<VerifyingKey, QueryResult>> = LazyLock::new(|| {
     Cache::builder()
         .eviction_policy(EvictionPolicy::lru())
@@ -32,15 +36,13 @@ static PERSISTENT_CACHE: LazyLock<Cache<VerifyingKey, QueryResult>> = LazyLock::
         .build()
 });
 
+/// A volatile cache instance.
 static VOLATILE_CACHE: LazyLock<Cache<VerifyingKey, QueryResult>> = LazyLock::new(|| {
     Cache::builder()
         .eviction_policy(EvictionPolicy::lru())
         .max_capacity(Settings::rbac_cfg().volatile_pub_keys_cache_size)
         .build()
 });
-
-/// A query string.
-const QUERY: &str = include_str!("../cql/get_catalyst_id_for_public_key.cql");
 
 /// A result of query execution.
 #[allow(dead_code)]
@@ -63,9 +65,9 @@ struct QueryParams {
 #[derive(Debug, Clone, DeserializeRow)]
 pub(crate) struct Query {
     /// A Catalyst ID.
-    pub catalyst_id: DbCatalystId,
+    catalyst_id: DbCatalystId,
     /// A slot number.
-    pub slot_no: DbSlot,
+    slot_no: DbSlot,
 }
 
 impl Query {
@@ -82,11 +84,7 @@ impl Query {
     pub(crate) async fn get(
         session: &CassandraSession, public_key: VerifyingKey,
     ) -> Result<Option<QueryResult>> {
-        let cache = if session.is_persistent() {
-            &PERSISTENT_CACHE
-        } else {
-            &VOLATILE_CACHE
-        };
+        let cache = cache(session.is_persistent());
 
         if let Some(res) = cache.get(&public_key) {
             return Ok(Some(res));
@@ -117,5 +115,33 @@ impl From<Query> for QueryResult {
             catalyst_id: v.catalyst_id.into(),
             slot_no: v.slot_no.into(),
         }
+    }
+}
+
+/// Adds the given value to the cache.
+#[allow(dead_code)]
+pub fn cache_public_key(
+    is_persistent: bool, public_key: VerifyingKey, catalyst_id: CatalystId, slot_no: Slot,
+) {
+    let cache = cache(is_persistent);
+    cache.insert(public_key, QueryResult {
+        catalyst_id,
+        slot_no,
+    });
+}
+
+/// Removes all cached values.
+#[allow(dead_code)]
+pub fn invalidate_cache(is_persistent: bool) {
+    let cache = cache(is_persistent);
+    cache.invalidate_all();
+}
+
+/// Returns a persistent or a volatile cache instance depending on the parameter value.
+fn cache(is_persistent: bool) -> &'static Cache<VerifyingKey, QueryResult> {
+    if is_persistent {
+        &PERSISTENT_CACHE
+    } else {
+        &VOLATILE_CACHE
     }
 }

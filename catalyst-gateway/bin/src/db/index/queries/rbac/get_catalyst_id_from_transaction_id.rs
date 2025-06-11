@@ -24,6 +24,10 @@ use crate::{
     settings::Settings,
 };
 
+/// A query string.
+const QUERY: &str = include_str!("../cql/get_catalyst_id_for_transaction_id.cql");
+
+/// A persistent cache instance.
 static PERSISTENT_CACHE: LazyLock<Cache<TransactionId, QueryResult>> = LazyLock::new(|| {
     Cache::builder()
         .eviction_policy(EvictionPolicy::lru())
@@ -31,15 +35,13 @@ static PERSISTENT_CACHE: LazyLock<Cache<TransactionId, QueryResult>> = LazyLock:
         .build()
 });
 
+/// A volatile cache instance.
 static VOLATILE_CACHE: LazyLock<Cache<TransactionId, QueryResult>> = LazyLock::new(|| {
     Cache::builder()
         .eviction_policy(EvictionPolicy::lru())
         .max_capacity(Settings::rbac_cfg().volatile_pub_keys_cache_size)
         .build()
 });
-
-/// A query string.
-const QUERY: &str = include_str!("../cql/get_catalyst_id_for_transaction_id.cql");
 
 /// A result of query execution.
 #[allow(dead_code)]
@@ -81,11 +83,7 @@ impl Query {
     pub(crate) async fn get(
         session: &CassandraSession, txn_id: TransactionId,
     ) -> Result<Option<QueryResult>> {
-        let cache = if session.is_persistent() {
-            &PERSISTENT_CACHE
-        } else {
-            &VOLATILE_CACHE
-        };
+        let cache = cache(session.is_persistent());
 
         if let Some(res) = cache.get(&txn_id) {
             return Ok(Some(res));
@@ -119,5 +117,33 @@ impl From<Query> for QueryResult {
             catalyst_id: v.catalyst_id.into(),
             slot_no: v.slot_no.into(),
         }
+    }
+}
+
+/// Adds the given value to the cache.
+#[allow(dead_code)]
+pub fn cache_transaction(
+    is_persistent: bool, txn_id: TransactionId, catalyst_id: CatalystId, slot_no: Slot,
+) {
+    let cache = cache(is_persistent);
+    cache.insert(txn_id, QueryResult {
+        catalyst_id,
+        slot_no,
+    });
+}
+
+/// Removes all cached values.
+#[allow(dead_code)]
+pub fn invalidate_cache(is_persistent: bool) {
+    let cache = cache(is_persistent);
+    cache.invalidate_all();
+}
+
+/// Returns a persistent or a volatile cache instance depending on the parameter value.
+fn cache(is_persistent: bool) -> &'static Cache<TransactionId, QueryResult> {
+    if is_persistent {
+        &PERSISTENT_CACHE
+    } else {
+        &VOLATILE_CACHE
     }
 }
