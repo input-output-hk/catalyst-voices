@@ -41,7 +41,8 @@ final class InsufficientAdaForAssetsException extends Equatable implements Excep
   String toString() => 'InsufficientAdaForAssetsException';
 }
 
-/// Exception thrown when the transaction outputs exceed the inputs.
+/// Exception thrown when the leftover ada is not enough to cover
+/// an extra change output and burning Ada as a fee is disabled.
 final class InsufficientAdaForChangeOutputException extends Equatable implements Exception {
   /// The amount of [Coin] that user has.
   final Coin actualAmount;

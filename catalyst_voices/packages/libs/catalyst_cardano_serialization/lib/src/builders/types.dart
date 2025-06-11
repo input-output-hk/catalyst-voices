@@ -32,7 +32,7 @@ enum ChangeOutputAdaStrategy {
 
   /// Attempt to create change outputs first but if that fails due to various reasons
   /// (i.e. Ada not enough to satisfy the minimum Ada requirement for the UTXO)
-  /// then do not burn the remaining Ada as fee and throw [InsufficientUtxoBalanceException].
+  /// then do not burn the remaining Ada as fee and throw [InsufficientAdaForChangeOutputException].
   noBurn,
 }
 

@@ -265,7 +265,6 @@ final class TransactionBuilder extends Equatable {
   /// minimum and maximum number of inputs to be considered during selection.
   ///
   /// Parameters:
-  /// - [strategy]: The coin selection strategy to use.
   /// - [minInputs]: The minimum number of inputs to include.
   /// - [maxInputs]: The maximum number of inputs to include.
   /// - [changeOutputStrategy]: Defines a strategy applied to
@@ -276,13 +275,12 @@ final class TransactionBuilder extends Equatable {
   ///   the total (witnesses included) transaction fee.
   ///
   SelectionResult selectInputs({
-    CoinSelectionStrategy strategy = const GreedySelectionStrategy(),
     int minInputs = CoinSelector.minInputs,
     int maxInputs = CoinSelector.maxInputs,
     ChangeOutputAdaStrategy changeOutputStrategy = ChangeOutputAdaStrategy.burn,
   }) {
     final selector = InputBuilder(
-      selectionStrategy: strategy,
+      selectionStrategy: config.selectionStrategy,
       changeOutputStrategy: changeOutputStrategy,
     );
 
