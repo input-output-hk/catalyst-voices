@@ -577,6 +577,10 @@
   "@walletLinkWalletDetailsNoticeTopUpLink": {
     "description": "A link to top-up provide when the user doesn't have enough balance on wallet link screen"
   },
+  "walletLinkWalletDetailsHeadsUpText": "We only read your balance to calculate voting power — we can't access or use your wallet.",
+  "@walletLinkWalletDetailsHeadsUpText": {
+    "description": "A heads up content explaining that the app only reads wallet balance and cannot spend it."
+  },
   "walletLinkTransactionTitle": "Let's make sure everything looks right.",
   "@walletLinkTransactionTitle": {
     "description": "A title in link wallet flow on transaction screen."
@@ -1383,6 +1387,15 @@
         "type": "int"
       },
       "max": {
+        "type": "int"
+      }
+    }
+  },
+  "errorValidationStringLengthOutOfExactRange": "The text should be {count} {count, plural, =0{characters} =1{character} other{characters}}.",
+  "@errorValidationStringLengthOutOfExactRange": {
+    "description": "Validation error when the user entered text is not matching the exact required length.",
+    "placeholders": {
+      "count": {
         "type": "int"
       }
     }

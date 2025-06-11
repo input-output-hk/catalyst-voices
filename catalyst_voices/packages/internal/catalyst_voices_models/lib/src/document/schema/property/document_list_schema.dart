@@ -119,6 +119,19 @@ sealed class DocumentListSchema extends DocumentPropertySchema {
     }
   }
 
+  @override
+  DocumentPropertySchema? getPropertySchema(DocumentNodeId nodeId) {
+    if (nodeId == this.nodeId) {
+      return this;
+    }
+
+    if (!nodeId.isChildOf(this.nodeId)) {
+      return null;
+    }
+
+    return itemsSchema.getPropertySchema(nodeId);
+  }
+
   /// Validates the property against document rules.
   DocumentValidationResult validate(List<DocumentProperty> properties) {
     final values = properties.map((e) => e.value).toList();
