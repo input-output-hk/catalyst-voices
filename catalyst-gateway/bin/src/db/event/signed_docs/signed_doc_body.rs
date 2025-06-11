@@ -47,7 +47,7 @@ impl SignedDocBody {
     }
 
     /// Returns the document type.
-    pub(crate) fn doc_type(&self) -> &Vec<uuid::Uuid> {
+    pub(crate) fn doc_type(&self) -> &[uuid::Uuid] {
         &self.doc_type
     }
 

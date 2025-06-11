@@ -66,8 +66,14 @@ impl Example for DocumentType {
     }
 }
 
+impl FromIterator<uuid::Uuid> for DocumentType {
+    fn from_iter<I: IntoIterator<Item = uuid::Uuid>>(iter: I) -> Self {
+        Self(iter.into_iter().map(UUIDv4::from).collect())
+    }
+}
+
 impl From<Vec<uuid::Uuid>> for DocumentType {
-    fn from(value: Vec<uuid::Uuid>) -> Self {
-        Self(value.into_iter().map(UUIDv4::from).collect())
+    fn from(vec: Vec<uuid::Uuid>) -> Self {
+        vec.into_iter().collect()
     }
 }
