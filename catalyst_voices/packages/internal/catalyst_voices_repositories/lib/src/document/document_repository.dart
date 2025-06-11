@@ -320,8 +320,13 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     required Uint8List data,
     required CatalystId authorId,
   }) async {
-    final jsonData = json.fuse(utf8).decode(data)! as Map<String, dynamic>;
-    final document = DocumentDataDto.fromJson(jsonData).toModel();
+    late final DocumentData document;
+    try {
+      final jsonData = json.fuse(utf8).decode(data)! as Map<String, dynamic>;
+      document = DocumentDataDto.fromJson(jsonData).toModel();
+    } catch (e) {
+      throw DocumentImportInvalidDataException(e);
+    }
 
     final newMetadata = document.metadata.copyWith(
       selfRef: DraftRef.generateFirstRef(),

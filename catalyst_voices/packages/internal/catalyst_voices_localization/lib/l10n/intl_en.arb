@@ -2992,5 +2992,9 @@
   "reviewTimelineHeader": "Community review:",
   "@reviewTimelineHeader": {
     "description": "Header for the review timeline"
+  },
+  "documentImportInvalidDataError": "The imported document does not have valid format or is corrupted.",
+  "@documentImportInvalidDataError": {
+    "description": "Error message when user tries to import a document that is not valid and cannot be parsed"
   }
 }
