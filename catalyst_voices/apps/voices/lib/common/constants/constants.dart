@@ -1,6 +1,4 @@
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
-import 'package:catalyst_voices/dependency/dependencies.dart';
-import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 
 abstract class VoicesConstants {
   static const _docs = 'https://docs.projectcatalyst.io';
@@ -39,10 +37,6 @@ abstract class VoicesConstants {
   static const unlockAccountUrl = '$_catalystApp/my-account#lock-unlock-account';
   static const confirmSeedPhraseUrl = '$_catalystApp/getting-started#confirm-seed-phrase';
   static const campaignTimeline = '$_docs/current-fund/fund-basics/fund-timeline';
-
-  static String becomeReviewerUrl() {
-    return '${Dependencies.instance.get<AppEnvironment>().type.reviews}/register';
-  }
 
   static String cardanoScanStakeAddressUrl(ShelleyAddress stakeAddress) {
     switch (stakeAddress.network) {

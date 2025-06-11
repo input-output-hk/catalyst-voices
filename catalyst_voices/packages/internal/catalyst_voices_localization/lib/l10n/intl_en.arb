@@ -577,6 +577,10 @@
   "@walletLinkWalletDetailsNoticeTopUpLink": {
     "description": "A link to top-up provide when the user doesn't have enough balance on wallet link screen"
   },
+  "walletLinkWalletDetailsHeadsUpText": "We only read your balance to calculate voting power — we can't access or use your wallet.",
+  "@walletLinkWalletDetailsHeadsUpText": {
+    "description": "A heads up content explaining that the app only reads wallet balance and cannot spend it."
+  },
   "walletLinkTransactionTitle": "Let's make sure everything looks right.",
   "@walletLinkTransactionTitle": {
     "description": "A title in link wallet flow on transaction screen."
@@ -1383,6 +1387,15 @@
         "type": "int"
       },
       "max": {
+        "type": "int"
+      }
+    }
+  },
+  "errorValidationStringLengthOutOfExactRange": "The text should be {count} {count, plural, =0{characters} =1{character} other{characters}}.",
+  "@errorValidationStringLengthOutOfExactRange": {
+    "description": "Validation error when the user entered text is not matching the exact required length.",
+    "placeholders": {
+      "count": {
         "type": "int"
       }
     }
@@ -2528,7 +2541,7 @@
   "@dontShowAgain": {
     "description": "Action to not show again"
   },
-  "proposalSubmissionWindowClosesAt": "The proposal submission window closes {date}",
+  "proposalSubmissionWindowClosesAt": "The proposal submission window closes on {date}",
   "@proposalSubmissionWindowClosesAt": {
     "description": "Description for the proposal submission window closes at",
     "placeholders": {
@@ -2537,11 +2550,11 @@
       }
     }
   },
-  "submitProposalBeforeClosing": "Submit your final proposals to Review stage well before the App closes.",
-  "@submitProposalBeforeClosing": {
-    "description": "Information for user to submit proposal before the submission window closes"
+  "moveFinalProposalsToReviewStage": "Move your Final proposals into the Review stage.",
+  "@moveFinalProposalsToReviewStage": {
+    "description": "Information for user to to move their final proposals to review stage before submission window closes"
   },
-  "checkMaxProposal": "Check your finals (max {count}) in My proposals.",
+  "checkMaxProposal": "Submit no more than {count} {count, plural, =1{proposal} other{proposals}} as Final.",
   "@checkMaxProposal": {
     "description": "Information for user to check their final proposals before submission window closes",
     "placeholders": {
@@ -2549,10 +2562,6 @@
         "type": "int"
       }
     }
-  },
-  "catalystAppNotAvailableAfterSubmissionCloses": "The Catalyst App won’t be available after submission close.",
-  "@catalystAppNotAvailableAfterSubmissionCloses": {
-    "description": "Information that app won't be available after submission closes"
   },
   "wantToBackUpProposals": "Want to back up your proposals?",
   "@wantToBackUpProposals": {
@@ -2992,5 +3001,13 @@
   "reviewTimelineHeader": "Community review:",
   "@reviewTimelineHeader": {
     "description": "Header for the review timeline"
+  },
+  "stepsToDoBeforeAppCloses": "Before the Catalyst app closes, make sure to:",
+  "@stepsToDoBeforeAppCloses": {
+    "description": "Title for the steps to do before the app closes"
+  },
+  "importCatalystAppUnavailableAfterDeadline": "IMPORTANT: The Catalyst app won’t be accessible after the deadline.",
+  "@importCatalystAppUnavailableAfterDeadline": {
+    "description": "note for user that app will not be available after submission deadline"
   }
 }
