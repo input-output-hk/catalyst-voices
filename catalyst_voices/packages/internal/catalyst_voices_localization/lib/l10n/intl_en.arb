@@ -628,7 +628,7 @@
       }
     }
   },
-  "registrationInsufficientBalance": "Please ensure your Cardano wallet has at least 5 ADA before continuing.",
+  "registrationInsufficientBalance": "Wallet Balance Too Low. Please ensure your Cardano wallet has at least 5 ADA before continuing.",
   "@registrationInsufficientBalance": {
     "description": "Indicates an error when preparing a transaction has failed due to low wallet balance."
   },
