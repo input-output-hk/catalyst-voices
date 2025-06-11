@@ -95,7 +95,7 @@ final class InputBuilder implements CoinSelector {
       maxInputs: maxInputs,
       canBurnChangeAsFee: false,
     );
-    
+
     if (resultWithoutBurning != null) {
       return resultWithoutBurning;
     }
