@@ -21,144 +21,6 @@ use crate::db::index::{
 
 #[ignore = "An integration test which requires a running Scylla node instance, disabled from `testunit` CI run"]
 #[tokio::test]
-async fn catalyst_id_for_stake_address() {
-    let Ok((session, _)) = get_shared_session().await else {
-        panic!("{SESSION_ERR_MSG}");
-    };
-
-    // data
-    let data = vec![
-        rbac509::insert_catalyst_id_for_stake_address::Params::new(
-            stake_address_1(),
-            0.into(),
-            "cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE"
-                .parse()
-                .unwrap(),
-        ),
-        rbac509::insert_catalyst_id_for_stake_address::Params::new(
-            stake_address_2(),
-            1.into(),
-            "cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE"
-                .parse()
-                .unwrap(),
-        ),
-    ];
-    let data_len = data.len();
-
-    // insert
-    session
-        .execute_batch(PreparedQuery::CatalystIdForStakeAddressInsertQuery, data)
-        .await
-        .unwrap();
-
-    // read
-    let mut row_stream = catalyst_id_for_stake_address::PrimaryKeyQuery::execute(&session)
-        .await
-        .unwrap();
-
-    let mut read_rows = vec![];
-    while let Some(row_res) = row_stream.next().await {
-        read_rows.push(row_res.unwrap());
-    }
-
-    assert_eq!(read_rows.len(), data_len);
-
-    // delete
-    let delete_params = read_rows
-        .into_iter()
-        .map(catalyst_id_for_stake_address::Params::from)
-        .collect();
-    let row_results = catalyst_id_for_stake_address::DeleteQuery::execute(&session, delete_params)
-        .await
-        .unwrap()
-        .into_iter()
-        .all(|r| r.result_not_rows().is_ok());
-
-    assert!(row_results);
-
-    // re-read
-    let mut row_stream = catalyst_id_for_stake_address::PrimaryKeyQuery::execute(&session)
-        .await
-        .unwrap();
-
-    let mut read_rows = vec![];
-    while let Some(row_res) = row_stream.next().await {
-        read_rows.push(row_res.unwrap());
-    }
-
-    assert!(read_rows.is_empty());
-}
-
-#[ignore = "An integration test which requires a running Scylla node instance, disabled from `testunit` CI run"]
-#[tokio::test]
-async fn catalyst_id_for_txn_id() {
-    let Ok((session, _)) = get_shared_session().await else {
-        panic!("{SESSION_ERR_MSG}");
-    };
-
-    // data
-    let data = vec![
-        rbac509::insert_catalyst_id_for_txn_id::Params::new(
-            "cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE"
-                .parse()
-                .unwrap(),
-            TransactionId::new(&[0]),
-        ),
-        rbac509::insert_catalyst_id_for_txn_id::Params::new(
-            "cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE"
-                .parse()
-                .unwrap(),
-            TransactionId::new(&[1]),
-        ),
-    ];
-    let data_len = data.len();
-
-    // insert
-    session
-        .execute_batch(PreparedQuery::CatalystIdForTxnIdInsertQuery, data)
-        .await
-        .unwrap();
-
-    // read
-    let mut row_stream = catalyst_id_for_txn_id::PrimaryKeyQuery::execute(&session)
-        .await
-        .unwrap();
-
-    let mut read_rows = vec![];
-    while let Some(row_res) = row_stream.next().await {
-        read_rows.push(row_res.unwrap());
-    }
-
-    assert_eq!(read_rows.len(), data_len);
-
-    // delete
-    let delete_params = read_rows
-        .into_iter()
-        .map(catalyst_id_for_txn_id::Params::from)
-        .collect();
-    let row_results = catalyst_id_for_txn_id::DeleteQuery::execute(&session, delete_params)
-        .await
-        .unwrap()
-        .into_iter()
-        .all(|r| r.result_not_rows().is_ok());
-
-    assert!(row_results);
-
-    // re-read
-    let mut row_stream = catalyst_id_for_txn_id::PrimaryKeyQuery::execute(&session)
-        .await
-        .unwrap();
-
-    let mut read_rows = vec![];
-    while let Some(row_res) = row_stream.next().await {
-        read_rows.push(row_res.unwrap());
-    }
-
-    assert!(read_rows.is_empty());
-}
-
-#[ignore = "An integration test which requires a running Scylla node instance, disabled from `testunit` CI run"]
-#[tokio::test]
 async fn rbac509_registration() {
     let Ok((session, _)) = get_shared_session().await else {
         panic!("{SESSION_ERR_MSG}");
@@ -173,7 +35,6 @@ async fn rbac509_registration() {
             TransactionId::new(&[0]),
             0.into(),
             0.into(),
-            UuidV4::new(),
             None,
         ),
         rbac509::insert_rbac509::Params::new(
@@ -183,7 +44,6 @@ async fn rbac509_registration() {
             TransactionId::new(&[1]),
             1.into(),
             1.into(),
-            UuidV4::new(),
             None,
         ),
     ];
