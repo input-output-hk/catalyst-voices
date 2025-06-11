@@ -77,7 +77,7 @@ async fn get_catalyst_id_by_transaction_id() {
         panic!("{SESSION_ERR_MSG}");
     };
 
-    let txn_id = TransactionId::new(&[1, 2, 3]).into();
+    let txn_id = TransactionId::new(&[1, 2, 3]);
     Query::get(&session, txn_id).await.unwrap();
 }
 

@@ -104,7 +104,7 @@ impl Query {
             .transpose()
             .inspect(|v| {
                 if let Some(v) = v {
-                    cache.insert(public_key, v.clone())
+                    cache.insert(public_key, v.clone());
                 }
             })
             .context("Failed to get Catalyst ID by transaction ID query row")
