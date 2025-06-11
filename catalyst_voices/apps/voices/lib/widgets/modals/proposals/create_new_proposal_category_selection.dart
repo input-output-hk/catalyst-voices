@@ -85,6 +85,7 @@ class _CategoryCard extends StatelessWidget {
 
 class _CreateNewProposalCategorySelectionState extends State<CreateNewProposalCategorySelection> {
   late final ScrollController _scrollController;
+
   CampaignCategoryDetailsViewModel? get _selectedCategory {
     return widget.categories.firstWhereOrNull((element) => element.id == widget.selectedCategory);
   }
