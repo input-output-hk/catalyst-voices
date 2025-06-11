@@ -7,12 +7,14 @@ class CampaignTimelineViewModel extends Equatable {
   final String description;
   final DateRange timeline;
   final CampaignTimelineStage stage;
+  final bool offstage;
 
   const CampaignTimelineViewModel({
     required this.title,
     required this.description,
     required this.timeline,
     required this.stage,
+    this.offstage = false,
   });
 
   factory CampaignTimelineViewModel.fromModel(CampaignTimeline model) => CampaignTimelineViewModel(
@@ -23,6 +25,7 @@ class CampaignTimelineViewModel extends Equatable {
           to: model.timeline.to,
         ),
         stage: model.stage,
+        offstage: model.offstage,
       );
 
   @override
@@ -31,5 +34,6 @@ class CampaignTimelineViewModel extends Equatable {
         description,
         timeline,
         stage,
+        offstage,
       ];
 }

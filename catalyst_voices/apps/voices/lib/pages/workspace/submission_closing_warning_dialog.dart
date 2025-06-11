@@ -5,6 +5,7 @@ import 'package:catalyst_voices/widgets/text/proposal_submission_closes_text.dar
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 
@@ -202,7 +203,7 @@ class _RightSide extends StatelessWidget {
         ProposalSubmissionClosesText(dateTime: date),
         const SizedBox(height: 12),
         _HeadsUpInfo(context.l10n.submitProposalBeforeClosing),
-        _HeadsUpInfo(context.l10n.checkMaxProposal),
+        _HeadsUpInfo(context.l10n.checkMaxProposal(ProposalDocument.maxSubmittedProposalsPerUser)),
         _HeadsUpInfo(
           context.l10n.catalystAppNotAvailableAfterSubmissionCloses,
           isBold: true,

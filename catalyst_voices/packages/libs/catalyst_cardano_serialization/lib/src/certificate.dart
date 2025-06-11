@@ -1,6 +1,7 @@
 // ignore_for_file: avoid_equals_and_hash_code_on_mutable_classes
 
 import 'package:catalyst_cardano_serialization/src/types.dart';
+import 'package:catalyst_cardano_serialization/src/utils/hex.dart';
 import 'package:cbor/cbor.dart';
 import 'package:convert/convert.dart';
 
@@ -18,7 +19,7 @@ abstract base class BaseCertificate implements CborEncodable {
 
   /// Constructs the [BaseCertificate] from a hex string representation
   /// of [bytes].
-  BaseCertificate.fromHex(String string) : this.fromBytes(bytes: hex.decode(string));
+  BaseCertificate.fromHex(String string) : this.fromBytes(bytes: hexDecode(string));
 
   @override
   int get hashCode => bytes.hashCode;
