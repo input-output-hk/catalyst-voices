@@ -527,7 +527,7 @@ void main() {
         expect(activeAccount?.publicStatus, account.publicStatus);
       });
 
-      test('returns false when email did not changed', () async {
+      test('returns did change false when email did not changed', () async {
         // Given
         const currentEmail = 'dev@iohk.com';
         const updateEmail = 'dev@iohk.com';
@@ -557,7 +557,7 @@ void main() {
         expect(result, expectedResult);
       });
 
-      test('returns true when email did changed', () async {
+      test('returns did change true when email did changed', () async {
         // Given
         const currentEmail = 'dev@iohk.com';
         const updateEmail = 'otherDev@iohk.com';
@@ -577,6 +577,94 @@ void main() {
         const publicProfile = AccountPublicProfile(email: '', status: AccountPublicStatus.verified);
 
         const expectedResult = AccountUpdateResult(didChanged: true);
+
+        // When
+        when(() => userRepository.getUser()).thenAnswer((_) => Future.value(user));
+        when(() => userRepository.saveUser(any())).thenAnswer((_) => Future(() {}));
+        when(
+          () => userRepository.publishUserProfile(
+            catalystId: catalystId,
+            email: updateEmail,
+          ),
+        ).thenAnswer((_) => Future.value(publicProfile));
+
+        userObserver.user = user;
+
+        final didUpdateAccount = await service.updateAccount(id: catalystId, email: updateEmail);
+
+        // Then
+        expect(didUpdateAccount, expectedResult);
+      });
+
+      test(
+          'returns has pending email change when '
+          'public profile effective email did not change', () async {
+        // Given
+        const currentEmail = 'dev@iohk.com';
+        const updateEmail = 'otherDev@iohk.com';
+
+        final catalystId = DummyCatalystIdFactory.create();
+        final keychainId = const Uuid().v4();
+        final keychain = await keychainProvider.create(keychainId);
+        final account = Account.dummy(
+          catalystId: catalystId,
+          keychain: keychain,
+          isActive: true,
+        ).copyWith(
+          email: const Optional(currentEmail),
+          publicStatus: AccountPublicStatus.verified,
+        );
+        final user = User.optional(accounts: [account]);
+        const publicProfile = AccountPublicProfile(
+          email: currentEmail,
+          status: AccountPublicStatus.verified,
+        );
+
+        const expectedResult = AccountUpdateResult(hasPendingEmailChange: true);
+
+        // When
+        when(() => userRepository.getUser()).thenAnswer((_) => Future.value(user));
+        when(() => userRepository.saveUser(any())).thenAnswer((_) => Future(() {}));
+        when(
+          () => userRepository.publishUserProfile(
+            catalystId: catalystId,
+            email: updateEmail,
+          ),
+        ).thenAnswer((_) => Future.value(publicProfile));
+
+        userObserver.user = user;
+
+        final didUpdateAccount = await service.updateAccount(id: catalystId, email: updateEmail);
+
+        // Then
+        expect(didUpdateAccount, expectedResult);
+      });
+
+      test(
+          'returns has pending email change when '
+          'public profile status downgraded', () async {
+        // Given
+        const currentEmail = 'dev@iohk.com';
+        const updateEmail = 'otherDev@iohk.com';
+
+        final catalystId = DummyCatalystIdFactory.create();
+        final keychainId = const Uuid().v4();
+        final keychain = await keychainProvider.create(keychainId);
+        final account = Account.dummy(
+          catalystId: catalystId,
+          keychain: keychain,
+          isActive: true,
+        ).copyWith(
+          email: const Optional(currentEmail),
+          publicStatus: AccountPublicStatus.verified,
+        );
+        final user = User.optional(accounts: [account]);
+        const publicProfile = AccountPublicProfile(
+          email: updateEmail,
+          status: AccountPublicStatus.verifying,
+        );
+
+        const expectedResult = AccountUpdateResult(hasPendingEmailChange: true);
 
         // When
         when(() => userRepository.getUser()).thenAnswer((_) => Future.value(user));
