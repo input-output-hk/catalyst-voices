@@ -19,7 +19,7 @@ class VideoManager extends ValueNotifier<VideoManagerState> {
     super.dispose();
   }
 
-  Future<VideoPlayerController> getOrCreateController(
+  Future<VideoPlayerController> createOrReinitializeController(
     VideoCacheKey asset,
   ) async {
     final key = _createKey(asset.name, asset.package);
