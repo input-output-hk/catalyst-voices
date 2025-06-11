@@ -54,22 +54,9 @@ final class DocumentSchema extends Equatable implements DocumentNode {
 
   DocumentPropertySchema? getPropertySchema(DocumentNodeId nodeId) {
     for (final property in properties) {
-      if (property.nodeId == nodeId) {
-        return property;
-      }
-
-      if (property is DocumentSegmentSchema) {
-        for (final section in property.sections) {
-          if (section.nodeId == nodeId) {
-            return section;
-          }
-
-          for (final sectionProperty in section.properties) {
-            if (sectionProperty.nodeId == nodeId) {
-              return sectionProperty;
-            }
-          }
-        }
+      final foundProperty = property.getPropertySchema(nodeId);
+      if (foundProperty != null) {
+        return foundProperty;
       }
     }
     return null;
