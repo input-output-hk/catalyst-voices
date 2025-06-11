@@ -41,6 +41,7 @@ impl Debug for Params {
 
 impl Params {
     /// Creates a new record for this transaction.
+    #[allow(dead_code)]
     pub(crate) fn new(catalyst_id: CatalystId, txn_id: TransactionId, slot_no: Slot) -> Self {
         Params {
             txn_id: txn_id.into(),

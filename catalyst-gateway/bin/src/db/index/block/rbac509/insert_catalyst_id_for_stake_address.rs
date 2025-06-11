@@ -44,6 +44,7 @@ impl Debug for Params {
 
 impl Params {
     /// Create a new record for this transaction.
+    #[allow(dead_code)]
     pub(crate) fn new(
         stake_address: StakeAddress, slot_no: Slot, txn_index: TxnIndex, catalyst_id: CatalystId,
     ) -> Self {
