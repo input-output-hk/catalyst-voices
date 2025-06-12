@@ -37,30 +37,30 @@ pub(crate) fn init_metrics_reporter() {
         } = event
         {
             if *is_persistent {
-                reporter::PERSISTENT_CACHE_ACCESS
+                reporter::PERSISTENT_ACCESS
                     .with_label_values(&[&api_host_names, service_id, &network])
                     .inc();
 
                 if *is_found {
-                    reporter::PERSISTENT_CACHE_HIT
+                    reporter::PERSISTENT_HIT
                         .with_label_values(&[&api_host_names, service_id, &network])
                         .inc();
                 } else {
-                    reporter::PERSISTENT_CACHE_MISS
+                    reporter::PERSISTENT_MISS
                         .with_label_values(&[&api_host_names, service_id, &network])
                         .inc();
                 }
             } else {
-                reporter::VOLATILE_CACHE_ACCESS
+                reporter::VOLATILE_ACCESS
                     .with_label_values(&[&api_host_names, service_id, &network])
                     .inc();
 
                 if *is_found {
-                    reporter::VOLATILE_CACHE_HIT
+                    reporter::VOLATILE_HIT
                         .with_label_values(&[&api_host_names, service_id, &network])
                         .inc();
                 } else {
-                    reporter::VOLATILE_CACHE_MISS
+                    reporter::VOLATILE_MISS
                         .with_label_values(&[&api_host_names, service_id, &network])
                         .inc();
                 }
@@ -87,7 +87,7 @@ pub(crate) fn update() {
     reporter::MAX_CACHE_SIZE
         .with_label_values(&[&api_host_names, service_id, &network])
         .set(i64::try_from(Settings::rbac_cache_max_mem_size()).unwrap_or(-1));
-    reporter::CACHING_RBAC_ENTRIES
+    reporter::RBAC_ENTRIES
         .with_label_values(&[&api_host_names, service_id, &network])
         .set(i64::try_from(rbac_entries).unwrap_or(-1));
     // TODO: add size approximation on storage caching when it's available
@@ -110,9 +110,9 @@ pub(crate) mod reporter {
     const METRIC_LABELS: [&str; 3] = ["api_host_names", "service_id", "network"];
 
     /// Total count of cache hits for persistent.
-    pub(crate) static PERSISTENT_CACHE_HIT: LazyLock<CounterVec> = LazyLock::new(|| {
+    pub(crate) static PERSISTENT_HIT: LazyLock<CounterVec> = LazyLock::new(|| {
         register_counter_vec!(
-            "persistent_cache_hit",
+            "cache_persistent_hit",
             "Total count of cache hits for persistent",
             &METRIC_LABELS
         )
@@ -120,9 +120,9 @@ pub(crate) mod reporter {
     });
 
     /// Total count of cache misses for persistent.
-    pub(crate) static PERSISTENT_CACHE_MISS: LazyLock<CounterVec> = LazyLock::new(|| {
+    pub(crate) static PERSISTENT_MISS: LazyLock<CounterVec> = LazyLock::new(|| {
         register_counter_vec!(
-            "persistent_cache_miss",
+            "cache_persistent_miss",
             "Total count of cache misses for persistent",
             &METRIC_LABELS
         )
@@ -130,9 +130,9 @@ pub(crate) mod reporter {
     });
 
     /// Total count of cache access attempts for persistent.
-    pub(crate) static PERSISTENT_CACHE_ACCESS: LazyLock<CounterVec> = LazyLock::new(|| {
+    pub(crate) static PERSISTENT_ACCESS: LazyLock<CounterVec> = LazyLock::new(|| {
         register_counter_vec!(
-            "persistent_cache_access",
+            "cache_persistent_access",
             "Total count of cache access attempts for persistent",
             &METRIC_LABELS
         )
@@ -140,9 +140,9 @@ pub(crate) mod reporter {
     });
 
     /// Total count of cache hits for volatile.
-    pub(crate) static VOLATILE_CACHE_HIT: LazyLock<CounterVec> = LazyLock::new(|| {
+    pub(crate) static VOLATILE_HIT: LazyLock<CounterVec> = LazyLock::new(|| {
         register_counter_vec!(
-            "volatile_cache_hit",
+            "cache_volatile_hit",
             "Total count of cache hits for volatile",
             &METRIC_LABELS
         )
@@ -150,9 +150,9 @@ pub(crate) mod reporter {
     });
 
     /// Total count of cache misses for volatile.
-    pub(crate) static VOLATILE_CACHE_MISS: LazyLock<CounterVec> = LazyLock::new(|| {
+    pub(crate) static VOLATILE_MISS: LazyLock<CounterVec> = LazyLock::new(|| {
         register_counter_vec!(
-            "volatile_cache_miss",
+            "cache_volatile_miss",
             "Total count of cache misses for volatile",
             &METRIC_LABELS
         )
@@ -160,9 +160,9 @@ pub(crate) mod reporter {
     });
 
     /// Total count of cache access attempts for volatile.
-    pub(crate) static VOLATILE_CACHE_ACCESS: LazyLock<CounterVec> = LazyLock::new(|| {
+    pub(crate) static VOLATILE_ACCESS: LazyLock<CounterVec> = LazyLock::new(|| {
         register_counter_vec!(
-            "volatile_cache_access",
+            "cache_volatile_access",
             "Total count of cache access attempts for volatile",
             &METRIC_LABELS
         )
@@ -172,28 +172,28 @@ pub(crate) mod reporter {
     /// Duration measured in milliseconds for accessing cache on a cache hit.
     pub(crate) static LATENCY: LazyLock<HistogramVec> = LazyLock::new(|| {
         register_histogram_vec!(
-            "latency",
+            "cache_latency",
             "Duration measured in milliseconds for accessing cache on a cache hit",
             &METRIC_LABELS
         )
         .unwrap()
     });
 
-    /// Total space in bytes currently using for RBAC caching.
+    /// Total storage space in bytes currently using for RBAC caching.
     pub(crate) static CACHE_SIZE: LazyLock<IntGaugeVec> = LazyLock::new(|| {
         register_int_gauge_vec!(
             "cache_size",
-            "Total space in bytes currently using for RBAC caching",
+            "Total storage space in bytes currently using for RBAC caching",
             &METRIC_LABELS
         )
         .unwrap()
     });
 
-    /// Maximum space in bytes for RBAC caching.
+    /// Maximum storage space in bytes for RBAC caching.
     pub(crate) static MAX_CACHE_SIZE: LazyLock<IntGaugeVec> = LazyLock::new(|| {
         register_int_gauge_vec!(
-            "max_cache_size",
-            "Maximum space in bytes for RBAC caching",
+            "cache_max_size",
+            "Maximum storage space in bytes for RBAC caching",
             &METRIC_LABELS
         )
         .unwrap()
@@ -202,7 +202,7 @@ pub(crate) mod reporter {
     /// Total time in milliseconds taken to set up RBAC caching service to be operational.
     pub(crate) static START_UP_TIME: LazyLock<IntGaugeVec> = LazyLock::new(|| {
         register_int_gauge_vec!(
-            "start_up_time",
+            "cache_start_up_time",
             "Total time in milliseconds taken to set up RBAC caching service to be operational",
             &METRIC_LABELS
         )
@@ -210,9 +210,9 @@ pub(crate) mod reporter {
     });
 
     /// Total number of RBAC registration chain entries being stored as cache.
-    pub(crate) static CACHING_RBAC_ENTRIES: LazyLock<IntGaugeVec> = LazyLock::new(|| {
+    pub(crate) static RBAC_ENTRIES: LazyLock<IntGaugeVec> = LazyLock::new(|| {
         register_int_gauge_vec!(
-            "caching_rbac_entries",
+            "cache_rbac_entries",
             "Total number of RBAC registration chain entries being stored as cache",
             &METRIC_LABELS
         )
