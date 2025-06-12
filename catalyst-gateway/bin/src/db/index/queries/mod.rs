@@ -47,7 +47,10 @@ use super::block::{
 };
 use crate::{
     db::index::{
-        block::{certs::StakeRegistrationInsertQuery, cip36::insert_cip36::Cip36Insert},
+        block::{
+            certs::StakeRegistrationInsertQuery,
+            cip36::{insert_cip36::Cip36Insert, insert_cip36_invalid::Cip36InvalidInsert},
+        },
         queries::rbac::{
             get_catalyst_id_from_stake_address, get_catalyst_id_from_transaction_id,
             get_rbac_invalid_registrations, get_rbac_registrations,
@@ -242,7 +245,8 @@ async fn prepare_queries(
         TxoUnstakedInsert,
         TxoUnstakedAssetInsert,
         StakeRegistrationInsertQuery,
-        Cip36Insert
+        Cip36Insert,
+        Cip36InvalidInsert
     );
     Ok(queries)
 }

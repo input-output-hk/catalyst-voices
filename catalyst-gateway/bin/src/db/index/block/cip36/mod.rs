@@ -24,7 +24,7 @@ pub(crate) struct Cip36InsertQuery {
     /// Stake Registration Data captured during indexing.
     registrations: Vec<insert_cip36::Cip36Insert>,
     /// Stake Registration Data captured during indexing.
-    invalid: Vec<insert_cip36_invalid::Params>,
+    invalid: Vec<insert_cip36_invalid::Cip36InvalidInsert>,
     /// Stake Registration Data captured during indexing.
     for_vote_key: Vec<insert_cip36_for_vote_key::Params>,
     /// Stake Registration Data captured during indexing.
@@ -48,7 +48,7 @@ impl Cip36InsertQuery {
     ) -> anyhow::Result<(SizedBatch, SizedBatch, SizedBatch)> {
         let insert_cip36_batch = insert_cip36::Cip36Insert::prepare_batch(session, cfg).await;
         let insert_cip36_invalid_batch =
-            insert_cip36_invalid::Params::prepare_batch(session, cfg).await;
+            insert_cip36_invalid::Cip36InvalidInsert::prepare_batch(session, cfg).await;
         let insert_cip36_for_vote_key_addr_batch =
             insert_cip36_for_vote_key::Params::prepare_batch(session, cfg).await;
         // Its a hack of inserting `stake_regs` during the indexing CIP 36 registrations.
@@ -107,17 +107,19 @@ impl Cip36InsertQuery {
                 // Cannot index an invalid CIP36, if there is no stake public key.
                 if let Some(stake_pk) = cip36.stake_pk() {
                     if cip36.voting_pks().is_empty() {
-                        self.invalid.push(insert_cip36_invalid::Params::new(
-                            None, slot_no, index, &cip36,
-                        ));
+                        self.invalid
+                            .push(insert_cip36_invalid::Cip36InvalidInsert::new(
+                                None, slot_no, index, &cip36,
+                            ));
                     } else {
                         for voting_key in cip36.voting_pks() {
-                            self.invalid.push(insert_cip36_invalid::Params::new(
-                                Some(voting_key),
-                                slot_no,
-                                index,
-                                &cip36,
-                            ));
+                            self.invalid
+                                .push(insert_cip36_invalid::Cip36InvalidInsert::new(
+                                    Some(voting_key),
+                                    slot_no,
+                                    index,
+                                    &cip36,
+                                ));
                             self.for_vote_key
                                 .push(insert_cip36_for_vote_key::Params::new(
                                     voting_key, slot_no, index, &cip36, false,
