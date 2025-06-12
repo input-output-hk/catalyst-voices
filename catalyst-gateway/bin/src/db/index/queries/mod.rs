@@ -86,6 +86,54 @@ pub(crate) trait Query {
     ) -> anyhow::Result<QueryKind>;
 }
 
+/// Implement Query trait for batched types
+#[macro_export]
+macro_rules! impl_query_batch {
+    ($i:ty, $c:ident) => {
+        impl $crate::db::index::queries::Query for $i {
+            /// Prepare Batch of Insert TXI Index Data Queries
+            async fn prepare_query(
+                session: &std::sync::Arc<scylla::Session>,
+                cfg: &$crate::settings::cassandra_db::EnvVars,
+            ) -> anyhow::Result<$crate::db::index::queries::QueryKind> {
+                Self::prepare_batch(session, cfg)
+                    .await
+                    .map($crate::db::index::queries::QueryKind::Batch)
+            }
+        }
+
+        impl std::fmt::Display for $i {
+            fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                write!(f, "{{$c}}")
+            }
+        }
+    };
+}
+
+/// Implement Query trait for statement types
+#[macro_export]
+macro_rules! impl_query_statement {
+    ($i:ty, $c:ident) => {
+        impl $crate::db::index::queries::Query for $i {
+            /// Prepare Batch of Insert TXI Index Data Queries
+            async fn prepare_query(
+                session: &std::sync::Arc<scylla::Session>,
+                _: &$crate::settings::cassandra_db::EnvVars,
+            ) -> anyhow::Result<$crate::db::index::queries::QueryKind> {
+                Self::prepare(session)
+                    .await
+                    .map($crate::db::index::queries::QueryKind::Statement)
+            }
+        }
+
+        impl std::fmt::Display for $i {
+            fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                write!(f, "{{$c}}")
+            }
+        }
+    };
+}
+
 /// All Prepared insert Queries that we know about.
 #[derive(strum_macros::Display)]
 #[allow(clippy::enum_variant_names)]
