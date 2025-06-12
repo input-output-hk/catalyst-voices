@@ -60,8 +60,10 @@ use crate::{
             },
         },
         queries::rbac::{
-            get_catalyst_id_from_stake_address, get_catalyst_id_from_transaction_id,
-            get_rbac_invalid_registrations, get_rbac_registrations,
+            get_catalyst_id_from_stake_address::GetCatalystIdForStakeAddress,
+            get_catalyst_id_from_transaction_id::GetCatalystIdForTxnId,
+            get_rbac_invalid_registrations::GetRbac509InvalidRegistrations,
+            get_rbac_registrations::GetRbac509Registrations,
         },
         session::CassandraSessionError,
     },
@@ -318,7 +320,11 @@ async fn prepare_queries(
         GetInvalidRegistrationQuery,
         GetAllRegistrationsQuery,
         GetAllInvalidRegistrationsQuery,
-        SyncStatusInsertQuery
+        SyncStatusInsertQuery,
+        GetCatalystIdForStakeAddress,
+        GetCatalystIdForTxnId,
+        GetRbac509Registrations,
+        GetRbac509InvalidRegistrations
     );
     Ok(queries)
 }
@@ -369,13 +375,13 @@ impl PreparedQueries {
             GetAllInvalidRegistrationsQuery::prepare(session.clone()).await;
         let sync_status_insert = SyncStatusInsertQuery::prepare(session.clone()).await?;
         let catalyst_id_by_stake_address_query =
-            get_catalyst_id_from_stake_address::Query::prepare(session.clone()).await?;
+            GetCatalystIdForStakeAddress::prepare(session.clone()).await?;
         let catalyst_id_by_transaction_id_query =
-            get_catalyst_id_from_transaction_id::Query::prepare(session.clone()).await?;
+            GetCatalystIdForTxnId::prepare(session.clone()).await?;
         let rbac_registrations_by_catalyst_id_query =
-            get_rbac_registrations::Query::prepare(session.clone()).await?;
+            GetRbac509Registrations::prepare(session.clone()).await?;
         let rbac_invalid_registrations_by_catalyst_id_query =
-            get_rbac_invalid_registrations::Query::prepare(session.clone()).await?;
+            GetRbac509InvalidRegistrations::prepare(session.clone()).await?;
 
         Ok(Self {
             txo_insert_queries,
