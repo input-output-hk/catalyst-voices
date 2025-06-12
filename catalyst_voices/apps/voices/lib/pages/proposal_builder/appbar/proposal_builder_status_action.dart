@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/pages/proposal_builder/appbar/widget/proposal_builder_menu_item.dart';
+import 'package:catalyst_voices/widgets/modals/proposals/forget_proposal_dialog.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/proposal_builder_delete_confirmation_dialog.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/publish_proposal_iteration_dialog.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/submit_proposal_for_review_dialog.dart';
@@ -134,6 +135,28 @@ class _PopupMenuButtonState extends State<_PopupMenuButton> {
     context.read<ProposalBuilderBloc>().add(ExportProposalEvent(filePrefix: prefix));
   }
 
+  Future<void> _forgetProposal() async {
+    final state = context.read<ProposalBuilderBloc>().state;
+    final title = state.proposalTitle;
+    final publish = state.metadata.publish;
+    final latestVersion = state.metadata.latestVersion?.number;
+    final action = await ForgetProposalDialog.show(
+      context: context,
+      title: title ?? '',
+      version: latestVersion ?? 1,
+      publish: publish,
+    );
+    if (action == null) return;
+    switch (action) {
+      case ExportProposalForgetAction():
+        _exportProposal();
+      case ForgetProposalForgetAction():
+        if (mounted) {
+          context.read<ProposalBuilderBloc>().add(const ForgetProposalBuilderEvent());
+        }
+    }
+  }
+
   bool _isLocal(ProposalPublish publish, int iteration) {
     return publish == ProposalPublish.localDraft && iteration == DocumentVersion.firstNumber;
   }
@@ -148,6 +171,8 @@ class _PopupMenuButtonState extends State<_PopupMenuButton> {
         _exportProposal();
       case ProposalMenuItemAction.delete:
         unawaited(_deleteProposal());
+      case ProposalMenuItemAction.forget:
+        unawaited(_forgetProposal());
       case _:
         break;
     }

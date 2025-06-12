@@ -68,6 +68,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     on<MaxProposalsLimitReachedEvent>(_onMaxProposalsLimitReached);
     on<UpdateUsernameEvent>(_onUpdateUsername);
     on<UnlockProposalBuilderEvent>(_unlockProposal);
+    on<ForgetProposalBuilderEvent>(_forgetProposal);
 
     final activeAccount = _userService.user.activeAccount;
 
@@ -327,6 +328,28 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
         }
       case DocumentValueProperty():
       // do nothing, values don't have children
+    }
+  }
+
+  Future<void> _forgetProposal(
+    ProposalBuilderEvent event,
+    Emitter<ProposalBuilderState> emit,
+  ) async {
+    final categoryId = state.metadata.categoryId;
+    final proposalRef = state.metadata.documentRef;
+    try {
+      emit(state.copyWith(isChanging: true));
+      await _proposalService.forgetProposal(
+        proposalRef: proposalRef! as SignedDocumentRef,
+        categoryId: categoryId!,
+      );
+      unawaited(_clearCache());
+      emitSignal(const ForgotProposalSuccessBuilderSignal());
+    } catch (e, stackTrace) {
+      _logger.severe('Error forgetting proposal', e, stackTrace);
+      emitError(LocalizedException.create(e));
+    } finally {
+      emit(state.copyWith(isChanging: false));
     }
   }
 
