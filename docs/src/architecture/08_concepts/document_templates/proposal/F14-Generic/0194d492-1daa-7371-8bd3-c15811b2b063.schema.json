@@ -306,7 +306,7 @@
                                 "properties": {
                                     "name": {
                                         "type": "string",
-                                        "title": "Name and Surname",
+                                        "title": "Full Name",
                                         "description": "Full name of the co-proposer",
                                         "minLength": 2,
                                         "maxLength": 100
