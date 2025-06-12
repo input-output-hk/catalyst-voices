@@ -3002,6 +3002,10 @@
   "@reviewTimelineHeader": {
     "description": "Header for the review timeline"
   },
+  "documentImportInvalidDataError": "The imported document does not have valid format or is corrupted.",
+  "@documentImportInvalidDataError": {
+    "description": "Error message when user tries to import a document that is not valid and cannot be parsed"
+  },
   "stepsToDoBeforeAppCloses": "Before the Catalyst app closes, make sure to:",
   "@stepsToDoBeforeAppCloses": {
     "description": "Title for the steps to do before the app closes"
