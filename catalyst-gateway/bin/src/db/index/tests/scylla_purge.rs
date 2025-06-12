@@ -321,14 +321,14 @@ async fn test_cip36_registration_for_vote_key() {
 
     // data
     let data = vec![
-        cip36::insert_cip36_for_vote_key::Params::new(
+        cip36::insert_cip36_for_vote_key::Cip36ForVoteKeyInsert::new(
             &voting_pub_key(0),
             0.into(),
             0.into(),
             &test_utils::cip_36_1(),
             false,
         ),
-        cip36::insert_cip36_for_vote_key::Params::new(
+        cip36::insert_cip36_for_vote_key::Cip36ForVoteKeyInsert::new(
             &voting_pub_key(1),
             1.into(),
             1.into(),

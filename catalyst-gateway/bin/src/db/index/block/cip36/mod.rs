@@ -26,7 +26,7 @@ pub(crate) struct Cip36InsertQuery {
     /// Stake Registration Data captured during indexing.
     invalid: Vec<insert_cip36_invalid::Cip36InvalidInsert>,
     /// Stake Registration Data captured during indexing.
-    for_vote_key: Vec<insert_cip36_for_vote_key::Params>,
+    for_vote_key: Vec<insert_cip36_for_vote_key::Cip36ForVoteKeyInsert>,
     /// Stake Registration Data captured during indexing.
     stake_regs: Vec<certs::StakeRegistrationInsertQuery>,
 }
@@ -50,7 +50,7 @@ impl Cip36InsertQuery {
         let insert_cip36_invalid_batch =
             insert_cip36_invalid::Cip36InvalidInsert::prepare_batch(session, cfg).await;
         let insert_cip36_for_vote_key_addr_batch =
-            insert_cip36_for_vote_key::Params::prepare_batch(session, cfg).await;
+            insert_cip36_for_vote_key::Cip36ForVoteKeyInsert::prepare_batch(session, cfg).await;
         // Its a hack of inserting `stake_regs` during the indexing CIP 36 registrations.
         // Its done because some of the CIP 36 registrations contains some stake addresses which
         // are not actually some how registered using cardano certs.
@@ -86,7 +86,7 @@ impl Cip36InsertQuery {
                     voting_key, slot_no, index, &cip36,
                 ));
                 self.for_vote_key
-                    .push(insert_cip36_for_vote_key::Params::new(
+                    .push(insert_cip36_for_vote_key::Cip36ForVoteKeyInsert::new(
                         voting_key, slot_no, index, &cip36, true,
                     ));
                 self.stake_regs
@@ -120,10 +120,11 @@ impl Cip36InsertQuery {
                                     index,
                                     &cip36,
                                 ));
-                            self.for_vote_key
-                                .push(insert_cip36_for_vote_key::Params::new(
+                            self.for_vote_key.push(
+                                insert_cip36_for_vote_key::Cip36ForVoteKeyInsert::new(
                                     voting_key, slot_no, index, &cip36, false,
-                                ));
+                                ),
+                            );
                         }
                     }
 
