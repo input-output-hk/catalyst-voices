@@ -75,6 +75,8 @@ export 'proposals/proposals_filters.dart';
 export 'proposals/proposals_order.dart';
 export 'registration/account_submit_data.dart';
 export 'registration/registration.dart';
+export 'share/share_channel.dart';
+export 'share/share_data.dart';
 export 'signed_document/signed_document.dart';
 export 'signed_document/signed_document_payload.dart';
 export 'sync/sync_stats.dart';
