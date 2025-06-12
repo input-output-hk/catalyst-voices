@@ -1,6 +1,6 @@
 //! Insert RBAC 509 Registration Query.
 
-use std::{fmt::Debug, sync::Arc};
+use std::{fmt, sync::Arc};
 
 use cardano_blockchain_types::{Slot, TransactionId, TxnIndex};
 use catalyst_types::{catalyst_id::CatalystId, uuid::UuidV4};
@@ -12,6 +12,7 @@ use crate::{
         index::queries::{PreparedQueries, SizedBatch},
         types::{DbCatalystId, DbSlot, DbTransactionId, DbTxnIndex, DbUuidV4},
     },
+    impl_query_batch,
     settings::cassandra_db::EnvVars,
 };
 
@@ -20,7 +21,7 @@ const QUERY: &str = include_str!("cql/insert_rbac509.cql");
 
 /// Insert RBAC Registration Query Parameters
 #[derive(SerializeRow)]
-pub(crate) struct Params {
+pub(crate) struct Rbac509Insert {
     /// A Catalyst short identifier.
     catalyst_id: DbCatalystId,
     /// A transaction hash
@@ -35,13 +36,15 @@ pub(crate) struct Params {
     purpose: DbUuidV4,
 }
 
-impl Debug for Params {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl_query_batch!(Rbac509Insert, QUERY);
+
+impl fmt::Debug for Rbac509Insert {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let prv_txn_id = match self.prv_txn_id {
             MaybeUnset::Unset => "UNSET".to_owned(),
             MaybeUnset::Set(ref v) => format!("{v:?}"),
         };
-        f.debug_struct("Params")
+        f.debug_struct("Rbac509Insert")
             .field("catalyst_id", &self.catalyst_id)
             .field("txn_id", &self.txn_id)
             .field("slot_no", &self.slot_no)
@@ -52,7 +55,7 @@ impl Debug for Params {
     }
 }
 
-impl Params {
+impl Rbac509Insert {
     /// Create a new record for this transaction.
     pub(crate) fn new(
         catalyst_id: CatalystId, txn_id: TransactionId, slot_no: Slot, txn_index: TxnIndex,

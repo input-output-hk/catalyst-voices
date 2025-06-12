@@ -1,5 +1,5 @@
 //! Get the TXO by Stake Address
-use std::{fmt, sync::Arc};
+use std::sync::Arc;
 
 use cardano_blockchain_types::{Slot, StakeAddress};
 use scylla::{
@@ -11,12 +11,12 @@ use tracing::error;
 use crate::{
     db::{
         index::{
-            queries::{PreparedQueries, PreparedSelectQuery, Query, QueryKind},
+            queries::{PreparedQueries, PreparedSelectQuery},
             session::CassandraSession,
         },
         types::{DbSlot, DbStakeAddress, DbTransactionId, DbTxnIndex, DbTxnOutputOffset},
     },
-    settings::cassandra_db,
+    impl_query_statement,
 };
 
 /// Get txo by stake address query string.
@@ -58,20 +58,7 @@ pub(crate) struct GetTxoByStakeAddressQuery {
     pub spent_slot: Option<DbSlot>,
 }
 
-impl Query for GetTxoByStakeAddressQuery {
-    /// Prepare Batch of Insert TXI Index Data Queries
-    async fn prepare_query(
-        session: &Arc<Session>, _cfg: &cassandra_db::EnvVars,
-    ) -> anyhow::Result<QueryKind> {
-        Self::prepare(session).await.map(QueryKind::Statement)
-    }
-}
-
-impl fmt::Display for GetTxoByStakeAddressQuery {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{GET_TXO_BY_STAKE_ADDRESS_QUERY}")
-    }
-}
+impl_query_statement!(GetTxoByStakeAddressQuery, GET_TXO_BY_STAKE_ADDRESS_QUERY);
 
 impl GetTxoByStakeAddressQuery {
     /// Prepares a get txo by stake address query.

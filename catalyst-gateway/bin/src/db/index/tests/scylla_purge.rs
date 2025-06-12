@@ -28,14 +28,14 @@ async fn catalyst_id_for_stake_address() {
 
     // data
     let data = vec![
-        rbac509::insert_catalyst_id_for_stake_address::Params::new(
+        rbac509::insert_catalyst_id_for_stake_address::CatalystIdForStakeAddressInsert::new(
             stake_address_1(),
             0.into(),
             "cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE"
                 .parse()
                 .unwrap(),
         ),
-        rbac509::insert_catalyst_id_for_stake_address::Params::new(
+        rbac509::insert_catalyst_id_for_stake_address::CatalystIdForStakeAddressInsert::new(
             stake_address_2(),
             1.into(),
             "cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE"
@@ -98,13 +98,13 @@ async fn catalyst_id_for_txn_id() {
 
     // data
     let data = vec![
-        rbac509::insert_catalyst_id_for_txn_id::Params::new(
+        rbac509::insert_catalyst_id_for_txn_id::CatalystIdForTxnIdInsert::new(
             "cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE"
                 .parse()
                 .unwrap(),
             TransactionId::new(&[0]),
         ),
-        rbac509::insert_catalyst_id_for_txn_id::Params::new(
+        rbac509::insert_catalyst_id_for_txn_id::CatalystIdForTxnIdInsert::new(
             "cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE"
                 .parse()
                 .unwrap(),
@@ -166,7 +166,7 @@ async fn rbac509_registration() {
 
     // data
     let data = vec![
-        rbac509::insert_rbac509::Params::new(
+        rbac509::insert_rbac509::Rbac509Insert::new(
             "cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE"
                 .parse()
                 .unwrap(),
@@ -176,7 +176,7 @@ async fn rbac509_registration() {
             UuidV4::new(),
             None,
         ),
-        rbac509::insert_rbac509::Params::new(
+        rbac509::insert_rbac509::Rbac509Insert::new(
             "cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE"
                 .parse()
                 .unwrap(),
@@ -243,7 +243,7 @@ async fn rbac509_invalid_registration() {
     // data
     let report = ProblemReport::new("test context");
     let data = vec![
-        rbac509::insert_rbac509_invalid::Params::new(
+        rbac509::insert_rbac509_invalid::Rbac509InvalidInsert::new(
             "cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE"
                 .parse()
                 .unwrap(),
@@ -254,7 +254,7 @@ async fn rbac509_invalid_registration() {
             None,
             &report,
         ),
-        rbac509::insert_rbac509_invalid::Params::new(
+        rbac509::insert_rbac509_invalid::Rbac509InvalidInsert::new(
             "cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE"
                 .parse()
                 .unwrap(),

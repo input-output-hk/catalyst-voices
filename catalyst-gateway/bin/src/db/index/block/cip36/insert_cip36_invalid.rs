@@ -9,9 +9,10 @@ use tracing::error;
 
 use crate::{
     db::{
-        index::queries::{PreparedQueries, Query, QueryKind, SizedBatch},
+        index::queries::{PreparedQueries, SizedBatch},
         types::{DbSlot, DbTxnIndex},
     },
+    impl_query_batch,
     settings::cassandra_db,
 };
 
@@ -46,16 +47,7 @@ pub(crate) struct Cip36InvalidInsert {
     problem_report: String,
 }
 
-impl Query for Cip36InvalidInsert {
-    /// Prepare Batch of Insert TXI Index Data Queries
-    async fn prepare_query(
-        session: &Arc<Session>, cfg: &cassandra_db::EnvVars,
-    ) -> anyhow::Result<QueryKind> {
-        Self::prepare_batch(session, cfg)
-            .await
-            .map(QueryKind::Batch)
-    }
-}
+impl_query_batch!(Cip36InvalidInsert, INSERT_CIP36_REGISTRATION_INVALID_QUERY);
 
 impl fmt::Debug for Cip36InvalidInsert {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -76,12 +68,6 @@ impl fmt::Debug for Cip36InvalidInsert {
             .field("signed", &self.signed)
             .field("problem_report", &self.problem_report)
             .finish()
-    }
-}
-
-impl fmt::Display for Cip36InvalidInsert {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{INSERT_CIP36_REGISTRATION_INVALID_QUERY}")
     }
 }
 

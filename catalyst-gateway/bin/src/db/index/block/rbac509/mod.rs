@@ -29,13 +29,14 @@ use crate::{
 #[derive(Debug)]
 pub(crate) struct Rbac509InsertQuery {
     /// RBAC Registration Data captured during indexing.
-    pub(crate) registrations: Vec<insert_rbac509::Params>,
+    pub(crate) registrations: Vec<insert_rbac509::Rbac509Insert>,
     /// An invalid RBAC registration data.
-    pub(crate) invalid: Vec<insert_rbac509_invalid::Params>,
+    pub(crate) invalid: Vec<insert_rbac509_invalid::Rbac509InvalidInsert>,
     /// A Catalyst ID for transaction ID Data captured during indexing.
-    pub(crate) catalyst_id_for_txn_id: Vec<insert_catalyst_id_for_txn_id::Params>,
+    pub(crate) catalyst_id_for_txn_id: Vec<insert_catalyst_id_for_txn_id::CatalystIdForTxnIdInsert>,
     /// A Catalyst ID for stake address data captured during indexing.
-    pub(crate) catalyst_id_for_stake_address: Vec<insert_catalyst_id_for_stake_address::Params>,
+    pub(crate) catalyst_id_for_stake_address:
+        Vec<insert_catalyst_id_for_stake_address::CatalystIdForStakeAddressInsert>,
 }
 
 impl Rbac509InsertQuery {
@@ -54,10 +55,14 @@ impl Rbac509InsertQuery {
         session: &Arc<Session>, cfg: &EnvVars,
     ) -> anyhow::Result<(SizedBatch, SizedBatch, SizedBatch, SizedBatch)> {
         Ok((
-            insert_rbac509::Params::prepare_batch(session, cfg).await?,
-            insert_rbac509_invalid::Params::prepare_batch(session, cfg).await?,
-            insert_catalyst_id_for_txn_id::Params::prepare_batch(session, cfg).await?,
-            insert_catalyst_id_for_stake_address::Params::prepare_batch(session, cfg).await?,
+            insert_rbac509::Rbac509Insert::prepare_batch(session, cfg).await?,
+            insert_rbac509_invalid::Rbac509InvalidInsert::prepare_batch(session, cfg).await?,
+            insert_catalyst_id_for_txn_id::CatalystIdForTxnIdInsert::prepare_batch(session, cfg)
+                .await?,
+            insert_catalyst_id_for_stake_address::CatalystIdForStakeAddressInsert::prepare_batch(
+                session, cfg,
+            )
+            .await?,
         ))
     }
 
@@ -121,7 +126,7 @@ impl Rbac509InsertQuery {
         let purpose = cip509.purpose();
         match cip509.consume() {
             Ok((purpose, metadata, _)) => {
-                self.registrations.push(insert_rbac509::Params::new(
+                self.registrations.push(insert_rbac509::Rbac509Insert::new(
                     catalyst_id.clone(),
                     txn_hash,
                     slot,
@@ -129,14 +134,15 @@ impl Rbac509InsertQuery {
                     purpose,
                     previous_transaction,
                 ));
-                self.catalyst_id_for_txn_id
-                    .push(insert_catalyst_id_for_txn_id::Params::new(
+                self.catalyst_id_for_txn_id.push(
+                    insert_catalyst_id_for_txn_id::CatalystIdForTxnIdInsert::new(
                         catalyst_id.clone(),
                         txn_hash,
-                    ));
+                    ),
+                );
                 for address in stake_addresses(&metadata) {
                     self.catalyst_id_for_stake_address.push(
-                        insert_catalyst_id_for_stake_address::Params::new(
+                        insert_catalyst_id_for_stake_address::CatalystIdForStakeAddressInsert::new(
                             address,
                             slot,
                             catalyst_id.clone(),
@@ -145,15 +151,16 @@ impl Rbac509InsertQuery {
                 }
             },
             Err(report) => {
-                self.invalid.push(insert_rbac509_invalid::Params::new(
-                    catalyst_id,
-                    txn_hash,
-                    slot,
-                    index,
-                    purpose,
-                    previous_transaction,
-                    &report,
-                ));
+                self.invalid
+                    .push(insert_rbac509_invalid::Rbac509InvalidInsert::new(
+                        catalyst_id,
+                        txn_hash,
+                        slot,
+                        index,
+                        purpose,
+                        previous_transaction,
+                        &report,
+                    ));
             },
         }
     }

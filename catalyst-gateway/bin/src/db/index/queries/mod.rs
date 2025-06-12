@@ -53,6 +53,11 @@ use crate::{
                 insert_cip36::Cip36Insert, insert_cip36_for_vote_key::Cip36ForVoteKeyInsert,
                 insert_cip36_invalid::Cip36InvalidInsert,
             },
+            rbac509::{
+                insert_catalyst_id_for_stake_address::CatalystIdForStakeAddressInsert,
+                insert_catalyst_id_for_txn_id::CatalystIdForTxnIdInsert,
+                insert_rbac509::Rbac509Insert, insert_rbac509_invalid::Rbac509InvalidInsert,
+            },
         },
         queries::rbac::{
             get_catalyst_id_from_stake_address, get_catalyst_id_from_transaction_id,
@@ -300,8 +305,12 @@ async fn prepare_queries(
         Cip36Insert,
         Cip36InvalidInsert,
         Cip36ForVoteKeyInsert,
-        // prepared statement queries
         UpdateTxoSpentQuery,
+        Rbac509Insert,
+        Rbac509InvalidInsert,
+        CatalystIdForTxnIdInsert,
+        CatalystIdForStakeAddressInsert,
+        // prepared statement queries
         GetTxoByStakeAddressQuery,
         GetTxiByTxnHashesQuery
     );

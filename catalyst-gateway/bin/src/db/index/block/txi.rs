@@ -1,6 +1,6 @@
 //! Insert TXI Index Data Queries.
 
-use std::{fmt, sync::Arc};
+use std::sync::Arc;
 
 use cardano_blockchain_types::{Slot, TransactionId, TxnOutputOffset};
 use catalyst_types::hashes::Blake2b256Hash;
@@ -10,13 +10,12 @@ use tracing::error;
 use crate::{
     db::{
         index::{
-            queries::{
-                FallibleQueryTasks, PreparedQueries, PreparedQuery, Query, QueryKind, SizedBatch,
-            },
+            queries::{FallibleQueryTasks, PreparedQueries, PreparedQuery, SizedBatch},
             session::CassandraSession,
         },
         types::{DbSlot, DbTransactionId, DbTxnOutputOffset},
     },
+    impl_query_batch,
     settings::cassandra_db,
 };
 
@@ -48,25 +47,10 @@ pub(crate) struct TxiInsertQuery {
     txi_data: Vec<TxiInsertParams>,
 }
 
-impl Query for TxiInsertQuery {
-    /// Prepare Batch of Insert TXI Index Data Queries
-    async fn prepare_query(
-        session: &Arc<Session>, cfg: &cassandra_db::EnvVars,
-    ) -> anyhow::Result<QueryKind> {
-        TxiInsertQuery::prepare_batch(session, cfg)
-            .await
-            .map(QueryKind::Batch)
-    }
-}
-
 /// TXI by Txn hash Index
 const INSERT_TXI_QUERY: &str = include_str!("./cql/insert_txi.cql");
 
-impl fmt::Display for TxiInsertQuery {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{INSERT_TXI_QUERY}")
-    }
-}
+impl_query_batch!(TxiInsertQuery, INSERT_TXI_QUERY);
 
 impl TxiInsertQuery {
     /// Create a new record for this transaction.

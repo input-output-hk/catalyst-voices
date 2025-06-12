@@ -1,6 +1,6 @@
 //! Insert invalid RBAC 509 Registration Query.
 
-use std::{fmt::Debug, sync::Arc};
+use std::{fmt, sync::Arc};
 
 use cardano_blockchain_types::{Slot, TransactionId, TxnIndex};
 use catalyst_types::{catalyst_id::CatalystId, problem_report::ProblemReport, uuid::UuidV4};
@@ -12,6 +12,7 @@ use crate::{
         index::queries::{PreparedQueries, SizedBatch},
         types::{DbCatalystId, DbSlot, DbTransactionId, DbTxnIndex, DbUuidV4},
     },
+    impl_query_batch,
     settings::cassandra_db::EnvVars,
 };
 
@@ -20,7 +21,7 @@ const QUERY: &str = include_str!("cql/insert_rbac509_invalid.cql");
 
 /// Insert an invalid RBAC registration query parameters.
 #[derive(SerializeRow)]
-pub(crate) struct Params {
+pub(crate) struct Rbac509InvalidInsert {
     /// A Catalyst short identifier.
     catalyst_id: DbCatalystId,
     /// A transaction hash of this registration.
@@ -37,7 +38,9 @@ pub(crate) struct Params {
     problem_report: String,
 }
 
-impl Params {
+impl_query_batch!(Rbac509InvalidInsert, QUERY);
+
+impl Rbac509InvalidInsert {
     /// Create a new record for this transaction.
     pub(crate) fn new(
         catalyst_id: CatalystId, txn_id: TransactionId, slot_no: Slot, txn_index: TxnIndex,
@@ -81,8 +84,8 @@ impl Params {
     }
 }
 
-impl Debug for Params {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl fmt::Debug for Rbac509InvalidInsert {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let prv_txn_id = match self.prv_txn_id {
             MaybeUnset::Unset => "UNSET".to_owned(),
             MaybeUnset::Set(v) => format!("{v}"),
@@ -91,7 +94,7 @@ impl Debug for Params {
             MaybeUnset::Unset => "UNSET".to_owned(),
             MaybeUnset::Set(v) => format!("{}", UuidV4::from(v)),
         };
-        f.debug_struct("Params")
+        f.debug_struct("Rbac509InvalidInsert")
             .field("catalyst_id", &self.catalyst_id)
             .field("txn_id", &self.txn_id)
             .field("slot_no", &self.slot_no)
