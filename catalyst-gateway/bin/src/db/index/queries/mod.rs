@@ -125,7 +125,7 @@ macro_rules! impl_query_statement {
                 session: &std::sync::Arc<scylla::Session>,
                 _: &$crate::settings::cassandra_db::EnvVars,
             ) -> anyhow::Result<$crate::db::index::queries::QueryKind> {
-                Self::prepare(session)
+                Self::prepare(session.clone())
                     .await
                     .map($crate::db::index::queries::QueryKind::Statement)
             }
@@ -285,9 +285,7 @@ async fn prepare_queries(
         ( $( $i:ty),* ) => {
             {
                 let queries = vec![
-                    $(
-                        (TypeId::of::<$i>(), <$i>::prepare_query(session, cfg).await?),
-                    )*
+                    $( (TypeId::of::<$i>(), <$i>::prepare_query(session, cfg).await?), )*
                 ];
                 DashMap::from_iter(queries)
             }
@@ -312,7 +310,15 @@ async fn prepare_queries(
         CatalystIdForStakeAddressInsert,
         // prepared statement queries
         GetTxoByStakeAddressQuery,
-        GetTxiByTxnHashesQuery
+        GetTxiByTxnHashesQuery,
+        GetAssetsByStakeAddressQuery,
+        GetRegistrationQuery,
+        GetStakeAddrQuery,
+        GetStakeAddrFromVoteKeyQuery,
+        GetInvalidRegistrationQuery,
+        GetAllRegistrationsQuery,
+        GetAllInvalidRegistrationsQuery,
+        SyncStatusInsertQuery
     );
     Ok(queries)
 }
@@ -349,8 +355,8 @@ impl PreparedQueries {
         ) = Rbac509InsertQuery::prepare_batch(&session, cfg).await?;
 
         // Prepared Statement queries
-        let txo_by_stake_address_query = GetTxoByStakeAddressQuery::prepare(&session).await;
-        let txi_by_txn_hash_query = GetTxiByTxnHashesQuery::prepare(&session).await;
+        let txo_by_stake_address_query = GetTxoByStakeAddressQuery::prepare(session.clone()).await;
+        let txi_by_txn_hash_query = GetTxiByTxnHashesQuery::prepare(session.clone()).await;
         let native_assets_by_stake_address_query =
             GetAssetsByStakeAddressQuery::prepare(session.clone()).await;
         let registration_from_stake_addr_query =

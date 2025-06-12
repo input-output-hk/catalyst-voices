@@ -13,6 +13,7 @@ use crate::{
         queries::{PreparedQueries, PreparedUpsertQuery},
         session::CassandraSession,
     },
+    impl_query_statement,
     service::utilities::convert::from_saturating,
     settings::Settings,
 };
@@ -59,6 +60,8 @@ impl SyncStatusQueryParams {
 
 /// Sync Status Insert query.
 pub(crate) struct SyncStatusInsertQuery;
+
+impl_query_statement!(SyncStatusInsertQuery, INSERT_SYNC_STATUS_QUERY);
 
 impl SyncStatusInsertQuery {
     /// Prepares a Sync Status Insert query.

@@ -16,6 +16,7 @@ use crate::{
         },
         types::DbSlot,
     },
+    impl_query_statement,
     service::common::types::cardano::slot_no::SlotNo,
 };
 
@@ -58,6 +59,11 @@ pub(crate) struct GetInvalidRegistrationQuery {
     /// Is the Registration CIP36 format, or CIP15
     pub cip36: bool,
 }
+
+impl_query_statement!(
+    GetInvalidRegistrationQuery,
+    GET_INVALID_REGISTRATIONS_FROM_STAKE_ADDR_QUERY
+);
 
 impl GetInvalidRegistrationQuery {
     /// Prepares a get invalid registration query.

@@ -8,12 +8,15 @@ use scylla::{
 };
 use tracing::error;
 
-use crate::db::{
-    index::{
-        queries::{PreparedQueries, PreparedSelectQuery},
-        session::CassandraSession,
+use crate::{
+    db::{
+        index::{
+            queries::{PreparedQueries, PreparedSelectQuery},
+            session::CassandraSession,
+        },
+        types::{DbSlot, DbTxnIndex},
     },
-    types::{DbSlot, DbTxnIndex},
+    impl_query_statement,
 };
 
 /// Get registrations from stake addr query.
@@ -53,6 +56,11 @@ pub(crate) struct GetRegistrationQuery {
     /// Is the Registration CIP36 format, or CIP15
     pub cip36: bool,
 }
+
+impl_query_statement!(
+    GetRegistrationQuery,
+    GET_REGISTRATIONS_FROM_STAKE_ADDR_QUERY
+);
 
 impl GetRegistrationQuery {
     /// Prepares a get registration query.
