@@ -2545,7 +2545,7 @@
   "@dontShowAgain": {
     "description": "Action to not show again"
   },
-  "proposalSubmissionWindowClosesAt": "The proposal submission window closes {date}",
+  "proposalSubmissionWindowClosesAt": "The proposal submission window closes on {date}",
   "@proposalSubmissionWindowClosesAt": {
     "description": "Description for the proposal submission window closes at",
     "placeholders": {
@@ -2554,11 +2554,11 @@
       }
     }
   },
-  "submitProposalBeforeClosing": "Submit your final proposals to Review stage well before the App closes.",
-  "@submitProposalBeforeClosing": {
-    "description": "Information for user to submit proposal before the submission window closes"
+  "moveFinalProposalsToReviewStage": "Move your Final proposals into the Review stage.",
+  "@moveFinalProposalsToReviewStage": {
+    "description": "Information for user to to move their final proposals to review stage before submission window closes"
   },
-  "checkMaxProposal": "Check your finals (max {count}) in My proposals.",
+  "checkMaxProposal": "Submit no more than {count} {count, plural, =1{proposal} other{proposals}} as Final.",
   "@checkMaxProposal": {
     "description": "Information for user to check their final proposals before submission window closes",
     "placeholders": {
@@ -2566,10 +2566,6 @@
         "type": "int"
       }
     }
-  },
-  "catalystAppNotAvailableAfterSubmissionCloses": "The Catalyst App won’t be available after submission close.",
-  "@catalystAppNotAvailableAfterSubmissionCloses": {
-    "description": "Information that app won't be available after submission closes"
   },
   "wantToBackUpProposals": "Want to back up your proposals?",
   "@wantToBackUpProposals": {
@@ -3021,5 +3017,13 @@
   "reviewTimelineHeader": "Community review:",
   "@reviewTimelineHeader": {
     "description": "Header for the review timeline"
+  },
+  "stepsToDoBeforeAppCloses": "Before the Catalyst app closes, make sure to:",
+  "@stepsToDoBeforeAppCloses": {
+    "description": "Title for the steps to do before the app closes"
+  },
+  "importCatalystAppUnavailableAfterDeadline": "IMPORTANT: The Catalyst app won’t be accessible after the deadline.",
+  "@importCatalystAppUnavailableAfterDeadline": {
+    "description": "note for user that app will not be available after submission deadline"
   }
 }

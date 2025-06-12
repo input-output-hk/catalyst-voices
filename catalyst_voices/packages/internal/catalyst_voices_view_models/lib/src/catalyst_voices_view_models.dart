@@ -50,6 +50,7 @@ export 'segments/segments_navigation.dart';
 export 'session/session_account.dart';
 export 'session/session_settings.dart';
 export 'session/session_status.dart';
+export 'share/share_channel_ext.dart';
 export 'treasury/treasury_segments.dart';
 export 'workspace/workspace_proposal_list_item.dart';
 export 'workspace/workspace_tab_type.dart';
