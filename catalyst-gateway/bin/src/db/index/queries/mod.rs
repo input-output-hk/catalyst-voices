@@ -40,13 +40,14 @@ use super::block::{
     txi::TxiInsertQuery,
     txo::{
         insert_txo::TxoInsertQuery, insert_txo_asset::Params as TxoAssetInsert,
-        insert_unstaked_txo::Params as TxoUnstaked,
-        insert_unstaked_txo_asset::Params as TxoUnstakedAsset, TxoInsertQuery as TxoInsertQueries,
+        insert_unstaked_txo::Params as TxoUnstakedInsert,
+        insert_unstaked_txo_asset::Params as TxoUnstakedAssetInsert,
+        TxoInsertQuery as TxoInsertQueries,
     },
 };
 use crate::{
     db::index::{
-        block::certs::StakeRegistrationInsertQuery,
+        block::{certs::StakeRegistrationInsertQuery, cip36::insert_cip36::Cip36Insert},
         queries::rbac::{
             get_catalyst_id_from_stake_address, get_catalyst_id_from_transaction_id,
             get_rbac_invalid_registrations, get_rbac_registrations,
@@ -238,9 +239,10 @@ async fn prepare_queries(
         TxiInsertQuery,
         TxoInsertQuery,
         TxoAssetInsert,
-        TxoUnstaked,
-        TxoUnstakedAsset,
-        StakeRegistrationInsertQuery
+        TxoUnstakedInsert,
+        TxoUnstakedAssetInsert,
+        StakeRegistrationInsertQuery,
+        Cip36Insert
     );
     Ok(queries)
 }

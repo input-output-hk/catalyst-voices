@@ -22,7 +22,7 @@ use crate::{
 /// Insert CIP-36 Registration Queries
 pub(crate) struct Cip36InsertQuery {
     /// Stake Registration Data captured during indexing.
-    registrations: Vec<insert_cip36::Params>,
+    registrations: Vec<insert_cip36::Cip36Insert>,
     /// Stake Registration Data captured during indexing.
     invalid: Vec<insert_cip36_invalid::Params>,
     /// Stake Registration Data captured during indexing.
@@ -46,7 +46,7 @@ impl Cip36InsertQuery {
     pub(crate) async fn prepare_batch(
         session: &Arc<Session>, cfg: &cassandra_db::EnvVars,
     ) -> anyhow::Result<(SizedBatch, SizedBatch, SizedBatch)> {
-        let insert_cip36_batch = insert_cip36::Params::prepare_batch(session, cfg).await;
+        let insert_cip36_batch = insert_cip36::Cip36Insert::prepare_batch(session, cfg).await;
         let insert_cip36_invalid_batch =
             insert_cip36_invalid::Params::prepare_batch(session, cfg).await;
         let insert_cip36_for_vote_key_addr_batch =
@@ -82,7 +82,7 @@ impl Cip36InsertQuery {
                 let stake_pk_hash = Blake2b224Hash::new(&stake_pk.to_bytes());
                 let stake_address = StakeAddress::new(block.network(), false, stake_pk_hash);
 
-                self.registrations.push(insert_cip36::Params::new(
+                self.registrations.push(insert_cip36::Cip36Insert::new(
                     voting_key, slot_no, index, &cip36,
                 ));
                 self.for_vote_key
