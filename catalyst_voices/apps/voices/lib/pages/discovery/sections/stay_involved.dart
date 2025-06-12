@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:catalyst_voices/common/constants/constants.dart';
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/pages/discovery/sections/session_account_catalyst_id.dart';
+import 'package:catalyst_voices/share/share_manager.dart';
 import 'package:catalyst_voices/widgets/text/campaign_stage_time_text.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
@@ -11,6 +12,7 @@ import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class StayInvolved extends StatelessWidget {
   const StayInvolved({super.key});
@@ -55,7 +57,9 @@ class _CopyCatalystIdTipText extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.only(top: 20),
             child: TipText(
-              context.l10n.tipCopyCatalystIdForReviewTool(VoicesConstants.becomeReviewerUrl()),
+              context.l10n.tipCopyCatalystIdForReviewTool(
+                ShareManager.of(context).becomeReviewer().decoded(),
+              ),
               style:
                   context.textTheme.bodyMedium?.copyWith(color: context.colors.textOnPrimaryLevel1),
             ),
@@ -177,7 +181,11 @@ class _ReviewerCard extends StatelessWidget {
           ),
           _StayInvolvedActionButton(
             title: context.l10n.becomeReviewer,
-            urlString: VoicesConstants.becomeReviewerUrl(),
+            onTap: () {
+              final shareManager = ShareManager.of(context);
+              final uri = shareManager.becomeReviewer();
+              unawaited(launchUrl(uri));
+            },
             trailing: VoicesAssets.icons.externalLink.buildIcon(),
           ),
         ],
@@ -188,13 +196,13 @@ class _ReviewerCard extends StatelessWidget {
 
 class _StayInvolvedActionButton extends StatelessWidget with LaunchUrlMixin {
   final String title;
-  final String urlString;
   final Widget? trailing;
+  final VoidCallback? onTap;
 
   const _StayInvolvedActionButton({
     required this.title,
-    required this.urlString,
     this.trailing,
+    this.onTap,
   });
 
   @override
@@ -202,16 +210,11 @@ class _StayInvolvedActionButton extends StatelessWidget with LaunchUrlMixin {
     return Padding(
       padding: const EdgeInsets.only(top: 20),
       child: VoicesFilledButton(
-        onTap: _handleUrlTap,
+        onTap: onTap,
         trailing: trailing,
         child: Text(title),
       ),
     );
-  }
-
-  Future<void> _handleUrlTap() async {
-    final url = urlString.getUri();
-    await launchUri(url);
   }
 }
 
@@ -327,7 +330,10 @@ class _VoterCard extends StatelessWidget {
           ),
           _StayInvolvedActionButton(
             title: context.l10n.becomeVoter,
-            urlString: VoicesConstants.afterSubmissionUrl,
+            onTap: () {
+              final uri = Uri.parse(VoicesConstants.afterSubmissionUrl);
+              unawaited(launchUrl(uri));
+            },
           ),
         ],
       ),

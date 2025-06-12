@@ -6,6 +6,7 @@ import 'package:catalyst_voices/app/view/app_session_listener.dart';
 import 'package:catalyst_voices/app/view/app_splash_screen_manager.dart';
 import 'package:catalyst_voices/app/view/video_cache/app_video_precache.dart';
 import 'package:catalyst_voices/common/ext/preferences_ext.dart';
+import 'package:catalyst_voices/share/share_manager.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
@@ -64,9 +65,7 @@ final class _AppContent extends StatelessWidget {
       routerConfig: routerConfig,
       themeMode: themeMode,
       theme: ThemeBuilder.buildTheme(),
-      darkTheme: ThemeBuilder.buildTheme(
-        brightness: Brightness.dark,
-      ),
+      darkTheme: ThemeBuilder.buildTheme(brightness: Brightness.dark),
       debugShowCheckedModeBanner: false,
       builder: (_, child) {
         return AppGlobalShortcuts(
@@ -81,7 +80,9 @@ final class _AppContent extends StatelessWidget {
                   // screen behavior.
                   child: AppSplashScreenManager(
                     child: AppMobileAccessRestriction(
-                      child: child ?? const SizedBox.shrink(),
+                      child: DefaultShareManager(
+                        child: child ?? const SizedBox.shrink(),
+                      ),
                     ),
                   ),
                 ),
