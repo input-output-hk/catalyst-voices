@@ -31,12 +31,16 @@ While this maximizes rendering efficiency, it increases visual complexity and re
 
 ## Decision
 
-We will extract widgets that depend on **Bloc** state (via **BlocSelector**) into dedicated files,
+We will extract widgets that depend on any observable data source, such as **BlocSelector**,
+**StreamBuilder**, **FutureBuilder** or **ValueListenableBuilder**, into dedicated files,
 placed in the corresponding `/widgets` subdirectory.
 
 The public widget will act as the interface, encapsulating the state selection logic.
 It will delegate rendering to a private, internal widget that is unaware of the Bloc and simply
 receives the selected data as parameters.
+
+Only exception from spliting delegating rendering into separate, private, widget is having
+"atomic" or "trivial" widgets with less or equals than 2 children.
 
 ### Example
 
