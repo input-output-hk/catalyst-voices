@@ -88,6 +88,7 @@ class _SeedPhrasePanelState extends State<SeedPhrasePanel> {
   Widget build(BuildContext context) {
     return RegistrationDetailsPanelScaffold(
       body: _BlocLoadable(builder: (context) => const _BlocSeedPhraseWords()),
+      footerSpacing: 2,
       footer: const Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -120,7 +121,10 @@ class _SeedPhraseWords extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 20),
-          SeedPhrasesViewer(words: words),
+          SeedPhrasesViewer(
+            words: words,
+            crossAxisSpacing: 6,
+          ),
           const SizedBox(height: 10),
           VoicesTextButton(
             key: const Key('DownloadSeedPhraseButton'),
