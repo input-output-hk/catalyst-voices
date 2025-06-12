@@ -628,9 +628,15 @@
       }
     }
   },
-  "registrationInsufficientBalance": "Wallet Balance Too Low. Please ensure your Cardano wallet has at least 5 ADA before continuing.",
+  "registrationInsufficientBalance": "Wallet Balance Too Low. Please ensure your Cardano wallet has at least {amount} ADA before continuing.",
   "@registrationInsufficientBalance": {
-    "description": "Indicates an error when preparing a transaction has failed due to low wallet balance."
+    "description": "Indicates an error when preparing a transaction has failed due to low wallet balance.",
+    "placeholders": {
+      "amount": {
+        "type": "double",
+        "format": "compact"
+      }
+    }
   },
   "registrationSeedPhraseNotFound": "Seed phrase was not found. Make sure correct words are correct.",
   "@registrationSeedPhraseNotFound": {
@@ -2521,9 +2527,15 @@
   "@goodToKnow": {
     "description": "Text to show when some tip will be presented to user"
   },
-  "registrationTransactionFeeDescription": "The creation of a Catalyst account costs, a transaction fee of (0,21 ADA), be sure your wallet has a minimum of 5 ADA.",
+  "registrationTransactionFeeDescription": "The creation of a Catalyst account costs, a transaction fee of (0,21 ADA), be sure your wallet has a minimum of {amount} ADA.",
   "@registrationTransactionFeeDescription": {
-    "description": "Description for the registration transaction fee"
+    "description": "Description for the registration transaction fee",
+    "placeholders": {
+      "amount": {
+        "type": "double",
+        "format": "compact"
+      }
+    }
   },
   "eternlWallet": "Eternl Wallet",
   "@eternlWallet": {
