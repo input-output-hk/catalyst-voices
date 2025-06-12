@@ -18,27 +18,10 @@ class _PrivacyPolicyRichTextState extends State<PrivacyPolicyRichText> with Laun
   late final TapGestureRecognizer _recognizer;
 
   @override
-  void initState() {
-    super.initState();
-
-    _recognizer = TapGestureRecognizer();
-    _recognizer.onTap = () {
-      final uri = Uri.parse(VoicesConstants.privacyPolicyUrl);
-      unawaited(launchUri(uri));
-    };
-  }
-
-  @override
-  void dispose() {
-    _recognizer.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return PlaceholderRichText(
       key: const Key('PrivacyPolicyRichText'),
-      context.l10n.createBaseProfileAcknowledgementsPrivacyPolicy,
+      context.l10n.createProfileAcknowledgementsPrivacyPolicy('{privacy_policy}'),
       placeholderSpanBuilder: (context, placeholder) {
         return switch (placeholder) {
           'privacy_policy' => TextSpan(
@@ -50,5 +33,22 @@ class _PrivacyPolicyRichTextState extends State<PrivacyPolicyRichText> with Laun
         };
       },
     );
+  }
+
+  @override
+  void dispose() {
+    _recognizer.dispose();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    _recognizer = TapGestureRecognizer();
+    _recognizer.onTap = () {
+      final uri = Uri.parse(VoicesConstants.privacyPolicyUrl);
+      unawaited(launchUri(uri));
+    };
   }
 }

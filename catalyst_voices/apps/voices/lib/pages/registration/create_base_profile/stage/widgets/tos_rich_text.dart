@@ -18,27 +18,10 @@ class _TosRichTextState extends State<TosRichText> with LaunchUrlMixin {
   late final TapGestureRecognizer _recognizer;
 
   @override
-  void initState() {
-    super.initState();
-
-    _recognizer = TapGestureRecognizer();
-    _recognizer.onTap = () {
-      final uri = Uri.parse(VoicesConstants.tosUrl);
-      unawaited(launchUri(uri));
-    };
-  }
-
-  @override
-  void dispose() {
-    _recognizer.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return PlaceholderRichText(
       key: const Key('TosRichText'),
-      context.l10n.createBaseProfileAcknowledgementsToS,
+      context.l10n.createProfileAcknowledgementsToS('{tos}'),
       placeholderSpanBuilder: (context, placeholder) {
         return switch (placeholder) {
           'tos' => TextSpan(
@@ -50,5 +33,22 @@ class _TosRichTextState extends State<TosRichText> with LaunchUrlMixin {
         };
       },
     );
+  }
+
+  @override
+  void dispose() {
+    _recognizer.dispose();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    _recognizer = TapGestureRecognizer();
+    _recognizer.onTap = () {
+      final uri = Uri.parse(VoicesConstants.tosUrl);
+      unawaited(launchUri(uri));
+    };
   }
 }

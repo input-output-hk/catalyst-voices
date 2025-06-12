@@ -5,12 +5,14 @@ import '../../../utils/translations_utils.dart';
 import '../onboarding_base_page.dart';
 import 'step_4_acknowledgments.dart';
 
-class BaseProfileFinalPanel extends OnboardingPageBase {
-  BaseProfileFinalPanel(super.$);
-
+class ProfileFinalPanel extends OnboardingPageBase {
   static const createKeychainButton = Key('CreateKeychainButton');
+
   final nextStepBody = const Key('NextStepBody');
   final nextStepTitle = const Key('NextStepText');
+
+  ProfileFinalPanel(super.$);
+
   Future<void> clickCreateKeychain() async {
     await $(createKeychainButton).tap();
   }
@@ -21,10 +23,10 @@ class BaseProfileFinalPanel extends OnboardingPageBase {
     await AcknowledgmentsPanel($).clickNext();
   }
 
-  @override
-  Future<void> verifyPageElements() async {
-    await verifyInfoPanel();
-    await verifyDetailsPanel();
+  Future<void> verifyDetailsPanel() async {
+    expect($(createKeychainButton), findsOneWidget);
+    expect($(nextStepBody), findsOneWidget);
+    expect($(nextStepTitle), findsOneWidget);
   }
 
   Future<void> verifyInfoPanel() async {
@@ -40,9 +42,9 @@ class BaseProfileFinalPanel extends OnboardingPageBase {
     );
   }
 
-  Future<void> verifyDetailsPanel() async {
-    expect($(createKeychainButton), findsOneWidget);
-    expect($(nextStepBody), findsOneWidget);
-    expect($(nextStepTitle), findsOneWidget);
+  @override
+  Future<void> verifyPageElements() async {
+    await verifyInfoPanel();
+    await verifyDetailsPanel();
   }
 }
