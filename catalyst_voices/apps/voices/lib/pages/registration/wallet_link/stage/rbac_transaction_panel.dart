@@ -135,8 +135,8 @@ class _BlocTxSubmitError extends StatelessWidget {
   }
 }
 
-class _DefaultNavigation extends StatelessWidget {
-  const _DefaultNavigation();
+class _SuccessNavigation extends StatelessWidget {
+  const _SuccessNavigation();
 
   @override
   Widget build(BuildContext context) {
@@ -231,7 +231,7 @@ class _Navigation extends StatelessWidget {
         if (isFailure) {
           return const _ErrorNavigation();
         } else {
-          return const _DefaultNavigation();
+          return const _SuccessNavigation();
         }
       },
     );
