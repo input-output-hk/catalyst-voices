@@ -6,19 +6,15 @@ final class BaseProfileStateData extends Equatable {
   final Username username;
   final bool isToSAccepted;
   final bool isPrivacyPolicyAccepted;
-  final bool isDataUsageAccepted;
 
   const BaseProfileStateData({
     this.email = const Email.pure(),
     this.username = const Username.pure(),
     this.isToSAccepted = false,
     this.isPrivacyPolicyAccepted = false,
-    this.isDataUsageAccepted = false,
   });
 
-  bool get arAcknowledgementsAccepted {
-    return isToSAccepted && isPrivacyPolicyAccepted && isDataUsageAccepted;
-  }
+  bool get arAcknowledgementsAccepted => isToSAccepted && isPrivacyPolicyAccepted;
 
   bool get isBaseProfileDataValid => email.isValid && username.isValid;
 
@@ -30,7 +26,6 @@ final class BaseProfileStateData extends Equatable {
         username,
         isToSAccepted,
         isPrivacyPolicyAccepted,
-        isDataUsageAccepted,
       ];
 
   BaseProfileStateData copyWith({
@@ -38,14 +33,12 @@ final class BaseProfileStateData extends Equatable {
     Username? username,
     bool? isToSAccepted,
     bool? isPrivacyPolicyAccepted,
-    bool? isDataUsageAccepted,
   }) {
     return BaseProfileStateData(
       email: email ?? this.email,
       username: username ?? this.username,
       isToSAccepted: isToSAccepted ?? this.isToSAccepted,
       isPrivacyPolicyAccepted: isPrivacyPolicyAccepted ?? this.isPrivacyPolicyAccepted,
-      isDataUsageAccepted: isDataUsageAccepted ?? this.isDataUsageAccepted,
     );
   }
 }

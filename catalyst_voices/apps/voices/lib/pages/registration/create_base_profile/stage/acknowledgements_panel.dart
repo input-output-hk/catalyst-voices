@@ -21,42 +21,9 @@ class AcknowledgementsPanel extends StatelessWidget {
           _TosCheckboxSelector(key: ValueKey('TosCheckbox')),
           SizedBox(height: 24),
           _PrivacyPolicySelector(key: ValueKey('PrivacyPolicyCheckbox')),
-          SizedBox(height: 24),
-          _DataUsageSelector(key: ValueKey('DataUsageCheckbox')),
         ],
       ),
       footer: const _NavigationSelector(),
-    );
-  }
-}
-
-class _DataUsageCheckBox extends StatelessWidget {
-  final bool isChecked;
-
-  const _DataUsageCheckBox({
-    required this.isChecked,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return VoicesCheckbox(
-      value: isChecked,
-      label: Text(context.l10n.createBaseProfileAcknowledgementsDataUsage),
-      onChanged: (value) {
-        RegistrationCubit.of(context).baseProfile.updateDataUsage(isAccepted: value);
-      },
-    );
-  }
-}
-
-class _DataUsageSelector extends StatelessWidget {
-  const _DataUsageSelector({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocBaseProfileSelector<bool>(
-      selector: (state) => state.isDataUsageAccepted,
-      builder: (context, state) => _DataUsageCheckBox(isChecked: state),
     );
   }
 }
