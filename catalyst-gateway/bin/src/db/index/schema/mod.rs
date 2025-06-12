@@ -86,11 +86,6 @@ const SCHEMAS: &[(&str, &str)] = &[
         include_str!("cql/catalyst_id_for_stake_address.cql"),
         "Create Table Catalyst ID For Stake Address",
     ),
-    (
-        // Secondary index for RBAC 509 registrations table.
-        include_str!("cql/rbac_registration_cat_id_by_txn_id_index.cql"),
-        "Create secondary index Catalyst ID for transaction ID on rbac_registration",
-    ),
 ];
 
 /// Removes all comments from each line in the input query text and joins the remaining
@@ -265,7 +260,7 @@ mod tests {
     /// This constant is ONLY used by Unit tests to identify when the schema version will
     /// change accidentally, and is NOT to be used directly to set the schema version of
     /// the table namespaces.
-    const SCHEMA_VERSION: &str = "f2e9ee5e-278c-8c9c-b3f6-8a27d4443e29";
+    const SCHEMA_VERSION: &str = "504c9e72-9737-849c-8212-37824eff881a";
 
     #[test]
     /// This test is designed to fail if the schema version has changed.
