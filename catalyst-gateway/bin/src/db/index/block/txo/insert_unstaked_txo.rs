@@ -1,5 +1,5 @@
 //! Insert Unstaked TXOs into the DB.
-use std::{fmt, sync::Arc};
+use std::sync::Arc;
 
 use cardano_blockchain_types::{Slot, TransactionId, TxnIndex, TxnOutputOffset};
 use scylla::{SerializeRow, Session};
@@ -7,9 +7,10 @@ use tracing::error;
 
 use crate::{
     db::{
-        index::queries::{PreparedQueries, Query, QueryKind, SizedBatch},
+        index::queries::{PreparedQueries, SizedBatch},
         types::{DbSlot, DbTransactionId, DbTxnIndex, DbTxnOutputOffset},
     },
+    impl_query_batch,
     settings::cassandra_db,
 };
 
@@ -34,21 +35,7 @@ pub(crate) struct Params {
     value: num_bigint::BigInt,
 }
 
-impl fmt::Display for Params {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{INSERT_UNSTAKED_TXO_QUERY}")
-    }
-}
-
-impl Query for Params {
-    async fn prepare_query(
-        session: &Arc<Session>, cfg: &cassandra_db::EnvVars,
-    ) -> anyhow::Result<crate::db::index::queries::QueryKind> {
-        Params::prepare_batch(session, cfg)
-            .await
-            .map(QueryKind::Batch)
-    }
-}
+impl_query_batch!(Params, INSERT_UNSTAKED_TXO_QUERY);
 
 impl Params {
     /// Create a new record for this transaction.

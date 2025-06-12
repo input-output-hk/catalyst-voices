@@ -11,13 +11,12 @@ use tracing::error;
 use crate::{
     db::{
         index::{
-            queries::{
-                FallibleQueryTasks, PreparedQueries, PreparedQuery, Query, QueryKind, SizedBatch,
-            },
+            queries::{FallibleQueryTasks, PreparedQueries, PreparedQuery, SizedBatch},
             session::CassandraSession,
         },
         types::{DbPublicKey, DbSlot, DbStakeAddress, DbTxnIndex},
     },
+    impl_query_batch,
     settings::cassandra_db,
 };
 
@@ -42,17 +41,6 @@ pub(crate) struct StakeRegistrationInsertQuery {
     cip36: MaybeUnset<bool>,
     /// Pool Delegation Address
     pool_delegation: MaybeUnset<Vec<u8>>,
-}
-
-impl Query for StakeRegistrationInsertQuery {
-    /// Prepare Batch of Insert TXI Index Data Queries
-    async fn prepare_query(
-        session: &Arc<Session>, cfg: &cassandra_db::EnvVars,
-    ) -> anyhow::Result<QueryKind> {
-        StakeRegistrationInsertQuery::prepare_batch(session, cfg)
-            .await
-            .map(QueryKind::Batch)
-    }
 }
 
 impl fmt::Debug for StakeRegistrationInsertQuery {
@@ -92,11 +80,10 @@ impl fmt::Debug for StakeRegistrationInsertQuery {
 /// Insert stake registration
 const INSERT_STAKE_REGISTRATION_QUERY: &str = include_str!("./cql/insert_stake_registration.cql");
 
-impl fmt::Display for StakeRegistrationInsertQuery {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{INSERT_STAKE_REGISTRATION_QUERY}")
-    }
-}
+impl_query_batch!(
+    StakeRegistrationInsertQuery,
+    INSERT_STAKE_REGISTRATION_QUERY
+);
 
 impl StakeRegistrationInsertQuery {
     /// Create a new Insert Query.

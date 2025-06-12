@@ -1,6 +1,6 @@
 //! Insert CIP36 Registration Query
 
-use std::{fmt, sync::Arc};
+use std::sync::Arc;
 
 use cardano_blockchain_types::{Cip36, Slot, TxnIndex, VotingPubKey};
 use scylla::{SerializeRow, Session};
@@ -8,9 +8,10 @@ use tracing::error;
 
 use crate::{
     db::{
-        index::queries::{PreparedQueries, Query, QueryKind, SizedBatch},
+        index::queries::{PreparedQueries, SizedBatch},
         types::{DbSlot, DbTxnIndex},
     },
+    impl_query_batch,
     settings::cassandra_db,
 };
 
@@ -33,22 +34,10 @@ pub(crate) struct Cip36ForVoteKeyInsert {
     valid: bool,
 }
 
-impl Query for Cip36ForVoteKeyInsert {
-    /// Prepare Batch of Insert TXI Index Data Queries
-    async fn prepare_query(
-        session: &Arc<Session>, cfg: &cassandra_db::EnvVars,
-    ) -> anyhow::Result<QueryKind> {
-        Self::prepare_batch(session, cfg)
-            .await
-            .map(QueryKind::Batch)
-    }
-}
-
-impl fmt::Display for Cip36ForVoteKeyInsert {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{INSERT_CIP36_REGISTRATION_FOR_VOTE_KEY_QUERY}")
-    }
-}
+impl_query_batch!(
+    Cip36ForVoteKeyInsert,
+    INSERT_CIP36_REGISTRATION_FOR_VOTE_KEY_QUERY
+);
 
 impl Cip36ForVoteKeyInsert {
     /// Create a new Insert Query.
