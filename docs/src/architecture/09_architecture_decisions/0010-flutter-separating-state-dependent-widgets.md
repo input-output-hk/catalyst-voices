@@ -1,7 +1,7 @@
 ---
     title: Separation of concerns for bloc state-dependent widgets
       adr:
-        author: Damian Moliński
+        author: Damian Molinski
         created: 06-Jun-2025
         status: proposed
         extends:
@@ -15,20 +15,28 @@
 
 ## Context
 
-We use [flutter_bloc](https://pub.dev/packages/flutter_bloc) as our state management solution. Commonly, we use **BlocSelector** to retrieve specific parts of **Bloc** state. This allows us to rebuild only widgets when data, which they depend on, changes.
+We use [flutter_bloc](https://pub.dev/packages/flutter_bloc) as our state management solution.
+Commonly, we use **BlocSelector** to retrieve specific parts of **Bloc** state.
+This allows us to rebuild only widgets when data, which they depend on, changes.
 
-However, embedding **BlocSelector** directly within large widgets clutters the widget tree with state-selection logic. While this maximizes rendering efficiency, it increases visual complexity and reduces maintainability.
+However, embedding **BlocSelector** directly within large widgets clutters the widget tree with state-selection logic.
+While this maximizes rendering efficiency, it increases visual complexity and reduces maintainability.
 
 ## Assumptions
 
 * System will grow and UI will become more complex
-* We need to make widget tree as simple to read and understand as possible in order to make it easier to maintain and modify while system grows
+* We need to make widget tree as simple to read and understand as possible in order to
+  * make it easier to maintain
+  * modify and apply changes while system grows
 
 ## Decision
 
-We will extract widgets that depend on **Bloc** state (via **BlocSelector**) into dedicated files, placed in the corresponding `/widgets` subdirectory.
+We will extract widgets that depend on **Bloc** state (via **BlocSelector**) into dedicated files,
+placed in the corresponding `/widgets` subdirectory.
 
-The public widget will act as the interface, encapsulating the state selection logic. It will delegate rendering to a private, internal widget that is unaware of the Bloc and simply receives the selected data as parameters.
+The public widget will act as the interface, encapsulating the state selection logic.
+It will delegate rendering to a private, internal widget that is unaware of the Bloc and simply
+receives the selected data as parameters.
 
 ### Example
 
@@ -144,8 +152,10 @@ return SpacesScaffold(
 
 ## Risks
 
-* While this introduces more files and a slight increase in initial development effort due to the two-widget pattern, we believe the long-term gains in maintainability and readability outweigh this overhead
-* Risk of over-abstraction if used for trivial selections
+While this introduces more files and a slight increase in initial development effort due to the
+two-widget pattern, we believe the long-term gains in maintainability and readability outweigh
+this overhead.
+Risk of over-abstraction if used for trivial selections
 
 ## Consequences
 
