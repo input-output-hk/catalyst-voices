@@ -250,7 +250,8 @@ async fn prepare_queries(
         StakeRegistrationInsertQuery,
         Cip36Insert,
         Cip36InvalidInsert,
-        Cip36ForVoteKeyInsert
+        Cip36ForVoteKeyInsert,
+        UpdateTxoSpentQuery
     );
     Ok(queries)
 }
@@ -276,8 +277,7 @@ impl PreparedQueries {
             cip36_registration_error_insert_queries,
             cip36_registration_for_vote_key_insert_queries,
         ) = Cip36InsertQuery::prepare_batch(&session, cfg).await?;
-        let txo_spent_update_queries =
-            UpdateTxoSpentQuery::prepare_batch(session.clone(), cfg).await?;
+        let txo_spent_update_queries = UpdateTxoSpentQuery::prepare_batch(&session, cfg).await?;
         let txo_by_stake_address_query = GetTxoByStakeAddressQuery::prepare(session.clone()).await;
         let txi_by_txn_hash_query = GetTxiByTxnHashesQuery::prepare(session.clone()).await;
         let (
