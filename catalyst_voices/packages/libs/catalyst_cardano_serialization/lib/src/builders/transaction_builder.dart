@@ -151,7 +151,6 @@ final class TransactionBuilder extends Equatable {
     ChangeOutputAdaStrategy changeOutputStrategy = ChangeOutputAdaStrategy.burn,
   }) {
     final (selectedInputs, changes, totalFee) = selectInputs(
-      strategy: config.selectionStrategy,
       minInputs: minInputs,
       maxInputs: maxInputs,
       changeOutputStrategy: changeOutputStrategy,
