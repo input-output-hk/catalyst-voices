@@ -1,6 +1,6 @@
 //! Update the TXO Spent column to optimize future queries.
 
-use std::{fmt, sync::Arc};
+use std::sync::Arc;
 
 use scylla::{SerializeRow, Session};
 use tracing::error;
@@ -8,13 +8,12 @@ use tracing::error;
 use crate::{
     db::{
         index::{
-            queries::{
-                FallibleQueryResults, PreparedQueries, PreparedQuery, Query, QueryKind, SizedBatch,
-            },
+            queries::{FallibleQueryResults, PreparedQueries, PreparedQuery, SizedBatch},
             session::CassandraSession,
         },
         types::{DbSlot, DbStakeAddress, DbTxnIndex, DbTxnOutputOffset},
     },
+    impl_query_batch,
     settings::cassandra_db,
 };
 
@@ -39,22 +38,7 @@ pub(crate) struct UpdateTxoSpentQueryParams {
 /// Update TXO spent query.
 pub(crate) struct UpdateTxoSpentQuery;
 
-impl Query for UpdateTxoSpentQuery {
-    /// Prepare Batch of Insert TXI Index Data Queries
-    async fn prepare_query(
-        session: &Arc<Session>, cfg: &cassandra_db::EnvVars,
-    ) -> anyhow::Result<QueryKind> {
-        Self::prepare_batch(session, cfg)
-            .await
-            .map(QueryKind::Batch)
-    }
-}
-
-impl fmt::Display for UpdateTxoSpentQuery {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{UPDATE_TXO_SPENT_QUERY}")
-    }
-}
+impl_query_batch!(UpdateTxoSpentQuery, UPDATE_TXO_SPENT_QUERY);
 
 impl UpdateTxoSpentQuery {
     /// Prepare a batch of update TXO spent queries.
