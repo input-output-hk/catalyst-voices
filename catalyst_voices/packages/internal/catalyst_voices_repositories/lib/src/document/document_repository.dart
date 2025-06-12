@@ -121,6 +121,11 @@ abstract interface class DocumentRepository {
     bool includeLocalDrafts = false,
   });
 
+  /// Removes all locally stored documents.
+  ///
+  /// Returns number of deleted rows.
+  Future<int> removeAll();
+
   /// Updates fav status matching [ref].
   Future<void> updateDocumentFavorite({
     required DocumentRef ref,
@@ -376,6 +381,14 @@ final class DocumentRepositoryImpl implements DocumentRepository {
           ),
         )
         .toList();
+  }
+
+  @override
+  Future<int> removeAll() async {
+    final deletedDrafts = await _drafts.deleteAll();
+    final deletedDocuments = await _localDocuments.deleteAll();
+
+    return deletedDrafts + deletedDocuments;
   }
 
   @override
