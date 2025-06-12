@@ -39,7 +39,7 @@ impl Endpoint for MetricsUpdaterMiddleware {
         }
 
         // perform updating as another task
-        let updater = self.updater.clone();
+        let updater = self.updater;
         let handle = tokio::task::spawn(async move { (updater)() });
 
         if let Err(err) = handle.await {

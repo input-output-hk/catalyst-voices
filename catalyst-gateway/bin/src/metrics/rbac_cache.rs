@@ -86,14 +86,14 @@ pub(crate) fn update() {
 
     reporter::MAX_CACHE_SIZE
         .with_label_values(&[&api_host_names, service_id, &network])
-        .set(i64::try_from(Settings::rbac_cache_max_mem_size()).unwrap_or(-1));
-    reporter::RBAC_ENTRIES
+        .set(i64::try_from(Settings::rbac_cache_max_size()).unwrap_or(-1));
+    reporter::RBAC_CHAIN_ENTRIES
         .with_label_values(&[&api_host_names, service_id, &network])
         .set(i64::try_from(rbac_entries).unwrap_or(-1));
     // TODO: add size approximation on storage caching when it's available
     reporter::CACHE_SIZE
         .with_label_values(&[&api_host_names, service_id, &network])
-        .set(i64::try_from(0).unwrap_or(-1));
+        .set(0);
 }
 
 /// All the related RBAC Registration Chain Caching reporting metrics to the Prometheus
@@ -210,9 +210,9 @@ pub(crate) mod reporter {
     });
 
     /// Total number of RBAC registration chain entries being stored as cache.
-    pub(crate) static RBAC_ENTRIES: LazyLock<IntGaugeVec> = LazyLock::new(|| {
+    pub(crate) static RBAC_CHAIN_ENTRIES: LazyLock<IntGaugeVec> = LazyLock::new(|| {
         register_int_gauge_vec!(
-            "cache_rbac_entries",
+            "cache_rbac_chain_entries",
             "Total number of RBAC registration chain entries being stored as cache",
             &METRIC_LABELS
         )

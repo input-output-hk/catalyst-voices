@@ -55,11 +55,8 @@ const METRICS_MEMORY_INTERVAL_DEFAULT: Duration = Duration::from_secs(1);
 /// Default `METRICS_FOLLOWER_INTERVAL`, 1 second.
 const METRICS_FOLLOWER_INTERVAL_DEFAULT: Duration = Duration::from_secs(1);
 
-/// Default `RBAC_CACHE_MAX_MEM_SIZE`, 10 MB.
-const RBAC_CACHE_MAX_MEM_SIZE_DEFAULT: u64 = 10 * 1024 * 1024;
-
-/// Default `RBAC_CACHE_MAX_DISK_SIZE`, 10 GB.
-const RBAC_CACHE_MAX_DISK_SIZE_DEFAULT: u64 = 10 * 1024 * 1024 * 1024;
+/// Default `RBAC_CACHE_MAX_SIZE`, 10 GB.
+const RBAC_CACHE_MAX_SIZE_DEFAULT: u64 = 10 * 1024 * 1024 * 1024;
 
 /// Default number of slots used as overlap when purging Live Index data.
 const PURGE_BACKWARD_SLOT_BUFFER_DEFAULT: u64 = 100;
@@ -157,12 +154,8 @@ struct EnvVars {
     /// Interval for updating and sending Chain Follower metrics.
     metrics_follower_interval: Duration,
 
-    /// Maximum in-memory cache size for RBAC data, in bytes.
-    rbac_cache_max_mem_size: u64,
-
-    /// Maximum disk cache size for RBAC data, in bytes.
-    #[allow(unused)]
-    rbac_cache_max_disk_size: u64,
+    /// Maximum cache size on disk for RBAC data, in bytes.
+    rbac_cache_max_size: u64,
 
     /// Interval for determining if the service is live.
     service_live_timeout_interval: Duration,
@@ -245,15 +238,9 @@ static ENV_VARS: LazyLock<EnvVars> = LazyLock::new(|| {
             "SERVICE_LIVE_TIMEOUT_INTERVAL",
             SERVICE_LIVE_TIMEOUT_INTERVAL_DEFAULT,
         ),
-        rbac_cache_max_mem_size: StringEnvVar::new_as_int(
-            "RBAC_CACHE_MAX_MEM_SIZE",
-            RBAC_CACHE_MAX_MEM_SIZE_DEFAULT,
-            0,
-            u64::MAX,
-        ),
-        rbac_cache_max_disk_size: StringEnvVar::new_as_int(
+        rbac_cache_max_size: StringEnvVar::new_as_int(
             "RBAC_CACHE_MAX_DISK_SIZE",
-            RBAC_CACHE_MAX_DISK_SIZE_DEFAULT,
+            RBAC_CACHE_MAX_SIZE_DEFAULT,
             0,
             u64::MAX,
         ),
@@ -405,8 +392,8 @@ impl Settings {
     }
 
     /// Maximum in-memory cache size for RBAC data, in bytes.
-    pub(crate) fn rbac_cache_max_mem_size() -> u64 {
-        ENV_VARS.rbac_cache_max_mem_size
+    pub(crate) fn rbac_cache_max_size() -> u64 {
+        ENV_VARS.rbac_cache_max_size
     }
 
     /// Get a list of all host names to serve the API on.
