@@ -59,11 +59,16 @@ use crate::{
                 insert_rbac509::Rbac509Insert, insert_rbac509_invalid::Rbac509InvalidInsert,
             },
         },
-        queries::rbac::{
-            get_catalyst_id_from_stake_address::GetCatalystIdForStakeAddress,
-            get_catalyst_id_from_transaction_id::GetCatalystIdForTxnId,
-            get_rbac_invalid_registrations::GetRbac509InvalidRegistrations,
-            get_rbac_registrations::GetRbac509Registrations,
+        queries::{
+            purge::txo_ada::{
+                DeleteQuery as PurgeTxoAdaDelete, PrimaryKeyQuery as PurgeTxoAdaSelect,
+            },
+            rbac::{
+                get_catalyst_id_from_stake_address::GetCatalystIdForStakeAddress,
+                get_catalyst_id_from_transaction_id::GetCatalystIdForTxnId,
+                get_rbac_invalid_registrations::GetRbac509InvalidRegistrations,
+                get_rbac_registrations::GetRbac509Registrations,
+            },
         },
         session::CassandraSessionError,
     },
@@ -324,7 +329,10 @@ async fn prepare_queries(
         GetCatalystIdForStakeAddress,
         GetCatalystIdForTxnId,
         GetRbac509Registrations,
-        GetRbac509InvalidRegistrations
+        GetRbac509InvalidRegistrations,
+        // purge queries
+        PurgeTxoAdaSelect,
+        PurgeTxoAdaDelete
     );
     Ok(queries)
 }
