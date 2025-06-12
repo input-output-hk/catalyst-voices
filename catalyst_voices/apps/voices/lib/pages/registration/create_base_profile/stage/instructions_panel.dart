@@ -38,15 +38,15 @@ class _EmailRequestCard extends StatelessWidget {
       key: const Key('EmailRequestCard'),
       icon: VoicesAssets.icons.mailOpen.buildIcon(),
       title: Text(
-        context.l10n.createBaseProfileInstructionsEmailRequest,
+        context.l10n.createProfileInstructionsEmailRequest,
         key: const Key('EmailRequestTitle'),
       ),
       desc: BulletList(
         key: const Key('EmailRequestList'),
         items: [
-          context.l10n.createBaseProfileInstructionsEmailReason1,
-          context.l10n.createBaseProfileInstructionsEmailReason2,
-          context.l10n.createBaseProfileInstructionsEmailReason3,
+          context.l10n.createProfileInstructionsEmailReason1,
+          context.l10n.createProfileInstructionsEmailReason2,
+          context.l10n.createProfileInstructionsEmailReason3,
         ],
         spacing: 0,
       ),
@@ -85,7 +85,7 @@ class _NextButton extends StatelessWidget {
     return VoicesFilledButton(
       key: const Key('CreateBaseProfileNext'),
       onTap: () => RegistrationCubit.of(context).nextStep(),
-      child: Text(context.l10n.createBaseProfileInstructionsNext),
+      child: Text(context.l10n.createProfileInstructionsNext),
     );
   }
 }
@@ -98,8 +98,8 @@ class _PanelMainMessage extends StatelessWidget {
     final l10n = context.l10n;
 
     return RegistrationStageMessage(
-      title: Text(l10n.createBaseProfileInstructionsTitle),
-      subtitle: Text(l10n.createBaseProfileInstructionsMessage),
+      title: Text(l10n.createProfileInstructionsTitle),
+      subtitle: Text(l10n.createProfileInstructionsMessage),
     );
   }
 }
