@@ -7,9 +7,14 @@ import 'package:flutter/material.dart';
 /// Displays a list of seed phrases in a grid-like layout with
 /// customizable columns.
 class SeedPhrasesViewer extends StatelessWidget {
-  /// The number of columns to use for displaying the seed phrases.
-  /// Defaults to 2.
+  /// See [ColumnsRow.columnsCount].
   final int columnsCount;
+
+  /// See [ColumnsRow.mainAxisSpacing].
+  final double mainAxisSpacing;
+
+  /// See [ColumnsRow.crossAxisSpacing].
+  final double crossAxisSpacing;
 
   /// The list of seed phrases to be displayed.
   final List<SeedPhraseWord> words;
@@ -17,6 +22,8 @@ class SeedPhrasesViewer extends StatelessWidget {
   const SeedPhrasesViewer({
     super.key,
     this.columnsCount = 2,
+    this.mainAxisSpacing = 24,
+    this.crossAxisSpacing = 12,
     required this.words,
   });
 
@@ -24,9 +31,9 @@ class SeedPhrasesViewer extends StatelessWidget {
   Widget build(BuildContext context) {
     return MediaQuery.withNoTextScaling(
       child: ColumnsRow(
-        columnsCount: 2,
-        mainAxisSpacing: 24,
-        crossAxisSpacing: 12,
+        columnsCount: columnsCount,
+        mainAxisSpacing: mainAxisSpacing,
+        crossAxisSpacing: crossAxisSpacing,
         children: words.mapIndexed((index, word) {
           return _WordCell(
             word.data,
