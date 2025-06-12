@@ -31,6 +31,32 @@ class RegistrationProgressStepper extends StatelessWidget {
   }
 }
 
+final class _AccountCompleted extends _RegistrationProgressStep {
+  const _AccountCompleted();
+
+  @override
+  List<Object?> get props => const [];
+
+  @override
+  String _localizedName(BuildContext context) {
+    return context.l10n.registrationCompletedStepGroup;
+  }
+}
+
+final class _AccountCreationProgress extends _RegistrationProgressStep {
+  final AccountCreateStepType data;
+
+  const _AccountCreationProgress(this.data);
+
+  @override
+  List<Object?> get props => [data];
+
+  @override
+  String _localizedName(BuildContext context) {
+    return data._localizedName(context);
+  }
+}
+
 sealed class _RegistrationProgressStep extends Equatable {
   const _RegistrationProgressStep();
 
@@ -45,36 +71,10 @@ sealed class _RegistrationProgressStep extends Equatable {
   }
 }
 
-final class _AccountCreationProgress extends _RegistrationProgressStep {
-  final AccountCreateStepType data;
-
-  const _AccountCreationProgress(this.data);
-
-  @override
-  String _localizedName(BuildContext context) {
-    return data._localizedName(context);
-  }
-
-  @override
-  List<Object?> get props => [data];
-}
-
-final class _AccountCompleted extends _RegistrationProgressStep {
-  const _AccountCompleted();
-
-  @override
-  String _localizedName(BuildContext context) {
-    return context.l10n.registrationCompletedStepGroup;
-  }
-
-  @override
-  List<Object?> get props => const [];
-}
-
 extension _AccountCreateStepType on AccountCreateStepType {
   String _localizedName(BuildContext context) {
     return switch (this) {
-      AccountCreateStepType.baseProfile => context.l10n.registrationCreateBaseProfileStepGroup,
+      AccountCreateStepType.baseProfile => context.l10n.registrationCreateProfileStepGroup,
       AccountCreateStepType.keychain => context.l10n.registrationCreateKeychainStepGroup,
       AccountCreateStepType.walletLink => context.l10n.registrationLinkWalletStepGroup,
     };
