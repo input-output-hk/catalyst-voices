@@ -1,6 +1,6 @@
 //! Get TXI by Transaction hash query
 
-use std::{fmt, sync::Arc};
+use std::sync::Arc;
 
 use cardano_blockchain_types::TransactionId;
 use scylla::{
@@ -12,12 +12,12 @@ use tracing::error;
 use crate::{
     db::{
         index::{
-            queries::{PreparedQueries, PreparedSelectQuery, Query, QueryKind},
+            queries::{PreparedQueries, PreparedSelectQuery},
             session::CassandraSession,
         },
         types::{DbSlot, DbTransactionId, DbTxnOutputOffset},
     },
-    settings::cassandra_db,
+    impl_query_statement,
 };
 
 /// Get TXI query string.
@@ -49,24 +49,11 @@ pub(crate) struct GetTxiByTxnHashesQuery {
     pub slot_no: DbSlot,
 }
 
-impl Query for GetTxiByTxnHashesQuery {
-    /// Prepare Batch of Insert TXI Index Data Queries
-    async fn prepare_query(
-        session: &Arc<Session>, _cfg: &cassandra_db::EnvVars,
-    ) -> anyhow::Result<QueryKind> {
-        Self::prepare(session).await.map(QueryKind::Statement)
-    }
-}
-
-impl fmt::Display for GetTxiByTxnHashesQuery {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{GET_TXI_BY_TXN_HASHES_QUERY}")
-    }
-}
+impl_query_statement!(GetTxiByTxnHashesQuery, GET_TXI_BY_TXN_HASHES_QUERY);
 
 impl GetTxiByTxnHashesQuery {
     /// Prepares a get txi query.
-    pub(crate) async fn prepare(session: &Arc<Session>) -> anyhow::Result<PreparedStatement> {
+    pub(crate) async fn prepare(session: Arc<Session>) -> anyhow::Result<PreparedStatement> {
         PreparedQueries::prepare(
             session.clone(),
             GET_TXI_BY_TXN_HASHES_QUERY,

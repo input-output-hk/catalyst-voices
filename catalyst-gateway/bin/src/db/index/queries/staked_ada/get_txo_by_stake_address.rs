@@ -62,9 +62,9 @@ impl_query_statement!(GetTxoByStakeAddressQuery, GET_TXO_BY_STAKE_ADDRESS_QUERY)
 
 impl GetTxoByStakeAddressQuery {
     /// Prepares a get txo by stake address query.
-    pub(crate) async fn prepare(session: &Arc<Session>) -> anyhow::Result<PreparedStatement> {
+    pub(crate) async fn prepare(session: Arc<Session>) -> anyhow::Result<PreparedStatement> {
         PreparedQueries::prepare(
-            session.clone(),
+            session,
             GET_TXO_BY_STAKE_ADDRESS_QUERY,
             scylla::statement::Consistency::All,
             true,

@@ -8,9 +8,12 @@ use scylla::{
 };
 use tracing::error;
 
-use crate::db::index::{
-    queries::{PreparedQueries, PreparedSelectQuery},
-    session::CassandraSession,
+use crate::{
+    db::index::{
+        queries::{PreparedQueries, PreparedSelectQuery},
+        session::CassandraSession,
+    },
+    impl_query_statement,
 };
 
 /// Get all invalid registrations
@@ -38,6 +41,8 @@ pub(crate) struct GetAllInvalidRegistrationsQuery {
     /// Is the Registration CIP36 format, or CIP15
     pub cip36: bool,
 }
+
+impl_query_statement!(GetAllInvalidRegistrationsQuery, GET_ALL_INVALIDS);
 
 impl GetAllInvalidRegistrationsQuery {
     /// Prepares get all registrations
