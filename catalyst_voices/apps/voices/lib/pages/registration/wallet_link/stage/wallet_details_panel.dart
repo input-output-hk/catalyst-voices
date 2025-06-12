@@ -142,7 +142,7 @@ class _Footer extends StatelessWidget {
         const SizedBox(height: 8),
         const _HeadsUp(),
         const SizedBox(height: 24),
-        const _BlocNavigation(),
+        const Center(child: _BlocNavigation()),
       ],
     );
   }
