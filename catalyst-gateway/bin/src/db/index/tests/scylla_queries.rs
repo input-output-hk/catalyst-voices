@@ -49,13 +49,13 @@ async fn test_get_assets_by_stake_addr() {
 #[ignore = "An integration test which requires a running Scylla node instance, disabled from `testunit` CI run"]
 #[tokio::test]
 async fn get_catalyst_id_by_stake_address() {
-    use rbac::get_catalyst_id_from_stake_address::{Query, QueryParams};
+    use rbac::get_catalyst_id_from_stake_address::{GetCatalystIdForStakeAddress, QueryParams};
 
     let Ok((session, _)) = get_shared_session().await else {
         panic!("{SESSION_ERR_MSG}");
     };
 
-    let mut row_stream = Query::execute(&session, QueryParams {
+    let mut row_stream = GetCatalystIdForStakeAddress::execute(&session, QueryParams {
         stake_address: stake_address_1().into(),
     })
     .await
@@ -69,14 +69,14 @@ async fn get_catalyst_id_by_stake_address() {
 #[ignore = "An integration test which requires a running Scylla node instance, disabled from `testunit` CI run"]
 #[tokio::test]
 async fn get_catalyst_id_by_transaction_id() {
-    use rbac::get_catalyst_id_from_transaction_id::{Query, QueryParams};
+    use rbac::get_catalyst_id_from_transaction_id::{GetCatalystIdForTxnId, QueryParams};
 
     let Ok((session, _)) = get_shared_session().await else {
         panic!("{SESSION_ERR_MSG}");
     };
 
     let txn_id = TransactionId::new(&[1, 2, 3]).into();
-    let mut row_stream = Query::execute(&session, QueryParams { txn_id })
+    let mut row_stream = GetCatalystIdForTxnId::execute(&session, QueryParams { txn_id })
         .await
         .unwrap();
 
@@ -107,7 +107,7 @@ async fn test_get_invalid_registration_w_stake_addr() {
 #[ignore = "An integration test which requires a running Scylla node instance, disabled from `testunit` CI run"]
 #[tokio::test]
 async fn get_rbac_registrations_by_catalyst_id() {
-    use rbac::get_rbac_registrations::{Query, QueryParams};
+    use rbac::get_rbac_registrations::{GetRbac509Registrations, QueryParams};
 
     let Ok((session, _)) = get_shared_session().await else {
         panic!("{SESSION_ERR_MSG}");
@@ -116,7 +116,7 @@ async fn get_rbac_registrations_by_catalyst_id() {
     let id: CatalystId = "cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE"
         .parse()
         .unwrap();
-    let mut row_stream = Query::execute(&session, QueryParams {
+    let mut row_stream = GetRbac509Registrations::execute(&session, QueryParams {
         catalyst_id: id.into(),
     })
     .await
@@ -130,7 +130,7 @@ async fn get_rbac_registrations_by_catalyst_id() {
 #[ignore = "An integration test which requires a running Scylla node instance, disabled from `testunit` CI run"]
 #[tokio::test]
 async fn get_rbac_invalid_registrations_by_catalyst_id() {
-    use rbac::get_rbac_invalid_registrations::{Query, QueryParams};
+    use rbac::get_rbac_invalid_registrations::{GetRbac509InvalidRegistrations, QueryParams};
 
     let Ok((session, _)) = get_shared_session().await else {
         panic!("{SESSION_ERR_MSG}");
@@ -139,7 +139,7 @@ async fn get_rbac_invalid_registrations_by_catalyst_id() {
     let id: CatalystId = "cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE"
         .parse()
         .unwrap();
-    let mut row_stream = Query::execute(&session, QueryParams {
+    let mut row_stream = GetRbac509InvalidRegistrations::execute(&session, QueryParams {
         catalyst_id: id.into(),
     })
     .await

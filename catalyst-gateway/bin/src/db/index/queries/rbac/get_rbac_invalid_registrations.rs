@@ -8,12 +8,15 @@ use scylla::{
 };
 use tracing::error;
 
-use crate::db::{
-    index::{
-        queries::{PreparedQueries, PreparedSelectQuery},
-        session::CassandraSession,
+use crate::{
+    db::{
+        index::{
+            queries::{PreparedQueries, PreparedSelectQuery},
+            session::CassandraSession,
+        },
+        types::{DbCatalystId, DbSlot, DbTransactionId, DbTxnIndex, DbUuidV4},
     },
-    types::{DbCatalystId, DbSlot, DbTransactionId, DbTxnIndex, DbUuidV4},
+    impl_query_statement,
 };
 
 /// Get invalid registrations by Catalyst ID query.
@@ -29,7 +32,7 @@ pub(crate) struct QueryParams {
 /// Get invalid registrations by Catalyst ID query.
 #[allow(dead_code)]
 #[derive(DeserializeRow)]
-pub(crate) struct Query {
+pub(crate) struct GetRbac509InvalidRegistrations {
     /// Registration transaction id.
     pub txn_id: DbTransactionId,
     /// A block slot number.
@@ -44,7 +47,9 @@ pub(crate) struct Query {
     pub problem_report: String,
 }
 
-impl Query {
+impl_query_statement!(GetRbac509InvalidRegistrations, QUERY);
+
+impl GetRbac509InvalidRegistrations {
     /// Prepares a query.
     pub(crate) async fn prepare(session: Arc<Session>) -> anyhow::Result<PreparedStatement> {
         PreparedQueries::prepare(session, QUERY, Consistency::All, true)
@@ -59,14 +64,14 @@ impl Query {
     #[allow(dead_code)]
     pub(crate) async fn execute(
         session: &CassandraSession, params: QueryParams,
-    ) -> anyhow::Result<TypedRowStream<Query>> {
+    ) -> anyhow::Result<TypedRowStream<GetRbac509InvalidRegistrations>> {
         session
             .execute_iter(
                 PreparedSelectQuery::RbacInvalidRegistrationsByCatalystId,
                 params,
             )
             .await?
-            .rows_stream::<Query>()
+            .rows_stream::<GetRbac509InvalidRegistrations>()
             .map_err(Into::into)
     }
 }

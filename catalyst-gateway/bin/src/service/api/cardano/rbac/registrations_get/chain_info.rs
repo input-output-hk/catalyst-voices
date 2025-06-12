@@ -10,7 +10,9 @@ use rbac_registration::registration::cardano::RegistrationChain;
 
 use crate::{
     db::index::{
-        queries::rbac::get_rbac_registrations::{build_reg_chain, indexed_registrations, Query},
+        queries::rbac::get_rbac_registrations::{
+            build_reg_chain, indexed_registrations, GetRbac509Registrations,
+        },
         session::CassandraSession,
     },
     settings::Settings,
@@ -72,7 +74,7 @@ impl ChainInfo {
 async fn last_registration_chain(
     persistent_session: &CassandraSession, volatile_session: &CassandraSession,
     catalyst_id: &CatalystId,
-) -> anyhow::Result<Vec<(bool, Query)>> {
+) -> anyhow::Result<Vec<(bool, GetRbac509Registrations)>> {
     let (persistent_registrations, volatile_registrations) = try_join(
         indexed_registrations(persistent_session, catalyst_id),
         indexed_registrations(volatile_session, catalyst_id),

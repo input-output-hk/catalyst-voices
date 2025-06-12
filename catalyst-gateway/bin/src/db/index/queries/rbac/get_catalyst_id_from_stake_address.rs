@@ -8,12 +8,15 @@ use scylla::{
 };
 use tracing::error;
 
-use crate::db::{
-    index::{
-        queries::{PreparedQueries, PreparedSelectQuery},
-        session::CassandraSession,
+use crate::{
+    db::{
+        index::{
+            queries::{PreparedQueries, PreparedSelectQuery},
+            session::CassandraSession,
+        },
+        types::{DbCatalystId, DbSlot, DbStakeAddress},
     },
-    types::{DbCatalystId, DbSlot, DbStakeAddress},
+    impl_query_statement,
 };
 
 /// Get Catalyst ID by stake address query string.
@@ -28,14 +31,16 @@ pub(crate) struct QueryParams {
 
 /// Get Catalyst ID by stake address query.
 #[derive(Debug, Clone, DeserializeRow)]
-pub(crate) struct Query {
+pub(crate) struct GetCatalystIdForStakeAddress {
     /// Catalyst ID for the queries stake address.
     pub catalyst_id: DbCatalystId,
     /// A slot number.
     pub slot_no: DbSlot,
 }
 
-impl Query {
+impl_query_statement!(GetCatalystIdForStakeAddress, QUERY);
+
+impl GetCatalystIdForStakeAddress {
     /// Prepares a get Catalyst ID by stake address query.
     pub(crate) async fn prepare(session: Arc<Session>) -> anyhow::Result<PreparedStatement> {
         PreparedQueries::prepare(session, QUERY, Consistency::All, true)
@@ -48,11 +53,11 @@ impl Query {
     /// Executes a get Catalyst ID by stake address query.
     pub(crate) async fn execute(
         session: &CassandraSession, params: QueryParams,
-    ) -> anyhow::Result<TypedRowStream<Query>> {
+    ) -> anyhow::Result<TypedRowStream<GetCatalystIdForStakeAddress>> {
         session
             .execute_iter(PreparedSelectQuery::CatalystIdByStakeAddress, params)
             .await?
-            .rows_stream::<Query>()
+            .rows_stream::<GetCatalystIdForStakeAddress>()
             .map_err(Into::into)
     }
 }
