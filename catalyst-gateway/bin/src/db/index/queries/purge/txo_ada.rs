@@ -18,6 +18,7 @@ use crate::{
         },
         types::{DbSlot, DbStakeAddress, DbTxnIndex, DbTxnOutputOffset},
     },
+    impl_query_batch, impl_query_statement,
     settings::cassandra_db,
 };
 
@@ -70,9 +71,11 @@ impl From<result::PrimaryKey> for Params {
 /// Get primary key for TXO by Stake Address query.
 pub(crate) struct PrimaryKeyQuery;
 
+impl_query_statement!(PrimaryKeyQuery, SELECT_QUERY);
+
 impl PrimaryKeyQuery {
     /// Prepares a query to get all TXO by stake address primary keys.
-    pub(crate) async fn prepare(session: &Arc<Session>) -> anyhow::Result<PreparedStatement> {
+    pub(crate) async fn prepare(session: Arc<Session>) -> anyhow::Result<PreparedStatement> {
         PreparedQueries::prepare(
             session.clone(),
             SELECT_QUERY,
@@ -104,6 +107,8 @@ const DELETE_QUERY: &str = include_str!("cql/delete_txo_by_stake_address.cql");
 
 /// Delete TXO by Stake Address Query
 pub(crate) struct DeleteQuery;
+
+impl_query_batch!(DeleteQuery, DELETE_QUERY);
 
 impl DeleteQuery {
     /// Prepare Batch of Delete Queries
