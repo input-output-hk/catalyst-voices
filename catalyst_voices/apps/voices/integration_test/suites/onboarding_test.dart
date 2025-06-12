@@ -56,15 +56,13 @@ void main() async {
         await GetStartedPanel($).verifyPageElements();
       });
 
-      patrolWidgetTest('visitor - create - base profile info screen looks OK',
-          (PatrolTester $) async {
+      patrolWidgetTest('visitor - create - profile info screen looks OK', (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await ProfileInfoPanel($).goto();
         await ProfileInfoPanel($).verifyPageElements();
       });
 
-      patrolWidgetTest('visitor - create - base profile setup screen looks OK',
-          (PatrolTester $) async {
+      patrolWidgetTest('visitor - create - profile setup screen looks OK', (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await SetupProfilePanel($).goto();
         await SetupProfilePanel($).verifyPageElements();
@@ -77,8 +75,7 @@ void main() async {
         await AcknowledgmentsPanel($).verifyPageElements();
       });
 
-      patrolWidgetTest('visitor - create - base profile setup screen looks OK',
-          (PatrolTester $) async {
+      patrolWidgetTest('visitor - create - profile setup screen looks OK', (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await SetupProfilePanel($).goto();
         await SetupProfilePanel($).verifyPageElements();
@@ -328,7 +325,7 @@ void main() async {
         expect($(OnboardingPageBase($).registrationDialog), findsNothing);
       });
       patrolWidgetTest(
-          'visitor - create - base profile setup screen close button - '
+          'visitor - create - profile setup screen close button - '
           'dialog check', (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await SetupProfilePanel($).goto();
@@ -337,7 +334,7 @@ void main() async {
       });
 
       patrolWidgetTest(
-          'visitor - create - base profile setup screen close button - '
+          'visitor - create - profile setup screen close button - '
           'dialog continue', (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await SetupProfilePanel($).goto();
@@ -347,7 +344,7 @@ void main() async {
       });
 
       patrolWidgetTest(
-          'visitor - create - base profile setup screen close button - '
+          'visitor - create - profile setup screen close button - '
           'dialog cancel', (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await SetupProfilePanel($).goto();
@@ -359,7 +356,7 @@ void main() async {
       patrolWidgetTest(
           tags: 'issues_1998',
           skip: true,
-          'visitor - create - base profile setup screen close button - '
+          'visitor - create - profile setup screen close button - '
           'dialog close', (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await SetupProfilePanel($).goto();
