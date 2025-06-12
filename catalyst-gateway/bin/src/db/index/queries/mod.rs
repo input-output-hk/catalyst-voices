@@ -242,6 +242,7 @@ async fn prepare_queries(
     }
     // WIP: Adding queries as they implement trait
     let queries = prepare_q!(
+        // prepared batch queries
         TxiInsertQuery,
         TxoInsertQuery,
         TxoAssetInsert,
@@ -251,7 +252,10 @@ async fn prepare_queries(
         Cip36Insert,
         Cip36InvalidInsert,
         Cip36ForVoteKeyInsert,
-        UpdateTxoSpentQuery
+        // prepared statement queries
+        UpdateTxoSpentQuery,
+        GetTxoByStakeAddressQuery,
+        GetTxiByTxnHashesQuery
     );
     Ok(queries)
 }
@@ -263,6 +267,8 @@ impl PreparedQueries {
         session: Arc<Session>, cfg: &cassandra_db::EnvVars,
     ) -> anyhow::Result<Self> {
         // We initialize like this, so that all errors preparing querys get shown before aborting.
+
+        // Prepared batched queries
         let txi_insert_queries = TxiInsertQuery::prepare_batch(&session, cfg).await?;
         let (
             txo_insert_queries,
@@ -278,14 +284,16 @@ impl PreparedQueries {
             cip36_registration_for_vote_key_insert_queries,
         ) = Cip36InsertQuery::prepare_batch(&session, cfg).await?;
         let txo_spent_update_queries = UpdateTxoSpentQuery::prepare_batch(&session, cfg).await?;
-        let txo_by_stake_address_query = GetTxoByStakeAddressQuery::prepare(session.clone()).await;
-        let txi_by_txn_hash_query = GetTxiByTxnHashesQuery::prepare(session.clone()).await;
         let (
             rbac509_registration_insert_queries,
             rbac509_invalid_registration_insert_queries,
             catalyst_id_for_txn_id_insert_queries,
             catalyst_id_for_stake_address_insert_queries,
         ) = Rbac509InsertQuery::prepare_batch(&session, cfg).await?;
+
+        // Prepared Statement queries
+        let txo_by_stake_address_query = GetTxoByStakeAddressQuery::prepare(&session).await;
+        let txi_by_txn_hash_query = GetTxiByTxnHashesQuery::prepare(&session).await;
         let native_assets_by_stake_address_query =
             GetAssetsByStakeAddressQuery::prepare(session.clone()).await;
         let registration_from_stake_addr_query =
