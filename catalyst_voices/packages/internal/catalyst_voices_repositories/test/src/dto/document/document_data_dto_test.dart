@@ -11,7 +11,7 @@ void main() {
         final id = const Uuid().v7();
         final version = const Uuid().v7();
         final oldJson = <String, dynamic>{
-          'type': DocumentType.proposalDocument.uuid,
+          'type': DocumentType.proposalDocument.toJson(),
           'id': id,
           'version': version,
         };
