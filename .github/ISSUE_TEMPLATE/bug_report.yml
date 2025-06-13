@@ -2,6 +2,7 @@ name: Bug Report
 description: File a bug report
 title: "[Bug]: "
 type: "bug"
+label: "in triage"
 body:
   - type: markdown
     attributes:
@@ -22,6 +23,7 @@ body:
       description: A concise description of what you're experiencing.
     validations:
       required: false
+
   - type: textarea
     attributes:
       label: Expected Behavior
@@ -52,9 +54,16 @@ body:
         **If you selected Frontend as Project please include the relevant component in the issue title:**
 
               [account.registration] [proposal.builder] [proposal.view]
-              [workspace] [proposals] [discovery]  
+              [workspace] [proposals] [discovery]
 
         👉 **Example:** `[Bug][discovery] Crash on login`
+
+  - type: textarea
+    attributes:
+      label: Version
+      description: Specify the version/release/commit that has been impacted by the bug
+    validations:
+      required: true
 
   - type: dropdown
     id: OS
