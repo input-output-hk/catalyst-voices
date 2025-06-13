@@ -3013,5 +3013,21 @@
   "importCatalystAppUnavailableAfterDeadline": "IMPORTANT: The Catalyst app won’t be accessible after the deadline.",
   "@importCatalystAppUnavailableAfterDeadline": {
     "description": "note for user that app will not be available after submission deadline"
+  },
+  "errorUuidInvalidFormat": "Invalid format",
+  "@errorUuidInvalidFormat": {
+    "description": "Error message when given input does not match uuid format"
+  },
+  "errorUuidVersionMissMatch": "uuid version miss match. Got {version} but requires {requiredVersion}",
+  "@errorUuidVersionMissMatch": {
+    "description": "Error message when given is valid uuid but in different version",
+    "placeholders": {
+      "version": {
+        "type": "int"
+      },
+      "requiredVersion": {
+        "type": "int"
+      }
+    }
   }
 }
