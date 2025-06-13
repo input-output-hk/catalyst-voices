@@ -1,3 +1,4 @@
+export 'account/exception/localized_active_account_not_found_exception.dart';
 export 'account/exception/localized_email_already_use_exception.dart';
 export 'account/my_account_role_item.dart';
 export 'account/my_account_status_notification.dart';

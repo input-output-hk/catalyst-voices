@@ -1633,6 +1633,10 @@
   "@errorEmailAlreadyInUse": {
     "description": "Error when trying to update email that is taken already."
   },
+  "errorActiveAccountNotFound": "Active account not found.",
+  "@errorActiveAccountNotFound": {
+    "description": "Generic error message when trying to access account resources but non was found."
+  },
   "categoryDetails": "Category Details",
   "fundsAvailable": "Funds Available",
   "minBudgetRequest": "Min budget request",
@@ -2848,6 +2852,18 @@
   "verificationEmailSendSubMessage": "Please verify your new email address.",
   "@verificationEmailSendSubMessage": {
     "description": "Sub message of dialog account verification send"
+  },
+  "pendingEmailChangeTitle": "Pending email change",
+  "@pendingEmailChangeTitle": {
+    "description": "Title of dialog about pending email change"
+  },
+  "pendingEmailChangeMessage": "Email will be update after successful verification",
+  "@pendingEmailChangeMessage": {
+    "description": "Message of dialog about pending email change"
+  },
+  "pendingEmailChangeSubMessage": "Please verify your new email address.",
+  "@pendingEmailChangeSubMessage": {
+    "description": "Sub message of dialog about pending email change"
   },
   "invalidSeedPhraseWord": "Invalid",
   "@invalidSeedPhraseWord": {
