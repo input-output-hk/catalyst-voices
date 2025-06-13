@@ -168,6 +168,19 @@ final class UpdateCommentBuilderEvent extends ProposalBuilderEvent {
   List<Object?> get props => [ref, show];
 }
 
+final class UpdateCommentExpandEvent extends ProposalBuilderEvent {
+  final SignedDocumentRef ref;
+  final bool isExpanded;
+
+  const UpdateCommentExpandEvent({
+    required this.ref,
+    required this.isExpanded,
+  });
+
+  @override
+  List<Object?> get props => [ref, isExpanded];
+}
+
 final class UpdateCommentRepliesEvent extends ProposalBuilderEvent {
   final SignedDocumentRef ref;
   final bool show;

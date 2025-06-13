@@ -19,6 +19,10 @@ class ProposalBuilderCommentTile extends StatelessWidget {
       return value.state.comments.showReplies;
     });
 
+    final expandComment = context.select<ProposalBuilderBloc, Map<DocumentRef, bool>>((value) {
+      return value.state.comments.expandComment;
+    });
+
     final showReplyBuilder = context.select<ProposalBuilderBloc, bool>((value) {
       return value.state.comments.showReplyBuilder[comment.ref] ?? false;
     });
@@ -31,6 +35,7 @@ class ProposalBuilderCommentTile extends StatelessWidget {
       comment: comment,
       canReply: canReply,
       showReplies: showReplies,
+      expandComment: expandComment,
       showReplyBuilder: showReplyBuilder,
       onSubmit: ({required document, reply}) async {
         final event = SubmitCommentEvent(
@@ -44,6 +49,9 @@ class ProposalBuilderCommentTile extends StatelessWidget {
       },
       onToggleBuilder: (show) {
         bloc.add(UpdateCommentBuilderEvent(ref: comment.ref, show: show));
+      },
+      onToggleExpand: (value) {
+        bloc.add(UpdateCommentExpandEvent(ref: comment.ref, isExpanded: value));
       },
       onToggleReplies: (show) {
         bloc.add(UpdateCommentRepliesEvent(ref: comment.ref, show: show));

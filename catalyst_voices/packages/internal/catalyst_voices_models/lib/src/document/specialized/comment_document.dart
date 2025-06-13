@@ -13,6 +13,9 @@ final class CommentDocument extends Equatable {
     required this.document,
   });
 
+  // TODO(damian-molinski): how many lines?
+  int get lines => 0;
+
   @override
   List<Object?> get props => [metadata, document];
 

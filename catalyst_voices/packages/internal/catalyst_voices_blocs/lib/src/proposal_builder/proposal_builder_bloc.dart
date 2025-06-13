@@ -62,6 +62,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     on<ProposalSubmissionCloseDateEvent>(_proposalSubmissionCloseDate);
     on<UpdateCommentsSortEvent>(_updateCommentsSort);
     on<UpdateCommentBuilderEvent>(_updateCommentBuilder);
+    on<UpdateCommentExpandEvent>(_updateCommentExpand);
     on<UpdateCommentRepliesEvent>(_updateCommentReplies);
     on<SubmitCommentEvent>(_submitComment);
     on<MaxProposalsLimitChangedEvent>(_updateMaxProposalsLimitReached);
@@ -991,6 +992,18 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     Emitter<ProposalBuilderState> emit,
   ) async {
     final updatedComments = state.comments.updateCommentBuilder(ref: event.ref, show: event.show);
+
+    emit(state.copyWith(comments: updatedComments));
+  }
+
+  Future<void> _updateCommentExpand(
+    UpdateCommentExpandEvent event,
+    Emitter<ProposalBuilderState> emit,
+  ) async {
+    final updatedComments = state.comments.updateCommentExpand(
+      ref: event.ref,
+      isExpanded: event.isExpanded,
+    );
 
     emit(state.copyWith(comments: updatedComments));
   }
