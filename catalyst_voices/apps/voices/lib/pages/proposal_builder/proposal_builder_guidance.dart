@@ -42,7 +42,7 @@ class _GuidanceCard extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
-        color: theme.colors.onSurfacePrimary012,
+        color: theme.colors.elevationsOnSurfaceNeutralLv2,
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -69,6 +69,7 @@ class _GuidanceCard extends StatelessWidget {
           MarkdownText(
             item.description,
             pStyle: context.textTheme.bodyMedium,
+            pColor: theme.colors.textOnPrimaryLevel1,
           ),
         ],
       ),
