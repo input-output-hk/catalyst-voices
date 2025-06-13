@@ -8,12 +8,15 @@ use scylla::{
 };
 use tracing::error;
 
-use crate::db::{
-    index::{
-        queries::{PreparedQueries, PreparedSelectQuery},
-        session::CassandraSession,
+use crate::{
+    db::{
+        index::{
+            queries::{PreparedQueries, PreparedSelectQuery},
+            session::CassandraSession,
+        },
+        types::{DbSlot, DbStakeAddress, DbTransactionId, DbTxnIndex, DbTxnOutputOffset},
     },
-    types::{DbSlot, DbStakeAddress, DbTransactionId, DbTxnIndex, DbTxnOutputOffset},
+    impl_query_statement,
 };
 
 /// Get txo by stake address query string.
@@ -54,6 +57,8 @@ pub(crate) struct GetTxoByStakeAddressQuery {
     /// TXO spent slot.
     pub spent_slot: Option<DbSlot>,
 }
+
+impl_query_statement!(GetTxoByStakeAddressQuery, GET_TXO_BY_STAKE_ADDRESS_QUERY);
 
 impl GetTxoByStakeAddressQuery {
     /// Prepares a get txo by stake address query.

@@ -9,12 +9,15 @@ use scylla::{
 };
 use tracing::error;
 
-use crate::db::{
-    index::{
-        queries::{PreparedQueries, PreparedSelectQuery},
-        session::CassandraSession,
+use crate::{
+    db::{
+        index::{
+            queries::{PreparedQueries, PreparedSelectQuery},
+            session::CassandraSession,
+        },
+        types::{DbSlot, DbTransactionId, DbTxnOutputOffset},
     },
-    types::{DbSlot, DbTransactionId, DbTxnOutputOffset},
+    impl_query_statement,
 };
 
 /// Get TXI query string.
@@ -46,11 +49,13 @@ pub(crate) struct GetTxiByTxnHashesQuery {
     pub slot_no: DbSlot,
 }
 
+impl_query_statement!(GetTxiByTxnHashesQuery, GET_TXI_BY_TXN_HASHES_QUERY);
+
 impl GetTxiByTxnHashesQuery {
     /// Prepares a get txi query.
     pub(crate) async fn prepare(session: Arc<Session>) -> anyhow::Result<PreparedStatement> {
         PreparedQueries::prepare(
-            session,
+            session.clone(),
             GET_TXI_BY_TXN_HASHES_QUERY,
             scylla::statement::Consistency::All,
             true,

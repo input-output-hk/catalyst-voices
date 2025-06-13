@@ -13,17 +13,20 @@ use scylla::{
 };
 use tracing::error;
 
-use crate::db::{
-    index::{
-        queries::{PreparedQueries, PreparedSelectQuery},
-        session::CassandraSession,
+use crate::{
+    db::{
+        index::{
+            queries::{PreparedQueries, PreparedSelectQuery},
+            session::CassandraSession,
+        },
+        types::{DbCatalystId, DbTransactionId},
     },
-    types::{DbCatalystId, DbTransactionId},
+    impl_query_statement,
 };
 
 /// Cached data.
 #[allow(dead_code)]
-static CACHE: LazyLock<Cache<DbTransactionId, Query>> = LazyLock::new(|| {
+static CACHE: LazyLock<Cache<DbTransactionId, GetCatalystIdForTxnId>> = LazyLock::new(|| {
     Cache::builder()
         .eviction_policy(EvictionPolicy::lru())
         .build()
@@ -41,12 +44,14 @@ pub(crate) struct QueryParams {
 
 /// Get Catalyst ID by stake address query.
 #[derive(Debug, Clone, DeserializeRow)]
-pub(crate) struct Query {
+pub(crate) struct GetCatalystIdForTxnId {
     /// A Catalyst ID.
     pub catalyst_id: DbCatalystId,
 }
 
-impl Query {
+impl_query_statement!(GetCatalystIdForTxnId, QUERY);
+
+impl GetCatalystIdForTxnId {
     /// Prepares a get catalyst ID by transaction ID query.
     pub(crate) async fn prepare(session: Arc<Session>) -> Result<PreparedStatement> {
         PreparedQueries::prepare(session, QUERY, Consistency::All, true)
@@ -61,11 +66,11 @@ impl Query {
     /// Don't call directly, use one of the methods instead.
     pub(crate) async fn execute(
         session: &CassandraSession, params: QueryParams,
-    ) -> Result<TypedRowStream<Query>> {
+    ) -> Result<TypedRowStream<GetCatalystIdForTxnId>> {
         session
             .execute_iter(PreparedSelectQuery::CatalystIdByTransactionId, params)
             .await?
-            .rows_stream::<Query>()
+            .rows_stream::<GetCatalystIdForTxnId>()
             .map_err(Into::into)
     }
 
@@ -74,7 +79,7 @@ impl Query {
     /// Unless you really know you need an uncached result, use the cached version.
     pub(crate) async fn get_latest_uncached(
         session: &CassandraSession, txn_id: DbTransactionId,
-    ) -> Result<Option<Query>> {
+    ) -> Result<Option<GetCatalystIdForTxnId>> {
         Self::execute(session, QueryParams { txn_id })
             .await?
             .next()
@@ -86,7 +91,7 @@ impl Query {
     /// Gets the latest Catalyst ID for the given transaction ID.
     pub(crate) async fn get_latest(
         session: &CassandraSession, transaction_id: DbTransactionId,
-    ) -> Result<Option<Query>> {
+    ) -> Result<Option<GetCatalystIdForTxnId>> {
         // TODO: Caching is disabled because we want to measure the performance without it and be
         // sure that the logic is sound. Also caches needs to be tunable.
         Self::get_latest_uncached(session, transaction_id).await

@@ -15,6 +15,7 @@ use crate::{
         },
         types::{DbSlot, DbTransactionId, DbTxnOutputOffset},
     },
+    impl_query_batch,
     settings::cassandra_db,
 };
 
@@ -48,6 +49,8 @@ pub(crate) struct TxiInsertQuery {
 
 /// TXI by Txn hash Index
 const INSERT_TXI_QUERY: &str = include_str!("./cql/insert_txi.cql");
+
+impl_query_batch!(TxiInsertQuery, INSERT_TXI_QUERY);
 
 impl TxiInsertQuery {
     /// Create a new record for this transaction.
