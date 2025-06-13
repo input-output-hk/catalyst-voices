@@ -19,10 +19,6 @@ class ProposalCommentTile extends StatelessWidget {
       return value.state.comments.showReplies;
     });
 
-    final expandComment = context.select<ProposalCubit, Map<DocumentRef, bool>>((value) {
-      return value.state.comments.expandComment;
-    });
-
     final showReplyBuilder = context.select<ProposalCubit, bool>((value) {
       return value.state.comments.showReplyBuilder[comment.ref] ?? false;
     });
@@ -35,7 +31,6 @@ class ProposalCommentTile extends StatelessWidget {
       comment: comment,
       canReply: canReply,
       showReplies: showReplies,
-      expandComment: expandComment,
       showReplyBuilder: showReplyBuilder,
       onSubmit: ({required document, reply}) async {
         return cubit.submitComment(document: document, reply: reply);
@@ -45,9 +40,6 @@ class ProposalCommentTile extends StatelessWidget {
       },
       onToggleBuilder: (show) {
         cubit.updateCommentBuilder(ref: comment.ref, show: show);
-      },
-      onToggleExpand: (value) {
-        cubit.updateCommentExpand(ref: comment.ref, isExpanded: value);
       },
       onToggleReplies: (show) {
         cubit.updateCommentReplies(ref: comment.ref, show: show);

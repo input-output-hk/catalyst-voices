@@ -7,17 +7,14 @@ import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 
-// TODO(damian-molinski): merge showReplies, expandComment and showReplyBuilder into object.
 class ProposalCommentWithRepliesCard extends StatelessWidget {
   final CommentWithReplies comment;
   final bool canReply;
   final Map<DocumentRef, bool> showReplies;
-  final Map<DocumentRef, bool> expandComment;
   final bool showReplyBuilder;
   final OnSubmitProposalComment onSubmit;
   final VoidCallback onCancel;
   final ValueChanged<bool> onToggleBuilder;
-  final ValueChanged<bool> onToggleExpand;
   final ValueChanged<bool> onToggleReplies;
 
   const ProposalCommentWithRepliesCard({
@@ -25,22 +22,16 @@ class ProposalCommentWithRepliesCard extends StatelessWidget {
     required this.comment,
     required this.canReply,
     required this.showReplies,
-    required this.expandComment,
     required this.showReplyBuilder,
     required this.onSubmit,
     required this.onCancel,
     required this.onToggleBuilder,
-    required this.onToggleExpand,
     required this.onToggleReplies,
   });
 
-  bool get _isExpanded => showReplies[comment.ref] ?? true;
-
-  bool get _showCommentFooter => _showToggleExpand || _showToggleReplies;
+  bool get _showCommentFooter => _showToggleReplies;
 
   bool get _showReplies => showReplies[comment.ref] ?? true;
-
-  bool get _showToggleExpand => comment.comment.lines > 6;
 
   bool get _showToggleReplies => comment.replies.isEmpty;
 
@@ -56,16 +47,12 @@ class ProposalCommentWithRepliesCard extends StatelessWidget {
           key: ValueKey('ProposalComment${comment.comment.metadata.selfRef}Card'),
           document: comment.comment,
           canReply: canReply,
+          trimLines: 6,
           onReplyTap: () => onToggleBuilder(true),
           footer: _showCommentFooter
               ? Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    if (_showToggleExpand)
-                      _ToggleExpandChip(
-                        isExpanded: _isExpanded,
-                        onTap: () => onToggleExpand(!_isExpanded),
-                      ),
                     if (_showToggleReplies)
                       _ToggleRepliesChip(
                         repliesCount: comment.replies.length,
@@ -88,11 +75,9 @@ class ProposalCommentWithRepliesCard extends StatelessWidget {
                     key: ValueKey('ReplyComment.${reply.comment.metadata.selfRef.id}'),
                     comment: reply,
                     showReplies: showReplies,
-                    expandComment: expandComment,
                     onSubmit: onSubmit,
                     onCancel: onCancel,
                     onToggleBuilder: onToggleBuilder,
-                    onToggleExpand: onToggleExpand,
                     onToggleReplies: onToggleReplies,
                   ),
               ],
@@ -120,22 +105,18 @@ class ProposalCommentWithRepliesCard extends StatelessWidget {
 class _RepliesCard extends StatelessWidget {
   final CommentWithReplies comment;
   final Map<DocumentRef, bool> showReplies;
-  final Map<DocumentRef, bool> expandComment;
   final OnSubmitProposalComment onSubmit;
   final VoidCallback onCancel;
   final ValueChanged<bool> onToggleBuilder;
-  final ValueChanged<bool> onToggleExpand;
   final ValueChanged<bool> onToggleReplies;
 
   const _RepliesCard({
     required super.key,
     required this.comment,
     required this.showReplies,
-    required this.expandComment,
     required this.onSubmit,
     required this.onCancel,
     required this.onToggleBuilder,
-    required this.onToggleExpand,
     required this.onToggleReplies,
   });
 
@@ -145,29 +126,12 @@ class _RepliesCard extends StatelessWidget {
       comment: comment,
       canReply: false,
       showReplies: showReplies,
-      expandComment: expandComment,
       showReplyBuilder: false,
       onSubmit: onSubmit,
       onCancel: onCancel,
       onToggleBuilder: onToggleBuilder,
-      onToggleExpand: onToggleExpand,
       onToggleReplies: onToggleReplies,
     );
-  }
-}
-
-class _ToggleExpandChip extends StatelessWidget {
-  final bool isExpanded;
-  final VoidCallback? onTap;
-
-  const _ToggleExpandChip({
-    required this.isExpanded,
-    this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return const Placeholder();
   }
 }
 

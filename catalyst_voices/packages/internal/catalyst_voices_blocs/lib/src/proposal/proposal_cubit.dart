@@ -185,15 +185,6 @@ final class ProposalCubit extends Cubit<ProposalState>
     emit(state.copyWith(comments: updatedComments));
   }
 
-  void updateCommentExpand({
-    required SignedDocumentRef ref,
-    required bool isExpanded,
-  }) {
-    final updatedComments = state.comments.updateCommentExpand(ref: ref, isExpanded: isExpanded);
-
-    emit(state.copyWith(comments: updatedComments));
-  }
-
   void updateCommentReplies({
     required SignedDocumentRef ref,
     required bool show,
