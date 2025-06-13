@@ -3,6 +3,8 @@ description: File a bug report
 title: "[Bug]: "
 type: "bug"
 labels: ["in triage"]
+projects: ["input-output-hk/102"]
+
 body:
   - type: markdown
     attributes:
