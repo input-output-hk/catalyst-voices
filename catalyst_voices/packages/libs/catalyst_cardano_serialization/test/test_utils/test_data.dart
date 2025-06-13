@@ -1,13 +1,17 @@
 import 'package:catalyst_cardano_serialization/src/address.dart';
+import 'package:catalyst_cardano_serialization/src/builders/strategies/greedy_selection_strategy.dart';
+import 'package:catalyst_cardano_serialization/src/builders/transaction_builder.dart';
+import 'package:catalyst_cardano_serialization/src/builders/types.dart';
+import 'package:catalyst_cardano_serialization/src/fees.dart';
 import 'package:catalyst_cardano_serialization/src/hashes.dart';
 import 'package:catalyst_cardano_serialization/src/scripts.dart';
 import 'package:catalyst_cardano_serialization/src/signature.dart';
 import 'package:catalyst_cardano_serialization/src/transaction.dart';
 import 'package:catalyst_cardano_serialization/src/transaction_output.dart';
 import 'package:catalyst_cardano_serialization/src/types.dart';
+import 'package:catalyst_cardano_serialization/src/utils/hex.dart';
 import 'package:catalyst_cardano_serialization/src/witness.dart';
 import 'package:cbor/cbor.dart';
-import 'package:convert/convert.dart';
 
 /// Reference scripts that exist on the Preview network, with sizes verified.
 const refInputScriptsSizes = [2470, 6296, 1579];
@@ -451,7 +455,7 @@ Transaction fullSignedTestTransaction({Set<TransactionInput>? inputs}) {
       requiredSigners: {
         Ed25519PublicKeyHash.fromPublicKey(
           Ed25519PublicKey.fromBytes(
-            hex.decode(
+            hexDecode(
               '3311ca404fcf22c91d607ace285d70e2'
               '263a1b81745c39673080329bd1a3f56e',
             ),
@@ -465,13 +469,13 @@ Transaction fullSignedTestTransaction({Set<TransactionInput>? inputs}) {
       vkeyWitnesses: {
         VkeyWitness(
           vkey: Ed25519PublicKey.fromBytes(
-            hex.decode(
+            hexDecode(
               '3311ca404fcf22c91d607ace285d70e2'
               '263a1b81745c39673080329bd1a3f56e',
             ),
           ),
           signature: Ed25519Signature.fromBytes(
-            hex.decode(
+            hexDecode(
               'f5eb006f048fdfa9b81b0fe3abee1ce1f1a75789d'
               'c21088b23ebf95c76b050ad157a497999e083e1957'
               'c2a3d730a07a5b2aef4a755783c9ce778c02c4a08970f',
@@ -506,7 +510,7 @@ Transaction fullUnsignedTestTransaction({Set<TransactionInput>? inputs}) {
       requiredSigners: {
         Ed25519PublicKeyHash.fromPublicKey(
           Ed25519PublicKey.fromBytes(
-            hex.decode(
+            hexDecode(
               '3311ca404fcf22c91d607ace285d70e2'
               '263a1b81745c39673080329bd1a3f56e',
             ),
@@ -543,13 +547,13 @@ Transaction minimalSignedTestTransaction({Set<TransactionInput>? inputs}) {
       vkeyWitnesses: {
         VkeyWitness(
           vkey: Ed25519PublicKey.fromBytes(
-            hex.decode(
+            hexDecode(
               '3311ca404fcf22c91d607ace285d70e2'
               '263a1b81745c39673080329bd1a3f56e',
             ),
           ),
           signature: Ed25519Signature.fromBytes(
-            hex.decode(
+            hexDecode(
               '85b3a67a0529c95a740fd643e2998f03f251268ca'
               '603a0778b6631966b9a43fd2e02fa907c610ecc98'
               '5b375fa9852c14789dacd2ab7897b445efe4f4b0f60a06',
@@ -582,16 +586,14 @@ Transaction minimalUnsignedTestTransaction({Set<TransactionInput>? inputs}) {
   );
 }
 
-/* cSpell:enable */
-
 AuxiliaryData testAuxiliaryData() {
   return AuxiliaryData(
     map: {
       const CborSmallInt(1): CborString('Test'),
-      const CborSmallInt(2): CborBytes(hex.decode('aabbccddeeff')),
+      const CborSmallInt(2): CborBytes(hexDecode('aabbccddeeff')),
       const CborSmallInt(3): const CborSmallInt(997),
       const CborSmallInt(4): cbor.decode(
-        hex.decode(
+        hexDecode(
           '82a50081825820afcf8497561065afe1ca623823508753cc580eb575ac8f1d6cfa'
           'a18c3ceeac010001818258390080f9e2c88e6c817008f3a812ed889b4a4da8e0bd'
           '103f86e7335422aa122a946b9ad3d2ddf029d3a828f0468aece76895f15c9efbd6'
@@ -602,6 +604,7 @@ AuxiliaryData testAuxiliaryData() {
     },
   );
 }
+/* cSpell:enable */
 
 TransactionUnspentOutput testUtxo({int? index, ScriptRef? scriptRef}) {
   return TransactionUnspentOutput(
@@ -617,5 +620,27 @@ TransactionUnspentOutput testUtxo({int? index, ScriptRef? scriptRef}) {
       amount: const Balance(coin: Coin(100000000)),
       scriptRef: scriptRef,
     ),
+  );
+}
+
+/// The default configuration for transaction building.
+///
+/// This configuration includes fee algorithm parameters, maximum transaction
+/// size, maximum value size, and coins per UTxO byte.
+TransactionBuilderConfig transactionBuilderConfig({
+  CoinSelectionStrategy selectionStrategy = const GreedySelectionStrategy(),
+  int maxAssetsPerOutput = 100,
+}) {
+  return TransactionBuilderConfig(
+    feeAlgo: const TieredFee(
+      constant: 155381,
+      coefficient: 44,
+      refScriptByteCost: 15,
+    ),
+    maxTxSize: 16384,
+    maxValueSize: 5000,
+    maxAssetsPerOutput: maxAssetsPerOutput,
+    coinsPerUtxoByte: const Coin(4310),
+    selectionStrategy: selectionStrategy,
   );
 }

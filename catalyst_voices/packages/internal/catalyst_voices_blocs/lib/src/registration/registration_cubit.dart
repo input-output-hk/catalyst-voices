@@ -323,7 +323,11 @@ final class RegistrationCubit extends Cubit<RegistrationState> with BlocErrorEmi
     }
   }
 
-  void recoverProgress() {
+  Future<void> recoverProgress() async {
+    _accountId = null;
+    _keychain = null;
+    _transaction = null;
+
     final progress = _progressNotifier.value;
     final baseProfileProgress = progress.baseProfileProgress;
     final keychainProgress = progress.keychainProgress;
@@ -338,15 +342,27 @@ final class RegistrationCubit extends Cubit<RegistrationState> with BlocErrorEmi
     }
 
     if (keychainProgress != null) {
-      _keychainCreationCubit
-        ..recoverSeedPhrase(keychainProgress.seedPhrase)
-        ..recoverPassword(keychainProgress.password);
+      try {
+        _keychain = await _registrationService.getKeychain(keychainProgress.keychainId);
+
+        _keychainCreationCubit
+          ..recoverSeedPhrase(keychainProgress.seedPhrase)
+          ..recoverPassword(keychainProgress.password);
+      } on RegistrationRecoverKeychainNotFoundException catch (_) {
+        _keychain = null;
+
+        _keychainCreationCubit
+          ..clearSeedPhrase()
+          ..recoverPassword('');
+
+        emitError(const LocalizedRecoverKeychainNotFoundException());
+      }
     }
 
     final step = AccountCreateProgressStep(
       completedSteps: [
         if (baseProfileProgress != null) AccountCreateStepType.baseProfile,
-        if (keychainProgress != null) AccountCreateStepType.keychain,
+        if (_keychain != null) AccountCreateStepType.keychain,
       ],
     );
     _goToStep(step);
@@ -608,7 +624,26 @@ final class RegistrationCubit extends Cubit<RegistrationState> with BlocErrorEmi
           keychainProgress: const Optional.empty(),
         );
       case AccountCreateStepType.keychain:
-        final data = _keychainCreationCubit.createRecoverProgress();
+        final keychain = _keychain;
+        final seedPhrase = _keychainCreationCubit.seedPhrase;
+        final password = _keychainCreationCubit.password;
+
+        final missingDataErrors = <LocalizedException>[
+          if (keychain == null) const LocalizedKeychainNotFoundException(),
+          if (seedPhrase == null) const LocalizedSeedPhraseNotFoundException(),
+          if (password.isNotValid) const LocalizedUnlockPasswordNotFoundException(),
+        ];
+
+        if (missingDataErrors.isNotEmpty) {
+          emitError(LocalizedSaveRegistrationProgressException(reasons: missingDataErrors));
+          return;
+        }
+
+        final data = KeychainProgress(
+          keychainId: keychain!.id,
+          seedPhrase: seedPhrase!,
+          password: password.value,
+        );
         _progressNotifier.value = _progressNotifier.value.copyWith(
           keychainProgress: Optional(data),
         );

@@ -116,7 +116,7 @@ final class DevToolsBloc extends Bloc<DevToolsEvent, DevToolsState>
     emit(state.copyWith(enableTapCount: count));
 
     _resetCountTimer = Timer(
-      const Duration(seconds: 1),
+      const Duration(seconds: 2),
       () => add(const DevToolsEnablerTapResetEvent()),
     );
   }

@@ -41,7 +41,7 @@ class _DataUsageCheckBox extends StatelessWidget {
   Widget build(BuildContext context) {
     return VoicesCheckbox(
       value: isChecked,
-      label: Text(context.l10n.createBaseProfileAcknowledgementsDataUsage),
+      label: Text(context.l10n.createProfileAcknowledgementsDataUsage),
       onChanged: (value) {
         RegistrationCubit.of(context).baseProfile.updateDataUsage(isAccepted: value);
       },
@@ -133,7 +133,7 @@ class _Title extends StatelessWidget {
 
     return Text(
       key: const ValueKey('AcknowledgementsTitle'),
-      context.l10n.createBaseProfileAcknowledgementsTitle,
+      context.l10n.createProfileAcknowledgementsTitle,
       style: textStyle,
     );
   }

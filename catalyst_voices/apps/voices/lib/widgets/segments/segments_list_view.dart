@@ -26,6 +26,7 @@ class BasicSegmentsListView extends StatelessWidget {
   final IndexedWidgetBuilder separatorBuilder;
   final EdgeInsetsGeometry? padding;
   final ItemScrollController? itemScrollController;
+  final double? minCacheExtent;
 
   const BasicSegmentsListView({
     super.key,
@@ -34,6 +35,7 @@ class BasicSegmentsListView extends StatelessWidget {
     required this.separatorBuilder,
     this.padding = EdgeInsets.zero,
     this.itemScrollController,
+    this.minCacheExtent,
   });
 
   @override
@@ -51,6 +53,7 @@ class BasicSegmentsListView extends StatelessWidget {
         itemBuilder: itemBuilder,
         separatorBuilder: separatorBuilder,
         itemCount: items.length,
+        minCacheExtent: minCacheExtent,
       ),
     );
   }
