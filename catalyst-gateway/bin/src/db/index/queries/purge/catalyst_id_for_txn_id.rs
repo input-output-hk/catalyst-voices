@@ -19,6 +19,7 @@ use crate::{
         },
         types::DbTransactionId,
     },
+    impl_query_batch, impl_query_statement,
     settings::cassandra_db,
 };
 
@@ -65,6 +66,8 @@ impl From<result::PrimaryKey> for Params {
 /// Get primary key for Catalyst ID For TX ID registration query.
 pub(crate) struct PrimaryKeyQuery;
 
+impl_query_statement!(PrimaryKeyQuery, SELECT_QUERY);
+
 impl PrimaryKeyQuery {
     /// Prepares a query to get all Catalyst ID For TX ID registration primary keys.
     pub(crate) async fn prepare(session: &Arc<Session>) -> anyhow::Result<PreparedStatement> {
@@ -99,6 +102,8 @@ const DELETE_QUERY: &str = include_str!("cql/delete_catalyst_id_for_txn_id.cql")
 
 /// Delete Catalyst ID For TX ID registration Query
 pub(crate) struct DeleteQuery;
+
+impl_query_batch!(DeleteQuery, DELETE_QUERY);
 
 impl DeleteQuery {
     /// Prepare Batch of Delete Queries

@@ -12,6 +12,54 @@ use std::{any::TypeId, fmt::Debug, sync::Arc};
 
 use anyhow::bail;
 use dashmap::DashMap;
+use purge::{
+    catalyst_id_for_stake_address::{
+        DeleteQuery as PurgeCatalystIdForStakeAddressDelete,
+        PrimaryKeyQuery as PurgeCatalystIdForStakeAddressSelect,
+    },
+    catalyst_id_for_txn_id::{
+        DeleteQuery as PurgeCatalystIdForTxnIdDelete,
+        PrimaryKeyQuery as PurgeCatalystIdForTxnIdSelect,
+    },
+    cip36_registration::{
+        DeleteQuery as PurgeCip36RegistrationDelete,
+        PrimaryKeyQuery as PurgeCip36RegistrationSelect,
+    },
+    cip36_registration_for_vote_key::{
+        DeleteQuery as PurgeCip36RegistrationForVoteKeyDelete,
+        PrimaryKeyQuery as PurgeCip36RegistrationForVoteKeySelect,
+    },
+    cip36_registration_invalid::{
+        DeleteQuery as PurgeCip36RegistrationInvalidDelete,
+        PrimaryKeyQuery as PurgeCip36RegistrationInvalidSelect,
+    },
+    rbac509_invalid_registration::{
+        DeleteQuery as PurgeRbacRegistrationInvalidDelete,
+        PrimaryKeyQuery as PurgeRbacRegistrationInvalidSelect,
+    },
+    rbac509_registration::{
+        DeleteQuery as PurgeRbacRegistrationDelete, PrimaryKeyQuery as PurgeRbacRegistrationSelect,
+    },
+    stake_registration::{
+        DeleteQuery as PurgeStakeRegistrationDelete,
+        PrimaryKeyQuery as PurgeStakeRegistrationSelect,
+    },
+    txi_by_hash::{DeleteQuery as PurgeTxiByHashDelete, PrimaryKeyQuery as PurgeTxiByHashSelect},
+    txo_ada::{DeleteQuery as PurgeTxoAdaDelete, PrimaryKeyQuery as PurgeTxoAdaSelect},
+    txo_assets::{DeleteQuery as PurgeTxoAssetsDelete, PrimaryKeyQuery as PurgeTxoAssetsSelect},
+    unstaked_txo_ada::{
+        DeleteQuery as PurgeTxoUnstakedAdaDelete, PrimaryKeyQuery as PurgeTxoUnstakedAdaSelect,
+    },
+    unstaked_txo_assets::{
+        DeleteQuery as PurgeTxoUnstakedAssetDelete, PrimaryKeyQuery as PurgeTxoUnstakedAssetSelect,
+    },
+};
+use rbac::{
+    get_catalyst_id_from_stake_address::GetCatalystIdForStakeAddress,
+    get_catalyst_id_from_transaction_id::GetCatalystIdForTxnId,
+    get_rbac_invalid_registrations::GetRbac509InvalidRegistrations,
+    get_rbac_registrations::GetRbac509Registrations,
+};
 use registrations::{
     get_all_invalids::GetAllInvalidRegistrationsQuery,
     get_all_registrations::GetAllRegistrationsQuery, get_from_stake_addr::GetRegistrationQuery,
@@ -33,48 +81,29 @@ use staked_ada::{
 use sync_status::update::SyncStatusInsertQuery;
 use tracing::error;
 
-use super::block::{
-    certs::CertInsertQuery,
-    cip36::Cip36InsertQuery,
-    rbac509::Rbac509InsertQuery,
-    txi::TxiInsertQuery,
-    txo::{
-        insert_txo::TxoInsertQuery, insert_txo_asset::Params as TxoAssetInsert,
-        insert_unstaked_txo::Params as TxoUnstakedInsert,
-        insert_unstaked_txo_asset::Params as TxoUnstakedAssetInsert,
-        TxoInsertQuery as TxoInsertQueries,
-    },
-};
-use crate::{
-    db::index::{
-        block::{
-            certs::StakeRegistrationInsertQuery,
-            cip36::{
-                insert_cip36::Cip36Insert, insert_cip36_for_vote_key::Cip36ForVoteKeyInsert,
-                insert_cip36_invalid::Cip36InvalidInsert,
-            },
-            rbac509::{
-                insert_catalyst_id_for_stake_address::CatalystIdForStakeAddressInsert,
-                insert_catalyst_id_for_txn_id::CatalystIdForTxnIdInsert,
-                insert_rbac509::Rbac509Insert, insert_rbac509_invalid::Rbac509InvalidInsert,
-            },
+use super::{
+    block::{
+        certs::{CertInsertQuery, StakeRegistrationInsertQuery},
+        cip36::{
+            insert_cip36::Cip36Insert, insert_cip36_for_vote_key::Cip36ForVoteKeyInsert,
+            insert_cip36_invalid::Cip36InvalidInsert, Cip36InsertQuery,
         },
-        queries::{
-            purge::txo_ada::{
-                DeleteQuery as PurgeTxoAdaDelete, PrimaryKeyQuery as PurgeTxoAdaSelect,
-            },
-            rbac::{
-                get_catalyst_id_from_stake_address::GetCatalystIdForStakeAddress,
-                get_catalyst_id_from_transaction_id::GetCatalystIdForTxnId,
-                get_rbac_invalid_registrations::GetRbac509InvalidRegistrations,
-                get_rbac_registrations::GetRbac509Registrations,
-            },
+        rbac509::{
+            insert_catalyst_id_for_stake_address::CatalystIdForStakeAddressInsert,
+            insert_catalyst_id_for_txn_id::CatalystIdForTxnIdInsert, insert_rbac509::Rbac509Insert,
+            insert_rbac509_invalid::Rbac509InvalidInsert, Rbac509InsertQuery,
         },
-        session::CassandraSessionError,
+        txi::TxiInsertQuery,
+        txo::{
+            insert_txo::TxoInsertQuery, insert_txo_asset::Params as TxoAssetInsert,
+            insert_unstaked_txo::Params as TxoUnstakedInsert,
+            insert_unstaked_txo_asset::Params as TxoUnstakedAssetInsert,
+            TxoInsertQuery as TxoInsertQueries,
+        },
     },
-    service::utilities::health::set_index_db_liveness,
-    settings::cassandra_db,
+    session::CassandraSessionError,
 };
+use crate::{service::utilities::health::set_index_db_liveness, settings::cassandra_db};
 
 /// Batches of different sizes, prepared and ready for use.
 pub(crate) type SizedBatch = DashMap<u16, Arc<Batch>>;
@@ -173,6 +202,85 @@ macro_rules! impl_query_statement {
             }
         }
     };
+}
+
+/// Prepare Queries
+#[allow(dead_code)]
+async fn prepare_queries(
+    session: &Arc<Session>, cfg: &cassandra_db::EnvVars,
+) -> anyhow::Result<DashMap<TypeId, QueryKind>> {
+    // Prepare a query dashmap
+    macro_rules! prepare_q {
+        ( $( $i:ty),* ) => {
+            {
+                let queries = vec![
+                    $( (<$i as Query>::type_id(), <$i as Query>::prepare_query(session, cfg).await?), )*
+                ];
+                DashMap::from_iter(queries)
+            }
+        }
+    }
+    // WIP: Adding queries as they implement trait
+    let queries = prepare_q!(
+        // prepared batch queries
+        TxiInsertQuery,
+        TxoInsertQuery,
+        TxoAssetInsert,
+        TxoUnstakedInsert,
+        TxoUnstakedAssetInsert,
+        StakeRegistrationInsertQuery,
+        Cip36Insert,
+        Cip36InvalidInsert,
+        Cip36ForVoteKeyInsert,
+        UpdateTxoSpentQuery,
+        Rbac509Insert,
+        Rbac509InvalidInsert,
+        CatalystIdForTxnIdInsert,
+        CatalystIdForStakeAddressInsert,
+        // prepared statement queries
+        GetTxoByStakeAddressQuery,
+        GetTxiByTxnHashesQuery,
+        GetAssetsByStakeAddressQuery,
+        GetRegistrationQuery,
+        GetStakeAddrQuery,
+        GetStakeAddrFromVoteKeyQuery,
+        GetInvalidRegistrationQuery,
+        GetAllRegistrationsQuery,
+        GetAllInvalidRegistrationsQuery,
+        SyncStatusInsertQuery,
+        GetCatalystIdForStakeAddress,
+        GetCatalystIdForTxnId,
+        GetRbac509Registrations,
+        GetRbac509InvalidRegistrations,
+        // purge queries
+        PurgeTxoAdaSelect,
+        PurgeTxoAdaDelete,
+        PurgeTxoAssetsSelect,
+        PurgeTxoAssetsDelete,
+        PurgeTxoUnstakedAdaSelect,
+        PurgeTxoUnstakedAdaDelete,
+        PurgeTxoUnstakedAssetSelect,
+        PurgeTxoUnstakedAssetDelete,
+        PurgeTxiByHashSelect,
+        PurgeTxiByHashDelete,
+        PurgeStakeRegistrationSelect,
+        PurgeStakeRegistrationDelete,
+        PurgeCip36RegistrationSelect,
+        PurgeCip36RegistrationDelete,
+        PurgeCip36RegistrationInvalidSelect,
+        PurgeCip36RegistrationInvalidDelete,
+        PurgeCip36RegistrationForVoteKeySelect,
+        PurgeCip36RegistrationForVoteKeyDelete,
+        PurgeRbacRegistrationSelect,
+        PurgeRbacRegistrationDelete,
+        PurgeRbacRegistrationInvalidSelect,
+        PurgeRbacRegistrationInvalidDelete,
+        PurgeCatalystIdForTxnIdSelect,
+        PurgeCatalystIdForTxnIdDelete,
+        PurgeCatalystIdForStakeAddressSelect,
+        PurgeCatalystIdForStakeAddressDelete
+    );
+    Ok(queries)
 }
 
 /// Prepares a statement.
@@ -352,61 +460,6 @@ pub(crate) struct PreparedQueries {
 pub(crate) type FallibleQueryResults = anyhow::Result<Vec<QueryResult>>;
 /// A set of query responses from tasks that can fail.
 pub(crate) type FallibleQueryTasks = Vec<tokio::task::JoinHandle<FallibleQueryResults>>;
-
-/// Prepare Queries
-#[allow(dead_code)]
-async fn prepare_queries(
-    session: &Arc<Session>, cfg: &cassandra_db::EnvVars,
-) -> anyhow::Result<DashMap<TypeId, QueryKind>> {
-    // Prepare a query dashmap
-    macro_rules! prepare_q {
-        ( $( $i:ty),* ) => {
-            {
-                let queries = vec![
-                    $( (TypeId::of::<$i>(), <$i>::prepare_query(session, cfg).await?), )*
-                ];
-                DashMap::from_iter(queries)
-            }
-        }
-    }
-    // WIP: Adding queries as they implement trait
-    let queries = prepare_q!(
-        // prepared batch queries
-        TxiInsertQuery,
-        TxoInsertQuery,
-        TxoAssetInsert,
-        TxoUnstakedInsert,
-        TxoUnstakedAssetInsert,
-        StakeRegistrationInsertQuery,
-        Cip36Insert,
-        Cip36InvalidInsert,
-        Cip36ForVoteKeyInsert,
-        UpdateTxoSpentQuery,
-        Rbac509Insert,
-        Rbac509InvalidInsert,
-        CatalystIdForTxnIdInsert,
-        CatalystIdForStakeAddressInsert,
-        // prepared statement queries
-        GetTxoByStakeAddressQuery,
-        GetTxiByTxnHashesQuery,
-        GetAssetsByStakeAddressQuery,
-        GetRegistrationQuery,
-        GetStakeAddrQuery,
-        GetStakeAddrFromVoteKeyQuery,
-        GetInvalidRegistrationQuery,
-        GetAllRegistrationsQuery,
-        GetAllInvalidRegistrationsQuery,
-        SyncStatusInsertQuery,
-        GetCatalystIdForStakeAddress,
-        GetCatalystIdForTxnId,
-        GetRbac509Registrations,
-        GetRbac509InvalidRegistrations,
-        // purge queries
-        PurgeTxoAdaSelect,
-        PurgeTxoAdaDelete
-    );
-    Ok(queries)
-}
 
 impl PreparedQueries {
     /// Create new prepared queries for a given session.
