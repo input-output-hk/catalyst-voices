@@ -14,8 +14,6 @@ final class CommonSnackbars {
   /// Shows a snackbar with success message about proposal forgetting.
   /// Used in [WorkspacePage] and [ProposalBuilderPage].
   static void showForgetProposalSuccessDialog(BuildContext context) {
-    VoicesSnackBar.hideCurrent(context);
-
     VoicesSnackBar(
       type: VoicesSnackBarType.success,
       behavior: SnackBarBehavior.floating,
