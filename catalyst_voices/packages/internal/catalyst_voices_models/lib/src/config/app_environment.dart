@@ -85,10 +85,6 @@ enum AppEnvironmentType {
     };
   }
 
-  Uri get appGatewayApi => app.replace(path: '/api/gateway');
-
-  Uri get appReviewsApi => app.replace(path: '/api/reviews');
-
   Uri get reviews {
     return switch (this) {
       AppEnvironmentType.dev || AppEnvironmentType.preprod => _getBaseUrl('reviews', envName: name),

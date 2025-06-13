@@ -31,19 +31,18 @@ final class ApiServices {
 
     return ApiServices.internal(
       gateway: CatGateway.create(
-        baseUrl: env.appGatewayApi,
+        baseUrl: env.app,
         converter: CborOrJsonDelegateConverter(
           cborConverter: CborSerializableConverter(),
           jsonConverter: $JsonSerializableConverter(),
         ),
         interceptors: [
-          PathTrimInterceptor(),
           RbacAuthInterceptor(authTokenProvider),
           if (kDebugMode) HttpLoggingInterceptor(onlyErrors: true),
         ],
       ),
       reviews: CatReviews.create(
-        baseUrl: env.appReviewsApi,
+        baseUrl: env.app.replace(path: '/api/reviews'),
         interceptors: [
           PathTrimInterceptor(),
           RbacAuthInterceptor(authTokenProvider),
