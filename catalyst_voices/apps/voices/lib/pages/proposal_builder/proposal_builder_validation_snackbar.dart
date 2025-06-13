@@ -97,7 +97,7 @@ class _ExitFormIssueModeDialog extends StatelessWidget {
         color: context.colors.iconsWarning,
       ),
       title: Text(context.l10n.proposalEditorValidationExitDialogTitle),
-      message: Text(context.l10n.proposalEditorValidationExitDialogMessage),
+      message: const Offstage(),
       action: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         spacing: 12,
