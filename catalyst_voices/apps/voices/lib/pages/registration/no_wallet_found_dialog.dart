@@ -5,6 +5,7 @@ import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -273,7 +274,11 @@ class _RightSide extends StatelessWidget {
         const Spacer(),
         TipCard(
           headerText: context.l10n.goodToKnow,
-          tips: [context.l10n.registrationTransactionFeeDescription],
+          tips: [
+            context.l10n.registrationTransactionFeeDescription(
+              CardanoWalletDetails.minAdaForRegistration.ada,
+            ),
+          ],
         ),
       ],
     );
