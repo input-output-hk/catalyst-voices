@@ -8,6 +8,7 @@ import 'package:catalyst_voices/pages/workspace/page/workspace_loading.dart';
 import 'package:catalyst_voices/pages/workspace/page/workspace_user_proposals.dart';
 import 'package:catalyst_voices/pages/workspace/submission_closing_warning_dialog.dart';
 import 'package:catalyst_voices/routes/routing/proposal_builder_route.dart';
+import 'package:catalyst_voices/widgets/snackbar/common_snackbars.dart';
 import 'package:catalyst_voices/widgets/snackbar/voices_snackbar.dart';
 import 'package:catalyst_voices/widgets/snackbar/voices_snackbar_type.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
@@ -114,14 +115,7 @@ class _WorkspacePageState extends State<WorkspacePage>
   }
 
   void _showForgetSuccessSnackBar() {
-    VoicesSnackBar.hideCurrent(context);
-
-    VoicesSnackBar(
-      type: VoicesSnackBarType.success,
-      behavior: SnackBarBehavior.floating,
-      title: context.l10n.successProposalForgot,
-      message: context.l10n.successProposalForgotDescription,
-    ).show(context);
+    CommonSnackbars.showForgetProposalSuccessDialog(context);
   }
 
   Future<void> _showSubmissionClosingWarningDialog([

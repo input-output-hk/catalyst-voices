@@ -36,6 +36,13 @@ final class ExportProposalEvent extends ProposalBuilderEvent {
   List<Object?> get props => [filePrefix];
 }
 
+final class ForgetProposalBuilderEvent extends ProposalBuilderEvent {
+  const ForgetProposalBuilderEvent();
+
+  @override
+  List<Object?> get props => [];
+}
+
 final class LoadDefaultProposalCategoryEvent extends ProposalBuilderEvent {
   const LoadDefaultProposalCategoryEvent();
 
