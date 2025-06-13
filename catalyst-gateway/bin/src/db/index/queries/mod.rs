@@ -91,7 +91,10 @@ pub(crate) enum QueryKind {
 
 /// A trait to prepare Index DB queries.
 #[allow(dead_code)]
-pub(crate) trait Query {
+pub(crate) trait Query: std::fmt::Display + std::any::Any {
+    /// Returns the type id for the query.
+    fn type_id() -> TypeId;
+
     /// Prepare the query
     async fn prepare_query(
         session: &Arc<Session>, cfg: &cassandra_db::EnvVars,
@@ -103,14 +106,27 @@ pub(crate) trait Query {
 macro_rules! impl_query_batch {
     ($i:ty, $c:ident) => {
         impl $crate::db::index::queries::Query for $i {
-            /// Prepare Batch of Insert TXI Index Data Queries
+
+            fn type_id() -> std::any::TypeId {
+                std::any::TypeId::of::<$i>()
+            }
+
             async fn prepare_query(
                 session: &std::sync::Arc<scylla::Session>,
                 cfg: &$crate::settings::cassandra_db::EnvVars,
             ) -> anyhow::Result<$crate::db::index::queries::QueryKind> {
-                Self::prepare_batch(session, cfg)
-                    .await
-                    .map($crate::db::index::queries::QueryKind::Batch)
+                $crate::db::index::queries::prepare_batch(
+                    session.clone(),
+                    $c,
+                    cfg,
+                    scylla::statement::Consistency::Any,
+                    true,
+                    false,
+                )
+                .await
+                .map($crate::db::index::queries::QueryKind::Batch)
+                .inspect_err(|error| error!(error=%error,"Failed to prepare $c Query."))
+                .map_err(|error| anyhow::anyhow!("{error}\n--\n{{$c}}"))
             }
         }
 
@@ -127,14 +143,27 @@ macro_rules! impl_query_batch {
 macro_rules! impl_query_statement {
     ($i:ty, $c:ident) => {
         impl $crate::db::index::queries::Query for $i {
-            /// Prepare Batch of Insert TXI Index Data Queries
+
+            fn type_id() -> std::any::TypeId {
+                std::any::TypeId::of::<$i>()
+            }
+
             async fn prepare_query(
                 session: &std::sync::Arc<scylla::Session>,
                 _: &$crate::settings::cassandra_db::EnvVars,
             ) -> anyhow::Result<$crate::db::index::queries::QueryKind> {
-                Self::prepare(session.clone())
+
+                $crate::db::index::queries::prepare_statement(
+                    session,
+                    $c,
+                    scylla::statement::Consistency::All,
+                    true,
+                )
                     .await
                     .map($crate::db::index::queries::QueryKind::Statement)
+                    .inspect_err(|error| error!(error=%error, "Failed to prepare $c query."))
+                    .map_err(|error| anyhow::anyhow!("{error}\n--\n{{$c}}"))
+
             }
         }
 
@@ -144,6 +173,48 @@ macro_rules! impl_query_statement {
             }
         }
     };
+}
+
+/// Prepares a statement.
+pub(crate) async fn prepare_statement<Q: std::fmt::Display>(
+    session: &Arc<Session>, query: Q, consistency: scylla::statement::Consistency, idempotent: bool,
+) -> anyhow::Result<PreparedStatement> {
+    let mut prepared = session.prepare(format!("{query}")).await?;
+    prepared.set_consistency(consistency);
+    prepared.set_is_idempotent(idempotent);
+
+    Ok(prepared)
+}
+
+/// Prepares all permutations of the batch from 1 to max.
+/// It is necessary to do this because batches are pre-sized, they can not be dynamic.
+/// Preparing the batches in advance is a very larger performance increase.
+pub(crate) async fn prepare_batch<Q: std::fmt::Display>(
+    session: Arc<Session>, query: Q, cfg: &cassandra_db::EnvVars,
+    consistency: scylla::statement::Consistency, idempotent: bool, logged: bool,
+) -> anyhow::Result<SizedBatch> {
+    let sized_batches: SizedBatch = DashMap::new();
+
+    // First prepare the query. Only needs to be done once, all queries on a batch are the
+    // same.
+    let prepared = prepare_statement(&session, query, consistency, idempotent).await?;
+
+    for batch_size in cassandra_db::MIN_BATCH_SIZE..=cfg.max_batch_size {
+        let mut batch: Batch = Batch::new(if logged {
+            scylla::batch::BatchType::Logged
+        } else {
+            scylla::batch::BatchType::Unlogged
+        });
+        batch.set_consistency(consistency);
+        batch.set_is_idempotent(idempotent);
+        for _ in cassandra_db::MIN_BATCH_SIZE..=batch_size {
+            batch.append_statement(prepared.clone());
+        }
+
+        sized_batches.insert(batch_size.try_into()?, Arc::new(batch));
+    }
+
+    Ok(sized_batches)
 }
 
 /// All Prepared insert Queries that we know about.
@@ -424,46 +495,21 @@ impl PreparedQueries {
     }
 
     /// Prepares a statement.
-    pub(crate) async fn prepare(
-        session: Arc<Session>, query: &str, consistency: scylla::statement::Consistency,
+    pub(crate) async fn prepare<Q: std::fmt::Display>(
+        session: Arc<Session>, query: Q, consistency: scylla::statement::Consistency,
         idempotent: bool,
     ) -> anyhow::Result<PreparedStatement> {
-        let mut prepared = session.prepare(query).await?;
-        prepared.set_consistency(consistency);
-        prepared.set_is_idempotent(idempotent);
-
-        Ok(prepared)
+        prepare_statement(&session, query, consistency, idempotent).await
     }
 
     /// Prepares all permutations of the batch from 1 to max.
     /// It is necessary to do this because batches are pre-sized, they can not be dynamic.
     /// Preparing the batches in advance is a very larger performance increase.
-    pub(crate) async fn prepare_batch(
-        session: Arc<Session>, query: &str, cfg: &cassandra_db::EnvVars,
+    pub(crate) async fn prepare_batch<Q: std::fmt::Display>(
+        session: Arc<Session>, query: Q, cfg: &cassandra_db::EnvVars,
         consistency: scylla::statement::Consistency, idempotent: bool, logged: bool,
     ) -> anyhow::Result<SizedBatch> {
-        let sized_batches: SizedBatch = DashMap::new();
-
-        // First prepare the query. Only needs to be done once, all queries on a batch are the
-        // same.
-        let prepared = Self::prepare(session, query, consistency, idempotent).await?;
-
-        for batch_size in cassandra_db::MIN_BATCH_SIZE..=cfg.max_batch_size {
-            let mut batch: Batch = Batch::new(if logged {
-                scylla::batch::BatchType::Logged
-            } else {
-                scylla::batch::BatchType::Unlogged
-            });
-            batch.set_consistency(consistency);
-            batch.set_is_idempotent(idempotent);
-            for _ in cassandra_db::MIN_BATCH_SIZE..=batch_size {
-                batch.append_statement(prepared.clone());
-            }
-
-            sized_batches.insert(batch_size.try_into()?, Arc::new(batch));
-        }
-
-        Ok(sized_batches)
+        prepare_batch(session, query, cfg, consistency, idempotent, logged).await
     }
 
     /// Executes a single query with the given parameters.
