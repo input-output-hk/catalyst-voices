@@ -7,17 +7,120 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localized_locales/flutter_localized_locales.dart';
 
+/// A callback that builds a widget for given [listItem].
+typedef DocumentPropertyReadListItemBuilder = Widget Function(
+  BuildContext context,
+  DocumentPropertyValueListItem<Object> listItem,
+);
+
+/// A map defining overrides for [DocumentPropertyReadBuilder].
+typedef DocumentPropertyReadOverrides = Map<DocumentNodeId, DocumentPropertyReadListItemBuilder>;
+
+/// Renders single document property in read only way. Commonly used for proposal view + comments.
 class DocumentPropertyReadBuilder extends StatefulWidget {
   final DocumentProperty property;
+  final DocumentPropertyReadOverrides overrides;
 
   const DocumentPropertyReadBuilder({
     super.key,
     required this.property,
+    this.overrides = const {},
   });
 
   @override
   State<DocumentPropertyReadBuilder> createState() {
     return _DocumentPropertyReadBuilderState();
+  }
+}
+
+class _DocumentPropertyReadBuilderListTile extends StatelessWidget {
+  final String title;
+  final bool isMultiline;
+  final Widget child;
+
+  const _DocumentPropertyReadBuilderListTile({
+    required super.key,
+    required this.title,
+    this.isMultiline = false,
+    required this.child,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = context.textTheme;
+    final colors = context.colors;
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Note. Links are single line https entry but do not have title
+        if (title.isNotEmpty) ...[
+          Text(
+            title,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: textTheme.bodySmall?.copyWith(
+              color: colors.textOnPrimaryLevel1,
+            ),
+          ),
+          const SizedBox(height: 2),
+        ],
+        DefaultTextStyle(
+          style: (textTheme.bodyMedium ?? const TextStyle()).copyWith(
+            color: colors.textOnPrimaryLevel0,
+          ),
+          maxLines: !isMultiline ? 1 : null,
+          overflow: !isMultiline ? TextOverflow.ellipsis : TextOverflow.clip,
+          child: child,
+        ),
+      ],
+    );
+  }
+}
+
+class _DocumentPropertyReadBuilderListTileBuilder extends StatelessWidget {
+  final DocumentPropertyValueListItem<Object> item;
+  final DocumentPropertyReadOverrides overrides;
+
+  const _DocumentPropertyReadBuilderListTileBuilder({
+    required super.key,
+    required this.item,
+    required this.overrides,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    if (overrides.containsKey(item.id)) {
+      return _DocumentPropertyReadBuilderListTile(
+        key: ValueKey('DocumentProperty[${item.id}]ReadTile'),
+        title: item.title,
+        isMultiline: true,
+        child: overrides[item.id]!(context, item),
+      );
+    }
+
+    return switch (item) {
+      DocumentLinkReadItem(:final title, :final value) => _DocumentPropertyReadBuilderListTile(
+          key: ValueKey('DocumentProperty[${item.id}]ReadTile'),
+          title: title,
+          isMultiline: true,
+          child: value != null ? LinkText(value) : const Text('-'),
+        ),
+      DocumentMarkdownListItem(:final title, :final value) => _DocumentPropertyReadBuilderListTile(
+          key: ValueKey('DocumentProperty[${item.id}]ReadTile'),
+          title: title,
+          isMultiline: true,
+          child: MarkdownText(value ?? const MarkdownData('-')),
+        ),
+      DocumentTextListItem(:final title, :final value, :final isMultiline) =>
+        _DocumentPropertyReadBuilderListTile(
+          key: ValueKey('DocumentProperty[${item.id}]ReadTile'),
+          title: title,
+          isMultiline: isMultiline,
+          child: Text(value ?? '-'),
+        ),
+    };
   }
 }
 
@@ -32,9 +135,10 @@ class _DocumentPropertyReadBuilderState extends State<DocumentPropertyReadBuilde
       spacing: 16,
       children: [
         for (final item in _items)
-          _ListItemBuilder(
+          _DocumentPropertyReadBuilderListTileBuilder(
             key: ObjectKey(item.id),
             item: item,
+            overrides: widget.overrides,
           ),
       ],
     );
@@ -191,80 +295,5 @@ class _DocumentPropertyReadBuilderState extends State<DocumentPropertyReadBuilde
       ..clear()
       ..addAll(_calculateItemsFrom(widget.property))
       ..removeWhere((element) => element.isEmpty);
-  }
-}
-
-class _ListItem extends StatelessWidget {
-  final String title;
-  final Widget value;
-  final bool isMultiline;
-
-  const _ListItem({
-    required this.title,
-    required this.value,
-    this.isMultiline = false,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final textTheme = context.textTheme;
-    final colors = context.colors;
-
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Note. Links are single line https entry but do not have title
-        if (title.isNotEmpty) ...[
-          Text(
-            title,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: textTheme.bodySmall?.copyWith(
-              color: colors.textOnPrimaryLevel1,
-            ),
-          ),
-          const SizedBox(height: 2),
-        ],
-        DefaultTextStyle(
-          style: (textTheme.bodyMedium ?? const TextStyle()).copyWith(
-            color: colors.textOnPrimaryLevel0,
-          ),
-          maxLines: !isMultiline ? 1 : null,
-          overflow: !isMultiline ? TextOverflow.ellipsis : TextOverflow.clip,
-          child: value,
-        ),
-      ],
-    );
-  }
-}
-
-class _ListItemBuilder extends StatelessWidget {
-  final DocumentPropertyValueListItem<Object> item;
-
-  const _ListItemBuilder({
-    required super.key,
-    required this.item,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return switch (item) {
-      DocumentLinkReadItem(:final title, :final value) => _ListItem(
-          title: title,
-          value: value != null ? LinkText(value) : const Text('-'),
-          isMultiline: true,
-        ),
-      DocumentMarkdownListItem(:final title, :final value) => _ListItem(
-          title: title,
-          value: MarkdownText(value ?? const MarkdownData('-')),
-          isMultiline: true,
-        ),
-      DocumentTextListItem(:final title, :final value, :final isMultiline) => _ListItem(
-          title: title,
-          value: Text(value ?? '-'),
-          isMultiline: isMultiline,
-        ),
-    };
   }
 }

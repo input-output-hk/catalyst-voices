@@ -18,7 +18,7 @@ final class DocumentMarkdownListItem extends DocumentPropertyValueListItem<Markd
 }
 
 sealed class DocumentPropertyValueListItem<T> extends Equatable {
-  final NodeId id;
+  final DocumentNodeId id;
   final String title;
   final T? value;
 

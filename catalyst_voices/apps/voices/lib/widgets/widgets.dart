@@ -87,6 +87,7 @@ export 'separators/dot_separator.dart';
 export 'separators/voices_divider.dart';
 export 'separators/voices_text_divider.dart';
 export 'separators/voices_vertical_divider.dart';
+export 'text/expandable_text.dart';
 export 'text/link_text.dart';
 export 'text/timestamp_text.dart';
 export 'text/timezone_date_time_text.dart';
