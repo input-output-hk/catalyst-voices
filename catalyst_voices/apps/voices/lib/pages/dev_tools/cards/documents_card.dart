@@ -16,8 +16,26 @@ class DocumentsCard extends StatelessWidget {
       children: [
         ValueText(name: Text('Sync stats'), value: SyncStatsText()),
         ValueText(name: Text('Documents count'), value: DocumentsCountText()),
-        _StartSyncButton(),
+        Row(
+          spacing: 8,
+          children: [
+            _StartSyncButton(),
+            _ClearButton(),
+          ],
+        ),
       ],
+    );
+  }
+}
+
+class _ClearButton extends StatelessWidget {
+  const _ClearButton();
+
+  @override
+  Widget build(BuildContext context) {
+    return VoicesFilledButton(
+      child: const Text('Clear'),
+      onTap: () => context.read<DevToolsBloc>().add(const ClearDocumentsEvent()),
     );
   }
 }
