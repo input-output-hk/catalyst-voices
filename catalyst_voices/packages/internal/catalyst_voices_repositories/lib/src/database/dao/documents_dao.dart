@@ -40,7 +40,7 @@ abstract interface class DocumentsDao {
   });
 
   /// Deletes all documents. Cascades to metadata.
-  Future<void> deleteAll();
+  Future<int> deleteAll();
 
   /// If version is specified in [ref] returns this version or null.
   /// Returns newest version with matching id or null of none found.
@@ -169,12 +169,14 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
   }
 
   @override
-  Future<void> deleteAll() async {
+  Future<int> deleteAll() async {
     final deletedRows = await delete(documents).go();
 
     if (kDebugMode) {
       debugPrint('DocumentsDao: Deleted[$deletedRows] rows');
     }
+
+    return deletedRows;
   }
 
   @override

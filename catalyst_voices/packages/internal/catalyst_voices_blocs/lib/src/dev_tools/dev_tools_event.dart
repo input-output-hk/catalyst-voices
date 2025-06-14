@@ -20,6 +20,10 @@ final class ChangeLogLevelEvent extends DevToolsEvent {
   List<Object?> get props => [level];
 }
 
+final class ClearDocumentsEvent extends DevToolsEvent {
+  const ClearDocumentsEvent();
+}
+
 final class DevToolsEnablerTappedEvent extends DevToolsEvent {
   const DevToolsEnablerTappedEvent();
 }
