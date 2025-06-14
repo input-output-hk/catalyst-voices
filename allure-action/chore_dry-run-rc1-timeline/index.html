@@ -1,0 +1,36 @@
+<!-- report-action -->
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Folder Listing</title>
+  </head>
+
+  <body>
+    <div id="app">
+      <ul id="links"></ul>
+    </div>
+
+    <script>
+      const linksList = document.getElementById('links')
+
+      fetch(`./data.json?t=${Date.now()}`)
+        .then((response) => response.ok && response.json())
+        .then((json) => {
+          if (!json) {
+            return
+          }
+
+          json.links.forEach((record) => {
+            const link = document.createElement('a')
+            link.appendChild(document.createTextNode(record))
+            link.href = record
+            const li = document.createElement('li')
+            li.appendChild(link)
+            linksList.appendChild(li)
+          })
+          delete json.links
+        })
+    </script>
+  </body>
+</html>
