@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["GET_SYNC_STATUS"],"fn":["get_sync_status","merge_consecutive_sync_records"],"struct":["SyncStatus"]};

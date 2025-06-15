@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["INSERT_STAKE_REGISTRATION_QUERY"],"struct":["CertInsertQuery","StakeRegistrationInsertQuery"]};
