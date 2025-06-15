@@ -74,13 +74,13 @@ class _ClearedSnackbar extends StatelessWidget {
       },
       buttonAction: () {
         final event = switch (origin) {
-          ProposalBuilderValidationOrigin.shareDraft => const PublishProposalEvent(),
-          ProposalBuilderValidationOrigin.submitForReview => const SubmitProposalEvent(),
+          ProposalBuilderValidationOrigin.shareDraft => const RequestPublishProposalEvent(),
+          ProposalBuilderValidationOrigin.submitForReview => const RequestSubmitProposalEvent(),
         };
 
         context.read<ProposalBuilderBloc>().add(event);
       },
-      onClose: () {
+      onExit: () {
         context.read<ProposalBuilderBloc>().add(const ClearValidationProposalEvent());
       },
     );
@@ -218,7 +218,7 @@ class _Snackbar extends StatelessWidget {
   final String message;
   final String buttonText;
   final VoidCallback buttonAction;
-  final VoidCallback? onClose;
+  final VoidCallback? onExit;
 
   const _Snackbar({
     required this.type,
@@ -226,7 +226,7 @@ class _Snackbar extends StatelessWidget {
     required this.message,
     required this.buttonText,
     required this.buttonAction,
-    this.onClose,
+    this.onExit,
   });
 
   @override
@@ -235,18 +235,23 @@ class _Snackbar extends StatelessWidget {
       type: type,
       title: title,
       message: message,
-      onClosePressed: onClose ?? () => unawaited(_onClose(context)),
+      showClose: false,
       actions: [
-        VoicesSnackBarPrimaryAction(
+        VoicesSnackBarSecondaryAction(
           type: type,
           onPressed: buttonAction,
           child: Text(buttonText),
+        ),
+        VoicesSnackBarSecondaryAction(
+          type: type,
+          onPressed: onExit ?? () => unawaited(_onExit(context)),
+          child: Text(context.l10n.proposalEditorValidationExitIssueMode),
         ),
       ],
     );
   }
 
-  Future<void> _onClose(BuildContext context) async {
+  Future<void> _onExit(BuildContext context) async {
     final close = await _ExitFormIssueModeDialog.show(context);
     if (close && context.mounted) {
       context.read<ProposalBuilderBloc>().add(const ClearValidationProposalEvent());
