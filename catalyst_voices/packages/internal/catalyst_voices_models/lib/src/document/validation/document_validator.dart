@@ -5,6 +5,42 @@ import 'package:collection/collection.dart';
 
 /// Validates [DocumentProperty].
 final class DocumentValidator {
+  static DocumentValidationResult validateConstValue(
+    DocumentValueSchema schema,
+    Object? value,
+  ) {
+    final constValue = schema.constValue;
+    if (constValue != null && value != null) {
+      final isValid = value == constValue;
+      if (!isValid) {
+        return DocumentConstValueMismatch(
+          invalidNodeId: schema.nodeId,
+          constValue: constValue,
+        );
+      }
+    }
+
+    return const SuccessfulDocumentValidation();
+  }
+
+  static DocumentValidationResult validateEnumValues(
+    DocumentValueSchema schema,
+    Object? value,
+  ) {
+    final enumValues = schema.enumValues;
+    if (enumValues != null && value != null) {
+      final isValid = enumValues.contains(value);
+      if (!isValid) {
+        return DocumentEnumValueMismatch(
+          invalidNodeId: schema.nodeId,
+          enumValues: enumValues,
+        );
+      }
+    }
+
+    return const SuccessfulDocumentValidation();
+  }
+
   static DocumentValidationResult validateIfRequired(
     DocumentPropertySchema schema,
     Object? value,
@@ -16,61 +52,9 @@ final class DocumentValidator {
     return const SuccessfulDocumentValidation();
   }
 
-  static DocumentValidationResult validateStringLength(
-    DocumentStringSchema schema,
-    String? value,
-  ) {
-    final strRange = schema.strLengthRange;
-    if (strRange != null && value != null) {
-      if (!strRange.contains(value.length)) {
-        return DocumentStringOutOfRange(
-          invalidNodeId: schema.nodeId,
-          expectedRange: strRange,
-          actualLength: value.length,
-        );
-      }
-    }
-
-    return const SuccessfulDocumentValidation();
-  }
-
-  static DocumentValidationResult validateStringPattern(
-    DocumentStringSchema schema,
-    String? value,
-  ) {
-    final pattern = schema.pattern;
-    if (pattern != null && value != null) {
-      if (!pattern.hasMatch(value)) {
-        return DocumentPatternMismatch(
-          pattern: pattern,
-          value: value,
-        );
-      }
-    }
-    return const SuccessfulDocumentValidation();
-  }
-
   static DocumentValidationResult validateIntegerRange(
     DocumentIntegerSchema schema,
     int? value,
-  ) {
-    final numRange = schema.numRange;
-    if (numRange != null && value != null) {
-      if (!numRange.contains(value)) {
-        return DocumentNumOutOfRange(
-          invalidNodeId: schema.nodeId,
-          expectedRange: numRange,
-          actualValue: value,
-        );
-      }
-    }
-
-    return const SuccessfulDocumentValidation();
-  }
-
-  static DocumentValidationResult validateNumberRange(
-    DocumentNumberSchema schema,
-    double? value,
   ) {
     final numRange = schema.numRange;
     if (numRange != null && value != null) {
@@ -124,17 +108,17 @@ final class DocumentValidator {
     return const SuccessfulDocumentValidation();
   }
 
-  static DocumentValidationResult validateConstValue(
-    DocumentValueSchema schema,
-    Object? value,
+  static DocumentValidationResult validateNumberRange(
+    DocumentNumberSchema schema,
+    double? value,
   ) {
-    final constValue = schema.constValue;
-    if (constValue != null && value != null) {
-      final isValid = value == constValue;
-      if (!isValid) {
-        return DocumentConstValueMismatch(
+    final numRange = schema.numRange;
+    if (numRange != null && value != null) {
+      if (!numRange.contains(value)) {
+        return DocumentNumOutOfRange(
           invalidNodeId: schema.nodeId,
-          constValue: constValue,
+          expectedRange: numRange,
+          actualValue: value,
         );
       }
     }
@@ -142,21 +126,39 @@ final class DocumentValidator {
     return const SuccessfulDocumentValidation();
   }
 
-  static DocumentValidationResult validateEnumValues(
-    DocumentValueSchema schema,
-    Object? value,
+  static DocumentValidationResult validateStringLength(
+    DocumentStringSchema schema,
+    String? value,
   ) {
-    final enumValues = schema.enumValues;
-    if (enumValues != null && value != null) {
-      final isValid = enumValues.contains(value);
-      if (!isValid) {
-        return DocumentEnumValueMismatch(
+    final strRange = schema.strLengthRange;
+    if (strRange != null && value != null) {
+      if (!strRange.contains(value.length)) {
+        return DocumentStringOutOfRange(
           invalidNodeId: schema.nodeId,
-          enumValues: enumValues,
+          expectedRange: strRange,
+          actualLength: value.length,
         );
       }
     }
 
+    return const SuccessfulDocumentValidation();
+  }
+
+  static DocumentValidationResult validateStringPattern(
+    DocumentStringSchema schema,
+    String? value,
+    DocumentPatternType patternType,
+  ) {
+    final pattern = schema.pattern;
+    if (pattern != null && value != null) {
+      if (!pattern.hasMatch(value)) {
+        return DocumentPatternMismatch(
+          pattern: pattern,
+          value: value,
+          patternType: patternType,
+        );
+      }
+    }
     return const SuccessfulDocumentValidation();
   }
 }

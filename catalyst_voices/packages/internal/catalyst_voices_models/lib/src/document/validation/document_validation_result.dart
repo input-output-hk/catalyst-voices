@@ -76,16 +76,23 @@ final class DocumentNumOutOfRange extends DocumentValidationResult {
 
 /// A string doesn't match the pattern.
 final class DocumentPatternMismatch extends DocumentValidationResult {
+  final DocumentPatternType patternType;
   final RegExp pattern;
   final String? value;
 
   const DocumentPatternMismatch({
+    required this.patternType,
     required this.pattern,
     required this.value,
   });
 
   @override
-  List<Object?> get props => [pattern, value];
+  List<Object?> get props => [patternType, pattern, value];
+}
+
+enum DocumentPatternType {
+  generic,
+  https,
 }
 
 /// The [String]'s [actualLength] is not within [expectedRange].

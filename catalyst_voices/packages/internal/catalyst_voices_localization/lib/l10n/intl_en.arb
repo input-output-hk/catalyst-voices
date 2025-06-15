@@ -777,7 +777,7 @@
   "@createProfileInstructionsMessage": {
     "description": "Information about account creation steps"
   },
-  "createProfileInstructionsNext": "Create your profile now", 
+  "createProfileInstructionsNext": "Create your profile now",
   "@createProfileInstructionsNext": {
     "description": "CTA to move to the next step in account creation"
   },
@@ -1070,7 +1070,7 @@
   "createKeychainSeedPhraseCheckSuccessNextStep": "Now let's set your Unlock password for this device!",
   "createKeychainUnlockPasswordInstructionsTitle": "Set your Catalyst unlock password for this device",
   "createKeychainUnlockPasswordInstructionsSubtitle": "In this next step, you'll set your Unlock Password for this device. It's like a shortcut for proving ownership of your Keychain.  \u2028\u2028Whenever you recover your account for the first time on a new device, you'll need to use your Catalyst seed phrase to get started. Every time after that, you can use your Unlock Password to quickly regain access.",
-  "createProfileCreatedTitle": "Congratulations your profile is setup!", 
+  "createProfileCreatedTitle": "Congratulations your profile is setup!",
   "@createProfileCreatedTitle": {
     "description": "Title for the profile created"
   },
@@ -1538,6 +1538,10 @@
   "errorValidationPatternMismatch": "The value does not match the valid pattern.",
   "@errorValidationPatternMismatch": {
     "description": "Validation error when the user entered value does not match the pattern"
+  },
+  "errorValidationHttpsPatternMismatch": "Start your url with https://",
+  "@errorValidationHttpsPatternMismatch": {
+    "description": "Validation error when the user entered value does not match the https:// pattern"
   },
   "errorValidationStringEmpty": "The text cannot be empty.",
   "@errorValidationStringEmpty": {
