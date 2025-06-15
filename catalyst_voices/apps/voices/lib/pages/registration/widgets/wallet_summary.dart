@@ -111,7 +111,7 @@ class _WalletBalanceNotice extends StatelessWidget {
         const SizedBox(height: 6),
         Text(
           context.l10n.walletLinkWalletDetailsNotice,
-          style: Theme.of(context).textTheme.labelSmall,
+          style: Theme.of(context).textTheme.bodySmall,
         ),
       ],
     );

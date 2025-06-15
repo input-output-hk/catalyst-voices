@@ -775,6 +775,16 @@
   "@createProfileInstructionsMessage": {
     "description": "Information about account creation steps"
   },
+  "createProfileInstructionsNotice": "Please ensure your Cardano wallet has at least {amount} ADA before continuing.",
+  "@createProfileInstructionsNotice": {
+    "description": "Information about minimum wallet balance",
+    "placeholders": {
+      "amount": {
+        "type": "double",
+        "format": "compact"
+      }
+    }
+  },
   "createProfileInstructionsNext": "Create your profile now",
   "@createProfileInstructionsNext": {
     "description": "CTA to move to the next step in account creation"
@@ -783,17 +793,13 @@
   "@createProfileInstructionsEmailRequest": {
     "description": "Request to provide email address"
   },
-  "createProfileInstructionsEmailReason1": "We store email in a mutable database.",
+  "createProfileInstructionsEmailReason1": "Email is stored in Catalyst database.",
   "@createProfileInstructionsEmailReason1": {
     "description": "Reason to store email in a mutable database"
   },
-  "createProfileInstructionsEmailReason2": "We do not store your email on-chain ever.",
+  "createProfileInstructionsEmailReason2": "Email is never published on chain",
   "@createProfileInstructionsEmailReason2": {
     "description": "Reason to not store email on-chain"
-  },
-  "createProfileInstructionsEmailReason3": "We only use email for communication about Catalyst.",
-  "@createProfileInstructionsEmailReason3": {
-    "description": "Reason to only use email for communication"
   },
   "createProfileSetupTitle": "Setup your profile",
   "@createProfileSetupTitle": {
