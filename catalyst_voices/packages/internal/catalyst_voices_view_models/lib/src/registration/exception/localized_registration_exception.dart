@@ -58,9 +58,7 @@ final class LocalizedRegistrationInsufficientBalanceException
   const LocalizedRegistrationInsufficientBalanceException();
 
   @override
-  String message(BuildContext context) => context.l10n.registrationInsufficientBalance(
-        CardanoWalletDetails.minAdaForRegistration.ada,
-      );
+  String message(BuildContext context) => context.l10n.registrationInsufficientBalance;
 }
 
 final class LocalizedRegistrationKeychainNotFoundException extends LocalizedRegistrationException {

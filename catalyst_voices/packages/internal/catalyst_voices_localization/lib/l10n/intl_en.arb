@@ -565,21 +565,19 @@
       }
     }
   },
-  "walletLinkWalletDetailsNotice": "Wallet and role registrations require a minimal transaction fee. You can setup your default dApp connector wallet in your browser extension settings.",
+  "walletLinkWalletDetailsNotice": "To calculate voting power, Catalyst reads your wallet balance from the blockchain. ",
   "@walletLinkWalletDetailsNotice": {
-    "description": "A message in link wallet flow on wallet details screen when a user wallet doesn't have enough balance."
+    "description": "A message in link wallet flow on wallet details screen explaining why Catalyst reads user wallet balance."
   },
-  "walletLinkWalletDetailsNoticeTopUp": "Top up ADA",
-  "@walletLinkWalletDetailsNoticeTopUp": {
-    "description": "A message recommending the user to top up ADA in wallet link on wallet details screen."
-  },
-  "walletLinkWalletDetailsNoticeTopUpLink": "Link to top-up provider",
-  "@walletLinkWalletDetailsNoticeTopUpLink": {
-    "description": "A link to top-up provide when the user doesn't have enough balance on wallet link screen"
-  },
-  "walletLinkWalletDetailsHeadsUpText": "We only read your balance to calculate voting power — we can't access or use your wallet.",
-  "@walletLinkWalletDetailsHeadsUpText": {
-    "description": "A heads up content explaining that the app only reads wallet balance and cannot spend it."
+  "walletLinkWalletDetailsLowBalanceHeadsUpText": "Please ensure your Cardano wallet has at least {amount} ADA before continuing.",
+  "@walletLinkWalletDetailsLowBalanceHeadsUpText": {
+    "description": "A heads up content explaining that the user needs to have some ada for registration.",
+    "placeholders": {
+      "amount": {
+        "type": "double",
+        "format": "compact"
+      }
+    }
   },
   "walletLinkTransactionTitle": "Let's make sure everything looks right.",
   "@walletLinkTransactionTitle": {
@@ -628,15 +626,9 @@
       }
     }
   },
-  "registrationInsufficientBalance": "Wallet Balance Too Low. Please ensure your Cardano wallet has at least {amount} ADA before continuing.",
+  "registrationInsufficientBalance": "Transaction cannot proceed due to low wallet balance.",
   "@registrationInsufficientBalance": {
-    "description": "Indicates an error when preparing a transaction has failed due to low wallet balance.",
-    "placeholders": {
-      "amount": {
-        "type": "double",
-        "format": "compact"
-      }
-    }
+    "description": "Indicates an error when preparing a transaction has failed due to low wallet balance."
   },
   "registrationSeedPhraseNotFound": "Seed phrase was not found. Make sure correct words are correct.",
   "@registrationSeedPhraseNotFound": {
@@ -783,7 +775,7 @@
   "@createProfileInstructionsMessage": {
     "description": "Information about account creation steps"
   },
-  "createProfileInstructionsNext": "Create your profile now", 
+  "createProfileInstructionsNext": "Create your profile now",
   "@createProfileInstructionsNext": {
     "description": "CTA to move to the next step in account creation"
   },
@@ -1076,7 +1068,7 @@
   "createKeychainSeedPhraseCheckSuccessNextStep": "Now let's set your Unlock password for this device!",
   "createKeychainUnlockPasswordInstructionsTitle": "Set your Catalyst unlock password for this device",
   "createKeychainUnlockPasswordInstructionsSubtitle": "In this next step, you'll set your Unlock Password for this device. It's like a shortcut for proving ownership of your Keychain.  \u2028\u2028Whenever you recover your account for the first time on a new device, you'll need to use your Catalyst seed phrase to get started. Every time after that, you can use your Unlock Password to quickly regain access.",
-  "createProfileCreatedTitle": "Congratulations your profile is setup!", 
+  "createProfileCreatedTitle": "Congratulations your profile is setup!",
   "@createProfileCreatedTitle": {
     "description": "Title for the profile created"
   },
@@ -1203,10 +1195,6 @@
   "incorrectUploadDialogContent": "The Catalyst keychain that you entered or uploaded is incorrect, please try again.",
   "incorrectUploadDialogTryAgainButton": "Try again",
   "finishAccountCreation": "Finish account creation",
-  "connectDifferentWallet": "Connect a different wallet",
-  "@connectDifferentWallet": {
-    "description": "A button label to connect a different wallet in wallet detail panel."
-  },
   "reviewRegistrationTransaction": "Review registration transaction",
   "@reviewRegistrationTransaction": {
     "description": "A button label to review the registration transaction in wallet detail panel."
