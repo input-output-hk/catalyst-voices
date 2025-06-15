@@ -8,7 +8,7 @@ class ActionCard extends StatelessWidget {
   final Widget icon;
   final Widget title;
   final Widget desc;
-  final Widget statusIcon;
+  final Widget? statusIcon;
   final Widget? body;
   final bool isExpanded;
 
@@ -17,7 +17,7 @@ class ActionCard extends StatelessWidget {
     required this.icon,
     required this.title,
     required this.desc,
-    required this.statusIcon,
+    this.statusIcon,
     this.body,
     this.isExpanded = false,
   });
@@ -31,6 +31,8 @@ class ActionCard extends StatelessWidget {
 
     final descTextStyle = (theme.textTheme.bodySmall ?? const TextStyle())
         .copyWith(color: theme.colors.textOnPrimaryLevel1);
+
+    final statusIcon = this.statusIcon;
 
     return Material(
       color: theme.colors.elevationsOnSurfaceNeutralLv1Grey,
@@ -64,7 +66,7 @@ class ActionCard extends StatelessWidget {
                 ],
               ),
             ),
-            _StatusIconAvatar(icon: statusIcon),
+            if (statusIcon != null) _StatusIconAvatar(icon: statusIcon),
           ].separatedBy(const SizedBox(width: 12)).toList(),
         ),
       ),
