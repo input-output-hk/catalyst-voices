@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/widgets/gesture/voices_gesture_detector.dart';
 import 'package:flutter/material.dart';
 
 class ExpandableText extends StatefulWidget {
@@ -6,7 +7,7 @@ class ExpandableText extends StatefulWidget {
 
   const ExpandableText(
     this.data, {
-    super.key,
+    required super.key,
     required this.trimLines,
   });
 
@@ -15,8 +16,32 @@ class ExpandableText extends StatefulWidget {
 }
 
 class _ExpandableTextState extends State<ExpandableText> {
+  bool _isExpanded = true;
+
   @override
   Widget build(BuildContext context) {
-    return Text(widget.data);
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // '…'
+        Text(
+          widget.data,
+          maxLines: _isExpanded ? null : widget.trimLines,
+          overflow: _isExpanded ? TextOverflow.clip : TextOverflow.ellipsis,
+        ),
+        const SizedBox(height: 4),
+        VoicesGestureDetector(
+          onTap: () {
+            setState(() {
+              _isExpanded = !_isExpanded;
+            });
+          },
+          child: Text(
+            _isExpanded ? 'Show less' : 'Show more',
+          ),
+        ),
+      ],
+    );
   }
 }
