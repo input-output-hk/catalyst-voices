@@ -309,10 +309,12 @@ class _FakeUserRepository extends Fake implements UserRepository {
   Future<User> getUser() async => _user ?? const User.empty();
 
   @override
-  Future<void> publishUserProfile({
+  Future<AccountPublicProfile> publishUserProfile({
     required CatalystId catalystId,
     required String email,
-  }) async {}
+  }) async {
+    return AccountPublicProfile(email: email, status: AccountPublicStatus.verifying);
+  }
 
   void reset() {
     _user = null;
