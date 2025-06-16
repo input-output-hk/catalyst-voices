@@ -3,6 +3,12 @@
     "$id": "https://cardano.org/schemas/catalyst/comments",
     "title": "Proposal Comments Schema",
     "description": "Schema for comments on Catalyst proposals",
+    "maintainers": [{ "name": "Catalyst Team", "url": "https://projectcatalyst.io/" }],
+    "x-changelog": {
+        "2025-06-16": [
+            "Updating maxLength for content text"
+        ]
+    },
     "definitions": {
         "multiLineTextEntry": {
             "$comment": "UI - Multiline text entry without any markup or rich text capability.",
@@ -23,10 +29,9 @@
                     "$ref": "#/definitions/multiLineTextEntry",
                     "description": "The comment text content",
                     "minLength": 1,
-                    "maxLength": 5000
+                    "maxLength": 2000
                 }
             }
-
         }
-}
+    }
 }
