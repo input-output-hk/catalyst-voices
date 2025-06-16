@@ -140,11 +140,9 @@ class _Footer extends StatelessWidget {
       builder: (context, showLowBalance) {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+          spacing: 24,
           children: [
-            if (showLowBalance) ...[
-              const _WalletBalanceHeadsUp(),
-              const SizedBox(height: 24),
-            ],
+            if (showLowBalance) const _WalletBalanceHeadsUp(),
             const Center(child: _BlocNavigation()),
           ],
         );
@@ -161,12 +159,12 @@ class _WalletBalanceHeadsUp extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: 8,
       children: [
         Text(
           context.l10n.headsUp,
           style: Theme.of(context).textTheme.titleMedium,
         ),
-        const SizedBox(height: 8),
         ActionCard(
           key: const Key('WalletBalanceHeadsUp'),
           icon: VoicesAssets.icons.wallet.buildIcon(),

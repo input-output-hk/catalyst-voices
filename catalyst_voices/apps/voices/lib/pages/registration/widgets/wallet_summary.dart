@@ -101,6 +101,7 @@ class _WalletBalanceNotice extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: 6,
       children: [
         Text(
           context.l10n.notice,
@@ -108,7 +109,6 @@ class _WalletBalanceNotice extends StatelessWidget {
                 fontWeight: FontWeight.w800,
               ),
         ),
-        const SizedBox(height: 6),
         Text(
           context.l10n.walletLinkWalletDetailsNotice,
           style: Theme.of(context).textTheme.bodySmall,
