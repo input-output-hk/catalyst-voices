@@ -122,7 +122,7 @@ build-web:
     SAVE ARTIFACT web
 
 package:
-    FROM caddy:v2.10
+    FROM caddy:2.10
     ARG tag='latest'
 
     COPY +build-web/web /app
