@@ -21,7 +21,9 @@ import 'package:catalyst_voices/routes/routing/proposal_builder_route.dart';
 import 'package:catalyst_voices/widgets/modals/comment/submit_comment_error_dialog.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/proposal_limit_reached_dialog.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/publish_proposal_error_dialog.dart';
+import 'package:catalyst_voices/widgets/modals/proposals/publish_proposal_iteration_dialog.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/submit_proposal_error_dialog.dart';
+import 'package:catalyst_voices/widgets/modals/proposals/submit_proposal_for_review_dialog.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/unlock_edit_proposal.dart';
 import 'package:catalyst_voices/widgets/snackbar/voices_snackbar.dart';
 import 'package:catalyst_voices/widgets/snackbar/voices_snackbar_type.dart';
@@ -169,6 +171,10 @@ class _ProposalBuilderBodyState extends State<_ProposalBuilderBody>
         unawaited(_showUnlockProposalDialog(signal));
       case NewProposalAndEmailNotVerifiedSignal():
         _showEmailVerificationNeededSnackbar();
+      case ShowPublishConfirmationSignal():
+        unawaited(_showPublishConfirmationDialog(signal));
+      case ShowSubmitConfirmationSignal():
+        unawaited(_showSubmitConfirmationDialog(signal));
     }
   }
 
@@ -315,6 +321,20 @@ class _ProposalBuilderBodyState extends State<_ProposalBuilderBody>
     );
   }
 
+  Future<void> _showPublishConfirmationDialog(ShowPublishConfirmationSignal signal) async {
+    final shouldPublish = await PublishProposalIterationDialog.show(
+          context: context,
+          proposalTitle: signal.proposalTitle ?? context.l10n.proposalEditorStatusDropdownViewTitle,
+          currentIteration: signal.currentIteration,
+          nextIteration: signal.nextIteration,
+        ) ??
+        false;
+
+    if (shouldPublish && mounted) {
+      context.read<ProposalBuilderBloc>().add(const PublishProposalEvent());
+    }
+  }
+
   Future<void> _showPublishException(ProposalBuilderPublishException error) {
     return PublishProposalErrorDialog.show(
       context: context,
@@ -333,6 +353,20 @@ class _ProposalBuilderBodyState extends State<_ProposalBuilderBody>
         submissionCloseAt: submissionCloseDate,
         dontShowAgain: _dontShowCampaignSubmissionClosingDialog,
       );
+    }
+  }
+
+  Future<void> _showSubmitConfirmationDialog(ShowSubmitConfirmationSignal signal) async {
+    final shouldSubmit = await SubmitProposalForReviewDialog.show(
+          context: context,
+          proposalTitle: signal.proposalTitle ?? context.l10n.proposalEditorStatusDropdownViewTitle,
+          currentIteration: signal.currentIteration,
+          nextIteration: signal.nextIteration,
+        ) ??
+        false;
+
+    if (shouldSubmit && mounted) {
+      context.read<ProposalBuilderBloc>().add(const SubmitProposalEvent());
     }
   }
 

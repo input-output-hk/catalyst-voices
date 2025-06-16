@@ -60,6 +60,44 @@ final class PublishedProposalBuilderSignal extends ProposalBuilderSignal {
   List<Object?> get props => [];
 }
 
+final class ShowPublishConfirmationSignal extends ProposalBuilderSignal {
+  final String? proposalTitle;
+  final int? currentIteration;
+  final int nextIteration;
+
+  const ShowPublishConfirmationSignal({
+    required this.proposalTitle,
+    required this.currentIteration,
+    required this.nextIteration,
+  });
+
+  @override
+  List<Object?> get props => [
+        proposalTitle,
+        currentIteration,
+        nextIteration,
+      ];
+}
+
+final class ShowSubmitConfirmationSignal extends ProposalBuilderSignal {
+  final String? proposalTitle;
+  final int? currentIteration;
+  final int nextIteration;
+
+  const ShowSubmitConfirmationSignal({
+    required this.proposalTitle,
+    required this.currentIteration,
+    required this.nextIteration,
+  });
+
+  @override
+  List<Object?> get props => [
+        proposalTitle,
+        currentIteration,
+        nextIteration,
+      ];
+}
+
 final class SubmittedProposalBuilderSignal extends ProposalBuilderSignal {
   const SubmittedProposalBuilderSignal();
 
