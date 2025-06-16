@@ -585,6 +585,10 @@
   "@walletLinkTransactionTitle": {
     "description": "A title in link wallet flow on transaction screen."
   },
+  "walletLinkTransactionSubtitle": "To complete this action, you'll submit a signed transaction to Cardano. There will be an ADA transaction fee.",
+  "@walletLinkTransactionSubtitle": {
+    "description": "A subtitle in link wallet flow on transaction screen."
+  },
   "walletLinkTransactionAccountCompletion": "Account completion for Catalyst",
   "@walletLinkTransactionAccountCompletion": {
     "description": "A subtitle in link wallet flow on transaction screen."
@@ -605,6 +609,10 @@
   "walletLinkTransactionChangeRoles": "Change role setup",
   "@walletLinkTransactionChangeRoles": {
     "description": "The secondary button label to change the roles on transaction summary screen."
+  },
+  "walletLinkTransactionBackToWalletSelection": "Back to Wallet Selection",
+  "@walletLinkTransactionBackToWalletSelection": {
+    "description": "The primary button label to go back to wallet selection on transaction summary screen."
   },
   "walletLinkTransactionRoleItem": "1 {role} registration",
   "@walletLinkTransactionRoleItem": {
@@ -769,34 +777,104 @@
     "description": "Related to account role"
   },
   "catalystKeychain": "Catalyst Keychain",
-  "createBaseProfileInstructionsTitle": "Introduction",
-  "createBaseProfileInstructionsMessage": "In the following account creation steps we will:\n\n1. Setup your base profile\n2. Create your Catalyst Keychain\n3. Link Cardano wallet & roles\n\nTo ensure a smooth experience, completing your account setup in one session is essential—stay focused and avoid interruptions to finalize everything efficiently.",
-  "createBaseProfileInstructionsNext": "Create your Base profile now",
-  "createBaseProfileInstructionsEmailRequest": "Email request",
-  "createBaseProfileInstructionsEmailReason1": "We store email in a mutable database.",
-  "createBaseProfileInstructionsEmailReason2": "We do not store your email on-chain ever.",
-  "createBaseProfileInstructionsEmailReason3": "We only use email for communication about Catalyst.",
-  "createBaseProfileSetupTitle": "Setup your base profile",
-  "createBaseProfileSetupDisplayNameLabel": "What should we call you?",
-  "createBaseProfileSetupDisplayNameHint": "Display name",
-  "createBaseProfileSetupDisplayNameHelper": "Please provide a nickname or real name.",
-  "createBaseProfileSetupEmailLabel": "Your e-mail",
-  "createBaseProfileSetupEmailHint": "E-mail",
-  "createBaseProfileSetupEmailHelper": "You must provide your e-mail if you want to become a proposer or a reviewer.",
-  "createBaseProfileHasIdeascaleAccountAlready": "Submitted proposals in Ideascale before?",
-  "@createBaseProfileHasIdeascaleAccountAlready": {
+  "createProfileInstructionsTitle": "Introduction",
+  "@createProfileInstructionsTitle": {
+    "description": "Title for account creation steps"
+  },
+  "createProfileInstructionsMessage": "In the following account creation steps we will:\n\n1. Setup your profile\n2. Create your Catalyst Keychain\n3. Link Cardano wallet & roles\n\nTo ensure a smooth experience, completing your account setup in one session is essential—stay focused and avoid interruptions to finalize everything efficiently.",
+  "@createProfileInstructionsMessage": {
+    "description": "Information about account creation steps"
+  },
+  "createProfileInstructionsNext": "Create your profile now",
+  "@createProfileInstructionsNext": {
+    "description": "CTA to move to the next step in account creation"
+  },
+  "createProfileInstructionsEmailRequest": "Email request",
+  "@createProfileInstructionsEmailRequest": {
+    "description": "Request to provide email address"
+  },
+  "createProfileInstructionsEmailReason1": "We store email in a mutable database.",
+  "@createProfileInstructionsEmailReason1": {
+    "description": "Reason to store email in a mutable database"
+  },
+  "createProfileInstructionsEmailReason2": "We do not store your email on-chain ever.",
+  "@createProfileInstructionsEmailReason2": {
+    "description": "Reason to not store email on-chain"
+  },
+  "createProfileInstructionsEmailReason3": "We only use email for communication about Catalyst.",
+  "@createProfileInstructionsEmailReason3": {
+    "description": "Reason to only use email for communication"
+  },
+  "createProfileSetupTitle": "Setup your profile",
+  "@createProfileSetupTitle": {
+    "description": "Title for the setup of the profile"
+  },
+  "createProfileSetupDisplayNameLabel": "What should we call you?",
+  "@createProfileSetupDisplayNameLabel": {
+    "description": "Label for the display name input"
+  },
+  "createProfileSetupDisplayNameHint": "Display name",
+  "@createProfileSetupDisplayNameHint": {
+    "description": "Hint for the display name input"
+  },
+  "createProfileSetupDisplayNameHelper": "Please provide a nickname or real name.",
+  "@createProfileSetupDisplayNameHelper": {
+    "description": "Helper text for the display name input"
+  },
+  "createProfileSetupEmailLabel": "Your e-mail",
+  "@createProfileSetupEmailLabel": {
+    "description": "Label for the email input"
+  },
+  "createProfileSetupEmailHint": "E-mail",
+  "@createProfileSetupEmailHint": {
+    "description": "Hint for the email input"
+  },
+  "createProfileSetupEmailHelper": "You must provide your e-mail if you want to become a proposer or a reviewer.",
+  "@createProfileSetupEmailHelper": {
+    "description": "Helper text for the email input"
+  },
+  "createProfileHasIdeascaleAccountAlready": "Submitted proposals in Ideascale before?",
+  "@createProfileHasIdeascaleAccountAlready": {
     "description": "Label for info card to let user know to use the same email as in Ideascale if they have already submitted a proposal there."
   },
-  "createBaseProfileSetupIdeascaleReason1": "Be sure to use the same email associated with your Ideascale account",
-  "@createBaseProfileSetupIdeascaleReason1": {
+  "createProfileSetupIdeascaleReason1": "Be sure to use the same email associated with your Ideascale account",
+  "@createProfileSetupIdeascaleReason1": {
     "description": "Description for info card to let user know to use the same email as in Ideascale if they have already submitted a proposal there."
   },
-  "createBaseProfileAcknowledgementsTitle": "Mandatory Acknowledgements",
-  "createBaseProfileAcknowledgementsToS": "I confirm that I have read and agree to be bound by {tos}.",
+  "createProfileAcknowledgementsTitle": "Mandatory Acknowledgements",
+  "@createProfileAcknowledgementsTitle": {
+    "description": "Title for the acknowledgements section"
+  },
+  "createProfileAcknowledgementsToS": "I confirm that I have read and agree to be bound by {tos}.",
+  "@createProfileAcknowledgementsToS": {
+    "description": "Text acknowledging that the user has read and agreed to the Catalyst FC's Terms and Conditions",
+    "placeholders": {
+      "tos": {
+        "type": "String"
+      }
+    }
+  },
   "catalystTos": "Project Catalyst Terms and Conditions",
-  "createBaseProfileAcknowledgementsPrivacyPolicy": "I acknowledge and agree that any data I share in connection with my participation in Project Catalyst Funds will be collected, stored, used and processed in accordance with the {privacy_policy}.",
+  "@catalystTos": {
+    "description": "Link to the Catalyst FC's Terms and Conditions"
+  },
+  "createProfileAcknowledgementsPrivacyPolicy": "I acknowledge and agree that any data I share in connection with my participation in Project Catalyst Funds will be collected, stored, used and processed in accordance with the {privacy_policy}.",
+  "@createProfileAcknowledgementsPrivacyPolicy": {
+    "description": "Text acknowledging that the user has read and agreed to the Catalyst FC's Privacy Policy",
+    "placeholders": {
+      "privacy_policy": {
+        "type": "String"
+      }
+    }
+  },
   "catalystPrivacyPolicy": "Catalyst FC's Privacy Policy",
-  "createBaseProfileAcknowledgementsDataUsage": "I acknowledge that the Catalyst Ops team may use my email only for Catalyst communication.",
+  "@catalystPrivacyPolicy": {
+    "description": "Link to the Catalyst FC's Privacy Policy"
+  },
+  "createProfileAcknowledgementsDataUsage": "I acknowledge that the Catalyst Ops team may use my email only for Catalyst communication.",
+  "@createProfileAcknowledgementsDataUsage": {
+    "description": "Text acknowledging that the Catalyst Ops team may use the user's email only for Catalyst communication"
+  },
   "accountCreationSplashTitle": "Create your Catalyst Keychain",
   "accountCreationSplashMessage": "Catalyst Keychain is your ticket to participate in innovation on the global stage.  \u2028\u2028These next steps will create your Catalyst keychain so you can enter new spaces, discover awesome ideas, and share your feedback to help improve ideas.",
   "accountCreationSplashNextButton": "Create your Keychain now",
@@ -1000,12 +1078,21 @@
   "createKeychainSeedPhraseCheckSuccessNextStep": "Now let's set your Unlock password for this device!",
   "createKeychainUnlockPasswordInstructionsTitle": "Set your Catalyst unlock password for this device",
   "createKeychainUnlockPasswordInstructionsSubtitle": "In this next step, you'll set your Unlock Password for this device. It's like a shortcut for proving ownership of your Keychain.  \u2028\u2028Whenever you recover your account for the first time on a new device, you'll need to use your Catalyst seed phrase to get started. Every time after that, you can use your Unlock Password to quickly regain access.",
-  "createBaseProfileCreatedTitle": "Congratulations your Base profile is setup!",
+  "createProfileCreatedTitle": "Congratulations your profile is setup!",
+  "@createProfileCreatedTitle": {
+    "description": "Title for the profile created"
+  },
   "createKeychainCreatedTitle": "Congratulations your Catalyst \u2028Keychain is created!",
-  "createBaseProfileNextStep": "In the next step you Create your Catalyst Keychain",
+  "createProfileNextStep": "In the next step you Create your Catalyst Keychain",
+  "@createProfileNextStep": {
+    "description": "Title for the next step in the profile creation"
+  },
   "createKeychainCreatedNextStep": "In the next step you write your Catalyst roles and \u2028account to the Cardano Mainnet.",
   "createKeychainLinkWalletAndRoles": "Link your Cardano Wallet & Roles",
-  "registrationCreateBaseProfileStepGroup": "Base profile created",
+  "registrationCreateProfileStepGroup": "Profile created",
+  "@registrationCreateProfileStepGroup": {
+    "description": "Title for successful profile creation"
+  },
   "registrationCreateKeychainStepGroup": "Catalyst Keychain created",
   "registrationLinkWalletStepGroup": "Link Cardano Wallet & Roles",
   "registrationCompletedStepGroup": "Catalyst account creation completed!",
@@ -1460,6 +1547,10 @@
   "@errorValidationPatternMismatch": {
     "description": "Validation error when the user entered value does not match the pattern"
   },
+  "errorValidationHttpsPatternMismatch": "Start your url with https://",
+  "@errorValidationHttpsPatternMismatch": {
+    "description": "Validation error when the user entered value does not match the https:// pattern"
+  },
   "errorValidationStringEmpty": "The text cannot be empty.",
   "@errorValidationStringEmpty": {
     "description": "Validation error when the user entered text is empty"
@@ -1553,6 +1644,10 @@
   "errorEmailAlreadyInUse": "This email address is already in use.",
   "@errorEmailAlreadyInUse": {
     "description": "Error when trying to update email that is taken already."
+  },
+  "errorActiveAccountNotFound": "Active account not found.",
+  "@errorActiveAccountNotFound": {
+    "description": "Generic error message when trying to access account resources but non was found."
   },
   "categoryDetails": "Category Details",
   "fundsAvailable": "Funds Available",
@@ -1769,6 +1864,10 @@
   "proposalEditorValidationExitDialogMessage": "When you exit, any unsaved changes will be lost.",
   "@proposalEditorValidationExitDialogMessage": {
     "description": "Message in a dialog asking if the user wants to leave the form issue mode."
+  },
+  "proposalEditorValidationExitIssueMode": "Exit Issue Mode",
+  "@proposalEditorValidationExitIssueMode": {
+    "description": "Button text for exiting the proposal editor validation snackbar."
   },
   "proposalEditorDeleteDialogTitle": "Delete Proposal?",
   "@proposalEditorDeleteDialogTitle": {
@@ -2769,6 +2868,18 @@
   "verificationEmailSendSubMessage": "Please verify your new email address.",
   "@verificationEmailSendSubMessage": {
     "description": "Sub message of dialog account verification send"
+  },
+  "pendingEmailChangeTitle": "Pending email change",
+  "@pendingEmailChangeTitle": {
+    "description": "Title of dialog about pending email change"
+  },
+  "pendingEmailChangeMessage": "Email will be update after successful verification",
+  "@pendingEmailChangeMessage": {
+    "description": "Message of dialog about pending email change"
+  },
+  "pendingEmailChangeSubMessage": "Please verify your new email address.",
+  "@pendingEmailChangeSubMessage": {
+    "description": "Sub message of dialog about pending email change"
   },
   "invalidSeedPhraseWord": "Invalid",
   "@invalidSeedPhraseWord": {
