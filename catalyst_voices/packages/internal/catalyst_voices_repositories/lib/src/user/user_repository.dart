@@ -6,7 +6,6 @@ import 'package:catalyst_voices_repositories/src/common/rbac_token_ext.dart';
 import 'package:catalyst_voices_repositories/src/common/response_mapper.dart';
 import 'package:catalyst_voices_repositories/src/dto/user/catalyst_id_public_ext.dart';
 import 'package:catalyst_voices_repositories/src/dto/user/rbac_registration_chain_dto.dart';
-import 'package:catalyst_voices_repositories/src/dto/user/reviews_catalyst_id_status_ext.dart';
 import 'package:catalyst_voices_repositories/src/dto/user/user_dto.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:collection/collection.dart';
@@ -19,7 +18,7 @@ abstract interface class UserRepository {
     DocumentRepository documentRepository,
   ) = UserRepositoryImpl;
 
-  Future<AccountPublicStatus> getAccountPublicStatus();
+  Future<AccountPublicProfile?> getAccountPublicProfile();
 
   Future<TransactionHash> getPreviousRegistrationTransactionId({
     required CatalystId catalystId,
@@ -28,7 +27,7 @@ abstract interface class UserRepository {
   Future<User> getUser();
 
   /// Throws [EmailAlreadyUsedException] if [email] already taken.
-  Future<void> publishUserProfile({
+  Future<AccountPublicProfile> publishUserProfile({
     required CatalystId catalystId,
     required String email,
   });
@@ -55,11 +54,7 @@ final class UserRepositoryImpl implements UserRepository {
   );
 
   @override
-  Future<AccountPublicStatus> getAccountPublicStatus() {
-    return _getReviewsCatalystIDPublic()
-        .then((value) => value?.status?.toModel())
-        .then((value) => value ?? AccountPublicStatus.notSetup);
-  }
+  Future<AccountPublicProfile?> getAccountPublicProfile() => _getAccountPublicProfile();
 
   @override
   Future<TransactionHash> getPreviousRegistrationTransactionId({
@@ -88,19 +83,20 @@ final class UserRepositoryImpl implements UserRepository {
   }
 
   @override
-  Future<void> publishUserProfile({
+  Future<AccountPublicProfile> publishUserProfile({
     required CatalystId catalystId,
     required String email,
-  }) async {
+  }) {
     try {
-      await _apiServices.reviews
+      return _apiServices.reviews
           .apiCatalystIdsMePost(
             body: CatalystIDCreate(
               catalystIdUri: catalystId.toUri().toStringWithoutScheme(),
               email: email,
             ),
           )
-          .successBodyOrThrow();
+          .successBodyOrThrow()
+          .then((value) => value.toModel());
     } on ResourceConflictException {
       throw const EmailAlreadyUsedException();
     }
@@ -115,18 +111,18 @@ final class UserRepositoryImpl implements UserRepository {
         .apiGatewayV1RbacRegistrationGet(lookup: catalystId.toUri().toStringWithoutScheme())
         .successBodyOrThrow();
 
-    final publicId = await _getReviewsCatalystIDPublic(token: rbacToken);
-    final username = (publicId?.username as String?) ??
+    final publicProfile = await _getAccountPublicProfile(token: rbacToken);
+    final username = publicProfile?.username ??
         await _lookupUsernameFromDocuments(
           catalystId: catalystId,
         );
 
     return RecoveredAccount(
       username: username,
-      email: publicId?.email as String?,
+      email: publicProfile?.email,
       roles: rbacRegistration.accountRoles,
       stakeAddress: rbacRegistration.stakeAddress,
-      publicStatus: publicId?.status?.toModel() ?? AccountPublicStatus.notSetup,
+      publicStatus: publicProfile?.status ?? AccountPublicStatus.notSetup,
     );
   }
 
@@ -139,7 +135,7 @@ final class UserRepositoryImpl implements UserRepository {
 
   /// Looks up reviews module and receives status for active
   /// account if [token] is not specified.
-  Future<CatalystIDPublic?> _getReviewsCatalystIDPublic({
+  Future<AccountPublicProfile?> _getAccountPublicProfile({
     RbacToken? token,
   }) async {
     return _apiServices.reviews
@@ -147,7 +143,7 @@ final class UserRepositoryImpl implements UserRepository {
         .successBodyOrThrow()
         .then<CatalystIDPublic?>((value) => value)
         .onError<NotFoundException>((error, stackTrace) => null)
-        .then((value) => value?.decode());
+        .then((value) => value?.toModel());
   }
 
   Future<String?> _lookupUsernameFromDocuments({

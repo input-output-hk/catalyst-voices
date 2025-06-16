@@ -585,6 +585,10 @@
   "@walletLinkTransactionTitle": {
     "description": "A title in link wallet flow on transaction screen."
   },
+  "walletLinkTransactionSubtitle": "To complete this action, you'll submit a signed transaction to Cardano. There will be an ADA transaction fee.",
+  "@walletLinkTransactionSubtitle": {
+    "description": "A subtitle in link wallet flow on transaction screen."
+  },
   "walletLinkTransactionAccountCompletion": "Account completion for Catalyst",
   "@walletLinkTransactionAccountCompletion": {
     "description": "A subtitle in link wallet flow on transaction screen."
@@ -605,6 +609,10 @@
   "walletLinkTransactionChangeRoles": "Change role setup",
   "@walletLinkTransactionChangeRoles": {
     "description": "The secondary button label to change the roles on transaction summary screen."
+  },
+  "walletLinkTransactionBackToWalletSelection": "Back to Wallet Selection",
+  "@walletLinkTransactionBackToWalletSelection": {
+    "description": "The primary button label to go back to wallet selection on transaction summary screen."
   },
   "walletLinkTransactionRoleItem": "1 {role} registration",
   "@walletLinkTransactionRoleItem": {
@@ -777,7 +785,7 @@
   "@createProfileInstructionsMessage": {
     "description": "Information about account creation steps"
   },
-  "createProfileInstructionsNext": "Create your profile now", 
+  "createProfileInstructionsNext": "Create your profile now",
   "@createProfileInstructionsNext": {
     "description": "CTA to move to the next step in account creation"
   },
@@ -1070,7 +1078,7 @@
   "createKeychainSeedPhraseCheckSuccessNextStep": "Now let's set your Unlock password for this device!",
   "createKeychainUnlockPasswordInstructionsTitle": "Set your Catalyst unlock password for this device",
   "createKeychainUnlockPasswordInstructionsSubtitle": "In this next step, you'll set your Unlock Password for this device. It's like a shortcut for proving ownership of your Keychain.  \u2028\u2028Whenever you recover your account for the first time on a new device, you'll need to use your Catalyst seed phrase to get started. Every time after that, you can use your Unlock Password to quickly regain access.",
-  "createProfileCreatedTitle": "Congratulations your profile is setup!", 
+  "createProfileCreatedTitle": "Congratulations your profile is setup!",
   "@createProfileCreatedTitle": {
     "description": "Title for the profile created"
   },
@@ -1539,6 +1547,10 @@
   "@errorValidationPatternMismatch": {
     "description": "Validation error when the user entered value does not match the pattern"
   },
+  "errorValidationHttpsPatternMismatch": "Start your url with https://",
+  "@errorValidationHttpsPatternMismatch": {
+    "description": "Validation error when the user entered value does not match the https:// pattern"
+  },
   "errorValidationStringEmpty": "The text cannot be empty.",
   "@errorValidationStringEmpty": {
     "description": "Validation error when the user entered text is empty"
@@ -1632,6 +1644,10 @@
   "errorEmailAlreadyInUse": "This email address is already in use.",
   "@errorEmailAlreadyInUse": {
     "description": "Error when trying to update email that is taken already."
+  },
+  "errorActiveAccountNotFound": "Active account not found.",
+  "@errorActiveAccountNotFound": {
+    "description": "Generic error message when trying to access account resources but non was found."
   },
   "categoryDetails": "Category Details",
   "fundsAvailable": "Funds Available",
@@ -1848,6 +1864,10 @@
   "proposalEditorValidationExitDialogMessage": "When you exit, any unsaved changes will be lost.",
   "@proposalEditorValidationExitDialogMessage": {
     "description": "Message in a dialog asking if the user wants to leave the form issue mode."
+  },
+  "proposalEditorValidationExitIssueMode": "Exit Issue Mode",
+  "@proposalEditorValidationExitIssueMode": {
+    "description": "Button text for exiting the proposal editor validation snackbar."
   },
   "proposalEditorDeleteDialogTitle": "Delete Proposal?",
   "@proposalEditorDeleteDialogTitle": {
@@ -2848,6 +2868,18 @@
   "verificationEmailSendSubMessage": "Please verify your new email address.",
   "@verificationEmailSendSubMessage": {
     "description": "Sub message of dialog account verification send"
+  },
+  "pendingEmailChangeTitle": "Pending email change",
+  "@pendingEmailChangeTitle": {
+    "description": "Title of dialog about pending email change"
+  },
+  "pendingEmailChangeMessage": "Email will be update after successful verification",
+  "@pendingEmailChangeMessage": {
+    "description": "Message of dialog about pending email change"
+  },
+  "pendingEmailChangeSubMessage": "Please verify your new email address.",
+  "@pendingEmailChangeSubMessage": {
+    "description": "Sub message of dialog about pending email change"
   },
   "invalidSeedPhraseWord": "Invalid",
   "@invalidSeedPhraseWord": {
