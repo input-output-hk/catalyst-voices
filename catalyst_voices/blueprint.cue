@@ -45,33 +45,33 @@ project: {
 
 					configs: caddy: data: "Caddyfile": """
 						localhost:8080 {
-						  root * /app
+							root * /app
 
-						  file_server {
-                            try_files {path} {path}/ /index.html
-                          }
+							file_server {
+							try_files {path} {path}/ /index.html
+							}
 
-						  header {
+							header {
 							Cross-Origin-Opener-Policy "same-origin"
 							Cross-Origin-Embedder-Policy "require-corp"
 
 							/ Cache-Control "public, max-age=3600, must-revalidate"
-						  }
+							}
 
-						  respond /healthz `{"status": "ok"}` 200
+							respond /healthz `{"status": "ok"}` 200
 
-						  route /metrics {
-						    @local remote_ip 127.0.0.1
+							route /metrics {
+							@local remote_ip 127.0.0.1
 							require local
-						    metrics
-						  }
+							metrics
+							}
 
-						  handle_errors {
+							handle_errors {
 							rewrite * /50x.html
 							file_server
-						  }
+							}
 
-						  log
+							log
 						}
 						"""
 
