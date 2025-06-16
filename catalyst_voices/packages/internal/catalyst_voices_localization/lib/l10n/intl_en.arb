@@ -1547,6 +1547,10 @@
   "@errorValidationPatternMismatch": {
     "description": "Validation error when the user entered value does not match the pattern"
   },
+  "errorValidationHttpsPatternMismatch": "Start your url with https://",
+  "@errorValidationHttpsPatternMismatch": {
+    "description": "Validation error when the user entered value does not match the https:// pattern"
+  },
   "errorValidationStringEmpty": "The text cannot be empty.",
   "@errorValidationStringEmpty": {
     "description": "Validation error when the user entered text is empty"
