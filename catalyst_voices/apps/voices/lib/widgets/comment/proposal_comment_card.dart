@@ -50,11 +50,13 @@ class ProposalCommentCard extends StatelessWidget {
                 DocumentPropertyReadBuilder(
                   property: property,
                   overrides: {
-                    CommentDocument.content: (context, listItem) => ExpandableText(
-                          key: ValueKey('Comment[${document.metadata.selfRef}]ExpandableText'),
-                          listItem.value is String ? listItem.value! as String : '',
-                          trimLines: trimLines,
-                        ),
+                    CommentDocument.content: (context, listItem) {
+                      return ExpandableText(
+                        key: ValueKey('Comment[${document.metadata.selfRef}]ExpandableText'),
+                        listItem.value is String ? listItem.value! as String : '',
+                        trimLines: trimLines,
+                      );
+                    },
                   },
                 ),
               if (footer != null) ...[
