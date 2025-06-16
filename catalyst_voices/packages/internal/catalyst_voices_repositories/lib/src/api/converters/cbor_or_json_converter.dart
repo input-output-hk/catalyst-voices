@@ -1,10 +1,11 @@
 import 'dart:async';
 
+import 'package:catalyst_voices_repositories/src/api/converters/cbor_serializable_converter.dart';
 import 'package:chopper/chopper.dart';
 import 'package:http/http.dart' as http;
 
 /// A [Converter] which decodes json/cbor depending on content-type header.
-/// 
+///
 /// If the request does not have a content-type header
 /// then the converter will fallback to json serialization.
 ///
@@ -43,8 +44,9 @@ class CborOrJsonDelegateConverter implements Converter {
   bool _isCborContentType(Map<String, String> headers) {
     final lowercaseHeaders =
         headers.map((key, value) => MapEntry(key.toLowerCase(), value.toLowerCase()));
-    final contentType = lowercaseHeaders['content-type'];
-    return contentType != null && contentType.contains('application/cbor');
+    final contentType = lowercaseHeaders[CborSerializableConverter.contentTypeHeader.toLowerCase()];
+    return contentType != null &&
+        contentType.contains(CborSerializableConverter.applicationCbor.toLowerCase());
   }
 
   bool _isCborRequest(http.BaseRequest request) {
