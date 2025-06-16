@@ -36,6 +36,7 @@ class ExpandableText extends StatefulWidget {
 class _ExpandableTextState extends State<ExpandableText> {
   bool _isUserExpanded = false;
   bool _needsTrim = false;
+  TextPainter? _textPainter;
 
   bool get _isExpanded => !_needsTrim || _isUserExpanded;
 
@@ -61,7 +62,7 @@ class _ExpandableTextState extends State<ExpandableText> {
               textDirection: widget.textDirection,
               locale: widget.locale,
               softWrap: widget.softWrap,
-              overflow: widget.overflow,
+              overflow: _isExpanded ? null : TextOverflow.ellipsis,
               textScaler: widget.textScaler,
             ),
             if (_needsTrim) _ToggleExpandChip(isExpanded: _isExpanded, onTap: _toggleIsExpanded),
@@ -71,18 +72,45 @@ class _ExpandableTextState extends State<ExpandableText> {
     );
   }
 
-  bool _calculateNeedsTrim({
-    double minWidth = 0,
-    double maxWidth = double.infinity,
-  }) {
-    final textPainter = TextPainter(
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _textPainter = _buildPainter();
+  }
+
+  @override
+  void didUpdateWidget(ExpandableText oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (widget.data != oldWidget.data ||
+        widget.trimLines != oldWidget.trimLines ||
+        widget.textDirection != widget.textDirection ||
+        widget.locale != oldWidget.locale ||
+        widget.textAlign != oldWidget.textAlign ||
+        widget.textScaler != oldWidget.textScaler) {
+      _textPainter = _buildPainter();
+    }
+  }
+
+  TextPainter _buildPainter() {
+    return TextPainter(
       text: TextSpan(text: widget.data, style: widget.style),
       maxLines: widget.trimLines,
       textDirection: widget.textDirection ?? Directionality.of(context),
       locale: widget.locale,
       textAlign: widget.textAlign ?? TextAlign.start,
       textScaler: widget.textScaler ?? TextScaler.noScaling,
-    )..layout(minWidth: minWidth, maxWidth: maxWidth);
+    );
+  }
+
+  bool _calculateNeedsTrim({
+    double minWidth = 0,
+    double maxWidth = double.infinity,
+  }) {
+    final textPainter = _textPainter ??= _buildPainter();
+
+    // ignore: cascade_invocations
+    textPainter.layout(minWidth: minWidth, maxWidth: maxWidth);
 
     return textPainter.didExceedMaxLines;
   }

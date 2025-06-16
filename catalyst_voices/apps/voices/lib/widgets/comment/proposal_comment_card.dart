@@ -55,6 +55,7 @@ class ProposalCommentCard extends StatelessWidget {
                         key: ValueKey('Comment[${document.metadata.selfRef}]ExpandableText'),
                         listItem.value is String ? listItem.value! as String : '',
                         trimLines: trimLines,
+                        overflow: TextOverflow.ellipsis,
                       );
                     },
                   },
