@@ -16,8 +16,14 @@ final class InputBuilder implements CoinSelector {
   /// Strategy used to prioritize the available UTxOs.
   final CoinSelectionStrategy selectionStrategy;
 
+  /// Defines a strategy applied to remaining Ada when planning change outputs.
+  final ChangeOutputAdaStrategy changeOutputStrategy;
+
   /// Creates an [InputBuilder] with the given [selectionStrategy].
-  const InputBuilder({required this.selectionStrategy});
+  const InputBuilder({
+    required this.selectionStrategy,
+    required this.changeOutputStrategy,
+  });
 
   /// Groups UTxOs by token, mapping each token to its corresponding UTxOs.
   @override
@@ -64,8 +70,6 @@ final class InputBuilder implements CoinSelector {
     int minInputs = CoinSelector.minInputs,
     int maxInputs = CoinSelector.maxInputs,
   }) {
-    final availableInputs = builder.inputs.toSet();
-
     final inputTotal = CoinSelector.sumAmounts(
       builder.inputs,
       (input) => input.output.amount,
@@ -83,6 +87,51 @@ final class InputBuilder implements CoinSelector {
       );
     }
 
+    // Attempt to make input selection without burning any Ada.
+    final resultWithoutBurning = _selectInputs(
+      builder: builder,
+      targetTotal: targetTotal,
+      minInputs: minInputs,
+      maxInputs: maxInputs,
+      canBurnChangeAsFee: false,
+    );
+
+    if (resultWithoutBurning != null) {
+      return resultWithoutBurning;
+    }
+
+    // If burning Ada is allowed attempt to make a selection that burns remaining Ada.
+    if (changeOutputStrategy == ChangeOutputAdaStrategy.burn) {
+      final resultWithBurning = _selectInputs(
+        builder: builder,
+        targetTotal: targetTotal,
+        minInputs: minInputs,
+        maxInputs: maxInputs,
+        canBurnChangeAsFee: true,
+      );
+
+      if (resultWithBurning != null) {
+        return resultWithBurning;
+      }
+    }
+
+    // Throw an exception if the selection process fails to meet the
+    // requirements.
+    throw InsufficientUtxoBalanceException(
+      actualAmount: inputTotal,
+      requiredAmount: targetTotal,
+    );
+  }
+
+  SelectionResult? _selectInputs({
+    required TransactionBuilder builder,
+    required Balance targetTotal,
+    required int minInputs,
+    required int maxInputs,
+    required bool canBurnChangeAsFee,
+  }) {
+    final availableInputs = builder.inputs.toSet();
+
     // Group UTXOs by asset ID for coin selection.
     final assetGroups = buildAssetGroups(targetTotal, availableInputs);
 
@@ -96,6 +145,7 @@ final class InputBuilder implements CoinSelector {
       availableInputs: availableInputs,
       targetTotal: targetTotal,
       assetGroups: assetGroups,
+      canBurnChangeAsFee: canBurnChangeAsFee,
     );
 
     return selector.selectInputs();
@@ -109,6 +159,7 @@ class _InputSelector {
   final Set<TransactionUnspentOutput> availableInputs;
   final Balance targetTotal;
   final AssetsGroup assetGroups;
+  final bool canBurnChangeAsFee;
 
   final selectedInputs = <TransactionUnspentOutput>{};
   Balance selectedTotal = const Balance.zero();
@@ -120,9 +171,10 @@ class _InputSelector {
     required this.availableInputs,
     required this.targetTotal,
     required this.assetGroups,
+    required this.canBurnChangeAsFee,
   });
 
-  SelectionResult selectInputs() {
+  SelectionResult? selectInputs() {
     final postOutputsResult = _selectInputsToSatisfyOutputs();
     if (postOutputsResult != null) {
       return postOutputsResult;
@@ -138,12 +190,7 @@ class _InputSelector {
       return result;
     }
 
-    // Throw an exception if the selection process fails to meet the
-    // requirements.
-    throw InsufficientUtxoBalanceException(
-      actualAmount: selectedTotal,
-      requiredAmount: targetTotal,
-    );
+    return null;
   }
 
   /// Constructs the change outputs and calculates their associated fees.
@@ -174,7 +221,7 @@ class _InputSelector {
     try {
       if (remainingBalance.isZero) return ([], const Coin(0));
 
-      final builderWithChangeOutputs = builder.withChangeIfNeeded();
+      final builderWithChangeOutputs = builder.withChangeIfNeeded(burnAsFee: canBurnChangeAsFee);
       final deltaOutputs = List.of(builderWithChangeOutputs.outputs)..removeAll(builder.outputs);
       final deltaFee = builderWithChangeOutputs.fee! - builder.minFee();
 
@@ -182,6 +229,8 @@ class _InputSelector {
     } on InsufficientUtxoBalanceException {
       return null;
     } on InsufficientAdaForAssetsException {
+      return null;
+    } on InsufficientAdaForChangeOutputException {
       return null;
     }
   }

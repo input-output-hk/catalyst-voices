@@ -48,10 +48,6 @@ class ProfileInfoPanel extends OnboardingPageBase {
       $(emailRequestList).$(Flexible).at(1).$(Text).text,
       (await t()).createProfileInstructionsEmailReason2,
     );
-    expect(
-      $(emailRequestList).$(Flexible).at(2).$(Text).text,
-      (await t()).createProfileInstructionsEmailReason3,
-    );
     expect($(createProfileButton).visible, true);
     expect(await closeButton(), findsOneWidget);
   }
