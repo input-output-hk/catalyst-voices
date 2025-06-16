@@ -100,7 +100,7 @@ class _Title extends StatelessWidget {
 
     return Text(
       key: const ValueKey('AcknowledgementsTitle'),
-      context.l10n.createBaseProfileAcknowledgementsTitle,
+      context.l10n.createProfileAcknowledgementsTitle,
       style: textStyle,
     );
   }
