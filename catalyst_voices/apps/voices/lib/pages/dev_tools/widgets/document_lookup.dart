@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:catalyst_voices/pages/dev_tools/document_data_preview/document_data_preview_page.dart';
 import 'package:catalyst_voices/pages/dev_tools/widgets/document_ref_field.dart';
 import 'package:catalyst_voices/pages/dev_tools/widgets/document_search_button.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -42,6 +45,6 @@ class _DocumentLookupState extends State<DocumentLookup> {
     ref ??= _controller.value;
     assert(ref != null, 'ref is invalid!');
 
-    print(ref);
+    unawaited(DocumentDataPreviewPage.show(context, ref: ref!));
   }
 }
