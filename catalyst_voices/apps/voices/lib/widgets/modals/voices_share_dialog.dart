@@ -1,96 +1,17 @@
+import 'dart:async';
+
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
+import 'package:catalyst_voices/share/share_manager.dart';
 import 'package:catalyst_voices/widgets/modals/details/voices_align_title_header.dart';
 import 'package:catalyst_voices/widgets/snackbar/voices_snackbar.dart';
 import 'package:catalyst_voices/widgets/snackbar/voices_snackbar_type.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-
-enum ShareType {
-  clipboard('Clipboard'),
-  xTwitter('X / Twitter'),
-  linkedin('LinkedIn'),
-  facebook('Facebook'),
-  reddit('Reddit');
-
-  final String name;
-
-  const ShareType(this.name);
-
-  SvgGenImage get icon => switch (this) {
-        ShareType.clipboard => VoicesAssets.icons.duplicate,
-        ShareType.xTwitter => VoicesAssets.icons.xTwitter,
-        ShareType.linkedin => VoicesAssets.icons.linkedin,
-        ShareType.facebook => VoicesAssets.icons.facebook,
-        ShareType.reddit => VoicesAssets.icons.reddit,
-      };
-
-  String description(VoicesLocalizations l10n, String itemType) => switch (this) {
-        ShareType.clipboard => l10n.shareDirectLinkToItem(itemType),
-        ShareType.xTwitter => l10n.shareLinkOnSocialMedia(itemType, name),
-        ShareType.linkedin => l10n.shareLinkOnSocialMedia(itemType, name),
-        ShareType.facebook => l10n.shareLinkOnSocialMedia(itemType, name),
-        ShareType.reddit => l10n.shareLinkOnSocialMedia(itemType, name),
-      };
-
-  String shareMessage(VoicesLocalizations l10n) => switch (this) {
-        ShareType.clipboard => l10n.copyLink,
-        _ => l10n.shareOnSocialMedia(name),
-      };
-
-  String shareUrl(String shareMessage, String url) => switch (this) {
-        ShareType.xTwitter => _twitterShareUrl(url, shareMessage).toString(),
-        ShareType.linkedin => _linkedinShareUrl(url).toString(),
-        ShareType.facebook => _facebookShareUrl(url).toString(),
-        ShareType.reddit => _redditShareUrl(url, shareMessage).toString(),
-        _ => '',
-      };
-
-  Uri _facebookShareUrl(String url) {
-    return Uri.https(
-      'facebook.com',
-      'sharer.php',
-      {
-        'u': url,
-      },
-    );
-  }
-
-  Uri _linkedinShareUrl(String url) {
-    return Uri.https(
-      'linkedin.com',
-      'sharing/share-offsite',
-      {
-        'url': url,
-      },
-    );
-  }
-
-  Uri _redditShareUrl(String url, String shareMessage) {
-    return Uri.https(
-      'reddit.com',
-      'submit',
-      {
-        'url': url,
-        'shareMessage': shareMessage,
-      },
-    );
-  }
-
-  Uri _twitterShareUrl(String url, String shareMessage) {
-    return Uri.https(
-      'twitter.com',
-      'intent/tweet',
-      {
-        'url': url,
-        'text': shareMessage,
-      },
-    );
-  }
-}
 
 class VoicesShareDialog extends StatelessWidget {
   final EdgeInsets bodyPadding;
@@ -99,15 +20,13 @@ class VoicesShareDialog extends StatelessWidget {
   /// proposal, campaign
   /// Its used in header of the dialog
   final String shareItemType;
-  final String shareUrl;
-  final String shareMessage;
+  final ShareData data;
 
   const VoicesShareDialog({
     super.key,
     this.bodyPadding = const EdgeInsets.all(24),
     required this.shareItemType,
-    required this.shareUrl,
-    required this.shareMessage,
+    required this.data,
   });
 
   @override
@@ -127,36 +46,52 @@ class VoicesShareDialog extends StatelessWidget {
           child: Column(
             spacing: 16,
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              ...ShareType.values.map<Widget>(
-                (e) => _ShareItem(
-                  key: Key(e.name),
-                  shareType: e,
-                  itemType: context.l10n.proposal.toLowerCase(),
-                  shareUrl: shareUrl,
-                  shareMessage: shareMessage,
-                ),
-              ),
-            ],
+            children: ShareChannel.values.map((channel) {
+              return _ShareItemTile(
+                key: ValueKey(channel),
+                icon: channel.icon,
+                title: channel.title(context),
+                desc: channel.description(context, itemType: shareItemType.toLowerCase()),
+                onTap: () => unawaited(_shareViaChannel(context, channel)),
+              );
+            }).toList(),
           ),
         ),
       ),
     );
   }
+
+  Future<void> _shareViaChannel(BuildContext context, ShareChannel channel) async {
+    await ShareManager.of(context).share(data, channel: channel);
+
+    if (context.mounted && channel == ShareChannel.clipboard) {
+      _showCopied(context);
+    }
+  }
+
+  void _showCopied(BuildContext context) {
+    VoicesSnackBar(
+      type: VoicesSnackBarType.success,
+      behavior: SnackBarBehavior.floating,
+      title: context.l10n.copied,
+      message: context.l10n.linkCopiedToClipboard,
+      duration: const Duration(seconds: 2),
+    ).show(context);
+  }
 }
 
-class _ShareItem extends StatelessWidget with LaunchUrlMixin {
-  final ShareType shareType;
-  final String itemType;
-  final String shareUrl;
-  final String shareMessage;
+class _ShareItemTile extends StatelessWidget with LaunchUrlMixin {
+  final SvgGenImage icon;
+  final String title;
+  final String desc;
+  final VoidCallback onTap;
 
-  const _ShareItem({
+  const _ShareItemTile({
     super.key,
-    required this.shareType,
-    required this.itemType,
-    required this.shareUrl,
-    required this.shareMessage,
+    required this.icon,
+    required this.title,
+    required this.desc,
+    required this.onTap,
   });
 
   @override
@@ -165,12 +100,10 @@ class _ShareItem extends StatelessWidget with LaunchUrlMixin {
       borderRadius: BorderRadius.circular(8),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
-        onTap: CatalystPlatform.isWeb ? () async => _webShareItem(context) : _shareItem,
+        onTap: onTap,
         child: Container(
           decoration: BoxDecoration(
-            border: Border.all(
-              color: context.colors.outlineBorderVariant,
-            ),
+            border: Border.all(color: context.colors.outlineBorderVariant),
             borderRadius: BorderRadius.circular(8),
           ),
           padding: const EdgeInsets.all(12),
@@ -180,7 +113,7 @@ class _ShareItem extends StatelessWidget with LaunchUrlMixin {
             children: [
               VoicesAvatar(
                 key: const Key('ItemIcon'),
-                icon: shareType.icon.buildIcon(),
+                icon: icon.buildIcon(),
                 backgroundColor: context.colors.elevationsOnSurfaceNeutralLv1Grey,
                 foregroundColor: context.colors.iconsForeground,
               ),
@@ -191,11 +124,11 @@ class _ShareItem extends StatelessWidget with LaunchUrlMixin {
                   children: [
                     Text(
                       key: const Key('ItemTitle'),
-                      shareType.shareMessage(context.l10n),
+                      title,
                     ),
                     Text(
                       key: const Key('ItemDescription'),
-                      shareType.description(context.l10n, itemType),
+                      desc,
                     ),
                   ],
                 ),
@@ -205,31 +138,5 @@ class _ShareItem extends StatelessWidget with LaunchUrlMixin {
         ),
       ),
     );
-  }
-
-  void _shareItem() {
-    throw UnimplementedError(
-      'Share method for other platforms is not implemented yet',
-    );
-  }
-
-  void _showSnackbar(BuildContext context) {
-    VoicesSnackBar(
-      type: VoicesSnackBarType.success,
-      title: context.l10n.copied,
-      message: context.l10n.linkCopiedToClipboard,
-      duration: const Duration(seconds: 2),
-    ).show(context);
-  }
-
-  Future<void> _webShareItem(BuildContext context) async {
-    final link = Uri.base.replace(path: shareUrl).toString();
-
-    if (shareType == ShareType.clipboard) {
-      _showSnackbar(context);
-      return Clipboard.setData(ClipboardData(text: link));
-    } else {
-      await launchUri(shareType.shareUrl(shareMessage, link).getUri());
-    }
   }
 }

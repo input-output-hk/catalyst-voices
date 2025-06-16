@@ -4,6 +4,7 @@ import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.da
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:collection/collection.dart';
 
 abstract interface class UserService implements ActiveAware {
   const factory UserService(
@@ -54,7 +55,9 @@ abstract interface class UserService implements ActiveAware {
   Future<void> resendActiveAccountVerificationEmail();
 
   /// Throws [EmailAlreadyUsedException] if [email] already taken.
-  Future<void> updateAccount({
+  ///
+  /// Returns true if updated, false otherwise.
+  Future<bool> updateAccount({
     required CatalystId id,
     Optional<String>? username,
     Optional<String>? email,
@@ -215,7 +218,7 @@ final class UserServiceImpl implements UserService {
   }
 
   @override
-  Future<void> updateAccount({
+  Future<bool> updateAccount({
     required CatalystId id,
     Optional<String>? username,
     Optional<String>? email,
@@ -223,18 +226,20 @@ final class UserServiceImpl implements UserService {
   }) async {
     final user = await getUser();
     if (!user.hasAccount(id: id)) {
-      return;
+      return false;
     }
     final account = user.getAccount(id);
+    final didEmailChange = email != null && account.email != email.data;
+    final didUsernameChange = username != null && account.username != username.data;
 
     var updatedAccount = account.copyWith();
 
-    if (username != null) {
+    if (didUsernameChange) {
       final catalystId = updatedAccount.catalystId.copyWith(username: username);
       updatedAccount = updatedAccount.copyWith(catalystId: catalystId);
     }
 
-    if (email != null) {
+    if (didEmailChange) {
       updatedAccount = updatedAccount.copyWith(
         email: email,
         publicStatus: email.isEmpty ? AccountPublicStatus.notSetup : AccountPublicStatus.verifying,
@@ -245,7 +250,7 @@ final class UserServiceImpl implements UserService {
       updatedAccount = updatedAccount.copyWith(roles: roles);
     }
 
-    if (username != null || email != null) {
+    if (didUsernameChange || didEmailChange) {
       final accountEmail = updatedAccount.email;
       if (accountEmail != null) {
         await _userRepository.publishUserProfile(
@@ -255,9 +260,15 @@ final class UserServiceImpl implements UserService {
       }
     }
 
+    if (updatedAccount == account) {
+      return false;
+    }
+
     final updatedUser = user.updateAccount(updatedAccount);
 
     await _updateUser(updatedUser);
+
+    return true;
   }
 
   @override
@@ -268,11 +279,13 @@ final class UserServiceImpl implements UserService {
       return;
     }
 
-    final publicStatus = await _userRepository.getAccountPublicStatus();
-    final updatedAccount = activeAccount.copyWith(publicStatus: publicStatus);
-    final updatedUser = user.updateAccount(updatedAccount);
+    if (!activeAccount.publicStatus.isNotSetup) {
+      final publicStatus = await _userRepository.getAccountPublicStatus();
+      final updatedAccount = activeAccount.copyWith(publicStatus: publicStatus);
+      final updatedUser = user.updateAccount(updatedAccount);
 
-    await _updateUser(updatedUser);
+      await _updateUser(updatedUser);
+    }
   }
 
   @override

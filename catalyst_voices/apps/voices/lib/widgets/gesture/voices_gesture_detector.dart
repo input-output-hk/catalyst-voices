@@ -11,6 +11,12 @@ class VoicesGestureDetector extends StatelessWidget {
   /// See [GestureDetector.onTap].
   final VoidCallback? onTap;
 
+  /// See [GestureDetector.onSecondaryTap].
+  final VoidCallback? onSecondaryTap;
+
+  /// See [GestureDetector.onLongPress].
+  final VoidCallback? onLongPress;
+
   /// See [GestureDetector.onHorizontalDragUpdate].
   final GestureDragUpdateCallback? onHorizontalDragUpdate;
 
@@ -36,6 +42,8 @@ class VoicesGestureDetector extends StatelessWidget {
     this.behavior,
     this.onTapDown,
     this.onTap,
+    this.onSecondaryTap,
+    this.onLongPress,
     this.onHorizontalDragUpdate,
     this.onPanUpdate,
     this.mouseRegionOnExit,
@@ -48,6 +56,8 @@ class VoicesGestureDetector extends StatelessWidget {
   List<Object?> get _callbacks => [
         onTapDown,
         onTap,
+        onSecondaryTap,
+        onLongPress,
         onHorizontalDragUpdate,
         onPanUpdate,
       ];
@@ -65,6 +75,8 @@ class VoicesGestureDetector extends StatelessWidget {
         behavior: behavior,
         onTapDown: onTapDown,
         onTap: onTap,
+        onSecondaryTap: onSecondaryTap,
+        onLongPress: onLongPress,
         onHorizontalDragUpdate: onHorizontalDragUpdate,
         onPanUpdate: onPanUpdate,
         excludeFromSemantics: excludeFromSemantics,

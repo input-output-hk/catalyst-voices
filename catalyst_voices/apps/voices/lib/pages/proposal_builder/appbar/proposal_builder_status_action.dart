@@ -12,7 +12,7 @@ import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart'
-    show DocumentVersion, ProposalMenuItemAction;
+    show DocumentVersion, ProposalBuilderMenuItemData, ProposalMenuItemAction;
 import 'package:flutter/material.dart';
 
 class ProposalBuilderStatusAction extends StatelessWidget {
@@ -82,6 +82,8 @@ class _PopupMenuButtonState extends State<_PopupMenuButton> {
 
   @override
   Widget build(BuildContext context) {
+    final bloc = context.read<ProposalBuilderBloc>();
+
     return PopupMenuButton<int>(
       key: _buttonKey,
       offset: const Offset(0, 48),
@@ -95,7 +97,14 @@ class _PopupMenuButtonState extends State<_PopupMenuButton> {
               value: item.index,
               enabled: item.clickable,
               padding: EdgeInsets.zero,
-              child: ProposalBuilderMenuItem(item: item),
+              child: BlocSelector<ProposalBuilderBloc, ProposalBuilderState,
+                  ProposalBuilderMenuItemData>(
+                bloc: bloc,
+                selector: (state) => state.buildMenuItem(action: item),
+                builder: (context, itemData) {
+                  return ProposalBuilderMenuItem(data: itemData);
+                },
+              ),
             ),
         ].separatedBy(const PopupMenuDivider(height: 0)).toList();
       },
@@ -156,7 +165,7 @@ class _PopupMenuButtonState extends State<_PopupMenuButton> {
       return;
     }
 
-    if (!bloc.validate()) {
+    if (!bloc.validate(ProposalBuilderValidationOrigin.shareDraft)) {
       return;
     }
 
@@ -194,12 +203,12 @@ class _PopupMenuButtonState extends State<_PopupMenuButton> {
       return;
     }
 
-    if (!bloc.validate()) {
+    if (!await bloc.isAccountEmailVerified()) {
+      bloc.emitSignal(const EmailNotVerifiedProposalBuilderSignal());
       return;
     }
 
-    if (!await bloc.isAccountEmailVerified()) {
-      bloc.emitSignal(const EmailNotVerifiedProposalBuilderSignal());
+    if (!bloc.validate(ProposalBuilderValidationOrigin.submitForReview)) {
       return;
     }
 

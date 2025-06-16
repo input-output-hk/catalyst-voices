@@ -56,33 +56,6 @@ void main() {
         );
       },
     );
-
-    testWidgets(
-      'gap is present and default correctly',
-      (tester) async {
-        // Given
-        const closeIcon = Icon(Icons.close);
-        const affixDecorator = Directionality(
-          textDirection: TextDirection.ltr,
-          child: AffixDecorator(
-            prefix: closeIcon,
-            child: Text('Label'),
-          ),
-        );
-
-        // When
-        await tester.pumpWidget(affixDecorator);
-
-        // Then
-        final iconFinder = find.byIcon(Icons.close);
-        final gapFinder = find.byWidgetPredicate(
-          (widget) => widget is SizedBox && widget.width == 8.0,
-        );
-
-        expect(iconFinder, findsOneWidget);
-        expect(gapFinder, findsOneWidget);
-      },
-    );
   });
 
   group('Child', () {
@@ -177,13 +150,7 @@ void main() {
         await tester.pumpWidget(affixDecorator);
 
         // Then
-        final iconFinder = find.byIcon(Icons.close);
-        final gapFinder = find.byWidgetPredicate(
-          (widget) => widget is SizedBox && widget.width == 8.0,
-        );
-
-        expect(iconFinder, findsOneWidget);
-        expect(gapFinder, findsOneWidget);
+        expect(find.byIcon(Icons.close), findsOneWidget);
       },
     );
   });

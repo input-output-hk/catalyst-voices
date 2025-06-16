@@ -1,7 +1,9 @@
-import 'package:catalyst_voices/pages/dev_tools/widgets/app_info_card.dart';
-import 'package:catalyst_voices/pages/dev_tools/widgets/config_card.dart';
-import 'package:catalyst_voices/pages/dev_tools/widgets/documents_card.dart';
-import 'package:catalyst_voices/pages/dev_tools/widgets/gateway_info_card.dart';
+import 'package:catalyst_voices/pages/dev_tools/cards/app_info_card.dart';
+import 'package:catalyst_voices/pages/dev_tools/cards/config_card.dart';
+import 'package:catalyst_voices/pages/dev_tools/cards/documents_card.dart';
+import 'package:catalyst_voices/pages/dev_tools/cards/gateway_info_card.dart';
+import 'package:catalyst_voices/pages/dev_tools/cards/logs_card.dart';
+import 'package:catalyst_voices/pages/dev_tools/widgets/environment_card.dart';
 import 'package:catalyst_voices/pages/dev_tools/widgets/x_close_button.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
@@ -39,6 +41,8 @@ class _DevToolsPageState extends State<DevToolsPage> {
       body: ListView(
         padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
         children: const [
+          EnvironmentCard(),
+          SizedBox(height: 12),
           AppInfoCard(),
           SizedBox(height: 12),
           GatewayInfoCard(),
@@ -46,6 +50,8 @@ class _DevToolsPageState extends State<DevToolsPage> {
           ConfigCard(),
           SizedBox(height: 12),
           DocumentsCard(),
+          SizedBox(height: 12),
+          LogsCard(),
         ],
       ),
     );
@@ -61,6 +67,7 @@ class _DevToolsPageState extends State<DevToolsPage> {
   @override
   void dispose() {
     _bloc?.add(const StopWatchingSystemInfoEvent());
+    _bloc?.add(const StopWatchingDocumentsEvent());
     _bloc = null;
     super.dispose();
   }
@@ -71,6 +78,7 @@ class _DevToolsPageState extends State<DevToolsPage> {
 
     _bloc = context.read<DevToolsBloc>()
       ..add(const UpdateAllEvent())
-      ..add(const WatchSystemInfoEvent());
+      ..add(const WatchSystemInfoEvent())
+      ..add(const WatchDocumentsEvent());
   }
 }

@@ -57,11 +57,10 @@ final class KeychainCreationCubit extends Cubit<KeychainStateData>
     }
   }
 
-  KeychainProgress createRecoverProgress() {
-    return KeychainProgress(
-      seedPhrase: _seedPhrase!,
-      password: password.value,
-    );
+  void clearSeedPhrase() {
+    _seedPhrase = SeedPhrase();
+    setSeedPhraseStored(false);
+    setUserSeedPhraseWords([]);
   }
 
   @override
@@ -106,7 +105,12 @@ final class KeychainCreationCubit extends Cubit<KeychainStateData>
     final seedPhrase = _seedPhrase;
     final seedPhraseWords = seedPhrase?.mnemonicWords;
 
+    final allSelected = words.length == seedPhraseWords?.length;
     final matches = listEquals(seedPhraseWords, words);
+
+    if (allSelected && !matches) {
+      emitError(const LocalizedSeedPhraseWordsDoNotMatchException());
+    }
 
     _seedPhraseStateData = _seedPhraseStateData.copyWith(
       userWords: words,

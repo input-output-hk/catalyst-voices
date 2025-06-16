@@ -60,7 +60,7 @@ extension CurrentCampaignX on CurrentCampaign {
     name: 'Catalyst Fund14',
     description: '''
 Project Catalyst turns economic power into innovation power by using the Cardano Treasury to incentivize and fund community-approved ideas.''',
-    allFunds: const Coin.fromWholeAda(50000000),
+    allFunds: const Coin.fromWholeAda(20000000),
     totalAsk: const Coin.fromWholeAda(4020000),
     askRange: const ComparableRange(
       min: Coin.fromWholeAda(30000),

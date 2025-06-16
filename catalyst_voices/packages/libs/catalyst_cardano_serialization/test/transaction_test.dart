@@ -1,4 +1,5 @@
 import 'package:catalyst_cardano_serialization/src/transaction.dart';
+import 'package:catalyst_cardano_serialization/src/utils/hex.dart';
 import 'package:cbor/cbor.dart';
 import 'package:convert/convert.dart';
 import 'package:test/test.dart';
@@ -129,20 +130,12 @@ void main() {
           'b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855ffffff'
           'ff821a000b0a3d1a106ae424f5f6';
 
-      final serialized = cbor.decode(hex.decode(hex1));
+      final serialized = cbor.decode(hexDecode(hex1));
       final tx = Transaction.fromCbor(serialized);
       final hex2 = hex.encode(cbor.encode(tx.toCbor()));
       expect(hex1, equals(hex2));
     });
   });
-}
-
-void _testTransactionSerializationRoundTrip(Transaction transaction) {
-  final hex1 = hex.encode(cbor.encode(transaction.toCbor()));
-  final tx1 = Transaction.fromCbor(cbor.decode(hex.decode(hex1)));
-  final hex2 = hex.encode(cbor.encode(tx1.toCbor()));
-
-  expect(hex1, equals(hex2));
 }
 
 void _testTransactionSerialization(
@@ -153,4 +146,12 @@ void _testTransactionSerialization(
   final hexString = hex.encode(bytes);
 
   expect(hexString, equals(expectedHex));
+}
+
+void _testTransactionSerializationRoundTrip(Transaction transaction) {
+  final hex1 = hex.encode(cbor.encode(transaction.toCbor()));
+  final tx1 = Transaction.fromCbor(cbor.decode(hexDecode(hex1)));
+  final hex2 = hex.encode(cbor.encode(tx1.toCbor()));
+
+  expect(hex1, equals(hex2));
 }

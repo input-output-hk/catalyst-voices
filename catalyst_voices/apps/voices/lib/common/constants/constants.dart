@@ -1,55 +1,42 @@
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 
 abstract class VoicesConstants {
+  static const _docs = 'https://docs.projectcatalyst.io';
+  static const _catalystApp = '$_docs/catalyst-tools/catalyst-app';
+
   /// External urls
-  static const supportedWalletsUrl =
-      'https://docs.projectcatalyst.io/current-fund/voter-registration/supported-wallets';
-  static const tosUrl =
-      'https://docs.projectcatalyst.io/current-fund/fund-basics/project-catalyst-terms-and-conditions';
+  static const supportedWalletsUrl = '$_docs/current-fund/voter-registration/supported-wallets';
+  static const tosUrl = '$_docs/current-fund/fund-basics/project-catalyst-terms-and-conditions';
   static const privacyPolicyUrl =
-      'https://docs.projectcatalyst.io/current-fund/fund-basics/project-catalyst-terms-and-conditions/catalyst-fc-privacy-policy';
+      '$_docs/current-fund/fund-basics/project-catalyst-terms-and-conditions/catalyst-fc-privacy-policy';
   static const supportUrl = 'https://catalystiog.zendesk.com/hc/en-us/requests/new';
-  static const docsUrl = 'https://docs.projectcatalyst.io/';
-  static const beforeSubmissionUrl =
-      'https://docs.projectcatalyst.io/catalyst-tools/catalyst-app/app-timeline#before-submission';
-  static const afterSubmissionUrl =
-      'https://docs.projectcatalyst.io/catalyst-tools/catalyst-app/stay-involved';
-  static const becomeReviewerUrl = 'https://reviews.projectcatalyst.io/';
-  static const votingRegistrationUrl =
-      'https://docs.projectcatalyst.io/current-fund/voter-registration';
+  static const docsUrl = '$_docs/';
+  static const beforeSubmissionUrl = '$_catalystApp/app-timeline#before-submission';
+  static const afterSubmissionUrl = '$_catalystApp/stay-involved';
+  static const votingRegistrationUrl = '$_docs/current-fund/voter-registration';
   static const walletTroubleshootingUrl =
-      'https://docs.projectcatalyst.io/catalyst-tools/catalyst-app/getting-started#wallet-connect-troubleshooting';
-  static const mobileExperienceUrl =
-      'https://docs.projectcatalyst.io/catalyst-tools/catalyst-app/mobile-experience';
-  static const catalystKnowledgeBaseUrl =
-      'https://docs.projectcatalyst.io/catalyst-tools/catalyst-app';
+      '$_catalystApp/getting-started#wallet-connect-troubleshooting';
+  static const mobileExperienceUrl = '$_catalystApp/mobile-experience';
+  static const catalystKnowledgeBaseUrl = _catalystApp;
   static const proposalPublishingDocsUrl =
-      'https://docs.projectcatalyst.io/catalyst-tools/catalyst-app/create-and-submit-proposals-in-workspace#proposal-publishing';
-  static const getStartedUrl =
-      'https://docs.projectcatalyst.io/catalyst-tools/catalyst-app/getting-started';
-  static const setupBaseProfileUrl =
-      'https://docs.projectcatalyst.io/catalyst-tools/catalyst-app/getting-started#setup-base-profile';
-  static const createCatalystKeychainUrl =
-      'https://docs.projectcatalyst.io/catalyst-tools/catalyst-app/getting-started#create-catalyst-keychain';
+      '$_catalystApp/create-and-submit-proposals-in-workspace#proposal-publishing';
+  static const getStartedUrl = '$_catalystApp/getting-started';
+  static const setupBaseProfileUrl = '$_catalystApp/getting-started#setup-base-profile';
+  static const createCatalystKeychainUrl = '$_catalystApp/getting-started#create-catalyst-keychain';
   static const officiallySupportedWalletsUrl =
-      'https://docs.projectcatalyst.io/catalyst-tools/catalyst-app/getting-started#officially-supported-wallets';
-  static const linkCardanoWalletUrl =
-      'https://docs.projectcatalyst.io/catalyst-tools/catalyst-app/getting-started#link-cardano-wallet-and-roles';
-  static const selectRolesUrl =
-      'https://docs.projectcatalyst.io/catalyst-tools/catalyst-app/getting-started#select-roles';
+      '$_catalystApp/getting-started#officially-supported-wallets';
+  static const linkCardanoWalletUrl = '$_catalystApp/getting-started#link-cardano-wallet-and-roles';
+  static const selectRolesUrl = '$_catalystApp/getting-started#select-roles';
   static const submitRegistrationTransactionUrl =
-      'https://docs.projectcatalyst.io/catalyst-tools/catalyst-app/getting-started#submit-registration-transaction';
-  static const restoreKeychainUrl =
-      'https://docs.projectcatalyst.io/catalyst-tools/catalyst-app/restore-keychain';
-  static const myAccountUrl =
-      'https://docs.projectcatalyst.io/catalyst-tools/catalyst-app/my-account';
+      '$_catalystApp/getting-started#submit-registration-transaction';
+  static const restoreKeychainUrl = '$_catalystApp/restore-keychain';
+  static const myAccountUrl = '$_catalystApp/my-account';
   static const insertNewImageDocsUrl =
-      'https://docs.projectcatalyst.io/catalyst-tools/catalyst-app/create-and-submit-proposals-in-workspace/using-images';
+      '$_catalystApp/create-and-submit-proposals-in-workspace/using-images';
   static const joinNewsletterUrl = 'https://mpc.projectcatalyst.io/newsletter-signup';
-  static const unlockAccountUrl =
-      'https://docs.projectcatalyst.io/catalyst-tools/catalyst-app/my-account#lock-unlock-account';
-  static const confirmSeedPhraseUrl =
-      'https://docs.projectcatalyst.io/catalyst-tools/catalyst-app/getting-started#confirm-seed-phrase';
+  static const unlockAccountUrl = '$_catalystApp/my-account#lock-unlock-account';
+  static const confirmSeedPhraseUrl = '$_catalystApp/getting-started#confirm-seed-phrase';
+  static const campaignTimeline = '$_docs/current-fund/fund-basics/fund-timeline';
 
   static String cardanoScanStakeAddressUrl(ShelleyAddress stakeAddress) {
     switch (stakeAddress.network) {
