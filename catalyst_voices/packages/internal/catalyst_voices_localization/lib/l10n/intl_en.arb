@@ -583,6 +583,10 @@
   "@walletLinkTransactionTitle": {
     "description": "A title in link wallet flow on transaction screen."
   },
+  "walletLinkTransactionSubtitle": "To complete this action, you'll submit a signed transaction to Cardano. There will be an ADA transaction fee.",
+  "@walletLinkTransactionSubtitle": {
+    "description": "A subtitle in link wallet flow on transaction screen."
+  },
   "walletLinkTransactionAccountCompletion": "Account completion for Catalyst",
   "@walletLinkTransactionAccountCompletion": {
     "description": "A subtitle in link wallet flow on transaction screen."
@@ -603,6 +607,10 @@
   "walletLinkTransactionChangeRoles": "Change role setup",
   "@walletLinkTransactionChangeRoles": {
     "description": "The secondary button label to change the roles on transaction summary screen."
+  },
+  "walletLinkTransactionBackToWalletSelection": "Back to Wallet Selection",
+  "@walletLinkTransactionBackToWalletSelection": {
+    "description": "The primary button label to go back to wallet selection on transaction summary screen."
   },
   "walletLinkTransactionRoleItem": "1 {role} registration",
   "@walletLinkTransactionRoleItem": {
@@ -1852,6 +1860,10 @@
   "proposalEditorValidationExitDialogMessage": "When you exit, any unsaved changes will be lost.",
   "@proposalEditorValidationExitDialogMessage": {
     "description": "Message in a dialog asking if the user wants to leave the form issue mode."
+  },
+  "proposalEditorValidationExitIssueMode": "Exit Issue Mode",
+  "@proposalEditorValidationExitIssueMode": {
+    "description": "Button text for exiting the proposal editor validation snackbar."
   },
   "proposalEditorDeleteDialogTitle": "Delete Proposal?",
   "@proposalEditorDeleteDialogTitle": {
