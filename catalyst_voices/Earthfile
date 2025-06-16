@@ -122,16 +122,16 @@ build-web:
     SAVE ARTIFACT web
 
 package:
-    FROM nginx:alpine3.20-slim
+    FROM caddy:v2.10
     ARG tag='latest'
 
     COPY +build-web/web /app
 
     # Note this is only used for local development, a different nginx.conf is
     # used during deployment. See blueprint.cue.
-    COPY ./nginx.conf /etc/nginx/nginx.conf
+    #COPY ./nginx.conf /etc/nginx/nginx.conf
 
-    EXPOSE 80
+    EXPOSE 8080
 
     SAVE IMAGE voices-frontend:$tag
 
