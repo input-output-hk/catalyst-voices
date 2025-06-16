@@ -1857,6 +1857,10 @@
   "@proposalEditorValidationExitDialogMessage": {
     "description": "Message in a dialog asking if the user wants to leave the form issue mode."
   },
+  "proposalEditorValidationExitIssueMode": "Exit Issue Mode",
+  "@proposalEditorValidationExitIssueMode": {
+    "description": "Button text for exiting the proposal editor validation snackbar."
+  },
   "proposalEditorDeleteDialogTitle": "Delete Proposal?",
   "@proposalEditorDeleteDialogTitle": {
     "description": "A title for the dialog to confirm proposal deletion."
