@@ -30,6 +30,7 @@ void main() {
         'PUT',
         Uri.parse('https://example.com/api/v1/document'),
         Uri.parse('https://example.com/'),
+        headers: {'content-type': 'application/cbor'},
       );
 
       when(() => cborConverter.convertRequest(any())).thenAnswer((_) => Future.value(request));
@@ -45,6 +46,7 @@ void main() {
         'GET',
         Uri.parse('https://example.com/api/v1/other'),
         Uri.parse('https://example.com/'),
+        headers: {'content-type': 'application/json'},
       );
 
       when(() => jsonConverter.convertRequest(any())).thenAnswer((_) => Future.value(request));
@@ -64,6 +66,7 @@ void main() {
 
       final baseResponse = MockBaseResponse();
       final response = MockResponse<void>();
+      when(() => response.headers).thenReturn({'content-type': 'application/cbor'});
       when(() => response.base).thenReturn(baseResponse);
       when(() => baseResponse.request).thenReturn(request);
       when(() => cborConverter.convertResponse<void, void>(response)).thenReturn(response);
@@ -83,6 +86,7 @@ void main() {
 
       final baseResponse = MockBaseResponse();
       final response = MockResponse<void>();
+      when(() => response.headers).thenReturn({'content-type': 'application/json'});
       when(() => response.base).thenReturn(baseResponse);
       when(() => baseResponse.request).thenReturn(request);
       when(() => jsonConverter.convertResponse<void, void>(response)).thenReturn(response);

@@ -19,6 +19,7 @@ targets:
           use_path_for_request_names: true
           additional_headers:
             - "Authorization"
+            - "Content-Type"
           response_override_value_map:
             - url: /api/v1/document/index
               method: post
