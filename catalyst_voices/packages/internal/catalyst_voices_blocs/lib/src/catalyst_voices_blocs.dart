@@ -1,4 +1,5 @@
 export 'account/account.dart';
+export 'account/email/account_email.dart';
 export 'admin_tools/admin_tools.dart';
 export 'brand/brand.dart';
 export 'campaign/campaign_builder/campaign_builder.dart';

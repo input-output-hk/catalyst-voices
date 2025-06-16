@@ -101,7 +101,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     return super.close();
   }
 
-  Future<bool> isAccountEmailVerified() {
+  Future<bool> isAccountEmailVerified() async {
     return _userService.isActiveAccountPubliclyVerified();
   }
 
@@ -480,6 +480,11 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
           isLatest: index == proposalData.versions.length - 1,
         );
       }).toList();
+      if (versions.length == 1 && versions.first.number == 1 && proposalData.publish.isLocal) {
+        if (_userService.user.activeAccount?.email?.isNotEmpty ?? false) {
+          emitSignal(const NewProposalAndEmailNotVerifiedSignal());
+        }
+      }
       final categoryId = proposalData.categoryId;
       final category = await _campaignService.getCategory(categoryId);
 

@@ -58,7 +58,8 @@ final class UserRepositoryImpl implements UserRepository {
   Future<AccountPublicStatus> getAccountPublicStatus() {
     return _getReviewsCatalystIDPublic()
         .then((value) => value?.status?.toModel())
-        .then((value) => value ?? AccountPublicStatus.notSetup);
+        .then((value) => value ?? AccountPublicStatus.notSetup)
+        .onError((_, __) => AccountPublicStatus.unknown);
   }
 
   @override
