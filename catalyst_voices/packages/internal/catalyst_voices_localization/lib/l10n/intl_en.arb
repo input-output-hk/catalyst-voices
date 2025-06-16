@@ -3135,7 +3135,7 @@
   "@errorUuidInvalidFormat": {
     "description": "Error message when given input does not match uuid format"
   },
-  "errorUuidVersionMissMatch": "uuid version miss match. Got {version} but requires {requiredVersion}",
+  "errorUuidVersionMissMatch": "Uuid version miss match. Got {version} but requires {requiredVersion}",
   "@errorUuidVersionMissMatch": {
     "description": "Error message when given is valid uuid but in different version",
     "placeholders": {

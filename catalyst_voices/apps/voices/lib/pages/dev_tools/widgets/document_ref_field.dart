@@ -1,9 +1,8 @@
+import 'package:catalyst_voices/widgets/common/affix_decorator.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart' as vm;
 import 'package:flutter/material.dart';
-
-const _uuidVersion = 7;
 
 final class DocumentRefController extends ValueNotifier<DocumentRef?> {
   DocumentRefController([super.value]);
@@ -11,12 +10,14 @@ final class DocumentRefController extends ValueNotifier<DocumentRef?> {
 
 class DocumentRefField extends StatefulWidget {
   final DocumentRefController? controller;
-  final ValueChanged<DocumentRef>? onChange;
+  final ValueChanged<DocumentRef?>? onChange;
+  final ValueChanged<DocumentRef?>? onSubmitted;
 
   const DocumentRefField({
     super.key,
     this.controller,
     this.onChange,
+    this.onSubmitted,
   });
 
   @override
@@ -29,21 +30,65 @@ class _DocumentRefFieldState extends State<DocumentRefField> {
   late final TextEditingController _verController;
   late final ValueNotifier<bool> _isLocalController;
 
-  vm.Uuid _id = const vm.Uuid.pure(version: _uuidVersion);
-  vm.Uuid _ver = const vm.Uuid.pure(version: _uuidVersion);
+  vm.Uuid _id = const vm.UuidV7.pure();
+  vm.Uuid _ver = const vm.UuidV7Optional.pure();
+  bool _isLocal = true;
 
   DocumentRefController get _effectiveController {
     return widget.controller ?? (_controller = DocumentRefController());
   }
 
+  bool get _isValid => _id.isValid && _ver.isValid;
+
+  DocumentRef? get _ref => _isValid
+      ? DocumentRef.build(
+          id: _id.value,
+          version: _ver.value,
+          isDraft: _isLocal,
+        )
+      : null;
+
   @override
   Widget build(BuildContext context) {
-    return Row(
-      spacing: 8,
-      children: [
-        _IdTextField(),
-        _VerTextField(),
-      ],
+    return FocusTraversalGroup(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        spacing: 4,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            spacing: 8,
+            children: [
+              Expanded(
+                child: _IdTextField(
+                  controller: _idController,
+                  error: _id.displayError,
+                ),
+              ),
+              Expanded(
+                child: _VerTextField(
+                  controller: _verController,
+                  error: _ver.displayError,
+                  onSubmitted: (value) {
+                    _syncRefWithParts(ver: value);
+                    widget.onSubmitted?.call(_effectiveController.value);
+                  },
+                ),
+              ),
+            ],
+          ),
+          AffixDecorator(
+            prefix: const Text('Is Local:'),
+            child: VoicesSwitch(
+              value: _isLocal,
+              onChanged: (value) {
+                _isLocalController.value = value;
+              },
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -52,8 +97,10 @@ class _DocumentRefFieldState extends State<DocumentRefField> {
     super.didUpdateWidget(oldWidget);
 
     if (widget.controller != oldWidget.controller) {
-      (oldWidget.controller ?? _controller)?.removeListener(_onRefChanged);
-      (widget.controller ?? _controller)?.addListener(_onRefChanged);
+      (oldWidget.controller ?? _controller)?.removeListener(_onRefControllerChanged);
+      (widget.controller ?? _controller)?.addListener(_onRefControllerChanged);
+
+      _syncPartsWithRef(_effectiveController.value);
     }
   }
 
@@ -73,47 +120,109 @@ class _DocumentRefFieldState extends State<DocumentRefField> {
   void initState() {
     super.initState();
 
-    final controller = _effectiveController..addListener(_onRefChanged);
+    final controller = _effectiveController..addListener(_onRefControllerChanged);
     final ref = controller.value;
 
-    _id = vm.Uuid.pure(value: ref?.id ?? '', version: _uuidVersion);
-    _ver = vm.Uuid.pure(value: ref?.version ?? '', version: _uuidVersion);
+    _id = vm.UuidV7.pure(value: ref?.id ?? '');
+    _ver = vm.UuidV7Optional.pure(value: ref?.version ?? '');
+    _isLocal = ref is DraftRef;
 
-    _idController = TextEditingController(text: _id.value)..addListener(_syncParts);
-    _verController = TextEditingController(text: _ver.value)..addListener(_syncParts);
-    _isLocalController = ValueNotifier(ref is DraftRef)..addListener(_syncParts);
+    _idController = TextEditingController(text: _id.value)..addListener(_onPartControllerChanged);
+    _verController = TextEditingController(text: _ver.value)..addListener(_onPartControllerChanged);
+    _isLocalController = ValueNotifier(_isLocal)..addListener(_onPartControllerChanged);
   }
 
-  void _onRefChanged() {}
+  void _onPartControllerChanged() {
+    setState(_syncRefWithParts);
+  }
 
-  void _syncParts() {
-    final id = _idController.text;
-    final ver = _verController.text;
-    final isLocal = _isLocalController.value;
+  void _onRefControllerChanged() {
+    setState(() {
+      _syncPartsWithRef(_effectiveController.value);
+    });
+  }
+
+  void _syncPartsWithRef(DocumentRef? ref) {
+    _id = vm.UuidV7.pure(value: ref?.id ?? '');
+    _ver = vm.UuidV7Optional.pure(value: ref?.version ?? '');
+    _isLocal = ref is DraftRef;
+
+    _idController.removeListener(_onPartControllerChanged);
+    _verController.removeListener(_onPartControllerChanged);
+    _isLocalController.removeListener(_onPartControllerChanged);
+
+    _idController.text = _id.value;
+    _verController.text = _ver.value;
+    _isLocalController.value = _isLocal;
+
+    _idController.addListener(_onPartControllerChanged);
+    _verController.addListener(_onPartControllerChanged);
+    _isLocalController.addListener(_onPartControllerChanged);
+  }
+
+  void _syncRefWithParts({
+    vm.Uuid? id,
+    vm.Uuid? ver,
+    bool? isLocal,
+  }) {
+    _id = id ??= vm.UuidV7.dirty(value: _idController.text);
+    _ver = ver ??= vm.UuidV7Optional.dirty(value: _verController.text);
+    _isLocal = isLocal ??= _isLocalController.value;
+
+    final ref = _ref;
+
+    _effectiveController
+      ..removeListener(_onRefControllerChanged)
+      ..value = ref
+      ..addListener(_onRefControllerChanged);
   }
 }
 
 class _IdTextField extends StatelessWidget {
-  const _IdTextField();
+  final vm.LocalizedException? error;
+  final TextEditingController controller;
+
+  const _IdTextField({
+    this.error,
+    required this.controller,
+  });
 
   @override
   Widget build(BuildContext context) {
     return VoicesUuidTextField(
-      onFieldSubmitted: (value) {
-        //
-      },
+      controller: controller,
+      decoration: VoicesTextFieldDecoration(
+        labelText: 'ID',
+        hintText: 'UUID-v7',
+        errorText: error?.message(context),
+      ),
+      onFieldSubmitted: (_) => FocusScope.of(context).nextFocus(),
     );
   }
 }
 
 class _VerTextField extends StatelessWidget {
-  const _VerTextField();
+  final vm.LocalizedException? error;
+  final TextEditingController controller;
+  final ValueChanged<vm.UuidV7Optional> onSubmitted;
+
+  const _VerTextField({
+    this.error,
+    required this.controller,
+    required this.onSubmitted,
+  });
 
   @override
   Widget build(BuildContext context) {
     return VoicesUuidTextField(
+      controller: controller,
+      decoration: VoicesTextFieldDecoration(
+        labelText: 'Ver',
+        hintText: 'UUID-v7',
+        errorText: error?.message(context),
+      ),
       onFieldSubmitted: (value) {
-        //
+        onSubmitted(vm.UuidV7Optional.dirty(value: value));
       },
     );
   }
