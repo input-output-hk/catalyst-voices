@@ -30,8 +30,8 @@ base class Uuid extends FormzInput<String, LocalizedException> {
       return null;
     }
 
-    if (!UuidValidation.isValidUUID(fromString: value) &&
-        UuidValidation.isValidUUID(fromString: value, noDashes: true)) {
+    if (!(UuidValidation.isValidUUID(fromString: value) ||
+        UuidValidation.isValidUUID(fromString: value, noDashes: true))) {
       return const UuidValidationFormatException();
     }
 

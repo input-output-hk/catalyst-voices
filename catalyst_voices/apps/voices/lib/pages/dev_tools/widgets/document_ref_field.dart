@@ -1,7 +1,7 @@
 import 'package:catalyst_voices/widgets/common/affix_decorator.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart' as vm;
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 final class DocumentRefController extends ValueNotifier<DocumentRef?> {
@@ -30,8 +30,8 @@ class _DocumentRefFieldState extends State<DocumentRefField> {
   late final TextEditingController _verController;
   late final ValueNotifier<bool> _isLocalController;
 
-  vm.Uuid _id = const vm.UuidV7.pure();
-  vm.Uuid _ver = const vm.UuidV7Optional.pure();
+  Uuid _id = const UuidV7.pure();
+  Uuid _ver = const UuidV7Optional.pure();
   bool _isLocal = true;
 
   DocumentRefController get _effectiveController {
@@ -123,8 +123,8 @@ class _DocumentRefFieldState extends State<DocumentRefField> {
     final controller = _effectiveController..addListener(_onRefControllerChanged);
     final ref = controller.value;
 
-    _id = vm.UuidV7.pure(value: ref?.id ?? '');
-    _ver = vm.UuidV7Optional.pure(value: ref?.version ?? '');
+    _id = UuidV7.pure(value: ref?.id ?? '');
+    _ver = UuidV7Optional.pure(value: ref?.version ?? '');
     _isLocal = ref is DraftRef;
 
     _idController = TextEditingController(text: _id.value)..addListener(_onPartControllerChanged);
@@ -143,8 +143,8 @@ class _DocumentRefFieldState extends State<DocumentRefField> {
   }
 
   void _syncPartsWithRef(DocumentRef? ref) {
-    _id = vm.UuidV7.pure(value: ref?.id ?? '');
-    _ver = vm.UuidV7Optional.pure(value: ref?.version ?? '');
+    _id = UuidV7.pure(value: ref?.id ?? '');
+    _ver = UuidV7Optional.pure(value: ref?.version ?? '');
     _isLocal = ref is DraftRef;
 
     _idController.removeListener(_onPartControllerChanged);
@@ -161,12 +161,12 @@ class _DocumentRefFieldState extends State<DocumentRefField> {
   }
 
   void _syncRefWithParts({
-    vm.Uuid? id,
-    vm.Uuid? ver,
+    Uuid? id,
+    Uuid? ver,
     bool? isLocal,
   }) {
-    _id = id ??= vm.UuidV7.dirty(value: _idController.text);
-    _ver = ver ??= vm.UuidV7Optional.dirty(value: _verController.text);
+    _id = id ??= UuidV7.dirty(value: _idController.text);
+    _ver = ver ??= UuidV7Optional.dirty(value: _verController.text);
     _isLocal = isLocal ??= _isLocalController.value;
 
     final ref = _ref;
@@ -179,7 +179,7 @@ class _DocumentRefFieldState extends State<DocumentRefField> {
 }
 
 class _IdTextField extends StatelessWidget {
-  final vm.LocalizedException? error;
+  final LocalizedException? error;
   final TextEditingController controller;
 
   const _IdTextField({
@@ -202,9 +202,9 @@ class _IdTextField extends StatelessWidget {
 }
 
 class _VerTextField extends StatelessWidget {
-  final vm.LocalizedException? error;
+  final LocalizedException? error;
   final TextEditingController controller;
-  final ValueChanged<vm.UuidV7Optional> onSubmitted;
+  final ValueChanged<UuidV7Optional> onSubmitted;
 
   const _VerTextField({
     this.error,
@@ -222,7 +222,7 @@ class _VerTextField extends StatelessWidget {
         errorText: error?.message(context),
       ),
       onFieldSubmitted: (value) {
-        onSubmitted(vm.UuidV7Optional.dirty(value: value));
+        onSubmitted(UuidV7Optional.dirty(value: value));
       },
     );
   }
