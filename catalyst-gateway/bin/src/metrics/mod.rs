@@ -21,8 +21,3 @@ pub(crate) fn init_prometheus() -> Registry {
 
     default_registry().clone()
 }
-
-/// Updates metrics to current values.
-pub(crate) fn metrics_updater_fn() {
-    rbac_cache::update();
-}

@@ -27,7 +27,14 @@ pub(crate) fn init_metrics_reporter() {
     let api_host_names = Settings::api_host_names().join(",");
     let service_id = Settings::service_id();
     let network = Settings::cardano_network();
-    let network_idx = network as usize;
+
+    // TODO: remove this index mapper as `Network` in newer versions have its own index, so
+    // use that instead
+    let network_idx = match network {
+        Network::Mainnet => 0,
+        Network::Preprod => 1,
+        Network::Preview => 2,
+    };
 
     thread::spawn(move || {
         loop {
