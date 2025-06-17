@@ -38,7 +38,8 @@ pub(crate) fn set_to_started() {
 pub(crate) fn condition_for_started() -> bool {
     let event_db = event_db_is_live();
     let index_db = index_db_is_live();
-    let follower = follower_has_first_reached_tip();
+    let follower =
+        live_follower_has_first_reached_tip() && immutable_follower_has_first_reached_tip();
     debug!("Checking if service has started. Event DB: {event_db}, Index DB: {index_db}, Follower: {follower}");
     event_db && index_db && follower
 }
@@ -67,12 +68,18 @@ pub(crate) fn set_index_db_liveness(flag: bool) {
     LIVE_INDEX_DB.store(flag, Release);
 }
 
-/// Returns whether the Chain Follower has reached Tip or not.
+/// Returns whether the Chain Follower has reached Immutable Tip or not.
 ///
-/// Gets the stored value from `INITIAL_FOLLOWER_TIP_REACHED` flag.
-pub(crate) fn follower_has_first_reached_tip() -> bool {
+/// Gets the stored value from `INITIAL_IMMUTABLE_FOLLOWER_TIP_REACHED` flag.
+pub(crate) fn immutable_follower_has_first_reached_tip() -> bool {
     INITIAL_IMMUTABLE_FOLLOWER_TIP_REACHED.load(Acquire)
-        && INITIAL_LIVE_FOLLOWER_TIP_REACHED.load(Acquire)
+}
+
+/// Returns whether the Chain Follower has reached Live Tip or not.
+///
+/// Gets the stored value from `INITIAL_LIVE_FOLLOWER_TIP_REACHED` flag.
+pub(crate) fn live_follower_has_first_reached_tip() -> bool {
+    INITIAL_LIVE_FOLLOWER_TIP_REACHED.load(Acquire)
 }
 
 /// Set the `INITIAL_IMMUTABLE_FOLLOWER_TIP_REACHED` as `true`.
