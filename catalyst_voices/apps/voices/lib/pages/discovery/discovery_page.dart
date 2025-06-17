@@ -8,7 +8,7 @@ import 'package:catalyst_voices/pages/discovery/sections/stay_involved.dart';
 import 'package:catalyst_voices/pages/discovery/state_selectors/campaign_categories_state_selector.dart';
 import 'package:catalyst_voices/pages/discovery/state_selectors/current_campaign_selector.dart';
 import 'package:catalyst_voices/pages/discovery/state_selectors/most_recent_proposals_selector.dart';
-import 'package:catalyst_voices/widgets/banner/email_need_verification_banner.dart';
+import 'package:catalyst_voices/widgets/banner/widgets/email_need_verification_banner.dart';
 import 'package:catalyst_voices/widgets/common/infrastructure/voices_wide_screen_constrained.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:flutter/material.dart';

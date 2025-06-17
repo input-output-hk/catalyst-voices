@@ -77,8 +77,8 @@ class _AppState extends State<App> {
       BlocProvider<DevToolsBloc>(
         create: (_) => Dependencies.instance.get<DevToolsBloc>(),
       ),
-      BlocProvider<AccountEmailCubit>(
-        create: (_) => Dependencies.instance.get<AccountEmailCubit>(),
+      BlocProvider<PublicProfileEmailStatusCubit>(
+        create: (_) => Dependencies.instance.get<PublicProfileEmailStatusCubit>(),
       ),
     ];
   }
