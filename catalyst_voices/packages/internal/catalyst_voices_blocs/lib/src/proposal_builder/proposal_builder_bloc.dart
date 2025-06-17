@@ -103,7 +103,11 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
   }
 
   Future<bool> isAccountEmailVerified() async {
-    return _userService.isActiveAccountPubliclyVerified();
+    try {
+      return _userService.isActiveAccountPubliclyVerified();
+    } catch (e) {
+      return false;
+    }
   }
 
   bool validate(ProposalBuilderValidationOrigin origin) {
@@ -485,7 +489,9 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
           isLatest: index == proposalData.versions.length - 1,
         );
       }).toList();
-      if (versions.length == 1 && versions.first.number == 1 && proposalData.publish.isLocal) {
+      if (versions.length == 1 &&
+          versions.first.number == DocumentVersion.firstNumber &&
+          proposalData.publish.isLocal) {
         if (_userService.user.activeAccount?.email?.isNotEmpty ?? false) {
           emitSignal(const NewProposalAndEmailNotVerifiedSignal());
         }
@@ -834,95 +840,105 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     RequestPublishProposalEvent event,
     Emitter<ProposalBuilderState> emit,
   ) async {
-    if (!await isAccountEmailVerified()) {
-      emitSignal(const EmailNotVerifiedProposalBuilderSignal());
-      return;
+    try {
+      emit(state.copyWith(isChanging: true));
+      if (!await isAccountEmailVerified()) {
+        emitSignal(const EmailNotVerifiedProposalBuilderSignal());
+        return;
+      }
+
+      if (emit.isDone) {
+        return;
+      }
+
+      if (!validate(ProposalBuilderValidationOrigin.shareDraft)) {
+        return;
+      }
+
+      final proposalTitle = state.proposalTitle;
+      final nextIteration = state.metadata.latestVersion?.number ?? DocumentVersion.firstNumber;
+
+      // if it's local draft and the first version then
+      // it should be shown as local which corresponds to null
+      final currentIteration =
+          _isLocal(state.metadata.publish, nextIteration) ? null : nextIteration - 1;
+
+      emitSignal(
+        ShowPublishConfirmationSignal(
+          proposalTitle: proposalTitle,
+          currentIteration: currentIteration,
+          nextIteration: nextIteration,
+        ),
+      );
+    } finally {
+      emit(state.copyWith(isChanging: false));
     }
-
-    if (emit.isDone) {
-      return;
-    }
-
-    if (!validate(ProposalBuilderValidationOrigin.shareDraft)) {
-      return;
-    }
-
-    final proposalTitle = state.proposalTitle;
-    final nextIteration = state.metadata.latestVersion?.number ?? DocumentVersion.firstNumber;
-
-    // if it's local draft and the first version then
-    // it should be shown as local which corresponds to null
-    final currentIteration =
-        _isLocal(state.metadata.publish, nextIteration) ? null : nextIteration - 1;
-
-    emitSignal(
-      ShowPublishConfirmationSignal(
-        proposalTitle: proposalTitle,
-        currentIteration: currentIteration,
-        nextIteration: nextIteration,
-      ),
-    );
   }
 
   Future<void> _requestSubmitProposal(
     RequestSubmitProposalEvent event,
     Emitter<ProposalBuilderState> emit,
   ) async {
-    if (state.isMaxProposalsLimitReached) {
-      final proposalSubmissionCloseDate = await _getProposalSubmissionCloseDate();
-      final count = await _proposalService.watchUserProposalsCount().first;
+    try {
+      emit(state.copyWith(isChanging: true));
+      if (state.isMaxProposalsLimitReached) {
+        final proposalSubmissionCloseDate = await _getProposalSubmissionCloseDate();
+        final count = await _proposalService.watchUserProposalsCount().first;
 
-      if (proposalSubmissionCloseDate != null) {
-        final signal = MaxProposalsLimitReachedSignal(
-          proposalSubmissionCloseDate: proposalSubmissionCloseDate,
-          currentSubmissions: count.finals,
-          maxSubmissions: ProposalDocument.maxSubmittedProposalsPerUser,
-        );
+        if (proposalSubmissionCloseDate != null) {
+          final signal = MaxProposalsLimitReachedSignal(
+            proposalSubmissionCloseDate: proposalSubmissionCloseDate,
+            currentSubmissions: count.finals,
+            maxSubmissions: ProposalDocument.maxSubmittedProposalsPerUser,
+          );
 
-        emitSignal(signal);
+          emitSignal(signal);
+        }
+
+        return;
       }
 
-      return;
+      if (!await isAccountEmailVerified()) {
+        emitSignal(const EmailNotVerifiedProposalBuilderSignal());
+        return;
+      }
+
+      if (!validate(ProposalBuilderValidationOrigin.submitForReview)) {
+        return;
+      }
+
+      if (emit.isDone) {
+        return;
+      }
+
+      final proposalTitle = state.proposalTitle;
+      final latestVersion = state.metadata.latestVersion;
+      final nextIteration = latestVersion?.number ?? DocumentVersion.firstNumber;
+
+      final int? currentIteration;
+      if (_isLocal(state.metadata.publish, nextIteration)) {
+        // if it's local draft and the first version then
+        // it should be shown as local which corresponds to null
+        currentIteration = null;
+      } else if (state.metadata.publish == ProposalPublish.localDraft) {
+        // current iteration is a local draft
+        // so next iteration must increment the version
+        currentIteration = nextIteration - 1;
+      } else {
+        // only changing status of the iteration, no need to increment the version
+        currentIteration = nextIteration;
+      }
+
+      emitSignal(
+        ShowSubmitConfirmationSignal(
+          proposalTitle: proposalTitle,
+          currentIteration: currentIteration,
+          nextIteration: nextIteration,
+        ),
+      );
+    } finally {
+      emit(state.copyWith(isChanging: false));
     }
-
-    if (!await isAccountEmailVerified()) {
-      emitSignal(const EmailNotVerifiedProposalBuilderSignal());
-      return;
-    }
-
-    if (!validate(ProposalBuilderValidationOrigin.submitForReview)) {
-      return;
-    }
-
-    if (emit.isDone) {
-      return;
-    }
-
-    final proposalTitle = state.proposalTitle;
-    final latestVersion = state.metadata.latestVersion;
-    final nextIteration = latestVersion?.number ?? DocumentVersion.firstNumber;
-
-    final int? currentIteration;
-    if (_isLocal(state.metadata.publish, nextIteration)) {
-      // if it's local draft and the first version then
-      // it should be shown as local which corresponds to null
-      currentIteration = null;
-    } else if (state.metadata.publish == ProposalPublish.localDraft) {
-      // current iteration is a local draft
-      // so next iteration must increment the version
-      currentIteration = nextIteration - 1;
-    } else {
-      // only changing status of the iteration, no need to increment the version
-      currentIteration = nextIteration;
-    }
-
-    emitSignal(
-      ShowSubmitConfirmationSignal(
-        proposalTitle: proposalTitle,
-        currentIteration: currentIteration,
-        nextIteration: nextIteration,
-      ),
-    );
   }
 
   Future<void> _saveDocumentLocally(

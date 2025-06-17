@@ -142,6 +142,8 @@ final class UserRepositoryImpl implements UserRepository {
         .successBodyOrThrow()
         .then<CatalystIDPublic?>((value) => value)
         .onError<NotFoundException>((error, stackTrace) => null)
+        // Review module returns 401 Registration not found for the auth token
+        .onError<UnauthorizedException>((error, stackTrace) => null)
         .then((value) => value?.toModel());
   }
 
