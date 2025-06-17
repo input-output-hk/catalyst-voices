@@ -3130,5 +3130,13 @@
   "importCatalystAppUnavailableAfterDeadline": "IMPORTANT: The Catalyst app won’t be accessible after the deadline.",
   "@importCatalystAppUnavailableAfterDeadline": {
     "description": "note for user that app will not be available after submission deadline"
+  },
+  "expandableTextLess": "Show less",
+  "@expandableTextLess": {
+    "description": "When text is too long and you can collapse it to eg. 2 lines"
+  },
+  "expandableTextMore": "Show more",
+  "@expandableTextMore": {
+    "description": "When text is too long and you can display it fully"
   }
 }
