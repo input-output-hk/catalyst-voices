@@ -128,7 +128,7 @@ package:
     COPY +build-web/web /app
 
     # Note this is only used for local development, a different Caddyfile is
-    # used during deployment. See blueprint.cue.
+    # used during deployment. See the blueprint.cue file.
     COPY ./Caddyfile /etc/caddy/Caddyfile
 
     EXPOSE 8080
