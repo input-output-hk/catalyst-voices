@@ -8,9 +8,10 @@ import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart'
-    show ProposalBuilderMenuItemData, ProposalMenuItemAction;
+    show DocumentVersion, ProposalBuilderMenuItemData, ProposalMenuItemAction;
 import 'package:flutter/material.dart';
 
 class ProposalBuilderStatusAction extends StatelessWidget {
@@ -140,7 +141,7 @@ class _PopupMenuButtonState extends State<_PopupMenuButton> {
     final action = await ForgetProposalDialog.show(
       context: context,
       title: title ?? '',
-      version: latestVersion ?? 1,
+      version: latestVersion ?? DocumentVersion.firstNumber,
       publish: publish,
     );
     if (action == null) return;
@@ -152,10 +153,6 @@ class _PopupMenuButtonState extends State<_PopupMenuButton> {
           context.read<ProposalBuilderBloc>().add(const ForgetProposalBuilderEvent());
         }
     }
-  }
-
-  bool _isLocal(ProposalPublish publish, int iteration) {
-    return publish == ProposalPublish.localDraft && iteration == DocumentVersion.firstNumber;
   }
 
   void _onSelected(ProposalMenuItemAction item) {
