@@ -33,12 +33,12 @@ class _EnvironmentCard extends StatelessWidget {
       children: [
         ValueText(name: const Text('Env'), value: Text(env?.type.name.capitalize() ?? '-')),
         ValueText(
-          name: const Text('GatewayUrl'),
-          value: Text(env?.type.appGatewayApi.toString() ?? '-'),
+          name: const Text('App'),
+          value: Text(env?.type.app.toString() ?? '-'),
         ),
         ValueText(
-          name: const Text('ReviewsUrl'),
-          value: Text(env?.type.appReviewsApi.toString() ?? '-'),
+          name: const Text('reviews'),
+          value: Text(env?.type.reviews.toString() ?? '-'),
         ),
       ],
     );
