@@ -291,14 +291,6 @@ class _ProposalBuilderBodyState extends State<_ProposalBuilderBody>
     }
   }
 
-  void _showForgetProposalSuccessDialog() {
-    CommonSnackbars.showForgetProposalSuccessDialog(context);
-
-    Router.neglect(context, () {
-      const WorkspaceRoute().replace(context);
-    });
-  }
-
   void _showEmailVerificationNeededSnackbar() {
     VoicesSnackBar(
       type: VoicesSnackBarType.error,
@@ -319,6 +311,14 @@ class _ProposalBuilderBodyState extends State<_ProposalBuilderBody>
         ),
       ],
     ).show(context);
+  }
+
+  void _showForgetProposalSuccessDialog() {
+    CommonSnackbars.showForgetProposalSuccessDialog(context);
+
+    Router.neglect(context, () {
+      const WorkspaceRoute().replace(context);
+    });
   }
 
   Future<void> _showProposalLimitReachedDialog(
