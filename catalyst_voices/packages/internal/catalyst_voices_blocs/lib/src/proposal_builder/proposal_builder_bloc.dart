@@ -512,12 +512,12 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
           isLatest: index == proposalData.versions.length - 1,
         );
       }).toList();
-      if (versions.length == 1 &&
-          versions.first.number == DocumentVersion.firstNumber &&
-          proposalData.publish.isLocal) {
-        if (_userService.user.activeAccount?.email?.isNotEmpty ?? false) {
-          emitSignal(const NewProposalAndEmailNotVerifiedSignal());
-        }
+      final notVerifiedAccount =
+          !(_userService.user.activeAccount?.publicStatus.isVerified ?? false);
+      final firstVersion =
+          versions.length == 1 && versions.first.number == DocumentVersion.firstNumber;
+      if (firstVersion && proposalData.publish.isLocal && notVerifiedAccount) {
+        emitSignal(const NewProposalAndEmailNotVerifiedSignal());
       }
       final categoryId = proposalData.categoryId;
       final category = await _campaignService.getCategory(categoryId);
