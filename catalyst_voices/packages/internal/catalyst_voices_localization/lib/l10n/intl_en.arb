@@ -3141,7 +3141,7 @@
   },
   "goToMyAccountForEmailVerification": "Go to {destination} to verify it.",
   "@goToMyAccountForEmailVerification": {
-    "description": "Message used in banner for CTA to inform user to go to My Account to verify email",
+    "description": "Message used in banner for CTA to inform user to go to My Account to verify email"
   },
   "verifiedEmailNeededToPublishTitle": "A verified email is required to publish your proposal",
   "@verifiedEmailNeededToPublishTitle": {
