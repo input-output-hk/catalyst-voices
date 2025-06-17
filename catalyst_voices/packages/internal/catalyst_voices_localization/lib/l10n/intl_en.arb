@@ -565,21 +565,19 @@
       }
     }
   },
-  "walletLinkWalletDetailsNotice": "Wallet and role registrations require a minimal transaction fee. You can setup your default dApp connector wallet in your browser extension settings.",
+  "walletLinkWalletDetailsNotice": "To calculate voting power, Catalyst reads your wallet balance from the blockchain. ",
   "@walletLinkWalletDetailsNotice": {
-    "description": "A message in link wallet flow on wallet details screen when a user wallet doesn't have enough balance."
+    "description": "A message in link wallet flow on wallet details screen explaining why Catalyst reads user wallet balance."
   },
-  "walletLinkWalletDetailsNoticeTopUp": "Top up ADA",
-  "@walletLinkWalletDetailsNoticeTopUp": {
-    "description": "A message recommending the user to top up ADA in wallet link on wallet details screen."
-  },
-  "walletLinkWalletDetailsNoticeTopUpLink": "Link to top-up provider",
-  "@walletLinkWalletDetailsNoticeTopUpLink": {
-    "description": "A link to top-up provide when the user doesn't have enough balance on wallet link screen"
-  },
-  "walletLinkWalletDetailsHeadsUpText": "We only read your balance to calculate voting power — we can't access or use your wallet.",
-  "@walletLinkWalletDetailsHeadsUpText": {
-    "description": "A heads up content explaining that the app only reads wallet balance and cannot spend it."
+  "walletLinkWalletDetailsLowBalanceHeadsUpText": "Please ensure your Cardano wallet has at least {amount} ADA before continuing.",
+  "@walletLinkWalletDetailsLowBalanceHeadsUpText": {
+    "description": "A heads up content explaining that the user needs to have some ada for registration.",
+    "placeholders": {
+      "amount": {
+        "type": "double",
+        "format": "compact"
+      }
+    }
   },
   "walletLinkTransactionTitle": "Let's make sure everything looks right.",
   "@walletLinkTransactionTitle": {
@@ -636,7 +634,7 @@
       }
     }
   },
-  "registrationInsufficientBalance": "Insufficient balance, please top up your wallet.",
+  "registrationInsufficientBalance": "Transaction cannot proceed due to low wallet balance.",
   "@registrationInsufficientBalance": {
     "description": "Indicates an error when preparing a transaction has failed due to low wallet balance."
   },
@@ -785,6 +783,16 @@
   "@createProfileInstructionsMessage": {
     "description": "Information about account creation steps"
   },
+  "createProfileInstructionsNotice": "Please ensure your Cardano wallet has at least {amount} ADA before continuing.",
+  "@createProfileInstructionsNotice": {
+    "description": "Information about minimum wallet balance",
+    "placeholders": {
+      "amount": {
+        "type": "double",
+        "format": "compact"
+      }
+    }
+  },
   "createProfileInstructionsNext": "Create your profile now",
   "@createProfileInstructionsNext": {
     "description": "CTA to move to the next step in account creation"
@@ -793,17 +801,13 @@
   "@createProfileInstructionsEmailRequest": {
     "description": "Request to provide email address"
   },
-  "createProfileInstructionsEmailReason1": "We store email in a mutable database.",
+  "createProfileInstructionsEmailReason1": "Email is stored in Catalyst database.",
   "@createProfileInstructionsEmailReason1": {
     "description": "Reason to store email in a mutable database"
   },
-  "createProfileInstructionsEmailReason2": "We do not store your email on-chain ever.",
+  "createProfileInstructionsEmailReason2": "Email is never published on chain",
   "@createProfileInstructionsEmailReason2": {
     "description": "Reason to not store email on-chain"
-  },
-  "createProfileInstructionsEmailReason3": "We only use email for communication about Catalyst.",
-  "@createProfileInstructionsEmailReason3": {
-    "description": "Reason to only use email for communication"
   },
   "createProfileSetupTitle": "Setup your profile",
   "@createProfileSetupTitle": {
@@ -1205,10 +1209,6 @@
   "incorrectUploadDialogContent": "The Catalyst keychain that you entered or uploaded is incorrect, please try again.",
   "incorrectUploadDialogTryAgainButton": "Try again",
   "finishAccountCreation": "Finish account creation",
-  "connectDifferentWallet": "Connect a different wallet",
-  "@connectDifferentWallet": {
-    "description": "A button label to connect a different wallet in wallet detail panel."
-  },
   "reviewRegistrationTransaction": "Review registration transaction",
   "@reviewRegistrationTransaction": {
     "description": "A button label to review the registration transaction in wallet detail panel."
@@ -2620,9 +2620,15 @@
   "@goodToKnow": {
     "description": "Text to show when some tip will be presented to user"
   },
-  "registrationTransactionFeeDescription": "The creation of a Catalyst account costs, a transaction fee of (0,21 ADA), be sure your wallet has a minimum of 1 ADA.",
+  "registrationTransactionFeeDescription": "The creation of a Catalyst account costs, a transaction fee of (0,21 ADA), be sure your wallet has a minimum of {amount} ADA.",
   "@registrationTransactionFeeDescription": {
-    "description": "Description for the registration transaction fee"
+    "description": "Description for the registration transaction fee",
+    "placeholders": {
+      "amount": {
+        "type": "double",
+        "format": "compact"
+      }
+    }
   },
   "eternlWallet": "Eternl Wallet",
   "@eternlWallet": {

@@ -5,6 +5,7 @@ import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 
 class InstructionsPanel extends StatelessWidget {
@@ -46,7 +47,6 @@ class _EmailRequestCard extends StatelessWidget {
         items: [
           context.l10n.createProfileInstructionsEmailReason1,
           context.l10n.createProfileInstructionsEmailReason2,
-          context.l10n.createProfileInstructionsEmailReason3,
         ],
         spacing: 0,
       ),
@@ -99,7 +99,42 @@ class _PanelMainMessage extends StatelessWidget {
 
     return RegistrationStageMessage(
       title: Text(l10n.createProfileInstructionsTitle),
-      subtitle: Text(l10n.createProfileInstructionsMessage),
+      subtitle: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        spacing: 10,
+        children: [
+          Text(l10n.createProfileInstructionsMessage),
+          const _WalletBalanceNotice(),
+        ],
+      ),
+    );
+  }
+}
+
+class _WalletBalanceNotice extends StatelessWidget {
+  const _WalletBalanceNotice();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          context.l10n.notice,
+          style: Theme.of(context).textTheme.labelSmall!.copyWith(
+                fontWeight: FontWeight.w800,
+              ),
+        ),
+        const SizedBox(height: 6),
+        Text(
+          context.l10n.createProfileInstructionsNotice(
+            CardanoWalletDetails.minAdaForRegistration.ada,
+          ),
+          style: Theme.of(context).textTheme.bodySmall,
+        ),
+      ],
     );
   }
 }
