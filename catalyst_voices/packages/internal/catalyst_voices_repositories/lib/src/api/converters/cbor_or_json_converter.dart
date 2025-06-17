@@ -1,6 +1,7 @@
 import 'dart:async';
 
-import 'package:catalyst_voices_repositories/src/api/converters/cbor_serializable_converter.dart';
+import 'package:catalyst_voices_repositories/src/common/content_types.dart';
+import 'package:catalyst_voices_repositories/src/common/http_headers.dart';
 import 'package:chopper/chopper.dart';
 import 'package:http/http.dart' as http;
 
@@ -44,9 +45,9 @@ class CborOrJsonDelegateConverter implements Converter {
   bool _isCborContentType(Map<String, String> headers) {
     final lowercaseHeaders =
         headers.map((key, value) => MapEntry(key.toLowerCase(), value.toLowerCase()));
-    final contentType = lowercaseHeaders[CborSerializableConverter.contentTypeHeader.toLowerCase()];
+    final contentType = lowercaseHeaders[HttpHeaders.contentType.toLowerCase()];
     return contentType != null &&
-        contentType.contains(CborSerializableConverter.applicationCbor.toLowerCase());
+        contentType.contains(ContentTypes.applicationCbor.toLowerCase());
   }
 
   bool _isCborRequest(http.BaseRequest request) {

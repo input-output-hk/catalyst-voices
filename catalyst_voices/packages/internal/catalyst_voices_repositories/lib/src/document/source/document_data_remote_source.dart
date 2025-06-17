@@ -1,7 +1,7 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_repositories/generated/api/cat_gateway.models.swagger.dart';
-import 'package:catalyst_voices_repositories/src/api/converters/cbor_serializable_converter.dart';
+import 'package:catalyst_voices_repositories/src/common/content_types.dart';
 import 'package:catalyst_voices_repositories/src/common/response_mapper.dart';
 import 'package:catalyst_voices_repositories/src/document/document_data_factory.dart';
 import 'package:catalyst_voices_repositories/src/dto/api/document_index_list_dto.dart';
@@ -100,7 +100,7 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
     await _api.gateway
         .apiGatewayV1DocumentPut(
           body: bytes,
-          contentType: CborSerializableConverter.applicationCbor,
+          contentType: ContentTypes.applicationCbor,
         )
         .successOrThrow();
   }

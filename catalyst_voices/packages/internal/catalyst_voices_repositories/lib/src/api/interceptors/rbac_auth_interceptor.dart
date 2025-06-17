@@ -87,7 +87,7 @@ final class RbacAuthInterceptor implements Interceptor {
 extension on Request {
   Request applyAuthToken(RbacToken token) {
     return applyHeader(
-      name: RbacAuthInterceptor._authHeaderName,
+      name: HttpHeaders.authorization,
       value: token.authHeader(),
     );
   }
