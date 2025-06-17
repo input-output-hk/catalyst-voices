@@ -1,6 +1,10 @@
 //! Metrics related to RBAC Registration Chain Caching analytics.
 
-use std::sync::atomic::{AtomicBool, Ordering};
+use std::{
+    sync::atomic::{AtomicBool, Ordering},
+    thread,
+    time::Duration,
+};
 
 use crate::{
     rbac_cache::{
@@ -73,27 +77,31 @@ pub(crate) fn init_metrics_reporter() {
             }
         }
     }));
-}
 
-/// Updates `MAX_CACHE_SIZE`, `CACHING_RBAC_ENTRIES`, and `CACHE_SIZE` metrics to current
-/// values.
-pub(crate) fn update() {
-    let api_host_names = Settings::api_host_names().join(",");
-    let service_id = Settings::service_id();
-    let network = Settings::cardano_network().to_string();
+    thread::spawn(move || {
+        loop {
+            {
+                let api_host_names = Settings::api_host_names().join(",");
+                let service_id = Settings::service_id();
+                let network = Settings::cardano_network().to_string();
 
-    let rbac_entries = RBAC_CACHE.rbac_entries();
+                let rbac_entries = RBAC_CACHE.rbac_entries();
 
-    reporter::MAX_CACHE_SIZE
-        .with_label_values(&[&api_host_names, service_id, &network])
-        .set(i64::try_from(Settings::rbac_cache_max_size()).unwrap_or(-1));
-    reporter::RBAC_CHAIN_ENTRIES
-        .with_label_values(&[&api_host_names, service_id, &network])
-        .set(i64::try_from(rbac_entries).unwrap_or(-1));
-    // TODO: add size approximation on storage caching when it's available
-    reporter::CACHE_SIZE
-        .with_label_values(&[&api_host_names, service_id, &network])
-        .set(0);
+                reporter::MAX_CACHE_SIZE
+                    .with_label_values(&[&api_host_names, service_id, &network])
+                    .set(i64::try_from(Settings::rbac_cache_max_size()).unwrap_or(-1));
+                reporter::RBAC_CHAIN_ENTRIES
+                    .with_label_values(&[&api_host_names, service_id, &network])
+                    .set(i64::try_from(rbac_entries).unwrap_or(-1));
+                // TODO: add size approximation on storage caching when it's available
+                reporter::CACHE_SIZE
+                    .with_label_values(&[&api_host_names, service_id, &network])
+                    .set(0);
+            }
+
+            thread::sleep(Duration::from_secs(1));
+        }
+    });
 }
 
 /// All the related RBAC Registration Chain Caching reporting metrics to the Prometheus
