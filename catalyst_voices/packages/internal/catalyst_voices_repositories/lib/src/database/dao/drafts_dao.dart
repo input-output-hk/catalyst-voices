@@ -19,6 +19,9 @@ abstract interface class DraftsDao {
   /// matching [ref] id.
   Future<int> count({DocumentRef? ref});
 
+  /// Clears table.
+  Future<int> deleteAll();
+
   /// Deletes a document draft with [ref].
   ///
   /// If [ref] is null then all drafts are deleted.
@@ -83,6 +86,9 @@ class DriftDraftsDao extends DatabaseAccessor<DriftCatalystDatabase>
       return drafts.count(where: (row) => _filterRef(row, ref)).getSingle();
     }
   }
+
+  @override
+  Future<int> deleteAll() => delete(drafts).go();
 
   @override
   Future<void> deleteWhere({DraftRef? ref}) async {
