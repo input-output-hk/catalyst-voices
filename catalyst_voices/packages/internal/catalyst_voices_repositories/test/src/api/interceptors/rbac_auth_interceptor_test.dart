@@ -1,6 +1,7 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/api/interceptors/rbac_auth_interceptor.dart';
 import 'package:catalyst_voices_repositories/src/auth/auth_token_provider.dart';
+import 'package:catalyst_voices_repositories/src/common/http_headers.dart';
 import 'package:catalyst_voices_repositories/src/common/rbac_token_ext.dart';
 import 'package:chopper/chopper.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -57,7 +58,7 @@ void main() {
       final captured = verify(() => chain.proceed(captureAny())).captured;
 
       expect(
-        (captured.single as Request).headers.containsKey(_authHeaderName),
+        (captured.single as Request).headers.containsKey(HttpHeaders.authorization),
         isTrue,
       );
     });
@@ -78,7 +79,7 @@ void main() {
       final captured = verify(() => chain.proceed(captureAny())).captured;
 
       expect(
-        (captured.single as Request).headers[_authHeaderName],
+        (captured.single as Request).headers[HttpHeaders.authorization],
         startsWith('Bearer'),
       );
     });
@@ -102,7 +103,7 @@ void main() {
       final captured = verify(() => chain.proceed(captureAny())).captured;
 
       expect(
-        (captured.single as Request).headers.containsKey(_authHeaderName),
+        (captured.single as Request).headers.containsKey(HttpHeaders.authorization),
         isFalse,
       );
     });
@@ -294,6 +295,5 @@ void main() {
   });
 }
 
-const _authHeaderName = 'Authorization';
 
 class _MockAuthTokenProvider extends Mock implements AuthTokenProvider {}

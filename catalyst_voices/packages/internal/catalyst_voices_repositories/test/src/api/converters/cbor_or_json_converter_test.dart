@@ -1,4 +1,6 @@
 import 'package:catalyst_voices_repositories/src/api/converters/cbor_or_json_converter.dart';
+import 'package:catalyst_voices_repositories/src/common/content_types.dart';
+import 'package:catalyst_voices_repositories/src/common/http_headers.dart';
 import 'package:chopper/chopper.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
@@ -30,7 +32,7 @@ void main() {
         'PUT',
         Uri.parse('https://example.com/api/v1/document'),
         Uri.parse('https://example.com/'),
-        headers: {'content-type': 'application/cbor'},
+        headers: {HttpHeaders.contentType: ContentTypes.applicationCbor},
       );
 
       when(() => cborConverter.convertRequest(any())).thenAnswer((_) => Future.value(request));
@@ -46,7 +48,7 @@ void main() {
         'GET',
         Uri.parse('https://example.com/api/v1/other'),
         Uri.parse('https://example.com/'),
-        headers: {'content-type': 'application/json'},
+        headers: {HttpHeaders.contentType: ContentTypes.applicationJson},
       );
 
       when(() => jsonConverter.convertRequest(any())).thenAnswer((_) => Future.value(request));
@@ -66,7 +68,8 @@ void main() {
 
       final baseResponse = MockBaseResponse();
       final response = MockResponse<void>();
-      when(() => response.headers).thenReturn({'content-type': 'application/cbor'});
+      when(() => response.headers)
+          .thenReturn({HttpHeaders.contentType: ContentTypes.applicationCbor});
       when(() => response.base).thenReturn(baseResponse);
       when(() => baseResponse.request).thenReturn(request);
       when(() => cborConverter.convertResponse<void, void>(response)).thenReturn(response);
@@ -86,7 +89,8 @@ void main() {
 
       final baseResponse = MockBaseResponse();
       final response = MockResponse<void>();
-      when(() => response.headers).thenReturn({'content-type': 'application/json'});
+      when(() => response.headers)
+          .thenReturn({HttpHeaders.contentType: ContentTypes.applicationJson});
       when(() => response.base).thenReturn(baseResponse);
       when(() => baseResponse.request).thenReturn(request);
       when(() => jsonConverter.convertResponse<void, void>(response)).thenReturn(response);
