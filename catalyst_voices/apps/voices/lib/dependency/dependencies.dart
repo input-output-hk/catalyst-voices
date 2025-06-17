@@ -176,8 +176,8 @@ final class Dependencies extends DependencyProvider {
           get<DocumentsService>(),
         );
       })
-      ..registerFactory<DocumentDataPreviewBloc>(() {
-        return DocumentDataPreviewBloc(
+      ..registerFactory<DocumentLookupBloc>(() {
+        return DocumentLookupBloc(
           get<DocumentsService>(),
         );
       });

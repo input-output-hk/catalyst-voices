@@ -7,7 +7,7 @@ class DocumentsDataListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<DocumentDataPreviewBloc, DocumentDataPreviewState, List<DocumentData>>(
+    return BlocSelector<DocumentLookupBloc, DocumentLookupState, List<DocumentData>>(
       selector: (state) => state.documents ?? const [],
       builder: (context, state) {
         return _DocumentsDataListView(documents: state);
@@ -26,13 +26,13 @@ class _DocumentDataTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      shape: const RoundedRectangleBorder(
+    return const Material(
+      shape: RoundedRectangleBorder(
         side: BorderSide(),
         borderRadius: BorderRadius.all(Radius.circular(8)),
       ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+        padding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [

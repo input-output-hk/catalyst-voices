@@ -2,22 +2,22 @@ import 'dart:async';
 
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/dependency/dependencies.dart';
-import 'package:catalyst_voices/pages/dev_tools/document_data_preview/widget/documents_data_list_view.dart';
+import 'package:catalyst_voices/pages/dev_tools/document_lookup/widget/documents_data_list_view.dart';
 import 'package:catalyst_voices/pages/dev_tools/widgets/x_close_button.dart';
 import 'package:catalyst_voices/widgets/app_bar/voices_app_bar.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 
-class DocumentDataPreviewPage extends StatefulWidget {
+class DocumentLookupPage extends StatefulWidget {
   final DocumentRef ref;
 
-  const DocumentDataPreviewPage._({
+  const DocumentLookupPage._({
     required this.ref,
   });
 
   @override
-  State<DocumentDataPreviewPage> createState() => _DocumentDataPreviewPageState();
+  State<DocumentLookupPage> createState() => _DocumentLookupPageState();
 
   static Future<void> show(
     BuildContext context, {
@@ -27,7 +27,7 @@ class DocumentDataPreviewPage extends StatefulWidget {
       pageBuilder: (context, animation, secondaryAnimation) {
         return FadeTransition(
           opacity: animation,
-          child: DocumentDataPreviewPage._(ref: ref),
+          child: DocumentLookupPage._(ref: ref),
         );
       },
       transitionDuration: const Duration(milliseconds: 200),
@@ -38,8 +38,8 @@ class DocumentDataPreviewPage extends StatefulWidget {
   }
 }
 
-class _DocumentDataPreviewPageState extends State<DocumentDataPreviewPage> {
-  late final DocumentDataPreviewBloc _bloc;
+class _DocumentLookupPageState extends State<DocumentLookupPage> {
+  late final DocumentLookupBloc _bloc;
 
   @override
   Widget build(BuildContext context) {
@@ -59,7 +59,7 @@ class _DocumentDataPreviewPageState extends State<DocumentDataPreviewPage> {
   }
 
   @override
-  void didUpdateWidget(DocumentDataPreviewPage oldWidget) {
+  void didUpdateWidget(DocumentLookupPage oldWidget) {
     super.didUpdateWidget(oldWidget);
 
     if (widget.ref != oldWidget.ref) {
