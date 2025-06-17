@@ -2,7 +2,6 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_repositories/generated/api/cat_gateway.models.swagger.dart';
 import 'package:catalyst_voices_repositories/src/api/converters/cbor_serializable_converter.dart';
-import 'package:catalyst_voices_repositories/src/common/response_mapper.dart';
 import 'package:catalyst_voices_repositories/src/document/document_data_factory.dart';
 import 'package:catalyst_voices_repositories/src/dto/api/document_index_list_dto.dart';
 import 'package:catalyst_voices_repositories/src/dto/api/document_index_query_filters_dto.dart';
@@ -24,7 +23,7 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
   @override
   Future<DocumentData> get({required DocumentRef ref}) async {
     final bytes = await _api.gateway
-        .apiV1DocumentDocumentIdGet(
+        .apiGatewayV1DocumentDocumentIdGet(
           documentId: ref.id,
           version: ref.version,
         )
@@ -47,7 +46,7 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
 
     try {
       final index = await _api.gateway
-          .apiV1DocumentIndexPost(
+          .apiGatewayV1DocumentIndexPost(
             body: DocumentIndexQueryFilter(id: EqOrRangedIdDto.eq(id)),
             limit: 1,
           )
@@ -98,7 +97,7 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
   Future<void> publish(SignedDocument document) async {
     final bytes = document.toBytes();
     await _api.gateway
-        .apiV1DocumentPut(
+        .apiGatewayV1DocumentPut(
           body: bytes,
           contentType: CborSerializableConverter.applicationCbor,
         )
@@ -110,7 +109,7 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
     required int limit,
   }) async {
     return _api.gateway
-        .apiV1DocumentIndexPost(
+        .apiGatewayV1DocumentIndexPost(
           body: const DocumentIndexQueryFilter(),
           limit: limit,
           page: page,

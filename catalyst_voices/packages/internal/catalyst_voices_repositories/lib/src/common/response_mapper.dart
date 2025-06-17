@@ -46,6 +46,8 @@ extension ResponseMapper<T> on chopper.Response<T> {
       return bodyOrThrow;
     } else if (statusCode == ApiErrorResponseException.notFound) {
       throw NotFoundException(message: _extractErrorMessage(error));
+    } else if (statusCode == ApiErrorResponseException.unauthorized) {
+      throw UnauthorizedException(message: error.toString());
     } else if (statusCode == ApiErrorResponseException.conflict) {
       throw ResourceConflictException(message: _extractErrorMessage(error));
     } else {

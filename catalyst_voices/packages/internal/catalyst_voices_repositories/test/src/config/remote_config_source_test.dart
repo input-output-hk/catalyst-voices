@@ -33,7 +33,7 @@ void main() {
       final response = Response<Object>(http.Response('', 200), configJson);
 
       // When
-      when(gateway.apiV1ConfigFrontendGet).thenAnswer((_) => Future.value(response));
+      when(gateway.apiGatewayV1ConfigFrontendGet).thenAnswer((_) => Future.value(response));
 
       // Then
       final config = await source.get();
@@ -49,7 +49,7 @@ void main() {
       final response = Response<Object>(http.Response('', 200), configJson);
 
       // When
-      when(gateway.apiV1ConfigFrontendGet).thenAnswer((_) => Future.value(response));
+      when(gateway.apiGatewayV1ConfigFrontendGet).thenAnswer((_) => Future.value(response));
 
       // Then
       final config = await source.get();
@@ -65,7 +65,7 @@ void main() {
       final response = Response<Object>(http.Response('', 200), configJson);
 
       // When
-      when(gateway.apiV1ConfigFrontendGet).thenAnswer((_) => Future.value(response));
+      when(gateway.apiGatewayV1ConfigFrontendGet).thenAnswer((_) => Future.value(response));
 
       // Then
       final config = await source.get();
