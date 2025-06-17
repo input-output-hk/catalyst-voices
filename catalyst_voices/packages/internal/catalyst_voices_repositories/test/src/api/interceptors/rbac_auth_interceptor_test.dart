@@ -295,5 +295,4 @@ void main() {
   });
 }
 
-
 class _MockAuthTokenProvider extends Mock implements AuthTokenProvider {}
