@@ -14,6 +14,13 @@ final class EmailNotVerifiedProposalBuilderSignal extends ProposalBuilderSignal 
   List<Object?> get props => [];
 }
 
+final class ForgotProposalSuccessBuilderSignal extends ProposalBuilderSignal {
+  const ForgotProposalSuccessBuilderSignal();
+
+  @override
+  List<Object?> get props => [];
+}
+
 final class NewProposalAndEmailNotVerifiedSignal extends ProposalBuilderSignal {
   const NewProposalAndEmailNotVerifiedSignal();
 

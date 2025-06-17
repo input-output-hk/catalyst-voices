@@ -25,6 +25,7 @@ import 'package:catalyst_voices/widgets/modals/proposals/publish_proposal_iterat
 import 'package:catalyst_voices/widgets/modals/proposals/submit_proposal_error_dialog.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/submit_proposal_for_review_dialog.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/unlock_edit_proposal.dart';
+import 'package:catalyst_voices/widgets/snackbar/common_snackbars.dart';
 import 'package:catalyst_voices/widgets/snackbar/voices_snackbar.dart';
 import 'package:catalyst_voices/widgets/snackbar/voices_snackbar_type.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
@@ -169,6 +170,8 @@ class _ProposalBuilderBodyState extends State<_ProposalBuilderBody>
         unawaited(_showProposalLimitReachedDialog(signal));
       case UnlockProposalSignal():
         unawaited(_showUnlockProposalDialog(signal));
+      case ForgotProposalSuccessBuilderSignal():
+        _showForgetProposalSuccessDialog();
       case NewProposalAndEmailNotVerifiedSignal():
         _showEmailVerificationNeededSnackbar();
       case ShowPublishConfirmationSignal():
@@ -286,6 +289,14 @@ class _ProposalBuilderBodyState extends State<_ProposalBuilderBody>
         unawaited(const AccountRoute().push(context));
       });
     }
+  }
+
+  void _showForgetProposalSuccessDialog() {
+    CommonSnackbars.showForgetProposalSuccessDialog(context);
+
+    Router.neglect(context, () {
+      const WorkspaceRoute().replace(context);
+    });
   }
 
   void _showEmailVerificationNeededSnackbar() {
