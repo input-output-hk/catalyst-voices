@@ -81,17 +81,25 @@ final class RegistrationTransactionBuilder {
   /// Throws [RegistrationInsufficientBalanceException] in case the
   /// user doesn't have enough balance to pay for the registration transaction.
   Future<Transaction> build() async {
-    if (utxos.isEmpty) {
+    try {
+      if (utxos.isEmpty) {
+        throw const RegistrationInsufficientBalanceException();
+      }
+
+      final x509Envelope = await _buildMetadataEnvelope();
+
+      return _buildUnsignedRbacTx(
+        auxiliaryData: AuxiliaryData.fromCbor(
+          await x509Envelope.toCbor(serializer: (e) => e.toCbor()),
+        ),
+      );
+    } on InsufficientAdaForAssetsException {
+      throw const RegistrationInsufficientBalanceException();
+    } on InsufficientAdaForChangeOutputException {
+      throw const RegistrationInsufficientBalanceException();
+    } on InsufficientUtxoBalanceException {
       throw const RegistrationInsufficientBalanceException();
     }
-
-    final x509Envelope = await _buildMetadataEnvelope();
-
-    return _buildUnsignedRbacTx(
-      auxiliaryData: AuxiliaryData.fromCbor(
-        await x509Envelope.toCbor(serializer: (e) => e.toCbor()),
-      ),
-    );
   }
 
   Future<RegistrationMetadata> _buildMetadataEnvelope() async {
@@ -183,7 +191,11 @@ final class RegistrationTransactionBuilder {
       changeAddress: changeAddress,
     );
 
-    final txBody = txBuilder.applySelection().buildBody();
+    final txBody = txBuilder
+        .applySelection(
+          changeOutputStrategy: ChangeOutputAdaStrategy.noBurn,
+        )
+        .buildBody();
 
     return Transaction(
       body: txBody,
