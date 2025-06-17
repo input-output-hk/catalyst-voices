@@ -49,6 +49,7 @@ class _DocumentLookupPageState extends State<DocumentLookupPage> {
         appBar: const VoicesAppBar(leading: XCloseButton()),
         body: Column(
           children: [
+            const SizedBox(height: 8),
             _Title(ref: widget.ref),
             const SizedBox(height: 16),
             const Expanded(child: DocumentsDataListView()),

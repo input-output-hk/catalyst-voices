@@ -43,7 +43,7 @@ class _DocumentRefFieldState extends State<DocumentRefField> {
   DocumentRef? get _ref => _isValid
       ? DocumentRef.build(
           id: _id.value,
-          version: _ver.value,
+          version: _ver.value.isNotEmpty ? _ver.value : null,
           isDraft: _isLocal,
         )
       : null;

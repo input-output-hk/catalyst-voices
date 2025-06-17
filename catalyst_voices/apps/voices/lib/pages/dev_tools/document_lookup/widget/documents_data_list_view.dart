@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
@@ -35,10 +36,12 @@ class _DocumentDataTile extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
         child: Column(
           mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Metadata'),
+            const _SectionTileNameText('Metadata'),
             SelectableText(document.metadata),
-            const Text('Content'),
+            const SizedBox(height: 12),
+            const _SectionTileNameText('Content'),
             SelectableText(document.content),
           ],
         ),
@@ -56,7 +59,8 @@ class _DocumentsDataListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
+    return ListView.separated(
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
       itemCount: documents.length,
       itemBuilder: (context, index) {
         final document = documents[index];
@@ -66,6 +70,21 @@ class _DocumentsDataListView extends StatelessWidget {
           document: document,
         );
       },
+      separatorBuilder: (_, __) => const SizedBox(height: 12),
+    );
+  }
+}
+
+class _SectionTileNameText extends StatelessWidget {
+  final String data;
+
+  const _SectionTileNameText(this.data);
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      data,
+      style: context.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
     );
   }
 }
