@@ -3131,6 +3131,14 @@
   "@importCatalystAppUnavailableAfterDeadline": {
     "description": "note for user that app will not be available after submission deadline"
   },
+  "expandableTextLess": "Show less",
+  "@expandableTextLess": {
+    "description": "When text is too long and you can collapse it to eg. 2 lines"
+  },
+  "expandableTextMore": "Show more",
+  "@expandableTextMore": {
+    "description": "When text is too long and you can display it fully"
+  },
   "errorUuidInvalidFormat": "Invalid format",
   "@errorUuidInvalidFormat": {
     "description": "Error message when given input does not match uuid format"

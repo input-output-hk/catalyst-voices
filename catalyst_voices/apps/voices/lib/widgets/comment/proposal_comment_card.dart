@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 class ProposalCommentCard extends StatelessWidget {
   final CommentDocument document;
   final bool canReply;
+  final int trimLines;
   final VoidCallback? onReplyTap;
   final Widget? footer;
 
@@ -14,6 +15,7 @@ class ProposalCommentCard extends StatelessWidget {
     super.key,
     required this.document,
     this.canReply = true,
+    required this.trimLines,
     this.onReplyTap,
     this.footer,
   });
@@ -45,7 +47,19 @@ class ProposalCommentCard extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               for (final property in document.document.properties)
-                DocumentPropertyReadBuilder(property: property),
+                DocumentPropertyReadBuilder(
+                  property: property,
+                  overrides: {
+                    CommentDocument.content: (context, listItem) {
+                      return ExpandableText(
+                        key: ValueKey('Comment[${document.metadata.selfRef}]ExpandableText'),
+                        listItem.value is String ? listItem.value! as String : '',
+                        trimLines: trimLines,
+                        overflow: TextOverflow.ellipsis,
+                      );
+                    },
+                  },
+                ),
               if (footer != null) ...[
                 const SizedBox(height: 8),
                 footer,
