@@ -24,6 +24,7 @@ import 'package:catalyst_voices/widgets/modals/proposals/publish_proposal_iterat
 import 'package:catalyst_voices/widgets/modals/proposals/submit_proposal_error_dialog.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/submit_proposal_for_review_dialog.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/unlock_edit_proposal.dart';
+import 'package:catalyst_voices/widgets/snackbar/common_snackbars.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
@@ -166,6 +167,8 @@ class _ProposalBuilderBodyState extends State<_ProposalBuilderBody>
         unawaited(_showProposalLimitReachedDialog(signal));
       case UnlockProposalSignal():
         unawaited(_showUnlockProposalDialog(signal));
+      case ForgotProposalSuccessBuilderSignal():
+        _showForgetProposalSuccessDialog();
       case ShowPublishConfirmationSignal():
         unawaited(_showPublishConfirmationDialog(signal));
       case ShowSubmitConfirmationSignal():
@@ -282,6 +285,14 @@ class _ProposalBuilderBodyState extends State<_ProposalBuilderBody>
         unawaited(const AccountRoute().push(context));
       });
     }
+  }
+
+  void _showForgetProposalSuccessDialog() {
+    CommonSnackbars.showForgetProposalSuccessDialog(context);
+
+    Router.neglect(context, () {
+      const WorkspaceRoute().replace(context);
+    });
   }
 
   Future<void> _showProposalLimitReachedDialog(
