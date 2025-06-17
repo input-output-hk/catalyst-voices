@@ -20,7 +20,7 @@ targets:
           additional_headers:
             - "Authorization"
           response_override_value_map:
-            - url: /api/v1/document/index
+            - url: /api/gateway/v1/document/index
               method: post
               overridden_value: "DocumentIndexList"
       json_serializable:
