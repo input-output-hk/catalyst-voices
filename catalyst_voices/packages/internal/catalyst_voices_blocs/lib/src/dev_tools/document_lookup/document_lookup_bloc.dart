@@ -7,5 +7,14 @@ final class DocumentLookupBloc extends Bloc<DocumentLookupEvent, DocumentLookupS
 
   DocumentLookupBloc(
     this._documentsService,
-  ) : super(const DocumentLookupState());
+  ) : super(const DocumentLookupState()) {
+    on<LookupRefDocumentsEvent>(_handleDocumentLookup);
+  }
+
+  Future<void> _handleDocumentLookup(
+    LookupRefDocumentsEvent event,
+    Emitter<DocumentLookupState> emit,
+  ) async {
+    //
+  }
 }

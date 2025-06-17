@@ -14,6 +14,7 @@ export 'campaign/current_campaign_info_view_model.dart';
 export 'campaign/exception/active_campaign_not_found_exception.dart';
 export 'category/category_description_view_model.dart';
 export 'category/dropdown_menu_view_model.dart';
+export 'dev_tools/document_lookup/document_lookup_tile_data.dart';
 export 'document/document_property_value_read_item.dart';
 export 'document/document_segment.dart';
 export 'document/document_version.dart';

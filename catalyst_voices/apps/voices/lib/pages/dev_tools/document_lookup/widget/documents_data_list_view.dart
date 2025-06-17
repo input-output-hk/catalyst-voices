@@ -1,5 +1,5 @@
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
-import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 class DocumentsDataListView extends StatelessWidget {
@@ -7,7 +7,7 @@ class DocumentsDataListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<DocumentLookupBloc, DocumentLookupState, List<DocumentData>>(
+    return BlocSelector<DocumentLookupBloc, DocumentLookupState, List<DocumentLookupTileData>>(
       selector: (state) => state.documents ?? const [],
       builder: (context, state) {
         return _DocumentsDataListView(documents: state);
@@ -17,7 +17,7 @@ class DocumentsDataListView extends StatelessWidget {
 }
 
 class _DocumentDataTile extends StatelessWidget {
-  final DocumentData document;
+  final DocumentLookupTileData document;
 
   const _DocumentDataTile({
     required super.key,
@@ -26,20 +26,20 @@ class _DocumentDataTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Material(
-      shape: RoundedRectangleBorder(
+    return Material(
+      shape: const RoundedRectangleBorder(
         side: BorderSide(),
         borderRadius: BorderRadius.all(Radius.circular(8)),
       ),
       child: Padding(
-        padding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('Metadata'),
-            SelectableText('data'),
-            Text('Content'),
-            SelectableText('data'),
+            const Text('Metadata'),
+            SelectableText(document.metadata),
+            const Text('Content'),
+            SelectableText(document.content),
           ],
         ),
       ),
@@ -48,7 +48,7 @@ class _DocumentDataTile extends StatelessWidget {
 }
 
 class _DocumentsDataListView extends StatelessWidget {
-  final List<DocumentData> documents;
+  final List<DocumentLookupTileData> documents;
 
   const _DocumentsDataListView({
     required this.documents,
