@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:catalyst_voices/common/error_handler.dart';
+import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/common/signal_handler.dart';
 import 'package:catalyst_voices/dependency/dependencies.dart';
 import 'package:catalyst_voices/pages/proposal_builder/appbar/proposal_builder_back_action.dart';
@@ -25,6 +26,8 @@ import 'package:catalyst_voices/widgets/modals/proposals/submit_proposal_error_d
 import 'package:catalyst_voices/widgets/modals/proposals/submit_proposal_for_review_dialog.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/unlock_edit_proposal.dart';
 import 'package:catalyst_voices/widgets/snackbar/common_snackbars.dart';
+import 'package:catalyst_voices/widgets/snackbar/voices_snackbar.dart';
+import 'package:catalyst_voices/widgets/snackbar/voices_snackbar_type.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
@@ -169,6 +172,8 @@ class _ProposalBuilderBodyState extends State<_ProposalBuilderBody>
         unawaited(_showUnlockProposalDialog(signal));
       case ForgotProposalSuccessBuilderSignal():
         _showForgetProposalSuccessDialog();
+      case NewProposalAndEmailNotVerifiedSignal():
+        _showEmailVerificationNeededSnackbar();
       case ShowPublishConfirmationSignal():
         unawaited(_showPublishConfirmationDialog(signal));
       case ShowSubmitConfirmationSignal():
@@ -239,7 +244,6 @@ class _ProposalBuilderBodyState extends State<_ProposalBuilderBody>
 
     final proposalId = widget.proposalId;
     final categoryId = widget.categoryId;
-
     if (proposalId != null) {
       bloc.add(LoadProposalEvent(proposalId: proposalId));
     } else if (categoryId != null) {
@@ -285,6 +289,28 @@ class _ProposalBuilderBodyState extends State<_ProposalBuilderBody>
         unawaited(const AccountRoute().push(context));
       });
     }
+  }
+
+  void _showEmailVerificationNeededSnackbar() {
+    VoicesSnackBar(
+      type: VoicesSnackBarType.error,
+      behavior: SnackBarBehavior.floating,
+      title: context.l10n.verifiedEmailNeededToPublishTitle,
+      message: context.l10n.verifiedEmailNeededToPublishMessage,
+      actions: [
+        VoicesTextButton(
+          onTap: () => unawaited(const AccountRoute().push(context)),
+          child: Text(
+            context.l10n.emailNotVerifiedDialogAction,
+            style: context.textTheme.labelLarge?.copyWith(
+              decoration: TextDecoration.underline,
+              decorationColor: context.colors.elevationsOnSurfaceNeutralLv0,
+              color: context.colors.elevationsOnSurfaceNeutralLv0,
+            ),
+          ),
+        ),
+      ],
+    ).show(context);
   }
 
   void _showForgetProposalSuccessDialog() {

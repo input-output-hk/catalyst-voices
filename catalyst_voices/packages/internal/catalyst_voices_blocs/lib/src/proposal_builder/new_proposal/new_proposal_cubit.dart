@@ -80,7 +80,9 @@ class NewProposalCubit extends Cubit<NewProposalState>
         // right now user can start creating proposal without selecting category.
         // Right now every category have the same requirements for title so we can do a fallback for
         // first category from the list.
-        ref: categoryRef ?? categoriesModels.first.proposalTemplateRef,
+        ref: categoriesModels
+            .firstWhere((e) => e.selfRef == categoryRef, orElse: () => categoriesModels.first)
+            .proposalTemplateRef,
       );
 
       final titlePropertySchema = templateRef.schema
