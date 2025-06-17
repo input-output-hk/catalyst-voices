@@ -3,8 +3,9 @@ project: {
 	name: "voices"
 	deployment: {
 		on: {
-			merge: {}
-			tag: {}
+			//merge: {}
+			//tag: {}
+			always: {}
 		}
 
 		bundle: {
@@ -29,7 +30,8 @@ project: {
 							}
 						}
 						ports: {
-							http: port: 8080
+							http: port:    8080
+							metrics: port: 8081
 						}
 						probes: {
 							liveness: {
@@ -44,31 +46,32 @@ project: {
 					}
 
 					configs: caddy: data: "Caddyfile": """
-						localhost:8080 {
+						{
+						  admin :8081
+						  metrics
+						}
+						http://:8080 {
 							root * /app
 
-							file_server {
-							try_files {path} {path}/ /index.html
+							handle /healthz {
+							  respond `{"status":"ok"}` 200
+							}
+
+							handle {
+							  try_files {path} /index.html
+							  file_server
 							}
 
 							header {
-							Cross-Origin-Opener-Policy "same-origin"
-							Cross-Origin-Embedder-Policy "require-corp"
+							  Cross-Origin-Opener-Policy "same-origin"
+							  Cross-Origin-Embedder-Policy "require-corp"
 
-							/ Cache-Control "public, max-age=3600, must-revalidate"
-							}
-
-							respond /healthz `{"status": "ok"}` 200
-
-							route /metrics {
-							@local remote_ip 127.0.0.1
-							require local
-							metrics
+							  / Cache-Control "public, max-age=3600, must-revalidate"
 							}
 
 							handle_errors {
-							rewrite * /50x.html
-							file_server
+							  rewrite * /50x.html
+							  file_server
 							}
 
 							log

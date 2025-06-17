@@ -127,11 +127,12 @@ package:
 
     COPY +build-web/web /app
 
-    # Note this is only used for local development, a different nginx.conf is
+    # Note this is only used for local development, a different Cadyfile is
     # used during deployment. See blueprint.cue.
-    #COPY ./nginx.conf /etc/nginx/nginx.conf
+    COPY ./Caddyfile /etc/caddy/Caddyfile
 
     EXPOSE 8080
+    EXPOSE 8081
 
     SAVE IMAGE voices-frontend:$tag
 
