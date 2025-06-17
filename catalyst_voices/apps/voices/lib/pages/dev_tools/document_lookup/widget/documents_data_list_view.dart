@@ -39,10 +39,10 @@ class _DocumentDataTile extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const _SectionTileNameText('Metadata'),
-            SelectableText(document.metadata),
+            Text(document.metadata),
             const SizedBox(height: 12),
             const _SectionTileNameText('Content'),
-            SelectableText(document.content),
+            Text(document.content),
           ],
         ),
       ),

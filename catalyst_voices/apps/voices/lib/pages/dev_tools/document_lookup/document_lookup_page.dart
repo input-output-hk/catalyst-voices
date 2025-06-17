@@ -47,13 +47,15 @@ class _DocumentLookupPageState extends State<DocumentLookupPage> {
       value: _bloc,
       child: Scaffold(
         appBar: const VoicesAppBar(leading: XCloseButton()),
-        body: Column(
-          children: [
-            const SizedBox(height: 8),
-            _Title(ref: widget.ref),
-            const SizedBox(height: 16),
-            const Expanded(child: DocumentsDataListView()),
-          ],
+        body: SelectionArea(
+          child: Column(
+            children: [
+              const SizedBox(height: 8),
+              _Title(ref: widget.ref),
+              const SizedBox(height: 16),
+              const Expanded(child: DocumentsDataListView()),
+            ],
+          ),
         ),
       ),
     );
