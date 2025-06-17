@@ -16,9 +16,13 @@ static LIVE_INDEX_DB: AtomicBool = AtomicBool::new(false);
 /// Flag to determine if the Event DB has started.
 static LIVE_EVENT_DB: AtomicBool = AtomicBool::new(false);
 
-/// Flag to determine if the chain follower has synchronized with the Tip for the first
-/// time.
-static INITIAL_FOLLOWER_TIP_REACHED: AtomicBool = AtomicBool::new(false);
+/// Flag to determine if the chain follower has synchronized with the IMMUTABLE tip for
+/// the first time.
+static INITIAL_IMMUTABLE_FOLLOWER_TIP_REACHED: AtomicBool = AtomicBool::new(false);
+
+/// Flag to determine if the chain follower has synchronized with the LIVE tip for the
+/// first time.
+static INITIAL_LIVE_FOLLOWER_TIP_REACHED: AtomicBool = AtomicBool::new(false);
 
 /// Returns whether the service has started or not.
 pub(crate) fn service_has_started() -> bool {
@@ -67,12 +71,20 @@ pub(crate) fn set_index_db_liveness(flag: bool) {
 ///
 /// Gets the stored value from `INITIAL_FOLLOWER_TIP_REACHED` flag.
 pub(crate) fn follower_has_first_reached_tip() -> bool {
-    INITIAL_FOLLOWER_TIP_REACHED.load(Acquire)
+    INITIAL_IMMUTABLE_FOLLOWER_TIP_REACHED.load(Acquire)
+        && INITIAL_LIVE_FOLLOWER_TIP_REACHED.load(Acquire)
 }
 
-/// Set the `INITIAL_FOLLOWER_TIP_REACHED` as `true`.
+/// Set the `INITIAL_IMMUTABLE_FOLLOWER_TIP_REACHED` as `true`.
 ///
 /// This value can not be set to `false` afterwards.
-pub(crate) fn set_follower_first_reached_tip() {
-    INITIAL_FOLLOWER_TIP_REACHED.store(true, Release);
+pub(crate) fn set_follower_immutable_first_reached_tip() {
+    INITIAL_IMMUTABLE_FOLLOWER_TIP_REACHED.store(true, Release);
+}
+
+/// Set the `INITIAL_LIVE_FOLLOWER_TIP_REACHED` as `true`.
+///
+/// This value can not be set to `false` afterwards.
+pub(crate) fn set_follower_live_first_reached_tip() {
+    INITIAL_LIVE_FOLLOWER_TIP_REACHED.store(true, Release);
 }
