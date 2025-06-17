@@ -1,0 +1,40 @@
+//! Event types for RBAC Cache Manager.
+
+use std::time::Duration;
+
+/// Represents various events that can occur in the RBAC cache manager.
+#[derive(Debug, Clone)]
+pub(crate) enum RbacCacheManagerEvent {
+    /// Emitted when the cache manager is initialized.
+    Initialized {
+        /// Time taken to complete startup.
+        start_up_time: Duration,
+    },
+    /// Emitted when the cache is accessed.
+    CacheAccessed {
+        /// Time taken to access the cache.
+        latency: Duration,
+        /// Whether the access involved persistent storage.
+        is_persistent: bool,
+        /// Whether the cache entry was found; marked as cache hit.
+        is_found: bool,
+    },
+}
+
+pub(crate) type EventListenerFn<T> = Box<dyn Fn(&T) + Send + Sync + 'static>;
+
+/// A trait that allows adding and dispatching events to listeners.
+pub(crate) trait EventTarget<T: Send + Sync> {
+    /// Adds an event listener to the target.
+    ///
+    /// # Arguments
+    /// * `listener` - A function that will be called whenever an event of type `T`
+    ///   occurs.
+    fn add_event_listener(&self, listener: EventListenerFn<T>);
+
+    /// Dispatches an event to all registered listeners.
+    ///
+    /// # Arguments
+    /// * `message` - The event message to be dispatched.
+    fn dispatch_event(&self, message: T);
+}
