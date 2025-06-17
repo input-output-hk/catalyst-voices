@@ -105,7 +105,7 @@ impl Query {
                     cache.insert(public_key, v.clone());
                 }
             })
-            .context("Failed to get Catalyst ID by transaction ID query row")
+            .context("Failed to get Catalyst ID by public key query row")
     }
 }
 
