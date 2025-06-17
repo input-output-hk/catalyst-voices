@@ -319,7 +319,7 @@ final class ProposalCubit extends Cubit<ProposalState>
     final isDraftProposal = document.metadata.selfRef is DraftRef;
 
     final overviewSegment = ProposalOverviewSegment.build(
-      categoryName: category?.categoryName ?? '',
+      categoryName: category?.categoryText ?? '',
       proposalTitle: document.title ?? '',
       data: ProposalViewMetadata(
         author: Profile(catalystId: document.authorId!),
