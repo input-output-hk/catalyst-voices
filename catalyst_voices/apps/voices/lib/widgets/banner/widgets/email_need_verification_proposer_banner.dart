@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
-import 'package:catalyst_voices/routes/routing/routing.dart';
+import 'package:catalyst_voices/routes/routing/account_route.dart';
 import 'package:catalyst_voices/widgets/banner/voices_banner.dart';
 import 'package:catalyst_voices/widgets/rich_text/markdown_text.dart';
 import 'package:catalyst_voices/widgets/rich_text/placeholder_rich_text.dart';
@@ -11,56 +11,6 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-
-class EmailNeedVerificationBanner extends StatelessWidget {
-  const EmailNeedVerificationBanner({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocSelector<AccountEmailCubit, AccountEmailState, Account?>(
-      selector: (state) {
-        return state.account;
-      },
-      builder: (context, account) {
-        if (account == null) {
-          return const SizedBox.shrink();
-        }
-
-        if (account.hasRole(AccountRole.proposer)) {
-          return const EmailNeedVerificationProposerBanner();
-        } else {
-          return const EmailNeedVerificationContributorBanner();
-        }
-      },
-    );
-  }
-}
-
-class EmailNeedVerificationContributorBanner extends StatelessWidget {
-  const EmailNeedVerificationContributorBanner({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocSelector<AccountEmailCubit, AccountEmailState, bool>(
-      selector: (state) {
-        return state.showDiscoveryEmailVerificationBanner;
-      },
-      builder: (context, show) {
-        return Offstage(
-          offstage: !show,
-          child: VoicesBanner(
-            child: MarkdownText(
-              MarkdownData(
-                context.l10n.emailNotVerifiedBannerContributor,
-              ),
-              pStyle: context.textTheme.labelLarge,
-            ),
-          ),
-        );
-      },
-    );
-  }
-}
 
 class EmailNeedVerificationProposerBanner extends StatefulWidget {
   const EmailNeedVerificationProposerBanner({super.key});
@@ -74,7 +24,7 @@ class _EmailNeedVerificationProposerBannerState extends State<EmailNeedVerificat
   late final TapGestureRecognizer _recognizer;
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<AccountEmailCubit, AccountEmailState, bool>(
+    return BlocSelector<PublicProfileEmailStatusCubit, PublicProfileEmailStatusState, bool>(
       selector: (state) {
         return state.showProposerEmailVerificationBanner;
       },

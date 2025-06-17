@@ -1,5 +1,5 @@
 export 'account/account.dart';
-export 'account/email/account_email.dart';
+export 'account/public_profile/public_profile_email.dart';
 export 'admin_tools/admin_tools.dart';
 export 'brand/brand.dart';
 export 'campaign/campaign_builder/campaign_builder.dart';
