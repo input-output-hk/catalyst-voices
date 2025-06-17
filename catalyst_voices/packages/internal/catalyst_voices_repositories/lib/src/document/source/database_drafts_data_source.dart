@@ -15,6 +15,9 @@ final class DatabaseDraftsDataSource implements DraftDataSource {
   }
 
   @override
+  Future<int> deleteAll() => _database.draftsDao.deleteAll();
+
+  @override
   Future<bool> exists({required DocumentRef ref}) {
     return _database.draftsDao.count(ref: ref).then((count) => count > 0);
   }

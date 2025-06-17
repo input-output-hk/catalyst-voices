@@ -565,25 +565,27 @@
       }
     }
   },
-  "walletLinkWalletDetailsNotice": "Wallet and role registrations require a minimal transaction fee. You can setup your default dApp connector wallet in your browser extension settings.",
+  "walletLinkWalletDetailsNotice": "To calculate voting power, Catalyst reads your wallet balance from the blockchain. ",
   "@walletLinkWalletDetailsNotice": {
-    "description": "A message in link wallet flow on wallet details screen when a user wallet doesn't have enough balance."
+    "description": "A message in link wallet flow on wallet details screen explaining why Catalyst reads user wallet balance."
   },
-  "walletLinkWalletDetailsNoticeTopUp": "Top up ADA",
-  "@walletLinkWalletDetailsNoticeTopUp": {
-    "description": "A message recommending the user to top up ADA in wallet link on wallet details screen."
-  },
-  "walletLinkWalletDetailsNoticeTopUpLink": "Link to top-up provider",
-  "@walletLinkWalletDetailsNoticeTopUpLink": {
-    "description": "A link to top-up provide when the user doesn't have enough balance on wallet link screen"
-  },
-  "walletLinkWalletDetailsHeadsUpText": "We only read your balance to calculate voting power — we can't access or use your wallet.",
-  "@walletLinkWalletDetailsHeadsUpText": {
-    "description": "A heads up content explaining that the app only reads wallet balance and cannot spend it."
+  "walletLinkWalletDetailsLowBalanceHeadsUpText": "Please ensure your Cardano wallet has at least {amount} ADA before continuing.",
+  "@walletLinkWalletDetailsLowBalanceHeadsUpText": {
+    "description": "A heads up content explaining that the user needs to have some ada for registration.",
+    "placeholders": {
+      "amount": {
+        "type": "double",
+        "format": "compact"
+      }
+    }
   },
   "walletLinkTransactionTitle": "Let's make sure everything looks right.",
   "@walletLinkTransactionTitle": {
     "description": "A title in link wallet flow on transaction screen."
+  },
+  "walletLinkTransactionSubtitle": "To complete this action, you'll submit a signed transaction to Cardano. There will be an ADA transaction fee.",
+  "@walletLinkTransactionSubtitle": {
+    "description": "A subtitle in link wallet flow on transaction screen."
   },
   "walletLinkTransactionAccountCompletion": "Account completion for Catalyst",
   "@walletLinkTransactionAccountCompletion": {
@@ -605,6 +607,10 @@
   "walletLinkTransactionChangeRoles": "Change role setup",
   "@walletLinkTransactionChangeRoles": {
     "description": "The secondary button label to change the roles on transaction summary screen."
+  },
+  "walletLinkTransactionBackToWalletSelection": "Back to Wallet Selection",
+  "@walletLinkTransactionBackToWalletSelection": {
+    "description": "The primary button label to go back to wallet selection on transaction summary screen."
   },
   "walletLinkTransactionRoleItem": "1 {role} registration",
   "@walletLinkTransactionRoleItem": {
@@ -628,7 +634,7 @@
       }
     }
   },
-  "registrationInsufficientBalance": "Insufficient balance, please top up your wallet.",
+  "registrationInsufficientBalance": "Transaction cannot proceed due to low wallet balance.",
   "@registrationInsufficientBalance": {
     "description": "Indicates an error when preparing a transaction has failed due to low wallet balance."
   },
@@ -777,7 +783,17 @@
   "@createProfileInstructionsMessage": {
     "description": "Information about account creation steps"
   },
-  "createProfileInstructionsNext": "Create your profile now", 
+  "createProfileInstructionsNotice": "Please ensure your Cardano wallet has at least {amount} ADA before continuing.",
+  "@createProfileInstructionsNotice": {
+    "description": "Information about minimum wallet balance",
+    "placeholders": {
+      "amount": {
+        "type": "double",
+        "format": "compact"
+      }
+    }
+  },
+  "createProfileInstructionsNext": "Create your profile now",
   "@createProfileInstructionsNext": {
     "description": "CTA to move to the next step in account creation"
   },
@@ -785,17 +801,13 @@
   "@createProfileInstructionsEmailRequest": {
     "description": "Request to provide email address"
   },
-  "createProfileInstructionsEmailReason1": "We store email in a mutable database.",
+  "createProfileInstructionsEmailReason1": "Email is stored in Catalyst database.",
   "@createProfileInstructionsEmailReason1": {
     "description": "Reason to store email in a mutable database"
   },
-  "createProfileInstructionsEmailReason2": "We do not store your email on-chain ever.",
+  "createProfileInstructionsEmailReason2": "Email is never published on chain",
   "@createProfileInstructionsEmailReason2": {
     "description": "Reason to not store email on-chain"
-  },
-  "createProfileInstructionsEmailReason3": "We only use email for communication about Catalyst.",
-  "@createProfileInstructionsEmailReason3": {
-    "description": "Reason to only use email for communication"
   },
   "createProfileSetupTitle": "Setup your profile",
   "@createProfileSetupTitle": {
@@ -1070,7 +1082,7 @@
   "createKeychainSeedPhraseCheckSuccessNextStep": "Now let's set your Unlock password for this device!",
   "createKeychainUnlockPasswordInstructionsTitle": "Set your Catalyst unlock password for this device",
   "createKeychainUnlockPasswordInstructionsSubtitle": "In this next step, you'll set your Unlock Password for this device. It's like a shortcut for proving ownership of your Keychain.  \u2028\u2028Whenever you recover your account for the first time on a new device, you'll need to use your Catalyst seed phrase to get started. Every time after that, you can use your Unlock Password to quickly regain access.",
-  "createProfileCreatedTitle": "Congratulations your profile is setup!", 
+  "createProfileCreatedTitle": "Congratulations your profile is setup!",
   "@createProfileCreatedTitle": {
     "description": "Title for the profile created"
   },
@@ -1197,10 +1209,6 @@
   "incorrectUploadDialogContent": "The Catalyst keychain that you entered or uploaded is incorrect, please try again.",
   "incorrectUploadDialogTryAgainButton": "Try again",
   "finishAccountCreation": "Finish account creation",
-  "connectDifferentWallet": "Connect a different wallet",
-  "@connectDifferentWallet": {
-    "description": "A button label to connect a different wallet in wallet detail panel."
-  },
   "reviewRegistrationTransaction": "Review registration transaction",
   "@reviewRegistrationTransaction": {
     "description": "A button label to review the registration transaction in wallet detail panel."
@@ -1539,6 +1547,10 @@
   "@errorValidationPatternMismatch": {
     "description": "Validation error when the user entered value does not match the pattern"
   },
+  "errorValidationHttpsPatternMismatch": "Start your url with https://",
+  "@errorValidationHttpsPatternMismatch": {
+    "description": "Validation error when the user entered value does not match the https:// pattern"
+  },
   "errorValidationStringEmpty": "The text cannot be empty.",
   "@errorValidationStringEmpty": {
     "description": "Validation error when the user entered text is empty"
@@ -1632,6 +1644,10 @@
   "errorEmailAlreadyInUse": "This email address is already in use.",
   "@errorEmailAlreadyInUse": {
     "description": "Error when trying to update email that is taken already."
+  },
+  "errorActiveAccountNotFound": "Active account not found.",
+  "@errorActiveAccountNotFound": {
+    "description": "Generic error message when trying to access account resources but non was found."
   },
   "categoryDetails": "Category Details",
   "fundsAvailable": "Funds Available",
@@ -1848,6 +1864,10 @@
   "proposalEditorValidationExitDialogMessage": "When you exit, any unsaved changes will be lost.",
   "@proposalEditorValidationExitDialogMessage": {
     "description": "Message in a dialog asking if the user wants to leave the form issue mode."
+  },
+  "proposalEditorValidationExitIssueMode": "Exit Issue Mode",
+  "@proposalEditorValidationExitIssueMode": {
+    "description": "Button text for exiting the proposal editor validation snackbar."
   },
   "proposalEditorDeleteDialogTitle": "Delete Proposal?",
   "@proposalEditorDeleteDialogTitle": {
@@ -2600,9 +2620,15 @@
   "@goodToKnow": {
     "description": "Text to show when some tip will be presented to user"
   },
-  "registrationTransactionFeeDescription": "The creation of a Catalyst account costs, a transaction fee of (0,21 ADA), be sure your wallet has a minimum of 1 ADA.",
+  "registrationTransactionFeeDescription": "The creation of a Catalyst account costs, a transaction fee of (0,21 ADA), be sure your wallet has a minimum of {amount} ADA.",
   "@registrationTransactionFeeDescription": {
-    "description": "Description for the registration transaction fee"
+    "description": "Description for the registration transaction fee",
+    "placeholders": {
+      "amount": {
+        "type": "double",
+        "format": "compact"
+      }
+    }
   },
   "eternlWallet": "Eternl Wallet",
   "@eternlWallet": {
@@ -2849,6 +2875,18 @@
   "@verificationEmailSendSubMessage": {
     "description": "Sub message of dialog account verification send"
   },
+  "pendingEmailChangeTitle": "Pending email change",
+  "@pendingEmailChangeTitle": {
+    "description": "Title of dialog about pending email change"
+  },
+  "pendingEmailChangeMessage": "Email will be update after successful verification",
+  "@pendingEmailChangeMessage": {
+    "description": "Message of dialog about pending email change"
+  },
+  "pendingEmailChangeSubMessage": "Please verify your new email address.",
+  "@pendingEmailChangeSubMessage": {
+    "description": "Sub message of dialog about pending email change"
+  },
   "invalidSeedPhraseWord": "Invalid",
   "@invalidSeedPhraseWord": {
     "description": "Error shown when user inputs SeedPhrase word but invalid does not match any"
@@ -3092,5 +3130,33 @@
   "importCatalystAppUnavailableAfterDeadline": "IMPORTANT: The Catalyst app won’t be accessible after the deadline.",
   "@importCatalystAppUnavailableAfterDeadline": {
     "description": "note for user that app will not be available after submission deadline"
+  },
+  "emailNotVerifiedBannerContributor": "**Email Not Verified:** Check your inbox to verify your email and unlock all features.",
+  "@emailNotVerifiedBannerContributor": {
+    "description": "Message used in banner to inform user that email is not verified when user is a contributor"
+  },
+  "emailNotVerifiedBannerProposer": "**Email Not Verified**: You can’t publish a proposal until your email is verified.",
+  "@emailNotVerifiedBannerProposer": {
+    "description": "Message used in banner to inform user that email is not verified when user is a proposer"
+  },
+  "goToMyAccountForEmailVerification": "Go to {destination} to verify it.",
+  "@goToMyAccountForEmailVerification": {
+    "description": "Message used in banner for CTA to inform user to go to My Account to verify email"
+  },
+  "verifiedEmailNeededToPublishTitle": "A verified email is required to publish your proposal",
+  "@verifiedEmailNeededToPublishTitle": {
+    "description": "Title of snackbar shown when user tries to publish a proposal without having a verified email"
+  },
+  "verifiedEmailNeededToPublishMessage": "You need to verify your email address to publish your proposal.",
+  "@verifiedEmailNeededToPublishMessage": {
+    "description": "Go to My Account to check your email address and resend the verification."
+  },
+  "expandableTextLess": "Show less",
+  "@expandableTextLess": {
+    "description": "When text is too long and you can collapse it to eg. 2 lines"
+  },
+  "expandableTextMore": "Show more",
+  "@expandableTextMore": {
+    "description": "When text is too long and you can display it fully"
   }
 }

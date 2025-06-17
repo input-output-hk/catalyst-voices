@@ -76,6 +76,7 @@ build:
 
     # Generate the OpenAPI doc from the cat-gateway executable itself.
     ENV API_HOST_NAMES "https://gateway.dev.projectcatalyst.io"
+    ENV API_URL_PREFIX  "/api/gateway"
     RUN ./target/release/cat-gateway docs ./target/doc/cat-gateway-api.json
 
     SAVE ARTIFACT target/doc doc

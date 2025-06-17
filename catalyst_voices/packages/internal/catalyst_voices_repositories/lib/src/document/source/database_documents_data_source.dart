@@ -11,6 +11,9 @@ final class DatabaseDocumentsDataSource
   );
 
   @override
+  Future<int> deleteAll() => _database.documentsDao.deleteAll();
+
+  @override
   Future<bool> exists({required DocumentRef ref}) {
     return _database.documentsDao.count(ref: ref).then((count) => count > 0);
   }

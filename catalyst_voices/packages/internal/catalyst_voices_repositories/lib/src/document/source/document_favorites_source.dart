@@ -9,6 +9,9 @@ final class DatabaseDocumentFavoriteSource implements DocumentFavoriteSource {
   );
 
   @override
+  Future<int> deleteAll() => _database.favoritesDao.deleteAll();
+
+  @override
   Future<void> updateDocumentFavorite(
     String id, {
     required DocumentType type,
@@ -41,6 +44,8 @@ final class DatabaseDocumentFavoriteSource implements DocumentFavoriteSource {
 }
 
 abstract interface class DocumentFavoriteSource {
+  Future<int> deleteAll();
+
   Future<void> updateDocumentFavorite(
     String id, {
     required DocumentType type,
