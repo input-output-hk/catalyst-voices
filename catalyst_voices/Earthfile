@@ -127,7 +127,7 @@ package:
 
     COPY +build-web/web /app
 
-    # Note this is only used for local development, a different Cadyfile is
+    # Note this is only used for local development, a different Caddyfile is
     # used during deployment. See blueprint.cue.
     COPY ./Caddyfile /etc/caddy/Caddyfile
 
