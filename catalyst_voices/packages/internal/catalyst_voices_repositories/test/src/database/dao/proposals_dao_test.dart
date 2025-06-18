@@ -1764,6 +1764,138 @@ void main() {
         },
         onPlatform: driftOnPlatforms,
       );
+
+      test(
+        'order alphabetical works case-insensitively with null titles',
+        () async {
+          // Given
+          final templateRef = SignedDocumentRef.generateFirstRef();
+          const titles = [
+            'ABC',
+            'bcd',
+            null,
+            'Xyz',
+            'aabc',
+          ];
+
+          final templates = [
+            _buildProposalTemplate(selfRef: templateRef),
+          ];
+
+          final proposals = titles.map((title) {
+            return _buildProposal(
+              selfRef: SignedDocumentRef.generateFirstRef(),
+              template: templateRef,
+              title: title,
+            );
+          }).shuffled();
+
+          final actions = <DocumentEntityWithMetadata>[];
+          final comments = <DocumentEntityWithMetadata>[];
+
+          const filters = ProposalsFilters();
+          const order = Alphabetical();
+
+          // When
+          await database.documentsDao.saveAll([
+            ...templates,
+            ...proposals,
+            ...actions,
+            ...comments,
+          ]);
+
+          // Then
+          const request = PageRequest(page: 0, size: 25);
+          final page = await database.proposalsDao.queryProposalsPage(
+            request: request,
+            filters: filters,
+            order: order,
+          );
+
+          expect(page.page, 0);
+
+          final proposalsTitles = page.items.map((e) => e.proposal.content.title).toList();
+
+          final expectedOrder = [
+            'aabc',
+            'ABC',
+            'bcd',
+            'Xyz',
+            null,
+          ];
+
+          expect(proposalsTitles, containsAllInOrder(expectedOrder));
+        },
+        onPlatform: driftOnPlatforms,
+      );
+
+      test(
+        'order alphabetical works case-insensitively',
+        () async {
+          // Given
+          final templateRef = SignedDocumentRef.generateFirstRef();
+          const titles = [
+            'Bravo',
+            'Lima',
+            'Test',
+            'alpha',
+            'beta',
+            'leet',
+            'tango',
+          ];
+
+          final templates = [
+            _buildProposalTemplate(selfRef: templateRef),
+          ];
+
+          final proposals = titles.map((title) {
+            return _buildProposal(
+              selfRef: SignedDocumentRef.generateFirstRef(),
+              template: templateRef,
+              title: title,
+            );
+          }).shuffled();
+
+          final actions = <DocumentEntityWithMetadata>[];
+          final comments = <DocumentEntityWithMetadata>[];
+
+          const filters = ProposalsFilters();
+          const order = Alphabetical();
+
+          // When
+          await database.documentsDao.saveAll([
+            ...templates,
+            ...proposals,
+            ...actions,
+            ...comments,
+          ]);
+
+          // Then
+          const request = PageRequest(page: 0, size: 25);
+          final page = await database.proposalsDao.queryProposalsPage(
+            request: request,
+            filters: filters,
+            order: order,
+          );
+
+          expect(page.page, 0);
+
+          final proposalsTitles = page.items.map((e) => e.proposal.content.title).toList();
+
+          final expectedOrder = [
+            'alpha',
+            'beta',
+            'Bravo',
+            'leet',
+            'Lima',
+            'tango',
+            'Test',
+          ];
+
+          expect(proposalsTitles, containsAllInOrder(expectedOrder));
+        },
+        onPlatform: driftOnPlatforms,
+      );
     });
   });
 }
