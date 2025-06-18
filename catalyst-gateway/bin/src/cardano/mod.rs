@@ -710,8 +710,14 @@ impl event::EventTarget<event::ChainIndexerEvent> for SyncTask {
     fn add_event_listener(&mut self, listener: event::EventListenerFn<event::ChainIndexerEvent>) {
         let mut rx = self.event_channel.0.subscribe();
         tokio::spawn(async move {
-            while let Ok(event) = rx.recv().await {
-                (listener)(&event);
+            loop {
+                match rx.recv().await {
+                    Ok(event) => (listener)(&event),
+                    Err(broadcast::error::RecvError::Lagged(lag)) => {
+                        error!(lag = lag, "Sync tasks event listenner lagged");
+                    },
+                    Err(broadcast::error::RecvError::Closed) => break,
+                }
             }
         });
     }
