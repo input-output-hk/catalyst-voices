@@ -73,7 +73,7 @@ dependencies:
   mask_text_input_formatter: ^2.9.0
   result_type: ^0.2.0
   scrollable_positioned_list: ^0.3.8
-  sentry_flutter: ^8.8.0
+  sentry_flutter: ^9.0.0
   shared_preferences: ^2.3.3
   skeletonizer: ^1.4.3
   url_launcher: ^6.2.2
@@ -97,7 +97,7 @@ dev_dependencies:
   mocktail: ^1.0.1
   patrol_finders: ^2.5.1
   plugin_platform_interface: ^2.1.8
-  sentry_dart_plugin: ^2.1.0
+  sentry_dart_plugin: ^2.4.1
   url_launcher_platform_interface: ^2.2.0
 
 flutter:
