@@ -1,4 +1,5 @@
 import 'package:catalyst_voices/pages/dev_tools/cards/info_card.dart';
+import 'package:catalyst_voices/pages/dev_tools/widgets/document_lookup.dart';
 import 'package:catalyst_voices/pages/dev_tools/widgets/documents_count_text.dart';
 import 'package:catalyst_voices/pages/dev_tools/widgets/sync_stats_text.dart';
 import 'package:catalyst_voices/pages/dev_tools/widgets/value_text.dart';
@@ -16,6 +17,9 @@ class DocumentsCard extends StatelessWidget {
       children: [
         ValueText(name: Text('Sync stats'), value: SyncStatsText()),
         ValueText(name: Text('Documents count'), value: DocumentsCountText()),
+        VoicesTextDivider(indent: 0, child: Text('Lookup')),
+        DocumentLookup(),
+        VoicesDivider.expanded(),
         Row(
           spacing: 8,
           children: [
