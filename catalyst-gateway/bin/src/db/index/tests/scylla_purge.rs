@@ -4,7 +4,9 @@
 
 // cSpell:ignoreRegExp cardano/Fftx
 
-use cardano_blockchain_types::{TransactionId, VotingPubKey};
+use std::collections::HashSet;
+
+use cardano_blockchain_types::{Network, StakeAddress, TransactionId, VotingPubKey};
 use catalyst_types::{problem_report::ProblemReport, uuid::UuidV4};
 use ed25519_dalek::VerifyingKey;
 use futures::StreamExt;
@@ -18,6 +20,226 @@ use crate::db::index::{
         test_utils::{stake_address_1, stake_address_2},
     },
 };
+
+#[ignore = "An integration test which requires a running Scylla node instance, disabled from `testunit` CI run"]
+#[tokio::test]
+async fn catalyst_id_for_stake_address() {
+    let Ok((session, _)) = get_shared_session().await else {
+        panic!("{SESSION_ERR_MSG}");
+    };
+
+    // data
+    let data = vec![
+        rbac509::insert_catalyst_id_for_stake_address::Params::new(
+            stake_address_1(),
+            0.into(),
+            0.into(),
+            "cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE"
+                .parse()
+                .unwrap(),
+        ),
+        rbac509::insert_catalyst_id_for_stake_address::Params::new(
+            stake_address_2(),
+            1.into(),
+            1.into(),
+            "cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE"
+                .parse()
+                .unwrap(),
+        ),
+    ];
+    let data_len = data.len();
+
+    // insert
+    session
+        .execute_batch(PreparedQuery::CatalystIdForStakeAddressInsertQuery, data)
+        .await
+        .unwrap();
+
+    // read
+    let mut row_stream = catalyst_id_for_stake_address::PrimaryKeyQuery::execute(&session)
+        .await
+        .unwrap();
+
+    let mut read_rows = vec![];
+    while let Some(row_res) = row_stream.next().await {
+        read_rows.push(row_res.unwrap());
+    }
+
+    assert_eq!(read_rows.len(), data_len);
+
+    // delete
+    let delete_params = read_rows
+        .into_iter()
+        .map(catalyst_id_for_stake_address::Params::from)
+        .collect();
+    let row_results = catalyst_id_for_stake_address::DeleteQuery::execute(&session, delete_params)
+        .await
+        .unwrap()
+        .into_iter()
+        .all(|r| r.result_not_rows().is_ok());
+
+    assert!(row_results);
+
+    // re-read
+    let mut row_stream = catalyst_id_for_stake_address::PrimaryKeyQuery::execute(&session)
+        .await
+        .unwrap();
+
+    let mut read_rows = vec![];
+    while let Some(row_res) = row_stream.next().await {
+        read_rows.push(row_res.unwrap());
+    }
+
+    assert!(read_rows.is_empty());
+}
+
+#[ignore = "An integration test which requires a running Scylla node instance, disabled from `testunit` CI run"]
+#[tokio::test]
+async fn catalyst_id_for_txn_id() {
+    let Ok((session, _)) = get_shared_session().await else {
+        panic!("{SESSION_ERR_MSG}");
+    };
+
+    // data
+    let data = vec![
+        rbac509::insert_catalyst_id_for_txn_id::Params::new(
+            "cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE"
+                .parse()
+                .unwrap(),
+            TransactionId::new(&[0]),
+            0.into(),
+        ),
+        rbac509::insert_catalyst_id_for_txn_id::Params::new(
+            "cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE"
+                .parse()
+                .unwrap(),
+            TransactionId::new(&[1]),
+            1.into(),
+        ),
+    ];
+    let data_len = data.len();
+
+    // insert
+    session
+        .execute_batch(PreparedQuery::CatalystIdForTxnIdInsertQuery, data)
+        .await
+        .unwrap();
+
+    // read
+    let mut row_stream = catalyst_id_for_txn_id::PrimaryKeyQuery::execute(&session)
+        .await
+        .unwrap();
+
+    let mut read_rows = vec![];
+    while let Some(row_res) = row_stream.next().await {
+        read_rows.push(row_res.unwrap());
+    }
+
+    assert_eq!(read_rows.len(), data_len);
+
+    // delete
+    let delete_params = read_rows
+        .into_iter()
+        .map(catalyst_id_for_txn_id::Params::from)
+        .collect();
+    let row_results = catalyst_id_for_txn_id::DeleteQuery::execute(&session, delete_params)
+        .await
+        .unwrap()
+        .into_iter()
+        .all(|r| r.result_not_rows().is_ok());
+
+    assert!(row_results);
+
+    // re-read
+    let mut row_stream = catalyst_id_for_txn_id::PrimaryKeyQuery::execute(&session)
+        .await
+        .unwrap();
+
+    let mut read_rows = vec![];
+    while let Some(row_res) = row_stream.next().await {
+        read_rows.push(row_res.unwrap());
+    }
+
+    assert!(read_rows.is_empty());
+}
+
+#[ignore = "An integration test which requires a running Scylla node instance, disabled from `testunit` CI run"]
+#[tokio::test]
+async fn catalyst_id_for_public_key() {
+    let Ok((session, _)) = get_shared_session().await else {
+        panic!("{SESSION_ERR_MSG}");
+    };
+
+    // data
+    let data = vec![
+        rbac509::insert_catalyst_id_for_public_key::Params::new(
+            VerifyingKey::from_bytes(&[
+                51, 200, 245, 181, 232, 166, 86, 58, 48, 33, 72, 162, 85, 30, 7, 28, 12, 87, 113,
+                3, 68, 233, 104, 179, 113, 196, 59, 4, 155, 225, 74, 149,
+            ])
+            .unwrap(),
+            0.into(),
+            "cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE"
+                .parse()
+                .unwrap(),
+        ),
+        rbac509::insert_catalyst_id_for_public_key::Params::new(
+            VerifyingKey::from_bytes(&[
+                203, 12, 200, 203, 42, 30, 255, 236, 0, 171, 68, 163, 116, 199, 128, 6, 177, 15,
+                47, 74, 188, 81, 43, 244, 51, 2, 161, 145, 195, 236, 188, 75,
+            ])
+            .unwrap(),
+            1.into(),
+            "cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE"
+                .parse()
+                .unwrap(),
+        ),
+    ];
+    let data_len = data.len();
+
+    // insert
+    session
+        .execute_batch(PreparedQuery::CatalystIdForPublicKeyInsertQuery, data)
+        .await
+        .unwrap();
+
+    // read
+    let mut row_stream = catalyst_id_for_public_key::PrimaryKeyQuery::execute(&session)
+        .await
+        .unwrap();
+
+    let mut read_rows = vec![];
+    while let Some(row_res) = row_stream.next().await {
+        read_rows.push(row_res.unwrap());
+    }
+
+    assert_eq!(read_rows.len(), data_len);
+
+    // delete
+    let delete_params = read_rows
+        .into_iter()
+        .map(catalyst_id_for_public_key::Params::from)
+        .collect();
+    let row_results = catalyst_id_for_public_key::DeleteQuery::execute(&session, delete_params)
+        .await
+        .unwrap()
+        .into_iter()
+        .all(|r| r.result_not_rows().is_ok());
+
+    assert!(row_results);
+
+    // re-read
+    let mut row_stream = catalyst_id_for_public_key::PrimaryKeyQuery::execute(&session)
+        .await
+        .unwrap();
+
+    let mut read_rows = vec![];
+    while let Some(row_res) = row_stream.next().await {
+        read_rows.push(row_res.unwrap());
+    }
+
+    assert!(read_rows.is_empty());
+}
 
 #[ignore = "An integration test which requires a running Scylla node instance, disabled from `testunit` CI run"]
 #[tokio::test]
@@ -36,6 +258,7 @@ async fn rbac509_registration() {
             0.into(),
             0.into(),
             None,
+            HashSet::new(),
         ),
         rbac509::insert_rbac509::Params::new(
             "cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE"
@@ -44,7 +267,16 @@ async fn rbac509_registration() {
             TransactionId::new(&[1]),
             1.into(),
             1.into(),
-            None,
+            Some(TransactionId::new(&[3])),
+            [StakeAddress::new(
+                Network::Mainnet,
+                false,
+                "276fd18711931e2c0e21430192dbeac0e458093cd9d1fcd7210f64b3"
+                    .parse()
+                    .unwrap(),
+            )]
+            .into_iter()
+            .collect(),
         ),
     ];
     let data_len = data.len();

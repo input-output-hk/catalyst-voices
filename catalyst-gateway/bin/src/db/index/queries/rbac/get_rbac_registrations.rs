@@ -1,6 +1,6 @@
 //! Get RBAC registrations by Catalyst ID.
 
-use std::sync::Arc;
+use std::{collections::HashSet, sync::Arc};
 
 use anyhow::Context;
 use cardano_blockchain_types::{Network, Point, Slot, TxnIndex};
@@ -19,7 +19,7 @@ use crate::db::{
         queries::{PreparedQueries, PreparedSelectQuery},
         session::CassandraSession,
     },
-    types::{DbCatalystId, DbSlot, DbTransactionId, DbTxnIndex},
+    types::{DbCatalystId, DbSlot, DbStakeAddress, DbTransactionId, DbTxnIndex},
 };
 
 /// Get registrations by Catalyst ID query.
@@ -33,6 +33,7 @@ pub(crate) struct QueryParams {
 }
 
 /// Get registrations by Catalyst ID query.
+#[allow(dead_code)]
 #[derive(DeserializeRow, Clone)]
 pub(crate) struct Query {
     /// Registration transaction id.
@@ -43,8 +44,9 @@ pub(crate) struct Query {
     /// A transaction index.
     pub txn_index: DbTxnIndex,
     /// A previous  transaction id.
-    #[allow(dead_code)]
     pub prv_txn_id: Option<DbTransactionId>,
+    /// A set of removed stake addresses.
+    pub removed_stake_addresses: HashSet<DbStakeAddress>,
 }
 
 impl Query {
