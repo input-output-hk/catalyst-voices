@@ -1,9 +1,9 @@
 import 'dart:math';
 
-import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart' as cs
-    show Ed25519PublicKey;
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart'
     hide Ed25519PublicKey;
+import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart' as cs
+    show Ed25519PublicKey;
 import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/src/crypto/key_derivation_service.dart';
@@ -81,17 +81,25 @@ final class RegistrationTransactionBuilder {
   /// Throws [RegistrationInsufficientBalanceException] in case the
   /// user doesn't have enough balance to pay for the registration transaction.
   Future<Transaction> build() async {
-    if (utxos.isEmpty) {
+    try {
+      if (utxos.isEmpty) {
+        throw const RegistrationInsufficientBalanceException();
+      }
+
+      final x509Envelope = await _buildMetadataEnvelope();
+
+      return _buildUnsignedRbacTx(
+        auxiliaryData: AuxiliaryData.fromCbor(
+          await x509Envelope.toCbor(serializer: (e) => e.toCbor()),
+        ),
+      );
+    } on InsufficientAdaForAssetsException {
+      throw const RegistrationInsufficientBalanceException();
+    } on InsufficientAdaForChangeOutputException {
+      throw const RegistrationInsufficientBalanceException();
+    } on InsufficientUtxoBalanceException {
       throw const RegistrationInsufficientBalanceException();
     }
-
-    final x509Envelope = await _buildMetadataEnvelope();
-
-    return _buildUnsignedRbacTx(
-      auxiliaryData: AuxiliaryData.fromCbor(
-        await x509Envelope.toCbor(serializer: (e) => e.toCbor()),
-      ),
-    );
   }
 
   Future<RegistrationMetadata> _buildMetadataEnvelope() async {
@@ -180,13 +188,14 @@ final class RegistrationTransactionBuilder {
       networkId: networkId,
       ttl: slotNumberTtl,
       auxiliaryData: auxiliaryData,
-      witnessBuilder: const TransactionWitnessSetBuilder(
-        vkeys: {},
-        vkeysCount: 2,
-      ),
+      changeAddress: changeAddress,
     );
 
-    final txBody = txBuilder.withChangeAddressIfNeeded(changeAddress).buildBody();
+    final txBody = txBuilder
+        .applySelection(
+          changeOutputStrategy: ChangeOutputAdaStrategy.noBurn,
+        )
+        .buildBody();
 
     return Transaction(
       body: txBody,
@@ -254,9 +263,7 @@ final class RegistrationTransactionBuilder {
 
     final tbs = X509TBSCertificate(
       serialNumber: _randomSerialNumber(),
-      subjectPublicKey: Bip32Ed25519XPublicKeyFactory.instance.fromBytes(
-        keyPair.publicKey.bytes,
-      ),
+      subjectPublicKey: keyPair.publicKey.toEd25519(),
       issuer: issuer,
       validityNotBefore: DateTime.now().toUtc(),
       validityNotAfter: X509TBSCertificate.foreverValid,

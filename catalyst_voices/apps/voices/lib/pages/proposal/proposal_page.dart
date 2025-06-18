@@ -36,6 +36,35 @@ class ProposalPage extends StatefulWidget {
   State<ProposalPage> createState() => _ProposalPageState();
 }
 
+class _AppBar extends StatelessWidget implements PreferredSizeWidget {
+  const _AppBar();
+
+  @override
+  Size get preferredSize => const VoicesAppBar().preferredSize;
+
+  @override
+  Widget build(BuildContext context) {
+    final readOnlyMode = context.select<ProposalCubit, bool>((cubit) => cubit.state.readOnlyMode);
+
+    return VoicesAppBar(
+      leading: NavigationBack(
+        isCompact: true,
+        onCanNotPop: (context, _) => const ProposalsRoute().go(context),
+      ),
+      actions: [
+        Offstage(
+          offstage: readOnlyMode,
+          child: const SessionActionHeader(),
+        ),
+        Offstage(
+          offstage: readOnlyMode,
+          child: const SessionStateHeader(),
+        ),
+      ],
+    );
+  }
+}
+
 class _ProposalPageState extends State<ProposalPage>
     with
         ErrorHandlerStateMixin<ProposalCubit, ProposalPage>,
@@ -50,13 +79,7 @@ class _ProposalPageState extends State<ProposalPage>
     return SegmentsControllerScope(
       controller: _segmentsController,
       child: Scaffold(
-        appBar: const VoicesAppBar(
-          automaticallyImplyLeading: false,
-          actions: [
-            SessionActionHeader(),
-            SessionStateHeader(),
-          ],
-        ),
+        appBar: const _AppBar(),
         endDrawer: const OpportunitiesDrawer(),
         body: ProposalHeaderWrapper(
           child: ProposalSidebars(
@@ -124,7 +147,7 @@ class _ProposalPageState extends State<ProposalPage>
 
     final bloc = context.read<ProposalCubit>();
 
-    _segmentsController = SegmentsController();
+    _segmentsController = SegmentsController(scrollAlignment: 0.1);
     _segmentsScrollController = ItemScrollController();
 
     _segmentsController

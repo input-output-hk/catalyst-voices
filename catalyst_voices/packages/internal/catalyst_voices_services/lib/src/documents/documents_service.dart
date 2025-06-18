@@ -14,11 +14,16 @@ typedef _RefFailure = Failure<MaybeTypedDocumentRef, Exception>;
 
 typedef _RefSuccess = Success<MaybeTypedDocumentRef, Exception>;
 
-// ignore: one_member_abstracts
 abstract interface class DocumentsService {
-  factory DocumentsService(
+  const factory DocumentsService(
     DocumentRepository documentRepository,
   ) = DocumentsServiceImpl;
+
+  /// Removes all locally stored documents.
+  Future<int> clear();
+
+  /// Returns all matching [DocumentData] for given [ref].
+  Future<List<DocumentData>> lookup(DocumentRef ref);
 
   /// Syncs locally stored documents with api.
   ///
@@ -29,14 +34,25 @@ abstract interface class DocumentsService {
     ValueChanged<double>? onProgress,
     int maxConcurrent,
   });
+
+  /// Emits change of documents count.
+  Stream<int> watchCount();
 }
 
 final class DocumentsServiceImpl implements DocumentsService {
   final DocumentRepository _documentRepository;
 
-  DocumentsServiceImpl(
+  const DocumentsServiceImpl(
     this._documentRepository,
   );
+
+  @override
+  Future<int> clear() => _documentRepository.removeAll();
+
+  @override
+  Future<List<DocumentData>> lookup(DocumentRef ref) {
+    return _documentRepository.getAllDocumentsData(ref: ref);
+  }
 
   @override
   Future<List<MaybeTypedDocumentRef>> sync({
@@ -137,5 +153,10 @@ final class DocumentsServiceImpl implements DocumentsService {
     onProgress?.call(1);
 
     return outcomes.whereType<_RefSuccess>().map((e) => e.success).toList();
+  }
+
+  @override
+  Stream<int> watchCount() {
+    return _documentRepository.watchCount();
   }
 }

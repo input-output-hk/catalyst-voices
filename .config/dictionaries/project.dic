@@ -35,6 +35,7 @@ bkioshn
 bluefireteam
 bridgefor
 BROTLI
+Caddyfile
 canvaskit
 cardano
 cargokit
@@ -51,6 +52,7 @@ certdir
 CEST
 cfbundle
 changeme
+choosealicense
 Chotivichit
 chromedriver
 chrono
@@ -76,6 +78,7 @@ dalek
 damian-molinski
 daos
 DAPPLICATION
+dartify
 dashmap
 dbeaver
 dbschema
@@ -84,10 +87,12 @@ Debouncer
 Deleg
 delegators
 devnet
+devs
 DIND
 dockerhub
 domcontentloaded
 Dominik
+donts
 dotenv
 dotenvy
 dotglob
@@ -97,6 +102,7 @@ dtscalac
 earthfile
 earthlyignore
 Easterling
+ecommerce
 eddsa
 Edgedriver
 Embedder
@@ -128,6 +134,7 @@ gradlew
 Hackathons
 headful
 headlessui
+healthz
 HIDPI
 hotspots
 icudtl
@@ -206,6 +213,7 @@ minicbor
 minijinja
 mithril
 mitigations
+mitmdump
 mocktail
 moderations
 moka
@@ -258,6 +266,7 @@ pubkey
 PUBLICKEY
 pubspec
 pycardano
+pyright
 pytest
 qrcode
 rapidoc
@@ -297,10 +306,12 @@ servernum
 serviceworker
 skeletonizer
 slotno
+snackbars
 sqlfluff
 SRCROOT
 sslmode
 sstableinfo
+stablecoins
 stake1u94ullc9nj9gawc08990nx8hwgw80l9zpmr8re44kydqy9cdjq6rq
 staticlib
 Stefano

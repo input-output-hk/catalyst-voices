@@ -31,6 +31,8 @@ class DocumentBuilderSectionTile extends StatefulWidget {
   /// See [DocumentPropertyBuilderOverrides].
   final DocumentPropertyBuilderOverrides? overrides;
 
+  final DocumentPropertyActionOverrides? actionOverrides;
+
   const DocumentBuilderSectionTile({
     required super.key,
     required this.section,
@@ -39,6 +41,7 @@ class DocumentBuilderSectionTile extends StatefulWidget {
     this.autovalidateMode = AutovalidateMode.disabled,
     required this.onChanged,
     this.overrides,
+    this.actionOverrides,
   });
 
   @override
@@ -68,6 +71,12 @@ class _DocumentBuilderSectionTileState extends State<DocumentBuilderSectionTile>
     return null;
   }
 
+  Widget? get _overrideAction {
+    final overrides = widget.actionOverrides?[widget.section.nodeId];
+
+    return overrides;
+  }
+
   @override
   Widget build(BuildContext context) {
     final title = _editedSection.schema.title;
@@ -83,6 +92,7 @@ class _DocumentBuilderSectionTileState extends State<DocumentBuilderSectionTile>
       saveButtonLeading: VoicesAssets.icons.check.buildIcon(),
       editCancelButtonStyle: VoicesEditCancelButtonStyle.outlinedWithIcon,
       onChanged: _onEditModeChange,
+      overrideAction: _overrideAction,
       child: Form(
         key: _formKey,
         autovalidateMode: widget.autovalidateMode,
@@ -172,6 +182,8 @@ class _DocumentBuilderSectionTileState extends State<DocumentBuilderSectionTile>
           setState(() {
             _isEditMode = value.isEditMode;
           });
+          SegmentsControllerScope.of(context)
+              .selectSectionStep(widget.section.nodeId, shouldScroll: false);
         }
 
       case EditableTileChangeSource.save:

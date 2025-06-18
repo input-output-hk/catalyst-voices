@@ -35,8 +35,10 @@ class FundsDetailCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          VoicesAssets.icons.library.buildIcon(),
-          const SizedBox(height: 32),
+          if (type == FundsDetailCardType.found) ...[
+            VoicesAssets.icons.library.buildIcon(),
+            const SizedBox(height: 32),
+          ],
           SizedBox(
             width: double.infinity,
             child: Wrap(
@@ -50,14 +52,20 @@ class FundsDetailCard extends StatelessWidget {
                   description: type.localizedTypeDescription(context.l10n),
                   funds: allFunds,
                 ),
-                _CampaignFundsDetail(
-                  key: const Key('FundsDetailRequested'),
-                  title: type.localizedTotalAsk(context.l10n),
-                  description: context.l10n.campaignTotalAskDescription,
-                  funds: totalAsk,
-                  largeFundsText: false,
+                Offstage(
+                  offstage: type.isCategoryCompact,
+                  child: _CampaignFundsDetail(
+                    key: const Key('FundsDetailRequested'),
+                    title: type.localizedTotalAsk(context.l10n),
+                    description: context.l10n.campaignTotalAskDescription,
+                    funds: totalAsk,
+                    largeFundsText: false,
+                  ),
                 ),
-                _RangeAsk(range: askRange),
+                Offstage(
+                  offstage: type.isFound,
+                  child: _RangeAsk(range: askRange),
+                ),
               ],
             ),
           ),
@@ -69,26 +77,32 @@ class FundsDetailCard extends StatelessWidget {
 
 enum FundsDetailCardType {
   found,
+  categoryCompact,
   category;
+
+  bool get isCategoryCompact => this == FundsDetailCardType.categoryCompact;
+  bool get isFound => this == FundsDetailCardType.found;
 
   String localizedTotalAsk(VoicesLocalizations l10n) {
     return switch (this) {
       FundsDetailCardType.found => l10n.campaignTotalAsk,
-      FundsDetailCardType.category => l10n.currentAsk,
+      FundsDetailCardType.category || FundsDetailCardType.categoryCompact => l10n.currentAsk,
     };
   }
 
   String localizedTypeDescription(VoicesLocalizations l10n) {
     return switch (this) {
       FundsDetailCardType.found => l10n.campaignTreasuryDescription,
-      FundsDetailCardType.category => l10n.fundsAvailableForCategory,
+      FundsDetailCardType.category ||
+      FundsDetailCardType.categoryCompact =>
+        l10n.fundsAvailableForCategory,
     };
   }
 
   String localizedTypeName(VoicesLocalizations l10n) {
     return switch (this) {
       FundsDetailCardType.found => l10n.campaignTreasury,
-      FundsDetailCardType.category => l10n.categoryBudget,
+      FundsDetailCardType.category || FundsDetailCardType.categoryCompact => l10n.categoryBudget,
     };
   }
 }

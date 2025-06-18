@@ -18,6 +18,8 @@ abstract interface class CampaignService {
 
   Future<List<CampaignTimeline>> getCampaignTimeline();
 
+  Future<CampaignTimeline> getCampaignTimelineByStage(CampaignTimelineStage stage);
+
   Future<CampaignCategory> getCategory(SignedDocumentRef ref);
 
   Future<CurrentCampaign> getCurrentCampaign();
@@ -52,6 +54,8 @@ final class CampaignServiceImpl implements CampaignService {
   Future<List<CampaignCategory>> getCampaignCategories() async {
     final categories = await _campaignRepository.getCampaignCategories();
     final updatedCategories = <CampaignCategory>[];
+    final proposalSubmissionStage =
+        await getCampaignTimelineByStage(CampaignTimelineStage.proposalSubmission);
 
     for (final category in categories) {
       final categoryProposals = await _proposalRepository.getProposals(
@@ -63,6 +67,7 @@ final class CampaignServiceImpl implements CampaignService {
       final updatedCategory = category.copyWith(
         totalAsk: totalAsk,
         proposalsCount: categoryProposals.length,
+        submissionCloseDate: proposalSubmissionStage.timeline.to,
       );
       updatedCategories.add(updatedCategory);
     }
@@ -75,17 +80,30 @@ final class CampaignServiceImpl implements CampaignService {
   }
 
   @override
+  Future<CampaignTimeline> getCampaignTimelineByStage(CampaignTimelineStage stage) async {
+    final timeline = await getCampaignTimeline();
+    final timelineStage = timeline.firstWhere(
+      (element) => element.stage == stage,
+      orElse: () => throw (StateError('Stage $stage not found')),
+    );
+    return timelineStage;
+  }
+
+  @override
   Future<CampaignCategory> getCategory(SignedDocumentRef ref) async {
     final category = await _campaignRepository.getCategory(ref);
     final categoryProposals = await _proposalRepository.getProposals(
       type: ProposalsFilterType.finals,
       categoryRef: ref,
     );
+    final proposalSubmissionStage =
+        await getCampaignTimelineByStage(CampaignTimelineStage.proposalSubmission);
     final totalAsk = _calculateTotalAsk(categoryProposals);
 
     return category.copyWith(
       totalAsk: totalAsk,
       proposalsCount: categoryProposals.length,
+      submissionCloseDate: proposalSubmissionStage.timeline.to,
     );
   }
 

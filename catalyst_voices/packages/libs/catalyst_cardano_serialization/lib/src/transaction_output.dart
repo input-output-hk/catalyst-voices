@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+
 import 'package:catalyst_cardano_serialization/src/address.dart';
 import 'package:catalyst_cardano_serialization/src/datum.dart';
 import 'package:catalyst_cardano_serialization/src/scripts.dart';
@@ -6,42 +7,6 @@ import 'package:catalyst_cardano_serialization/src/types.dart';
 import 'package:cbor/cbor.dart';
 import 'package:equatable/equatable.dart';
 import 'package:pinenacl/api.dart';
-
-/// Abstract base class representing a transaction output in Cardano.
-/// A [ShelleyMultiAssetTransactionOutput] defines the destination address
-/// and the amount of cryptocurrency being sent to that address.
-///
-/// There are different implementations of Cardano's
-/// TransactionOutputs depending on the era.
-/// This class provides common functionality for both types.
-///
-/// > Note: It does not support pure Shelley era outputs i.e. output with only
-/// pure coin (int) type as amount.
-sealed class ShelleyMultiAssetTransactionOutput extends Equatable implements CborEncodable {
-  /// The destination address for the output.
-  final ShelleyAddress address;
-
-  /// The amount of cryptocurrency being sent to the address.
-  final Balance amount;
-
-  /// Constructor for the [ShelleyMultiAssetTransactionOutput] class, requiring
-  /// an address and amount.
-  const ShelleyMultiAssetTransactionOutput({
-    required this.address,
-    required this.amount,
-  });
-
-  @override
-  List<Object?> get props => [address, amount];
-
-  /// Abstract method for copying a transaction output with optional new values.
-  /// Subclasses must implement this method to allow for creating modified
-  /// copies of existing transaction outputs.
-  ShelleyMultiAssetTransactionOutput copyWith({
-    ShelleyAddress? address,
-    Balance? amount,
-  });
-}
 
 /// Class representing a transaction output from the Pre-Babbage era in Cardano.
 /// A [PreBabbageTransactionOutput] contains a datum hash, which refers to data
@@ -80,19 +45,11 @@ final class PreBabbageTransactionOutput extends ShelleyMultiAssetTransactionOutp
     );
   }
 
-  /// Converts the [PreBabbageTransactionOutput] to a CBOR-encoded value.
-  /// The CBOR list contains the address, amount, and optionally the datum hash.
+  /// Override of the [Equatable] properties for value comparison.
+  /// This allows comparing [PreBabbageTransactionOutput] instances based on
+  /// their address, amount, and optional datum hash.
   @override
-  CborValue toCbor({List<int> tags = const []}) {
-    return CborList(
-      [
-        address.toCbor(),
-        amount.toCbor(),
-        if (datumHash != null) datumHash!.toCbor(),
-      ],
-      tags: tags,
-    );
-  }
+  List<Object?> get props => [address, amount, datumHash];
 
   /// Method for creating a copy of the [PreBabbageTransactionOutput] with
   /// optional new values.
@@ -111,11 +68,55 @@ final class PreBabbageTransactionOutput extends ShelleyMultiAssetTransactionOutp
     );
   }
 
-  /// Override of the [Equatable] properties for value comparison.
-  /// This allows comparing [PreBabbageTransactionOutput] instances based on
-  /// their address, amount, and optional datum hash.
+  /// Converts the [PreBabbageTransactionOutput] to a CBOR-encoded value.
+  /// The CBOR list contains the address, amount, and optionally the datum hash.
   @override
-  List<Object?> get props => [address, amount, datumHash];
+  CborValue toCbor({List<int> tags = const []}) {
+    return CborList(
+      [
+        address.toCbor(),
+        amount.toCbor(),
+        if (datumHash != null) datumHash!.toCbor(),
+      ],
+      tags: tags,
+    );
+  }
+}
+
+/// Abstract base class representing a transaction output in Cardano.
+/// A [ShelleyMultiAssetTransactionOutput] defines the destination address
+/// and the amount of cryptocurrency being sent to that address.
+///
+/// There are different implementations of Cardano's
+/// TransactionOutputs depending on the era.
+/// This class provides common functionality for both types.
+///
+/// > Note: It does not support pure Shelley era outputs i.e. output with only
+/// pure coin (int) type as amount.
+sealed class ShelleyMultiAssetTransactionOutput extends Equatable implements CborEncodable {
+  /// The destination address for the output.
+  final ShelleyAddress address;
+
+  /// The amount of cryptocurrency being sent to the address.
+  final Balance amount;
+
+  /// Constructor for the [ShelleyMultiAssetTransactionOutput] class, requiring
+  /// an address and amount.
+  const ShelleyMultiAssetTransactionOutput({
+    required this.address,
+    required this.amount,
+  });
+
+  @override
+  List<Object?> get props => [address, amount];
+
+  /// Abstract method for copying a transaction output with optional new values.
+  /// Subclasses must implement this method to allow for creating modified
+  /// copies of existing transaction outputs.
+  ShelleyMultiAssetTransactionOutput copyWith({
+    ShelleyAddress? address,
+    Balance? amount,
+  });
 }
 
 /// Class representing a transaction output from the Post-Alonzo era in Cardano.
@@ -149,24 +150,6 @@ final class TransactionOutput extends ShelleyMultiAssetTransactionOutput {
     this.scriptRef,
   });
 
-  /// Factory constructor to create a [ShelleyMultiAssetTransactionOutput]
-  /// from a CBOR-encoded value.
-  /// Depending on the structure of the CBOR value, it returns either a
-  /// [PreBabbageTransactionOutput] or [TransactionOutput].
-  static ShelleyMultiAssetTransactionOutput fromCbor(CborValue value) {
-    try {
-      return switch (value) {
-        CborList _ => PreBabbageTransactionOutput._fromCborList(value),
-        CborMap _ => TransactionOutput._fromCborMap(value),
-        _ => throw ArgumentError('Invalid CBOR value for TransactionOutput'),
-      };
-    } catch (e) {
-      throw ArgumentError(
-        'Failed to decode ShelleyMultiAssetTransactionOutput: $e',
-      );
-    }
-  }
-
   /// Factory constructor to create a [TransactionOutput] from a CBOR map.
   /// The CBOR map should contain the address, amount, and optionally the datum
   /// option and script reference.
@@ -184,6 +167,24 @@ final class TransactionOutput extends ShelleyMultiAssetTransactionOutput {
       amount: amount,
       datumOption: datumOption,
       scriptRef: scriptRef,
+    );
+  }
+
+  @override
+  List<Object?> get props => [address, amount, datumOption, scriptRef];
+
+  @override
+  TransactionOutput copyWith({
+    ShelleyAddress? address,
+    Balance? amount,
+    DatumOption? datumOption,
+    ScriptRef? scriptRef,
+  }) {
+    return TransactionOutput(
+      address: address ?? this.address,
+      amount: amount ?? this.amount,
+      datumOption: datumOption ?? this.datumOption,
+      scriptRef: scriptRef ?? this.scriptRef,
     );
   }
 
@@ -211,21 +212,21 @@ final class TransactionOutput extends ShelleyMultiAssetTransactionOutput {
     return map;
   }
 
-  @override
-  TransactionOutput copyWith({
-    ShelleyAddress? address,
-    Balance? amount,
-    DatumOption? datumOption,
-    ScriptRef? scriptRef,
-  }) {
-    return TransactionOutput(
-      address: address ?? this.address,
-      amount: amount ?? this.amount,
-      datumOption: datumOption ?? this.datumOption,
-      scriptRef: scriptRef ?? this.scriptRef,
-    );
+  /// Factory constructor to create a [ShelleyMultiAssetTransactionOutput]
+  /// from a CBOR-encoded value.
+  /// Depending on the structure of the CBOR value, it returns either a
+  /// [PreBabbageTransactionOutput] or [TransactionOutput].
+  static ShelleyMultiAssetTransactionOutput fromCbor(CborValue value) {
+    try {
+      return switch (value) {
+        CborList _ => PreBabbageTransactionOutput._fromCborList(value),
+        CborMap _ => TransactionOutput._fromCborMap(value),
+        _ => throw ArgumentError('Invalid CBOR value for TransactionOutput'),
+      };
+    } catch (e) {
+      throw ArgumentError(
+        'Failed to decode ShelleyMultiAssetTransactionOutput: $e',
+      );
+    }
   }
-
-  @override
-  List<Object?> get props => [address, amount, datumOption, scriptRef];
 }

@@ -1,3 +1,4 @@
+import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart' show Coin;
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_repositories/src/database/catalyst_database.dart';
@@ -5,6 +6,7 @@ import 'package:catalyst_voices_repositories/src/database/dao/proposals_dao.dart
 import 'package:catalyst_voices_repositories/src/database/table/documents_metadata.dart';
 import 'package:catalyst_voices_repositories/src/dto/proposal/proposal_submission_action_dto.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:uuid_plus/uuid_plus.dart';
 
@@ -667,6 +669,7 @@ void main() {
           ];
           const request = PageRequest(page: 0, size: 10);
           const filters = ProposalsFilters();
+          const order = UpdateDate(isAscending: true);
 
           final expectedRefs = [
             latestRef,
@@ -680,6 +683,7 @@ void main() {
           final page = await database.proposalsDao.queryProposalsPage(
             request: request,
             filters: filters,
+            order: order,
           );
 
           expect(page.items.length, 2);
@@ -714,6 +718,7 @@ void main() {
             );
           });
           const filters = ProposalsFilters();
+          const order = UpdateDate(isAscending: true);
 
           // When
           await database.documentsDao.saveAll([...templates, ...proposals]);
@@ -723,6 +728,7 @@ void main() {
           final pageZero = await database.proposalsDao.queryProposalsPage(
             request: firstRequest,
             filters: filters,
+            order: order,
           );
 
           expect(pageZero.page, 0);
@@ -734,6 +740,7 @@ void main() {
           final pageOne = await database.proposalsDao.queryProposalsPage(
             request: secondRequest,
             filters: filters,
+            order: order,
           );
 
           expect(pageOne.page, 1);
@@ -783,6 +790,7 @@ void main() {
               proposals.sublist(0, 3).map((proposal) => proposal.document.ref).toList();
 
           final filters = ProposalsFilters(category: categoryId);
+          const order = UpdateDate(isAscending: true);
 
           // When
           await database.documentsDao.saveAll([...templates, ...proposals]);
@@ -792,6 +800,7 @@ void main() {
           final page = await database.proposalsDao.queryProposalsPage(
             request: request,
             filters: filters,
+            order: order,
           );
 
           expect(page.page, 0);
@@ -848,6 +857,7 @@ void main() {
           ];
 
           const filters = ProposalsFilters(type: ProposalsFilterType.finals);
+          const order = UpdateDate(isAscending: true);
 
           // When
           await database.documentsDao.saveAll([
@@ -861,6 +871,7 @@ void main() {
           final page = await database.proposalsDao.queryProposalsPage(
             request: request,
             filters: filters,
+            order: order,
           );
 
           expect(page.page, 0);
@@ -918,6 +929,7 @@ void main() {
           ];
 
           const filters = ProposalsFilters(type: ProposalsFilterType.finals);
+          const order = UpdateDate(isAscending: true);
 
           // When
           await database.documentsDao.saveAll([
@@ -931,6 +943,7 @@ void main() {
           final page = await database.proposalsDao.queryProposalsPage(
             request: request,
             filters: filters,
+            order: order,
           );
 
           expect(page.page, 0);
@@ -990,6 +1003,7 @@ void main() {
           ];
 
           const filters = ProposalsFilters();
+          const order = UpdateDate(isAscending: true);
 
           // When
           await database.documentsDao.saveAll([
@@ -1004,6 +1018,7 @@ void main() {
           final page = await database.proposalsDao.queryProposalsPage(
             request: request,
             filters: filters,
+            order: order,
           );
 
           expect(page.page, 0);
@@ -1063,6 +1078,7 @@ void main() {
           final comments = <DocumentEntityWithMetadata>[];
 
           final filters = ProposalsFilters(searchQuery: searchQuery);
+          const order = UpdateDate(isAscending: true);
 
           // When
           await database.documentsDao.saveAll([
@@ -1077,6 +1093,7 @@ void main() {
           final page = await database.proposalsDao.queryProposalsPage(
             request: request,
             filters: filters,
+            order: order,
           );
 
           expect(page.page, 0);
@@ -1086,6 +1103,415 @@ void main() {
 
           expect(refs, hasLength(expectedRefs.length));
           expect(refs, containsAll(expectedRefs));
+        },
+        onPlatform: driftOnPlatforms,
+      );
+
+      test(
+        'hidden proposals are filtered out when pointing to older version',
+        () async {
+          // Given
+          final templateRef = SignedDocumentRef.generateFirstRef();
+          final proposalRef = SignedDocumentRef.generateFirstRef();
+          final nextProposalRef = proposalRef.nextVersion().toSignedDocumentRef();
+
+          final templates = [
+            _buildProposalTemplate(selfRef: templateRef),
+          ];
+
+          final proposals = [
+            _buildProposal(
+              selfRef: proposalRef,
+              template: templateRef,
+            ),
+            _buildProposal(
+              selfRef: nextProposalRef,
+              template: templateRef,
+            ),
+          ];
+
+          const expectedRefs = <SignedDocumentRef>[];
+
+          final actions = <DocumentEntityWithMetadata>[
+            _buildProposalAction(
+              selfRef: _buildRefAt(DateTime(2025, 5, 2)),
+              action: ProposalSubmissionActionDto.aFinal,
+              proposalRef: proposalRef,
+            ),
+            _buildProposalAction(
+              selfRef: _buildRefAt(DateTime(2025, 5, 20)),
+              action: ProposalSubmissionActionDto.hide,
+              proposalRef: proposalRef,
+            ),
+          ];
+          final comments = <DocumentEntityWithMetadata>[];
+
+          const filters = ProposalsFilters();
+          const order = UpdateDate(isAscending: true);
+
+          // When
+          await database.documentsDao.saveAll([
+            ...templates,
+            ...proposals,
+            ...actions,
+            ...comments,
+          ]);
+
+          // Then
+          const request = PageRequest(page: 0, size: 25);
+          final page = await database.proposalsDao.queryProposalsPage(
+            request: request,
+            filters: filters,
+            order: order,
+          );
+
+          expect(page.page, 0);
+          expect(page.total, expectedRefs.length);
+
+          final refs = page.items.map((e) => e.proposal.metadata.selfRef).toList();
+
+          expect(refs, hasLength(expectedRefs.length));
+          expect(refs, containsAll(expectedRefs));
+        },
+        onPlatform: driftOnPlatforms,
+      );
+
+      test(
+        'order alphabetical works against title',
+        () async {
+          // Given
+          final templateRef = SignedDocumentRef.generateFirstRef();
+          const titles = [
+            'Abc',
+            'Bcd',
+            'cde',
+          ];
+
+          final templates = [
+            _buildProposalTemplate(selfRef: templateRef),
+          ];
+
+          final proposals = titles.map((title) {
+            return _buildProposal(
+              selfRef: SignedDocumentRef.generateFirstRef(),
+              template: templateRef,
+              title: title,
+            );
+          }).shuffled();
+
+          final actions = <DocumentEntityWithMetadata>[];
+          final comments = <DocumentEntityWithMetadata>[];
+
+          const filters = ProposalsFilters();
+          const order = Alphabetical();
+
+          // When
+          await database.documentsDao.saveAll([
+            ...templates,
+            ...proposals,
+            ...actions,
+            ...comments,
+          ]);
+
+          // Then
+          const request = PageRequest(page: 0, size: 25);
+          final page = await database.proposalsDao.queryProposalsPage(
+            request: request,
+            filters: filters,
+            order: order,
+          );
+
+          expect(page.page, 0);
+
+          final proposalsTitles = page.items.map((e) => e.proposal.content.title).toList();
+
+          expect(proposalsTitles, containsAllInOrder(titles));
+        },
+        onPlatform: driftOnPlatforms,
+      );
+
+      test(
+        'order budget asc works against content path',
+        () async {
+          // Given
+          final templateRef = SignedDocumentRef.generateFirstRef();
+          const budgets = [
+            Coin.fromWholeAda(100000),
+            Coin.fromWholeAda(199999),
+            Coin.fromWholeAda(200000),
+          ];
+
+          final templates = [
+            _buildProposalTemplate(selfRef: templateRef),
+          ];
+
+          final proposals = budgets.map((requestedFund) {
+            return _buildProposal(
+              selfRef: SignedDocumentRef.generateFirstRef(),
+              template: templateRef,
+              requestedFunds: requestedFund,
+            );
+          }).shuffled();
+
+          final actions = <DocumentEntityWithMetadata>[];
+          final comments = <DocumentEntityWithMetadata>[];
+
+          const filters = ProposalsFilters();
+          const order = Budget(isAscending: true);
+
+          // When
+          await database.documentsDao.saveAll([
+            ...templates,
+            ...proposals,
+            ...actions,
+            ...comments,
+          ]);
+
+          // Then
+          const request = PageRequest(page: 0, size: 25);
+          final page = await database.proposalsDao.queryProposalsPage(
+            request: request,
+            filters: filters,
+            order: order,
+          );
+
+          expect(page.page, 0);
+
+          final proposalsBudgets =
+              page.items.map((e) => e.proposal.content.requestedFunds).toList();
+
+          expect(proposalsBudgets, containsAllInOrder(budgets));
+        },
+        onPlatform: driftOnPlatforms,
+      );
+
+      test(
+        'order budget desc works against content path',
+        () async {
+          // Given
+          final templateRef = SignedDocumentRef.generateFirstRef();
+          const budgets = [
+            Coin.fromWholeAda(200000),
+            Coin.fromWholeAda(199999),
+            Coin.fromWholeAda(100000),
+          ];
+
+          final templates = [
+            _buildProposalTemplate(selfRef: templateRef),
+          ];
+
+          final proposals = budgets.map((requestedFund) {
+            return _buildProposal(
+              selfRef: SignedDocumentRef.generateFirstRef(),
+              template: templateRef,
+              requestedFunds: requestedFund,
+            );
+          }).shuffled();
+
+          final actions = <DocumentEntityWithMetadata>[];
+          final comments = <DocumentEntityWithMetadata>[];
+
+          const filters = ProposalsFilters();
+          const order = Budget(isAscending: false);
+
+          // When
+          await database.documentsDao.saveAll([
+            ...templates,
+            ...proposals,
+            ...actions,
+            ...comments,
+          ]);
+
+          // Then
+          const request = PageRequest(page: 0, size: 25);
+          final page = await database.proposalsDao.queryProposalsPage(
+            request: request,
+            filters: filters,
+            order: order,
+          );
+
+          expect(page.page, 0);
+
+          final proposalsBudgets =
+              page.items.map((e) => e.proposal.content.requestedFunds).toList();
+
+          expect(proposalsBudgets, containsAllInOrder(budgets));
+        },
+        onPlatform: driftOnPlatforms,
+      );
+
+      test(
+        'order updateDate asc works against content path',
+        () async {
+          // Given
+          final templateRef = SignedDocumentRef.generateFirstRef();
+          final dates = [
+            DateTime.utc(2025, 5, 10),
+            DateTime.utc(2025, 5, 20),
+            DateTime.utc(2025, 5, 29),
+          ];
+
+          final templates = [
+            _buildProposalTemplate(selfRef: templateRef),
+          ];
+
+          final proposals = dates.map((date) {
+            return _buildProposal(
+              selfRef: _buildRefAt(date),
+              template: templateRef,
+            );
+          }).shuffled();
+
+          final actions = <DocumentEntityWithMetadata>[];
+          final comments = <DocumentEntityWithMetadata>[];
+
+          const filters = ProposalsFilters();
+          const order = UpdateDate(isAscending: true);
+
+          // When
+          await database.documentsDao.saveAll([
+            ...templates,
+            ...proposals,
+            ...actions,
+            ...comments,
+          ]);
+
+          // Then
+          const request = PageRequest(page: 0, size: 25);
+          final page = await database.proposalsDao.queryProposalsPage(
+            request: request,
+            filters: filters,
+            order: order,
+          );
+
+          expect(page.page, 0);
+
+          final proposalsDates = page.items
+              .map((e) => UuidHiLo(high: e.proposal.verHi, low: e.proposal.verLo).dateTime)
+              .toList();
+
+          expect(proposalsDates, containsAllInOrder(dates));
+        },
+        onPlatform: driftOnPlatforms,
+      );
+
+      test(
+        'order updateDate desc works against content path',
+        () async {
+          // Given
+          final templateRef = SignedDocumentRef.generateFirstRef();
+          final dates = [
+            DateTime.utc(2025, 5, 29),
+            DateTime.utc(2025, 5, 20),
+            DateTime.utc(2025, 5, 10),
+          ];
+
+          final templates = [
+            _buildProposalTemplate(selfRef: templateRef),
+          ];
+
+          final proposals = dates.map((date) {
+            return _buildProposal(
+              selfRef: _buildRefAt(date),
+              template: templateRef,
+            );
+          }).shuffled();
+
+          final actions = <DocumentEntityWithMetadata>[];
+          final comments = <DocumentEntityWithMetadata>[];
+
+          const filters = ProposalsFilters();
+          const order = UpdateDate(isAscending: false);
+
+          // When
+          await database.documentsDao.saveAll([
+            ...templates,
+            ...proposals,
+            ...actions,
+            ...comments,
+          ]);
+
+          // Then
+          const request = PageRequest(page: 0, size: 25);
+          final page = await database.proposalsDao.queryProposalsPage(
+            request: request,
+            filters: filters,
+            order: order,
+          );
+
+          expect(page.page, 0);
+
+          final proposalsDates = page.items
+              .map((e) => UuidHiLo(high: e.proposal.verHi, low: e.proposal.verLo).dateTime)
+              .toList();
+
+          expect(proposalsDates, containsAllInOrder(dates));
+        },
+        onPlatform: driftOnPlatforms,
+      );
+
+      test(
+        'latest version value is one ordered against',
+        () async {
+          // Given
+          final templateRef = SignedDocumentRef.generateFirstRef();
+          final proposalRef = SignedDocumentRef.first(_buildUuidAt(DateTime.utc(2025, 5, 10)));
+          final latestProposalRef = proposalRef.copyWith(
+            version: Optional(_buildUuidAt(DateTime.utc(2025, 5, 29))),
+          );
+
+          const expectedBudgets = [
+            Coin.fromWholeAda(30000),
+            Coin.fromWholeAda(2000),
+          ];
+          final refsBudgets = <SignedDocumentRef, Coin>{
+            proposalRef: const Coin.fromWholeAda(10000),
+            latestProposalRef: expectedBudgets[0],
+            SignedDocumentRef.generateFirstRef(): expectedBudgets[1],
+          };
+
+          final templates = [
+            _buildProposalTemplate(selfRef: templateRef),
+          ];
+
+          final proposals = refsBudgets.entries.map(
+            (entity) {
+              return _buildProposal(
+                selfRef: entity.key,
+                template: templateRef,
+                requestedFunds: entity.value,
+              );
+            },
+          ).shuffled();
+
+          final actions = <DocumentEntityWithMetadata>[];
+          final comments = <DocumentEntityWithMetadata>[];
+
+          const filters = ProposalsFilters();
+          const order = Budget(isAscending: false);
+
+          // When
+          await database.documentsDao.saveAll([
+            ...templates,
+            ...proposals,
+            ...actions,
+            ...comments,
+          ]);
+
+          // Then
+          const request = PageRequest(page: 0, size: 25);
+          final page = await database.proposalsDao.queryProposalsPage(
+            request: request,
+            filters: filters,
+            order: order,
+          );
+
+          expect(page.page, 0);
+
+          final proposalsBudgets =
+              page.items.map((e) => e.proposal.content.requestedFunds).toList();
+
+          expect(proposalsBudgets, containsAllInOrder(expectedBudgets));
         },
         onPlatform: driftOnPlatforms,
       );
@@ -1349,6 +1775,7 @@ DocumentEntityWithMetadata _buildProposal({
   CatalystId? author,
   String? contentAuthorName,
   SignedDocumentRef? categoryId,
+  Coin? requestedFunds,
 }) {
   final metadata = DocumentDataMetadata(
     type: DocumentType.proposalDocument,
@@ -1370,6 +1797,12 @@ DocumentEntityWithMetadata _buildProposal({
           'title': {
             'title': title,
           },
+      },
+    if (requestedFunds != null)
+      'summary': {
+        'budget': {
+          'requestedFunds': requestedFunds.ada.toInt(),
+        },
       },
   });
 
@@ -1466,9 +1899,12 @@ DocumentEntityWithMetadata _buildProposalTemplate({
 }
 
 SignedDocumentRef _buildRefAt(DateTime dateTime) {
+  return SignedDocumentRef.first(_buildUuidAt(dateTime));
+}
+
+String _buildUuidAt(DateTime dateTime) {
   final config = V7Options(dateTime.millisecondsSinceEpoch, null);
-  final val = const Uuid().v7(config: config);
-  return SignedDocumentRef.first(val);
+  return const Uuid().v7(config: config);
 }
 
 extension on DocumentEntity {

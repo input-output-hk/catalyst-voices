@@ -41,7 +41,7 @@ abstract interface class DocumentsDao {
   });
 
   /// Deletes all documents. Cascades to metadata.
-  Future<void> deleteAll();
+  Future<int> deleteAll();
 
   /// If version is specified in [ref] returns this version or null.
   /// Returns newest version with matching id or null of none found.
@@ -49,7 +49,12 @@ abstract interface class DocumentsDao {
 
   /// Returns all entities. If same document have different versions
   /// all will be returned.
-  Future<List<DocumentEntity>> queryAll({DocumentType? type});
+  ///
+  /// Optionally matching [ref] or [type].
+  Future<List<DocumentEntity>> queryAll({
+    DocumentRef? ref,
+    DocumentType? type,
+  });
 
   /// Returns all known document refs.
   Future<List<TypedDocumentRef>> queryAllTypedRefs();
@@ -170,12 +175,14 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
   }
 
   @override
-  Future<void> deleteAll() async {
+  Future<int> deleteAll() async {
     final deletedRows = await delete(documents).go();
 
     if (kDebugMode) {
       debugPrint('DocumentsDao: Deleted[$deletedRows] rows');
     }
+
+    return deletedRows;
   }
 
   @override
@@ -184,8 +191,15 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
   }
 
   @override
-  Future<List<DocumentEntity>> queryAll({DocumentType? type}) {
+  Future<List<DocumentEntity>> queryAll({
+    DocumentRef? ref,
+    DocumentType? type,
+  }) {
     final query = select(documents);
+
+    if (ref != null) {
+      query.where((tbl) => _filterRef(tbl, ref, filterVersion: false));
+    }
     if (type != null) {
       query.where((doc) => doc.type.equalsValue(type));
     }
@@ -337,19 +351,36 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
     ]);
 
     if (unique) {
-      return query.watch().map((list) {
-        final latestVersions = <String, DocumentEntity>{};
-        for (final entity in list) {
-          final id = '${entity.idHi}_${entity.idLo}';
-          if (!latestVersions.containsKey(id)) {
-            latestVersions[id] = entity;
-          }
-        }
-        if (limit != null) {
-          return latestVersions.values.toList().take(limit).toList();
-        }
-        return latestVersions.values.toList();
-      });
+      final latestDocumentRef = alias(documents, 'latestDocumentRef');
+      final maxVerHi = latestDocumentRef.verHi.max();
+      final latestDocumentQuery = selectOnly(latestDocumentRef, distinct: true)
+        ..addColumns([
+          latestDocumentRef.idHi,
+          latestDocumentRef.idLo,
+          maxVerHi,
+          latestDocumentRef.verLo,
+        ])
+        ..where(latestDocumentRef.type.equalsValue(DocumentType.proposalDocument))
+        ..groupBy([latestDocumentRef.idHi + latestDocumentRef.idLo]);
+
+      final verSubquery = Subquery(latestDocumentQuery, 'latestDocumentRef');
+
+      final uniqueQuery = query.join([
+        innerJoin(
+          verSubquery,
+          Expression.and([
+            verSubquery.ref(maxVerHi).equalsExp(documents.verHi),
+            verSubquery.ref(latestDocumentRef.verLo).equalsExp(documents.verLo),
+          ]),
+          useColumns: false,
+        ),
+      ]);
+
+      if (limit != null) {
+        uniqueQuery.limit(limit);
+      }
+
+      return uniqueQuery.map((row) => row.readTable(documents)).watch();
     }
 
     if (limit != null) {

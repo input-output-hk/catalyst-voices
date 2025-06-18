@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/widgets/rich_text/markdown_text.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
@@ -41,7 +42,7 @@ class _GuidanceCard extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
-        color: theme.colors.onSurfacePrimary012,
+        color: theme.colors.elevationsOnSurfaceNeutralLv2,
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -58,12 +59,18 @@ class _GuidanceCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 12),
-          Text(
-            item.sectionTitle,
-            style: theme.textTheme.titleSmall?.copyWith(color: theme.colors.textOnPrimaryLevel1),
+          if (item.sectionTitle.isNotEmpty) ...[
+            Text(
+              item.sectionTitle,
+              style: theme.textTheme.titleSmall?.copyWith(color: theme.colors.textOnPrimaryLevel1),
+            ),
+            const SizedBox(height: 10),
+          ],
+          MarkdownText(
+            item.description,
+            pStyle: context.textTheme.bodyMedium,
+            pColor: theme.colors.textOnPrimaryLevel1,
           ),
-          const SizedBox(height: 10),
-          MarkdownText(item.description),
         ],
       ),
     );

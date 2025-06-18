@@ -1,7 +1,7 @@
 VERSION 0.8
 
 IMPORT github.com/input-output-hk/catalyst-ci/earthly/python:v3.4.2 AS python-ci
-IMPORT github.com/input-output-hk/catalyst-libs/rust:r20250425-00 AS cat-libs-rust
+IMPORT github.com/input-output-hk/catalyst-libs/rust:r20250526-00 AS cat-libs-rust
 
 builder:
     FROM python-ci+python-base
@@ -10,8 +10,9 @@ builder:
     COPY --dir ./api .
     COPY --dir ./integration .
     COPY --dir ./scripts .
-    COPY --dir ./utils .
     COPY --dir ./test_data .
+    COPY --dir ./utils .
+    COPY --dir ./wrappers .
     COPY cat-libs-rust+build/mk_signed_doc .
     DO python-ci+BUILDER
 
@@ -22,6 +23,8 @@ test:
     ENV EVENT_DB_TEST_URL "postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev"
     ENV CAT_GATEWAY_TEST_URL "http://127.0.0.1:3030"
     ENV CAT_GATEWAY_INTERNAL_API_KEY "123"
+    # for the current setup its not possible to provide a path to the cat-gateway binary, because its running under the container
+    ENV CAT_GATEWAY_EXECUTABLE_PATH "SOME VALUE"
 
     WITH DOCKER \
         --compose docker-compose.yml \

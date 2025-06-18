@@ -1,19 +1,15 @@
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 
-/// Represents the valid range for coin values as a tuple of minimum and
-/// maximum [Coin] values.
-typedef ValidRange = (Coin minInclusive, Coin maxInclusive);
-
 /// Represents an asset identified by a [PolicyId] and [AssetName].
 typedef AssetId = (PolicyId, AssetName);
-
-/// Maps assets to UTxOs, where assets are identified by [PolicyId] and
-/// [AssetName].
-typedef AssetsMap = Map<AssetId, List<TransactionUnspentOutput>>;
 
 /// A list of asset group entries, each mapping an asset to its associated
 /// UTxOs.
 typedef AssetsGroup = List<MapEntry<AssetId, List<TransactionUnspentOutput>>>;
+
+/// Maps assets to UTxOs, where assets are identified by [PolicyId] and
+/// [AssetName].
+typedef AssetsMap = Map<AssetId, List<TransactionUnspentOutput>>;
 
 /// Result of coin selection: selected inputs, change outputs, and transaction
 /// fee.
@@ -22,6 +18,23 @@ typedef SelectionResult = (
   List<ShelleyMultiAssetTransactionOutput>,
   Coin,
 );
+
+/// Represents the valid range for coin values as a tuple of minimum and
+/// maximum [Coin] values.
+typedef ValidRange = (Coin minInclusive, Coin maxInclusive);
+
+/// Defines a strategy applied to the remaining Ada when planning change outputs.
+enum ChangeOutputAdaStrategy {
+  /// Attempt to create change outputs first but if that fails due to various reasons
+  /// (i.e. Ada not enough to satisfy the minimum Ada requirement for the UTXO)
+  /// then the implementation will attempt to burn remaining Ada as fee.
+  burn,
+
+  /// Attempt to create change outputs first but if that fails due to various reasons
+  /// (i.e. Ada not enough to satisfy the minimum Ada requirement for the UTXO)
+  /// then do not burn the remaining Ada as fee and throw [InsufficientAdaForChangeOutputException].
+  noBurn,
+}
 
 /// Interface for coin selection strategies applied to asset maps.
 // ignore: one_member_abstracts
@@ -37,9 +50,6 @@ abstract class CoinSelectionStrategy {
 /// Coin selection is the process of choosing UTxOs as inputs to fulfill the
 /// transaction's outputs, while also calculating necessary change.
 abstract interface class CoinSelector {
-  /// Allows subclasses to define `const` constructors.
-  const CoinSelector();
-
   /// The predefined [PolicyId] for ADA.
   static final PolicyId adaPolicy = PolicyId('');
 
@@ -76,24 +86,8 @@ abstract interface class CoinSelector {
   /// that must be selected for inclusion in a transaction. It defaults to 0.
   static const minInputs = 0;
 
-  /// Selects UTxOs to fulfill the required outputs and calculates change.
-  ///
-  /// - [builder]: The transaction builder containing available UTxOs and
-  ///   desired outputs.
-  /// - [minInputs]: Minimum inputs required.
-  /// - [maxInputs]: Maximum allowed inputs.
-  ///
-  /// Returns:
-  /// - [SelectionResult] with selected inputs, change outputs, and transaction
-  ///   fee.
-  ///
-  /// Throws:
-  /// - An exception if constraints cannot be satisfied.
-  SelectionResult? selectInputs({
-    required TransactionBuilder builder,
-    int minInputs = CoinSelector.minInputs,
-    int maxInputs = CoinSelector.maxInputs,
-  });
+  /// Allows subclasses to define `const` constructors.
+  const CoinSelector();
 
   /// Groups UTxOs by assets, mapping each asset to its corresponding UTxOs for
   /// further processing by a coin selection strategy.
@@ -112,6 +106,25 @@ abstract interface class CoinSelector {
     Balance requiredBalance,
     Set<TransactionUnspentOutput> inputs,
   );
+
+  /// Selects UTxOs to fulfill the required outputs and calculates change.
+  ///
+  /// - [builder]: The transaction builder containing available UTxOs and
+  ///   desired outputs.
+  /// - [minInputs]: Minimum inputs required.
+  /// - [maxInputs]: Maximum allowed inputs.
+  ///
+  /// Returns:
+  /// - [SelectionResult] with selected inputs, change outputs, and transaction
+  ///   fee.
+  ///
+  /// Throws:
+  /// - An exception if constraints cannot be satisfied.
+  SelectionResult? selectInputs({
+    required TransactionBuilder builder,
+    int minInputs = CoinSelector.minInputs,
+    int maxInputs = CoinSelector.maxInputs,
+  });
 
   /// A helper function to calculate the total balance from a collection of
   /// items.

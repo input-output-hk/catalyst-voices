@@ -48,6 +48,9 @@ final class AccountCubit extends Cubit<AccountState>
       await _userService.resendActiveAccountVerificationEmail();
 
       emitSignal(const AccountVerificationEmailSendSignal());
+    } on EmailAlreadyUsedException catch (error, stackTrace) {
+      _logger.severe('Re-send verification email - already used', error, stackTrace);
+      emitError(const LocalizedEmailAlreadyUsedException());
     } catch (error, stackTrace) {
       _logger.severe('Re-send verification email', error, stackTrace);
       emitError(LocalizedException.create(error));
@@ -66,22 +69,25 @@ final class AccountCubit extends Cubit<AccountState>
   /// Returns true if updated, false otherwise.
   Future<bool> updateEmail(Email email) async {
     try {
-      if (email.isNotValid) {
-        return false;
+      final result = await _updateActiveAccount(email: email);
+
+      if (result.didChanged) {
+        emit(state.copyWith(email: email));
       }
 
-      final activeAccount = _userService.user.activeAccount;
-      if (activeAccount != null) {
-        await _userService.updateAccount(
-          id: activeAccount.catalystId,
-          email: email.value.isNotEmpty ? Optional(email.value) : const Optional.empty(),
-        );
+      if (result.hasPendingEmailChange) {
+        emitSignal(const PendingEmailChangeSignal());
       }
 
-      emit(state.copyWith(email: email));
-      emitSignal(const AccountVerificationEmailSendSignal());
+      if (result.didChanged && _userService.user.activeAccount?.publicStatus.isVerified == false) {
+        emitSignal(const AccountVerificationEmailSendSignal());
+      }
 
-      return true;
+      return result.didChanged;
+    } on EmailAlreadyUsedException {
+      _logger.info('Email already used');
+      emitError(const LocalizedEmailAlreadyUsedException());
+      return false;
     } catch (error, stackTrace) {
       _logger.severe('Update email', error, stackTrace);
       emitError(LocalizedException.create(error));
@@ -92,22 +98,13 @@ final class AccountCubit extends Cubit<AccountState>
   /// Returns true if updated, false otherwise.
   Future<bool> updateUsername(Username username) async {
     try {
-      if (username.isNotValid) {
-        return false;
+      final result = await _updateActiveAccount(username: username);
+
+      if (result.didChanged) {
+        emit(state.copyWith(username: username));
       }
 
-      final activeAccount = _userService.user.activeAccount;
-      if (activeAccount != null) {
-        final value = username.value;
-
-        await _userService.updateAccount(
-          id: activeAccount.catalystId,
-          username: value.isNotEmpty ? Optional(value) : const Optional.empty(),
-        );
-      }
-
-      emit(state.copyWith(username: username));
-      return true;
+      return result.didChanged;
     } catch (error, stackTrace) {
       _logger.severe('Update username', error, stackTrace);
       emitError(LocalizedException.create(error));
@@ -117,6 +114,32 @@ final class AccountCubit extends Cubit<AccountState>
 
   void _handleActiveAccountChange(Account? account) {
     emit(_buildState(from: account));
+  }
+
+  Future<AccountUpdateResult> _updateActiveAccount({
+    Email? email,
+    Username? username,
+  }) {
+    assert(email == null || email.isValid, 'Email is not valid');
+    assert(username == null || username.isValid, 'Username is not valid');
+
+    final activeAccount = _userService.user.activeAccount;
+    if (activeAccount == null) {
+      throw const LocalizedActiveAccountNotFoundException();
+    }
+
+    final emailValue = email?.value;
+    final usernameValue = username != null
+        ? username.value.isNotEmpty
+            ? Optional(username.value)
+            : const Optional<String>.empty()
+        : null;
+
+    return _userService.updateAccount(
+      id: activeAccount.catalystId,
+      email: emailValue,
+      username: usernameValue,
+    );
   }
 
   static AccountState _buildState({Account? from}) {

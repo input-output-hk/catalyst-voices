@@ -1,8 +1,8 @@
 import 'dart:async';
 
-import 'package:catalyst_voices/common/error_handler.dart';
 import 'package:catalyst_voices/dependency/dependencies.dart';
 import 'package:catalyst_voices/pages/registration/registration_details_panel.dart';
+import 'package:catalyst_voices/pages/registration/registration_error_handler.dart';
 import 'package:catalyst_voices/pages/registration/registration_info_panel.dart';
 import 'package:catalyst_voices/pages/registration/registration_type.dart';
 import 'package:catalyst_voices/pages/registration/widgets/registration_confirm_dialog.dart';
@@ -35,12 +35,8 @@ class RegistrationDialog extends StatefulWidget {
   }
 }
 
-class _RegistrationDialogState extends State<RegistrationDialog>
-    with ErrorHandlerStateMixin<RegistrationCubit, RegistrationDialog> {
+class _RegistrationDialogState extends State<RegistrationDialog> {
   late final RegistrationCubit _cubit = Dependencies.instance.get();
-
-  @override
-  RegistrationCubit get errorEmitter => _cubit;
 
   @override
   Widget build(BuildContext context) {
@@ -56,24 +52,31 @@ class _RegistrationDialogState extends State<RegistrationDialog>
             ),
           );
         },
-        child: BlocSelector<RegistrationCubit, RegistrationState, bool>(
-          selector: (state) {
-            final isAccountCompleted = state.step is AccountCompletedStep;
-            final isRecovered = state.step ==
-                const RecoverWithSeedPhraseStep(
-                  stage: RecoverWithSeedPhraseStage.success,
-                );
+        child: ScaffoldMessenger(
+          child: Scaffold(
+            backgroundColor: Colors.transparent,
+            body: RegistrationErrorHandler(
+              child: BlocSelector<RegistrationCubit, RegistrationState, bool>(
+                selector: (state) {
+                  final isAccountCompleted = state.step is AccountCompletedStep;
+                  final isRecovered = state.step ==
+                      const RecoverWithSeedPhraseStep(
+                        stage: RecoverWithSeedPhraseStage.success,
+                      );
 
-            return !isAccountCompleted && !isRecovered;
-          },
-          builder: (context, showCloseButton) {
-            return VoicesTwoPaneDialog(
-              key: const Key('RegistrationDialog'),
-              left: const RegistrationInfoPanel(),
-              right: const RegistrationDetailsPanel(),
-              showCloseButton: showCloseButton,
-            );
-          },
+                  return !isAccountCompleted && !isRecovered;
+                },
+                builder: (context, showCloseButton) {
+                  return VoicesTwoPaneDialog(
+                    key: const Key('RegistrationDialog'),
+                    left: const RegistrationInfoPanel(),
+                    right: const RegistrationDetailsPanel(),
+                    showCloseButton: showCloseButton,
+                  );
+                },
+              ),
+            ),
+          ),
         ),
       ),
     );
@@ -97,7 +100,7 @@ class _RegistrationDialogState extends State<RegistrationDialog>
       case RecoverRegistration():
         _cubit.goToStep(const RecoverWithSeedPhraseStep());
       case ContinueRegistration():
-        _cubit.recoverProgress();
+        unawaited(_cubit.recoverProgress());
     }
   }
 

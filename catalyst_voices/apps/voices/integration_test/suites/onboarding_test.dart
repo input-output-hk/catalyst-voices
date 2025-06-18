@@ -2,7 +2,6 @@ import 'package:catalyst_voices/app/view/app.dart';
 import 'package:catalyst_voices/configs/bootstrap.dart';
 import 'package:catalyst_voices/routes/routes.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart' as blocs;
-import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:patrol_finders/patrol_finders.dart';
@@ -15,10 +14,10 @@ import '../pageobject/onboarding/create_flow/step_13_password_input.dart';
 import '../pageobject/onboarding/create_flow/step_14_keychain_final.dart';
 import '../pageobject/onboarding/create_flow/step_15_link_wallet_info.dart';
 import '../pageobject/onboarding/create_flow/step_16_wallet_list.dart';
-import '../pageobject/onboarding/create_flow/step_2_base_profile_info.dart';
-import '../pageobject/onboarding/create_flow/step_3_setup_base_profile.dart';
+import '../pageobject/onboarding/create_flow/step_2_profile_info.dart';
+import '../pageobject/onboarding/create_flow/step_3_setup_profile.dart';
 import '../pageobject/onboarding/create_flow/step_4_acknowledgments.dart';
-import '../pageobject/onboarding/create_flow/step_5_base_profile_final.dart';
+import '../pageobject/onboarding/create_flow/step_5_profile_final.dart';
 import '../pageobject/onboarding/create_flow/step_6_catalyst_keychain_info.dart';
 import '../pageobject/onboarding/create_flow/step_7_catalyst_keychain_success.dart';
 import '../pageobject/onboarding/create_flow/step_8_writedown_seedphrase.dart';
@@ -26,6 +25,7 @@ import '../pageobject/onboarding/create_flow/step_9_writedown_seedphrase_info.da
 import '../pageobject/onboarding/onboarding_base_page.dart';
 import '../pageobject/onboarding/step_1_get_started.dart';
 import '../types/password_validation_states.dart';
+import '../utils/bootstrap_utils.dart';
 import '../utils/test_context.dart';
 
 void main() async {
@@ -38,12 +38,12 @@ void main() async {
   });
 
   setUp(() async {
-    await registerDependencies(config: const AppConfig());
+    await registerForTests();
     router.go(const DiscoveryRoute().location);
   });
 
   tearDown(() async {
-    await restartDependencies();
+    await restartForTests();
     TestContext.clearContext();
   });
 
@@ -56,18 +56,16 @@ void main() async {
         await GetStartedPanel($).verifyPageElements();
       });
 
-      patrolWidgetTest('visitor - create - base profile info screen looks OK',
-          (PatrolTester $) async {
+      patrolWidgetTest('visitor - create - profile info screen looks OK', (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
-        await BaseProfileInfoPanel($).goto();
-        await BaseProfileInfoPanel($).verifyPageElements();
+        await ProfileInfoPanel($).goto();
+        await ProfileInfoPanel($).verifyPageElements();
       });
 
-      patrolWidgetTest('visitor - create - base profile setup screen looks OK',
-          (PatrolTester $) async {
+      patrolWidgetTest('visitor - create - profile setup screen looks OK', (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
-        await SetupBaseProfilePanel($).goto();
-        await SetupBaseProfilePanel($).verifyPageElements();
+        await SetupProfilePanel($).goto();
+        await SetupProfilePanel($).verifyPageElements();
       });
 
       patrolWidgetTest('visitor - create - keychain acknowledgement screen looks OK',
@@ -77,18 +75,17 @@ void main() async {
         await AcknowledgmentsPanel($).verifyPageElements();
       });
 
-      patrolWidgetTest('visitor - create - base profile setup screen looks OK',
-          (PatrolTester $) async {
+      patrolWidgetTest('visitor - create - profile setup screen looks OK', (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
-        await SetupBaseProfilePanel($).goto();
-        await SetupBaseProfilePanel($).verifyPageElements();
+        await SetupProfilePanel($).goto();
+        await SetupProfilePanel($).verifyPageElements();
       });
 
       patrolWidgetTest('visitor - create - keychain create Catalyst Keychain looks OK',
           (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
-        await BaseProfileFinalPanel($).goto();
-        await BaseProfileFinalPanel($).verifyPageElements();
+        await ProfileFinalPanel($).goto();
+        await ProfileFinalPanel($).verifyPageElements();
       });
 
       patrolWidgetTest('visitor - create - keychain info screen looks OK', (PatrolTester $) async {
@@ -328,29 +325,29 @@ void main() async {
         expect($(OnboardingPageBase($).registrationDialog), findsNothing);
       });
       patrolWidgetTest(
-          'visitor - create - base profile setup screen close button - '
+          'visitor - create - profile setup screen close button - '
           'dialog check', (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
-        await SetupBaseProfilePanel($).goto();
+        await SetupProfilePanel($).goto();
         await OnboardingPageBase($).closeButton().tap();
         await OnboardingPageBase($).incompleteDialogCheckKeychainPhase();
       });
 
       patrolWidgetTest(
-          'visitor - create - base profile setup screen close button - '
+          'visitor - create - profile setup screen close button - '
           'dialog continue', (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
-        await SetupBaseProfilePanel($).goto();
+        await SetupProfilePanel($).goto();
         await OnboardingPageBase($).closeButton().tap();
         await OnboardingPageBase($).incompleteDialogClickContinue();
-        await SetupBaseProfilePanel($).verifyDetailsPanel();
+        await SetupProfilePanel($).verifyDetailsPanel();
       });
 
       patrolWidgetTest(
-          'visitor - create - base profile setup screen close button - '
+          'visitor - create - profile setup screen close button - '
           'dialog cancel', (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
-        await SetupBaseProfilePanel($).goto();
+        await SetupProfilePanel($).goto();
         await OnboardingPageBase($).closeButton().tap();
         await OnboardingPageBase($).incompleteDialogClickCancel();
         await AppBarPage($).looksAsExpectedForVisitor();
@@ -359,13 +356,13 @@ void main() async {
       patrolWidgetTest(
           tags: 'issues_1998',
           skip: true,
-          'visitor - create - base profile setup screen close button - '
+          'visitor - create - profile setup screen close button - '
           'dialog close', (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
-        await SetupBaseProfilePanel($).goto();
+        await SetupProfilePanel($).goto();
         await OnboardingPageBase($).closeButton().tap();
         await OnboardingPageBase($).incompleteDialogClickClose();
-        await SetupBaseProfilePanel($).verifyDetailsPanel();
+        await SetupProfilePanel($).verifyDetailsPanel();
       });
 
       patrolWidgetTest(

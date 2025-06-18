@@ -55,9 +55,6 @@ class _AppState extends State<App> {
       BlocProvider<WorkspaceBloc>(
         create: (context) => Dependencies.instance.get<WorkspaceBloc>(),
       ),
-      BlocProvider<ProposalBuilderBloc>(
-        create: (context) => Dependencies.instance.get<ProposalBuilderBloc>(),
-      ),
       BlocProvider<DiscoveryCubit>(
         create: (context) => Dependencies.instance.get<DiscoveryCubit>(),
       ),
@@ -76,6 +73,12 @@ class _AppState extends State<App> {
       BlocProvider<CampaignStageCubit>(
         lazy: false,
         create: (_) => Dependencies.instance.get<CampaignStageCubit>(),
+      ),
+      BlocProvider<DevToolsBloc>(
+        create: (_) => Dependencies.instance.get<DevToolsBloc>(),
+      ),
+      BlocProvider<PublicProfileEmailStatusCubit>(
+        create: (_) => Dependencies.instance.get<PublicProfileEmailStatusCubit>(),
       ),
     ];
   }

@@ -1,4 +1,5 @@
 import 'package:catalyst_voices/pages/registration/widgets/next_step.dart';
+import 'package:catalyst_voices/pages/registration/widgets/registration_details_panel_scaffold.dart';
 import 'package:catalyst_voices/pages/registration/widgets/registration_progress_stepper.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_filled_button.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
@@ -26,66 +27,35 @@ class AccountCreateProgressPanel extends StatelessWidget {
     final nextStep = lastCompletedStep?.next;
     final nextStepText = lastCompletedStep?._nextStepText(context);
 
-    return Column(
+    return RegistrationDetailsPanelScaffold(
       key: const Key('AccountCreateProgressPanel'),
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        const SizedBox(height: 24),
-        Expanded(
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                if (title != null) ...[
-                  _TitleText(title),
-                  const SizedBox(height: 24),
-                ],
-                RegistrationProgressStepper(
-                  completed: completedSteps.toSet(),
-                  current:
-                      AccountCreateStepType.values.whereNot(completedSteps.contains).firstOrNull,
-                ),
-              ],
-            ),
-          ),
-        ),
-        if (nextStepText != null) ...[
-          const SizedBox(height: 10),
-          NextStep(nextStepText, key: const Key('NextStep')),
+      title: title != null ? _TitleText(title) : null,
+      body: RegistrationProgressStepper(
+        completed: completedSteps.toSet(),
+        current: AccountCreateStepType.values.whereNot(completedSteps.contains).firstOrNull,
+      ),
+      footer: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          if (nextStepText != null) ...[
+            NextStep(nextStepText, key: const Key('NextStep')),
+          ],
+          if (nextStep == AccountCreateStepType.keychain) ...[
+            const SizedBox(height: 10),
+            _CreateKeychainButton(onTap: () => _goToNextStep(context)),
+          ],
+          if (nextStep == AccountCreateStepType.walletLink) ...[
+            const SizedBox(height: 10),
+            _LinkWalletAndRolesButton(onTap: () => _goToNextStep(context)),
+          ],
         ],
-        if (nextStep == AccountCreateStepType.keychain) ...[
-          const SizedBox(height: 10),
-          _CreateKeychainButton(onTap: () => _goToNextStep(context)),
-        ],
-        if (nextStep == AccountCreateStepType.walletLink) ...[
-          const SizedBox(height: 10),
-          _LinkWalletAndRolesButton(onTap: () => _goToNextStep(context)),
-        ],
-        const SizedBox(height: 24),
-      ],
+      ),
     );
   }
 
   void _goToNextStep(BuildContext context) {
     RegistrationCubit.of(context).nextStep();
-  }
-}
-
-class _TitleText extends StatelessWidget {
-  final String data;
-
-  const _TitleText(this.data);
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final color = theme.colors.textOnPrimaryLevel1;
-
-    return Text(
-      data,
-      style: theme.textTheme.titleMedium?.copyWith(color: color),
-    );
   }
 }
 
@@ -125,19 +95,36 @@ class _LinkWalletAndRolesButton extends StatelessWidget {
   }
 }
 
+class _TitleText extends StatelessWidget {
+  final String data;
+
+  const _TitleText(this.data);
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final color = theme.colors.textOnPrimaryLevel1;
+
+    return Text(
+      data,
+      style: theme.textTheme.titleMedium?.copyWith(color: color),
+    );
+  }
+}
+
 extension _AccountCreateStepType on AccountCreateStepType {
-  String? _title(BuildContext context) {
+  String? _nextStepText(BuildContext context) {
     return switch (this) {
-      AccountCreateStepType.baseProfile => context.l10n.createBaseProfileCreatedTitle,
-      AccountCreateStepType.keychain => context.l10n.createKeychainCreatedTitle,
+      AccountCreateStepType.baseProfile => context.l10n.createProfileNextStep,
+      AccountCreateStepType.keychain => context.l10n.createKeychainCreatedNextStep,
       AccountCreateStepType.walletLink => null,
     };
   }
 
-  String? _nextStepText(BuildContext context) {
+  String? _title(BuildContext context) {
     return switch (this) {
-      AccountCreateStepType.baseProfile => context.l10n.createBaseProfileNextStep,
-      AccountCreateStepType.keychain => context.l10n.createKeychainCreatedNextStep,
+      AccountCreateStepType.baseProfile => context.l10n.createProfileCreatedTitle,
+      AccountCreateStepType.keychain => context.l10n.createKeychainCreatedTitle,
       AccountCreateStepType.walletLink => null,
     };
   }

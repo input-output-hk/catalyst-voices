@@ -1,9 +1,11 @@
+import 'package:catalyst_voices/pages/registration/widgets/registration_details_panel_scaffold.dart';
 import 'package:catalyst_voices/pages/registration/widgets/registration_stage_message.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 
 class InstructionsPanel extends StatelessWidget {
@@ -11,38 +13,44 @@ class InstructionsPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        SizedBox(height: 24),
-        Expanded(
-          child: SingleChildScrollView(
-            child: _PanelMainMessage(),
-          ),
-        ),
-        SizedBox(height: 12),
-        _ExplanationText(
-          key: Key('BaseProfileExplanationTest'),
-        ),
-        SizedBox(height: 8),
-        _EmailRequestCard(),
-        SizedBox(height: 24),
-        _NextButton(),
-      ],
+    return const RegistrationDetailsPanelScaffold(
+      body: SingleChildScrollView(child: _PanelMainMessage()),
+      footer: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          _ExplanationText(key: Key('BaseProfileExplanationTest')),
+          SizedBox(height: 8),
+          _EmailRequestCard(),
+          SizedBox(height: 24),
+          _NextButton(),
+        ],
+      ),
     );
   }
 }
 
-class _PanelMainMessage extends StatelessWidget {
-  const _PanelMainMessage();
+class _EmailRequestCard extends StatelessWidget {
+  const _EmailRequestCard();
 
   @override
   Widget build(BuildContext context) {
-    final l10n = context.l10n;
-
-    return RegistrationStageMessage(
-      title: Text(l10n.createBaseProfileInstructionsTitle),
-      subtitle: Text(l10n.createBaseProfileInstructionsMessage),
+    return ActionCard(
+      key: const Key('EmailRequestCard'),
+      icon: VoicesAssets.icons.mailOpen.buildIcon(),
+      title: Text(
+        context.l10n.createProfileInstructionsEmailRequest,
+        key: const Key('EmailRequestTitle'),
+      ),
+      desc: BulletList(
+        key: const Key('EmailRequestList'),
+        items: [
+          context.l10n.createProfileInstructionsEmailReason1,
+          context.l10n.createProfileInstructionsEmailReason2,
+        ],
+        spacing: 0,
+      ),
+      statusIcon: VoicesAssets.icons.informationCircle.buildIcon(),
     );
   }
 }
@@ -69,32 +77,6 @@ class _ExplanationText extends StatelessWidget {
   }
 }
 
-class _EmailRequestCard extends StatelessWidget {
-  const _EmailRequestCard();
-
-  @override
-  Widget build(BuildContext context) {
-    return ActionCard(
-      key: const Key('EmailRequestCard'),
-      icon: VoicesAssets.icons.mailOpen.buildIcon(),
-      title: Text(
-        context.l10n.createBaseProfileInstructionsEmailRequest,
-        key: const Key('EmailRequestTitle'),
-      ),
-      desc: BulletList(
-        key: const Key('EmailRequestList'),
-        items: [
-          context.l10n.createBaseProfileInstructionsEmailReason1,
-          context.l10n.createBaseProfileInstructionsEmailReason2,
-          context.l10n.createBaseProfileInstructionsEmailReason3,
-        ],
-        spacing: 0,
-      ),
-      statusIcon: VoicesAssets.icons.informationCircle.buildIcon(),
-    );
-  }
-}
-
 class _NextButton extends StatelessWidget {
   const _NextButton();
 
@@ -103,7 +85,56 @@ class _NextButton extends StatelessWidget {
     return VoicesFilledButton(
       key: const Key('CreateBaseProfileNext'),
       onTap: () => RegistrationCubit.of(context).nextStep(),
-      child: Text(context.l10n.createBaseProfileInstructionsNext),
+      child: Text(context.l10n.createProfileInstructionsNext),
+    );
+  }
+}
+
+class _PanelMainMessage extends StatelessWidget {
+  const _PanelMainMessage();
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+
+    return RegistrationStageMessage(
+      title: Text(l10n.createProfileInstructionsTitle),
+      subtitle: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        spacing: 10,
+        children: [
+          Text(l10n.createProfileInstructionsMessage),
+          const _WalletBalanceNotice(),
+        ],
+      ),
+    );
+  }
+}
+
+class _WalletBalanceNotice extends StatelessWidget {
+  const _WalletBalanceNotice();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          context.l10n.notice,
+          style: Theme.of(context).textTheme.labelSmall!.copyWith(
+                fontWeight: FontWeight.w800,
+              ),
+        ),
+        const SizedBox(height: 6),
+        Text(
+          context.l10n.createProfileInstructionsNotice(
+            CardanoWalletDetails.minAdaForRegistration.ada,
+          ),
+          style: Theme.of(context).textTheme.bodySmall,
+        ),
+      ],
     );
   }
 }

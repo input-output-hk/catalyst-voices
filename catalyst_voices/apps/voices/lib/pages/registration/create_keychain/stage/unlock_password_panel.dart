@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:catalyst_voices/common/ext/text_editing_controller_ext.dart';
+import 'package:catalyst_voices/pages/registration/widgets/registration_details_panel_scaffold.dart';
 import 'package:catalyst_voices/pages/registration/widgets/registration_stage_navigation.dart';
 import 'package:catalyst_voices/pages/registration/widgets/unlock_password_form.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
@@ -88,34 +89,26 @@ class _UnlockPasswordPanelState extends State<UnlockPasswordPanel> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        const SizedBox(height: 24),
-        const SizedBox(height: 12),
-        Expanded(
-          child: _BlocUnlockPasswordForm(
-            passwordController: _passwordController,
-            confirmPasswordController: _confirmPasswordController,
-            onSubmitted: (_) {
-              final isNextEnabled = context
-                  .read<RegistrationCubit>()
-                  .state
-                  .recoverStateData
-                  .unlockPasswordState
-                  .isNextEnabled;
-              if (isNextEnabled) {
-                _createKeychain();
-              }
-            },
-          ),
-        ),
-        const SizedBox(height: 22),
-        _BlocNavigation(
-          onNextTap: _createKeychain,
-          onBackTap: _clearPasswordAndGoBack,
-        ),
-      ],
+    return RegistrationDetailsPanelScaffold(
+      body: _BlocUnlockPasswordForm(
+        passwordController: _passwordController,
+        confirmPasswordController: _confirmPasswordController,
+        onSubmitted: (_) {
+          final isNextEnabled = context
+              .read<RegistrationCubit>()
+              .state
+              .recoverStateData
+              .unlockPasswordState
+              .isNextEnabled;
+          if (isNextEnabled) {
+            _createKeychain();
+          }
+        },
+      ),
+      footer: _BlocNavigation(
+        onNextTap: _createKeychain,
+        onBackTap: _clearPasswordAndGoBack,
+      ),
     );
   }
 

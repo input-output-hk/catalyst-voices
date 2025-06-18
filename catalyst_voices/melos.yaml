@@ -150,10 +150,11 @@ command:
       cbor: ^6.2.0
       convert: ^3.1.1
       path: ^1.9.1
+      package_info_plus: ^8.3.0
       pinenacl: ^0.6.0
       pool: ^1.5.1
       uuid_plus: ^0.1.0
-      sentry_flutter: ^8.8.0
+      sentry_flutter: ^9.0.0
       scrollable_positioned_list: ^0.3.8
       shared_preferences: ^2.3.3
       shared_preferences_platform_interface: ^2.4.1
@@ -172,6 +173,7 @@ command:
       chopper_generator: ^8.0.4
       flutter_gen_runner: ^5.10.0
       mocktail: ^1.0.1
+      sentry_dart_plugin: ^2.4.1
 
 scripts:
   l10n:

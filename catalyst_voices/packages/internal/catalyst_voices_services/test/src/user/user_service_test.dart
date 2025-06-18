@@ -28,7 +28,7 @@ void main() {
       keychainProvider = VaultKeychainProvider(
         secureStorage: const FlutterSecureStorage(),
         sharedPreferences: SharedPreferencesAsync(),
-        cacheConfig: const CacheConfig(),
+        cacheConfig: AppConfig.dev().cache,
       );
       userObserver = StreamUserObserver();
     });
@@ -90,8 +90,8 @@ void main() {
     });
 
     test(
-        'when using a new account with the same catalystId'
-        ' the getter returns updated account', () async {
+        'when using a new account with the same catalystId '
+        'the getter returns updated account', () async {
       // Given
       final oldKeychainId = const Uuid().v4();
       final newKeychainId = const Uuid().v4();
@@ -347,6 +347,343 @@ void main() {
         );
       });
     });
+
+    group('updateActiveAccountDetails', () {
+      setUp(() {
+        userRepository = _MockUserRepository();
+        service = UserService(userRepository, userObserver);
+
+        registerFallbackValue(const User.empty());
+      });
+
+      tearDown(() {
+        reset(userRepository);
+      });
+
+      test('user repository is not called when public status is not setup', () async {
+        // Given
+        final keychainId = const Uuid().v4();
+        const publicStatus = AccountPublicStatus.notSetup;
+
+        final keychain = await keychainProvider.create(keychainId);
+        final account = Account.dummy(
+          catalystId: DummyCatalystIdFactory.create(),
+          keychain: keychain,
+          isActive: true,
+        ).copyWith(publicStatus: publicStatus);
+        final user = User.optional(accounts: [account]);
+
+        // When
+        when(() => userRepository.getUser()).thenAnswer((_) => Future.value(user));
+        when(() => userRepository.saveUser(any())).thenAnswer((_) => Future(() {}));
+
+        await service.useLastAccount();
+        await service.updateActiveAccountDetails();
+
+        // Then
+        verifyNever(() => userRepository.getAccountPublicProfile());
+
+        final serviceUser = await service.getUser();
+        expect(serviceUser, user);
+      });
+
+      test('user repository is called when public status is setup', () async {
+        // Given
+        final keychainId = const Uuid().v4();
+        const publicStatus = AccountPublicStatus.verifying;
+
+        final keychain = await keychainProvider.create(keychainId);
+        final account = Account.dummy(
+          catalystId: DummyCatalystIdFactory.create(),
+          keychain: keychain,
+          isActive: true,
+        ).copyWith(
+          email: const Optional('dev@iohk.com'),
+          publicStatus: publicStatus,
+        );
+        final user = User.optional(accounts: [account]);
+
+        // When
+        when(() => userRepository.getUser()).thenAnswer((_) => Future.value(user));
+        when(() => userRepository.saveUser(any())).thenAnswer((_) => Future(() {}));
+        when(() => userRepository.getAccountPublicProfile()).thenAnswer(
+          (_) => Future.value(
+            const AccountPublicProfile(
+              email: '',
+              status: AccountPublicStatus.verified,
+            ),
+          ),
+        );
+
+        await service.useLastAccount();
+        await service.updateActiveAccountDetails();
+
+        // Then
+        verify(() => userRepository.getAccountPublicProfile()).called(1);
+      });
+
+      test('user account is updated when status changes', () async {
+        // Given
+        final keychainId = const Uuid().v4();
+        const publicStatus = AccountPublicStatus.verifying;
+        const updatedPublicStatus = AccountPublicStatus.verified;
+        const publicProfile = AccountPublicProfile(email: '', status: updatedPublicStatus);
+
+        final keychain = await keychainProvider.create(keychainId);
+        final account = Account.dummy(
+          catalystId: DummyCatalystIdFactory.create(),
+          keychain: keychain,
+          isActive: true,
+        ).copyWith(
+          email: const Optional('dev@iohk.com'),
+          publicStatus: publicStatus,
+        );
+        final user = User.optional(accounts: [account]);
+
+        // When
+        when(() => userRepository.getUser()).thenAnswer((_) => Future.value(user));
+        when(() => userRepository.saveUser(any())).thenAnswer((_) => Future(() {}));
+        when(() => userRepository.getAccountPublicProfile())
+            .thenAnswer((_) => Future.value(publicProfile));
+
+        await service.useLastAccount();
+        await service.updateActiveAccountDetails();
+
+        // Then
+        expect(service.user.activeAccount?.publicStatus, updatedPublicStatus);
+      });
+    });
+
+    group('updateAccount', () {
+      setUp(() {
+        userRepository = _MockUserRepository();
+        service = UserService(userRepository, userObserver);
+
+        registerFallbackValue(const User.empty());
+      });
+
+      tearDown(() {
+        reset(userRepository);
+      });
+
+      test('when email is the same user is not updated', () async {
+        // Given
+        const currentEmail = 'dev@iohk.com';
+        const updateEmail = 'dev@iohk.com';
+
+        final catalystId = DummyCatalystIdFactory.create();
+        final keychainId = const Uuid().v4();
+        final keychain = await keychainProvider.create(keychainId);
+        final account = Account.dummy(
+          catalystId: catalystId,
+          keychain: keychain,
+          isActive: true,
+        ).copyWith(
+          email: const Optional(currentEmail),
+          publicStatus: AccountPublicStatus.verified,
+        );
+        final user = User.optional(accounts: [account]);
+
+        // When
+        when(() => userRepository.getUser()).thenAnswer((_) => Future.value(user));
+
+        await service.updateAccount(id: catalystId, email: updateEmail);
+
+        // Then
+        verifyNever(() => userRepository.saveUser(any()));
+      });
+
+      test('when email is the same public status is not updated or profile published', () async {
+        // Given
+        const currentEmail = 'dev@iohk.com';
+        const updateEmail = 'dev@iohk.com';
+
+        final catalystId = DummyCatalystIdFactory.create();
+        final keychainId = const Uuid().v4();
+        final keychain = await keychainProvider.create(keychainId);
+        final account = Account.dummy(
+          catalystId: catalystId,
+          keychain: keychain,
+          isActive: true,
+        ).copyWith(
+          email: const Optional(currentEmail),
+          publicStatus: AccountPublicStatus.verified,
+        );
+        final user = User.optional(accounts: [account]);
+
+        // When
+        when(() => userRepository.getUser()).thenAnswer((_) => Future.value(user));
+        userObserver.user = user;
+
+        await service.updateAccount(id: catalystId, email: updateEmail);
+
+        // Then
+        verifyNever(
+          () => userRepository.publishUserProfile(catalystId: catalystId, email: updateEmail),
+        );
+
+        final activeAccount = service.user.activeAccount;
+        expect(activeAccount?.email, currentEmail);
+        expect(activeAccount?.publicStatus, account.publicStatus);
+      });
+
+      test('returns did change false when email did not changed', () async {
+        // Given
+        const currentEmail = 'dev@iohk.com';
+        const updateEmail = 'dev@iohk.com';
+
+        final catalystId = DummyCatalystIdFactory.create();
+        final keychainId = const Uuid().v4();
+        final keychain = await keychainProvider.create(keychainId);
+        final account = Account.dummy(
+          catalystId: catalystId,
+          keychain: keychain,
+          isActive: true,
+        ).copyWith(
+          email: const Optional(currentEmail),
+          publicStatus: AccountPublicStatus.verified,
+        );
+        final user = User.optional(accounts: [account]);
+
+        const expectedResult = AccountUpdateResult();
+
+        // When
+        when(() => userRepository.getUser()).thenAnswer((_) => Future.value(user));
+        userObserver.user = user;
+
+        final result = await service.updateAccount(id: catalystId, email: updateEmail);
+
+        // Then
+        expect(result, expectedResult);
+      });
+
+      test('returns did change true when email did changed', () async {
+        // Given
+        const currentEmail = 'dev@iohk.com';
+        const updateEmail = 'otherDev@iohk.com';
+
+        final catalystId = DummyCatalystIdFactory.create();
+        final keychainId = const Uuid().v4();
+        final keychain = await keychainProvider.create(keychainId);
+        final account = Account.dummy(
+          catalystId: catalystId,
+          keychain: keychain,
+          isActive: true,
+        ).copyWith(
+          email: const Optional(currentEmail),
+          publicStatus: AccountPublicStatus.verified,
+        );
+        final user = User.optional(accounts: [account]);
+        const publicProfile = AccountPublicProfile(email: '', status: AccountPublicStatus.verified);
+
+        const expectedResult = AccountUpdateResult(didChanged: true);
+
+        // When
+        when(() => userRepository.getUser()).thenAnswer((_) => Future.value(user));
+        when(() => userRepository.saveUser(any())).thenAnswer((_) => Future(() {}));
+        when(
+          () => userRepository.publishUserProfile(
+            catalystId: catalystId,
+            email: updateEmail,
+          ),
+        ).thenAnswer((_) => Future.value(publicProfile));
+
+        userObserver.user = user;
+
+        final didUpdateAccount = await service.updateAccount(id: catalystId, email: updateEmail);
+
+        // Then
+        expect(didUpdateAccount, expectedResult);
+      });
+
+      test(
+          'returns has pending email change when '
+          'public profile effective email did not change', () async {
+        // Given
+        const currentEmail = 'dev@iohk.com';
+        const updateEmail = 'otherDev@iohk.com';
+
+        final catalystId = DummyCatalystIdFactory.create();
+        final keychainId = const Uuid().v4();
+        final keychain = await keychainProvider.create(keychainId);
+        final account = Account.dummy(
+          catalystId: catalystId,
+          keychain: keychain,
+          isActive: true,
+        ).copyWith(
+          email: const Optional(currentEmail),
+          publicStatus: AccountPublicStatus.verified,
+        );
+        final user = User.optional(accounts: [account]);
+        const publicProfile = AccountPublicProfile(
+          email: currentEmail,
+          status: AccountPublicStatus.verified,
+        );
+
+        const expectedResult = AccountUpdateResult(hasPendingEmailChange: true);
+
+        // When
+        when(() => userRepository.getUser()).thenAnswer((_) => Future.value(user));
+        when(() => userRepository.saveUser(any())).thenAnswer((_) => Future(() {}));
+        when(
+          () => userRepository.publishUserProfile(
+            catalystId: catalystId,
+            email: updateEmail,
+          ),
+        ).thenAnswer((_) => Future.value(publicProfile));
+
+        userObserver.user = user;
+
+        final didUpdateAccount = await service.updateAccount(id: catalystId, email: updateEmail);
+
+        // Then
+        expect(didUpdateAccount, expectedResult);
+      });
+
+      test(
+          'returns has pending email change when '
+          'public profile status downgraded', () async {
+        // Given
+        const currentEmail = 'dev@iohk.com';
+        const updateEmail = 'otherDev@iohk.com';
+
+        final catalystId = DummyCatalystIdFactory.create();
+        final keychainId = const Uuid().v4();
+        final keychain = await keychainProvider.create(keychainId);
+        final account = Account.dummy(
+          catalystId: catalystId,
+          keychain: keychain,
+          isActive: true,
+        ).copyWith(
+          email: const Optional(currentEmail),
+          publicStatus: AccountPublicStatus.verified,
+        );
+        final user = User.optional(accounts: [account]);
+        const publicProfile = AccountPublicProfile(
+          email: updateEmail,
+          status: AccountPublicStatus.verifying,
+        );
+
+        const expectedResult = AccountUpdateResult(hasPendingEmailChange: true);
+
+        // When
+        when(() => userRepository.getUser()).thenAnswer((_) => Future.value(user));
+        when(() => userRepository.saveUser(any())).thenAnswer((_) => Future(() {}));
+        when(
+          () => userRepository.publishUserProfile(
+            catalystId: catalystId,
+            email: updateEmail,
+          ),
+        ).thenAnswer((_) => Future.value(publicProfile));
+
+        userObserver.user = user;
+
+        final didUpdateAccount = await service.updateAccount(id: catalystId, email: updateEmail);
+
+        // Then
+        expect(didUpdateAccount, expectedResult);
+      });
+    });
   });
 }
 
@@ -368,13 +705,17 @@ class _FakeUserRepository extends Fake implements UserRepository {
   Future<User> getUser() async => _user ?? const User.empty();
 
   @override
-  Future<void> publishUserProfile({
+  Future<AccountPublicProfile> publishUserProfile({
     required CatalystId catalystId,
     required String email,
-  }) async {}
+  }) async {
+    return AccountPublicProfile(email: email, status: AccountPublicStatus.notSetup);
+  }
 
   @override
   Future<void> saveUser(User user) async {
     _user = user;
   }
 }
+
+class _MockUserRepository extends Mock implements UserRepository {}

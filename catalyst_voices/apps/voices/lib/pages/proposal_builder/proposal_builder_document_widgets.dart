@@ -20,25 +20,25 @@ class _CategoryDetails extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              category.name,
-              style: Theme.of(context).textTheme.titleSmall,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              category.subname,
+              category.formattedName,
               style: Theme.of(context).textTheme.headlineMedium,
             ),
             const SizedBox(height: 20),
-            _Stats(category: category),
-            const SizedBox(height: 20),
             Text(
-              context.l10n.shortSummary,
-              style: Theme.of(context).textTheme.titleSmall,
+              context.l10n.description,
+              style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: 8),
             Text(
               category.description,
               style: Theme.of(context).textTheme.bodyLarge,
+            ),
+            const SizedBox(height: 28),
+            _Stats(category: category),
+            const SizedBox(height: 28),
+            CategoryRequirementsList(
+              dos: category.dos,
+              donts: category.donts,
             ),
           ],
         );
@@ -96,11 +96,17 @@ class _StatsItem extends StatelessWidget {
       children: [
         Text(
           CryptocurrencyFormatter.formatAmount(value),
-          style: Theme.of(context).textTheme.titleLarge,
+          style: Theme.of(context)
+              .textTheme
+              .titleLarge
+              ?.copyWith(color: context.colors.textOnPrimaryLevel1),
         ),
         Text(
           label,
-          style: Theme.of(context).textTheme.bodySmall,
+          style: Theme.of(context)
+              .textTheme
+              .bodySmall
+              ?.copyWith(color: context.colors.textOnPrimaryLevel1),
         ),
       ],
     );

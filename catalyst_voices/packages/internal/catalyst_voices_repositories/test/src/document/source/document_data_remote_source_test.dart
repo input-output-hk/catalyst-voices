@@ -11,7 +11,6 @@ import 'package:uuid_plus/uuid_plus.dart';
 void main() {
   final CatGateway gateway = _MockedCatGateway();
   final CatReviews reviews = _MockedCatReviews();
-  final Vit vit = _MockedVit();
   final SignedDocumentManager signedDocumentManager = _MockedSignedDocumentManager();
 
   late final ApiServices apiServices;
@@ -22,7 +21,6 @@ void main() {
   setUpAll(() {
     apiServices = ApiServices.internal(
       gateway: gateway,
-      vit: vit,
       reviews: reviews,
     );
 
@@ -32,7 +30,6 @@ void main() {
   tearDown(() {
     reset(gateway);
     reset(reviews);
-    reset(vit);
     reset(signedDocumentManager);
   });
 
@@ -62,14 +59,14 @@ void main() {
 
         // When
         when(
-          () => gateway.apiV1DocumentIndexPost(
+          () => gateway.apiGatewayV1DocumentIndexPost(
             body: const DocumentIndexQueryFilter(),
             limit: maxPageSize,
             page: 0,
           ),
         ).thenAnswer((_) => Future.value(pageZeroResponse));
         when(
-          () => gateway.apiV1DocumentIndexPost(
+          () => gateway.apiGatewayV1DocumentIndexPost(
             body: const DocumentIndexQueryFilter(),
             limit: maxPageSize,
             page: 1,
@@ -82,7 +79,7 @@ void main() {
         expect(refs, isNotEmpty);
 
         verify(
-          () => gateway.apiV1DocumentIndexPost(
+          () => gateway.apiGatewayV1DocumentIndexPost(
             body: any(named: 'body'),
             limit: any(named: 'limit'),
             page: any(named: 'page'),
@@ -126,7 +123,7 @@ void main() {
 
         // When
         when(
-          () => gateway.apiV1DocumentIndexPost(
+          () => gateway.apiGatewayV1DocumentIndexPost(
             body: const DocumentIndexQueryFilter(),
             limit: maxPageSize,
             page: 0,
@@ -171,5 +168,3 @@ class _MockedCatGateway extends Mock implements CatGateway {}
 class _MockedCatReviews extends Mock implements CatReviews {}
 
 class _MockedSignedDocumentManager extends Mock implements SignedDocumentManager {}
-
-class _MockedVit extends Mock implements Vit {}

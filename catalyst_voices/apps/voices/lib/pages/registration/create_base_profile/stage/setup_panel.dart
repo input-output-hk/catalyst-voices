@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/pages/registration/widgets/registration_details_panel_scaffold.dart';
 import 'package:catalyst_voices/pages/registration/widgets/registration_stage_navigation.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
@@ -46,9 +47,9 @@ class _DisplayNameTextField extends StatelessWidget {
       },
       onFieldSubmitted: null,
       decoration: VoicesTextFieldDecoration(
-        labelText: l10n.createBaseProfileSetupDisplayNameLabel.starred(),
-        hintText: l10n.createBaseProfileSetupDisplayNameHint,
-        helperText: l10n.createBaseProfileSetupDisplayNameHelper,
+        labelText: l10n.createProfileSetupDisplayNameLabel.starred(),
+        hintText: l10n.createProfileSetupDisplayNameHint,
+        helperText: l10n.createProfileSetupDisplayNameHelper,
         errorText: displayName.displayError?.message(context),
       ),
       maxLength: Username.lengthRange.max,
@@ -97,13 +98,13 @@ class _EmailTextField extends StatelessWidget {
       },
       textInputAction: TextInputAction.done,
       decoration: VoicesTextFieldDecoration(
-        labelText: l10n.createBaseProfileSetupEmailLabel.withSuffix(
+        labelText: l10n.createProfileSetupEmailLabel.withSuffix(
           l10n.optional,
           space: true,
           brackets: true,
         ),
-        hintText: l10n.createBaseProfileSetupEmailHint,
-        helperText: l10n.createBaseProfileSetupEmailHelper,
+        hintText: l10n.createProfileSetupEmailHint,
+        helperText: l10n.createProfileSetupEmailHelper,
         errorText: email.displayError?.message(context),
       ),
       maxLength: Email.lengthRange.max,
@@ -120,13 +121,13 @@ class _IdeascaleInfoCard extends StatelessWidget {
       key: const Key('IdeascaleInfoCard'),
       icon: VoicesAssets.icons.mailOpen.buildIcon(),
       title: Text(
-        context.l10n.createBaseProfileHasIdeascaleAccountAlready,
+        context.l10n.createProfileHasIdeascaleAccountAlready,
         key: const Key('InfoCardTitle'),
       ),
       desc: BulletList(
         key: const Key('InfoCardDesc'),
         items: [
-          context.l10n.createBaseProfileSetupIdeascaleReason1,
+          context.l10n.createProfileSetupIdeascaleReason1,
         ],
         spacing: 0,
       ),
@@ -167,34 +168,33 @@ class _SetupPanelState extends State<SetupPanel> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const SizedBox(height: 24),
-        const _Title(),
-        Expanded(
-          child: FocusScope(
-            child: VoicesScrollbar(
-              controller: _scrollController,
-              alwaysVisible: true,
-              padding: const EdgeInsets.only(left: 10),
-              child: ListView(
-                controller: _scrollController,
-                padding: const EdgeInsets.symmetric(vertical: 24),
-                children: const [
-                  _DisplayNameSelector(),
-                  SizedBox(height: 24),
-                  _EmailSelector(),
-                ],
-              ),
-            ),
+    return RegistrationDetailsPanelScaffold(
+      title: const _Title(),
+      body: FocusScope(
+        child: VoicesScrollbar(
+          controller: _scrollController,
+          alwaysVisible: true,
+          padding: const EdgeInsets.only(left: 10),
+          child: ListView(
+            controller: _scrollController,
+            padding: EdgeInsets.zero,
+            children: const [
+              _DisplayNameSelector(),
+              SizedBox(height: 24),
+              _EmailSelector(),
+            ],
           ),
         ),
-        const SizedBox(height: 24),
-        const _IdeascaleInfoCard(),
-        const SizedBox(height: 24),
-        const _NavigationSelector(),
-      ],
+      ),
+      footer: const Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          _IdeascaleInfoCard(),
+          SizedBox(height: 24),
+          _NavigationSelector(),
+        ],
+      ),
     );
   }
 
@@ -225,7 +225,7 @@ class _Title extends StatelessWidget {
 
     return Text(
       key: const Key('TitleText'),
-      context.l10n.createBaseProfileSetupTitle,
+      context.l10n.createProfileSetupTitle,
       style: textStyle,
     );
   }

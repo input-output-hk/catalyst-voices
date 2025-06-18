@@ -1,4 +1,5 @@
 export 'account/account.dart';
+export 'account/public_profile/public_profile_email.dart';
 export 'admin_tools/admin_tools.dart';
 export 'brand/brand.dart';
 export 'campaign/campaign_builder/campaign_builder.dart';
@@ -9,6 +10,8 @@ export 'category/category_detail.dart';
 export 'common/bloc_error_emitter_mixin.dart';
 export 'common/bloc_event_transformers.dart';
 export 'common/bloc_signal_emitter_mixin.dart';
+export 'dev_tools/dev_tools.dart';
+export 'dev_tools/document_lookup/document_lookup.dart';
 export 'discovery/discovery.dart';
 export 'proposal/proposal.dart';
 export 'proposal_builder/new_proposal/new_proposal.dart';

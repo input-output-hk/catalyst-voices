@@ -10,7 +10,7 @@ project: {
 		bundle: {
 			modules: main: {
 				name:    "app"
-				version: "0.6.0"
+				version: "0.11.0"
 				values: {
 					deployment: containers: main: {
 						image: {
@@ -21,73 +21,81 @@ project: {
 							config: {
 								ref: {
 									config: {
-										name: "nginx"
+										name: "caddy"
 									}
 								}
-								path:    "/etc/nginx/nginx.conf"
-								subPath: "nginx.conf"
+								path:    "/etc/caddy/Caddyfile"
+								subPath: "Caddyfile"
 							}
 						}
-						port: 8080
+						ports: {
+							http: port:    8080
+							metrics: port: 8081
+						}
 						probes: {
-							liveness: path:  "/"
-							readiness: path: "/"
+							liveness: {
+								path: "/healthz"
+								port: 8080
+							}
+							readiness: {
+								path: "/healthz"
+								port: 8080
+							}
 						}
 					}
 
-					configs: nginx: data: "nginx.conf": """
-						user  nginx;
-						worker_processes  1;
-						error_log  /var/log/nginx/error.log warn;
-						pid        /var/run/nginx.pid;
-						events {
-						  worker_connections  1024;
+					configs: caddy: data: "Caddyfile": """
+						{
+						  admin :8081
+						  metrics
 						}
-						http {
-						  include       /etc/nginx/mime.types;
-						  default_type  application/octet-stream;
-						  log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
-											'$status $body_bytes_sent "$http_referer" '
-											'"$http_user_agent" "$http_x_forwarded_for"';
-						  access_log  /var/log/nginx/access.log  main;
-						  sendfile        on;
-						  keepalive_timeout  65;
-						  server {
-							listen       8080;
-							server_name  localhost;
+						http://:8080 {
+							root * /app
 
-							# https://cjycode.com/flutter_rust_bridge/manual/miscellaneous/web-cross-origin#background
-							# https://drift.simonbinder.eu/platforms/web/#additional-headers
-							add_header Cross-Origin-Opener-Policy "same-origin";
-							add_header Cross-Origin-Embedder-Policy "require-corp";
-
-							# Enforce browser to always check with server whether the app static files are up-to-date.
-							add_header 'Cache-Control' 'must-revalidate';
-							expires 1h;
-							etag on;
-
-							location / {
-							  root   /app;
-							  index  index.html;
-							  try_files $uri $uri/ /index.html;
+							handle /healthz {
+							  respond `{"status":"ok"}` 200
 							}
 
-							error_page   500 502 503 504  /50x.html;
-							location = /50x.html {
-							  root   /usr/share/nginx/html;
+							handle {
+							  try_files {path} /index.html
+							  file_server
 							}
-						  }
+
+							header {
+							  Cross-Origin-Opener-Policy "same-origin"
+							  Cross-Origin-Embedder-Policy "require-corp"
+
+							  / Cache-Control "public, max-age=3600, must-revalidate"
+							}
+
+							handle_errors {
+							  rewrite * /50x.html
+							  file_server
+							}
+
+							log
 						}
 						"""
 
-					dns: subdomain: "voices"
-					route: rules: [{
-						matchPrefix: "/"
-					}]
+					dns: subdomain: "app"
+					route: {
+						rules: [
+							{
+								matches: [
+									{
+										path: {
+											type:  "PathPrefix"
+											value: "/"
+										}
+									},
+								]
+								target: port: 8080
+							},
+						]
+					}
 
 					service: {
-						port:       80
-						targetPort: 8080
+						scrape: true
 					}
 				}
 			}

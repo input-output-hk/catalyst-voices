@@ -77,16 +77,20 @@ abstract class DateFormatter {
     return DateFormat('d MMM HH:mm').format(dateTime);
   }
 
-  /// Formats full date and time.
+  static String formatFullDate24Format(DateTime dateTime) {
+    return DateFormat('d MMM, yyyy - HH:mm').format(dateTime);
+  }
+
+  /// Formats full date and time in 24 format with leading day of week.
   /// If [timeOnNewline] is true then the time will be placed on a new line.
   ///
   /// Example:
-  /// - Thu, 6 June 2024 10:00 am
+  /// - Thu, 6 June 2024 10:00
   static String formatFullDateTime(
     DateTime dateTime, {
     bool timeOnNewline = false,
   }) {
-    final format = timeOnNewline ? 'EEE, d MMMM yyyy\nh:mm a' : 'EEE, d MMMM yyyy h:mm a';
+    final format = timeOnNewline ? 'EEE, d MMMM yyyy\nHH:mm' : 'EEE, d MMMM yyyy, HH:mm';
     return DateFormat(format).format(dateTime);
   }
 

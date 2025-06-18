@@ -17,6 +17,13 @@ abstract interface class ProposalDocumentDataLocalSource {
   Future<Page<ProposalDocumentData>> getProposalsPage({
     required PageRequest request,
     required ProposalsFilters filters,
+    required ProposalsOrder order,
+  });
+
+  Stream<Page<ProposalDocumentData>> watchProposalsPage({
+    required PageRequest request,
+    required ProposalsFilters filters,
+    required ProposalsOrder order,
   });
 
   Stream<ProposalsCount> watchProposalsCount({

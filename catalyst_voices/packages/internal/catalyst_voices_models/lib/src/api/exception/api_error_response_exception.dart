@@ -16,6 +16,10 @@ final class ApiErrorResponseException extends ApiException {
   /// In context of request.
   static const int notFound = 404;
 
+  /// A request could not be completed due to a conflict
+  /// with the current state of the target resource.
+  static const int conflict = 409;
+
   /// The client has not sent valid data in its request, headers, parameters
   /// or body.
   static const int preconditionFailed = 412;

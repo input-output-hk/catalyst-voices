@@ -56,16 +56,20 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     on<RebuildCommentsProposalEvent>(_rebuildComments);
     on<RebuildActiveAccountProposalEvent>(_rebuildActiveAccount);
     on<SubmitProposalEvent>(_submitProposal);
+    on<RequestPublishProposalEvent>(_requestPublishProposal);
+    on<RequestSubmitProposalEvent>(_requestSubmitProposal);
     on<ValidateProposalEvent>(_validateProposal);
+    on<UpdateProposalBuilderValidationStatusEvent>(_updateValidationStatus);
+    on<ClearValidationProposalEvent>(_clearValidation);
     on<ProposalSubmissionCloseDateEvent>(_proposalSubmissionCloseDate);
     on<UpdateCommentsSortEvent>(_updateCommentsSort);
     on<UpdateCommentBuilderEvent>(_updateCommentBuilder);
     on<UpdateCommentRepliesEvent>(_updateCommentReplies);
     on<SubmitCommentEvent>(_submitComment);
     on<MaxProposalsLimitChangedEvent>(_updateMaxProposalsLimitReached);
-    on<MaxProposalsLimitReachedEvent>(_onMaxProposalsLimitReached);
     on<UpdateUsernameEvent>(_onUpdateUsername);
     on<UnlockProposalBuilderEvent>(_unlockProposal);
+    on<ForgetProposalBuilderEvent>(_forgetProposal);
 
     final activeAccount = _userService.user.activeAccount;
 
@@ -99,14 +103,18 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     return super.close();
   }
 
-  Future<bool> isAccountEmailVerified() {
-    return _userService.isActiveAccountPubliclyVerified();
+  Future<bool> isAccountEmailVerified() async {
+    try {
+      return _userService.isActiveAccountPubliclyVerified();
+    } catch (e) {
+      return false;
+    }
   }
 
-  bool validate() {
+  bool validate(ProposalBuilderValidationOrigin origin) {
     final document = _buildDocument();
     final isValid = document.isValid;
-    add(const ValidateProposalEvent());
+    add(ValidateProposalEvent(origin: origin));
 
     return isValid;
   }
@@ -147,7 +155,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
   }) {
     final documentSegments = _mapDocumentToSegments(
       proposalDocument,
-      showValidationErrors: state.showValidationErrors,
+      showValidationErrors: state.validationErrors?.showErrors ?? false,
     );
 
     final commentSegments = _mapCommentToSegments(
@@ -172,7 +180,8 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
       metadata: proposalMetadata,
       category: categoryVM,
       activeNodeId: firstSection?.id,
-      canPublish: isEmailVerified,
+      validationErrors: state.validationErrors?.withErrorList(proposalDocument.collectErrors()),
+      canPublish: isEmailVerified && proposalDocument.isValid,
       isMaxProposalsLimitReached: isMaxProposalsLimitReached,
     );
   }
@@ -218,6 +227,23 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
       activeAccountId: activeAccount?.catalystId,
       accountPublicStatus: activeAccount?.publicStatus,
       isMaxProposalsLimitReached: isMaxProposalsLimitReached,
+    );
+  }
+
+  void _clearValidation(
+    ClearValidationProposalEvent event,
+    Emitter<ProposalBuilderState> emit,
+  ) {
+    final documentSegments = _mapDocumentToSegments(
+      _cache.proposalDocument!,
+      showValidationErrors: false,
+    );
+
+    emit(
+      state.copyWith(
+        documentSegments: documentSegments,
+        validationErrors: const Optional.empty(),
+      ),
     );
   }
 
@@ -284,10 +310,14 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     }
 
     final guidance = property.schema.guidance;
+
+    final sectionTitle = property.schema.nodeId.isChildOf(ProposalDocument.milestoneListChildNodeId)
+        ? ''
+        : property.schema.title;
     if (guidance != null) {
       yield ProposalGuidanceItem(
         segmentTitle: segment.schema.title,
-        sectionTitle: property.schema.title,
+        sectionTitle: sectionTitle,
         description: guidance,
       );
     }
@@ -303,6 +333,28 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
         }
       case DocumentValueProperty():
       // do nothing, values don't have children
+    }
+  }
+
+  Future<void> _forgetProposal(
+    ProposalBuilderEvent event,
+    Emitter<ProposalBuilderState> emit,
+  ) async {
+    final categoryId = state.metadata.categoryId;
+    final proposalRef = state.metadata.documentRef;
+    try {
+      emit(state.copyWith(isChanging: true));
+      await _proposalService.forgetProposal(
+        proposalRef: proposalRef! as SignedDocumentRef,
+        categoryId: categoryId!,
+      );
+      unawaited(_clearCache());
+      emitSignal(const ForgotProposalSuccessBuilderSignal());
+    } catch (e, stackTrace) {
+      _logger.severe('Error forgetting proposal', e, stackTrace);
+      emitError(LocalizedException.create(e));
+    } finally {
+      emit(state.copyWith(isChanging: false));
     }
   }
 
@@ -365,14 +417,20 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     proposalBuilder!.addChanges(event.changes);
     final document = proposalBuilder.build();
 
+    _cache = _cache.copyWith(proposalDocument: Optional(document));
+
     final documentSegments = _mapDocumentToSegments(
       document,
-      showValidationErrors: state.showValidationErrors,
+      showValidationErrors: state.validationErrors?.showErrors ?? false,
     );
+
+    final validationErrors = state.validationErrors?.withErrorList(document.collectErrors());
 
     final newState = state.copyWith(
       document: Optional(document),
       documentSegments: documentSegments,
+      validationErrors: Optional(validationErrors),
+      canPublish: _cache.isEmailVerified && document.isValid,
     );
 
     // early emit new state to make the UI responsive
@@ -380,6 +438,10 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
 
     // then proceed slow async operations
     await _saveDocumentLocally(emit, document);
+  }
+
+  bool _isLocal(ProposalPublish publish, int iteration) {
+    return publish == ProposalPublish.localDraft && iteration == DocumentVersion.firstNumber;
   }
 
   Future<void> _loadDefaultProposalCategory(
@@ -450,6 +512,13 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
           isLatest: index == proposalData.versions.length - 1,
         );
       }).toList();
+      final notVerifiedAccount =
+          !(_userService.user.activeAccount?.publicStatus.isVerified ?? false);
+      final firstVersion =
+          versions.length == 1 && versions.first.number == DocumentVersion.firstNumber;
+      if (firstVersion && proposalData.publish.isLocal && notVerifiedAccount) {
+        emitSignal(const NewProposalAndEmailNotVerifiedSignal());
+      }
       final categoryId = proposalData.categoryId;
       final category = await _campaignService.getCategory(categoryId);
 
@@ -594,24 +663,6 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     }).toList();
   }
 
-  Future<void> _onMaxProposalsLimitReached(
-    MaxProposalsLimitReachedEvent event,
-    Emitter<ProposalBuilderState> emit,
-  ) async {
-    final proposalSubmissionCloseDate = await _getProposalSubmissionCloseDate();
-    final count = await _proposalService.watchUserProposalsCount().first;
-
-    if (proposalSubmissionCloseDate != null) {
-      final signal = MaxProposalsLimitReachedSignal(
-        proposalSubmissionCloseDate: proposalSubmissionCloseDate,
-        currentSubmissions: count.finals,
-        maxSubmissions: ProposalDocument.maxSubmittedProposalsPerUser,
-      );
-
-      emitSignal(signal);
-    }
-  }
-
   Future<void> _onUpdateUsername(
     UpdateUsernameEvent event,
     Emitter<ProposalBuilderState> emit,
@@ -690,7 +741,12 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
   ) async {
     try {
       _logger.info('Publishing proposal');
-      emit(state.copyWith(isChanging: true));
+      emit(
+        state.copyWith(
+          isChanging: true,
+          validationErrors: const Optional.empty(),
+        ),
+      );
 
       final currentRef = state.metadata.documentRef!;
       final updatedRef = await _proposalService.publishProposal(
@@ -753,7 +809,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     final commentTemplate = _cache.commentTemplate;
     final comments = _cache.comments ?? [];
     final commentsState = state.comments;
-    final emailStatus = _cache.accountPublicStatus;
+    final isEmailVerified = _cache.isEmailVerified;
     final isMaxProposalsLimitReached = _cache.isMaxProposalsLimitReached ?? true;
 
     if (proposalDocument == null ||
@@ -774,7 +830,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
       commentSchema: commentTemplate.schema,
       comments: comments,
       commentsState: commentsState,
-      isEmailVerified: emailStatus?.isVerified ?? false,
+      isEmailVerified: isEmailVerified,
       isMaxProposalsLimitReached: isMaxProposalsLimitReached,
     );
   }
@@ -801,6 +857,111 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
           isLatest: newRef.version == currentId,
         ),
     ];
+  }
+
+  Future<void> _requestPublishProposal(
+    RequestPublishProposalEvent event,
+    Emitter<ProposalBuilderState> emit,
+  ) async {
+    try {
+      emit(state.copyWith(isChanging: true));
+      if (!await isAccountEmailVerified()) {
+        emitSignal(const EmailNotVerifiedProposalBuilderSignal());
+        return;
+      }
+
+      if (emit.isDone) {
+        return;
+      }
+
+      if (!validate(ProposalBuilderValidationOrigin.shareDraft)) {
+        return;
+      }
+
+      final proposalTitle = state.proposalTitle;
+      final nextIteration = state.metadata.latestVersion?.number ?? DocumentVersion.firstNumber;
+
+      // if it's local draft and the first version then
+      // it should be shown as local which corresponds to null
+      final currentIteration =
+          _isLocal(state.metadata.publish, nextIteration) ? null : nextIteration - 1;
+
+      emitSignal(
+        ShowPublishConfirmationSignal(
+          proposalTitle: proposalTitle,
+          currentIteration: currentIteration,
+          nextIteration: nextIteration,
+        ),
+      );
+    } finally {
+      emit(state.copyWith(isChanging: false));
+    }
+  }
+
+  Future<void> _requestSubmitProposal(
+    RequestSubmitProposalEvent event,
+    Emitter<ProposalBuilderState> emit,
+  ) async {
+    try {
+      emit(state.copyWith(isChanging: true));
+      if (state.isMaxProposalsLimitReached) {
+        final proposalSubmissionCloseDate = await _getProposalSubmissionCloseDate();
+        final count = await _proposalService.watchUserProposalsCount().first;
+
+        if (proposalSubmissionCloseDate != null) {
+          final signal = MaxProposalsLimitReachedSignal(
+            proposalSubmissionCloseDate: proposalSubmissionCloseDate,
+            currentSubmissions: count.finals,
+            maxSubmissions: ProposalDocument.maxSubmittedProposalsPerUser,
+          );
+
+          emitSignal(signal);
+        }
+
+        return;
+      }
+
+      if (!await isAccountEmailVerified()) {
+        emitSignal(const EmailNotVerifiedProposalBuilderSignal());
+        return;
+      }
+
+      if (!validate(ProposalBuilderValidationOrigin.submitForReview)) {
+        return;
+      }
+
+      if (emit.isDone) {
+        return;
+      }
+
+      final proposalTitle = state.proposalTitle;
+      final latestVersion = state.metadata.latestVersion;
+      final nextIteration = latestVersion?.number ?? DocumentVersion.firstNumber;
+
+      final int? currentIteration;
+      if (_isLocal(state.metadata.publish, nextIteration)) {
+        // if it's local draft and the first version then
+        // it should be shown as local which corresponds to null
+        currentIteration = null;
+      } else if (state.metadata.publish == ProposalPublish.localDraft) {
+        // current iteration is a local draft
+        // so next iteration must increment the version
+        currentIteration = nextIteration - 1;
+      } else {
+        // only changing status of the iteration, no need to increment the version
+        currentIteration = nextIteration;
+      }
+
+      emitSignal(
+        ShowSubmitConfirmationSignal(
+          proposalTitle: proposalTitle,
+          currentIteration: currentIteration,
+          nextIteration: nextIteration,
+        ),
+      );
+    } finally {
+      emit(state.copyWith(isChanging: false));
+    }
   }
 
   Future<void> _saveDocumentLocally(
@@ -894,7 +1055,12 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
   ) async {
     try {
       _logger.info('Submitting proposal for review');
-      emit(state.copyWith(isChanging: true));
+      emit(
+        state.copyWith(
+          isChanging: true,
+          validationErrors: const Optional.empty(),
+        ),
+      );
 
       switch (state.metadata.publish) {
         case ProposalPublish.localDraft:
@@ -1004,6 +1170,25 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     emit(updatedState);
   }
 
+  void _updateValidationStatus(
+    UpdateProposalBuilderValidationStatusEvent event,
+    Emitter<ProposalBuilderState> emit,
+  ) {
+    final validationErrors = state.validationErrors?.copyWith(status: event.status);
+
+    final documentSegments = _mapDocumentToSegments(
+      _cache.proposalDocument!,
+      showValidationErrors: validationErrors?.showErrors ?? false,
+    );
+
+    emit(
+      state.copyWith(
+        documentSegments: documentSegments,
+        validationErrors: Optional(validationErrors),
+      ),
+    );
+  }
+
   Future<DraftRef> _upsertDraftProposal(DocumentDataContent document) async {
     final currentRef = state.metadata.documentRef!;
     final originalRef = state.metadata.originalDocumentRef;
@@ -1039,22 +1224,33 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
 
     final documentSegments = _mapDocumentToSegments(
       document,
-      showValidationErrors: showErrors,
+      showValidationErrors: false,
     );
 
     if (showErrors) {
-      emitError(
-        ProposalBuilderValidationException(
-          fields: document.invalidProperties.map((e) => e.schema.title).toList(),
+      final newState = state.copyWith(
+        documentSegments: documentSegments,
+        validationErrors: Optional(
+          ProposalBuilderValidationErrors(
+            status: ProposalBuilderValidationStatus.notStarted,
+            origin: event.origin,
+            errors: document.collectErrors(),
+          ),
         ),
       );
+      emit(newState);
+    } else {
+      final newState = state.copyWith(
+        documentSegments: documentSegments,
+        validationErrors: const Optional.empty(),
+      );
+      emit(newState);
     }
+  }
+}
 
-    final newState = state.copyWith(
-      documentSegments: documentSegments,
-      showValidationErrors: showErrors,
-    );
-
-    emit(newState);
+extension on Document {
+  List<String> collectErrors() {
+    return invalidProperties.map((e) => e.schema.title).whereNot((e) => e.isBlank).toList();
   }
 }

@@ -53,6 +53,17 @@ void main() {
       );
     });
 
+    test('successBodyBytesOrThrow throws $ResourceConflictException for 409', () {
+      final response = mockBinaryResponse(
+        statusCode: HttpStatus.conflict,
+      );
+
+      expect(
+        response.successBodyBytesOrThrow,
+        throwsA(const ResourceConflictException()),
+      );
+    });
+
     test('successBodyBytesOrThrow throws $ApiErrorResponseException otherwise', () {
       final response = mockBinaryResponse(
         statusCode: HttpStatus.internalServerError,
@@ -82,6 +93,17 @@ void main() {
       );
     });
 
+    test('successBodyOrThrow throws $ResourceConflictException for 409', () {
+      final response = mockResponse(
+        statusCode: HttpStatus.conflict,
+      );
+
+      expect(
+        response.successBodyOrThrow,
+        throwsA(const ResourceConflictException()),
+      );
+    });
+
     test('successBodyOrThrow throws $ApiErrorResponseException otherwise', () {
       final response = mockResponse(
         statusCode: HttpStatus.internalServerError,
@@ -90,6 +112,45 @@ void main() {
 
       expect(
         response.successBodyOrThrow,
+        throwsA(isA<ApiErrorResponseException>()),
+      );
+    });
+
+    test('successOrThrow returns normally when successful', () {
+      const body = 'Success!';
+      final response = mockResponse(body: body);
+
+      expect(response.successOrThrow, returnsNormally);
+    });
+
+    test('successOrThrow throws $NotFoundException for 404', () {
+      final response = mockResponse(statusCode: HttpStatus.notFound);
+
+      expect(
+        response.successOrThrow,
+        throwsA(isA<NotFoundException>()),
+      );
+    });
+
+    test('successOrThrow throws $ResourceConflictException for 409', () {
+      final response = mockResponse(
+        statusCode: HttpStatus.conflict,
+      );
+
+      expect(
+        response.successOrThrow,
+        throwsA(const ResourceConflictException()),
+      );
+    });
+
+    test('successOrThrow throws $ApiErrorResponseException otherwise', () {
+      final response = mockResponse(
+        statusCode: HttpStatus.internalServerError,
+        error: 'Internal Error',
+      );
+
+      expect(
+        response.successOrThrow,
         throwsA(isA<ApiErrorResponseException>()),
       );
     });
@@ -112,6 +173,17 @@ void main() {
       final futureResponse = Future.value(response);
       final result = await futureResponse.successBodyOrThrow();
       expect(result, equals(body));
+    });
+
+    test('successOrThrow awaits and returns normally', () async {
+      const body = 'Hello!';
+      final response = mockResponse(body: body);
+
+      final futureResponse = Future.value(response);
+      expect(
+        futureResponse.successBodyOrThrow,
+        returnsNormally,
+      );
     });
   });
 }

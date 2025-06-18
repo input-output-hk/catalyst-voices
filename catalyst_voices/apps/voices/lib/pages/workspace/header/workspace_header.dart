@@ -4,8 +4,7 @@ import 'dart:typed_data';
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/common/ext/space_ext.dart';
 import 'package:catalyst_voices/routes/routing/routing.dart';
-import 'package:catalyst_voices/widgets/campaign_timeline/campaign_timeline_card.dart';
-import 'package:catalyst_voices/widgets/modals/proposals/create_new_proposal_dialog.dart';
+import 'package:catalyst_voices/widgets/buttons/create_proposal_button.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
@@ -14,7 +13,6 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart' show Proposa
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
-part 'create_proposal_button.dart';
 part 'import_proposal_button.dart';
 part 'timeline_toggle_button.dart';
 
@@ -30,51 +28,48 @@ class _HasCommentCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MouseRegion(
-      cursor: SystemMouseCursors.click,
-      child: GestureDetector(
-        onTap: () async => ProposalsRoute.myProposals().push(context),
-        child: Container(
-          decoration: BoxDecoration(
-            color: context.colors.elevationsOnSurfaceNeutralLv0,
-            borderRadius: BorderRadius.circular(16),
-          ),
-          padding: const EdgeInsets.all(16),
-          constraints: const BoxConstraints(
-            maxWidth: 300,
-            maxHeight: 190,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Row(
-                children: [
-                  VoicesAssets.icons.chat.buildIcon(
-                    color: context.colors.iconsPrimary,
-                  ),
-                  const Spacer(),
-                  VoicesAssets.icons.arrowRight.buildIcon(
-                    color: context.colors.primaryContainer,
-                  ),
-                ],
-              ),
-              const Spacer(),
-              Text(
-                context.l10n.viewProposalComments,
-                style: context.textTheme.titleSmall?.copyWith(
-                  color: context.colors.textOnPrimaryLevel1,
+    return VoicesGestureDetector(
+      onTap: () async => ProposalsRoute.myProposals().push(context),
+      child: Container(
+        decoration: BoxDecoration(
+          color: context.colors.elevationsOnSurfaceNeutralLv0,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        padding: const EdgeInsets.all(16),
+        constraints: const BoxConstraints(
+          maxWidth: 300,
+          maxHeight: 190,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
+              children: [
+                VoicesAssets.icons.chat.buildIcon(
+                  color: context.colors.iconsPrimary,
                 ),
-              ),
-              Text(
-                context.l10n.viewProposalCommentsDescription,
-                style: context.textTheme.bodyMedium?.copyWith(
-                  color: context.colors.sysColorsNeutralN60,
+                const Spacer(),
+                VoicesAssets.icons.arrowRight.buildIcon(
+                  color: context.colors.primaryContainer,
                 ),
+              ],
+            ),
+            const Spacer(),
+            Text(
+              context.l10n.viewProposalComments,
+              style: context.textTheme.titleSmall?.copyWith(
+                color: context.colors.textOnPrimaryLevel1,
               ),
-              const Spacer(),
-            ],
-          ),
+            ),
+            Text(
+              context.l10n.viewProposalCommentsDescription,
+              style: context.textTheme.bodyMedium?.copyWith(
+                color: context.colors.sysColorsNeutralN60,
+              ),
+            ),
+            const Spacer(),
+          ],
         ),
       ),
     );
@@ -131,7 +126,7 @@ class _WorkspaceHeaderState extends State<WorkspaceHeader> {
                 ),
               ),
               const Spacer(),
-              const _CreateProposalButton(),
+              const CreateProposalButton(showTrailingIcon: true),
               const SizedBox(width: 8),
               const _ImportProposalButton(),
               const SizedBox(width: 8),
@@ -149,11 +144,8 @@ class _WorkspaceHeaderState extends State<WorkspaceHeader> {
                   child: Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: theme.colorScheme.surface,
+                      color: context.colors.onSurfaceNeutralOpaqueLv0.withValues(alpha: 0.6),
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: Colors.grey.withAlpha(51),
-                      ),
                     ),
                     child: BlocSelector<WorkspaceBloc, WorkspaceState,
                         List<CampaignTimelineViewModel>>(
@@ -163,7 +155,6 @@ class _WorkspaceHeaderState extends State<WorkspaceHeader> {
                       builder: (context, timelineItems) {
                         return CampaignTimeline(
                           timelineItems: timelineItems,
-                          placement: CampaignTimelinePlacement.workspace,
                         );
                       },
                     ),

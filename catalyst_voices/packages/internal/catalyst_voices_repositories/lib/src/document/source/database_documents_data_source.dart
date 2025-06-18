@@ -11,6 +11,9 @@ final class DatabaseDocumentsDataSource
   );
 
   @override
+  Future<int> deleteAll() => _database.documentsDao.deleteAll();
+
+  @override
   Future<bool> exists({required DocumentRef ref}) {
     return _database.documentsDao.count(ref: ref).then((count) => count > 0);
   }
@@ -23,6 +26,13 @@ final class DatabaseDocumentsDataSource
     }
 
     return entity.toModel();
+  }
+
+  @override
+  Future<List<DocumentData>> getAll({required DocumentRef ref}) {
+    return _database.documentsDao
+        .queryAll(ref: ref)
+        .then((value) => value.map((e) => e.toModel()).toList());
   }
 
   @override
@@ -48,9 +58,10 @@ final class DatabaseDocumentsDataSource
   Future<Page<ProposalDocumentData>> getProposalsPage({
     required PageRequest request,
     required ProposalsFilters filters,
+    required ProposalsOrder order,
   }) {
     return _database.proposalsDao
-        .queryProposalsPage(request: request, filters: filters)
+        .queryProposalsPage(request: request, filters: filters, order: order)
         .then((page) => page.map((e) => e.toModel()));
   }
 
@@ -151,6 +162,17 @@ final class DatabaseDocumentsDataSource
     required ProposalsCountFilters filters,
   }) {
     return _database.proposalsDao.watchCount(filters: filters);
+  }
+
+  @override
+  Stream<Page<ProposalDocumentData>> watchProposalsPage({
+    required PageRequest request,
+    required ProposalsFilters filters,
+    required ProposalsOrder order,
+  }) {
+    return _database.proposalsDao
+        .watchProposalsPage(request: request, filters: filters, order: order)
+        .map((page) => page.map((e) => e.toModel()));
   }
 
   @override

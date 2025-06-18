@@ -1,20 +1,19 @@
 import 'dart:async';
 
-import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:catalyst_voices_repositories/src/common/content_types.dart';
+import 'package:catalyst_voices_repositories/src/common/http_headers.dart';
 import 'package:chopper/chopper.dart';
 import 'package:http/http.dart' as http;
 
-/// A [Converter] which maintains a set of hardcoded [cborRequests]
-/// to decide between cbor/json content converters.
+/// A [Converter] which decodes json/cbor depending on content-type header.
+///
+/// If the request does not have a content-type header
+/// then the converter will fallback to json serialization.
 ///
 /// The swagger_dart_code_generator package incorrectly generates
 /// request handlers for application/cbor requests therefore we are
 /// mapping out these requests to a proper converter type.
 class CborOrJsonDelegateConverter implements Converter {
-  static const cborRequests = [
-    (method: 'PUT', path: '/api/v1/document'),
-  ];
-
   final Converter cborConverter;
   final Converter jsonConverter;
 
@@ -36,24 +35,25 @@ class CborOrJsonDelegateConverter implements Converter {
   FutureOr<Response<BodyType>> convertResponse<BodyType, InnerType>(
     Response<dynamic> response,
   ) {
-    final request = response.base.request;
-    if (request == null) {
-      return response as Response<BodyType>;
-    } else if (_isCborRequest(request)) {
+    if (_isCborResponse(response)) {
       return cborConverter.convertResponse<BodyType, InnerType>(response);
     } else {
       return jsonConverter.convertResponse<BodyType, InnerType>(response);
     }
   }
 
-  bool _isCborRequest(http.BaseRequest request) {
-    for (final cborRequest in cborRequests) {
-      if (cborRequest.method.equalsIgnoreCase(request.method) &&
-          cborRequest.path.equalsIgnoreCase(request.url.path)) {
-        return true;
-      }
-    }
+  bool _isCborContentType(Map<String, String> headers) {
+    final lowercaseHeaders =
+        headers.map((key, value) => MapEntry(key.toLowerCase(), value.toLowerCase()));
+    final contentType = lowercaseHeaders[HttpHeaders.contentType.toLowerCase()];
+    return contentType != null && contentType.contains(ContentTypes.applicationCbor.toLowerCase());
+  }
 
-    return false;
+  bool _isCborRequest(http.BaseRequest request) {
+    return _isCborContentType(request.headers);
+  }
+
+  bool _isCborResponse(Response<dynamic> response) {
+    return _isCborContentType(response.headers);
   }
 }

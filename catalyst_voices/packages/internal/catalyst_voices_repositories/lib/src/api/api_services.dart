@@ -1,9 +1,10 @@
-import 'package:catalyst_voices_models/catalyst_voices_models.dart' show ApiConfig;
+import 'package:catalyst_voices_models/catalyst_voices_models.dart' show AppEnvironmentType;
 import 'package:catalyst_voices_repositories/generated/api/cat_gateway.swagger.dart';
 import 'package:catalyst_voices_repositories/generated/api/client_index.dart';
 import 'package:catalyst_voices_repositories/generated/api/client_mapping.dart';
 import 'package:catalyst_voices_repositories/src/api/converters/cbor_or_json_converter.dart';
 import 'package:catalyst_voices_repositories/src/api/converters/cbor_serializable_converter.dart';
+import 'package:catalyst_voices_repositories/src/api/interceptors/path_trim_interceptor.dart';
 import 'package:catalyst_voices_repositories/src/api/interceptors/rbac_auth_interceptor.dart';
 import 'package:catalyst_voices_repositories/src/auth/auth_token_provider.dart';
 import 'package:chopper/chopper.dart';
@@ -20,18 +21,17 @@ void _fixModelsMapping() {
 
 final class ApiServices {
   final CatGateway gateway;
-  final Vit vit;
   final CatReviews reviews;
 
   factory ApiServices({
-    required ApiConfig config,
+    required AppEnvironmentType env,
     required AuthTokenProvider authTokenProvider,
   }) {
     _fixModelsMapping();
 
     return ApiServices.internal(
       gateway: CatGateway.create(
-        baseUrl: Uri.parse(config.gatewayUrl),
+        baseUrl: env.app,
         converter: CborOrJsonDelegateConverter(
           cborConverter: CborSerializableConverter(),
           jsonConverter: $JsonSerializableConverter(),
@@ -41,15 +41,10 @@ final class ApiServices {
           if (kDebugMode) HttpLoggingInterceptor(onlyErrors: true),
         ],
       ),
-      vit: Vit.create(
-        baseUrl: Uri.parse(config.vitUrl),
-        interceptors: [
-          if (kDebugMode) HttpLoggingInterceptor(onlyErrors: true),
-        ],
-      ),
       reviews: CatReviews.create(
-        baseUrl: Uri.parse(config.reviewsUrl),
+        baseUrl: env.app.replace(path: '/api/reviews'),
         interceptors: [
+          PathTrimInterceptor(),
           RbacAuthInterceptor(authTokenProvider),
           if (kDebugMode) HttpLoggingInterceptor(onlyErrors: true),
         ],
@@ -60,7 +55,6 @@ final class ApiServices {
   @visibleForTesting
   const ApiServices.internal({
     required this.gateway,
-    required this.vit,
     required this.reviews,
   });
 }

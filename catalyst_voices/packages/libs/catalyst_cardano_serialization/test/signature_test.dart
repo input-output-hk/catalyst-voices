@@ -1,4 +1,5 @@
 import 'package:catalyst_cardano_serialization/src/signature.dart';
+import 'package:catalyst_cardano_serialization/src/utils/hex.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -8,6 +9,21 @@ void main() {
         Ed25519PublicKey.seeded(1).bytes.length,
         equals(Ed25519PublicKey.length),
       );
+    });
+
+    test('fromSimpleOrExtendedBytes skips chain code', () {
+      const extendedKeyHex = 'bcbf9d3b5b8ef3d6f65fa59ef4bb64e6e56bb3de354bc'
+          '484fa74f2e19734fa2ef5e94d3e0b9968b8f464ad8b3f'
+          'b24ab1fbda4cb0cdaa2960f8f3d07cc4ee3c7f';
+
+      const simpleKeyHex = 'bcbf9d3b5b8ef3d6f65fa59ef4bb64e6e56bb3de354bc484fa74f2e19734fa2e';
+
+      final extendedKeyBytes = hexDecode(extendedKeyHex);
+      final simpleKeyBytes = hexDecode(simpleKeyHex);
+
+      final publicKey = Ed25519PublicKey.fromSimpleOrExtendedBytes(extendedKeyBytes);
+      expect(publicKey.bytes, isNot(equals(extendedKeyBytes)));
+      expect(publicKey.bytes, equals(simpleKeyBytes));
     });
   });
 
