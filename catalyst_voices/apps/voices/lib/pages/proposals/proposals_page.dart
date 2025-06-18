@@ -132,7 +132,7 @@ class _ProposalsPageState extends State<ProposalsPage>
   void initState() {
     super.initState();
 
-    final proposalsFilterType = _initialFilterType() ?? ProposalsFilterType.total;
+    final proposalsFilterType = _determineFilterType();
 
     _tabController = TabController(
       initialIndex: proposalsFilterType.index,
@@ -156,6 +156,17 @@ class _ProposalsPageState extends State<ProposalsPage>
       ..notifyPageRequestListeners(0);
   }
 
+  ProposalsFilterType _determineFilterType() {
+    final isProposerUnlock = context.read<SessionCubit>().state.isProposerUnlock;
+    final requestedType = widget.type;
+
+    if (!isProposerUnlock && (requestedType?.isMy ?? false)) {
+      _updateRoute(filterType: ProposalsFilterType.total);
+    }
+
+    return requestedType ?? ProposalsFilterType.total;
+  }
+
   void _doResetPagination() {
     _pagingController.notifyPageRequestListeners(0);
   }
@@ -167,17 +178,6 @@ class _ProposalsPageState extends State<ProposalsPage>
   ) async {
     final request = PageRequest(page: pageKey, size: pageSize);
     await context.read<ProposalsCubit>().getProposals(request);
-  }
-
-  ProposalsFilterType? _initialFilterType() {
-    final isProposerUnlock = context.read<SessionCubit>().state.isProposerUnlock;
-    final requestedType = widget.type;
-
-    if (!isProposerUnlock && (requestedType?.isMy ?? false)) {
-      _updateRoute(filterType: ProposalsFilterType.total);
-    }
-
-    return requestedType ?? ProposalsFilterType.total;
   }
 
   void _updateRoute({
