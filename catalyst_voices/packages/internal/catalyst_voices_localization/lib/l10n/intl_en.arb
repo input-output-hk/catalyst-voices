@@ -3158,5 +3158,21 @@
   "expandableTextMore": "Show more",
   "@expandableTextMore": {
     "description": "When text is too long and you can display it fully"
+  },
+  "errorUuidInvalidFormat": "Invalid format",
+  "@errorUuidInvalidFormat": {
+    "description": "Error message when given input does not match uuid format"
+  },
+  "errorUuidVersionMissMatch": "Uuid version miss match. Got {version} but requires {requiredVersion}",
+  "@errorUuidVersionMissMatch": {
+    "description": "Error message when given is valid uuid but in different version",
+    "placeholders": {
+      "version": {
+        "type": "int"
+      },
+      "requiredVersion": {
+        "type": "int"
+      }
+    }
   }
 }

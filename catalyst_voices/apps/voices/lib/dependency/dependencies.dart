@@ -180,6 +180,12 @@ final class Dependencies extends DependencyProvider {
         return PublicProfileEmailStatusCubit(
           get<UserService>(),
         );
+      })
+      ..registerFactory<DocumentLookupBloc>(() {
+        return DocumentLookupBloc(
+          get<DocumentsService>(),
+          get<DocumentMapper>(),
+        );
       });
   }
 
