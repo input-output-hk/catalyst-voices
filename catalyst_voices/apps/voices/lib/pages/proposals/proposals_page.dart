@@ -17,13 +17,11 @@ import 'package:flutter/material.dart';
 
 class ProposalsPage extends StatefulWidget {
   final SignedDocumentRef? categoryId;
-  final bool myProposals;
   final ProposalsFilterType? type;
 
   const ProposalsPage({
     super.key,
     this.categoryId,
-    this.myProposals = false,
     this.type,
   });
 
@@ -88,11 +86,9 @@ class _ProposalsPageState extends State<ProposalsPage>
   void didUpdateWidget(ProposalsPage oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    if (widget.categoryId != oldWidget.categoryId ||
-        widget.myProposals != oldWidget.myProposals ||
-        widget.type != oldWidget.type) {
+    if (widget.categoryId != oldWidget.categoryId || widget.type != oldWidget.type) {
       context.read<ProposalsCubit>().changeFilters(
-            onlyMy: Optional(widget.myProposals),
+            onlyMy: Optional(widget.type?.isMy ?? false),
             category: Optional(widget.categoryId),
             type: widget.type ?? ProposalsFilterType.total,
           );
@@ -136,8 +132,7 @@ class _ProposalsPageState extends State<ProposalsPage>
   void initState() {
     super.initState();
 
-    final proposalsFilterType =
-        widget.type ?? (widget.myProposals ? ProposalsFilterType.my : ProposalsFilterType.total);
+    final proposalsFilterType = _initialFilterType() ?? ProposalsFilterType.total;
 
     _tabController = TabController(
       initialIndex: proposalsFilterType.index,
@@ -150,7 +145,7 @@ class _ProposalsPageState extends State<ProposalsPage>
     );
 
     context.read<ProposalsCubit>().init(
-          onlyMyProposals: widget.myProposals,
+          onlyMyProposals: widget.type?.isMy ?? false,
           category: widget.categoryId,
           type: proposalsFilterType,
           order: const Alphabetical(),
@@ -174,6 +169,17 @@ class _ProposalsPageState extends State<ProposalsPage>
     await context.read<ProposalsCubit>().getProposals(request);
   }
 
+  ProposalsFilterType? _initialFilterType() {
+    final isProposerUnlock = context.read<SessionCubit>().state.isProposerUnlock;
+    final requestedType = widget.type;
+
+    if (!isProposerUnlock && (requestedType?.isMy ?? false)) {
+      _updateRoute(filterType: ProposalsFilterType.total);
+    }
+
+    return requestedType ?? ProposalsFilterType.total;
+  }
+
   void _updateRoute({
     Optional<String>? categoryId,
     ProposalsFilterType? filterType,
@@ -185,7 +191,6 @@ class _ProposalsPageState extends State<ProposalsPage>
       ProposalsRoute(
         categoryId: effectiveCategoryId,
         type: effectiveType,
-        myProposals: widget.myProposals,
       ).replace(context);
     });
   }

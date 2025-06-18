@@ -55,9 +55,14 @@ class _ProposalsTabs extends StatelessWidget {
             ProposalsFilterType.my => data.my,
           };
 
-          return Tab(
-            key: value.tabKey(),
-            text: value.noOf(context, count: count),
+          return Offstage(
+            offstage:
+                !context.select<SessionCubit, bool>((cubit) => cubit.state.isProposerUnlock) &&
+                    value == ProposalsFilterType.my,
+            child: Tab(
+              key: value.tabKey(),
+              text: value.noOf(context, count: count),
+            ),
           );
         },
       ).toList(),
