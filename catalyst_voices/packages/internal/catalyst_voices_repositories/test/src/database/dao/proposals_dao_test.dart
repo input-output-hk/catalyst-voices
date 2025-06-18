@@ -1775,7 +1775,7 @@ void main() {
             'bcd',
             null,
             'Xyz',
-            'aabc',
+            'aabc', //cspell:disable-line
           ];
 
           final templates = [
@@ -1817,7 +1817,7 @@ void main() {
           final proposalsTitles = page.items.map((e) => e.proposal.content.title).toList();
 
           final expectedOrder = [
-            'aabc',
+            'aabc', //cspell:disable-line
             'ABC',
             'bcd',
             'Xyz',
