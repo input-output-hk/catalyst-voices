@@ -59,7 +59,7 @@ void main() {
         'returns newest version when ver is not specified',
         () async {
           // Given
-          final id = const Uuid().v7();
+          final id = DocumentRefFactory.randomUuidV7();
           final firstVersionId = const Uuid().v7(
             config: V7Options(
               DateTime(2025, 2, 10).millisecondsSinceEpoch,
@@ -111,7 +111,7 @@ void main() {
             2,
             (index) => DraftFactory.build(),
           );
-          final ref = DraftRef(id: const Uuid().v7());
+          final ref = DraftRef(id: DocumentRefFactory.randomUuidV7());
 
           // When
           await database.draftsDao.saveAll(drafts);
@@ -292,14 +292,17 @@ void main() {
         'ref without ver includes all versions',
         () async {
           // Given
-          final id = const Uuid().v7();
+          final id = DocumentRefFactory.randomUuidV7();
           final drafts = List<DocumentDraftEntity>.generate(
             2,
             (index) {
               return DraftFactory.build(
                 metadata: DocumentDataMetadata(
                   type: DocumentType.proposalDocument,
-                  selfRef: DraftRef(id: id, version: const Uuid().v7()),
+                  selfRef: DraftRef(
+                    id: id,
+                    version: DocumentRefFactory.randomUuidV7(),
+                  ),
                 ),
               );
             },
@@ -321,8 +324,8 @@ void main() {
         'ref with ver includes only that version',
         () async {
           // Given
-          final id = const Uuid().v7();
-          final version = const Uuid().v7();
+          final id = DocumentRefFactory.randomUuidV7();
+          final version = DocumentRefFactory.randomUuidV7();
           final drafts = <DocumentDraftEntity>[
             DraftFactory.build(
               metadata: DocumentDataMetadata(
@@ -358,7 +361,8 @@ void main() {
             DraftFactory.build(),
             DraftFactory.build(),
           ];
-          final ref = DraftRef(id: const Uuid().v7());
+
+          final ref = DraftRef(id: DocumentRefFactory.randomUuidV7());
 
           // When
           await database.draftsDao.saveAll(drafts);

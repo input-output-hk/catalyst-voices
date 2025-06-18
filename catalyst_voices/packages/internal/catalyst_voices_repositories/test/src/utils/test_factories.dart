@@ -58,8 +58,7 @@ abstract final class DocumentMetadataFactory {
     required DocumentMetadataFieldKey fieldKey,
     required String fieldValue,
   }) {
-    ver ??= const Uuid().v7();
-
+    ver ??= DocumentRefFactory.randomUuidV7();
     final verHiLo = UuidHiLo.from(ver);
 
     return DocumentMetadataEntity(

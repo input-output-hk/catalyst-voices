@@ -6,7 +6,6 @@ import 'package:catalyst_voices_repositories/src/dto/document_data_with_ref_dat.
 import 'package:collection/collection.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:uuid_plus/uuid_plus.dart';
 
 import '../../fixture/voices_document_templates.dart';
 import '../database/connection/test_connection.dart';
@@ -56,14 +55,14 @@ void main() {
         final templateData = await VoicesDocumentsTemplates.proposalF14Schema;
         final proposalData = await VoicesDocumentsTemplates.proposalF14Document;
 
-        final templateRef = SignedDocumentRef.first(const Uuid().v7());
+        final templateRef = SignedDocumentRef.first(DocumentRefFactory.randomUuidV7());
         final template = DocumentDataFactory.build(
           selfRef: templateRef,
           type: DocumentType.proposalTemplate,
           content: DocumentDataContent(templateData),
         );
         final proposal = DocumentDataFactory.build(
-          selfRef: SignedDocumentRef.first(const Uuid().v7()),
+          selfRef: SignedDocumentRef.first(DocumentRefFactory.randomUuidV7()),
           template: templateRef,
           content: DocumentDataContent(proposalData),
         );
@@ -92,12 +91,9 @@ void main() {
       'getDocument correctly propagates errors',
       () async {
         // Given
-        final templateRef = SignedDocumentRef(
-          id: const Uuid().v7(),
-          version: const Uuid().v7(),
-        );
+        final templateRef = DocumentRefFactory.signedDocumentRef();
         final proposal = DocumentDataFactory.build(
-          selfRef: SignedDocumentRef.first(const Uuid().v7()),
+          selfRef: SignedDocumentRef.first(DocumentRefFactory.randomUuidV7()),
           template: templateRef,
         );
 
@@ -128,7 +124,7 @@ void main() {
         'remote source is called only once for same proposal',
         () async {
           // Given
-          final id = const Uuid().v7();
+          final id = DocumentRefFactory.randomUuidV7();
           final version = id;
 
           final documentData = DocumentDataFactory.build(
@@ -153,7 +149,7 @@ void main() {
         'latest version is called when ref is not exact ',
         () async {
           // Given
-          final id = const Uuid().v7();
+          final id = DocumentRefFactory.randomUuidV7();
           final version = id;
 
           final documentData = DocumentDataFactory.build(
@@ -330,10 +326,7 @@ void main() {
           // Given
           final refs = List.generate(
             10,
-            (_) => SignedDocumentRef.exact(
-              id: const Uuid().v7(),
-              version: const Uuid().v7(),
-            ).toTyped(DocumentType.proposalDocument),
+            (_) => DocumentRefFactory.signedDocumentRef().toTyped(DocumentType.proposalDocument),
           );
 
           // When
@@ -353,14 +346,11 @@ void main() {
           // Given
           final exactRefs = List.generate(
             10,
-            (_) => SignedDocumentRef.exact(
-              id: const Uuid().v7(),
-              version: const Uuid().v7(),
-            ).toTyped(DocumentType.proposalDocument),
+            (_) => DocumentRefFactory.signedDocumentRef().toTyped(DocumentType.proposalDocument),
           );
           final looseRefs = List.generate(
             10,
-            (_) => SignedDocumentRef.loose(id: const Uuid().v7())
+            (_) => SignedDocumentRef.loose(id: DocumentRefFactory.randomUuidV7())
                 .toTyped(DocumentType.proposalDocument),
           );
           final refs = [...exactRefs, ...looseRefs];
@@ -368,7 +358,7 @@ void main() {
           // When
           when(() => remoteDocuments.index()).thenAnswer((_) => Future.value(refs));
           when(() => remoteDocuments.getLatestVersion(any()))
-              .thenAnswer((_) => Future(() => const Uuid().v7()));
+              .thenAnswer((_) => Future(DocumentRefFactory.randomUuidV7));
 
           final allRefs = await repository.getAllDocumentsRefs();
 
