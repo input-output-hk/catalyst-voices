@@ -10,9 +10,9 @@ import 'package:result_type/result_type.dart';
 
 final _logger = Logger('DocumentsService');
 
-typedef _RefFailure = Failure<TypedDocumentRef, Exception>;
+typedef _RefFailure = Failure<MaybeTypedDocumentRef, Exception>;
 
-typedef _RefSuccess = Success<TypedDocumentRef, Exception>;
+typedef _RefSuccess = Success<MaybeTypedDocumentRef, Exception>;
 
 abstract interface class DocumentsService {
   const factory DocumentsService(
@@ -30,7 +30,7 @@ abstract interface class DocumentsService {
   /// [onProgress] emits from 0.0 to 1.0.
   ///
   /// Returns list of added refs.
-  Future<List<TypedDocumentRef>> sync({
+  Future<List<MaybeTypedDocumentRef>> sync({
     ValueChanged<double>? onProgress,
     int maxConcurrent,
   });
@@ -55,7 +55,7 @@ final class DocumentsServiceImpl implements DocumentsService {
   }
 
   @override
-  Future<List<TypedDocumentRef>> sync({
+  Future<List<MaybeTypedDocumentRef>> sync({
     ValueChanged<double>? onProgress,
     int maxConcurrent = 100,
   }) async {
@@ -82,10 +82,10 @@ final class DocumentsServiceImpl implements DocumentsService {
     final total = missingRefs.length;
     final pool = Pool(maxConcurrent);
 
-    final outcomes = <Result<TypedDocumentRef, Exception>>[];
+    final outcomes = <Result<MaybeTypedDocumentRef, Exception>>[];
 
     final prioritizedMissingRefs = missingRefs
-        .groupListsBy((element) => element.type.priority)
+        .groupListsBy((element) => element.type?.priority ?? 0)
         .entries
         .sorted((a, b) => a.key.compareTo(b.key) * -1);
 

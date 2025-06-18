@@ -1,107 +1,79 @@
 //! Signed Document Type
 //!
-//! `UUIDv4` Encoded Document Type.
+//! List of `UUIDv4`.
 
-use std::sync::LazyLock;
-
-use anyhow::bail;
 use poem_openapi::{
-    registry::{MetaExternalDocument, MetaSchema, MetaSchemaRef},
-    types::{Example, ParseError, ParseFromJSON, ParseFromParameter, ParseResult, ToJSON, Type},
+    registry::{MetaExternalDocument, MetaSchema},
+    types::{Example, ToJSON},
 };
-use serde_json::Value;
 
 use self::generic::uuidv4;
-use crate::service::common::types::{generic, string_types::impl_string_types};
+use crate::service::common::types::{
+    array_types::impl_array_types,
+    generic::{self, uuidv4::UUIDv4},
+};
 
 /// Title.
 const TITLE: &str = "Signed Document Type";
 /// Description.
-const DESCRIPTION: &str = "Document Type.  UUIDv4 Formatted 128bit value.";
-/// Example.
-pub(crate) const EXAMPLE: &str = "7808d2ba-d511-40af-84e8-c0d1625fdfdc";
+const DESCRIPTION: &str = "Document Type. List UUIDv4 Formatted 128bit value.";
 /// External Documentation URI
 const URI: &str =
-    "https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/spec/#type";
+    "https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/types/";
 /// Description of the URI
 const URI_DESCRIPTION: &str = "Specification";
-/// Length of the hex encoded string
-pub(crate) const ENCODED_LENGTH: usize = uuidv4::ENCODED_LENGTH;
-/// Validation Regex Pattern
-pub(crate) const PATTERN: &str = uuidv4::PATTERN;
-/// Format
-pub(crate) const FORMAT: &str = uuidv4::FORMAT;
+/// Maximum length
+const MAX_LENGTH: usize = usize::MAX;
+/// Minimum length
+const MIN_LENGTH: usize = 1;
 
-/// Schema
-static SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| {
-    MetaSchema {
-        title: Some(TITLE.to_owned()),
+impl_array_types!(
+    /// Document type - list of `UUIDv4`
+    DocumentType,
+    UUIDv4,
+    Some( MetaSchema {
+        title: Some(TITLE.into()),
         description: Some(DESCRIPTION),
-        example: Some(Value::String(EXAMPLE.to_string())),
-        max_length: Some(ENCODED_LENGTH),
-        min_length: Some(ENCODED_LENGTH),
-        pattern: Some(PATTERN.to_string()),
+        max_items: Some(MAX_LENGTH),
+        min_items: Some(MIN_LENGTH),
+        items: Some(Box::new(UUIDv4::schema_ref())),
         external_docs: Some(MetaExternalDocument {
             url: URI.to_owned(),
             description: Some(URI_DESCRIPTION.to_owned()),
         }),
-
-        ..poem_openapi::registry::MetaSchema::ANY
-    }
-});
-
-/// Because ALL the constraints are defined above, we do not ever need to define them in
-/// the API. BUT we do need to make a validator.
-/// This helps enforce uniform validation.
-fn is_valid(uuid: &str) -> bool {
-    uuidv4::UUIDv4::try_from(uuid).is_ok()
-}
-
-impl_string_types!(
-    DocumentType,
-    "string",
-    FORMAT,
-    Some(SCHEMA.clone()),
-    is_valid
+        example: Self::example().to_json(),
+        ..MetaSchema::ANY
+    })
 );
 
 impl DocumentType {
-    /// Creates a new `DocumentType` instance without validation.
-    /// **NOTE** could produce an invalid instance, be sure that passing `String` is a
-    /// valid `DocumentType`
-    pub(crate) fn new_unchecked(uuid: String) -> Self {
-        Self(uuid)
+    /// Convert to sql format used for filter '{"uuid", "uuid"}'
+    pub(crate) fn to_sql_array(&self) -> String {
+        format!(
+            "{{{}}}",
+            self.0
+                .iter()
+                .map(|uuid| uuid.to_string())
+                .collect::<Vec<String>>()
+                .join(",")
+        )
     }
 }
 
 impl Example for DocumentType {
-    /// An example.
     fn example() -> Self {
-        Self(EXAMPLE.to_owned())
+        Self(vec![uuidv4::UUIDv4::example(), uuidv4::UUIDv4::example()])
     }
 }
 
-impl TryFrom<&str> for DocumentType {
-    type Error = anyhow::Error;
-
-    fn try_from(value: &str) -> Result<Self, Self::Error> {
-        value.to_string().try_into()
+impl FromIterator<uuid::Uuid> for DocumentType {
+    fn from_iter<I: IntoIterator<Item = uuid::Uuid>>(iter: I) -> Self {
+        Self(iter.into_iter().map(UUIDv4::from).collect())
     }
 }
 
-impl TryFrom<String> for DocumentType {
-    type Error = anyhow::Error;
-
-    fn try_from(value: String) -> Result<Self, Self::Error> {
-        if !is_valid(&value) {
-            bail!("Invalid DocumentType '{value}', must be a valid UUIDv4")
-        }
-        Ok(Self(value))
-    }
-}
-
-impl From<uuidv4::UUIDv4> for DocumentType {
-    fn from(value: uuidv4::UUIDv4) -> Self {
-        Self(value.to_string())
+impl From<Vec<uuid::Uuid>> for DocumentType {
+    fn from(vec: Vec<uuid::Uuid>) -> Self {
+        vec.into_iter().collect()
     }
 }

@@ -28,7 +28,7 @@ pub(crate) struct SignedDocBody {
     /// `signed_doc` table `ver` field
     ver: uuid::Uuid,
     /// `signed_doc` table `type` field
-    doc_type: uuid::Uuid,
+    doc_type: Vec<uuid::Uuid>,
     /// `signed_doc` table `authors` field
     authors: Vec<String>,
     /// `signed_doc` table `metadata` field
@@ -47,7 +47,7 @@ impl SignedDocBody {
     }
 
     /// Returns the document type.
-    pub(crate) fn doc_type(&self) -> &uuid::Uuid {
+    pub(crate) fn doc_type(&self) -> &[uuid::Uuid] {
         &self.doc_type
     }
 
@@ -74,7 +74,7 @@ impl SignedDocBody {
 
     /// Creates a  `SignedDocBody` instance.
     pub(crate) fn new(
-        id: uuid::Uuid, ver: uuid::Uuid, doc_type: uuid::Uuid, authors: Vec<String>,
+        id: uuid::Uuid, ver: uuid::Uuid, doc_type: Vec<uuid::Uuid>, authors: Vec<String>,
         metadata: Option<serde_json::Value>,
     ) -> Self {
         Self {

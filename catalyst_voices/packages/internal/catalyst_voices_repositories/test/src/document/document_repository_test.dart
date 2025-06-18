@@ -451,9 +451,9 @@ void main() {
           const categoryType = DocumentType.categoryParametersDocument;
 
           final ref = DocumentRefFactory.signedDocumentRef();
-          final docsRefs = <TypedDocumentRef>[
+          final docsRefs = <MaybeTypedDocumentRef>[
             TypedDocumentRef(ref: ref, type: DocumentType.proposalDocument),
-            TypedDocumentRef(ref: ref, type: DocumentType.unknown),
+            MaybeTypedDocumentRef(ref: ref),
           ];
           final expectedRefs = <TypedDocumentRef>[
             ...constantDocumentsRefs.expand(

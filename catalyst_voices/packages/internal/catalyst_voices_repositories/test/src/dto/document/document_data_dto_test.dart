@@ -12,7 +12,7 @@ void main() {
         final id = DocumentRefFactory.randomUuidV7();
         final version = DocumentRefFactory.randomUuidV7();
         final oldJson = <String, dynamic>{
-          'type': DocumentType.proposalDocument.uuid,
+          'type': DocumentType.proposalDocument.toJson(),
           'id': id,
           'version': version,
         };

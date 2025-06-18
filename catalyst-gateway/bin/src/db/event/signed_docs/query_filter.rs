@@ -3,14 +3,17 @@
 use std::fmt::Display;
 
 use super::DocumentRef;
-use crate::db::event::common::eq_or_ranged_uuid::EqOrRangedUuid;
+use crate::{
+    db::event::common::eq_or_ranged_uuid::EqOrRangedUuid,
+    service::common::types::document::doc_type::DocumentType,
+};
 
 /// A `select_signed_docs` query filtering argument.
 /// If all fields would be `None` the query will search for all entries from the db.
 #[derive(Clone, Debug, Default)]
 pub(crate) struct DocsQueryFilter {
     /// `type` field
-    doc_type: Option<uuid::Uuid>,
+    doc_type: Option<DocumentType>,
     /// `id` field
     id: Option<EqOrRangedUuid>,
     /// `ver` field
@@ -35,7 +38,11 @@ impl Display for DocsQueryFilter {
         let mut query = "TRUE".to_string();
 
         if let Some(doc_type) = &self.doc_type {
-            write!(&mut query, " AND signed_docs.type = '{doc_type}'")?;
+            write!(
+                query,
+                " AND signed_docs.type = '{}'",
+                doc_type.to_sql_array()
+            )?;
         }
 
         if let Some(id) = &self.id {
@@ -102,7 +109,7 @@ impl DocsQueryFilter {
     }
 
     /// Set the `type` field filter condition
-    pub fn with_type(self, doc_type: uuid::Uuid) -> Self {
+    pub fn with_type(self, doc_type: DocumentType) -> Self {
         DocsQueryFilter {
             doc_type: Some(doc_type),
             ..self
