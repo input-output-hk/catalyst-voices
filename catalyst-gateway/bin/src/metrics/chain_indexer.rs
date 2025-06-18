@@ -91,7 +91,6 @@ pub(crate) mod reporter {
     });
 
     /// Chain Indexer indicator whether live tip is reached or in progress.
-    #[allow(dead_code)]
     pub(crate) static LIVE_REACHED_TIP: LazyLock<IntGaugeVec> = LazyLock::new(|| {
         register_int_gauge_vec!(
             "indexer_reached_live_tip_indicator",

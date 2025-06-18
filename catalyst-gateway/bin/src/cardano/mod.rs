@@ -309,6 +309,7 @@ fn sync_subchain(
                     if chain_update.tip && !live_follower_has_first_reached_tip() {
                         info!("Follower has reached LIVE TIP for the first time");
                         set_follower_live_first_reached_tip();
+                        let _ = event_sender.send(event::ChainIndexerEvent::SyncLiveChainCompleted);
                     }
 
                     update_block_state(
@@ -520,10 +521,10 @@ impl SyncTask {
             ),
             self.event_channel.0.clone(),
         );
+        self.dispatch_event(event::ChainIndexerEvent::SyncLiveChainStarted);
 
         self.start_immutable_followers();
-
-        self.dispatch_event(event::ChainIndexerEvent::SyncLiveChainStarted);
+        self.dispatch_event(event::ChainIndexerEvent::SyncImmutableChainStarted);
 
         // Wait Sync tasks to complete.  If they fail and have not completed, reschedule them.
         // If an immutable sync task ends OK, and we still have immutable data to sync then
@@ -559,13 +560,14 @@ impl SyncTask {
                                     live_slot: self.live_tip_slot,
                                 },
                             );
-                            info!(chain=%self.cfg.chain, report=%finished,
-                            "Chain Indexer finished reaching TIP.");
+                            info!(chain=%self.cfg.chain, report=%finished, "Chain Indexer finished reaching TIP.");
 
                             self.start_immutable_followers();
+                            self.dispatch_event(
+                                event::ChainIndexerEvent::SyncImmutableChainStarted,
+                            );
                         } else {
-                            error!(chain=%self.cfg.chain, report=%finished,
-                            "Chain Indexer finished without to reach TIP.");
+                            error!(chain=%self.cfg.chain, report=%finished, "Chain Indexer finished without to reach TIP.");
                         }
 
                         // Start the Live Chain sync task again from where it left off.
@@ -620,9 +622,8 @@ impl SyncTask {
                 if !immutable_follower_has_first_reached_tip() {
                     info!("Follower has reached IMMUTABLE TIP for the first time");
                     set_follower_immutable_first_reached_tip();
+                    self.dispatch_event(event::ChainIndexerEvent::SyncImmutableChainCompleted);
                 }
-
-                self.dispatch_event(event::ChainIndexerEvent::SyncLiveChainCompleted);
 
                 // Purge data up to this slot
                 // Slots arithmetic has saturating semantic, so this is ok.

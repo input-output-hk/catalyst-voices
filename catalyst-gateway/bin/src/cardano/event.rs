@@ -9,14 +9,12 @@ pub(crate) enum ChainIndexerEvent {
     /// Event triggered when the synchronization process of the live chain starts.
     SyncLiveChainStarted,
     /// Event triggered when the synchronization process of the immutable chain starts.
-    #[allow(dead_code)]
     SyncImmutableChainStarted,
     /// Event triggered when the synchronization process of the live chain completes
     /// (live chain synchronization never stops, this event triggers when first tip is
     /// reached).
     SyncLiveChainCompleted,
     /// Event triggered when the synchronization process of the immutable chain completes.
-    #[allow(dead_code)]
     SyncImmutableChainCompleted,
     /// Event triggered when the number of current synchronization tasks changes.
     SyncTasksChanged {
