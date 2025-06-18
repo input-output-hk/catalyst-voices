@@ -43,8 +43,10 @@ class _Body extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Expanded(
-              child: CategoryDetailView(
-                category: category,
+              child: SingleChildScrollView(
+                child: CategoryDetailView(
+                  category: category,
+                ),
               ),
             ),
             const SizedBox(width: 48),
@@ -166,21 +168,19 @@ class _CategoryDetailLoadingOrDataSelector extends StatelessWidget {
 class _CategoryPageState extends State<CategoryPage> {
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: ResponsivePadding(
-        xs: const EdgeInsets.symmetric(horizontal: 12),
-        sm: const EdgeInsets.symmetric(horizontal: 20),
-        md: const EdgeInsets.symmetric(horizontal: 120),
-        lg: const EdgeInsets.symmetric(horizontal: 120),
-        other: const EdgeInsets.symmetric(horizontal: 120),
-        child: Stack(
-          children: [
-            const _CategoryDetailLoadingOrDataSelector(),
-            _CategoryDetailErrorSelector(
-              categoryId: widget.categoryId,
-            ),
-          ].constrainedDelegate(maxWidth: 1200),
-        ),
+    return ResponsivePadding(
+      xs: const EdgeInsets.symmetric(horizontal: 12),
+      sm: const EdgeInsets.symmetric(horizontal: 20),
+      md: const EdgeInsets.symmetric(horizontal: 120),
+      lg: const EdgeInsets.symmetric(horizontal: 120),
+      other: const EdgeInsets.symmetric(horizontal: 120),
+      child: Stack(
+        children: [
+          const _CategoryDetailLoadingOrDataSelector(),
+          _CategoryDetailErrorSelector(
+            categoryId: widget.categoryId,
+          ),
+        ].constrainedDelegate(maxWidth: 1200),
       ),
     );
   }

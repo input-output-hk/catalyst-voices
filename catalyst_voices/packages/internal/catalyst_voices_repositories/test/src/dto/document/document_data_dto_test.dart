@@ -1,15 +1,16 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/document_data_dto.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:uuid_plus/uuid_plus.dart';
+
+import '../../utils/test_factories.dart';
 
 void main() {
   group(DocumentDataMetadataDto, () {
     group('migration', () {
       test('version and id migration works as expected', () {
         // Given
-        final id = const Uuid().v7();
-        final version = const Uuid().v7();
+        final id = DocumentRefFactory.randomUuidV7();
+        final version = DocumentRefFactory.randomUuidV7();
         final oldJson = <String, dynamic>{
           'type': DocumentType.proposalDocument.toJson(),
           'id': id,

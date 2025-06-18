@@ -6,7 +6,8 @@ import 'package:chopper/chopper.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:mocktail/mocktail.dart';
-import 'package:uuid_plus/uuid_plus.dart';
+
+import '../../utils/test_factories.dart';
 
 void main() {
   final CatGateway gateway = _MockedCatGateway();
@@ -89,12 +90,12 @@ void main() {
 
       test('expands all page refs correctly', () async {
         // Given
-        final proposalId = const Uuid().v7();
+        final proposalId = DocumentRefFactory.randomUuidV7();
         final proposalRefs = [
-          SignedDocumentRef(id: proposalId, version: const Uuid().v7()),
-          SignedDocumentRef(id: proposalId, version: const Uuid().v7()),
+          SignedDocumentRef(id: proposalId, version: DocumentRefFactory.randomUuidV7()),
+          SignedDocumentRef(id: proposalId, version: DocumentRefFactory.randomUuidV7()),
         ];
-        final templateRef = SignedDocumentRef.first(const Uuid().v7());
+        final templateRef = SignedDocumentRef.first(DocumentRefFactory.randomUuidV7());
 
         final page = DocumentIndexList(
           docs: [
@@ -148,13 +149,13 @@ DocumentIndexListDto _buildDocumentIndexList({
   DocumentRefForFilteredDocuments? ref,
 }) {
   return DocumentIndexListDto(
-    id: const Uuid().v7(),
+    id: DocumentRefFactory.randomUuidV7(),
     ver: List.generate(
       verCount,
       (index) {
         return IndividualDocumentVersion(
-          ver: const Uuid().v7(),
-          type: const Uuid().v7(),
+          ver: DocumentRefFactory.randomUuidV7(),
+          type: DocumentRefFactory.randomUuidV7(),
           template: template,
           ref: ref,
         );

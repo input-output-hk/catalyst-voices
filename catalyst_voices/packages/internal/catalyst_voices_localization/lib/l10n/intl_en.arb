@@ -1596,7 +1596,10 @@
   "campaignTreasury": "Campaign Treasury",
   "campaignTreasuryDescription": "Total budget, including ecosystem incentives",
   "campaignTotalAsk": "Campaign Total Ask",
-  "campaignTotalAskDescription": "Funds requested by all submitted projects",
+  "campaignTotalAskDescription": "Funds requested for all final proposals",
+  "@campaignTotalAskDescription": {
+    "description": "Description for the total ask section"
+  },
   "maximumAsk": "Maximum Ask",
   "minimumAsk": "Minimum Ask",
   "ideaJourney": "Idea Journey",

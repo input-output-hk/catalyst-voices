@@ -23,7 +23,10 @@ use crate::{
         },
         session::CassandraSession,
     },
-    service::utilities::health::{follower_has_first_reached_tip, set_follower_first_reached_tip},
+    service::utilities::health::{
+        immutable_follower_has_first_reached_tip, live_follower_has_first_reached_tip,
+        set_follower_immutable_first_reached_tip, set_follower_live_first_reached_tip,
+    },
     settings::{chain_follower, Settings},
 };
 
@@ -303,10 +306,9 @@ fn sync_subchain(
                         );
                     }
 
-                    // Update flag if this is the first time reaching TIP.
-                    if chain_update.tip && !follower_has_first_reached_tip() {
-                        info!("Follower has reached TIP for the first time");
-                        set_follower_first_reached_tip();
+                    if chain_update.tip && !live_follower_has_first_reached_tip() {
+                        info!("Follower has reached LIVE TIP for the first time");
+                        set_follower_live_first_reached_tip();
                     }
 
                     update_block_state(
@@ -615,6 +617,11 @@ impl SyncTask {
             // between the live chain and immutable chain.  This gap should be
             // a parameter.
             if sync_task_count == 1 {
+                if !immutable_follower_has_first_reached_tip() {
+                    info!("Follower has reached IMMUTABLE TIP for the first time");
+                    set_follower_immutable_first_reached_tip();
+                }
+
                 self.dispatch_event(event::ChainIndexerEvent::SyncCompleted);
 
                 // Purge data up to this slot
