@@ -44,6 +44,11 @@ abstract interface class DocumentRepository {
     required DocumentData document,
   });
 
+  /// Returns all matching [DocumentData] to given [ref].
+  Future<List<DocumentData>> getAllDocumentsData({
+    required DocumentRef ref,
+  });
+
   /// Returns list of refs to all published and any refs it may hold.
   ///
   /// Its using documents index api.
@@ -235,6 +240,17 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     final documentDataDto = DocumentDataDto.fromModel(document);
     final jsonData = documentDataDto.toJson();
     return json.fuse(utf8).encode(jsonData) as Uint8List;
+  }
+
+  @override
+  Future<List<DocumentData>> getAllDocumentsData({required DocumentRef ref}) async {
+    final all = switch (ref) {
+      DraftRef() => await _drafts.getAll(ref: ref),
+      SignedDocumentRef() => await _localDocuments.getAll(ref: ref),
+    }
+      ..sort();
+
+    return all;
   }
 
   @override

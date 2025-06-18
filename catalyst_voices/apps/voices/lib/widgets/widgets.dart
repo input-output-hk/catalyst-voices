@@ -101,6 +101,7 @@ export 'text_field/voices_int_field.dart';
 export 'text_field/voices_password_text_field.dart';
 export 'text_field/voices_text_field.dart';
 export 'text_field/voices_username_text_field.dart';
+export 'text_field/voices_uuid_text_field.dart';
 export 'tiles/base_tile.dart';
 export 'tiles/editable_tile.dart';
 export 'tiles/menu_item_tile.dart';
