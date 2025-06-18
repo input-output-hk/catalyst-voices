@@ -33,6 +33,13 @@ final class DatabaseDraftsDataSource implements DraftDataSource {
   }
 
   @override
+  Future<List<DocumentData>> getAll({required DocumentRef ref}) {
+    return _database.draftsDao
+        .queryAll(ref: ref)
+        .then((value) => value.map((e) => e.toModel()).toList());
+  }
+
+  @override
   Future<DocumentData?> getLatest({CatalystId? authorId}) {
     return _database.draftsDao.queryLatest(authorId: authorId).then((value) => value?.toModel());
   }
