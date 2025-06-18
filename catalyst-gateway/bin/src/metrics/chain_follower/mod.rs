@@ -8,41 +8,22 @@ use crate::settings::Settings;
 mod reporter;
 
 /// Updates Chain Follower metrics to current values.
-pub fn update() {
+pub(crate) fn update() {
     let api_host_names = Settings::api_host_names().join(",");
     let service_id = Settings::service_id();
     let network = Settings::cardano_network();
-    let network_idx = network as usize;
 
     let follower_stats = Statistics::new(network);
 
-    report_mithril(
-        &follower_stats,
-        &api_host_names,
-        service_id,
-        network,
-        network_idx,
-    );
-    report_live(
-        &follower_stats,
-        &api_host_names,
-        service_id,
-        network,
-        network_idx,
-    );
+    report_mithril(&follower_stats, &api_host_names, service_id, network);
+    report_live(&follower_stats, &api_host_names, service_id, network);
 }
 
 /// Performs reporting Chain Follower's Mithril information to Prometheus.
 #[allow(clippy::indexing_slicing)]
-fn report_mithril(
-    stats: &Statistics,
-    api_host_names: &str,
-    service_id: &str,
-    network: Network,
-    // TODO: remove `net_idx` and convert `network` to usize instead
-    net_idx: usize,
-) {
+fn report_mithril(stats: &Statistics, api_host_names: &str, service_id: &str, network: Network) {
     let stats = &stats.mithril;
+    let net_idx = network as usize;
     let network = network.to_string();
 
     reporter::MITHRIL_UPDATES[net_idx]
@@ -121,15 +102,9 @@ fn report_mithril(
 
 /// Performs reporting Chain Follower's Live information to Prometheus.
 #[allow(clippy::indexing_slicing)]
-fn report_live(
-    stats: &Statistics,
-    api_host_names: &str,
-    service_id: &str,
-    network: Network,
-    // TODO: remove `net_idx` and convert `network` to usize instead
-    net_idx: usize,
-) {
+fn report_live(stats: &Statistics, api_host_names: &str, service_id: &str, network: Network) {
     let stats = &stats.live;
+    let net_idx = network as usize;
     let network = network.to_string();
 
     reporter::LIVE_SYNC_START[net_idx]

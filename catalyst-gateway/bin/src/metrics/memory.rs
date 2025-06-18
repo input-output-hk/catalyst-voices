@@ -14,7 +14,7 @@ use crate::settings::Settings;
 static GLOBAL: &StatsAlloc<System> = &INSTRUMENTED_SYSTEM;
 
 /// Updates memory metrics to current values.
-pub fn update() {
+pub(crate) fn update() {
     let stats = Region::new(GLOBAL);
     let api_host_names = Settings::api_host_names().join(",");
     let service_id = Settings::service_id();
