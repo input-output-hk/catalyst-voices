@@ -759,11 +759,21 @@ pub(crate) async fn start_followers() -> anyhow::Result<()> {
         // add an event listener to watch for certain events to report as metrics
         sync_task.add_event_listener(Box::new(move |event: &Event| {
             if let Event::SyncLiveChainStarted = event {
+                reporter::LIVE_REACHED_TIP
+                    .with_label_values(&[&api_host_names, service_id, &network])
+                    .set(0);
+            }
+            if let Event::SyncImmutableChainStarted = event {
                 reporter::IMMUTABLE_REACHED_TIP
                     .with_label_values(&[&api_host_names, service_id, &network])
                     .set(0);
             }
             if let Event::SyncLiveChainCompleted = event {
+                reporter::LIVE_REACHED_TIP
+                    .with_label_values(&[&api_host_names, service_id, &network])
+                    .set(1);
+            }
+            if let Event::SyncImmutableChainCompleted = event {
                 reporter::IMMUTABLE_REACHED_TIP
                     .with_label_values(&[&api_host_names, service_id, &network])
                     .set(1);
