@@ -80,11 +80,22 @@ pub(crate) mod reporter {
         .unwrap()
     });
 
-    /// Chain Indexer indicator whether tip is reached or in progress.
-    pub(crate) static REACHED_TIP: LazyLock<IntGaugeVec> = LazyLock::new(|| {
+    /// Chain Indexer indicator whether immutable tip is reached or in progress.
+    pub(crate) static IMMUTABLE_REACHED_TIP: LazyLock<IntGaugeVec> = LazyLock::new(|| {
         register_int_gauge_vec!(
-            "indexer_reached_tip_indicator",
-            "Chain Indexer indicator whether tip is reached or in progress",
+            "indexer_reached_immutable_tip_indicator",
+            "Chain Indexer indicator whether immutable chain tip is reached or in progress. It also reflects a freshly downloaded mithril snapshots, when new immutable synchronization starts.",
+            &METRIC_LABELS
+        )
+        .unwrap()
+    });
+
+    /// Chain Indexer indicator whether live tip is reached or in progress.
+    #[allow(dead_code)]
+    pub(crate) static LIVE_REACHED_TIP: LazyLock<IntGaugeVec> = LazyLock::new(|| {
+        register_int_gauge_vec!(
+            "indexer_reached_live_tip_indicator",
+            "Chain Indexer indicator whether live chain tip is reached or in progress. Live chain synchronization never stops, this metric shows when first tip is reached.",
             &METRIC_LABELS
         )
         .unwrap()
@@ -93,7 +104,7 @@ pub(crate) mod reporter {
     /// The slot difference between immutable tip slot and the volatile tip slot number.
     pub(crate) static SLOT_TIP_DIFF: LazyLock<IntGaugeVec> = LazyLock::new(|| {
         register_int_gauge_vec!(
-            format!("indexer_slot_tip_diff"),
+            "indexer_slot_tip_diff",
             "The slot difference between immutable tip slot and the volatile tip slot number",
             &METRIC_LABELS
         )

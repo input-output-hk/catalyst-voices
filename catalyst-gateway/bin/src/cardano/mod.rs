@@ -521,7 +521,7 @@ impl SyncTask {
 
         self.start_immutable_followers();
 
-        self.dispatch_event(event::ChainIndexerEvent::SyncStarted);
+        self.dispatch_event(event::ChainIndexerEvent::SyncLiveChainStarted);
 
         // Wait Sync tasks to complete.  If they fail and have not completed, reschedule them.
         // If an immutable sync task ends OK, and we still have immutable data to sync then
@@ -615,7 +615,7 @@ impl SyncTask {
             // between the live chain and immutable chain.  This gap should be
             // a parameter.
             if sync_task_count == 1 {
-                self.dispatch_event(event::ChainIndexerEvent::SyncCompleted);
+                self.dispatch_event(event::ChainIndexerEvent::SyncLiveChainCompleted);
 
                 // Purge data up to this slot
                 // Slots arithmetic has saturating semantic, so this is ok.
@@ -744,13 +744,13 @@ pub(crate) async fn start_followers() -> anyhow::Result<()> {
 
         // add an event listener to watch for certain events to report as metrics
         sync_task.add_event_listener(Box::new(move |event: &Event| {
-            if let Event::SyncStarted = event {
-                reporter::REACHED_TIP
+            if let Event::SyncLiveChainStarted = event {
+                reporter::IMMUTABLE_REACHED_TIP
                     .with_label_values(&[&api_host_names, service_id, &network])
                     .set(0);
             }
-            if let Event::SyncCompleted = event {
-                reporter::REACHED_TIP
+            if let Event::SyncLiveChainCompleted = event {
+                reporter::IMMUTABLE_REACHED_TIP
                     .with_label_values(&[&api_host_names, service_id, &network])
                     .set(1);
             }
