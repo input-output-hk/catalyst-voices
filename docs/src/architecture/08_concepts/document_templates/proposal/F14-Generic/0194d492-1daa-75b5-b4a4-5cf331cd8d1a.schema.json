@@ -5,6 +5,9 @@
     "description": "Schema for the F14 Cardano Use Cases: Partners & Products Form",
     "maintainers": [{ "name": "Catalyst Team", "url": "https://projectcatalyst.io/" }],
     "x-changelog": {
+        "2025-06-18": [
+            "Added maximum constraint for milestone cost."
+        ],
         "2025-06-02": [
             "Adding category questions"
         ]
@@ -955,7 +958,8 @@
                                         "$ref": "#/definitions/tokenValueCardanoADA",
                                         "title": "Cost",
                                         "description": "The cost of this milestone in ADA",
-                                        "x-placeholder": "Enter the cost associated with this milestone"
+                                        "x-placeholder": "Enter the cost associated with this milestone",
+                                        "maximum": 1000000
                                     },
                                     "progress": {
                                         "$ref": "#/definitions/dropDownSingleSelect",
