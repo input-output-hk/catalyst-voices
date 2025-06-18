@@ -10,31 +10,31 @@ pub(crate) mod reporter {
     /// Labels for the metrics.
     const METRIC_LABELS: [&str; 3] = ["api_host_names", "service_id", "network"];
 
-    /// Chain Indexer current live tip slot#.
+    /// Chain Indexer current live tip slot.
     pub(crate) static CURRENT_LIVE_TIP_SLOT: LazyLock<IntGaugeVec> = LazyLock::new(|| {
         register_int_gauge_vec!(
             "indexer_current_live_tip_slot",
-            "Chain Indexer current live tip slot#",
+            "Chain Indexer current live tip slot",
             &METRIC_LABELS
         )
         .unwrap()
     });
 
-    /// Chain Indexer current immutable tip slot#.
+    /// Chain Indexer current immutable tip slot.
     pub(crate) static CURRENT_IMMUTABLE_TIP_SLOT: LazyLock<IntGaugeVec> = LazyLock::new(|| {
         register_int_gauge_vec!(
             "indexer_current_immutable_tip_slot",
-            "Chain Indexer current immutable tip slot#",
+            "Chain Indexer current immutable tip slot",
             &METRIC_LABELS
         )
         .unwrap()
     });
 
-    /// Chain Indexer highest complete indexed slot#.
+    /// Chain Indexer highest complete indexed slot.
     pub(crate) static HIGHEST_COMPLETE_INDEXED_SLOT: LazyLock<IntGaugeVec> = LazyLock::new(|| {
         register_int_gauge_vec!(
             "indexer_highest_complete_indexed_slot",
-            "Chain Indexer highest complete indexed slot#",
+            "Chain Indexer highest complete indexed slot",
             &METRIC_LABELS
         )
         .unwrap()
