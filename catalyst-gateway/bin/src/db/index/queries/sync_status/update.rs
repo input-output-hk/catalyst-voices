@@ -6,7 +6,7 @@ use cardano_blockchain_types::Slot;
 use row::SyncStatusQueryParams;
 use scylla::{frame::value::CqlTimestamp, prepared_statement::PreparedStatement, Session};
 use tokio::task;
-use tracing::{error, warn};
+use tracing::{error, info, warn};
 
 use crate::{
     db::index::{
@@ -118,5 +118,6 @@ pub(crate) fn update_sync_status(end_slot: Slot, start_slot: Slot) {
                 "Failed to store Sync Status"
             );
         };
+        info!(start_slot = ?start_slot, end_slot = ?end_slot, "Sync Status updated");
     });
 }
