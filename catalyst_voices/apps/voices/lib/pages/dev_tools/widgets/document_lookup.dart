@@ -37,8 +37,8 @@ class _DocumentLookupState extends State<DocumentLookup> {
 
   @override
   void dispose() {
-    super.dispose();
     _controller.dispose();
+    super.dispose();
   }
 
   void _openDocDetails({DocumentRef? ref}) {
