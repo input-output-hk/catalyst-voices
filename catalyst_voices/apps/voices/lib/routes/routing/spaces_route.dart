@@ -77,12 +77,10 @@ final class ProposalsRoute extends GoRouteData
     with FadePageTransitionMixin, CompositeRouteGuardMixin {
   final String? categoryId;
   final String? type;
-  final bool myProposals;
 
   const ProposalsRoute({
     this.categoryId,
     this.type,
-    this.myProposals = false,
   });
 
   factory ProposalsRoute.fromRef({SignedDocumentRef? categoryRef}) {
@@ -90,7 +88,7 @@ final class ProposalsRoute extends GoRouteData
   }
 
   factory ProposalsRoute.myProposals() {
-    return const ProposalsRoute(myProposals: true);
+    return ProposalsRoute(type: ProposalsFilterType.my.name);
   }
 
   @override
@@ -106,7 +104,6 @@ final class ProposalsRoute extends GoRouteData
     return ProposalsPage(
       categoryId: categoryRef,
       type: type,
-      myProposals: myProposals,
     );
   }
 }

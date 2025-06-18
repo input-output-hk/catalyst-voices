@@ -710,7 +710,7 @@ extension on ProposalsOrder {
   List<OrderingTerm> terms($DocumentsTable table) {
     return switch (this) {
       Alphabetical() => [
-          OrderingTerm.asc(table.content.title, nulls: NullsOrder.last),
+          OrderingTerm.asc(table.content.title.collate(Collate.noCase), nulls: NullsOrder.last),
           OrderingTerm.desc(table.verHi),
         ],
       Budget(:final isAscending) => [

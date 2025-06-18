@@ -112,7 +112,6 @@ class _SearchTextFieldState extends State<SearchTextField> {
     if (searchValue == null) return;
 
     final trimmedValue = searchValue.trim();
-    if (trimmedValue.isEmpty) return;
 
     widget.onSearch(searchValue: trimmedValue, isSubmitted: isSubmitted);
   }
