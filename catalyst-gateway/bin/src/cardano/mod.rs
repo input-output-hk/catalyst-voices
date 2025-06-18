@@ -1,6 +1,6 @@
 //! Logic for orchestrating followers
 
-use std::{fmt::Display, sync::Arc, time::Duration};
+use std::{fmt::Display, ops::Sub, sync::Arc, time::Duration};
 
 use cardano_blockchain_types::{MultiEraBlock, Network, Point, Slot};
 use cardano_chain_follower::{ChainFollower, ChainSyncConfig};
@@ -791,16 +791,12 @@ pub(crate) async fn start_followers() -> anyhow::Result<()> {
                 reporter::CURRENT_LIVE_TIP_SLOT
                     .with_label_values(&[&api_host_names, service_id, &network])
                     .set(i64::try_from(u64::from(*live_slot)).unwrap_or(-1));
-
                 reporter::SLOT_TIP_DIFF
                     .with_label_values(&[&api_host_names, service_id, &network])
                     .set(
-                        i64::try_from(
-                            u64::from(*immutable_slot)
-                                .checked_sub(u64::from(*live_slot))
-                                .unwrap_or_default(),
-                        )
-                        .unwrap_or(-1),
+                        u64::from(immutable_slot.sub(*live_slot))
+                            .try_into()
+                            .unwrap_or(-1),
                     );
             }
             if let Event::ImmutableTipSlotChanged {
@@ -815,12 +811,9 @@ pub(crate) async fn start_followers() -> anyhow::Result<()> {
                 reporter::SLOT_TIP_DIFF
                     .with_label_values(&[&api_host_names, service_id, &network])
                     .set(
-                        i64::try_from(
-                            u64::from(*immutable_slot)
-                                .checked_sub(u64::from(*live_slot))
-                                .unwrap_or_default(),
-                        )
-                        .unwrap_or(-1),
+                        u64::from(immutable_slot.sub(*live_slot))
+                            .try_into()
+                            .unwrap_or(-1),
                     );
             }
             if let Event::IndexedSlotProgressed { slot } = event {
