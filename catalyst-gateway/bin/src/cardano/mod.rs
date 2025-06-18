@@ -794,7 +794,7 @@ pub(crate) async fn start_followers() -> anyhow::Result<()> {
                 reporter::SLOT_TIP_DIFF
                     .with_label_values(&[&api_host_names, service_id, &network])
                     .set(
-                        u64::from(immutable_slot.sub(*live_slot))
+                        u64::from(live_slot.sub(*immutable_slot))
                             .try_into()
                             .unwrap_or(-1),
                     );
@@ -811,7 +811,7 @@ pub(crate) async fn start_followers() -> anyhow::Result<()> {
                 reporter::SLOT_TIP_DIFF
                     .with_label_values(&[&api_host_names, service_id, &network])
                     .set(
-                        u64::from(immutable_slot.sub(*live_slot))
+                        u64::from(live_slot.sub(*immutable_slot))
                             .try_into()
                             .unwrap_or(-1),
                     );
