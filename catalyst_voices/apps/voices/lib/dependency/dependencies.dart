@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:catalyst_cardano/catalyst_cardano.dart';
 import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
 import 'package:catalyst_voices/app/view/video_cache/app_video_manager.dart';
+import 'package:catalyst_voices/share/resource_url_resolver.dart';
+import 'package:catalyst_voices/share/share_manager.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
@@ -172,6 +174,17 @@ final class Dependencies extends DependencyProvider {
           isRegistered<LoggingService>() ? get<LoggingService>() : null,
           get<DownloaderService>(),
           get<DocumentsService>(),
+        );
+      })
+      ..registerFactory<PublicProfileEmailStatusCubit>(() {
+        return PublicProfileEmailStatusCubit(
+          get<UserService>(),
+        );
+      })
+      ..registerFactory<DocumentLookupBloc>(() {
+        return DocumentLookupBloc(
+          get<DocumentsService>(),
+          get<DocumentMapper>(),
         );
       });
   }
@@ -355,6 +368,15 @@ final class Dependencies extends DependencyProvider {
         get<AppConfig>(),
       );
     });
+    registerLazySingleton<ResourceUrlResolver>(() {
+      return ResourceUrlResolver(environment: get<AppEnvironment>());
+    });
+    registerLazySingleton<ShareService>(() {
+      return ShareService(
+        get<ResourceUrlResolver>(),
+        get<ResourceUrlResolver>(),
+      );
+    });
   }
 
   void _registerStorages() {
@@ -417,5 +439,6 @@ final class Dependencies extends DependencyProvider {
       },
       dispose: (manager) => manager.dispose(),
     );
+    registerLazySingleton<ShareManager>(() => DelegatingShareManager(get<ShareService>()));
   }
 }

@@ -4,12 +4,16 @@ import 'package:flutter/material.dart';
 class RegistrationDetailsPanelScaffold extends StatelessWidget {
   final Widget? title;
   final Widget body;
+  final double leadingSpacing;
+  final double footerSpacing;
   final Widget? footer;
 
   const RegistrationDetailsPanelScaffold({
     super.key,
     this.title,
     required this.body,
+    this.leadingSpacing = 24,
+    this.footerSpacing = 8,
     this.footer,
   });
 
@@ -21,13 +25,16 @@ class RegistrationDetailsPanelScaffold extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const SizedBox(height: 24),
+        SizedBox(height: leadingSpacing),
         if (title != null) ...[
           _TitleDefaultStyle(child: title),
           const SizedBox(height: 24),
         ],
         Expanded(child: body),
-        if (footer != null) ...[const SizedBox(height: 8), footer],
+        if (footer != null) ...[
+          SizedBox(height: footerSpacing),
+          footer,
+        ],
       ],
     );
   }

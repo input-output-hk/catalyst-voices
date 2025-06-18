@@ -33,6 +33,9 @@ class VoicesSnackBar extends StatelessWidget {
   /// Callback function to be executed when the close button is pressed.
   final VoidCallback? onClosePressed;
 
+  /// Whether to show the close button.
+  final bool showClose;
+
   /// The behavior of the [VoicesSnackBar], which can be fixed or floating.
   final SnackBarBehavior? behavior;
 
@@ -60,6 +63,7 @@ class VoicesSnackBar extends StatelessWidget {
     this.message,
     this.actions = const [],
     this.onClosePressed,
+    this.showClose = true,
     this.width,
     this.behavior = SnackBarBehavior.fixed,
     this.duration = const Duration(seconds: 4),
@@ -115,16 +119,17 @@ class VoicesSnackBar extends StatelessWidget {
               ),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.only(top: 8, right: 4),
-            child: IconButton(
-              icon: VoicesAssets.icons.x.buildIcon(
-                size: 24,
-                color: type.iconColor(context),
+          if (showClose)
+            Padding(
+              padding: const EdgeInsets.only(top: 8, right: 4),
+              child: IconButton(
+                icon: VoicesAssets.icons.x.buildIcon(
+                  size: 24,
+                  color: type.iconColor(context),
+                ),
+                onPressed: onClosePressed ?? () => hideCurrent(context),
               ),
-              onPressed: onClosePressed ?? () => hideCurrent(context),
             ),
-          ),
         ],
       ),
     );

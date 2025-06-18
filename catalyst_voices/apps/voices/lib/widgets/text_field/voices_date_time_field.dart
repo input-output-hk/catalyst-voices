@@ -103,6 +103,9 @@ class _VoicesDateTimeFieldState extends State<VoicesDateTimeField> {
     _controller?.dispose();
     _controller = null;
 
+    _dateController.dispose();
+    _timeController.dispose();
+
     super.dispose();
   }
 

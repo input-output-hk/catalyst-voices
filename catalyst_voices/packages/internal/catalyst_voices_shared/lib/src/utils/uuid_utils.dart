@@ -8,6 +8,17 @@ abstract final class UuidUtils {
     return const Uuid().v7(config: config);
   }
 
+  static int? tryVersion(
+    String uuid, {
+    bool noDashes = false,
+  }) {
+    try {
+      return version(uuid, noDashes: noDashes);
+    } catch (_) {
+      return null;
+    }
+  }
+
   static int version(
     String uuid, {
     bool noDashes = false,

@@ -29,7 +29,7 @@ final class BlockchainRepositoryImpl implements BlockchainRepository {
     RbacToken? rbacToken,
   }) {
     return _apiServices.gateway
-        .apiV1CardanoAssetsStakeAddressGet(
+        .apiGatewayV1CardanoAssetsStakeAddressGet(
           stakeAddress: stakeAddress.toBech32(),
           network: networkId.toDto(),
           authorization: rbacToken?.authHeader(),

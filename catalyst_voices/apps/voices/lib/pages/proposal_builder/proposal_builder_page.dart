@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:catalyst_voices/common/error_handler.dart';
+import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/common/signal_handler.dart';
 import 'package:catalyst_voices/dependency/dependencies.dart';
 import 'package:catalyst_voices/pages/proposal_builder/appbar/proposal_builder_back_action.dart';
@@ -20,10 +21,16 @@ import 'package:catalyst_voices/routes/routing/proposal_builder_route.dart';
 import 'package:catalyst_voices/widgets/modals/comment/submit_comment_error_dialog.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/proposal_limit_reached_dialog.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/publish_proposal_error_dialog.dart';
+import 'package:catalyst_voices/widgets/modals/proposals/publish_proposal_iteration_dialog.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/submit_proposal_error_dialog.dart';
+import 'package:catalyst_voices/widgets/modals/proposals/submit_proposal_for_review_dialog.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/unlock_edit_proposal.dart';
+import 'package:catalyst_voices/widgets/snackbar/common_snackbars.dart';
+import 'package:catalyst_voices/widgets/snackbar/voices_snackbar.dart';
+import 'package:catalyst_voices/widgets/snackbar/voices_snackbar_type.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
+import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/foundation.dart';
@@ -163,6 +170,14 @@ class _ProposalBuilderBodyState extends State<_ProposalBuilderBody>
         unawaited(_showProposalLimitReachedDialog(signal));
       case UnlockProposalSignal():
         unawaited(_showUnlockProposalDialog(signal));
+      case ForgotProposalSuccessBuilderSignal():
+        _showForgetProposalSuccessDialog();
+      case NewProposalAndEmailNotVerifiedSignal():
+        _showEmailVerificationNeededSnackbar();
+      case ShowPublishConfirmationSignal():
+        unawaited(_showPublishConfirmationDialog(signal));
+      case ShowSubmitConfirmationSignal():
+        unawaited(_showSubmitConfirmationDialog(signal));
     }
   }
 
@@ -229,7 +244,6 @@ class _ProposalBuilderBodyState extends State<_ProposalBuilderBody>
 
     final proposalId = widget.proposalId;
     final categoryId = widget.categoryId;
-
     if (proposalId != null) {
       bloc.add(LoadProposalEvent(proposalId: proposalId));
     } else if (categoryId != null) {
@@ -277,6 +291,36 @@ class _ProposalBuilderBodyState extends State<_ProposalBuilderBody>
     }
   }
 
+  void _showEmailVerificationNeededSnackbar() {
+    VoicesSnackBar(
+      type: VoicesSnackBarType.error,
+      behavior: SnackBarBehavior.floating,
+      title: context.l10n.verifiedEmailNeededToPublishTitle,
+      message: context.l10n.verifiedEmailNeededToPublishMessage,
+      actions: [
+        VoicesTextButton(
+          onTap: () => unawaited(const AccountRoute().push(context)),
+          child: Text(
+            context.l10n.emailNotVerifiedDialogAction,
+            style: context.textTheme.labelLarge?.copyWith(
+              decoration: TextDecoration.underline,
+              decorationColor: context.colors.elevationsOnSurfaceNeutralLv0,
+              color: context.colors.elevationsOnSurfaceNeutralLv0,
+            ),
+          ),
+        ),
+      ],
+    ).show(context);
+  }
+
+  void _showForgetProposalSuccessDialog() {
+    CommonSnackbars.showForgetProposalSuccessDialog(context);
+
+    Router.neglect(context, () {
+      const WorkspaceRoute().replace(context);
+    });
+  }
+
   Future<void> _showProposalLimitReachedDialog(
     MaxProposalsLimitReachedSignal signal,
   ) {
@@ -286,6 +330,20 @@ class _ProposalBuilderBodyState extends State<_ProposalBuilderBody>
       maxSubmissions: signal.maxSubmissions,
       submissionCloseAt: signal.proposalSubmissionCloseDate,
     );
+  }
+
+  Future<void> _showPublishConfirmationDialog(ShowPublishConfirmationSignal signal) async {
+    final shouldPublish = await PublishProposalIterationDialog.show(
+          context: context,
+          proposalTitle: signal.proposalTitle ?? context.l10n.proposalEditorStatusDropdownViewTitle,
+          currentIteration: signal.currentIteration,
+          nextIteration: signal.nextIteration,
+        ) ??
+        false;
+
+    if (shouldPublish && mounted) {
+      context.read<ProposalBuilderBloc>().add(const PublishProposalEvent());
+    }
   }
 
   Future<void> _showPublishException(ProposalBuilderPublishException error) {
@@ -306,6 +364,20 @@ class _ProposalBuilderBodyState extends State<_ProposalBuilderBody>
         submissionCloseAt: submissionCloseDate,
         dontShowAgain: _dontShowCampaignSubmissionClosingDialog,
       );
+    }
+  }
+
+  Future<void> _showSubmitConfirmationDialog(ShowSubmitConfirmationSignal signal) async {
+    final shouldSubmit = await SubmitProposalForReviewDialog.show(
+          context: context,
+          proposalTitle: signal.proposalTitle ?? context.l10n.proposalEditorStatusDropdownViewTitle,
+          currentIteration: signal.currentIteration,
+          nextIteration: signal.nextIteration,
+        ) ??
+        false;
+
+    if (shouldSubmit && mounted) {
+      context.read<ProposalBuilderBloc>().add(const SubmitProposalEvent());
     }
   }
 

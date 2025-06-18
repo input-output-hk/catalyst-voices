@@ -268,6 +268,10 @@ final class ProposalCubit extends Cubit<ProposalState>
       );
     }).toList();
     final currentVersion = versions.singleWhereOrNull((e) => e.isCurrent);
+    final commentsCount = comments.fold(
+      0,
+      (previousValue, element) => previousValue + 1 + element.repliesCount,
+    );
 
     final segments = proposal != null
         ? _buildSegments(
@@ -279,6 +283,7 @@ final class ProposalCubit extends Cubit<ProposalState>
             commentsSort: commentsSort,
             hasActiveAccount: hasActiveAccount,
             hasAccountUsername: hasAccountUsername,
+            commentsCount: commentsCount,
           )
         : const <Segment>[];
 
@@ -287,7 +292,7 @@ final class ProposalCubit extends Cubit<ProposalState>
       title: proposalDocument?.title ?? '',
       authorName: proposalDocument?.authorName,
       createdAt: proposalDocumentRef?.version?.tryDateTime,
-      commentsCount: comments.length,
+      commentsCount: commentsCount,
       versions: versions,
       isFavorite: isFavorite,
     );
@@ -308,12 +313,13 @@ final class ProposalCubit extends Cubit<ProposalState>
     required ProposalCommentsSort commentsSort,
     required bool hasActiveAccount,
     required bool hasAccountUsername,
+    required int commentsCount,
   }) {
     final document = proposal.document;
     final isDraftProposal = document.metadata.selfRef is DraftRef;
 
     final overviewSegment = ProposalOverviewSegment.build(
-      categoryName: category?.categoryName ?? '',
+      categoryName: category?.categoryText ?? '',
       proposalTitle: document.title ?? '',
       data: ProposalViewMetadata(
         author: Profile(catalystId: document.authorId!),
@@ -322,7 +328,7 @@ final class ProposalCubit extends Cubit<ProposalState>
         createdAt: version?.id.tryDateTime ?? DateTime.now(),
         warningCreatedAt: version?.isLatest == false,
         tag: document.tag,
-        commentsCount: comments.length,
+        commentsCount: commentsCount,
         fundsRequested: document.fundsRequested,
         projectDuration: document.duration,
         milestoneCount: document.milestoneCount,
