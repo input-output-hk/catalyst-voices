@@ -184,7 +184,7 @@ void main() {
         'template reference is watched and combined correctly',
         () async {
           // Given
-          final templateRef = SignedDocumentRef.generateFirstRef();
+          final templateRef = DocumentRefFactory.signedDocumentRef();
           final template = DocumentDataFactory.build(
             type: DocumentType.proposalTemplate,
             selfRef: templateRef,
@@ -225,7 +225,7 @@ void main() {
         'loads template once when two documents refers to it',
         () async {
           // Given
-          final templateRef = SignedDocumentRef.generateFirstRef();
+          final templateRef = DocumentRefFactory.signedDocumentRef();
           final template = DocumentDataFactory.build(
             type: DocumentType.proposalTemplate,
             selfRef: templateRef,
@@ -272,7 +272,7 @@ void main() {
         () async {
           // Given
           final documentDataToSave = DocumentDataFactory.build(
-            selfRef: DraftRef.generateFirstRef(),
+            selfRef: DocumentRefFactory.draftRef(),
           );
 
           // When
@@ -297,7 +297,7 @@ void main() {
           const categoryType = DocumentType.categoryParametersDocument;
           final refs = List.generate(
             10,
-            (_) => SignedDocumentRef.generateFirstRef().toTyped(DocumentType.proposalDocument),
+            (_) => DocumentRefFactory.signedDocumentRef().toTyped(DocumentType.proposalDocument),
           );
           final remoteRefs = [...refs, ...refs];
           final expectedRefs = <TypedDocumentRef>[
@@ -394,7 +394,7 @@ void main() {
 
           final docsRefs = List.generate(
             10,
-            (_) => SignedDocumentRef.generateFirstRef().toTyped(DocumentType.proposalDocument),
+            (_) => DocumentRefFactory.signedDocumentRef().toTyped(DocumentType.proposalDocument),
           );
           final looseTemplatesRefs =
               constTemplatesRefs.map((e) => e.copyWith(ref: e.ref.toLoose()));
@@ -432,7 +432,7 @@ void main() {
 
           final docsRefs = List.generate(
             10,
-            (_) => SignedDocumentRef.generateFirstRef().toTyped(DocumentType.proposalDocument),
+            (_) => DocumentRefFactory.signedDocumentRef().toTyped(DocumentType.proposalDocument),
           );
           final looseCategoriesRefs = categoriesRefs.map((e) => e.copyWith(ref: e.ref.toLoose()));
           final refs = [
@@ -460,7 +460,7 @@ void main() {
           // Given
           const categoryType = DocumentType.categoryParametersDocument;
 
-          final ref = SignedDocumentRef.generateFirstRef();
+          final ref = DocumentRefFactory.signedDocumentRef();
           final docsRefs = <TypedDocumentRef>[
             TypedDocumentRef(ref: ref, type: DocumentType.proposalDocument),
             TypedDocumentRef(ref: ref, type: DocumentType.unknown),
@@ -493,13 +493,13 @@ void main() {
         // Given
         const updatedContent = DocumentDataContent({'title': 'My proposal'});
 
-        final templateRef = SignedDocumentRef.generateFirstRef();
+        final templateRef = DocumentRefFactory.signedDocumentRef();
         final templateData = DocumentDataFactory.build(
           selfRef: templateRef,
           type: DocumentType.proposalTemplate,
         );
 
-        final draftRef = DraftRef.generateFirstRef();
+        final draftRef = DocumentRefFactory.draftRef();
         final draftData = DocumentDataFactory.build(
           selfRef: draftRef,
           template: templateRef,
@@ -541,13 +541,13 @@ void main() {
     test(
       'watchProposalsDocuments returns correct model',
       () async {
-        final templateRef = SignedDocumentRef.generateFirstRef();
+        final templateRef = DocumentRefFactory.signedDocumentRef();
         final templateData = DocumentDataFactory.build(
           selfRef: templateRef,
           type: DocumentType.proposalTemplate,
         );
         const publicDraftContent = DocumentDataContent({'title': 'My proposal'});
-        final publicDraftRef = DraftRef.generateFirstRef();
+        final publicDraftRef = DocumentRefFactory.draftRef();
         final publicDraftData = DocumentDataFactory.build(
           selfRef: publicDraftRef,
           template: templateRef,

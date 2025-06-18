@@ -130,7 +130,7 @@ void main() {
           // Given
           final refs = List.generate(
             10,
-            (_) => DraftRef.generateFirstRef(),
+            (_) => DocumentRefFactory.draftRef(),
           );
           final drafts = refs.map((ref) {
             return DraftFactory.build(
@@ -162,7 +162,7 @@ void main() {
           final authorId1 = CatalystId(host: 'test', role0Key: Uint8List(32));
           final authorId2 = CatalystId(host: 'test1', role0Key: Uint8List(32));
 
-          final ref = DraftRef.generateFirstRef();
+          final ref = DocumentRefFactory.draftRef();
           // Given
           final draft = DraftFactory.build(
             metadata: DocumentDataMetadata(
@@ -194,7 +194,7 @@ void main() {
           final authorId1 = CatalystId(host: 'test', role0Key: Uint8List(32));
           final authorId2 = CatalystId(host: 'test1', role0Key: Uint8List(32));
 
-          final ref = DraftRef.generateFirstRef();
+          final ref = DocumentRefFactory.draftRef();
           // Given
           final draft = DraftFactory.build(
             metadata: DocumentDataMetadata(
@@ -248,14 +248,14 @@ void main() {
           final draft1 = DraftFactory.build(
             metadata: DocumentDataMetadata(
               type: DocumentType.proposalDocument,
-              selfRef: SignedDocumentRef.generateFirstRef(),
+              selfRef: DocumentRefFactory.signedDocumentRef(),
               authors: [originalId],
             ),
           );
           final draft2 = DraftFactory.build(
             metadata: DocumentDataMetadata(
               type: DocumentType.proposalDocument,
-              selfRef: SignedDocumentRef.generateFirstRef(),
+              selfRef: DocumentRefFactory.signedDocumentRef(),
               authors: [updatedId],
             ),
           );
@@ -443,7 +443,7 @@ void main() {
         'inserting and deleting a draft makes the table empty',
         () async {
           // Given
-          final ref = DraftRef.generateFirstRef();
+          final ref = DocumentRefFactory.draftRef();
 
           final draft = DraftFactory.build(
             metadata: DocumentDataMetadata(
