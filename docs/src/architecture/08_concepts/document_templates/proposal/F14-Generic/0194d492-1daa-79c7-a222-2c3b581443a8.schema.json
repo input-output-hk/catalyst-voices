@@ -959,7 +959,7 @@
                                         "title": "Cost",
                                         "description": "The cost of this milestone in ADA",
                                         "x-placeholder": "Enter the cost associated with this milestone",
-                                        "maximum": 1000000
+                                        "maximum": 100000
                                     },
                                     "progress": {
                                         "$ref": "#/definitions/dropDownSingleSelect",
