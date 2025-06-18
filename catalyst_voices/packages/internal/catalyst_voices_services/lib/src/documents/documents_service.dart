@@ -22,6 +22,9 @@ abstract interface class DocumentsService {
   /// Removes all locally stored documents.
   Future<int> clear();
 
+  /// Returns all matching [DocumentData] for given [ref].
+  Future<List<DocumentData>> lookup(DocumentRef ref);
+
   /// Syncs locally stored documents with api.
   ///
   /// [onProgress] emits from 0.0 to 1.0.
@@ -45,6 +48,11 @@ final class DocumentsServiceImpl implements DocumentsService {
 
   @override
   Future<int> clear() => _documentRepository.removeAll();
+
+  @override
+  Future<List<DocumentData>> lookup(DocumentRef ref) {
+    return _documentRepository.getAllDocumentsData(ref: ref);
+  }
 
   @override
   Future<List<TypedDocumentRef>> sync({
