@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["GET_REGISTRATIONS_FROM_STAKE_ADDR_QUERY"],"struct":["GetRegistrationParams","GetRegistrationQuery"]};

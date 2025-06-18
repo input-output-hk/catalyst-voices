@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Allure Reports</title>
+    <style>
+      body {
+        margin: 0px;
+        font-size: 0.9em;
+        font-family: sans-serif;
+      }
+
+      #allureTable {
+        border-collapse: collapse;
+        margin: 10px;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+      }
+      #allureTable tbody tr.test-fail {
+        background-color: #fe988f;
+      }
+      #allureTable tbody tr.test-pass {
+        background-color: #6be781;
+      }
+      #allureTable tbody tr.test-unknown {
+        background-color: #bababa;
+      }
+      #allureTable thead tr {
+        background-color: #4c90e2;
+        color: #ffffff;
+        text-align: left;
+      }
+      #allureTable thead th:nth-child(1) {
+        min-width: 80px;
+      }
+      #allureTable th,
+      #allureTable td {
+        padding: 12px 15px;
+      }
+      #allureTable tbody tr {
+        border-bottom: 1px solid #dddddd;
+      }
+      #allureTable tbody tr:hover {
+        filter: brightness(125%);
+        transition: filter 0.15s ease-in-out;
+      }
+      #allureTable tfoot tr {
+        border-top: 2px solid #4c90e2;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <table id="allureTable">
+      <thead></thead>
+      <tbody></tbody>
+      <tfoot></tfoot>
+    </table>
+  </body>
+  <script type="text/javascript">
+    const createTr = (data, cellType = 'td', testResult) => {
+      const row = document.createElement('tr')
+
+      if (testResult === 'PASS') {
+        row.classList.add('test-pass')
+      } else if (testResult === 'FAIL') {
+        row.classList.add('test-fail')
+      } else if (testResult === 'UNKNOWN') {
+        row.classList.add('test-unknown')
+      }
+
+      data.forEach((el) => {
+        const cell = document.createElement(cellType)
+        cell.appendChild(el)
+        row.appendChild(cell)
+      })
+      return row
+    }
+
+    const formatDate = (ts) => {
+      let dateTime = new Date(ts).toISOString().replace('T', ' ')
+      dateTime = dateTime.substring(0, dateTime.indexOf('.'))
+      return dateTime
+    }
+
+    const formatDuration = (dur) => {
+      const seconds = Math.round(dur / 1000)
+      const minutes = Math.floor(seconds / 60)
+      const secondsRemainder = seconds - minutes * 60
+      return `${minutes}m ${secondsRemainder}s`
+    }
+
+    const allureTable = document.getElementById('allureTable')
+
+    // header data
+    const allureTableHeader = allureTable.getElementsByTagName('thead')[0]
+    const headers = ['Date', 'Pass', 'Fail', 'Skip', 'Total', 'Duration', 'Link'].map((t) => document.createTextNode(t))
+    allureTableHeader.appendChild(createTr(headers, 'th'))
+
+    // body data
+    const allureTableBody = allureTable.getElementsByTagName('tbody')[0]
+
+    fetch(`./data.json?t=${Date.now()}`)
+      .then((response) => response.ok && response.json())
+      .then((json) => {
+        if (!json) {
+          return
+        }
+
+        // footer data
+        const allureTableFooter = allureTable.getElementsByTagName('tfoot')[0]
+        allureTableFooter.appendChild(createTr(['TOTAL', '', '', '', '', '', json.length].map((t) => document.createTextNode(t))))
+
+        json.forEach((r) => {
+          const rowData = []
+
+          rowData.push(document.createTextNode(formatDate(r.timestamp)))
+          rowData.push(document.createTextNode(r.summary.statistic.passed))
+          rowData.push(document.createTextNode(r.summary.statistic.failed + r.summary.statistic.broken))
+          rowData.push(document.createTextNode(r.summary.statistic.skipped))
+          rowData.push(document.createTextNode(r.summary.statistic.total))
+          rowData.push(document.createTextNode(formatDuration(r.summary.time.duration)))
+
+          const link = document.createElement('a')
+          link.href = `./${r.runUniqueId}`
+          link.appendChild(document.createTextNode(r.runId))
+          rowData.push(link)
+
+          // append row to body
+          allureTableBody.appendChild(createTr(rowData, 'td', r.testResult))
+        })
+      })
+  </script>
+</html>

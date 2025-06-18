@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"mod":["as_at","cat_id_or_stake","stake_or_voter"]};

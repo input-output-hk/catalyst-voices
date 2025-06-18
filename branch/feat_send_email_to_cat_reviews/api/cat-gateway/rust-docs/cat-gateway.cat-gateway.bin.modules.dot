@@ -1,0 +1,525 @@
+digraph {
+
+    graph [
+        label="cat_gateway",
+        labelloc=t,
+
+        pad=0.4,
+
+        // Consider rendering the graph using a different layout algorithm, such as:
+        // [dot, neato, twopi, circo, fdp, sfdp]
+        layout=neato,
+        overlap=false,
+        splines="line",
+        rankdir=LR,
+
+        fontname="Helvetica", 
+        fontsize="36",
+    ];
+
+    node [
+        fontname="monospace",
+        fontsize="10",
+        shape="record",
+        style="filled",
+    ];
+
+    edge [
+        fontname="monospace",
+        fontsize="10",
+    ];
+
+    "cat_gateway" [label="crate|cat_gateway", fillcolor="#5397c8"]; // "crate" node
+    "cat_gateway::build_info" [label="pub(crate) mod|build_info", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::cardano" [label="pub(crate) mod|cardano", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::cardano::event" [label="pub(crate) mod|cardano::event", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::cardano::util" [label="pub(crate) mod|cardano::util", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::cli" [label="pub(crate) mod|cli", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::db" [label="pub(crate) mod|db", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::db::event" [label="pub(crate) mod|db::event", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::db::event::common" [label="pub(crate) mod|db::event::common", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::db::event::common::eq_or_ranged_uuid" [label="pub(crate) mod|db::event::common::eq_or_ranged_uuid", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::db::event::common::query_limits" [label="pub(crate) mod|db::event::common::query_limits", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::db::event::config" [label="pub(crate) mod|db::event::config", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::db::event::config::key" [label="pub(crate) mod|db::event::config::key", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::db::event::error" [label="pub(crate) mod|db::event::error", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::db::event::schema_check" [label="pub(crate) mod|db::event::schema_check", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::db::event::signed_docs" [label="pub(crate) mod|db::event::signed_docs", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::db::event::signed_docs::doc_ref" [label="pub(self) mod|db::event::signed_docs::doc_ref", fillcolor="#db5367"]; // "mod" node
+    "cat_gateway::db::event::signed_docs::full_signed_doc" [label="pub(self) mod|db::event::signed_docs::full_signed_doc", fillcolor="#db5367"]; // "mod" node
+    "cat_gateway::db::event::signed_docs::query_filter" [label="pub(self) mod|db::event::signed_docs::query_filter", fillcolor="#db5367"]; // "mod" node
+    "cat_gateway::db::event::signed_docs::signed_doc_body" [label="pub(self) mod|db::event::signed_docs::signed_doc_body", fillcolor="#db5367"]; // "mod" node
+    "cat_gateway::db::index" [label="pub(crate) mod|db::index", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::db::index::block" [label="pub(crate) mod|db::index::block", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::db::index::block::certs" [label="pub(crate) mod|db::index::block::certs", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::db::index::block::cip36" [label="pub(crate) mod|db::index::block::cip36", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::db::index::block::cip36::insert_cip36" [label="pub(crate) mod|db::index::block::cip36::insert_cip36", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::db::index::block::cip36::insert_cip36_for_vote_key" [label="pub(crate) mod|db::index::block::cip36::insert_cip36_for_vote_key", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::db::index::block::cip36::insert_cip36_invalid" [label="pub(crate) mod|db::index::block::cip36::insert_cip36_invalid", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::db::index::block::rbac509" [label="pub(crate) mod|db::index::block::rbac509", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::db::index::block::rbac509::insert_catalyst_id_for_stake_address" [label="pub(crate) mod|db::index::block::rbac509::insert_catalyst_id_for_stake_address", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::db::index::block::rbac509::insert_catalyst_id_for_txn_id" [label="pub(crate) mod|db::index::block::rbac509::insert_catalyst_id_for_txn_id", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::db::index::block::rbac509::insert_rbac509" [label="pub(crate) mod|db::index::block::rbac509::insert_rbac509", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::db::index::block::rbac509::insert_rbac509_invalid" [label="pub(crate) mod|db::index::block::rbac509::insert_rbac509_invalid", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::db::index::block::roll_forward" [label="pub(crate) mod|db::index::block::roll_forward", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::db::index::block::txi" [label="pub(crate) mod|db::index::block::txi", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::db::index::block::txo" [label="pub(crate) mod|db::index::block::txo", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::db::index::block::txo::insert_txo" [label="pub(crate) mod|db::index::block::txo::insert_txo", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::db::index::block::txo::insert_txo_asset" [label="pub(crate) mod|db::index::block::txo::insert_txo_asset", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::db::index::block::txo::insert_unstaked_txo" [label="pub(crate) mod|db::index::block::txo::insert_unstaked_txo", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::db::index::block::txo::insert_unstaked_txo_asset" [label="pub(crate) mod|db::index::block::txo::insert_unstaked_txo_asset", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::db::index::queries" [label="pub(crate) mod|db::index::queries", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::db::index::queries::purge" [label="pub(crate) mod|db::index::queries::purge", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::db::index::queries::purge::catalyst_id_for_stake_address" [label="pub(crate) mod|db::index::queries::purge::catalyst_id_for_stake_address", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::db::index::queries::purge::catalyst_id_for_stake_address::result" [label="pub(crate) mod|db::index::queries::purge::catalyst_id_for_stake_address::result", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::db::index::queries::purge::catalyst_id_for_txn_id" [label="pub(crate) mod|db::index::queries::purge::catalyst_id_for_txn_id", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::db::index::queries::purge::catalyst_id_for_txn_id::result" [label="pub(crate) mod|db::index::queries::purge::catalyst_id_for_txn_id::result", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::db::index::queries::purge::cip36_registration" [label="pub(crate) mod|db::index::queries::purge::cip36_registration", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::db::index::queries::purge::cip36_registration::result" [label="pub(crate) mod|db::index::queries::purge::cip36_registration::result", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::db::index::queries::purge::cip36_registration_for_vote_key" [label="pub(crate) mod|db::index::queries::purge::cip36_registration_for_vote_key", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::db::index::queries::purge::cip36_registration_for_vote_key::result" [label="pub(crate) mod|db::index::queries::purge::cip36_registration_for_vote_key::result", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::db::index::queries::purge::cip36_registration_invalid" [label="pub(crate) mod|db::index::queries::purge::cip36_registration_invalid", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::db::index::queries::purge::cip36_registration_invalid::result" [label="pub(crate) mod|db::index::queries::purge::cip36_registration_invalid::result", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::db::index::queries::purge::rbac509_invalid_registration" [label="pub(crate) mod|db::index::queries::purge::rbac509_invalid_registration", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::db::index::queries::purge::rbac509_invalid_registration::result" [label="pub(crate) mod|db::index::queries::purge::rbac509_invalid_registration::result", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::db::index::queries::purge::rbac509_registration" [label="pub(crate) mod|db::index::queries::purge::rbac509_registration", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::db::index::queries::purge::rbac509_registration::result" [label="pub(crate) mod|db::index::queries::purge::rbac509_registration::result", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::db::index::queries::purge::stake_registration" [label="pub(crate) mod|db::index::queries::purge::stake_registration", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::db::index::queries::purge::stake_registration::result" [label="pub(crate) mod|db::index::queries::purge::stake_registration::result", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::db::index::queries::purge::txi_by_hash" [label="pub(crate) mod|db::index::queries::purge::txi_by_hash", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::db::index::queries::purge::txi_by_hash::result" [label="pub(crate) mod|db::index::queries::purge::txi_by_hash::result", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::db::index::queries::purge::txo_ada" [label="pub(crate) mod|db::index::queries::purge::txo_ada", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::db::index::queries::purge::txo_ada::result" [label="pub(crate) mod|db::index::queries::purge::txo_ada::result", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::db::index::queries::purge::txo_assets" [label="pub(crate) mod|db::index::queries::purge::txo_assets", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::db::index::queries::purge::txo_assets::result" [label="pub(crate) mod|db::index::queries::purge::txo_assets::result", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::db::index::queries::purge::unstaked_txo_ada" [label="pub(crate) mod|db::index::queries::purge::unstaked_txo_ada", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::db::index::queries::purge::unstaked_txo_ada::result" [label="pub(crate) mod|db::index::queries::purge::unstaked_txo_ada::result", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::db::index::queries::purge::unstaked_txo_assets" [label="pub(crate) mod|db::index::queries::purge::unstaked_txo_assets", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::db::index::queries::purge::unstaked_txo_assets::result" [label="pub(crate) mod|db::index::queries::purge::unstaked_txo_assets::result", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::db::index::queries::rbac" [label="pub(crate) mod|db::index::queries::rbac", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::db::index::queries::rbac::get_catalyst_id_from_stake_address" [label="pub(crate) mod|db::index::queries::rbac::get_catalyst_id_from_stake_address", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::db::index::queries::rbac::get_catalyst_id_from_transaction_id" [label="pub(crate) mod|db::index::queries::rbac::get_catalyst_id_from_transaction_id", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::db::index::queries::rbac::get_rbac_invalid_registrations" [label="pub(crate) mod|db::index::queries::rbac::get_rbac_invalid_registrations", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::db::index::queries::rbac::get_rbac_registrations" [label="pub(crate) mod|db::index::queries::rbac::get_rbac_registrations", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::db::index::queries::registrations" [label="pub(crate) mod|db::index::queries::registrations", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::db::index::queries::registrations::get_all_invalids" [label="pub(crate) mod|db::index::queries::registrations::get_all_invalids", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::db::index::queries::registrations::get_all_registrations" [label="pub(crate) mod|db::index::queries::registrations::get_all_registrations", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::db::index::queries::registrations::get_from_stake_addr" [label="pub(crate) mod|db::index::queries::registrations::get_from_stake_addr", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::db::index::queries::registrations::get_from_stake_address" [label="pub(crate) mod|db::index::queries::registrations::get_from_stake_address", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::db::index::queries::registrations::get_from_vote_key" [label="pub(crate) mod|db::index::queries::registrations::get_from_vote_key", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::db::index::queries::registrations::get_invalid" [label="pub(crate) mod|db::index::queries::registrations::get_invalid", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::db::index::queries::staked_ada" [label="pub(crate) mod|db::index::queries::staked_ada", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::db::index::queries::staked_ada::get_assets_by_stake_address" [label="pub(crate) mod|db::index::queries::staked_ada::get_assets_by_stake_address", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::db::index::queries::staked_ada::get_txi_by_txn_hash" [label="pub(crate) mod|db::index::queries::staked_ada::get_txi_by_txn_hash", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::db::index::queries::staked_ada::get_txo_by_stake_address" [label="pub(crate) mod|db::index::queries::staked_ada::get_txo_by_stake_address", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::db::index::queries::staked_ada::update_txo_spent" [label="pub(crate) mod|db::index::queries::staked_ada::update_txo_spent", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::db::index::queries::sync_status" [label="pub(crate) mod|db::index::queries::sync_status", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::db::index::queries::sync_status::get" [label="pub(crate) mod|db::index::queries::sync_status::get", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::db::index::queries::sync_status::update" [label="pub(crate) mod|db::index::queries::sync_status::update", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::db::index::queries::sync_status::update::row" [label="pub(crate) mod|db::index::queries::sync_status::update::row", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::db::index::schema" [label="pub(crate) mod|db::index::schema", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::db::index::session" [label="pub(crate) mod|db::index::session", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::db::types" [label="pub(crate) mod|db::types", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::db::types::catalyst_id" [label="pub(self) mod|db::types::catalyst_id", fillcolor="#db5367"]; // "mod" node
+    "cat_gateway::db::types::public_key" [label="pub(self) mod|db::types::public_key", fillcolor="#db5367"]; // "mod" node
+    "cat_gateway::db::types::slot" [label="pub(self) mod|db::types::slot", fillcolor="#db5367"]; // "mod" node
+    "cat_gateway::db::types::stake_address" [label="pub(self) mod|db::types::stake_address", fillcolor="#db5367"]; // "mod" node
+    "cat_gateway::db::types::transaction_id" [label="pub(self) mod|db::types::transaction_id", fillcolor="#db5367"]; // "mod" node
+    "cat_gateway::db::types::transaction_index" [label="pub(self) mod|db::types::transaction_index", fillcolor="#db5367"]; // "mod" node
+    "cat_gateway::db::types::txn_output_offset" [label="pub(self) mod|db::types::txn_output_offset", fillcolor="#db5367"]; // "mod" node
+    "cat_gateway::db::types::uuidv4" [label="pub(self) mod|db::types::uuidv4", fillcolor="#db5367"]; // "mod" node
+    "cat_gateway::jinja" [label="pub(crate) mod|jinja", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::logger" [label="pub(crate) mod|logger", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::metrics" [label="pub(crate) mod|metrics", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::metrics::chain_follower" [label="pub(crate) mod|metrics::chain_follower", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::metrics::chain_follower::reporter" [label="pub(self) mod|metrics::chain_follower::reporter", fillcolor="#db5367"]; // "mod" node
+    "cat_gateway::metrics::chain_indexer" [label="pub(crate) mod|metrics::chain_indexer", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::metrics::chain_indexer::reporter" [label="pub(crate) mod|metrics::chain_indexer::reporter", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::metrics::endpoint" [label="pub(crate) mod|metrics::endpoint", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::metrics::memory" [label="pub(crate) mod|metrics::memory", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::metrics::memory::reporter" [label="pub(self) mod|metrics::memory::reporter", fillcolor="#db5367"]; // "mod" node
+    "cat_gateway::service" [label="pub(crate) mod|service", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::api" [label="pub(self) mod|service::api", fillcolor="#db5367"]; // "mod" node
+    "cat_gateway::service::api::cardano" [label="pub(crate) mod|service::api::cardano", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::api::cardano::cip36" [label="pub(crate) mod|service::api::cardano::cip36", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::api::cardano::cip36::endpoint" [label="pub(crate) mod|service::api::cardano::cip36::endpoint", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::api::cardano::cip36::filter" [label="pub(crate) mod|service::api::cardano::cip36::filter", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::api::cardano::cip36::response" [label="pub(crate) mod|service::api::cardano::cip36::response", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::api::cardano::rbac" [label="pub(crate) mod|service::api::cardano::rbac", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::api::cardano::rbac::registrations_get" [label="pub(self) mod|service::api::cardano::rbac::registrations_get", fillcolor="#db5367"]; // "mod" node
+    "cat_gateway::service::api::cardano::rbac::registrations_get::binary_data" [label="pub(self) mod|service::api::cardano::rbac::registrations_get::binary_data", fillcolor="#db5367"]; // "mod" node
+    "cat_gateway::service::api::cardano::rbac::registrations_get::chain_info" [label="pub(self) mod|service::api::cardano::rbac::registrations_get::chain_info", fillcolor="#db5367"]; // "mod" node
+    "cat_gateway::service::api::cardano::rbac::registrations_get::extended_data" [label="pub(self) mod|service::api::cardano::rbac::registrations_get::extended_data", fillcolor="#db5367"]; // "mod" node
+    "cat_gateway::service::api::cardano::rbac::registrations_get::key_data" [label="pub(self) mod|service::api::cardano::rbac::registrations_get::key_data", fillcolor="#db5367"]; // "mod" node
+    "cat_gateway::service::api::cardano::rbac::registrations_get::key_data_list" [label="pub(self) mod|service::api::cardano::rbac::registrations_get::key_data_list", fillcolor="#db5367"]; // "mod" node
+    "cat_gateway::service::api::cardano::rbac::registrations_get::key_type" [label="pub(self) mod|service::api::cardano::rbac::registrations_get::key_type", fillcolor="#db5367"]; // "mod" node
+    "cat_gateway::service::api::cardano::rbac::registrations_get::payment_data" [label="pub(self) mod|service::api::cardano::rbac::registrations_get::payment_data", fillcolor="#db5367"]; // "mod" node
+    "cat_gateway::service::api::cardano::rbac::registrations_get::payment_data_list" [label="pub(self) mod|service::api::cardano::rbac::registrations_get::payment_data_list", fillcolor="#db5367"]; // "mod" node
+    "cat_gateway::service::api::cardano::rbac::registrations_get::purpose_list" [label="pub(self) mod|service::api::cardano::rbac::registrations_get::purpose_list", fillcolor="#db5367"]; // "mod" node
+    "cat_gateway::service::api::cardano::rbac::registrations_get::registration_chain" [label="pub(self) mod|service::api::cardano::rbac::registrations_get::registration_chain", fillcolor="#db5367"]; // "mod" node
+    "cat_gateway::service::api::cardano::rbac::registrations_get::response" [label="pub(self) mod|service::api::cardano::rbac::registrations_get::response", fillcolor="#db5367"]; // "mod" node
+    "cat_gateway::service::api::cardano::rbac::registrations_get::role_data" [label="pub(self) mod|service::api::cardano::rbac::registrations_get::role_data", fillcolor="#db5367"]; // "mod" node
+    "cat_gateway::service::api::cardano::rbac::registrations_get::role_map" [label="pub(self) mod|service::api::cardano::rbac::registrations_get::role_map", fillcolor="#db5367"]; // "mod" node
+    "cat_gateway::service::api::cardano::rbac::registrations_get::unprocessable_content" [label="pub(self) mod|service::api::cardano::rbac::registrations_get::unprocessable_content", fillcolor="#db5367"]; // "mod" node
+    "cat_gateway::service::api::cardano::staking" [label="pub(crate) mod|service::api::cardano::staking", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::api::cardano::staking::assets_get" [label="pub(self) mod|service::api::cardano::staking::assets_get", fillcolor="#db5367"]; // "mod" node
+    "cat_gateway::service::api::config" [label="pub(self) mod|service::api::config", fillcolor="#db5367"]; // "mod" node
+    "cat_gateway::service::api::documents" [label="pub(self) mod|service::api::documents", fillcolor="#db5367"]; // "mod" node
+    "cat_gateway::service::api::documents::get_document" [label="pub(self) mod|service::api::documents::get_document", fillcolor="#db5367"]; // "mod" node
+    "cat_gateway::service::api::documents::post_document_index_query" [label="pub(self) mod|service::api::documents::post_document_index_query", fillcolor="#db5367"]; // "mod" node
+    "cat_gateway::service::api::documents::post_document_index_query::query_filter" [label="pub(crate) mod|service::api::documents::post_document_index_query::query_filter", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::api::documents::post_document_index_query::response" [label="pub(crate) mod|service::api::documents::post_document_index_query::response", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::api::documents::put_document" [label="pub(self) mod|service::api::documents::put_document", fillcolor="#db5367"]; // "mod" node
+    "cat_gateway::service::api::documents::put_document::unprocessable_content_request" [label="pub(crate) mod|service::api::documents::put_document::unprocessable_content_request", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::api::documents::templates" [label="pub(self) mod|service::api::documents::templates", fillcolor="#db5367"]; // "mod" node
+    "cat_gateway::service::api::documents::templates::data" [label="pub(self) mod|service::api::documents::templates::data", fillcolor="#db5367"]; // "mod" node
+    "cat_gateway::service::api::health" [label="pub(self) mod|service::api::health", fillcolor="#db5367"]; // "mod" node
+    "cat_gateway::service::api::health::inspection_get" [label="pub(self) mod|service::api::health::inspection_get", fillcolor="#db5367"]; // "mod" node
+    "cat_gateway::service::api::health::live_get" [label="pub(self) mod|service::api::health::live_get", fillcolor="#db5367"]; // "mod" node
+    "cat_gateway::service::api::health::ready_get" [label="pub(self) mod|service::api::health::ready_get", fillcolor="#db5367"]; // "mod" node
+    "cat_gateway::service::api::health::started_get" [label="pub(self) mod|service::api::health::started_get", fillcolor="#db5367"]; // "mod" node
+    "cat_gateway::service::common" [label="pub(crate) mod|service::common", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::common::auth" [label="pub(crate) mod|service::common::auth", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::common::auth::api_key" [label="pub(crate) mod|service::common::auth::api_key", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::common::auth::none" [label="pub(crate) mod|service::common::auth::none", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::common::auth::none_or_api_key" [label="pub(crate) mod|service::common::auth::none_or_api_key", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::common::auth::none_or_rbac" [label="pub(crate) mod|service::common::auth::none_or_rbac", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::common::auth::rbac" [label="pub(crate) mod|service::common::auth::rbac", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::common::auth::rbac::scheme" [label="pub(crate) mod|service::common::auth::rbac::scheme", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::common::auth::rbac::token" [label="pub(crate) mod|service::common::auth::rbac::token", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::common::objects" [label="pub(crate) mod|service::common::objects", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::common::objects::cardano" [label="pub(crate) mod|service::common::objects::cardano", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::common::objects::cardano::hash" [label="pub(crate) mod|service::common::objects::cardano::hash", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::common::objects::cardano::network" [label="pub(crate) mod|service::common::objects::cardano::network", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::common::objects::cardano::slot_info" [label="pub(crate) mod|service::common::objects::cardano::slot_info", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::common::objects::cardano::stake_info" [label="pub(crate) mod|service::common::objects::cardano::stake_info", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::common::objects::config" [label="pub(crate) mod|service::common::objects::config", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::common::objects::config::environment" [label="pub(self) mod|service::common::objects::config::environment", fillcolor="#db5367"]; // "mod" node
+    "cat_gateway::service::common::objects::config::frontend_config" [label="pub(crate) mod|service::common::objects::config::frontend_config", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::common::objects::config::version" [label="pub(self) mod|service::common::objects::config::version", fillcolor="#db5367"]; // "mod" node
+    "cat_gateway::service::common::objects::document" [label="pub(crate) mod|service::common::objects::document", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::common::objects::generic" [label="pub(crate) mod|service::common::objects::generic", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::common::objects::generic::json_object" [label="pub(crate) mod|service::common::objects::generic::json_object", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::common::objects::generic::pagination" [label="pub(crate) mod|service::common::objects::generic::pagination", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::common::responses" [label="pub(crate) mod|service::common::responses", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::common::responses::code_401_unauthorized" [label="pub(self) mod|service::common::responses::code_401_unauthorized", fillcolor="#db5367"]; // "mod" node
+    "cat_gateway::service::common::responses::code_403_forbidden" [label="pub(self) mod|service::common::responses::code_403_forbidden", fillcolor="#db5367"]; // "mod" node
+    "cat_gateway::service::common::responses::code_412_precondition_failed" [label="pub(self) mod|service::common::responses::code_412_precondition_failed", fillcolor="#db5367"]; // "mod" node
+    "cat_gateway::service::common::responses::code_429_too_many_requests" [label="pub(self) mod|service::common::responses::code_429_too_many_requests", fillcolor="#db5367"]; // "mod" node
+    "cat_gateway::service::common::responses::code_500_internal_server_error" [label="pub(crate) mod|service::common::responses::code_500_internal_server_error", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::common::responses::code_503_service_unavailable" [label="pub(crate) mod|service::common::responses::code_503_service_unavailable", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::common::tags" [label="pub(crate) mod|service::common::tags", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::common::types" [label="pub(crate) mod|service::common::types", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::common::types::array_types" [label="pub(crate) mod|service::common::types::array_types", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::common::types::cardano" [label="pub(crate) mod|service::common::types::cardano", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::common::types::cardano::ada_value" [label="pub(crate) mod|service::common::types::cardano::ada_value", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::common::types::cardano::asset_name" [label="pub(crate) mod|service::common::types::cardano::asset_name", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::common::types::cardano::asset_value" [label="pub(crate) mod|service::common::types::cardano::asset_value", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::common::types::cardano::catalyst_id" [label="pub(crate) mod|service::common::types::cardano::catalyst_id", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::common::types::cardano::cip19_shelley_address" [label="pub(crate) mod|service::common::types::cardano::cip19_shelley_address", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::common::types::cardano::cip19_stake_address" [label="pub(crate) mod|service::common::types::cardano::cip19_stake_address", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::common::types::cardano::hash28" [label="pub(crate) mod|service::common::types::cardano::hash28", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::common::types::cardano::nonce" [label="pub(crate) mod|service::common::types::cardano::nonce", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::common::types::cardano::query" [label="pub(crate) mod|service::common::types::cardano::query", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::common::types::cardano::query::as_at" [label="pub(crate) mod|service::common::types::cardano::query::as_at", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::common::types::cardano::query::cat_id_or_stake" [label="pub(crate) mod|service::common::types::cardano::query::cat_id_or_stake", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::common::types::cardano::query::stake_or_voter" [label="pub(crate) mod|service::common::types::cardano::query::stake_or_voter", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::common::types::cardano::registration_list" [label="pub(crate) mod|service::common::types::cardano::registration_list", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::common::types::cardano::slot_no" [label="pub(crate) mod|service::common::types::cardano::slot_no", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::common::types::cardano::slot_tx_idx" [label="pub(crate) mod|service::common::types::cardano::slot_tx_idx", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::common::types::cardano::transaction_id" [label="pub(crate) mod|service::common::types::cardano::transaction_id", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::common::types::cardano::txn_index" [label="pub(crate) mod|service::common::types::cardano::txn_index", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::common::types::document" [label="pub(crate) mod|service::common::types::document", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::common::types::document::doc_ref" [label="pub(crate) mod|service::common::types::document::doc_ref", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::common::types::document::doc_type" [label="pub(crate) mod|service::common::types::document::doc_type", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::common::types::document::id" [label="pub(crate) mod|service::common::types::document::id", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::common::types::document::ver" [label="pub(crate) mod|service::common::types::document::ver", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::common::types::generic" [label="pub(crate) mod|service::common::types::generic", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::common::types::generic::boolean" [label="pub(crate) mod|service::common::types::generic::boolean", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::common::types::generic::date_time" [label="pub(crate) mod|service::common::types::generic::date_time", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::common::types::generic::ed25519_public_key" [label="pub(crate) mod|service::common::types::generic::ed25519_public_key", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::common::types::generic::error_list" [label="pub(crate) mod|service::common::types::generic::error_list", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::common::types::generic::error_msg" [label="pub(crate) mod|service::common::types::generic::error_msg", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::common::types::generic::error_uuid" [label="pub(crate) mod|service::common::types::generic::error_uuid", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::common::types::generic::query" [label="pub(crate) mod|service::common::types::generic::query", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::common::types::generic::query::pagination" [label="pub(crate) mod|service::common::types::generic::query::pagination", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::common::types::generic::url" [label="pub(crate) mod|service::common::types::generic::url", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::common::types::generic::uuidv4" [label="pub(crate) mod|service::common::types::generic::uuidv4", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::common::types::generic::uuidv7" [label="pub(crate) mod|service::common::types::generic::uuidv7", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::common::types::headers" [label="pub(crate) mod|service::common::types::headers", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::common::types::headers::access_control_allow_origin" [label="pub(crate) mod|service::common::types::headers::access_control_allow_origin", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::common::types::headers::ratelimit" [label="pub(crate) mod|service::common::types::headers::ratelimit", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::common::types::headers::retry_after" [label="pub(crate) mod|service::common::types::headers::retry_after", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::common::types::payload" [label="pub(crate) mod|service::common::types::payload", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::common::types::payload::cbor" [label="pub(crate) mod|service::common::types::payload::cbor", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::common::types::string_types" [label="pub(crate) mod|service::common::types::string_types", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::docs" [label="pub(self) mod|service::docs", fillcolor="#db5367"]; // "mod" node
+    "cat_gateway::service::docs::stoplight_elements" [label="pub(self) mod|service::docs::stoplight_elements", fillcolor="#db5367"]; // "mod" node
+    "cat_gateway::service::poem_service" [label="pub(self) mod|service::poem_service", fillcolor="#db5367"]; // "mod" node
+    "cat_gateway::service::utilities" [label="pub(crate) mod|service::utilities", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::utilities::catch_panic" [label="pub(crate) mod|service::utilities::catch_panic", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::utilities::convert" [label="pub(crate) mod|service::utilities::convert", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::utilities::health" [label="pub(crate) mod|service::utilities::health", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::utilities::health::live" [label="pub(self) mod|service::utilities::health::live", fillcolor="#db5367"]; // "mod" node
+    "cat_gateway::service::utilities::json" [label="pub(crate) mod|service::utilities::json", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::utilities::middleware" [label="pub(crate) mod|service::utilities::middleware", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::utilities::middleware::schema_validation" [label="pub(crate) mod|service::utilities::middleware::schema_validation", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::utilities::middleware::tracing_mw" [label="pub(crate) mod|service::utilities::middleware::tracing_mw", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::utilities::net" [label="pub(crate) mod|service::utilities::net", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::settings" [label="pub(crate) mod|settings", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::settings::cassandra_db" [label="pub(crate) mod|settings::cassandra_db", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::settings::chain_follower" [label="pub(crate) mod|settings::chain_follower", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::settings::signed_doc" [label="pub(crate) mod|settings::signed_doc", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::settings::str_env_var" [label="pub(self) mod|settings::str_env_var", fillcolor="#db5367"]; // "mod" node
+    "cat_gateway::utils" [label="pub(crate) mod|utils", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::utils::blake2b_hash" [label="pub(crate) mod|utils::blake2b_hash", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::utils::ed25519" [label="pub(crate) mod|utils::ed25519", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::utils::schema" [label="pub(crate) mod|utils::schema", fillcolor="#f8c04c"]; // "mod" node
+
+    "cat_gateway" -> "cat_gateway::build_info" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway" -> "cat_gateway::cardano" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway" -> "cat_gateway::cli" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway" -> "cat_gateway::db" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway" -> "cat_gateway::jinja" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway" -> "cat_gateway::logger" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway" -> "cat_gateway::metrics" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway" -> "cat_gateway::service" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway" -> "cat_gateway::settings" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway" -> "cat_gateway::utils" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::cardano" -> "cat_gateway::cardano::event" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::cardano" -> "cat_gateway::cardano::util" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::db" -> "cat_gateway::db::event" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::db" -> "cat_gateway::db::index" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::db" -> "cat_gateway::db::types" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::db::event" -> "cat_gateway::db::event::common" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::db::event" -> "cat_gateway::db::event::config" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::db::event" -> "cat_gateway::db::event::error" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::db::event" -> "cat_gateway::db::event::schema_check" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::db::event" -> "cat_gateway::db::event::signed_docs" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::db::event::common" -> "cat_gateway::db::event::common::eq_or_ranged_uuid" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::db::event::common" -> "cat_gateway::db::event::common::query_limits" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::db::event::config" -> "cat_gateway::db::event::config::key" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::db::event::signed_docs" -> "cat_gateway::db::event::signed_docs::doc_ref" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::db::event::signed_docs" -> "cat_gateway::db::event::signed_docs::full_signed_doc" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::db::event::signed_docs" -> "cat_gateway::db::event::signed_docs::query_filter" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::db::event::signed_docs" -> "cat_gateway::db::event::signed_docs::signed_doc_body" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::db::index" -> "cat_gateway::db::index::block" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::db::index" -> "cat_gateway::db::index::queries" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::db::index" -> "cat_gateway::db::index::schema" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::db::index" -> "cat_gateway::db::index::session" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::db::index::block" -> "cat_gateway::db::index::block::certs" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::db::index::block" -> "cat_gateway::db::index::block::cip36" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::db::index::block" -> "cat_gateway::db::index::block::rbac509" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::db::index::block" -> "cat_gateway::db::index::block::roll_forward" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::db::index::block" -> "cat_gateway::db::index::block::txi" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::db::index::block" -> "cat_gateway::db::index::block::txo" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::db::index::block::cip36" -> "cat_gateway::db::index::block::cip36::insert_cip36" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::db::index::block::cip36" -> "cat_gateway::db::index::block::cip36::insert_cip36_for_vote_key" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::db::index::block::cip36" -> "cat_gateway::db::index::block::cip36::insert_cip36_invalid" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::db::index::block::rbac509" -> "cat_gateway::db::index::block::rbac509::insert_catalyst_id_for_stake_address" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::db::index::block::rbac509" -> "cat_gateway::db::index::block::rbac509::insert_catalyst_id_for_txn_id" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::db::index::block::rbac509" -> "cat_gateway::db::index::block::rbac509::insert_rbac509" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::db::index::block::rbac509" -> "cat_gateway::db::index::block::rbac509::insert_rbac509_invalid" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::db::index::block::txo" -> "cat_gateway::db::index::block::txo::insert_txo" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::db::index::block::txo" -> "cat_gateway::db::index::block::txo::insert_txo_asset" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::db::index::block::txo" -> "cat_gateway::db::index::block::txo::insert_unstaked_txo" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::db::index::block::txo" -> "cat_gateway::db::index::block::txo::insert_unstaked_txo_asset" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::db::index::queries" -> "cat_gateway::db::index::queries::purge" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::db::index::queries" -> "cat_gateway::db::index::queries::rbac" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::db::index::queries" -> "cat_gateway::db::index::queries::registrations" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::db::index::queries" -> "cat_gateway::db::index::queries::staked_ada" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::db::index::queries" -> "cat_gateway::db::index::queries::sync_status" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::db::index::queries::purge" -> "cat_gateway::db::index::queries::purge::catalyst_id_for_stake_address" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::db::index::queries::purge" -> "cat_gateway::db::index::queries::purge::catalyst_id_for_txn_id" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::db::index::queries::purge" -> "cat_gateway::db::index::queries::purge::cip36_registration" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::db::index::queries::purge" -> "cat_gateway::db::index::queries::purge::cip36_registration_for_vote_key" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::db::index::queries::purge" -> "cat_gateway::db::index::queries::purge::cip36_registration_invalid" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::db::index::queries::purge" -> "cat_gateway::db::index::queries::purge::rbac509_invalid_registration" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::db::index::queries::purge" -> "cat_gateway::db::index::queries::purge::rbac509_registration" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::db::index::queries::purge" -> "cat_gateway::db::index::queries::purge::stake_registration" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::db::index::queries::purge" -> "cat_gateway::db::index::queries::purge::txi_by_hash" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::db::index::queries::purge" -> "cat_gateway::db::index::queries::purge::txo_ada" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::db::index::queries::purge" -> "cat_gateway::db::index::queries::purge::txo_assets" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::db::index::queries::purge" -> "cat_gateway::db::index::queries::purge::unstaked_txo_ada" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::db::index::queries::purge" -> "cat_gateway::db::index::queries::purge::unstaked_txo_assets" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::db::index::queries::purge::catalyst_id_for_stake_address" -> "cat_gateway::db::index::queries::purge::catalyst_id_for_stake_address::result" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::db::index::queries::purge::catalyst_id_for_txn_id" -> "cat_gateway::db::index::queries::purge::catalyst_id_for_txn_id::result" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::db::index::queries::purge::cip36_registration" -> "cat_gateway::db::index::queries::purge::cip36_registration::result" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::db::index::queries::purge::cip36_registration_for_vote_key" -> "cat_gateway::db::index::queries::purge::cip36_registration_for_vote_key::result" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::db::index::queries::purge::cip36_registration_invalid" -> "cat_gateway::db::index::queries::purge::cip36_registration_invalid::result" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::db::index::queries::purge::rbac509_invalid_registration" -> "cat_gateway::db::index::queries::purge::rbac509_invalid_registration::result" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::db::index::queries::purge::rbac509_registration" -> "cat_gateway::db::index::queries::purge::rbac509_registration::result" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::db::index::queries::purge::stake_registration" -> "cat_gateway::db::index::queries::purge::stake_registration::result" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::db::index::queries::purge::txi_by_hash" -> "cat_gateway::db::index::queries::purge::txi_by_hash::result" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::db::index::queries::purge::txo_ada" -> "cat_gateway::db::index::queries::purge::txo_ada::result" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::db::index::queries::purge::txo_assets" -> "cat_gateway::db::index::queries::purge::txo_assets::result" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::db::index::queries::purge::unstaked_txo_ada" -> "cat_gateway::db::index::queries::purge::unstaked_txo_ada::result" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::db::index::queries::purge::unstaked_txo_assets" -> "cat_gateway::db::index::queries::purge::unstaked_txo_assets::result" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::db::index::queries::rbac" -> "cat_gateway::db::index::queries::rbac::get_catalyst_id_from_stake_address" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::db::index::queries::rbac" -> "cat_gateway::db::index::queries::rbac::get_catalyst_id_from_transaction_id" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::db::index::queries::rbac" -> "cat_gateway::db::index::queries::rbac::get_rbac_invalid_registrations" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::db::index::queries::rbac" -> "cat_gateway::db::index::queries::rbac::get_rbac_registrations" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::db::index::queries::registrations" -> "cat_gateway::db::index::queries::registrations::get_all_invalids" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::db::index::queries::registrations" -> "cat_gateway::db::index::queries::registrations::get_all_registrations" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::db::index::queries::registrations" -> "cat_gateway::db::index::queries::registrations::get_from_stake_addr" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::db::index::queries::registrations" -> "cat_gateway::db::index::queries::registrations::get_from_stake_address" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::db::index::queries::registrations" -> "cat_gateway::db::index::queries::registrations::get_from_vote_key" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::db::index::queries::registrations" -> "cat_gateway::db::index::queries::registrations::get_invalid" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::db::index::queries::staked_ada" -> "cat_gateway::db::index::queries::staked_ada::get_assets_by_stake_address" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::db::index::queries::staked_ada" -> "cat_gateway::db::index::queries::staked_ada::get_txi_by_txn_hash" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::db::index::queries::staked_ada" -> "cat_gateway::db::index::queries::staked_ada::get_txo_by_stake_address" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::db::index::queries::staked_ada" -> "cat_gateway::db::index::queries::staked_ada::update_txo_spent" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::db::index::queries::sync_status" -> "cat_gateway::db::index::queries::sync_status::get" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::db::index::queries::sync_status" -> "cat_gateway::db::index::queries::sync_status::update" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::db::index::queries::sync_status::update" -> "cat_gateway::db::index::queries::sync_status::update::row" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::db::types" -> "cat_gateway::db::types::catalyst_id" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::db::types" -> "cat_gateway::db::types::public_key" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::db::types" -> "cat_gateway::db::types::slot" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::db::types" -> "cat_gateway::db::types::stake_address" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::db::types" -> "cat_gateway::db::types::transaction_id" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::db::types" -> "cat_gateway::db::types::transaction_index" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::db::types" -> "cat_gateway::db::types::txn_output_offset" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::db::types" -> "cat_gateway::db::types::uuidv4" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::metrics" -> "cat_gateway::metrics::chain_follower" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::metrics" -> "cat_gateway::metrics::chain_indexer" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::metrics" -> "cat_gateway::metrics::endpoint" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::metrics" -> "cat_gateway::metrics::memory" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::metrics::chain_follower" -> "cat_gateway::metrics::chain_follower::reporter" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::metrics::chain_indexer" -> "cat_gateway::metrics::chain_indexer::reporter" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::metrics::memory" -> "cat_gateway::metrics::memory::reporter" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service" -> "cat_gateway::service::api" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service" -> "cat_gateway::service::common" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service" -> "cat_gateway::service::docs" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service" -> "cat_gateway::service::poem_service" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service" -> "cat_gateway::service::utilities" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::api" -> "cat_gateway::service::api::cardano" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::api" -> "cat_gateway::service::api::config" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::api" -> "cat_gateway::service::api::documents" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::api" -> "cat_gateway::service::api::health" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::api::cardano" -> "cat_gateway::service::api::cardano::cip36" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::api::cardano" -> "cat_gateway::service::api::cardano::rbac" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::api::cardano" -> "cat_gateway::service::api::cardano::staking" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::api::cardano::cip36" -> "cat_gateway::service::api::cardano::cip36::endpoint" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::api::cardano::cip36" -> "cat_gateway::service::api::cardano::cip36::filter" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::api::cardano::cip36" -> "cat_gateway::service::api::cardano::cip36::response" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::api::cardano::rbac" -> "cat_gateway::service::api::cardano::rbac::registrations_get" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::api::cardano::rbac::registrations_get" -> "cat_gateway::service::api::cardano::rbac::registrations_get::binary_data" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::api::cardano::rbac::registrations_get" -> "cat_gateway::service::api::cardano::rbac::registrations_get::chain_info" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::api::cardano::rbac::registrations_get" -> "cat_gateway::service::api::cardano::rbac::registrations_get::extended_data" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::api::cardano::rbac::registrations_get" -> "cat_gateway::service::api::cardano::rbac::registrations_get::key_data" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::api::cardano::rbac::registrations_get" -> "cat_gateway::service::api::cardano::rbac::registrations_get::key_data_list" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::api::cardano::rbac::registrations_get" -> "cat_gateway::service::api::cardano::rbac::registrations_get::key_type" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::api::cardano::rbac::registrations_get" -> "cat_gateway::service::api::cardano::rbac::registrations_get::payment_data" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::api::cardano::rbac::registrations_get" -> "cat_gateway::service::api::cardano::rbac::registrations_get::payment_data_list" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::api::cardano::rbac::registrations_get" -> "cat_gateway::service::api::cardano::rbac::registrations_get::purpose_list" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::api::cardano::rbac::registrations_get" -> "cat_gateway::service::api::cardano::rbac::registrations_get::registration_chain" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::api::cardano::rbac::registrations_get" -> "cat_gateway::service::api::cardano::rbac::registrations_get::response" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::api::cardano::rbac::registrations_get" -> "cat_gateway::service::api::cardano::rbac::registrations_get::role_data" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::api::cardano::rbac::registrations_get" -> "cat_gateway::service::api::cardano::rbac::registrations_get::role_map" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::api::cardano::rbac::registrations_get" -> "cat_gateway::service::api::cardano::rbac::registrations_get::unprocessable_content" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::api::cardano::staking" -> "cat_gateway::service::api::cardano::staking::assets_get" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::api::documents" -> "cat_gateway::service::api::documents::get_document" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::api::documents" -> "cat_gateway::service::api::documents::post_document_index_query" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::api::documents" -> "cat_gateway::service::api::documents::put_document" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::api::documents" -> "cat_gateway::service::api::documents::templates" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::api::documents::post_document_index_query" -> "cat_gateway::service::api::documents::post_document_index_query::query_filter" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::api::documents::post_document_index_query" -> "cat_gateway::service::api::documents::post_document_index_query::response" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::api::documents::put_document" -> "cat_gateway::service::api::documents::put_document::unprocessable_content_request" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::api::documents::templates" -> "cat_gateway::service::api::documents::templates::data" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::api::health" -> "cat_gateway::service::api::health::inspection_get" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::api::health" -> "cat_gateway::service::api::health::live_get" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::api::health" -> "cat_gateway::service::api::health::ready_get" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::api::health" -> "cat_gateway::service::api::health::started_get" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common" -> "cat_gateway::service::common::auth" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common" -> "cat_gateway::service::common::objects" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common" -> "cat_gateway::service::common::responses" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common" -> "cat_gateway::service::common::tags" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common" -> "cat_gateway::service::common::types" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common::auth" -> "cat_gateway::service::common::auth::api_key" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common::auth" -> "cat_gateway::service::common::auth::none" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common::auth" -> "cat_gateway::service::common::auth::none_or_api_key" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common::auth" -> "cat_gateway::service::common::auth::none_or_rbac" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common::auth" -> "cat_gateway::service::common::auth::rbac" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common::auth::rbac" -> "cat_gateway::service::common::auth::rbac::scheme" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common::auth::rbac" -> "cat_gateway::service::common::auth::rbac::token" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common::objects" -> "cat_gateway::service::common::objects::cardano" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common::objects" -> "cat_gateway::service::common::objects::config" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common::objects" -> "cat_gateway::service::common::objects::document" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common::objects" -> "cat_gateway::service::common::objects::generic" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common::objects::cardano" -> "cat_gateway::service::common::objects::cardano::hash" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common::objects::cardano" -> "cat_gateway::service::common::objects::cardano::network" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common::objects::cardano" -> "cat_gateway::service::common::objects::cardano::slot_info" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common::objects::cardano" -> "cat_gateway::service::common::objects::cardano::stake_info" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common::objects::config" -> "cat_gateway::service::common::objects::config::environment" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common::objects::config" -> "cat_gateway::service::common::objects::config::frontend_config" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common::objects::config" -> "cat_gateway::service::common::objects::config::version" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common::objects::generic" -> "cat_gateway::service::common::objects::generic::json_object" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common::objects::generic" -> "cat_gateway::service::common::objects::generic::pagination" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common::responses" -> "cat_gateway::service::common::responses::code_401_unauthorized" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common::responses" -> "cat_gateway::service::common::responses::code_403_forbidden" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common::responses" -> "cat_gateway::service::common::responses::code_412_precondition_failed" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common::responses" -> "cat_gateway::service::common::responses::code_429_too_many_requests" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common::responses" -> "cat_gateway::service::common::responses::code_500_internal_server_error" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common::responses" -> "cat_gateway::service::common::responses::code_503_service_unavailable" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common::types" -> "cat_gateway::service::common::types::array_types" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common::types" -> "cat_gateway::service::common::types::cardano" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common::types" -> "cat_gateway::service::common::types::document" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common::types" -> "cat_gateway::service::common::types::generic" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common::types" -> "cat_gateway::service::common::types::headers" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common::types" -> "cat_gateway::service::common::types::payload" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common::types" -> "cat_gateway::service::common::types::string_types" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common::types::cardano" -> "cat_gateway::service::common::types::cardano::ada_value" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common::types::cardano" -> "cat_gateway::service::common::types::cardano::asset_name" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common::types::cardano" -> "cat_gateway::service::common::types::cardano::asset_value" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common::types::cardano" -> "cat_gateway::service::common::types::cardano::catalyst_id" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common::types::cardano" -> "cat_gateway::service::common::types::cardano::cip19_shelley_address" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common::types::cardano" -> "cat_gateway::service::common::types::cardano::cip19_stake_address" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common::types::cardano" -> "cat_gateway::service::common::types::cardano::hash28" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common::types::cardano" -> "cat_gateway::service::common::types::cardano::nonce" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common::types::cardano" -> "cat_gateway::service::common::types::cardano::query" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common::types::cardano" -> "cat_gateway::service::common::types::cardano::registration_list" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common::types::cardano" -> "cat_gateway::service::common::types::cardano::slot_no" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common::types::cardano" -> "cat_gateway::service::common::types::cardano::slot_tx_idx" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common::types::cardano" -> "cat_gateway::service::common::types::cardano::transaction_id" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common::types::cardano" -> "cat_gateway::service::common::types::cardano::txn_index" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common::types::cardano::query" -> "cat_gateway::service::common::types::cardano::query::as_at" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common::types::cardano::query" -> "cat_gateway::service::common::types::cardano::query::cat_id_or_stake" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common::types::cardano::query" -> "cat_gateway::service::common::types::cardano::query::stake_or_voter" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common::types::document" -> "cat_gateway::service::common::types::document::doc_ref" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common::types::document" -> "cat_gateway::service::common::types::document::doc_type" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common::types::document" -> "cat_gateway::service::common::types::document::id" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common::types::document" -> "cat_gateway::service::common::types::document::ver" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common::types::generic" -> "cat_gateway::service::common::types::generic::boolean" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common::types::generic" -> "cat_gateway::service::common::types::generic::date_time" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common::types::generic" -> "cat_gateway::service::common::types::generic::ed25519_public_key" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common::types::generic" -> "cat_gateway::service::common::types::generic::error_list" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common::types::generic" -> "cat_gateway::service::common::types::generic::error_msg" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common::types::generic" -> "cat_gateway::service::common::types::generic::error_uuid" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common::types::generic" -> "cat_gateway::service::common::types::generic::query" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common::types::generic" -> "cat_gateway::service::common::types::generic::url" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common::types::generic" -> "cat_gateway::service::common::types::generic::uuidv4" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common::types::generic" -> "cat_gateway::service::common::types::generic::uuidv7" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common::types::generic::query" -> "cat_gateway::service::common::types::generic::query::pagination" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common::types::headers" -> "cat_gateway::service::common::types::headers::access_control_allow_origin" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common::types::headers" -> "cat_gateway::service::common::types::headers::ratelimit" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common::types::headers" -> "cat_gateway::service::common::types::headers::retry_after" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common::types::payload" -> "cat_gateway::service::common::types::payload::cbor" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::docs" -> "cat_gateway::service::docs::stoplight_elements" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::utilities" -> "cat_gateway::service::utilities::catch_panic" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::utilities" -> "cat_gateway::service::utilities::convert" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::utilities" -> "cat_gateway::service::utilities::health" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::utilities" -> "cat_gateway::service::utilities::json" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::utilities" -> "cat_gateway::service::utilities::middleware" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::utilities" -> "cat_gateway::service::utilities::net" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::utilities::health" -> "cat_gateway::service::utilities::health::live" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::utilities::middleware" -> "cat_gateway::service::utilities::middleware::schema_validation" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::utilities::middleware" -> "cat_gateway::service::utilities::middleware::tracing_mw" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::settings" -> "cat_gateway::settings::cassandra_db" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::settings" -> "cat_gateway::settings::chain_follower" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::settings" -> "cat_gateway::settings::signed_doc" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::settings" -> "cat_gateway::settings::str_env_var" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::utils" -> "cat_gateway::utils::blake2b_hash" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::utils" -> "cat_gateway::utils::ed25519" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::utils" -> "cat_gateway::utils::schema" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+
+}
