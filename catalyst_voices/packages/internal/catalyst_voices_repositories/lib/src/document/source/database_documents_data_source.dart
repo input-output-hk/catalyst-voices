@@ -29,6 +29,13 @@ final class DatabaseDocumentsDataSource
   }
 
   @override
+  Future<List<DocumentData>> getAll({required DocumentRef ref}) {
+    return _database.documentsDao
+        .queryAll(ref: ref)
+        .then((value) => value.map((e) => e.toModel()).toList());
+  }
+
+  @override
   Future<DocumentData?> getLatest({
     CatalystId? authorId,
   }) {
