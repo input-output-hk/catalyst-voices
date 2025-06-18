@@ -2,14 +2,16 @@ import 'dart:async';
 
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/pages/proposal_builder/appbar/widget/proposal_builder_menu_item.dart';
+import 'package:catalyst_voices/widgets/modals/proposals/forget_proposal_dialog.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/proposal_builder_delete_confirmation_dialog.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart'
-    show ProposalBuilderMenuItemData, ProposalMenuItemAction;
+    show DocumentVersion, ProposalBuilderMenuItemData, ProposalMenuItemAction;
 import 'package:flutter/material.dart';
 
 class ProposalBuilderStatusAction extends StatelessWidget {
@@ -131,6 +133,28 @@ class _PopupMenuButtonState extends State<_PopupMenuButton> {
     context.read<ProposalBuilderBloc>().add(ExportProposalEvent(filePrefix: prefix));
   }
 
+  Future<void> _forgetProposal() async {
+    final state = context.read<ProposalBuilderBloc>().state;
+    final title = state.proposalTitle;
+    final publish = state.metadata.publish;
+    final latestVersion = state.metadata.latestVersion?.number;
+    final action = await ForgetProposalDialog.show(
+      context: context,
+      title: title ?? '',
+      version: latestVersion ?? DocumentVersion.firstNumber,
+      publish: publish,
+    );
+    if (action == null) return;
+    switch (action) {
+      case ExportProposalForgetAction():
+        _exportProposal();
+      case ForgetProposalForgetAction():
+        if (mounted) {
+          context.read<ProposalBuilderBloc>().add(const ForgetProposalBuilderEvent());
+        }
+    }
+  }
+
   void _onSelected(ProposalMenuItemAction item) {
     switch (item) {
       case ProposalMenuItemAction.publish:
@@ -141,6 +165,8 @@ class _PopupMenuButtonState extends State<_PopupMenuButton> {
         _exportProposal();
       case ProposalMenuItemAction.delete:
         unawaited(_deleteProposal());
+      case ProposalMenuItemAction.forget:
+        unawaited(_forgetProposal());
       case _:
         break;
     }
