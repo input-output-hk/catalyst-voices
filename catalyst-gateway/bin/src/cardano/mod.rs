@@ -622,8 +622,8 @@ impl SyncTask {
                 if !immutable_follower_has_first_reached_tip() {
                     info!("Follower has reached IMMUTABLE TIP for the first time");
                     set_follower_immutable_first_reached_tip();
-                    self.dispatch_event(event::ChainIndexerEvent::SyncImmutableChainCompleted);
                 }
+                self.dispatch_event(event::ChainIndexerEvent::SyncImmutableChainCompleted);
 
                 // Purge data up to this slot
                 // Slots arithmetic has saturating semantic, so this is ok.
