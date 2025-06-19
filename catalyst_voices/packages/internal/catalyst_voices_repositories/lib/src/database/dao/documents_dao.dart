@@ -40,7 +40,7 @@ abstract interface class DocumentsDao {
   });
 
   /// Deletes all documents. Cascades to metadata.
-  Future<void> deleteAll();
+  Future<int> deleteAll();
 
   /// If version is specified in [ref] returns this version or null.
   /// Returns newest version with matching id or null of none found.
@@ -48,7 +48,12 @@ abstract interface class DocumentsDao {
 
   /// Returns all entities. If same document have different versions
   /// all will be returned.
-  Future<List<DocumentEntity>> queryAll({DocumentType? type});
+  ///
+  /// Optionally matching [ref] or [type].
+  Future<List<DocumentEntity>> queryAll({
+    DocumentRef? ref,
+    DocumentType? type,
+  });
 
   /// Returns all known document refs.
   Future<List<TypedDocumentRef>> queryAllTypedRefs();
@@ -169,12 +174,14 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
   }
 
   @override
-  Future<void> deleteAll() async {
+  Future<int> deleteAll() async {
     final deletedRows = await delete(documents).go();
 
     if (kDebugMode) {
       debugPrint('DocumentsDao: Deleted[$deletedRows] rows');
     }
+
+    return deletedRows;
   }
 
   @override
@@ -183,8 +190,15 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
   }
 
   @override
-  Future<List<DocumentEntity>> queryAll({DocumentType? type}) {
+  Future<List<DocumentEntity>> queryAll({
+    DocumentRef? ref,
+    DocumentType? type,
+  }) {
     final query = select(documents);
+
+    if (ref != null) {
+      query.where((tbl) => _filterRef(tbl, ref, filterVersion: false));
+    }
     if (type != null) {
       query.where((doc) => doc.type.equals(type.uuid));
     }

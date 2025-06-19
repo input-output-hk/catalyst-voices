@@ -5,6 +5,9 @@
     "description": "Schema for the F14 Cardano Open: Developers",
     "maintainers": [{ "name": "Catalyst Team", "url": "https://projectcatalyst.io/" }],
     "x-changelog": {
+        "2025-06-18": [
+            "Added maximum constraint for milestone cost."
+        ],
         "2025-06-02": [
             "Adding category questions"
         ]
@@ -257,7 +260,7 @@
                             "$ref": "#/definitions/singleLineTextEntry",
                             "title": "Please provide your proposal title",
                             "description": "**Proposal title**\n\nPlease note we suggest you use no more than 60 characters for your proposal title so that it can be easily viewed in the voting app.",
-                            "minLength": 1,
+                            "minLength": 3,
                             "maxLength": 60,
                             "x-guidance": "This is the first detail about your proposal that voters see so it should clearly express what the proposal is about. A clear, unambiguous, and concise title is very important.",
                             "x-placeholder": "Summarize your proposal in 60 characters or less"
@@ -306,7 +309,7 @@
                                 "properties": {
                                     "name": {
                                         "type": "string",
-                                        "title": "Enter the names of co-proposers or additional applicants",
+                                        "title": "Full Name",
                                         "description": "Full name of the co-proposer",
                                         "minLength": 2,
                                         "maxLength": 100
@@ -342,7 +345,7 @@
                             "$ref": "#/definitions/tokenValueCardanoADA",
                             "title": "Enter the amount of funding you are requesting in ADA",
                             "description": "The amount of funding requested for your proposal",
-                            "x-guidance": "Each funding category has a minimum and maximum amount of funding a single proposal can request.\n\nMinimum Funding Amount per proposal:\n\n- Cardano Use Cases: Concepts: **₳250k**\n- Cardano Uses Cases: Concepts: **₳15K**\n- Cardano Open: Developers: **₳15K**\n- Cardano Open: Ecosystem: **₳15K**\n\nMaximum Funding Amount per proposal:\n\n- Cardano Use Cases: Concepts: **₳1M**\n- Cardano Uses Cases: Concepts: **₳100K**\n- Cardano Open: Developers: **₳100K**\n- Cardano Open: Ecosystem: **₳60K**",
+                            "x-guidance": "Each funding category has a minimum and maximum amount of funding a single proposal can request.\n\n**Cardano Open: Developers**\nMinimum Funding Amount per proposal: **₳15K**\nMaximum Funding Amount per proposal: **₳100K**",
                             "x-placeholder": "Enter the amount of funding you are requesting in ADA",
                             "minimum": 15000,
                             "maximum": 100000
@@ -955,7 +958,8 @@
                                         "$ref": "#/definitions/tokenValueCardanoADA",
                                         "title": "Cost",
                                         "description": "The cost of this milestone in ADA",
-                                        "x-placeholder": "Enter the cost associated with this milestone"
+                                        "x-placeholder": "Enter the cost associated with this milestone",
+                                        "maximum": 100000
                                     },
                                     "progress": {
                                         "$ref": "#/definitions/dropDownSingleSelect",

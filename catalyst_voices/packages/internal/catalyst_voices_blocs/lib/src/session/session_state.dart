@@ -72,6 +72,8 @@ final class SessionState extends Equatable {
 
   bool get isGuest => status == SessionStatus.guest;
 
+  bool get isProposerUnlock => isActive && (account?.isProposer ?? false);
+
   bool get isVisitor => status == SessionStatus.visitor;
 
   @override

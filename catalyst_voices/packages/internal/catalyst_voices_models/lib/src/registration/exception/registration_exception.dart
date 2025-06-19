@@ -42,6 +42,14 @@ final class RegistrationTransactionException extends RegistrationException {
   String toString() => 'RegistrationTransactionException';
 }
 
+/// An exception thrown when recovering registration but keychain was not found locally.
+final class RegistrationRecoverKeychainNotFoundException extends RegistrationException {
+  const RegistrationRecoverKeychainNotFoundException();
+
+  @override
+  String toString() => 'RegistrationRecoverKeychainNotFoundException';
+}
+
 /// An exception thrown when attempting to register and the transaction fails.
 final class RegistrationUnknownException extends RegistrationException {
   const RegistrationUnknownException();

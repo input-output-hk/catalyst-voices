@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/routes/routing/proposal_builder_route.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_filled_button.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_outlined_button.dart';
@@ -19,32 +20,42 @@ class CreateNewProposalActionButtons extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return switch (step) {
-      CreateProposalWithPreselectedCategoryStep() => const Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            _AgreementCheckboxes(),
-            _StartProposalButton(),
-          ],
+    return Container(
+      decoration: BoxDecoration(
+        border: Border(
+          top: BorderSide(
+            color: context.colors.outlineBorderVariant,
+          ),
         ),
-      CreateProposalWithoutPreselectedCategoryStep(:final stage)
-          when stage == CreateProposalStage.selectCategory =>
-        const Row(
-          children: [
-            _AgreementCheckboxes(),
-            Spacer(),
-            _BackButton(),
-            SizedBox(width: 8),
-            _StartProposalButton(),
-          ],
-        ),
-      CreateProposalWithoutPreselectedCategoryStep() => const Row(
-          children: [
-            Spacer(),
-            _SelectCategoryButton(),
-          ],
-        ),
-    };
+      ),
+      padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
+      child: switch (step) {
+        CreateProposalWithPreselectedCategoryStep() => const Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              _AgreementCheckboxes(),
+              _StartProposalButton(),
+            ],
+          ),
+        CreateProposalWithoutPreselectedCategoryStep(:final stage)
+            when stage == CreateProposalStage.selectCategory =>
+          const Row(
+            children: [
+              _AgreementCheckboxes(),
+              Spacer(),
+              _BackButton(),
+              SizedBox(width: 8),
+              _StartProposalButton(),
+            ],
+          ),
+        CreateProposalWithoutPreselectedCategoryStep() => const Row(
+            children: [
+              Spacer(),
+              _SelectCategoryButton(),
+            ],
+          ),
+      },
+    );
   }
 }
 

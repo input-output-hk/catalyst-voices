@@ -2,9 +2,8 @@ import 'dart:async';
 
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/pages/proposal_builder/appbar/widget/proposal_builder_menu_item.dart';
+import 'package:catalyst_voices/widgets/modals/proposals/forget_proposal_dialog.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/proposal_builder_delete_confirmation_dialog.dart';
-import 'package:catalyst_voices/widgets/modals/proposals/publish_proposal_iteration_dialog.dart';
-import 'package:catalyst_voices/widgets/modals/proposals/submit_proposal_for_review_dialog.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
@@ -134,118 +133,46 @@ class _PopupMenuButtonState extends State<_PopupMenuButton> {
     context.read<ProposalBuilderBloc>().add(ExportProposalEvent(filePrefix: prefix));
   }
 
-  bool _isLocal(ProposalPublish publish, int iteration) {
-    return publish == ProposalPublish.localDraft && iteration == DocumentVersion.firstNumber;
+  Future<void> _forgetProposal() async {
+    final state = context.read<ProposalBuilderBloc>().state;
+    final title = state.proposalTitle;
+    final publish = state.metadata.publish;
+    final latestVersion = state.metadata.latestVersion?.number;
+    final action = await ForgetProposalDialog.show(
+      context: context,
+      title: title ?? '',
+      version: latestVersion ?? DocumentVersion.firstNumber,
+      publish: publish,
+    );
+    if (action == null) return;
+    switch (action) {
+      case ExportProposalForgetAction():
+        _exportProposal();
+      case ForgetProposalForgetAction():
+        if (mounted) {
+          context.read<ProposalBuilderBloc>().add(const ForgetProposalBuilderEvent());
+        }
+    }
   }
 
   void _onSelected(ProposalMenuItemAction item) {
     switch (item) {
       case ProposalMenuItemAction.publish:
-        unawaited(_publishIteration());
+        context.read<ProposalBuilderBloc>().add(const RequestPublishProposalEvent());
       case ProposalMenuItemAction.submit:
-        unawaited(_submitForReview());
+        context.read<ProposalBuilderBloc>().add(const RequestSubmitProposalEvent());
       case ProposalMenuItemAction.export:
         _exportProposal();
       case ProposalMenuItemAction.delete:
         unawaited(_deleteProposal());
+      case ProposalMenuItemAction.forget:
+        unawaited(_forgetProposal());
       case _:
         break;
     }
   }
 
-  Future<void> _publishIteration() async {
-    final bloc = context.read<ProposalBuilderBloc>();
-
-    if (!await bloc.isAccountEmailVerified()) {
-      bloc.emitSignal(const EmailNotVerifiedProposalBuilderSignal());
-      return;
-    }
-
-    if (!mounted || bloc.isClosed) {
-      return;
-    }
-
-    if (!bloc.validate(ProposalBuilderValidationOrigin.shareDraft)) {
-      return;
-    }
-
-    final state = bloc.state;
-    final proposalTitle = state.proposalTitle ?? context.l10n.proposalEditorStatusDropdownViewTitle;
-    final nextIteration = state.metadata.latestVersion?.number ?? DocumentVersion.firstNumber;
-
-    // if it's local draft and the first version then
-    // it should be shown as local which corresponds to null
-    final currentIteration =
-        _isLocal(state.metadata.publish, nextIteration) ? null : nextIteration - 1;
-
-    final shouldPublish = await PublishProposalIterationDialog.show(
-          context: context,
-          proposalTitle: proposalTitle,
-          currentIteration: currentIteration,
-          nextIteration: nextIteration,
-        ) ??
-        false;
-
-    if (shouldPublish) {
-      bloc.add(const PublishProposalEvent());
-    }
-  }
-
   void _showMenu() {
     _buttonKey.currentState?.showButtonMenu();
-  }
-
-  Future<void> _submitForReview() async {
-    final bloc = context.read<ProposalBuilderBloc>();
-
-    if (bloc.state.isMaxProposalsLimitReached) {
-      bloc.add(const MaxProposalsLimitReachedEvent());
-      return;
-    }
-
-    if (!bloc.validate(ProposalBuilderValidationOrigin.submitForReview)) {
-      return;
-    }
-
-    if (!await bloc.isAccountEmailVerified()) {
-      bloc.emitSignal(const EmailNotVerifiedProposalBuilderSignal());
-      return;
-    }
-
-    if (!mounted || bloc.isClosed) {
-      return;
-    }
-
-    final state = bloc.state;
-    final proposalTitle = state.proposalTitle ?? context.l10n.proposalEditorStatusDropdownViewTitle;
-    final latestVersion = state.metadata.latestVersion!;
-
-    final nextIteration = latestVersion.number;
-
-    final int? currentIteration;
-    if (_isLocal(state.metadata.publish, nextIteration)) {
-      // if it's local draft and the first version then
-      // it should be shown as local which corresponds to null
-      currentIteration = null;
-    } else if (state.metadata.publish == ProposalPublish.localDraft) {
-      // current iteration is a local draft
-      // so next iteration must increment the version
-      currentIteration = nextIteration - 1;
-    } else {
-      // only changing status of the iteration, no need to increment the version
-      currentIteration = nextIteration;
-    }
-
-    final shouldSubmit = await SubmitProposalForReviewDialog.show(
-          context: context,
-          proposalTitle: proposalTitle,
-          currentIteration: currentIteration,
-          nextIteration: nextIteration,
-        ) ??
-        false;
-
-    if (shouldSubmit) {
-      bloc.add(const SubmitProposalEvent());
-    }
   }
 }

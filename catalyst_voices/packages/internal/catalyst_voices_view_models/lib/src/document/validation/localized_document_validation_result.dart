@@ -104,14 +104,19 @@ final class LocalizedDocumentNumOutOfRange extends LocalizedDocumentValidationRe
 }
 
 final class LocalizedDocumentPatternMismatch extends LocalizedDocumentValidationResult {
-  const LocalizedDocumentPatternMismatch();
+  final DocumentPatternType patternType;
+
+  const LocalizedDocumentPatternMismatch({required this.patternType});
 
   @override
-  List<Object?> get props => [];
+  List<Object?> get props => [patternType];
 
   @override
   String? message(BuildContext context) {
-    return context.l10n.errorValidationPatternMismatch;
+    return switch (patternType) {
+      DocumentPatternType.generic => context.l10n.errorValidationPatternMismatch,
+      DocumentPatternType.https => context.l10n.errorValidationHttpsPatternMismatch
+    };
   }
 }
 
@@ -129,7 +134,9 @@ final class LocalizedDocumentStringOutOfRange extends LocalizedDocumentValidatio
     final max = range.max;
 
     if (min != null && max != null) {
-      return context.l10n.errorValidationStringLengthOutOfRange(min, max);
+      return min == max
+          ? context.l10n.errorValidationStringLengthOutOfExactRange(min)
+          : context.l10n.errorValidationStringLengthOutOfRange(min, max);
     } else if (min != null) {
       return context.l10n.errorValidationStringLengthBelowMin(min);
     } else if (max != null) {
@@ -162,7 +169,8 @@ sealed class LocalizedDocumentValidationResult extends Equatable {
         LocalizedDocumentConstValueMismatch(constValue: result.constValue),
       DocumentEnumValueMismatch() =>
         LocalizedDocumentEnumValuesMismatch(enumValues: result.enumValues),
-      DocumentPatternMismatch() => const LocalizedDocumentPatternMismatch(),
+      DocumentPatternMismatch(:final patternType) =>
+        LocalizedDocumentPatternMismatch(patternType: patternType),
     };
   }
 

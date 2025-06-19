@@ -5,6 +5,9 @@
     "description": "Schema for the F14 Catalyst Proposal Submission Form",
     "maintainers": [{ "name": "Catalyst Team", "url": "https://projectcatalyst.io/" }],
     "x-changelog": {
+        "2025-06-18": [
+            "Added maximum constraint for milestone cost."
+        ],
         "2025-05-28": [
             "Setting titles/description/placeholders/requirements according to generic proposal template requirements for F14"
         ],
@@ -1088,7 +1091,8 @@
                                         "$ref": "#/definitions/tokenValueCardanoADA",
                                         "title": "Cost",
                                         "description": "The cost of this milestone in ADA",
-                                        "x-placeholder": "Enter the cost associated with this milestone"
+                                        "x-placeholder": "Enter the cost associated with this milestone",
+                                        "maximum": 1000000
                                     },
                                     "progress": {
                                         "$ref": "#/definitions/dropDownSingleSelect",

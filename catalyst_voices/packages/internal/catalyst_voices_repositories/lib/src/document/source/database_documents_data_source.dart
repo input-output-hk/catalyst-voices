@@ -11,6 +11,9 @@ final class DatabaseDocumentsDataSource
   );
 
   @override
+  Future<int> deleteAll() => _database.documentsDao.deleteAll();
+
+  @override
   Future<bool> exists({required DocumentRef ref}) {
     return _database.documentsDao.count(ref: ref).then((count) => count > 0);
   }
@@ -23,6 +26,13 @@ final class DatabaseDocumentsDataSource
     }
 
     return entity.toModel();
+  }
+
+  @override
+  Future<List<DocumentData>> getAll({required DocumentRef ref}) {
+    return _database.documentsDao
+        .queryAll(ref: ref)
+        .then((value) => value.map((e) => e.toModel()).toList());
   }
 
   @override
