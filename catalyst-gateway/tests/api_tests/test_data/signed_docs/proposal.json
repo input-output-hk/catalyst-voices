@@ -73,7 +73,8 @@
     },
     "milestones": {
         "milestones": {
-            "milestone_list": [{
+            "milestone_list": [
+                {
                     "title": "Initial Setup and Planning",
                     "outputs": "Project infrastructure setup and detailed planning documents",
                     "acceptance_criteria": "- Development environment configured\n- Detailed project plan approved",
@@ -114,11 +115,5 @@
             "note": "This project provides excellent value for money by delivering essential developer tools..."
         }
     },
-    "agreements": {
-        "mandatory": {
-            "fund_rules": true,
-            "terms_and_conditions": true,
-            "privacy_policy": true
-        }
-    }
+    "agreements": {}
 }
