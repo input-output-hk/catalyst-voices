@@ -1,6 +1,6 @@
 //! Insert CIP36 Registration Query (Invalid Records)
 
-use std::{fmt::Debug, sync::Arc};
+use std::{fmt, sync::Arc};
 
 use cardano_blockchain_types::{Cip36, Slot, TxnIndex, VotingPubKey};
 use pallas::ledger::addresses::Address;
@@ -12,6 +12,7 @@ use crate::{
         index::queries::{PreparedQueries, SizedBatch},
         types::{DbSlot, DbTxnIndex},
     },
+    impl_query_batch,
     settings::cassandra_db,
 };
 
@@ -21,7 +22,7 @@ const INSERT_CIP36_REGISTRATION_INVALID_QUERY: &str =
 
 /// Insert CIP-36 Registration Invalid Query Parameters
 #[derive(SerializeRow, Clone)]
-pub(crate) struct Params {
+pub(crate) struct Cip36InvalidInsert {
     /// Full Stake Address (not hashed, 32 byte ED25519 Public key).
     stake_public_key: Vec<u8>,
     /// Slot Number the cert is in.
@@ -46,13 +47,15 @@ pub(crate) struct Params {
     problem_report: String,
 }
 
-impl Debug for Params {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl_query_batch!(Cip36InvalidInsert, INSERT_CIP36_REGISTRATION_INVALID_QUERY);
+
+impl fmt::Debug for Cip36InvalidInsert {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let cip36 = match self.cip36 {
             MaybeUnset::Unset => "UNSET",
             MaybeUnset::Set(v) => &format!("{v:?}"),
         };
-        f.debug_struct("Params")
+        f.debug_struct("Cip36InvalidInsert")
             .field("stake_public_key", &self.stake_public_key)
             .field("slot_no", &self.slot_no)
             .field("txn_index", &self.txn_index)
@@ -68,7 +71,7 @@ impl Debug for Params {
     }
 }
 
-impl Params {
+impl Cip36InvalidInsert {
     /// Create a new Insert Query.
     pub fn new(
         vote_key: Option<&VotingPubKey>, slot_no: Slot, txn_index: TxnIndex, cip36: &Cip36,
@@ -89,7 +92,7 @@ impl Params {
             String::new()
         });
 
-        Params {
+        Cip36InvalidInsert {
             stake_public_key,
             slot_no: slot_no.into(),
             txn_index: txn_index.into(),

@@ -152,15 +152,18 @@ impl PreparedQueries {
     ) -> anyhow::Result<Self> {
         // We initialize like this, so that all errors preparing querys get shown before aborting.
         Ok(Self {
-            select_txo_ada: txo_ada::PrimaryKeyQuery::prepare(&session).await?,
+            select_txo_ada: txo_ada::PrimaryKeyQuery::prepare(session.clone()).await?,
             delete_txo_ada: txo_ada::DeleteQuery::prepare_batch(&session, cfg).await?,
-            select_txo_assets: txo_assets::PrimaryKeyQuery::prepare(&session).await?,
+            select_txo_assets: txo_assets::PrimaryKeyQuery::prepare(&session.clone()).await?,
             delete_txo_assets: txo_assets::DeleteQuery::prepare_batch(&session, cfg).await?,
-            select_unstaked_txo_ada: unstaked_txo_ada::PrimaryKeyQuery::prepare(&session).await?,
+            select_unstaked_txo_ada: unstaked_txo_ada::PrimaryKeyQuery::prepare(&session.clone())
+                .await?,
             delete_unstaked_txo_ada: unstaked_txo_ada::DeleteQuery::prepare_batch(&session, cfg)
                 .await?,
-            select_unstaked_txo_assets: unstaked_txo_assets::PrimaryKeyQuery::prepare(&session)
-                .await?,
+            select_unstaked_txo_assets: unstaked_txo_assets::PrimaryKeyQuery::prepare(
+                &session.clone(),
+            )
+            .await?,
             delete_unstaked_txo_assets: unstaked_txo_assets::DeleteQuery::prepare_batch(
                 &session, cfg,
             )

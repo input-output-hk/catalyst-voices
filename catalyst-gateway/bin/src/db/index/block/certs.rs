@@ -1,6 +1,6 @@
 //! Index certs found in a transaction.
 
-use std::{fmt::Debug, sync::Arc};
+use std::{fmt, sync::Arc};
 
 use cardano_blockchain_types::{MultiEraBlock, Slot, StakeAddress, TxnIndex, VKeyHash};
 use ed25519_dalek::VerifyingKey;
@@ -16,6 +16,7 @@ use crate::{
         },
         types::{DbPublicKey, DbSlot, DbStakeAddress, DbTxnIndex},
     },
+    impl_query_batch,
     settings::cassandra_db,
 };
 
@@ -42,8 +43,8 @@ pub(crate) struct StakeRegistrationInsertQuery {
     pool_delegation: MaybeUnset<Vec<u8>>,
 }
 
-impl Debug for StakeRegistrationInsertQuery {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+impl fmt::Debug for StakeRegistrationInsertQuery {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let stake_public_key = hex::encode(self.stake_public_key.as_ref());
         let register = match self.register {
             MaybeUnset::Unset => "UNSET",
@@ -78,6 +79,11 @@ impl Debug for StakeRegistrationInsertQuery {
 
 /// Insert stake registration
 const INSERT_STAKE_REGISTRATION_QUERY: &str = include_str!("./cql/insert_stake_registration.cql");
+
+impl_query_batch!(
+    StakeRegistrationInsertQuery,
+    INSERT_STAKE_REGISTRATION_QUERY
+);
 
 impl StakeRegistrationInsertQuery {
     /// Create a new Insert Query.

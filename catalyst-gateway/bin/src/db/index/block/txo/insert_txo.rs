@@ -13,6 +13,7 @@ use crate::{
         index::queries::{PreparedQueries, SizedBatch},
         types::{DbSlot, DbStakeAddress, DbTransactionId, DbTxnIndex, DbTxnOutputOffset},
     },
+    impl_query_batch,
     settings::cassandra_db,
 };
 
@@ -22,7 +23,7 @@ const INSERT_TXO_QUERY: &str = include_str!("./cql/insert_txo.cql");
 /// Insert TXO Query Parameters
 /// (Superset of data to support both Staked and Unstaked TXO records.)
 #[derive(SerializeRow, Debug)]
-pub(crate) struct Params {
+pub(crate) struct TxoInsertQuery {
     /// Stake Address - Binary 29 bytes.
     stake_address: DbStakeAddress,
     /// Block Slot Number
@@ -39,7 +40,9 @@ pub(crate) struct Params {
     txn_hash: DbTransactionId,
 }
 
-impl Params {
+impl_query_batch!(TxoInsertQuery, INSERT_TXO_QUERY);
+
+impl TxoInsertQuery {
     /// Create a new record for this transaction.
     pub(crate) fn new(
         stake_address: StakeAddress, slot_no: Slot, txn_index: TxnIndex, txo: TxnOutputOffset,
